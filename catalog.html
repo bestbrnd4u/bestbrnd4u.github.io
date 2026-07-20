@@ -97,19 +97,16 @@ rel="stylesheet">
 </p>
 </div>
 
-<div class="catalog-layout">
-<aside class="catalog-sidebar">
-<h2>
-Фільтри
-</h2>
+<div class="catalog-filters-bar">
 
-<h3>Пошук</h3>
+<div class="filter-group filter-search">
 <input
 type="text"
 id="searchInput"
 placeholder="Пошук товару...">
+</div>
 
-<h3>Стать</h3>
+<div class="filter-group filter-gender">
 <div id="genderFilter" class="gender-filter">
 <button type="button" class="gender-pill" data-gender="">Всі</button>
 <button type="button" class="gender-pill" data-gender="Чоловікам">Чоловікам</button>
@@ -117,50 +114,51 @@ placeholder="Пошук товару...">
 <button type="button" class="gender-pill" data-gender="Унісекс">Унісекс</button>
 <button type="button" class="gender-pill" data-gender="Дітям">Дітям</button>
 </div>
-<p id="genderLockNote" class="gender-lock-note" hidden>
-🔒 Розділ обрано з меню.
-<a href="catalog.html">Показати все</a>
-</p>
+</div>
 
-<h3>Бренд</h3>
+<div class="filter-group">
 <select id="brandFilter">
 <option value="">Усі бренди</option>
 </select>
+</div>
 
-<h3>Ціна</h3>
+<div class="filter-group">
 <select id="priceFilter">
 <option value="">
-Будь-яка
+Будь-яка ціна
 </option>
-<option value="0-100">
-до 100$
+<option value="0-2000">
+до 2 000 ₴
 </option>
-<option value="100-250">
-100–250$
+<option value="2000-5000">
+2 000 – 5 000 ₴
 </option>
-<option value="250-500">
-250–500$
+<option value="5000-8000">
+5 000 – 8 000 ₴
 </option>
-<option value="500">
-від 500$
+<option value="8000">
+від 8 000 ₴
 </option>
 </select>
+</div>
 
-<h3>Сортування</h3>
+<div class="filter-group">
 <select id="sortSelect">
 <option value="">За замовчуванням</option>
 <option value="priceAsc">Ціна ↑</option>
 <option value="priceDesc">Ціна ↓</option>
-<option value="rating">Рейтинг</option>
 </select>
+</div>
 
 <button
 id="resetFilters"
-class="btn">
+class="btn btn-outline filter-reset">
 Скинути фільтри
 </button>
-</aside>
 
+</div>
+
+<div class="catalog-layout">
 <main>
 <div class="catalog-top">
 <p>

@@ -459,19 +459,54 @@ document.addEventListener("click", event => {
 
     if (buy) {
 
-        const productPage = buy.closest("#productPage");
+        const scope = buy.closest("#productPage") || buy.closest(".product-card, .favorite-row");
 
         let color = null;
         let size = null;
 
-        if (productPage) {
+        if (scope) {
 
-            color = productPage.querySelector(".color.active")?.dataset.color || null;
-            size = productPage.querySelector(".size.active")?.textContent.trim() || null;
+            color = scope.querySelector(".color.active")?.dataset.color
+                || scope.querySelector(".mini-color.active")?.dataset.color
+                || null;
+
+            size = scope.querySelector(".size.active")?.textContent.trim()
+                || scope.querySelector(".mini-size.active")?.textContent.trim()
+                || null;
 
         }
 
         addToCart(Number(buy.dataset.id), { color, size });
+
+        return;
+
+    }
+
+    const colorBtn = event.target.closest(".mini-color");
+
+    if (colorBtn) {
+
+        const group = colorBtn.closest(".product-colors");
+
+        group?.querySelectorAll(".mini-color").forEach(b => b.classList.remove("active"));
+
+        colorBtn.classList.add("active");
+
+        return;
+
+    }
+
+    const sizeBtn = event.target.closest(".mini-size");
+
+    if (sizeBtn) {
+
+        const group = sizeBtn.closest(".product-sizes");
+
+        group?.querySelectorAll(".mini-size").forEach(b => b.classList.remove("active"));
+
+        sizeBtn.classList.add("active");
+
+        return;
 
     }
 
@@ -500,6 +535,11 @@ document.addEventListener("click", function (e) {
 
     // Кнопка "Обране"
     if (e.target.closest(".favorite")) {
+        return;
+    }
+
+    // Вибір кольору/розміру на картці
+    if (e.target.closest(".product-options")) {
         return;
     }
 

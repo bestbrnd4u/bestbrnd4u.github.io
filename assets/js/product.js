@@ -82,13 +82,6 @@ function renderProduct(product) {
 
         </h1>
 
-        <div class="product-rating">
-
-            ⭐ ${product.rating}
-            <span>(${product.reviews} відгуків)</span>
-
-        </div>
-
         <div class="price-box">
 
             <span class="old-price">

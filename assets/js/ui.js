@@ -15,8 +15,6 @@ function createProductCard(product) {
 
     const image = product.images?.[0] || "assets/images/no-image.png";
 
-    const rating = product.rating ?? 0;
-    const reviews = product.reviews ?? 0;
     const brand = product.brand || "Без бренду";
 
     const oldPrice = product.oldPrice
@@ -26,6 +24,31 @@ function createProductCard(product) {
     const discount = product.oldPrice
         ? Math.round((1 - product.price / product.oldPrice) * 100)
         : 0;
+
+    const colors = [
+        { name: "Чорний", hex: "#000" },
+        { name: "Коричневий", hex: "#8b5e3c" },
+        { name: "Бежевий", hex: "#d9c7a1" }
+    ];
+
+    const sizes = ["S", "M", "L"];
+
+    const colorButtons = colors.map((color, index) => `
+        <button
+            type="button"
+            class="mini-color ${index === 0 ? "active" : ""}"
+            data-color="${color.name}"
+            title="${color.name}"
+            style="background:${color.hex}"></button>
+    `).join("");
+
+    const sizeButtons = sizes.map((size, index) => `
+        <button
+            type="button"
+            class="mini-size ${index === 0 ? "active" : ""}">
+            ${size}
+        </button>
+    `).join("");
 
     return `
         <div class="product-card" data-id="${product.id}">
@@ -52,9 +75,13 @@ function createProductCard(product) {
                 <div class="product-title">
                     ${product.title}
                 </div>
-                <div class="product-rating">
-                    ⭐ ${rating}
-                    (${reviews})
+                <div class="product-options">
+                    <div class="product-colors">
+                        ${colorButtons}
+                    </div>
+                    <div class="product-sizes">
+                        ${sizeButtons}
+                    </div>
                 </div>
                 <div class="product-price">
                     <div class="price-wrapper">

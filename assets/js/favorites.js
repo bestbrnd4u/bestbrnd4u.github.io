@@ -63,9 +63,6 @@ function createFavoriteRow(product) {
                 <a href="product.html?id=${product.id}" class="favorite-row-title">
                     ${product.title}
                 </a>
-                <div class="favorite-row-rating">
-                    ⭐ ${product.rating ?? 0} (${product.reviews ?? 0})
-                </div>
                 <div class="favorite-row-price">
                     ${oldPrice}
                     <span class="price">${formatPrice(product.price)}</span>

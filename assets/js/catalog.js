@@ -20,7 +20,6 @@ const gridViewBtn = document.getElementById("gridViewBtn");
 const listViewBtn = document.getElementById("listViewBtn");
 
 const genderFilterEl = document.getElementById("genderFilter");
-const genderLockNote = document.getElementById("genderLockNote");
 const breadcrumbsList = document.getElementById("breadcrumbsList");
 const catalogTitle = document.getElementById("catalogTitle");
 const catalogSubtitle = document.getElementById("catalogSubtitle");
@@ -28,10 +27,10 @@ const catalogSubtitle = document.getElementById("catalogSubtitle");
 const GENDERS = ["Чоловікам", "Жінкам", "Унісекс", "Дітям"];
 const SALE_MIN_DISCOUNT = 30; // % — мінімальна знижка для розділу "Акції"
 
-// поточний стан розділу, приходить з URL і далі не змінюється кліками
+// поточний стан розділу, приходить з URL; стать — лише початкове
+// значення фільтра, після завантаження сторінки завжди вільно змінюється
 let currentSection = ""; // "" | "new" | "sale"
 let currentGender = "";  // "" | одне з GENDERS
-let genderLocked = false;
 
 function readUrlState() {
 
@@ -42,7 +41,6 @@ function readUrlState() {
 
     const genderParam = params.get("gender");
     currentGender = GENDERS.includes(genderParam) ? genderParam : "";
-    genderLocked = Boolean(currentGender);
 
 }
 
@@ -134,40 +132,20 @@ function setupGenderFilter() {
     const buttons = [...genderFilterEl.querySelectorAll(".gender-pill")];
 
     buttons.forEach(btn => {
+
         btn.classList.toggle("active", btn.dataset.gender === currentGender);
+
+        btn.addEventListener("click", () => {
+
+            currentGender = btn.dataset.gender;
+
+            buttons.forEach(b => b.classList.toggle("active", b === btn));
+
+            render();
+
+        });
+
     });
-
-    if (genderLocked) {
-
-        buttons.forEach(btn => {
-
-            if (btn.dataset.gender !== currentGender) {
-                btn.disabled = true;
-            }
-
-        });
-
-        genderFilterEl.classList.add("locked");
-
-        if (genderLockNote) genderLockNote.hidden = false;
-
-    } else {
-
-        buttons.forEach(btn => {
-
-            btn.addEventListener("click", () => {
-
-                currentGender = btn.dataset.gender;
-
-                buttons.forEach(b => b.classList.toggle("active", b === btn));
-
-                render();
-
-            });
-
-        });
-
-    }
 
 }
 
@@ -292,27 +270,27 @@ function filterProducts() {
 
         switch (priceFilter.value) {
 
-            case "0-100":
-                list = list.filter(product => product.price <= 100);
+            case "0-2000":
+                list = list.filter(product => product.price <= 2000);
                 break;
 
-            case "100-250":
+            case "2000-5000":
                 list = list.filter(product =>
-                    product.price >= 100 &&
-                    product.price <= 250
+                    product.price >= 2000 &&
+                    product.price <= 5000
                 );
                 break;
 
-            case "250-500":
+            case "5000-8000":
                 list = list.filter(product =>
-                    product.price >= 250 &&
-                    product.price <= 500
+                    product.price >= 5000 &&
+                    product.price <= 8000
                 );
                 break;
 
-            case "500":
+            case "8000":
                 list = list.filter(product =>
-                    product.price >= 500
+                    product.price >= 8000
                 );
                 break;
 
@@ -328,10 +306,6 @@ function filterProducts() {
 
         case "priceDesc":
             list.sort((a, b) => b.price - a.price);
-            break;
-
-        case "rating":
-            list.sort((a, b) => b.rating - a.rating);
             break;
 
     }
@@ -374,16 +348,11 @@ function resetAllFilters() {
 
     }
 
-    // стать скидаємо, тільки якщо вона не закріплена через меню
-    if (!genderLocked) {
+    currentGender = "";
 
-        currentGender = "";
-
-        genderFilterEl?.querySelectorAll(".gender-pill").forEach(btn => {
-            btn.classList.toggle("active", btn.dataset.gender === "");
-        });
-
-    }
+    genderFilterEl?.querySelectorAll(".gender-pill").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.gender === "");
+    });
 
     render();
 
