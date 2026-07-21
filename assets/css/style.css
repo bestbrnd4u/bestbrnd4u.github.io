@@ -1594,6 +1594,229 @@ footer{
     font-weight:800;
 }
 
+/* -- кастомні дропдауни "Бренд" / "Ціна" (в стилі сортування) -- */
+
+.filter-dropdown{
+    position:relative;
+    flex:1 1 180px;
+    min-width:170px;
+}
+
+.filter-toggle{
+    width:100%;
+    height:48px;
+    padding:0 16px;
+    border-radius:12px;
+    border:1.5px solid var(--gray200);
+    background:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    font-size:14px;
+    font-weight:600;
+    color:var(--gray700);
+    transition:.2s;
+}
+
+.filter-toggle:hover{
+    border-color:var(--gray300);
+}
+
+.filter-dropdown.open .filter-toggle{
+    border-color:var(--secondary);
+    box-shadow:0 0 0 4px rgba(37,99,235,.1);
+}
+
+.filter-toggle span:first-child{
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.filter-arrow{
+    font-size:11px;
+    color:var(--gray500);
+    transition:transform .2s;
+    flex-shrink:0;
+}
+
+.filter-dropdown.open .filter-arrow{
+    transform:rotate(180deg);
+}
+
+.filter-menu{
+    position:absolute;
+    top:calc(100% + 8px);
+    left:0;
+    right:0;
+    background:#fff;
+    border-radius:14px;
+    box-shadow:var(--shadow-lg);
+    padding:8px;
+    min-width:220px;
+    max-height:320px;
+    overflow-y:auto;
+    z-index:200;
+}
+
+.filter-option{
+    width:100%;
+    display:block;
+    text-align:left;
+    padding:10px 14px;
+    border-radius:8px;
+    background:transparent;
+    font-size:14px;
+    color:var(--gray700);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.filter-option:hover{
+    background:var(--gray100);
+    color:var(--gray900);
+}
+
+.filter-option.active{
+    background:rgba(37,99,235,.08);
+    color:var(--secondary);
+    font-weight:700;
+}
+
+/* -- пошук всередині дропдауна "Бренд" -- */
+
+.filter-menu-search{
+    padding-top:6px;
+}
+
+.filter-menu-search-box{
+    position:relative;
+    padding:2px 2px 8px;
+    margin-bottom:6px;
+    border-bottom:1px solid var(--gray100);
+}
+
+.filter-menu-search-icon{
+    position:absolute;
+    left:12px;
+    top:50%;
+    transform:translateY(-50%);
+    font-size:13px;
+    opacity:.5;
+    pointer-events:none;
+}
+
+.filter-menu-search-box input{
+    width:100%;
+    height:40px;
+    padding:0 12px 0 34px;
+    border:1.5px solid var(--gray200);
+    border-radius:10px;
+    font-size:13.5px;
+    background:var(--gray50);
+}
+
+.filter-menu-search-box input:focus{
+    outline:none;
+    border-color:var(--secondary);
+    background:#fff;
+}
+
+.filter-menu-options{
+    max-height:220px;
+    overflow-y:auto;
+}
+
+.filter-menu-empty{
+    padding:16px 14px;
+    text-align:center;
+    color:var(--gray500);
+    font-size:13.5px;
+}
+
+/* -- панель активних фільтрів -- */
+
+.active-filters-bar{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:10px;
+    margin:-14px 0 28px;
+    padding:14px 20px;
+    background:rgba(37,99,235,.05);
+    border:1px dashed rgba(37,99,235,.25);
+    border-radius:16px;
+}
+
+.active-filters-label{
+    font-size:13px;
+    font-weight:600;
+    color:var(--gray500);
+    white-space:nowrap;
+}
+
+.active-filters-list{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    flex:1;
+}
+
+.filter-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:7px 10px 7px 14px;
+    border-radius:50px;
+    background:#fff;
+    border:1.5px solid var(--gray200);
+    font-size:13px;
+    font-weight:600;
+    color:var(--gray700);
+    transition:.2s;
+    white-space:nowrap;
+}
+
+.filter-chip:hover{
+    border-color:var(--danger);
+    color:var(--danger);
+}
+
+.filter-chip-x{
+    width:18px;
+    height:18px;
+    border-radius:50%;
+    background:var(--gray100);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:9px;
+    color:var(--gray500);
+    transition:.2s;
+}
+
+.filter-chip:hover .filter-chip-x{
+    background:var(--danger);
+    color:#fff;
+}
+
+.filter-reset-chip{
+    margin-left:auto;
+    padding:8px 16px;
+    border-radius:50px;
+    font-size:13px;
+    font-weight:700;
+    color:var(--secondary);
+    white-space:nowrap;
+    transition:.2s;
+}
+
+.filter-reset-chip:hover{
+    background:rgba(37,99,235,.1);
+}
+
 .catalog-top{
     background:#fff;
     padding:16px 22px;
@@ -3155,6 +3378,340 @@ footer{
 
     .product-actions .btn{
         min-width:0;
+    }
+
+}
+
+/* =====================================
+   ГЛОБАЛЬНИЙ ПОШУК (оверлей у стилі Nike)
+===================================== */
+
+.search-overlay{
+    position:fixed;
+    inset:0;
+    z-index:4000;
+    display:flex;
+    justify-content:center;
+}
+
+.search-overlay[hidden]{
+    display:none;
+}
+
+.search-overlay-backdrop{
+    position:absolute;
+    inset:0;
+    background:rgba(17,24,39,.5);
+    opacity:0;
+    transition:opacity .25s ease;
+}
+
+.search-overlay.open .search-overlay-backdrop{
+    opacity:1;
+}
+
+.search-overlay-panel{
+    position:relative;
+    z-index:1;
+    width:100%;
+    max-height:100vh;
+    overflow-y:auto;
+    background:#fff;
+    box-shadow:var(--shadow-lg);
+    transform:translateY(-16px);
+    opacity:0;
+    transition:.25s ease;
+}
+
+.search-overlay.open .search-overlay-panel{
+    transform:translateY(0);
+    opacity:1;
+}
+
+.search-overlay-bar{
+    display:flex;
+    align-items:center;
+    gap:20px;
+    padding:26px 32px;
+    border-bottom:1px solid var(--gray100);
+}
+
+.search-overlay-input-wrap{
+    flex:1;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    background:var(--gray50);
+    border:1.5px solid var(--gray200);
+    border-radius:14px;
+    padding:0 18px;
+    transition:.2s;
+}
+
+.search-overlay-input-wrap:focus-within{
+    border-color:var(--secondary);
+    background:#fff;
+    box-shadow:0 0 0 4px rgba(37,99,235,.1);
+}
+
+.search-overlay-icon{
+    font-size:16px;
+    opacity:.5;
+    flex-shrink:0;
+}
+
+.search-overlay-input-wrap input{
+    flex:1;
+    height:56px;
+    border:none;
+    background:transparent;
+    font-size:18px;
+    padding:0;
+}
+
+.search-overlay-input-wrap input:focus{
+    outline:none;
+}
+
+.search-overlay-clear{
+    width:26px;
+    height:26px;
+    border-radius:50%;
+    background:var(--gray200);
+    color:var(--gray700);
+    font-size:11px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    transition:.2s;
+}
+
+.search-overlay-clear:hover{
+    background:var(--gray300);
+}
+
+.search-overlay-cancel{
+    font-size:15px;
+    font-weight:600;
+    color:var(--gray700);
+    white-space:nowrap;
+    transition:.2s;
+}
+
+.search-overlay-cancel:hover{
+    color:var(--secondary);
+}
+
+.search-overlay-body{
+    padding:36px 32px 60px;
+}
+
+.search-section + .search-section{
+    margin-top:36px;
+}
+
+.search-section-title{
+    font-size:13px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:var(--gray500);
+    margin-bottom:16px;
+}
+
+/* -- популярні запити (чіпи) -- */
+
+.search-chip-list{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+.search-chip{
+    padding:12px 20px;
+    border-radius:50px;
+    background:var(--gray100);
+    color:var(--gray900);
+    font-size:14px;
+    font-weight:600;
+    transition:.2s;
+}
+
+.search-chip:hover{
+    background:var(--secondary);
+    color:#fff;
+}
+
+/* -- останні пошуки -- */
+
+.search-recent-list{
+    display:flex;
+    flex-direction:column;
+}
+
+.search-recent-item{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:13px 4px;
+    border-bottom:1px solid var(--gray100);
+    cursor:pointer;
+}
+
+.search-recent-item:hover .search-recent-term{
+    color:var(--secondary);
+}
+
+.search-recent-term{
+    font-size:15px;
+    color:var(--gray900);
+    transition:.2s;
+}
+
+.search-recent-remove{
+    width:26px;
+    height:26px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--gray400, var(--gray300));
+    font-size:11px;
+    transition:.2s;
+}
+
+.search-recent-remove:hover{
+    background:var(--gray100);
+    color:var(--gray900);
+}
+
+/* -- результати пошуку -- */
+
+.search-results{
+    display:grid;
+    grid-template-columns:220px 1fr;
+    gap:48px;
+}
+
+.search-suggestion-list{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+}
+
+.search-suggestion-item{
+    text-align:left;
+    padding:11px 10px;
+    border-radius:8px;
+    font-size:14.5px;
+    color:var(--gray700);
+    transition:.15s;
+}
+
+.search-suggestion-item:hover{
+    background:var(--gray100);
+    color:var(--secondary);
+}
+
+.search-no-suggestions{
+    color:var(--gray300);
+    font-size:13.5px;
+}
+
+.search-results-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(150px, 1fr));
+    gap:20px;
+}
+
+.search-result-card{
+    display:block;
+    transition:.2s;
+}
+
+.search-result-image{
+    aspect-ratio:1/1;
+    background:var(--gray50);
+    border-radius:14px;
+    overflow:hidden;
+    margin-bottom:10px;
+}
+
+.search-result-image img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    transition:.3s;
+}
+
+.search-result-card:hover .search-result-image img{
+    transform:scale(1.06);
+}
+
+.search-result-brand{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    color:var(--gray500);
+    margin-bottom:2px;
+}
+
+.search-result-title{
+    font-size:14px;
+    font-weight:600;
+    color:var(--gray900);
+    margin-bottom:4px;
+    line-height:1.3;
+}
+
+.search-result-price{
+    font-size:14px;
+    font-weight:700;
+    color:var(--gray900);
+}
+
+.search-no-results{
+    color:var(--gray500);
+    font-size:14.5px;
+    padding:8px 0;
+}
+
+.search-see-all{
+    display:inline-block;
+    margin-top:20px;
+    font-size:14px;
+    font-weight:700;
+    color:var(--secondary);
+}
+
+.search-see-all:hover{
+    text-decoration:underline;
+}
+
+@media(max-width:800px){
+
+    .search-overlay-bar{
+        padding:18px 20px;
+        gap:12px;
+    }
+
+    .search-overlay-input-wrap input{
+        height:48px;
+        font-size:16px;
+    }
+
+    .search-overlay-body{
+        padding:24px 20px 48px;
+    }
+
+    .search-results{
+        grid-template-columns:1fr;
+        gap:28px;
+    }
+
+    .search-results-grid{
+        grid-template-columns:repeat(2, 1fr);
     }
 
 }

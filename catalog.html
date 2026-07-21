@@ -116,38 +116,55 @@ placeholder="Пошук товару...">
 </div>
 </div>
 
-<div class="filter-group">
-<select id="brandFilter">
-<option value="">Усі бренди</option>
-</select>
+<div class="filter-group filter-dropdown" id="brandDropdown">
+<button type="button" id="brandToggle" class="filter-toggle">
+<span id="brandLabel">Усі бренди</span>
+<span class="filter-arrow">▾</span>
+</button>
+<div id="brandMenu" class="filter-menu filter-menu-search" hidden>
+<div class="filter-menu-search-box">
+<span class="filter-menu-search-icon">🔍</span>
+<input type="text" id="brandSearchInput" placeholder="Пошук бренду...">
+</div>
+<div id="brandOptionsList" class="filter-menu-options">
+<button type="button" class="filter-option active" data-brand="">Усі бренди</button>
+</div>
+<p id="brandNoResults" class="filter-menu-empty" hidden>Бренд не знайдено</p>
+</div>
 </div>
 
-<div class="filter-group">
-<select id="priceFilter">
-<option value="">
+<div class="filter-group filter-dropdown" id="priceDropdown">
+<button type="button" id="priceToggle" class="filter-toggle">
+<span id="priceLabel">Будь-яка ціна</span>
+<span class="filter-arrow">▾</span>
+</button>
+<div id="priceMenu" class="filter-menu" hidden>
+<button type="button" class="filter-option active" data-price="" data-label="Будь-яка ціна">
 Будь-яка ціна
-</option>
-<option value="0-2000">
+</button>
+<button type="button" class="filter-option" data-price="0-2000" data-label="до 2 000 ₴">
 до 2 000 ₴
-</option>
-<option value="2000-5000">
+</button>
+<button type="button" class="filter-option" data-price="2000-5000" data-label="2 000 – 5 000 ₴">
 2 000 – 5 000 ₴
-</option>
-<option value="5000-8000">
+</button>
+<button type="button" class="filter-option" data-price="5000-8000" data-label="5 000 – 8 000 ₴">
 5 000 – 8 000 ₴
-</option>
-<option value="8000">
+</button>
+<button type="button" class="filter-option" data-price="8000" data-label="від 8 000 ₴">
 від 8 000 ₴
-</option>
-</select>
+</button>
+</div>
 </div>
 
-<button
-id="resetFilters"
-class="btn btn-outline filter-reset">
+</div>
+
+<div id="activeFiltersBar" class="active-filters-bar" hidden>
+<span class="active-filters-label">Активні фільтри:</span>
+<div id="activeFiltersList" class="active-filters-list"></div>
+<button type="button" id="resetFilters" class="filter-reset-chip">
 Скинути фільтри
 </button>
-
 </div>
 
 <div class="catalog-layout">

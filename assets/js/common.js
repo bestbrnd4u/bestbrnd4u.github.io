@@ -452,25 +452,364 @@ function showToast(text) {
 // Пошук (шапка сайту)
 // -------------------------
 
-const searchBtn = document.getElementById("searchBtn");
+// -------------------------
+// Глобальний пошук (оверлей у стилі Nike)
+// -------------------------
 
-if (searchBtn) {
+const POPULAR_SEARCHES = ["Guess", "Michael Kors", "Рюкзаки", "Жіночі сумки", "Чоловічі сумки", "Furla"];
+const RECENT_SEARCHES_KEY = "recentSearches";
+const MAX_RECENT_SEARCHES = 6;
+const MAX_SEARCH_RESULTS = 6;
 
-    searchBtn.addEventListener("click", () => {
+let searchOverlayEl = null;
+let searchDebounceTimer = null;
 
-        if (window.location.pathname.endsWith("catalog.html")) {
+function getRecentSearches() {
+    return getStorage(RECENT_SEARCHES_KEY);
+}
 
-            document.getElementById("searchInput")?.focus();
+function saveRecentSearch(term) {
 
-        } else {
+    const clean = term.trim();
 
-            window.location.href = "catalog.html";
+    if (!clean) return;
 
-        }
+    let list = getRecentSearches().filter(item => item.toLowerCase() !== clean.toLowerCase());
+
+    list.unshift(clean);
+
+    list = list.slice(0, MAX_RECENT_SEARCHES);
+
+    setStorage(RECENT_SEARCHES_KEY, list);
+
+}
+
+function removeRecentSearch(term) {
+
+    const list = getRecentSearches().filter(item => item !== term);
+
+    setStorage(RECENT_SEARCHES_KEY, list);
+
+}
+
+function buildSearchOverlay() {
+
+    const overlay = document.createElement("div");
+
+    overlay.id = "searchOverlay";
+    overlay.className = "search-overlay";
+    overlay.hidden = true;
+
+    overlay.innerHTML = `
+        <div class="search-overlay-panel">
+
+            <div class="search-overlay-bar container">
+                <div class="search-overlay-input-wrap">
+                    <span class="search-overlay-icon">🔍</span>
+                    <input type="text" id="globalSearchInput" placeholder="Пошук товарів..." autocomplete="off">
+                    <button type="button" id="globalSearchClear" class="search-overlay-clear" hidden>✕</button>
+                </div>
+                <button type="button" id="globalSearchCancel" class="search-overlay-cancel">Скасувати</button>
+            </div>
+
+            <div class="search-overlay-body container">
+
+                <div id="searchIdleState" class="search-idle">
+
+                    <div class="search-section">
+                        <div class="search-section-title">Популярні запити</div>
+                        <div id="searchPopular" class="search-chip-list"></div>
+                    </div>
+
+                    <div class="search-section" id="searchRecentSection" hidden>
+                        <div class="search-section-title">Останні пошуки</div>
+                        <div id="searchRecent" class="search-recent-list"></div>
+                    </div>
+
+                </div>
+
+                <div id="searchResultsState" class="search-results" hidden>
+
+                    <div class="search-suggestions">
+                        <div class="search-section-title">Підказки</div>
+                        <div id="searchSuggestions" class="search-suggestion-list"></div>
+                    </div>
+
+                    <div class="search-results-main">
+                        <div class="search-section-title">Товари</div>
+                        <div id="searchResultsGrid" class="search-results-grid"></div>
+                        <p id="searchNoResults" class="search-no-results" hidden>
+                            Нічого не знайдено. Спробуйте інший запит.
+                        </p>
+                        <a href="catalog.html" id="searchSeeAll" class="search-see-all" hidden>
+                            Показати всі результати →
+                        </a>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+        <div class="search-overlay-backdrop"></div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    return overlay;
+
+}
+
+function matchesQuery(product, q) {
+
+    const haystack = `${product.title} ${product.brand} ${product.category}`.toLowerCase();
+
+    return haystack.includes(q);
+
+}
+
+async function runGlobalSearch(query) {
+
+    const idleState = document.getElementById("searchIdleState");
+    const resultsState = document.getElementById("searchResultsState");
+    const clearBtn = document.getElementById("globalSearchClear");
+
+    const q = query.trim().toLowerCase();
+
+    clearBtn.hidden = q.length === 0;
+
+    if (!q) {
+
+        idleState.hidden = false;
+        resultsState.hidden = true;
+
+        return;
+
+    }
+
+    idleState.hidden = true;
+    resultsState.hidden = false;
+
+    await getProductById(-1); // гарантовано підвантажує cachedProducts
+
+    const matches = (cachedProducts || []).filter(product => matchesQuery(product, q));
+
+    const suggestionsEl = document.getElementById("searchSuggestions");
+    const gridEl = document.getElementById("searchResultsGrid");
+    const noResultsEl = document.getElementById("searchNoResults");
+    const seeAllEl = document.getElementById("searchSeeAll");
+
+    // підказки — унікальні назви товарів, що збігаються
+    const suggestions = [...new Set(matches.map(p => p.title))].slice(0, 6);
+
+    suggestionsEl.innerHTML = suggestions.length
+        ? suggestions.map(title => `<button type="button" class="search-suggestion-item">${title}</button>`).join("")
+        : `<p class="search-no-suggestions">Немає підказок</p>`;
+
+    suggestionsEl.querySelectorAll(".search-suggestion-item").forEach(btn => {
+
+        btn.addEventListener("click", () => {
+
+            const input = document.getElementById("globalSearchInput");
+
+            input.value = btn.textContent;
+
+            runGlobalSearch(btn.textContent);
+
+        });
+
+    });
+
+    gridEl.innerHTML = matches.slice(0, MAX_SEARCH_RESULTS).map(product => {
+
+        const image = product.images?.[0] || "assets/images/no-image.png";
+
+        return `
+            <a href="product.html?id=${product.id}" class="search-result-card">
+                <div class="search-result-image">
+                    <img src="${image}" alt="${product.title}" onerror="this.src='assets/images/no-image.png'">
+                </div>
+                <div class="search-result-brand">${product.brand}</div>
+                <div class="search-result-title">${product.title}</div>
+                <div class="search-result-price">${formatPrice(product.price)}</div>
+            </a>
+        `;
+
+    }).join("");
+
+    gridEl.querySelectorAll(".search-result-card").forEach(card => {
+
+        card.addEventListener("click", () => saveRecentSearch(query));
+
+    });
+
+    noResultsEl.hidden = matches.length !== 0;
+
+    seeAllEl.hidden = matches.length === 0;
+    seeAllEl.href = `catalog.html?search=${encodeURIComponent(query.trim())}`;
+
+}
+
+function renderSearchIdleLists() {
+
+    const popularEl = document.getElementById("searchPopular");
+    const recentSection = document.getElementById("searchRecentSection");
+    const recentEl = document.getElementById("searchRecent");
+
+    popularEl.innerHTML = POPULAR_SEARCHES.map(term =>
+        `<button type="button" class="search-chip">${term}</button>`
+    ).join("");
+
+    popularEl.querySelectorAll(".search-chip").forEach(chip => {
+
+        chip.addEventListener("click", () => {
+
+            const input = document.getElementById("globalSearchInput");
+
+            input.value = chip.textContent;
+
+            runGlobalSearch(chip.textContent);
+
+        });
+
+    });
+
+    const recent = getRecentSearches();
+
+    recentSection.hidden = recent.length === 0;
+
+    recentEl.innerHTML = recent.map(term => `
+        <div class="search-recent-item" data-term="${term}">
+            <span class="search-recent-term">${term}</span>
+            <button type="button" class="search-recent-remove" aria-label="Видалити">✕</button>
+        </div>
+    `).join("");
+
+    recentEl.querySelectorAll(".search-recent-item").forEach(item => {
+
+        const term = item.dataset.term;
+
+        item.querySelector(".search-recent-term").addEventListener("click", () => {
+
+            const input = document.getElementById("globalSearchInput");
+
+            input.value = term;
+
+            runGlobalSearch(term);
+
+        });
+
+        item.querySelector(".search-recent-remove").addEventListener("click", event => {
+
+            event.stopPropagation();
+
+            removeRecentSearch(term);
+
+            renderSearchIdleLists();
+
+        });
 
     });
 
 }
+
+function openSearchOverlay() {
+
+    if (!searchOverlayEl) {
+
+        searchOverlayEl = buildSearchOverlay();
+
+        const input = document.getElementById("globalSearchInput");
+        const clearBtn = document.getElementById("globalSearchClear");
+        const cancelBtn = document.getElementById("globalSearchCancel");
+        const backdrop = searchOverlayEl.querySelector(".search-overlay-backdrop");
+
+        input.addEventListener("input", () => {
+
+            clearTimeout(searchDebounceTimer);
+
+            searchDebounceTimer = setTimeout(() => runGlobalSearch(input.value), 150);
+
+        });
+
+        input.addEventListener("keydown", event => {
+
+            if (event.key === "Enter" && input.value.trim()) {
+
+                saveRecentSearch(input.value);
+
+                window.location.href = `catalog.html?search=${encodeURIComponent(input.value.trim())}`;
+
+            } else if (event.key === "Escape") {
+
+                closeSearchOverlay();
+
+            }
+
+        });
+
+        clearBtn.addEventListener("click", () => {
+
+            input.value = "";
+
+            input.focus();
+
+            runGlobalSearch("");
+
+        });
+
+        cancelBtn.addEventListener("click", closeSearchOverlay);
+        backdrop.addEventListener("click", closeSearchOverlay);
+
+    }
+
+    renderSearchIdleLists();
+
+    searchOverlayEl.hidden = false;
+
+    requestAnimationFrame(() => searchOverlayEl.classList.add("open"));
+
+    document.body.style.overflow = "hidden";
+
+    const input = document.getElementById("globalSearchInput");
+
+    input.value = "";
+
+    runGlobalSearch("");
+
+    setTimeout(() => input.focus(), 50);
+
+}
+
+function closeSearchOverlay() {
+
+    if (!searchOverlayEl) return;
+
+    searchOverlayEl.classList.remove("open");
+
+    document.body.style.overflow = "";
+
+    setTimeout(() => {
+
+        if (searchOverlayEl) searchOverlayEl.hidden = true;
+
+    }, 200);
+
+}
+
+document.addEventListener("keydown", event => {
+
+    if (event.key === "Escape" && searchOverlayEl && !searchOverlayEl.hidden) {
+
+        closeSearchOverlay();
+
+    }
+
+});
+
+const searchBtn = document.getElementById("searchBtn");
+
+searchBtn?.addEventListener("click", openSearchOverlay);
 
 // -------------------------
 // Підписка на новини — тепер повністю на боці MailerLite
