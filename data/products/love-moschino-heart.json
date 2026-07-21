@@ -1,0 +1,23 @@
+{
+  "id": 6,
+  "slug": "love-moschino-heart",
+  "brand": "Love Moschino",
+  "title": "Heart Collection",
+  "category": "Жіночі сумки",
+  "gender": "Жінкам",
+  "isNew": false,
+  "price": 7299,
+  "oldPrice": 7999,
+  "rating": 4.9,
+  "reviews": 133,
+  "badge": "HOT",
+  "material": "Екошкіра",
+  "color": "Червоний",
+  "country": "Італія",
+  "description": "Яскрава сумка Love Moschino з колекції Heart із фірмовим декором у вигляді серця. Стильний акцент для сміливих образів.",
+  "images": [
+    "https://images.pexels.com/photos/7419416/pexels-photo-7419416.jpeg?auto=compress&cs=tinysrgb&w=800",
+    "https://images.pexels.com/photos/20086706/pexels-photo-20086706.jpeg?auto=compress&cs=tinysrgb&w=800",
+    "https://images.pexels.com/photos/20086704/pexels-photo-20086704.jpeg?auto=compress&cs=tinysrgb&w=800"
+  ]
+}

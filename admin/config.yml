@@ -1,0 +1,152 @@
+backend:
+  name: github
+  repo: bestbrnd4u/bestbrnd4u.github.io
+  branch: main
+  # Netlify виступає лише як безкоштовний OAuth-проксі для GitHub —
+  # сам сайт при цьому продовжує жити на GitHub Pages, без Netlify-хостингу.
+  base_url: https://api.netlify.com
+  auth_endpoint: auth
+
+# зберігання завантажених фото (можна або завантажити файл,
+# або просто вставити зовнішнє посилання — обидва варіанти працюють
+# в полі "Фотографії" нижче)
+media_folder: "assets/images/products/uploads"
+public_folder: "/assets/images/products/uploads"
+
+publish_mode: simple
+
+collections:
+  - name: "products"
+    label: "Товари"
+    label_singular: "Товар"
+    description: "Кожен товар — окремий файл. Після збереження товари автоматично збираються в загальний каталог сайту (data/products.json) — це займає близько хвилини."
+    folder: "data/products"
+    create: true
+    delete: true
+    extension: "json"
+    format: "json"
+    identifier_field: "title"
+    summary: "{{brand}} — {{title}} ({{price}} ₴)"
+    sortable_fields: ["title", "brand", "price", "isNew"]
+    view_filters:
+      - label: "Новинки"
+        field: isNew
+        pattern: true
+      - label: "Зі знижкою"
+        field: oldPrice
+        pattern: '.+'
+    fields:
+      - label: "Назва товару"
+        name: "title"
+        widget: "string"
+        required: true
+        hint: "Наприклад: Guess Noelle Black"
+
+      - label: "Бренд"
+        name: "brand"
+        widget: "string"
+        required: true
+
+      - label: "Категорія"
+        name: "category"
+        widget: "select"
+        required: true
+        options:
+          - "Жіночі сумки"
+          - "Чоловічі сумки"
+          - "Унісекс сумки"
+          - "Рюкзаки"
+          - "Дитячі сумки"
+          - "Дитячі рюкзаки"
+
+      - label: "Для кого"
+        name: "gender"
+        widget: "select"
+        required: true
+        options:
+          - "Жінкам"
+          - "Чоловікам"
+          - "Унісекс"
+          - "Дітям"
+
+      - label: "Ціна, ₴"
+        name: "price"
+        widget: "number"
+        value_type: "int"
+        required: true
+
+      - label: "Стара ціна, ₴ (якщо є знижка)"
+        name: "oldPrice"
+        widget: "number"
+        value_type: "int"
+        required: false
+        hint: "Залиште порожнім, якщо товар без знижки"
+
+      - label: "Позначка на картці"
+        name: "badge"
+        widget: "select"
+        required: false
+        options: ["NEW", "SALE", "TOP", "HOT"]
+        hint: "Необов'язково — кольоровий лейбл у кутку картки товару"
+
+      - label: "Це новинка?"
+        name: "isNew"
+        widget: "boolean"
+        default: false
+        hint: "Впливає на розділ «Новинки» в каталозі"
+
+      - label: "Фотографії"
+        name: "images"
+        widget: "list"
+        required: true
+        hint: "Перше фото — головне, воно показується в каталозі. Можна завантажити файл або вставити посилання на фото."
+        field:
+          label: "Фото"
+          name: "image"
+          widget: "image"
+          required: true
+          choose_url: true
+
+      - label: "Опис товару"
+        name: "description"
+        widget: "text"
+        required: true
+
+      - label: "Матеріал"
+        name: "material"
+        widget: "string"
+        required: false
+
+      - label: "Колір"
+        name: "color"
+        widget: "string"
+        required: false
+
+      - label: "Країна виробник"
+        name: "country"
+        widget: "string"
+        required: false
+
+      - label: "Рейтинг"
+        name: "rating"
+        widget: "number"
+        value_type: "float"
+        required: false
+        default: 5
+        min: 1
+        max: 5
+
+      - label: "Кількість відгуків"
+        name: "reviews"
+        widget: "number"
+        value_type: "int"
+        required: false
+        default: 0
+
+      # Технічне поле — не показується як звичайний інпут,
+      # використовується сайтом для кошика/обраного.
+      # НЕ ЧІПАТИ: заповнюється і зберігається автоматично.
+      - label: "ID (службове поле)"
+        name: "id"
+        widget: "hidden"
+        required: false

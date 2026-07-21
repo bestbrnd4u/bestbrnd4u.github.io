@@ -1,0 +1,21 @@
+{
+  "id": 11,
+  "slug": "bagvero-unisex-tote",
+  "brand": "Bagvero Unisex",
+  "title": "Canvas Tote",
+  "category": "Унісекс сумки",
+  "gender": "Унісекс",
+  "isNew": true,
+  "price": 2199,
+  "oldPrice": 2599,
+  "rating": 4.7,
+  "reviews": 23,
+  "badge": "NEW",
+  "material": "Бавовняне полотно",
+  "color": "Бежевий",
+  "country": "Україна",
+  "description": "Практична сумка-тоут із щільного бавовняного полотна. Підходить для покупок, навчання та повсякденних прогулянок — універсальна для всіх.",
+  "images": [
+    "https://images.pexels.com/photos/3758495/pexels-photo-3758495.jpeg?auto=compress&cs=tinysrgb&w=800"
+  ]
+}

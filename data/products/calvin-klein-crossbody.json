@@ -1,0 +1,21 @@
+{
+  "id": 5,
+  "slug": "calvin-klein-crossbody",
+  "brand": "Calvin Klein",
+  "title": "Crossbody Bag",
+  "category": "Жіночі сумки",
+  "gender": "Жінкам",
+  "isNew": false,
+  "price": 5699,
+  "oldPrice": 8199,
+  "rating": 4.6,
+  "reviews": 76,
+  "badge": "SALE",
+  "material": "Екошкіра",
+  "color": "Чорний",
+  "country": "США",
+  "description": "Мінімалістична сумка через плече Calvin Klein у фірмовому лаконічному стилі бренду. Легка, містка, з регульованим ременем.",
+  "images": [
+    "https://images.pexels.com/photos/157888/pexels-photo-157888.jpeg?auto=compress&cs=tinysrgb&w=800"
+  ]
+}

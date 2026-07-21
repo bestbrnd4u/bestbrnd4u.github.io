@@ -1,0 +1,21 @@
+{
+  "id": 7,
+  "slug": "bagvero-man-briefcase",
+  "brand": "Bagvero Man",
+  "title": "Business Briefcase",
+  "category": "Чоловічі сумки",
+  "gender": "Чоловікам",
+  "isNew": true,
+  "price": 5499,
+  "oldPrice": 5999,
+  "rating": 4.7,
+  "reviews": 42,
+  "badge": "NEW",
+  "material": "Натуральна шкіра",
+  "color": "Коричневий",
+  "country": "Україна",
+  "description": "Строгий чоловічий портфель для документів і ноутбука. Щільна шкіра, надійна фурнітура та продумані відділення для ділового стилю.",
+  "images": [
+    "https://images.pexels.com/photos/57750/pexels-photo-57750.jpeg?auto=compress&cs=tinysrgb&w=800"
+  ]
+}

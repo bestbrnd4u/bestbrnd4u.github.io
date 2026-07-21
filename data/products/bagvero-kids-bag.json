@@ -1,0 +1,21 @@
+{
+  "id": 10,
+  "slug": "bagvero-kids-bag",
+  "brand": "Bagvero Kids",
+  "title": "Kids Print Bag",
+  "category": "Дитячі сумки",
+  "gender": "Дітям",
+  "isNew": true,
+  "price": 899,
+  "oldPrice": 999,
+  "rating": 4.6,
+  "reviews": 18,
+  "badge": "NEW",
+  "material": "Текстиль",
+  "color": "Мультиколір",
+  "country": "Україна",
+  "description": "Яскрава дитяча сумочка з веселим принтом — зручний розмір для книжок, іграшок та шкільних дрібничок.",
+  "images": [
+    "https://images.pexels.com/photos/6110950/pexels-photo-6110950.jpeg?auto=compress&cs=tinysrgb&w=800"
+  ]
+}

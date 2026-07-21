@@ -1,0 +1,23 @@
+{
+  "id": 4,
+  "slug": "furla-metropolis",
+  "brand": "Furla",
+  "title": "Metropolis Mini",
+  "category": "Жіночі сумки",
+  "gender": "Жінкам",
+  "isNew": false,
+  "price": 10999,
+  "oldPrice": 11999,
+  "rating": 5,
+  "reviews": 84,
+  "badge": "TOP",
+  "material": "Натуральна шкіра",
+  "color": "Бежевий",
+  "country": "Італія",
+  "description": "Furla Metropolis Mini — одна з найбільш впізнаваних сумок бренду. Компактний корпус, металевий декор-пряжка та італійська шкіра найвищої якості.",
+  "images": [
+    "assets/images/products/furla/furla-1.webp",
+    "assets/images/products/furla/furla-2.webp",
+    "assets/images/products/furla/furla-3.webp"
+  ]
+}

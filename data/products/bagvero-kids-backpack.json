@@ -1,0 +1,21 @@
+{
+  "id": 9,
+  "slug": "bagvero-kids-backpack",
+  "brand": "Bagvero Kids",
+  "title": "Mini School Backpack",
+  "category": "Дитячі рюкзаки",
+  "gender": "Дітям",
+  "isNew": false,
+  "price": 1499,
+  "oldPrice": 2199,
+  "rating": 4.8,
+  "reviews": 29,
+  "badge": "SALE",
+  "material": "Текстиль",
+  "color": "Жовтий",
+  "country": "Україна",
+  "description": "Легкий дитячий рюкзак для школи та прогулянок. М'які лямки, міцні блискавки та яскравий дизайн, який сподобається дитині.",
+  "images": [
+    "https://images.pexels.com/photos/7269547/pexels-photo-7269547.jpeg?auto=compress&cs=tinysrgb&w=800"
+  ]
+}
