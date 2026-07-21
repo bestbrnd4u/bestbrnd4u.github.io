@@ -3924,6 +3924,10 @@ footer{
     gap:16px;
 }
 
+.auth-form[hidden]{
+    display:none;
+}
+
 .auth-form label{
     display:flex;
     flex-direction:column;
