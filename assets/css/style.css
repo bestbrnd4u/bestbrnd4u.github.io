@@ -3863,3 +3863,237 @@ footer{
     }
 
 }
+
+/* =====================================
+   ОСОБИСТИЙ КАБІНЕТ / АВТОРИЗАЦІЯ
+===================================== */
+
+#accountLink.logged-in{
+    background:var(--secondary);
+    color:#fff;
+}
+
+.account-page{
+    padding:50px 0 80px;
+}
+
+.account-page .loader{
+    padding:60px 0;
+}
+
+/* -- картка входу / реєстрації -- */
+
+.auth-card{
+    max-width:420px;
+    margin:0 auto;
+    background:#fff;
+    border-radius:var(--radius);
+    box-shadow:var(--shadow-sm);
+    padding:32px;
+}
+
+.auth-tabs{
+    display:flex;
+    gap:8px;
+    margin-bottom:24px;
+    background:var(--gray100);
+    border-radius:12px;
+    padding:4px;
+}
+
+.auth-tab{
+    flex:1;
+    padding:10px;
+    border-radius:9px;
+    font-size:14px;
+    font-weight:700;
+    color:var(--gray500);
+    background:transparent;
+    transition:.2s;
+}
+
+.auth-tab.active{
+    background:#fff;
+    color:var(--gray900);
+    box-shadow:var(--shadow-sm);
+}
+
+.auth-form{
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+}
+
+.auth-form label{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    font-size:14px;
+    color:var(--gray700);
+    font-weight:600;
+}
+
+.auth-form input:focus{
+    outline:none;
+    border-color:var(--secondary);
+}
+
+.auth-form .btn{
+    width:100%;
+    margin-top:4px;
+}
+
+.auth-link{
+    align-self:center;
+    font-size:13px;
+    font-weight:600;
+    color:var(--gray500);
+    text-decoration:underline;
+}
+
+.auth-link:hover{
+    color:var(--secondary);
+}
+
+/* -- кабінет авторизованого користувача -- */
+
+.account-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:16px;
+    margin-bottom:36px;
+}
+
+.account-header h1{
+    text-align:left;
+    margin-bottom:4px;
+}
+
+.account-email{
+    color:var(--gray500);
+    font-size:14px;
+}
+
+.orders-heading{
+    font-size:22px;
+    text-align:left;
+    margin-bottom:20px;
+}
+
+.orders-list{
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+}
+
+.order-card{
+    background:#fff;
+    border-radius:var(--radius);
+    box-shadow:var(--shadow-sm);
+    padding:24px;
+}
+
+.order-card-header{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:16px;
+    padding-bottom:16px;
+    margin-bottom:16px;
+    border-bottom:1px solid var(--gray100);
+}
+
+.order-card-number{
+    display:block;
+    font-weight:700;
+    font-size:15px;
+    color:var(--gray900);
+}
+
+.order-card-date{
+    display:block;
+    font-size:13px;
+    color:var(--gray500);
+    margin-top:2px;
+}
+
+.order-status{
+    flex-shrink:0;
+    padding:6px 14px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:700;
+    white-space:nowrap;
+    background:var(--gray100);
+    color:var(--gray700);
+}
+
+.order-status-new{
+    background:rgba(37,99,235,.1);
+    color:var(--secondary);
+}
+
+.order-status-processing{
+    background:rgba(245,158,11,.12);
+    color:#b45309;
+}
+
+.order-status-shipped{
+    background:rgba(37,99,235,.1);
+    color:var(--secondary);
+}
+
+.order-status-completed{
+    background:rgba(16,185,129,.12);
+    color:#047857;
+}
+
+.order-status-cancelled{
+    background:rgba(239,68,68,.1);
+    color:var(--danger);
+}
+
+.order-card-items{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+}
+
+.order-card-footer{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    margin-top:18px;
+    padding-top:16px;
+    border-top:1px solid var(--gray100);
+    font-size:13px;
+    color:var(--gray500);
+}
+
+.order-card-total{
+    font-size:16px;
+    font-weight:700;
+    color:var(--gray900);
+}
+
+@media(max-width:600px){
+
+    .auth-card{
+        padding:24px 20px;
+    }
+
+    .account-header{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    .order-card-footer{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:6px;
+    }
+
+}

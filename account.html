@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Кошик покупок Bagvero">
+    <meta name="description" content="Особистий кабінет Bagvero — вхід, реєстрація та історія замовлень">
     <meta name="theme-color" content="#111827">
     <meta name="robots" content="noindex,follow">
 
@@ -13,7 +13,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicon-16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="assets/images/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="192x192" href="assets/images/favicon-192.png">
-    <title>Кошик | Bagvero</title>
+    <title>Особистий кабінет | Bagvero</title>
 
     <link rel="stylesheet" href="assets/css/style.css">
 
@@ -34,7 +34,6 @@
 <!-- End MailerLite Universal -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 
 </head>
 
@@ -84,15 +83,13 @@
         <div class="header-icons">
 
             <button id="searchBtn">🔍</button>
-<a href="account.html" id="accountLink">👤</a>
 
-            <a href="favorites.html">
-                ❤
-                <span id="favCount">0</span>
-            </a>
+            <a href="account.html" id="accountLink" class="active">👤</a>
+
+            <a href="favorites.html">         ❤         <span id="favCount">0</span>     </a>
 
             <div class="cart-icon-wrap">
-    <a href="cart.html" class="active" id="cartIconLink">
+    <a href="cart.html" id="cartIconLink">
         🛒
         <span id="cartCount">0</span>
     </a>
@@ -113,62 +110,102 @@
 
         <span>/</span>
 
-        <span>Кошик</span>
+        <span>Кабінет</span>
 
     </div>
 
 </section>
 
-<section class="cart-page">
+<section class="account-page">
 
     <div class="container">
 
-        <h1>Кошик покупок</h1>
+        <div id="authLoader" class="loader">
+            <div class="spinner"></div>
+        </div>
 
-        <div id="cartEmpty" class="empty-state" hidden>
+        <!-- ========== Гість: вхід / реєстрація ========== -->
 
-            <h2>🛒</h2>
+        <div id="authCard" class="auth-card" hidden>
 
-            <p>Ваш кошик поки порожній</p>
+            <div class="auth-tabs">
+                <button type="button" class="auth-tab active" data-tab="login">Увійти</button>
+                <button type="button" class="auth-tab" data-tab="signup">Реєстрація</button>
+            </div>
 
-            <a href="catalog.html" class="btn">Перейти до каталогу</a>
+            <form id="loginForm" class="auth-form">
+
+                <label>
+                    Email
+                    <input type="email" id="loginEmail" required placeholder="you@example.com" autocomplete="email">
+                </label>
+
+                <label>
+                    Пароль
+                    <input type="password" id="loginPassword" required placeholder="Ваш пароль" autocomplete="current-password">
+                </label>
+
+                <span id="loginError" class="field-error"></span>
+
+                <button type="submit" class="btn" id="loginSubmit">Увійти</button>
+
+                <button type="button" class="auth-link" id="forgotPasswordBtn">Забули пароль?</button>
+
+            </form>
+
+            <form id="signupForm" class="auth-form" hidden>
+
+                <label>
+                    Ім'я
+                    <input type="text" id="signupName" required placeholder="Ваше ім'я" autocomplete="given-name">
+                </label>
+
+                <label>
+                    Email
+                    <input type="email" id="signupEmail" required placeholder="you@example.com" autocomplete="email">
+                </label>
+
+                <label>
+                    Пароль
+                    <input type="password" id="signupPassword" required placeholder="Мінімум 6 символів" autocomplete="new-password">
+                </label>
+
+                <span id="signupError" class="field-error"></span>
+
+                <button type="submit" class="btn" id="signupSubmit">Зареєструватися</button>
+
+            </form>
 
         </div>
 
-        <div id="cartLayout" class="cart-layout" hidden>
+        <!-- ========== Авторизований користувач ========== -->
 
-            <div id="cartItems" class="cart-items">
+        <div id="accountDashboard" hidden>
+
+            <div class="account-header">
+
+                <div>
+                    <h1>Особистий кабінет</h1>
+                    <p id="accountEmail" class="account-email"></p>
+                </div>
+
+                <button type="button" class="btn btn-outline" id="logoutBtn">Вийти</button>
+
             </div>
 
-            <aside class="cart-summary">
+            <h2 class="orders-heading">Історія замовлень</h2>
 
-                <h2>Разом</h2>
+            <div id="ordersLoader" class="loader">
+                <div class="spinner"></div>
+            </div>
 
-                <div class="summary-row">
-                    <span>Товари (<span id="cartItemsCount">0</span>)</span>
-                    <span id="cartSubtotal">0 ₴</span>
-                </div>
+            <div id="emptyOrders" class="empty-state" hidden>
+                <h2>🛍️</h2>
+                <p>У вас поки немає замовлень</p>
+                <a href="catalog.html" class="btn">Перейти до каталогу</a>
+            </div>
 
-                <div class="summary-row" id="cartDiscountRow" hidden>
-                    <span>Знижка</span>
-                    <span id="cartDiscount" class="discount-value">−0 ₴</span>
-                </div>
-
-                <div class="summary-row">
-                    <span>Доставка</span>
-                    <span>Безкоштовно</span>
-                </div>
-
-                <div class="summary-row summary-total">
-                    <span>До сплати</span>
-                    <span id="cartTotal">0 ₴</span>
-                </div>
-
-                <button id="checkoutBtn" class="btn">Оформити замовлення</button>
-
-                <a href="catalog.html" class="btn btn-outline">Продовжити покупки</a>
-
-            </aside>
+            <div id="ordersList" class="orders-list"></div>
 
         </div>
 
@@ -263,7 +300,7 @@
 <script src="assets/js/supabase-client.js"></script>
 <script src="assets/js/common.js"></script>
 <script src="assets/js/ui.js"></script>
-<script src="assets/js/cart.js"></script>
+<script src="assets/js/account.js"></script>
 
 </body>
 

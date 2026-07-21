@@ -516,6 +516,60 @@ function buildEmailTemplateParams(orderId, orderDate) {
 
 }
 
+function buildOrderItemsSnapshot() {
+
+    return getCartLines().map(({ product, qty, color, size }) => ({
+        id: product.id,
+        title: product.title,
+        brand: product.brand,
+        price: product.price,
+        image: product.images?.[0] || null,
+        qty,
+        color,
+        size
+    }));
+
+}
+
+// зберігаємо замовлення в Supabase, щоб воно з'явилося в
+// «Історії замовлень» кабінету — лише якщо клієнт авторизований;
+// гостьові замовлення й далі йдуть тільки поштою, як раніше.
+// Це best-effort: якщо збереження не вдалося, оформлення
+// замовлення все одно вважається успішним (лист вже надіслано).
+async function saveOrderToSupabase(orderId) {
+
+    if (!supabaseClient) return;
+
+    const user = await getCurrentUser();
+
+    if (!user) return;
+
+    const { subtotal, totalDiscount, delivery, total } = computeOrderTotals();
+
+    const { error } = await supabaseClient.from("orders").insert({
+        user_id: user.id,
+        order_number: orderId,
+        status: "new",
+        items: buildOrderItemsSnapshot(),
+        subtotal,
+        discount: totalDiscount,
+        delivery_price: delivery ? delivery.price : 0,
+        total,
+        delivery_method: delivery ? delivery.label : null,
+        delivery_city: document.getElementById("city")?.value.trim() || null,
+        promo_code: appliedPromo ? appliedPromo.code : null,
+        first_name: document.getElementById("firstName")?.value.trim() || null,
+        last_name: document.getElementById("lastName")?.value.trim() || null,
+        phone: document.getElementById("phone")?.value.trim() || null,
+        email: document.getElementById("email")?.value.trim() || null
+    });
+
+    if (error) {
+        console.warn("Не вдалося зберегти замовлення в історію кабінету:", error);
+    }
+
+}
+
 // -------------------------
 // Відправка замовлення
 // -------------------------
@@ -588,9 +642,13 @@ checkoutForm?.addEventListener("submit", event => {
                 firstName: document.getElementById("firstName")?.value.trim() || ""
             }));
 
-            saveCart([]);
+            saveOrderToSupabase(orderId).finally(() => {
 
-            window.location.href = "thanks.html";
+                saveCart([]);
+
+                window.location.href = "thanks.html";
+
+            });
 
         } else {
 
