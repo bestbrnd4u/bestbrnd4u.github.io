@@ -3,7 +3,13 @@ let products = [];
 const grid = document.getElementById("catalogGrid");
 const search = document.getElementById("searchInput");
 const brand = document.getElementById("brandFilter");
-const sort = document.getElementById("sortSelect");
+
+const sortToggle = document.getElementById("sortToggle");
+const sortMenu = document.getElementById("sortMenu");
+const sortLabel = document.getElementById("sortLabel");
+const sortDropdown = document.getElementById("sortDropdown");
+
+let currentSort = "";
 
 const priceFilter = document.getElementById("priceFilter");
 
@@ -298,7 +304,15 @@ function filterProducts() {
 
     }
 
-    switch (sort.value) {
+    switch (currentSort) {
+
+        case "new":
+            list.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
+            break;
+
+        case "top":
+            list.sort((a, b) => (b.badge === "TOP" ? 1 : 0) - (a.badge === "TOP" ? 1 : 0));
+            break;
 
         case "priceAsc":
             list.sort((a, b) => a.price - b.price);
@@ -308,9 +322,21 @@ function filterProducts() {
             list.sort((a, b) => b.price - a.price);
             break;
 
+        case "discount":
+            list.sort((a, b) => getDiscountPercent(b) - getDiscountPercent(a));
+            break;
+
     }
 
     return list;
+
+}
+
+function getDiscountPercent(product) {
+
+    if (!product.oldPrice || product.oldPrice <= product.price) return 0;
+
+    return Math.round((1 - product.price / product.oldPrice) * 100);
 
 }
 
@@ -340,7 +366,13 @@ function resetAllFilters() {
 
     brand.value = "";
 
-    sort.value = "";
+    currentSort = "";
+
+    if (sortLabel) sortLabel.textContent = "За замовчуванням";
+
+    sortMenu?.querySelectorAll(".sort-option").forEach(o => {
+        o.classList.toggle("active", o.dataset.sort === "");
+    });
 
     if (priceFilter) {
 
@@ -366,9 +398,53 @@ search.addEventListener("input", render);
 
 brand.addEventListener("change", render);
 
-sort.addEventListener("change", render);
-
 priceFilter?.addEventListener("change", render);
+
+// -------------------------
+// Кастомний дропдаун сортування
+// -------------------------
+
+sortToggle?.addEventListener("click", event => {
+
+    event.stopPropagation();
+
+    sortMenu.hidden = !sortMenu.hidden;
+
+    sortDropdown?.classList.toggle("open", !sortMenu.hidden);
+
+});
+
+sortMenu?.querySelectorAll(".sort-option").forEach(option => {
+
+    option.addEventListener("click", () => {
+
+        currentSort = option.dataset.sort;
+
+        sortLabel.textContent = option.dataset.label;
+
+        sortMenu.querySelectorAll(".sort-option").forEach(o => o.classList.toggle("active", o === option));
+
+        sortMenu.hidden = true;
+
+        sortDropdown?.classList.remove("open");
+
+        render();
+
+    });
+
+});
+
+document.addEventListener("click", event => {
+
+    if (sortMenu && !sortMenu.hidden && !event.target.closest("#sortDropdown")) {
+
+        sortMenu.hidden = true;
+
+        sortDropdown?.classList.remove("open");
+
+    }
+
+});
 
 // -------------------------
 // Перемикач "плитка / список"

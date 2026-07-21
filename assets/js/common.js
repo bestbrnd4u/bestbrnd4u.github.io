@@ -4,6 +4,24 @@
 // ======================================
 
 // -------------------------
+// Фіксований набір кольорів/розмірів
+//
+// В products.json немає even даних про реально доступні
+// варіанти по кожному товару окремо, тому на картці
+// каталогу, в обраному і в кошику використовується той
+// самий єдиний набір, що й раніше був захардкоджений на
+// сторінці товару (product.js).
+// -------------------------
+
+const PRODUCT_COLORS = [
+    { name: "Чорний", hex: "#000" },
+    { name: "Коричневий", hex: "#8b5e3c" },
+    { name: "Бежевий", hex: "#d9c7a1" }
+];
+
+const PRODUCT_SIZES = ["S", "M", "L"];
+
+// -------------------------
 // LocalStorage
 // -------------------------
 
@@ -277,11 +295,39 @@ document.addEventListener("click", event => {
 
 // -------------------------
 // Обране
+//
+// Кожен запис — об'єкт { id, color, size }, як і в
+// кошику: колір/розмір, обрані на картці чи сторінці
+// товару в момент кліку на ❤, зберігаються разом з
+// товаром і можуть бути змінені пізніше на сторінці
+// "Обране". На відміну від кошика, тут один товар —
+// один запис (серце просто вкл/викл для товару,
+// а не для конкретного варіанта).
+//
+// normalizeFavoriteEntry залишено для зворотної
+// сумісності зі старим обраним, де лежали просто
+// числа id (без кольору/розміру).
 // -------------------------
+
+function normalizeFavoriteEntry(entry) {
+
+    if (entry && typeof entry === "object") {
+
+        return {
+            id: Number(entry.id),
+            color: entry.color || null,
+            size: entry.size || null
+        };
+
+    }
+
+    return { id: Number(entry), color: null, size: null };
+
+}
 
 function getFavorites() {
 
-    return getStorage("favorites");
+    return getStorage("favorites").map(normalizeFavoriteEntry);
 
 }
 
@@ -293,19 +339,27 @@ function saveFavorites(list) {
 
 }
 
-function toggleFavorite(id) {
+function isFavorite(id) {
+
+    return getFavorites().some(entry => entry.id === Number(id));
+
+}
+
+function toggleFavorite(id, options = {}) {
+
+    const { color = null, size = null } = options;
 
     let favorites = getFavorites();
 
-    if (favorites.includes(id)) {
+    if (favorites.some(entry => entry.id === Number(id))) {
 
-        favorites = favorites.filter(item => item !== id);
+        favorites = favorites.filter(entry => entry.id !== Number(id));
 
         showToast("Видалено з обраного");
 
     } else {
 
-        favorites.push(id);
+        favorites.push({ id: Number(id), color, size });
 
         showToast("Додано в обране");
 
@@ -314,6 +368,21 @@ function toggleFavorite(id) {
     saveFavorites(favorites);
 
     updateFavoriteButtons();
+
+}
+
+// зміна кольору/розміру вже доданого в обране товару
+function changeFavoriteVariant(id, field, value) {
+
+    const favorites = getFavorites();
+
+    const entry = favorites.find(item => item.id === Number(id));
+
+    if (!entry) return;
+
+    entry[field] = value;
+
+    saveFavorites(favorites);
 
 }
 
@@ -327,7 +396,7 @@ function updateFavoriteButtons() {
 
         button.classList.toggle(
             "active",
-            favorites.includes(id)
+            favorites.some(entry => entry.id === id)
         );
 
     });
@@ -443,13 +512,38 @@ if (scrollTopBtn) {
 // Делегування подій
 // -------------------------
 
+// -------------------------
+// Обраний варіант (колір/розмір) у зоні картки/сторінки товару
+// -------------------------
+
+function getSelectedVariant(scope) {
+
+    if (!scope) return { color: null, size: null };
+
+    const color = scope.querySelector(".color.active")?.dataset.color
+        || scope.querySelector(".mini-color.active")?.dataset.color
+        || null;
+
+    const size = scope.querySelector(".size.active")?.textContent.trim()
+        || scope.querySelector(".mini-size.active")?.textContent.trim()
+        || null;
+
+    return { color, size };
+
+}
+
 document.addEventListener("click", event => {
 
     const favorite = event.target.closest(".favorite");
 
     if (favorite) {
 
-        toggleFavorite(Number(favorite.dataset.id));
+        const scope = favorite.closest("#productPage")
+            || favorite.closest(".product-card, .favorite-row");
+
+        const { color, size } = getSelectedVariant(scope);
+
+        toggleFavorite(Number(favorite.dataset.id), { color, size });
 
         return;
 
@@ -461,20 +555,7 @@ document.addEventListener("click", event => {
 
         const scope = buy.closest("#productPage") || buy.closest(".product-card, .favorite-row");
 
-        let color = null;
-        let size = null;
-
-        if (scope) {
-
-            color = scope.querySelector(".color.active")?.dataset.color
-                || scope.querySelector(".mini-color.active")?.dataset.color
-                || null;
-
-            size = scope.querySelector(".size.active")?.textContent.trim()
-                || scope.querySelector(".mini-size.active")?.textContent.trim()
-                || null;
-
-        }
+        const { color, size } = getSelectedVariant(scope);
 
         addToCart(Number(buy.dataset.id), { color, size });
 

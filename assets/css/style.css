@@ -584,7 +584,7 @@ nav li.has-mega:hover .mega-menu{
 
     background:
         linear-gradient(rgba(17,24,39,.45), rgba(17,24,39,.45)),
-        url("../hero.jpg");
+        url("https://images.pexels.com/photos/5745781/pexels-photo-5745781.jpeg?auto=compress&cs=tinysrgb&w=1600");
     background-size:cover;
     background-position:center;
     background-attachment:fixed;
@@ -660,6 +660,72 @@ nav li.has-mega:hover .mega-menu{
 .section-title a{
     color:var(--secondary);
     font-weight:700;
+}
+
+/* =====================================
+   INSTAGRAM PROMO
+===================================== */
+
+.instagram-promo{
+    background:var(--primary);
+    padding:50px 0;
+}
+
+.instagram-card{
+    display:flex;
+    align-items:center;
+    gap:28px;
+    flex-wrap:wrap;
+    padding:36px 44px;
+    border-radius:24px;
+    background:linear-gradient(135deg,#405de6,#5851db 25%,#833ab4 50%,#c13584 75%,#fd1d1d);
+}
+
+.instagram-icon{
+    font-size:40px;
+    flex-shrink:0;
+    width:76px;
+    height:76px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(255,255,255,.18);
+    border-radius:50%;
+}
+
+.instagram-text{
+    flex:1;
+    min-width:220px;
+}
+
+.instagram-text h3{
+    color:#fff;
+    font-size:24px;
+    margin-bottom:6px;
+}
+
+.instagram-text p{
+    color:rgba(255,255,255,.9);
+}
+
+.instagram-card .btn{
+    background:#fff;
+    color:var(--primary);
+    white-space:nowrap;
+}
+
+.instagram-card .btn:hover{
+    background:rgba(255,255,255,.85);
+}
+
+@media(max-width:768px){
+
+    .instagram-card{
+        flex-direction:column;
+        text-align:center;
+        padding:32px 24px;
+    }
+
 }
 
 /* =====================================
@@ -1199,7 +1265,7 @@ footer{
 
     background:
         linear-gradient(rgba(17,24,39,.55), rgba(17,24,39,.55)),
-        url("../images/promo.jpg");
+        url("https://images.pexels.com/photos/336372/pexels-photo-336372.jpeg?auto=compress&cs=tinysrgb&w=1600");
     background-size:cover;
     background-position:center;
 }
@@ -1581,6 +1647,82 @@ footer{
     color:#fff;
 }
 
+/* -- кастомний дропдаун сортування -- */
+
+.sort-dropdown{
+    position:relative;
+}
+
+.catalog-actions .sort-toggle{
+    width:auto;
+    height:auto;
+    padding:10px 16px;
+    border-radius:10px;
+    background:var(--gray100);
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:14px;
+    font-weight:600;
+    color:var(--gray700);
+    white-space:nowrap;
+}
+
+.catalog-actions .sort-toggle:hover{
+    background:var(--gray200);
+    color:var(--gray900);
+}
+
+.sort-toggle #sortLabel{
+    color:var(--secondary);
+    font-weight:700;
+}
+
+.sort-arrow{
+    font-size:11px;
+    transition:transform .2s;
+}
+
+.sort-dropdown.open .sort-arrow{
+    transform:rotate(180deg);
+}
+
+.sort-menu{
+    position:absolute;
+    top:calc(100% + 8px);
+    right:0;
+    background:#fff;
+    border-radius:14px;
+    box-shadow:var(--shadow-lg);
+    padding:8px;
+    min-width:220px;
+    z-index:200;
+}
+
+.catalog-actions .sort-option{
+    width:100%;
+    height:auto;
+    display:block;
+    text-align:left;
+    padding:10px 14px;
+    border-radius:8px;
+    background:transparent;
+    font-size:14px;
+    color:var(--gray700);
+    white-space:nowrap;
+}
+
+.catalog-actions .sort-option:hover{
+    background:var(--gray100);
+    color:var(--gray900);
+}
+
+.catalog-actions .sort-option.active{
+    background:rgba(37,99,235,.08);
+    color:var(--secondary);
+    font-weight:700;
+}
+
 .catalog-actions button.active{
     background:var(--secondary);
     color:#fff;
@@ -1940,9 +2082,8 @@ footer{
     color:var(--secondary);
 }
 
-.cart-item-variant{
-    font-size:13px;
-    color:var(--gray500);
+.cart-item-options{
+    margin-bottom:8px;
 }
 
 .cart-item-price{
@@ -2930,6 +3071,14 @@ footer{
 }
 
 @media(max-width:768px){
+
+    .sort-menu{
+        right:auto;
+        left:0;
+        min-width:0;
+        width:calc(100vw - 60px);
+        max-width:280px;
+    }
 
     .hero{
         min-height:520px;

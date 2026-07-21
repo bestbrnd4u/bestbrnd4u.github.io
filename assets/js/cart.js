@@ -92,14 +92,25 @@ function renderCart() {
 
         const image = product.images?.[0] || "assets/images/no-image.png";
 
-        const metaParts = [];
+        const activeColor = line.color || PRODUCT_COLORS[0].name;
+        const activeSize = line.size || PRODUCT_SIZES[0];
 
-        if (line.color) metaParts.push(`Колір: ${line.color}`);
-        if (line.size) metaParts.push(`Розмір: ${line.size}`);
+        const colorButtons = PRODUCT_COLORS.map(color => `
+            <button
+                type="button"
+                class="mini-color ${color.name === activeColor ? "active" : ""}"
+                data-color="${color.name}"
+                title="${color.name}"
+                style="background:${color.hex}"></button>
+        `).join("");
 
-        const variantHtml = metaParts.length
-            ? `<div class="cart-item-variant">${metaParts.join(" · ")}</div>`
-            : "";
+        const sizeButtons = PRODUCT_SIZES.map(size => `
+            <button
+                type="button"
+                class="mini-size ${size === activeSize ? "active" : ""}">
+                ${size}
+            </button>
+        `).join("");
 
         return `
             <div class="cart-item" data-id="${line.id}" data-color="${line.color || ""}" data-size="${line.size || ""}">
@@ -116,7 +127,14 @@ function renderCart() {
                     <a href="product.html?id=${line.id}" class="cart-item-title">
                         ${product.title}
                     </a>
-                    ${variantHtml}
+                    <div class="product-options cart-item-options">
+                        <div class="product-colors">
+                            ${colorButtons}
+                        </div>
+                        <div class="product-sizes">
+                            ${sizeButtons}
+                        </div>
+                    </div>
                     <div class="cart-item-price">${formatPrice(product.price)}</div>
                 </div>
 
@@ -213,7 +231,60 @@ function removeCartItem(id, color, size) {
 
 }
 
+// зміна кольору/розміру рядка кошика — оновлює ВСІ записи
+// цього варіанта (тобто всю кількість одразу, не по одному)
+function changeVariant(id, oldColor, oldSize, field, value) {
+
+    const cart = getCart();
+
+    cart.forEach(entry => {
+
+        if (
+            entry.id === id &&
+            (entry.color || null) === (oldColor || null) &&
+            (entry.size || null) === (oldSize || null)
+        ) {
+
+            entry[field] = value;
+
+        }
+
+    });
+
+    saveCart(cart);
+
+    renderCart();
+
+}
+
 cartItemsEl?.addEventListener("click", event => {
+
+    const colorBtn = event.target.closest(".mini-color");
+    const sizeBtn = event.target.closest(".mini-size");
+
+    if (colorBtn || sizeBtn) {
+
+        const row = event.target.closest(".cart-item");
+
+        if (!row) return;
+
+        const id = Number(row.dataset.id);
+        const oldColor = row.dataset.color || null;
+        const oldSize = row.dataset.size || null;
+
+        if (colorBtn) {
+
+            changeVariant(id, oldColor, oldSize, "color", colorBtn.dataset.color);
+
+        } else {
+
+            changeVariant(id, oldColor, oldSize, "size", sizeBtn.textContent.trim());
+
+        }
+
+        return;
+
+    }
 
     const minus = event.target.closest(".qty-minus");
     const plus = event.target.closest(".qty-plus");

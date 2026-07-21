@@ -25,13 +25,8 @@ function createProductCard(product) {
         ? Math.round((1 - product.price / product.oldPrice) * 100)
         : 0;
 
-    const colors = [
-        { name: "Чорний", hex: "#000" },
-        { name: "Коричневий", hex: "#8b5e3c" },
-        { name: "Бежевий", hex: "#d9c7a1" }
-    ];
-
-    const sizes = ["S", "M", "L"];
+    const colors = PRODUCT_COLORS;
+    const sizes = PRODUCT_SIZES;
 
     const colorButtons = colors.map((color, index) => `
         <button
