@@ -182,6 +182,8 @@ function applyBrandFromUrl() {
 
     const params = new URLSearchParams(location.search);
 
+    const urlBrand = params.get("brand");
+
     if (urlBrand) {
 
         const match = [...brandOptionsList.querySelectorAll(".filter-option")]
