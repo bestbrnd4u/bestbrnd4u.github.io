@@ -178,9 +178,9 @@ function applySearchFromUrl() {
 
 }
 
-    const params = new URLSearchParams(location.search);
+function applyBrandFromUrl() {
 
-    const urlBrand = params.get("brand");
+    const params = new URLSearchParams(location.search);
 
     if (urlBrand) {
 

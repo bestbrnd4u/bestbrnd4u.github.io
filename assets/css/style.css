@@ -1738,6 +1738,10 @@ footer{
 
 /* -- панель активних фільтрів -- */
 
+.active-filters-bar[hidden]{
+    display:none;
+}
+
 .active-filters-bar{
     display:flex;
     flex-wrap:wrap;
@@ -2375,6 +2379,10 @@ footer{
     margin-bottom:6px;
 }
 
+.summary-row[hidden]{
+    display:none;
+}
+
 .summary-row{
     display:flex;
     justify-content:space-between;
@@ -2411,6 +2419,14 @@ footer{
 }
 
 /* -- горизонтальные строки избранного -- */
+
+.favorites-list[hidden]{
+    display:none;
+}
+
+.favorites-list[hidden]{
+    display:none;
+}
 
 .favorites-list{
     display:flex;
@@ -3388,7 +3404,10 @@ footer{
 
 .search-overlay{
     position:fixed;
-    inset:0;
+    top:82px;
+    left:0;
+    right:0;
+    bottom:0;
     z-index:4000;
     display:flex;
     justify-content:center;
@@ -3414,7 +3433,7 @@ footer{
     position:relative;
     z-index:1;
     width:100%;
-    max-height:100vh;
+    max-height:calc(100vh - 82px);
     overflow-y:auto;
     background:#fff;
     box-shadow:var(--shadow-lg);
@@ -3471,6 +3490,10 @@ footer{
 
 .search-overlay-input-wrap input:focus{
     outline:none;
+}
+
+.search-overlay-clear[hidden]{
+    display:none;
 }
 
 .search-overlay-clear{
@@ -3588,6 +3611,10 @@ footer{
 
 /* -- результати пошуку -- */
 
+.search-results[hidden]{
+    display:none;
+}
+
 .search-results{
     display:grid;
     grid-template-columns:220px 1fr;
@@ -3675,6 +3702,10 @@ footer{
     color:var(--gray500);
     font-size:14.5px;
     padding:8px 0;
+}
+
+.search-see-all[hidden]{
+    display:none;
 }
 
 .search-see-all{
