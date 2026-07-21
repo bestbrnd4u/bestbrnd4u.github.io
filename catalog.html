@@ -126,9 +126,8 @@ placeholder="Пошук товару...">
 <span class="filter-menu-search-icon">🔍</span>
 <input type="text" id="brandSearchInput" placeholder="Пошук бренду...">
 </div>
-<div id="brandOptionsList" class="filter-menu-options">
-<button type="button" class="filter-option active" data-brand="">Усі бренди</button>
-</div>
+<button type="button" class="filter-option-clear" data-clear-brand>✕ Скинути вибір бренду</button>
+<div id="brandOptionsList" class="filter-menu-options"></div>
 <p id="brandNoResults" class="filter-menu-empty" hidden>Бренд не знайдено</p>
 </div>
 </div>
@@ -139,19 +138,21 @@ placeholder="Пошук товару...">
 <span class="filter-arrow">▾</span>
 </button>
 <div id="priceMenu" class="filter-menu" hidden>
-<button type="button" class="filter-option active" data-price="" data-label="Будь-яка ціна">
-Будь-яка ціна
-</button>
+<button type="button" class="filter-option-clear" data-clear-price>✕ Скинути вибір ціни</button>
 <button type="button" class="filter-option" data-price="0-2000" data-label="до 2 000 ₴">
+<span class="filter-checkbox"></span>
 до 2 000 ₴
 </button>
 <button type="button" class="filter-option" data-price="2000-5000" data-label="2 000 – 5 000 ₴">
+<span class="filter-checkbox"></span>
 2 000 – 5 000 ₴
 </button>
 <button type="button" class="filter-option" data-price="5000-8000" data-label="5 000 – 8 000 ₴">
+<span class="filter-checkbox"></span>
 5 000 – 8 000 ₴
 </button>
 <button type="button" class="filter-option" data-price="8000" data-label="від 8 000 ₴">
+<span class="filter-checkbox"></span>
 від 8 000 ₴
 </button>
 </div>

@@ -9,8 +9,8 @@ const sortLabel = document.getElementById("sortLabel");
 const sortDropdown = document.getElementById("sortDropdown");
 
 let currentSort = "";
-let currentBrand = "";
-let currentPrice = "";
+let selectedBrands = new Set();
+let selectedPrices = new Set();
 
 // -------------------------
 // Дропдаун «Бренд» (з пошуком)
@@ -57,6 +57,49 @@ const GENDERS = ["Чоловікам", "Жінкам", "Унісекс", "Діт
 const SALE_MIN_DISCOUNT = 30; // % — мінімальна знижка для розділу "Акції"
 const DEFAULT_BRAND_LABEL = "Усі бренди";
 const DEFAULT_PRICE_LABEL = "Будь-яка ціна";
+
+const PRICE_RANGE_LABELS = {
+    "0-2000": "до 2 000 ₴",
+    "2000-5000": "2 000 – 5 000 ₴",
+    "5000-8000": "5 000 – 8 000 ₴",
+    "8000": "від 8 000 ₴"
+};
+
+function matchesPriceRange(product, rangeKey) {
+
+    switch (rangeKey) {
+
+        case "0-2000":
+            return product.price <= 2000;
+
+        case "2000-5000":
+            return product.price >= 2000 && product.price <= 5000;
+
+        case "5000-8000":
+            return product.price >= 5000 && product.price <= 8000;
+
+        case "8000":
+            return product.price >= 8000;
+
+        default:
+            return false;
+
+    }
+
+}
+
+// формує підпис кнопки-дропдауна залежно від кількості обраних значень
+function getMultiSelectLabel(selectedSet, defaultLabel, noun, labelForValue) {
+
+    if (selectedSet.size === 0) return defaultLabel;
+
+    const toLabel = labelForValue || (value => value);
+
+    if (selectedSet.size === 1) return toLabel([...selectedSet][0]);
+
+    return `${noun} (${selectedSet.size})`;
+
+}
 
 // поточний стан розділу, приходить з URL; стать — лише початкове
 // значення фільтра, після завантаження сторінки завжди вільно змінюється
@@ -124,7 +167,7 @@ async function initCatalog() {
 }
 
 // -------------------------
-// Дропдаун «Бренд»
+// Дропдаун «Бренд» (мультиселект)
 // -------------------------
 
 function fillBrands() {
@@ -138,9 +181,9 @@ function fillBrands() {
         option.type = "button";
         option.className = "filter-option";
         option.dataset.brand = item;
-        option.textContent = item;
+        option.innerHTML = `<span class="filter-checkbox"></span>${item}`;
 
-        option.addEventListener("click", () => selectBrand(item, item));
+        option.addEventListener("click", () => toggleBrand(item));
 
         brandOptionsList.appendChild(option);
 
@@ -148,19 +191,43 @@ function fillBrands() {
 
 }
 
-function selectBrand(value, label) {
+function toggleBrand(value) {
 
-    currentBrand = value;
+    if (selectedBrands.has(value)) {
 
-    brandLabel.textContent = label || DEFAULT_BRAND_LABEL;
+        selectedBrands.delete(value);
 
-    brandOptionsList.querySelectorAll(".filter-option").forEach(o => {
-        o.classList.toggle("active", (o.dataset.brand || "") === value);
-    });
+    } else {
+
+        selectedBrands.add(value);
+
+    }
+
+    updateBrandUI();
+
+    render();
+
+}
+
+function clearBrands() {
+
+    selectedBrands.clear();
+
+    updateBrandUI();
 
     closeAllDropdowns();
 
     render();
+
+}
+
+function updateBrandUI() {
+
+    brandLabel.textContent = getMultiSelectLabel(selectedBrands, DEFAULT_BRAND_LABEL, "Бренди");
+
+    brandOptionsList.querySelectorAll(".filter-option").forEach(o => {
+        o.classList.toggle("active", selectedBrands.has(o.dataset.brand));
+    });
 
 }
 
@@ -189,7 +256,13 @@ function applyBrandFromUrl() {
         const match = [...brandOptionsList.querySelectorAll(".filter-option")]
             .find(o => o.dataset.brand === urlBrand);
 
-        if (match) selectBrand(urlBrand, urlBrand);
+        if (match) {
+
+            selectedBrands.add(urlBrand);
+
+            updateBrandUI();
+
+        }
 
     }
 
@@ -215,6 +288,8 @@ brandToggle?.addEventListener("click", event => {
 
 });
 
+document.querySelector("[data-clear-brand]")?.addEventListener("click", clearBrands);
+
 function filterBrandOptions(query) {
 
     const q = query.trim().toLowerCase();
@@ -222,16 +297,7 @@ function filterBrandOptions(query) {
 
     brandOptionsList.querySelectorAll(".filter-option").forEach(option => {
 
-        // пункт "Усі бренди" завжди залишається на місці
-        if (!option.dataset.brand) {
-
-            option.hidden = false;
-
-            return;
-
-        }
-
-        const matches = option.textContent.toLowerCase().includes(q);
+        const matches = option.dataset.brand.toLowerCase().includes(q);
 
         option.hidden = !matches;
 
@@ -252,26 +318,65 @@ brandSearchInput?.addEventListener("input", () => {
 brandSearchInput?.addEventListener("click", event => event.stopPropagation());
 
 // -------------------------
-// Дропдаун «Ціна»
+// Дропдаун «Ціна» (мультиселект)
 // -------------------------
 
 priceMenu?.querySelectorAll(".filter-option").forEach(option => {
 
     option.addEventListener("click", () => {
 
-        currentPrice = option.dataset.price;
-
-        priceLabel.textContent = option.dataset.label;
-
-        priceMenu.querySelectorAll(".filter-option").forEach(o => o.classList.toggle("active", o === option));
-
-        closeAllDropdowns();
-
-        render();
+        togglePrice(option.dataset.price);
 
     });
 
 });
+
+function togglePrice(value) {
+
+    if (selectedPrices.has(value)) {
+
+        selectedPrices.delete(value);
+
+    } else {
+
+        selectedPrices.add(value);
+
+    }
+
+    updatePriceUI();
+
+    render();
+
+}
+
+function clearPrices() {
+
+    selectedPrices.clear();
+
+    updatePriceUI();
+
+    closeAllDropdowns();
+
+    render();
+
+}
+
+function updatePriceUI() {
+
+    priceLabel.textContent = getMultiSelectLabel(
+        selectedPrices,
+        DEFAULT_PRICE_LABEL,
+        "Ціна",
+        value => PRICE_RANGE_LABELS[value]
+    );
+
+    priceMenu.querySelectorAll(".filter-option").forEach(o => {
+        o.classList.toggle("active", selectedPrices.has(o.dataset.price));
+    });
+
+}
+
+document.querySelector("[data-clear-price]")?.addEventListener("click", clearPrices);
 
 priceToggle?.addEventListener("click", event => {
 
@@ -451,43 +556,19 @@ function filterProducts() {
 
     }
 
-    if (currentBrand) {
+    if (selectedBrands.size) {
 
         list = list.filter(product =>
-            product.brand === currentBrand
+            selectedBrands.has(product.brand)
         );
 
     }
 
-    if (currentPrice) {
+    if (selectedPrices.size) {
 
-        switch (currentPrice) {
-
-            case "0-2000":
-                list = list.filter(product => product.price <= 2000);
-                break;
-
-            case "2000-5000":
-                list = list.filter(product =>
-                    product.price >= 2000 &&
-                    product.price <= 5000
-                );
-                break;
-
-            case "5000-8000":
-                list = list.filter(product =>
-                    product.price >= 5000 &&
-                    product.price <= 8000
-                );
-                break;
-
-            case "8000":
-                list = list.filter(product =>
-                    product.price >= 8000
-                );
-                break;
-
-        }
+        list = list.filter(product =>
+            [...selectedPrices].some(range => matchesPriceRange(product, range))
+        );
 
     }
 
@@ -573,17 +654,17 @@ function renderActiveFilters() {
 
     }
 
-    if (currentBrand) {
+    selectedBrands.forEach(brand => {
 
-        chips.push({ type: "brand", label: currentBrand });
+        chips.push({ type: "brand", value: brand, label: brand });
 
-    }
+    });
 
-    if (currentPrice) {
+    selectedPrices.forEach(range => {
 
-        chips.push({ type: "price", label: priceLabel.textContent });
+        chips.push({ type: "price", value: range, label: PRICE_RANGE_LABELS[range] });
 
-    }
+    });
 
     if (chips.length === 0) {
 
@@ -597,7 +678,7 @@ function renderActiveFilters() {
     activeFiltersBar.hidden = false;
 
     activeFiltersList.innerHTML = chips.map(chip => `
-        <button type="button" class="filter-chip" data-clear="${chip.type}">
+        <button type="button" class="filter-chip" data-clear="${chip.type}" data-value="${chip.value || ""}">
             ${chip.label}
             <span class="filter-chip-x">✕</span>
         </button>
@@ -611,11 +692,11 @@ activeFiltersList?.addEventListener("click", event => {
 
     if (!chip) return;
 
-    clearOneFilter(chip.dataset.clear);
+    clearOneFilter(chip.dataset.clear, chip.dataset.value);
 
 });
 
-function clearOneFilter(type) {
+function clearOneFilter(type, value) {
 
     if (type === "search") {
 
@@ -631,19 +712,15 @@ function clearOneFilter(type) {
 
     } else if (type === "brand") {
 
-        selectBrand("", DEFAULT_BRAND_LABEL);
+        selectedBrands.delete(value);
 
-        return; // selectBrand вже викликає render()
+        updateBrandUI();
 
     } else if (type === "price") {
 
-        currentPrice = "";
+        selectedPrices.delete(value);
 
-        priceLabel.textContent = DEFAULT_PRICE_LABEL;
-
-        priceMenu?.querySelectorAll(".filter-option").forEach(o => {
-            o.classList.toggle("active", o.dataset.price === "");
-        });
+        updatePriceUI();
 
     }
 
@@ -655,17 +732,11 @@ function resetAllFilters() {
 
     search.value = "";
 
-    currentBrand = "";
-    brandLabel.textContent = DEFAULT_BRAND_LABEL;
-    brandOptionsList.querySelectorAll(".filter-option").forEach(o => {
-        o.classList.toggle("active", (o.dataset.brand || "") === "");
-    });
+    selectedBrands.clear();
+    updateBrandUI();
 
-    currentPrice = "";
-    priceLabel.textContent = DEFAULT_PRICE_LABEL;
-    priceMenu?.querySelectorAll(".filter-option").forEach(o => {
-        o.classList.toggle("active", o.dataset.price === "");
-    });
+    selectedPrices.clear();
+    updatePriceUI();
 
     currentSort = "";
 

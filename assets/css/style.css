@@ -1662,7 +1662,9 @@ footer{
 
 .filter-option{
     width:100%;
-    display:block;
+    display:flex;
+    align-items:center;
+    gap:10px;
     text-align:left;
     padding:10px 14px;
     border-radius:8px;
@@ -1683,6 +1685,53 @@ footer{
     background:rgba(37,99,235,.08);
     color:var(--secondary);
     font-weight:700;
+}
+
+.filter-checkbox{
+    flex-shrink:0;
+    width:17px;
+    height:17px;
+    border-radius:5px;
+    border:1.5px solid var(--gray300);
+    background:#fff;
+    position:relative;
+    transition:.2s;
+}
+
+.filter-option.active .filter-checkbox{
+    background:var(--secondary);
+    border-color:var(--secondary);
+}
+
+.filter-option.active .filter-checkbox::after{
+    content:"";
+    position:absolute;
+    left:5px;
+    top:1px;
+    width:4px;
+    height:8px;
+    border:solid #fff;
+    border-width:0 2px 2px 0;
+    transform:rotate(45deg);
+}
+
+.filter-option-clear{
+    width:100%;
+    display:block;
+    text-align:left;
+    padding:9px 14px;
+    margin-bottom:4px;
+    border-radius:8px;
+    background:transparent;
+    font-size:13px;
+    font-weight:600;
+    color:var(--gray500);
+    border-bottom:1px solid var(--gray100);
+}
+
+.filter-option-clear:hover{
+    background:var(--gray100);
+    color:var(--danger);
 }
 
 /* -- пошук всередині дропдауна "Бренд" -- */
@@ -3530,6 +3579,17 @@ footer{
     padding:36px 32px 60px;
 }
 
+.search-idle{
+    display:flex;
+    align-items:flex-start;
+    gap:56px;
+}
+
+.search-idle-main{
+    flex:1 1 380px;
+    min-width:0;
+}
+
 .search-section + .search-section{
     margin-top:36px;
 }
@@ -3576,7 +3636,8 @@ footer{
 .search-recent-item{
     display:flex;
     align-items:center;
-    justify-content:space-between;
+    justify-content:flex-start;
+    gap:12px;
     padding:13px 4px;
     border-bottom:1px solid var(--gray100);
     cursor:pointer;
@@ -3596,6 +3657,7 @@ footer{
     width:26px;
     height:26px;
     border-radius:50%;
+    flex-shrink:0;
     display:flex;
     align-items:center;
     justify-content:center;
@@ -3607,6 +3669,52 @@ footer{
 .search-recent-remove:hover{
     background:var(--gray100);
     color:var(--gray900);
+}
+
+/* -- банери каталогу (права колонка ідле-стану пошуку) -- */
+
+.search-promo-banners{
+    flex:1 1 320px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+}
+
+.search-promo-banner{
+    position:relative;
+    height:130px;
+    border-radius:16px;
+    background-size:cover;
+    background-position:center;
+    display:flex;
+    align-items:flex-end;
+    padding:16px;
+    overflow:hidden;
+    transition:transform .25s;
+}
+
+.search-promo-banner:hover{
+    transform:translateY(-3px);
+}
+
+.search-promo-banner span{
+    color:#fff;
+    font-weight:700;
+    font-size:16px;
+    position:relative;
+    z-index:1;
+}
+
+.search-promo-new{
+    background:linear-gradient(135deg,#0f1729,#1b2540);
+}
+
+.search-promo-new span{
+    color:#e8c98a;
+}
+
+.search-promo-sale{
+    background:linear-gradient(135deg,#7f1d1d,#b91c1c);
 }
 
 /* -- результати пошуку -- */
@@ -3734,6 +3842,15 @@ footer{
 
     .search-overlay-body{
         padding:24px 20px 48px;
+    }
+
+    .search-idle{
+        flex-direction:column;
+        gap:32px;
+    }
+
+    .search-promo-banners{
+        width:100%;
     }
 
     .search-results{

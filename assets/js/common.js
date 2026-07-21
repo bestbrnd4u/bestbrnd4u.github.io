@@ -464,6 +464,45 @@ const MAX_SEARCH_RESULTS = 6;
 let searchOverlayEl = null;
 let searchDebounceTimer = null;
 
+// -------------------------
+// Блокування скролу без "стрибка" верстки
+//
+// document.body.style.overflow = "hidden" прибирає смугу
+// прокрутки, і сторінка (а разом з нею fixed-хедер) стає
+// трохи ширшою — все "стрибає" на ширину смуги прокрутки.
+// Компенсуємо це padding-right на body І на хедері (він
+// position:fixed і сам по собі padding body не бачить).
+// -------------------------
+
+function lockPageScroll() {
+
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+
+    document.body.style.overflow = "hidden";
+
+    if (scrollbarWidth > 0) {
+
+        document.body.style.paddingRight = `${scrollbarWidth}px`;
+
+        const headerEl = document.querySelector("header");
+
+        if (headerEl) headerEl.style.paddingRight = `${scrollbarWidth}px`;
+
+    }
+
+}
+
+function unlockPageScroll() {
+
+    document.body.style.overflow = "";
+    document.body.style.paddingRight = "";
+
+    const headerEl = document.querySelector("header");
+
+    if (headerEl) headerEl.style.paddingRight = "";
+
+}
+
 function getRecentSearches() {
     return getStorage(RECENT_SEARCHES_KEY);
 }
@@ -516,14 +555,38 @@ function buildSearchOverlay() {
 
                 <div id="searchIdleState" class="search-idle">
 
-                    <div class="search-section">
-                        <div class="search-section-title">Популярні запити</div>
-                        <div id="searchPopular" class="search-chip-list"></div>
+                    <div class="search-idle-main">
+
+                        <div class="search-section">
+                            <div class="search-section-title">Популярні запити</div>
+                            <div id="searchPopular" class="search-chip-list"></div>
+                        </div>
+
+                        <div class="search-section" id="searchRecentSection" hidden>
+                            <div class="search-section-title">Останні пошуки</div>
+                            <div id="searchRecent" class="search-recent-list"></div>
+                        </div>
+
                     </div>
 
-                    <div class="search-section" id="searchRecentSection" hidden>
-                        <div class="search-section-title">Останні пошуки</div>
-                        <div id="searchRecent" class="search-recent-list"></div>
+                    <div class="search-promo-banners">
+
+                        <a href="catalog.html?gender=Чоловікам" class="search-promo-banner" style="background-image:linear-gradient(rgba(15,23,41,.35),rgba(15,23,41,.55)),url('https://images.pexels.com/photos/7869755/pexels-photo-7869755.jpeg?auto=compress&cs=tinysrgb&w=600')">
+                            <span>Чоловікам</span>
+                        </a>
+
+                        <a href="catalog.html?gender=Жінкам" class="search-promo-banner" style="background-image:linear-gradient(rgba(15,23,41,.35),rgba(15,23,41,.55)),url('https://images.pexels.com/photos/932401/pexels-photo-932401.jpeg?auto=compress&cs=tinysrgb&w=600')">
+                            <span>Жінкам</span>
+                        </a>
+
+                        <a href="catalog.html?section=new" class="search-promo-banner search-promo-new">
+                            <span>Новинки</span>
+                        </a>
+
+                        <a href="catalog.html?section=sale" class="search-promo-banner search-promo-sale">
+                            <span>Акції</span>
+                        </a>
+
                     </div>
 
                 </div>
@@ -769,7 +832,7 @@ function openSearchOverlay() {
 
     requestAnimationFrame(() => searchOverlayEl.classList.add("open"));
 
-    document.body.style.overflow = "hidden";
+    lockPageScroll();
 
     const input = document.getElementById("globalSearchInput");
 
@@ -787,7 +850,7 @@ function closeSearchOverlay() {
 
     searchOverlayEl.classList.remove("open");
 
-    document.body.style.overflow = "";
+    unlockPageScroll();
 
     setTimeout(() => {
 
