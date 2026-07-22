@@ -3938,9 +3938,38 @@ footer{
     font-weight:600;
 }
 
+/* FIX: display:flex вище перебиває стандартний display:none
+   у [hidden] — без цього рядка поля "Номер відділення" /
+   "Номер поштомату" / "Адреса..." показувались всі одразу,
+   незалежно від обраного способу отримання. */
+.auth-form label[hidden]{
+    display:none;
+}
+
 .auth-form input:focus{
     outline:none;
     border-color:var(--secondary);
+}
+
+.auth-form select{
+    appearance:none;
+    -webkit-appearance:none;
+    padding-right:44px;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9' fill='none'%3E%3Cpath d='M1 1L7 7L13 1' stroke='%236b7280' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position:right 16px center;
+    cursor:pointer;
+    transition:var(--transition);
+}
+
+.auth-form select:hover{
+    border-color:var(--gray300);
+}
+
+.auth-form select:focus{
+    outline:none;
+    border-color:var(--secondary);
+    box-shadow:0 0 0 4px rgba(37,99,235,.1);
 }
 
 .auth-form .btn{
@@ -4431,7 +4460,24 @@ footer{
 }
 
 .address-modal-card{
-    max-width:480px;
+    max-width:520px;
+    max-height:calc(100vh - 80px);
+    overflow-y:auto;
+    scrollbar-width:thin;
+    scrollbar-color:var(--gray300) transparent;
+}
+
+.address-modal-card::-webkit-scrollbar{
+    width:6px;
+}
+
+.address-modal-card::-webkit-scrollbar-track{
+    background:transparent;
+}
+
+.address-modal-card::-webkit-scrollbar-thumb{
+    background:var(--gray300);
+    border-radius:10px;
 }
 
 .address-default-check{
