@@ -270,6 +270,16 @@ function renderOrderCard(order) {
 
     }).join("");
 
+    const deliveryLine = order.delivery_method
+        ? `${order.delivery_method}${order.delivery_city ? " · " + order.delivery_city : ""}`
+        : "—";
+
+    const hasDiscount = Number(order.discount) > 0;
+
+    const discountLine = hasDiscount
+        ? `-${formatPrice(order.discount)}${order.promo_code ? ` (промокод: ${order.promo_code})` : ""}`
+        : null;
+
     return `
         <div class="order-card">
 
@@ -288,13 +298,34 @@ function renderOrderCard(order) {
                 ${itemsHtml}
             </div>
 
-            <div class="order-card-footer">
+            <div class="order-card-delivery">
+                <span>Доставка</span>
+                <span>${deliveryLine}</span>
+            </div>
 
-                <span>
-                    ${order.delivery_method ? `${order.delivery_method}${order.delivery_city ? " · " + order.delivery_city : ""}` : ""}
-                </span>
+            <div class="order-card-summary">
 
-                <span class="order-card-total">Разом: ${formatPrice(order.total)}</span>
+                <div class="order-card-summary-row">
+                    <span>Сума товарів</span>
+                    <span>${formatPrice(order.subtotal)}</span>
+                </div>
+
+                ${hasDiscount ? `
+                <div class="order-card-summary-row order-card-summary-discount">
+                    <span>Знижка</span>
+                    <span>${discountLine}</span>
+                </div>
+                ` : ""}
+
+                <div class="order-card-summary-row">
+                    <span>Доставка</span>
+                    <span>${Number(order.delivery_price) > 0 ? formatPrice(order.delivery_price) : "Безкоштовно"}</span>
+                </div>
+
+                <div class="order-card-summary-row order-card-summary-total">
+                    <span>Разом</span>
+                    <span>${formatPrice(order.total)}</span>
+                </div>
 
             </div>
 
