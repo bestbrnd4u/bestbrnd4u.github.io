@@ -20,6 +20,11 @@ const ordersLoader = document.getElementById("ordersLoader");
 const emptyOrders = document.getElementById("emptyOrders");
 const ordersListEl = document.getElementById("ordersList");
 
+const profileForm = document.getElementById("profileForm");
+const profileEmailEl = document.getElementById("profileEmail");
+const profileMessageEl = document.getElementById("profileMessage");
+const changePasswordBtn = document.getElementById("changePasswordBtn");
+
 // -------------------------
 // Перемикання вкладок "Увійти" / "Реєстрація"
 // -------------------------
@@ -280,51 +285,73 @@ function renderOrderCard(order) {
         ? `-${formatPrice(order.discount)}${order.promo_code ? ` (промокод: ${order.promo_code})` : ""}`
         : null;
 
+    // компактний рядок-зведення, видимий у згорнутому стані картки
+    const briefParts = [
+        deliveryLine,
+        `Сума товарів ${formatPrice(order.subtotal)}`
+    ];
+
+    if (hasDiscount) {
+        briefParts.push(`<span class="order-card-brief-discount">Знижка ${discountLine}</span>`);
+    }
+
+    briefParts.push(`Доставка ${Number(order.delivery_price) > 0 ? formatPrice(order.delivery_price) : "Безкоштовно"}`);
+    briefParts.push(`<span class="order-card-brief-total">Разом ${formatPrice(order.total)}</span>`);
+
     return `
         <div class="order-card">
 
-            <div class="order-card-header">
+            <button type="button" class="order-card-toggle">
 
-                <div>
-                    <span class="order-card-number">Замовлення ${order.order_number}</span>
-                    <span class="order-card-date">${date}</span>
+                <div class="order-card-header">
+
+                    <div>
+                        <span class="order-card-number">Замовлення ${order.order_number}</span>
+                        <span class="order-card-date">${date}</span>
+                    </div>
+
+                    <span class="order-status order-status-${order.status || "new"}">${orderStatusLabel(order.status)}</span>
+
+                    <span class="order-card-chevron">⌄</span>
+
                 </div>
 
-                <span class="order-status order-status-${order.status || "new"}">${orderStatusLabel(order.status)}</span>
-
-            </div>
-
-            <div class="order-card-items">
-                ${itemsHtml}
-            </div>
-
-            <div class="order-card-delivery">
-                <span>Доставка</span>
-                <span>${deliveryLine}</span>
-            </div>
-
-            <div class="order-card-summary">
-
-                <div class="order-card-summary-row">
-                    <span>Сума товарів</span>
-                    <span>${formatPrice(order.subtotal)}</span>
+                <div class="order-card-brief">
+                    ${briefParts.join('<span class="order-card-brief-dot">·</span>')}
                 </div>
 
-                ${hasDiscount ? `
-                <div class="order-card-summary-row order-card-summary-discount">
-                    <span>Знижка</span>
-                    <span>${discountLine}</span>
-                </div>
-                ` : ""}
+            </button>
 
-                <div class="order-card-summary-row">
-                    <span>Доставка</span>
-                    <span>${Number(order.delivery_price) > 0 ? formatPrice(order.delivery_price) : "Безкоштовно"}</span>
+            <div class="order-card-details" hidden>
+
+                <div class="order-card-items">
+                    ${itemsHtml}
                 </div>
 
-                <div class="order-card-summary-row order-card-summary-total">
-                    <span>Разом</span>
-                    <span>${formatPrice(order.total)}</span>
+                <div class="order-card-summary">
+
+                    <div class="order-card-summary-row">
+                        <span>Сума товарів</span>
+                        <span>${formatPrice(order.subtotal)}</span>
+                    </div>
+
+                    ${hasDiscount ? `
+                    <div class="order-card-summary-row order-card-summary-discount">
+                        <span>Знижка</span>
+                        <span>${discountLine}</span>
+                    </div>
+                    ` : ""}
+
+                    <div class="order-card-summary-row">
+                        <span>Доставка</span>
+                        <span>${Number(order.delivery_price) > 0 ? formatPrice(order.delivery_price) : "Безкоштовно"}</span>
+                    </div>
+
+                    <div class="order-card-summary-row order-card-summary-total">
+                        <span>Разом</span>
+                        <span>${formatPrice(order.total)}</span>
+                    </div>
+
                 </div>
 
             </div>
@@ -333,6 +360,132 @@ function renderOrderCard(order) {
     `;
 
 }
+
+// розгортання / згортання картки замовлення —
+// делегування на список, бо картки перемальовуються динамічно
+ordersListEl?.addEventListener("click", event => {
+
+    const toggle = event.target.closest(".order-card-toggle");
+
+    if (!toggle) return;
+
+    const card = toggle.closest(".order-card");
+    const details = card.querySelector(".order-card-details");
+
+    const isOpen = card.classList.toggle("expanded");
+
+    details.hidden = !isOpen;
+
+});
+
+// -------------------------
+// Перемикання вкладок "Історія замовлень" / "Мої дані"
+// -------------------------
+
+document.querySelectorAll(".account-tab").forEach(tab => {
+
+    tab.addEventListener("click", () => {
+
+        document.querySelectorAll(".account-tab").forEach(t => t.classList.toggle("active", t === tab));
+
+        const isOrders = tab.dataset.tab === "orders";
+
+        document.getElementById("ordersPanel").hidden = !isOrders;
+        document.getElementById("profilePanel").hidden = isOrders;
+
+    });
+
+});
+
+// -------------------------
+// "Мої дані" — завантаження та збереження профілю
+// -------------------------
+
+async function loadProfile(user) {
+
+    profileEmailEl.textContent = user.email;
+
+    const { data, error } = await supabaseClient
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .maybeSingle();
+
+    if (error) {
+        console.warn("Не вдалося завантажити профіль:", error);
+        return;
+    }
+
+    document.getElementById("profileFirstName").value = data?.first_name || "";
+    document.getElementById("profileLastName").value = data?.last_name || "";
+    document.getElementById("profileMiddleName").value = data?.middle_name || "";
+    document.getElementById("profilePhone").value = data?.phone || "";
+    document.getElementById("profileCity").value = data?.city || "";
+
+}
+
+profileForm?.addEventListener("submit", async event => {
+
+    event.preventDefault();
+
+    profileMessageEl.textContent = "";
+
+    const user = await getCurrentUser();
+
+    if (!user) return;
+
+    const submitBtn = document.getElementById("profileSubmit");
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Зберігаємо...";
+
+    const { error } = await supabaseClient.from("profiles").upsert({
+        id: user.id,
+        first_name: document.getElementById("profileFirstName").value.trim(),
+        last_name: document.getElementById("profileLastName").value.trim(),
+        middle_name: document.getElementById("profileMiddleName").value.trim(),
+        phone: document.getElementById("profilePhone").value.trim(),
+        city: document.getElementById("profileCity").value.trim(),
+        updated_at: new Date().toISOString()
+    });
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Зберегти зміни";
+
+    if (error) {
+
+        console.error("Не вдалося зберегти профіль:", error);
+
+        profileMessageEl.textContent = "Не вдалося зберегти дані. Спробуйте ще раз";
+
+        return;
+
+    }
+
+    showToast("Дані збережено");
+
+});
+
+changePasswordBtn?.addEventListener("click", async () => {
+
+    const user = await getCurrentUser();
+
+    if (!user) return;
+
+    changePasswordBtn.disabled = true;
+
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(user.email);
+
+    changePasswordBtn.disabled = false;
+
+    if (error) {
+        showToast("Не вдалося надіслати лист. Спробуйте ще раз");
+        return;
+    }
+
+    showToast("Лист для зміни пароля надіслано на " + user.email);
+
+});
 
 // -------------------------
 // Визначення стану авторизації на самій сторінці кабінету
@@ -351,7 +504,10 @@ async function renderAuthState() {
 
         accountEmailEl.textContent = user.email;
 
-        await loadOrders(user.id);
+        await Promise.all([
+            loadOrders(user.id),
+            loadProfile(user)
+        ]);
 
     } else {
 

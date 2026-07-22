@@ -94,6 +94,44 @@ const toggleSummaryBtn = document.getElementById("toggleSummary");
 const checkoutForm = document.getElementById("checkoutForm");
 const submitOrderBtn = document.getElementById("submitOrderBtn");
 
+// якщо клієнт авторизований і вже заповнював «Мої дані» в кабінеті —
+// підставляємо ці дані в форму оформлення замовлення автоматично.
+// Best-effort: якщо щось піде не так, форма просто лишається порожньою.
+async function prefillFromProfile() {
+
+    if (!supabaseClient) return;
+
+    const user = await getCurrentUser();
+
+    if (!user) return;
+
+    const emailField = document.getElementById("email");
+
+    if (emailField && !emailField.value) {
+        emailField.value = user.email;
+    }
+
+    const { data, error } = await supabaseClient
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .maybeSingle();
+
+    if (error || !data) return;
+
+    const fill = (id, value) => {
+        const field = document.getElementById(id);
+        if (field && !field.value && value) field.value = value;
+    };
+
+    fill("firstName", data.first_name);
+    fill("lastName", data.last_name);
+    fill("middleName", data.middle_name);
+    fill("phone", data.phone);
+    fill("city", data.city);
+
+}
+
 async function initCheckout() {
 
     if (!checkoutLayoutEl) return;
@@ -115,6 +153,8 @@ async function initCheckout() {
         allProducts = await response.json();
 
         renderOrderSummary();
+
+        prefillFromProfile();
 
     } catch (error) {
 

@@ -193,19 +193,85 @@
 
             </div>
 
-            <h2 class="orders-heading">Історія замовлень</h2>
-
-            <div id="ordersLoader" class="loader">
-                <div class="spinner"></div>
+            <div class="account-tabs">
+                <button type="button" class="account-tab active" data-tab="orders">Історія замовлень</button>
+                <button type="button" class="account-tab" data-tab="profile">Мої дані</button>
             </div>
 
-            <div id="emptyOrders" class="empty-state" hidden>
-                <h2>🛍️</h2>
-                <p>У вас поки немає замовлень</p>
-                <a href="catalog.html" class="btn">Перейти до каталогу</a>
+            <!-- ---- Історія замовлень ---- -->
+
+            <div id="ordersPanel" class="account-panel">
+
+                <div id="ordersLoader" class="loader">
+                    <div class="spinner"></div>
+                </div>
+
+                <div id="emptyOrders" class="empty-state" hidden>
+                    <h2>🛍️</h2>
+                    <p>У вас поки немає замовлень</p>
+                    <a href="catalog.html" class="btn">Перейти до каталогу</a>
+                </div>
+
+                <div id="ordersList" class="orders-list"></div>
+
             </div>
 
-            <div id="ordersList" class="orders-list"></div>
+            <!-- ---- Мої дані ---- -->
+
+            <div id="profilePanel" class="account-panel" hidden>
+
+                <div class="profile-card">
+
+                    <h2>Персональна інформація</h2>
+                    <p class="profile-card-sub">Ці дані автоматично підставляться при оформленні замовлення</p>
+
+                    <form id="profileForm" class="profile-form">
+
+                        <div class="profile-fields">
+
+                            <label>
+                                Ім'я
+                                <input type="text" id="profileFirstName" placeholder="Ваше ім'я">
+                            </label>
+
+                            <label>
+                                Прізвище
+                                <input type="text" id="profileLastName" placeholder="Ваше прізвище">
+                            </label>
+
+                            <label>
+                                По батькові
+                                <input type="text" id="profileMiddleName" placeholder="Необов'язково">
+                            </label>
+
+                            <label>
+                                Телефон
+                                <input type="tel" id="profilePhone" placeholder="+380 XX XXX XX XX">
+                            </label>
+
+                            <label class="field-full">
+                                Місто
+                                <input type="text" id="profileCity" placeholder="Наприклад: Київ">
+                            </label>
+
+                        </div>
+
+                        <div class="profile-email-row">
+                            <span>Email</span>
+                            <strong id="profileEmail"></strong>
+                        </div>
+
+                        <button type="button" class="auth-link" id="changePasswordBtn">Змінити пароль</button>
+
+                        <span id="profileMessage" class="field-error"></span>
+
+                        <button type="submit" class="btn" id="profileSubmit">Зберегти зміни</button>
+
+                    </form>
+
+                </div>
+
+            </div>
 
         </div>
 

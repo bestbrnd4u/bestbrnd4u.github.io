@@ -3980,10 +3980,117 @@ footer{
     font-size:14px;
 }
 
-.orders-heading{
-    font-size:22px;
+.account-tabs{
+    display:flex;
+    gap:8px;
+    margin-bottom:28px;
+    border-bottom:1px solid var(--gray200);
+}
+
+.account-tab{
+    padding:12px 4px;
+    margin-right:24px;
+    font-size:15px;
+    font-weight:700;
+    color:var(--gray500);
+    background:none;
+    border-bottom:2px solid transparent;
+    margin-bottom:-1px;
+    transition:.2s;
+}
+
+.account-tab:hover{
+    color:var(--gray900);
+}
+
+.account-tab.active{
+    color:var(--gray900);
+    border-bottom-color:var(--secondary);
+}
+
+.account-panel[hidden]{
+    display:none;
+}
+
+/* -- Мої дані -- */
+
+.profile-card{
+    background:#fff;
+    border-radius:var(--radius);
+    box-shadow:var(--shadow-sm);
+    padding:32px;
+    max-width:640px;
+}
+
+.profile-card h2{
     text-align:left;
-    margin-bottom:20px;
+    font-size:20px;
+    margin-bottom:6px;
+}
+
+.profile-card-sub{
+    color:var(--gray500);
+    font-size:14px;
+    margin-bottom:24px;
+}
+
+.profile-form{
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+}
+
+.profile-fields{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px 20px;
+}
+
+.profile-fields .field-full{
+    grid-column:1 / -1;
+}
+
+.profile-form label{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    font-size:14px;
+    color:var(--gray700);
+    font-weight:600;
+}
+
+.profile-form input:focus{
+    outline:none;
+    border-color:var(--secondary);
+}
+
+.profile-email-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:14px 16px;
+    background:var(--gray50);
+    border-radius:12px;
+    font-size:14px;
+}
+
+.profile-email-row span{
+    color:var(--gray500);
+}
+
+.profile-email-row strong{
+    color:var(--gray900);
+    font-weight:600;
+}
+
+.profile-form .auth-link{
+    align-self:flex-start;
+}
+
+.profile-form .btn{
+    align-self:flex-start;
+    min-width:180px;
 }
 
 .orders-list{
@@ -3996,17 +4103,24 @@ footer{
     background:#fff;
     border-radius:var(--radius);
     box-shadow:var(--shadow-sm);
-    padding:24px;
+    overflow:hidden;
+}
+
+.order-card-toggle{
+    display:block;
+    width:100%;
+    text-align:left;
+    padding:20px 24px;
+    background:none;
+    border:none;
+    cursor:pointer;
 }
 
 .order-card-header{
     display:flex;
-    align-items:flex-start;
+    align-items:center;
     justify-content:space-between;
     gap:16px;
-    padding-bottom:16px;
-    margin-bottom:16px;
-    border-bottom:1px solid var(--gray100);
 }
 
 .order-card-number{
@@ -4021,6 +4135,50 @@ footer{
     font-size:13px;
     color:var(--gray500);
     margin-top:2px;
+}
+
+.order-card-chevron{
+    flex-shrink:0;
+    font-size:16px;
+    color:var(--gray500);
+    transition:transform .2s;
+}
+
+.order-card.expanded .order-card-chevron{
+    transform:rotate(180deg);
+}
+
+.order-card-brief{
+    margin-top:10px;
+    font-size:13px;
+    color:var(--gray500);
+    line-height:1.7;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    display:-webkit-box;
+    -webkit-line-clamp:1;
+    -webkit-box-orient:vertical;
+}
+
+.order-card-brief-dot{
+    margin:0 8px;
+    color:var(--gray300);
+}
+
+.order-card-brief-discount{
+    color:var(--danger);
+}
+
+.order-card-brief-total{
+    color:var(--gray900);
+    font-weight:700;
+}
+
+.order-card-details{
+    padding:0 24px 24px;
+    border-top:1px solid var(--gray100);
+    margin-top:0;
+    padding-top:20px;
 }
 
 .order-status{
@@ -4063,27 +4221,6 @@ footer{
     display:flex;
     flex-direction:column;
     gap:14px;
-}
-
-.order-card-delivery{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:16px;
-    margin-top:18px;
-    padding-top:16px;
-    border-top:1px solid var(--gray100);
-    font-size:13px;
-}
-
-.order-card-delivery span:first-child{
-    color:var(--gray500);
-}
-
-.order-card-delivery span:last-child{
-    color:var(--gray700);
-    font-weight:600;
-    text-align:right;
 }
 
 .order-card-summary{
@@ -4129,10 +4266,35 @@ footer{
         align-items:flex-start;
     }
 
-    .order-card-delivery{
-        flex-direction:column;
-        align-items:flex-start;
-        gap:4px;
+    .order-card-toggle{
+        padding:16px 18px;
+    }
+
+    .order-card-details{
+        padding:0 18px 18px;
+    }
+
+    .order-card-brief{
+        display:block;
+        white-space:normal;
+        line-height:1.6;
+    }
+
+    .profile-fields{
+        grid-template-columns:1fr;
+    }
+
+    .profile-card{
+        padding:24px 20px;
+    }
+
+    .account-tabs{
+        gap:0;
+    }
+
+    .account-tab{
+        margin-right:16px;
+        font-size:14px;
     }
 
 }
