@@ -4118,9 +4118,23 @@ footer{
 
 .order-card-header{
     display:flex;
-    align-items:center;
+    align-items:flex-start;
     justify-content:space-between;
     gap:16px;
+}
+
+.order-card-title-group{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+.order-card-header-right{
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    gap:14px;
 }
 
 .order-card-number{
@@ -4134,7 +4148,6 @@ footer{
     display:block;
     font-size:13px;
     color:var(--gray500);
-    margin-top:2px;
 }
 
 .order-card-chevron{
@@ -4297,4 +4310,215 @@ footer{
         font-size:14px;
     }
 
+}
+
+/* =====================================
+   АДРЕСИ ДОСТАВКИ (особистий кабінет)
+===================================== */
+
+.addresses-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:20px;
+    margin-bottom:28px;
+}
+
+.addresses-header h2{
+    margin-bottom:4px;
+}
+
+.addresses-header .btn{
+    flex-shrink:0;
+    padding:12px 22px;
+    font-size:14px;
+}
+
+.addresses-list{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+}
+
+.address-card{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    background:#fff;
+    border:1px solid var(--gray100);
+    border-radius:16px;
+    padding:18px 20px;
+    box-shadow:var(--shadow-sm);
+}
+
+.address-card-icon{
+    width:44px;
+    height:44px;
+    flex-shrink:0;
+    border-radius:12px;
+    background:var(--gray50);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:20px;
+}
+
+.address-card-info{
+    flex:1;
+    min-width:0;
+}
+
+.address-card-title{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:8px;
+    font-weight:700;
+    font-size:15px;
+    color:var(--gray900);
+}
+
+.address-default-badge{
+    font-size:11px;
+    font-weight:700;
+    color:var(--secondary);
+    background:rgba(37,99,235,.1);
+    padding:3px 10px;
+    border-radius:20px;
+}
+
+.address-card-detail{
+    margin-top:4px;
+    font-size:13.5px;
+    color:var(--gray500);
+}
+
+.address-card-actions{
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+
+.address-edit-btn,
+.address-remove-btn{
+    padding:9px 14px;
+    border-radius:10px;
+    font-size:13px;
+    font-weight:600;
+    white-space:nowrap;
+    transition:.2s;
+}
+
+.address-edit-btn{
+    color:var(--secondary);
+}
+
+.address-edit-btn:hover{
+    background:rgba(37,99,235,.1);
+}
+
+.address-remove-btn{
+    color:var(--gray500);
+}
+
+.address-remove-btn:hover{
+    background:#fee2e2;
+    color:var(--danger);
+}
+
+.address-modal-card{
+    max-width:480px;
+}
+
+.address-default-check{
+    display:flex !important;
+    flex-direction:row !important;
+    align-items:center;
+    gap:10px;
+    font-size:14px;
+    font-weight:500;
+    color:var(--gray700);
+    cursor:pointer;
+}
+
+.address-default-check input{
+    width:18px;
+    height:18px;
+    accent-color:var(--secondary);
+}
+
+@media(max-width:600px){
+
+    .addresses-header{
+        flex-direction:column;
+    }
+
+    .addresses-header .btn{
+        width:100%;
+    }
+
+    .address-card{
+        flex-wrap:wrap;
+    }
+
+    .address-card-actions{
+        width:100%;
+        justify-content:flex-end;
+    }
+
+}
+
+/* -- збережені адреси на чекауті -- */
+
+.saved-addresses-block{
+    margin-bottom:22px;
+}
+
+.saved-addresses-title{
+    font-size:13px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    color:var(--gray500);
+    margin-bottom:10px;
+}
+
+.saved-addresses-list{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+.saved-address-chip{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:2px;
+    padding:10px 16px;
+    border-radius:12px;
+    border:1.5px solid var(--gray200);
+    background:#fff;
+    text-align:left;
+    transition:.2s;
+}
+
+.saved-address-chip:hover{
+    border-color:var(--secondary);
+}
+
+.saved-address-chip.active{
+    border-color:var(--secondary);
+    background:rgba(37,99,235,.06);
+}
+
+.saved-address-chip-title{
+    font-size:13.5px;
+    font-weight:700;
+    color:var(--gray900);
+}
+
+.saved-address-chip-meta{
+    font-size:12px;
+    color:var(--gray500);
 }

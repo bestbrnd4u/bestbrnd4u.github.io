@@ -132,6 +132,99 @@ async function prefillFromProfile() {
 
 }
 
+// -------------------------
+// Збережені адреси доставки — підтягуємо в чекаут,
+// щоб не вводити їх заново кожного разу
+// -------------------------
+
+function applySavedAddress(address) {
+
+    document.getElementById("city").value = address.city || "";
+
+    const radio = document.querySelector(
+        `input[name="deliveryMethod"][value="${CSS.escape(address.delivery_method)}"]`
+    );
+
+    if (radio) {
+
+        radio.checked = true;
+        radio.dispatchEvent(new Event("change"));
+
+    }
+
+    if (address.branch_number) {
+        document.getElementById("branchNumber").value = address.branch_number;
+    }
+
+    if (address.postomat_number) {
+        document.getElementById("postomatNumber").value = address.postomat_number;
+    }
+
+    if (address.courier_address) {
+        document.getElementById("courierAddress").value = address.courier_address;
+    }
+
+    clearFieldError("city");
+    clearFieldError("deliveryMethod");
+
+    document.querySelectorAll(".saved-address-chip").forEach(chip => {
+        chip.classList.toggle("active", Number(chip.dataset.id) === address.id);
+    });
+
+}
+
+async function loadSavedAddressesForCheckout() {
+
+    if (!supabaseClient) return;
+
+    const user = await getCurrentUser();
+
+    if (!user) return;
+
+    const { data, error } = await supabaseClient
+        .from("addresses")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("is_default", { ascending: false })
+        .order("created_at", { ascending: false });
+
+    if (error || !data || data.length === 0) return;
+
+    const block = document.getElementById("savedAddressesBlock");
+    const list = document.getElementById("savedAddressesList");
+
+    list.innerHTML = data.map(address => `
+        <button type="button" class="saved-address-chip" data-id="${address.id}">
+            <span class="saved-address-chip-title">${address.label ? `${address.label} · ` : ""}${address.city}</span>
+            <span class="saved-address-chip-meta">${address.delivery_method}</span>
+        </button>
+    `).join("");
+
+    list.querySelectorAll(".saved-address-chip").forEach(chip => {
+
+        chip.addEventListener("click", () => {
+
+            const address = data.find(a => a.id === Number(chip.dataset.id));
+
+            if (address) applySavedAddress(address);
+
+        });
+
+    });
+
+    block.hidden = false;
+
+    // якщо є адреса за замовчуванням і форма ще порожня — підставляємо одразу
+    const defaultAddress = data.find(a => a.is_default) || data[0];
+
+    if (defaultAddress && !document.getElementById("city").value) {
+
+        applySavedAddress(defaultAddress);
+
+    }
+
+}
+
 async function initCheckout() {
 
     if (!checkoutLayoutEl) return;
@@ -155,6 +248,8 @@ async function initCheckout() {
         renderOrderSummary();
 
         prefillFromProfile();
+
+        loadSavedAddressesForCheckout();
 
     } catch (error) {
 

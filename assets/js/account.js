@@ -285,6 +285,10 @@ function renderOrderCard(order) {
         ? `-${formatPrice(order.discount)}${order.promo_code ? ` (промокод: ${order.promo_code})` : ""}`
         : null;
 
+    const deliveryPriceText = Number(order.delivery_price) > 0
+        ? `Від ${formatPrice(order.delivery_price)}`
+        : "Безкоштовно";
+
     // компактний рядок-зведення, видимий у згорнутому стані картки
     const briefParts = [
         deliveryLine,
@@ -295,7 +299,7 @@ function renderOrderCard(order) {
         briefParts.push(`<span class="order-card-brief-discount">Знижка ${discountLine}</span>`);
     }
 
-    briefParts.push(`Доставка ${Number(order.delivery_price) > 0 ? formatPrice(order.delivery_price) : "Безкоштовно"}`);
+    briefParts.push(`Доставка ${deliveryPriceText}`);
     briefParts.push(`<span class="order-card-brief-total">Разом ${formatPrice(order.total)}</span>`);
 
     return `
@@ -305,14 +309,15 @@ function renderOrderCard(order) {
 
                 <div class="order-card-header">
 
-                    <div>
+                    <div class="order-card-title-group">
                         <span class="order-card-number">Замовлення ${order.order_number}</span>
-                        <span class="order-card-date">${date}</span>
+                        <span class="order-status order-status-${order.status || "new"}">${orderStatusLabel(order.status)}</span>
                     </div>
 
-                    <span class="order-status order-status-${order.status || "new"}">${orderStatusLabel(order.status)}</span>
-
-                    <span class="order-card-chevron">⌄</span>
+                    <div class="order-card-header-right">
+                        <span class="order-card-date">${date}</span>
+                        <span class="order-card-chevron">⌄</span>
+                    </div>
 
                 </div>
 
@@ -344,7 +349,7 @@ function renderOrderCard(order) {
 
                     <div class="order-card-summary-row">
                         <span>Доставка</span>
-                        <span>${Number(order.delivery_price) > 0 ? formatPrice(order.delivery_price) : "Безкоштовно"}</span>
+                        <span>${deliveryPriceText}</span>
                     </div>
 
                     <div class="order-card-summary-row order-card-summary-total">
@@ -388,10 +393,15 @@ document.querySelectorAll(".account-tab").forEach(tab => {
 
         document.querySelectorAll(".account-tab").forEach(t => t.classList.toggle("active", t === tab));
 
-        const isOrders = tab.dataset.tab === "orders";
+        const target = tab.dataset.tab;
 
-        document.getElementById("ordersPanel").hidden = !isOrders;
-        document.getElementById("profilePanel").hidden = isOrders;
+        document.getElementById("ordersPanel").hidden = target !== "orders";
+        document.getElementById("addressesPanel").hidden = target !== "addresses";
+        document.getElementById("profilePanel").hidden = target !== "profile";
+
+        if (target === "addresses" && !addressesLoadedOnce) {
+            loadAddresses();
+        }
 
     });
 
@@ -488,6 +498,265 @@ changePasswordBtn?.addEventListener("click", async () => {
 });
 
 // -------------------------
+// Адреси доставки
+// -------------------------
+
+const addressesLoader = document.getElementById("addressesLoader");
+const emptyAddresses = document.getElementById("emptyAddresses");
+const addressesListEl = document.getElementById("addressesList");
+
+const addressModal = document.getElementById("addressModal");
+const addressModalTitle = document.getElementById("addressModalTitle");
+const addressForm = document.getElementById("addressForm");
+const addressFormError = document.getElementById("addressFormError");
+
+const addressMethodSelect = document.getElementById("addressMethod");
+const addressBranchField = document.getElementById("addressBranchField");
+const addressPostomatField = document.getElementById("addressPostomatField");
+const addressCourierField = document.getElementById("addressCourierField");
+
+let addressesLoadedOnce = false;
+let cachedAddresses = [];
+
+function toggleAddressMethodFields() {
+
+    const value = addressMethodSelect.value;
+
+    addressBranchField.hidden = value !== "На відділення «Нова пошта»";
+    addressPostomatField.hidden = value !== "Поштомат «Нова пошта»";
+    addressCourierField.hidden = value !== "Кур'єром «Нова пошта»";
+
+}
+
+addressMethodSelect?.addEventListener("change", toggleAddressMethodFields);
+
+function openAddressModal(address) {
+
+    addressForm.reset();
+    addressFormError.textContent = "";
+
+    document.getElementById("addressId").value = address?.id || "";
+    document.getElementById("addressLabel").value = address?.label || "";
+    document.getElementById("addressCity").value = address?.city || "";
+    addressMethodSelect.value = address?.delivery_method || "На відділення «Нова пошта»";
+    document.getElementById("addressBranchNumber").value = address?.branch_number || "";
+    document.getElementById("addressPostomatNumber").value = address?.postomat_number || "";
+    document.getElementById("addressCourierAddress").value = address?.courier_address || "";
+    document.getElementById("addressIsDefault").checked = Boolean(address?.is_default);
+
+    toggleAddressMethodFields();
+
+    addressModalTitle.textContent = address ? "Редагувати адресу" : "Нова адреса";
+
+    addressModal.hidden = false;
+
+}
+
+function closeAddressModal() {
+
+    addressModal.hidden = true;
+
+}
+
+document.getElementById("addAddressBtn")?.addEventListener("click", () => openAddressModal(null));
+document.getElementById("emptyAddAddressBtn")?.addEventListener("click", () => openAddressModal(null));
+document.getElementById("addressCancelBtn")?.addEventListener("click", closeAddressModal);
+document.getElementById("addressModalClose")?.addEventListener("click", closeAddressModal);
+
+addressModal?.addEventListener("click", event => {
+    if (event.target === addressModal) closeAddressModal();
+});
+
+function renderAddressCard(address) {
+
+    const methodIcon = {
+        "На відділення «Нова пошта»": "📦",
+        "Поштомат «Нова пошта»": "🏤",
+        "Кур'єром «Нова пошта»": "🚚"
+    }[address.delivery_method] || "📍";
+
+    const detail = address.delivery_method === "На відділення «Нова пошта»"
+        ? address.branch_number
+        : address.delivery_method === "Поштомат «Нова пошта»"
+            ? address.postomat_number
+            : address.courier_address;
+
+    return `
+        <div class="address-card" data-id="${address.id}">
+
+            <div class="address-card-icon">${methodIcon}</div>
+
+            <div class="address-card-info">
+                <div class="address-card-title">
+                    ${address.label ? `${address.label} · ` : ""}${address.city}
+                    ${address.is_default ? `<span class="address-default-badge">За замовчуванням</span>` : ""}
+                </div>
+                <div class="address-card-detail">
+                    ${address.delivery_method}${detail ? `, ${detail}` : ""}
+                </div>
+            </div>
+
+            <div class="address-card-actions">
+                <button type="button" class="address-edit-btn" data-id="${address.id}">Редагувати</button>
+                <button type="button" class="address-remove-btn" data-id="${address.id}">✕ Видалити</button>
+            </div>
+
+        </div>
+    `;
+
+}
+
+async function loadAddresses() {
+
+    addressesLoadedOnce = true;
+
+    addressesLoader.hidden = false;
+    emptyAddresses.hidden = true;
+    addressesListEl.innerHTML = "";
+
+    const user = await getCurrentUser();
+
+    if (!user) {
+        addressesLoader.hidden = true;
+        return;
+    }
+
+    const { data, error } = await supabaseClient
+        .from("addresses")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("is_default", { ascending: false })
+        .order("created_at", { ascending: false });
+
+    addressesLoader.hidden = true;
+
+    if (error) {
+
+        console.error("Не вдалося завантажити адреси:", error);
+
+        addressesListEl.innerHTML = `<p class="error">Не вдалося завантажити адреси доставки.</p>`;
+
+        return;
+
+    }
+
+    cachedAddresses = data || [];
+
+    if (cachedAddresses.length === 0) {
+
+        emptyAddresses.hidden = false;
+
+        return;
+
+    }
+
+    addressesListEl.innerHTML = cachedAddresses.map(renderAddressCard).join("");
+
+}
+
+addressesListEl?.addEventListener("click", async event => {
+
+    const editBtn = event.target.closest(".address-edit-btn");
+    const removeBtn = event.target.closest(".address-remove-btn");
+
+    if (editBtn) {
+
+        const address = cachedAddresses.find(a => String(a.id) === editBtn.dataset.id);
+
+        if (address) openAddressModal(address);
+
+        return;
+
+    }
+
+    if (removeBtn) {
+
+        if (!confirm("Видалити цю адресу?")) return;
+
+        const { error } = await supabaseClient
+            .from("addresses")
+            .delete()
+            .eq("id", removeBtn.dataset.id);
+
+        if (error) {
+            showToast("Не вдалося видалити адресу");
+            return;
+        }
+
+        showToast("Адресу видалено");
+
+        loadAddresses();
+
+    }
+
+});
+
+addressForm?.addEventListener("submit", async event => {
+
+    event.preventDefault();
+
+    addressFormError.textContent = "";
+
+    const user = await getCurrentUser();
+
+    if (!user) return;
+
+    const id = document.getElementById("addressId").value;
+    const isDefault = document.getElementById("addressIsDefault").checked;
+
+    const submitBtn = document.getElementById("addressSubmitBtn");
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Зберігаємо...";
+
+    // якщо адреса стає "за замовчуванням" — знімаємо цю позначку
+    // з усіх інших адрес користувача, щоб дефолтна була лише одна
+    if (isDefault) {
+
+        await supabaseClient
+            .from("addresses")
+            .update({ is_default: false })
+            .eq("user_id", user.id);
+
+    }
+
+    const payload = {
+        user_id: user.id,
+        label: document.getElementById("addressLabel").value.trim(),
+        city: document.getElementById("addressCity").value.trim(),
+        delivery_method: addressMethodSelect.value,
+        branch_number: document.getElementById("addressBranchNumber").value.trim(),
+        postomat_number: document.getElementById("addressPostomatNumber").value.trim(),
+        courier_address: document.getElementById("addressCourierAddress").value.trim(),
+        is_default: isDefault
+    };
+
+    if (id) payload.id = Number(id);
+
+    const { error } = await supabaseClient.from("addresses").upsert(payload);
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Зберегти адресу";
+
+    if (error) {
+
+        console.error("Не вдалося зберегти адресу:", error);
+
+        addressFormError.textContent = "Не вдалося зберегти адресу. Спробуйте ще раз";
+
+        return;
+
+    }
+
+    closeAddressModal();
+
+    showToast("Адресу збережено");
+
+    loadAddresses();
+
+});
+
+// -------------------------
 // Визначення стану авторизації на самій сторінці кабінету
 // -------------------------
 
@@ -506,6 +775,7 @@ async function renderAuthState() {
 
         await Promise.all([
             loadOrders(user.id),
+            loadAddresses(),
             loadProfile(user)
         ]);
 

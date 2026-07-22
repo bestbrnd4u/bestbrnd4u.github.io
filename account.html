@@ -195,6 +195,7 @@
 
             <div class="account-tabs">
                 <button type="button" class="account-tab active" data-tab="orders">Історія замовлень</button>
+                <button type="button" class="account-tab" data-tab="addresses">Адреси доставки</button>
                 <button type="button" class="account-tab" data-tab="profile">Мої дані</button>
             </div>
 
@@ -213,6 +214,32 @@
                 </div>
 
                 <div id="ordersList" class="orders-list"></div>
+
+            </div>
+
+            <!-- ---- Адреси доставки ---- -->
+
+            <div id="addressesPanel" class="account-panel" hidden>
+
+                <div class="addresses-header">
+                    <div>
+                        <h2>Адреси доставки</h2>
+                        <p class="profile-card-sub">Збережіть адресу — і на оформленні замовлення її можна буде обрати в один клік</p>
+                    </div>
+                    <button type="button" class="btn" id="addAddressBtn">+ Додати адресу</button>
+                </div>
+
+                <div id="addressesLoader" class="loader">
+                    <div class="spinner"></div>
+                </div>
+
+                <div id="emptyAddresses" class="empty-state" hidden>
+                    <h2>📍</h2>
+                    <p>У вас поки немає збережених адрес</p>
+                    <button type="button" class="btn" id="emptyAddAddressBtn">Додати першу адресу</button>
+                </div>
+
+                <div id="addressesList" class="addresses-list"></div>
 
             </div>
 
@@ -362,6 +389,69 @@
 <button id="scrollTop" class="scroll-top" aria-label="Нагору">
     ↑
 </button>
+
+<div id="addressModal" class="modal-overlay" hidden>
+    <div class="modal-card address-modal-card">
+
+        <div class="modal-header">
+            <h3 id="addressModalTitle">Нова адреса</h3>
+            <button type="button" id="addressModalClose" class="modal-close" aria-label="Закрити">✕</button>
+        </div>
+
+        <form id="addressForm" class="auth-form">
+
+            <input type="hidden" id="addressId">
+
+            <label>
+                Назва адреси (необов'язково)
+                <input type="text" id="addressLabel" placeholder="Наприклад: Дім, Робота">
+            </label>
+
+            <label>
+                Місто
+                <input type="text" id="addressCity" required placeholder="Наприклад: Київ">
+            </label>
+
+            <label>
+                Спосіб отримання
+                <select id="addressMethod" required>
+                    <option value="На відділення «Нова пошта»">На відділення «Нова пошта»</option>
+                    <option value="Поштомат «Нова пошта»">Поштомат «Нова пошта»</option>
+                    <option value="Кур'єром «Нова пошта»">Кур'єром «Нова пошта»</option>
+                </select>
+            </label>
+
+            <label id="addressBranchField">
+                Номер відділення
+                <input type="text" id="addressBranchNumber" placeholder="Наприклад: Відділення №45">
+            </label>
+
+            <label id="addressPostomatField" hidden>
+                Номер поштомату
+                <input type="text" id="addressPostomatNumber" placeholder="Наприклад: Поштомат №1234">
+            </label>
+
+            <label id="addressCourierField" hidden>
+                Адреса (вулиця, будинок, квартира)
+                <input type="text" id="addressCourierAddress" placeholder="Вулиця, будинок, квартира">
+            </label>
+
+            <label class="address-default-check">
+                <input type="checkbox" id="addressIsDefault">
+                Використовувати за замовчуванням
+            </label>
+
+            <span id="addressFormError" class="field-error"></span>
+
+            <div class="modal-actions">
+                <button type="submit" class="btn" id="addressSubmitBtn">Зберегти адресу</button>
+                <button type="button" class="btn btn-outline" id="addressCancelBtn">Скасувати</button>
+            </div>
+
+        </form>
+
+    </div>
+</div>
 
 <script src="assets/js/supabase-client.js"></script>
 <script src="assets/js/common.js"></script>
