@@ -26,6 +26,65 @@ const profileMessageEl = document.getElementById("profileMessage");
 const changePasswordBtn = document.getElementById("changePasswordBtn");
 
 // -------------------------
+// Глазок "показати/приховати пароль"
+//
+// Огортає КОЖНЕ поле type="password" всередині .auth-form —
+// на вході, реєстрації і на формі відновлення пароля.
+// Нові поля (наприклад, форма скидання пароля нижче)
+// підхоплюються автоматично, без ручної розмітки для кожного.
+// -------------------------
+
+const EYE_OPEN_SVG = `<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+const EYE_OFF_SVG = `<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.8 21.8 0 0 1 5.06-6.06M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a21.8 21.8 0 0 1-3.22 4.44M14.12 14.12a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
+
+function initPasswordToggles() {
+
+    document.querySelectorAll('.auth-form input[type="password"]').forEach(input => {
+
+        if (input.closest(".password-field")) return; // вже обгорнуто раніше
+
+        const wrapper = document.createElement("div");
+
+        wrapper.className = "password-field";
+
+        input.parentNode.insertBefore(wrapper, input);
+        wrapper.appendChild(input);
+
+        const toggle = document.createElement("button");
+
+        toggle.type = "button";
+        toggle.className = "password-toggle";
+        toggle.setAttribute("aria-label", "Показати пароль");
+        toggle.innerHTML = EYE_OPEN_SVG;
+
+        wrapper.appendChild(toggle);
+
+    });
+
+}
+
+initPasswordToggles();
+
+document.addEventListener("click", event => {
+
+    const toggle = event.target.closest(".password-toggle");
+
+    if (!toggle) return;
+
+    const input = toggle.parentElement.querySelector('input');
+
+    if (!input) return;
+
+    const willShow = input.type === "password";
+
+    input.type = willShow ? "text" : "password";
+
+    toggle.innerHTML = willShow ? EYE_OFF_SVG : EYE_OPEN_SVG;
+    toggle.setAttribute("aria-label", willShow ? "Приховати пароль" : "Показати пароль");
+
+});
+
+// -------------------------
 // Перемикання вкладок "Увійти" / "Реєстрація"
 // -------------------------
 
@@ -142,7 +201,9 @@ document.getElementById("forgotPasswordBtn")?.addEventListener("click", async ()
         return;
     }
 
-    const { error } = await supabaseClient.auth.resetPasswordForEmail(email);
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/account.html`
+    });
 
     if (error) {
         loginError.textContent = translateAuthError(error);
@@ -162,6 +223,83 @@ document.getElementById("forgotPasswordBtn")?.addEventListener("click", async ()
 logoutBtn?.addEventListener("click", async () => {
 
     await supabaseClient.auth.signOut();
+
+    await renderAuthState();
+
+});
+
+// -------------------------
+// Відновлення пароля (перехід за посиланням з листа)
+//
+// Supabase після переходу за посиланням сама відновлює
+// сесію з токена в URL і надсилає подію PASSWORD_RECOVERY.
+// Перевірку самого URL робимо додатково і одразу — щоб не
+// було миготіння звичайної форми входу до того, як подія
+// встигне спрацювати.
+// -------------------------
+
+const resetPasswordCard = document.getElementById("resetPasswordCard");
+const resetPasswordForm = document.getElementById("resetPasswordForm");
+const resetPasswordError = document.getElementById("resetPasswordError");
+
+let isPasswordRecovery =
+    window.location.hash.includes("type=recovery") ||
+    window.location.search.includes("type=recovery");
+
+supabaseClient?.auth.onAuthStateChange((event) => {
+
+    if (event === "PASSWORD_RECOVERY") {
+
+        isPasswordRecovery = true;
+
+        renderAuthState();
+
+    }
+
+});
+
+resetPasswordForm?.addEventListener("submit", async event => {
+
+    event.preventDefault();
+
+    resetPasswordError.textContent = "";
+
+    const password = document.getElementById("newPassword").value;
+    const passwordConfirm = document.getElementById("newPasswordConfirm").value;
+
+    if (password.length < 6) {
+        resetPasswordError.textContent = "Пароль має містити щонайменше 6 символів";
+        return;
+    }
+
+    if (password !== passwordConfirm) {
+        resetPasswordError.textContent = "Паролі не збігаються";
+        return;
+    }
+
+    const submitBtn = document.getElementById("resetPasswordSubmit");
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Зберігаємо...";
+
+    const { error } = await supabaseClient.auth.updateUser({ password });
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Зберегти новий пароль";
+
+    if (error) {
+
+        resetPasswordError.textContent = translateAuthError(error);
+        return;
+
+    }
+
+    isPasswordRecovery = false;
+
+    // прибираємо токен відновлення з адресного рядка
+    window.history.replaceState({}, document.title, window.location.pathname);
+
+    showToast("Пароль успішно змінено!");
 
     await renderAuthState();
 
@@ -484,7 +622,9 @@ changePasswordBtn?.addEventListener("click", async () => {
 
     changePasswordBtn.disabled = true;
 
-    const { error } = await supabaseClient.auth.resetPasswordForEmail(user.email);
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(user.email, {
+        redirectTo: `${window.location.origin}/account.html`
+    });
 
     changePasswordBtn.disabled = false;
 
@@ -802,6 +942,18 @@ async function renderAuthState() {
     const user = await getCurrentUser();
 
     authLoader.hidden = true;
+
+    if (isPasswordRecovery) {
+
+        authCard.hidden = true;
+        accountDashboard.hidden = true;
+        resetPasswordCard.hidden = false;
+
+        return;
+
+    }
+
+    resetPasswordCard.hidden = true;
 
     if (user) {
 

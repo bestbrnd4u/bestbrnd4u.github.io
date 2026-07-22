@@ -3902,6 +3902,18 @@ footer{
     padding:4px;
 }
 
+.auth-card-title{
+    font-size:22px;
+    text-align:left;
+    margin-bottom:6px;
+}
+
+.auth-card-sub{
+    color:var(--gray500);
+    font-size:14px;
+    margin-bottom:24px;
+}
+
 .auth-tab{
     flex:1;
     padding:10px;
@@ -3970,6 +3982,36 @@ footer{
     outline:none;
     border-color:var(--secondary);
     box-shadow:0 0 0 4px rgba(37,99,235,.1);
+}
+
+/* -- глазок "показати/приховати пароль" -- */
+
+.password-field{
+    position:relative;
+}
+
+.password-field input{
+    padding-right:46px;
+}
+
+.password-toggle{
+    position:absolute;
+    right:4px;
+    top:50%;
+    transform:translateY(-50%);
+    width:36px;
+    height:36px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--gray400, var(--gray300));
+    transition:var(--transition);
+}
+
+.password-toggle:hover{
+    background:var(--gray100);
+    color:var(--gray700);
 }
 
 .auth-form .btn{

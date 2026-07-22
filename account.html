@@ -178,6 +178,33 @@
 
         </div>
 
+        <!-- ========== Відновлення пароля (перехід з листа) ========== -->
+
+        <div id="resetPasswordCard" class="auth-card" hidden>
+
+            <h2 class="auth-card-title">Встановити новий пароль</h2>
+            <p class="auth-card-sub">Введіть новий пароль для входу в акаунт</p>
+
+            <form id="resetPasswordForm" class="auth-form">
+
+                <label>
+                    Новий пароль
+                    <input type="password" id="newPassword" required minlength="6" placeholder="Мінімум 6 символів" autocomplete="new-password">
+                </label>
+
+                <label>
+                    Підтвердіть пароль
+                    <input type="password" id="newPasswordConfirm" required minlength="6" placeholder="Повторіть пароль" autocomplete="new-password">
+                </label>
+
+                <span id="resetPasswordError" class="field-error"></span>
+
+                <button type="submit" class="btn" id="resetPasswordSubmit">Зберегти новий пароль</button>
+
+            </form>
+
+        </div>
+
         <!-- ========== Авторизований користувач ========== -->
 
         <div id="accountDashboard" hidden>
