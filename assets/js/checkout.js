@@ -3,7 +3,7 @@
 // Логіка сторінки оформлення замовлення (checkout.html)
 // ======================================
 
-const FORM_TARGET_EMAIL = "ilyapiven4@gmail.com";
+const FORM_TARGET_EMAIL = "b8e2e26d0dab4962153e7c42bfab1499";
 
 // -------------------------
 // EmailJS — лист-подяка клієнту

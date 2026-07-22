@@ -3145,7 +3145,8 @@ footer{
     align-items:center;
     justify-content:center;
     padding:20px;
-    z-index:3000;
+    z-index:10000;
+    overflow-y:auto;
 }
 
 .modal-overlay[hidden]{
@@ -4325,7 +4326,9 @@ footer{
 }
 
 .addresses-header h2{
-    margin-bottom:4px;
+    text-align:left;
+    font-size:22px;
+    margin-bottom:6px;
 }
 
 .addresses-header .btn{

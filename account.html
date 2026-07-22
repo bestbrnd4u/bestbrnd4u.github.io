@@ -390,6 +390,27 @@
     ↑
 </button>
 
+<div id="confirmDeleteModal" class="modal-overlay" hidden>
+    <div class="modal-card">
+
+        <div class="modal-header">
+            <h3>Видалити адресу?</h3>
+            <button type="button" id="confirmDeleteClose" class="modal-close" aria-label="Закрити">✕</button>
+        </div>
+
+        <p class="modal-text">
+            Цю адресу доставки буде видалено назавжди.
+            Цю дію не можна скасувати.
+        </p>
+
+        <div class="modal-actions">
+            <button type="button" id="confirmDeleteYes" class="btn-modal btn-modal-confirm">Так, видалити</button>
+            <button type="button" id="confirmDeleteNo" class="btn-modal btn-modal-cancel">Скасувати</button>
+        </div>
+
+    </div>
+</div>
+
 <div id="addressModal" class="modal-overlay" hidden>
     <div class="modal-card address-modal-card">
 

@@ -654,6 +654,54 @@ async function loadAddresses() {
 
 }
 
+const confirmDeleteModal = document.getElementById("confirmDeleteModal");
+const confirmDeleteYes = document.getElementById("confirmDeleteYes");
+const confirmDeleteNo = document.getElementById("confirmDeleteNo");
+const confirmDeleteClose = document.getElementById("confirmDeleteClose");
+
+let pendingDeleteId = null;
+
+function openConfirmDeleteModal(id) {
+    pendingDeleteId = id;
+    confirmDeleteModal.hidden = false;
+}
+
+function closeConfirmDeleteModal() {
+    confirmDeleteModal.hidden = true;
+    pendingDeleteId = null;
+}
+
+confirmDeleteNo?.addEventListener("click", closeConfirmDeleteModal);
+confirmDeleteClose?.addEventListener("click", closeConfirmDeleteModal);
+
+confirmDeleteModal?.addEventListener("click", event => {
+    if (event.target === confirmDeleteModal) closeConfirmDeleteModal();
+});
+
+confirmDeleteYes?.addEventListener("click", async () => {
+
+    if (!pendingDeleteId) return;
+
+    const idToDelete = pendingDeleteId;
+
+    closeConfirmDeleteModal();
+
+    const { error } = await supabaseClient
+        .from("addresses")
+        .delete()
+        .eq("id", idToDelete);
+
+    if (error) {
+        showToast("Не вдалося видалити адресу");
+        return;
+    }
+
+    showToast("Адресу видалено");
+
+    loadAddresses();
+
+});
+
 addressesListEl?.addEventListener("click", async event => {
 
     const editBtn = event.target.closest(".address-edit-btn");
@@ -671,21 +719,7 @@ addressesListEl?.addEventListener("click", async event => {
 
     if (removeBtn) {
 
-        if (!confirm("Видалити цю адресу?")) return;
-
-        const { error } = await supabaseClient
-            .from("addresses")
-            .delete()
-            .eq("id", removeBtn.dataset.id);
-
-        if (error) {
-            showToast("Не вдалося видалити адресу");
-            return;
-        }
-
-        showToast("Адресу видалено");
-
-        loadAddresses();
+        openConfirmDeleteModal(removeBtn.dataset.id);
 
     }
 
@@ -731,9 +765,12 @@ addressForm?.addEventListener("submit", async event => {
         is_default: isDefault
     };
 
-    if (id) payload.id = Number(id);
-
-    const { error } = await supabaseClient.from("addresses").upsert(payload);
+    // "id" — GENERATED ALWAYS AS IDENTITY, тому його не можна
+    // передавати в тілі insert/update — для редагування існуючої
+    // адреси використовуємо update() за id, для нової — insert()
+    const { error } = id
+        ? await supabaseClient.from("addresses").update(payload).eq("id", id)
+        : await supabaseClient.from("addresses").insert(payload);
 
     submitBtn.disabled = false;
     submitBtn.textContent = "Зберегти адресу";
