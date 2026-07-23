@@ -85,6 +85,38 @@ document.addEventListener("click", event => {
 });
 
 // -------------------------
+// Переклад стандартних підказок браузера (валідація полів) —
+// інакше при required/minlength браузер показує їх англійською
+// -------------------------
+
+function localizeValidationMessages(form) {
+
+    form?.querySelectorAll("input").forEach(input => {
+
+        const setMessage = () => {
+
+            if (input.validity.valueMissing) {
+                input.setCustomValidity("Заповніть це поле");
+            } else if (input.validity.tooShort) {
+                input.setCustomValidity(`Мінімум ${input.minLength} символів (зараз ${input.value.length})`);
+            } else if (input.validity.typeMismatch && input.type === "email") {
+                input.setCustomValidity("Введіть коректну email-адресу");
+            } else {
+                input.setCustomValidity("");
+            }
+
+        };
+
+        input.addEventListener("invalid", setMessage);
+        input.addEventListener("input", () => input.setCustomValidity(""));
+
+    });
+
+}
+
+document.querySelectorAll(".auth-form").forEach(localizeValidationMessages);
+
+// -------------------------
 // Перемикання вкладок "Увійти" / "Реєстрація"
 // -------------------------
 
@@ -312,6 +344,11 @@ resetPasswordForm?.addEventListener("submit", async event => {
 function translateAuthError(error) {
 
     const msg = error?.message || "";
+    const code = error?.code || "";
+
+    if (code === "same_password" || msg.includes("different from the old password")) {
+        return "Новий пароль повинен відрізнятися від поточного";
+    }
 
     if (msg.includes("Invalid login credentials")) return "Невірний email або пароль";
     if (msg.includes("User already registered")) return "Користувач із таким email вже зареєстрований";

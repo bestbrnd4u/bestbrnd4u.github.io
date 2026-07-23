@@ -52,6 +52,9 @@ const catalogSubtitle = document.getElementById("catalogSubtitle");
 
 const activeFiltersBar = document.getElementById("activeFiltersBar");
 const activeFiltersList = document.getElementById("activeFiltersList");
+const activeFiltersChips = document.getElementById("activeFiltersChips");
+
+let activeFiltersExpanded = false;
 
 const GENDERS = ["Чоловікам", "Жінкам", "Унісекс", "Дітям"];
 const SALE_MIN_DISCOUNT = 30; // % — мінімальна знижка для розділу "Акції"
@@ -636,7 +639,7 @@ function render() {
 
 function renderActiveFilters() {
 
-    if (!activeFiltersBar || !activeFiltersList) return;
+    if (!activeFiltersBar || !activeFiltersChips) return;
 
     const chips = [];
 
@@ -669,7 +672,8 @@ function renderActiveFilters() {
     if (chips.length === 0) {
 
         activeFiltersBar.hidden = true;
-        activeFiltersList.innerHTML = "";
+        activeFiltersChips.innerHTML = "";
+        activeFiltersExpanded = false;
 
         return;
 
@@ -677,20 +681,110 @@ function renderActiveFilters() {
 
     activeFiltersBar.hidden = false;
 
-    activeFiltersList.innerHTML = chips.map(chip => `
+    activeFiltersChips.innerHTML = chips.map(chip => `
         <button type="button" class="filter-chip" data-clear="${chip.type}" data-value="${chip.value || ""}">
             ${chip.label}
             <span class="filter-chip-x">✕</span>
         </button>
     `).join("");
 
+    layoutActiveFilters();
+
+}
+
+// -------------------------
+// Обмежуємо активні фільтри двома рядками,
+// решту ховаємо за кнопкою "+N фільтрів"
+// -------------------------
+
+function pluralizeFilters(n) {
+
+    const mod10 = n % 10;
+    const mod100 = n % 100;
+
+    if (mod10 === 1 && mod100 !== 11) return "фільтр";
+    if (mod10 >= 2 && mod10 <= 4 && !(mod100 >= 12 && mod100 <= 14)) return "фільтри";
+
+    return "фільтрів";
+
+}
+
+function layoutActiveFilters() {
+
+    if (!activeFiltersChips) return;
+
+    const label = document.querySelector(".active-filters-label");
+    const chipButtons = Array.from(activeFiltersChips.querySelectorAll(".filter-chip"));
+
+    const existingMore = activeFiltersChips.querySelector(".filter-more-chip");
+    if (existingMore) existingMore.remove();
+
+    chipButtons.forEach(el => el.classList.remove("filter-chip-hidden"));
+
+    if (chipButtons.length === 0) return;
+
+    const measureItems = [label, ...chipButtons].filter(Boolean);
+    const rowTops = [...new Set(measureItems.map(el => el.offsetTop))];
+
+    const overflowChips = rowTops.length > 2
+        ? chipButtons.filter(el => el.offsetTop > rowTops[1])
+        : [];
+
+    if (overflowChips.length === 0) return;
+
+    const moreBtn = document.createElement("button");
+    moreBtn.type = "button";
+    moreBtn.className = "filter-chip filter-more-chip";
+
+    if (activeFiltersExpanded) {
+
+        moreBtn.textContent = "Згорнути ▴";
+
+    } else {
+
+        overflowChips.forEach(el => el.classList.add("filter-chip-hidden"));
+
+        moreBtn.textContent = `+${overflowChips.length} ${pluralizeFilters(overflowChips.length)}`;
+
+    }
+
+    activeFiltersChips.appendChild(moreBtn);
+
+}
+
+window.addEventListener("resize", debounce(() => {
+
+    if (activeFiltersBar && !activeFiltersBar.hidden) layoutActiveFilters();
+
+}, 200));
+
+function debounce(fn, delay) {
+
+    let timer = null;
+
+    return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn(...args), delay);
+    };
+
 }
 
 activeFiltersList?.addEventListener("click", event => {
 
+    const moreBtn = event.target.closest(".filter-more-chip");
+
+    if (moreBtn) {
+
+        activeFiltersExpanded = !activeFiltersExpanded;
+        layoutActiveFilters();
+
+        return;
+
+    }
+
     const chip = event.target.closest(".filter-chip");
 
-    if (!chip) return;
+    if (!chip || chip.classList.contains("filter-more-chip")) return;
 
     clearOneFilter(chip.dataset.clear, chip.dataset.value);
 
