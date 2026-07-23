@@ -13,12 +13,9 @@
 // сторінці товару (product.js).
 // -------------------------
 
-const PRODUCT_COLORS = [
-    { name: "Чорний", hex: "#000" },
-    { name: "Коричневий", hex: "#8b5e3c" },
-    { name: "Бежевий", hex: "#d9c7a1" }
-];
-
+// Розміри поки що спільні для всіх товарів (у products.json
+// немає окремих даних про доступні розміри по товару) —
+// на відміну від кольору, який тепер береться з product.variants.
 const PRODUCT_SIZES = ["S", "M", "L"];
 
 // -------------------------
@@ -965,15 +962,55 @@ document.addEventListener("click", event => {
 
     }
 
-    const colorBtn = event.target.closest(".mini-color");
+    const colorBtn = event.target.closest(".mini-color, .color");
 
     if (colorBtn) {
 
-        const group = colorBtn.closest(".product-colors");
+        const group = colorBtn.closest(".product-colors, .color-options");
 
-        group?.querySelectorAll(".mini-color").forEach(b => b.classList.remove("active"));
+        group?.querySelectorAll(".mini-color, .color").forEach(b => b.classList.remove("active"));
 
         colorBtn.classList.add("active");
+
+        // перемикаємо фото товару на фото цього кольору
+        // (шукаємо картинку в межах картки каталогу, рядка
+        // кошика/обраного або самої сторінки товару)
+        const scope = colorBtn.closest(".product-card, .favorite-row, .cart-item, #productPage");
+
+        const targetImg = scope?.querySelector(".product-main-image, .cart-item-image img, .favorite-row-image img");
+
+        if (targetImg) {
+
+            try {
+
+                const images = JSON.parse(colorBtn.dataset.images || "[]");
+
+                if (images[0]) targetImg.src = images[0];
+
+            } catch (error) {
+
+                console.warn("Не вдалося розібрати images для кольору", error);
+
+            }
+
+        }
+
+        // на сторінці товару додатково перемикаємо всю галерею
+        if (scope?.id === "productPage" && typeof updateGalleryForColor === "function") {
+
+            try {
+
+                const images = JSON.parse(colorBtn.dataset.images || "[]");
+
+                updateGalleryForColor(images);
+
+            } catch (error) {
+
+                console.warn("Не вдалося оновити галерею", error);
+
+            }
+
+        }
 
         return;
 

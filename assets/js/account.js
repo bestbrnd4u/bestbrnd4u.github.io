@@ -500,7 +500,7 @@ function renderOrderCard(order) {
                     </div>
 
                     <div class="order-card-header-right">
-                        <span class="order-card-date">${date}</span>
+                        <span class="order-card-date">Дата замовлення: ${date}</span>
                         <span class="order-card-chevron">⌄</span>
                     </div>
 
@@ -652,6 +652,23 @@ async function loadProfile(user) {
     document.getElementById("profileMiddleName").value = data?.middle_name || "";
     document.getElementById("profilePhone").value = data?.phone || "";
     document.getElementById("profileCity").value = data?.city || "";
+
+    if (accountEmailEl) accountEmailEl.textContent = buildAccountGreeting(data?.first_name);
+
+}
+
+// -------------------------
+// Привітальне маркетингове повідомлення в кабінеті
+// (замість email під заголовком "Особистий кабінет")
+// -------------------------
+
+function buildAccountGreeting(firstName) {
+
+    const name = (firstName || "").trim();
+
+    return name
+        ? `Давай зробимо покупку, ${name}! 🛍️`
+        : `Давай зробимо покупку! 🛍️`;
 
 }
 
@@ -1047,7 +1064,7 @@ async function renderAuthState() {
         authCard.hidden = true;
         accountDashboard.hidden = false;
 
-        accountEmailEl.textContent = user.email;
+        accountEmailEl.textContent = buildAccountGreeting();
 
         await Promise.all([
             loadOrders(user.id),

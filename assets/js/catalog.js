@@ -10,7 +10,60 @@ const sortDropdown = document.getElementById("sortDropdown");
 
 let currentSort = "";
 let selectedBrands = new Set();
+let selectedCategories = new Set();
 let selectedPrices = new Set();
+let selectedSizes = new Set(); // елементи виду "group:size", напр. "bags:S"
+
+const SIZE_GROUPS = [
+    {
+        key: "bags",
+        title: "Сумки",
+        categories: ["Жіночі сумки", "Чоловічі сумки", "Унісекс сумки", "Дитячі сумки"],
+        sizes: ["XS", "S", "M", "L"]
+    },
+    {
+        key: "backpacks",
+        title: "Рюкзаки",
+        categories: ["Рюкзаки", "Дитячі рюкзаки"],
+        sizes: ["S", "M", "L", "XL"]
+    },
+    {
+        key: "clothes",
+        title: "Одяг",
+        categories: typeof CATEGORY_DEPARTMENTS !== "undefined"
+            ? CATEGORY_DEPARTMENTS.find(d => d.key === "clothes").categories
+            : [],
+        sizes: ["XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL"]
+    },
+    {
+        key: "shoes",
+        title: "Взуття",
+        categories: typeof CATEGORY_DEPARTMENTS !== "undefined"
+            ? CATEGORY_DEPARTMENTS.find(d => d.key === "shoes").categories
+            : [],
+        sizes: ["35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46"]
+    }
+];
+
+function matchesSizeKey(product, key) {
+
+    const [groupKey, size] = key.split(":");
+
+    const group = SIZE_GROUPS.find(g => g.key === groupKey);
+
+    if (!group) return false;
+
+    return group.categories.includes(product.category) && (product.sizes || []).includes(size);
+
+}
+
+const categoryDropdown = document.getElementById("categoryDropdown");
+const categoryToggle = document.getElementById("categoryToggle");
+const categoryMenu = document.getElementById("categoryMenu");
+const categoryLabel = document.getElementById("categoryLabel");
+const categorySearchInput = document.getElementById("categorySearchInput");
+const categoryOptionsList = document.getElementById("categoryOptionsList");
+const categoryNoResults = document.getElementById("categoryNoResults");
 
 // -------------------------
 // Дропдаун «Бренд» (з пошуком)
@@ -32,6 +85,15 @@ const priceDropdown = document.getElementById("priceDropdown");
 const priceToggle = document.getElementById("priceToggle");
 const priceMenu = document.getElementById("priceMenu");
 const priceLabel = document.getElementById("priceLabel");
+
+// -------------------------
+// Дропдаун «Розмір»
+// -------------------------
+
+const sizeDropdown = document.getElementById("sizeDropdown");
+const sizeToggle = document.getElementById("sizeToggle");
+const sizeMenu = document.getElementById("sizeMenu");
+const sizeLabel = document.getElementById("sizeLabel");
 
 const loader = document.getElementById("catalogLoader");
 const emptyState = document.getElementById("emptyCatalog");
@@ -59,7 +121,9 @@ let activeFiltersExpanded = false;
 const GENDERS = ["Чоловікам", "Жінкам", "Унісекс", "Дітям"];
 const SALE_MIN_DISCOUNT = 30; // % — мінімальна знижка для розділу "Акції"
 const DEFAULT_BRAND_LABEL = "Усі бренди";
+const DEFAULT_CATEGORY_LABEL = "Усі категорії";
 const DEFAULT_PRICE_LABEL = "Будь-яка ціна";
+const DEFAULT_SIZE_LABEL = "Розмір";
 
 const PRICE_RANGE_LABELS = {
     "0-2000": "до 2 000 ₴",
@@ -140,6 +204,12 @@ async function initCatalog() {
         fillBrands();
 
         applyBrandFromUrl();
+
+        fillCategories();
+
+        applyCategoryFromUrl();
+
+        fillSizeGroups();
 
         applySearchFromUrl();
 
@@ -321,6 +391,185 @@ brandSearchInput?.addEventListener("input", () => {
 brandSearchInput?.addEventListener("click", event => event.stopPropagation());
 
 // -------------------------
+// Дропдаун «Категорія» (з пошуком, згруповано по розділах)
+// -------------------------
+
+function fillCategories() {
+
+    if (!categoryOptionsList || typeof CATEGORY_DEPARTMENTS === "undefined") return;
+
+    const presentCategories = new Set(products.map(product => product.category));
+
+    CATEGORY_DEPARTMENTS.forEach(department => {
+
+        const categoriesHere = department.categories.filter(c => presentCategories.has(c));
+
+        if (categoriesHere.length === 0) return;
+
+        const groupTitle = document.createElement("div");
+        groupTitle.className = "filter-option-group-title";
+        groupTitle.textContent = department.title;
+
+        categoryOptionsList.appendChild(groupTitle);
+
+        categoriesHere.forEach(category => {
+
+            const option = document.createElement("button");
+
+            option.type = "button";
+            option.className = "filter-option";
+            option.dataset.category = category;
+            option.innerHTML = `<span class="filter-checkbox"></span>${category}`;
+
+            option.addEventListener("click", () => toggleCategory(category));
+
+            categoryOptionsList.appendChild(option);
+
+        });
+
+    });
+
+}
+
+function toggleCategory(value) {
+
+    if (selectedCategories.has(value)) {
+
+        selectedCategories.delete(value);
+
+    } else {
+
+        selectedCategories.add(value);
+
+    }
+
+    updateCategoryUI();
+
+    render();
+
+}
+
+function clearCategories() {
+
+    selectedCategories.clear();
+
+    updateCategoryUI();
+
+    closeAllDropdowns();
+
+    render();
+
+}
+
+function updateCategoryUI() {
+
+    categoryLabel.textContent = getMultiSelectLabel(selectedCategories, DEFAULT_CATEGORY_LABEL, "Категорії");
+
+    categoryOptionsList.querySelectorAll(".filter-option").forEach(o => {
+        o.classList.toggle("active", selectedCategories.has(o.dataset.category));
+    });
+
+}
+
+function applyCategoryFromUrl() {
+
+    const params = new URLSearchParams(location.search);
+
+    const urlCategory = params.get("category");
+
+    if (urlCategory) {
+
+        const match = [...categoryOptionsList.querySelectorAll(".filter-option")]
+            .find(o => o.dataset.category === urlCategory);
+
+        if (match) {
+
+            selectedCategories.add(urlCategory);
+
+            updateCategoryUI();
+
+        }
+
+    }
+
+}
+
+categoryToggle?.addEventListener("click", event => {
+
+    event.stopPropagation();
+
+    const willOpen = categoryMenu.hidden;
+
+    closeAllDropdowns();
+
+    if (willOpen) {
+
+        categoryMenu.hidden = false;
+        categoryDropdown.classList.add("open");
+        categorySearchInput.value = "";
+        filterCategoryOptions("");
+        categorySearchInput.focus();
+
+    }
+
+});
+
+document.querySelector("[data-clear-category]")?.addEventListener("click", clearCategories);
+
+function filterCategoryOptions(query) {
+
+    const q = query.trim().toLowerCase();
+    let visibleCount = 0;
+
+    categoryOptionsList.querySelectorAll(".filter-option-group-title").forEach(title => {
+        title.hidden = false;
+    });
+
+    categoryOptionsList.querySelectorAll(".filter-option").forEach(option => {
+
+        const matches = option.dataset.category.toLowerCase().includes(q);
+
+        option.hidden = !matches;
+
+        if (matches) visibleCount++;
+
+    });
+
+    // ховаємо заголовки розділів, у яких після пошуку не лишилось жодної категорії
+    let currentGroup = null;
+
+    categoryOptionsList.querySelectorAll(".filter-option-group-title, .filter-option").forEach(el => {
+
+        if (el.classList.contains("filter-option-group-title")) {
+
+            if (currentGroup) currentGroup.hidden = currentGroup.hasVisible ? false : true;
+
+            currentGroup = el;
+            currentGroup.hasVisible = false;
+
+        } else if (currentGroup && !el.hidden) {
+
+            currentGroup.hasVisible = true;
+
+        }
+
+    });
+
+    if (currentGroup) currentGroup.hidden = currentGroup.hasVisible ? false : true;
+
+    if (categoryNoResults) categoryNoResults.hidden = q === "" || visibleCount !== 0;
+
+}
+
+categorySearchInput?.addEventListener("input", () => {
+
+    filterCategoryOptions(categorySearchInput.value);
+
+});
+
+categorySearchInput?.addEventListener("click", event => event.stopPropagation());
+
+// -------------------------
 // Дропдаун «Ціна» (мультиселект)
 // -------------------------
 
@@ -398,9 +647,120 @@ priceToggle?.addEventListener("click", event => {
 
 });
 
+// -------------------------
+// Дропдаун «Розмір» (мультиселект, з групами)
+// -------------------------
+
+const sizeGroupsList = document.getElementById("sizeGroupsList");
+
+function fillSizeGroups() {
+
+    if (!sizeGroupsList) return;
+
+    const presentCategories = new Set(products.map(product => product.category));
+
+    sizeGroupsList.innerHTML = SIZE_GROUPS
+        .filter(group => group.categories.some(c => presentCategories.has(c)))
+        .map(group => `
+            <div class="filter-size-group">
+                <div class="filter-size-group-title">${group.title}</div>
+                <div class="filter-size-chips">
+                    ${group.sizes.map(size => `
+                        <button type="button" class="filter-size-chip" data-group="${group.key}" data-size="${size}">${size}</button>
+                    `).join("")}
+                </div>
+            </div>
+        `)
+        .join("");
+
+}
+
+sizeGroupsList?.addEventListener("click", event => {
+
+    const chip = event.target.closest(".filter-size-chip");
+
+    if (!chip) return;
+
+    toggleSize(`${chip.dataset.group}:${chip.dataset.size}`);
+
+});
+
+function toggleSize(key) {
+
+    if (selectedSizes.has(key)) {
+
+        selectedSizes.delete(key);
+
+    } else {
+
+        selectedSizes.add(key);
+
+    }
+
+    updateSizeUI();
+
+    render();
+
+}
+
+function clearSizes() {
+
+    selectedSizes.clear();
+
+    updateSizeUI();
+
+    closeAllDropdowns();
+
+    render();
+
+}
+
+function sizeKeyLabel(key) {
+
+    const [groupKey, size] = key.split(":");
+
+    const group = SIZE_GROUPS.find(g => g.key === groupKey);
+
+    return group ? `${group.title} · ${size}` : size;
+
+}
+
+function updateSizeUI() {
+
+    sizeLabel.textContent = getMultiSelectLabel(selectedSizes, DEFAULT_SIZE_LABEL, "Розмір", sizeKeyLabel);
+
+    sizeMenu.querySelectorAll(".filter-size-chip").forEach(chip => {
+
+        const key = `${chip.dataset.group}:${chip.dataset.size}`;
+
+        chip.classList.toggle("active", selectedSizes.has(key));
+
+    });
+
+}
+
+document.querySelector("[data-clear-size]")?.addEventListener("click", clearSizes);
+
+sizeToggle?.addEventListener("click", event => {
+
+    event.stopPropagation();
+
+    const willOpen = sizeMenu.hidden;
+
+    closeAllDropdowns();
+
+    if (willOpen) {
+
+        sizeMenu.hidden = false;
+        sizeDropdown.classList.add("open");
+
+    }
+
+});
+
 function closeAllDropdowns() {
 
-    [sortDropdown, brandDropdown, priceDropdown].forEach(dropdown => {
+    [sortDropdown, brandDropdown, categoryDropdown, priceDropdown, sizeDropdown].forEach(dropdown => {
 
         if (!dropdown) return;
 
@@ -416,7 +776,7 @@ function closeAllDropdowns() {
 
 document.addEventListener("click", event => {
 
-    if (event.target.closest("#sortDropdown, #brandDropdown, #priceDropdown")) return;
+    if (event.target.closest("#sortDropdown, #brandDropdown, #priceDropdown, #sizeDropdown")) return;
 
     closeAllDropdowns();
 
@@ -463,25 +823,25 @@ function renderBreadcrumbsAndTitle() {
 
     if (currentSection === "new") {
 
-        crumbs.push(`<span>/</span>`, `<a href="catalog.html?section=new">Новинки</a>`);
+        crumbs.push(`<span class="crumb-sep">→</span>`, `<a href="catalog.html?section=new">Новинки</a>`);
         title = "Новинки";
         subtitle = "Останні надходження до каталогу Bagvero";
 
     } else if (currentSection === "sale") {
 
-        crumbs.push(`<span>/</span>`, `<span class="sale-text">Акції</span>`);
+        crumbs.push(`<span class="crumb-sep">→</span>`, `<span class="sale-text">Акції</span>`);
         title = `<span class="sale-text">Акції</span>`;
         subtitle = `Знижки від ${SALE_MIN_DISCOUNT}% на сумки, рюкзаки та аксесуари`;
 
     } else {
 
-        crumbs.push(`<span>/</span>`, `<a href="catalog.html">Каталог</a>`);
+        crumbs.push(`<span class="crumb-sep">→</span>`, `<a href="catalog.html">Каталог</a>`);
 
     }
 
     if (currentGender) {
 
-        crumbs.push(`<span>/</span>`, `<span>${currentGender}</span>`);
+        crumbs.push(`<span class="crumb-sep">→</span>`, `<span>${currentGender}</span>`);
         subtitle = `${subtitle} · ${currentGender}`;
 
     }
@@ -567,10 +927,26 @@ function filterProducts() {
 
     }
 
+    if (selectedCategories.size) {
+
+        list = list.filter(product =>
+            selectedCategories.has(product.category)
+        );
+
+    }
+
     if (selectedPrices.size) {
 
         list = list.filter(product =>
             [...selectedPrices].some(range => matchesPriceRange(product, range))
+        );
+
+    }
+
+    if (selectedSizes.size) {
+
+        list = list.filter(product =>
+            [...selectedSizes].some(key => matchesSizeKey(product, key))
         );
 
     }
@@ -663,9 +1039,21 @@ function renderActiveFilters() {
 
     });
 
+    selectedCategories.forEach(category => {
+
+        chips.push({ type: "category", value: category, label: category });
+
+    });
+
     selectedPrices.forEach(range => {
 
         chips.push({ type: "price", value: range, label: PRICE_RANGE_LABELS[range] });
+
+    });
+
+    selectedSizes.forEach(key => {
+
+        chips.push({ type: "size", value: key, label: sizeKeyLabel(key) });
 
     });
 
@@ -810,11 +1198,23 @@ function clearOneFilter(type, value) {
 
         updateBrandUI();
 
+    } else if (type === "category") {
+
+        selectedCategories.delete(value);
+
+        updateCategoryUI();
+
     } else if (type === "price") {
 
         selectedPrices.delete(value);
 
         updatePriceUI();
+
+    } else if (type === "size") {
+
+        selectedSizes.delete(value);
+
+        updateSizeUI();
 
     }
 
@@ -829,8 +1229,14 @@ function resetAllFilters() {
     selectedBrands.clear();
     updateBrandUI();
 
+    selectedCategories.clear();
+    updateCategoryUI();
+
     selectedPrices.clear();
     updatePriceUI();
+
+    selectedSizes.clear();
+    updateSizeUI();
 
     currentSort = "";
 

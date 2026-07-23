@@ -13,7 +13,11 @@ function createProductCard(product) {
         ? `<div class="badge">${product.badge}</div>`
         : "";
 
-    const image = product.images?.[0] || "assets/images/no-image.png";
+    const variants = product.variants?.length
+        ? product.variants
+        : [{ color: product.color || "Основний", hex: "#999", images: product.images || [] }];
+
+    const image = variants[0].images?.[0] || product.images?.[0] || "assets/images/no-image.png";
 
     const brand = product.brand || "Без бренду";
 
@@ -25,16 +29,16 @@ function createProductCard(product) {
         ? Math.round((1 - product.price / product.oldPrice) * 100)
         : 0;
 
-    const colors = PRODUCT_COLORS;
     const sizes = PRODUCT_SIZES;
 
-    const colorButtons = colors.map((color, index) => `
+    const colorButtons = variants.map((variant, index) => `
         <button
             type="button"
             class="mini-color ${index === 0 ? "active" : ""}"
-            data-color="${color.name}"
-            title="${color.name}"
-            style="background:${color.hex}"></button>
+            data-color="${variant.color}"
+            data-images='${JSON.stringify(variant.images || [])}'
+            title="${variant.color}"
+            style="background:${variant.hex}"></button>
     `).join("");
 
     const sizeButtons = sizes.map((size, index) => `
@@ -58,6 +62,7 @@ function createProductCard(product) {
                     </svg>
                 </button>
                 <img
+                    class="product-main-image"
                     src="${image}"
                     alt="${product.title}"
                     loading="lazy"

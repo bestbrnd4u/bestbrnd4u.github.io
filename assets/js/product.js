@@ -32,15 +32,42 @@ function renderProduct(product) {
 
     document.getElementById("breadTitle").textContent = product.title;
 
+    const variants = product.variants?.length
+        ? product.variants
+        : [{ color: product.color || "Основний", hex: "#999", images: product.images || [] }];
+
+    const activeVariant = variants[0];
+    const galleryImages = activeVariant.images?.length ? activeVariant.images : (product.images || []);
+
+    const colorButtons = variants.map((variant, index) => {
+
+        const swatchImage = variant.images?.[0];
+
+        const swatchStyle = swatchImage
+            ? `background-image:url('${swatchImage}')`
+            : `background-color:${variant.hex || "#999"}`;
+
+        return `
+        <button
+            class="color ${index === 0 ? "active" : ""}"
+            data-color="${variant.color}"
+            data-images='${JSON.stringify(variant.images || [])}'
+            title="${variant.color}"
+            aria-label="Колір: ${variant.color}"
+            style="${swatchStyle}"></button>
+    `;
+
+    }).join("");
+
     document.getElementById("productPage").innerHTML = `
 
 <div class="product-wrapper">
 
     <div class="product-gallery">
 
-    <div class="thumbs-vertical">
+    <div class="thumbs-vertical" id="thumbsVertical">
 
-        ${product.images.map((img,index)=>`
+        ${galleryImages.map((img,index)=>`
 
             <img
                 src="${img}"
@@ -59,7 +86,7 @@ function renderProduct(product) {
 
             <img
                 id="mainImage"
-                src="${product.images[0]}"
+                src="${galleryImages[0] || "assets/images/no-image.png"}"
                 alt="${product.title}">
 
         </div>
@@ -103,11 +130,7 @@ function renderProduct(product) {
 
     <div class="color-options">
 
-        <button class="color active" data-color="Чорний" title="Чорний" style="background:#000"></button>
-
-        <button class="color" data-color="Коричневий" title="Коричневий" style="background:#8b5e3c"></button>
-
-        <button class="color" data-color="Бежевий" title="Бежевий" style="background:#d9c7a1"></button>
+        ${colorButtons}
 
     </div>
 
@@ -180,22 +203,79 @@ L
 
         <div class="specifications">
 
-            <h3>Характеристики</h3>
+            ${product.sku ? `
+            <div class="spec-block">
+                <h3>Артикул</h3>
+                <p class="spec-plain">${product.sku}</p>
+            </div>` : ""}
 
-            <div class="spec-row">
-                <span>Матеріал</span>
-                <strong>${product.material || "Екошкіра"}</strong>
+            <div class="spec-block">
+
+                <h3>Інформація про товар</h3>
+
+                <div class="spec-row" id="specColorRow">
+                    <span>Колір</span>
+                    <strong id="specColorValue">${activeVariant.color}</strong>
+                </div>
+
+                ${product.closure ? `
+                <div class="spec-row">
+                    <span>Застібка</span>
+                    <strong>${product.closure}</strong>
+                </div>` : ""}
+
+                ${product.decor ? `
+                <div class="spec-row">
+                    <span>Декор</span>
+                    <strong>${product.decor}</strong>
+                </div>` : ""}
+
+                ${product.dimensions ? `
+                <div class="spec-row">
+                    <span>Розмір</span>
+                    <strong>${product.dimensions}</strong>
+                </div>` : ""}
+
+                ${product.strapInfo ? `<p class="spec-plain">${product.strapInfo}</p>` : ""}
+
+                ${product.compartments ? `
+                <div class="spec-row">
+                    <span>Відділення / кишені (зовнішні)</span>
+                    <strong>${product.compartments}</strong>
+                </div>` : ""}
+
+                ${product.material ? `
+                <div class="spec-row">
+                    <span>Матеріал</span>
+                    <strong>${product.material}</strong>
+                </div>` : ""}
+
+                <div class="spec-row">
+                    <span>Бренд</span>
+                    <strong>${product.brand}</strong>
+                </div>
+
+                <div class="spec-row">
+                    <span>Стать</span>
+                    <strong>${product.gender || "Унісекс"}</strong>
+                </div>
+
+                ${product.country ? `
+                <div class="spec-row">
+                    <span>Країна</span>
+                    <strong>${product.country}</strong>
+                </div>` : ""}
+
             </div>
 
-            <div class="spec-row">
-                <span>Колір</span>
-                <strong>${product.color || "Чорний"}</strong>
-            </div>
-
-            <div class="spec-row">
-                <span>Країна</span>
-                <strong>${product.country || "Італія"}</strong>
-            </div>
+            ${product.composition ? `
+            <div class="spec-block">
+                <h3>Склад</h3>
+                <div class="spec-row">
+                    <span>Склад</span>
+                    <strong>${product.composition}</strong>
+                </div>
+            </div>` : ""}
 
         </div>
 
@@ -221,6 +301,49 @@ L
 
 }
 
+// Викликається з common.js при кліку на колір на сторінці товару —
+// повністю перебудовує галерею (мініатюри + головне фото) під
+// фотографії обраного кольору.
+function updateGalleryForColor(images) {
+
+    if (!images || !images.length) return;
+
+    const thumbsVertical = document.getElementById("thumbsVertical");
+    const mainImage = document.getElementById("mainImage");
+
+    if (!thumbsVertical || !mainImage) return;
+
+    thumbsVertical.innerHTML = images.map((img, index) => `
+        <img
+            src="${img}"
+            class="thumb ${index === 0 ? "active" : ""}"
+            alt="">
+    `).join("");
+
+    mainImage.src = images[0];
+
+    thumbsVertical.querySelectorAll(".thumb").forEach(thumb => {
+
+        thumb.addEventListener("click", function () {
+
+            mainImage.src = this.src;
+
+            thumbsVertical.querySelectorAll(".thumb").forEach(i => i.classList.remove("active"));
+
+            this.classList.add("active");
+
+        });
+
+    });
+
+    // синхронізуємо назву кольору в характеристиках товару
+    const colorLabel = document.querySelector(".color.active")?.dataset.color;
+    const specColorValue = document.getElementById("specColorValue");
+
+    if (colorLabel && specColorValue) specColorValue.textContent = colorLabel;
+
+}
+
 function renderSimilar(product){
 
 const list=products.filter(item=>
@@ -238,19 +361,7 @@ list.forEach(item=>{
 container.innerHTML+=createProductCard(item);
 
 });
-    document.querySelectorAll(".color").forEach(button=>{
-
-    button.onclick=function(){
-
-        document.querySelectorAll(".color").forEach(item=>item.classList.remove("active"));
-
-        this.classList.add("active");
-
-    }
-
-});
-
-document.querySelectorAll(".size").forEach(button=>{
+    document.querySelectorAll(".size").forEach(button=>{
 
     button.onclick=function(){
 

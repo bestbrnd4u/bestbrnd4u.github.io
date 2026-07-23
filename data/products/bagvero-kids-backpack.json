@@ -17,5 +17,31 @@
   "description": "Легкий дитячий рюкзак для школи та прогулянок. М'які лямки, міцні блискавки та яскравий дизайн, який сподобається дитині.",
   "images": [
     "https://images.pexels.com/photos/7269547/pexels-photo-7269547.jpeg?auto=compress&cs=tinysrgb&w=800"
+  ],
+  "variants": [
+    {
+      "color": "Жовтий",
+      "hex": "#e8b923",
+      "images": [
+        "https://images.pexels.com/photos/7269547/pexels-photo-7269547.jpeg?auto=compress&cs=tinysrgb&w=800"
+      ]
+    },
+    {
+      "color": "М'ятний",
+      "hex": "#a8e6cf",
+      "images": [
+        "https://images.pexels.com/photos/8423383/pexels-photo-8423383.jpeg?auto=compress&cs=tinysrgb&w=800"
+      ]
+    }
+  ],
+  "sku": "BK-BP-9009",
+  "closure": "блискавка",
+  "decor": "яскравий принт",
+  "dimensions": "30x22x12 см",
+  "strapInfo": "Регульовані м'які лямки, висота 30-40 см",
+  "compartments": "одне основне відділення, одна передня кишеня",
+  "composition": "100% поліестер",
+  "sizes": [
+    "S"
   ]
 }

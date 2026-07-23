@@ -17,5 +17,32 @@
   "description": "Культова сумка Michael Kors Jet Set Travel — компактний і місткий формат, ідеальний для подорожей та міського життя. Впізнаваний дизайн і преміальні матеріали.",
   "images": [
     "https://images.pexels.com/photos/1214212/pexels-photo-1214212.jpeg?auto=compress&cs=tinysrgb&w=800"
+  ],
+  "variants": [
+    {
+      "color": "Коричневий",
+      "hex": "#6b4423",
+      "images": [
+        "https://images.pexels.com/photos/1214212/pexels-photo-1214212.jpeg?auto=compress&cs=tinysrgb&w=800"
+      ]
+    },
+    {
+      "color": "Чорний",
+      "hex": "#1a1a1a",
+      "images": [
+        "https://images.pexels.com/photos/1214212/pexels-photo-1214212.jpeg?auto=compress&cs=tinysrgb&w=800"
+      ]
+    }
+  ],
+  "sku": "MK-JS-1002",
+  "closure": "магніт",
+  "decor": "логотип MK, золота фурнітура",
+  "dimensions": "33x24x13 см",
+  "strapInfo": "Дві короткі ручки та знімний ремінь на плече довжиною 60 см",
+  "compartments": "одне основне відділення, дві зовнішні кишені",
+  "composition": "100% сап'янова шкіра",
+  "sizes": [
+    "M",
+    "L"
   ]
 }

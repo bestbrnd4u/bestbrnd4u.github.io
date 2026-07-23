@@ -82,9 +82,9 @@ rel="stylesheet">
 <section class="breadcrumbs">
 <div class="container" id="breadcrumbsList">
 <a href="index.html">
-Главная
+Головна
 </a>
-<span>/</span>
+<span class="crumb-sep">→</span>
 <span>Каталог</span>
 </div>
 </section>
@@ -117,6 +117,22 @@ placeholder="Пошук товару...">
 <button type="button" class="gender-pill" data-gender="Жінкам">Жінкам</button>
 <button type="button" class="gender-pill" data-gender="Унісекс">Унісекс</button>
 <button type="button" class="gender-pill" data-gender="Дітям">Дітям</button>
+</div>
+</div>
+
+<div class="filter-group filter-dropdown" id="categoryDropdown">
+<button type="button" id="categoryToggle" class="filter-toggle">
+<span id="categoryLabel">Усі категорії</span>
+<span class="filter-arrow">▾</span>
+</button>
+<div id="categoryMenu" class="filter-menu filter-menu-search" hidden>
+<div class="filter-menu-search-box">
+<span class="filter-menu-search-icon">🔍</span>
+<input type="text" id="categorySearchInput" placeholder="Пошук категорії...">
+</div>
+<button type="button" class="filter-option-clear" data-clear-category>✕ Скинути вибір категорії</button>
+<div id="categoryOptionsList" class="filter-menu-options"></div>
+<p id="categoryNoResults" class="filter-menu-empty" hidden>Категорію не знайдено</p>
 </div>
 </div>
 
@@ -160,6 +176,18 @@ placeholder="Пошук товару...">
 від 8 000 ₴
 </button>
 </div>
+</div>
+
+<div class="filter-group filter-dropdown" id="sizeDropdown">
+<button type="button" id="sizeToggle" class="filter-toggle">
+<span id="sizeLabel">Розмір</span>
+<span class="filter-arrow">▾</span>
+</button>
+<div id="sizeMenu" class="filter-menu filter-menu-sizes" hidden>
+<button type="button" class="filter-option-clear" data-clear-size>✕ Скинути вибір розміру</button>
+
+<div id="sizeGroupsList"></div>
+
 </div>
 
 </div>
@@ -325,6 +353,7 @@ aria-label="Нагору">
 <script src="assets/js/supabase-client.js"></script>
 <script src="assets/js/common.js"></script>
 <script src="assets/js/ui.js"></script>
+<script src="assets/js/categories.js"></script>
 <script src="assets/js/catalog.js"></script>
 </body>
 

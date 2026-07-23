@@ -90,18 +90,25 @@ function renderCart() {
         subtotalFull += lineTotalFull;
         itemsCount += qty;
 
-        const image = product.images?.[0] || "assets/images/no-image.png";
+        const variants = product.variants?.length
+            ? product.variants
+            : [{ color: product.color || "Основний", hex: "#999", images: product.images || [] }];
 
-        const activeColor = line.color || PRODUCT_COLORS[0].name;
+        const activeColor = line.color || variants[0].color;
         const activeSize = line.size || PRODUCT_SIZES[0];
 
-        const colorButtons = PRODUCT_COLORS.map(color => `
+        const activeVariant = variants.find(v => v.color === activeColor) || variants[0];
+
+        const image = activeVariant.images?.[0] || product.images?.[0] || "assets/images/no-image.png";
+
+        const colorButtons = variants.map(variant => `
             <button
                 type="button"
-                class="mini-color ${color.name === activeColor ? "active" : ""}"
-                data-color="${color.name}"
-                title="${color.name}"
-                style="background:${color.hex}"></button>
+                class="mini-color ${variant.color === activeColor ? "active" : ""}"
+                data-color="${variant.color}"
+                data-images='${JSON.stringify(variant.images || [])}'
+                title="${variant.color}"
+                style="background:${variant.hex}"></button>
         `).join("");
 
         const sizeButtons = PRODUCT_SIZES.map(size => `

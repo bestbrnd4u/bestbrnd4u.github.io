@@ -19,6 +19,34 @@
     "images": [
       "https://images.pexels.com/photos/12373441/pexels-photo-12373441.jpeg?auto=compress&cs=tinysrgb&w=800",
       "https://images.pexels.com/photos/3973974/pexels-photo-3973974.jpeg?auto=compress&cs=tinysrgb&w=800"
+    ],
+    "variants": [
+      {
+        "color": "Чорний",
+        "hex": "#1a1a1a",
+        "images": [
+          "https://images.pexels.com/photos/12373441/pexels-photo-12373441.jpeg?auto=compress&cs=tinysrgb&w=800",
+          "https://images.pexels.com/photos/3973974/pexels-photo-3973974.jpeg?auto=compress&cs=tinysrgb&w=800"
+        ]
+      },
+      {
+        "color": "Бежевий",
+        "hex": "#d9c7a1",
+        "images": [
+          "https://images.pexels.com/photos/33475810/pexels-photo-33475810.jpeg?auto=compress&cs=tinysrgb&w=800"
+        ]
+      }
+    ],
+    "sku": "GN-2024-001",
+    "closure": "блискавка",
+    "decor": "логотип, металева фурнітура",
+    "dimensions": "28x18x10 см",
+    "strapInfo": "Один регульований та знімний ремінь довжиною 110-120 см",
+    "compartments": "одне основне відділення, одна внутрішня кишеня",
+    "composition": "100% екошкіра",
+    "sizes": [
+      "S",
+      "M"
     ]
   },
   {
@@ -40,6 +68,33 @@
     "description": "Культова сумка Michael Kors Jet Set Travel — компактний і місткий формат, ідеальний для подорожей та міського життя. Впізнаваний дизайн і преміальні матеріали.",
     "images": [
       "https://images.pexels.com/photos/1214212/pexels-photo-1214212.jpeg?auto=compress&cs=tinysrgb&w=800"
+    ],
+    "variants": [
+      {
+        "color": "Коричневий",
+        "hex": "#6b4423",
+        "images": [
+          "https://images.pexels.com/photos/1214212/pexels-photo-1214212.jpeg?auto=compress&cs=tinysrgb&w=800"
+        ]
+      },
+      {
+        "color": "Чорний",
+        "hex": "#1a1a1a",
+        "images": [
+          "https://images.pexels.com/photos/1214212/pexels-photo-1214212.jpeg?auto=compress&cs=tinysrgb&w=800"
+        ]
+      }
+    ],
+    "sku": "MK-JS-1002",
+    "closure": "магніт",
+    "decor": "логотип MK, золота фурнітура",
+    "dimensions": "33x24x13 см",
+    "strapInfo": "Дві короткі ручки та знімний ремінь на плече довжиною 60 см",
+    "compartments": "одне основне відділення, дві зовнішні кишені",
+    "composition": "100% сап'янова шкіра",
+    "sizes": [
+      "M",
+      "L"
     ]
   },
   {
@@ -61,6 +116,33 @@
     "description": "Міський рюкзак Tommy Hilfiger поєднує практичність і стиль: відділення для ноутбука, міцні блискавки та фірмова нашивка бренду. Підходить і чоловікам, і жінкам.",
     "images": [
       "https://images.pexels.com/photos/3731256/pexels-photo-3731256.jpeg?auto=compress&cs=tinysrgb&w=800"
+    ],
+    "variants": [
+      {
+        "color": "Синій",
+        "hex": "#2c4a7c",
+        "images": [
+          "https://images.pexels.com/photos/3731256/pexels-photo-3731256.jpeg?auto=compress&cs=tinysrgb&w=800"
+        ]
+      },
+      {
+        "color": "Чорний",
+        "hex": "#1a1a1a",
+        "images": [
+          "https://images.pexels.com/photos/3731256/pexels-photo-3731256.jpeg?auto=compress&cs=tinysrgb&w=800"
+        ]
+      }
+    ],
+    "sku": "TH-BP-3003",
+    "closure": "блискавка",
+    "decor": "нашивка з логотипом",
+    "dimensions": "45x30x15 см",
+    "strapInfo": "Регульовані лямки, висота 40-55 см",
+    "compartments": "два основних відділення, одна кишеня для ноутбука, дві бічні кишені",
+    "composition": "100% поліестер",
+    "sizes": [
+      "M",
+      "L"
     ]
   },
   {
@@ -84,6 +166,36 @@
       "assets/images/products/furla/furla-1.webp",
       "assets/images/products/furla/furla-2.webp",
       "assets/images/products/furla/furla-3.webp"
+    ],
+    "variants": [
+      {
+        "color": "Бежевий",
+        "hex": "#d9c7a1",
+        "images": [
+          "assets/images/products/furla/furla-1.webp",
+          "assets/images/products/furla/furla-2.webp",
+          "assets/images/products/furla/furla-3.webp"
+        ]
+      },
+      {
+        "color": "Чорний",
+        "hex": "#1a1a1a",
+        "images": [
+          "https://images.pexels.com/photos/6786665/pexels-photo-6786665.jpeg?auto=compress&cs=tinysrgb&w=800",
+          "https://images.pexels.com/photos/2962086/pexels-photo-2962086.jpeg?auto=compress&cs=tinysrgb&w=800"
+        ]
+      }
+    ],
+    "sku": "FR-MP-4004",
+    "closure": "магніт з фірмовою пряжкою",
+    "decor": "металева пряжка Furla",
+    "dimensions": "20x16x8 см",
+    "strapInfo": "Один незнімний ремінь довжиною 110 см",
+    "compartments": "одне основне відділення, одна внутрішня кишеня",
+    "composition": "100% натуральна шкіра",
+    "sizes": [
+      "XS",
+      "S"
     ]
   },
   {
@@ -105,6 +217,33 @@
     "description": "Мінімалістична сумка через плече Calvin Klein у фірмовому лаконічному стилі бренду. Легка, містка, з регульованим ременем.",
     "images": [
       "https://images.pexels.com/photos/157888/pexels-photo-157888.jpeg?auto=compress&cs=tinysrgb&w=800"
+    ],
+    "variants": [
+      {
+        "color": "Чорний",
+        "hex": "#1a1a1a",
+        "images": [
+          "https://images.pexels.com/photos/157888/pexels-photo-157888.jpeg?auto=compress&cs=tinysrgb&w=800"
+        ]
+      },
+      {
+        "color": "Бежевий",
+        "hex": "#d9c7a1",
+        "images": [
+          "https://images.pexels.com/photos/6787035/pexels-photo-6787035.jpeg?auto=compress&cs=tinysrgb&w=800"
+        ]
+      }
+    ],
+    "sku": "CK-CB-5005",
+    "closure": "блискавка",
+    "decor": "логотип CK",
+    "dimensions": "22x17x7 см",
+    "strapInfo": "Один регульований знімний ремінь довжиною 100-130 см",
+    "compartments": "одне основне відділення, одна кишеня на блискавці",
+    "composition": "100% екошкіра",
+    "sizes": [
+      "XS",
+      "S"
     ]
   },
   {
@@ -128,6 +267,35 @@
       "https://images.pexels.com/photos/7419416/pexels-photo-7419416.jpeg?auto=compress&cs=tinysrgb&w=800",
       "https://images.pexels.com/photos/20086706/pexels-photo-20086706.jpeg?auto=compress&cs=tinysrgb&w=800",
       "https://images.pexels.com/photos/20086704/pexels-photo-20086704.jpeg?auto=compress&cs=tinysrgb&w=800"
+    ],
+    "variants": [
+      {
+        "color": "Червоний",
+        "hex": "#b91c1c",
+        "images": [
+          "https://images.pexels.com/photos/7419416/pexels-photo-7419416.jpeg?auto=compress&cs=tinysrgb&w=800",
+          "https://images.pexels.com/photos/20086706/pexels-photo-20086706.jpeg?auto=compress&cs=tinysrgb&w=800",
+          "https://images.pexels.com/photos/20086704/pexels-photo-20086704.jpeg?auto=compress&cs=tinysrgb&w=800"
+        ]
+      },
+      {
+        "color": "Коричневий",
+        "hex": "#6b4423",
+        "images": [
+          "https://images.pexels.com/photos/14806252/pexels-photo-14806252.jpeg?auto=compress&cs=tinysrgb&w=800"
+        ]
+      }
+    ],
+    "sku": "LM-HC-6006",
+    "closure": "блискавка",
+    "decor": "декоративне серце, золота фурнітура",
+    "dimensions": "26x19x11 см",
+    "strapInfo": "Один знімний ремінь довжиною 60-115 см",
+    "compartments": "одне основне відділення, дві внутрішні кишені",
+    "composition": "100% екошкіра",
+    "sizes": [
+      "S",
+      "M"
     ]
   },
   {
@@ -149,6 +317,33 @@
     "description": "Строгий чоловічий портфель для документів і ноутбука. Щільна шкіра, надійна фурнітура та продумані відділення для ділового стилю.",
     "images": [
       "https://images.pexels.com/photos/57750/pexels-photo-57750.jpeg?auto=compress&cs=tinysrgb&w=800"
+    ],
+    "variants": [
+      {
+        "color": "Коричневий",
+        "hex": "#6b4423",
+        "images": [
+          "https://images.pexels.com/photos/57750/pexels-photo-57750.jpeg?auto=compress&cs=tinysrgb&w=800"
+        ]
+      },
+      {
+        "color": "Чорний",
+        "hex": "#1a1a1a",
+        "images": [
+          "https://images.pexels.com/photos/3778212/pexels-photo-3778212.jpeg?auto=compress&cs=tinysrgb&w=800"
+        ]
+      }
+    ],
+    "sku": "BM-BR-7007",
+    "closure": "блискавка",
+    "decor": "мінімалістичний логотип",
+    "dimensions": "40x30x8 см",
+    "strapInfo": "Дві ручки та знімний плечовий ремінь довжиною 130 см",
+    "compartments": "відділення для ноутбука, два основних відділення, три кишені",
+    "composition": "100% натуральна шкіра",
+    "sizes": [
+      "M",
+      "L"
     ]
   },
   {
@@ -170,6 +365,32 @@
     "description": "Компактна чоловіча сумка-слінг через плече для щоденних речей: телефон, гаманець, ключі. Регульований ремінь, мінімалістичний дизайн.",
     "images": [
       "https://images.pexels.com/photos/8276590/pexels-photo-8276590.jpeg?auto=compress&cs=tinysrgb&w=800"
+    ],
+    "variants": [
+      {
+        "color": "Чорний",
+        "hex": "#1a1a1a",
+        "images": [
+          "https://images.pexels.com/photos/8276590/pexels-photo-8276590.jpeg?auto=compress&cs=tinysrgb&w=800"
+        ]
+      },
+      {
+        "color": "Коричневий",
+        "hex": "#6b4423",
+        "images": [
+          "https://images.pexels.com/photos/1936848/pexels-photo-1936848.jpeg?auto=compress&cs=tinysrgb&w=800"
+        ]
+      }
+    ],
+    "sku": "BM-SL-8008",
+    "closure": "блискавка",
+    "decor": "логотип",
+    "dimensions": "24x18x9 см",
+    "strapInfo": "Один незнімний регульований ремінь довжиною 130 см",
+    "compartments": "одне основне відділення, одна зовнішня кишеня",
+    "composition": "100% екошкіра",
+    "sizes": [
+      "S"
     ]
   },
   {
@@ -191,6 +412,32 @@
     "description": "Легкий дитячий рюкзак для школи та прогулянок. М'які лямки, міцні блискавки та яскравий дизайн, який сподобається дитині.",
     "images": [
       "https://images.pexels.com/photos/7269547/pexels-photo-7269547.jpeg?auto=compress&cs=tinysrgb&w=800"
+    ],
+    "variants": [
+      {
+        "color": "Жовтий",
+        "hex": "#e8b923",
+        "images": [
+          "https://images.pexels.com/photos/7269547/pexels-photo-7269547.jpeg?auto=compress&cs=tinysrgb&w=800"
+        ]
+      },
+      {
+        "color": "М'ятний",
+        "hex": "#a8e6cf",
+        "images": [
+          "https://images.pexels.com/photos/8423383/pexels-photo-8423383.jpeg?auto=compress&cs=tinysrgb&w=800"
+        ]
+      }
+    ],
+    "sku": "BK-BP-9009",
+    "closure": "блискавка",
+    "decor": "яскравий принт",
+    "dimensions": "30x22x12 см",
+    "strapInfo": "Регульовані м'які лямки, висота 30-40 см",
+    "compartments": "одне основне відділення, одна передня кишеня",
+    "composition": "100% поліестер",
+    "sizes": [
+      "S"
     ]
   },
   {
@@ -212,6 +459,32 @@
     "description": "Яскрава дитяча сумочка з веселим принтом — зручний розмір для книжок, іграшок та шкільних дрібничок.",
     "images": [
       "https://images.pexels.com/photos/6110950/pexels-photo-6110950.jpeg?auto=compress&cs=tinysrgb&w=800"
+    ],
+    "variants": [
+      {
+        "color": "Мультиколір",
+        "hex": "linear-gradient(90deg,#f87171,#fbbf24,#34d399,#60a5fa)",
+        "images": [
+          "https://images.pexels.com/photos/6110950/pexels-photo-6110950.jpeg?auto=compress&cs=tinysrgb&w=800"
+        ]
+      },
+      {
+        "color": "Синій",
+        "hex": "#2c4a7c",
+        "images": [
+          "https://images.pexels.com/photos/9327162/pexels-photo-9327162.jpeg?auto=compress&cs=tinysrgb&w=800"
+        ]
+      }
+    ],
+    "sku": "BK-KB-1010",
+    "closure": "кнопка",
+    "decor": "яскравий принт",
+    "dimensions": "18x14x6 см",
+    "strapInfo": "Один незнімний ремінь довжиною 90 см",
+    "compartments": "одне основне відділення",
+    "composition": "100% поліестер",
+    "sizes": [
+      "XS"
     ]
   },
   {
@@ -233,6 +506,33 @@
     "description": "Практична сумка-тоут із щільного бавовняного полотна. Підходить для покупок, навчання та повсякденних прогулянок — універсальна для всіх.",
     "images": [
       "https://images.pexels.com/photos/3758495/pexels-photo-3758495.jpeg?auto=compress&cs=tinysrgb&w=800"
+    ],
+    "variants": [
+      {
+        "color": "Бежевий",
+        "hex": "#d9c7a1",
+        "images": [
+          "https://images.pexels.com/photos/3758495/pexels-photo-3758495.jpeg?auto=compress&cs=tinysrgb&w=800"
+        ]
+      },
+      {
+        "color": "Червоний",
+        "hex": "#b91c1c",
+        "images": [
+          "https://images.pexels.com/photos/1381562/pexels-photo-1381562.jpeg?auto=compress&cs=tinysrgb&w=800"
+        ]
+      }
+    ],
+    "sku": "BU-CT-1111",
+    "closure": "без застібки (відкритий верх)",
+    "decor": "мінімалістичний принт",
+    "dimensions": "38x32x12 см",
+    "strapInfo": "Дві короткі ручки довжиною 25 см",
+    "compartments": "одне основне відділення, одна внутрішня кишеня",
+    "composition": "100% бавовна",
+    "sizes": [
+      "M",
+      "L"
     ]
   }
 ]

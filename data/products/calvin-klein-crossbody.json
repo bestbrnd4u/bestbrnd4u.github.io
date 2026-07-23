@@ -17,5 +17,32 @@
   "description": "Мінімалістична сумка через плече Calvin Klein у фірмовому лаконічному стилі бренду. Легка, містка, з регульованим ременем.",
   "images": [
     "https://images.pexels.com/photos/157888/pexels-photo-157888.jpeg?auto=compress&cs=tinysrgb&w=800"
+  ],
+  "variants": [
+    {
+      "color": "Чорний",
+      "hex": "#1a1a1a",
+      "images": [
+        "https://images.pexels.com/photos/157888/pexels-photo-157888.jpeg?auto=compress&cs=tinysrgb&w=800"
+      ]
+    },
+    {
+      "color": "Бежевий",
+      "hex": "#d9c7a1",
+      "images": [
+        "https://images.pexels.com/photos/6787035/pexels-photo-6787035.jpeg?auto=compress&cs=tinysrgb&w=800"
+      ]
+    }
+  ],
+  "sku": "CK-CB-5005",
+  "closure": "блискавка",
+  "decor": "логотип CK",
+  "dimensions": "22x17x7 см",
+  "strapInfo": "Один регульований знімний ремінь довжиною 100-130 см",
+  "compartments": "одне основне відділення, одна кишеня на блискавці",
+  "composition": "100% екошкіра",
+  "sizes": [
+    "XS",
+    "S"
   ]
 }

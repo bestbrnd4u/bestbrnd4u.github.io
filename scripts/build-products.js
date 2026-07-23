@@ -18,6 +18,41 @@ const ROOT = path.join(__dirname, "..");
 const PRODUCTS_DIR = path.join(ROOT, "data", "products");
 const OUTPUT_FILE = path.join(ROOT, "data", "products.json");
 
+// Перевіряє, чи заповнені всі поля, обов'язкові для показу на сайті.
+// Список свідомо дублює required:true поля з admin/config.yml.
+function getMissingFields(data) {
+
+    const missing = [];
+
+    if (!data.title) missing.push("title (Назва товару)");
+    if (!data.brand) missing.push("brand (Бренд)");
+    if (!data.category) missing.push("category (Категорія)");
+    if (!data.gender) missing.push("gender (Для кого)");
+    if (typeof data.price !== "number") missing.push("price (Ціна)");
+    if (!data.description) missing.push("description (Опис товару)");
+
+    const hasVariants = Array.isArray(data.variants) && data.variants.length > 0;
+
+    if (!hasVariants) {
+
+        missing.push("variants (Варіанти кольору)");
+
+    } else {
+
+        const [firstVariant] = data.variants;
+
+        if (!firstVariant.color) missing.push("variants[0].color (Колір першого варіанту)");
+        if (!firstVariant.hex) missing.push("variants[0].hex (HEX першого варіанту)");
+        if (!Array.isArray(firstVariant.images) || firstVariant.images.length === 0) {
+            missing.push("variants[0].images (Фотографії першого варіанту)");
+        }
+
+    }
+
+    return missing;
+
+}
+
 function main() {
 
     if (!fs.existsSync(PRODUCTS_DIR)) {
@@ -70,9 +105,50 @@ function main() {
             changed = true;
         }
 
+        // color/images верхнього рівня — це завжди перший варіант
+        // кольору. Якщо в CMS відредагували variants, ці поля
+        // підтягуються автоматично — не треба заповнювати двічі.
+        if (Array.isArray(data.variants) && data.variants.length > 0) {
+
+            const [firstVariant] = data.variants;
+
+            if (data.color !== firstVariant.color) {
+                data.color = firstVariant.color;
+                changed = true;
+            }
+
+            if (JSON.stringify(data.images) !== JSON.stringify(firstVariant.images)) {
+                data.images = firstVariant.images;
+                changed = true;
+            }
+
+        }
+
         if (changed) {
             fs.writeFileSync(filePath, JSON.stringify(data, null, 2) + "\n", "utf8");
             console.log(`оновлено ${file}: id=${data.id}, slug=${data.slug}`);
+        }
+
+        const missing = getMissingFields(data);
+
+        if (missing.length > 0 && !data.forcePublish) {
+
+            console.log(
+                `⏭  ПРОПУЩЕНО (не потрапить на сайт): ${file} — ` +
+                `не заповнено: ${missing.join(", ")}. ` +
+                `Щоб все одно показати товар — увімкніть "Опублікувати попри неповні дані" в адмінці.`
+            );
+
+            return;
+
+        }
+
+        if (missing.length > 0 && data.forcePublish) {
+
+            console.log(
+                `⚠  Опубліковано попри неповні дані: ${file} — не заповнено: ${missing.join(", ")}`
+            );
+
         }
 
         products.push(data);

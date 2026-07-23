@@ -17,5 +17,32 @@
   "description": "Практична сумка-тоут із щільного бавовняного полотна. Підходить для покупок, навчання та повсякденних прогулянок — універсальна для всіх.",
   "images": [
     "https://images.pexels.com/photos/3758495/pexels-photo-3758495.jpeg?auto=compress&cs=tinysrgb&w=800"
+  ],
+  "variants": [
+    {
+      "color": "Бежевий",
+      "hex": "#d9c7a1",
+      "images": [
+        "https://images.pexels.com/photos/3758495/pexels-photo-3758495.jpeg?auto=compress&cs=tinysrgb&w=800"
+      ]
+    },
+    {
+      "color": "Червоний",
+      "hex": "#b91c1c",
+      "images": [
+        "https://images.pexels.com/photos/1381562/pexels-photo-1381562.jpeg?auto=compress&cs=tinysrgb&w=800"
+      ]
+    }
+  ],
+  "sku": "BU-CT-1111",
+  "closure": "без застібки (відкритий верх)",
+  "decor": "мінімалістичний принт",
+  "dimensions": "38x32x12 см",
+  "strapInfo": "Дві короткі ручки довжиною 25 см",
+  "compartments": "одне основне відділення, одна внутрішня кишеня",
+  "composition": "100% бавовна",
+  "sizes": [
+    "M",
+    "L"
   ]
 }
