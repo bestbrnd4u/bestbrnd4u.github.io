@@ -1038,3 +1038,134 @@ document.addEventListener("click", function (e) {
     }
 
 });
+
+// ======================================
+// Українські підказки валідації форм
+// (замість англійських системних тултипів
+// браузера на required/email/minlength полях)
+// ======================================
+
+function ukrainianValidationMessage(field) {
+
+    const v = field.validity;
+
+    if (v.valueMissing) {
+
+        return field.type === "checkbox"
+            ? "Це поле обов'язкове"
+            : "Будь ласка, заповніть це поле";
+
+    }
+
+    if (v.typeMismatch) {
+
+        if (field.type === "email") {
+            return "Введіть коректну електронну адресу, наприклад name@example.com";
+        }
+
+        return "Значення введено в неправильному форматі";
+
+    }
+
+    if (v.tooShort) {
+        return `Мінімум ${field.minLength} символів (зараз ${field.value.length})`;
+    }
+
+    if (v.tooLong) {
+        return `Максимум ${field.maxLength} символів`;
+    }
+
+    if (v.patternMismatch) {
+        return "Значення не відповідає очікуваному формату";
+    }
+
+    if (v.rangeUnderflow) {
+        return `Значення має бути не менше ${field.min}`;
+    }
+
+    if (v.rangeOverflow) {
+        return `Значення має бути не більше ${field.max}`;
+    }
+
+    return "Перевірте правильність заповнення цього поля";
+
+}
+
+// Вішає обробники на всі поля форми: скидають кастомне
+// повідомлення при введенні і виставляють українське замість
+// дефолтного англійського, коли поле недійсне.
+function applyUkrainianValidation(form) {
+
+    if (!form || form.dataset.ukValidationBound) return;
+
+    form.dataset.ukValidationBound = "true";
+
+    form.querySelectorAll("input, select, textarea").forEach(field => {
+
+        field.addEventListener("invalid", () => {
+
+            field.setCustomValidity(ukrainianValidationMessage(field));
+
+        });
+
+        field.addEventListener("input", () => field.setCustomValidity(""));
+        field.addEventListener("change", () => field.setCustomValidity(""));
+
+    });
+
+}
+
+// Перевіряє форму цілком; якщо є недійсні поля — показує
+// українську підказку на першому з них і повертає false.
+function validateFormUk(form) {
+
+    applyUkrainianValidation(form);
+
+    const fields = [...form.querySelectorAll("input, select, textarea")];
+
+    let firstInvalid = null;
+
+    fields.forEach(field => {
+
+        field.setCustomValidity("");
+
+        if (!field.checkValidity()) {
+
+            field.setCustomValidity(ukrainianValidationMessage(field));
+
+            if (!firstInvalid) firstInvalid = field;
+
+        }
+
+    });
+
+    if (firstInvalid) {
+
+        firstInvalid.reportValidity();
+        firstInvalid.focus();
+
+        return false;
+
+    }
+
+    return true;
+
+}
+
+// подключаємо одразу до всіх форм на сторінці, які досі
+// покладались на нативні (англійські) підказки браузера
+document.querySelectorAll("form").forEach(applyUkrainianValidation);
+
+const contactForm = document.getElementById("contactForm");
+
+contactForm?.addEventListener("submit", event => {
+
+    event.preventDefault();
+
+    if (!validateFormUk(contactForm)) return;
+
+    showToast("Дякуємо! Ваше повідомлення надіслано, ми зв'яжемося з вами найближчим часом.");
+
+    contactForm.reset();
+
+});

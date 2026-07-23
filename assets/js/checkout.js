@@ -301,6 +301,39 @@ function getSelectedDelivery() {
 
 }
 
+function getSelectedPayment() {
+
+    const checked = document.querySelector('input[name="paymentMethod"]:checked');
+
+    return checked ? checked.value : null;
+
+}
+
+// поле-деталь доставки (номер відділення / поштомату / адреса
+// кур'єра — залежно від обраного способу), одним рядком —
+// саме так воно потрапляє в кабінет і в лист
+function getDeliveryDetailValue() {
+
+    const delivery = getSelectedDelivery();
+
+    if (!delivery) return null;
+
+    if (delivery.label === "На відділення «Нова пошта»") {
+        return document.getElementById("branchNumber")?.value.trim() || null;
+    }
+
+    if (delivery.label === "Поштомат «Нова пошта»") {
+        return document.getElementById("postomatNumber")?.value.trim() || null;
+    }
+
+    if (delivery.label === "Кур'єром «Нова пошта»") {
+        return document.getElementById("courierAddress")?.value.trim() || null;
+    }
+
+    return null;
+
+}
+
 function renderOrderSummary() {
 
     const lines = getCartLines();
@@ -609,6 +642,7 @@ function fillHiddenFields() {
 
     document.getElementById("orderComposition").value = buildOrderCompositionText();
     document.getElementById("orderSubtotalField").value = formatPrice(subtotal);
+    document.getElementById("orderPaymentField").value = getSelectedPayment() || "—";
     document.getElementById("orderDiscountField").value = totalDiscount > 0
         ? `-${formatPrice(totalDiscount)}${appliedPromo ? ` (промокод: ${appliedPromo.code})` : ""}`
         : "0 ₴";
@@ -645,6 +679,7 @@ function buildEmailTemplateParams(orderId, orderDate) {
         order_total: formatPrice(total),
         delivery_city: cityValue,
         delivery_method: delivery ? delivery.label : "—",
+        payment_method: getSelectedPayment() || "—",
         customer_phone: phoneValue,
         contact_channel: contactChannel
     };
@@ -692,6 +727,8 @@ async function saveOrderToSupabase(orderId) {
         total,
         delivery_method: delivery ? delivery.label : null,
         delivery_city: document.getElementById("city")?.value.trim() || null,
+        delivery_detail: getDeliveryDetailValue(),
+        payment_method: getSelectedPayment(),
         promo_code: appliedPromo ? appliedPromo.code : null,
         first_name: document.getElementById("firstName")?.value.trim() || null,
         last_name: document.getElementById("lastName")?.value.trim() || null,

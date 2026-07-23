@@ -133,7 +133,7 @@
                 <button type="button" class="auth-tab" data-tab="signup">Реєстрація</button>
             </div>
 
-            <form id="loginForm" class="auth-form">
+            <form id="loginForm" class="auth-form" novalidate>
 
                 <label>
                     Email
@@ -153,7 +153,7 @@
 
             </form>
 
-            <form id="signupForm" class="auth-form" hidden>
+            <form id="signupForm" class="auth-form" hidden novalidate>
 
                 <label>
                     Ім'я
@@ -185,7 +185,7 @@
             <h2 class="auth-card-title">Встановити новий пароль</h2>
             <p class="auth-card-sub">Введіть новий пароль для входу в акаунт</p>
 
-            <form id="resetPasswordForm" class="auth-form">
+            <form id="resetPasswordForm" class="auth-form" novalidate>
 
                 <label>
                     Новий пароль
@@ -279,7 +279,7 @@
                     <h2>Персональна інформація</h2>
                     <p class="profile-card-sub">Ці дані автоматично підставляться при оформленні замовлення</p>
 
-                    <form id="profileForm" class="profile-form">
+                    <form id="profileForm" class="profile-form" novalidate>
 
                         <div class="profile-fields">
 
@@ -446,7 +446,7 @@
             <button type="button" id="addressModalClose" class="modal-close" aria-label="Закрити">✕</button>
         </div>
 
-        <form id="addressForm" class="auth-form">
+        <form id="addressForm" class="auth-form" novalidate>
 
             <input type="hidden" id="addressId">
 

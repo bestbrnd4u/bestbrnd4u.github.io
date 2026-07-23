@@ -146,6 +146,8 @@ signupForm?.addEventListener("submit", async event => {
 
     event.preventDefault();
 
+    if (!validateFormUk(signupForm)) return;
+
     signupError.textContent = "";
 
     const name = document.getElementById("signupName").value.trim();
@@ -193,6 +195,8 @@ signupForm?.addEventListener("submit", async event => {
 loginForm?.addEventListener("submit", async event => {
 
     event.preventDefault();
+
+    if (!validateFormUk(loginForm)) return;
 
     loginError.textContent = "";
 
@@ -293,6 +297,8 @@ supabaseClient?.auth.onAuthStateChange((event) => {
 resetPasswordForm?.addEventListener("submit", async event => {
 
     event.preventDefault();
+
+    if (!validateFormUk(resetPasswordForm)) return;
 
     resetPasswordError.textContent = "";
 
@@ -427,10 +433,9 @@ function renderOrderCard(order) {
 
         const metaParts = [];
 
-        if (item.color) metaParts.push(`Колір: ${item.color}`);
         if (item.size) metaParts.push(`Розмір: ${item.size}`);
-
-        metaParts.push(`Кількість: ${item.qty}`);
+        if (item.color) metaParts.push(`Колір: ${item.color}`);
+        if (Number(item.qty) > 1) metaParts.push(`Кількість: ${item.qty}`);
 
         return `
             <div class="order-item">
@@ -440,15 +445,20 @@ function renderOrderCard(order) {
                 </div>
 
                 <div class="order-item-info">
+                    ${item.brand ? `<span class="order-item-brand">${item.brand}</span>` : ""}
                     <span class="order-item-title">${item.title}</span>
-                    <span class="order-item-meta">${metaParts.join(" · ")}</span>
-                    <span class="order-item-price">${formatPrice(item.price)}</span>
+                    <span class="order-item-meta">${metaParts.join("&nbsp;&nbsp;&nbsp;")}</span>
+                    <button type="button" class="order-item-refuse" data-order="${order.order_number}">
+                        ↩ Відмова
+                    </button>
                 </div>
 
             </div>
         `;
 
     }).join("");
+
+    const fullName = [order.last_name, order.first_name].filter(Boolean).join(" ") || "—";
 
     const deliveryLine = order.delivery_method
         ? `${order.delivery_method}${order.delivery_city ? " · " + order.delivery_city : ""}`
@@ -504,6 +514,32 @@ function renderOrderCard(order) {
 
             <div class="order-card-details" hidden>
 
+                <div class="order-detail-columns">
+
+                    <div class="order-detail-block">
+                        <h3>Контактні дані</h3>
+                        <p>${fullName}</p>
+                        ${order.email ? `<p>${order.email}</p>` : ""}
+                        ${order.phone ? `<p>${order.phone}</p>` : ""}
+                    </div>
+
+                    <div class="order-detail-block">
+                        <h3>Доставка</h3>
+                        <p>${order.delivery_method || "—"}</p>
+                        <p>${[order.delivery_city, order.delivery_detail].filter(Boolean).join(" ") || "—"}</p>
+                        <p><strong>Статус доставки:</strong> ${order.delivery_status || "—"}</p>
+                        <p><strong>ТТН:</strong> ${order.ttn || "—"}</p>
+                    </div>
+
+                </div>
+
+                <div class="order-detail-block order-detail-payment">
+                    <h3>Оплата</h3>
+                    <p>${order.payment_method || "—"}</p>
+                </div>
+
+                <hr class="order-detail-divider">
+
                 <div class="order-card-items">
                     ${itemsHtml}
                 </div>
@@ -544,6 +580,16 @@ function renderOrderCard(order) {
 // розгортання / згортання картки замовлення —
 // делегування на список, бо картки перемальовуються динамічно
 ordersListEl?.addEventListener("click", event => {
+
+    const refuseBtn = event.target.closest(".order-item-refuse");
+
+    if (refuseBtn) {
+
+        showToast("Запит на відмову від товару надіслано. Менеджер зв'яжеться з вами найближчим часом");
+
+        return;
+
+    }
 
     const toggle = event.target.closest(".order-card-toggle");
 
@@ -612,6 +658,8 @@ async function loadProfile(user) {
 profileForm?.addEventListener("submit", async event => {
 
     event.preventDefault();
+
+    if (!validateFormUk(profileForm)) return;
 
     profileMessageEl.textContent = "";
 
@@ -905,6 +953,8 @@ addressesListEl?.addEventListener("click", async event => {
 addressForm?.addEventListener("submit", async event => {
 
     event.preventDefault();
+
+    if (!validateFormUk(addressForm)) return;
 
     addressFormError.textContent = "";
 

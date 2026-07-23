@@ -4329,9 +4329,83 @@ footer{
 }
 
 .order-card-items{
-    display:flex;
-    flex-direction:column;
-    gap:14px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px 28px;
+}
+
+.order-item-brand{
+    font-size:11px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    color:var(--gray500);
+}
+
+.order-item-refuse{
+    align-self:flex-start;
+    margin-top:4px;
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--gray500);
+    transition:.2s;
+}
+
+.order-item-refuse:hover{
+    color:var(--danger);
+}
+
+/* -- контактні дані / доставка / оплата у деталях замовлення -- */
+
+.order-detail-columns{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:24px;
+    margin-bottom:20px;
+}
+
+.order-detail-block h3{
+    font-size:13px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    color:var(--gray900);
+    margin-bottom:10px;
+}
+
+.order-detail-block p{
+    font-size:14px;
+    color:var(--gray500);
+    line-height:1.6;
+    margin:0;
+}
+
+.order-detail-block p strong{
+    color:var(--gray700);
+    font-weight:600;
+}
+
+.order-detail-payment{
+    margin-bottom:20px;
+}
+
+.order-detail-divider{
+    border:none;
+    border-top:1px solid var(--gray100);
+    margin:0 0 20px;
+}
+
+@media(max-width:640px){
+
+    .order-card-items{
+        grid-template-columns:1fr;
+    }
+
+    .order-detail-columns{
+        grid-template-columns:1fr;
+        gap:16px;
+    }
+
 }
 
 .order-card-summary{

@@ -267,6 +267,39 @@
 
                 <div class="checkout-block">
 
+                    <h2>Оплата</h2>
+                    <p class="checkout-block-sub">Оберіть зручний спосіб оплати</p>
+
+                    <div class="delivery-options">
+
+                        <label class="delivery-option">
+                            <input type="radio" name="paymentMethod" value="Банківською карткою (Visa/Mastercard)" checked>
+                            <span class="delivery-option-card">
+                                <span class="delivery-option-title">
+                                    <span class="delivery-option-icon">💳</span>
+                                    Банківською карткою (Visa/Mastercard)
+                                </span>
+                            </span>
+                        </label>
+
+                        <label class="delivery-option">
+                            <input type="radio" name="paymentMethod" value="Готівкою при отриманні на пошті">
+                            <span class="delivery-option-card">
+                                <span class="delivery-option-title">
+                                    <span class="delivery-option-icon">💵</span>
+                                    Готівкою при отриманні на пошті
+                                </span>
+                            </span>
+                        </label>
+
+                        <span class="field-error" data-error-for="paymentMethod"></span>
+
+                    </div>
+
+                </div>
+
+                <div class="checkout-block">
+
                     <h2>Зв'язатися зі мною</h2>
                     <p class="checkout-block-sub">
                         Наш менеджер зателефонує вам, щоб підтвердити замовлення.
@@ -304,6 +337,7 @@
                 <input type="hidden" name="Сума замовлення" id="orderSubtotalField">
                 <input type="hidden" name="Знижка" id="orderDiscountField">
                 <input type="hidden" name="Промокод" id="orderPromoField">
+                <input type="hidden" name="Спосіб оплати" id="orderPaymentField">
                 <input type="hidden" name="Вартість доставки" id="orderDeliveryField">
                 <input type="hidden" name="Всього до сплати" id="orderTotalField">
                 <input type="hidden" name="_subject" value="Нове замовлення на bestbrnd4u.github.io">
