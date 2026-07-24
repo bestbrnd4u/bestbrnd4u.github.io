@@ -92,7 +92,9 @@ function renderHero(hero) {
 
     if (hero.image && heroSection) {
         heroSection.style.backgroundImage =
-            `linear-gradient(rgba(17,24,39,.45), rgba(17,24,39,.45)), url('${hero.image}')`;
+            `linear-gradient(90deg, rgba(17,24,39,.65) 0%, rgba(17,24,39,.30) 55%, rgba(17,24,39,0) 100%), ` +
+            `linear-gradient(rgba(17,24,39,.45), rgba(17,24,39,.45)), ` +
+            `url('${hero.image}')`;
     }
 
     if (heroLabel && hero.label) heroLabel.textContent = hero.label;

@@ -613,6 +613,13 @@ nav li.has-mega:hover .mega-menu{
    HERO
 ===================================== */
 
+/* тёмна підкладка позаду hero — щоб у вирізі
+   скругленого нижнього кута було видно темний
+   колір, а не світлий фон сторінки */
+.hero-backdrop{
+    background:#111827;
+}
+
 .hero{
     border-radius:0 0 40px 40px;
     margin-top:82px;
@@ -622,23 +629,27 @@ nav li.has-mega:hover .mega-menu{
     position:relative;
     overflow:hidden;
 
-    background:
+    /* захисний колір-підклад: якщо з якоїсь причини
+       фото не завантажиться, кут не буде "світлою дірою" */
+    background-color:#111827;
+
+    /* усе одним background-image — навмисно без окремого
+       ::before для градієнта: два різних composite-шари
+       (псевдоелемент + фон) з border-radius:40px і
+       overflow:hidden давали баг рендеру в Chrome — по кутах
+       "просвічував" фон сторінки. Один шар = один клip. */
+    background-image:
+        linear-gradient(
+            90deg,
+            rgba(17,24,39,.65) 0%,
+            rgba(17,24,39,.30) 55%,
+            rgba(17,24,39,0) 100%
+        ),
         linear-gradient(rgba(17,24,39,.45), rgba(17,24,39,.45)),
         url("https://images.pexels.com/photos/5745781/pexels-photo-5745781.jpeg?auto=compress&cs=tinysrgb&w=1600");
     background-size:cover;
     background-position:center;
-}
-
-.hero::before{
-    content:"";
-    position:absolute;
-    inset:0;
-    background:linear-gradient(
-        90deg,
-        rgba(17,24,39,.65) 0%,
-        rgba(17,24,39,.30) 55%,
-        rgba(17,24,39,0) 100%
-    );
+    background-repeat:no-repeat;
 }
 
 .hero-content{
@@ -1302,11 +1313,13 @@ footer{
     padding:90px;
     color:white;
 
-    background:
+    background-color:#111827;
+    background-image:
         linear-gradient(rgba(17,24,39,.55), rgba(17,24,39,.55)),
         url("https://images.pexels.com/photos/336372/pexels-photo-336372.jpeg?auto=compress&cs=tinysrgb&w=1600");
     background-size:cover;
     background-position:center;
+    background-repeat:no-repeat;
 }
 
 .promo-content{
