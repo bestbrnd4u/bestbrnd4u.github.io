@@ -645,7 +645,7 @@ function fillHiddenFields() {
     document.getElementById("orderPaymentField").value = getSelectedPayment() || "—";
     document.getElementById("orderDiscountField").value = totalDiscount > 0
         ? `-${formatPrice(totalDiscount)}${appliedPromo ? ` (промокод: ${appliedPromo.code})` : ""}`
-        : "0 ₴";
+        : "0 грн";
     document.getElementById("orderPromoField").value = appliedPromo ? appliedPromo.code : "—";
     document.getElementById("orderDeliveryField").value = delivery
         ? `${delivery.label} — від ${formatPrice(deliveryPrice)}`
@@ -674,7 +674,7 @@ function buildEmailTemplateParams(orderId, orderDate) {
         order_date: orderDate,
         order_items: buildOrderCompositionText(),
         order_subtotal: formatPrice(subtotal),
-        order_discount: totalDiscount > 0 ? `-${formatPrice(totalDiscount)}` : "0 ₴",
+        order_discount: totalDiscount > 0 ? `-${formatPrice(totalDiscount)}` : "0 грн",
         order_delivery_price: delivery ? `від ${formatPrice(deliveryPrice)}` : "—",
         order_total: formatPrice(total),
         delivery_city: cityValue,

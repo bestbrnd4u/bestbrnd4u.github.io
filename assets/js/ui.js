@@ -4,7 +4,7 @@
 // ======================================
 
 function formatPrice(price) {
-    return new Intl.NumberFormat("uk-UA").format(price) + " ₴";
+    return new Intl.NumberFormat("uk-UA").format(price) + " грн";
 }
 
 function createProductCard(product) {

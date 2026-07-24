@@ -126,7 +126,7 @@ function renderProduct(product) {
         </div>
         <div class="option-group">
 
-    <label>Колір</label>
+    <label>Колір: <span id="selectedColorLabel">${activeVariant.color}</span></label>
 
     <div class="color-options">
 
@@ -186,6 +186,7 @@ L
                 aria-label="Додати в обране">
 
                 ❤
+                <span class="favorite-indicator">❤</span>
 
             </button>
 
@@ -337,10 +338,13 @@ function updateGalleryForColor(images) {
     });
 
     // синхронізуємо назву кольору в характеристиках товару
+    // і в підписі над мініатюрами ("Колір: ...")
     const colorLabel = document.querySelector(".color.active")?.dataset.color;
     const specColorValue = document.getElementById("specColorValue");
+    const selectedColorLabel = document.getElementById("selectedColorLabel");
 
     if (colorLabel && specColorValue) specColorValue.textContent = colorLabel;
+    if (colorLabel && selectedColorLabel) selectedColorLabel.textContent = colorLabel;
 
 }
 

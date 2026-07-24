@@ -2395,6 +2395,7 @@ footer{
 }
 
 .favorite-btn{
+    position:relative;
     width:60px;
     height:60px;
     flex-shrink:0;
@@ -2409,6 +2410,36 @@ footer{
     background:var(--primary);
     color:#fff;
     border-color:var(--primary);
+}
+
+/* -- маленький бейдж-індикатор у кутку кнопки "в обране" —
+   з'являється, тільки коли товар вже додано (клас .active) -- */
+
+.favorite-indicator{
+    position:absolute;
+    top:-8px;
+    right:-8px;
+    width:24px;
+    height:24px;
+    border-radius:50%;
+    background:#fff;
+    border:2px solid var(--gray200);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:11px;
+    line-height:1;
+    opacity:0;
+    transform:scale(.5);
+    transition:.25s;
+    pointer-events:none;
+}
+
+.favorite-btn.active .favorite-indicator{
+    opacity:1;
+    transform:scale(1);
+    border-color:var(--danger);
+    box-shadow:0 4px 10px rgba(0,0,0,.12);
 }
 
 /* -- доставка / оплата / возврат -- */
