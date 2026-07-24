@@ -142,7 +142,10 @@ function renderCart() {
                             ${sizeButtons}
                         </div>
                     </div>
-                    <div class="cart-item-price">${formatPrice(product.price)}</div>
+                    <div class="cart-item-price">
+                        ${product.oldPrice ? `<span class="old-price">${formatPrice(product.oldPrice)}</span>` : ""}
+                        <span class="price">${formatPrice(product.price)}</span>
+                    </div>
                 </div>
 
                 <div class="cart-item-qty">
@@ -151,7 +154,10 @@ function renderCart() {
                     <button class="qty-btn qty-plus" data-id="${line.id}" data-color="${line.color || ""}" data-size="${line.size || ""}" aria-label="Збільшити кількість">+</button>
                 </div>
 
-                <div class="cart-item-total">${formatPrice(lineTotal)}</div>
+                <div class="cart-item-total">
+                    ${product.oldPrice ? `<span class="old-price">${formatPrice(lineTotalFull)}</span>` : ""}
+                    <span class="price">${formatPrice(lineTotal)}</span>
+                </div>
 
                 <button class="cart-item-remove" data-id="${line.id}" data-color="${line.color || ""}" data-size="${line.size || ""}" aria-label="Видалити товар">✕</button>
 

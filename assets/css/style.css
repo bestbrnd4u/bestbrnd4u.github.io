@@ -2628,8 +2628,23 @@ footer{
 }
 
 .cart-item-price{
+    display:flex;
+    align-items:baseline;
+    gap:8px;
     color:var(--gray500);
     font-size:14px;
+}
+
+.cart-item-price .old-price,
+.cart-item-total .old-price{
+    text-decoration:line-through;
+    color:var(--gray300);
+    font-size:.85em;
+}
+
+.cart-item-price .price{
+    color:var(--gray900);
+    font-weight:600;
 }
 
 .cart-item-qty{
@@ -2658,6 +2673,9 @@ footer{
 }
 
 .cart-item-total{
+    display:flex;
+    align-items:baseline;
+    gap:8px;
     font-weight:700;
     white-space:nowrap;
 }

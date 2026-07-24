@@ -383,6 +383,8 @@ updateFavoriteButtons();
 
         this.classList.add("active");
 
+        updateFavoriteButtons();
+
     }
 
 });

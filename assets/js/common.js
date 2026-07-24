@@ -336,9 +336,13 @@ function saveFavorites(list) {
 
 }
 
-function isFavorite(id) {
+function isFavorite(id, color = null, size = null) {
 
-    return getFavorites().some(entry => entry.id === Number(id));
+    return getFavorites().some(entry =>
+        entry.id === Number(id) &&
+        entry.color === color &&
+        entry.size === size
+    );
 
 }
 
@@ -348,9 +352,17 @@ function toggleFavorite(id, options = {}) {
 
     let favorites = getFavorites();
 
-    if (favorites.some(entry => entry.id === Number(id))) {
+    const alreadyFavorite = favorites.some(entry =>
+        entry.id === Number(id) &&
+        entry.color === color &&
+        entry.size === size
+    );
 
-        favorites = favorites.filter(entry => entry.id !== Number(id));
+    if (alreadyFavorite) {
+
+        favorites = favorites.filter(entry =>
+            !(entry.id === Number(id) && entry.color === color && entry.size === size)
+        );
 
         showToast("Видалено з обраного");
 
@@ -368,33 +380,18 @@ function toggleFavorite(id, options = {}) {
 
 }
 
-// зміна кольору/розміру вже доданого в обране товару
-function changeFavoriteVariant(id, field, value) {
-
-    const favorites = getFavorites();
-
-    const entry = favorites.find(item => item.id === Number(id));
-
-    if (!entry) return;
-
-    entry[field] = value;
-
-    saveFavorites(favorites);
-
-}
-
 function updateFavoriteButtons() {
-
-    const favorites = getFavorites();
 
     document.querySelectorAll(".favorite").forEach(button => {
 
         const id = Number(button.dataset.id);
 
-        button.classList.toggle(
-            "active",
-            favorites.some(entry => entry.id === id)
-        );
+        const scope = button.closest("#productPage")
+            || button.closest(".product-card, .favorite-row");
+
+        const { color, size } = getSelectedVariant(scope);
+
+        button.classList.toggle("active", isFavorite(id, color, size));
 
     });
 
@@ -1018,6 +1015,8 @@ document.addEventListener("click", event => {
 
         }
 
+        updateFavoriteButtons();
+
         return;
 
     }
@@ -1031,6 +1030,8 @@ document.addEventListener("click", event => {
         group?.querySelectorAll(".mini-size").forEach(b => b.classList.remove("active"));
 
         sizeBtn.classList.add("active");
+
+        updateFavoriteButtons();
 
         return;
 
