@@ -1215,6 +1215,8 @@ function render() {
         .map(product => createProductCard(product))
         .join("");
 
+    updateFavoriteButtons();
+
     productsCount.textContent = list.length;
 
     if (productsCounter) {

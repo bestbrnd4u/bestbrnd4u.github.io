@@ -1722,6 +1722,10 @@ footer{
     text-overflow:ellipsis;
 }
 
+.filter-option[hidden]{
+    display:none;
+}
+
 .filter-option-group-title{
     padding:12px 14px 4px;
     font-size:11px;
@@ -2402,18 +2406,44 @@ footer{
     border-radius:16px;
     border:1px solid var(--gray200);
     background:#fff;
-    font-size:24px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:.25s;
+}
+
+.favorite-btn-icon{
+    width:24px;
+    height:24px;
+    fill:none;
+    stroke:var(--gray900);
+    stroke-width:2;
     transition:.25s;
 }
 
 .favorite-btn:hover{
     background:var(--primary);
-    color:#fff;
     border-color:var(--primary);
 }
 
+.favorite-btn:hover .favorite-btn-icon{
+    fill:#fff;
+    stroke:#fff;
+}
+
+.favorite-btn.active .favorite-btn-icon{
+    fill:var(--danger);
+    stroke:var(--danger);
+}
+
+.favorite-btn.active:hover .favorite-btn-icon{
+    fill:var(--danger);
+    stroke:var(--danger);
+}
+
 /* -- маленький бейдж-індикатор у кутку кнопки "в обране" —
-   з'являється, тільки коли товар вже додано (клас .active) -- */
+   з'являється, тільки коли товар вже додано (клас .active) —
+   лишається червоним завжди, незалежно від наведення на кнопку -- */
 
 .favorite-indicator{
     position:absolute;
@@ -2427,12 +2457,18 @@ footer{
     display:flex;
     align-items:center;
     justify-content:center;
-    font-size:11px;
-    line-height:1;
     opacity:0;
     transform:scale(.5);
     transition:.25s;
     pointer-events:none;
+}
+
+.favorite-indicator svg{
+    width:12px;
+    height:12px;
+    fill:var(--danger);
+    stroke:var(--danger);
+    stroke-width:2;
 }
 
 .favorite-btn.active .favorite-indicator{
@@ -2950,6 +2986,10 @@ footer{
     grid-template-columns:1fr 380px;
     gap:40px;
     align-items:start;
+}
+
+.checkout-layout[hidden]{
+    display:none;
 }
 
 .checkout-form{

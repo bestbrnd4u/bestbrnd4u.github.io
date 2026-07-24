@@ -185,8 +185,15 @@ L
                 title="До обраного"
                 aria-label="Додати в обране">
 
-                ❤
-                <span class="favorite-indicator">❤</span>
+                <svg class="favorite-btn-icon" viewBox="0 0 24 24">
+                    <path d="M12 21s-6.7-4.4-9.3-8.3C.9 9.6 1.7 5.9 5.1 4.9c2-.6 4 .2 5.2 1.9l1.7 2.3 1.7-2.3c1.2-1.7 3.2-2.5 5.2-1.9 3.4 1 4.2 4.7 2.4 7.8C18.7 16.6 12 21 12 21z"/>
+                </svg>
+
+                <span class="favorite-indicator">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 21s-6.7-4.4-9.3-8.3C.9 9.6 1.7 5.9 5.1 4.9c2-.6 4 .2 5.2 1.9l1.7 2.3 1.7-2.3c1.2-1.7 3.2-2.5 5.2-1.9 3.4 1 4.2 4.7 2.4 7.8C18.7 16.6 12 21 12 21z"/>
+                    </svg>
+                </span>
 
             </button>
 
@@ -365,6 +372,9 @@ list.forEach(item=>{
 container.innerHTML+=createProductCard(item);
 
 });
+
+updateFavoriteButtons();
+
     document.querySelectorAll(".size").forEach(button=>{
 
     button.onclick=function(){
