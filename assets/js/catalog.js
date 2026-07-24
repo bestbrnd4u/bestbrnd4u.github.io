@@ -10,9 +10,33 @@ const sortDropdown = document.getElementById("sortDropdown");
 
 let currentSort = "";
 let selectedBrands = new Set();
+let selectedColors = new Set();
 let selectedCategories = new Set();
 let selectedPrices = new Set();
 let selectedSizes = new Set(); // елементи виду "group:size", напр. "bags:S"
+
+// колір товару (для фільтра) — беремо прямо з variants,
+// де hex вже заданий в адмінці; це й головне джерело правди
+// для свотчів у фільтрі "Колір"
+function getProductColors(product) {
+
+    const colors = new Map(); // назва -> hex
+
+    (product.variants || []).forEach(variant => {
+
+        if (variant.color && !colors.has(variant.color)) {
+            colors.set(variant.color, variant.hex || null);
+        }
+
+    });
+
+    if (product.color && !colors.has(product.color)) {
+        colors.set(product.color, null);
+    }
+
+    return colors;
+
+}
 
 const SIZE_GROUPS = [
     {
@@ -30,20 +54,71 @@ const SIZE_GROUPS = [
     {
         key: "clothes",
         title: "Одяг",
-        categories: typeof CATEGORY_DEPARTMENTS !== "undefined"
-            ? CATEGORY_DEPARTMENTS.find(d => d.key === "clothes").categories
-            : [],
+        // заповнюється в initCatalog() з даних data/categories.json
+        categories: [],
         sizes: ["XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL"]
     },
     {
         key: "shoes",
         title: "Взуття",
-        categories: typeof CATEGORY_DEPARTMENTS !== "undefined"
-            ? CATEGORY_DEPARTMENTS.find(d => d.key === "shoes").categories
-            : [],
+        // заповнюється в initCatalog() з даних data/categories.json
+        categories: [],
         sizes: ["35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46"]
     }
 ];
+
+// підтягує актуальний список категорій одягу/взуття з адмінки
+// (data/categories.json) у відповідні групи розмірів
+function applyCategoryDataToSizeGroups(categoryDepartments) {
+
+    const clothesGroup = SIZE_GROUPS.find(g => g.key === "clothes");
+    const shoesGroup = SIZE_GROUPS.find(g => g.key === "shoes");
+
+    const clothesDept = categoryDepartments.find(d => d.title === "Одяг");
+    const shoesDept = categoryDepartments.find(d => d.title === "Взуття");
+
+    if (clothesGroup) clothesGroup.categories = clothesDept ? clothesDept.categories : [];
+    if (shoesGroup) shoesGroup.categories = shoesDept ? shoesDept.categories : [];
+
+}
+
+// завантажує дерево категорій з адмінки (data/categories.json,
+// зібраного зі списку окремих файлів data/categories/*.json)
+// і групує його за розділами — у форматі, який очікують
+// fillCategories() та applyCategoryDataToSizeGroups()
+async function loadCategoryDepartments() {
+
+    try {
+
+        const response = await fetch("data/categories.json");
+
+        if (!response.ok) return [];
+
+        const categories = await response.json();
+
+        const byDepartment = new Map();
+
+        categories.forEach(category => {
+
+            if (!byDepartment.has(category.department)) {
+                byDepartment.set(category.department, { title: category.department, categories: [] });
+            }
+
+            byDepartment.get(category.department).categories.push(category.name);
+
+        });
+
+        return [...byDepartment.values()];
+
+    } catch (error) {
+
+        console.warn("Не вдалося завантажити категорії:", error);
+
+        return [];
+
+    }
+
+}
 
 function matchesSizeKey(product, key) {
 
@@ -76,6 +151,16 @@ const brandLabel = document.getElementById("brandLabel");
 const brandSearchInput = document.getElementById("brandSearchInput");
 const brandOptionsList = document.getElementById("brandOptionsList");
 const brandNoResults = document.getElementById("brandNoResults");
+
+// -------------------------
+// Дропдаун «Колір»
+// -------------------------
+
+const colorDropdown = document.getElementById("colorDropdown");
+const colorToggle = document.getElementById("colorToggle");
+const colorMenu = document.getElementById("colorMenu");
+const colorLabel = document.getElementById("colorLabel");
+const colorOptionsList = document.getElementById("colorOptionsList");
 
 // -------------------------
 // Дропдаун «Ціна»
@@ -121,6 +206,7 @@ let activeFiltersExpanded = false;
 const GENDERS = ["Чоловікам", "Жінкам", "Унісекс", "Дітям"];
 const SALE_MIN_DISCOUNT = 30; // % — мінімальна знижка для розділу "Акції"
 const DEFAULT_BRAND_LABEL = "Усі бренди";
+const DEFAULT_COLOR_LABEL = "Усі кольори";
 const DEFAULT_CATEGORY_LABEL = "Усі категорії";
 const DEFAULT_PRICE_LABEL = "Будь-яка ціна";
 const DEFAULT_SIZE_LABEL = "Розмір";
@@ -201,11 +287,17 @@ async function initCatalog() {
 
         products = await response.json();
 
+        const categoryDepartments = await loadCategoryDepartments();
+
+        applyCategoryDataToSizeGroups(categoryDepartments);
+
         fillBrands();
 
         applyBrandFromUrl();
 
-        fillCategories();
+        fillColors();
+
+        fillCategories(categoryDepartments);
 
         applyCategoryFromUrl();
 
@@ -391,16 +483,122 @@ brandSearchInput?.addEventListener("input", () => {
 brandSearchInput?.addEventListener("click", event => event.stopPropagation());
 
 // -------------------------
+// Дропдаун «Колір» (мультиселект, свотчі з даних товару)
+// -------------------------
+
+function fillColors() {
+
+    if (!colorOptionsList) return;
+
+    const colorSwatches = new Map(); // назва -> hex
+
+    products.forEach(product => {
+
+        getProductColors(product).forEach((hex, name) => {
+
+            if (!colorSwatches.has(name) || (!colorSwatches.get(name) && hex)) {
+                colorSwatches.set(name, hex);
+            }
+
+        });
+
+    });
+
+    [...colorSwatches.keys()]
+        .sort((a, b) => a.localeCompare(b, "uk"))
+        .forEach(name => {
+
+            const hex = colorSwatches.get(name) || "#e5e7eb";
+
+            const option = document.createElement("button");
+
+            option.type = "button";
+            option.className = "filter-option filter-option-color";
+            option.dataset.color = name;
+            option.innerHTML = `
+                <span class="filter-checkbox"></span>
+                <span class="filter-color-swatch" style="background:${hex}"></span>
+                ${name}
+            `;
+
+            option.addEventListener("click", () => toggleColor(name));
+
+            colorOptionsList.appendChild(option);
+
+        });
+
+}
+
+function toggleColor(value) {
+
+    if (selectedColors.has(value)) {
+
+        selectedColors.delete(value);
+
+    } else {
+
+        selectedColors.add(value);
+
+    }
+
+    updateColorUI();
+
+    render();
+
+}
+
+function clearColors() {
+
+    selectedColors.clear();
+
+    updateColorUI();
+
+    closeAllDropdowns();
+
+    render();
+
+}
+
+function updateColorUI() {
+
+    colorLabel.textContent = getMultiSelectLabel(selectedColors, DEFAULT_COLOR_LABEL, "Кольори");
+
+    colorOptionsList.querySelectorAll(".filter-option").forEach(o => {
+        o.classList.toggle("active", selectedColors.has(o.dataset.color));
+    });
+
+}
+
+document.querySelector("[data-clear-color]")?.addEventListener("click", clearColors);
+
+colorToggle?.addEventListener("click", event => {
+
+    event.stopPropagation();
+
+    const willOpen = colorMenu.hidden;
+
+    closeAllDropdowns();
+
+    if (willOpen) {
+
+        colorMenu.hidden = false;
+        colorDropdown.classList.add("open");
+
+    }
+
+});
+
+// -------------------------
 // Дропдаун «Категорія» (з пошуком, згруповано по розділах)
 // -------------------------
 
-function fillCategories() {
+function fillCategories(categoryDepartments) {
 
-    if (!categoryOptionsList || typeof CATEGORY_DEPARTMENTS === "undefined") return;
+    if (!categoryOptionsList || !Array.isArray(categoryDepartments)) return;
 
     const presentCategories = new Set(products.map(product => product.category));
 
-    CATEGORY_DEPARTMENTS.forEach(department => {
+    categoryDepartments.forEach(department => {
 
         const categoriesHere = department.categories.filter(c => presentCategories.has(c));
 
@@ -760,7 +958,7 @@ sizeToggle?.addEventListener("click", event => {
 
 function closeAllDropdowns() {
 
-    [sortDropdown, brandDropdown, categoryDropdown, priceDropdown, sizeDropdown].forEach(dropdown => {
+    [sortDropdown, brandDropdown, colorDropdown, categoryDropdown, priceDropdown, sizeDropdown].forEach(dropdown => {
 
         if (!dropdown) return;
 
@@ -776,7 +974,7 @@ function closeAllDropdowns() {
 
 document.addEventListener("click", event => {
 
-    if (event.target.closest("#sortDropdown, #brandDropdown, #priceDropdown, #sizeDropdown")) return;
+    if (event.target.closest("#sortDropdown, #brandDropdown, #colorDropdown, #categoryDropdown, #priceDropdown, #sizeDropdown")) return;
 
     closeAllDropdowns();
 
@@ -927,6 +1125,18 @@ function filterProducts() {
 
     }
 
+    if (selectedColors.size) {
+
+        list = list.filter(product => {
+
+            const productColorNames = new Set(getProductColors(product).keys());
+
+            return [...selectedColors].some(color => productColorNames.has(color));
+
+        });
+
+    }
+
     if (selectedCategories.size) {
 
         list = list.filter(product =>
@@ -1036,6 +1246,12 @@ function renderActiveFilters() {
     selectedBrands.forEach(brand => {
 
         chips.push({ type: "brand", value: brand, label: brand });
+
+    });
+
+    selectedColors.forEach(color => {
+
+        chips.push({ type: "color", value: color, label: color });
 
     });
 
@@ -1198,6 +1414,12 @@ function clearOneFilter(type, value) {
 
         updateBrandUI();
 
+    } else if (type === "color") {
+
+        selectedColors.delete(value);
+
+        updateColorUI();
+
     } else if (type === "category") {
 
         selectedCategories.delete(value);
@@ -1228,6 +1450,9 @@ function resetAllFilters() {
 
     selectedBrands.clear();
     updateBrandUI();
+
+    selectedColors.clear();
+    updateColorUI();
 
     selectedCategories.clear();
     updateCategoryUI();

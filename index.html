@@ -59,7 +59,7 @@
 
                 <li><a href="index.html" class="active">Головна</a></li>
 
-                <li class="has-mega"><a href="catalog.html" id="navCatalogLink">Каталог</a><div class="mega-menu">
+                <li class="has-mega"><a href="catalog.html" id="navCatalogLink">Каталог</a><div class="mega-menu" id="catalogMegaMenu">
 <a class="mega-item" href="catalog.html?gender=Жінкам"><img src="https://images.pexels.com/photos/932401/pexels-photo-932401.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Жінкам"><span>Жінкам</span></a>
 <a class="mega-item" href="catalog.html?gender=Чоловікам"><img src="https://images.pexels.com/photos/7869755/pexels-photo-7869755.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Чоловікам"><span>Чоловікам</span></a>
 <a class="mega-item" href="catalog.html?gender=Унісекс"><img src="https://images.pexels.com/photos/10425471/pexels-photo-10425471.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Унісекс"><span>Унісекс</span></a>
@@ -106,23 +106,23 @@
 
 </header>
 
-<section class="hero">
+<section class="hero" id="heroSection">
 
     <div class="container">
 
         <div class="hero-content">
             
-            <span class="hero-label">
+            <span class="hero-label" id="heroLabel">
                 Нова колекція 2026
             </span>
 
-            <h1>
+            <h1 id="heroHeading">
                 Знайдіть сумку,
                 яка підкреслить
                 ваш стиль
             </h1>
 
-            <p>
+            <p id="heroText">
                 Понад 500 оригінальних моделей
                 від світових брендів.
                 Швидка доставка, зручна оплата
@@ -130,11 +130,11 @@
             </p>
 
             <div class="hero-buttons">
-                <a href="catalog.html" class="btn">
+                <a href="catalog.html" class="btn" id="heroPrimaryBtn">
                     Перейти до каталогу
                 </a>
 
-                <a href="#products" class="btn btn-outline">
+                <a href="#products" class="btn btn-outline" id="heroSecondaryBtn">
                     Популярні товари
                 </a>
             </div>
@@ -154,11 +154,11 @@
             <div class="instagram-icon">📸</div>
 
             <div class="instagram-text">
-                <h3>Стежте за нами в Instagram</h3>
-                <p>Нові колекції, образи та акції — щодня у нашому акаунті.</p>
+                <h3 id="instagramTitle">Стежте за нами в Instagram</h3>
+                <p id="instagramText">Нові колекції, образи та акції — щодня у нашому акаунті.</p>
             </div>
 
-            <a href="https://www.instagram.com/bestbrnd4u" target="_blank" rel="noopener" class="btn">
+            <a href="https://www.instagram.com/bestbrnd4u" target="_blank" rel="noopener" class="btn" id="instagramBtn">
                 Підписатися · @bestbrnd4u
             </a>
 
@@ -172,9 +172,9 @@
 
     <div class="container">
 
-        <h2>Популярні категорії</h2>
+        <h2 id="categoriesTitle">Популярні категорії</h2>
 
-        <div class="grid">
+        <div class="grid" id="categoriesGrid">
 
             <a href="catalog.html?gender=Жінкам" class="category">
                 <img src="https://images.pexels.com/photos/932401/pexels-photo-932401.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Жінкам" onerror="this.src='assets/images/no-image.png'">
@@ -206,20 +206,20 @@
 
     <div class="container">
 
-        <div class="promo-banner">
+        <div class="promo-banner" id="promoBanner">
 
             <div class="promo-content">
 
-                <span class="promo-label">НОВА КОЛЕКЦІЯ 2026</span>
+                <span class="promo-label" id="promoLabel">НОВА КОЛЕКЦІЯ 2026</span>
 
-                <h2>Свіжі надходження вже в каталозі</h2>
+                <h2 id="promoHeading">Свіжі надходження вже в каталозі</h2>
 
-                <p>
+                <p id="promoText">
                     Guess, Michael Kors, Calvin Klein, Tommy Hilfiger,
                     Furla та багато інших — перші оглядайте новинки сезону.
                 </p>
 
-                <a href="catalog.html?section=new" class="btn">
+                <a href="catalog.html?section=new" class="btn" id="promoBtn">
                     Дивитися новинки
                 </a>
 
@@ -235,9 +235,9 @@
 
     <div class="container">
 
-        <h2>Популярні бренди</h2>
+        <h2 id="brandsTitle">Популярні бренди</h2>
 
-        <div class="brands-grid">
+        <div class="brands-grid" id="brandsGrid">
 
             <a href="catalog.html?brand=Guess" class="brand-card">GUESS</a>
 
@@ -280,7 +280,7 @@
 
     <div class="container">
 
-        <div class="advantages-grid">
+        <div class="advantages-grid" id="advantagesGrid">
 
             <div>
 
@@ -426,6 +426,7 @@
 
 <script src="assets/js/supabase-client.js"></script>
 <script src="assets/js/common.js"></script>
+<script src="assets/js/mega-menu.js"></script>
 <script src="assets/js/ui.js"></script>
 <script src="assets/js/products.js"></script>
 <script src="assets/js/app.js"></script>

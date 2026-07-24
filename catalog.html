@@ -40,7 +40,7 @@ rel="stylesheet">
 <nav>
 <ul>
 <li><a href="index.html">Головна</a></li>
-<li class="has-mega"><a href="catalog.html" id="navCatalogLink" class="active">Каталог</a><div class="mega-menu">
+<li class="has-mega"><a href="catalog.html" id="navCatalogLink" class="active">Каталог</a><div class="mega-menu" id="catalogMegaMenu">
 <a class="mega-item" href="catalog.html?gender=Жінкам"><img src="https://images.pexels.com/photos/932401/pexels-photo-932401.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Жінкам"><span>Жінкам</span></a>
 <a class="mega-item" href="catalog.html?gender=Чоловікам"><img src="https://images.pexels.com/photos/7869755/pexels-photo-7869755.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Чоловікам"><span>Чоловікам</span></a>
 <a class="mega-item" href="catalog.html?gender=Унісекс"><img src="https://images.pexels.com/photos/10425471/pexels-photo-10425471.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Унісекс"><span>Унісекс</span></a>
@@ -152,6 +152,17 @@ placeholder="Пошук товару...">
 </div>
 </div>
 
+<div class="filter-group filter-dropdown" id="colorDropdown">
+<button type="button" id="colorToggle" class="filter-toggle">
+<span id="colorLabel">Усі кольори</span>
+<span class="filter-arrow">▾</span>
+</button>
+<div id="colorMenu" class="filter-menu filter-menu-colors" hidden>
+<button type="button" class="filter-option-clear" data-clear-color>✕ Скинути вибір кольору</button>
+<div id="colorOptionsList" class="filter-menu-options"></div>
+</div>
+</div>
+
 <div class="filter-group filter-dropdown" id="priceDropdown">
 <button type="button" id="priceToggle" class="filter-toggle">
 <span id="priceLabel">Будь-яка ціна</span>
@@ -187,6 +198,8 @@ placeholder="Пошук товару...">
 <button type="button" class="filter-option-clear" data-clear-size>✕ Скинути вибір розміру</button>
 
 <div id="sizeGroupsList"></div>
+
+</div>
 
 </div>
 
@@ -352,8 +365,8 @@ aria-label="Нагору">
 
 <script src="assets/js/supabase-client.js"></script>
 <script src="assets/js/common.js"></script>
+<script src="assets/js/mega-menu.js"></script>
 <script src="assets/js/ui.js"></script>
-<script src="assets/js/categories.js"></script>
 <script src="assets/js/catalog.js"></script>
 </body>
 

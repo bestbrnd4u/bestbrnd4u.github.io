@@ -16,6 +16,242 @@ public_folder: "/assets/images/products/uploads"
 publish_mode: simple
 
 collections:
+  - name: "pages"
+    label: "Сторінки"
+    files:
+      - name: "home"
+        label: "Головна сторінка"
+        file: "data/home.json"
+        description: "Вміст головної сторінки сайту (index.html) — заголовок, банери, категорії, бренди, переваги. Розділ «Популярні товари» сюди не входить — він завжди підтягується автоматично з каталогу."
+        fields:
+          - label: "Головний банер (hero)"
+            name: "hero"
+            widget: "object"
+            collapsed: false
+            fields:
+              - label: "Маленький підпис зверху"
+                name: "label"
+                widget: "string"
+                required: false
+                hint: "Наприклад: Нова колекція 2026"
+
+              - label: "Заголовок"
+                name: "heading"
+                widget: "text"
+                required: true
+                hint: "Кожен рядок — з нового рядка, так вони й розіб'ються на екрані"
+
+              - label: "Опис"
+                name: "text"
+                widget: "text"
+                required: true
+
+              - label: "Фонове фото"
+                name: "image"
+                widget: "image"
+                required: true
+                choose_url: true
+
+              - label: "Кнопка 1 — текст"
+                name: "primaryButtonText"
+                widget: "string"
+                required: true
+
+              - label: "Кнопка 1 — посилання"
+                name: "primaryButtonLink"
+                widget: "string"
+                required: true
+                hint: "Наприклад: catalog.html"
+
+              - label: "Кнопка 2 — текст"
+                name: "secondaryButtonText"
+                widget: "string"
+                required: false
+
+              - label: "Кнопка 2 — посилання"
+                name: "secondaryButtonLink"
+                widget: "string"
+                required: false
+                hint: "Наприклад: #products"
+
+          - label: "Блок \"Instagram\""
+            name: "instagram"
+            widget: "object"
+            collapsed: true
+            fields:
+              - label: "Заголовок"
+                name: "title"
+                widget: "string"
+                required: true
+
+              - label: "Текст"
+                name: "text"
+                widget: "string"
+                required: true
+
+              - label: "Текст кнопки"
+                name: "buttonText"
+                widget: "string"
+                required: true
+
+              - label: "Посилання на Instagram"
+                name: "link"
+                widget: "string"
+                required: true
+
+          - label: "Блок \"Популярні категорії\""
+            name: "categories"
+            widget: "object"
+            collapsed: true
+            fields:
+              - label: "Заголовок розділу"
+                name: "title"
+                widget: "string"
+                required: true
+
+              - label: "Категорії"
+                name: "items"
+                widget: "list"
+                required: true
+                summary: "{{fields.label}}"
+                fields:
+                  - label: "Назва"
+                    name: "label"
+                    widget: "string"
+                    required: true
+
+                  - label: "Фото"
+                    name: "image"
+                    widget: "image"
+                    required: true
+                    choose_url: true
+
+                  - label: "Посилання"
+                    name: "link"
+                    widget: "string"
+                    required: true
+                    hint: "Наприклад: catalog.html?gender=Жінкам"
+
+          - label: "Промо-банер"
+            name: "promo"
+            widget: "object"
+            collapsed: true
+            fields:
+              - label: "Маленький підпис зверху"
+                name: "label"
+                widget: "string"
+                required: false
+
+              - label: "Заголовок"
+                name: "heading"
+                widget: "string"
+                required: true
+
+              - label: "Опис"
+                name: "text"
+                widget: "text"
+                required: true
+
+              - label: "Фонове фото"
+                name: "image"
+                widget: "image"
+                required: true
+                choose_url: true
+
+              - label: "Текст кнопки"
+                name: "buttonText"
+                widget: "string"
+                required: true
+
+              - label: "Посилання кнопки"
+                name: "buttonLink"
+                widget: "string"
+                required: true
+
+          - label: "Блок \"Популярні бренди\""
+            name: "brands"
+            widget: "object"
+            collapsed: true
+            fields:
+              - label: "Заголовок розділу"
+                name: "title"
+                widget: "string"
+                required: true
+
+              - label: "Бренди"
+                name: "items"
+                widget: "list"
+                required: true
+                summary: "{{fields.name}}"
+                fields:
+                  - label: "Назва бренду"
+                    name: "name"
+                    widget: "string"
+                    required: true
+
+                  - label: "Посилання"
+                    name: "link"
+                    widget: "string"
+                    required: true
+                    hint: "Наприклад: catalog.html?brand=Guess"
+
+          - label: "Блок \"Переваги\""
+            name: "advantages"
+            widget: "list"
+            required: true
+            summary: "{{fields.title}}"
+            fields:
+              - label: "Іконка (емодзі)"
+                name: "icon"
+                widget: "string"
+                required: true
+                hint: "Наприклад: 🚚"
+
+              - label: "Заголовок"
+                name: "title"
+                widget: "string"
+                required: true
+
+              - label: "Опис"
+                name: "text"
+                widget: "string"
+                required: true
+
+  - name: "categories"
+    label: "Категорії"
+    label_singular: "Категорія"
+    description: >
+      Розділи та підкатегорії каталогу. Додана тут категорія одразу зʼявиться
+      у списку вибору при заповненні товару, а в меню сайту й фільтрах
+      каталогу — щойно з'явиться хоча б один товар цієї категорії.
+    folder: "data/categories"
+    create: true
+    delete: true
+    extension: "json"
+    format: "json"
+    identifier_field: "name"
+    summary: "{{department}} — {{name}}"
+    sortable_fields: ["department", "name"]
+    fields:
+      - label: "Назва категорії"
+        name: "name"
+        widget: "string"
+        required: true
+        hint: "Наприклад: Кросівки. Саме ця назва показується покупцям."
+
+      - label: "Розділ"
+        name: "department"
+        widget: "select"
+        required: true
+        hint: "До якого великого розділу належить категорія"
+        options:
+          - "Сумки"
+          - "Одяг"
+          - "Взуття"
+          - "Аксесуари"
+          - "Білизна"
+          - "Спорт"
+
   - name: "products"
     label: "Товари"
     label_singular: "Товар"
@@ -52,70 +288,16 @@ collections:
 
       - label: "Категорія"
         name: "category"
-        widget: "select"
+        widget: "relation"
+        collection: "categories"
+        search_fields: ["name"]
+        value_field: "name"
+        display_fields: ["department", "name"]
         required: true
         hint: >
-          Список згруповано по розділах (Сумки / Одяг / Взуття / Аксесуари /
-          Білизна / Спорт) — просто оберіть потрібну підкатегорію.
-        options:
-          # -- Сумки --
-          - "Жіночі сумки"
-          - "Чоловічі сумки"
-          - "Унісекс сумки"
-          - "Рюкзаки"
-          - "Дитячі сумки"
-          - "Дитячі рюкзаки"
-          # -- Одяг --
-          - "Блузи та сорочки"
-          - "Брюки і штани"
-          - "Верхній одяг"
-          - "Джемпери і светри"
-          - "Джинси"
-          - "Кардигани і кофти"
-          - "Комбінезони"
-          - "Комплекти одягу"
-          - "Купальники"
-          - "Одяг для немовлят"
-          - "Піджаки і костюми"
-          - "Сукні"
-          - "Пляжний одяг"
-          - "Сорочки"
-          - "Топи і майки"
-          - "Трикотажні кофти"
-          - "Футболки і поло"
-          - "Шорти"
-          - "Спідниці"
-          # -- Взуття --
-          - "Босоніжки"
-          - "Черевики"
-          - "Черевики та чоботи"
-          - "Домашні капці"
-          - "Кросівки"
-          - "Взуття без задника"
-          - "Гумові чоботи"
-          - "Сандалі"
-          - "Чоботи"
-          - "Туфлі"
-          # -- Аксесуари --
-          - "Аксесуари для подорожей"
-          - "Головні убори"
-          - "Інші аксесуари"
-          - "Шкарпетки"
-          - "Окуляри і оправи"
-          - "Ремені і підтяжки"
-          - "Сумки і рюкзаки"
-          - "Прикраси"
-          - "Годинники"
-          - "Шарфи і рукавички"
-          # -- Білизна --
-          - "Набори білизни"
-          - "Спідня білизна"
-          - "Одяг для дому та сну"
-          # -- Спорт --
-          - "Аксесуари для спорту"
-          - "Спортивне взуття"
-          - "Спортивний одяг"
-          - "Спортивна білизна"
+          Список підтягується з розділу «Категорії» в адмінці (ліворуч).
+          Не бачите потрібної підкатегорії — додайте нову там, і вона одразу
+          зʼявиться тут.
 
       - label: "Для кого"
         name: "gender"
