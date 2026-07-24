@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Оформлення замовлення Bagvero">
+    <meta name="theme-color" content="#111827">
+    <meta name="robots" content="noindex,follow">
+
+<link rel="icon" href="favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicon-16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/images/favicon-192.png">
+    <title>Оформлення замовлення | Bagvero</title>
+
+    <link rel="stylesheet" href="assets/css/style.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+<!-- MailerLite Universal -->
+<script>
+    (function(w,d,e,u,f,l,n){w[f]=w[f]||function(){(w[f].q=w[f].q||[])
+    .push(arguments);},l=d.createElement(e),l.async=1,l.src=u,
+    n=d.getElementsByTagName(e)[0],n.parentNode.insertBefore(l,n);})
+    (window,document,'script','https://assets.mailerlite.com/js/universal.js','ml');
+    ml('account', '2520119');
+</script>
+<!-- End MailerLite Universal -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+</head>
+
+<body>
+
+<header>
+
+    <div class="container header">
+
+        <a href="index.html" class="logo">
+            Bagvero
+        </a>
+
+        <nav>
+
+            <ul>
+
+                <li><a href="index.html">Головна</a></li>
+
+                <li class="has-mega"><a href="catalog.html" id="navCatalogLink">Каталог</a><div class="mega-menu" id="catalogMegaMenu">
+<a class="mega-item" href="catalog.html?gender=Жінкам"><img src="https://images.pexels.com/photos/932401/pexels-photo-932401.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Жінкам"><span>Жінкам</span></a>
+<a class="mega-item" href="catalog.html?gender=Чоловікам"><img src="https://images.pexels.com/photos/7869755/pexels-photo-7869755.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Чоловікам"><span>Чоловікам</span></a>
+<a class="mega-item" href="catalog.html?gender=Унісекс"><img src="https://images.pexels.com/photos/10425471/pexels-photo-10425471.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Унісекс"><span>Унісекс</span></a>
+<a class="mega-item" href="catalog.html?gender=Дітям"><img src="https://images.pexels.com/photos/7269547/pexels-photo-7269547.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Дітям"><span>Дітям</span></a>
+</div></li>
+
+                <li class="has-mega"><a href="catalog.html?section=new" id="navNewLink">Новинки</a><div class="mega-menu">
+<a class="mega-item" href="catalog.html?section=new&gender=Жінкам"><img src="https://images.pexels.com/photos/932401/pexels-photo-932401.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Жінкам"><span>Жінкам</span></a>
+<a class="mega-item" href="catalog.html?section=new&gender=Чоловікам"><img src="https://images.pexels.com/photos/7869755/pexels-photo-7869755.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Чоловікам"><span>Чоловікам</span></a>
+<a class="mega-item" href="catalog.html?section=new&gender=Унісекс"><img src="https://images.pexels.com/photos/10425471/pexels-photo-10425471.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Унісекс"><span>Унісекс</span></a>
+<a class="mega-item" href="catalog.html?section=new&gender=Дітям"><img src="https://images.pexels.com/photos/7269547/pexels-photo-7269547.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Дітям"><span>Дітям</span></a>
+</div></li>
+
+                <li class="has-mega"><a href="catalog.html?section=sale" id="navSaleLink" class="sale-text">Акції</a><div class="mega-menu">
+<a class="mega-item" href="catalog.html?section=sale&gender=Жінкам"><img src="https://images.pexels.com/photos/932401/pexels-photo-932401.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Жінкам"><span>Жінкам</span></a>
+<a class="mega-item" href="catalog.html?section=sale&gender=Чоловікам"><img src="https://images.pexels.com/photos/7869755/pexels-photo-7869755.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Чоловікам"><span>Чоловікам</span></a>
+<a class="mega-item" href="catalog.html?section=sale&gender=Унісекс"><img src="https://images.pexels.com/photos/10425471/pexels-photo-10425471.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Унісекс"><span>Унісекс</span></a>
+<a class="mega-item" href="catalog.html?section=sale&gender=Дітям"><img src="https://images.pexels.com/photos/7269547/pexels-photo-7269547.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Дітям"><span>Дітям</span></a>
+</div></li>
+
+                <li><a href="contacts.html">Контакти</a></li>
+
+            </ul>
+
+        </nav>
+
+        <div class="header-icons">
+
+            <button id="searchBtn">🔍</button>
+<a href="account.html" id="accountLink">👤</a>
+
+            <a href="favorites.html">
+                ❤
+                <span id="favCount">0</span>
+            </a>
+
+            <div class="cart-icon-wrap">
+    <a href="cart.html" class="active" id="cartIconLink">
+        🛒
+        <span id="cartCount">0</span>
+    </a>
+    <div id="cartPopup" class="cart-popup" hidden></div>
+</div>
+
+        </div>
+
+    </div>
+
+</header>
+
+<section class="breadcrumbs">
+
+    <div class="container">
+
+        <a href="index.html">Головна</a>
+
+        <span class="crumb-sep">→</span>
+
+        <a href="cart.html">Кошик</a>
+
+        <span class="crumb-sep">→</span>
+
+        <span>Оформлення замовлення</span>
+
+    </div>
+
+</section>
+
+<section class="checkout-page">
+
+    <div class="container">
+
+        <h1>Оформлення замовлення</h1>
+
+        <div id="checkoutEmpty" class="empty-state" hidden>
+
+            <h2>🛒</h2>
+
+            <p>Ваш кошик порожній — немає що оформлювати</p>
+
+            <a href="catalog.html" class="btn">Перейти в каталог</a>
+
+        </div>
+
+        <div id="checkoutLayout" class="checkout-layout" hidden>
+
+            <form id="checkoutForm" class="checkout-form" novalidate action="https://formsubmit.co/b8e2e26d0dab4962153e7c42bfab1499" method="POST">
+
+                <div class="checkout-block">
+
+                    <h2>Контактні дані</h2>
+                    <p class="checkout-block-sub">Вкажіть, як з вами зв'язатися</p>
+
+                    <div class="checkout-fields">
+
+                        <label>
+                            Ім'я
+                            <input type="text" id="firstName" name="Ім'я" required placeholder="Ваше ім'я">
+                            <span class="field-error" data-error-for="firstName"></span>
+                        </label>
+
+                        <label>
+                            Прізвище
+                            <input type="text" id="lastName" name="Прізвище" required placeholder="Ваше прізвище">
+                            <span class="field-error" data-error-for="lastName"></span>
+                        </label>
+
+                        <label>
+                            По батькові
+                            <input type="text" id="middleName" name="По батькові" placeholder="По батькові (необов'язково)">
+                        </label>
+
+                        <label>
+                            Email
+                            <input type="email" id="email" name="Email" required placeholder="you@example.com">
+                            <span class="field-error" data-error-for="email"></span>
+                        </label>
+
+                        <label class="field-full">
+                            Телефон
+                            <input type="tel" id="phone" name="Телефон" required placeholder="+380 XX XXX XX XX">
+                            <span class="field-error" data-error-for="phone"></span>
+                        </label>
+
+                    </div>
+
+                </div>
+
+                <div class="checkout-block">
+
+                    <h2>Доставка</h2>
+                    <p class="checkout-block-sub">Оберіть місто та зручний спосіб отримання</p>
+
+                    <div id="savedAddressesBlock" class="saved-addresses-block" hidden>
+                        <p class="saved-addresses-title">Ваші збережені адреси</p>
+                        <div id="savedAddressesList" class="saved-addresses-list"></div>
+                    </div>
+
+                    <div class="checkout-fields" style="margin-bottom:20px;">
+
+                        <label class="field-full">
+                            Місто доставки
+                            <input type="text" id="city" name="Місто доставки" required placeholder="Наприклад: Київ">
+                            <span class="field-error" data-error-for="city"></span>
+                        </label>
+
+                    </div>
+
+                    <div class="delivery-options">
+
+                        <label class="delivery-option">
+                            <input type="radio" name="deliveryMethod" value="На відділення «Нова пошта»" data-price="60">
+                            <span class="delivery-option-card">
+                                <span class="delivery-option-title">
+                                    <span class="delivery-option-icon">📦</span>
+                                    На відділення «Нова пошта»
+                                </span>
+                                <span class="delivery-option-price">від 60 грн</span>
+                            </span>
+                        </label>
+
+                        <div class="delivery-detail" data-detail-for="На відділення «Нова пошта»">
+                            <label>
+                                Оберіть номер відділення
+                                <input type="text" id="branchNumber" name="Номер відділення" placeholder="Наприклад: Відділення №45">
+                            </label>
+                        </div>
+
+                        <label class="delivery-option">
+                            <input type="radio" name="deliveryMethod" value="Поштомат «Нова пошта»" data-price="60">
+                            <span class="delivery-option-card">
+                                <span class="delivery-option-title">
+                                    <span class="delivery-option-icon">🏤</span>
+                                    Поштомат «Нова пошта»
+                                </span>
+                                <span class="delivery-option-price">від 60 грн</span>
+                            </span>
+                        </label>
+
+                        <div class="delivery-detail" data-detail-for="Поштомат «Нова пошта»">
+                            <label>
+                                Оберіть номер поштомату
+                                <input type="text" id="postomatNumber" name="Номер поштомату" placeholder="Наприклад: Поштомат №1234">
+                            </label>
+                        </div>
+
+                        <label class="delivery-option">
+                            <input type="radio" name="deliveryMethod" value="Кур'єром «Нова пошта»" data-price="95">
+                            <span class="delivery-option-card">
+                                <span class="delivery-option-title">
+                                    <span class="delivery-option-icon">🚚</span>
+                                    Кур'єром «Нова пошта»
+                                </span>
+                                <span class="delivery-option-price">від 95 грн</span>
+                            </span>
+                        </label>
+
+                        <div class="delivery-detail" data-detail-for="Кур'єром «Нова пошта»">
+                            <label>
+                                Адреса доставки (вулиця, будинок, квартира)
+                                <input type="text" id="courierAddress" name="Адреса доставки" placeholder="Вулиця, будинок, квартира">
+                            </label>
+                        </div>
+
+                        <span class="field-error" data-error-for="deliveryMethod"></span>
+
+                    </div>
+
+                </div>
+
+                <div class="checkout-block">
+
+                    <h2>Оплата</h2>
+                    <p class="checkout-block-sub">Оберіть зручний спосіб оплати</p>
+
+                    <div class="delivery-options">
+
+                        <label class="delivery-option">
+                            <input type="radio" name="paymentMethod" value="Банківською карткою (Visa/Mastercard)" checked>
+                            <span class="delivery-option-card">
+                                <span class="delivery-option-title">
+                                    <span class="delivery-option-icon">💳</span>
+                                    Банківською карткою (Visa/Mastercard)
+                                </span>
+                            </span>
+                        </label>
+
+                        <label class="delivery-option">
+                            <input type="radio" name="paymentMethod" value="Готівкою при отриманні на пошті">
+                            <span class="delivery-option-card">
+                                <span class="delivery-option-title">
+                                    <span class="delivery-option-icon">💵</span>
+                                    Готівкою при отриманні на пошті
+                                </span>
+                            </span>
+                        </label>
+
+                        <span class="field-error" data-error-for="paymentMethod"></span>
+
+                    </div>
+
+                </div>
+
+                <div class="checkout-block">
+
+                    <h2>Зв'язатися зі мною</h2>
+                    <p class="checkout-block-sub">
+                        Наш менеджер зателефонує вам, щоб підтвердити замовлення.
+                        Оберіть зручний спосіб зв'язку
+                    </p>
+
+                    <div class="contact-channels">
+
+                        <label class="contact-channel">
+                            <input type="radio" name="contactChannel" value="Телефоном" checked>
+                            <span class="contact-channel-chip">📞 Телефоном</span>
+                        </label>
+
+                        <label class="contact-channel">
+                            <input type="radio" name="contactChannel" value="Viber">
+                            <span class="contact-channel-chip">💬 Viber</span>
+                        </label>
+
+                        <label class="contact-channel">
+                            <input type="radio" name="contactChannel" value="Telegram">
+                            <span class="contact-channel-chip">✈ Telegram</span>
+                        </label>
+
+                        <label class="contact-channel">
+                            <input type="radio" name="contactChannel" value="Email">
+                            <span class="contact-channel-chip">✉ Email</span>
+                        </label>
+
+                    </div>
+
+                </div>
+
+                <!-- службові поля для листа -->
+                <input type="hidden" name="Склад замовлення" id="orderComposition">
+                <input type="hidden" name="Сума замовлення" id="orderSubtotalField">
+                <input type="hidden" name="Знижка" id="orderDiscountField">
+                <input type="hidden" name="Промокод" id="orderPromoField">
+                <input type="hidden" name="Спосіб оплати" id="orderPaymentField">
+                <input type="hidden" name="Вартість доставки" id="orderDeliveryField">
+                <input type="hidden" name="Всього до сплати" id="orderTotalField">
+                <input type="hidden" name="_subject" value="Нове замовлення на bestbrnd4u.github.io">
+                <input type="hidden" name="_template" value="table">
+                <input type="hidden" name="_captcha" value="false">
+                <input type="hidden" name="_replyto" id="orderReplyTo">
+                <input type="hidden" name="_url" value="https://bestbrnd4u.github.io/checkout.html">
+
+            </form>
+
+            <aside class="order-summary">
+
+                <div class="order-summary-header">
+                    <h2>Ваше замовлення</h2>
+                    <button type="button" id="toggleSummary" class="order-summary-toggle">Приховати</button>
+                </div>
+
+                <div id="orderSummaryItems" class="order-summary-items">
+                </div>
+
+                <div>
+                    <div class="promo-row">
+                        <input type="text" id="promoInput" placeholder="Маєте промокод?">
+                        <button type="button" id="applyPromo">Застосувати</button>
+                    </div>
+                    <div id="promoMessage" class="promo-message"></div>
+                </div>
+
+                <div class="summary-row">
+                    <span>Сума замовлення</span>
+                    <span id="orderSubtotal">0 грн</span>
+                </div>
+
+                <div class="summary-row" id="orderDiscountRow" hidden>
+                    <span>Загальна знижка</span>
+                    <span class="discount-value" id="orderDiscount">-0 грн</span>
+                </div>
+
+                <div class="summary-row">
+                    <span>Доставка</span>
+                    <span id="orderDeliveryPrice">Оберіть спосіб</span>
+                </div>
+
+                <div class="summary-row summary-total">
+                    <span>Всього</span>
+                    <span id="orderTotal">0 грн</span>
+                </div>
+
+                <button type="submit" form="checkoutForm" id="submitOrderBtn" class="btn">Оформити замовлення</button>
+
+            </aside>
+
+        </div>
+
+    </div>
+
+</section>
+
+<footer>
+
+    <div class="container footer">
+
+        <div>
+
+            <h3>Bagvero</h3>
+
+            <p>
+                Інтернет-магазин сумок
+та аксесуарів.
+            </p>
+
+            <div class="footer-social">
+                <a href="https://www.instagram.com/bestbrnd4u" target="_blank" rel="noopener" aria-label="Instagram">
+                    Instagram
+                </a>
+                <a href="#" aria-label="Facebook">
+                    Facebook
+                </a>
+                <a href="#" aria-label="Telegram">
+                    Telegram
+                </a>
+            </div>
+
+        </div>
+
+        <div>
+
+            <h3>Покупцям</h3>
+
+            <a href="#">Доставка</a>
+            <a href="#">Оплата</a>
+            <a href="#">Гарантія</a>
+
+        </div>
+
+        <div>
+
+            <h3>Каталог</h3>
+
+            <a href="catalog.html">Всі товари</a>
+
+            <a href="catalog.html?section=new">Новинки</a>
+
+            <a href="catalog.html?section=sale" class="sale-text">Акції</a>
+
+            <a href="#">Бренди</a>
+
+        </div>
+
+        <div>
+
+            <h3>Зв'яжіться з нами</h3>
+
+            <p>📍 Україна</p>
+
+            <p>✉ info@bagvero.ua</p>
+
+            <p>☎ +380 XX XXX XX XX</p>
+
+            <p>🕘 Пн–Нд 09:00–20:00</p>
+
+        </div>
+
+    </div>
+
+</footer>
+
+<div class="copyright">
+
+    <div class="container">
+
+    © 2026 bagvero.
+    Всі права захищені.
+
+    </div>
+
+</div>
+
+<button id="scrollTop" class="scroll-top" aria-label="Нагору">
+    ↑
+</button>
+
+<div id="leaveConfirmModal" class="modal-overlay" hidden>
+    <div class="modal-card">
+
+        <div class="modal-header">
+            <h3>Ви залишаєте сторінку замовлення</h3>
+            <button type="button" id="leaveModalClose" class="modal-close" aria-label="Закрити">✕</button>
+        </div>
+
+        <p class="modal-text">
+            Ви дійсно бажаєте залишити сторінку замовлення?
+            Вся інформація про замовлення буде втрачена.
+        </p>
+
+        <div class="modal-actions">
+            <button type="button" id="leaveModalConfirm" class="btn-modal btn-modal-confirm">Так</button>
+            <button type="button" id="leaveModalCancel" class="btn-modal btn-modal-cancel">Ні</button>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="assets/js/supabase-client.js"></script>
+<script src="assets/js/common.js"></script>
+<script src="assets/js/mega-menu.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/checkout.js"></script>
+
+</body>
+
+</html>

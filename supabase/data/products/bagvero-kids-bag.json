@@ -1,0 +1,51 @@
+{
+  "id": 10,
+  "slug": "bagvero-kids-bag",
+  "brand": "Bagvero Kids",
+  "title": "Kids Print Bag",
+  "category": "Дитячі сумки",
+  "gender": "Дітям",
+  "isNew": true,
+  "price": 899,
+  "oldPrice": 999,
+  "rating": 4.6,
+  "reviews": 18,
+  "badge": "NEW",
+  "material": "Текстиль",
+  "color": "Мультиколір",
+  "country": "Україна",
+  "description": "Яскрава дитяча сумочка з веселим принтом — зручний розмір для книжок, іграшок та шкільних дрібничок.",
+  "images": [
+    "https://images.pexels.com/photos/6110950/pexels-photo-6110950.jpeg?auto=compress&cs=tinysrgb&w=800"
+  ],
+  "variants": [
+    {
+      "color": "Мультиколір",
+      "hex": "linear-gradient(90deg,#f87171,#fbbf24,#34d399,#60a5fa)",
+      "images": [
+        "https://images.pexels.com/photos/6110950/pexels-photo-6110950.jpeg?auto=compress&cs=tinysrgb&w=800"
+      ]
+    },
+    {
+      "color": "Синій",
+      "hex": "#2c4a7c",
+      "images": [
+        "https://images.pexels.com/photos/9327162/pexels-photo-9327162.jpeg?auto=compress&cs=tinysrgb&w=800"
+      ]
+    }
+  ],
+  "sku": "BK-KB-1010",
+  "closure": "кнопка",
+  "decor": "яскравий принт",
+  "dimensions": "18x14x6 см",
+  "strapInfo": "Один незнімний ремінь довжиною 90 см",
+  "compartments": "одне основне відділення",
+  "composition": "100% поліестер",
+  "sizes": [
+    "XS"
+  ],
+  "searchKeywords": [
+    "дитяча сумочка",
+    "сумка з малюнком"
+  ]
+}
