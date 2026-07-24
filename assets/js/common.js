@@ -622,7 +622,13 @@ function buildSearchOverlay() {
 
 function matchesQuery(product, q) {
 
-    const haystack = `${product.title} ${product.brand} ${product.category}`.toLowerCase();
+    const haystack = [
+        product.title,
+        product.brand,
+        product.category,
+        product.description,
+        ...(product.searchKeywords || [])
+    ].filter(Boolean).join(" ").toLowerCase();
 
     return haystack.includes(q);
 

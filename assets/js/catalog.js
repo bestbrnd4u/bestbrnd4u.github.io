@@ -1111,9 +1111,19 @@ function filterProducts() {
 
     if (text) {
 
-        list = list.filter(product =>
-            product.title.toLowerCase().includes(text)
-        );
+        list = list.filter(product => {
+
+            const haystack = [
+                product.title,
+                product.brand,
+                product.category,
+                product.description,
+                ...(product.searchKeywords || [])
+            ].filter(Boolean).join(" ").toLowerCase();
+
+            return haystack.includes(text);
+
+        });
 
     }
 

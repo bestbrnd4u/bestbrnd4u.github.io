@@ -414,6 +414,12 @@ collections:
         widget: "text"
         required: true
 
+      - label: "Пошукові теги"
+        name: "searchKeywords"
+        widget: "list"
+        required: false
+        hint: "Слова, за якими покупці можуть шукати цей товар — не показуються на сайті, лише допомагають пошуку. Додайте синоніми, розмовні назви, варіанти написання. Наприклад: сумка, клатч, кросбоді, шоппер, через плече"
+
       - label: "Матеріал"
         name: "material"
         widget: "string"
