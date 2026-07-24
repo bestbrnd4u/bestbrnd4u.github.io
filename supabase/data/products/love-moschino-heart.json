@@ -1,0 +1,57 @@
+{
+  "id": 6,
+  "slug": "love-moschino-heart",
+  "brand": "Love Moschino",
+  "title": "Heart Collection",
+  "category": "Жіночі сумки",
+  "gender": "Жінкам",
+  "isNew": false,
+  "price": 7299,
+  "oldPrice": 7999,
+  "rating": 4.9,
+  "reviews": 133,
+  "badge": "HOT",
+  "material": "Екошкіра",
+  "color": "Червоний",
+  "country": "Італія",
+  "description": "Яскрава сумка Love Moschino з колекції Heart із фірмовим декором у вигляді серця. Стильний акцент для сміливих образів.",
+  "images": [
+    "https://images.pexels.com/photos/7419416/pexels-photo-7419416.jpeg?auto=compress&cs=tinysrgb&w=800",
+    "https://images.pexels.com/photos/20086706/pexels-photo-20086706.jpeg?auto=compress&cs=tinysrgb&w=800",
+    "https://images.pexels.com/photos/20086704/pexels-photo-20086704.jpeg?auto=compress&cs=tinysrgb&w=800"
+  ],
+  "variants": [
+    {
+      "color": "Червоний",
+      "hex": "#b91c1c",
+      "images": [
+        "https://images.pexels.com/photos/7419416/pexels-photo-7419416.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/20086706/pexels-photo-20086706.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/20086704/pexels-photo-20086704.jpeg?auto=compress&cs=tinysrgb&w=800"
+      ]
+    },
+    {
+      "color": "Коричневий",
+      "hex": "#6b4423",
+      "images": [
+        "https://images.pexels.com/photos/14806252/pexels-photo-14806252.jpeg?auto=compress&cs=tinysrgb&w=800"
+      ]
+    }
+  ],
+  "sku": "LM-HC-6006",
+  "closure": "блискавка",
+  "decor": "декоративне серце, золота фурнітура",
+  "dimensions": "26x19x11 см",
+  "strapInfo": "Один знімний ремінь довжиною 60-115 см",
+  "compartments": "одне основне відділення, дві внутрішні кишені",
+  "composition": "100% екошкіра",
+  "sizes": [
+    "S",
+    "M"
+  ],
+  "searchKeywords": [
+    "сумка з серцем",
+    "клатч",
+    "вечірня сумка"
+  ]
+}

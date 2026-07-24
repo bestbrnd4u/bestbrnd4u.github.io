@@ -1,0 +1,49 @@
+name: Build catalog data
+
+# Запускається щоразу, коли адмінка (Decap CMS) комітить зміни
+# в data/products/** або data/categories/**, і перезбирає
+# відповідні data/products.json / data/categories.json —
+# саме ці файли реально вантажить сайт. Результат комітиться
+# назад у main.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "data/products/**"
+      - "data/categories/**"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Build data/categories.json
+        run: node scripts/build-categories.js
+
+      - name: Build data/products.json
+        run: node scripts/build-products.js
+
+      - name: Commit result if changed
+        run: |
+          git config user.name "bagvero-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/products.json data/products/*.json data/categories.json
+          if git diff --cached --quiet; then
+            echo "Немає змін — пропускаємо коміт"
+          else
+            git commit -m "chore: перезібрано каталог (products/categories) [skip ci]"
+            git push
+          fi
