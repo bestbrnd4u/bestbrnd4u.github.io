@@ -1,6 +1,6 @@
 {
   "hero": {
-    "label": "Нова колекція 2026",
+    "label": "Нова колекція",
     "heading": "Знайдіть сумку,\nяка підкреслить\nваш стиль",
     "text": "Понад 500 оригінальних моделей від світових брендів. Швидка доставка, зручна оплата та гарантія якості.",
     "image": "https://images.pexels.com/photos/5745781/pexels-photo-5745781.jpeg?auto=compress&cs=tinysrgb&w=1600",
@@ -51,18 +51,52 @@
   "brands": {
     "title": "Популярні бренди",
     "items": [
-      { "name": "GUESS", "link": "catalog.html?brand=Guess" },
-      { "name": "MICHAEL KORS", "link": "catalog.html?brand=Michael%20Kors" },
-      { "name": "CALVIN KLEIN", "link": "catalog.html?brand=Calvin%20Klein" },
-      { "name": "TOMMY HILFIGER", "link": "catalog.html?brand=Tommy%20Hilfiger" },
-      { "name": "FURLA", "link": "catalog.html?brand=Furla" },
-      { "name": "LOVE MOSCHINO", "link": "catalog.html?brand=Love%20Moschino" }
+      {
+        "name": "GUESS",
+        "link": "catalog.html?brand=Guess"
+      },
+      {
+        "name": "MICHAEL KORS",
+        "link": "catalog.html?brand=Michael%20Kors"
+      },
+      {
+        "name": "CALVIN KLEIN",
+        "link": "catalog.html?brand=Calvin%20Klein"
+      },
+      {
+        "name": "TOMMY HILFIGER",
+        "link": "catalog.html?brand=Tommy%20Hilfiger"
+      },
+      {
+        "name": "FURLA",
+        "link": "catalog.html?brand=Furla"
+      },
+      {
+        "name": "LOVE MOSCHINO",
+        "link": "catalog.html?brand=Love%20Moschino"
+      }
     ]
   },
   "advantages": [
-    { "icon": "🚚", "title": "Швидка доставка", "text": "По всій Україні" },
-    { "icon": "💳", "title": "Зручна оплата", "text": "Карткою або готівкою" },
-    { "icon": "⭐", "title": "Гарантія якості", "text": "Тільки оригінальні товари" },
-    { "icon": "🔄", "title": "Повернення 14 днів", "text": "Без зайвих запитань" }
+    {
+      "icon": "🚚",
+      "title": "Швидка доставка",
+      "text": "По всій Україні"
+    },
+    {
+      "icon": "💳",
+      "title": "Зручна оплата",
+      "text": "Карткою або готівкою"
+    },
+    {
+      "icon": "⭐",
+      "title": "Гарантія якості",
+      "text": "Тільки оригінальні товари"
+    },
+    {
+      "icon": "🔄",
+      "title": "Повернення 14 днів",
+      "text": "Без зайвих запитань"
+    }
   ]
 }
