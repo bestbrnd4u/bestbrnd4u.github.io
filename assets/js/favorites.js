@@ -48,8 +48,10 @@ function createFavoriteRow(product, favEntry) {
         ? `<span class="old-price">${formatPrice(product.oldPrice)}</span>`
         : "";
 
+    const sizes = product.sizes?.length ? product.sizes : PRODUCT_SIZES;
+
     const activeColor = favEntry.color || variants[0].color;
-    const activeSize = favEntry.size || PRODUCT_SIZES[0];
+    const activeSize = favEntry.size || sizes[0];
 
     const activeVariant = variants.find(v => v.color === activeColor) || variants[0];
 
@@ -65,7 +67,7 @@ function createFavoriteRow(product, favEntry) {
             style="background:${variant.hex}"></button>
     `).join("");
 
-    const sizeButtons = PRODUCT_SIZES.map(size => `
+    const sizeButtons = sizes.map(size => `
         <button
             type="button"
             class="mini-size ${size === activeSize ? "active" : ""}">
@@ -74,7 +76,7 @@ function createFavoriteRow(product, favEntry) {
     `).join("");
 
     return `
-        <div class="favorite-row" data-id="${product.id}">
+        <div class="favorite-row" data-id="${product.id}" data-color="${favEntry.color || ""}" data-size="${favEntry.size || ""}">
 
             <a href="product.html?id=${product.id}" class="favorite-row-image">
                 <img
@@ -122,12 +124,12 @@ function renderFavorites() {
 
     const favorites = getFavorites();
 
-    const list = allProducts
-        .map(product => {
+    const list = favorites
+        .map(favEntry => {
 
-            const favEntry = favorites.find(entry => entry.id === product.id);
+            const product = allProducts.find(item => item.id === favEntry.id);
 
-            return favEntry ? { product, favEntry } : null;
+            return product ? { product, favEntry } : null;
 
         })
         .filter(Boolean);
@@ -159,14 +161,16 @@ favoritesGrid?.addEventListener("click", event => {
     if (!row) return;
 
     const id = Number(row.dataset.id);
+    const oldColor = row.dataset.color || null;
+    const oldSize = row.dataset.size || null;
 
     if (colorBtn) {
 
-        changeFavoriteVariant(id, "color", colorBtn.dataset.color);
+        changeFavoriteVariant(id, oldColor, oldSize, "color", colorBtn.dataset.color);
 
     } else if (sizeBtn) {
 
-        changeFavoriteVariant(id, "size", sizeBtn.textContent.trim());
+        changeFavoriteVariant(id, oldColor, oldSize, "size", sizeBtn.textContent.trim());
 
     }
 

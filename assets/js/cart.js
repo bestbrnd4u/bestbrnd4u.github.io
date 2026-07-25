@@ -94,8 +94,10 @@ function renderCart() {
             ? product.variants
             : [{ color: product.color || "Основний", hex: "#999", images: product.images || [] }];
 
+        const sizes = product.sizes?.length ? product.sizes : PRODUCT_SIZES;
+
         const activeColor = line.color || variants[0].color;
-        const activeSize = line.size || PRODUCT_SIZES[0];
+        const activeSize = line.size || sizes[0];
 
         const activeVariant = variants.find(v => v.color === activeColor) || variants[0];
 
@@ -111,7 +113,7 @@ function renderCart() {
                 style="background:${variant.hex}"></button>
         `).join("");
 
-        const sizeButtons = PRODUCT_SIZES.map(size => `
+        const sizeButtons = sizes.map(size => `
             <button
                 type="button"
                 class="mini-size ${size === activeSize ? "active" : ""}">

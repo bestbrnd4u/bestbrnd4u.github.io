@@ -59,6 +59,14 @@ function renderProduct(product) {
 
     }).join("");
 
+    const sizes = product.sizes?.length ? product.sizes : PRODUCT_SIZES;
+
+    const sizeButtons = sizes.map((size, index) => `
+        <button class="size ${index === 0 ? "active" : ""}">
+            ${size}
+        </button>
+    `).join("");
+
     document.getElementById("productPage").innerHTML = `
 
 <div class="product-wrapper">
@@ -141,23 +149,7 @@ function renderProduct(product) {
 
 <div class="sizes">
 
-<button class="size active">
-
-S
-
-</button>
-
-<button class="size">
-
-M
-
-</button>
-
-<button class="size">
-
-L
-
-</button>
+${sizeButtons}
 
 </div>
 

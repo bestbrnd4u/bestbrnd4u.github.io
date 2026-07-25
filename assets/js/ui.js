@@ -29,7 +29,7 @@ function createProductCard(product) {
         ? Math.round((1 - product.price / product.oldPrice) * 100)
         : 0;
 
-    const sizes = PRODUCT_SIZES;
+    const sizes = product.sizes?.length ? product.sizes : PRODUCT_SIZES;
 
     const colorButtons = variants.map((variant, index) => `
         <button

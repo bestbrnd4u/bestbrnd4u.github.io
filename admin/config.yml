@@ -217,6 +217,71 @@ collections:
                 widget: "string"
                 required: true
 
+  - name: "promotions"
+    label: "Акції"
+    label_singular: "Акція"
+    description: >
+      Картки акцій на головній сторінці (розділ «Акції»), схожі на банери
+      знижок на md-fashion.ua. Кожна акція — окремий файл. Вимкнути акцію,
+      не видаляючи її, можна перемикачем «Показувати на сайті».
+    folder: "data/promotions"
+    create: true
+    delete: true
+    extension: "json"
+    format: "json"
+    identifier_field: "title"
+    summary: "{{title}}"
+    sortable_fields: ["order", "title"]
+    fields:
+      - label: "Показувати на сайті"
+        name: "active"
+        widget: "boolean"
+        default: true
+        hint: "Вимкніть, щоб приховати акцію, не видаляючи файл"
+
+      - label: "Порядок показу"
+        name: "order"
+        widget: "number"
+        value_type: "int"
+        default: 1
+        hint: "Менше число — вище на сторінці"
+
+      - label: "Бейдж"
+        name: "badge"
+        widget: "string"
+        required: false
+        hint: "Наприклад: -50% або NEW"
+
+      - label: "Заголовок"
+        name: "title"
+        widget: "string"
+        required: true
+        hint: "Наприклад: SUMMER SALE до -50%"
+
+      - label: "Опис"
+        name: "text"
+        widget: "string"
+        required: true
+        hint: "Наприклад: Guess, Michael Kors, Calvin Klein та інші"
+
+      - label: "Фото"
+        name: "image"
+        widget: "image"
+        required: true
+        choose_url: true
+
+      - label: "Текст кнопки"
+        name: "buttonText"
+        widget: "string"
+        required: true
+        default: "Дивитись усі товари"
+
+      - label: "Посилання кнопки"
+        name: "link"
+        widget: "string"
+        required: true
+        hint: "Наприклад: catalog.html?section=sale або catalog.html?brand=Guess"
+
   - name: "categories"
     label: "Категорії"
     label_singular: "Категорія"

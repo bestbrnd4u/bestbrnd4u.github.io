@@ -226,3 +226,60 @@ function renderAdvantages(advantages) {
 
 initHome();
 initHomeContent();
+initPromotions();
+
+// -------------------------
+// Розділ "Акції" на головній (data/promotions.json —
+// окремий файл, зібраний із data/promotions/*.json)
+// -------------------------
+
+async function initPromotions() {
+
+    const section = document.getElementById("promotionsSection");
+    const grid = document.getElementById("promotionsGrid");
+
+    if (!section || !grid) return;
+
+    try {
+
+        const response = await fetch("data/promotions.json");
+
+        if (!response.ok) {
+            throw new Error("Не вдалося завантажити акції");
+        }
+
+        const promotions = await response.json();
+
+        if (!Array.isArray(promotions) || promotions.length === 0) {
+            return;
+        }
+
+        grid.innerHTML = promotions.map(promo => `
+            <a href="${promo.link}" class="promo-card">
+
+                <div class="promo-card-image">
+                    <img
+                        src="${promo.image}"
+                        alt="${promo.title}"
+                        onerror="this.src='assets/images/no-image.png'">
+                    ${promo.badge ? `<span class="promo-card-badge">${promo.badge}</span>` : ""}
+                </div>
+
+                <div class="promo-card-info">
+                    <h3>${promo.title}</h3>
+                    ${promo.text ? `<p>${promo.text}</p>` : ""}
+                    <span class="promo-card-link">${promo.buttonText || "Дивитись усі товари"} →</span>
+                </div>
+
+            </a>
+        `).join("");
+
+        section.hidden = false;
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
+
+}

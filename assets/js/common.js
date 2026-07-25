@@ -380,6 +380,46 @@ function toggleFavorite(id, options = {}) {
 
 }
 
+// зміна кольору/розміру вже доданого в обране товару.
+// На відміну від кошика, тут кожен запис унікальний за
+// (id, колір, розмір) — тож якщо користувач перемикає
+// варіант на той, що вже окремо є в обраному, просто
+// прибираємо старий запис замість дубля.
+function changeFavoriteVariant(id, oldColor, oldSize, field, value) {
+
+    let favorites = getFavorites();
+
+    const index = favorites.findIndex(entry =>
+        entry.id === Number(id) &&
+        (entry.color || null) === (oldColor || null) &&
+        (entry.size || null) === (oldSize || null)
+    );
+
+    if (index === -1) return;
+
+    const updated = { ...favorites[index], [field]: value };
+
+    const duplicateIndex = favorites.findIndex((entry, i) =>
+        i !== index &&
+        entry.id === updated.id &&
+        (entry.color || null) === (updated.color || null) &&
+        (entry.size || null) === (updated.size || null)
+    );
+
+    if (duplicateIndex !== -1) {
+
+        favorites.splice(index, 1);
+
+    } else {
+
+        favorites[index] = updated;
+
+    }
+
+    saveFavorites(favorites);
+
+}
+
 function updateFavoriteButtons() {
 
     document.querySelectorAll(".favorite").forEach(button => {
