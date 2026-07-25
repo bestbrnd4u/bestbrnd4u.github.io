@@ -7,6 +7,70 @@ function formatPrice(price) {
     return new Intl.NumberFormat("uk-UA").format(price) + "\u00A0грн";
 }
 
+// -------------------------
+// Карусель для "Популярні товари" / "Схожі товари"
+//
+// Викликати ПІСЛЯ того, як картки вже вставлені в
+// .carousel-track (innerHTML) — інакше нема що виміряти.
+// Однакова логіка для будь-якого блоку такого вигляду:
+// <div class="carousel">
+//   <button class="carousel-arrow carousel-prev">...
+//   <div class="carousel-track">...картки...</div>
+//   <button class="carousel-arrow carousel-next">...
+// </div>
+// -------------------------
+
+function initCarousel(carouselEl) {
+
+    if (!carouselEl) return;
+
+    const track = carouselEl.querySelector(".carousel-track");
+    const prevBtn = carouselEl.querySelector(".carousel-prev");
+    const nextBtn = carouselEl.querySelector(".carousel-next");
+
+    if (!track || !prevBtn || !nextBtn) return;
+
+    function getStep() {
+
+        const card = track.querySelector(".product-card");
+
+        if (!card) return track.clientWidth;
+
+        const gap = parseFloat(getComputedStyle(track).columnGap || getComputedStyle(track).gap) || 24;
+
+        return card.getBoundingClientRect().width + gap;
+
+    }
+
+    function updateArrows() {
+
+        const maxScroll = track.scrollWidth - track.clientWidth - 2;
+
+        const hasOverflow = track.scrollWidth > track.clientWidth + 2;
+
+        prevBtn.disabled = !hasOverflow || track.scrollLeft <= 2;
+        nextBtn.disabled = !hasOverflow || track.scrollLeft >= maxScroll;
+
+    }
+
+    prevBtn.addEventListener("click", () => {
+        track.scrollBy({ left: -getStep(), behavior: "smooth" });
+    });
+
+    nextBtn.addEventListener("click", () => {
+        track.scrollBy({ left: getStep(), behavior: "smooth" });
+    });
+
+    track.addEventListener("scroll", updateArrows);
+
+    window.addEventListener("resize", updateArrows);
+
+    // даємо браузеру один кадр, щоб порахувати реальні розміри
+    // щойно вставлених карток
+    requestAnimationFrame(updateArrows);
+
+}
+
 function createProductCard(product) {
 
     const badge = product.badge

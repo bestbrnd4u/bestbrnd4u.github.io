@@ -400,6 +400,8 @@ container.innerHTML+=createProductCard(item);
 
 updateFavoriteButtons();
 
+initCarousel(document.getElementById("similarCarousel"));
+
 }
 
 init();

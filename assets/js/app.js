@@ -26,6 +26,8 @@ async function initHome() {
 
         renderProducts(featured);
 
+        initCarousel(document.getElementById("productsCarousel"));
+
         updateFavoriteButtons();
 
     } catch (error) {
