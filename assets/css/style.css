@@ -1606,6 +1606,34 @@ footer{
     transform:translateY(0);
 }
 
+/* помітне повідомлення зверху — під іконкою профілю
+   в шапці, окремо від звичайного тоста знизу */
+.top-notice{
+    position:fixed;
+    top:96px;
+    right:20px;
+    max-width:360px;
+    background:var(--primary);
+    color:#fff;
+    padding:16px 20px;
+    border-radius:14px;
+    box-shadow:var(--shadow-lg);
+    font-size:14px;
+    font-weight:600;
+    line-height:1.5;
+    z-index:9998;
+    opacity:0;
+    transform:translateY(-14px);
+    transition:.3s;
+    pointer-events:none;
+}
+
+.top-notice.show{
+    opacity:1;
+    transform:translateY(0);
+    pointer-events:auto;
+}
+
 .scroll-top{
     position:fixed;
     right:30px;

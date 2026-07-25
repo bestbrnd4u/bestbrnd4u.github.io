@@ -237,6 +237,27 @@ document.getElementById("forgotPasswordBtn")?.addEventListener("click", async ()
         return;
     }
 
+    loginError.textContent = "";
+
+    // Перевіряємо, чи взагалі є такий email у системі —
+    // без цього Supabase мовчки "надсилає лист" навіть
+    // для незареєстрованої пошти (це навмисний захист від
+    // email enumeration, детальніше — у email-exists-function.sql)
+    const { data: emailExists, error: checkError } = await supabaseClient.rpc(
+        "email_exists",
+        { check_email: email }
+    );
+
+    if (checkError) {
+        loginError.textContent = translateAuthError(checkError);
+        return;
+    }
+
+    if (!emailExists) {
+        loginError.textContent = "Такої пошти немає в системі. Зареєструйте акаунт, щоб увійти.";
+        return;
+    }
+
     const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/account.html`
     });
@@ -246,9 +267,7 @@ document.getElementById("forgotPasswordBtn")?.addEventListener("click", async ()
         return;
     }
 
-    loginError.textContent = "";
-
-    showToast("Лист для відновлення пароля надіслано на " + email);
+    showTopNotice("Лист для відновлення пароля надіслано на " + email);
 
 });
 
@@ -1082,3 +1101,40 @@ async function renderAuthState() {
 }
 
 renderAuthState();
+
+// -------------------------
+// Помітне повідомлення зверху сторінки (під іконкою
+// профілю в шапці) — використовується для важливих
+// підтверджень на цій сторінці, які легко пропустити,
+// якщо показувати їх звичайним тостом знизу
+// -------------------------
+
+function showTopNotice(text) {
+
+    let notice = document.getElementById("topNotice");
+
+    if (!notice) {
+
+        notice = document.createElement("div");
+
+        notice.id = "topNotice";
+
+        notice.className = "top-notice";
+
+        document.body.appendChild(notice);
+
+    }
+
+    notice.textContent = text;
+
+    notice.classList.add("show");
+
+    clearTimeout(window.topNoticeTimer);
+
+    window.topNoticeTimer = setTimeout(() => {
+
+        notice.classList.remove("show");
+
+    }, 5000);
+
+}
