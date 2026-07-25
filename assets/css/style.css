@@ -1110,6 +1110,7 @@ nav li.has-mega:hover .mega-menu{
     display:inline-flex;
     align-items:center;
     justify-content:center;
+    align-self:center;
     padding:4px 10px;
     border-radius:999px;
     background:var(--danger);
