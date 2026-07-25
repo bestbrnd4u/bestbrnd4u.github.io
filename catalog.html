@@ -205,6 +205,93 @@ placeholder="Пошук товару...">
 
 </div>
 
+<!-- Мобільна закріплена панель "Фільтри / Сортування" -->
+<div id="mobileFilterBar" class="mobile-filter-bar">
+<button type="button" id="mobileFiltersBtn" class="mobile-filter-btn">
+<span class="mobile-filter-btn-icon">☰</span>
+Фільтри
+<span id="mobileFiltersCount" class="mobile-filter-count" hidden>0</span>
+</button>
+</div>
+
+<!-- Мобільний повноекранний "Всі фільтри" -->
+<div id="mobileFiltersModal" class="mobile-filters-modal" hidden>
+<div class="mobile-filters-sheet">
+
+<div class="mobile-filters-screen" id="mobileFiltersMain">
+<div class="mobile-filters-head">
+<span class="mobile-filters-head-title">Всі фільтри</span>
+<button type="button" id="mobileFiltersCloseBtn" class="mobile-filters-close" aria-label="Закрити">✕</button>
+</div>
+
+<div class="mobile-filters-rows" id="mobileFiltersRows">
+<button type="button" class="mobile-filter-row" data-target="category">
+<span>Категорія</span>
+<span class="mobile-filter-row-right">
+<span class="mobile-filter-row-value" id="mfRowCategory"></span>
+<span class="mobile-filter-row-arrow">→</span>
+</span>
+</button>
+<button type="button" class="mobile-filter-row" data-target="brand">
+<span>Бренд</span>
+<span class="mobile-filter-row-right">
+<span class="mobile-filter-row-value" id="mfRowBrand"></span>
+<span class="mobile-filter-row-arrow">→</span>
+</span>
+</button>
+<button type="button" class="mobile-filter-row" data-target="color">
+<span>Колір</span>
+<span class="mobile-filter-row-right">
+<span class="mobile-filter-row-value" id="mfRowColor"></span>
+<span class="mobile-filter-row-arrow">→</span>
+</span>
+</button>
+<button type="button" class="mobile-filter-row" data-target="size">
+<span>Розмір</span>
+<span class="mobile-filter-row-right">
+<span class="mobile-filter-row-value" id="mfRowSize"></span>
+<span class="mobile-filter-row-arrow">→</span>
+</span>
+</button>
+<button type="button" class="mobile-filter-row" data-target="gender">
+<span>Стать</span>
+<span class="mobile-filter-row-right">
+<span class="mobile-filter-row-value" id="mfRowGender"></span>
+<span class="mobile-filter-row-arrow">→</span>
+</span>
+</button>
+<button type="button" class="mobile-filter-row" data-target="price">
+<span>Ціна</span>
+<span class="mobile-filter-row-right">
+<span class="mobile-filter-row-value" id="mfRowPrice"></span>
+<span class="mobile-filter-row-arrow">→</span>
+</span>
+</button>
+</div>
+
+<div class="mobile-filters-footer">
+<button type="button" id="mobileFiltersResetBtn" class="btn btn-outline">Видалити все</button>
+<button type="button" id="mobileFiltersApplyBtn" class="btn">Показати <span id="mfCount">0</span> товарів</button>
+</div>
+</div>
+
+<div class="mobile-filters-screen mobile-filters-sub" id="mobileFiltersSub" hidden>
+<div class="mobile-filters-head">
+<button type="button" id="mobileFiltersBackBtn" class="mobile-filters-back" aria-label="Назад">←</button>
+<span class="mobile-filters-head-title" id="mobileFiltersSubTitle"></span>
+<button type="button" id="mobileFiltersCloseBtn2" class="mobile-filters-close" aria-label="Закрити">✕</button>
+</div>
+
+<div class="mobile-filters-sub-content" id="mobileFiltersSubContent"></div>
+
+<div class="mobile-filters-footer">
+<button type="button" id="mobileFiltersSubApplyBtn" class="btn">Показати <span id="mfSubCount">0</span> товарів</button>
+</div>
+</div>
+
+</div>
+</div>
+
 <div id="activeFiltersBar" class="active-filters-bar" hidden>
 <div id="activeFiltersList" class="active-filters-list">
 <span class="active-filters-label">Активні фільтри:</span>
@@ -228,6 +315,7 @@ placeholder="Пошук товару...">
 
 <div class="catalog-actions">
 
+<span id="sortDropdownAnchor" hidden></span>
 <div class="sort-dropdown" id="sortDropdown">
 <button type="button" id="sortToggle" class="sort-toggle">
 Сортувати: <span id="sortLabel">За замовчуванням</span>

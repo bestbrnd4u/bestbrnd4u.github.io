@@ -148,16 +148,16 @@ function createProductCard(product) {
                     </div>
                 </div>
                 <div class="product-price">
-                    <div class="price-wrapper">
+                    <span class="price">
+                        ${formatPrice(product.price)}
+                    </span>
+                    <div class="price-meta">
                         ${oldPrice}
                         ${
                             discount > 0
                                 ? `<span class="discount">-${discount}%</span>`
                                 : ""
                         }
-                        <span class="price">
-                            ${formatPrice(product.price)}
-                        </span>
                     </div>
                 </div>
                 <button

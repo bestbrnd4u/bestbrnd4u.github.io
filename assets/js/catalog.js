@@ -1559,3 +1559,264 @@ listViewBtn?.addEventListener("click", () => setView("list"));
 setView(localStorage.getItem("catalogView") || "grid");
 
 initCatalog();
+
+// =====================================
+// МОБІЛЬНІ ФІЛЬТРИ КАТАЛОГУ
+// (закріплена панель "Фільтри/Сортування" під хедером
+// + повноекранна шторка зі списком фільтрів; на відміну
+// від старого мобільного вигляду (стек інпутів на всю
+// ширину) реальні DOM-вузли дропдаунів просто переносяться
+// в шторку і назад — без дублювання логіки фільтрації)
+// =====================================
+
+(function setupMobileFilters() {
+
+    const mobileFilterBar = document.getElementById("mobileFilterBar");
+    const mobileFiltersBtn = document.getElementById("mobileFiltersBtn");
+    const mobileFiltersCount = document.getElementById("mobileFiltersCount");
+    const mobileFiltersModal = document.getElementById("mobileFiltersModal");
+    const mobileFiltersMain = document.getElementById("mobileFiltersMain");
+    const mobileFiltersSub = document.getElementById("mobileFiltersSub");
+    const mobileFiltersSubTitle = document.getElementById("mobileFiltersSubTitle");
+    const mobileFiltersSubContent = document.getElementById("mobileFiltersSubContent");
+    const mobileFiltersCloseBtn = document.getElementById("mobileFiltersCloseBtn");
+    const mobileFiltersCloseBtn2 = document.getElementById("mobileFiltersCloseBtn2");
+    const mobileFiltersBackBtn = document.getElementById("mobileFiltersBackBtn");
+    const mobileFiltersResetBtn = document.getElementById("mobileFiltersResetBtn");
+    const mobileFiltersApplyBtn = document.getElementById("mobileFiltersApplyBtn");
+    const mobileFiltersSubApplyBtn = document.getElementById("mobileFiltersSubApplyBtn");
+    const mobileFiltersRows = document.getElementById("mobileFiltersRows");
+    const sortDropdownAnchor = document.getElementById("sortDropdownAnchor");
+    const mfCount = document.getElementById("mfCount");
+    const mfSubCount = document.getElementById("mfSubCount");
+
+    if (!mobileFilterBar || !mobileFiltersModal) return;
+
+    const mfRows = {
+        category: document.getElementById("mfRowCategory"),
+        brand: document.getElementById("mfRowBrand"),
+        color: document.getElementById("mfRowColor"),
+        size: document.getElementById("mfRowSize"),
+        gender: document.getElementById("mfRowGender"),
+        price: document.getElementById("mfRowPrice")
+    };
+
+    // реальні вузли десктопних дропдаунів, які на мобільному
+    // переносяться в шторку (без клонування — з усіма їх
+    // обробниками подій)
+    const targets = {
+        category: { el: categoryMenu, parent: categoryDropdown, title: "Категорія" },
+        brand: { el: brandMenu, parent: brandDropdown, title: "Бренд" },
+        color: { el: colorMenu, parent: colorDropdown, title: "Колір" },
+        size: { el: sizeMenu, parent: sizeDropdown, title: "Розмір" },
+        gender: { el: genderFilterEl, parent: genderFilterEl ? genderFilterEl.parentElement : null, title: "Стать" },
+        price: { el: priceMenu, parent: priceDropdown, title: "Ціна" }
+    };
+
+    const mq = window.matchMedia("(max-width:768px)");
+
+    function relocateSortDropdown() {
+
+        if (!sortDropdown) return;
+
+        if (mq.matches) {
+            mobileFilterBar.appendChild(sortDropdown);
+        } else if (sortDropdownAnchor) {
+            sortDropdownAnchor.after(sortDropdown);
+        }
+
+    }
+
+    function activeFilterCount() {
+
+        return (currentGender ? 1 : 0)
+            + selectedBrands.size
+            + selectedColors.size
+            + selectedCategories.size
+            + selectedPrices.size
+            + selectedSizes.size;
+
+    }
+
+    function refreshRowLabels() {
+
+        if (mfRows.category) mfRows.category.textContent = categoryLabel ? categoryLabel.textContent : "";
+        if (mfRows.brand) mfRows.brand.textContent = brandLabel ? brandLabel.textContent : "";
+        if (mfRows.color) mfRows.color.textContent = colorLabel ? colorLabel.textContent : "";
+        if (mfRows.size) mfRows.size.textContent = sizeLabel ? sizeLabel.textContent : "";
+        if (mfRows.price) mfRows.price.textContent = priceLabel ? priceLabel.textContent : "";
+        if (mfRows.gender) mfRows.gender.textContent = currentGender || "Всі";
+
+        const count = activeFilterCount();
+
+        if (mobileFiltersCount) {
+            mobileFiltersCount.hidden = count === 0;
+            mobileFiltersCount.textContent = count;
+        }
+
+    }
+
+    function refreshCounts() {
+
+        const n = productsCount ? productsCount.textContent : "0";
+
+        if (mfCount) mfCount.textContent = n;
+        if (mfSubCount) mfSubCount.textContent = n;
+
+    }
+
+    function returnRelocatedTargets() {
+
+        Object.values(targets).forEach(target => {
+
+            if (!target.el || !target.parent) return;
+
+            if (target.el.parentElement !== target.parent) {
+
+                target.parent.appendChild(target.el);
+
+                if (target.el.classList.contains("filter-menu")) {
+                    target.el.hidden = true;
+                }
+
+            }
+
+        });
+
+    }
+
+    function openMobileFilters() {
+
+        refreshRowLabels();
+        refreshCounts();
+
+        mobileFiltersSub.hidden = true;
+        mobileFiltersMain.hidden = false;
+        mobileFiltersModal.hidden = false;
+
+        document.body.style.overflow = "hidden";
+
+    }
+
+    function closeMobileFilters() {
+
+        returnRelocatedTargets();
+
+        mobileFiltersModal.hidden = true;
+
+        document.body.style.overflow = "";
+
+    }
+
+    function openMobileFilterSection(key) {
+
+        const target = targets[key];
+
+        if (!target || !target.el) return;
+
+        mobileFiltersSubTitle.textContent = target.title;
+        mobileFiltersSubContent.innerHTML = "";
+        mobileFiltersSubContent.appendChild(target.el);
+
+        target.el.hidden = false;
+
+        mobileFiltersMain.hidden = true;
+        mobileFiltersSub.hidden = false;
+
+        refreshCounts();
+
+    }
+
+    function backToMobileFiltersMain() {
+
+        mobileFiltersSub.hidden = true;
+        mobileFiltersMain.hidden = false;
+
+        refreshRowLabels();
+        refreshCounts();
+
+    }
+
+    mobileFiltersBtn?.addEventListener("click", openMobileFilters);
+    mobileFiltersCloseBtn?.addEventListener("click", closeMobileFilters);
+    mobileFiltersCloseBtn2?.addEventListener("click", closeMobileFilters);
+    mobileFiltersApplyBtn?.addEventListener("click", closeMobileFilters);
+    mobileFiltersSubApplyBtn?.addEventListener("click", closeMobileFilters);
+    mobileFiltersBackBtn?.addEventListener("click", backToMobileFiltersMain);
+
+    mobileFiltersResetBtn?.addEventListener("click", () => {
+
+        resetAllFilters();
+
+        refreshRowLabels();
+        refreshCounts();
+
+    });
+
+    mobileFiltersRows?.addEventListener("click", event => {
+
+        const row = event.target.closest(".mobile-filter-row");
+
+        if (!row) return;
+
+        openMobileFilterSection(row.dataset.target);
+
+    });
+
+    // тримаємо бейдж і лічильники товарів актуальними, поки
+    // шторка відкрита і користувач одразу бачить результат тапу
+    const baseRender = render;
+
+    render = function() {
+
+        baseRender();
+
+        if (!mobileFiltersModal.hidden) {
+
+            refreshCounts();
+
+            if (!mobileFiltersMain.hidden) refreshRowLabels();
+
+        }
+
+    };
+
+    function handleViewportChange() {
+
+        relocateSortDropdown();
+
+        if (!mq.matches && !mobileFiltersModal.hidden) {
+            closeMobileFilters();
+        }
+
+    }
+
+    relocateSortDropdown();
+
+    if (mq.addEventListener) {
+        mq.addEventListener("change", handleViewportChange);
+    } else {
+        mq.addListener(handleViewportChange);
+    }
+
+    // -------------------------
+    // закріплена панель ховається при скролі вниз і
+    // з'являється знову, щойно користувач скролить угору
+    // -------------------------
+
+    let lastScrollY = window.scrollY;
+
+    window.addEventListener("scroll", () => {
+
+        if (!mq.matches) return;
+
+        const currentY = window.scrollY;
+        const goingDown = currentY > lastScrollY && currentY > 140;
+
+        mobileFilterBar.classList.toggle("is-hidden", goingDown);
+
+        lastScrollY = currentY;
+
+    }, { passive: true });
+
+})();

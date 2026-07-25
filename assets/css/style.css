@@ -585,8 +585,13 @@ nav li.has-mega:hover .mega-menu{
 @media(max-width:500px){
 
     .cart-popup{
-        width:280px;
-        right:-60px;
+        position:fixed;
+        top:92px;
+        left:16px;
+        right:16px;
+        width:auto;
+        max-width:360px;
+        margin:0 auto;
     }
 
 }
@@ -1082,24 +1087,28 @@ nav li.has-mega:hover .mega-menu{
     pointer-events:none;
 }
 
-.favorite:hover{
-    background:var(--danger);
-    transform:scale(1.08);
-}
+@media (hover:hover) and (pointer:fine){
 
-.favorite:hover svg{
-    fill:#fff;
-    stroke:#fff;
+    .favorite:hover{
+        background:var(--danger);
+        transform:scale(1.08);
+    }
+
+    .favorite:hover svg{
+        fill:#fff;
+        stroke:#fff;
+    }
+
+    .favorite.active:hover svg{
+        fill:#fff;
+        stroke:#fff;
+    }
+
 }
 
 .favorite.active svg{
     fill:var(--danger);
     stroke:var(--danger);
-}
-
-.favorite.active:hover svg{
-    fill:#fff;
-    stroke:#fff;
 }
 
 .product-image .favorite{
@@ -1193,22 +1202,26 @@ nav li.has-mega:hover .mega-menu{
 
 .product-price{
     display:flex;
-    align-items:center;
-    flex-wrap:wrap;
-    gap:12px;
+    flex-direction:column;
+    gap:6px;
     margin-bottom:22px;
+    /* резервуємо місце під другий рядок (стара ціна + знижка),
+       навіть коли товар без знижки — щоб усі картки в ряду/
+       каруселі завжди мали однакову висоту незалежно від
+       довжини ціни (див. фікс "маленька ціна ламає картку") */
+    min-height:52px;
+    justify-content:center;
 }
 
-.price-wrapper{
+.price-meta{
     display:flex;
     align-items:baseline;
-    flex-wrap:wrap;
-    row-gap:6px;
+    flex-wrap:nowrap;
     gap:10px;
+    min-height:19px;
 }
 
-.price-wrapper .price,
-.price-wrapper .old-price{
+.price-meta .old-price{
     white-space:nowrap;
 }
 
@@ -1216,6 +1229,7 @@ nav li.has-mega:hover .mega-menu{
     font-size:24px;
     font-weight:800;
     color:var(--gray900);
+    white-space:nowrap;
 }
 
 .product-card .old-price{
@@ -1511,6 +1525,7 @@ footer{
     width:100%;
     height:100%;
     object-fit:cover;
+    object-position:top;
     transition:.45s;
 }
 
@@ -2472,15 +2487,20 @@ footer{
     width:100%;
     aspect-ratio:1/1;
     object-fit:cover;
+    object-position:top;
     cursor:pointer;
     border-radius:14px;
     border:2px solid transparent;
     transition:.25s;
 }
 
-.thumb:hover{
-    transform:translateY(-3px);
-    border-color:var(--primary);
+@media (hover:hover) and (pointer:fine){
+
+    .thumb:hover{
+        transform:translateY(-3px);
+        border-color:var(--primary);
+    }
+
 }
 
 .thumb.active{
@@ -2523,8 +2543,12 @@ footer{
     cursor:zoom-in;
 }
 
-.zoom-container:hover img{
-    transform:scale(1.15);
+@media (hover:hover) and (pointer:fine){
+
+    .zoom-container:hover img{
+        transform:scale(1.15);
+    }
+
 }
 
 /* -- инфо-блок товара -- */
@@ -2671,14 +2695,18 @@ footer{
     transition:.25s;
 }
 
-.favorite-btn:hover{
-    background:var(--primary);
-    border-color:var(--primary);
-}
+@media (hover:hover) and (pointer:fine){
 
-.favorite-btn:hover .favorite-btn-icon{
-    fill:#fff;
-    stroke:#fff;
+    .favorite-btn:hover{
+        background:var(--primary);
+        border-color:var(--primary);
+    }
+
+    .favorite-btn:hover .favorite-btn-icon{
+        fill:#fff;
+        stroke:#fff;
+    }
+
 }
 
 .favorite-btn.active .favorite-btn-icon{
@@ -3929,6 +3957,15 @@ footer{
         grid-template-columns:1fr;
     }
 
+    .products-grid.list-view .product-card{
+        flex-direction:column;
+    }
+
+    .products-grid.list-view .product-image{
+        width:100%;
+        height:340px;
+    }
+
     .grid{
         grid-template-columns:1fr;
     }
@@ -3947,6 +3984,17 @@ footer{
 
     .promo-banner{
         padding:45px 30px;
+    }
+
+    /* картинка в блоці "Акції" на мобільному має виглядати
+       як повноцінне фото, а не вузька обрізана смужка */
+    .promotions-grid{
+        grid-template-columns:1fr;
+    }
+
+    .promo-card-image{
+        height:auto;
+        aspect-ratio:4/5;
     }
 
     nav{
@@ -5293,4 +5341,288 @@ footer{
         font-size:30px;
     }
 
+}
+
+/* =====================================
+   МОБІЛЬНІ ФІЛЬТРИ КАТАЛОГУ
+   (закріплена панель "Фільтри" + повноекранний
+   список фільтрів, замість громіздкого стеку
+   інпутів/дропдаунів на вузьких екранах)
+===================================== */
+
+.mobile-filter-bar{
+    display:none;
+}
+
+@media(max-width:768px){
+
+    .catalog-filters-bar{
+        display:none;
+    }
+
+    .mobile-filter-bar{
+        display:flex;
+        align-items:center;
+        gap:10px;
+        position:sticky;
+        top:82px;
+        z-index:500;
+        background:#fff;
+        padding:12px 20px;
+        margin:0 -20px 20px;
+        box-shadow:0 6px 20px rgba(0,0,0,.06);
+        transition:transform .3s ease;
+    }
+
+    .mobile-filter-bar.is-hidden{
+        transform:translateY(-140%);
+    }
+
+    .mobile-filter-bar .sort-dropdown{
+        flex:1 1 auto;
+        min-width:0;
+    }
+
+    .mobile-filter-bar .sort-toggle{
+        width:100%;
+        height:44px;
+        justify-content:center;
+    }
+
+    .mobile-filter-bar .sort-menu{
+        left:auto;
+        right:0;
+        width:min(78vw,320px);
+        max-width:none;
+    }
+
+}
+
+.mobile-filter-btn{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    flex:0 0 auto;
+    height:44px;
+    padding:0 18px;
+    border-radius:12px;
+    border:1.5px solid var(--gray200);
+    background:#fff;
+    font-size:14px;
+    font-weight:700;
+    color:var(--gray900);
+    white-space:nowrap;
+}
+
+.mobile-filter-btn-icon{
+    font-size:14px;
+}
+
+.mobile-filter-count{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:19px;
+    height:19px;
+    padding:0 5px;
+    border-radius:50px;
+    background:var(--secondary);
+    color:#fff;
+    font-size:11.5px;
+    font-weight:800;
+}
+
+.mobile-filter-count[hidden]{
+    display:none;
+}
+
+/* -- повноекранна модалка "Всі фільтри" -- */
+
+.mobile-filters-modal[hidden]{
+    display:none;
+}
+
+.mobile-filters-modal{
+    position:fixed;
+    inset:0;
+    z-index:10050;
+    background:#fff;
+}
+
+.mobile-filters-sheet{
+    position:relative;
+    height:100%;
+    overflow:hidden;
+}
+
+.mobile-filters-screen{
+    position:absolute;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+    background:#fff;
+}
+
+.mobile-filters-screen[hidden]{
+    display:none;
+}
+
+.mobile-filters-head{
+    flex:0 0 auto;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:18px 20px;
+    border-bottom:1px solid var(--gray100);
+}
+
+.mobile-filters-head-title{
+    font-size:17px;
+    font-weight:800;
+    color:var(--gray900);
+}
+
+.mobile-filters-close,
+.mobile-filters-back{
+    flex:0 0 auto;
+    width:34px;
+    height:34px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:50%;
+    background:var(--gray100);
+    font-size:15px;
+    color:var(--gray700);
+}
+
+.mobile-filters-back{
+    margin-right:auto;
+}
+
+.mobile-filters-close{
+    margin-left:auto;
+}
+
+.mobile-filters-rows{
+    flex:1 1 auto;
+    overflow-y:auto;
+    padding:4px 4px 24px;
+}
+
+.mobile-filter-row{
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:18px 16px;
+    border-bottom:1px solid var(--gray100);
+    text-align:left;
+    font-size:15.5px;
+    font-weight:600;
+    color:var(--gray900);
+}
+
+.mobile-filter-row-right{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    min-width:0;
+    color:var(--gray500);
+    font-weight:500;
+}
+
+.mobile-filter-row-value{
+    max-width:150px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    font-size:14px;
+}
+
+.mobile-filter-row-arrow{
+    flex-shrink:0;
+    color:var(--gray300);
+}
+
+.mobile-filters-footer{
+    flex:0 0 auto;
+    display:flex;
+    gap:12px;
+    padding:14px 20px calc(16px + env(safe-area-inset-bottom));
+    border-top:1px solid var(--gray100);
+    box-shadow:0 -8px 24px rgba(0,0,0,.05);
+}
+
+.mobile-filters-footer .btn{
+    flex:1 1 auto;
+    justify-content:center;
+}
+
+.mobile-filters-footer .btn-outline{
+    flex:0 0 auto;
+    padding-left:18px;
+    padding-right:18px;
+}
+
+.mobile-filters-sub-content{
+    flex:1 1 auto;
+    overflow-y:auto;
+    padding:14px 16px 24px;
+}
+
+/* коли реальні елементи дропдаунів (categoryMenu/brandMenu/...)
+   переносяться JS-ом всередину мобільної шторки — знімаємо
+   з них абсолютне позиціювання та обмеження висоти, які їм
+   потрібні лише для десктопного попапу */
+.mobile-filters-sub-content .filter-menu{
+    position:static;
+    box-shadow:none;
+    padding:0;
+    min-width:0;
+    max-height:none;
+    overflow:visible;
+    border-radius:0;
+}
+
+.mobile-filters-sub-content .filter-menu-options{
+    max-height:none;
+    overflow:visible;
+}
+
+.mobile-filters-sub-content .filter-option{
+    padding:13px 10px;
+    font-size:15px;
+    white-space:normal;
+}
+
+.mobile-filters-sub-content .filter-option-clear{
+    padding:12px 10px;
+}
+
+.mobile-filters-sub-content .filter-size-chips{
+    padding:0 0 6px;
+}
+
+.mobile-filters-sub-content .gender-filter{
+    flex-direction:column;
+    gap:0;
+}
+
+.mobile-filters-sub-content .gender-pill{
+    justify-content:flex-start;
+    border:none;
+    border-bottom:1px solid var(--gray100);
+    border-radius:0;
+    padding:14px 10px;
+    font-size:15px;
+    background:transparent;
+}
+
+.mobile-filters-sub-content .gender-pill.active{
+    background:transparent;
+    color:var(--secondary);
 }

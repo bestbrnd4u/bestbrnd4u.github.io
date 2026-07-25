@@ -951,6 +951,41 @@ if (scrollTopBtn) {
 }
 
 // -------------------------
+// Плавний підйом до фото товару при зміні кольору
+// -------------------------
+
+// Хедер зафіксований зверху (position:fixed), тому при скролі
+// до фото додаємо невеликий відступ, щоб верх фото не ховався під ним.
+const PRODUCT_IMAGE_SCROLL_OFFSET = 96;
+
+function scrollProductImageIntoView() {
+
+    const mainPhoto = document.querySelector(".main-photo");
+
+    if (!mainPhoto) return;
+
+    const rect = mainPhoto.getBoundingClientRect();
+
+    // якщо верх фото й так вже видно під хедером — нікуди не скролимо,
+    // щоб не смикати сторінку зайвий раз
+    if (rect.top >= PRODUCT_IMAGE_SCROLL_OFFSET) return;
+
+    const targetY = Math.max(
+        window.scrollY + rect.top - PRODUCT_IMAGE_SCROLL_OFFSET,
+        0
+    );
+
+    window.scrollTo({
+
+        top: targetY,
+
+        behavior: "smooth"
+
+    });
+
+}
+
+// -------------------------
 // Делегування подій
 // -------------------------
 
@@ -1052,6 +1087,14 @@ document.addEventListener("click", event => {
                 console.warn("Не вдалося оновити галерею", error);
 
             }
+
+            // перебудова галереї (інша кількість мініатюр тощо) могла
+            // зсунути вміст сторінки, і сторінка ніби "стрибала".
+            // Замість цього плавно піднімаємо сторінку так, щоб було
+            // видно верх фото з новим кольором — але тільки якщо фото
+            // й так вже не в зоні видимості під хедером, щоб зайвий раз
+            // не смикати сторінку, якщо воно й так видно.
+            scrollProductImageIntoView();
 
         }
 
