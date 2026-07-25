@@ -35,6 +35,7 @@ function main() {
 
         const filePath = path.join(PROMOTIONS_DIR, file);
         const data = JSON.parse(fs.readFileSync(filePath, "utf8"));
+        const slug = file.replace(/\.json$/, "");
 
         if (!data.title || !data.image || !data.link) {
 
@@ -53,12 +54,16 @@ function main() {
         }
 
         promotions.push({
+            slug,
             title: data.title,
             text: data.text || "",
             badge: data.badge || "",
             image: data.image,
             buttonText: data.buttonText || "Дивитись усі товари",
             link: data.link,
+            brand: data.brand || "",
+            discountPercent: typeof data.discountPercent === "number" ? data.discountPercent : null,
+            productIds: Array.isArray(data.products) ? data.products.map(Number) : [],
             order: typeof data.order === "number" ? data.order : 1
         });
 

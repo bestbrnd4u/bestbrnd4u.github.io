@@ -672,6 +672,13 @@ nav li.has-mega:hover .mega-menu{
     max-width:520px;
 }
 
+.hero-buttons{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:18px;
+}
+
 .hero .btn{
     font-size:18px;
 }
@@ -3903,6 +3910,17 @@ footer{
         margin:auto;
     }
 
+    .hero-buttons{
+        flex-direction:column;
+        align-items:stretch;
+        gap:14px;
+        width:100%;
+    }
+
+    .hero-buttons .btn{
+        width:100%;
+    }
+
     .products-grid{
         grid-template-columns:1fr;
     }
@@ -5207,4 +5225,72 @@ footer{
 .saved-address-chip-meta{
     font-size:12px;
     color:var(--gray500);
+}
+
+/* =====================================
+   ОКРЕМА СТОРІНКА АКЦІЇ (promo.html)
+===================================== */
+
+.promo-hero{
+    padding:40px 0 20px;
+}
+
+.promo-hero-banner{
+    border-radius:30px;
+    overflow:hidden;
+    padding:70px 60px;
+    color:#fff;
+    background-color:#111827;
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+}
+
+.promo-hero-content{
+    max-width:650px;
+}
+
+.promo-hero-badge{
+    display:inline-block;
+    padding:8px 18px;
+    background:var(--danger);
+    border-radius:50px;
+    margin-bottom:20px;
+    font-size:14px;
+    font-weight:700;
+    letter-spacing:.04em;
+}
+
+.promo-hero-badge[hidden]{
+    display:none;
+}
+
+.promo-hero-content h1{
+    color:#fff;
+    font-size:42px;
+    margin-bottom:16px;
+}
+
+.promo-hero-content p{
+    color:rgba(255,255,255,.88);
+    font-size:17px;
+    line-height:1.6;
+    margin-bottom:32px;
+    max-width:520px;
+}
+
+.promo-products{
+    padding:50px 0 80px;
+}
+
+@media(max-width:768px){
+
+    .promo-hero-banner{
+        padding:44px 28px;
+    }
+
+    .promo-hero-content h1{
+        font-size:30px;
+    }
+
 }

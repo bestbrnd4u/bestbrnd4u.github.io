@@ -276,11 +276,46 @@ collections:
         required: true
         default: "Дивитись усі товари"
 
-      - label: "Посилання кнопки"
+      - label: "Посилання кнопки на сторінці акції"
         name: "link"
         widget: "string"
         required: true
-        hint: "Наприклад: catalog.html?section=sale або catalog.html?brand=Guess"
+        hint: >
+          Куди веде кнопка "Дивитись усі товари" на сторінці самої акції.
+          Наприклад: catalog.html?section=sale. Картка на головній сторінці
+          завжди веде на окрему сторінку цієї акції автоматично.
+
+      - label: "Бренд, який бере участь в акції"
+        name: "brand"
+        widget: "string"
+        required: false
+        hint: >
+          Необов'язково. Якщо вказати бренд (наприклад: Guess) — усі товари
+          цього бренду автоматично покажуться на сторінці акції, навіть
+          якщо їх не додано нижче вручну.
+
+      - label: "Знижка за замовчуванням, %"
+        name: "discountPercent"
+        widget: "number"
+        value_type: "int"
+        required: false
+        hint: >
+          Наприклад: 30. Показується як позначка на товарах з цієї акції,
+          якщо в самого товару не вказана своя ціна зі знижкою.
+
+      - label: "Товари цієї акції"
+        name: "products"
+        widget: "relation"
+        collection: "products"
+        multiple: true
+        required: false
+        search_fields: ["title", "brand", "category"]
+        display_fields: ["title"]
+        value_field: "id"
+        hint: >
+          Оберіть конкретні товари для акції вручну — почніть вводити назву,
+          бренд або категорію, щоб знайти потрібні. Не обов'язково, якщо
+          вище вказано бренд — тоді досить і цього.
 
   - name: "categories"
     label: "Категорії"

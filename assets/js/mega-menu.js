@@ -50,10 +50,10 @@
         const genderColumn = `
             <div class="mega-col">
                 <div class="mega-col-title">За статтю</div>
-                <a href="catalog.html?gender=Жінкам">Жінкам</a>
-                <a href="catalog.html?gender=Чоловікам">Чоловікам</a>
-                <a href="catalog.html?gender=Унісекс">Унісекс</a>
-                <a href="catalog.html?gender=Дітям">Дітям</a>
+                <a href="catalog?gender=Жінкам">Жінкам</a>
+                <a href="catalog?gender=Чоловікам">Чоловікам</a>
+                <a href="catalog?gender=Унісекс">Унісекс</a>
+                <a href="catalog?gender=Дітям">Дітям</a>
             </div>
         `;
 
@@ -61,7 +61,7 @@
             <div class="mega-col">
                 <div class="mega-col-title">${department}</div>
                 ${names.map(name => `
-                    <a href="catalog.html?category=${encodeURIComponent(name)}">${name}</a>
+                    <a href="catalog?category=${encodeURIComponent(name)}">${name}</a>
                 `).join("")}
             </div>
         `).join("");

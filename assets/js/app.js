@@ -152,7 +152,7 @@ function renderCategories(categories) {
     if (gridEl && Array.isArray(categories.items)) {
 
         gridEl.innerHTML = categories.items.map(item => `
-            <a href="${item.link || "catalog.html"}" class="category">
+            <a href="${item.link || "catalog"}" class="category">
                 <img
                     src="${item.image || "assets/images/no-image.png"}"
                     alt="${item.label || ""}"
@@ -203,7 +203,7 @@ function renderBrands(brands) {
     if (gridEl && Array.isArray(brands.items)) {
 
         gridEl.innerHTML = brands.items.map(item => `
-            <a href="${item.link || "catalog.html"}" class="brand-card">${item.name || ""}</a>
+            <a href="${item.link || "catalog"}" class="brand-card">${item.name || ""}</a>
         `).join("");
 
     }
@@ -257,7 +257,7 @@ async function initPromotions() {
         }
 
         grid.innerHTML = promotions.map(promo => `
-            <a href="${promo.link}" class="promo-card">
+            <a href="promo?id=${encodeURIComponent(promo.slug)}" class="promo-card">
 
                 <div class="promo-card-image">
                     <img

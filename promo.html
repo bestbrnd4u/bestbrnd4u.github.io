@@ -2,21 +2,21 @@
 <html lang="uk">
 
 <head>
-
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Товар | Bagvero</title>
-
+<meta name="description" content="Акції та знижки Bagvero">
+<meta name="theme-color" content="#111827">
 <link rel="icon" href="favicon.ico" sizes="any">
     <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicon-16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="assets/images/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="192x192" href="assets/images/favicon-192.png">
-
+<title id="pageTitle">Акція | Bagvero</title>
 <link rel="stylesheet" href="assets/css/style.css">
-
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+rel="stylesheet">
 <!-- MailerLite Universal -->
 <script>
     (function(w,d,e,u,f,l,n){w[f]=w[f]||function(){(w[f].q=w[f].q||[])
@@ -35,58 +35,39 @@
 <body>
 
 <header>
-
 <div class="container header">
-
-<a href="/" class="logo">
-
-Bagvero
-
-</a>
-
+<a href="/" class="logo">Bagvero</a>
 <nav>
-
 <ul>
-
 <li><a href="/">Головна</a></li>
-
 <li class="has-mega"><a href="catalog" id="navCatalogLink">Каталог</a><div class="mega-menu" id="catalogMegaMenu">
 <a class="mega-item" href="catalog?gender=Жінкам"><img src="https://images.pexels.com/photos/932401/pexels-photo-932401.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Жінкам"><span>Жінкам</span></a>
 <a class="mega-item" href="catalog?gender=Чоловікам"><img src="https://images.pexels.com/photos/7869755/pexels-photo-7869755.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Чоловікам"><span>Чоловікам</span></a>
 <a class="mega-item" href="catalog?gender=Унісекс"><img src="https://images.pexels.com/photos/10425471/pexels-photo-10425471.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Унісекс"><span>Унісекс</span></a>
 <a class="mega-item" href="catalog?gender=Дітям"><img src="https://images.pexels.com/photos/7269547/pexels-photo-7269547.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Дітям"><span>Дітям</span></a>
 </div></li>
-
 <li class="has-mega"><a href="catalog?section=new" id="navNewLink">Новинки</a><div class="mega-menu">
 <a class="mega-item" href="catalog?section=new&gender=Жінкам"><img src="https://images.pexels.com/photos/932401/pexels-photo-932401.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Жінкам"><span>Жінкам</span></a>
 <a class="mega-item" href="catalog?section=new&gender=Чоловікам"><img src="https://images.pexels.com/photos/7869755/pexels-photo-7869755.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Чоловікам"><span>Чоловікам</span></a>
 <a class="mega-item" href="catalog?section=new&gender=Унісекс"><img src="https://images.pexels.com/photos/10425471/pexels-photo-10425471.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Унісекс"><span>Унісекс</span></a>
 <a class="mega-item" href="catalog?section=new&gender=Дітям"><img src="https://images.pexels.com/photos/7269547/pexels-photo-7269547.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Дітям"><span>Дітям</span></a>
 </div></li>
-
-<li class="has-mega"><a href="catalog?section=sale" id="navSaleLink" class="sale-text">Акції</a><div class="mega-menu">
+<li class="has-mega"><a href="catalog?section=sale" id="navSaleLink" class="sale-text active">Акції</a><div class="mega-menu">
 <a class="mega-item" href="catalog?section=sale&gender=Жінкам"><img src="https://images.pexels.com/photos/932401/pexels-photo-932401.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Жінкам"><span>Жінкам</span></a>
 <a class="mega-item" href="catalog?section=sale&gender=Чоловікам"><img src="https://images.pexels.com/photos/7869755/pexels-photo-7869755.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Чоловікам"><span>Чоловікам</span></a>
 <a class="mega-item" href="catalog?section=sale&gender=Унісекс"><img src="https://images.pexels.com/photos/10425471/pexels-photo-10425471.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Унісекс"><span>Унісекс</span></a>
 <a class="mega-item" href="catalog?section=sale&gender=Дітям"><img src="https://images.pexels.com/photos/7269547/pexels-photo-7269547.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Дітям"><span>Дітям</span></a>
 </div></li>
-
 <li><a href="contacts">Контакти</a></li>
-
 </ul>
-
 </nav>
-
 <div class="header-icons">
-
 <button id="searchBtn">🔍</button>
 <a href="account" id="accountLink">👤</a>
-
 <a href="favorites">
 ❤
 <span id="favCount">0</span>
 </a>
-
 <div class="cart-icon-wrap">
     <a href="cart" id="cartIconLink">
         🛒
@@ -94,159 +75,146 @@ Bagvero
     </a>
     <div id="cartPopup" class="cart-popup" hidden></div>
 </div>
-
 </div>
-
 </div>
-
 </header>
 
 <section class="breadcrumbs">
-
-<div class="container">
-
+<div class="container" id="breadcrumbsList">
 <a href="/">Головна</a>
-
 <span class="crumb-sep">→</span>
-
-<a href="catalog">Каталог</a>
-
+<a href="catalog?section=sale">Акції</a>
 <span class="crumb-sep">→</span>
-
-<span id="breadTitle">
-
-Товар
-
-</span>
-
+<span id="breadcrumbTitle">Акція</span>
 </div>
-
 </section>
 
-<section class="product-page-section">
-
-<div class="container">
-
-<div id="productPage">
-
+<div id="promoLoader" class="loader">
+    <div class="spinner"></div>
 </div>
 
-</div>
+<section class="promo-hero" id="promoHero" hidden>
 
-</section>
+    <div class="container">
 
-<section class="similar">
+        <div class="promo-hero-banner" id="promoHeroBanner">
 
-<div class="container">
+            <div class="promo-hero-content">
 
-<h2>
+                <span class="promo-hero-badge" id="promoHeroBadge" hidden></span>
 
-Схожі товари
+                <h1 id="promoHeroTitle"></h1>
 
-</h2>
+                <p id="promoHeroText" hidden></p>
 
-<div class="carousel" id="similarCarousel">
+                <a href="catalog" id="promoHeroLink" class="btn">
+                    <span id="promoHeroLinkText">Дивитись усі товари</span>
+                </a>
 
-    <button type="button" class="carousel-arrow carousel-prev" aria-label="Попередні товари">
-        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
-    </button>
+            </div>
 
-    <div
-    id="similarProducts"
-    class="products-grid carousel-track">
+        </div>
 
     </div>
 
-    <button type="button" class="carousel-arrow carousel-next" aria-label="Наступні товари">
-        <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
-    </button>
+</section>
 
-</div>
+<section class="promo-products" id="promoProductsSection" hidden>
 
-</div>
+    <div class="container">
+
+        <div class="catalog-top">
+            <p>
+                У цій акції
+                <span id="promoProductsCount">0</span>
+                товарів
+            </p>
+        </div>
+
+        <div id="promoProductsGrid" class="products-grid"></div>
+
+    </div>
 
 </section>
 
+<div id="promoNotFound" class="empty-state" hidden>
+    <h2>😔</h2>
+    <p>Цю акцію не знайдено або її вже завершено</p>
+    <a href="catalog" class="btn">Перейти до каталогу</a>
+</div>
+
+<section class="newsletter">
+<div class="container">
+<div class="ml-embedded" data-form="vKcNi2"></div>
+<small>
+Жодного спаму.
+Тільки акції та нові колекції.
+</small>
+</div>
+</section>
+
 <footer>
-
 <div class="container footer">
-
 <div>
-
 <h3>Bagvero</h3>
-
 <p>
 Інтернет-магазин сумок
 та аксесуарів.
 </p>
-
 <div class="footer-social">
-<a href="https://www.instagram.com/bestbrnd4u" target="_blank" rel="noopener" aria-label="Instagram">Instagram</a>
-<a href="#" aria-label="Facebook">Facebook</a>
-<a href="#" aria-label="Telegram">Telegram</a>
+<a href="https://www.instagram.com/bestbrnd4u" target="_blank" rel="noopener" aria-label="Instagram">
+Instagram
+</a>
+<a href="#" aria-label="Facebook">
+Facebook
+</a>
+<a href="#" aria-label="Telegram">
+Telegram
+</a>
 </div>
-
 </div>
-
 <div>
-
 <h3>Покупцям</h3>
-
 <a href="#">Доставка</a>
 <a href="#">Оплата</a>
 <a href="#">Гарантія</a>
-
 </div>
-
 <div>
-
 <h3>Каталог</h3>
-
 <a href="catalog">Всі товари</a>
 <a href="catalog?section=new">Новинки</a>
 <a href="catalog?section=sale" class="sale-text">Акції</a>
 <a href="#">Бренди</a>
-
 </div>
-
 <div>
-
 <h3>Зв'яжіться з нами</h3>
-
 <p>📍 Україна</p>
 <p>✉ info@bagvero.ua</p>
 <p>☎ +380 XX XXX XX XX</p>
 <p>🕘 Пн–Нд 09:00–20:00</p>
-
 </div>
-
 </div>
-
 </footer>
 
 <div class="copyright">
-
 <div class="container">
-
 © 2026 bagvero.
 Всі права захищені.
-
+</div>
 </div>
 
-</div>
-
-<button id="scrollTop" class="scroll-top" aria-label="Нагору">↑</button>
+<button
+id="scrollTop"
+class="scroll-top"
+aria-label="Нагору">
+↑
+</button>
 
 <script src="assets/js/supabase-client.js"></script>
 <script src="assets/js/common.js"></script>
 <script src="assets/js/mega-menu.js"></script>
-
 <script src="assets/js/ui.js"></script>
-
-<script src="assets/js/app.js"></script>
-
-<script src="assets/js/product.js"></script>
-
+<script src="assets/js/promo.js"></script>
 </body>
 
 </html>

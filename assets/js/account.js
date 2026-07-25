@@ -1,6 +1,6 @@
 // ======================================
 // account.js
-// Логіка сторінки особистого кабінету (account.html):
+// Логіка сторінки особистого кабінету (account):
 // вхід, реєстрація, вихід, історія замовлень.
 // ======================================
 
@@ -259,7 +259,7 @@ document.getElementById("forgotPasswordBtn")?.addEventListener("click", async ()
     }
 
     const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/account.html`
+        redirectTo: `${window.location.origin}/account`
     });
 
     if (error) {
@@ -744,7 +744,7 @@ changePasswordBtn?.addEventListener("click", async () => {
     changePasswordBtn.disabled = true;
 
     const { error } = await supabaseClient.auth.resetPasswordForEmail(user.email, {
-        redirectTo: `${window.location.origin}/account.html`
+        redirectTo: `${window.location.origin}/account`
     });
 
     changePasswordBtn.disabled = false;

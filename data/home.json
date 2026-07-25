@@ -5,7 +5,7 @@
     "text": "Понад 500 оригінальних моделей від світових брендів. Швидка доставка, зручна оплата та гарантія якості.",
     "image": "https://images.pexels.com/photos/5745781/pexels-photo-5745781.jpeg?auto=compress&cs=tinysrgb&w=1600",
     "primaryButtonText": "Перейти до каталогу",
-    "primaryButtonLink": "catalog.html",
+    "primaryButtonLink": "catalog",
     "secondaryButtonText": "Популярні товари",
     "secondaryButtonLink": "#products"
   },
@@ -21,22 +21,22 @@
       {
         "label": "Жінкам",
         "image": "https://images.pexels.com/photos/932401/pexels-photo-932401.jpeg?auto=compress&cs=tinysrgb&w=800",
-        "link": "catalog.html?gender=Жінкам"
+        "link": "catalog?gender=Жінкам"
       },
       {
         "label": "Чоловікам",
         "image": "https://images.pexels.com/photos/7869755/pexels-photo-7869755.jpeg?auto=compress&cs=tinysrgb&w=800",
-        "link": "catalog.html?gender=Чоловікам"
+        "link": "catalog?gender=Чоловікам"
       },
       {
         "label": "Унісекс",
         "image": "https://images.pexels.com/photos/10425471/pexels-photo-10425471.jpeg?auto=compress&cs=tinysrgb&w=800",
-        "link": "catalog.html?gender=Унісекс"
+        "link": "catalog?gender=Унісекс"
       },
       {
         "label": "Дітям",
         "image": "https://images.pexels.com/photos/7269547/pexels-photo-7269547.jpeg?auto=compress&cs=tinysrgb&w=800",
-        "link": "catalog.html?gender=Дітям"
+        "link": "catalog?gender=Дітям"
       }
     ]
   },
@@ -46,34 +46,34 @@
     "text": "Guess, Michael Kors, Calvin Klein, Tommy Hilfiger, Furla та багато інших — перші оглядайте новинки сезону.",
     "image": "https://images.pexels.com/photos/336372/pexels-photo-336372.jpeg?auto=compress&cs=tinysrgb&w=1600",
     "buttonText": "Дивитися новинки",
-    "buttonLink": "catalog.html?section=new"
+    "buttonLink": "catalog?section=new"
   },
   "brands": {
     "title": "Популярні бренди",
     "items": [
       {
         "name": "GUESS",
-        "link": "catalog.html?brand=Guess"
+        "link": "catalog?brand=Guess"
       },
       {
         "name": "MICHAEL KORS",
-        "link": "catalog.html?brand=Michael%20Kors"
+        "link": "catalog?brand=Michael%20Kors"
       },
       {
         "name": "CALVIN KLEIN",
-        "link": "catalog.html?brand=Calvin%20Klein"
+        "link": "catalog?brand=Calvin%20Klein"
       },
       {
         "name": "TOMMY HILFIGER",
-        "link": "catalog.html?brand=Tommy%20Hilfiger"
+        "link": "catalog?brand=Tommy%20Hilfiger"
       },
       {
         "name": "FURLA",
-        "link": "catalog.html?brand=Furla"
+        "link": "catalog?brand=Furla"
       },
       {
         "name": "LOVE MOSCHINO",
-        "link": "catalog.html?brand=Love%20Moschino"
+        "link": "catalog?brand=Love%20Moschino"
       }
     ]
   },

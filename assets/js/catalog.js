@@ -1014,14 +1014,14 @@ function setupGenderFilter() {
 
 function renderBreadcrumbsAndTitle() {
 
-    const crumbs = [`<a href="index.html">Головна</a>`];
+    const crumbs = [`<a href="/">Головна</a>`];
 
     let title = "Каталог сумок";
     let subtitle = "Понад 500 моделей від світових брендів";
 
     if (currentSection === "new") {
 
-        crumbs.push(`<span class="crumb-sep">→</span>`, `<a href="catalog.html?section=new">Новинки</a>`);
+        crumbs.push(`<span class="crumb-sep">→</span>`, `<a href="catalog?section=new">Новинки</a>`);
         title = "Новинки";
         subtitle = "Останні надходження до каталогу Bagvero";
 
@@ -1033,7 +1033,7 @@ function renderBreadcrumbsAndTitle() {
 
     } else {
 
-        crumbs.push(`<span class="crumb-sep">→</span>`, `<a href="catalog.html">Каталог</a>`);
+        crumbs.push(`<span class="crumb-sep">→</span>`, `<a href="catalog">Каталог</a>`);
 
     }
 

@@ -243,8 +243,8 @@ function showCartPopup(product, selection = {}) {
             <span>${formatPrice(subtotal)}</span>
         </div>
 
-        <a href="checkout.html" class="btn">Оформити замовлення</a>
-        <a href="cart.html" class="cart-popup-link">Перейти до кошика</a>
+        <a href="checkout" class="btn">Оформити замовлення</a>
+        <a href="cart" class="cart-popup-link">Перейти до кошика</a>
     `;
 
     popup.hidden = false;
@@ -605,19 +605,19 @@ function buildSearchOverlay() {
 
                     <div class="search-promo-banners">
 
-                        <a href="catalog.html?gender=Чоловікам" class="search-promo-banner" style="background-image:linear-gradient(rgba(15,23,41,.35),rgba(15,23,41,.55)),url('https://images.pexels.com/photos/7869755/pexels-photo-7869755.jpeg?auto=compress&cs=tinysrgb&w=600')">
+                        <a href="catalog?gender=Чоловікам" class="search-promo-banner" style="background-image:linear-gradient(rgba(15,23,41,.35),rgba(15,23,41,.55)),url('https://images.pexels.com/photos/7869755/pexels-photo-7869755.jpeg?auto=compress&cs=tinysrgb&w=600')">
                             <span>Чоловікам</span>
                         </a>
 
-                        <a href="catalog.html?gender=Жінкам" class="search-promo-banner" style="background-image:linear-gradient(rgba(15,23,41,.35),rgba(15,23,41,.55)),url('https://images.pexels.com/photos/932401/pexels-photo-932401.jpeg?auto=compress&cs=tinysrgb&w=600')">
+                        <a href="catalog?gender=Жінкам" class="search-promo-banner" style="background-image:linear-gradient(rgba(15,23,41,.35),rgba(15,23,41,.55)),url('https://images.pexels.com/photos/932401/pexels-photo-932401.jpeg?auto=compress&cs=tinysrgb&w=600')">
                             <span>Жінкам</span>
                         </a>
 
-                        <a href="catalog.html?section=new" class="search-promo-banner search-promo-new">
+                        <a href="catalog?section=new" class="search-promo-banner search-promo-new">
                             <span>Новинки</span>
                         </a>
 
-                        <a href="catalog.html?section=sale" class="search-promo-banner search-promo-sale">
+                        <a href="catalog?section=sale" class="search-promo-banner search-promo-sale">
                             <span>Акції</span>
                         </a>
 
@@ -638,7 +638,7 @@ function buildSearchOverlay() {
                         <p id="searchNoResults" class="search-no-results" hidden>
                             Нічого не знайдено. Спробуйте інший запит.
                         </p>
-                        <a href="catalog.html" id="searchSeeAll" class="search-see-all" hidden>
+                        <a href="catalog" id="searchSeeAll" class="search-see-all" hidden>
                             Показати всі результати →
                         </a>
                     </div>
@@ -728,7 +728,7 @@ async function runGlobalSearch(query) {
         const image = product.images?.[0] || "assets/images/no-image.png";
 
         return `
-            <a href="product.html?id=${product.id}" class="search-result-card">
+            <a href="product?id=${product.id}" class="search-result-card">
                 <div class="search-result-image">
                     <img src="${image}" alt="${product.title}" onerror="this.src='assets/images/no-image.png'">
                 </div>
@@ -749,7 +749,7 @@ async function runGlobalSearch(query) {
     noResultsEl.hidden = matches.length !== 0;
 
     seeAllEl.hidden = matches.length === 0;
-    seeAllEl.href = `catalog.html?search=${encodeURIComponent(query.trim())}`;
+    seeAllEl.href = `catalog?search=${encodeURIComponent(query.trim())}`;
 
 }
 
@@ -841,7 +841,7 @@ function openSearchOverlay() {
 
                 saveRecentSearch(input.value);
 
-                window.location.href = `catalog.html?search=${encodeURIComponent(input.value.trim())}`;
+                window.location.href = `catalog?search=${encodeURIComponent(input.value.trim())}`;
 
             } else if (event.key === "Escape") {
 
@@ -1117,7 +1117,7 @@ document.addEventListener("click", function (e) {
 
         const id = card.dataset.id;
 
-        window.location.href = `product.html?id=${id}`;
+        window.location.href = `product?id=${id}`;
 
     }
 

@@ -6,5 +6,8 @@
   "text": "Guess, Michael Kors, Calvin Klein, Tommy Hilfiger, Furla",
   "image": "https://images.pexels.com/photos/8289255/pexels-photo-8289255.jpeg?auto=compress&cs=tinysrgb&w=1200",
   "buttonText": "Дивитись усі товари",
-  "link": "catalog.html?section=sale"
+  "link": "catalog?section=sale",
+  "brand": "Guess",
+  "discountPercent": 30,
+  "products": [2, 4, 5]
 }

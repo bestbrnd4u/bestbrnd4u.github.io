@@ -1,6 +1,6 @@
 // ======================================
 // cart.js
-// Логіка сторінки кошика (cart.html)
+// Логіка сторінки кошика (cart)
 // ======================================
 
 let allProducts = [];
@@ -124,7 +124,7 @@ function renderCart() {
         return `
             <div class="cart-item" data-id="${line.id}" data-color="${line.color || ""}" data-size="${line.size || ""}">
 
-                <a href="product.html?id=${line.id}" class="cart-item-image">
+                <a href="product?id=${line.id}" class="cart-item-image">
                     <img
                         src="${image}"
                         alt="${product.title}"
@@ -133,7 +133,7 @@ function renderCart() {
 
                 <div class="cart-item-info">
                     <div class="cart-item-brand">${product.brand || ""}</div>
-                    <a href="product.html?id=${line.id}" class="cart-item-title">
+                    <a href="product?id=${line.id}" class="cart-item-title">
                         ${product.title}
                     </a>
                     <div class="product-options cart-item-options">
@@ -333,7 +333,7 @@ checkoutBtn?.addEventListener("click", () => {
 
     if (getCart().length === 0) return;
 
-    window.location.href = "checkout.html";
+    window.location.href = "checkout";
 
 });
 

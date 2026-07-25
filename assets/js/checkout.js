@@ -1,6 +1,6 @@
 // ======================================
 // checkout.js
-// Логіка сторінки оформлення замовлення (checkout.html)
+// Логіка сторінки оформлення замовлення (checkout)
 // ======================================
 
 const FORM_TARGET_EMAIL = "b8e2e26d0dab4962153e7c42bfab1499";
@@ -365,12 +365,12 @@ function renderOrderSummary() {
         return `
             <div class="order-item">
 
-                <a href="product.html?id=${product.id}" class="order-item-image">
+                <a href="product?id=${product.id}" class="order-item-image">
                     <img src="${image}" alt="${product.title}" onerror="this.src='assets/images/no-image.png'">
                 </a>
 
                 <div class="order-item-info">
-                    <a href="product.html?id=${product.id}" class="order-item-title">${product.title}</a>
+                    <a href="product?id=${product.id}" class="order-item-title">${product.title}</a>
                     <span class="order-item-meta">
                         ${metaParts.join(" · ")}
                     </span>
@@ -818,7 +818,7 @@ checkoutForm?.addEventListener("submit", event => {
 
                 saveCart([]);
 
-                window.location.href = "thanks.html";
+                window.location.href = "thanks";
 
             });
 
