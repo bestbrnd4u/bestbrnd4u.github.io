@@ -6,7 +6,11 @@ let products=[];
 
 async function init(){
 
+try {
+
 const response=await fetch("data/products.json");
+
+if (!response.ok) throw new Error("Не вдалося завантажити товари");
 
 products=await response.json();
 
@@ -25,6 +29,16 @@ renderProduct(product);
 renderSimilar(product);
 
 updateFavoriteButtons();
+
+} catch (error) {
+
+console.error(error);
+
+document.getElementById("productPage").innerHTML = `
+    <p class="error">Помилка завантаження товару. Спробуйте оновити сторінку.</p>
+`;
+
+}
 
 }
 
@@ -119,11 +133,7 @@ function renderProduct(product) {
 
         <div class="price-box">
 
-            <span class="old-price">
-
-                ${product.oldPrice ? formatPrice(product.oldPrice) : ""}
-
-            </span>
+            ${product.oldPrice ? `<span class="old-price">${formatPrice(product.oldPrice)}</span>` : ""}
 
             <span class="price">
 
@@ -299,6 +309,20 @@ ${sizeButtons}
 
     });
 
+    document.querySelectorAll(".size").forEach(button => {
+
+        button.addEventListener("click", function () {
+
+            document.querySelectorAll(".size").forEach(item => item.classList.remove("active"));
+
+            this.classList.add("active");
+
+            updateFavoriteButtons();
+
+        });
+
+    });
+
 }
 
 // Викликається з common.js при кліку на колір на сторінці товару —
@@ -349,11 +373,20 @@ function updateGalleryForColor(images) {
 
 function renderSimilar(product){
 
-const list=products.filter(item=>
+    const others = products.filter(item => item.id !== product.id);
 
-item.id!==product.id
+    // спочатку товари тієї ж категорії, потім — тієї ж статі,
+    // і лише як останній варіант — будь-які інші, щоб блок
+    // не був порожнім навіть для рідкісних категорій
+    const sameCategory = others.filter(item => item.category === product.category);
+    const sameGender = others.filter(item =>
+        item.gender === product.gender && item.category !== product.category
+    );
+    const rest = others.filter(item =>
+        item.category !== product.category && item.gender !== product.gender
+    );
 
-).slice(0,4);
+    const list = [...sameCategory, ...sameGender, ...rest].slice(0, 4);
 
 const container=document.getElementById("similarProducts");
 
@@ -366,20 +399,6 @@ container.innerHTML+=createProductCard(item);
 });
 
 updateFavoriteButtons();
-
-    document.querySelectorAll(".size").forEach(button=>{
-
-    button.onclick=function(){
-
-        document.querySelectorAll(".size").forEach(item=>item.classList.remove("active"));
-
-        this.classList.add("active");
-
-        updateFavoriteButtons();
-
-    }
-
-});
 
 }
 
