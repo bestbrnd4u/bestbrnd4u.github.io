@@ -1681,6 +1681,13 @@ footer{
     pointer-events:auto;
 }
 
+/* коли відкрита мобільна шторка "Всі фільтри" — ховаємо кнопку
+   "нагору", інакше вона накладається на футер шторки */
+body.mobile-filters-open .scroll-top{
+    opacity:0;
+    pointer-events:none;
+}
+
 /* =====================================
    LOADER / SPINNER / EMPTY STATE
 ===================================== */
@@ -2163,7 +2170,9 @@ footer{
     padding:0 12px 0 34px;
     border:1.5px solid var(--gray200);
     border-radius:10px;
-    font-size:13.5px;
+    /* мінімум 16px, інакше Safari на iOS автоматично зумить
+       сторінку при фокусі на полі пошуку категорії/бренду */
+    font-size:16px;
     background:var(--gray50);
 }
 
@@ -2348,7 +2357,7 @@ footer{
     position:relative;
 }
 
-.catalog-actions .sort-toggle{
+.sort-toggle{
     width:auto;
     height:auto;
     padding:10px 16px;
@@ -2363,7 +2372,7 @@ footer{
     white-space:nowrap;
 }
 
-.catalog-actions .sort-toggle:hover{
+.sort-toggle:hover{
     background:var(--gray200);
     color:var(--gray900);
 }
@@ -2391,10 +2400,10 @@ footer{
     box-shadow:var(--shadow-lg);
     padding:8px;
     min-width:220px;
-    z-index:200;
+    z-index:600;
 }
 
-.catalog-actions .sort-option{
+.sort-option{
     width:100%;
     height:auto;
     display:block;
@@ -2407,12 +2416,12 @@ footer{
     white-space:nowrap;
 }
 
-.catalog-actions .sort-option:hover{
+.sort-option:hover{
     background:var(--gray100);
     color:var(--gray900);
 }
 
-.catalog-actions .sort-option.active{
+.sort-option.active{
     background:rgba(37,99,235,.08);
     color:var(--secondary);
     font-weight:700;
@@ -2670,6 +2679,8 @@ footer{
     flex:1;
     min-width:200px;
     height:60px;
+    font-size:18px;
+    gap:8px;
 }
 
 .favorite-btn{

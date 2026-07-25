@@ -1695,6 +1695,7 @@ initCatalog();
         mobileFiltersModal.hidden = false;
 
         document.body.style.overflow = "hidden";
+        document.body.classList.add("mobile-filters-open");
 
     }
 
@@ -1705,6 +1706,7 @@ initCatalog();
         mobileFiltersModal.hidden = true;
 
         document.body.style.overflow = "";
+        document.body.classList.remove("mobile-filters-open");
 
     }
 
@@ -1713,6 +1715,22 @@ initCatalog();
         const target = targets[key];
 
         if (!target || !target.el) return;
+
+        // скидаємо тільки текст пошуку (і показуємо знову всі
+        // опції), вибрані категорія/бренд при цьому не чіпаємо —
+        // інакше при поверненні в "Всі фільтри" і повторному вході
+        // в розділ залишався старий текст пошуку
+        if (key === "category" && categorySearchInput) {
+
+            categorySearchInput.value = "";
+            filterCategoryOptions("");
+
+        } else if (key === "brand" && brandSearchInput) {
+
+            brandSearchInput.value = "";
+            filterBrandOptions("");
+
+        }
 
         mobileFiltersSubTitle.textContent = target.title;
         mobileFiltersSubContent.innerHTML = "";
