@@ -2223,6 +2223,8 @@ footer{
     gap:20px;
     align-items:start;
     width:100%;
+    position:sticky;
+    top:110px;
 }
 
 .thumbs-vertical{
@@ -3577,6 +3579,10 @@ footer{
 
     .product-wrapper{
         grid-template-columns:1fr;
+    }
+
+    .product-gallery{
+        position:static;
     }
 
     .catalog-filters-bar{
