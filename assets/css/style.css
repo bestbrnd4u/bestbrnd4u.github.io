@@ -2738,6 +2738,16 @@ body.mobile-filters-open .scroll-top{
 
 @media(max-width:768px){
 
+    /* на iOS/Android браузер сам збільшує масштаб при фокусі на
+       полі вводу, якщо шрифт менший за 16px — тому на мобільних
+       піднімаємо розмір саме для полів форм (авторизація,
+       реєстрація, чекаут тощо), щоб автозум не спрацьовував */
+    input,
+    textarea,
+    select{
+        font-size:16px;
+    }
+
     .thumbs-vertical{
         display:none;
     }
