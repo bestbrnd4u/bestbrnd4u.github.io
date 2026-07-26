@@ -2693,7 +2693,6 @@ body.mobile-filters-open .scroll-top{
     width:100%;
     display:block;
     scroll-snap-align:start;
-    scroll-snap-stop:always;
     transition:transform .35s ease;
     cursor:zoom-in;
 }

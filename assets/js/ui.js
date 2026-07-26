@@ -162,6 +162,13 @@ function bindProductCarousel(track) {
 
             axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
 
+            // на час горизонтального свайпу вимикаємо CSS
+            // scroll-snap — інакше браузер намагається
+            // "підтягнути" позицію до найближчого фото на
+            // кожному touchmove, і замість плавного руху за
+            // пальцем виходить залипання з різким стрибком
+            if (axis === "x") track.style.scrollSnapType = "none";
+
         }
 
         if (axis === "y") return; // вертикаль — віддаємо жест сторінці, нічого не робимо
@@ -183,6 +190,16 @@ function bindProductCarousel(track) {
         const index = Math.round(track.scrollLeft / (track.clientWidth || 1));
 
         track.scrollTo({ left: index * track.clientWidth, behavior: "smooth" });
+
+        // повертаємо snap назад вже після того, як доїхали —
+        // невелика затримка під тривалість smooth-скролу
+        setTimeout(() => { track.style.scrollSnapType = ""; }, 400);
+
+    });
+
+    track.addEventListener("touchcancel", () => {
+
+        track.style.scrollSnapType = "";
 
     });
 
