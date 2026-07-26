@@ -81,6 +81,70 @@ async function initHomeContent() {
 
 }
 
+// -------------------------
+// Респонсивні кропи для hero/promo-банерів
+//
+// Одне й те саме фото по-різному "сідає" в широкий
+// десктопний банер і у вузький мобільний — тому замість
+// одного background-size:cover на всі екрани, тут
+// генеруються 3 окремо обрізаних версії (Pexels вміє
+// обрізати фото прямо по параметрах в URL, don't need to
+// download/re-upload нічого) і підставляються під
+// відповідну ширину екрана через CSS-змінну.
+// -------------------------
+
+function buildCroppedImageUrl(url, width, height) {
+
+    try {
+
+        const parsed = new URL(url);
+
+        parsed.searchParams.set("auto", "compress");
+        parsed.searchParams.set("cs", "tinysrgb");
+        parsed.searchParams.set("fit", "crop");
+        parsed.searchParams.set("w", width);
+        parsed.searchParams.set("h", height);
+
+        return parsed.toString();
+
+    } catch (error) {
+
+        // не Pexels або не абсолютний URL — просто показуємо як є
+        return url;
+
+    }
+
+}
+
+function setResponsiveBanner(el, cssVarName, imageUrl, crops) {
+
+    if (!el || !imageUrl) return;
+
+    const desktopUrl = buildCroppedImageUrl(imageUrl, crops.desktop.w, crops.desktop.h);
+    const tabletUrl = buildCroppedImageUrl(imageUrl, crops.tablet.w, crops.tablet.h);
+    const mobileUrl = buildCroppedImageUrl(imageUrl, crops.mobile.w, crops.mobile.h);
+
+    const mqMobile = window.matchMedia("(max-width: 600px)");
+    const mqTablet = window.matchMedia("(max-width: 900px)");
+
+    function apply() {
+
+        let url = desktopUrl;
+
+        if (mqMobile.matches) url = mobileUrl;
+        else if (mqTablet.matches) url = tabletUrl;
+
+        el.style.setProperty(cssVarName, `url('${url}')`);
+
+    }
+
+    apply();
+
+    mqMobile.addEventListener("change", apply);
+    mqTablet.addEventListener("change", apply);
+
+}
+
 function renderHero(hero) {
 
     if (!hero) return;
@@ -93,10 +157,13 @@ function renderHero(hero) {
     const heroSecondaryBtn = document.getElementById("heroSecondaryBtn");
 
     if (hero.image && heroSection) {
-        heroSection.style.backgroundImage =
-            `linear-gradient(90deg, rgba(17,24,39,.65) 0%, rgba(17,24,39,.30) 55%, rgba(17,24,39,0) 100%), ` +
-            `linear-gradient(rgba(17,24,39,.45), rgba(17,24,39,.45)), ` +
-            `url('${hero.image}')`;
+
+        setResponsiveBanner(heroSection, "--hero-bg", hero.image, {
+            desktop: { w: 1600, h: 720 },
+            tablet: { w: 1024, h: 900 },
+            mobile: { w: 750, h: 1000 }
+        });
+
     }
 
     if (heroLabel && hero.label) heroLabel.textContent = hero.label;
@@ -176,8 +243,13 @@ function renderPromoBanner(promo) {
     const btnEl = document.getElementById("promoBtn");
 
     if (promo.image && bannerEl) {
-        bannerEl.style.backgroundImage =
-            `linear-gradient(rgba(17,24,39,.55), rgba(17,24,39,.55)), url('${promo.image}')`;
+
+        setResponsiveBanner(bannerEl, "--promo-bg", promo.image, {
+            desktop: { w: 1600, h: 640 },
+            tablet: { w: 1024, h: 800 },
+            mobile: { w: 750, h: 900 }
+        });
+
     }
 
     if (labelEl && promo.label) labelEl.textContent = promo.label;
