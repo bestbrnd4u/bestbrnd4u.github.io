@@ -285,7 +285,7 @@ function getMultiSelectLabel(selectedSet, defaultLabel, noun, labelForValue) {
 // поточний стан розділу, приходить з URL; стать — лише початкове
 // значення фільтра, після завантаження сторінки завжди вільно змінюється
 let currentSection = ""; // "" | "new" | "sale"
-let currentGender = "";  // "" | одне з GENDERS
+let selectedGenders = new Set(); // підмножина GENDERS
 
 function readUrlState() {
 
@@ -295,7 +295,13 @@ function readUrlState() {
     currentSection = (section === "new" || section === "sale") ? section : "";
 
     const genderParam = params.get("gender");
-    currentGender = GENDERS.includes(genderParam) ? genderParam : "";
+
+    selectedGenders = new Set(
+        (genderParam || "")
+            .split(",")
+            .map(v => v.trim())
+            .filter(v => GENDERS.includes(v))
+    );
 
 }
 
@@ -1012,21 +1018,50 @@ document.addEventListener("click", event => {
 // Фільтр «Стать»
 // -------------------------
 
+function updateGenderUI() {
+
+    if (!genderFilterEl) return;
+
+    genderFilterEl.querySelectorAll(".gender-pill").forEach(btn => {
+
+        const value = btn.dataset.gender;
+
+        btn.classList.toggle(
+            "active",
+            value === "" ? selectedGenders.size === 0 : selectedGenders.has(value)
+        );
+
+    });
+
+}
+
 function setupGenderFilter() {
 
     if (!genderFilterEl) return;
 
-    const buttons = [...genderFilterEl.querySelectorAll(".gender-pill")];
+    updateGenderUI();
 
-    buttons.forEach(btn => {
-
-        btn.classList.toggle("active", btn.dataset.gender === currentGender);
+    genderFilterEl.querySelectorAll(".gender-pill").forEach(btn => {
 
         btn.addEventListener("click", () => {
 
-            currentGender = btn.dataset.gender;
+            const value = btn.dataset.gender;
 
-            buttons.forEach(b => b.classList.toggle("active", b === btn));
+            if (value === "") {
+
+                selectedGenders.clear();
+
+            } else if (selectedGenders.has(value)) {
+
+                selectedGenders.delete(value);
+
+            } else {
+
+                selectedGenders.add(value);
+
+            }
+
+            updateGenderUI();
 
             render();
 
@@ -1065,10 +1100,12 @@ function renderBreadcrumbsAndTitle() {
 
     }
 
-    if (currentGender) {
+    if (selectedGenders.size) {
 
-        crumbs.push(`<span class="crumb-sep">→</span>`, `<span>${currentGender}</span>`);
-        subtitle = `${subtitle} · ${currentGender}`;
+        const label = [...selectedGenders].join(", ");
+
+        crumbs.push(`<span class="crumb-sep">→</span>`, `<span>${label}</span>`);
+        subtitle = `${subtitle} · ${label}`;
 
     }
 
@@ -1129,9 +1166,9 @@ function filterProducts() {
 
     }
 
-    if (currentGender) {
+    if (selectedGenders.size) {
 
-        list = list.filter(product => product.gender === currentGender);
+        list = list.filter(product => selectedGenders.has(product.gender));
 
     }
 
@@ -1277,11 +1314,11 @@ function renderActiveFilters() {
 
     }
 
-    if (currentGender) {
+    selectedGenders.forEach(gender => {
 
-        chips.push({ type: "gender", label: currentGender });
+        chips.push({ type: "gender", value: gender, label: gender });
 
-    }
+    });
 
     selectedBrands.forEach(brand => {
 
@@ -1442,11 +1479,8 @@ function clearOneFilter(type, value) {
 
     } else if (type === "gender") {
 
-        currentGender = "";
-
-        genderFilterEl?.querySelectorAll(".gender-pill").forEach(btn => {
-            btn.classList.toggle("active", btn.dataset.gender === "");
-        });
+        selectedGenders.delete(value);
+        updateGenderUI();
 
     } else if (type === "brand") {
 
@@ -1511,11 +1545,8 @@ function resetAllFilters() {
         o.classList.toggle("active", o.dataset.sort === "");
     });
 
-    currentGender = "";
-
-    genderFilterEl?.querySelectorAll(".gender-pill").forEach(btn => {
-        btn.classList.toggle("active", btn.dataset.gender === "");
-    });
+    selectedGenders.clear();
+    updateGenderUI();
 
     render();
 
@@ -1657,7 +1688,7 @@ initCatalog();
 
     function activeFilterCount() {
 
-        return (currentGender ? 1 : 0)
+        return selectedGenders.size
             + selectedBrands.size
             + selectedColors.size
             + selectedCategories.size
@@ -1673,7 +1704,7 @@ initCatalog();
         if (mfRows.color) mfRows.color.textContent = colorLabel ? colorLabel.textContent : "";
         if (mfRows.size) mfRows.size.textContent = sizeLabel ? sizeLabel.textContent : "";
         if (mfRows.price) mfRows.price.textContent = priceLabel ? priceLabel.textContent : "";
-        if (mfRows.gender) mfRows.gender.textContent = currentGender || "Всі";
+        if (mfRows.gender) mfRows.gender.textContent = getMultiSelectLabel(selectedGenders, "Всі", "Стать");
 
         const count = activeFilterCount();
 

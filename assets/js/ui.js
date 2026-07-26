@@ -133,9 +133,12 @@ function createProductCard(product) {
                     onerror="this.src='assets/images/no-image.png'">
             </div>
             <div class="product-info">
-                <div class="product-category">
+                <a
+                    class="product-category"
+                    href="catalog?brand=${encodeURIComponent(brand)}"
+                    title="Усі товари бренду ${brand}">
                     ${brand}
-                </div>
+                </a>
                 <div class="product-title">
                     ${product.title}
                 </div>

@@ -119,17 +119,21 @@ function renderProduct(product) {
 
     <div class="product-info">
 
-        <div class="brand">
+        <a class="brand" href="catalog?brand=${encodeURIComponent(product.brand)}">
 
             ${product.brand}
 
-        </div>
+        </a>
 
         <h1>
 
             ${product.title}
 
         </h1>
+
+        <div class="product-meta-line">
+            ${product.brand}${product.sku ? ` · ${product.sku}` : ""}
+        </div>
 
         <div class="price-box">
 
@@ -211,17 +215,27 @@ ${sizeButtons}
 
         </div>
 
-        <div class="specifications">
+        <div class="specifications" id="productSpecifications">
 
             ${product.sku ? `
-            <div class="spec-block">
-                <h3>Артикул</h3>
-                <p class="spec-plain">${product.sku}</p>
+            <div class="spec-block accordion-item">
+                <button type="button" class="spec-block-header">
+                    <h3>Артикул</h3>
+                    <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="spec-block-content">
+                    <p class="spec-plain">${product.sku}</p>
+                </div>
             </div>` : ""}
 
-            <div class="spec-block">
+            <div class="spec-block accordion-item open">
 
-                <h3>Інформація про товар</h3>
+                <button type="button" class="spec-block-header">
+                    <h3>Інформація про товар</h3>
+                    <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+
+                <div class="spec-block-content">
 
                 <div class="spec-row" id="specColorRow">
                     <span>Колір</span>
@@ -276,16 +290,33 @@ ${sizeButtons}
                     <strong>${product.country}</strong>
                 </div>` : ""}
 
+                </div>
+
             </div>
 
             ${product.composition ? `
-            <div class="spec-block">
-                <h3>Склад</h3>
-                <div class="spec-row">
-                    <span>Склад</span>
-                    <strong>${product.composition}</strong>
+            <div class="spec-block accordion-item">
+                <button type="button" class="spec-block-header">
+                    <h3>Склад</h3>
+                    <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="spec-block-content">
+                    <div class="spec-row">
+                        <span>Склад</span>
+                        <strong>${product.composition}</strong>
+                    </div>
                 </div>
             </div>` : ""}
+
+            <div class="spec-block accordion-item">
+                <button type="button" class="spec-block-header">
+                    <h3>Опис</h3>
+                    <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="spec-block-content">
+                    <p class="spec-plain">${product.description || "Стильна сумка преміальної якості. Підходить для щоденного використання та чудово поєднується з будь-яким образом."}</p>
+                </div>
+            </div>
 
         </div>
 
@@ -294,6 +325,16 @@ ${sizeButtons}
 </div>
 
 `;
+
+    document.querySelectorAll(".spec-block-header").forEach(header => {
+
+        header.addEventListener("click", () => {
+
+            header.closest(".accordion-item")?.classList.toggle("open");
+
+        });
+
+    });
 
     document.querySelectorAll(".thumb").forEach(thumb => {
 

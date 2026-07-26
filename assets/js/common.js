@@ -1153,6 +1153,12 @@ document.addEventListener("click", function (e) {
         return;
     }
 
+    // Клік на бренд — окремий перехід у каталог бренду,
+    // не в картку товару
+    if (e.target.closest(".product-category")) {
+        return;
+    }
+
     // Картка товару
     const card = e.target.closest(".product-card, .favorite-row");
 
