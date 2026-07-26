@@ -107,7 +107,7 @@ function renderProduct(product) {
         <div class="zoom-container gallery-track" id="mainGalleryTrack">
 
             ${(galleryImages.length ? galleryImages : ["assets/images/no-image.png"]).map(img => `
-                <img class="gallery-slide" src="${img}" alt="${product.title}">
+                <img class="gallery-slide" src="${img}" alt="${product.title}" draggable="false">
             `).join("")}
 
         </div>
@@ -175,7 +175,7 @@ ${sizeButtons}
 
         <div class="product-short">
 
-            ${product.description || "Стильна сумка преміальної якості. Підходить для щоденного використання та чудово поєднується з будь-яким образом."}
+            ${product.description || "Стильна сумка преміальної якості. Підходить для щоденного використання та чудово поє[...]
 
         </div>
 
@@ -318,7 +318,7 @@ ${sizeButtons}
                     <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
                 </button>
                 <div class="spec-block-content">
-                    <p class="spec-plain">${product.description || "Стильна сумка преміальної якості. Підходить для щоденного використання та чудово поєднується з будь-яким образом."}</p>
+                    <p class="spec-plain">${product.description || "Стильна сумка преміальної якості. Підходить для щоденного використа[...]
                 </div>
             </div>
 
@@ -373,6 +373,12 @@ function setupGallery() {
     if (!track) return;
 
     if (typeof preventWheelHijack === "function") preventWheelHijack(track);
+
+    // Блокуємо drag'а картинок для Safari/iOS
+    document.querySelectorAll(".gallery-slide").forEach(img => {
+        img.draggable = false;
+        img.ondragstart = () => false;
+    });
 
     function goToSlide(index) {
 
@@ -460,7 +466,7 @@ function updateGalleryForColor(images) {
     `).join("");
 
     track.innerHTML = images.map(img => `
-        <img class="gallery-slide" src="${img}" alt="">
+        <img class="gallery-slide" src="${img}" alt="" draggable="false">
     `).join("");
 
     track.scrollLeft = 0;
