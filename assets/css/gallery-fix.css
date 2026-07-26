@@ -1,26 +1,17 @@
 /* ==========================================
    ФИКС: галерея товара на мобильном
-   Решение конфликта горизонтального свайпа
-   и вертикального скролла страницы
+   Запрет на перетягивание картинок в Safari
    ========================================== */
 
-/* Основной контейнер галереи:
-   - pan-y: разрешаем браузеру обработать вертикальные свайпы как скролл страницы
-   - auto: горизонтальные свайпы обработает сам контейнер (scroll-snap) */
-.zoom-container.gallery-track,
-.gallery-track {
-    touch-action: pan-y;
+/* Запрещаем выделение и drag */
+.gallery-track,
+.gallery-slide {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
 }
 
-/* Для мобильных устройств убедимся, что вертикальный свайп 
-   внутри галереи пробивает до скролла страницы */
-@media (max-width: 768px) {
-    .zoom-container.gallery-track,
-    .gallery-track {
-        touch-action: pan-y;
-        /* Дополнительно: убедимся, что overflow правильный */
-        overflow-x: auto;
-        overflow-y: visible;
-        -webkit-overflow-scrolling: touch;
-    }
+.gallery-slide {
+    -webkit-user-drag: none;
+    user-drag: none;
 }
