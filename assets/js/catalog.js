@@ -3,6 +3,34 @@ let products = [];
 const grid = document.getElementById("catalogGrid");
 const search = document.getElementById("searchInput");
 
+// плавний скрол до першого товару в каталозі — викликається
+// після застосування фільтрів (мобільна шторка "Всі фільтри"
+// та десктопні випадаючі списки), щоб користувач одразу бачив
+// оновлений результат
+function scrollToFirstProduct() {
+
+    if (!grid) return;
+
+    const firstCard = grid.querySelector(".product-card");
+    const target = firstCard || grid;
+
+    const headerEl = document.querySelector("header");
+    const mobileBar = document.querySelector(".mobile-filter-bar");
+
+    let offset = headerEl ? headerEl.offsetHeight : 0;
+
+    if (mobileBar && getComputedStyle(mobileBar).display !== "none") {
+        offset += mobileBar.offsetHeight;
+    }
+
+    offset += 16;
+
+    const top = target.getBoundingClientRect().top + window.scrollY - offset;
+
+    window.scrollTo({ top: Math.max(top, 0), behavior: "smooth" });
+
+}
+
 const sortToggle = document.getElementById("sortToggle");
 const sortMenu = document.getElementById("sortMenu");
 const sortLabel = document.getElementById("sortLabel");
@@ -1758,8 +1786,17 @@ initCatalog();
     mobileFiltersBtn?.addEventListener("click", openMobileFilters);
     mobileFiltersCloseBtn?.addEventListener("click", closeMobileFilters);
     mobileFiltersCloseBtn2?.addEventListener("click", closeMobileFilters);
-    mobileFiltersApplyBtn?.addEventListener("click", closeMobileFilters);
-    mobileFiltersSubApplyBtn?.addEventListener("click", closeMobileFilters);
+
+    mobileFiltersApplyBtn?.addEventListener("click", () => {
+        closeMobileFilters();
+        scrollToFirstProduct();
+    });
+
+    mobileFiltersSubApplyBtn?.addEventListener("click", () => {
+        closeMobileFilters();
+        scrollToFirstProduct();
+    });
+
     mobileFiltersBackBtn?.addEventListener("click", backToMobileFiltersMain);
 
     mobileFiltersResetBtn?.addEventListener("click", () => {
