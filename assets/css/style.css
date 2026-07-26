@@ -904,10 +904,11 @@ nav li.has-mega:hover .mega-menu{
     scrollbar-width:none;
     padding:4px 4px 8px;
     margin:-4px -4px -8px;
-    /* те саме, що й для photo-track: свайп по картках теж
-       має гортатись тільки вліво/вправо, вертикаль лишаємо
-       сторінці */
-    touch-action:pan-x;
+    /* те саме, що й для photo-track: горизонтальний свайп
+       гортає картки, а вертикальний свайп повинен нормально
+       йти на скрол сторінки — тому дозволяємо обидва напрямки
+       й даємо браузеру самому визначити жест (як на MD Fashion) */
+    touch-action:pan-x pan-y;
 }
 
 .carousel-track.products-grid::-webkit-scrollbar{
@@ -1055,10 +1056,11 @@ nav li.has-mega:hover .mega-menu{
     scroll-snap-type:x mandatory;
     -webkit-overflow-scrolling:touch;
     scrollbar-width:none;
-    /* дозволяємо жест лише по горизонталі — вертикальний свайп
-       пальцем повинен завжди йти на скрол сторінки, а не
-       "підійматись" разом з фото (це й був той самий баг) */
-    touch-action:pan-x;
+    /* дозволяємо ОБИДВА напрямки жесту: горизонтальний свайп
+       гортає фото, а вертикальний — нормально скролить сторінку
+       (сам pan-x без pan-y блокував вертикаль повністю — це й
+       був той самий баг "не скролиться, як на фото") */
+    touch-action:pan-x pan-y;
 }
 
 .photo-track::-webkit-scrollbar{
@@ -2671,7 +2673,9 @@ body.mobile-filters-open .scroll-top{
     scroll-snap-type:x mandatory;
     -webkit-overflow-scrolling:touch;
     scrollbar-width:none;
-    touch-action:pan-x;
+    /* обидва напрямки — щоб вертикальний свайп по фото
+       нормально скролив сторінку, як на md-fashion.ua */
+    touch-action:pan-x pan-y;
 }
 
 .gallery-track::-webkit-scrollbar{

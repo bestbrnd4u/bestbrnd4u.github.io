@@ -1541,7 +1541,7 @@ function resetAllFilters() {
 
     currentSort = "";
 
-    if (sortLabel) sortLabel.textContent = "За замовчуванням";
+    if (sortLabel) sortLabel.textContent = "за замовчуванням";
 
     sortMenu?.querySelectorAll(".sort-option").forEach(o => {
         o.classList.toggle("active", o.dataset.sort === "");
