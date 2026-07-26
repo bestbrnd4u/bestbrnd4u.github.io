@@ -2687,6 +2687,7 @@ body.mobile-filters-open .scroll-top{
     width:100%;
     display:block;
     scroll-snap-align:start;
+    scroll-snap-stop:always;
     transition:transform .35s ease;
     cursor:zoom-in;
 }
@@ -2739,6 +2740,11 @@ body.mobile-filters-open .scroll-top{
 
     .thumbs-vertical{
         display:none;
+    }
+
+    .main-photo{
+        padding:12px;
+        border-radius:16px;
     }
 
 }
@@ -4189,7 +4195,7 @@ body.mobile-filters-open .scroll-top{
 
 }
 
-@media(max-width:900px){
+@media(min-width:769px) and (max-width:900px){
 
     .product-gallery{
         grid-template-columns:1fr;
@@ -4206,6 +4212,10 @@ body.mobile-filters-open .scroll-top{
         height:70px;
         flex-shrink:0;
     }
+
+}
+
+@media(max-width:900px){
 
     .cart-item{
         grid-template-columns:70px 1fr;
