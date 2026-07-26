@@ -5570,13 +5570,24 @@ body.mobile-filters-open .scroll-top{
 
 .mobile-filters-footer .btn{
     flex:1 1 auto;
+    width:auto;
     justify-content:center;
 }
 
 .mobile-filters-footer .btn-outline{
     flex:0 0 auto;
+    width:auto;
     padding-left:18px;
     padding-right:18px;
+}
+
+/* текстові вузли навколо <span> в кнопках "Показати N товарів"
+   стають окремими анонімними flex-елементами (бо .btn — flex),
+   і пробіл між ними "з'їдається" браузером — фіксуємо явним
+   відступом, щоб не злипалось у "Показати2товарів" */
+#mfCount,
+#mfSubCount{
+    margin:0 4px;
 }
 
 .mobile-filters-sub-content{
