@@ -92,19 +92,39 @@ function bindProductCarousel(track) {
 
     const carousel = track.closest(".product-carousel");
 
+    function syncNav() {
+
+        const total = track.children.length;
+
+        const index = Math.round(track.scrollLeft / (track.clientWidth || 1));
+
+        const prevBtn = carousel?.querySelector(".photo-nav-prev");
+        const nextBtn = carousel?.querySelector(".photo-nav-next");
+
+        if (prevBtn) prevBtn.disabled = index <= 0;
+        if (nextBtn) nextBtn.disabled = index >= total - 1;
+
+    }
+
     function syncDots() {
 
         const dots = carousel?.querySelectorAll(".photo-dot");
 
-        if (!dots || !dots.length) return;
-
         const index = Math.round(track.scrollLeft / (track.clientWidth || 1));
 
-        dots.forEach((dot, i) => dot.classList.toggle("active", i === index));
+        if (dots && dots.length) {
+            dots.forEach((dot, i) => dot.classList.toggle("active", i === index));
+        }
+
+        syncNav();
 
     }
 
     let scrollTimer = null;
+
+    // одразу виставляємо правильний стан стрілок (перше фото —
+    // "назад" вимкнена), а не тільки після першого скролу
+    syncDots();
 
     track.addEventListener("scroll", () => {
 
