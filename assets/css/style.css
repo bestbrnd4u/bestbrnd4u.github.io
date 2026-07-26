@@ -904,9 +904,6 @@ nav li.has-mega:hover .mega-menu{
     scrollbar-width:none;
     padding:4px 4px 8px;
     margin:-4px -4px -8px;
-    /* лише горизонтальний свайп — вертикальний тягне сторінку,
-       а не картинку товару всередині картки */
-    touch-action:pan-x;
 }
 
 .carousel-track.products-grid::-webkit-scrollbar{
@@ -1054,9 +1051,6 @@ nav li.has-mega:hover .mega-menu{
     scroll-snap-type:x mandatory;
     -webkit-overflow-scrolling:touch;
     scrollbar-width:none;
-    /* дозволяємо жест лише по горизонталі — вертикальний свайп
-       має скролити сторінку, а не "тягати" фото в рамці картки */
-    touch-action:pan-x;
 }
 
 .photo-track::-webkit-scrollbar{
@@ -2660,9 +2654,6 @@ body.mobile-filters-open .scroll-top{
     scroll-snap-type:x mandatory;
     -webkit-overflow-scrolling:touch;
     scrollbar-width:none;
-    /* дозволяємо жест лише по горизонталі — вертикальний свайп
-       має скролити сторінку, а не "тягати" фото в рамці */
-    touch-action:pan-x;
 }
 
 .gallery-track::-webkit-scrollbar{
@@ -2685,6 +2676,8 @@ body.mobile-filters-open .scroll-top{
     -webkit-user-drag:none;
     user-drag:none;
     -webkit-touch-callout:none;
+    -webkit-user-select:none;
+    user-select:none;
 }
 
 @media (hover:hover) and (pointer:fine){
