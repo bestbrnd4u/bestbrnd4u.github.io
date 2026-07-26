@@ -904,6 +904,9 @@ nav li.has-mega:hover .mega-menu{
     scrollbar-width:none;
     padding:4px 4px 8px;
     margin:-4px -4px -8px;
+    /* лише горизонтальний свайп — вертикальний тягне сторінку,
+       а не картинку товару всередині картки */
+    touch-action:pan-x;
 }
 
 .carousel-track.products-grid::-webkit-scrollbar{
@@ -1051,6 +1054,9 @@ nav li.has-mega:hover .mega-menu{
     scroll-snap-type:x mandatory;
     -webkit-overflow-scrolling:touch;
     scrollbar-width:none;
+    /* дозволяємо жест лише по горизонталі — вертикальний свайп
+       має скролити сторінку, а не "тягати" фото в рамці картки */
+    touch-action:pan-x;
 }
 
 .photo-track::-webkit-scrollbar{
@@ -2501,6 +2507,10 @@ body.mobile-filters-open .scroll-top{
     z-index:600;
 }
 
+.sort-menu[hidden]{
+    display:none !important;
+}
+
 .sort-option{
     width:100%;
     height:auto;
@@ -2650,6 +2660,9 @@ body.mobile-filters-open .scroll-top{
     scroll-snap-type:x mandatory;
     -webkit-overflow-scrolling:touch;
     scrollbar-width:none;
+    /* дозволяємо жест лише по горизонталі — вертикальний свайп
+       має скролити сторінку, а не "тягати" фото в рамці */
+    touch-action:pan-x;
 }
 
 .gallery-track::-webkit-scrollbar{
@@ -2663,6 +2676,15 @@ body.mobile-filters-open .scroll-top{
     scroll-snap-align:start;
     transition:transform .35s ease;
     cursor:zoom-in;
+}
+
+.gallery-slide,
+.photo-slide,
+.category img,
+.product-image img{
+    -webkit-user-drag:none;
+    user-drag:none;
+    -webkit-touch-callout:none;
 }
 
 @media (hover:hover) and (pointer:fine){
@@ -3241,6 +3263,34 @@ body.mobile-filters-open .scroll-top{
 .cart-summary .btn,
 .cart-summary .btn-outline{
     width:100%;
+}
+
+/* "Оформити замовлення" — основна дія, має виглядати
+   помітніше; "Продовжити покупки" — другорядна, тому
+   зроблена як тихе текстове посилання без рамки, щоб не
+   конкурувала візуально з кнопкою оформлення замовлення */
+.cart-summary #checkoutBtn{
+    padding:19px 24px;
+    font-size:16px;
+    font-weight:800;
+    letter-spacing:.2px;
+}
+
+.cart-summary a.btn-outline{
+    margin-top:-4px;
+    padding:10px 20px;
+    border:none;
+    background:transparent;
+    box-shadow:none;
+    color:var(--gray500);
+    font-size:13.5px;
+    font-weight:600;
+}
+
+.cart-summary a.btn-outline:hover{
+    background:var(--gray50);
+    color:var(--gray900);
+    transform:none;
 }
 
 /* =====================================
@@ -4339,6 +4389,26 @@ body.mobile-filters-open .scroll-top{
 
     .checkout-block{
         padding:22px;
+    }
+
+    /* заголовок секції ("Популярні товари", "Новинки" тощо) —
+       на вузькому екрані h2 в 42px не влазить в один рядок і
+       "з'їдає" посилання "Переглянути всі" поруч */
+    .section-title{
+        margin-bottom:24px;
+        gap:10px;
+    }
+
+    .section-title h2{
+        font-size:22px;
+        text-align:left;
+        margin-bottom:0;
+    }
+
+    .section-title a{
+        font-size:13px;
+        white-space:nowrap;
+        flex-shrink:0;
     }
 
 }
