@@ -175,7 +175,7 @@ ${sizeButtons}
 
         <div class="product-short">
 
-            ${product.description || "Стильна сумка преміальної якості. Підходить для щоденного використання та чудово поєднується з будь-яким образом."}
+            ${product.description || "Стильна сумка преміальної якості. Підходить для щоденного використання та чудово поє[...]
 
         </div>
 
@@ -318,7 +318,7 @@ ${sizeButtons}
                     <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
                 </button>
                 <div class="spec-block-content">
-                    <p class="spec-plain">${product.description || "Стильна сумка преміальної якості. Підходить для щоденного використання та чудово поєднується з будь-яким образом."}</p>
+                    <p class="spec-plain">${product.description || "Стильна сумка преміальної якості. Підходить для щоденного використа[...]
                 </div>
             </div>
 

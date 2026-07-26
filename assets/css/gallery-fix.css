@@ -1,0 +1,17 @@
+/* ==========================================
+   ФИКС: галерея товара на мобильном
+   Запрет на перетягивание картинок в Safari
+   ========================================== */
+
+/* Запрещаем выделение и drag */
+.gallery-track,
+.gallery-slide {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+}
+
+.gallery-slide {
+    -webkit-user-drag: none;
+    user-drag: none;
+}
