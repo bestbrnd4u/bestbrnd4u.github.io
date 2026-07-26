@@ -133,21 +133,58 @@ function bindProductCarousel(track) {
 
     }, { passive: true });
 
-    let touchStartX = 0;
+    let startX = 0;
+    let startY = 0;
+    let startScrollLeft = 0;
+    let axis = null; // null поки не визначено, "x" або "y"
     let isSwiping = false;
 
     track.addEventListener("touchstart", event => {
 
-        touchStartX = event.touches[0].clientX;
+        startX = event.touches[0].clientX;
+        startY = event.touches[0].clientY;
+        startScrollLeft = track.scrollLeft;
+        axis = null;
         isSwiping = false;
 
     }, { passive: true });
 
+    // touchmove НЕ пасивний навмисно — інакше не можна буде
+    // викликати preventDefault() лише для горизонтального жесту
     track.addEventListener("touchmove", event => {
 
-        if (Math.abs(event.touches[0].clientX - touchStartX) > 10) isSwiping = true;
+        const dx = event.touches[0].clientX - startX;
+        const dy = event.touches[0].clientY - startY;
 
-    }, { passive: true });
+        if (axis === null) {
+
+            if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+
+            axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+
+        }
+
+        if (axis === "y") return; // вертикаль — віддаємо жест сторінці, нічого не робимо
+
+        // горизонталь — гортаємо фото самі, забороняючи
+        // браузеру одночасно намагатись скролити сторінку
+        event.preventDefault();
+
+        isSwiping = true;
+
+        track.scrollLeft = startScrollLeft - dx;
+
+    }, { passive: false });
+
+    track.addEventListener("touchend", () => {
+
+        if (axis !== "x") return;
+
+        const index = Math.round(track.scrollLeft / (track.clientWidth || 1));
+
+        track.scrollTo({ left: index * track.clientWidth, behavior: "smooth" });
+
+    });
 
     // якщо це був свайп, а не тап — гасимо клік, щоб картка
     // не перекинула на сторінку товару одразу після гортання фото

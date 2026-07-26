@@ -443,6 +443,61 @@ function setupGallery() {
 
     window.addEventListener("resize", () => goToSlide(currentSlideIndex()));
 
+    if (!track.dataset.touchBound) {
+
+        track.dataset.touchBound = "1";
+
+        let startX = 0;
+        let startY = 0;
+        let startScrollLeft = 0;
+        let axis = null; // null поки не визначено, "x" або "y"
+
+        track.addEventListener("touchstart", event => {
+
+            startX = event.touches[0].clientX;
+            startY = event.touches[0].clientY;
+            startScrollLeft = track.scrollLeft;
+            axis = null;
+
+        }, { passive: true });
+
+        // touchmove НЕ пасивний навмисно — інакше не можна буде
+        // викликати preventDefault() лише для горизонтального жесту
+        track.addEventListener("touchmove", event => {
+
+            const dx = event.touches[0].clientX - startX;
+            const dy = event.touches[0].clientY - startY;
+
+            if (axis === null) {
+
+                if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+
+                axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+
+            }
+
+            if (axis === "y") return; // вертикаль — віддаємо жест сторінці
+
+            // горизонталь — гортаємо фото самі, забороняючи
+            // браузеру одночасно намагатись скролити сторінку
+            event.preventDefault();
+
+            track.scrollLeft = startScrollLeft - dx;
+
+        }, { passive: false });
+
+        track.addEventListener("touchend", () => {
+
+            if (axis !== "x") return;
+
+            const index = Math.round(track.scrollLeft / (track.clientWidth || 1));
+
+            track.scrollTo({ left: index * track.clientWidth, behavior: "smooth" });
+
+        });
+
+    }
+
 }
 
 // Викликається з common.js при кліку на колір на сторінці товару —

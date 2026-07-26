@@ -1057,9 +1057,12 @@ nav li.has-mega:hover .mega-menu{
     overflow-y:hidden;
     scroll-snap-type:x mandatory;
     -webkit-overflow-scrolling:touch;
-    /* лише горизонтальна панорама — див. пояснення біля
-       .gallery-track, не повертати pan-y */
-    touch-action:pan-x;
+    /* горизонталь тепер керується вручну в JS
+       (bindProductCarousel в ui.js) — див. докладне пояснення
+       біля .gallery-track. Тут дозволяємо pan-y, щоб сторінка
+       нормально скролилась, коли палець на фото картки */
+    touch-action:pan-y pinch-zoom;
+    overscroll-behavior-x:contain;
     scrollbar-width:none;
 }
 
@@ -2667,16 +2670,17 @@ body.mobile-filters-open .scroll-top{
     overflow-y:hidden;
     scroll-snap-type:x mandatory;
     -webkit-overflow-scrolling:touch;
-    /* тільки горизонтальна панорама на цьому елементі — це НЕ
-       блокує звичайний вертикальний скрол сторінки (жест просто
-       передається вгору, браузер обробляє його як завжди). Якщо
-       дозволити тут ще й pan-y, iOS починає сприймати цей
-       елемент як щось, що можна "потягнути" вертикально —
-       звідси й був баг з картинкою, що їздить вгору/вниз. Це
-       окрема історія від нативного drag картинки мишкою
-       (той фікситься через dragstart у common.js) —
-       не плутати і не повертати pan-y назад */
-    touch-action:pan-x;
+    /* iOS вважає будь-який overflow-x:auto елемент окремою
+       "зоною жестів" і не передає з нього вертикальний тач
+       сторінці, незалежно від touch-action:pan-x. Тому
+       горизонтальне гортання тепер керується вручну в JS
+       (setupGallery у product.js: touchmove з preventDefault
+       лише коли жест визначено як горизонтальний), а тут
+       дозволяємо саме pan-y — вертикаль обробляється браузером
+       як завжди, і сторінка нормально скролиться, коли палець
+       на фото */
+    touch-action:pan-y pinch-zoom;
+    overscroll-behavior-x:contain;
     scrollbar-width:none;
 }
 
