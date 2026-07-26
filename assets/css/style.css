@@ -904,6 +904,10 @@ nav li.has-mega:hover .mega-menu{
     scrollbar-width:none;
     padding:4px 4px 8px;
     margin:-4px -4px -8px;
+    /* те саме, що й для photo-track: свайп по картках теж
+       має гортатись тільки вліво/вправо, вертикаль лишаємо
+       сторінці */
+    touch-action:pan-x;
 }
 
 .carousel-track.products-grid::-webkit-scrollbar{
@@ -1051,6 +1055,10 @@ nav li.has-mega:hover .mega-menu{
     scroll-snap-type:x mandatory;
     -webkit-overflow-scrolling:touch;
     scrollbar-width:none;
+    /* дозволяємо жест лише по горизонталі — вертикальний свайп
+       пальцем повинен завжди йти на скрол сторінки, а не
+       "підійматись" разом з фото (це й був той самий баг) */
+    touch-action:pan-x;
 }
 
 .photo-track::-webkit-scrollbar{
@@ -2432,7 +2440,8 @@ body.mobile-filters-open .scroll-top{
     font-size:14px;
 }
 
-.catalog-actions button{
+#gridViewBtn,
+#listViewBtn{
     width:36px;
     height:36px;
     border-radius:10px;
@@ -2444,7 +2453,8 @@ body.mobile-filters-open .scroll-top{
     transition:.2s;
 }
 
-.catalog-actions button:hover{
+#gridViewBtn:hover,
+#listViewBtn:hover{
     background:var(--secondary);
     color:#fff;
 }
@@ -2529,7 +2539,8 @@ body.mobile-filters-open .scroll-top{
     font-weight:700;
 }
 
-.catalog-actions button.active{
+#gridViewBtn.active,
+#listViewBtn.active{
     background:var(--secondary);
     color:#fff;
 }
@@ -2654,6 +2665,7 @@ body.mobile-filters-open .scroll-top{
     scroll-snap-type:x mandatory;
     -webkit-overflow-scrolling:touch;
     scrollbar-width:none;
+    touch-action:pan-x;
 }
 
 .gallery-track::-webkit-scrollbar{

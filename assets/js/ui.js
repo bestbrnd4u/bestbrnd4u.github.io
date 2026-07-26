@@ -65,6 +65,8 @@ function initCarousel(carouselEl) {
 
     window.addEventListener("resize", updateArrows);
 
+    preventWheelHijack(track);
+
     // даємо браузеру один кадр, щоб порахувати реальні розміри
     // щойно вставлених карток
     requestAnimationFrame(updateArrows);
@@ -85,6 +87,8 @@ function bindProductCarousel(track) {
     if (!track || track.dataset.carouselBound) return;
 
     track.dataset.carouselBound = "1";
+
+    preventWheelHijack(track);
 
     const carousel = track.closest(".product-carousel");
 
@@ -141,6 +145,34 @@ function bindProductCarousel(track) {
 function initProductCarousels(root) {
 
     (root || document).querySelectorAll(".photo-track").forEach(bindProductCarousel);
+
+}
+
+// -------------------------
+// Захист від "захоплення" колеса миші горизонтальною
+// каруссю (scroll-snap-type:x). Без цього, навівши мишку на
+// фото і покрутивши колесо (звичний вертикальний скрол
+// сторінки), браузer іноді трактує це як команду "гортати
+// слайди" — сторінка при цьому не скролиться. Тут ми самі
+// вирішуємо: вертикальний жест — завжди скрол сторінки,
+// горизонтальний (трекпад-свайп) — гортання каруселі.
+// -------------------------
+
+function preventWheelHijack(track) {
+
+    if (!track || track.dataset.wheelGuardBound) return;
+
+    track.dataset.wheelGuardBound = "1";
+
+    track.addEventListener("wheel", event => {
+
+        if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+
+        event.preventDefault();
+
+        window.scrollBy({ top: event.deltaY, left: 0 });
+
+    }, { passive: false });
 
 }
 

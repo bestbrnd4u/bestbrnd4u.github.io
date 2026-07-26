@@ -372,6 +372,8 @@ function setupGallery() {
 
     if (!track) return;
 
+    if (typeof preventWheelHijack === "function") preventWheelHijack(track);
+
     function goToSlide(index) {
 
         const slide = track.children[index];
