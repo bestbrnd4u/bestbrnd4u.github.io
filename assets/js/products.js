@@ -10,4 +10,6 @@ function renderProducts(list) {
 
     });
 
+    initProductCarousels(productsGrid);
+
 }

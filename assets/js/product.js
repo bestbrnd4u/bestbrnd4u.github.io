@@ -104,14 +104,18 @@ function renderProduct(product) {
 
         ${product.badge ? `<span class="product-badge">${product.badge}</span>` : ""}
 
-        <div class="zoom-container">
+        <div class="zoom-container gallery-track" id="mainGalleryTrack">
 
-            <img
-                id="mainImage"
-                src="${galleryImages[0] || "assets/images/no-image.png"}"
-                alt="${product.title}">
+            ${(galleryImages.length ? galleryImages : ["assets/images/no-image.png"]).map(img => `
+                <img class="gallery-slide" src="${img}" alt="${product.title}">
+            `).join("")}
 
         </div>
+
+        ${galleryImages.length > 1 ? `
+        <div class="gallery-dots" id="mainGalleryDots">
+            ${galleryImages.map((_, index) => `<span class="gallery-dot ${index === 0 ? "active" : ""}"></span>`).join("")}
+        </div>` : ""}
 
     </div>
 
@@ -336,19 +340,7 @@ ${sizeButtons}
 
     });
 
-    document.querySelectorAll(".thumb").forEach(thumb => {
-
-        thumb.addEventListener("click", function(){
-
-            document.getElementById("mainImage").src = this.src;
-
-            document.querySelectorAll(".thumb").forEach(i=>i.classList.remove("active"));
-
-            this.classList.add("active");
-
-        });
-
-    });
+    setupGallery();
 
     document.querySelectorAll(".size").forEach(button => {
 
@@ -366,6 +358,85 @@ ${sizeButtons}
 
 }
 
+// -------------------------
+// Галерея товару: свайп-карусель головного фото
+// (scroll-snap) синхронізована з крапками-індикаторами
+// та вертикальними мініатюрами
+// -------------------------
+
+function setupGallery() {
+
+    const track = document.getElementById("mainGalleryTrack");
+    const dotsWrap = document.getElementById("mainGalleryDots");
+    const thumbsVertical = document.getElementById("thumbsVertical");
+
+    if (!track) return;
+
+    function goToSlide(index) {
+
+        const slide = track.children[index];
+
+        if (slide) track.scrollTo({ left: slide.offsetLeft, behavior: "smooth" });
+
+    }
+
+    function currentSlideIndex() {
+
+        let closest = 0;
+        let minDiff = Infinity;
+
+        [...track.children].forEach((slide, index) => {
+
+            const diff = Math.abs(slide.offsetLeft - track.scrollLeft);
+
+            if (diff < minDiff) {
+                minDiff = diff;
+                closest = index;
+            }
+
+        });
+
+        return closest;
+
+    }
+
+    function syncActiveState() {
+
+        const index = currentSlideIndex();
+
+        dotsWrap?.querySelectorAll(".gallery-dot").forEach((dot, i) => {
+            dot.classList.toggle("active", i === index);
+        });
+
+        thumbsVertical?.querySelectorAll(".thumb").forEach((thumb, i) => {
+            thumb.classList.toggle("active", i === index);
+        });
+
+    }
+
+    let scrollTimer = null;
+
+    track.addEventListener("scroll", () => {
+
+        clearTimeout(scrollTimer);
+        scrollTimer = setTimeout(syncActiveState, 80);
+
+    }, { passive: true });
+
+    dotsWrap?.querySelectorAll(".gallery-dot").forEach((dot, index) => {
+        dot.addEventListener("click", () => goToSlide(index));
+    });
+
+    thumbsVertical?.querySelectorAll(".thumb").forEach((thumb, index) => {
+
+        thumb.addEventListener("click", () => goToSlide(index));
+
+    });
+
+    window.addEventListener("resize", () => goToSlide(currentSlideIndex()));
+
+}
+
 // Викликається з common.js при кліку на колір на сторінці товару —
 // повністю перебудовує галерею (мініатюри + головне фото) під
 // фотографії обраного кольору.
@@ -374,9 +445,10 @@ function updateGalleryForColor(images) {
     if (!images || !images.length) return;
 
     const thumbsVertical = document.getElementById("thumbsVertical");
-    const mainImage = document.getElementById("mainImage");
+    const track = document.getElementById("mainGalleryTrack");
+    const dotsWrap = document.getElementById("mainGalleryDots");
 
-    if (!thumbsVertical || !mainImage) return;
+    if (!thumbsVertical || !track) return;
 
     thumbsVertical.innerHTML = images.map((img, index) => `
         <img
@@ -385,21 +457,21 @@ function updateGalleryForColor(images) {
             alt="">
     `).join("");
 
-    mainImage.src = images[0];
+    track.innerHTML = images.map(img => `
+        <img class="gallery-slide" src="${img}" alt="">
+    `).join("");
 
-    thumbsVertical.querySelectorAll(".thumb").forEach(thumb => {
+    track.scrollLeft = 0;
 
-        thumb.addEventListener("click", function () {
+    if (dotsWrap) {
 
-            mainImage.src = this.src;
+        dotsWrap.innerHTML = images.length > 1
+            ? images.map((_, index) => `<span class="gallery-dot ${index === 0 ? "active" : ""}"></span>`).join("")
+            : "";
 
-            thumbsVertical.querySelectorAll(".thumb").forEach(i => i.classList.remove("active"));
+    }
 
-            this.classList.add("active");
-
-        });
-
-    });
+    setupGallery();
 
     // синхронізуємо назву кольору в характеристиках товару
     // і в підписі над мініатюрами ("Колір: ...")
@@ -440,6 +512,8 @@ container.innerHTML+=createProductCard(item);
 });
 
 updateFavoriteButtons();
+
+initProductCarousels(container);
 
 initCarousel(document.getElementById("similarCarousel"));
 

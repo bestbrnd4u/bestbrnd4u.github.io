@@ -1280,6 +1280,8 @@ function render() {
         .map(product => createProductCard(product))
         .join("");
 
+    initProductCarousels(grid);
+
     updateFavoriteButtons();
 
     productsCount.textContent = list.length;

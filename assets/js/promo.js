@@ -133,6 +133,8 @@ function renderPromoProducts(promo, allProducts) {
 
     grid.innerHTML = curated.map(product => createProductCard(product)).join("");
 
+    initProductCarousels(grid);
+
     updateFavoriteButtons();
 
     section.hidden = false;

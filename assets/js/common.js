@@ -1055,19 +1055,65 @@ document.addEventListener("click", event => {
         // кошика/обраного або самої сторінки товару)
         const scope = colorBtn.closest(".product-card, .favorite-row, .cart-item, #productPage");
 
-        const targetImg = scope?.querySelector(".product-main-image, .cart-item-image img, .favorite-row-image img");
+        const carousel = scope?.querySelector(".product-carousel");
+        const carouselTrack = carousel?.querySelector(".photo-track");
 
-        if (targetImg) {
+        if (carouselTrack) {
 
+            // картка каталогу з каруселлю фото — перебудовуємо
+            // весь трек і крапки під фото нового кольору
             try {
 
                 const images = JSON.parse(colorBtn.dataset.images || "[]");
 
-                if (images[0]) targetImg.src = images[0];
+                if (images.length) {
+
+                    carouselTrack.innerHTML = images.map(img => `
+                        <img
+                            class="product-main-image photo-slide"
+                            src="${img}"
+                            alt=""
+                            loading="lazy"
+                            onerror="this.src='assets/images/no-image.png'">
+                    `).join("");
+
+                    carouselTrack.scrollLeft = 0;
+
+                    const dotsWrap = carousel.querySelector(".photo-dots");
+
+                    if (dotsWrap) {
+
+                        dotsWrap.innerHTML = images.length > 1
+                            ? images.map((_, i) => `<span class="photo-dot ${i === 0 ? "active" : ""}"></span>`).join("")
+                            : "";
+
+                    }
+
+                }
 
             } catch (error) {
 
-                console.warn("Не вдалося розібрати images для кольору", error);
+                console.warn("Не вдалося оновити карусель для кольору", error);
+
+            }
+
+        } else {
+
+            const targetImg = scope?.querySelector(".product-main-image, .cart-item-image img, .favorite-row-image img");
+
+            if (targetImg) {
+
+                try {
+
+                    const images = JSON.parse(colorBtn.dataset.images || "[]");
+
+                    if (images[0]) targetImg.src = images[0];
+
+                } catch (error) {
+
+                    console.warn("Не вдалося розібрати images для кольору", error);
+
+                }
 
             }
 
@@ -1137,6 +1183,49 @@ updateFavoriteCounter();
 // ======================================
 
 document.addEventListener("click", function (e) {
+
+    // Стрілки каруселі фото на картці товару
+    const carouselNav = e.target.closest(".photo-nav-prev, .photo-nav-next");
+
+    if (carouselNav) {
+
+        e.preventDefault();
+
+        const track = carouselNav.closest(".product-carousel")?.querySelector(".photo-track");
+
+        if (track) {
+
+            const dir = carouselNav.classList.contains("photo-nav-prev") ? -1 : 1;
+
+            track.scrollBy({ left: dir * track.clientWidth, behavior: "smooth" });
+
+        }
+
+        return;
+
+    }
+
+    // Крапки-індикатори каруселі фото на картці товару
+    const carouselDot = e.target.closest(".photo-dot");
+
+    if (carouselDot) {
+
+        e.preventDefault();
+
+        const dotsWrap = carouselDot.parentElement;
+        const track = carouselDot.closest(".product-carousel")?.querySelector(".photo-track");
+
+        if (track && dotsWrap) {
+
+            const index = [...dotsWrap.children].indexOf(carouselDot);
+
+            track.scrollTo({ left: index * track.clientWidth, behavior: "smooth" });
+
+        }
+
+        return;
+
+    }
 
     // Кнопка "Купити"
     if (e.target.closest(".buy-btn")) {

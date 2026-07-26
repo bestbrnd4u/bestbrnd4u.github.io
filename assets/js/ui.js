@@ -71,6 +71,79 @@ function initCarousel(carouselEl) {
 
 }
 
+// -------------------------
+// Карусель фото на картці товару (каталог/подборки) —
+// scroll-snap трек + крапки-індикатори. Стрілки та крапки
+// обробляються делегуванням в common.js (щоб не навішувати
+// обробники повторно при перебудові треку через зміну кольору),
+// тут лише синхронізуємо активну крапку зі скролом і гасимо
+// клік по картці одразу після свайпу.
+// -------------------------
+
+function bindProductCarousel(track) {
+
+    if (!track || track.dataset.carouselBound) return;
+
+    track.dataset.carouselBound = "1";
+
+    const carousel = track.closest(".product-carousel");
+
+    function syncDots() {
+
+        const dots = carousel?.querySelectorAll(".photo-dot");
+
+        if (!dots || !dots.length) return;
+
+        const index = Math.round(track.scrollLeft / (track.clientWidth || 1));
+
+        dots.forEach((dot, i) => dot.classList.toggle("active", i === index));
+
+    }
+
+    let scrollTimer = null;
+
+    track.addEventListener("scroll", () => {
+
+        clearTimeout(scrollTimer);
+        scrollTimer = setTimeout(syncDots, 80);
+
+    }, { passive: true });
+
+    let touchStartX = 0;
+    let isSwiping = false;
+
+    track.addEventListener("touchstart", event => {
+
+        touchStartX = event.touches[0].clientX;
+        isSwiping = false;
+
+    }, { passive: true });
+
+    track.addEventListener("touchmove", event => {
+
+        if (Math.abs(event.touches[0].clientX - touchStartX) > 10) isSwiping = true;
+
+    }, { passive: true });
+
+    // якщо це був свайп, а не тап — гасимо клік, щоб картка
+    // не перекинула на сторінку товару одразу після гортання фото
+    track.addEventListener("click", event => {
+
+        if (isSwiping) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
+    });
+
+}
+
+function initProductCarousels(root) {
+
+    (root || document).querySelectorAll(".photo-track").forEach(bindProductCarousel);
+
+}
+
 function createProductCard(product) {
 
     const badge = product.badge
@@ -81,7 +154,9 @@ function createProductCard(product) {
         ? product.variants
         : [{ color: product.color || "Основний", hex: "#999", images: product.images || [] }];
 
-    const image = variants[0].images?.[0] || product.images?.[0] || "assets/images/no-image.png";
+    const images = variants[0].images?.length
+        ? variants[0].images
+        : (product.images?.length ? product.images : ["assets/images/no-image.png"]);
 
     const brand = product.brand || "Без бренду";
 
@@ -125,12 +200,24 @@ function createProductCard(product) {
                         <path d="M12 21s-6.7-4.4-9.3-8.3C.9 9.6 1.7 5.9 5.1 4.9c2-.6 4 .2 5.2 1.9l1.7 2.3 1.7-2.3c1.2-1.7 3.2-2.5 5.2-1.9 3.4 1 4.2 4.7 2.4 7.8C18.7 16.6 12 21 12 21z"/>
                     </svg>
                 </button>
-                <img
-                    class="product-main-image"
-                    src="${image}"
-                    alt="${product.title}"
-                    loading="lazy"
-                    onerror="this.src='assets/images/no-image.png'">
+                <div class="product-carousel">
+                    <div class="photo-track">
+                        ${images.map(img => `
+                            <img
+                                class="product-main-image photo-slide"
+                                src="${img}"
+                                alt="${product.title}"
+                                loading="lazy"
+                                onerror="this.src='assets/images/no-image.png'">
+                        `).join("")}
+                    </div>
+                    ${images.length > 1 ? `
+                    <button type="button" class="photo-nav photo-nav-prev" aria-label="Попереднє фото">‹</button>
+                    <button type="button" class="photo-nav photo-nav-next" aria-label="Наступне фото">›</button>
+                    <div class="photo-dots">
+                        ${images.map((_, index) => `<span class="photo-dot ${index === 0 ? "active" : ""}"></span>`).join("")}
+                    </div>` : ""}
+                </div>
             </div>
             <div class="product-info">
                 <a
