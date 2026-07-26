@@ -272,12 +272,9 @@ function createProductCard(product) {
                 </div>
             </div>
             <div class="product-info">
-                <a
-                    class="product-category"
-                    href="catalog?brand=${encodeURIComponent(brand)}"
-                    title="Усі товари бренду ${brand}">
+                <div class="product-category">
                     ${brand}
-                </a>
+                </div>
                 <div class="product-title">
                     ${product.title}
                 </div>

@@ -963,7 +963,8 @@ nav li.has-mega:hover .mega-menu{
 }
 
 .carousel-arrow[disabled]{
-    opacity:0;
+    opacity:.35;
+    cursor:default;
     pointer-events:none;
 }
 
@@ -1241,12 +1242,6 @@ nav li.has-mega:hover .mega-menu{
     text-transform:uppercase;
     letter-spacing:1px;
     margin-bottom:8px;
-    text-decoration:none;
-}
-
-.product-category:hover{
-    color:var(--secondary);
-    text-decoration:underline;
 }
 
 .product-title{
@@ -2746,6 +2741,10 @@ body.mobile-filters-open .scroll-top{
     textarea,
     select{
         font-size:16px;
+    }
+
+    .product-gallery{
+        grid-template-columns:1fr;
     }
 
     .thumbs-vertical{
