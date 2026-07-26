@@ -1054,14 +1054,13 @@ nav li.has-mega:hover .mega-menu{
     width:100%;
     height:100%;
     overflow-x:auto;
+    overflow-y:hidden;
     scroll-snap-type:x mandatory;
     -webkit-overflow-scrolling:touch;
+    /* лише горизонтальна панорама — див. пояснення біля
+       .gallery-track, не повертати pan-y */
+    touch-action:pan-x;
     scrollbar-width:none;
-    /* дозволяємо ОБИДВА напрямки жесту: горизонтальний свайп
-       гортає фото, а вертикальний — нормально скролить сторінку
-       (сам pan-x без pan-y блокував вертикаль повністю — це й
-       був той самий баг "не скролиться, як на фото") */
-    touch-action:pan-x pan-y;
 }
 
 .photo-track::-webkit-scrollbar{
@@ -2665,12 +2664,20 @@ body.mobile-filters-open .scroll-top{
     display:flex;
     width:100%;
     overflow-x:auto;
+    overflow-y:hidden;
     scroll-snap-type:x mandatory;
     -webkit-overflow-scrolling:touch;
+    /* тільки горизонтальна панорама на цьому елементі — це НЕ
+       блокує звичайний вертикальний скрол сторінки (жест просто
+       передається вгору, браузер обробляє його як завжди). Якщо
+       дозволити тут ще й pan-y, iOS починає сприймати цей
+       елемент як щось, що можна "потягнути" вертикально —
+       звідси й був баг з картинкою, що їздить вгору/вниз. Це
+       окрема історія від нативного drag картинки мишкою
+       (той фікситься через dragstart у common.js) —
+       не плутати і не повертати pan-y назад */
+    touch-action:pan-x;
     scrollbar-width:none;
-    /* обидва напрямки — щоб вертикальний свайп по фото
-       нормально скролив сторінку, як на md-fashion.ua */
-    touch-action:pan-x pan-y;
 }
 
 .gallery-track::-webkit-scrollbar{
