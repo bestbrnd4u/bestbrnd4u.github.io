@@ -1398,3 +1398,88 @@ contactForm?.addEventListener("submit", event => {
     contactForm.reset();
 
 });
+
+// -------------------------
+// SEO: динамічне оновлення <title>, meta description,
+// canonical, Open Graph та JSON-LD для сторінок, контент яких
+// підвантажується через JS (товар, акція). Без цього кожна така
+// сторінка мала б однаковий title/description для Google —
+// це й був один з найкритичніших SEO-багів сайту.
+// -------------------------
+
+const SITE_URL = "https://bestbrnd4u.github.io";
+
+function setMetaByName(name, content) {
+
+    if (!content) return;
+
+    let tag = document.querySelector(`meta[name="${name}"]`);
+
+    if (!tag) {
+        tag = document.createElement("meta");
+        tag.setAttribute("name", name);
+        document.head.appendChild(tag);
+    }
+
+    tag.setAttribute("content", content);
+
+}
+
+function setMetaByProperty(property, content) {
+
+    if (!content) return;
+
+    let tag = document.querySelector(`meta[property="${property}"]`);
+
+    if (!tag) {
+        tag = document.createElement("meta");
+        tag.setAttribute("property", property);
+        document.head.appendChild(tag);
+    }
+
+    tag.setAttribute("content", content);
+
+}
+
+function setCanonical(url) {
+
+    let link = document.querySelector('link[rel="canonical"]');
+
+    if (!link) {
+        link = document.createElement("link");
+        link.setAttribute("rel", "canonical");
+        document.head.appendChild(link);
+    }
+
+    link.setAttribute("href", url);
+
+}
+
+// Створює/оновлює <script type="application/ld+json"> з заданим id.
+// Ключі зі значенням undefined JSON.stringify сам прибирає —
+// зручно для необов'язкових полів (sku, rating тощо).
+function setJsonLd(id, data) {
+
+    let script = document.getElementById(id);
+
+    if (!script) {
+        script = document.createElement("script");
+        script.type = "application/ld+json";
+        script.id = id;
+        document.head.appendChild(script);
+    }
+
+    script.textContent = JSON.stringify(data);
+
+}
+
+// Обрізає опис до безпечної для meta description довжини,
+// не розриваючи слово посередині.
+function truncateForMeta(text, maxLength = 155) {
+
+    if (!text || text.length <= maxLength) return text || "";
+
+    return `${text.slice(0, maxLength).replace(/\s+\S*$/, "")}…`;
+
+}
+

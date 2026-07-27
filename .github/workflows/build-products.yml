@@ -40,11 +40,14 @@ jobs:
       - name: Build data/promotions.json
         run: node scripts/build-promotions.js
 
+      - name: Build sitemap.xml
+        run: node scripts/build-sitemap.js
+
       - name: Commit result if changed
         run: |
           git config user.name "bagvero-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data/products.json data/products/*.json data/categories.json data/promotions.json data/promotions/*.json
+          git add data/products.json data/products/*.json data/categories.json data/promotions.json data/promotions/*.json sitemap.xml
           if git diff --cached --quiet; then
             echo "Немає змін — пропускаємо коміт"
           else

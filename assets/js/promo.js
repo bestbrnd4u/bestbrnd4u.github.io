@@ -66,10 +66,32 @@ function showPromoNotFound() {
 
 }
 
+function updatePromoSeoMetadata(promo) {
+
+    const pageUrl = `${SITE_URL}/promo?id=${promo.slug}`;
+
+    const title = `${promo.title} | Bagvero`;
+
+    const description = truncateForMeta(promo.text || `Акція ${promo.title} в інтернет-магазині Bagvero`);
+
+    setMetaByName("description", description);
+
+    setCanonical(pageUrl);
+
+    setMetaByProperty("og:type", "website");
+    setMetaByProperty("og:title", title);
+    setMetaByProperty("og:description", description);
+    setMetaByProperty("og:image", promo.image);
+    setMetaByProperty("og:url", pageUrl);
+
+}
+
 function renderPromoHero(promo) {
 
     document.getElementById("pageTitle").textContent = `${promo.title} | Bagvero`;
     document.getElementById("breadcrumbTitle").textContent = promo.title;
+
+    updatePromoSeoMetadata(promo);
 
     const heroSection = document.getElementById("promoHero");
     const banner = document.getElementById("promoHeroBanner");

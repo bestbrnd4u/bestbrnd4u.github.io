@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /account
+Disallow: /cart
+Disallow: /checkout
+Disallow: /favorites
+Disallow: /thanks
+
+Sitemap: https://bestbrnd4u.github.io/sitemap.xml

@@ -2758,7 +2758,15 @@ body.mobile-filters-open .scroll-top{
     }
 
     .thumbs-vertical{
-        display:none;
+        flex-direction:row;
+        order:2;
+        overflow-x:auto;
+    }
+
+    .thumb{
+        width:64px;
+        height:64px;
+        flex-shrink:0;
     }
 
     .main-photo{
@@ -2783,6 +2791,7 @@ body.mobile-filters-open .scroll-top{
 
 .brand{
     display:inline-block;
+    align-self:flex-start;
     font-size:15px;
     letter-spacing:2px;
     text-transform:uppercase;
@@ -3045,6 +3054,7 @@ body.mobile-filters-open .scroll-top{
     width:100%;
     text-align:left;
     cursor:default;
+    -webkit-tap-highlight-color:transparent;
 }
 
 .spec-block-header h3{
@@ -3100,12 +3110,21 @@ body.mobile-filters-open .scroll-top{
     }
 
     .spec-block-content{
-        max-height:0;
-        padding-bottom:0;
+        display:grid;
+        grid-template-rows:0fr;
+        transition:grid-template-rows .3s ease;
+    }
+
+    .spec-block-inner{
+        overflow:hidden;
+        min-height:0;
     }
 
     .accordion-item.open .spec-block-content{
-        max-height:none;
+        grid-template-rows:1fr;
+    }
+
+    .accordion-item.open .spec-block-inner{
         padding-bottom:18px;
     }
 
@@ -6082,4 +6101,232 @@ body.mobile-filters-open .scroll-top{
 .mobile-filters-sub-content .gender-pill.active{
     background:transparent;
     color:var(--secondary);
+}
+
+/* =====================================
+   LIGHTBOX — повноекранний перегляд фото
+   товару з зумом (за зразком md-fashion.ua)
+===================================== */
+
+.lightbox{
+    position:fixed;
+    inset:0;
+    z-index:20000;
+    background:rgba(10,10,12,.97);
+    opacity:0;
+    transition:opacity .25s ease;
+    display:flex;
+    flex-direction:column;
+}
+
+.lightbox[hidden]{
+    display:none;
+}
+
+.lightbox.open{
+    opacity:1;
+}
+
+.lightbox-stage{
+    position:relative;
+    flex:1;
+    overflow:hidden;
+    display:flex;
+}
+
+.lightbox-track{
+    display:flex;
+    width:100%;
+    height:100%;
+    transition:transform .35s ease;
+    will-change:transform;
+}
+
+.lightbox-slide{
+    flex:0 0 100%;
+    width:100%;
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    padding:20px;
+}
+
+.lightbox-img{
+    max-width:100%;
+    max-height:100%;
+    object-fit:contain;
+    touch-action:none;
+    transition:transform .25s ease;
+    user-select:none;
+    -webkit-user-drag:none;
+}
+
+.lightbox.is-zoomed .lightbox-slide{
+    cursor:grab;
+}
+
+.lightbox-close{
+    position:fixed;
+    top:20px;
+    right:20px;
+    width:44px;
+    height:44px;
+    border-radius:50%;
+    background:rgba(255,255,255,.08);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:2;
+    transition:.2s;
+}
+
+.lightbox-close:hover{
+    background:rgba(255,255,255,.18);
+}
+
+.lightbox-close svg{
+    width:20px;
+    height:20px;
+    fill:none;
+    stroke:currentColor;
+    stroke-width:2;
+    stroke-linecap:round;
+}
+
+.lightbox-arrow{
+    width:52px;
+    height:52px;
+    border-radius:50%;
+    background:rgba(255,255,255,.08);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    transition:.2s;
+}
+
+.lightbox-arrow:hover{
+    background:rgba(255,255,255,.18);
+}
+
+.lightbox-arrow svg{
+    width:22px;
+    height:22px;
+    fill:none;
+    stroke:currentColor;
+    stroke-width:2;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+}
+
+.lightbox-arrow[disabled]{
+    opacity:.3;
+    pointer-events:none;
+}
+
+/* великі стрілки посередині екрана — тільки на широких екранах */
+.lightbox > .lightbox-prev,
+.lightbox > .lightbox-next{
+    display:none;
+}
+
+.lightbox-bottom-bar{
+    position:relative;
+    z-index:2;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:24px;
+    padding:18px 20px;
+}
+
+.lightbox-counter{
+    color:#fff;
+    font-size:16px;
+    font-weight:600;
+    font-variant-numeric:tabular-nums;
+    min-width:56px;
+    text-align:center;
+}
+
+.lightbox-counter-total{
+    color:rgba(255,255,255,.5);
+    font-weight:500;
+}
+
+.lightbox-hint{
+    position:relative;
+    z-index:2;
+    text-align:center;
+    color:rgba(255,255,255,.55);
+    font-size:12.5px;
+    padding:0 24px 22px;
+}
+
+@media(min-width:769px){
+
+    .lightbox-hint{
+        display:none;
+    }
+
+    .lightbox-bottom-bar{
+        position:fixed;
+        top:36px;
+        left:44px;
+        justify-content:flex-start;
+        padding:0;
+    }
+
+    .lightbox-bottom-bar .lightbox-prev-mobile,
+    .lightbox-bottom-bar .lightbox-next-mobile{
+        display:none;
+    }
+
+    .lightbox-counter{
+        font-size:30px;
+        font-weight:800;
+        color:#fff;
+    }
+
+    .lightbox-counter-total{
+        font-size:16px;
+    }
+
+    .lightbox > .lightbox-prev,
+    .lightbox > .lightbox-next{
+        display:flex;
+        position:fixed;
+        top:50%;
+        transform:translateY(-50%);
+        z-index:2;
+    }
+
+    .lightbox > .lightbox-prev{
+        left:30px;
+    }
+
+    .lightbox > .lightbox-next{
+        right:30px;
+    }
+
+}
+
+@media(max-width:768px){
+
+    .lightbox-close{
+        top:14px;
+        right:14px;
+        width:38px;
+        height:38px;
+    }
+
+    .lightbox-arrow{
+        width:38px;
+        height:38px;
+    }
+
 }

@@ -42,9 +42,76 @@ document.getElementById("productPage").innerHTML = `
 
 }
 
+// Виправляє головний SEO-баг сторінки товару: раніше document.title
+// і meta description ніколи не оновлювались, тож усі товари мали
+// однаковий заголовок у видачі Google. Тепер кожен товар отримує
+// власні title/description/canonical/OG + структуровані дані.
+function updateProductSeoMetadata(product) {
+
+    const pageUrl = `${SITE_URL}/product?id=${product.id}`;
+
+    const priceText = `${new Intl.NumberFormat("uk-UA").format(product.price)} грн`;
+
+    const title = `${product.title} — купити за ${priceText} | Bagvero`;
+
+    const description = truncateForMeta(
+        product.description ||
+        `${product.title} від ${product.brand} — купити в інтернет-магазині Bagvero. Ціна ${priceText}.`
+    );
+
+    const image = product.images?.[0] || "";
+
+    document.title = title;
+
+    setMetaByName("description", description);
+
+    setCanonical(pageUrl);
+
+    setMetaByProperty("og:type", "product");
+    setMetaByProperty("og:title", title);
+    setMetaByProperty("og:description", description);
+    setMetaByProperty("og:image", image);
+    setMetaByProperty("og:url", pageUrl);
+
+    setJsonLd("productSchema", {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        name: product.title,
+        image: product.images || [],
+        description,
+        sku: product.sku,
+        brand: product.brand ? { "@type": "Brand", name: product.brand } : undefined,
+        offers: {
+            "@type": "Offer",
+            url: pageUrl,
+            priceCurrency: "UAH",
+            price: product.price,
+            availability: "https://schema.org/InStock"
+        },
+        aggregateRating: product.rating ? {
+            "@type": "AggregateRating",
+            ratingValue: product.rating,
+            reviewCount: product.reviews || 0
+        } : undefined
+    });
+
+    setJsonLd("breadcrumbSchema", {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Головна", item: `${SITE_URL}/` },
+            { "@type": "ListItem", position: 2, name: "Каталог", item: `${SITE_URL}/catalog` },
+            { "@type": "ListItem", position: 3, name: product.title, item: pageUrl }
+        ]
+    });
+
+}
+
 function renderProduct(product) {
 
     document.getElementById("breadTitle").textContent = product.title;
+
+    updateProductSeoMetadata(product);
 
     const variants = product.variants?.length
         ? product.variants
@@ -228,7 +295,9 @@ ${sizeButtons}
                     <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
                 </button>
                 <div class="spec-block-content">
-                    <p class="spec-plain">${product.sku}</p>
+                    <div class="spec-block-inner">
+                        <p class="spec-plain">${product.sku}</p>
+                    </div>
                 </div>
             </div>` : ""}
 
@@ -240,6 +309,7 @@ ${sizeButtons}
                 </button>
 
                 <div class="spec-block-content">
+                <div class="spec-block-inner">
 
                 <div class="spec-row" id="specColorRow">
                     <span>Колір</span>
@@ -296,6 +366,8 @@ ${sizeButtons}
 
                 </div>
 
+                </div>
+
             </div>
 
             ${product.composition ? `
@@ -305,9 +377,11 @@ ${sizeButtons}
                     <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
                 </button>
                 <div class="spec-block-content">
-                    <div class="spec-row">
-                        <span>Склад</span>
-                        <strong>${product.composition}</strong>
+                    <div class="spec-block-inner">
+                        <div class="spec-row">
+                            <span>Склад</span>
+                            <strong>${product.composition}</strong>
+                        </div>
                     </div>
                 </div>
             </div>` : ""}
@@ -318,7 +392,9 @@ ${sizeButtons}
                     <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
                 </button>
                 <div class="spec-block-content">
-                    <p class="spec-plain">${product.description || "Стильна сумка преміальної якості. Підходить для щоденного використання та чудово поєднується з будь-яким образом."}</p>
+                    <div class="spec-block-inner">
+                        <p class="spec-plain">${product.description || "Стильна сумка преміальної якості. Підходить для щоденного використання та чудово поєднується з будь-яким образом."}</p>
+                    </div>
                 </div>
             </div>
 
@@ -509,6 +585,22 @@ function setupGallery() {
         track.addEventListener("touchcancel", () => {
 
             track.style.scrollSnapType = "";
+
+        });
+
+        // клік/тап по фото — відкриваємо повноекранний перегляд
+        // з зумом (не спрацьовує, якщо це був свайп)
+        track.addEventListener("click", () => {
+
+            if (axis === "x") return;
+
+            if (typeof window.openLightbox !== "function") return;
+
+            const currentImages = [...track.children]
+                .map(slide => slide.src)
+                .filter(Boolean);
+
+            window.openLightbox(currentImages, currentSlideIndex());
 
         });
 
