@@ -10,6 +10,9 @@
 
     const MAX_SCALE = 4;
     const DOUBLE_TAP_SCALE = 2.5;
+    const CLICK_ZOOM_SCALE = 2.5;
+
+    const desktopPointer = window.matchMedia("(hover:hover) and (pointer:fine)");
 
     let images = [];
     let index = 0;
@@ -18,6 +21,7 @@
     let track = null;
     let currentEl = null;
     let totalEl = null;
+    let zoomHint = null;
 
     let scale = 1;
     let tx = 0;
@@ -51,6 +55,7 @@
             </button>
             <div class="lightbox-stage">
                 <div class="lightbox-track" id="lightboxTrack"></div>
+                <div class="lightbox-zoom-hint" id="lightboxZoomHint">+</div>
             </div>
             <div class="lightbox-bottom-bar">
                 <button type="button" class="lightbox-arrow lightbox-prev-mobile" aria-label="Попереднє фото">
@@ -72,6 +77,7 @@
         track = el.querySelector("#lightboxTrack");
         currentEl = el.querySelector("#lightboxCurrent");
         totalEl = el.querySelector("#lightboxTotal");
+        zoomHint = el.querySelector("#lightboxZoomHint");
 
         bindControls();
 
@@ -87,7 +93,7 @@
             </div>
         `).join("");
 
-        totalEl.textContent = images.length;
+        totalEl.textContent = String(images.length).padStart(2, "0");
 
     }
 
@@ -98,6 +104,7 @@
         ty = 0;
 
         applyTransform();
+        hideZoomHint();
 
     }
 
@@ -130,7 +137,7 @@
             track.style.transition = "";
         }
 
-        currentEl.textContent = index + 1;
+        currentEl.textContent = String(index + 1).padStart(2, "0");
 
         [...track.children].forEach((slide, i) => {
             slide.classList.toggle("active", i === index);
@@ -204,20 +211,72 @@
 
         });
 
-        // подвійний клік на десктопі — тогл зуму
-        track.addEventListener("dblclick", event => {
+        // Десктоп: клік по фото наближає його, а рух курсора
+        // (без затиснутої кнопки) "гортає" збільшене зображення —
+        // так само, як на md-fashion.ua. На тач-пристроях замість
+        // цього працює свій подвійний тап (bindTouch нижче).
+        track.addEventListener("click", event => {
+
+            if (!desktopPointer.matches) return;
 
             const stageRect = root.querySelector(".lightbox-stage").getBoundingClientRect();
 
-            toggleZoom(event.clientX - stageRect.left - stageRect.width / 2, event.clientY - stageRect.top - stageRect.height / 2);
+            toggleZoom(
+                event.clientX - stageRect.left - stageRect.width / 2,
+                event.clientY - stageRect.top - stageRect.height / 2,
+                CLICK_ZOOM_SCALE
+            );
+
+            hideZoomHint();
 
         });
+
+        track.addEventListener("mousemove", event => {
+
+            if (!desktopPointer.matches) return;
+
+            const stageRect = root.querySelector(".lightbox-stage").getBoundingClientRect();
+
+            if (scale > 1.02) {
+
+                // фото вже наближене — курсор керує тим, яку
+                // ділянку показувати (без перетискання кнопки)
+                tx = -(event.clientX - stageRect.left - stageRect.width / 2) * (scale - 1) / scale;
+                ty = -(event.clientY - stageRect.top - stageRect.height / 2) * (scale - 1) / scale;
+
+                clampPan();
+                applyTransform(true);
+
+                return;
+
+            }
+
+            showZoomHint(event.clientX - stageRect.left, event.clientY - stageRect.top);
+
+        });
+
+        track.addEventListener("mouseleave", hideZoomHint);
 
         bindTouch();
 
     }
 
-    function toggleZoom(offsetX, offsetY) {
+    function showZoomHint(x, y) {
+
+        if (!zoomHint || !desktopPointer.matches) return;
+
+        zoomHint.style.transform = `translate(${x - 22}px, ${y - 22}px)`;
+        zoomHint.classList.add("show");
+
+    }
+
+    function hideZoomHint() {
+
+        zoomHint?.classList.remove("show");
+
+    }
+
+    function toggleZoom(offsetX, offsetY, zoomScale) {
 
         if (scale > 1) {
 
@@ -225,7 +284,7 @@
 
         } else {
 
-            scale = DOUBLE_TAP_SCALE;
+            scale = zoomScale || DOUBLE_TAP_SCALE;
             tx = -offsetX * (scale - 1) / scale;
             ty = -offsetY * (scale - 1) / scale;
 
