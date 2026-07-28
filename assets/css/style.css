@@ -918,6 +918,7 @@ nav li.has-mega:hover .mega-menu{
 
 .products{
     background:#f8fafc;
+    scroll-margin-top:100px;
 }
 
 .products-grid{
