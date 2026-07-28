@@ -53,6 +53,22 @@ function initCarousel(carouselEl) {
 
     }
 
+    let settleTimer = null;
+
+    function onScroll() {
+
+        updateArrows();
+
+        // на iOS фінальна корекція скролу (доводка до
+        // найближчої картки через scroll-snap після інерції
+        // свайпу) не завжди супроводжується ще одним "scroll"
+        // подією рівно в кінцевій позиції — тому додатково
+        // перевіряємо стан ще раз, коли скрол справді зупинився
+        clearTimeout(settleTimer);
+        settleTimer = setTimeout(updateArrows, 120);
+
+    }
+
     prevBtn.addEventListener("click", () => {
         track.scrollBy({ left: -getStep(), behavior: "smooth" });
     });
@@ -61,7 +77,7 @@ function initCarousel(carouselEl) {
         track.scrollBy({ left: getStep(), behavior: "smooth" });
     });
 
-    track.addEventListener("scroll", updateArrows);
+    track.addEventListener("scroll", onScroll, { passive: true });
 
     window.addEventListener("resize", updateArrows);
 

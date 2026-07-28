@@ -404,6 +404,18 @@ ${sizeButtons}
 
 </div>
 
+<div class="mobile-sticky-cart" id="mobileStickyCart">
+
+    <button
+        class="btn buy-btn"
+        data-id="${product.id}">
+
+        🛒 Додати в кошик
+
+    </button>
+
+</div>
+
 `;
 
     document.querySelectorAll(".spec-block-header").forEach(header => {
@@ -417,6 +429,7 @@ ${sizeButtons}
     });
 
     setupGallery();
+    setupMobileStickyCart();
 
     document.querySelectorAll(".size").forEach(button => {
 
@@ -439,6 +452,31 @@ ${sizeButtons}
 // (scroll-snap) синхронізована з крапками-індикаторами
 // та вертикальними мініатюрами
 // -------------------------
+
+// -------------------------
+// Мобільна закріплена панель "Додати в кошик" — з'являється
+// знизу екрана, коли основна кнопка "Купити" йде за межі
+// екрана вгору (як на md-fashion.ua)
+// -------------------------
+
+function setupMobileStickyCart() {
+
+    const mainBuyBtn = document.querySelector(".product-actions .buy-btn");
+    const stickyBar = document.getElementById("mobileStickyCart");
+
+    if (!mainBuyBtn || !stickyBar || typeof IntersectionObserver === "undefined") return;
+
+    const observer = new IntersectionObserver(([entry]) => {
+
+        const scrolledPast = !entry.isIntersecting && entry.boundingClientRect.top < 0;
+
+        stickyBar.classList.toggle("show", scrolledPast);
+
+    }, { threshold: 0 });
+
+    observer.observe(mainBuyBtn);
+
+}
 
 function setupGallery() {
 
