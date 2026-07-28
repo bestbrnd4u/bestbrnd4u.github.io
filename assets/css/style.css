@@ -40,6 +40,9 @@
     margin:0;
     padding:0;
     box-sizing:border-box;
+    /* прибираємо системний сірий блик при тапі на iOS/Android —
+       замість нього використовуємо власні :active стани нижче */
+    -webkit-tap-highlight-color:transparent;
 }
 
 html{
@@ -74,8 +77,10 @@ body{
     border:2px solid var(--gray50);
 }
 
+@media (hover:hover) and (pointer:fine){
 ::-webkit-scrollbar-thumb:hover{
     background:var(--gray500);
+}
 }
 
 img{
@@ -171,10 +176,12 @@ p{
     box-shadow:var(--shadow);
 }
 
+@media (hover:hover) and (pointer:fine){
 .btn:hover{
     transform:translateY(-4px);
     box-shadow:var(--shadow-lg);
     background:#1d4ed8;
+}
 }
 
 .btn-outline{
@@ -184,11 +191,13 @@ p{
     border:2px solid var(--gray300);
 }
 
+@media (hover:hover) and (pointer:fine){
 .btn-outline:hover{
     background:var(--gray100);
     color:var(--primary);
     border-color:var(--gray300);
     transform:translateY(-4px);
+}
 }
 
 /* =====================================
@@ -246,8 +255,10 @@ header{
     transition:.3s;
 }
 
+@media (hover:hover) and (pointer:fine){
 .logo:hover{
     color:var(--secondary);
+}
 }
 
 .logo span{
@@ -268,8 +279,10 @@ nav a{
     transition:.3s;
 }
 
+@media (hover:hover) and (pointer:fine){
 nav a:hover{
     color:var(--secondary);
+}
 }
 
 nav a.active{
@@ -277,9 +290,16 @@ nav a.active{
 }
 
 .sale-text,
-.sale-text:hover,
 .sale-text.active{
     color:var(--danger) !important;
+}
+
+
+
+@media (hover:hover) and (pointer:fine){
+.sale-text:hover{
+    color:var(--danger) !important;
+}
 }
 
 /* -- мега-меню -- */
@@ -305,8 +325,10 @@ nav li.has-mega > a::after{
     transition:.25s;
 }
 
+@media (hover:hover) and (pointer:fine){
 nav li.has-mega:hover > a::after{
     transform:rotate(225deg) translateY(2px);
+}
 }
 
 .mega-menu{
@@ -328,11 +350,13 @@ nav li.has-mega:hover > a::after{
     z-index:500;
 }
 
+@media (hover:hover) and (pointer:fine){
 nav li.has-mega:hover .mega-menu{
     opacity:1;
     visibility:visible;
     pointer-events:auto;
     transform:translateX(-50%) translateY(0);
+}
 }
 
 .mega-item{
@@ -346,9 +370,11 @@ nav li.has-mega:hover .mega-menu{
     transition:.25s;
 }
 
+@media (hover:hover) and (pointer:fine){
 .mega-item:hover{
     background:var(--gray50);
     color:var(--secondary);
+}
 }
 
 .mega-item img{
@@ -364,8 +390,10 @@ nav li.has-mega:hover .mega-menu{
     color:var(--gray900);
 }
 
+@media (hover:hover) and (pointer:fine){
 .mega-item:hover span{
     color:var(--secondary);
+}
 }
 
 /* -- мегаменю "Каталог" з колонками розділів (наповнюється JS) -- */
@@ -404,8 +432,10 @@ nav li.has-mega:hover .mega-menu{
     text-overflow:ellipsis;
 }
 
+@media (hover:hover) and (pointer:fine){
 .mega-col a:hover{
     color:var(--secondary);
+}
 }
 
 .header-icons{
@@ -429,11 +459,13 @@ nav li.has-mega:hover .mega-menu{
     font-size:20px;
 }
 
+@media (hover:hover) and (pointer:fine){
 .header-icons a:hover,
 .header-icons button:hover{
     background:var(--secondary);
     color:white;
     transform:translateY(-3px);
+}
 }
 
 /* -- мини-корзина (поп-ап под иконкой корзины) -- */
@@ -550,10 +582,12 @@ nav li.has-mega:hover .mega-menu{
     color:#fff;
 }
 
+@media (hover:hover) and (pointer:fine){
 .cart-popup .btn:hover{
     background:#1d4ed8;
     transform:translateY(-2px);
     box-shadow:var(--shadow);
+}
 }
 
 .cart-popup .cart-popup-link{
@@ -575,11 +609,13 @@ nav li.has-mega:hover .mega-menu{
     box-shadow:none;
 }
 
+@media (hover:hover) and (pointer:fine){
 .cart-popup .cart-popup-link:hover{
     border-color:var(--secondary);
     color:var(--secondary);
     background:rgba(37,99,235,.05);
     transform:none;
+}
 }
 
 @media(max-width:500px){
@@ -698,10 +734,12 @@ nav li.has-mega:hover .mega-menu{
     backdrop-filter:blur(6px);
 }
 
+@media (hover:hover) and (pointer:fine){
 .hero .btn-outline:hover{
     background:#fff;
     color:var(--primary);
     border-color:#fff;
+}
 }
 
 /* =====================================
@@ -776,8 +814,10 @@ nav li.has-mega:hover .mega-menu{
     white-space:nowrap;
 }
 
+@media (hover:hover) and (pointer:fine){
 .instagram-card .btn:hover{
     background:rgba(255,255,255,.85);
+}
 }
 
 @media(max-width:768px){
@@ -813,8 +853,10 @@ nav li.has-mega:hover .mega-menu{
     cursor:pointer;
 }
 
+@media (hover:hover) and (pointer:fine){
 .category:hover{
     transform:translateY(-8px);
+}
 }
 
 .category img{
@@ -824,8 +866,10 @@ nav li.has-mega:hover .mega-menu{
     transition:.5s;
 }
 
+@media (hover:hover) and (pointer:fine){
 .category:hover img{
     transform:scale(1.05);
+}
 }
 
 .category h3{
@@ -855,9 +899,11 @@ nav li.has-mega:hover .mega-menu{
     transition:.3s;
 }
 
+@media (hover:hover) and (pointer:fine){
 .advantages-grid div:hover{
     transform:translateY(-8px);
     box-shadow:var(--shadow);
+}
 }
 
 .advantages-grid h3{
@@ -948,10 +994,12 @@ nav li.has-mega:hover .mega-menu{
     stroke-linejoin:round;
 }
 
+@media (hover:hover) and (pointer:fine){
 .carousel-arrow:hover{
     background:var(--primary);
     color:#fff;
     transform:translateY(-50%) scale(1.06);
+}
 }
 
 .carousel-arrow.carousel-prev{
@@ -1004,9 +1052,11 @@ nav li.has-mega:hover .mega-menu{
     cursor:pointer;
 }
 
+@media (hover:hover) and (pointer:fine){
 .product-card:hover{
     transform:translateY(-10px);
     box-shadow:0 25px 60px rgba(0,0,0,.12);
+}
 }
 
 .product-card::before{
@@ -1019,8 +1069,10 @@ nav li.has-mega:hover .mega-menu{
     pointer-events:none;
 }
 
+@media (hover:hover) and (pointer:fine){
 .product-card:hover::before{
     border-color:rgba(37,99,235,.15);
+}
 }
 
 /* -- изображение карточки -- */
@@ -1039,8 +1091,10 @@ nav li.has-mega:hover .mega-menu{
     transition:.45s;
 }
 
+@media (hover:hover) and (pointer:fine){
 .product-card:hover .product-image img{
     transform:scale(1.08);
+}
 }
 
 .product-carousel{
@@ -1096,9 +1150,11 @@ nav li.has-mega:hover .mega-menu{
     transition:opacity .2s;
 }
 
+@media (hover:hover) and (pointer:fine){
 .product-card:hover .photo-nav{
     opacity:1;
     pointer-events:auto;
+}
 }
 
 .photo-nav:disabled{
@@ -1276,8 +1332,10 @@ nav li.has-mega:hover .mega-menu{
     transition:.2s;
 }
 
+@media (hover:hover) and (pointer:fine){
 .mini-color:hover{
     box-shadow:0 0 0 1.5px var(--gray300);
+}
 }
 
 .mini-color.active{
@@ -1301,8 +1359,10 @@ nav li.has-mega:hover .mega-menu{
     transition:.2s;
 }
 
+@media (hover:hover) and (pointer:fine){
 .mini-size:hover{
     border-color:var(--gray300);
+}
 }
 
 .mini-size.active{
@@ -1383,9 +1443,11 @@ nav li.has-mega:hover .mega-menu{
     transition:.3s;
 }
 
+@media (hover:hover) and (pointer:fine){
 .product-card .buy-btn:hover{
     background:#1d4ed8;
     transform:translateY(-2px);
+}
 }
 
 /* =====================================
@@ -1451,10 +1513,12 @@ nav li.has-mega:hover .mega-menu{
     box-shadow:none;
 }
 
+@media (hover:hover) and (pointer:fine){
 .newsletter-form .btn:hover{
     background:var(--secondary);
     color:#fff;
     transform:translateY(-2px);
+}
 }
 
 .newsletter-form .btn:disabled{
@@ -1524,9 +1588,11 @@ footer{
     transition:.3s;
 }
 
+@media (hover:hover) and (pointer:fine){
 .footer a:hover{
     color:white;
     padding-left:8px;
+}
 }
 
 .footer p{
@@ -1621,9 +1687,11 @@ footer{
     transition:.3s;
 }
 
+@media (hover:hover) and (pointer:fine){
 .promo-card:hover{
     transform:translateY(-8px);
     box-shadow:0 20px 45px rgba(0,0,0,.12);
+}
 }
 
 .promo-card-image{
@@ -1640,8 +1708,10 @@ footer{
     transition:.45s;
 }
 
+@media (hover:hover) and (pointer:fine){
 .promo-card:hover .promo-card-image img{
     transform:scale(1.06);
+}
 }
 
 .promo-card-badge{
@@ -1682,8 +1752,10 @@ footer{
     transition:.2s;
 }
 
+@media (hover:hover) and (pointer:fine){
 .promo-card:hover .promo-card-link{
     color:#1d4ed8;
+}
 }
 
 .brands{
@@ -1710,10 +1782,18 @@ footer{
     box-shadow:0 8px 25px rgba(0,0,0,.05);
 }
 
+.brand-card:active{
+    background:var(--primary);
+    color:white;
+    transform:scale(.97);
+}
+
+@media (hover:hover) and (pointer:fine){
 .brand-card:hover{
     transform:translateY(-8px);
     background:var(--primary);
     color:white;
+}
 }
 
 /* =====================================
@@ -1871,8 +1951,10 @@ body.mobile-filters-open .scroll-top{
     color:var(--gray500);
 }
 
+@media (hover:hover) and (pointer:fine){
 .breadcrumbs a:hover{
     color:var(--secondary);
+}
 }
 
 .breadcrumbs .crumb-sep{
@@ -1961,9 +2043,11 @@ body.mobile-filters-open .scroll-top{
     min-width:160px;
 }
 
+@media (hover:hover) and (pointer:fine){
 .catalog-filters-bar input:hover,
 .catalog-filters-bar select:hover{
     border-color:var(--gray300);
+}
 }
 
 .catalog-filters-bar input:focus,
@@ -2003,10 +2087,12 @@ body.mobile-filters-open .scroll-top{
     transition:.2s;
 }
 
+@media (hover:hover) and (pointer:fine){
 .gender-pill:hover{
     border-color:var(--secondary);
     color:var(--secondary);
     background:rgba(37,99,235,.05);
+}
 }
 
 .gender-pill.active{
@@ -2046,8 +2132,10 @@ body.mobile-filters-open .scroll-top{
     transition:.2s;
 }
 
+@media (hover:hover) and (pointer:fine){
 .filter-toggle:hover{
     border-color:var(--gray300);
+}
 }
 
 .filter-dropdown.open .filter-toggle{
@@ -2120,9 +2208,11 @@ body.mobile-filters-open .scroll-top{
     padding-top:4px;
 }
 
+@media (hover:hover) and (pointer:fine){
 .filter-option:hover{
     background:var(--gray100);
     color:var(--gray900);
+}
 }
 
 .filter-option.active{
@@ -2173,9 +2263,11 @@ body.mobile-filters-open .scroll-top{
     border-bottom:1px solid var(--gray100);
 }
 
+@media (hover:hover) and (pointer:fine){
 .filter-option-clear:hover{
     background:var(--gray100);
     color:var(--danger);
+}
 }
 
 /* -- дропдаун "Розмір": групи (Сумки/Рюкзаки) з чіпами -- */
@@ -2219,8 +2311,10 @@ body.mobile-filters-open .scroll-top{
     transition:.2s;
 }
 
+@media (hover:hover) and (pointer:fine){
 .filter-size-chip:hover{
     border-color:var(--gray300);
+}
 }
 
 .filter-size-chip.active{
@@ -2365,15 +2459,19 @@ body.mobile-filters-open .scroll-top{
     padding:7px 16px;
 }
 
+@media (hover:hover) and (pointer:fine){
 .filter-more-chip:hover{
     background:rgba(37,99,235,.12);
     border-color:var(--secondary);
     color:var(--secondary);
 }
+}
 
+@media (hover:hover) and (pointer:fine){
 .filter-chip:hover{
     border-color:var(--danger);
     color:var(--danger);
+}
 }
 
 .filter-chip-x{
@@ -2389,9 +2487,11 @@ body.mobile-filters-open .scroll-top{
     transition:.2s;
 }
 
+@media (hover:hover) and (pointer:fine){
 .filter-chip:hover .filter-chip-x{
     background:var(--danger);
     color:#fff;
+}
 }
 
 .filter-reset-chip{
@@ -2404,8 +2504,10 @@ body.mobile-filters-open .scroll-top{
     transition:.2s;
 }
 
+@media (hover:hover) and (pointer:fine){
 .filter-reset-chip:hover{
     background:rgba(37,99,235,.1);
+}
 }
 
 .catalog-top{
@@ -2458,10 +2560,12 @@ body.mobile-filters-open .scroll-top{
     transition:.2s;
 }
 
+@media (hover:hover) and (pointer:fine){
 #gridViewBtn:hover,
 #listViewBtn:hover{
     background:var(--secondary);
     color:#fff;
+}
 }
 
 /* -- кастомний дропдаун сортування -- */
@@ -2485,9 +2589,11 @@ body.mobile-filters-open .scroll-top{
     white-space:nowrap;
 }
 
+@media (hover:hover) and (pointer:fine){
 .sort-toggle:hover{
     background:var(--gray200);
     color:var(--gray900);
+}
 }
 
 .sort-toggle #sortLabel{
@@ -2533,9 +2639,11 @@ body.mobile-filters-open .scroll-top{
     white-space:nowrap;
 }
 
+@media (hover:hover) and (pointer:fine){
 .sort-option:hover{
     background:var(--gray100);
     color:var(--gray900);
+}
 }
 
 .sort-option.active{
@@ -2798,9 +2906,11 @@ body.mobile-filters-open .scroll-top{
     text-decoration:none;
 }
 
+@media (hover:hover) and (pointer:fine){
 .brand:hover{
     color:var(--secondary);
     text-decoration:underline;
+}
 }
 
 .product-meta-line{
@@ -2861,9 +2971,11 @@ body.mobile-filters-open .scroll-top{
     transition:.2s;
 }
 
+@media (hover:hover) and (pointer:fine){
 .color:hover{
     border-color:var(--gray300);
     transform:translateY(-2px);
+}
 }
 
 .color.active{
@@ -2885,8 +2997,10 @@ body.mobile-filters-open .scroll-top{
     transition:.2s;
 }
 
+@media (hover:hover) and (pointer:fine){
 .size:hover{
     border-color:var(--primary);
+}
 }
 
 .size.active{
@@ -2953,9 +3067,11 @@ body.mobile-filters-open .scroll-top{
     stroke:var(--danger);
 }
 
+@media (hover:hover) and (pointer:fine){
 .favorite-btn.active:hover .favorite-btn-icon{
     fill:var(--danger);
     stroke:var(--danger);
+}
 }
 
 /* -- маленький бейдж-індикатор у кутку кнопки "в обране" —
@@ -3206,8 +3322,10 @@ body.mobile-filters-open .scroll-top{
     color:var(--gray900);
 }
 
+@media (hover:hover) and (pointer:fine){
 .cart-item-title:hover{
     color:var(--secondary);
+}
 }
 
 .cart-item-options{
@@ -3254,9 +3372,11 @@ body.mobile-filters-open .scroll-top{
     transition:var(--transition);
 }
 
+@media (hover:hover) and (pointer:fine){
 .qty-btn:hover{
     background:var(--secondary);
     color:#fff;
+}
 }
 
 .cart-item-total{
@@ -3277,9 +3397,11 @@ body.mobile-filters-open .scroll-top{
     transition:.3s;
 }
 
+@media (hover:hover) and (pointer:fine){
 .cart-item-remove:hover{
     background:#fee2e2;
     color:#dc2626;
+}
 }
 
 .cart-summary{
@@ -3344,10 +3466,12 @@ body.mobile-filters-open .scroll-top{
     font-weight:600;
 }
 
+@media (hover:hover) and (pointer:fine){
 .cart-summary a.btn-outline:hover{
     background:var(--gray50);
     color:var(--gray900);
     transform:none;
+}
 }
 
 /* =====================================
@@ -3394,8 +3518,10 @@ body.mobile-filters-open .scroll-top{
     cursor:pointer;
 }
 
+@media (hover:hover) and (pointer:fine){
 .favorite-row:hover{
     box-shadow:var(--shadow);
+}
 }
 
 .favorite-row-image{
@@ -3431,8 +3557,10 @@ body.mobile-filters-open .scroll-top{
     margin-bottom:8px;
 }
 
+@media (hover:hover) and (pointer:fine){
 .favorite-row-title:hover{
     color:var(--secondary);
+}
 }
 
 .favorite-row-price{
@@ -3484,10 +3612,12 @@ body.mobile-filters-open .scroll-top{
     transition:.2s;
 }
 
+@media (hover:hover) and (pointer:fine){
 .favorite-row-remove:hover{
     background:#fee2e2;
     color:var(--danger);
     transform:none;
+}
 }
 
 @media(max-width:700px){
@@ -3746,8 +3876,10 @@ body.mobile-filters-open .scroll-top{
     background:#eff6ff;
 }
 
+@media (hover:hover) and (pointer:fine){
 .delivery-option-card:hover{
     border-color:var(--gray300);
+}
 }
 
 .delivery-option-title{
@@ -3875,8 +4007,10 @@ body.mobile-filters-open .scroll-top{
     transition:.2s;
 }
 
+@media (hover:hover) and (pointer:fine){
 .order-item-image:hover img{
     opacity:.85;
+}
 }
 
 .order-item-info{
@@ -3895,8 +4029,10 @@ body.mobile-filters-open .scroll-top{
     transition:.2s;
 }
 
+@media (hover:hover) and (pointer:fine){
 .order-item-title:hover{
     color:var(--secondary);
+}
 }
 
 .order-item-meta{
@@ -3936,8 +4072,10 @@ body.mobile-filters-open .scroll-top{
     transition:var(--transition);
 }
 
+@media (hover:hover) and (pointer:fine){
 .promo-row button:hover{
     background:var(--gray200);
+}
 }
 
 .promo-message{
@@ -4096,9 +4234,11 @@ body.mobile-filters-open .scroll-top{
     transition:var(--transition);
 }
 
+@media (hover:hover) and (pointer:fine){
 .modal-close:hover{
     background:var(--gray200);
     color:var(--primary);
+}
 }
 
 .modal-text{
@@ -4127,9 +4267,11 @@ body.mobile-filters-open .scroll-top{
     color:#e8c98a;
 }
 
+@media (hover:hover) and (pointer:fine){
 .btn-modal-confirm:hover{
     background:#1b2540;
     transform:translateY(-2px);
+}
 }
 
 .btn-modal-cancel{
@@ -4138,10 +4280,12 @@ body.mobile-filters-open .scroll-top{
     border:2px solid var(--gray200);
 }
 
+@media (hover:hover) and (pointer:fine){
 .btn-modal-cancel:hover{
     border-color:var(--gray300);
     background:var(--gray50);
     transform:translateY(-2px);
+}
 }
 
 @media(max-width:480px){
@@ -4610,8 +4754,10 @@ body.mobile-filters-open .scroll-top{
     transition:.2s;
 }
 
+@media (hover:hover) and (pointer:fine){
 .search-overlay-clear:hover{
     background:var(--gray300);
+}
 }
 
 .search-overlay-cancel{
@@ -4622,8 +4768,10 @@ body.mobile-filters-open .scroll-top{
     transition:.2s;
 }
 
+@media (hover:hover) and (pointer:fine){
 .search-overlay-cancel:hover{
     color:var(--secondary);
+}
 }
 
 .search-overlay-body{
@@ -4672,9 +4820,11 @@ body.mobile-filters-open .scroll-top{
     transition:.2s;
 }
 
+@media (hover:hover) and (pointer:fine){
 .search-chip:hover{
     background:var(--secondary);
     color:#fff;
+}
 }
 
 /* -- останні пошуки -- */
@@ -4694,8 +4844,10 @@ body.mobile-filters-open .scroll-top{
     cursor:pointer;
 }
 
+@media (hover:hover) and (pointer:fine){
 .search-recent-item:hover .search-recent-term{
     color:var(--secondary);
+}
 }
 
 .search-recent-term{
@@ -4717,9 +4869,11 @@ body.mobile-filters-open .scroll-top{
     transition:.2s;
 }
 
+@media (hover:hover) and (pointer:fine){
 .search-recent-remove:hover{
     background:var(--gray100);
     color:var(--gray900);
+}
 }
 
 /* -- банери каталогу (права колонка ідле-стану пошуку) -- */
@@ -4744,8 +4898,10 @@ body.mobile-filters-open .scroll-top{
     transition:transform .25s;
 }
 
+@media (hover:hover) and (pointer:fine){
 .search-promo-banner:hover{
     transform:translateY(-3px);
+}
 }
 
 .search-promo-banner span{
@@ -4795,9 +4951,11 @@ body.mobile-filters-open .scroll-top{
     transition:.15s;
 }
 
+@media (hover:hover) and (pointer:fine){
 .search-suggestion-item:hover{
     background:var(--gray100);
     color:var(--secondary);
+}
 }
 
 .search-no-suggestions{
@@ -4831,8 +4989,10 @@ body.mobile-filters-open .scroll-top{
     transition:.3s;
 }
 
+@media (hover:hover) and (pointer:fine){
 .search-result-card:hover .search-result-image img{
     transform:scale(1.06);
+}
 }
 
 .search-result-brand{
@@ -4875,8 +5035,10 @@ body.mobile-filters-open .scroll-top{
     color:var(--secondary);
 }
 
+@media (hover:hover) and (pointer:fine){
 .search-see-all:hover{
     text-decoration:underline;
+}
 }
 
 @media(max-width:800px){
@@ -5024,8 +5186,10 @@ body.mobile-filters-open .scroll-top{
     transition:var(--transition);
 }
 
+@media (hover:hover) and (pointer:fine){
 .auth-form select:hover{
     border-color:var(--gray300);
+}
 }
 
 .auth-form select:focus{
@@ -5059,9 +5223,11 @@ body.mobile-filters-open .scroll-top{
     transition:var(--transition);
 }
 
+@media (hover:hover) and (pointer:fine){
 .password-toggle:hover{
     background:var(--gray100);
     color:var(--gray700);
+}
 }
 
 .auth-form .btn{
@@ -5077,8 +5243,10 @@ body.mobile-filters-open .scroll-top{
     text-decoration:underline;
 }
 
+@media (hover:hover) and (pointer:fine){
 .auth-link:hover{
     color:var(--secondary);
+}
 }
 
 /* -- кабінет авторизованого користувача -- */
@@ -5121,8 +5289,10 @@ body.mobile-filters-open .scroll-top{
     transition:.2s;
 }
 
+@media (hover:hover) and (pointer:fine){
 .account-tab:hover{
     color:var(--gray900);
+}
 }
 
 .account-tab.active{
@@ -5375,8 +5545,10 @@ body.mobile-filters-open .scroll-top{
     transition:.2s;
 }
 
+@media (hover:hover) and (pointer:fine){
 .order-item-refuse:hover{
     color:var(--danger);
+}
 }
 
 /* -- контактні дані / доставка / оплата у деталях замовлення -- */
@@ -5612,17 +5784,21 @@ body.mobile-filters-open .scroll-top{
     color:var(--secondary);
 }
 
+@media (hover:hover) and (pointer:fine){
 .address-edit-btn:hover{
     background:rgba(37,99,235,.1);
+}
 }
 
 .address-remove-btn{
     color:var(--gray500);
 }
 
+@media (hover:hover) and (pointer:fine){
 .address-remove-btn:hover{
     background:#fee2e2;
     color:var(--danger);
+}
 }
 
 .address-modal-card{
@@ -5718,8 +5894,10 @@ body.mobile-filters-open .scroll-top{
     transition:.2s;
 }
 
+@media (hover:hover) and (pointer:fine){
 .saved-address-chip:hover{
     border-color:var(--secondary);
+}
 }
 
 .saved-address-chip.active{
@@ -6222,8 +6400,10 @@ body.mobile-filters-open .scroll-top{
     transition:.2s;
 }
 
+@media (hover:hover) and (pointer:fine){
 .lightbox-close:hover{
     background:rgba(255,255,255,.18);
+}
 }
 
 .lightbox-close svg{
@@ -6248,8 +6428,10 @@ body.mobile-filters-open .scroll-top{
     transition:.2s;
 }
 
+@media (hover:hover) and (pointer:fine){
 .lightbox-arrow:hover{
     background:rgba(255,255,255,.18);
+}
 }
 
 .lightbox-arrow svg{
