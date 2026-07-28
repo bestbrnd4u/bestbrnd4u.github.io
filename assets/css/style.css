@@ -918,7 +918,6 @@ nav li.has-mega:hover .mega-menu{
 
 .products{
     background:#f8fafc;
-    scroll-margin-top:100px;
 }
 
 .products-grid{
@@ -1876,7 +1875,7 @@ footer{
 /* коли відкрита мобільна шторка "Всі фільтри" — ховаємо кнопку
    "нагору", інакше вона накладається на футер шторки */
 body:has(.mobile-sticky-cart.show) .scroll-top{
-    bottom:100px;
+    bottom:calc(100px + env(safe-area-inset-bottom, 0px));
 }
 
 body.mobile-filters-open .scroll-top{
@@ -3118,7 +3117,12 @@ body.mobile-filters-open .scroll-top{
         bottom:0;
         z-index:900;
         background:#fff;
-        padding:12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+        /* мінімум 20px відступу знизу навіть якщо
+           env(safe-area-inset-bottom) дорівнює 0 — інакше
+           кнопка опиняється в "гарячій зоні" й перший тап
+           в Safari на iOS лише розгортає нижню панель
+           браузера замість натискання на кнопку */
+        padding:12px 16px max(20px, calc(12px + env(safe-area-inset-bottom, 0px)));
         box-shadow:0 -10px 30px rgba(0,0,0,.1);
         transform:translateY(110%);
         transition:transform .3s ease;

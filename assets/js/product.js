@@ -142,11 +142,21 @@ function renderProduct(product) {
 
     const sizes = product.sizes?.length ? product.sizes : PRODUCT_SIZES;
 
-    const sizeButtons = sizes.map(size => `
-        <button class="size ${sizes.length === 1 ? "active" : ""}">
+    // якщо розмір уже був обраний на картці в каталозі —
+    // він приходить сюди через ?size= і має лишитися обраним
+    const requestedSize = params.get("size");
+
+    const sizeButtons = sizes.map(size => {
+
+        const isActive = sizes.length === 1 || size === requestedSize;
+
+        return `
+        <button class="size ${isActive ? "active" : ""}">
             ${size}
         </button>
-    `).join("");
+    `;
+
+    }).join("");
 
     document.getElementById("productPage").innerHTML = `
 
@@ -445,6 +455,8 @@ ${sizeButtons}
             this.classList.add("active");
 
             updateFavoriteButtons();
+
+            this.closest(".sizes, .product-sizes")?.classList.remove("size-shake");
 
             const errorEl = document.getElementById("sizeError");
 

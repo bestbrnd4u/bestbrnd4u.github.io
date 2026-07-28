@@ -1327,7 +1327,15 @@ document.addEventListener("click", function (e) {
 
         const id = card.dataset.id;
 
-        window.location.href = `product?id=${id}`;
+        // якщо на картці вже обраний розмір — переносимо його
+        // на сторінку товару, щоб не обирати заново
+        const { size } = getSelectedVariant(card);
+
+        const query = new URLSearchParams({ id });
+
+        if (size) query.set("size", size);
+
+        window.location.href = `product?${query.toString()}`;
 
     }
 
