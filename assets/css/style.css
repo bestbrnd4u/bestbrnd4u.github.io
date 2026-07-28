@@ -751,6 +751,7 @@ nav li.has-mega:hover .mega-menu{
     justify-content:space-between;
     align-items:center;
     margin-bottom:45px;
+    scroll-margin-top:100px;
 }
 
 .section-title h2{
@@ -918,7 +919,6 @@ nav li.has-mega:hover .mega-menu{
 
 .products{
     background:#f8fafc;
-    scroll-margin-top:82px;
 }
 
 .products-grid{
