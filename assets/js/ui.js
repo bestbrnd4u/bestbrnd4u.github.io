@@ -70,11 +70,40 @@ function initCarousel(carouselEl) {
     }
 
     prevBtn.addEventListener("click", () => {
-        track.scrollBy({ left: -getStep(), behavior: "smooth" });
+
+        if (prevBtn.disabled) return;
+
+        const step = getStep();
+        let target = track.scrollLeft - step;
+
+        // якщо до самого початку залишається менше кроку —
+        // доскролюємо рівно до 0, щоб не "застрягти" через
+        // дробові пікселі і не лишити стрілку активною
+        if (target < step / 2) target = 0;
+
+        prevBtn.disabled = target <= 0;
+        nextBtn.disabled = false;
+
+        track.scrollTo({ left: target, behavior: "smooth" });
+
     });
 
     nextBtn.addEventListener("click", () => {
-        track.scrollBy({ left: getStep(), behavior: "smooth" });
+
+        if (nextBtn.disabled) return;
+
+        const step = getStep();
+        const maxScroll = track.scrollWidth - track.clientWidth;
+        let target = track.scrollLeft + step;
+
+        // так само на кінці — доскролюємо рівно до останньої картки
+        if (target > maxScroll - step / 2) target = maxScroll;
+
+        nextBtn.disabled = target >= maxScroll;
+        prevBtn.disabled = false;
+
+        track.scrollTo({ left: target, behavior: "smooth" });
+
     });
 
     track.addEventListener("scroll", onScroll, { passive: true });

@@ -695,7 +695,10 @@ function setupGallery() {
                 .map(slide => slide.src)
                 .filter(Boolean);
 
-            window.openLightbox(currentImages, currentSlideIndex());
+            const brand = document.querySelector(".product-info .brand")?.textContent.trim();
+            const title = document.querySelector(".product-info h1")?.textContent.trim();
+
+            window.openLightbox(currentImages, currentSlideIndex(), { brand, title });
 
         });
 

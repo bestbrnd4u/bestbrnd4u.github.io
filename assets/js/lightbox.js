@@ -22,6 +22,9 @@
     let currentEl = null;
     let totalEl = null;
     let zoomHint = null;
+    let infoEl = null;
+    let infoBrandEl = null;
+    let infoTitleEl = null;
 
     let scale = 1;
     let tx = 0;
@@ -57,6 +60,10 @@
                 <div class="lightbox-track" id="lightboxTrack"></div>
                 <div class="lightbox-zoom-hint" id="lightboxZoomHint">+</div>
             </div>
+            <div class="lightbox-info" id="lightboxInfo">
+                <div class="lightbox-info-brand" id="lightboxInfoBrand"></div>
+                <div class="lightbox-info-title" id="lightboxInfoTitle"></div>
+            </div>
             <div class="lightbox-bottom-bar">
                 <button type="button" class="lightbox-arrow lightbox-prev-mobile" aria-label="Попереднє фото">
                     <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>
@@ -78,6 +85,9 @@
         currentEl = el.querySelector("#lightboxCurrent");
         totalEl = el.querySelector("#lightboxTotal");
         zoomHint = el.querySelector("#lightboxZoomHint");
+        infoEl = el.querySelector("#lightboxInfo");
+        infoBrandEl = el.querySelector("#lightboxInfoBrand");
+        infoTitleEl = el.querySelector("#lightboxInfoTitle");
 
         bindControls();
 
@@ -153,7 +163,7 @@
 
     }
 
-    window.openLightbox = function (imageList, startIndex) {
+    window.openLightbox = function (imageList, startIndex, meta) {
 
         buildLightbox();
 
@@ -162,6 +172,13 @@
         if (!images.length) return;
 
         renderSlides();
+
+        const brand = meta?.brand || "";
+        const title = meta?.title || "";
+
+        infoBrandEl.textContent = brand;
+        infoTitleEl.textContent = title;
+        infoEl.hidden = !brand && !title;
 
         root.hidden = false;
 
@@ -243,8 +260,8 @@
 
                 // фото вже наближене — курсор керує тим, яку
                 // ділянку показувати (без перетискання кнопки)
-                tx = -(event.clientX - stageRect.left - stageRect.width / 2) * (scale - 1) / scale;
-                ty = -(event.clientY - stageRect.top - stageRect.height / 2) * (scale - 1) / scale;
+                tx = -(event.clientX - stageRect.left - stageRect.width / 2) * (scale - 1);
+                ty = -(event.clientY - stageRect.top - stageRect.height / 2) * (scale - 1);
 
                 clampPan();
                 applyTransform(true);
@@ -323,8 +340,8 @@
         } else {
 
             scale = zoomScale || DOUBLE_TAP_SCALE;
-            tx = -offsetX * (scale - 1) / scale;
-            ty = -offsetY * (scale - 1) / scale;
+            tx = -offsetX * (scale - 1);
+            ty = -offsetY * (scale - 1);
 
             clampPan();
             applyTransform();

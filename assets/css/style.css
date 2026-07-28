@@ -45,6 +45,23 @@
     -webkit-tap-highlight-color:transparent;
 }
 
+/* iOS Safari тримає режим "подвійний тап — зум" активним для
+   будь-якого елемента, тому перший тап по кнопці/посиланню
+   очікує ~300-350мс, чи не буде другого тапу поруч. Якщо
+   людина не дочекалась і тапнула ще раз ("не спрацювало"),
+   Safari іноді сприймає цю пару тапів як жест зуму і гасить
+   клік повністю — кнопка "Купити"/"Додати в кошик" не
+   спрацьовує з першого разу. touch-action:manipulation прибирає
+   цю неоднозначність: клік по інтерактивних елементах
+   реєструється миттєво, без очікування другого тапу. */
+button,
+a,
+.btn,
+input[type="button"],
+input[type="submit"]{
+    touch-action:manipulation;
+}
+
 html{
     scroll-behavior:smooth;
     scroll-padding-top:100px;
@@ -922,6 +939,10 @@ nav li.has-mega:hover .mega-menu{
     padding-top:40px;
 }
 
+#products{
+    scroll-margin-top:82px;
+}
+
 .products-grid{
     display:grid;
     grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
@@ -1015,7 +1036,6 @@ nav li.has-mega:hover .mega-menu{
 .carousel-arrow[disabled]{
     opacity:.35;
     cursor:default;
-    pointer-events:none;
 }
 
 @media(max-width:900px){
@@ -3264,14 +3284,26 @@ body.mobile-filters-open .scroll-top{
 
 .spec-row{
     display:flex;
-    justify-content:space-between;
-    gap:16px;
-    padding:14px 0;
-    border-bottom:1px solid var(--gray100);
+    flex-wrap:wrap;
+    align-items:baseline;
+    gap:6px;
+    padding:7px 0;
+    font-size:14.5px;
+    line-height:1.55;
 }
 
-.spec-row:last-child{
-    border-bottom:none;
+.spec-row span{
+    color:var(--gray500);
+    flex-shrink:0;
+}
+
+.spec-row span::after{
+    content:":";
+}
+
+.spec-row strong{
+    color:var(--gray900);
+    font-weight:600;
 }
 
 .spec-block + .spec-block{
@@ -6590,6 +6622,32 @@ body.mobile-filters-open .scroll-top{
     padding:18px 20px;
 }
 
+.lightbox-info{
+    position:relative;
+    z-index:2;
+    text-align:center;
+    padding:0 24px 6px;
+}
+
+.lightbox-info[hidden]{
+    display:none;
+}
+
+.lightbox-info-brand{
+    color:rgba(255,255,255,.55);
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:1.2px;
+    text-transform:uppercase;
+}
+
+.lightbox-info-title{
+    color:#fff;
+    font-size:15px;
+    font-weight:600;
+    margin-top:4px;
+}
+
 .lightbox-counter{
     color:#fff;
     font-size:16px;
@@ -6640,6 +6698,23 @@ body.mobile-filters-open .scroll-top{
 
     .lightbox-counter-total{
         font-size:16px;
+    }
+
+    .lightbox-info{
+        position:fixed;
+        top:92px;
+        left:44px;
+        text-align:left;
+        padding:0;
+        max-width:360px;
+    }
+
+    .lightbox-info-brand{
+        font-size:13px;
+    }
+
+    .lightbox-info-title{
+        font-size:19px;
     }
 
     .lightbox > .lightbox-prev,
