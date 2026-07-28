@@ -2956,6 +2956,88 @@ body.mobile-filters-open .scroll-top{
     font-weight:600;
 }
 
+.size-row-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+}
+
+.size-row-head label{
+    margin-bottom:12px;
+}
+
+.size-guide-link{
+    color:var(--secondary);
+    font-weight:600;
+    font-size:14px;
+    text-decoration:underline;
+    text-underline-offset:2px;
+    margin-bottom:12px;
+}
+
+@media (hover:hover) and (pointer:fine){
+    .size-guide-link:hover{
+        color:#1d4ed8;
+    }
+}
+
+.size-error{
+    margin-top:10px;
+    color:#dc2626;
+    font-size:13.5px;
+    font-weight:600;
+}
+
+@keyframes sizeShake{
+    10%, 90%{ transform:translateX(-1px); }
+    20%, 80%{ transform:translateX(2px); }
+    30%, 50%, 70%{ transform:translateX(-4px); }
+    40%, 60%{ transform:translateX(4px); }
+}
+
+.size-shake{
+    animation:sizeShake .5s;
+}
+
+.size-shake .size,
+.size-shake .mini-size{
+    border-color:#dc2626 !important;
+}
+
+/* -- модалка "Таблиця розмірів" -- */
+
+.size-guide-card{
+    max-width:520px;
+    border-top-color:var(--secondary);
+}
+
+.size-guide-table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:18px;
+}
+
+.size-guide-table th,
+.size-guide-table td{
+    padding:12px 10px;
+    text-align:left;
+    border-bottom:1px solid var(--gray100);
+    font-size:14.5px;
+}
+
+.size-guide-table th{
+    color:var(--gray500);
+    font-weight:600;
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+}
+
+.size-guide-table td:first-child{
+    font-weight:700;
+}
+
 .color-options{
     display:flex;
     gap:12px;

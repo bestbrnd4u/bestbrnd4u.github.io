@@ -51,7 +51,7 @@ function createFavoriteRow(product, favEntry) {
     const sizes = product.sizes?.length ? product.sizes : PRODUCT_SIZES;
 
     const activeColor = favEntry.color || variants[0].color;
-    const activeSize = favEntry.size || sizes[0];
+    const activeSize = favEntry.size || (sizes.length === 1 ? sizes[0] : null);
 
     const activeVariant = variants.find(v => v.color === activeColor) || variants[0];
 

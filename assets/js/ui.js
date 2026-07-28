@@ -302,10 +302,10 @@ function createProductCard(product) {
             style="background:${variant.hex}"></button>
     `).join("");
 
-    const sizeButtons = sizes.map((size, index) => `
+    const sizeButtons = sizes.map(size => `
         <button
             type="button"
-            class="mini-size ${index === 0 ? "active" : ""}">
+            class="mini-size ${sizes.length === 1 ? "active" : ""}">
             ${size}
         </button>
     `).join("");

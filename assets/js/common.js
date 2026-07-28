@@ -1022,6 +1022,56 @@ function getSelectedVariant(scope) {
 
 }
 
+// Розмір обов'язковий тільки якщо у товару реально є вибір
+// (більше одного варіанту) — якщо розмір один-єдиний, він уже
+// проставлений активним автоматично і нічого обирати не треба.
+function isSizeSatisfied(scope) {
+
+    const sizesWrap = scope.querySelector(".sizes, .product-sizes");
+
+    if (!sizesWrap) return true;
+
+    const options = sizesWrap.querySelectorAll(".size, .mini-size");
+
+    if (options.length <= 1) return true;
+
+    return !!sizesWrap.querySelector(".size.active, .mini-size.active");
+
+}
+
+// Підсвічуємо, що розмір треба обрати. На сторінці товару є
+// місце під постійний текст помилки — показуємо його і
+// прокручуємо до розмірів. У компактній картці каталогу/віджета
+// такого місця немає, тож обмежуємось стряскою по рядку
+// розмірів і спливаючим повідомленням.
+function flagSizeRequired(scope) {
+
+    const sizesWrap = scope.querySelector(".sizes, .product-sizes");
+
+    if (!sizesWrap) return;
+
+    sizesWrap.classList.remove("size-shake");
+
+    void sizesWrap.offsetWidth;
+
+    sizesWrap.classList.add("size-shake");
+
+    const errorEl = scope.querySelector(".size-error");
+
+    if (errorEl) {
+
+        errorEl.hidden = false;
+
+        sizesWrap.scrollIntoView({ behavior: "smooth", block: "center" });
+
+    } else {
+
+        showToast("Будь ласка, оберіть розмір");
+
+    }
+
+}
+
 document.addEventListener("click", event => {
 
     const favorite = event.target.closest(".favorite");
@@ -1044,6 +1094,14 @@ document.addEventListener("click", event => {
     if (buy) {
 
         const scope = buy.closest("#productPage") || buy.closest(".product-card, .favorite-row");
+
+        if (scope && !isSizeSatisfied(scope)) {
+
+            flagSizeRequired(scope);
+
+            return;
+
+        }
 
         const { color, size } = getSelectedVariant(scope);
 
@@ -1174,6 +1232,13 @@ document.addEventListener("click", event => {
         sizeBtn.classList.add("active");
 
         updateFavoriteButtons();
+
+        group?.classList.remove("size-shake");
+
+        const scope = sizeBtn.closest(".product-card, .favorite-row");
+        const errorEl = scope?.querySelector(".size-error");
+
+        if (errorEl) errorEl.hidden = true;
 
         return;
 

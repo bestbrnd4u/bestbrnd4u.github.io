@@ -142,8 +142,8 @@ function renderProduct(product) {
 
     const sizes = product.sizes?.length ? product.sizes : PRODUCT_SIZES;
 
-    const sizeButtons = sizes.map((size, index) => `
-        <button class="size ${index === 0 ? "active" : ""}">
+    const sizeButtons = sizes.map(size => `
+        <button class="size ${sizes.length === 1 ? "active" : ""}">
             ${size}
         </button>
     `).join("");
@@ -230,13 +230,18 @@ function renderProduct(product) {
 </div>
 <div class="option-group">
 
-<label>Розмір</label>
+<div class="size-row-head">
+    <label>Розмір</label>
+    <button type="button" class="size-guide-link" id="sizeGuideBtn">Таблиця розмірів</button>
+</div>
 
 <div class="sizes">
 
 ${sizeButtons}
 
 </div>
+
+<div class="size-error" id="sizeError" hidden>Будь ласка, оберіть розмір</div>
 
 </div>
 
@@ -441,7 +446,47 @@ ${sizeButtons}
 
             updateFavoriteButtons();
 
+            const errorEl = document.getElementById("sizeError");
+
+            if (errorEl) errorEl.hidden = true;
+
         });
+
+    });
+
+    setupSizeGuideModal();
+
+}
+
+// -------------------------
+// Модалка "Таблиця розмірів"
+// -------------------------
+
+function setupSizeGuideModal() {
+
+    const openBtn = document.getElementById("sizeGuideBtn");
+    const modal = document.getElementById("sizeGuideModal");
+    const closeBtn = document.getElementById("sizeGuideClose");
+
+    if (!openBtn || !modal || modal.dataset.bound) return;
+
+    modal.dataset.bound = "1";
+
+    openBtn.addEventListener("click", () => {
+
+        modal.hidden = false;
+
+    });
+
+    closeBtn?.addEventListener("click", () => {
+
+        modal.hidden = true;
+
+    });
+
+    modal.addEventListener("click", event => {
+
+        if (event.target === modal) modal.hidden = true;
 
     });
 
