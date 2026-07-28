@@ -219,6 +219,8 @@
 
             if (!desktopPointer.matches) return;
 
+            if (!isPointOverImage(event.clientX, event.clientY)) return;
+
             const stageRect = root.querySelector(".lightbox-stage").getBoundingClientRect();
 
             toggleZoom(
@@ -227,7 +229,7 @@
                 CLICK_ZOOM_SCALE
             );
 
-            hideZoomHint();
+            showZoomHint(event.clientX - stageRect.left, event.clientY - stageRect.top, scale > 1.02);
 
         });
 
@@ -247,11 +249,23 @@
                 clampPan();
                 applyTransform(true);
 
+                // в наближеному стані фото завжди займає весь стейдж,
+                // тож кружок з "−" показуємо без перевірки меж
+                showZoomHint(event.clientX - stageRect.left, event.clientY - stageRect.top, true);
+
                 return;
 
             }
 
-            showZoomHint(event.clientX - stageRect.left, event.clientY - stageRect.top);
+            // не в зумі: object-fit:contain лишає порожні поля з боків
+            // або зверху/знизу для не-квадратних фото — там кружок
+            // ховаємо і повертаємо звичайний курсор
+            if (!isPointOverImage(event.clientX, event.clientY)) {
+                hideZoomHint();
+                return;
+            }
+
+            showZoomHint(event.clientX - stageRect.left, event.clientY - stageRect.top, false);
 
         });
 
@@ -261,18 +275,42 @@
 
     }
 
-    function showZoomHint(x, y) {
+    function showZoomHint(x, y, isZoomedIn) {
 
         if (!zoomHint || !desktopPointer.matches) return;
 
+        zoomHint.textContent = isZoomedIn ? "−" : "+";
         zoomHint.style.transform = `translate(${x - 22}px, ${y - 22}px)`;
         zoomHint.classList.add("show");
+
+        // ховаємо системний курсор ("лупу") — його місце займає
+        // цей кружок; поза межами фото клас знімається в hideZoomHint
+        track.classList.add("cursor-hidden");
 
     }
 
     function hideZoomHint() {
 
         zoomHint?.classList.remove("show");
+        track?.classList.remove("cursor-hidden");
+
+    }
+
+    // Перевіряє, чи координати курсора (clientX/clientY) справді
+    // потрапляють на видиму частину фото — object-fit:contain
+    // лишає порожні поля з боків або зверху/знизу для фото, чиї
+    // пропорції не збігаються зі стейджем.
+    function isPointOverImage(clientX, clientY) {
+
+        const slide = track.children[index];
+        const img = slide?.querySelector(".lightbox-img");
+
+        if (!img) return false;
+
+        const rect = img.getBoundingClientRect();
+
+        return clientX >= rect.left && clientX <= rect.right
+            && clientY >= rect.top && clientY <= rect.bottom;
 
     }
 

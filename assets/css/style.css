@@ -6162,20 +6162,18 @@ body.mobile-filters-open .scroll-top{
 }
 
 .lightbox.is-zoomed .lightbox-slide{
-    cursor:grab;
+    /* курсор ховається кастомним кружком-підказкою (JS додає
+       клас .cursor-hidden лише поки курсор реально над фото) */
 }
 
-/* -- десктоп: наведення міняє курсор, клік наближає фото,
-   а рух курсора після цього "гортає" збільшене зображення
-   (без перетискання) — за зразком md-fashion.ua -- */
+/* -- десктоп: замість системного курсора "лупа" показуємо
+   свій кружок з +/- (лоджика в lightbox.js), а системний
+   курсор ховаємо тільки поки він справді над фото -- */
 @media (hover:hover) and (pointer:fine){
 
-    .lightbox-slide{
-        cursor:zoom-in;
-    }
-
-    .lightbox.is-zoomed .lightbox-slide{
-        cursor:zoom-out;
+    .lightbox-track.cursor-hidden,
+    .lightbox-track.cursor-hidden .lightbox-slide{
+        cursor:none;
     }
 
     .lightbox.is-zoomed .lightbox-img{
