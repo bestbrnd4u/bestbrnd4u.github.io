@@ -940,7 +940,7 @@ nav li.has-mega:hover .mega-menu{
 }
 
 #products{
-    scroll-margin-top:42px;
+    scroll-margin-top:-58px; /* header(82) - html scroll-padding-top(100) - .products padding-top(40) = -58, cancels the double offset from the global scroll-padding-top so the title lands flush under the header */
 }
 
 .products-grid{
