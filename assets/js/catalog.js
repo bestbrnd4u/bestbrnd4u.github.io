@@ -46,26 +46,6 @@ let selectedSizes = new Set(); // елементи виду "group:size", нап
 // колір товару (для фільтра) — беремо прямо з variants,
 // де hex вже заданий в адмінці; це й головне джерело правди
 // для свотчів у фільтрі "Колір"
-function getProductColors(product) {
-
-    const colors = new Map(); // назва -> hex
-
-    (product.variants || []).forEach(variant => {
-
-        if (variant.color && !colors.has(variant.color)) {
-            colors.set(variant.color, variant.hex || null);
-        }
-
-    });
-
-    if (product.color && !colors.has(product.color)) {
-        colors.set(product.color, null);
-    }
-
-    return colors;
-
-}
-
 const SIZE_GROUPS = [
     {
         key: "bags",
@@ -1261,14 +1241,6 @@ function filterProducts() {
     }
 
     return list;
-
-}
-
-function getDiscountPercent(product) {
-
-    if (!product.oldPrice || product.oldPrice <= product.price) return 0;
-
-    return Math.round((1 - product.price / product.oldPrice) * 100);
 
 }
 

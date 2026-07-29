@@ -67,6 +67,11 @@ html{
     scroll-padding-top:100px;
     scrollbar-width:thin;
     scrollbar-color:var(--gray300) var(--gray50);
+    /* резервуємо місце під вертикальний скролбар завжди —
+       без цього поява скролбару (напр. коли в пошуку з'являються
+       результати) змінює доступну ширину і весь центрований
+       контент "стрибає" вліво */
+    scrollbar-gutter:stable;
 }
 
 body{
@@ -940,7 +945,7 @@ nav li.has-mega:hover .mega-menu{
 }
 
 #products{
-    scroll-margin-top:82px;
+    scroll-margin-top:-58px; /* header(82) - html scroll-padding-top(100) - .products padding-top(40) = -58, cancels the double offset from the global scroll-padding-top so the title lands flush under the header */
 }
 
 .products-grid{
@@ -4836,6 +4841,9 @@ body.mobile-filters-open .scroll-top{
     width:100%;
     max-height:calc(100vh - 82px);
     overflow-y:auto;
+    /* без цього поява внутрішнього скролбару (коли зʼявляються
+       результати пошуку) звужує контент і все "стрибає" вліво */
+    scrollbar-gutter:stable;
     background:#fff;
     box-shadow:var(--shadow-lg);
     transform:translateY(-16px);

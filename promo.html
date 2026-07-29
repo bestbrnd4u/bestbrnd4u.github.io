@@ -124,12 +124,63 @@ rel="stylesheet">
 
     <div class="container">
 
+        <div class="catalog-filters-bar" id="promoFiltersBar">
+
+            <div class="filter-group filter-dropdown" id="promoBrandDropdown">
+                <button type="button" id="promoBrandToggle" class="filter-toggle">
+                    <span id="promoBrandLabel">Усі бренди</span>
+                    <span class="filter-arrow">▾</span>
+                </button>
+                <div id="promoBrandMenu" class="filter-menu" hidden>
+                    <button type="button" class="filter-option-clear" data-clear-promo-brand>✕ Скинути вибір бренду</button>
+                    <div id="promoBrandOptionsList" class="filter-menu-options"></div>
+                </div>
+            </div>
+
+            <div class="filter-group filter-dropdown" id="promoColorDropdown">
+                <button type="button" id="promoColorToggle" class="filter-toggle">
+                    <span id="promoColorLabel">Усі кольори</span>
+                    <span class="filter-arrow">▾</span>
+                </button>
+                <div id="promoColorMenu" class="filter-menu filter-menu-colors" hidden>
+                    <button type="button" class="filter-option-clear" data-clear-promo-color>✕ Скинути вибір кольору</button>
+                    <div id="promoColorOptionsList" class="filter-menu-options"></div>
+                </div>
+            </div>
+
+        </div>
+
         <div class="catalog-top">
             <p>
                 У цій акції
                 <span id="promoProductsCount">0</span>
                 товарів
             </p>
+
+            <div class="catalog-actions">
+
+                <div class="sort-dropdown" id="promoSortDropdown">
+                    <button type="button" id="promoSortToggle" class="sort-toggle">
+                        Сортувати: <span id="promoSortLabel">за замовчуванням</span>
+                        <span class="sort-arrow">▾</span>
+                    </button>
+                    <div id="promoSortMenu" class="sort-menu" hidden>
+                        <button type="button" class="sort-option active" data-sort="" data-label="за замовчуванням">за замовчуванням</button>
+                        <button type="button" class="sort-option" data-sort="new" data-label="новинки">новинки</button>
+                        <button type="button" class="sort-option" data-sort="top" data-label="топ">топ</button>
+                        <button type="button" class="sort-option" data-sort="priceAsc" data-label="за збільшенням ціни">за збільшенням ціни</button>
+                        <button type="button" class="sort-option" data-sort="priceDesc" data-label="за зменшенням ціни">за зменшенням ціни</button>
+                        <button type="button" class="sort-option" data-sort="discount" data-label="за знижкою">за знижкою</button>
+                    </div>
+                </div>
+
+                <div>
+                    Показати:
+                    <button id="promoGridViewBtn" aria-label="Сітка товарів" class="active">▦</button>
+                    <button id="promoListViewBtn" aria-label="Список товарів">☰</button>
+                </div>
+
+            </div>
         </div>
 
         <div id="promoProductsGrid" class="products-grid"></div>

@@ -1473,6 +1473,39 @@ contactForm?.addEventListener("submit", event => {
 });
 
 // -------------------------
+// Кольори товару (використовується в catalog.js і promo.js для
+// побудови фільтра "Колір")
+// -------------------------
+
+function getProductColors(product) {
+
+    const colors = new Map(); // назва -> hex
+
+    (product.variants || []).forEach(variant => {
+
+        if (variant.color && !colors.has(variant.color)) {
+            colors.set(variant.color, variant.hex || null);
+        }
+
+    });
+
+    if (product.color && !colors.has(product.color)) {
+        colors.set(product.color, null);
+    }
+
+    return colors;
+
+}
+
+function getDiscountPercent(product) {
+
+    if (!product.oldPrice || product.oldPrice <= product.price) return 0;
+
+    return Math.round((1 - product.price / product.oldPrice) * 100);
+
+}
+
+// -------------------------
 // SEO: динамічне оновлення <title>, meta description,
 // canonical, Open Graph та JSON-LD для сторінок, контент яких
 // підвантажується через JS (товар, акція). Без цього кожна така

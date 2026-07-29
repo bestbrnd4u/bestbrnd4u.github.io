@@ -173,6 +173,13 @@
 
         renderSlides();
 
+        // на випадок, якщо лайтбокс раніше закрився не через
+        // closeLightbox() (наприклад, перехід на іншу сторінку
+        // посеред жесту) — гарантуємо чистий стан перед показом
+        root.style.opacity = "";
+        track.style.transition = "";
+        track.style.transform = "";
+
         const brand = meta?.brand || "";
         const title = meta?.title || "";
 
@@ -199,6 +206,14 @@
         document.body.style.overflow = "";
 
         resetZoom();
+
+        // без цього скидання: якщо закрити свайпом вниз (жест
+        // "dismiss"), inline opacity/transform лишались "застряглими"
+        // на середині жесту — і при наступному відкритті лайтбокс
+        // з'являвся вже напівпрозорим і зі зсувом
+        root.style.opacity = "";
+        track.style.transition = "";
+        track.style.transform = "";
 
     }
 
