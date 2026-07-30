@@ -1107,21 +1107,18 @@ nav li.has-mega:hover .mega-menu{
 .product-image{
     position:relative;
     overflow:hidden;
-    height:340px;
-    background:var(--gray100);
-}
-
-@media(min-width:769px){
-    .product-image{
-        height:380px;
-    }
+    aspect-ratio:4/5;
+    height:auto;
+    background:var(--gray50);
+    padding:16px;
+    box-sizing:border-box;
 }
 
 .product-image img{
     width:100%;
     height:100%;
-    object-fit:cover;
-    object-position:top;
+    object-fit:contain;
+    object-position:center;
     transition:.45s;
 }
 
@@ -1323,25 +1320,28 @@ nav li.has-mega:hover .mega-menu{
     display:flex;
     flex-direction:column;
     flex:1;
-    padding:24px;
+    padding:18px 20px 20px;
 }
 
 .product-category{
     display:inline-block;
     color:var(--gray700);
-    font-size:13px;
+    font-size:12px;
     font-weight:700;
     text-transform:uppercase;
     letter-spacing:1px;
-    margin-bottom:8px;
+    margin-bottom:6px;
 }
 
 .product-title{
-    font-size:20px;
+    font-size:17px;
     font-weight:600;
     line-height:1.3;
-    margin-bottom:12px;
-    min-height:52px;
+    margin-bottom:10px;
+    display:-webkit-box;
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:2;
+    overflow:hidden;
 }
 
 .product-meta-row{
@@ -1362,7 +1362,7 @@ nav li.has-mega:hover .mega-menu{
         align-items:center;
         justify-content:space-between;
         gap:14px;
-        margin-bottom:20px;
+        margin-bottom:14px;
     }
 
     .product-meta-row .product-options{
@@ -1383,18 +1383,18 @@ nav li.has-mega:hover .mega-menu{
     display:flex;
     flex-wrap:wrap;
     align-items:center;
-    gap:10px;
+    gap:14px;
     margin-bottom:16px;
 }
 
 .product-colors{
     display:flex;
-    gap:6px;
+    gap:7px;
 }
 
 .mini-color{
-    width:20px;
-    height:20px;
+    width:22px;
+    height:22px;
     border-radius:50%;
     border:2px solid #fff;
     box-shadow:0 0 0 1.5px var(--gray200);
@@ -1413,15 +1413,15 @@ nav li.has-mega:hover .mega-menu{
 
 .product-sizes{
     display:flex;
-    gap:4px;
+    gap:5px;
 }
 
 .mini-size{
-    width:26px;
-    height:26px;
-    border-radius:7px;
+    width:28px;
+    height:28px;
+    border-radius:9px;
     border:1.5px solid var(--gray200);
-    font-size:11.5px;
+    font-size:12px;
     font-weight:700;
     color:var(--gray700);
     background:#fff;
@@ -1443,13 +1443,13 @@ nav li.has-mega:hover .mega-menu{
 .product-price{
     display:flex;
     flex-direction:column;
-    gap:6px;
-    margin-bottom:22px;
+    gap:4px;
+    margin-bottom:14px;
     /* резервуємо місце під другий рядок (стара ціна + знижка),
        навіть коли товар без знижки — щоб усі картки в ряду/
        каруселі завжди мали однакову висоту незалежно від
        довжини ціни (див. фікс "маленька ціна ламає картку") */
-    min-height:52px;
+    min-height:42px;
     justify-content:center;
 }
 
@@ -1503,11 +1503,11 @@ nav li.has-mega:hover .mega-menu{
 .product-card .buy-btn{
     margin-top:auto;
     width:100%;
-    height:54px;
-    border-radius:14px;
+    height:48px;
+    border-radius:12px;
     background:var(--secondary);
     color:white;
-    font-size:16px;
+    font-size:15px;
     font-weight:700;
     transition:.3s;
 }
@@ -4679,7 +4679,8 @@ body.mobile-filters-open .scroll-top{
     }
 
     #catalogGrid.products-grid:not(.list-view) .product-image{
-        height:190px;
+        aspect-ratio:1/1;
+        padding:10px;
     }
 
     #catalogGrid.products-grid:not(.list-view) .badge{
@@ -4772,7 +4773,7 @@ body.mobile-filters-open .scroll-top{
 
     .products-grid.list-view .product-image{
         width:100%;
-        height:340px;
+        aspect-ratio:4/5;
     }
 
     .grid{
