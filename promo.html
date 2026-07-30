@@ -124,47 +124,215 @@ rel="stylesheet">
 
     <div class="container">
 
-        <div class="catalog-filters-bar" id="promoFiltersBar">
+        <div class="catalog-filters-bar">
 
-            <div class="filter-group filter-dropdown" id="promoBrandDropdown">
-                <button type="button" id="promoBrandToggle" class="filter-toggle">
-                    <span id="promoBrandLabel">Усі бренди</span>
-                    <span class="filter-arrow">▾</span>
-                </button>
-                <div id="promoBrandMenu" class="filter-menu" hidden>
-                    <button type="button" class="filter-option-clear" data-clear-promo-brand>✕ Скинути вибір бренду</button>
-                    <div id="promoBrandOptionsList" class="filter-menu-options"></div>
+            <div class="filter-group filter-search">
+                <input type="text" id="searchInput" placeholder="Пошук товару...">
+            </div>
+
+            <div class="filter-group filter-gender">
+                <div id="genderFilter" class="gender-filter">
+                    <button type="button" class="gender-pill" data-gender="">Всі</button>
+                    <button type="button" class="gender-pill" data-gender="Чоловікам">Чоловікам</button>
+                    <button type="button" class="gender-pill" data-gender="Жінкам">Жінкам</button>
+                    <button type="button" class="gender-pill" data-gender="Унісекс">Унісекс</button>
+                    <button type="button" class="gender-pill" data-gender="Дітям">Дітям</button>
                 </div>
             </div>
 
-            <div class="filter-group filter-dropdown" id="promoColorDropdown">
-                <button type="button" id="promoColorToggle" class="filter-toggle">
-                    <span id="promoColorLabel">Усі кольори</span>
+            <div class="filter-group filter-dropdown" id="categoryDropdown">
+                <button type="button" id="categoryToggle" class="filter-toggle">
+                    <span id="categoryLabel">Усі категорії</span>
                     <span class="filter-arrow">▾</span>
                 </button>
-                <div id="promoColorMenu" class="filter-menu filter-menu-colors" hidden>
-                    <button type="button" class="filter-option-clear" data-clear-promo-color>✕ Скинути вибір кольору</button>
-                    <div id="promoColorOptionsList" class="filter-menu-options"></div>
+                <div id="categoryMenu" class="filter-menu filter-menu-search" hidden>
+                    <div class="filter-menu-search-box">
+                        <span class="filter-menu-search-icon">🔍</span>
+                        <input type="text" id="categorySearchInput" placeholder="Пошук категорії...">
+                    </div>
+                    <button type="button" class="filter-option-clear" data-clear-category>✕ Скинути вибір категорії</button>
+                    <div id="categoryOptionsList" class="filter-menu-options"></div>
+                    <p id="categoryNoResults" class="filter-menu-empty" hidden>Категорію не знайдено</p>
+                </div>
+            </div>
+
+            <div class="filter-group filter-dropdown" id="brandDropdown">
+                <button type="button" id="brandToggle" class="filter-toggle">
+                    <span id="brandLabel">Усі бренди</span>
+                    <span class="filter-arrow">▾</span>
+                </button>
+                <div id="brandMenu" class="filter-menu filter-menu-search" hidden>
+                    <div class="filter-menu-search-box">
+                        <span class="filter-menu-search-icon">🔍</span>
+                        <input type="text" id="brandSearchInput" placeholder="Пошук бренду...">
+                    </div>
+                    <button type="button" class="filter-option-clear" data-clear-brand>✕ Скинути вибір бренду</button>
+                    <div id="brandOptionsList" class="filter-menu-options"></div>
+                    <p id="brandNoResults" class="filter-menu-empty" hidden>Бренд не знайдено</p>
+                </div>
+            </div>
+
+            <div class="filter-group filter-dropdown" id="colorDropdown">
+                <button type="button" id="colorToggle" class="filter-toggle">
+                    <span id="colorLabel">Усі кольори</span>
+                    <span class="filter-arrow">▾</span>
+                </button>
+                <div id="colorMenu" class="filter-menu filter-menu-colors" hidden>
+                    <button type="button" class="filter-option-clear" data-clear-color>✕ Скинути вибір кольору</button>
+                    <div id="colorOptionsList" class="filter-menu-options"></div>
+                </div>
+            </div>
+
+            <div class="filter-group filter-dropdown" id="priceDropdown">
+                <button type="button" id="priceToggle" class="filter-toggle">
+                    <span id="priceLabel">Будь-яка ціна</span>
+                    <span class="filter-arrow">▾</span>
+                </button>
+                <div id="priceMenu" class="filter-menu" hidden>
+                    <button type="button" class="filter-option-clear" data-clear-price>✕ Скинути вибір ціни</button>
+                    <button type="button" class="filter-option" data-price="0-2000" data-label="до 2 000 грн">
+                        <span class="filter-checkbox"></span>
+                        до 2 000 грн
+                    </button>
+                    <button type="button" class="filter-option" data-price="2000-5000" data-label="2 000 – 5 000 грн">
+                        <span class="filter-checkbox"></span>
+                        2 000 – 5 000 грн
+                    </button>
+                    <button type="button" class="filter-option" data-price="5000-8000" data-label="5 000 – 8 000 грн">
+                        <span class="filter-checkbox"></span>
+                        5 000 – 8 000 грн
+                    </button>
+                    <button type="button" class="filter-option" data-price="8000" data-label="від 8 000 грн">
+                        <span class="filter-checkbox"></span>
+                        від 8 000 грн
+                    </button>
+                </div>
+            </div>
+
+            <div class="filter-group filter-dropdown" id="sizeDropdown">
+                <button type="button" id="sizeToggle" class="filter-toggle">
+                    <span id="sizeLabel">Розмір</span>
+                    <span class="filter-arrow">▾</span>
+                </button>
+                <div id="sizeMenu" class="filter-menu filter-menu-sizes" hidden>
+                    <button type="button" class="filter-option-clear" data-clear-size>✕ Скинути вибір розміру</button>
+                    <div id="sizeGroupsList"></div>
                 </div>
             </div>
 
         </div>
 
+        <!-- Мобільна закріплена панель "Фільтри / Сортування" -->
+        <div id="mobileFilterBar" class="mobile-filter-bar">
+            <button type="button" id="mobileFiltersBtn" class="mobile-filter-btn">
+                <span class="mobile-filter-btn-icon">☰</span>
+                Фільтри
+                <span id="mobileFiltersCount" class="mobile-filter-count" hidden>0</span>
+            </button>
+        </div>
+
+        <!-- Мобільний повноекранний "Всі фільтри" -->
+        <div id="mobileFiltersModal" class="mobile-filters-modal" hidden>
+            <div class="mobile-filters-sheet">
+
+                <div class="mobile-filters-screen" id="mobileFiltersMain">
+                    <div class="mobile-filters-head">
+                        <span class="mobile-filters-head-title">Всі фільтри</span>
+                        <button type="button" id="mobileFiltersCloseBtn" class="mobile-filters-close" aria-label="Закрити">✕</button>
+                    </div>
+
+                    <div class="mobile-filters-rows" id="mobileFiltersRows">
+                        <button type="button" class="mobile-filter-row" data-target="category">
+                            <span>Категорія</span>
+                            <span class="mobile-filter-row-right">
+                                <span class="mobile-filter-row-value" id="mfRowCategory"></span>
+                                <span class="mobile-filter-row-arrow">→</span>
+                            </span>
+                        </button>
+                        <button type="button" class="mobile-filter-row" data-target="brand">
+                            <span>Бренд</span>
+                            <span class="mobile-filter-row-right">
+                                <span class="mobile-filter-row-value" id="mfRowBrand"></span>
+                                <span class="mobile-filter-row-arrow">→</span>
+                            </span>
+                        </button>
+                        <button type="button" class="mobile-filter-row" data-target="color">
+                            <span>Колір</span>
+                            <span class="mobile-filter-row-right">
+                                <span class="mobile-filter-row-value" id="mfRowColor"></span>
+                                <span class="mobile-filter-row-arrow">→</span>
+                            </span>
+                        </button>
+                        <button type="button" class="mobile-filter-row" data-target="size">
+                            <span>Розмір</span>
+                            <span class="mobile-filter-row-right">
+                                <span class="mobile-filter-row-value" id="mfRowSize"></span>
+                                <span class="mobile-filter-row-arrow">→</span>
+                            </span>
+                        </button>
+                        <button type="button" class="mobile-filter-row" data-target="gender">
+                            <span>Стать</span>
+                            <span class="mobile-filter-row-right">
+                                <span class="mobile-filter-row-value" id="mfRowGender"></span>
+                                <span class="mobile-filter-row-arrow">→</span>
+                            </span>
+                        </button>
+                        <button type="button" class="mobile-filter-row" data-target="price">
+                            <span>Ціна</span>
+                            <span class="mobile-filter-row-right">
+                                <span class="mobile-filter-row-value" id="mfRowPrice"></span>
+                                <span class="mobile-filter-row-arrow">→</span>
+                            </span>
+                        </button>
+                    </div>
+
+                    <div class="mobile-filters-footer">
+                        <button type="button" id="mobileFiltersResetBtn" class="btn btn-outline">Видалити все</button>
+                        <button type="button" id="mobileFiltersApplyBtn" class="btn">Показати <span id="mfCount">0</span> товарів</button>
+                    </div>
+                </div>
+
+                <div class="mobile-filters-screen mobile-filters-sub" id="mobileFiltersSub" hidden>
+                    <div class="mobile-filters-head">
+                        <button type="button" id="mobileFiltersBackBtn" class="mobile-filters-back" aria-label="Назад">←</button>
+                        <span class="mobile-filters-head-title" id="mobileFiltersSubTitle"></span>
+                        <button type="button" id="mobileFiltersCloseBtn2" class="mobile-filters-close" aria-label="Закрити">✕</button>
+                    </div>
+
+                    <div class="mobile-filters-sub-content" id="mobileFiltersSubContent"></div>
+
+                    <div class="mobile-filters-footer">
+                        <button type="button" id="mobileFiltersSubApplyBtn" class="btn">Показати <span id="mfSubCount">0</span> товарів</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="activeFiltersBar" class="active-filters-bar" hidden>
+            <div id="activeFiltersList" class="active-filters-list">
+                <span class="active-filters-label">Активні фільтри:</span>
+                <div id="activeFiltersChips" class="active-filters-chips"></div>
+                <button type="button" id="resetFilters" class="filter-reset-chip">Скинути фільтри</button>
+            </div>
+        </div>
+
         <div class="catalog-top">
             <p>
                 У цій акції
-                <span id="promoProductsCount">0</span>
+                <span id="productsCount">0</span>
                 товарів
             </p>
 
             <div class="catalog-actions">
 
-                <div class="sort-dropdown" id="promoSortDropdown">
-                    <button type="button" id="promoSortToggle" class="sort-toggle">
-                        Сортувати: <span id="promoSortLabel">за замовчуванням</span>
+                <span id="sortDropdownAnchor" hidden></span>
+                <div class="sort-dropdown" id="sortDropdown">
+                    <button type="button" id="sortToggle" class="sort-toggle">
+                        Сортувати: <span id="sortLabel">за замовчуванням</span>
                         <span class="sort-arrow">▾</span>
                     </button>
-                    <div id="promoSortMenu" class="sort-menu" hidden>
+                    <div id="sortMenu" class="sort-menu" hidden>
                         <button type="button" class="sort-option active" data-sort="" data-label="за замовчуванням">за замовчуванням</button>
                         <button type="button" class="sort-option" data-sort="new" data-label="новинки">новинки</button>
                         <button type="button" class="sort-option" data-sort="top" data-label="топ">топ</button>
@@ -176,14 +344,21 @@ rel="stylesheet">
 
                 <div>
                     Показати:
-                    <button id="promoGridViewBtn" aria-label="Сітка товарів" class="active">▦</button>
-                    <button id="promoListViewBtn" aria-label="Список товарів">☰</button>
+                    <button id="gridViewBtn" aria-label="Сітка товарів" class="active">▦</button>
+                    <button id="listViewBtn" aria-label="Список товарів">☰</button>
                 </div>
 
             </div>
         </div>
 
-        <div id="promoProductsGrid" class="products-grid"></div>
+        <div id="catalogGrid" class="products-grid"></div>
+
+        <div id="emptyCatalog" class="empty-state" hidden>
+            <h2>😔</h2>
+            <p>За вашим запитом нічого не знайдено</p>
+            <button class="btn" id="clearSearch">Показати все</button>
+            <a href="catalog" class="btn btn-outline">На головну</a>
+        </div>
 
     </div>
 
@@ -267,6 +442,8 @@ aria-label="Нагору">
 <script src="assets/js/sync.js"></script>
 <script src="assets/js/mega-menu.js"></script>
 <script src="assets/js/ui.js"></script>
+<script>window.CATALOG_SKIP_AUTO_INIT = true;</script>
+<script src="assets/js/catalog.js"></script>
 <script src="assets/js/promo.js"></script>
 </body>
 
