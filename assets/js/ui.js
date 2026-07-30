@@ -400,6 +400,7 @@ function createProductCard(product) {
                         </div>
                     </div>
                 </div>
+                ${product.description ? `<div class="product-desc">${product.description}</div>` : ""}
                 <button
                     class="btn buy-btn"
                     data-id="${product.id}">
