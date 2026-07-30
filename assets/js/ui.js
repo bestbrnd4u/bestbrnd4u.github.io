@@ -377,25 +377,27 @@ function createProductCard(product) {
                 <div class="product-title">
                     ${product.title}
                 </div>
-                <div class="product-options">
-                    <div class="product-colors">
-                        ${colorButtons}
+                <div class="product-meta-row">
+                    <div class="product-price">
+                        <span class="price">
+                            ${formatPrice(product.price)}
+                        </span>
+                        <div class="price-meta">
+                            ${oldPrice}
+                            ${
+                                discount > 0
+                                    ? `<span class="discount">-${discount}%</span>`
+                                    : ""
+                            }
+                        </div>
                     </div>
-                    <div class="product-sizes">
-                        ${sizeButtons}
-                    </div>
-                </div>
-                <div class="product-price">
-                    <span class="price">
-                        ${formatPrice(product.price)}
-                    </span>
-                    <div class="price-meta">
-                        ${oldPrice}
-                        ${
-                            discount > 0
-                                ? `<span class="discount">-${discount}%</span>`
-                                : ""
-                        }
+                    <div class="product-options">
+                        <div class="product-colors">
+                            ${colorButtons}
+                        </div>
+                        <div class="product-sizes">
+                            ${sizeButtons}
+                        </div>
                     </div>
                 </div>
                 <button

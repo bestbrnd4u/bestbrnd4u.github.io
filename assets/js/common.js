@@ -75,6 +75,99 @@ async function getProductById(id) {
 
 }
 
+async function getAllProductsCached() {
+
+    if (!cachedProducts) {
+
+        try {
+
+            const response = await fetch("data/products.json");
+
+            cachedProducts = await response.json();
+
+        } catch (error) {
+
+            console.error(error);
+
+            return [];
+
+        }
+
+    }
+
+    return cachedProducts;
+
+}
+
+// -------------------------
+// Переглянуті товари
+//
+// Зберігаємо в localStorage лише масив id (найновіший — першим),
+// самі дані товару підвантажуються через getAllProductsCached()
+// при рендері віджету — це працює однаково на будь-якій сторінці
+// (каталог, картка товару), незалежно від того, що саме конкретна
+// сторінка вже завантажила сама.
+// -------------------------
+
+const RECENTLY_VIEWED_KEY = "bagvero_recently_viewed";
+const RECENTLY_VIEWED_LIMIT = 12;
+
+function trackRecentlyViewed(productId) {
+
+    const id = Number(productId);
+
+    if (!id) return;
+
+    let ids = getStorage(RECENTLY_VIEWED_KEY).map(Number).filter(Boolean);
+
+    ids = ids.filter(existingId => existingId !== id);
+
+    ids.unshift(id);
+
+    setStorage(RECENTLY_VIEWED_KEY, ids.slice(0, RECENTLY_VIEWED_LIMIT));
+
+}
+
+async function renderRecentlyViewed(options) {
+
+    const {
+        sectionId = "recentlyViewedSection",
+        gridId = "recentlyViewedGrid",
+        carouselId = "recentlyViewedCarousel",
+        excludeId = null,
+        limit = 8
+    } = options || {};
+
+    const section = document.getElementById(sectionId);
+    const grid = document.getElementById(gridId);
+
+    if (!section || !grid) return;
+
+    const ids = getStorage(RECENTLY_VIEWED_KEY)
+        .map(Number)
+        .filter(id => id && id !== Number(excludeId));
+
+    if (!ids.length) return;
+
+    const allProducts = await getAllProductsCached();
+
+    const list = ids
+        .map(id => allProducts.find(item => Number(item.id) === id))
+        .filter(Boolean)
+        .slice(0, limit);
+
+    if (!list.length) return;
+
+    grid.innerHTML = list.map(product => createProductCard(product)).join("");
+
+    if (typeof initProductCarousels === "function") initProductCarousels(grid);
+    if (typeof updateFavoriteButtons === "function") updateFavoriteButtons();
+    if (typeof initCarousel === "function" && carouselId) initCarousel(document.getElementById(carouselId));
+
+    section.hidden = false;
+
+}
+
 // -------------------------
 // Кошик
 //

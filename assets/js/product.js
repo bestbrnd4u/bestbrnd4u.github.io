@@ -30,6 +30,10 @@ renderSimilar(product);
 
 updateFavoriteButtons();
 
+trackRecentlyViewed(product.id);
+
+renderRecentlyViewed({ excludeId: product.id });
+
 } catch (error) {
 
 console.error(error);

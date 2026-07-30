@@ -327,6 +327,8 @@ async function initCatalog() {
 
         render();
 
+        renderRecentlyViewed();
+
     } catch (error) {
 
         grid.innerHTML = `
