@@ -110,8 +110,6 @@ function initCarousel(carouselEl) {
 
     window.addEventListener("resize", updateArrows);
 
-    preventWheelHijack(track);
-
     // даємо браузеру один кадр, щоб порахувати реальні розміри
     // щойно вставлених карток
     requestAnimationFrame(updateArrows);
@@ -132,8 +130,6 @@ function bindProductCarousel(track) {
     if (!track || track.dataset.carouselBound) return;
 
     track.dataset.carouselBound = "1";
-
-    preventWheelHijack(track);
 
     const carousel = track.closest(".product-carousel");
 
@@ -276,29 +272,6 @@ function initProductCarousels(root) {
 // вирішуємо: вертикальний жест — завжди скрол сторінки,
 // горизонтальний (трекпад-свайп) — гортання каруселі.
 // -------------------------
-
-function preventWheelHijack(track) {
-
-    if (!track || track.dataset.wheelGuardBound) return;
-
-    track.dataset.wheelGuardBound = "1";
-
-    track.addEventListener("wheel", event => {
-
-        if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
-
-        event.preventDefault();
-
-        // behavior:"instant" обов'язковий — сторінка має
-        // html{scroll-behavior:smooth} для якірних посилань,
-        // і без явного "instant" кожен тік колеса миші тут
-        // запускав би власну плавну анімацію на кілька пікселів,
-        // через що скрол відчувався як дуже повільний і смиконий
-        window.scrollBy({ top: event.deltaY, left: 0, behavior: "instant" });
-
-    }, { passive: false });
-
-}
 
 function createProductCard(product) {
 

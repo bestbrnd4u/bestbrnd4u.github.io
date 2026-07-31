@@ -569,8 +569,6 @@ function setupGallery() {
 
     if (!track) return;
 
-    if (typeof preventWheelHijack === "function") preventWheelHijack(track);
-
     // Блокуємо drag'а картинок для Safari/iOS
     document.querySelectorAll(".gallery-slide").forEach(img => {
         img.draggable = false;
