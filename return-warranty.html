@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Повернення та гарантія Bagvero: право на повернення товару протягом 14 днів згідно із Законом України «Про захист прав споживачів», гарантія оригінальності та умови обміну.">
+    <meta name="theme-color" content="#111827">
+    <meta name="robots" content="index,follow">
+    <link rel="canonical" href="https://bestbrnd4u.github.io/return-warranty">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Повернення та гарантія | Bagvero">
+    <meta property="og:description" content="Умови повернення, обміну та гарантія оригінальності товарів в інтернет-магазині Bagvero.">
+    <meta property="og:url" content="https://bestbrnd4u.github.io/return-warranty">
+
+<link rel="icon" href="favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicon-16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/images/favicon-192.png">
+    <title>Повернення та гарантія | Bagvero</title>
+
+    <link rel="stylesheet" href="assets/css/style.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+<!-- MailerLite Universal -->
+<script>
+    (function(w,d,e,u,f,l,n){w[f]=w[f]||function(){(w[f].q=w[f].q||[])
+    .push(arguments);},l=d.createElement(e),l.async=1,l.src=u,
+    n=d.getElementsByTagName(e)[0],n.parentNode.insertBefore(l,n);})
+    (window,document,'script','https://assets.mailerlite.com/js/universal.js','ml');
+    ml('account', '2520119');
+</script>
+<!-- End MailerLite Universal -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+        {
+            "@type": "Question",
+            "name": "Скільки часу є на повернення товару?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Згідно із Законом України «Про захист прав споживачів» — 14 днів з моменту отримання товару." }
+        },
+        {
+            "@type": "Question",
+            "name": "Чи оригінальні товари в Bagvero?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Так, усі товари каталогу оригінальні — закуповуються на офіційних сайтах брендів, у перевірених дистрибʼюторів або напряму у виробника." }
+        },
+        {
+            "@type": "Question",
+            "name": "Що потрібно для повернення чи обміну?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Товар не повинен мати слідів використання, бирки та фабричне пакування мають бути збережені, а також потрібен документ, що підтверджує покупку." }
+        },
+        {
+            "@type": "Question",
+            "name": "Коли гроші повернуться на картку?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Не пізніше 3 робочих днів після того, як товар повернеться на наш склад і пройде перевірку менеджером." }
+        },
+        {
+            "@type": "Question",
+            "name": "Чи можна повернути товар, замовлений під байєр-сервісом?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Товари, замовлені індивідуально під клієнта через байєр-сервіс, поверненню або обміну не підлягають, окрім випадків браку чи пересортиці. Можливість продажу такого товару розглядається окремо." }
+        },
+        {
+            "@type": "Question",
+            "name": "Хто оплачує пересилку при поверненні?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Якщо товар не підійшов за розміром чи кольором — пересилку оплачує покупець. Якщо прийшов брак або не той товар — доставку в обидва боки оплачує Bagvero." }
+        }
+    ]
+}
+</script>
+
+</head>
+
+<body>
+
+<header>
+
+    <div class="container header">
+
+        <a href="/" class="logo">
+            Bagvero
+        </a>
+
+        <nav>
+
+            <ul>
+
+                <li><a href="/">Головна</a></li>
+
+                <li class="has-mega"><a href="catalog" id="navCatalogLink">Каталог</a><div class="mega-menu" id="catalogMegaMenu">
+<a class="mega-item" href="catalog?gender=Жінкам"><img src="https://images.pexels.com/photos/932401/pexels-photo-932401.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Жінкам"><span>Жінкам</span></a>
+<a class="mega-item" href="catalog?gender=Чоловікам"><img src="https://images.pexels.com/photos/7869755/pexels-photo-7869755.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Чоловікам"><span>Чоловікам</span></a>
+<a class="mega-item" href="catalog?gender=Унісекс"><img src="https://images.pexels.com/photos/10425471/pexels-photo-10425471.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Унісекс"><span>Унісекс</span></a>
+<a class="mega-item" href="catalog?gender=Дітям"><img src="https://images.pexels.com/photos/7269547/pexels-photo-7269547.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Дітям"><span>Дітям</span></a>
+</div></li>
+
+                <li class="has-mega"><a href="catalog?section=new" id="navNewLink">Новинки</a><div class="mega-menu">
+<a class="mega-item" href="catalog?section=new&gender=Жінкам"><img src="https://images.pexels.com/photos/932401/pexels-photo-932401.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Жінкам"><span>Жінкам</span></a>
+<a class="mega-item" href="catalog?section=new&gender=Чоловікам"><img src="https://images.pexels.com/photos/7869755/pexels-photo-7869755.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Чоловікам"><span>Чоловікам</span></a>
+<a class="mega-item" href="catalog?section=new&gender=Унісекс"><img src="https://images.pexels.com/photos/10425471/pexels-photo-10425471.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Унісекс"><span>Унісекс</span></a>
+<a class="mega-item" href="catalog?section=new&gender=Дітям"><img src="https://images.pexels.com/photos/7269547/pexels-photo-7269547.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Дітям"><span>Дітям</span></a>
+</div></li>
+
+                <li class="has-mega"><a href="catalog?section=sale" id="navSaleLink" class="sale-text">Акції</a><div class="mega-menu">
+<a class="mega-item" href="catalog?section=sale&gender=Жінкам"><img src="https://images.pexels.com/photos/932401/pexels-photo-932401.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Жінкам"><span>Жінкам</span></a>
+<a class="mega-item" href="catalog?section=sale&gender=Чоловікам"><img src="https://images.pexels.com/photos/7869755/pexels-photo-7869755.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Чоловікам"><span>Чоловікам</span></a>
+<a class="mega-item" href="catalog?section=sale&gender=Унісекс"><img src="https://images.pexels.com/photos/10425471/pexels-photo-10425471.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Унісекс"><span>Унісекс</span></a>
+<a class="mega-item" href="catalog?section=sale&gender=Дітям"><img src="https://images.pexels.com/photos/7269547/pexels-photo-7269547.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Дітям"><span>Дітям</span></a>
+</div></li>
+
+                <li><a href="bayer-service">Байєр-сервіс</a></li>
+
+                <li><a href="contacts">Контакти</a></li>
+
+            </ul>
+
+        </nav>
+
+        <div class="header-icons">
+
+            <button id="searchBtn">🔍</button>
+<a href="account" id="accountLink">👤</a>
+
+            <a href="favorites">         ❤         <span id="favCount">0</span>     </a>
+
+            <div class="cart-icon-wrap">
+    <a href="cart" id="cartIconLink">
+        🛒
+        <span id="cartCount">0</span>
+    </a>
+    <div id="cartPopup" class="cart-popup" hidden></div>
+</div>
+
+        </div>
+
+    </div>
+
+</header>
+
+<section class="breadcrumbs">
+
+    <div class="container">
+
+        <a href="/">Головна</a>
+
+        <span class="crumb-sep">→</span>
+
+        <span>Повернення та гарантія</span>
+
+    </div>
+
+</section>
+
+<section class="bayer-section" style="padding-top:36px;">
+
+    <div class="container">
+
+        <div class="bayer-hero-banner dp-hero-banner">
+
+            <div class="bayer-hero-content">
+
+                <span class="bayer-hero-badge">↩️ Повернення та гарантія</span>
+
+                <h1>14 днів на повернення та гарантія оригінальності</h1>
+
+                <p>
+                    Якщо товар не підійшов — поверніть або обміняйте його
+                    протягом 14 днів з моменту отримання, як це передбачає
+                    Закон України «Про захист прав споживачів». А оригінальність
+                    кожної речі в каталозі ми гарантуємо незалежно від строку
+                    повернення.
+                </p>
+
+                <div class="bayer-hero-actions">
+                    <a href="#conditions" class="btn">Умови повернення</a>
+                    <a href="#rwFaq" class="btn btn-outline" style="color:#fff;border-color:rgba(255,255,255,.4);">Часті запитання</a>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="bayer-section">
+
+    <div class="container">
+
+        <div class="bayer-section-head">
+            <span class="bayer-section-eyebrow">💯</span>
+            <h2>Гарантія оригінальності</h2>
+            <p>
+                Кожен товар у каталозі Bagvero — оригінальний, а не репліка
+                чи товар "як оригінал".
+            </p>
+        </div>
+
+        <div class="bayer-benefits-grid">
+
+            <div class="bayer-benefit-card">
+                <div class="bayer-benefit-icon">🏷️</div>
+                <h3>Тільки офіційні джерела</h3>
+                <p>Закуповуємо на офіційних сайтах брендів, у перевірених дистрибʼюторів або напряму у виробника — жодних сумнівних постачальників.</p>
+            </div>
+
+            <div class="bayer-benefit-card">
+                <div class="bayer-benefit-icon">🔍</div>
+                <h3>Перевірка перед відправкою</h3>
+                <p>Кожен товар оглядається на складі перед пакуванням — комплектність, бирки та якість перевіряються ще до того, як посилка вирушить до вас.</p>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="bayer-section" id="conditions">
+
+    <div class="container">
+
+        <div class="bayer-section-head">
+            <span class="bayer-section-eyebrow">✅</span>
+            <h2>Умови повернення та обміну</h2>
+            <p>
+                Щоб ми могли прийняти товар назад чи обміняти його,
+                достатньо виконати кілька простих умов.
+            </p>
+        </div>
+
+        <div class="bayer-why-list">
+
+            <div class="bayer-why-item">
+                <span class="bayer-why-check">✓</span>
+                <p><strong>Не більше 14 днів</strong> з моменту отримання товару — саме стільки часу дає Закон України «Про захист прав споживачів».</p>
+            </div>
+
+            <div class="bayer-why-item">
+                <span class="bayer-why-check">✓</span>
+                <p><strong>Товарний вигляд збережено</strong> — без слідів носіння, з фабричними бирками, наклейками та оригінальною упаковкою.</p>
+            </div>
+
+            <div class="bayer-why-item">
+                <span class="bayer-why-check">✓</span>
+                <p><strong>Комплектність та документи</strong> — усі елементи товару на місці, а також збережено чек або інше підтвердження покупки.</p>
+            </div>
+
+            <div class="bayer-why-item">
+                <span class="bayer-why-check">✓</span>
+                <p><strong>Повернення коштів не пізніше 3 робочих днів</strong> з моменту, як товар потрапив на наш склад і пройшов перевірку — тим самим способом, яким була здійснена оплата.</p>
+            </div>
+
+            <div class="bayer-why-item">
+                <span class="bayer-why-check">✓</span>
+                <p><strong>Брак чи пересортиця — за наш рахунок.</strong> Якщо прийшов не той товар або з дефектом, доставку для обміну оплачує Bagvero.</p>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="bayer-section">
+
+    <div class="container">
+
+        <div class="bayer-section-head">
+            <span class="bayer-section-eyebrow">🚫</span>
+            <h2>Коли повернення неможливе</h2>
+        </div>
+
+        <div class="bayer-why-list">
+
+            <div class="bayer-why-item">
+                <span class="bayer-why-check is-negative">✕</span>
+                <p>Товар був у використанні або має сліди носіння.</p>
+            </div>
+
+            <div class="bayer-why-item">
+                <span class="bayer-why-check is-negative">✕</span>
+                <p>Відсутній документ, що підтверджує покупку товару.</p>
+            </div>
+
+            <div class="bayer-why-item">
+                <span class="bayer-why-check is-negative">✕</span>
+                <p>Товар придбано зі знижкою через дефект, про який покупця було попереджено заздалегідь.</p>
+            </div>
+
+            <div class="bayer-why-item">
+                <span class="bayer-why-check is-negative">✕</span>
+                <p>Дефекти зʼявились через самостійний ремонт або неправильну експлуатацію виробу.</p>
+            </div>
+
+            <div class="bayer-why-item">
+                <span class="bayer-why-check is-negative">✕</span>
+                <p>Товар замовлено індивідуально через байєр-сервіс під конкретного клієнта.</p>
+            </div>
+
+            <div class="bayer-why-item">
+                <span class="bayer-why-check is-negative">✕</span>
+                <p>Товар входить до переліку продукції належної якості, що не підлягає поверненню або обміну.</p>
+            </div>
+
+        </div>
+
+        <p style="margin-top:18px;color:var(--gray500);font-size:14.5px;text-align:center;">
+            👉 <a href="https://zakon.rada.gov.ua/laws/show/172-94-%D0%BF" target="_blank" rel="noopener">Повний перелік товарів належної якості, що не підлягають обміну чи поверненню</a>
+        </p>
+
+    </div>
+
+</section>
+
+<section class="bayer-section">
+
+    <div class="container">
+
+        <div class="bayer-section-head">
+            <span class="bayer-section-eyebrow">📦</span>
+            <h2>Як оформити повернення</h2>
+            <p>Чотири кроки від рішення повернути товар до отримання коштів.</p>
+        </div>
+
+        <div class="bayer-steps">
+
+            <div class="bayer-step">
+                <div class="bayer-step-number">1</div>
+                <div>
+                    <h3>Звʼяжіться з нами</h3>
+                    <p>Напишіть у месенджер або на пошту, вкажіть номер замовлення й причину повернення чи обміну.</p>
+                </div>
+            </div>
+
+            <div class="bayer-step">
+                <div class="bayer-step-number">2</div>
+                <div>
+                    <h3>Запакуйте товар</h3>
+                    <p>Складіть товар в оригінальну упаковку зі збереженими бирками та документом, що підтверджує покупку.</p>
+                </div>
+            </div>
+
+            <div class="bayer-step">
+                <div class="bayer-step-number">3</div>
+                <div>
+                    <h3>Відправте Новою поштою</h3>
+                    <p>Ми підкажемо адресу відправлення та оформимо накладну — вам залишиться лише здати посилку у відділенні.</p>
+                </div>
+            </div>
+
+            <div class="bayer-step">
+                <div class="bayer-step-number">4</div>
+                <div>
+                    <h3>Отримайте кошти або новий товар</h3>
+                    <p>Після перевірки на складі повертаємо кошти протягом 3 робочих днів або одразу відправляємо обмінний товар.</p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="bayer-section" id="rwFaq">
+
+    <div class="container">
+
+        <div class="bayer-section-head">
+            <span class="bayer-section-eyebrow">❓</span>
+            <h2>Часті запитання</h2>
+        </div>
+
+        <div class="bayer-faq-list">
+
+            <div class="bayer-faq-item">
+                <button type="button" class="bayer-faq-question">
+                    Скільки часу є на повернення товару?
+                    <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="bayer-faq-answer">
+                    <div class="bayer-faq-answer-inner">
+                        <p>Згідно із Законом України «Про захист прав споживачів» — 14 днів з моменту отримання товару.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bayer-faq-item">
+                <button type="button" class="bayer-faq-question">
+                    Чи оригінальні товари в Bagvero?
+                    <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="bayer-faq-answer">
+                    <div class="bayer-faq-answer-inner">
+                        <p>Так, усі товари каталогу оригінальні — закуповуються на офіційних сайтах брендів, у перевірених дистрибʼюторів або напряму у виробника.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bayer-faq-item">
+                <button type="button" class="bayer-faq-question">
+                    Що потрібно для повернення чи обміну?
+                    <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="bayer-faq-answer">
+                    <div class="bayer-faq-answer-inner">
+                        <p>Товар без слідів використання, зі збереженими бирками й фабричним пакуванням, а також документ, що підтверджує покупку.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bayer-faq-item">
+                <button type="button" class="bayer-faq-question">
+                    Коли гроші повернуться на картку?
+                    <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="bayer-faq-answer">
+                    <div class="bayer-faq-answer-inner">
+                        <p>Не пізніше 3 робочих днів після того, як товар повернеться на наш склад і пройде перевірку менеджером.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bayer-faq-item">
+                <button type="button" class="bayer-faq-question">
+                    Чи можна повернути товар, замовлений під байєр-сервісом?
+                    <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="bayer-faq-answer">
+                    <div class="bayer-faq-answer-inner">
+                        <p>Товари, замовлені індивідуально під клієнта, поверненню чи обміну не підлягають, окрім випадків браку або пересортиці. Можливість продажу такого товару розглядається окремо.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bayer-faq-item">
+                <button type="button" class="bayer-faq-question">
+                    Хто оплачує пересилку при поверненні?
+                    <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="bayer-faq-answer">
+                    <div class="bayer-faq-answer-inner">
+                        <p>Якщо товар не підійшов за розміром чи кольором — пересилку оплачує покупець. Якщо прийшов брак або не той товар — доставку в обидва боки оплачує Bagvero.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="bayer-section">
+
+    <div class="container" style="text-align:center;">
+
+        <div class="bayer-section-head">
+            <span class="bayer-section-eyebrow">💬</span>
+            <h2>Залишились питання?</h2>
+            <p>Напишіть нам — допоможемо оформити повернення чи обмін.</p>
+        </div>
+
+        <a href="contacts" class="btn">Звʼязатися з нами</a>
+
+    </div>
+
+</section>
+
+<section class="newsletter">
+<div class="container">
+<div class="ml-embedded" data-form="vKcNi2"></div>
+<small>
+Жодного спаму.
+Тільки акції та нові колекції.
+</small>
+</div>
+</section>
+
+<footer>
+
+    <div class="container footer">
+
+        <div>
+
+            <h3>Bagvero</h3>
+
+            <p>
+                Інтернет-магазин сумок
+та аксесуарів.
+            </p>
+
+            <div class="footer-social">
+                <a href="https://www.instagram.com/bestbrnd4u" target="_blank" rel="noopener" aria-label="Instagram">
+                    Instagram
+                </a>
+                <a href="#" aria-label="Facebook">
+                    Facebook
+                </a>
+                <a href="#" aria-label="Telegram">
+                    Telegram
+                </a>
+            </div>
+
+        </div>
+
+        <div>
+
+            <h3>Покупцям</h3>
+
+            <a href="delivery-payment#delivery">Доставка</a>
+            <a href="delivery-payment#payment">Оплата</a>
+            <a href="return-warranty">Повернення та гарантія</a>
+            <a href="bayer-service">Байєр-сервіс</a>
+
+        </div>
+
+        <div>
+
+            <h3>Каталог</h3>
+
+            <a href="catalog">Всі товари</a>
+
+            <a href="catalog?section=new">Новинки</a>
+
+            <a href="catalog?section=sale" class="sale-text">Акції</a>
+
+            <a href="#">Бренди</a>
+
+        </div>
+
+        <div>
+
+            <h3>Зв'яжіться з нами</h3>
+
+            <p>📍 Україна</p>
+
+            <p>✉ info@bagvero.ua</p>
+
+            <p>☎ +380 XX XXX XX XX</p>
+
+            <p>🕘 Пн–Нд 09:00–20:00</p>
+
+        </div>
+
+    </div>
+
+</footer>
+
+<div class="copyright">
+
+    <div class="container">
+
+    © 2026 bagvero.
+    Всі права захищені.
+
+    </div>
+
+</div>
+
+<button id="scrollTop" class="scroll-top" aria-label="Нагору">
+    ↑
+</button>
+
+<script src="assets/js/supabase-client.js"></script>
+<script src="assets/js/common.js"></script>
+<script src="assets/js/sync.js"></script>
+<script src="assets/js/mega-menu.js"></script>
+<script src="assets/js/ui.js"></script>
+
+<script>
+
+    document.querySelectorAll(".bayer-faq-question").forEach(question => {
+
+        question.addEventListener("click", () => {
+
+            question.closest(".bayer-faq-item")?.classList.toggle("open");
+
+        });
+
+    });
+
+</script>
+
+</body>
+
+</html>

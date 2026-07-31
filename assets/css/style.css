@@ -6971,6 +6971,12 @@ body.mobile-filters-open .scroll-top{
         center/cover no-repeat;
 }
 
+/* варіант без фотографії байєр-сервісу — для інших
+   інформаційних сторінок (наприклад "Оплата і доставка") */
+.dp-hero-banner{
+    background:linear-gradient(135deg, var(--primary), #1f2937);
+}
+
 .bayer-hero-banner .bayer-hero-content{
     max-width:640px;
 }
@@ -7177,6 +7183,11 @@ body.mobile-filters-open .scroll-top{
     align-items:center;
     justify-content:center;
     font-weight:800;
+}
+
+.bayer-why-check.is-negative{
+    background:rgba(239,68,68,.1);
+    color:var(--danger);
 }
 
 .bayer-why-item strong{

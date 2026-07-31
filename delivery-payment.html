@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Оплата і доставка Bagvero: оплата карткою онлайн або при отриманні, доставка Новою поштою по всій Україні за 1–3 дні, повернення протягом 14 днів.">
+    <meta name="theme-color" content="#111827">
+    <meta name="robots" content="index,follow">
+    <link rel="canonical" href="https://bestbrnd4u.github.io/delivery-payment">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Оплата і доставка | Bagvero">
+    <meta property="og:description" content="Зручні способи оплати та швидка доставка Новою поштою по всій Україні від Bagvero.">
+    <meta property="og:url" content="https://bestbrnd4u.github.io/delivery-payment">
+
+<link rel="icon" href="favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicon-16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/images/favicon-192.png">
+    <title>Оплата і доставка | Bagvero</title>
+
+    <link rel="stylesheet" href="assets/css/style.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+<!-- MailerLite Universal -->
+<script>
+    (function(w,d,e,u,f,l,n){w[f]=w[f]||function(){(w[f].q=w[f].q||[])
+    .push(arguments);},l=d.createElement(e),l.async=1,l.src=u,
+    n=d.getElementsByTagName(e)[0],n.parentNode.insertBefore(l,n);})
+    (window,document,'script','https://assets.mailerlite.com/js/universal.js','ml');
+    ml('account', '2520119');
+</script>
+<!-- End MailerLite Universal -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+        {
+            "@type": "Question",
+            "name": "Скільки коштує доставка?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Доставка Новою поштою по Україні коштує від 60 грн залежно від ваги й габаритів відправлення та розраховується автоматично при оформленні замовлення." }
+        },
+        {
+            "@type": "Question",
+            "name": "Як швидко ви відправляєте замовлення?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Збираємо і передаємо замовлення в службу доставки протягом 1–2 робочих днів після підтвердження оплати чи замовлення." }
+        },
+        {
+            "@type": "Question",
+            "name": "Чи можна оплатити карткою онлайн?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Так, при оформленні замовлення можна оплатити карткою Visa/Mastercard онлайн або обрати оплату при отриманні." }
+        },
+        {
+            "@type": "Question",
+            "name": "Чи можна оглянути товар перед оплатою?",
+            "acceptedAnswer": { "@type": "Answer", "text": "У відділенні Нової пошти можна перевірити цілісність упаковки. Огляд самого товару до оплати наложеним платежем не передбачений правилами перевізника." }
+        },
+        {
+            "@type": "Question",
+            "name": "Що робити, якщо товар не підійшов?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Поверніть товар протягом 14 днів у первинному вигляді з бирками — ми обміняємо його або повернемо кошти." }
+        },
+        {
+            "@type": "Question",
+            "name": "Хто оплачує доставку при поверненні?",
+            "acceptedAnswer": { "@type": "Answer", "text": "При поверненні через непідходящий розмір чи колір вартість пересилки товару назад оплачує покупець, якщо інше не погоджено окремо." }
+        }
+    ]
+}
+</script>
+
+</head>
+
+<body>
+
+<header>
+
+    <div class="container header">
+
+        <a href="/" class="logo">
+            Bagvero
+        </a>
+
+        <nav>
+
+            <ul>
+
+                <li><a href="/">Головна</a></li>
+
+                <li class="has-mega"><a href="catalog" id="navCatalogLink">Каталог</a><div class="mega-menu" id="catalogMegaMenu">
+<a class="mega-item" href="catalog?gender=Жінкам"><img src="https://images.pexels.com/photos/932401/pexels-photo-932401.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Жінкам"><span>Жінкам</span></a>
+<a class="mega-item" href="catalog?gender=Чоловікам"><img src="https://images.pexels.com/photos/7869755/pexels-photo-7869755.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Чоловікам"><span>Чоловікам</span></a>
+<a class="mega-item" href="catalog?gender=Унісекс"><img src="https://images.pexels.com/photos/10425471/pexels-photo-10425471.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Унісекс"><span>Унісекс</span></a>
+<a class="mega-item" href="catalog?gender=Дітям"><img src="https://images.pexels.com/photos/7269547/pexels-photo-7269547.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Дітям"><span>Дітям</span></a>
+</div></li>
+
+                <li class="has-mega"><a href="catalog?section=new" id="navNewLink">Новинки</a><div class="mega-menu">
+<a class="mega-item" href="catalog?section=new&gender=Жінкам"><img src="https://images.pexels.com/photos/932401/pexels-photo-932401.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Жінкам"><span>Жінкам</span></a>
+<a class="mega-item" href="catalog?section=new&gender=Чоловікам"><img src="https://images.pexels.com/photos/7869755/pexels-photo-7869755.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Чоловікам"><span>Чоловікам</span></a>
+<a class="mega-item" href="catalog?section=new&gender=Унісекс"><img src="https://images.pexels.com/photos/10425471/pexels-photo-10425471.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Унісекс"><span>Унісекс</span></a>
+<a class="mega-item" href="catalog?section=new&gender=Дітям"><img src="https://images.pexels.com/photos/7269547/pexels-photo-7269547.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Дітям"><span>Дітям</span></a>
+</div></li>
+
+                <li class="has-mega"><a href="catalog?section=sale" id="navSaleLink" class="sale-text">Акції</a><div class="mega-menu">
+<a class="mega-item" href="catalog?section=sale&gender=Жінкам"><img src="https://images.pexels.com/photos/932401/pexels-photo-932401.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Жінкам"><span>Жінкам</span></a>
+<a class="mega-item" href="catalog?section=sale&gender=Чоловікам"><img src="https://images.pexels.com/photos/7869755/pexels-photo-7869755.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Чоловікам"><span>Чоловікам</span></a>
+<a class="mega-item" href="catalog?section=sale&gender=Унісекс"><img src="https://images.pexels.com/photos/10425471/pexels-photo-10425471.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Унісекс"><span>Унісекс</span></a>
+<a class="mega-item" href="catalog?section=sale&gender=Дітям"><img src="https://images.pexels.com/photos/7269547/pexels-photo-7269547.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Дітям"><span>Дітям</span></a>
+</div></li>
+
+                <li><a href="bayer-service">Байєр-сервіс</a></li>
+
+                <li><a href="contacts">Контакти</a></li>
+
+            </ul>
+
+        </nav>
+
+        <div class="header-icons">
+
+            <button id="searchBtn">🔍</button>
+<a href="account" id="accountLink">👤</a>
+
+            <a href="favorites">         ❤         <span id="favCount">0</span>     </a>
+
+            <div class="cart-icon-wrap">
+    <a href="cart" id="cartIconLink">
+        🛒
+        <span id="cartCount">0</span>
+    </a>
+    <div id="cartPopup" class="cart-popup" hidden></div>
+</div>
+
+        </div>
+
+    </div>
+
+</header>
+
+<section class="breadcrumbs">
+
+    <div class="container">
+
+        <a href="/">Головна</a>
+
+        <span class="crumb-sep">→</span>
+
+        <span>Оплата і доставка</span>
+
+    </div>
+
+</section>
+
+<section class="bayer-section" style="padding-top:36px;">
+
+    <div class="container">
+
+        <div class="bayer-hero-banner dp-hero-banner">
+
+            <div class="bayer-hero-content">
+
+                <span class="bayer-hero-badge">🚚 Оплата і доставка</span>
+
+                <h1>Зручна оплата та швидка доставка по всій Україні</h1>
+
+                <p>
+                    Оплачуйте карткою онлайн або при отриманні — обираєте самі.
+                    Відправляємо замовлення протягом 1–2 днів, а Нова пошта
+                    доставляє його в будь-яке місто України за 1–3 дні.
+                </p>
+
+                <div class="bayer-hero-actions">
+                    <a href="#payment" class="btn">Способи оплати</a>
+                    <a href="#delivery" class="btn btn-outline" style="color:#fff;border-color:rgba(255,255,255,.4);">Способи доставки</a>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="bayer-section" id="payment">
+
+    <div class="container">
+
+        <div class="bayer-section-head">
+            <span class="bayer-section-eyebrow">💳</span>
+            <h2>Способи оплати</h2>
+            <p>
+                Обирайте зручний спосіб оплати при оформленні замовлення —
+                картою одразу онлайн або при отриманні посилки.
+            </p>
+        </div>
+
+        <div class="bayer-benefits-grid">
+
+            <div class="bayer-benefit-card">
+                <div class="bayer-benefit-icon">💳</div>
+                <h3>Банківською карткою онлайн</h3>
+                <p>Visa або Mastercard — оплата проходить одразу при оформленні замовлення на сайті, безпечно та без комісії.</p>
+            </div>
+
+            <div class="bayer-benefit-card">
+                <div class="bayer-benefit-icon">📦</div>
+                <h3>Оплата при отриманні</h3>
+                <p>Готівкою або карткою у відділенні Нової пошти чи кур'єру — оплачуєте лише тоді, коли забираєте замовлення.</p>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="bayer-section" id="delivery">
+
+    <div class="container">
+
+        <div class="bayer-section-head">
+            <span class="bayer-section-eyebrow">🚚</span>
+            <h2>Способи доставки</h2>
+            <p>Доставляємо по всій Україні Новою поштою — обирайте зручний варіант отримання.</p>
+        </div>
+
+        <table class="bayer-delivery-table">
+            <thead>
+                <tr>
+                    <th>Спосіб доставки</th>
+                    <th>Вартість</th>
+                    <th>Строк, дні</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>📦 Нова пошта, відділення</td>
+                    <td>від 60 грн</td>
+                    <td>1–3</td>
+                </tr>
+                <tr>
+                    <td>🚪 Нова пошта, кур'єр до дверей</td>
+                    <td>від 90 грн</td>
+                    <td>1–3</td>
+                </tr>
+                <tr>
+                    <td>📮 Укрпошта</td>
+                    <td>від 45 грн</td>
+                    <td>2–5</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p style="margin-top:18px;color:var(--gray500);font-size:14.5px;">
+            Точна вартість доставки залежить від ваги й габаритів замовлення та
+            розраховується автоматично на кроці оформлення. Безкоштовна доставка —
+            від 3 500 грн.
+        </p>
+
+    </div>
+
+</section>
+
+<section class="bayer-section">
+
+    <div class="container">
+
+        <div class="bayer-section-head">
+            <span class="bayer-section-eyebrow">🥇</span>
+            <h2>Як оформити замовлення</h2>
+            <p>Чотири кроки від обраного товару до посилки у вас в руках.</p>
+        </div>
+
+        <div class="bayer-steps">
+
+            <div class="bayer-step">
+                <div class="bayer-step-number">1</div>
+                <div>
+                    <h3>Обираєте товар</h3>
+                    <p>Додаєте товар у кошик, вказавши колір і розмір, і переходите до оформлення замовлення.</p>
+                </div>
+            </div>
+
+            <div class="bayer-step">
+                <div class="bayer-step-number">2</div>
+                <div>
+                    <h3>Вказуєте дані доставки</h3>
+                    <p>Заповнюєте контактні дані, обираєте місто й відділення Нової пошти або кур'єрську доставку до дверей.</p>
+                </div>
+            </div>
+
+            <div class="bayer-step">
+                <div class="bayer-step-number">3</div>
+                <div>
+                    <h3>Обираєте спосіб оплати</h3>
+                    <p>Оплачуєте карткою онлайн одразу або обираєте оплату при отриманні — як вам зручніше.</p>
+                </div>
+            </div>
+
+            <div class="bayer-step">
+                <div class="bayer-step-number">4</div>
+                <div>
+                    <h3>Отримуєте замовлення</h3>
+                    <p>Відправляємо замовлення протягом 1–2 днів. Ви отримаєте трек-номер для відстеження та заберете посилку у зручний час.</p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="bayer-section">
+
+    <div class="container">
+
+        <div class="bayer-section-head">
+            <span class="bayer-section-eyebrow">↩️</span>
+            <h2>Повернення та обмін</h2>
+        </div>
+
+        <div class="bayer-why-list">
+
+            <div class="bayer-why-item">
+                <span class="bayer-why-check">✓</span>
+                <p><strong>14 днів на повернення</strong> — якщо товар не підійшов за розміром чи кольором, поверніть або обміняйте його протягом 14 днів з моменту отримання.</p>
+            </div>
+
+            <div class="bayer-why-item">
+                <span class="bayer-why-check">✓</span>
+                <p><strong>Первинний вигляд товару</strong> — для повернення чи обміну товар має бути не ношеним, зі збереженими бирками та упаковкою.</p>
+            </div>
+
+            <div class="bayer-why-item">
+                <span class="bayer-why-check">✓</span>
+                <p><strong>Гарантія оригінальності</strong> — усі товари в каталозі оригінальні, з перевірених джерел.</p>
+            </div>
+
+            <div class="bayer-why-item">
+                <span class="bayer-why-check">✓</span>
+                <p><strong>Швидке повернення коштів</strong> — після отримання й перевірки поверненого товару кошти повертаємо протягом кількох робочих днів.</p>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="bayer-section" id="dpFaq">
+
+    <div class="container">
+
+        <div class="bayer-section-head">
+            <span class="bayer-section-eyebrow">❓</span>
+            <h2>Часті запитання</h2>
+        </div>
+
+        <div class="bayer-faq-list">
+
+            <div class="bayer-faq-item">
+                <button type="button" class="bayer-faq-question">
+                    Скільки коштує доставка?
+                    <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="bayer-faq-answer">
+                    <div class="bayer-faq-answer-inner">
+                        <p>Залежить від ваги й габаритів відправлення — точну суму бачите на кроці оформлення замовлення. Від 3 500 грн доставка безкоштовна.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bayer-faq-item">
+                <button type="button" class="bayer-faq-question">
+                    Як швидко ви відправляєте замовлення?
+                    <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="bayer-faq-answer">
+                    <div class="bayer-faq-answer-inner">
+                        <p>Збираємо і передаємо замовлення в службу доставки протягом 1–2 робочих днів після підтвердження.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bayer-faq-item">
+                <button type="button" class="bayer-faq-question">
+                    Чи можна оплатити карткою онлайн?
+                    <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="bayer-faq-answer">
+                    <div class="bayer-faq-answer-inner">
+                        <p>Так, при оформленні замовлення можна оплатити карткою Visa/Mastercard онлайн або обрати оплату при отриманні.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bayer-faq-item">
+                <button type="button" class="bayer-faq-question">
+                    Чи можна оглянути товар перед оплатою?
+                    <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="bayer-faq-answer">
+                    <div class="bayer-faq-answer-inner">
+                        <p>У відділенні Нової пошти можна перевірити цілісність упаковки. Огляд самого товару до оплати наложеним платежем правилами перевізника не передбачений.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bayer-faq-item">
+                <button type="button" class="bayer-faq-question">
+                    Що робити, якщо товар не підійшов?
+                    <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="bayer-faq-answer">
+                    <div class="bayer-faq-answer-inner">
+                        <p>Поверніть товар протягом 14 днів у первинному вигляді з бирками — обміняємо його або повернемо кошти.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bayer-faq-item">
+                <button type="button" class="bayer-faq-question">
+                    Хто оплачує доставку при поверненні?
+                    <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="bayer-faq-answer">
+                    <div class="bayer-faq-answer-inner">
+                        <p>При поверненні через непідходящий розмір чи колір пересилку товару назад оплачує покупець, якщо інше не погоджено окремо.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="newsletter">
+<div class="container">
+<div class="ml-embedded" data-form="vKcNi2"></div>
+<small>
+Жодного спаму.
+Тільки акції та нові колекції.
+</small>
+</div>
+</section>
+
+<footer>
+
+    <div class="container footer">
+
+        <div>
+
+            <h3>Bagvero</h3>
+
+            <p>
+                Інтернет-магазин сумок
+та аксесуарів.
+            </p>
+
+            <div class="footer-social">
+                <a href="https://www.instagram.com/bestbrnd4u" target="_blank" rel="noopener" aria-label="Instagram">
+                    Instagram
+                </a>
+                <a href="#" aria-label="Facebook">
+                    Facebook
+                </a>
+                <a href="#" aria-label="Telegram">
+                    Telegram
+                </a>
+            </div>
+
+        </div>
+
+        <div>
+
+            <h3>Покупцям</h3>
+
+            <a href="delivery-payment#delivery">Доставка</a>
+            <a href="delivery-payment#payment">Оплата</a>
+            <a href="return-warranty">Повернення та гарантія</a>
+            <a href="bayer-service">Байєр-сервіс</a>
+
+        </div>
+
+        <div>
+
+            <h3>Каталог</h3>
+
+            <a href="catalog">Всі товари</a>
+
+            <a href="catalog?section=new">Новинки</a>
+
+            <a href="catalog?section=sale" class="sale-text">Акції</a>
+
+            <a href="#">Бренди</a>
+
+        </div>
+
+        <div>
+
+            <h3>Зв'яжіться з нами</h3>
+
+            <p>📍 Україна</p>
+
+            <p>✉ info@bagvero.ua</p>
+
+            <p>☎ +380 XX XXX XX XX</p>
+
+            <p>🕘 Пн–Нд 09:00–20:00</p>
+
+        </div>
+
+    </div>
+
+</footer>
+
+<div class="copyright">
+
+    <div class="container">
+
+    © 2026 bagvero.
+    Всі права захищені.
+
+    </div>
+
+</div>
+
+<button id="scrollTop" class="scroll-top" aria-label="Нагору">
+    ↑
+</button>
+
+<script src="assets/js/supabase-client.js"></script>
+<script src="assets/js/common.js"></script>
+<script src="assets/js/sync.js"></script>
+<script src="assets/js/mega-menu.js"></script>
+<script src="assets/js/ui.js"></script>
+
+<script>
+
+    document.querySelectorAll(".bayer-faq-question").forEach(question => {
+
+        question.addEventListener("click", () => {
+
+            question.closest(".bayer-faq-item")?.classList.toggle("open");
+
+        });
+
+    });
+
+</script>
+
+</body>
+
+</html>
