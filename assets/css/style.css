@@ -1264,6 +1264,39 @@ nav li.has-mega:hover .mega-menu{
     z-index:2;
 }
 
+.badge-stack{
+    position:absolute;
+    top:18px;
+    left:18px;
+    z-index:2;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:8px;
+}
+
+.badge-stack .badge{
+    position:static;
+}
+
+.badge-preorder{
+    background:#b45309;
+}
+
+@media (hover:hover) and (pointer:fine){
+    .badge-preorder{
+        opacity:0;
+        transform:translateY(-6px);
+        transition:.25s ease;
+        pointer-events:none;
+    }
+
+    .product-image:hover .badge-preorder{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
 /* -- кнопка "в избранное" (иконка-сердце) --
    base круглый стиль общий для карточки
    и для страницы товара (.favorite-btn ниже

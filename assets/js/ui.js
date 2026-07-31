@@ -344,14 +344,17 @@ function createProductCard(product) {
         </button>
     `).join("");
 
-    const preOrderTag = product.preOrder
-        ? `<div class="preorder-tag">📦 Під замовлення</div>`
+    const preOrderBadge = product.preOrder
+        ? `<div class="badge badge-preorder">📦 Під замовлення</div>`
         : "";
 
     return `
         <div class="product-card" data-id="${product.id}">
             <div class="product-image">
-                ${badge}
+                <div class="badge-stack">
+                    ${badge}
+                    ${preOrderBadge}
+                </div>
                 <button
                     class="favorite"
                     data-id="${product.id}"
@@ -409,7 +412,6 @@ function createProductCard(product) {
                         </div>
                     </div>
                 </div>
-                ${preOrderTag}
                 ${product.description ? `<div class="product-desc">${product.description}</div>` : ""}
                 <button
                     class="btn buy-btn"
