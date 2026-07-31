@@ -764,6 +764,23 @@ nav li.has-mega:hover .mega-menu{
 }
 }
 
+/* той самий фікс, що і для .hero, але для банерів
+   сторінок bayer-service / delivery-payment / return-warranty */
+.bayer-hero-banner .btn-outline{
+    color:#fff;
+    border-color:rgba(255,255,255,.55);
+    background:rgba(255,255,255,.06);
+    backdrop-filter:blur(6px);
+}
+
+@media (hover:hover) and (pointer:fine){
+.bayer-hero-banner .btn-outline:hover{
+    background:#fff;
+    color:var(--primary);
+    border-color:#fff;
+}
+}
+
 /* =====================================
    SECTION TITLE
 ===================================== */
@@ -7289,6 +7306,8 @@ body.mobile-filters-open .scroll-top{
 .bayer-faq-answer-inner{
     overflow:hidden;
     min-height:0;
+    padding:0 24px;
+    transition:padding .3s ease;
 }
 
 .bayer-faq-item.open .bayer-faq-answer-inner{
