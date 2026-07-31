@@ -48,8 +48,20 @@ function initCarousel(carouselEl) {
 
         const hasOverflow = track.scrollWidth > track.clientWidth + 2;
 
-        prevBtn.disabled = !hasOverflow || track.scrollLeft <= 2;
-        nextBtn.disabled = !hasOverflow || track.scrollLeft >= maxScroll;
+        // якщо картки й так усі влазять (наприклад, у віджеті
+        // лишився один товар) — гортати нема куди, тож стрілки
+        // не просто дизейблимо, а прибираємо зовсім
+        prevBtn.style.display = hasOverflow ? "" : "none";
+        nextBtn.style.display = hasOverflow ? "" : "none";
+
+        // поріг "ми на самому початку/кінці" зроблений з запасом
+        // (не строго 0/maxScroll) — після інерційного свайпу чи
+        // scroll-snap браузер іноді лишає scrollLeft у стані на
+        // кілька пікселів вбік (напр. 4px), і з надто суворим
+        // порогом стрілка "Попередні" лишалася активною навіть
+        // на першому товарі
+        prevBtn.disabled = !hasOverflow || track.scrollLeft <= 8;
+        nextBtn.disabled = !hasOverflow || track.scrollLeft >= maxScroll - 6;
 
     }
 

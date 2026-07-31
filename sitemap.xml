@@ -18,12 +18,17 @@
   <url>
     <loc>https://bestbrnd4u.github.io/delivery-payment</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.5</priority>
   </url>
   <url>
     <loc>https://bestbrnd4u.github.io/return-warranty</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://bestbrnd4u.github.io/privacy-policy</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
   </url>
   <url>
     <loc>https://bestbrnd4u.github.io/contacts</loc>

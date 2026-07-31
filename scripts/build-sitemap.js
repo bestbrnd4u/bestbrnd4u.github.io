@@ -25,6 +25,9 @@ const STATIC_PAGES = [
     { loc: "/", changefreq: "daily", priority: "1.0" },
     { loc: "/catalog", changefreq: "daily", priority: "0.9" },
     { loc: "/bayer-service", changefreq: "monthly", priority: "0.7" },
+    { loc: "/delivery-payment", changefreq: "monthly", priority: "0.5" },
+    { loc: "/return-warranty", changefreq: "monthly", priority: "0.5" },
+    { loc: "/privacy-policy", changefreq: "yearly", priority: "0.3" },
     { loc: "/contacts", changefreq: "monthly", priority: "0.3" }
 ];
 

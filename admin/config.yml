@@ -542,6 +542,18 @@ collections:
               required: true
               choose_url: true
 
+          - label: "Відео цього кольору"
+            name: "video"
+            widget: "file"
+            required: false
+            choose_url: true
+            hint: >
+              Необов'язково. Короткий відео-огляд товару (mp4) — додається
+              останнім слайдом у галереї на сторінці товару, поряд із
+              фото. Можна завантажити файл або вставити посилання
+              (наприклад, на YouTube/Vimeo пряме відео тут не програється —
+              потрібне саме посилання на .mp4-файл).
+
       - label: "Опис товару"
         name: "description"
         widget: "text"

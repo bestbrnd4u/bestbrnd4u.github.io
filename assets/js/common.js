@@ -1290,7 +1290,7 @@ document.addEventListener("click", event => {
 
                 const images = JSON.parse(colorBtn.dataset.images || "[]");
 
-                updateGalleryForColor(images);
+                updateGalleryForColor(images, colorBtn.dataset.video || "");
 
             } catch (error) {
 

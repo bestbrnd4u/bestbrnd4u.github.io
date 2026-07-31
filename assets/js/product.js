@@ -111,6 +111,58 @@ function updateProductSeoMetadata(product) {
 
 }
 
+// Галерея товару: побудова мініатюр / головних слайдів / крапок
+// з масиву фото + необов'язкового відео обраного кольору.
+// Відео завжди йде останнім слайдом і позначається значком ▶
+// на мініатюрі (саме відео там не програється — просто "обкладинка").
+// -------------------------
+
+function buildThumbsMarkup(images, video, altText) {
+
+    const imageThumbs = images.map((img, index) => `
+        <div class="thumb ${index === 0 ? "active" : ""}">
+            <img
+                src="${img}"
+                alt="${altText}"
+                onerror="this.onerror=null;this.src='assets/images/no-image.png'">
+        </div>
+    `).join("");
+
+    const videoThumb = video ? `
+        <div class="thumb thumb-video ${images.length === 0 ? "active" : ""}">
+            <video src="${video}" muted playsinline preload="metadata"></video>
+            <span class="thumb-play" aria-hidden="true">▶</span>
+        </div>
+    ` : "";
+
+    return imageThumbs + videoThumb;
+
+}
+
+function buildTrackMarkup(images, video, altText) {
+
+    const imageSlides = images.map(img => `
+        <img class="gallery-slide" src="${img}" alt="${altText}" draggable="false" onerror="this.onerror=null;this.src='assets/images/no-image.png'">
+    `).join("");
+
+    const videoSlide = video
+        ? `<video class="gallery-slide gallery-slide-video" src="${video}" controls playsinline preload="metadata"></video>`
+        : "";
+
+    return imageSlides + videoSlide || `<img class="gallery-slide" src="assets/images/no-image.png" alt="${altText}">`;
+
+}
+
+function buildDotsMarkup(images, video) {
+
+    const total = images.length + (video ? 1 : 0);
+
+    if (total <= 1) return "";
+
+    return Array.from({ length: total }, (_, index) => `<span class="gallery-dot ${index === 0 ? "active" : ""}"></span>`).join("");
+
+}
+
 function renderProduct(product) {
 
     document.getElementById("breadTitle").textContent = product.title;
@@ -123,20 +175,26 @@ function renderProduct(product) {
 
     const activeVariant = variants[0];
     const galleryImages = activeVariant.images?.length ? activeVariant.images : (product.images || []);
+    const galleryVideo = activeVariant.video || "";
 
     const colorButtons = variants.map((variant, index) => {
 
         const swatchImage = variant.images?.[0];
+        const swatchColor = variant.hex || "#999";
 
+        // колір ставимо завжди (навіть коли є фото) — це підкладка:
+        // якщо фото свотча не завантажиться (бита посилання),
+        // колір все одно буде видно замість порожнього квадрата
         const swatchStyle = swatchImage
-            ? `background-image:url('${swatchImage}')`
-            : `background-color:${variant.hex || "#999"}`;
+            ? `background-color:${swatchColor};background-image:url('${swatchImage}');background-size:cover;background-position:center`
+            : `background-color:${swatchColor}`;
 
         return `
         <button
             class="color ${index === 0 ? "active" : ""}"
             data-color="${variant.color}"
             data-images='${JSON.stringify(variant.images || [])}'
+            data-video="${variant.video || ""}"
             title="${variant.color}"
             aria-label="Колір: ${variant.color}"
             style="${swatchStyle}"></button>
@@ -170,15 +228,7 @@ function renderProduct(product) {
 
     <div class="thumbs-vertical" id="thumbsVertical">
 
-        ${galleryImages.map((img,index)=>`
-
-            <img
-                src="${img}"
-                class="thumb ${index===0?"active":""}"
-                alt="${product.title}"
-                onerror="this.onerror=null;this.src='assets/images/no-image.png'">
-
-        `).join("")}
+        ${buildThumbsMarkup(galleryImages, galleryVideo, product.title)}
 
     </div>
 
@@ -188,15 +238,13 @@ function renderProduct(product) {
 
         <div class="zoom-container gallery-track" id="mainGalleryTrack">
 
-            ${(galleryImages.length ? galleryImages : ["assets/images/no-image.png"]).map(img => `
-                <img class="gallery-slide" src="${img}" alt="${product.title}" draggable="false" onerror="this.onerror=null;this.src='assets/images/no-image.png'">
-            `).join("")}
+            ${buildTrackMarkup(galleryImages, galleryVideo, product.title)}
 
         </div>
 
-        ${galleryImages.length > 1 ? `
+        ${galleryImages.length + (galleryVideo ? 1 : 0) > 1 ? `
         <div class="gallery-dots" id="mainGalleryDots">
-            ${galleryImages.map((_, index) => `<span class="gallery-dot ${index === 0 ? "active" : ""}"></span>`).join("")}
+            ${buildDotsMarkup(galleryImages, galleryVideo)}
         </div>` : ""}
 
     </div>
@@ -715,14 +763,21 @@ function setupGallery() {
 
             if (typeof window.openLightbox !== "function") return;
 
-            const currentImages = [...track.children]
-                .map(slide => slide.src)
-                .filter(Boolean);
+            const slides = [...track.children];
+            const activeSlide = slides[currentSlideIndex()];
+
+            // відео-слайд відкриває власні (нативні) controls по тапу —
+            // фото-лайтбокс із зумом тут не потрібен і не підтримує відео
+            if (activeSlide?.tagName === "VIDEO") return;
+
+            const imageSlides = slides.filter(slide => slide.tagName === "IMG");
+            const currentImages = imageSlides.map(slide => slide.src).filter(Boolean);
+            const startIndex = imageSlides.indexOf(activeSlide);
 
             const brand = document.querySelector(".product-info .brand")?.textContent.trim();
             const title = document.querySelector(".product-info h1")?.textContent.trim();
 
-            window.openLightbox(currentImages, currentSlideIndex(), { brand, title });
+            window.openLightbox(currentImages, startIndex, { brand, title });
 
         });
 
@@ -733,7 +788,7 @@ function setupGallery() {
 // Викликається з common.js при кліку на колір на сторінці товару —
 // повністю перебудовує галерею (мініатюри + головне фото) під
 // фотографії обраного кольору.
-function updateGalleryForColor(images) {
+function updateGalleryForColor(images, video) {
 
     if (!images || !images.length) return;
 
@@ -743,26 +798,16 @@ function updateGalleryForColor(images) {
 
     if (!thumbsVertical || !track) return;
 
-    thumbsVertical.innerHTML = images.map((img, index) => `
-        <img
-            src="${img}"
-            class="thumb ${index === 0 ? "active" : ""}"
-            alt=""
-            onerror="this.onerror=null;this.src='assets/images/no-image.png'">
-    `).join("");
+    const altText = document.querySelector(".product-info h1")?.textContent.trim() || "";
 
-    track.innerHTML = images.map(img => `
-        <img class="gallery-slide" src="${img}" alt="" draggable="false" onerror="this.onerror=null;this.src='assets/images/no-image.png'">
-    `).join("");
+    thumbsVertical.innerHTML = buildThumbsMarkup(images, video, altText);
+
+    track.innerHTML = buildTrackMarkup(images, video, altText);
 
     track.scrollLeft = 0;
 
     if (dotsWrap) {
-
-        dotsWrap.innerHTML = images.length > 1
-            ? images.map((_, index) => `<span class="gallery-dot ${index === 0 ? "active" : ""}"></span>`).join("")
-            : "";
-
+        dotsWrap.innerHTML = buildDotsMarkup(images, video);
     }
 
     setupGallery();
