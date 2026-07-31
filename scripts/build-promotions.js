@@ -64,6 +64,9 @@ function main() {
             brand: data.brand || "",
             discountPercent: typeof data.discountPercent === "number" ? data.discountPercent : null,
             productIds: Array.isArray(data.products) ? data.products.map(Number) : [],
+            displayType: ["card", "banner_products", "banner_compact"].includes(data.displayType)
+                ? data.displayType
+                : "card",
             order: typeof data.order === "number" ? data.order : 1
         });
 

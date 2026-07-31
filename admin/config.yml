@@ -239,6 +239,21 @@ collections:
         default: true
         hint: "Вимкніть, щоб приховати акцію, не видаляючи файл"
 
+      - label: "Спосіб показу на головній"
+        name: "displayType"
+        widget: "select"
+        default: "card"
+        options:
+          - { label: "Маленька картка в сітці «Акції»", value: "card" }
+          - { label: "Великий банер на всю ширину + товари під ним", value: "banner_products" }
+          - { label: "Компактний банер бренду (фото + короткий текст, без товарів)", value: "banner_compact" }
+        hint: >
+          "Маленька картка" — звичайна картка в сітці «Акції» (як зараз).
+          "Великий банер" — фото + текст на всю ширину і ряд товарів під
+          ним, як банер GANT на md-fashion.ua. "Компактний банер" — менший
+          банер бренду з фото та коротким текстом, без товарів під ним —
+          зручно для швидких тизерів колекції.
+
       - label: "Порядок показу"
         name: "order"
         widget: "number"
@@ -327,11 +342,34 @@ collections:
     folder: "data/categories"
     create: true
     delete: true
+    search: true
     extension: "json"
     format: "json"
     identifier_field: "name"
     summary: "{{department}} — {{name}}"
     sortable_fields: ["department", "name"]
+    view_groups:
+      - label: "За розділом"
+        field: department
+    view_filters:
+      - label: "Сумки"
+        field: department
+        pattern: "Сумки"
+      - label: "Одяг"
+        field: department
+        pattern: "Одяг"
+      - label: "Взуття"
+        field: department
+        pattern: "Взуття"
+      - label: "Аксесуари"
+        field: department
+        pattern: "Аксесуари"
+      - label: "Білизна"
+        field: department
+        pattern: "Білизна"
+      - label: "Спорт"
+        field: department
+        pattern: "Спорт"
     fields:
       - label: "Назва категорії"
         name: "name"
@@ -359,11 +397,19 @@ collections:
     folder: "data/products"
     create: true
     delete: true
+    search: true
     extension: "json"
     format: "json"
     identifier_field: "title"
     summary: "{{brand}} — {{title}} ({{price}} ₴)"
     sortable_fields: ["title", "brand", "price", "isNew"]
+    view_groups:
+      - label: "За брендом"
+        field: brand
+      - label: "За категорією"
+        field: category
+      - label: "За статтю"
+        field: gender
     view_filters:
       - label: "Новинки"
         field: isNew
@@ -371,6 +417,18 @@ collections:
       - label: "Зі знижкою"
         field: oldPrice
         pattern: '.+'
+      - label: "Жінкам"
+        field: gender
+        pattern: "Жінкам"
+      - label: "Чоловікам"
+        field: gender
+        pattern: "Чоловікам"
+      - label: "Унісекс"
+        field: gender
+        pattern: "Унісекс"
+      - label: "Дітям"
+        field: gender
+        pattern: "Дітям"
       - label: "⚠️ Опубліковані попри неповні дані"
         field: forcePublish
         pattern: true
@@ -548,11 +606,17 @@ collections:
             required: false
             choose_url: true
             hint: >
-              Необов'язково. Короткий відео-огляд товару (mp4) — додається
+              Необов'язково. Короткий відео-огляд товару — додається
               останнім слайдом у галереї на сторінці товару, поряд із
-              фото. Можна завантажити файл або вставити посилання
-              (наприклад, на YouTube/Vimeo пряме відео тут не програється —
-              потрібне саме посилання на .mp4-файл).
+              фото. Два варіанти: 1) завантажити файл або вставити пряме
+              посилання на .mp4 — підійде, якщо відео вже в сумісному
+              форматі; 2) вставити звичайне посилання на YouTube або
+              Vimeo — рекомендовано для відео, знятого на iPhone
+              (формат .mov з iPhone часто грає лише в Safari, а не в
+              Chrome/Firefox; YouTube/Vimeo самі перекодовують відео при
+              завантаженні, і воно потім грає скрізь). Завантажити відео
+              з iPhone на YouTube/Vimeo можна прямо з телефону через їхній
+              застосунок чи сайт.
 
       - label: "Опис товару"
         name: "description"

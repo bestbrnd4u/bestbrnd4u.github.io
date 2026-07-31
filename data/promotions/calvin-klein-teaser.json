@@ -1,0 +1,11 @@
+{
+  "active": true,
+  "displayType": "banner_compact",
+  "order": 2,
+  "title": "Осіння колекція Calvin Klein",
+  "text": "Лаконічні силуети та якісні тканини для щоденних образів",
+  "image": "https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=1200",
+  "buttonText": "Дивитись все",
+  "link": "catalog?brand=Calvin%20Klein",
+  "brand": "Calvin Klein"
+}

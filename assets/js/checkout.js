@@ -22,7 +22,15 @@ if (emailjsReady) {
 }
 
 function generateOrderId() {
-    return "BG" + Date.now().toString(36).toUpperCase();
+
+    // 10-значний цифровий номер замовлення: останні 7 цифр
+    // поточної мітки часу (мс) + 3 випадкові цифри — унікальний,
+    // без жодної літери, легко продиктувати телефоном
+    const timePart = Date.now().toString().slice(-7);
+    const randomPart = Math.floor(100 + Math.random() * 900);
+
+    return timePart.toString() + randomPart.toString();
+
 }
 
 function getFormattedOrderDate() {

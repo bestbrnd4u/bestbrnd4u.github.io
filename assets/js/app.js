@@ -328,32 +328,186 @@ async function initPromotions() {
             return;
         }
 
-        grid.innerHTML = promotions.map(promo => `
-            <a href="promo?id=${encodeURIComponent(promo.slug)}" class="promo-card">
+        const regular = promotions.filter(promo => promo.displayType === "card");
+        const bannersWithProducts = promotions.filter(promo => promo.displayType === "banner_products");
+        const compactBanners = promotions.filter(promo => promo.displayType === "banner_compact");
 
-                <div class="promo-card-image">
-                    <img
-                        src="${promo.image}"
-                        alt="${promo.title}"
-                        onerror="this.src='assets/images/no-image.png'">
-                    ${promo.badge ? `<span class="promo-card-badge">${promo.badge}</span>` : ""}
-                </div>
+        if (regular.length) {
 
-                <div class="promo-card-info">
-                    <h3>${promo.title}</h3>
-                    ${promo.text ? `<p>${promo.text}</p>` : ""}
-                    <span class="promo-card-link">${promo.buttonText || "Дивитись усі товари"} →</span>
-                </div>
+            grid.innerHTML = regular.map(promo => `
+                <a href="promo?id=${encodeURIComponent(promo.slug)}" class="promo-card">
 
-            </a>
-        `).join("");
+                    <div class="promo-card-image">
+                        <img
+                            src="${promo.image}"
+                            alt="${promo.title}"
+                            onerror="this.src='assets/images/no-image.png'">
+                        ${promo.badge ? `<span class="promo-card-badge">${promo.badge}</span>` : ""}
+                    </div>
 
-        section.hidden = false;
+                    <div class="promo-card-info">
+                        <h3>${promo.title}</h3>
+                        ${promo.text ? `<p>${promo.text}</p>` : ""}
+                        <span class="promo-card-link">${promo.buttonText || "Дивитись усі товари"} →</span>
+                    </div>
+
+                </a>
+            `).join("");
+
+            section.hidden = false;
+
+        }
+
+        if (bannersWithProducts.length) {
+            renderFeaturedPromotions(bannersWithProducts);
+        }
+
+        if (compactBanners.length) {
+            renderCompactPromotions(compactBanners);
+        }
 
     } catch (error) {
 
         console.error(error);
 
     }
+
+}
+
+// -------------------------
+// Повноширинні банери акцій (featured: true) — фото + текст
+// на всю ширину сторінки, а під ним ряд товарів цієї акції,
+// як банер бренду на md-fashion.ua
+// -------------------------
+
+async function renderFeaturedPromotions(featuredPromotions) {
+
+    const section = document.getElementById("brandCampaignsSection");
+
+    if (!section) return;
+
+    let allProducts = [];
+
+    try {
+
+        const response = await fetch("data/products.json");
+
+        if (response.ok) allProducts = await response.json();
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
+
+    section.innerHTML = featuredPromotions.map(promo => {
+
+        const productIds = new Set(promo.productIds || []);
+
+        const curated = allProducts
+            .filter(product =>
+                productIds.has(product.id) ||
+                (promo.brand && product.brand === promo.brand)
+            )
+            .slice(0, 4);
+
+        return `
+            <div class="brand-campaign">
+
+                <div class="container">
+
+                    <div class="brand-campaign-banner">
+
+                        <div class="brand-campaign-image">
+                            <img
+                                src="${promo.image}"
+                                alt="${promo.title}"
+                                onerror="this.src='assets/images/no-image.png'">
+                        </div>
+
+                        <div class="brand-campaign-content">
+
+                            ${promo.badge ? `<span class="brand-campaign-eyebrow">${promo.badge}</span>` : ""}
+
+                            <h2>${promo.title}</h2>
+
+                            ${promo.text ? `<p>${promo.text}</p>` : ""}
+
+                            <a href="promo?id=${encodeURIComponent(promo.slug)}" class="btn">
+                                ${promo.buttonText || "Дивитись усі товари"}
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                    ${curated.length ? `
+
+                    <div class="brand-campaign-products">
+                        ${curated.map(product => createProductCard(product)).join("")}
+                    </div>
+
+                    <div class="brand-campaign-more">
+                        <a href="promo?id=${encodeURIComponent(promo.slug)}" class="btn btn-outline">
+                            ${promo.buttonText || "Дивитись усі товари"}
+                        </a>
+                    </div>
+
+                    ` : ""}
+
+                </div>
+
+            </div>
+        `;
+
+    }).join("");
+
+    if (typeof initProductCarousels === "function") initProductCarousels(section);
+    if (typeof updateFavoriteButtons === "function") updateFavoriteButtons();
+
+}
+
+// -------------------------
+// Компактні банери брендів (displayType: "banner_compact") —
+// фото + короткий текст і кнопка, без ряду товарів під ним
+// -------------------------
+
+function renderCompactPromotions(compactPromotions) {
+
+    const section = document.getElementById("compactPromotionsSection");
+
+    if (!section) return;
+
+    section.innerHTML = compactPromotions.map(promo => `
+        <div class="brand-teaser">
+
+            <div class="container">
+
+                <div class="brand-teaser-banner">
+
+                    <div class="brand-teaser-image">
+                        <img
+                            src="${promo.image}"
+                            alt="${promo.title}"
+                            onerror="this.src='assets/images/no-image.png'">
+                    </div>
+
+                    <div class="brand-teaser-content">
+
+                        <p class="brand-teaser-text">${promo.title}</p>
+
+                        <a href="promo?id=${encodeURIComponent(promo.slug)}" class="brand-teaser-btn">
+                            ${promo.buttonText || "Дивитись все"}
+                            <span class="brand-teaser-arrow">→</span>
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    `).join("");
 
 }

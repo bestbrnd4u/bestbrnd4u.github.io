@@ -3037,9 +3037,21 @@ body.mobile-filters-open .scroll-top{
     cursor:zoom-in;
 }
 
-.gallery-slide-video{
+.gallery-slide-video,
+.gallery-slide-embed{
     cursor:default;
     background:#000;
+}
+
+.gallery-slide-embed{
+    aspect-ratio:16/9;
+}
+
+.gallery-slide-embed iframe{
+    width:100%;
+    height:100%;
+    border:0;
+    display:block;
 }
 
 .gallery-slide,
@@ -3637,6 +3649,218 @@ body.mobile-filters-open .scroll-top{
     color:var(--gray700);
     font-size:14.5px;
     line-height:1.6;
+}
+
+/* -- компактні банери брендів (displayType: banner_compact) --
+   менший банер: фото + короткий текст і кнопка, без товарів,
+   за зразком тизера G-STAR на md-fashion.ua -- */
+
+.brand-teaser{
+    padding:30px 0;
+}
+
+.brand-teaser:nth-child(even){
+    background:#fafafa;
+}
+
+.brand-teaser-banner{
+    display:grid;
+    grid-template-columns:330px 1fr;
+    align-items:stretch;
+}
+
+.brand-teaser-image{
+    aspect-ratio:1/1;
+    max-height:280px;
+}
+
+.brand-teaser-image img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+}
+
+.brand-teaser-content{
+    background:var(--gray50);
+    padding:0 44px;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    justify-content:center;
+    gap:16px;
+}
+
+.brand-teaser-text{
+    color:var(--accent);
+    font-weight:600;
+    font-size:15px;
+    line-height:1.5;
+    max-width:220px;
+}
+
+.brand-teaser-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background:var(--primary);
+    color:#fff;
+    padding:10px 18px;
+    border-radius:8px;
+    font-size:13.5px;
+    font-weight:600;
+    transition:.2s;
+}
+
+.brand-teaser-btn:hover{
+    background:#1f2937;
+    transform:translateY(-2px);
+}
+
+.brand-teaser-arrow{
+    transition:transform .2s;
+}
+
+.brand-teaser-btn:hover .brand-teaser-arrow{
+    transform:translateX(3px);
+}
+
+@media(max-width:700px){
+
+    .brand-teaser-banner{
+        grid-template-columns:1fr;
+    }
+
+    .brand-teaser-image{
+        max-height:none;
+        aspect-ratio:4/3;
+    }
+
+    .brand-teaser-content{
+        padding:28px 24px;
+    }
+
+    .brand-teaser-text{
+        max-width:none;
+    }
+
+}
+
+/* -- повноширинні банери акцій (featured) на головній --
+   фото + текст в один ряд, а під ним товари цієї акції,
+   за зразком банерів брендів на md-fashion.ua -- */
+
+.brand-campaign{
+    padding:70px 0;
+}
+
+.brand-campaign:nth-child(even){
+    background:#fafafa;
+}
+
+.brand-campaign-banner{
+    display:grid;
+    grid-template-columns:1.1fr 1fr;
+    align-items:stretch;
+    gap:0;
+    border-radius:24px;
+    overflow:hidden;
+    margin-bottom:40px;
+    box-shadow:var(--shadow);
+}
+
+.brand-campaign-image{
+    min-height:420px;
+}
+
+.brand-campaign-image img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+}
+
+.brand-campaign-content{
+    background:var(--gray50);
+    padding:60px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:flex-start;
+    gap:14px;
+}
+
+.brand-campaign-eyebrow{
+    display:inline-block;
+    padding:6px 16px;
+    background:var(--secondary);
+    color:#fff;
+    border-radius:50px;
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:.5px;
+}
+
+.brand-campaign-content h2{
+    font-size:32px;
+    line-height:1.25;
+}
+
+.brand-campaign-content p{
+    color:var(--gray500);
+    font-size:16px;
+}
+
+.brand-campaign-content .btn{
+    margin-top:10px;
+}
+
+.brand-campaign-products{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:24px;
+    margin-bottom:32px;
+}
+
+.brand-campaign-more{
+    text-align:center;
+}
+
+@media(max-width:1000px){
+
+    .brand-campaign-banner{
+        grid-template-columns:1fr;
+    }
+
+    .brand-campaign-image{
+        min-height:280px;
+    }
+
+    .brand-campaign-content{
+        padding:40px 32px;
+    }
+
+    .brand-campaign-products{
+        grid-template-columns:repeat(2, 1fr);
+    }
+
+}
+
+@media(max-width:560px){
+
+    .brand-campaign-products{
+        grid-template-columns:1fr 1fr;
+        gap:14px;
+    }
+
+    .brand-campaign-content{
+        padding:32px 24px;
+    }
+
+    .brand-campaign-content h2{
+        font-size:24px;
+    }
+
 }
 
 /* -- похожие товары -- */

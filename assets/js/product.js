@@ -117,6 +117,46 @@ function updateProductSeoMetadata(product) {
 // на мініатюрі (саме відео там не програється — просто "обкладинка").
 // -------------------------
 
+// Розпізнає посилання на відео: пряме посилання на файл (.mp4 тощо)
+// відтворюємо як звичайний <video>, а YouTube/Vimeo — вбудовуємо
+// через iframe. Це важливо саме для відео з iPhone: пряме .mov/.mp4
+// знято на iPhone часто в кодеку HEVC, який грає лише в Safari — не
+// в Chrome/Firefox. YouTube/Vimeo самі перекодовують відео при
+// завантаженні у сумісний формат, який працює в будь-якому браузері.
+function parseVideoEmbed(url) {
+
+    if (!url) return null;
+
+    const youtubeMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{6,})/);
+
+    if (youtubeMatch) {
+
+        const id = youtubeMatch[1];
+
+        return {
+            type: "embed",
+            embedUrl: `https://www.youtube-nocookie.com/embed/${id}?rel=0`,
+            thumbUrl: `https://img.youtube.com/vi/${id}/hqdefault.jpg`
+        };
+
+    }
+
+    const vimeoMatch = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+
+    if (vimeoMatch) {
+
+        return {
+            type: "embed",
+            embedUrl: `https://player.vimeo.com/video/${vimeoMatch[1]}`,
+            thumbUrl: ""
+        };
+
+    }
+
+    return { type: "file", videoUrl: url };
+
+}
+
 function buildThumbsMarkup(images, video, altText) {
 
     const imageThumbs = images.map((img, index) => `
@@ -128,12 +168,32 @@ function buildThumbsMarkup(images, video, altText) {
         </div>
     `).join("");
 
-    const videoThumb = video ? `
+    const media = parseVideoEmbed(video);
+
+    let videoThumb = "";
+
+    if (media?.type === "file") {
+
+        videoThumb = `
         <div class="thumb thumb-video ${images.length === 0 ? "active" : ""}">
-            <video src="${video}" muted playsinline preload="metadata"></video>
+            <video src="${media.videoUrl}" muted playsinline preload="metadata"></video>
             <span class="thumb-play" aria-hidden="true">▶</span>
         </div>
-    ` : "";
+    `;
+
+    } else if (media?.type === "embed") {
+
+        const bgStyle = media.thumbUrl
+            ? `background-image:url('${media.thumbUrl}');background-size:cover;background-position:center`
+            : `background:#111827`;
+
+        videoThumb = `
+        <div class="thumb thumb-video ${images.length === 0 ? "active" : ""}" style="${bgStyle}">
+            <span class="thumb-play" aria-hidden="true">▶</span>
+        </div>
+    `;
+
+    }
 
     return imageThumbs + videoThumb;
 
@@ -145,9 +205,28 @@ function buildTrackMarkup(images, video, altText) {
         <img class="gallery-slide" src="${img}" alt="${altText}" draggable="false" onerror="this.onerror=null;this.src='assets/images/no-image.png'">
     `).join("");
 
-    const videoSlide = video
-        ? `<video class="gallery-slide gallery-slide-video" src="${video}" controls playsinline preload="metadata"></video>`
-        : "";
+    const media = parseVideoEmbed(video);
+
+    let videoSlide = "";
+
+    if (media?.type === "file") {
+
+        videoSlide = `<video class="gallery-slide gallery-slide-video" src="${media.videoUrl}" controls playsinline preload="metadata"></video>`;
+
+    } else if (media?.type === "embed") {
+
+        videoSlide = `
+            <div class="gallery-slide gallery-slide-embed">
+                <iframe
+                    src="${media.embedUrl}"
+                    title="${altText}"
+                    allow="autoplay; fullscreen; picture-in-picture"
+                    allowfullscreen
+                    loading="lazy"></iframe>
+            </div>
+        `;
+
+    }
 
     return imageSlides + videoSlide || `<img class="gallery-slide" src="assets/images/no-image.png" alt="${altText}">`;
 
@@ -766,9 +845,9 @@ function setupGallery() {
             const slides = [...track.children];
             const activeSlide = slides[currentSlideIndex()];
 
-            // відео-слайд відкриває власні (нативні) controls по тапу —
+            // відео/embed-слайд відкриває власні controls по тапу —
             // фото-лайтбокс із зумом тут не потрібен і не підтримує відео
-            if (activeSlide?.tagName === "VIDEO") return;
+            if (activeSlide && activeSlide.tagName !== "IMG") return;
 
             const imageSlides = slides.filter(slide => slide.tagName === "IMG");
             const currentImages = imageSlides.map(slide => slide.src).filter(Boolean);

@@ -14,6 +14,21 @@
       4,
       5
     ],
+    "displayType": "banner_products",
     "order": 1
+  },
+  {
+    "slug": "calvin-klein-teaser",
+    "title": "Осіння колекція Calvin Klein",
+    "text": "Лаконічні силуети та якісні тканини для щоденних образів",
+    "badge": "",
+    "image": "https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    "buttonText": "Дивитись все",
+    "link": "catalog?brand=Calvin%20Klein",
+    "brand": "Calvin Klein",
+    "discountPercent": null,
+    "productIds": [],
+    "displayType": "banner_compact",
+    "order": 2
   }
 ]
