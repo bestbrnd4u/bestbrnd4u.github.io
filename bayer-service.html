@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Байєр-сервіс Bagvero: замовляйте оригінальні брендові сумки, взуття та аксесуари з офіційних сайтів США та Європи. Викуп, доставка в Україну, супровід на кожному етапі.">
+    <meta name="theme-color" content="#111827">
+    <meta name="robots" content="index,follow">
+    <link rel="canonical" href="https://bestbrnd4u.github.io/bayer-service">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Байєр-сервіс | Bagvero">
+    <meta property="og:description" content="Замовляйте оригінальні брендові товари з США та Європи через байєр-сервіс Bagvero — вигідні ціни, викуп і доставка під ключ.">
+    <meta property="og:image" content="https://images.pexels.com/photos/5745781/pexels-photo-5745781.jpeg?auto=compress&cs=tinysrgb&w=1200">
+    <meta property="og:url" content="https://bestbrnd4u.github.io/bayer-service">
+
+<link rel="icon" href="favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicon-16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/images/favicon-192.png">
+    <title>Байєр-сервіс: замовлення брендових товарів з США та Європи | Bagvero</title>
+
+    <link rel="stylesheet" href="assets/css/style.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+<!-- MailerLite Universal -->
+<script>
+    (function(w,d,e,u,f,l,n){w[f]=w[f]||function(){(w[f].q=w[f].q||[])
+    .push(arguments);},l=d.createElement(e),l.async=1,l.src=u,
+    n=d.getElementsByTagName(e)[0],n.parentNode.insertBefore(l,n);})
+    (window,document,'script','https://assets.mailerlite.com/js/universal.js','ml');
+    ml('account', '2520119');
+</script>
+<!-- End MailerLite Universal -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+        {
+            "@type": "Question",
+            "name": "Чи входить вага упаковки у розрахунок доставки?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Так, вартість доставки рахується за вагою вже упакованого відправлення, а не лише самого товару." }
+        },
+        {
+            "@type": "Question",
+            "name": "Строки доставки включають обробку замовлення магазином у США?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Ні, вказані строки — це час перевезення. Деякі закордонні магазини самі обробляють і відправляють замовлення до 7 робочих днів, це рахується окремо." }
+        },
+        {
+            "@type": "Question",
+            "name": "Чи є додаткові збори на техніку та деякі аксесуари з США?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Так, на окремі категорії товарів (техніка, деякі аксесуари) продавець у США може додавати місцевий податок — ми попереджаємо про це заздалегідь, до оплати." }
+        },
+        {
+            "@type": "Question",
+            "name": "Як доставляють великогабаритні або важкі речі?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Для великих і важких відправлень вигідніше морське перевезення — довше за термінами, але суттєво дешевше за авіа." }
+        },
+        {
+            "@type": "Question",
+            "name": "Чи можна замовити товар, якого зараз немає в наявності?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Так, ми можемо відстежувати появу товару в продажу й оформити викуп, щойно він з'явиться знову." }
+        },
+        {
+            "@type": "Question",
+            "name": "Яка мінімальна сума замовлення через байєр-сервіс?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Мінімальної суми немає — можна замовити навіть одну річ." }
+        },
+        {
+            "@type": "Question",
+            "name": "Чи можна об'єднати товари з різних магазинів в одну посилку?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Так, ми можемо об'єднати кілька викупів в одне відправлення, щоб зменшити витрати на доставку." }
+        }
+    ]
+}
+</script>
+
+</head>
+
+<body>
+
+<header>
+
+    <div class="container header">
+
+        <a href="/" class="logo">
+            Bagvero
+        </a>
+
+        <nav>
+
+            <ul>
+
+                <li><a href="/">Головна</a></li>
+
+                <li class="has-mega"><a href="catalog" id="navCatalogLink">Каталог</a><div class="mega-menu" id="catalogMegaMenu">
+<a class="mega-item" href="catalog?gender=Жінкам"><img src="https://images.pexels.com/photos/932401/pexels-photo-932401.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Жінкам"><span>Жінкам</span></a>
+<a class="mega-item" href="catalog?gender=Чоловікам"><img src="https://images.pexels.com/photos/7869755/pexels-photo-7869755.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Чоловікам"><span>Чоловікам</span></a>
+<a class="mega-item" href="catalog?gender=Унісекс"><img src="https://images.pexels.com/photos/10425471/pexels-photo-10425471.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Унісекс"><span>Унісекс</span></a>
+<a class="mega-item" href="catalog?gender=Дітям"><img src="https://images.pexels.com/photos/7269547/pexels-photo-7269547.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Дітям"><span>Дітям</span></a>
+</div></li>
+
+                <li class="has-mega"><a href="catalog?section=new" id="navNewLink">Новинки</a><div class="mega-menu">
+<a class="mega-item" href="catalog?section=new&gender=Жінкам"><img src="https://images.pexels.com/photos/932401/pexels-photo-932401.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Жінкам"><span>Жінкам</span></a>
+<a class="mega-item" href="catalog?section=new&gender=Чоловікам"><img src="https://images.pexels.com/photos/7869755/pexels-photo-7869755.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Чоловікам"><span>Чоловікам</span></a>
+<a class="mega-item" href="catalog?section=new&gender=Унісекс"><img src="https://images.pexels.com/photos/10425471/pexels-photo-10425471.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Унісекс"><span>Унісекс</span></a>
+<a class="mega-item" href="catalog?section=new&gender=Дітям"><img src="https://images.pexels.com/photos/7269547/pexels-photo-7269547.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Дітям"><span>Дітям</span></a>
+</div></li>
+
+                <li class="has-mega"><a href="catalog?section=sale" id="navSaleLink" class="sale-text">Акції</a><div class="mega-menu">
+<a class="mega-item" href="catalog?section=sale&gender=Жінкам"><img src="https://images.pexels.com/photos/932401/pexels-photo-932401.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Жінкам"><span>Жінкам</span></a>
+<a class="mega-item" href="catalog?section=sale&gender=Чоловікам"><img src="https://images.pexels.com/photos/7869755/pexels-photo-7869755.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Чоловікам"><span>Чоловікам</span></a>
+<a class="mega-item" href="catalog?section=sale&gender=Унісекс"><img src="https://images.pexels.com/photos/10425471/pexels-photo-10425471.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Унісекс"><span>Унісекс</span></a>
+<a class="mega-item" href="catalog?section=sale&gender=Дітям"><img src="https://images.pexels.com/photos/7269547/pexels-photo-7269547.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Дітям"><span>Дітям</span></a>
+</div></li>
+
+                <li><a href="bayer-service" class="active">Байєр-сервіс</a></li>
+
+                <li><a href="contacts">Контакти</a></li>
+
+            </ul>
+
+        </nav>
+
+        <div class="header-icons">
+
+            <button id="searchBtn">🔍</button>
+<a href="account" id="accountLink">👤</a>
+
+            <a href="favorites">         ❤         <span id="favCount">0</span>     </a>
+
+            <div class="cart-icon-wrap">
+    <a href="cart" id="cartIconLink">
+        🛒
+        <span id="cartCount">0</span>
+    </a>
+    <div id="cartPopup" class="cart-popup" hidden></div>
+</div>
+
+        </div>
+
+    </div>
+
+</header>
+
+<section class="breadcrumbs">
+
+    <div class="container">
+
+        <a href="/">Головна</a>
+
+        <span class="crumb-sep">→</span>
+
+        <span>Байєр-сервіс</span>
+
+    </div>
+
+</section>
+
+<section class="bayer-section" style="padding-top:36px;">
+
+    <div class="container">
+
+        <div class="bayer-hero-banner">
+
+            <div class="bayer-hero-content">
+
+                <span class="bayer-hero-badge">🛍️ Байєр-сервіс</span>
+
+                <h1>Не знайшли потрібну сумку в каталозі? Ми привеземо її з США чи Європи</h1>
+
+                <p>
+                    Якщо оригінального товару немає в наявності в Україні або за кордоном
+                    він коштує суттєво дешевше — оформіть викуп через Bagvero. Знаходите
+                    річ на офіційному сайті бренду чи маркетплейсі, а ми викуповуємо
+                    її та привозимо вам, беручи на себе всі клопоти з оплатою і логістикою.
+                </p>
+
+                <div class="bayer-hero-actions">
+                    <a href="#bayerContact" class="btn">Оформити заявку</a>
+                    <a href="#bayerFaq" class="btn btn-outline" style="color:#fff;border-color:rgba(255,255,255,.4);">Часті запитання</a>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="bayer-section">
+
+    <div class="container">
+
+        <div class="bayer-section-head">
+            <span class="bayer-section-eyebrow">🤝</span>
+            <h2>Що таке байєр-сервіс</h2>
+            <p>
+                Це послуга викупу товарів з іноземних магазинів для клієнтів в Україні.
+                Ви обираєте будь-яку брендову річ на офіційному західному сайті —
+                ми викуповуємо її від свого імені, оформлюємо міжнародну доставку
+                і передаємо вам уже в Україні. Це стосується не лише сумок і взуття:
+                так можна замовити одяг, аксесуари, косметику чи інші товари,
+                дозволені до ввезення.
+            </p>
+        </div>
+
+        <div class="bayer-benefits-grid">
+
+            <div class="bayer-benefit-card">
+                <div class="bayer-benefit-icon">💸</div>
+                <h3>Вигідніші ціни</h3>
+                <p>Розпродажі та сезонні знижки на офіційних сайтах брендів у США та Європі часто роблять покупку вигіднішою навіть з доставкою.</p>
+            </div>
+
+            <div class="bayer-benefit-card">
+                <div class="bayer-benefit-icon">✅</div>
+                <h3>Гарантія оригіналу</h3>
+                <p>Викуповуємо тільки з офіційних сайтів брендів і перевірених маркетплейсів — жодних підробок чи сірого імпорту.</p>
+            </div>
+
+            <div class="bayer-benefit-card">
+                <div class="bayer-benefit-icon">🌍</div>
+                <h3>Ширший вибір</h3>
+                <p>Доступні моделі, кольори й розміри, яких ще немає або вже розпродано на українському ринку.</p>
+            </div>
+
+            <div class="bayer-benefit-card">
+                <div class="bayer-benefit-icon">📦</div>
+                <h3>Без клопоту з логістикою</h3>
+                <p>Ви просто надсилаєте посилання на товар — оплату закордонному продавцю, пересилку і митні питання беремо на себе.</p>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="bayer-section">
+
+    <div class="container">
+
+        <div class="bayer-section-head">
+            <span class="bayer-section-eyebrow">🥇</span>
+            <h2>Як це працює</h2>
+            <p>Шість простих кроків від посилання на товар до посилки у вас в руках.</p>
+        </div>
+
+        <div class="bayer-steps">
+
+            <div class="bayer-step">
+                <div class="bayer-step-number">1</div>
+                <div>
+                    <h3>Надсилаєте посилання на товар</h3>
+                    <p>
+                        Знайшли потрібну річ на офіційному сайті бренду чи маркетплейсі —
+                        надішліть нам посилання. Не знаєте, де шукати конкретну модель?
+                        Підкажемо перевірені магазини самі.
+                    </p>
+                </div>
+            </div>
+
+            <div class="bayer-step">
+                <div class="bayer-step-number">2</div>
+                <div>
+                    <h3>Рахуємо повну вартість</h3>
+                    <p>Озвучуємо фінальну суму замовлення одразу, без прихованих доплат згодом:</p>
+                    <ul>
+                        <li>🏷️ ціна товару на сайті продавця;</li>
+                        <li>📦 вартість пересилки до України;</li>
+                        <li>💰 комісія сервісу — 10–15% від вартості товару, залежно від складності викупу.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="bayer-step">
+                <div class="bayer-step-number">3</div>
+                <div>
+                    <h3>Вносите передоплату</h3>
+                    <p>Після узгодження суми ви вносите передоплату, і ми одразу оформлюємо викуп товару в продавця.</p>
+                </div>
+            </div>
+
+            <div class="bayer-step">
+                <div class="bayer-step-number">4</div>
+                <div>
+                    <h3>Обираєте спосіб доставки в Україну</h3>
+                    <p>Три варіанти під різний бюджет і терміновість:</p>
+
+                    <table class="bayer-delivery-table">
+                        <thead>
+                            <tr>
+                                <th>Варіант доставки</th>
+                                <th>Вартість</th>
+                                <th>Строк, дні</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>🚚 З Європи</td>
+                                <td>від 280 грн/кг</td>
+                                <td>5–14</td>
+                            </tr>
+                            <tr>
+                                <td>⛵ Морем із США</td>
+                                <td>від 390 грн/кг</td>
+                                <td>20–45</td>
+                            </tr>
+                            <tr>
+                                <td>✈ Авіа із США</td>
+                                <td>від 560 грн/кг</td>
+                                <td>10–21</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bayer-step">
+                <div class="bayer-step-number">5</div>
+                <div>
+                    <h3>Стежите за статусом</h3>
+                    <p>
+                        Уточнити статус замовлення можна в будь-який момент — напишіть
+                        нам у Instagram Direct або Telegram, і ми розкажемо, на якому
+                        етапі ваша посилка.
+                    </p>
+                </div>
+            </div>
+
+            <div class="bayer-step">
+                <div class="bayer-step-number">6</div>
+                <div>
+                    <h3>Фінальна оплата й отримання</h3>
+                    <p>
+                        Коли товар прибуває в Україну, ви доплачуєте залишок і
+                        обираєте зручний спосіб отримання — Новою поштою в будь-яке
+                        місто країни або особисто.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="bayer-section">
+
+    <div class="container">
+
+        <div class="bayer-section-head">
+            <span class="bayer-section-eyebrow">😻</span>
+            <h2>Чому обирають Bagvero</h2>
+        </div>
+
+        <div class="bayer-why-list">
+
+            <div class="bayer-why-item">
+                <span class="bayer-why-check">✓</span>
+                <p><strong>Гарантія оригінальності</strong> — купуємо винятково на офіційних сайтах брендів і перевірених маркетплейсах.</p>
+            </div>
+
+            <div class="bayer-why-item">
+                <span class="bayer-why-check">✓</span>
+                <p><strong>Вигода на розпродажах</strong> — закордонні магазини регулярно проводять акції, і ми ловимо для вас найкращу ціну.</p>
+            </div>
+
+            <div class="bayer-why-item">
+                <span class="bayer-why-check">✓</span>
+                <p><strong>Прозорі умови</strong> — жодних прихованих платежів, лише реальна вартість товару та комісія сервісу.</p>
+            </div>
+
+            <div class="bayer-why-item">
+                <span class="bayer-why-check">✓</span>
+                <p><strong>Зручна доставка</strong> — самі обираєте оптимальний варіант перевезення за ціною й швидкістю.</p>
+            </div>
+
+            <div class="bayer-why-item">
+                <span class="bayer-why-check">✓</span>
+                <p><strong>Супровід на кожному етапі</strong> — від оформлення викупу до моменту, коли посилка потрапляє до ваших рук.</p>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="bayer-section" id="bayerContact">
+
+    <div class="container">
+
+        <div class="bayer-cta">
+
+            <h2>Готові оформити замовлення?</h2>
+
+            <p>
+                Надішліть посилання на товар — і ми порахуємо вартість викупу
+                та підберемо найвигідніший спосіб доставки.
+            </p>
+
+            <div class="bayer-cta-actions">
+                <a href="mailto:info@bagvero.ua" class="btn">✉ Написати на info@bagvero.ua</a>
+                <a href="https://www.instagram.com/bestbrnd4u" target="_blank" rel="noopener" class="btn btn-outline">Instagram Direct</a>
+                <a href="contacts" class="btn btn-outline">Усі способи зв'язку</a>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="bayer-section" id="bayerFaq">
+
+    <div class="container">
+
+        <div class="bayer-section-head">
+            <span class="bayer-section-eyebrow">🤔</span>
+            <h2>Часті запитання</h2>
+        </div>
+
+        <div class="bayer-faq-list" id="bayerFaqList">
+
+            <div class="bayer-faq-item">
+                <button type="button" class="bayer-faq-question">
+                    Чи входить вага упаковки у розрахунок доставки?
+                    <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="bayer-faq-answer">
+                    <div class="bayer-faq-answer-inner">
+                        <p>Так, вартість перевезення рахується за вагою вже упакованого відправлення, а не лише самого товару.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bayer-faq-item">
+                <button type="button" class="bayer-faq-question">
+                    Строки доставки включають обробку замовлення магазином?
+                    <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="bayer-faq-answer">
+                    <div class="bayer-faq-answer-inner">
+                        <p>Ні, у таблиці вказано лише час перевезення. Деякі закордонні магазини самі обробляють замовлення до 7 робочих днів — це рахується окремо і ми попереджаємо про це заздалегідь.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bayer-faq-item">
+                <button type="button" class="bayer-faq-question">
+                    Чи є додаткові збори на техніку й аксесуари з США?
+                    <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="bayer-faq-answer">
+                    <div class="bayer-faq-answer-inner">
+                        <p>На окремі категорії товарів у США справді діє місцевий податок. Ми завжди озвучуємо його в розрахунку вартості ще до того, як ви вносите передоплату.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bayer-faq-item">
+                <button type="button" class="bayer-faq-question">
+                    Як доставляють великогабаритні або важкі речі?
+                    <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="bayer-faq-answer">
+                    <div class="bayer-faq-answer-inner">
+                        <p>Для габаритних чи важких відправлень вигідніше морське перевезення — довше за термінами, зате помітно дешевше за авіадоставку.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bayer-faq-item">
+                <button type="button" class="bayer-faq-question">
+                    Можна замовити товар, якого зараз немає в наявності?
+                    <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="bayer-faq-answer">
+                    <div class="bayer-faq-answer-inner">
+                        <p>Так, ми можемо відстежувати появу товару в продажу й оформити викуп, щойно він знову з'явиться на сайті продавця.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bayer-faq-item">
+                <button type="button" class="bayer-faq-question">
+                    Скільки часу займає викуп після передоплати?
+                    <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="bayer-faq-answer">
+                    <div class="bayer-faq-answer-inner">
+                        <p>Зазвичай оформлюємо покупку протягом 24–48 годин після отримання передоплати. Якщо у продавця затримка з обробкою — повідомимо вам одразу.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bayer-faq-item">
+                <button type="button" class="bayer-faq-question">
+                    Чи можна відстежити посилку після відправлення?
+                    <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="bayer-faq-answer">
+                    <div class="bayer-faq-answer-inner">
+                        <p>Так, ми надаємо трек-номер для відстеження доставки по Україні і повідомляємо про основні етапи руху замовлення.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bayer-faq-item">
+                <button type="button" class="bayer-faq-question">
+                    Яка мінімальна сума замовлення через байєр-сервіс?
+                    <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="bayer-faq-answer">
+                    <div class="bayer-faq-answer-inner">
+                        <p>Мінімальної суми немає — можна замовити навіть одну річ.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bayer-faq-item">
+                <button type="button" class="bayer-faq-question">
+                    Можна об'єднати товари з різних магазинів в одну посилку?
+                    <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="bayer-faq-answer">
+                    <div class="bayer-faq-answer-inner">
+                        <p>Так, ми можемо об'єднати кілька викупів в одне відправлення, щоб зменшити загальні витрати на пересилку.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bayer-faq-item">
+                <button type="button" class="bayer-faq-question">
+                    Що робити, якщо товар прийшов з дефектом?
+                    <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="bayer-faq-answer">
+                    <div class="bayer-faq-answer-inner">
+                        <p>Допоможемо уточнити можливість повернення чи обміну — умови залежать від конкретного магазину. Обов'язково повідомте нас одразу після отримання товару.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="newsletter">
+<div class="container">
+<div class="ml-embedded" data-form="vKcNi2"></div>
+<small>
+Жодного спаму.
+Тільки акції та нові колекції.
+</small>
+</div>
+</section>
+
+<footer>
+
+    <div class="container footer">
+
+        <div>
+
+            <h3>Bagvero</h3>
+
+            <p>
+                Інтернет-магазин сумок
+та аксесуарів.
+            </p>
+
+            <div class="footer-social">
+                <a href="https://www.instagram.com/bestbrnd4u" target="_blank" rel="noopener" aria-label="Instagram">
+                    Instagram
+                </a>
+                <a href="#" aria-label="Facebook">
+                    Facebook
+                </a>
+                <a href="#" aria-label="Telegram">
+                    Telegram
+                </a>
+            </div>
+
+        </div>
+
+        <div>
+
+            <h3>Покупцям</h3>
+
+            <a href="#">Доставка</a>
+            <a href="#">Оплата</a>
+            <a href="#">Гарантія</a>
+            <a href="bayer-service">Байєр-сервіс</a>
+
+        </div>
+
+        <div>
+
+            <h3>Каталог</h3>
+
+            <a href="catalog">Всі товари</a>
+
+            <a href="catalog?section=new">Новинки</a>
+
+            <a href="catalog?section=sale" class="sale-text">Акції</a>
+
+            <a href="#">Бренди</a>
+
+        </div>
+
+        <div>
+
+            <h3>Зв'яжіться з нами</h3>
+
+            <p>📍 Україна</p>
+
+            <p>✉ info@bagvero.ua</p>
+
+            <p>☎ +380 XX XXX XX XX</p>
+
+            <p>🕘 Пн–Нд 09:00–20:00</p>
+
+        </div>
+
+    </div>
+
+</footer>
+
+<div class="copyright">
+
+    <div class="container">
+
+    © 2026 bagvero.
+    Всі права захищені.
+
+    </div>
+
+</div>
+
+<button id="scrollTop" class="scroll-top" aria-label="Нагору">
+    ↑
+</button>
+
+<script src="assets/js/supabase-client.js"></script>
+<script src="assets/js/common.js"></script>
+<script src="assets/js/sync.js"></script>
+<script src="assets/js/mega-menu.js"></script>
+<script src="assets/js/ui.js"></script>
+
+<script>
+
+    document.querySelectorAll(".bayer-faq-question").forEach(question => {
+
+        question.addEventListener("click", () => {
+
+            question.closest(".bayer-faq-item")?.classList.toggle("open");
+
+        });
+
+    });
+
+</script>
+
+</body>
+
+</html>

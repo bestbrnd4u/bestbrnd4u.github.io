@@ -24,6 +24,7 @@ const OUTPUT_FILE = path.join(ROOT, "sitemap.xml");
 const STATIC_PAGES = [
     { loc: "/", changefreq: "daily", priority: "1.0" },
     { loc: "/catalog", changefreq: "daily", priority: "0.9" },
+    { loc: "/bayer-service", changefreq: "monthly", priority: "0.7" },
     { loc: "/contacts", changefreq: "monthly", priority: "0.3" }
 ];
 
