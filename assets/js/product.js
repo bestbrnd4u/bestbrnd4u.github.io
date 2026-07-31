@@ -175,7 +175,8 @@ function renderProduct(product) {
             <img
                 src="${img}"
                 class="thumb ${index===0?"active":""}"
-                alt="${product.title}">
+                alt="${product.title}"
+                onerror="this.onerror=null;this.src='assets/images/no-image.png'">
 
         `).join("")}
 
@@ -188,7 +189,7 @@ function renderProduct(product) {
         <div class="zoom-container gallery-track" id="mainGalleryTrack">
 
             ${(galleryImages.length ? galleryImages : ["assets/images/no-image.png"]).map(img => `
-                <img class="gallery-slide" src="${img}" alt="${product.title}" draggable="false">
+                <img class="gallery-slide" src="${img}" alt="${product.title}" draggable="false" onerror="this.onerror=null;this.src='assets/images/no-image.png'">
             `).join("")}
 
         </div>
@@ -748,11 +749,12 @@ function updateGalleryForColor(images) {
         <img
             src="${img}"
             class="thumb ${index === 0 ? "active" : ""}"
-            alt="">
+            alt=""
+            onerror="this.onerror=null;this.src='assets/images/no-image.png'">
     `).join("");
 
     track.innerHTML = images.map(img => `
-        <img class="gallery-slide" src="${img}" alt="" draggable="false">
+        <img class="gallery-slide" src="${img}" alt="" draggable="false" onerror="this.onerror=null;this.src='assets/images/no-image.png'">
     `).join("");
 
     track.scrollLeft = 0;
