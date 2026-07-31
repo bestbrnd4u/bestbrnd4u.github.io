@@ -27,7 +27,11 @@
     "link": "catalog?brand=Calvin%20Klein",
     "brand": "Calvin Klein",
     "discountPercent": null,
-    "productIds": [],
+    "productIds": [
+      9,
+      10,
+      8
+    ],
     "displayType": "banner_compact",
     "order": 2
   }
