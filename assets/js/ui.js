@@ -289,7 +289,12 @@ function preventWheelHijack(track) {
 
         event.preventDefault();
 
-        window.scrollBy({ top: event.deltaY, left: 0 });
+        // behavior:"instant" обов'язковий — сторінка має
+        // html{scroll-behavior:smooth} для якірних посилань,
+        // і без явного "instant" кожен тік колеса миші тут
+        // запускав би власну плавну анімацію на кілька пікселів,
+        // через що скрол відчувався як дуже повільний і смиконий
+        window.scrollBy({ top: event.deltaY, left: 0, behavior: "instant" });
 
     }, { passive: false });
 
