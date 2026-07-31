@@ -216,7 +216,10 @@
       "клатч",
       "міні сумка",
       "вечірня сумка"
-    ]
+    ],
+    "preOrder": true,
+    "preOrderDays": "7–14 робочих днів",
+    "preOrderPrepayment": 50
   },
   {
     "id": 5,

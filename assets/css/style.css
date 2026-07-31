@@ -1333,6 +1333,30 @@ nav li.has-mega:hover .mega-menu{
     margin-bottom:6px;
 }
 
+.preorder-tag{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    padding:4px 10px;
+    margin-bottom:8px;
+    border-radius:6px;
+    background:rgba(245,158,11,.12);
+    color:#b45309;
+    font-size:12px;
+    font-weight:700;
+}
+
+.preorder-banner{
+    padding:14px 18px;
+    margin-bottom:20px;
+    border-radius:14px;
+    background:rgba(245,158,11,.1);
+    border:1px solid rgba(245,158,11,.3);
+    color:#92400e;
+    font-size:14px;
+    line-height:1.5;
+}
+
 .product-title{
     font-size:17px;
     font-weight:600;
@@ -3377,6 +3401,26 @@ body.mobile-filters-open .scroll-top{
     flex-direction:column;
     gap:12px;
     font-size:15px;
+}
+
+.preorder-box{
+    padding:20px;
+    background:rgba(245,158,11,.08);
+    border:1px solid rgba(245,158,11,.3);
+    border-radius:18px;
+}
+
+.preorder-box-title{
+    font-weight:700;
+    color:#b45309;
+    margin-bottom:8px;
+}
+
+.preorder-box p{
+    font-size:14px;
+    line-height:1.6;
+    color:var(--gray700);
+    margin:0;
 }
 
 /* -- характеристики -- */

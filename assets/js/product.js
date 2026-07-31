@@ -210,6 +210,8 @@ function renderProduct(product) {
 
         </a>
 
+        ${product.preOrder ? `<div class="preorder-tag">📦 Під замовлення</div>` : ""}
+
         <h1>
 
             ${product.title}
@@ -271,7 +273,7 @@ ${sizeButtons}
                 class="btn buy-btn"
                 data-id="${product.id}">
 
-                🛒 Купити
+                ${product.preOrder ? "📦 Замовити" : "🛒 Купити"}
 
             </button>
 
@@ -295,6 +297,24 @@ ${sizeButtons}
 
         </div>
 
+        ${product.preOrder ? `
+        <div class="preorder-box">
+
+            <div class="preorder-box-title">📦 Цей товар під замовлення</div>
+
+            <p>
+                ${
+                    product.preOrderNote
+                        ? product.preOrderNote
+                        : `Термін виготовлення та доставки: ${product.preOrderDays || "уточнюється у менеджера"}.` +
+                          (product.preOrderPrepayment
+                              ? ` Потрібна передоплата ${product.preOrderPrepayment}% вартості — після оформлення з вами зв'яжеться менеджер.`
+                              : "")
+                }
+            </p>
+
+        </div>
+        ` : `
         <div class="delivery-box">
 
             <div>🚚 Доставка по Україні 1–3 дні</div>
@@ -304,6 +324,7 @@ ${sizeButtons}
             <div>↩️ Повернення протягом 14 днів</div>
 
         </div>
+        `}
 
         <div class="specifications" id="productSpecifications">
 

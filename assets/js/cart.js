@@ -75,12 +75,15 @@ function renderCart() {
     let subtotal = 0;      // за факт. ціною (зі знижкою товару)
     let subtotalFull = 0;  // за старою ціною (якщо була знижка)
     let itemsCount = 0;
+    let hasPreOrder = false;
 
     const rows = lines.map(line => {
 
         const product = findProductById(line.id);
 
         if (!product) return "";
+
+        if (product.preOrder) hasPreOrder = true;
 
         const qty = line.qty;
         const lineTotal = product.price * qty;
@@ -136,6 +139,7 @@ function renderCart() {
                     <a href="product?id=${line.id}" class="cart-item-title">
                         ${product.title}
                     </a>
+                    ${product.preOrder ? `<div class="preorder-tag">📦 Під замовлення</div>` : ""}
                     <div class="product-options cart-item-options">
                         <div class="product-colors">
                             ${colorButtons}
@@ -182,7 +186,13 @@ function renderCart() {
     cartEmptyEl.hidden = true;
     cartLayoutEl.hidden = false;
 
-    cartItemsEl.innerHTML = rows.join("");
+    cartItemsEl.innerHTML =
+        (hasPreOrder ? `
+            <div class="preorder-banner">
+                📦 У кошику є товари під замовлення — термін виготовлення для них довший
+                за звичайну доставку. Деталі вказані під кожним таким товаром.
+            </div>
+        ` : "") + rows.join("");
 
     cartItemsCountEl.textContent = itemsCount;
     cartSubtotalEl.textContent = formatPrice(subtotalFull);
