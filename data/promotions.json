@@ -9,10 +9,8 @@
     "link": "catalog?section=sale",
     "brand": "",
     "discountPercent": 50,
-    "productIds": [
-      9
-    ],
-    "displayType": "card",
+    "productIds": [],
+    "displayType": "hero_slider",
     "order": 1
   },
   {
