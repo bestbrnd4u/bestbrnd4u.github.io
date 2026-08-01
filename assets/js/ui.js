@@ -386,8 +386,11 @@ function createProductCard(product) {
                 </div>
             </div>
             <div class="product-info">
-                <div class="product-category">
-                    ${brand}
+                <div class="product-category-row">
+                    <div class="product-category">
+                        ${brand}
+                    </div>
+                    ${product.preOrder ? `<span class="preorder-inline">📦 Під замовлення</span>` : ""}
                 </div>
                 <div class="product-title">
                     ${product.title}
@@ -416,6 +419,7 @@ function createProductCard(product) {
                     </div>
                 </div>
                 ${product.description ? `<div class="product-desc">${product.description}</div>` : ""}
+                ${product.preOrder ? `<div class="preorder-row">📦 Під замовлення</div>` : ""}
                 <button
                     class="btn buy-btn"
                     data-id="${product.id}">

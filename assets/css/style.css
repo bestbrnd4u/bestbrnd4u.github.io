@@ -1333,7 +1333,7 @@ nav li.has-mega:hover .mega-menu{
 }
 
 .badge-preorder{
-    display:flex;
+    display:none;
     align-items:center;
     gap:5px;
     background:#b45309;
@@ -1342,6 +1342,7 @@ nav li.has-mega:hover .mega-menu{
 @media(max-width:768px){
 
     .badge-preorder{
+        display:flex;
         width:34px;
         height:34px;
         padding:0;
@@ -1432,6 +1433,14 @@ nav li.has-mega:hover .mega-menu{
     padding:18px 20px 20px;
 }
 
+.product-category-row{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:6px;
+}
+
 .product-category{
     display:inline-block;
     color:var(--gray700);
@@ -1439,7 +1448,42 @@ nav li.has-mega:hover .mega-menu{
     font-weight:700;
     text-transform:uppercase;
     letter-spacing:1px;
-    margin-bottom:6px;
+}
+
+.preorder-inline,
+.preorder-row{
+    display:none;
+}
+
+@media(min-width:769px){
+
+    .preorder-inline,
+    .preorder-row{
+        align-items:center;
+        gap:5px;
+        padding:3px 10px;
+        border-radius:50px;
+        background:rgba(180,83,9,.12);
+        color:#b45309;
+        font-size:11px;
+        font-weight:700;
+        letter-spacing:.3px;
+        white-space:nowrap;
+    }
+
+    /* сітка (не список) — тег поруч з брендом */
+    .products-grid:not(.list-view) .preorder-inline{
+        display:inline-flex;
+    }
+
+    /* список — власним рядком під розмір/колір, перед кнопкою */
+    .products-grid.list-view .preorder-row{
+        display:inline-flex;
+        width:fit-content;
+        padding:6px 14px;
+        font-size:12px;
+    }
+
 }
 
 .preorder-tag{
@@ -3099,8 +3143,13 @@ body.mobile-filters-open .scroll-top{
             "cat cat"
             "title title"
             "meta desc"
+            "preorder preorder"
             "buy buy";
         column-gap:40px;
+    }
+
+    .products-grid.list-view .preorder-row{
+        grid-area:preorder;
     }
 
     .products-grid.list-view .product-category{
