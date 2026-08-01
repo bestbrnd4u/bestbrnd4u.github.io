@@ -18,18 +18,14 @@
     "title": "SUMMER SALE до -30%",
     "text": "Guess, Michael Kors, Calvin Klein, Tommy Hilfiger, Furla",
     "badge": "-30%",
-    "image": "/assets/images/products/uploads/c818d5ef404ee0a9cc6da6cb3732.png",
+    "image": "/assets/images/products/uploads/485d0e230d97266f0bf4e4744df2.webp",
     "buttonText": "Дивитись усі товари",
     "link": "catalog?section=sale",
     "brand": "Guess",
     "discountPercent": 30,
     "productIds": [
       2,
-      4,
-      5,
-      11,
-      3,
-      8
+      4
     ],
     "displayType": "banner_products",
     "order": 1
