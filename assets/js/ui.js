@@ -189,6 +189,7 @@ function bindProductCarousel(track) {
     let startX = 0;
     let startY = 0;
     let startScrollLeft = 0;
+    let startTime = 0;
     let axis = null; // null поки не визначено, "x" або "y"
     let isSwiping = false;
 
@@ -197,6 +198,7 @@ function bindProductCarousel(track) {
         startX = event.touches[0].clientX;
         startY = event.touches[0].clientY;
         startScrollLeft = track.scrollLeft;
+        startTime = Date.now();
         axis = null;
         isSwiping = false;
 
@@ -240,9 +242,25 @@ function bindProductCarousel(track) {
 
         if (axis !== "x") return;
 
-        const index = Math.round(track.scrollLeft / (track.clientWidth || 1));
+        const width = track.clientWidth || 1;
+        const baseIndex = Math.round(startScrollLeft / width);
 
-        track.scrollTo({ left: index * track.clientWidth, behavior: "smooth" });
+        const dx = track.scrollLeft - startScrollLeft;
+        const elapsed = Math.max(Date.now() - startTime, 1);
+        const velocity = Math.abs(dx) / elapsed;
+
+        const distanceThreshold = width * 0.12;
+        const velocityThreshold = 0.3;
+
+        let index = baseIndex;
+
+        if (Math.abs(dx) > distanceThreshold || velocity > velocityThreshold) {
+            index = baseIndex + (dx > 0 ? 1 : -1);
+        }
+
+        index = Math.max(0, Math.min(index, track.children.length - 1));
+
+        track.scrollTo({ left: index * width, behavior: "smooth" });
 
         // повертаємо snap назад вже після того, як доїхали —
         // невелика затримка під тривалість smooth-скролу
