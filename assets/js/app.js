@@ -399,9 +399,19 @@ function renderHeroSliderPromotions(heroPromotions) {
 
     track.innerHTML = heroPromotions.map(promo => {
 
-        const baseLink = promo.link || "catalog";
-        const linkWithGender = gender =>
-            `${baseLink}${baseLink.includes("?") ? "&" : "?"}gender=${encodeURIComponent(gender)}`;
+        const promoLink = `promo?id=${encodeURIComponent(promo.slug)}`;
+
+        const genderButtons = Array.isArray(promo.genderButtons) && promo.genderButtons.length
+            ? promo.genderButtons
+            : [
+                { gender: "Жінкам", color: "#111827" },
+                { gender: "Чоловікам", color: "#111827" },
+                { gender: "Дітям", color: "#111827" }
+            ];
+
+        const quicklinksHtml = genderButtons.map(btn => `
+            <a href="${promoLink}&gender=${encodeURIComponent(btn.gender)}" style="background:${btn.color || "#111827"}">${btn.gender}</a>
+        `).join("");
 
         return `
         <div class="promo-hero-slide">
@@ -414,19 +424,15 @@ function renderHeroSliderPromotions(heroPromotions) {
 
                 ${promo.text ? `<p>${promo.text}</p>` : ""}
 
-                <div class="promo-hero-quicklinks">
-                    <a href="${linkWithGender("Жінкам")}">Жінкам</a>
-                    <a href="${linkWithGender("Чоловікам")}">Чоловікам</a>
-                    <a href="${linkWithGender("Дітям")}">Дітям</a>
-                </div>
+                ${genderButtons.length ? `<div class="promo-hero-quicklinks">${quicklinksHtml}</div>` : ""}
 
-                <a href="promo?id=${encodeURIComponent(promo.slug)}" class="btn promo-hero-cta">
+                <a href="${promoLink}" class="btn promo-hero-cta">
                     ${promo.buttonText || "Дивитись усі товари"} →
                 </a>
 
             </div>
 
-            <a href="promo?id=${encodeURIComponent(promo.slug)}" class="promo-hero-slide-image">
+            <a href="${promoLink}" class="promo-hero-slide-image">
                 <img
                     src="${promo.image}"
                     alt="${promo.title}"

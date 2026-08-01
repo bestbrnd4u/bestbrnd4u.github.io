@@ -232,6 +232,7 @@ collections:
     identifier_field: "title"
     summary: "{{title}}"
     sortable_fields: ["order", "title"]
+    slug: "{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}"
     fields:
       - label: "Показувати на сайті"
         name: "active"
@@ -323,6 +324,33 @@ collections:
           Наприклад: 30. Показується як позначка на товарах з цієї акції,
           якщо в самого товару не вказана своя ціна зі знижкою.
 
+      - label: "Кнопки розділів під банером (лише для «Слайдер на всю ширину»)"
+        name: "genderButtons"
+        widget: "list"
+        required: false
+        summary: "{{fields.gender}}"
+        hint: >
+          Кнопки-шорткати під заголовком банера (як "Жінкам"/"Чоловікам"/
+          "Дітям" на md-fashion.ua) — стосується лише "Слайдер на всю
+          ширину сторінки" вище. Порядок у списку = порядок кнопок на
+          сайті (перетягуйте, щоб поміняти місцями). Можна прибрати
+          будь-яку кнопку, додати кілька разів "Унісекс" або залишити
+          список порожнім — тоді покажуться стандартні "Жінкам/Чоловікам/
+          Дітям". Кожна кнопка веде на сторінку саме цієї акції,
+          відфільтровану під обрану стать.
+        fields:
+          - label: "Розділ"
+            name: "gender"
+            widget: "select"
+            options: ["Жінкам", "Чоловікам", "Дітям", "Унісекс"]
+
+          - label: "Колір кнопки"
+            name: "color"
+            widget: "color"
+            required: false
+            default: "#111827"
+            hint: "Не обов'язково — за замовчуванням темний, як зараз"
+
       - label: "Товари цієї акції"
         name: "products"
         widget: "relation"
@@ -352,6 +380,7 @@ collections:
     identifier_field: "title"
     summary: "{{title}}"
     sortable_fields: ["order", "title"]
+    slug: "{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}"
     fields:
       - label: "Показувати на сайті"
         name: "active"
