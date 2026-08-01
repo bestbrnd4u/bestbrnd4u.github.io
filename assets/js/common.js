@@ -1021,6 +1021,143 @@ const searchBtn = document.getElementById("searchBtn");
 searchBtn?.addEventListener("click", openSearchOverlay);
 
 // -------------------------
+// Мобільне меню
+//
+// На вузьких екранах <nav> в хедері повністю ховається
+// (див. nav{display:none} у style.css), а заміни йому не було —
+// з хедера неможливо було потрапити в Каталог/Новинки/Акції
+// та інші розділи. Кнопку-гамбургер і саму панель генеруємо тут
+// і додаємо в усі сторінки одразу (як і поп-ап пошуку вище) —
+// це той самий набір посилань, що й у десктопному <nav>.
+// -------------------------
+
+let mobileNavEl = null;
+let mobileNavBackdropEl = null;
+
+const mobileMenuBtn = (() => {
+
+    const headerIcons = document.querySelector(".header-icons");
+
+    if (!headerIcons) return null;
+
+    const btn = document.createElement("button");
+
+    btn.type = "button";
+    btn.id = "mobileMenuBtn";
+    btn.className = "mobile-menu-btn";
+    btn.setAttribute("aria-label", "Меню");
+    btn.setAttribute("aria-expanded", "false");
+    btn.innerHTML = "<span></span><span></span><span></span>";
+
+    headerIcons.prepend(btn);
+
+    return btn;
+
+})();
+
+function buildMobileNav() {
+
+    const backdrop = document.createElement("div");
+
+    backdrop.id = "mobileNavBackdrop";
+    backdrop.className = "mobile-nav-backdrop";
+
+    const nav = document.createElement("div");
+
+    nav.id = "mobileNav";
+    nav.className = "mobile-nav";
+
+    nav.innerHTML = `
+        <ul class="mobile-nav-list">
+            <li><a href="/">Головна</a></li>
+            <li><a href="catalog">Каталог</a></li>
+            <li><a href="catalog?section=new">Новинки</a></li>
+            <li><a href="catalog?section=sale" class="sale-text">Акції</a></li>
+            <li><a href="bayer-service">Байєр-сервіс</a></li>
+            <li><a href="contacts">Контакти</a></li>
+        </ul>
+    `;
+
+    document.body.appendChild(backdrop);
+    document.body.appendChild(nav);
+
+    backdrop.addEventListener("click", closeMobileNav);
+
+    nav.querySelectorAll("a").forEach(link => {
+
+        link.addEventListener("click", closeMobileNav);
+
+    });
+
+    return { nav, backdrop };
+
+}
+
+function openMobileNav() {
+
+    if (!mobileNavEl) {
+
+        const built = buildMobileNav();
+
+        mobileNavEl = built.nav;
+        mobileNavBackdropEl = built.backdrop;
+
+    }
+
+    mobileMenuBtn.classList.add("open");
+    mobileMenuBtn.setAttribute("aria-expanded", "true");
+
+    mobileNavEl.classList.add("open");
+    mobileNavBackdropEl.classList.add("open");
+
+    lockPageScroll();
+
+}
+
+function closeMobileNav() {
+
+    if (!mobileNavEl || !mobileNavEl.classList.contains("open")) return;
+
+    mobileMenuBtn.classList.remove("open");
+    mobileMenuBtn.setAttribute("aria-expanded", "false");
+
+    mobileNavEl.classList.remove("open");
+    mobileNavBackdropEl.classList.remove("open");
+
+    unlockPageScroll();
+
+}
+
+mobileMenuBtn?.addEventListener("click", () => {
+
+    if (mobileNavEl?.classList.contains("open")) {
+
+        closeMobileNav();
+
+    } else {
+
+        openMobileNav();
+
+    }
+
+});
+
+document.addEventListener("keydown", event => {
+
+    if (event.key === "Escape") closeMobileNav();
+
+});
+
+// закриваємо мобільне меню, якщо екран розширили за брейкпоінт
+// (наприклад, повернули телефон/склали складачку) — інакше
+// панель могла лишитись відкритою поверх десктопного <nav>
+window.matchMedia("(min-width:769px)").addEventListener("change", event => {
+
+    if (event.matches) closeMobileNav();
+
+});
+
+// -------------------------
 // Підписка на новини — тепер повністю на боці MailerLite
 // (universal-скрипт у <head> + віджет .ml-embedded на сторінці)
 // -------------------------

@@ -1,10 +1,11 @@
 name: Build catalog data
 
 # Запускається щоразу, коли адмінка (Decap CMS) комітить зміни
-# в data/products/** або data/categories/**, і перезбирає
-# відповідні data/products.json / data/categories.json —
-# саме ці файли реально вантажить сайт. Результат комітиться
-# назад у main.
+# в data/products/**, data/categories/**, data/promotions/**
+# або data/collections/**, і перезбирає відповідні
+# data/products.json / data/categories.json /
+# data/promotions.json / data/collections.json — саме ці файли
+# реально вантажить сайт. Результат комітиться назад у main.
 
 on:
   push:

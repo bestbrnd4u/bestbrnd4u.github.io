@@ -328,6 +328,14 @@ nav a.active{
 
 nav li.has-mega{
     position:relative;
+    /* висота = висоті header (82px), інакше .mega-menu (top:100%
+       відносно цього li) відраховується від короткого блоку тексту
+       посередині header, а не від його нижнього краю — і випадаюче
+       меню на ~29px "заходить" під сам header замість того, щоб
+       починатися рівно під ним */
+    height:82px;
+    display:flex;
+    align-items:center;
 }
 
 nav li.has-mega > a{
@@ -488,6 +496,51 @@ nav li.has-mega:hover .mega-menu{
     color:white;
     transform:translateY(-3px);
 }
+}
+
+/* -- кнопка мобільного меню (гамбургер) --
+   сама кнопка з'являється лише на вузьких екранах, див.
+   .header-icons .mobile-menu-btn{display:flex} у
+   @media(max-width:768px) — тут лише базовий вигляд, спільний
+   з іншими іконками хедера. Селектор навмисно з двох класів
+   (.header-icons .mobile-menu-btn), а не одного — інакше
+   .header-icons button{display:flex} (вище) переважає за
+   специфічністю, і кнопка лізла б навіть на десктопі */
+
+.header-icons .mobile-menu-btn{
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:4px;
+    width:46px;
+    height:46px;
+    border-radius:50%;
+    background:white;
+    box-shadow:var(--shadow-sm);
+    transition:.3s;
+    order:-1;
+}
+
+.mobile-menu-btn span{
+    display:block;
+    width:18px;
+    height:2px;
+    border-radius:2px;
+    background:var(--gray900);
+    transition:.25s;
+}
+
+.mobile-menu-btn.open span:nth-child(1){
+    transform:translateY(6px) rotate(45deg);
+}
+
+.mobile-menu-btn.open span:nth-child(2){
+    opacity:0;
+}
+
+.mobile-menu-btn.open span:nth-child(3){
+    transform:translateY(-6px) rotate(-45deg);
 }
 
 /* -- мини-корзина (поп-ап под иконкой корзины) -- */
@@ -5394,6 +5447,10 @@ body.mobile-filters-open .scroll-top{
         display:none;
     }
 
+    .header-icons .mobile-menu-btn{
+        display:flex;
+    }
+
     .checkout-fields{
         grid-template-columns:1fr;
     }
@@ -5446,6 +5503,74 @@ body.mobile-filters-open .scroll-top{
         min-width:0;
     }
 
+}
+
+/* =====================================
+   МОБІЛЬНЕ МЕНЮ (випадна панель під хедером,
+   відкривається кнопкою .mobile-menu-btn — див. common.js)
+===================================== */
+
+.mobile-nav-backdrop{
+    position:fixed;
+    inset:82px 0 0 0;
+    background:rgba(17,24,39,.5);
+    z-index:3999;
+    opacity:0;
+    visibility:hidden;
+    transition:opacity .25s ease;
+}
+
+.mobile-nav-backdrop.open{
+    opacity:1;
+    visibility:visible;
+}
+
+.mobile-nav{
+    position:fixed;
+    top:82px;
+    left:0;
+    right:0;
+    z-index:4000;
+    max-height:calc(100vh - 82px);
+    overflow-y:auto;
+    background:#fff;
+    box-shadow:var(--shadow-lg);
+    transform:translateY(-12px);
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    transition:.25s;
+}
+
+.mobile-nav.open{
+    transform:translateY(0);
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+}
+
+.mobile-nav-list{
+    list-style:none;
+    padding:12px 0;
+}
+
+.mobile-nav-list a{
+    display:flex;
+    align-items:center;
+    padding:16px 24px;
+    font-size:16px;
+    font-weight:700;
+    color:var(--gray900);
+    border-bottom:1px solid var(--gray100);
+}
+
+.mobile-nav-list a:active{
+    background:var(--gray50);
+}
+
+.mobile-nav-list a.sale-text,
+.mobile-nav-list a.sale-text:active{
+    color:var(--danger) !important;
 }
 
 /* =====================================
@@ -8006,7 +8131,11 @@ body.mobile-filters-open .scroll-top{
 
 .collection-products-row{
     display:grid;
-    grid-template-columns:repeat(3,1fr);
+    /* minmax(0,1fr), а не просто 1fr — інакше колонка не може
+       стиснутися вужче за вміст (назву товару/бренд), і третя
+       картка "вилазить" за межі екрана на вузьких вьюпортах —
+       сторінка отримує зайвий горизонтальний скрол */
+    grid-template-columns:repeat(3,minmax(0,1fr));
     gap:24px;
 }
 
@@ -8114,7 +8243,12 @@ body.mobile-filters-open .scroll-top{
     }
 
     .collection-products-row{
-        grid-template-columns:repeat(3,1fr);
+        /* 2 колонки, а не 3 — так само, як #catalogGrid на
+           мобільному: на вузькому екрані 3 картки в ряд стають
+           надто вузькими для назви/бренду/ціни. При 3 товарах на
+           "сторінці" добірки третя картка просто переноситься на
+           другий рядок */
+        grid-template-columns:repeat(2,minmax(0,1fr));
         gap:12px;
     }
 
