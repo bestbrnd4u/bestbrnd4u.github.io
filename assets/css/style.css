@@ -2119,6 +2119,10 @@ footer{
     }
 }
 
+.promo-hero-stage{
+    position:relative;
+}
+
 .promo-hero-controls{
     display:flex;
     align-items:center;
@@ -2127,7 +2131,14 @@ footer{
     margin-top:14px;
 }
 
+.promo-hero-controls[hidden]{
+    display:none;
+}
+
 .promo-hero-arrow{
+    display:flex;
+    align-items:center;
+    justify-content:center;
     width:44px;
     height:44px;
     flex-shrink:0;
@@ -2136,6 +2147,31 @@ footer{
     box-shadow:0 6px 20px rgba(0,0,0,.1);
     font-size:16px;
     transition:.2s;
+    margin:10px auto 0;
+}
+
+.promo-hero-arrow[hidden]{
+    display:none;
+}
+
+@media(min-width:769px){
+
+    .promo-hero-arrow{
+        position:absolute;
+        top:50%;
+        transform:translateY(-50%);
+        z-index:3;
+        margin:0;
+    }
+
+    .promo-hero-arrow-prev{
+        left:24px;
+    }
+
+    .promo-hero-arrow-next{
+        right:24px;
+    }
+
 }
 
 @media (hover:hover) and (pointer:fine){

@@ -449,6 +449,8 @@ function renderHeroSliderPromotions(heroPromotions) {
 function setupPromoHeroSlider({ track, total, prevBtn, nextBtn, counterEl, controls }) {
 
     if (controls) controls.hidden = total <= 1;
+    if (prevBtn) prevBtn.hidden = total <= 1;
+    if (nextBtn) nextBtn.hidden = total <= 1;
 
     if (total <= 1) return;
 
@@ -561,12 +563,6 @@ async function renderFeaturedPromotions(featuredPromotions) {
 
                     <div class="brand-campaign-products">
                         ${curated.map(product => createProductCard(product)).join("")}
-                    </div>
-
-                    <div class="brand-campaign-more">
-                        <a href="promo?id=${encodeURIComponent(promo.slug)}" class="btn btn-outline">
-                            ${promo.buttonText || "Дивитись усі товари"}
-                        </a>
                     </div>
 
                     ` : ""}
