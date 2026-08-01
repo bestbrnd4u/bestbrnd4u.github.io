@@ -1,0 +1,17 @@
+{
+  "badge": "",
+  "products": [
+    8,
+    1,
+    2
+  ],
+  "discountPercent": 20,
+  "active": true,
+  "text": "Guess, Michael Kors, Calvin Klein, Tommy Hilfiger, Furla та інші бренди зі знижками 20%",
+  "order": 1,
+  "title": "Більше стилю для яскравого літа",
+  "link": "catalog?section=sale",
+  "image": "https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=1600",
+  "displayType": "hero_slider",
+  "buttonText": "Дивитись усі товари"
+}
