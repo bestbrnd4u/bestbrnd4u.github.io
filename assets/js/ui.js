@@ -348,7 +348,7 @@ function createProductCard(product) {
     `).join("");
 
     const preOrderBadge = product.preOrder
-        ? `<div class="badge badge-preorder">📦 Під замовлення</div>`
+        ? `<div class="badge badge-preorder"><span class="badge-preorder-icon">📦</span><span class="badge-preorder-text">Під замовлення</span></div>`
         : "";
 
     return `
@@ -356,8 +356,8 @@ function createProductCard(product) {
             <div class="product-image">
                 <div class="badge-stack">
                     ${badge}
+                    ${preOrderBadge}
                 </div>
-                ${preOrderBadge}
                 <button
                     class="favorite"
                     data-id="${product.id}"
