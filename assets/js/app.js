@@ -397,7 +397,13 @@ function renderHeroSliderPromotions(heroPromotions) {
 
     if (!section || !track) return;
 
-    track.innerHTML = heroPromotions.map(promo => `
+    track.innerHTML = heroPromotions.map(promo => {
+
+        const baseLink = promo.link || "catalog";
+        const linkWithGender = gender =>
+            `${baseLink}${baseLink.includes("?") ? "&" : "?"}gender=${encodeURIComponent(gender)}`;
+
+        return `
         <div class="promo-hero-slide">
 
             <div class="promo-hero-slide-content">
@@ -409,9 +415,9 @@ function renderHeroSliderPromotions(heroPromotions) {
                 ${promo.text ? `<p>${promo.text}</p>` : ""}
 
                 <div class="promo-hero-quicklinks">
-                    <a href="catalog?gender=Жінкам">Жінкам</a>
-                    <a href="catalog?gender=Чоловікам">Чоловікам</a>
-                    <a href="catalog?gender=Дітям">Дітям</a>
+                    <a href="${linkWithGender("Жінкам")}">Жінкам</a>
+                    <a href="${linkWithGender("Чоловікам")}">Чоловікам</a>
+                    <a href="${linkWithGender("Дітям")}">Дітям</a>
                 </div>
 
                 <a href="promo?id=${encodeURIComponent(promo.slug)}" class="btn promo-hero-cta">
@@ -428,7 +434,9 @@ function renderHeroSliderPromotions(heroPromotions) {
             </a>
 
         </div>
-    `).join("");
+    `;
+
+    }).join("");
 
     section.hidden = false;
 
