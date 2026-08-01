@@ -301,7 +301,6 @@ function renderAdvantages(advantages) {
 initHome();
 initHomeContent();
 initPromotions();
-initCollections();
 
 // -------------------------
 // Розділ "Акції" на головній (data/promotions.json —
@@ -330,8 +329,8 @@ async function initPromotions() {
         }
 
         const regular = promotions.filter(promo => promo.displayType === "card");
-        const heroSliderPromos = promotions.filter(promo => promo.displayType === "hero_slider");
         const bannersWithProducts = promotions.filter(promo => promo.displayType === "banner_products");
+        const sideBanners = promotions.filter(promo => promo.displayType === "banner_side");
         const compactBanners = promotions.filter(promo => promo.displayType === "banner_compact");
 
         if (regular.length) {
@@ -360,12 +359,30 @@ async function initPromotions() {
 
         }
 
-        if (heroSliderPromos.length) {
-            renderHeroSliderPromotions(heroSliderPromos);
+        let allProducts = [];
+
+        if (bannersWithProducts.length || sideBanners.length) {
+
+            try {
+
+                const productsResponse = await fetch("data/products.json");
+
+                if (productsResponse.ok) allProducts = await productsResponse.json();
+
+            } catch (error) {
+
+                console.error(error);
+
+            }
+
         }
 
         if (bannersWithProducts.length) {
-            renderFeaturedPromotions(bannersWithProducts);
+            renderFeaturedPromotions(bannersWithProducts, allProducts);
+        }
+
+        if (sideBanners.length) {
+            renderSideCampaigns(sideBanners, allProducts);
         }
 
         if (compactBanners.length) {
@@ -381,132 +398,16 @@ async function initPromotions() {
 }
 
 // -------------------------
-// Повноширинний слайдер-банер (displayType: "hero_slider") —
-// одна велика акція за раз на всю ширину сторінки, зі стрілками
-// та лічильником, як банер на md-fashion.ua
-// -------------------------
-
-function renderHeroSliderPromotions(heroPromotions) {
-
-    const section = document.getElementById("promoHeroSliderSection");
-    const track = document.getElementById("promoHeroTrack");
-    const controls = document.getElementById("promoHeroControls");
-    const prevBtn = document.getElementById("promoHeroPrev");
-    const nextBtn = document.getElementById("promoHeroNext");
-    const counterEl = document.getElementById("promoHeroCounter");
-
-    if (!section || !track) return;
-
-    track.innerHTML = heroPromotions.map(promo => `
-        <div class="promo-hero-slide">
-
-            <div class="promo-hero-slide-content">
-
-                ${promo.badge ? `<span class="promo-hero-slide-badge">${promo.badge}</span>` : ""}
-
-                <h2>${promo.title}</h2>
-
-                ${promo.text ? `<p>${promo.text}</p>` : ""}
-
-                <div class="promo-hero-quicklinks">
-                    <a href="catalog?gender=Жінкам">Жінкам</a>
-                    <a href="catalog?gender=Чоловікам">Чоловікам</a>
-                    <a href="catalog?gender=Дітям">Дітям</a>
-                </div>
-
-                <a href="promo?id=${encodeURIComponent(promo.slug)}" class="btn promo-hero-cta">
-                    ${promo.buttonText || "Дивитись усі товари"} →
-                </a>
-
-            </div>
-
-            <a href="promo?id=${encodeURIComponent(promo.slug)}" class="promo-hero-slide-image">
-                <img
-                    src="${promo.image}"
-                    alt="${promo.title}"
-                    onerror="this.src='assets/images/no-image.png'">
-            </a>
-
-        </div>
-    `).join("");
-
-    section.hidden = false;
-
-    setupPromoHeroSlider({ track, total: heroPromotions.length, prevBtn, nextBtn, counterEl, controls });
-
-}
-
-// Керування слайдером: стрілки + лічильник "01/03", той самий
-// scroll-snap підхід, що й в інших каруселях сайту
-function setupPromoHeroSlider({ track, total, prevBtn, nextBtn, counterEl, controls }) {
-
-    if (controls) controls.hidden = total <= 1;
-
-    if (total <= 1) return;
-
-    function pad(n) {
-        return String(n).padStart(2, "0");
-    }
-
-    function currentIndex() {
-        return Math.round(track.scrollLeft / (track.clientWidth || 1));
-    }
-
-    function updateCounter() {
-        if (counterEl) counterEl.textContent = `${pad(currentIndex() + 1)}/${pad(total)}`;
-    }
-
-    function goTo(index) {
-
-        const clamped = Math.max(0, Math.min(total - 1, index));
-
-        track.scrollTo({ left: clamped * track.clientWidth, behavior: "smooth" });
-
-    }
-
-    prevBtn?.addEventListener("click", () => goTo(currentIndex() - 1));
-    nextBtn?.addEventListener("click", () => goTo(currentIndex() + 1));
-
-    let scrollTimer = null;
-
-    track.addEventListener("scroll", () => {
-
-        clearTimeout(scrollTimer);
-        scrollTimer = setTimeout(updateCounter, 80);
-
-    }, { passive: true });
-
-    window.addEventListener("resize", () => goTo(currentIndex()));
-
-    updateCounter();
-
-}
-
-// -------------------------
 // Повноширинні банери акцій (featured: true) — фото + текст
 // на всю ширину сторінки, а під ним ряд товарів цієї акції,
 // як банер бренду на md-fashion.ua
 // -------------------------
 
-async function renderFeaturedPromotions(featuredPromotions) {
+async function renderFeaturedPromotions(featuredPromotions, allProducts) {
 
     const section = document.getElementById("brandCampaignsSection");
 
     if (!section) return;
-
-    let allProducts = [];
-
-    try {
-
-        const response = await fetch("data/products.json");
-
-        if (response.ok) allProducts = await response.json();
-
-    } catch (error) {
-
-        console.error(error);
-
-    }
 
     section.innerHTML = featuredPromotions.map(promo => {
 
@@ -576,6 +477,177 @@ async function renderFeaturedPromotions(featuredPromotions) {
 }
 
 // -------------------------
+// Банер зліва + карусель товарів справа (displayType: "banner_side") —
+// фото акції зліва на всю висоту, а справа лічильник "01/05",
+// стрілки та невелика горизонтальна карусель карток товару,
+// за зразком блоку акцій на md-fashion.ua
+// -------------------------
+
+function renderSideCampaigns(sideBanners, allProducts) {
+
+    const section = document.getElementById("sideCampaignsSection");
+
+    if (!section) return;
+
+    section.innerHTML = sideBanners.map((promo, campaignIndex) => {
+
+        const productIds = new Set(promo.productIds || []);
+
+        const curated = allProducts
+            .filter(product =>
+                productIds.has(product.id) ||
+                (promo.brand && product.brand === promo.brand)
+            )
+            .slice(0, 8);
+
+        if (!curated.length) return "";
+
+        const trackId = `sideCampaignTrack${campaignIndex}`;
+        const counterId = `sideCampaignCounter${campaignIndex}`;
+        const total = String(curated.length).padStart(2, "0");
+
+        return `
+            <div class="container">
+
+                <div class="side-campaign">
+
+                    <div class="side-campaign-head">
+                        <div>
+                            <span class="side-campaign-eyebrow">${promo.badge || "Акції"}</span>
+                            <h2>${promo.title}</h2>
+                        </div>
+                        <div class="side-campaign-nav">
+                            <span class="side-campaign-counter">
+                                <span id="${counterId}">01</span>/${total}
+                            </span>
+                            <button type="button" class="side-campaign-arrow" data-dir="-1" data-track="${trackId}" aria-label="Попередній товар">←</button>
+                            <button type="button" class="side-campaign-arrow" data-dir="1" data-track="${trackId}" aria-label="Наступний товар">→</button>
+                        </div>
+                    </div>
+
+                    <div class="side-campaign-layout">
+
+                        <a href="promo?id=${encodeURIComponent(promo.slug)}" class="side-campaign-image">
+                            <img
+                                src="${promo.image}"
+                                alt="${promo.title}"
+                                onerror="this.src='assets/images/no-image.png'">
+                            ${promo.text ? `<span class="side-campaign-image-caption">${promo.text}</span>` : ""}
+                        </a>
+
+                        <div class="side-campaign-products">
+
+                            <div class="side-campaign-track" id="${trackId}" data-counter="${counterId}">
+
+                                ${curated.map(product => createSideCampaignCard(product)).join("")}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        `;
+
+    }).join("");
+
+    setupSideCampaignCarousels();
+
+    if (typeof updateFavoriteButtons === "function") updateFavoriteButtons();
+
+}
+
+function createSideCampaignCard(product) {
+
+    const variant = product.variants?.[0];
+    const image = variant?.images?.[0] || product.images?.[0] || "assets/images/no-image.png";
+
+    const oldPrice = product.oldPrice
+        ? `<span class="side-campaign-old-price">${product.oldPrice.toLocaleString("uk-UA")} грн</span>`
+        : "";
+
+    return `
+        <a href="product?id=${product.id}" class="side-campaign-card">
+
+            <div class="side-campaign-card-image">
+                <img src="${image}" alt="${product.title}" onerror="this.src='assets/images/no-image.png'">
+                <button type="button" class="favorite" data-id="${product.id}" title="Додати в обране">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 21s-6.7-4.4-9.3-8.3C.9 9.6 1.7 5.9 5.1 4.9c2-.6 4 .2 5.2 1.9l1.7 2.3 1.7-2.3c1.2-1.7 3.2-2.5 5.2-1.9 3.4 1 4.2 4.7 2.4 7.8C18.7 16.6 12 21 12 21z"/>
+                    </svg>
+                </button>
+            </div>
+
+            <span class="side-campaign-card-brand">${product.brand || ""}</span>
+            <span class="side-campaign-card-title">${product.title}</span>
+            <span class="side-campaign-card-price">
+                ${product.price.toLocaleString("uk-UA")} грн
+                ${oldPrice}
+            </span>
+
+        </a>
+    `;
+
+}
+
+function setupSideCampaignCarousels() {
+
+    document.querySelectorAll(".side-campaign-track").forEach(track => {
+
+        if (track.dataset.bound) return;
+
+        track.dataset.bound = "1";
+
+        const counterEl = document.getElementById(track.dataset.counter);
+
+        const cardWidth = () => track.querySelector(".side-campaign-card")?.getBoundingClientRect().width + 16 || 200;
+
+        function updateCounter() {
+
+            if (!counterEl) return;
+
+            const index = Math.round(track.scrollLeft / cardWidth());
+            const clamped = Math.min(index, track.children.length - 1);
+
+            counterEl.textContent = String(clamped + 1).padStart(2, "0");
+
+        }
+
+        track.addEventListener("scroll", () => {
+
+            window.requestAnimationFrame(updateCounter);
+
+        }, { passive: true });
+
+    });
+
+    document.querySelectorAll(".side-campaign-arrow").forEach(button => {
+
+        if (button.dataset.bound) return;
+
+        button.dataset.bound = "1";
+
+        button.addEventListener("click", () => {
+
+            const track = document.getElementById(button.dataset.track);
+
+            if (!track) return;
+
+            const card = track.querySelector(".side-campaign-card");
+            const step = (card?.getBoundingClientRect().width || 200) + 16;
+
+            track.scrollBy({ left: step * Number(button.dataset.dir), behavior: "smooth" });
+
+        });
+
+    });
+
+}
+
+// -------------------------
 // Компактні банери брендів (displayType: "banner_compact") —
 // фото + короткий текст і кнопка, без ряду товарів під ним
 // -------------------------
@@ -617,196 +689,5 @@ function renderCompactPromotions(compactPromotions) {
 
         </div>
     `).join("");
-
-}
-
-// -------------------------
-// Блоки "Добірка" на головній (data/collections.json —
-// зібраний із data/collections/*.json через адмінку) — велике
-// фото зліва і кілька товарів справа з гортанням стрілками,
-// за зразком блоків "Добірка" на md-fashion.ua
-// -------------------------
-
-async function initCollections() {
-
-    const section = document.getElementById("collectionsSection");
-
-    if (!section) return;
-
-    try {
-
-        const [collectionsResponse, productsResponse] = await Promise.all([
-            fetch("data/collections.json"),
-            fetch("data/products.json")
-        ]);
-
-        if (!collectionsResponse.ok) return;
-
-        const collections = await collectionsResponse.json();
-
-        if (!Array.isArray(collections) || collections.length === 0) return;
-
-        const allProducts = productsResponse.ok ? await productsResponse.json() : [];
-
-        section.innerHTML = collections.map(collection => {
-
-            const items = (collection.productIds || [])
-                .map(id => allProducts.find(product => product.id === id))
-                .filter(Boolean);
-
-            if (!items.length) return "";
-
-            return renderCollectionWidget(collection, items);
-
-        }).join("");
-
-        section.querySelectorAll(".collection-widget").forEach(setupCollectionPagination);
-
-        if (typeof updateFavoriteButtons === "function") updateFavoriteButtons();
-
-    } catch (error) {
-
-        console.error(error);
-
-    }
-
-}
-
-function renderCollectionWidget(collection, items) {
-
-    const pageSize = 3;
-    const pageCount = Math.ceil(items.length / pageSize);
-
-    return `
-        <div class="container">
-
-            <div class="collection-widget" data-page-size="${pageSize}" data-page-count="${pageCount}" data-page="0">
-
-                <div class="collection-image">
-                    <img
-                        src="${collection.image}"
-                        alt="${collection.imageAlt || collection.title}"
-                        loading="lazy"
-                        onerror="this.src='assets/images/no-image.png'">
-                </div>
-
-                <div class="collection-content">
-
-                    <div class="collection-head">
-
-                        <div>
-                            <span class="collection-eyebrow">${collection.eyebrow || "ДОБІРКА"}</span>
-                            <h2>${collection.title}</h2>
-                        </div>
-
-                        ${pageCount > 1 ? `
-                        <div class="collection-nav">
-                            <span class="collection-page-indicator">
-                                <span class="collection-page-current">01</span>/${String(pageCount).padStart(2, "0")}
-                            </span>
-                            <button type="button" class="collection-arrow collection-prev" aria-label="Попередні товари" disabled>←</button>
-                            <button type="button" class="collection-arrow collection-next" aria-label="Наступні товари">→</button>
-                        </div>` : ""}
-
-                    </div>
-
-                    <div class="collection-products-row">
-                        ${items.map(product => createCollectionProductCard(product)).join("")}
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-    `;
-
-}
-
-function createCollectionProductCard(product) {
-
-    const image =
-        product.images?.[0] ||
-        product.variants?.[0]?.images?.[0] ||
-        "assets/images/no-image.png";
-
-    const oldPrice = product.oldPrice
-        ? `<span class="old-price">${formatPrice(product.oldPrice)}</span>`
-        : "";
-
-    return `
-        <div class="collection-product">
-
-            <div class="collection-product-image">
-
-                <img
-                    src="${image}"
-                    alt="${product.title}"
-                    loading="lazy"
-                    onerror="this.src='assets/images/no-image.png'">
-
-                <button class="favorite" data-id="${product.id}" title="Додати в обране">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M12 21s-6.7-4.4-9.3-8.3C.9 9.6 1.7 5.9 5.1 4.9c2-.6 4 .2 5.2 1.9l1.7 2.3 1.7-2.3c1.2-1.7 3.2-2.5 5.2-1.9 3.4 1 4.2 4.7 2.4 7.8C18.7 16.6 12 21 12 21z"/>
-                    </svg>
-                </button>
-
-            </div>
-
-            <div class="collection-product-info">
-
-                <span class="collection-product-brand">${product.brand || ""}</span>
-
-                <a href="product?id=${product.id}" class="collection-product-title">
-                    ${product.title}
-                </a>
-
-                <div class="collection-product-price">
-                    <span class="price">${formatPrice(product.price)}</span>
-                    ${oldPrice}
-                </div>
-
-            </div>
-
-        </div>
-    `;
-
-}
-
-function setupCollectionPagination(widget) {
-
-    const pageSize = Number(widget.dataset.pageSize) || 3;
-    const pageCount = Number(widget.dataset.pageCount) || 1;
-
-    const cards = [...widget.querySelectorAll(".collection-product")];
-    const prevBtn = widget.querySelector(".collection-prev");
-    const nextBtn = widget.querySelector(".collection-next");
-    const indicator = widget.querySelector(".collection-page-current");
-
-    function render() {
-
-        const page = Number(widget.dataset.page) || 0;
-
-        cards.forEach((card, i) => {
-            card.hidden = Math.floor(i / pageSize) !== page;
-        });
-
-        if (prevBtn) prevBtn.disabled = page <= 0;
-        if (nextBtn) nextBtn.disabled = page >= pageCount - 1;
-        if (indicator) indicator.textContent = String(page + 1).padStart(2, "0");
-
-    }
-
-    prevBtn?.addEventListener("click", () => {
-        widget.dataset.page = String(Math.max(0, (Number(widget.dataset.page) || 0) - 1));
-        render();
-    });
-
-    nextBtn?.addEventListener("click", () => {
-        widget.dataset.page = String(Math.min(pageCount - 1, (Number(widget.dataset.page) || 0) + 1));
-        render();
-    });
-
-    render();
 
 }

@@ -338,8 +338,8 @@ function createProductCard(product) {
             <div class="product-image">
                 <div class="badge-stack">
                     ${badge}
+                    ${preOrderBadge}
                 </div>
-                ${preOrderBadge}
                 <button
                     class="favorite"
                     data-id="${product.id}"

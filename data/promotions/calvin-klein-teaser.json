@@ -1,16 +1,11 @@
 {
-  "products": [
-    9,
-    10,
-    8
-  ],
   "active": true,
-  "brand": "Calvin Klein",
-  "text": "Лаконічні силуети та якісні тканини для щоденних образів",
+  "displayType": "banner_compact",
   "order": 2,
   "title": "Осіння колекція Calvin Klein",
-  "link": "catalog?brand=Calvin%20Klein",
+  "text": "Лаконічні силуети та якісні тканини для щоденних образів",
   "image": "https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=1200",
-  "displayType": "banner_compact",
-  "buttonText": "Дивитись все"
+  "buttonText": "Дивитись все",
+  "link": "catalog?brand=Calvin%20Klein",
+  "brand": "Calvin Klein"
 }

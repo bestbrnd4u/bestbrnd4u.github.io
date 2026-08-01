@@ -1333,28 +1333,21 @@ nav li.has-mega:hover .mega-menu{
 }
 
 .badge-preorder{
-    position:absolute;
-    top:60px;
-    bottom:18px;
-    right:18px;
-    left:auto;
-    width:30px;
     background:#b45309;
-    color:#fff;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-    writing-mode:vertical-rl;
-    transform:rotate(180deg);
-    border-radius:10px;
-    font-size:11px;
-    font-weight:700;
-    letter-spacing:.5px;
-    line-height:1.3;
-    padding:12px 0;
-    z-index:2;
-    box-shadow:var(--shadow-sm);
+}
+
+@media (hover:hover) and (pointer:fine){
+    .badge-preorder{
+        opacity:0;
+        transform:translateY(-6px);
+        transition:.25s ease;
+        pointer-events:none;
+    }
+
+    .product-image:hover .badge-preorder{
+        opacity:1;
+        transform:translateY(0);
+    }
 }
 
 /* -- кнопка "в избранное" (иконка-сердце) --
@@ -1959,176 +1952,6 @@ footer{
 .promo-card:hover .promo-card-link{
     color:#1d4ed8;
 }
-}
-
-/* =====================================
-   ПОВНОШИРИННИЙ СЛАЙДЕР АКЦІЙ (displayType: "hero_slider") —
-   одна велика акція за раз, зі стрілками й лічильником,
-   як банер на md-fashion.ua
-===================================== */
-
-.promo-hero-slider{
-    background:#fff;
-}
-
-.promo-hero-track{
-    display:flex;
-    overflow-x:auto;
-    scroll-snap-type:x mandatory;
-    -webkit-overflow-scrolling:touch;
-    scrollbar-width:none;
-    border-radius:30px;
-    overscroll-behavior-x:contain;
-}
-
-.promo-hero-track::-webkit-scrollbar{
-    display:none;
-}
-
-.promo-hero-slide{
-    flex:0 0 100%;
-    scroll-snap-align:start;
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    min-height:440px;
-    background:#f8fafc;
-}
-
-.promo-hero-slide-content{
-    display:flex;
-    flex-direction:column;
-    align-items:flex-start;
-    justify-content:center;
-    gap:16px;
-    padding:70px;
-}
-
-.promo-hero-slide-badge{
-    display:inline-block;
-    padding:8px 18px;
-    background:var(--danger);
-    color:#fff;
-    border-radius:50px;
-    font-size:14px;
-    font-weight:700;
-    letter-spacing:.5px;
-}
-
-.promo-hero-slide-content h2{
-    font-size:36px;
-    line-height:1.15;
-    text-align:left;
-    margin:0;
-}
-
-.promo-hero-slide-content p{
-    color:var(--gray500);
-    font-size:16px;
-    margin:0;
-}
-
-.promo-hero-quicklinks{
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px;
-    margin-top:8px;
-}
-
-.promo-hero-quicklinks a{
-    padding:12px 22px;
-    background:var(--gray900);
-    color:#fff;
-    border-radius:10px;
-    font-weight:600;
-    font-size:14px;
-    transition:.2s;
-}
-
-@media (hover:hover) and (pointer:fine){
-    .promo-hero-quicklinks a:hover{
-        background:var(--secondary);
-    }
-}
-
-.promo-hero-cta{
-    margin-top:10px;
-}
-
-.promo-hero-slide-image{
-    position:relative;
-    display:block;
-    overflow:hidden;
-}
-
-.promo-hero-slide-image img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    display:block;
-    transition:.5s;
-}
-
-@media (hover:hover) and (pointer:fine){
-    .promo-hero-slide-image:hover img{
-        transform:scale(1.04);
-    }
-}
-
-.promo-hero-controls{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:20px;
-    margin-top:26px;
-}
-
-.promo-hero-arrow{
-    width:44px;
-    height:44px;
-    flex-shrink:0;
-    border-radius:50%;
-    background:#fff;
-    box-shadow:0 6px 20px rgba(0,0,0,.1);
-    font-size:16px;
-    transition:.2s;
-}
-
-@media (hover:hover) and (pointer:fine){
-    .promo-hero-arrow:hover{
-        background:var(--gray900);
-        color:#fff;
-    }
-}
-
-.promo-hero-counter{
-    font-weight:700;
-    color:var(--gray500);
-    letter-spacing:.5px;
-    min-width:60px;
-    text-align:center;
-}
-
-@media(max-width:768px){
-
-    .promo-hero-slide{
-        grid-template-columns:1fr;
-        min-height:auto;
-    }
-
-    .promo-hero-slide-content{
-        order:2;
-        padding:28px 22px 36px;
-    }
-
-    .promo-hero-slide-content h2{
-        font-size:24px;
-    }
-
-    .promo-hero-slide-image{
-        order:1;
-        aspect-ratio:4/3;
-    }
-
 }
 
 .brands{
@@ -4089,6 +3912,241 @@ body.mobile-filters-open .scroll-top{
 
     .brand-campaign-content h2{
         font-size:24px;
+    }
+
+}
+
+/* =====================================
+   БАНЕР ЗЛІВА + КАРУСЕЛЬ ТОВАРІВ СПРАВА
+   (displayType: "banner_side" — за зразком блоку
+   акцій на md-fashion.ua: фото зліва на всю висоту,
+   справа лічильник/стрілки і невелика горизонтальна
+   карусель карток товару)
+===================================== */
+
+.side-campaigns .side-campaign{
+    padding:50px 0;
+    border-top:1px solid var(--gray100);
+}
+
+.side-campaign-head{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:20px;
+    margin-bottom:24px;
+}
+
+.side-campaign-eyebrow{
+    display:block;
+    color:var(--gray400);
+    font-size:12.5px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    margin-bottom:6px;
+}
+
+.side-campaign-head h2{
+    font-size:26px;
+    text-align:left;
+    margin:0;
+}
+
+.side-campaign-nav{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    flex-shrink:0;
+}
+
+.side-campaign-counter{
+    color:var(--gray500);
+    font-size:14px;
+    white-space:nowrap;
+}
+
+.side-campaign-counter span{
+    color:var(--gray900);
+    font-weight:700;
+}
+
+.side-campaign-arrow{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    border:1px solid var(--gray200);
+    background:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:15px;
+    flex-shrink:0;
+}
+
+@media (hover:hover) and (pointer:fine){
+    .side-campaign-arrow:hover{
+        background:var(--gray50);
+        border-color:var(--gray300);
+    }
+}
+
+.side-campaign-layout{
+    display:grid;
+    grid-template-columns:1.05fr 1fr;
+    gap:28px;
+    align-items:stretch;
+}
+
+.side-campaign-image{
+    position:relative;
+    display:block;
+    border-radius:20px;
+    overflow:hidden;
+    min-height:460px;
+}
+
+.side-campaign-image img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+}
+
+.side-campaign-image-caption{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:0;
+    padding:16px 20px;
+    background:linear-gradient(transparent, rgba(17,24,39,.75));
+    color:#fff;
+    font-size:14px;
+    font-weight:600;
+}
+
+.side-campaign-products{
+    display:flex;
+    min-width:0;
+}
+
+.side-campaign-track{
+    display:flex;
+    gap:16px;
+    overflow-x:auto;
+    scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    touch-action:pan-x;
+}
+
+.side-campaign-track::-webkit-scrollbar{
+    display:none;
+}
+
+.side-campaign-card{
+    flex:0 0 calc((100% - 32px) / 3);
+    scroll-snap-align:start;
+    display:flex;
+    flex-direction:column;
+    min-width:0;
+}
+
+.side-campaign-card-image{
+    position:relative;
+    border-radius:14px;
+    overflow:hidden;
+    background:var(--gray100);
+    aspect-ratio:3/4;
+}
+
+.side-campaign-card-image img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    -webkit-user-drag:none;
+    user-drag:none;
+    -webkit-touch-callout:none;
+}
+
+.side-campaign-card-image .favorite{
+    position:absolute;
+    top:8px;
+    right:8px;
+    width:32px;
+    height:32px;
+}
+
+.side-campaign-card-image .favorite svg{
+    width:15px;
+    height:15px;
+}
+
+.side-campaign-card-brand{
+    display:block;
+    margin-top:10px;
+    font-size:11px;
+    font-weight:700;
+    text-transform:uppercase;
+    color:var(--gray500);
+    letter-spacing:.03em;
+}
+
+.side-campaign-card-title{
+    display:block;
+    margin-top:2px;
+    font-size:13.5px;
+    font-weight:600;
+    color:var(--gray900);
+    line-height:1.3;
+}
+
+.side-campaign-card-price{
+    display:block;
+    margin-top:6px;
+    font-size:14px;
+    font-weight:700;
+    color:var(--gray900);
+}
+
+.side-campaign-old-price{
+    margin-left:6px;
+    font-size:12.5px;
+    font-weight:400;
+    color:var(--gray400);
+    text-decoration:line-through;
+}
+
+@media(max-width:1000px){
+
+    .side-campaign-layout{
+        grid-template-columns:1fr;
+    }
+
+    .side-campaign-image{
+        min-height:260px;
+    }
+
+    .side-campaign-card{
+        flex-basis:calc((100% - 32px) / 3);
+    }
+
+}
+
+@media(max-width:640px){
+
+    .side-campaign-head{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:14px;
+    }
+
+    .side-campaign-head h2{
+        font-size:22px;
+    }
+
+    .side-campaign-card{
+        flex-basis:65%;
     }
 
 }
@@ -8023,255 +8081,6 @@ body.mobile-filters-open .scroll-top{
     .bayer-cta{
         padding:40px 22px;
         border-radius:22px;
-    }
-
-}
-
-/* =====================================
-   ДОБІРКА (collections.json) — велике фото зліва,
-   товари з гортанням справа, за зразком md-fashion.ua
-===================================== */
-
-.collections .container + .container{
-    margin-top:60px;
-}
-
-.collection-widget{
-    display:grid;
-    grid-template-columns:minmax(260px,38%) 1fr;
-    gap:40px;
-    align-items:stretch;
-}
-
-.collection-image{
-    border-radius:20px;
-    overflow:hidden;
-    background:var(--gray100);
-}
-
-.collection-image img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    display:block;
-}
-
-.collection-content{
-    display:flex;
-    flex-direction:column;
-    gap:24px;
-    min-width:0;
-}
-
-.collection-head{
-    display:flex;
-    align-items:flex-end;
-    justify-content:space-between;
-    gap:20px;
-    flex-wrap:wrap;
-}
-
-.collection-eyebrow{
-    display:block;
-    font-size:12px;
-    font-weight:700;
-    letter-spacing:1px;
-    color:var(--secondary);
-    margin-bottom:6px;
-}
-
-.collection-head h2{
-    margin:0;
-    font-size:26px;
-}
-
-.collection-nav{
-    display:flex;
-    align-items:center;
-    gap:14px;
-    flex-shrink:0;
-}
-
-.collection-page-indicator{
-    font-size:13px;
-    color:var(--gray500);
-}
-
-.collection-page-current{
-    color:var(--gray900);
-    font-weight:700;
-}
-
-.collection-arrow{
-    width:34px;
-    height:34px;
-    border-radius:50%;
-    border:1px solid var(--gray200);
-    background:#fff;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:15px;
-    color:var(--gray900);
-    transition:.2s;
-}
-
-.collection-arrow:disabled{
-    opacity:.35;
-    cursor:default;
-}
-
-@media (hover:hover) and (pointer:fine){
-    .collection-arrow:not(:disabled):hover{
-        background:var(--primary);
-        border-color:var(--primary);
-        color:#fff;
-    }
-}
-
-.collection-products-row{
-    display:grid;
-    /* minmax(0,1fr), а не просто 1fr — інакше колонка не може
-       стиснутися вужче за вміст (назву товару/бренд), і третя
-       картка "вилазить" за межі екрана на вузьких вьюпортах —
-       сторінка отримує зайвий горизонтальний скрол */
-    grid-template-columns:repeat(3,minmax(0,1fr));
-    gap:24px;
-}
-
-.collection-product{
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-}
-
-.collection-product-image{
-    position:relative;
-    aspect-ratio:3/4;
-    border-radius:14px;
-    overflow:hidden;
-    background:var(--gray100);
-}
-
-.collection-product-image img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    display:block;
-    transition:.4s;
-}
-
-@media (hover:hover) and (pointer:fine){
-    .collection-product:hover .collection-product-image img{
-        transform:scale(1.05);
-    }
-}
-
-.collection-product-image .favorite{
-    position:absolute;
-    top:12px;
-    right:12px;
-    width:34px;
-    height:34px;
-    border-radius:50%;
-    background:rgba(255,255,255,.92);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    z-index:2;
-}
-
-.collection-product-info{
-    display:flex;
-    flex-direction:column;
-    gap:3px;
-}
-
-.collection-product-brand{
-    font-size:11px;
-    font-weight:700;
-    letter-spacing:.5px;
-    color:var(--gray500);
-    text-transform:uppercase;
-}
-
-.collection-product-title{
-    font-size:13.5px;
-    color:var(--gray900);
-    line-height:1.4;
-}
-
-@media (hover:hover) and (pointer:fine){
-    .collection-product-title:hover{
-        color:var(--secondary);
-    }
-}
-
-.collection-product-price{
-    display:flex;
-    align-items:baseline;
-    gap:8px;
-    margin-top:4px;
-    font-size:14px;
-    font-weight:700;
-    color:var(--gray900);
-}
-
-.collection-product-price .old-price{
-    font-size:12px;
-    font-weight:500;
-    color:var(--gray400,var(--gray500));
-    text-decoration:line-through;
-}
-
-@media(max-width:900px){
-
-    .collection-widget{
-        grid-template-columns:1fr;
-    }
-
-    .collection-image{
-        aspect-ratio:16/9;
-    }
-
-}
-
-@media(max-width:640px){
-
-    .collections .container + .container{
-        margin-top:40px;
-    }
-
-    .collection-products-row{
-        /* 2 колонки, а не 3 — так само, як #catalogGrid на
-           мобільному: на вузькому екрані 3 картки в ряд стають
-           надто вузькими для назви/бренду/ціни. При 3 товарах на
-           "сторінці" добірки третя картка просто переноситься на
-           другий рядок */
-        grid-template-columns:repeat(2,minmax(0,1fr));
-        gap:12px;
-    }
-
-    .collection-head h2{
-        font-size:19px;
-    }
-
-    .collection-product-title{
-        font-size:11.5px;
-    }
-
-    .collection-product-price{
-        font-size:12.5px;
-    }
-
-    .collection-nav{
-        gap:8px;
-    }
-
-    .collection-arrow{
-        width:28px;
-        height:28px;
-        font-size:13px;
     }
 
 }
