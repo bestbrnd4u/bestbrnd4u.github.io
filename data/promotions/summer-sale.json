@@ -2,11 +2,7 @@
   "badge": "-30%",
   "products": [
     2,
-    4,
-    5,
-    11,
-    3,
-    8
+    4
   ],
   "discountPercent": 30,
   "active": true,
@@ -15,7 +11,7 @@
   "order": 1,
   "title": "SUMMER SALE до -30%",
   "link": "catalog?section=sale",
-  "image": "/assets/images/products/uploads/c818d5ef404ee0a9cc6da6cb3732.png",
+  "image": "/assets/images/products/uploads/485d0e230d97266f0bf4e4744df2.webp",
   "displayType": "banner_products",
   "buttonText": "Дивитись усі товари"
 }
