@@ -9,9 +9,7 @@
     "link": "catalog?section=sale",
     "brand": "",
     "discountPercent": 50,
-    "productIds": [
-      9
-    ],
+    "productIds": [],
     "displayType": "hero_slider",
     "order": 1
   },
@@ -43,7 +41,11 @@
     "link": "catalog?brand=Calvin%20Klein",
     "brand": "Calvin Klein",
     "discountPercent": null,
-    "productIds": [],
+    "productIds": [
+      9,
+      10,
+      8
+    ],
     "displayType": "banner_compact",
     "order": 2
   }
