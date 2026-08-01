@@ -1,0 +1,9 @@
+{
+  "active": true,
+  "order": 1,
+  "eyebrow": "ДОБІРКА",
+  "title": "Сумки для твого літа",
+  "image": "https://images.pexels.com/photos/1152077/pexels-photo-1152077.jpeg?auto=compress&cs=tinysrgb&w=1200",
+  "imageAlt": "Сумки для твого літа",
+  "products": [1, 2, 4, 5, 6]
+}

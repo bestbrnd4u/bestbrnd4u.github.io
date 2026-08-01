@@ -301,6 +301,7 @@ function renderAdvantages(advantages) {
 initHome();
 initHomeContent();
 initPromotions();
+initCollections();
 
 // -------------------------
 // Розділ "Акції" на головній (data/promotions.json —
@@ -329,6 +330,7 @@ async function initPromotions() {
         }
 
         const regular = promotions.filter(promo => promo.displayType === "card");
+        const heroSliderPromos = promotions.filter(promo => promo.displayType === "hero_slider");
         const bannersWithProducts = promotions.filter(promo => promo.displayType === "banner_products");
         const compactBanners = promotions.filter(promo => promo.displayType === "banner_compact");
 
@@ -358,6 +360,10 @@ async function initPromotions() {
 
         }
 
+        if (heroSliderPromos.length) {
+            renderHeroSliderPromotions(heroSliderPromos);
+        }
+
         if (bannersWithProducts.length) {
             renderFeaturedPromotions(bannersWithProducts);
         }
@@ -371,6 +377,108 @@ async function initPromotions() {
         console.error(error);
 
     }
+
+}
+
+// -------------------------
+// Повноширинний слайдер-банер (displayType: "hero_slider") —
+// одна велика акція за раз на всю ширину сторінки, зі стрілками
+// та лічильником, як банер на md-fashion.ua
+// -------------------------
+
+function renderHeroSliderPromotions(heroPromotions) {
+
+    const section = document.getElementById("promoHeroSliderSection");
+    const track = document.getElementById("promoHeroTrack");
+    const controls = document.getElementById("promoHeroControls");
+    const prevBtn = document.getElementById("promoHeroPrev");
+    const nextBtn = document.getElementById("promoHeroNext");
+    const counterEl = document.getElementById("promoHeroCounter");
+
+    if (!section || !track) return;
+
+    track.innerHTML = heroPromotions.map(promo => `
+        <div class="promo-hero-slide">
+
+            <div class="promo-hero-slide-content">
+
+                ${promo.badge ? `<span class="promo-hero-slide-badge">${promo.badge}</span>` : ""}
+
+                <h2>${promo.title}</h2>
+
+                ${promo.text ? `<p>${promo.text}</p>` : ""}
+
+                <div class="promo-hero-quicklinks">
+                    <a href="catalog?gender=Жінкам">Жінкам</a>
+                    <a href="catalog?gender=Чоловікам">Чоловікам</a>
+                    <a href="catalog?gender=Дітям">Дітям</a>
+                </div>
+
+                <a href="promo?id=${encodeURIComponent(promo.slug)}" class="btn promo-hero-cta">
+                    ${promo.buttonText || "Дивитись усі товари"} →
+                </a>
+
+            </div>
+
+            <a href="promo?id=${encodeURIComponent(promo.slug)}" class="promo-hero-slide-image">
+                <img
+                    src="${promo.image}"
+                    alt="${promo.title}"
+                    onerror="this.src='assets/images/no-image.png'">
+            </a>
+
+        </div>
+    `).join("");
+
+    section.hidden = false;
+
+    setupPromoHeroSlider({ track, total: heroPromotions.length, prevBtn, nextBtn, counterEl, controls });
+
+}
+
+// Керування слайдером: стрілки + лічильник "01/03", той самий
+// scroll-snap підхід, що й в інших каруселях сайту
+function setupPromoHeroSlider({ track, total, prevBtn, nextBtn, counterEl, controls }) {
+
+    if (controls) controls.hidden = total <= 1;
+
+    if (total <= 1) return;
+
+    function pad(n) {
+        return String(n).padStart(2, "0");
+    }
+
+    function currentIndex() {
+        return Math.round(track.scrollLeft / (track.clientWidth || 1));
+    }
+
+    function updateCounter() {
+        if (counterEl) counterEl.textContent = `${pad(currentIndex() + 1)}/${pad(total)}`;
+    }
+
+    function goTo(index) {
+
+        const clamped = Math.max(0, Math.min(total - 1, index));
+
+        track.scrollTo({ left: clamped * track.clientWidth, behavior: "smooth" });
+
+    }
+
+    prevBtn?.addEventListener("click", () => goTo(currentIndex() - 1));
+    nextBtn?.addEventListener("click", () => goTo(currentIndex() + 1));
+
+    let scrollTimer = null;
+
+    track.addEventListener("scroll", () => {
+
+        clearTimeout(scrollTimer);
+        scrollTimer = setTimeout(updateCounter, 80);
+
+    }, { passive: true });
+
+    window.addEventListener("resize", () => goTo(currentIndex()));
+
+    updateCounter();
 
 }
 
@@ -509,5 +617,196 @@ function renderCompactPromotions(compactPromotions) {
 
         </div>
     `).join("");
+
+}
+
+// -------------------------
+// Блоки "Добірка" на головній (data/collections.json —
+// зібраний із data/collections/*.json через адмінку) — велике
+// фото зліва і кілька товарів справа з гортанням стрілками,
+// за зразком блоків "Добірка" на md-fashion.ua
+// -------------------------
+
+async function initCollections() {
+
+    const section = document.getElementById("collectionsSection");
+
+    if (!section) return;
+
+    try {
+
+        const [collectionsResponse, productsResponse] = await Promise.all([
+            fetch("data/collections.json"),
+            fetch("data/products.json")
+        ]);
+
+        if (!collectionsResponse.ok) return;
+
+        const collections = await collectionsResponse.json();
+
+        if (!Array.isArray(collections) || collections.length === 0) return;
+
+        const allProducts = productsResponse.ok ? await productsResponse.json() : [];
+
+        section.innerHTML = collections.map(collection => {
+
+            const items = (collection.productIds || [])
+                .map(id => allProducts.find(product => product.id === id))
+                .filter(Boolean);
+
+            if (!items.length) return "";
+
+            return renderCollectionWidget(collection, items);
+
+        }).join("");
+
+        section.querySelectorAll(".collection-widget").forEach(setupCollectionPagination);
+
+        if (typeof updateFavoriteButtons === "function") updateFavoriteButtons();
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
+
+}
+
+function renderCollectionWidget(collection, items) {
+
+    const pageSize = 3;
+    const pageCount = Math.ceil(items.length / pageSize);
+
+    return `
+        <div class="container">
+
+            <div class="collection-widget" data-page-size="${pageSize}" data-page-count="${pageCount}" data-page="0">
+
+                <div class="collection-image">
+                    <img
+                        src="${collection.image}"
+                        alt="${collection.imageAlt || collection.title}"
+                        loading="lazy"
+                        onerror="this.src='assets/images/no-image.png'">
+                </div>
+
+                <div class="collection-content">
+
+                    <div class="collection-head">
+
+                        <div>
+                            <span class="collection-eyebrow">${collection.eyebrow || "ДОБІРКА"}</span>
+                            <h2>${collection.title}</h2>
+                        </div>
+
+                        ${pageCount > 1 ? `
+                        <div class="collection-nav">
+                            <span class="collection-page-indicator">
+                                <span class="collection-page-current">01</span>/${String(pageCount).padStart(2, "0")}
+                            </span>
+                            <button type="button" class="collection-arrow collection-prev" aria-label="Попередні товари" disabled>←</button>
+                            <button type="button" class="collection-arrow collection-next" aria-label="Наступні товари">→</button>
+                        </div>` : ""}
+
+                    </div>
+
+                    <div class="collection-products-row">
+                        ${items.map(product => createCollectionProductCard(product)).join("")}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    `;
+
+}
+
+function createCollectionProductCard(product) {
+
+    const image =
+        product.images?.[0] ||
+        product.variants?.[0]?.images?.[0] ||
+        "assets/images/no-image.png";
+
+    const oldPrice = product.oldPrice
+        ? `<span class="old-price">${formatPrice(product.oldPrice)}</span>`
+        : "";
+
+    return `
+        <div class="collection-product">
+
+            <div class="collection-product-image">
+
+                <img
+                    src="${image}"
+                    alt="${product.title}"
+                    loading="lazy"
+                    onerror="this.src='assets/images/no-image.png'">
+
+                <button class="favorite" data-id="${product.id}" title="Додати в обране">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 21s-6.7-4.4-9.3-8.3C.9 9.6 1.7 5.9 5.1 4.9c2-.6 4 .2 5.2 1.9l1.7 2.3 1.7-2.3c1.2-1.7 3.2-2.5 5.2-1.9 3.4 1 4.2 4.7 2.4 7.8C18.7 16.6 12 21 12 21z"/>
+                    </svg>
+                </button>
+
+            </div>
+
+            <div class="collection-product-info">
+
+                <span class="collection-product-brand">${product.brand || ""}</span>
+
+                <a href="product?id=${product.id}" class="collection-product-title">
+                    ${product.title}
+                </a>
+
+                <div class="collection-product-price">
+                    <span class="price">${formatPrice(product.price)}</span>
+                    ${oldPrice}
+                </div>
+
+            </div>
+
+        </div>
+    `;
+
+}
+
+function setupCollectionPagination(widget) {
+
+    const pageSize = Number(widget.dataset.pageSize) || 3;
+    const pageCount = Number(widget.dataset.pageCount) || 1;
+
+    const cards = [...widget.querySelectorAll(".collection-product")];
+    const prevBtn = widget.querySelector(".collection-prev");
+    const nextBtn = widget.querySelector(".collection-next");
+    const indicator = widget.querySelector(".collection-page-current");
+
+    function render() {
+
+        const page = Number(widget.dataset.page) || 0;
+
+        cards.forEach((card, i) => {
+            card.hidden = Math.floor(i / pageSize) !== page;
+        });
+
+        if (prevBtn) prevBtn.disabled = page <= 0;
+        if (nextBtn) nextBtn.disabled = page >= pageCount - 1;
+        if (indicator) indicator.textContent = String(page + 1).padStart(2, "0");
+
+    }
+
+    prevBtn?.addEventListener("click", () => {
+        widget.dataset.page = String(Math.max(0, (Number(widget.dataset.page) || 0) - 1));
+        render();
+    });
+
+    nextBtn?.addEventListener("click", () => {
+        widget.dataset.page = String(Math.min(pageCount - 1, (Number(widget.dataset.page) || 0) + 1));
+        render();
+    });
+
+    render();
 
 }
