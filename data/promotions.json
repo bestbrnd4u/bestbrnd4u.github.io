@@ -26,7 +26,10 @@
     "productIds": [
       2,
       4,
-      5
+      5,
+      11,
+      3,
+      8
     ],
     "displayType": "banner_products",
     "order": 1
