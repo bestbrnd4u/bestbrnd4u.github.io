@@ -169,6 +169,22 @@ function bindProductCarousel(track) {
             dots.forEach((dot, i) => dot.classList.toggle("active", i === index));
         }
 
+        // якщо серед слайдів є відео — програємо його лише тоді,
+        // коли користувач долистав саме до цього слайду каруселі
+        // (а не коли картка просто зʼявилась на екрані); на всіх
+        // інших слайдах відео ставимо на паузу
+        Array.from(track.children).forEach((slide, i) => {
+
+            if (slide.tagName !== "VIDEO") return;
+
+            if (i === index) {
+                slide.play().catch(() => {});
+            } else {
+                slide.pause();
+            }
+
+        });
+
         syncNav();
 
     }
@@ -290,38 +306,6 @@ function bindProductCarousel(track) {
 function initProductCarousels(root) {
 
     (root || document).querySelectorAll(".photo-track").forEach(bindProductCarousel);
-    (root || document).querySelectorAll(".product-video").forEach(bindProductVideo);
-
-}
-
-// Відео в картці товару (каталог/віджети): до того, як картка
-// потрапить у вʼюпорт — показано звичайне фото (poster відео).
-// Щойно картка стає видимою — відео плавно проявляється і
-// вмикається саме (без звуку, по колу); коли картка виходить
-// з екрана — ставимо на паузу, щоб не програвались одразу
-// десятки відео в довгому каталозі.
-function bindProductVideo(video) {
-
-    if (video.dataset.videoBound) return;
-    video.dataset.videoBound = "1";
-
-    const observer = new IntersectionObserver(entries => {
-
-        entries.forEach(entry => {
-
-            if (entry.isIntersecting) {
-                video.classList.add("is-playing");
-                video.play().catch(() => {});
-            } else {
-                video.classList.remove("is-playing");
-                video.pause();
-            }
-
-        });
-
-    }, { threshold: 0.5 });
-
-    observer.observe(video);
 
 }
 
@@ -412,25 +396,25 @@ function createProductCard(product) {
                                 loading="lazy"
                                 onerror="this.src='assets/images/no-image.png'">
                         `).join("")}
+                        ${video ? `
+                            <video
+                                class="photo-slide product-video-slide"
+                                src="${video}"
+                                poster="${images[0]}"
+                                muted
+                                loop
+                                playsinline
+                                preload="metadata"></video>
+                        ` : ""}
                     </div>
-                    ${images.length > 1 ? `
+                    ${(images.length + (video ? 1 : 0)) > 1 ? `
                     <button type="button" class="photo-nav photo-nav-prev" aria-label="Попереднє фото">‹</button>
                     <button type="button" class="photo-nav photo-nav-next" aria-label="Наступне фото">›</button>
                     <div class="photo-dots">
                         ${images.map((_, index) => `<span class="photo-dot ${index === 0 ? "active" : ""}"></span>`).join("")}
+                        ${video ? `<span class="photo-dot"></span>` : ""}
                     </div>` : ""}
                 </div>
-
-                ${video ? `
-                <video
-                    class="product-video"
-                    src="${video}"
-                    poster="${images[0]}"
-                    muted
-                    loop
-                    playsinline
-                    preload="metadata"></video>
-                ` : ""}
 
                 <!-- З'являється лише при наведенні на десктопі (сітка
                      каталогу/карусель) — дублює колір/розмір/кнопку
