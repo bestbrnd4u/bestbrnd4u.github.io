@@ -290,6 +290,38 @@ function bindProductCarousel(track) {
 function initProductCarousels(root) {
 
     (root || document).querySelectorAll(".photo-track").forEach(bindProductCarousel);
+    (root || document).querySelectorAll(".product-video").forEach(bindProductVideo);
+
+}
+
+// Відео в картці товару (каталог/віджети): до того, як картка
+// потрапить у вʼюпорт — показано звичайне фото (poster відео).
+// Щойно картка стає видимою — відео плавно проявляється і
+// вмикається саме (без звуку, по колу); коли картка виходить
+// з екрана — ставимо на паузу, щоб не програвались одразу
+// десятки відео в довгому каталозі.
+function bindProductVideo(video) {
+
+    if (video.dataset.videoBound) return;
+    video.dataset.videoBound = "1";
+
+    const observer = new IntersectionObserver(entries => {
+
+        entries.forEach(entry => {
+
+            if (entry.isIntersecting) {
+                video.classList.add("is-playing");
+                video.play().catch(() => {});
+            } else {
+                video.classList.remove("is-playing");
+                video.pause();
+            }
+
+        });
+
+    }, { threshold: 0.5 });
+
+    observer.observe(video);
 
 }
 
@@ -316,6 +348,10 @@ function createProductCard(product) {
     const images = variants[0].images?.length
         ? variants[0].images
         : (product.images?.length ? product.images : ["assets/images/no-image.png"]);
+
+    // відео беремо з активного (першого) варіанту кольору —
+    // саме його фото/колір показані на картці за замовчуванням
+    const video = variants[0].video || "";
 
     const brand = product.brand || "Без бренду";
 
@@ -384,6 +420,17 @@ function createProductCard(product) {
                         ${images.map((_, index) => `<span class="photo-dot ${index === 0 ? "active" : ""}"></span>`).join("")}
                     </div>` : ""}
                 </div>
+
+                ${video ? `
+                <video
+                    class="product-video"
+                    src="${video}"
+                    poster="${images[0]}"
+                    muted
+                    loop
+                    playsinline
+                    preload="metadata"></video>
+                ` : ""}
 
                 <!-- З'являється лише при наведенні на десктопі (сітка
                      каталогу/карусель) — дублює колір/розмір/кнопку
