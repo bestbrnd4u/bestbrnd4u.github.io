@@ -498,16 +498,48 @@ nav li.has-mega:hover .mega-menu{
 }
 }
 
+.header-left{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.header-left button{
+    position:relative;
+    width:46px;
+    height:46px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:white;
+    box-shadow:var(--shadow-sm);
+    transition:.3s;
+    font-size:20px;
+    flex-shrink:0;
+}
+
+@media (hover:hover) and (pointer:fine){
+.header-left button:hover{
+    background:var(--secondary);
+    color:white;
+    transform:translateY(-3px);
+}
+}
+
 /* -- кнопка мобільного меню (гамбургер) --
    сама кнопка з'являється лише на вузьких екранах, див.
-   .header-icons .mobile-menu-btn{display:flex} у
-   @media(max-width:768px) — тут лише базовий вигляд, спільний
-   з іншими іконками хедера. Селектор навмисно з двох класів
-   (.header-icons .mobile-menu-btn), а не одного — інакше
-   .header-icons button{display:flex} (вище) переважає за
-   специфічністю, і кнопка лізла б навіть на десктопі */
+   @media(max-width:768px) нижче — тут лише базовий вигляд,
+   спільний з іншими іконками хедера. Селектор навмисно з двох
+   класів (.header-icons/.header-left .mobile-menu-btn), а не
+   одного — інакше .header-icons button{display:flex} (вище)
+   переважає за специфічністю, і кнопка лізла б навіть на
+   десктопі. Два варіанти селектора — бо на мобільному JS
+   переносить кнопку з .header-icons в .header-left (див.
+   common.js), а на десктопі вона повертається назад */
 
-.header-icons .mobile-menu-btn{
+.header-icons .mobile-menu-btn,
+.header-left .mobile-menu-btn{
     display:none;
     flex-direction:column;
     align-items:center;
@@ -5463,8 +5495,15 @@ body.mobile-filters-open .scroll-top{
         display:none;
     }
 
-    .header-icons .mobile-menu-btn{
+    .header-icons .mobile-menu-btn,
+    .header-left .mobile-menu-btn{
         display:flex;
+    }
+
+    /* акаунт на мобільному ховаємо — на вузькому екрані місце
+       у хедері обмежене, а увійти можна й з мобільного меню */
+    #accountLink{
+        display:none;
     }
 
     .checkout-fields{
@@ -5501,6 +5540,23 @@ body.mobile-filters-open .scroll-top{
 
     .container{
         padding:0 20px;
+    }
+
+    /* повний розмір лого (34px + letter-spacing 4px) разом з
+       гамбургером/пошуком зліва і обраним/кошиком справа не
+       влазить у вузький екран — звужуємо саме лого, іконки
+       мають фіксований розмір і їх звужувати нема куди */
+    .logo{
+        font-size:20px;
+        letter-spacing:1px;
+    }
+
+    .header-left{
+        gap:10px;
+    }
+
+    .header-icons{
+        gap:10px;
     }
 
     .hero h1{
