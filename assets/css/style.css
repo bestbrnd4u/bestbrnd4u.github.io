@@ -4170,6 +4170,7 @@ body.mobile-filters-open .scroll-top{
 }
 
 .brand-campaign-image{
+    display:block;
     min-height:420px;
 }
 
@@ -4204,6 +4205,14 @@ body.mobile-filters-open .scroll-top{
 .brand-campaign-content h2{
     font-size:32px;
     line-height:1.25;
+    /* глобальний h2{margin-bottom:50px} (для великих заголовків
+       секцій типу "Популярні товари") тут зайвий — додається
+       поверх gap:14px від .brand-campaign-content і дає
+       нерівний, набагато більший відступ саме під заголовком.
+       Скидаємо його, щоб відстань між усіма блоками (беджем,
+       заголовком, текстом, кнопкою) була однаковою */
+    margin-bottom:0;
+    text-align:left;
 }
 
 .brand-campaign-content p{
@@ -7086,9 +7095,15 @@ body.mobile-filters-open .scroll-top{
     padding:70px 60px;
     color:#fff;
     background-color:#111827;
-    background-size:cover;
+    /* contain, а не cover — з cover частина картинки, яку
+       завантажили в акцію, обрізалась по краях (висота банера
+       залежить від тексту всередині, а не від пропорцій фото).
+       min-height додає банеру простір, щоб фото не виглядало
+       крихітним посередині, коли тексту акції мало */
+    background-size:contain;
     background-position:center;
     background-repeat:no-repeat;
+    min-height:420px;
 }
 
 .promo-hero-content{
@@ -7132,6 +7147,7 @@ body.mobile-filters-open .scroll-top{
 
     .promo-hero-banner{
         padding:44px 28px;
+        min-height:320px;
     }
 
     .promo-hero-content h1{

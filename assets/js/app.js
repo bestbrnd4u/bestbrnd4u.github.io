@@ -582,12 +582,12 @@ async function renderFeaturedPromotions(featuredPromotions) {
 
                     <div class="brand-campaign-banner">
 
-                        <div class="brand-campaign-image">
+                        <a href="promo?id=${encodeURIComponent(promo.slug)}" class="brand-campaign-image">
                             <img
                                 src="${promo.image}"
                                 alt="${promo.title}"
                                 onerror="this.src='assets/images/no-image.png'">
-                        </div>
+                        </a>
 
                         <div class="brand-campaign-content">
 
