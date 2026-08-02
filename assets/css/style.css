@@ -1176,18 +1176,12 @@ nav li.has-mega:hover .mega-menu{
 
 .product-image{
     position:relative;
-    overflow:hidden;
-    aspect-ratio:4/5;
-    height:auto;
-    background:var(--gray50);
-    padding:16px;
-    box-sizing:border-box;
 }
 
 .product-image img{
     width:100%;
     height:100%;
-    object-fit:contain;
+    object-fit:cover;
     object-position:center;
     transition:.45s;
 }
@@ -1201,7 +1195,9 @@ nav li.has-mega:hover .mega-menu{
 .product-carousel{
     position:relative;
     width:100%;
-    height:100%;
+    aspect-ratio:4/5;
+    overflow:hidden;
+    background:var(--gray50);
 }
 
 .photo-track{
@@ -1422,6 +1418,69 @@ nav li.has-mega:hover .mega-menu{
     top:18px;
     right:18px;
     z-index:2;
+}
+
+/* -- панель кольору/розміру/кнопки, що з'являється поверх фото
+      лише при наведенні (десктопна сітка каталогу й каруселі) --
+      За замовчуванням (мобільний, список) прихована — там працює
+      звичайний блок нижче фото, як і раніше. */
+
+.product-hover-panel{
+    display:none;
+}
+
+@media (hover:hover) and (pointer:fine){
+
+    .products-grid:not(.list-view) .product-hover-panel{
+        display:flex;
+        flex-direction:column;
+        align-items:flex-start;
+        gap:10px;
+        position:absolute;
+        left:10px;
+        right:10px;
+        bottom:10px;
+        z-index:4;
+        padding:14px;
+        border-radius:16px;
+        background:linear-gradient(to top, rgba(17,24,39,.88) 0%, rgba(17,24,39,.55) 65%, rgba(17,24,39,0) 100%);
+        opacity:0;
+        transform:translateY(10px);
+        pointer-events:none;
+        transition:.25s;
+    }
+
+    .products-grid:not(.list-view) .product-card:hover .product-hover-panel{
+        opacity:1;
+        transform:translateY(0);
+        pointer-events:auto;
+    }
+
+    .product-hover-panel .product-options{
+        display:flex;
+        align-items:center;
+        gap:14px;
+        margin-bottom:0;
+    }
+
+    .product-hover-panel .discount{
+        align-self:flex-start;
+    }
+
+    .product-hover-panel .buy-btn{
+        height:42px;
+        font-size:14px;
+    }
+
+    /* оригінальний блок (колір/розмір/ціна-знижка/кнопка) під фото —
+       у цьому режимі дублюється панеллю вище, тож ховаємо його, щоб
+       не показувати двічі */
+    .products-grid:not(.list-view) .product-card .product-meta-row .product-options,
+    .products-grid:not(.list-view) .product-card .price-meta .discount,
+    .products-grid:not(.list-view) .product-card > .product-info > .buy-btn{
+        display:none;
+    }
+
 }
 
 /* -- текстовая часть карточки -- */
@@ -5393,9 +5452,8 @@ body.mobile-filters-open .scroll-top{
         gap:14px;
     }
 
-    #catalogGrid.products-grid:not(.list-view) .product-image{
+    #catalogGrid.products-grid:not(.list-view) .product-carousel{
         aspect-ratio:1/1;
-        padding:10px;
     }
 
     #catalogGrid.products-grid:not(.list-view) .badge{

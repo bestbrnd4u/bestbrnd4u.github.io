@@ -1345,11 +1345,29 @@ document.addEventListener("click", event => {
 
     if (colorBtn) {
 
-        const group = colorBtn.closest(".product-colors, .color-options");
+        // картка каталогу (.product-card) може мати два набори свотчів
+        // (звичайний під фото + дублікат у hover-панелі поверх фото на
+        // десктопі) — синхронізуємо їх за кольором у межах ЦІЄЇ картки.
+        // Поза каталожною карткою (сторінка товару, кошик, обране)
+        // свотчі й так одні — лишаємо стару вузьку синхронізацію в
+        // межах найближчої групи, щоб не чіпати сусідні незалежні картки
+        const cardScope = colorBtn.closest(".product-card");
 
-        group?.querySelectorAll(".mini-color, .color").forEach(b => b.classList.remove("active"));
+        if (cardScope) {
 
-        colorBtn.classList.add("active");
+            cardScope.querySelectorAll(".mini-color, .color").forEach(b => {
+                b.classList.toggle("active", b.dataset.color === colorBtn.dataset.color);
+            });
+
+        } else {
+
+            const group = colorBtn.closest(".product-colors, .color-options");
+
+            group?.querySelectorAll(".mini-color, .color").forEach(b => b.classList.remove("active"));
+
+            colorBtn.classList.add("active");
+
+        }
 
         // перемикаємо фото товару на фото цього кольору
         // (шукаємо картинку в межах картки каталогу, рядка
@@ -1455,11 +1473,27 @@ document.addEventListener("click", event => {
 
     if (sizeBtn) {
 
+        // та сама причина, що й для кольору вище: у картці каталогу
+        // тепер може бути два набори розмірів (звичайний +
+        // дублікат у hover-панелі) — синхронізуємо в межах картки
+        const cardScope = sizeBtn.closest(".product-card");
         const group = sizeBtn.closest(".product-sizes");
 
-        group?.querySelectorAll(".mini-size").forEach(b => b.classList.remove("active"));
+        if (cardScope) {
 
-        sizeBtn.classList.add("active");
+            const label = sizeBtn.textContent.trim();
+
+            cardScope.querySelectorAll(".mini-size").forEach(b => {
+                b.classList.toggle("active", b.textContent.trim() === label);
+            });
+
+        } else {
+
+            group?.querySelectorAll(".mini-size").forEach(b => b.classList.remove("active"));
+
+            sizeBtn.classList.add("active");
+
+        }
 
         updateFavoriteButtons();
 

@@ -384,6 +384,28 @@ function createProductCard(product) {
                         ${images.map((_, index) => `<span class="photo-dot ${index === 0 ? "active" : ""}"></span>`).join("")}
                     </div>` : ""}
                 </div>
+
+                <!-- З'являється лише при наведенні на десктопі (сітка
+                     каталогу/карусель) — дублює колір/розмір/кнопку
+                     нижче, щоб фото картки лишалось чистим за
+                     замовчуванням. На мобільному й у режимі "список"
+                     не показується — там працює звичайний блок нижче. -->
+                <div class="product-hover-panel">
+                    ${discount > 0 ? `<span class="discount">-${discount}%</span>` : ""}
+                    <div class="product-options">
+                        <div class="product-colors">
+                            ${colorButtons}
+                        </div>
+                        <div class="product-sizes">
+                            ${sizeButtons}
+                        </div>
+                    </div>
+                    <button
+                        class="btn buy-btn"
+                        data-id="${product.id}">
+                        ${product.preOrder ? "Замовити" : "Купити"}
+                    </button>
+                </div>
             </div>
             <div class="product-info">
                 <div class="product-category-row">
