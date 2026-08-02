@@ -1332,17 +1332,29 @@ function isSizeSatisfied(scope) {
 // прокручуємо до розмірів. У компактній картці каталогу/віджета
 // такого місця немає, тож обмежуємось стряскою по рядку
 // розмірів і спливаючим повідомленням.
+//
+// У картці каталогу тепер може бути ДВА блоки .product-sizes —
+// прихована на мобільному hover-панель (десктоп, при наведенні)
+// і завжди видимий блок нижче. Раніше підсвічувався лише
+// ПЕРШИЙ знайдений в DOM (hover-панель) — на мобільному вона
+// прихована, тож підсвітки ніхто не бачив. Тепер підсвічуємо
+// ОБИДВА, щоб працювало незалежно від того, яка версія картки
+// зараз видима користувачу.
 function flagSizeRequired(scope) {
 
-    const sizesWrap = scope.querySelector(".sizes, .product-sizes");
+    const sizeWraps = scope.querySelectorAll(".sizes, .product-sizes");
 
-    if (!sizesWrap) return;
+    if (!sizeWraps.length) return;
 
-    sizesWrap.classList.remove("size-shake");
+    sizeWraps.forEach(sizesWrap => {
 
-    void sizesWrap.offsetWidth;
+        sizesWrap.classList.remove("size-shake");
 
-    sizesWrap.classList.add("size-shake");
+        void sizesWrap.offsetWidth;
+
+        sizesWrap.classList.add("size-shake");
+
+    });
 
     const errorEl = scope.querySelector(".size-error");
 
@@ -1350,7 +1362,7 @@ function flagSizeRequired(scope) {
 
         errorEl.hidden = false;
 
-        sizesWrap.scrollIntoView({ behavior: "smooth", block: "center" });
+        sizeWraps[0].scrollIntoView({ behavior: "smooth", block: "center" });
 
     } else {
 
