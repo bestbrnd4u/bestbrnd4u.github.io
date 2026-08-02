@@ -4044,6 +4044,8 @@ body.mobile-filters-open .scroll-top{
     .spec-block-inner{
         overflow:hidden;
         min-height:0;
+        padding-bottom:0;
+        transition:padding-bottom .3s ease;
     }
 
     .accordion-item.open .spec-block-content{
