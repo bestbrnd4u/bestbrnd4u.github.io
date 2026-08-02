@@ -1069,7 +1069,10 @@ const mobileMenuBtn = (() => {
     const logo = headerRow?.querySelector(".logo");
     const headerIcons = document.querySelector(".header-icons");
 
-    if (!headerRow || !logo || !headerIcons) return;
+    if (!headerRow || !logo || !headerIcons) {
+        headerRow?.classList.add("header-ready");
+        return;
+    }
 
     const mobileQuery = window.matchMedia("(max-width:768px)");
 
@@ -1089,13 +1092,9 @@ const mobileMenuBtn = (() => {
             if (mobileMenuBtn) headerLeft.appendChild(mobileMenuBtn);
             if (searchBtn) headerLeft.appendChild(searchBtn);
 
-            headerLeft.appendChild(logo);
-
         } else {
 
             if (!headerLeft) return; // і так у десктопному вигляді
-
-            headerRow.insertBefore(logo, headerLeft);
 
             if (searchBtn) headerIcons.prepend(searchBtn);
             if (mobileMenuBtn) headerIcons.prepend(mobileMenuBtn);
@@ -1109,6 +1108,11 @@ const mobileMenuBtn = (() => {
     applyLayout(mobileQuery.matches);
 
     mobileQuery.addEventListener("change", event => applyLayout(event.matches));
+
+    // до цього моменту рядок шапки був прихований (visibility:hidden
+    // в CSS), щоб уникнути "стрибка" — тепер розкладка вже фінальна,
+    // можна показувати
+    headerRow.classList.add("header-ready");
 
 })();
 
@@ -1923,3 +1927,10 @@ function truncateForMeta(text, maxLength = 155) {
 
 }
 
+
+// Аварійний запобіжник: якщо з якоїсь причини блок вище не
+// відпрацював (помилка в іншому місці файлу тощо) — шапка на
+// мобільному не повинна лишитись прихованою назавжди.
+setTimeout(() => {
+    document.querySelector("header .header")?.classList.add("header-ready");
+}, 1500);

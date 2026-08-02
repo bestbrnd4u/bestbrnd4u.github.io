@@ -1870,24 +1870,8 @@ if (!window.CATALOG_SKIP_AUTO_INIT) {
         mq.addListener(handleViewportChange);
     }
 
-    // -------------------------
-    // закріплена панель ховається при скролі вниз і
-    // з'являється знову, щойно користувач скролить угору
-    // -------------------------
-
-    let lastScrollY = window.scrollY;
-
-    window.addEventListener("scroll", () => {
-
-        if (!mq.matches) return;
-
-        const currentY = window.scrollY;
-        const goingDown = currentY > lastScrollY && currentY > 140;
-
-        mobileFilterBar.classList.toggle("is-hidden", goingDown);
-
-        lastScrollY = currentY;
-
-    }, { passive: true });
+    // панель залишається прилиплою під шапкою (position:sticky) —
+    // без додаткової анімації приховування при скролі вниз, яка
+    // раніше "підстрибувала" й конфліктувала зі sticky-позиціюванням
 
 })();

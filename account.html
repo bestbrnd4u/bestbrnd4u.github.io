@@ -315,7 +315,10 @@
                             <strong id="profileEmail"></strong>
                         </div>
 
-                        <button type="button" class="auth-link" id="changePasswordBtn">Змінити пароль</button>
+                        <div class="profile-links-row">
+                            <button type="button" class="auth-link" id="changePasswordBtn">Змінити пароль</button>
+                            <button type="button" class="auth-link auth-link-danger" id="deleteAccountBtn">Видалити акаунт</button>
+                        </div>
 
                         <span id="profileMessage" class="field-error"></span>
 
@@ -439,6 +442,28 @@
         <div class="modal-actions">
             <button type="button" id="confirmDeleteYes" class="btn-modal btn-modal-confirm">Так, видалити</button>
             <button type="button" id="confirmDeleteNo" class="btn-modal btn-modal-cancel">Скасувати</button>
+        </div>
+
+    </div>
+</div>
+
+<div id="deleteAccountModal" class="modal-overlay" hidden>
+    <div class="modal-card">
+
+        <div class="modal-header">
+            <h3>Видалити акаунт?</h3>
+            <button type="button" id="deleteAccountClose" class="modal-close" aria-label="Закрити">✕</button>
+        </div>
+
+        <p class="modal-text">
+            Ваш профіль, збережені адреси та список обраного буде
+            видалено назавжди. Історія замовлень збережеться згідно
+            з правилами обліку. Цю дію не можна скасувати.
+        </p>
+
+        <div class="modal-actions">
+            <button type="button" id="deleteAccountYes" class="btn-modal btn-modal-confirm">Так, видалити</button>
+            <button type="button" id="deleteAccountNo" class="btn-modal btn-modal-cancel">Скасувати</button>
         </div>
 
     </div>

@@ -958,6 +958,75 @@ confirmDeleteYes?.addEventListener("click", async () => {
 
 });
 
+// -------------------------
+// Видалення акаунту
+//
+// Тут видаляємо власні дані користувача (профіль, адреси,
+// обране) і завершуємо сесію — на це вистачає прав звичайного
+// користувача (RLS дозволяє видаляти власні рядки). Сам обліковий
+// запис у Supabase Auth лишається — щоб видалити саме його,
+// потрібен виклик admin-API з service-role ключем, а це можна
+// робити тільки на бекенді (Edge Function), не з клієнтського
+// JS напряму. Якщо потрібна повна фізична видаленість акаунту —
+// сюди варто додати виклик такої функції.
+// -------------------------
+
+const deleteAccountModal = document.getElementById("deleteAccountModal");
+const deleteAccountBtn = document.getElementById("deleteAccountBtn");
+const deleteAccountYes = document.getElementById("deleteAccountYes");
+const deleteAccountNo = document.getElementById("deleteAccountNo");
+const deleteAccountClose = document.getElementById("deleteAccountClose");
+
+function openDeleteAccountModal() {
+    deleteAccountModal.hidden = false;
+}
+
+function closeDeleteAccountModal() {
+    deleteAccountModal.hidden = true;
+}
+
+deleteAccountBtn?.addEventListener("click", openDeleteAccountModal);
+deleteAccountNo?.addEventListener("click", closeDeleteAccountModal);
+deleteAccountClose?.addEventListener("click", closeDeleteAccountModal);
+
+deleteAccountModal?.addEventListener("click", event => {
+    if (event.target === deleteAccountModal) closeDeleteAccountModal();
+});
+
+deleteAccountYes?.addEventListener("click", async () => {
+
+    deleteAccountYes.disabled = true;
+    deleteAccountYes.textContent = "Видаляємо...";
+
+    const user = await getCurrentUser();
+
+    if (!user) {
+        closeDeleteAccountModal();
+        return;
+    }
+
+    await supabaseClient.from("favorites").delete().eq("user_id", user.id);
+    await supabaseClient.from("addresses").delete().eq("user_id", user.id);
+
+    const { error } = await supabaseClient.from("profiles").delete().eq("id", user.id);
+
+    deleteAccountYes.disabled = false;
+    deleteAccountYes.textContent = "Так, видалити";
+
+    if (error) {
+        closeDeleteAccountModal();
+        showToast("Не вдалося видалити акаунт");
+        return;
+    }
+
+    closeDeleteAccountModal();
+
+    await supabaseClient.auth.signOut();
+
+    window.location.href = "/";
+
+});
+
 addressesListEl?.addEventListener("click", async event => {
 
     const editBtn = event.target.closest(".address-edit-btn");
