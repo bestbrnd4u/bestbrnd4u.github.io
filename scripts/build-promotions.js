@@ -70,6 +70,7 @@ function main() {
             text: data.text || "",
             badge: data.badge || "",
             image: data.image,
+            imageMobile: data.imageMobile || "",
             buttonText: data.buttonText || "Дивитись усі товари",
             link: data.link,
             brand: data.brand || "",

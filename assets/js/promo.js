@@ -112,8 +112,10 @@ function renderPromoHero(promo) {
     const linkEl = document.getElementById("promoHeroLink");
     const linkTextEl = document.getElementById("promoHeroLinkText");
 
-    banner.style.backgroundImage =
-        `linear-gradient(rgba(17,24,39,.55), rgba(17,24,39,.55)), url('${promo.image}')`;
+    const overlay = "linear-gradient(rgba(17,24,39,.55), rgba(17,24,39,.55))";
+
+    banner.style.setProperty("--banner-img-desktop", `${overlay}, url('${promo.image}')`);
+    banner.style.setProperty("--banner-img-mobile", `${overlay}, url('${promo.imageMobile || promo.image}')`);
 
     if (promo.badge) {
         badgeEl.textContent = promo.badge;

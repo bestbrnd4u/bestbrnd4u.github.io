@@ -7095,15 +7095,25 @@ body.mobile-filters-open .scroll-top{
     padding:70px 60px;
     color:#fff;
     background-color:#111827;
-    /* contain, а не cover — з cover частина картинки, яку
-       завантажили в акцію, обрізалась по краях (висота банера
-       залежить від тексту всередині, а не від пропорцій фото).
-       min-height додає банеру простір, щоб фото не виглядало
-       крихітним посередині, коли тексту акції мало */
-    background-size:contain;
+    /* cover, щоб не було сірих/порожніх полів по краях банера.
+       Було contain — але тоді фото, завантажене в акцію, показувалось
+       цілком і залишало порожні поля, якщо його пропорції не збігались
+       з пропорціями банера. Тепер фото завжди заповнює банер повністю;
+       щоб при цьому на мобільному та десктопі не обрізало по-різному
+       важливі деталі/текст на фото, можна завантажити в акції окреме,
+       вертикальніше фото спеціально під мобільні екрани (--banner-img-mobile
+       нижче) — інакше на вузьких екранах просто обрізається те саме фото */
+    background-image:var(--banner-img-mobile);
+    background-size:cover;
     background-position:center;
     background-repeat:no-repeat;
     min-height:420px;
+}
+
+@media(min-width:769px){
+    .promo-hero-banner{
+        background-image:var(--banner-img-desktop);
+    }
 }
 
 .promo-hero-content{
