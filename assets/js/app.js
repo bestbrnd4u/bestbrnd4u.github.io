@@ -712,6 +712,7 @@ async function initCollections() {
 
         section.querySelectorAll(".collection-widget").forEach(setupCollectionPagination);
 
+        if (typeof initProductCarousels === "function") initProductCarousels(section);
         if (typeof updateFavoriteButtons === "function") updateFavoriteButtons();
 
     } catch (error) {
@@ -760,8 +761,8 @@ function renderCollectionWidget(collection, items) {
 
                     </div>
 
-                    <div class="collection-products-row">
-                        ${items.map(product => createCollectionProductCard(product)).join("")}
+                    <div class="collection-products-row products-grid">
+                        ${items.map(product => createProductCard(product)).join("")}
                     </div>
 
                 </div>
@@ -828,7 +829,7 @@ function setupCollectionPagination(widget) {
     const pageSize = Number(widget.dataset.pageSize) || 3;
     const pageCount = Number(widget.dataset.pageCount) || 1;
 
-    const cards = [...widget.querySelectorAll(".collection-product")];
+    const cards = [...widget.querySelectorAll(".product-card")];
     const prevBtn = widget.querySelector(".collection-prev");
     const nextBtn = widget.querySelector(".collection-next");
     const indicator = widget.querySelector(".collection-page-current");

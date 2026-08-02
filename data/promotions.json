@@ -1,63 +1,9 @@
 [
   {
-    "slug": "#U0431#U0456#U043b#U044c#U0448#U0435-#U0441#U0442#U0438#U043b#U044e-#U0434#U043b#U044f-#U044f#U0441#U043a#U0440#U0430#U0432#U043e#U0433#U043e-#U043b#U0456#U0442#U0430",
-    "title": "Більше стилю для яскравого літа",
-    "text": "Guess, Michael Kors, Calvin Klein, Tommy Hilfiger, Furla та інші бренди зі знижками до -20%",
-    "badge": "-20%",
-    "image": "/assets/images/products/uploads/485d0e230d97266f0bf4e4744df2.webp",
-    "imageMobile": "",
-    "buttonText": "Дивитись усі товари",
-    "link": "catalog?section=sale",
-    "brand": "",
-    "discountPercent": 50,
-    "productIds": [
-      10,
-      5
-    ],
-    "genderButtons": [],
-    "displayType": "hero_slider",
-    "order": 1
-  },
-  {
     "slug": "20260801205300",
     "title": "Більше стилю для яскравого літа",
     "text": "Guess, Michael Kors, Calvin Klein, Tommy Hilfiger, Furla та інші бренди зі знижками до -21%",
     "badge": "-21%",
-    "image": "/assets/images/products/uploads/485d0e230d97266f0bf4e4744df2.webp",
-    "imageMobile": "",
-    "buttonText": "Дивитись усі товари",
-    "link": "catalog?section=sale",
-    "brand": "",
-    "discountPercent": 50,
-    "productIds": [
-      10,
-      5
-    ],
-    "genderButtons": [],
-    "displayType": "hero_slider",
-    "order": 1
-  },
-  {
-    "slug": "summer-hero-demo",
-    "title": "Більше стилю для яскравого літа",
-    "text": "Guess, Michael Kors, Calvin Klein, Tommy Hilfiger, Furla та інші бренди зі знижками до -50%",
-    "badge": "-50%",
-    "image": "/assets/images/products/uploads/c818d5ef404ee0a9cc6da6cb3732.png",
-    "imageMobile": "",
-    "buttonText": "Дивитись усі товари",
-    "link": "catalog?section=sale",
-    "brand": "",
-    "discountPercent": 50,
-    "productIds": [],
-    "genderButtons": [],
-    "displayType": "hero_slider",
-    "order": 1
-  },
-  {
-    "slug": "більше-стилю-для-яскравого-літа",
-    "title": "Більше стилю для яскравого літа",
-    "text": "Guess, Michael Kors, Calvin Klein, Tommy Hilfiger, Furla та інші бренди зі знижками до -20%",
-    "badge": "-20%",
     "image": "/assets/images/products/uploads/485d0e230d97266f0bf4e4744df2.webp",
     "imageMobile": "",
     "buttonText": "Дивитись усі товари",
