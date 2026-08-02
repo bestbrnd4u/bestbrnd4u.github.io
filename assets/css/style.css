@@ -1292,10 +1292,14 @@ nav li.has-mega:hover .mega-menu{
     opacity:1;
     pointer-events:auto;
 }
+
+.product-card:hover .photo-nav:disabled{
+    opacity:.35;
+    pointer-events:none;
+}
 }
 
 .photo-nav:disabled{
-    opacity:.35 !important;
     cursor:default;
     pointer-events:none;
 }
