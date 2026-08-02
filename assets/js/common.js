@@ -1055,6 +1055,63 @@ const mobileMenuBtn = (() => {
 
 })();
 
+// -------------------------
+// Мобільний хедер: гамбургер + пошук + лого одним кластером
+// ліворуч, обране/кошик — праворуч (обліковий запис на
+// мобільному ховається через CSS, див. style.css). На десктопі
+// лишаємо все як було раніше — переносимо елементи лише в межах
+// того самого брейкпоинту, на якому й так ховається <nav>.
+// -------------------------
+
+(() => {
+
+    const headerRow = document.querySelector("header .header");
+    const logo = headerRow?.querySelector(".logo");
+    const headerIcons = document.querySelector(".header-icons");
+
+    if (!headerRow || !logo || !headerIcons) return;
+
+    const mobileQuery = window.matchMedia("(max-width:768px)");
+
+    function applyLayout(isMobile) {
+
+        let headerLeft = document.querySelector(".header-left");
+
+        if (isMobile) {
+
+            if (headerLeft) return; // вже перебудовано
+
+            headerLeft = document.createElement("div");
+            headerLeft.className = "header-left";
+
+            headerRow.insertBefore(headerLeft, logo);
+
+            if (mobileMenuBtn) headerLeft.appendChild(mobileMenuBtn);
+            if (searchBtn) headerLeft.appendChild(searchBtn);
+
+            headerLeft.appendChild(logo);
+
+        } else {
+
+            if (!headerLeft) return; // і так у десктопному вигляді
+
+            headerRow.insertBefore(logo, headerLeft);
+
+            if (searchBtn) headerIcons.prepend(searchBtn);
+            if (mobileMenuBtn) headerIcons.prepend(mobileMenuBtn);
+
+            headerLeft.remove();
+
+        }
+
+    }
+
+    applyLayout(mobileQuery.matches);
+
+    mobileQuery.addEventListener("change", event => applyLayout(event.matches));
+
+})();
+
 function buildMobileNav() {
 
     const backdrop = document.createElement("div");
@@ -1075,6 +1132,7 @@ function buildMobileNav() {
             <li><a href="catalog?section=sale" class="sale-text">Акції</a></li>
             <li><a href="bayer-service">Байєр-сервіс</a></li>
             <li><a href="contacts">Контакти</a></li>
+            <li><a href="account">Особистий кабінет</a></li>
         </ul>
     `;
 
