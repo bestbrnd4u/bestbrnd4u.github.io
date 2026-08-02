@@ -142,10 +142,6 @@ function renderPromoHero(promo) {
 
 function setupPromoCatalog(promo, allProducts, categoryDepartments) {
 
-    // без цього виклику фільтр за статтю в URL (?gender=...) ігнорувався б:
-    // saveGenderFilter/selectedGenders в catalog.js заповнюються лише тут
-    readUrlState();
-
     const productIds = new Set(promo.productIds || []);
 
     let curated = allProducts.filter(product =>

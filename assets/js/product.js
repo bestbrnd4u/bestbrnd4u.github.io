@@ -772,7 +772,6 @@ function setupGallery() {
         let startX = 0;
         let startY = 0;
         let startScrollLeft = 0;
-        let startTime = 0;
         let axis = null; // null поки не визначено, "x" або "y"
 
         track.addEventListener("touchstart", event => {
@@ -780,7 +779,6 @@ function setupGallery() {
             startX = event.touches[0].clientX;
             startY = event.touches[0].clientY;
             startScrollLeft = track.scrollLeft;
-            startTime = Date.now();
             axis = null;
 
         }, { passive: true });
@@ -821,29 +819,9 @@ function setupGallery() {
 
             if (axis !== "x") return;
 
-            const width = track.clientWidth || 1;
-            const baseIndex = Math.round(startScrollLeft / width);
+            const index = Math.round(track.scrollLeft / (track.clientWidth || 1));
 
-            // фактичний зсув треку (додатній — свайп вліво, до наступного фото)
-            const dx = track.scrollLeft - startScrollLeft;
-            const elapsed = Math.max(Date.now() - startTime, 1);
-            const velocity = Math.abs(dx) / elapsed; // px/мс
-
-            // легкий свайп: досить невеликої відстані (12% ширини)
-            // АБО швидкого короткого флiку — не треба тягнути картинку
-            // до половини екрана, щоб вона перемкнулась
-            const distanceThreshold = width * 0.12;
-            const velocityThreshold = 0.3;
-
-            let index = baseIndex;
-
-            if (Math.abs(dx) > distanceThreshold || velocity > velocityThreshold) {
-                index = baseIndex + (dx > 0 ? 1 : -1);
-            }
-
-            index = Math.max(0, Math.min(index, track.children.length - 1));
-
-            track.scrollTo({ left: index * width, behavior: "smooth" });
+            track.scrollTo({ left: index * track.clientWidth, behavior: "smooth" });
 
             // повертаємо snap назад вже після того, як доїхали
             setTimeout(() => { track.style.scrollSnapType = ""; }, 400);

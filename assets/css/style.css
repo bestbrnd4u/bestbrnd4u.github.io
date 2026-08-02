@@ -498,48 +498,16 @@ nav li.has-mega:hover .mega-menu{
 }
 }
 
-.header-left{
-    display:flex;
-    align-items:center;
-    gap:14px;
-}
-
-.header-left button{
-    position:relative;
-    width:46px;
-    height:46px;
-    border-radius:50%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:white;
-    box-shadow:var(--shadow-sm);
-    transition:.3s;
-    font-size:20px;
-    flex-shrink:0;
-}
-
-@media (hover:hover) and (pointer:fine){
-.header-left button:hover{
-    background:var(--secondary);
-    color:white;
-    transform:translateY(-3px);
-}
-}
-
 /* -- кнопка мобільного меню (гамбургер) --
    сама кнопка з'являється лише на вузьких екранах, див.
-   @media(max-width:768px) нижче — тут лише базовий вигляд,
-   спільний з іншими іконками хедера. Селектор навмисно з двох
-   класів (.header-icons/.header-left .mobile-menu-btn), а не
-   одного — інакше .header-icons button{display:flex} (вище)
-   переважає за специфічністю, і кнопка лізла б навіть на
-   десктопі. Два варіанти селектора — бо на мобільному JS
-   переносить кнопку з .header-icons в .header-left (див.
-   common.js), а на десктопі вона повертається назад */
+   .header-icons .mobile-menu-btn{display:flex} у
+   @media(max-width:768px) — тут лише базовий вигляд, спільний
+   з іншими іконками хедера. Селектор навмисно з двох класів
+   (.header-icons .mobile-menu-btn), а не одного — інакше
+   .header-icons button{display:flex} (вище) переважає за
+   специфічністю, і кнопка лізла б навіть на десктопі */
 
-.header-icons .mobile-menu-btn,
-.header-left .mobile-menu-btn{
+.header-icons .mobile-menu-btn{
     display:none;
     flex-direction:column;
     align-items:center;
@@ -1208,12 +1176,18 @@ nav li.has-mega:hover .mega-menu{
 
 .product-image{
     position:relative;
+    overflow:hidden;
+    aspect-ratio:4/5;
+    height:auto;
+    background:var(--gray50);
+    padding:16px;
+    box-sizing:border-box;
 }
 
 .product-image img{
     width:100%;
     height:100%;
-    object-fit:cover;
+    object-fit:contain;
     object-position:center;
     transition:.45s;
 }
@@ -1227,9 +1201,7 @@ nav li.has-mega:hover .mega-menu{
 .product-carousel{
     position:relative;
     width:100%;
-    aspect-ratio:4/5;
-    overflow:hidden;
-    background:var(--gray50);
+    height:100%;
 }
 
 .photo-track{
@@ -1361,28 +1333,28 @@ nav li.has-mega:hover .mega-menu{
 }
 
 .badge-preorder{
-    display:none;
-    align-items:center;
-    gap:5px;
+    position:absolute;
+    top:60px;
+    bottom:18px;
+    right:18px;
+    left:auto;
+    width:30px;
     background:#b45309;
-}
-
-@media(max-width:768px){
-
-    .badge-preorder{
-        display:flex;
-        width:34px;
-        height:34px;
-        padding:0;
-        justify-content:center;
-        border-radius:50%;
-        font-size:15px;
-    }
-
-    .badge-preorder-text{
-        display:none;
-    }
-
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    writing-mode:vertical-rl;
+    transform:rotate(180deg);
+    border-radius:10px;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.5px;
+    line-height:1.3;
+    padding:12px 0;
+    z-index:2;
+    box-shadow:var(--shadow-sm);
 }
 
 /* -- кнопка "в избранное" (иконка-сердце) --
@@ -1452,69 +1424,6 @@ nav li.has-mega:hover .mega-menu{
     z-index:2;
 }
 
-/* -- панель кольору/розміру/кнопки, що з'являється поверх фото
-      лише при наведенні (десктопна сітка каталогу й каруселі) --
-      За замовчуванням (мобільний, список) прихована — там працює
-      звичайний блок нижче фото, як і раніше. */
-
-.product-hover-panel{
-    display:none;
-}
-
-@media (hover:hover) and (pointer:fine){
-
-    .products-grid:not(.list-view) .product-hover-panel{
-        display:flex;
-        flex-direction:column;
-        align-items:flex-start;
-        gap:10px;
-        position:absolute;
-        left:10px;
-        right:10px;
-        bottom:10px;
-        z-index:4;
-        padding:14px;
-        border-radius:16px;
-        background:linear-gradient(to top, rgba(17,24,39,.88) 0%, rgba(17,24,39,.55) 65%, rgba(17,24,39,0) 100%);
-        opacity:0;
-        transform:translateY(10px);
-        pointer-events:none;
-        transition:.25s;
-    }
-
-    .products-grid:not(.list-view) .product-card:hover .product-hover-panel{
-        opacity:1;
-        transform:translateY(0);
-        pointer-events:auto;
-    }
-
-    .product-hover-panel .product-options{
-        display:flex;
-        align-items:center;
-        gap:14px;
-        margin-bottom:0;
-    }
-
-    .product-hover-panel .discount{
-        align-self:flex-start;
-    }
-
-    .product-hover-panel .buy-btn{
-        height:42px;
-        font-size:14px;
-    }
-
-    /* оригінальний блок (колір/розмір/ціна-знижка/кнопка) під фото —
-       у цьому режимі дублюється панеллю вище, тож ховаємо його, щоб
-       не показувати двічі */
-    .products-grid:not(.list-view) .product-card .product-meta-row .product-options,
-    .products-grid:not(.list-view) .product-card .price-meta .discount,
-    .products-grid:not(.list-view) .product-card > .product-info > .buy-btn{
-        display:none;
-    }
-
-}
-
 /* -- текстовая часть карточки -- */
 
 .product-card .product-info{
@@ -1524,14 +1433,6 @@ nav li.has-mega:hover .mega-menu{
     padding:18px 20px 20px;
 }
 
-.product-category-row{
-    display:flex;
-    align-items:center;
-    flex-wrap:wrap;
-    gap:8px;
-    margin-bottom:6px;
-}
-
 .product-category{
     display:inline-block;
     color:var(--gray700);
@@ -1539,42 +1440,7 @@ nav li.has-mega:hover .mega-menu{
     font-weight:700;
     text-transform:uppercase;
     letter-spacing:1px;
-}
-
-.preorder-inline,
-.preorder-row{
-    display:none;
-}
-
-@media(min-width:769px){
-
-    .preorder-inline,
-    .preorder-row{
-        align-items:center;
-        gap:5px;
-        padding:3px 10px;
-        border-radius:50px;
-        background:rgba(180,83,9,.12);
-        color:#b45309;
-        font-size:11px;
-        font-weight:700;
-        letter-spacing:.3px;
-        white-space:nowrap;
-    }
-
-    /* сітка (не список) — тег поруч з брендом */
-    .products-grid:not(.list-view) .preorder-inline{
-        display:inline-flex;
-    }
-
-    /* список — власним рядком під розмір/колір, перед кнопкою */
-    .products-grid.list-view .preorder-row{
-        display:inline-flex;
-        width:fit-content;
-        padding:6px 14px;
-        font-size:12px;
-    }
-
+    margin-bottom:6px;
 }
 
 .preorder-tag{
@@ -2210,26 +2076,15 @@ footer{
     }
 }
 
-.promo-hero-stage{
-    position:relative;
-}
-
 .promo-hero-controls{
     display:flex;
     align-items:center;
     justify-content:center;
     gap:20px;
-    margin-top:22px;
-}
-
-.promo-hero-controls[hidden]{
-    display:none;
+    margin-top:14px;
 }
 
 .promo-hero-arrow{
-    display:flex;
-    align-items:center;
-    justify-content:center;
     width:44px;
     height:44px;
     flex-shrink:0;
@@ -2238,10 +2093,6 @@ footer{
     box-shadow:0 6px 20px rgba(0,0,0,.1);
     font-size:16px;
     transition:.2s;
-}
-
-.promo-hero-arrow[hidden]{
-    display:none;
 }
 
 @media (hover:hover) and (pointer:fine){
@@ -3249,13 +3100,8 @@ body.mobile-filters-open .scroll-top{
             "cat cat"
             "title title"
             "meta desc"
-            "preorder preorder"
             "buy buy";
         column-gap:40px;
-    }
-
-    .products-grid.list-view .preorder-row{
-        grid-area:preorder;
     }
 
     .products-grid.list-view .product-category{
@@ -5484,8 +5330,9 @@ body.mobile-filters-open .scroll-top{
         gap:14px;
     }
 
-    #catalogGrid.products-grid:not(.list-view) .product-carousel{
+    #catalogGrid.products-grid:not(.list-view) .product-image{
         aspect-ratio:1/1;
+        padding:10px;
     }
 
     #catalogGrid.products-grid:not(.list-view) .badge{
@@ -5616,15 +5463,8 @@ body.mobile-filters-open .scroll-top{
         display:none;
     }
 
-    .header-icons .mobile-menu-btn,
-    .header-left .mobile-menu-btn{
+    .header-icons .mobile-menu-btn{
         display:flex;
-    }
-
-    /* акаунт на мобільному ховаємо — на вузькому екрані місце
-       у хедері обмежене, а увійти можна й з мобільного меню */
-    #accountLink{
-        display:none;
     }
 
     .checkout-fields{
@@ -5661,23 +5501,6 @@ body.mobile-filters-open .scroll-top{
 
     .container{
         padding:0 20px;
-    }
-
-    /* повний розмір лого (34px + letter-spacing 4px) разом з
-       гамбургером/пошуком зліва і обраним/кошиком справа не
-       влазить у вузький екран — звужуємо саме лого, іконки
-       мають фіксований розмір і їх звужувати нема куди */
-    .logo{
-        font-size:20px;
-        letter-spacing:1px;
-    }
-
-    .header-left{
-        gap:10px;
-    }
-
-    .header-icons{
-        gap:10px;
     }
 
     .hero h1{

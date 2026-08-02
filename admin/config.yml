@@ -24,6 +24,34 @@ collections:
         file: "data/home.json"
         description: "Вміст головної сторінки сайту (index.html) — заголовок, банери, категорії, бренди, переваги. Розділ «Популярні товари» сюди не входить — він завжди підтягується автоматично з каталогу."
         fields:
+          - label: "Порядок блоків на головній"
+            name: "sectionsOrder"
+            widget: "list"
+            required: false
+            summary: "{{fields.section}}"
+            hint: >
+              Перетягніть рядки (за іконку зліва), щоб змінити порядок
+              блоків на головній сторінці. Головний банер зверху і форма
+              підписки внизу порядком не керуються — вони завжди перший і
+              останній. Якщо якийсь блок прибрати з цього списку — він не
+              зникне із сайту, а лишиться на своєму місці за замовчуванням.
+            field:
+              label: "Блок"
+              name: "section"
+              widget: "select"
+              options:
+                - { label: "Слайдер акцій (якщо увімкнений)", value: "promo-hero-slider" }
+                - { label: "Instagram", value: "instagram" }
+                - { label: "Популярні категорії", value: "categories" }
+                - { label: "Акції (маленькі картки)", value: "promotions" }
+                - { label: "Банер акції на всю ширину + товари", value: "brand-campaigns" }
+                - { label: "Компактні банери брендів", value: "brand-teasers" }
+                - { label: "Колекції", value: "collections" }
+                - { label: "Промо-банер", value: "promo-banner" }
+                - { label: "Бренди", value: "brands" }
+                - { label: "Популярні товари", value: "popular-products" }
+                - { label: "Переваги магазину", value: "advantages" }
+
           - label: "Головний банер (hero)"
             name: "hero"
             widget: "object"
@@ -232,7 +260,6 @@ collections:
     identifier_field: "title"
     summary: "{{title}}"
     sortable_fields: ["order", "title"]
-    slug: "{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}"
     fields:
       - label: "Показувати на сайті"
         name: "active"
@@ -324,33 +351,6 @@ collections:
           Наприклад: 30. Показується як позначка на товарах з цієї акції,
           якщо в самого товару не вказана своя ціна зі знижкою.
 
-      - label: "Кнопки розділів під банером (лише для «Слайдер на всю ширину»)"
-        name: "genderButtons"
-        widget: "list"
-        required: false
-        summary: "{{fields.gender}}"
-        hint: >
-          Кнопки-шорткати під заголовком банера (як "Жінкам"/"Чоловікам"/
-          "Дітям" на md-fashion.ua) — стосується лише "Слайдер на всю
-          ширину сторінки" вище. Порядок у списку = порядок кнопок на
-          сайті (перетягуйте, щоб поміняти місцями). Можна прибрати
-          будь-яку кнопку, додати кілька разів "Унісекс" або залишити
-          список порожнім — тоді покажуться стандартні "Жінкам/Чоловікам/
-          Дітям". Кожна кнопка веде на сторінку саме цієї акції,
-          відфільтровану під обрану стать.
-        fields:
-          - label: "Розділ"
-            name: "gender"
-            widget: "select"
-            options: ["Жінкам", "Чоловікам", "Дітям", "Унісекс"]
-
-          - label: "Колір кнопки"
-            name: "color"
-            widget: "color"
-            required: false
-            default: "#111827"
-            hint: "Не обов'язково — за замовчуванням темний, як зараз"
-
       - label: "Товари цієї акції"
         name: "products"
         widget: "relation"
@@ -380,7 +380,6 @@ collections:
     identifier_field: "title"
     summary: "{{title}}"
     sortable_fields: ["order", "title"]
-    slug: "{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}"
     fields:
       - label: "Показувати на сайті"
         name: "active"
