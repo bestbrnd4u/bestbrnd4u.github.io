@@ -71,8 +71,6 @@ async function initHomeContent() {
         renderBrands(data.brands);
         renderAdvantages(data.advantages);
 
-        applyHomeSectionsOrder(data.sectionsOrder);
-
     } catch (error) {
 
         // Якщо не вдалося завантажити — просто лишаємо
@@ -80,44 +78,6 @@ async function initHomeContent() {
         console.error(error);
 
     }
-
-}
-
-// -------------------------
-// Порядок блоків на головній — редагується в адмінці
-// (перетягуванням у списку), тут лише фізично переставляємо
-// DOM-секції в потрібній послідовності. Hero (перший) і
-// форма підписки (останній) порядком не керуються — це
-// природні "рамки" сторінки.
-//
-// Якщо список порожній/не заданий — нічого не робимо і
-// секції лишаються в тому порядку, що й у самому HTML.
-// -------------------------
-
-function applyHomeSectionsOrder(order) {
-
-    if (!Array.isArray(order) || !order.length) return;
-
-    const seen = new Set();
-
-    order.forEach(item => {
-
-        const key = typeof item === "string" ? item : item?.section;
-
-        if (!key || seen.has(key)) return;
-
-        seen.add(key);
-
-        const section = document.querySelector(`[data-section="${key}"]`);
-
-        if (!section) return;
-
-        // якщо цей блок ще прихований службовим hidden — не займаємо
-        // йому місце "пусткою": просто переносимо, приховане так і
-        // лишиться прихованим до того, як власний рендер його покаже
-        section.parentNode.insertBefore(section, document.querySelector(".newsletter"));
-
-    });
 
 }
 
@@ -439,9 +399,19 @@ function renderHeroSliderPromotions(heroPromotions) {
 
     track.innerHTML = heroPromotions.map(promo => {
 
-        const baseLink = promo.link || "catalog";
-        const linkWithGender = gender =>
-            `${baseLink}${baseLink.includes("?") ? "&" : "?"}gender=${encodeURIComponent(gender)}`;
+        const promoLink = `promo?id=${encodeURIComponent(promo.slug)}`;
+
+        const genderButtons = Array.isArray(promo.genderButtons) && promo.genderButtons.length
+            ? promo.genderButtons
+            : [
+                { gender: "Жінкам", color: "#111827" },
+                { gender: "Чоловікам", color: "#111827" },
+                { gender: "Дітям", color: "#111827" }
+            ];
+
+        const quicklinksHtml = genderButtons.map(btn => `
+            <a href="${promoLink}&gender=${encodeURIComponent(btn.gender)}" style="background:${btn.color || "#111827"}">${btn.gender}</a>
+        `).join("");
 
         return `
         <div class="promo-hero-slide">
@@ -454,19 +424,15 @@ function renderHeroSliderPromotions(heroPromotions) {
 
                 ${promo.text ? `<p>${promo.text}</p>` : ""}
 
-                <div class="promo-hero-quicklinks">
-                    <a href="${linkWithGender("Жінкам")}">Жінкам</a>
-                    <a href="${linkWithGender("Чоловікам")}">Чоловікам</a>
-                    <a href="${linkWithGender("Дітям")}">Дітям</a>
-                </div>
+                ${genderButtons.length ? `<div class="promo-hero-quicklinks">${quicklinksHtml}</div>` : ""}
 
-                <a href="promo?id=${encodeURIComponent(promo.slug)}" class="btn promo-hero-cta">
+                <a href="${promoLink}" class="btn promo-hero-cta">
                     ${promo.buttonText || "Дивитись усі товари"} →
                 </a>
 
             </div>
 
-            <a href="promo?id=${encodeURIComponent(promo.slug)}" class="promo-hero-slide-image">
+            <a href="${promoLink}" class="promo-hero-slide-image">
                 <img
                     src="${promo.image}"
                     alt="${promo.title}"
@@ -489,6 +455,8 @@ function renderHeroSliderPromotions(heroPromotions) {
 function setupPromoHeroSlider({ track, total, prevBtn, nextBtn, counterEl, controls }) {
 
     if (controls) controls.hidden = total <= 1;
+    if (prevBtn) prevBtn.hidden = total <= 1;
+    if (nextBtn) nextBtn.hidden = total <= 1;
 
     if (total <= 1) return;
 
@@ -601,12 +569,6 @@ async function renderFeaturedPromotions(featuredPromotions) {
 
                     <div class="brand-campaign-products">
                         ${curated.map(product => createProductCard(product)).join("")}
-                    </div>
-
-                    <div class="brand-campaign-more">
-                        <a href="promo?id=${encodeURIComponent(promo.slug)}" class="btn btn-outline">
-                            ${promo.buttonText || "Дивитись усі товари"}
-                        </a>
                     </div>
 
                     ` : ""}

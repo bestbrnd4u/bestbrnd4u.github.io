@@ -189,6 +189,7 @@ function bindProductCarousel(track) {
     let startX = 0;
     let startY = 0;
     let startScrollLeft = 0;
+    let startTime = 0;
     let axis = null; // null поки не визначено, "x" або "y"
     let isSwiping = false;
 
@@ -197,6 +198,7 @@ function bindProductCarousel(track) {
         startX = event.touches[0].clientX;
         startY = event.touches[0].clientY;
         startScrollLeft = track.scrollLeft;
+        startTime = Date.now();
         axis = null;
         isSwiping = false;
 
@@ -240,9 +242,25 @@ function bindProductCarousel(track) {
 
         if (axis !== "x") return;
 
-        const index = Math.round(track.scrollLeft / (track.clientWidth || 1));
+        const width = track.clientWidth || 1;
+        const baseIndex = Math.round(startScrollLeft / width);
 
-        track.scrollTo({ left: index * track.clientWidth, behavior: "smooth" });
+        const dx = track.scrollLeft - startScrollLeft;
+        const elapsed = Math.max(Date.now() - startTime, 1);
+        const velocity = Math.abs(dx) / elapsed;
+
+        const distanceThreshold = width * 0.12;
+        const velocityThreshold = 0.3;
+
+        let index = baseIndex;
+
+        if (Math.abs(dx) > distanceThreshold || velocity > velocityThreshold) {
+            index = baseIndex + (dx > 0 ? 1 : -1);
+        }
+
+        index = Math.max(0, Math.min(index, track.children.length - 1));
+
+        track.scrollTo({ left: index * width, behavior: "smooth" });
 
         // повертаємо snap назад вже після того, як доїхали —
         // невелика затримка під тривалість smooth-скролу
@@ -330,7 +348,7 @@ function createProductCard(product) {
     `).join("");
 
     const preOrderBadge = product.preOrder
-        ? `<div class="badge badge-preorder">📦 Під замовлення</div>`
+        ? `<div class="badge badge-preorder"><span class="badge-preorder-icon">📦</span><span class="badge-preorder-text">Під замовлення</span></div>`
         : "";
 
     return `
@@ -338,8 +356,8 @@ function createProductCard(product) {
             <div class="product-image">
                 <div class="badge-stack">
                     ${badge}
+                    ${preOrderBadge}
                 </div>
-                ${preOrderBadge}
                 <button
                     class="favorite"
                     data-id="${product.id}"
@@ -366,10 +384,35 @@ function createProductCard(product) {
                         ${images.map((_, index) => `<span class="photo-dot ${index === 0 ? "active" : ""}"></span>`).join("")}
                     </div>` : ""}
                 </div>
+
+                <!-- З'являється лише при наведенні на десктопі (сітка
+                     каталогу/карусель) — дублює колір/розмір/кнопку
+                     нижче, щоб фото картки лишалось чистим за
+                     замовчуванням. На мобільному й у режимі "список"
+                     не показується — там працює звичайний блок нижче. -->
+                <div class="product-hover-panel">
+                    ${discount > 0 ? `<span class="discount">-${discount}%</span>` : ""}
+                    <div class="product-options">
+                        <div class="product-colors">
+                            ${colorButtons}
+                        </div>
+                        <div class="product-sizes">
+                            ${sizeButtons}
+                        </div>
+                    </div>
+                    <button
+                        class="btn buy-btn"
+                        data-id="${product.id}">
+                        ${product.preOrder ? "Замовити" : "Купити"}
+                    </button>
+                </div>
             </div>
             <div class="product-info">
-                <div class="product-category">
-                    ${brand}
+                <div class="product-category-row">
+                    <div class="product-category">
+                        ${brand}
+                    </div>
+                    ${product.preOrder ? `<span class="preorder-inline">📦 Під замовлення</span>` : ""}
                 </div>
                 <div class="product-title">
                     ${product.title}
@@ -398,6 +441,7 @@ function createProductCard(product) {
                     </div>
                 </div>
                 ${product.description ? `<div class="product-desc">${product.description}</div>` : ""}
+                ${product.preOrder ? `<div class="preorder-row">📦 Під замовлення</div>` : ""}
                 <button
                     class="btn buy-btn"
                     data-id="${product.id}">

@@ -53,6 +53,17 @@ function main() {
 
         }
 
+        const validGenders = ["Жінкам", "Чоловікам", "Дітям", "Унісекс"];
+
+        const genderButtons = Array.isArray(data.genderButtons)
+            ? data.genderButtons
+                .filter(btn => btn && validGenders.includes(btn.gender))
+                .map(btn => ({
+                    gender: btn.gender,
+                    color: typeof btn.color === "string" && btn.color ? btn.color : "#111827"
+                }))
+            : [];
+
         promotions.push({
             slug,
             title: data.title,
@@ -64,6 +75,7 @@ function main() {
             brand: data.brand || "",
             discountPercent: typeof data.discountPercent === "number" ? data.discountPercent : null,
             productIds: Array.isArray(data.products) ? data.products.map(Number) : [],
+            genderButtons,
             displayType: ["card", "hero_slider", "banner_products", "banner_compact"].includes(data.displayType)
                 ? data.displayType
                 : "card",

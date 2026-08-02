@@ -1055,6 +1055,63 @@ const mobileMenuBtn = (() => {
 
 })();
 
+// -------------------------
+// Мобільний хедер: гамбургер + пошук + лого одним кластером
+// ліворуч, обране/кошик — праворуч (обліковий запис на
+// мобільному ховається через CSS, див. style.css). На десктопі
+// лишаємо все як було раніше — переносимо елементи лише в межах
+// того самого брейкпоинту, на якому й так ховається <nav>.
+// -------------------------
+
+(() => {
+
+    const headerRow = document.querySelector("header .header");
+    const logo = headerRow?.querySelector(".logo");
+    const headerIcons = document.querySelector(".header-icons");
+
+    if (!headerRow || !logo || !headerIcons) return;
+
+    const mobileQuery = window.matchMedia("(max-width:768px)");
+
+    function applyLayout(isMobile) {
+
+        let headerLeft = document.querySelector(".header-left");
+
+        if (isMobile) {
+
+            if (headerLeft) return; // вже перебудовано
+
+            headerLeft = document.createElement("div");
+            headerLeft.className = "header-left";
+
+            headerRow.insertBefore(headerLeft, logo);
+
+            if (mobileMenuBtn) headerLeft.appendChild(mobileMenuBtn);
+            if (searchBtn) headerLeft.appendChild(searchBtn);
+
+            headerLeft.appendChild(logo);
+
+        } else {
+
+            if (!headerLeft) return; // і так у десктопному вигляді
+
+            headerRow.insertBefore(logo, headerLeft);
+
+            if (searchBtn) headerIcons.prepend(searchBtn);
+            if (mobileMenuBtn) headerIcons.prepend(mobileMenuBtn);
+
+            headerLeft.remove();
+
+        }
+
+    }
+
+    applyLayout(mobileQuery.matches);
+
+    mobileQuery.addEventListener("change", event => applyLayout(event.matches));
+
+})();
+
 function buildMobileNav() {
 
     const backdrop = document.createElement("div");
@@ -1075,6 +1132,7 @@ function buildMobileNav() {
             <li><a href="catalog?section=sale" class="sale-text">Акції</a></li>
             <li><a href="bayer-service">Байєр-сервіс</a></li>
             <li><a href="contacts">Контакти</a></li>
+            <li><a href="account">Особистий кабінет</a></li>
         </ul>
     `;
 
@@ -1345,11 +1403,29 @@ document.addEventListener("click", event => {
 
     if (colorBtn) {
 
-        const group = colorBtn.closest(".product-colors, .color-options");
+        // картка каталогу (.product-card) може мати два набори свотчів
+        // (звичайний під фото + дублікат у hover-панелі поверх фото на
+        // десктопі) — синхронізуємо їх за кольором у межах ЦІЄЇ картки.
+        // Поза каталожною карткою (сторінка товару, кошик, обране)
+        // свотчі й так одні — лишаємо стару вузьку синхронізацію в
+        // межах найближчої групи, щоб не чіпати сусідні незалежні картки
+        const cardScope = colorBtn.closest(".product-card");
 
-        group?.querySelectorAll(".mini-color, .color").forEach(b => b.classList.remove("active"));
+        if (cardScope) {
 
-        colorBtn.classList.add("active");
+            cardScope.querySelectorAll(".mini-color, .color").forEach(b => {
+                b.classList.toggle("active", b.dataset.color === colorBtn.dataset.color);
+            });
+
+        } else {
+
+            const group = colorBtn.closest(".product-colors, .color-options");
+
+            group?.querySelectorAll(".mini-color, .color").forEach(b => b.classList.remove("active"));
+
+            colorBtn.classList.add("active");
+
+        }
 
         // перемикаємо фото товару на фото цього кольору
         // (шукаємо картинку в межах картки каталогу, рядка
@@ -1455,11 +1531,27 @@ document.addEventListener("click", event => {
 
     if (sizeBtn) {
 
+        // та сама причина, що й для кольору вище: у картці каталогу
+        // тепер може бути два набори розмірів (звичайний +
+        // дублікат у hover-панелі) — синхронізуємо в межах картки
+        const cardScope = sizeBtn.closest(".product-card");
         const group = sizeBtn.closest(".product-sizes");
 
-        group?.querySelectorAll(".mini-size").forEach(b => b.classList.remove("active"));
+        if (cardScope) {
 
-        sizeBtn.classList.add("active");
+            const label = sizeBtn.textContent.trim();
+
+            cardScope.querySelectorAll(".mini-size").forEach(b => {
+                b.classList.toggle("active", b.textContent.trim() === label);
+            });
+
+        } else {
+
+            group?.querySelectorAll(".mini-size").forEach(b => b.classList.remove("active"));
+
+            sizeBtn.classList.add("active");
+
+        }
 
         updateFavoriteButtons();
 
