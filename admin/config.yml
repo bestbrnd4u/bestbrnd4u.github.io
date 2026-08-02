@@ -24,6 +24,34 @@ collections:
         file: "data/home.json"
         description: "Вміст головної сторінки сайту (index.html) — заголовок, банери, категорії, бренди, переваги. Розділ «Популярні товари» сюди не входить — він завжди підтягується автоматично з каталогу."
         fields:
+          - label: "Порядок блоків на головній"
+            name: "sectionsOrder"
+            widget: "list"
+            required: false
+            summary: "{{fields.section}}"
+            hint: >
+              Перетягніть рядки (за іконку зліва), щоб змінити порядок
+              блоків на головній сторінці. Головний банер зверху і форма
+              підписки внизу порядком не керуються — вони завжди перший і
+              останній. Якщо якийсь блок прибрати з цього списку — він не
+              зникне із сайту, а лишиться на своєму місці за замовчуванням.
+            field:
+              label: "Блок"
+              name: "section"
+              widget: "select"
+              options:
+                - { label: "Слайдер акцій (якщо увімкнений)", value: "promo-hero-slider" }
+                - { label: "Instagram", value: "instagram" }
+                - { label: "Популярні категорії", value: "categories" }
+                - { label: "Акції (маленькі картки)", value: "promotions" }
+                - { label: "Банер акції на всю ширину + товари", value: "brand-campaigns" }
+                - { label: "Компактні банери брендів", value: "brand-teasers" }
+                - { label: "Колекції", value: "collections" }
+                - { label: "Промо-банер", value: "promo-banner" }
+                - { label: "Бренди", value: "brands" }
+                - { label: "Популярні товари", value: "popular-products" }
+                - { label: "Переваги магазину", value: "advantages" }
+
           - label: "Головний банер (hero)"
             name: "hero"
             widget: "object"

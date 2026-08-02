@@ -71,6 +71,8 @@ async function initHomeContent() {
         renderBrands(data.brands);
         renderAdvantages(data.advantages);
 
+        applyHomeSectionsOrder(data.sectionsOrder);
+
     } catch (error) {
 
         // Якщо не вдалося завантажити — просто лишаємо
@@ -78,6 +80,44 @@ async function initHomeContent() {
         console.error(error);
 
     }
+
+}
+
+// -------------------------
+// Порядок блоків на головній — редагується в адмінці
+// (перетягуванням у списку), тут лише фізично переставляємо
+// DOM-секції в потрібній послідовності. Hero (перший) і
+// форма підписки (останній) порядком не керуються — це
+// природні "рамки" сторінки.
+//
+// Якщо список порожній/не заданий — нічого не робимо і
+// секції лишаються в тому порядку, що й у самому HTML.
+// -------------------------
+
+function applyHomeSectionsOrder(order) {
+
+    if (!Array.isArray(order) || !order.length) return;
+
+    const seen = new Set();
+
+    order.forEach(item => {
+
+        const key = typeof item === "string" ? item : item?.section;
+
+        if (!key || seen.has(key)) return;
+
+        seen.add(key);
+
+        const section = document.querySelector(`[data-section="${key}"]`);
+
+        if (!section) return;
+
+        // якщо цей блок ще прихований службовим hidden — не займаємо
+        // йому місце "пусткою": просто переносимо, приховане так і
+        // лишиться прихованим до того, як власний рендер його покаже
+        section.parentNode.insertBefore(section, document.querySelector(".newsletter"));
+
+    });
 
 }
 

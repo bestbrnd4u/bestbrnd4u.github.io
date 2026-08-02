@@ -98,5 +98,18 @@
       "title": "Повернення 14 днів",
       "text": "Без зайвих запитань"
     }
+  ],
+  "sectionsOrder": [
+    "promo-hero-slider",
+    "instagram",
+    "categories",
+    "promotions",
+    "brand-campaigns",
+    "brand-teasers",
+    "collections",
+    "promo-banner",
+    "brands",
+    "popular-products",
+    "advantages"
   ]
 }

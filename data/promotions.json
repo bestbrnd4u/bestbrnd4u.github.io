@@ -13,10 +13,7 @@
       10,
       5
     ],
-<<<<<<< HEAD
-=======
     "genderButtons": [],
->>>>>>> parent of 7797732 (admin)
     "displayType": "hero_slider",
     "order": 1
   },
@@ -50,23 +47,6 @@
       5
     ],
     "genderButtons": [],
-    "displayType": "hero_slider",
-    "order": 1
-  },
-  {
-    "slug": "більше-стилю-для-яскравого-літа",
-    "title": "Більше стилю для яскравого літа",
-    "text": "Guess, Michael Kors, Calvin Klein, Tommy Hilfiger, Furla та інші бренди зі знижками до -20%",
-    "badge": "-20%",
-    "image": "/assets/images/products/uploads/485d0e230d97266f0bf4e4744df2.webp",
-    "buttonText": "Дивитись усі товари",
-    "link": "catalog?section=sale",
-    "brand": "",
-    "discountPercent": 50,
-    "productIds": [
-      10,
-      5
-    ],
     "displayType": "hero_slider",
     "order": 1
   },
