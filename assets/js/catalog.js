@@ -1870,8 +1870,49 @@ if (!window.CATALOG_SKIP_AUTO_INIT) {
         mq.addListener(handleViewportChange);
     }
 
-    // панель залишається прилиплою під шапкою (position:sticky) —
-    // без додаткової анімації приховування при скролі вниз, яка
-    // раніше "підстрибувала" й конфліктувала зі sticky-позиціюванням
+    // Ховаємо панель фільтрів при скролі вниз і показуємо назад
+    // при скролі вгору (типова мобільна поведінка). Стежимо саме
+    // за напрямком скролу, а не просто за позицією — і головне:
+    // чіпаємо клас is-hidden лише коли панель вже реально "прилипла"
+    // під шапкою (getBoundingClientRect().top === sticky top).
+    // Це і є фікс старого бага: раніше клас перемикався завжди,
+    // з самого початку — поки сторінка ще довантажувала banner
+    // акції над каталогом, позиція панелі "гуляла" разом з layout
+    // shift від картинки, і вона видимо "стрибала"/впиралась у
+    // банер. Тепер поки панель не в прилиплому стані — ми її
+    // взагалі не чіпаємо, вона просто рухається зі сторінкою як
+    // завжди.
+    if (mobileFilterBar) {
+
+        let lastScrollY = window.scrollY;
+        let ticking = false;
+
+        const HIDE_THRESHOLD = 6; // щоб дрібний джиттер скролу не смикав панель туди-сюди
+        const stickyTop = parseFloat(getComputedStyle(mobileFilterBar).top) || 0;
+
+        function updateFilterBarVisibility() {
+
+            const currentScrollY = window.scrollY;
+            const delta = currentScrollY - lastScrollY;
+            const isStuck = mobileFilterBar.getBoundingClientRect().top <= stickyTop + 1;
+
+            if (!isStuck) {
+                mobileFilterBar.classList.remove("is-hidden");
+            } else if (Math.abs(delta) > HIDE_THRESHOLD) {
+                mobileFilterBar.classList.toggle("is-hidden", delta > 0);
+            }
+
+            lastScrollY = currentScrollY;
+            ticking = false;
+
+        }
+
+        window.addEventListener("scroll", () => {
+            if (ticking) return;
+            ticking = true;
+            requestAnimationFrame(updateFilterBarVisibility);
+        }, { passive: true });
+
+    }
 
 })();
