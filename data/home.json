@@ -101,7 +101,6 @@
   ],
   "sectionsOrder": [
     "promo-hero-slider",
-    "instagram",
     "categories",
     "promotions",
     "brand-campaigns",
@@ -110,6 +109,7 @@
     "promo-banner",
     "brands",
     "popular-products",
-    "advantages"
+    "advantages",
+    "instagram"
   ]
 }

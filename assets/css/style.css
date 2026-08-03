@@ -1932,7 +1932,7 @@ nav li.has-mega:hover .mega-menu{
 ===================================== */
 
 footer{
-    margin-top:100px;
+    margin-top:0;
     background:var(--primary);
     padding:80px 0 30px;
 }
