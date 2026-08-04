@@ -258,8 +258,15 @@ collections:
     extension: "json"
     format: "json"
     identifier_field: "title"
-    summary: "{{title}}"
-    sortable_fields: ["order", "title"]
+    summary: "{{title}} — {{fields.badge}}"
+    view_groups:
+      - label: "Тип показу"
+        field: "displayType"
+    sortable_fields:
+      fields: ["commit_date", "order", "title"]
+      default:
+        field: "commit_date"
+        direction: "descending"
     slug: "{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}"
     fields:
       - label: "Показувати на сайті"
