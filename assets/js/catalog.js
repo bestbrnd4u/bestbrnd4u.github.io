@@ -997,6 +997,64 @@ document.addEventListener("click", event => {
 });
 
 // -------------------------
+// Приховування відкритого дропдауна фільтрів при скролі
+//
+// Меню дропдауна (.filter-menu / .sort-menu) — position:absolute
+// відносно кнопки-тригера. Через це, коли сторінку прокручують
+// вниз, кнопка-тригер може виїхати за межі екрана раніше, ніж
+// саме меню (воно значно вище за кнопку) — і меню лишається
+// висіти "у повітрі" поверх товарів нижче, вже не прив'язане до
+// жодної видимої кнопки.
+//
+// Тут — суто візуальне приховування на час скролу вниз (клас
+// scroll-hidden), окремо від "по-справжньому закрито" (menu.hidden
+// + відсутність класу .open, як і раніше керує closeAllDropdowns).
+// При скролі вгору знову показуємо дропдаун, якщо користувач сам
+// його не закрив (тобто якщо menu.hidden усе ще false).
+(function setupDropdownScrollVisibility() {
+
+    let lastScrollY = window.scrollY;
+    let ticking = false;
+
+    const SCROLL_THRESHOLD = 4;
+
+    function update() {
+
+        const currentScrollY = window.scrollY;
+        const delta = currentScrollY - lastScrollY;
+
+        if (Math.abs(delta) > SCROLL_THRESHOLD) {
+
+            const openDropdown = [sortDropdown, brandDropdown, colorDropdown, categoryDropdown, priceDropdown, sizeDropdown]
+                .find(dropdown => dropdown?.classList.contains("open"));
+
+            const menu = openDropdown?.querySelector(".filter-menu, .sort-menu");
+
+            if (menu && !menu.hidden) {
+
+                menu.classList.toggle("scroll-hidden", delta > 0);
+
+            }
+
+        }
+
+        lastScrollY = currentScrollY;
+        ticking = false;
+
+    }
+
+    window.addEventListener("scroll", () => {
+
+        if (ticking) return;
+
+        ticking = true;
+        requestAnimationFrame(update);
+
+    }, { passive: true });
+
+})();
+
+// -------------------------
 // Фільтр «Стать»
 // -------------------------
 
@@ -1882,63 +1940,37 @@ if (!window.CATALOG_SKIP_AUTO_INIT) {
     // банер. Тепер поки панель не в прилиплому стані — ми її
     // взагалі не чіпаємо, вона просто рухається зі сторінкою як
     // завжди.
-    // Ховаємо панель фільтрів при скролі вниз і показуємо назад
-    // при скролі вгору (типова мобільна поведінка). Стежимо саме
-    // за напрямком скролу, а не просто за позицією — і головне:
-    // чіпаємо клас is-hidden лише коли панель вже реально "прилипла"
-    // під шапкою (getBoundingClientRect().top === sticky top).
-    // Це і є фікс старого бага: раніше клас перемикався завжди,
-    // з самого початку — поки сторінка ще довантажувала banner
-    // акції над каталогом, позиція панелі "гуляла" разом з layout
-    // shift від картинки, і вона видимо "стрибала"/впиралась у
-    // банер. Тепер поки панель не в прилиплому стані — ми її
-    // взагалі не чіпаємо, вона просто рухається зі сторінкою як
-    // завжди.
-    //
-    // Винесено у функцію (а не лишається інлайн лише для мобільної
-    // панелі), бо той самий сценарій — sticky-панель ховається при
-    // скролі вниз — тепер потрібен і десктопній .catalog-filters-bar.
-    initStickyFilterAutoHide(mobileFilterBar);
+    if (mobileFilterBar) {
 
-})();
+        let lastScrollY = window.scrollY;
+        let ticking = false;
 
-function initStickyFilterAutoHide(el) {
+        const HIDE_THRESHOLD = 6; // щоб дрібний джиттер скролу не смикав панель туди-сюди
+        const stickyTop = parseFloat(getComputedStyle(mobileFilterBar).top) || 0;
 
-    if (!el) return;
+        function updateFilterBarVisibility() {
 
-    let lastScrollY = window.scrollY;
-    let ticking = false;
+            const currentScrollY = window.scrollY;
+            const delta = currentScrollY - lastScrollY;
+            const isStuck = mobileFilterBar.getBoundingClientRect().top <= stickyTop + 1;
 
-    const HIDE_THRESHOLD = 6; // щоб дрібний джиттер скролу не смикав панель туди-сюди
-    const stickyTop = parseFloat(getComputedStyle(el).top) || 0;
+            if (!isStuck) {
+                mobileFilterBar.classList.remove("is-hidden");
+            } else if (Math.abs(delta) > HIDE_THRESHOLD) {
+                mobileFilterBar.classList.toggle("is-hidden", delta > 0);
+            }
 
-    function updateVisibility() {
+            lastScrollY = currentScrollY;
+            ticking = false;
 
-        const currentScrollY = window.scrollY;
-        const delta = currentScrollY - lastScrollY;
-        const isStuck = el.getBoundingClientRect().top <= stickyTop + 1;
-
-        if (!isStuck) {
-            el.classList.remove("is-hidden");
-        } else if (Math.abs(delta) > HIDE_THRESHOLD) {
-            el.classList.toggle("is-hidden", delta > 0);
         }
 
-        lastScrollY = currentScrollY;
-        ticking = false;
+        window.addEventListener("scroll", () => {
+            if (ticking) return;
+            ticking = true;
+            requestAnimationFrame(updateFilterBarVisibility);
+        }, { passive: true });
 
     }
 
-    window.addEventListener("scroll", () => {
-        if (ticking) return;
-        ticking = true;
-        requestAnimationFrame(updateVisibility);
-    }, { passive: true });
-
-}
-
-// та сама поведінка на десктопі — для .catalog-filters-bar
-// (мобільна панель ховається/показується вище, тут — дублюємо
-// для десктопної панелі фільтрів; на вузьких екранах цей елемент
-// display:none, тож там ця ініціалізація просто нічого не робить)
-initStickyFilterAutoHide(document.querySelector(".catalog-filters-bar"));
+})();
