@@ -1929,7 +1929,8 @@ if (!window.CATALOG_SKIP_AUTO_INIT) {
     }
 
     // Ховаємо панель фільтрів при скролі вниз і показуємо назад
-    // при скролі вгору (типова мобільна поведінка). Стежимо саме
+    // при скролі вгору (типова мобільна поведінка, застосовується
+    // і на десктопі — та сама .catalog-filters-bar). Стежимо саме
     // за напрямком скролу, а не просто за позицією — і головне:
     // чіпаємо клас is-hidden лише коли панель вже реально "прилипла"
     // під шапкою (getBoundingClientRect().top === sticky top).
@@ -1940,24 +1941,41 @@ if (!window.CATALOG_SKIP_AUTO_INIT) {
     // банер. Тепер поки панель не в прилиплому стані — ми її
     // взагалі не чіпаємо, вона просто рухається зі сторінкою як
     // завжди.
-    if (mobileFilterBar) {
+    function initStickyFilterAutoHide(el) {
+
+        if (!el) return;
 
         let lastScrollY = window.scrollY;
         let ticking = false;
 
         const HIDE_THRESHOLD = 6; // щоб дрібний джиттер скролу не смикав панель туди-сюди
-        const stickyTop = parseFloat(getComputedStyle(mobileFilterBar).top) || 0;
+        const stickyTop = parseFloat(getComputedStyle(el).top) || 0;
 
-        function updateFilterBarVisibility() {
+        function updateVisibility() {
 
             const currentScrollY = window.scrollY;
             const delta = currentScrollY - lastScrollY;
-            const isStuck = mobileFilterBar.getBoundingClientRect().top <= stickyTop + 1;
+            const isStuck = el.getBoundingClientRect().top <= stickyTop + 1;
 
             if (!isStuck) {
-                mobileFilterBar.classList.remove("is-hidden");
+
+                el.classList.remove("is-hidden");
+
             } else if (Math.abs(delta) > HIDE_THRESHOLD) {
-                mobileFilterBar.classList.toggle("is-hidden", delta > 0);
+
+                const hiding = delta > 0;
+
+                // при скролі вниз панель ховається трансформом
+                // (translateY), але відкритий випадаючий список —
+                // значно вищий за саму панель і виходить за межі
+                // цього зсуву, тож без явного закриття він лишається
+                // "висіти" поверх контенту нижче. При скролі вгору
+                // панель просто повертається на місце — список у цей
+                // момент вже закритий, нічого додатково ховати не треба.
+                if (hiding && typeof closeAllDropdowns === "function") closeAllDropdowns();
+
+                el.classList.toggle("is-hidden", hiding);
+
             }
 
             lastScrollY = currentScrollY;
@@ -1968,9 +1986,16 @@ if (!window.CATALOG_SKIP_AUTO_INIT) {
         window.addEventListener("scroll", () => {
             if (ticking) return;
             ticking = true;
-            requestAnimationFrame(updateFilterBarVisibility);
+            requestAnimationFrame(updateVisibility);
         }, { passive: true });
 
     }
+
+    initStickyFilterAutoHide(mobileFilterBar);
+
+    // та сама поведінка на десктопі — для .catalog-filters-bar
+    // (на вузьких екранах цей елемент display:none, тож там ця
+    // ініціалізація просто нічого не робить)
+    initStickyFilterAutoHide(document.querySelector(".catalog-filters-bar"));
 
 })();

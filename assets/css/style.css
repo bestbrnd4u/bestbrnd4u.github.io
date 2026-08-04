@@ -2590,6 +2590,17 @@ body.mobile-filters-open .scroll-top{
     border-radius:20px;
     box-shadow:0 10px 30px rgba(0,0,0,.06);
     margin-bottom:28px;
+    /* та сама sticky-поведінка, що й у мобільної .mobile-filter-bar:
+       прилипає під шапкою і ховається при скролі вниз (керується
+       класом is-hidden з initStickyFilterAutoHide у catalog.js) */
+    position:sticky;
+    top:82px;
+    z-index:500;
+    transition:transform .3s ease;
+}
+
+.catalog-filters-bar.is-hidden{
+    transform:translateY(-140%);
 }
 
 .filter-group{
