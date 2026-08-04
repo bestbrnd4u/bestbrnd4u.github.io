@@ -5855,6 +5855,118 @@ body.mobile-filters-open .scroll-top{
 }
 
 /* =====================================
+   ПОП-АП АКЦІЇ (керується з адмінки — displayType:"popup"
+   у розділі «Акції», див. assets/js/promo-popup.js)
+===================================== */
+
+.promo-popup-backdrop{
+    position:fixed;
+    inset:0;
+    z-index:10000;
+    background:rgba(17,24,39,.65);
+    opacity:0;
+    transition:opacity .3s ease;
+}
+
+.promo-popup-backdrop.open{
+    opacity:1;
+}
+
+.promo-popup{
+    position:fixed;
+    top:50%;
+    left:50%;
+    z-index:10001;
+    width:min(360px, calc(100vw - 40px));
+    border-radius:22px;
+    overflow:hidden;
+    box-shadow:var(--shadow-lg);
+    background:#111827;
+    opacity:0;
+    transform:translate(-50%, -50%) scale(.92);
+    transition:opacity .3s ease, transform .3s ease;
+    pointer-events:none;
+}
+
+.promo-popup.open{
+    opacity:1;
+    transform:translate(-50%, -50%) scale(1);
+    pointer-events:auto;
+}
+
+.promo-popup-close{
+    position:absolute;
+    top:14px;
+    right:14px;
+    z-index:2;
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    background:#fff;
+    box-shadow:var(--shadow-sm);
+    font-size:15px;
+    line-height:1;
+    color:var(--gray900);
+}
+
+@media (hover:hover) and (pointer:fine){
+    .promo-popup-close:hover{
+        background:var(--secondary);
+        color:#fff;
+    }
+}
+
+.promo-popup-image-link{
+    display:block;
+    position:relative;
+}
+
+.promo-popup-image-link img{
+    display:block;
+    width:100%;
+    aspect-ratio:1/1;
+    object-fit:cover;
+}
+
+.promo-popup-overlay{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:0;
+    padding:18px 20px 22px;
+    background:linear-gradient(180deg, rgba(17,24,39,0) 0%, rgba(17,24,39,.85) 45%, rgba(17,24,39,.95) 100%);
+    color:#fff;
+}
+
+.promo-popup-badge{
+    display:inline-block;
+    padding:4px 12px;
+    border-radius:100px;
+    background:var(--secondary);
+    font-size:12px;
+    font-weight:700;
+    margin-bottom:10px;
+}
+
+.promo-popup-overlay h3{
+    font-size:21px;
+    font-weight:800;
+    line-height:1.25;
+    margin-bottom:6px;
+}
+
+.promo-popup-overlay p{
+    font-size:13.5px;
+    color:rgba(255,255,255,.85);
+}
+
+@media(max-width:480px){
+    .promo-popup-overlay h3{
+        font-size:19px;
+    }
+}
+
+/* =====================================
    ГЛОБАЛЬНИЙ ПОШУК (оверлей у стилі Nike)
 ===================================== */
 

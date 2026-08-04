@@ -58,6 +58,7 @@ async function initPromoPage() {
 
         renderPromoHero(promo);
         setupPromoCatalog(promo, allProducts, categoryDepartments);
+        initPromoPopup("promo");
 
     } catch (error) {
 
