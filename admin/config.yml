@@ -245,6 +245,73 @@ collections:
                 widget: "string"
                 required: true
 
+  - name: "promoPopups"
+    label: "Спливаючі банери"
+    label_singular: "Спливаючий банер"
+    description: >
+      Невеличкий банер, що спливає в кутку екрана (як на md-fashion.ua) —
+      привертає увагу до акції. З'являється один раз на сторінці (за
+      замовчуванням через 60 секунд), і якщо відвідувач його закрив —
+      повторно вже не покажеться. Клік по банеру веде на сторінку акції.
+    folder: "data/promo-popups"
+    create: true
+    delete: true
+    extension: "json"
+    format: "json"
+    identifier_field: "title"
+    summary: "{{title}}"
+    fields:
+      - label: "Показувати банер"
+        name: "active"
+        widget: "boolean"
+        default: true
+
+      - label: "Назва (лише для адмінки)"
+        name: "title"
+        widget: "string"
+        required: true
+        hint: "Ніде на сайті не показується — потрібна лише щоб впізнати банер у списку"
+
+      - label: "Зображення банера"
+        name: "image"
+        widget: "image"
+        required: true
+        choose_url: true
+        hint: "Квадратне або портретне зображення виглядає найкраще (як у прикладі md-fashion.ua)"
+
+      - label: "Акція, на яку веде клік"
+        name: "promoSlug"
+        widget: "relation"
+        collection: "promotions"
+        search_fields: ["title"]
+        value_field: "{{slug}}"
+        display_fields: ["title"]
+        required: true
+        hint: >
+          Оберіть акцію зі списку «Акції». При кліку на банер відвідувач
+          потрапить на сторінку саме цієї акції з товарами, фільтрами
+          та сортуванням.
+
+      - label: "На яких сторінках показувати"
+        name: "pages"
+        widget: "select"
+        multiple: true
+        required: true
+        default: ["catalog", "promo"]
+        options:
+          - { label: "Каталог", value: "catalog" }
+          - { label: "Сторінка будь-якої акції", value: "promo" }
+          - { label: "Головна сторінка", value: "home" }
+        hint: "Можна обрати декілька"
+
+      - label: "Через скільки секунд показати"
+        name: "delaySeconds"
+        widget: "number"
+        value_type: "int"
+        default: 60
+        required: false
+        hint: "За замовчуванням — 60 (через хвилину після того, як відвідувач відкрив сторінку)"
+
   - name: "promotions"
     label: "Акції"
     label_singular: "Акція"
@@ -262,7 +329,11 @@ collections:
     view_groups:
       - label: "Тип показу"
         field: "displayType"
-    sortable_fields: ["order", "title"]
+    sortable_fields:
+      fields: ["commit_date", "order", "title"]
+      default:
+        field: "commit_date"
+        direction: "descending"
     slug: "{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}"
     fields:
       - label: "Показувати на сайті"
