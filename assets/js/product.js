@@ -174,9 +174,13 @@ function buildThumbsMarkup(images, video, altText) {
 
     if (media?.type === "file") {
 
+        // мініатюра — це фото (poster), а не сам відеотег: так
+        // завжди видно нормальну картинку зверху, а не порожній/
+        // чорний кадр, поки браузер ще не підвантажив відео
+        const poster = images[0] || "assets/images/no-image.png";
+
         videoThumb = `
-        <div class="thumb thumb-video ${images.length === 0 ? "active" : ""}">
-            <video src="${media.videoUrl}" muted playsinline preload="metadata"></video>
+        <div class="thumb thumb-video ${images.length === 0 ? "active" : ""}" style="background-image:url('${poster}');background-size:cover;background-position:center">
             <span class="thumb-play" aria-hidden="true">▶</span>
         </div>
     `;
@@ -211,7 +215,21 @@ function buildTrackMarkup(images, video, altText) {
 
     if (media?.type === "file") {
 
-        videoSlide = `<video class="gallery-slide gallery-slide-video" src="${media.videoUrl}" controls playsinline preload="metadata"></video>`;
+        // poster — щоб на слайді відразу було видно фото товару,
+        // а не порожній/чорний кадр, поки відео ще не почало
+        // програватись; muted — без цього автозапуск при свайпі
+        // (нижче, в setupGallery) заблокував би сам браузер
+        videoSlide = `
+            <video
+                class="gallery-slide gallery-slide-video"
+                src="${media.videoUrl}"
+                poster="${images[0] || "assets/images/no-image.png"}"
+                controls
+                muted
+                playsinline
+                loop
+                preload="metadata"></video>
+        `;
 
     } else if (media?.type === "embed") {
 
@@ -742,9 +760,35 @@ function setupGallery() {
             thumb.classList.toggle("active", i === index);
         });
 
+        // відео (файлове, не YouTube/Vimeo вбудовування) — програємо
+        // лише той слайд, до якого долистали свайпом/скролом, і
+        // одразу ставимо на паузу решту. slide.paused перевіряємо,
+        // щоб не перемотувати на початок відео, яке й так вже грає
+        // (наприклад, повторний виклик під час одного й того ж
+        // перегляду) — тільки при свіжому поверненні на цей слайд
+        [...track.children].forEach((slide, i) => {
+
+            if (slide.tagName !== "VIDEO") return;
+
+            if (i === index) {
+
+                if (slide.paused) slide.currentTime = 0;
+
+                slide.play().catch(() => {});
+
+            } else {
+
+                slide.pause();
+
+            }
+
+        });
+
     }
 
     let scrollTimer = null;
+
+    syncActiveState();
 
     track.addEventListener("scroll", () => {
 
