@@ -64,12 +64,6 @@ function main() {
                 }))
             : [];
 
-        const validPopupPages = ["catalog", "promo"];
-
-        const popupPages = Array.isArray(data.popupPages)
-            ? data.popupPages.filter(page => validPopupPages.includes(page))
-            : [];
-
         promotions.push({
             slug,
             title: data.title,
@@ -77,15 +71,13 @@ function main() {
             badge: data.badge || "",
             image: data.image,
             imageMobile: data.imageMobile || "",
-            popupImage: data.popupImage || "",
-            popupPages,
             buttonText: data.buttonText || "Дивитись усі товари",
             link: data.link,
             brand: data.brand || "",
             discountPercent: typeof data.discountPercent === "number" ? data.discountPercent : null,
             productIds: Array.isArray(data.products) ? data.products.map(Number) : [],
             genderButtons,
-            displayType: ["card", "hero_slider", "banner_products", "banner_compact", "popup"].includes(data.displayType)
+            displayType: ["card", "hero_slider", "banner_products", "banner_compact"].includes(data.displayType)
                 ? data.displayType
                 : "card",
             order: typeof data.order === "number" ? data.order : 1

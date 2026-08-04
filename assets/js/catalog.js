@@ -1601,7 +1601,6 @@ setView(localStorage.getItem("catalogView") || "grid");
 if (!window.CATALOG_SKIP_AUTO_INIT) {
 
     initCatalog();
-    initPromoPopup("catalog");
 
 }
 
@@ -1920,9 +1919,24 @@ function initStickyFilterAutoHide(el) {
         const isStuck = el.getBoundingClientRect().top <= stickyTop + 1;
 
         if (!isStuck) {
+
             el.classList.remove("is-hidden");
+
         } else if (Math.abs(delta) > HIDE_THRESHOLD) {
-            el.classList.toggle("is-hidden", delta > 0);
+
+            const hiding = delta > 0;
+
+            // при скролі вниз панель ховається трансформом (translateY),
+            // але відкритий випадаючий список — значно вищий за саму
+            // панель і виходить за межі цього зсуву, тож без явного
+            // закриття він лишається "висіти" поверх контенту нижче.
+            // При скролі вгору панель просто повертається на місце —
+            // список у цей момент вже закритий, нічого додатково
+            // ховати не треба.
+            if (hiding) closeAllDropdowns();
+
+            el.classList.toggle("is-hidden", hiding);
+
         }
 
         lastScrollY = currentScrollY;

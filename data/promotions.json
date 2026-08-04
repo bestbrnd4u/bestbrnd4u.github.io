@@ -6,8 +6,6 @@
     "badge": "-50%",
     "image": "/assets/images/products/uploads/c818d5ef404ee0a9cc6da6cb3732.png",
     "imageMobile": "",
-    "popupImage": "",
-    "popupPages": [],
     "buttonText": "Дивитись усі товари",
     "link": "catalog?section=sale",
     "brand": "",
@@ -18,39 +16,12 @@
     "order": 1
   },
   {
-    "slug": "summer-sale-popup-demo",
-    "title": "SUMMER SALE до -30%",
-    "text": "Guess, Michael Kors, Calvin Klein, Tommy Hilfiger, Furla",
-    "badge": "-30%",
-    "image": "/assets/images/products/uploads/485d0e230d97266f0bf4e4744df2.webp",
-    "imageMobile": "",
-    "popupImage": "/assets/images/products/uploads/485d0e230d97266f0bf4e4744df2.webp",
-    "popupPages": [
-      "catalog",
-      "promo"
-    ],
-    "buttonText": "Дивитись усі товари",
-    "link": "catalog?section=sale",
-    "brand": "Guess",
-    "discountPercent": null,
-    "productIds": [
-      2,
-      4,
-      5
-    ],
-    "genderButtons": [],
-    "displayType": "popup",
-    "order": 1
-  },
-  {
     "slug": "summer-sale",
     "title": "SUMMER SALE до -30%",
     "text": "Guess, Michael Kors, Calvin Klein, Tommy Hilfiger, Furla",
     "badge": "-30%",
     "image": "/assets/images/products/uploads/485d0e230d97266f0bf4e4744df2.webp",
     "imageMobile": "",
-    "popupImage": "",
-    "popupPages": [],
     "buttonText": "Дивитись усі товари",
     "link": "catalog?section=sale",
     "brand": "Guess",
@@ -72,8 +43,6 @@
     "badge": "",
     "image": "https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=1200",
     "imageMobile": "",
-    "popupImage": "",
-    "popupPages": [],
     "buttonText": "Дивитись все",
     "link": "catalog?brand=Calvin%20Klein",
     "brand": "Calvin Klein",
