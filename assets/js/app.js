@@ -723,19 +723,9 @@ async function initCollections() {
 
 }
 
-function getCollectionPageSize() {
-
-    // на мобільному сітка добірки — 2 колонки (.collection-products-row
-    // у CSS), тож 3 картки на "сторінці" лишають порожню комірку в
-    // другому рядку; на мобільному показуємо 4 картки (рівно 2×2),
-    // на десктопі — як і раніше 3 (там 3 колонки)
-    return window.matchMedia("(max-width:640px)").matches ? 4 : 3;
-
-}
-
 function renderCollectionWidget(collection, items) {
 
-    const pageSize = getCollectionPageSize();
+    const pageSize = 3;
     const pageCount = Math.ceil(items.length / pageSize);
 
     return `
@@ -836,14 +826,13 @@ function createCollectionProductCard(product) {
 
 function setupCollectionPagination(widget) {
 
-    let pageSize = Number(widget.dataset.pageSize) || getCollectionPageSize();
-    let pageCount = Number(widget.dataset.pageCount) || 1;
+    const pageSize = Number(widget.dataset.pageSize) || 3;
+    const pageCount = Number(widget.dataset.pageCount) || 1;
 
     const cards = [...widget.querySelectorAll(".product-card")];
     const prevBtn = widget.querySelector(".collection-prev");
     const nextBtn = widget.querySelector(".collection-next");
     const indicator = widget.querySelector(".collection-page-current");
-    const totalEl = widget.querySelector(".collection-page-indicator");
 
     function render() {
 
@@ -858,29 +847,6 @@ function setupCollectionPagination(widget) {
         if (indicator) indicator.textContent = String(page + 1).padStart(2, "0");
 
     }
-
-    function recalcPageSize() {
-
-        const nextPageSize = getCollectionPageSize();
-
-        if (nextPageSize === pageSize) return;
-
-        pageSize = nextPageSize;
-        pageCount = Math.ceil(cards.length / pageSize);
-
-        widget.dataset.pageSize = String(pageSize);
-        widget.dataset.pageCount = String(pageCount);
-        widget.dataset.page = String(Math.min(Number(widget.dataset.page) || 0, pageCount - 1));
-
-        const totalDigits = String(pageCount).padStart(2, "0");
-
-        if (totalEl) totalEl.lastChild.textContent = `/${totalDigits}`;
-
-        render();
-
-    }
-
-    window.addEventListener("resize", recalcPageSize, { passive: true });
 
     prevBtn?.addEventListener("click", () => {
         widget.dataset.page = String(Math.max(0, (Number(widget.dataset.page) || 0) - 1));

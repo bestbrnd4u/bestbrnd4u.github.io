@@ -2315,7 +2315,7 @@ footer{
 
     .promo-hero-slide-image{
         order:1;
-        min-height:280px;
+        aspect-ratio:3/4;
     }
 
     .promo-hero-quicklinks{
