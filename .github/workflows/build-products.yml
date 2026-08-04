@@ -1,10 +1,11 @@
 name: Build catalog data
 
 # Запускається щоразу, коли адмінка (Decap CMS) комітить зміни
-# в data/products/**, data/categories/**, data/promotions/**,
-# data/collections/** або data/promo-popups/**, і перезбирає
-# відповідні data/*.json — саме ці файли реально вантажить сайт.
-# Результат комітиться назад у main.
+# в data/products/**, data/categories/**, data/promotions/**
+# або data/collections/**, і перезбирає відповідні
+# data/products.json / data/categories.json /
+# data/promotions.json / data/collections.json — саме ці файли
+# реально вантажить сайт. Результат комітиться назад у main.
 
 on:
   push:
@@ -14,7 +15,6 @@ on:
       - "data/categories/**"
       - "data/promotions/**"
       - "data/collections/**"
-      - "data/promo-popups/**"
   workflow_dispatch: {}
 
 permissions:
@@ -45,9 +45,6 @@ jobs:
       - name: Build data/collections.json
         run: node scripts/build-collections.js
 
-      - name: Build data/promo-popups.json
-        run: node scripts/build-promo-popups.js
-
       - name: Build sitemap.xml
         run: node scripts/build-sitemap.js
 
@@ -55,12 +52,10 @@ jobs:
         run: |
           git config user.name "bagvero-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data/products.json data/products/*.json data/categories.json \
-                  data/promotions.json data/collections.json \
-                  data/promo-popups.json sitemap.xml
+          git add data/products.json data/products/*.json data/categories.json data/promotions.json data/promotions/*.json data/collections.json data/collections/*.json sitemap.xml
           if git diff --cached --quiet; then
             echo "Немає змін — пропускаємо коміт"
           else
-            git commit -m "chore: перезібрано дані каталогу [skip ci]"
+            git commit -m "chore: перезібрано каталог (products/categories/promotions/collections) [skip ci]"
             git push
           fi
