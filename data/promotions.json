@@ -1,5 +1,21 @@
 [
   {
+    "slug": "summer-hero-demo",
+    "title": "Більше стилю для яскравого літа",
+    "text": "Guess, Michael Kors, Calvin Klein, Tommy Hilfiger, Furla та інші бренди зі знижками до -50%",
+    "badge": "-50%",
+    "image": "/assets/images/products/uploads/c818d5ef404ee0a9cc6da6cb3732.png",
+    "imageMobile": "",
+    "buttonText": "Дивитись усі товари",
+    "link": "catalog?section=sale",
+    "brand": "",
+    "discountPercent": 50,
+    "productIds": [],
+    "genderButtons": [],
+    "displayType": "hero_slider",
+    "order": 1
+  },
+  {
     "slug": "summer-sale",
     "title": "SUMMER SALE до -30%",
     "text": "Guess, Michael Kors, Calvin Klein, Tommy Hilfiger, Furla",
@@ -19,25 +35,6 @@
     "genderButtons": [],
     "displayType": "banner_products",
     "order": 1
-  },
-  {
-    "slug": "20260801205300",
-    "title": "Більше стилю для яскравого літа",
-    "text": "Guess, Michael Kors, Calvin Klein, Tommy Hilfiger, Furla та інші бренди зі знижками до -21%",
-    "badge": "-21%",
-    "image": "/assets/images/products/uploads/485d0e230d97266f0bf4e4744df2.webp",
-    "imageMobile": "",
-    "buttonText": "Дивитись усі товари",
-    "link": "catalog?section=sale",
-    "brand": "",
-    "discountPercent": 50,
-    "productIds": [
-      10,
-      5
-    ],
-    "genderButtons": [],
-    "displayType": "hero_slider",
-    "order": 2
   },
   {
     "slug": "calvin-klein-teaser",

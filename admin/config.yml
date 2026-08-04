@@ -262,7 +262,11 @@ collections:
     view_groups:
       - label: "Тип показу"
         field: "displayType"
-    sortable_fields: ["order", "title"]
+    sortable_fields:
+      fields: ["commit_date", "order", "title"]
+      default:
+        field: "commit_date"
+        direction: "descending"
     slug: "{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}"
     fields:
       - label: "Показувати на сайті"
@@ -409,71 +413,6 @@ collections:
           Оберіть конкретні товари для акції вручну — почніть вводити назву,
           бренд або категорію, щоб знайти потрібні. Не обов'язково, якщо
           вище вказано бренд — тоді досить і цього.
-
-  - name: "promoPopups"
-    label: "Спливаючі банери"
-    label_singular: "Спливаючий банер"
-    description: >
-      Банер, що спливає в кутку екрана через якийсь час після відкриття
-      сторінки (як на md-fashion.ua) і веде на обрану акцію. Якщо
-      відвідувач закриє банер (або клікне по ньому) — цьому відвідувачу
-      він більше не покажеться.
-    folder: "data/promo-popups"
-    create: true
-    delete: true
-    extension: "json"
-    format: "json"
-    identifier_field: "title"
-    summary: "{{title}}"
-    sortable_fields: ["title"]
-    slug: "{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}"
-    fields:
-      - label: "Показувати на сайті"
-        name: "active"
-        widget: "boolean"
-        default: true
-        hint: "Вимкніть, щоб приховати банер, не видаляючи файл"
-
-      - label: "Назва (для себе, на сайті не показується)"
-        name: "title"
-        widget: "string"
-        required: true
-        hint: "Наприклад: Спливаючий банер — SUMMER SALE"
-
-      - label: "Картинка банера"
-        name: "image"
-        widget: "image"
-        required: true
-        choose_url: true
-
-      - label: "Акція, на яку веде клік"
-        name: "promoSlug"
-        widget: "relation"
-        collection: "promotions"
-        search_fields: ["title"]
-        display_fields: ["title"]
-        value_field: "{{slug}}"
-        required: true
-        hint: "Клік по банеру поведе на сторінку цієї акції"
-
-      - label: "На яких сторінках показувати"
-        name: "pages"
-        widget: "select"
-        multiple: true
-        required: true
-        options:
-          - { label: "Каталог", value: "catalog" }
-          - { label: "Сторінка будь-якої акції", value: "promo" }
-          - { label: "Головна", value: "index" }
-        hint: "Можна вибрати кілька сторінок одразу"
-
-      - label: "Через скільки секунд показати"
-        name: "delaySeconds"
-        widget: "number"
-        value_type: "int"
-        default: 60
-        required: false
-        hint: "За замовчуванням 60 (тобто через хвилину після відкриття сторінки)"
 
   - name: "collections"
     label: "Добірки"
