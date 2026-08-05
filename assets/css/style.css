@@ -1313,13 +1313,11 @@ nav li.has-mega:hover .mega-menu{
 
 .product-card:hover .photo-nav:disabled{
     opacity:.35;
-    pointer-events:none;
 }
 }
 
 .photo-nav:disabled{
     cursor:default;
-    pointer-events:none;
 }
 
 .photo-nav-prev{ left:10px; }
