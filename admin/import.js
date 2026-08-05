@@ -1,0 +1,451 @@
+// -------------------------
+// Масовий імпорт товарів через Excel — повністю client-side,
+// нічого нікуди не відправляється. Результат — ZIP з файлами
+// товарів у форматі, який очікує scripts/build-products.js
+// (id/slug там же присвоюються автоматично при наступній збірці).
+// -------------------------
+
+const GENDERS = ["Жінкам", "Чоловікам", "Унісекс", "Дітям"];
+const BADGES = ["NEW", "SALE", "TOP", "HOT"];
+const COLOR_SLOTS = 3;
+
+const HEADERS = [
+    "Назва товару",
+    "Бренд",
+    "Категорія",
+    "Для кого",
+    "Ціна",
+    "Стара ціна",
+    "Позначка (NEW/SALE/TOP/HOT)",
+    "Новинка (так/ні)",
+    "Розміри (через кому)",
+    "Опис товару",
+    "Матеріал",
+    "Країна виробник",
+    "Артикул",
+    "Застібка",
+    "Декор",
+    "Габарити",
+    "Опис ручки/ременя",
+    "Відділення/кишені",
+    "Склад матеріалу",
+    "Пошукові теги (через кому)",
+    "Під замовлення (так/ні)",
+    "Термін виготовлення",
+    "Передоплата %"
+];
+
+for (let i = 1; i <= COLOR_SLOTS; i++) {
+    HEADERS.push(
+        `Колір ${i} (назва)`,
+        `Колір ${i} (HEX)`,
+        `Колір ${i} (фото, посилання через кому)`,
+        `Колір ${i} (відео, посилання)`
+    );
+}
+
+let categoriesCache = null;
+
+async function loadCategories() {
+
+    if (categoriesCache) return categoriesCache;
+
+    try {
+
+        const response = await fetch("../data/categories.json");
+
+        categoriesCache = response.ok ? await response.json() : [];
+
+    } catch (error) {
+
+        categoriesCache = [];
+
+    }
+
+    return categoriesCache;
+
+}
+
+// -------------------------
+// Крок 1 — шаблон
+// -------------------------
+
+function buildExampleRow(values) {
+
+    const row = {};
+
+    HEADERS.forEach((header, index) => {
+        row[header] = values[index] !== undefined ? values[index] : "";
+    });
+
+    return row;
+
+}
+
+async function downloadTemplate() {
+
+    const categories = await loadCategories();
+
+    const example1 = buildExampleRow([
+        "Metropolis Mini", "Furla", "Жіночі сумки", "Жінкам", 10999, 11999,
+        "TOP", "ні", "XS, S",
+        "Компактна сумка з італійської шкіри з металевим декором-пряжкою.",
+        "Натуральна шкіра", "Італія", "FR-MP-4004", "магніт із пряжкою", "металева пряжка",
+        "20x16x8 см", "Один незнімний ремінь довжиною 110 см", "одне основне відділення", "100% шкіра",
+        "клатч, міні сумка, вечірня сумка", "ні", "", "",
+        "Бежевий", "#d9c7a1", "https://example.com/foto1.jpg, https://example.com/foto2.jpg", "",
+        "Чорний", "#1a1a1a", "https://example.com/foto3.jpg, https://example.com/foto4.jpg", "",
+        "", "", "", ""
+    ]);
+
+    const example2 = buildExampleRow([
+        "Urban Backpack", "Tommy Hilfiger", "Рюкзаки", "Унісекс", 4599, "",
+        "", "так", "",
+        "Місткий рюкзак для щоденного використання з відділенням для ноутбука.",
+        "Поліестер", "В'єтнам", "TH-UB-1102", "блискавка", "логотип",
+        "30x20x12 см", "", "одне відділення для ноутбука, дві бічні кишені", "100% поліестер",
+        "рюкзак, для ноутбука", "так", "10–14 робочих днів", "50",
+        "Чорний", "#111111", "https://example.com/backpack-1.jpg", "",
+        "", "", "", "",
+        "", "", "", ""
+    ]);
+
+    const ws = XLSX.utils.json_to_sheet([example1, example2], { header: HEADERS });
+
+    ws["!cols"] = HEADERS.map(h => ({ wch: Math.max(18, Math.min(38, h.length + 4)) }));
+
+    const wb = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(wb, ws, "Товари");
+
+    const genderRows = [["Для кого — допустимі значення"]].concat(GENDERS.map(g => [g]));
+    const wsGender = XLSX.utils.aoa_to_sheet(genderRows);
+    wsGender["!cols"] = [{ wch: 30 }];
+    XLSX.utils.book_append_sheet(wb, wsGender, "Довідник - Для кого");
+
+    const categoryRows = [["Розділ", "Категорія (точна назва)"]]
+        .concat(categories.map(c => [c.department || "", c.name || ""]));
+    const wsCategories = XLSX.utils.aoa_to_sheet(categoryRows);
+    wsCategories["!cols"] = [{ wch: 20 }, { wch: 30 }];
+    XLSX.utils.book_append_sheet(wb, wsCategories, "Довідник категорій");
+
+    XLSX.writeFile(wb, "bagvero-shablon-tovariv.xlsx");
+
+}
+
+// -------------------------
+// Крок 2 — розбір і перевірка завантаженого файлу
+// -------------------------
+
+function readNumber(value) {
+
+    if (value === "" || value === null || value === undefined) return undefined;
+
+    const n = Number(String(value).replace(",", "."));
+
+    return Number.isNaN(n) ? undefined : n;
+
+}
+
+function readBool(value) {
+
+    const s = String(value || "").trim().toLowerCase();
+
+    return s === "так" || s === "yes" || s === "true" || s === "1";
+
+}
+
+function splitList(value) {
+
+    return String(value || "")
+        .split(",")
+        .map(s => s.trim())
+        .filter(Boolean);
+
+}
+
+function escapeHtml(str) {
+
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+
+}
+
+function rowToProduct(row, rowNumber, validCategoryNames) {
+
+    const errors = [];
+    const warnings = [];
+
+    const title = String(row["Назва товару"] || "").trim();
+    const brand = String(row["Бренд"] || "").trim();
+    const category = String(row["Категорія"] || "").trim();
+    const gender = String(row["Для кого"] || "").trim();
+    const price = readNumber(row["Ціна"]);
+    const description = String(row["Опис товару"] || "").trim();
+
+    if (!title) errors.push("не вказана назва товару");
+    if (!brand) errors.push("не вказаний бренд");
+    if (!category) errors.push("не вказана категорія");
+
+    if (!gender) {
+        errors.push("не вказано поле «Для кого»");
+    } else if (!GENDERS.includes(gender)) {
+        errors.push(`поле «Для кого» має бути точно одним з: ${GENDERS.join(", ")} (зараз: «${gender}»)`);
+    }
+
+    if (price === undefined) errors.push("не вказана або нечислова ціна");
+    if (!description) errors.push("не вказаний опис товару");
+
+    if (category && validCategoryNames && validCategoryNames.length && !validCategoryNames.includes(category)) {
+        warnings.push(`категорію «${category}» не знайдено в довіднику — перевірте точний напис на листі «Довідник категорій» (регістр і пробіли важливі)`);
+    }
+
+    const variants = [];
+
+    for (let i = 1; i <= COLOR_SLOTS; i++) {
+
+        const color = String(row[`Колір ${i} (назва)`] || "").trim();
+        const hex = String(row[`Колір ${i} (HEX)`] || "").trim();
+        const images = splitList(row[`Колір ${i} (фото, посилання через кому)`]);
+        const video = String(row[`Колір ${i} (відео, посилання)`] || "").trim();
+
+        // порожній слот кольору — просто пропускаємо, це нормально
+        if (!color && !hex && images.length === 0) continue;
+
+        if (!color) errors.push(`Колір ${i}: не вказана назва кольору`);
+        if (!hex) errors.push(`Колір ${i}: не вказаний HEX-код кольору`);
+        if (images.length === 0) errors.push(`Колір ${i}: не вказано жодного посилання на фото`);
+
+        if (color && hex && images.length > 0) {
+
+            const variant = { color, hex, images };
+
+            if (video) variant.video = video;
+
+            variants.push(variant);
+
+        }
+
+    }
+
+    if (variants.length === 0) {
+        errors.push("не заповнено жодного кольору (мінімум потрібен «Колір 1»: назва, HEX і хоча б одне фото)");
+    }
+
+    if (errors.length > 0) {
+
+        return { ok: false, row: rowNumber, title: title || "(без назви)", errors, warnings };
+
+    }
+
+    const product = { title, brand, category, gender, price, description, variants };
+
+    const oldPrice = readNumber(row["Стара ціна"]);
+    if (oldPrice !== undefined) product.oldPrice = oldPrice;
+
+    const badge = String(row["Позначка (NEW/SALE/TOP/HOT)"] || "").trim().toUpperCase();
+    if (BADGES.includes(badge)) product.badge = badge;
+
+    product.isNew = readBool(row["Новинка (так/ні)"]);
+
+    const sizes = splitList(row["Розміри (через кому)"]);
+    if (sizes.length) product.sizes = sizes;
+
+    const textFields = {
+        "Матеріал": "material",
+        "Країна виробник": "country",
+        "Артикул": "sku",
+        "Застібка": "closure",
+        "Декор": "decor",
+        "Габарити": "dimensions",
+        "Опис ручки/ременя": "strapInfo",
+        "Відділення/кишені": "compartments",
+        "Склад матеріалу": "composition"
+    };
+
+    Object.keys(textFields).forEach(header => {
+
+        const value = String(row[header] || "").trim();
+
+        if (value) product[textFields[header]] = value;
+
+    });
+
+    const searchKeywords = splitList(row["Пошукові теги (через кому)"]);
+    if (searchKeywords.length) product.searchKeywords = searchKeywords;
+
+    if (readBool(row["Під замовлення (так/ні)"])) {
+
+        product.preOrder = true;
+
+        const preOrderDays = String(row["Термін виготовлення"] || "").trim();
+        if (preOrderDays) product.preOrderDays = preOrderDays;
+
+        const preOrderPrepayment = readNumber(row["Передоплата %"]);
+        if (preOrderPrepayment !== undefined) product.preOrderPrepayment = preOrderPrepayment;
+
+    }
+
+    return { ok: true, row: rowNumber, title, product, warnings };
+
+}
+
+function renderReport(okResults, badResults) {
+
+    const el = document.getElementById("report");
+
+    let html = "";
+
+    if (okResults.length > 0) {
+
+        html += `<div class="ok-line">✅ ${okResults.length} товар(ів) готово до завантаження</div>`;
+
+        const withWarnings = okResults.filter(r => r.warnings.length > 0);
+
+        if (withWarnings.length > 0) {
+
+            html += `<div class="warn-line">⚠ Звернути увагу (не блокує імпорт):</div><ul class="warn-list">`;
+
+            withWarnings.forEach(r => {
+
+                r.warnings.forEach(w => {
+                    html += `<li>Рядок ${r.row} (${escapeHtml(r.title)}): ${escapeHtml(w)}</li>`;
+                });
+
+            });
+
+            html += "</ul>";
+
+        }
+
+    }
+
+    if (badResults.length > 0) {
+
+        html += `<div class="err-line">✕ ${badResults.length} рядк(ів) з помилками — виправте їх у файлі й завантажте ще раз:</div><ul class="err-list">`;
+
+        badResults.forEach(r => {
+
+            html += `<li>Рядок ${r.row} (${escapeHtml(r.title)}): ${r.errors.map(escapeHtml).join("; ")}</li>`;
+
+        });
+
+        html += "</ul>";
+
+    }
+
+    if (okResults.length === 0 && badResults.length === 0) {
+
+        html = "<p>У файлі не знайдено жодного заповненого рядка товару.</p>";
+
+    }
+
+    el.innerHTML = html;
+
+}
+
+let importedProducts = [];
+
+async function processFile(file) {
+
+    const buffer = await file.arrayBuffer();
+    const workbook = XLSX.read(buffer, { type: "array" });
+
+    const sheetName = workbook.SheetNames.find(name => name.toLowerCase().includes("товар")) || workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+    const rows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+
+    const categories = await loadCategories();
+    const validCategoryNames = categories.map(c => c.name);
+
+    const results = rows
+        .map((row, index) => ({ row, rowNumber: index + 2 }))
+        .filter(({ row }) => Object.values(row).some(v => String(v).trim() !== ""))
+        .map(({ row, rowNumber }) => rowToProduct(row, rowNumber, validCategoryNames));
+
+    const okResults = results.filter(r => r.ok);
+    const badResults = results.filter(r => !r.ok);
+
+    renderReport(okResults, badResults);
+
+    importedProducts = okResults;
+
+    document.getElementById("downloadCard").hidden = okResults.length === 0;
+
+}
+
+async function downloadZip() {
+
+    const zip = new JSZip();
+    const folder = zip.folder("data").folder("products");
+    const stamp = Date.now();
+
+    importedProducts.forEach((result, index) => {
+
+        const filename = `import-${stamp}-${index + 1}.json`;
+
+        folder.file(filename, JSON.stringify(result.product, null, 2) + "\n");
+
+    });
+
+    const blob = await zip.generateAsync({ type: "blob" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "bagvero-import-tovariv.zip";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    URL.revokeObjectURL(url);
+
+}
+
+// -------------------------
+// Прив'язка до кнопок
+// -------------------------
+
+document.getElementById("downloadTemplateBtn").addEventListener("click", () => {
+
+    downloadTemplate();
+
+});
+
+const fileInput = document.getElementById("fileInput");
+const processBtn = document.getElementById("processBtn");
+
+fileInput.addEventListener("change", () => {
+
+    processBtn.disabled = fileInput.files.length === 0;
+
+    document.getElementById("report").innerHTML = "";
+    document.getElementById("downloadCard").hidden = true;
+
+});
+
+processBtn.addEventListener("click", () => {
+
+    const file = fileInput.files[0];
+
+    if (!file) return;
+
+    processBtn.disabled = true;
+    processBtn.textContent = "Обробляю…";
+
+    processFile(file).finally(() => {
+
+        processBtn.disabled = false;
+        processBtn.textContent = "Перевірити та обробити файл";
+
+    });
+
+});
+
+document.getElementById("downloadZipBtn").addEventListener("click", () => {
+
+    downloadZip();
+
+});

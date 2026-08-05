@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex" />
+<title>Bagvero — Масовий імпорт товарів</title>
+<link rel="icon" href="../assets/images/favicon.png">
+<style>
+
+    *{ box-sizing:border-box; }
+
+    body{
+        margin:0;
+        font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+        background:#f8fafc;
+        color:#111827;
+        line-height:1.6;
+    }
+
+    .wrap{
+        max-width:820px;
+        margin:0 auto;
+        padding:36px 24px 80px;
+    }
+
+    a.back{
+        display:inline-flex;
+        align-items:center;
+        gap:6px;
+        color:#2563eb;
+        text-decoration:none;
+        font-weight:600;
+        font-size:14px;
+        margin-bottom:18px;
+    }
+
+    h1{
+        font-size:28px;
+        margin:0 0 6px;
+    }
+
+    .lead{
+        color:#4b5563;
+        margin:0 0 32px;
+        font-size:15px;
+    }
+
+    .card{
+        background:#fff;
+        border-radius:16px;
+        box-shadow:0 8px 24px rgba(0,0,0,.06);
+        padding:24px 26px;
+        margin-bottom:22px;
+    }
+
+    .card h2{
+        font-size:16px;
+        margin:0 0 4px;
+        display:flex;
+        align-items:center;
+        gap:10px;
+    }
+
+    .step-num{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        width:26px;
+        height:26px;
+        border-radius:50%;
+        background:#111827;
+        color:#fff;
+        font-size:13px;
+        font-weight:700;
+        flex-shrink:0;
+    }
+
+    .card p{
+        color:#4b5563;
+        font-size:14px;
+        margin:8px 0 16px;
+    }
+
+    .card ul{
+        color:#4b5563;
+        font-size:14px;
+        margin:8px 0 16px;
+        padding-left:20px;
+    }
+
+    .card ul li{ margin-bottom:4px; }
+
+    .btn{
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        background:#2563eb;
+        color:#fff;
+        border:none;
+        padding:12px 22px;
+        border-radius:10px;
+        font-weight:700;
+        font-size:14px;
+        cursor:pointer;
+        text-decoration:none;
+        transition:.2s;
+    }
+
+    .btn:hover{ background:#1d4ed8; }
+
+    .btn:disabled{
+        background:#cbd5e1;
+        cursor:not-allowed;
+    }
+
+    .btn-secondary{
+        background:#111827;
+    }
+
+    .btn-secondary:hover{
+        background:#000;
+    }
+
+    input[type="file"]{
+        display:block;
+        margin-bottom:14px;
+        font-size:14px;
+    }
+
+    .report{
+        margin-top:18px;
+        font-size:14px;
+    }
+
+    .report .ok-line{
+        color:#15803d;
+        font-weight:700;
+        margin-bottom:8px;
+    }
+
+    .report .warn-line{
+        color:#b45309;
+        font-weight:700;
+        margin:14px 0 6px;
+    }
+
+    .report .err-line{
+        color:#dc2626;
+        font-weight:700;
+        margin:14px 0 6px;
+    }
+
+    .report ul{
+        margin:0 0 10px;
+        padding-left:20px;
+        color:inherit;
+    }
+
+    .report .err-list li{ color:#dc2626; }
+    .report .warn-list li{ color:#b45309; }
+
+    .hint{
+        background:#eff6ff;
+        border-radius:10px;
+        padding:12px 16px;
+        font-size:13px;
+        color:#1e40af;
+        margin-top:10px;
+    }
+
+    code{
+        background:#f1f5f9;
+        padding:2px 6px;
+        border-radius:5px;
+        font-size:13px;
+    }
+
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+    <a class="back" href="index.html">← Назад в адмінку</a>
+
+    <h1>Масовий імпорт товарів</h1>
+    <p class="lead">
+        Заповніть один Excel-файл замість того, щоб додавати кожен товар вручну
+        через форму. Інструмент перетворить рядки таблиці на файли товарів,
+        готові для сайту.
+    </p>
+
+    <div class="card">
+        <h2><span class="step-num">1</span> Завантажте шаблон</h2>
+        <p>
+            Excel-файл із потрібними колонками та двома прикладами заповнення
+            (товар з одним кольором і товар із двома). На другому та третьому
+            листах файлу — довідники: точний список категорій сайту й
+            допустимі значення для поля «Для кого».
+        </p>
+        <button class="btn" id="downloadTemplateBtn">📥 Завантажити шаблон (Excel)</button>
+    </div>
+
+    <div class="card">
+        <h2><span class="step-num">2</span> Заповніть і завантажте назад</h2>
+        <p>Заповніть шаблон своїми товарами (рядок = один товар) і завантажте файл сюди:</p>
+        <input type="file" id="fileInput" accept=".xlsx,.xls">
+        <br>
+        <button class="btn" id="processBtn" disabled>Перевірити та обробити файл</button>
+        <div class="report" id="report"></div>
+    </div>
+
+    <div class="card" id="downloadCard" hidden>
+        <h2><span class="step-num">3</span> Завантажте готові файли</h2>
+        <p>Товари без помилок готові — завантажте архів з файлами товарів:</p>
+        <button class="btn btn-secondary" id="downloadZipBtn">📦 Завантажити ZIP з товарами</button>
+    </div>
+
+    <div class="card">
+        <h2><span class="step-num">4</span> Що робити з архівом далі</h2>
+        <p>Archів вже має правильну структуру папок усередині (<code>data/products/…</code>), тому:</p>
+        <ul>
+            <li>Розпакуйте архів прямо в папку вашого репозиторію на комп'ютері (туди, де лежить <code>data</code>, <code>assets</code> тощо) — файли самі стануть в потрібне місце, поверх існуючих товарів нічого не перезапише.</li>
+            <li>Відкрийте GitHub Desktop — побачите нові файли в списку змін.</li>
+            <li>Напишіть коротке повідомлення коміту (наприклад «Імпорт товарів») і натисніть <strong>Commit → Push origin</strong>.</li>
+            <li>Через 1–2 хвилини GitHub Actions сам збере всі товари в загальний каталог сайту — товари з'являться на сайті автоматично.</li>
+            <li>Після цього товари також з'являться в адмінці (розділ «Товари») — за потреби доповніть чи виправте щось вручну, як завжди.</li>
+        </ul>
+        <div class="hint">
+            Фото у стовпцях «фото, посилання через кому» — це прямі посилання на вже
+            десь розміщені зображення (наприклад, завантажені на Pexels/Imgur чи
+            інший хостинг). Завантажити файл фото просто з комп'ютера через цей
+            інструмент не можна — лише через звичайну форму товару в адмінці.
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="import.js"></script>
+
+</body>
+</html>
