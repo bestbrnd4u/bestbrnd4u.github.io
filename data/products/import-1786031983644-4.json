@@ -1,0 +1,50 @@
+{
+  "title": "Urban Sneakers",
+  "brand": "Nike",
+  "category": "Кросівки",
+  "gender": "Унісекс",
+  "price": 4299,
+  "description": "Легкі повсякденні кросівки з амортизуючою підошвою для активного міського ритму.",
+  "variants": [
+    {
+      "color": "Білий",
+      "hex": "#f7f7f7",
+      "images": [
+        "https://commons.wikimedia.org/wiki/Special:Redirect/file/Timberland%206%20inch%20boots.jpg"
+      ]
+    },
+    {
+      "color": "Чорний",
+      "hex": "#161616",
+      "images": [
+        "https://commons.wikimedia.org/wiki/Special:Redirect/file/Timberland%206%20inch%20boots.jpg"
+      ]
+    }
+  ],
+  "oldPrice": 4799,
+  "badge": "TOP",
+  "isNew": false,
+  "sizes": [
+    "36",
+    "37",
+    "38",
+    "39",
+    "40",
+    "41",
+    "42"
+  ],
+  "material": "Текстиль та синтетичні матеріали",
+  "country": "В'єтнам",
+  "sku": "NK-US-7731",
+  "closure": "шнурівка",
+  "decor": "логотип",
+  "dimensions": "32x21x12 см",
+  "strapInfo": "Без ременя",
+  "compartments": "основне відділення коробки для взуття",
+  "composition": "текстиль, синтетика, гума",
+  "searchKeywords": [
+    "кросівки",
+    "повсякденні",
+    "спортивний стиль"
+  ]
+}
