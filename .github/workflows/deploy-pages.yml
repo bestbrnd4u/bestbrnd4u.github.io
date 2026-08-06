@@ -1,0 +1,66 @@
+name: Deploy to GitHub Pages
+
+# Замінює нативний Pages-деплой у режимі "Deploy from a branch".
+#
+# ЧОМУ ЦЕ ПОТРІБНО: адмінка (github-publish.js) робить коміт → це сам
+# по собі пуш у main. Одразу за ним build-products.yml перезбирає
+# data/*.json і комітить результат ще одним пушем (з [skip ci], щоб
+# не запускати build-products.yml вдруге по колу). Два пуші поспіль —
+# це два запити на Pages-деплой. Нативна система Pages намагається
+# скасувати перший деплой на користь другого, але якщо перший встигає
+# завершитися до виклику API скасування — GitHub Actions падає з
+# "Unable to cancel deployment ... as it's finished" (400), хоча сайт
+# зазвичай публікується нормально. Це відома поведінка самої системи
+# Pages, а не помилка в коді репозиторію.
+#
+# Рішення — керувати деплоєм самостійно через actions/deploy-pages
+# з concurrency-групою: GitHub Actions скасовує застарілий запуск
+# власним, надійним механізмом (а не тим самим Pages API, який і
+# падає), тож гонки більше немає.
+#
+# ОБОВ'ЯЗКОВИЙ РУЧНИЙ КРОК ПІСЛЯ ДОДАВАННЯ ЦЬОГО ФАЙЛУ:
+# Settings → Pages → Build and deployment → Source → "GitHub Actions"
+# (замість "Deploy from a branch"). Без цього перемикання нативна
+# система Pages продовжить деплоїти паралельно з цим workflow.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+# Лише один активний деплой одночасно. Новий пуш скасовує ще не
+# завершений попередній запуск (саме тут і вирішується вихідна
+# проблема) — на відміну від нативного скасування Pages, скасування
+# GitHub Actions runs не залежить від того, встиг задеплоїтись
+# попередній запуск чи ні.
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

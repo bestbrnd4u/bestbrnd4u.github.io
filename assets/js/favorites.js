@@ -61,10 +61,10 @@ function createFavoriteRow(product, favEntry) {
         <button
             type="button"
             class="mini-color ${variant.color === activeColor ? "active" : ""}"
-            data-color="${variant.color}"
-            data-images='${JSON.stringify(variant.images || [])}'
-            title="${variant.color}"
-            style="background:${variant.hex}"></button>
+            data-color="${escapeHtml(variant.color)}"
+            data-images='${escapeAttrSingleQuoted(JSON.stringify(variant.images || []))}'
+            title="${escapeHtml(variant.color)}"
+            style="background:${escapeHtml(variant.hex)}"></button>
     `).join("");
 
     const sizeButtons = sizes.map(size => `
@@ -81,7 +81,7 @@ function createFavoriteRow(product, favEntry) {
             <a href="product?id=${product.id}" class="favorite-row-image">
                 <img
                     src="${image}"
-                    alt="${product.title}"
+                    alt="${escapeHtml(product.title)}"
                     onerror="this.src='assets/images/no-image.png'">
             </a>
 
@@ -90,7 +90,7 @@ function createFavoriteRow(product, favEntry) {
                     ${product.brand || "Без бренду"}
                 </div>
                 <a href="product?id=${product.id}" class="favorite-row-title">
-                    ${product.title}
+                    ${escapeHtml(product.title)}
                 </a>
                 <div class="product-options">
                     <div class="product-colors">

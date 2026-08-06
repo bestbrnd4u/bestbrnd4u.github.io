@@ -7,6 +7,41 @@ const search = document.getElementById("searchInput");
 // після застосування фільтрів (мобільна шторка "Всі фільтри"
 // та десктопні випадаючі списки), щоб користувач одразу бачив
 // оновлений результат
+// "Захисне вікно" часу, протягом якого автоприховування при скролі
+// (і sticky-панелі фільтрів, і відкритого дропдауна) має ігнорувати
+// напрямок скролу. Потрібне через те, що scrollToFirstProduct()
+// сама викликає window.scrollTo({behavior:"smooth"}) — а для логіки
+// автоприховування це виглядає як звичайний скрол users вниз, і
+// панель/список ховаються рівно в момент, коли товари щойно
+// з'явились на екрані (класичний сценарій: стояли зверху сторінки,
+// застосували фільтр — і фільтри одразу зникають).
+let autoScrollGuardUntil = 0;
+
+function isAutoScrollGuardActive() {
+
+    return Date.now() < autoScrollGuardUntil;
+
+}
+
+function armAutoScrollGuard(durationMs) {
+
+    autoScrollGuardUntil = Date.now() + durationMs;
+
+    // 'scrollend' підтримують усі сучасні браузери (Chrome/Edge/
+    // Firefox з 2023, Safari з 17) — знімаємо захист достроково,
+    // щойно сама анімація скролу реально завершилась, а не чекаємо
+    // повний таймаут. Для браузерів без підтримки просто спрацює
+    // таймаут нижче.
+    if ("onscrollend" in window) {
+
+        window.addEventListener("scrollend", () => {
+            autoScrollGuardUntil = 0;
+        }, { once: true });
+
+    }
+
+}
+
 function scrollToFirstProduct() {
 
     if (!grid) return;
@@ -37,9 +72,22 @@ function scrollToFirstProduct() {
 
     offset += 16;
 
-    const top = target.getBoundingClientRect().top + window.scrollY - offset;
+    const top = Math.max(target.getBoundingClientRect().top + window.scrollY - offset, 0);
 
-    window.scrollTo({ top: Math.max(top, 0), behavior: "smooth" });
+    // захист озброюємо лише якщо реально є куди скролити — інакше
+    // (ціль уже на екрані) 'scrollend' не спрацює жодного разу і
+    // прапорець завис би увімкненим назавжди, блокуючи приховування
+    // панелі при звичайному подальшому скролі користувача
+    if (Math.abs(top - window.scrollY) > 4) {
+
+        // 900ms — з запасом понад типову тривалість плавного скролу
+        // на дистанції в межах каталогу; 'scrollend' зазвичай знімає
+        // захист набагато раніше цього таймауту
+        armAutoScrollGuard(900);
+
+    }
+
+    window.scrollTo({ top, behavior: "smooth" });
 
 }
 
@@ -1306,7 +1354,12 @@ document.addEventListener("click", event => {
 
             if (menu && !menu.hidden) {
 
-                menu.classList.toggle("scroll-hidden", delta > 0);
+                // та сама причина, що й у initStickyFilterAutoHide:
+                // не ховаємо відкритий дропдаун через наш власний
+                // programmatic-скрол після застосування фільтра
+                const hiding = delta > 0 && !isAutoScrollGuardActive();
+
+                menu.classList.toggle("scroll-hidden", hiding);
 
             }
 
@@ -2239,7 +2292,12 @@ if (!window.CATALOG_SKIP_AUTO_INIT) {
 
             } else if (Math.abs(delta) > HIDE_THRESHOLD) {
 
-                const hiding = delta > 0;
+                // ховаємо тільки якщо це справжній скрол користувача
+                // вниз, а не наш власний плавний scrollToFirstProduct()
+                // після застосування фільтра (див. autoScrollGuardUntil
+                // вище) — інакше панель зникає рівно в той момент,
+                // коли щойно з'явились результати
+                const hiding = delta > 0 && !isAutoScrollGuardActive();
 
                 // При скролі вниз панель ховається трансформом
                 // (translateY), а відкритий список вищий за неї, тож

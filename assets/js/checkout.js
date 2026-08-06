@@ -374,11 +374,11 @@ function renderOrderSummary() {
             <div class="order-item">
 
                 <a href="product?id=${product.id}" class="order-item-image">
-                    <img src="${image}" alt="${product.title}" onerror="this.src='assets/images/no-image.png'">
+                    <img src="${image}" alt="${escapeHtml(product.title)}" onerror="this.src='assets/images/no-image.png'">
                 </a>
 
                 <div class="order-item-info">
-                    <a href="product?id=${product.id}" class="order-item-title">${product.title}</a>
+                    <a href="product?id=${product.id}" class="order-item-title">${escapeHtml(product.title)}</a>
                     <span class="order-item-meta">
                         ${metaParts.join(" · ")}
                     </span>
@@ -609,7 +609,7 @@ function buildOrderCompositionText() {
 
         const lineTotal = product.price * qty;
 
-        return `${product.brand ? product.brand + " — " : ""}${product.title}`
+        return `${product.brand ? escapeHtml(product.brand) + " — " : ""}${escapeHtml(product.title)}`
             + `${color ? `, колір: ${color}` : ""}`
             + `${size ? `, розмір: ${size}` : ""}`
             + `, кількість: ${qty}`

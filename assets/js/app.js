@@ -802,7 +802,7 @@ function createCollectionProductCard(product) {
 
                 <img
                     src="${image}"
-                    alt="${product.title}"
+                    alt="${escapeHtml(product.title)}"
                     loading="lazy"
                     onerror="this.src='assets/images/no-image.png'">
 
@@ -819,7 +819,7 @@ function createCollectionProductCard(product) {
                 <span class="collection-product-brand">${product.brand || ""}</span>
 
                 <a href="product?id=${product.id}" class="collection-product-title">
-                    ${product.title}
+                    ${escapeHtml(product.title)}
                 </a>
 
                 <div class="collection-product-price">

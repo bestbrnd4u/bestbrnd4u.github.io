@@ -110,10 +110,10 @@ function renderCart() {
             <button
                 type="button"
                 class="mini-color ${variant.color === activeColor ? "active" : ""}"
-                data-color="${variant.color}"
-                data-images='${JSON.stringify(variant.images || [])}'
-                title="${variant.color}"
-                style="background:${variant.hex}"></button>
+                data-color="${escapeHtml(variant.color)}"
+                data-images='${escapeAttrSingleQuoted(JSON.stringify(variant.images || []))}'
+                title="${escapeHtml(variant.color)}"
+                style="background:${escapeHtml(variant.hex)}"></button>
         `).join("");
 
         const sizeButtons = sizes.map(size => `
@@ -130,14 +130,14 @@ function renderCart() {
                 <a href="product?id=${line.id}" class="cart-item-image">
                     <img
                         src="${image}"
-                        alt="${product.title}"
+                        alt="${escapeHtml(product.title)}"
                         onerror="this.src='assets/images/no-image.png'">
                 </a>
 
                 <div class="cart-item-info">
                     <div class="cart-item-brand">${product.brand || ""}</div>
                     <a href="product?id=${line.id}" class="cart-item-title">
-                        ${product.title}
+                        ${escapeHtml(product.title)}
                     </a>
                     ${product.preOrder ? `<div class="preorder-tag">📦 Під замовлення</div>` : ""}
                     <div class="product-options cart-item-options">

@@ -4,6 +4,39 @@
 // ======================================
 
 // -------------------------
+// Екранування тексту з товарів (назва, бренд, опис, колір тощо)
+// перед вставкою в HTML.
+//
+// Ці поля заповнюються в адмінці або через масовий Excel-імпорт
+// (admin/import.js) — тобто це не жорстко контрольований розробником
+// текст, а довільний ввід. Раніше вони вставлялись у шаблони
+// напряму (`${product.title}`), тож символи <, >, " у назві товару
+// чи кольору ставали справжньою HTML/JS-розміткою на сторінці —
+// класична stored-XSS: досить одного товару з "<script>" у назві,
+// імпортованого з чужого прайс-листа, і код виконається в браузері
+// кожного відвідувача сайту.
+//
+// escapeHtml — для тексту й атрибутів у подвійних лапках (більшість
+// місць). escapeAttrSingleQuoted — додатково екранує ' для тих
+// нечастих місць, де атрибут обгорнутий в одинарні лапки (наприклад
+// data-images='...json...' у картці товару).
+function escapeHtml(value) {
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+
+}
+
+function escapeAttrSingleQuoted(value) {
+
+    return escapeHtml(value).replace(/'/g, "&#39;");
+
+}
+
+// -------------------------
 // Забороняємо нативне "підняття" картинки (drag) —
 // саме воно і показувало білу підкладку під фото при
 // протягуванні пальцем. На відміну від touch-action:pan-x
@@ -334,11 +367,11 @@ function showCartPopup(product, selection = {}) {
         <div class="cart-popup-item">
             <img
                 src="${image}"
-                alt="${product.title}"
+                alt="${escapeHtml(product.title)}"
                 onerror="this.src='assets/images/no-image.png'">
             <div class="cart-popup-item-info">
-                ${product.brand ? `<div class="cart-popup-item-brand">${product.brand}</div>` : ""}
-                <div class="cart-popup-item-title">${product.title}</div>
+                ${product.brand ? `<div class="cart-popup-item-brand">${escapeHtml(product.brand)}</div>` : ""}
+                <div class="cart-popup-item-title">${escapeHtml(product.title)}</div>
                 ${metaHtml}
                 <div class="cart-popup-item-price">${formatPrice(product.price)}</div>
             </div>
@@ -836,10 +869,10 @@ async function runGlobalSearch(query) {
         return `
             <a href="product?id=${product.id}" class="search-result-card">
                 <div class="search-result-image">
-                    <img src="${image}" alt="${product.title}" onerror="this.src='assets/images/no-image.png'">
+                    <img src="${image}" alt="${escapeHtml(product.title)}" onerror="this.src='assets/images/no-image.png'">
                 </div>
-                <div class="search-result-brand">${product.brand}</div>
-                <div class="search-result-title">${product.title}</div>
+                <div class="search-result-brand">${escapeHtml(product.brand)}</div>
+                <div class="search-result-title">${escapeHtml(product.title)}</div>
                 <div class="search-result-price">${formatPrice(product.price)}</div>
             </a>
         `;

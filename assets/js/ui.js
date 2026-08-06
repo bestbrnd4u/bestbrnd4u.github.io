@@ -364,10 +364,10 @@ function createProductCard(product) {
         <button
             type="button"
             class="mini-color ${index === 0 ? "active" : ""}"
-            data-color="${variant.color}"
-            data-images='${JSON.stringify(variant.images || [])}'
-            title="${variant.color}"
-            style="background:${variant.hex}"></button>
+            data-color="${escapeHtml(variant.color)}"
+            data-images='${escapeAttrSingleQuoted(JSON.stringify(variant.images || []))}'
+            title="${escapeHtml(variant.color)}"
+            style="background:${escapeHtml(variant.hex)}"></button>
     `).join("");
 
     const sizeButtons = sizes.map(size => `
@@ -403,7 +403,7 @@ function createProductCard(product) {
                             <img
                                 class="product-main-image photo-slide"
                                 src="${img}"
-                                alt="${product.title}"
+                                alt="${escapeHtml(product.title)}"
                                 loading="lazy"
                                 onerror="this.src='assets/images/no-image.png'">
                         `).join("")}
@@ -452,12 +452,12 @@ function createProductCard(product) {
             <div class="product-info">
                 <div class="product-category-row">
                     <div class="product-category">
-                        ${brand}
+                        ${escapeHtml(brand)}
                     </div>
                     ${product.preOrder ? `<span class="preorder-inline">📦 Під замовлення</span>` : ""}
                 </div>
                 <div class="product-title">
-                    ${product.title}
+                    ${escapeHtml(product.title)}
                 </div>
                 <div class="product-meta-row">
                     <div class="product-price">
@@ -482,7 +482,7 @@ function createProductCard(product) {
                         </div>
                     </div>
                 </div>
-                ${product.description ? `<div class="product-desc">${product.description}</div>` : ""}
+                ${product.description ? `<div class="product-desc">${escapeHtml(product.description)}</div>` : ""}
                 ${product.preOrder ? `<div class="preorder-row">📦 Під замовлення</div>` : ""}
                 <button
                     class="btn buy-btn"

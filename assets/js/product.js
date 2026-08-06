@@ -277,23 +277,30 @@ function renderProduct(product) {
     const colorButtons = variants.map((variant, index) => {
 
         const swatchImage = variant.images?.[0];
-        const swatchColor = variant.hex || "#999";
+        const swatchColor = escapeAttrSingleQuoted(variant.hex || "#999");
 
         // колір ставимо завжди (навіть коли є фото) — це підкладка:
         // якщо фото свотча не завантажиться (бита посилання),
         // колір все одно буде видно замість порожнього квадрата
+        //
+        // swatchImage тут проходить через escapeAttrSingleQuoted, а не
+        // просто escapeHtml: рядок опиняється одразу в ДВОХ контекстах
+        // лапок — усередині style="..." (подвійні) і всередині
+        // url('...') (одинарні). Це посилання на файл, завантажений
+        // через адмінку/масовий імпорт, тож апостроф чи лапка в назві
+        // файлу інакше розірвали б або HTML-атрибут, або CSS url().
         const swatchStyle = swatchImage
-            ? `background-color:${swatchColor};background-image:url('${swatchImage}');background-size:cover;background-position:center`
+            ? `background-color:${swatchColor};background-image:url('${escapeAttrSingleQuoted(swatchImage)}');background-size:cover;background-position:center`
             : `background-color:${swatchColor}`;
 
         return `
         <button
             class="color ${index === 0 ? "active" : ""}"
-            data-color="${variant.color}"
-            data-images='${JSON.stringify(variant.images || [])}'
-            data-video="${variant.video || ""}"
-            title="${variant.color}"
-            aria-label="Колір: ${variant.color}"
+            data-color="${escapeHtml(variant.color)}"
+            data-images='${escapeAttrSingleQuoted(JSON.stringify(variant.images || []))}'
+            data-video="${escapeHtml(variant.video || "")}"
+            title="${escapeHtml(variant.color)}"
+            aria-label="Колір: ${escapeHtml(variant.color)}"
             style="${swatchStyle}"></button>
     `;
 
@@ -352,7 +359,7 @@ function renderProduct(product) {
 
         <a class="brand" href="catalog?brand=${encodeURIComponent(product.brand)}">
 
-            ${product.brand}
+            ${escapeHtml(product.brand)}
 
         </a>
 
@@ -360,12 +367,12 @@ function renderProduct(product) {
 
         <h1>
 
-            ${product.title}
+            ${escapeHtml(product.title)}
 
         </h1>
 
         <div class="product-meta-line">
-            ${product.brand}${product.sku ? ` · ${product.sku}` : ""}
+            ${escapeHtml(product.brand)}${product.sku ? ` · ${escapeHtml(product.sku)}` : ""}
         </div>
 
         <div class="price-box">
@@ -482,7 +489,7 @@ ${sizeButtons}
                 </button>
                 <div class="spec-block-content">
                     <div class="spec-block-inner">
-                        <p class="spec-plain">${product.sku}</p>
+                        <p class="spec-plain">${escapeHtml(product.sku)}</p>
                     </div>
                 </div>
             </div>` : ""}
@@ -505,38 +512,38 @@ ${sizeButtons}
                 ${product.closure ? `
                 <div class="spec-row">
                     <span>Застібка</span>
-                    <strong>${product.closure}</strong>
+                    <strong>${escapeHtml(product.closure)}</strong>
                 </div>` : ""}
 
                 ${product.decor ? `
                 <div class="spec-row">
                     <span>Декор</span>
-                    <strong>${product.decor}</strong>
+                    <strong>${escapeHtml(product.decor)}</strong>
                 </div>` : ""}
 
                 ${product.dimensions ? `
                 <div class="spec-row">
                     <span>Розмір</span>
-                    <strong>${product.dimensions}</strong>
+                    <strong>${escapeHtml(product.dimensions)}</strong>
                 </div>` : ""}
 
-                ${product.strapInfo ? `<p class="spec-plain">${product.strapInfo}</p>` : ""}
+                ${product.strapInfo ? `<p class="spec-plain">${escapeHtml(product.strapInfo)}</p>` : ""}
 
                 ${product.compartments ? `
                 <div class="spec-row">
                     <span>Відділення / кишені (зовнішні)</span>
-                    <strong>${product.compartments}</strong>
+                    <strong>${escapeHtml(product.compartments)}</strong>
                 </div>` : ""}
 
                 ${product.material ? `
                 <div class="spec-row">
                     <span>Матеріал</span>
-                    <strong>${product.material}</strong>
+                    <strong>${escapeHtml(product.material)}</strong>
                 </div>` : ""}
 
                 <div class="spec-row">
                     <span>Бренд</span>
-                    <strong>${product.brand}</strong>
+                    <strong>${escapeHtml(product.brand)}</strong>
                 </div>
 
                 <div class="spec-row">
@@ -547,7 +554,7 @@ ${sizeButtons}
                 ${product.country ? `
                 <div class="spec-row">
                     <span>Країна</span>
-                    <strong>${product.country}</strong>
+                    <strong>${escapeHtml(product.country)}</strong>
                 </div>` : ""}
 
                 </div>
@@ -566,7 +573,7 @@ ${sizeButtons}
                     <div class="spec-block-inner">
                         <div class="spec-row">
                             <span>Склад</span>
-                            <strong>${product.composition}</strong>
+                            <strong>${escapeHtml(product.composition)}</strong>
                         </div>
                     </div>
                 </div>
