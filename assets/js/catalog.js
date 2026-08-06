@@ -213,10 +213,10 @@ let activeFiltersExpanded = false;
 
 const GENDERS = ["Чоловікам", "Жінкам", "Унісекс", "Дітям"];
 const SALE_MIN_DISCOUNT = 30; // % — мінімальна знижка для розділу "Акції"
-const DEFAULT_BRAND_LABEL = "Усі бренди";
-const DEFAULT_COLOR_LABEL = "Усі кольори";
-const DEFAULT_CATEGORY_LABEL = "Усі категорії";
-const DEFAULT_PRICE_LABEL = "Будь-яка ціна";
+const DEFAULT_BRAND_LABEL = "Бренд";
+const DEFAULT_COLOR_LABEL = "Колір";
+const DEFAULT_CATEGORY_LABEL = "Категорія";
+const DEFAULT_PRICE_LABEL = "Ціна";
 const DEFAULT_SIZE_LABEL = "Розмір";
 
 const PRICE_RANGE_LABELS = {

@@ -46,6 +46,90 @@ for (let i = 1; i <= COLOR_SLOTS; i++) {
 
 let categoriesCache = null;
 
+// -------------------------
+// Фото, обрані користувачем на кроці 3 — зіставляємо з назвами
+// файлів, які вказані в комірках "фото" таблиці
+// -------------------------
+
+let selectedPhotos = new Map(); // ключ: назва файлу як є (trim), значення: File
+let selectedPhotosLower = new Map(); // той самий набір, ключі в нижньому регістрі — для м'якшого пошуку
+
+function registerSelectedPhotos(fileList) {
+
+    selectedPhotos = new Map();
+    selectedPhotosLower = new Map();
+
+    Array.from(fileList).forEach(file => {
+
+        const name = file.name.trim();
+
+        selectedPhotos.set(name, file);
+        selectedPhotosLower.set(name.toLowerCase(), file);
+
+    });
+
+}
+
+function findPhotoFile(reference) {
+
+    const name = reference.trim();
+
+    return selectedPhotos.get(name) || selectedPhotosLower.get(name.toLowerCase()) || null;
+
+}
+
+function sanitizeFilename(name) {
+
+    const dot = name.lastIndexOf(".");
+    const base = dot > 0 ? name.slice(0, dot) : name;
+    const ext = dot > 0 ? name.slice(dot).toLowerCase() : "";
+
+    const safeBase = base
+        .replace(/[^a-zA-Z0-9._-]+/g, "-")
+        .replace(/-+/g, "-")
+        .replace(/^-|-$/g, "");
+
+    return (safeBase || "photo") + ext;
+
+}
+
+// назва файлу в архіві (може відрізнятись від оригінальної, якщо
+// оригінал містив кирилицю/пробіли/тощо) — та сама мапа гарантує,
+// що той самий файл, згаданий у кількох товарах, потрапить в архів
+// лише один раз і під однією назвою
+const filesToZip = new Map(); // ключ: оригінальна назва файлу, значення: { file, safeName }
+const usedSafeNames = new Set();
+
+function registerFileForZip(file) {
+
+    if (filesToZip.has(file.name)) {
+
+        return filesToZip.get(file.name).safeName;
+
+    }
+
+    let safeName = sanitizeFilename(file.name);
+
+    if (usedSafeNames.has(safeName)) {
+
+        const dot = safeName.lastIndexOf(".");
+        const base = dot > 0 ? safeName.slice(0, dot) : safeName;
+        const ext = dot > 0 ? safeName.slice(dot) : "";
+        let counter = 2;
+
+        while (usedSafeNames.has(`${base}-${counter}${ext}`)) counter++;
+
+        safeName = `${base}-${counter}${ext}`;
+
+    }
+
+    usedSafeNames.add(safeName);
+    filesToZip.set(file.name, { file, safeName });
+
+    return safeName;
+
+}
+
 async function loadCategories() {
 
     if (categoriesCache) return categoriesCache;
@@ -208,17 +292,43 @@ function rowToProduct(row, rowNumber, validCategoryNames) {
 
         const color = String(row[`Колір ${i} (назва)`] || "").trim();
         const hex = String(row[`Колір ${i} (HEX)`] || "").trim();
-        const images = splitList(row[`Колір ${i} (фото, посилання через кому)`]);
+        const photoRefs = splitList(row[`Колір ${i} (фото, посилання через кому)`]);
         const video = String(row[`Колір ${i} (відео, посилання)`] || "").trim();
 
         // порожній слот кольору — просто пропускаємо, це нормально
-        if (!color && !hex && images.length === 0) continue;
+        if (!color && !hex && photoRefs.length === 0) continue;
 
         if (!color) errors.push(`Колір ${i}: не вказана назва кольору`);
         if (!hex) errors.push(`Колір ${i}: не вказаний HEX-код кольору`);
-        if (images.length === 0) errors.push(`Колір ${i}: не вказано жодного посилання на фото`);
+        if (photoRefs.length === 0) errors.push(`Колір ${i}: не вказано жодного фото (посилання або назви файлу)`);
 
-        if (color && hex && images.length > 0) {
+        const images = [];
+
+        photoRefs.forEach(ref => {
+
+            if (/^https?:\/\//i.test(ref)) {
+
+                images.push(ref);
+                return;
+
+            }
+
+            const file = findPhotoFile(ref);
+
+            if (!file) {
+
+                errors.push(`Колір ${i}: файл «${ref}» не знайдено серед завантажених фото (крок 3) — або вкажіть посилання https://…, або завантажте файл із такою назвою`);
+                return;
+
+            }
+
+            const safeName = registerFileForZip(file);
+
+            images.push(`assets/images/products/uploads/${safeName}`);
+
+        });
+
+        if (color && hex && photoRefs.length > 0 && images.length === photoRefs.length) {
 
             const variant = { color, hex, images };
 
@@ -350,6 +460,9 @@ let importedProducts = [];
 
 async function processFile(file) {
 
+    filesToZip.clear();
+    usedSafeNames.clear();
+
     const buffer = await file.arrayBuffer();
     const workbook = XLSX.read(buffer, { type: "array" });
 
@@ -379,16 +492,28 @@ async function processFile(file) {
 async function downloadZip() {
 
     const zip = new JSZip();
-    const folder = zip.folder("data").folder("products");
+    const productsFolder = zip.folder("data").folder("products");
     const stamp = Date.now();
 
     importedProducts.forEach((result, index) => {
 
         const filename = `import-${stamp}-${index + 1}.json`;
 
-        folder.file(filename, JSON.stringify(result.product, null, 2) + "\n");
+        productsFolder.file(filename, JSON.stringify(result.product, null, 2) + "\n");
 
     });
+
+    if (filesToZip.size > 0) {
+
+        const uploadsFolder = zip.folder("assets").folder("images").folder("products").folder("uploads");
+
+        filesToZip.forEach(({ file, safeName }) => {
+
+            uploadsFolder.file(safeName, file);
+
+        });
+
+    }
 
     const blob = await zip.generateAsync({ type: "blob" });
     const url = URL.createObjectURL(blob);
@@ -416,6 +541,25 @@ document.getElementById("downloadTemplateBtn").addEventListener("click", () => {
 
 const fileInput = document.getElementById("fileInput");
 const processBtn = document.getElementById("processBtn");
+const photosInput = document.getElementById("photosInput");
+const photosSummary = document.getElementById("photosSummary");
+
+photosInput.addEventListener("change", () => {
+
+    registerSelectedPhotos(photosInput.files);
+
+    if (selectedPhotos.size > 0) {
+
+        photosSummary.hidden = false;
+        photosSummary.textContent = `Обрано файлів: ${selectedPhotos.size}. У таблиці вказуйте їх точні назви (з розширенням), наприклад: ${Array.from(selectedPhotos.keys()).slice(0, 2).join(", ")}${selectedPhotos.size > 2 ? "…" : ""}`;
+
+    } else {
+
+        photosSummary.hidden = true;
+
+    }
+
+});
 
 fileInput.addEventListener("change", () => {
 

@@ -144,7 +144,7 @@ rel="stylesheet">
 
             <div class="filter-group filter-dropdown" id="categoryDropdown">
                 <button type="button" id="categoryToggle" class="filter-toggle">
-                    <span id="categoryLabel">Усі категорії</span>
+                    <span id="categoryLabel">Категорія</span>
                     <span class="filter-arrow">▾</span>
                 </button>
                 <div id="categoryMenu" class="filter-menu filter-menu-search" hidden>
@@ -160,7 +160,7 @@ rel="stylesheet">
 
             <div class="filter-group filter-dropdown" id="brandDropdown">
                 <button type="button" id="brandToggle" class="filter-toggle">
-                    <span id="brandLabel">Усі бренди</span>
+                    <span id="brandLabel">Бренд</span>
                     <span class="filter-arrow">▾</span>
                 </button>
                 <div id="brandMenu" class="filter-menu filter-menu-search" hidden>
@@ -176,7 +176,7 @@ rel="stylesheet">
 
             <div class="filter-group filter-dropdown" id="colorDropdown">
                 <button type="button" id="colorToggle" class="filter-toggle">
-                    <span id="colorLabel">Усі кольори</span>
+                    <span id="colorLabel">Колір</span>
                     <span class="filter-arrow">▾</span>
                 </button>
                 <div id="colorMenu" class="filter-menu filter-menu-colors" hidden>
@@ -185,9 +185,20 @@ rel="stylesheet">
                 </div>
             </div>
 
+            <div class="filter-group filter-dropdown" id="sizeDropdown">
+                <button type="button" id="sizeToggle" class="filter-toggle">
+                    <span id="sizeLabel">Розмір</span>
+                    <span class="filter-arrow">▾</span>
+                </button>
+                <div id="sizeMenu" class="filter-menu filter-menu-sizes" hidden>
+                    <button type="button" class="filter-option-clear" data-clear-size>✕ Скинути вибір розміру</button>
+                    <div id="sizeGroupsList"></div>
+                </div>
+            </div>
+
             <div class="filter-group filter-dropdown" id="priceDropdown">
                 <button type="button" id="priceToggle" class="filter-toggle">
-                    <span id="priceLabel">Будь-яка ціна</span>
+                    <span id="priceLabel">Ціна</span>
                     <span class="filter-arrow">▾</span>
                 </button>
                 <div id="priceMenu" class="filter-menu" hidden>
@@ -208,17 +219,6 @@ rel="stylesheet">
                         <span class="filter-checkbox"></span>
                         від 8 000 грн
                     </button>
-                </div>
-            </div>
-
-            <div class="filter-group filter-dropdown" id="sizeDropdown">
-                <button type="button" id="sizeToggle" class="filter-toggle">
-                    <span id="sizeLabel">Розмір</span>
-                    <span class="filter-arrow">▾</span>
-                </button>
-                <div id="sizeMenu" class="filter-menu filter-menu-sizes" hidden>
-                    <button type="button" class="filter-option-clear" data-clear-size>✕ Скинути вибір розміру</button>
-                    <div id="sizeGroupsList"></div>
                 </div>
             </div>
 
