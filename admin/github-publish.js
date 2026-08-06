@@ -113,9 +113,35 @@ window.GitHubPublisher = (function () {
 
     }
 
-    // Той самий OAuth-потік, що використовує Decap CMS: відкриваємо
-    // вікно Netlify → воно веде на GitHub → після дозволу вікно
-    // повертає токен через postMessage.
+    // Вікно OAuth МАЄ відкриватись синхронно, прямо в обробнику
+    // кліку. Якщо перед window.open стоїть будь-який await (навіть
+    // швидкий fetch конфігу), Safari і Firefox вважають, що "жест
+    // користувача" вже витрачено, і блокують спливаюче вікно.
+    //
+    // Тому кнопка публікації спершу викликає preopenAuthWindow() —
+    // вона синхронно відкриває порожнє вікно, а реальний URL
+    // підставляється пізніше, коли конфіг вже завантажився.
+    let pendingPopup = null;
+
+    function preopenAuthWindow() {
+
+        if (readStoredToken() || cachedToken) return null;
+
+        const width = 960;
+        const height = 720;
+        const left = window.screenX + (window.outerWidth - width) / 2;
+        const top = window.screenY + (window.outerHeight - height) / 2;
+
+        pendingPopup = window.open(
+            "about:blank",
+            "github-oauth",
+            `width=${width},height=${height},left=${left},top=${top}`
+        );
+
+        return pendingPopup;
+
+    }
+
     function loginWithGitHub(config) {
 
         return new Promise((resolve, reject) => {
@@ -123,16 +149,30 @@ window.GitHubPublisher = (function () {
             const url = `${config.baseUrl}/${config.authEndpoint}` +
                 `?provider=github&site_id=${encodeURIComponent(config.siteId)}&scope=repo`;
 
-            const width = 960;
-            const height = 720;
-            const left = window.screenX + (window.outerWidth - width) / 2;
-            const top = window.screenY + (window.outerHeight - height) / 2;
+            let popup = pendingPopup;
 
-            const popup = window.open(
-                url,
-                "github-oauth",
-                `width=${width},height=${height},left=${left},top=${top}`
-            );
+            pendingPopup = null;
+
+            if (popup && !popup.closed) {
+
+                // вікно вже відкрите синхронно — просто ведемо його
+                // за потрібною адресою
+                popup.location.replace(url);
+
+            } else {
+
+                const width = 960;
+                const height = 720;
+                const left = window.screenX + (window.outerWidth - width) / 2;
+                const top = window.screenY + (window.outerHeight - height) / 2;
+
+                popup = window.open(
+                    url,
+                    "github-oauth",
+                    `width=${width},height=${height},left=${left},top=${top}`
+                );
+
+            }
 
             if (!popup) {
 
@@ -226,6 +266,11 @@ window.GitHubPublisher = (function () {
     }
 
     let cachedToken = null;
+
+    // конфіг тягнемо одразу при завантаженні сторінки, щоб на момент
+    // кліку по "Опублікувати" він уже був у пам'яті і не з'їдав
+    // "жест користувача" зайвим await перед відкриттям вікна входу
+    loadConfig();
 
     async function getToken({ interactive = true } = {}) {
 
@@ -359,77 +404,117 @@ window.GitHubPublisher = (function () {
 
         report("Перевіряю доступ до репозиторію…");
 
-        const ref = await api(`/repos/${owner}/${repo}/git/ref/heads/${branch}`);
-        const headSha = ref.object.sha;
+        // 1. Заливаємо вміст кожного файлу як blob.
+        //    По 4 паралельно — інакше імпорт на 30 фото перетворюється
+        //    на 30 послідовних запитів і тягнеться хвилинами.
+        const treeItems = new Array(files.length);
 
-        const headCommit = await api(`/repos/${owner}/${repo}/git/commits/${headSha}`);
-        const baseTreeSha = headCommit.tree.sha;
+        let done = 0;
+        let cursor = 0;
 
-        // 1. заливаємо вміст кожного файлу як blob
-        const treeItems = [];
+        async function worker() {
 
-        for (let i = 0; i < files.length; i++) {
+            while (cursor < files.length) {
 
-            const item = files[i];
+                const index = cursor++;
+                const item = files[index];
 
-            report(`Завантажую файли: ${i + 1} з ${files.length}…`);
+                const content = item.file
+                    ? await fileToBase64(item.file)
+                    : textToBase64(item.text);
 
-            const content = item.file
-                ? await fileToBase64(item.file)
-                : textToBase64(item.text);
+                const blob = await api(`/repos/${owner}/${repo}/git/blobs`, {
+                    method: "POST",
+                    body: JSON.stringify({ content, encoding: "base64" })
+                });
 
-            const blob = await api(`/repos/${owner}/${repo}/git/blobs`, {
-                method: "POST",
-                body: JSON.stringify({ content, encoding: "base64" })
-            });
+                treeItems[index] = {
+                    path: item.path,
+                    mode: "100644",
+                    type: "blob",
+                    sha: blob.sha
+                };
 
-            treeItems.push({
-                path: item.path,
-                mode: "100644",
-                type: "blob",
-                sha: blob.sha
-            });
+                done++;
+
+                report(`Завантажую файли: ${done} з ${files.length}…`);
+
+            }
 
         }
 
-        // 2. дерево поверх поточного стану гілки —
-        // усе, чого немає в списку, лишається як було
-        report("Формую коміт…");
+        await Promise.all(
+            Array.from({ length: Math.min(4, files.length) }, worker)
+        );
 
-        const tree = await api(`/repos/${owner}/${repo}/git/trees`, {
-            method: "POST",
-            body: JSON.stringify({ base_tree: baseTreeSha, tree: treeItems })
-        });
+        // 2. Дерево → коміт → пересування гілки.
+        //
+        //    Гілку в цей момент може зрушити GitHub Actions (workflow
+        //    сам комітить перезібраний каталог назад у main). Тоді
+        //    PATCH ref впаде з 422 "not a fast forward". Це не помилка
+        //    користувача — просто гонка, тож перезбираємо дерево вже
+        //    поверх нової верхівки і пробуємо ще раз. SHA блобів при
+        //    цьому лишаються дійсними, заново нічого не вантажимо.
+        const ATTEMPTS = 3;
 
-        // 3. коміт
-        const commit = await api(`/repos/${owner}/${repo}/git/commits`, {
-            method: "POST",
-            body: JSON.stringify({
-                message,
-                tree: tree.sha,
-                parents: [headSha]
-            })
-        });
+        for (let attempt = 1; attempt <= ATTEMPTS; attempt++) {
 
-        // 4. пересуваємо гілку на новий коміт
-        report("Публікую…");
+            const ref = await api(`/repos/${owner}/${repo}/git/ref/heads/${branch}`);
+            const headSha = ref.object.sha;
 
-        await api(`/repos/${owner}/${repo}/git/refs/heads/${branch}`, {
-            method: "PATCH",
-            body: JSON.stringify({ sha: commit.sha, force: false })
-        });
+            const headCommit = await api(`/repos/${owner}/${repo}/git/commits/${headSha}`);
 
-        return {
-            sha: commit.sha,
-            commitUrl: `https://github.com/${owner}/${repo}/commit/${commit.sha}`,
-            actionsUrl: `https://github.com/${owner}/${repo}/actions`
-        };
+            report(attempt === 1 ? "Формую коміт…" : "Гілку оновили паралельно — пробую ще раз…");
+
+            const tree = await api(`/repos/${owner}/${repo}/git/trees`, {
+                method: "POST",
+                body: JSON.stringify({ base_tree: headCommit.tree.sha, tree: treeItems })
+            });
+
+            const commit = await api(`/repos/${owner}/${repo}/git/commits`, {
+                method: "POST",
+                body: JSON.stringify({
+                    message,
+                    tree: tree.sha,
+                    parents: [headSha]
+                })
+            });
+
+            report("Публікую…");
+
+            try {
+
+                await api(`/repos/${owner}/${repo}/git/refs/heads/${branch}`, {
+                    method: "PATCH",
+                    body: JSON.stringify({ sha: commit.sha, force: false })
+                });
+
+            } catch (error) {
+
+                const isRace = /42[29]|not a fast forward/i.test(error.message || "");
+
+                if (isRace && attempt < ATTEMPTS) continue;
+
+                throw error;
+
+            }
+
+            return {
+                sha: commit.sha,
+                commitUrl: `https://github.com/${owner}/${repo}/commit/${commit.sha}`,
+                actionsUrl: `https://github.com/${owner}/${repo}/actions`
+            };
+
+        }
+
+        throw new Error("Гілку весь час оновлює хтось інший — спробуйте ще раз за хвилину.");
 
     }
 
     return {
         loadConfig,
         getToken,
+        preopenAuthWindow,
         hasStoredToken: () => Boolean(cachedToken || readStoredToken()),
         publishFiles
     };

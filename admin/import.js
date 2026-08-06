@@ -656,6 +656,10 @@ async function publishToGitHub() {
 
 publishBtn?.addEventListener("click", () => {
 
+    // синхронно, ДО будь-якого await — інакше браузер вважає жест
+    // користувача витраченим і заблокує вікно входу
+    GitHubPublisher.preopenAuthWindow();
+
     publishToGitHub();
 
 });
