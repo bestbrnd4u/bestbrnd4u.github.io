@@ -11,11 +11,17 @@ function scrollToFirstProduct() {
 
     if (!grid) return;
 
+    // ціль — рядок ".catalog-top" ("Знайдено N товарів" + сортування),
+    // а не сама перша картка: так після застосування фільтра одразу
+    // видно і кількість знайдених товарів, і початок першої картки
+    // під ним
+    const catalogTop = document.querySelector(".catalog-top");
     const firstCard = grid.querySelector(".product-card");
-    const target = firstCard || grid;
+    const target = catalogTop || firstCard || grid;
 
     const headerEl = document.querySelector("header");
     const mobileBar = document.querySelector(".mobile-filter-bar");
+    const desktopBar = document.querySelector(".catalog-filters-bar");
 
     let offset = headerEl ? headerEl.offsetHeight : 0;
 
@@ -23,11 +29,32 @@ function scrollToFirstProduct() {
         offset += mobileBar.offsetHeight;
     }
 
+    // на десктопі панель фільтрів теж sticky — без цього запасу
+    // вона накриє собою рядок "Знайдено N товарів"
+    if (desktopBar && getComputedStyle(desktopBar).display !== "none") {
+        offset += desktopBar.offsetHeight;
+    }
+
     offset += 16;
 
     const top = target.getBoundingClientRect().top + window.scrollY - offset;
 
     window.scrollTo({ top: Math.max(top, 0), behavior: "smooth" });
+
+}
+
+// застосування будь-якого фільтра: перемальовуємо каталог і
+// одразу підкручуємо сторінку до результатів
+function applyFilterChange() {
+
+    render();
+
+    // у мобільній шторці "Всі фільтри" скрол не потрібен — там
+    // результат застосовує кнопка "Показати N товарів", яка сама
+    // викликає scrollToFirstProduct() після закриття шторки
+    if (document.body.classList.contains("mobile-filters-open")) return;
+
+    scrollToFirstProduct();
 
 }
 
@@ -40,7 +67,11 @@ let currentSort = "";
 let selectedBrands = new Set();
 let selectedColors = new Set();
 let selectedCategories = new Set();
-let selectedPrices = new Set();
+// фільтр ціни — діапазон "від / до" (повзунок + два поля вводу).
+// null означає "ще не ініціалізовано" — межі підставляються з
+// реальних цін каталогу після його завантаження
+let priceRange = { min: null, max: null };
+let priceBounds = { min: 0, max: 0 };
 let selectedSizes = new Set(); // елементи виду "group:size", напр. "bags:S"
 
 // колір товару (для фільтра) — беремо прямо з variants,
@@ -219,33 +250,29 @@ const DEFAULT_CATEGORY_LABEL = "Категорія";
 const DEFAULT_PRICE_LABEL = "Ціна";
 const DEFAULT_SIZE_LABEL = "Розмір";
 
-const PRICE_RANGE_LABELS = {
-    "0-2000": "до 2 000 грн",
-    "2000-5000": "2 000 – 5 000 грн",
-    "5000-8000": "5 000 – 8 000 грн",
-    "8000": "від 8 000 грн"
-};
+// ціна без копійок і з розділювачем тисяч — "31 990"
+function formatPrice(value) {
 
-function matchesPriceRange(product, rangeKey) {
+    return Math.round(value).toLocaleString("uk-UA").replace(/\u00A0/g, " ");
 
-    switch (rangeKey) {
+}
 
-        case "0-2000":
-            return product.price <= 2000;
+// фільтр вважається активним, тільки якщо користувач реально
+// звузив діапазон відносно меж каталогу
+function priceFilterActive() {
 
-        case "2000-5000":
-            return product.price >= 2000 && product.price <= 5000;
+    if (priceRange.min === null || priceRange.max === null) return false;
 
-        case "5000-8000":
-            return product.price >= 5000 && product.price <= 8000;
+    return priceRange.min > priceBounds.min || priceRange.max < priceBounds.max;
 
-        case "8000":
-            return product.price >= 8000;
+}
 
-        default:
-            return false;
+function priceRangeLabel() {
 
-    }
+    const from = priceRange.min !== null ? priceRange.min : priceBounds.min;
+    const to = priceRange.max !== null ? priceRange.max : priceBounds.max;
+
+    return `${formatPrice(from)} – ${formatPrice(to)} грн`;
 
 }
 
@@ -386,7 +413,7 @@ function toggleBrand(value) {
 
     updateBrandUI();
 
-    render();
+    applyFilterChange();
 
 }
 
@@ -398,7 +425,7 @@ function clearBrands() {
 
     closeAllDropdowns();
 
-    render();
+    applyFilterChange();
 
 }
 
@@ -459,8 +486,7 @@ brandToggle?.addEventListener("click", event => {
 
     if (willOpen) {
 
-        brandMenu.hidden = false;
-        brandDropdown.classList.add("open");
+        openDropdownMenu(brandDropdown, brandMenu);
         brandSearchInput.value = "";
         filterBrandOptions("");
         brandSearchInput.focus();
@@ -559,7 +585,7 @@ function toggleColor(value) {
 
     updateColorUI();
 
-    render();
+    applyFilterChange();
 
 }
 
@@ -571,7 +597,7 @@ function clearColors() {
 
     closeAllDropdowns();
 
-    render();
+    applyFilterChange();
 
 }
 
@@ -595,12 +621,7 @@ colorToggle?.addEventListener("click", event => {
 
     closeAllDropdowns();
 
-    if (willOpen) {
-
-        colorMenu.hidden = false;
-        colorDropdown.classList.add("open");
-
-    }
+    if (willOpen) openDropdownMenu(colorDropdown, colorMenu);
 
 });
 
@@ -659,7 +680,7 @@ function toggleCategory(value) {
 
     updateCategoryUI();
 
-    render();
+    applyFilterChange();
 
 }
 
@@ -671,7 +692,7 @@ function clearCategories() {
 
     closeAllDropdowns();
 
-    render();
+    applyFilterChange();
 
 }
 
@@ -718,8 +739,7 @@ categoryToggle?.addEventListener("click", event => {
 
     if (willOpen) {
 
-        categoryMenu.hidden = false;
-        categoryDropdown.classList.add("open");
+        openDropdownMenu(categoryDropdown, categoryMenu);
         categorySearchInput.value = "";
         filterCategoryOptions("");
         categorySearchInput.focus();
@@ -784,65 +804,293 @@ categorySearchInput?.addEventListener("input", () => {
 categorySearchInput?.addEventListener("click", event => event.stopPropagation());
 
 // -------------------------
-// Дропдаун «Ціна» (мультиселект)
+// Дропдаун «Ціна» — повзунок діапазону "від / до"
+//
+// Розмітка повзунка будується тут, у JS, а не в catalog.html /
+// promo.html — щоб обидві сторінки автоматично отримали однаковий
+// фільтр, а межі діапазону підставились з реальних цін каталогу.
 // -------------------------
 
-priceMenu?.querySelectorAll(".filter-option").forEach(option => {
+let priceUI = null;
 
-    option.addEventListener("click", () => {
+// крок повзунка підбираємо під розмах цін, щоб ручка рухалась
+// плавно, але значення лишались "круглими"
+function priceStep(span) {
 
-        togglePrice(option.dataset.price);
+    if (span > 20000) return 100;
+    if (span > 5000) return 50;
+    if (span > 1000) return 10;
+
+    return 1;
+
+}
+
+function buildPriceUI() {
+
+    if (!priceMenu) return;
+
+    const clearBtn = priceMenu.querySelector("[data-clear-price]");
+
+    priceMenu.innerHTML = "";
+
+    if (clearBtn) priceMenu.appendChild(clearBtn);
+
+    const box = document.createElement("div");
+
+    box.className = "price-range";
+
+    box.innerHTML = `
+        <div class="price-range-slider">
+            <div class="price-range-track"></div>
+            <div class="price-range-fill"></div>
+            <input type="range" class="price-range-input price-range-min" aria-label="Ціна від">
+            <input type="range" class="price-range-input price-range-max" aria-label="Ціна до">
+        </div>
+        <div class="price-range-fields">
+            <label class="price-range-field">
+                <input type="text" inputmode="numeric" class="price-range-number price-range-number-min" aria-label="Ціна від">
+                <span class="price-range-suffix">грн</span>
+            </label>
+            <span class="price-range-dash">—</span>
+            <label class="price-range-field">
+                <input type="text" inputmode="numeric" class="price-range-number price-range-number-max" aria-label="Ціна до">
+                <span class="price-range-suffix">грн</span>
+            </label>
+        </div>
+    `;
+
+    priceMenu.appendChild(box);
+
+    priceUI = {
+        box,
+        fill: box.querySelector(".price-range-fill"),
+        rangeMin: box.querySelector(".price-range-min"),
+        rangeMax: box.querySelector(".price-range-max"),
+        numberMin: box.querySelector(".price-range-number-min"),
+        numberMax: box.querySelector(".price-range-number-max")
+    };
+
+    // клік усередині повзунка не має закривати дропдаун
+    box.addEventListener("click", event => event.stopPropagation());
+
+    // тягнемо ручку — числа під повзунком оновлюються миттєво,
+    // а сам каталог перемальовується вже на відпусканні, щоб не
+    // рендерити сітку на кожен піксель руху
+    [priceUI.rangeMin, priceUI.rangeMax].forEach(input => {
+
+        input.addEventListener("input", () => {
+
+            readPriceSliders();
+            paintPriceUI();
+
+        });
+
+        input.addEventListener("change", () => {
+
+            readPriceSliders();
+            updatePriceUI();
+            applyFilterChange();
+
+        });
 
     });
 
-});
+    [priceUI.numberMin, priceUI.numberMax].forEach(input => {
 
-function togglePrice(value) {
+        input.addEventListener("change", commitPriceNumbers);
 
-    if (selectedPrices.has(value)) {
+        input.addEventListener("keydown", event => {
 
-        selectedPrices.delete(value);
+            if (event.key === "Enter") {
 
-    } else {
+                event.preventDefault();
 
-        selectedPrices.add(value);
+                input.blur();
+
+            }
+
+        });
+
+    });
+
+}
+
+function readPriceSliders() {
+
+    if (!priceUI) return;
+
+    let min = Number(priceUI.rangeMin.value);
+    let max = Number(priceUI.rangeMax.value);
+
+    // ручки не мають "перестрибувати" одна одну — та, за яку
+    // зараз тягнуть, штовхає другу перед собою
+    if (min > max) {
+
+        if (document.activeElement === priceUI.rangeMin) {
+            max = min;
+        } else {
+            min = max;
+        }
 
     }
 
+    priceRange.min = min;
+    priceRange.max = max;
+
+}
+
+function parsePriceInput(value, fallback) {
+
+    const digits = String(value).replace(/[^\d]/g, "");
+
+    if (!digits) return fallback;
+
+    return Number(digits);
+
+}
+
+function commitPriceNumbers() {
+
+    if (!priceUI) return;
+
+    let min = parsePriceInput(priceUI.numberMin.value, priceBounds.min);
+    let max = parsePriceInput(priceUI.numberMax.value, priceBounds.max);
+
+    min = Math.min(Math.max(min, priceBounds.min), priceBounds.max);
+    max = Math.min(Math.max(max, priceBounds.min), priceBounds.max);
+
+    // ввели "від" більше за "до" — просто міняємо місцями,
+    // це майже завжди саме те, що людина мала на увазі
+    if (min > max) {
+
+        const swap = min;
+
+        min = max;
+        max = swap;
+
+    }
+
+    priceRange.min = min;
+    priceRange.max = max;
+
     updatePriceUI();
 
-    render();
+    applyFilterChange();
+
+}
+
+// перемальовує сам повзунок і поля під ним під поточний стан
+function paintPriceUI() {
+
+    if (!priceUI) return;
+
+    const min = priceRange.min !== null ? priceRange.min : priceBounds.min;
+    const max = priceRange.max !== null ? priceRange.max : priceBounds.max;
+
+    priceUI.rangeMin.value = min;
+    priceUI.rangeMax.value = max;
+
+    // поле, яке зараз редагують, не чіпаємо — інакше форматування
+    // з'їдало б цифри прямо під час набору
+    if (document.activeElement !== priceUI.numberMin) {
+        priceUI.numberMin.value = formatPrice(min);
+    }
+
+    if (document.activeElement !== priceUI.numberMax) {
+        priceUI.numberMax.value = formatPrice(max);
+    }
+
+    const span = priceBounds.max - priceBounds.min || 1;
+
+    const left = ((min - priceBounds.min) / span) * 100;
+    const right = ((max - priceBounds.min) / span) * 100;
+
+    priceUI.fill.style.left = left + "%";
+    priceUI.fill.style.width = Math.max(right - left, 0) + "%";
+
+    // коли обидві ручки зійшлись у правому краї, верхня перекриває
+    // нижню — піднімаємо ту, за яку ще реально можна взятись
+    priceUI.rangeMin.style.zIndex = min >= priceBounds.max ? 5 : 3;
+
+}
+
+// межі беремо з реальних цін каталогу один раз, після його
+// завантаження — далі вони не залежать від інших фільтрів,
+// інакше повзунок "стрибав" би після кожного вибору
+function setupPriceRange() {
+
+    if (!priceMenu || !products.length) return;
+
+    const prices = products
+        .map(product => Number(product.price))
+        .filter(value => Number.isFinite(value));
+
+    if (!prices.length) return;
+
+    const rawMin = Math.min(...prices);
+    const rawMax = Math.max(...prices);
+
+    const step = priceStep(rawMax - rawMin);
+
+    priceBounds.min = Math.floor(rawMin / step) * step;
+    priceBounds.max = Math.ceil(rawMax / step) * step;
+
+    if (priceBounds.max === priceBounds.min) priceBounds.max = priceBounds.min + step;
+
+    if (!priceUI) buildPriceUI();
+
+    [priceUI.rangeMin, priceUI.rangeMax].forEach(input => {
+
+        input.min = priceBounds.min;
+        input.max = priceBounds.max;
+        input.step = step;
+
+    });
+
+    // якщо межі ще не чіпали — розтягуємо діапазон на весь каталог
+    if (priceRange.min === null) priceRange.min = priceBounds.min;
+    if (priceRange.max === null) priceRange.max = priceBounds.max;
+
+    priceRange.min = Math.max(priceRange.min, priceBounds.min);
+    priceRange.max = Math.min(priceRange.max, priceBounds.max);
+
+    updatePriceUI();
 
 }
 
 function clearPrices() {
 
-    selectedPrices.clear();
+    priceRange.min = priceBounds.min;
+    priceRange.max = priceBounds.max;
 
     updatePriceUI();
 
     closeAllDropdowns();
 
-    render();
+    applyFilterChange();
 
 }
 
 function updatePriceUI() {
 
-    priceLabel.textContent = getMultiSelectLabel(
-        selectedPrices,
-        DEFAULT_PRICE_LABEL,
-        "Ціна",
-        value => PRICE_RANGE_LABELS[value]
-    );
+    if (priceLabel) {
 
-    priceMenu.querySelectorAll(".filter-option").forEach(o => {
-        o.classList.toggle("active", selectedPrices.has(o.dataset.price));
-    });
+        priceLabel.textContent = priceFilterActive() ? priceRangeLabel() : DEFAULT_PRICE_LABEL;
+
+    }
+
+    paintPriceUI();
 
 }
 
-document.querySelector("[data-clear-price]")?.addEventListener("click", clearPrices);
+// кнопка "Скинути вибір ціни" живе всередині priceMenu, який
+// перебудовується при ініціалізації повзунка — тому обробник
+// делегований на саме меню, а не на кнопку
+priceMenu?.addEventListener("click", event => {
+
+    if (event.target.closest("[data-clear-price]")) clearPrices();
+
+});
 
 priceToggle?.addEventListener("click", event => {
 
@@ -852,12 +1100,7 @@ priceToggle?.addEventListener("click", event => {
 
     closeAllDropdowns();
 
-    if (willOpen) {
-
-        priceMenu.hidden = false;
-        priceDropdown.classList.add("open");
-
-    }
+    if (willOpen) openDropdownMenu(priceDropdown, priceMenu);
 
 });
 
@@ -913,7 +1156,7 @@ function toggleSize(key) {
 
     updateSizeUI();
 
-    render();
+    applyFilterChange();
 
 }
 
@@ -925,7 +1168,7 @@ function clearSizes() {
 
     closeAllDropdowns();
 
-    render();
+    applyFilterChange();
 
 }
 
@@ -963,12 +1206,7 @@ sizeToggle?.addEventListener("click", event => {
 
     closeAllDropdowns();
 
-    if (willOpen) {
-
-        sizeMenu.hidden = false;
-        sizeDropdown.classList.add("open");
-
-    }
+    if (willOpen) openDropdownMenu(sizeDropdown, sizeMenu);
 
 });
 
@@ -980,11 +1218,47 @@ function closeAllDropdowns() {
 
         const menu = dropdown.querySelector(".filter-menu, .sort-menu");
 
-        if (menu) menu.hidden = true;
+        if (menu) {
+
+            menu.hidden = true;
+
+            // ОБОВ'ЯЗКОВО знімаємо і суто візуальне приховування
+            // від скролу. Саме залишок цього класу був причиною
+            // бага "список не відкривається на середині каталогу":
+            // menu.hidden ставав false і додавався .open, але меню
+            // лишалось з opacity:0 та pointer-events:none — тобто
+            // невидимим, і "оживало" лише після скролу вгору.
+            menu.classList.remove("scroll-hidden");
+
+        }
 
         dropdown.classList.remove("open");
 
     });
+
+}
+
+// єдина точка відкриття будь-якого дропдауна фільтрів: меню
+// показується одразу, незалежно від того, в якому місці каталогу
+// зараз користувач і що відбувалось зі скролом раніше. Панель
+// фільтрів sticky, тож список з'являється рівно під шапкою.
+function openDropdownMenu(dropdown, menu) {
+
+    if (!dropdown || !menu) return;
+
+    closeAllDropdowns();
+
+    menu.hidden = false;
+    menu.classList.remove("scroll-hidden");
+
+    dropdown.classList.add("open");
+
+    // якщо панель фільтрів у цей момент була відведена вгору після
+    // скролу вниз — повертаємо її на місце, інакше меню відкрилось
+    // би разом з нею за межами екрана
+    const stickyBar = dropdown.closest(".catalog-filters-bar, .mobile-filter-bar");
+
+    if (stickyBar) stickyBar.classList.remove("is-hidden");
 
 }
 
@@ -1103,7 +1377,7 @@ function setupGenderFilter() {
 
             updateGenderUI();
 
-            render();
+            applyFilterChange();
 
         });
 
@@ -1260,10 +1534,10 @@ function filterProducts() {
 
     }
 
-    if (selectedPrices.size) {
+    if (priceFilterActive()) {
 
         list = list.filter(product =>
-            [...selectedPrices].some(range => matchesPriceRange(product, range))
+            product.price >= priceRange.min && product.price <= priceRange.max
         );
 
     }
@@ -1305,6 +1579,11 @@ function filterProducts() {
 }
 
 function render() {
+
+    // межі повзунка ціни залежать від завантажених товарів —
+    // виставляємо їх один раз, при першому рендері з даними
+    // (працює і для catalog.html, і для promo.html)
+    if (!priceUI && products.length) setupPriceRange();
 
     const list = filterProducts();
 
@@ -1372,11 +1651,11 @@ function renderActiveFilters() {
 
     });
 
-    selectedPrices.forEach(range => {
+    if (priceFilterActive()) {
 
-        chips.push({ type: "price", value: range, label: PRICE_RANGE_LABELS[range] });
+        chips.push({ type: "price", value: "", label: priceRangeLabel() });
 
-    });
+    }
 
     selectedSizes.forEach(key => {
 
@@ -1536,7 +1815,8 @@ function clearOneFilter(type, value) {
 
     } else if (type === "price") {
 
-        selectedPrices.delete(value);
+        priceRange.min = priceBounds.min;
+        priceRange.max = priceBounds.max;
 
         updatePriceUI();
 
@@ -1548,7 +1828,7 @@ function clearOneFilter(type, value) {
 
     }
 
-    render();
+    applyFilterChange();
 
 }
 
@@ -1565,7 +1845,8 @@ function resetAllFilters() {
     selectedCategories.clear();
     updateCategoryUI();
 
-    selectedPrices.clear();
+    priceRange.min = priceBounds.min;
+    priceRange.max = priceBounds.max;
     updatePriceUI();
 
     selectedSizes.clear();
@@ -1582,7 +1863,7 @@ function resetAllFilters() {
     selectedGenders.clear();
     updateGenderUI();
 
-    render();
+    applyFilterChange();
 
 }
 
@@ -1604,12 +1885,7 @@ sortToggle?.addEventListener("click", event => {
 
     closeAllDropdowns();
 
-    if (willOpen) {
-
-        sortMenu.hidden = false;
-        sortDropdown?.classList.add("open");
-
-    }
+    if (willOpen) openDropdownMenu(sortDropdown, sortMenu);
 
 });
 
@@ -1625,7 +1901,7 @@ sortMenu?.querySelectorAll(".sort-option").forEach(option => {
 
         closeAllDropdowns();
 
-        render();
+        applyFilterChange();
 
     });
 
@@ -1735,7 +2011,7 @@ if (!window.CATALOG_SKIP_AUTO_INIT) {
             + selectedBrands.size
             + selectedColors.size
             + selectedCategories.size
-            + selectedPrices.size
+            + (priceFilterActive() ? 1 : 0)
             + selectedSizes.size;
 
     }
@@ -1965,15 +2241,18 @@ if (!window.CATALOG_SKIP_AUTO_INIT) {
 
                 const hiding = delta > 0;
 
-                // при скролі вниз панель ховається трансформом
-                // (translateY), але відкритий випадаючий список —
-                // значно вищий за саму панель і виходить за межі
-                // цього зсуву, тож без явного закриття він лишається
-                // "висіти" поверх контенту нижче. При скролі вгору
-                // панель просто повертається на місце — список у цей
-                // момент вже закритий, нічого додатково ховати не треба.
-                if (hiding && typeof closeAllDropdowns === "function") closeAllDropdowns();
-
+                // При скролі вниз панель ховається трансформом
+                // (translateY), а відкритий список вищий за неї, тож
+                // сам зсув його повністю не прибирає. Раніше тут
+                // викликався closeAllDropdowns() — список закривався
+                // по-справжньому і після скролу вгору вже не
+                // повертався (а через залишковий клас scroll-hidden
+                // ще й не відкривався по кліку).
+                //
+                // Тепер список лише ховається візуально — клас
+                // scroll-hidden ставить setupDropdownScrollVisibility,
+                // і при скролі вгору він повертається сам, якщо
+                // користувач його не закривав.
                 el.classList.toggle("is-hidden", hiding);
 
             }

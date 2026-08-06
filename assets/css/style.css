@@ -2774,6 +2774,169 @@ body.mobile-filters-open .scroll-top{
     pointer-events:none;
 }
 
+/* -- фільтр ціни: повзунок діапазону "від / до" -- */
+
+.price-range{
+    padding:14px 12px 8px;
+}
+
+.price-range-slider{
+    position:relative;
+    height:22px;
+    margin:0 10px 18px;
+}
+
+.price-range-track,
+.price-range-fill{
+    position:absolute;
+    top:50%;
+    height:3px;
+    transform:translateY(-50%);
+    border-radius:2px;
+    pointer-events:none;
+}
+
+.price-range-track{
+    left:0;
+    right:0;
+    background:var(--gray200);
+}
+
+.price-range-fill{
+    background:var(--gray700);
+}
+
+/* два range-інпути лежать один поверх одного: сама доріжка
+   прозора, клікабельні лише самі ручки (pointer-events нижче) */
+.price-range-input{
+    position:absolute;
+    top:0;
+    left:-10px;
+    width:calc(100% + 20px);
+    height:22px;
+    margin:0;
+    padding:0;
+    background:none;
+    border:none;
+    appearance:none;
+    -webkit-appearance:none;
+    pointer-events:none;
+}
+
+.price-range-input:focus{
+    outline:none;
+}
+
+.price-range-min{ z-index:3; }
+.price-range-max{ z-index:4; }
+
+.price-range-input::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    appearance:none;
+    pointer-events:auto;
+    width:20px;
+    height:20px;
+    border-radius:50%;
+    background:var(--gray700);
+    border:none;
+    cursor:grab;
+    transition:transform .15s ease, box-shadow .15s ease;
+}
+
+.price-range-input::-webkit-slider-thumb:active{
+    cursor:grabbing;
+    transform:scale(1.1);
+    box-shadow:0 0 0 6px rgba(37,99,235,.15);
+}
+
+.price-range-input:focus-visible::-webkit-slider-thumb{
+    box-shadow:0 0 0 4px rgba(37,99,235,.25);
+}
+
+.price-range-input::-moz-range-thumb{
+    pointer-events:auto;
+    width:20px;
+    height:20px;
+    border-radius:50%;
+    background:var(--gray700);
+    border:none;
+    cursor:grab;
+}
+
+.price-range-input::-moz-range-track{
+    background:none;
+    border:none;
+}
+
+.price-range-fields{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.price-range-field{
+    flex:1 1 0;
+    min-width:0;
+    display:flex;
+    align-items:stretch;
+    border:1px solid var(--gray200);
+    border-radius:8px;
+    overflow:hidden;
+    background:#fff;
+    transition:border-color .15s ease, box-shadow .15s ease;
+}
+
+.price-range-field:focus-within{
+    border-color:var(--secondary);
+    box-shadow:0 0 0 3px rgba(37,99,235,.1);
+}
+
+/* важливо: перебиваємо загальне правило .catalog-filters-bar input,
+   яке робить усі інпути на всю ширину і 48px заввишки */
+.catalog-filters-bar .price-range-number,
+.price-range-number{
+    flex:1 1 auto;
+    width:100%;
+    min-width:0;
+    height:36px;
+    border:none;
+    border-radius:0;
+    padding:0 8px;
+    font-size:14px;
+    font-weight:600;
+    color:var(--gray700);
+    text-align:center;
+    background:none;
+}
+
+.price-range-number:focus{
+    outline:none;
+    border:none;
+    box-shadow:none;
+}
+
+.price-range-suffix{
+    display:flex;
+    align-items:center;
+    padding:0 9px;
+    font-size:13px;
+    color:var(--gray500);
+    background:var(--gray100,#f3f4f6);
+    border-left:1px solid var(--gray200);
+    white-space:nowrap;
+}
+
+.price-range-dash{
+    color:var(--gray500);
+    flex-shrink:0;
+}
+
+/* у мобільній шторці "Всі фільтри" меню ціни розтягується
+   на всю ширину — даємо повзунку більше повітря */
+.mobile-filters-sub-content .price-range{
+    padding:18px 4px 4px;
+}
+
 .filter-option{
     width:100%;
     display:flex;

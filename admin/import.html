@@ -176,6 +176,54 @@
         font-size:13px;
     }
 
+    .publish-status{
+        margin-top:14px;
+        font-size:14px;
+        line-height:1.5;
+        padding:12px 16px;
+        border-radius:10px;
+        background:#f1f5f9;
+        color:#334155;
+    }
+
+    .publish-status-progress{
+        background:#eff6ff;
+        color:#1e40af;
+    }
+
+    .publish-status-ok{
+        background:#ecfdf5;
+        color:#166534;
+    }
+
+    .publish-status-err{
+        background:#fef2f2;
+        color:#b91c1c;
+    }
+
+    .publish-status a{
+        color:inherit;
+        font-weight:700;
+    }
+
+    .fallback{
+        margin-top:18px;
+        border-top:1px solid #e5e7eb;
+        padding-top:14px;
+    }
+
+    .fallback summary{
+        cursor:pointer;
+        font-size:13px;
+        font-weight:600;
+        color:#6b7280;
+    }
+
+    .fallback p,
+    .fallback ul{
+        font-size:13px;
+    }
+
 </style>
 </head>
 <body>
@@ -237,32 +285,52 @@
     </div>
 
     <div class="card" id="downloadCard" hidden>
-        <h2><span class="step-num">5</span> Завантажте готові файли</h2>
-        <p>Товари без помилок готові — завантажте архів з файлами товарів (і фото, якщо додавали):</p>
-        <button class="btn btn-secondary" id="downloadZipBtn">📦 Завантажити ZIP з товарами</button>
+        <h2><span class="step-num">5</span> Опублікуйте товари на сайт</h2>
+        <p>
+            Товари без помилок готові. Натисніть кнопку — файли товарів і фото
+            одразу підуть на сайт (вхід той самий, що і в адмінці, GitHub Desktop
+            і ручний пуш більше не потрібні).
+        </p>
+        <button class="btn" id="publishBtn">🚀 Опублікувати на сайт</button>
+
+        <div class="publish-status" id="publishStatus" hidden></div>
+
+        <div class="hint">
+            Через 1–2 хвилини після публікації каталог перезбереться автоматично —
+            товари з'являться і на сайті, і в адмінці (розділ «Товари»), де їх
+            за потреби можна доповнити вручну.
+        </div>
+
+        <details class="fallback">
+            <summary>Запасний варіант — завантажити ZIP і залити вручну</summary>
+            <p>
+                Знадобиться, лише якщо публікація вище чомусь не спрацювала.
+                Архів вже має правильну структуру папок усередині
+                (<code>data/products/…</code>, фото — у
+                <code>assets/images/products/uploads/…</code>):
+            </p>
+            <ul>
+                <li>Розпакуйте архів прямо в папку вашого репозиторію на комп'ютері (туди, де лежить <code>data</code>, <code>assets</code> тощо).</li>
+                <li>Відкрийте GitHub Desktop, напишіть повідомлення коміту і натисніть <strong>Commit → Push origin</strong>.</li>
+            </ul>
+            <button class="btn btn-secondary" id="downloadZipBtn">📦 Завантажити ZIP з товарами</button>
+        </details>
     </div>
 
     <div class="card">
-        <h2><span class="step-num">6</span> Що робити з архівом далі</h2>
-        <p>Archів вже має правильну структуру папок усередині (<code>data/products/…</code>, а фото — у <code>assets/images/products/uploads/…</code>), тому:</p>
+        <h2><span class="step-num">6</span> Корисно знати</h2>
         <ul>
-            <li>Розпакуйте архів прямо в папку вашого репозиторію на комп'ютері (туди, де лежить <code>data</code>, <code>assets</code> тощо) — файли самі стануть в потрібне місце, поверх існуючих товарів нічого не перезапише.</li>
-            <li>Відкрийте GitHub Desktop — побачите нові файли в списку змін.</li>
-            <li>Напишіть коротке повідомлення коміту (наприклад «Імпорт товарів») і натисніть <strong>Commit → Push origin</strong>.</li>
-            <li>Через 1–2 хвилини GitHub Actions сам збере всі товари в загальний каталог сайту — товари з'являться на сайті автоматично.</li>
-            <li>Після цього товари також з'являться в адмінці (розділ «Товари») — за потреби доповніть чи виправте щось вручну, як завжди.</li>
+            <li>Один файл фото можна використати для кількох товарів одразу — просто вкажіть його назву в кількох рядках таблиці, завантажувати повторно не потрібно.</li>
+            <li>Публікація нічого не перезаписує: існуючі товари лишаються на місці, додаються тільки нові файли.</li>
+            <li>Якщо ви ще не входили в адмінку в цьому браузері — під час публікації відкриється звичайне вікно входу через GitHub.</li>
         </ul>
-        <div class="hint">
-            Один файл фото можна використати для кількох товарів одразу — просто
-            вкажіть його назву в кількох рядках таблиці, завантажувати повторно
-            не потрібно.
-        </div>
     </div>
 
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="github-publish.js"></script>
 <script src="import.js"></script>
 
 </body>

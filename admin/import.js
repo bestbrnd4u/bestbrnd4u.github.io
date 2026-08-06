@@ -487,6 +487,24 @@ async function processFile(file) {
 
     document.getElementById("downloadCard").hidden = okResults.length === 0;
 
+    const publishBtnEl = document.getElementById("publishBtn");
+
+    if (publishBtnEl) {
+
+        publishBtnEl.disabled = okResults.length === 0;
+        publishBtnEl.textContent = "🚀 Опублікувати на сайт";
+
+    }
+
+    const publishStatusEl = document.getElementById("publishStatus");
+
+    if (publishStatusEl) {
+
+        publishStatusEl.hidden = true;
+        publishStatusEl.innerHTML = "";
+
+    }
+
 }
 
 async function downloadZip() {
@@ -528,6 +546,119 @@ async function downloadZip() {
     URL.revokeObjectURL(url);
 
 }
+
+// -------------------------
+// Пряма публікація на сайт (без GitHub Desktop)
+//
+// Той самий набір файлів, що йшов у ZIP, але замість завантаження
+// архіву комітимо його прямо в репозиторій через GitHub API —
+// вхід переиспользуємо той самий, що і в адмінці (OAuth Netlify).
+// -------------------------
+
+function collectFilesForPublish() {
+
+    const files = [];
+    const stamp = Date.now();
+
+    importedProducts.forEach((result, index) => {
+
+        files.push({
+            path: `data/products/import-${stamp}-${index + 1}.json`,
+            text: JSON.stringify(result.product, null, 2) + "\n"
+        });
+
+    });
+
+    filesToZip.forEach(({ file, safeName }) => {
+
+        files.push({
+            path: `assets/images/products/uploads/${safeName}`,
+            file
+        });
+
+    });
+
+    return files;
+
+}
+
+const publishBtn = document.getElementById("publishBtn");
+const publishStatus = document.getElementById("publishStatus");
+
+function setPublishStatus(html, kind) {
+
+    if (!publishStatus) return;
+
+    publishStatus.hidden = !html;
+    publishStatus.className = "publish-status" + (kind ? " publish-status-" + kind : "");
+    publishStatus.innerHTML = html || "";
+
+}
+
+async function publishToGitHub() {
+
+    if (importedProducts.length === 0) return;
+
+    const files = collectFilesForPublish();
+
+    publishBtn.disabled = true;
+    publishBtn.textContent = "Публікую…";
+
+    setPublishStatus("Підключаюсь до GitHub…", "progress");
+
+    try {
+
+        // якщо в адмінці ще не логінились — відкриється те саме
+        // вікно входу через GitHub, що й у самій адмінці
+        if (!GitHubPublisher.hasStoredToken()) {
+
+            setPublishStatus("Відкрилось вікно входу через GitHub — підтвердіть доступ у ньому.", "progress");
+
+        }
+
+        const productWord = importedProducts.length === 1 ? "товар" : "товарів";
+
+        const result = await GitHubPublisher.publishFiles(
+            files,
+            `Імпорт товарів з адмінки (${importedProducts.length} ${productWord})`,
+            text => setPublishStatus(text, "progress")
+        );
+
+        setPublishStatus(
+            `✅ Опубліковано ${importedProducts.length} ${productWord}. ` +
+            `Через 1–2 хвилини товари з'являться на сайті та в адмінці — ` +
+            `каталог перезбирається автоматично.<br>` +
+            `<a href="${result.actionsUrl}" target="_blank" rel="noopener">Стежити за збіркою</a> · ` +
+            `<a href="${result.commitUrl}" target="_blank" rel="noopener">Переглянути коміт</a>`,
+            "ok"
+        );
+
+        publishBtn.textContent = "✅ Опубліковано";
+
+        return;
+
+    } catch (error) {
+
+        console.error(error);
+
+        setPublishStatus(
+            `✕ Не вдалося опублікувати: ${escapeHtml(error.message || String(error))}. ` +
+            `Можна спробувати ще раз або скористатись запасним варіантом — завантажити ZIP нижче.`,
+            "err"
+        );
+
+        publishBtn.disabled = false;
+        publishBtn.textContent = "🚀 Опублікувати на сайт";
+
+    }
+
+}
+
+publishBtn?.addEventListener("click", () => {
+
+    publishToGitHub();
+
+});
 
 // -------------------------
 // Прив'язка до кнопок
