@@ -402,6 +402,192 @@ function rowToProduct(row, rowNumber, validCategoryNames) {
 
 }
 
+// -------------------------
+// Перевірка на дублі (крок 4–5)
+//
+// Товар вважається дублем, якщо збігається:
+//   - артикул (SKU) — найнадійніша ознака, або
+//   - пара «бренд + назва» — коли артикул не заповнений.
+//
+// Перевіряємо у двох напрямках:
+//   1) проти товарів, які ВЖЕ є на сайті (data/products.json);
+//   2) всередині самого файлу — той самий товар двічі в одній
+//      таблиці теж не має залитись двома копіями.
+// -------------------------
+
+let existingProductsCache = null;
+
+async function loadExistingProducts() {
+
+    if (existingProductsCache) return existingProductsCache;
+
+    try {
+
+        // ?t= — щоб не отримати застарілий список з кешу браузера
+        // одразу після попередньої публікації
+        const response = await fetch(`../data/products.json?t=${Date.now()}`);
+
+        existingProductsCache = response.ok ? await response.json() : [];
+
+    } catch (error) {
+
+        // немає мережі / файлу — не блокуємо імпорт, просто не
+        // зможемо попередити про дублі
+        existingProductsCache = [];
+
+    }
+
+    return existingProductsCache;
+
+}
+
+// зводимо рядок до порівнюваного вигляду: регістр, апострофи,
+// подвійні пробіли й розділові знаки не повинні заважати
+// побачити, що "Furla  Metropolis" і "furla metropolis" — одне й те саме
+function normalizeKey(value) {
+
+    return String(value ?? "")
+        .toLowerCase()
+        .replace(/[\u2019'`"]/g, "")
+        .replace(/[^\p{L}\p{N}]+/gu, " ")
+        .trim();
+
+}
+
+function skuKey(product) {
+
+    return product.sku ? normalizeKey(product.sku) : "";
+
+}
+
+function nameKey(product) {
+
+    return `${normalizeKey(product.brand)}|${normalizeKey(product.title)}`;
+
+}
+
+async function detectDuplicates(okResults) {
+
+    const existing = await loadExistingProducts();
+
+    const catalogBySku = new Map();
+    const catalogByName = new Map();
+
+    existing.forEach(product => {
+
+        const sk = skuKey(product);
+        const nk = nameKey(product);
+
+        if (sk && !catalogBySku.has(sk)) catalogBySku.set(sk, product);
+        if (nk !== "|" && !catalogByName.has(nk)) catalogByName.set(nk, product);
+
+    });
+
+    const batchBySku = new Map();
+    const batchByName = new Map();
+
+    okResults.forEach(result => {
+
+        const product = result.product;
+
+        const sk = skuKey(product);
+        const nk = nameKey(product);
+
+        result.duplicate = null;
+
+        if (sk && batchBySku.has(sk)) {
+
+            result.duplicate = { scope: "file", by: "артикулом", ref: `рядок ${batchBySku.get(sk)}` };
+
+        } else if (batchByName.has(nk)) {
+
+            result.duplicate = { scope: "file", by: "брендом і назвою", ref: `рядок ${batchByName.get(nk)}` };
+
+        } else if (sk && catalogBySku.has(sk)) {
+
+            result.duplicate = { scope: "catalog", by: "артикулом", ref: catalogBySku.get(sk).title };
+
+        } else if (nk !== "|" && catalogByName.has(nk)) {
+
+            result.duplicate = { scope: "catalog", by: "брендом і назвою", ref: catalogByName.get(nk).title };
+
+        }
+
+        if (sk && !batchBySku.has(sk)) batchBySku.set(sk, result.row);
+        if (!batchByName.has(nk)) batchByName.set(nk, result.row);
+
+    });
+
+}
+
+// товари, які реально підуть у публікацію/архів: дублі
+// пропускаємо, якщо користувач явно не поставив галочку
+function productsToPublish() {
+
+    const includeDuplicates = document.getElementById("includeDuplicates")?.checked;
+
+    return importedProducts.filter(result => includeDuplicates || !result.duplicate);
+
+}
+
+function renderDuplicateBox() {
+
+    const box = document.getElementById("duplicateBox");
+
+    if (!box) return;
+
+    const duplicates = importedProducts.filter(result => result.duplicate);
+
+    if (duplicates.length === 0) {
+
+        box.hidden = true;
+        box.innerHTML = "";
+
+        return;
+
+    }
+
+    box.hidden = false;
+
+    box.innerHTML = `
+        <div class="dup-title">⚠ Знайдено дублі: ${duplicates.length}</div>
+        <ul class="dup-list">
+            ${duplicates.map(result => `
+                <li>
+                    Рядок ${result.row} (${escapeHtml(result.title)}) —
+                    збігається ${escapeHtml(result.duplicate.by)}
+                    ${result.duplicate.scope === "catalog"
+                        ? `з товаром на сайті «${escapeHtml(result.duplicate.ref)}»`
+                        : `з ${escapeHtml(result.duplicate.ref)} цього ж файлу`}
+                </li>
+            `).join("")}
+        </ul>
+        <label class="dup-check">
+            <input type="checkbox" id="includeDuplicates">
+            Все одно завантажити дублі (створяться окремі товари)
+        </label>
+    `;
+
+    box.querySelector("#includeDuplicates").addEventListener("change", refreshPublishButton);
+
+}
+
+function refreshPublishButton() {
+
+    const publishBtnEl = document.getElementById("publishBtn");
+
+    if (!publishBtnEl) return;
+
+    const count = productsToPublish().length;
+    const skipped = importedProducts.length - count;
+
+    publishBtnEl.disabled = count === 0;
+    publishBtnEl.textContent = count === 0
+        ? "Немає що публікувати"
+        : `🚀 Опублікувати на сайт (${count})${skipped ? ` · пропустити дублів: ${skipped}` : ""}`;
+
+}
+
 function renderReport(okResults, badResults) {
 
     const el = document.getElementById("report");
@@ -410,7 +596,28 @@ function renderReport(okResults, badResults) {
 
     if (okResults.length > 0) {
 
-        html += `<div class="ok-line">✅ ${okResults.length} товар(ів) готово до завантаження</div>`;
+        const duplicates = okResults.filter(r => r.duplicate);
+        const fresh = okResults.length - duplicates.length;
+
+        html += `<div class="ok-line">✅ ${fresh} товар(ів) готово до завантаження</div>`;
+
+        if (duplicates.length > 0) {
+
+            html += `<div class="warn-line">⚠ ${duplicates.length} з них — дублі, за замовчуванням вони НЕ будуть завантажені (деталі на кроці 5):</div><ul class="warn-list">`;
+
+            duplicates.forEach(r => {
+
+                html += `<li>Рядок ${r.row} (${escapeHtml(r.title)}) — збігається ${escapeHtml(r.duplicate.by)} ${
+                    r.duplicate.scope === "catalog"
+                        ? `з товаром на сайті «${escapeHtml(r.duplicate.ref)}»`
+                        : `з ${escapeHtml(r.duplicate.ref)} цього ж файлу`
+                }</li>`;
+
+            });
+
+            html += "</ul>";
+
+        }
 
         const withWarnings = okResults.filter(r => r.warnings.length > 0);
 
@@ -481,20 +688,17 @@ async function processFile(file) {
     const okResults = results.filter(r => r.ok);
     const badResults = results.filter(r => !r.ok);
 
+    // позначаємо дублі ДО звіту, щоб одразу показати їх користувачу
+    await detectDuplicates(okResults);
+
     renderReport(okResults, badResults);
 
     importedProducts = okResults;
 
     document.getElementById("downloadCard").hidden = okResults.length === 0;
 
-    const publishBtnEl = document.getElementById("publishBtn");
-
-    if (publishBtnEl) {
-
-        publishBtnEl.disabled = okResults.length === 0;
-        publishBtnEl.textContent = "🚀 Опублікувати на сайт";
-
-    }
+    renderDuplicateBox();
+    refreshPublishButton();
 
     const publishStatusEl = document.getElementById("publishStatus");
 
@@ -513,11 +717,27 @@ async function downloadZip() {
     const productsFolder = zip.folder("data").folder("products");
     const stamp = Date.now();
 
-    importedProducts.forEach((result, index) => {
+    // запасний ZIP підкоряється тому самому вибору щодо дублів,
+    // що й публікація одним кліком
+    const publishing = productsToPublish();
+
+    publishing.forEach((result, index) => {
 
         const filename = `import-${stamp}-${index + 1}.json`;
 
         productsFolder.file(filename, JSON.stringify(result.product, null, 2) + "\n");
+
+    });
+
+    const usedImages = new Set();
+
+    publishing.forEach(result => {
+
+        (result.product.variants || []).forEach(variant => {
+
+            (variant.images || []).forEach(src => usedImages.add(src));
+
+        });
 
     });
 
@@ -526,6 +746,8 @@ async function downloadZip() {
         const uploadsFolder = zip.folder("assets").folder("images").folder("products").folder("uploads");
 
         filesToZip.forEach(({ file, safeName }) => {
+
+            if (!usedImages.has(`assets/images/products/uploads/${safeName}`)) return;
 
             uploadsFolder.file(safeName, file);
 
@@ -560,7 +782,9 @@ function collectFilesForPublish() {
     const files = [];
     const stamp = Date.now();
 
-    importedProducts.forEach((result, index) => {
+    const publishing = productsToPublish();
+
+    publishing.forEach((result, index) => {
 
         files.push({
             path: `data/products/import-${stamp}-${index + 1}.json`,
@@ -569,7 +793,24 @@ function collectFilesForPublish() {
 
     });
 
+    // фото вантажимо лише ті, на які реально посилаються товари,
+    // що публікуються — інакше пропущені дублі тягли б за собою
+    // купу непотрібних файлів у репозиторій
+    const usedImages = new Set();
+
+    publishing.forEach(result => {
+
+        (result.product.variants || []).forEach(variant => {
+
+            (variant.images || []).forEach(src => usedImages.add(src));
+
+        });
+
+    });
+
     filesToZip.forEach(({ file, safeName }) => {
+
+        if (!usedImages.has(`assets/images/products/uploads/${safeName}`)) return;
 
         files.push({
             path: `assets/images/products/uploads/${safeName}`,
@@ -597,7 +838,9 @@ function setPublishStatus(html, kind) {
 
 async function publishToGitHub() {
 
-    if (importedProducts.length === 0) return;
+    const publishing = productsToPublish();
+
+    if (publishing.length === 0) return;
 
     const files = collectFilesForPublish();
 
@@ -616,16 +859,25 @@ async function publishToGitHub() {
 
         }
 
-        const productWord = importedProducts.length === 1 ? "товар" : "товарів";
+        const productWord = publishing.length === 1 ? "товар" : "товарів";
+
+        const skipped = importedProducts.length - publishing.length;
 
         const result = await GitHubPublisher.publishFiles(
             files,
-            `Імпорт товарів з адмінки (${importedProducts.length} ${productWord})`,
+            `Імпорт товарів з адмінки (${publishing.length} ${productWord})`,
             text => setPublishStatus(text, "progress")
         );
 
+        // Щойно опубліковані товари одразу враховуємо як існуючі:
+        // data/products.json перезбереться лише через 1–2 хвилини,
+        // тож без цього повторний імпорт того самого файлу в цій же
+        // вкладці не побачив би їх і створив дублі
+        publishing.forEach(result => existingProductsCache?.push(result.product));
+
         setPublishStatus(
-            `✅ Опубліковано ${importedProducts.length} ${productWord}. ` +
+            `✅ Опубліковано ${publishing.length} ${productWord}` +
+            (skipped ? `, пропущено дублів: ${skipped}` : "") + `. ` +
             `Через 1–2 хвилини товари з'являться на сайті та в адмінці — ` +
             `каталог перезбирається автоматично.<br>` +
             `<a href="${result.actionsUrl}" target="_blank" rel="noopener">Стежити за збіркою</a> · ` +

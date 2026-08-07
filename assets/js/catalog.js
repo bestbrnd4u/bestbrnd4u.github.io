@@ -42,14 +42,15 @@ function armAutoScrollGuard(durationMs) {
 
 }
 
-function scrollToFirstProduct() {
+// Позиція, на якій починаються результати каталогу — рядок
+// ".catalog-top" ("Знайдено N товарів" + сортування), а не сама
+// перша картка: так одразу видно і кількість знайдених товарів,
+// і початок першої картки під ним. Винесено окремо, бо цю ж
+// позицію перевіряє обробник поля пошуку.
+function getResultsScrollTop() {
 
-    if (!grid) return;
+    if (!grid) return 0;
 
-    // ціль — рядок ".catalog-top" ("Знайдено N товарів" + сортування),
-    // а не сама перша картка: так після застосування фільтра одразу
-    // видно і кількість знайдених товарів, і початок першої картки
-    // під ним
     const catalogTop = document.querySelector(".catalog-top");
     const firstCard = grid.querySelector(".product-card");
     const target = catalogTop || firstCard || grid;
@@ -72,7 +73,15 @@ function scrollToFirstProduct() {
 
     offset += 16;
 
-    const top = Math.max(target.getBoundingClientRect().top + window.scrollY - offset, 0);
+    return Math.max(target.getBoundingClientRect().top + window.scrollY - offset, 0);
+
+}
+
+function scrollToFirstProduct() {
+
+    if (!grid) return;
+
+    const top = getResultsScrollTop();
 
     // захист озброюємо лише якщо реально є куди скролити — інакше
     // (ціль уже на екрані) 'scrollend' не спрацює жодного разу і
@@ -2067,7 +2076,28 @@ resetBtn?.addEventListener("click", resetAllFilters);
 
 clearBtn?.addEventListener("click", resetAllFilters);
 
-search.addEventListener("input", render);
+// Пошук: перемальовуємо результати і, якщо користувач зараз нижче
+// за початок каталогу, піднімаємо його до рядка "Знайдено N товарів".
+//
+// Навмисно НЕ через applyFilterChange(): той скролить завжди, а тут
+// це смикало б сторінку на кожній натиснутій клавіші. Тому підйом
+// відбувається фактично один раз — на початку набору: щойно ми
+// опинились угорі, умова нижче більше не виконується, і подальші
+// символи вже нічого не рухають.
+search.addEventListener("input", () => {
+
+    render();
+
+    // у мобільній шторці "Всі фільтри" скрол не потрібен
+    if (document.body.classList.contains("mobile-filters-open")) return;
+
+    // анімація підйому ще триває після попереднього символу —
+    // не перезапускаємо її, інакше скрол смикався б
+    if (isAutoScrollGuardActive()) return;
+
+    if (window.scrollY > getResultsScrollTop() + 4) scrollToFirstProduct();
+
+});
 
 // -------------------------
 // Кастомний дропдаун сортування

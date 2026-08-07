@@ -176,6 +176,47 @@
         font-size:13px;
     }
 
+    .dup-box{
+        margin:14px 0 4px;
+        padding:14px 16px;
+        border-radius:10px;
+        background:#fffbeb;
+        border:1px solid #fde68a;
+        color:#92400e;
+        font-size:14px;
+        line-height:1.5;
+    }
+
+    .dup-title{
+        font-weight:700;
+        margin-bottom:8px;
+    }
+
+    .dup-list{
+        margin:0 0 10px;
+        padding-left:20px;
+        font-size:13px;
+    }
+
+    .dup-list li{
+        margin-bottom:4px;
+    }
+
+    .dup-check{
+        display:flex;
+        align-items:center;
+        gap:8px;
+        font-size:13px;
+        font-weight:600;
+        cursor:pointer;
+    }
+
+    .dup-check input{
+        width:16px;
+        height:16px;
+        cursor:pointer;
+    }
+
     .publish-status{
         margin-top:14px;
         font-size:14px;
@@ -287,10 +328,12 @@
     <div class="card" id="downloadCard" hidden>
         <h2><span class="step-num">5</span> Опублікуйте товари на сайт</h2>
         <p>
-            Товари без помилок готові. Натисніть кнопку — файли товарів і фото
+            Товари без помилок готові й перевірені на дублі. Натисніть кнопку — файли товарів і фото
             одразу підуть на сайт (вхід той самий, що і в адмінці, GitHub Desktop
             і ручний пуш більше не потрібні).
         </p>
+        <div class="dup-box" id="duplicateBox" hidden></div>
+
         <button class="btn" id="publishBtn">🚀 Опублікувати на сайт</button>
 
         <div class="publish-status" id="publishStatus" hidden></div>

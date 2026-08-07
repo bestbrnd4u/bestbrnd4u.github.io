@@ -1713,14 +1713,19 @@ nav li.has-mega:hover .mega-menu{
 }
 
 .mini-size{
-    width:28px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:28px;
     height:28px;
+    padding:0 7px;
     border-radius:9px;
     border:1.5px solid var(--gray200);
     font-size:12px;
     font-weight:700;
     color:var(--gray700);
     background:#fff;
+    white-space:nowrap;
     transition:.2s;
 }
 
@@ -2877,6 +2882,23 @@ body.mobile-filters-open .scroll-top{
 }
 
 /* -- фільтр ціни: повзунок діапазону "від / до" -- */
+
+/* -- фільтр ціни: повзунок діапазону "від / до" -- */
+
+/* .filter-menu за замовчуванням розтягнутий на ширину самої
+   кнопки-тригера (left:0;right:0) — цього достатньо для списку
+   чекбоксів, але замало для повзунка з двома полями введення та
+   підписом "грн". Ціна до того ж останній фільтр у рядку, тож
+   рости вправо нікуди — впирається у край екрана й обрізається
+   (це і показано на скріні). Розкриваємо ширше й від правого
+   краю кнопки, щоб меню росло вліво, у вільний простір рядка
+   фільтрів, а не за межі viewport. */
+#priceDropdown .filter-menu{
+    left:auto;
+    right:0;
+    width:336px;
+    min-width:336px;
+}
 
 .price-range{
     padding:14px 12px 8px;
@@ -5886,8 +5908,9 @@ body.mobile-filters-open .scroll-top{
     }
 
     #catalogGrid.products-grid:not(.list-view) .mini-size{
-        width:22px;
+        min-width:22px;
         height:22px;
+        padding:0 5px;
         font-size:10px;
     }
 
