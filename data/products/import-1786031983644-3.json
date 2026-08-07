@@ -43,5 +43,11 @@
   ],
   "preOrder": true,
   "preOrderDays": "10–16 робочих днів",
-  "preOrderPrepayment": 100
+  "preOrderPrepayment": 100,
+  "slug": "import-1786031983644-3",
+  "id": 14,
+  "color": "Коричневий",
+  "images": [
+    "https://commons.wikimedia.org/wiki/Special:Redirect/file/Mk%20bag.jpg"
+  ]
 }

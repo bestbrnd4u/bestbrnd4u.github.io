@@ -29,5 +29,11 @@
   ],
   "preOrder": true,
   "preOrderDays": "10–14 робочих днів",
-  "preOrderPrepayment": 50
+  "preOrderPrepayment": 50,
+  "slug": "import-1786031983644-2",
+  "id": 13,
+  "color": "Чорний",
+  "images": [
+    "https://commons.wikimedia.org/wiki/Special:Redirect/file/Eastpak%20Sugarbush%20backpack%20black.jpg"
+  ]
 }

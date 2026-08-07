@@ -593,5 +593,501 @@
       "еко сумка",
       "сумка для покупок"
     ]
+  },
+  {
+    "title": "Metropolis Mini",
+    "brand": "Furla",
+    "category": "Жіночі сумки",
+    "gender": "Жінкам",
+    "price": 10999,
+    "description": "Компактна сумка з італійської шкіри з металевим декором-пряжкою.",
+    "variants": [
+      {
+        "color": "Бежевий",
+        "hex": "#d9c7a1",
+        "images": [
+          "https://commons.wikimedia.org/wiki/Special:Redirect/file/Furla%2C%20pochette%20metropolis%2C%202016.jpg"
+        ]
+      },
+      {
+        "color": "Чорний",
+        "hex": "#1a1a1a",
+        "images": [
+          "https://commons.wikimedia.org/wiki/Special:Redirect/file/Furla%2C%20pochette%20metropolis%2C%202016.jpg"
+        ]
+      }
+    ],
+    "oldPrice": 11999,
+    "badge": "TOP",
+    "isNew": false,
+    "sizes": [
+      "XS",
+      "S"
+    ],
+    "material": "Натуральна шкіра",
+    "country": "Італія",
+    "sku": "FR-MP-4004",
+    "closure": "магніт із пряжкою",
+    "decor": "металева пряжка",
+    "dimensions": "20x16x8 см",
+    "strapInfo": "Один незнімний ремінь довжиною 110 см",
+    "compartments": "одне основне відділення",
+    "composition": "100% шкіра",
+    "searchKeywords": [
+      "клатч",
+      "міні сумка",
+      "вечірня сумка"
+    ],
+    "slug": "import-1786031983644-1",
+    "id": 12,
+    "color": "Бежевий",
+    "images": [
+      "https://commons.wikimedia.org/wiki/Special:Redirect/file/Furla%2C%20pochette%20metropolis%2C%202016.jpg"
+    ]
+  },
+  {
+    "title": "Urban Backpack",
+    "brand": "Tommy Hilfiger",
+    "category": "Рюкзаки",
+    "gender": "Унісекс",
+    "price": 4599,
+    "description": "Місткий рюкзак для щоденного використання з відділенням для ноутбука.",
+    "variants": [
+      {
+        "color": "Чорний",
+        "hex": "#111111",
+        "images": [
+          "https://commons.wikimedia.org/wiki/Special:Redirect/file/Eastpak%20Sugarbush%20backpack%20black.jpg"
+        ]
+      }
+    ],
+    "isNew": true,
+    "material": "Поліестер",
+    "country": "В'єтнам",
+    "sku": "TH-UB-1102",
+    "closure": "блискавка",
+    "decor": "логотип",
+    "dimensions": "30x20x12 см",
+    "compartments": "одне відділення для ноутбука, дві бічні кишені",
+    "composition": "100% поліестер",
+    "searchKeywords": [
+      "рюкзак",
+      "для ноутбука"
+    ],
+    "preOrder": true,
+    "preOrderDays": "10–14 робочих днів",
+    "preOrderPrepayment": 50,
+    "slug": "import-1786031983644-2",
+    "id": 13,
+    "color": "Чорний",
+    "images": [
+      "https://commons.wikimedia.org/wiki/Special:Redirect/file/Eastpak%20Sugarbush%20backpack%20black.jpg"
+    ]
+  },
+  {
+    "title": "City Tote",
+    "brand": "Michael Kors",
+    "category": "Жіночі сумки",
+    "gender": "Жінкам",
+    "price": 8999,
+    "description": "Елегантна містка сумка для міста з короткими ручками та знімним ременем.",
+    "variants": [
+      {
+        "color": "Коричневий",
+        "hex": "#8b5e3c",
+        "images": [
+          "https://commons.wikimedia.org/wiki/Special:Redirect/file/Mk%20bag.jpg"
+        ]
+      },
+      {
+        "color": "Чорний",
+        "hex": "#1a1a1a",
+        "images": [
+          "https://commons.wikimedia.org/wiki/Special:Redirect/file/Michael%20Kors%20Jet%20Set%20Travel%20LG%20EW%20Crossbody%2032S4GTVC3L%20Kalbsleder%20schwarz%20-%20silber%20%281%29%20%2816647360061%29.jpg"
+        ]
+      }
+    ],
+    "oldPrice": 9999,
+    "badge": "SALE",
+    "isNew": false,
+    "sizes": [
+      "ONESIZE"
+    ],
+    "material": "Еко-шкіра",
+    "country": "Китай",
+    "sku": "MK-CT-2210",
+    "closure": "блискавка",
+    "decor": "логотип",
+    "dimensions": "28x24x12 см",
+    "strapInfo": "Дві короткі ручки та знімний ремінь 100 см",
+    "compartments": "одне основне відділення, внутрішня кишеня на блискавці",
+    "composition": "100% поліуретан",
+    "searchKeywords": [
+      "тоут",
+      "жіноча сумка",
+      "міська сумка"
+    ],
+    "preOrder": true,
+    "preOrderDays": "10–16 робочих днів",
+    "preOrderPrepayment": 100,
+    "slug": "import-1786031983644-3",
+    "id": 14,
+    "color": "Коричневий",
+    "images": [
+      "https://commons.wikimedia.org/wiki/Special:Redirect/file/Mk%20bag.jpg"
+    ]
+  },
+  {
+    "title": "Urban Sneakers",
+    "brand": "Nike",
+    "category": "Кросівки",
+    "gender": "Унісекс",
+    "price": 4299,
+    "description": "Легкі повсякденні кросівки з амортизуючою підошвою для активного міського ритму.",
+    "variants": [
+      {
+        "color": "Білий",
+        "hex": "#f7f7f7",
+        "images": [
+          "https://commons.wikimedia.org/wiki/Special:Redirect/file/Timberland%206%20inch%20boots.jpg"
+        ]
+      },
+      {
+        "color": "Чорний",
+        "hex": "#161616",
+        "images": [
+          "https://commons.wikimedia.org/wiki/Special:Redirect/file/Timberland%206%20inch%20boots.jpg"
+        ]
+      }
+    ],
+    "oldPrice": 4799,
+    "badge": "TOP",
+    "isNew": false,
+    "sizes": [
+      "36",
+      "37",
+      "38",
+      "39",
+      "40",
+      "41",
+      "42"
+    ],
+    "material": "Текстиль та синтетичні матеріали",
+    "country": "В'єтнам",
+    "sku": "NK-US-7731",
+    "closure": "шнурівка",
+    "decor": "логотип",
+    "dimensions": "32x21x12 см",
+    "strapInfo": "Без ременя",
+    "compartments": "основне відділення коробки для взуття",
+    "composition": "текстиль, синтетика, гума",
+    "searchKeywords": [
+      "кросівки",
+      "повсякденні",
+      "спортивний стиль"
+    ],
+    "slug": "import-1786031983644-4",
+    "id": 15,
+    "color": "Білий",
+    "images": [
+      "https://commons.wikimedia.org/wiki/Special:Redirect/file/Timberland%206%20inch%20boots.jpg"
+    ]
+  },
+  {
+    "title": "Minimal Watch",
+    "brand": "Casio",
+    "category": "Годинники",
+    "gender": "Унісекс",
+    "price": 3199,
+    "description": "Лаконічний наручний годинник із чистим циферблатом та сталевим браслетом.",
+    "variants": [
+      {
+        "color": "Сріблястий",
+        "hex": "#c0c0c0",
+        "images": [
+          "assets/images/products/uploads/RayBanAviator.png"
+        ]
+      },
+      {
+        "color": "Чорний",
+        "hex": "#1a1a1a",
+        "images": [
+          "https://commons.wikimedia.org/wiki/Special:Redirect/file/Ray-Ban%20Aviator%20sunglasses.jpg"
+        ]
+      }
+    ],
+    "badge": "NEW",
+    "isNew": true,
+    "sizes": [
+      "ONESIZE"
+    ],
+    "material": "Нержавіюча сталь",
+    "country": "Японія",
+    "sku": "CA-MW-9012",
+    "closure": "застібка-кліпса",
+    "decor": "мінімалістичний циферблат",
+    "dimensions": "Корпус 38 мм",
+    "strapInfo": "Браслет із регулюванням довжини",
+    "compartments": "циферблат, кварцовий механізм",
+    "composition": "сталь, мінеральне скло",
+    "searchKeywords": [
+      "годинник",
+      "наручний",
+      "мінімалізм"
+    ],
+    "slug": "import-1786031983644-5",
+    "id": 16,
+    "color": "Сріблястий",
+    "images": [
+      "assets/images/products/uploads/RayBanAviator.png"
+    ]
+  },
+  {
+    "title": "Metropolis Mini",
+    "brand": "Furla",
+    "category": "Жіночі сумки",
+    "gender": "Жінкам",
+    "price": 10999,
+    "description": "Компактна сумка з італійської шкіри з металевим декором-пряжкою.",
+    "variants": [
+      {
+        "color": "Бежевий",
+        "hex": "#d9c7a1",
+        "images": [
+          "https://commons.wikimedia.org/wiki/Special:Redirect/file/Furla%2C%20pochette%20metropolis%2C%202016.jpg"
+        ]
+      },
+      {
+        "color": "Чорний",
+        "hex": "#1a1a1a",
+        "images": [
+          "https://commons.wikimedia.org/wiki/Special:Redirect/file/Furla%2C%20pochette%20metropolis%2C%202016.jpg"
+        ]
+      }
+    ],
+    "oldPrice": 11999,
+    "badge": "TOP",
+    "isNew": false,
+    "sizes": [
+      "XS",
+      "S"
+    ],
+    "material": "Натуральна шкіра",
+    "country": "Італія",
+    "sku": "FR-MP-4004",
+    "closure": "магніт із пряжкою",
+    "decor": "металева пряжка",
+    "dimensions": "20x16x8 см",
+    "strapInfo": "Один незнімний ремінь довжиною 110 см",
+    "compartments": "одне основне відділення",
+    "composition": "100% шкіра",
+    "searchKeywords": [
+      "клатч",
+      "міні сумка",
+      "вечірня сумка"
+    ],
+    "slug": "import-1786087720648-1",
+    "id": 17,
+    "color": "Бежевий",
+    "images": [
+      "https://commons.wikimedia.org/wiki/Special:Redirect/file/Furla%2C%20pochette%20metropolis%2C%202016.jpg"
+    ]
+  },
+  {
+    "title": "Urban Backpack",
+    "brand": "Tommy Hilfiger",
+    "category": "Рюкзаки",
+    "gender": "Унісекс",
+    "price": 4599,
+    "description": "Місткий рюкзак для щоденного використання з відділенням для ноутбука.",
+    "variants": [
+      {
+        "color": "Чорний",
+        "hex": "#111111",
+        "images": [
+          "https://commons.wikimedia.org/wiki/Special:Redirect/file/Eastpak%20Sugarbush%20backpack%20black.jpg"
+        ]
+      }
+    ],
+    "isNew": true,
+    "material": "Поліестер",
+    "country": "В'єтнам",
+    "sku": "TH-UB-1102",
+    "closure": "блискавка",
+    "decor": "логотип",
+    "dimensions": "30x20x12 см",
+    "compartments": "одне відділення для ноутбука, дві бічні кишені",
+    "composition": "100% поліестер",
+    "searchKeywords": [
+      "рюкзак",
+      "для ноутбука"
+    ],
+    "preOrder": true,
+    "preOrderDays": "10–14 робочих днів",
+    "preOrderPrepayment": 50,
+    "slug": "import-1786087720648-2",
+    "id": 18,
+    "color": "Чорний",
+    "images": [
+      "https://commons.wikimedia.org/wiki/Special:Redirect/file/Eastpak%20Sugarbush%20backpack%20black.jpg"
+    ]
+  },
+  {
+    "title": "City Tote",
+    "brand": "Michael Kors",
+    "category": "Жіночі сумки",
+    "gender": "Жінкам",
+    "price": 8999,
+    "description": "Елегантна містка сумка для міста з короткими ручками та знімним ременем.",
+    "variants": [
+      {
+        "color": "Коричневий",
+        "hex": "#8b5e3c",
+        "images": [
+          "https://commons.wikimedia.org/wiki/Special:Redirect/file/Mk%20bag.jpg"
+        ]
+      },
+      {
+        "color": "Чорний",
+        "hex": "#1a1a1a",
+        "images": [
+          "https://commons.wikimedia.org/wiki/Special:Redirect/file/Michael%20Kors%20Jet%20Set%20Travel%20LG%20EW%20Crossbody%2032S4GTVC3L%20Kalbsleder%20schwarz%20-%20silber%20%281%29%20%2816647360061%29.jpg"
+        ]
+      }
+    ],
+    "oldPrice": 9999,
+    "badge": "SALE",
+    "isNew": false,
+    "sizes": [
+      "ONESIZE"
+    ],
+    "material": "Еко-шкіра",
+    "country": "Китай",
+    "sku": "MK-CT-2210",
+    "closure": "блискавка",
+    "decor": "логотип",
+    "dimensions": "28x24x12 см",
+    "strapInfo": "Дві короткі ручки та знімний ремінь 100 см",
+    "compartments": "одне основне відділення, внутрішня кишеня на блискавці",
+    "composition": "100% поліуретан",
+    "searchKeywords": [
+      "тоут",
+      "жіноча сумка",
+      "міська сумка"
+    ],
+    "preOrder": true,
+    "preOrderDays": "10–16 робочих днів",
+    "preOrderPrepayment": 100,
+    "slug": "import-1786087720648-3",
+    "id": 19,
+    "color": "Коричневий",
+    "images": [
+      "https://commons.wikimedia.org/wiki/Special:Redirect/file/Mk%20bag.jpg"
+    ]
+  },
+  {
+    "title": "Urban Sneakers",
+    "brand": "Nike",
+    "category": "Кросівки",
+    "gender": "Унісекс",
+    "price": 4299,
+    "description": "Легкі повсякденні кросівки з амортизуючою підошвою для активного міського ритму.",
+    "variants": [
+      {
+        "color": "Білий",
+        "hex": "#f7f7f7",
+        "images": [
+          "https://commons.wikimedia.org/wiki/Special:Redirect/file/Timberland%206%20inch%20boots.jpg"
+        ]
+      },
+      {
+        "color": "Чорний",
+        "hex": "#161616",
+        "images": [
+          "https://commons.wikimedia.org/wiki/Special:Redirect/file/Timberland%206%20inch%20boots.jpg"
+        ]
+      }
+    ],
+    "oldPrice": 4799,
+    "badge": "TOP",
+    "isNew": false,
+    "sizes": [
+      "36",
+      "37",
+      "38",
+      "39",
+      "40",
+      "41",
+      "42"
+    ],
+    "material": "Текстиль та синтетичні матеріали",
+    "country": "В'єтнам",
+    "sku": "NK-US-7731",
+    "closure": "шнурівка",
+    "decor": "логотип",
+    "dimensions": "32x21x12 см",
+    "strapInfo": "Без ременя",
+    "compartments": "основне відділення коробки для взуття",
+    "composition": "текстиль, синтетика, гума",
+    "searchKeywords": [
+      "кросівки",
+      "повсякденні",
+      "спортивний стиль"
+    ],
+    "slug": "import-1786087720648-4",
+    "id": 20,
+    "color": "Білий",
+    "images": [
+      "https://commons.wikimedia.org/wiki/Special:Redirect/file/Timberland%206%20inch%20boots.jpg"
+    ]
+  },
+  {
+    "title": "Minimal Watch",
+    "brand": "Casio",
+    "category": "Годинники",
+    "gender": "Унісекс",
+    "price": 3199,
+    "description": "Лаконічний наручний годинник із чистим циферблатом та сталевим браслетом.",
+    "variants": [
+      {
+        "color": "Сріблястий",
+        "hex": "#c0c0c0",
+        "images": [
+          "assets/images/products/uploads/RayBanAviator.png"
+        ]
+      },
+      {
+        "color": "Чорний",
+        "hex": "#1a1a1a",
+        "images": [
+          "https://commons.wikimedia.org/wiki/Special:Redirect/file/Ray-Ban%20Aviator%20sunglasses.jpg"
+        ]
+      }
+    ],
+    "badge": "NEW",
+    "isNew": true,
+    "sizes": [
+      "ONESIZE"
+    ],
+    "material": "Нержавіюча сталь",
+    "country": "Японія",
+    "sku": "CA-MW-9012",
+    "closure": "застібка-кліпса",
+    "decor": "мінімалістичний циферблат",
+    "dimensions": "Корпус 38 мм",
+    "strapInfo": "Браслет із регулюванням довжини",
+    "compartments": "циферблат, кварцовий механізм",
+    "composition": "сталь, мінеральне скло",
+    "searchKeywords": [
+      "годинник",
+      "наручний",
+      "мінімалізм"
+    ],
+    "slug": "import-1786087720648-5",
+    "id": 21,
+    "color": "Сріблястий",
+    "images": [
+      "assets/images/products/uploads/RayBanAviator.png"
+    ]
   }
 ]
