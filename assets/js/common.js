@@ -1481,6 +1481,23 @@ document.addEventListener("click", event => {
         // кошика/обраного або самої сторінки товару)
         const scope = colorBtn.closest(".product-card, .favorite-row, .cart-item, #productPage");
 
+        // Артикул теж свій у кожного кольору — оновлюємо підпис під
+        // назвою товару і рядок у характеристиках. data-sku порожній →
+        // артикула немає взагалі, тоді просто чистимо текст.
+        if (scope && colorBtn.dataset.sku !== undefined) {
+
+            const sku = colorBtn.dataset.sku;
+
+            const inlineSku = scope.querySelector("[data-product-sku]");
+
+            if (inlineSku) inlineSku.textContent = sku ? ` · ${sku}` : "";
+
+            const specSku = scope.querySelector("[data-spec-sku]");
+
+            if (specSku) specSku.textContent = sku;
+
+        }
+
         // Розміри можуть відрізнятись у різних кольорів (напр. чорні
         // кросівки 40–46, білі 36–39) — при перемиканні кольору
         // перемальовуємо список розмірів під обраний варіант.
@@ -1972,10 +1989,16 @@ function loadSizeGroups() {
         .then(response => response.ok ? response.json() : null)
         .then(data => {
 
-            if (!Array.isArray(data) || data.length === 0) return FALLBACK_SIZE_GROUPS;
+            // Decap зберігає file-колекцію як ОБ'ЄКТ, де ключ — імʼя поля
+            // ({"groups": [...]}), тому читаємо саме data.groups. Голий
+            // масив теж підтримуємо — на випадок ручного редагування
+            // файлу або старого формату.
+            const list = Array.isArray(data) ? data : data?.groups;
+
+            if (!Array.isArray(list) || list.length === 0) return FALLBACK_SIZE_GROUPS;
 
             // нормалізуємо, щоб далі не перевіряти кожне поле на існування
-            return data.map(group => ({
+            return list.map(group => ({
                 key: group.key || "",
                 title: group.title || "",
                 department: group.department || "",
@@ -2013,6 +2036,18 @@ function findSizeGroupForCategory(groups, category, categoryDepartments) {
     return (groups || []).find(group =>
         resolveGroupCategories(group, categoryDepartments).includes(category)
     ) || null;
+
+}
+
+// Артикул варіанта кольору. У різних кольорів однієї моделі артикул
+// зазвичай різний, тож він задається в самому кольорі; якщо там
+// порожньо — береться загальний артикул товару (так влаштовані всі
+// товари, додані до появи артикула в кольорах).
+function getVariantSku(product, variant) {
+
+    const variantSku = (variant?.sku || "").trim();
+
+    return variantSku || (product?.sku || "");
 
 }
 

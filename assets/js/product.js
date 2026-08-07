@@ -83,7 +83,7 @@ function updateProductSeoMetadata(product) {
         name: product.title,
         image: product.images || [],
         description,
-        sku: product.sku,
+        sku: getVariantSku(product, (product.variants || [])[0]),
         brand: product.brand ? { "@type": "Brand", name: product.brand } : undefined,
         offers: {
             "@type": "Offer",
@@ -299,6 +299,7 @@ function renderProduct(product) {
             data-color="${escapeHtml(variant.color)}"
             data-images='${escapeAttrSingleQuoted(JSON.stringify(variant.images || []))}'
             data-sizes='${escapeAttrSingleQuoted(JSON.stringify(getVariantSizes(product, variant)))}'
+            data-sku="${escapeHtml(getVariantSku(product, variant))}"
             data-video="${escapeHtml(variant.video || "")}"
             title="${escapeHtml(variant.color)}"
             aria-label="Колір: ${escapeHtml(variant.color)}"
@@ -309,6 +310,10 @@ function renderProduct(product) {
 
     // розміри першого (активного за замовчуванням) кольору;
     // при перемиканні кольору список оновлює common.js
+    // артикул активного (першого) кольору; при перемиканні кольору
+    // його оновлює обробник у common.js за data-sku
+    const activeSku = getVariantSku(product, variants[0]);
+
     const firstVariantSizes = getVariantSizes(product, variants[0]);
     const sizes = firstVariantSizes.length ? firstVariantSizes : PRODUCT_SIZES;
 
@@ -376,7 +381,7 @@ function renderProduct(product) {
         </h1>
 
         <div class="product-meta-line">
-            ${escapeHtml(product.brand)}${product.sku ? ` · ${escapeHtml(product.sku)}` : ""}
+            ${escapeHtml(product.brand)}<span data-product-sku>${activeSku ? ` · ${escapeHtml(activeSku)}` : ""}</span>
         </div>
 
         <div class="price-box">
@@ -485,7 +490,7 @@ ${sizeButtons}
 
         <div class="specifications" id="productSpecifications">
 
-            ${product.sku ? `
+            ${activeSku ? `
             <div class="spec-block accordion-item">
                 <button type="button" class="spec-block-header">
                     <h3>Артикул</h3>
@@ -493,7 +498,7 @@ ${sizeButtons}
                 </button>
                 <div class="spec-block-content">
                     <div class="spec-block-inner">
-                        <p class="spec-plain">${escapeHtml(product.sku)}</p>
+                        <p class="spec-plain" data-spec-sku>${escapeHtml(activeSku)}</p>
                     </div>
                 </div>
             </div>` : ""}
@@ -650,12 +655,88 @@ ${sizeButtons}
 
     setupSizeGuideModal();
     renderSizeGuide(product);
+    renderProductInstagram(product);
 
 }
 
 // -------------------------
 // Модалка "Таблиця розмірів"
 // -------------------------
+
+// -------------------------
+// Блок Instagram під товаром
+//
+// Режим задається в адмінці для кожного товару:
+//   reels   — Reels саме цього товару
+//   general — звичайна реклама акаунту (текст і посилання спільні
+//             з головною, з data/home.json — щоб не дублювати
+//             налаштування у двох місцях)
+//   none    — не показувати
+//
+// За замовчуванням (поле не заповнене у старих товарах) — general,
+// як і на головній.
+// -------------------------
+
+async function renderProductInstagram(product) {
+
+    const section = document.getElementById("productInstagram");
+
+    if (!section) return;
+
+    const mode = product.instagramBlock || "general";
+
+    if (mode === "none") {
+
+        section.hidden = true;
+
+        return;
+
+    }
+
+    const titleEl = document.getElementById("productInstagramTitle");
+    const textEl = document.getElementById("productInstagramText");
+    const btnEl = document.getElementById("productInstagramBtn");
+
+    const reels = (product.instagramReels || "").trim();
+
+    // Обрали Reels, але посилання не вказали — не ховаємо блок і не
+    // ведемо в нікуди, а показуємо звичайну рекламу акаунту.
+    if (mode === "reels" && reels) {
+
+        titleEl.textContent = "Цей товар у Reels";
+        textEl.textContent = "Подивіться, який він у русі — коротке відео в Instagram.";
+        btnEl.textContent = "Дивитися Reels";
+        btnEl.href = reels;
+
+        section.hidden = false;
+
+        return;
+
+    }
+
+    // спільні налаштування з головної
+    let instagram = null;
+
+    try {
+
+        const response = await fetch("data/home.json");
+
+        if (response.ok) instagram = (await response.json()).instagram;
+
+    } catch (error) {
+
+        // немає файлу — нижче підставляться запасні тексти
+
+    }
+
+    titleEl.textContent = instagram?.title || "Стежте за нами в Instagram";
+    textEl.textContent = instagram?.text || "Нові колекції, образи та акції — щодня у нашому акаунті.";
+    btnEl.textContent = instagram?.buttonText || "Підписатися";
+    btnEl.href = instagram?.link || "https://www.instagram.com/bestbrnd4u";
+
+    section.hidden = false;
+
+}
 
 // Наповнює таблицю розмірів під групу, до якої належить категорія
 // товару: у сумок свої стовпці, у взуття — свої. Дані з адмінки
