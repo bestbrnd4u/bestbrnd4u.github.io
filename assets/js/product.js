@@ -633,17 +633,31 @@ ${sizeButtons}
     setupGallery();
     setupMobileStickyCart();
 
-    document.querySelectorAll(".size").forEach(button => {
+    // Розміри слухаємо ДЕЛЕГОВАНО, а не навішуємо обробник на кожну
+    // кнопку. Причина: при зміні кольору список розмірів
+    // перемальовується (у різних кольорів вони різні — див. common.js),
+    // старі кнопки зникають разом зі слухачами, і розмір переставав
+    // вибиратись, доки не перезавантажиш сторінку.
+    // Прапорець потрібен, бо ця функція виконується на кожен рендер,
+    // а слухач має бути один.
+    if (!document.body.dataset.sizeClickBound) {
 
-        button.addEventListener("click", function () {
+        document.body.dataset.sizeClickBound = "1";
 
-            document.querySelectorAll(".size").forEach(item => item.classList.remove("active"));
+        document.addEventListener("click", event => {
 
-            this.classList.add("active");
+            const button = event.target.closest(".size");
+
+            if (!button || !button.closest("#productPage")) return;
+
+            document.querySelectorAll("#productPage .size")
+                .forEach(item => item.classList.remove("active"));
+
+            button.classList.add("active");
 
             updateFavoriteButtons();
 
-            this.closest(".sizes, .product-sizes")?.classList.remove("size-shake");
+            button.closest(".sizes, .product-sizes")?.classList.remove("size-shake");
 
             const errorEl = document.getElementById("sizeError");
 
@@ -651,7 +665,7 @@ ${sizeButtons}
 
         });
 
-    });
+    }
 
     setupSizeGuideModal();
     renderSizeGuide(product);
@@ -1050,22 +1064,49 @@ function setupGallery() {
 
         // клік/тап по фото — відкриваємо повноекранний перегляд
         // з зумом (не спрацьовує, якщо це був свайп)
-        track.addEventListener("click", () => {
+        track.addEventListener("click", event => {
 
             if (axis === "x") return;
 
             if (typeof window.openLightbox !== "function") return;
 
             const slides = [...track.children];
-            const activeSlide = slides[currentSlideIndex()];
+            const activeIndex = currentSlideIndex();
+            const activeSlide = slides[activeIndex];
 
-            // відео/embed-слайд відкриває власні controls по тапу —
-            // фото-лайтбокс із зумом тут не потрібен і не підтримує відео
-            if (activeSlide && activeSlide.tagName !== "IMG") return;
+            // На слайді з відео тап по самому плеєру має керувати
+            // відтворенням, а не відкривати лайтбокс — інакше не
+            // можна було б поставити на паузу чи перемотати.
+            if (event.target.closest("video, iframe")) return;
 
-            const imageSlides = slides.filter(slide => slide.tagName === "IMG");
-            const currentImages = imageSlides.map(slide => slide.src).filter(Boolean);
-            const startIndex = imageSlides.indexOf(activeSlide);
+            // Лайтбокс тепер показує і відео, тож передаємо ВСІ слайди
+            // галереї, а не лише фото — інакше на відео зум просто
+            // не відкривався, і воно «зникало» з повноекранного
+            // перегляду.
+            const lightboxSlides = slides.map(slide => {
+
+                if (slide.tagName === "VIDEO") {
+
+                    return {
+                        type: "video",
+                        src: slide.getAttribute("src"),
+                        poster: slide.getAttribute("poster") || ""
+                    };
+
+                }
+
+                if (slide.classList.contains("gallery-slide-embed")) {
+
+                    return { type: "embed", src: slide.querySelector("iframe")?.getAttribute("src") };
+
+                }
+
+                return { type: "image", src: slide.src };
+
+            }).filter(slide => slide.src);
+
+            const currentImages = lightboxSlides;
+            const startIndex = Math.max(0, Math.min(activeIndex, lightboxSlides.length - 1));
 
             const brand = document.querySelector(".product-info .brand")?.textContent.trim();
             const title = document.querySelector(".product-info h1")?.textContent.trim();

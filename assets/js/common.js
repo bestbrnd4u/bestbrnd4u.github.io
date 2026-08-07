@@ -104,8 +104,14 @@ document.addEventListener("click", event => {
     const header = document.querySelector("header");
     const offset = (header ? header.offsetHeight : 0) + 12;
 
+    // Цілимось у сам заголовок секції, а не в її верхній край.
+    // У секцій є власний padding-top (у «Популярних товарах» — 40px),
+    // тож скрол до краю лишав помітний порожній простір над рядком
+    // «Популярні товари» — виглядало, наче сторінка недокрутилась.
+    const heading = target.querySelector("h1, h2, .section-title") || target;
+
     window.scrollTo({
-        top: Math.max(target.getBoundingClientRect().top + window.scrollY - offset, 0),
+        top: Math.max(heading.getBoundingClientRect().top + window.scrollY - offset, 0),
         behavior: "smooth"
     });
 

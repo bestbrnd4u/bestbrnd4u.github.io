@@ -8207,6 +8207,38 @@ body.mobile-filters-open .scroll-top{
     padding:20px;
 }
 
+/* -- відео та вбудовані плеєри в лайтбоксі -- */
+
+/* На відміну від фото, тут НЕ ставимо touch-action:none —
+   плеєру потрібні власні жести (перемотка, гучність). */
+.lightbox-slide-media{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:100%;
+    height:100%;
+    padding:16px;
+}
+
+.lightbox-video{
+    max-width:100%;
+    max-height:100%;
+    border-radius:12px;
+    background:#000;
+    outline:none;
+}
+
+/* embed (YouTube/Vimeo) — тримаємо співвідношення 16:9 і
+   вписуємо у вільне місце екрана */
+.lightbox-embed{
+    width:min(100%, 1100px);
+    aspect-ratio:16 / 9;
+    max-height:100%;
+    border:0;
+    border-radius:12px;
+    background:#000;
+}
+
 .lightbox-img{
     max-width:100%;
     max-height:100%;

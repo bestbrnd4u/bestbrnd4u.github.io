@@ -95,15 +95,74 @@
 
     }
 
+    // Слайд може бути фото, відеофайлом або вбудованим плеєром
+    // (YouTube/Vimeo). Зум працює лише для фото — у відео власні
+    // елементи керування, і масштабувати його не потрібно.
     function renderSlides() {
 
-        track.innerHTML = images.map(src => `
-            <div class="lightbox-slide">
-                <img class="lightbox-img" src="${src}" alt="" draggable="false">
-            </div>
-        `).join("");
+        track.innerHTML = images.map(slide => {
+
+            if (slide.type === "video") {
+
+                return `
+                    <div class="lightbox-slide lightbox-slide-media">
+                        <video class="lightbox-video"
+                               src="${slide.src}"
+                               ${slide.poster ? `poster="${slide.poster}"` : ""}
+                               controls
+                               playsinline
+                               preload="metadata"></video>
+                    </div>
+                `;
+
+            }
+
+            if (slide.type === "embed") {
+
+                return `
+                    <div class="lightbox-slide lightbox-slide-media">
+                        <iframe class="lightbox-embed"
+                                src="${slide.src}"
+                                allow="autoplay; fullscreen; picture-in-picture"
+                                allowfullscreen
+                                loading="lazy"></iframe>
+                    </div>
+                `;
+
+            }
+
+            return `
+                <div class="lightbox-slide">
+                    <img class="lightbox-img" src="${slide.src}" alt="" draggable="false">
+                </div>
+            `;
+
+        }).join("");
 
         totalEl.textContent = String(images.length).padStart(2, "0");
+
+    }
+
+    // Зупиняємо відтворення на всіх слайдах. Потрібно і при
+    // перемиканні слайда, і при закритті: інакше відео продовжує
+    // грати за кадром — його чути, але не видно.
+    function stopAllMedia() {
+
+        track.querySelectorAll("video").forEach(video => {
+
+            try { video.pause(); } catch (error) { /* нічого страшного */ }
+
+        });
+
+        // iframe не можна поставити на паузу ззовні (інший домен),
+        // тож перезавантажуємо його — це гарантовано зупиняє звук
+        track.querySelectorAll("iframe").forEach(frame => {
+
+            const src = frame.getAttribute("src");
+
+            if (src) frame.setAttribute("src", src);
+
+        });
 
     }
 
@@ -136,6 +195,8 @@
 
         index = Math.max(0, Math.min(newIndex, images.length - 1));
 
+        stopAllMedia();
+
         resetZoom();
 
         track.style.transition = animate ? "" : "none";
@@ -167,7 +228,12 @@
 
         buildLightbox();
 
-        images = imageList && imageList.length ? imageList : [];
+        // Приймаємо і новий формат ({type, src}), і старий — просто
+        // масив рядків із посиланнями на фото. Так лайтбокс лишається
+        // сумісним із рештою місць, які викликають його по-старому.
+        images = (imageList || [])
+            .map(item => typeof item === "string" ? { type: "image", src: item } : item)
+            .filter(item => item && item.src);
 
         if (!images.length) return;
 
@@ -199,6 +265,8 @@
     };
 
     function closeLightbox() {
+
+        stopAllMedia();
 
         root.classList.remove("open");
         root.hidden = true;
@@ -399,6 +467,17 @@
         }
 
         track.addEventListener("touchstart", event => {
+
+            // На слайді з відео жести віддаємо самому плеєру: інакше
+            // перетягування повзунка гучності/перемотки лайтбокс
+            // сприймав би як свайп і гортав слайди.
+            if (event.target.closest(".lightbox-slide-media")) {
+
+                mode = null;
+
+                return;
+
+            }
 
             if (event.touches.length === 2) {
 
