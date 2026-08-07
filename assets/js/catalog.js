@@ -388,6 +388,8 @@ async function initCatalog() {
 
         fillCategories(categoryDepartments);
 
+        fillCatalogSidebar(categoryDepartments);
+
         applyCategoryFromUrl();
 
         fillSizeGroups();
@@ -677,17 +679,62 @@ colorToggle?.addEventListener("click", event => {
 // Дропдаун «Категорія» (з пошуком, згруповано по розділах)
 // -------------------------
 
+// Спільне дерево «розділ → категорії з кількістю товарів» для
+// дропдауна фільтра і бокового меню каталогу.
+//
+// Головні правила:
+// - показуються ЛИШЕ категорії, у яких зараз є хоча б один товар
+//   (з'явився товар нової категорії — пункт додається сам, зник
+//   останній — пункт ховається);
+// - розділи без жодної непорожньої категорії не виводяться взагалі;
+// - категорії, яких немає в довіднику data/categories.json (напр.,
+//   довільне значення з Excel-імпорту), не губляться — вони
+//   збираються в окрему групу «Інше», щоб товар завжди можна було
+//   знайти через навігацію.
+function buildCategoryTree(categoryDepartments) {
+
+    const counts = new Map();
+
+    products.forEach(product => {
+
+        if (!product.category) return;
+
+        counts.set(product.category, (counts.get(product.category) || 0) + 1);
+
+    });
+
+    const known = new Set();
+    const tree = [];
+
+    (categoryDepartments || []).forEach(department => {
+
+        const categories = department.categories
+            .filter(name => {
+                known.add(name);
+                return counts.has(name);
+            })
+            .map(name => ({ name, count: counts.get(name) }));
+
+        if (categories.length) tree.push({ title: department.title, categories });
+
+    });
+
+    const unknown = [...counts.keys()]
+        .filter(name => !known.has(name))
+        .sort((a, b) => a.localeCompare(b, "uk"))
+        .map(name => ({ name, count: counts.get(name) }));
+
+    if (unknown.length) tree.push({ title: "Інше", categories: unknown });
+
+    return tree;
+
+}
+
 function fillCategories(categoryDepartments) {
 
-    if (!categoryOptionsList || !Array.isArray(categoryDepartments)) return;
+    if (!categoryOptionsList) return;
 
-    const presentCategories = new Set(products.map(product => product.category));
-
-    categoryDepartments.forEach(department => {
-
-        const categoriesHere = department.categories.filter(c => presentCategories.has(c));
-
-        if (categoriesHere.length === 0) return;
+    buildCategoryTree(categoryDepartments).forEach(department => {
 
         const groupTitle = document.createElement("div");
         groupTitle.className = "filter-option-group-title";
@@ -695,20 +742,113 @@ function fillCategories(categoryDepartments) {
 
         categoryOptionsList.appendChild(groupTitle);
 
-        categoriesHere.forEach(category => {
+        department.categories.forEach(({ name }) => {
 
             const option = document.createElement("button");
 
             option.type = "button";
             option.className = "filter-option";
-            option.dataset.category = category;
-            option.innerHTML = `<span class="filter-checkbox"></span>${category}`;
+            option.dataset.category = name;
+            option.innerHTML = `<span class="filter-checkbox"></span>${escapeHtml(name)}`;
 
-            option.addEventListener("click", () => toggleCategory(category));
+            option.addEventListener("click", () => toggleCategory(name));
 
             categoryOptionsList.appendChild(option);
 
         });
+
+    });
+
+}
+
+// -------------------------
+// Бокове дерево категорій зліва від сітки (лише десктоп) —
+// той самий buildCategoryTree, але у вигляді постійно видимого
+// меню зі счетчиками, як у великих магазинів
+// -------------------------
+
+const catalogSidebar = document.getElementById("catalogSidebar");
+
+function fillCatalogSidebar(categoryDepartments) {
+
+    if (!catalogSidebar) return;
+
+    const tree = buildCategoryTree(categoryDepartments);
+
+    if (!tree.length) {
+
+        catalogSidebar.hidden = true;
+
+        return;
+
+    }
+
+    const totalCount = products.length;
+
+    let html = `
+        <nav class="sidebar-tree" aria-label="Категорії каталогу">
+            <button type="button" class="sidebar-all" data-sidebar-all>
+                Всі товари
+                <span class="sidebar-count">${totalCount}</span>
+            </button>
+    `;
+
+    tree.forEach(department => {
+
+        html += `<div class="sidebar-group">
+            <div class="sidebar-group-title">${escapeHtml(department.title)}</div>`;
+
+        department.categories.forEach(({ name, count }) => {
+
+            html += `
+                <button type="button" class="sidebar-category" data-sidebar-category="${escapeHtml(name)}">
+                    ${escapeHtml(name)}
+                    <span class="sidebar-count">${count}</span>
+                </button>
+            `;
+
+        });
+
+        html += `</div>`;
+
+    });
+
+    html += `</nav>`;
+
+    catalogSidebar.innerHTML = html;
+    catalogSidebar.hidden = false;
+
+    catalogSidebar.querySelector("[data-sidebar-all]").addEventListener("click", () => {
+
+        selectedCategories.clear();
+
+        updateCategoryUI();
+
+        applyFilterChange();
+
+    });
+
+    catalogSidebar.querySelectorAll("[data-sidebar-category]").forEach(button => {
+
+        button.addEventListener("click", () => toggleCategory(button.dataset.sidebarCategory));
+
+    });
+
+    updateSidebarActive();
+
+}
+
+function updateSidebarActive() {
+
+    if (!catalogSidebar) return;
+
+    const allButton = catalogSidebar.querySelector("[data-sidebar-all]");
+
+    if (allButton) allButton.classList.toggle("active", selectedCategories.size === 0);
+
+    catalogSidebar.querySelectorAll("[data-sidebar-category]").forEach(button => {
+
+        button.classList.toggle("active", selectedCategories.has(button.dataset.sidebarCategory));
 
     });
 
@@ -751,6 +891,9 @@ function updateCategoryUI() {
     categoryOptionsList.querySelectorAll(".filter-option").forEach(o => {
         o.classList.toggle("active", selectedCategories.has(o.dataset.category));
     });
+
+    // бокове дерево категорій підсвічує той самий вибір
+    updateSidebarActive();
 
 }
 
@@ -1446,8 +1589,8 @@ function renderBreadcrumbsAndTitle() {
 
     const crumbs = [`<a href="/">Головна</a>`];
 
-    let title = "Каталог сумок";
-    let subtitle = "Понад 500 моделей від світових брендів";
+    let title = "Каталог товарів";
+    let subtitle = "Сумки, одяг, взуття та аксесуари від світових брендів";
 
     if (currentSection === "new") {
 

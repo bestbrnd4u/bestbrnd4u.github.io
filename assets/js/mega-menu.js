@@ -29,11 +29,14 @@
         const categories = await categoriesRes.json();
         const products = await productsRes.json();
 
-        const presentCategories = new Set(products.map(p => p.category));
+        const presentCategories = new Set(products.map(p => p.category).filter(Boolean));
 
         const byDepartment = new Map();
+        const known = new Set();
 
         categories.forEach(category => {
+
+            known.add(category.name);
 
             if (!presentCategories.has(category.name)) return;
 
@@ -44,6 +47,15 @@
             byDepartment.get(category.department).push(category.name);
 
         });
+
+        // категорії, яких немає в довіднику (наприклад, довільне
+        // значення з Excel-імпорту), не губляться — збираються в
+        // колонку «Інше», щоб товар завжди був доступний з меню
+        const unknown = [...presentCategories]
+            .filter(name => !known.has(name))
+            .sort((a, b) => a.localeCompare(b, "uk"));
+
+        if (unknown.length) byDepartment.set("Інше", unknown);
 
         if (byDepartment.size === 0) return;
 
@@ -59,9 +71,9 @@
 
         const departmentColumns = [...byDepartment.entries()].map(([department, names]) => `
             <div class="mega-col">
-                <div class="mega-col-title">${department}</div>
+                <div class="mega-col-title">${escapeHtml(department)}</div>
                 ${names.map(name => `
-                    <a href="catalog?category=${encodeURIComponent(name)}">${name}</a>
+                    <a href="catalog?category=${encodeURIComponent(name)}">${escapeHtml(name)}</a>
                 `).join("")}
             </div>
         `).join("");

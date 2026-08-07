@@ -2567,6 +2567,108 @@ body.mobile-filters-open .scroll-top{
     display:block;
 }
 
+/* -- бокове дерево категорій зліва від сітки (лише десктоп) -- */
+
+/* на вузьких екранах сайдбар не показуємо взагалі — категорії
+   доступні через дропдаун "Категорія" і мобільну шторку фільтрів */
+.catalog-sidebar{
+    display:none;
+}
+
+@media(min-width:1100px){
+
+    .catalog-layout{
+        display:grid;
+        grid-template-columns:250px minmax(0,1fr);
+        gap:34px;
+        align-items:start;
+    }
+
+    .catalog-sidebar{
+        display:block;
+        position:sticky;
+        top:170px; /* шапка + sticky-панель фільтрів */
+        max-height:calc(100vh - 190px);
+        overflow-y:auto;
+        padding-right:6px;
+        scrollbar-width:thin;
+    }
+
+    .catalog-sidebar[hidden]{
+        display:none;
+    }
+
+}
+
+.sidebar-tree{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+}
+
+.sidebar-all,
+.sidebar-category{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    width:100%;
+    padding:9px 12px;
+    border-radius:10px;
+    font-size:14.5px;
+    color:var(--gray700);
+    text-align:left;
+    transition:background .15s ease, color .15s ease;
+}
+
+.sidebar-all{
+    font-weight:700;
+    margin-bottom:6px;
+}
+
+.sidebar-all:hover,
+.sidebar-category:hover{
+    background:var(--gray100);
+}
+
+.sidebar-all.active,
+.sidebar-category.active{
+    background:#eff6ff;
+    color:var(--secondary);
+    font-weight:600;
+}
+
+.sidebar-group{
+    padding-top:12px;
+}
+
+.sidebar-group-title{
+    padding:0 12px 7px;
+    font-size:12px;
+    font-weight:800;
+    letter-spacing:.8px;
+    text-transform:uppercase;
+    color:var(--gray500);
+}
+
+.sidebar-count{
+    flex-shrink:0;
+    min-width:26px;
+    padding:1px 8px;
+    border-radius:20px;
+    background:var(--gray100);
+    font-size:12px;
+    font-weight:600;
+    color:var(--gray500);
+    text-align:center;
+}
+
+.sidebar-all.active .sidebar-count,
+.sidebar-category.active .sidebar-count{
+    background:#dbeafe;
+    color:var(--secondary);
+}
+
 /* FIX: .cart-layout{display:grid} перебивает
    стандартный display:none у [hidden] — без этого
    правила товары в корзине не исчезали и "съезжали"

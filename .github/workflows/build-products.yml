@@ -6,13 +6,16 @@ name: Build catalog data
 # і перезбирає відповідні data/*.json — саме ці файли реально
 # вантажить сайт. Результат комітиться назад у main.
 #
-# НАВМИСНО без [skip ci] у повідомленні коміту нижче: цей коміт має
-# запустити deploy-pages.yml (він реагує на будь-який пуш у main) —
-# інакше щойно перезібрані дані ніколи не потраплять на сайт.
-# Коміт від бота підпадає під ті самі path-фільтри й теоретично міг
-# би запустити ЦЕЙ workflow вдруге по колу, але цикл сам себе гасить:
-# на другому прогоні збірка дає той самий результат, git diff порожній,
-# і крок нижче просто нічого не комітить.
+# ВАЖЛИВО ПРО ДЕПЛОЙ: пуш, зроблений з дефолтним GITHUB_TOKEN (як
+# коміт бота нижче), за правилами GitHub НЕ породжує подію push для
+# інших workflow — тобто deploy-pages.yml від нього сам НЕ запуститься
+# (захист GitHub від нескінченної рекурсії; раніше це не було
+# проблемою, бо нативний Pages-деплой не workflow і реагував на
+# будь-який пуш). Тому після коміту даних крок "Trigger deploy"
+# нижче ЯВНО запускає deploy-pages.yml через workflow_dispatch —
+# без нього перезібраний каталог лишався б лише в репозиторії,
+# а сайт продовжував би віддавати старий data/products.json
+# (симптом: товар видно в адмінці, але немає в каталозі).
 
 on:
   push:
@@ -27,6 +30,9 @@ on:
 
 permissions:
   contents: write
+  # потрібно кроку "Trigger deploy", щоб мати право запустити
+  # deploy-pages.yml через workflow_dispatch
+  actions: write
 
 # якщо за короткий час прилетить кілька пушів (наприклад, два імпорти
 # поспіль) — не даємо їхнім збіркам штовхати гілку одночасно; кожен
@@ -43,12 +49,14 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
-          node-version: "20"
+          # Node.js 20 досяг EOL 30 квітня 2026 — патчів безпеки для
+          # нього більше не буде. 22 — поточна LTS-версія
+          node-version: "22"
 
       - name: Build data/categories.json
         run: node scripts/build-categories.js
@@ -77,7 +85,19 @@ jobs:
                   data/promo-popups.json sitemap.xml
           if git diff --cached --quiet; then
             echo "Немає змін — пропускаємо коміт"
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
           else
             git commit -m "chore: перезібрано дані каталогу"
             git push
+            echo "pushed=true" >> "$GITHUB_OUTPUT"
           fi
+        id: commit
+
+      # Пуш бота вище не породжує подію push (див. коментар угорі),
+      # тож деплоїмо явно. Якщо коміту не було (дані не змінились),
+      # деплой не потрібен — на сайті вже актуальна версія.
+      - name: Trigger deploy
+        if: steps.commit.outputs.pushed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy-pages.yml --ref main

@@ -1,0 +1,30 @@
+version: 2
+
+updates:
+  # -------------------------
+  # GitHub Actions — версії кроків усередині .github/workflows/*.yml
+  # (actions/checkout, actions/setup-node, actions/deploy-pages тощо).
+  #
+  # Саме це відстежувало б за нас апдейт actions/checkout@v4 → v7 і
+  # actions/configure-pages@v5 → v6, які довелось шукати вручну.
+  # Dependabot сам відкриє Pull Request з оновленням версії в файлі
+  # workflow, щойно вийде новий мажорний реліз якогось з actions.
+  # -------------------------
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    # окремий префікс у назвах PR/комітів — одразу видно в списку,
+    # що це саме апдейт actions, а не звичайна робота
+    commit-message:
+      prefix: "chore(actions)"
+    labels:
+      - "dependencies"
+      - "github-actions"
+
+# npm-екосистему навмисно не додано: у репозиторії немає package.json
+# узагалі — scripts/build-*.js написані на чистих вбудованих модулях
+# Node (fs, path), без жодної зовнішньої залежності. Якщо колись
+# з'явиться package.json (наприклад, для лінтера чи збірника),
+# додайте сюди блок package-ecosystem: "npm".

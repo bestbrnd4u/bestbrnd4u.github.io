@@ -97,7 +97,7 @@ rel="stylesheet">
 <div class="container">
 <div class="catalog-header">
 <h1>
-<span id="catalogTitle">Каталог сумок</span>
+<span id="catalogTitle">Каталог товарів</span>
 </h1>
 <p id="catalogSubtitle">
 Понад 500 моделей
@@ -292,6 +292,14 @@ placeholder="Пошук товару...">
 </div>
 
 <div class="catalog-layout">
+
+<!-- Дерево категорій зліва (лише десктоп). Наповнюється в
+     catalog.js з реальних товарів: показуються тільки розділи
+     й категорії, у яких зараз є хоча б один товар, разом з
+     кількістю. З'являється товар нової категорії — пункт
+     додається сам, зникає останній товар — пункт ховається. -->
+<aside id="catalogSidebar" class="catalog-sidebar" hidden></aside>
+
 <main>
 <div class="catalog-top">
 <p>
