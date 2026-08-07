@@ -446,11 +446,17 @@ nav li.has-mega:hover .mega-menu{
     display:flex;
     flex-wrap:wrap;
     grid-template-columns:none;
-    gap:26px 32px;
-    /* 5 колонок (4 статі + бренди) по 160px з відступами 32px = 928px;
-       на вузьких вікнах обмежуємось шириною екрана, щоб меню не
-       вилазило за край — воно центроване через translateX(-50%) */
-    max-width:min(1040px, calc(100vw - 40px));
+    gap:26px 36px;
+    /* width:max-content — ОБОВ'ЯЗКОВО.
+       Меню позиціоноване absolute усередині nav li.has-mega
+       (position:relative), тож без явної ширини браузер стискає його
+       до ширини самого пункту «Каталог» (~90px) — колонки не
+       вміщуються поруч і падають одна під одну вертикально.
+       Стара сітка цього не мала, бо grid-template-columns задавав
+       колонкам конкретну ширину. max-content розпрямляє колонки
+       в один ряд, а max-width нижче не дає вилізти за екран. */
+    width:max-content;
+    max-width:min(1100px, calc(100vw - 40px));
     padding:28px 32px 24px;
     text-align:left;
 }

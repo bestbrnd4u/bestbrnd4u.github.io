@@ -833,16 +833,17 @@ function fillCatalogSidebar(categoryDepartments) {
             </button>
     `;
 
-    const collapsed = readCollapsedGroups();
+    const expanded = readExpandedGroups();
 
     tree.forEach(department => {
 
-        // Група розгортається примусово, якщо всередині є обрана
-        // категорія — інакше після переходу за посиланням з меню
-        // користувач бачив би згорнуту групу і не розумів, звідки
-        // взявся фільтр.
+        // За замовчуванням усі групи ЗГОРНУТІ (показують «+») —
+        // розгортаються або кліком користувача (запам'ятовується),
+        // або примусово, якщо всередині є обрана категорія: інакше
+        // після переходу за посиланням з меню фільтр був би
+        // застосований, а звідки він узявся — у меню не видно.
         const hasActive = department.categories.some(({ name }) => selectedCategories.has(name));
-        const isCollapsed = !hasActive && collapsed.has(department.title);
+        const isCollapsed = !hasActive && !expanded.has(department.title);
 
         html += `<div class="sidebar-group${isCollapsed ? " collapsed" : ""}" data-sidebar-group="${escapeHtml(department.title)}">
             <button type="button" class="sidebar-group-title"
@@ -898,15 +899,15 @@ function fillCatalogSidebar(categoryDepartments) {
 
             button.setAttribute("aria-expanded", nowCollapsed ? "false" : "true");
 
-            const saved = readCollapsedGroups();
+            const saved = readExpandedGroups();
 
             if (nowCollapsed) {
-                saved.add(group.dataset.sidebarGroup);
-            } else {
                 saved.delete(group.dataset.sidebarGroup);
+            } else {
+                saved.add(group.dataset.sidebarGroup);
             }
 
-            saveCollapsedGroups(saved);
+            saveExpandedGroups(saved);
 
         });
 
@@ -916,33 +917,38 @@ function fillCatalogSidebar(categoryDepartments) {
 
 }
 
-// Які групи бокового меню користувач згорнув. Зберігаємо між
+// Які групи бокового меню користувач РОЗГОРНУВ. Зберігаємо між
 // сторінками, щоб вибір не скидався при кожному переході в каталозі.
-const SIDEBAR_COLLAPSED_KEY = "bagvero:sidebar-collapsed";
+//
+// Ключ навмисно новий (…-expanded замість …-collapsed): у попередній
+// версії за замовчуванням усе було розгорнуто і зберігався
+// протилежний набір — згорнуті групи. Якби ключ лишився той самий,
+// старе збережене значення прочиталось би навпаки.
+const SIDEBAR_EXPANDED_KEY = "bagvero:sidebar-expanded";
 
-function readCollapsedGroups() {
+function readExpandedGroups() {
 
     try {
 
-        const raw = localStorage.getItem(SIDEBAR_COLLAPSED_KEY);
+        const raw = localStorage.getItem(SIDEBAR_EXPANDED_KEY);
 
         return new Set(raw ? JSON.parse(raw) : []);
 
     } catch (error) {
 
         // приватний режим або зіпсоване значення — не критично,
-        // просто показуємо все розгорнутим
+        // просто лишаємо все згорнутим
         return new Set();
 
     }
 
 }
 
-function saveCollapsedGroups(groups) {
+function saveExpandedGroups(groups) {
 
     try {
 
-        localStorage.setItem(SIDEBAR_COLLAPSED_KEY, JSON.stringify([...groups]));
+        localStorage.setItem(SIDEBAR_EXPANDED_KEY, JSON.stringify([...groups]));
 
     } catch (error) {
 
