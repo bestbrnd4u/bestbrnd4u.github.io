@@ -492,25 +492,20 @@
     "category": "Дитячі рюкзаки"
   },
   {
-    "id": 10,
-    "slug": "bagvero-kids-bag",
-    "brand": "Bagvero Kids",
-    "title": "Kids Print Bag",
-    "category": "Дитячі сумки",
+    "compartments": "одне основне відділення",
     "gender": "Дітям",
-    "isNew": true,
-    "price": 899,
     "oldPrice": 999,
-    "rating": 4.6,
-    "reviews": 18,
-    "badge": "NEW",
-    "material": "Текстиль",
     "color": "Мультиколір",
-    "country": "Україна",
-    "description": "Яскрава дитяча сумочка з веселим принтом — зручний розмір для книжок, іграшок та шкільних дрібничок.",
-    "images": [
-      "https://images.pexels.com/photos/6110950/pexels-photo-6110950.jpeg?auto=compress&cs=tinysrgb&w=800"
-    ],
+    "badge": "NEW",
+    "forcePublish": true,
+    "decor": "яскравий принт",
+    "instagramReels": "https://www.instagram.com/p/Dbp7H2yuqnr/",
+    "material": "Текстиль",
+    "brand": "Bagvero Kids",
+    "price": 899,
+    "composition": "100% поліестер",
+    "slug": "bagvero-kids-bag",
+    "dimensions": "18x14x6 см",
     "variants": [
       {
         "color": "Мультиколір",
@@ -527,20 +522,28 @@
         ]
       }
     ],
-    "sku": "BK-KB-1010",
-    "closure": "кнопка",
-    "decor": "яскравий принт",
-    "dimensions": "18x14x6 см",
     "strapInfo": "Один незнімний ремінь довжиною 90 см",
-    "compartments": "одне основне відділення",
-    "composition": "100% поліестер",
     "sizes": [
       "XS"
     ],
     "searchKeywords": [
       "дитяча сумочка",
       "сумка з малюнком"
-    ]
+    ],
+    "isNew": true,
+    "country": "Україна",
+    "title": "Kids Print Bag",
+    "images": [
+      "https://images.pexels.com/photos/6110950/pexels-photo-6110950.jpeg?auto=compress&cs=tinysrgb&w=800"
+    ],
+    "reviews": 18,
+    "id": 10,
+    "closure": "кнопка",
+    "instagramBlock": "reels",
+    "description": "Яскрава дитяча сумочка з веселим принтом — зручний розмір для книжок, іграшок та шкільних дрібничок.",
+    "sku": "BK-KB-1010",
+    "rating": 4.6,
+    "category": "Дитячі сумки"
   },
   {
     "id": 11,
