@@ -544,13 +544,18 @@ function createProductCard(product) {
 
     }
 
-    // перевіряємо наявність переповнення в момент наведення на картку:
-    // до цього панель прихована і розміри мають нульову ширину
+    // Перевіряємо переповнення в момент наведення на КАРТКУ, а не на
+    // сам блок розмірів. До появи панелі розміри мають нульову ширину,
+    // тож порахувати заздалегідь не можна. А якщо чекати, поки курсор
+    // потрапить рівно на розміри, стрілки не з'являлись би саме тоді,
+    // коли вони потрібні — щоб зрозуміти, що список можна прокрутити.
     document.addEventListener("mouseover", event => {
 
-        const wrap = event.target.closest?.(".product-sizes-wrap");
+        const scope = event.target.closest?.(".product-card, .product-wrapper, #productPage");
 
-        if (wrap) updateArrows(wrap);
+        if (!scope) return;
+
+        scope.querySelectorAll(".product-sizes-wrap").forEach(updateArrows);
 
     });
 

@@ -35,7 +35,20 @@ on:
 # попередній запуск чи ні.
 concurrency:
   group: "pages"
-  cancel-in-progress: true
+  # cancel-in-progress: false — НАВМИСНО.
+  #
+  # Типовий сценарій публікації товару дає два деплої підряд:
+  #   1) ваш пуш у main → запускається цей workflow;
+  #   2) build-products.yml перезбирає data/*.json, комітить і сам
+  #      викликає цей workflow ще раз (пуш бота події push не дає).
+  #
+  # З cancel-in-progress:true другий запуск ГАСИВ перший на середині —
+  # і в списку Actions лишався червоний "cancelled" з написом
+  # "The operation was canceled", хоча насправді все гаразд: другий
+  # деплой публікує вже фінальний вміст. Тепер деплої просто стають
+  # у чергу один за одним, обидва зелені, а на сайті лишається
+  # результат останнього.
+  cancel-in-progress: false
 
 permissions:
   contents: read

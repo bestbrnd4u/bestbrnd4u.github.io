@@ -1580,6 +1580,24 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
         align-items:center;
         gap:14px;
         margin-bottom:0;
+        /* Панель має align-items:flex-start, тому діти НЕ розтягуються
+           і рядок опцій ріс по вмісту — розміри вилазили за картку, а
+           .product-sizes ніколи не ставав вужчим за вміст, тож
+           scrollWidth === clientWidth і стрілки не з'являлись.
+           width:100% + min-width:0 обмежують рядок шириною панелі. */
+        width:100%;
+        min-width:0;
+    }
+
+    /* блок розмірів займає місце, що лишилось після кружечків
+       кольору, і саме він стає прокручуваним */
+    .product-hover-panel .product-sizes-wrap{
+        flex:1 1 auto;
+        min-width:0;
+    }
+
+    .product-hover-panel .product-colors{
+        flex:0 0 auto;
     }
 
     .product-hover-panel .discount{
@@ -4293,7 +4311,14 @@ body.mobile-filters-open .scroll-top{
 
 .sizes{
     display:flex;
+    /* без переносу 20 розмірів (36–46 + XS–4XL) розтягували рядок
+       за межі контейнера і ламали верстку сторінки товару */
+    flex-wrap:wrap;
     gap:12px;
+}
+
+.sizes .size{
+    flex-shrink:0;
 }
 
 .size{

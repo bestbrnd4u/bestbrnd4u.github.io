@@ -649,12 +649,68 @@ ${sizeButtons}
     });
 
     setupSizeGuideModal();
+    renderSizeGuide(product);
 
 }
 
 // -------------------------
 // Модалка "Таблиця розмірів"
 // -------------------------
+
+// Наповнює таблицю розмірів під групу, до якої належить категорія
+// товару: у сумок свої стовпці, у взуття — свої. Дані з адмінки
+// (розділ «Розміри»). Якщо для групи таблиця не заповнена —
+// посилання «Таблиця розмірів» ховаємо, щоб не відкривати порожнє
+// вікно.
+async function renderSizeGuide(product) {
+
+    const body = document.getElementById("sizeGuideBody");
+    const openBtn = document.getElementById("sizeGuideBtn");
+
+    if (!body) return;
+
+    const [groups, categoryDepartments] = await Promise.all([
+        loadSizeGroups(),
+        loadCategoryTree()
+    ]);
+
+    const group = findSizeGroupForCategory(groups, product.category, categoryDepartments);
+
+    if (!group || !group.guideNote || group.guideRows.length === 0) {
+
+        body.innerHTML = "";
+
+        if (openBtn) openBtn.hidden = true;
+
+        return;
+
+    }
+
+    if (openBtn) openBtn.hidden = false;
+
+    body.innerHTML = `
+        <p class="modal-text">${escapeHtml(group.guideNote)}</p>
+        <table class="size-guide-table">
+            <thead>
+                <tr>
+                    <th>Розмір</th>
+                    ${group.guideColumns.map(column => `<th>${escapeHtml(column)}</th>`).join("")}
+                </tr>
+            </thead>
+            <tbody>
+                ${group.guideRows.map(row => `
+                    <tr>
+                        <td>${escapeHtml(row.size)}</td>
+                        ${group.guideColumns.map((column, index) =>
+                            `<td>${escapeHtml((row.values || [])[index] || "—")}</td>`
+                        ).join("")}
+                    </tr>
+                `).join("")}
+            </tbody>
+        </table>
+    `;
+
+}
 
 function setupSizeGuideModal() {
 

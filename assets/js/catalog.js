@@ -134,47 +134,23 @@ let selectedSizes = new Set(); // елементи виду "group:size", нап
 // колір товару (для фільтра) — беремо прямо з variants,
 // де hex вже заданий в адмінці; це й головне джерело правди
 // для свотчів у фільтрі "Колір"
-const SIZE_GROUPS = [
-    {
-        key: "bags",
-        title: "Сумки",
-        categories: ["Жіночі сумки", "Чоловічі сумки", "Унісекс сумки", "Дитячі сумки"],
-        sizes: ["XS", "S", "M", "L"]
-    },
-    {
-        key: "backpacks",
-        title: "Рюкзаки",
-        categories: ["Рюкзаки", "Дитячі рюкзаки"],
-        sizes: ["S", "M", "L", "XL"]
-    },
-    {
-        key: "clothes",
-        title: "Одяг",
-        // заповнюється в initCatalog() з даних data/categories.json
-        categories: [],
-        sizes: ["XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL"]
-    },
-    {
-        key: "shoes",
-        title: "Взуття",
-        // заповнюється в initCatalog() з даних data/categories.json
-        categories: [],
-        sizes: ["35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46"]
-    }
-];
+// Групи розмірів приходять з адмінки (розділ «Розміри» →
+// data/size-groups.json). До завантаження працює вбудований
+// запасний набір з common.js, тож фільтр не ламається.
+let SIZE_GROUPS = FALLBACK_SIZE_GROUPS.map(group => ({ ...group }));
 
 // підтягує актуальний список категорій одягу/взуття з адмінки
 // (data/categories.json) у відповідні групи розмірів
 function applyCategoryDataToSizeGroups(categoryDepartments) {
 
-    const clothesGroup = SIZE_GROUPS.find(g => g.key === "clothes");
-    const shoesGroup = SIZE_GROUPS.find(g => g.key === "shoes");
+    // У групі можна або перелічити категорії вручну, або вказати
+    // розділ — тоді підхоплюються ВСІ його категорії, включно з
+    // тими, які додадуть в адмінку пізніше.
+    SIZE_GROUPS.forEach(group => {
 
-    const clothesDept = categoryDepartments.find(d => d.title === "Одяг");
-    const shoesDept = categoryDepartments.find(d => d.title === "Взуття");
+        group.categories = resolveGroupCategories(group, categoryDepartments);
 
-    if (clothesGroup) clothesGroup.categories = clothesDept ? clothesDept.categories : [];
-    if (shoesGroup) shoesGroup.categories = shoesDept ? shoesDept.categories : [];
+    });
 
 }
 
@@ -389,6 +365,9 @@ async function initCatalog() {
         products = await response.json();
 
         const categoryDepartments = await loadCategoryDepartments();
+
+        // групи розмірів з адмінки — до побудови фільтра «Розмір»
+        SIZE_GROUPS = (await loadSizeGroups()).map(group => ({ ...group }));
 
         applyCategoryDataToSizeGroups(categoryDepartments);
 

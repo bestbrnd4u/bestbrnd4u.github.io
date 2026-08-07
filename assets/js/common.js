@@ -1897,6 +1897,125 @@ contactForm?.addEventListener("submit", event => {
 // власних розмірів «успадковує» загальні.
 // -------------------------
 
+// -------------------------
+// Групи розмірів і таблиця розмірів — з адмінки
+//
+// Джерело: data/size-groups.json (розділ «Розміри» в адмінці).
+// Визначає, які розміри доступні для яких категорій (фільтр
+// «Розмір» у каталозі) і що показувати в «Таблиці розмірів»
+// на сторінці товару.
+//
+// Якщо файл недоступний — лишається вбудований запасний набір,
+// тож сайт працює навіть за відсутності налаштувань.
+// -------------------------
+
+const FALLBACK_SIZE_GROUPS = [
+    { key: "bags", title: "Сумки", department: "",
+      categories: ["Жіночі сумки", "Чоловічі сумки", "Унісекс сумки", "Дитячі сумки"],
+      sizes: ["XS", "S", "M", "L"] },
+    { key: "backpacks", title: "Рюкзаки", department: "",
+      categories: ["Рюкзаки", "Дитячі рюкзаки"],
+      sizes: ["S", "M", "L", "XL"] },
+    { key: "clothes", title: "Одяг", department: "Одяг", categories: [],
+      sizes: ["XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL"] },
+    { key: "shoes", title: "Взуття", department: "Взуття", categories: [],
+      sizes: ["35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46"] }
+];
+
+// Розділи → категорії з data/categories.json. Потрібно, щоб група
+// розмірів, задана через «Розділ каталогу», знала свої категорії.
+// Живе саме тут (а не в catalog.js), бо потрібно ще й на сторінці
+// товару для таблиці розмірів — catalog.js там не підключений.
+let categoryTreePromise = null;
+
+function loadCategoryTree() {
+
+    if (categoryTreePromise) return categoryTreePromise;
+
+    categoryTreePromise = fetch("data/categories.json")
+        .then(response => response.ok ? response.json() : [])
+        .then(categories => {
+
+            const byDepartment = new Map();
+
+            (Array.isArray(categories) ? categories : []).forEach(category => {
+
+                if (!byDepartment.has(category.department)) {
+
+                    byDepartment.set(category.department, {
+                        title: category.department,
+                        categories: []
+                    });
+
+                }
+
+                byDepartment.get(category.department).categories.push(category.name);
+
+            });
+
+            return [...byDepartment.values()];
+
+        })
+        .catch(() => []);
+
+    return categoryTreePromise;
+
+}
+
+let sizeGroupsPromise = null;
+
+function loadSizeGroups() {
+
+    if (sizeGroupsPromise) return sizeGroupsPromise;
+
+    sizeGroupsPromise = fetch("data/size-groups.json")
+        .then(response => response.ok ? response.json() : null)
+        .then(data => {
+
+            if (!Array.isArray(data) || data.length === 0) return FALLBACK_SIZE_GROUPS;
+
+            // нормалізуємо, щоб далі не перевіряти кожне поле на існування
+            return data.map(group => ({
+                key: group.key || "",
+                title: group.title || "",
+                department: group.department || "",
+                categories: Array.isArray(group.categories) ? group.categories : [],
+                sizes: Array.isArray(group.sizes) ? group.sizes : [],
+                guideNote: group.guideNote || "",
+                guideColumns: Array.isArray(group.guideColumns) ? group.guideColumns : [],
+                guideRows: Array.isArray(group.guideRows) ? group.guideRows : []
+            })).filter(group => group.key && group.sizes.length);
+
+        })
+        .catch(() => FALLBACK_SIZE_GROUPS);
+
+    return sizeGroupsPromise;
+
+}
+
+// Категорії групи: або перелічені вручну, або ВСІ категорії
+// вибраного розділу — тоді нові категорії підхоплюються самі.
+function resolveGroupCategories(group, categoryDepartments) {
+
+    if (group.categories.length) return group.categories;
+
+    if (!group.department) return [];
+
+    const department = (categoryDepartments || []).find(d => d.title === group.department);
+
+    return department ? department.categories : [];
+
+}
+
+// Група розмірів, до якої належить категорія товару
+function findSizeGroupForCategory(groups, category, categoryDepartments) {
+
+    return (groups || []).find(group =>
+        resolveGroupCategories(group, categoryDepartments).includes(category)
+    ) || null;
+
+}
+
 function getVariantSizes(product, variant) {
 
     if (variant && Array.isArray(variant.sizes) && variant.sizes.length) {
@@ -1915,15 +2034,26 @@ function getVariantSizes(product, variant) {
 function getAllProductSizes(product) {
 
     const all = new Set();
+    const variants = product?.variants || [];
 
-    (product?.variants || []).forEach(variant => {
+    if (variants.length) {
 
-        (variant.sizes || []).forEach(size => all.add(size));
+        // ВАЖЛИВО: через getVariantSizes(), а не variant.sizes напряму.
+        // Інакше в змішаному випадку (в одного кольору свої розміри, в
+        // іншого — успадковані загальні) об'єднання виходило неповним:
+        // напр. у товару 20 загальних розмірів, «Чорний» має лише
+        // 35 і 36, а «Білий» успадковує всі 20 — старий код повертав
+        // тільки {35,36}, і фільтр каталогу не знаходив товар за
+        // розміром 40, хоча білий у 40 є.
+        variants.forEach(variant => {
 
-    });
+            getVariantSizes(product, variant).forEach(size => all.add(size));
 
-    if (all.size === 0) {
+        });
 
+    } else {
+
+        // товар без варіантів кольору — лишаються тільки загальні
         (product?.sizes || []).forEach(size => all.add(size));
 
     }

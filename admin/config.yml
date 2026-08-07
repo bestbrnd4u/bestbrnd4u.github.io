@@ -602,6 +602,125 @@ collections:
           - "Білизна"
           - "Спорт"
 
+  # -------------------------
+  # Розміри: які розміри доступні для яких категорій + таблиця
+  # розмірів на сторінці товару. Читається сайтом напряму з
+  # data/size-groups.json (без перезбірки).
+  # -------------------------
+  - name: sizeGroups
+    label: Розміри
+    description: Які розміри доступні для яких категорій товару і що показувати в «Таблиці розмірів»
+      на сторінці товару. Зміни застосовуються автоматично — у фільтрі «Розмір» у каталозі та в таблиці
+      розмірів. Одна група = один блок розмірів (напр. Сумки, Взуття, Одяг).
+    files:
+    - name: sizeGroups
+      label: Групи розмірів
+      file: data/size-groups.json
+      format: json
+      fields:
+      - label: Групи розмірів
+        name: groups
+        widget: list
+        required: true
+        summary: '{{fields.title}}'
+        fields:
+        - label: Технічний ключ
+          name: key
+          widget: string
+          required: true
+          hint: 'Латиницею, без пробілів: bags, shoes, clothes. Використовується всередині сайту —
+            у вже створених групах не змінюйте.'
+        - label: Назва групи
+          name: title
+          widget: string
+          required: true
+          hint: 'Заголовок у фільтрі «Розмір» у каталозі. Напр.: Взуття'
+        - label: Розділ каталогу
+          name: department
+          widget: select
+          required: false
+          options:
+          - ''
+          - Сумки
+          - Одяг
+          - Взуття
+          - Аксесуари
+          - Білизна
+          - Спорт
+          hint: Якщо вибрати розділ — група автоматично охопить УСІ його категорії, навіть ті, які
+            ви додасте пізніше. Тоді список категорій нижче можна не заповнювати.
+        - label: Категорії
+          name: categories
+          widget: list
+          required: false
+          field:
+            label: Категорія
+            name: category
+            widget: string
+          hint: Точні назви категорій, як у розділі «Категорії». Заповнюйте, якщо група охоплює лише
+            окремі категорії, а не весь розділ.
+        - label: Доступні розміри
+          name: sizes
+          widget: select
+          multiple: true
+          required: true
+          options:
+          - XS
+          - S
+          - M
+          - L
+          - XL
+          - XXL
+          - 3XL
+          - 4XL
+          - '35'
+          - '36'
+          - '37'
+          - '38'
+          - '39'
+          - '40'
+          - '41'
+          - '42'
+          - '43'
+          - '44'
+          - '45'
+          - '46'
+          hint: Саме ці розміри з'являться у фільтрі каталогу для категорій цієї групи.
+        - label: Текст над таблицею розмірів
+          name: guideNote
+          widget: text
+          required: false
+          hint: Показується у вікні «Таблиця розмірів». Якщо порожньо — для цієї групи таблиця не показується,
+            а посилання ховається.
+        - label: Стовпці таблиці
+          name: guideColumns
+          widget: list
+          required: false
+          field:
+            label: Назва стовпця
+            name: column
+            widget: string
+          hint: 'Напр. для взуття: Довжина стопи, UK, US. Для сумок: Ширина, Висота, Глибина.'
+        - label: Рядки таблиці
+          name: guideRows
+          widget: list
+          required: false
+          summary: '{{fields.size}}'
+          fields:
+          - label: Розмір
+            name: size
+            widget: string
+            required: true
+          - label: Значення
+            name: values
+            widget: list
+            required: false
+            field:
+              label: Значення
+              name: value
+              widget: string
+            hint: У ТОМУ Ж порядку, що й стовпці вище.
+
   - name: "products"
     label: "Товари"
     label_singular: "Товар"
