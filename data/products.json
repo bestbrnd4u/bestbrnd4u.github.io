@@ -738,12 +738,19 @@
     ]
   },
   {
-    "title": "Urban Sneakers",
-    "brand": "Nike",
-    "category": "Кросівки",
+    "compartments": "основне відділення коробки для взуття",
     "gender": "Унісекс",
+    "oldPrice": 4799,
+    "color": "Білий",
+    "badge": "TOP",
+    "forcePublish": true,
+    "decor": "логотип",
+    "material": "Текстиль та синтетичні матеріали",
+    "brand": "Nike",
     "price": 4299,
-    "description": "Легкі повсякденні кросівки з амортизуючою підошвою для активного міського ритму.",
+    "composition": "текстиль, синтетика, гума",
+    "slug": "import-1786031983644-4",
+    "dimensions": "32x21x12 см",
     "variants": [
       {
         "color": "Білий",
@@ -757,12 +764,14 @@
         "hex": "#161616",
         "images": [
           "https://commons.wikimedia.org/wiki/Special:Redirect/file/Timberland%206%20inch%20boots.jpg"
+        ],
+        "sizes": [
+          "35",
+          "36"
         ]
       }
     ],
-    "oldPrice": 4799,
-    "badge": "TOP",
-    "isNew": false,
+    "strapInfo": "Без ременя",
     "sizes": [
       "36",
       "37",
@@ -770,28 +779,28 @@
       "39",
       "40",
       "41",
-      "42"
+      "42",
+      "43",
+      "44",
+      "45",
+      "46"
     ],
-    "material": "Текстиль та синтетичні матеріали",
-    "country": "В'єтнам",
-    "sku": "NK-US-7731",
-    "closure": "шнурівка",
-    "decor": "логотип",
-    "dimensions": "32x21x12 см",
-    "strapInfo": "Без ременя",
-    "compartments": "основне відділення коробки для взуття",
-    "composition": "текстиль, синтетика, гума",
     "searchKeywords": [
       "кросівки",
       "повсякденні",
       "спортивний стиль"
     ],
-    "slug": "import-1786031983644-4",
-    "id": 15,
-    "color": "Білий",
+    "isNew": false,
+    "country": "В'єтнам",
+    "title": "Urban Sneakers",
     "images": [
       "https://commons.wikimedia.org/wiki/Special:Redirect/file/Timberland%206%20inch%20boots.jpg"
-    ]
+    ],
+    "id": 15,
+    "closure": "шнурівка",
+    "description": "Легкі повсякденні кросівки з амортизуючою підошвою для активного міського ритму.",
+    "sku": "NK-US-7731",
+    "category": "Кросівки"
   },
   {
     "title": "Minimal Watch",
