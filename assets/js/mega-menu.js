@@ -72,6 +72,41 @@
 
     }
 
+    // Меню лежить усередині nav li.has-mega (position:relative), тож
+    // його left/right відлічуються від вузького пункту меню. Щоб
+    // панель займала всю ширину екрана, зсуваємо її вліво рівно на
+    // відступ пункту від краю вікна і задаємо ширину вікна.
+    // clientWidth (а не innerWidth) — щоб не залізти під вертикальний
+    // скролбар і не породити горизонтальний.
+    const builtMenus = [];
+
+    function stretchToViewport(menu, item) {
+
+        const rect = item.getBoundingClientRect();
+
+        menu.style.left = `${-rect.left}px`;
+        menu.style.width = `${document.documentElement.clientWidth}px`;
+
+    }
+
+    let resizeScheduled = false;
+
+    window.addEventListener("resize", () => {
+
+        if (resizeScheduled) return;
+
+        resizeScheduled = true;
+
+        requestAnimationFrame(() => {
+
+            resizeScheduled = false;
+
+            builtMenus.forEach(({ menu, item }) => stretchToViewport(menu, item));
+
+        });
+
+    });
+
     try {
 
         const [categoriesRes, productsRes] = await Promise.all([
@@ -180,7 +215,11 @@
             if (!genderColumns && !brandColumn) return;
 
             menu.classList.add("mega-menu-columns");
-            menu.innerHTML = genderColumns + brandColumn;
+            menu.innerHTML = `<div class="mega-inner">${genderColumns}${brandColumn}</div>`;
+
+            builtMenus.push({ menu, item });
+
+            stretchToViewport(menu, item);
 
         });
 

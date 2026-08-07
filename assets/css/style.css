@@ -443,22 +443,49 @@ nav li.has-mega:hover .mega-menu{
 /* -- мегаменю "Каталог" з колонками розділів (наповнюється JS) -- */
 
 .mega-menu.mega-menu-columns{
-    display:flex;
-    flex-wrap:wrap;
+    /* Панель на всю ширину екрана: усі три меню (Каталог, Новинки,
+       Акції) відкриваються на одному й тому самому місці, тож при
+       переведенні курсору між пунктами вона більше не "стрибає"
+       вбік. Точні left/width виставляє mega-menu.js — сам li вузький
+       і є containing block, тому суто через CSS дотягнутись до країв
+       екрана не вийде. */
+    left:0;
+    right:auto;
+    width:auto;
+    max-width:none;
+    transform:translateY(4px);
+
+    display:block;
     grid-template-columns:none;
-    gap:26px 36px;
-    /* width:max-content — ОБОВ'ЯЗКОВО.
-       Меню позиціоноване absolute усередині nav li.has-mega
-       (position:relative), тож без явної ширини браузер стискає його
-       до ширини самого пункту «Каталог» (~90px) — колонки не
-       вміщуються поруч і падають одна під одну вертикально.
-       Стара сітка цього не мала, бо grid-template-columns задавав
-       колонкам конкретну ширину. max-content розпрямляє колонки
-       в один ряд, а max-width нижче не дає вилізти за екран. */
-    width:max-content;
-    max-width:min(1100px, calc(100vw - 40px));
-    padding:28px 32px 24px;
+    gap:0;
+    padding:0;
+    border-radius:0 0 20px 20px;
+}
+
+/* правило nav li.has-mega:hover .mega-menu має специфічність (0,3,2)
+   і перебило б transform вище, повернувши translateX(-50%) — тобто
+   панель знову з'їхала б убік. Дублюємо селектор із класом колонок */
+nav li.has-mega:hover .mega-menu.mega-menu-columns{
+    transform:translateY(0);
+}
+
+/* вміст вирівняний по центральній сітці сайту, колонки — рівні
+   за шириною, з однаковими відступами між ними */
+.mega-inner{
+    max-width:1600px;
+    margin:0 auto;
+    padding:30px 32px 28px;
+    display:grid;
+    grid-auto-flow:column;
+    grid-auto-columns:minmax(0,1fr);
+    gap:26px 32px;
+    align-items:start;
     text-align:left;
+}
+
+/* усередині сітки ширину задає сама колонка сітки, а не фікс. 160px */
+.mega-inner .mega-col{
+    width:auto;
 }
 
 .mega-col{
@@ -2701,13 +2728,19 @@ body.mobile-filters-open .scroll-top{
     color:var(--gray700);
 }
 
-/* значок «+ / −», намальований двома лініями: горизонтальна
-   є завжди, вертикальна ховається, коли група розгорнута */
+/* Значок «+ / −» з двох ліній: горизонтальна є завжди, вертикальна
+   з'являється лише коли група ЗГОРНУТА (тоді разом виходить «+»).
+   Колір — синій, як акцент інтерфейсу.
+
+   Раніше тут була переставлена логіка: у згорнутому стані
+   вертикальна лінія отримувала rotate(0deg), тобто лягала рівно
+   поверх горизонтальної — і замість «+» усюди був «−». */
 .sidebar-group-icon{
     position:relative;
     flex-shrink:0;
     width:11px;
     height:11px;
+    color:var(--secondary);
 }
 
 .sidebar-group-icon::before,
@@ -2717,20 +2750,23 @@ body.mobile-filters-open .scroll-top{
     top:50%;
     left:0;
     width:11px;
-    height:1.5px;
+    height:2px;
     background:currentColor;
     border-radius:1px;
     transform:translateY(-50%);
     transition:transform .18s ease, opacity .18s ease;
 }
 
+/* розгорнуто: вертикальна лінія «складається» в горизонтальну
+   і зникає → лишається «−» */
 .sidebar-group-icon::after{
-    transform:translateY(-50%) rotate(90deg);
+    transform:translateY(-50%) rotate(0deg);
     opacity:0;
 }
 
+/* згорнуто: вертикальна лінія повертається на 90° і стає видимою → «+» */
 .sidebar-group.collapsed .sidebar-group-icon::after{
-    transform:translateY(-50%) rotate(0deg);
+    transform:translateY(-50%) rotate(90deg);
     opacity:1;
 }
 
