@@ -104,16 +104,26 @@ document.addEventListener("click", event => {
     const header = document.querySelector("header");
     const offset = (header ? header.offsetHeight : 0) + 12;
 
-    // Цілимось у сам заголовок секції, а не в її верхній край.
-    // У секцій є власний padding-top (у «Популярних товарах» — 40px),
-    // тож скрол до краю лишав помітний порожній простір над рядком
-    // «Популярні товари» — виглядало, наче сторінка недокрутилась.
+    // Цілимось у сам заголовок секції, а не в її верхній край:
+    // у секцій є власний padding-top, і скрол до краю лишав помітний
+    // порожній простір над рядком «Популярні товари».
     const heading = target.querySelector("h1, h2, .section-title") || target;
 
-    window.scrollTo({
-        top: Math.max(heading.getBoundingClientRect().top + window.scrollY - offset, 0),
-        behavior: "smooth"
-    });
+    // scrollIntoView + scroll-margin-top, а НЕ ручний window.scrollTo.
+    //
+    // Ручний варіант рахує кінцеву позицію один раз, на момент кліку.
+    // На головній вище за «Популярні товари» лежать банер і стрічка
+    // брендів із картинками: поки триває плавний скрол, вони
+    // дозавантажуються, висота сторінки змінюється — і сторінка
+    // зупиняється не там, де ціль опинилась насправді. На iPhone до
+    // цього додається згортання адресного рядка, яке теж змінює
+    // висоту вікна посеред анімації.
+    //
+    // scrollIntoView віддає розрахунок браузеру: він тримає ціль
+    // із урахуванням зсувів верстки до кінця анімації.
+    heading.style.scrollMarginTop = `${offset}px`;
+
+    heading.scrollIntoView({ behavior: "smooth", block: "start" });
 
 });
 
@@ -1825,12 +1835,13 @@ document.addEventListener("click", function (e) {
 
         const id = card.dataset.id;
 
-        // якщо на картці вже обраний розмір — переносимо його
+        // якщо на картці вже обрані колір/розмір — переносимо їх
         // на сторінку товару, щоб не обирати заново
-        const { size } = getSelectedVariant(card);
+        const { color, size } = getSelectedVariant(card);
 
         const query = new URLSearchParams({ id });
 
+        if (color) query.set("color", color);
         if (size) query.set("size", size);
 
         window.location.href = `product?${query.toString()}`;

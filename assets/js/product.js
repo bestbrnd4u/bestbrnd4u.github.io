@@ -270,7 +270,17 @@ function renderProduct(product) {
         ? product.variants
         : [{ color: product.color || "Основний", hex: "#999", images: product.images || [] }];
 
-    const activeVariant = variants[0];
+    // Колір, обраний ще в каталозі, приходить у ?color=... — саме він
+    // має бути активним, інакше сторінка щоразу відкривалась на
+    // першому кольорі і вибір користувача губився.
+    const requestedColor = new URLSearchParams(location.search).get("color");
+
+    const activeIndex = Math.max(
+        variants.findIndex(variant => variant.color === requestedColor),
+        0
+    );
+
+    const activeVariant = variants[activeIndex];
     const galleryImages = activeVariant.images?.length ? activeVariant.images : (product.images || []);
     const galleryVideo = activeVariant.video || "";
 
@@ -295,7 +305,7 @@ function renderProduct(product) {
 
         return `
         <button
-            class="color ${index === 0 ? "active" : ""}"
+            class="color ${index === activeIndex ? "active" : ""}"
             data-color="${escapeHtml(variant.color)}"
             data-images='${escapeAttrSingleQuoted(JSON.stringify(variant.images || []))}'
             data-sizes='${escapeAttrSingleQuoted(JSON.stringify(getVariantSizes(product, variant)))}'
@@ -312,9 +322,9 @@ function renderProduct(product) {
     // при перемиканні кольору список оновлює common.js
     // артикул активного (першого) кольору; при перемиканні кольору
     // його оновлює обробник у common.js за data-sku
-    const activeSku = getVariantSku(product, variants[0]);
+    const activeSku = getVariantSku(product, activeVariant);
 
-    const firstVariantSizes = getVariantSizes(product, variants[0]);
+    const firstVariantSizes = getVariantSizes(product, activeVariant);
     const sizes = firstVariantSizes.length ? firstVariantSizes : PRODUCT_SIZES;
 
     // якщо розмір уже був обраний на картці в каталозі —

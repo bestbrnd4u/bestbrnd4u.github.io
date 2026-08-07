@@ -64,7 +64,11 @@ input[type="submit"]{
 
 html{
     scroll-behavior:smooth;
-    scroll-padding-top:100px;
+    /* scroll-padding-top навмисно НЕ задаємо: зсув під шапку тепер
+       рахує JS (див. syncPhoneLinks/скрол до якорів у common.js) —
+       він міряє реальну висоту шапки, а фіксовані 100px були
+       підібрані під десктоп і на телефоні давали хибну позицію,
+       ще й додавались до scroll-margin цілі. */
     scrollbar-width:thin;
     scrollbar-color:var(--gray300) var(--gray50);
     /* резервуємо місце під вертикальний скролбар завжди —
@@ -1120,7 +1124,9 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
 }
 
 #products{
-    scroll-margin-top:-58px; /* header(82) - html scroll-padding-top(100) - .products padding-top(40) = -58, cancels the double offset from the global scroll-padding-top so the title lands flush under the header */
+    /* магічний -58px прибрано разом із global scroll-padding-top:
+       зсув тепер виставляє JS через scroll-margin-top на самому
+       заголовку, під фактичну висоту шапки */
 }
 
 .products-grid{
