@@ -43,6 +43,74 @@ function escapeAttrSingleQuoted(value) {
 // (яке ми пробували раніше і яке ламало звичайний
 // вертикальний скрол сторінки), це не чіпає скрол взагалі —
 // блокується лише сама дія "перетягнути картинку".
+// -------------------------
+// Телефон: клік → дзвінок
+//
+// href будуємо з тексту самого посилання, а не тримаємо окремо:
+// номер показаний на 14 сторінках, і якби href задавався руками,
+// після зміни номера частина сторінок дзвонила б на старий.
+// Тепер достатньо змінити видимий текст.
+// -------------------------
+
+function syncPhoneLinks() {
+
+    document.querySelectorAll("a.phone-link").forEach(link => {
+
+        const digits = link.textContent.replace(/[^\d+]/g, "");
+
+        // у номері-заглушці ("+380 XX XXX XX XX") цифр замало —
+        // не робимо посилання, щоб не дзвонити в нікуди
+        if (digits.replace(/\D/g, "").length < 10) {
+
+            link.removeAttribute("href");
+
+            return;
+
+        }
+
+        link.href = `tel:${digits}`;
+
+    });
+
+}
+
+document.addEventListener("DOMContentLoaded", syncPhoneLinks);
+
+// -------------------------
+// Плавний скрол до якорів на сторінці з урахуванням висоти шапки.
+//
+// Раніше зсув задавався у CSS (scroll-padding-top + scroll-margin-top)
+// підібраними під шапку 82px числами. На телефоні шапка іншої висоти,
+// тож сторінка зупинялась вище за потрібний заголовок. Тепер висоту
+// міряємо в момент кліку — працює на будь-якій ширині екрана.
+// -------------------------
+
+document.addEventListener("click", event => {
+
+    const link = event.target.closest?.('a[href^="#"]');
+
+    if (!link) return;
+
+    const id = link.getAttribute("href").slice(1);
+
+    if (!id) return;
+
+    const target = document.getElementById(id);
+
+    if (!target) return;
+
+    event.preventDefault();
+
+    const header = document.querySelector("header");
+    const offset = (header ? header.offsetHeight : 0) + 12;
+
+    window.scrollTo({
+        top: Math.max(target.getBoundingClientRect().top + window.scrollY - offset, 0),
+        behavior: "smooth"
+    });
+
+});
+
 document.addEventListener("dragstart", event => {
 
     if (event.target.tagName === "IMG") event.preventDefault();

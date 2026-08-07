@@ -6173,9 +6173,14 @@ body.mobile-filters-open .scroll-top{
         scrollbar-width:none;
         -ms-overflow-style:none;
         -webkit-overflow-scrolling:touch;
-        /* прокрутка лише по горизонталі — вертикальний свайп
-           сторінки не перехоплюється */
-        touch-action:pan-x;
+        /* touch-action НЕ задаємо навмисно.
+           Раніше тут стояв touch-action:pan-x — і будь-який
+           мікрозсув пальця під час тапу браузер трактував як
+           початок горизонтального панорамування, тож клік
+           скасовувався: колір доводилось тиснути двічі, а розмір
+           не вибирався взагалі. overflow-x:auto сам по собі вже
+           дає горизонтальну прокрутку, а розпізнавання «тап проти
+           свайпу» краще лишити браузеру. */
     }
 
     #catalogGrid.products-grid:not(.list-view) .product-options::-webkit-scrollbar{
