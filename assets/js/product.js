@@ -298,6 +298,7 @@ function renderProduct(product) {
             class="color ${index === 0 ? "active" : ""}"
             data-color="${escapeHtml(variant.color)}"
             data-images='${escapeAttrSingleQuoted(JSON.stringify(variant.images || []))}'
+            data-sizes='${escapeAttrSingleQuoted(JSON.stringify(getVariantSizes(product, variant)))}'
             data-video="${escapeHtml(variant.video || "")}"
             title="${escapeHtml(variant.color)}"
             aria-label="Колір: ${escapeHtml(variant.color)}"
@@ -306,7 +307,10 @@ function renderProduct(product) {
 
     }).join("");
 
-    const sizes = product.sizes?.length ? product.sizes : PRODUCT_SIZES;
+    // розміри першого (активного за замовчуванням) кольору;
+    // при перемиканні кольору список оновлює common.js
+    const firstVariantSizes = getVariantSizes(product, variants[0]);
+    const sizes = firstVariantSizes.length ? firstVariantSizes : PRODUCT_SIZES;
 
     // якщо розмір уже був обраний на картці в каталозі —
     // він приходить сюди через ?size= і має лишитися обраним

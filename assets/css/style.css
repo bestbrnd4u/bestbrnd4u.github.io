@@ -3275,7 +3275,9 @@ body.mobile-filters-open .scroll-top{
    його неможливо було б зняти. */
 .filter-option.unavailable,
 .filter-size-chip.unavailable,
-.filter-size-group.unavailable{
+.filter-size-group.unavailable,
+.sidebar-category.unavailable,
+.sidebar-group.unavailable{
     display:none;
 }
 

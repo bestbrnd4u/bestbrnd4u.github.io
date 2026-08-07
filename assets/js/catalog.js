@@ -224,7 +224,10 @@ function matchesSizeKey(product, key) {
 
     if (!group) return false;
 
-    return group.categories.includes(product.category) && (product.sizes || []).includes(size);
+    // розміри можуть бути задані окремо для кожного кольору —
+    // товар підходить, якщо потрібний розмір є хоча б в одному
+    return group.categories.includes(product.category)
+        && getAllProductSizes(product).includes(size);
 
 }
 
@@ -526,7 +529,7 @@ function availableFacets() {
 
             if (!group.categories.includes(product.category)) return;
 
-            (product.sizes || []).forEach(size => sizes.add(`${group.key}:${size}`));
+            getAllProductSizes(product).forEach(size => sizes.add(`${group.key}:${size}`));
 
         });
 
@@ -1033,6 +1036,68 @@ function saveExpandedGroups(groups) {
         // сховище недоступне — стан просто не переживе перезавантаження
 
     }
+
+}
+
+// Перерахунок лічильників у боковому меню під поточні фільтри.
+//
+// Саме меню будується один раз із усіх категорій розділу (щоб при
+// знятті фільтра було що показати назад), а тут лише оновлюються
+// числа й ховаються категорії, у яких за поточних фільтрів нічого
+// не лишилось. Раніше меню враховувало лише розділ і після вибору
+// статі «Чоловікам» показувало «Всі товари 21» та жіночі категорії,
+// хоча в сітці було 2 товари.
+//
+// База — filterProducts("categories"), тобто ВСІ фільтри, крім
+// вибору самої категорії: інакше після кліку по категорії меню
+// схлопнулось би до єдиного пункту і перемкнутись було б нікуди.
+function refreshSidebarCounts() {
+
+    if (!catalogSidebar || catalogSidebar.hidden) return;
+
+    const base = filterProducts("categories");
+
+    const counts = new Map();
+
+    base.forEach(product => {
+
+        if (!product.category) return;
+
+        counts.set(product.category, (counts.get(product.category) || 0) + 1);
+
+    });
+
+    const allButton = catalogSidebar.querySelector("[data-sidebar-all] .sidebar-count");
+
+    if (allButton) allButton.textContent = base.length;
+
+    catalogSidebar.querySelectorAll("[data-sidebar-category]").forEach(button => {
+
+        const name = button.dataset.sidebarCategory;
+        const count = counts.get(name) || 0;
+        const selected = selectedCategories.has(name);
+
+        const countEl = button.querySelector(".sidebar-count");
+
+        if (countEl) countEl.textContent = count;
+
+        // обрану категорію не ховаємо навіть при нулі — інакше її
+        // неможливо було б зняти
+        button.classList.toggle("unavailable", count === 0 && !selected);
+
+    });
+
+    // група ховається цілком, якщо в ній не лишилось жодної категорії
+    catalogSidebar.querySelectorAll(".sidebar-group").forEach(group => {
+
+        const items = [...group.querySelectorAll("[data-sidebar-category]")];
+
+        group.classList.toggle(
+            "unavailable",
+            items.length > 0 && items.every(item => item.classList.contains("unavailable"))
+        );
+
+    });
 
 }
 
@@ -1859,26 +1924,33 @@ function setupGenderFilter() {
 
 function renderBreadcrumbsAndTitle() {
 
-    const crumbs = [`<a href="/">Головна</a>`];
+    // Кожна крихта — це {label, href}, а не готовий HTML: href===null
+    // означає "це поточна сторінка", і саме тому останню крихту
+    // рендеримо СПАНОМ, а не посиланням — сюди все одно нікуди йти.
+    // Раніше "Каталог"/"Новинки" завжди були <a href="...">, навіть
+    // коли ставали останньою крихтою (плейн /catalog чи /catalog?
+    // section=new без інших фільтрів) — виходило посилання саме на
+    // себе, як на скріні.
+    const crumbs = [{ label: "Головна", href: "/" }];
 
     let title = "Каталог товарів";
     let subtitle = "Сумки, одяг, взуття та аксесуари від світових брендів";
 
     if (currentSection === "new") {
 
-        crumbs.push(`<span class="crumb-sep">→</span>`, `<a href="catalog?section=new">Новинки</a>`);
+        crumbs.push({ label: "Новинки", href: "catalog?section=new" });
         title = "Новинки";
         subtitle = "Останні надходження до каталогу Bagvero";
 
     } else if (currentSection === "sale") {
 
-        crumbs.push(`<span class="crumb-sep">→</span>`, `<span class="sale-text">Акції</span>`);
+        crumbs.push({ label: "Акції", href: "catalog?section=sale", className: "sale-text" });
         title = `<span class="sale-text">Акції</span>`;
         subtitle = `Знижки від ${SALE_MIN_DISCOUNT}% на сумки, рюкзаки та аксесуари`;
 
     } else {
 
-        crumbs.push(`<span class="crumb-sep">→</span>`, `<a href="catalog">Каталог</a>`);
+        crumbs.push({ label: "Каталог", href: "catalog" });
 
     }
 
@@ -1886,12 +1958,26 @@ function renderBreadcrumbsAndTitle() {
 
         const label = [...selectedGenders].join(", ");
 
-        crumbs.push(`<span class="crumb-sep">→</span>`, `<span>${label}</span>`);
+        crumbs.push({ label, href: "catalog" });
         subtitle = `${subtitle} · ${label}`;
 
     }
 
-    if (breadcrumbsList) breadcrumbsList.innerHTML = crumbs.join("\n");
+    const html = crumbs.map((crumb, index) => {
+
+        const isLast = index === crumbs.length - 1;
+        const classAttr = crumb.className ? ` class="${crumb.className}"` : "";
+
+        // остання крихта — завжди поточна сторінка, тож без href
+        const node = isLast
+            ? `<span${classAttr}>${escapeHtml(crumb.label)}</span>`
+            : `<a href="${crumb.href}"${classAttr}>${escapeHtml(crumb.label)}</a>`;
+
+        return index === 0 ? node : `<span class="crumb-sep">→</span>\n${node}`;
+
+    }).join("\n");
+
+    if (breadcrumbsList) breadcrumbsList.innerHTML = html;
 
     if (catalogTitle) catalogTitle.innerHTML = title;
     if (catalogSubtitle) catalogSubtitle.textContent = subtitle;
@@ -2054,6 +2140,8 @@ function refreshFacets() {
         updateSizeUI();
         updateCategoryUI();
         updateGenderUI();
+
+        refreshSidebarCounts();
 
     } finally {
 

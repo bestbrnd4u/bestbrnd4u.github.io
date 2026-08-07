@@ -1481,6 +1481,42 @@ document.addEventListener("click", event => {
         // кошика/обраного або самої сторінки товару)
         const scope = colorBtn.closest(".product-card, .favorite-row, .cart-item, #productPage");
 
+        // Розміри можуть відрізнятись у різних кольорів (напр. чорні
+        // кросівки 40–46, білі 36–39) — при перемиканні кольору
+        // перемальовуємо список розмірів під обраний варіант.
+        // data-sizes порожній → у цього кольору власних розмірів
+        // немає, лишаємо те, що вже показано (загальні розміри).
+        if (scope && colorBtn.dataset.sizes) {
+
+            try {
+
+                const variantSizes = JSON.parse(colorBtn.dataset.sizes);
+
+                if (Array.isArray(variantSizes) && variantSizes.length) {
+
+                    scope.querySelectorAll(".product-sizes, .sizes").forEach(list => {
+
+                        const isMini = list.classList.contains("product-sizes");
+
+                        list.innerHTML = variantSizes.map((size, index) => `
+                            <button type="button"
+                                class="${isMini ? "mini-size" : "size"} ${variantSizes.length === 1 && index === 0 ? "active" : ""}"
+                                data-size="${escapeHtml(size)}">${escapeHtml(size)}</button>
+                        `).join("");
+
+                    });
+
+                }
+
+            } catch (error) {
+
+                // зіпсований JSON у data-sizes — просто лишаємо
+                // поточний список, нічого не ламаємо
+
+            }
+
+        }
+
         const carousel = scope?.querySelector(".product-carousel");
         const carouselTrack = carousel?.querySelector(".photo-track");
 
@@ -1847,6 +1883,54 @@ contactForm?.addEventListener("submit", event => {
 // Кольори товару (використовується в catalog.js і promo.js для
 // побудови фільтра "Колір")
 // -------------------------
+
+// -------------------------
+// Розміри товару
+//
+// Розміри можуть бути задані двома способами:
+//   1) у конкретного варіанта кольору (variant.sizes) — наприклад,
+//      чорні кросівки є в 40–46, а білі лише в 36–39;
+//   2) загальні для товару (product.sizes) — так влаштовані всі
+//      товари, додані до появи розмірів у кольорах.
+//
+// Обидва способи мають працювати одночасно, тому варіант без
+// власних розмірів «успадковує» загальні.
+// -------------------------
+
+function getVariantSizes(product, variant) {
+
+    if (variant && Array.isArray(variant.sizes) && variant.sizes.length) {
+
+        return variant.sizes;
+
+    }
+
+    return product?.sizes || [];
+
+}
+
+// Усі розміри товару разом (об'єднання по кольорах) — для фільтра
+// в каталозі: товар підходить, якщо потрібний розмір є хоча б
+// в одному з кольорів.
+function getAllProductSizes(product) {
+
+    const all = new Set();
+
+    (product?.variants || []).forEach(variant => {
+
+        (variant.sizes || []).forEach(size => all.add(size));
+
+    });
+
+    if (all.size === 0) {
+
+        (product?.sizes || []).forEach(size => all.add(size));
+
+    }
+
+    return [...all];
+
+}
 
 function getProductColors(product) {
 

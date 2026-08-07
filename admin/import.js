@@ -39,6 +39,7 @@ for (let i = 1; i <= COLOR_SLOTS; i++) {
     HEADERS.push(
         `Колір ${i} (назва)`,
         `Колір ${i} (HEX)`,
+        `Колір ${i} (розміри, через кому)`,
         `Колір ${i} (фото, посилання через кому)`,
         `Колір ${i} (відео, посилання)`
     );
@@ -172,26 +173,30 @@ async function downloadTemplate() {
 
     const example1 = buildExampleRow([
         "Metropolis Mini", "Furla", "Жіночі сумки", "Жінкам", 10999, 11999,
-        "TOP", "ні", "XS, S",
+        "TOP", "ні", "",
         "Компактна сумка з італійської шкіри з металевим декором-пряжкою.",
         "Натуральна шкіра", "Італія", "FR-MP-4004", "магніт із пряжкою", "металева пряжка",
         "20x16x8 см", "Один незнімний ремінь довжиною 110 см", "одне основне відділення", "100% шкіра",
         "клатч, міні сумка, вечірня сумка", "ні", "", "",
-        "Бежевий", "#d9c7a1", "https://example.com/foto1.jpg, https://example.com/foto2.jpg", "",
-        "Чорний", "#1a1a1a", "https://example.com/foto3.jpg, https://example.com/foto4.jpg", "",
-        "", "", "", ""
+        // приклад РІЗНИХ розмірів у різних кольорів: бежева є в XS і S,
+        // чорна — лише в S. Загальна колонка «Розміри» тут порожня.
+        "Бежевий", "#d9c7a1", "XS, S", "https://example.com/foto1.jpg, https://example.com/foto2.jpg", "",
+        "Чорний", "#1a1a1a", "S", "https://example.com/foto3.jpg, https://example.com/foto4.jpg", "",
+        "", "", "", "", ""
     ]);
 
     const example2 = buildExampleRow([
         "Urban Backpack", "Tommy Hilfiger", "Рюкзаки", "Унісекс", 4599, "",
-        "", "так", "",
+        "", "так", "M, L",
         "Місткий рюкзак для щоденного використання з відділенням для ноутбука.",
         "Поліестер", "В'єтнам", "TH-UB-1102", "блискавка", "логотип",
         "30x20x12 см", "", "одне відділення для ноутбука, дві бічні кишені", "100% поліестер",
         "рюкзак, для ноутбука", "так", "10–14 робочих днів", "50",
-        "Чорний", "#111111", "https://example.com/backpack-1.jpg", "",
-        "", "", "", "",
-        "", "", "", ""
+        // тут навпаки: у кольору власних розмірів немає, тож візьмуться
+        // загальні з колонки «Розміри (через кому)» вище
+        "Чорний", "#111111", "", "https://example.com/backpack-1.jpg", "",
+        "", "", "", "", "",
+        "", "", "", "", ""
     ]);
 
     const ws = XLSX.utils.json_to_sheet([example1, example2], { header: HEADERS });
@@ -292,6 +297,7 @@ function rowToProduct(row, rowNumber, validCategoryNames) {
 
         const color = String(row[`Колір ${i} (назва)`] || "").trim();
         const hex = String(row[`Колір ${i} (HEX)`] || "").trim();
+        const colorSizes = splitList(row[`Колір ${i} (розміри, через кому)`]);
         const photoRefs = splitList(row[`Колір ${i} (фото, посилання через кому)`]);
         const video = String(row[`Колір ${i} (відео, посилання)`] || "").trim();
 
@@ -331,6 +337,10 @@ function rowToProduct(row, rowNumber, validCategoryNames) {
         if (color && hex && photoRefs.length > 0 && images.length === photoRefs.length) {
 
             const variant = { color, hex, images };
+
+            // розміри саме цього кольору; якщо колонка порожня —
+            // на сайті візьмуться загальні «Розміри (через кому)»
+            if (colorSizes.length) variant.sizes = colorSizes;
 
             if (video) variant.video = video;
 

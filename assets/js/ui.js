@@ -358,7 +358,11 @@ function createProductCard(product) {
         ? Math.round((1 - product.price / product.oldPrice) * 100)
         : 0;
 
-    const sizes = product.sizes?.length ? product.sizes : PRODUCT_SIZES;
+    // показуємо розміри ПЕРШОГО кольору (він активний за
+    // замовчуванням); при перемиканні кольору список оновлює
+    // обробник у common.js за data-sizes
+    const firstVariantSizes = getVariantSizes(product, variants[0]);
+    const sizes = firstVariantSizes.length ? firstVariantSizes : PRODUCT_SIZES;
 
     const colorButtons = variants.map((variant, index) => `
         <button
@@ -366,6 +370,7 @@ function createProductCard(product) {
             class="mini-color ${index === 0 ? "active" : ""}"
             data-color="${escapeHtml(variant.color)}"
             data-images='${escapeAttrSingleQuoted(JSON.stringify(variant.images || []))}'
+            data-sizes='${escapeAttrSingleQuoted(JSON.stringify(getVariantSizes(product, variant)))}'
             title="${escapeHtml(variant.color)}"
             style="background:${escapeHtml(variant.hex)}"></button>
     `).join("");
