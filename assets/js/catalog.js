@@ -833,10 +833,25 @@ function fillCatalogSidebar(categoryDepartments) {
             </button>
     `;
 
+    const collapsed = readCollapsedGroups();
+
     tree.forEach(department => {
 
-        html += `<div class="sidebar-group">
-            <div class="sidebar-group-title">${escapeHtml(department.title)}</div>`;
+        // Група розгортається примусово, якщо всередині є обрана
+        // категорія — інакше після переходу за посиланням з меню
+        // користувач бачив би згорнуту групу і не розумів, звідки
+        // взявся фільтр.
+        const hasActive = department.categories.some(({ name }) => selectedCategories.has(name));
+        const isCollapsed = !hasActive && collapsed.has(department.title);
+
+        html += `<div class="sidebar-group${isCollapsed ? " collapsed" : ""}" data-sidebar-group="${escapeHtml(department.title)}">
+            <button type="button" class="sidebar-group-title"
+                    data-sidebar-group-toggle
+                    aria-expanded="${isCollapsed ? "false" : "true"}">
+                <span>${escapeHtml(department.title)}</span>
+                <span class="sidebar-group-icon" aria-hidden="true"></span>
+            </button>
+            <div class="sidebar-group-body">`;
 
         department.categories.forEach(({ name, count }) => {
 
@@ -849,7 +864,7 @@ function fillCatalogSidebar(categoryDepartments) {
 
         });
 
-        html += `</div>`;
+        html += `</div></div>`;
 
     });
 
@@ -874,7 +889,66 @@ function fillCatalogSidebar(categoryDepartments) {
 
     });
 
+    catalogSidebar.querySelectorAll("[data-sidebar-group-toggle]").forEach(button => {
+
+        button.addEventListener("click", () => {
+
+            const group = button.closest(".sidebar-group");
+            const nowCollapsed = group.classList.toggle("collapsed");
+
+            button.setAttribute("aria-expanded", nowCollapsed ? "false" : "true");
+
+            const saved = readCollapsedGroups();
+
+            if (nowCollapsed) {
+                saved.add(group.dataset.sidebarGroup);
+            } else {
+                saved.delete(group.dataset.sidebarGroup);
+            }
+
+            saveCollapsedGroups(saved);
+
+        });
+
+    });
+
     updateSidebarActive();
+
+}
+
+// Які групи бокового меню користувач згорнув. Зберігаємо між
+// сторінками, щоб вибір не скидався при кожному переході в каталозі.
+const SIDEBAR_COLLAPSED_KEY = "bagvero:sidebar-collapsed";
+
+function readCollapsedGroups() {
+
+    try {
+
+        const raw = localStorage.getItem(SIDEBAR_COLLAPSED_KEY);
+
+        return new Set(raw ? JSON.parse(raw) : []);
+
+    } catch (error) {
+
+        // приватний режим або зіпсоване значення — не критично,
+        // просто показуємо все розгорнутим
+        return new Set();
+
+    }
+
+}
+
+function saveCollapsedGroups(groups) {
+
+    try {
+
+        localStorage.setItem(SIDEBAR_COLLAPSED_KEY, JSON.stringify([...groups]));
+
+    } catch (error) {
+
+        // сховище недоступне — стан просто не переживе перезавантаження
+
+    }
 
 }
 
@@ -888,7 +962,25 @@ function updateSidebarActive() {
 
     catalogSidebar.querySelectorAll("[data-sidebar-category]").forEach(button => {
 
-        button.classList.toggle("active", selectedCategories.has(button.dataset.sidebarCategory));
+        const isActive = selectedCategories.has(button.dataset.sidebarCategory);
+
+        button.classList.toggle("active", isActive);
+
+        // якщо категорію обрали не з бокового меню (дропдаун, чіп,
+        // посилання з шапки) — розгортаємо групу, щоб підсвічений
+        // пункт не лишився захованим усередині згорнутої групи
+        if (isActive) {
+
+            const group = button.closest(".sidebar-group");
+
+            if (group?.classList.contains("collapsed")) {
+
+                group.classList.remove("collapsed");
+                group.querySelector("[data-sidebar-group-toggle]")?.setAttribute("aria-expanded", "true");
+
+            }
+
+        }
 
     });
 

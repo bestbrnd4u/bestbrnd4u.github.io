@@ -1,21 +1,76 @@
 // ======================================
 // mega-menu.js
-// Динамічно наповнює мегаменю під пунктом "Каталог" колонками
-// розділів (дані беруться з адмінки — data/categories.json),
-// але показує лише ті категорії, для яких у каталозі реально
-// є хоча б один товар (data/products.json).
+// Наповнює випадаючі меню в шапці — «Каталог», «Новинки», «Акції» —
+// колонками за статтю (Жінкам / Чоловікам / Унісекс / Дітям), де під
+// кожною статтю перелічені категорії, у яких реально є товари, плюс
+// окрема колонка брендів.
 //
-// Підключається на кожній сторінці — шапка сайту однакова всюди.
-// Якщо щось піде не так (немає мережі, пусті файли тощо) —
-// мегаменю просто лишається таким, яким закладено в самій
-// розмітці сторінки (картки "За статтю"), сайт не ламається.
+// Меню шукаються структурно (усі .has-mega у шапці), а розділ
+// визначається з href самого пункту — тому файл працює на всіх
+// сторінках сайту без правок розмітки і без окремих id.
+//
+// Дані: data/categories.json (порядок розділів і категорій, як в
+// адмінці) + data/products.json (що реально є в наявності).
+//
+// Якщо щось піде не так (немає мережі, порожні файли) — меню
+// лишається таким, як закладено в самій розмітці сторінки, сайт
+// не ламається.
 // ======================================
 
-(async function initCatalogMegaMenu() {
+(async function initHeaderMegaMenus() {
 
-    const container = document.getElementById("catalogMegaMenu");
+    const megaItems = document.querySelectorAll(".has-mega");
 
-    if (!container) return;
+    if (!megaItems.length) return;
+
+    const GENDER_ORDER = ["Жінкам", "Чоловікам", "Унісекс", "Дітям"];
+
+    // має збігатися з SALE_MIN_DISCOUNT у assets/js/catalog.js —
+    // інакше в меню «Акції» потраплять не ті самі товари, що і в
+    // самому розділі
+    const SALE_MIN_DISCOUNT = 30;
+
+    const MAX_BRANDS = 8;
+
+    function isSaleProduct(product) {
+
+        if (!product.oldPrice) return false;
+
+        return (1 - product.price / product.oldPrice) * 100 >= SALE_MIN_DISCOUNT;
+
+    }
+
+    // розділ визначаємо з посилання самого пункту меню:
+    // "catalog?section=new" → "new", "catalog" → ""
+    function sectionFromHref(href) {
+
+        const match = /[?&]section=(new|sale)\b/.exec(href || "");
+
+        return match ? match[1] : "";
+
+    }
+
+    function scopeProducts(products, section) {
+
+        if (section === "new") return products.filter(p => p.isNew);
+
+        if (section === "sale") return products.filter(isSaleProduct);
+
+        return products;
+
+    }
+
+    function buildQuery(section, extra) {
+
+        const parts = [];
+
+        if (section) parts.push(`section=${section}`);
+
+        extra.forEach(([key, value]) => parts.push(`${key}=${encodeURIComponent(value)}`));
+
+        return parts.length ? `catalog?${parts.join("&")}` : "catalog";
+
+    }
 
     try {
 
@@ -29,61 +84,109 @@
         const categories = await categoriesRes.json();
         const products = await productsRes.json();
 
-        const presentCategories = new Set(products.map(p => p.category).filter(Boolean));
+        if (!Array.isArray(products) || products.length === 0) return;
 
-        const byDepartment = new Map();
-        const known = new Set();
+        // порядок категорій беремо з довідника, щоб у меню він був
+        // такий самий, як в адмінці, а не випадковий
+        const categoryOrder = new Map();
 
-        categories.forEach(category => {
+        (Array.isArray(categories) ? categories : []).forEach((category, index) => {
 
-            known.add(category.name);
-
-            if (!presentCategories.has(category.name)) return;
-
-            if (!byDepartment.has(category.department)) {
-                byDepartment.set(category.department, []);
-            }
-
-            byDepartment.get(category.department).push(category.name);
+            categoryOrder.set(category.name, index);
 
         });
 
-        // категорії, яких немає в довіднику (наприклад, довільне
-        // значення з Excel-імпорту), не губляться — збираються в
-        // колонку «Інше», щоб товар завжди був доступний з меню
-        const unknown = [...presentCategories]
-            .filter(name => !known.has(name))
-            .sort((a, b) => a.localeCompare(b, "uk"));
+        function sortCategories(names) {
 
-        if (unknown.length) byDepartment.set("Інше", unknown);
+            return names.sort((a, b) => {
 
-        if (byDepartment.size === 0) return;
+                const ia = categoryOrder.has(a) ? categoryOrder.get(a) : Infinity;
+                const ib = categoryOrder.has(b) ? categoryOrder.get(b) : Infinity;
 
-        const genderColumn = `
-            <div class="mega-col">
-                <div class="mega-col-title">За статтю</div>
-                <a href="catalog?gender=Жінкам">Жінкам</a>
-                <a href="catalog?gender=Чоловікам">Чоловікам</a>
-                <a href="catalog?gender=Унісекс">Унісекс</a>
-                <a href="catalog?gender=Дітям">Дітям</a>
-            </div>
-        `;
+                // категорії, яких немає в довіднику (довільне значення
+                // з Excel-імпорту), не губляться — просто йдуть у кінці
+                if (ia !== ib) return ia - ib;
 
-        const departmentColumns = [...byDepartment.entries()].map(([department, names]) => `
-            <div class="mega-col">
-                <div class="mega-col-title">${escapeHtml(department)}</div>
-                ${names.map(name => `
-                    <a href="catalog?category=${encodeURIComponent(name)}">${escapeHtml(name)}</a>
-                `).join("")}
-            </div>
-        `).join("");
+                return a.localeCompare(b, "uk");
 
-        container.classList.add("mega-menu-columns");
-        container.innerHTML = genderColumn + departmentColumns;
+            });
+
+        }
+
+        megaItems.forEach(item => {
+
+            const link = item.querySelector("a");
+            const menu = item.querySelector(".mega-menu");
+
+            if (!link || !menu) return;
+
+            const section = sectionFromHref(link.getAttribute("href"));
+            const scoped = scopeProducts(products, section);
+
+            // порожній розділ — лишаємо запасну розмітку, щоб меню
+            // не виявилось порожньою білою плямою
+            if (!scoped.length) return;
+
+            const genderColumns = GENDER_ORDER.map(gender => {
+
+                const items = scoped.filter(product => product.gender === gender);
+
+                if (!items.length) return "";
+
+                const names = sortCategories(
+                    [...new Set(items.map(product => product.category).filter(Boolean))]
+                );
+
+                const links = names.map(name => `
+                    <a href="${buildQuery(section, [["gender", gender], ["category", name]])}">${escapeHtml(name)}</a>
+                `).join("");
+
+                return `
+                    <div class="mega-col">
+                        <a class="mega-col-title mega-col-title-link"
+                           href="${buildQuery(section, [["gender", gender]])}">${escapeHtml(gender)}</a>
+                        ${links}
+                    </div>
+                `;
+
+            }).join("");
+
+            // бренди — за кількістю товарів у цьому ж розділі
+            const brandCounts = new Map();
+
+            scoped.forEach(product => {
+
+                if (!product.brand) return;
+
+                brandCounts.set(product.brand, (brandCounts.get(product.brand) || 0) + 1);
+
+            });
+
+            const topBrands = [...brandCounts.entries()]
+                .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "uk"))
+                .slice(0, MAX_BRANDS)
+                .map(([brand]) => brand);
+
+            const brandColumn = topBrands.length ? `
+                <div class="mega-col">
+                    <div class="mega-col-title">Бренди</div>
+                    ${topBrands.map(brand => `
+                        <a href="${buildQuery(section, [["brand", brand]])}">${escapeHtml(brand)}</a>
+                    `).join("")}
+                    <a class="mega-col-all" href="${buildQuery(section, [])}">Усі бренди</a>
+                </div>
+            ` : "";
+
+            if (!genderColumns && !brandColumn) return;
+
+            menu.classList.add("mega-menu-columns");
+            menu.innerHTML = genderColumns + brandColumn;
+
+        });
 
     } catch (error) {
 
-        console.warn("Не вдалося побудувати мегаменю каталогу, лишено запасний варіант:", error);
+        console.warn("Не вдалося побудувати меню шапки, лишено запасний варіант:", error);
 
     }
 

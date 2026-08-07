@@ -446,8 +446,11 @@ nav li.has-mega:hover .mega-menu{
     display:flex;
     flex-wrap:wrap;
     grid-template-columns:none;
-    gap:28px 40px;
-    max-width:820px;
+    gap:26px 32px;
+    /* 5 колонок (4 статі + бренди) по 160px з відступами 32px = 928px;
+       на вузьких вікнах обмежуємось шириною екрана, щоб меню не
+       вилазило за край — воно центроване через translateX(-50%) */
+    max-width:min(1040px, calc(100vw - 40px));
     padding:28px 32px 24px;
     text-align:left;
 }
@@ -456,13 +459,36 @@ nav li.has-mega:hover .mega-menu{
     width:160px;
 }
 
+/* заголовок колонки — назва статі: темний, звичайним регістром,
+   як у референсі; сам по собі є посиланням на всю стать */
 .mega-col-title{
-    font-size:12px;
+    font-size:15px;
     font-weight:700;
-    text-transform:uppercase;
-    letter-spacing:.04em;
-    color:var(--gray300);
-    margin-bottom:10px;
+    color:var(--gray900);
+    margin-bottom:12px;
+}
+
+/* ВАЖЛИВО про подвійний селектор: правило .mega-col a нижче має
+   специфічність (0,1,1) — вищу за .mega-col-title (0,1,0) — і
+   перебило б розмір та колір заголовка, зрівнявши його зі
+   звичайним пунктом списку */
+.mega-col a.mega-col-title-link{
+    display:block;
+    font-size:15px;
+    font-weight:700;
+    color:var(--gray900);
+    padding:0;
+    margin-bottom:12px;
+}
+
+.mega-col a.mega-col-title-link:hover{
+    color:var(--secondary);
+}
+
+.mega-col a.mega-col-all{
+    margin-top:6px;
+    font-weight:600;
+    color:var(--secondary);
 }
 
 .mega-col a{
@@ -2647,13 +2673,63 @@ body.mobile-filters-open .scroll-top{
     padding-top:12px;
 }
 
+/* заголовок групи тепер кнопка «згорнути/розгорнути» */
 .sidebar-group-title{
-    padding:0 12px 7px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    width:100%;
+    padding:4px 12px 7px;
     font-size:12px;
     font-weight:800;
     letter-spacing:.8px;
     text-transform:uppercase;
     color:var(--gray500);
+    text-align:left;
+    cursor:pointer;
+    transition:color .15s ease;
+}
+
+.sidebar-group-title:hover{
+    color:var(--gray700);
+}
+
+/* значок «+ / −», намальований двома лініями: горизонтальна
+   є завжди, вертикальна ховається, коли група розгорнута */
+.sidebar-group-icon{
+    position:relative;
+    flex-shrink:0;
+    width:11px;
+    height:11px;
+}
+
+.sidebar-group-icon::before,
+.sidebar-group-icon::after{
+    content:"";
+    position:absolute;
+    top:50%;
+    left:0;
+    width:11px;
+    height:1.5px;
+    background:currentColor;
+    border-radius:1px;
+    transform:translateY(-50%);
+    transition:transform .18s ease, opacity .18s ease;
+}
+
+.sidebar-group-icon::after{
+    transform:translateY(-50%) rotate(90deg);
+    opacity:0;
+}
+
+.sidebar-group.collapsed .sidebar-group-icon::after{
+    transform:translateY(-50%) rotate(0deg);
+    opacity:1;
+}
+
+.sidebar-group.collapsed .sidebar-group-body{
+    display:none;
 }
 
 .sidebar-count{
