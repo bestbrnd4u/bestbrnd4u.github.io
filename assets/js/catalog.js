@@ -488,12 +488,82 @@ function clearBrands() {
 
 }
 
+// -------------------------
+// «Звужувальні» фільтри (facets)
+//
+// Після вибору будь-якого фільтра в решті лишаються тільки ті
+// значення, які реально ще можна знайти. Наприклад, обрали
+// категорію «Кросівки» — у розмірах зникають розміри сумок,
+// у кольорах лишаються лише кольори кросівок.
+//
+// Для кожного виміру рахуємо доступні значення на товарах,
+// відфільтрованих усіма ІНШИМИ вимірами (filterProducts(skip)) —
+// інакше, наприклад, у списку кольорів лишився б рівно один,
+// уже обраний, колір.
+// -------------------------
+
+function availableFacets() {
+
+    const forBrands = filterProducts("brands");
+    const forColors = filterProducts("colors");
+    const forSizes = filterProducts("sizes");
+    const forGenders = filterProducts("gender");
+    const forCategories = filterProducts("categories");
+
+    const colors = new Set();
+
+    forColors.forEach(product => {
+
+        getProductColors(product).forEach((hex, name) => colors.add(name));
+
+    });
+
+    const sizes = new Set();
+
+    forSizes.forEach(product => {
+
+        SIZE_GROUPS.forEach(group => {
+
+            if (!group.categories.includes(product.category)) return;
+
+            (product.sizes || []).forEach(size => sizes.add(`${group.key}:${size}`));
+
+        });
+
+    });
+
+    return {
+        brands: new Set(forBrands.map(p => p.brand).filter(Boolean)),
+        colors,
+        sizes,
+        genders: new Set(forGenders.map(p => p.gender).filter(Boolean)),
+        categories: new Set(forCategories.map(p => p.category).filter(Boolean))
+    };
+
+}
+
+// Позначаємо недоступні варіанти. Уже обраний варіант ніколи не
+// ховаємо — інакше його неможливо було б зняти.
+function markAvailability(element, isAvailable, isSelected) {
+
+    element.classList.toggle("unavailable", !isAvailable && !isSelected);
+
+}
+
 function updateBrandUI() {
 
     brandLabel.textContent = getMultiSelectLabel(selectedBrands, DEFAULT_BRAND_LABEL, "Бренди");
 
+    const available = availableFacets();
+
     brandOptionsList.querySelectorAll(".filter-option").forEach(o => {
-        o.classList.toggle("active", selectedBrands.has(o.dataset.brand));
+
+        const selected = selectedBrands.has(o.dataset.brand);
+
+        o.classList.toggle("active", selected);
+
+        markAvailability(o, available.brands.has(o.dataset.brand), selected);
+
     });
 
 }
@@ -664,8 +734,16 @@ function updateColorUI() {
 
     colorLabel.textContent = getMultiSelectLabel(selectedColors, DEFAULT_COLOR_LABEL, "Кольори");
 
+    const available = availableFacets();
+
     colorOptionsList.querySelectorAll(".filter-option").forEach(o => {
-        o.classList.toggle("active", selectedColors.has(o.dataset.color));
+
+        const selected = selectedColors.has(o.dataset.color);
+
+        o.classList.toggle("active", selected);
+
+        markAvailability(o, available.colors.has(o.dataset.color), selected);
+
     });
 
 }
@@ -1026,8 +1104,16 @@ function updateCategoryUI() {
 
     categoryLabel.textContent = getMultiSelectLabel(selectedCategories, DEFAULT_CATEGORY_LABEL, "Категорії");
 
+    const available = availableFacets();
+
     categoryOptionsList.querySelectorAll(".filter-option").forEach(o => {
-        o.classList.toggle("active", selectedCategories.has(o.dataset.category));
+
+        const selected = selectedCategories.has(o.dataset.category);
+
+        o.classList.toggle("active", selected);
+
+        markAvailability(o, available.categories.has(o.dataset.category), selected);
+
     });
 
     // бокове дерево категорій підсвічує той самий вибір
@@ -1387,10 +1473,31 @@ function setupPriceRange() {
 
 }
 
+// Скидання діапазону ціни до повного.
+//
+// Якщо межі ще невідомі (товари не завантажились), НЕ ставимо 0–0:
+// priceFilterActive() вважав би такий діапазон звуженим (0 < max),
+// фільтр відкинув би геть усі товари, і каталог показав би порожньо.
+// Лишаємо null — setupPriceRange() потім виставить справжні межі.
+function resetPriceRange() {
+
+    if (priceBounds.max > priceBounds.min) {
+
+        priceRange.min = priceBounds.min;
+        priceRange.max = priceBounds.max;
+
+    } else {
+
+        priceRange.min = null;
+        priceRange.max = null;
+
+    }
+
+}
+
 function clearPrices() {
 
-    priceRange.min = priceBounds.min;
-    priceRange.max = priceBounds.max;
+    resetPriceRange();
 
     updatePriceUI();
 
@@ -1443,12 +1550,12 @@ function fillSizeGroups() {
 
     if (!sizeGroupsList) return;
 
-    const presentCategories = new Set(products.map(product => product.category));
+    const presentCategories = new Set(sectionProducts().map(product => product.category));
 
     sizeGroupsList.innerHTML = SIZE_GROUPS
         .filter(group => group.categories.some(c => presentCategories.has(c)))
         .map(group => `
-            <div class="filter-size-group">
+            <div class="filter-size-group" data-size-group="${group.key}">
                 <div class="filter-size-group-title">${group.title}</div>
                 <div class="filter-size-chips">
                     ${group.sizes.map(size => `
@@ -1515,11 +1622,30 @@ function updateSizeUI() {
 
     sizeLabel.textContent = getMultiSelectLabel(selectedSizes, DEFAULT_SIZE_LABEL, "Розмір", sizeKeyLabel);
 
+    const available = availableFacets();
+
     sizeMenu.querySelectorAll(".filter-size-chip").forEach(chip => {
 
         const key = `${chip.dataset.group}:${chip.dataset.size}`;
+        const selected = selectedSizes.has(key);
 
-        chip.classList.toggle("active", selectedSizes.has(key));
+        chip.classList.toggle("active", selected);
+
+        markAvailability(chip, available.sizes.has(key), selected);
+
+    });
+
+    // ховаємо і заголовок групи розмірів, якщо в ній не лишилось
+    // жодного доступного розміру (напр. розміри взуття, коли обрані
+    // лише сумки)
+    sizeMenu.querySelectorAll("[data-size-group]").forEach(groupEl => {
+
+        const chips = [...groupEl.querySelectorAll(".filter-size-chip")];
+
+        groupEl.classList.toggle(
+            "unavailable",
+            chips.length > 0 && chips.every(chip => chip.classList.contains("unavailable"))
+        );
 
     });
 
@@ -1670,14 +1796,22 @@ function updateGenderUI() {
 
     if (!genderFilterEl) return;
 
+    const available = availableFacets();
+
     genderFilterEl.querySelectorAll(".gender-pill").forEach(btn => {
 
         const value = btn.dataset.gender;
+        const selected = value === "" ? selectedGenders.size === 0 : selectedGenders.has(value);
 
-        btn.classList.toggle(
-            "active",
-            value === "" ? selectedGenders.size === 0 : selectedGenders.has(value)
-        );
+        btn.classList.toggle("active", selected);
+
+        // «Всі» доступна завжди; решту статей вимикаємо, а не ховаємо —
+        // це фіксований ряд кнопок, і зникнення однієї з них
+        // перебудовувало б увесь рядок
+        const isAvailable = value === "" || available.genders.has(value);
+
+        btn.classList.toggle("disabled", !isAvailable && !selected);
+        btn.disabled = !isAvailable && !selected;
 
     });
 
@@ -1792,13 +1926,17 @@ function highlightNavLink() {
 // Фільтрація товарів
 // -------------------------
 
-function filterProducts() {
+// skip — назва виміру, який треба ПРОПУСТИТИ під час фільтрації.
+// Потрібно для «звужувальних» фільтрів: щоб порахувати, які кольори
+// ще доступні, треба застосувати всі фільтри, КРІМ самого кольору —
+// інакше в списку лишився б рівно один, уже обраний, колір.
+function filterProducts(skip) {
 
     // копія обов'язкова: sectionProducts() для звичайного каталогу
     // повертає сам масив products, а нижче список сортується на місці
     let list = [...sectionProducts()];
 
-    if (selectedGenders.size) {
+    if (selectedGenders.size && skip !== "gender") {
 
         list = list.filter(product => selectedGenders.has(product.gender));
 
@@ -1824,7 +1962,7 @@ function filterProducts() {
 
     }
 
-    if (selectedBrands.size) {
+    if (selectedBrands.size && skip !== "brands") {
 
         list = list.filter(product =>
             selectedBrands.has(product.brand)
@@ -1832,7 +1970,7 @@ function filterProducts() {
 
     }
 
-    if (selectedColors.size) {
+    if (selectedColors.size && skip !== "colors") {
 
         list = list.filter(product => {
 
@@ -1844,7 +1982,7 @@ function filterProducts() {
 
     }
 
-    if (selectedCategories.size) {
+    if (selectedCategories.size && skip !== "categories") {
 
         list = list.filter(product =>
             selectedCategories.has(product.category)
@@ -1852,7 +1990,7 @@ function filterProducts() {
 
     }
 
-    if (priceFilterActive()) {
+    if (priceFilterActive() && skip !== "price") {
 
         list = list.filter(product =>
             product.price >= priceRange.min && product.price <= priceRange.max
@@ -1860,7 +1998,7 @@ function filterProducts() {
 
     }
 
-    if (selectedSizes.size) {
+    if (selectedSizes.size && skip !== "sizes") {
 
         list = list.filter(product =>
             [...selectedSizes].some(key => matchesSizeKey(product, key))
@@ -1896,6 +2034,35 @@ function filterProducts() {
 
 }
 
+// Перерахунок доступних значень у всіх фільтрах. Викликається з
+// render(), бо доступність залежить від поточного набору фільтрів,
+// а не лише від того, який фільтр щойно змінили.
+let refreshingFacets = false;
+
+function refreshFacets() {
+
+    // updateXxxUI() усередині знову викликають availableFacets(),
+    // тож без цього прапорця вийшла б зайва рекурсія розрахунків
+    if (refreshingFacets) return;
+
+    refreshingFacets = true;
+
+    try {
+
+        updateBrandUI();
+        updateColorUI();
+        updateSizeUI();
+        updateCategoryUI();
+        updateGenderUI();
+
+    } finally {
+
+        refreshingFacets = false;
+
+    }
+
+}
+
 function render() {
 
     // межі повзунка ціни залежать від завантажених товарів —
@@ -1924,6 +2091,8 @@ function render() {
     emptyState.hidden = list.length !== 0;
 
     renderActiveFilters();
+
+    refreshFacets();
 
 }
 
@@ -2133,8 +2302,7 @@ function clearOneFilter(type, value) {
 
     } else if (type === "price") {
 
-        priceRange.min = priceBounds.min;
-        priceRange.max = priceBounds.max;
+        resetPriceRange();
 
         updatePriceUI();
 
@@ -2163,8 +2331,7 @@ function resetAllFilters() {
     selectedCategories.clear();
     updateCategoryUI();
 
-    priceRange.min = priceBounds.min;
-    priceRange.max = priceBounds.max;
+    resetPriceRange();
     updatePriceUI();
 
     selectedSizes.clear();

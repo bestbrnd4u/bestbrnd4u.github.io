@@ -3202,6 +3202,26 @@ body.mobile-filters-open .scroll-top{
     padding:18px 4px 4px;
 }
 
+/* -- «звужувальні» фільтри: недоступні варіанти -- */
+
+/* Варіанти, яких немає серед знайдених товарів, ховаємо повністю —
+   так само, як у великих магазинів. Уже обраний варіант ніколи не
+   отримує цей клас (див. markAvailability у catalog.js), інакше
+   його неможливо було б зняти. */
+.filter-option.unavailable,
+.filter-size-chip.unavailable,
+.filter-size-group.unavailable{
+    display:none;
+}
+
+/* Стать — фіксований ряд кнопок, тому не ховаємо, а гасимо:
+   зникнення однієї кнопки перебудовувало б увесь рядок */
+.gender-pill.disabled{
+    opacity:.35;
+    cursor:not-allowed;
+    pointer-events:none;
+}
+
 .filter-option{
     width:100%;
     display:flex;
@@ -6038,9 +6058,41 @@ body.mobile-filters-open .scroll-top{
         overflow:hidden;
     }
 
+    /* Колір і розмір — ОДНИМ рядком, з горизонтальною прокруткою.
+       Раніше тут працював успадкований flex-wrap:wrap: коли кольорів
+       або розмірів багато (напр. 36–41), вони переносились на новий
+       рядок і вилазили за межі картки. Тепер рядок не переноситься,
+       а зайве прокручується пальцем усередині самої картки. */
     #catalogGrid.products-grid:not(.list-view) .product-options{
-        gap:6px;
+        gap:8px;
         margin-bottom:10px;
+        flex-wrap:nowrap;
+        overflow-x:auto;
+        overflow-y:hidden;
+        /* ховаємо смугу прокрутки, жест лишається */
+        scrollbar-width:none;
+        -ms-overflow-style:none;
+        -webkit-overflow-scrolling:touch;
+        /* прокрутка лише по горизонталі — вертикальний свайп
+           сторінки не перехоплюється */
+        touch-action:pan-x;
+    }
+
+    #catalogGrid.products-grid:not(.list-view) .product-options::-webkit-scrollbar{
+        display:none;
+    }
+
+    /* без цього flex стискав би кружечки та розміри замість того,
+       щоб дати рядку прокручуватись */
+    #catalogGrid.products-grid:not(.list-view) .product-colors,
+    #catalogGrid.products-grid:not(.list-view) .product-sizes{
+        flex-wrap:nowrap;
+        flex-shrink:0;
+    }
+
+    #catalogGrid.products-grid:not(.list-view) .mini-color,
+    #catalogGrid.products-grid:not(.list-view) .mini-size{
+        flex-shrink:0;
     }
 
     #catalogGrid.products-grid:not(.list-view) .mini-color{
