@@ -2907,7 +2907,8 @@ body.mobile-filters-open .scroll-top{
 .price-range-slider{
     position:relative;
     height:22px;
-    margin:0 10px 18px;
+    /* більший відступ знизу — щоб поля вводу не тулились до смужки */
+    margin:6px 10px 22px;
 }
 
 .price-range-track,
@@ -2930,8 +2931,18 @@ body.mobile-filters-open .scroll-top{
     background:var(--gray700);
 }
 
-/* два range-інпути лежать один поверх одного: сама доріжка
-   прозора, клікабельні лише самі ручки (pointer-events нижче) */
+/* Два range-інпути лежать один поверх одного: сама доріжка прозора,
+   клікабельні лише ручки (pointer-events нижче).
+
+   ВАЖЛИВО про подвійний селектор: загальне правило
+   .catalog-filters-bar input має специфічність (0,1,1) — вищу, ніж
+   .price-range-input (0,1,0), — і нав'язувало повзунку height:48px,
+   width:100% та рамку 1.5px. Саме звідси бралась овальна обводка
+   навколо чорної смужки, а 48px висоти замість 22px розпирали
+   контейнер і накладались на блок вище. Дублюємо селектор з
+   .catalog-filters-bar, щоб перебити це правило. */
+.catalog-filters-bar .price-range-input,
+.mobile-filters-sub-content .price-range-input,
 .price-range-input{
     position:absolute;
     top:0;
@@ -2942,13 +2953,20 @@ body.mobile-filters-open .scroll-top{
     padding:0;
     background:none;
     border:none;
+    border-radius:0;
     appearance:none;
     -webkit-appearance:none;
     pointer-events:none;
 }
 
+/* те саме і для :focus — інакше .catalog-filters-bar input:focus
+   малює блакитне світіння box-shadow навколо всієї смужки */
+.catalog-filters-bar .price-range-input:focus,
+.mobile-filters-sub-content .price-range-input:focus,
 .price-range-input:focus{
     outline:none;
+    border:none;
+    box-shadow:none;
 }
 
 .price-range-min{ z-index:3; }
@@ -3033,6 +3051,11 @@ body.mobile-filters-open .scroll-top{
     background:none;
 }
 
+/* .catalog-filters-bar input:focus має специфічність (0,2,1) і
+   перебило б голий .price-range-number:focus (0,2,0), домалювавши
+   друге блакитне світіння поверх того, що вже дає
+   .price-range-field:focus-within — тому дублюємо селектор */
+.catalog-filters-bar .price-range-number:focus,
 .price-range-number:focus{
     outline:none;
     border:none;

@@ -700,11 +700,40 @@ colorToggle?.addEventListener("click", event => {
 //   довільне значення з Excel-імпорту), не губляться — вони
 //   збираються в окрему групу «Інше», щоб товар завжди можна було
 //   знайти через навігацію.
-function buildCategoryTree(categoryDepartments) {
+// Товари в межах поточного розділу сторінки: Новинки, Акції або
+// весь каталог. Саме на цьому наборі мають будуватись бокове меню,
+// список у дропдауні «Категорія» і межі повзунка ціни — інакше на
+// /catalog?section=new вони показують весь каталог (21 товар і
+// категорії, у яких новинок немає), хоча в сітці лише 8 новинок.
+function sectionProducts() {
+
+    if (currentSection === "new") {
+
+        return products.filter(product => product.isNew);
+
+    }
+
+    if (currentSection === "sale") {
+
+        return products.filter(product => {
+
+            if (!product.oldPrice) return false;
+
+            return (1 - product.price / product.oldPrice) * 100 >= SALE_MIN_DISCOUNT;
+
+        });
+
+    }
+
+    return products;
+
+}
+
+function buildCategoryTree(categoryDepartments, sourceProducts) {
 
     const counts = new Map();
 
-    products.forEach(product => {
+    (sourceProducts || products).forEach(product => {
 
         if (!product.category) return;
 
@@ -743,7 +772,7 @@ function fillCategories(categoryDepartments) {
 
     if (!categoryOptionsList) return;
 
-    buildCategoryTree(categoryDepartments).forEach(department => {
+    buildCategoryTree(categoryDepartments, sectionProducts()).forEach(department => {
 
         const groupTitle = document.createElement("div");
         groupTitle.className = "filter-option-group-title";
@@ -782,7 +811,9 @@ function fillCatalogSidebar(categoryDepartments) {
 
     if (!catalogSidebar) return;
 
-    const tree = buildCategoryTree(categoryDepartments);
+    const scoped = sectionProducts();
+
+    const tree = buildCategoryTree(categoryDepartments, scoped);
 
     if (!tree.length) {
 
@@ -792,7 +823,7 @@ function fillCatalogSidebar(categoryDepartments) {
 
     }
 
-    const totalCount = products.length;
+    const totalCount = scoped.length;
 
     let html = `
         <nav class="sidebar-tree" aria-label="Категорії каталогу">
@@ -1221,7 +1252,7 @@ function setupPriceRange() {
 
     if (!priceMenu || !products.length) return;
 
-    const prices = products
+    const prices = sectionProducts()
         .map(product => Number(product.price))
         .filter(value => Number.isFinite(value));
 
@@ -1665,25 +1696,9 @@ function highlightNavLink() {
 
 function filterProducts() {
 
-    let list = [...products];
-
-    if (currentSection === "new") {
-
-        list = list.filter(product => product.isNew);
-
-    } else if (currentSection === "sale") {
-
-        list = list.filter(product => {
-
-            if (!product.oldPrice) return false;
-
-            const discount = (1 - product.price / product.oldPrice) * 100;
-
-            return discount >= SALE_MIN_DISCOUNT;
-
-        });
-
-    }
+    // копія обов'язкова: sectionProducts() для звичайного каталогу
+    // повертає сам масив products, а нижче список сортується на місці
+    let list = [...sectionProducts()];
 
     if (selectedGenders.size) {
 
