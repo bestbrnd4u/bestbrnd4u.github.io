@@ -756,7 +756,8 @@
         "color": "Білий",
         "hex": "#f7f7f7",
         "images": [
-          "https://commons.wikimedia.org/wiki/Special:Redirect/file/Timberland%206%20inch%20boots.jpg"
+          "https://commons.wikimedia.org/wiki/Special:Redirect/file/Timberland%206%20inch%20boots.jpg",
+          "/assets/images/products/uploads/RayBanAviator.png"
         ]
       },
       {
@@ -803,7 +804,8 @@
     "country": "В'єтнам",
     "title": "Urban Sneakers",
     "images": [
-      "https://commons.wikimedia.org/wiki/Special:Redirect/file/Timberland%206%20inch%20boots.jpg"
+      "https://commons.wikimedia.org/wiki/Special:Redirect/file/Timberland%206%20inch%20boots.jpg",
+      "/assets/images/products/uploads/RayBanAviator.png"
     ],
     "id": 15,
     "closure": "шнурівка",
