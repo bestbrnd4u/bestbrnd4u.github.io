@@ -438,8 +438,12 @@ function createProductCard(product) {
                         <div class="product-colors">
                             ${colorButtons}
                         </div>
-                        <div class="product-sizes">
-                            ${sizeButtons}
+                        <div class="product-sizes-wrap">
+                            <button type="button" class="sizes-arrow sizes-arrow-left" aria-label="Попередні розміри" tabindex="-1">‹</button>
+                            <div class="product-sizes">
+                                ${sizeButtons}
+                            </div>
+                            <button type="button" class="sizes-arrow sizes-arrow-right" aria-label="Наступні розміри" tabindex="-1">›</button>
                         </div>
                     </div>
                     <button
@@ -477,8 +481,12 @@ function createProductCard(product) {
                         <div class="product-colors">
                             ${colorButtons}
                         </div>
-                        <div class="product-sizes">
-                            ${sizeButtons}
+                        <div class="product-sizes-wrap">
+                            <button type="button" class="sizes-arrow sizes-arrow-left" aria-label="Попередні розміри" tabindex="-1">‹</button>
+                            <div class="product-sizes">
+                                ${sizeButtons}
+                            </div>
+                            <button type="button" class="sizes-arrow sizes-arrow-right" aria-label="Наступні розміри" tabindex="-1">›</button>
                         </div>
                     </div>
                 </div>
@@ -494,3 +502,93 @@ function createProductCard(product) {
     `;
 
 }
+
+
+// -------------------------
+// Прокрутка розмірів у картці товару
+//
+// Коли розмірів багато (напр. 36–41), вони не вміщаються в панель
+// над фото. Замість того щоб обрізати їх, робимо рядок прокручуваним
+// і показуємо стрілки з боків — але лише тоді, коли вони справді
+// потрібні (є що прокручувати).
+//
+// Обробники навішані делеговано на document, бо картки
+// перемальовуються при кожній зміні фільтрів — переприв'язувати
+// слухачі щоразу було б зайвим.
+// -------------------------
+
+(function initSizeScrollers() {
+
+    function updateArrows(wrap) {
+
+        const list = wrap.querySelector(".product-sizes");
+
+        if (!list) return;
+
+        const overflowing = list.scrollWidth - list.clientWidth > 1;
+
+        wrap.classList.toggle("has-overflow", overflowing);
+
+        if (!overflowing) return;
+
+        const left = wrap.querySelector(".sizes-arrow-left");
+        const right = wrap.querySelector(".sizes-arrow-right");
+
+        if (left) left.disabled = list.scrollLeft <= 1;
+        if (right) right.disabled = list.scrollLeft + list.clientWidth >= list.scrollWidth - 1;
+
+    }
+
+    // перевіряємо наявність переповнення в момент наведення на картку:
+    // до цього панель прихована і розміри мають нульову ширину
+    document.addEventListener("mouseover", event => {
+
+        const wrap = event.target.closest?.(".product-sizes-wrap");
+
+        if (wrap) updateArrows(wrap);
+
+    });
+
+    document.addEventListener("scroll", event => {
+
+        const list = event.target;
+
+        if (list?.classList?.contains?.("product-sizes")) {
+
+            updateArrows(list.parentElement);
+
+        }
+
+    }, true);
+
+    document.addEventListener("click", event => {
+
+        const arrow = event.target.closest?.(".sizes-arrow");
+
+        if (!arrow) return;
+
+        // картка реагує на кліки (вибір розміру/кольору, перехід на
+        // товар) — стрілка не має нічого з цього запускати
+        event.preventDefault();
+        event.stopPropagation();
+
+        const wrap = arrow.closest(".product-sizes-wrap");
+        const list = wrap?.querySelector(".product-sizes");
+
+        if (!list) return;
+
+        const step = Math.max(list.clientWidth * 0.7, 60);
+
+        list.scrollBy({
+            left: arrow.classList.contains("sizes-arrow-left") ? -step : step,
+            behavior: "smooth"
+        });
+
+    // ФАЗА ПЕРЕХОПЛЕННЯ (true) — принципово.
+    // Сама картка теж слухає кліки (відкриття товару, вибір
+    // кольору/розміру). Якби цей слухач працював на спливанні, він
+    // спрацював би ПІСЛЯ обробників картки, і stopPropagation() вже
+    // нічого б не зупинив — клік по стрілці відкривав би товар.
+    }, true);
+
+})();

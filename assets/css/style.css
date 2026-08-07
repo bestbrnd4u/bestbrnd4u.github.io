@@ -1766,9 +1766,74 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
     box-shadow:0 0 0 2px var(--secondary);
 }
 
+.product-sizes-wrap{
+    position:relative;
+    display:flex;
+    align-items:center;
+    min-width:0;
+}
+
 .product-sizes{
     display:flex;
     gap:5px;
+    min-width:0;
+}
+
+.product-sizes .mini-size{
+    flex-shrink:0;
+}
+
+/* стрілки прокрутки розмірів — лише десктоп і лише коли є що
+   прокручувати (клас has-overflow ставить ui.js) */
+.sizes-arrow{
+    display:none;
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    z-index:3;
+    width:20px;
+    height:20px;
+    align-items:center;
+    justify-content:center;
+    border-radius:50%;
+    background:#fff;
+    box-shadow:0 2px 8px rgba(0,0,0,.22);
+    color:var(--gray700);
+    font-size:14px;
+    line-height:1;
+    cursor:pointer;
+    transition:opacity .15s ease;
+}
+
+.sizes-arrow-left{ left:-8px; }
+.sizes-arrow-right{ right:-8px; }
+
+.sizes-arrow:disabled{
+    opacity:.3;
+    cursor:default;
+}
+
+@media(min-width:769px){
+
+    .product-sizes{
+        overflow-x:auto;
+        scroll-behavior:smooth;
+        scrollbar-width:none;
+        -ms-overflow-style:none;
+        /* рамка активного розміру малюється поза межами кнопки —
+           без цього запасу її обрізав би контейнер прокрутки */
+        padding:2px;
+        margin:-2px;
+    }
+
+    .product-sizes::-webkit-scrollbar{
+        display:none;
+    }
+
+    .product-sizes-wrap.has-overflow .sizes-arrow{
+        display:inline-flex;
+    }
+
 }
 
 .mini-size{
@@ -6066,6 +6131,14 @@ body.mobile-filters-open .scroll-top{
     #catalogGrid.products-grid:not(.list-view) .product-options{
         gap:8px;
         margin-bottom:10px;
+        /* Кільце активного кольору (box-shadow) виходить за межі
+           самого кружечка, а контейнер прокрутки обрізав його —
+           перший колір виглядав "зрізаним" зліва. Padding дає
+           кільцю місце, а від'ємний margin повертає рядок на
+           попереднє місце, щоб нічого не з'їхало. */
+        padding:0 3px;
+        margin-left:-3px;
+        margin-right:-3px;
         flex-wrap:nowrap;
         overflow-x:auto;
         overflow-y:hidden;
