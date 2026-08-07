@@ -438,25 +438,19 @@
     ]
   },
   {
-    "id": 9,
-    "slug": "bagvero-kids-backpack",
-    "brand": "Bagvero Kids",
-    "title": "Mini School Backpack",
-    "category": "Дитячі рюкзаки",
+    "compartments": "одне основне відділення, одна передня кишеня",
     "gender": "Дітям",
-    "isNew": false,
-    "price": 1499,
     "oldPrice": 2199,
-    "rating": 4.8,
-    "reviews": 29,
-    "badge": "SALE",
-    "material": "Текстиль",
     "color": "Жовтий",
-    "country": "Україна",
-    "description": "Легкий дитячий рюкзак для школи та прогулянок. М'які лямки, міцні блискавки та яскравий дизайн, який сподобається дитині.",
-    "images": [
-      "https://images.pexels.com/photos/7269547/pexels-photo-7269547.jpeg?auto=compress&cs=tinysrgb&w=800"
-    ],
+    "badge": "SALE",
+    "forcePublish": true,
+    "decor": "яскравий принт",
+    "material": "Текстиль",
+    "brand": "Bagvero Kids",
+    "price": 1499,
+    "composition": "100% поліестер",
+    "slug": "bagvero-kids-backpack",
+    "dimensions": "30x22x12 см",
     "variants": [
       {
         "color": "Жовтий",
@@ -473,13 +467,7 @@
         ]
       }
     ],
-    "sku": "BK-BP-9009",
-    "closure": "блискавка",
-    "decor": "яскравий принт",
-    "dimensions": "30x22x12 см",
     "strapInfo": "Регульовані м'які лямки, висота 30-40 см",
-    "compartments": "одне основне відділення, одна передня кишеня",
-    "composition": "100% поліестер",
     "sizes": [
       "S"
     ],
@@ -487,7 +475,21 @@
       "шкільний рюкзак",
       "ранець",
       "портфель дитячий"
-    ]
+    ],
+    "isNew": false,
+    "country": "Україна",
+    "title": "Mini School Backpack",
+    "images": [
+      "https://images.pexels.com/photos/7269547/pexels-photo-7269547.jpeg?auto=compress&cs=tinysrgb&w=800"
+    ],
+    "reviews": 29,
+    "id": 9,
+    "closure": "блискавка",
+    "instagramBlock": "general",
+    "description": "Легкий дитячий рюкзак для школи та прогулянок. М'які лямки, міцні блискавки та яскравий дизайн, який сподобається дитині.",
+    "sku": "BK-BP-9009",
+    "rating": 4.8,
+    "category": "Дитячі рюкзаки"
   },
   {
     "id": 10,
