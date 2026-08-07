@@ -438,25 +438,19 @@
     ]
   },
   {
-    "id": 9,
-    "slug": "bagvero-kids-backpack",
-    "brand": "Bagvero Kids",
-    "title": "Mini School Backpack",
-    "category": "Дитячі рюкзаки",
+    "compartments": "одне основне відділення, одна передня кишеня",
     "gender": "Дітям",
-    "isNew": false,
-    "price": 1499,
     "oldPrice": 2199,
-    "rating": 4.8,
-    "reviews": 29,
-    "badge": "SALE",
-    "material": "Текстиль",
     "color": "Жовтий",
-    "country": "Україна",
-    "description": "Легкий дитячий рюкзак для школи та прогулянок. М'які лямки, міцні блискавки та яскравий дизайн, який сподобається дитині.",
-    "images": [
-      "https://images.pexels.com/photos/7269547/pexels-photo-7269547.jpeg?auto=compress&cs=tinysrgb&w=800"
-    ],
+    "badge": "SALE",
+    "forcePublish": true,
+    "decor": "яскравий принт",
+    "material": "Текстиль",
+    "brand": "Bagvero Kids",
+    "price": 1499,
+    "composition": "100% поліестер",
+    "slug": "bagvero-kids-backpack",
+    "dimensions": "30x22x12 см",
     "variants": [
       {
         "color": "Жовтий",
@@ -473,13 +467,7 @@
         ]
       }
     ],
-    "sku": "BK-BP-9009",
-    "closure": "блискавка",
-    "decor": "яскравий принт",
-    "dimensions": "30x22x12 см",
     "strapInfo": "Регульовані м'які лямки, висота 30-40 см",
-    "compartments": "одне основне відділення, одна передня кишеня",
-    "composition": "100% поліестер",
     "sizes": [
       "S"
     ],
@@ -487,28 +475,37 @@
       "шкільний рюкзак",
       "ранець",
       "портфель дитячий"
-    ]
+    ],
+    "isNew": false,
+    "country": "Україна",
+    "title": "Mini School Backpack",
+    "images": [
+      "https://images.pexels.com/photos/7269547/pexels-photo-7269547.jpeg?auto=compress&cs=tinysrgb&w=800"
+    ],
+    "reviews": 29,
+    "id": 9,
+    "closure": "блискавка",
+    "instagramBlock": "general",
+    "description": "Легкий дитячий рюкзак для школи та прогулянок. М'які лямки, міцні блискавки та яскравий дизайн, який сподобається дитині.",
+    "sku": "BK-BP-9009",
+    "rating": 4.8,
+    "category": "Дитячі рюкзаки"
   },
   {
-    "id": 10,
-    "slug": "bagvero-kids-bag",
-    "brand": "Bagvero Kids",
-    "title": "Kids Print Bag",
-    "category": "Дитячі сумки",
+    "compartments": "одне основне відділення",
     "gender": "Дітям",
-    "isNew": true,
-    "price": 899,
     "oldPrice": 999,
-    "rating": 4.6,
-    "reviews": 18,
-    "badge": "NEW",
-    "material": "Текстиль",
     "color": "Мультиколір",
-    "country": "Україна",
-    "description": "Яскрава дитяча сумочка з веселим принтом — зручний розмір для книжок, іграшок та шкільних дрібничок.",
-    "images": [
-      "https://images.pexels.com/photos/6110950/pexels-photo-6110950.jpeg?auto=compress&cs=tinysrgb&w=800"
-    ],
+    "badge": "NEW",
+    "forcePublish": true,
+    "decor": "яскравий принт",
+    "instagramReels": "https://www.instagram.com/p/Dbp7H2yuqnr/",
+    "material": "Текстиль",
+    "brand": "Bagvero Kids",
+    "price": 899,
+    "composition": "100% поліестер",
+    "slug": "bagvero-kids-bag",
+    "dimensions": "18x14x6 см",
     "variants": [
       {
         "color": "Мультиколір",
@@ -525,20 +522,28 @@
         ]
       }
     ],
-    "sku": "BK-KB-1010",
-    "closure": "кнопка",
-    "decor": "яскравий принт",
-    "dimensions": "18x14x6 см",
     "strapInfo": "Один незнімний ремінь довжиною 90 см",
-    "compartments": "одне основне відділення",
-    "composition": "100% поліестер",
     "sizes": [
       "XS"
     ],
     "searchKeywords": [
       "дитяча сумочка",
       "сумка з малюнком"
-    ]
+    ],
+    "isNew": true,
+    "country": "Україна",
+    "title": "Kids Print Bag",
+    "images": [
+      "https://images.pexels.com/photos/6110950/pexels-photo-6110950.jpeg?auto=compress&cs=tinysrgb&w=800"
+    ],
+    "reviews": 18,
+    "id": 10,
+    "closure": "кнопка",
+    "instagramBlock": "reels",
+    "description": "Яскрава дитяча сумочка з веселим принтом — зручний розмір для книжок, іграшок та шкільних дрібничок.",
+    "sku": "BK-KB-1010",
+    "rating": 4.6,
+    "category": "Дитячі сумки"
   },
   {
     "id": 11,
