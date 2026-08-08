@@ -67,8 +67,9 @@
     "productIds": [
       2,
       4,
+      1,
       5,
-      7
+      15
     ],
     "genderButtons": [],
     "displayType": "banner_products",
