@@ -6133,38 +6133,38 @@ body.mobile-filters-open .scroll-top{
         aspect-ratio:1/1;
     }
 
-    #catalogGrid.products-grid:not(.list-view) .badge{
+    .product-card .badge{
         top:10px;
         left:10px;
         padding:5px 9px;
         font-size:10px;
     }
 
-    #catalogGrid.products-grid:not(.list-view) .product-image .favorite{
+    .product-card .product-image .favorite{
         top:10px;
         right:10px;
     }
 
-    #catalogGrid.products-grid:not(.list-view) .favorite{
+    .product-card .favorite{
         width:32px;
         height:32px;
     }
 
-    #catalogGrid.products-grid:not(.list-view) .favorite svg{
+    .product-card .favorite svg{
         width:15px;
         height:15px;
     }
 
-    #catalogGrid.products-grid:not(.list-view) .product-card .product-info{
+    .product-card .product-info{
         padding:12px;
     }
 
-    #catalogGrid.products-grid:not(.list-view) .product-category{
+    .product-card .product-category{
         font-size:10.5px;
         margin-bottom:4px;
     }
 
-    #catalogGrid.products-grid:not(.list-view) .product-title{
+    .product-card .product-title{
         font-size:13.5px;
         line-height:1.3;
         margin-bottom:8px;
@@ -6180,7 +6180,7 @@ body.mobile-filters-open .scroll-top{
        або розмірів багато (напр. 36–41), вони переносились на новий
        рядок і вилазили за межі картки. Тепер рядок не переноситься,
        а зайве прокручується пальцем усередині самої картки. */
-    #catalogGrid.products-grid:not(.list-view) .product-options{
+    .product-card .product-options{
         gap:8px;
         margin-bottom:10px;
         /* Кільце активного кольору (box-shadow) виходить за межі
@@ -6208,29 +6208,29 @@ body.mobile-filters-open .scroll-top{
            свайпу» краще лишити браузеру. */
     }
 
-    #catalogGrid.products-grid:not(.list-view) .product-options::-webkit-scrollbar{
+    .product-card .product-options::-webkit-scrollbar{
         display:none;
     }
 
     /* без цього flex стискав би кружечки та розміри замість того,
        щоб дати рядку прокручуватись */
-    #catalogGrid.products-grid:not(.list-view) .product-colors,
-    #catalogGrid.products-grid:not(.list-view) .product-sizes{
+    .product-card .product-colors,
+    .product-card .product-sizes{
         flex-wrap:nowrap;
         flex-shrink:0;
     }
 
-    #catalogGrid.products-grid:not(.list-view) .mini-color,
-    #catalogGrid.products-grid:not(.list-view) .mini-size{
+    .product-card .mini-color,
+    .product-card .mini-size{
         flex-shrink:0;
     }
 
-    #catalogGrid.products-grid:not(.list-view) .mini-color{
+    .product-card .mini-color{
         width:16px;
         height:16px;
     }
 
-    #catalogGrid.products-grid:not(.list-view) .mini-size{
+    .product-card .mini-size{
         min-width:22px;
         height:22px;
         padding:0 5px;
@@ -6238,26 +6238,26 @@ body.mobile-filters-open .scroll-top{
     }
 
 
-    #catalogGrid.products-grid:not(.list-view) .product-price{
+    .product-card .product-price{
         margin-bottom:10px;
         min-height:0;
         gap:2px;
     }
 
-    #catalogGrid.products-grid:not(.list-view) .product-card .price{
+    .product-card .price{
         font-size:15px;
     }
 
-    #catalogGrid.products-grid:not(.list-view) .product-card .old-price{
+    .product-card .old-price{
         font-size:11.5px;
     }
 
-    #catalogGrid.products-grid:not(.list-view) .discount{
+    .product-card .discount{
         padding:3px 8px;
         font-size:11px;
     }
 
-    #catalogGrid.products-grid:not(.list-view) .product-card .buy-btn{
+    .product-card .buy-btn{
         height:38px;
         padding:0 12px;
         font-size:12.5px;
@@ -9116,6 +9116,12 @@ body.mobile-filters-open .scroll-top{
     display:flex;
     flex-direction:column;
     gap:10px;
+    /* грід-колонка (.collection-products-row: grid-template-columns:
+       repeat(2,minmax(0,1fr)) на мобільному) сама по собі мінімальна
+       ширина ще НЕ означає, що дитина всередині теж стискається —
+       у грід-елемента типовий min-width:auto, тож довгий нерозривний
+       рядок ціни міг вилізти за межі своєї колонки */
+    min-width:0;
 }
 
 .collection-product[hidden]{
@@ -9162,6 +9168,7 @@ body.mobile-filters-open .scroll-top{
     display:flex;
     flex-direction:column;
     gap:3px;
+    min-width:0;
 }
 
 .collection-product-brand{
@@ -9187,11 +9194,21 @@ body.mobile-filters-open .scroll-top{
 .collection-product-price{
     display:flex;
     align-items:baseline;
-    gap:8px;
+    /* одним рядком, без переносу — так само, як у ціни картки
+       товару в каталозі: ціна + закреслена стара мають вміщатись
+       у вузьку колонку добірки, не переносячи "грн" на новий рядок */
+    flex-wrap:nowrap;
+    gap:6px;
     margin-top:4px;
     font-size:14px;
     font-weight:700;
     color:var(--gray900);
+    min-width:0;
+}
+
+.collection-product-price .price,
+.collection-product-price .old-price{
+    white-space:nowrap;
 }
 
 .collection-product-price .old-price{
