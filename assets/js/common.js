@@ -125,6 +125,52 @@ document.addEventListener("click", event => {
 
     heading.scrollIntoView({ behavior: "smooth", block: "start" });
 
+    // ДОГАНЯЄМО ЦІЛЬ ПІСЛЯ АНІМАЦІЇ.
+    //
+    // На головній вище за «Популярні товари» лежать секції, які
+    // наповнюються асинхронно з JSON (акції, колекції, добірки
+    // брендів — частина з них узагалі стартує з hidden). Вони
+    // з'являються ВЖЕ ПІСЛЯ початку прокрутки і зсувають ціль униз,
+    // тож будь-яка позиція, порахована наперед, стає застарілою —
+    // саме тому сторінка зупинялась на стрічці брендів замість
+    // потрібного заголовка.
+    //
+    // Тому кілька разів перевіряємо фактичне положення і, якщо воно
+    // з'їхало, доводимо до потрібного. Перевірки припиняються, щойно
+    // користувач сам почав гортати — щоб не смикати сторінку під ним.
+    let userInterrupted = false;
+
+    const stop = () => { userInterrupted = true; };
+
+    window.addEventListener("wheel", stop, { passive: true, once: true });
+    window.addEventListener("touchstart", stop, { passive: true, once: true });
+
+    [350, 700, 1100, 1600].forEach(delay => {
+
+        setTimeout(() => {
+
+            if (userInterrupted) return;
+
+            const diff = heading.getBoundingClientRect().top - offset;
+
+            // 2px — щоб не смикати через похибку округлення
+            if (Math.abs(diff) > 2) {
+
+                window.scrollBy({ top: diff, behavior: "smooth" });
+
+            }
+
+        }, delay);
+
+    });
+
+    setTimeout(() => {
+
+        window.removeEventListener("wheel", stop);
+        window.removeEventListener("touchstart", stop);
+
+    }, 1800);
+
 });
 
 document.addEventListener("dragstart", event => {

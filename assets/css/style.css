@@ -1440,13 +1440,19 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
 
 .badge-stack{
     position:absolute;
-    top:18px;
-    left:18px;
+    /* щільніше в лівий верхній кут, щоб стовпчик бейджів
+       (NEW/TOP → -30% → «Під замовлення») менше закривав фото */
+    top:10px;
+    left:10px;
     z-index:2;
     display:flex;
     flex-direction:column;
     align-items:flex-start;
-    gap:8px;
+    gap:6px;
+}
+
+.badge-discount{
+    background:var(--danger);
 }
 
 .badge-stack .badge{
@@ -1632,6 +1638,11 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
     display:flex;
     flex-direction:column;
     flex:1;
+    /* min-width:0 обов'язковий: у .product-card стоїть
+       overflow:hidden, і без цього рядок ціни з white-space:nowrap
+       не міг стиснутись — «грн» просто зрізалось краєм картки
+       (виглядало так, наче валюти в каталозі немає взагалі) */
+    min-width:0;
     padding:18px 20px 20px;
 }
 
@@ -1890,16 +1901,19 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
 }
 
 .product-price{
+    /* Ціна і закреслена стара — ОДНИМ рядком. Раніше стара ціна з
+       пігулкою відсотка займали другий рядок і на вузьких картках
+       каталогу «грн» вилазило за край. Відсоток тепер живе в
+       бейджі на фото, тож рядок став коротшим і вміщається. */
     display:flex;
-    flex-direction:column;
-    gap:4px;
+    flex-direction:row;
+    align-items:baseline;
+    flex-wrap:nowrap;
+    gap:8px;
+    min-width:0;
     margin-bottom:14px;
-    /* резервуємо місце під другий рядок (стара ціна + знижка),
-       навіть коли товар без знижки — щоб усі картки в ряду/
-       каруселі завжди мали однакову висоту незалежно від
-       довжини ціни (див. фікс "маленька ціна ламає картку") */
-    min-height:42px;
-    justify-content:center;
+    /* однакова висота карток у ряду — тепер це один рядок */
+    min-height:28px;
 }
 
 .price-meta{
@@ -1915,7 +1929,7 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
 }
 
 .product-card .price{
-    font-size:24px;
+    font-size:20px;
     font-weight:800;
     color:var(--gray900);
     white-space:nowrap;
@@ -1924,7 +1938,8 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
 .product-card .old-price{
     text-decoration:line-through;
     color:var(--gray300);
-    font-size:15px;
+    font-size:13px;
+    white-space:nowrap;
 }
 
 .discount{
@@ -4973,6 +4988,10 @@ body.mobile-filters-open .scroll-top{
 .cart-item-price{
     display:flex;
     align-items:baseline;
+    /* nowrap — щоб у вузькому віджеті кошика ціна і закреслена
+       стара лишались одним рядком, а не переносились */
+    flex-wrap:nowrap;
+    white-space:nowrap;
     gap:8px;
     color:var(--gray500);
     font-size:14px;
@@ -6217,6 +6236,7 @@ body.mobile-filters-open .scroll-top{
         padding:0 5px;
         font-size:10px;
     }
+
 
     #catalogGrid.products-grid:not(.list-view) .product-price{
         margin-bottom:10px;

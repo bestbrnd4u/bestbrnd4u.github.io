@@ -383,6 +383,14 @@ function createProductCard(product) {
         </button>
     `).join("");
 
+    // Бейдж знижки у стовпчику бейджів (під NEW/TOP). Відсоток
+    // показуємо ЛИШЕ тут: унизу картки поруч із закресленою ціною
+    // його більше немає — інакше рядок ціни не вміщався в один
+    // рядок на вузьких картках каталогу.
+    const discountBadge = discount > 0
+        ? `<div class="badge badge-discount">-${discount}%</div>`
+        : "";
+
     const preOrderBadge = product.preOrder
         ? `<div class="badge badge-preorder"><span class="badge-preorder-icon">📦</span><span class="badge-preorder-text">Під замовлення</span></div>`
         : "";
@@ -392,6 +400,7 @@ function createProductCard(product) {
             <div class="product-image">
                 <div class="badge-stack">
                     ${badge}
+                    ${discountBadge}
                     ${preOrderBadge}
                 </div>
                 <button
@@ -438,7 +447,6 @@ function createProductCard(product) {
                      замовчуванням. На мобільному й у режимі "список"
                      не показується — там працює звичайний блок нижче. -->
                 <div class="product-hover-panel">
-                    ${discount > 0 ? `<span class="discount">-${discount}%</span>` : ""}
                     <div class="product-options">
                         <div class="product-colors">
                             ${colorButtons}
@@ -470,17 +478,8 @@ function createProductCard(product) {
                 </div>
                 <div class="product-meta-row">
                     <div class="product-price">
-                        <span class="price">
-                            ${formatPrice(product.price)}
-                        </span>
-                        <div class="price-meta">
-                            ${oldPrice}
-                            ${
-                                discount > 0
-                                    ? `<span class="discount">-${discount}%</span>`
-                                    : ""
-                            }
-                        </div>
+                        <span class="price">${formatPrice(product.price)}</span>
+                        ${oldPrice}
                     </div>
                     <div class="product-options">
                         <div class="product-colors">
