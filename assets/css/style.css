@@ -3897,12 +3897,38 @@ body.mobile-filters-open .scroll-top{
         align-items:flex-start;
         justify-content:flex-start;
         gap:16px;
+        /* дає флекс-елементу право стиснутись до ширини своєї
+           грід-колонки: без цього рядок кольору/розміру міг
+           розпирати "meta" ширше за виділені їй 1fr і наїжджати
+           на сусідню колонку з описом (див. options нижче) */
+        min-width:0;
     }
 
     .products-grid.list-view .product-meta-row .product-options{
         order:0;
         flex-direction:row;
         align-items:center;
+        /* дає флекс-рядку право стиснутись до ширини колонки —
+           інакше він розпирає "meta" ширше за виділений 1fr */
+        min-width:0;
+    }
+
+    /* Колір завжди лишається повністю видимим і не стискається —
+       прокручується тільки блок розмірів (той самий .product-sizes-
+       wrap/.product-sizes, що вже вміє це на десктопі — див. правило
+       нижче по файлу). Той самий підхід, що й у панелі наведення на
+       картці в сітці.
+       Раніше жодних обмежень тут не було: рядок кольору+розміру
+       розпирав виділену йому колонку "meta" на всю свою природну
+       ширину (у товару з 20 розмірами — дуже широко) й наїжджав на
+       сусідню колонку з описом, ламаючи верстку, як на скріні. */
+    .products-grid.list-view .product-colors{
+        flex:0 0 auto;
+    }
+
+    .products-grid.list-view .product-sizes-wrap{
+        flex:1 1 auto;
+        min-width:0;
     }
 
     .products-grid.list-view .product-desc{

@@ -25,11 +25,116 @@
       "color": "Чорний",
       "hex": "#161616",
       "images": [
-        "https://commons.wikimedia.org/wiki/Special:Redirect/file/Timberland%206%20inch%20boots.jpg"
+        "https://commons.wikimedia.org/wiki/Special:Redirect/file/Timberland%206%20inch%20boots.jpg",
+        "/assets/images/products/uploads/RayBanAviator.png"
       ],
       "sizes": [
         "35",
         "36"
+      ]
+    },
+    {
+      "color": "Червоний",
+      "hex": "#c0392b",
+      "images": [
+        "https://commons.wikimedia.org/wiki/Special:Redirect/file/Timberland%206%20inch%20boots.jpg",
+        "/assets/images/products/uploads/RayBanAviator.png"
+      ]
+    },
+    {
+      "color": "Синій",
+      "hex": "#1d4ed8",
+      "images": [
+        "https://commons.wikimedia.org/wiki/Special:Redirect/file/Timberland%206%20inch%20boots.jpg",
+        "/assets/images/products/uploads/RayBanAviator.png"
+      ]
+    },
+    {
+      "color": "Зелений",
+      "hex": "#15803d",
+      "images": [
+        "https://commons.wikimedia.org/wiki/Special:Redirect/file/Timberland%206%20inch%20boots.jpg",
+        "/assets/images/products/uploads/RayBanAviator.png"
+      ]
+    },
+    {
+      "color": "Жовтий",
+      "hex": "#eab308",
+      "images": [
+        "https://commons.wikimedia.org/wiki/Special:Redirect/file/Timberland%206%20inch%20boots.jpg",
+        "/assets/images/products/uploads/RayBanAviator.png"
+      ]
+    },
+    {
+      "color": "Помаранчевий",
+      "hex": "#ea580c",
+      "images": [
+        "https://commons.wikimedia.org/wiki/Special:Redirect/file/Timberland%206%20inch%20boots.jpg",
+        "/assets/images/products/uploads/RayBanAviator.png"
+      ]
+    },
+    {
+      "color": "Рожевий",
+      "hex": "#ec4899",
+      "images": [
+        "https://commons.wikimedia.org/wiki/Special:Redirect/file/Timberland%206%20inch%20boots.jpg",
+        "/assets/images/products/uploads/RayBanAviator.png"
+      ]
+    },
+    {
+      "color": "Фіолетовий",
+      "hex": "#7c3aed",
+      "images": [
+        "https://commons.wikimedia.org/wiki/Special:Redirect/file/Timberland%206%20inch%20boots.jpg",
+        "/assets/images/products/uploads/RayBanAviator.png"
+      ]
+    },
+    {
+      "color": "Бежевий",
+      "hex": "#d9c7a1",
+      "images": [
+        "https://commons.wikimedia.org/wiki/Special:Redirect/file/Timberland%206%20inch%20boots.jpg",
+        "/assets/images/products/uploads/RayBanAviator.png"
+      ]
+    },
+    {
+      "color": "Сірий",
+      "hex": "#6b7280",
+      "images": [
+        "https://commons.wikimedia.org/wiki/Special:Redirect/file/Timberland%206%20inch%20boots.jpg",
+        "/assets/images/products/uploads/RayBanAviator.png"
+      ]
+    },
+    {
+      "color": "Коричневий",
+      "hex": "#78350f",
+      "images": [
+        "https://commons.wikimedia.org/wiki/Special:Redirect/file/Timberland%206%20inch%20boots.jpg",
+        "/assets/images/products/uploads/RayBanAviator.png"
+      ]
+    },
+    {
+      "color": "Бордовий",
+      "hex": "#7f1d1d",
+      "images": [
+        "https://commons.wikimedia.org/wiki/Special:Redirect/file/Timberland%206%20inch%20boots.jpg",
+        "/assets/images/products/uploads/RayBanAviator.png"
+      ]
+    },
+    {
+      "color": "Хакі",
+      "hex": "#6b7047",
+      "images": [
+        "https://commons.wikimedia.org/wiki/Special:Redirect/file/Timberland%206%20inch%20boots.jpg",
+        "/assets/images/products/uploads/RayBanAviator.png"
+      ]
+    },
+    {
+      "color": "Блакитний",
+      "hex": "#38bdf8",
+      "images": [
+        "https://commons.wikimedia.org/wiki/Special:Redirect/file/Timberland%206%20inch%20boots.jpg",
+        "/assets/images/products/uploads/RayBanAviator.png"
       ]
     }
   ],
