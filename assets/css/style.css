@@ -1728,6 +1728,15 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
     font-weight:600;
     line-height:1.3;
     margin-bottom:10px;
+    /* Резервуємо висоту РІВНО під 2 рядки (2 × line-height), навіть
+       якщо назва товару вміщається в один. Без цього назва в один
+       рядок займає вдвічі менше місця, ніж у два — і все, що нижче
+       (ціна, кнопка "Купити"), зʼїжджає вгору. У сусідніх картках
+       одного ряду з різною довжиною назви ціна опинялась на різній
+       висоті — саме це показано на скріні. em — відносно ВЛАСНОГО
+       font-size цього правила, тож стабільно і на мобільній версії
+       з іншим розміром шрифту (там окреме дзеркальне правило нижче). */
+    min-height:2.6em;
     display:-webkit-box;
     -webkit-box-orient:vertical;
     -webkit-line-clamp:2;
@@ -6168,7 +6177,9 @@ body.mobile-filters-open .scroll-top{
         font-size:13.5px;
         line-height:1.3;
         margin-bottom:8px;
-        min-height:0;
+        /* той самий резерв під 2 рядки, що і в десктопному правилі
+           вище, — тут окремо, бо в мобільній версії інший font-size */
+        min-height:2.6em;
         display:-webkit-box;
         -webkit-box-orient:vertical;
         -webkit-line-clamp:2;
