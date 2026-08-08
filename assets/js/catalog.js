@@ -286,8 +286,19 @@ const DEFAULT_CATEGORY_LABEL = "Категорія";
 const DEFAULT_PRICE_LABEL = "Ціна";
 const DEFAULT_SIZE_LABEL = "Розмір";
 
-// ціна без копійок і з розділювачем тисяч — "31 990"
-function formatPrice(value) {
+// Ціна без копійок і з розділювачем тисяч, БЕЗ "грн" — тільки для
+// підписів повзунка ціни ("850 — 31 990 грн").
+//
+// НАЗВА НАВМИСНО ІНША, НЕ formatPrice.
+// ui.js і catalog.js — звичайні <script>, не модулі, тож
+// оголошення верхнього рівня в обох потрапляють в один спільний
+// window. catalog.js підключається ПІСЛЯ ui.js (див. catalog.html),
+// і якби тут теж була function formatPrice(...), вона мовчки
+// ПЕРЕЗАПИСАЛА б версію з ui.js (та сама форматує ціну картки
+// товару, з "грн" в кінці) — картки каталогу лишились би зовсім
+// без валюти. Саме так і сталось: ця колізія — справжня причина
+// "нема грн", а не CSS.
+function formatPriceShort(value) {
 
     return Math.round(value).toLocaleString("uk-UA").replace(/\u00A0/g, " ");
 
@@ -308,7 +319,7 @@ function priceRangeLabel() {
     const from = priceRange.min !== null ? priceRange.min : priceBounds.min;
     const to = priceRange.max !== null ? priceRange.max : priceBounds.max;
 
-    return `${formatPrice(from)} – ${formatPrice(to)} грн`;
+    return `${formatPriceShort(from)} – ${formatPriceShort(to)} грн`;
 
 }
 
@@ -1452,11 +1463,11 @@ function paintPriceUI() {
     // поле, яке зараз редагують, не чіпаємо — інакше форматування
     // з'їдало б цифри прямо під час набору
     if (document.activeElement !== priceUI.numberMin) {
-        priceUI.numberMin.value = formatPrice(min);
+        priceUI.numberMin.value = formatPriceShort(min);
     }
 
     if (document.activeElement !== priceUI.numberMax) {
-        priceUI.numberMax.value = formatPrice(max);
+        priceUI.numberMax.value = formatPriceShort(max);
     }
 
     const span = priceBounds.max - priceBounds.min || 1;
