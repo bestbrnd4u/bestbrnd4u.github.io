@@ -92,7 +92,9 @@ function updatePromoSeoMetadata(promo) {
     setMetaByProperty("og:type", "website");
     setMetaByProperty("og:title", title);
     setMetaByProperty("og:description", description);
-    setMetaByProperty("og:image", promo.image);
+    // теж від широкого банера цієї сторінки, а не від тизера з
+    // головної — саме таке фото соцмережі покажуть у прев'ю посилання
+    setMetaByProperty("og:image", promo.promoPageImage || promo.image);
     setMetaByProperty("og:url", pageUrl);
 
 }
@@ -114,8 +116,19 @@ function renderPromoHero(promo) {
 
     const overlay = "linear-gradient(rgba(17,24,39,.55), rgba(17,24,39,.55))";
 
-    banner.style.setProperty("--banner-img-desktop", `${overlay}, url('${promo.image}')`);
-    banner.style.setProperty("--banner-img-mobile", `${overlay}, url('${promo.imageMobile || promo.image}')`);
+    // Банер цієї сторінки — окреме поле "Фото на сторінці акції", а
+    // не те саме фото, що й тизер на головній. Причина: тизер і цей
+    // банер мають зовсім різні пропорції (напр. компактний банер
+    // бренду на головній — вертикальний 4:5, а тут — широка смуга
+    // 3.2:1), тож одне фото не могло вкластися в обидва без поганої
+    // обрізки в одному з місць. Якщо нове поле не заповнене — старі
+    // акції показують те саме фото, що й раніше (image/imageMobile),
+    // тож нічого не ламається для вже опублікованих акцій.
+    const desktopImage = promo.promoPageImage || promo.image;
+    const mobileImage = promo.promoPageImageMobile || promo.promoPageImage || promo.imageMobile || promo.image;
+
+    banner.style.setProperty("--banner-img-desktop", `${overlay}, url('${desktopImage}')`);
+    banner.style.setProperty("--banner-img-mobile", `${overlay}, url('${mobileImage}')`);
 
     if (promo.badge) {
         badgeEl.textContent = promo.badge;

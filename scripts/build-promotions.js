@@ -71,6 +71,12 @@ function main() {
             badge: data.badge || "",
             image: data.image,
             imageMobile: data.imageMobile || "",
+            // Окреме фото для банера сторінки самої акції (promo.html) —
+            // якщо не заповнене, сторінка сама відкотиться на image/
+            // imageMobile (див. assets/js/promo.js), тож старі акції
+            // без цього поля не ламаються.
+            promoPageImage: data.promoPageImage || "",
+            promoPageImageMobile: data.promoPageImageMobile || "",
             buttonText: data.buttonText || "Дивитись усі товари",
             link: data.link,
             brand: data.brand || "",

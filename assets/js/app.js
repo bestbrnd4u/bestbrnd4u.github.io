@@ -544,6 +544,39 @@ function setupPromoHeroSlider({ track, total, prevBtn, nextBtn, counterEl, contr
 // як банер бренду на md-fashion.ua
 // -------------------------
 
+// Товари прев'ю акції на головній: спершу ті, що адмін вручну обрав
+// і розставив у полі "Товари цієї акції" — РІВНО в тому порядку,
+// в якому вони там лежать (перетягування в адмінці має сенс лише
+// якщо порядок реально доїжджає до сайту). Далі, якщо вказано
+// бренд акції, додаються решта товарів цього бренду — тих, кого
+// адмін не обирав вручну, — у порядку каталогу.
+//
+// Раніше тут стояв .filter(...).slice(0,4): фільтр не зберігав
+// порядок productIds (сортував як завгодно, у порядку
+// data/products.json), а slice(0,4) обрізав усе, що не влізло —
+// разом із товарами, які адмін обрав явно. Саме тому "Urban
+// Sneakers" (5-й у списку) зникав, а решта показувались не в тому
+// порядку, що в адмінці.
+function pickPromotionProducts(promo, allProducts) {
+
+    const byId = new Map(allProducts.map(product => [product.id, product]));
+
+    const manual = (promo.productIds || [])
+        .map(id => byId.get(id))
+        .filter(Boolean);
+
+    const manualIds = new Set(manual.map(product => product.id));
+
+    const byBrand = promo.brand
+        ? allProducts.filter(product =>
+            product.brand === promo.brand && !manualIds.has(product.id)
+          )
+        : [];
+
+    return [...manual, ...byBrand];
+
+}
+
 async function renderFeaturedPromotions(featuredPromotions) {
 
     const section = document.getElementById("brandCampaignsSection");
@@ -566,14 +599,7 @@ async function renderFeaturedPromotions(featuredPromotions) {
 
     section.innerHTML = featuredPromotions.map(promo => {
 
-        const productIds = new Set(promo.productIds || []);
-
-        const curated = allProducts
-            .filter(product =>
-                productIds.has(product.id) ||
-                (promo.brand && product.brand === promo.brand)
-            )
-            .slice(0, 4);
+        const curated = pickPromotionProducts(promo, allProducts);
 
         return `
             <div class="brand-campaign">
@@ -607,8 +633,26 @@ async function renderFeaturedPromotions(featuredPromotions) {
 
                     ${curated.length ? `
 
-                    <div class="brand-campaign-products">
-                        ${curated.map(product => createProductCard(product)).join("")}
+                    <!-- Той самий переюзаний блок каруселі, що й "Популярні
+                         товари" на головній (.carousel + .carousel-track):
+                         initCarousel() сам ховає стрілки, якщо всі товари
+                         й так влазять без прокрутки (рівно 4 чи менше), і
+                         вмикає гортання, тільки коли товарів справді
+                         більше — окремої каруселі писати не знадобилось. -->
+                    <div class="carousel brand-campaign-carousel">
+
+                        <button type="button" class="carousel-arrow carousel-prev" aria-label="Попередні товари">
+                            <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+                        </button>
+
+                        <div class="brand-campaign-products products-grid carousel-track">
+                            ${curated.map(product => createProductCard(product)).join("")}
+                        </div>
+
+                        <button type="button" class="carousel-arrow carousel-next" aria-label="Наступні товари">
+                            <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                        </button>
+
                     </div>
 
                     ` : ""}
@@ -619,6 +663,12 @@ async function renderFeaturedPromotions(featuredPromotions) {
         `;
 
     }).join("");
+
+    section.querySelectorAll(".brand-campaign-carousel").forEach(carouselEl => {
+
+        if (typeof initCarousel === "function") initCarousel(carouselEl);
+
+    });
 
     if (typeof initProductCarousels === "function") initProductCarousels(section);
     if (typeof updateFavoriteButtons === "function") updateFavoriteButtons();
