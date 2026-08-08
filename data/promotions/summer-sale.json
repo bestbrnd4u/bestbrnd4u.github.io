@@ -4,8 +4,9 @@
   "products": [
     2,
     4,
-    5,
-    7
+    15,
+    1,
+    5
   ],
   "discountPercent": 30,
   "active": true,
