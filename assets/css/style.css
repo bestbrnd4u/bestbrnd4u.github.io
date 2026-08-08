@@ -1615,25 +1615,15 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
        чим. Тепер колір ділить рядок з розміром чесно: до 45% ширини
        собі, а якщо й туди не влазить — прокручується так само, як
        розмір. */
-    .product-hover-panel .product-colors{
+    /* Ширину обмежує САМЕ обгортка, а не список кольорів усередині:
+       стрілки позиціонуються absolute відносно .product-colors-wrap,
+       тож саме її межі мають збігатися з видимою областю прокрутки —
+       інакше стрілки стояли б не по краях того, що видно.
+       Сам overflow-x лишається на .product-colors (спільне правило
+       в @media(min-width:769px) нижче по файлу). */
+    .product-hover-panel .product-colors-wrap{
         flex:0 1 auto;
         max-width:45%;
-        overflow-x:auto;
-        flex-wrap:nowrap;
-        scrollbar-width:none;
-        -ms-overflow-style:none;
-        /* кільце активного кольору виходить за межі кружечка —
-           запас, щоб контейнер прокрутки не обрізав його з країв */
-        padding:2px;
-        margin:-2px;
-    }
-
-    .product-hover-panel .product-colors::-webkit-scrollbar{
-        display:none;
-    }
-
-    .product-hover-panel .mini-color{
-        flex-shrink:0;
     }
 
     .product-hover-panel .discount{
@@ -1834,7 +1824,8 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
     box-shadow:0 0 0 2px var(--secondary);
 }
 
-.product-sizes-wrap{
+.product-sizes-wrap,
+.product-colors-wrap{
     position:relative;
     display:flex;
     align-items:center;
@@ -1853,7 +1844,8 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
 
 /* стрілки прокрутки розмірів — лише десктоп і лише коли є що
    прокручувати (клас has-overflow ставить ui.js) */
-.sizes-arrow{
+.sizes-arrow,
+.colors-arrow{
     display:none;
     position:absolute;
     top:50%;
@@ -1873,33 +1865,47 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
     transition:opacity .15s ease;
 }
 
-.sizes-arrow-left{ left:-8px; }
-.sizes-arrow-right{ right:-8px; }
+.sizes-arrow-left,
+.colors-arrow-left{ left:-8px; }
 
-.sizes-arrow:disabled{
+.sizes-arrow-right,
+.colors-arrow-right{ right:-8px; }
+
+.sizes-arrow:disabled,
+.colors-arrow:disabled{
     opacity:.3;
     cursor:default;
 }
 
 @media(min-width:769px){
 
-    .product-sizes{
+    .product-sizes,
+    .product-colors{
         overflow-x:auto;
         scroll-behavior:smooth;
         scrollbar-width:none;
         -ms-overflow-style:none;
-        /* рамка активного розміру малюється поза межами кнопки —
-           без цього запасу її обрізав би контейнер прокрутки */
+        /* рамка активного розміру / кільце активного кольору
+           малюються ПОЗА межами самої кнопки — без цього запасу
+           контейнер прокрутки обрізав би їх з країв */
         padding:2px;
         margin:-2px;
     }
 
-    .product-sizes::-webkit-scrollbar{
+    .product-sizes::-webkit-scrollbar,
+    .product-colors::-webkit-scrollbar{
         display:none;
     }
 
-    .product-sizes-wrap.has-overflow .sizes-arrow{
+    .product-sizes-wrap.has-overflow .sizes-arrow,
+    .product-colors-wrap.has-overflow .colors-arrow{
         display:inline-flex;
+    }
+
+    /* кружечки кольору не стискаються — інакше flex ужимав би їх
+       замість того, щоб дати рядку прокручуватись */
+    .product-colors .mini-color{
+        flex-shrink:0;
     }
 
 }
@@ -3951,23 +3957,11 @@ body.mobile-filters-open .scroll-top{
        не влазить, замість того щоб просто необмежено розтягуватись
        (як було раніше і не давало розміру взагалі жодного місця
        при 15 кольорах). */
-    .products-grid.list-view .product-colors{
+    /* обгортка займає весь свій рядок — стрілки стають рівно по
+       краях видимої області (див. пояснення в панелі наведення вище) */
+    .products-grid.list-view .product-colors-wrap{
         width:100%;
-        max-width:100%;
-        flex-wrap:nowrap;
-        overflow-x:auto;
-        scrollbar-width:none;
-        -ms-overflow-style:none;
-        padding:2px;
-        margin:-2px;
-    }
-
-    .products-grid.list-view .product-colors::-webkit-scrollbar{
-        display:none;
-    }
-
-    .products-grid.list-view .mini-color{
-        flex-shrink:0;
+        min-width:0;
     }
 
     .products-grid.list-view .product-sizes-wrap{
@@ -6290,9 +6284,14 @@ body.mobile-filters-open .scroll-top{
     }
 
     /* без цього flex стискав би кружечки та розміри замість того,
-       щоб дати рядку прокручуватись */
+       щоб дати рядку прокручуватись.
+       Обгортки (-wrap) теж тут: між .product-options і самим списком
+       тепер є проміжний шар, і якби він міг стискатись, рядок
+       кольору ужимався б замість того, щоб прокручуватись. */
     .product-card .product-colors,
-    .product-card .product-sizes{
+    .product-card .product-sizes,
+    .product-card .product-colors-wrap,
+    .product-card .product-sizes-wrap{
         flex-wrap:nowrap;
         flex-shrink:0;
     }

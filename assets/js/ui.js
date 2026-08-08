@@ -448,8 +448,12 @@ function createProductCard(product) {
                      не показується — там працює звичайний блок нижче. -->
                 <div class="product-hover-panel">
                     <div class="product-options">
-                        <div class="product-colors">
-                            ${colorButtons}
+                        <div class="product-colors-wrap">
+                            <button type="button" class="colors-arrow colors-arrow-left" aria-label="Попередні кольори" tabindex="-1">‹</button>
+                            <div class="product-colors">
+                                ${colorButtons}
+                            </div>
+                            <button type="button" class="colors-arrow colors-arrow-right" aria-label="Наступні кольори" tabindex="-1">›</button>
                         </div>
                         <div class="product-sizes-wrap">
                             <button type="button" class="sizes-arrow sizes-arrow-left" aria-label="Попередні розміри" tabindex="-1">‹</button>
@@ -482,8 +486,12 @@ function createProductCard(product) {
                         ${oldPrice}
                     </div>
                     <div class="product-options">
-                        <div class="product-colors">
-                            ${colorButtons}
+                        <div class="product-colors-wrap">
+                            <button type="button" class="colors-arrow colors-arrow-left" aria-label="Попередні кольори" tabindex="-1">‹</button>
+                            <div class="product-colors">
+                                ${colorButtons}
+                            </div>
+                            <button type="button" class="colors-arrow colors-arrow-right" aria-label="Наступні кольори" tabindex="-1">›</button>
                         </div>
                         <div class="product-sizes-wrap">
                             <button type="button" class="sizes-arrow sizes-arrow-left" aria-label="Попередні розміри" tabindex="-1">‹</button>
@@ -509,23 +517,40 @@ function createProductCard(product) {
 
 
 // -------------------------
-// Прокрутка розмірів у картці товару
+// Прокрутка розмірів і кольорів у картці товару
 //
-// Коли розмірів багато (напр. 36–41), вони не вміщаються в панель
-// над фото. Замість того щоб обрізати їх, робимо рядок прокручуваним
-// і показуємо стрілки з боків — але лише тоді, коли вони справді
-// потрібні (є що прокручувати).
+// Коли варіантів багато (розмірів — 36–46+XS–4XL, кольорів — 10+),
+// вони не вміщаються в панель над фото чи в рядок метаданих. Замість
+// того щоб обрізати їх, робимо рядок прокручуваним і показуємо
+// стрілки з боків — але лише тоді, коли вони справді потрібні (є що
+// прокручувати). Розмір і колір — однаковий механізм, різні класи,
+// тому один набір слухачів обробляє обидва варіанти одразу.
 //
 // Обробники навішані делеговано на document, бо картки
 // перемальовуються при кожній зміні фільтрів — переприв'язувати
 // слухачі щоразу було б зайвим.
 // -------------------------
 
-(function initSizeScrollers() {
+(function initHorizontalScrollers() {
+
+    const SCROLLERS = [
+        { wrapClass: "product-sizes-wrap", listClass: "product-sizes", arrowClass: "sizes-arrow" },
+        { wrapClass: "product-colors-wrap", listClass: "product-colors", arrowClass: "colors-arrow" }
+    ];
+
+    function configFor(wrap) {
+
+        return SCROLLERS.find(s => wrap.classList.contains(s.wrapClass));
+
+    }
 
     function updateArrows(wrap) {
 
-        const list = wrap.querySelector(".product-sizes");
+        const config = wrap && configFor(wrap);
+
+        if (!config) return;
+
+        const list = wrap.querySelector(`.${config.listClass}`);
 
         if (!list) return;
 
@@ -535,8 +560,8 @@ function createProductCard(product) {
 
         if (!overflowing) return;
 
-        const left = wrap.querySelector(".sizes-arrow-left");
-        const right = wrap.querySelector(".sizes-arrow-right");
+        const left = wrap.querySelector(`.${config.arrowClass}-left`);
+        const right = wrap.querySelector(`.${config.arrowClass}-right`);
 
         if (left) left.disabled = list.scrollLeft <= 1;
         if (right) right.disabled = list.scrollLeft + list.clientWidth >= list.scrollWidth - 1;
@@ -544,17 +569,18 @@ function createProductCard(product) {
     }
 
     // Перевіряємо переповнення в момент наведення на КАРТКУ, а не на
-    // сам блок розмірів. До появи панелі розміри мають нульову ширину,
-    // тож порахувати заздалегідь не можна. А якщо чекати, поки курсор
-    // потрапить рівно на розміри, стрілки не з'являлись би саме тоді,
-    // коли вони потрібні — щоб зрозуміти, що список можна прокрутити.
+    // сам блок розмірів/кольорів. До появи панелі вони мають нульову
+    // ширину, тож порахувати заздалегідь не можна. А якщо чекати,
+    // поки курсор потрапить рівно на блок, стрілки не з'являлись би
+    // саме тоді, коли вони потрібні — щоб зрозуміти, що список можна
+    // прокрутити.
     document.addEventListener("mouseover", event => {
 
         const scope = event.target.closest?.(".product-card, .product-wrapper, #productPage");
 
         if (!scope) return;
 
-        scope.querySelectorAll(".product-sizes-wrap").forEach(updateArrows);
+        scope.querySelectorAll(".product-sizes-wrap, .product-colors-wrap").forEach(updateArrows);
 
     });
 
@@ -562,7 +588,7 @@ function createProductCard(product) {
 
         const list = event.target;
 
-        if (list?.classList?.contains?.("product-sizes")) {
+        if (list?.classList?.contains?.("product-sizes") || list?.classList?.contains?.("product-colors")) {
 
             updateArrows(list.parentElement);
 
@@ -572,7 +598,7 @@ function createProductCard(product) {
 
     document.addEventListener("click", event => {
 
-        const arrow = event.target.closest?.(".sizes-arrow");
+        const arrow = event.target.closest?.(".sizes-arrow, .colors-arrow");
 
         if (!arrow) return;
 
@@ -581,15 +607,17 @@ function createProductCard(product) {
         event.preventDefault();
         event.stopPropagation();
 
-        const wrap = arrow.closest(".product-sizes-wrap");
-        const list = wrap?.querySelector(".product-sizes");
+        const wrap = arrow.closest(".product-sizes-wrap, .product-colors-wrap");
+        const config = wrap && configFor(wrap);
+        const list = wrap && config && wrap.querySelector(`.${config.listClass}`);
 
         if (!list) return;
 
         const step = Math.max(list.clientWidth * 0.7, 60);
+        const isLeft = arrow.classList.contains("sizes-arrow-left") || arrow.classList.contains("colors-arrow-left");
 
         list.scrollBy({
-            left: arrow.classList.contains("sizes-arrow-left") ? -step : step,
+            left: isLeft ? -step : step,
             behavior: "smooth"
         });
 
