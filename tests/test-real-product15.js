@@ -5,8 +5,7 @@ const ROOT = require("path").join(__dirname, "..");
 let failures=0;
 const check=(n,c,e)=>{if(c)console.log("  ✓",n);else{console.log("  ✗",n,e!==undefined?"→ "+e:"");failures++;}};
 
-const product=JSON.parse(fs.readFileSync(path.join(ROOT,"data/products.json"),"utf8"))
-    .find(p=>p.id===15);
+const product=require("./helpers/products").findProductById(15);
 
 const dom=new JSDOM("<!doctype html><body><div id='root'></div></body>",{runScripts:"outside-only",pretendToBeVisual:true});
 const {window}=dom;

@@ -41,5 +41,11 @@
 
     <!-- Decap CMS (форк Netlify CMS, той самий движок) -->
     <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+
+    <!-- Власні прев'ю: показують товар/акцію/добірку так, як вони
+         виглядатимуть на сайті, замість типового дампу полів.
+         ПІДКЛЮЧАЄТЬСЯ ПІСЛЯ decap-cms.js — саме він створює
+         глобальні CMS і createClass, якими користується цей файл. -->
+    <script src="preview-templates.js"></script>
 </body>
 </html>

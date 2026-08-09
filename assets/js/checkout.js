@@ -709,9 +709,16 @@ function buildOrderItemsSnapshot() {
 
 }
 
-// зберігаємо замовлення в Supabase, щоб воно з'явилося в
-// «Історії замовлень» кабінету — лише якщо клієнт авторизований;
-// гостьові замовлення й далі йдуть тільки поштою, як раніше.
+// Зберігаємо замовлення в Supabase.
+//
+// Раніше тут стояв ранній вихід `if (!user) return;` — гостьові
+// замовлення в базу не потрапляли взагалі, лишався тільки лист.
+// Через це, зокрема, сповіщення в Telegram (воно спрацьовує на
+// додавання рядка в orders) не бачило б жодної заявки від гостя,
+// а таких — більшість. Тепер зберігаємо завжди: авторизованим
+// проставляємо user_id, щоб замовлення було видно в «Історії
+// замовлень» кабінету, гостям лишаємо null.
+//
 // Це best-effort: якщо збереження не вдалося, оформлення
 // замовлення все одно вважається успішним (лист вже надіслано).
 async function saveOrderToSupabase(orderId) {
@@ -720,12 +727,10 @@ async function saveOrderToSupabase(orderId) {
 
     const user = await getCurrentUser();
 
-    if (!user) return;
-
     const { subtotal, totalDiscount, delivery, total } = computeOrderTotals();
 
     const { error } = await supabaseClient.from("orders").insert({
-        user_id: user.id,
+        user_id: user ? user.id : null,
         order_number: orderId,
         status: "new",
         items: buildOrderItemsSnapshot(),

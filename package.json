@@ -8,8 +8,8 @@
     "build": "node scripts/build-categories.js && node scripts/build-products.js && node scripts/build-promotions.js && node scripts/build-collections.js && node scripts/build-promo-popups.js && node scripts/build-sitemap.js"
   },
   "devDependencies": {
-    "jsdom": "^30.0.1",
-    "js-yaml": "^5.2.3"
+    "jsdom": "^24.1.0",
+    "js-yaml": "^4.1.0"
   },
   "engines": {
     "node": ">=20"

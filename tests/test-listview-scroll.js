@@ -69,8 +69,8 @@ console.log("\n[4b] Стрілки доступні в режимі списку
 
 console.log("\n[5] Дані товару id=15: 15 кольорів для стрес-тесту");
 {
-  const products = JSON.parse(fs.readFileSync(path.join(ROOT,"data/products.json"),"utf8"));
-  const p15 = products.find(p => p.id === 15);
+  // джерело, а не згенерований агрегат (див. helpers/products.js)
+  const p15 = require("./helpers/products").findProductById(15);
   check("товар знайдено", !!p15);
   check("рівно 15 варіантів кольору", p15.variants.length === 15, p15.variants.length);
   check("кольори унікальні", new Set(p15.variants.map(v=>v.color)).size === 15);

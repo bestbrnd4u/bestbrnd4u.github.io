@@ -1,0 +1,258 @@
+/* Обгортка навколо прев'ю в адмінці.
+   Сама картка товару малюється справжніми класами сайту (їх дає
+   підключений assets/css/style.css) — тут лише «сцена» навколо неї
+   та список полів під візуалом. */
+
+.cms-preview{
+    padding:20px 22px 40px;
+    font-family:Inter, -apple-system, "Segoe UI", sans-serif;
+    color:#111827;
+    background:#f9fafb;
+    min-height:100%;
+}
+
+.cms-preview-hint{
+    margin-bottom:14px;
+    padding:9px 12px;
+    border-radius:8px;
+    background:#eff6ff;
+    color:#1d4ed8;
+    font-size:12.5px;
+    line-height:1.45;
+}
+
+/* «сцена» — імітує сітку каталогу, щоб картка мала реальну ширину,
+   а не розтягувалась на всю панель прев'ю */
+.cms-preview-stage{
+    max-width:300px;
+    margin-bottom:26px;
+}
+
+.cms-preview-card{
+    pointer-events:none; /* прев'ю не інтерактивне */
+}
+
+.cms-preview-cover{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+}
+
+.cms-preview-nophoto{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:180px;
+    background:#e5e7eb;
+    color:#6b7280;
+    font-size:13px;
+    border-radius:12px;
+}
+
+/* -- блоки під візуалом -- */
+
+.cms-preview-section{
+    margin-bottom:22px;
+}
+
+.cms-preview-heading{
+    margin:0 0 8px;
+    font-size:12px;
+    font-weight:800;
+    letter-spacing:.7px;
+    text-transform:uppercase;
+    color:#6b7280;
+}
+
+.cms-preview-details{
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:10px;
+    overflow:hidden;
+}
+
+.cms-preview-row{
+    display:flex;
+    gap:12px;
+    padding:8px 12px;
+    font-size:13px;
+    border-bottom:1px solid #f3f4f6;
+}
+
+.cms-preview-row:last-child{
+    border-bottom:0;
+}
+
+.cms-preview-label{
+    flex:0 0 44%;
+    color:#6b7280;
+}
+
+.cms-preview-value{
+    flex:1;
+    font-weight:600;
+    word-break:break-word;
+}
+
+.cms-preview-text{
+    margin:0;
+    padding:10px 12px;
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:10px;
+    font-size:13.5px;
+    line-height:1.6;
+}
+
+/* -- перелік кольорів товару -- */
+
+.cms-preview-variants{
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:10px;
+    overflow:hidden;
+}
+
+.cms-preview-variant{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:8px 12px;
+    font-size:13px;
+    border-bottom:1px solid #f3f4f6;
+}
+
+.cms-preview-variant:last-child{
+    border-bottom:0;
+}
+
+.cms-preview-swatch{
+    flex:0 0 auto;
+    width:18px;
+    height:18px;
+    border-radius:50%;
+    border:1px solid #d1d5db;
+}
+
+.cms-preview-variant-name{
+    font-weight:700;
+    min-width:96px;
+}
+
+.cms-preview-variant-meta{
+    color:#6b7280;
+    font-size:12.5px;
+}
+
+/* -- акція -- */
+
+.cms-preview-promo-banner{
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    justify-content:center;
+    gap:10px;
+    min-height:210px;
+    padding:26px;
+    border-radius:16px;
+    background:#374151 center/cover no-repeat;
+    color:#fff;
+}
+
+.cms-preview-promo-badge{
+    padding:4px 10px;
+    border-radius:20px;
+    background:#dc2626;
+    font-size:12px;
+    font-weight:700;
+}
+
+.cms-preview-promo-title{
+    margin:0;
+    font-size:24px;
+    line-height:1.2;
+}
+
+.cms-preview-promo-text{
+    margin:0;
+    font-size:13.5px;
+    opacity:.9;
+}
+
+.cms-preview-promo-btn{
+    margin-top:6px;
+    pointer-events:none;
+}
+
+.cms-preview-teaser{
+    display:block;
+    width:100%;
+    max-width:260px;
+    border-radius:12px;
+}
+
+/* сцена для акції/добірки ширша за картку товару */
+.cms-preview-stage:has(.cms-preview-promo-banner),
+.cms-preview-stage:has(.cms-preview-collection){
+    max-width:640px;
+}
+
+/* -- добірка -- */
+
+.cms-preview-collection{
+    display:grid;
+    grid-template-columns:180px 1fr;
+    gap:16px;
+    padding:16px;
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:16px;
+}
+
+.cms-preview-collection-img{
+    width:100%;
+    aspect-ratio:4/3;
+    object-fit:cover;
+    border-radius:12px;
+}
+
+.cms-preview-collection-body{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+}
+
+.cms-preview-eyebrow{
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:.8px;
+    text-transform:uppercase;
+    color:#6b7280;
+}
+
+.cms-preview-collection-title{
+    margin:0;
+    font-size:19px;
+}
+
+.cms-preview-count{
+    margin-top:auto;
+    font-size:12.5px;
+    color:#6b7280;
+}
+
+/* -- спливаючий банер -- */
+
+.cms-preview-popup{
+    width:220px;
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow:0 10px 30px rgba(0,0,0,.18);
+}
+
+.cms-preview-popup img{
+    display:block;
+    width:100%;
+}
