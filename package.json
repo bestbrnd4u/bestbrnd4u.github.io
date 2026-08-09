@@ -1,0 +1,17 @@
+{
+  "name": "bagvero-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Інтернет-магазин Bagvero — статичний сайт на GitHub Pages з адмінкою Decap CMS",
+  "scripts": {
+    "test": "node tests/run-all.js",
+    "build": "node scripts/build-categories.js && node scripts/build-products.js && node scripts/build-promotions.js && node scripts/build-collections.js && node scripts/build-promo-popups.js && node scripts/build-sitemap.js"
+  },
+  "devDependencies": {
+    "jsdom": "^24.1.0",
+    "js-yaml": "^4.1.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

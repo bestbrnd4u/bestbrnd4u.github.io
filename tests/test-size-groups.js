@@ -1,0 +1,105 @@
+const fs=require("fs"),path=require("path"),{JSDOM}=require("jsdom");
+const ROOT = require("path").join(__dirname, "..");
+const { loadYaml } = require("./helpers/yaml");
+let failures=0;
+const check=(n,c,e)=>{if(c)console.log("  ✓",n);else{console.log("  ✗",n,e!==undefined?"→ "+e:"");failures++;}};
+
+const RAW=JSON.parse(fs.readFileSync(path.join(ROOT,"data/size-groups.json"),"utf8"));
+// Decap зберігає file-колекцію як {"<імʼя поля>": [...]}, а не голим
+// масивом — інакше розділ в адмінці відкривається порожнім
+const GROUPS=Array.isArray(RAW)?RAW:RAW.groups;
+const CATS=JSON.parse(fs.readFileSync(path.join(ROOT,"data/categories.json"),"utf8"));
+
+console.log("\n[1] Налаштування в адмінці");
+{
+  const _cfg = loadYaml("admin/config.yml");
+  const _sg = _cfg.collections.find(c => c.name === "sizeGroups");
+  const _g = _sg.files[0].fields[0];
+  const yaml = JSON.stringify({
+    file: _sg.files[0].file,
+    fields: _g.fields.map(f => f.name),
+    sizes_multiple: _g.fields.find(f => f.name === "sizes").multiple ?? null,
+    collections: _cfg.collections.map(c => c.name)
+  });
+  const info=JSON.parse(yaml);
+  check("колекція «Розміри» додана", info.collections.includes("sizeGroups"), info.collections.join(","));
+  check("редагує саме data/size-groups.json", info.file==="data/size-groups.json");
+  check("є всі потрібні поля",
+        ["key","title","department","categories","sizes","guideNote","guideColumns","guideRows"]
+          .every(f=>info.fields.includes(f)), info.fields.join(","));
+  check("розміри — мультивибір", info.sizes_multiple===true);
+}
+
+console.log("\n[2] Файл налаштувань коректний");
+{
+  check("корінь файлу — об'єкт з ключем groups (формат Decap)",
+        !Array.isArray(RAW) && Array.isArray(RAW.groups), Array.isArray(RAW)?"array":typeof RAW);
+  check("4 групи", GROUPS.length===4, GROUPS.length);
+  GROUPS.forEach(g=>{
+    check(`«${g.title}»: є розміри`, Array.isArray(g.sizes)&&g.sizes.length>0);
+    if (g.guideNote) {
+      check(`«${g.title}»: у кожному рядку значень = стовпців`,
+            g.guideRows.every(r=>(r.values||[]).length===g.guideColumns.length),
+            g.guideRows.map(r=>(r.values||[]).length).join(","));
+      check(`«${g.title}»: рядки таблиці лише з дозволених розмірів`,
+            g.guideRows.every(r=>g.sizes.includes(r.size)),
+            g.guideRows.filter(r=>!g.sizes.includes(r.size)).map(r=>r.size).join(","));
+    }
+  });
+}
+
+console.log("\n[3] Розв'язання категорій (вручну + через розділ)");
+{
+  const dom=new JSDOM("",{runScripts:"outside-only"});
+  const {window}=dom;
+  const common=fs.readFileSync(path.join(ROOT,"assets/js/common.js"),"utf8");
+  ["resolveGroupCategories","findSizeGroupForCategory"].forEach(fn=>
+    window.eval(common.match(new RegExp("function "+fn+"[\\s\\S]*?\\n}\\n"))[0]));
+
+  const tree=Object.values(CATS.reduce((acc,c)=>{
+    (acc[c.department]=acc[c.department]||{title:c.department,categories:[]}).categories.push(c.name);
+    return acc;},{}));
+
+  const bags=GROUPS.find(g=>g.key==="bags");
+  const shoes=GROUPS.find(g=>g.key==="shoes");
+
+  check("група з переліком категорій — беруться вони",
+        window.resolveGroupCategories(bags,tree).includes("Жіночі сумки"));
+  check("група через розділ підхоплює ВСІ категорії розділу",
+        window.resolveGroupCategories(shoes,tree).includes("Босоніжки")
+        && window.resolveGroupCategories(shoes,tree).includes("Кросівки"),
+        window.resolveGroupCategories(shoes,tree).length+" категорій");
+  check("нова категорія розділу підхопиться сама (це і є «динамічно»)",
+        window.resolveGroupCategories(shoes,tree).length===
+          tree.find(d=>d.title==="Взуття").categories.length);
+
+  check("за категорією знаходиться група: Кросівки → Взуття",
+        window.findSizeGroupForCategory(GROUPS,"Кросівки",tree)?.key==="shoes");
+  check("Жіночі сумки → Сумки",
+        window.findSizeGroupForCategory(GROUPS,"Жіночі сумки",tree)?.key==="bags");
+  check("Годинники (аксесуар) → групи немає, таблиця не показується",
+        window.findSizeGroupForCategory(GROUPS,"Годинники",tree)===null);
+}
+
+console.log("\n[4] Модалка таблиці розмірів стала динамічною");
+{
+  const html=fs.readFileSync(path.join(ROOT,"product.html"),"utf8");
+  check("контейнер під таблицю є", html.includes('id="sizeGuideBody"'));
+  check("статична таблиця сумок прибрана з розмітки", !html.includes("18–22 см"));
+  const js=fs.readFileSync(path.join(ROOT,"assets/js/product.js"),"utf8");
+  check("є рендер таблиці", js.includes("async function renderSizeGuide"));
+  check("викликається для товару", js.includes("renderSizeGuide(product)"));
+  check("посилання ховається, якщо таблиці немає", js.includes("openBtn.hidden = true"));
+}
+
+console.log("\n[5] Каталог більше не має зашитих груп");
+{
+  const js=fs.readFileSync(path.join(ROOT,"assets/js/catalog.js"),"utf8");
+  check("SIZE_GROUPS не константа з даними", !js.includes('const SIZE_GROUPS = ['));
+  check("групи вантажаться з адмінки", js.includes("await loadSizeGroups()"));
+  check("є запасний набір на випадок недоступності файлу",
+        fs.readFileSync(path.join(ROOT,"assets/js/common.js"),"utf8").includes("FALLBACK_SIZE_GROUPS"));
+}
+
+console.log(failures===0?"\n✅ Усі перевірки пройдено":`\n❌ Провалено: ${failures}`);
+process.exit(failures===0?0:1);

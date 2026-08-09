@@ -15,6 +15,29 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
+
+    # -------------------------
+    # Усі оновлення actions — ОДНИМ Pull Request, а не окремим на
+    # кожну дію.
+    #
+    # У двох workflow використовується 5 різних actions (checkout,
+    # setup-node, configure-pages, upload-pages-artifact,
+    # deploy-pages), причому checkout — двічі. Без групування, коли
+    # виходить кілька релізів одночасно, Dependabot відкрив би до
+    # п'яти окремих PR-ів, і кожен довелося б переглядати й мержити
+    # руками. Згруповані — це один PR, який або проходить деплой
+    # цілком, або ні; перевіряти й відкочувати теж треба лише його.
+    # -------------------------
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+
+    # Стеля одночасно відкритих PR-ів. Із групуванням реально
+    # потрібен лише один, але ліміт страхує від засмічення вкладки
+    # Pull requests, якщо якийсь апдейт зависне непомерженим.
+    open-pull-requests-limit: 3
+
     # окремий префікс у назвах PR/комітів — одразу видно в списку,
     # що це саме апдейт actions, а не звичайна робота
     commit-message:
@@ -23,8 +46,39 @@ updates:
       - "dependencies"
       - "github-actions"
 
-# npm-екосистему навмисно не додано: у репозиторії немає package.json
-# узагалі — scripts/build-*.js написані на чистих вбудованих модулях
-# Node (fs, path), без жодної зовнішньої залежності. Якщо колись
-# з'явиться package.json (наприклад, для лінтера чи збірника),
-# додайте сюди блок package-ecosystem: "npm".
+  # -------------------------
+  # npm — devDependencies з package.json.
+  #
+  # Раніше цього блоку свідомо не було: package.json не існував,
+  # scripts/build-*.js написані на вбудованих модулях Node (fs, path)
+  # без жодної залежності, тож Dependabot просто не мав би що
+  # оновлювати.
+  #
+  # Тепер package.json з'явився — у ньому jsdom і js-yaml, потрібні
+  # щоб ганяти тести (npm test / CI). Це вже справжні зовнішні
+  # залежності: у jsdom регулярно виходять оновлення, зокрема з
+  # виправленнями безпеки. Саме за ними тут і стежимо.
+  #
+  # Це ЛИШЕ devDependencies — на сам сайт вони не потрапляють:
+  # GitHub Pages віддає статику, node_modules туди не деплоїться.
+  # Тобто ризик від оновлення обмежений тестами, а не магазином.
+  # -------------------------
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+
+    # так само одним PR — залежностей мало, дробити нема сенсу
+    groups:
+      dev-dependencies:
+        patterns:
+          - "*"
+
+    open-pull-requests-limit: 3
+
+    commit-message:
+      prefix: "chore(deps)"
+    labels:
+      - "dependencies"
+      - "npm"

@@ -1,0 +1,45 @@
+# Ганяє тести при кожному пуші та Pull Request.
+#
+# НАВІЩО: за час роботи над сайтом кілька разів траплялось, що
+# виправлення одного місця тихо ламало інше — наприклад, друга
+# функція formatPrice() у catalog.js перезаписала ту, що з "грн",
+# і ціни в каталозі лишились без валюти; або перемальовування
+# розмірів при зміні кольору знімало обробники кліку, і розмір
+# переставав вибиратись. Візуально такі речі помітні не одразу.
+# Тепер кожен пуш проганяє повний набір перевірок, і подібна
+# регресія падає в CI, а не виявляється на живому сайті.
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# кілька пушів підряд — тестуємо лише найсвіжіший, попередні
+# прогони гасимо, щоб не витрачати хвилини Actions даремно
+concurrency:
+  group: "tests-${{ github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      # npm ci (а не install) — ставить рівно те, що зафіксовано в
+      # package-lock.json, тож локально і в CI однакові версії
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
