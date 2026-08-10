@@ -29,6 +29,14 @@ export function deliveryById(id) {
   return DELIVERY_OPTIONS.find((o) => o.id === id) ?? null;
 }
 
+// За назвою, яка вже лежить у чернетці (delivery_method).
+// Навмисно НЕ зберігаємо окремо delivery_id: зайве поле в чернетці
+// означало б ще одну колонку в таблиці, яку легко забути додати —
+// саме на цьому діалог і зупинявся.
+export function deliveryByLabel(label) {
+  return DELIVERY_OPTIONS.find((o) => o.label === label) ?? null;
+}
+
 // -------------------------
 // Доступні варіанти товару
 // -------------------------
@@ -222,7 +230,7 @@ export function confirmKeyboard() {
 
 export function stepPrompt(step, product, session) {
 
-  const delivery = deliveryById(session?.delivery_id);
+  const delivery = deliveryByLabel(session?.delivery_method);
 
   switch (step) {
 
@@ -363,6 +371,10 @@ export function buildOrderRow(product, session, orderNumber) {
 
   return {
     user_id: null,                 // замовлення з бота — завжди гість
+    // Куди писати клієнту про зміну статусу. Саме завдяки цьому полю
+    // сповіщення працюють без окремої «прив'язки Telegram»: людина
+    // замовила в боті — отже, чат уже відомий.
+    telegram_chat_id: session.chat_id ?? null,
     order_number: orderNumber,
     status: "new",
     items: [{

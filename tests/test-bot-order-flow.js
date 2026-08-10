@@ -173,6 +173,52 @@ console.log("\n[10] Міграція таблиці чернеток");
   check("є прибирання покинутих чернеток", /cleanup_bot_sessions/i.test(sql));
 }
 
+console.log("\n[11] Чернетка пишеться лише в наявні колонки");
+{
+  // Регресія: бот зберігав у чернетку поле delivery_id, якого немає
+  // в таблиці. Запит падав з «column does not exist», крок не
+  // зберігався — і діалог мовчки зупинявся посеред оформлення
+  // (клієнт писав місто, а бот уже не розумів, чого він чекає).
+  const sql = fs.readFileSync(path.join(ROOT,"supabase/migrations/002-bot-order-sessions.sql"),"utf8");
+  const extra = fs.readFileSync(path.join(ROOT,"supabase/migrations/003-customer-notifications.sql"),"utf8");
+
+  // колонки з CREATE TABLE
+  const createBlock = sql.slice(sql.indexOf("create table"), sql.indexOf(");", sql.indexOf("create table")));
+  const columns = [...createBlock.matchAll(/^\s{4}([a-z_]+)\s+\S/gm)].map(m => m[1]);
+
+  // плюс додані пізніше
+  [...extra.matchAll(/add column if not exists ([a-z_]+)/gi)].forEach(m => columns.push(m[1]));
+
+  check("колонки таблиці зчитані", columns.length > 5, columns.join(", "));
+
+  // те, що код реально пише
+  const whitelist = SRC.match(/const SESSION_COLUMNS = \[([\s\S]*?)\];/);
+  check("у коді є білий список колонок", !!whitelist);
+
+  const written = [...whitelist[1].matchAll(/"([a-z_]+)"/g)].map(m => m[1]);
+
+  written.forEach(col => {
+    check(`колонка «${col}» існує в таблиці`, columns.includes(col),
+          `таблиця: ${columns.join(", ")}`);
+  });
+
+  check("delivery_id більше не пишеться (його немає в таблиці)",
+        !written.includes("delivery_id"));
+  check("спосіб доставки визначається за назвою, а не за окремим id",
+        SRC.includes("delivery_method") && !/delivery_id:/.test(SRC));
+}
+
+console.log("\n[12] Збій збереження не залишає діалог мовчазним");
+{
+  // між рядками стоїть пояснювальний коментар — запас має його вмістити
+  check("advance перевіряє результат збереження",
+        /const saved = await saveSession[\s\S]{0,500}if \(!saved\)/.test(SRC));
+  check("клієнту повідомляється про помилку",
+        SRC.includes("Щось пішло не так під час оформлення"));
+  check("після помилки крок не питається (щоб не чекати відповіді даремно)",
+        /if \(!saved\)[\s\S]{0,400}return;/.test(SRC));
+}
+
 console.log(failures===0?"\n✅ Усі перевірки пройдено":`\n❌ Провалено: ${failures}`);
 process.exit(failures===0?0:1);
 

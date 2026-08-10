@@ -263,6 +263,90 @@ function buildProductKeyboard(product, siteUrl) {
 
 }
 
+// ======================================
+// Сповіщення КЛІЄНТУ про зміну статусу
+//
+// Надсилаються лише тим, хто замовляв у боті — у таких замовлень
+// збережений telegram_chat_id. Замовлення з сайту цього поля не
+// мають, і для них сповіщення просто не надсилаються.
+// ======================================
+
+// Посилання на відстеження Нової пошти. Клієнту зручніше натиснути
+// кнопку, ніж копіювати номер і шукати сайт.
+function trackingUrl(ttn) {
+
+  const digits = String(ttn ?? "").replace(/\D/g, "");
+
+  if (!digits) return "";
+
+  return `https://novaposhta.ua/tracking/?cargo_number=${digits}`;
+
+}
+
+// ТТН Нової пошти — 14 цифр. Перевіряємо, щоб не надіслати клієнту
+// випадковий текст замість номера.
+function validateTracking(text) {
+
+  const raw = String(text ?? "").trim();
+  const digits = raw.replace(/\D/g, "");
+
+  if (!digits) return { ok: false, error: "Це не схоже на номер накладної. Надішліть 14 цифр або /skip." };
+  if (digits.length < 10) return { ok: false, error: `Замало цифр (${digits.length}). ТТН Нової пошти — 14 цифр. Або /skip.` };
+  if (digits.length > 20) return { ok: false, error: "Забагато цифр для номера накладної. Або /skip." };
+
+  return { ok: true, value: digits };
+
+}
+
+// Текст для клієнта під конкретний статус. Повертає null, якщо про
+// цей статус клієнта повідомляти не треба (напр. «Нове» — він щойно
+// сам оформив замовлення й уже отримав підтвердження).
+function customerStatusMessage(order, status) {
+
+  const number = escapeHtml(order?.order_number ?? "");
+  const ttn = order?.tracking_number;
+
+  switch (normalizeStatus(status)) {
+
+    case "processing":
+      return `👌 Ваше замовлення <b>${number}</b> прийнято в роботу.\n\n` +
+             `Ми зв'яжемось із вами найближчим часом, щоб підтвердити деталі.`;
+
+    case "shipped":
+      return ttn
+        ? `📦 Замовлення <b>${number}</b> відправлено!\n\n` +
+          `Номер накладної: <code>${escapeHtml(ttn)}</code>`
+        : `📦 Замовлення <b>${number}</b> відправлено!\n\n` +
+          `Номер накладної надішлемо окремо.`;
+
+    case "completed":
+      return `🎉 Замовлення <b>${number}</b> виконано.\n\n` +
+             `Дякуємо за покупку! Будемо раді бачити вас знову.`;
+
+    case "cancelled":
+      return `❌ Замовлення <b>${number}</b> скасовано.\n\n` +
+             `Якщо це помилка — напишіть нам, ми все виправимо.`;
+
+    default:
+      return null;
+
+  }
+
+}
+
+// Кнопка відстеження — лише коли є ТТН
+function customerStatusKeyboard(order, status) {
+
+  if (normalizeStatus(status) !== "shipped") return undefined;
+
+  const url = trackingUrl(order?.tracking_number);
+
+  if (!url) return undefined;
+
+  return { inline_keyboard: [[{ text: "🔍 Відстежити посилку", url }]] };
+
+}
+
 
 // ======================================
 // Логіка оформлення замовлення в боті.
@@ -292,6 +376,14 @@ const MAX_QTY = 10;
 
 function deliveryById(id) {
   return DELIVERY_OPTIONS.find((o) => o.id === id) ?? null;
+}
+
+// За назвою, яка вже лежить у чернетці (delivery_method).
+// Навмисно НЕ зберігаємо окремо delivery_id: зайве поле в чернетці
+// означало б ще одну колонку в таблиці, яку легко забути додати —
+// саме на цьому діалог і зупинявся.
+function deliveryByLabel(label) {
+  return DELIVERY_OPTIONS.find((o) => o.label === label) ?? null;
 }
 
 // -------------------------
@@ -487,7 +579,7 @@ function confirmKeyboard() {
 
 function stepPrompt(step, product, session) {
 
-  const delivery = deliveryById(session?.delivery_id);
+  const delivery = deliveryByLabel(session?.delivery_method);
 
   switch (step) {
 
@@ -628,6 +720,10 @@ function buildOrderRow(product, session, orderNumber) {
 
   return {
     user_id: null,                 // замовлення з бота — завжди гість
+    // Куди писати клієнту про зміну статусу. Саме завдяки цьому полю
+    // сповіщення працюють без окремої «прив'язки Telegram»: людина
+    // замовила в боті — отже, чат уже відомий.
+    telegram_chat_id: session.chat_id ?? null,
     order_number: orderNumber,
     status: "new",
     items: [{
@@ -868,9 +964,27 @@ async function getSession(chatId: number) {
 
 }
 
+// Колонки таблиці bot_sessions. Пишемо СУВОРО їх.
+//
+// Раніше сюди потрапляло будь-яке поле з чернетки — і варто було
+// додати в об'єкт щось службове (як delivery_id), як запит падав з
+// «column does not exist». Помилка була мовчазною: діалог просто
+// зупинявся посеред оформлення, бо крок не встигав зберегтися.
+const SESSION_COLUMNS = [
+  "step", "product_id", "color", "size", "qty",
+  "delivery_method", "delivery_price", "city", "delivery_detail",
+  "first_name", "last_name", "phone", "awaiting_ttn_for",
+];
+
 async function saveSession(chatId: number, patch: Record<string, any>) {
 
-  const row = { chat_id: chatId, ...patch, updated_at: new Date().toISOString() };
+  const clean: Record<string, any> = {};
+
+  for (const key of SESSION_COLUMNS) {
+    if (key in patch) clean[key] = patch[key];
+  }
+
+  const row = { chat_id: chatId, ...clean, updated_at: new Date().toISOString() };
 
   const response = await supabaseRest("bot_sessions?on_conflict=chat_id", {
     method: "POST",
@@ -958,7 +1072,22 @@ async function advance(chatId: number, fromStep: string, product: Record<string,
 
   const saved = await saveSession(chatId, { ...filled, step });
 
-  await askStep(chatId, step, product, saved ?? filled);
+  // Якщо крок не зберігся, продовжувати не можна: бот поставить
+  // питання, але наступну відповідь клієнта вже не впізнає — діалог
+  // мовчки обірветься. Краще чесно сказати й не морочити людину.
+  if (!saved) {
+
+    await telegram("sendMessage", {
+      chat_id: chatId,
+      text: "Щось пішло не так під час оформлення. Спробуйте ще раз або зателефонуйте нам.",
+      reply_markup: { remove_keyboard: true },
+    });
+
+    return;
+
+  }
+
+  await askStep(chatId, step, product, saved);
 
 }
 
@@ -1023,6 +1152,27 @@ async function handleCallback(callback: Record<string, any>) {
 
   }
 
+  // --- сповіщення клієнту ---
+  // Тільки для замовлень із бота: у них є telegram_chat_id. Для
+  // замовлень із сайту поле порожнє, і ми мовчки нічого не шлемо.
+  await notifyCustomer(updated, status);
+
+  // Якщо позначили «Відправлено» — просимо номер накладної, щоб
+  // одразу переслати його клієнту з посиланням на відстеження
+  if (status === "shipped" && !updated.tracking_number) {
+
+    await saveSession(callback.message.chat.id, { awaiting_ttn_for: updated.id });
+
+    await telegram("sendMessage", {
+      chat_id: callback.message.chat.id,
+      text:
+        `Надішліть номер накладної для замовлення <b>${escapeHtml(updated.order_number ?? "")}</b> ` +
+        `— я перешлю його клієнту.\n\nЯкщо ТТН поки немає — /skip`,
+      parse_mode: "HTML",
+    });
+
+  }
+
   // перемальовуємо те саме повідомлення — щоб історія в чаті не
   // засмічувалась дублями, а поточний статус завжди був актуальним
   await telegram("editMessageText", {
@@ -1063,6 +1213,8 @@ async function handleMessage(message: Record<string, any>) {
   // --- відповіді на кроках, де клієнт пише текстом ---
   // Робимо це ДО перевірки команд: людина відповідає на питання
   // бота звичайним повідомленням, а не командою.
+  // спершу ТТН від власника, потім кроки оформлення клієнтом
+  if (await handleTrackingInput(message)) return;
   if (await handleOrderText(message)) return;
 
   if (!command) return;
@@ -1158,6 +1310,107 @@ async function handleMessage(message: Record<string, any>) {
       ],
     },
   });
+
+}
+
+// -------------------------
+// Сповіщення клієнту
+// -------------------------
+
+async function notifyCustomer(order: Record<string, any>, status: string) {
+
+  const chatId = order?.telegram_chat_id;
+
+  // замовлення з сайту — чату немає, це нормально
+  if (!chatId) return;
+
+  const text = customerStatusMessage(order, status);
+
+  if (!text) return;
+
+  await telegram("sendMessage", {
+    chat_id: chatId,
+    text,
+    parse_mode: "HTML",
+    reply_markup: customerStatusKeyboard(order, status),
+  });
+
+}
+
+// -------------------------
+// Введення номера накладної власником
+//
+// Повертає true, якщо повідомлення було номером ТТН — тоді решта
+// обробників його не чіпає.
+// -------------------------
+
+async function handleTrackingInput(message: Record<string, any>): Promise<boolean> {
+
+  const chatId = message.chat.id;
+
+  const session = await getSession(chatId);
+
+  if (!session?.awaiting_ttn_for) return false;
+
+  const text: string = message.text ?? "";
+
+  // передумали або ТТН ще немає
+  if (text.trim() === "/skip") {
+
+    await saveSession(chatId, { awaiting_ttn_for: null });
+
+    await telegram("sendMessage", {
+      chat_id: chatId,
+      text: "Гаразд, без накладної. Надішлете пізніше — просто натисніть «Відправлено» ще раз.",
+    });
+
+    return true;
+
+  }
+
+  const check = validateTracking(text);
+
+  if (!check.ok) {
+
+    await telegram("sendMessage", { chat_id: chatId, text: check.error });
+
+    return true;
+
+  }
+
+  // зберігаємо ТТН і одразу шлемо клієнту
+  const response = await supabaseRest(
+    `orders?id=eq.${encodeURIComponent(session.awaiting_ttn_for)}`,
+    {
+      method: "PATCH",
+      headers: { Prefer: "return=representation" },
+      body: JSON.stringify({ tracking_number: check.value }),
+    },
+  );
+
+  const rows = response.ok ? await response.json() : [];
+  const order = Array.isArray(rows) ? rows[0] : null;
+
+  await saveSession(chatId, { awaiting_ttn_for: null });
+
+  if (!order) {
+
+    await telegram("sendMessage", { chat_id: chatId, text: "Не вдалося зберегти накладну." });
+
+    return true;
+
+  }
+
+  await notifyCustomer(order, "shipped");
+
+  await telegram("sendMessage", {
+    chat_id: chatId,
+    text: order.telegram_chat_id
+      ? `✅ Накладну збережено і надіслано клієнту.`
+      : `✅ Накладну збережено. Клієнт замовляв на сайті, тож у Telegram його не сповістити — передайте номер телефоном.`,
+  });
+
+  return true;
 
 }
 
@@ -1357,7 +1610,6 @@ async function handleOrderCallback(callback: Record<string, any>, data: string) 
       ...session,
       delivery_method: option.label,
       delivery_price: option.price,
-      delivery_id: option.id,
     });
 
     return;
@@ -1368,7 +1620,7 @@ async function handleOrderCallback(callback: Record<string, any>, data: string) 
   if (action === "submit") {
 
     const orderNumber = generateOrderNumber();
-    const row = buildOrderRow(product, session, orderNumber);
+    const row = buildOrderRow(product, { ...session, chat_id: chatId }, orderNumber);
 
     const created = await createOrder(row);
 

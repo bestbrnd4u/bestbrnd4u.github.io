@@ -26,6 +26,7 @@
 import {
   STATUSES, normalizeStatus, formatOrder, buildKeyboard,
   parseStartPayload, formatProductCard, buildProductKeyboard, absoluteImageUrl,
+  customerStatusMessage, customerStatusKeyboard, validateTracking,
 } from "./format.js";
 import {
   DELIVERY_OPTIONS, deliveryById, colorsOf, sizesOf, autoFill, nextStep,
@@ -219,9 +220,27 @@ async function getSession(chatId: number) {
 
 }
 
+// Колонки таблиці bot_sessions. Пишемо СУВОРО їх.
+//
+// Раніше сюди потрапляло будь-яке поле з чернетки — і варто було
+// додати в об'єкт щось службове (як delivery_id), як запит падав з
+// «column does not exist». Помилка була мовчазною: діалог просто
+// зупинявся посеред оформлення, бо крок не встигав зберегтися.
+const SESSION_COLUMNS = [
+  "step", "product_id", "color", "size", "qty",
+  "delivery_method", "delivery_price", "city", "delivery_detail",
+  "first_name", "last_name", "phone", "awaiting_ttn_for",
+];
+
 async function saveSession(chatId: number, patch: Record<string, any>) {
 
-  const row = { chat_id: chatId, ...patch, updated_at: new Date().toISOString() };
+  const clean: Record<string, any> = {};
+
+  for (const key of SESSION_COLUMNS) {
+    if (key in patch) clean[key] = patch[key];
+  }
+
+  const row = { chat_id: chatId, ...clean, updated_at: new Date().toISOString() };
 
   const response = await supabaseRest("bot_sessions?on_conflict=chat_id", {
     method: "POST",
@@ -309,7 +328,22 @@ async function advance(chatId: number, fromStep: string, product: Record<string,
 
   const saved = await saveSession(chatId, { ...filled, step });
 
-  await askStep(chatId, step, product, saved ?? filled);
+  // Якщо крок не зберігся, продовжувати не можна: бот поставить
+  // питання, але наступну відповідь клієнта вже не впізнає — діалог
+  // мовчки обірветься. Краще чесно сказати й не морочити людину.
+  if (!saved) {
+
+    await telegram("sendMessage", {
+      chat_id: chatId,
+      text: "Щось пішло не так під час оформлення. Спробуйте ще раз або зателефонуйте нам.",
+      reply_markup: { remove_keyboard: true },
+    });
+
+    return;
+
+  }
+
+  await askStep(chatId, step, product, saved);
 
 }
 
@@ -374,6 +408,27 @@ async function handleCallback(callback: Record<string, any>) {
 
   }
 
+  // --- сповіщення клієнту ---
+  // Тільки для замовлень із бота: у них є telegram_chat_id. Для
+  // замовлень із сайту поле порожнє, і ми мовчки нічого не шлемо.
+  await notifyCustomer(updated, status);
+
+  // Якщо позначили «Відправлено» — просимо номер накладної, щоб
+  // одразу переслати його клієнту з посиланням на відстеження
+  if (status === "shipped" && !updated.tracking_number) {
+
+    await saveSession(callback.message.chat.id, { awaiting_ttn_for: updated.id });
+
+    await telegram("sendMessage", {
+      chat_id: callback.message.chat.id,
+      text:
+        `Надішліть номер накладної для замовлення <b>${escapeHtml(updated.order_number ?? "")}</b> ` +
+        `— я перешлю його клієнту.\n\nЯкщо ТТН поки немає — /skip`,
+      parse_mode: "HTML",
+    });
+
+  }
+
   // перемальовуємо те саме повідомлення — щоб історія в чаті не
   // засмічувалась дублями, а поточний статус завжди був актуальним
   await telegram("editMessageText", {
@@ -414,6 +469,8 @@ async function handleMessage(message: Record<string, any>) {
   // --- відповіді на кроках, де клієнт пише текстом ---
   // Робимо це ДО перевірки команд: людина відповідає на питання
   // бота звичайним повідомленням, а не командою.
+  // спершу ТТН від власника, потім кроки оформлення клієнтом
+  if (await handleTrackingInput(message)) return;
   if (await handleOrderText(message)) return;
 
   if (!command) return;
@@ -509,6 +566,107 @@ async function handleMessage(message: Record<string, any>) {
       ],
     },
   });
+
+}
+
+// -------------------------
+// Сповіщення клієнту
+// -------------------------
+
+async function notifyCustomer(order: Record<string, any>, status: string) {
+
+  const chatId = order?.telegram_chat_id;
+
+  // замовлення з сайту — чату немає, це нормально
+  if (!chatId) return;
+
+  const text = customerStatusMessage(order, status);
+
+  if (!text) return;
+
+  await telegram("sendMessage", {
+    chat_id: chatId,
+    text,
+    parse_mode: "HTML",
+    reply_markup: customerStatusKeyboard(order, status),
+  });
+
+}
+
+// -------------------------
+// Введення номера накладної власником
+//
+// Повертає true, якщо повідомлення було номером ТТН — тоді решта
+// обробників його не чіпає.
+// -------------------------
+
+async function handleTrackingInput(message: Record<string, any>): Promise<boolean> {
+
+  const chatId = message.chat.id;
+
+  const session = await getSession(chatId);
+
+  if (!session?.awaiting_ttn_for) return false;
+
+  const text: string = message.text ?? "";
+
+  // передумали або ТТН ще немає
+  if (text.trim() === "/skip") {
+
+    await saveSession(chatId, { awaiting_ttn_for: null });
+
+    await telegram("sendMessage", {
+      chat_id: chatId,
+      text: "Гаразд, без накладної. Надішлете пізніше — просто натисніть «Відправлено» ще раз.",
+    });
+
+    return true;
+
+  }
+
+  const check = validateTracking(text);
+
+  if (!check.ok) {
+
+    await telegram("sendMessage", { chat_id: chatId, text: check.error });
+
+    return true;
+
+  }
+
+  // зберігаємо ТТН і одразу шлемо клієнту
+  const response = await supabaseRest(
+    `orders?id=eq.${encodeURIComponent(session.awaiting_ttn_for)}`,
+    {
+      method: "PATCH",
+      headers: { Prefer: "return=representation" },
+      body: JSON.stringify({ tracking_number: check.value }),
+    },
+  );
+
+  const rows = response.ok ? await response.json() : [];
+  const order = Array.isArray(rows) ? rows[0] : null;
+
+  await saveSession(chatId, { awaiting_ttn_for: null });
+
+  if (!order) {
+
+    await telegram("sendMessage", { chat_id: chatId, text: "Не вдалося зберегти накладну." });
+
+    return true;
+
+  }
+
+  await notifyCustomer(order, "shipped");
+
+  await telegram("sendMessage", {
+    chat_id: chatId,
+    text: order.telegram_chat_id
+      ? `✅ Накладну збережено і надіслано клієнту.`
+      : `✅ Накладну збережено. Клієнт замовляв на сайті, тож у Telegram його не сповістити — передайте номер телефоном.`,
+  });
+
+  return true;
 
 }
 
@@ -708,7 +866,6 @@ async function handleOrderCallback(callback: Record<string, any>, data: string) 
       ...session,
       delivery_method: option.label,
       delivery_price: option.price,
-      delivery_id: option.id,
     });
 
     return;
@@ -719,7 +876,7 @@ async function handleOrderCallback(callback: Record<string, any>, data: string) 
   if (action === "submit") {
 
     const orderNumber = generateOrderNumber();
-    const row = buildOrderRow(product, session, orderNumber);
+    const row = buildOrderRow(product, { ...session, chat_id: chatId }, orderNumber);
 
     const created = await createOrder(row);
 

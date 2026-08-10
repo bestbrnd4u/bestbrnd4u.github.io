@@ -250,3 +250,87 @@ export function buildProductKeyboard(product, siteUrl) {
   };
 
 }
+
+// ======================================
+// Сповіщення КЛІЄНТУ про зміну статусу
+//
+// Надсилаються лише тим, хто замовляв у боті — у таких замовлень
+// збережений telegram_chat_id. Замовлення з сайту цього поля не
+// мають, і для них сповіщення просто не надсилаються.
+// ======================================
+
+// Посилання на відстеження Нової пошти. Клієнту зручніше натиснути
+// кнопку, ніж копіювати номер і шукати сайт.
+export function trackingUrl(ttn) {
+
+  const digits = String(ttn ?? "").replace(/\D/g, "");
+
+  if (!digits) return "";
+
+  return `https://novaposhta.ua/tracking/?cargo_number=${digits}`;
+
+}
+
+// ТТН Нової пошти — 14 цифр. Перевіряємо, щоб не надіслати клієнту
+// випадковий текст замість номера.
+export function validateTracking(text) {
+
+  const raw = String(text ?? "").trim();
+  const digits = raw.replace(/\D/g, "");
+
+  if (!digits) return { ok: false, error: "Це не схоже на номер накладної. Надішліть 14 цифр або /skip." };
+  if (digits.length < 10) return { ok: false, error: `Замало цифр (${digits.length}). ТТН Нової пошти — 14 цифр. Або /skip.` };
+  if (digits.length > 20) return { ok: false, error: "Забагато цифр для номера накладної. Або /skip." };
+
+  return { ok: true, value: digits };
+
+}
+
+// Текст для клієнта під конкретний статус. Повертає null, якщо про
+// цей статус клієнта повідомляти не треба (напр. «Нове» — він щойно
+// сам оформив замовлення й уже отримав підтвердження).
+export function customerStatusMessage(order, status) {
+
+  const number = escapeHtml(order?.order_number ?? "");
+  const ttn = order?.tracking_number;
+
+  switch (normalizeStatus(status)) {
+
+    case "processing":
+      return `👌 Ваше замовлення <b>${number}</b> прийнято в роботу.\n\n` +
+             `Ми зв'яжемось із вами найближчим часом, щоб підтвердити деталі.`;
+
+    case "shipped":
+      return ttn
+        ? `📦 Замовлення <b>${number}</b> відправлено!\n\n` +
+          `Номер накладної: <code>${escapeHtml(ttn)}</code>`
+        : `📦 Замовлення <b>${number}</b> відправлено!\n\n` +
+          `Номер накладної надішлемо окремо.`;
+
+    case "completed":
+      return `🎉 Замовлення <b>${number}</b> виконано.\n\n` +
+             `Дякуємо за покупку! Будемо раді бачити вас знову.`;
+
+    case "cancelled":
+      return `❌ Замовлення <b>${number}</b> скасовано.\n\n` +
+             `Якщо це помилка — напишіть нам, ми все виправимо.`;
+
+    default:
+      return null;
+
+  }
+
+}
+
+// Кнопка відстеження — лише коли є ТТН
+export function customerStatusKeyboard(order, status) {
+
+  if (normalizeStatus(status) !== "shipped") return undefined;
+
+  const url = trackingUrl(order?.tracking_number);
+
+  if (!url) return undefined;
+
+  return { inline_keyboard: [[{ text: "🔍 Відстежити посилку", url }]] };
+
+}
