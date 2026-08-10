@@ -26,7 +26,7 @@
 import {
   STATUSES, normalizeStatus, formatOrder, buildKeyboard,
   parseStartPayload, formatProductCard, buildProductKeyboard, absoluteImageUrl,
-  customerStatusMessage, customerStatusKeyboard, validateTracking,
+  customerStatusMessage, customerStatusKeyboard, validateTracking, parseTtnCommand,
 } from "./format.js";
 import {
   DELIVERY_OPTIONS, deliveryById, colorsOf, sizesOf, autoFill, nextStep,
@@ -229,7 +229,7 @@ async function getSession(chatId: number) {
 const SESSION_COLUMNS = [
   "step", "product_id", "color", "size", "qty",
   "delivery_method", "delivery_price", "city", "delivery_detail",
-  "first_name", "last_name", "phone", "awaiting_ttn_for",
+  "first_name", "last_name", "phone", "awaiting_ttn_for", "message_id",
 ];
 
 async function saveSession(chatId: number, patch: Record<string, any>) {
@@ -290,33 +290,70 @@ async function createOrder(row: Record<string, any>) {
 
 async function askStep(chatId: number, step: string, product: Record<string, any>, session: Record<string, any>) {
 
-  if (step === "confirm") {
-
-    await telegram("sendMessage", {
-      chat_id: chatId,
-      text: summaryText(product, session),
-      parse_mode: "HTML",
-      reply_markup: confirmKeyboard(),
-    });
-
-    return;
-
-  }
+  const text = step === "confirm"
+    ? summaryText(product, session)
+    : stepPrompt(step, product, session);
 
   const keyboards: Record<string, unknown> = {
     color: colorKeyboard(product),
     size: sizeKeyboard(product, session.color),
     qty: qtyKeyboard(),
     delivery: deliveryKeyboard(),
-    phone: phoneKeyboard(),
+    confirm: confirmKeyboard(),
   };
 
-  await telegram("sendMessage", {
+  // Крок з телефоном — єдиний, де потрібна ЗВИЧАЙНА клавіатура
+  // (кнопка «поділитися контактом» працює тільки з нею), а таку
+  // не можна причепити до відредагованого повідомлення. Тому тут
+  // завжди надсилаємо нове.
+  if (step === "phone") {
+
+    await telegram("sendMessage", {
+      chat_id: chatId,
+      text,
+      parse_mode: "HTML",
+      reply_markup: phoneKeyboard(),
+    });
+
+    return;
+
+  }
+
+  const reply_markup = keyboards[step];
+
+  // РЕДАГУЄМО одне й те саме повідомлення замість надсилання нового
+  // на кожен крок. Інакше чат швидко виростає, і клієнту доводиться
+  // прокручувати його вручну, щоб побачити наступне питання —
+  // Telegram не завжди догортає сам, коли з'являється клавіатура.
+  if (session.message_id) {
+
+    const edited = await telegram("editMessageText", {
+      chat_id: chatId,
+      message_id: session.message_id,
+      text,
+      parse_mode: "HTML",
+      reply_markup,
+    });
+
+    if (edited?.ok) return;
+
+    // Повідомлення могло стати надто старим для редагування або
+    // бути видаленим — тоді просто надсилаємо нове нижче.
+
+  }
+
+  const sent = await telegram("sendMessage", {
     chat_id: chatId,
-    text: stepPrompt(step, product, session),
+    text,
     parse_mode: "HTML",
-    reply_markup: keyboards[step] ?? { remove_keyboard: true },
+    reply_markup,
   });
+
+  if (sent?.result?.message_id) {
+
+    await saveSession(chatId, { message_id: sent.result.message_id });
+
+  }
 
 }
 
@@ -361,7 +398,7 @@ async function handleNewOrder(record: Record<string, any>) {
     text,
     parse_mode: "HTML",
     disable_web_page_preview: true,
-    reply_markup: buildKeyboard(record.id, record.status ?? "new"),
+    reply_markup: buildKeyboard(record.id, record.status ?? "new", { hasTracking: Boolean(record.tracking_number) }),
   });
 
 }
@@ -376,6 +413,35 @@ async function handleCallback(callback: Record<string, any>) {
   if (data.startsWith("o:")) {
 
     await handleOrderCallback(callback, data);
+
+    return;
+
+  }
+
+  // Кнопка «Додати ТТН» під відправленим замовленням — щоб можна
+  // було дослати накладну, якщо раніше натиснули /skip
+  if (data.startsWith("ttn:")) {
+
+    const orderId = data.slice(4);
+
+    await saveSession(callback.message.chat.id, { awaiting_ttn_for: orderId });
+
+    await telegram("answerCallbackQuery", { callback_query_id: callback.id });
+
+    // Обов'язково називаємо замовлення. Якщо натиснути «Додати ТТН»
+    // під двома замовленнями поспіль, без номера в тексті було б
+    // видно два однакових запити — і незрозуміло, якому з них
+    // належить наступна відповідь.
+    const order = await findOrderById(orderId);
+
+    await telegram("sendMessage", {
+      chat_id: callback.message.chat.id,
+      text:
+        `Надішліть номер накладної для замовлення <b>${escapeHtml(order?.order_number ?? "")}</b> ` +
+        `— я перешлю його клієнту.\n\n` +
+        `Передумали — /skip`,
+      parse_mode: "HTML",
+    });
 
     return;
 
@@ -437,7 +503,7 @@ async function handleCallback(callback: Record<string, any>) {
     text: formatOrder(updated),
     parse_mode: "HTML",
     disable_web_page_preview: true,
-    reply_markup: buildKeyboard(updated.id, status),
+    reply_markup: buildKeyboard(updated.id, status, { hasTracking: Boolean(updated.tracking_number) }),
   });
 
   await telegram("answerCallbackQuery", {
@@ -458,7 +524,10 @@ async function handleMessage(message: Record<string, any>) {
 
     await telegram("sendMessage", {
       chat_id: chatId,
-      text: `ID цього чату: <code>${chatId}</code>`,
+      text:
+        `ID цього чату: <code>${chatId}</code>\n\n` +
+        `Накладну можна додати командою:\n` +
+        `<code>/ttn 0708553442 20450912345678</code>`,
       parse_mode: "HTML",
     });
 
@@ -504,6 +573,8 @@ async function handleMessage(message: Record<string, any>) {
       color: null, size: null, qty: 1,
       delivery_method: null, delivery_price: 0,
       city: null, delivery_detail: null,
+      // нове оформлення — нове повідомлення для кроків
+      message_id: null,
     });
 
     const caption = formatProductCard(product, SITE_URL);
@@ -570,6 +641,55 @@ async function handleMessage(message: Record<string, any>) {
 }
 
 // -------------------------
+// Пошук замовлення
+// -------------------------
+
+async function findOrderById(id: string) {
+
+  const response = await supabaseRest(`orders?id=eq.${encodeURIComponent(id)}&select=*`);
+
+  if (!response.ok) return null;
+
+  const rows = await response.json();
+
+  return Array.isArray(rows) ? rows[0] ?? null : null;
+
+}
+
+async function findOrderByNumber(orderNumber: string) {
+
+  const response = await supabaseRest(
+    `orders?order_number=eq.${encodeURIComponent(orderNumber)}&select=*`,
+  );
+
+  if (!response.ok) return null;
+
+  const rows = await response.json();
+
+  return Array.isArray(rows) ? rows[0] ?? null : null;
+
+}
+
+// Зберігає накладну і повідомляє клієнта. Повертає оновлене
+// замовлення або null.
+async function applyTracking(orderId: string, tracking: string) {
+
+  const response = await supabaseRest(`orders?id=eq.${encodeURIComponent(orderId)}`, {
+    method: "PATCH",
+    headers: { Prefer: "return=representation" },
+    body: JSON.stringify({ tracking_number: tracking }),
+  });
+
+  const rows = response.ok ? await response.json() : [];
+  const order = Array.isArray(rows) ? rows[0] ?? null : null;
+
+  if (order) await notifyCustomer(order, "shipped");
+
+  return order;
+
+}
+
+// -------------------------
 // Сповіщення клієнту
 // -------------------------
 
@@ -604,6 +724,51 @@ async function handleTrackingInput(message: Record<string, any>): Promise<boolea
 
   const chatId = message.chat.id;
 
+  // --- явна команда: /ttn <номер замовлення> <ТТН> ---
+  // Не залежить від того, яку кнопку натиснули останньою, тож
+  // працює навіть коли замовлень багато або картка вже загубилась
+  // у переписці.
+  const command = parseTtnCommand(message.text);
+
+  if (command) {
+
+    if (command.error) {
+
+      await telegram("sendMessage", { chat_id: chatId, text: command.error });
+
+      return true;
+
+    }
+
+    const order = await findOrderByNumber(command.orderNumber);
+
+    if (!order) {
+
+      await telegram("sendMessage", {
+        chat_id: chatId,
+        text: `Замовлення ${command.orderNumber} не знайдено. Перевірте номер.`,
+      });
+
+      return true;
+
+    }
+
+    const updated = await applyTracking(order.id, command.tracking);
+
+    await telegram("sendMessage", {
+      chat_id: chatId,
+      text: updated?.telegram_chat_id
+        ? `✅ Накладну <code>${escapeHtml(command.tracking)}</code> збережено для замовлення ` +
+          `<b>${escapeHtml(command.orderNumber)}</b> і надіслано клієнту.`
+        : `✅ Накладну збережено для замовлення <b>${escapeHtml(command.orderNumber)}</b>. ` +
+          `Клієнт замовляв на сайті — передайте номер телефоном.`,
+      parse_mode: "HTML",
+    });
+
+    return true;
+
+  }
+
   const session = await getSession(chatId);
 
   if (!session?.awaiting_ttn_for) return false;
@@ -634,18 +799,7 @@ async function handleTrackingInput(message: Record<string, any>): Promise<boolea
 
   }
 
-  // зберігаємо ТТН і одразу шлемо клієнту
-  const response = await supabaseRest(
-    `orders?id=eq.${encodeURIComponent(session.awaiting_ttn_for)}`,
-    {
-      method: "PATCH",
-      headers: { Prefer: "return=representation" },
-      body: JSON.stringify({ tracking_number: check.value }),
-    },
-  );
-
-  const rows = response.ok ? await response.json() : [];
-  const order = Array.isArray(rows) ? rows[0] : null;
+  const order = await applyTracking(session.awaiting_ttn_for, check.value);
 
   await saveSession(chatId, { awaiting_ttn_for: null });
 
@@ -657,13 +811,16 @@ async function handleTrackingInput(message: Record<string, any>): Promise<boolea
 
   }
 
-  await notifyCustomer(order, "shipped");
-
+  // У підтвердженні теж називаємо замовлення — щоб було видно, куди
+  // саме пішов номер, а не просто «збережено»
   await telegram("sendMessage", {
     chat_id: chatId,
     text: order.telegram_chat_id
-      ? `✅ Накладну збережено і надіслано клієнту.`
-      : `✅ Накладну збережено. Клієнт замовляв на сайті, тож у Telegram його не сповістити — передайте номер телефоном.`,
+      ? `✅ Накладну <code>${escapeHtml(check.value)}</code> збережено для замовлення ` +
+        `<b>${escapeHtml(order.order_number ?? "")}</b> і надіслано клієнту.`
+      : `✅ Накладну збережено для замовлення <b>${escapeHtml(order.order_number ?? "")}</b>. ` +
+        `Клієнт замовляв на сайті, тож у Telegram його не сповістити — передайте номер телефоном.`,
+    parse_mode: "HTML",
   });
 
   return true;
@@ -729,8 +886,11 @@ async function handleOrderText(message: Record<string, any>): Promise<boolean> {
 
     }
 
+    // після звичайної клавіатури повертаємось до редагованого
+    // повідомлення — скидаємо id, щоб підсумок прийшов новим
     await advance(chatId, "phone", product, {
       ...session,
+      message_id: null,
       phone: result.value,
       first_name: contact?.first_name ?? session.first_name ?? message.from?.first_name ?? null,
       last_name: contact?.last_name ?? session.last_name ?? message.from?.last_name ?? null,

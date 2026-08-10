@@ -179,15 +179,24 @@ console.log("\n[11] Чернетка пишеться лише в наявні �
   // в таблиці. Запит падав з «column does not exist», крок не
   // зберігався — і діалог мовчки зупинявся посеред оформлення
   // (клієнт писав місто, а бот уже не розумів, чого він чекає).
-  const sql = fs.readFileSync(path.join(ROOT,"supabase/migrations/002-bot-order-sessions.sql"),"utf8");
-  const extra = fs.readFileSync(path.join(ROOT,"supabase/migrations/003-customer-notifications.sql"),"utf8");
+  // Читаємо ВСІ міграції, а не перелічені руками: інакше кожна нова
+  // міграція означала б правку тесту, і саме через це перевірка
+  // щойно пропустила колонку message_id, додану в 004.
+  const migrationsDir = path.join(ROOT, "supabase/migrations");
+  const sqlAll = fs.readdirSync(migrationsDir)
+      .filter(f => f.endsWith(".sql"))
+      .sort()
+      .map(f => fs.readFileSync(path.join(migrationsDir, f), "utf8"))
+      .join("\n");
 
-  // колонки з CREATE TABLE
-  const createBlock = sql.slice(sql.indexOf("create table"), sql.indexOf(");", sql.indexOf("create table")));
+  // колонки з CREATE TABLE bot_sessions
+  const createAt = sqlAll.indexOf("create table if not exists public.bot_sessions");
+  const createBlock = sqlAll.slice(createAt, sqlAll.indexOf(");", createAt));
   const columns = [...createBlock.matchAll(/^\s{4}([a-z_]+)\s+\S/gm)].map(m => m[1]);
 
-  // плюс додані пізніше
-  [...extra.matchAll(/add column if not exists ([a-z_]+)/gi)].forEach(m => columns.push(m[1]));
+  // плюс усі, додані ALTER-ами саме до bot_sessions
+  [...sqlAll.matchAll(/alter table public\.bot_sessions\s+add column if not exists ([a-z_]+)/gi)]
+      .forEach(m => columns.push(m[1]));
 
   check("колонки таблиці зчитані", columns.length > 5, columns.join(", "));
 

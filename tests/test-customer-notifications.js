@@ -113,6 +113,105 @@ console.log("\n[7] Міграція");
         (sql.match(/add column if not exists/gi) || []).length === 3);
 }
 
+console.log("\n[8] ТТН можна дослати після /skip");
+{
+  // Регресія: після «Відправлено» кнопка «Відправлено» зникає
+  // (далі йдуть «Виконано» і «Скасовано»), тож порада «натисніть
+  // ще раз» не працювала — накладну не було чим додати взагалі.
+  const kbNoTtn = M.buildKeyboard("id1", "shipped", { hasTracking: false });
+  const flat = kbNoTtn.inline_keyboard.flat().map(b => b.callback_data);
+
+  check("під відправленим без ТТН є кнопка «Додати ТТН»",
+        flat.includes("ttn:id1"), flat.join(", "));
+
+  const kbWithTtn = M.buildKeyboard("id1", "shipped", { hasTracking: true });
+  check("коли ТТН вже є — кнопки немає",
+        !JSON.stringify(kbWithTtn).includes("ttn:"), JSON.stringify(kbWithTtn));
+
+  check("на інших статусах кнопки ТТН немає",
+        !JSON.stringify(M.buildKeyboard("id1","new",{}) ?? {}).includes("ttn:"));
+
+  check("статусні кнопки лишились на місці",
+        flat.includes("st:completed:id1") && flat.includes("st:cancelled:id1"));
+
+  check("обробник кнопки є у функції", SRC.includes('data.startsWith("ttn:")'));
+  check("кнопка ставить очікування саме цього замовлення",
+        /awaiting_ttn_for: orderId/.test(SRC));
+  check("картка перемальовується з урахуванням наявності ТТН",
+        SRC.includes("hasTracking: Boolean(updated.tracking_number)"));
+}
+
+console.log("\n[9] Діалог не засмічує чат (редагування замість нових повідомлень)");
+{
+  // Клієнт скаржився, що доводиться прокручувати чат вручну, щоб
+  // побачити наступне питання. Кожен крок надсилався окремим
+  // повідомленням; тепер редагуємо одне.
+  check("кроки редагують повідомлення", SRC.includes('telegram("editMessageText"'));
+  check("id повідомлення зберігається в чернетці", SRC.includes("message_id"));
+  check("якщо редагування не вдалось — надсилаємо нове",
+        /if \(edited\?\.ok\) return;/.test(SRC));
+  check("крок з телефоном лишається окремим повідомленням (потрібна звичайна клавіатура)",
+        /if \(step === "phone"\)[\s\S]{0,400}phoneKeyboard\(\)/.test(SRC));
+  check("нове оформлення починає нове повідомлення",
+        /message_id: null/.test(SRC));
+
+  const sql = fs.readFileSync(path.join(ROOT,"supabase/migrations/004-bot-message-id.sql"),"utf8");
+  check("колонка message_id додається міграцією",
+        /add column if not exists message_id/i.test(sql));
+}
+
+console.log("\n[10] Кілька замовлень: ТТН потрапляє в потрібне");
+{
+  // Проблема: awaiting_ttn_for один на чат. Натиснули «Додати ТТН»
+  // під замовленням A, потім під B — очікування перезаписалось.
+  // Якщо в тексті запиту не названо замовлення, власник бачить два
+  // однакових повідомлення й не знає, на яке відповідає.
+
+  check("запит по кнопці називає конкретне замовлення",
+        /Надішліть номер накладної для замовлення <b>\$\{escapeHtml\(order\?\.order_number/.test(SRC),
+        "у тексті має бути номер замовлення");
+
+  check("для цього замовлення підвантажується з бази",
+        SRC.includes("await findOrderById(orderId)"));
+
+  check("підтвердження теж називає замовлення",
+        /збережено для замовлення[\s\S]{0,120}order\.order_number/.test(SRC));
+
+  check("у підтвердженні видно сам номер накладної",
+        /escapeHtml\(check\.value\)/.test(SRC));
+}
+
+console.log("\n[11] Команда /ttn — не залежить від натиснутих кнопок");
+{
+  const p = M.parseTtnCommand;
+
+  check("розбирає номер замовлення і накладну",
+        JSON.stringify(p("/ttn 0708553442 20450912345678")) ===
+        JSON.stringify({ orderNumber:"0708553442", tracking:"20450912345678" }));
+
+  check("накладна з пробілами склеюється",
+        p("/ttn 0708553442 2045 0912 345678").tracking === "20450912345678");
+
+  check("накладна з дефісами теж",
+        p("/ttn 0708553442 2045-0912-345678").tracking === "20450912345678");
+
+  check("команда з @іменем бота працює (важливо для груп)",
+        p("/ttn@bagvero_bot 0708553442 20450912345678")?.orderNumber === "0708553442");
+
+  check("без аргументів — підказка формату", !!p("/ttn")?.error);
+  check("з одним аргументом — теж підказка", !!p("/ttn 0708553442")?.error);
+  check("звичайний текст не сприймається за команду", p("привіт") === null);
+  check("схожий текст без слеша ігнорується", p("ttn 123 456") === null);
+
+  check("обробник шукає замовлення за номером",
+        SRC.includes("findOrderByNumber(command.orderNumber)"));
+  check("неіснуючий номер — зрозуміла відповідь",
+        SRC.includes("не знайдено. Перевірте номер"));
+  check("команда обробляється незалежно від awaiting_ttn_for",
+        SRC.indexOf("parseTtnCommand(message.text)") < SRC.indexOf("session?.awaiting_ttn_for"));
+  check("підказка про команду є в /id", SRC.includes("/ttn 0708553442"));
+}
+
 console.log(failures===0?"\n✅ Усі перевірки пройдено":`\n❌ Провалено: ${failures}`);
 process.exit(failures===0?0:1);
 

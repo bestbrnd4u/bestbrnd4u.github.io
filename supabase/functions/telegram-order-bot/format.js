@@ -110,7 +110,7 @@ export function formatOrder(order) {
 
 // Показуємо лише ті статуси, у які має сенс переходити з поточного —
 // щоб не тицьнути «Відправлено» на скасованому замовленні.
-export function buildKeyboard(orderId, current) {
+export function buildKeyboard(orderId, current, options = {}) {
 
   const status = normalizeStatus(current);
 
@@ -130,16 +130,29 @@ export function buildKeyboard(orderId, current) {
   // зникне одна кнопка, а решта працює.
   const valid = next.filter((key) => STATUSES[key]);
 
-  if (!valid.length) return undefined;
+  const rows = [];
 
-  return {
-    inline_keyboard: [
-      valid.map((key) => ({
-        text: `${STATUSES[key].emoji} ${STATUSES[key].label}`,
-        callback_data: `st:${key}:${orderId}`,
-      })),
-    ],
-  };
+  if (valid.length) {
+
+    rows.push(valid.map((key) => ({
+      text: `${STATUSES[key].emoji} ${STATUSES[key].label}`,
+      callback_data: `st:${key}:${orderId}`,
+    })));
+
+  }
+
+  // Окрема кнопка для накладної.
+  //
+  // Потрібна саме тому, що після «Відправлено» цієї кнопки в списку
+  // вже немає (наступні статуси — «Виконано» і «Скасовано»), і якщо
+  // ТТН пропустили через /skip, додати його не було б чим.
+  if (status === "shipped" && !options.hasTracking) {
+
+    rows.push([{ text: "📦 Додати ТТН", callback_data: `ttn:${orderId}` }]);
+
+  }
+
+  return rows.length ? { inline_keyboard: rows } : undefined;
 
 }
 
@@ -332,5 +345,36 @@ export function customerStatusKeyboard(order, status) {
   if (!url) return undefined;
 
   return { inline_keyboard: [[{ text: "🔍 Відстежити посилку", url }]] };
+
+}
+
+// Явна команда для накладної: /ttn <номер замовлення> <ТТН>
+//
+// Потрібна, коли замовлень кілька: кнопка «Додати ТТН» прив'язується
+// до останнього натискання, і якщо натиснути під двома замовленнями
+// поспіль, легко переплутати, якому саме належить наступна відповідь.
+// Команда не залежить від стану — у ній прямо вказано, куди писати.
+export function parseTtnCommand(text) {
+
+  const raw = String(text ?? "").trim();
+
+  if (!/^\/ttn(@\S+)?\b/i.test(raw)) return null;
+
+  const rest = raw.replace(/^\/ttn(@\S+)?/i, "").trim();
+
+  // очікуємо два числа: номер замовлення (10 цифр) і ТТН
+  const parts = rest.split(/\s+/).filter(Boolean);
+
+  if (parts.length < 2) {
+    return { error: "Формат: /ttn <номер замовлення> <номер накладної>\nНаприклад: /ttn 0708553442 20450912345678" };
+  }
+
+  const orderNumber = parts[0].replace(/\D/g, "");
+  const tracking = parts.slice(1).join("").replace(/\D/g, "");
+
+  if (!orderNumber) return { error: "Не розпізнав номер замовлення." };
+  if (!tracking) return { error: "Не розпізнав номер накладної." };
+
+  return { orderNumber, tracking };
 
 }
