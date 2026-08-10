@@ -163,6 +163,37 @@ const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 const TELEGRAM_API = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}`;
 
 // -------------------------
+// Фонова робота
+//
+// Telegram чекає від webhook лише швидкий 200 — сам результат йому не
+// потрібен. Якщо тримати його з'єднання, поки ми ходимо в api.telegram.org
+// і в базу, він рано чи пізно відвалиться з "Read timeout expired" і почне
+// ретраїти той самий апдейт — тобто одне натискання кнопки може
+// оброблятись кілька разів.
+//
+// Тому відповідаємо одразу, а роботу доробляємо у фоні. EdgeRuntime
+// .waitUntil() тримає ізолят живим до завершення обіцянки; якщо його
+// немає (локальний запуск, інша версія рантайму) — просто чекаємо, це
+// теж коректно, лише повільніше.
+// -------------------------
+
+function background(work: Promise<unknown>) {
+
+  const runtime = (globalThis as any).EdgeRuntime;
+
+  if (runtime && typeof runtime.waitUntil === "function") {
+
+    runtime.waitUntil(work.catch((error: unknown) => console.error(error)));
+
+    return Promise.resolve();
+
+  }
+
+  return work.catch((error: unknown) => console.error(error));
+
+}
+
+// -------------------------
 // Telegram API
 // -------------------------
 
@@ -310,6 +341,22 @@ async function handleMessage(message: Record<string, any>) {
 
 Deno.serve(async (request) => {
 
+  try {
+    return await handleRequest(request);
+  } catch (error) {
+    // Будь-яка неперехоплена помилка раніше могла лишити Telegram
+    // без відповіді — і той ретраїв апдейт по колу. Тепер завжди
+    // відповідаємо, а причину пишемо в логи функції.
+    console.error("Необроблена помилка:", error);
+    return new Response("error", { status: 200 });
+  }
+
+});
+
+async function handleRequest(request: Request): Promise<Response> {
+
+  // GET — проста перевірка «чи жива функція»: відкрийте URL функції
+  // в браузері, має показати ok. Якщо висить — функція не стартує.
   if (request.method !== "POST") {
     return new Response("ok", { status: 200 });
   }
@@ -341,9 +388,9 @@ Deno.serve(async (request) => {
     }
 
     if (body.callback_query) {
-      await handleCallback(body.callback_query);
+      await background(handleCallback(body.callback_query));
     } else if (body.message) {
-      await handleMessage(body.message);
+      await background(handleMessage(body.message));
     }
 
     return new Response("ok", { status: 200 });
@@ -359,7 +406,7 @@ Deno.serve(async (request) => {
       return new Response("forbidden", { status: 403 });
     }
 
-    await handleNewOrder(body.record);
+    await background(handleNewOrder(body.record));
 
     return new Response("ok", { status: 200 });
 
@@ -367,4 +414,4 @@ Deno.serve(async (request) => {
 
   return new Response("ignored", { status: 200 });
 
-});
+}

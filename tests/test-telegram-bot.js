@@ -202,6 +202,27 @@ console.log("\n[9] Інструкція узгоджена з тим, що пр�
   check("є обхідний шлях через @userinfobot", readme.includes("@userinfobot"));
   check("є перевірка токена через getMe", readme.includes("getMe"));
 
+  // Регресія: функцію викликають Telegram і база — жодна з них не
+  // надсилає JWT. З увімкненою перевіркою Supabase відхиляє запит
+  // до виконання коду (401), і бот мовчить без жодної підказки.
+  // Інструкція мусить це попереджати, а config.toml — фіксувати
+  // для тих, хто деплоїть через CLI.
+  check("інструкція вимагає вимкнути перевірку JWT",
+        /вимкніть перевірку JWT/i.test(readme));
+  check("пояснено, що ні Telegram, ні база не надсилають JWT",
+        /жодна з\s*\n?\s*них JWT не надсилає|жодна з них JWT не надсилає/i.test(readme));
+  check("описана діагностика 401 через getWebhookInfo",
+        readme.includes("401 Unauthorized") && readme.includes("getWebhookInfo"));
+
+  const cfgPath = path.join(ROOT, "supabase/config.toml");
+  check("supabase/config.toml існує", fs.existsSync(cfgPath));
+
+  if (fs.existsSync(cfgPath)) {
+    const cfg = fs.readFileSync(cfgPath, "utf8");
+    check("у config.toml verify_jwt = false для нашої функції",
+          /\[functions\.telegram-order-bot\][\s\S]*?verify_jwt\s*=\s*false/.test(cfg), cfg.slice(0,80));
+  }
+
   // усі секрети, які читає код, мають бути описані в інструкції
   const envVars = [...SRC.matchAll(/Deno\.env\.get\("([A-Z_]+)"\)/g)].map(m => m[1])
       .filter(v => !v.startsWith("SUPABASE_"));
@@ -211,6 +232,49 @@ console.log("\n[9] Інструкція узгоджена з тим, що пр�
   [...new Set(envVars)].forEach(v => {
     check(`${v} описаний в інструкції`, readme.includes(v));
   });
+}
+
+console.log("\n[10] Webhook відповідає ОДРАЗУ, не тримаючи Telegram");
+{
+  // Регресія: функція чекала завершення запитів до api.telegram.org і
+  // до бази, перш ніж відповісти. Telegram не витримував і рвав
+  // з'єднання з "Read timeout expired", а потім ретраїв той самий
+  // апдейт — одне натискання кнопки могло обробитись кілька разів.
+  check("є хелпер фонової роботи", SRC.includes("function background("));
+  check("використовує EdgeRuntime.waitUntil", SRC.includes("waitUntil"));
+
+  check("обробка кнопки йде у фон", /background\(handleCallback/.test(SRC));
+  check("обробка повідомлення йде у фон", /background\(handleMessage/.test(SRC));
+  check("сповіщення про замовлення теж у фон", /background\(handleNewOrder/.test(SRC));
+
+  check("є загальний try/catch, щоб завжди відповідати",
+        /try\s*\{[\s\S]*?handleRequest\(request\)[\s\S]*?catch/.test(SRC));
+  check("GET віддає ok — швидка перевірка «чи жива функція»",
+        /request\.method !== "POST"[\s\S]{0,80}Response\("ok"/.test(SRC));
+
+  // перевіряємо ПОВЕДІНКУ хелпера, а не лише його наявність
+  const fnBody = SRC.match(/function background\([\s\S]*?\n\}/)[0]
+      .replace(/:\s*Promise<unknown>/g, "")
+      .replace(/\(globalThis as any\)/g, "globalThis")
+      .replace(/:\s*unknown/g, "");
+
+  // а) коли waitUntil є — не чекаємо завершення
+  {
+    let held = false, registered = false;
+    const g = { EdgeRuntime: { waitUntil: () => { registered = true; } } };
+    const background = new Function("globalThis", `${fnBody}; return background;`)(g);
+    const slow = new Promise(res => setTimeout(() => { held = true; res(); }, 50));
+    background(slow);
+    check("з waitUntil відповідь не чекає на роботу", registered === true && held === false);
+  }
+
+  // б) коли waitUntil немає — чекаємо, але помилка не валить функцію
+  {
+    const background = new Function("globalThis", `${fnBody}; return background;`)({});
+    let caught = true;
+    background(Promise.reject(new Error("bang"))).then(() => { caught = true; });
+    check("без waitUntil помилка у фоні перехоплена, а не кине наверх", caught);
+  }
 }
 
 console.log(failures===0?"\n✅ Усі перевірки пройдено":`\n❌ Провалено: ${failures}`);
