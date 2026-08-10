@@ -7,7 +7,7 @@ const ROOT = require("path").join(__dirname, "..");
 let failures=0;
 const check=(n,c,e)=>{if(c)console.log("  ✓",n);else{console.log("  ✗",n,e!==undefined?"→ "+e:"");failures++;}};
 
-const SRC = fs.readFileSync(path.join(ROOT,"supabase/functions/telegram-order-bot/index.ts"), "utf8");
+const SRC = fs.readFileSync(path.join(ROOT,"supabase/functions/telegram-order-bot/_index.src.ts"), "utf8");
 
 // Чисту логіку імпортуємо НАПРЯМУ з того самого модуля, який
 // використовує Edge Function. Раніше тут стояло вирізання
@@ -133,6 +133,84 @@ console.log("\n[7] Гостьові замовлення тепер зберіг
   check("RLS лишається увімкненим", /enable row level security/i.test(sql));
   check("є політика вставки для гостя", /user_id is null/i.test(sql));
   check("читати чужі замовлення не можна", /using \(user_id = auth\.uid\(\)\)/i.test(sql));
+}
+
+console.log("\n[8] Деплой: один самодостатній файл, і він не застарів");
+{
+  // Регресія: спершу функція деплоїлась двома файлами, і index.ts
+  // імпортував ./format.js. У панелі Supabase другий файл легко
+  // не долити — деплой падав з "Module not found ... format.js".
+  // Тепер index.ts ЗБИРАЄТЬСЯ з джерел в один файл. Тут стежимо,
+  // щоб він лишався самодостатнім і не розходився з джерелами.
+  const fnDir = path.join(ROOT, "supabase/functions/telegram-order-bot");
+  const bundled = fs.readFileSync(path.join(fnDir, "index.ts"), "utf8");
+
+  check("у файлі для деплою немає локальних імпортів",
+        !/from\s+["']\.\//.test(bundled),
+        (bundled.match(/from\s+["']\.[^"']*["']/) || ["—"])[0]);
+
+  check("немає export — усе локальне в одному файлі",
+        !/^export\s/m.test(bundled));
+
+  ["STATUSES", "formatOrder", "buildKeyboard", "escapeHtml", "Deno.serve"]
+    .forEach(name => check(`${name} присутній у зібраному файлі`, bundled.includes(name)));
+
+  // найважливіше: зібраний файл має відповідати поточним джерелам
+  const { build } = require(path.join(ROOT, "scripts/build-edge-function.js"));
+  check("index.ts перезібраний з актуальних джерел (не застарів)",
+        build() === bundled,
+        "запустіть: node scripts/build-edge-function.js");
+
+  const readme = fs.readFileSync(path.join(ROOT, "supabase/README-telegram-bot.md"), "utf8");
+  check("інструкція каже, що файл один", /Файл ОДИН/i.test(readme));
+  check("інструкція згадує команду перезбірки",
+        readme.includes("build-edge-function.js"));
+}
+
+console.log("\n[9] Інструкція узгоджена з тим, що приймає інтерфейс");
+{
+  // Регресія: в інструкції було сказано лишити TELEGRAM_CHAT_ID
+  // порожнім і заповнити пізніше — але форма секретів Supabase
+  // порожні значення не приймає взагалі. Користувач упирався в
+  // "Please provide a value". Тепер chat_id дізнаються ДО створення
+  // секретів, і в інструкції не має лишитись порад лишати поле
+  // порожнім.
+  const readme = fs.readFileSync(path.join(ROOT, "supabase/README-telegram-bot.md"), "utf8");
+
+  check("немає поради лишити секрет порожнім",
+        !/лиш(іть|ити) порожнім/i.test(readme),
+        (readme.match(/[^\n]*лиш[^\n]*порожн[^\n]*/i) || ["—"])[0]);
+
+  check("сказано, що всі поля обов'язкові",
+        /не приймає порожні значення/i.test(readme));
+
+  // порядок кроків: chat_id має бути відомий ДО кроку з секретами
+  const iChatId = readme.indexOf("Дізнатися ID свого чату");
+  const iSecrets = readme.indexOf("Додати секрети");
+  check("chat_id дізнаються раніше, ніж створюють секрети",
+        iChatId > -1 && iSecrets > -1 && iChatId < iSecrets,
+        `chat_id@${iChatId}, secrets@${iSecrets}`);
+
+  check("показано, як дізнатися chat_id без функції (getUpdates)",
+        readme.includes("getUpdates"));
+
+  // Найчастіша пастка: якщо webhook уже стоїть, getUpdates завжди
+  // повертає порожньо — інструкція мусить це пояснювати, інакше
+  // користувач упреться в {"ok":true,"result":[]} без підказки.
+  check("пояснено конфлікт webhook і getUpdates",
+        readme.includes("getWebhookInfo") && readme.includes("deleteWebhook"));
+  check("є обхідний шлях через @userinfobot", readme.includes("@userinfobot"));
+  check("є перевірка токена через getMe", readme.includes("getMe"));
+
+  // усі секрети, які читає код, мають бути описані в інструкції
+  const envVars = [...SRC.matchAll(/Deno\.env\.get\("([A-Z_]+)"\)/g)].map(m => m[1])
+      .filter(v => !v.startsWith("SUPABASE_"));
+
+  check("у коді знайдено секрети", envVars.length > 0, envVars.join(", "));
+
+  [...new Set(envVars)].forEach(v => {
+    check(`${v} описаний в інструкції`, readme.includes(v));
+  });
 }
 
 console.log(failures===0?"\n✅ Усі перевірки пройдено":`\n❌ Провалено: ${failures}`);
