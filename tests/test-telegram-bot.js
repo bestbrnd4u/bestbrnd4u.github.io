@@ -81,24 +81,56 @@ console.log("\n[4] Захист від XSS у даних клієнта");
   check("кутові дужки перетворені на сутності", t.includes("&lt;"));
 }
 
-console.log("\n[5] Кнопки статусів: лише осмислені переходи");
+console.log("\n[5] Статуси бота = статуси сайту (інакше сайт покаже «Нове»)");
 {
-  const fromNew = buildKeyboard("id1","new").inline_keyboard[0].map(b=>b.callback_data);
-  check("з «Нове» → взяти в роботу або скасувати",
-        fromNew.join(",")==="st:taken:id1,st:cancelled:id1", fromNew.join(","));
+  // Регресія: бот мав власні ключі (taken, confirmed). У Telegram
+  // усе виглядало правильно, а «Історія замовлень» у кабінеті таких
+  // значень не знала і малювала їх як «Нове» — здавалось, що статус
+  // не змінюється. Тепер звіряємо два джерела автоматично.
+  const account = fs.readFileSync(path.join(ROOT, "assets/js/account.js"), "utf8");
 
-  const fromTaken = buildKeyboard("id1","taken").inline_keyboard[0].map(b=>b.callback_data);
-  check("з «Взято» → підтвердити або скасувати",
-        fromTaken.join(",")==="st:confirmed:id1,st:cancelled:id1", fromTaken.join(","));
+  const mapBody = account.match(/function orderStatusLabel[\s\S]*?const labels = \{([\s\S]*?)\};/)[1];
+  const siteStatuses = [...mapBody.matchAll(/^\s*(\w+)\s*:/gm)].map(m => m[1]);
 
-  const fromConfirmed = buildKeyboard("id1","confirmed").inline_keyboard[0].map(b=>b.callback_data);
-  check("з «Підтверджено» → відправити або скасувати",
-        fromConfirmed.join(",")==="st:shipped:id1,st:cancelled:id1", fromConfirmed.join(","));
+  check("статуси сайту знайдено", siteStatuses.length > 0, siteStatuses.join(", "));
 
+  const botStatuses = Object.keys(STATUSES);
+
+  botStatuses.forEach(key => {
+    check(`«${key}» відомий сайту`, siteStatuses.includes(key),
+          `сайт знає: ${siteStatuses.join(", ")}`);
+  });
+
+  // і для кожного є свій стиль, інакше бейдж буде без кольору
+  const css = fs.readFileSync(path.join(ROOT, "assets/css/style.css"), "utf8");
+  botStatuses.forEach(key => {
+    check(`є стиль .order-status-${key}`, css.includes(`.order-status-${key}`));
+  });
+
+  // усі статуси, у які ведуть кнопки, теж мусять бути валідними
+  const reachable = new Set();
+  ["new","processing","shipped","completed","cancelled"].forEach(from => {
+    (buildKeyboard("x", from)?.inline_keyboard[0] ?? [])
+      .forEach(b => reachable.add(b.callback_data.split(":")[1]));
+  });
+  [...reachable].forEach(key => {
+    check(`кнопка веде у валідний статус «${key}»`, siteStatuses.includes(key));
+  });
+}
+
+console.log("\n[5b] Кнопки статусів: лише осмислені переходи");
+{
+  const flow = (from) => (buildKeyboard("id1", from)?.inline_keyboard[0] ?? [])
+      .map(b => b.callback_data.split(":")[1]);
+
+  check("з «Нове» → в обробці або скасувати",
+        flow("new").join(",")==="processing,cancelled", flow("new").join(","));
+  check("з «В обробці» → відправити або скасувати",
+        flow("processing").join(",")==="shipped,cancelled", flow("processing").join(","));
+  check("з «Відправлено» → виконано або скасувати",
+        flow("shipped").join(",")==="completed,cancelled", flow("shipped").join(","));
   check("зі «Скасовано» кнопок немає", buildKeyboard("id1","cancelled")===undefined);
-  check("з «Відправлено» кнопок немає", buildKeyboard("id1","shipped")===undefined);
-  check("на скасованому немає кнопки «Відправлено»",
-        !JSON.stringify(buildKeyboard("id1","cancelled")||{}).includes("shipped"));
+  check("з «Виконано» кнопок немає", buildKeyboard("id1","completed")===undefined);
 }
 
 console.log("\n[6] Безпека: секрети не зашиті в код");

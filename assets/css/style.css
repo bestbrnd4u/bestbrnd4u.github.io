@@ -5059,6 +5059,28 @@ body.mobile-filters-open .scroll-top{
     margin-bottom:8px;
 }
 
+/* -- прокрутка кольору/розміру в кошику та обраному --
+   Ті самі обгортки, що в картці товару. min-width:0 обов'язковий:
+   без нього обгортка сідає по ширині вмісту, переповнення не
+   виникає — і рядок із багатьма кольорами розпирає верстку замість
+   того, щоб прокручуватись (саме це було на скріні кошика). */
+.cart-item-options,
+.favorite-row .product-options{
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    gap:8px;
+    min-width:0;
+}
+
+.cart-item .product-colors-wrap,
+.cart-item .product-sizes-wrap,
+.favorite-row .product-colors-wrap,
+.favorite-row .product-sizes-wrap{
+    width:100%;
+    min-width:0;
+}
+
 .cart-item-price{
     display:flex;
     align-items:baseline;

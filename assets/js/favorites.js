@@ -93,11 +93,19 @@ function createFavoriteRow(product, favEntry) {
                     ${escapeHtml(product.title)}
                 </a>
                 <div class="product-options">
-                    <div class="product-colors">
-                        ${colorButtons}
+<div class="product-colors-wrap">
+                        <button type="button" class="colors-arrow colors-arrow-left" aria-label="Попередні кольори" tabindex="-1">‹</button>
+                        <div class="product-colors">
+                            ${colorButtons}
+                        </div>
+                        <button type="button" class="colors-arrow colors-arrow-right" aria-label="Наступні кольори" tabindex="-1">›</button>
                     </div>
-                    <div class="product-sizes">
-                        ${sizeButtons}
+                    <div class="product-sizes-wrap">
+                        <button type="button" class="sizes-arrow sizes-arrow-left" aria-label="Попередні розміри" tabindex="-1">‹</button>
+                        <div class="product-sizes">
+                            ${sizeButtons}
+                        </div>
+                        <button type="button" class="sizes-arrow sizes-arrow-right" aria-label="Наступні розміри" tabindex="-1">›</button>
                     </div>
                 </div>
                 <div class="favorite-row-price">

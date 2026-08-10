@@ -23,7 +23,7 @@
 
 // Чиста логіка (форматування картки, кнопки) винесена окремо —
 // щоб її можна було запускати й тестувати в Node без Deno.
-import { STATUSES, formatOrder, buildKeyboard } from "./format.js";
+import { STATUSES, normalizeStatus, formatOrder, buildKeyboard } from "./format.js";
 
 const TELEGRAM_BOT_TOKEN = Deno.env.get("TELEGRAM_BOT_TOKEN") ?? "";
 const TELEGRAM_CHAT_ID = Deno.env.get("TELEGRAM_CHAT_ID") ?? "";

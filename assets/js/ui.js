@@ -576,7 +576,14 @@ function createProductCard(product) {
     // прокрутити.
     document.addEventListener("mouseover", event => {
 
-        const scope = event.target.closest?.(".product-card, .product-wrapper, #productPage");
+        // Кошик (.cart-item) і обране (.favorite-row) використовують ті
+        // самі блоки кольору/розміру, що й картка товару — тож і
+        // прокрутка зі стрілками має працювати там само. Без цих двох
+        // селекторів has-overflow не виставлявся, і при багатьох
+        // варіантах рядок просто розпирав верстку.
+        const scope = event.target.closest?.(
+            ".product-card, .product-wrapper, #productPage, .cart-item, .favorite-row"
+        );
 
         if (!scope) return;
 

@@ -9,13 +9,34 @@
 // вирізаючи типи регулярками. index.ts імпортує його як є.
 // ======================================
 
+// Статуси ЗАМОВЛЕННЯ.
+//
+// ⚠️ Ключі мусять точно збігатися з тими, які розуміє сайт —
+// orderStatusLabel() в assets/js/account.js і класи .order-status-*
+// у style.css. Спершу бот мав власні вигадані ключі (taken,
+// confirmed): у Telegram усе виглядало правильно, але «Історія
+// замовлень» у кабінеті таких значень не знала і показувала їх як
+// «Нове» — статус наче не змінювався. Список тут — єдине джерело
+// правди для обох сторін.
 export const STATUSES = {
-  new:       { label: "Нове",           emoji: "🆕" },
-  taken:     { label: "Взято в роботу", emoji: "👌" },
-  confirmed: { label: "Підтверджено",   emoji: "✅" },
-  shipped:   { label: "Відправлено",    emoji: "📦" },
-  cancelled: { label: "Скасовано",      emoji: "❌" },
+  new:        { label: "Нове",      emoji: "🆕" },
+  processing: { label: "В обробці", emoji: "👌" },
+  shipped:    { label: "Відправлено", emoji: "📦" },
+  completed:  { label: "Виконано",  emoji: "🎉" },
+  cancelled:  { label: "Скасовано", emoji: "❌" },
 };
+
+// Значення, що лишились від першої версії бота. Щоб такі замовлення
+// не виглядали зламаними в Telegram, показуємо їх як «В обробці», а
+// кнопки повертають їх у нормальний ланцюжок.
+export const LEGACY_STATUSES = {
+  taken: "processing",
+  confirmed: "processing",
+};
+
+export function normalizeStatus(status) {
+  return LEGACY_STATUSES[status] ?? status;
+}
 
 // Дані замовлення приходять від клієнта (імʼя, місто, коментар),
 // а повідомлення надсилається з parse_mode:"HTML" — без екранування
@@ -34,7 +55,7 @@ export function money(value) {
 
 export function formatOrder(order) {
 
-  const status = STATUSES[order.status] ?? STATUSES.new;
+  const status = STATUSES[normalizeStatus(order.status)] ?? STATUSES.new;
 
   // items приходить або масивом, або JSON-рядком — залежно від того,
   // як драйвер віддав jsonb-колонку
@@ -91,17 +112,29 @@ export function formatOrder(order) {
 // щоб не тицьнути «Відправлено» на скасованому замовленні.
 export function buildKeyboard(orderId, current) {
 
+  const status = normalizeStatus(current);
+
+  // Ланцюжок повторює той, що вже закладений у сайті:
+  // Нове → В обробці → Відправлено → Виконано, і скасувати можна
+  // на будь-якому кроці до відправлення.
   const next =
-    current === "new"       ? ["taken", "cancelled"] :
-    current === "taken"     ? ["confirmed", "cancelled"] :
-    current === "confirmed" ? ["shipped", "cancelled"] :
+    status === "new"        ? ["processing", "cancelled"] :
+    status === "processing" ? ["shipped", "cancelled"] :
+    status === "shipped"    ? ["completed", "cancelled"] :
     [];
 
-  if (!next.length) return undefined;
+  // Відкидаємо статуси, яких немає в STATUSES. Раніше неузгодженість
+  // ланцюжка зі списком статусів валила функцію з TypeError уже під
+  // час формування кнопок — тобто через друкарську помилку в одному
+  // рядку бот перестав би відповідати взагалі. Тепер у гіршому разі
+  // зникне одна кнопка, а решта працює.
+  const valid = next.filter((key) => STATUSES[key]);
+
+  if (!valid.length) return undefined;
 
   return {
     inline_keyboard: [
-      next.map((key) => ({
+      valid.map((key) => ({
         text: `${STATUSES[key].emoji} ${STATUSES[key].label}`,
         callback_data: `st:${key}:${orderId}`,
       })),

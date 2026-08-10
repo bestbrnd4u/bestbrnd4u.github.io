@@ -141,11 +141,19 @@ function renderCart() {
                     </a>
                     ${product.preOrder ? `<div class="preorder-tag">📦 Під замовлення</div>` : ""}
                     <div class="product-options cart-item-options">
-                        <div class="product-colors">
-                            ${colorButtons}
+<div class="product-colors-wrap">
+                            <button type="button" class="colors-arrow colors-arrow-left" aria-label="Попередні кольори" tabindex="-1">‹</button>
+                            <div class="product-colors">
+                                ${colorButtons}
+                            </div>
+                            <button type="button" class="colors-arrow colors-arrow-right" aria-label="Наступні кольори" tabindex="-1">›</button>
                         </div>
-                        <div class="product-sizes">
-                            ${sizeButtons}
+                        <div class="product-sizes-wrap">
+                            <button type="button" class="sizes-arrow sizes-arrow-left" aria-label="Попередні розміри" tabindex="-1">‹</button>
+                            <div class="product-sizes">
+                                ${sizeButtons}
+                            </div>
+                            <button type="button" class="sizes-arrow sizes-arrow-right" aria-label="Наступні розміри" tabindex="-1">›</button>
                         </div>
                     </div>
                     <div class="cart-item-price">
