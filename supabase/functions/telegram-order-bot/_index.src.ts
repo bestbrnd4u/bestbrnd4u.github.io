@@ -27,6 +27,13 @@ import {
   STATUSES, normalizeStatus, formatOrder, buildKeyboard,
   parseStartPayload, formatProductCard, buildProductKeyboard, absoluteImageUrl,
 } from "./format.js";
+import {
+  DELIVERY_OPTIONS, deliveryById, colorsOf, sizesOf, autoFill, nextStep,
+  colorKeyboard, sizeKeyboard, qtyKeyboard, deliveryKeyboard, phoneKeyboard,
+  confirmKeyboard, stepPrompt, summaryText, computeTotals,
+  validateCity, validateDetail, validatePhone,
+  generateOrderNumber, buildOrderRow,
+} from "./order-flow.js";
 
 const TELEGRAM_BOT_TOKEN = Deno.env.get("TELEGRAM_BOT_TOKEN") ?? "";
 const TELEGRAM_CHAT_ID = Deno.env.get("TELEGRAM_CHAT_ID") ?? "";
@@ -179,6 +186,134 @@ async function loadCatalog(): Promise<Record<string, any>[]> {
 }
 
 // -------------------------
+// Чернетка замовлення (таблиця bot_sessions)
+//
+// Між натисканнями кнопок бот має пам'ятати вибір клієнта. У самій
+// кнопці це не збережеш (Telegram обмежує callback_data 64 байтами),
+// а Edge Function між запитами нічого не тримає — тож стан живе в базі.
+// -------------------------
+
+async function supabaseRest(path: string, init: RequestInit = {}) {
+
+  return await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      apikey: SERVICE_ROLE_KEY,
+      Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+      ...(init.headers ?? {}),
+    },
+  });
+
+}
+
+async function getSession(chatId: number) {
+
+  const response = await supabaseRest(`bot_sessions?chat_id=eq.${chatId}&select=*`);
+
+  if (!response.ok) return null;
+
+  const rows = await response.json();
+
+  return Array.isArray(rows) ? rows[0] ?? null : null;
+
+}
+
+async function saveSession(chatId: number, patch: Record<string, any>) {
+
+  const row = { chat_id: chatId, ...patch, updated_at: new Date().toISOString() };
+
+  const response = await supabaseRest("bot_sessions?on_conflict=chat_id", {
+    method: "POST",
+    headers: { Prefer: "resolution=merge-duplicates,return=representation" },
+    body: JSON.stringify(row),
+  });
+
+  if (!response.ok) {
+    console.error("Не вдалося зберегти чернетку:", await response.text());
+    return null;
+  }
+
+  const rows = await response.json();
+
+  return Array.isArray(rows) ? rows[0] ?? null : null;
+
+}
+
+async function clearSession(chatId: number) {
+
+  await supabaseRest(`bot_sessions?chat_id=eq.${chatId}`, { method: "DELETE" });
+
+}
+
+async function createOrder(row: Record<string, any>) {
+
+  const response = await supabaseRest("orders", {
+    method: "POST",
+    headers: { Prefer: "return=representation" },
+    body: JSON.stringify(row),
+  });
+
+  if (!response.ok) {
+    console.error("Не вдалося створити замовлення:", await response.text());
+    return null;
+  }
+
+  const rows = await response.json();
+
+  return Array.isArray(rows) ? rows[0] ?? null : null;
+
+}
+
+// -------------------------
+// Крок діалогу: показати питання або підсумок
+// -------------------------
+
+async function askStep(chatId: number, step: string, product: Record<string, any>, session: Record<string, any>) {
+
+  if (step === "confirm") {
+
+    await telegram("sendMessage", {
+      chat_id: chatId,
+      text: summaryText(product, session),
+      parse_mode: "HTML",
+      reply_markup: confirmKeyboard(),
+    });
+
+    return;
+
+  }
+
+  const keyboards: Record<string, unknown> = {
+    color: colorKeyboard(product),
+    size: sizeKeyboard(product, session.color),
+    qty: qtyKeyboard(),
+    delivery: deliveryKeyboard(),
+    phone: phoneKeyboard(),
+  };
+
+  await telegram("sendMessage", {
+    chat_id: chatId,
+    text: stepPrompt(step, product, session),
+    parse_mode: "HTML",
+    reply_markup: keyboards[step] ?? { remove_keyboard: true },
+  });
+
+}
+
+// Просуваємо діалог: рахуємо наступний крок, зберігаємо і питаємо
+async function advance(chatId: number, fromStep: string, product: Record<string, any>, session: Record<string, any>) {
+
+  const filled = autoFill(product, session);
+  const step = nextStep(fromStep, product, filled);
+
+  const saved = await saveSession(chatId, { ...filled, step });
+
+  await askStep(chatId, step, product, saved ?? filled);
+
+}
+
+// -------------------------
 // Обробники
 // -------------------------
 
@@ -201,6 +336,17 @@ async function handleNewOrder(record: Record<string, any>) {
 async function handleCallback(callback: Record<string, any>) {
 
   const data: string = callback.data ?? "";
+
+  // Кнопки оформлення замовлення клієнтом (префікс "o:") —
+  // окремий сценарій, не плутати з кнопками статусу для власника
+  if (data.startsWith("o:")) {
+
+    await handleOrderCallback(callback, data);
+
+    return;
+
+  }
+
   const [prefix, status, orderId] = data.split(":");
 
   if (prefix !== "st" || !STATUSES[status] || !orderId) {
@@ -265,6 +411,11 @@ async function handleMessage(message: Record<string, any>) {
 
   }
 
+  // --- відповіді на кроках, де клієнт пише текстом ---
+  // Робимо це ДО перевірки команд: людина відповідає на питання
+  // бота звичайним повідомленням, а не командою.
+  if (await handleOrderText(message)) return;
+
   if (!command) return;
 
   // --- посилання на конкретний товар ---
@@ -289,8 +440,27 @@ async function handleMessage(message: Record<string, any>) {
     const variants = Array.isArray(product.variants) ? product.variants : [];
     const photo = absoluteImageUrl(variants[0]?.images?.[0] ?? product.images?.[0], SITE_URL);
 
+    // Запам'ятовуємо, який товар дивиться клієнт — щоб кнопка
+    // «Замовити в боті» знала, з чим працювати
+    await saveSession(chatId, {
+      product_id: product.id, step: "idle",
+      color: null, size: null, qty: 1,
+      delivery_method: null, delivery_price: 0,
+      city: null, delivery_detail: null,
+    });
+
     const caption = formatProductCard(product, SITE_URL);
-    const reply_markup = buildProductKeyboard(product, SITE_URL);
+
+    const base = buildProductKeyboard(product, SITE_URL);
+
+    // Кнопка оформлення просто в боті — першою, бо саме заради неї
+    // людина прийшла з Instagram
+    const reply_markup = {
+      inline_keyboard: [
+        [{ text: "🛍 Замовити в боті", callback_data: "o:buy" }],
+        ...base.inline_keyboard,
+      ],
+    };
 
     // Фото надсилаємо, лише якщо воно є. sendPhoto без валідного
     // URL повертає помилку, і клієнт не побачив би нічого — тому
@@ -339,6 +509,255 @@ async function handleMessage(message: Record<string, any>) {
       ],
     },
   });
+
+}
+
+// -------------------------
+// Текстові відповіді під час оформлення (місто, адреса, телефон)
+//
+// Повертає true, якщо повідомлення було відповіддю на крок діалогу —
+// тоді решта обробників його не чіпає.
+// -------------------------
+
+async function handleOrderText(message: Record<string, any>): Promise<boolean> {
+
+  const chatId = message.chat.id;
+  const text: string = message.text ?? "";
+
+  // «Скасувати» зі звичайної клавіатури (вона з'являється на кроці телефону)
+  if (text.trim() === "✖️ Скасувати") {
+
+    await clearSession(chatId);
+
+    await telegram("sendMessage", {
+      chat_id: chatId,
+      text: "Замовлення скасовано.",
+      reply_markup: { remove_keyboard: true },
+    });
+
+    return true;
+
+  }
+
+  const session = await getSession(chatId);
+
+  if (!session || !["city", "detail", "phone"].includes(session.step)) return false;
+
+  const catalog = await loadCatalog();
+  const product = catalog.find((item) => Number(item.id) === Number(session.product_id));
+
+  if (!product) {
+
+    await clearSession(chatId);
+
+    return false;
+
+  }
+
+  // Телефон може прийти кнопкою «поділитися контактом» — тоді Telegram
+  // передає його в message.contact разом з ім'ям, і набирати нічого
+  // не треба. Текстом теж приймаємо.
+  if (session.step === "phone") {
+
+    const contact = message.contact;
+    const raw = contact?.phone_number ?? text;
+    const result = validatePhone(raw);
+
+    if (!result.ok) {
+
+      await telegram("sendMessage", { chat_id: chatId, text: result.error });
+
+      return true;
+
+    }
+
+    await advance(chatId, "phone", product, {
+      ...session,
+      phone: result.value,
+      first_name: contact?.first_name ?? session.first_name ?? message.from?.first_name ?? null,
+      last_name: contact?.last_name ?? session.last_name ?? message.from?.last_name ?? null,
+    });
+
+    return true;
+
+  }
+
+  const check = session.step === "city" ? validateCity(text) : validateDetail(text);
+
+  if (!check.ok) {
+
+    await telegram("sendMessage", { chat_id: chatId, text: check.error });
+
+    return true;
+
+  }
+
+  const patch = session.step === "city"
+    ? { city: check.value }
+    : { delivery_detail: check.value };
+
+  await advance(chatId, session.step, product, { ...session, ...patch });
+
+  return true;
+
+}
+
+// -------------------------
+// Кнопки оформлення замовлення (клієнт)
+// -------------------------
+
+async function handleOrderCallback(callback: Record<string, any>, data: string) {
+
+  const chatId = callback.message.chat.id;
+  const [, action, value] = data.split(":");
+
+  const ack = (text?: string) =>
+    telegram("answerCallbackQuery", { callback_query_id: callback.id, text });
+
+  if (action === "cancel") {
+
+    await clearSession(chatId);
+    await ack("Скасовано");
+
+    await telegram("sendMessage", {
+      chat_id: chatId,
+      text: "Замовлення скасовано. Якщо передумаєте — просто відкрийте товар знову.",
+      reply_markup: { remove_keyboard: true },
+    });
+
+    return;
+
+  }
+
+  const session = await getSession(chatId);
+
+  if (!session?.product_id) {
+
+    await ack("Почніть з вибору товару");
+
+    return;
+
+  }
+
+  const catalog = await loadCatalog();
+  const product = catalog.find((item) => Number(item.id) === Number(session.product_id));
+
+  if (!product) {
+
+    await clearSession(chatId);
+    await ack("Товар більше не доступний");
+
+    return;
+
+  }
+
+  // --- старт оформлення ---
+  if (action === "buy") {
+
+    await ack();
+    await advance(chatId, "start", product, session);
+
+    return;
+
+  }
+
+  // --- вибір кольору (передаємо індекс: у callback_data 64 байти) ---
+  if (action === "color") {
+
+    const color = colorsOf(product)[Number(value)];
+
+    await ack(color);
+    // розмір скидаємо: у нового кольору свій набір розмірів
+    await advance(chatId, "color", product, { ...session, color, size: null });
+
+    return;
+
+  }
+
+  if (action === "size") {
+
+    const size = sizesOf(product, session.color)[Number(value)];
+
+    await ack(size);
+    await advance(chatId, "size", product, { ...session, size });
+
+    return;
+
+  }
+
+  if (action === "qty") {
+
+    await ack(`${value} шт.`);
+    await advance(chatId, "qty", product, { ...session, qty: Number(value) });
+
+    return;
+
+  }
+
+  if (action === "dlv") {
+
+    const option = deliveryById(value);
+
+    if (!option) {
+      await ack("Невідомий спосіб доставки");
+      return;
+    }
+
+    await ack(option.label);
+    await advance(chatId, "delivery", product, {
+      ...session,
+      delivery_method: option.label,
+      delivery_price: option.price,
+      delivery_id: option.id,
+    });
+
+    return;
+
+  }
+
+  // --- підтвердження ---
+  if (action === "submit") {
+
+    const orderNumber = generateOrderNumber();
+    const row = buildOrderRow(product, session, orderNumber);
+
+    const created = await createOrder(row);
+
+    if (!created) {
+
+      await ack("Не вдалося оформити, спробуйте ще раз", true);
+
+      await telegram("sendMessage", {
+        chat_id: chatId,
+        text: "Не вдалося оформити замовлення. Спробуйте ще раз або зателефонуйте нам.",
+      });
+
+      return;
+
+    }
+
+    await clearSession(chatId);
+    await ack("Замовлення прийнято");
+
+    const totals = computeTotals(product, session.qty, session.delivery_price);
+
+    await telegram("sendMessage", {
+      chat_id: chatId,
+      text:
+        `✅ <b>Замовлення ${escapeHtml(orderNumber)} прийнято</b>\n\n` +
+        `${escapeHtml(product.title)}\n` +
+        `Разом: <b>${money(totals.total)}</b>\n\n` +
+        `Ми зателефонуємо на ${escapeHtml(session.phone ?? "")} найближчим часом, ` +
+        `щоб підтвердити деталі.`,
+      parse_mode: "HTML",
+      reply_markup: { remove_keyboard: true },
+    });
+
+    return;
+
+  }
+
+  await ack();
 
 }
 

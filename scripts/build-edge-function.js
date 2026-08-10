@@ -21,22 +21,31 @@ const path = require("path");
 const DIR = path.join(__dirname, "..", "supabase", "functions", "telegram-order-bot");
 
 const FORMAT = path.join(DIR, "format.js");
+const FLOW = path.join(DIR, "order-flow.js");
 const SOURCE = path.join(DIR, "_index.src.ts");
 const OUTPUT = path.join(DIR, "index.ts");
 
 function build() {
 
     const format = fs.readFileSync(FORMAT, "utf8");
+    const flow = fs.readFileSync(FLOW, "utf8");
     const source = fs.readFileSync(SOURCE, "utf8");
 
     // прибираємо ключове слово export — усе стає локальним у межах
     // одного файлу
-    const inlined = format.replace(/^export\s+/gm, "");
+    // order-flow.js імпортує з format.js — у зібраному файлі все
+    // лежить поруч, тож і цей імпорт прибираємо
+    const inlined = [format, flow]
+        .map(src => src.replace(/^export\s+/gm, ""))
+        .map(src => src.replace(/^import\s*\{[\s\S]*?\}\s*from\s*["']\.\/[^"']+["'];?\s*$/m, ""))
+        .join("\n\n");
 
     // прибираємо рядок імпорту: те, що він імпортував, тепер лежить
     // прямо тут, вище за викликами
+    // прибираємо ВСІ локальні імпорти: те, що вони імпортували,
+    // тепер лежить прямо тут, вище за викликами
     const handlers = source.replace(
-        /^import\s*\{[^}]*\}\s*from\s*["']\.\/format\.js["'];?\s*$/m,
+        /^import\s*\{[\s\S]*?\}\s*from\s*["']\.\/[^"']+["'];?\s*$/gm,
         "",
     );
 
@@ -44,7 +53,8 @@ function build() {
         "// ⚠️ ЦЕЙ ФАЙЛ ЗГЕНЕРОВАНО АВТОМАТИЧНО — НЕ РЕДАГУЙТЕ ВРУЧНУ.",
         "//",
         "// Джерела:",
-        "//   supabase/functions/telegram-order-bot/format.js      (чиста логіка)",
+        "//   supabase/functions/telegram-order-bot/format.js      (картка замовлення)",
+        "//   supabase/functions/telegram-order-bot/order-flow.js  (діалог оформлення)",
         "//   supabase/functions/telegram-order-bot/_index.src.ts  (мережа й база)",
         "//",
         "// Перезібрати:  node scripts/build-edge-function.js",
