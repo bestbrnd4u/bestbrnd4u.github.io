@@ -155,6 +155,114 @@ function buildKeyboard(orderId, current) {
 }
 
 // ======================================
+// Глибокі посилання з Instagram на конкретний товар
+//
+// Посилання виду t.me/ваш_бот?start=product_15 Telegram передає боту
+// як звичайне повідомлення "/start product_15". Розбираємо його й
+// показуємо саме цей товар.
+// ======================================
+
+// Що саме відкрити. Приймаємо кілька написань, бо посилання
+// вставляють руками в шапку профілю та сторіс, і зайва вимогливість
+// до формату означала б «мертві» посилання:
+//   product_15 · product-15 · p15 · 15
+function parseStartPayload(text) {
+
+  const raw = String(text ?? "").trim();
+
+  if (!raw.startsWith("/start")) return null;
+
+  // "/start product_15" → "product_15"; "/start@MyBot product_15" теж
+  const payload = raw.replace(/^\/start(@\S+)?/, "").trim();
+
+  if (!payload) return { type: "welcome" };
+
+  const match = payload.match(/^(?:product[_-]?|p)?(\d+)$/i);
+
+  if (match) return { type: "product", id: Number(match[1]) };
+
+  return { type: "unknown", payload };
+
+}
+
+// Фото товару може бути і зовнішнім посиланням, і шляхом на сайті
+// (/assets/...). Telegram потрібен абсолютний URL.
+function absoluteImageUrl(src, siteUrl) {
+
+  const value = String(src ?? "").trim();
+
+  if (!value) return "";
+  if (/^https?:\/\//i.test(value)) return value;
+
+  return `${String(siteUrl).replace(/\/$/, "")}/${value.replace(/^\//, "")}`;
+
+}
+
+// Підпис під фото товару. Ліміт Telegram на caption — 1024 символи,
+// тож опис підрізаємо: інакше повідомлення не надішлеться взагалі.
+function formatProductCard(product, siteUrl) {
+
+  const variants = Array.isArray(product.variants) ? product.variants : [];
+  const first = variants[0] ?? {};
+
+  const colors = variants.map((v) => v.color).filter(Boolean);
+
+  const sizes = (first.sizes && first.sizes.length)
+    ? first.sizes
+    : (Array.isArray(product.sizes) ? product.sizes : []);
+
+  const discount = (product.oldPrice && product.price && Number(product.oldPrice) > Number(product.price))
+    ? Math.round((1 - Number(product.price) / Number(product.oldPrice)) * 100)
+    : 0;
+
+  const priceLine = discount > 0
+    ? `<b>${money(product.price)}</b>  <s>${money(product.oldPrice)}</s>  −${discount}%`
+    : `<b>${money(product.price)}</b>`;
+
+  const description = String(product.description ?? "").trim();
+  const shortDescription = description.length > 320
+    ? description.slice(0, 317).trimEnd() + "…"
+    : description;
+
+  const rows = [
+    product.brand ? escapeHtml(String(product.brand).toUpperCase()) : "",
+    `<b>${escapeHtml(product.title)}</b>`,
+    "",
+    priceLine,
+    "",
+    colors.length ? `Кольори: ${escapeHtml(colors.join(", "))}` : "",
+    sizes.length ? `Розміри: ${escapeHtml(sizes.join(", "))}` : "",
+    product.preOrder ? "📦 Під замовлення" : "",
+    "",
+    shortDescription ? escapeHtml(shortDescription) : "",
+  ];
+
+  return rows.filter((r) => r !== "").join("\n");
+
+}
+
+function buildProductKeyboard(product, siteUrl) {
+
+  const base = String(siteUrl).replace(/\/$/, "");
+  const variants = Array.isArray(product.variants) ? product.variants : [];
+  const color = variants[0]?.color;
+
+  // переносимо колір у посилання — так само, як це робить каталог,
+  // щоб сторінка відкрилась саме на тому кольорі, що на фото
+  const query = new URLSearchParams({ id: String(product.id) });
+
+  if (color) query.set("color", color);
+
+  return {
+    inline_keyboard: [
+      [{ text: "🛒 Замовити на сайті", url: `${base}/product?${query.toString()}` }],
+      [{ text: "📚 Весь каталог", url: `${base}/catalog` }],
+    ],
+  };
+
+}
+
+// ======================================
 // Telegram-бот для заявок Bagvero
 //
 // Одна функція обробляє ДВА види запитів:
@@ -192,6 +300,10 @@ const TELEGRAM_WEBHOOK_SECRET = Deno.env.get("TELEGRAM_WEBHOOK_SECRET") ?? "";
 // ці дві змінні Supabase підставляє в Edge Functions автоматично
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+
+// Адреса сайту — з неї бот бере каталог і будує посилання на товар.
+// Можна перевизначити секретом SITE_URL, якщо домен зміниться.
+const SITE_URL = (Deno.env.get("SITE_URL") ?? "https://bestbrnd4u.github.io").replace(/\/$/, "");
 
 const TELEGRAM_API = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}`;
 
@@ -280,6 +392,53 @@ async function updateOrderStatus(orderId: string, status: string) {
 }
 
 // -------------------------
+// Каталог товарів
+//
+// Беремо той самий data/products.json, що й сайт — окремої копії
+// товарів для бота не існує, тож розійтися вони не можуть.
+//
+// Кеш у пам'яті на 5 хвилин: за одне натискання посилання з
+// Instagram може прийти кілька апдейтів, і тягнути весь каталог
+// щоразу — марно. Ізолят живе недовго, тож кеш сам собою свіжий.
+// -------------------------
+
+let catalogCache: { at: number; items: Record<string, any>[] } | null = null;
+
+const CATALOG_TTL_MS = 5 * 60 * 1000;
+
+async function loadCatalog(): Promise<Record<string, any>[]> {
+
+  if (catalogCache && Date.now() - catalogCache.at < CATALOG_TTL_MS) {
+    return catalogCache.items;
+  }
+
+  try {
+
+    const response = await fetch(`${SITE_URL}/data/products.json`);
+
+    if (!response.ok) return catalogCache?.items ?? [];
+
+    const items = await response.json();
+
+    if (!Array.isArray(items)) return catalogCache?.items ?? [];
+
+    catalogCache = { at: Date.now(), items };
+
+    return items;
+
+  } catch (error) {
+
+    console.error("Не вдалося завантажити каталог:", error);
+
+    // якщо мережа підвела — краще віддати підстаркуватий кеш,
+    // ніж сказати клієнтові «товар не знайдено»
+    return catalogCache?.items ?? [];
+
+  }
+
+}
+
+// -------------------------
 // Обробники
 // -------------------------
 
@@ -350,21 +509,96 @@ async function handleCallback(callback: Record<string, any>) {
 // 3. Команди в чаті
 async function handleMessage(message: Record<string, any>) {
 
-  const text: string = message.text ?? "";
+  const chatId = message.chat.id;
+  const command = parseStartPayload(message.text);
 
-  if (text.startsWith("/start") || text.startsWith("/id")) {
+  // /id — службова команда: підказує chat_id під час налаштування
+  if (String(message.text ?? "").startsWith("/id")) {
 
     await telegram("sendMessage", {
-      chat_id: message.chat.id,
-      text:
-        `Бот заявок Bagvero.\n\n` +
-        `ID цього чату: <code>${message.chat.id}</code>\n\n` +
-        `Впишіть його в секрет <b>TELEGRAM_CHAT_ID</b>, ` +
-        `щоб сюди приходили нові замовлення.`,
+      chat_id: chatId,
+      text: `ID цього чату: <code>${chatId}</code>`,
       parse_mode: "HTML",
     });
 
+    return;
+
   }
+
+  if (!command) return;
+
+  // --- посилання на конкретний товар ---
+  if (command.type === "product") {
+
+    const catalog = await loadCatalog();
+    const product = catalog.find((item) => Number(item.id) === command.id);
+
+    if (!product) {
+
+      await telegram("sendMessage", {
+        chat_id: chatId,
+        text:
+          "Не знайшли цей товар — можливо, його вже продали або прибрали з каталогу.\n\n" +
+          `Подивіться інші: ${SITE_URL}/catalog`,
+      });
+
+      return;
+
+    }
+
+    const variants = Array.isArray(product.variants) ? product.variants : [];
+    const photo = absoluteImageUrl(variants[0]?.images?.[0] ?? product.images?.[0], SITE_URL);
+
+    const caption = formatProductCard(product, SITE_URL);
+    const reply_markup = buildProductKeyboard(product, SITE_URL);
+
+    // Фото надсилаємо, лише якщо воно є. sendPhoto без валідного
+    // URL повертає помилку, і клієнт не побачив би нічого — тому
+    // за відсутності фото відправляємо просто текст.
+    if (photo) {
+
+      const result = await telegram("sendPhoto", {
+        chat_id: chatId,
+        photo,
+        caption,
+        parse_mode: "HTML",
+        reply_markup,
+      });
+
+      // Telegram може відмовитись тягнути картинку (недоступний
+      // хост, надто великий файл) — тоді все одно показуємо товар
+      // текстом, а не лишаємо клієнта ні з чим
+      if (result?.ok) return;
+
+    }
+
+    await telegram("sendMessage", {
+      chat_id: chatId,
+      text: caption,
+      parse_mode: "HTML",
+      disable_web_page_preview: true,
+      reply_markup,
+    });
+
+    return;
+
+  }
+
+  // --- звичайний /start або незрозумілий параметр ---
+  await telegram("sendMessage", {
+    chat_id: chatId,
+    text:
+      "Вітаємо в <b>Bagvero</b> 👋\n\n" +
+      "Сумки, взуття та аксесуари світових брендів.\n\n" +
+      "Тисніть кнопку нижче, щоб подивитися каталог.",
+    parse_mode: "HTML",
+    reply_markup: {
+      inline_keyboard: [
+        [{ text: "📚 Каталог", url: `${SITE_URL}/catalog` }],
+        [{ text: "🔥 Акції", url: `${SITE_URL}/catalog?section=sale` }],
+      ],
+    },
+  });
 
 }
 

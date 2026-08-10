@@ -23,7 +23,10 @@
 
 // Чиста логіка (форматування картки, кнопки) винесена окремо —
 // щоб її можна було запускати й тестувати в Node без Deno.
-import { STATUSES, normalizeStatus, formatOrder, buildKeyboard } from "./format.js";
+import {
+  STATUSES, normalizeStatus, formatOrder, buildKeyboard,
+  parseStartPayload, formatProductCard, buildProductKeyboard, absoluteImageUrl,
+} from "./format.js";
 
 const TELEGRAM_BOT_TOKEN = Deno.env.get("TELEGRAM_BOT_TOKEN") ?? "";
 const TELEGRAM_CHAT_ID = Deno.env.get("TELEGRAM_CHAT_ID") ?? "";
@@ -37,6 +40,10 @@ const TELEGRAM_WEBHOOK_SECRET = Deno.env.get("TELEGRAM_WEBHOOK_SECRET") ?? "";
 // ці дві змінні Supabase підставляє в Edge Functions автоматично
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+
+// Адреса сайту — з неї бот бере каталог і будує посилання на товар.
+// Можна перевизначити секретом SITE_URL, якщо домен зміниться.
+const SITE_URL = (Deno.env.get("SITE_URL") ?? "https://bestbrnd4u.github.io").replace(/\/$/, "");
 
 const TELEGRAM_API = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}`;
 
@@ -125,6 +132,53 @@ async function updateOrderStatus(orderId: string, status: string) {
 }
 
 // -------------------------
+// Каталог товарів
+//
+// Беремо той самий data/products.json, що й сайт — окремої копії
+// товарів для бота не існує, тож розійтися вони не можуть.
+//
+// Кеш у пам'яті на 5 хвилин: за одне натискання посилання з
+// Instagram може прийти кілька апдейтів, і тягнути весь каталог
+// щоразу — марно. Ізолят живе недовго, тож кеш сам собою свіжий.
+// -------------------------
+
+let catalogCache: { at: number; items: Record<string, any>[] } | null = null;
+
+const CATALOG_TTL_MS = 5 * 60 * 1000;
+
+async function loadCatalog(): Promise<Record<string, any>[]> {
+
+  if (catalogCache && Date.now() - catalogCache.at < CATALOG_TTL_MS) {
+    return catalogCache.items;
+  }
+
+  try {
+
+    const response = await fetch(`${SITE_URL}/data/products.json`);
+
+    if (!response.ok) return catalogCache?.items ?? [];
+
+    const items = await response.json();
+
+    if (!Array.isArray(items)) return catalogCache?.items ?? [];
+
+    catalogCache = { at: Date.now(), items };
+
+    return items;
+
+  } catch (error) {
+
+    console.error("Не вдалося завантажити каталог:", error);
+
+    // якщо мережа підвела — краще віддати підстаркуватий кеш,
+    // ніж сказати клієнтові «товар не знайдено»
+    return catalogCache?.items ?? [];
+
+  }
+
+}
+
+// -------------------------
 // Обробники
 // -------------------------
 
@@ -195,21 +249,96 @@ async function handleCallback(callback: Record<string, any>) {
 // 3. Команди в чаті
 async function handleMessage(message: Record<string, any>) {
 
-  const text: string = message.text ?? "";
+  const chatId = message.chat.id;
+  const command = parseStartPayload(message.text);
 
-  if (text.startsWith("/start") || text.startsWith("/id")) {
+  // /id — службова команда: підказує chat_id під час налаштування
+  if (String(message.text ?? "").startsWith("/id")) {
 
     await telegram("sendMessage", {
-      chat_id: message.chat.id,
-      text:
-        `Бот заявок Bagvero.\n\n` +
-        `ID цього чату: <code>${message.chat.id}</code>\n\n` +
-        `Впишіть його в секрет <b>TELEGRAM_CHAT_ID</b>, ` +
-        `щоб сюди приходили нові замовлення.`,
+      chat_id: chatId,
+      text: `ID цього чату: <code>${chatId}</code>`,
       parse_mode: "HTML",
     });
 
+    return;
+
   }
+
+  if (!command) return;
+
+  // --- посилання на конкретний товар ---
+  if (command.type === "product") {
+
+    const catalog = await loadCatalog();
+    const product = catalog.find((item) => Number(item.id) === command.id);
+
+    if (!product) {
+
+      await telegram("sendMessage", {
+        chat_id: chatId,
+        text:
+          "Не знайшли цей товар — можливо, його вже продали або прибрали з каталогу.\n\n" +
+          `Подивіться інші: ${SITE_URL}/catalog`,
+      });
+
+      return;
+
+    }
+
+    const variants = Array.isArray(product.variants) ? product.variants : [];
+    const photo = absoluteImageUrl(variants[0]?.images?.[0] ?? product.images?.[0], SITE_URL);
+
+    const caption = formatProductCard(product, SITE_URL);
+    const reply_markup = buildProductKeyboard(product, SITE_URL);
+
+    // Фото надсилаємо, лише якщо воно є. sendPhoto без валідного
+    // URL повертає помилку, і клієнт не побачив би нічого — тому
+    // за відсутності фото відправляємо просто текст.
+    if (photo) {
+
+      const result = await telegram("sendPhoto", {
+        chat_id: chatId,
+        photo,
+        caption,
+        parse_mode: "HTML",
+        reply_markup,
+      });
+
+      // Telegram може відмовитись тягнути картинку (недоступний
+      // хост, надто великий файл) — тоді все одно показуємо товар
+      // текстом, а не лишаємо клієнта ні з чим
+      if (result?.ok) return;
+
+    }
+
+    await telegram("sendMessage", {
+      chat_id: chatId,
+      text: caption,
+      parse_mode: "HTML",
+      disable_web_page_preview: true,
+      reply_markup,
+    });
+
+    return;
+
+  }
+
+  // --- звичайний /start або незрозумілий параметр ---
+  await telegram("sendMessage", {
+    chat_id: chatId,
+    text:
+      "Вітаємо в <b>Bagvero</b> 👋\n\n" +
+      "Сумки, взуття та аксесуари світових брендів.\n\n" +
+      "Тисніть кнопку нижче, щоб подивитися каталог.",
+    parse_mode: "HTML",
+    reply_markup: {
+      inline_keyboard: [
+        [{ text: "📚 Каталог", url: `${SITE_URL}/catalog` }],
+        [{ text: "🔥 Акції", url: `${SITE_URL}/catalog?section=sale` }],
+      ],
+    },
+  });
 
 }
 

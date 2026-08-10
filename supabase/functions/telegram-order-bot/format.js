@@ -142,3 +142,111 @@ export function buildKeyboard(orderId, current) {
   };
 
 }
+
+// ======================================
+// Глибокі посилання з Instagram на конкретний товар
+//
+// Посилання виду t.me/ваш_бот?start=product_15 Telegram передає боту
+// як звичайне повідомлення "/start product_15". Розбираємо його й
+// показуємо саме цей товар.
+// ======================================
+
+// Що саме відкрити. Приймаємо кілька написань, бо посилання
+// вставляють руками в шапку профілю та сторіс, і зайва вимогливість
+// до формату означала б «мертві» посилання:
+//   product_15 · product-15 · p15 · 15
+export function parseStartPayload(text) {
+
+  const raw = String(text ?? "").trim();
+
+  if (!raw.startsWith("/start")) return null;
+
+  // "/start product_15" → "product_15"; "/start@MyBot product_15" теж
+  const payload = raw.replace(/^\/start(@\S+)?/, "").trim();
+
+  if (!payload) return { type: "welcome" };
+
+  const match = payload.match(/^(?:product[_-]?|p)?(\d+)$/i);
+
+  if (match) return { type: "product", id: Number(match[1]) };
+
+  return { type: "unknown", payload };
+
+}
+
+// Фото товару може бути і зовнішнім посиланням, і шляхом на сайті
+// (/assets/...). Telegram потрібен абсолютний URL.
+export function absoluteImageUrl(src, siteUrl) {
+
+  const value = String(src ?? "").trim();
+
+  if (!value) return "";
+  if (/^https?:\/\//i.test(value)) return value;
+
+  return `${String(siteUrl).replace(/\/$/, "")}/${value.replace(/^\//, "")}`;
+
+}
+
+// Підпис під фото товару. Ліміт Telegram на caption — 1024 символи,
+// тож опис підрізаємо: інакше повідомлення не надішлеться взагалі.
+export function formatProductCard(product, siteUrl) {
+
+  const variants = Array.isArray(product.variants) ? product.variants : [];
+  const first = variants[0] ?? {};
+
+  const colors = variants.map((v) => v.color).filter(Boolean);
+
+  const sizes = (first.sizes && first.sizes.length)
+    ? first.sizes
+    : (Array.isArray(product.sizes) ? product.sizes : []);
+
+  const discount = (product.oldPrice && product.price && Number(product.oldPrice) > Number(product.price))
+    ? Math.round((1 - Number(product.price) / Number(product.oldPrice)) * 100)
+    : 0;
+
+  const priceLine = discount > 0
+    ? `<b>${money(product.price)}</b>  <s>${money(product.oldPrice)}</s>  −${discount}%`
+    : `<b>${money(product.price)}</b>`;
+
+  const description = String(product.description ?? "").trim();
+  const shortDescription = description.length > 320
+    ? description.slice(0, 317).trimEnd() + "…"
+    : description;
+
+  const rows = [
+    product.brand ? escapeHtml(String(product.brand).toUpperCase()) : "",
+    `<b>${escapeHtml(product.title)}</b>`,
+    "",
+    priceLine,
+    "",
+    colors.length ? `Кольори: ${escapeHtml(colors.join(", "))}` : "",
+    sizes.length ? `Розміри: ${escapeHtml(sizes.join(", "))}` : "",
+    product.preOrder ? "📦 Під замовлення" : "",
+    "",
+    shortDescription ? escapeHtml(shortDescription) : "",
+  ];
+
+  return rows.filter((r) => r !== "").join("\n");
+
+}
+
+export function buildProductKeyboard(product, siteUrl) {
+
+  const base = String(siteUrl).replace(/\/$/, "");
+  const variants = Array.isArray(product.variants) ? product.variants : [];
+  const color = variants[0]?.color;
+
+  // переносимо колір у посилання — так само, як це робить каталог,
+  // щоб сторінка відкрилась саме на тому кольорі, що на фото
+  const query = new URLSearchParams({ id: String(product.id) });
+
+  if (color) query.set("color", color);
+
+  return {
+    inline_keyboard: [
+      [{ text: "🛒 Замовити на сайті", url: `${base}/product?${query.toString()}` }],
+      [{ text: "📚 Весь каталог", url: `${base}/catalog` }],
+    ],
+  };
+
+}
