@@ -6349,6 +6349,47 @@ body.mobile-filters-open .scroll-top{
         font-size:10px;
     }
 
+    /* Кошик і обране на мобільному: та сама прокрутка, що вище в
+       .product-card, тільки колір і розмір тут НЕ в одному спільному
+       рядку (у картці товару вони туляться поруч із ціною), а кожен
+       на всю ширину, один під одним (.product-colors-wrap /
+       .product-sizes-wrap: width:100%, див. правило вище по файлу) —
+       тож прокручується кожен .product-colors / .product-sizes
+       окремо. Це те саме правило, що вже працює в
+       @media(min-width:769px) нижче; тут лише знято обмеження по
+       ширині екрана, щоб воно діяло і на мобільному. Стрілки
+       навмисно лишаються десктопними — на мобільному скролить палець. */
+    .cart-item .product-colors,
+    .cart-item .product-sizes,
+    .favorite-row .product-colors,
+    .favorite-row .product-sizes{
+        overflow-x:auto;
+        -webkit-overflow-scrolling:touch;
+        scrollbar-width:none;
+        -ms-overflow-style:none;
+        /* той самий запас під кільце активного кольору/розміру, що
+           й у десктопному правилі — інакше прокрутка обрізає його
+           з країв */
+        padding:2px;
+        margin:-2px;
+    }
+
+    .cart-item .product-colors::-webkit-scrollbar,
+    .cart-item .product-sizes::-webkit-scrollbar,
+    .favorite-row .product-colors::-webkit-scrollbar,
+    .favorite-row .product-sizes::-webkit-scrollbar{
+        display:none;
+    }
+
+    /* без цього кружечки кольору стискались би замість того, щоб
+       рядок прокручувався — та сама причина, що й у .product-card
+       вище. .mini-size тут не дублюємо: він уже не стискається
+       завдяки базовому правилу .product-sizes .mini-size задалеко
+       вище по файлу (діє на будь-якій ширині екрана). */
+    .cart-item .mini-color,
+    .favorite-row .mini-color{
+        flex-shrink:0;
+    }
 
     .product-card .product-price{
         margin-bottom:10px;
