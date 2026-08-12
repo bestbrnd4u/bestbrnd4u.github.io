@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Доступи до адмінки | Bagvero</title>
+<style>
+    *{ box-sizing:border-box; }
+
+    body{
+        margin:0;
+        padding:32px 20px 80px;
+        background:#f9fafb;
+        color:#111827;
+        font:16px/1.6 Inter, -apple-system, "Segoe UI", sans-serif;
+    }
+
+    .wrap{ max-width:760px; margin:0 auto; }
+
+    h1{ font-size:28px; margin:0 0 8px; }
+    h2{ font-size:19px; margin:32px 0 10px; }
+    h3{ font-size:16px; margin:22px 0 8px; }
+
+    .lead{ color:#6b7280; margin:0 0 26px; }
+
+    .card{
+        background:#fff;
+        border:1px solid #e5e7eb;
+        border-radius:14px;
+        padding:20px 22px;
+        margin-bottom:18px;
+    }
+
+    .note{
+        background:#eff6ff;
+        border:1px solid #bfdbfe;
+        border-radius:12px;
+        padding:14px 16px;
+        margin:18px 0;
+        font-size:14.5px;
+    }
+
+    .warn{
+        background:#fffbeb;
+        border:1px solid #fde68a;
+        border-radius:12px;
+        padding:14px 16px;
+        margin:18px 0;
+        font-size:14.5px;
+    }
+
+    ol, ul{ margin:10px 0; padding-left:22px; }
+    li{ margin-bottom:7px; }
+
+    code{
+        background:#f3f4f6;
+        padding:2px 6px;
+        border-radius:5px;
+        font-size:13.5px;
+        font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    a{ color:#2563eb; }
+
+    .btn{
+        display:inline-block;
+        margin:8px 8px 0 0;
+        padding:11px 18px;
+        border-radius:10px;
+        background:#2563eb;
+        color:#fff;
+        font-weight:600;
+        font-size:14.5px;
+        text-decoration:none;
+    }
+
+    .btn-outline{
+        background:#fff;
+        color:#2563eb;
+        border:1.5px solid #2563eb;
+    }
+
+    table{ width:100%; border-collapse:collapse; margin:12px 0; font-size:14.5px; }
+    th, td{ text-align:left; padding:9px 10px; border-bottom:1px solid #f3f4f6; vertical-align:top; }
+    th{ color:#6b7280; font-weight:600; font-size:13px; text-transform:uppercase; letter-spacing:.4px; }
+
+    .back{ display:inline-block; margin-bottom:20px; color:#6b7280; text-decoration:none; font-size:14.5px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+    <a class="back" href="index.html">← Назад до адмінки</a>
+
+    <h1>Доступи до адмінки</h1>
+    <p class="lead">Як дати колезі можливість редагувати сайт.</p>
+
+    <div class="warn">
+        <strong>Важливо, як це працює.</strong>
+        Вхід в адмінку — це вхід <strong>через GitHub</strong>. Окремих
+        логінів і паролів для адмінки не існує: у CMS немає власної бази
+        користувачів. Хто має право писати в репозиторій — той і може
+        редагувати сайт.
+        <br><br>
+        Тому «додати користувача» = <strong>додати співавтора репозиторію</strong>.
+        Це займає хвилину і робиться на GitHub.
+    </div>
+
+    <h2>Як додати колегу</h2>
+
+    <div class="card">
+        <ol>
+            <li>Колега реєструє акаунт на <a href="https://github.com/signup" target="_blank" rel="noopener">github.com</a>
+                (безкоштовно) і каже вам свій <strong>username</strong>.</li>
+            <li>Ви відкриваєте налаштування доступів репозиторію:
+                <br>
+                <a class="btn" href="https://github.com/bestbrnd4u/bestbrnd4u.github.io/settings/access"
+                   target="_blank" rel="noopener">Відкрити доступи на GitHub</a>
+            </li>
+            <li>Натискаєте <strong>Add people</strong>, вводите username колеги.</li>
+            <li>Роль обираєте <strong>Write</strong> — цього достатньо, щоб
+                редагувати товари й публікувати зміни.</li>
+            <li>Колезі прийде запрошення на пошту — він має його прийняти.</li>
+            <li>Після цього він заходить на
+                <a href="https://bestbrnd4u.github.io/admin/" target="_blank" rel="noopener">bestbrnd4u.github.io/admin/</a>,
+                тисне «Login with GitHub» — і працює в адмінці.</li>
+        </ol>
+    </div>
+
+    <h2>Які ролі бувають</h2>
+
+    <div class="card">
+        <table>
+            <tr>
+                <th>Роль на GitHub</th>
+                <th>Що може в адмінці</th>
+            </tr>
+            <tr>
+                <td><strong>Read</strong></td>
+                <td>Увійти <em>не зможе</em> — редагування недоступне.</td>
+            </tr>
+            <tr>
+                <td><strong>Write</strong></td>
+                <td>Усе, що потрібно контент-менеджеру: товари, акції,
+                    добірки, категорії, публікація на сайт. <strong>Рекомендована роль.</strong></td>
+            </tr>
+            <tr>
+                <td><strong>Admin</strong></td>
+                <td>Те саме плюс керування самим репозиторієм і доступами.
+                    Давайте лише тим, кому справді потрібно.</td>
+            </tr>
+        </table>
+
+        <div class="note">
+            Окремих прав «тільки товари» чи «тільки акції» CMS не підтримує:
+            хто має доступ — бачить усі розділи. Якщо потрібно обмежити
+            когось конкретним напрямком — це домовленість, а не технічне
+            обмеження.
+        </div>
+    </div>
+
+    <h2>Як забрати доступ</h2>
+
+    <div class="card">
+        <p>На тій самій сторінці доступів навпроти людини — <strong>Remove</strong>.
+        Доступ зникає одразу, окремо нічого міняти не треба.</p>
+
+        <a class="btn btn-outline" href="https://github.com/bestbrnd4u/bestbrnd4u.github.io/settings/access"
+           target="_blank" rel="noopener">Керувати доступами</a>
+    </div>
+
+    <h2>Якщо потрібен вхід за поштою і паролем</h2>
+
+    <div class="card">
+        <p>Такий варіант існує, але він означає зміну способу входу в
+        адмінку (Netlify Identity + Git Gateway замість GitHub). Тоді ви
+        запрошуєте людей поштою, і вони самі задають пароль — акаунт на
+        GitHub їм не потрібен.</p>
+
+        <p>Що це коштує:</p>
+        <ul>
+            <li>потрібен сайт на Netlify, прив'язаний до цього репозиторію
+                (сам сайт лишається на GitHub Pages — Netlify
+                використовується тільки для входу);</li>
+            <li>треба переналаштувати <code>backend</code> в
+                <code>admin/config.yml</code>;</li>
+            <li>Netlify Identity зараз у режимі підтримки — нових
+                можливостей у нього не додають, і варто перевірити
+                актуальні умови перед переходом.</li>
+        </ul>
+
+        <p>Якщо колег небагато — простіше лишити вхід через GitHub:
+        нічого переналаштовувати не треба, і це працює вже зараз.</p>
+    </div>
+
+</div>
+</body>
+</html>
