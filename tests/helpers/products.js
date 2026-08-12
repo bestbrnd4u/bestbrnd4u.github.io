@@ -32,3 +32,21 @@ function findProductById(id) {
 }
 
 module.exports = { loadProducts, findProductById };
+
+// Категорії — так само з ДЖЕРЕЛ (data/categories/*.json), а не з
+// згенерованого data/categories.json: агрегат перезбирає GitHub
+// Actions, і в CI до перезбірки він відстає від джерел.
+function loadCategories() {
+
+    const dir = path.join(ROOT, "data", "categories");
+
+    if (!fs.existsSync(dir)) return [];
+
+    return fs.readdirSync(dir)
+        .filter(f => f.endsWith(".json"))
+        .map(f => JSON.parse(fs.readFileSync(path.join(dir, f), "utf8")))
+        .filter(c => c && c.name && c.department);
+
+}
+
+module.exports.loadCategories = loadCategories;

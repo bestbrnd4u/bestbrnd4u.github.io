@@ -8,7 +8,8 @@ const RAW=JSON.parse(fs.readFileSync(path.join(ROOT,"data/size-groups.json"),"ut
 // Decap зберігає file-колекцію як {"<імʼя поля>": [...]}, а не голим
 // масивом — інакше розділ в адмінці відкривається порожнім
 const GROUPS=Array.isArray(RAW)?RAW:RAW.groups;
-const CATS=JSON.parse(fs.readFileSync(path.join(ROOT,"data/categories.json"),"utf8"));
+// джерела, а не згенерований data/categories.json (див. helpers/products.js)
+const CATS=require("./helpers/products").loadCategories();
 
 console.log("\n[1] Налаштування в адмінці");
 {

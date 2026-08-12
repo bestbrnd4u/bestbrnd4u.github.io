@@ -105,12 +105,29 @@ console.log("\n[7] Назва магазину — BestBrnd4u");
     "tests/test-sidebar-collapse.js": "перевіряє той самий ключ localStorage",
   };
 
+  // ЗГЕНЕРОВАНІ файли не перевіряємо: їх перезбирає GitHub Actions
+  // після коміту, тож у свіжому клоні та в CI до перезбірки вони
+  // відстають від джерел. Перевіряти їх — означає ловити не помилку в
+  // коді, а момент часу. Джерела (data/products/*.json) перевіряємо
+  // нижче окремо.
+  const GENERATED = [
+    "data/products.json",
+    "data/categories.json",
+    "data/promotions.json",
+    "data/collections.json",
+    "data/promo-popups.json",
+    "package-lock.json",
+  ];
+
   const files = [];
   const walk = dir => fs.readdirSync(dir, { withFileTypes: true }).forEach(e => {
     if (e.name === "node_modules" || e.name === ".git") return;
     const full = path.join(dir, e.name);
     if (e.isDirectory()) walk(full);
-    else if (/\.(html|js|ts|css|json|yml|md|sql)$/.test(e.name)) files.push(full);
+    else if (/\.(html|js|ts|css|json|yml|md|sql)$/.test(e.name)) {
+      const rel = path.relative(ROOT, full).split(path.sep).join("/");
+      if (!GENERATED.includes(rel)) files.push(full);
+    }
   });
   walk(ROOT);
 
@@ -130,15 +147,18 @@ console.log("\n[7] Назва магазину — BestBrnd4u");
   check("згадки лишились саме там, де очікуємо",
         rest.every(f => f in ALLOWED), rest.join(", "));
 
-  // у товарах стара назва має бути ЛИШЕ у slug, не в бренді й не в назві
+  // У ДЖЕРЕЛЬНИХ файлах товарів стара назва має лишитись тільки в
+  // slug (він дорівнює імені файлу), але не в бренді чи назві.
   const badProducts = [];
-  productSlugs.forEach(rel => {
-    const data = fs.readFileSync(path.join(ROOT, rel), "utf8");
-    const stripped = data.replace(/"slug":\s*"[^"]*"/g, "");
-    if (/bagvero/i.test(stripped)) badProducts.push(rel);
-  });
+  productSlugs
+    .filter(rel => rel.startsWith("data/products/"))   // саме джерела, не агрегат
+    .forEach(rel => {
+      const data = fs.readFileSync(path.join(ROOT, rel), "utf8");
+      const stripped = data.replace(/"slug":\s*"[^"]*"/g, "");
+      if (/bagvero/i.test(stripped)) badProducts.push(rel);
+    });
 
-  check("у товарах стара назва лишилась тільки в slug (не в бренді чи назві)",
+  check("у джерельних товарах стара назва лишилась тільки в slug",
         badProducts.length === 0, badProducts.join(", "));
 
   check("нова назва є на головній", read("index.html").includes("BestBrnd4u"));

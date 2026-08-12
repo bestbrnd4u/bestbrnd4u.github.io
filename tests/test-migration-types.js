@@ -128,5 +128,48 @@ console.log("\n[5] Повторний запуск міграцій безпеч
   });
 }
 
+console.log("\n[6] Тести не залежать від ЗГЕНЕРОВАНИХ файлів");
+{
+  // Регресія (двічі): тести читали data/products.json і
+  // data/categories.json — агрегати, які перезбирає GitHub Actions
+  // після коміту. У свіжому клоні та в CI до перезбірки вони
+  // відстають від джерел, і тест падав не через помилку в коді, а
+  // через момент часу. Джерела — data/products/*.json і
+  // data/categories/*.json — завжди актуальні.
+  const GENERATED = [
+    "data/products.json",
+    "data/categories.json",
+    "data/promotions.json",
+    "data/collections.json",
+    "data/promo-popups.json",
+  ];
+
+  const testsDir = path.join(ROOT, "tests");
+  const testFiles = fs.readdirSync(testsDir).filter(f => /^test.*\.js$/.test(f));
+
+  const offenders = [];
+
+  testFiles.forEach(f => {
+    const src = fs.readFileSync(path.join(testsDir, f), "utf8");
+
+    GENERATED.forEach(gen => {
+      // читання файлу — це readFileSync з цим шляхом; згадка в рядку
+      // (напр. перевірка, що бот тягне саме цей URL) — не читання
+      const reads = new RegExp(`readFileSync\\([^)]*${gen.replace(/[./]/g, "\\$&")}`);
+      if (reads.test(src)) offenders.push(`${f} → ${gen}`);
+    });
+  });
+
+  check("жоден тест не читає згенерований агрегат",
+        offenders.length === 0, offenders.join(", "));
+
+  // і навпаки: помічники для читання джерел існують
+  const helper = fs.readFileSync(path.join(testsDir, "helpers/products.js"), "utf8");
+  check("є помічник для джерельних товарів", /function loadProducts/.test(helper));
+  check("є помічник для джерельних категорій", /function loadCategories/.test(helper));
+  check("помічники читають саме теки джерел",
+        /"data", "products"/.test(helper) && /"data", "categories"/.test(helper));
+}
+
 console.log(failures===0?"\n✅ Усі перевірки пройдено":`\n❌ Провалено: ${failures}`);
 process.exit(failures===0?0:1);
