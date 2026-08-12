@@ -1,5 +1,5 @@
 /* ===========================================
-   bagvero
+   bestbrnd4u
    Version 2.1 — исправлены баги каталога
 =========================================== */
 
@@ -2166,6 +2166,37 @@ footer{
 .footer p{
     color:var(--gray300);
     margin-bottom:10px;
+}
+
+/* Контакти на сторінці «Контакти» — успадковують колір тексту
+   картки, підкреслення при наведенні */
+.contact-card .contact-link{
+    color:inherit;
+    text-decoration:none;
+}
+
+.contact-card .contact-link:hover{
+    color:var(--secondary);
+    text-decoration:underline;
+}
+
+/* Контакти у футері — телефон, пошта, Telegram.
+   Успадковують колір тексту футера, а не типовий синій колір
+   посилання: інакше три контактні рядки вибивалися б із блоку.
+   Підкреслення з'являється лише при наведенні — щоб було видно,
+   що це все-таки посилання. */
+.footer .phone-link,
+.footer .mail-link,
+.footer .tg-link{
+    color:inherit;
+    text-decoration:none;
+}
+
+.footer .phone-link:hover,
+.footer .mail-link:hover,
+.footer .tg-link:hover{
+    color:#fff;
+    text-decoration:underline;
 }
 
 .copyright{
@@ -6463,7 +6494,7 @@ body.mobile-filters-open .scroll-top{
 
     /* лого більше не в одному кластері з гамбургером/пошуком —
        ３ колонки: лівий кластер / лого по центру / кошик+обране,
-       так текст "Bagvero" стоїть рівно посередині шапки, а не
+       так текст "BestBrnd4u" стоїть рівно посередині шапки, а не
        притиснутий ліворуч разом з іконками */
     .header{
         display:grid;

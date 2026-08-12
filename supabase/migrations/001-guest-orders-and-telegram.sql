@@ -117,5 +117,5 @@ create trigger trg_notify_telegram_new_order
 --
 -- insert into public.orders (order_number, status, items, subtotal, total, first_name, phone)
 -- values ('TEST-001', 'new',
---         '[{"title":"Тестова сумка","brand":"Bagvero","price":1200,"qty":1,"color":"Чорний","size":"M"}]'::jsonb,
+--         '[{"title":"Тестова сумка","brand":"BestBrnd4u","price":1200,"qty":1,"color":"Чорний","size":"M"}]'::jsonb,
 --         1200, 1200, 'Тест', '+380737288291');

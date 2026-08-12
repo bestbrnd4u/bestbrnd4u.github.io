@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bagvero — Адмінка</title>
+    <title>BestBrnd4u — Адмінка</title>
     <link rel="icon" href="../assets/images/favicon.png">
 </head>
 <body>
@@ -15,49 +15,128 @@
     <script>
     (function () {
 
-        var BASE_STYLE = "position:fixed;z-index:999999;padding:12px 18px;" +
-            "border-radius:12px;font:600 14px/1.2 -apple-system,Inter,sans-serif;" +
-            "text-decoration:none;box-shadow:0 8px 24px rgba(0,0,0,.25);";
+        // Свої посилання в адмінці: масовий імпорт і доступи для колег.
+        //
+        // Місце — у ЛІВОМУ МЕНЮ, під списком розділів.
+        // Раніше вони висіли фіксовано в правому нижньому куті й
+        // перекривали робочу область на сторінках редагування товару.
+        // У меню для них є вільне місце, а в редакторі меню зникає —
+        // отже, кнопки самі не показуються там, де мішали.
+        //
+        // Якщо меню знайти не вдалось (Decap міняв розмітку), лишається
+        // запасний варіант — компактна кнопка в лівому нижньому куті,
+        // подалі від керування збереженням, яке Decap тримає справа.
 
-        function addLink(id, href, text, style) {
+        var LINKS = [
+            {
+                id: "bulkImportLink",
+                href: "import.html",
+                text: "📥 Масовий імпорт товарів",
+                primary: true
+            },
+            {
+                // Навмисно ВЕДЕ НА ІНСТРУКЦІЮ, а не на форму «додати
+                // користувача»: вхід в адмінку — це вхід через GitHub,
+                // власної бази користувачів у CMS немає. Форма з логіном
+                // і паролем нічого б не відкривала, лише створювала
+                // хибне враження, що доступ видано.
+                id: "accessLink",
+                href: "access.html",
+                text: "👥 Доступи для колег",
+                primary: false
+            }
+        ];
 
-            if (document.getElementById(id)) return;
+        // Ліве меню шукаємо СТРУКТУРНО — через посилання на колекції,
+        // а не за назвами класів: Decap генерує їх автоматично, і
+        // прив'язка до класу зламалась би на будь-якому оновленні.
+        function findSidebar() {
 
-            var a = document.createElement("a");
-            a.id = id;
-            a.href = href;
-            a.textContent = text;
-            a.style.cssText = BASE_STYLE + style;
+            var links = document.querySelectorAll('a[href*="#/collections/"]');
 
-            document.body.appendChild(a);
+            if (!links.length) return null;
+
+            var node = links[0].parentElement;
+
+            // піднімаємось, доки не знайдемо вузол, що містить УСІ
+            // посилання на розділи — це і є контейнер меню
+            while (node && node.querySelectorAll('a[href*="#/collections/"]').length < links.length) {
+                node = node.parentElement;
+            }
+
+            return node;
+
+        }
+
+        function buildBox(inSidebar) {
+
+            var box = document.createElement("div");
+            box.id = "customAdminLinks";
+
+            box.style.cssText = inSidebar
+                ? "display:flex;flex-direction:column;gap:8px;margin:14px 0 4px;"
+                : "position:fixed;left:16px;bottom:16px;z-index:999999;" +
+                  "display:flex;flex-direction:column;gap:8px;";
+
+            LINKS.forEach(function (item) {
+
+                var a = document.createElement("a");
+                a.id = item.id;
+                a.href = item.href;
+                a.textContent = item.text;
+
+                a.style.cssText =
+                    "display:block;padding:10px 14px;border-radius:10px;" +
+                    "font:600 13.5px/1.2 -apple-system,Inter,sans-serif;" +
+                    "text-decoration:none;text-align:left;" +
+                    (item.primary
+                        ? "background:#2563eb;color:#fff;"
+                        : "background:#fff;color:#2563eb;border:1.5px solid #2563eb;") +
+                    (inSidebar ? "" : "box-shadow:0 6px 18px rgba(0,0,0,.18);");
+
+                box.appendChild(a);
+
+            });
+
+            return box;
 
         }
 
         function addLinks() {
 
-            addLink("bulkImportLink", "import.html", "📥 Масовий імпорт товарів",
-                "bottom:20px;right:20px;background:#2563eb;color:#fff;");
+            var existing = document.getElementById("customAdminLinks");
+            var sidebar = findSidebar();
 
-            // Доступи для колег. Навмисно ВЕДЕ НА ІНСТРУКЦІЮ, а не на
-            // форму «додати користувача»: вхід в адмінку — це вхід через
-            // GitHub, власної бази користувачів у CMS немає. Форма з
-            // логіном і паролем нічого б не відкривала, лише створювала
-            // б хибне враження, що доступ видано.
-            addLink("accessLink", "access.html", "👥 Доступи для колег",
-                "bottom:20px;right:250px;background:#fff;color:#2563eb;" +
-                "border:1.5px solid #2563eb;");
+            // уже стоїть у правильному місці — нічого не робимо
+            if (existing) {
+
+                var isInSidebar = sidebar && sidebar.contains(existing);
+
+                if ((sidebar && isInSidebar) || (!sidebar && !isInSidebar)) return;
+
+                existing.remove();
+
+            }
+
+            if (sidebar) sidebar.appendChild(buildBox(true));
+            else document.body.appendChild(buildBox(false));
 
         }
 
         addLinks();
 
-        new MutationObserver(addLinks).observe(document.body, { childList: true });
+        // Decap перемальовує розмітку при переходах — повертаємо
+        // посилання назад. childList+subtree, бо меню лежить глибоко.
+        new MutationObserver(addLinks).observe(document.body, {
+            childList: true,
+            subtree: true
+        });
 
     })();
     </script>
 
     <!-- Decap CMS (форк Netlify CMS, той самий движок) -->
-    <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+    <script src="https://unpkg.com/decap-cms@3.15.1/dist/decap-cms.js"></script>
 
     <!-- Власні прев'ю: показують товар/акцію/добірку так, як вони
          виглядатимуть на сайті, замість типового дампу полів.

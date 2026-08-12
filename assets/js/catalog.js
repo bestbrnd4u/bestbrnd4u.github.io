@@ -995,6 +995,11 @@ function fillCatalogSidebar(categoryDepartments) {
 // версії за замовчуванням усе було розгорнуто і зберігався
 // протилежний набір — згорнуті групи. Якби ключ лишився той самий,
 // старе збережене значення прочиталось би навпаки.
+// Ключ НАВМИСНО лишається зі старою назвою (bagvero:).
+// Це ідентифікатор у localStorage відвідувача — він ніде не
+// показується. Перейменування скинуло б збережений стан у всіх, хто
+// вже заходив на сайт: розгорнуті групи в сайдбарі поїхали б за
+// замовчуванням. Користі — нуль, тож не чіпаємо.
 const SIDEBAR_EXPANDED_KEY = "bagvero:sidebar-expanded";
 
 function readExpandedGroups() {
@@ -1930,7 +1935,7 @@ function renderBreadcrumbsAndTitle() {
 
         crumbs.push({ label: "Новинки", href: "catalog?section=new" });
         title = "Новинки";
-        subtitle = "Останні надходження до каталогу Bagvero";
+        subtitle = "Останні надходження до каталогу BestBrnd4u";
 
     } else if (currentSection === "sale") {
 
@@ -1973,10 +1978,10 @@ function renderBreadcrumbsAndTitle() {
     if (catalogSubtitle) catalogSubtitle.textContent = subtitle;
 
     document.title = currentSection === "sale"
-        ? "Акції | Bagvero"
+        ? "Акції | BestBrnd4u"
         : currentSection === "new"
-            ? "Новинки | Bagvero"
-            : "Каталог | Bagvero";
+            ? "Новинки | BestBrnd4u"
+            : "Каталог | BestBrnd4u";
 
 }
 

@@ -819,7 +819,7 @@ checkoutForm?.addEventListener("submit", event => {
 
             const itemsCount = getCart().reduce((sum, line) => sum + line.qty, 0);
 
-            sessionStorage.setItem("bagveroLastOrder", JSON.stringify({
+            sessionStorage.setItem("bestbrnd4uLastOrder", JSON.stringify({
                 orderId,
                 orderDate,
                 itemsCount,

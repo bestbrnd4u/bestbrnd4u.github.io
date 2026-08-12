@@ -547,7 +547,14 @@ function renderOrderCard(order) {
                         <p>${order.delivery_method || "—"}</p>
                         <p>${[order.delivery_city, order.delivery_detail].filter(Boolean).join(" ") || "—"}</p>
                         <p><strong>Статус доставки:</strong> ${order.delivery_status || "—"}</p>
-                        <p><strong>ТТН:</strong> ${order.ttn || "—"}</p>
+                        <p><strong>ТТН:</strong> ${
+                            order.tracking_number
+                                ? `<a href="https://novaposhta.ua/tracking/?cargo_number=${encodeURIComponent(order.tracking_number)}" target="_blank" rel="noopener">${escapeHtml(order.tracking_number)}</a>`
+                                : "—"
+                        }</p>
+                        ${order.refusal_requested_at ? `
+                        <p class="order-refusal-note"><strong>Відмова:</strong> запит надіслано, менеджер зв'яжеться</p>
+                        ` : ""}
                     </div>
 
                 </div>
@@ -597,6 +604,92 @@ function renderOrderCard(order) {
 }
 
 // розгортання / згортання картки замовлення —
+// -------------------------
+// Відмова від товару
+//
+// Раніше кнопка лише показувала напис «менеджер зв'яжеться» — нічого
+// не зберігалось і нікого не сповіщало, тобто клієнту обіцяли те,
+// чого не відбувалось.
+//
+// Тепер створюється заявка в order_refusals. Тригер у базі ставить
+// позначку на замовленні й надсилає магазину повідомлення в Telegram.
+// Клієнт не може змінювати саме замовлення — лише створити заявку на
+// своє (див. міграцію 005).
+// -------------------------
+
+async function requestRefusal(button) {
+
+    const orderNumber = button.dataset.order;
+
+    if (!supabaseClient || !orderNumber) {
+
+        showToast("Не вдалося надіслати запит. Зателефонуйте нам, будь ласка");
+
+        return;
+
+    }
+
+    // захист від подвійного натискання, поки летить запит
+    if (button.dataset.sending === "1") return;
+
+    button.dataset.sending = "1";
+
+    try {
+
+        const user = await getCurrentUser();
+
+        if (!user) {
+
+            showToast("Увійдіть в акаунт, щоб оформити відмову");
+
+            return;
+
+        }
+
+        const { data: order, error: orderError } = await supabaseClient
+            .from("orders")
+            .select("id")
+            .eq("order_number", orderNumber)
+            .maybeSingle();
+
+        if (orderError || !order) {
+
+            showToast("Замовлення не знайдено. Зателефонуйте нам, будь ласка");
+
+            return;
+
+        }
+
+        const { error } = await supabaseClient
+            .from("order_refusals")
+            .insert({ order_id: order.id, user_id: user.id });
+
+        if (error) {
+
+            console.error("Заявка на відмову:", error);
+
+            showToast("Не вдалося надіслати запит. Зателефонуйте нам, будь ласка");
+
+            return;
+
+        }
+
+        // Показуємо результат на самій кнопці, а не тільки тостом:
+        // інакше після перемальовування списку не видно, що заявку
+        // вже надіслано, і клієнт тисне повторно.
+        button.textContent = "✓ Відмову надіслано";
+        button.disabled = true;
+
+        showToast("Запит на відмову надіслано. Менеджер зв'яжеться з вами найближчим часом");
+
+    } finally {
+
+        button.dataset.sending = "";
+
+    }
+
+}
+
 // делегування на список, бо картки перемальовуються динамічно
 ordersListEl?.addEventListener("click", event => {
 
@@ -604,7 +697,7 @@ ordersListEl?.addEventListener("click", event => {
 
     if (refuseBtn) {
 
-        showToast("Запит на відмову від товару надіслано. Менеджер зв'яжеться з вами найближчим часом");
+        requestRefusal(refuseBtn);
 
         return;
 

@@ -8,7 +8,7 @@
 //   node scripts/telegram-links.js <логін_бота>
 //
 // Приклад:
-//   node scripts/telegram-links.js bagvero_orders_bot
+//   node scripts/telegram-links.js bestbrnd4u_orders_bot
 //
 // Прапорці:
 //   --csv    вивести таблицею через кому (зручно вставити в Excel)
@@ -53,7 +53,7 @@ function main() {
     if (!bot) {
 
         console.error("Вкажіть логін бота, напр.:");
-        console.error("  node scripts/telegram-links.js bagvero_orders_bot");
+        console.error("  node scripts/telegram-links.js bestbrnd4u_orders_bot");
         process.exit(1);
 
     }

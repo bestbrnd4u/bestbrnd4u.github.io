@@ -56,11 +56,11 @@ function updateProductSeoMetadata(product) {
 
     const priceText = `${new Intl.NumberFormat("uk-UA").format(product.price)} грн`;
 
-    const title = `${product.title} — купити за ${priceText} | Bagvero`;
+    const title = `${product.title} — купити за ${priceText} | BestBrnd4u`;
 
     const description = truncateForMeta(
         product.description ||
-        `${product.title} від ${product.brand} — купити в інтернет-магазині Bagvero. Ціна ${priceText}.`
+        `${product.title} від ${product.brand} — купити в інтернет-магазині BestBrnd4u. Ціна ${priceText}.`
     );
 
     const image = product.images?.[0] || "";

@@ -114,6 +114,8 @@ function formatOrder(order) {
     order.payment_method ? `💳 ${escapeHtml(order.payment_method)}` : "",
     order.promo_code ? `🎟 Промокод: ${escapeHtml(order.promo_code)}` : "",
     order.user_id ? "" : "👥 <i>Гість (без реєстрації)</i>",
+    order.refusal_requested_at ? "❗️ <b>Клієнт просив відмову</b>" : "",
+    order.tracking_number ? `📦 ТТН: <code>${escapeHtml(order.tracking_number)}</code>` : "",
   ];
 
   return rows.filter((r) => r !== "").join("\n");
@@ -388,6 +390,42 @@ function parseTtnCommand(text) {
   if (!tracking) return { error: "Не розпізнав номер накладної." };
 
   return { orderNumber, tracking };
+
+}
+
+
+// ======================================
+// Список замовлень для власника (/orders)
+// ======================================
+
+// Короткий рядок замовлення для списку: номер, сума, статус, позначки.
+function orderListLine(order) {
+
+  const status = STATUSES[normalizeStatus(order.status)] ?? STATUSES.new;
+
+  const marks = [
+    order.tracking_number ? "" : "без ТТН",
+    order.refusal_requested_at ? "❗відмова" : "",
+  ].filter(Boolean).join(", ");
+
+  return `${status.emoji} <b>${escapeHtml(order.order_number ?? "")}</b> — ` +
+         `${money(order.total)}${marks ? ` · <i>${escapeHtml(marks)}</i>` : ""}`;
+
+}
+
+// Кнопки списку: по одній на замовлення, щоб відкрити картку.
+function orderListKeyboard(orders) {
+
+  const rows = (orders || []).map((order) => ([{
+    text: `${(STATUSES[normalizeStatus(order.status)] ?? STATUSES.new).emoji} ` +
+          `${order.order_number ?? ""} · ${money(order.total)}` +
+          (order.tracking_number ? "" : " · без ТТН"),
+    callback_data: `open:${order.id}`,
+  }]));
+
+  if (!rows.length) return undefined;
+
+  return { inline_keyboard: rows };
 
 }
 
@@ -798,7 +836,7 @@ function buildOrderRow(product, session, orderNumber) {
 }
 
 // ======================================
-// Telegram-бот для заявок Bagvero
+// Telegram-бот для заявок BestBrnd4u
 //
 // Одна функція обробляє ДВА види запитів:
 //
@@ -1208,7 +1246,58 @@ async function handleCallback(callback: Record<string, any>) {
 
   // Кнопка «Додати ТТН» під відправленим замовленням — щоб можна
   // було дослати накладну, якщо раніше натиснули /skip
+  // Відкрити картку замовлення зі списку /orders
+  if (data.startsWith("open:")) {
+
+    if (!isOwner(callback.message.chat.id)) {
+
+      await telegram("answerCallbackQuery", {
+        callback_query_id: callback.id,
+        text: "Ця дія доступна лише магазину",
+      });
+
+      return;
+
+    }
+
+    const order = await findOrderById(data.slice(5));
+
+    await telegram("answerCallbackQuery", { callback_query_id: callback.id });
+
+    if (!order) {
+
+      await telegram("sendMessage", { chat_id: callback.message.chat.id, text: "Замовлення не знайдено." });
+
+      return;
+
+    }
+
+    await telegram("sendMessage", {
+      chat_id: callback.message.chat.id,
+      text: formatOrder(order),
+      parse_mode: "HTML",
+      disable_web_page_preview: true,
+      reply_markup: buildKeyboard(order.id, order.status ?? "new", {
+        hasTracking: Boolean(order.tracking_number),
+      }),
+    });
+
+    return;
+
+  }
+
   if (data.startsWith("ttn:")) {
+
+    if (!isOwner(callback.message.chat.id)) {
+
+      await telegram("answerCallbackQuery", {
+        callback_query_id: callback.id,
+        text: "Ця дія доступна лише магазину",
+      });
+
+      return;
+
+    }
 
     const orderId = data.slice(4);
 
@@ -1229,6 +1318,18 @@ async function handleCallback(callback: Record<string, any>) {
         `— я перешлю його клієнту.\n\n` +
         `Передумали — /skip`,
       parse_mode: "HTML",
+    });
+
+    return;
+
+  }
+
+  // зміна статусу — теж лише власнику
+  if (data.startsWith("st:") && !isOwner(callback.message.chat.id)) {
+
+    await telegram("answerCallbackQuery", {
+      callback_query_id: callback.id,
+      text: "Ця дія доступна лише магазину",
     });
 
     return;
@@ -1308,7 +1409,7 @@ async function handleMessage(message: Record<string, any>) {
   const command = parseStartPayload(message.text);
 
   // /id — службова команда: підказує chat_id під час налаштування
-  if (String(message.text ?? "").startsWith("/id")) {
+  if (String(message.text ?? "").startsWith("/id") && isOwner(chatId)) {
 
     await telegram("sendMessage", {
       chat_id: chatId,
@@ -1414,7 +1515,7 @@ async function handleMessage(message: Record<string, any>) {
   await telegram("sendMessage", {
     chat_id: chatId,
     text:
-      "Вітаємо в <b>Bagvero</b> 👋\n\n" +
+      "Вітаємо в <b>BestBrnd4u</b> 👋\n\n" +
       "Сумки, взуття та аксесуари світових брендів.\n\n" +
       "Тисніть кнопку нижче, щоб подивитися каталог.",
     parse_mode: "HTML",
@@ -1425,6 +1526,28 @@ async function handleMessage(message: Record<string, any>) {
       ],
     },
   });
+
+}
+
+// -------------------------
+// Чи це власник магазину
+//
+// КРИТИЧНО. Бот відкритий: написати йому може будь-хто, хто знає
+// логін. Команди керування замовленнями (ТТН, статуси, список
+// замовлень) мусять слухатись ЛИШЕ вас — інакше сторонній міг би
+// підставити накладну в чуже замовлення й від імені магазину
+// надіслати її клієнту.
+//
+// Порівнюємо з TELEGRAM_CHAT_ID — тим самим чатом, куди приходять
+// заявки. Якщо ви ведете замовлення в групі, це id групи, і команди
+// з неї теж працюють.
+// -------------------------
+
+function isOwner(chatId: unknown): boolean {
+
+  if (!TELEGRAM_CHAT_ID) return false;
+
+  return String(chatId) === String(TELEGRAM_CHAT_ID);
 
 }
 
@@ -1441,6 +1564,23 @@ async function findOrderById(id: string) {
   const rows = await response.json();
 
   return Array.isArray(rows) ? rows[0] ?? null : null;
+
+}
+
+async function listRecentOrders(limit = 10) {
+
+  const response = await supabaseRest(
+    `orders?select=*&order=created_at.desc&limit=${limit}`,
+  );
+
+  if (!response.ok) {
+    console.error("Не вдалося отримати список замовлень:", await response.text());
+    return [];
+  }
+
+  const rows = await response.json();
+
+  return Array.isArray(rows) ? rows : [];
 
 }
 
@@ -1474,6 +1614,45 @@ async function applyTracking(orderId: string, tracking: string) {
   if (order) await notifyCustomer(order, "shipped");
 
   return order;
+
+}
+
+// -------------------------
+// Відмова від товару
+//
+// Клієнт натиснув «Відмова» в кабінеті. Раніше це нічого не робило —
+// лише показувало напис. Тепер створюється заявка, а ви одразу
+// бачите її тут із кнопками, щоб не шукати замовлення вручну.
+// -------------------------
+
+async function handleRefusal(record: Record<string, any>, order: Record<string, any> | null) {
+
+  const ord = order ?? await findOrderById(record.order_id);
+
+  const number = escapeHtml(ord?.order_number ?? "");
+
+  const lines = [
+    `❗️ <b>Клієнт просить відмову</b>`,
+    "",
+    `Замовлення: <b>${number}</b>`,
+    ord?.total ? `Сума: ${money(ord.total)}` : "",
+    ord?.phone ? `📞 <a href="tel:${escapeHtml(ord.phone)}">${escapeHtml(ord.phone)}</a>` : "",
+    record.note ? `\nКоментар клієнта: ${escapeHtml(record.note)}` : "",
+    "",
+    `Зателефонуйте клієнту й вирішіть, чи скасовувати.`,
+  ].filter((l) => l !== "");
+
+  await telegram("sendMessage", {
+    chat_id: TELEGRAM_CHAT_ID,
+    text: lines.join("\n"),
+    parse_mode: "HTML",
+    disable_web_page_preview: true,
+    reply_markup: ord
+      ? buildKeyboard(ord.id, ord.status ?? "new", {
+          hasTracking: Boolean(ord.tracking_number),
+        })
+      : undefined,
+  });
 
 }
 
@@ -1512,6 +1691,41 @@ async function handleTrackingInput(message: Record<string, any>): Promise<boolea
 
   const chatId = message.chat.id;
 
+  // --- /orders: останні замовлення списком ---
+  //
+  // Замінює окрему сторінку адмінки: замовлення живуть у Supabase, а
+  // адмінка сайту (Decap) працює з файлами в репозиторії й до бази не
+  // має доступу. Окрема веб-сторінка вимагала б ще одного входу й
+  // політик доступу до чужих замовлень. У боті ви вже впізнані —
+  // тому список тут.
+  if (/^\/orders(@\S+)?$/i.test(String(message.text ?? "").trim())) {
+
+    if (!isOwner(chatId)) return true;
+
+    const orders = await listRecentOrders(10);
+
+    if (!orders.length) {
+
+      await telegram("sendMessage", { chat_id: chatId, text: "Замовлень поки немає." });
+
+      return true;
+
+    }
+
+    await telegram("sendMessage", {
+      chat_id: chatId,
+      text:
+        `<b>Останні ${orders.length} замовлень</b>\n\n` +
+        orders.map(orderListLine).join("\n") +
+        `\n\nНатисніть замовлення, щоб відкрити картку з кнопками.`,
+      parse_mode: "HTML",
+      reply_markup: orderListKeyboard(orders),
+    });
+
+    return true;
+
+  }
+
   // --- явна команда: /ttn <номер замовлення> <ТТН> ---
   // Не залежить від того, яку кнопку натиснули останньою, тож
   // працює навіть коли замовлень багато або картка вже загубилась
@@ -1519,6 +1733,15 @@ async function handleTrackingInput(message: Record<string, any>): Promise<boolea
   const command = parseTtnCommand(message.text);
 
   if (command) {
+
+    if (!isOwner(chatId)) {
+
+      // сторонньому просто не відповідаємо по суті — не підказуємо,
+      // що така команда взагалі існує
+      return true;
+
+    }
+
 
     if (command.error) {
 
@@ -1556,6 +1779,8 @@ async function handleTrackingInput(message: Record<string, any>): Promise<boolea
     return true;
 
   }
+
+  if (!isOwner(chatId)) return false;
 
   const session = await getSession(chatId);
 
@@ -1923,6 +2148,21 @@ async function handleRequest(request: Request): Promise<Response> {
     } else if (body.message) {
       await background(handleMessage(body.message));
     }
+
+    return new Response("ok", { status: 200 });
+
+  }
+
+  // --- Відмова від товару (заявка клієнта) ---
+  if (body.type === "INSERT" && body.table === "order_refusals" && body.record) {
+
+    const secret = request.headers.get("x-hook-secret");
+
+    if (HOOK_SECRET && secret !== HOOK_SECRET) {
+      return new Response("forbidden", { status: 403 });
+    }
+
+    await background(handleRefusal(body.record, body.order));
 
     return new Response("ok", { status: 200 });
 

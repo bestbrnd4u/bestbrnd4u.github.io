@@ -30,7 +30,7 @@ console.log("\n[1] Розбір посилання — усі написання
     });
 
   // Telegram у групах додає @ім'я_бота до команди
-  const withBot = p("/start@bagvero_bot product_15");
+  const withBot = p("/start@bestbrnd4u_bot product_15");
   check("команда з @іменем бота теж працює",
         withBot?.type === "product" && withBot.id === 15, JSON.stringify(withBot));
 
@@ -108,7 +108,7 @@ console.log("\n[6] Обробник у функції");
         SRC.includes("Не знайшли цей товар"));
   check("якщо sendPhoto не вдався — надсилає текстом",
         /result\?\.ok/.test(SRC) && SRC.includes("sendMessage"));
-  check("звичайний /start вітає й веде в каталог", SRC.includes("Вітаємо в <b>Bagvero</b>"));
+  check("звичайний /start вітає й веде в каталог", SRC.includes("Вітаємо в <b>BestBrnd4u</b>"));
   check("/id лишився для налаштування", SRC.includes('startsWith("/id")'));
   check("адресу сайту можна перевизначити секретом", SRC.includes('Deno.env.get("SITE_URL")'));
 }

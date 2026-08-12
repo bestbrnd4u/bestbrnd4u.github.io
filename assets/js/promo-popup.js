@@ -17,7 +17,7 @@
 
     if (!CURRENT_PAGE) return;
 
-    const DISMISS_KEY_PREFIX = "bagveroPopupDismissed:";
+    const DISMISS_KEY_PREFIX = "bestbrnd4uPopupDismissed:";
 
     async function initPromoPopup() {
 

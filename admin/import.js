@@ -221,7 +221,7 @@ async function downloadTemplate() {
     wsCategories["!cols"] = [{ wch: 20 }, { wch: 30 }];
     XLSX.utils.book_append_sheet(wb, wsCategories, "Довідник категорій");
 
-    XLSX.writeFile(wb, "bagvero-shablon-tovariv.xlsx");
+    XLSX.writeFile(wb, "bestbrnd4u-shablon-tovariv.xlsx");
 
 }
 
@@ -819,7 +819,7 @@ async function downloadZip() {
 
     const a = document.createElement("a");
     a.href = url;
-    a.download = "bagvero-import-tovariv.zip";
+    a.download = "bestbrnd4u-import-tovariv.zip";
     document.body.appendChild(a);
     a.click();
     a.remove();

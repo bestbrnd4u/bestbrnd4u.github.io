@@ -81,9 +81,9 @@ function updatePromoSeoMetadata(promo) {
 
     const pageUrl = `${SITE_URL}/promo?id=${promo.slug}`;
 
-    const title = `${promo.title} | Bagvero`;
+    const title = `${promo.title} | BestBrnd4u`;
 
-    const description = truncateForMeta(promo.text || `Акція ${promo.title} в інтернет-магазині Bagvero`);
+    const description = truncateForMeta(promo.text || `Акція ${promo.title} в інтернет-магазині BestBrnd4u`);
 
     setMetaByName("description", description);
 
@@ -101,7 +101,7 @@ function updatePromoSeoMetadata(promo) {
 
 function renderPromoHero(promo) {
 
-    document.getElementById("pageTitle").textContent = `${promo.title} | Bagvero`;
+    document.getElementById("pageTitle").textContent = `${promo.title} | BestBrnd4u`;
     document.getElementById("breadcrumbTitle").textContent = promo.title;
 
     updatePromoSeoMetadata(promo);

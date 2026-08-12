@@ -102,6 +102,8 @@ export function formatOrder(order) {
     order.payment_method ? `💳 ${escapeHtml(order.payment_method)}` : "",
     order.promo_code ? `🎟 Промокод: ${escapeHtml(order.promo_code)}` : "",
     order.user_id ? "" : "👥 <i>Гість (без реєстрації)</i>",
+    order.refusal_requested_at ? "❗️ <b>Клієнт просив відмову</b>" : "",
+    order.tracking_number ? `📦 ТТН: <code>${escapeHtml(order.tracking_number)}</code>` : "",
   ];
 
   return rows.filter((r) => r !== "").join("\n");
@@ -376,5 +378,41 @@ export function parseTtnCommand(text) {
   if (!tracking) return { error: "Не розпізнав номер накладної." };
 
   return { orderNumber, tracking };
+
+}
+
+
+// ======================================
+// Список замовлень для власника (/orders)
+// ======================================
+
+// Короткий рядок замовлення для списку: номер, сума, статус, позначки.
+export function orderListLine(order) {
+
+  const status = STATUSES[normalizeStatus(order.status)] ?? STATUSES.new;
+
+  const marks = [
+    order.tracking_number ? "" : "без ТТН",
+    order.refusal_requested_at ? "❗відмова" : "",
+  ].filter(Boolean).join(", ");
+
+  return `${status.emoji} <b>${escapeHtml(order.order_number ?? "")}</b> — ` +
+         `${money(order.total)}${marks ? ` · <i>${escapeHtml(marks)}</i>` : ""}`;
+
+}
+
+// Кнопки списку: по одній на замовлення, щоб відкрити картку.
+export function orderListKeyboard(orders) {
+
+  const rows = (orders || []).map((order) => ([{
+    text: `${(STATUSES[normalizeStatus(order.status)] ?? STATUSES.new).emoji} ` +
+          `${order.order_number ?? ""} · ${money(order.total)}` +
+          (order.tracking_number ? "" : " · без ТТН"),
+    callback_data: `open:${order.id}`,
+  }]));
+
+  if (!rows.length) return undefined;
+
+  return { inline_keyboard: rows };
 
 }

@@ -40,8 +40,19 @@ alter table public.orders
 -- одного поля була б зайвою.
 -- --------------------------------------
 
+-- bigint, а НЕ uuid: тут лежить id замовлення, а public.orders.id —
+-- bigint (див. supabase/orders-schema.sql).
+--
+-- У першій версії цієї міграції стояв uuid. Якщо ви вже її виконали,
+-- колонка створилась з неправильним типом і кнопка «Додати ТТН» не
+-- працювала б: збереження id замовлення падало б на невідповідності
+-- типів. Тому спершу прибираємо стару колонку — у ній лежить лише
+-- тимчасовий стан діалогу, втрачати нічого.
 alter table public.bot_sessions
-    add column if not exists awaiting_ttn_for uuid;
+    drop column if exists awaiting_ttn_for;
+
+alter table public.bot_sessions
+    add column if not exists awaiting_ttn_for bigint;
 
 
 -- --------------------------------------

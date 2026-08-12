@@ -94,30 +94,74 @@ console.log("\n[4] Варіант з поштою і паролем описан
 
 console.log("\n[5] Кнопка в адмінці веде на інструкцію, а не на форму");
 {
-  check("кнопка додається", index.includes('addLink("accessLink"'));
-  check("веде на access.html", /addLink\("accessLink",\s*"access\.html"/.test(index));
+  check("посилання оголошене", index.includes('id: "accessLink"'));
+  check("веде на access.html", /href:\s*"access\.html"/.test(index));
   check("немає жодної форми створення користувача",
         !/type=["']password["']/i.test(page) && !/type=["']password["']/i.test(index));
   check("у коді пояснено, чому саме інструкція",
         index.includes("власної бази користувачів у CMS немає"));
+}
 
-  // обидві кнопки мають рендеритись і не накладатись
+console.log("\n[6] Кнопки не перекривають робочу область");
+{
+  // Регресія: посилання висіли фіксовано в правому нижньому куті й
+  // перекривали редактор товару. Тепер вони живуть у лівому меню, а
+  // в редакторі (де меню немає) не показуються на робочому місці.
+  check("місце шукається структурно, а не за класами Decap",
+        index.includes('a[href*="#/collections/"]'),
+        "класи Decap генеруються автоматично й змінюються між версіями");
+
+  check("правий нижній кут більше не використовується",
+        !/right:\s*\d+px;\s*bottom|bottom:20px;right:20px/.test(index));
+
+  check("наблюдач стежить за глибокими змінами розмітки",
+        /childList:\s*true,\s*\n?\s*subtree:\s*true/.test(index));
+
+  // поведінкова перевірка на справжньому DOM
   const dom = new JSDOM(index, { runScripts: "dangerously" });
-  const d = dom.window.document;
-  const ids = [...d.querySelectorAll("a[id]")].map(a => a.id);
+  const w = dom.window, d = w.document;
 
-  check("рендеряться обидві кнопки", ids.includes("bulkImportLink") && ids.includes("accessLink"), ids.join(", "));
+  let box = d.getElementById("customAdminLinks");
+  check("до появи меню є запасний варіант", !!box && box.style.position === "fixed");
+  check("запасний варіант — ЛІВИЙ кут (справа Decap тримає збереження)",
+        box.style.left === "16px" && !box.style.right, `left:${box.style.left} right:${box.style.right}`);
 
-  const imp = d.getElementById("bulkImportLink").style;
-  const acc = d.getElementById("accessLink").style;
-  check("кнопки не в одній точці (не перекривають одна одну)",
-        imp.right !== acc.right, `${imp.right} vs ${acc.right}`);
+}
 
-  // повторний виклик не має дублювати кнопки (адмінка перемальовує body)
-  dom.window.document.body.appendChild(dom.window.document.createElement("div"));
-  const again = [...d.querySelectorAll("#accessLink")].length;
-  check("кнопка не дублюється при перемалюванні", again === 1, again);
+(async () => {
+
+console.log("\n[7] Перенесення в меню, коли Decap його домалює");
+{
+  const dom = new JSDOM(index, { runScripts: "dangerously" });
+  const w = dom.window, d = w.document;
+
+  const card = d.createElement("div");
+  card.className = "sidebar-card";
+  card.innerHTML = '<h2>Collections</h2><ul>' +
+    '<li><a href="#/collections/pages">Сторінки</a></li>' +
+    '<li><a href="#/collections/products">Товари</a></li></ul>';
+  d.body.appendChild(card);
+
+  await new Promise(r => setTimeout(r, 40));
+
+  let box = d.getElementById("customAdminLinks");
+  check("кнопки переїхали в меню", !!box.closest(".sidebar-card"));
+  check("більше не фіксовані — у потоці сторінки", box.style.position === "");
+  check("не задублювались", d.querySelectorAll("#customAdminLinks").length === 1);
+  check("обидва посилання на місці",
+        [...box.querySelectorAll("a")].map(a => a.id).join(",") === "bulkImportLink,accessLink");
+
+  // перехід у редактор: Decap приховує меню
+  card.remove();
+  await new Promise(r => setTimeout(r, 40));
+
+  box = d.getElementById("customAdminLinks");
+  check("без меню знову запасний варіант у лівому куті",
+        box.style.position === "fixed" && box.style.left === "16px");
+  check("і без дублів", d.querySelectorAll("#customAdminLinks").length === 1);
 }
 
 console.log(failures===0?"\n✅ Усі перевірки пройдено":`\n❌ Провалено: ${failures}`);
 process.exit(failures===0?0:1);
+
+})();

@@ -6,16 +6,17 @@
 // Логіка:
 // - Гість (не залогінений) — все як і було, працює тільки
 //   localStorage, нічого з цього файлу не втручається.
-// - Клієнт УВІЙШОВ (подія SIGNED_IN, тобто саме зараз ввів
-//   логін/пароль або зареєструвався) — те, що встиг накидати
-//   в кошик/обране як гість на ЦЬОМУ пристрої, ОБ'ЄДНУЄМО з
-//   тим, що вже є в його акаунті (з інших пристроїв), і
-//   зберігаємо об'єднаний результат і локально, і на сервері.
-// - Клієнт ВІДКРИВ сторінку, уже будучи залогіненим раніше
-//   (подія INITIAL_SESSION) — просто підтягуємо те, що
-//   збережено в акаунті, і показуємо (без об'єднання: інакше
-//   при кожному відкритті сторінки кількість товарів в кошику
-//   подвоювалась би).
+// - У localStorage лежать ГОСТЬОВІ дані (позначки власника нема) —
+//   те, що клієнт накидав до входу, ОБ'ЄДНУЄМО з тим, що вже є в
+//   акаунті, і зберігаємо результат локально й на сервері.
+// - У localStorage лежить КОПІЯ цього ж акаунту (позначка власника
+//   збігається) — просто підтягуємо серверні дані, БЕЗ об'єднання.
+//   Інакше кількість товарів подвоювалась би при кожному
+//   спрацюванні події авторизації.
+//
+//   Гілку обираємо саме за позначкою власника, а не за типом події
+//   (SIGNED_IN / INITIAL_SESSION): supabase-js підключений без
+//   фіксованої версії, і склад подій змінюється між релізами.
 // - Клієнт вийшов з акаунту (SIGNED_OUT) — чистимо локальний
 //   кошик/обране, щоб дані одного акаунту не "перетекли" в
 //   наступну гостьову сесію чи інший акаунт на цьому браузері.
@@ -59,11 +60,80 @@ function dedupeFavoriteEntries(list) {
 // (там кошик зберігається згорнутим, з колонкою qty)
 // -------------------------
 
+// -------------------------
+// Захист від роздування кошика
+//
+// Кошик зберігається плоским масивом (один запис = одна одиниця),
+// тож помилка в об'єднанні множиться дуже швидко: 2^17 = 131072
+// записів за 17 повторів. Такий масив ще й розгортається в пам'яті
+// при кожному читанні.
+//
+// Тому обмежуємо кількість однієї позиції розумною межею. Це
+// одночасно ЛІКУЄ вже роздуті кошики: при наступному завантаженні
+// зайве відрізається й на сервер їде вже нормальна кількість.
+// -------------------------
+
+const MAX_QTY_PER_VARIANT = 99;
+
+function clampCart(flatCart) {
+
+    const counts = new Map();
+    const result = [];
+
+    (flatCart || []).forEach(entry => {
+
+        const key = variantKey(entry);
+        const seen = counts.get(key) || 0;
+
+        if (seen >= MAX_QTY_PER_VARIANT) return;
+
+        counts.set(key, seen + 1);
+        result.push(entry);
+
+    });
+
+    return result;
+
+}
+
+// -------------------------
+// Кому належить локальний кошик
+//
+// Без цієї позначки неможливо відрізнити дві різні ситуації:
+//   • у localStorage лежать ГОСТЬОВІ товари — їх треба приєднати
+//     до акаунту;
+//   • у localStorage лежить КОПІЯ кошика цього ж акаунту — тоді
+//     приєднувати нічого не можна, інакше кількість подвоїться.
+//
+// Раніше їх розрізняли за типом події авторизації: SIGNED_IN —
+// об'єднати, INITIAL_SESSION — просто підтягнути. Але supabase-js
+// підключений без фіксованої версії (@supabase/supabase-js@2), і
+// SIGNED_IN почав приходити не лише при справжньому вході, а й при
+// поновленні токена та відновленні сесії. Кожен такий випадок
+// подвоював кошик.
+//
+// Позначка власника не залежить від того, яка подія прийшла, —
+// тому логіка стала стійкою до змін у бібліотеці.
+// -------------------------
+
+const CART_OWNER_KEY = "cartOwner";
+
+function getLocalDataOwner() {
+    return localStorage.getItem(CART_OWNER_KEY) || null;
+}
+
+function setLocalDataOwner(userId) {
+
+    if (userId) localStorage.setItem(CART_OWNER_KEY, userId);
+    else localStorage.removeItem(CART_OWNER_KEY);
+
+}
+
 function groupCartForRemote(flatCart) {
 
     const map = new Map();
 
-    flatCart.forEach(entry => {
+    clampCart(flatCart).forEach(entry => {
 
         const key = variantKey(entry);
         const existing = map.get(key);
@@ -90,7 +160,9 @@ function expandCartFromRemote(rows) {
 
     (rows || []).forEach(row => {
 
-        for (let i = 0; i < row.qty; i++) {
+        const qty = Math.min(Number(row.qty) || 0, MAX_QTY_PER_VARIANT);
+
+        for (let i = 0; i < qty; i++) {
 
             flat.push({ id: row.product_id, color: row.color || null, size: row.size || null });
 
@@ -270,11 +342,15 @@ async function mergeGuestDataIntoAccount(userId) {
             pullFavoritesFromRemote(userId)
         ]);
 
-        const mergedCart = getCart().concat(remoteCart);
+        const mergedCart = clampCart(getCart().concat(remoteCart));
         const mergedFavorites = dedupeFavoriteEntries(getFavorites().concat(remoteFavorites));
 
         setStorage("cart", mergedCart);
         setStorage("favorites", mergedFavorites);
+
+        // локальні дані тепер належать цьому акаунту — повторне
+        // об'єднання більше не спрацює
+        setLocalDataOwner(userId);
 
         updateCartCounter();
         updateFavoriteCounter();
@@ -319,6 +395,9 @@ async function loadAccountDataAsIs(userId) {
         setStorage("cart", remoteCart);
         setStorage("favorites", remoteFavorites);
 
+        // локальна копія належить цьому акаунту
+        setLocalDataOwner(userId);
+
         updateCartCounter();
         updateFavoriteCounter();
 
@@ -339,6 +418,9 @@ function clearLocalCartAndFavorites() {
     setStorage("cart", []);
     setStorage("favorites", []);
 
+    // локальні дані знову гостьові
+    setLocalDataOwner(null);
+
     updateCartCounter();
     updateFavoriteCounter();
 
@@ -348,17 +430,34 @@ function clearLocalCartAndFavorites() {
 
 supabaseClient?.auth.onAuthStateChange((event, session) => {
 
-    if (event === "SIGNED_IN" && session?.user) {
+    const userId = session?.user?.id;
 
-        mergeGuestDataIntoAccount(session.user.id);
-
-    } else if (event === "INITIAL_SESSION" && session?.user) {
-
-        loadAccountDataAsIs(session.user.id);
-
-    } else if (event === "SIGNED_OUT") {
+    if (event === "SIGNED_OUT") {
 
         clearLocalCartAndFavorites();
+
+        return;
+
+    }
+
+    if (!userId) return;
+
+    // Гілку обираємо за ВЛАСНИКОМ локальних даних, а не за типом
+    // події. supabase-js підключений без фіксованої версії, і
+    // SIGNED_IN приходить не тільки при справжньому вході — а й при
+    // поновленні токена та відновленні сесії. Раніше кожен такий
+    // випадок запускав об'єднання, і кошик подвоювався: 2^17 = 131072
+    // одиниці одного товару за 17 подій.
+    if (getLocalDataOwner() === userId) {
+
+        // локальні дані — уже копія цього акаунту, приєднувати нічого
+        loadAccountDataAsIs(userId);
+
+    } else {
+
+        // у localStorage гостьові товари (або дані іншого акаунту) —
+        // приєднуємо їх до акаунту один раз
+        mergeGuestDataIntoAccount(userId);
 
     }
 
