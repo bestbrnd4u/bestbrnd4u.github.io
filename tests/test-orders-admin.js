@@ -123,6 +123,47 @@ console.log("\n[6] Міграція відмов");
   check("тригер ставить дату відмови", /set refusal_requested_at = now\(\)/.test(sql));
 }
 
+console.log("\n[7] Статус доставки в кабінеті — не прочерк");
+{
+  // Регресія: показувалось order.delivery_status, а цю колонку ніхто
+  // не заповнює — тож у клієнта завжди стояв «—», навіть коли
+  // замовлення вже відправлене й накладна є.
+  check("прочерк за замовчуванням прибрано",
+        !/delivery_status \|\| "—"/.test(ACC));
+  check("є окремі формулювання про доставку",
+        /function deliveryStatusLabel/.test(ACC));
+  check("значення екрановане", /escapeHtml\(deliveryStatusLabel\(order\)\)/.test(ACC));
+
+  const fn = new Function(
+    ACC.match(/function deliveryStatusLabel[\s\S]*?\n\}/)[0] +
+    "; return deliveryStatusLabel;"
+  )();
+
+  check("нове → очікує обробки", fn({ status:"new" }) === "Очікує обробки");
+  check("в обробці → готується", fn({ status:"processing" }).includes("Готується"));
+  check("відправлено → передано в доставку", fn({ status:"shipped" }).includes("доставку"));
+  check("виконано → доставлено", fn({ status:"completed" }) === "Доставлено");
+  check("скасовано → скасовано", fn({ status:"cancelled" }) === "Скасовано");
+
+  check("невідомий статус не дає порожнечі", !!fn({ status:"хтозна" }));
+  check("жоден стан не повертає прочерк",
+        ["new","processing","shipped","completed","cancelled"]
+          .every(st => fn({ status: st }) !== "—"));
+
+  // якщо колонку колись почнуть заповнювати — вона має пріоритет
+  check("заповнена колонка має перевагу",
+        fn({ status:"shipped", delivery_status:"У відділенні" }) === "У відділенні");
+
+  // формулювання мусять відрізнятись від статусу замовлення,
+  // інакше рядок просто дублює бейдж угорі картки
+  const orderLabels = new Function(
+    ACC.match(/function orderStatusLabel[\s\S]*?\n\}/)[0] + "; return orderStatusLabel;"
+  )();
+  const different = ["new","processing"].filter(st => fn({status:st}) !== orderLabels(st));
+  check("не дублює бейдж статусу замовлення", different.length === 2,
+        `однакові формулювання у ${2 - different.length} станах`);
+}
+
 console.log(failures===0?"\n✅ Усі перевірки пройдено":`\n❌ Провалено: ${failures}`);
 process.exit(failures===0?0:1);
 

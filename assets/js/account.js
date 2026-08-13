@@ -388,6 +388,29 @@ function translateAuthError(error) {
 // Історія замовлень
 // -------------------------
 
+// Стан саме ДОСТАВКИ — формулювання інші, ніж у статусі замовлення.
+//
+// Колонка delivery_status у базі є, але її ніхто не заповнює, тож у
+// кабінеті там завжди стояв прочерк — навіть коли замовлення вже
+// відправлене з накладною. Тепер: якщо колонку колись почнуть
+// заповнювати (напр. з API Нової пошти) — показуємо її, інакше
+// виводимо стан, виведений зі статусу замовлення.
+function deliveryStatusLabel(order) {
+
+    if (order.delivery_status) return order.delivery_status;
+
+    const labels = {
+        new: "Очікує обробки",
+        processing: "Готується до відправлення",
+        shipped: "Передано в доставку",
+        completed: "Доставлено",
+        cancelled: "Скасовано"
+    };
+
+    return labels[order.status] || "Очікує обробки";
+
+}
+
 function orderStatusLabel(status) {
 
     const labels = {
@@ -546,7 +569,7 @@ function renderOrderCard(order) {
                         <h3>Доставка</h3>
                         <p>${order.delivery_method || "—"}</p>
                         <p>${[order.delivery_city, order.delivery_detail].filter(Boolean).join(" ") || "—"}</p>
-                        <p><strong>Статус доставки:</strong> ${order.delivery_status || "—"}</p>
+                        <p><strong>Статус доставки:</strong> ${escapeHtml(deliveryStatusLabel(order))}</p>
                         <p><strong>ТТН:</strong> ${
                             order.tracking_number
                                 ? `<a href="https://novaposhta.ua/tracking/?cargo_number=${encodeURIComponent(order.tracking_number)}" target="_blank" rel="noopener">${escapeHtml(order.tracking_number)}</a>`
