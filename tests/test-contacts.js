@@ -197,5 +197,36 @@ console.log("\n[8] Мертвих посилань у соцмережах не�
         `${withInsta.length} з ${pages.length}`);
 }
 
+console.log("\n[9] Позначки авторства (потрібні для скарги DMCA)");
+{
+  const withAuthor = pages.filter(f => /name="author"\s+content="BestBrnd4u"/.test(read(f)));
+  check("автор указаний на всіх сторінках", withAuthor.length === pages.length,
+        `${withAuthor.length} з ${pages.length}`);
+
+  const withCopyright = pages.filter(f => /name="copyright"/.test(read(f)));
+  check("копірайт у метаданих на всіх сторінках", withCopyright.length === pages.length,
+        `${withCopyright.length} з ${pages.length}`);
+
+  const withLicense = pages.filter(f => /rel="license"/.test(read(f)));
+  check("посилання на ліцензію на всіх сторінках", withLicense.length === pages.length,
+        `${withLicense.length} з ${pages.length}`);
+
+  const lic = path.join(ROOT, "LICENSE");
+  check("файл LICENSE існує", fs.existsSync(lic));
+
+  if (fs.existsSync(lic)) {
+    const text = fs.readFileSync(lic, "utf8");
+
+    check("явна заборона використання", /ЗАБОРОНЕНО|PROHIBITED/.test(text));
+    check("сказано, що публічність ≠ дозвіл",
+          /НЕ означає дозволу/i.test(text) && /does NOT grant any/i.test(text));
+    check("є контакт для скарг", text.includes("bestbrnd4u@proton.me"));
+    check("згадано DMCA", /DMCA/.test(text));
+    check("двомовна (укр + англ) — хостери часто англомовні",
+          /УКРАЇНСЬКОЮ/.test(text) && /ENGLISH/.test(text));
+    check("назва бренду актуальна", text.includes("BestBrnd4u") && !/bagvero/i.test(text));
+  }
+}
+
 console.log(failures===0?"\n✅ Усі перевірки пройдено":`\n❌ Провалено: ${failures}`);
 process.exit(failures===0?0:1);
