@@ -28,6 +28,8 @@ async function build() {
   const dom = new JSDOM(html, { runScripts:"outside-only", pretendToBeVisual:true, url:"https://x.test/catalog" });
   const { window } = dom;
   window.escapeHtml = v => String(v ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  // mega-menu.js читає статі через спільну функцію з common.js
+  window.getProductGenders = p => Array.isArray(p?.gender) ? p.gender.filter(Boolean) : (p?.gender ? [p.gender] : []);
   window.fetch = url => Promise.resolve({
     ok:true,
     json: () => Promise.resolve(String(url).includes("categories") ? CATEGORIES : PRODUCTS)
@@ -129,6 +131,7 @@ console.log("\n[5] Стійкість: помилка мережі не лама
   const dom = new JSDOM(html, { runScripts:"outside-only", pretendToBeVisual:true, url:"https://x.test/catalog" });
   const { window } = dom;
   window.escapeHtml = v => String(v);
+  window.getProductGenders = p => Array.isArray(p?.gender) ? p.gender.filter(Boolean) : (p?.gender ? [p.gender] : []);
   window.fetch = () => Promise.reject(new Error("offline"));
   window.eval(fs.readFileSync(ROOT + "/assets/js/mega-menu.js", "utf8"));
   await new Promise(r => setTimeout(r, 60));
@@ -143,6 +146,8 @@ console.log("\n[6] XSS у назві категорії");
   const dom = new JSDOM(html, { runScripts:"outside-only", pretendToBeVisual:true, url:"https://x.test/catalog" });
   const { window } = dom;
   window.escapeHtml = v => String(v ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  // mega-menu.js читає статі через спільну функцію з common.js
+  window.getProductGenders = p => Array.isArray(p?.gender) ? p.gender.filter(Boolean) : (p?.gender ? [p.gender] : []);
   window.__pwned = false;
   window.fetch = url => Promise.resolve({ ok:true, json: () => Promise.resolve(
     String(url).includes("categories") ? [] :

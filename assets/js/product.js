@@ -567,7 +567,7 @@ ${sizeButtons}
 
                 <div class="spec-row">
                     <span>Стать</span>
-                    <strong>${product.gender || "Унісекс"}</strong>
+                    <strong>${escapeHtml(getProductGenderLabel(product))}</strong>
                 </div>
 
                 ${product.country ? `
@@ -1176,10 +1176,10 @@ function renderSimilar(product){
     // не був порожнім навіть для рідкісних категорій
     const sameCategory = others.filter(item => item.category === product.category);
     const sameGender = others.filter(item =>
-        item.gender === product.gender && item.category !== product.category
+        getProductGenders(item).some(g => getProductGenders(product).includes(g)) && item.category !== product.category
     );
     const rest = others.filter(item =>
-        item.category !== product.category && item.gender !== product.gender
+        item.category !== product.category && !getProductGenders(item).some(g => getProductGenders(product).includes(g))
     );
 
     const list = [...sameCategory, ...sameGender, ...rest].slice(0, 4);

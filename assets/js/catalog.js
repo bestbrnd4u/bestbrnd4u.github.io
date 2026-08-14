@@ -529,7 +529,7 @@ function availableFacets() {
         brands: new Set(forBrands.map(p => p.brand).filter(Boolean)),
         colors,
         sizes,
-        genders: new Set(forGenders.map(p => p.gender).filter(Boolean)),
+        genders: new Set(forGenders.flatMap(p => getProductGenders(p))),
         categories: new Set(forCategories.map(p => p.category).filter(Boolean))
     };
 
@@ -2019,7 +2019,10 @@ function filterProducts(skip) {
 
     if (selectedGenders.size && skip !== "gender") {
 
-        list = list.filter(product => selectedGenders.has(product.gender));
+        // товар підходить, якщо БУДЬ-ЯКА його стать серед обраних —
+        // унісекс-товар має знаходитись і в «Жінкам», і в «Чоловікам»
+        list = list.filter(product =>
+            getProductGenders(product).some(g => selectedGenders.has(g)));
 
     }
 

@@ -273,7 +273,10 @@ function rowToProduct(row, rowNumber, validCategoryNames) {
     const title = String(row["Назва товару"] || "").trim();
     const brand = String(row["Бренд"] || "").trim();
     const category = String(row["Категорія"] || "").trim();
-    const gender = String(row["Для кого"] || "").trim();
+    // Статей може бути кілька — через кому: «Жінкам, Унісекс».
+    // Товар тоді потрапляє в кожен із цих розділів каталогу.
+    const genderList = splitList(row["Для кого"]);
+    const gender = genderList.length === 1 ? genderList[0] : genderList;
     const price = readNumber(row["Ціна"]);
     const description = String(row["Опис товару"] || "").trim();
 
@@ -281,10 +284,18 @@ function rowToProduct(row, rowNumber, validCategoryNames) {
     if (!brand) errors.push("не вказаний бренд");
     if (!category) errors.push("не вказана категорія");
 
-    if (!gender) {
+    // Перевіряємо саме довжину списку: порожній масив [] у JS
+    // «істинний», тож звична перевірка !gender його б пропустила.
+    if (genderList.length === 0) {
         errors.push("не вказано поле «Для кого»");
-    } else if (!GENDERS.includes(gender)) {
-        errors.push(`поле «Для кого» має бути точно одним з: ${GENDERS.join(", ")} (зараз: «${gender}»)`);
+    } else {
+
+        const wrong = genderList.filter(g => !GENDERS.includes(g));
+
+        if (wrong.length) {
+            errors.push(`поле «Для кого»: невідомі значення «${wrong.join("», «")}». Допустимі: ${GENDERS.join(", ")}. Кілька — через кому.`);
+        }
+
     }
 
     if (price === undefined) errors.push("не вказана або нечислова ціна");

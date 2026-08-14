@@ -164,7 +164,7 @@
 
             const genderColumns = GENDER_ORDER.map(gender => {
 
-                const items = scoped.filter(product => product.gender === gender);
+                const items = scoped.filter(product => getProductGenders(product).includes(gender));
 
                 if (!items.length) return "";
 

@@ -34,6 +34,8 @@ window.eval("window.FALLBACK_SIZE_GROUPS = " +
     _cs.match(/const FALLBACK_SIZE_GROUPS = (\[[\s\S]*?\n\]);\n/)[1] + ";");
 window.eval(_cs.match(/function resolveGroupCategories[\s\S]*?\n}\n/)[0]);
 window.eval(_cs.match(/function findSizeGroupForCategory[\s\S]*?\n}\n/)[0]);
+window.eval(_cs.match(/function getProductGenders[\s\S]*?\n}\n/)[0]);
+window.eval(_cs.match(/function getProductGenderLabel[\s\S]*?\n}\n/)[0]);
 window.eval(_cs.match(/let sizeGroupsPromise[\s\S]*?\n}\n/)[0]);
 
 let code = fs.readFileSync(path.join(ROOT, "assets/js/catalog.js"), "utf8");

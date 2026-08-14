@@ -1615,6 +1615,34 @@ document.addEventListener("click", event => {
         // кошика/обраного або самої сторінки товару)
         const scope = colorBtn.closest(".product-card, .favorite-row, .cart-item, #productPage");
 
+        // Оновлюємо адресу сторінки під обраний колір.
+        //
+        // Раніше в URL лишався колір, з яким сторінку відкрили, тож
+        // покупець перемикав на чорний, копіював посилання — а воно
+        // вело на світло-сірий. replaceState, а не pushState: інакше
+        // кожне перемикання кольору додавало б крок в історію, і
+        // «Назад» замість повернення в каталог гортало б кольори.
+        if (!cardScope && colorBtn.dataset.color) {
+
+            try {
+
+                const url = new URL(window.location.href);
+
+                if (url.searchParams.has("id")) {
+
+                    url.searchParams.set("color", colorBtn.dataset.color);
+                    window.history.replaceState(null, "", url);
+
+                }
+
+            } catch (error) {
+
+                // адресний рядок — не критично, мовчки лишаємо як є
+
+            }
+
+        }
+
         // Артикул теж свій у кожного кольору — оновлюємо підпис під
         // назвою товару і рядок у характеристиках. data-sku порожній →
         // артикула немає взагалі, тоді просто чистимо текст.
@@ -2183,6 +2211,36 @@ function getVariantSku(product, variant) {
     const variantSku = (variant?.sku || "").trim();
 
     return variantSku || (product?.sku || "");
+
+}
+
+// Стать(і) товару.
+//
+// Товар може належати кільком розділам одразу — наприклад, унісекс-
+// сумка доречна і в «Жінкам», і в «Чоловікам». В адмінці це
+// мультивибір, тож у даних лежить СПИСОК.
+//
+// Але товари, створені раніше, мають звичайний рядок. Тому всюди
+// читаємо через цю функцію: вона однаково розуміє і рядок, і список,
+// і порожнє значення. Так старі товари не ламаються, а нові
+// отримують кілька розділів.
+function getProductGenders(product) {
+
+    const raw = product?.gender;
+
+    if (Array.isArray(raw)) return raw.filter(Boolean);
+
+    return raw ? [raw] : [];
+
+}
+
+// Для місць, де треба показати одне значення (картка товару,
+// характеристики) — перелічуємо через кому.
+function getProductGenderLabel(product) {
+
+    const list = getProductGenders(product);
+
+    return list.length ? list.join(", ") : "Унісекс";
 
 }
 

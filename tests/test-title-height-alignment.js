@@ -44,7 +44,7 @@ console.log("\n[4] DOM: назва йде ПЕРЕД рядком ціни — �
   const dom=new JSDOM("<!doctype html><body><div id='r'></div></body>",{runScripts:"outside-only",pretendToBeVisual:true});
   const {window}=dom;
   const cs=fs.readFileSync(path.join(ROOT,"assets/js/common.js"),"utf8");
-  ["escapeHtml","escapeAttrSingleQuoted","getProductColors","getVariantSizes","getAllProductSizes"]
+  ["escapeHtml","escapeAttrSingleQuoted","getProductColors","getVariantSizes","getAllProductSizes","getProductGenders","getProductGenderLabel"]
     .forEach(fn=>window.eval(cs.match(new RegExp("function "+fn+"[\\s\\S]*?\\n}\\n"))[0]));
   window.eval(fs.readFileSync(path.join(ROOT,"assets/js/ui.js"),"utf8").replace(
     "function createProductCard(product) {",
