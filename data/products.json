@@ -1,5 +1,55 @@
 [
   {
+    "title": "Сонцезахисні окуляри ALAIN MIKLI Dark Grey Rectangular Unisex",
+    "brand": "Alain Mikli",
+    "category": "Окуляри і оправи",
+    "gender": "Унісекс",
+    "price": 6500,
+    "description": "Сонцезахисні окуляри Alain Mikli в оправі «черепаха». Широкі скроневі дуги, темні лінзи. Універсальна форма, що підходить і жінкам, і чоловікам.",
+    "variants": [
+      {
+        "color": "Темно-сірий",
+        "hex": "#56535a",
+        "images": [
+          "assets/images/products/uploads/a05042-0037354-1.webp",
+          "assets/images/products/uploads/a05042-0037354-2.webp",
+          "assets/images/products/uploads/a05042-0037354-3.webp"
+        ],
+        "sku": "A05042 0037354",
+        "sizes": [
+          "ONESIZE"
+        ]
+      }
+    ],
+    "isNew": false,
+    "sizes": [
+      "ONESIZE"
+    ],
+    "sku": "A05042 0037354",
+    "searchKeywords": [
+      "ален міклі",
+      "alain mikli",
+      "сонцезахисні окуляри",
+      "окуляри від сонця",
+      "оправа",
+      "темно-сірий",
+      "alain",
+      "mikli",
+      "dark",
+      "grey"
+    ],
+    "instagramBlock": "general",
+    "preOrder": false,
+    "images": [
+      "assets/images/products/uploads/a05042-0037354-1.webp",
+      "assets/images/products/uploads/a05042-0037354-2.webp",
+      "assets/images/products/uploads/a05042-0037354-3.webp"
+    ],
+    "slug": "alain-mikli-sontsezakhysni-okuliary-alain-mikli-dark-grey-re",
+    "id": 1,
+    "color": "Темно-сірий"
+  },
+  {
     "compartments": "одне основне відділення, одна внутрішня кишеня",
     "gender": "Жінкам",
     "oldPrice": 5899,
@@ -56,6 +106,52 @@
     "category": "Жіночі сумки"
   },
   {
+    "title": "Чоловіча сумка Armani Exchange Crossbody Bag Black",
+    "brand": "Armani Exchange",
+    "category": "Чоловічі сумки",
+    "gender": "Чоловікам",
+    "price": 6000,
+    "description": "Крос-боді Armani Exchange — плаский корпус, який не додає об'єму під верхнім одягом. Логотип AX на лицьовій стороні, ремінець через плече. Для документів, телефона й дрібниць.",
+    "variants": [
+      {
+        "color": "Чорний",
+        "hex": "#1d1f22",
+        "images": [
+          "assets/images/products/uploads/arc54h01t-q11-1.webp",
+          "assets/images/products/uploads/arc54h01t-q11-2.webp",
+          "assets/images/products/uploads/arc54h01t-q11-3.webp"
+        ],
+        "sku": "ARC54H01T-Q11"
+      }
+    ],
+    "isNew": false,
+    "sku": "ARC54H01T-Q11",
+    "searchKeywords": [
+      "армані",
+      "armani exchange",
+      "ax",
+      "сумка чоловіча",
+      "кросбоді",
+      "барсетка",
+      "сумка через плече",
+      "чорний",
+      "armani",
+      "exchange",
+      "crossbody",
+      "bag"
+    ],
+    "instagramBlock": "general",
+    "preOrder": false,
+    "images": [
+      "assets/images/products/uploads/arc54h01t-q11-1.webp",
+      "assets/images/products/uploads/arc54h01t-q11-2.webp",
+      "assets/images/products/uploads/arc54h01t-q11-3.webp"
+    ],
+    "slug": "armani-exchange-cholovicha-sumka-armani-exchange-crossbody-b",
+    "id": 2,
+    "color": "Чорний"
+  },
+  {
     "id": 2,
     "slug": "michael-kors-jet-set",
     "brand": "Michael Kors",
@@ -109,6 +205,52 @@
     ]
   },
   {
+    "title": "Чоловіча сумка Armani Exchange",
+    "brand": "Armani Exchange",
+    "category": "Чоловічі сумки",
+    "gender": "Чоловікам",
+    "price": 6000,
+    "description": "Поясна сумка Armani Exchange із монограмним принтом по корпусу. Носиться на поясі або через плече. Компактна модель для прогулянок і подорожей.",
+    "variants": [
+      {
+        "color": "Чорний",
+        "hex": "#1f2223",
+        "images": [
+          "assets/images/products/uploads/rtladf952201-1.webp",
+          "assets/images/products/uploads/rtladf952201-2.webp",
+          "assets/images/products/uploads/rtladf952201-3.webp",
+          "assets/images/products/uploads/rtladf952201-4.webp"
+        ],
+        "sku": "RTLADF952201"
+      }
+    ],
+    "isNew": false,
+    "sku": "RTLADF952201",
+    "searchKeywords": [
+      "армані",
+      "armani exchange",
+      "ax",
+      "сумка чоловіча",
+      "кросбоді",
+      "барсетка",
+      "сумка через плече",
+      "чорний",
+      "armani",
+      "exchange"
+    ],
+    "instagramBlock": "general",
+    "preOrder": false,
+    "images": [
+      "assets/images/products/uploads/rtladf952201-1.webp",
+      "assets/images/products/uploads/rtladf952201-2.webp",
+      "assets/images/products/uploads/rtladf952201-3.webp",
+      "assets/images/products/uploads/rtladf952201-4.webp"
+    ],
+    "slug": "armani-exchange-cholovicha-sumka-armani-exchange",
+    "id": 3,
+    "color": "Чорний"
+  },
+  {
     "id": 3,
     "slug": "tommy-hilfiger-backpack",
     "brand": "Tommy Hilfiger",
@@ -160,6 +302,56 @@
       "портфель",
       "сумка для ноутбука"
     ]
+  },
+  {
+    "title": "Balenciaga Сонцезахисні окуляри Grey Rectangular Ladies Sunglasses",
+    "brand": "Balenciaga",
+    "category": "Окуляри і оправи",
+    "gender": "Жінкам",
+    "price": 12500,
+    "description": "Сонцезахисні окуляри Balenciaga у прямокутній оправі з темними лінзами. Стримана форма з фірмовим логотипом на дузі — доречні щодня.",
+    "variants": [
+      {
+        "color": "Темно-сірий",
+        "hex": "#706c69",
+        "images": [
+          "assets/images/products/uploads/bb0096s-001-51-1.webp",
+          "assets/images/products/uploads/bb0096s-001-51-2.webp"
+        ],
+        "sku": "BB0096S 001 51",
+        "sizes": [
+          "ONESIZE"
+        ]
+      }
+    ],
+    "oldPrice": 16250,
+    "badge": "SALE",
+    "isNew": false,
+    "sizes": [
+      "ONESIZE"
+    ],
+    "sku": "BB0096S 001 51",
+    "searchKeywords": [
+      "баленсіага",
+      "balenciaga",
+      "сонцезахисні окуляри",
+      "окуляри від сонця",
+      "оправа",
+      "темно-сірий",
+      "balenciaga",
+      "grey",
+      "rectangular",
+      "ladies"
+    ],
+    "instagramBlock": "general",
+    "preOrder": false,
+    "images": [
+      "assets/images/products/uploads/bb0096s-001-51-1.webp",
+      "assets/images/products/uploads/bb0096s-001-51-2.webp"
+    ],
+    "slug": "balenciaga-balenciaga-sontsezakhysni-okuliary-grey-rectangul-2",
+    "id": 4,
+    "color": "Темно-сірий"
   },
   {
     "id": 4,
@@ -224,6 +416,60 @@
     "preOrderPrepayment": 50
   },
   {
+    "title": "Balenciaga Сонцезахисні окуляри Grey Rectangular Unisex Sunglasses",
+    "brand": "Balenciaga",
+    "category": "Окуляри і оправи",
+    "gender": "Унісекс",
+    "price": 13000,
+    "description": "Сонцезахисні окуляри Balenciaga з масивною оправою й темними лінзами. Виразна геометрія, логотип бренду на скроневій дузі. Модель, що працює як самостійний акцент образу.",
+    "variants": [
+      {
+        "color": "Темно-сірий",
+        "hex": "#484445",
+        "images": [
+          "assets/images/products/uploads/bb0041s-001-99-1.webp",
+          "assets/images/products/uploads/bb0041s-001-99-2.webp",
+          "assets/images/products/uploads/bb0041s-001-99-3.webp",
+          "assets/images/products/uploads/bb0041s-001-99-4.webp"
+        ],
+        "sku": "BB0041S 001 99",
+        "sizes": [
+          "ONESIZE"
+        ]
+      }
+    ],
+    "oldPrice": 16900,
+    "badge": "SALE",
+    "isNew": false,
+    "sizes": [
+      "ONESIZE"
+    ],
+    "sku": "BB0041S 001 99",
+    "searchKeywords": [
+      "баленсіага",
+      "balenciaga",
+      "сонцезахисні окуляри",
+      "окуляри від сонця",
+      "оправа",
+      "темно-сірий",
+      "balenciaga",
+      "grey",
+      "rectangular",
+      "unisex"
+    ],
+    "instagramBlock": "general",
+    "preOrder": false,
+    "images": [
+      "assets/images/products/uploads/bb0041s-001-99-1.webp",
+      "assets/images/products/uploads/bb0041s-001-99-2.webp",
+      "assets/images/products/uploads/bb0041s-001-99-3.webp",
+      "assets/images/products/uploads/bb0041s-001-99-4.webp"
+    ],
+    "slug": "balenciaga-balenciaga-sontsezakhysni-okuliary-grey-rectangul",
+    "id": 5,
+    "color": "Темно-сірий"
+  },
+  {
     "id": 5,
     "slug": "calvin-klein-crossbody",
     "brand": "Calvin Klein",
@@ -275,6 +521,60 @@
       "сумка через плече",
       "поясна сумка"
     ]
+  },
+  {
+    "title": "Сонцезахисні окуляри Burberry Sophia Dark Grey Cat Eye",
+    "brand": "Burberry",
+    "category": "Окуляри і оправи",
+    "gender": "Жінкам",
+    "price": 9000,
+    "description": "Сонцезахисні окуляри Burberry Sophia. Прямокутна оправа, темні лінзи, логотип бренду на скроневій дузі. Класична форма, що пасує до більшості типів обличчя.",
+    "variants": [
+      {
+        "color": "Темно-сірий",
+        "hex": "#3a383b",
+        "images": [
+          "assets/images/products/uploads/be4361f-300187-51-1.webp",
+          "assets/images/products/uploads/be4361f-300187-51-2.webp",
+          "assets/images/products/uploads/be4361f-300187-51-3.webp",
+          "assets/images/products/uploads/be4361f-300187-51-4.webp"
+        ],
+        "sku": "BE4361F 300187 51",
+        "sizes": [
+          "ONESIZE"
+        ]
+      }
+    ],
+    "oldPrice": 11700,
+    "badge": "SALE",
+    "isNew": false,
+    "sizes": [
+      "ONESIZE"
+    ],
+    "sku": "BE4361F 300187 51",
+    "searchKeywords": [
+      "барбері",
+      "burberry",
+      "сонцезахисні окуляри",
+      "окуляри від сонця",
+      "оправа",
+      "темно-сірий",
+      "burberry",
+      "sophia",
+      "dark",
+      "grey"
+    ],
+    "instagramBlock": "general",
+    "preOrder": false,
+    "images": [
+      "assets/images/products/uploads/be4361f-300187-51-1.webp",
+      "assets/images/products/uploads/be4361f-300187-51-2.webp",
+      "assets/images/products/uploads/be4361f-300187-51-3.webp",
+      "assets/images/products/uploads/be4361f-300187-51-4.webp"
+    ],
+    "slug": "burberry-sontsezakhysni-okuliary-burberry-sophia-dark-grey-c",
+    "id": 6,
+    "color": "Темно-сірий"
   },
   {
     "id": 6,
@@ -387,6 +687,56 @@
     ]
   },
   {
+    "title": "Чоловіча шкіряна сумка Coach Ethan Signature Canvas",
+    "brand": "Coach",
+    "category": "Чоловічі сумки",
+    "gender": "Чоловікам",
+    "price": 8600,
+    "description": "Coach Ethan у фірменому принті Signature — крос-боді зі шкіряними вставками. Компактний корпус, ремінець через плече. Для щоденних дрібниць.",
+    "variants": [
+      {
+        "color": "Коричневий",
+        "hex": "#866751",
+        "images": [
+          "assets/images/products/uploads/coach-ethan-cv918-qbnrx-1.webp",
+          "assets/images/products/uploads/coach-ethan-cv918-qbnrx-2.webp",
+          "assets/images/products/uploads/coach-ethan-cv918-qbnrx-3.webp",
+          "assets/images/products/uploads/coach-ethan-cv918-qbnrx-4.webp"
+        ],
+        "sku": "coach ethan cv918 qbnrx"
+      }
+    ],
+    "oldPrice": 11180,
+    "badge": "SALE",
+    "isNew": false,
+    "material": "Шкіра",
+    "sku": "coach ethan cv918 qbnrx",
+    "searchKeywords": [
+      "коуч",
+      "coach",
+      "сумка чоловіча",
+      "кросбоді",
+      "барсетка",
+      "сумка через плече",
+      "коричневий",
+      "coach",
+      "ethan",
+      "signature",
+      "canvas"
+    ],
+    "instagramBlock": "general",
+    "preOrder": false,
+    "images": [
+      "assets/images/products/uploads/coach-ethan-cv918-qbnrx-1.webp",
+      "assets/images/products/uploads/coach-ethan-cv918-qbnrx-2.webp",
+      "assets/images/products/uploads/coach-ethan-cv918-qbnrx-3.webp",
+      "assets/images/products/uploads/coach-ethan-cv918-qbnrx-4.webp"
+    ],
+    "slug": "coach-cholovicha-shkiriana-sumka-coach-ethan-signature-canva",
+    "id": 7,
+    "color": "Коричневий"
+  },
+  {
     "id": 8,
     "slug": "bagvero-man-sling",
     "brand": "BestBrnd4u Man",
@@ -437,6 +787,51 @@
       "сумка на груди",
       "поясна сумка"
     ]
+  },
+  {
+    "title": "Чоловіча шкіряна сумка Racer Belt Bag In Signature Canvas",
+    "brand": "Coach",
+    "category": "Унісекс сумки",
+    "gender": "Унісекс",
+    "price": 7500,
+    "description": "Coach Racer Belt Bag зі шкіри — поясна сумка з монограмним рельєфом. Регульований ремінь, носиться на поясі, через плече або навскіс. Унісекс-модель.",
+    "variants": [
+      {
+        "color": "Чорний",
+        "hex": "#252525",
+        "images": [
+          "assets/images/products/uploads/coach-ct714-qbml5-1.webp",
+          "assets/images/products/uploads/coach-ct714-qbml5-2.webp",
+          "assets/images/products/uploads/coach-ct714-qbml5-3.webp"
+        ],
+        "sku": "coach ct714 qbml5"
+      }
+    ],
+    "isNew": false,
+    "material": "Шкіра",
+    "sku": "coach ct714 qbml5",
+    "searchKeywords": [
+      "коуч",
+      "coach",
+      "сумка унісекс",
+      "поясна сумка",
+      "бананка",
+      "чорний",
+      "racer",
+      "belt",
+      "bag",
+      "signature"
+    ],
+    "instagramBlock": "general",
+    "preOrder": false,
+    "images": [
+      "assets/images/products/uploads/coach-ct714-qbml5-1.webp",
+      "assets/images/products/uploads/coach-ct714-qbml5-2.webp",
+      "assets/images/products/uploads/coach-ct714-qbml5-3.webp"
+    ],
+    "slug": "coach-cholovicha-shkiriana-sumka-racer-belt-bag-in-signature",
+    "id": 8,
+    "color": "Чорний"
   },
   {
     "compartments": "одне основне відділення, одна передня кишеня",
@@ -493,6 +888,75 @@
     "category": "Дитячі рюкзаки"
   },
   {
+    "title": "Шкіряна сумочка Coach Tabby 26",
+    "brand": "Coach",
+    "category": "Жіночі сумки",
+    "gender": "Жінкам",
+    "price": 11000,
+    "description": "Coach Tabby 26 — одна з найвпізнаваніших моделей бренду. Шкіряний корпус, фірмова застібка-турнікет у формі літери C, знімний ремінець. Доступна у трьох відтінках, тримає форму й однаково доречна з денним і вечірнім образом.",
+    "variants": [
+      {
+        "color": "Темно-сірий",
+        "hex": "#3f3f3f",
+        "images": [
+          "assets/images/products/uploads/coach73995black-1.webp",
+          "assets/images/products/uploads/coach73995black-2.webp",
+          "assets/images/products/uploads/coach73995black-3.webp"
+        ],
+        "sku": "coach73995black"
+      },
+      {
+        "color": "Світло-сірий",
+        "hex": "#d2cac4",
+        "images": [
+          "assets/images/products/uploads/coach73995chalk-1.webp",
+          "assets/images/products/uploads/coach73995chalk-2.webp",
+          "assets/images/products/uploads/coach73995chalk-3.webp",
+          "assets/images/products/uploads/coach73995chalk-4.webp"
+        ],
+        "sku": "coach73995chalk"
+      },
+      {
+        "color": "Коричневий",
+        "hex": "#8c6f63",
+        "images": [
+          "assets/images/products/uploads/coach73995-dark-stone-1.webp",
+          "assets/images/products/uploads/coach73995-dark-stone-2.webp",
+          "assets/images/products/uploads/coach73995-dark-stone-3.webp"
+        ],
+        "sku": "coach73995 dark stone"
+      }
+    ],
+    "oldPrice": 14300,
+    "badge": "SALE",
+    "isNew": false,
+    "material": "Шкіра",
+    "sku": "coach73995black",
+    "searchKeywords": [
+      "коуч",
+      "coach",
+      "сумка жіноча",
+      "кросбоді",
+      "сумка через плече",
+      "клатч",
+      "темно-сірий",
+      "світло-сірий",
+      "коричневий",
+      "coach",
+      "tabby"
+    ],
+    "instagramBlock": "general",
+    "preOrder": false,
+    "images": [
+      "assets/images/products/uploads/coach73995black-1.webp",
+      "assets/images/products/uploads/coach73995black-2.webp",
+      "assets/images/products/uploads/coach73995black-3.webp"
+    ],
+    "slug": "coach-shkiriana-sumochka-coach-tabby-26",
+    "id": 9,
+    "color": "Темно-сірий"
+  },
+  {
     "compartments": "одне основне відділення",
     "gender": "Дітям",
     "oldPrice": 999,
@@ -545,6 +1009,77 @@
     "sku": "BK-KB-1010",
     "rating": 4.6,
     "category": "Дитячі сумки"
+  },
+  {
+    "title": "Сумочка Coach Tabby 26 With Quilting",
+    "brand": "Coach",
+    "category": "Жіночі сумки",
+    "gender": "Жінкам",
+    "price": 12500,
+    "description": "Coach Tabby 26 у стьобаному виконанні. Об'ємний ромбовидний рельєф, застібка-турнікет C і ланцюжок зі шкіряною вставкою. Три відтінки — від світлого до темно-коричневого.",
+    "variants": [
+      {
+        "color": "Світло-сірий",
+        "hex": "#d4cac2",
+        "images": [
+          "assets/images/products/uploads/coach-cp150-b4ha-1.webp",
+          "assets/images/products/uploads/coach-cp150-b4ha-2.webp",
+          "assets/images/products/uploads/coach-cp150-b4ha-3.webp",
+          "assets/images/products/uploads/coach-cp150-b4ha-4.webp"
+        ],
+        "sku": "coach cp150 b4ha"
+      },
+      {
+        "color": "Чорний",
+        "hex": "#232323",
+        "images": [
+          "assets/images/products/uploads/cp150-b4bk-a0-1.webp",
+          "assets/images/products/uploads/cp150-b4bk-a0-2.webp",
+          "assets/images/products/uploads/cp150-b4bk-a0-3.webp"
+        ],
+        "sku": "cp150_b4bk_a0"
+      },
+      {
+        "color": "Темно-коричневий",
+        "hex": "#41251d",
+        "images": [
+          "assets/images/products/uploads/cp150-b4mpl-1.webp",
+          "assets/images/products/uploads/cp150-b4mpl-2.webp",
+          "assets/images/products/uploads/cp150-b4mpl-3.webp"
+        ],
+        "sku": "cp150_b4mpl"
+      }
+    ],
+    "oldPrice": 16250,
+    "badge": "SALE",
+    "isNew": false,
+    "sku": "coach cp150 b4ha",
+    "searchKeywords": [
+      "коуч",
+      "coach",
+      "сумка жіноча",
+      "кросбоді",
+      "сумка через плече",
+      "клатч",
+      "світло-сірий",
+      "чорний",
+      "темно-коричневий",
+      "coach",
+      "tabby",
+      "with",
+      "quilting"
+    ],
+    "instagramBlock": "general",
+    "preOrder": false,
+    "images": [
+      "assets/images/products/uploads/coach-cp150-b4ha-1.webp",
+      "assets/images/products/uploads/coach-cp150-b4ha-2.webp",
+      "assets/images/products/uploads/coach-cp150-b4ha-3.webp",
+      "assets/images/products/uploads/coach-cp150-b4ha-4.webp"
+    ],
+    "slug": "coach-sumochka-coach-tabby-26-with-quilting",
+    "id": 10,
+    "color": "Світло-сірий"
   },
   {
     "id": 11,
@@ -601,6 +1136,58 @@
     ]
   },
   {
+    "title": "Сонцезахисні окуляри GUCCI GG0516S Grey Rectangula",
+    "brand": "Gucci",
+    "category": "Окуляри і оправи",
+    "gender": "Жінкам",
+    "price": 12800,
+    "description": "Сонцезахисні окуляри Gucci GG0516S. Оправа «котяче око» з металевим декором на скроневих дугах і темними лінзами. Форма, що візуально витягує риси обличчя.",
+    "variants": [
+      {
+        "color": "Темно-сірий",
+        "hex": "#5c5954",
+        "images": [
+          "assets/images/products/uploads/gg0516s-001-52-1.webp",
+          "assets/images/products/uploads/gg0516s-001-52-2.webp",
+          "assets/images/products/uploads/gg0516s-001-52-3.webp"
+        ],
+        "sku": "GG0516S 001 52",
+        "sizes": [
+          "ONESIZE"
+        ]
+      }
+    ],
+    "oldPrice": 16640,
+    "badge": "SALE",
+    "isNew": false,
+    "sizes": [
+      "ONESIZE"
+    ],
+    "sku": "GG0516S 001 52",
+    "searchKeywords": [
+      "гуччі",
+      "gucci",
+      "сонцезахисні окуляри",
+      "окуляри від сонця",
+      "оправа",
+      "темно-сірий",
+      "gucci",
+      "gg0516s",
+      "grey",
+      "rectangula"
+    ],
+    "instagramBlock": "general",
+    "preOrder": false,
+    "images": [
+      "assets/images/products/uploads/gg0516s-001-52-1.webp",
+      "assets/images/products/uploads/gg0516s-001-52-2.webp",
+      "assets/images/products/uploads/gg0516s-001-52-3.webp"
+    ],
+    "slug": "gucci-sontsezakhysni-okuliary-gucci-gg0516s-grey-rectangula",
+    "id": 11,
+    "color": "Темно-сірий"
+  },
+  {
     "title": "Metropolis Mini",
     "brand": "Furla",
     "category": "Жіночі сумки",
@@ -652,6 +1239,47 @@
     ]
   },
   {
+    "title": "Чоловічий годинник",
+    "brand": "Invicta",
+    "category": "Годинники",
+    "gender": "Чоловікам",
+    "price": 5500,
+    "description": "Чоловічий годинник Invicta Pro Diver — модель у стилі класичних дайверських годинників. Обертовий безель, комбінований браслет, темно-синій циферблат із позначкою дати.",
+    "variants": [
+      {
+        "color": "Темно-синій",
+        "hex": "#0c2354",
+        "images": [
+          "assets/images/products/uploads/invicta-pro-diver-blue-dial-22058-1.webp"
+        ],
+        "sku": "invicta-pro-diver-blue-dial 22058",
+        "sizes": [
+          "ONESIZE"
+        ]
+      }
+    ],
+    "isNew": false,
+    "sizes": [
+      "ONESIZE"
+    ],
+    "sku": "invicta-pro-diver-blue-dial 22058",
+    "searchKeywords": [
+      "інвікта",
+      "invicta",
+      "годинник",
+      "наручний годинник",
+      "темно-синій"
+    ],
+    "instagramBlock": "general",
+    "preOrder": false,
+    "images": [
+      "assets/images/products/uploads/invicta-pro-diver-blue-dial-22058-1.webp"
+    ],
+    "slug": "invicta-cholovichyy-hodynnyk",
+    "id": 12,
+    "color": "Темно-синій"
+  },
+  {
     "title": "Urban Backpack",
     "brand": "Tommy Hilfiger",
     "category": "Рюкзаки",
@@ -689,6 +1317,50 @@
     "images": [
       "https://commons.wikimedia.org/wiki/Special:Redirect/file/Eastpak%20Sugarbush%20backpack%20black.jpg"
     ]
+  },
+  {
+    "title": "Сумочка на плече Jw Pei TESSA",
+    "brand": "JW PEI",
+    "category": "Жіночі сумки",
+    "gender": "Жінкам",
+    "price": 6000,
+    "description": "JW PEI Tessa — сумка на плече з фурнітурою й декоративними деталями по корпусу. Півмісяцева форма, що щільно сидить на плечі.",
+    "variants": [
+      {
+        "color": "Чорний",
+        "hex": "#242523",
+        "images": [
+          "assets/images/products/uploads/jwpr-wy46-1.webp",
+          "assets/images/products/uploads/jwpr-wy46-2.webp",
+          "assets/images/products/uploads/jwpr-wy46-3.webp"
+        ],
+        "sku": "JWPR-WY46"
+      }
+    ],
+    "isNew": false,
+    "sku": "JWPR-WY46",
+    "searchKeywords": [
+      "джей ві пей",
+      "jw pei",
+      "jwpei",
+      "сумка жіноча",
+      "кросбоді",
+      "сумка через плече",
+      "клатч",
+      "чорний",
+      "pei",
+      "tessa"
+    ],
+    "instagramBlock": "general",
+    "preOrder": false,
+    "images": [
+      "assets/images/products/uploads/jwpr-wy46-1.webp",
+      "assets/images/products/uploads/jwpr-wy46-2.webp",
+      "assets/images/products/uploads/jwpr-wy46-3.webp"
+    ],
+    "slug": "jw-pei-sumochka-na-pleche-jw-pei-tessa",
+    "id": 13,
+    "color": "Чорний"
   },
   {
     "title": "City Tote",
@@ -742,6 +1414,63 @@
     "images": [
       "https://commons.wikimedia.org/wiki/Special:Redirect/file/Mk%20bag.jpg"
     ]
+  },
+  {
+    "title": "Жіноча сумка на плече JW PEI Gabbi Ruched Hobo Handbag",
+    "brand": "JW PEI",
+    "category": "Жіночі сумки",
+    "gender": "Жінкам",
+    "price": 4400,
+    "description": "JW PEI Gabbi — сумка-хобо з характерною драпіровкою, яка зробила модель відомою. Округла форма, коротка ручка, носиться в руці або на згині лікоття. Два насичених кольори.",
+    "variants": [
+      {
+        "color": "Зелений",
+        "hex": "#06b454",
+        "images": [
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp",
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-2.webp",
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp"
+        ],
+        "sku": "Gabbi Ruched Hobo Handbag - Grass Green  B094QT219C"
+      },
+      {
+        "color": "Карамельний",
+        "hex": "#f49657",
+        "images": [
+          "assets/images/products/uploads/jwp-ma123-1.webp",
+          "assets/images/products/uploads/jwp-ma123-2.webp",
+          "assets/images/products/uploads/jwp-ma123-3.webp"
+        ],
+        "sku": "JWP-MA123"
+      }
+    ],
+    "isNew": false,
+    "sku": "Gabbi Ruched Hobo Handbag - Grass Green  B094QT219C",
+    "searchKeywords": [
+      "джей ві пей",
+      "jw pei",
+      "jwpei",
+      "сумка жіноча",
+      "кросбоді",
+      "сумка через плече",
+      "клатч",
+      "зелений",
+      "карамельний",
+      "pei",
+      "gabbi",
+      "ruched",
+      "hobo"
+    ],
+    "instagramBlock": "general",
+    "preOrder": false,
+    "images": [
+      "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp",
+      "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-2.webp",
+      "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp"
+    ],
+    "slug": "jw-pei-zhinocha-sumka-na-pleche-jw-pei-gabbi-ruched-hobo-han",
+    "id": 14,
+    "color": "Зелений"
   },
   {
     "compartments": "основне відділення коробки для взуття",
@@ -925,6 +1654,51 @@
     "category": "Кросівки"
   },
   {
+    "title": "Жіноча сумочка JW PEI Maze Crossbody",
+    "brand": "JW PEI",
+    "category": "Жіночі сумки",
+    "gender": "Жінкам",
+    "price": 4000,
+    "description": "JW PEI Maze — крос-боді з плетеним верхом у два тони. Довгий ремінець, компактний корпус. Модель із вираженою текстурою, що замінює собою аксесуар.",
+    "variants": [
+      {
+        "color": "Коричневий",
+        "hex": "#af734e",
+        "images": [
+          "assets/images/products/uploads/jwp-ma106-1.webp",
+          "assets/images/products/uploads/jwp-ma106-2.webp",
+          "assets/images/products/uploads/jwp-ma106-3.webp"
+        ],
+        "sku": "JWP-MA106"
+      }
+    ],
+    "isNew": false,
+    "sku": "JWP-MA106",
+    "searchKeywords": [
+      "джей ві пей",
+      "jw pei",
+      "jwpei",
+      "сумка жіноча",
+      "кросбоді",
+      "сумка через плече",
+      "клатч",
+      "коричневий",
+      "pei",
+      "maze",
+      "crossbody"
+    ],
+    "instagramBlock": "general",
+    "preOrder": false,
+    "images": [
+      "assets/images/products/uploads/jwp-ma106-1.webp",
+      "assets/images/products/uploads/jwp-ma106-2.webp",
+      "assets/images/products/uploads/jwp-ma106-3.webp"
+    ],
+    "slug": "jw-pei-zhinocha-sumochka-jw-pei-maze-crossbody",
+    "id": 15,
+    "color": "Коричневий"
+  },
+  {
     "title": "Minimal Watch",
     "brand": "Casio",
     "category": "Годинники",
@@ -972,6 +1746,54 @@
     "images": [
       "assets/images/products/uploads/RayBanAviator.png"
     ]
+  },
+  {
+    "title": "Жіноча сумочка JW PEI Mila Shoulder Bag",
+    "brand": "JW PEI",
+    "category": "Жіночі сумки",
+    "gender": "Жінкам",
+    "price": 4500,
+    "description": "JW PEI Mila — сумка на плече з м'якими лініями й короткою ручкою. Мінімалістичний дизайн без зайвого декору, який легко вписується в будь-який образ.",
+    "variants": [
+      {
+        "color": "Синій",
+        "hex": "#a084c4",
+        "images": [
+          "assets/images/products/uploads/jwp-ma080-1.webp",
+          "assets/images/products/uploads/jwp-ma080-2.webp",
+          "assets/images/products/uploads/jwp-ma080-3.webp",
+          "assets/images/products/uploads/jwp-ma080-4.webp"
+        ],
+        "sku": "JWP-MA080"
+      }
+    ],
+    "isNew": false,
+    "sku": "JWP-MA080",
+    "searchKeywords": [
+      "джей ві пей",
+      "jw pei",
+      "jwpei",
+      "сумка жіноча",
+      "кросбоді",
+      "сумка через плече",
+      "клатч",
+      "синій",
+      "pei",
+      "mila",
+      "shoulder",
+      "bag"
+    ],
+    "instagramBlock": "general",
+    "preOrder": false,
+    "images": [
+      "assets/images/products/uploads/jwp-ma080-1.webp",
+      "assets/images/products/uploads/jwp-ma080-2.webp",
+      "assets/images/products/uploads/jwp-ma080-3.webp",
+      "assets/images/products/uploads/jwp-ma080-4.webp"
+    ],
+    "slug": "jw-pei-zhinocha-sumochka-jw-pei-mila-shoulder-bag",
+    "id": 16,
+    "color": "Синій"
   },
   {
     "title": "Metropolis Mini",
@@ -1025,6 +1847,57 @@
     ]
   },
   {
+    "title": "Сонцезахисні окуляри Marc Jacobs",
+    "brand": "Marc Jacobs",
+    "category": "Окуляри і оправи",
+    "gender": "Жінкам",
+    "price": 6000,
+    "description": "Сонцезахисні окуляри Marc Jacobs у формі «котяче око» з темними лінзами. Виразний вигин оправи, фірмовий логотип на скроневій дузі.",
+    "variants": [
+      {
+        "color": "Темно-сірий",
+        "hex": "#6d6d6f",
+        "images": [
+          "assets/images/products/uploads/mj-1028s-0807ir-54-1.webp",
+          "assets/images/products/uploads/mj-1028s-0807ir-54-2.webp",
+          "assets/images/products/uploads/mj-1028s-0807ir-54-3.webp",
+          "assets/images/products/uploads/mj-1028s-0807ir-54-4.webp"
+        ],
+        "sku": "MJ 1028S 0807IR 54",
+        "sizes": [
+          "ONESIZE"
+        ]
+      }
+    ],
+    "isNew": false,
+    "sizes": [
+      "ONESIZE"
+    ],
+    "sku": "MJ 1028S 0807IR 54",
+    "searchKeywords": [
+      "марк джейкобс",
+      "marc jacobs",
+      "mj",
+      "сонцезахисні окуляри",
+      "окуляри від сонця",
+      "оправа",
+      "темно-сірий",
+      "marc",
+      "jacobs"
+    ],
+    "instagramBlock": "general",
+    "preOrder": false,
+    "images": [
+      "assets/images/products/uploads/mj-1028s-0807ir-54-1.webp",
+      "assets/images/products/uploads/mj-1028s-0807ir-54-2.webp",
+      "assets/images/products/uploads/mj-1028s-0807ir-54-3.webp",
+      "assets/images/products/uploads/mj-1028s-0807ir-54-4.webp"
+    ],
+    "slug": "marc-jacobs-sontsezakhysni-okuliary-marc-jacobs-2",
+    "id": 17,
+    "color": "Темно-сірий"
+  },
+  {
     "title": "Urban Backpack",
     "brand": "Tommy Hilfiger",
     "category": "Рюкзаки",
@@ -1062,6 +1935,55 @@
     "images": [
       "https://commons.wikimedia.org/wiki/Special:Redirect/file/Eastpak%20Sugarbush%20backpack%20black.jpg"
     ]
+  },
+  {
+    "title": "Сонцезахисні окуляри Marc Jacobs",
+    "brand": "Marc Jacobs",
+    "category": "Окуляри і оправи",
+    "gender": "Жінкам",
+    "price": 7200,
+    "description": "Сонцезахисні окуляри Marc Jacobs — велика оправа з градієнтними лінзами теплого відтінку. Модель, що закриває значну частину обличчя й працює як акцент.",
+    "variants": [
+      {
+        "color": "Темно-коричневий",
+        "hex": "#6c2621",
+        "images": [
+          "assets/images/products/uploads/mj-1061s-009qha-59-1.webp",
+          "assets/images/products/uploads/mj-1061s-009qha-59-2.webp",
+          "assets/images/products/uploads/mj-1061s-009qha-59-3.webp"
+        ],
+        "sku": "MJ 1061S 009QHA 59",
+        "sizes": [
+          "ONESIZE"
+        ]
+      }
+    ],
+    "isNew": false,
+    "sizes": [
+      "ONESIZE"
+    ],
+    "sku": "MJ 1061S 009QHA 59",
+    "searchKeywords": [
+      "марк джейкобс",
+      "marc jacobs",
+      "mj",
+      "сонцезахисні окуляри",
+      "окуляри від сонця",
+      "оправа",
+      "темно-коричневий",
+      "marc",
+      "jacobs"
+    ],
+    "instagramBlock": "general",
+    "preOrder": false,
+    "images": [
+      "assets/images/products/uploads/mj-1061s-009qha-59-1.webp",
+      "assets/images/products/uploads/mj-1061s-009qha-59-2.webp",
+      "assets/images/products/uploads/mj-1061s-009qha-59-3.webp"
+    ],
+    "slug": "marc-jacobs-sontsezakhysni-okuliary-marc-jacobs-3",
+    "id": 18,
+    "color": "Темно-коричневий"
   },
   {
     "title": "City Tote",
@@ -1115,6 +2037,55 @@
     "images": [
       "https://commons.wikimedia.org/wiki/Special:Redirect/file/Mk%20bag.jpg"
     ]
+  },
+  {
+    "title": "Сонцезахисні окуляри Marc Jacobs",
+    "brand": "Marc Jacobs",
+    "category": "Окуляри і оправи",
+    "gender": "Жінкам",
+    "price": 6000,
+    "description": "Сонцезахисні окуляри Marc Jacobs у вузькій прямокутній оправі з темними лінзами. Лаконічна форма з логотипом бренду на дузі.",
+    "variants": [
+      {
+        "color": "Темно-сірий",
+        "hex": "#534f54",
+        "images": [
+          "assets/images/products/uploads/marc-409s-08079o-54-1.webp",
+          "assets/images/products/uploads/marc-409s-08079o-54-2.webp",
+          "assets/images/products/uploads/marc-409s-08079o-54-3.webp"
+        ],
+        "sku": "MARC 409S 08079O 54",
+        "sizes": [
+          "ONESIZE"
+        ]
+      }
+    ],
+    "isNew": false,
+    "sizes": [
+      "ONESIZE"
+    ],
+    "sku": "MARC 409S 08079O 54",
+    "searchKeywords": [
+      "марк джейкобс",
+      "marc jacobs",
+      "mj",
+      "сонцезахисні окуляри",
+      "окуляри від сонця",
+      "оправа",
+      "темно-сірий",
+      "marc",
+      "jacobs"
+    ],
+    "instagramBlock": "general",
+    "preOrder": false,
+    "images": [
+      "assets/images/products/uploads/marc-409s-08079o-54-1.webp",
+      "assets/images/products/uploads/marc-409s-08079o-54-2.webp",
+      "assets/images/products/uploads/marc-409s-08079o-54-3.webp"
+    ],
+    "slug": "marc-jacobs-sontsezakhysni-okuliary-marc-jacobs",
+    "id": 19,
+    "color": "Темно-сірий"
   },
   {
     "title": "Urban Sneakers",
@@ -1173,6 +2144,66 @@
     ]
   },
   {
+    "title": "Сумка крос-боді жіноча шкіряна Marc Jacobs The Snapshot",
+    "brand": "Marc Jacobs",
+    "category": "Жіночі сумки",
+    "gender": "Жінкам",
+    "price": 10000,
+    "description": "Крос-боді Marc Jacobs зі шкіри — акуратний прямокутний корпус і подвійна монограма J. Ремінець регулюється, тож сумку можна носити через плече або навскіс. Два кольори на вибір.",
+    "variants": [
+      {
+        "color": "Бежевий",
+        "hex": "#e3d1b6",
+        "images": [
+          "assets/images/products/uploads/2s3hcr500h03-134-1.webp",
+          "assets/images/products/uploads/2s3hcr500h03-134-2.webp",
+          "assets/images/products/uploads/2s3hcr500h03-134-3.webp"
+        ],
+        "sku": "2S3HCR500H03_134"
+      },
+      {
+        "color": "Чорний",
+        "hex": "#29282a",
+        "images": [
+          "assets/images/products/uploads/h153l01sp22-002-1.webp",
+          "assets/images/products/uploads/h153l01sp22-002-2.webp",
+          "assets/images/products/uploads/h153l01sp22-002-3.webp"
+        ],
+        "sku": "H153L01SP22-002"
+      }
+    ],
+    "oldPrice": 13000,
+    "badge": "SALE",
+    "isNew": false,
+    "material": "Шкіра",
+    "sku": "2S3HCR500H03_134",
+    "searchKeywords": [
+      "марк джейкобс",
+      "marc jacobs",
+      "mj",
+      "сумка жіноча",
+      "кросбоді",
+      "сумка через плече",
+      "клатч",
+      "бежевий",
+      "чорний",
+      "marc",
+      "jacobs",
+      "the",
+      "snapshot"
+    ],
+    "instagramBlock": "general",
+    "preOrder": false,
+    "images": [
+      "assets/images/products/uploads/2s3hcr500h03-134-1.webp",
+      "assets/images/products/uploads/2s3hcr500h03-134-2.webp",
+      "assets/images/products/uploads/2s3hcr500h03-134-3.webp"
+    ],
+    "slug": "marc-jacobs-sumka-kros-bodi-zhinocha-shkiriana-marc-jacobs-t",
+    "id": 20,
+    "color": "Бежевий"
+  },
+  {
     "title": "Minimal Watch",
     "brand": "Casio",
     "category": "Годинники",
@@ -1220,5 +2251,346 @@
     "images": [
       "assets/images/products/uploads/RayBanAviator.png"
     ]
+  },
+  {
+    "title": "Сумочка The Teddy J Marc Mini Bag Brown",
+    "brand": "Marc Jacobs",
+    "category": "Жіночі сумки",
+    "gender": "Жінкам",
+    "price": 9000,
+    "description": "Компактна сумочка Marc Jacobs із колекції The Teddy — м'який ворсистий верх і фірмова монограма J на клапані. Носиться на ланцюжку через плече або в руці. Модель на щодень, коли потрібно взяти лише необхідне.",
+    "variants": [
+      {
+        "color": "Коричневий",
+        "hex": "#996f4f",
+        "images": [
+          "assets/images/products/uploads/2f3hsh042h02-230-1.webp",
+          "assets/images/products/uploads/2f3hsh042h02-230-2.webp",
+          "assets/images/products/uploads/2f3hsh042h02-230-3.webp"
+        ],
+        "sku": "2F3HSH042H02-230"
+      }
+    ],
+    "oldPrice": 11700,
+    "badge": "SALE",
+    "isNew": false,
+    "sku": "2F3HSH042H02-230",
+    "searchKeywords": [
+      "марк джейкобс",
+      "marc jacobs",
+      "mj",
+      "сумка жіноча",
+      "кросбоді",
+      "сумка через плече",
+      "клатч",
+      "коричневий",
+      "the",
+      "teddy",
+      "marc",
+      "mini"
+    ],
+    "instagramBlock": "general",
+    "preOrder": false,
+    "images": [
+      "assets/images/products/uploads/2f3hsh042h02-230-1.webp",
+      "assets/images/products/uploads/2f3hsh042h02-230-2.webp",
+      "assets/images/products/uploads/2f3hsh042h02-230-3.webp"
+    ],
+    "slug": "marc-jacobs-sumochka-the-teddy-j-marc-mini-bag-brown",
+    "id": 21,
+    "color": "Коричневий"
+  },
+  {
+    "title": "Жіноча шкіряна сумочка крос-боді Marc Jacobs the leather bucket bag",
+    "brand": "Marc Jacobs",
+    "category": "Жіночі сумки",
+    "gender": "Жінкам",
+    "price": 13000,
+    "description": "Крос-боді Marc Jacobs зі шкіри. Компактний корпус, фірмова монограма, ремінець через плече. Модель, у яку вміщається все потрібне, але яка не виглядає громіздкою.",
+    "variants": [
+      {
+        "color": "Чорний",
+        "hex": "#242426",
+        "images": [
+          "assets/images/products/uploads/h652l01pf22-1.webp",
+          "assets/images/products/uploads/h652l01pf22-2.webp",
+          "assets/images/products/uploads/h652l01pf22-3.webp"
+        ],
+        "sku": "H652L01PF22"
+      }
+    ],
+    "oldPrice": 16900,
+    "badge": "SALE",
+    "isNew": false,
+    "material": "Шкіра",
+    "sku": "H652L01PF22",
+    "searchKeywords": [
+      "марк джейкобс",
+      "marc jacobs",
+      "mj",
+      "сумка жіноча",
+      "кросбоді",
+      "сумка через плече",
+      "клатч",
+      "чорний",
+      "marc",
+      "jacobs",
+      "the",
+      "leather"
+    ],
+    "instagramBlock": "general",
+    "preOrder": false,
+    "images": [
+      "assets/images/products/uploads/h652l01pf22-1.webp",
+      "assets/images/products/uploads/h652l01pf22-2.webp",
+      "assets/images/products/uploads/h652l01pf22-3.webp"
+    ],
+    "slug": "marc-jacobs-zhinocha-shkiriana-sumochka-kros-bodi-marc-jacob",
+    "id": 22,
+    "color": "Чорний"
+  },
+  {
+    "title": "Годинник жіночий Mathey Tissot City Metal",
+    "brand": "Mathey-Tissot",
+    "category": "Годинники",
+    "gender": "Жінкам",
+    "price": 6500,
+    "description": "Жіночий годинник Mathey Tissot із колекції City — компактний корпус на металевому браслеті. Лаконічний циферблат із позначкою дати. Швейцарський бренд із понад 130-річною історією.",
+    "variants": [
+      {
+        "color": "Світло-сірий",
+        "hex": "#cecdc6",
+        "images": [
+          "assets/images/products/uploads/d31186mabu-1.webp",
+          "assets/images/products/uploads/d31186mabu-2.webp"
+        ],
+        "sku": "D31186MABU",
+        "sizes": [
+          "ONESIZE"
+        ]
+      }
+    ],
+    "oldPrice": 8450,
+    "badge": "SALE",
+    "isNew": false,
+    "sizes": [
+      "ONESIZE"
+    ],
+    "sku": "D31186MABU",
+    "searchKeywords": [
+      "матей тіссо",
+      "mathey tissot",
+      "годинник",
+      "наручний годинник",
+      "світло-сірий",
+      "mathey",
+      "tissot",
+      "city",
+      "metal"
+    ],
+    "instagramBlock": "general",
+    "preOrder": false,
+    "images": [
+      "assets/images/products/uploads/d31186mabu-1.webp",
+      "assets/images/products/uploads/d31186mabu-2.webp"
+    ],
+    "slug": "mathey-tissot-hodynnyk-zhinochyy-mathey-tissot-city-metal",
+    "id": 23,
+    "color": "Світло-сірий"
+  },
+  {
+    "title": "Годинник жіночий Mathey Tissot Mathey II Quartz Crystal Black Dial Ladies Watch",
+    "brand": "Mathey-Tissot",
+    "category": "Годинники",
+    "gender": "Жінкам",
+    "price": 6500,
+    "description": "Жіночий годинник Mathey Tissot на комбінованому браслеті. Темний циферблат із декоративними вставками по колу й віконцем дати. Модель для щоденного носіння й особливих подій.",
+    "variants": [
+      {
+        "color": "Темно-сірий",
+        "hex": "#3c3b3a",
+        "images": [
+          "assets/images/products/uploads/d710bn-1.webp",
+          "assets/images/products/uploads/d710bn-2.webp",
+          "assets/images/products/uploads/d710bn-3.webp"
+        ],
+        "sku": "D710BN",
+        "sizes": [
+          "ONESIZE"
+        ]
+      }
+    ],
+    "oldPrice": 8450,
+    "badge": "SALE",
+    "isNew": false,
+    "sizes": [
+      "ONESIZE"
+    ],
+    "sku": "D710BN",
+    "searchKeywords": [
+      "матей тіссо",
+      "mathey tissot",
+      "годинник",
+      "наручний годинник",
+      "темно-сірий",
+      "mathey",
+      "tissot",
+      "quartz"
+    ],
+    "instagramBlock": "general",
+    "preOrder": false,
+    "images": [
+      "assets/images/products/uploads/d710bn-1.webp",
+      "assets/images/products/uploads/d710bn-2.webp",
+      "assets/images/products/uploads/d710bn-3.webp"
+    ],
+    "slug": "mathey-tissot-hodynnyk-zhinochyy-mathey-tissot-mathey-ii-qua",
+    "id": 24,
+    "color": "Темно-сірий"
+  },
+  {
+    "title": "Шкіряна сумочка Greenwich Medium Saffiano",
+    "brand": "Michael Kors",
+    "category": "Жіночі сумки",
+    "gender": "Жінкам",
+    "price": 8900,
+    "description": "Michael Kors Greenwich у середньому розмірі зі шкіри сафʼяно з дрібнозернистою текстурою. Клапан із фірменою круглою емблемою MK, знімний ремінець. Практична модель, що не втрачає вигляд у щоденному носінні.",
+    "variants": [
+      {
+        "color": "Синій",
+        "hex": "#bacbdb",
+        "images": [
+          "assets/images/products/uploads/30h1ggrl2l-487-1.webp",
+          "assets/images/products/uploads/30h1ggrl2l-487-2.webp",
+          "assets/images/products/uploads/30h1ggrl2l-487-3.webp"
+        ],
+        "sku": "30H1GGRL2L-487"
+      }
+    ],
+    "isNew": false,
+    "material": "Шкіра",
+    "sku": "30H1GGRL2L-487",
+    "searchKeywords": [
+      "майкл корс",
+      "michael kors",
+      "mk",
+      "сумка жіноча",
+      "кросбоді",
+      "сумка через плече",
+      "клатч",
+      "синій",
+      "greenwich",
+      "medium",
+      "saffiano"
+    ],
+    "instagramBlock": "general",
+    "preOrder": false,
+    "images": [
+      "assets/images/products/uploads/30h1ggrl2l-487-1.webp",
+      "assets/images/products/uploads/30h1ggrl2l-487-2.webp",
+      "assets/images/products/uploads/30h1ggrl2l-487-3.webp"
+    ],
+    "slug": "michael-kors-shkiriana-sumochka-greenwich-medium-saffiano",
+    "id": 25,
+    "color": "Синій"
+  },
+  {
+    "title": "Жіночий годинник MICHAEL KORS MK4619",
+    "brand": "Michael Kors",
+    "category": "Годинники",
+    "gender": "Жінкам",
+    "price": 6500,
+    "description": "Жіночий годинник Michael Kors MK4619 на сітчастому браслеті золотистого відтінку. Світлий циферблат, оздоблення по безелю. Аксесуар, що завершує образ.",
+    "variants": [
+      {
+        "color": "Бежевий",
+        "hex": "#cdb89a",
+        "images": [
+          "assets/images/products/uploads/mk4619-1.webp",
+          "assets/images/products/uploads/mk4619-2.webp",
+          "assets/images/products/uploads/mk4619-3.webp"
+        ],
+        "sku": "MK4619",
+        "sizes": [
+          "ONESIZE"
+        ]
+      }
+    ],
+    "isNew": false,
+    "sizes": [
+      "ONESIZE"
+    ],
+    "sku": "MK4619",
+    "searchKeywords": [
+      "майкл корс",
+      "michael kors",
+      "mk",
+      "годинник",
+      "наручний годинник",
+      "бежевий",
+      "michael",
+      "kors",
+      "mk4619"
+    ],
+    "instagramBlock": "general",
+    "preOrder": false,
+    "images": [
+      "assets/images/products/uploads/mk4619-1.webp",
+      "assets/images/products/uploads/mk4619-2.webp",
+      "assets/images/products/uploads/mk4619-3.webp"
+    ],
+    "slug": "michael-kors-zhinochyy-hodynnyk-michael-kors-mk4619",
+    "id": 26,
+    "color": "Бежевий"
+  },
+  {
+    "title": "Сонцезахисні окуляри PRADA 20WS 1AB5S0 DARK GREY",
+    "brand": "Prada",
+    "category": "Окуляри і оправи",
+    "gender": "Жінкам",
+    "price": 10000,
+    "description": "Сонцезахисні окуляри Prada 20WS. Вузька оправа з темними лінзами й логотипом бренду на скроневій дузі. Стримана модель для щоденного носіння.",
+    "variants": [
+      {
+        "color": "Темно-сірий",
+        "hex": "#3e3b3c",
+        "images": [
+          "assets/images/products/uploads/pr-20ws-1ab5s0-49-1.webp",
+          "assets/images/products/uploads/pr-20ws-1ab5s0-49-2.webp",
+          "assets/images/products/uploads/pr-20ws-1ab5s0-49-3.webp"
+        ],
+        "sku": "PR 20WS 1AB5S0 49",
+        "sizes": [
+          "ONESIZE"
+        ]
+      }
+    ],
+    "isNew": false,
+    "sizes": [
+      "ONESIZE"
+    ],
+    "sku": "PR 20WS 1AB5S0 49",
+    "searchKeywords": [
+      "прада",
+      "prada",
+      "сонцезахисні окуляри",
+      "окуляри від сонця",
+      "оправа",
+      "темно-сірий",
+      "prada",
+      "20ws",
+      "1ab5s0",
+      "dark"
+    ],
+    "instagramBlock": "general",
+    "preOrder": false,
+    "images": [
+      "assets/images/products/uploads/pr-20ws-1ab5s0-49-1.webp",
+      "assets/images/products/uploads/pr-20ws-1ab5s0-49-2.webp",
+      "assets/images/products/uploads/pr-20ws-1ab5s0-49-3.webp"
+    ],
+    "slug": "prada-sontsezakhysni-okuliary-prada-20ws-1ab5s0-dark-grey",
+    "id": 27,
+    "color": "Темно-сірий"
   }
 ]
