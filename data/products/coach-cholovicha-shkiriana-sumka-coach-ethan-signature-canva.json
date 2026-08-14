@@ -1,0 +1,50 @@
+{
+  "title": "Чоловіча шкіряна сумка Coach Ethan Signature Canvas",
+  "brand": "Coach",
+  "category": "Чоловічі сумки",
+  "gender": "Чоловікам",
+  "price": 8600,
+  "description": "Coach Ethan у фірменому принті Signature — крос-боді зі шкіряними вставками. Компактний корпус, ремінець через плече. Для щоденних дрібниць.",
+  "variants": [
+    {
+      "color": "Коричневий",
+      "hex": "#866751",
+      "images": [
+        "assets/images/products/uploads/coach-ethan-cv918-qbnrx-1.webp",
+        "assets/images/products/uploads/coach-ethan-cv918-qbnrx-2.webp",
+        "assets/images/products/uploads/coach-ethan-cv918-qbnrx-3.webp",
+        "assets/images/products/uploads/coach-ethan-cv918-qbnrx-4.webp"
+      ],
+      "sku": "coach ethan cv918 qbnrx"
+    }
+  ],
+  "oldPrice": 11180,
+  "badge": "SALE",
+  "isNew": false,
+  "material": "Шкіра",
+  "sku": "coach ethan cv918 qbnrx",
+  "searchKeywords": [
+    "коуч",
+    "coach",
+    "сумка чоловіча",
+    "кросбоді",
+    "барсетка",
+    "сумка через плече",
+    "коричневий",
+    "coach",
+    "ethan",
+    "signature",
+    "canvas"
+  ],
+  "instagramBlock": "general",
+  "preOrder": false,
+  "images": [
+    "assets/images/products/uploads/coach-ethan-cv918-qbnrx-1.webp",
+    "assets/images/products/uploads/coach-ethan-cv918-qbnrx-2.webp",
+    "assets/images/products/uploads/coach-ethan-cv918-qbnrx-3.webp",
+    "assets/images/products/uploads/coach-ethan-cv918-qbnrx-4.webp"
+  ],
+  "slug": "coach-cholovicha-shkiriana-sumka-coach-ethan-signature-canva",
+  "id": 7,
+  "color": "Коричневий"
+}

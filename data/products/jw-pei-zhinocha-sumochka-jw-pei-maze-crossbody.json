@@ -1,0 +1,45 @@
+{
+  "title": "Жіноча сумочка JW PEI Maze Crossbody",
+  "brand": "JW PEI",
+  "category": "Жіночі сумки",
+  "gender": "Жінкам",
+  "price": 4000,
+  "description": "JW PEI Maze — крос-боді з плетеним верхом у два тони. Довгий ремінець, компактний корпус. Модель із вираженою текстурою, що замінює собою аксесуар.",
+  "variants": [
+    {
+      "color": "Коричневий",
+      "hex": "#af734e",
+      "images": [
+        "assets/images/products/uploads/jwp-ma106-1.webp",
+        "assets/images/products/uploads/jwp-ma106-2.webp",
+        "assets/images/products/uploads/jwp-ma106-3.webp"
+      ],
+      "sku": "JWP-MA106"
+    }
+  ],
+  "isNew": false,
+  "sku": "JWP-MA106",
+  "searchKeywords": [
+    "джей ві пей",
+    "jw pei",
+    "jwpei",
+    "сумка жіноча",
+    "кросбоді",
+    "сумка через плече",
+    "клатч",
+    "коричневий",
+    "pei",
+    "maze",
+    "crossbody"
+  ],
+  "instagramBlock": "general",
+  "preOrder": false,
+  "images": [
+    "assets/images/products/uploads/jwp-ma106-1.webp",
+    "assets/images/products/uploads/jwp-ma106-2.webp",
+    "assets/images/products/uploads/jwp-ma106-3.webp"
+  ],
+  "slug": "jw-pei-zhinocha-sumochka-jw-pei-maze-crossbody",
+  "id": 15,
+  "color": "Коричневий"
+}

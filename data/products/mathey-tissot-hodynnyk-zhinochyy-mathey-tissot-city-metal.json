@@ -1,0 +1,49 @@
+{
+  "title": "Годинник жіночий Mathey Tissot City Metal",
+  "brand": "Mathey-Tissot",
+  "category": "Годинники",
+  "gender": "Жінкам",
+  "price": 6500,
+  "description": "Жіночий годинник Mathey Tissot із колекції City — компактний корпус на металевому браслеті. Лаконічний циферблат із позначкою дати. Швейцарський бренд із понад 130-річною історією.",
+  "variants": [
+    {
+      "color": "Світло-сірий",
+      "hex": "#cecdc6",
+      "images": [
+        "assets/images/products/uploads/d31186mabu-1.webp",
+        "assets/images/products/uploads/d31186mabu-2.webp"
+      ],
+      "sku": "D31186MABU",
+      "sizes": [
+        "ONESIZE"
+      ]
+    }
+  ],
+  "oldPrice": 8450,
+  "badge": "SALE",
+  "isNew": false,
+  "sizes": [
+    "ONESIZE"
+  ],
+  "sku": "D31186MABU",
+  "searchKeywords": [
+    "матей тіссо",
+    "mathey tissot",
+    "годинник",
+    "наручний годинник",
+    "світло-сірий",
+    "mathey",
+    "tissot",
+    "city",
+    "metal"
+  ],
+  "instagramBlock": "general",
+  "preOrder": false,
+  "images": [
+    "assets/images/products/uploads/d31186mabu-1.webp",
+    "assets/images/products/uploads/d31186mabu-2.webp"
+  ],
+  "slug": "mathey-tissot-hodynnyk-zhinochyy-mathey-tissot-city-metal",
+  "id": 23,
+  "color": "Світло-сірий"
+}

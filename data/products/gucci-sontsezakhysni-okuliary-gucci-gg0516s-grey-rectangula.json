@@ -1,0 +1,52 @@
+{
+  "title": "Сонцезахисні окуляри GUCCI GG0516S Grey Rectangula",
+  "brand": "Gucci",
+  "category": "Окуляри і оправи",
+  "gender": "Жінкам",
+  "price": 12800,
+  "description": "Сонцезахисні окуляри Gucci GG0516S. Оправа «котяче око» з металевим декором на скроневих дугах і темними лінзами. Форма, що візуально витягує риси обличчя.",
+  "variants": [
+    {
+      "color": "Темно-сірий",
+      "hex": "#5c5954",
+      "images": [
+        "assets/images/products/uploads/gg0516s-001-52-1.webp",
+        "assets/images/products/uploads/gg0516s-001-52-2.webp",
+        "assets/images/products/uploads/gg0516s-001-52-3.webp"
+      ],
+      "sku": "GG0516S 001 52",
+      "sizes": [
+        "ONESIZE"
+      ]
+    }
+  ],
+  "oldPrice": 16640,
+  "badge": "SALE",
+  "isNew": false,
+  "sizes": [
+    "ONESIZE"
+  ],
+  "sku": "GG0516S 001 52",
+  "searchKeywords": [
+    "гуччі",
+    "gucci",
+    "сонцезахисні окуляри",
+    "окуляри від сонця",
+    "оправа",
+    "темно-сірий",
+    "gucci",
+    "gg0516s",
+    "grey",
+    "rectangula"
+  ],
+  "instagramBlock": "general",
+  "preOrder": false,
+  "images": [
+    "assets/images/products/uploads/gg0516s-001-52-1.webp",
+    "assets/images/products/uploads/gg0516s-001-52-2.webp",
+    "assets/images/products/uploads/gg0516s-001-52-3.webp"
+  ],
+  "slug": "gucci-sontsezakhysni-okuliary-gucci-gg0516s-grey-rectangula",
+  "id": 11,
+  "color": "Темно-сірий"
+}

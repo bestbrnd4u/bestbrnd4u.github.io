@@ -1,0 +1,69 @@
+{
+  "title": "Шкіряна сумочка Coach Tabby 26",
+  "brand": "Coach",
+  "category": "Жіночі сумки",
+  "gender": "Жінкам",
+  "price": 11000,
+  "description": "Coach Tabby 26 — одна з найвпізнаваніших моделей бренду. Шкіряний корпус, фірмова застібка-турнікет у формі літери C, знімний ремінець. Доступна у трьох відтінках, тримає форму й однаково доречна з денним і вечірнім образом.",
+  "variants": [
+    {
+      "color": "Темно-сірий",
+      "hex": "#3f3f3f",
+      "images": [
+        "assets/images/products/uploads/coach73995black-1.webp",
+        "assets/images/products/uploads/coach73995black-2.webp",
+        "assets/images/products/uploads/coach73995black-3.webp"
+      ],
+      "sku": "coach73995black"
+    },
+    {
+      "color": "Світло-сірий",
+      "hex": "#d2cac4",
+      "images": [
+        "assets/images/products/uploads/coach73995chalk-1.webp",
+        "assets/images/products/uploads/coach73995chalk-2.webp",
+        "assets/images/products/uploads/coach73995chalk-3.webp",
+        "assets/images/products/uploads/coach73995chalk-4.webp"
+      ],
+      "sku": "coach73995chalk"
+    },
+    {
+      "color": "Коричневий",
+      "hex": "#8c6f63",
+      "images": [
+        "assets/images/products/uploads/coach73995-dark-stone-1.webp",
+        "assets/images/products/uploads/coach73995-dark-stone-2.webp",
+        "assets/images/products/uploads/coach73995-dark-stone-3.webp"
+      ],
+      "sku": "coach73995 dark stone"
+    }
+  ],
+  "oldPrice": 14300,
+  "badge": "SALE",
+  "isNew": false,
+  "material": "Шкіра",
+  "sku": "coach73995black",
+  "searchKeywords": [
+    "коуч",
+    "coach",
+    "сумка жіноча",
+    "кросбоді",
+    "сумка через плече",
+    "клатч",
+    "темно-сірий",
+    "світло-сірий",
+    "коричневий",
+    "coach",
+    "tabby"
+  ],
+  "instagramBlock": "general",
+  "preOrder": false,
+  "images": [
+    "assets/images/products/uploads/coach73995black-1.webp",
+    "assets/images/products/uploads/coach73995black-2.webp",
+    "assets/images/products/uploads/coach73995black-3.webp"
+  ],
+  "slug": "coach-shkiriana-sumochka-coach-tabby-26",
+  "id": 9,
+  "color": "Темно-сірий"
+}

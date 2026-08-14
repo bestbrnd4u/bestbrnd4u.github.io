@@ -1,0 +1,50 @@
+{
+  "title": "Balenciaga Сонцезахисні окуляри Grey Rectangular Ladies Sunglasses",
+  "brand": "Balenciaga",
+  "category": "Окуляри і оправи",
+  "gender": "Жінкам",
+  "price": 12500,
+  "description": "Сонцезахисні окуляри Balenciaga у прямокутній оправі з темними лінзами. Стримана форма з фірмовим логотипом на дузі — доречні щодня.",
+  "variants": [
+    {
+      "color": "Темно-сірий",
+      "hex": "#706c69",
+      "images": [
+        "assets/images/products/uploads/bb0096s-001-51-1.webp",
+        "assets/images/products/uploads/bb0096s-001-51-2.webp"
+      ],
+      "sku": "BB0096S 001 51",
+      "sizes": [
+        "ONESIZE"
+      ]
+    }
+  ],
+  "oldPrice": 16250,
+  "badge": "SALE",
+  "isNew": false,
+  "sizes": [
+    "ONESIZE"
+  ],
+  "sku": "BB0096S 001 51",
+  "searchKeywords": [
+    "баленсіага",
+    "balenciaga",
+    "сонцезахисні окуляри",
+    "окуляри від сонця",
+    "оправа",
+    "темно-сірий",
+    "balenciaga",
+    "grey",
+    "rectangular",
+    "ladies"
+  ],
+  "instagramBlock": "general",
+  "preOrder": false,
+  "images": [
+    "assets/images/products/uploads/bb0096s-001-51-1.webp",
+    "assets/images/products/uploads/bb0096s-001-51-2.webp"
+  ],
+  "slug": "balenciaga-balenciaga-sontsezakhysni-okuliary-grey-rectangul-2",
+  "id": 4,
+  "color": "Темно-сірий"
+}

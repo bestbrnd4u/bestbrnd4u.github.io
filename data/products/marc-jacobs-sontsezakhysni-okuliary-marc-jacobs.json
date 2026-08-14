@@ -1,0 +1,49 @@
+{
+  "title": "Сонцезахисні окуляри Marc Jacobs",
+  "brand": "Marc Jacobs",
+  "category": "Окуляри і оправи",
+  "gender": "Жінкам",
+  "price": 6000,
+  "description": "Сонцезахисні окуляри Marc Jacobs у вузькій прямокутній оправі з темними лінзами. Лаконічна форма з логотипом бренду на дузі.",
+  "variants": [
+    {
+      "color": "Темно-сірий",
+      "hex": "#534f54",
+      "images": [
+        "assets/images/products/uploads/marc-409s-08079o-54-1.webp",
+        "assets/images/products/uploads/marc-409s-08079o-54-2.webp",
+        "assets/images/products/uploads/marc-409s-08079o-54-3.webp"
+      ],
+      "sku": "MARC 409S 08079O 54",
+      "sizes": [
+        "ONESIZE"
+      ]
+    }
+  ],
+  "isNew": false,
+  "sizes": [
+    "ONESIZE"
+  ],
+  "sku": "MARC 409S 08079O 54",
+  "searchKeywords": [
+    "марк джейкобс",
+    "marc jacobs",
+    "mj",
+    "сонцезахисні окуляри",
+    "окуляри від сонця",
+    "оправа",
+    "темно-сірий",
+    "marc",
+    "jacobs"
+  ],
+  "instagramBlock": "general",
+  "preOrder": false,
+  "images": [
+    "assets/images/products/uploads/marc-409s-08079o-54-1.webp",
+    "assets/images/products/uploads/marc-409s-08079o-54-2.webp",
+    "assets/images/products/uploads/marc-409s-08079o-54-3.webp"
+  ],
+  "slug": "marc-jacobs-sontsezakhysni-okuliary-marc-jacobs",
+  "id": 19,
+  "color": "Темно-сірий"
+}

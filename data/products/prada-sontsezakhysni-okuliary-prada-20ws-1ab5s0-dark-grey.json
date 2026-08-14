@@ -1,0 +1,50 @@
+{
+  "title": "Сонцезахисні окуляри PRADA 20WS 1AB5S0 DARK GREY",
+  "brand": "Prada",
+  "category": "Окуляри і оправи",
+  "gender": "Жінкам",
+  "price": 10000,
+  "description": "Сонцезахисні окуляри Prada 20WS. Вузька оправа з темними лінзами й логотипом бренду на скроневій дузі. Стримана модель для щоденного носіння.",
+  "variants": [
+    {
+      "color": "Темно-сірий",
+      "hex": "#3e3b3c",
+      "images": [
+        "assets/images/products/uploads/pr-20ws-1ab5s0-49-1.webp",
+        "assets/images/products/uploads/pr-20ws-1ab5s0-49-2.webp",
+        "assets/images/products/uploads/pr-20ws-1ab5s0-49-3.webp"
+      ],
+      "sku": "PR 20WS 1AB5S0 49",
+      "sizes": [
+        "ONESIZE"
+      ]
+    }
+  ],
+  "isNew": false,
+  "sizes": [
+    "ONESIZE"
+  ],
+  "sku": "PR 20WS 1AB5S0 49",
+  "searchKeywords": [
+    "прада",
+    "prada",
+    "сонцезахисні окуляри",
+    "окуляри від сонця",
+    "оправа",
+    "темно-сірий",
+    "prada",
+    "20ws",
+    "1ab5s0",
+    "dark"
+  ],
+  "instagramBlock": "general",
+  "preOrder": false,
+  "images": [
+    "assets/images/products/uploads/pr-20ws-1ab5s0-49-1.webp",
+    "assets/images/products/uploads/pr-20ws-1ab5s0-49-2.webp",
+    "assets/images/products/uploads/pr-20ws-1ab5s0-49-3.webp"
+  ],
+  "slug": "prada-sontsezakhysni-okuliary-prada-20ws-1ab5s0-dark-grey",
+  "id": 27,
+  "color": "Темно-сірий"
+}

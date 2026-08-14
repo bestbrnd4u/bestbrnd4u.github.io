@@ -1,0 +1,50 @@
+{
+  "title": "Годинник жіночий Mathey Tissot Mathey II Quartz Crystal Black Dial Ladies Watch",
+  "brand": "Mathey-Tissot",
+  "category": "Годинники",
+  "gender": "Жінкам",
+  "price": 6500,
+  "description": "Жіночий годинник Mathey Tissot на комбінованому браслеті. Темний циферблат із декоративними вставками по колу й віконцем дати. Модель для щоденного носіння й особливих подій.",
+  "variants": [
+    {
+      "color": "Темно-сірий",
+      "hex": "#3c3b3a",
+      "images": [
+        "assets/images/products/uploads/d710bn-1.webp",
+        "assets/images/products/uploads/d710bn-2.webp",
+        "assets/images/products/uploads/d710bn-3.webp"
+      ],
+      "sku": "D710BN",
+      "sizes": [
+        "ONESIZE"
+      ]
+    }
+  ],
+  "oldPrice": 8450,
+  "badge": "SALE",
+  "isNew": false,
+  "sizes": [
+    "ONESIZE"
+  ],
+  "sku": "D710BN",
+  "searchKeywords": [
+    "матей тіссо",
+    "mathey tissot",
+    "годинник",
+    "наручний годинник",
+    "темно-сірий",
+    "mathey",
+    "tissot",
+    "quartz"
+  ],
+  "instagramBlock": "general",
+  "preOrder": false,
+  "images": [
+    "assets/images/products/uploads/d710bn-1.webp",
+    "assets/images/products/uploads/d710bn-2.webp",
+    "assets/images/products/uploads/d710bn-3.webp"
+  ],
+  "slug": "mathey-tissot-hodynnyk-zhinochyy-mathey-tissot-mathey-ii-qua",
+  "id": 24,
+  "color": "Темно-сірий"
+}

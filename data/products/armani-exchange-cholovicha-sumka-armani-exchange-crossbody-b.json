@@ -1,0 +1,46 @@
+{
+  "title": "Чоловіча сумка Armani Exchange Crossbody Bag Black",
+  "brand": "Armani Exchange",
+  "category": "Чоловічі сумки",
+  "gender": "Чоловікам",
+  "price": 6000,
+  "description": "Крос-боді Armani Exchange — плаский корпус, який не додає об'єму під верхнім одягом. Логотип AX на лицьовій стороні, ремінець через плече. Для документів, телефона й дрібниць.",
+  "variants": [
+    {
+      "color": "Чорний",
+      "hex": "#1d1f22",
+      "images": [
+        "assets/images/products/uploads/arc54h01t-q11-1.webp",
+        "assets/images/products/uploads/arc54h01t-q11-2.webp",
+        "assets/images/products/uploads/arc54h01t-q11-3.webp"
+      ],
+      "sku": "ARC54H01T-Q11"
+    }
+  ],
+  "isNew": false,
+  "sku": "ARC54H01T-Q11",
+  "searchKeywords": [
+    "армані",
+    "armani exchange",
+    "ax",
+    "сумка чоловіча",
+    "кросбоді",
+    "барсетка",
+    "сумка через плече",
+    "чорний",
+    "armani",
+    "exchange",
+    "crossbody",
+    "bag"
+  ],
+  "instagramBlock": "general",
+  "preOrder": false,
+  "images": [
+    "assets/images/products/uploads/arc54h01t-q11-1.webp",
+    "assets/images/products/uploads/arc54h01t-q11-2.webp",
+    "assets/images/products/uploads/arc54h01t-q11-3.webp"
+  ],
+  "slug": "armani-exchange-cholovicha-sumka-armani-exchange-crossbody-b",
+  "id": 2,
+  "color": "Чорний"
+}

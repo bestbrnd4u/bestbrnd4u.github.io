@@ -1,0 +1,71 @@
+{
+  "title": "Сумочка Coach Tabby 26 With Quilting",
+  "brand": "Coach",
+  "category": "Жіночі сумки",
+  "gender": "Жінкам",
+  "price": 12500,
+  "description": "Coach Tabby 26 у стьобаному виконанні. Об'ємний ромбовидний рельєф, застібка-турнікет C і ланцюжок зі шкіряною вставкою. Три відтінки — від світлого до темно-коричневого.",
+  "variants": [
+    {
+      "color": "Світло-сірий",
+      "hex": "#d4cac2",
+      "images": [
+        "assets/images/products/uploads/coach-cp150-b4ha-1.webp",
+        "assets/images/products/uploads/coach-cp150-b4ha-2.webp",
+        "assets/images/products/uploads/coach-cp150-b4ha-3.webp",
+        "assets/images/products/uploads/coach-cp150-b4ha-4.webp"
+      ],
+      "sku": "coach cp150 b4ha"
+    },
+    {
+      "color": "Чорний",
+      "hex": "#232323",
+      "images": [
+        "assets/images/products/uploads/cp150-b4bk-a0-1.webp",
+        "assets/images/products/uploads/cp150-b4bk-a0-2.webp",
+        "assets/images/products/uploads/cp150-b4bk-a0-3.webp"
+      ],
+      "sku": "cp150_b4bk_a0"
+    },
+    {
+      "color": "Темно-коричневий",
+      "hex": "#41251d",
+      "images": [
+        "assets/images/products/uploads/cp150-b4mpl-1.webp",
+        "assets/images/products/uploads/cp150-b4mpl-2.webp",
+        "assets/images/products/uploads/cp150-b4mpl-3.webp"
+      ],
+      "sku": "cp150_b4mpl"
+    }
+  ],
+  "oldPrice": 16250,
+  "badge": "SALE",
+  "isNew": false,
+  "sku": "coach cp150 b4ha",
+  "searchKeywords": [
+    "коуч",
+    "coach",
+    "сумка жіноча",
+    "кросбоді",
+    "сумка через плече",
+    "клатч",
+    "світло-сірий",
+    "чорний",
+    "темно-коричневий",
+    "coach",
+    "tabby",
+    "with",
+    "quilting"
+  ],
+  "instagramBlock": "general",
+  "preOrder": false,
+  "images": [
+    "assets/images/products/uploads/coach-cp150-b4ha-1.webp",
+    "assets/images/products/uploads/coach-cp150-b4ha-2.webp",
+    "assets/images/products/uploads/coach-cp150-b4ha-3.webp",
+    "assets/images/products/uploads/coach-cp150-b4ha-4.webp"
+  ],
+  "slug": "coach-sumochka-coach-tabby-26-with-quilting",
+  "id": 10,
+  "color": "Світло-сірий"
+}

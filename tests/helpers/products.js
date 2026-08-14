@@ -50,3 +50,26 @@ function loadCategories() {
 }
 
 module.exports.loadCategories = loadCategories;
+
+
+// Вибір товару за ПОТРІБНОЮ ВЛАСТИВІСТЮ, а не за конкретним id.
+//
+// Раніше тести шукали товар id=15 («Urban Sneakers», 15 кольорів) —
+// демо-товар, який жив у каталозі. Щойно каталог замінили справжнім,
+// половина тестів упала, хоча код сайту не змінювався. Тест не має
+// залежати від вмісту каталогу — лише від наявності товару з
+// потрібними ознаками.
+function pickProduct(predicate) {
+    return loadProducts().filter(predicate)[0] || null;
+}
+
+// Товар із найбільшою кількістю кольорів — саме на такому видно
+// переповнення рядка кольорів.
+function productWithMostColors() {
+    const all = loadProducts().filter(p => Array.isArray(p.variants) && p.variants.length);
+    if (!all.length) return null;
+    return all.sort((a, b) => b.variants.length - a.variants.length)[0];
+}
+
+module.exports.pickProduct = pickProduct;
+module.exports.productWithMostColors = productWithMostColors;

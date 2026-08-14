@@ -1,0 +1,54 @@
+{
+  "title": "Сонцезахисні окуляри Burberry Sophia Dark Grey Cat Eye",
+  "brand": "Burberry",
+  "category": "Окуляри і оправи",
+  "gender": "Жінкам",
+  "price": 9000,
+  "description": "Сонцезахисні окуляри Burberry Sophia. Прямокутна оправа, темні лінзи, логотип бренду на скроневій дузі. Класична форма, що пасує до більшості типів обличчя.",
+  "variants": [
+    {
+      "color": "Темно-сірий",
+      "hex": "#3a383b",
+      "images": [
+        "assets/images/products/uploads/be4361f-300187-51-1.webp",
+        "assets/images/products/uploads/be4361f-300187-51-2.webp",
+        "assets/images/products/uploads/be4361f-300187-51-3.webp",
+        "assets/images/products/uploads/be4361f-300187-51-4.webp"
+      ],
+      "sku": "BE4361F 300187 51",
+      "sizes": [
+        "ONESIZE"
+      ]
+    }
+  ],
+  "oldPrice": 11700,
+  "badge": "SALE",
+  "isNew": false,
+  "sizes": [
+    "ONESIZE"
+  ],
+  "sku": "BE4361F 300187 51",
+  "searchKeywords": [
+    "барбері",
+    "burberry",
+    "сонцезахисні окуляри",
+    "окуляри від сонця",
+    "оправа",
+    "темно-сірий",
+    "burberry",
+    "sophia",
+    "dark",
+    "grey"
+  ],
+  "instagramBlock": "general",
+  "preOrder": false,
+  "images": [
+    "assets/images/products/uploads/be4361f-300187-51-1.webp",
+    "assets/images/products/uploads/be4361f-300187-51-2.webp",
+    "assets/images/products/uploads/be4361f-300187-51-3.webp",
+    "assets/images/products/uploads/be4361f-300187-51-4.webp"
+  ],
+  "slug": "burberry-sontsezakhysni-okuliary-burberry-sophia-dark-grey-c",
+  "id": 6,
+  "color": "Темно-сірий"
+}

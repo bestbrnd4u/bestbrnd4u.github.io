@@ -1,0 +1,49 @@
+{
+  "title": "Сонцезахисні окуляри Marc Jacobs",
+  "brand": "Marc Jacobs",
+  "category": "Окуляри і оправи",
+  "gender": "Жінкам",
+  "price": 7200,
+  "description": "Сонцезахисні окуляри Marc Jacobs — велика оправа з градієнтними лінзами теплого відтінку. Модель, що закриває значну частину обличчя й працює як акцент.",
+  "variants": [
+    {
+      "color": "Темно-коричневий",
+      "hex": "#6c2621",
+      "images": [
+        "assets/images/products/uploads/mj-1061s-009qha-59-1.webp",
+        "assets/images/products/uploads/mj-1061s-009qha-59-2.webp",
+        "assets/images/products/uploads/mj-1061s-009qha-59-3.webp"
+      ],
+      "sku": "MJ 1061S 009QHA 59",
+      "sizes": [
+        "ONESIZE"
+      ]
+    }
+  ],
+  "isNew": false,
+  "sizes": [
+    "ONESIZE"
+  ],
+  "sku": "MJ 1061S 009QHA 59",
+  "searchKeywords": [
+    "марк джейкобс",
+    "marc jacobs",
+    "mj",
+    "сонцезахисні окуляри",
+    "окуляри від сонця",
+    "оправа",
+    "темно-коричневий",
+    "marc",
+    "jacobs"
+  ],
+  "instagramBlock": "general",
+  "preOrder": false,
+  "images": [
+    "assets/images/products/uploads/mj-1061s-009qha-59-1.webp",
+    "assets/images/products/uploads/mj-1061s-009qha-59-2.webp",
+    "assets/images/products/uploads/mj-1061s-009qha-59-3.webp"
+  ],
+  "slug": "marc-jacobs-sontsezakhysni-okuliary-marc-jacobs-3",
+  "id": 18,
+  "color": "Темно-коричневий"
+}

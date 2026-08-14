@@ -1,0 +1,54 @@
+{
+  "title": "Balenciaga Сонцезахисні окуляри Grey Rectangular Unisex Sunglasses",
+  "brand": "Balenciaga",
+  "category": "Окуляри і оправи",
+  "gender": "Унісекс",
+  "price": 13000,
+  "description": "Сонцезахисні окуляри Balenciaga з масивною оправою й темними лінзами. Виразна геометрія, логотип бренду на скроневій дузі. Модель, що працює як самостійний акцент образу.",
+  "variants": [
+    {
+      "color": "Темно-сірий",
+      "hex": "#484445",
+      "images": [
+        "assets/images/products/uploads/bb0041s-001-99-1.webp",
+        "assets/images/products/uploads/bb0041s-001-99-2.webp",
+        "assets/images/products/uploads/bb0041s-001-99-3.webp",
+        "assets/images/products/uploads/bb0041s-001-99-4.webp"
+      ],
+      "sku": "BB0041S 001 99",
+      "sizes": [
+        "ONESIZE"
+      ]
+    }
+  ],
+  "oldPrice": 16900,
+  "badge": "SALE",
+  "isNew": false,
+  "sizes": [
+    "ONESIZE"
+  ],
+  "sku": "BB0041S 001 99",
+  "searchKeywords": [
+    "баленсіага",
+    "balenciaga",
+    "сонцезахисні окуляри",
+    "окуляри від сонця",
+    "оправа",
+    "темно-сірий",
+    "balenciaga",
+    "grey",
+    "rectangular",
+    "unisex"
+  ],
+  "instagramBlock": "general",
+  "preOrder": false,
+  "images": [
+    "assets/images/products/uploads/bb0041s-001-99-1.webp",
+    "assets/images/products/uploads/bb0041s-001-99-2.webp",
+    "assets/images/products/uploads/bb0041s-001-99-3.webp",
+    "assets/images/products/uploads/bb0041s-001-99-4.webp"
+  ],
+  "slug": "balenciaga-balenciaga-sontsezakhysni-okuliary-grey-rectangul",
+  "id": 5,
+  "color": "Темно-сірий"
+}

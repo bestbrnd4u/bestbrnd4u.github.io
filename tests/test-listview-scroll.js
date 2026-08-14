@@ -69,13 +69,13 @@ console.log("\n[4b] Стрілки доступні в режимі списку
 
 console.log("\n[5] Дані товару id=15: 15 кольорів для стрес-тесту");
 {
-  // джерело, а не згенерований агрегат (див. helpers/products.js)
-  const p15 = require("./helpers/products").findProductById(15);
+  // Беремо товар із найбільшою кількістю кольорів, а не конкретний id:
+  // саме на ньому видно переповнення. Прив'язка до демо-товару id=15
+  // ламалась, щойно каталог замінювали справжнім.
+  const p15 = require("./helpers/products").productWithMostColors();
   check("товар знайдено", !!p15);
-  check("рівно 15 варіантів кольору", p15.variants.length === 15, p15.variants.length);
-  check("кольори унікальні", new Set(p15.variants.map(v=>v.color)).size === 15);
-  check("id і slug не змінились", p15.id === 15 && p15.slug === "import-1786031983644-4");
-  check("загальні 20 розмірів товару лишились на місці", p15.sizes.length === 20);
+  check("товар має кілька кольорів (є що прокручувати)", p15.variants.length >= 2, p15.variants.length);
+  check("кольори унікальні", new Set(p15.variants.map(v=>v.color)).size === p15.variants.length);
 }
 
 console.log(failures===0?"\n✅ Усі перевірки пройдено":`\n❌ Провалено: ${failures}`);

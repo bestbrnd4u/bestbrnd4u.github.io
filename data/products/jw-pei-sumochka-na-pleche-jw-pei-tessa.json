@@ -1,0 +1,44 @@
+{
+  "title": "Сумочка на плече Jw Pei TESSA",
+  "brand": "JW PEI",
+  "category": "Жіночі сумки",
+  "gender": "Жінкам",
+  "price": 6000,
+  "description": "JW PEI Tessa — сумка на плече з фурнітурою й декоративними деталями по корпусу. Півмісяцева форма, що щільно сидить на плечі.",
+  "variants": [
+    {
+      "color": "Чорний",
+      "hex": "#242523",
+      "images": [
+        "assets/images/products/uploads/jwpr-wy46-1.webp",
+        "assets/images/products/uploads/jwpr-wy46-2.webp",
+        "assets/images/products/uploads/jwpr-wy46-3.webp"
+      ],
+      "sku": "JWPR-WY46"
+    }
+  ],
+  "isNew": false,
+  "sku": "JWPR-WY46",
+  "searchKeywords": [
+    "джей ві пей",
+    "jw pei",
+    "jwpei",
+    "сумка жіноча",
+    "кросбоді",
+    "сумка через плече",
+    "клатч",
+    "чорний",
+    "pei",
+    "tessa"
+  ],
+  "instagramBlock": "general",
+  "preOrder": false,
+  "images": [
+    "assets/images/products/uploads/jwpr-wy46-1.webp",
+    "assets/images/products/uploads/jwpr-wy46-2.webp",
+    "assets/images/products/uploads/jwpr-wy46-3.webp"
+  ],
+  "slug": "jw-pei-sumochka-na-pleche-jw-pei-tessa",
+  "id": 13,
+  "color": "Чорний"
+}

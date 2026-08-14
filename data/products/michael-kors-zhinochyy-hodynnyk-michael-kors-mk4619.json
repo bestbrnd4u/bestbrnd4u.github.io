@@ -1,0 +1,49 @@
+{
+  "title": "Жіночий годинник MICHAEL KORS MK4619",
+  "brand": "Michael Kors",
+  "category": "Годинники",
+  "gender": "Жінкам",
+  "price": 6500,
+  "description": "Жіночий годинник Michael Kors MK4619 на сітчастому браслеті золотистого відтінку. Світлий циферблат, оздоблення по безелю. Аксесуар, що завершує образ.",
+  "variants": [
+    {
+      "color": "Бежевий",
+      "hex": "#cdb89a",
+      "images": [
+        "assets/images/products/uploads/mk4619-1.webp",
+        "assets/images/products/uploads/mk4619-2.webp",
+        "assets/images/products/uploads/mk4619-3.webp"
+      ],
+      "sku": "MK4619",
+      "sizes": [
+        "ONESIZE"
+      ]
+    }
+  ],
+  "isNew": false,
+  "sizes": [
+    "ONESIZE"
+  ],
+  "sku": "MK4619",
+  "searchKeywords": [
+    "майкл корс",
+    "michael kors",
+    "mk",
+    "годинник",
+    "наручний годинник",
+    "бежевий",
+    "michael",
+    "kors",
+    "mk4619"
+  ],
+  "instagramBlock": "general",
+  "preOrder": false,
+  "images": [
+    "assets/images/products/uploads/mk4619-1.webp",
+    "assets/images/products/uploads/mk4619-2.webp",
+    "assets/images/products/uploads/mk4619-3.webp"
+  ],
+  "slug": "michael-kors-zhinochyy-hodynnyk-michael-kors-mk4619",
+  "id": 26,
+  "color": "Бежевий"
+}

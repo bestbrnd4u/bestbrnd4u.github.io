@@ -82,8 +82,21 @@ function textOf(tree){
 
 console.log("\n[3] Товар рендериться СПРАВЖНЬОЮ карткою на реальних даних");
 {
-  const p = findProductById(15);
-  check("товар 15 знайдено у джерельних файлах", !!p);
+  // Прев'ю перевіряємо на ВЛАСНОМУ наборі з усіма полями: сенс тесту —
+  // чи малюється картка, а не чи існує конкретний товар у каталозі.
+  // Раніше тест спирався на демо-товар id=15 і впав при заміні каталогу.
+  const p = {
+    id: 999, title: "Тестовий товар", brand: "Test Brand",
+    category: "Жіночі сумки", gender: "Жінкам",
+    price: 4299, oldPrice: 4799, badge: "SALE",
+    sizes: ["S","M","L"], material: "Шкіра", country: "Італія",
+    description: "Опис тестового товару для перевірки прев'ю в адмінці.",
+    variants: [
+      { color:"Білий", hex:"#ffffff", images:["a.webp"], sku:"T-1" },
+      { color:"Чорний", hex:"#000000", images:["b.webp"], sku:"T-2", sizes:["S"] },
+    ],
+  };
+  check("набір даних готовий", !!p.variants.length);
 
   const tpl = registered["products"];
   const tree = tpl.render.call({

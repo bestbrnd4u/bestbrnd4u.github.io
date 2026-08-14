@@ -1,0 +1,48 @@
+{
+  "title": "Жіноча сумочка JW PEI Mila Shoulder Bag",
+  "brand": "JW PEI",
+  "category": "Жіночі сумки",
+  "gender": "Жінкам",
+  "price": 4500,
+  "description": "JW PEI Mila — сумка на плече з м'якими лініями й короткою ручкою. Мінімалістичний дизайн без зайвого декору, який легко вписується в будь-який образ.",
+  "variants": [
+    {
+      "color": "Синій",
+      "hex": "#a084c4",
+      "images": [
+        "assets/images/products/uploads/jwp-ma080-1.webp",
+        "assets/images/products/uploads/jwp-ma080-2.webp",
+        "assets/images/products/uploads/jwp-ma080-3.webp",
+        "assets/images/products/uploads/jwp-ma080-4.webp"
+      ],
+      "sku": "JWP-MA080"
+    }
+  ],
+  "isNew": false,
+  "sku": "JWP-MA080",
+  "searchKeywords": [
+    "джей ві пей",
+    "jw pei",
+    "jwpei",
+    "сумка жіноча",
+    "кросбоді",
+    "сумка через плече",
+    "клатч",
+    "синій",
+    "pei",
+    "mila",
+    "shoulder",
+    "bag"
+  ],
+  "instagramBlock": "general",
+  "preOrder": false,
+  "images": [
+    "assets/images/products/uploads/jwp-ma080-1.webp",
+    "assets/images/products/uploads/jwp-ma080-2.webp",
+    "assets/images/products/uploads/jwp-ma080-3.webp",
+    "assets/images/products/uploads/jwp-ma080-4.webp"
+  ],
+  "slug": "jw-pei-zhinocha-sumochka-jw-pei-mila-shoulder-bag",
+  "id": 16,
+  "color": "Синій"
+}

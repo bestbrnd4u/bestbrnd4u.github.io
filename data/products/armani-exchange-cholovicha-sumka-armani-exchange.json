@@ -1,0 +1,46 @@
+{
+  "title": "Чоловіча сумка Armani Exchange",
+  "brand": "Armani Exchange",
+  "category": "Чоловічі сумки",
+  "gender": "Чоловікам",
+  "price": 6000,
+  "description": "Поясна сумка Armani Exchange із монограмним принтом по корпусу. Носиться на поясі або через плече. Компактна модель для прогулянок і подорожей.",
+  "variants": [
+    {
+      "color": "Чорний",
+      "hex": "#1f2223",
+      "images": [
+        "assets/images/products/uploads/rtladf952201-1.webp",
+        "assets/images/products/uploads/rtladf952201-2.webp",
+        "assets/images/products/uploads/rtladf952201-3.webp",
+        "assets/images/products/uploads/rtladf952201-4.webp"
+      ],
+      "sku": "RTLADF952201"
+    }
+  ],
+  "isNew": false,
+  "sku": "RTLADF952201",
+  "searchKeywords": [
+    "армані",
+    "armani exchange",
+    "ax",
+    "сумка чоловіча",
+    "кросбоді",
+    "барсетка",
+    "сумка через плече",
+    "чорний",
+    "armani",
+    "exchange"
+  ],
+  "instagramBlock": "general",
+  "preOrder": false,
+  "images": [
+    "assets/images/products/uploads/rtladf952201-1.webp",
+    "assets/images/products/uploads/rtladf952201-2.webp",
+    "assets/images/products/uploads/rtladf952201-3.webp",
+    "assets/images/products/uploads/rtladf952201-4.webp"
+  ],
+  "slug": "armani-exchange-cholovicha-sumka-armani-exchange",
+  "id": 3,
+  "color": "Чорний"
+}

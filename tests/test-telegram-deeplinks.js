@@ -2,7 +2,7 @@
 // відкривати бота одразу на потрібному товарі.
 const fs=require("fs"), path=require("path");
 const ROOT = require("path").join(__dirname, "..");
-const { findProductById } = require("./helpers/products");
+const { findProductById, pickProduct } = require("./helpers/products");
 
 let failures=0;
 const check=(n,c,e)=>{if(c)console.log("  ✓",n);else{console.log("  ✗",n,e!==undefined?"→ "+e:"");failures++;}};
@@ -56,12 +56,14 @@ console.log("\n[2] Абсолютні URL картинок (Telegram відно�
 
 console.log("\n[3] Картка товару на РЕАЛЬНИХ даних");
 {
-  const p15 = findProductById(15);
-  check("товар 15 знайдено", !!p15);
+  // Потрібен товар зі знижкою і розмірами — саме їх перевіряє картка.
+  // Прив'язка до демо-товару id=15 ламалась при заміні каталогу.
+  const p15 = pickProduct(p => p.oldPrice > p.price && p.sizes && p.sizes.length);
+  check("є товар зі знижкою і розмірами", !!p15, p15 && p15.title);
 
   const card = M.formatProductCard(p15, SITE);
 
-  check("бренд великими літерами", card.includes("NIKE"), card.split("\n")[0]);
+  check("бренд великими літерами", card.includes(p15.brand.toUpperCase()), card.split("\n")[0]);
   check("назва товару", card.includes(p15.title));
   check("ціна з грн", /грн/.test(card));
   check("стара ціна зачеркнута", card.includes("<s>"), card.match(/<s>[^<]*<\/s>/)?.[0]);
@@ -84,11 +86,11 @@ console.log("\n[4] Довгий опис підрізається, а не ла�
 
 console.log("\n[5] Кнопки під товаром ведуть куди треба");
 {
-  const p15 = findProductById(15);
+  const p15 = pickProduct(p => p.oldPrice > p.price && p.sizes && p.sizes.length);
   const kb = M.buildProductKeyboard(p15, SITE);
   const urls = kb.inline_keyboard.flat().map(b => b.url);
 
-  check("є кнопка на сторінку товару", urls[0].includes("/product?id=15"), urls[0]);
+  check("є кнопка на сторінку товару", urls[0].includes(`/product?id=${p15.id}`), urls[0]);
   check("колір переноситься в посилання (сторінка відкриється на тому ж кольорі)",
         urls[0].includes("color="), urls[0]);
   check("колір коректно закодований", !/[А-Яа-яІіЇїЄє]/.test(urls[0]), urls[0]);
