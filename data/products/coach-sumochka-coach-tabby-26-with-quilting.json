@@ -1,10 +1,15 @@
 {
-  "title": "Сумочка Coach Tabby 26 With Quilting",
-  "brand": "Coach",
-  "category": "Жіночі сумки",
   "gender": "Жінкам",
+  "oldPrice": 16250,
+  "color": "Світло-сірий",
+  "badge": "SALE",
+  "forcePublish": true,
+  "instagramReels": "https://www.instagram.com/p/Dbp7H2yuqnr/",
+  "brand": "Coach",
   "price": 12500,
-  "description": "Coach Tabby 26 у стьобаному виконанні. Об'ємний ромбовидний рельєф, застібка-турнікет C і ланцюжок зі шкіряною вставкою. Три відтінки — від світлого до темно-коричневого.",
+  "preOrder": false,
+  "slug": "coach-sumochka-coach-tabby-26-with-quilting",
+  "dimensions": "26 × 14 × 10 см",
   "variants": [
     {
       "color": "Світло-сірий",
@@ -38,10 +43,6 @@
       "sku": "cp150_b4mpl"
     }
   ],
-  "oldPrice": 16250,
-  "badge": "SALE",
-  "isNew": false,
-  "sku": "coach cp150 b4ha",
   "searchKeywords": [
     "коуч",
     "coach",
@@ -57,15 +58,17 @@
     "with",
     "quilting"
   ],
-  "instagramBlock": "general",
-  "preOrder": false,
+  "isNew": false,
+  "title": "Сумочка Coach Tabby 26 With Quilting",
   "images": [
     "assets/images/products/uploads/coach-cp150-b4ha-1.webp",
     "assets/images/products/uploads/coach-cp150-b4ha-2.webp",
     "assets/images/products/uploads/coach-cp150-b4ha-3.webp",
     "assets/images/products/uploads/coach-cp150-b4ha-4.webp"
   ],
-  "slug": "coach-sumochka-coach-tabby-26-with-quilting",
   "id": 10,
-  "color": "Світло-сірий"
+  "instagramBlock": "general",
+  "description": " Coach Tabby Pillow стильна сумочка, яка стане акцентом будь-якого образу \nМ’який силует, та культовий дизайн Coach роблять цю модель ідеальним вибором як на кожен день, так і для особливих випадків ",
+  "sku": "coach cp150 b4ha",
+  "category": "Жіночі сумки"
 }
