@@ -3,7 +3,7 @@
   "oldPrice": 16250,
   "color": "Світло-сірий",
   "badge": "SALE",
-  "forcePublish": true,
+  "forcePublish": false,
   "instagramReels": "https://www.instagram.com/p/Dbp7H2yuqnr/",
   "brand": "Coach",
   "price": 12500,
@@ -68,7 +68,7 @@
   ],
   "id": 10,
   "instagramBlock": "general",
-  "description": " Coach Tabby Pillow стильна сумочка, яка стане акцентом будь-якого образу \nМ’який силует, та культовий дизайн Coach роблять цю модель ідеальним вибором як на кожен день, так і для особливих випадків ",
+  "description": "Coach Tabby Pillow стильна сумочка, яка стане акцентом будь-якого образу \nМ’який силует, та культовий дизайн Coach роблять цю модель ідеальним вибором як на кожен день, так і для особливих випадків ",
   "sku": "coach cp150 b4ha",
   "category": "Жіночі сумки"
 }
