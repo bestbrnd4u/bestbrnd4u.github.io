@@ -803,57 +803,6 @@
     "color": "Темно-сірий"
   },
   {
-    "title": "Metropolis Mini",
-    "brand": "Furla",
-    "category": "Жіночі сумки",
-    "gender": "Жінкам",
-    "price": 10999,
-    "description": "Компактна сумка з італійської шкіри з металевим декором-пряжкою.",
-    "variants": [
-      {
-        "color": "Бежевий",
-        "hex": "#d9c7a1",
-        "images": [
-          "https://commons.wikimedia.org/wiki/Special:Redirect/file/Furla%2C%20pochette%20metropolis%2C%202016.jpg"
-        ]
-      },
-      {
-        "color": "Чорний",
-        "hex": "#1a1a1a",
-        "images": [
-          "https://commons.wikimedia.org/wiki/Special:Redirect/file/Furla%2C%20pochette%20metropolis%2C%202016.jpg"
-        ]
-      }
-    ],
-    "oldPrice": 11999,
-    "badge": "TOP",
-    "isNew": false,
-    "sizes": [
-      "XS",
-      "S"
-    ],
-    "material": "Натуральна шкіра",
-    "country": "Італія",
-    "sku": "FR-MP-4004",
-    "closure": "магніт із пряжкою",
-    "decor": "металева пряжка",
-    "dimensions": "20x16x8 см",
-    "strapInfo": "Один незнімний ремінь довжиною 110 см",
-    "compartments": "одне основне відділення",
-    "composition": "100% шкіра",
-    "searchKeywords": [
-      "клатч",
-      "міні сумка",
-      "вечірня сумка"
-    ],
-    "slug": "import-1786031983644-1",
-    "id": 12,
-    "color": "Бежевий",
-    "images": [
-      "https://commons.wikimedia.org/wiki/Special:Redirect/file/Furla%2C%20pochette%20metropolis%2C%202016.jpg"
-    ]
-  },
-  {
     "title": "Чоловічий годинник",
     "brand": "Invicta",
     "category": "Годинники",
