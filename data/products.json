@@ -737,58 +737,6 @@
     "color": "Коричневий"
   },
   {
-    "id": 8,
-    "slug": "bagvero-man-sling",
-    "brand": "BestBrnd4u Man",
-    "title": "City Sling Bag",
-    "category": "Чоловічі сумки",
-    "gender": "Чоловікам",
-    "isNew": false,
-    "price": 2799,
-    "oldPrice": 4199,
-    "rating": 4.5,
-    "reviews": 37,
-    "badge": "SALE",
-    "material": "Екошкіра",
-    "color": "Чорний",
-    "country": "Україна",
-    "description": "Компактна чоловіча сумка-слінг через плече для щоденних речей: телефон, гаманець, ключі. Регульований ремінь, мінімалістичний дизайн.",
-    "images": [
-      "https://images.pexels.com/photos/8276590/pexels-photo-8276590.jpeg?auto=compress&cs=tinysrgb&w=800"
-    ],
-    "variants": [
-      {
-        "color": "Чорний",
-        "hex": "#1a1a1a",
-        "images": [
-          "https://images.pexels.com/photos/8276590/pexels-photo-8276590.jpeg?auto=compress&cs=tinysrgb&w=800"
-        ]
-      },
-      {
-        "color": "Коричневий",
-        "hex": "#6b4423",
-        "images": [
-          "https://images.pexels.com/photos/1936848/pexels-photo-1936848.jpeg?auto=compress&cs=tinysrgb&w=800"
-        ]
-      }
-    ],
-    "sku": "BM-SL-8008",
-    "closure": "блискавка",
-    "decor": "логотип",
-    "dimensions": "24x18x9 см",
-    "strapInfo": "Один незнімний регульований ремінь довжиною 130 см",
-    "compartments": "одне основне відділення, одна зовнішня кишеня",
-    "composition": "100% екошкіра",
-    "sizes": [
-      "S"
-    ],
-    "searchKeywords": [
-      "слінг",
-      "сумка на груди",
-      "поясна сумка"
-    ]
-  },
-  {
     "title": "Чоловіча шкіряна сумка Racer Belt Bag In Signature Canvas",
     "brand": "Coach",
     "category": "Унісекс сумки",
@@ -832,60 +780,6 @@
     "slug": "coach-cholovicha-shkiriana-sumka-racer-belt-bag-in-signature",
     "id": 8,
     "color": "Чорний"
-  },
-  {
-    "compartments": "одне основне відділення, одна передня кишеня",
-    "gender": "Дітям",
-    "oldPrice": 2199,
-    "color": "Жовтий",
-    "badge": "SALE",
-    "forcePublish": true,
-    "decor": "яскравий принт",
-    "material": "Текстиль",
-    "brand": "BestBrnd4u Kids",
-    "price": 1499,
-    "composition": "100% поліестер",
-    "slug": "bagvero-kids-backpack",
-    "dimensions": "30x22x12 см",
-    "variants": [
-      {
-        "color": "Жовтий",
-        "hex": "#e8b923",
-        "images": [
-          "https://images.pexels.com/photos/7269547/pexels-photo-7269547.jpeg?auto=compress&cs=tinysrgb&w=800"
-        ]
-      },
-      {
-        "color": "М'ятний",
-        "hex": "#a8e6cf",
-        "images": [
-          "https://images.pexels.com/photos/8423383/pexels-photo-8423383.jpeg?auto=compress&cs=tinysrgb&w=800"
-        ]
-      }
-    ],
-    "strapInfo": "Регульовані м'які лямки, висота 30-40 см",
-    "sizes": [
-      "S"
-    ],
-    "searchKeywords": [
-      "шкільний рюкзак",
-      "ранець",
-      "портфель дитячий"
-    ],
-    "isNew": false,
-    "country": "Україна",
-    "title": "Mini School Backpack",
-    "images": [
-      "https://images.pexels.com/photos/7269547/pexels-photo-7269547.jpeg?auto=compress&cs=tinysrgb&w=800"
-    ],
-    "reviews": 29,
-    "id": 9,
-    "closure": "блискавка",
-    "instagramBlock": "general",
-    "description": "Легкий дитячий рюкзак для школи та прогулянок. М'які лямки, міцні блискавки та яскравий дизайн, який сподобається дитині.",
-    "sku": "BK-BP-9009",
-    "rating": 4.8,
-    "category": "Дитячі рюкзаки"
   },
   {
     "title": "Шкіряна сумочка Coach Tabby 26",
@@ -955,60 +849,6 @@
     "slug": "coach-shkiriana-sumochka-coach-tabby-26",
     "id": 9,
     "color": "Темно-сірий"
-  },
-  {
-    "compartments": "одне основне відділення",
-    "gender": "Дітям",
-    "oldPrice": 999,
-    "color": "Мультиколір",
-    "badge": "NEW",
-    "forcePublish": true,
-    "decor": "яскравий принт",
-    "instagramReels": "https://www.instagram.com/p/Dbp7H2yuqnr/",
-    "material": "Текстиль",
-    "brand": "BestBrnd4u Kids",
-    "price": 899,
-    "composition": "100% поліестер",
-    "slug": "bagvero-kids-bag",
-    "dimensions": "18x14x6 см",
-    "variants": [
-      {
-        "color": "Мультиколір",
-        "hex": "linear-gradient(90deg,#f87171,#fbbf24,#34d399,#60a5fa)",
-        "images": [
-          "https://images.pexels.com/photos/6110950/pexels-photo-6110950.jpeg?auto=compress&cs=tinysrgb&w=800"
-        ]
-      },
-      {
-        "color": "Синій",
-        "hex": "#2c4a7c",
-        "images": [
-          "https://images.pexels.com/photos/9327162/pexels-photo-9327162.jpeg?auto=compress&cs=tinysrgb&w=800"
-        ]
-      }
-    ],
-    "strapInfo": "Один незнімний ремінь довжиною 90 см",
-    "sizes": [
-      "XS"
-    ],
-    "searchKeywords": [
-      "дитяча сумочка",
-      "сумка з малюнком"
-    ],
-    "isNew": true,
-    "country": "Україна",
-    "title": "Kids Print Bag",
-    "images": [
-      "https://images.pexels.com/photos/6110950/pexels-photo-6110950.jpeg?auto=compress&cs=tinysrgb&w=800"
-    ],
-    "reviews": 18,
-    "id": 10,
-    "closure": "кнопка",
-    "instagramBlock": "reels",
-    "description": "Яскрава дитяча сумочка з веселим принтом — зручний розмір для книжок, іграшок та шкільних дрібничок.",
-    "sku": "BK-KB-1010",
-    "rating": 4.6,
-    "category": "Дитячі сумки"
   },
   {
     "title": "Сумочка Coach Tabby 26 With Quilting",
