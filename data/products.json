@@ -844,45 +844,6 @@
     "color": "Темно-синій"
   },
   {
-    "title": "Urban Backpack",
-    "brand": "Tommy Hilfiger",
-    "category": "Рюкзаки",
-    "gender": "Унісекс",
-    "price": 4599,
-    "description": "Місткий рюкзак для щоденного використання з відділенням для ноутбука.",
-    "variants": [
-      {
-        "color": "Чорний",
-        "hex": "#111111",
-        "images": [
-          "https://commons.wikimedia.org/wiki/Special:Redirect/file/Eastpak%20Sugarbush%20backpack%20black.jpg"
-        ]
-      }
-    ],
-    "isNew": true,
-    "material": "Поліестер",
-    "country": "В'єтнам",
-    "sku": "TH-UB-1102",
-    "closure": "блискавка",
-    "decor": "логотип",
-    "dimensions": "30x20x12 см",
-    "compartments": "одне відділення для ноутбука, дві бічні кишені",
-    "composition": "100% поліестер",
-    "searchKeywords": [
-      "рюкзак",
-      "для ноутбука"
-    ],
-    "preOrder": true,
-    "preOrderDays": "10–14 робочих днів",
-    "preOrderPrepayment": 50,
-    "slug": "import-1786031983644-2",
-    "id": 13,
-    "color": "Чорний",
-    "images": [
-      "https://commons.wikimedia.org/wiki/Special:Redirect/file/Eastpak%20Sugarbush%20backpack%20black.jpg"
-    ]
-  },
-  {
     "title": "Сумочка на плече Jw Pei TESSA",
     "brand": "JW PEI",
     "category": "Жіночі сумки",
