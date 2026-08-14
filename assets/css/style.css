@@ -1309,6 +1309,26 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
     transition:.45s;
 }
 
+/* Фото, яке за пропорціями помітно ширше за картку, показуємо
+   ПОВНІСТЮ, а не обрізаємо.
+   Картка вертикальна (4:5), а фото окулярів і годинників —
+   квадратні 800x800. При cover з них зрізало по 20% з боків, тобто
+   рівно дужки окулярів, і товар виглядав обрізаним. Клас ставить
+   ui.js, порівнявши справжні пропорції фото з пропорціями картки. */
+.product-image img.fit-contain{
+    object-fit:contain;
+    padding:6%;
+    background:#fff;
+}
+
+/* збільшення при наведенні лишаємо, але меншим — інакше товар
+   упирається в краї картки */
+@media (hover:hover) and (pointer:fine){
+    .product-card:hover .product-image img.fit-contain{
+        transform:scale(1.04);
+    }
+}
+
 @media (hover:hover) and (pointer:fine){
 .product-card:hover .product-image img{
     transform:scale(1.08);

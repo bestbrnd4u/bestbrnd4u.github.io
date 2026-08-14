@@ -517,6 +517,78 @@ function createProductCard(product) {
 
 
 // -------------------------
+// Підгонка фото під картку
+//
+// Картка товару вертикальна (4:5). Якщо фото помітно ширше за неї —
+// а фото окулярів і годинників квадратні 800x800 — заповнення по
+// ширині зрізає боки, і в окулярів зникають дужки.
+//
+// Тому порівнюємо СПРАВЖНІ пропорції фото з пропорціями картки: коли
+// фото ширше з відчутним запасом, показуємо його повністю. Рішення
+// за фактичним файлом, а не за категорією товару — тож працює і для
+// нових категорій, і для нетипових фото.
+// -------------------------
+
+(function initImageFit() {
+
+    const TOLERANCE = 1.08;   // 8% — щоб не смикати майже однакові пропорції
+
+    function fitImage(img) {
+
+        if (!img.naturalWidth || !img.naturalHeight) return;
+
+        const box = img.parentElement;
+
+        if (!box) return;
+
+        const boxW = box.clientWidth;
+        const boxH = box.clientHeight;
+
+        if (!boxW || !boxH) return;
+
+        const imageRatio = img.naturalWidth / img.naturalHeight;
+        const boxRatio = boxW / boxH;
+
+        img.classList.toggle("fit-contain", imageRatio > boxRatio * TOLERANCE);
+
+    }
+
+    function fitAll(root) {
+
+        (root || document).querySelectorAll(".product-image img").forEach(img => {
+
+            // вже завантажене (з кешу) — рахуємо одразу
+            if (img.complete) fitImage(img);
+
+        });
+
+    }
+
+    // Подія load не спливає, тому слухаємо у фазі перехоплення —
+    // інакше не побачимо завантаження зображень усередині карток.
+    document.addEventListener("load", event => {
+
+        const img = event.target;
+
+        if (img && img.tagName === "IMG" && img.closest(".product-image")) fitImage(img);
+
+    }, true);
+
+    // Картки перемальовуються при зміні фільтрів — переобчислюємо
+    new MutationObserver(() => fitAll()).observe(document.documentElement, {
+        childList: true,
+        subtree: true,
+    });
+
+    window.addEventListener("resize", () => fitAll());
+
+    document.addEventListener("DOMContentLoaded", () => fitAll());
+
+    fitAll();
+
+})();
+
+// -------------------------
 // Прокрутка розмірів і кольорів у картці товару
 //
 // Коли варіантів багато (розмірів — 36–46+XS–4XL, кольорів — 10+),

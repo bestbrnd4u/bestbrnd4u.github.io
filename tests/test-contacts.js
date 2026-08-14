@@ -103,6 +103,8 @@ console.log("\n[7] Назва магазину — BestBrnd4u");
     "assets/js/common.js": "ключ localStorage + пояснення",
     "tests/test-contacts.js": "сам тест",
     "tests/test-sidebar-collapse.js": "перевіряє той самий ключ localStorage",
+    "scripts/clean-old-products.js": "перелік СТАРИХ файлів демо-каталогу — їх треба назвати дослівно, щоб видалити",
+    "tests/test-image-fit.js": "перевіряє той самий скрипт прибирання",
   };
 
   // ЗГЕНЕРОВАНІ файли не перевіряємо: їх перезбирає GitHub Actions
