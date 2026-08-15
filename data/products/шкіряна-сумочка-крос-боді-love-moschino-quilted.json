@@ -1,0 +1,37 @@
+{
+  "gender": [
+    "Жінкам"
+  ],
+  "preOrderDays": "5–10 робочих днів",
+  "oldPrice": 9500,
+  "badge": "HOT",
+  "forcePublish": true,
+  "material": "100% натуральна теляча шкіра ",
+  "brand": " Love Moschino",
+  "price": 8000,
+  "preOrder": false,
+  "dimensions": "23 × 15 × 7 см",
+  "variants": [
+    {
+      "color": "Blush Beige",
+      "hex": "#f0ca4d",
+      "sku": "JC4118PP1FLT0",
+      "images": [
+        "/assets/images/products/uploads/8hybhuwa8-pieihdxmmy4qa25el9a4rw-3c4axbydv-smd.webp",
+        "/assets/images/products/uploads/txvdeftbnijzrfdwvf4win8rqlzsyr-8wmrxlu7dxtu-smd.webp",
+        "/assets/images/products/uploads/vgridejhnrc1qnilkwjvdn0bstqu39-ztwyqjz8eql-smd.webp",
+        "/assets/images/products/uploads/18674373_41344477_2048.webp"
+      ]
+    }
+  ],
+  "preOrderPrepayment": 50,
+  "sizes": null,
+  "isNew": true,
+  "title": "Шкіряна сумочка крос-боді Love Moschino quilted",
+  "reviews": 0,
+  "instagramBlock": "general",
+  "description": "Love Moschino Logo-plaque Quilted Cross-body Bag\nЕлегантна стьобана сумка Love Moschino у ніжному бежевому відтінку. Модель прикрашена фірмовою металевою пластиною з логотипом бренду, що додає образу впізнаваного акценту. Матеріал 100% натуральна теляча шкіра (calf leather)\nСумка має компактний, але практичний формат, основне відділення для необхідних речей та довгий ремінець для носіння через плече або кросбоді.",
+  "sku": "JC4118PP1FLT0",
+  "rating": 5,
+  "category": "Жіночі сумки"
+}
