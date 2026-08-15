@@ -12,8 +12,8 @@ const variants = products.fields.find(f => f.name === "variants");
 const sizes = variants.fields.find(f => f.name === "sizes");
 const out = JSON.stringify({
     variant_fields: variants.fields.map(f => f.name),
-    sizes_options_len: (sizes.options || []).length,
-    sizes_options_is_list: Array.isArray(sizes.options),
+    sizes_widget: sizes.widget,
+    sizes_has_options: "options" in sizes,
     sizes_required: sizes.required !== undefined ? sizes.required : true,
     preorder_required: (() => {
         const p = products.fields.find(f => f.name === "preOrder");
@@ -27,8 +27,13 @@ check("варіант кольору має рівно 6 полів (не 20+ в
       info.variant_fields.length === 6, JSON.stringify(info.variant_fields));
 check("порядок полів: color, hex, sku, sizes, images, video",
       info.variant_fields.join(",") === "color,hex,sku,sizes,images,video", info.variant_fields.join(","));
-check("options дійсно масив (а не рядок/об'єкт)", info.sizes_options_is_list === true);
-check("у options рівно 20 розмірів", info.sizes_options_len === 20, info.sizes_options_len);
+// Регресія навпаки: раніше тут стежили за закритим переліком із 20
+// розмірів. Тепер поле — власний віджет, який дозволяє і вибрати
+// наявний розмір, і вписати новий (ONESIZE, 39.5 тощо).
+check("розміри кольору — власний віджет, а не закритий select",
+      info.sizes_widget === "sizeTags", info.sizes_widget);
+check("закритого переліку більше немає", info.sizes_has_options === false);
+
 check("розміри кольору не обов'язкові", info.sizes_required === false, info.sizes_required);
 check("«Товар під замовлення» не обов'язковий (звідси й падала публікація)",
       info.preorder_required === false, info.preorder_required);
