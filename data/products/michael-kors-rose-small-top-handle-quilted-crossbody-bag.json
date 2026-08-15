@@ -3,10 +3,12 @@
     "Жінкам"
   ],
   "preOrderDays": "5–10 робочих днів",
+  "color": "Racing Green",
   "forcePublish": true,
   "brand": "Michael Kors",
   "price": 8000,
   "preOrder": false,
+  "slug": "michael-kors-rose-small-top-handle-quilted-crossbody-bag",
   "dimensions": " 18 см × 13 см × 7,5 см",
   "variants": [
     {
@@ -15,7 +17,7 @@
         "/assets/images/products/uploads/35f1gx0c5u-3-.webp",
         "/assets/images/products/uploads/d14f4ff9-1527-4de8-9c0e-b5bc28f0ce69.jpg"
       ],
-      "video": "/assets/images/products/uploads/35f1gx0c5u-2-.webp",
+      "video": "",
       "color": "Racing Green",
       "hex": "#0e9409",
       "sku": "35F0GX0C5T"
@@ -28,10 +30,10 @@
         "XS"
       ],
       "images": [
-        "/assets/images/products/uploads/35f1gx0c5u-1-navy.webp",
-        "/assets/images/products/uploads/michael-kors-rose-small-top-handle-crossbody-quilted-navy-angle-scaled.webp",
         "/assets/images/products/uploads/michael-kors-rose-small-top-handle-crossbody-quilted-navy-front-scaled.webp",
-        "/assets/images/products/uploads/2ed9179f-687b-4e08-8769-ddcff453b8a1.jpg"
+        "/assets/images/products/uploads/michael-kors-rose-small-top-handle-crossbody-quilted-navy-angle-scaled.webp",
+        "/assets/images/products/uploads/2ed9179f-687b-4e08-8769-ddcff453b8a1.jpg",
+        "/assets/images/products/uploads/35f1gx0c5u-1-navy.webp"
       ]
     },
     {
@@ -85,18 +87,16 @@
   ],
   "isNew": false,
   "title": "Michael Kors Rose Small Top Handle Quilted Crossbody Bag",
-  "reviews": 0,
-  "instagramBlock": "general",
-  "description": "Michael Kors Rose Small Top Handle Crossbody — стьобана сумка в насиченому відтінку Racing Green\nЕлегантна компактна сумка Michael Kors Rose поєднує жіночний дизайн і практичний формат. Стьобана фактура додає моделі виразності, а глибокий зелений відтінок Racing Green робить її стильним акцентом образу.\nКомпактна модель, яка легко доповнить як повсякденний, так і більш елегантний образ.\n",
-  "sku": "35F1GX0C5U",
-  "rating": 5,
-  "category": "Жіночі сумки",
-  "slug": "michael-kors-rose-small-top-handle-quilted-crossbody-bag",
-  "id": 28,
-  "color": "Racing Green",
   "images": [
     "/assets/images/products/uploads/35f1gx0c5u.webp",
     "/assets/images/products/uploads/35f1gx0c5u-3-.webp",
     "/assets/images/products/uploads/d14f4ff9-1527-4de8-9c0e-b5bc28f0ce69.jpg"
-  ]
+  ],
+  "reviews": 0,
+  "id": 28,
+  "instagramBlock": "general",
+  "description": "Michael Kors Rose Small Top Handle Crossbody — стьобана сумка в насиченому відтінку Racing Green\nЕлегантна компактна сумка Michael Kors Rose поєднує жіночний дизайн і практичний формат. Стьобана фактура додає моделі виразності, а глибокий зелений відтінок Racing Green робить її стильним акцентом образу.\nКомпактна модель, яка легко доповнить як повсякденний, так і більш елегантний образ.\n",
+  "sku": "35F1GX0C5U",
+  "rating": 5,
+  "category": "Жіночі сумки"
 }
