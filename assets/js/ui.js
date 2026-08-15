@@ -417,6 +417,8 @@ function createProductCard(product) {
                             <img
                                 class="product-main-image photo-slide"
                                 src="${img}"
+                                data-variant-src="${img}"
+                                data-variant-sizes="(max-width: 768px) 50vw, 300px"
                                 alt="${escapeHtml(product.title)}"
                                 loading="lazy"
                                 onerror="this.src='assets/images/no-image.png'">
@@ -517,76 +519,78 @@ function createProductCard(product) {
 
 
 // -------------------------
-// Підгонка фото під картку
+// Кілька розмірів одного фото
 //
-// Картка товару вертикальна (4:5). Якщо фото помітно ширше за неї —
-// а фото окулярів і годинників квадратні 800x800 — заповнення по
-// ширині зрізає боки, і в окулярів зникають дужки.
+// Кожне фото товару лежить у трьох ширинах: 1200 (сторінка товару й
+// зум), 600 (картка каталогу на retina) і 300 (мініатюри, мобільна
+// сітка). Браузер сам обирає потрібний за srcset — каталог більше не
+// тягне повнорозмірні знімки.
 //
-// Тому порівнюємо СПРАВЖНІ пропорції фото з пропорціями картки: коли
-// фото ширше з відчутним запасом, показуємо його повністю. Рішення
-// за фактичним файлом, а не за категорією товару — тож працює і для
-// нових категорій, і для нетипових фото.
+// Перелік фото, для яких згенеровано розміри, лежить у
+// data/image-variants.json. Якщо фото додали пізніше через адмінку і
+// його там немає — srcset просто не додається, показується оригінал.
+// Так нове фото ніколи не перетвориться на «биту» картинку.
 // -------------------------
 
-(function initImageFit() {
+let imageVariants = null;
 
-    const TOLERANCE = 1.08;   // 8% — щоб не смикати майже однакові пропорції
+function loadImageVariants() {
 
-    function fitImage(img) {
+    if (imageVariants) return imageVariants;
 
-        if (!img.naturalWidth || !img.naturalHeight) return;
+    imageVariants = fetch("data/image-variants.json")
+        .then(r => r.ok ? r.json() : [])
+        .then(list => new Set(Array.isArray(list) ? list : []))
+        .catch(() => new Set());
 
-        const box = img.parentElement;
+    return imageVariants;
 
-        if (!box) return;
+}
 
-        const boxW = box.clientWidth;
-        const boxH = box.clientHeight;
+function buildSrcSet(src) {
 
-        if (!boxW || !boxH) return;
+    const name = String(src || "").split("/").pop();
 
-        const imageRatio = img.naturalWidth / img.naturalHeight;
-        const boxRatio = boxW / boxH;
+    if (!name.endsWith(".webp")) return null;
 
-        img.classList.toggle("fit-contain", imageRatio > boxRatio * TOLERANCE);
+    const base = src.slice(0, -".webp".length);
 
-    }
+    return `${base}-300.webp 300w, ${base}-600.webp 600w, ${src} 1200w`;
 
-    function fitAll(root) {
+}
 
-        (root || document).querySelectorAll(".product-image img").forEach(img => {
+// Проставляємо srcset уже після вставки в DOM: список фото
+// підвантажується асинхронно, а картки малюються одразу.
+async function applyImageVariants(root) {
 
-            // вже завантажене (з кешу) — рахуємо одразу
-            if (img.complete) fitImage(img);
+    const known = await loadImageVariants();
 
-        });
+    if (!known.size) return;
 
-    }
+    (root || document).querySelectorAll("img[data-variant-src]").forEach(img => {
 
-    // Подія load не спливає, тому слухаємо у фазі перехоплення —
-    // інакше не побачимо завантаження зображень усередині карток.
-    document.addEventListener("load", event => {
+        const src = img.dataset.variantSrc;
 
-        const img = event.target;
+        if (!known.has(src.split("/").pop())) return;
 
-        if (img && img.tagName === "IMG" && img.closest(".product-image")) fitImage(img);
+        const srcset = buildSrcSet(src);
 
-    }, true);
+        if (!srcset) return;
 
-    // Картки перемальовуються при зміні фільтрів — переобчислюємо
-    new MutationObserver(() => fitAll()).observe(document.documentElement, {
-        childList: true,
-        subtree: true,
+        img.srcset = srcset;
+        img.sizes = img.dataset.variantSizes || "(max-width: 768px) 50vw, 300px";
+
+        delete img.dataset.variantSrc;
+
     });
 
-    window.addEventListener("resize", () => fitAll());
+}
 
-    document.addEventListener("DOMContentLoaded", () => fitAll());
+document.addEventListener("DOMContentLoaded", () => applyImageVariants());
 
-    fitAll();
-
-})();
+new MutationObserver(() => applyImageVariants()).observe(document.documentElement, {
+    childList: true, subtree: true,
+});
 
 // -------------------------
 // Прокрутка розмірів і кольорів у картці товару

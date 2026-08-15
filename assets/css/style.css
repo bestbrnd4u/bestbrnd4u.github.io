@@ -1309,25 +1309,7 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
     transition:.45s;
 }
 
-/* Фото, яке за пропорціями помітно ширше за картку, показуємо
-   ПОВНІСТЮ, а не обрізаємо.
-   Картка вертикальна (4:5), а фото окулярів і годинників —
-   квадратні 800x800. При cover з них зрізало по 20% з боків, тобто
-   рівно дужки окулярів, і товар виглядав обрізаним. Клас ставить
-   ui.js, порівнявши справжні пропорції фото з пропорціями картки. */
-.product-image img.fit-contain{
-    object-fit:contain;
-    padding:6%;
-    background:#fff;
-}
 
-/* збільшення при наведенні лишаємо, але меншим — інакше товар
-   упирається в краї картки */
-@media (hover:hover) and (pointer:fine){
-    .product-card:hover .product-image img.fit-contain{
-        transform:scale(1.04);
-    }
-}
 
 @media (hover:hover) and (pointer:fine){
 .product-card:hover .product-image img{
@@ -9545,6 +9527,72 @@ body.mobile-filters-open .scroll-top{
         width:auto;
         max-width:260px;
         margin-left:auto;
+    }
+
+}
+
+
+/* -------------------------
+   Сторінки каталогу
+   ------------------------- */
+
+.pagination{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:6px;
+    margin:34px 0 8px;
+}
+
+.pagination[hidden]{ display:none; }
+
+.pagination-page,
+.pagination-arrow{
+    min-width:40px;
+    height:40px;
+    padding:0 12px;
+    border:1.5px solid var(--gray200);
+    border-radius:10px;
+    background:#fff;
+    color:var(--gray700);
+    font:600 14px/1 Inter, -apple-system, sans-serif;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.pagination-page:hover:not(.active),
+.pagination-arrow:hover:not(:disabled){
+    border-color:var(--secondary);
+    color:var(--secondary);
+}
+
+.pagination-page.active{
+    background:var(--secondary);
+    border-color:var(--secondary);
+    color:#fff;
+    cursor:default;
+}
+
+.pagination-arrow:disabled{
+    opacity:.4;
+    cursor:default;
+}
+
+.pagination-gap{
+    padding:0 4px;
+    color:var(--gray300);
+    user-select:none;
+}
+
+@media(max-width:768px){
+
+    .pagination-page,
+    .pagination-arrow{
+        min-width:36px;
+        height:36px;
+        padding:0 9px;
+        font-size:13px;
     }
 
 }

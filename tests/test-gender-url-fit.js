@@ -75,32 +75,28 @@ console.log("\n[2] Мультивибір статі");
   check("у кожного наявного товару стать читається", bad.length === 0, bad.slice(0,3).join(", "));
 }
 
-console.log("\n[3] Товар заповнює кадр");
+console.log("\n[3] Фото нормалізовані під єдиний холст");
 {
+  // Раніше тут вимірювалась частка кадру. Після нормалізації товар
+  // ВПИСУЄТЬСЯ в холст 4:5 із однаковим полем, тож частка кадру
+  // залежить від форми товару (окуляри широкі — займають менше
+  // висоти) і сама по собі вже нічого не каже.
+  //
+  // Що справді важливо — однакові пропорції: тоді жоден контейнер
+  // не ріже фото. Це перевіряє test-images-pagination.js.
   const { execSync } = require("child_process");
   const out = execSync(`python3 -c "
-from PIL import Image, ImageChops
-import os
+from PIL import Image
+import os, re
 DIR='${path.join(ROOT,'assets/images/products/uploads')}'
-small=0; total=0
-for f in sorted(os.listdir(DIR)):
-    if not f.endswith('.webp'): continue
-    im=Image.open(os.path.join(DIR,f)).convert('RGB'); W,H=im.size
-    corners=[im.getpixel(p) for p in [(0,0),(W-1,0),(0,H-1),(W-1,H-1)]]
-    if max(max(c)-min(c) for c in corners)>40: continue
-    avg=tuple(sum(c[i] for c in corners)//4 for i in range(3))
-    diff=ImageChops.difference(im,Image.new('RGB',im.size,avg)).convert('L').point(lambda v:255 if v>18 else 0)
-    b=diff.getbbox()
-    if not b: continue
-    total+=1
-    if (b[2]-b[0])*(b[3]-b[1]) < W*H*0.35: small+=1
-print(small, total)
+base=[f for f in os.listdir(DIR) if f.endswith('.webp') and not re.search(r'-(600|300)\\.webp$',f)]
+rs={round(Image.open(os.path.join(DIR,f)).size[0]/Image.open(os.path.join(DIR,f)).size[1],3) for f in base}
+print(len(base), len(rs), sorted(rs)[0])
 "`).toString().trim().split(" ");
 
-  const [small, total] = out.map(Number);
-  check(`товар займає менше 35% кадру лише в поодиноких фото (${small} з ${total})`,
-        small <= 12, `${small} з ${total}`);
-  check("фото перевірено", total > 80, total);
+  check("фото знайдено", Number(out[0]) > 80, out[0]);
+  check("усі в одних пропорціях", Number(out[1]) === 1, out[1] + " різних");
+  check("це 4:5", Number(out[2]) === 0.8, out[2]);
 }
 
 console.log(failures===0?"\n✅ Усі перевірки пройдено":`\n❌ Провалено: ${failures}`);

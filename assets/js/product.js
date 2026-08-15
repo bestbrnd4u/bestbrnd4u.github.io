@@ -163,6 +163,8 @@ function buildThumbsMarkup(images, video, altText) {
         <div class="thumb ${index === 0 ? "active" : ""}">
             <img
                 src="${img}"
+                data-variant-src="${img}"
+                data-variant-sizes="100px"
                 alt="${altText}"
                 onerror="this.onerror=null;this.src='assets/images/no-image.png'">
         </div>
@@ -206,7 +208,7 @@ function buildThumbsMarkup(images, video, altText) {
 function buildTrackMarkup(images, video, altText) {
 
     const imageSlides = images.map(img => `
-        <img class="gallery-slide" src="${img}" alt="${altText}" draggable="false" onerror="this.onerror=null;this.src='assets/images/no-image.png'">
+        <img class="gallery-slide" src="${img}" data-variant-src="${img}" data-variant-sizes="(max-width: 900px) 100vw, 600px" alt="${altText}" draggable="false" onerror="this.onerror=null;this.src='assets/images/no-image.png'">
     `).join("");
 
     const media = parseVideoEmbed(video);

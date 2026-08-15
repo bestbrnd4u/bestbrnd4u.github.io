@@ -104,6 +104,11 @@ function scrollToFirstProduct() {
 // одразу підкручуємо сторінку до результатів
 function applyFilterChange() {
 
+    // Будь-яка зміна фільтра повертає на першу сторінку: інакше
+    // користувач, стоячи на 3-й сторінці, звузив би вибірку до двох
+    // товарів і побачив порожнечу замість результату.
+    currentPage = 1;
+
     render();
 
     // у мобільній шторці "Всі фільтри" скрол не потрібен — там
@@ -360,6 +365,13 @@ function readUrlState() {
 }
 
 async function initCatalog() {
+
+    // сторінка з адреси — щоб надіслане посилання відкривалось там,
+    // де його скопіювали, і «Назад» повертав на ту саму сторінку
+    const pageParam = Number(new URLSearchParams(location.search).get("page"));
+
+    if (Number.isFinite(pageParam) && pageParam > 1) currentPage = pageParam;
+
 
     readUrlState();
 
@@ -2149,6 +2161,123 @@ function refreshFacets() {
 
 }
 
+// -------------------------
+// Посторінковий вивід
+//
+// Зі зростанням каталогу вивід усіх товарів одразу означає сотні
+// карток і фото в одному документі — сторінка стає важкою навіть
+// при легких зображеннях.
+//
+// Номер сторінки живе в адресі (?page=2), тож посилання можна
+// надіслати або зберегти, а кнопка «Назад» повертає на ту саму
+// сторінку, а не на першу.
+// -------------------------
+
+const PER_PAGE = 24;
+
+let currentPage = 1;
+
+const paginationEl = document.getElementById("pagination");
+
+function totalPages(count) {
+    return Math.max(1, Math.ceil(count / PER_PAGE));
+}
+
+function clampPage(count) {
+    // після зміни фільтрів сторінки може вже не існувати
+    currentPage = Math.min(Math.max(1, currentPage), totalPages(count));
+    return currentPage;
+}
+
+function syncPageToUrl() {
+
+    try {
+
+        const url = new URL(window.location.href);
+
+        if (currentPage > 1) url.searchParams.set("page", currentPage);
+        else url.searchParams.delete("page");
+
+        window.history.replaceState(null, "", url);
+
+    } catch (error) {
+
+        // адресний рядок — не критично
+
+    }
+
+}
+
+// Номери з трьома крапками: 1 … 4 5 6 … 12
+function pageNumbers(total, current) {
+
+    if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+
+    const out = new Set([1, total, current, current - 1, current + 1]);
+
+    if (current <= 3) [2, 3, 4].forEach(n => out.add(n));
+    if (current >= total - 2) [total - 1, total - 2, total - 3].forEach(n => out.add(n));
+
+    const pages = [...out].filter(n => n >= 1 && n <= total).sort((a, b) => a - b);
+    const result = [];
+
+    pages.forEach((n, i) => {
+        if (i && n - pages[i - 1] > 1) result.push("…");
+        result.push(n);
+    });
+
+    return result;
+
+}
+
+function renderPagination(count) {
+
+    if (!paginationEl) return;
+
+    const total = totalPages(count);
+
+    // одна сторінка — ховаємо блок, щоб не займав місце дарма
+    paginationEl.hidden = total <= 1;
+
+    if (total <= 1) { paginationEl.innerHTML = ""; return; }
+
+    const buttons = pageNumbers(total, currentPage).map(n =>
+        n === "…"
+            ? `<span class="pagination-gap">…</span>`
+            : `<button type="button" class="pagination-page${n === currentPage ? " active" : ""}"
+                       data-page="${n}"${n === currentPage ? ' aria-current="page"' : ""}>${n}</button>`
+    ).join("");
+
+    paginationEl.innerHTML = `
+        <button type="button" class="pagination-arrow" data-page="${currentPage - 1}"
+                ${currentPage === 1 ? "disabled" : ""} aria-label="Попередня сторінка">‹</button>
+        ${buttons}
+        <button type="button" class="pagination-arrow" data-page="${currentPage + 1}"
+                ${currentPage === total ? "disabled" : ""} aria-label="Наступна сторінка">›</button>
+    `;
+
+}
+
+paginationEl?.addEventListener("click", event => {
+
+    const btn = event.target.closest("[data-page]");
+
+    if (!btn || btn.disabled) return;
+
+    currentPage = Number(btn.dataset.page);
+
+    render();
+
+    // Підіймаємо до початку списку, а не до самого верху сторінки:
+    // інакше після переходу користувач бачить шапку й фільтри, а не
+    // товари, заради яких натискав.
+    const top = grid.getBoundingClientRect().top + window.scrollY
+        - ((document.querySelector("header")?.offsetHeight || 0) + 12);
+
+    window.scrollTo({ top: Math.max(top, 0), behavior: "smooth" });
+
+});
+
 function render() {
 
     // межі повзунка ціни залежать від завантажених товарів —
@@ -2158,9 +2287,17 @@ function render() {
 
     const list = filterProducts();
 
+    clampPage(list.length);
+
+    const from = (currentPage - 1) * PER_PAGE;
+
     grid.innerHTML = list
+        .slice(from, from + PER_PAGE)
         .map(product => createProductCard(product))
         .join("");
+
+    renderPagination(list.length);
+    syncPageToUrl();
 
     initProductCarousels(grid);
 
