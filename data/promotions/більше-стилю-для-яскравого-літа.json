@@ -1,16 +1,16 @@
 {
-  "badge": "-20%",
+  "badge": "",
   "products": [
     10,
     5
   ],
   "discountPercent": 50,
   "active": true,
-  "text": "Guess, Michael Kors, Calvin Klein, Tommy Hilfiger, Furla та інші бренди зі знижками до -20%",
+  "text": "Сумочки з дуже приємними знижками",
   "order": 1,
-  "title": "Більше стилю для яскравого літа",
+  "title": "Обери сумочку для себе",
   "link": "catalog?section=sale",
-  "image": "/assets/images/products/uploads/485d0e230d97266f0bf4e4744df2.webp",
+  "image": "/assets/images/products/uploads/ksxmpzwgh-gycmdt7tj5e3r0pkerhv6rymi5h1hecy3p_a0n-djl5bgem05kgabi0abxgnus_9glrgsenbxupp51i_p-ezuxjjkwg5t6c4jd9fh7si_yk-qieee_grao7hsnghqgjcozr0aqmifpg6itmnna1qnhxebmaskfhpknmj2fgb7i9gvsacyqrdox.jpg",
   "displayType": "hero_slider",
   "buttonText": "Дивитись усі товари"
 }
