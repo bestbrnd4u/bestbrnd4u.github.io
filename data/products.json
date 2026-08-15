@@ -1373,5 +1373,107 @@
     "slug": "prada-sontsezakhysni-okuliary-prada-20ws-1ab5s0-dark-grey",
     "id": 27,
     "color": "Темно-сірий"
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "5–10 робочих днів",
+    "color": "Racing Green",
+    "forcePublish": true,
+    "brand": "Michael Kors",
+    "price": 8000,
+    "preOrder": false,
+    "slug": "michael-kors-rose-small-top-handle-quilted-crossbody-bag",
+    "dimensions": " 18 см × 13 см × 7,5 см",
+    "variants": [
+      {
+        "images": [
+          "/assets/images/products/uploads/35f1gx0c5u.webp",
+          "/assets/images/products/uploads/35f1gx0c5u-3-.webp",
+          "/assets/images/products/uploads/d14f4ff9-1527-4de8-9c0e-b5bc28f0ce69.jpg"
+        ],
+        "video": "",
+        "color": "Racing Green",
+        "hex": "#0e9409",
+        "sku": "35F0GX0C5T"
+      },
+      {
+        "color": "Navy",
+        "sku": "35F1GX0C5U",
+        "hex": "#0e5fbc",
+        "sizes": [
+          "XS"
+        ],
+        "images": [
+          "/assets/images/products/uploads/michael-kors-rose-small-top-handle-crossbody-quilted-navy-front-scaled.webp",
+          "/assets/images/products/uploads/michael-kors-rose-small-top-handle-crossbody-quilted-navy-angle-scaled.webp",
+          "/assets/images/products/uploads/2ed9179f-687b-4e08-8769-ddcff453b8a1.jpg",
+          "/assets/images/products/uploads/35f1gx0c5u-1-navy.webp"
+        ]
+      },
+      {
+        "color": "Pearl Grey",
+        "hex": "#c1bfbf",
+        "sku": "35F0SX0C5T",
+        "images": [
+          "/assets/images/products/uploads/000001_1644393747.webp"
+        ]
+      },
+      {
+        "color": "Black",
+        "hex": "#0a0000",
+        "sku": "35F1GX0C5U",
+        "images": [
+          "/assets/images/products/uploads/35f1gx0c5u-1-.webp",
+          "/assets/images/products/uploads/35f1gx0c5u-2-.webp",
+          "/assets/images/products/uploads/c9149295-ab22-4007-afc5-eedc1ba4ff80.jpg"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 50,
+    "sizes": [
+      "XS"
+    ],
+    "searchKeywords": [
+      "сумка",
+      "жіноча сумка",
+      "маленька сумка",
+      "міні сумка",
+      "сумка через плече",
+      "кросбоді",
+      "крос-боді",
+      "сумка кросбоді",
+      "сумка з ручкою",
+      "сумка на плече",
+      "стьобана сумка",
+      "стегана сумка",
+      "зелена сумка",
+      "темно-зелена сумка",
+      "сумка Michael Kors",
+      "Michael Kors",
+      "MK",
+      "Rose",
+      "Michael Kors Rose",
+      "Rose Small",
+      "Rose Small Crossbody",
+      "Rose Small Top Handle",
+      "quilted bag",
+      "crossbody bag"
+    ],
+    "isNew": false,
+    "title": "Michael Kors Rose Small Top Handle Quilted Crossbody Bag",
+    "images": [
+      "/assets/images/products/uploads/35f1gx0c5u.webp",
+      "/assets/images/products/uploads/35f1gx0c5u-3-.webp",
+      "/assets/images/products/uploads/d14f4ff9-1527-4de8-9c0e-b5bc28f0ce69.jpg"
+    ],
+    "reviews": 0,
+    "id": 28,
+    "instagramBlock": "general",
+    "description": "Michael Kors Rose Small Top Handle Crossbody — стьобана сумка в насиченому відтінку Racing Green\nЕлегантна компактна сумка Michael Kors Rose поєднує жіночний дизайн і практичний формат. Стьобана фактура додає моделі виразності, а глибокий зелений відтінок Racing Green робить її стильним акцентом образу.\nКомпактна модель, яка легко доповнить як повсякденний, так і більш елегантний образ.\n",
+    "sku": "35F1GX0C5U",
+    "rating": 5,
+    "category": "Жіночі сумки"
   }
 ]
