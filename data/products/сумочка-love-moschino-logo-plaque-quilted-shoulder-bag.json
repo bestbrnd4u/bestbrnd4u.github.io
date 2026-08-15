@@ -51,5 +51,14 @@
   "instagramBlock": "general",
   "description": "Стильна стьобана сумка Love Moschino у класичному чорному кольорі. Модель доповнена фірмовим логотипом Love Moschino та має елегантний компактний дизайн.\nСумка оснащена зручним плечовим ремінцем, що дозволяє носити її через плече або кросбоді. Компактний розмір робить модель чудовим варіантом для повсякденних образів, коли все необхідне має бути під рукою.",
   "rating": 5,
-  "category": "Жіночі сумки"
+  "category": "Жіночі сумки",
+  "slug": "сумочка-love-moschino-logo-plaque-quilted-shoulder-bag",
+  "id": 30,
+  "color": "Nero",
+  "images": [
+    "/assets/images/products/uploads/800070279777-1.jpg",
+    "/assets/images/products/uploads/800070279777-3.jpg",
+    "/assets/images/products/uploads/800070279777-4.jpg",
+    "/assets/images/products/uploads/torbica-love-moschino-jc4116pp1flt0000-nero.webp"
+  ]
 }
