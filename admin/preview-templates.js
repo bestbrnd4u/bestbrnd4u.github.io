@@ -42,6 +42,114 @@
 
     };
 
+    // -------------------------
+    // Картинка, яка вміє дочекатись файлу
+    //
+    // getAsset() віддає вже збережені фото ОДРАЗУ, а щойно завантажені —
+    // ні: для них повертається обʼєкт, який отримує адресу згодом
+    // (файл спершу треба прочитати в памʼяті браузера). Прев'ю ж
+    // малювалось один раз і більше не перемальовувалось — тому нове
+    // фото лишалось «битим», хоча старі показувались нормально.
+    //
+    // Цей компонент запитує адресу, чекає на неї й перемальовує себе,
+    // коли вона зʼявиться. Плюс стежить за зміною значення: замінили
+    // фото — запитує заново.
+    // -------------------------
+
+    var AssetImage = createClass({
+
+        getInitialState: function () {
+            return { url: "", failed: false };
+        },
+
+        componentDidMount: function () {
+            this.resolve();
+        },
+
+        componentDidUpdate: function (prevProps) {
+
+            if (prevProps.path === this.props.path) return;
+
+            // замінили фото — пробуємо наново, з чистого аркуша
+            this.retried = false;
+            this.setState({ failed: false });
+            this.resolve();
+
+        },
+
+        componentWillUnmount: function () {
+            this.gone = true;
+        },
+
+        resolve: function () {
+
+            var self = this;
+            var path = this.props.path;
+
+            if (!path) { this.setState({ url: "" }); return; }
+
+            var asset;
+
+            try {
+                asset = this.props.getAsset(path);
+            } catch (error) {
+                this.setState({ url: "", failed: true });
+                return;
+            }
+
+            // Decap може повернути або готовий обʼєкт, або обіцянку —
+            // приймаємо обидва варіанти
+            if (asset && typeof asset.then === "function") {
+
+                asset.then(function (resolved) {
+                    if (!self.gone) self.setState({ url: String(resolved || "") });
+                }).catch(function () {
+                    if (!self.gone) self.setState({ url: "", failed: true });
+                });
+
+                return;
+
+            }
+
+            var url = asset ? String(asset) : "";
+
+            // Порожній рядок означає, що файл ще читається. Пробуємо
+            // ще раз за мить — інакше довелося б перемикати вкладку,
+            // щоб побачити щойно завантажене фото.
+            if (!url && !this.retried) {
+
+                this.retried = true;
+
+                setTimeout(function () { if (!self.gone) self.resolve(); }, 250);
+
+            }
+
+            this.setState({ url: url });
+
+        },
+
+        render: function () {
+
+            if (!this.state.url) {
+
+                var text = !this.props.path ? "фото не завантажено"
+                    : this.state.failed ? "не вдалося показати фото"
+                    : "фото завантажується…";
+
+                return h("div", { className: "cms-preview-nophoto" }, text);
+
+            }
+
+            return h("img", {
+                src: this.state.url,
+                className: this.props.className,
+                alt: "",
+            });
+
+        },
+
+    });
+
     function esc(value) {
         return value === undefined || value === null ? "" : String(value);
     }
@@ -97,7 +205,6 @@
             var first = variantList[0] || {};
 
             var images = first.images || [];
-            var cover = images[0] ? getAsset(images[0]).toString() : "";
 
             var price = e.get("price");
             var oldPrice = e.get("oldPrice");
@@ -122,9 +229,11 @@
                         e.get("preOrder") ? h("div", { className: "badge badge-preorder" }, "📦") : null
                     ),
 
-                    cover
-                        ? h("img", { src: cover, alt: "", className: "cms-preview-cover" })
-                        : h("div", { className: "cms-preview-nophoto" }, "фото не завантажено")
+                    h(AssetImage, {
+                        path: images[0],
+                        getAsset: getAsset,
+                        className: "cms-preview-cover",
+                    })
                 ),
 
                 h("div", { className: "product-info" },
@@ -254,17 +363,18 @@
             var e = this.props.entry.get("data");
             var getAsset = this.props.getAsset;
 
-            var teaser = e.get("image") ? getAsset(e.get("image")).toString() : "";
-            var pageImg = e.get("promoPageImage") ? getAsset(e.get("promoPageImage")).toString() : "";
+            var teaser = e.get("image");
+            var pageImg = e.get("promoPageImage");
 
             var products = e.get("products");
             var productList = products && products.toJS ? products.toJS() : [];
 
             // банер сторінки акції — той самий вигляд, що на promo.html
-            var banner = h("div", { className: "cms-preview-promo-banner",
-                    style: pageImg || teaser
-                        ? { backgroundImage: "linear-gradient(rgba(17,24,39,.55), rgba(17,24,39,.55)), url(" + (pageImg || teaser) + ")" }
-                        : {} },
+            // Банер малюємо картинкою під текстом, а не фоном: фон не
+            // вміє дочекатись щойно завантаженого файлу, а AssetImage вміє.
+            var banner = h("div", { className: "cms-preview-promo-banner" },
+                h("div", { className: "cms-preview-promo-bg" },
+                    h(AssetImage, { path: pageImg || teaser, getAsset: getAsset })),
                 e.get("badge") ? h("span", { className: "cms-preview-promo-badge" }, e.get("badge")) : null,
                 h("h2", { className: "cms-preview-promo-title" }, esc(e.get("title"))),
                 e.get("text") ? h("p", { className: "cms-preview-promo-text" }, e.get("text")) : null,
@@ -281,7 +391,8 @@
                 h("div", { className: "cms-preview-stage" }, banner),
 
                 section("Прев'ю на головній", teaser
-                    ? h("img", { src: teaser, className: "cms-preview-teaser", alt: "" }) : null),
+                    ? h(AssetImage, { path: teaser, getAsset: getAsset, className: "cms-preview-teaser" })
+                    : null),
 
                 section("Налаштування", detailsList([
                     ["Показувати на сайті", e.get("active") === false ? "ні" : "так"],
@@ -310,16 +421,18 @@
             var e = this.props.entry.get("data");
             var getAsset = this.props.getAsset;
 
-            var img = e.get("image") ? getAsset(e.get("image")).toString() : "";
+            var img = e.get("image");
 
             var products = e.get("products");
             var productList = products && products.toJS ? products.toJS() : [];
 
             var block = h("div", { className: "cms-preview-collection" },
 
-                img
-                    ? h("img", { src: img, className: "cms-preview-collection-img", alt: "" })
-                    : h("div", { className: "cms-preview-nophoto" }, "фото не завантажено"),
+                h(AssetImage, {
+                    path: img,
+                    getAsset: getAsset,
+                    className: "cms-preview-collection-img",
+                }),
 
                 h("div", { className: "cms-preview-collection-body" },
                     e.get("eyebrow") ? h("span", { className: "cms-preview-eyebrow" }, e.get("eyebrow")) : null,
@@ -359,7 +472,7 @@
         render: function () {
 
             var e = this.props.entry.get("data");
-            var img = e.get("image") ? this.props.getAsset(e.get("image")).toString() : "";
+            var img = e.get("image");
 
             return h("div", { className: "cms-preview" },
 
@@ -368,8 +481,7 @@
 
                 h("div", { className: "cms-preview-stage" },
                     h("div", { className: "cms-preview-popup" },
-                        img ? h("img", { src: img, alt: "" })
-                            : h("div", { className: "cms-preview-nophoto" }, "фото не завантажено")
+                        h(AssetImage, { path: img, getAsset: this.props.getAsset })
                     )
                 ),
 

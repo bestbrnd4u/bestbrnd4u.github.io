@@ -15,122 +15,124 @@
     <script>
     (function () {
 
-        // Свої посилання в адмінці: масовий імпорт і доступи для колег.
+        // Меню в шапці адмінки: масовий імпорт, доступи для колег і вихід.
         //
-        // Місце — у ЛІВОМУ МЕНЮ, під списком розділів.
-        // Раніше вони висіли фіксовано в правому нижньому куті й
-        // перекривали робочу область на сторінках редагування товару.
-        // У меню для них є вільне місце, а в редакторі меню зникає —
-        // отже, кнопки самі не показуються там, де мішали.
+        // Раніше два посилання висіли окремими кнопками — спершу в
+        // правому нижньому куті (перекривали редактор), потім у лівому
+        // меню (зникали на сторінці редагування товару). Місце в шапці
+        // не залежить від того, на якій сторінці адмінки ви зараз.
         //
-        // Якщо меню знайти не вдалось (Decap міняв розмітку), лишається
-        // запасний варіант — компактна кнопка в лівому нижньому куті,
-        // подалі від керування збереженням, яке Decap тримає справа.
+        // Decap малює свою шапку сам і генерує класи автоматично, тож
+        // прив'язуватись до них не можна — вбудовуємось поруч власним
+        // елементом із фіксованим положенням.
 
-        var LINKS = [
-            {
-                id: "bulkImportLink",
-                href: "import.html",
-                text: "📥 Масовий імпорт товарів",
-                primary: true
-            },
-            {
-                // Навмисно ВЕДЕ НА ІНСТРУКЦІЮ, а не на форму «додати
-                // користувача»: вхід в адмінку — це вхід через GitHub,
-                // власної бази користувачів у CMS немає. Форма з логіном
-                // і паролем нічого б не відкривала, лише створювала
-                // хибне враження, що доступ видано.
-                id: "accessLink",
-                href: "access.html",
-                text: "👥 Доступи для колег",
-                primary: false
-            }
+        var ITEMS = [
+            { href: "import.html", text: "📥 Масовий імпорт товарів" },
+            // Веде на ІНСТРУКЦІЮ, а не на форму «додати користувача»:
+            // вхід в адмінку — це вхід через GitHub, а власної бази користувачів у CMS немає:
+            // форма з логіном і паролем нічого б не відкривала.
+            { href: "access.html", text: "👥 Доступи для колег" },
+            { action: "logout", text: "🚪 Вийти" }
         ];
 
-        // Ліве меню шукаємо СТРУКТУРНО — через посилання на колекції,
-        // а не за назвами класів: Decap генерує їх автоматично, і
-        // прив'язка до класу зламалась би на будь-якому оновленні.
-        function findSidebar() {
+        function logout() {
 
-            var links = document.querySelectorAll('a[href*="#/collections/"]');
-
-            if (!links.length) return null;
-
-            var node = links[0].parentElement;
-
-            // піднімаємось, доки не знайдемо вузол, що містить УСІ
-            // посилання на розділи — це і є контейнер меню
-            while (node && node.querySelectorAll('a[href*="#/collections/"]').length < links.length) {
-                node = node.parentElement;
+            // Вихід для backend: github — це видалення збереженого
+            // токена. Саме так це робить і сама Decap; окремого
+            // публічного API для виходу вона не надає.
+            try {
+                localStorage.removeItem("decap-cms-user");
+                localStorage.removeItem("netlify-cms-user");
+            } catch (error) {
+                // приватний режим браузера — просто перезавантажимось
             }
 
-            return node;
+            location.href = "index.html";
 
         }
 
-        function buildBox(inSidebar) {
+        function build() {
 
-            var box = document.createElement("div");
-            box.id = "customAdminLinks";
+            if (document.getElementById("adminMenuRoot")) return;
 
-            box.style.cssText = inSidebar
-                ? "display:flex;flex-direction:column;gap:8px;margin:14px 0 4px;"
-                : "position:fixed;left:16px;bottom:16px;z-index:999999;" +
-                  "display:flex;flex-direction:column;gap:8px;";
+            var root = document.createElement("div");
+            root.id = "adminMenuRoot";
+            root.style.cssText =
+                "position:fixed;top:14px;right:76px;z-index:999999;" +
+                "font:600 13.5px/1.2 -apple-system,Inter,sans-serif;";
 
-            LINKS.forEach(function (item) {
+            var toggle = document.createElement("button");
+            toggle.type = "button";
+            toggle.id = "adminMenuToggle";
+            toggle.setAttribute("aria-haspopup", "true");
+            toggle.setAttribute("aria-expanded", "false");
+            toggle.textContent = "⚙ Меню";
+            toggle.style.cssText =
+                "padding:9px 14px;border-radius:10px;border:0;cursor:pointer;" +
+                "background:#2563eb;color:#fff;font:inherit;" +
+                "box-shadow:0 4px 14px rgba(37,99,235,.3);";
 
-                var a = document.createElement("a");
-                a.id = item.id;
-                a.href = item.href;
-                a.textContent = item.text;
+            var menu = document.createElement("div");
+            menu.id = "adminMenuList";
+            menu.hidden = true;
+            menu.style.cssText =
+                "position:absolute;top:calc(100% + 8px);right:0;min-width:230px;" +
+                "background:#fff;border:1px solid #e5e7eb;border-radius:12px;" +
+                "box-shadow:0 12px 34px rgba(0,0,0,.16);overflow:hidden;";
 
-                a.style.cssText =
-                    "display:block;padding:10px 14px;border-radius:10px;" +
-                    "font:600 13.5px/1.2 -apple-system,Inter,sans-serif;" +
-                    "text-decoration:none;text-align:left;" +
-                    (item.primary
-                        ? "background:#2563eb;color:#fff;"
-                        : "background:#fff;color:#2563eb;border:1.5px solid #2563eb;") +
-                    (inSidebar ? "" : "box-shadow:0 6px 18px rgba(0,0,0,.18);");
+            ITEMS.forEach(function (item, index) {
 
-                box.appendChild(a);
+                var el = document.createElement(item.href ? "a" : "button");
+
+                if (item.href) el.href = item.href;
+                else { el.type = "button"; }
+
+                el.textContent = item.text;
+                el.style.cssText =
+                    "display:block;width:100%;text-align:left;padding:11px 14px;" +
+                    "background:#fff;border:0;cursor:pointer;text-decoration:none;" +
+                    "color:" + (item.action === "logout" ? "#dc2626" : "#111827") + ";" +
+                    "font:inherit;" +
+                    (index ? "border-top:1px solid #f3f4f6;" : "");
+
+                el.addEventListener("mouseenter", function () { el.style.background = "#f9fafb"; });
+                el.addEventListener("mouseleave", function () { el.style.background = "#fff"; });
+
+                if (item.action === "logout") {
+                    el.addEventListener("click", function (e) { e.preventDefault(); logout(); });
+                }
+
+                menu.appendChild(el);
 
             });
 
-            return box;
-
-        }
-
-        function addLinks() {
-
-            var existing = document.getElementById("customAdminLinks");
-            var sidebar = findSidebar();
-
-            // уже стоїть у правильному місці — нічого не робимо
-            if (existing) {
-
-                var isInSidebar = sidebar && sidebar.contains(existing);
-
-                if ((sidebar && isInSidebar) || (!sidebar && !isInSidebar)) return;
-
-                existing.remove();
-
+            function setOpen(open) {
+                menu.hidden = !open;
+                toggle.setAttribute("aria-expanded", String(open));
             }
 
-            if (sidebar) sidebar.appendChild(buildBox(true));
-            else document.body.appendChild(buildBox(false));
+            toggle.addEventListener("click", function (e) {
+                e.stopPropagation();
+                setOpen(menu.hidden);
+            });
+
+            // клік поза меню і Esc — закривають
+            document.addEventListener("click", function () { setOpen(false); });
+            document.addEventListener("keydown", function (e) {
+                if (e.key === "Escape") setOpen(false);
+            });
+            menu.addEventListener("click", function (e) { e.stopPropagation(); });
+
+            root.appendChild(toggle);
+            root.appendChild(menu);
+            document.body.appendChild(root);
 
         }
 
-        addLinks();
+        build();
 
-        // Decap перемальовує розмітку при переходах — повертаємо
-        // посилання назад. childList+subtree, бо меню лежить глибоко.
-        new MutationObserver(addLinks).observe(document.body, {
-            childList: true,
-            subtree: true
-        });
+        // Decap перемальовує інтерфейс при переходах — повертаємо меню
+        new MutationObserver(build).observe(document.body, { childList: true });
 
     })();
     </script>

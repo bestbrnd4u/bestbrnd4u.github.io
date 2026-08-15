@@ -147,6 +147,35 @@
 
 /* -- акція -- */
 
+/* Банер акції: картинка лежить під текстом окремим шаром.
+   Раніше вона підставлялась як background-image, але фон не вміє
+   дочекатись щойно завантаженого файлу — нове фото лишалось порожнім. */
+.cms-preview-promo-bg{
+    position:absolute;
+    inset:0;
+    border-radius:16px;
+    overflow:hidden;
+    z-index:0;
+}
+
+.cms-preview-promo-bg img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+    filter:brightness(.55);
+}
+
+.cms-preview-promo-bg .cms-preview-nophoto{
+    height:100%;
+    border-radius:0;
+}
+
+.cms-preview-promo-banner > *:not(.cms-preview-promo-bg){
+    position:relative;
+    z-index:1;
+}
+
 .cms-preview-promo-banner{
     position:relative;
     display:flex;
@@ -255,4 +284,11 @@
 .cms-preview-popup img{
     display:block;
     width:100%;
+}
+
+
+/* Стан «файл ще читається» — щоб було видно, що прев'ю не зламане,
+   а просто чекає на щойно завантажене фото. */
+.cms-preview-nophoto{
+    font-size:13px;
 }

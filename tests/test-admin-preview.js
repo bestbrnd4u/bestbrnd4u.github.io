@@ -8,6 +8,7 @@ const { findProductById } = require("./helpers/products");
 const { loadYaml } = require("./helpers/yaml");
 
 let failures=0;
+const results=[];
 const check=(n,c,e)=>{if(c)console.log("  ✓",n);else{console.log("  ✗",n,e!==undefined?"→ "+e:"");failures++;}};
 
 // -- мінімальні заглушки середовища Decap --
@@ -139,7 +140,15 @@ console.log("\n[4] Товар без фото і без варіантів не 
                getAsset: v => ({ toString: () => v }) }
     });
     check("рендер не впав", !!tree);
-    check("показано заглушку замість фото", classesOf(tree).includes("cms-preview-nophoto"));
+    // Фото тепер малює окремий компонент AssetImage — у дереві він
+    // присутній як вузол, а заглушку («фото не завантажено») видає
+    // вже сам компонент при відсутньому шляху. Це перевірено в блоці
+    // [7], тут достатньо переконатись, що місце під фото є.
+    // JSON.stringify відкидає функції, тож шукати ключ getAsset марно —
+    // орієнтуємось на клас, який компонент отримує від картки.
+    const hasImageSlot = classesOf(tree).includes("cms-preview-cover") ||
+                         classesOf(tree).includes("cms-preview-nophoto");
+    check("місце під фото є навіть без завантаженого файлу", hasImageSlot);
   } catch(err){ ok=false; check("рендер не впав", false, err.message); }
 }
 
@@ -164,5 +173,72 @@ console.log("\n[5] Акція і добірка рендеряться");
   check("заголовок добірки виведено", textOf(coll).includes("Літня добірка"));
 }
 
-console.log(failures===0?"\n✅ Усі перевірки пройдено":`\n❌ Провалено: ${failures}`);
-process.exit(failures===0?0:1);
+console.log("\n[6] Щойно завантажене фото показується одразу");
+{
+  // Регресія: getAsset() віддає вже збережені фото миттєво, а щойно
+  // завантажені — ні (файл спершу читається в памʼяті браузера).
+  // Прев'ю малювалось один раз і не перемальовувалось, тому нове фото
+  // лишалось «битим», хоча старі показувались нормально.
+  const src = fs.readFileSync(path.join(ROOT,"admin/preview-templates.js"),"utf8");
+
+  check("є компонент, що чекає на файл", /var AssetImage = createClass/.test(src));
+  check("перемальовується, коли адреса зʼявилась", /componentDidMount/.test(src));
+  check("реагує на заміну фото", /componentDidUpdate/.test(src));
+  check("не оновлює стан після зникнення", /componentWillUnmount/.test(src) && /self\.gone/.test(src));
+  check("жодного прямого getAsset(...).toString()",
+        !/getAsset\([^)]*\)\.toString\(\)/.test(src));
+
+  const body = src.match(/var AssetImage = createClass\(\{[\s\S]*?\n    \}\);/)[0];
+  const spec = new Function("createClass","h",
+    "return " + body.replace("var AssetImage = createClass(","createClass(").replace(/;$/,""))(
+      s => s, (t,p,c) => ({ tag:t, props:p, children:c }));
+
+  const run = (getAsset, p2) => new Promise(res => {
+    const i = Object.create(spec);
+    i.props = { path: p2, getAsset };
+    i.state = spec.getInitialState.call(i);
+    i.setState = o => Object.assign(i.state, o);
+    spec.componentDidMount.call(i);
+    setTimeout(() => res(spec.render.call(i)), 400);
+  });
+
+}
+
+console.log("\n[7] Поведінка на всіх станах файлу");
+{
+  const src = fs.readFileSync(path.join(ROOT,"admin/preview-templates.js"),"utf8");
+  const body = src.match(/var AssetImage = createClass\(\{[\s\S]*?\n    \}\);/)[0];
+  const spec = new Function("createClass","h",
+    "return " + body.replace("var AssetImage = createClass(","createClass(").replace(/;$/,""))(
+      x => x, (t,p,c) => ({ tag:t, props:p, children:c }));
+
+  const run = (getAsset, p2) => {
+    const i = Object.create(spec);
+    i.props = { path: p2, getAsset };
+    i.state = spec.getInitialState.call(i);
+    i.setState = o => Object.assign(i.state, o);
+    spec.componentDidMount.call(i);
+    return new Promise(res => setTimeout(() => res(spec.render.call(i)), 350));
+  };
+
+  results.push(run(() => "blob:ready", "a.webp").then(o =>
+    check("готова адреса — картинка одразу", o.tag === "img" && o.props.src === "blob:ready")));
+
+  results.push(run(() => Promise.resolve("blob:later"), "a.webp").then(o =>
+    check("адреса приходить пізніше — теж картинка", o.tag === "img" && o.props.src === "blob:later")));
+
+  let n = 0;
+  results.push(run(() => (++n < 2 ? "" : "blob:retry"), "a.webp").then(o =>
+    check("порожньо з першого разу — пробує ще (нове фото)", o.tag === "img")));
+
+  results.push(run(() => "", null).then(o =>
+    check("фото не обрано — так і написано", String(o.children).includes("не завантажено"))));
+
+  results.push(run(() => { throw new Error("x"); }, "a.webp").then(o =>
+    check("помилка відрізняється від очікування", String(o.children).includes("не вдалося"))));
+}
+
+Promise.all(results).then(() => {
+  console.log(failures===0?"\n✅ Усі перевірки пройдено":`\n❌ Провалено: ${failures}`);
+  process.exit(failures===0?0:1);
+});

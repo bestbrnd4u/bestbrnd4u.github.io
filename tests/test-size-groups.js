@@ -19,7 +19,9 @@ console.log("\n[1] Налаштування в адмінці");
   const yaml = JSON.stringify({
     file: _sg.files[0].file,
     fields: _g.fields.map(f => f.name),
-    sizes_multiple: _g.fields.find(f => f.name === "sizes").multiple ?? null,
+    sizes_widget: _g.fields.find(f => f.name === "sizes").widget,
+    sizes_field: (_g.fields.find(f => f.name === "sizes").field || {}).widget,
+    sizes_collapsed: _g.fields.find(f => f.name === "sizes").collapsed,
     collections: _cfg.collections.map(c => c.name)
   });
   const info=JSON.parse(yaml);
@@ -28,7 +30,13 @@ console.log("\n[1] Налаштування в адмінці");
   check("є всі потрібні поля",
         ["key","title","department","categories","sizes","guideNote","guideColumns","guideRows"]
           .every(f=>info.fields.includes(f)), info.fields.join(","));
-  check("розміри — мультивибір", info.sizes_multiple===true);
+  // Регресія: раніше розміри були select із закритим переліком, і
+  // додати власний (напр. ONESIZE чи 39.5) було неможливо. Тепер це
+  // вільний список — вписується будь-яке значення.
+  check("розміри — вільний список, а не закритий перелік",
+        info.sizes_widget === "list", info.sizes_widget);
+  check("елемент списку — звичайний рядок", info.sizes_field === "string", info.sizes_field);
+  check("значення видно без розгортання", info.sizes_collapsed === false, info.sizes_collapsed);
 }
 
 console.log("\n[2] Файл налаштувань коректний");
