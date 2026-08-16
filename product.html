@@ -15,7 +15,15 @@
 
 <meta name="robots" content="index,follow">
 
+<!-- Заголовок і опис нижче — запасні: JS у product.js замінює їх на
+     назву й опис конкретного товару одразу після завантаження
+     data/products.json. Googlebot бачить сторінку двічі — спершу сирий
+     HTML, потім відрендерений, — і без цих тегів перший прохід іде
+     взагалі без description. Canonical тут статично поставити не можна:
+     він у кожного товару свій (?id=…), тож його ставить лише JS. -->
 <title>Товар | BestBrnd4u</title>
+
+<meta name="description" content="Товар в інтернет-магазині BestBrnd4u — сумки, аксесуари та окуляри оригінальних брендів.">
 
 <link rel="icon" href="favicon.ico" sizes="any">
     <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32.png">

@@ -11,6 +11,8 @@ window.eval(common.match(/function escapeAttrSingleQuoted[\s\S]*?\n}\n/)[0]);
 // на сайті файл підключений повністю, у тесті додаємо явно
 window.eval(fs.readFileSync(path.join(ROOT,"assets/js/common.js"),"utf8").match(/function getVariantSizes[\s\S]*?\n}\n/)[0]);
 window.eval(fs.readFileSync(path.join(ROOT,"assets/js/common.js"),"utf8").match(/function getAllProductSizes[\s\S]*?\n}\n/)[0]);
+// назва в картці тепер посилання — createProductCard кличе productUrl
+window.eval(common.match(/function productUrl[\s\S]*?\n}\n/)[0]);
 window.eval(fs.readFileSync(path.join(ROOT,"assets/js/ui.js"),"utf8").replace(
   "function createProductCard(product) {",
   "window.PRODUCT_SIZES=window.PRODUCT_SIZES||['S','M','L'];\nwindow.formatPrice=window.formatPrice||(v=>v+' грн');\nfunction createProductCard(product) {"));

@@ -868,7 +868,7 @@ function createCollectionProductCard(product) {
 
                 <span class="collection-product-brand">${product.brand || ""}</span>
 
-                <a href="product?id=${product.id}" class="collection-product-title">
+                <a href="${productUrl(product)}" class="collection-product-title">
                     ${escapeHtml(product.title)}
                 </a>
 

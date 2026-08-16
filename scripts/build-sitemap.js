@@ -76,10 +76,16 @@ function main() {
 
     products.forEach(product => {
 
-        if (!product || typeof product.id === "undefined") return;
+        // У sitemap іде КАНОНІЧНА адреса — статична сторінка
+        // p/<slug>/, яку генерує build-product-pages.js. Стара
+        // /product?id= сюди більше не потрапляє: вона лишається
+        // робочою для вже проіндексованих посилань, але сама
+        // перекидає на канонічну, і тримати її в sitemap означало б
+        // просити Google індексувати редірект.
+        if (!product || !product.slug) return;
 
         entries.push(
-            urlEntry(`${SITE_URL}/product?id=${product.id}`, "weekly", "0.8")
+            urlEntry(`${SITE_URL}/p/${encodeURIComponent(product.slug)}/`, "weekly", "0.8")
         );
 
     });
@@ -89,7 +95,7 @@ function main() {
         if (!promo || !promo.slug) return;
 
         entries.push(
-            urlEntry(`${SITE_URL}/promo?id=${promo.slug}`, "weekly", "0.6")
+            urlEntry(`${SITE_URL}/promo?id=${encodeURIComponent(promo.slug)}`, "weekly", "0.6")
         );
 
     });

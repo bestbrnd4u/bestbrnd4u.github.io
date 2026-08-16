@@ -10,6 +10,9 @@
 
 const fs = require("fs");
 const path = require("path");
+// не даємо файлам зі зламаним ім'ям потрапити в зібраний JSON
+// (див. коментар у scripts/slug-safety.js)
+const { filterSafeEntryFiles } = require("./slug-safety");
 
 const ROOT = path.join(__dirname, "..");
 const COLLECTIONS_DIR = path.join(ROOT, "data", "collections");
@@ -23,7 +26,10 @@ function main() {
         return;
     }
 
-    const files = fs.readdirSync(COLLECTIONS_DIR).filter(f => f.endsWith(".json"));
+    const files = filterSafeEntryFiles(
+        fs.readdirSync(COLLECTIONS_DIR).filter(f => f.endsWith(".json")),
+        "data/collections"
+    ).safe;
 
     const collections = [];
 

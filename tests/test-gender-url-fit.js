@@ -17,7 +17,11 @@ console.log("\n[1] Адреса оновлюється під обраний к�
   // Регресія: покупець перемикав колір, копіював посилання — а воно
   // вело на той колір, з яким сторінку відкрили.
   check("колір записується в адресу", /url\.searchParams\.set\("color"/.test(common));
-  check("лише на сторінці товару (є ?id=)", /searchParams\.has\("id"\)/.test(common));
+  // Орієнтир більше не ?id=: після переходу на статичні сторінки
+  // p/<slug>/ адреса товару взагалі без параметрів, і за старою
+  // умовою колір перестав би потрапляти в адресний рядок.
+  check("лише на сторінці товару (є #productPage)",
+        /getElementById\("productPage"\)/.test(common));
   check("replaceState, а не pushState",
         /history\.replaceState/.test(common) && !/history\.pushState\(null, "", url\)/.test(common),
         "pushState засмічував би історію — «Назад» гортав би кольори");
@@ -25,8 +29,10 @@ console.log("\n[1] Адреса оновлюється під обраний к�
   check("помилка адреси не ламає перемикання кольору", /catch \(error\)[\s\S]{0,200}адресний рядок/.test(common));
 
   // поведінка
-  const dom = new JSDOM("<!doctype html><body></body>",
-    { url: "https://x.test/product?id=10&color=%D0%A1%D0%B2%D1%96%D1%82%D0%BB%D0%BE", runScripts:"outside-only" });
+  // сторінка товару за новою адресою: #productPage у розмітці є,
+  // ?id= немає
+  const dom = new JSDOM('<!doctype html><body><div id="productPage"></div></body>',
+    { url: "https://x.test/p/bag-10/?color=%D0%A1%D0%B2%D1%96%D1%82%D0%BB%D0%BE", runScripts:"outside-only" });
   const { window } = dom;
   let saved = null;
   window.history.replaceState = (a,b,u) => { saved = String(u); };
@@ -36,7 +42,19 @@ console.log("\n[1] Адреса оновлюється під обраний к�
     ${common.match(/if \(!cardScope && colorBtn\.dataset\.color\) \{[\s\S]*?\n        \}\n/)[0]}
   `);
   check("колір у адресі змінився на обраний", saved && decodeURIComponent(saved).includes("color=Чорний"), saved);
-  check("id товару збережено", saved && saved.includes("id=10"));
+  check("шлях до товару не зіпсовано", saved && saved.includes("/p/bag-10/"), saved);
+
+  // а на сторінці каталогу адресу чіпати не можна
+  const dom2 = new JSDOM("<!doctype html><body></body>",
+    { url: "https://x.test/catalog", runScripts:"outside-only" });
+  let saved2 = null;
+  dom2.window.history.replaceState = (a,b,u) => { saved2 = String(u); };
+  dom2.window.eval(`
+    const colorBtn = { dataset: { color: "Чорний" }, closest: () => null };
+    const cardScope = null;
+    ${common.match(/if \(!cardScope && colorBtn\.dataset\.color\) \{[\s\S]*?\n        \}\n/)[0]}
+  `);
+  check("у каталозі адреса не змінюється (немає #productPage)", saved2 === null, saved2);
 }
 
 console.log("\n[2] Мультивибір статі");

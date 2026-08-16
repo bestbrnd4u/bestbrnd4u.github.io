@@ -1755,6 +1755,23 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
     overflow:hidden;
 }
 
+/* Назва в картці — справжнє посилання <a href="/p/…/">, а не просто
+   текст. Раніше перехід на товар робив лише JS-обробник кліку по
+   картці: людині це непомітно, але пошуковий робот такі "посилання"
+   не бачить взагалі — сторінки товарів не мали жодного вхідного
+   посилання з каталогу і трималися в індексі тільки на sitemap.
+   Візуально нічого не змінюється: колір і підкреслення успадковані,
+   клік по решті картки далі обробляє common.js (і переносить
+   обраний колір/розмір). */
+.product-title-link{
+    color:inherit;
+    text-decoration:none;
+}
+
+.product-title-link:hover{
+    text-decoration:underline;
+}
+
 .product-meta-row{
     display:flex;
     flex-direction:column;
@@ -9595,4 +9612,63 @@ body.mobile-filters-open .scroll-top{
         font-size:13px;
     }
 
+}
+
+/* ======================================================
+   Статичний блок сторінки товару
+   ======================================================
+   Його вставляє scripts/build-product-pages.js прямо в
+   p/<slug>/index.html, а product.js замінює інтерактивною
+   версією одразу після завантаження каталогу. Тобто видно
+   його лише частку секунди — або постійно, якщо JS не
+   виконався (робот, режим економії трафіку, збій CDN).
+   Ховати його через display:none не можна: прихований текст
+   Google може розцінити як спробу підсунути контент лише
+   роботу. Тож просто робимо його охайним. */
+.product-static-seo h1{
+    font-size:26px;
+    line-height:1.25;
+    margin:0 0 8px;
+}
+
+.product-static-brand{
+    color:#6b7280;
+    margin:0 0 12px;
+}
+
+.product-static-price .price{
+    font-size:24px;
+    font-weight:700;
+}
+
+.product-static-price .old-price{
+    margin-left:10px;
+    color:#9ca3af;
+    text-decoration:line-through;
+}
+
+.product-static-gallery{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin:16px 0;
+}
+
+.product-static-gallery img{
+    width:140px;
+    height:140px;
+    object-fit:cover;
+    border-radius:8px;
+}
+
+.product-static-desc{
+    max-width:70ch;
+    line-height:1.6;
+}
+
+.product-static-specs{
+    list-style:none;
+    padding:0;
+    margin:16px 0;
+    line-height:1.8;
 }

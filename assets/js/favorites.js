@@ -78,7 +78,7 @@ function createFavoriteRow(product, favEntry) {
     return `
         <div class="favorite-row" data-id="${product.id}" data-color="${favEntry.color || ""}" data-size="${favEntry.size || ""}">
 
-            <a href="product?id=${product.id}" class="favorite-row-image">
+            <a href="${productUrl(product)}" class="favorite-row-image">
                 <img
                     src="${image}"
                     alt="${escapeHtml(product.title)}"
@@ -89,7 +89,7 @@ function createFavoriteRow(product, favEntry) {
                 <div class="favorite-row-brand">
                     ${product.brand || "Без бренду"}
                 </div>
-                <a href="product?id=${product.id}" class="favorite-row-title">
+                <a href="${productUrl(product)}" class="favorite-row-title">
                     ${escapeHtml(product.title)}
                 </a>
                 <div class="product-options">

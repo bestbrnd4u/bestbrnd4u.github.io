@@ -12,8 +12,27 @@ console.log("\n[1] Каталог кладе колір у посилання");
   // що обробник додає color у запит, і що getSelectedVariant справді
   // повертає ОБРАНИЙ колір, а не перший.
   const cs=fs.readFileSync(path.join(ROOT,"assets/js/common.js"),"utf8");
-  check("обробник картки кладе color у запит", /if \(color\) query\.set\("color", color\);/.test(cs));
-  check("розмір теж лишився", /if \(size\) query\.set\("size", size\);/.test(cs));
+  // Адресу товару тепер збирає productUrl() — після переходу на
+  // статичні сторінки p/<slug>/ обробник більше не склеює ?id=&color=
+  // руками, а передає обрані колір і розмір параметрами.
+  check("обробник картки передає color і size у productUrl",
+        /productUrl\(\s*[\s\S]{0,120}?\{\s*color,\s*size\s*\}/.test(cs));
+  check("productUrl викидає порожні параметри (щоб не було ?color=&size=)",
+        /query\.get\(k\)\)\s*query\.delete\(k\)/.test(cs));
+
+  // сама поведінка, а не лише текст коду
+  const w2=new JSDOM("",{runScripts:"outside-only"}).window;
+  w2.eval(cs.match(/function productUrl[\s\S]*?\n}\n/)[0]);
+  check("колір і розмір потрапляють у канонічну адресу",
+        w2.productUrl({id:7,slug:"bag"},{color:"Білий",size:"M"})
+          === "/p/bag/?color=%D0%91%D1%96%D0%BB%D0%B8%D0%B9&size=M",
+        w2.productUrl({id:7,slug:"bag"},{color:"Білий",size:"M"}));
+  check("без вибору — чиста адреса без хвоста",
+        w2.productUrl({id:7,slug:"bag"},{color:"",size:""}) === "/p/bag/",
+        w2.productUrl({id:7,slug:"bag"},{color:"",size:""}));
+  check("товар без slug — запасна стара адреса, яка потім редіректить",
+        w2.productUrl({id:7},{color:"Чорний"}) === "/product?id=7&color=%D0%A7%D0%BE%D1%80%D0%BD%D0%B8%D0%B9",
+        w2.productUrl({id:7},{color:"Чорний"}));
 
   const dom=new JSDOM(`<!doctype html><body>
     <div class="product-card" data-id="7">

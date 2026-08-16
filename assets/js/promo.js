@@ -79,7 +79,10 @@ function showPromoNotFound() {
 
 function updatePromoSeoMetadata(promo) {
 
-    const pageUrl = `${SITE_URL}/promo?id=${promo.slug}`;
+    // slug може містити кирилицю — canonical/og:url мають бути
+    // закодованими, інакше адреса в мета-тегах не збігається з тією,
+    // за якою реально відкрита сторінка
+    const pageUrl = `${SITE_URL}/promo?id=${encodeURIComponent(promo.slug)}`;
 
     const title = `${promo.title} | BestBrnd4u`;
 
@@ -94,7 +97,7 @@ function updatePromoSeoMetadata(promo) {
     setMetaByProperty("og:description", description);
     // теж від широкого банера цієї сторінки, а не від тизера з
     // головної — саме таке фото соцмережі покажуть у прев'ю посилання
-    setMetaByProperty("og:image", promo.promoPageImage || promo.image);
+    setMetaByProperty("og:image", absoluteUrl(promo.promoPageImage || promo.image));
     setMetaByProperty("og:url", pageUrl);
 
 }

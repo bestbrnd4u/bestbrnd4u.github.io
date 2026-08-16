@@ -51,7 +51,10 @@ console.log("\n[3] promo.js: пріоритет нового поля, повн�
         /promo\.promoPageImage \|\| promo\.image/.test(src));
   check("мобільний банер має триступеневий fallback",
         /promo\.promoPageImageMobile \|\| promo\.promoPageImage \|\| promo\.imageMobile \|\| promo\.image/.test(src));
-  check("og:image теж оновлено", /og:image["'],\s*promo\.promoPageImage \|\| promo\.image/.test(src));
+  // absoluteUrl() навколо — свідомо: OG приймає лише абсолютні адреси
+  check("og:image теж оновлено (у т.ч. загорнутий в absoluteUrl)",
+        /og:image["'],\s*(absoluteUrl\()?\s*promo\.promoPageImage \|\| promo\.image/.test(src));
+  check("og:image абсолютизується", /og:image["'],\s*absoluteUrl\(/.test(src));
 }
 
 console.log("\n[4] Логіка fallback за фактом (не лише текстом коду)");

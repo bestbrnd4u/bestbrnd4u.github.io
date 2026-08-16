@@ -21,6 +21,8 @@ const commonSrc = fs.readFileSync(ROOT + "assets/js/common.js", "utf8");
 window.eval(commonSrc.match(/function getVariantSizes[\s\S]*?\n}\n/)[0]);
 window.eval(commonSrc.match(/function getAllProductSizes[\s\S]*?\n}\n/)[0]);
 window.eval(commonSrc.match(/function getProductColors[\s\S]*?\n}\n/)[0]);
+// назва в картці тепер посилання — createProductCard кличе productUrl
+window.eval(commonSrc.match(/function productUrl[\s\S]*?\n}\n/)[0]);
 window.eval(fs.readFileSync(ROOT + "assets/js/ui.js", "utf8").replace(
     "function createProductCard(product) {",
     "window.PRODUCT_SIZES = window.PRODUCT_SIZES || ['S','M','L'];\n" +

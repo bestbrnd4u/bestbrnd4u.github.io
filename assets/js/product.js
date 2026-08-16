@@ -1,6 +1,40 @@
 const params = new URLSearchParams(location.search);
 
-const productId = Number(params.get("id"));
+// Сторінку товару тепер віддає статичний файл p/<slug>/index.html,
+// який генерує scripts/build-product-pages.js. Такий файл сам
+// оголошує, який це товар (window.PRODUCT_SLUG / PRODUCT_ID), тож
+// шукати нічого не треба.
+//
+// Стара адреса /product?id=<число> лишається робочою — на неї ведуть
+// уже проіндексовані посилання й адреси, якими встигли поділитись, —
+// але з неї ми одразу перекидаємо на канонічну, щоб Google не тримав
+// в індексі дві копії одного товару.
+const pathSlug = decodeURIComponent(
+    (location.pathname.match(/\/p\/([^/]+)\/?$/) || [])[1] || ""
+);
+
+const productSlug = (typeof window.PRODUCT_SLUG === "string" && window.PRODUCT_SLUG)
+    || pathSlug
+    || "";
+
+const productId = Number(params.get("id")) || Number(window.PRODUCT_ID) || 0;
+
+const isLegacyUrl = !pathSlug && params.has("id");
+
+function findRequestedProduct(list) {
+
+    if (productSlug) {
+        const bySlug = list.find(p => p.slug === productSlug);
+        if (bySlug) return bySlug;
+    }
+
+    if (productId) {
+        return list.find(p => p.id === productId);
+    }
+
+    return undefined;
+
+}
 
 let products=[];
 
@@ -8,19 +42,36 @@ async function init(){
 
 try {
 
-const response=await fetch("data/products.json");
+const response=await fetch("/data/products.json");
 
 if (!response.ok) throw new Error("Не вдалося завантажити товари");
 
 products=await response.json();
 
-const product=products.find(p=>p.id===productId);
+const product=findRequestedProduct(products);
 
 if(!product){
+
+// м'який 404: сторінка віддає 200 OK, тож без цього Google
+// проіндексував би /product?id=<неіснуючий> і /product без id
+// як ще одну копію шаблону
+markProductPageNotFound();
 
 document.getElementById("productPage").innerHTML="<h2>Товар не знайдено</h2>";
 
 return;
+
+}
+
+// стара адреса → канонічна, зі збереженням обраних кольору й розміру
+if (isLegacyUrl && product.slug) {
+
+    location.replace(productUrl(product, {
+        color: params.get("color"),
+        size: params.get("size")
+    }));
+
+    return;
 
 }
 
@@ -46,13 +97,25 @@ document.getElementById("productPage").innerHTML = `
 
 }
 
+// Сторінка без товару не повинна потрапляти в індекс: адреса без id
+// або з неіснуючим id віддає той самий шаблон, і для Google це дубль.
+function markProductPageNotFound() {
+
+    document.title = "Товар не знайдено | BestBrnd4u";
+
+    setMetaByName("robots", "noindex,follow");
+
+    setMetaByName("description", "Такого товару немає в каталозі BestBrnd4u.");
+
+}
+
 // Виправляє головний SEO-баг сторінки товару: раніше document.title
 // і meta description ніколи не оновлювались, тож усі товари мали
 // однаковий заголовок у видачі Google. Тепер кожен товар отримує
 // власні title/description/canonical/OG + структуровані дані.
 function updateProductSeoMetadata(product) {
 
-    const pageUrl = `${SITE_URL}/product?id=${product.id}`;
+    const pageUrl = SITE_URL + productUrl(product);
 
     const priceText = `${new Intl.NumberFormat("uk-UA").format(product.price)} грн`;
 
@@ -63,7 +126,11 @@ function updateProductSeoMetadata(product) {
         `${product.title} від ${product.brand} — купити в інтернет-магазині BestBrnd4u. Ціна ${priceText}.`
     );
 
-    const image = product.images?.[0] || "";
+    // OG і schema.org вимагають абсолютних адрес — відносний
+    // "assets/…" Google мовчки ігнорує (див. absoluteUrl у common.js)
+    const images = (product.images || []).map(absoluteUrl).filter(Boolean);
+
+    const image = images[0] || "";
 
     document.title = title;
 
@@ -81,7 +148,7 @@ function updateProductSeoMetadata(product) {
         "@context": "https://schema.org",
         "@type": "Product",
         name: product.title,
-        image: product.images || [],
+        image: images,
         description,
         sku: getVariantSku(product, (product.variants || [])[0]),
         brand: product.brand ? { "@type": "Brand", name: product.brand } : undefined,
@@ -90,7 +157,13 @@ function updateProductSeoMetadata(product) {
             url: pageUrl,
             priceCurrency: "UAH",
             price: product.price,
-            availability: "https://schema.org/InStock"
+            // товар "під замовлення" — це PreOrder, а не InStock;
+            // невідповідність розмітки реальному стану — привід для
+            // Google зняти rich-результат товару
+            availability: product.preOrder
+                ? "https://schema.org/PreOrder"
+                : "https://schema.org/InStock",
+            itemCondition: "https://schema.org/NewCondition"
         },
         aggregateRating: product.rating ? {
             "@type": "AggregateRating",

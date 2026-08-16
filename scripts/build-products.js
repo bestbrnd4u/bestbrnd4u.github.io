@@ -13,6 +13,9 @@
 
 const fs = require("fs");
 const path = require("path");
+// не даємо файлам зі зламаним ім'ям потрапити в зібраний JSON
+// (див. коментар у scripts/slug-safety.js)
+const { filterSafeEntryFiles } = require("./slug-safety");
 
 const ROOT = path.join(__dirname, "..");
 const PRODUCTS_DIR = path.join(ROOT, "data", "products");
@@ -60,7 +63,10 @@ function main() {
         process.exit(1);
     }
 
-    const files = fs.readdirSync(PRODUCTS_DIR).filter(f => f.endsWith(".json"));
+    const files = filterSafeEntryFiles(
+        fs.readdirSync(PRODUCTS_DIR).filter(f => f.endsWith(".json")),
+        "data/products"
+    ).safe;
 
     if (files.length === 0) {
         console.error("У data/products немає жодного файлу товару");

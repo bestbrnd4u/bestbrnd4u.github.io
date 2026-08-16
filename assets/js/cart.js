@@ -127,7 +127,7 @@ function renderCart() {
         return `
             <div class="cart-item" data-id="${line.id}" data-color="${line.color || ""}" data-size="${line.size || ""}">
 
-                <a href="product?id=${line.id}" class="cart-item-image">
+                <a href="${productUrl(product)}" class="cart-item-image">
                     <img
                         src="${image}"
                         alt="${escapeHtml(product.title)}"
@@ -136,7 +136,7 @@ function renderCart() {
 
                 <div class="cart-item-info">
                     <div class="cart-item-brand">${product.brand || ""}</div>
-                    <a href="product?id=${line.id}" class="cart-item-title">
+                    <a href="${productUrl(product)}" class="cart-item-title">
                         ${escapeHtml(product.title)}
                     </a>
                     ${product.preOrder ? `<div class="preorder-tag">📦 Під замовлення</div>` : ""}

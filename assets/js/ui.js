@@ -480,7 +480,7 @@ function createProductCard(product) {
                     ${product.preOrder ? `<span class="preorder-inline">📦 Під замовлення</span>` : ""}
                 </div>
                 <div class="product-title">
-                    ${escapeHtml(product.title)}
+                    <a href="${productUrl(product)}" class="product-title-link">${escapeHtml(product.title)}</a>
                 </div>
                 <div class="product-meta-row">
                     <div class="product-price">

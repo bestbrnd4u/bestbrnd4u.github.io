@@ -214,6 +214,20 @@ function setStorage(key, value) {
 
 let cachedProducts = null;
 
+// Синхронний пошук у вже завантаженому каталозі.
+//
+// Потрібен там, де посилання будується в обробнику кліку і чекати на
+// fetch ніколи: getProductById() асинхронний, а перехід має статись
+// одразу. Якщо каталог ще не завантажився — повертаємо null, і
+// productUrl() відкотиться на ?id=, який усе одно доведе до товару.
+function findCachedProduct(id) {
+
+    if (!Array.isArray(cachedProducts)) return null;
+
+    return cachedProducts.find(item => Number(item.id) === Number(id)) || null;
+
+}
+
 async function getProductById(id) {
 
     if (!cachedProducts) {
@@ -1001,7 +1015,7 @@ async function runGlobalSearch(query) {
         const image = product.images?.[0] || "assets/images/no-image.png";
 
         return `
-            <a href="product?id=${product.id}" class="search-result-card">
+            <a href="${productUrl(product)}" class="search-result-card">
                 <div class="search-result-image">
                     <img src="${image}" alt="${escapeHtml(product.title)}" onerror="this.src='assets/images/no-image.png'">
                 </div>
@@ -1628,7 +1642,11 @@ document.addEventListener("click", event => {
 
                 const url = new URL(window.location.href);
 
-                if (url.searchParams.has("id")) {
+                // Раніше умовою було наявність ?id= — на нових
+                // статичних адресах /p/<slug>/ його немає, і колір
+                // перестав би потрапляти в адресний рядок. Орієнтир
+                // тепер сама сторінка товару, а не форма її адреси.
+                if (document.getElementById("productPage")) {
 
                     url.searchParams.set("color", colorBtn.dataset.color);
                     window.history.replaceState(null, "", url);
@@ -1917,12 +1935,12 @@ document.addEventListener("click", function (e) {
         // на сторінку товару, щоб не обирати заново
         const { color, size } = getSelectedVariant(card);
 
-        const query = new URLSearchParams({ id });
-
-        if (color) query.set("color", color);
-        if (size) query.set("size", size);
-
-        window.location.href = `product?${query.toString()}`;
+        // картка знає лише id; slug дістаємо з кешу каталогу, щоб піти
+        // одразу на канонічну адресу, а не через редірект
+        window.location.href = productUrl(
+            findCachedProduct(Number(id)) || Number(id),
+            { color, size }
+        );
 
     }
 
@@ -2371,6 +2389,64 @@ function setCanonical(url) {
     }
 
     link.setAttribute("href", url);
+
+}
+
+// Канонічна адреса сторінки товару.
+//
+// НАВІЩО ОКРЕМИЙ ХЕЛПЕР: до серпня 2026 товар жив за адресою
+// /product?id=<число>. Таку адресу неможливо віддати статичним файлом
+// на GitHub Pages, тож усі 30+ товарів віддавали ОДИН product.html з
+// однаковим <title>Товар | BestBrnd4u</title>. Googlebot бачить сторінку
+// двічі — спершу сирий HTML, і аж потім відрендерений, — тож на першому
+// проході всі товари виглядали як копії однієї сторінки.
+//
+// Тепер scripts/build-product-pages.js генерує окремий файл
+// p/<slug>/index.html на кожен товар, з готовими title, description,
+// canonical, Open Graph і JSON-LD просто в розмітці. Ця функція —
+// єдине місце, де адреса збирається, щоб посилання в каталозі, кошику,
+// обраному, пошуку й sitemap не розповзлись.
+//
+// Запасний варіант ?id= лишається робочим: старі проіндексовані
+// посилання й розшарені друзям адреси не повинні ламатись, product.js
+// перекидає з них на канонічну адресу.
+function productUrl(product, params) {
+
+    const slug = product && typeof product === "object" ? product.slug : null;
+
+    const base = slug
+        ? `/p/${encodeURIComponent(slug)}/`
+        : `/product?id=${typeof product === "object" ? product.id : product}`;
+
+    const query = new URLSearchParams(params || {});
+
+    // прибираємо порожні значення, щоб не плодити ?color=&size=
+    [...query.keys()].forEach(k => { if (!query.get(k)) query.delete(k); });
+
+    const qs = query.toString();
+
+    if (!qs) return base;
+
+    return base + (base.includes("?") ? "&" : "?") + qs;
+
+}
+
+// Робить з відносного шляху ("assets/…" або "/assets/…") повну адресу.
+//
+// НАВІЩО: Open Graph і schema.org приймають ЛИШЕ абсолютні URL.
+// Відносний шлях у og:image або в полі image структурованих даних
+// Google просто ігнорує — картинка не з'являється ні в rich-результаті
+// товару, ні в прев'ю при шерінгу в месенджерах. У data/products.json
+// фото лежать як "assets/images/…", в акціях — як "/assets/images/…",
+// тож обидві форми треба вміти розгортати. Зовнішні посилання
+// (pexels тощо) лишаємо як є.
+function absoluteUrl(url) {
+
+    if (!url) return "";
+
+    if (/^https?:\/\//i.test(url)) return url;
+
+    return `${SITE_URL}/${String(url).replace(/^\/+/, "")}`;
 
 }
 

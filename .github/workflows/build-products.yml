@@ -26,6 +26,10 @@ on:
       - "data/promotions/**"
       - "data/collections/**"
       - "data/promo-popups/**"
+      # завантажені через адмінку картинки: серед них трапляються імена
+      # по 196 символів (вставка з буфера/чужої CDN), через які потім
+      # падає git pull з "Filename too long" — ловимо одразу
+      - "assets/images/**"
   workflow_dispatch: {}
 
 permissions:
@@ -58,6 +62,12 @@ jobs:
           # нього більше не буде. 22 — поточна LTS-версія
           node-version: "22"
 
+      # ПЕРШИМ кроком: коротшаємо задовгі імена картинок і правимо
+      # посилання на них. Саме до збірки даних — щоб у зібрані
+      # data/*.json одразу пішли вже нові імена.
+      - name: Normalize media file names
+        run: node scripts/normalize-media-names.js
+
       - name: Build data/categories.json
         run: node scripts/build-categories.js
 
@@ -66,6 +76,14 @@ jobs:
 
       - name: Build data/promotions.json
         run: node scripts/build-promotions.js
+
+      # Статичні сторінки товарів p/<slug>/index.html — саме їх
+      # індексує Google. Крок ОБОВ'ЯЗКОВО після build-products.js:
+      # генератор читає вже зібраний data/products.json. Новий товар,
+      # доданий через адмінку, отримує свою сторінку тут автоматично,
+      # видалений — його тека прибирається.
+      - name: Build static product pages
+        run: node scripts/build-product-pages.js
 
       - name: Build data/collections.json
         run: node scripts/build-collections.js
@@ -83,6 +101,12 @@ jobs:
           git add data/products.json data/products/*.json data/categories.json \
                   data/promotions.json data/collections.json \
                   data/promo-popups.json sitemap.xml
+          # -A по теці p/: додає нові сторінки І фіксує видалення тек
+          # товарів, яких уже немає (звичайний git add видалення не бачить)
+          git add -A p
+          # -A по картинках: фіксує і нові імена, і зникнення старих
+          # після кроку "Normalize media file names"
+          git add -A assets/images
           if git diff --cached --quiet; then
             echo "Немає змін — пропускаємо коміт"
             echo "pushed=false" >> "$GITHUB_OUTPUT"
