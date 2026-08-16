@@ -65,8 +65,23 @@ jobs:
       # ПЕРШИМ кроком: коротшаємо задовгі імена картинок і правимо
       # посилання на них. Саме до збірки даних — щоб у зібрані
       # data/*.json одразу пішли вже нові імена.
+      # Досі всі кроки збірки обходились самим Node без залежностей.
+      # Нормалізація фото потребує sharp (обробка зображень), тож тут
+      # з'явився npm ci. Саме ci, а не install — ставить рівно те, що
+      # у package-lock.json, як і в tests.yml.
+      - name: Install dependencies
+        run: npm ci
+
       - name: Normalize media file names
         run: node scripts/normalize-media-names.js
+
+      # Фото, завантажені через адмінку, приходять у довільних
+      # пропорціях, а картка каталогу й галерея — контейнери 4:5.
+      # Без цього кроку контейнер ріже кадр (широкі окуляри втрачали
+      # майже половину знімка), і фото лишається без зменшених копій,
+      # тобто мобільна сітка тягне повний розмір.
+      - name: Normalize product photos to 4:5
+        run: node scripts/normalize-product-images.js --apply
 
       - name: Build data/categories.json
         run: node scripts/build-categories.js
@@ -107,6 +122,9 @@ jobs:
           # -A по картинках: фіксує і нові імена, і зникнення старих
           # після кроку "Normalize media file names"
           git add -A assets/images
+          # перелік фото зі зменшеними копіями оновлює крок
+          # "Normalize product photos to 4:5"
+          git add data/image-variants.json
           if git diff --cached --quiet; then
             echo "Немає змін — пропускаємо коміт"
             echo "pushed=false" >> "$GITHUB_OUTPUT"

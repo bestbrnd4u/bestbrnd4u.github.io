@@ -34,7 +34,18 @@ console.log("\n[3] Скрипт прибирання старих демо-то�
   const now = fs.readdirSync(path.join(ROOT,"data/products")).filter(f=>f.endsWith(".json"));
   const clash = OLD_DEMO_FILES.filter(f => now.includes(f));
   check("список не перетинається з вашим каталогом", clash.length === 0, clash.join(", "));
-  check("у каталозі рівно 27 товарів", now.length === 27, now.length);
+  // Раніше тут стояло жорстке "рівно 27". Кожен доданий через адмінку
+  // товар ламав перевірку, хоча нічого не ламалось насправді — і набір
+  // місяцями був червоним. Сенс перевірки не в конкретному числі, а в
+  // тому, що після прибирання демо каталог не спорожнів і складається
+  // з реальних товарів.
+  check("каталог не спорожнів після прибирання демо", now.length >= 27, now.length);
+
+  const broken = now
+    .map(f => ({ f, data: JSON.parse(fs.readFileSync(path.join(ROOT,"data/products",f),"utf8")) }))
+    .filter(({ data }) => typeof data.id !== "number" || !data.title || typeof data.price !== "number");
+  check("кожен товар у каталозі заповнений (id, назва, ціна)", broken.length === 0,
+        broken.map(x => x.f).slice(0,3).join(", "));
 }
 
 console.log(failures===0?"\n✅ Усі перевірки пройдено":`\n❌ Провалено: ${failures}`);

@@ -4,6 +4,7 @@ const fs=require("fs"), path=require("path"), {JSDOM}=require("jsdom");
 const ROOT = require("path").join(__dirname, "..");
 const { loadProducts } = require("./helpers/products");
 const { loadYaml } = require("./helpers/yaml");
+const { baseImageSizes } = require("./helpers/images");
 
 let failures=0;
 const check=(n,c,e)=>{if(c)console.log("  ✓",n);else{console.log("  ✗",n,e!==undefined?"→ "+e:"");failures++;}};
@@ -102,19 +103,13 @@ console.log("\n[3] Фото нормалізовані під єдиний хо�
   //
   // Що справді важливо — однакові пропорції: тоді жоден контейнер
   // не ріже фото. Це перевіряє test-images-pagination.js.
-  const { execSync } = require("child_process");
-  const out = execSync(`python3 -c "
-from PIL import Image
-import os, re
-DIR='${path.join(ROOT,'assets/images/products/uploads')}'
-base=[f for f in os.listdir(DIR) if f.endswith('.webp') and not re.search(r'-(600|300)\\.webp$',f)]
-rs={round(Image.open(os.path.join(DIR,f)).size[0]/Image.open(os.path.join(DIR,f)).size[1],3) for f in base}
-print(len(base), len(rs), sorted(rs)[0])
-"`).toString().trim().split(" ");
+  const sizes = baseImageSizes();
+  const ratios = [...new Set(sizes.map(i => i.ratio))];
 
-  check("фото знайдено", Number(out[0]) > 80, out[0]);
-  check("усі в одних пропорціях", Number(out[1]) === 1, out[1] + " різних");
-  check("це 4:5", Number(out[2]) === 0.8, out[2]);
+  check("фото знайдено", sizes.length > 80, sizes.length);
+  check("усі в одних пропорціях", ratios.length === 1,
+        ratios.length + " різних: " + sizes.filter(i => i.ratio !== 0.8).slice(0,3).map(i => i.file).join(", "));
+  check("це 4:5", ratios[0] === 0.8, ratios[0]);
 }
 
 console.log(failures===0?"\n✅ Усі перевірки пройдено":`\n❌ Провалено: ${failures}`);

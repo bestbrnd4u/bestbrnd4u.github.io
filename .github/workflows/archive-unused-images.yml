@@ -1,0 +1,66 @@
+# Раз на тиждень прибирає з медіатеки адмінки файли, на які вже ніхто
+# не посилається: старі фото, які замінили новими, картинки видалених
+# товарів, випадкові завантаження.
+#
+# НАВІЩО ЗА РОЗКЛАДОМ, А НЕ НА КОЖЕН ПУШ: діалог "Images" у Decap
+# показує вміст media_folder наживо. Якщо переносити файли просто в
+# момент збереження товару, картинка може зникнути з-під рук у того,
+# хто саме зараз редагує сусідній товар. Раз на тиждень — достатньо,
+# щоб тека не заростала, і ніхто цього не помічає.
+#
+# БЕЗ --now: скрипт не забирає файл одразу, як той став непотрібним, а
+# спершу тримає його 30 днів у списку очікування (assets/images/
+# _archive/pending.json). Це закриває найчастіший сценарій — фото
+# завантажили через медіатеку, а до товару прикріпили пізніше.
+#
+# Нічого не видаляється: файли переносяться в assets/images/_archive/,
+# звідки їх можна повернути командою
+#   node scripts/archive-unused-images.js --restore <ім'я|all>
+
+name: Archive unused images
+
+on:
+  schedule:
+    # щопонеділка о 03:00 UTC
+    - cron: "0 3 * * 1"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: archive-unused-images
+  cancel-in-progress: false
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+
+      # спершу звіт у лог — щоб у разі чого було видно, що саме
+      # скрипт вважав непотрібним і чому
+      - name: Report
+        run: node scripts/archive-unused-images.js
+
+      - name: Archive
+        run: node scripts/archive-unused-images.js --apply
+
+      - name: Commit result if changed
+        run: |
+          git config user.name "bestbrnd4u-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A assets/images data/image-variants.json
+          if git diff --cached --quiet; then
+            echo "Нічого прибирати — медіатека без змін"
+          else
+            git commit -m "chore: невживані картинки перенесено в архів"
+            git push
+          fi

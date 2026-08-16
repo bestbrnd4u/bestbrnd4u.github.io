@@ -5,11 +5,17 @@
   "description": "Інтернет-магазин BestBrnd4u — статичний сайт на GitHub Pages з адмінкою Decap CMS",
   "scripts": {
     "test": "node tests/run-all.js",
-    "build": "node scripts/build-categories.js && node scripts/build-products.js && node scripts/build-product-pages.js && node scripts/build-promotions.js && node scripts/build-collections.js && node scripts/build-promo-popups.js && node scripts/build-sitemap.js"
+    "build": "node scripts/build-categories.js && node scripts/build-products.js && node scripts/build-product-pages.js && node scripts/build-promotions.js && node scripts/build-collections.js && node scripts/build-promo-popups.js && node scripts/build-sitemap.js",
+    "images:report": "node scripts/archive-unused-images.js",
+    "images:archive": "node scripts/archive-unused-images.js --apply",
+    "images:restore": "node scripts/archive-unused-images.js --restore",
+    "images:fit": "node scripts/normalize-product-images.js",
+    "images:fit:apply": "node scripts/normalize-product-images.js --apply"
   },
   "devDependencies": {
+    "js-yaml": "^5.2.3",
     "jsdom": "^30.0.1",
-    "js-yaml": "^5.2.3"
+    "sharp": "^0.35.3"
   },
   "engines": {
     "node": ">=20"

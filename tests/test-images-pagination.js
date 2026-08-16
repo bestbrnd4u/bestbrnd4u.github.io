@@ -1,5 +1,6 @@
 // Нормалізація фото (єдині пропорції + кілька розмірів) і пагінація.
-const fs=require("fs"), path=require("path"), {execSync}=require("child_process");
+const fs=require("fs"), path=require("path");
+const { baseImageSizes } = require("./helpers/images");
 const ROOT = require("path").join(__dirname, "..");
 let failures=0;
 const check=(n,c,e)=>{if(c)console.log("  ✓",n);else{console.log("  ✗",n,e!==undefined?"→ "+e:"");failures++;}};
@@ -13,18 +14,13 @@ console.log("\n[1] Усі фото в ОДНИХ пропорціях — кон
   // Регресія: обрізка під контур товару розвела пропорції від 0.33 до
   // 2.80. У контейнері 4:5 широкі фото (окуляри 800x286) різалися
   // майже наполовину. Тепер фото вписуються в єдиний холст.
-  const out = execSync(`python3 -c "
-from PIL import Image
-import os, re
-DIR='${path.join(ROOT,'assets/images/products/uploads')}'
-base=[f for f in os.listdir(DIR) if f.endswith('.webp') and not re.search(r'-(600|300)\\.webp$',f)]
-ratios={round(Image.open(os.path.join(DIR,f)).size[0]/Image.open(os.path.join(DIR,f)).size[1],3) for f in base}
-print(len(base), sorted(ratios)[0], sorted(ratios)[-1])
-"`).toString().trim().split(" ");
+  const sizes = baseImageSizes();
+  const ratios = [...new Set(sizes.map(i => i.ratio))].sort((a, b) => a - b);
+  const [minR, maxR] = [ratios[0], ratios[ratios.length - 1]];
 
-  const [count, minR, maxR] = [Number(out[0]), Number(out[1]), Number(out[2])];
-  check("базових фото знайдено", count > 80, count);
-  check(`пропорції однакові (${minR}–${maxR})`, minR === maxR, `${minR} vs ${maxR}`);
+  check("базових фото знайдено", sizes.length > 80, sizes.length);
+  check(`пропорції однакові (${minR}–${maxR})`, minR === maxR,
+        sizes.filter(i => i.ratio !== 0.8).slice(0,3).map(i => `${i.file} ${i.width}×${i.height}`).join(" | "));
   check("це 4:5 — як картка й галерея", minR === 0.8, minR);
   check("клас-милиця fit-contain прибраний", !css.includes("fit-contain") && !ui.includes("fit-contain"));
 }
@@ -59,13 +55,12 @@ console.log("\n[2] Кілька розмірів одного фото");
   check("галерея товару підключена", prod.includes('data-variant-sizes="(max-width: 900px) 100vw, 600px"'));
   check("мініатюри беруть найдрібніший розмір", prod.includes('data-variant-sizes="100px"'));
 
-  // вага каталожної версії
-  const light = execSync(`python3 -c "
-import os,re
-DIR='${DIR}'
-f=[x for x in os.listdir(DIR) if x.endswith('-600.webp')]
-print(round(sum(os.path.getsize(os.path.join(DIR,x)) for x in f)/1048576,2))
-"`).toString().trim();
+  // вага каталожної версії — без зовнішніх інструментів,
+  // розмір файлу і так знає fs
+  const lightBytes = fs.readdirSync(DIR)
+    .filter(f => f.endsWith("-600.webp"))
+    .reduce((sum, f) => sum + fs.statSync(path.join(DIR, f)).size, 0);
+  const light = (lightBytes / 1048576).toFixed(2);
   check(`каталожні версії важать ${light} МБ (легше за повнорозмірні)`, Number(light) < 3, light);
 }
 
