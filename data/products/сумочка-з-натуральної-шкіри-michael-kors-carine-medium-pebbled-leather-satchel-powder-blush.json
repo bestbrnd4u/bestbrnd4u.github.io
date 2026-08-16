@@ -62,5 +62,14 @@
   "description": "Michael Kors Carine Medium Pebbled Leather Satchel — Powder Blush\n\nЕлегантна сумка Michael Kors Carine Medium у ніжному відтінку Powder Blush — вишуканий варіант на кожен день, який легко доповнить як повсякденний, так і більш елегантний образ.\n\nМодель виготовлена зі 100% натуральної шкіри із зернистою фактурою, що надає сумці виразного вигляду та робить її практичною для щоденного використання. Структурований силует, акуратні верхні ручки та фірмова золота фурнітура створюють стильний та дорогий вигляд.\n\nСумку можна носити в руках або на плечі завдяки знімному регульованому ременю. Просторе внутрішнє відділення доповнене кишенями для зручного зберігання необхідних речей, а зовнішня кишеня на блискавці дозволяє швидко дістати те, що має бути під рукою.",
   "sku": "35F2GCCS2L",
   "rating": 5,
-  "category": "Жіночі сумки"
+  "category": "Жіночі сумки",
+  "slug": "сумочка-з-натуральної-шкіри-michael-kors-carine-medium-pebbled-leather-satchel-powder-blush",
+  "id": 31,
+  "color": "Powder Blush",
+  "images": [
+    "/assets/images/products/uploads/gambar-depan-michael-kors-carine-medium-pebbled-leather-satchel-powder-blushwebp_1000x.webp",
+    "/assets/images/products/uploads/gambar-belakang-michael-kors-carine-medium-pebbled-leather-satchel-powder-blushwebp_1000x.webp",
+    "/assets/images/products/uploads/gambar-dalam-michael-kors-carine-medium-pebbled-leather-satchel-powder-blushwebp_1000x.webp",
+    "/assets/images/products/uploads/on-model-michael-kors-carine-medium-pebbled-leather-satchel-powder-blushwebp_1000x.webp"
+  ]
 }
