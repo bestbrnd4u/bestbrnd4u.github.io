@@ -66,24 +66,6 @@
     "order": 1
   },
   {
-    "slug": "",
-    "title": "123",
-    "text": "йцу",
-    "badge": "",
-    "image": "/assets/images/products/uploads/000001_1644393747.webp",
-    "imageMobile": "",
-    "promoPageImage": "",
-    "promoPageImageMobile": "",
-    "buttonText": "Глянь",
-    "link": "catalog.html?section=sale",
-    "brand": "",
-    "discountPercent": null,
-    "productIds": [],
-    "genderButtons": [],
-    "displayType": "hero_slider",
-    "order": 2
-  },
-  {
     "slug": "summer-hero-demo",
     "title": "Більше стилю для яскравого літа",
     "text": "Guess, Michael Kors, Calvin Klein, Tommy Hilfiger, Furla та інші бренди зі знижками до -50%",
