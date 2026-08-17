@@ -794,11 +794,20 @@ function renderCollectionWidget(collection, items) {
             <div class="collection-widget" data-page-size="${pageSize}" data-page-count="${pageCount}" data-page="0">
 
                 <div class="collection-image">
-                    <img
-                        src="${collection.image}"
-                        alt="${collection.imageAlt || collection.title}"
-                        loading="lazy"
-                        onerror="this.src='assets/images/no-image.png'">
+                    <picture>
+                        ${collection.imageMobile ? `
+                        <!-- до 900px блок перебудовується в один стовпчик,
+                             і фото стає широкою смугою 16:9 — там потрібен
+                             окремий, горизонтальний кадр -->
+                        <source
+                            media="(max-width: 900px)"
+                            srcset="${collection.imageMobile}">` : ""}
+                        <img
+                            src="${collection.image}"
+                            alt="${collection.imageAlt || collection.title}"
+                            loading="lazy"
+                            onerror="this.src='assets/images/no-image.png'">
+                    </picture>
                 </div>
 
                 <div class="collection-content">

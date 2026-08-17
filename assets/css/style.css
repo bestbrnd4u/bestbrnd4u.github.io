@@ -9225,6 +9225,14 @@ body.mobile-filters-open .scroll-top{
     background:var(--gray100);
 }
 
+/* <picture> — інлайновий елемент, тож без цього він не розтягується
+   на всю висоту колонки і object-fit у вкладеного <img> нічого не дає */
+.collection-image picture{
+    display:block;
+    width:100%;
+    height:100%;
+}
+
 .collection-image img{
     width:100%;
     height:100%;

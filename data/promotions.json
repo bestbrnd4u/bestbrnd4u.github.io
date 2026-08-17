@@ -95,9 +95,15 @@
     "text": "Лаконічні силуети та якісні тканини для щоденних образів",
     "badge": "",
     "image": "/assets/images/banners/coach-teaser.jpg",
+<<<<<<< Updated upstream
     "imageMobile": "/assets/images/products/uploads/043_small_card_1200x1500.jpg",
     "promoPageImage": "/assets/images/products/uploads/2.png",
     "promoPageImageMobile": "/assets/images/products/uploads/043_small_card_1200x1500.jpg",
+=======
+    "imageMobile": "/assets/images/banners/coach-teaser-mobile.jpg",
+    "promoPageImage": "/assets/images/banners/coach-promo-page.jpg",
+    "promoPageImageMobile": "/assets/images/banners/coach-promo-page-mobile.jpg",
+>>>>>>> Stashed changes
     "buttonText": "Дивитись все",
     "link": "catalog?brand=Calvin%20Klein",
     "brand": "Calvin Klein",

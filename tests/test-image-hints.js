@@ -51,7 +51,13 @@ console.log("\n[3] Точкові перевірки конкретних роз
   check("Категорії — 800×660", /800\s*[×x]\s*660/.test(byPath("categories")?.hint||""));
   check("Промо-банер — 2000×1600", /2000\s*[×x]\s*1600/.test(byPath("promo/image")?.hint||""));
   check("Спливаючий банер — 800×800", /800\s*[×x]\s*800/.test(byPath("promoPopups")?.hint||""));
-  check("Добірки — 1200×900", /1200\s*[×x]\s*900/.test(byPath("collections")?.hint||""));
+  // Слот добірки на десктопі — вертикальна колонка, а не 4:3, як тут
+  // вважалось раніше; на мобільному блок перебудовується в смугу 16:9,
+  // під яку зʼявилось окреме поле imageMobile
+  check("Добірки, десктоп — 900×1200",
+        /900\s*[×x]\s*1200/.test(byPath("collections/collections/image")?.hint||""));
+  check("Добірки, мобільна — 1600×900",
+        /1600\s*[×x]\s*900/.test(byPath("collections/collections/imageMobile")?.hint||""));
   check("Фото товару — 1200×1500", /1200\s*[×x]\s*1500/.test(byPath("products")?.hint||""));
   check("Акції (тизер) згадує усі 4 типи показу",
         /1000.*1160[\s\S]*1800.*900[\s\S]*800.*1000/.test(byPath("promotions/promotions/image")?.hint||"") ||

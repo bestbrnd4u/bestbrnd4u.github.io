@@ -60,6 +60,10 @@ function main() {
             eyebrow: data.eyebrow || "ДОБІРКА",
             title: data.title,
             image: data.image,
+            // Порожній рядок, а не відсутнє поле: фронт сам відкотиться
+            // на десктопне фото (див. renderCollectionWidget в app.js),
+            // тож уже створені добірки без цього поля не ламаються.
+            imageMobile: data.imageMobile || "",
             imageAlt: data.imageAlt || data.title,
             productIds: data.products.map(Number),
             order: typeof data.order === "number" ? data.order : 1
