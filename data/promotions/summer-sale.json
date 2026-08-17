@@ -1,21 +1,24 @@
 {
   "genderButtons": [],
-  "badge": "-30%",
+  "badge": "",
   "products": [
-    2,
-    4,
-    15,
     1,
-    5
+    4,
+    5,
+    6,
+    11,
+    17,
+    18,
+    19,
+    27
   ],
-  "discountPercent": 30,
+  "discountPercent": 0,
   "active": true,
-  "brand": "Guess",
-  "text": "Guess, Michael Kors, Calvin Klein, Tommy Hilfiger, Furla",
+  "text": "Сонцезахисні окуляри Balenciaga, Gucci, Prada, Burberry, Marc Jacobs, Alain Mikli",
   "order": 1,
-  "title": "SUMMER SALE до -30%",
-  "link": "catalog?section=sale",
-  "image": "/assets/images/products/uploads/485d0e230d97266f0bf4e4744df2.webp",
+  "title": "SUMMER SALE",
+  "link": "catalog?category=Окуляри%20і%20оправи",
+  "image": "/assets/images/banners/promo-glasses.jpg",
   "displayType": "banner_products",
   "buttonText": "Дивитись усі товари"
 }

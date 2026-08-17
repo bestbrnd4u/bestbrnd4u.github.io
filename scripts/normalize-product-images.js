@@ -38,7 +38,13 @@ const path = require("path");
 const sharp = require("sharp");
 
 const ROOT = path.join(__dirname, "..");
+// ТІЛЬКИ фото товарів. Банери сюди навмисно не входять: у них своя,
+// широка геометрія, і приведення до 4:5 їх нищить. Так уже сталось —
+// банер 1635×1104 після першого прогону цього скрипта перетворився на
+// 1200×1500 з великими білими полями зверху й знизу. Тому банери
+// живуть в assets/images/banners/ (див. tests/test-image-canvas.js).
 const DIR = path.join(ROOT, "assets/images/products/uploads");
+const BANNERS_DIR = path.join(ROOT, "assets/images/banners");
 const VARIANTS_FILE = path.join(ROOT, "data/image-variants.json");
 
 // холст і ширини — такі самі, як у першої, ручної нормалізації,

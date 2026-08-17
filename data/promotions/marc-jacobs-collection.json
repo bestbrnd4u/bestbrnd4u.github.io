@@ -1,0 +1,19 @@
+{
+  "products": [
+    17,
+    18,
+    19,
+    20,
+    21,
+    22
+  ],
+  "active": true,
+  "brand": "Marc Jacobs",
+  "text": "Найширша добірка бренду в каталозі — сумки та сонцезахисні окуляри",
+  "order": 2,
+  "title": "Колекція Marc Jacobs",
+  "link": "catalog?brand=Marc%20Jacobs",
+  "image": "/assets/images/banners/promo-marc-jacobs.jpg",
+  "displayType": "banner_compact",
+  "buttonText": "Дивитись колекцію"
+}

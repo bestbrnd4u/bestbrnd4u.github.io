@@ -1,16 +1,32 @@
 {
   "badge": "",
   "products": [
+    2,
+    3,
+    7,
+    8,
+    9,
     10,
-    5
+    13,
+    14,
+    15,
+    16,
+    20,
+    21,
+    22,
+    25,
+    28,
+    29,
+    30,
+    31
   ],
-  "discountPercent": 50,
+  "discountPercent": 0,
   "active": true,
-  "text": "Сумочки з дуже приємними знижками",
+  "text": "Жіночі, чоловічі та унісекс — усі сумки каталогу в одному місці",
   "order": 1,
   "title": "Обери сумочку для себе",
-  "link": "catalog?section=sale",
-  "image": "/assets/images/products/uploads/ksxmpzwgh-gycmdt7tj5e3r0pkerhv6rymi5h1he-9c57c469.jpg",
+  "link": "catalog",
+  "image": "/assets/images/banners/promo-bags-all.jpg",
   "displayType": "hero_slider",
   "buttonText": "Дивитись усі товари"
 }

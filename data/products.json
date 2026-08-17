@@ -162,7 +162,7 @@
         ]
       }
     ],
-    "oldPrice": 16250,
+    "oldPrice": 17900,
     "badge": "SALE",
     "isNew": false,
     "sizes": [
@@ -214,7 +214,7 @@
         ]
       }
     ],
-    "oldPrice": 16900,
+    "oldPrice": 18600,
     "badge": "SALE",
     "isNew": false,
     "sizes": [
@@ -268,7 +268,7 @@
         ]
       }
     ],
-    "oldPrice": 11700,
+    "oldPrice": 12900,
     "badge": "SALE",
     "isNew": false,
     "sizes": [
@@ -319,7 +319,7 @@
         "sku": "coach ethan cv918 qbnrx"
       }
     ],
-    "oldPrice": 11180,
+    "oldPrice": 12300,
     "badge": "SALE",
     "isNew": false,
     "material": "Шкіра",
@@ -434,7 +434,7 @@
         "sku": "coach73995 dark stone"
       }
     ],
-    "oldPrice": 14300,
+    "oldPrice": 15750,
     "badge": "SALE",
     "isNew": false,
     "material": "Шкіра",
@@ -465,7 +465,7 @@
   },
   {
     "gender": "Жінкам",
-    "oldPrice": 16250,
+    "oldPrice": 17900,
     "color": "Світло-сірий",
     "badge": "SALE",
     "forcePublish": false,
@@ -559,7 +559,7 @@
         ]
       }
     ],
-    "oldPrice": 16640,
+    "oldPrice": 18300,
     "badge": "SALE",
     "isNew": false,
     "sizes": [
@@ -1002,7 +1002,7 @@
         "sku": "H153L01SP22-002"
       }
     ],
-    "oldPrice": 13000,
+    "oldPrice": 14300,
     "badge": "SALE",
     "isNew": false,
     "material": "Шкіра",
@@ -1052,7 +1052,7 @@
         "sku": "2F3HSH042H02-230"
       }
     ],
-    "oldPrice": 11700,
+    "oldPrice": 12900,
     "badge": "SALE",
     "isNew": false,
     "sku": "2F3HSH042H02-230",
@@ -1100,9 +1100,9 @@
         "sku": "H652L01PF22"
       }
     ],
-    "oldPrice": 16900,
+    "oldPrice": 18600,
     "badge": "SALE",
-    "isNew": false,
+    "isNew": true,
     "material": "Шкіра",
     "sku": "H652L01PF22",
     "searchKeywords": [
@@ -1151,9 +1151,9 @@
         ]
       }
     ],
-    "oldPrice": 8450,
+    "oldPrice": 9300,
     "badge": "SALE",
-    "isNew": false,
+    "isNew": true,
     "sizes": [
       "ONESIZE"
     ],
@@ -1201,9 +1201,9 @@
         ]
       }
     ],
-    "oldPrice": 8450,
+    "oldPrice": 9300,
     "badge": "SALE",
-    "isNew": false,
+    "isNew": true,
     "sizes": [
       "ONESIZE"
     ],
@@ -1248,7 +1248,7 @@
         "sku": "30H1GGRL2L-487"
       }
     ],
-    "isNew": false,
+    "isNew": true,
     "material": "Шкіра",
     "sku": "30H1GGRL2L-487",
     "searchKeywords": [
@@ -1297,7 +1297,7 @@
         ]
       }
     ],
-    "isNew": false,
+    "isNew": true,
     "sizes": [
       "ONESIZE"
     ],
@@ -1346,7 +1346,7 @@
         ]
       }
     ],
-    "isNew": false,
+    "isNew": true,
     "sizes": [
       "ONESIZE"
     ],
@@ -1461,7 +1461,7 @@
       "quilted bag",
       "crossbody bag"
     ],
-    "isNew": false,
+    "isNew": true,
     "title": "Michael Kors Rose Small Top Handle Quilted Crossbody Bag",
     "images": [
       "/assets/images/products/uploads/35f1gx0c5u-1-.webp",
@@ -1481,7 +1481,7 @@
       "Жінкам"
     ],
     "preOrderDays": "5–10 робочих днів",
-    "oldPrice": 9500,
+    "oldPrice": 11450,
     "color": "Blush Beige",
     "badge": "HOT",
     "forcePublish": true,
@@ -1569,7 +1569,7 @@
       "стьобана кросбоді",
       "сумка на кожен день"
     ],
-    "isNew": false,
+    "isNew": true,
     "title": "Сумочка Love Moschino Logo Plaque Quilted Shoulder Bag",
     "reviews": 0,
     "instagramBlock": "general",
@@ -1643,7 +1643,7 @@
       "Michael Kors Carine Powder Blush",
       "35F2GCCS2L"
     ],
-    "isNew": false,
+    "isNew": true,
     "title": "Сумочка з натуральної шкіри Michael Kors Carine Medium Pebbled Leather Satchel  Powder Blush",
     "reviews": 0,
     "instagramBlock": "general",

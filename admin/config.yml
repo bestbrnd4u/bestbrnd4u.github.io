@@ -401,7 +401,7 @@ collections:
         name: "text"
         widget: "string"
         required: true
-        hint: "Наприклад: Guess, Michael Kors, Calvin Klein та інші"
+        hint: "Наприклад: Marc Jacobs, Michael Kors, Coach та інші"
 
       - label: "Фото"
         name: "image"

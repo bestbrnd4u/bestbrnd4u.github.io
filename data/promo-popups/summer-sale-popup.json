@@ -1,8 +1,11 @@
 {
   "active": true,
   "title": "Спливаючий банер — SUMMER SALE",
-  "image": "https://images.pexels.com/photos/1152077/pexels-photo-1152077.jpeg?auto=compress&cs=tinysrgb&w=800",
+  "image": "/assets/images/banners/popup-glasses.jpg",
   "promoSlug": "summer-sale",
-  "pages": ["catalog", "promo"],
+  "pages": [
+    "catalog",
+    "promo"
+  ],
   "delaySeconds": 60
 }

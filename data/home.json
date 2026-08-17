@@ -3,7 +3,7 @@
     "label": "Нова колекція",
     "heading": "Знайдіть сумку,\nяка підкреслить\nваш стиль",
     "text": "Понад 500 оригінальних моделей від світових брендів. Швидка доставка, зручна оплата та гарантія якості.",
-    "image": "/assets/images/products/uploads/055d546d-c1e2-4396-9348-fee4bbd283aa.png",
+    "image": "/assets/images/banners/hero-bags.jpg",
     "primaryButtonText": "Перейти до каталогу",
     "primaryButtonLink": "catalog",
     "secondaryButtonText": "Популярні товари",
@@ -43,8 +43,8 @@
   "promo": {
     "label": "НОВА КОЛЕКЦІЯ",
     "heading": "Свіжі надходження вже в каталозі",
-    "text": "Guess, Michael Kors, Calvin Klein, Tommy Hilfiger, Furla та багато інших — перші оглядайте новинки сезону.",
-    "image": "https://images.pexels.com/photos/336372/pexels-photo-336372.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    "text": "Marc Jacobs, Michael Kors, Coach, JW PEI, Love Moschino — свіжі надходження сезону.",
+    "image": "/assets/images/banners/home-new-arrivals.jpg",
     "buttonText": "Дивитися новинки",
     "buttonLink": "catalog?section=new"
   },
@@ -52,28 +52,28 @@
     "title": "Популярні бренди",
     "items": [
       {
-        "name": "GUESS",
-        "link": "catalog?brand=Guess"
+        "name": "MARC JACOBS",
+        "link": "catalog?brand=Marc%20Jacobs"
+      },
+      {
+        "name": "COACH",
+        "link": "catalog?brand=Coach"
+      },
+      {
+        "name": "JW PEI",
+        "link": "catalog?brand=JW%20PEI"
       },
       {
         "name": "MICHAEL KORS",
         "link": "catalog?brand=Michael%20Kors"
       },
       {
-        "name": "CALVIN KLEIN",
-        "link": "catalog?brand=Calvin%20Klein"
-      },
-      {
-        "name": "TOMMY HILFIGER",
-        "link": "catalog?brand=Tommy%20Hilfiger"
-      },
-      {
-        "name": "FURLA",
-        "link": "catalog?brand=Furla"
-      },
-      {
         "name": "LOVE MOSCHINO",
         "link": "catalog?brand=Love%20Moschino"
+      },
+      {
+        "name": "BALENCIAGA",
+        "link": "catalog?brand=Balenciaga"
       }
     ]
   },

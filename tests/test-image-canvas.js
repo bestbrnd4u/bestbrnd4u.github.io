@@ -101,7 +101,52 @@ console.log("\n[3] У кожного фото є всі зменшені коп�
         wrong.length === 0, wrong.slice(0, 3).join(", "));
 }
 
-console.log("\n[4] Приведення вбудоване в збірку, а не разова ручна дія");
+console.log("\n[4] Банери не потрапляють під приведення до 4:5");
+{
+    // Банер — широкий за задумом. Перший прогон нормалізації зачепив
+    // банер 1635×1104 і перетворив його на 1200×1500 з білими полями:
+    // на сайті це виглядало як зіпсована картинка. Тому банери лежать
+    // окремою текою, а скрипт бачить лише фото товарів.
+    const script = fs.readFileSync(path.join(ROOT, "scripts/normalize-product-images.js"), "utf8");
+
+    check("скрипт дивиться лише в теку фото товарів",
+        /const DIR = path\.join\(ROOT, "assets\/images\/products\/uploads"\)/.test(script));
+    check("тека банерів у скрипті названа окремо (щоб її не переплутали)",
+        script.includes("assets/images/banners"));
+
+    const bannersDir = path.join(ROOT, "assets/images/banners");
+
+    if (fs.existsSync(bannersDir)) {
+
+        const banners = fs.readdirSync(bannersDir).filter(f => /\.(jpe?g|png|webp)$/i.test(f));
+
+        check(`банери існують (${banners.length})`, banners.length > 0);
+
+
+        const squashed = banners.filter(f => {
+            const buf = fs.readFileSync(path.join(bannersDir, f));
+            // JPEG SOF маркер: шукаємо розміри без сторонніх бібліотек
+            if (buf.slice(0, 2).toString("hex") !== "ffd8") return false;
+            let i = 2;
+            while (i < buf.length - 9) {
+                if (buf[i] !== 0xff) { i++; continue; }
+                const marker = buf[i + 1];
+                if (marker >= 0xc0 && marker <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(marker)) {
+                    const h = buf.readUInt16BE(i + 5);
+                    const w = buf.readUInt16BE(i + 7);
+                    return +(w / h).toFixed(3) === 0.8;
+                }
+                i += 2 + buf.readUInt16BE(i + 2);
+            }
+            return false;
+        });
+
+        check("жоден банер не приведений до 4:5", squashed.length === 0, squashed.join(", "));
+
+    }
+}
+
+console.log("\n[5] Приведення вбудоване в збірку, а не разова ручна дія");
 {
     const wf = fs.readFileSync(path.join(ROOT, ".github/workflows/build-products.yml"), "utf8");
 
