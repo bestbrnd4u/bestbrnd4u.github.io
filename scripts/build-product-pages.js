@@ -56,6 +56,83 @@ const SITE_URL = "https://bestbrnd4u.github.io";
 
 const { slugProblem } = require("./slug-safety");
 
+// Умови повернення й доставки для розмітки товару.
+//
+// Search Console просив додати hasMerchantReturnPolicy і shippingDetails
+// у offers (розділ Merchant listings). Значення нижче — НЕ вигадані:
+// узяті зі сторінок return-warranty і delivery-payment, тож розмітка
+// збігається з тим, що покупець реально прочитає на сайті.
+//
+// • 14 днів на повернення — строк із Закону України «Про захист прав
+//   споживачів», саме він зазначений в умовах;
+// • пересилку назад при «не підійшов розмір/колір» оплачує покупець —
+//   для цього в schema.org є значення ReturnFeesCustomerResponsibility,
+//   воно не вимагає вказувати суму (а сума й залежить від відправлення);
+// • 1–2 дні на збірку + 1–3 дні доставки Новою поштою по Україні;
+// • доставка безкоштовна від 3 500 грн. Найдешевший товар каталогу —
+//   4 000 грн, тобто для будь-якого окремого товару доставка справді
+//   нульова. Якщо колись з'явиться товар дешевше за поріг, ставка не
+//   вказується: краще неповна розмітка, ніж неправдива обіцянка.
+const RETURN_POLICY = {
+    "@type": "MerchantReturnPolicy",
+    applicableCountry: "UA",
+    returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+    merchantReturnDays: 14,
+    returnMethod: "https://schema.org/ReturnByMail",
+    returnFees: "https://schema.org/ReturnFeesCustomerResponsibility"
+};
+
+const FREE_SHIPPING_FROM = 3500;
+
+// Артикул: спершу власний, далі — першого варіанта з ним.
+function firstSku(product) {
+
+    if (product.sku && String(product.sku).trim()) return String(product.sku).trim();
+
+    const withSku = (product.variants || []).find(v => v && v.sku && String(v.sku).trim());
+
+    return withSku ? String(withSku.sku).trim() : "";
+
+}
+
+function shippingDetailsFor(price) {
+
+    const details = {
+        "@type": "OfferShippingDetails",
+        shippingDestination: {
+            "@type": "DefinedRegion",
+            addressCountry: "UA"
+        },
+        deliveryTime: {
+            "@type": "ShippingDeliveryTime",
+            handlingTime: {
+                "@type": "QuantitativeValue",
+                minValue: 1,
+                maxValue: 2,
+                unitCode: "DAY"
+            },
+            transitTime: {
+                "@type": "QuantitativeValue",
+                minValue: 1,
+                maxValue: 3,
+                unitCode: "DAY"
+            }
+        }
+    };
+
+    if (Number(price) >= FREE_SHIPPING_FROM) {
+        details.shippingRate = {
+            "@type": "MonetaryAmount",
+            value: 0,
+            currency: "UAH"
+        };
+    }
+
+    return details;
+
+}
+
+
 // ---------------------------------------------------------------
 // дрібні помічники
 // ---------------------------------------------------------------
@@ -190,7 +267,11 @@ function buildHead(product) {
         name: product.title,
         image: images,
         description,
-        sku: product.sku || undefined,
+        // Артикул може бути не в товара, а у варіанта (колір/розмір).
+        // Раніше тут стояло лише product.sku, і в одного товару поле
+        // взагалі не потрапляло в розмітку — Search Console скаржився
+        // на sku в розділі Merchant listings.
+        sku: firstSku(product) || undefined,
         brand: product.brand ? { "@type": "Brand", name: product.brand } : undefined,
         category: product.category || undefined,
         offers: {
@@ -199,6 +280,8 @@ function buildHead(product) {
             priceCurrency: "UAH",
             price: product.price,
             itemCondition: "https://schema.org/NewCondition",
+            hasMerchantReturnPolicy: RETURN_POLICY,
+            shippingDetails: shippingDetailsFor(product.price),
             availability
         }
     };

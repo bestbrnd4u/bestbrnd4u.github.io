@@ -62,6 +62,17 @@ function seoSandbox() {
     window.eval(grab(/function truncateForMeta\(text, maxLength = 155\) \{[\s\S]*?\n\}\n/));
 
     window.getVariantSku = (p, v) => (v && v.sku) || p.sku || undefined;
+    // умови повернення й доставки для offers — updateProductSeoMetadata
+    // тепер посилається на них (додано на запит Search Console)
+    // Через window.*, а не const: у jsdom оголошення const всередині
+    // window.eval лишається в межах того ж виклику і глобальним не стає
+    // (та сама пастка, що колись була з SITE_URL).
+    window.eval(productJs.match(/const RETURN_POLICY = \{[\s\S]*?\n\};\n/)[0]
+        .replace("const RETURN_POLICY =", "window.RETURN_POLICY ="));
+    window.eval(productJs.match(/const FREE_SHIPPING_FROM = \d+;/)[0]
+        .replace("const FREE_SHIPPING_FROM =", "window.FREE_SHIPPING_FROM ="));
+    window.eval(productJs.match(/function shippingDetailsFor\(price\) \{[\s\S]*?\n\}\n/)[0]
+        .replace("function shippingDetailsFor(price) {", "window.shippingDetailsFor = function (price) {"));
     window.eval(productJs.match(/function markProductPageNotFound\(\) \{[\s\S]*?\n\}\n/)[0]);
     window.eval(productJs.match(/function updateProductSeoMetadata\(product\) \{[\s\S]*?\n\n\}\n/)[0]);
 

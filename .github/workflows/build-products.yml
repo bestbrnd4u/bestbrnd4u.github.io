@@ -106,6 +106,13 @@ jobs:
       - name: Build data/promo-popups.json
         run: node scripts/build-promo-popups.js
 
+      # Статична розмітка головної: index.html містить готовий HTML, і
+      # саме його бачить браузер до виконання app.js. Якщо там лишиться
+      # стара картинка — вона блимне при кожному оновленні сторінки.
+      # Крок тримає її в згоді з data/home.json.
+      - name: Sync static homepage markup
+        run: node scripts/build-home-static.js
+
       - name: Build sitemap.xml
         run: node scripts/build-sitemap.js
 
@@ -118,6 +125,7 @@ jobs:
                   data/promo-popups.json sitemap.xml
           # -A по теці p/: додає нові сторінки І фіксує видалення тек
           # товарів, яких уже немає (звичайний git add видалення не бачить)
+          git add index.html
           git add -A p
           # -A по картинках: фіксує і нові імена, і зникнення старих
           # після кроку "Normalize media file names"

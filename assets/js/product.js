@@ -97,6 +97,43 @@ document.getElementById("productPage").innerHTML = `
 
 }
 
+// Умови повернення й доставки для розмітки товару — ті самі, що в
+// scripts/build-product-pages.js (статичні сторінки) і ті самі, що
+// написані на сторінках return-warranty і delivery-payment. Search
+// Console просив ці поля в offers (розділ Merchant listings).
+// Докладні пояснення до кожного значення — у генераторі сторінок.
+const RETURN_POLICY = {
+    "@type": "MerchantReturnPolicy",
+    applicableCountry: "UA",
+    returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+    merchantReturnDays: 14,
+    returnMethod: "https://schema.org/ReturnByMail",
+    returnFees: "https://schema.org/ReturnFeesCustomerResponsibility"
+};
+
+const FREE_SHIPPING_FROM = 3500;
+
+function shippingDetailsFor(price) {
+
+    const details = {
+        "@type": "OfferShippingDetails",
+        shippingDestination: { "@type": "DefinedRegion", addressCountry: "UA" },
+        deliveryTime: {
+            "@type": "ShippingDeliveryTime",
+            handlingTime: { "@type": "QuantitativeValue", minValue: 1, maxValue: 2, unitCode: "DAY" },
+            transitTime: { "@type": "QuantitativeValue", minValue: 1, maxValue: 3, unitCode: "DAY" }
+        }
+    };
+
+    // ставку 0 ставимо лише коли доставка справді безкоштовна
+    if (Number(price) >= FREE_SHIPPING_FROM) {
+        details.shippingRate = { "@type": "MonetaryAmount", value: 0, currency: "UAH" };
+    }
+
+    return details;
+
+}
+
 // Сторінка без товару не повинна потрапляти в індекс: адреса без id
 // або з неіснуючим id віддає той самий шаблон, і для Google це дубль.
 function markProductPageNotFound() {
@@ -163,12 +200,19 @@ function updateProductSeoMetadata(product) {
             availability: product.preOrder
                 ? "https://schema.org/PreOrder"
                 : "https://schema.org/InStock",
-            itemCondition: "https://schema.org/NewCondition"
+            itemCondition: "https://schema.org/NewCondition",
+            hasMerchantReturnPolicy: RETURN_POLICY,
+            shippingDetails: shippingDetailsFor(product.price)
         },
-        aggregateRating: product.rating ? {
+        // Рейтинг — ЛИШЕ якщо за ним стоять справжні відгуки.
+        // Раніше умовою було саме product.rating, і в чотирьох товарів
+        // із rating: 5, reviews: 0 у розмітку йшов reviewCount: 0 —
+        // оцінка без жодного відгуку. Google такий блок або відкидає,
+        // або (гірше) розцінює як накрутку рейтингу.
+        aggregateRating: (product.rating && Number(product.reviews) > 0) ? {
             "@type": "AggregateRating",
             ratingValue: product.rating,
-            reviewCount: product.reviews || 0
+            reviewCount: Number(product.reviews)
         } : undefined
     });
 

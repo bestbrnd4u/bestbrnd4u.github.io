@@ -4,7 +4,7 @@
     "title": "Обери сумочку для себе",
     "text": "Жіночі, чоловічі та унісекс — усі сумки каталогу в одному місці",
     "badge": "",
-    "image": "/assets/images/banners/coach-teaser-mobile.jpg",
+    "image": "/assets/images/banners/01_hero_slider_1000x1160-1-.jpg",
     "imageMobile": "/assets/images/banners/03_banner_compact_800x1000.jpg",
     "promoPageImage": "/assets/images/banners/2.png",
     "promoPageImageMobile": "/assets/images/banners/coach-teaser-mobile.jpg",
@@ -32,16 +32,7 @@
       30,
       31
     ],
-    "genderButtons": [
-      {
-        "gender": "Жінкам",
-        "color": "#111827"
-      },
-      {
-        "gender": "Чоловікам",
-        "color": "#111827"
-      }
-    ],
+    "genderButtons": [],
     "displayType": "hero_slider",
     "order": 1
   },
@@ -80,7 +71,7 @@
     "badge": "",
     "image": "/assets/images/banners/coach-teaser.jpg",
     "imageMobile": "/assets/images/banners/4coachsmall_card_1200x1500.jpg",
-    "promoPageImage": "/assets/images/banners/2.png",
+    "promoPageImage": "/assets/images/banners/coach-promo-page.jpg",
     "promoPageImageMobile": "/assets/images/banners/043_small_card_1200x1500.jpg",
     "buttonText": "Дивитись колекцію",
     "link": "catalog?brand=Coach",
@@ -98,7 +89,7 @@
     "badge": "",
     "image": "/assets/images/banners/01marc-jacobs_hero_slider_1000x1160.jpg",
     "imageMobile": "/assets/images/banners/02marc-jacobs_banner_products_1800x900.jpg",
-    "promoPageImage": "/assets/images/banners/02marc-jacobs_banner_products_1800x900.jpg",
+    "promoPageImage": "/assets/images/banners/04marc-jacobs_мобильная_страница_акции_1080x1400.jpg",
     "promoPageImageMobile": "/assets/images/banners/04marc-jacobs_мобильная_страница_акции_1080x1400.jpg",
     "buttonText": "Дивитись колекцію",
     "link": "catalog?brand=Marc%20Jacobs",
