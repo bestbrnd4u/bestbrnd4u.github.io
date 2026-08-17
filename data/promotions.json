@@ -65,6 +65,24 @@
     "order": 1
   },
   {
+    "slug": "20260817124647",
+    "title": "Колекція Coach",
+    "text": "Найширша добірка бренду в каталозі — сумки",
+    "badge": "",
+    "image": "/assets/images/banners/coach-teaser.jpg",
+    "imageMobile": "/assets/images/banners/043_small_card_1200x1500.jpg",
+    "promoPageImage": "/assets/images/banners/coach-promo-page.jpg",
+    "promoPageImageMobile": "/assets/images/banners/043_small_card_1200x1500.jpg",
+    "buttonText": "Дивитись колекцію",
+    "link": "catalog?brand=Coach",
+    "brand": "Coach",
+    "discountPercent": null,
+    "productIds": [],
+    "genderButtons": [],
+    "displayType": "banner_compact",
+    "order": 2
+  },
+  {
     "slug": "marc-jacobs-collection",
     "title": "Колекція Marc Jacobs",
     "text": "Найширша добірка бренду в каталозі — сумки та сонцезахисні окуляри",
