@@ -8,7 +8,7 @@ let failures=0;
 const check=(n,c,e)=>{if(c)console.log("  ✓",n);else{console.log("  ✗",n,e!==undefined?"→ "+e:"");failures++;}};
 
 const SRC = fs.readFileSync(path.join(ROOT,"supabase/functions/telegram-order-bot/_index.src.ts"),"utf8");
-const SITE = "https://bestbrnd4u.github.io";
+const { SITE_URL: SITE } = require("../scripts/site-env");
 
 let M;
 

@@ -52,7 +52,8 @@ const ROOT = path.join(__dirname, "..");
 const TEMPLATE_FILE = path.join(ROOT, "product.html");
 const PRODUCTS_FILE = path.join(ROOT, "data", "products.json");
 const OUTPUT_DIR = path.join(ROOT, "p");
-const SITE_URL = "https://bestbrnd4u.github.io";
+// домен береться з site.config.json (див. scripts/site-env.js)
+const { SITE_URL } = require("./site-env");
 
 const { slugProblem } = require("./slug-safety");
 

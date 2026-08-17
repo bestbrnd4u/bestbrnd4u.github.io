@@ -15,6 +15,8 @@ const path = require("path");
 const { JSDOM } = require("jsdom");
 
 const ROOT = path.join(__dirname, "..");
+// домен — з site.config.json, щоб тест не ламався при переїзді
+const { SITE_URL } = require("../scripts/site-env");
 
 let failures = 0;
 const check = (n, c, e) => {
@@ -42,7 +44,7 @@ function seoSandbox() {
     const dom = new JSDOM(
         `<!DOCTYPE html><html><head><title>Товар | BestBrnd4u</title></head>
          <body><div id="productPage"></div><span id="breadTitle"></span></body></html>`,
-        { runScripts: "outside-only", url: "https://bestbrnd4u.github.io/product?id=1" });
+        { runScripts: "outside-only", url: `${SITE_URL}/product?id=1` });
 
     const { window } = dom;
 
@@ -52,7 +54,7 @@ function seoSandbox() {
         return m[0];
     };
 
-    window.SITE_URL = "https://bestbrnd4u.github.io";
+    window.SITE_URL = SITE_URL;
     window.eval(grab(/function productUrl\(product, params\) \{[\s\S]*?\n\}\n/));
     window.eval(grab(/function absoluteUrl\(url\) \{[\s\S]*?\n\}\n/));
     window.eval(grab(/function setMetaByName\(name, content\) \{[\s\S]*?\n\}\n/));
@@ -88,10 +90,10 @@ console.log("\n[1] absoluteUrl розгортає обидві форми шля
 {
     const w = seoSandbox();
     check('"assets/…" → повна адреса',
-        w.absoluteUrl("assets/images/a.webp") === "https://bestbrnd4u.github.io/assets/images/a.webp",
+        w.absoluteUrl("assets/images/a.webp") === `${SITE_URL}/assets/images/a.webp`,
         w.absoluteUrl("assets/images/a.webp"));
     check('"/assets/…" → без подвійного слеша',
-        w.absoluteUrl("/assets/images/a.webp") === "https://bestbrnd4u.github.io/assets/images/a.webp",
+        w.absoluteUrl("/assets/images/a.webp") === `${SITE_URL}/assets/images/a.webp`,
         w.absoluteUrl("/assets/images/a.webp"));
     check("зовнішнє посилання не чіпаємо",
         w.absoluteUrl("https://images.pexels.com/x.jpg") === "https://images.pexels.com/x.jpg");
@@ -118,7 +120,7 @@ console.log("\n[2] Реальний товар id=1 отримує власні 
     const canonical = w.document.querySelector('link[rel="canonical"]');
     check("canonical вказує на канонічну статичну адресу товару",
         canonical && canonical.getAttribute("href")
-            === `https://bestbrnd4u.github.io/p/${encodeURIComponent(product.slug)}/`,
+            === `${SITE_URL}/p/${encodeURIComponent(product.slug)}/`,
         canonical && canonical.getAttribute("href"));
 
     check("og:type = product", meta(w, 'meta[property="og:type"]') === "product");

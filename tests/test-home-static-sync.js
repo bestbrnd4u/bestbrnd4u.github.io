@@ -69,8 +69,10 @@ console.log("\n[3] Банери в розмітці = банери в даних
             html.includes(`--promo-bg:url('${home.promo.image}')`), home.promo.image);
     }
 
+    // домен беремо з конфіга: інакше перевірка ламається при переїзді
+    const { SITE_URL } = require("../scripts/site-env");
     check("og:image веде на власний домен",
-        /og:image" content="https:\/\/bestbrnd4u\.github\.io\//.test(html));
+        html.includes(`og:image" content="${SITE_URL}/`), SITE_URL);
 }
 
 console.log("\n[4] Бренди й випадаюче меню теж не застаріли");

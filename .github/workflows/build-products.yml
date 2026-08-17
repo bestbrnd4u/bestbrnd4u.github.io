@@ -72,6 +72,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Домен і налаштування середовища — з site.config.json.
+      # Першим кроком, щоб усе згенероване далі (сторінки товарів,
+      # sitemap, статична розмітка) одразу мало правильні адреси.
+      - name: Apply site environment
+        run: node scripts/apply-site-env.js
+
       - name: Normalize media file names
         run: node scripts/normalize-media-names.js
 
@@ -125,7 +131,7 @@ jobs:
                   data/promo-popups.json sitemap.xml
           # -A по теці p/: додає нові сторінки І фіксує видалення тек
           # товарів, яких уже немає (звичайний git add видалення не бачить)
-          git add index.html
+          git add index.html robots.txt CNAME admin/config.yml
           git add -A p
           # -A по картинках: фіксує і нові імена, і зникнення старих
           # після кроку "Normalize media file names"

@@ -15,7 +15,8 @@ const fs = require("fs");
 const path = require("path");
 
 const ROOT = path.join(__dirname, "..");
-const SITE_URL = "https://bestbrnd4u.github.io";
+// домен береться з site.config.json (див. scripts/site-env.js)
+const { SITE_URL } = require("./site-env");
 
 const PRODUCTS_FILE = path.join(ROOT, "data", "products.json");
 const PROMOTIONS_FILE = path.join(ROOT, "data", "promotions.json");

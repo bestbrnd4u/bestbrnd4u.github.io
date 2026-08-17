@@ -2344,7 +2344,7 @@ function getDiscountPercent(product) {
 // це й був один з найкритичніших SEO-багів сайту.
 // -------------------------
 
-const SITE_URL = "https://bestbrnd4u.github.io";
+const SITE_URL = "https://bestbrnd4u.com";
 
 function setMetaByName(name, content) {
 

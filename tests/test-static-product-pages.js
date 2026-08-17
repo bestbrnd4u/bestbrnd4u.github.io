@@ -20,7 +20,9 @@ const { JSDOM } = require("jsdom");
 
 const ROOT = path.join(__dirname, "..");
 const PAGES_DIR = path.join(ROOT, "p");
-const SITE_URL = "https://bestbrnd4u.github.io";
+// домен береться з site.config.json — інакше тест ламається
+// при кожній зміні домену (див. scripts/site-env.js)
+const { SITE_URL } = require("../scripts/site-env");
 
 let failures = 0;
 const check = (n, c, e) => {

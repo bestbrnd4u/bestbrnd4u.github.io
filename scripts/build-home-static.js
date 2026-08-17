@@ -27,7 +27,8 @@ const path = require("path");
 const ROOT = path.join(__dirname, "..");
 const INDEX = path.join(ROOT, "index.html");
 const HOME = path.join(ROOT, "data", "home.json");
-const SITE_URL = "https://bestbrnd4u.github.io";
+// домен береться з site.config.json (див. scripts/site-env.js)
+const { SITE_URL } = require("./site-env");
 
 function escapeAttr(value) {
 

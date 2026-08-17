@@ -3,6 +3,8 @@ const { JSDOM } = require("jsdom");
 
 const ROOT = require("path").join(__dirname, "..");
 const SRC = ROOT + "/admin/github-publish.js";
+// домен — з site.config.json, щоб тест не ламався при переїзді
+const { SITE_URL } = require("../scripts/site-env");
 
 let failures = 0;
 function check(name, cond, extra) {
@@ -12,7 +14,7 @@ function check(name, cond, extra) {
 
 function makeEnv({ token = "tok123", refConflicts = 0 } = {}) {
     const dom = new JSDOM("<!doctype html><body></body>", {
-        url: "https://bestbrnd4u.github.io/admin/import.html",
+        url: `${SITE_URL}/admin/import.html`,
         runScripts: "outside-only"
     });
     const { window } = dom;
