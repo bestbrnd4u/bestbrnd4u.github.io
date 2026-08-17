@@ -1,4 +1,14 @@
 {
+  "genderButtons": [
+    {
+      "color": "#111827",
+      "gender": "Жінкам"
+    },
+    {
+      "color": "#111827",
+      "gender": "Чоловікам"
+    }
+  ],
   "badge": "",
   "products": [
     2,
