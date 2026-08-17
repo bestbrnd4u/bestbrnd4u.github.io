@@ -1,15 +1,17 @@
 {
-  "_comment": "Середовища сайту. Домен більше не зашитий у код — усі скрипти й розмітка беруть його звідси. Змінити домен = змінити цей файл і перезібрати.",
+  "_comment": "Середовища сайту. Домен більше не зашитий у код — усі скрипти й розмітка беруть його звідси. oauthSiteId — це домен, під яким сайт зареєстрований у Netlify (OAuth-проксі для входу в адмінку); Netlify відправляє токен назад саме на цю адресу, тож вона МАЄ збігатися з тією, де відкрита адмінка.",
   "production": {
     "url": "https://bestbrnd4u.com",
     "branch": "main",
     "indexable": true,
-    "cname": "bestbrnd4u.com"
+    "cname": "bestbrnd4u.com",
+    "oauthSiteId": "bestbrnd4u.com"
   },
   "development": {
     "url": "https://dev.bestbrnd4u.com",
     "branch": "dev",
     "indexable": false,
-    "cname": null
+    "cname": null,
+    "oauthSiteId": "dev.bestbrnd4u.com"
   }
 }

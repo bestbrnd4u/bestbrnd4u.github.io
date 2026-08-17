@@ -30,7 +30,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const { SITE_URL, BRANCH, INDEXABLE, CNAME, ENV_NAME, ALL } = require("./site-env");
+const { SITE_URL, BRANCH, INDEXABLE, CNAME, ENV_NAME, ALL, OAUTH_SITE_ID } = require("./site-env");
 
 const ROOT = path.join(__dirname, "..");
 
@@ -144,7 +144,16 @@ rewrite("admin/config.yml", text => {
     // Заміна домену їх зіпсувала б: site_domain перестав би збігатися з
     // зареєстрованим у Netlify (і вхід в адмінку відвалився б), а repo
     // вказав би на неіснуючий репозиторій.
-    const KEEP = /^(\s*(?:site_domain|repo):\s*).+$/gm;
+    // Тільки repo: це шлях до репозиторію, він від домену не залежить.
+    //
+    // site_domain СВІДОМО більше не в цьому списку. Спершу я його тут
+    // прибив до bestbrnd4u.github.io — і вхід зламався інакше: Netlify
+    // відправляє токен назад через postMessage на адресу того домену,
+    // під яким сайт у нього зареєстрований. Якщо ця адреса не збігається
+    // з тією, де відкрита адмінка, браузер повідомлення відкидає —
+    // вікно показує «Authorized» і зависає назавжди.
+    // Тому site_domain має дорівнювати домену САМОЇ адмінки.
+    const KEEP = /^(\s*repo:\s*).+$/gm;
     const saved = [];
 
     let out = text.replace(KEEP, m => {
@@ -152,7 +161,9 @@ rewrite("admin/config.yml", text => {
         return `@@KEEP${saved.length - 1}@@`;
     });
 
-    out = swapHost(out).replace(/^(\s*branch:\s*).+$/m, `$1${BRANCH}`);
+    out = swapHost(out)
+        .replace(/^(\s*branch:\s*).+$/m, `$1${BRANCH}`)
+        .replace(/^(\s*site_domain:\s*).+$/m, `$1${OAUTH_SITE_ID}`);
 
     return out.replace(/@@KEEP(\d+)@@/g, (all, i) => saved[Number(i)]);
 
