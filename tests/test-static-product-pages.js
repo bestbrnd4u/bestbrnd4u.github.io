@@ -192,11 +192,28 @@ console.log("\n[7] Стара адреса ?id= не ламається, а ве
     const productJs = fs.readFileSync(path.join(ROOT, "assets/js/product.js"), "utf8");
 
     check("є ознака старої адреси", /const isLegacyUrl\s*=/.test(productJs));
+    // між ознакою старої адреси й самим переходом тепер стоїть ще й
+    // блок розмітки з коментарем, тож вікно пошуку більше за колишні 200
     check("зі старої адреси йде location.replace (без зайвого кроку в історії)",
-        /isLegacyUrl[\s\S]{0,200}location\.replace\(/.test(productJs));
+        /isLegacyUrl[\s\S]{0,1400}location\.replace\(/.test(productJs));
     check("товар шукається і за slug, і за id",
         /find\(p => p\.slug === productSlug\)/.test(productJs)
         && /find\(p => p\.id === productId\)/.test(productJs));
+    // Search Console перевіряє виправлення саме за старою адресою —
+    // вона лишається в індексі. Робот не виконує location.replace, тож
+    // якщо перекинути його раніше за розмітку, він побачить порожню
+    // оболонку без canonical і без JSON-LD, і перевірка зупиниться з
+    // «Affected pages were found». Порядок тут критичний.
+    const legacyBlock = productJs.slice(
+        productJs.indexOf("if (isLegacyUrl && product.slug)"),
+        productJs.indexOf("if (isLegacyUrl && product.slug)") + 1400);
+
+    check("розмітка проставляється ДО переходу зі старої адреси",
+        legacyBlock.indexOf("updateProductSeoMetadata(product)") !== -1
+        && legacyBlock.indexOf("updateProductSeoMetadata(product)")
+           < legacyBlock.indexOf("location.replace("),
+        "updateProductSeoMetadata має стояти перед location.replace");
+
     check("колір і розмір переносяться на нову адресу",
         /location\.replace\(productUrl\(product, \{[\s\S]{0,120}color[\s\S]{0,120}size/.test(productJs));
     check("product.js тягне каталог з кореня, а не відносно теки",
