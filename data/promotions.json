@@ -45,24 +45,6 @@
     "order": 1
   },
   {
-    "slug": "summer-hero-demo",
-    "title": "Більше стилю для яскравого літа",
-    "text": "Guess, Michael Kors, Calvin Klein, Tommy Hilfiger, Furla та інші бренди зі знижками до -50%",
-    "badge": "-50%",
-    "image": "/assets/images/products/uploads/c818d5ef404ee0a9cc6da6cb3732.png",
-    "imageMobile": "",
-    "promoPageImage": "",
-    "promoPageImageMobile": "",
-    "buttonText": "Дивитись усі товари",
-    "link": "catalog?section=sale",
-    "brand": "",
-    "discountPercent": 50,
-    "productIds": [],
-    "genderButtons": [],
-    "displayType": "hero_slider",
-    "order": 2
-  },
-  {
     "slug": "calvin-klein-teaser",
     "title": "Осіння колекція Calvin Klein",
     "text": "Лаконічні силуети та якісні тканини для щоденних образів",
