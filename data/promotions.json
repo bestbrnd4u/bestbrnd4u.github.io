@@ -65,15 +65,9 @@
     "order": 1
   },
   {
-<<<<<<< Updated upstream
-    "slug": "calvin-klein-teaser",
-    "title": "Осіння колекція Calvin Klein",
-    "text": "Лаконічні силуети та якісні тканини для щоденних образів",
-=======
     "slug": "marc-jacobs-collection",
     "title": "Колекція Marc Jacobs",
     "text": "Найширша добірка бренду в каталозі — сумки та сонцезахисні окуляри",
->>>>>>> Stashed changes
     "badge": "",
     "image": "/assets/images/banners/promo-marc-jacobs.jpg",
     "imageMobile": "",
@@ -90,6 +84,28 @@
       20,
       21,
       22
+    ],
+    "genderButtons": [],
+    "displayType": "banner_compact",
+    "order": 2
+  },
+  {
+    "slug": "calvin-klein-teaser",
+    "title": "Осіння колекція Calvin Klein",
+    "text": "Лаконічні силуети та якісні тканини для щоденних образів",
+    "badge": "",
+    "image": "https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    "imageMobile": "",
+    "promoPageImage": "",
+    "promoPageImageMobile": "",
+    "buttonText": "Дивитись все",
+    "link": "catalog?brand=Calvin%20Klein",
+    "brand": "Calvin Klein",
+    "discountPercent": null,
+    "productIds": [
+      9,
+      10,
+      8
     ],
     "genderButtons": [],
     "displayType": "banner_compact",
