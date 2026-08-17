@@ -138,8 +138,25 @@ rewrite("robots.txt", text => {
 }
 
 // ---- 5. адмінка: у яку гілку комітити ----
-rewrite("admin/config.yml", text =>
-    swapHost(text).replace(/^(\s*branch:\s*).+$/m, `$1${BRANCH}`));
+rewrite("admin/config.yml", text => {
+
+    // site_domain і repo — НЕ адреси сайту, а ключі GitHub і Netlify.
+    // Заміна домену їх зіпсувала б: site_domain перестав би збігатися з
+    // зареєстрованим у Netlify (і вхід в адмінку відвалився б), а repo
+    // вказав би на неіснуючий репозиторій.
+    const KEEP = /^(\s*(?:site_domain|repo):\s*).+$/gm;
+    const saved = [];
+
+    let out = text.replace(KEEP, m => {
+        saved.push(m);
+        return `@@KEEP${saved.length - 1}@@`;
+    });
+
+    out = swapHost(out).replace(/^(\s*branch:\s*).+$/m, `$1${BRANCH}`);
+
+    return out.replace(/@@KEEP(\d+)@@/g, (all, i) => saved[Number(i)]);
+
+});
 
 // ---- 6. заборона індексації дев-середовища в самій розмітці ----
 // robots.txt рятує не завжди: якщо на дев хтось поставить посилання,
