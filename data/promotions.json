@@ -32,7 +32,16 @@
       30,
       31
     ],
-    "genderButtons": [],
+    "genderButtons": [
+      {
+        "gender": "Жінкам",
+        "color": "#111827"
+      },
+      {
+        "gender": "Чоловікам",
+        "color": "#111827"
+      }
+    ],
     "displayType": "hero_slider",
     "order": 1
   },
