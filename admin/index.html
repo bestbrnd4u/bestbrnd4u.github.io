@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BestBrnd4u — Адмінка</title>
     <link rel="icon" href="../assets/images/favicon.png">
+    <!--SITE_ENVIRONMENT-->
+    <script>window.SITE_ENVIRONMENT = {"name":"production","host":"bestbrnd4u.com","branch":"main"};</script>
 </head>
 <body>
     <!-- Плаваюче посилання на інструмент масового імпорту товарів
@@ -151,6 +153,11 @@
     <!-- Свій вибір товарів: стандартний relation шукає підпослідовністю
          і на «coach» видавав Armani/Marc Jacobs/Michael Kors -->
     <script src="product-picker.js"></script>
+
+    <!-- Смуга-індикатор середовища. Адмінок дві, виглядають однаково,
+         і переплутати бойову з тестовою — питання однієї вкладки.
+         Дані підставляє scripts/apply-site-env.js (блок нижче). -->
+    <script src="env-badge.js"></script>
 
     <script src="preview-templates.js"></script>
 </body>

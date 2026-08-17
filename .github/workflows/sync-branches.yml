@@ -1,0 +1,117 @@
+# Перенесення коду між гілками main (прод) і dev (тест) — кнопкою.
+#
+# НАВІЩО ОКРЕМИЙ WORKFLOW, А НЕ ЗВИЧАЙНИЙ MERGE
+# ----------------------------------------------
+# Гілки НЕ можуть бути однаковими побайтно, і це нормально: частина
+# файлів генерується під конкретне середовище. У main лежить canonical
+# на bestbrnd4u.com, файл CNAME і admin/config.yml з branch: main; у dev
+# — адреси dev.bestbrnd4u.com, noindex, robots.txt із Disallow і
+# branch: dev. Тому звичайний merge конфліктує на цих файлах КОЖНОГО
+# разу, хоча змістовного конфлікту немає.
+#
+# Тут послідовність така:
+#   1. злиття з перевагою гілки-джерела — беремо її версію файлів;
+#   2. перезбірка під середовище гілки-приймача — вона повертає
+#      правильні адреси, robots, CNAME і гілку адмінки;
+#   3. коміт результату.
+# Тобто конфлікти не розвʼязуються вручну, а знімаються самою збіркою.
+#
+# ЯК ЗАПУСТИТИ
+# GitHub → Actions → «Sync branches» → Run workflow → обрати напрямок.
+#
+# ЯКИЙ НАПРЯМОК ОБИРАТИ
+#   dev → main   звичайний шлях: перевірив на тесті, викотив у бій;
+#   main → dev   підтягнути тест до бойового (після правок в адмінці
+#                прода або після накладання архіву на main).
+
+name: Sync branches
+
+on:
+  workflow_dispatch:
+    inputs:
+      direction:
+        description: "Напрямок перенесення"
+        required: true
+        default: "dev-to-main"
+        type: choice
+        options:
+          - dev-to-main
+          - main-to-dev
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-branches
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0          # потрібна вся історія, інакше merge неможливий
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Визначити гілки
+        id: pick
+        run: |
+          if [ "${{ inputs.direction }}" = "dev-to-main" ]; then
+            echo "from=dev"  >> "$GITHUB_OUTPUT"
+            echo "to=main"   >> "$GITHUB_OUTPUT"
+            echo "env=production" >> "$GITHUB_OUTPUT"
+          else
+            echo "from=main" >> "$GITHUB_OUTPUT"
+            echo "to=dev"    >> "$GITHUB_OUTPUT"
+            echo "env=development" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Перенести і перезібрати
+        env:
+          SITE_ENV: ${{ steps.pick.outputs.env }}
+        run: |
+          set -e
+          git config user.name "bestbrnd4u-bot"
+          git config user.email "actions@users.noreply.github.com"
+
+          git checkout "${{ steps.pick.outputs.to }}"
+
+          # -X theirs: там, де файли розійшлись, перемагає гілка-джерело.
+          # Розходяться майже завжди саме згенеровані файли, і їх усе
+          # одно перезбере наступний крок.
+          git merge --no-edit -X theirs "origin/${{ steps.pick.outputs.from }}" || true
+
+          # якщо merge все ж лишив конфлікти — беремо версію джерела
+          if git ls-files -u | grep -q .; then
+            git checkout --theirs . || true
+            git add -A
+            git commit --no-edit
+          fi
+
+          # перезбірка під середовище гілки-приймача
+          npm run build
+
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Нічого переносити — гілки вже збігаються"
+          else
+            git commit -m "chore: ${{ inputs.direction }} + перезбірка під ${{ steps.pick.outputs.env }}"
+          fi
+
+          git push origin "${{ steps.pick.outputs.to }}"
+
+      - name: Підсумок
+        run: |
+          echo "### Перенесено: ${{ steps.pick.outputs.from }} → ${{ steps.pick.outputs.to }}" >> $GITHUB_STEP_SUMMARY
+          echo "Середовище збірки: ${{ steps.pick.outputs.env }}" >> $GITHUB_STEP_SUMMARY

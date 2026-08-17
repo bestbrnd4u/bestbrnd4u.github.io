@@ -124,6 +124,62 @@ console.log("\n[5] Повернення на прод відновлює все"
         admin.backend.site_domain === "bestbrnd4u.github.io");
 }
 
+console.log("\n[5b] Смуга середовища в адмінці не дає переплутати сайти");
+{
+    // Адмінок дві, виглядають однаково. Відкриті поруч вкладки нічим
+    // не відрізняються, і «спробую на тесті» легко стає правкою
+    // бойового каталогу — помітно вже після публікації.
+    const { JSDOM } = require("jsdom");
+    const badge = read("admin/env-badge.js");
+    const adminHtml = read("admin/index.html");
+
+    check("смуга підключена в адмінці", adminHtml.includes("env-badge.js"));
+    check("дані середовища проставлені збіркою",
+        /window\.SITE_ENVIRONMENT = \{[^}]*"branch"/.test(adminHtml));
+    check("блок даних рівно один (не накопичується при перезбірках)",
+        (adminHtml.match(/window\.SITE_ENVIRONMENT = /g) || []).length === 1);
+
+    const show = async json => {
+        const dom = new JSDOM("<!doctype html><html><head></head><body></body></html>",
+            { runScripts: "outside-only", pretendToBeVisual: true });
+        dom.window.eval(`window.SITE_ENVIRONMENT = ${json};`);
+        dom.window.eval(badge);
+        await new Promise(r => setTimeout(r, 250));
+        const bar = dom.window.document.getElementById("envBadge");
+        return { text: bar ? bar.textContent : "", title: dom.window.document.title,
+                 color: bar ? bar.style.background : "" };
+    };
+
+    return show('{"name":"production","host":"bestbrnd4u.com","branch":"main"}')
+        .then(prod => {
+
+            check("на боєвому написано, що він бойовий", /БОЙОВИЙ/.test(prod.text), prod.text);
+            check("видно гілку, у яку підуть коміти", /main/.test(prod.text));
+            check("бойове — червоне", /185, 28, 28/.test(prod.color), prod.color);
+            check("у назві вкладки видно середовище", /PROD/.test(prod.title), prod.title);
+
+            return show('{"name":"development","host":"dev.bestbrnd4u.com","branch":"dev"}');
+
+        })
+        .then(dev => {
+
+            check("на тестовому написано, що він тестовий", /ТЕСТОВЕ/.test(dev.text), dev.text);
+            check("видно гілку dev", /dev/.test(dev.text));
+            check("тестове — зелене", /4, 120, 87/.test(dev.color), dev.color);
+            check("вкладка позначена DEV", /DEV/.test(dev.title), dev.title);
+
+            // краще нічого, ніж неправильна гілка
+            return show("undefined");
+
+        })
+        .then(none => {
+            check("без даних середовища смуга не малюється", none.text === "", none.text);
+            finish();
+        });
+}
+
+function finish() {
+
 console.log("\n[6] Дев-збірка налаштована в CI");
 {
     const wf = path.join(ROOT, ".github/workflows/build-dev.yml");
@@ -135,16 +191,45 @@ console.log("\n[6] Дев-збірка налаштована в CI");
         check("збирає з SITE_ENV=development", /SITE_ENV: development/.test(text));
     }
 
+    // Перенесення між гілками кнопкою: гілки НЕ однакові побайтно
+    // (canonical, robots, CNAME, гілка адмінки різні), тож звичайний
+    // merge конфліктував би щоразу. Workflow знімає це перезбіркою.
+    const syncPath = path.join(ROOT, ".github/workflows/sync-branches.yml");
+    check("є workflow перенесення між гілками", fs.existsSync(syncPath));
+
+    if (fs.existsSync(syncPath)) {
+        const sync = fs.readFileSync(syncPath, "utf8");
+        check("запускається вручну, а не сам", /workflow_dispatch/.test(sync));
+        check("обидва напрямки доступні",
+            /dev-to-main/.test(sync) && /main-to-dev/.test(sync));
+        check("конфлікти знімаються перевагою джерела", /-X theirs/.test(sync));
+        check("після перенесення йде перезбірка під середовище приймача",
+            /SITE_ENV: \$\{\{ steps\.pick\.outputs\.env \}\}/.test(sync));
+        check("потрібна повна історія для merge", /fetch-depth: 0/.test(sync));
+    }
+
+    // POSIX-префікс змінної не працює в PowerShell, а робота ведеться
+    // саме там — тому дев-збірка запускається через node
+    const pkg2 = JSON.parse(read("package.json"));
+    check("build:dev кросплатформений (без SITE_ENV=... на початку)",
+        !/^SITE_ENV=/.test(pkg2.scripts["build:dev"]), pkg2.scripts["build:dev"]);
+    check("build:dev іде через node-обгортку",
+        /node scripts\/build-dev\.js/.test(pkg2.scripts["build:dev"]));
+
     const prodWf = read(".github/workflows/build-products.yml");
     check("прод-збірка застосовує середовище", prodWf.includes("apply-site-env.js"));
     check("прод-збірка комітить CNAME і robots",
         /git add[\s\S]{0,200}CNAME/.test(prodWf));
 }
 
-} finally {
-    // хай там що — лишаємо репозиторій у продакшн-стані
     applyEnv("production");
+
+    console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
+    process.exit(failures === 0 ? 0 : 1);
+
 }
 
-console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
-process.exit(failures === 0 ? 0 : 1);
+} catch (error) {
+    applyEnv("production");   // хай там що — лишаємо репозиторій у продакшн-стані
+    throw error;
+}

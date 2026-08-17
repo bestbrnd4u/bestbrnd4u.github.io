@@ -11,7 +11,7 @@
     "images:restore": "node scripts/archive-unused-images.js --restore",
     "images:fit": "node scripts/normalize-product-images.js",
     "images:fit:apply": "node scripts/normalize-product-images.js --apply",
-    "build:dev": "SITE_ENV=development npm run build"
+    "build:dev": "node scripts/build-dev.js"
   },
   "devDependencies": {
     "js-yaml": "^5.2.3",

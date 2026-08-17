@@ -158,6 +158,33 @@ rewrite("admin/config.yml", text => {
 
 });
 
+// ---- 5b. дані середовища для смуги в адмінці ----
+// Адмінок дві й виглядають вони однаково; смуга показує, де ти зараз
+// і в яку гілку підуть коміти (admin/env-badge.js).
+rewrite("admin/index.html", text => {
+
+    const payload = JSON.stringify({
+        name: ENV_NAME,
+        host: SITE_URL.replace(/^https?:\/\//, ""),
+        branch: BRANCH
+    });
+
+    const block = `    <script>window.SITE_ENVIRONMENT = ${payload};</script>`;
+
+    // прибираємо попередній блок і ставимо свіжий на те саме місце
+    const cleaned = text.replace(
+        /[ \t]*<script>window\.SITE_ENVIRONMENT = [^<]*<\/script>\n?/,
+        "");
+
+    if (cleaned.includes("<!--SITE_ENVIRONMENT-->")) {
+        return cleaned.replace("<!--SITE_ENVIRONMENT-->",
+            `<!--SITE_ENVIRONMENT-->\n${block}`);
+    }
+
+    return cleaned.replace(/<\/head>/i, `${block}\n</head>`);
+
+});
+
 // ---- 6. заборона індексації дев-середовища в самій розмітці ----
 // robots.txt рятує не завжди: якщо на дев хтось поставить посилання,
 // Google може показати сторінку в результатах і без обходу. Мета-тег
