@@ -1,8 +1,4 @@
 
-# Тестове середовище — повністю закрите від пошуку
-User-agent: *
-Disallow: /
-
 
 
 
@@ -23,4 +19,4 @@ Disallow: /checkout
 Disallow: /favorites
 Disallow: /thanks
 
-Sitemap: https://dev.bestbrnd4u.com/sitemap.xml
+Sitemap: https://bestbrnd4u.com/sitemap.xml
