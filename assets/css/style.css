@@ -871,7 +871,7 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
             rgba(17,24,39,0) 100%
         ),
         linear-gradient(rgba(17,24,39,.45), rgba(17,24,39,.45)),
-        var(--hero-bg, url("https://images.pexels.com/photos/5745781/pexels-photo-5745781.jpeg?auto=compress&cs=tinysrgb&w=1600"));
+        var(--hero-bg, url("/assets/images/banners/hero-bags.jpg"));
     background-size:cover;
     background-position:center;
     background-repeat:no-repeat;
@@ -2244,7 +2244,7 @@ footer{
     background-color:#111827;
     background-image:
         linear-gradient(rgba(17,24,39,.55), rgba(17,24,39,.55)),
-        var(--promo-bg, url("https://images.pexels.com/photos/336372/pexels-photo-336372.jpeg?auto=compress&cs=tinysrgb&w=1600"));
+        var(--promo-bg, url("/assets/images/banners/home-new-arrivals.jpg"));
     background-size:cover;
     background-position:center;
     background-repeat:no-repeat;

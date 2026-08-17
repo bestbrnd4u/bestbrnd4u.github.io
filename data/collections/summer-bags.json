@@ -2,18 +2,13 @@
   "active": true,
   "order": 1,
   "eyebrow": "ДОБІРКА",
-  "title": "Сумки та окуляри для твого літа",
-  "image": "/assets/images/banners/collection-bags-glasses.jpg",
-  "imageAlt": "Сумки та окуляри для твого літа",
+  "title": "Годинники для твого стилю",
+  "image": "/assets/images/banners/collection-watches.jpg",
+  "imageAlt": "Годинники для твого стилю",
   "products": [
-    25,
-    31,
-    13,
-    16,
-    29,
-    6,
-    11,
-    27,
-    17
+    12,
+    23,
+    24,
+    26
   ]
 }

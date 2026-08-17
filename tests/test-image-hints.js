@@ -54,13 +54,13 @@ console.log("\n[3] Точкові перевірки конкретних роз
   check("Добірки — 1200×900", /1200\s*[×x]\s*900/.test(byPath("collections")?.hint||""));
   check("Фото товару — 1200×1500", /1200\s*[×x]\s*1500/.test(byPath("products")?.hint||""));
   check("Акції (тизер) згадує усі 4 типи показу",
-        /1200.*1500[\s\S]*1600.*1070[\s\S]*800.*1000/.test(byPath("promotions/promotions/image")?.hint||"") ||
+        /1000.*1160[\s\S]*1800.*900[\s\S]*800.*1000/.test(byPath("promotions/promotions/image")?.hint||"") ||
         /card[\s\S]*hint/.test(""), // допоміжна заглушка, реальна перевірка нижче
         "перевірка нижче");
   const promoTeaser = images.find(i => i.path.endsWith("/image") && i.path.includes("promotions"));
-  check("Акції (тизер) — згадані всі три різні розміри карток",
+  check("Акції (тизер) — згадані розміри всіх способів показу",
         /1200.*1500/.test(promoTeaser?.hint||"") &&
-        /1600.*1070/.test(promoTeaser?.hint||"") &&
+        /1800.*900/.test(promoTeaser?.hint||"") &&
         /800.*1000/.test(promoTeaser?.hint||""));
   check("Акції — нове поле банера сторінки, 1920×600",
         /1920\s*[×x]\s*600/.test(byPath("promoPageImage")?.hint||""));

@@ -124,7 +124,11 @@
 
 <div class="hero-backdrop">
 
-<section class="hero" id="heroSection">
+<!-- Фон заданий прямо тут, а не лише з JS. Інакше браузер до
+     виконання app.js малює запасну картинку з CSS — і на оновленні
+     сторінки на долю секунди блимав старий банер. -->
+<section class="hero" id="heroSection"
+         style="--hero-bg:url('/assets/images/banners/hero-bags.jpg')">
 
     <div class="container">
 
@@ -260,7 +264,8 @@
 
     <div class="container">
 
-        <div class="promo-banner" id="promoBanner">
+        <div class="promo-banner" id="promoBanner"
+             style="--promo-bg:url('/assets/images/banners/home-new-arrivals.jpg')">
 
             <div class="promo-content">
 
