@@ -9691,3 +9691,60 @@ body.mobile-filters-open .scroll-top{
     margin:16px 0;
     line-height:1.8;
 }
+
+/* ======================================================
+   Фото акцій на мобільному — видно ПОВНІСТЮ
+   ======================================================
+   Слоти під фото акції мали жорстко задану висоту:
+   .brand-teaser-image — aspect-ratio:4/3, .brand-campaign-image —
+   min-height:420px, .promo-hero-slide-image — min-height:280px. Разом з
+   object-fit:cover це означало, що будь-яке фото інших пропорцій
+   обрізається. Вертикальний кадр 1200×1500, завантажений у слот 4:3,
+   показував лише вузьку смугу посередині — саме це й було видно на
+   мобільній верстці.
+
+   Тут висота слота НЕ задається, а береться від самого фото. Тобто
+   кадр видно цілком, і при цьому не з'являється порожніх полів —
+   на відміну від object-fit:contain у слоті фіксованої висоти.
+   (Порожні поля колись були проблемою на банері сторінки акції,
+   там свідомо лишили cover — див. коментар біля --banner-img-mobile.)
+
+   Блок навмисно в кінці файлу: правила вище задають висоту в кількох
+   різних медіа-запитах, і перебити їх без !important можна лише
+   порядком. */
+@media(max-width:768px){
+
+    .promo-hero-slide-image,
+    .brand-campaign-image,
+    .brand-teaser-image,
+    .promo-card-image{
+        aspect-ratio:auto;
+        height:auto;
+        min-height:0;
+        max-height:none;
+    }
+
+    .promo-hero-slide-image picture,
+    .brand-campaign-image picture,
+    .brand-teaser-image picture,
+    .promo-card-image picture{
+        height:auto;
+    }
+
+    .promo-hero-slide-image img,
+    .brand-campaign-image img,
+    .brand-teaser-image img,
+    .promo-card-image img{
+        width:100%;
+        height:auto;
+        object-fit:contain;
+    }
+
+    /* картка в сітці не має розтягуватись на висоту сусіда —
+       інакше слот знову отримає чужу висоту */
+    .brand-teaser-image,
+    .brand-campaign-image{
+        align-self:start;
+    }
+
+}

@@ -132,9 +132,31 @@ function main() {
 
     renames.forEach((to, from) => {
 
+        // Файл із коротким іменем уже є. Це типова ситуація після
+        // накладання архіву поверх робочої копії: розпакування ДОДАЄ
+        // короткий варіант, але не видаляє довгий, і в теці лежать два
+        // однакових знімки. Раніше скрипт тут просто здавався, і ті
+        // самі 4 файли поверталися з кожним новим архівом.
         if (fs.existsSync(to)) {
-            console.error(`::error::${path.relative(ROOT, to)} вже існує — пропущено`);
+
+            const same = fs.readFileSync(from).equals(fs.readFileSync(to));
+
+            if (!same) {
+                // різний вміст — самі вирішуйте, який лишити
+                console.error(`::error::${path.relative(ROOT, to)} вже існує, і вміст РІЗНИЙ — пропущено`);
+                return;
+            }
+
+            fs.rmSync(from);
+
+            // ім'я все одно мапимо: посилання на довгий варіант, якщо
+            // десь лишились, треба перевести на короткий
+            nameMap.set(path.basename(from), path.basename(to));
+
+            console.log(`  дубль прибрано (вміст той самий): ${path.basename(from).slice(0, 46)}…`);
+
             return;
+
         }
 
         fs.renameSync(from, to);
