@@ -12,8 +12,8 @@
   "link": "catalog?brand=Calvin%20Klein",
   "image": "/assets/images/banners/coach-teaser.jpg",
   "displayType": "banner_compact",
-  "imageMobile": "/assets/images/banners/coach-teaser-mobile.jpg",
-  "promoPageImage": "/assets/images/banners/coach-promo-page.jpg",
-  "buttonText": "Дивитись все",
-  "promoPageImageMobile": "/assets/images/banners/coach-promo-page-mobile.jpg"
+  "imageMobile": "/assets/images/products/uploads/27f3b0ed-59dd-45af-9814-9e32866ce991.png",
+  "promoPageImage": "/assets/images/products/uploads/111.png",
+  "buttonText": "Дивитись все"
+
 }
