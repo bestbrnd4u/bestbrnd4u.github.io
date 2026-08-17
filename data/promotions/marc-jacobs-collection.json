@@ -13,7 +13,10 @@
   "order": 2,
   "title": "Колекція Marc Jacobs",
   "link": "catalog?brand=Marc%20Jacobs",
-  "image": "/assets/images/banners/promo-marc-jacobs.jpg",
+  "image": "/assets/images/banners/01marc-jacobs_hero_slider_1000x1160.jpg",
   "displayType": "banner_compact",
+  "imageMobile": "/assets/images/banners/02marc-jacobs_banner_products_1800x900.jpg",
+  "promoPageImage": "/assets/images/banners/04marc-jacobs_мобильная_страница_акции_1080x1400.jpg",
+  "promoPageImageMobile": "/assets/images/banners/04marc-jacobs_мобильная_страница_акции_1080x1400.jpg",
   "buttonText": "Дивитись колекцію"
 }
