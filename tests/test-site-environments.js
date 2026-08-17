@@ -42,6 +42,10 @@ console.log("\n[1] Конфіг середовищ описаний повніс
         if (!e) return;
         check(`${name}: адреса з https`, /^https:\/\//.test(e.url), e.url);
         check(`${name}: вказана гілка`, !!e.branch, e.branch);
+        // домен для OAuth мусить бути саме хостом цього середовища
+        check(`${name}: oauthSiteId = хост середовища`,
+            e.oauthSiteId === e.url.replace(/^https?:\/\//, ""),
+            `${e.oauthSiteId} проти ${e.url}`);
     });
 
     check("прод і дев на різних адресах",
@@ -90,9 +94,20 @@ console.log("\n[4] Вхід в адмінку переїзду не поміча
 {
     const admin = loadYaml("admin/config.yml");
 
+    // ЦЕ ГОЛОВНА ПЕРЕВІРКА ЦЬОГО БЛОКУ.
+    //
+    // Netlify відправляє токен назад через postMessage на адресу того
+    // домену, під яким сайт у нього зареєстрований (site_domain). Якщо
+    // ця адреса не збігається з тією, де відкрита адмінка, браузер
+    // повідомлення просто відкидає: вікно показує «Authorized» і
+    // зависає, а в адмінку так і не заходиш.
+    //
+    // Спершу я прибив site_domain до bestbrnd4u.github.io — і зламав
+    // вхід саме так. Тепер він мусить дорівнювати домену середовища.
     check("site_domain заданий явно", !!admin.backend.site_domain, admin.backend.site_domain);
-    check("site_domain НЕ підмінений доменом дева",
-        admin.backend.site_domain === "bestbrnd4u.github.io", admin.backend.site_domain);
+    check("site_domain = домен цієї ж адмінки (інакше токен не дійде)",
+        admin.backend.site_domain === config.development.oauthSiteId,
+        `${admin.backend.site_domain}, очікував ${config.development.oauthSiteId}`);
     check("repo НЕ підмінений",
         admin.backend.repo === "bestbrnd4u/bestbrnd4u.github.io", admin.backend.repo);
     check("OAuth-проксі на місці", admin.backend.base_url === "https://api.netlify.com");
@@ -120,8 +135,9 @@ console.log("\n[5] Повернення на прод відновлює все"
 
     const admin = loadYaml("admin/config.yml");
     check("адмінка знову комітить у main", admin.backend.branch === "main");
-    check("site_domain і після повернення цілий",
-        admin.backend.site_domain === "bestbrnd4u.github.io");
+    check("site_domain повернувся на бойовий домен",
+        admin.backend.site_domain === config.production.oauthSiteId,
+        admin.backend.site_domain);
 }
 
 console.log("\n[5b] Смуга середовища в адмінці не дає переплутати сайти");

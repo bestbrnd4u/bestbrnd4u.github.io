@@ -30,5 +30,8 @@ module.exports = {
     BRANCH: env.branch,
     INDEXABLE: env.indexable !== false,
     CNAME: env.cname || null,
+    // домен, за яким Netlify впізнає сайт і на який ВІДПРАВЛЯЄ токен
+    // назад через postMessage (див. site.config.json)
+    OAUTH_SITE_ID: env.oauthSiteId || env.url.replace(/^https?:\/\//, ""),
     ALL: config
 };
