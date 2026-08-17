@@ -9227,6 +9227,17 @@ body.mobile-filters-open .scroll-top{
 
 /* <picture> — інлайновий елемент, тож без цього він не розтягується
    на всю висоту колонки і object-fit у вкладеного <img> нічого не дає */
+/* Те саме, що й для добірки: <picture> інлайновий, і без розтягування
+   вкладений <img> з object-fit не заповнює слот. Стосується всіх трьох
+   способів показу акції на головній. */
+.promo-hero-slide-image picture,
+.brand-campaign-image picture,
+.brand-teaser-image picture{
+    display:block;
+    width:100%;
+    height:100%;
+}
+
 .collection-image picture{
     display:block;
     width:100%;

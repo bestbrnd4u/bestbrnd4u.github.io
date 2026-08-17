@@ -156,6 +156,37 @@ function buildCroppedImageUrl(url, width, height) {
 
 }
 
+// Картинка акції з окремим кадром для вузьких екранів.
+//
+// НАВІЩО: поле «Фото для мобільної версії» довго читав ЛИШЕ promo.js —
+// тобто сама сторінка акції. На головній усі три способи показу
+// (слайдер, великий банер з товарами, компактний тизер) малювали
+// звичайний <img src="${promo.image}"> і мобільне фото ігнорували.
+// Ззовні це виглядало так, ніби поле не працює: його міняли, чекали
+// деплой — і нічого не змінювалось.
+//
+// <picture> замість підміни через JS свідомо: браузер обирає файл ще
+// до виконання скриптів і не викачує зайвий кадр. Кожен спосіб показу
+// має СВОЮ точку перелому — саме ту, на якій його блок перебудовується
+// в CSS, інакше картинка й розмітка розʼїдуться.
+function promoPicture(promo, breakpoint, extraAttrs) {
+
+    const mobile = promo.imageMobile
+        ? `<source media="(max-width: ${breakpoint}px)" srcset="${promo.imageMobile}">`
+        : "";
+
+    return `
+        <picture>
+            ${mobile}
+            <img
+                src="${promo.image}"
+                alt="${promo.title}"
+                ${extraAttrs || ""}
+                onerror="this.src='assets/images/no-image.png'">
+        </picture>`;
+
+}
+
 function setResponsiveBanner(el, cssVarName, imageUrl, crops) {
 
     if (!el || !imageUrl) return;
@@ -380,10 +411,7 @@ async function initPromotions() {
                 <a href="promo?id=${encodeURIComponent(promo.slug)}" class="promo-card">
 
                     <div class="promo-card-image">
-                        <img
-                            src="${promo.image}"
-                            alt="${promo.title}"
-                            onerror="this.src='assets/images/no-image.png'">
+                        ${promoPicture(promo, 700)}
                         ${promo.badge ? `<span class="promo-card-badge">${promo.badge}</span>` : ""}
                     </div>
 
@@ -473,10 +501,7 @@ function renderHeroSliderPromotions(heroPromotions) {
             </div>
 
             <a href="${promoLink}" class="promo-hero-slide-image">
-                <img
-                    src="${promo.image}"
-                    alt="${promo.title}"
-                    onerror="this.src='assets/images/no-image.png'">
+                ${promoPicture(promo, 768)}
             </a>
 
         </div>
@@ -609,10 +634,7 @@ async function renderFeaturedPromotions(featuredPromotions) {
                     <div class="brand-campaign-banner">
 
                         <a href="promo?id=${encodeURIComponent(promo.slug)}" class="brand-campaign-image">
-                            <img
-                                src="${promo.image}"
-                                alt="${promo.title}"
-                                onerror="this.src='assets/images/no-image.png'">
+                            ${promoPicture(promo, 700)}
                         </a>
 
                         <div class="brand-campaign-content">
@@ -694,10 +716,7 @@ function renderCompactPromotions(compactPromotions) {
                 <div class="brand-teaser-banner">
 
                     <div class="brand-teaser-image">
-                        <img
-                            src="${promo.image}"
-                            alt="${promo.title}"
-                            onerror="this.src='assets/images/no-image.png'">
+                        ${promoPicture(promo, 700)}
                     </div>
 
                     <div class="brand-teaser-content">

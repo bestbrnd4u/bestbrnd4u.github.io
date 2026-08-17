@@ -26,10 +26,10 @@
   "order": 1,
   "title": "Обери сумочку для себе",
   "link": "catalog",
-  "image": "/assets/images/products/uploads/01_hero_slider_1000x1160-1-.jpg",
+  "image": "/assets/images/banners/01_hero_slider_1000x1160-1-.jpg",
   "displayType": "hero_slider",
-  "imageMobile": "/assets/images/products/uploads/03_banner_compact_800x1000.jpg",
-  "promoPageImage": "/assets/images/products/uploads/2.png",
+  "imageMobile": "/assets/images/banners/03_banner_compact_800x1000.jpg",
+  "promoPageImage": "/assets/images/banners/2.png",
   "promoPageImageMobile": "/assets/images/banners/coach-teaser-mobile.jpg",
   "buttonText": "Дивитись усі товари"
 }
