@@ -1,0 +1,53 @@
+{
+  "gender": [
+    "Жінкам"
+  ],
+  "preOrderDays": "5–10 робочих днів",
+  "forcePublish": false,
+  "brand": "Jimmy Choo",
+  "price": 8600,
+  "preOrder": false,
+  "dimensions": "51",
+  "variants": [
+    {
+      "color": "Nero",
+      "hex": "#0d0000",
+      "sku": "NENA/S 807 51",
+      "images": [
+        "/assets/images/products/uploads/jimmy-choo-sunglasses-nena-s-807-afw1500fh937.5.webp",
+        "/assets/images/products/uploads/41my3jtmifl.webp",
+        "/assets/images/products/uploads/30486-34-550x550.webp"
+      ]
+    }
+  ],
+  "preOrderPrepayment": 50,
+  "sizes": [
+    "51"
+  ],
+  "searchKeywords": [
+    "Jimmy Choo",
+    "Jimmy Choo NENA/S",
+    "NENA/S 807 51",
+    "Jimmy Choo NENA/S 807",
+    "сонцезахисні окуляри Jimmy Choo",
+    "жіночі окуляри Jimmy Choo",
+    "окуляри Jimmy Choo чорні",
+    "чорні сонцезахисні окуляри",
+    "прямокутні окуляри",
+    "жіночі сонцезахисні окуляри",
+    "брендові окуляри",
+    "дизайнерські окуляри",
+    "окуляри з ацетату",
+    "окуляри з градієнтними лінзами",
+    "оригінальні Jimmy Choo",
+    "Jimmy Choo sunglasses",
+    "Jimmy Choo NENA/S sunglasses"
+  ],
+  "isNew": true,
+  "title": "Сонцезахисні окуляри Jimmy Choo NENA/S 807 51",
+  "reviews": 0,
+  "instagramBlock": "general",
+  "description": "Стильні жіночі сонцезахисні окуляри Jimmy Choo NENA/S із виразною прямокутною оправою. Модель виконана з ацетату в чорному кольорі та доповнена темно-сірими градієнтними лінзами. Масивні завушники прикрашені об’ємним логотипом JC, що додає аксесуару впізнаваного акценту Jimmy Choo",
+  "rating": 5,
+  "category": "Окуляри і оправи"
+}
