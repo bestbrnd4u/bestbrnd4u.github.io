@@ -49,5 +49,13 @@
   "instagramBlock": "general",
   "description": "Стильні жіночі сонцезахисні окуляри Jimmy Choo NENA/S із виразною прямокутною оправою. Модель виконана з ацетату в чорному кольорі та доповнена темно-сірими градієнтними лінзами. Масивні завушники прикрашені об’ємним логотипом JC, що додає аксесуару впізнаваного акценту Jimmy Choo",
   "rating": 5,
-  "category": "Окуляри і оправи"
+  "category": "Окуляри і оправи",
+  "slug": "сонцезахисні-окуляри-jimmy-choo-nena-s-807-51",
+  "id": 32,
+  "color": "Nero",
+  "images": [
+    "/assets/images/products/uploads/jimmy-choo-sunglasses-nena-s-807-afw1500fh937.5.webp",
+    "/assets/images/products/uploads/41my3jtmifl.webp",
+    "/assets/images/products/uploads/30486-34-550x550.webp"
+  ]
 }
