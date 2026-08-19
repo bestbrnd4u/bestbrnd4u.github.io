@@ -1721,5 +1721,64 @@
       "/assets/images/products/uploads/41my3jtmifl.webp",
       "/assets/images/products/uploads/30486-34-550x550.webp"
     ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "5–10 робочих днів",
+    "forcePublish": false,
+    "brand": "Marc Jacobs",
+    "price": 6500,
+    "preOrder": false,
+    "variants": [
+      {
+        "color": "Nero",
+        "hex": "#000000",
+        "images": [
+          "/assets/images/products/uploads/marc-jacobs-grey-shaded-cat-eye-ladies-sunglasses-mj-1010s-08079o-54-mj-1010s-08079o-54_3.webp",
+          "/assets/images/products/uploads/marc-jacobs-grey-shaded-cat-eye-ladies-sunglasses-mj-1010s-08079o-54-mj-1010s-08079o-54.webp",
+          "/assets/images/products/uploads/marc-jacobs-grey-shaded-cat-eye-ladies-sunglasses-mj-1010s-08079o-54-mj-1010s-08079o-54_4.webp"
+        ],
+        "video": "/assets/images/products/uploads/marc-jacobs-grey-shaded-cat-eye-ladies-sunglasses-mj-1010s-08079o-54-mj-1010s-08079o-54_4.webp"
+      }
+    ],
+    "preOrderPrepayment": 50,
+    "sizes": [
+      "54"
+    ],
+    "searchKeywords": [
+      "Marc Jacobs",
+      "Marc Jacobs MJ 1010/S",
+      "MJ 1010/S 0807/9O 54",
+      "MJ 1010/S",
+      "сонцезахисні окуляри Marc Jacobs",
+      "жіночі окуляри Marc Jacobs",
+      "окуляри Marc Jacobs",
+      "брендові окуляри",
+      "дизайнерські окуляри",
+      "жіночі сонцезахисні окуляри",
+      "прямокутні окуляри",
+      "модні сонцезахисні окуляри",
+      "оригінальні Marc Jacobs",
+      "Marc Jacobs sunglasses",
+      "MJ 1010/S sunglasses"
+    ],
+    "isNew": false,
+    "title": "Стильні жіночі сонцезахисні окуляри Marc Jacobs MJ 1010/S",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильні жіночі сонцезахисні окуляри Marc Jacobs MJ 1010/S з елегантною прямокутною формою оправи. Модель поєднує сучасний дизайн і впізнавану естетику бренду, легко доповнюючи як повсякденні, так і більш вишукані образи",
+    "sku": "MJ 1010/S 0807/9O 54",
+    "rating": 5,
+    "category": "Окуляри і оправи",
+    "slug": "стильні-жіночі-сонцезахисні-окуляри-marc-jacobs-mj-1010-s",
+    "id": 33,
+    "color": "Nero",
+    "images": [
+      "/assets/images/products/uploads/marc-jacobs-grey-shaded-cat-eye-ladies-sunglasses-mj-1010s-08079o-54-mj-1010s-08079o-54_3.webp",
+      "/assets/images/products/uploads/marc-jacobs-grey-shaded-cat-eye-ladies-sunglasses-mj-1010s-08079o-54-mj-1010s-08079o-54.webp",
+      "/assets/images/products/uploads/marc-jacobs-grey-shaded-cat-eye-ladies-sunglasses-mj-1010s-08079o-54-mj-1010s-08079o-54_4.webp"
+    ]
   }
 ]
