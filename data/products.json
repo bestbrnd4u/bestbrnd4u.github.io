@@ -1903,5 +1903,71 @@
       "/assets/images/products/uploads/124849471.webp",
       "/assets/images/products/uploads/124849473.webp"
     ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "5–10 робочих днів",
+    "forcePublish": false,
+    "brand": "Lacoste",
+    "price": 6200,
+    "preOrder": false,
+    "variants": [
+      {
+        "hex": "#f8faf6",
+        "color": "Барвистий",
+        "images": [
+          "/assets/images/products/uploads/e5de78de-29a2-40ba-8edd-a70c4e1ea31b_size2000x2000_cropcenter.webp",
+          "/assets/images/products/uploads/f7e4b799-732f-44f2-975b-40cd657042ed_size2000x2000_cropcenter.webp",
+          "/assets/images/products/uploads/f33f16ca-2354-4bb1-a195-063ef2737099_size2000x2000_cropcenter.webp",
+          "/assets/images/products/uploads/8bfe46ad-4152-486e-af2b-0e8f2715354a_size2000x2000_cropcenter-1-.webp"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 50,
+    "sizes": [
+      "37",
+      "38",
+      "39"
+    ],
+    "searchKeywords": [
+      "Lacoste",
+      "Lacoste L003",
+      "L003",
+      "744SFA0020",
+      "744SFA0020.080",
+      "кросівки Lacoste",
+      "жіночі кросівки Lacoste",
+      "кросівки Lacoste жіночі",
+      "Lacoste L003 жіночі",
+      "жіночі брендові кросівки",
+      "оригінальні Lacoste",
+      "брендові кросівки",
+      "повсякденні кросівки",
+      "кросівки на кожен день",
+      "спортивні кросівки",
+      "міські кросівки",
+      "жіночі снікерси",
+      "модні кросівки",
+      "кросівки Lacoste L003 744SFA0020"
+    ],
+    "isNew": false,
+    "title": "Lacoste кросівки жіночі L003",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильні жіночі кросівки Lacoste L003 — сучасна модель для повсякденного гардероба, що поєднує спортивний характер, комфорт і впізнаваний французький стиль. Легкий нейлоновий верх доповнений синтетичними елементами та оригінальною конструкцією шнурівки.\nСпеціальна система шнурівки та конструкція язичка забезпечують надійну фіксацію стопи й комфортну посадку. Текстильна підкладка та м’яка устілка роблять модель зручною для тривалого носіння.\nПідошва поєднує гуму та EVA, забезпечуючи амортизацію, гнучкість і хороше зчеплення з поверхнею. Фірмовий тиснений логотип-крокодил на п’яті додає моделі характерної для Lacoste впізнаваності.",
+    "sku": "744SFA0020.080",
+    "rating": 5,
+    "category": "Кросівки",
+    "slug": "lacoste-кросівки-жіночі-l003",
+    "id": 36,
+    "color": "Барвистий",
+    "images": [
+      "/assets/images/products/uploads/e5de78de-29a2-40ba-8edd-a70c4e1ea31b_size2000x2000_cropcenter.webp",
+      "/assets/images/products/uploads/f7e4b799-732f-44f2-975b-40cd657042ed_size2000x2000_cropcenter.webp",
+      "/assets/images/products/uploads/f33f16ca-2354-4bb1-a195-063ef2737099_size2000x2000_cropcenter.webp",
+      "/assets/images/products/uploads/8bfe46ad-4152-486e-af2b-0e8f2715354a_size2000x2000_cropcenter-1-.webp"
+    ]
   }
 ]
