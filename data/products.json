@@ -2030,5 +2030,62 @@
       "/assets/images/products/uploads/b7842f76-5f88-4078-92a4-f026770f790e_size2000x2000_cropcenter.webp",
       "/assets/images/products/uploads/510f13a6-c954-47f8-beda-b551a9557a8e_size2000x2000_cropcenter.webp"
     ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "5–10 робочих днів",
+    "forcePublish": false,
+    "brand": "Lacoste",
+    "price": 6900,
+    "preOrder": false,
+    "variants": [
+      {
+        "color": "Рожевий",
+        "hex": "#e10cc0",
+        "images": [
+          "/assets/images/products/uploads/f7f0e509c4be46ffb9d3ef22b5ba170e.webp",
+          "/assets/images/products/uploads/c8995a203d3b4b9291e3348646974342.webp",
+          "/assets/images/products/uploads/c126c8e7b28b4046bbabd9d5194d182b.webp"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 50,
+    "sizes": [
+      "38"
+    ],
+    "searchKeywords": [
+      "Lacoste",
+      "Lacoste L003",
+      "L003 NEO Junior",
+      "L003 Neo",
+      "LA216D08D-J11",
+      "дитячі кросівки Lacoste",
+      "кросівки Lacoste для дітей",
+      "дитячі брендові кросівки",
+      "оригінальні Lacoste",
+      "рожеві кросівки",
+      "рожеві кросівки Lacoste",
+      "кросівки для дівчинки",
+      "унісекс кросівки",
+      "дитячі кросівки на кожен день"
+    ],
+    "isNew": false,
+    "title": "Lacoste L003 NEO Athleisure Lace",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильні жіночі кросівки Lacoste L003 NEO Athleisure Lace у рожевому кольорі. Універсальна модель із текстильним верхом, сітчастими вставками та синтетичними деталями. Гнучка підошва та м’яка устілка забезпечують комфорт під час активного дня, а дихаючий матеріал допомагає підтримувати комфорт стоп.",
+    "sku": "LA216D08D-J11",
+    "rating": 5,
+    "category": "Кросівки",
+    "slug": "lacoste-l003-neo-athleisure-lace",
+    "id": 38,
+    "color": "Рожевий",
+    "images": [
+      "/assets/images/products/uploads/f7f0e509c4be46ffb9d3ef22b5ba170e.webp",
+      "/assets/images/products/uploads/c8995a203d3b4b9291e3348646974342.webp",
+      "/assets/images/products/uploads/c126c8e7b28b4046bbabd9d5194d182b.webp"
+    ]
   }
 ]

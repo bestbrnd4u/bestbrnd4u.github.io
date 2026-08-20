@@ -45,5 +45,13 @@
   "description": "Стильні жіночі кросівки Lacoste L003 NEO Athleisure Lace у рожевому кольорі. Універсальна модель із текстильним верхом, сітчастими вставками та синтетичними деталями. Гнучка підошва та м’яка устілка забезпечують комфорт під час активного дня, а дихаючий матеріал допомагає підтримувати комфорт стоп.",
   "sku": "LA216D08D-J11",
   "rating": 5,
-  "category": "Кросівки"
+  "category": "Кросівки",
+  "slug": "lacoste-l003-neo-athleisure-lace",
+  "id": 38,
+  "color": "Рожевий",
+  "images": [
+    "/assets/images/products/uploads/f7f0e509c4be46ffb9d3ef22b5ba170e.webp",
+    "/assets/images/products/uploads/c8995a203d3b4b9291e3348646974342.webp",
+    "/assets/images/products/uploads/c126c8e7b28b4046bbabd9d5194d182b.webp"
+  ]
 }
