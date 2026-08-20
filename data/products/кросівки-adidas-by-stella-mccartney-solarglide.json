@@ -51,5 +51,14 @@
   "description": "Стильні жіночі кросівки adidas by Stella McCartney Solarglide — поєднання спортивної функціональності та впізнаваної естетики Стелли Маккартні. Модель створена не лише для активного способу життя та бігу, а й для стильних повсякденних образів.\nЛегкий текстильний верх adidas PRIMEKNIT щільно облягає стопу та забезпечує комфортну посадку. \nПроміжна підошва BOOST допомагає амортизувати кожен крок і дарує відчуття енергійності під час ходьби та бігу. Гнучка гумова підошва забезпечує надійне зчеплення з поверхнею.",
   "sku": "GY6095",
   "rating": 5,
-  "category": "Кросівки"
+  "category": "Кросівки",
+  "slug": "кросівки-adidas-by-stella-mccartney-solarglide",
+  "id": 35,
+  "color": "White",
+  "images": [
+    "/assets/images/products/uploads/124849469.webp",
+    "/assets/images/products/uploads/124849470.webp",
+    "/assets/images/products/uploads/124849471.webp",
+    "/assets/images/products/uploads/124849473.webp"
+  ]
 }

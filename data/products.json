@@ -1839,5 +1839,69 @@
       "/assets/images/products/uploads/613xarv4knl._sx700_.webp",
       "/assets/images/products/uploads/61z3jdbac7l._sx700_.webp"
     ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "5–10 робочих днів",
+    "forcePublish": false,
+    "brand": "Adidas by Stella Mccartney ",
+    "price": 5800,
+    "preOrder": false,
+    "variants": [
+      {
+        "color": "White",
+        "hex": "#eff1ea",
+        "images": [
+          "/assets/images/products/uploads/124849469.webp",
+          "/assets/images/products/uploads/124849470.webp",
+          "/assets/images/products/uploads/124849471.webp",
+          "/assets/images/products/uploads/124849473.webp"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 50,
+    "sizes": [
+      "36"
+    ],
+    "searchKeywords": [
+      "adidas by Stella McCartney",
+      "Solarglide",
+      "adidas Solarglide",
+      "adidas Stella McCartney",
+      "кросівки adidas",
+      "жіночі кросівки adidas",
+      "жіночі кросівки Stella McCartney",
+      "кросівки для бігу",
+      "бігові кросівки",
+      "спортивні кросівки",
+      "повсякденні кросівки",
+      "брендові кросівки",
+      "оригінальні adidas",
+      "adidas жіночі",
+      "кросівки біло зелені",
+      "білі кросівки adidas",
+      "зелені кросівки adidas",
+      "Solarglide adidas",
+      "Stella McCartney sneakers"
+    ],
+    "isNew": false,
+    "title": "Кросівки Adidas by Stella Mccartney SolarGlide ",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильні жіночі кросівки adidas by Stella McCartney Solarglide — поєднання спортивної функціональності та впізнаваної естетики Стелли Маккартні. Модель створена не лише для активного способу життя та бігу, а й для стильних повсякденних образів.\nЛегкий текстильний верх adidas PRIMEKNIT щільно облягає стопу та забезпечує комфортну посадку. \nПроміжна підошва BOOST допомагає амортизувати кожен крок і дарує відчуття енергійності під час ходьби та бігу. Гнучка гумова підошва забезпечує надійне зчеплення з поверхнею.",
+    "sku": "GY6095",
+    "rating": 5,
+    "category": "Кросівки",
+    "slug": "кросівки-adidas-by-stella-mccartney-solarglide",
+    "id": 35,
+    "color": "White",
+    "images": [
+      "/assets/images/products/uploads/124849469.webp",
+      "/assets/images/products/uploads/124849470.webp",
+      "/assets/images/products/uploads/124849471.webp",
+      "/assets/images/products/uploads/124849473.webp"
+    ]
   }
 ]
