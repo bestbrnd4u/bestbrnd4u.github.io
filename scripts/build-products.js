@@ -130,6 +130,42 @@ function main() {
 
         }
 
+        // Кадрування прибираємо разом із фото.
+        //
+        // framing — це словник «ім'я файлу → рамка» (див.
+        // assets/js/image-framing.js). Ключі не зникають самі: видалили
+        // знімок у CMS — запис про його кадр лишався б у товарі назавжди
+        // і за рік перетворив би файл на смітник. Тому лишаємо тільки ті
+        // ключі, для яких фото ще є хоч в одному кольорі.
+        if (data.framing && typeof data.framing === "object") {
+
+            const alive = new Set(
+                (data.variants || [])
+                    .flatMap(variant => (variant && variant.images) || [])
+                    .map(src => String(src).split("/").pop())
+            );
+
+            const kept = {};
+
+            Object.keys(data.framing).forEach(key => {
+                if (alive.has(key)) kept[key] = data.framing[key];
+            });
+
+            if (JSON.stringify(kept) !== JSON.stringify(data.framing)) {
+
+                const dropped = Object.keys(data.framing).length - Object.keys(kept).length;
+
+                if (Object.keys(kept).length) data.framing = kept;
+                else delete data.framing;
+
+                console.log(`   ↻ ${file}: прибрано кадрувань без фото — ${dropped}`);
+
+                changed = true;
+
+            }
+
+        }
+
         if (changed) {
             fs.writeFileSync(filePath, JSON.stringify(data, null, 2) + "\n", "utf8");
             console.log(`оновлено ${file}: id=${data.id}, slug=${data.slug}`);

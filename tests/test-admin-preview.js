@@ -72,7 +72,14 @@ function walk(node, fn){
 }
 function classesOf(tree){
   const out=[];
-  walk(tree, n=>{ if (n.props && n.props.className) out.push(n.props.className); });
+  // imageClass — це className, який картка передає галереї прев'ю
+  // (PreviewGallery ставить його вже своєму <img>). У поверхневому
+  // дереві вкладений рендер не виконується, тож клас видно лише тут.
+  walk(tree, n=>{
+    if (!n.props) return;
+    if (n.props.className) out.push(n.props.className);
+    if (n.props.imageClass) out.push(n.props.imageClass);
+  });
   return out.join(" ");
 }
 function textOf(tree){
@@ -150,6 +157,56 @@ console.log("\n[4] Товар без фото і без варіантів не 
                          classesOf(tree).includes("cms-preview-nophoto");
     check("місце під фото є навіть без завантаженого файлу", hasImageSlot);
   } catch(err){ ok=false; check("рендер не впав", false, err.message); }
+}
+
+console.log("\n[4b] Прев'ю показує всі фото і сторінку товару");
+{
+  // Раніше прев'ю малювало лише images[0]: решту знімків можна було
+  // перевірити тільки після публікації. І сторінки товару в прев'ю не
+  // було взагалі.
+  const tpl = registered["products"];
+
+  const data = {
+    title: "Окуляри", brand: "Jimmy Choo", price: 8600,
+    framing: { "b.webp": { zoom: 1.4, x: 50, y: 40 } },
+    variants: [{ color: "Nero", hex: "#000", images: ["a.webp", "b.webp", "c.webp"] }],
+  };
+
+  const renderAs = view => tpl.render.call({
+    state: { view },
+    props: { entry: { get: () => Immutable(data) }, getAsset: v => ({ toString: () => v }) }
+  });
+
+  const card = renderAs("card");
+
+  // галерея отримує ВЕСЬ список, а не перший елемент
+  let gallery = null;
+  walk(card, n => {
+    if (n.props && Array.isArray(n.props.images) && n.props.framing !== undefined) gallery = n.props;
+  });
+
+  check("картка віддає галереї всі фото", !!gallery && gallery.images.length === 3,
+        gallery ? gallery.images.length : "галереї немає");
+  check("галерея знає про кадрування", !!gallery && !!gallery.framing);
+
+  check("є перемикач вигляду", classesOf(card).includes("cms-preview-tabs"));
+  check("за замовчуванням — картка каталогу", classesOf(card).includes("product-card"));
+
+  const page = renderAs("page");
+
+  check("режим сторінки товару малює свою верстку",
+        classesOf(page).includes("cms-preview-page"));
+  check("у режимі сторінки картки каталогу вже немає",
+        !classesOf(page).includes("product-card"));
+  check("на сторінці видно назву й бренд",
+        textOf(page).includes("Окуляри") && textOf(page).includes("Jimmy Choo"));
+
+  // без стану (як рендерить тест напряму) прев'ю не має падати
+  let survived = true;
+  try { tpl.render.call({ props: { entry: { get: () => Immutable(data) },
+                                   getAsset: v => ({ toString: () => v }) } }); }
+  catch (e) { survived = false; }
+  check("рендер без ініціалізованого стану не падає", survived);
 }
 
 console.log("\n[5] Акція і добірка рендеряться");

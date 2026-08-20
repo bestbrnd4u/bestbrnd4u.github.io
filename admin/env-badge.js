@@ -17,6 +17,28 @@
 // Значення підставляє scripts/apply-site-env.js під час збірки: тут
 // нічого не зашито, тож смуга не збреше після зміни домену.
 
+// ЧОМУ НЕ ВИСТАЧАЄ body { padding-top }
+// --------------------------------------
+// Смуга висить у position: fixed, і спершу її компенсували відступом
+// зверху в <body>. Це не працювало: два ключові елементи Decap живуть
+// поза потоком body і на її padding не реагують —
+//
+//   • шапка (<header>, AppHeader) — position: sticky; top: 0.
+//     Sticky липне до верху ВЬЮПОРТА, а не до padding-box body, тож
+//     при скролі шапка заїжджала під смугу;
+//
+//   • редактор запису (EditorContainer) — position: absolute; top: 0;
+//     height: 100% без позиціонованого предка, тобто прив'язаний до
+//     initial containing block. Саме тому в редакторі товару смуга
+//     перекривала кнопку Publish і напис UNSAVED CHANGES.
+//
+// Тому зсуваємо ці два елементи напряму. Кнопки Publish серед правил
+// немає навмисно: її ToolbarContainer лежить ВСЕРЕДИНІ EditorContainer,
+// тож їде разом із ним — окреме правило зсунуло б її двічі.
+//
+// Стиль кладемо в <head>, а не в style самого <body>: Decap перемальовує
+// <body> цілком, і інлайновий відступ доводилось би повертати щоразу.
+
 (function () {
 
     var env = window.SITE_ENVIRONMENT;
@@ -31,7 +53,48 @@
         ? { bg: "#b91c1c", text: "#fff", label: "БОЙОВИЙ САЙТ" }
         : { bg: "#047857", text: "#fff", label: "ТЕСТОВЕ СЕРЕДОВИЩЕ" };
 
+    // Один стиль на всю адмінку. Висота — через змінну: смуга з
+    // flex-wrap на вузькому екрані переноситься у два рядки, і зашиті
+    // 34px там збрехали б.
+    function injectStyles() {
+
+        if (document.getElementById("envBadgeStyles")) return;
+
+        var style = document.createElement("style");
+
+        style.id = "envBadgeStyles";
+        style.textContent = [
+            ":root { --env-badge-h: 34px; }",
+            "body { padding-top: var(--env-badge-h) !important; }",
+            // шапка адмінки: position: sticky; top: 0
+            "#nc-root header { top: var(--env-badge-h) !important; }",
+            // редактор запису: position: absolute; top: 0; height: 100%
+            '#nc-root [class*="EditorContainer"] {',
+            "    top: var(--env-badge-h) !important;",
+            "    height: calc(100% - var(--env-badge-h)) !important;",
+            "}"
+        ].join("\n");
+
+        (document.head || document.documentElement).appendChild(style);
+
+    }
+
+    // Реальна висота смуги → в змінну, щоб від неї рахувались і відступ
+    // body, і зсув шапки, і власне меню адмінки (admin/index.html).
+    function syncHeight(bar) {
+
+        var height = Math.ceil(bar.getBoundingClientRect().height);
+
+        if (!height) return;
+
+        document.documentElement.style.setProperty("--env-badge-h", height + "px");
+        document.documentElement.style.setProperty("scroll-padding-top", height + "px");
+
+    }
+
     function build() {
+
+        injectStyles();
 
         if (document.getElementById("envBadge")) return;
 
@@ -73,9 +136,15 @@
 
         document.body.appendChild(bar);
 
-        // зсуваємо саму адмінку, щоб смуга нічого не перекривала
-        document.documentElement.style.setProperty("scroll-padding-top", "34px");
-        document.body.style.paddingTop = "34px";
+        syncHeight(bar);
+
+        // висота змінюється при звуженні вікна — смуга переноситься
+        // в два рядки; тоді відступ мусить поїхати за нею
+        if (typeof ResizeObserver === "function") {
+            new ResizeObserver(function () { syncHeight(bar); }).observe(bar);
+        } else {
+            window.addEventListener("resize", function () { syncHeight(bar); });
+        }
 
     }
 

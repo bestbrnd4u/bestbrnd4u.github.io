@@ -39,6 +39,11 @@ const schemaOf = slug => {
 
 const schemas = products.map(p => ({ p, ld: schemaOf(p.slug) })).filter(x => x.ld);
 
+// Генератор схлопує пробіли в артикулі, тож порівнюємо нормалізовано:
+// інакше виправлений пробіл виглядав би як «артикул не з варіанта».
+const sameSku = (a, b) =>
+    String(a || "").replace(/\s+/g, " ").trim() === String(b || "").replace(/\s+/g, " ").trim();
+
 console.log("\n[1] Артикул є в кожного товару");
 {
     check(`сторінок з розміткою — ${schemas.length}`, schemas.length === products.length,
@@ -52,8 +57,62 @@ console.log("\n[1] Артикул є в кожного товару");
     // в одного товару поле раніше не потрапляло в розмітку
     const fromVariant = schemas.filter(x => !x.p.sku && x.ld.sku);
     check(`артикул підхвачено з варіанта там, де його немає в товарі (${fromVariant.length})`,
-        fromVariant.every(x => (x.p.variants || []).some(v => v && v.sku === x.ld.sku)),
+        fromVariant.every(x => (x.p.variants || []).some(v => v && sameSku(v.sku, x.ld.sku))),
         fromVariant.map(x => x.p.id).join(", "));
+}
+
+console.log("\n[1b] Артикул виглядає як артикул, а не як назва товару");
+{
+    // Search Console: «Invalid value in field "sku"». Значенням був
+    // не порожній рядок (стара перевірка вище такий і пропускала), а
+    // назва товару з Amazon разом з ASIN:
+    //   "Gabbi Ruched Hobo Handbag - Grass Green  B094QT219C"
+    // 51 символ і подвійний пробіл. Для Google sku — коротка позначка
+    // товару, і таке значення він відкидає.
+    const MAX_LENGTH = 50;
+    const MAX_SPACES = 3;
+
+    const problem = sku => {
+        if (typeof sku !== "string") return `не рядок (${typeof sku})`;
+        if (sku !== sku.trim()) return "пробіли по краях";
+        if (/\s{2,}/.test(sku)) return "подвійний пробіл усередині";
+        if (sku.length > MAX_LENGTH) return `${sku.length} символів > ${MAX_LENGTH}`;
+        if ((sku.split(" ").length - 1) > MAX_SPACES) return "більше схоже на назву, ніж на артикул";
+        return "";
+    };
+
+    const broken = schemas
+        .map(x => ({ id: x.p.id, sku: x.ld.sku, why: problem(x.ld.sku) }))
+        .filter(x => x.why);
+
+    check("усі sku проходять перевірку", broken.length === 0,
+        broken.map(x => `id=${x.id} «${x.sku}» — ${x.why}`).join("; "));
+
+    // Слеші лишаються навмисно: "NENA/S 807 51" і "MJ 1010/S 0807/9O 54" —
+    // справжні моделі Jimmy Choo і Marc Jacobs, а не сміття в даних.
+    const withSlash = schemas.filter(x => /\//.test(x.ld.sku));
+    check(`артикули зі слешем не поламані перевіркою (${withSlash.length})`,
+        withSlash.every(x => !problem(x.ld.sku)));
+
+    // Порожній рядок JSON.stringify не прибирає (він прибирає лише
+    // undefined), тож "sku": "" спокійно потрапило б у розмітку.
+    check("немає жодного порожнього sku",
+        schemas.every(x => x.ld.sku === undefined || String(x.ld.sku).trim() !== ""));
+
+    // і в даних теж не має лишатись сміття — інакше воно просто
+    // мовчки випаде з розмітки при наступній збірці
+    const inData = [];
+
+    products.forEach(p => {
+        [["товар", p.sku]].concat((p.variants || [])
+            .map(v => [`варіант «${v.color || v.name || "?"}»`, v && v.sku]))
+            .forEach(([where, sku]) => {
+                if (sku && problem(String(sku))) inData.push(`id=${p.id} ${where}: «${sku}»`);
+            });
+    });
+
+    check("у data/products теж немає битих артикулів", inData.length === 0,
+        inData.join("; "));
 }
 
 console.log("\n[2] Умови повернення — і в розмітці, і на сайті однакові");
@@ -156,6 +215,19 @@ console.log("\n[5] Обидва генератори розмітки узгод
         /FREE_SHIPPING_FROM = 3500/.test(productJs) && /FREE_SHIPPING_FROM = 3500/.test(builder));
     check("строк повернення однаковий",
         /merchantReturnDays: 14/.test(productJs) && /merchantReturnDays: 14/.test(builder));
+
+    // Артикул чиститься у двох місцях — статичні сторінки і клієнтський
+    // рендер. Розійдуться межі — Google побачить різний sku на одній
+    // адресі до і після виконання JS.
+    check("sanitizeSku є в обох",
+        /function sanitizeSku/.test(productJs) && /function sanitizeSku/.test(builder));
+    check("межа довжини артикула однакова",
+        /SKU_MAX_LENGTH = 50/.test(productJs) && /SKU_MAX_LENGTH = 50/.test(builder));
+    check("межа кількості пробілів однакова",
+        /SKU_MAX_SPACES = 3/.test(productJs) && /SKU_MAX_SPACES = 3/.test(builder));
+    check("порожній артикул не йде в розмітку (undefined, а не \"\")",
+        /schemaSku\(product\) \|\| undefined/.test(productJs)
+        && /firstSku\(product\) \|\| undefined/.test(builder));
 }
 
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);

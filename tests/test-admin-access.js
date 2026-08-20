@@ -117,7 +117,13 @@ console.log("\n[5] Меню в шапці адмінки");
   const menu = d.getElementById("adminMenuList");
 
   check("меню створено", !!root);
-  check("закріплене в шапці, не в кутку", root.style.position === "fixed" && root.style.top === "14px");
+  // Відступ рахується від смуги середовища (--env-badge-h з env-badge.js):
+  // з жорсткими 14px кнопка опинялась ПІД смугою. Без смуги змінної
+  // немає — тоді працює запасне 0px і кнопка лишається там, де була.
+  check("закріплене в шапці, не в кутку",
+        root.style.position === "fixed"
+        && /^calc\(var\(--env-badge-h, ?0px\) \+ 14px\)$/.test(root.style.top),
+        root.style.top);
   check("за замовчуванням згорнуте", menu.hidden === true);
 
   d.getElementById("adminMenuToggle").dispatchEvent(new w.MouseEvent("click", { bubbles: true }));

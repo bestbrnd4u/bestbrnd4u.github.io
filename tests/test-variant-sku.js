@@ -60,7 +60,20 @@ console.log("\n[4] Сторінка товару показує артикул �
   check("свотчі несуть data-sku", js.includes('data-sku="${escapeHtml(getVariantSku'));
   check("підпис під назвою має маркер", js.includes("data-product-sku"));
   check("рядок характеристик має маркер", js.includes("data-spec-sku"));
-  check("JSON-LD бере артикул першого кольору", js.includes("sku: getVariantSku(product,"));
+  // У розмітку артикул іде НЕ через getVariantSku: той віддає значення
+  // як є і може повернути порожній рядок — і те, і те Search Console
+  // позначає як «Invalid value in field "sku"». Для JSON-LD є окремий
+  // schemaSku(): він чистить значення і перебирає товар → кольори в
+  // тому самому порядку, що й firstSku() у scripts/build-product-pages.js.
+  // Порядок мусить збігатися, інакше та сама адреса покаже Google різний
+  // артикул до і після виконання JS.
+  //
+  // На видимій частині сторінки getVariantSku лишається: там артикул
+  // показується як є і перемикається разом з кольором (перевірки вище).
+  check("JSON-LD бере артикул через schemaSku", js.includes("sku: schemaSku(product) || undefined"));
+  check("порожній артикул у розмітку не потрапляє", js.includes("|| undefined"));
+  check("schemaSku починає з артикула товару, як і генератор сторінок",
+        /function schemaSku\(product\) \{\s*\n\s*const own = sanitizeSku\(product\.sku\);/.test(js));
   const cs=fs.readFileSync(path.join(ROOT,"assets/js/common.js"),"utf8");
   check("перемикання кольору оновлює артикул", cs.includes("[data-product-sku]") && cs.includes("[data-spec-sku]"));
 }

@@ -75,6 +75,17 @@ function seoSandbox() {
         .replace("const FREE_SHIPPING_FROM =", "window.FREE_SHIPPING_FROM ="));
     window.eval(productJs.match(/function shippingDetailsFor\(price\) \{[\s\S]*?\n\}\n/)[0]
         .replace("function shippingDetailsFor(price) {", "window.shippingDetailsFor = function (price) {"));
+
+    // Артикул для розмітки чиститься окремо: Search Console відкидав
+    // і надто довге значення, і порожній рядок (див. test-merchant-listings).
+    window.eval(productJs.match(/const SKU_MAX_LENGTH = \d+;/)[0]
+        .replace("const SKU_MAX_LENGTH =", "window.SKU_MAX_LENGTH ="));
+    window.eval(productJs.match(/const SKU_MAX_SPACES = \d+;/)[0]
+        .replace("const SKU_MAX_SPACES =", "window.SKU_MAX_SPACES ="));
+    window.eval(productJs.match(/function sanitizeSku\(value\) \{[\s\S]*?\n\}\n/)[0]
+        .replace("function sanitizeSku(value) {", "window.sanitizeSku = function (value) {"));
+    window.eval(productJs.match(/function schemaSku\(product\) \{[\s\S]*?\n\}\n/)[0]
+        .replace("function schemaSku(product) {", "window.schemaSku = function (product) {"));
     window.eval(productJs.match(/function markProductPageNotFound\(\) \{[\s\S]*?\n\}\n/)[0]);
     window.eval(productJs.match(/function updateProductSeoMetadata\(product\) \{[\s\S]*?\n\n\}\n/)[0]);
 

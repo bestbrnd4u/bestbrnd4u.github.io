@@ -136,23 +136,52 @@ console.log("\n[4] Банери не потрапляють під привед�
 
 console.log("\n[5] Приведення вбудоване в збірку, а не разова ручна дія");
 {
-    const wf = fs.readFileSync(path.join(ROOT, ".github/workflows/build-products.yml"), "utf8");
-
-    check("workflow запускає normalize-product-images.js",
-        wf.includes("normalize-product-images.js"));
-    check("запускається з --apply, а не лише звітом",
-        /normalize-product-images\.js --apply/.test(wf));
-    check("залежності ставляться (скрипту потрібен sharp)", wf.includes("npm ci"));
-
     const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, "package.json"), "utf8"));
+
+    check("є спільний скрипт build:media", !!pkg.scripts["build:media"]);
+    check("він запускає нормалізацію фото",
+        /normalize-product-images\.js/.test(pkg.scripts["build:media"] || ""));
+    check("з --apply, а не лише звітом",
+        /normalize-product-images\.js --apply/.test(pkg.scripts["build:media"] || ""));
+
+    // ОБИДВА середовища, а не лише прод.
+    //
+    // Кроки нормалізації були виписані тільки в build-products.yml.
+    // build-dev.yml у власній шапці стверджує, що «дзеркалить» його, але
+    // цих кроків не мав — і фото, залиті через дев-адмінку, лишались у
+    // своїх пропорціях. Знімок Jimmy Choo 1500×937 у дев-каталозі різало
+    // майже навпіл, тоді як в адмінці прев'ю показувало його цілим.
+    // Тому перевіряємо обидва файли й через один скрипт.
+    [
+        [".github/workflows/build-products.yml", "прод"],
+        [".github/workflows/build-dev.yml", "дев"]
+    ].forEach(([file, label]) => {
+
+        const wf = fs.readFileSync(path.join(ROOT, file), "utf8");
+
+        check(`${label}-збірка нормалізує медіа`, /npm run build:media/.test(wf));
+        check(`${label}-збірка ставить залежності (скрипту потрібен sharp)`,
+            wf.includes("npm ci"));
+
+    });
+
     check("sharp зафіксований у devDependencies", !!pkg.devDependencies.sharp,
         Object.keys(pkg.devDependencies).join(", "));
 
-    const commitBlock = wf.slice(wf.indexOf("git add"));
-    check("перероблені фото потрапляють у коміт",
-        commitBlock.includes("assets/images"));
-    check("оновлений перелік копій теж комітиться",
-        /git add[\s\S]{0,600}image-variants\.json/.test(wf) || wf.includes("git add -A data"));
+    [
+        [".github/workflows/build-products.yml", "прод"],
+        [".github/workflows/build-dev.yml", "дев"]
+    ].forEach(([file, label]) => {
+
+        const wf = fs.readFileSync(path.join(ROOT, file), "utf8");
+        const commitBlock = wf.slice(wf.indexOf("git add"));
+
+        check(`${label}: перероблені фото потрапляють у коміт`,
+            commitBlock.includes("assets/images"));
+        check(`${label}: оновлений перелік копій теж комітиться`,
+            /git add[\s\S]{0,600}image-variants\.json/.test(wf) || wf.includes("git add -A data"));
+
+    });
 }
 
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);

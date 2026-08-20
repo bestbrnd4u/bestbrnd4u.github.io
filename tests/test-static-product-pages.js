@@ -22,7 +22,11 @@ const ROOT = path.join(__dirname, "..");
 const PAGES_DIR = path.join(ROOT, "p");
 // домен береться з site.config.json — інакше тест ламається
 // при кожній зміні домену (див. scripts/site-env.js)
-const { SITE_URL } = require("../scripts/site-env");
+// Беремо адресу того середовища, у якому дерево ЗІБРАНЕ, а не з
+// SITE_ENV: без змінної site-env.js віддає production, і на гілці
+// dev перевірки canonical падали завжди (див. tests/helpers/tree-env.js).
+const { treeSiteEnv, childEnv } = require("./helpers/tree-env");
+const { SITE_URL } = treeSiteEnv();
 
 let failures = 0;
 const check = (n, c, e) => {
@@ -228,7 +232,7 @@ console.log("\n[8] Генератор переживає повторний за
     const script = path.join(ROOT, "scripts/build-product-pages.js");
 
     const before = readPage(products[0].slug);
-    execFileSync("node", [script], { cwd: ROOT, encoding: "utf8" });
+    execFileSync("node", [script], { cwd: ROOT, encoding: "utf8", env: childEnv() });
     const after = readPage(products[0].slug);
 
     check("повторний запуск не змінює сторінку (ідемпотентність)", before === after);
@@ -239,7 +243,7 @@ console.log("\n[8] Генератор переживає повторний за
     fs.mkdirSync(ghost, { recursive: true });
     fs.writeFileSync(path.join(ghost, "index.html"), "<html></html>");
 
-    execFileSync("node", [script], { cwd: ROOT, encoding: "utf8" });
+    execFileSync("node", [script], { cwd: ROOT, encoding: "utf8", env: childEnv() });
 
     check("сторінка неіснуючого товару прибирається автоматично",
         !fs.existsSync(ghost));

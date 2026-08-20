@@ -143,6 +143,8 @@
             return h("img", {
                 src: this.state.url,
                 className: this.props.className,
+                // кадрування: ті самі CSS-змінні, що на сайті
+                style: this.props.style || null,
                 alt: "",
             });
 
@@ -190,12 +192,131 @@
     }
 
     // -------------------------
+    // Галерея прев'ю
+    //
+    // Раніше тут показувалось лише images[0], тож перевірити решту
+    // знімків можна було тільки після публікації. Тепер видно всі:
+    // стрілки, крапки й мініатюри — і кожне фото вже з накладеною
+    // рамкою кадрування, тобто рівно так, як його побачить покупець.
+    // -------------------------
+
+    function frameStyleFor(framing, src) {
+
+        if (!window.ImageFraming) return null;
+
+        var style = window.ImageFraming.frameStyleObject(framing, src);
+
+        return Object.keys(style).length ? style : null;
+
+    }
+
+    var PreviewGallery = createClass({
+
+        getInitialState: function () {
+            return { index: 0 };
+        },
+
+        // Фото могли видалити або переставити, поки прев'ю відкрите:
+        // тримаємо індекс у межах списку, інакше галерея показала б
+        // порожнечу замість останнього знімка.
+        clampIndex: function (total) {
+            var i = this.state.index;
+            return total ? Math.max(0, Math.min(total - 1, i)) : 0;
+        },
+
+        step: function (delta, total) {
+            if (!total) return;
+            this.setState({ index: (this.clampIndex(total) + delta + total) % total });
+        },
+
+        render: function () {
+
+            var self = this;
+            var images = this.props.images || [];
+            var framing = this.props.framing;
+            var getAsset = this.props.getAsset;
+
+            if (!images.length) {
+                return h(AssetImage, { path: null, getAsset: getAsset,
+                                       className: this.props.imageClass });
+            }
+
+            var index = this.clampIndex(images.length);
+            var many = images.length > 1;
+
+            return h("div", { className: "cms-preview-gallery" },
+
+                h("div", { className: "cms-preview-stage" },
+
+                    h(AssetImage, {
+                        key: images[index],
+                        path: images[index],
+                        getAsset: getAsset,
+                        className: this.props.imageClass,
+                        style: frameStyleFor(framing, images[index])
+                    }),
+
+                    many ? h("button", {
+                        type: "button",
+                        className: "cms-preview-nav cms-preview-prev",
+                        onClick: function () { self.step(-1, images.length); },
+                        "aria-label": "Попереднє фото"
+                    }, "\u2039") : null,
+
+                    many ? h("button", {
+                        type: "button",
+                        className: "cms-preview-nav cms-preview-next",
+                        onClick: function () { self.step(1, images.length); },
+                        "aria-label": "Наступне фото"
+                    }, "\u203A") : null,
+
+                    many ? h("div", { className: "cms-preview-counter" },
+                        (index + 1) + " / " + images.length) : null
+                ),
+
+                many ? h("div", { className: "cms-preview-thumbs" },
+                    images.map(function (src, i) {
+                        return h("button", {
+                            key: src + i,
+                            type: "button",
+                            className: "cms-preview-thumb" + (i === index ? " is-active" : ""),
+                            onClick: function () { self.setState({ index: i }); },
+                            title: String(src).split("/").pop()
+                        }, h(AssetImage, {
+                            path: src,
+                            getAsset: getAsset,
+                            className: "cms-preview-thumb-img",
+                            style: frameStyleFor(framing, src)
+                        }));
+                    })
+                ) : null
+            );
+
+        }
+
+    });
+
+    // -------------------------
     // ТОВАР — справжня картка каталогу
     // -------------------------
 
     var ProductPreview = createClass({
 
+        getInitialState: function () {
+            // "card" — картка в каталозі, "page" — сторінка товару
+            return { view: "card" };
+        },
+
         render: function () {
+
+            var self = this;
+
+            // getInitialState виконує React, але прев'ю рендерять і
+            // напряму (tests/test-admin-preview.js викликає render з
+            // підставним this). Без запасного значення такий виклик
+            // падав на this.state.view — а мовчазне падіння прев'ю в
+            // адмінці виглядало б як «редактор зламався».
+            var view = (this.state && this.state.view) || "card";
 
             var e = this.props.entry.get("data");
             var getAsset = this.props.getAsset;
@@ -229,10 +350,11 @@
                         e.get("preOrder") ? h("div", { className: "badge badge-preorder" }, "📦") : null
                     ),
 
-                    h(AssetImage, {
-                        path: images[0],
+                    h(PreviewGallery, {
+                        images: images,
+                        framing: e.get("framing"),
                         getAsset: getAsset,
-                        className: "cms-preview-cover",
+                        imageClass: "cms-preview-cover"
                     })
                 ),
 
@@ -301,12 +423,61 @@
                 )
                 : null;
 
+            // ---- сторінка товару ----
+            //
+            // Раніше прев'ю показувало лише картку каталогу, і як товар
+            // виглядає на власній сторінці, було видно тільки після
+            // публікації. Верстка нижче повторює галерею сторінки
+            // товару: великий кадр із мініатюрами збоку.
+            var pageView = h("div", { className: "cms-preview-page" },
+
+                h("div", { className: "cms-preview-page-gallery" },
+                    h(PreviewGallery, {
+                        images: images,
+                        framing: e.get("framing"),
+                        getAsset: getAsset,
+                        imageClass: "cms-preview-page-image"
+                    })
+                ),
+
+                h("div", { className: "cms-preview-page-info" },
+                    h("div", { className: "cms-preview-page-brand" }, esc(e.get("brand"))),
+                    h("h2", { className: "cms-preview-page-title" }, esc(e.get("title"))),
+                    h("div", { className: "cms-preview-page-price" },
+                        price ? formatPrice(price) : "",
+                        oldPrice
+                            ? h("s", { className: "cms-preview-page-old" }, formatPrice(oldPrice))
+                            : null
+                    ),
+                    e.get("description")
+                        ? h("p", { className: "cms-preview-page-desc" }, e.get("description"))
+                        : null
+                )
+            );
+
+            var tabs = [["card", "Картка в каталозі"], ["page", "Сторінка товару"]];
+
             return h("div", { className: "cms-preview" },
 
-                h("div", { className: "cms-preview-hint" },
-                    "Так товар виглядатиме в каталозі. Нижче — решта даних."),
+                h("div", { className: "cms-preview-tabs" },
+                    tabs.map(function (tab) {
+                        return h("button", {
+                            key: tab[0],
+                            type: "button",
+                            className: "cms-preview-tab"
+                                + (view === tab[0] ? " is-active" : ""),
+                            onClick: function () { self.setState({ view: tab[0] }); }
+                        }, tab[1]);
+                    })
+                ),
 
-                h("div", { className: "cms-preview-stage" }, card),
+                h("div", { className: "cms-preview-hint" },
+                    view === "card"
+                        ? "Так товар виглядатиме в каталозі. Гортайте фото стрілками."
+                        : "Так виглядатиме сторінка товару. Нижче — решта даних."),
+
+                h("div", { className: "cms-preview-stage" },
+                    view === "card" ? card : pageView),
 
                 section("Кольори та їх варіанти", variantsBlock),
 

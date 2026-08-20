@@ -78,16 +78,17 @@ jobs:
       - name: Apply site environment
         run: node scripts/apply-site-env.js
 
-      - name: Normalize media file names
-        run: node scripts/normalize-media-names.js
-
       # Фото, завантажені через адмінку, приходять у довільних
       # пропорціях, а картка каталогу й галерея — контейнери 4:5.
       # Без цього кроку контейнер ріже кадр (широкі окуляри втрачали
       # майже половину знімка), і фото лишається без зменшених копій,
       # тобто мобільна сітка тягне повний розмір.
-      - name: Normalize product photos to 4:5
-        run: node scripts/normalize-product-images.js --apply
+      #
+      # Той самий npm-скрипт викликає build-dev.yml: раніше кроки були
+      # виписані тільки тут, дев про них не знав, і фото з дев-адмінки
+      # лишались нерізаними.
+      - name: Normalize media (names + 4:5 canvas + srcset copies)
+        run: npm run build:media
 
       - name: Build data/categories.json
         run: node scripts/build-categories.js

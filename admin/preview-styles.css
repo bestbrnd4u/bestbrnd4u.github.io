@@ -292,3 +292,260 @@
 .cms-preview-nophoto{
     font-size:13px;
 }
+
+/* ==========================================================
+   Галерея прев'ю, перемикач вигляду і кадрування
+   ========================================================== */
+
+/* -- перемикач «картка / сторінка товару» -- */
+.cms-preview-tabs{
+    display:flex;
+    gap:6px;
+    margin-bottom:10px;
+}
+
+.cms-preview-tab{
+    flex:1;
+    padding:8px 10px;
+    border:1px solid #e5e7eb;
+    border-radius:9px;
+    background:#fff;
+    cursor:pointer;
+    font:600 13px/1.2 inherit;
+    color:#374151;
+}
+
+.cms-preview-tab.is-active{
+    background:#2563eb;
+    border-color:#2563eb;
+    color:#fff;
+}
+
+/* -- галерея: стрілки, лічильник, мініатюри -- */
+.cms-preview-gallery{
+    position:relative;
+}
+
+.cms-preview-gallery .cms-preview-stage{
+    position:relative;
+    overflow:hidden;
+}
+
+.cms-preview-nav{
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    width:30px;
+    height:30px;
+    border:0;
+    border-radius:50%;
+    background:rgba(17,24,39,.55);
+    color:#fff;
+    font-size:19px;
+    line-height:1;
+    cursor:pointer;
+    z-index:2;
+}
+
+.cms-preview-prev{ left:6px; }
+.cms-preview-next{ right:6px; }
+
+.cms-preview-counter{
+    position:absolute;
+    right:8px;
+    bottom:8px;
+    padding:2px 8px;
+    border-radius:20px;
+    background:rgba(17,24,39,.55);
+    color:#fff;
+    font-size:11px;
+    z-index:2;
+}
+
+.cms-preview-thumbs{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+    margin-top:8px;
+}
+
+.cms-preview-thumb{
+    width:46px;
+    height:58px;
+    padding:0;
+    border:2px solid transparent;
+    border-radius:7px;
+    overflow:hidden;
+    background:#f3f4f6;
+    cursor:pointer;
+}
+
+.cms-preview-thumb.is-active{ border-color:#2563eb; }
+
+.cms-preview-thumb-img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+    /* кадрування діє і в мініатюрах — інакше вони показували б
+       не той кадр, що великий слайд */
+    transform:scale(var(--frame-zoom,1));
+    transform-origin:var(--frame-x,50%) var(--frame-y,50%);
+}
+
+/* фото в картці прев'ю теж слухається рамки */
+.cms-preview-cover{
+    transform:scale(var(--frame-zoom,1));
+    transform-origin:var(--frame-x,50%) var(--frame-y,50%);
+}
+
+/* -- режим «сторінка товару» -- */
+.cms-preview-page-gallery{
+    border-radius:14px;
+    overflow:hidden;
+    background:#f3f4f6;
+}
+
+.cms-preview-page-image{
+    width:100%;
+    aspect-ratio:4/5;
+    object-fit:cover;
+    display:block;
+    transform:scale(var(--frame-zoom,1));
+    transform-origin:var(--frame-x,50%) var(--frame-y,50%);
+}
+
+.cms-preview-page-info{ padding:14px 2px 2px; }
+
+.cms-preview-page-brand{
+    font-size:12px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:#6b7280;
+}
+
+.cms-preview-page-title{
+    margin:4px 0 8px;
+    font-size:19px;
+    line-height:1.3;
+}
+
+.cms-preview-page-price{
+    font-size:20px;
+    font-weight:700;
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+}
+
+.cms-preview-page-old{
+    font-size:14px;
+    font-weight:400;
+    color:#9ca3af;
+}
+
+.cms-preview-page-desc{
+    margin-top:10px;
+    font-size:13px;
+    line-height:1.55;
+    color:#4b5563;
+}
+
+/* ==========================================================
+   Поле кадрування (admin/image-framing-widget.js)
+   ========================================================== */
+
+.framing-toggle{
+    border:0;
+    background:none;
+    padding:4px 0;
+    cursor:pointer;
+    font:600 14px/1.2 inherit;
+    color:#2563eb;
+}
+
+.framing-row{
+    display:flex;
+    gap:14px;
+    align-items:flex-start;
+    padding:12px 0;
+    border-top:1px solid #f0f1f3;
+}
+
+.framing-frame{
+    flex:0 0 120px;
+    width:120px;
+    aspect-ratio:4/5;
+    border-radius:10px;
+    overflow:hidden;
+    background:#f3f4f6;
+    position:relative;
+    cursor:grab;
+    user-select:none;
+}
+
+.framing-frame:active{ cursor:grabbing; }
+
+.framing-empty{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    height:100%;
+    font-size:11px;
+    color:#9ca3af;
+    text-align:center;
+}
+
+/* мітка точки фокуса — видно тільки коли є наближення */
+.framing-dot{
+    position:absolute;
+    width:14px;
+    height:14px;
+    margin:-7px 0 0 -7px;
+    border-radius:50%;
+    border:2px solid #fff;
+    background:rgba(37,99,235,.85);
+    box-shadow:0 0 0 1px rgba(0,0,0,.25);
+    pointer-events:none;
+}
+
+.framing-controls{ flex:1; min-width:0; }
+
+.framing-name{
+    font-size:12px;
+    color:#374151;
+    word-break:break-all;
+}
+
+.framing-color{ color:#9ca3af; }
+
+.framing-zoom{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin:8px 0 4px;
+    font-size:12px;
+}
+
+.framing-zoom input{ flex:1; }
+.framing-zoom b{ min-width:46px; text-align:right; }
+
+.framing-hint{
+    margin:2px 0 8px;
+    font-size:11px;
+    color:#6b7280;
+}
+
+.framing-reset{
+    padding:5px 10px;
+    border:1px solid #e5e7eb;
+    border-radius:7px;
+    background:#fff;
+    cursor:pointer;
+    font-size:12px;
+}
+
+.framing-reset:disabled{
+    opacity:.45;
+    cursor:default;
+}

@@ -417,6 +417,7 @@ function createProductCard(product) {
                             <img
                                 class="product-main-image photo-slide"
                                 src="${img}"
+                                style="${cardFrameStyle(product.framing, img)}"
                                 data-variant-src="${img}"
                                 data-variant-sizes="(max-width: 768px) 50vw, 300px"
                                 alt="${escapeHtml(product.title)}"
@@ -556,6 +557,22 @@ function buildSrcSet(src) {
     const base = src.slice(0, -".webp".length);
 
     return `${base}-300.webp 300w, ${base}-600.webp 600w, ${src} 1200w`;
+
+}
+
+// Рамка кадрування → інлайновий style для КАРТКИ каталогу.
+//
+// Ім'я з префіксом card- навмисно: на сторінці товару поруч
+// завантажується product.js зі своєю galleryFrameStyle(), і коли обидві
+// звались однаково, друга мовчки перетирала першу — при різних
+// сигнатурах (див. tests/test-no-function-collisions.js).
+//
+// Математика спільна з адмінкою (assets/js/image-framing.js), тому
+// прев'ю показує рівно те, що побачить покупець. Якщо файл чомусь не
+// підключився — порожній рядок: картка малюється як раніше, без рамки.
+function cardFrameStyle(framing, src) {
+
+    return (window.ImageFraming && window.ImageFraming.frameStyleAttr(framing, src)) || "";
 
 }
 

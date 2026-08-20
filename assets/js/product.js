@@ -129,6 +129,51 @@ const RETURN_POLICY = {
 
 const FREE_SHIPPING_FROM = 3500;
 
+// Артикул для розмітки — ті самі межі, що в scripts/build-product-pages.js.
+//
+// Search Console: «Invalid value in field "sku"». У даних лежала назва
+// товару з Amazon замість артикула, а getVariantSku може повернути й
+// порожній рядок — JSON.stringify прибирає тільки undefined, тож
+// "sku": "" пішло б у розмітку як є. Пояснення до меж — у генераторі.
+const SKU_MAX_LENGTH = 50;
+const SKU_MAX_SPACES = 3;
+
+function sanitizeSku(value) {
+
+    const sku = String(value === undefined || value === null ? "" : value)
+        .replace(/\s+/g, " ")
+        .trim();
+
+    if (!sku) return "";
+
+    if (sku.length > SKU_MAX_LENGTH) return "";
+
+    if ((sku.split(" ").length - 1) > SKU_MAX_SPACES) return "";
+
+    return sku;
+
+}
+
+// Перший придатний артикул: власний товару, далі — варіантів.
+// Порядок такий самий, як у firstSku() генератора статичних сторінок.
+function schemaSku(product) {
+
+    const own = sanitizeSku(product.sku);
+
+    if (own) return own;
+
+    for (const variant of product.variants || []) {
+
+        const fromVariant = sanitizeSku(variant && variant.sku);
+
+        if (fromVariant) return fromVariant;
+
+    }
+
+    return "";
+
+}
+
 function shippingDetailsFor(price) {
 
     const details = {
@@ -203,7 +248,10 @@ function updateProductSeoMetadata(product) {
         name: product.title,
         image: images,
         description,
-        sku: getVariantSku(product, (product.variants || [])[0]),
+        // Раніше тут стояв getVariantSku() першого варіанта: він віддає
+        // значення як є і може повернути порожній рядок — обидва випадки
+        // Search Console позначає як «Invalid value in field "sku"».
+        sku: schemaSku(product) || undefined,
         brand: product.brand ? { "@type": "Brand", name: product.brand } : undefined,
         offers: {
             "@type": "Offer",
@@ -290,12 +338,29 @@ function parseVideoEmbed(url) {
 
 }
 
+// Рамка кадрування → інлайновий style для ГАЛЕРЕЇ сторінки товару.
+//
+// Бере framing з currentFraming, а не з аргументу: галерею перемальовує
+// ще й updateGalleryForColor(), у якої товару під рукою вже немає.
+// Префікс gallery- розводить її з cardFrameStyle() в ui.js — обидва
+// файли підключені на цій сторінці одночасно.
+function galleryFrameStyle(src) {
+
+    return (window.ImageFraming
+        && window.ImageFraming.frameStyleAttr(currentFraming, src)) || "";
+
+}
+
+// framing поточного товару; проставляється при рендері сторінки
+let currentFraming = null;
+
 function buildThumbsMarkup(images, video, altText) {
 
     const imageThumbs = images.map((img, index) => `
         <div class="thumb ${index === 0 ? "active" : ""}">
             <img
                 src="${img}"
+                style="${galleryFrameStyle(img)}"
                 data-variant-src="${img}"
                 data-variant-sizes="100px"
                 alt="${altText}"
@@ -341,7 +406,7 @@ function buildThumbsMarkup(images, video, altText) {
 function buildTrackMarkup(images, video, altText) {
 
     const imageSlides = images.map(img => `
-        <img class="gallery-slide" src="${img}" data-variant-src="${img}" data-variant-sizes="(max-width: 900px) 100vw, 600px" alt="${altText}" draggable="false" onerror="this.onerror=null;this.src='assets/images/no-image.png'">
+        <img class="gallery-slide" src="${img}" style="${galleryFrameStyle(img)}" data-variant-src="${img}" data-variant-sizes="(max-width: 900px) 100vw, 600px" alt="${altText}" draggable="false" onerror="this.onerror=null;this.src='assets/images/no-image.png'">
     `).join("");
 
     const media = parseVideoEmbed(video);
@@ -396,6 +461,11 @@ function buildDotsMarkup(images, video) {
 }
 
 function renderProduct(product) {
+
+    // Рамки кадрування діють на всю сторінку товару — і на великі
+    // слайди, і на мініатюри, і після перемикання кольору
+    // (updateGalleryForColor малює галерею наново вже без product).
+    currentFraming = product.framing || null;
 
     document.getElementById("breadTitle").textContent = product.title;
 

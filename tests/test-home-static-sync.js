@@ -22,6 +22,11 @@ const ROOT = path.join(__dirname, "..");
 const html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
 const home = JSON.parse(fs.readFileSync(path.join(ROOT, "data/home.json"), "utf8"));
 
+// Адреса того середовища, у якому ЗІБРАНЕ дерево. Не з SITE_ENV:
+// без змінної site-env.js віддає production, і на гілці dev перевірки
+// власного домену падали завжди (див. tests/helpers/tree-env.js).
+const { SITE_URL } = require("./helpers/tree-env").treeSiteEnv();
+
 let failures = 0;
 const check = (n, c, e) => {
     if (c) console.log("  ✓", n);
@@ -31,10 +36,18 @@ const check = (n, c, e) => {
 console.log("\n[1] Жодних зовнішніх картинок у розмітці головної");
 {
     // саме вони й блимали: чужий хост, який до того ж треба чекати
-    const external = html.match(/(?:src|content)="https?:\/\/(?!bestbrnd4u)[^"]+\.(?:jpe?g|png|webp)[^"]*"/gi) || [];
+    //
+    // Свій хост беремо з конфіга середовища. Раніше в регулярці стояло
+    // (?!bestbrnd4u) одразу після "//", тобто в білому списку був лише
+    // апекс-домен. На гілці dev усі власні картинки лежать на
+    // dev.bestbrnd4u.com — і тест рахував їх сторонніми.
+    const ownHost = SITE_URL.replace(/^https?:\/\//, "");
 
-    check("немає посилань на сторонні фото", external.length === 0,
-        external.slice(0, 3).join(" | "));
+    const external = (html.match(/(?:src|content)="https?:\/\/[^"]+\.(?:jpe?g|png|webp)[^"]*"/gi) || [])
+        .filter(url => !url.includes(`//${ownHost}/`));
+
+    check(`немає посилань на сторонні фото (свій хост — ${ownHost})`,
+        external.length === 0, external.slice(0, 3).join(" | "));
 
     check("немає pexels", !/pexels/i.test(html));
 }
@@ -70,7 +83,6 @@ console.log("\n[3] Банери в розмітці = банери в даних
     }
 
     // домен беремо з конфіга: інакше перевірка ламається при переїзді
-    const { SITE_URL } = require("../scripts/site-env");
     check("og:image веде на власний домен",
         html.includes(`og:image" content="${SITE_URL}/`), SITE_URL);
 }

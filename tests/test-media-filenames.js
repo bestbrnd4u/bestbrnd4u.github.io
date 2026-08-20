@@ -121,14 +121,27 @@ console.log("\n[3] Посилання на картинки не побилис�
 
 console.log("\n[4] Нормалізація вбудована в збірку, а не лише в тест");
 {
-    const workflow = fs.readFileSync(path.join(ROOT, ".github/workflows/build-products.yml"), "utf8");
+    const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, "package.json"), "utf8"));
 
-    check("workflow запускає normalize-media-names.js",
-        workflow.includes("normalize-media-names.js"));
-    check("workflow стежить і за завантаженими картинками",
-        /paths:[\s\S]*assets\/images/.test(workflow));
-    check("результат нормалізації комітиться",
-        /git add[\s\S]{0,400}assets\/images/.test(workflow));
+    check("build:media запускає normalize-media-names.js",
+        /normalize-media-names\.js/.test(pkg.scripts["build:media"] || ""));
+
+    // Дев теж: у build-dev.yml цих кроків не було, тож довгі імена з
+    // дев-адмінки доживали до злиття в main (див. test-image-canvas).
+    [
+        [".github/workflows/build-products.yml", "прод"],
+        [".github/workflows/build-dev.yml", "дев"]
+    ].forEach(([file, label]) => {
+
+        const workflow = fs.readFileSync(path.join(ROOT, file), "utf8");
+
+        check(`${label}-збірка нормалізує імена`, /npm run build:media/.test(workflow));
+        check(`${label}-збірка стежить і за завантаженими картинками`,
+            /paths:[\s\S]*assets\/images/.test(workflow));
+        check(`${label}-збірка комітить результат`,
+            /git add[\s\S]{0,400}assets\/images/.test(workflow));
+
+    });
 }
 
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);

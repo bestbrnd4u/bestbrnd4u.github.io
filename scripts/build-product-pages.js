@@ -57,6 +57,12 @@ const { SITE_URL } = require("./site-env");
 
 const { slugProblem } = require("./slug-safety");
 
+// Кадрування фото — той самий файл, що виконується в браузері й в
+// адмінці (assets/js/image-framing.js). Статична розмітка мусить
+// показувати той самий кадр, що й JS-версія сторінки, інакше при
+// гідратації фото стрибне.
+const ImageFraming = require("../assets/js/image-framing.js");
+
 // Умови повернення й доставки для розмітки товару.
 //
 // Search Console просив додати hasMerchantReturnPolicy і shippingDetails
@@ -85,14 +91,84 @@ const RETURN_POLICY = {
 
 const FREE_SHIPPING_FROM = 3500;
 
-// Артикул: спершу власний, далі — першого варіанта з ним.
+// Артикул для розмітки: перевірений і почищений.
+//
+// НАВІЩО ПЕРЕВІРКА
+// -----------------
+// Search Console прислав «Invalid value in field "sku"» (Merchant
+// listings). Причина була в даних: при імпорті з Amazon в поле артикула
+// потрапила НАЗВА товару разом з ASIN —
+//
+//     "Gabbi Ruched Hobo Handbag - Grass Green  B094QT219C"
+//
+// 51 символ, подвійний пробіл усередині. Для Google sku — це коротка
+// позначка товару, а не речення, і таке значення він відкидає.
+//
+// Порожній рядок теж «invalid»: JSON.stringify прибирає лише undefined,
+// тож "sku": "" спокійно потрапляє в розмітку.
+//
+// МЕЖІ НИЖЧЕ
+// -----------
+// • не довше 50 символів;
+// • не більше 3 пробілів — цього вистачає справжнім артикулам
+//   ("BE4361F 300187 51", "coach ethan cv918 qbnrx", "MJ 1010/S 0807/9O 54"),
+//   але відсікає назву товару, яка випадково опинилась у полі.
+//
+// Слеші НЕ чіпаємо: "NENA/S 807 51" і "MJ 1010/S 0807/9O 54" — це
+// справжні моделі Jimmy Choo і Marc Jacobs, а не сміття.
+//
+// Невдале значення не підставляємо «як є» і не мовчимо: краще випустити
+// необов'язкове поле, ніж віддати Google завідомо биті дані, — і одразу
+// написати в лог збірки, щоб дані виправили в адмінці.
+const SKU_MAX_LENGTH = 50;
+const SKU_MAX_SPACES = 3;
+
+const skuWarnings = [];
+
+function sanitizeSku(value, context) {
+
+    const sku = String(value === undefined || value === null ? "" : value)
+        .replace(/\s+/g, " ")
+        .trim();
+
+    if (!sku) return "";
+
+    const reason = sku.length > SKU_MAX_LENGTH
+        ? `довший за ${SKU_MAX_LENGTH} символів (${sku.length})`
+        : (sku.split(" ").length - 1) > SKU_MAX_SPACES
+            ? `більше ${SKU_MAX_SPACES} пробілів — схоже на назву, а не на артикул`
+            : "";
+
+    if (reason) {
+        if (context) skuWarnings.push(`${context}: «${sku}» — ${reason}`);
+        return "";
+    }
+
+    return sku;
+
+}
+
+// Артикул: спершу власний, далі — першого варіанта з придатним.
 function firstSku(product) {
 
-    if (product.sku && String(product.sku).trim()) return String(product.sku).trim();
+    const context = product.slug || product.title || "товар без slug";
 
-    const withSku = (product.variants || []).find(v => v && v.sku && String(v.sku).trim());
+    const own = sanitizeSku(product.sku, product.sku ? context : "");
 
-    return withSku ? String(withSku.sku).trim() : "";
+    if (own) return own;
+
+    for (const variant of product.variants || []) {
+
+        const fromVariant = sanitizeSku(variant && variant.sku,
+            variant && variant.sku
+                ? `${context} → варіант «${variant.color || variant.name || "?"}»`
+                : "");
+
+        if (fromVariant) return fromVariant;
+
+    }
+
+    return "";
 
 }
 
@@ -353,13 +429,20 @@ function buildBody(product) {
         ? `<span class="old-price">${escapeHtml(formatPrice(product.oldPrice))}</span>`
         : "";
 
-    const gallery = (product.images || []).slice(0, 5).map((img, i) => `
+    const gallery = (product.images || []).slice(0, 5).map((img, i) => {
+
+        const frame = ImageFraming.frameStyleAttr(product.framing, img);
+
+        return `
                 <img
-                    src="${escapeHtml(absoluteUrl(img))}"
+                    src="${escapeHtml(absoluteUrl(img))}"${frame ? `
+                    style="${escapeHtml(frame)}"` : ""}
                     alt="${escapeHtml(product.title)}${i ? ` — фото ${i + 1}` : ""}"
                     width="600"
                     height="600"
-                    loading="${i ? "lazy" : "eager"}">`).join("");
+                    loading="${i ? "lazy" : "eager"}">`;
+
+    }).join("");
 
     const colors = [...new Set((product.variants || [])
         .map(v => v && v.color)
@@ -479,6 +562,18 @@ function main() {
             removed++;
 
         });
+
+    // Артикули, які не пройшли перевірку, у розмітку не пішли. Мовчазне
+    // зникнення поля — це той самий баг, тільки непомітний, тож пишемо
+    // прямо в лог збірки: видно і локально, і в Actions.
+    if (skuWarnings.length) {
+
+        console.warn(`::warning::Артикулів відкинуто: ${skuWarnings.length} `
+            + "— у розмітку товару вони не потрапили. Виправте поле «Артикул» в адмінці.");
+
+        skuWarnings.forEach(line => console.warn(`   ⚠ ${line}`));
+
+    }
 
     console.log(`Готово: ${written.size} сторінок товарів → p/<slug>/index.html`
         + (removed ? `, прибрано зайвих: ${removed}` : ""));

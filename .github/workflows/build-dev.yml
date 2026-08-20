@@ -50,6 +50,16 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Фото, завантажені через адмінку, приходять у довільних
+      # пропорціях, а картка каталогу й галерея — контейнери 4:5.
+      # Цього кроку тут НЕ БУЛО, хоча в build-products.yml він є, —
+      # і саме через це знімок 1500×937 (Jimmy Choo NENA/S) у dev-каталозі
+      # різався майже навпіл, тоді як в адмінці виглядав цілим.
+      # Крок винесений в npm run build:media, щоб два workflow не
+      # розʼїжджались удруге.
+      - name: Normalize media (names + 4:5 canvas + srcset copies)
+        run: npm run build:media
+
       - name: Build (development)
         env:
           SITE_ENV: development

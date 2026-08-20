@@ -59,8 +59,13 @@
 
             var root = document.createElement("div");
             root.id = "adminMenuRoot";
+            // Смуга середовища теж висить зверху (env-badge.js) і своєю
+            // висотою ділиться через --env-badge-h. Без цього зсуву
+            // кнопка опинялась ПІД смугою. Значення за замовчуванням —
+            // 0px: змінної не буде, якщо смуга не намалювалась.
             root.style.cssText =
-                "position:fixed;top:14px;right:76px;z-index:999999;" +
+                "position:fixed;top:calc(var(--env-badge-h, 0px) + 14px);" +
+                "right:76px;z-index:999999;" +
                 "font:600 13.5px/1.2 -apple-system,Inter,sans-serif;";
 
             var toggle = document.createElement("button");
@@ -148,11 +153,21 @@
          глобальні CMS і createClass, якими користується цей файл. -->
     <!-- Власне поле розмірів: вибір зі списку + додавання свого.
          Має підключатись ДО того, як Decap побудує форму. -->
+    <!-- Кадрування фото: та сама математика, що на сайті. Файл лежить
+         в assets/js і підключається В ОБИДВА боки навмисно — якби прев'ю
+         рахувало кадр власною копією, вона рано чи пізно розійшлася б
+         із каталогом, і адмін бачив би не те, що покупець. -->
+    <script src="../assets/js/image-framing.js"></script>
+
     <script src="size-widget.js"></script>
 
     <!-- Свій вибір товарів: стандартний relation шукає підпослідовністю
          і на «coach» видавав Armani/Marc Jacobs/Michael Kors -->
     <script src="product-picker.js"></script>
+
+    <!-- Редактор кадру: наближення й точка фокуса для кожного фото,
+         з живим прев'ю картки каталогу просто в полі. -->
+    <script src="image-framing-widget.js"></script>
 
     <!-- Смуга-індикатор середовища. Адмінок дві, виглядають однаково,
          і переплутати бойову з тестовою — питання однієї вкладки.

@@ -34,6 +34,29 @@ const applyEnv = env => execFileSync("node", [path.join(ROOT, "scripts/apply-sit
 
 const read = rel => fs.readFileSync(path.join(ROOT, rel), "utf8");
 
+// Стан дерева ДО тесту — щоб повернути його в кінці.
+//
+// НАВІЩО: цей набір перемикає середовище на ЖИВОМУ дереві (інакше не
+// перевірити ні robots, ні CNAME, ні гілку адмінки). Раніше в кінці
+// стояло applyEnv("production") — «хай там що, лишаємо прод». Поки
+// гілка була одна, це нічого не ламало. З появою dev вийшла міна:
+// після `npm test` на гілці dev у дереві лишались бойові canonical,
+// файл CNAME, robots.txt без Disallow і admin/config.yml із
+// branch: main. Закомітив результат — і тестова адмінка почала
+// комітити в прод, а dev відкрився для індексації.
+//
+// Ознака середовища — блок, який пише сам apply-site-env.js.
+const envBefore = (() => {
+
+    const m = read("admin/index.html")
+        .match(/window\.SITE_ENVIRONMENT = \{[^}]*"name"\s*:\s*"([a-z]+)"/);
+
+    return m ? m[1] : "production";
+
+})();
+
+const restoreEnv = () => applyEnv(envBefore);
+
 console.log("\n[1] Конфіг середовищ описаний повністю");
 {
     ["production", "development"].forEach(name => {
@@ -190,8 +213,83 @@ console.log("\n[5b] Смуга середовища в адмінці не да�
         })
         .then(none => {
             check("без даних середовища смуга не малюється", none.text === "", none.text);
+            badgeDoesNotCoverHeader();
             finish();
         });
+}
+
+function badgeDoesNotCoverHeader() {
+
+console.log("\n[5c] Смуга не перекриває шапку адмінки");
+{
+    // Смуга висить у position: fixed. Спершу її компенсували відступом
+    // у <body> — і цього не вистачало: два елементи Decap живуть поза
+    // потоком body і на її padding не реагують.
+    //
+    //   • <header> (AppHeader)  — position: sticky; top: 0
+    //   • EditorContainer       — position: absolute; top: 0; height: 100%
+    //
+    // Через це в редакторі товару смуга накривала кнопку Publish
+    // і напис UNSAVED CHANGES.
+    const badge = read("admin/env-badge.js");
+
+    check("відступ більше не ставиться інлайном у <body>",
+        !/body\.style\.paddingTop/.test(badge));
+    check("стиль кладеться в <head> окремим тегом (переживає перемальовку body)",
+        /envBadgeStyles/.test(badge) && /createElement\("style"\)/.test(badge));
+
+    check("шапку адмінки зсунуто (position: sticky; top: 0)",
+        /#nc-root header\s*\{\s*top:/.test(badge));
+    check("редактор запису зсунуто (position: absolute; top: 0)",
+        /#nc-root \[class\*="EditorContainer"\]/.test(badge));
+    check("редактору перерахована висота, інакше він вилазить за екран",
+        /height:\s*calc\(100% - var\(--env-badge-h\)\)/.test(badge));
+
+    // Кнопку Publish окремо НЕ зсуваємо: її ToolbarContainer лежить
+    // усередині EditorContainer і їде разом із ним. Окреме правило
+    // зсунуло б її двічі.
+    check("ToolbarContainer не зсувається окремо (їде разом з редактором)",
+        !/ToolbarContainer/.test(badge.replace(/\/\/[^\n]*/g, "")));
+
+    // Висота — не константа: смуга з flex-wrap на вузькому екрані
+    // переноситься у два рядки, і зашиті 34px тоді збрехали б.
+    check("висота вимірюється, а не зашита числом",
+        /getBoundingClientRect\(\)\.height/.test(badge));
+    check("зміну висоти відстежуємо", /ResizeObserver/.test(badge));
+
+    // Власне меню адмінки теж висіло під смугою
+    const adminHtml = read("admin/index.html");
+
+    check("кнопка «Меню» рахує відступ від смуги",
+        /top:calc\(var\(--env-badge-h, ?0px\) \+ \d+px\)/.test(adminHtml.replace(/\s+/g, " ")),
+        (adminHtml.match(/position:fixed;top:[^"]*/) || [""])[0]);
+    check("без смуги меню лишається на місці (fallback 0px)",
+        /var\(--env-badge-h, ?0px\)/.test(adminHtml));
+}
+
+console.log("\n[5d] Набір не лишає дерево в чужому середовищі");
+{
+    // Цей файл перемикає середовище на живому дереві — інакше не
+    // перевірити robots, CNAME і гілку адмінки. Раніше в кінці стояло
+    // applyEnv("production"), тобто після `npm test` на гілці dev у
+    // дереві лишались бойові налаштування: адмінка з branch: main,
+    // robots без Disallow і файл CNAME. Закомітив — і тестова адмінка
+    // пише в прод.
+    const self = read("tests/test-site-environments.js");
+
+    check("стан середовища запам'ятовується до перевірок",
+        /const envBefore =/.test(self));
+    check("у кінці повертається саме він, а не зашитий production",
+        /restoreEnv\(\)/.test(self) && !/applyEnv\("production"\);\s*\n\s*console\.log\(failures/.test(self));
+    check("повернення працює і після падіння (catch)",
+        /catch \(error\) \{\s*\n\s*restoreEnv\(\);/.test(self));
+
+    // на момент цієї перевірки блок [4] уже переключив дерево в
+    // production і назад — переконуємось, що ознака середовища жива
+    check("середовище дерева читається з admin/index.html",
+        ["production", "development"].includes(envBefore), envBefore);
+}
+
 }
 
 function finish() {
@@ -238,7 +336,9 @@ console.log("\n[6] Дев-збірка налаштована в CI");
         /git add[\s\S]{0,200}CNAME/.test(prodWf));
 }
 
-    applyEnv("production");
+    restoreEnv();
+
+    console.log(`\n↩ середовище дерева повернуто: ${envBefore}`);
 
     console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
     process.exit(failures === 0 ? 0 : 1);
@@ -246,6 +346,6 @@ console.log("\n[6] Дев-збірка налаштована в CI");
 }
 
 } catch (error) {
-    applyEnv("production");   // хай там що — лишаємо репозиторій у продакшн-стані
+    restoreEnv();   // хай там що — повертаємо дерево в те середовище, у якому воно було
     throw error;
 }
