@@ -46,5 +46,14 @@
   "description": "Lacoste L003 0722 1 SMА\nСтильні повсякденні кросівки Lacoste L003 0722 1 SMA — сучасна модель із виразним спортивним дизайном, натхненним тенісною естетикою. Верх поєднує текстильні та синтетичні матеріали, забезпечуючи комфортну посадку та легкість у повсякденному носінні.",
   "sku": "43SMA0064",
   "rating": 5,
-  "category": "Кросівки"
+  "category": "Кросівки",
+  "slug": "кросівки-lacoste-l003",
+  "id": 34,
+  "color": "White",
+  "images": [
+    "/assets/images/products/uploads/61nzkwkzmsl._sx700_-1-.webp",
+    "/assets/images/products/uploads/612qqlnx4al._sx700_.webp",
+    "/assets/images/products/uploads/613xarv4knl._sx700_.webp",
+    "/assets/images/products/uploads/61z3jdbac7l._sx700_.webp"
+  ]
 }

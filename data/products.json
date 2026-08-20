@@ -1780,5 +1780,64 @@
     "sku": "MJ 1010/S 0807/9O 54",
     "rating": 5,
     "category": "Окуляри і оправи"
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "5–10 робочих днів",
+    "forcePublish": false,
+    "brand": "Lacoste",
+    "price": 5900,
+    "preOrder": false,
+    "variants": [
+      {
+        "color": "White",
+        "hex": "#f6f6f4",
+        "images": [
+          "/assets/images/products/uploads/61nzkwkzmsl._sx700_-1-.webp",
+          "/assets/images/products/uploads/612qqlnx4al._sx700_.webp",
+          "/assets/images/products/uploads/613xarv4knl._sx700_.webp",
+          "/assets/images/products/uploads/61z3jdbac7l._sx700_.webp"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 50,
+    "sizes": [
+      "38",
+      "37",
+      "39"
+    ],
+    "searchKeywords": [
+      "Lacoste",
+      "Lacoste L003",
+      "L003 0722 1 SMA",
+      "кросівки Lacoste",
+      "жіночі кросівки Lacoste",
+      "кросівки Lacoste чоловічі",
+      "брендові кросівки",
+      "оригінальні Lacoste",
+      "спортивні кросівки",
+      "повсякденні кросівки",
+      "кросівки на кожен день",
+      "Lacoste L003 SMA"
+    ],
+    "isNew": false,
+    "title": "Кросівки Lacoste L003",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Lacoste L003 0722 1 SMА\nСтильні повсякденні кросівки Lacoste L003 0722 1 SMA — сучасна модель із виразним спортивним дизайном, натхненним тенісною естетикою. Верх поєднує текстильні та синтетичні матеріали, забезпечуючи комфортну посадку та легкість у повсякденному носінні.",
+    "sku": "43SMA0064",
+    "rating": 5,
+    "category": "Кросівки",
+    "slug": "кросівки-lacoste-l003",
+    "id": 34,
+    "color": "White",
+    "images": [
+      "/assets/images/products/uploads/61nzkwkzmsl._sx700_-1-.webp",
+      "/assets/images/products/uploads/612qqlnx4al._sx700_.webp",
+      "/assets/images/products/uploads/613xarv4knl._sx700_.webp",
+      "/assets/images/products/uploads/61z3jdbac7l._sx700_.webp"
+    ]
   }
 ]
