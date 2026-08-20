@@ -306,6 +306,10 @@ collections:
     fields:
       - label: "Показувати банер"
         name: "active"
+        # default без required — пастка: Decap вважає поле
+        # обов'язковим, а default застосовує лише до НОВИХ записів,
+        # тож старі перестають зберігатись (див. tests/test-entries-savable.js)
+        required: false
         widget: "boolean"
         default: true
 
@@ -384,12 +388,20 @@ collections:
     fields:
       - label: "Показувати на сайті"
         name: "active"
+        # default без required — пастка: Decap вважає поле
+        # обов'язковим, а default застосовує лише до НОВИХ записів,
+        # тож старі перестають зберігатись (див. tests/test-entries-savable.js)
+        required: false
         widget: "boolean"
         default: true
         hint: "Вимкніть, щоб приховати акцію, не видаляючи файл"
 
       - label: "Спосіб показу на головній"
         name: "displayType"
+        # default без required — пастка: Decap вважає поле
+        # обов'язковим, а default застосовує лише до НОВИХ записів,
+        # тож старі перестають зберігатись (див. tests/test-entries-savable.js)
+        required: false
         widget: "select"
         default: "card"
         options:
@@ -410,6 +422,10 @@ collections:
 
       - label: "Порядок показу"
         name: "order"
+        # default без required — пастка: Decap вважає поле
+        # обов'язковим, а default застосовує лише до НОВИХ записів,
+        # тож старі перестають зберігатись (див. tests/test-entries-savable.js)
+        required: false
         widget: "number"
         value_type: "int"
         default: 1
@@ -632,12 +648,20 @@ collections:
     fields:
       - label: "Показувати на сайті"
         name: "active"
+        # default без required — пастка: Decap вважає поле
+        # обов'язковим, а default застосовує лише до НОВИХ записів,
+        # тож старі перестають зберігатись (див. tests/test-entries-savable.js)
+        required: false
         widget: "boolean"
         default: true
         hint: "Вимкніть, щоб приховати добірку, не видаляючи файл"
 
       - label: "Порядок показу"
         name: "order"
+        # default без required — пастка: Decap вважає поле
+        # обов'язковим, а default застосовує лише до НОВИХ записів,
+        # тож старі перестають зберігатись (див. tests/test-entries-savable.js)
+        required: false
         widget: "number"
         value_type: "int"
         default: 1
@@ -988,6 +1012,9 @@ collections:
         name: "isNew"
         widget: "boolean"
         default: false
+        # див. пояснення в forcePublish нижче: без явного required: false
+        # товари, збережені до появи поля, перестають публікуватись
+        required: false
         hint: "Впливає на розділ «Новинки» в каталозі"
 
       - label: "📦 Товар під замовлення"
@@ -1030,6 +1057,20 @@ collections:
         name: "forcePublish"
         widget: "boolean"
         default: false
+        # required: false — обов'язково, і ось чому.
+        #
+        # Decap вважає поле обов'язковим, якщо required не вказано явно:
+        #   const isRequired = field.get('required', true)
+        # А default застосовується ЛИШЕ при створенні нового товару —
+        # у вже збережених записів ключа просто немає, тобто значення
+        # undefined, тобто «порожньо».
+        #
+        # Через це 26 із 38 товарів (усі, збережені до появи цього поля)
+        # переставали зберігатись: Decap відхиляв публікацію з
+        # «Oops, you've missed a required field», не показуючи, яке саме
+        # поле винне — прапорець стоїть далеко внизу форми і виглядає
+        # заповненим.
+        required: false
         hint: >
           За замовчуванням товар з незаповненими обов'язковими полями
           (категорія, ціна, опис, фото тощо) НЕ показується на сайті —
