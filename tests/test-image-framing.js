@@ -101,8 +101,9 @@ console.log("\n[3] Файл обчислень — один на сайт і а�
     const widget = read("admin/image-framing-widget.js");
     const preview = read("admin/preview-templates.js");
 
+    // межі повзунка приходять із бібліотеки, а не зашиті у віджеті
     check("віджет бере межі зі спільного файлу",
-        /Framing\.MIN_ZOOM/.test(widget) && /Framing\.MAX_ZOOM/.test(widget));
+        /lib\.MIN_ZOOM/.test(widget) && /lib\.MAX_ZOOM/.test(widget));
     check("віджет не має власної константи наближення",
         !/MAX_ZOOM\s*=\s*\d/.test(widget));
     check("прев'ю рахує стиль спільною функцією",
@@ -236,6 +237,102 @@ console.log("\n[8] Оригінали фото не змінюються");
     const normalizer = read("scripts/normalize-product-images.js");
     check("нормалізатор нічого не знає про рамки (не запікає їх у файл)",
         !/framing/i.test(normalizer));
+}
+
+console.log("\n[8b] Відсутність файла обчислень НЕ блокує збереження товару");
+{
+    // Реальний випадок з dev. assets/js/image-framing.js не віддався,
+    // віджет вийшов до registerWidget — і товар перестав зберігатись
+    // із повідомленням «Oops, you've missed a required field», хоча
+    // порожніх полів не було.
+    //
+    // Ланцюжок у decap-cms.js:
+    //   resolveWidget: function Ss(e){ return Cs(e||"string") || Cs("unknown"); }
+    //   processInnerControlRef = e => { if (!e) return; ... wrappedControlValid = ... }
+    //   validateWrappedControl = e => { if ("function" != typeof this.wrappedControlValid) throw ... }
+    // Контрол "unknown" — функціональний компонент, ref у нього null,
+    // тож wrappedControlValid лишається undefined і валідація кидає
+    // помилку. required: false на цьому шляху не допомагає взагалі.
+    const widgetSrc = read("admin/image-framing-widget.js");
+
+    // стенд: CMS + мінімальні заглушки React, БЕЗ window.ImageFraming
+    const stand = (withLib) => {
+
+        const registered = {};
+        const sandbox = {
+            CMS: { registerWidget: (n, c, p) => { registered[n] = { control: c, preview: p }; } }
+        };
+
+        sandbox.window = sandbox;
+        sandbox.console = { warn: () => {}, error: () => {} };
+        sandbox.h = (type, props, ...kids) => ({ type, props: props || {}, children: kids.flat() });
+        sandbox.createClass = spec => {
+            function C(props) {
+                this.props = props;
+                this.state = spec.getInitialState ? spec.getInitialState.call(this) : {};
+            }
+            Object.assign(C.prototype, spec);
+            C.prototype.setState = function (s) { Object.assign(this.state, s); };
+            return C;
+        };
+
+        if (withLib) sandbox.ImageFraming = require("../assets/js/image-framing.js");
+
+        require("vm").createContext(sandbox);
+        require("vm").runInContext(widgetSrc, sandbox);
+
+        return registered;
+
+    };
+
+    const without = stand(false);
+
+    check("віджет реєструється навіть без assets/js/image-framing.js",
+        !!without.imageFraming);
+
+    if (without.imageFraming) {
+
+        const Control = without.imageFraming.control;
+        const inst = new Control({
+            value: {},
+            entry: { get: () => ({ get: () => null }) },
+            getAsset: v => v
+        });
+
+        // isValid оголошений явно: інакше валідність залежала б від
+        // того, чи Decap встиг захопити ref контрола
+        check("контрол сам повідомляє, що він валідний",
+            typeof inst.isValid === "function" && inst.isValid() === true);
+
+        let rendered = null;
+        let threw = false;
+        try { rendered = inst.render(); } catch (e) { threw = true; }
+
+        check("рендер без бібліотеки не падає", !threw);
+        check("замість поля видно пояснення, а не порожнеча",
+            !threw && /не завантажився/.test(JSON.stringify(rendered)));
+
+    }
+
+    check("у файлі немає раннього return перед реєстрацією",
+        widgetSrc.indexOf("CMS.registerWidget") > -1
+        && !/if \(!Framing\)[\s\S]{0,80}return;/.test(widgetSrc));
+
+    const withLib = stand(true);
+    check("з бібліотекою віджет теж реєструється", !!withLib.imageFraming);
+}
+
+console.log("\n[8c] Стилі прев'ю не залипають у кеші");
+{
+    // preview-templates.js оновився, а preview-styles.css браузер віддав
+    // старий — вкладки злиплись у рядок тексту, стрілки й лічильник без
+    // оформлення. Виглядало як зламане прев'ю.
+    const preview = read("admin/preview-templates.js");
+
+    check("до стилів прев'ю додається унікальний параметр",
+        /registerPreviewStyle\("\.\.\/assets\/css\/style\.css" \+ noCache\)/.test(preview));
+    check("і до власних стилів адмінки теж",
+        /registerPreviewStyle\("preview-styles\.css" \+ noCache\)/.test(preview));
 }
 
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);

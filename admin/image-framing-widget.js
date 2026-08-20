@@ -47,11 +47,29 @@
 
     if (!h || !createClass) return;
 
-    var Framing = window.ImageFraming;
-
-    if (!Framing) {
-        console.warn("[framing] assets/js/image-framing.js не підключено — поле кадрування вимкнене");
-        return;
+    // ЧОМУ ТУТ НЕМАЄ РАННЬОГО return
+    // -------------------------------
+    // Спершу цей файл виходив, якщо не знайшов window.ImageFraming, —
+    // і це зробило товар НЕСОХРАНЯЄМИМ. Механізм такий:
+    //
+    //   1. віджет imageFraming не зареєстровано;
+    //   2. resolveWidget() у Decap підставляє замість нього "unknown":
+    //        function Ss(e){ return Cs(e || "string") || Cs("unknown"); }
+    //   3. контрол "unknown" — функціональний компонент, тож ref у нього
+    //      null, і processInnerControlRef виходить на першому рядку:
+    //        processInnerControlRef = e => { if (!e) return; ... }
+    //   4. через це this.wrappedControlValid лишається undefined, а
+    //      validateWrappedControl на цьому КИДАЄ помилку.
+    //
+    // Назовні це виглядає як «Oops, you've missed a required field»,
+    // хоча жодне поле не порожнє, і required: false не рятує: перевірка
+    // присутності до цього місця навіть не доходить.
+    //
+    // Тому реєструємось ЗАВЖДИ, а відсутність файла обчислень показуємо
+    // текстом усередині поля. Не працює кадрування — прикро; не
+    // зберігається товар — неприпустимо.
+    function framingLib() {
+        return window.ImageFraming || null;
     }
 
     // ---------- дані ----------
@@ -195,8 +213,8 @@
                         h("span", null, "Наближення"),
                         h("input", {
                             type: "range",
-                            min: Framing.MIN_ZOOM,
-                            max: Framing.MAX_ZOOM,
+                            min: this.props.lib.MIN_ZOOM,
+                            max: this.props.lib.MAX_ZOOM,
                             step: 0.05,
                             value: frame.zoom,
                             onChange: this.handleZoom
@@ -230,21 +248,21 @@
             return { open: true };
         },
 
-        frameOf: function (src) {
+        frameOf: function (lib, src) {
 
-            var stored = toPlain(this.props.value)[Framing.imageKey(src)];
-            var frame = Framing.normalizeFrame(stored);
+            var stored = toPlain(this.props.value)[lib.imageKey(src)];
+            var frame = lib.normalizeFrame(stored);
 
             return frame || { zoom: 1, x: 50, y: 50 };
 
         },
 
-        setFrame: function (src, frame) {
+        setFrame: function (lib, src, frame) {
 
             var next = toPlain(this.props.value);
-            var key = Framing.imageKey(src);
+            var key = lib.imageKey(src);
 
-            var clean = Framing.normalizeFrame(frame);
+            var clean = lib.normalizeFrame(frame);
 
             // zoom = 1 нічого не змінює — не засмічуємо файл товару
             if (clean) next[key] = clean;
@@ -254,10 +272,32 @@
 
         },
 
+        // Валідність поля не залежить від ref-а і від бібліотеки:
+        // кадрування необов'язкове й ніколи не має блокувати збереження.
+        isValid: function () {
+            return true;
+        },
+
         render: function () {
 
             var self = this;
-            var entryData = this.props.entry.get("data");
+            var lib = framingLib();
+
+            if (!lib) {
+                return h("div", { className: "framing-widget" },
+                    h("p", { className: "framing-hint" },
+                        "Кадрування недоступне: не завантажився "
+                        + "assets/js/image-framing.js. На збереження товару це "
+                        + "не впливає — уже задані рамки лишаються як є."));
+            }
+
+            var entryData = this.props.entry ? this.props.entry.get("data") : null;
+
+            if (!entryData) {
+                return h("div", { className: "framing-widget" },
+                    h("p", { className: "framing-hint" }, "Дані товару ще вантажаться…"));
+            }
+
             var images = collectImages(entryData);
             var getAsset = this.props.getAsset;
 
@@ -289,8 +329,9 @@
                             src: item.src,
                             color: item.color,
                             url: url,
-                            frame: self.frameOf(item.src),
-                            onChange: function (frame) { self.setFrame(item.src, frame); }
+                            lib: lib,
+                            frame: self.frameOf(lib, item.src),
+                            onChange: function (frame) { self.setFrame(lib, item.src, frame); }
                         });
 
                     }))

@@ -672,8 +672,21 @@
     // -------------------------
 
     // справжні стилі сайту — щоб картка виглядала точно як у каталозі
-    CMS.registerPreviewStyle("../assets/css/style.css");
-    CMS.registerPreviewStyle("preview-styles.css");
+    // Стилі прев'ю — БЕЗ кешу.
+    //
+    // Decap тягне ці файли у свій iframe звичайним запитом, тож браузер
+    // кешує їх нарівні зі статикою сайту. На практиці це виглядало так:
+    // preview-templates.js уже новий і малює галерею з вкладками, а
+    // preview-styles.css лишається старим — вкладки злипаються в один
+    // рядок тексту, стрілки й лічильник без оформлення. Виглядає як
+    // «прев'ю зламалось», хоча зламався тільки кеш.
+    //
+    // Адмінкою користуються одиниці, файли невеликі, тож постійне
+    // перезавантаження тут дешевше за плутанину.
+    var noCache = "?v=" + Date.now();
+
+    CMS.registerPreviewStyle("../assets/css/style.css" + noCache);
+    CMS.registerPreviewStyle("preview-styles.css" + noCache);
 
     CMS.registerPreviewTemplate("products", ProductPreview);
     CMS.registerPreviewTemplate("promotions", PromotionPreview);
