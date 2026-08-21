@@ -530,7 +530,18 @@ function buildDotsMarkup(images, video) {
 
     if (total <= 1) return "";
 
-    return Array.from({ length: total }, (_, index) => `<span class="gallery-dot ${index === 0 ? "active" : ""}"></span>`).join("");
+    // <button>, а не <span>.
+    //
+    // На точки вже був навішаний обробник кліку, але виглядали вони як
+    // декорація: курсор над ними лишався стрілкою, з клавіатури до них
+    // не дійти, і зчитувач екрана не називав їх кнопками. Плюс 7×7px —
+    // це надто мала мішень; збільшуємо її прозорим падінгом у CSS,
+    // не змінюючи вигляду самої крапки.
+    return Array.from({ length: total }, (_, index) => `
+        <button type="button"
+                class="gallery-dot ${index === 0 ? "active" : ""}"
+                aria-label="Фото ${index + 1} з ${total}"
+                ${index === 0 ? 'aria-current="true"' : ""}></button>`).join("");
 
 }
 
@@ -645,6 +656,12 @@ function renderProduct(product) {
         </div>
 
         ${galleryImages.length + (galleryVideo ? 1 : 0) > 1 ? `
+        <button type="button" class="gallery-arrow gallery-arrow-prev" id="mainGalleryPrev" aria-label="Попереднє фото">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button type="button" class="gallery-arrow gallery-arrow-next" id="mainGalleryNext" aria-label="Наступне фото">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
         <div class="gallery-dots" id="mainGalleryDots">
             ${buildDotsMarkup(galleryImages, galleryVideo)}
         </div>` : ""}
@@ -1204,7 +1221,14 @@ function setupGallery() {
         const index = currentSlideIndex();
 
         dotsWrap?.querySelectorAll(".gallery-dot").forEach((dot, i) => {
+
             dot.classList.toggle("active", i === index);
+
+            // не лише підсвітка: зчитувач екрана має розуміти, яке фото
+            // показане зараз
+            if (i === index) dot.setAttribute("aria-current", "true");
+            else dot.removeAttribute("aria-current");
+
         });
 
         thumbsVertical?.querySelectorAll(".thumb").forEach((thumb, i) => {
@@ -1251,6 +1275,61 @@ function setupGallery() {
     dotsWrap?.querySelectorAll(".gallery-dot").forEach((dot, index) => {
         dot.addEventListener("click", () => goToSlide(index));
     });
+
+    // Стрілки. Гортають по колу: з останнього фото вперед — на перше.
+    // Дійшовши до краю, людина частіше хоче подивитись ще раз, ніж
+    // упертись у мертву кнопку, а вимкнена стрілка на трьох фото
+    // виглядає як поломка.
+    const slidesCount = () => track.children.length;
+
+    function step(delta) {
+
+        const total = slidesCount();
+
+        if (!total) return;
+
+        goToSlide((currentSlideIndex() + delta + total) % total);
+
+    }
+
+    const prevBtn = document.getElementById("mainGalleryPrev");
+    const nextBtn = document.getElementById("mainGalleryNext");
+    const photoBox = track.closest(".main-photo");
+
+    // Крапки при зміні кольору перемальовуються, а кнопки стрілок — ні:
+    // вони лежать поза контейнером крапок. setupGallery() після кожної
+    // зміни кольору викликається наново, тож без цієї позначки на ту
+    // саму кнопку навісився б другий обробник, і галерея гортала б
+    // через одне фото. Той самий прийом уже застосований нижче для
+    // тач-жестів (track.dataset.touchBound).
+    if (photoBox && !photoBox.dataset.arrowsBound) {
+
+        photoBox.dataset.arrowsBound = "1";
+
+        prevBtn?.addEventListener("click", () => step(-1));
+        nextBtn?.addEventListener("click", () => step(1));
+
+        // Стрілки на клавіатурі — лише коли фокус усередині галереї.
+        // На всю сторінку вішати не можна: стрілками гортають саму
+        // сторінку, і галерея забирала б це в людини.
+        photoBox.addEventListener("keydown", event => {
+
+            if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+
+            event.preventDefault();
+
+            step(event.key === "ArrowLeft" ? -1 : 1);
+
+        });
+
+    }
+
+    // У різних кольорів буває різна кількість фото. На одному
+    // гортати нема чого — ховаємо стрілки, інакше вони виглядали б
+    // як зламані.
+    const single = slidesCount() < 2;
+
+    [prevBtn, nextBtn].forEach(btn => { if (btn) btn.hidden = single; });
 
     thumbsVertical?.querySelectorAll(".thumb").forEach((thumb, index) => {
 

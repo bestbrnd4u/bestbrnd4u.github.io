@@ -79,7 +79,11 @@ console.log("\n[3] Пагінація");
   check("перша сторінка не засмічує адресу",
         /value === ""\s*\)\s*params\.delete\(key\)/.test(cat.replace(/\s+/g, " "))
         || /params\.delete\(key\)/.test(cat));
-  check("сторінка читається з адреси при відкритті", /get\("page"\)/.test(cat));
+  // читається через readNumberParam: прямий Number(params.get(...))
+  // повертав 0 для відсутнього параметра — та сама пастка, що зламала
+  // фільтр ціни (див. tests/test-catalog-url-state.js, блок [7])
+  check("сторінка читається з адреси при відкритті",
+        /readNumberParam\(new URLSearchParams\(location\.search\), "page"\)/.test(cat));
   check("replaceState, щоб «Назад» не гортав сторінки", /history\.replaceState/.test(cat));
   check("після переходу підіймає до товарів, а не до шапки",
         /grid\.getBoundingClientRect/.test(cat));
