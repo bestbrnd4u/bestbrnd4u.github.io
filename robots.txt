@@ -76,6 +76,9 @@ Disallow: /
 Allow: /
 Disallow: /admin/
 Disallow: /account
+Allow: /
+Disallow: /admin/
+Disallow: /account
 Disallow: /cart
 Disallow: /checkout
 Disallow: /favorites
