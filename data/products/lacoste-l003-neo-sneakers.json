@@ -42,5 +42,13 @@
   "description": "Стильні кросівки Lacoste L003 Neo з сучасним масивним дизайном та фірмовим логотипом бренду. Комфортна посадка та універсальний силует роблять їх чудовим вибором для повсякденних образів",
   "sku": "45SFA0001",
   "rating": 5,
-  "category": "Кросівки"
+  "category": "Кросівки",
+  "slug": "lacoste-l003-neo-sneakers",
+  "id": 39,
+  "color": "Neo",
+  "images": [
+    "/assets/images/products/uploads/45sfa0001_075_02-1-.webp",
+    "/assets/images/products/uploads/45sfa0001_075_01.webp",
+    "/assets/images/products/uploads/ss23-obm1w1-99x_f4.webp"
+  ]
 }
