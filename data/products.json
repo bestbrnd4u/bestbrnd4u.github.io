@@ -2312,5 +2312,62 @@
       "/assets/images/products/uploads/6b15e7dfca384ec797dbde12aad79176.webp",
       "/assets/images/products/uploads/6c62a95311fd499f8cd54c4c96e0143f.webp"
     ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "5–10 робочих днів",
+    "forcePublish": false,
+    "brand": "Lacoste",
+    "price": 6000,
+    "preOrder": false,
+    "variants": [
+      {
+        "color": "Білий White 21G",
+        "hex": "#ffffff",
+        "images": [
+          "/assets/images/products/uploads/f24af44f-75d6-44a6-95a6-4f3655e50909_size2000x2000_cropcenter.webp",
+          "/assets/images/products/uploads/802ff4ae-b7b9-48c7-bcde-7862f3e83810_size2000x2000_cropcenter.webp",
+          "/assets/images/products/uploads/13949588-c4af-47dc-ad68-2a22e3971c3d_size2000x2000_cropcenter.webp",
+          "/assets/images/products/uploads/eea98936-ada5-48dc-b7d4-f61f2e2da8ec_size2000x2000_cropcenter-1-.webp"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 50,
+    "sizes": [
+      "38"
+    ],
+    "searchKeywords": [
+      "Lacoste Lineshot",
+      "Lacoste 746SMA0110",
+      "746SMA0110.21G",
+      "жіночі кросівки Lacoste",
+      "Lacoste жіночі кросівки",
+      "кросівки Lacoste",
+      "жіночі кросівки",
+      "білі кросівки Lacoste",
+      "Lacoste sneakers",
+      "брендові кросівки",
+      "оригінальні кросівки",
+      "жіноче брендове взуття"
+    ],
+    "isNew": false,
+    "title": "Жіночі білі кросівки Lacoste Lineshot 746SMA0110.21G",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильні жіночі кросівки Lacoste Lineshot у класичному білому кольорі. Лаконічний тенісний дизайн легко поєднується з повсякденними образами, а зручна конструкція забезпечує комфорт протягом дня. Універсальна модель для міського стилю та активного відпочинку",
+    "sku": "746SMA0110.21G",
+    "rating": 5,
+    "category": "Кросівки",
+    "slug": "жіночі-білі-кросівки-lacoste-lineshot-746sma0110-21g",
+    "id": 43,
+    "color": "Білий White 21G",
+    "images": [
+      "/assets/images/products/uploads/f24af44f-75d6-44a6-95a6-4f3655e50909_size2000x2000_cropcenter.webp",
+      "/assets/images/products/uploads/802ff4ae-b7b9-48c7-bcde-7862f3e83810_size2000x2000_cropcenter.webp",
+      "/assets/images/products/uploads/13949588-c4af-47dc-ad68-2a22e3971c3d_size2000x2000_cropcenter.webp",
+      "/assets/images/products/uploads/eea98936-ada5-48dc-b7d4-f61f2e2da8ec_size2000x2000_cropcenter-1-.webp"
+    ]
   }
 ]
