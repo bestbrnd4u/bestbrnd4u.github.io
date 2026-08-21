@@ -129,6 +129,14 @@ let currentSort = "";
 let selectedBrands = new Set();
 let selectedColors = new Set();
 let selectedCategories = new Set();
+
+// Відділ («Аксесуари», «Сумки») — рівень над категорією. Окремий стан,
+// а не розгортання у список категорій: інакше посилання з хлібних
+// крихт виглядало б як catalog?category=<десять назв через кому> —
+// 700 символів, які ще й змінюються щоразу, коли в адмінці додають
+// категорію. З ним у крихтах стоїть коротке catalog?department=Аксесуари.
+let selectedDepartments = new Set();
+let departmentByCategory = new Map();
 // фільтр ціни — діапазон "від / до" (повзунок + два поля вводу).
 // null означає "ще не ініціалізовано" — межі підставляються з
 // реальних цін каталогу після його завантаження
@@ -346,6 +354,31 @@ function getMultiSelectLabel(selectedSet, defaultLabel, noun, labelForValue) {
 let currentSection = ""; // "" | "new" | "sale"
 let selectedGenders = new Set(); // підмножина GENDERS
 
+// Читання множинного параметра: "a,b,c" → Set.
+// allowed передаємо там, де значення заздалегідь відомі (стать), —
+// щоб підроблена адреса не заводила в фільтр сміття. Для брендів,
+// категорій і кольорів список приходить з даних, тож там перевірка
+// відбувається пізніше, коли ці дані вже завантажені.
+function readSetParam(params, key, allowed) {
+
+    const raw = params.get(key);
+
+    if (!raw) return new Set();
+
+    const values = raw.split(",").map(v => v.trim()).filter(Boolean);
+
+    return new Set(allowed ? values.filter(v => allowed.includes(v)) : values);
+
+}
+
+function readNumberParam(params, key) {
+
+    const value = Number(params.get(key));
+
+    return Number.isFinite(value) && value >= 0 ? value : null;
+
+}
+
 function readUrlState() {
 
     const params = new URLSearchParams(location.search);
@@ -353,14 +386,23 @@ function readUrlState() {
     const section = params.get("section");
     currentSection = (section === "new" || section === "sale") ? section : "";
 
-    const genderParam = params.get("gender");
+    selectedGenders = readSetParam(params, "gender", GENDERS);
 
-    selectedGenders = new Set(
-        (genderParam || "")
-            .split(",")
-            .map(v => v.trim())
-            .filter(v => GENDERS.includes(v))
-    );
+    // Решта фільтрів раніше з адреси не читалась зовсім (крім brand і
+    // category, і то лише поодинокими значеннями). Через це скопійоване
+    // посилання відкривалось із порожнім фільтром.
+    selectedDepartments = readSetParam(params, "department");
+    selectedColors = readSetParam(params, "color");
+    selectedSizes = readSetParam(params, "size");
+
+    const sort = params.get("sort");
+    currentSort = sort || "";
+
+    const min = readNumberParam(params, "priceMin");
+    const max = readNumberParam(params, "priceMax");
+
+    if (min !== null) priceRange.min = min;
+    if (max !== null) priceRange.max = max;
 
 }
 
@@ -394,6 +436,18 @@ async function initCatalog() {
 
         applyCategoryDataToSizeGroups(categoryDepartments);
 
+        // мапа «категорія → відділ» для фільтра department
+        departmentByCategory = new Map();
+        categoryDepartments.forEach(group => {
+            (group.categories || []).forEach(name => departmentByCategory.set(name, group.title));
+        });
+
+        // відділ з адреси лишаємо, лише якщо він справді існує:
+        // застаріле посилання інакше давало б порожній каталог
+        [...selectedDepartments].forEach(name => {
+            if (![...departmentByCategory.values()].includes(name)) selectedDepartments.delete(name);
+        });
+
         fillBrands();
 
         applyBrandFromUrl();
@@ -412,11 +466,23 @@ async function initCatalog() {
 
         setupGenderFilter();
 
+        // Колір, розмір і сортування readUrlState() уже поклав у стан,
+        // але вигляд фільтрів будується пізніше — після fillColors() і
+        // fillSizeGroups(). Без цього кроку товари відфільтровані, а
+        // самі фільтри виглядають незайманими: людина не розуміє, чому
+        // видно лише частину каталогу, і не має що скинути.
+        applyUiFromUrlState();
+
         renderBreadcrumbsAndTitle();
 
         highlightNavLink();
 
         render();
+
+        bindCatalogReturnTracking();
+
+        // після першого рендера — сітка вже існує, є куди прокручувати
+        restoreCatalogPosition();
 
         renderRecentlyViewed();
 
@@ -587,26 +653,27 @@ function applySearchFromUrl() {
 
 }
 
+// Бренди з адреси. Раніше бралось лише ОДНЕ значення (?brand=Guess),
+// тож посилання з кількома брендами відкривалось із першим або взагалі
+// без фільтра. Тепер читаємо список і лишаємо тільки ті, що справді
+// існують у завантажених даних — інакше в активних фільтрах висів би
+// бренд, якого немає, і скинути його було б нічим.
 function applyBrandFromUrl() {
 
-    const params = new URLSearchParams(location.search);
+    const wanted = readSetParam(new URLSearchParams(location.search), "brand");
 
-    const urlBrand = params.get("brand");
+    if (!wanted.size) return;
 
-    if (urlBrand) {
+    const known = new Set([...brandOptionsList.querySelectorAll(".filter-option")]
+        .map(o => o.dataset.brand));
 
-        const match = [...brandOptionsList.querySelectorAll(".filter-option")]
-            .find(o => o.dataset.brand === urlBrand);
+    let added = false;
 
-        if (match) {
+    wanted.forEach(brand => {
+        if (known.has(brand)) { selectedBrands.add(brand); added = true; }
+    });
 
-            selectedBrands.add(urlBrand);
-
-            updateBrandUI();
-
-        }
-
-    }
+    if (added) updateBrandUI();
 
 }
 
@@ -1193,26 +1260,77 @@ function updateCategoryUI() {
 
 }
 
-function applyCategoryFromUrl() {
+// Показати в інтерфейсі те, що прийшло з адреси.
+//
+// readUrlState() виконується на самому початку, ще до того, як
+// побудовані списки кольорів і розмірів, тож підсвітити вибране там
+// нема де. Викликаємо це після заповнення фільтрів.
+//
+// Заразом викидаємо значення, яких у даних немає: у посиланні міг
+// лишитись колір знятого з продажу товару, і тоді каталог показував би
+// порожньо без жодного видимого фільтра.
+function applyUiFromUrlState() {
 
-    const params = new URLSearchParams(location.search);
+    const keepKnown = (set, nodes, attr) => {
 
-    const urlCategory = params.get("category");
+        if (!set.size || !nodes) return false;
 
-    if (urlCategory) {
+        const known = new Set([...nodes].map(node => node.dataset[attr]));
 
-        const match = [...categoryOptionsList.querySelectorAll(".filter-option")]
-            .find(o => o.dataset.category === urlCategory);
+        [...set].forEach(value => { if (!known.has(value)) set.delete(value); });
 
-        if (match) {
+        return true;
 
-            selectedCategories.add(urlCategory);
+    };
 
-            updateCategoryUI();
+    if (keepKnown(selectedColors, colorOptionsList?.querySelectorAll(".filter-option"), "color")) {
+        updateColorUI();
+    }
+
+    if (selectedSizes.size) {
+        updateSizeUI();
+    }
+
+    if (currentSort) {
+
+        const option = sortMenu?.querySelector(`.sort-option[data-sort="${CSS.escape(currentSort)}"]`);
+
+        if (option) {
+
+            if (sortLabel) sortLabel.textContent = option.dataset.label;
+
+            sortMenu.querySelectorAll(".sort-option")
+                .forEach(o => o.classList.toggle("active", o === option));
+
+        } else {
+
+            currentSort = "";   // невідоме сортування з підробленої адреси
 
         }
 
     }
+
+}
+
+// Категорії з адреси — так само списком, а не одним значенням.
+// Це те саме бічне меню каталогу: воно керує selectedCategories, тож
+// вибір розділу тепер теж переживає копіювання посилання й «Назад».
+function applyCategoryFromUrl() {
+
+    const wanted = readSetParam(new URLSearchParams(location.search), "category");
+
+    if (!wanted.size) return;
+
+    const known = new Set([...categoryOptionsList.querySelectorAll(".filter-option")]
+        .map(o => o.dataset.category));
+
+    let added = false;
+
+    wanted.forEach(category => {
+        if (known.has(category)) { selectedCategories.add(category); added = true; }
+    });
+
+    if (added) updateCategoryUI();
 
 }
 
@@ -1975,9 +2093,15 @@ function renderBreadcrumbsAndTitle() {
         const isLast = index === crumbs.length - 1;
         const classAttr = crumb.className ? ` class="${crumb.className}"` : "";
 
-        // остання крихта — завжди поточна сторінка, тож без href
+        // остання крихта — завжди поточна сторінка, тож без href.
+        // crumb-current робить її темнішою за посилання: інакше вся
+        // доріжка виглядає однорідним рядком і не читається з розгону.
+        const currentClass = isLast
+            ? ` class="${crumb.className ? crumb.className + " " : ""}crumb-current"`
+            : classAttr;
+
         const node = isLast
-            ? `<span${classAttr}>${escapeHtml(crumb.label)}</span>`
+            ? `<span${currentClass}>${escapeHtml(crumb.label)}</span>`
             : `<a href="${crumb.href}"${classAttr}>${escapeHtml(crumb.label)}</a>`;
 
         return index === 0 ? node : `<span class="crumb-sep">→</span>\n${node}`;
@@ -2086,6 +2210,17 @@ function filterProducts(skip) {
 
     }
 
+    // Відділ звужує так само, як категорія, тільки на рівень вище.
+    // Разом вони працюють як І: якщо людина прийшла з крихти «Аксесуари»
+    // й додала категорію, лишаються товари, що підходять під обидві умови.
+    if (selectedDepartments.size && skip !== "categories") {
+
+        list = list.filter(product =>
+            selectedDepartments.has(departmentByCategory.get(product.category))
+        );
+
+    }
+
     if (priceFilterActive() && skip !== "price") {
 
         list = list.filter(product =>
@@ -2189,14 +2324,188 @@ function clampPage(count) {
     return currentPage;
 }
 
-function syncPageToUrl() {
+// ==========================================================
+// Повернення на те саме місце в каталозі
+//
+// ЗАДАЧА
+// -------
+// Людина гортає каталог, відкриває товар, тисне «Назад» — і має
+// побачити той самий список і той самий товар, на якому спинилась,
+// а не починати перегляд спочатку.
+//
+// ЧОМУ ОДНОГО scrollRestoration МАЛО
+// -----------------------------------
+// Браузер відновлює скрол одразу після повернення, а каталог на цей
+// момент ще порожній: товари вантажаться з products.json і
+// малюються вже після. Відновлювати нема куди — сторінка коротка,
+// і скрол падає на нуль. Тому запамʼятовуємо не пікселі, а КАРТКУ:
+// пікселі брешуть, щойно зміниться кількість товарів у рядку
+// (інший екран, поворот телефона), а картка — ні.
+//
+// sessionStorage, а не localStorage: це стан однієї сесії перегляду.
+// Через тиждень повертати людину на позавчорашній товар безглуздо.
+// ==========================================================
+
+const RETURN_KEY = "catalogReturnTo";
+
+function rememberCatalogPosition(productId) {
+
+    try {
+
+        sessionStorage.setItem(RETURN_KEY, JSON.stringify({
+            id: String(productId),
+            // адреса потрібна, щоб не стрибати на картку, якщо людина
+            // повернулась у КАТАЛОГ З ІНШИМИ фільтрами
+            search: location.search
+        }));
+
+    } catch (error) {
+
+        // приватний режим — просто не запамʼятаємо
+
+    }
+
+}
+
+function takeCatalogReturn() {
+
+    try {
+
+        const raw = sessionStorage.getItem(RETURN_KEY);
+
+        if (!raw) return null;
+
+        // одноразово: інакше кожен наступний вхід у каталог смикав би
+        // сторінку до старої картки
+        sessionStorage.removeItem(RETURN_KEY);
+
+        return JSON.parse(raw);
+
+    } catch (error) {
+
+        return null;
+
+    }
+
+}
+
+// Клац по картці — запамʼятовуємо, куди повертатись.
+// Слухаємо на сітці, а не на кожній картці: картки перемальовуються
+// при кожному фільтрі, і окремі слухачі довелось би навішувати знову.
+function bindCatalogReturnTracking() {
+
+    grid?.addEventListener("click", event => {
+
+        const card = event.target.closest(".product-card");
+
+        if (!card || !card.dataset.id) return;
+
+        // клац по «серденьку» чи кнопці — це не перехід у товар
+        if (event.target.closest("button")) return;
+
+        rememberCatalogPosition(card.dataset.id);
+
+    });
+
+}
+
+function restoreCatalogPosition() {
+
+    const saved = takeCatalogReturn();
+
+    if (!saved || saved.search !== location.search) return;
+
+    const card = grid?.querySelector(`.product-card[data-id="${CSS.escape(saved.id)}"]`);
+
+    if (!card) return;
+
+    // "instant": людина вже бачила цей екран, плавна прокрутка тут
+    // виглядає як зайва анімація на порожньому місці
+    card.scrollIntoView({ block: "center", behavior: "instant" });
+
+    // коротка підсвітка — щоб очима знайти, де саме спинився перегляд
+    card.classList.add("just-returned");
+
+    setTimeout(() => card.classList.remove("just-returned"), 1600);
+
+}
+
+// ==========================================================
+// Стан каталогу в адресі
+//
+// НАВІЩО
+// -------
+// Раніше в адресу потрапляли лише section, gender, page (і brand
+// з category — але тільки на вхід). Через це:
+//
+//   • скопійоване посилання відкривалось із порожніми фільтрами —
+//     людина бачила «усі товари» замість того, що надсилали;
+//   • «Назад» зі сторінки товару повертав у каталог, але фільтри,
+//     сортування й категорія скидались, і перегляд доводилось
+//     починати спочатку.
+//
+// Тепер в адресі лежить ВЕСЬ стан. Побічний ефект приємний: кнопка
+// «Назад» стає майже безкоштовною — браузер повертається на адресу,
+// у якій уже все описано.
+//
+// replaceState, а не pushState: інакше кожне клацання по чекбоксу
+// додавало б запис в історію, і «Назад» довелось би тиснути 15 разів,
+// щоб вийти з каталогу.
+// ==========================================================
+
+// Порядок ключів фіксований — щоб дві однакові вибірки давали
+// однакове посилання (і однаково кешувались, і однаково виглядали).
+const URL_KEYS = {
+    section: "section",
+    gender: "gender",
+    department: "department",
+    category: "category",
+    brand: "brand",
+    color: "color",
+    size: "size",
+    priceMin: "priceMin",
+    priceMax: "priceMax",
+    sort: "sort",
+    page: "page"
+};
+
+function setOrDelete(params, key, value) {
+
+    if (value === null || value === undefined || value === "" ) params.delete(key);
+    else params.set(key, value);
+
+}
+
+function syncStateToUrl() {
 
     try {
 
         const url = new URL(window.location.href);
+        const p = url.searchParams;
 
-        if (currentPage > 1) url.searchParams.set("page", currentPage);
-        else url.searchParams.delete("page");
+        // множинні фільтри — через кому: читабельно в адресному рядку
+        // й не роздуває посилання, як повторювані ключі
+        const joinSet = set => (set && set.size) ? [...set].join(",") : "";
+
+        setOrDelete(p, URL_KEYS.section, currentSection);
+        setOrDelete(p, URL_KEYS.gender, joinSet(selectedGenders));
+        setOrDelete(p, URL_KEYS.department, joinSet(selectedDepartments));
+        setOrDelete(p, URL_KEYS.category, joinSet(selectedCategories));
+        setOrDelete(p, URL_KEYS.brand, joinSet(selectedBrands));
+        setOrDelete(p, URL_KEYS.color, joinSet(selectedColors));
+        setOrDelete(p, URL_KEYS.size, joinSet(selectedSizes));
+
+        // ціну пишемо, лише якщо людина її справді рухала: інакше
+        // посилання тягло б за собою межі поточного асортименту, і
+        // завтра, коли зʼявиться дорожчий товар, воно б його ховало
+        const movedMin = priceRange.min !== null && priceRange.min !== priceBounds.min;
+        const movedMax = priceRange.max !== null && priceRange.max !== priceBounds.max;
+
+        setOrDelete(p, URL_KEYS.priceMin, movedMin ? priceRange.min : "");
+        setOrDelete(p, URL_KEYS.priceMax, movedMax ? priceRange.max : "");
+
+        setOrDelete(p, URL_KEYS.sort, currentSort);
+        setOrDelete(p, URL_KEYS.page, currentPage > 1 ? currentPage : "");
 
         window.history.replaceState(null, "", url);
 
@@ -2206,6 +2515,11 @@ function syncPageToUrl() {
 
     }
 
+}
+
+// сумісність: стара назва лишається, бо на неї є виклики
+function syncPageToUrl() {
+    syncStateToUrl();
 }
 
 // Номери з трьома крапками: 1 … 4 5 6 … 12

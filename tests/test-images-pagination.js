@@ -70,8 +70,15 @@ console.log("\n[3] Пагінація");
         fs.readFileSync(path.join(ROOT,"catalog.html"),"utf8").includes('id="pagination"'));
   check("рендериться лише поточна сторінка", /\.slice\(from, from \+ PER_PAGE\)/.test(cat));
   check("зміна фільтра повертає на першу", /currentPage = 1;\s*\n\s*\n?\s*render\(\);/.test(cat));
-  check("сторінка зберігається в адресі", /searchParams\.set\("page"/.test(cat));
-  check("перша сторінка не засмічує адресу", /searchParams\.delete\("page"\)/.test(cat));
+  // Сторінка тепер пишеться не окремо, а разом з рештою стану каталогу
+  // (фільтри, сортування, категорія) — див. syncStateToUrl. Порожнє
+  // значення setOrDelete прибирає з адреси, тож перша сторінка її не
+  // засмічує, як і раніше.
+  check("сторінка зберігається в адресі",
+        /URL_KEYS\.page, currentPage > 1 \? currentPage : ""/.test(cat));
+  check("перша сторінка не засмічує адресу",
+        /value === ""\s*\)\s*params\.delete\(key\)/.test(cat.replace(/\s+/g, " "))
+        || /params\.delete\(key\)/.test(cat));
   check("сторінка читається з адреси при відкритті", /get\("page"\)/.test(cat));
   check("replaceState, щоб «Назад» не гортав сторінки", /history\.replaceState/.test(cat));
   check("після переходу підіймає до товарів, а не до шапки",

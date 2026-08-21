@@ -675,14 +675,12 @@
     "color": "Чорний"
   },
   {
-    "gender": [
-      "Жінкам"
-    ],
-    "color": "Зелений",
+    "title": "Жіноча сумка на плече JW PEI Gabbi Ruched Hobo Handbag",
     "brand": "JW PEI",
+    "category": "Жіночі сумки",
+    "gender": "Жінкам",
     "price": 4400,
-    "preOrder": false,
-    "slug": "jw-pei-zhinocha-sumka-na-pleche-jw-pei-gabbi-ruched-hobo-han",
+    "description": "JW PEI Gabbi — сумка-хобо з характерною драпіровкою, яка зробила модель відомою. Округла форма, коротка ручка, носиться в руці або на згині лікоття. Два насичених кольори.",
     "variants": [
       {
         "color": "Зелений",
@@ -705,6 +703,8 @@
         "sku": "JWP-MA123"
       }
     ],
+    "isNew": false,
+    "sku": "B094QT219C",
     "searchKeywords": [
       "джей ві пей",
       "jw pei",
@@ -720,18 +720,16 @@
       "ruched",
       "hobo"
     ],
-    "isNew": false,
-    "title": "Жіноча сумка на плече JW PEI Gabbi Ruched Hobo Handbag",
+    "instagramBlock": "general",
+    "preOrder": false,
     "images": [
       "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp",
       "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-2.webp",
       "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp"
     ],
+    "slug": "jw-pei-zhinocha-sumka-na-pleche-jw-pei-gabbi-ruched-hobo-han",
     "id": 14,
-    "instagramBlock": "general",
-    "description": "JW PEI Gabbi — сумка-хобо з характерною драпіровкою, яка зробила модель відомою. Округла форма, коротка ручка, носиться в руці або на згині лікоття. Два насичених кольори.",
-    "sku": "BG60983JWP",
-    "category": "Жіночі сумки"
+    "color": "Зелений"
   },
   {
     "title": "Жіноча сумочка JW PEI Maze Crossbody",

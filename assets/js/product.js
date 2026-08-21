@@ -344,6 +344,80 @@ function parseVideoEmbed(url) {
 // ще й updateGalleryForColor(), у якої товару під рукою вже немає.
 // Префікс gallery- розводить її з cardFrameStyle() в ui.js — обидва
 // файли підключені на цій сторінці одночасно.
+// Хлібні крихти: повний шлях замість «Головна – Каталог – Назва».
+//
+// Статичні сторінки p/<slug>/ уже приходять із готовою доріжкою від
+// генератора — тут ми або підтверджуємо те саме, або будуємо її для
+// product.html?id=…, де розмітки немає.
+//
+// Будівник спільний із генератором і з розміткою BreadcrumbList
+// (assets/js/breadcrumbs.js): якби кожне місце збирало доріжку саме,
+// Google рано чи пізно показував би шлях, якого на сторінці немає.
+let departmentByCategory = null;
+
+async function loadDepartmentMap() {
+
+    if (departmentByCategory) return departmentByCategory;
+
+    departmentByCategory = new Map();
+
+    try {
+
+        const response = await fetch("data/categories.json");
+
+        if (response.ok) {
+            (await response.json()).forEach(row => {
+                if (row && row.name && row.department) departmentByCategory.set(row.name, row.department);
+            });
+        }
+
+    } catch (error) {
+
+        // без переліку категорій ланка відділу просто не зʼявиться
+
+    }
+
+    return departmentByCategory;
+
+}
+
+function paintBreadcrumbs(product, map) {
+
+    const host = document.getElementById("breadcrumbsList");
+
+    if (!host || !window.Breadcrumbs) {
+
+        // запасний шлях: хоча б назва товару, як було раніше
+        const title = document.getElementById("breadTitle");
+
+        if (title) title.textContent = product.title;
+
+        return;
+
+    }
+
+    const trail = window.Breadcrumbs.buildTrail(product, {
+        departmentOf: name => (map && map.get(name)) || ""
+    });
+
+    host.innerHTML = trail
+        .map(crumb => crumb.current
+            ? `<span class="crumb-current" id="breadTitle">${escapeHtml(crumb.label)}</span>`
+            : `<a href="${escapeHtml(crumb.href)}">${escapeHtml(crumb.label)}</a>`)
+        .join('<span class="crumb-sep">–</span>');
+
+}
+
+function renderBreadcrumbs(product) {
+
+    // одразу малюємо те, що можна без мережі, а відділ додаємо, коли
+    // приїде перелік категорій — щоб доріжка не блимала порожньою
+    paintBreadcrumbs(product, departmentByCategory);
+
+    loadDepartmentMap().then(map => paintBreadcrumbs(product, map));
+
+}
+
 function galleryFrameStyle(src) {
 
     return (window.ImageFraming
@@ -467,7 +541,7 @@ function renderProduct(product) {
     // (updateGalleryForColor малює галерею наново вже без product).
     currentFraming = product.framing || null;
 
-    document.getElementById("breadTitle").textContent = product.title;
+    renderBreadcrumbs(product);
 
     updateProductSeoMetadata(product);
 

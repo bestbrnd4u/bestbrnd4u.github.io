@@ -122,17 +122,17 @@ BestBrnd4u
 
 <section class="breadcrumbs">
 
-<div class="container">
+<div class="container" id="breadcrumbsList">
 
 <a href="/">Головна</a>
 
-<span class="crumb-sep">→</span>
+<span class="crumb-sep">–</span>
 
 <a href="catalog">Каталог</a>
 
-<span class="crumb-sep">→</span>
+<span class="crumb-sep">–</span>
 
-<span id="breadTitle">
+<span id="breadTitle" class="crumb-current">
 
 Товар
 
@@ -338,6 +338,8 @@ BestBrnd4u
 <!-- Кадрування фото товару. Той самий файл підключає адмінка,
      тож прев'ю в ній і картка на сайті рахуються однаково. -->
 <script src="assets/js/image-framing.js"></script>
+<!-- Хлібні крихти: спільний будівник для сторінки й розмітки BreadcrumbList -->
+<script src="assets/js/breadcrumbs.js"></script>
 <script src="assets/js/common.js"></script>
 <script src="assets/js/sync.js"></script>
 <script src="assets/js/mega-menu.js"></script>

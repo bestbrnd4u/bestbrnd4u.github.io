@@ -2796,12 +2796,34 @@ body.mobile-filters-open .scroll-top{
 }
 }
 
+/* Роздільник крихт.
+   Було: стрілка «→» з відступом 8px — сусідні пункти зливались в один
+   рядок тексту, і на око не читалось, де закінчується одна ланка й
+   починається наступна. Стало: тонка риска з більшим повітрям з боків
+   і однаковою висотою — око чіпляється за ритм, а не за форму стрілки. */
 .breadcrumbs .crumb-sep{
     display:inline-block;
-    margin:0 8px;
+    margin:0 12px;
     color:var(--gray300);
     font-size:13px;
+    /* стрілка з розмітки не показується — замість неї риска нижче,
+       щоб не правити три місця в HTML і генераторі сторінок */
+    font-size:0;
 }
+
+.breadcrumbs .crumb-sep::before{
+    content:"–";
+    font-size:15px;
+    line-height:1;
+}
+
+/* остання ланка — назва товару: не посилання, тож робимо її помітно
+   темнішою за решту, як на великих магазинах */
+.breadcrumbs .crumb-current{
+    color:var(--dark);
+    font-weight:600;
+}
+
 
 /* =====================================
    CATALOG PAGE
@@ -9762,4 +9784,52 @@ body.mobile-filters-open .scroll-top{
         align-self:start;
     }
 
+}
+
+/* Картка, на яку повернулись кнопкою «Назад»
+   (assets/js/catalog.js → restoreCatalogPosition).
+   Коротка підсвітка допомагає очима знайти місце, де спинився
+   перегляд, — без неї сторінка просто відкривається десь посередині
+   списку й виглядає як випадкова. */
+.product-card.just-returned{
+    animation:justReturned 1.6s ease-out;
+}
+
+@keyframes justReturned{
+    0%   { box-shadow:0 0 0 3px var(--secondary); }
+    70%  { box-shadow:0 0 0 3px var(--secondary); }
+    100% { box-shadow:0 0 0 3px transparent; }
+}
+
+@media (prefers-reduced-motion:reduce){
+.product-card.just-returned{ animation:none; outline:3px solid var(--secondary); }
+}
+
+/* Довга доріжка крихт на вузькому екрані.
+   Після додавання рівнів «Стать → Відділ → Категорія → Бренд» доріжка
+   перестала вміщатись у телефон і переносилась у три рядки, зʼїдаючи
+   пів екрана над товаром. Тому на малих ширинах — один рядок із
+   горизонтальною прокруткою, як роблять великі магазини. */
+@media (max-width:768px){
+.breadcrumbs .container{
+    display:flex;
+    align-items:center;
+    flex-wrap:nowrap;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+}
+
+.breadcrumbs .container::-webkit-scrollbar{ display:none; }
+
+.breadcrumbs .container > *{ flex:0 0 auto; }
+
+/* назва товару може бути дуже довгою — не даємо їй розтягувати рядок
+   так, щоб початок шляху було не докрутити */
+.breadcrumbs .crumb-current{
+    max-width:60vw;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
 }

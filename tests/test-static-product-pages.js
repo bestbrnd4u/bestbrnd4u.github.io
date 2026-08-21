@@ -147,8 +147,19 @@ console.log("\n[4] Структуровані дані Product");
     check("itemCondition проставлено", !!ld.offers.itemCondition);
 
     const bread = JSON.parse(dom.window.document.getElementById("breadcrumbSchema").textContent);
+
+    // Доріжка тепер повна: Головна → Каталог → Стать → Відділ →
+    // Категорія → Бренд → Товар. Товар — завжди ОСТАННЯ ланка, а не
+    // третя, як було в короткому варіанті.
+    const last = bread.itemListElement[bread.itemListElement.length - 1];
+
     check("хлібні крихти ведуть на канонічну адресу",
-        bread.itemListElement[2].item === `${SITE_URL}/p/${encodeURIComponent(sample.slug)}/`);
+        last.item === `${SITE_URL}/p/${encodeURIComponent(sample.slug)}/`, last.item);
+    check("товар — остання ланка доріжки", last.name === sample.title);
+    check("позиції нумеруються поспіль з 1",
+        bread.itemListElement.every((c, i) => c.position === i + 1));
+    check("доріжка глибша за короткий варіант",
+        bread.itemListElement.length > 3, bread.itemListElement.length);
 }
 
 console.log("\n[5] aggregateRating — лише там, де рейтинг справжній");

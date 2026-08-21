@@ -125,6 +125,30 @@
     {
       "@type": "ListItem",
       "position": 3,
+      "name": "Чоловікам",
+      "item": "https://dev.bestbrnd4u.com/catalog?gender=%D0%A7%D0%BE%D0%BB%D0%BE%D0%B2%D1%96%D0%BA%D0%B0%D0%BC"
+    },
+    {
+      "@type": "ListItem",
+      "position": 4,
+      "name": "Сумки",
+      "item": "https://dev.bestbrnd4u.com/catalog?department=%D0%A1%D1%83%D0%BC%D0%BA%D0%B8"
+    },
+    {
+      "@type": "ListItem",
+      "position": 5,
+      "name": "Чоловічі сумки",
+      "item": "https://dev.bestbrnd4u.com/catalog?category=%D0%A7%D0%BE%D0%BB%D0%BE%D0%B2%D1%96%D1%87%D1%96%20%D1%81%D1%83%D0%BC%D0%BA%D0%B8"
+    },
+    {
+      "@type": "ListItem",
+      "position": 6,
+      "name": "Armani Exchange",
+      "item": "https://dev.bestbrnd4u.com/catalog?brand=Armani%20Exchange"
+    },
+    {
+      "@type": "ListItem",
+      "position": 7,
       "name": "Чоловіча сумка Armani Exchange",
       "item": "https://dev.bestbrnd4u.com/p/armani-exchange-cholovicha-sumka-armani-exchange/"
     }
@@ -236,22 +260,20 @@ BestBrnd4u
 
 <section class="breadcrumbs">
 
-<div class="container">
-
-<a href="/">Головна</a>
-
-<span class="crumb-sep">→</span>
-
-<a href="/catalog">Каталог</a>
-
-<span class="crumb-sep">→</span>
-
-<span id="breadTitle">
-
-Товар
-
-</span>
-
+<div class="container" id="breadcrumbsList">
+<a href="https://dev.bestbrnd4u.com/">Головна</a>
+<span class="crumb-sep">–</span>
+<a href="https://dev.bestbrnd4u.com/catalog">Каталог</a>
+<span class="crumb-sep">–</span>
+<a href="https://dev.bestbrnd4u.com/catalog?gender=%D0%A7%D0%BE%D0%BB%D0%BE%D0%B2%D1%96%D0%BA%D0%B0%D0%BC">Чоловікам</a>
+<span class="crumb-sep">–</span>
+<a href="https://dev.bestbrnd4u.com/catalog?department=%D0%A1%D1%83%D0%BC%D0%BA%D0%B8">Сумки</a>
+<span class="crumb-sep">–</span>
+<a href="https://dev.bestbrnd4u.com/catalog?category=%D0%A7%D0%BE%D0%BB%D0%BE%D0%B2%D1%96%D1%87%D1%96%20%D1%81%D1%83%D0%BC%D0%BA%D0%B8">Чоловічі сумки</a>
+<span class="crumb-sep">–</span>
+<a href="https://dev.bestbrnd4u.com/catalog?brand=Armani%20Exchange">Armani Exchange</a>
+<span class="crumb-sep">–</span>
+<span class="crumb-current">Чоловіча сумка Armani Exchange</span>
 </div>
 
 </section>
@@ -502,6 +524,8 @@ BestBrnd4u
 <!-- Кадрування фото товару. Той самий файл підключає адмінка,
      тож прев'ю в ній і картка на сайті рахуються однаково. -->
 <script src="/assets/js/image-framing.js"></script>
+<!-- Хлібні крихти: спільний будівник для сторінки й розмітки BreadcrumbList -->
+<script src="/assets/js/breadcrumbs.js"></script>
 <script src="/assets/js/common.js"></script>
 <script src="/assets/js/sync.js"></script>
 <script src="/assets/js/mega-menu.js"></script>

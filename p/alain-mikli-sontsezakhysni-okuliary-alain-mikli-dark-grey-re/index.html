@@ -124,6 +124,30 @@
     {
       "@type": "ListItem",
       "position": 3,
+      "name": "Унісекс",
+      "item": "https://dev.bestbrnd4u.com/catalog?gender=%D0%A3%D0%BD%D1%96%D1%81%D0%B5%D0%BA%D1%81"
+    },
+    {
+      "@type": "ListItem",
+      "position": 4,
+      "name": "Аксесуари",
+      "item": "https://dev.bestbrnd4u.com/catalog?department=%D0%90%D0%BA%D1%81%D0%B5%D1%81%D1%83%D0%B0%D1%80%D0%B8"
+    },
+    {
+      "@type": "ListItem",
+      "position": 5,
+      "name": "Окуляри і оправи",
+      "item": "https://dev.bestbrnd4u.com/catalog?category=%D0%9E%D0%BA%D1%83%D0%BB%D1%8F%D1%80%D0%B8%20%D1%96%20%D0%BE%D0%BF%D1%80%D0%B0%D0%B2%D0%B8"
+    },
+    {
+      "@type": "ListItem",
+      "position": 6,
+      "name": "Alain Mikli",
+      "item": "https://dev.bestbrnd4u.com/catalog?brand=Alain%20Mikli"
+    },
+    {
+      "@type": "ListItem",
+      "position": 7,
       "name": "Сонцезахисні окуляри ALAIN MIKLI Dark Grey Rectangular Unisex",
       "item": "https://dev.bestbrnd4u.com/p/alain-mikli-sontsezakhysni-okuliary-alain-mikli-dark-grey-re/"
     }
@@ -235,22 +259,20 @@ BestBrnd4u
 
 <section class="breadcrumbs">
 
-<div class="container">
-
-<a href="/">Головна</a>
-
-<span class="crumb-sep">→</span>
-
-<a href="/catalog">Каталог</a>
-
-<span class="crumb-sep">→</span>
-
-<span id="breadTitle">
-
-Товар
-
-</span>
-
+<div class="container" id="breadcrumbsList">
+<a href="https://dev.bestbrnd4u.com/">Головна</a>
+<span class="crumb-sep">–</span>
+<a href="https://dev.bestbrnd4u.com/catalog">Каталог</a>
+<span class="crumb-sep">–</span>
+<a href="https://dev.bestbrnd4u.com/catalog?gender=%D0%A3%D0%BD%D1%96%D1%81%D0%B5%D0%BA%D1%81">Унісекс</a>
+<span class="crumb-sep">–</span>
+<a href="https://dev.bestbrnd4u.com/catalog?department=%D0%90%D0%BA%D1%81%D0%B5%D1%81%D1%83%D0%B0%D1%80%D0%B8">Аксесуари</a>
+<span class="crumb-sep">–</span>
+<a href="https://dev.bestbrnd4u.com/catalog?category=%D0%9E%D0%BA%D1%83%D0%BB%D1%8F%D1%80%D0%B8%20%D1%96%20%D0%BE%D0%BF%D1%80%D0%B0%D0%B2%D0%B8">Окуляри і оправи</a>
+<span class="crumb-sep">–</span>
+<a href="https://dev.bestbrnd4u.com/catalog?brand=Alain%20Mikli">Alain Mikli</a>
+<span class="crumb-sep">–</span>
+<span class="crumb-current">Сонцезахисні окуляри ALAIN MIKLI Dark Grey Rectangular Unisex</span>
 </div>
 
 </section>
@@ -496,6 +518,8 @@ BestBrnd4u
 <!-- Кадрування фото товару. Той самий файл підключає адмінка,
      тож прев'ю в ній і картка на сайті рахуються однаково. -->
 <script src="/assets/js/image-framing.js"></script>
+<!-- Хлібні крихти: спільний будівник для сторінки й розмітки BreadcrumbList -->
+<script src="/assets/js/breadcrumbs.js"></script>
 <script src="/assets/js/common.js"></script>
 <script src="/assets/js/sync.js"></script>
 <script src="/assets/js/mega-menu.js"></script>
