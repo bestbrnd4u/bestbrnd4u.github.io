@@ -2369,5 +2369,62 @@
       "/assets/images/products/uploads/13949588-c4af-47dc-ad68-2a22e3971c3d_size2000x2000_cropcenter.webp",
       "/assets/images/products/uploads/eea98936-ada5-48dc-b7d4-f61f2e2da8ec_size2000x2000_cropcenter-1-.webp"
     ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "5–10 робочих днів",
+    "forcePublish": false,
+    "brand": "Lacoste",
+    "price": 6000,
+    "preOrder": false,
+    "variants": [
+      {
+        "color": "Бежевий  1R5",
+        "hex": "#e5e4e4",
+        "images": [
+          "/assets/images/products/uploads/bc4302e5-037f-4a05-b3b7-d6f959c4c00c_size2000x2000_cropcenter.webp",
+          "/assets/images/products/uploads/894a2223-e123-468a-9c5e-6949a9f72643_size2000x2000_cropcenter.webp",
+          "/assets/images/products/uploads/02e9fde1-b8ec-4df3-812c-6869dbcfb37c_size2000x2000_cropcenter.webp",
+          "/assets/images/products/uploads/1e18c52b-9cf3-411f-8897-4c0830babd56_size2000x2000_cropcenter.webp"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 50,
+    "sizes": [
+      "38"
+    ],
+    "searchKeywords": [
+      "Lacoste Lineshot",
+      "Lacoste 746SFA0075",
+      "746SFA0075.1R5",
+      "жіночі кросівки Lacoste",
+      "Lacoste жіночі кросівки",
+      "кросівки Lacoste",
+      "жіночі кросівки",
+      "бежеві кросівки Lacoste",
+      "Lacoste sneakers",
+      "брендові кросівки",
+      "оригінальні кросівки",
+      "жіноче брендове взуття"
+    ],
+    "isNew": false,
+    "title": "Жіночі бежеві кросівки з чорними деталями Lacoste Lineshot 746SFA0075.1R5",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильні жіночі кросівки Lacoste Lineshot у бежевому кольорі. Класичний тенісний силует 90-х поєднується із сучасними деталями, дихаючим верхом та комфортною підошвою Ortholite. Універсальна модель для повсякденних образів і активного міського ритму",
+    "sku": "746SFA0075.1R5",
+    "rating": 5,
+    "category": "Кросівки",
+    "slug": "жіночі-бежеві-кросівки-з-чорними-деталями-lacoste-lineshot-746sfa0075-1r5",
+    "id": 44,
+    "color": "Бежевий  1R5",
+    "images": [
+      "/assets/images/products/uploads/bc4302e5-037f-4a05-b3b7-d6f959c4c00c_size2000x2000_cropcenter.webp",
+      "/assets/images/products/uploads/894a2223-e123-468a-9c5e-6949a9f72643_size2000x2000_cropcenter.webp",
+      "/assets/images/products/uploads/02e9fde1-b8ec-4df3-812c-6869dbcfb37c_size2000x2000_cropcenter.webp",
+      "/assets/images/products/uploads/1e18c52b-9cf3-411f-8897-4c0830babd56_size2000x2000_cropcenter.webp"
+    ]
   }
 ]

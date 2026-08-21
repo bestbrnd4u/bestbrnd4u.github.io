@@ -44,5 +44,14 @@
   "description": "Стильні жіночі кросівки Lacoste Lineshot у бежевому кольорі. Класичний тенісний силует 90-х поєднується із сучасними деталями, дихаючим верхом та комфортною підошвою Ortholite. Універсальна модель для повсякденних образів і активного міського ритму",
   "sku": "746SFA0075.1R5",
   "rating": 5,
-  "category": "Кросівки"
+  "category": "Кросівки",
+  "slug": "жіночі-бежеві-кросівки-з-чорними-деталями-lacoste-lineshot-746sfa0075-1r5",
+  "id": 44,
+  "color": "Бежевий  1R5",
+  "images": [
+    "/assets/images/products/uploads/bc4302e5-037f-4a05-b3b7-d6f959c4c00c_size2000x2000_cropcenter.webp",
+    "/assets/images/products/uploads/894a2223-e123-468a-9c5e-6949a9f72643_size2000x2000_cropcenter.webp",
+    "/assets/images/products/uploads/02e9fde1-b8ec-4df3-812c-6869dbcfb37c_size2000x2000_cropcenter.webp",
+    "/assets/images/products/uploads/1e18c52b-9cf3-411f-8897-4c0830babd56_size2000x2000_cropcenter.webp"
+  ]
 }
