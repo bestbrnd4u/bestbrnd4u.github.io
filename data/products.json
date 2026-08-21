@@ -395,12 +395,17 @@
     "color": "Чорний"
   },
   {
-    "title": "Шкіряна сумочка Coach Tabby 26",
+    "gender": [
+      "Жінкам"
+    ],
+    "oldPrice": 15750,
+    "color": "Темно-сірий",
+    "badge": "SALE",
+    "material": "Шкіра",
     "brand": "Coach",
-    "category": "Жіночі сумки",
-    "gender": "Жінкам",
     "price": 11000,
-    "description": "Coach Tabby 26 — одна з найвпізнаваніших моделей бренду. Шкіряний корпус, фірмова застібка-турнікет у формі літери C, знімний ремінець. Доступна у трьох відтінках, тримає форму й однаково доречна з денним і вечірнім образом.",
+    "preOrder": false,
+    "slug": "coach-shkiriana-sumochka-coach-tabby-26",
     "variants": [
       {
         "color": "Темно-сірий",
@@ -432,13 +437,17 @@
           "assets/images/products/uploads/coach73995-dark-stone-3.webp"
         ],
         "sku": "coach73995 dark stone"
+      },
+      {
+        "hex": "#433636",
+        "color": "Brass Tan Black",
+        "images": [
+          "/assets/images/products/uploads/91215-b4ooh_7d995c2e069841c5ad45599ee803592d.webp",
+          "/assets/images/products/uploads/91215-b4ooh-1_b3aea35bcebe4922a51b66ad7b2bb0a1_master.webp",
+          "/assets/images/products/uploads/91215-b4ooh-2_ea0908385fb449c5a786a9c58e2e20cb_master.webp"
+        ]
       }
     ],
-    "oldPrice": 15750,
-    "badge": "SALE",
-    "isNew": false,
-    "material": "Шкіра",
-    "sku": "coach73995black",
     "searchKeywords": [
       "коуч",
       "coach",
@@ -452,16 +461,18 @@
       "coach",
       "tabby"
     ],
-    "instagramBlock": "general",
-    "preOrder": false,
+    "isNew": false,
+    "title": "Шкіряна сумочка Coach Tabby 26",
     "images": [
       "assets/images/products/uploads/coach73995black-1.webp",
       "assets/images/products/uploads/coach73995black-2.webp",
       "assets/images/products/uploads/coach73995black-3.webp"
     ],
-    "slug": "coach-shkiriana-sumochka-coach-tabby-26",
     "id": 9,
-    "color": "Темно-сірий"
+    "instagramBlock": "general",
+    "description": "Coach Tabby 26 — одна з найвпізнаваніших моделей бренду. Шкіряний корпус, фірмова застібка-турнікет у формі літери C, знімний ремінець. Доступна у трьох відтінках, тримає форму й однаково доречна з денним і вечірнім образом.",
+    "sku": "coach73995black",
+    "category": "Жіночі сумки"
   },
   {
     "gender": "Жінкам",
