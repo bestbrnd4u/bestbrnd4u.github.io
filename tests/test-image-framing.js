@@ -32,8 +32,28 @@ const Framing = require("../assets/js/image-framing.js");
 
 console.log("\n[1] Формула кадру: межі й нормалізація");
 {
-    check("1× не зберігається (нічого не змінює)",
-        Framing.normalizeFrame({ zoom: 1, x: 20, y: 30 }) === null);
+    // Порожня рамка — це 1× І центр.
+    //
+    // Раніше вистачало самого 1×: кадрування було лише для товару, де
+    // фото 4:5 лежить у контейнері 4:5 — нічого не обрізається, і точка
+    // фокуса без наближення справді нічого не міняла.
+    //
+    // Для банера й акції це не так: контейнер має ІНШУ пропорцію, кадр
+    // ріжеться завжди, і точка вирішує, що саме лишиться видимим.
+    check("1× у центрі не зберігається (нічого не змінює)",
+        Framing.normalizeFrame({ zoom: 1, x: 50, y: 50 }) === null);
+
+    check("1× зі зсувом зберігається (це кадр для банера)",
+        JSON.stringify(Framing.normalizeFrame({ zoom: 1, x: 20, y: 30 }))
+            === JSON.stringify({ zoom: 1, x: 20, y: 30 }));
+
+    // Number(null) — це 0, тож без окремої перевірки рамка з x: null
+    // мовчки зсувала кадр до лівого краю замість центру.
+    check("null означає «не задано», а не нуль",
+        Framing.normalizeFrame({ zoom: 1, x: null, y: null }) === null);
+
+    check("явний нуль лишається нулем",
+        (Framing.normalizeFrame({ zoom: 1, x: 0, y: 50 }) || {}).x === 0);
 
     check("порожнє значення — не рамка",
         Framing.normalizeFrame(null) === null && Framing.normalizeFrame({}) === null);
@@ -237,6 +257,52 @@ console.log("\n[8] Оригінали фото не змінюються");
     const normalizer = read("scripts/normalize-product-images.js");
     check("нормалізатор нічого не знає про рамки (не запікає їх у файл)",
         !/framing/i.test(normalizer));
+}
+
+console.log("\n[7b] Кадрування працює не лише в товарах");
+{
+    const { loadYaml } = require("./helpers/yaml");
+    const config = loadYaml("admin/config.yml");
+
+    const promo = config.collections.find(c => c.name === "promotions");
+    const home = config.collections.find(c => c.name === "pages")
+        .files.find(f => f.name === "home");
+
+    check("поле є в акціях",
+        (promo.fields || []).some(f => f.name === "framing" && f.widget === "imageFraming"));
+    check("поле є на головній",
+        (home.fields || []).some(f => f.name === "framing" && f.widget === "imageFraming"));
+
+    // Віджет спершу вмів лише data.variants[].images і в акціях та на
+    // головній не знаходив жодного фото.
+    const widget = read("admin/image-framing-widget.js");
+
+    check("віджет шукає фото вглиб даних, а не лише у варіантах",
+        /function walk\(value, label\)/.test(widget) && /IMAGE_RE/.test(widget));
+    check("не тягне посилання з описів", /SKIP_KEYS/.test(widget));
+
+    // Товар: фото 4:5 у контейнері 4:5 — обрізати нічого, треба
+    // наблизити, тож transform. Банер і акція: пропорції різні, кадр
+    // ріжеться завжди — вирішує позиція.
+    const css = read("assets/css/style.css").replace(/\/\*[\s\S]*?\*\//g, "");
+    const app = read("assets/js/app.js");
+
+    check("головний банер слухається точки кадру",
+        /--hero-bg[\s\S]{0,200}background-position:var\(--frame-x,50%\) var\(--frame-y,50%\)/.test(css));
+    check("банер «Нова колекція» теж",
+        /--promo-bg[\s\S]{0,200}background-position:var\(--frame-x,50%\) var\(--frame-y,50%\)/.test(css));
+
+    // без рамки картка акції має виглядати точно як досі
+    check("картка акції зберегла свій типовий кадр (top)",
+        /\.promo-card-image img\{[\s\S]{0,300}object-position:var\(--frame-x,50%\) var\(--frame-y,0%\)/.test(css));
+    check("ховер акції множиться на наближення",
+        /scale\(calc\(var\(--frame-zoom,1\) \* 1\.06\)\)/.test(css));
+
+    check("рамка доходить до банерів", /applyFraming\(el, framing, imageUrl\)/.test(app));
+    check("головна передає свій словник рамок",
+        /renderHero\(data\.hero, data\.framing\)/.test(app)
+        && /renderPromoBanner\(data\.promo, data\.framing\)/.test(app));
+    check("картка акції проставляє style", /style="\$\{frameFor\(promo\.image\)\}"/.test(app));
 }
 
 console.log("\n[8b] Відсутність файла обчислень НЕ блокує збереження товару");

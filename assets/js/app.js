@@ -64,10 +64,10 @@ async function initHomeContent() {
 
         const data = await response.json();
 
-        renderHero(data.hero);
+        renderHero(data.hero, data.framing);
         renderInstagramBlock(data.instagram);
         renderCategories(data.categories);
-        renderPromoBanner(data.promo);
+        renderPromoBanner(data.promo, data.framing);
         renderBrands(data.brands);
         renderAdvantages(data.advantages);
 
@@ -171,6 +171,12 @@ function buildCroppedImageUrl(url, width, height) {
 // в CSS, інакше картинка й розмітка розʼїдуться.
 function promoPicture(promo, breakpoint, extraAttrs) {
 
+    // Рамка кадрування акції. Картка й банер ріжуть знімок під свою
+    // пропорцію, тож object-position вирішує, що саме лишиться видимим.
+    // Мобільне фото має власну рамку — ключ словника це ім'я файлу.
+    const frameFor = src => (window.ImageFraming
+        && window.ImageFraming.frameStyleAttr(promo.framing, src)) || "";
+
     const mobile = promo.imageMobile
         ? `<source media="(max-width: ${breakpoint}px)" srcset="${promo.imageMobile}">`
         : "";
@@ -180,6 +186,7 @@ function promoPicture(promo, breakpoint, extraAttrs) {
             ${mobile}
             <img
                 src="${promo.image}"
+                style="${frameFor(promo.image)}"
                 alt="${promo.title}"
                 ${extraAttrs || ""}
                 onerror="this.src='assets/images/no-image.png'">
@@ -187,9 +194,40 @@ function promoPicture(promo, breakpoint, extraAttrs) {
 
 }
 
-function setResponsiveBanner(el, cssVarName, imageUrl, crops) {
+// Рамка кадрування для фонових банерів.
+//
+// У товару кадр задається через transform: scale — там фото і контейнер
+// однієї пропорції, обрізати нічого, треба лише наблизити. Банер інший:
+// смуга 1600×720 на десктопі й 750×1000 на телефоні, а завантажене фото
+// майже завжди третьої пропорції. Кадр ріжеться завжди, і питання не
+// «наскільки наблизити», а «яку частину лишити» — це background-position.
+//
+// Числа ті самі, що в товарах (assets/js/image-framing.js), тож рамка,
+// виставлена в адмінці, працює скрізь однаково.
+function applyFraming(el, framing, imageUrl) {
+
+    if (!el || !window.ImageFraming) return;
+
+    const frame = window.ImageFraming.frameFor(framing, imageUrl);
+
+    if (!frame) {
+        el.style.removeProperty("--frame-x");
+        el.style.removeProperty("--frame-y");
+        el.style.removeProperty("--frame-zoom");
+        return;
+    }
+
+    el.style.setProperty("--frame-x", frame.x + "%");
+    el.style.setProperty("--frame-y", frame.y + "%");
+    el.style.setProperty("--frame-zoom", String(frame.zoom));
+
+}
+
+function setResponsiveBanner(el, cssVarName, imageUrl, crops, framing) {
 
     if (!el || !imageUrl) return;
+
+    applyFraming(el, framing, imageUrl);
 
     const desktopUrl = buildCroppedImageUrl(imageUrl, crops.desktop.w, crops.desktop.h);
     const tabletUrl = buildCroppedImageUrl(imageUrl, crops.tablet.w, crops.tablet.h);
@@ -216,7 +254,10 @@ function setResponsiveBanner(el, cssVarName, imageUrl, crops) {
 
 }
 
-function renderHero(hero) {
+// framing — спільний для всієї головної словник «файл → рамка»
+// (лежить на верхньому рівні home.json, бо одне фото може
+// використовуватись і в банері, і в категорії)
+function renderHero(hero, framing) {
 
     if (!hero) return;
 
@@ -233,7 +274,7 @@ function renderHero(hero) {
             desktop: { w: 1600, h: 720 },
             tablet: { w: 1024, h: 900 },
             mobile: { w: 750, h: 1000 }
-        });
+        }, framing);
 
     }
 
@@ -303,7 +344,7 @@ function renderCategories(categories) {
 
 }
 
-function renderPromoBanner(promo) {
+function renderPromoBanner(promo, framing) {
 
     if (!promo) return;
 
@@ -319,7 +360,7 @@ function renderPromoBanner(promo) {
             desktop: { w: 1600, h: 640 },
             tablet: { w: 1024, h: 800 },
             mobile: { w: 750, h: 900 }
-        });
+        }, framing);
 
     }
 

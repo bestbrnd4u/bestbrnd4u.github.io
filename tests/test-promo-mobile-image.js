@@ -38,8 +38,13 @@ console.log("\n[1] Спільний помічник, а не копіпаст �
         /promo\.imageMobile\s*\?/.test(appJs));
     check("десктопне фото лишається у <img> як запасне",
         /<picture>[\s\S]{0,200}src="\$\{promo\.image\}"/.test(appJs));
+    // Перевіряємо ТІЛО функції, а не відстань у символах: попередній
+    // варіант шукав no-image.png у межах 600 знаків від назви функції
+    // й ламався щоразу, коли всередині зʼявлявся коментар.
+    const body = (appJs.match(/function promoPicture\([\s\S]*?\n\}/) || [""])[0];
+
     check("збережено запасну картинку при помилці завантаження",
-        /promoPicture[\s\S]{0,600}no-image\.png/.test(appJs));
+        body.includes("no-image.png"), body ? "" : "функцію не знайдено");
 }
 
 console.log("\n[2] Усі блоки акцій на головній переведені");
