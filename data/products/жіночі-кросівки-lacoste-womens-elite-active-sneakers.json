@@ -1,0 +1,48 @@
+{
+  "gender": [
+    "Жінкам"
+  ],
+  "preOrderDays": "5–10 робочих днів",
+  "forcePublish": false,
+  "brand": "Lacoste",
+  "price": 6100,
+  "preOrder": false,
+  "variants": [
+    {
+      "color": "Білий Wht-Dk Grn 286",
+      "hex": "#ffffff",
+      "images": [
+        "/assets/images/products/uploads/sneakers-lacoste-elite-active-746sma0008-wht-dk-grn-286-0000303494858.webp",
+        "/assets/images/products/uploads/sneakers-lacoste-elite-active-746sma0008-wht-dk-grn-286-0000303494858-3-.webp",
+        "/assets/images/products/uploads/sneakers-lacoste-elite-active-746sma0008-wht-dk-grn-286-0000303494858-2-.webp",
+        "/assets/images/products/uploads/sneakers-lacoste-elite-active-746sma0008-wht-dk-grn-286-0000303494858-1-.webp"
+      ]
+    }
+  ],
+  "preOrderPrepayment": 50,
+  "sizes": [
+    "37"
+  ],
+  "searchKeywords": [
+    "Lacoste Elite Active",
+    "Lacoste 746SMA0008",
+    "746SMA0008-286",
+    "жіночі кросівки Lacoste",
+    "Lacoste жіночі кросівки",
+    "кросівки Lacoste",
+    "жіночі кросівки",
+    "брендові кросівки",
+    "оригінальні кросівки",
+    "Lacoste sneakers",
+    "Elite Active Lacoste",
+    "жіноче брендове взуття"
+  ],
+  "isNew": false,
+  "title": "Жіночі кросівки Lacoste Women's Elite Active Sneakers",
+  "reviews": 0,
+  "instagramBlock": "general",
+  "description": "Стильні жіночі кросівки Lacoste Elite Active у білому кольорі з контрастними зеленими та червоними акцентами. Поєднання текстилю, замші та нубуку створює сучасний спортивний образ, а зручна конструкція чудово підходить для повсякденного носіння",
+  "sku": "746SMA0008-286",
+  "rating": 5,
+  "category": "Кросівки"
+}
