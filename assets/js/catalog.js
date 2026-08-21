@@ -371,9 +371,31 @@ function readSetParam(params, key, allowed) {
 
 }
 
+// Число з адреси або null, якщо параметра немає.
+//
+// ПАСТКА, ЧЕРЕЗ ЯКУ КАТАЛОГ ВІДКРИВАВСЯ ПОРОЖНІМ
+// -----------------------------------------------
+// Спершу тут стояло просто Number(params.get(key)). Коли параметра в
+// адресі немає, get() повертає null, а Number(null) — це 0, і перевірка
+// isFinite && >= 0 його спокійно пропускала.
+//
+// Тобто на КОЖНОМУ чистому відкритті каталогу priceRange.max ставав
+// нулем. Далі setupPriceRange() затискав діапазон межами асортименту:
+//   min = Math.max(0, 4000) = 4000
+//   max = Math.min(0, 9000) = 0
+// Виходив діапазон «4 000 – 0 грн», під який не підходить жоден товар,
+// — каталог, новинки й акції показували «Знайдено 0 товарів». А
+// syncStateToUrl() бачив max, що не дорівнює межі, вважав його
+// зміненим вручну й закріплював у адресі як ?priceMax=0.
+//
+// Тому порожній параметр перевіряємо ДО перетворення в число.
 function readNumberParam(params, key) {
 
-    const value = Number(params.get(key));
+    const raw = params.get(key);
+
+    if (raw === null || raw.trim() === "") return null;
+
+    const value = Number(raw);
 
     return Number.isFinite(value) && value >= 0 ? value : null;
 
@@ -410,9 +432,12 @@ async function initCatalog() {
 
     // сторінка з адреси — щоб надіслане посилання відкривалось там,
     // де його скопіювали, і «Назад» повертав на ту саму сторінку
-    const pageParam = Number(new URLSearchParams(location.search).get("page"));
+    // через readNumberParam, а не Number(...): тут 0 не шкодив лише
+    // тому, що не проходив умову > 1 — але тримати ще одну копію
+    // тієї самої пастки поруч не варто (див. readNumberParam)
+    const pageParam = readNumberParam(new URLSearchParams(location.search), "page");
 
-    if (Number.isFinite(pageParam) && pageParam > 1) currentPage = pageParam;
+    if (pageParam !== null && pageParam > 1) currentPage = pageParam;
 
 
     readUrlState();

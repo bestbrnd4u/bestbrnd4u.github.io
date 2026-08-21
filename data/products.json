@@ -590,14 +590,12 @@
     "color": "Темно-сірий"
   },
   {
-    "gender": [
-      "Чоловікам"
-    ],
-    "color": "Темно-синій",
-    "brand": "Invicta ",
+    "title": "Чоловічий годинник",
+    "brand": "Invicta",
+    "category": "Годинники",
+    "gender": "Чоловікам",
     "price": 5500,
-    "preOrder": false,
-    "slug": "invicta-cholovichyy-hodynnyk",
+    "description": "Чоловічий годинник Invicta Pro Diver — модель у стилі класичних дайверських годинників. Обертовий безель, комбінований браслет, темно-синій циферблат із позначкою дати.",
     "variants": [
       {
         "color": "Темно-синій",
@@ -611,9 +609,11 @@
         ]
       }
     ],
+    "isNew": false,
     "sizes": [
       "ONESIZE"
     ],
+    "sku": "invicta-pro-diver-blue-dial 22058",
     "searchKeywords": [
       "інвікта",
       "invicta",
@@ -621,16 +621,14 @@
       "наручний годинник",
       "темно-синій"
     ],
-    "isNew": false,
-    "title": "Чоловічий годинник Invicta Pro Diver",
+    "instagramBlock": "general",
+    "preOrder": false,
     "images": [
       "assets/images/products/uploads/invicta-pro-diver-blue-dial-22058-1.webp"
     ],
+    "slug": "invicta-cholovichyy-hodynnyk",
     "id": 12,
-    "instagramBlock": "general",
-    "description": "Чоловічий годинник Invicta Pro Diver — модель у стилі класичних дайверських годинників. Обертовий безель, комбінований браслет, темно-синій циферблат із позначкою дати.",
-    "sku": "invicta-pro-diver-blue-dial 22058",
-    "category": "Годинники"
+    "color": "Темно-синій"
   },
   {
     "title": "Сумочка на плече Jw Pei TESSA",
@@ -1788,12 +1786,10 @@
       "Жінкам"
     ],
     "preOrderDays": "5–10 робочих днів",
-    "color": "White",
     "forcePublish": false,
     "brand": "Lacoste",
     "price": 5900,
     "preOrder": false,
-    "slug": "кросівки-lacoste-l003",
     "variants": [
       {
         "color": "White",
@@ -1827,20 +1823,22 @@
       "Lacoste L003 SMA"
     ],
     "isNew": false,
-    "title": "Кросівки Lacoste L003 Textile Sneakers",
+    "title": "Кросівки Lacoste L003",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Lacoste L003 0722 1 SMА\nСтильні повсякденні кросівки Lacoste L003 0722 1 SMA — сучасна модель із виразним спортивним дизайном, натхненним тенісною естетикою. Верх поєднує текстильні та синтетичні матеріали, забезпечуючи комфортну посадку та легкість у повсякденному носінні.",
+    "sku": "43SMA0064",
+    "rating": 5,
+    "category": "Кросівки",
+    "slug": "кросівки-lacoste-l003",
+    "id": 34,
+    "color": "White",
     "images": [
       "/assets/images/products/uploads/61nzkwkzmsl._sx700_-1-.webp",
       "/assets/images/products/uploads/612qqlnx4al._sx700_.webp",
       "/assets/images/products/uploads/613xarv4knl._sx700_.webp",
       "/assets/images/products/uploads/61z3jdbac7l._sx700_.webp"
-    ],
-    "reviews": 0,
-    "id": 34,
-    "instagramBlock": "general",
-    "description": "Lacoste L003 0722 1 SMА\nСтильні повсякденні кросівки Lacoste L003 0722 1 SMA — сучасна модель із виразним спортивним дизайном, натхненним тенісною естетикою. Верх поєднує текстильні та синтетичні матеріали, забезпечуючи комфортну посадку та легкість у повсякденному носінні.",
-    "sku": "43SMA0064",
-    "rating": 5,
-    "category": "Кросівки"
+    ]
   },
   {
     "gender": [
@@ -1911,12 +1909,10 @@
       "Жінкам"
     ],
     "preOrderDays": "5–10 робочих днів",
-    "color": "Барвистий",
     "forcePublish": false,
     "brand": "Lacoste",
     "price": 6200,
     "preOrder": false,
-    "slug": "lacoste-кросівки-жіночі-l003",
     "variants": [
       {
         "hex": "#f8faf6",
@@ -1957,20 +1953,22 @@
       "кросівки Lacoste L003 744SFA0020"
     ],
     "isNew": false,
-    "title": "Lacoste кросівки жіночі L003 Extile Color-Block Sneakers",
+    "title": "Lacoste кросівки жіночі L003",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильні жіночі кросівки Lacoste L003 — сучасна модель для повсякденного гардероба, що поєднує спортивний характер, комфорт і впізнаваний французький стиль. Легкий нейлоновий верх доповнений синтетичними елементами та оригінальною конструкцією шнурівки.\nСпеціальна система шнурівки та конструкція язичка забезпечують надійну фіксацію стопи й комфортну посадку. Текстильна підкладка та м’яка устілка роблять модель зручною для тривалого носіння.\nПідошва поєднує гуму та EVA, забезпечуючи амортизацію, гнучкість і хороше зчеплення з поверхнею. Фірмовий тиснений логотип-крокодил на п’яті додає моделі характерної для Lacoste впізнаваності.",
+    "sku": "744SFA0020.080",
+    "rating": 5,
+    "category": "Кросівки",
+    "slug": "lacoste-кросівки-жіночі-l003",
+    "id": 36,
+    "color": "Барвистий",
     "images": [
       "/assets/images/products/uploads/e5de78de-29a2-40ba-8edd-a70c4e1ea31b_size2000x2000_cropcenter.webp",
       "/assets/images/products/uploads/f7e4b799-732f-44f2-975b-40cd657042ed_size2000x2000_cropcenter.webp",
       "/assets/images/products/uploads/f33f16ca-2354-4bb1-a195-063ef2737099_size2000x2000_cropcenter.webp",
       "/assets/images/products/uploads/8bfe46ad-4152-486e-af2b-0e8f2715354a_size2000x2000_cropcenter-1-.webp"
-    ],
-    "reviews": 0,
-    "id": 36,
-    "instagramBlock": "general",
-    "description": "Стильні жіночі кросівки Lacoste L003 — сучасна модель для повсякденного гардероба, що поєднує спортивний характер, комфорт і впізнаваний французький стиль. Легкий нейлоновий верх доповнений синтетичними елементами та оригінальною конструкцією шнурівки.\nСпеціальна система шнурівки та конструкція язичка забезпечують надійну фіксацію стопи й комфортну посадку. Текстильна підкладка та м’яка устілка роблять модель зручною для тривалого носіння.\nПідошва поєднує гуму та EVA, забезпечуючи амортизацію, гнучкість і хороше зчеплення з поверхнею. Фірмовий тиснений логотип-крокодил на п’яті додає моделі характерної для Lacoste впізнаваності.",
-    "sku": "744SFA0020.080",
-    "rating": 5,
-    "category": "Кросівки"
+    ]
   },
   {
     "gender": [
@@ -2088,229 +2086,6 @@
       "/assets/images/products/uploads/f7f0e509c4be46ffb9d3ef22b5ba170e.webp",
       "/assets/images/products/uploads/c8995a203d3b4b9291e3348646974342.webp",
       "/assets/images/products/uploads/c126c8e7b28b4046bbabd9d5194d182b.webp"
-    ]
-  },
-  {
-    "gender": [
-      "Жінкам"
-    ],
-    "preOrderDays": "5–10 робочих днів",
-    "forcePublish": false,
-    "brand": "Lacoste",
-    "price": 6500,
-    "preOrder": false,
-    "variants": [
-      {
-        "color": "Neo",
-        "hex": "#161616",
-        "sizes": [],
-        "images": [
-          "/assets/images/products/uploads/45sfa0001_075_02-1-.webp",
-          "/assets/images/products/uploads/45sfa0001_075_01.webp",
-          "/assets/images/products/uploads/ss23-obm1w1-99x_f4.webp"
-        ]
-      }
-    ],
-    "preOrderPrepayment": 50,
-    "sizes": [
-      "37"
-    ],
-    "searchKeywords": [
-      "Lacoste L003 Neo",
-      "Lacoste жіночі кросівки",
-      "жіночі кросівки Lacoste",
-      "кросівки Lacoste",
-      "Lacoste sneakers",
-      "жіночі кросівки",
-      "кросівки оригінал",
-      "брендове взуття",
-      "Lacoste L003",
-      "кросівки Lacoste L003 Neo"
-    ],
-    "isNew": false,
-    "title": "Lacoste L003 Neo Sneakers",
-    "reviews": 0,
-    "instagramBlock": "general",
-    "description": "Стильні кросівки Lacoste L003 Neo з сучасним масивним дизайном та фірмовим логотипом бренду. Комфортна посадка та універсальний силует роблять їх чудовим вибором для повсякденних образів",
-    "sku": "45SFA0001",
-    "rating": 5,
-    "category": "Кросівки",
-    "slug": "lacoste-l003-neo-sneakers",
-    "id": 39,
-    "color": "Neo",
-    "images": [
-      "/assets/images/products/uploads/45sfa0001_075_02-1-.webp",
-      "/assets/images/products/uploads/45sfa0001_075_01.webp",
-      "/assets/images/products/uploads/ss23-obm1w1-99x_f4.webp"
-    ]
-  },
-  {
-    "gender": [
-      "Чоловікам"
-    ],
-    "preOrderDays": "5–10 робочих днів",
-    "forcePublish": false,
-    "brand": "Lacoste",
-    "price": 4000,
-    "composition": "100% поліестр",
-    "preOrder": false,
-    "dimensions": "17 × 23 × 9 см",
-    "variants": [
-      {
-        "hex": "#031578",
-        "color": "Marine daphne 793",
-        "images": [
-          "/assets/images/products/uploads/nh4040nz_793_24.webp",
-          "/assets/images/products/uploads/nh4040nz_793_31.webp"
-        ],
-        "video": "/assets/images/products/uploads/nh4040nz_793_31.webp"
-      }
-    ],
-    "preOrderPrepayment": 50,
-    "sizes": [
-      "One Size"
-    ],
-    "searchKeywords": [
-      "Lacoste NH4040NZ",
-      "Lacoste Neocroc",
-      "Lacoste чоловіча сумка",
-      "чоловіча сумка Lacoste",
-      "сумка через плече Lacoste",
-      "чоловіча сумка через плече",
-      "Lacoste camera bag",
-      "Lacoste crossbody bag",
-      "Neocroc Checkboard Strap",
-      "брендові чоловічі сумки",
-      "сумка Lacoste оригінал"
-    ],
-    "isNew": false,
-    "title": "Чоловіча сумка Lacoste Neocroc Checkboard Strap Camera Bag",
-    "reviews": 0,
-    "instagramBlock": "general",
-    "description": "Lacoste Neocroc Checkboard Strap Camera Bag\nКомпактна чоловіча сумка через плече Lacoste Neocroc із контрастним картатим ременем та фірмовим логотипом. Практична модель для щоденного використання: два зовнішні кишені на блискавці та внутрішні відділення допомагають зручно розмістити необхідні речі. Виготовлена зі зносостійкого легкого поліестеру",
-    "sku": "NH4040NZ",
-    "rating": 5,
-    "category": "Чоловічі сумки",
-    "slug": "чоловіча-сумка-lacoste-neocroc-checkboard-strap-camera-bag",
-    "id": 40,
-    "color": "Marine daphne 793",
-    "images": [
-      "/assets/images/products/uploads/nh4040nz_793_24.webp",
-      "/assets/images/products/uploads/nh4040nz_793_31.webp"
-    ]
-  },
-  {
-    "gender": [
-      "Жінкам"
-    ],
-    "preOrderDays": "5–10 робочих днів",
-    "forcePublish": false,
-    "brand": "Lacoste",
-    "price": 6100,
-    "preOrder": false,
-    "variants": [
-      {
-        "color": "Білий Wht-Dk Grn 286",
-        "hex": "#ffffff",
-        "images": [
-          "/assets/images/products/uploads/sneakers-lacoste-elite-active-746sma0008-wht-dk-grn-286-0000303494858.webp",
-          "/assets/images/products/uploads/sneakers-lacoste-elite-active-746sma0008-wht-dk-grn-286-0000303494858-3-.webp",
-          "/assets/images/products/uploads/sneakers-lacoste-elite-active-746sma0008-wht-dk-grn-286-0000303494858-2-.webp",
-          "/assets/images/products/uploads/sneakers-lacoste-elite-active-746sma0008-wht-dk-grn-286-0000303494858-1-.webp"
-        ]
-      }
-    ],
-    "preOrderPrepayment": 50,
-    "sizes": [
-      "37"
-    ],
-    "searchKeywords": [
-      "Lacoste Elite Active",
-      "Lacoste 746SMA0008",
-      "746SMA0008-286",
-      "жіночі кросівки Lacoste",
-      "Lacoste жіночі кросівки",
-      "кросівки Lacoste",
-      "жіночі кросівки",
-      "брендові кросівки",
-      "оригінальні кросівки",
-      "Lacoste sneakers",
-      "Elite Active Lacoste",
-      "жіноче брендове взуття"
-    ],
-    "isNew": false,
-    "title": "Жіночі кросівки Lacoste Women's Elite Active Sneakers",
-    "reviews": 0,
-    "instagramBlock": "general",
-    "description": "Стильні жіночі кросівки Lacoste Elite Active у білому кольорі з контрастними зеленими та червоними акцентами. Поєднання текстилю, замші та нубуку створює сучасний спортивний образ, а зручна конструкція чудово підходить для повсякденного носіння",
-    "sku": "746SMA0008-286",
-    "rating": 5,
-    "category": "Кросівки",
-    "slug": "жіночі-кросівки-lacoste-womens-elite-active-sneakers",
-    "id": 41,
-    "color": "Білий Wht-Dk Grn 286",
-    "images": [
-      "/assets/images/products/uploads/sneakers-lacoste-elite-active-746sma0008-wht-dk-grn-286-0000303494858.webp",
-      "/assets/images/products/uploads/sneakers-lacoste-elite-active-746sma0008-wht-dk-grn-286-0000303494858-3-.webp",
-      "/assets/images/products/uploads/sneakers-lacoste-elite-active-746sma0008-wht-dk-grn-286-0000303494858-2-.webp",
-      "/assets/images/products/uploads/sneakers-lacoste-elite-active-746sma0008-wht-dk-grn-286-0000303494858-1-.webp"
-    ]
-  },
-  {
-    "gender": [
-      "Жінкам"
-    ],
-    "preOrderDays": "5–10 робочих днів",
-    "forcePublish": false,
-    "brand": "Lacoste",
-    "price": 5500,
-    "preOrder": false,
-    "variants": [
-      {
-        "color": "Біло-помаранчевий",
-        "hex": "#ffffff",
-        "images": [
-          "/assets/images/products/uploads/9a6de5f3db734534b849269b9b8efda3.webp",
-          "/assets/images/products/uploads/5e7f76a3740344a884d67834efc5cef8.webp",
-          "/assets/images/products/uploads/6b15e7dfca384ec797dbde12aad79176.webp",
-          "/assets/images/products/uploads/6c62a95311fd499f8cd54c4c96e0143f.webp"
-        ]
-      }
-    ],
-    "preOrderPrepayment": 50,
-    "sizes": [
-      "37"
-    ],
-    "searchKeywords": [
-      "Lacoste LA211A0QU",
-      "LA211A0QU-A12",
-      "жіночі кросівки Lacoste",
-      "Lacoste жіночі кросівки",
-      "кросівки Lacoste",
-      "жіночі кросівки",
-      "Lacoste sneakers",
-      "брендові кросівки",
-      "оригінальні кросівки",
-      "Lacoste white sneakers",
-      "білі кросівки",
-      "жіноче брендове взуття"
-    ],
-    "isNew": false,
-    "title": "Жіночі кросівки Lacoste Women's L003 Neo Sneakers",
-    "reviews": 0,
-    "instagramBlock": "general",
-    "description": "Стильні жіночі кросівки Lacoste у білому кольорі з темно-синіми та яскравими помаранчевими акцентами. Поєднання шкіри, синтетичних матеріалів і дихаючої сітки створює сучасний спортивний образ, а м'яка устілка забезпечує комфорт під час щоденного носіння",
-    "sku": "LA211A0QU-A12",
-    "rating": 5,
-    "category": "Кросівки",
-    "slug": "жіночі-кросівки-lacoste-womens-l003-neo-sneakers",
-    "id": 42,
-    "color": "Біло-помаранчевий",
-    "images": [
-      "/assets/images/products/uploads/9a6de5f3db734534b849269b9b8efda3.webp",
-      "/assets/images/products/uploads/5e7f76a3740344a884d67834efc5cef8.webp",
-      "/assets/images/products/uploads/6b15e7dfca384ec797dbde12aad79176.webp",
-      "/assets/images/products/uploads/6c62a95311fd499f8cd54c4c96e0143f.webp"
     ]
   }
 ]

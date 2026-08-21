@@ -1,12 +1,10 @@
 {
-  "gender": [
-    "Чоловікам"
-  ],
-  "color": "Темно-синій",
-  "brand": "Invicta ",
+  "title": "Чоловічий годинник",
+  "brand": "Invicta",
+  "category": "Годинники",
+  "gender": "Чоловікам",
   "price": 5500,
-  "preOrder": false,
-  "slug": "invicta-cholovichyy-hodynnyk",
+  "description": "Чоловічий годинник Invicta Pro Diver — модель у стилі класичних дайверських годинників. Обертовий безель, комбінований браслет, темно-синій циферблат із позначкою дати.",
   "variants": [
     {
       "color": "Темно-синій",
@@ -20,9 +18,11 @@
       ]
     }
   ],
+  "isNew": false,
   "sizes": [
     "ONESIZE"
   ],
+  "sku": "invicta-pro-diver-blue-dial 22058",
   "searchKeywords": [
     "інвікта",
     "invicta",
@@ -30,14 +30,12 @@
     "наручний годинник",
     "темно-синій"
   ],
-  "isNew": false,
-  "title": "Чоловічий годинник Invicta Pro Diver",
+  "instagramBlock": "general",
+  "preOrder": false,
   "images": [
     "assets/images/products/uploads/invicta-pro-diver-blue-dial-22058-1.webp"
   ],
+  "slug": "invicta-cholovichyy-hodynnyk",
   "id": 12,
-  "instagramBlock": "general",
-  "description": "Чоловічий годинник Invicta Pro Diver — модель у стилі класичних дайверських годинників. Обертовий безель, комбінований браслет, темно-синій циферблат із позначкою дати.",
-  "sku": "invicta-pro-diver-blue-dial 22058",
-  "category": "Годинники"
+  "color": "Темно-синій"
 }

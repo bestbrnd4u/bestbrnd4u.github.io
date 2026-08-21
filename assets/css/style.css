@@ -6968,10 +6968,27 @@ body.mobile-filters-open .scroll-top{
 
 .search-promo-banner{
     position:relative;
-    height:130px;
+    /* Пропорція, а не фіксована висота.
+       Було height:130px при гумовій ширині — на десктопі плитка
+       виходила 348×130 (2.68:1), на телефоні 160×130 (1.23:1). Одне й
+       те саме фото мусило пережити і широку смугу, і майже квадрат, і
+       background-size:cover зрізав людям голови. З aspect-ratio кроп
+       однаковий скрізь, тож картинку можна підготувати один раз. */
+    aspect-ratio:2 / 1;
+    min-height:104px;
     border-radius:16px;
     background-size:cover;
     background-position:center;
+    /* Картинку підставляє JS змінними --banner-lg / --banner-sm
+       (вони приходять із data/search-banners.json, який редагується
+       в адмінці). Медіазапит нижче перемикає на телефонну версію.
+       Робити це змінними, а не двома правилами з конкретними
+       адресами, — єдиний спосіб, бо адреси задає адміністратор. */
+    background-image:var(--banner-lg,none);
+    /* тло під фото: якщо файл банера колись не завантажиться, плитка
+       лишиться темною й білий підпис на ній буде видно, а не зникне
+       на білому */
+    background-color:#0f1729;
     display:flex;
     align-items:flex-end;
     padding:16px;
@@ -7145,6 +7162,13 @@ body.mobile-filters-open .scroll-top{
 
     .search-promo-banners{
         width:100%;
+    }
+
+    /* На телефоні плитка всього ~161px завширшки: смуга з трьох речей
+       перетворюється на кашу. Якщо адміністратор завантажив окрему
+       картинку — беремо її; ні — лишається та сама, що на комп'ютері. */
+    .search-promo-banner{
+        background-image:var(--banner-sm,var(--banner-lg,none));
     }
 
     .search-results{
