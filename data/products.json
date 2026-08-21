@@ -2143,5 +2143,60 @@
       "/assets/images/products/uploads/45sfa0001_075_01.webp",
       "/assets/images/products/uploads/ss23-obm1w1-99x_f4.webp"
     ]
+  },
+  {
+    "gender": [
+      "Чоловікам"
+    ],
+    "preOrderDays": "5–10 робочих днів",
+    "forcePublish": false,
+    "brand": "Lacoste",
+    "price": 4000,
+    "composition": "100% поліестр",
+    "preOrder": false,
+    "dimensions": "17 × 23 × 9 см",
+    "variants": [
+      {
+        "hex": "#031578",
+        "color": "Marine daphne 793",
+        "images": [
+          "/assets/images/products/uploads/nh4040nz_793_24.webp",
+          "/assets/images/products/uploads/nh4040nz_793_31.webp"
+        ],
+        "video": "/assets/images/products/uploads/nh4040nz_793_31.webp"
+      }
+    ],
+    "preOrderPrepayment": 50,
+    "sizes": [
+      "One Size"
+    ],
+    "searchKeywords": [
+      "Lacoste NH4040NZ",
+      "Lacoste Neocroc",
+      "Lacoste чоловіча сумка",
+      "чоловіча сумка Lacoste",
+      "сумка через плече Lacoste",
+      "чоловіча сумка через плече",
+      "Lacoste camera bag",
+      "Lacoste crossbody bag",
+      "Neocroc Checkboard Strap",
+      "брендові чоловічі сумки",
+      "сумка Lacoste оригінал"
+    ],
+    "isNew": false,
+    "title": "Чоловіча сумка Lacoste Neocroc Checkboard Strap Camera Bag",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Lacoste Neocroc Checkboard Strap Camera Bag\nКомпактна чоловіча сумка через плече Lacoste Neocroc із контрастним картатим ременем та фірмовим логотипом. Практична модель для щоденного використання: два зовнішні кишені на блискавці та внутрішні відділення допомагають зручно розмістити необхідні речі. Виготовлена зі зносостійкого легкого поліестеру",
+    "sku": "NH4040NZ",
+    "rating": 5,
+    "category": "Чоловічі сумки",
+    "slug": "чоловіча-сумка-lacoste-neocroc-checkboard-strap-camera-bag",
+    "id": 40,
+    "color": "Marine daphne 793",
+    "images": [
+      "/assets/images/products/uploads/nh4040nz_793_24.webp",
+      "/assets/images/products/uploads/nh4040nz_793_31.webp"
+    ]
   }
 ]

@@ -44,5 +44,12 @@
   "description": "Lacoste Neocroc Checkboard Strap Camera Bag\nКомпактна чоловіча сумка через плече Lacoste Neocroc із контрастним картатим ременем та фірмовим логотипом. Практична модель для щоденного використання: два зовнішні кишені на блискавці та внутрішні відділення допомагають зручно розмістити необхідні речі. Виготовлена зі зносостійкого легкого поліестеру",
   "sku": "NH4040NZ",
   "rating": 5,
-  "category": "Чоловічі сумки"
+  "category": "Чоловічі сумки",
+  "slug": "чоловіча-сумка-lacoste-neocroc-checkboard-strap-camera-bag",
+  "id": 40,
+  "color": "Marine daphne 793",
+  "images": [
+    "/assets/images/products/uploads/nh4040nz_793_24.webp",
+    "/assets/images/products/uploads/nh4040nz_793_31.webp"
+  ]
 }
