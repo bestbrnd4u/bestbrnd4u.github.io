@@ -44,5 +44,14 @@
   "description": "Стильні жіночі кросівки Lacoste у білому кольорі з темно-синіми та яскравими помаранчевими акцентами. Поєднання шкіри, синтетичних матеріалів і дихаючої сітки створює сучасний спортивний образ, а м'яка устілка забезпечує комфорт під час щоденного носіння",
   "sku": "LA211A0QU-A12",
   "rating": 5,
-  "category": "Кросівки"
+  "category": "Кросівки",
+  "slug": "жіночі-кросівки-lacoste-womens-l003-neo-sneakers",
+  "id": 42,
+  "color": "Біло-помаранчевий",
+  "images": [
+    "/assets/images/products/uploads/9a6de5f3db734534b849269b9b8efda3.webp",
+    "/assets/images/products/uploads/5e7f76a3740344a884d67834efc5cef8.webp",
+    "/assets/images/products/uploads/6b15e7dfca384ec797dbde12aad79176.webp",
+    "/assets/images/products/uploads/6c62a95311fd499f8cd54c4c96e0143f.webp"
+  ]
 }
