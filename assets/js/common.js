@@ -892,11 +892,11 @@ function buildSearchOverlay() {
 
                     <div class="search-promo-banners">
 
-                        <a href="catalog?gender=Чоловікам" class="search-promo-banner" style="background-image:linear-gradient(rgba(15,23,41,.35),rgba(15,23,41,.55)),url('https://images.pexels.com/photos/7869755/pexels-photo-7869755.jpeg?auto=compress&cs=tinysrgb&w=600')">
+                        <a href="catalog?gender=Чоловікам" class="search-promo-banner" data-banner="men">
                             <span>Чоловікам</span>
                         </a>
 
-                        <a href="catalog?gender=Жінкам" class="search-promo-banner" style="background-image:linear-gradient(rgba(15,23,41,.35),rgba(15,23,41,.55)),url('https://images.pexels.com/photos/932401/pexels-photo-932401.jpeg?auto=compress&cs=tinysrgb&w=600')">
+                        <a href="catalog?gender=Жінкам" class="search-promo-banner" data-banner="women">
                             <span>Жінкам</span>
                         </a>
 
@@ -940,7 +940,67 @@ function buildSearchOverlay() {
 
     document.body.appendChild(overlay);
 
+    applySearchBanners(overlay);
+
     return overlay;
+
+}
+
+// Картинки плиток «Чоловікам» / «Жінкам» у вікні пошуку.
+//
+// Адреси лежать у data/search-banners.json і редагуються в адмінці
+// (розділ «Сторінки» → «Картинки в пошуку»), тому в розмітці їх немає —
+// елемент несе лише data-banner="men|women".
+//
+// Кожній плитці ставимо дві CSS-змінні: --banner-lg для комп'ютера і
+// --banner-sm для телефона. Перемикання між ними — у медіазапиті в
+// style.css: адреси задає адміністратор, тож двома готовими правилами
+// це не опишеш.
+//
+// Якщо файл не приїде або в ньому нічого не вибрано, плитка лишиться
+// темною (background-color) з читабельним білим підписом — краще так,
+// ніж порожній світлий прямокутник із невидимим текстом.
+const SEARCH_BANNERS_URL = "data/search-banners.json";
+
+let searchBannersPromise = null;
+
+function loadSearchBanners() {
+
+    if (!searchBannersPromise) {
+
+        searchBannersPromise = fetch(SEARCH_BANNERS_URL)
+            .then(response => response.ok ? response.json() : {})
+            .catch(() => ({}));
+
+    }
+
+    return searchBannersPromise;
+
+}
+
+function applySearchBanners(root) {
+
+    const tiles = (root || document).querySelectorAll("[data-banner]");
+
+    if (!tiles.length) return;
+
+    loadSearchBanners().then(config => {
+
+        tiles.forEach(tile => {
+
+            const entry = (config || {})[tile.dataset.banner] || {};
+
+            const set = (name, value) => {
+                if (value) tile.style.setProperty(name, `url('${encodeURI(value)}')`);
+                else tile.style.removeProperty(name);
+            };
+
+            set("--banner-lg", entry.desktop);
+            set("--banner-sm", entry.mobile);
+
+        });
+
+    });
 
 }
 

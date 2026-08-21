@@ -114,13 +114,61 @@ function main() {
 
     const renames = new Map();
 
+    // Рішення приймається по ГРУПІ, а не по окремому файлу.
+    //
+    // Фото живе в теці не саме: поруч лежать зменшені копії
+    // -300 / -600 / -1200. Ім'я копії на 4 символи довше за базове,
+    // і саме через це раніше виходила ось така пара:
+    //
+    //   ...0000303494858-1-.webp       77 символів → НЕ перейменовано
+    //   ...0000303494858-1--300.webp   81 символ   → перейменовано
+    //
+    // Копія їхала під новим хешованим ім'ям, база лишалася під старим —
+    // і srcset рвався: браузер просив зменшену копію, якої за очікуваною
+    // адресою вже не було. Саме так і сталося на гілці dev після
+    // завантаження кросівок Lacoste.
+    //
+    // Хеш рахується від основи БЕЗ суфікса розміру, тож уся група
+    // отримує однакове нове ім'я — треба лише вирішувати про неї разом.
+    const groups = new Map();
+
     MEDIA_DIRS.forEach(rel => walk(path.join(ROOT, rel), (full, name) => {
 
-        if (name.length <= MAX_NAME) return;
+        const ext = path.extname(name);
+        const stem = path.basename(name, ext);
+        const variant = (stem.match(VARIANT_RE) || [""])[0];
+        const base = variant ? stem.slice(0, -variant.length) : stem;
 
-        renames.set(full, path.join(path.dirname(full), shortName(name)));
+        const key = path.join(path.dirname(full), base + ext);
+
+        if (!groups.has(key)) groups.set(key, []);
+
+        groups.get(key).push({ full, name });
 
     }));
+
+    // Найдовший суфікс, який ресайзер додасть до базового імені.
+    // Дивимось на нього НАПЕРЕД: якщо база вміщається в межу, а її
+    // майбутня копія — ні, то без цього переймeнування відклалося б до
+    // наступного запуску, і між ними в теці знову лежала б копія без
+    // пари. Саме так і виглядала поломка: база 77 символів пройшла,
+    // копія 81 — ні.
+    const LONGEST_VARIANT = "-1200".length;
+
+    groups.forEach(files => {
+
+        const tooLong = files.some(f =>
+            f.name.length > MAX_NAME
+            || (!VARIANT_RE.test(path.basename(f.name, path.extname(f.name)))
+                && f.name.length + LONGEST_VARIANT > MAX_NAME));
+
+        if (!tooLong) return;
+
+        files.forEach(({ full, name }) => {
+            renames.set(full, path.join(path.dirname(full), shortName(name)));
+        });
+
+    });
 
     if (renames.size === 0) {
         console.log(`Готово: задовгих імен немає (межа ${MAX_NAME} символів)`);

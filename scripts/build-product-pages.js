@@ -63,6 +63,52 @@ const { slugProblem } = require("./slug-safety");
 // гідратації фото стрибне.
 const ImageFraming = require("../assets/js/image-framing.js");
 
+// Хлібні крихти — той самий будівник, що виконується в браузері.
+// Доріжка потрібна і в розмітці сторінки, і в BreadcrumbList для
+// Google; збирати їх окремо означало б рано чи пізно показати роботу
+// шлях, якого на сторінці немає.
+const Breadcrumbs = require("../assets/js/breadcrumbs.js");
+
+const CATEGORIES_FILE = path.join(ROOT, "data", "categories.json");
+
+// назва категорії → відділ, і відділ → усі його категорії
+function loadCategoryIndex() {
+
+    if (!fs.existsSync(CATEGORIES_FILE)) return { departmentOf: () => "", categoriesOfDepartment: () => [] };
+
+    const list = JSON.parse(fs.readFileSync(CATEGORIES_FILE, "utf8"));
+    const rows = Array.isArray(list) ? list : (list.categories || []);
+
+    const byCategory = new Map();
+    const byDepartment = new Map();
+
+    rows.forEach(row => {
+
+        const name = row && (row.name || row.title);
+        const department = row && row.department;
+
+        if (!name || !department) return;
+
+        byCategory.set(name, department);
+
+        if (!byDepartment.has(department)) byDepartment.set(department, []);
+        byDepartment.get(department).push(name);
+
+    });
+
+    return {
+        departmentOf: name => byCategory.get(name) || "",
+        categoriesOfDepartment: department => byDepartment.get(department) || []
+    };
+
+}
+
+const categoryIndex = loadCategoryIndex();
+
+function trailFor(product) {
+    return Breadcrumbs.buildTrail(product, categoryIndex);
+}
+
 // Умови повернення й доставки для розмітки товару.
 //
 // Search Console просив додати hasMerchantReturnPolicy і shippingDetails
@@ -373,15 +419,10 @@ function buildHead(product) {
         };
     }
 
-    const breadcrumbLd = {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        itemListElement: [
-            { "@type": "ListItem", position: 1, name: "Головна", item: `${SITE_URL}/` },
-            { "@type": "ListItem", position: 2, name: "Каталог", item: `${SITE_URL}/catalog` },
-            { "@type": "ListItem", position: 3, name: product.title, item: url }
-        ]
-    };
+    // Раніше тут було жорстко три ланки — Головна / Каталог / Назва, —
+    // і вони не збігались із тим, що показує сайт. Тепер обидва місця
+    // беруть доріжку з одного будівника.
+    const breadcrumbLd = Breadcrumbs.toJsonLd(trailFor(product), SITE_URL, url);
 
     return [
         `<title>${escapeHtml(title)}</title>`,
@@ -420,6 +461,29 @@ function buildHead(product) {
 // ---------------------------------------------------------------
 // видимий текст сторінки (те, що бачить робот до рендеру JS)
 // ---------------------------------------------------------------
+
+// Доріжка в розмітці сторінки.
+//
+// У шаблоні product.html лежить заготовка з трьох ланок
+// (Головна / Каталог / назва). Замінюємо її цілком: інакше статична
+// сторінка показувала б коротку доріжку, а після виконання JS вона
+// стрибком ставала б довгою.
+const BREADCRUMB_SLOT_RE = /<div class="container" id="breadcrumbsList">[\s\S]*?<\/div>/;
+
+function breadcrumbsMarkup(product) {
+
+    // Адреси абсолютні, як і решта посилань у згенерованій розмітці:
+    // сторінка лежить у /p/<slug>/, і хоч <base href="/"> відносний
+    // шлях і врятує, у розмітці для робота краще не залежати від нього.
+    const nodes = trailFor(product).map(crumb => crumb.current
+        ? `<span class="crumb-current">${escapeHtml(crumb.label)}</span>`
+        : `<a href="${escapeHtml(absoluteUrl(crumb.href))}">${escapeHtml(crumb.label)}</a>`);
+
+    const html = nodes.join('\n<span class="crumb-sep">–</span>\n');
+
+    return `<div class="container" id="breadcrumbsList">\n${html}\n</div>`;
+
+}
 
 function buildBody(product) {
 
@@ -530,6 +594,7 @@ function main() {
 
         const html = template
             .replace("<!--SEO_HEAD-->", buildHead(product))
+            .replace(BREADCRUMB_SLOT_RE, breadcrumbsMarkup(product))
             .replace('<div id="productPage">\n\n</div>',
                 `<div id="productPage">${buildBody(product)}</div>`)
             .replace('<div id="productPage"></div>',

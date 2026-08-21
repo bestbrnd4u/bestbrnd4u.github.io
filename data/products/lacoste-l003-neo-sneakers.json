@@ -1,0 +1,54 @@
+{
+  "gender": [
+    "Жінкам"
+  ],
+  "preOrderDays": "5–10 робочих днів",
+  "forcePublish": false,
+  "brand": "Lacoste",
+  "price": 6500,
+  "preOrder": false,
+  "variants": [
+    {
+      "color": "Neo",
+      "hex": "#161616",
+      "sizes": [],
+      "images": [
+        "/assets/images/products/uploads/45sfa0001_075_02-1-.webp",
+        "/assets/images/products/uploads/45sfa0001_075_01.webp",
+        "/assets/images/products/uploads/ss23-obm1w1-99x_f4.webp"
+      ]
+    }
+  ],
+  "preOrderPrepayment": 50,
+  "sizes": [
+    "37"
+  ],
+  "searchKeywords": [
+    "Lacoste L003 Neo",
+    "Lacoste жіночі кросівки",
+    "жіночі кросівки Lacoste",
+    "кросівки Lacoste",
+    "Lacoste sneakers",
+    "жіночі кросівки",
+    "кросівки оригінал",
+    "брендове взуття",
+    "Lacoste L003",
+    "кросівки Lacoste L003 Neo"
+  ],
+  "isNew": false,
+  "title": "Lacoste L003 Neo Sneakers",
+  "reviews": 0,
+  "instagramBlock": "general",
+  "description": "Стильні кросівки Lacoste L003 Neo з сучасним масивним дизайном та фірмовим логотипом бренду. Комфортна посадка та універсальний силует роблять їх чудовим вибором для повсякденних образів",
+  "sku": "45SFA0001",
+  "rating": 5,
+  "category": "Кросівки",
+  "slug": "lacoste-l003-neo-sneakers",
+  "id": 39,
+  "color": "Neo",
+  "images": [
+    "/assets/images/products/uploads/45sfa0001_075_02-1-.webp",
+    "/assets/images/products/uploads/45sfa0001_075_01.webp",
+    "/assets/images/products/uploads/ss23-obm1w1-99x_f4.webp"
+  ]
+}

@@ -2796,12 +2796,34 @@ body.mobile-filters-open .scroll-top{
 }
 }
 
+/* Роздільник крихт.
+   Було: стрілка «→» з відступом 8px — сусідні пункти зливались в один
+   рядок тексту, і на око не читалось, де закінчується одна ланка й
+   починається наступна. Стало: тонка риска з більшим повітрям з боків
+   і однаковою висотою — око чіпляється за ритм, а не за форму стрілки. */
 .breadcrumbs .crumb-sep{
     display:inline-block;
-    margin:0 8px;
+    margin:0 12px;
     color:var(--gray300);
     font-size:13px;
+    /* стрілка з розмітки не показується — замість неї риска нижче,
+       щоб не правити три місця в HTML і генераторі сторінок */
+    font-size:0;
 }
+
+.breadcrumbs .crumb-sep::before{
+    content:"–";
+    font-size:15px;
+    line-height:1;
+}
+
+/* остання ланка — назва товару: не посилання, тож робимо її помітно
+   темнішою за решту, як на великих магазинах */
+.breadcrumbs .crumb-current{
+    color:var(--dark);
+    font-weight:600;
+}
+
 
 /* =====================================
    CATALOG PAGE
@@ -4245,18 +4267,100 @@ body.mobile-filters-open .scroll-top{
     z-index:3;
 }
 
+/* Крапка — справжня кнопка.
+   Обробник кліку на ній стояв і раніше, але виглядала вона як
+   декорація: курсор лишався стрілкою, з клавіатури не дійти. Тепер це
+   <button>, тож скидаємо його типове оформлення й повертаємо вигляд
+   крапки. */
 .gallery-dot{
     width:7px;
     height:7px;
+    padding:0;
+    border:0;
     border-radius:50%;
     background:rgba(17,24,39,.25);
     transition:.2s;
+    cursor:pointer;
+    position:relative;
+}
+
+/* Зона натискання більша за саму крапку: 7×7px — надто мала мішень
+   для пальця. Розширюємо псевдоелементом, а не падінгом: падінг
+   зсунув би сусідні крапки, а відʼємний margin наклав би їхні зони
+   одна на одну, і клік між крапками потрапляв би не туди.
+   По горизонталі беремо рівно 4px — половину gap (8px), тож сусідні
+   зони стикаються, але не перетинаються. */
+.gallery-dot::after{
+    content:"";
+    position:absolute;
+    inset:-9px -4px;
+}
+
+@media (hover:hover) and (pointer:fine){
+.gallery-dot:hover{
+    background:rgba(17,24,39,.55);
+}
 }
 
 .gallery-dot.active{
     width:22px;
     border-radius:4px;
     background:var(--gray900);
+}
+
+/* Стрілки гортання.
+   Півпрозорі, щоб не перетягувати увагу з товару, але з суцільним
+   тлом — інакше на світлому фото їх не видно взагалі. */
+.gallery-arrow{
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    z-index:4;
+    width:40px;
+    height:40px;
+    padding:0;
+    border:0;
+    border-radius:50%;
+    background:rgba(255,255,255,.9);
+    box-shadow:0 2px 10px rgba(0,0,0,.14);
+    color:var(--gray900);
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:background .2s, box-shadow .2s;
+}
+
+.gallery-arrow svg{
+    width:20px;
+    height:20px;
+    display:block;
+}
+
+.gallery-arrow-prev{ left:14px; }
+.gallery-arrow-next{ right:14px; }
+
+@media (hover:hover) and (pointer:fine){
+.gallery-arrow:hover{
+    background:#fff;
+    box-shadow:0 4px 16px rgba(0,0,0,.2);
+}
+}
+
+/* Фокус із клавіатури має бути видно — інакше гортання стрілками
+   з клавіатури перетворюється на здогадки, де ти зараз. */
+.gallery-arrow:focus-visible,
+.gallery-dot:focus-visible{
+    outline:2px solid var(--secondary);
+    outline-offset:2px;
+}
+
+@media(max-width:768px){
+
+    /* На телефоні гортають пальцем, і кнопки лише закривають товар.
+       Крапки лишаються — вони показують, скільки всього фото. */
+    .gallery-arrow{ display:none; }
+
 }
 
 @media(max-width:768px){
@@ -6946,10 +7050,27 @@ body.mobile-filters-open .scroll-top{
 
 .search-promo-banner{
     position:relative;
-    height:130px;
+    /* Пропорція, а не фіксована висота.
+       Було height:130px при гумовій ширині — на десктопі плитка
+       виходила 348×130 (2.68:1), на телефоні 160×130 (1.23:1). Одне й
+       те саме фото мусило пережити і широку смугу, і майже квадрат, і
+       background-size:cover зрізав людям голови. З aspect-ratio кроп
+       однаковий скрізь, тож картинку можна підготувати один раз. */
+    aspect-ratio:2 / 1;
+    min-height:104px;
     border-radius:16px;
     background-size:cover;
     background-position:center;
+    /* Картинку підставляє JS змінними --banner-lg / --banner-sm
+       (вони приходять із data/search-banners.json, який редагується
+       в адмінці). Медіазапит нижче перемикає на телефонну версію.
+       Робити це змінними, а не двома правилами з конкретними
+       адресами, — єдиний спосіб, бо адреси задає адміністратор. */
+    background-image:var(--banner-lg,none);
+    /* тло під фото: якщо файл банера колись не завантажиться, плитка
+       лишиться темною й білий підпис на ній буде видно, а не зникне
+       на білому */
+    background-color:#0f1729;
     display:flex;
     align-items:flex-end;
     padding:16px;
@@ -7123,6 +7244,13 @@ body.mobile-filters-open .scroll-top{
 
     .search-promo-banners{
         width:100%;
+    }
+
+    /* На телефоні плитка всього ~161px завширшки: смуга з трьох речей
+       перетворюється на кашу. Якщо адміністратор завантажив окрему
+       картинку — беремо її; ні — лишається та сама, що на комп'ютері. */
+    .search-promo-banner{
+        background-image:var(--banner-sm,var(--banner-lg,none));
     }
 
     .search-results{
@@ -9762,4 +9890,52 @@ body.mobile-filters-open .scroll-top{
         align-self:start;
     }
 
+}
+
+/* Картка, на яку повернулись кнопкою «Назад»
+   (assets/js/catalog.js → restoreCatalogPosition).
+   Коротка підсвітка допомагає очима знайти місце, де спинився
+   перегляд, — без неї сторінка просто відкривається десь посередині
+   списку й виглядає як випадкова. */
+.product-card.just-returned{
+    animation:justReturned 1.6s ease-out;
+}
+
+@keyframes justReturned{
+    0%   { box-shadow:0 0 0 3px var(--secondary); }
+    70%  { box-shadow:0 0 0 3px var(--secondary); }
+    100% { box-shadow:0 0 0 3px transparent; }
+}
+
+@media (prefers-reduced-motion:reduce){
+.product-card.just-returned{ animation:none; outline:3px solid var(--secondary); }
+}
+
+/* Довга доріжка крихт на вузькому екрані.
+   Після додавання рівнів «Стать → Відділ → Категорія → Бренд» доріжка
+   перестала вміщатись у телефон і переносилась у три рядки, зʼїдаючи
+   пів екрана над товаром. Тому на малих ширинах — один рядок із
+   горизонтальною прокруткою, як роблять великі магазини. */
+@media (max-width:768px){
+.breadcrumbs .container{
+    display:flex;
+    align-items:center;
+    flex-wrap:nowrap;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+}
+
+.breadcrumbs .container::-webkit-scrollbar{ display:none; }
+
+.breadcrumbs .container > *{ flex:0 0 auto; }
+
+/* назва товару може бути дуже довгою — не даємо їй розтягувати рядок
+   так, щоб початок шляху було не докрутити */
+.breadcrumbs .crumb-current{
+    max-width:60vw;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
 }

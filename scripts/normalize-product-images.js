@@ -111,6 +111,46 @@ async function normalize(file) {
 
 }
 
+// Добудувати зменшені копії для фото, яке переробляти не треба.
+//
+// НАВІЩО ОКРЕМО ВІД normalize()
+// ------------------------------
+// Копії 600/300 робилися ЛИШЕ всередині normalize(), тобто тільки для
+// знімків, які скрипт сам переводив у 4:5. Фото, що прийшло вже в
+// потрібній пропорції, копій не отримувало ніколи й не потрапляло в
+// image-variants.json — а верстка все одно просить у нього srcset.
+// Браузер на мобільному тягнув повний розмір, а тест цілісності
+// (test-image-canvas) падав на «копії 600/300 існують для всіх».
+//
+// Саме так і вийшло після завантаження кросівок Lacoste: частина
+// знімків приїхала з адмінки вже 1200×1500.
+async function buildMissingVariants(file) {
+
+    const full = path.join(DIR, file);
+    const stem = file.slice(0, -".webp".length);
+
+    const missing = VARIANT_WIDTHS.filter(width =>
+        !fs.existsSync(path.join(DIR, `${stem}-${width}.webp`)));
+
+    if (!missing.length) return false;
+
+    const source = fs.readFileSync(full);
+
+    for (const width of missing) {
+
+        const variant = await sharp(source)
+            .resize({ width })
+            .webp({ quality: 82 })
+            .toBuffer();
+
+        fs.writeFileSync(path.join(DIR, `${stem}-${width}.webp`), variant);
+
+    }
+
+    return true;
+
+}
+
 function registerVariants(files) {
 
     let list = [];
@@ -141,9 +181,33 @@ async function main() {
 
     const off = await findOffCanvas();
 
+    // Копії добудовуємо ЗАВЖДИ, а не лише для перероблених знімків:
+    // фото могло приїхати з адмінки вже в потрібній пропорції.
+    const patched = [];
+
+    if (apply) {
+
+        for (const file of baseWebpFiles()) {
+            if (await buildMissingVariants(file)) patched.push(file);
+        }
+
+        if (patched.length) {
+
+            const addedNow = registerVariants(patched);
+
+            console.log(`Добудовано копії 600/300: ${patched.length} фото`
+                + (addedNow ? `, у image-variants.json додано ${addedNow}` : ""));
+
+        }
+
+    }
+
     if (off.length === 0) {
+
         console.log(`Готово: усі ${baseWebpFiles().length} базових фото вже 4:5`);
+
         return;
+
     }
 
     console.log(`Не в пропорціях 4:5: ${off.length} фото\n`);
