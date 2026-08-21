@@ -2939,13 +2939,22 @@ body.mobile-filters-open .scroll-top{
 }
 
 /* заголовок групи тепер кнопка «згорнути/розгорнути» */
+/* Заголовок відділу — дві кнопки в один рядок: назва фільтрує,
+   «+/−» лише розгортає. Раніше це була одна кнопка, і клац по назві
+   не фільтрував нічим. */
+.sidebar-group-head{
+    display:flex;
+    align-items:center;
+}
+
 .sidebar-group-title{
     display:flex;
     align-items:center;
     justify-content:space-between;
     gap:10px;
-    width:100%;
-    padding:4px 12px 7px;
+    flex:1;
+    min-width:0;
+    padding:4px 6px 7px 12px;
     font-size:12px;
     font-weight:800;
     letter-spacing:.8px;
@@ -2958,6 +2967,26 @@ body.mobile-filters-open .scroll-top{
 
 .sidebar-group-title:hover{
     color:var(--gray700);
+}
+
+/* обраний відділ — так само помітно, як обрана категорія */
+.sidebar-group-title.active{
+    color:var(--secondary);
+}
+
+/* Кнопка «+/−». Окрема мішень: у неї треба влучити, не зачепивши
+   фільтр, тому робимо її відчутно більшою за сам значок. */
+.sidebar-group-toggle{
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:30px;
+    height:26px;
+    padding:0;
+    border:0;
+    background:none;
+    cursor:pointer;
 }
 
 /* Значок «+ / −» з двох ліній: горизонтальна є завжди, вертикальна

@@ -50,8 +50,26 @@
 
     }
 
-    function catalogHref(param, value) {
-        return "catalog?" + param + "=" + encodeURIComponent(value);
+    // Посилання крихти НАКОПИЧУВАЛЬНЕ: несе всі фільтри лівіше себе.
+    //
+    // Спершу кожна ланка вела лише за собою — «Balenciaga» відкривала
+    // catalog?brand=Balenciaga, і від шляху лишався один бренд:
+    // ні статі, ні відділу, ні категорії в фільтрах не було. Людина
+    // клацала «Balenciaga» всередині «Окуляри і оправи», а бачила всі
+    // товари бренду.
+    //
+    // Тепер кожна ланка додає себе до попередніх — так само, як на
+    // великих магазинах: клац по «Under Armour» лишає і «Спорт», і
+    // «Кросівки для тренувань», і «Чоловікам».
+    function catalogHref(parts) {
+
+        var query = Object.keys(parts)
+            .filter(function (key) { return parts[key]; })
+            .map(function (key) { return key + "=" + encodeURIComponent(parts[key]); })
+            .join("&");
+
+        return query ? "catalog?" + query : "catalog";
+
     }
 
     // options.departmentOf — функція «назва категорії → назва відділу».
@@ -64,9 +82,15 @@
 
         if (!product) return trail;
 
+        // накопичувач: кожна наступна ланка бачить усе, що було лівіше
+        var so_far = {};
+
         var gender = firstGender(product);
 
-        if (gender) trail.push({ label: gender, href: catalogHref("gender", gender) });
+        if (gender) {
+            so_far.gender = gender;
+            trail.push({ label: gender, href: catalogHref(so_far) });
+        }
 
         var category = product.category || "";
 
@@ -76,20 +100,23 @@
                 ? opts.departmentOf(category)
                 : "";
 
-            // Відділ має власний параметр. Спершу тут стояло перелічення
-            // всіх його категорій через кому — виходило посилання на
-            // 700 символів, яке ще й мінялось щоразу, коли в адмінці
-            // додавали категорію. Тепер це коротке ?department=Аксесуари.
+            // Відділ має власний короткий параметр. Спершу тут стояло
+            // перелічення всіх його категорій через кому — виходило
+            // посилання на 700 символів, яке ще й мінялось щоразу, коли
+            // в адмінці додавали категорію.
             if (department) {
-                trail.push({ label: department, href: catalogHref("department", department) });
+                so_far.department = department;
+                trail.push({ label: department, href: catalogHref(so_far) });
             }
 
-            trail.push({ label: category, href: catalogHref("category", category) });
+            so_far.category = category;
+            trail.push({ label: category, href: catalogHref(so_far) });
 
         }
 
         if (product.brand) {
-            trail.push({ label: product.brand, href: catalogHref("brand", product.brand) });
+            so_far.brand = product.brand;
+            trail.push({ label: product.brand, href: catalogHref(so_far) });
         }
 
         // остання ланка — сам товар, без посилання
