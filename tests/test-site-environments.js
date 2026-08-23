@@ -332,6 +332,42 @@ console.log("\n[6] Дев-збірка налаштована в CI");
 
     const prodWf = read(".github/workflows/build-products.yml");
     check("прод-збірка застосовує середовище", prodWf.includes("apply-site-env.js"));
+
+    // КОЖЕН workflow, що пише в main, мусить сам запустити деплой.
+    //
+    // Пуш, зроблений вбудованим GITHUB_TOKEN, НЕ породжує події push —
+    // GitHub так захищається від нескінченних ланцюжків. А
+    // deploy-pages.yml слухає саме `on: push: branches: [main]`.
+    //
+    // build-products.yml цю пастку обходив, sync-branches.yml — ні, і
+    // перенесення dev → main спрацьовувало «наполовину»: у гілці
+    // лежали правильні файли, а сайт лишався на старій збірці. Ззовні
+    // виглядало так, ніби товари не перенеслись, хоча перенеслось усе.
+    [
+        [".github/workflows/build-products.yml", "прод-збірка"],
+        [".github/workflows/sync-branches.yml", "перенесення гілок"]
+    ].forEach(([file, label]) => {
+
+        const wf = read(file);
+
+        check(`${label} сама запускає деплой`,
+            /gh workflow run deploy-pages\.yml/.test(wf));
+
+        // без actions: write крок падає з 403
+        check(`${label} має право запустити деплой`,
+            /permissions:[\s\S]{0,300}actions:\s*write/.test(wf));
+
+    });
+
+    // Умова «якщо були зміни» тут — пастка: коли файли в main уже
+    // правильні, а сайт застряг на старій збірці, повторний Sync
+    // нічого не переносить і деплою теж не буде.
+    const syncWf = read(".github/workflows/sync-branches.yml");
+    const deployStep = syncWf.slice(syncWf.indexOf("- name: Trigger deploy"));
+
+    check("деплой після перенесення не залежить від наявності змін",
+        /if:\s*steps\.pick\.outputs\.to == 'main'\s*\n/.test(deployStep)
+        && !/pushed == 'true'/.test(deployStep.slice(0, 200)));
     check("прод-збірка комітить CNAME і robots",
         /git add[\s\S]{0,200}CNAME/.test(prodWf));
 }
