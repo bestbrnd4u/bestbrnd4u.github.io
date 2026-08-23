@@ -27,7 +27,9 @@
     }
   ],
   "preOrderPrepayment": 50,
-  "sizes": null,
+  "sizes": [
+    "ONESIZE"
+  ],
   "isNew": true,
   "title": "Шкіряна сумочка крос-боді Love Moschino quilted",
   "images": [

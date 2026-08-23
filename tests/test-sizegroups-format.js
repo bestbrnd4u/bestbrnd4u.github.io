@@ -10,7 +10,11 @@ console.log("\n[1] Формат файлу відповідає тому, що �
   check("корінь — об'єкт, а не масив (інакше розділ порожній)",
         !Array.isArray(raw) && typeof raw==="object", Array.isArray(raw)?"array":typeof raw);
   check("ключ збігається з іменем поля в конфізі — groups", Array.isArray(raw.groups));
-  check("4 групи на місці", raw.groups.length===4, raw.groups.length);
+  // Скільки саме груп — вирішують дані, а не тест: раніше тут стояло
+  // жорстке 4, і видалення групи «Сумки» валило перевірку, хоча файл
+  // лишався коректним. Важливо, що групи є і що в кожної є ключ.
+  check("групи на місці", raw.groups.length>0 && raw.groups.every(g=>g.key),
+        raw.groups.map(g=>g.key).join(","));
 }
 
 console.log("\n[2] Завантажувач розуміє обидві форми");
@@ -27,15 +31,24 @@ async function load(payload){
 {
   const real=JSON.parse(fs.readFileSync(path.join(ROOT,"data/size-groups.json"),"utf8"));
   const fromObject=await load(real);
-  check("формат Decap {groups:[…]} → 4 групи", fromObject.length===4, fromObject.length);
-  check("назви збереглись", fromObject.map(g=>g.title).join(",")==="Сумки,Рюкзаки,Одяг,Взуття",
+  check("формат Decap {groups:[…]} читається повністю",
+        fromObject.length===real.groups.length, fromObject.length);
+  check("назви збереглись",
+        fromObject.map(g=>g.title).join(",")===real.groups.map(g=>g.title).join(","),
         fromObject.map(g=>g.title).join(","));
 
   const fromArray=await load(real.groups);
-  check("голий масив теж працює (зворотна сумісність)", fromArray.length===4, fromArray.length);
+  check("голий масив теж працює (зворотна сумісність)",
+        fromArray.length===real.groups.length, fromArray.length);
 
   const broken=await load({});
-  check("порожній об'єкт → запасний набір, сайт не ламається", broken.length===4, broken.length);
+  // Запасний набір продубльований у common.js. Він мусить збігатися з
+  // файлом за складом груп — інакше при збої завантаження у фільтрі
+  // зʼявиться те, чого в даних немає (саме так там лишалися «Сумки»).
+  check("порожній об'єкт → запасний набір, сайт не ламається", broken.length>0, broken.length);
+  check("запасний набір збігається з файлом",
+        broken.map(g=>g.key).sort().join(",")===real.groups.map(g=>g.key).sort().join(","),
+        broken.map(g=>g.key).join(","));
 }
 
 console.log(failures===0?"\n✅ Усі перевірки пройдено":`\n❌ Провалено: ${failures}`);

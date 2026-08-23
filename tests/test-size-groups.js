@@ -43,7 +43,10 @@ console.log("\n[2] Файл налаштувань коректний");
 {
   check("корінь файлу — об'єкт з ключем groups (формат Decap)",
         !Array.isArray(RAW) && Array.isArray(RAW.groups), Array.isArray(RAW)?"array":typeof RAW);
-  check("4 групи", GROUPS.length===4, GROUPS.length);
+  // Груп три: сумки виведені окремо — усі вони мають ONESIZE, тож
+  // фільтр за розміром для них нічого не звужував би (так само, як
+  // в окулярів і годинників, у яких групи теж немає).
+  check("3 групи", GROUPS.length===3, GROUPS.length);
   GROUPS.forEach(g=>{
     check(`«${g.title}»: є розміри`, Array.isArray(g.sizes)&&g.sizes.length>0);
     if (g.guideNote) {
@@ -69,11 +72,13 @@ console.log("\n[3] Розв'язання категорій (вручну + че
     (acc[c.department]=acc[c.department]||{title:c.department,categories:[]}).categories.push(c.name);
     return acc;},{}));
 
-  const bags=GROUPS.find(g=>g.key==="bags");
+  const backpacks=GROUPS.find(g=>g.key==="backpacks");
   const shoes=GROUPS.find(g=>g.key==="shoes");
 
+  // «Рюкзаки» перелічують категорії вручну, «Взуття» — через розділ:
+  // перевіряємо обидва способи (раніше тут для цього була група сумок).
   check("група з переліком категорій — беруться вони",
-        window.resolveGroupCategories(bags,tree).includes("Жіночі сумки"));
+        window.resolveGroupCategories(backpacks,tree).includes("Рюкзаки"));
   check("група через розділ підхоплює ВСІ категорії розділу",
         window.resolveGroupCategories(shoes,tree).includes("Босоніжки")
         && window.resolveGroupCategories(shoes,tree).includes("Кросівки"),
@@ -84,8 +89,10 @@ console.log("\n[3] Розв'язання категорій (вручну + че
 
   check("за категорією знаходиться група: Кросівки → Взуття",
         window.findSizeGroupForCategory(GROUPS,"Кросівки",tree)?.key==="shoes");
-  check("Жіночі сумки → Сумки",
-        window.findSizeGroupForCategory(GROUPS,"Жіночі сумки",tree)?.key==="bags");
+  // Сумки тепер без групи — як окуляри й годинники: розмір у них один,
+  // таблиці розмірів показувати нема чого.
+  check("Жіночі сумки → групи немає (усі сумки ONESIZE)",
+        window.findSizeGroupForCategory(GROUPS,"Жіночі сумки",tree)===null);
   check("Годинники (аксесуар) → групи немає, таблиця не показується",
         window.findSizeGroupForCategory(GROUPS,"Годинники",tree)===null);
 }
