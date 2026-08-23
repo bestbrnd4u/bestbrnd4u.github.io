@@ -47,10 +47,25 @@
     var MIN_ZOOM = 1;
     var MAX_ZOOM = 3;
 
-    function clamp(value, min, max) {
-        value = Number(value);
-        if (!isFinite(value)) return min;
-        return value < min ? min : (value > max ? max : value);
+    // Число в межах або значення за замовчуванням.
+    //
+    // fallback, а не min: для точки фокуса «не задано» означає центр
+    // (50), а не лівий край. Раніше тут стояв Number(value) без
+    // перевірки на null — а Number(null) це 0, тож рамка з x: null
+    // мовчки зсувала кадр до лівого краю замість того, щоб лишити
+    // його по центру.
+    function clamp(value, min, max, fallback) {
+
+        if (value === null || value === undefined || value === "") {
+            return fallback === undefined ? min : fallback;
+        }
+
+        var num = Number(value);
+
+        if (!isFinite(num)) return fallback === undefined ? min : fallback;
+
+        return num < min ? min : (num > max ? max : num);
+
     }
 
     // "/assets/images/products/uploads/a.webp" → "a.webp"
@@ -63,16 +78,21 @@
 
         if (!frame || typeof frame !== "object") return null;
 
-        var zoom = clamp(frame.zoom === undefined ? 1 : frame.zoom, MIN_ZOOM, MAX_ZOOM);
+        var zoom = clamp(frame.zoom, MIN_ZOOM, MAX_ZOOM, MIN_ZOOM);
+        var x = clamp(frame.x, 0, 100, 50);
+        var y = clamp(frame.y, 0, 100, 50);
 
-        // zoom = 1 нічого не змінює, тож і зберігати нема чого
-        if (zoom === MIN_ZOOM) return null;
+        // Порожня рамка — це 1× І центр. Раніше вистачало самого 1×,
+        // бо кадрування було лише для товару: там фото 4:5 лежить у
+        // контейнері 4:5, нічого не обрізається, і точка фокуса без
+        // наближення справді нічого не міняла.
+        //
+        // Для банера й акції це не так: контейнер має ІНШУ пропорцію,
+        // кадр обрізається завжди, і точка фокуса вирішує, що саме
+        // лишиться видимим — навіть при 1×. Тому тепер зберігаємо і її.
+        if (zoom === MIN_ZOOM && x === 50 && y === 50) return null;
 
-        return {
-            zoom: zoom,
-            x: clamp(frame.x === undefined ? 50 : frame.x, 0, 100),
-            y: clamp(frame.y === undefined ? 50 : frame.y, 0, 100)
-        };
+        return { zoom: zoom, x: x, y: y };
 
     }
 
@@ -101,6 +121,15 @@
 
         if (!frame) return {};
 
+        // Три змінні на всі випадки — стилі беруть те, що їм підходить:
+        //
+        //   товар   transform: scale(--frame-zoom) з transform-origin —
+        //           фото і контейнер однієї пропорції, обрізати нічого,
+        //           треба наблизити;
+        //   акція   object-position: --frame-x --frame-y при object-fit:
+        //           cover — пропорції різні, кадр ріжеться, і точка
+        //           вирішує, що лишиться;
+        //   банер   background-position з тими самими числами.
         return {
             "--frame-zoom": String(frame.zoom),
             "--frame-x": frame.x + "%",

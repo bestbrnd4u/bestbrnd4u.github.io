@@ -173,20 +173,33 @@ console.log("\n[6] Повний шлях у крихтах товару");
     // фільтри з адреси. Без цього доріжка була б декоративною.
     check("стать веде у каталог із фільтром",
         trail[2].href === "catalog?gender=" + encodeURIComponent("Жінкам"), trail[2].href);
-    check("бренд теж", /^catalog\?brand=/.test(trail[5].href));
+    // Кожна ланка НАКОПИЧУВАЛЬНА: несе все, що лівіше.
+    //
+    // Спершу «Balenciaga» відкривала catalog?brand=Balenciaga — і від
+    // шляху лишався один бренд: ні статі, ні відділу, ні категорії в
+    // фільтрах не було. Людина клацала бренд усередині «Окуляри і
+    // оправи», а бачила всі товари бренду.
+    const q = href => new URLSearchParams(String(href).split("?")[1] || "");
 
-    // Спершу відділ вів у каталог з перелічуванням усіх своїх категорій —
-    // виходило посилання на 700 символів, яке ще й мінялось щоразу, коли
-    // в адмінці додавали категорію.
-    check("відділ має короткий власний параметр",
-        trail[3].href === "catalog?department=" + encodeURIComponent("Аксесуари"), trail[3].href);
-    // Головна ознака — у посиланні ОДНА назва, а не перелік категорій:
-    // кирилиця в percent-encoding і так роздуває довжину втричі, тож
-    // міряти самі символи було б крихко.
+    check("відділ несе стать",
+        q(trail[3].href).get("gender") === "Жінкам"
+        && q(trail[3].href).get("department") === "Аксесуари", trail[3].href);
+
+    check("категорія несе стать і відділ",
+        q(trail[4].href).get("department") === "Аксесуари"
+        && q(trail[4].href).get("category") === "Окуляри і оправи");
+
+    check("бренд несе весь шлях",
+        ["gender", "department", "category", "brand"].every(k => q(trail[5].href).get(k)),
+        trail[5].href);
+
+    // Відділ має власний короткий параметр: спершу він вів у каталог із
+    // перелічуванням усіх своїх категорій через кому — виходило
+    // посилання на 700 символів, яке ще й мінялось щоразу, коли в
+    // адмінці додавали категорію.
     check("у посиланні відділу не перелік категорій",
-        !trail[3].href.includes("%2C") && !trail[3].href.includes(","), trail[3].href);
-    check("посилання відділу лишається коротким",
-        trail[3].href.length < 120, trail[3].href.length);
+        !q(trail[3].href).get("department").includes(","),
+        q(trail[3].href).get("department"));
 
     check("каталог знає фільтр department",
         /department: "department"/.test(catalog) && /selectedDepartments/.test(catalog));
@@ -281,6 +294,40 @@ console.log("\n[7] Фільтр ціни не вмикається сам");
 
     check("прямого Number(params.get(…)) у каталозі не лишилось",
         !/Number\(params\.get\(/.test(code) && !/Number\(new URLSearchParams/.test(code));
+}
+
+console.log("\n[8] Відділ у бічному меню — фільтр, а не лише розгортання");
+{
+    // Заголовок відділу був однією кнопкою, яка тільки розгортала
+    // список: відфільтрувати на «Аксесуари» було нічим, хоча в хлібних
+    // крихтах це повноцінна ланка. Тепер назва фільтрує, а «+/−»
+    // лишається окремою кнопкою-перемикачем.
+    check("назва відділу — окрема кнопка-фільтр",
+        /data-sidebar-department=/.test(catalog));
+    check("«+/−» лишився окремим перемикачем",
+        /class="sidebar-group-toggle"[\s\S]{0,140}data-sidebar-group-toggle/.test(catalog));
+    check("у перемикача є підпис для зчитувача",
+        /aria-label="\$\{isCollapsed \? "Розгорнути" : "Згорнути"\}/.test(catalog));
+
+    check("клік по відділу фільтрує", /function toggleDepartment/.test(catalog));
+    check("стан відділу оновлюється при перемальовці",
+        /aria-pressed", isActive \? "true" : "false"/.test(catalog));
+
+    // Відділ могли обрати хлібною крихтою — тоді група має розгорнутись,
+    // інакше фільтр застосований, а звідки він узявся, у меню не видно.
+    check("група розгортається, якщо відділ обрано ззовні",
+        /Відділ могли обрати не тут/.test(catalog));
+
+    check("відділ показується серед активних фільтрів",
+        /type: "department", value: department/.test(catalog));
+    check("чіп відділу знімається", /type === "department"/.test(catalog));
+    check("«Скинути фільтри» скидає й відділ", /selectedDepartments\.clear\(\)/.test(catalog));
+    check("відділ рахується у лічильнику фільтрів",
+        /\+ selectedDepartments\.size/.test(catalog));
+
+    check("є стилі роздільного заголовка",
+        /\.sidebar-group-head\{/.test(css) && /\.sidebar-group-toggle\{/.test(css));
+    check("обраний відділ підсвічений", /\.sidebar-group-title\.active\{/.test(css));
 }
 
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);

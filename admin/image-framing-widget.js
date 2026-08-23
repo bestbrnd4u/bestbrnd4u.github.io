@@ -74,22 +74,70 @@
 
     // ---------- дані ----------
 
-    // Усі фото товару: з кожного кольору, без повторів, у порядку появи.
+    // Усі фото запису — з будь-якої колекції.
+    //
+    // Спершу функція вміла лише варіанти товару
+    // (data.variants[].images), тож в акціях і на головній не знаходила
+    // нічого. Тепер обходимо дані вглиб і збираємо все, що виглядає як
+    // шлях до картинки: у товару це фото кольорів, в акції — image,
+    // imageMobile і пара для сторінки акції, на головній — фон банера,
+    // фон блока «Нова колекція» й фото категорій.
+    //
+    // Підпис беремо зі шляху до поля: у товару він лишається
+    // зрозумілим, а в акції одразу видно, яке саме це з чотирьох фото.
+    var IMAGE_RE = /\.(webp|jpe?g|png|avif|gif)$/i;
+
+    // Поля, де шлях до картинки трапляється всередині тексту, а не як
+    // саме фото, — інакше в список лізли б посилання з опису.
+    var SKIP_KEYS = { body: 1, description: 1, seoDescription: 1 };
+
     function collectImages(entryData) {
 
         var out = [];
         var seen = {};
 
-        var variants = entryData.get("variants");
-        var list = (variants && variants.toJS) ? variants.toJS() : [];
+        function walk(value, label) {
 
-        list.forEach(function (variant) {
-            (((variant || {}).images) || []).forEach(function (src) {
-                if (!src || seen[src]) return;
-                seen[src] = true;
-                out.push({ src: src, color: variant.color || "" });
-            });
-        });
+            if (value === null || value === undefined) return;
+
+            if (typeof value.toJS === "function") value = value.toJS();
+
+            if (typeof value === "string") {
+
+                if (!IMAGE_RE.test(value) || seen[value]) return;
+
+                seen[value] = true;
+                out.push({ src: value, label: label });
+
+                return;
+
+            }
+
+            if (Array.isArray(value)) {
+
+                value.forEach(function (item, index) {
+                    walk(item, label + " " + (index + 1));
+                });
+
+                return;
+
+            }
+
+            if (typeof value === "object") {
+
+                Object.keys(value).forEach(function (key) {
+
+                    if (SKIP_KEYS[key]) return;
+
+                    walk(value[key], label ? label + " → " + key : key);
+
+                });
+
+            }
+
+        }
+
+        walk(entryData, "");
 
         return out;
 
@@ -327,7 +375,7 @@
                         return h(FrameEditor, {
                             key: item.src + index,
                             src: item.src,
-                            color: item.color,
+                            color: item.label,
                             url: url,
                             lib: lib,
                             frame: self.frameOf(lib, item.src),

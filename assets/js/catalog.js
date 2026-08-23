@@ -982,6 +982,20 @@ function fillCategories(categoryDepartments) {
 
 const catalogSidebar = document.getElementById("catalogSidebar");
 
+// Увімкнути / вимкнути фільтр за відділом.
+//
+// Обраний відділ звужує до всіх своїх категорій одразу. Вибрані
+// всередині нього окремі категорії при вимкненні лишаємо: людина могла
+// відмітити їх свідомо, і мовчки скидати чужий вибір не варто.
+function toggleDepartment(name) {
+
+    if (selectedDepartments.has(name)) selectedDepartments.delete(name);
+    else selectedDepartments.add(name);
+
+    applyFilterChange();
+
+}
+
 function fillCatalogSidebar(categoryDepartments) {
 
     if (!catalogSidebar) return;
@@ -1020,13 +1034,33 @@ function fillCatalogSidebar(categoryDepartments) {
         const hasActive = department.categories.some(({ name }) => selectedCategories.has(name));
         const isCollapsed = !hasActive && !expanded.has(department.title);
 
+        // Заголовок відділу — ДВІ окремі кнопки.
+        //
+        // Раніше це була одна кнопка, яка лише розгортала список: на
+        // сам відділ відфільтрувати було нічим, хоча в хлібних крихтах
+        // «Аксесуари» — повноцінна ланка. Тепер назва фільтрує, а «+/−»
+        // лишається тільки перемикачем — як у великих магазинах.
+        const departmentCount = department.categories
+            .reduce((sum, item) => sum + item.count, 0);
+
+        const departmentActive = selectedDepartments.has(department.title);
+
         html += `<div class="sidebar-group${isCollapsed ? " collapsed" : ""}" data-sidebar-group="${escapeHtml(department.title)}">
-            <button type="button" class="sidebar-group-title"
-                    data-sidebar-group-toggle
-                    aria-expanded="${isCollapsed ? "false" : "true"}">
-                <span>${escapeHtml(department.title)}</span>
-                <span class="sidebar-group-icon" aria-hidden="true"></span>
-            </button>
+            <div class="sidebar-group-head">
+                <button type="button"
+                        class="sidebar-group-title${departmentActive ? " active" : ""}"
+                        data-sidebar-department="${escapeHtml(department.title)}"
+                        aria-pressed="${departmentActive ? "true" : "false"}">
+                    <span>${escapeHtml(department.title)}</span>
+                    <span class="sidebar-count">${departmentCount}</span>
+                </button>
+                <button type="button" class="sidebar-group-toggle"
+                        data-sidebar-group-toggle
+                        aria-expanded="${isCollapsed ? "false" : "true"}"
+                        aria-label="${isCollapsed ? "Розгорнути" : "Згорнути"} «${escapeHtml(department.title)}»">
+                    <span class="sidebar-group-icon" aria-hidden="true"></span>
+                </button>
+            </div>
             <div class="sidebar-group-body">`;
 
         department.categories.forEach(({ name, count }) => {
@@ -1062,6 +1096,12 @@ function fillCatalogSidebar(categoryDepartments) {
     catalogSidebar.querySelectorAll("[data-sidebar-category]").forEach(button => {
 
         button.addEventListener("click", () => toggleCategory(button.dataset.sidebarCategory));
+
+    });
+
+    catalogSidebar.querySelectorAll("[data-sidebar-department]").forEach(button => {
+
+        button.addEventListener("click", () => toggleDepartment(button.dataset.sidebarDepartment));
 
     });
 
@@ -1206,7 +1246,36 @@ function updateSidebarActive() {
 
     const allButton = catalogSidebar.querySelector("[data-sidebar-all]");
 
-    if (allButton) allButton.classList.toggle("active", selectedCategories.size === 0);
+    // «Всі товари» гасне, щойно щось обрано — і категорією, і відділом
+    if (allButton) {
+        allButton.classList.toggle("active",
+            selectedCategories.size === 0 && selectedDepartments.size === 0);
+    }
+
+    catalogSidebar.querySelectorAll("[data-sidebar-department]").forEach(button => {
+
+        const isActive = selectedDepartments.has(button.dataset.sidebarDepartment);
+
+        button.classList.toggle("active", isActive);
+        button.setAttribute("aria-pressed", isActive ? "true" : "false");
+
+        // Відділ могли обрати не тут, а хлібною крихтою з картки
+        // товару. Тоді група має бути розгорнута — інакше фільтр
+        // застосований, а звідки він узявся, у меню не видно.
+        if (isActive) {
+
+            const group = button.closest(".sidebar-group");
+
+            if (group?.classList.contains("collapsed")) {
+
+                group.classList.remove("collapsed");
+                group.querySelector("[data-sidebar-group-toggle]")?.setAttribute("aria-expanded", "true");
+
+            }
+
+        }
+
+    });
 
     catalogSidebar.querySelectorAll("[data-sidebar-category]").forEach(button => {
 
@@ -2694,6 +2763,14 @@ function renderActiveFilters() {
 
     });
 
+    // Відділ іде перед категоріями — так само, як у хлібних крихтах:
+    // він ширший за категорію, і читати зліва направо логічніше.
+    selectedDepartments.forEach(department => {
+
+        chips.push({ type: "department", value: department, label: department });
+
+    });
+
     selectedCategories.forEach(category => {
 
         chips.push({ type: "category", value: category, label: category });
@@ -2862,6 +2939,10 @@ function clearOneFilter(type, value) {
 
         updateCategoryUI();
 
+    } else if (type === "department") {
+
+        selectedDepartments.delete(value);
+
     } else if (type === "price") {
 
         resetPriceRange();
@@ -2892,6 +2973,10 @@ function resetAllFilters() {
 
     selectedCategories.clear();
     updateCategoryUI();
+
+    // «Скинути фільтри» має скидати ВСЕ: без цього рядка відділ,
+    // прийнесений хлібною крихтою, лишався б висіти після скидання
+    selectedDepartments.clear();
 
     resetPriceRange();
     updatePriceUI();
@@ -3079,6 +3164,7 @@ if (!window.CATALOG_SKIP_AUTO_INIT) {
             + selectedBrands.size
             + selectedColors.size
             + selectedCategories.size
+            + selectedDepartments.size
             + (priceFilterActive() ? 1 : 0)
             + selectedSizes.size;
 
