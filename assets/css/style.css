@@ -838,11 +838,19 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
    HERO
 ===================================== */
 
-/* тёмна підкладка позаду hero — щоб у вирізі
-   скругленого нижнього кута було видно темний
-   колір, а не світлий фон сторінки */
+/* Обгортка hero.
+   
+   Тут була темна підкладка #111827 — щоб у вирізі скругленого
+   нижнього кута замість світлого фону сторінки виднівся темний колір.
+   На практиці це читалось не як задум, а як два чорні кути, наче щось
+   не домалювалось: сам вигин світлий, а куточок біля нього чорний.
+   
+   Тепер підкладка прозора — у вирізі видно звичайний фон сторінки, і
+   нижній край банера виглядає рівним скругленням. Сам елемент лишаємо:
+   він є в статичній розмітці головної, і прибирати його заради одного
+   правила означало б чіпати build-home-static.js без потреби. */
 .hero-backdrop{
-    background:#111827;
+    background:transparent;
 }
 
 .hero{
@@ -4988,6 +4996,8 @@ body.mobile-filters-open .scroll-top{
 
 .brand-teaser-image{
     aspect-ratio:4/5;
+    display:block;
+    overflow:hidden;
 }
 
 .brand-teaser-image img{
@@ -4996,6 +5006,7 @@ body.mobile-filters-open .scroll-top{
     object-fit:cover;
     object-position:top;
     display:block;
+    transition:.5s;
 }
 
 .brand-teaser-content{
@@ -5096,6 +5107,8 @@ body.mobile-filters-open .scroll-top{
 .brand-campaign-image{
     display:block;
     min-height:420px;
+    /* без overflow збільшене фото вилазило б за межі банера */
+    overflow:hidden;
 }
 
 .brand-campaign-image img{
@@ -5103,6 +5116,7 @@ body.mobile-filters-open .scroll-top{
     height:100%;
     object-fit:cover;
     display:block;
+    transition:.5s;
 }
 
 .brand-campaign-content{
@@ -9409,6 +9423,24 @@ body.mobile-filters-open .scroll-top{
     background:var(--gray100);
 }
 
+/* Світла смуга над фото — чому тут line-height:0.
+   
+   Фото загорнуте в посилання, і в розмітці між <a> і <picture> є
+   перенос рядка. Це пробільний текстовий вузол: у блоковому контейнері
+   він утворює власний рядок висотою line-height — світлу смугу НАД
+   картинкою на всю ширину блока. На десктопі її не видно, бо блок
+   високий, а на телефоні вона впадає в око одразу під шапкою.
+   
+   line-height:0 схлопує цей рядок. Прибрати перенос у шаблоні було б
+   крихко: будь-яке переформатування коду поверне смугу назад. */
+.promo-hero-slide-image,
+.brand-campaign-image,
+.brand-teaser-image,
+.collection-image{
+    line-height:0;
+    font-size:0;
+}
+
 /* <picture> — інлайновий елемент, тож без цього він не розтягується
    на всю висоту колонки і object-fit у вкладеного <img> нічого не дає */
 /* Те саме, що й для добірки: <picture> інлайновий, і без розтягування
@@ -9979,4 +10011,119 @@ body.mobile-filters-open .scroll-top{
     text-overflow:ellipsis;
     white-space:nowrap;
 }
+}
+
+/* =====================================
+   ОФОРМЛЕННЯ ТЕКСТОВИХ БЛОКІВ З АДМІНКИ
+   (assets/js/text-styles.js)
+
+   Значення задаються в адмінці й проставляються на корінь блока
+   CSS-змінними. У КОЖНОГО правила є запасне значення — те, що діяло
+   досі. Тому порожні налаштування = поточний вигляд сайту, а
+   «скинути оформлення» = прибрати значення.
+
+   Клас .has-style ставиться лише тоді, коли щось справді задано:
+   без нього ці правила взагалі не застосовуються й не можуть нічого
+   зіпсувати у блоках, які ніхто не налаштовував.
+   ===================================== */
+
+.has-style{
+    font-family:var(--blk-font, inherit);
+    text-align:var(--blk-align, inherit);
+}
+
+.has-style h1,
+.has-style h2,
+.has-style h3,
+.has-style p,
+.has-style span{
+    color:var(--blk-text, inherit);
+}
+
+/* Заголовок масштабується множником, а не фіксованим розміром:
+   інакше на телефоні він ламав би верстку, бо там свій розмір. */
+.has-style h1,
+.has-style h2{
+    font-size:calc(var(--blk-title-base, 1em) * var(--blk-title-scale, 1));
+    text-transform:var(--blk-transform, none);
+    letter-spacing:var(--blk-tracking, inherit);
+}
+
+/* Дрібний підпис над заголовком має власний колір: він і задуманий
+   як акцент, і зливати його з основним текстом було б втратою. */
+.has-style .hero-label,
+.has-style .promo-label,
+.has-style .collection-eyebrow,
+.has-style .promo-card-label{
+    color:var(--blk-accent, inherit);
+    letter-spacing:var(--blk-tracking, inherit);
+}
+
+.has-style .btn,
+.has-style .btn-primary,
+.has-style .hero-actions a,
+.has-style .promo-actions a,
+.has-style .collection-cta{
+    background:var(--blk-btn-bg, inherit);
+    color:var(--blk-btn-text, inherit);
+    border-color:var(--blk-btn-bg, inherit);
+}
+
+/* Прозорі кнопки (btn-outline) мають лишатись прозорими — у них колір
+   з адмінки задає рамку й текст, а не заливку. Інакше «Дивитись
+   каталог» поруч із основною кнопкою перетворювалась би на її копію. */
+.has-style .btn-outline{
+    background:transparent;
+    color:var(--blk-btn-bg, inherit);
+    border-color:var(--blk-btn-bg, inherit);
+}
+
+/* Наведення на фото акції: воно трохи наближується й тим показує, що
+   на нього можна натиснути.
+
+   Так уже поводився слайдер акцій (.promo-hero-slide-image) — цей блок
+   тут за зразок. Двом іншим способам показу бракувало трьох речей:
+   overflow (інакше збільшене фото вилазить за межі), transition
+   (інакше стрибок замість руху) і власне правила на :hover. У
+   компактного тизера фото ще й не було посиланням — курсор лишався
+   стрілкою.
+
+   Тільки для миші: на тачскріні :hover «залипає» після дотику, і фото
+   лишалося б збільшеним доти, доки не торкнешся чогось іншого. */
+@media (hover:hover) and (pointer:fine){
+
+.brand-campaign-image:hover img,
+.brand-teaser-image:hover img{
+    transform:scale(1.04);
+}
+
+}
+
+/* Фокус із клавіатури має бути видно: фото — це посилання, і людина,
+   що ходить табом, мусить розуміти, де вона зараз. */
+.brand-campaign-image:focus-visible,
+.brand-teaser-image:focus-visible,
+.promo-hero-slide-image:focus-visible,
+.collection-image:focus-visible{
+    outline:3px solid var(--secondary);
+    outline-offset:3px;
+}
+
+/* Фото добірки як перемикач сторінок.
+   Клас ставить JS і лише тоді, коли сторінок справді більше однієї —
+   інакше фото вдавало б кнопку, яка нічого не робить. */
+.collection-image.is-pager{
+    cursor:pointer;
+}
+
+@media (hover:hover) and (pointer:fine){
+
+.collection-image.is-pager img{
+    transition:.5s;
+}
+
+.collection-image.is-pager:hover img{
+    transform:scale(1.04);
+}
+
 }

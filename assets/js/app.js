@@ -64,6 +64,13 @@ async function initHomeContent() {
 
         const data = await response.json();
 
+        // Вантажимо тільки ті шрифти, які справді десь обрані:
+        // підключати всі шість завжди — це сотні кілобайтів на кожне
+        // відкриття заради шрифту, яким може ніхто не користуватись.
+        if (window.TextStyles) {
+            window.TextStyles.ensureFonts([data.hero?.style, data.promo?.style]);
+        }
+
         renderHero(data.hero, data.framing);
         renderInstagramBlock(data.instagram);
         renderCategories(data.categories);
@@ -194,6 +201,40 @@ function promoPicture(promo, breakpoint, extraAttrs) {
 
 }
 
+// Оформлення текстового блока з адмінки (assets/js/text-styles.js).
+//
+// Клас has-style ставиться ЛИШЕ коли щось справді задано. Без цього
+// правила з .has-style взагалі не спрацьовують — тобто блок, який
+// ніхто не налаштовував, не може змінитись від цієї функції ніяк.
+//
+// Повертає рядок для атрибута style або порожній рядок.
+function blockStyleAttr(style) {
+
+    return (window.TextStyles && window.TextStyles.styleAttr(style)) || "";
+
+}
+
+function blockStyleClass(style) {
+
+    return blockStyleAttr(style) ? " has-style" : "";
+
+}
+
+// Ставить оформлення на вже наявний елемент (для блоків, які не
+// збираються рядком, а лежать у статичній розмітці).
+function applyBlockStyle(el, style) {
+
+    if (!el || !window.TextStyles) return;
+
+    const vars = window.TextStyles.styleVars(style);
+    const keys = Object.keys(vars);
+
+    el.classList.toggle("has-style", keys.length > 0);
+
+    keys.forEach(name => el.style.setProperty(name, vars[name]));
+
+}
+
 // Рамка кадрування для фонових банерів.
 //
 // У товару кадр задається через transform: scale — там фото і контейнер
@@ -223,15 +264,29 @@ function applyFraming(el, framing, imageUrl) {
 
 }
 
-function setResponsiveBanner(el, cssVarName, imageUrl, crops, framing) {
+// mobileImage — окреме фото для вузького екрана.
+//
+// НАВІЩО ВОНО ПОТРІБНЕ
+// ---------------------
+// buildCroppedImageUrl нижче вміє різати кадр лише для абсолютних
+// адрес із параметрами (так колись працювали фото з Pexels). Усі наші
+// фото локальні, тож для них функція повертає адресу БЕЗ ЗМІН — тобто
+// «десктопний», «планшетний» і «мобільний» варіанти були одним і тим
+// самим файлом, а різав його вже background-size:cover.
+//
+// Для банера це означало, що з широкої смуги 1600×720 на телефоні
+// лишалась вузька середина: текст опинявся просто на товарі, а сам
+// товар було не роздивитись. Тому мобільний кадр тепер окремий файл —
+// з іншою композицією, а не тим самим знімком іншого розміру.
+function setResponsiveBanner(el, cssVarName, imageUrl, crops, framing, mobileImage) {
 
     if (!el || !imageUrl) return;
 
-    applyFraming(el, framing, imageUrl);
+    const mobileSource = mobileImage || imageUrl;
 
     const desktopUrl = buildCroppedImageUrl(imageUrl, crops.desktop.w, crops.desktop.h);
     const tabletUrl = buildCroppedImageUrl(imageUrl, crops.tablet.w, crops.tablet.h);
-    const mobileUrl = buildCroppedImageUrl(imageUrl, crops.mobile.w, crops.mobile.h);
+    const mobileUrl = buildCroppedImageUrl(mobileSource, crops.mobile.w, crops.mobile.h);
 
     const mqMobile = window.matchMedia("(max-width: 600px)");
     const mqTablet = window.matchMedia("(max-width: 900px)");
@@ -239,11 +294,16 @@ function setResponsiveBanner(el, cssVarName, imageUrl, crops, framing) {
     function apply() {
 
         let url = desktopUrl;
+        let source = imageUrl;
 
-        if (mqMobile.matches) url = mobileUrl;
+        if (mqMobile.matches) { url = mobileUrl; source = mobileSource; }
         else if (mqTablet.matches) url = tabletUrl;
 
         el.style.setProperty(cssVarName, `url('${url}')`);
+
+        // Рамка кадрування прив'язана до ІМЕНІ ФАЙЛУ, а на телефоні
+        // файл інший — тож перечитуємо її разом зі зміною картинки.
+        applyFraming(el, framing, source);
 
     }
 
@@ -262,6 +322,9 @@ function renderHero(hero, framing) {
     if (!hero) return;
 
     const heroSection = document.getElementById("heroSection");
+
+    // оформлення з адмінки — на корінь блока
+    applyBlockStyle(heroSection, hero.style);
     const heroLabel = document.getElementById("heroLabel");
     const heroHeading = document.getElementById("heroHeading");
     const heroText = document.getElementById("heroText");
@@ -274,7 +337,7 @@ function renderHero(hero, framing) {
             desktop: { w: 1600, h: 720 },
             tablet: { w: 1024, h: 900 },
             mobile: { w: 750, h: 1000 }
-        }, framing);
+        }, framing, hero.imageMobile);
 
     }
 
@@ -349,6 +412,8 @@ function renderPromoBanner(promo, framing) {
     if (!promo) return;
 
     const bannerEl = document.getElementById("promoBanner");
+
+    applyBlockStyle(bannerEl, promo.style);
     const labelEl = document.getElementById("promoLabel");
     const headingEl = document.getElementById("promoHeading");
     const textEl = document.getElementById("promoText");
@@ -360,7 +425,7 @@ function renderPromoBanner(promo, framing) {
             desktop: { w: 1600, h: 640 },
             tablet: { w: 1024, h: 800 },
             mobile: { w: 750, h: 900 }
-        }, framing);
+        }, framing, promo.imageMobile);
 
     }
 
@@ -441,6 +506,11 @@ async function initPromotions() {
             return;
         }
 
+        // шрифти, обрані в акціях (вантажаться лише ті, що справді є)
+        if (window.TextStyles) {
+            window.TextStyles.ensureFonts(promotions.map(p => p.style));
+        }
+
         const regular = promotions.filter(promo => promo.displayType === "card");
         const heroSliderPromos = promotions.filter(promo => promo.displayType === "hero_slider");
         const bannersWithProducts = promotions.filter(promo => promo.displayType === "banner_products");
@@ -449,7 +519,7 @@ async function initPromotions() {
         if (regular.length) {
 
             grid.innerHTML = regular.map(promo => `
-                <a href="promo?id=${encodeURIComponent(promo.slug)}" class="promo-card">
+                <a href="promo?id=${encodeURIComponent(promo.slug)}" class="promo-card${blockStyleClass(promo.style)}" style="${blockStyleAttr(promo.style)}">
 
                     <div class="promo-card-image">
                         ${promoPicture(promo, 700)}
@@ -523,7 +593,7 @@ function renderHeroSliderPromotions(heroPromotions) {
         `).join("");
 
         return `
-        <div class="promo-hero-slide">
+        <div class="promo-hero-slide${blockStyleClass(promo.style)}" style="${blockStyleAttr(promo.style)}">
 
             <div class="promo-hero-slide-content">
 
@@ -672,7 +742,7 @@ async function renderFeaturedPromotions(featuredPromotions) {
 
                 <div class="container">
 
-                    <div class="brand-campaign-banner">
+                    <div class="brand-campaign-banner${blockStyleClass(promo.style)}" style="${blockStyleAttr(promo.style)}">
 
                         <a href="promo?id=${encodeURIComponent(promo.slug)}" class="brand-campaign-image">
                             ${promoPicture(promo, 700)}
@@ -756,9 +826,15 @@ function renderCompactPromotions(compactPromotions) {
 
                 <div class="brand-teaser-banner">
 
-                    <div class="brand-teaser-image">
+                    <!-- Фото — посилання, як у решти акцій. Раніше це був
+                         звичайний <div>: курсор над ним лишався стрілкою,
+                         клац нічого не робив, і єдиним входом у акцію була
+                         кнопка збоку. -->
+                    <a href="promo?id=${encodeURIComponent(promo.slug)}"
+                       class="brand-teaser-image"
+                       aria-label="${promo.title}">
                         ${promoPicture(promo, 700)}
-                    </div>
+                    </a>
 
                     <div class="brand-teaser-content">
 
@@ -806,6 +882,10 @@ async function initCollections() {
 
         if (!Array.isArray(collections) || collections.length === 0) return;
 
+        if (window.TextStyles) {
+            window.TextStyles.ensureFonts(collections.map(c => c.style));
+        }
+
         const allProducts = productsResponse.ok ? await productsResponse.json() : [];
 
         section.innerHTML = collections.map(collection => {
@@ -851,7 +931,7 @@ function renderCollectionWidget(collection, items) {
     return `
         <div class="container">
 
-            <div class="collection-widget" data-page-size="${pageSize}" data-page-count="${pageCount}" data-page="0">
+            <div class="collection-widget${blockStyleClass(collection.style)}" style="${blockStyleAttr(collection.style)}" data-page-size="${pageSize}" data-page-count="${pageCount}" data-page="0">
 
                 <div class="collection-image">
                     <picture>
@@ -964,6 +1044,8 @@ function setupCollectionPagination(widget) {
     const indicator = widget.querySelector(".collection-page-current");
     const totalEl = widget.querySelector(".collection-page-indicator");
 
+    const image = widget.querySelector(".collection-image");
+
     function render() {
 
         const page = Number(widget.dataset.page) || 0;
@@ -975,6 +1057,16 @@ function setupCollectionPagination(widget) {
         if (prevBtn) prevBtn.disabled = page <= 0;
         if (nextBtn) nextBtn.disabled = page >= pageCount - 1;
         if (indicator) indicator.textContent = String(page + 1).padStart(2, "0");
+
+        // Підпис для зчитувача оновлюється разом зі сторінкою — інакше
+        // він називав би першу сторінку навіть на останній.
+        if (image && pageCount > 1) {
+
+            image.setAttribute("aria-label",
+                `Показати товари ${((page + 1) % pageCount) + 1} з ${pageCount}`
+                + ` (зараз ${page + 1})`);
+
+        }
 
     }
 
@@ -1010,6 +1102,48 @@ function setupCollectionPagination(widget) {
         widget.dataset.page = String(Math.min(pageCount - 1, (Number(widget.dataset.page) || 0) + 1));
         render();
     });
+
+    // Клац по фото добірки гортає товари ПО КОЛУ.
+    //
+    // Стрілки поруч зупиняються на краях (кнопка «далі» гасне на
+    // останній сторінці) — це правильно для кнопки, у якої видно стан.
+    // Фото стану не показує: якщо воно на останній сторінці перестане
+    // реагувати, це виглядатиме як поломка, а не як «далі нічого
+    // немає». Тому з останньої сторінки повертаємось на першу.
+    if (image && pageCount > 1) {
+
+        image.classList.add("is-pager");
+
+        // Кнопка, а не посилання: перехід нікуди не веде, це керування
+        // вмістом блока. Посилання без адреси не потрапляє у Tab і
+        // мовчить для зчитувача екрана.
+        image.setAttribute("role", "button");
+        image.setAttribute("tabindex", "0");
+
+        const step = () => {
+
+            const page = Number(widget.dataset.page) || 0;
+
+            widget.dataset.page = String((page + 1) % pageCount);
+
+            render();
+
+        };
+
+        image.addEventListener("click", step);
+
+        image.addEventListener("keydown", event => {
+
+            if (event.key !== "Enter" && event.key !== " ") return;
+
+            // пробіл інакше прокрутить сторінку
+            event.preventDefault();
+
+            step();
+
+        });
+
+    }
 
     render();
 

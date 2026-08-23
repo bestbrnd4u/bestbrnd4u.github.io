@@ -121,6 +121,91 @@ collections:
             widget: "object"
             collapsed: false
             fields:
+              # ── Оформлення тексту (однаковий набір у всіх блоках) ──
+              # Усе необовʼязкове. Нічого не заповнили — блок виглядає як
+              # зараз: правила в style.css мають значення за замовчуванням,
+              # і змінна просто не зʼявляється.
+              - label: "Оформлення тексту і кнопки"
+                name: "style"
+                widget: "object"
+                collapsed: true
+                required: false
+                fields:
+                  - label: "Шрифт"
+                    name: "font"
+                    widget: "select"
+                    required: false
+                    options:
+                    - { label: "Inter — як зараз (без засічок)", value: "inter" }
+                    - { label: "Montserrat — геометричний, добре для заголовків", value: "montserrat" }
+                    - { label: "Playfair Display — із засічками, класика для моди", value: "playfair" }
+                    - { label: "Lora — із засічками, спокійний для довгого тексту", value: "lora" }
+                    - { label: "Oswald — вузький, помітні короткі заголовки", value: "oswald" }
+                    - { label: "Manrope — мʼякий без засічок", value: "manrope" }
+                    hint: >
+                      Усі шрифти безкоштовні (ліцензія SIL Open Font License) — питань
+                      щодо ліцензії не виникне. Завантажується тільки той, який справді
+                      обрали. ПЕРЕВІРТЕ ОЧИМА українські літери «і», «ї», «є», «ґ»:
+                      якщо в шрифті їх немає, вони намалюються запасним Inter і
+                      виглядатимуть інакше за решту тексту.
+                  - label: "Колір тексту"
+                    name: "textColor"
+                    widget: "color"
+                    required: false
+                    allowInput: true
+                    hint: "Заголовок і опис блока. Порожньо — як зараз."
+                  - label: "Колір маленького підпису зверху"
+                    name: "accentColor"
+                    widget: "color"
+                    required: false
+                    allowInput: true
+                    hint: "Той дрібний рядок над заголовком (наприклад «ДОБІРКА»)."
+                  - label: "Колір кнопки"
+                    name: "buttonBg"
+                    widget: "color"
+                    required: false
+                    allowInput: true
+                  - label: "Колір тексту на кнопці"
+                    name: "buttonText"
+                    widget: "color"
+                    required: false
+                    allowInput: true
+                    hint: >
+                      Слідкуйте за контрастом: світлий текст на світлій кнопці
+                      читатися не буде.
+                  - label: "Розмір заголовка"
+                    name: "titleSize"
+                    widget: "select"
+                    required: false
+                    options:
+                      - { label: "Менший", value: "s" }
+                      - { label: "Звичайний", value: "m" }
+                      - { label: "Більший", value: "l" }
+                      - { label: "Найбільший", value: "xl" }
+                  - label: "Вирівнювання"
+                    name: "align"
+                    widget: "select"
+                    required: false
+                    options:
+                      - { label: "Ліворуч", value: "left" }
+                      - { label: "По центру", value: "center" }
+                      - { label: "Праворуч", value: "right" }
+                  - label: "ВЕЛИКИМИ ЛІТЕРАМИ"
+                    name: "uppercase"
+                    widget: "boolean"
+                    required: false
+                    default: false
+                  - label: "Розрядка між літерами"
+                    name: "letterSpacing"
+                    widget: "number"
+                    required: false
+                    value_type: "int"
+                    min: -5
+                    max: 30
+                    hint: >
+                      У сотих em. 0 — як зараз, 10–20 добре виглядає на коротких
+                      заголовках великими літерами. Завелика розрядка розриває слова
+                      на телефоні.
               - label: "Маленький підпис зверху"
                 name: "label"
                 widget: "string"
@@ -154,6 +239,16 @@ collections:
                   портрет. Беріть фон-текстуру чи загальний план БЕЗ
                   дрібних деталей і без тексту на самому фото — зверху
                   ляже темна заливка та білий заголовок.
+              - label: "Фонове фото для телефона (необов'язково)"
+                name: "imageMobile"
+                widget: "image"
+                required: false
+                hint: >
+                  750×1000 (вертикальний, 3:4). Не заповните — на телефоні візьметься фото для
+                  компʼютера, але з широкої смуги там лишиться тільки вузька
+                  середина, і текст ляже просто на товар. Тому кадр потрібен
+                  ІНШИЙ, а не той самий у меншому розмірі: товар унизу, вільне темне місце зверху — там стоїть текст (на телефоні він по центру).
+
 
               - label: "Кнопка 1 — текст"
                 name: "primaryButtonText"
@@ -244,6 +339,91 @@ collections:
             widget: "object"
             collapsed: true
             fields:
+              # ── Оформлення тексту (однаковий набір у всіх блоках) ──
+              # Усе необовʼязкове. Нічого не заповнили — блок виглядає як
+              # зараз: правила в style.css мають значення за замовчуванням,
+              # і змінна просто не зʼявляється.
+              - label: "Оформлення тексту і кнопки"
+                name: "style"
+                widget: "object"
+                collapsed: true
+                required: false
+                fields:
+                  - label: "Шрифт"
+                    name: "font"
+                    widget: "select"
+                    required: false
+                    options:
+                    - { label: "Inter — як зараз (без засічок)", value: "inter" }
+                    - { label: "Montserrat — геометричний, добре для заголовків", value: "montserrat" }
+                    - { label: "Playfair Display — із засічками, класика для моди", value: "playfair" }
+                    - { label: "Lora — із засічками, спокійний для довгого тексту", value: "lora" }
+                    - { label: "Oswald — вузький, помітні короткі заголовки", value: "oswald" }
+                    - { label: "Manrope — мʼякий без засічок", value: "manrope" }
+                    hint: >
+                      Усі шрифти безкоштовні (ліцензія SIL Open Font License) — питань
+                      щодо ліцензії не виникне. Завантажується тільки той, який справді
+                      обрали. ПЕРЕВІРТЕ ОЧИМА українські літери «і», «ї», «є», «ґ»:
+                      якщо в шрифті їх немає, вони намалюються запасним Inter і
+                      виглядатимуть інакше за решту тексту.
+                  - label: "Колір тексту"
+                    name: "textColor"
+                    widget: "color"
+                    required: false
+                    allowInput: true
+                    hint: "Заголовок і опис блока. Порожньо — як зараз."
+                  - label: "Колір маленького підпису зверху"
+                    name: "accentColor"
+                    widget: "color"
+                    required: false
+                    allowInput: true
+                    hint: "Той дрібний рядок над заголовком (наприклад «ДОБІРКА»)."
+                  - label: "Колір кнопки"
+                    name: "buttonBg"
+                    widget: "color"
+                    required: false
+                    allowInput: true
+                  - label: "Колір тексту на кнопці"
+                    name: "buttonText"
+                    widget: "color"
+                    required: false
+                    allowInput: true
+                    hint: >
+                      Слідкуйте за контрастом: світлий текст на світлій кнопці
+                      читатися не буде.
+                  - label: "Розмір заголовка"
+                    name: "titleSize"
+                    widget: "select"
+                    required: false
+                    options:
+                      - { label: "Менший", value: "s" }
+                      - { label: "Звичайний", value: "m" }
+                      - { label: "Більший", value: "l" }
+                      - { label: "Найбільший", value: "xl" }
+                  - label: "Вирівнювання"
+                    name: "align"
+                    widget: "select"
+                    required: false
+                    options:
+                      - { label: "Ліворуч", value: "left" }
+                      - { label: "По центру", value: "center" }
+                      - { label: "Праворуч", value: "right" }
+                  - label: "ВЕЛИКИМИ ЛІТЕРАМИ"
+                    name: "uppercase"
+                    widget: "boolean"
+                    required: false
+                    default: false
+                  - label: "Розрядка між літерами"
+                    name: "letterSpacing"
+                    widget: "number"
+                    required: false
+                    value_type: "int"
+                    min: -5
+                    max: 30
+                    hint: >
+                      У сотих em. 0 — як зараз, 10–20 добре виглядає на коротких
+                      заголовках великими літерами. Завелика розрядка розриває слова
+                      на телефоні.
               - label: "Маленький підпис зверху"
                 name: "label"
                 widget: "string"
@@ -274,6 +454,16 @@ collections:
                   обрізки між десктопом і мобільним, тож беріть фон-текстуру
                   чи загальний план без дрібних деталей і без тексту на
                   самому фото.
+              - label: "Фонове фото для телефона (необов'язково)"
+                name: "imageMobile"
+                widget: "image"
+                required: false
+                hint: >
+                  750×1000 (вертикальний, 3:4). Не заповните — на телефоні візьметься фото для
+                  компʼютера, але з широкої смуги там лишиться тільки вузька
+                  середина, і текст ляже просто на товар. Тому кадр потрібен
+                  ІНШИЙ, а не той самий у меншому розмірі: товар унизу, вільне темне місце зверху — там стоїть текст (на телефоні він по центру).
+
 
               - label: "Текст кнопки"
                 name: "buttonText"
@@ -424,6 +614,92 @@ collections:
         default: 60
         required: false
         hint: "За замовчуванням — 60 (через хвилину після того, як відвідувач відкрив сторінку)"
+
+      # ── Оформлення тексту (однаковий набір у всіх блоках) ──
+      # Усе необовʼязкове. Нічого не заповнили — блок виглядає як
+      # зараз: правила в style.css мають значення за замовчуванням,
+      # і змінна просто не зʼявляється.
+      - label: "Оформлення тексту і кнопки"
+        name: "style"
+        widget: "object"
+        collapsed: true
+        required: false
+        fields:
+          - label: "Шрифт"
+            name: "font"
+            widget: "select"
+            required: false
+            options:
+            - { label: "Inter — як зараз (без засічок)", value: "inter" }
+            - { label: "Montserrat — геометричний, добре для заголовків", value: "montserrat" }
+            - { label: "Playfair Display — із засічками, класика для моди", value: "playfair" }
+            - { label: "Lora — із засічками, спокійний для довгого тексту", value: "lora" }
+            - { label: "Oswald — вузький, помітні короткі заголовки", value: "oswald" }
+            - { label: "Manrope — мʼякий без засічок", value: "manrope" }
+            hint: >
+              Усі шрифти безкоштовні (ліцензія SIL Open Font License) — питань
+              щодо ліцензії не виникне. Завантажується тільки той, який справді
+              обрали. ПЕРЕВІРТЕ ОЧИМА українські літери «і», «ї», «є», «ґ»:
+              якщо в шрифті їх немає, вони намалюються запасним Inter і
+              виглядатимуть інакше за решту тексту.
+          - label: "Колір тексту"
+            name: "textColor"
+            widget: "color"
+            required: false
+            allowInput: true
+            hint: "Заголовок і опис блока. Порожньо — як зараз."
+          - label: "Колір маленького підпису зверху"
+            name: "accentColor"
+            widget: "color"
+            required: false
+            allowInput: true
+            hint: "Той дрібний рядок над заголовком (наприклад «ДОБІРКА»)."
+          - label: "Колір кнопки"
+            name: "buttonBg"
+            widget: "color"
+            required: false
+            allowInput: true
+          - label: "Колір тексту на кнопці"
+            name: "buttonText"
+            widget: "color"
+            required: false
+            allowInput: true
+            hint: >
+              Слідкуйте за контрастом: світлий текст на світлій кнопці
+              читатися не буде.
+          - label: "Розмір заголовка"
+            name: "titleSize"
+            widget: "select"
+            required: false
+            options:
+              - { label: "Менший", value: "s" }
+              - { label: "Звичайний", value: "m" }
+              - { label: "Більший", value: "l" }
+              - { label: "Найбільший", value: "xl" }
+          - label: "Вирівнювання"
+            name: "align"
+            widget: "select"
+            required: false
+            options:
+              - { label: "Ліворуч", value: "left" }
+              - { label: "По центру", value: "center" }
+              - { label: "Праворуч", value: "right" }
+          - label: "ВЕЛИКИМИ ЛІТЕРАМИ"
+            name: "uppercase"
+            widget: "boolean"
+            required: false
+            default: false
+          - label: "Розрядка між літерами"
+            name: "letterSpacing"
+            widget: "number"
+            required: false
+            value_type: "int"
+            min: -5
+            max: 30
+            hint: >
+              У сотих em. 0 — як зараз, 10–20 добре виглядає на коротких
+              заголовках великими літерами. Завелика розрядка розриває слова
+              на телефоні.
 
   - name: "promotions"
     label: "Акції"
@@ -703,6 +979,92 @@ collections:
           Повзунком можна ще й наблизити. «Скинути кадр» повертає все
           як було — саме фото не змінюється ніколи.
 
+      # ── Оформлення тексту (однаковий набір у всіх блоках) ──
+      # Усе необовʼязкове. Нічого не заповнили — блок виглядає як
+      # зараз: правила в style.css мають значення за замовчуванням,
+      # і змінна просто не зʼявляється.
+      - label: "Оформлення тексту і кнопки"
+        name: "style"
+        widget: "object"
+        collapsed: true
+        required: false
+        fields:
+          - label: "Шрифт"
+            name: "font"
+            widget: "select"
+            required: false
+            options:
+            - { label: "Inter — як зараз (без засічок)", value: "inter" }
+            - { label: "Montserrat — геометричний, добре для заголовків", value: "montserrat" }
+            - { label: "Playfair Display — із засічками, класика для моди", value: "playfair" }
+            - { label: "Lora — із засічками, спокійний для довгого тексту", value: "lora" }
+            - { label: "Oswald — вузький, помітні короткі заголовки", value: "oswald" }
+            - { label: "Manrope — мʼякий без засічок", value: "manrope" }
+            hint: >
+              Усі шрифти безкоштовні (ліцензія SIL Open Font License) — питань
+              щодо ліцензії не виникне. Завантажується тільки той, який справді
+              обрали. ПЕРЕВІРТЕ ОЧИМА українські літери «і», «ї», «є», «ґ»:
+              якщо в шрифті їх немає, вони намалюються запасним Inter і
+              виглядатимуть інакше за решту тексту.
+          - label: "Колір тексту"
+            name: "textColor"
+            widget: "color"
+            required: false
+            allowInput: true
+            hint: "Заголовок і опис блока. Порожньо — як зараз."
+          - label: "Колір маленького підпису зверху"
+            name: "accentColor"
+            widget: "color"
+            required: false
+            allowInput: true
+            hint: "Той дрібний рядок над заголовком (наприклад «ДОБІРКА»)."
+          - label: "Колір кнопки"
+            name: "buttonBg"
+            widget: "color"
+            required: false
+            allowInput: true
+          - label: "Колір тексту на кнопці"
+            name: "buttonText"
+            widget: "color"
+            required: false
+            allowInput: true
+            hint: >
+              Слідкуйте за контрастом: світлий текст на світлій кнопці
+              читатися не буде.
+          - label: "Розмір заголовка"
+            name: "titleSize"
+            widget: "select"
+            required: false
+            options:
+              - { label: "Менший", value: "s" }
+              - { label: "Звичайний", value: "m" }
+              - { label: "Більший", value: "l" }
+              - { label: "Найбільший", value: "xl" }
+          - label: "Вирівнювання"
+            name: "align"
+            widget: "select"
+            required: false
+            options:
+              - { label: "Ліворуч", value: "left" }
+              - { label: "По центру", value: "center" }
+              - { label: "Праворуч", value: "right" }
+          - label: "ВЕЛИКИМИ ЛІТЕРАМИ"
+            name: "uppercase"
+            widget: "boolean"
+            required: false
+            default: false
+          - label: "Розрядка між літерами"
+            name: "letterSpacing"
+            widget: "number"
+            required: false
+            value_type: "int"
+            min: -5
+            max: 30
+            hint: >
+              У сотих em. 0 — як зараз, 10–20 добре виглядає на коротких
+              заголовках великими літерами. Завелика розрядка розриває слова
+              на телефоні.
+
   - name: "collections"
     label: "Добірки"
     label_singular: "Добірка"
@@ -800,6 +1162,92 @@ collections:
           Почніть вводити назву, бренд, категорію або артикул — пошук
           показує лише справжні збіги. На сайті товари виводяться в тому
           порядку, в якому додані тут: по 3 за раз, далі стрілками.
+
+      # ── Оформлення тексту (однаковий набір у всіх блоках) ──
+      # Усе необовʼязкове. Нічого не заповнили — блок виглядає як
+      # зараз: правила в style.css мають значення за замовчуванням,
+      # і змінна просто не зʼявляється.
+      - label: "Оформлення тексту і кнопки"
+        name: "style"
+        widget: "object"
+        collapsed: true
+        required: false
+        fields:
+          - label: "Шрифт"
+            name: "font"
+            widget: "select"
+            required: false
+            options:
+            - { label: "Inter — як зараз (без засічок)", value: "inter" }
+            - { label: "Montserrat — геометричний, добре для заголовків", value: "montserrat" }
+            - { label: "Playfair Display — із засічками, класика для моди", value: "playfair" }
+            - { label: "Lora — із засічками, спокійний для довгого тексту", value: "lora" }
+            - { label: "Oswald — вузький, помітні короткі заголовки", value: "oswald" }
+            - { label: "Manrope — мʼякий без засічок", value: "manrope" }
+            hint: >
+              Усі шрифти безкоштовні (ліцензія SIL Open Font License) — питань
+              щодо ліцензії не виникне. Завантажується тільки той, який справді
+              обрали. ПЕРЕВІРТЕ ОЧИМА українські літери «і», «ї», «є», «ґ»:
+              якщо в шрифті їх немає, вони намалюються запасним Inter і
+              виглядатимуть інакше за решту тексту.
+          - label: "Колір тексту"
+            name: "textColor"
+            widget: "color"
+            required: false
+            allowInput: true
+            hint: "Заголовок і опис блока. Порожньо — як зараз."
+          - label: "Колір маленького підпису зверху"
+            name: "accentColor"
+            widget: "color"
+            required: false
+            allowInput: true
+            hint: "Той дрібний рядок над заголовком (наприклад «ДОБІРКА»)."
+          - label: "Колір кнопки"
+            name: "buttonBg"
+            widget: "color"
+            required: false
+            allowInput: true
+          - label: "Колір тексту на кнопці"
+            name: "buttonText"
+            widget: "color"
+            required: false
+            allowInput: true
+            hint: >
+              Слідкуйте за контрастом: світлий текст на світлій кнопці
+              читатися не буде.
+          - label: "Розмір заголовка"
+            name: "titleSize"
+            widget: "select"
+            required: false
+            options:
+              - { label: "Менший", value: "s" }
+              - { label: "Звичайний", value: "m" }
+              - { label: "Більший", value: "l" }
+              - { label: "Найбільший", value: "xl" }
+          - label: "Вирівнювання"
+            name: "align"
+            widget: "select"
+            required: false
+            options:
+              - { label: "Ліворуч", value: "left" }
+              - { label: "По центру", value: "center" }
+              - { label: "Праворуч", value: "right" }
+          - label: "ВЕЛИКИМИ ЛІТЕРАМИ"
+            name: "uppercase"
+            widget: "boolean"
+            required: false
+            default: false
+          - label: "Розрядка між літерами"
+            name: "letterSpacing"
+            widget: "number"
+            required: false
+            value_type: "int"
+            min: -5
+            max: 30
+            hint: >
+              У сотих em. 0 — як зараз, 10–20 добре виглядає на коротких
+              заголовках великими літерами. Завелика розрядка розриває слова
+              на телефоні.
 
   - name: "categories"
     label: "Категорії"

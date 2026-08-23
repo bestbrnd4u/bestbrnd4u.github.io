@@ -88,7 +88,7 @@ function localPath(src) {
 async function pickPhotos(products, gender, tiles) {
 
     const candidates = products
-        .filter(p => (p.gender || []).includes(gender))
+        .filter(p => !gender || (p.gender || []).includes(gender))
         .map(p => ({ product: p, file: localPath((p.images || [])[0] || "") }))
         .filter(c => c.file && fs.existsSync(c.file));
 
@@ -187,6 +187,92 @@ async function buildBanner(photos, outFile, W, H) {
 
 }
 
+// ФОНИ ГОЛОВНОЇ (банер і промо-блок)
+//
+// ЧОМУ ЇХ ТРЕБА ГЕНЕРУВАТИ ОКРЕМО
+// --------------------------------
+// Раніше фоном стояла звичайна викладка товарів на всю ширину, а
+// поверх неї — білий текст. Текст лягав просто на сумки: читався
+// погано, товар теж було не роздивитись. Рятував лише суцільний
+// затемнювальний шар на 55%, від якого фото ставало каламутним.
+//
+// Тут кадр будується під верстку: товари займають ТІЛЬКИ ту частину
+// кадру, де тексту немає, а зона тексту лишається темною й чистою.
+//
+//   десктоп — текст ліворуч, тож товари праворуч;
+//   телефон — текст по центру (.hero на ≤768px: text-align:center,
+//             margin:auto), тож товари внизу.
+//
+// Окремий мобільний файл потрібен саме тому, що це РІЗНІ композиції, а
+// не той самий кадр іншого розміру: обрізати широку смугу 2400×1080 у
+// вертикальні 750×1000 означає лишити від неї вузьку середину.
+const BACKDROPS = [
+    { file: "home-hero.webp", width: 1600, height: 720, zone: "right", tiles: 2 },
+    { file: "home-hero-sm.webp", width: 750, height: 1000, zone: "bottom", tiles: 1 },
+    { file: "home-promo.webp", width: 1600, height: 640, zone: "right", tiles: 2 },
+    { file: "home-promo-sm.webp", width: 750, height: 900, zone: "bottom", tiles: 1 }
+];
+
+async function buildBackdrop(job, photos) {
+
+    const horizontal = job.zone === "right";
+
+    // Фото займають ВЕСЬ кадр, а чисту зону під текст робить градієнт.
+    //
+    // Спершу товари клали лише в частину кадру, а решту лишали темною.
+    // Виходила різка межа: світлий фон знімків упирався в темний холст,
+    // і банер читався як вклеєний прямокутник. Спроба розчинити краї
+    // маскою теж не допомогла — librsvg не тримає вкладені режими
+    // накладання всередині <mask>.
+    //
+    // Так простіше й надійніше: суцільна смуга знімків, поверх —
+    // напрямлений градієнт. Там, де текст, він майже непрозорий, тож
+    // товар під написом не проглядає (саме на це й була скарга), а з
+    // протилежного боку фото лишається видимим. Швів немає взагалі.
+    const slotW = Math.ceil(job.width / photos.length);
+
+    const parts = await Promise.all(photos.map(async (file, index) => ({
+        input: await sharp(file)
+            .resize(slotW, job.height, { fit: "cover", position: "attention" })
+            .modulate({ brightness: 0.98, saturation: 0.95 })
+            .toBuffer(),
+        left: index * slotW,
+        top: 0
+    })));
+
+    // Напрямок: на десктопі текст ліворуч, на телефоні — по центру
+    // (.hero на ≤768px має text-align:center і margin:auto), тож там
+    // темним робимо верх, а товари лишаємо внизу.
+    const dir = horizontal
+        ? 'x1="0" y1="0" x2="1" y2="0"'
+        : 'x1="0" y1="0" x2="0" y2="1"';
+
+    const overlay = Buffer.from(
+        `<svg width="${job.width}" height="${job.height}">
+            <defs>
+                <linearGradient id="g" ${dir}>
+                    <stop offset="0%" stop-color="#0f1729" stop-opacity="1"/>
+                    <stop offset="${horizontal ? 46 : 48}%" stop-color="#0f1729" stop-opacity="0.97"/>
+                    <stop offset="${horizontal ? 72 : 74}%" stop-color="#0f1729" stop-opacity="0.45"/>
+                    <stop offset="100%" stop-color="#0f1729" stop-opacity="0.20"/>
+                </linearGradient>
+            </defs>
+            <rect width="${job.width}" height="${job.height}" fill="url(#g)"/>
+        </svg>`
+    );
+
+    await sharp({
+        create: {
+            width: job.width, height: job.height, channels: 3,
+            background: { r: 15, g: 23, b: 41 }
+        }
+    })
+        .composite([...parts, { input: overlay, left: 0, top: 0 }])
+        .webp({ quality: 84 })
+        .toFile(path.join(OUT_DIR, job.file));
+
+}
+
 async function main() {
 
     const products = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "products.json"), "utf8"));
@@ -225,6 +311,22 @@ async function main() {
             console.log(`${file}: ${job.width}×${job.height} з ${photos.length} фото`);
 
         }
+
+    }
+
+    // фони головної — з товарів будь-якої статі, беремо найконтрастніші
+    for (const job of BACKDROPS) {
+
+        const photos = await pickPhotos(products, null, job.tiles);
+
+        if (!photos.length) {
+            console.warn(`::warning::Немає фото для ${job.file}`);
+            continue;
+        }
+
+        await buildBackdrop(job, photos);
+
+        console.log(`${job.file}: ${job.width}×${job.height}, текст ${job.zone === "right" ? "ліворуч" : "зверху"}`);
 
     }
 

@@ -108,8 +108,6 @@ Disallow: /
 
 
 
-<<<<<<< Updated upstream
-=======
 
 
 
@@ -117,7 +115,24 @@ Disallow: /
 
 
 
->>>>>>> Stashed changes
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Allow: /
 Disallow: /admin/
 Disallow: /account
