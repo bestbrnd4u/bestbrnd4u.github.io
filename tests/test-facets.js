@@ -37,6 +37,7 @@ window.__t={
   setProducts(l){products=l;},
   fillBrands:()=>fillBrands(), fillColors:()=>fillColors(),
   fillSizeGroups:()=>fillSizeGroups(), fillCategories:d=>fillCategories(d),
+  applySizeGroupCategories:d=>applyCategoryDataToSizeGroups(d),
   fillCatalogSidebar:d=>fillCatalogSidebar(d),
   toggleCategory:n=>toggleCategory(n), toggleBrand:n=>toggleBrand(n),
   toggleColor:n=>toggleColor(n), setGender:g=>{selectedGenders.clear();if(g)selectedGenders.add(g);},
@@ -70,6 +71,12 @@ function setup(){
   document.getElementById("categoryOptionsList").innerHTML="";
   document.getElementById("catalogSidebar").innerHTML="";
   window.__t.fillBrands(); window.__t.fillColors();
+  // Порядок як у справжній ініціалізації: спершу групам розмірів
+  // роздаються категорії розділу, і лише потім будуються чипи.
+  // Без цього кроку група «Взуття» (вона задана розділом, а не
+  // переліком) лишалась із порожнім списком категорій і не малювалась
+  // ніколи — стенд мовчки перевіряв менше, ніж здавалось.
+  window.__t.applySizeGroupCategories(departments);
   window.__t.fillSizeGroups(); window.__t.fillCategories(departments);
   window.__t.fillCatalogSidebar(departments);
   window.render();
@@ -132,11 +139,30 @@ check("лишився лише чорний", colors().join(",")==="Чорний
 console.log("\n[7] Група розмірів ховається цілком, якщо порожня");
 setup();
 window.__t.toggleCategory("Жіночі сумки");
-const groups=[...document.querySelectorAll("[data-size-group]")];
-check("групи розмірів є в розмітці", groups.length>0);
-check("порожня група прихована",
-      groups.every(g=>g.classList.contains("unavailable")), 
-      groups.map(g=>g.dataset.sizeGroup+":"+g.className).join(" | "));
+{
+  // Сумки більше не мають групи розмірів: у всіх них один ONESIZE, і
+  // фільтр за розміром для них нічого не звужував би (так само в
+  // окулярів і годинників). Тому після вибору «Жіночі сумки» груп у
+  // розмітці немає ЗОВСІМ — це та сама мета, лише досягнута сильніше:
+  // жодного зайвого блока на екрані.
+  const groups=[...document.querySelectorAll("[data-size-group]")];
+
+  check("для сумок груп розмірів не показано",
+        groups.every(g=>g.classList.contains("unavailable")),
+        groups.map(g=>g.dataset.sizeGroup+":"+g.className).join(" | ") || "груп немає");
+
+  // а там, де розміри справжні, група має зʼявитись — інакше перевірка
+  // вище проходила б і при повністю зламаному фільтрі
+  setup();
+  window.__t.toggleCategory("Кросівки");
+
+  const shoeGroups=[...document.querySelectorAll("[data-size-group]")];
+
+  check("для взуття група розмірів є",
+        shoeGroups.some(g=>g.dataset.sizeGroup==="shoes"
+                        && !g.classList.contains("unavailable")),
+        shoeGroups.map(g=>g.dataset.sizeGroup+":"+g.className).join(" | ") || "груп немає");
+}
 
 console.log("\n[8] Бокове меню слухається активних фільтрів");
 {

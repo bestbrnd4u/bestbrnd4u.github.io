@@ -93,7 +93,10 @@
     ],
     "slug": "armani-exchange-cholovicha-sumka-armani-exchange-crossbody-b",
     "id": 2,
-    "color": "Чорний"
+    "color": "Чорний",
+    "sizes": [
+      "ONESIZE"
+    ]
   },
   {
     "title": "Чоловіча сумка Armani Exchange",
@@ -139,7 +142,10 @@
     ],
     "slug": "armani-exchange-cholovicha-sumka-armani-exchange",
     "id": 3,
-    "color": "Чорний"
+    "color": "Чорний",
+    "sizes": [
+      "ONESIZE"
+    ]
   },
   {
     "title": "Balenciaga Сонцезахисні окуляри Grey Rectangular Ladies Sunglasses",
@@ -347,7 +353,10 @@
     ],
     "slug": "coach-cholovicha-shkiriana-sumka-coach-ethan-signature-canva",
     "id": 7,
-    "color": "Коричневий"
+    "color": "Коричневий",
+    "sizes": [
+      "ONESIZE"
+    ]
   },
   {
     "title": "Чоловіча шкіряна сумка Racer Belt Bag In Signature Canvas",
@@ -392,7 +401,10 @@
     ],
     "slug": "coach-cholovicha-shkiriana-sumka-racer-belt-bag-in-signature",
     "id": 8,
-    "color": "Чорний"
+    "color": "Чорний",
+    "sizes": [
+      "ONESIZE"
+    ]
   },
   {
     "gender": [
@@ -472,7 +484,10 @@
     "instagramBlock": "general",
     "description": "Coach Tabby 26 — одна з найвпізнаваніших моделей бренду. Шкіряний корпус, фірмова застібка-турнікет у формі літери C, знімний ремінець. Доступна у трьох відтінках, тримає форму й однаково доречна з денним і вечірнім образом.",
     "sku": "coach73995black",
-    "category": "Жіночі сумки"
+    "category": "Жіночі сумки",
+    "sizes": [
+      "ONESIZE"
+    ]
   },
   {
     "gender": "Жінкам",
@@ -546,7 +561,10 @@
     "instagramBlock": "reels",
     "description": "Coach Tabby Pillow стильна сумочка, яка стане акцентом будь-якого образу \nМ’який силует, та культовий дизайн Coach роблять цю модель ідеальним вибором як на кожен день, так і для особливих випадків ",
     "sku": "coach cp150 b4ha",
-    "category": "Жіночі сумки"
+    "category": "Жіночі сумки",
+    "sizes": [
+      "ONESIZE"
+    ]
   },
   {
     "title": "Сонцезахисні окуляри GUCCI GG0516S Grey Rectangula",
@@ -685,7 +703,10 @@
     ],
     "slug": "jw-pei-sumochka-na-pleche-jw-pei-tessa",
     "id": 13,
-    "color": "Чорний"
+    "color": "Чорний",
+    "sizes": [
+      "ONESIZE"
+    ]
   },
   {
     "title": "Жіноча сумка на плече JW PEI Gabbi Ruched Hobo Handbag",
@@ -742,7 +763,10 @@
     ],
     "slug": "jw-pei-zhinocha-sumka-na-pleche-jw-pei-gabbi-ruched-hobo-han",
     "id": 14,
-    "color": "Зелений"
+    "color": "Зелений",
+    "sizes": [
+      "ONESIZE"
+    ]
   },
   {
     "title": "Жіноча сумочка JW PEI Maze Crossbody",
@@ -787,7 +811,10 @@
     ],
     "slug": "jw-pei-zhinocha-sumochka-jw-pei-maze-crossbody",
     "id": 15,
-    "color": "Коричневий"
+    "color": "Коричневий",
+    "sizes": [
+      "ONESIZE"
+    ]
   },
   {
     "title": "Жіноча сумочка JW PEI Mila Shoulder Bag",
@@ -835,7 +862,10 @@
     ],
     "slug": "jw-pei-zhinocha-sumochka-jw-pei-mila-shoulder-bag",
     "id": 16,
-    "color": "Синій"
+    "color": "Синій",
+    "sizes": [
+      "ONESIZE"
+    ]
   },
   {
     "title": "Сонцезахисні окуляри Marc Jacobs",
@@ -1044,7 +1074,10 @@
     ],
     "slug": "marc-jacobs-sumka-kros-bodi-zhinocha-shkiriana-marc-jacobs-t",
     "id": 20,
-    "color": "Бежевий"
+    "color": "Бежевий",
+    "sizes": [
+      "ONESIZE"
+    ]
   },
   {
     "title": "Сумочка The Teddy J Marc Mini Bag Brown",
@@ -1092,7 +1125,10 @@
     ],
     "slug": "marc-jacobs-sumochka-the-teddy-j-marc-mini-bag-brown",
     "id": 21,
-    "color": "Коричневий"
+    "color": "Коричневий",
+    "sizes": [
+      "ONESIZE"
+    ]
   },
   {
     "title": "Жіноча шкіряна сумочка крос-боді Marc Jacobs the leather bucket bag",
@@ -1141,7 +1177,10 @@
     ],
     "slug": "marc-jacobs-zhinocha-shkiriana-sumochka-kros-bodi-marc-jacob",
     "id": 22,
-    "color": "Чорний"
+    "color": "Чорний",
+    "sizes": [
+      "ONESIZE"
+    ]
   },
   {
     "title": "Годинник жіночий Mathey Tissot City Metal",
@@ -1286,7 +1325,10 @@
     ],
     "slug": "michael-kors-shkiriana-sumochka-greenwich-medium-saffiano",
     "id": 25,
-    "color": "Синій"
+    "color": "Синій",
+    "sizes": [
+      "ONESIZE"
+    ]
   },
   {
     "title": "Жіночий годинник MICHAEL KORS MK4619",
@@ -1433,9 +1475,6 @@
         "color": "Navy",
         "sku": "35F1GX0C5U",
         "hex": "#0e5fbc",
-        "sizes": [
-          "XS"
-        ],
         "images": [
           "/assets/images/products/uploads/michael-kors-rose-small-top-handle-crossbody-quilted-navy-front-scaled.webp",
           "/assets/images/products/uploads/michael-kors-rose-small-top-handle-crossbody-quilted-navy-angle-scaled.webp",
@@ -1446,7 +1485,7 @@
     ],
     "preOrderPrepayment": 50,
     "sizes": [
-      "XS"
+      "ONESIZE"
     ],
     "searchKeywords": [
       "сумка",
@@ -1518,7 +1557,9 @@
       }
     ],
     "preOrderPrepayment": 50,
-    "sizes": null,
+    "sizes": [
+      "ONESIZE"
+    ],
     "isNew": true,
     "title": "Шкіряна сумочка крос-боді Love Moschino quilted",
     "images": [
@@ -1561,7 +1602,7 @@
     ],
     "preOrderPrepayment": 50,
     "sizes": [
-      "One Size"
+      "ONESIZE"
     ],
     "searchKeywords": [
       "Love Moschino",
@@ -1625,7 +1666,7 @@
     ],
     "preOrderPrepayment": 50,
     "sizes": [
-      "One Size"
+      "ONESIZE"
     ],
     "searchKeywords": [
       "Michael Kors",
@@ -2181,7 +2222,7 @@
     ],
     "preOrderPrepayment": 50,
     "sizes": [
-      "One Size"
+      "ONESIZE"
     ],
     "searchKeywords": [
       "Lacoste NH4040NZ",
