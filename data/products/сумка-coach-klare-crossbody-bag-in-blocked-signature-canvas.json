@@ -57,5 +57,15 @@
   "description": "Стильна сумка COACH Klare Crossbody Bag у фірмовому принті Signature Canvas з контрастними відтінками Gold, Chalk та Glacier White. Елегантний структурований дизайн, золотиста фурнітура та впізнаваний логотип COACH роблять модель універсальним доповненням до повсякденних і більш святкових образів.\nСумка виготовлена з фірмового покритого канвасу та гладкої шкіри. Має основне відділення, внутрішню кишеню на блискавці, багатофункціональні кишені та зовнішню кишеню. Закривається на зручну застібку.\nРегульований ремінець можна носити коротко або довше на плечі, а також через плече.",
   "sku": "CA148",
   "rating": 5,
-  "category": "Жіночі сумки"
+  "category": "Жіночі сумки",
+  "slug": "сумка-coach-klare-crossbody-bag-in-blocked-signature-canvas",
+  "id": 48,
+  "color": "Gold Chalk Glacier White Multi",
+  "images": [
+    "/assets/images/products/uploads/ca148_imrfi_a0.webp",
+    "/assets/images/products/uploads/ca148_imrfi_a3.webp",
+    "/assets/images/products/uploads/ca148_imrfi_a8.webp",
+    "/assets/images/products/uploads/ca148_imrfi_a92.webp",
+    "/assets/images/products/uploads/ca148_imrfi_a91.webp"
+  ]
 }
