@@ -58,5 +58,15 @@
   "description": "Стильна та містка сумка Marc Jacobs The Medium Tote Bag in Monogram Jacquard — культова модель The Tote Bag у вишуканому виконанні з фірмовим монограмним жакардом.\nСумка має впізнаваний дизайн Marc Jacobs із вишитим логотипом, шкіряною окантовкою та верхніми ручками. Просторе основне відділення закривається на блискавку та доповнене внутрішньою кишенею.\nМодель оснащена знімним та регульованим текстильним ремінцем, тому її можна носити в руці, на плечі або через плече",
   "sku": "2F4HTT015H05",
   "rating": 5,
-  "category": "Жіночі сумки"
+  "category": "Жіночі сумки",
+  "slug": "сумка-the-medium-tote-bag-in-monogram-jacquard",
+  "id": 51,
+  "color": "Black Beige  чорний  бежевий",
+  "images": [
+    "/assets/images/products/uploads/215896950_beige_in.webp",
+    "/assets/images/products/uploads/215896950_beige_bk.webp",
+    "/assets/images/products/uploads/215896950_beige_cu.webp",
+    "/assets/images/products/uploads/215896950_beige_e1.webp",
+    "/assets/images/products/uploads/215896950_beige_fr.webp"
+  ]
 }
