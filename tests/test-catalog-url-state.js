@@ -330,5 +330,83 @@ console.log("\n[8] Відділ у бічному меню — фільтр, а 
     check("обраний відділ підсвічений", /\.sidebar-group-title\.active\{/.test(css));
 }
 
+console.log("\n[9] Кнопка «Назад» у хлібних крихтах");
+{
+    const product = read("assets/js/product.js");
+    const breadcrumbs = read("assets/js/breadcrumbs.js");
+    const cssText = read("assets/css/style.css").replace(/\/\*[\s\S]*?\*\//g, "");
+
+    // Розмітка одна на всі три місця: шаблон, генератор статичних
+    // сторінок і рантайм. Три копії розійшлися б.
+    check("кнопка описана в спільному модулі", /BACK_HTML/.test(breadcrumbs));
+    check("рантайм бере її звідти", /window\.Breadcrumbs\.BACK_HTML/.test(product));
+    check("генератор теж", /Breadcrumbs\.BACK_HTML/.test(read("scripts/build-product-pages.js")));
+    check("є в шаблоні сторінки товару", /data-crumb-back/.test(read("product.html")));
+
+    // Прилипає до лівого краю: доріжку на телефоні прокручено вправо,
+    // і без sticky кнопка виїхала б за кадр.
+    check("кнопка прилипає до краю",
+        /\.crumb-back\{[\s\S]{0,400}position:sticky/.test(cssText));
+    check("під нею є тло",
+        /\.crumb-back\{[\s\S]{0,500}background:#f7f7f7/.test(cssText));
+
+    // На телефоні показуємо кінець доріжки — назву товару.
+    check("доріжка прокручується до кінця", /function scrollBreadcrumbsToEnd/.test(product));
+    check("тільки якщо не влазить",
+        /host\.scrollWidth <= host\.clientWidth\) return/.test(product));
+}
+
+console.log("\n[9b] Поведінка кнопки — на живому DOM");
+{
+    const { JSDOM } = require("jsdom");
+
+    const handler = read("assets/js/product.js")
+        .match(/document\.addEventListener\("click", event => \{\s*\n\s*const back[\s\S]*?\n\}\);/)[0];
+
+    const run = options => {
+
+        const dom = new JSDOM(
+            '<a href="catalog" class="crumb-back" data-crumb-back>Назад</a>',
+            Object.assign({
+                url: "https://dev.bestbrnd4u.com/p/x/",
+                runScripts: "outside-only",
+                pretendToBeVisual: true
+            }, options));
+
+        const w = dom.window;
+        let wentBack = false;
+
+        w.history.back = () => { wentBack = true; };
+        w.eval(handler);
+
+        const event = new w.MouseEvent("click", { bubbles: true, cancelable: true });
+
+        w.document.querySelector("a").dispatchEvent(event);
+
+        return { wentBack, prevented: event.defaultPrevented };
+
+    };
+
+    // Прийшли з каталогу — це справжнє «назад»: браузер поверне і
+    // фільтри, і позицію картки (restoreCatalogPosition).
+    const fromCatalog = run({ referrer: "https://dev.bestbrnd4u.com/catalog?brand=Coach" });
+
+    check("з каталогу — повертає назад по історії", fromCatalog.wentBack);
+    check("і не переходить за href", fromCatalog.prevented);
+
+    // Прийшли з пошуку — історії сайту немає, і history.back() виніс би
+    // людину ЗІ САЙТУ. Має спрацювати звичайне посилання на каталог.
+    const fromGoogle = run({ referrer: "https://www.google.com/" });
+
+    check("з Google — не смикає історію", !fromGoogle.wentBack);
+    check("працює як звичайне посилання", !fromGoogle.prevented);
+
+    // Відкрили напряму (месенджер, збережене посилання) — так само.
+    const direct = run({});
+
+    check("прямий вхід — не смикає історію", !direct.wentBack);
+    check("теж працює як посилання", !direct.prevented);
+}
+
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
 process.exit(failures === 0 ? 0 : 1);

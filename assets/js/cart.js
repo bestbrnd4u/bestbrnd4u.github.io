@@ -21,7 +21,7 @@ async function initCart() {
 
     try {
 
-        const response = await fetch("data/products.json");
+        const response = await fetch(dataUrl("data/products.json"));
 
         if (!response.ok) {
             throw new Error("Не вдалося завантажити товари");
@@ -387,6 +387,29 @@ cartItemsEl?.addEventListener("click", event => {
     const size = btn.dataset.size || null;
 
     if (minus) {
+
+        // Мінус при кількості 1 — це видалення рядка, просто інакше
+        // названа кнопка. Раніше воно відбувалось мовчки: людина
+        // зменшувала кількість, а товар зникав із кошика без попередження.
+        //
+        // Питаємо ЛИШЕ в цьому випадку. При кількості 2 і більше товар
+        // у кошику лишається, і підтвердження там тільки заважало б.
+        const line = getGroupedCartLines().find(entry =>
+            entry.id === id
+            && (entry.color || null) === (color || null)
+            && (entry.size || null) === (size || null)
+        );
+
+        if (line && line.qty <= 1) {
+
+            askConfirm({
+                title: "Видалити товар із кошика?",
+                text: "Це останній примірник — товар зникне з кошика."
+            }).then(yes => { if (yes) changeQty(id, color, size, -1); });
+
+            return;
+
+        }
 
         changeQty(id, color, size, -1);
 

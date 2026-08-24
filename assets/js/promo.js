@@ -33,8 +33,8 @@ async function initPromoPage() {
     try {
 
         const [promoRes, productsRes, categoryDepartments] = await Promise.all([
-            fetch("data/promotions.json"),
-            fetch("data/products.json"),
+            fetch(dataUrl("data/promotions.json")),
+            fetch(dataUrl("data/products.json")),
             loadCategoryDepartments()
         ]);
 

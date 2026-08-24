@@ -110,8 +110,8 @@
     try {
 
         const [categoriesRes, productsRes] = await Promise.all([
-            fetch("data/categories.json"),
-            fetch("data/products.json")
+            fetch(dataUrl("data/categories.json")),
+            fetch(dataUrl("data/products.json"))
         ]);
 
         if (!categoriesRes.ok || !productsRes.ok) return;

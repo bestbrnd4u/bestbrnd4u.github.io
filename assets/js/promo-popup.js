@@ -23,7 +23,7 @@
 
         try {
 
-            const response = await fetch("data/promo-popups.json");
+            const response = await fetch(dataUrl("data/promo-popups.json"));
 
             if (!response.ok) return;
 

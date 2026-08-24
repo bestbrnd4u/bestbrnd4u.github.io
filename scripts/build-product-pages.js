@@ -481,7 +481,17 @@ function breadcrumbsMarkup(product) {
 
     const html = nodes.join('\n<span class="crumb-sep">–</span>\n');
 
-    return `<div class="container" id="breadcrumbsList">\n${html}\n</div>`;
+    // Кнопка «Назад» — та сама розмітка, що в рантаймі
+    // (assets/js/breadcrumbs.js → BACK_HTML), щоб статична сторінка й
+    // сторінка після виконання JS не відрізнялись.
+    // href кнопки робимо абсолютним, як і решта посилань у згенерованій
+    // розмітці: сторінка лежить у /p/<slug>/, і хоч <base href="/">
+    // відносний шлях і врятує, у статиці краще на нього не покладатись.
+    const back = Breadcrumbs.BACK_HTML
+        .replace('href="catalog"', `href="${escapeHtml(absoluteUrl("catalog"))}"`);
+
+    return `<div class="container" id="breadcrumbsList">\n`
+        + `${back}\n${html}\n</div>`;
 
 }
 

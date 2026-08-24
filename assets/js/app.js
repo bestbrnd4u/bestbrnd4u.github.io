@@ -11,7 +11,7 @@ async function initHome() {
 
     try {
 
-        const response = await fetch("data/products.json");
+        const response = await fetch(dataUrl("data/products.json"));
 
         if (!response.ok) {
             throw new Error("Не вдалося завантажити товари");
@@ -56,7 +56,7 @@ async function initHomeContent() {
 
     try {
 
-        const response = await fetch("data/home.json");
+        const response = await fetch(dataUrl("data/home.json"));
 
         if (!response.ok) {
             throw new Error("Не вдалося завантажити контент головної сторінки");
@@ -494,7 +494,7 @@ async function initPromotions() {
 
     try {
 
-        const response = await fetch("data/promotions.json");
+        const response = await fetch(dataUrl("data/promotions.json"));
 
         if (!response.ok) {
             throw new Error("Не вдалося завантажити акції");
@@ -723,7 +723,7 @@ async function renderFeaturedPromotions(featuredPromotions) {
 
     try {
 
-        const response = await fetch("data/products.json");
+        const response = await fetch(dataUrl("data/products.json"));
 
         if (response.ok) allProducts = await response.json();
 
@@ -872,8 +872,8 @@ async function initCollections() {
     try {
 
         const [collectionsResponse, productsResponse] = await Promise.all([
-            fetch("data/collections.json"),
-            fetch("data/products.json")
+            fetch(dataUrl("data/collections.json")),
+            fetch(dataUrl("data/products.json"))
         ]);
 
         if (!collectionsResponse.ok) return;

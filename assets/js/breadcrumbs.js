@@ -154,7 +154,26 @@
 
     }
 
+    // Кнопка «Назад» на початку доріжки.
+    //
+    // Робить те саме, що кнопка «назад» у браузері: повертає в каталог
+    // саме туди, де людина спинилась — з тими самими фільтрами і на ту
+    // саму картку (assets/js/catalog.js → restoreCatalogPosition).
+    //
+    // ЧОМУ ЦЕ ПОСИЛАННЯ, А НЕ ПРОСТО КНОПКА
+    // --------------------------------------
+    // У розмітці це звичайний <a href="catalog">. Так воно працює ще до
+    // виконання JS і на сторінках, відкритих напряму з пошуку Google:
+    // там історії немає, і history.back() виніс би людину із сайту.
+    // JS «підвищує» посилання до справжнього «назад» лише тоді, коли
+    // попередня сторінка була нашою (див. product.js).
+    var BACK_HTML =
+        '<a href="catalog" class="crumb-back" data-crumb-back>'
+        + '<span aria-hidden="true">\u2039</span> Назад'
+        + '</a>';
+
     root.Breadcrumbs = {
+        BACK_HTML: BACK_HTML,
         firstGender: firstGender,
         buildTrail: buildTrail,
         toJsonLd: toJsonLd

@@ -7113,7 +7113,14 @@ body.mobile-filters-open .scroll-top{
 .search-promo-banners{
     flex:1 1 320px;
     display:grid;
-    grid-template-columns:1fr 1fr;
+    /* minmax(0,1fr), а не просто 1fr.
+       
+       Колонка 1fr за замовчуванням не може стати вужчою за свій вміст
+       (min-width:auto). Якщо плитка з якоїсь причини вимагає більше
+       місця — наприклад через конфлікт aspect-ratio з min-height —
+       колонка розтягується, сітка стає ширшою за контейнер, і сусідні
+       плитки накладаються. minmax(0,1fr) знімає цю нижню межу. */
+    grid-template-columns:minmax(0, 1fr) minmax(0, 1fr);
     gap:14px;
 }
 
@@ -7126,6 +7133,21 @@ body.mobile-filters-open .scroll-top{
        background-size:cover зрізав людям голови. З aspect-ratio кроп
        однаковий скрізь, тож картинку можна підготувати один раз. */
     aspect-ratio:2 / 1;
+    /* Ширину задаємо ЯВНО — інакше плитки наїжджають одна на одну.
+       
+       aspect-ratio і min-height разом утворюють конфлікт: ширина
+       приходить із колонки сітки (на телефоні ~160px), пропорція дає
+       висоту 80px, а min-height піднімає її до 104. Розв'язати це можна
+       двома способами — лишити ширину й збільшити висоту, або лишити
+       висоту й ПЕРЕРАХУВАТИ ШИРИНУ (104 × 2 = 208px). Safari обирає
+       друге, плитка вилазить за свою колонку й лягає на сусідню.
+       
+       width:100% робить ширину визначеною наперед, тож пропорції
+       лишається тільки порахувати висоту. min-width:0 не дає вмісту
+       (довгому підпису) розсунути колонку сітки — типова причина того
+       самого переповнення. */
+    width:100%;
+    min-width:0;
     min-height:104px;
     border-radius:16px;
     background-size:cover;
@@ -10460,4 +10482,70 @@ body.confirm-open{
     inset:-3px;
     border-radius:50%;
     border:1px dashed var(--gray500);
+}
+
+/* =====================================
+   КНОПКА «НАЗАД» У ХЛІБНИХ КРИХТАХ
+   ===================================== */
+
+.crumb-back{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    font-weight:600;
+    /* Прилипає до лівого краю.
+       
+       На телефоні доріжку прокручено вправо — до назви товару, бо саме
+       вона відповідає на питання «де я зараз». Без sticky кнопка
+       «Назад» виїхала б за кадр разом із початком шляху, тобто саме те,
+       чим користуються найчастіше, довелося б шукати прокруткою. */
+    position:sticky;
+    left:0;
+    z-index:2;
+    /* тло те саме, що в смуги крихт: інакше під кнопкою просвічували б
+       пункти, які проїжджають повз неї при прокрутці */
+    background:#f7f7f7;
+    padding-right:14px;
+}
+
+/* Розділювач після кнопки — щоб вона читалась як окремий елемент, а не
+   як перший пункт шляху. */
+.crumb-back::after{
+    content:"";
+    width:1px;
+    height:16px;
+    margin-left:14px;
+    background:var(--gray300);
+}
+
+.breadcrumbs .crumb-back{
+    color:var(--gray900);
+}
+
+@media (hover:hover) and (pointer:fine){
+.breadcrumbs .crumb-back:hover{
+    color:var(--secondary);
+}
+}
+
+.crumb-back:focus-visible{
+    outline:2px solid var(--secondary);
+    outline-offset:2px;
+    border-radius:4px;
+}
+
+/* Поле ніка Telegram — з'являється лише при виборі цього способу */
+.contact-channel-extra{
+    margin-top:14px;
+}
+
+.contact-channel-extra[hidden]{
+    display:none;
+}
+
+.contact-channel-hint{
+    margin:6px 0 0;
+    font-size:12.5px;
+    line-height:1.5;
+    color:var(--gray500);
 }

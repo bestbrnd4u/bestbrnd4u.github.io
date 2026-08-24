@@ -3,7 +3,9 @@
 // Логіка сторінки оформлення замовлення (checkout)
 // ======================================
 
-const FORM_TARGET_EMAIL = "b8e2e26d0dab4962153e7c42bfab1499";
+// Адреса призначення тепер у common.js — вона спільна з формою
+// «Написати нам» на сторінці контактів (див. FORMSUBMIT_TARGET).
+const FORM_TARGET_EMAIL = FORMSUBMIT_TARGET;
 
 // -------------------------
 // EmailJS — лист-подяка клієнту
@@ -20,6 +22,69 @@ const emailjsReady =
 if (emailjsReady) {
     emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
 }
+
+// -------------------------
+// Спосіб звʼязку
+//
+// Раніше під заголовком завжди стояло «наш менеджер зателефонує вам»,
+// незалежно від вибору. Людина обирала Telegram — і читала про дзвінок.
+//
+// Тепер підпис називає, КУДИ саме ми напишемо, і показує сам номер чи
+// адресу. Це не просто чесніше: людина бачить те, що щойно ввела, і
+// одразу помічає одруківку в номері — а помилку в номері інакше
+// виявляють уже тоді, коли не можуть додзвонитись.
+// -------------------------
+
+function contactChannelValue() {
+
+    return document.querySelector('input[name="contactChannel"]:checked')?.value
+        || "Телефоном";
+
+}
+
+function updateContactChannelNote() {
+
+    const note = document.getElementById("contactChannelNote");
+    const telegramField = document.getElementById("telegramField");
+
+    const channel = contactChannelValue();
+
+    // Поле ніка потрібне лише для Telegram: телефон і email уже зібрані
+    // вище, а Viber працює за номером.
+    if (telegramField) telegramField.hidden = channel !== "Telegram";
+
+    if (!note) return;
+
+    const phone = (document.getElementById("phone")?.value || "").trim();
+    const email = (document.getElementById("email")?.value || "").trim();
+
+    // Поки поле не заповнене — не вигадуємо, а називаємо його загально.
+    const where = {
+        "Телефоном": phone ? `зателефонуємо на ${phone}` : "зателефонуємо вам",
+        "Viber": phone ? `напишемо у Viber на ${phone}` : "напишемо у Viber на ваш номер",
+        "Telegram": "напишемо в Telegram",
+        "Email": email ? `напишемо на ${email}` : "напишемо на вашу пошту"
+    }[channel];
+
+    note.textContent = `Щоб підтвердити замовлення, ми ${where}.`;
+
+}
+
+document.addEventListener("change", event => {
+
+    if (event.target.name === "contactChannel") updateContactChannelNote();
+
+});
+
+// Номер і пошту людина вводить ПІСЛЯ вибору способу звʼязку, тож підпис
+// має оновлюватись і при їх зміні — інакше він назве порожнє поле.
+["phone", "email"].forEach(id => {
+
+    document.getElementById(id)?.addEventListener("input", updateContactChannelNote);
+
+});
+
+updateContactChannelNote();
 
 function generateOrderId() {
 
@@ -245,7 +310,7 @@ async function initCheckout() {
 
     try {
 
-        const response = await fetch("data/products.json");
+        const response = await fetch(dataUrl("data/products.json"));
 
         if (!response.ok) {
             throw new Error("Не вдалося завантажити товари");

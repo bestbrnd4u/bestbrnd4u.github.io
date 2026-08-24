@@ -234,7 +234,7 @@ async function getProductById(id) {
 
         try {
 
-            const response = await fetch("data/products.json");
+            const response = await fetch(dataUrl("data/products.json"));
 
             cachedProducts = await response.json();
 
@@ -258,7 +258,7 @@ async function getAllProductsCached() {
 
         try {
 
-            const response = await fetch("data/products.json");
+            const response = await fetch(dataUrl("data/products.json"));
 
             cachedProducts = await response.json();
 
@@ -847,6 +847,62 @@ function askConfirm(options) {
         // одразу після відкриття не має нічого стирати.
         overlay.querySelector('[data-confirm="no"]')?.focus();
 
+    });
+
+}
+
+// Адреса файлу даних із версією.
+//
+// Файли data/*.json тягне fetch, і кеш зберігає їх за адресою — так
+// само, як скрипти. Тобто після викладки новий товар міг не зʼявитись
+// іще довго, хоча сам файл на сервері вже оновився.
+//
+// Версії кладе в HTML крок збірки scripts/apply-cache-version.js:
+//
+//     window.ASSET_VERSIONS = { "data/products.json": "9b2e01", ... }
+//
+// Тут ми просто дописуємо потрібну до адреси. Змінився файл —
+// змінилась версія — змінилась адреса — кеш іде по нову копію.
+// Не змінився — адреса та сама, і файл береться з кеша, як і має бути.
+//
+// Якщо версій чомусь немає (сторінку відкрили без цього кроку збірки),
+// повертаємо адресу як є: гірше, ніж могло б бути, але точно не зламано.
+function dataUrl(url) {
+
+    // Ключі у списку версій без початкового «/» (data/products.json),
+    // а в коді трапляється й абсолютний шлях (/data/products.json —
+    // сторінки товарів лежать у /p/<slug>/, тож відносний туди не
+    // веде). Шукаємо за обома формами, інакше саме той файл лишився б
+    // без версії й протухав би в кеші.
+    const key = String(url).replace(/^\//, "");
+
+    const version = window.ASSET_VERSIONS && window.ASSET_VERSIONS[key];
+
+    return version ? `${url}?v=${version}` : url;
+
+}
+
+// Куди йдуть листи з форм сайту.
+//
+// Це не адреса, а токен FormSubmit: сервіс видає його після
+// підтвердження пошти й сам підставляє справжній bestbrnd4u@proton.me.
+// Тримати адресу в коді відкритим текстом означало б віддати її
+// збирачам спаму.
+//
+// Константа тут, а не в checkout.js, бо форм тепер дві — оформлення
+// замовлення і «Написати нам» у контактах. Дві копії рано чи пізно
+// розійшлися б, і одна з форм почала б слати листи в нікуди.
+const FORMSUBMIT_TARGET = "b8e2e26d0dab4962153e7c42bfab1499";
+
+function sendViaFormSubmit(payload) {
+
+    return fetch(`https://formsubmit.co/ajax/${FORMSUBMIT_TARGET}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        },
+        body: JSON.stringify(payload)
     });
 
 }
@@ -2339,7 +2395,7 @@ function loadCategoryTree() {
 
     if (categoryTreePromise) return categoryTreePromise;
 
-    categoryTreePromise = fetch("data/categories.json")
+    categoryTreePromise = fetch(dataUrl("data/categories.json"))
         .then(response => response.ok ? response.json() : [])
         .then(categories => {
 
@@ -2375,7 +2431,7 @@ function loadSizeGroups() {
 
     if (sizeGroupsPromise) return sizeGroupsPromise;
 
-    sizeGroupsPromise = fetch("data/size-groups.json")
+    sizeGroupsPromise = fetch(dataUrl("data/size-groups.json"))
         .then(response => response.ok ? response.json() : null)
         .then(data => {
 

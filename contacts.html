@@ -3,6 +3,7 @@
 
 <head>
     <meta name="robots" content="noindex,nofollow">
+<script>window.ASSET_VERSIONS = {"data/categories.json":"4a7a5e05","data/collections.json":"d86aab5b","data/home.json":"fe5da8cb","data/image-variants.json":"e9b955d0","data/products.json":"46f2929c","data/promo-popups.json":"0940ece5","data/promotions.json":"65f883a6","data/search-banners.json":"82a85e36","data/size-groups.json":"e70d29de"};</script>
     <meta charset="UTF-8">
     <meta name="author" content="BestBrnd4u">
     <meta name="copyright" content="© 2026 BestBrnd4u. Усі права захищено.">
@@ -20,7 +21,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="assets/images/favicon-192.png">
     <title>Контакти | BestBrnd4u</title>
 
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/style.css?v=66ceaad7">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -296,30 +297,108 @@
     ↑
 </button>
 
-<script src="assets/js/supabase-client.js"></script>
+<script src="assets/js/supabase-client.js?v=42a4012d"></script>
 <!-- Кадрування фото товару. Той самий файл підключає адмінка,
      тож прев'ю в ній і картка на сайті рахуються однаково. -->
-<script src="assets/js/image-framing.js"></script>
+<script src="assets/js/image-framing.js?v=006d4dfb"></script>
 <!-- Хлібні крихти: спільний будівник для сторінки й розмітки BreadcrumbList -->
-<script src="assets/js/breadcrumbs.js"></script>
+<script src="assets/js/breadcrumbs.js?v=50cb0737"></script>
 <!-- Оформлення текстових блоків з адмінки (кольори, шрифт, кнопка) -->
-<script src="assets/js/text-styles.js"></script>
+<script src="assets/js/text-styles.js?v=7dc05c7d"></script>
 <!-- Згода на використання даних (банер + блокування вбудованого відео) -->
-<script src="assets/js/consent.js"></script>
-<script src="assets/js/common.js"></script>
-<script src="assets/js/sync.js"></script>
-<script src="assets/js/mega-menu.js"></script>
-<script src="assets/js/ui.js"></script>
+<script src="assets/js/consent.js?v=f6d87dc1"></script>
+<script src="assets/js/common.js?v=94a654ef"></script>
+<script src="assets/js/sync.js?v=48ef002e"></script>
+<script src="assets/js/mega-menu.js?v=18cfdf18"></script>
+<script src="assets/js/ui.js?v=856958c8"></script>
 
 <script>
 
+    // Форма «Написати нам».
+    //
+    // ЩО ТУТ БУЛО НЕ ТАК
+    // -------------------
+    // Обробник робив рівно три речі: скасовував відправку, показував
+    // «Повідомлення надіслано!» і чистив поля. Листа не існувало
+    // взагалі — ні на пошту, ні в чергу. Людина бачила підтвердження і
+    // йшла чекати відповіді, якої не буде.
+    //
+    // Це гірше за неробочу кнопку: неробочу видно одразу, а тут збій
+    // непомітний з обох боків — покупець вважає, що написав, магазин
+    // не знає, що його питали.
+    //
+    // Тепер лист іде через FormSubmit — тим самим шляхом, яким
+    // надсилаються замовлення (adresa в common.js → FORMSUBMIT_TARGET).
     document.getElementById("contactForm")?.addEventListener("submit", function (event) {
 
         event.preventDefault();
 
-        showToast("Повідомлення надіслано! Ми незабаром зв'яжемося з вами.");
+        const form = this;
+        const button = form.querySelector('button[type="submit"]');
 
-        this.reset();
+        const value = name => (form.elements[name]?.value || "").trim();
+
+        const name = value("name");
+        const contact = value("contact");
+        const message = value("message");
+
+        // Форма з novalidate, тож перевіряємо самі. Порожній лист нікому
+        // не потрібен, а відповісти на нього все одно нема куди.
+        if (!name || !contact || !message) {
+
+            showToast("Заповніть усі поля — інакше ми не зможемо відповісти");
+
+            (!name ? form.elements.name
+                : !contact ? form.elements.contact
+                : form.elements.message).focus();
+
+            return;
+
+        }
+
+        const original = button.textContent;
+
+        button.disabled = true;
+        button.textContent = "Надсилаємо…";
+
+        sendViaFormSubmit({
+            // назви полів українською — саме так вони й прийдуть у листі
+            "Ім'я": name,
+            "Звʼязок": contact,
+            "Повідомлення": message,
+            _subject: `Запитання з сайту — ${name}`,
+            _template: "table"
+        })
+            .then(response => {
+
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                return response.json();
+
+            })
+            .then(() => {
+
+                showToast("Повідомлення надіслано! Ми незабаром звʼяжемося з вами.");
+
+                form.reset();
+
+            })
+            .catch(error => {
+
+                // Головне: НЕ кажемо «надіслано», коли не надіслано.
+                // І одразу даємо запасний шлях, щоб людина не лишилась
+                // ні з чим.
+                console.error("Форма контактів:", error);
+
+                showToast("Не вдалося надіслати. Напишіть на bestbrnd4u@proton.me або в Telegram @bestbrnd4u");
+
+            })
+            .finally(() => {
+
+                button.disabled = false;
+                button.textContent = original;
+
+            });
 
     });
 

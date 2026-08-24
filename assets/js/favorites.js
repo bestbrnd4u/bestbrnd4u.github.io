@@ -14,7 +14,7 @@ async function initFavorites() {
 
     try {
 
-        const response = await fetch("data/products.json");
+        const response = await fetch(dataUrl("data/products.json"));
 
         if (!response.ok) {
             throw new Error("Не вдалося завантажити товари");

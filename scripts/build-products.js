@@ -130,6 +130,56 @@ function main() {
 
         }
 
+        // Єдине написання «один розмір».
+        //
+        // У даних співіснували ONESIZE (45 товарів) і Onesize (7) —
+        // заводили в адмінку в різний час. Для фільтра, кошика й
+        // обраного це РІЗНІ значення: розмір порівнюється рядком, тож
+        // той самий товар у кошику й на сторінці міг не збігтися.
+        //
+        // Зводимо до одного вигляду при збірці, а не просимо
+        // адміністратора памʼятати регістр.
+        const CANON_ONESIZE = "ONESIZE";
+
+        const fixSizes = list => {
+
+            if (!Array.isArray(list)) return { list, changed: false };
+
+            let changed = false;
+
+            const next = list.map(size => {
+
+                if (typeof size === "string" && /^one\s*size$/i.test(size.trim())
+                    && size !== CANON_ONESIZE) {
+
+                    changed = true;
+
+                    return CANON_ONESIZE;
+
+                }
+
+                return size;
+
+            });
+
+            return { list: next, changed };
+
+        };
+
+        const own = fixSizes(data.sizes);
+
+        if (own.changed) { data.sizes = own.list; changed = true; }
+
+        (data.variants || []).forEach(variant => {
+
+            if (!variant || !variant.sizes) return;
+
+            const fixed = fixSizes(variant.sizes);
+
+            if (fixed.changed) { variant.sizes = fixed.list; changed = true; }
+
+        });
+
         // Кадрування прибираємо разом із фото.
         //
         // framing — це словник «ім'я файлу → рамка» (див.

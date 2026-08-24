@@ -21,14 +21,14 @@
         "/assets/images/products/uploads/cr144_svbk_a92.webp"
       ],
       "sizes": [
-        "Onesize"
+        "ONESIZE"
       ]
     },
     {
       "color": "Білий",
       "hex": "#fffefe",
       "sizes": [
-        "Onesize"
+        "ONESIZE"
       ],
       "images": [
         "/assets/images/products/uploads/cr144_svha_a0.webp",
@@ -41,7 +41,7 @@
   "preOrderPrepayment": 50,
   "strapInfo": "Знімні",
   "sizes": [
-    "Onesize"
+    "ONESIZE"
   ],
   "searchKeywords": [
     "COACH",

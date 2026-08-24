@@ -231,5 +231,55 @@ console.log("\n[7b] Поведінка обраного — на живих да
         store.map(x => x.color).join(","));
 }
 
+console.log("\n[8] Мінус при останньому примірнику теж питає");
+{
+    // Мінус при кількості 1 — це видалення рядка, просто інакше названа
+    // кнопка. Раніше воно відбувалось мовчки: людина зменшувала
+    // кількість, а товар зникав із кошика без попередження.
+    check("перед видаленням останнього питаємо",
+        /line && line\.qty <= 1/.test(cart) && /askConfirm\(\{[\s\S]{0,140}останній примірник/.test(cart));
+
+    // При кількості 2+ товар лишається в кошику, і підтвердження там
+    // тільки заважало б.
+    check("при кількості 2+ не питаємо",
+        cart.indexOf("changeQty(id, color, size, -1);") > cart.indexOf("line.qty <= 1"));
+}
+
+console.log("\n[9] Спосіб звʼязку в оформленні");
+{
+    const checkoutJs = strip(read("assets/js/checkout.js"));
+    const checkoutHtml = read("checkout.html");
+
+    // Раніше під заголовком завжди стояло «менеджер зателефонує вам» —
+    // і людина, яка обрала Telegram, усе одно читала про дзвінок.
+    check("підпис більше не статичний",
+        !/Наш менеджер зателефонує вам, щоб підтвердити/.test(checkoutHtml));
+    check("підпис оновлюється при виборі", /function updateContactChannelNote/.test(checkoutJs));
+    check("реагує на зміну способу",
+        /event\.target\.name === "contactChannel"/.test(checkoutJs));
+
+    // Номер і пошту вводять ПІСЛЯ вибору способу — інакше підпис
+    // назве порожнє поле.
+    check("оновлюється і при введенні номера чи пошти",
+        /\["phone", "email"\]\.forEach/.test(checkoutJs));
+
+    // Поле ніка потрібне лише для Telegram: телефон і email уже зібрані
+    // вище, Viber працює за номером.
+    check("є поле для ніка Telegram", /name="Telegram"/.test(checkoutHtml));
+    check("сховане за замовчуванням", /id="telegramField" hidden/.test(checkoutHtml));
+    check("показується лише для Telegram",
+        /telegramField\.hidden = channel !== "Telegram"/.test(checkoutJs));
+    check("поле необовʼязкове", !/name="Telegram"[^>]*required/.test(checkoutHtml));
+
+    // Сказано, що станеться, якщо нік не вказати.
+    check("пояснено запасний шлях без ніка",
+        /напишемо на номер, який ви ввели вище/.test(checkoutHtml));
+
+    // Підпис називає конкретний номер чи адресу: людина бачить те, що
+    // щойно ввела, і помічає одруківку до того, як їй не додзвоняться.
+    ["Viber", "Telegram", "Email"].forEach(channel =>
+        check(`названо спосіб «${channel}»`, new RegExp(`"${channel}":`).test(checkoutJs)));
+}
+
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
 process.exit(failures === 0 ? 0 : 1);

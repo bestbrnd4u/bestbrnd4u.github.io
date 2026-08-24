@@ -42,7 +42,7 @@ async function init(){
 
 try {
 
-const response=await fetch("/data/products.json");
+const response=await fetch(dataUrl("/data/products.json"));
 
 if (!response.ok) throw new Error("Не вдалося завантажити товари");
 
@@ -363,7 +363,7 @@ async function loadDepartmentMap() {
 
     try {
 
-        const response = await fetch("data/categories.json");
+        const response = await fetch(dataUrl("data/categories.json"));
 
         if (response.ok) {
             (await response.json()).forEach(row => {
@@ -380,6 +380,50 @@ async function loadDepartmentMap() {
     return departmentByCategory;
 
 }
+
+// Кнопка «Назад» у хлібних крихтах.
+//
+// Робить те саме, що кнопка «назад» у браузері: повертає в каталог із
+// тими самими фільтрами і на ту саму картку, де людина спинилась
+// (assets/js/catalog.js → restoreCatalogPosition).
+//
+// АЛЕ НЕ ЗАВЖДИ. Якщо сторінку товару відкрили напряму — з пошуку
+// Google, із месенджера, за збереженим посиланням — попередньої
+// сторінки просто немає, і history.back() виніс би людину ЗІ САЙТУ.
+// Тому перевіряємо, чи попередня сторінка була нашою. Якщо ні —
+// лишаємо звичайний перехід у каталог, який і так прописаний у href.
+//
+// Обробник на документі, а не на кнопці: доріжка перемальовується
+// при зміні кольору, і слухач на самій кнопці довелось би навішувати
+// щоразу заново.
+document.addEventListener("click", event => {
+
+    const back = event.target.closest("[data-crumb-back]");
+
+    if (!back) return;
+
+    let sameSite = false;
+
+    try {
+
+        sameSite = !!document.referrer
+            && new URL(document.referrer).origin === location.origin;
+
+    } catch (error) {
+
+        sameSite = false;
+
+    }
+
+    // history.length > 1 сам по собі не показник: у новій вкладці він
+    // теж буває більшим за одиницю.
+    if (!sameSite) return;   // працює як звичайне посилання на каталог
+
+    event.preventDefault();
+
+    history.back();
+
+});
 
 function paintBreadcrumbs(product, map) {
 
@@ -400,11 +444,35 @@ function paintBreadcrumbs(product, map) {
         departmentOf: name => (map && map.get(name)) || ""
     });
 
-    host.innerHTML = trail
+    host.innerHTML = window.Breadcrumbs.BACK_HTML + trail
         .map(crumb => crumb.current
             ? `<span class="crumb-current" id="breadTitle">${escapeHtml(crumb.label)}</span>`
             : `<a href="${escapeHtml(crumb.href)}">${escapeHtml(crumb.label)}</a>`)
         .join('<span class="crumb-sep">–</span>');
+
+}
+
+// На телефоні доріжку показуємо з КІНЦЯ — з назви товару.
+//
+// Шлях тепер довгий: Головна → Каталог → Стать → Відділ → Категорія →
+// Бренд → Назва. У вузький екран він не влазить, і за замовчуванням
+// видно початок — «Головна – Каталог», тобто найменш корисне. Людина
+// щойно відкрила товар і хоче бачити, ДЕ вона зараз, а не звідки
+// прийшла. Хто захоче вище — прокрутить вліво.
+//
+// Кнопка «Назад» при цьому лишається на місці: вона прилипла до лівого
+// краю (.crumb-back у style.css), інакше прокрутка вправо ховала б
+// саме те, чим найчастіше користуються.
+function scrollBreadcrumbsToEnd() {
+
+    const host = document.getElementById("breadcrumbsList");
+
+    if (!host) return;
+
+    // тільки якщо доріжка справді не влазить
+    if (host.scrollWidth <= host.clientWidth) return;
+
+    host.scrollLeft = host.scrollWidth;
 
 }
 
@@ -413,8 +481,12 @@ function renderBreadcrumbs(product) {
     // одразу малюємо те, що можна без мережі, а відділ додаємо, коли
     // приїде перелік категорій — щоб доріжка не блимала порожньою
     paintBreadcrumbs(product, departmentByCategory);
+    scrollBreadcrumbsToEnd();
 
-    loadDepartmentMap().then(map => paintBreadcrumbs(product, map));
+    loadDepartmentMap().then(map => {
+        paintBreadcrumbs(product, map);
+        scrollBreadcrumbsToEnd();
+    });
 
 }
 
@@ -1107,7 +1179,7 @@ async function renderProductInstagram(product) {
 
     try {
 
-        const response = await fetch("data/home.json");
+        const response = await fetch(dataUrl("data/home.json"));
 
         if (response.ok) instagram = (await response.json()).instagram;
 

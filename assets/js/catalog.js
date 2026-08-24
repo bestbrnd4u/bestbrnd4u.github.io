@@ -165,6 +165,49 @@ let SIZE_GROUPS = FALLBACK_SIZE_GROUPS.map(group => ({ ...group }));
 
 // підтягує актуальний список категорій одягу/взуття з адмінки
 // (data/categories.json) у відповідні групи розмірів
+// Розмір «один розмір» не є вибором.
+//
+// Ним позначені сумки, окуляри без вказаної ширини, годинники — тобто
+// речі, у яких розміру просто немає. Чип, що збігається з половиною
+// каталогу, нічого не звужує й лише займає місце у фільтрі.
+//
+// Регістр різний навмисно: у даних співіснують ONESIZE і Onesize —
+// їх заводили в адмінку в різний час. Порівнюємо без урахування
+// регістру, щоб не залежати від того, як саме набрали цього разу.
+// Порядок розмірів у фільтрі.
+//
+// Абетка тут не годиться: за нею «M» стає перед «S», хоча в одязі
+// порядок XS → S → M → L → XL. Числа теж треба порівнювати як числа,
+// інакше 51 опиниться після 5.
+const LETTER_SIZES = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL", "5XL"];
+
+function compareSizes(a, b) {
+
+    const na = Number(a);
+    const nb = Number(b);
+
+    if (Number.isFinite(na) && Number.isFinite(nb)) return na - nb;
+
+    const la = LETTER_SIZES.indexOf(String(a).toUpperCase());
+    const lb = LETTER_SIZES.indexOf(String(b).toUpperCase());
+
+    if (la !== -1 && lb !== -1) return la - lb;
+
+    // числа завжди після літер: у змішаній групі (напр. взуття + one
+    // size) інакше вийшов би випадковий порядок
+    if (la !== -1) return -1;
+    if (lb !== -1) return 1;
+
+    return String(a).localeCompare(String(b), "uk");
+
+}
+
+function isRealSize(value) {
+
+    return !!value && !/^one\s*size$/i.test(String(value).trim());
+
+}
+
 function applyCategoryDataToSizeGroups(categoryDepartments) {
 
     // У групі можна або перелічити категорії вручну, або вказати
@@ -173,6 +216,90 @@ function applyCategoryDataToSizeGroups(categoryDepartments) {
     SIZE_GROUPS.forEach(group => {
 
         group.categories = resolveGroupCategories(group, categoryDepartments);
+
+    });
+
+    addMissingSizeGroups(categoryDepartments);
+
+}
+
+// Групи для категорій, яких немає в довіднику.
+//
+// ЧОМУ ЦЕ ПОТРІБНО
+// -----------------
+// Групи задавалися вручну в data/size-groups.json, і покривали лише
+// частину каталогу. На практиці у фільтрі лишалося саме взуття:
+//
+//   • «Сумки» я прибрав раніше, коли всі вони були ONESIZE — але потім
+//     зʼявилися сумки з реальними S і M, а група не повернулась;
+//   • в окулярів є 51 і 54 (ширина лінзи), і групи для них не було
+//     ніколи;
+//   • «Одяг» і «Рюкзаки» описані, але таких товарів у каталозі немає.
+//
+// Тобто довідник описував не те, що є, а те, що колись планувалось.
+// Кожна нова категорія вимагала б ручної правки — і фільтр знову
+// відставав би від каталогу.
+//
+// Тепер довідник лишається джерелом ПОРЯДКУ розмірів і таблиць
+// відповідності, а недостаючі групи добудовуються з даних. Категорія,
+// у якої справді є розміри, отримує фільтр сама.
+function addMissingSizeGroups(categoryDepartments) {
+
+    const covered = new Set(SIZE_GROUPS.flatMap(group => group.categories || []));
+
+    // категорія → розділ (для назви групи)
+    const departmentOf = new Map();
+
+    (categoryDepartments || []).forEach(group => {
+        (group.categories || []).forEach(name => departmentOf.set(name, group.title));
+    });
+
+    // збираємо справжні розміри по кожній непокритій категорії
+    const found = new Map();
+
+    products.forEach(product => {
+
+        if (!product.category || covered.has(product.category)) return;
+
+        const sizes = [
+            ...(product.sizes || []),
+            ...(product.variants || []).flatMap(variant => variant.sizes || [])
+        ].filter(isRealSize);
+
+        if (!sizes.length) return;
+
+        if (!found.has(product.category)) found.set(product.category, new Set());
+
+        sizes.forEach(size => found.get(product.category).add(String(size).trim()));
+
+    });
+
+    // Категорії одного розділу зводимо в одну групу: окремі блоки
+    // «Жіночі сумки», «Чоловічі сумки», «Унісекс сумки» з тими самими
+    // розмірами виглядали б як помилка.
+    const byDepartment = new Map();
+
+    found.forEach((sizes, category) => {
+
+        const title = departmentOf.get(category) || category;
+
+        if (!byDepartment.has(title)) {
+            byDepartment.set(title, { sizes: new Set(), categories: [] });
+        }
+
+        byDepartment.get(title).categories.push(category);
+        sizes.forEach(size => byDepartment.get(title).sizes.add(size));
+
+    });
+
+    byDepartment.forEach((data, title) => {
+
+        SIZE_GROUPS.push({
+            key: "auto-" + title.toLowerCase().replace(/\s+/g, "-"),
+            title: title,
+            categories: data.categories,
+            sizes: [...data.sizes].sort(compareSizes)
+        });
 
     });
 
@@ -186,7 +313,7 @@ async function loadCategoryDepartments() {
 
     try {
 
-        const response = await fetch("data/categories.json");
+        const response = await fetch(dataUrl("data/categories.json"));
 
         if (!response.ok) return [];
 
@@ -457,7 +584,7 @@ async function initCatalog() {
 
         loader.hidden = false;
 
-        const response = await fetch("data/products.json");
+        const response = await fetch(dataUrl("data/products.json"));
 
         if (!response.ok) {
             throw new Error("Не вдалося завантажити товари");

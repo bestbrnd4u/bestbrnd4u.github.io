@@ -539,7 +539,7 @@ function loadImageVariants() {
 
     if (imageVariants) return imageVariants;
 
-    imageVariants = fetch("data/image-variants.json")
+    imageVariants = fetch(dataUrl("data/image-variants.json"))
         .then(r => r.ok ? r.json() : [])
         .then(list => new Set(Array.isArray(list) ? list : []))
         .catch(() => new Set());
