@@ -1,0 +1,60 @@
+{
+  "gender": [
+    "Жінкам"
+  ],
+  "preOrderDays": "5–10 робочих днів",
+  "forcePublish": false,
+  "material": "Натуральна шкіра",
+  "brand": "Marc Jacobs",
+  "price": 8600,
+  "preOrder": false,
+  "dimensions": "20 × 12 × 4 см",
+  "variants": [
+    {
+      "color": "Pink",
+      "hex": "#ff07db",
+      "images": [
+        "/assets/images/products/uploads/27687307_57865310_2048.webp",
+        "/assets/images/products/uploads/27687307_57865301_2048.webp",
+        "/assets/images/products/uploads/27687307_57865307_2048.webp",
+        "/assets/images/products/uploads/27687307_57865304_2048.webp"
+      ]
+    }
+  ],
+  "preOrderPrepayment": 50,
+  "strapInfo": "Ремінець знімний та регульований",
+  "sizes": [
+    "Onesize"
+  ],
+  "searchKeywords": [
+    "Marc Jacobs",
+    "The Leather Mini Bag",
+    "Marc Jacobs Mini Bag",
+    "Marc Jacobs 2S4SMN080",
+    "2S4SMN080S02678",
+    "Marc Jacobs сумка",
+    "сумка Marc Jacobs",
+    "жіноча сумка Marc Jacobs",
+    "міні сумка",
+    "маленька сумка",
+    "шкіряна сумка",
+    "сумка з натуральної шкіри",
+    "рожева сумка",
+    "рожева сумка Marc Jacobs",
+    "Bubblegum Pink",
+    "сумка через плече",
+    "сумка на плече",
+    "клатч",
+    "міні клатч",
+    "брендова сумка",
+    "оригінальна Marc Jacobs"
+  ],
+  "isNew": false,
+  "title": "Сумочка Marc Jacobs The Leather Mini Bag Pink",
+  "reviews": 0,
+  "instagramBlock": "general",
+  "description": "Елегантна міні-сумка Marc Jacobs The Leather Mini Bag у ніжному рожевому відтінку — компактна модель із лаконічним дизайном та фірмовим стилем Marc Jacobs.\nСумка виготовлена зі 100% натуральної шкіри та має відкидний клапан із магнітною застібкою. Усередині розташовані основне відділення, кишеня для дрібниць та 8 слотів для карток. Модель можна носити як клатч або використовувати знімний регульований ремінець для носіння на плечі чи через плече",
+  "sku": "2S4SMN080S02678",
+  "rating": 5,
+  "category": "Жіночі сумки"
+}
