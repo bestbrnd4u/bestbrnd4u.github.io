@@ -53,5 +53,15 @@
   "description": "Стильна сумка Marc Jacobs The Creature Tote Bag у чорному кольорі — ефектна модель із колекції бренду, яка поєднує впізнаваний дизайн та оригінальну фактуру. Сумка виконана з м’якого штучного хутра, доповнена шкіряними ручками та знімним регульованим ременем, що дозволяє носити її в руці, на плечі або через плече.\nМодель має містке основне відділення та практичну конструкцію, завдяки чому підходить як для повсякденних образів, так і для стильних виходів. Чорний колір легко поєднується з базовим гардеробом, а фактурний матеріал додає образу акцентності",
   "sku": "H025M06RE22",
   "rating": 5,
-  "category": "Жіночі сумки"
+  "category": "Жіночі сумки",
+  "slug": "жіноча-сумочка-marc-jacobs-the-creature-tote-bag-black",
+  "id": 45,
+  "color": "Чорний",
+  "images": [
+    "/assets/images/products/uploads/25077124~black_0.webp",
+    "/assets/images/products/uploads/25077124~black_2.webp",
+    "/assets/images/products/uploads/25077124~black_4.webp",
+    "/assets/images/products/uploads/25077124~black_3.webp",
+    "/assets/images/products/uploads/25077124~black_1.webp"
+  ]
 }
