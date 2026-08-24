@@ -549,3 +549,63 @@
     opacity:.45;
     cursor:default;
 }
+
+/* ==========================================================
+   Посилання для поста (admin/order-link-widget.js)
+   ========================================================== */
+
+.order-link-row + .order-link-row{
+    margin-top:14px;
+}
+
+.order-link-label{
+    font-size:12px;
+    font-weight:600;
+    color:#374151;
+    margin-bottom:4px;
+}
+
+.order-link-value{
+    display:flex;
+    gap:8px;
+}
+
+.order-link-value input{
+    flex:1;
+    min-width:0;
+    padding:8px 10px;
+    border:1px solid #e5e7eb;
+    border-radius:8px;
+    background:#f9fafb;
+    font-size:12.5px;
+    color:#111827;
+    /* Адреси довгі, і показувати їх обрізаними з початку було б гірше:
+       людина має впізнати товар. Тому текст не переноситься, але поле
+       прокручується. */
+    white-space:nowrap;
+    overflow-x:auto;
+}
+
+.order-link-copy{
+    flex-shrink:0;
+    padding:8px 14px;
+    border:1px solid #2563eb;
+    border-radius:8px;
+    background:#2563eb;
+    color:#fff;
+    font-size:12.5px;
+    font-weight:600;
+    cursor:pointer;
+}
+
+.order-link-copy.is-done{
+    background:#059669;
+    border-color:#059669;
+}
+
+.order-link-hint{
+    margin:5px 0 0;
+    font-size:11.5px;
+    line-height:1.45;
+    color:#6b7280;
+}

@@ -34,6 +34,24 @@ collections:
   - name: "pages"
     label: "Сторінки"
     files:
+      - name: "telegram"
+        label: "Telegram-бот"
+        file: "data/telegram.json"
+        description: >
+          Логін бота потрібен, щоб у картці товару зʼявилось посилання
+          «Замовити в боті» — його кладуть у рілси й шапку профілю.
+        fields:
+          - label: "Логін бота (без @)"
+            name: "botUsername"
+            widget: "string"
+            required: false
+            pattern: ["^[A-Za-z0-9_]{0,32}$", "Лише латиниця, цифри та підкреслення, без @"]
+            hint: >
+              Це НЕ назва, яку видно в шапці чату, а саме логін — той, що
+              в адресі t.me. Знайти: напишіть боту @BotFather команду
+              /mybots і оберіть свого бота, логін показано під назвою і
+              завжди закінчується на «bot». Вводьте без символу @.
+
       - name: "searchBanners"
         label: "Картинки в пошуку"
         file: "data/search-banners.json"
@@ -1533,6 +1551,16 @@ collections:
         field: forcePublish
         pattern: true
     fields:
+      # Посилання на товар для постів у Telegram.
+      #
+      # Нічого не зберігає: поле лише показує готові адреси й дає
+      # кнопку «Скопіювати». Адреса збирається зі slug-а, а його
+      # генерує збірка — в адмінці його інакше ніде не видно.
+      - label: "Посилання для поста"
+        name: "orderLink"
+        widget: "orderLink"
+        required: false
+
       - label: "Назва товару"
         name: "title"
         widget: "string"
