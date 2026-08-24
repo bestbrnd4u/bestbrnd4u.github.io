@@ -177,7 +177,14 @@ rewrite("admin/index.html", text => {
     const payload = JSON.stringify({
         name: ENV_NAME,
         host: SITE_URL.replace(/^https?:\/\//, ""),
-        branch: BRANCH
+        branch: BRANCH,
+        // Бойова адреса — окремо від поточної.
+        //
+        // Потрібна віджету посилань на товар (admin/order-link-widget.js):
+        // посилання для постів мусить вести на bestbrnd4u.com навіть тоді,
+        // коли редагують на дев-адмінці. Інакше покупець із поста
+        // потрапить на тестовий сайт, закритий від індексації.
+        productionUrl: ALL.production.url
     });
 
     const block = `    <script>window.SITE_ENVIRONMENT = ${payload};</script>`;

@@ -51,8 +51,48 @@ console.log("\n[1] Форма справді надсилає");
         !/formsubmit\.co\/ajax\/[a-z0-9._%-]+@/i.test(common));
 }
 
-console.log("\n[2] Поведінка на живому DOM");
+console.log("\n[1b] Форму обробляє РІВНО одне місце");
 {
+    // Саме тут крився баг, який виглядав нез'ясовним.
+    //
+    // Крім інлайнового обробника на сторінці, такий самий жив у
+    // common.js — колишній, який нічого не надсилав, а лише чистив
+    // поля. Коли інлайновий полагодили, цей лишився й зламав уже
+    // полагоджене: common.js підключається РАНІШЕ, тож спрацьовував
+    // першим, чистив форму, а справжній обробник бачив уже порожні
+    // поля й відповідав «Заповніть усі поля».
+    //
+    // Назовні: жодного запиту, порожня консоль, форма ніби порожня —
+    // причину зі сторони не видно.
+    check("у common.js обробника більше немає",
+        !/contactForm\?\.addEventListener/.test(common));
+    check("і самого посилання на форму теж",
+        !/getElementById\("contactForm"\)/.test(common));
+
+    // Один обробник на всю сторінку — рахуємо по всіх скриптах, які
+    // вона підключає.
+    const pageScripts = [...read("contacts.html")
+        .matchAll(/<script src="(assets\/js\/[^"?]+)/g)]
+        .map(m => read(m[1]));
+
+    const handlers = [...pageScripts, code]
+        .join("\n")
+        .match(/contactForm[\s\S]{0,40}addEventListener\("submit"/g) || [];
+
+    check("обробник submit рівно один", handlers.length === 1, handlers.length);
+
+    // Українські підказки валідації лишаються — вони вішаються на всі
+    // форми окремо й обробником не є.
+    check("українські підказки на місці", /applyUkrainianValidation/.test(common));
+}
+
+// Далі — перевірки поведінки. Обидва блоки асинхронні, тож
+// виконуються послідовно, а підсумок друкується в самому кінці.
+
+function checkBehaviour() {
+
+console.log("\n[2] Поведінка на живому DOM");
+
     const run = fetchImpl => {
 
         const dom = new JSDOM(
@@ -95,19 +135,17 @@ console.log("\n[2] Поведінка на живому DOM");
     check("порожня форма не надсилається", empty.box.sent === null);
     check("і про це сказано", /Заповніть усі поля/.test(empty.toasts[0] || ""), empty.toasts[0]);
 
-    // 2. успіх
     const ok = run(() => Promise.resolve({ ok: true, json: () => Promise.resolve({}) }));
 
     fill(ok);
     fire(ok);
 
-    // 3. збій мережі
     const bad = run(() => Promise.reject(new Error("offline")));
 
     fill(bad);
     fire(bad);
 
-    // 4. відповідь із помилкою HTTP — теж не успіх
+    // відповідь із помилкою HTTP — теж не успіх
     const http = run(() => Promise.resolve({ ok: false, status: 500, json: () => Promise.resolve({}) }));
 
     fill(http);
@@ -133,15 +171,88 @@ console.log("\n[2] Поведінка на живому DOM");
         check("при збої підказано, куди писати",
             /proton\.me/.test(bad.toasts.join(" ")) && /Telegram/.test(bad.toasts.join(" ")));
 
-        // кнопку треба розблокувати в будь-якому разі, інакше після
-        // збою повторити спробу вже не вийде
+        // кнопку треба розблокувати в будь-якому разі
         check("кнопка розблокована після збою",
             !bad.w.document.querySelector("button").disabled);
         check("кнопка розблокована після успіху",
             !ok.w.document.querySelector("button").disabled);
 
-        console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
-        process.exit(failures === 0 ? 0 : 1);
+        resolve();
 
     }, 50));
+
 }
+
+function checkWholePage() {
+
+console.log("\n[3] Наскрізно: сторінка цілком, як у браузері");
+
+    // Перевірки вище дивляться на код. Ця — на поведінку СТОРІНКИ:
+    // вантажимо common.js і інлайновий скрипт у тому ж порядку, що й
+    // браузер. Саме порядок і був причиною бага, і жоден тест на
+    // окремий файл його б не побачив.
+    const dom = new JSDOM(read("contacts.html"), {
+        runScripts: "outside-only",
+        pretendToBeVisual: true,
+        url: "https://bestbrnd4u.com/contacts"
+    });
+
+    const w = dom.window;
+    const toasts = [];
+
+    let requests = 0;
+
+    w.fetch = () => {
+        requests++;
+        return Promise.resolve({ ok: true, json: () => Promise.resolve({}) });
+    };
+
+    w.showToast = t => toasts.push(t);
+
+    // common.js спершу — як у розмітці
+    try { w.eval(common); } catch (error) { /* частина потребує інших сторінок */ }
+
+    w.showToast = t => toasts.push(t);
+    w.eval(code);
+
+    const form = w.document.getElementById("contactForm");
+
+    form.querySelector("[name=name]").value = "Ілля";
+    form.querySelector("[name=contact]").value = "test@example.com";
+    form.querySelector("[name=message]").value = "Питання про товар";
+
+    form.dispatchEvent(new w.Event("submit", { cancelable: true }));
+
+    return new Promise(resolve => setTimeout(() => {
+
+        // Головне: заповнена форма МУСИТЬ відправитись.
+        check("запит на надсилання пішов", requests === 1, requests);
+
+        check("тост рівно один", toasts.length === 1, toasts.join(" | "));
+        check("і він про успіх", /надіслано/i.test(toasts[0] || ""), toasts[0]);
+
+        // Саме цей тост бачив користувач замість листа
+        check("не просить заповнити заповнене",
+            !toasts.some(t => /Заповніть усі поля/.test(t)), toasts.join(" | "));
+
+        // Чистити форму можна лише ПІСЛЯ успіху
+        check("форму очищено після відправки",
+            form.querySelector("[name=name]").value === "");
+
+        resolve();
+
+    }, 60));
+
+}
+
+checkBehaviour()
+    .then(checkWholePage)
+    .then(() => {
+
+        console.log(failures === 0
+            ? "\n✅ Усі перевірки пройдено"
+            : `\n❌ Провалено: ${failures}`);
+
+        process.exit(failures === 0 ? 0 : 1);
+
+    });
