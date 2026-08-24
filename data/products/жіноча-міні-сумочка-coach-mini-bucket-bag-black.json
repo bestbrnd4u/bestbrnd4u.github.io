@@ -73,5 +73,15 @@
   "description": "Стильна міні-сумка COACH Mini Bucket Bag у поєднанні чорного кольору зі сріблястою фурнітурою. Лаконічний силует bucket та фірмовий логотип COACH роблять модель універсальним аксесуаром для повсякденних і вечірніх образів.\nСумка виготовлена з якісної натуральної шкіри та має зручне закриття на шнурок. Модель доповнена знімною ручкою та знімним ременем, тому її можна носити в руці, на плечі або через плече. Компактний розмір ідеально підходить для найнеобхідніших речей",
   "sku": "CR144",
   "rating": 5,
-  "category": "Жіночі сумки"
+  "category": "Жіночі сумки",
+  "slug": "жіноча-міні-сумочка-coach-mini-bucket-bag-black",
+  "id": 46,
+  "color": "Чорний",
+  "images": [
+    "/assets/images/products/uploads/cr144_svbk_a0.webp",
+    "/assets/images/products/uploads/cr144_svbk_a3.webp",
+    "/assets/images/products/uploads/cr144_svbk_a8.webp",
+    "/assets/images/products/uploads/cr144_svbk_a91.webp",
+    "/assets/images/products/uploads/cr144_svbk_a92.webp"
+  ]
 }

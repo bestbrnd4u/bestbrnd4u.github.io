@@ -2545,5 +2545,92 @@
       "/assets/images/products/uploads/25077124~black_3.webp",
       "/assets/images/products/uploads/25077124~black_1.webp"
     ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "5–10 робочих днів",
+    "forcePublish": false,
+    "material": "Натуральна шкіра",
+    "brand": "Coach",
+    "price": 6800,
+    "preOrder": false,
+    "dimensions": "14 × 16,5 × 9 см",
+    "variants": [
+      {
+        "color": "Чорний",
+        "hex": "#000000",
+        "images": [
+          "/assets/images/products/uploads/cr144_svbk_a0.webp",
+          "/assets/images/products/uploads/cr144_svbk_a3.webp",
+          "/assets/images/products/uploads/cr144_svbk_a8.webp",
+          "/assets/images/products/uploads/cr144_svbk_a91.webp",
+          "/assets/images/products/uploads/cr144_svbk_a92.webp"
+        ],
+        "sizes": [
+          "Onesize"
+        ]
+      },
+      {
+        "color": "Білий",
+        "hex": "#fffefe",
+        "sizes": [
+          "Onesize"
+        ],
+        "images": [
+          "/assets/images/products/uploads/cr144_svha_a0.webp",
+          "/assets/images/products/uploads/cr144_svha_a3.webp",
+          "/assets/images/products/uploads/cr144_svha_a8.webp",
+          "/assets/images/products/uploads/cr144_svha_a91.webp"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 50,
+    "strapInfo": "Знімні",
+    "sizes": [
+      "Onesize"
+    ],
+    "searchKeywords": [
+      "COACH",
+      "Coach Mini Bucket Bag",
+      "Coach CR144",
+      "сумка Coach",
+      "Coach сумка",
+      "жіноча сумка Coach",
+      "Mini Bucket Bag",
+      "Coach Bucket Bag",
+      "Coach чорна сумка",
+      "чорна сумка Coach",
+      "сумка через плече Coach",
+      "міні сумка",
+      "маленька сумка",
+      "bucket bag",
+      "сумка відро",
+      "шкіряна сумка",
+      "жіноча шкіряна сумка",
+      "брендова сумка",
+      "оригінальна Coach",
+      "сумка на плече",
+      "сумка кросбоді"
+    ],
+    "isNew": false,
+    "title": "Жіноча міні сумочка Coach Mini Bucket Bag Black",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильна міні-сумка COACH Mini Bucket Bag у поєднанні чорного кольору зі сріблястою фурнітурою. Лаконічний силует bucket та фірмовий логотип COACH роблять модель універсальним аксесуаром для повсякденних і вечірніх образів.\nСумка виготовлена з якісної натуральної шкіри та має зручне закриття на шнурок. Модель доповнена знімною ручкою та знімним ременем, тому її можна носити в руці, на плечі або через плече. Компактний розмір ідеально підходить для найнеобхідніших речей",
+    "sku": "CR144",
+    "rating": 5,
+    "category": "Жіночі сумки",
+    "slug": "жіноча-міні-сумочка-coach-mini-bucket-bag-black",
+    "id": 46,
+    "color": "Чорний",
+    "images": [
+      "/assets/images/products/uploads/cr144_svbk_a0.webp",
+      "/assets/images/products/uploads/cr144_svbk_a3.webp",
+      "/assets/images/products/uploads/cr144_svbk_a8.webp",
+      "/assets/images/products/uploads/cr144_svbk_a91.webp",
+      "/assets/images/products/uploads/cr144_svbk_a92.webp"
+    ]
   }
 ]
