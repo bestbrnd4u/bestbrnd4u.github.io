@@ -185,12 +185,19 @@ console.log("\n[6] Повний шлях у крихтах товару");
         q(trail[3].href).get("gender") === "Жінкам"
         && q(trail[3].href).get("department") === "Аксесуари", trail[3].href);
 
-    check("категорія несе стать і відділ",
-        q(trail[4].href).get("department") === "Аксесуари"
-        && q(trail[4].href).get("category") === "Окуляри і оправи");
+    // Відділ зникає, щойно зʼявилась категорія — вона лежить усередині
+    // нього, тож разом вони зайві. Ба більше: у каталозі відділ і
+    // категорія додаються як АБО, і посилання «Аксесуари + Окуляри»
+    // розкрило б увесь відділ замість самих окулярів.
+    check("категорія несе стать, але не відділ",
+        q(trail[4].href).get("category") === "Окуляри і оправи"
+        && q(trail[4].href).get("gender") === "Жінкам"
+        && !q(trail[4].href).get("department"),
+        trail[4].href);
 
-    check("бренд несе весь шлях",
-        ["gender", "department", "category", "brand"].every(k => q(trail[5].href).get(k)),
+    check("бренд несе шлях без зайвого відділу",
+        ["gender", "category", "brand"].every(k => q(trail[5].href).get(k))
+        && !q(trail[5].href).get("department"),
         trail[5].href);
 
     // Відділ має власний короткий параметр: спершу він вів у каталог із
@@ -406,6 +413,75 @@ console.log("\n[9b] Поведінка кнопки — на живому DOM");
 
     check("прямий вхід — не смикає історію", !direct.wentBack);
     check("теж працює як посилання", !direct.prevented);
+}
+
+console.log("\n[10] Відділ і категорія — один фільтр (АБО)");
+{
+    // СИМПТОМ: у бічному меню відмітили «Взуття», «Аксесуари» і три
+    // категорії сумок — каталог показав нуль товарів. Бо відділ і
+    // категорія працювали як І: товар мусив бути одночасно взуттям і
+    // сумкою, а таких не буває.
+    //
+    // Правильно як у решті фільтрів: кілька значень ОДНОГО фільтра
+    // розширюють вибірку, і лише різні фільтри звужують її разом.
+    check("відділ і категорія складаються, а не перетинаються",
+        /selectedCategories\.has\(product\.category\)\s*\n\s*\|\| selectedDepartments\.has/.test(catalog));
+
+    check("умова спрацьовує, якщо обрано хоч щось одне",
+        /\(selectedCategories\.size \|\| selectedDepartments\.size\)/.test(catalog));
+
+    // Перевіряємо на справжніх даних той самий випадок із репорту
+    const products = JSON.parse(read("data/products.json"));
+    const categories = JSON.parse(read("data/categories.json"));
+
+    const departmentOf = new Map();
+
+    categories.forEach(c => departmentOf.set(c.name, c.department));
+
+    const match = (departments, cats) => {
+
+        const D = new Set(departments);
+        const C = new Set(cats);
+
+        return products.filter(p =>
+            C.has(p.category) || D.has(departmentOf.get(p.category))).length;
+
+    };
+
+    const reported = match(["Взуття", "Аксесуари"],
+        ["Унісекс сумки", "Чоловічі сумки", "Жіночі сумки"]);
+
+    check("випадок із репорту більше не порожній", reported > 0, reported);
+
+    // і сума збігається: обрано все, що є
+    check("обрано всі розділи — видно весь каталог",
+        match(["Сумки", "Взуття", "Аксесуари"], []) === products.length,
+        `${match(["Сумки", "Взуття", "Аксесуари"], [])} з ${products.length}`);
+
+    // одна категорія лишається однією категорією, а не цілим відділом
+    const onlyWomen = match([], ["Жіночі сумки"]);
+    const wholeBags = match(["Сумки"], []);
+
+    check("одна категорія не розкриває весь відділ",
+        onlyWomen < wholeBags, `${onlyWomen} проти ${wholeBags}`);
+}
+
+console.log("\n[11] Автоскрол показує застосовані фільтри");
+{
+    // Скрол цілив у рядок «Знайдено N товарів», а панель із чипами
+    // стоїть ВИЩЕ — після застосування фільтра вона опинялась за
+    // верхнім краєм екрана. Людина щойно щось відмітила, а результату
+    // своєї дії не бачить: ні що обрано, ні кнопки «Скинути фільтри».
+    check("ціль скролу — панель активних фільтрів",
+        /getElementById\("activeFiltersBar"\)/.test(catalog));
+
+    check("панель має бути справді видимою",
+        /!filtersBar\.hidden[\s\S]{0,120}display !== "none"/.test(catalog));
+
+    // Коли фільтрів немає, панель схована — тоді, як і раніше,
+    // цілимось у рядок із кількістю знайденого.
+    check("без фільтрів працює як раніше",
+        /visibleFiltersBar \|\| catalogTop \|\| firstCard \|\| grid/.test(catalog));
 }
 
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);

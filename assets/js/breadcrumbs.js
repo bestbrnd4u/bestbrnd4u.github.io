@@ -109,6 +109,14 @@
                 trail.push({ label: department, href: catalogHref(so_far) });
             }
 
+            // Відділ прибираємо, щойно зʼявилась категорія.
+            //
+            // Категорія лежить УСЕРЕДИНІ відділу, тож разом вони зайві.
+            // Ба більше — шкідливі: у каталозі відділ і категорія
+            // додаються як АБО, і посилання «Аксесуари + Окуляри»
+            // розкрило б увесь відділ замість самих окулярів.
+            delete so_far.department;
+
             so_far.category = category;
             trail.push({ label: category, href: catalogHref(so_far) });
 

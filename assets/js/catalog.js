@@ -51,9 +51,26 @@ function getResultsScrollTop() {
 
     if (!grid) return 0;
 
+    // Ціль — панель активних фільтрів, якщо вона показана.
+    //
+    // Раніше скрол цілив у .catalog-top («Знайдено N товарів»), а
+    // панель із чипами стоїть ВИЩЕ — і після застосування фільтра вона
+    // опинялась за верхнім краєм екрана. Людина щойно щось відмітила,
+    // а результату своєї дії не бачить: не видно ні що саме обрано, ні
+    // кнопки «Скинути фільтри».
+    //
+    // Панель ховається, коли фільтрів немає (hidden), — тоді, як і
+    // раніше, цілимось у рядок із кількістю знайденого.
+    const filtersBar = document.getElementById("activeFiltersBar");
     const catalogTop = document.querySelector(".catalog-top");
     const firstCard = grid.querySelector(".product-card");
-    const target = catalogTop || firstCard || grid;
+
+    const visibleFiltersBar = filtersBar && !filtersBar.hidden
+        && getComputedStyle(filtersBar).display !== "none"
+        ? filtersBar
+        : null;
+
+    const target = visibleFiltersBar || catalogTop || firstCard || grid;
 
     const headerEl = document.querySelector("header");
     const mobileBar = document.querySelector(".mobile-filter-bar");
@@ -183,6 +200,11 @@ const LETTER_SIZES = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL", "5X
 
 function compareSizes(a, b) {
 
+    // «Один розмір» — завжди останній: це не позиція в шкалі, а
+    // відсутність розміру, і серед чисел чи літер він виглядав би
+    // випадково вставленим.
+    if (isOneSize(a) !== isOneSize(b)) return isOneSize(a) ? 1 : -1;
+
     const na = Number(a);
     const nb = Number(b);
 
@@ -202,9 +224,33 @@ function compareSizes(a, b) {
 
 }
 
+// «Один розмір» — теж вибір, але не завжди.
+//
+// Спершу я викидав його з фільтра як марний: чип, що збігається з
+// половиною каталогу, нічого не звужує. Це вірно лише для ОДНОРІДНОЇ
+// групи — там, де всі товари мають один розмір.
+//
+// Але групи змішані. В «Аксесуарах» окуляри з шириною 51 і 54 лежать
+// РАЗОМ із годинниками та окулярами без розміру. Вибір «один розмір»
+// відсікає перші — тобто звужує, і саме так ним і хочуть
+// користуватися. Те саме в «Сумках»: S і M поруч із рештою.
+//
+// Правило: показуємо «один розмір» тоді й лише тоді, коли в групі є ЩЕ
+// ЯКІСЬ розміри. Група, де геть усе — один розмір, фільтра не потребує,
+// і чип там був би шумом.
+//
+// Регістр не має значення: у даних свого часу співіснували ONESIZE і
+// Onesize. Зараз збірка зводить їх до одного вигляду, але покладатися
+// на це не варто — дані заводять руками.
+function isOneSize(value) {
+
+    return !!value && /^one\s*size$/i.test(String(value).trim());
+
+}
+
 function isRealSize(value) {
 
-    return !!value && !/^one\s*size$/i.test(String(value).trim());
+    return !!value && !isOneSize(value);
 
 }
 
@@ -264,7 +310,7 @@ function addMissingSizeGroups(categoryDepartments) {
         const sizes = [
             ...(product.sizes || []),
             ...(product.variants || []).flatMap(variant => variant.sizes || [])
-        ].filter(isRealSize);
+        ].filter(size => size && String(size).trim());
 
         if (!sizes.length) return;
 
@@ -293,6 +339,10 @@ function addMissingSizeGroups(categoryDepartments) {
     });
 
     byDepartment.forEach((data, title) => {
+
+        // Група, у якій немає нічого, крім «одного розміру», фільтра не
+        // потребує: єдиний чип збігався б з усіма товарами розділу.
+        if (![...data.sizes].some(isRealSize)) return;
 
         SIZE_GROUPS.push({
             key: "auto-" + title.toLowerCase().replace(/\s+/g, "-"),
@@ -2444,21 +2494,24 @@ function filterProducts(skip) {
 
     }
 
-    if (selectedCategories.size && skip !== "categories") {
+    // Відділ і категорія — ОДИН фільтр, значення в ньому додаються (АБО).
+    //
+    // Спершу вони працювали як І: товар мусив підходити і під обраний
+    // відділ, і під обрану категорію. У бічному меню це давало порожній
+    // каталог на найзвичайнішій дії — відмітили «Взуття», «Аксесуари» і
+    // три категорії сумок, а товару, який одночасно взуття й сумка, не
+    // існує.
+    //
+    // Правильно так само, як у решті фільтрів: кілька значень ОДНОГО
+    // фільтра розширюють вибірку (бренд Guess АБО Furla), і лише різні
+    // фільтри звужують її разом (бренд І колір). Відділ — це не окремий
+    // фільтр, а той самий «де шукати», тільки на рівень вище: відмітити
+    // відділ = відмітити всі його категорії.
+    if ((selectedCategories.size || selectedDepartments.size) && skip !== "categories") {
 
         list = list.filter(product =>
             selectedCategories.has(product.category)
-        );
-
-    }
-
-    // Відділ звужує так само, як категорія, тільки на рівень вище.
-    // Разом вони працюють як І: якщо людина прийшла з крихти «Аксесуари»
-    // й додала категорію, лишаються товари, що підходять під обидві умови.
-    if (selectedDepartments.size && skip !== "categories") {
-
-        list = list.filter(product =>
-            selectedDepartments.has(departmentByCategory.get(product.category))
+            || selectedDepartments.has(departmentByCategory.get(product.category))
         );
 
     }

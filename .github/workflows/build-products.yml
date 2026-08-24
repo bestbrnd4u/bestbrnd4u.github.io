@@ -140,6 +140,10 @@ jobs:
           # перелік фото зі зменшеними копіями оновлює крок
           # "Normalize product photos to 4:5"
           git add data/image-variants.json
+          # Реєстр відбитків картинок. Без нього наступна збірка не
+          # побачить, що фото замінили під тим самим імʼям, — і люди
+          # далі отримуватимуть стару картинку з кеша.
+          git add data/image-fingerprints.json
           if git diff --cached --quiet; then
             echo "Немає змін — пропускаємо коміт"
             echo "pushed=false" >> "$GITHUB_OUTPUT"
