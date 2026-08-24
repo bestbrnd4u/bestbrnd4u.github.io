@@ -74,11 +74,21 @@ function createFavoriteRow(product, favEntry) {
             ${size}
         </button>
     `).join("");
+    // Посилання веде на ТОЙ САМИЙ колір і розмір, що в обраному.
+    // Раніше стояв productUrl(product) без параметрів — з обраного
+    // завжди відкривався перший колір товару.
+    const rowUrl = productUrl(product, { color: activeColor, size: activeSize });
+
+    // Кружечки кольорів не підписані, тож назву показуємо окремо.
+    const colorLabel = activeColor
+        ? `<div class="favorite-row-color">Колір: <b>${escapeHtml(activeColor)}</b></div>`
+        : "";
+
 
     return `
         <div class="favorite-row" data-id="${product.id}" data-color="${favEntry.color || ""}" data-size="${favEntry.size || ""}">
 
-            <a href="${productUrl(product)}" class="favorite-row-image">
+            <a href="${rowUrl}" class="favorite-row-image">
                 <img
                     src="${image}"
                     alt="${escapeHtml(product.title)}"
@@ -89,9 +99,10 @@ function createFavoriteRow(product, favEntry) {
                 <div class="favorite-row-brand">
                     ${product.brand || "Без бренду"}
                 </div>
-                <a href="${productUrl(product)}" class="favorite-row-title">
+                <a href="${rowUrl}" class="favorite-row-title">
                     ${escapeHtml(product.title)}
                 </a>
+                ${colorLabel}
                 <div class="product-options">
 <div class="product-colors-wrap">
                         <button type="button" class="colors-arrow colors-arrow-left" aria-label="Попередні кольори" tabindex="-1">‹</button>

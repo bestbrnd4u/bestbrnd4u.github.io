@@ -418,6 +418,46 @@ function renderBreadcrumbs(product) {
 
 }
 
+// Заглушка відео → плеєр.
+//
+// Клац по ній вмикає ЦЕ відео, а не змінює загальну згоду: людина
+// погодилась подивитись конкретний ролик, і робити з цього постійний
+// дозвіл для всього сайту було б підміною її рішення. Загальний вибір
+// змінюється лише в банері.
+document.addEventListener("click", event => {
+
+    const btn = event.target.closest(".video-consent-btn");
+
+    if (!btn) return;
+
+    const box = btn.closest(".video-consent");
+
+    if (!box) return;
+
+    const iframe = document.createElement("iframe");
+
+    iframe.src = box.dataset.embedUrl;
+    iframe.title = box.dataset.embedTitle || "";
+    iframe.setAttribute("allow", "autoplay; fullscreen; picture-in-picture");
+    iframe.setAttribute("allowfullscreen", "");
+
+    box.classList.remove("video-consent");
+    box.innerHTML = "";
+    box.appendChild(iframe);
+
+});
+
+// Якщо згоду дали в банері вже після того, як сторінку намальовано, —
+// заглушки перетворюються на плеєри самі, без перезавантаження.
+document.addEventListener("consent:change", event => {
+
+    if (!event.detail?.embeds) return;
+
+    document.querySelectorAll(".video-consent .video-consent-btn")
+        .forEach(btn => btn.click());
+
+});
+
 function galleryFrameStyle(src) {
 
     return (window.ImageFraming
@@ -507,7 +547,20 @@ function buildTrackMarkup(images, video, altText) {
 
     } else if (media?.type === "embed") {
 
-        videoSlide = `
+        // Відео вантажиться ЛИШЕ після згоди (assets/js/consent.js).
+        //
+        // iframe YouTube чи Vimeo звертається до чужого сервера одразу
+        // при відкритті сторінки — тобто ці сервіси дізнаються
+        // IP-адресу відвідувача ще до того, як він щось натиснув.
+        // Саме через це в банері й питається окремо про відео: якби
+        // ми вставляли iframe одразу, згода була б декоративною.
+        //
+        // До згоди на місці плеєра — заглушка з обкладинкою й прямим
+        // текстом про те, що станеться після натискання.
+        const allowed = !window.Consent || window.Consent.has("embeds");
+
+        videoSlide = allowed
+            ? `
             <div class="gallery-slide gallery-slide-embed">
                 <iframe
                     src="${media.embedUrl}"
@@ -515,6 +568,21 @@ function buildTrackMarkup(images, video, altText) {
                     allow="autoplay; fullscreen; picture-in-picture"
                     allowfullscreen
                     loading="lazy"></iframe>
+            </div>
+        `
+            : `
+            <div class="gallery-slide gallery-slide-embed video-consent"
+                 data-embed-url="${escapeHtml(media.embedUrl)}"
+                 data-embed-title="${escapeHtml(altText)}"
+                 ${media.thumbUrl ? `style="--embed-thumb:url('${escapeHtml(media.thumbUrl)}')"` : ""}>
+                <button type="button" class="video-consent-btn">
+                    <span class="video-consent-play" aria-hidden="true">▶</span>
+                    <span class="video-consent-title">Показати відео</span>
+                    <span class="video-consent-note">
+                        Завантажиться з ${media.embedUrl.includes("vimeo") ? "Vimeo" : "YouTube"}.
+                        Сервіс отримає вашу IP-адресу.
+                    </span>
+                </button>
             </div>
         `;
 
@@ -729,11 +797,11 @@ ${sizeButtons}
 
 </div>
 
-        <div class="product-short">
-
-            ${product.description || "Стильна сумка преміальної якості. Підходить для щоденного використання та чудово поєднується з будь-яким образом."}
-
-        </div>
+        <!-- Опис тут НЕ дублюємо.
+             Той самий текст лежить нижче, у розділі «Опис» серед
+             характеристик. Два однакові абзаци на одному екрані
+             відсували кнопку «Купити» за межі видимого й виглядали як
+             помилка. Розгортайний блок нижче лишається єдиним місцем. -->
 
         <div class="product-actions">
 

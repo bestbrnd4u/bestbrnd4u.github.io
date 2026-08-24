@@ -4685,12 +4685,18 @@ body.mobile-filters-open .scroll-top{
         bottom:0;
         z-index:900;
         background:#fff;
-        /* мінімум 20px відступу знизу навіть якщо
-           env(safe-area-inset-bottom) дорівнює 0 — інакше
-           кнопка опиняється в "гарячій зоні" й перший тап
-           в Safari на iOS лише розгортає нижню панель
-           браузера замість натискання на кнопку */
-        padding:12px 16px max(20px, calc(12px + env(safe-area-inset-bottom, 0px)));
+        /* Відступ знизу такий самий, як зверху (12px), ПЛЮС apaратна
+           безпечна зона там, де вона є.
+           
+           Раніше стояло max(20px, …): жорсткий поріг у 20px додавався
+           навіть на пристроях без вирізу, і смуга виглядала помітно
+           нижчою знизу, ніж зверху.
+           
+           env(safe-area-inset-bottom) лишаємо обовʼязково: на iPhone з
+           жестовою смугою без нього кнопка опиняється просто під нею.
+           Там відступ і далі буде більшим — це не косметика, а
+           попадання пальцем. */
+        padding:12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
         box-shadow:0 -10px 30px rgba(0,0,0,.1);
         transform:translateY(110%);
         transition:transform .3s ease;
@@ -10127,3 +10133,252 @@ body.mobile-filters-open .scroll-top{
 }
 
 }
+
+/* =====================================
+   ПІДТВЕРДЖЕННЯ ВИДАЛЕННЯ (common.js → askConfirm)
+   ===================================== */
+
+.confirm-overlay{
+    position:fixed;
+    inset:0;
+    z-index:3000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    background:rgba(17,24,39,.55);
+    animation:confirmFade .15s ease;
+}
+
+@keyframes confirmFade{ from{opacity:0} to{opacity:1} }
+
+.confirm-box{
+    width:100%;
+    max-width:380px;
+    background:#fff;
+    border-radius:18px;
+    padding:26px 24px 20px;
+    box-shadow:0 20px 60px rgba(0,0,0,.25);
+    text-align:center;
+}
+
+.confirm-title{
+    margin:0 0 10px;
+    font-size:19px;
+    line-height:1.3;
+}
+
+.confirm-text{
+    margin:0 0 22px;
+    font-size:14px;
+    line-height:1.55;
+    color:var(--gray700);
+}
+
+.confirm-actions{
+    display:flex;
+    gap:10px;
+}
+
+.confirm-actions .btn{
+    flex:1;
+    height:46px;
+    justify-content:center;
+}
+
+/* Видалення — дія, яку не відкотиш, тож кнопка червона: колір сам по
+   собі попереджає ще до читання тексту. */
+.confirm-danger{
+    background:#dc2626;
+    border-color:#dc2626;
+    color:#fff;
+}
+
+@media (hover:hover) and (pointer:fine){
+.confirm-danger:hover{
+    background:#b91c1c;
+    border-color:#b91c1c;
+}
+}
+
+/* поки діалог відкритий, сторінка під ним не гортається */
+body.confirm-open{
+    overflow:hidden;
+}
+
+/* назва кольору в кошику й обраному */
+.cart-item-color,
+.favorite-row-color{
+    font-size:13px;
+    color:var(--gray700);
+    margin:6px 0 2px;
+}
+
+.cart-item-color b,
+.favorite-row-color b{
+    color:var(--gray900);
+}
+
+/* =====================================
+   ЗГОДА НА ВИКОРИСТАННЯ ДАНИХ (assets/js/consent.js)
+   ===================================== */
+
+.consent-banner{
+    position:fixed;
+    left:0;
+    right:0;
+    bottom:0;
+    z-index:2500;
+    background:#fff;
+    border-top:1px solid var(--gray200);
+    box-shadow:0 -12px 40px rgba(0,0,0,.12);
+    /* нижче мобільної кнопки «Купити» (z-index:900), але вище решти;
+       і з урахуванням жестової смуги на iPhone */
+    padding:16px 20px calc(16px + env(safe-area-inset-bottom, 0px));
+    animation:consentUp .25s ease;
+}
+
+@keyframes consentUp{ from{transform:translateY(100%)} to{transform:translateY(0)} }
+
+.consent-inner{
+    max-width:1100px;
+    margin:0 auto;
+    display:flex;
+    align-items:center;
+    gap:24px;
+}
+
+.consent-text{
+    flex:1;
+    font-size:13.5px;
+    line-height:1.55;
+    color:var(--gray700);
+}
+
+.consent-text b{ color:var(--gray900); }
+
+.consent-actions{
+    display:flex;
+    gap:10px;
+    flex-shrink:0;
+}
+
+.consent-actions .btn{
+    height:44px;
+    white-space:nowrap;
+}
+
+@media(max-width:768px){
+
+    .consent-inner{
+        flex-direction:column;
+        align-items:stretch;
+        gap:14px;
+    }
+
+    .consent-actions .btn{ flex:1; }
+
+    /* банер не має закривати кнопку «Купити» на сторінці товару */
+    body:has(.mobile-sticky-cart.show) .consent-banner{
+        bottom:76px;
+    }
+
+}
+
+/* -- заглушка замість відео до згоди -- */
+
+.video-consent{
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:var(--gray100) var(--embed-thumb, none) center/cover no-repeat;
+}
+
+/* Обкладинку приглушуємо: інакше здається, що відео вже завантажилось
+   і просто не грає. */
+.video-consent::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:rgba(17,24,39,.55);
+}
+
+.video-consent-btn{
+    position:relative;
+    z-index:2;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:8px;
+    max-width:320px;
+    padding:22px 24px;
+    border:0;
+    border-radius:16px;
+    background:rgba(255,255,255,.95);
+    cursor:pointer;
+    text-align:center;
+}
+
+.video-consent-play{
+    font-size:22px;
+    line-height:1;
+    color:var(--secondary);
+}
+
+.video-consent-title{
+    font-weight:700;
+    font-size:15px;
+    color:var(--gray900);
+}
+
+/* Прямим текстом, що станеться після натискання, — інакше вибір
+   не є усвідомленим. */
+.video-consent-note{
+    font-size:12px;
+    line-height:1.45;
+    color:var(--gray700);
+}
+
+/* Пояснення про дані під кнопкою оформлення.
+   Згорнуте за замовчуванням: хто не питає — не бачить стіни тексту,
+   хто питає — знаходить відповідь не виходячи зі сторінки. */
+.order-data-note{
+    margin-top:14px;
+    font-size:13px;
+    border:1px solid var(--gray200);
+    border-radius:12px;
+    background:var(--gray50);
+}
+
+.order-data-note > summary{
+    padding:12px 14px;
+    cursor:pointer;
+    font-weight:600;
+    color:var(--gray900);
+    list-style:none;
+}
+
+.order-data-note > summary::-webkit-details-marker{ display:none; }
+
+.order-data-note > summary::after{
+    content:"▾";
+    float:right;
+    color:var(--gray500);
+    transition:transform .2s;
+}
+
+.order-data-note[open] > summary::after{
+    transform:rotate(180deg);
+    display:inline-block;
+}
+
+.order-data-body{
+    padding:0 14px 12px;
+    color:var(--gray700);
+    line-height:1.55;
+}
+
+.order-data-body p{ margin:0 0 10px; }
+.order-data-body p:last-child{ margin-bottom:0; }
+.order-data-body b{ color:var(--gray900); }

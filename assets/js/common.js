@@ -739,6 +739,113 @@ function updateFavoriteCounter() {
 // Toast
 // -------------------------
 
+// -------------------------
+// Підтвердження перед видаленням
+//
+// Видалити товар із кошика чи обраного можна було одним випадковим
+// дотиком — кнопка «✕» стоїть поруч із кількістю, а повернути
+// видалене нічим. Тому питаємо.
+//
+// Свій діалог, а не вбудований confirm(): вбудований на телефоні
+// виглядає системним вікном браузера з адресою сайту, ламає стиль і
+// на iOS блокує сторінку цілком.
+// -------------------------
+
+function askConfirm(options) {
+
+    const {
+        title = "Видалити товар?",
+        text = "Цю дію не можна скасувати.",
+        confirmLabel = "Видалити",
+        cancelLabel = "Скасувати"
+    } = options || {};
+
+    return new Promise(resolve => {
+
+        const overlay = document.createElement("div");
+
+        overlay.className = "confirm-overlay";
+        overlay.innerHTML = `
+            <div class="confirm-box" role="dialog" aria-modal="true"
+                 aria-labelledby="confirmTitle">
+                <h3 class="confirm-title" id="confirmTitle">${escapeHtml(title)}</h3>
+                <p class="confirm-text">${escapeHtml(text)}</p>
+                <div class="confirm-actions">
+                    <button type="button" class="btn btn-outline" data-confirm="no">
+                        ${escapeHtml(cancelLabel)}
+                    </button>
+                    <button type="button" class="btn confirm-danger" data-confirm="yes">
+                        ${escapeHtml(confirmLabel)}
+                    </button>
+                </div>
+            </div>`;
+
+        // Куди повернути фокус після закриття: інакше людина, що
+        // ходить клавіатурою, опиниться на початку сторінки.
+        const returnTo = document.activeElement;
+
+        function close(answer) {
+
+            document.removeEventListener("keydown", onKey);
+            overlay.remove();
+            document.body.classList.remove("confirm-open");
+
+            if (returnTo && document.contains(returnTo)) returnTo.focus();
+
+            resolve(answer);
+
+        }
+
+        function onKey(event) {
+
+            if (event.key === "Escape") close(false);
+
+            // Tab по колу всередині вікна: без цього фокус іде на
+            // сторінку під діалогом, і незрозуміло, де ти зараз.
+            if (event.key === "Tab") {
+
+                const items = [...overlay.querySelectorAll("button")];
+
+                if (!items.length) return;
+
+                const first = items[0];
+                const last = items[items.length - 1];
+
+                if (event.shiftKey && document.activeElement === first) {
+                    event.preventDefault();
+                    last.focus();
+                } else if (!event.shiftKey && document.activeElement === last) {
+                    event.preventDefault();
+                    first.focus();
+                }
+
+            }
+
+        }
+
+        overlay.addEventListener("click", event => {
+
+            const answer = event.target.closest("[data-confirm]");
+
+            // клац повз вікно = скасувати
+            if (event.target === overlay) return close(false);
+
+            if (answer) close(answer.dataset.confirm === "yes");
+
+        });
+
+        document.addEventListener("keydown", onKey);
+        document.body.classList.add("confirm-open");
+        document.body.appendChild(overlay);
+
+        // Фокус на «Скасувати», а не на «Видалити»: випадковий Enter
+        // одразу після відкриття не має нічого стирати.
+        overlay.querySelector('[data-confirm="no"]')?.focus();
+
+    });
+
+}
+
 function showToast(text) {
 
     let toast = document.getElementById("toast");
@@ -1628,7 +1735,24 @@ document.addEventListener("click", event => {
 
         const { color, size } = getSelectedVariant(scope);
 
-        toggleFavorite(Number(favorite.dataset.id), { color, size });
+        const id = Number(favorite.dataset.id);
+
+        // На сторінці «Обране» ця сама кнопка не перемикає, а ВИДАЛЯЄ
+        // рядок зі списку — і повернути його нічим. Тому там питаємо.
+        // Скрізь інде (картка, сторінка товару) це звичайне
+        // перемикання сердечка: спитати означало б заважати.
+        if (favorite.classList.contains("favorite-row-remove")) {
+
+            askConfirm({
+                title: "Видалити з обраного?",
+                text: "Товар зникне зі списку обраного."
+            }).then(yes => { if (yes) toggleFavorite(id, { color, size }); });
+
+            return;
+
+        }
+
+        toggleFavorite(id, { color, size });
 
         return;
 

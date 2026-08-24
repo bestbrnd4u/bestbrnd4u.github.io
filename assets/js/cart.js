@@ -124,10 +124,25 @@ function renderCart() {
             </button>
         `).join("");
 
+        // Посилання веде на ТОЙ САМИЙ колір і розмір, що в кошику.
+        //
+        // Раніше тут стояв productUrl(product) без параметрів, тож із
+        // кошика завжди відкривався перший колір товару — людина
+        // клацала коричневу сумку, а бачила світло-сіру. productUrl
+        // уміє приймати параметри, їх просто не передавали.
+        const lineUrl = productUrl(product, { color: line.color, size: line.size });
+
+        // Назва кольору поруч із кружечками: самі кружечки не
+        // підписані, і в кошику «який саме це відтінок» доводилось
+        // згадувати по пам'яті.
+        const colorLabel = line.color
+            ? `<div class="cart-item-color">Колір: <b>${escapeHtml(line.color)}</b></div>`
+            : "";
+
         return `
             <div class="cart-item" data-id="${line.id}" data-color="${line.color || ""}" data-size="${line.size || ""}">
 
-                <a href="${productUrl(product)}" class="cart-item-image">
+                <a href="${lineUrl}" class="cart-item-image">
                     <img
                         src="${image}"
                         alt="${escapeHtml(product.title)}"
@@ -136,10 +151,11 @@ function renderCart() {
 
                 <div class="cart-item-info">
                     <div class="cart-item-brand">${product.brand || ""}</div>
-                    <a href="${productUrl(product)}" class="cart-item-title">
+                    <a href="${lineUrl}" class="cart-item-title">
                         ${escapeHtml(product.title)}
                     </a>
                     ${product.preOrder ? `<div class="preorder-tag">📦 Під замовлення</div>` : ""}
+                    ${colorLabel}
                     <div class="product-options cart-item-options">
 <div class="product-colors-wrap">
                             <button type="button" class="colors-arrow colors-arrow-left" aria-label="Попередні кольори" tabindex="-1">‹</button>
@@ -341,7 +357,12 @@ cartItemsEl?.addEventListener("click", event => {
 
     } else if (remove) {
 
-        removeCartItem(id, color, size);
+        // Кнопка «✕» стоїть поруч із кількістю, а повернути видалене
+        // нічим — тому питаємо.
+        askConfirm({
+            title: "Видалити товар із кошика?",
+            text: "Товар зникне з кошика. Додати його знову можна буде з каталогу."
+        }).then(yes => { if (yes) removeCartItem(id, color, size); });
 
     }
 
