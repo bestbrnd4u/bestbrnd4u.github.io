@@ -51,9 +51,26 @@ function getResultsScrollTop() {
 
     if (!grid) return 0;
 
+    // Ціль — панель активних фільтрів, якщо вона показана.
+    //
+    // Раніше скрол цілив у .catalog-top («Знайдено N товарів»), а
+    // панель із чипами стоїть ВИЩЕ — і після застосування фільтра вона
+    // опинялась за верхнім краєм екрана. Людина щойно щось відмітила,
+    // а результату своєї дії не бачить: не видно ні що саме обрано, ні
+    // кнопки «Скинути фільтри».
+    //
+    // Панель ховається, коли фільтрів немає (hidden), — тоді, як і
+    // раніше, цілимось у рядок із кількістю знайденого.
+    const filtersBar = document.getElementById("activeFiltersBar");
     const catalogTop = document.querySelector(".catalog-top");
     const firstCard = grid.querySelector(".product-card");
-    const target = catalogTop || firstCard || grid;
+
+    const visibleFiltersBar = filtersBar && !filtersBar.hidden
+        && getComputedStyle(filtersBar).display !== "none"
+        ? filtersBar
+        : null;
+
+    const target = visibleFiltersBar || catalogTop || firstCard || grid;
 
     const headerEl = document.querySelector("header");
     const mobileBar = document.querySelector(".mobile-filter-bar");
@@ -137,6 +154,17 @@ let selectedCategories = new Set();
 // категорію. З ним у крихтах стоїть коротке catalog?department=Аксесуари.
 let selectedDepartments = new Set();
 let departmentByCategory = new Map();
+
+// Порядок категорій такий самий, як у бічному меню.
+//
+// НАВІЩО: за замовчуванням каталог не сортувався взагалі — товари
+// йшли в порядку products.json, тобто за зростанням id. Через це
+// кожен доданий в адмінці товар опинявся в самому кінці, на останній
+// сторінці, де його ніхто не побачить. І категорії були перемішані:
+// сумка, окуляри, кросівки, знову сумка.
+//
+// Ключ — назва категорії, значення — її номер у меню.
+let categoryOrder = new Map();
 // фільтр ціни — діапазон "від / до" (повзунок + два поля вводу).
 // null означає "ще не ініціалізовано" — межі підставляються з
 // реальних цін каталогу після його завантаження
@@ -154,6 +182,78 @@ let SIZE_GROUPS = FALLBACK_SIZE_GROUPS.map(group => ({ ...group }));
 
 // підтягує актуальний список категорій одягу/взуття з адмінки
 // (data/categories.json) у відповідні групи розмірів
+// Розмір «один розмір» не є вибором.
+//
+// Ним позначені сумки, окуляри без вказаної ширини, годинники — тобто
+// речі, у яких розміру просто немає. Чип, що збігається з половиною
+// каталогу, нічого не звужує й лише займає місце у фільтрі.
+//
+// Регістр різний навмисно: у даних співіснують ONESIZE і Onesize —
+// їх заводили в адмінку в різний час. Порівнюємо без урахування
+// регістру, щоб не залежати від того, як саме набрали цього разу.
+// Порядок розмірів у фільтрі.
+//
+// Абетка тут не годиться: за нею «M» стає перед «S», хоча в одязі
+// порядок XS → S → M → L → XL. Числа теж треба порівнювати як числа,
+// інакше 51 опиниться після 5.
+const LETTER_SIZES = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL", "5XL"];
+
+function compareSizes(a, b) {
+
+    // «Один розмір» — завжди останній: це не позиція в шкалі, а
+    // відсутність розміру, і серед чисел чи літер він виглядав би
+    // випадково вставленим.
+    if (isOneSize(a) !== isOneSize(b)) return isOneSize(a) ? 1 : -1;
+
+    const na = Number(a);
+    const nb = Number(b);
+
+    if (Number.isFinite(na) && Number.isFinite(nb)) return na - nb;
+
+    const la = LETTER_SIZES.indexOf(String(a).toUpperCase());
+    const lb = LETTER_SIZES.indexOf(String(b).toUpperCase());
+
+    if (la !== -1 && lb !== -1) return la - lb;
+
+    // числа завжди після літер: у змішаній групі (напр. взуття + one
+    // size) інакше вийшов би випадковий порядок
+    if (la !== -1) return -1;
+    if (lb !== -1) return 1;
+
+    return String(a).localeCompare(String(b), "uk");
+
+}
+
+// «Один розмір» — теж вибір, але не завжди.
+//
+// Спершу я викидав його з фільтра як марний: чип, що збігається з
+// половиною каталогу, нічого не звужує. Це вірно лише для ОДНОРІДНОЇ
+// групи — там, де всі товари мають один розмір.
+//
+// Але групи змішані. В «Аксесуарах» окуляри з шириною 51 і 54 лежать
+// РАЗОМ із годинниками та окулярами без розміру. Вибір «один розмір»
+// відсікає перші — тобто звужує, і саме так ним і хочуть
+// користуватися. Те саме в «Сумках»: S і M поруч із рештою.
+//
+// Правило: показуємо «один розмір» тоді й лише тоді, коли в групі є ЩЕ
+// ЯКІСЬ розміри. Група, де геть усе — один розмір, фільтра не потребує,
+// і чип там був би шумом.
+//
+// Регістр не має значення: у даних свого часу співіснували ONESIZE і
+// Onesize. Зараз збірка зводить їх до одного вигляду, але покладатися
+// на це не варто — дані заводять руками.
+function isOneSize(value) {
+
+    return !!value && /^one\s*size$/i.test(String(value).trim());
+
+}
+
+function isRealSize(value) {
+
+    return !!value && !isOneSize(value);
+
+}
+
 function applyCategoryDataToSizeGroups(categoryDepartments) {
 
     // У групі можна або перелічити категорії вручну, або вказати
@@ -162,6 +262,94 @@ function applyCategoryDataToSizeGroups(categoryDepartments) {
     SIZE_GROUPS.forEach(group => {
 
         group.categories = resolveGroupCategories(group, categoryDepartments);
+
+    });
+
+    addMissingSizeGroups(categoryDepartments);
+
+}
+
+// Групи для категорій, яких немає в довіднику.
+//
+// ЧОМУ ЦЕ ПОТРІБНО
+// -----------------
+// Групи задавалися вручну в data/size-groups.json, і покривали лише
+// частину каталогу. На практиці у фільтрі лишалося саме взуття:
+//
+//   • «Сумки» я прибрав раніше, коли всі вони були ONESIZE — але потім
+//     зʼявилися сумки з реальними S і M, а група не повернулась;
+//   • в окулярів є 51 і 54 (ширина лінзи), і групи для них не було
+//     ніколи;
+//   • «Одяг» і «Рюкзаки» описані, але таких товарів у каталозі немає.
+//
+// Тобто довідник описував не те, що є, а те, що колись планувалось.
+// Кожна нова категорія вимагала б ручної правки — і фільтр знову
+// відставав би від каталогу.
+//
+// Тепер довідник лишається джерелом ПОРЯДКУ розмірів і таблиць
+// відповідності, а недостаючі групи добудовуються з даних. Категорія,
+// у якої справді є розміри, отримує фільтр сама.
+function addMissingSizeGroups(categoryDepartments) {
+
+    const covered = new Set(SIZE_GROUPS.flatMap(group => group.categories || []));
+
+    // категорія → розділ (для назви групи)
+    const departmentOf = new Map();
+
+    (categoryDepartments || []).forEach(group => {
+        (group.categories || []).forEach(name => departmentOf.set(name, group.title));
+    });
+
+    // збираємо справжні розміри по кожній непокритій категорії
+    const found = new Map();
+
+    products.forEach(product => {
+
+        if (!product.category || covered.has(product.category)) return;
+
+        const sizes = [
+            ...(product.sizes || []),
+            ...(product.variants || []).flatMap(variant => variant.sizes || [])
+        ].filter(size => size && String(size).trim());
+
+        if (!sizes.length) return;
+
+        if (!found.has(product.category)) found.set(product.category, new Set());
+
+        sizes.forEach(size => found.get(product.category).add(String(size).trim()));
+
+    });
+
+    // Категорії одного розділу зводимо в одну групу: окремі блоки
+    // «Жіночі сумки», «Чоловічі сумки», «Унісекс сумки» з тими самими
+    // розмірами виглядали б як помилка.
+    const byDepartment = new Map();
+
+    found.forEach((sizes, category) => {
+
+        const title = departmentOf.get(category) || category;
+
+        if (!byDepartment.has(title)) {
+            byDepartment.set(title, { sizes: new Set(), categories: [] });
+        }
+
+        byDepartment.get(title).categories.push(category);
+        sizes.forEach(size => byDepartment.get(title).sizes.add(size));
+
+    });
+
+    byDepartment.forEach((data, title) => {
+
+        // Група, у якій немає нічого, крім «одного розміру», фільтра не
+        // потребує: єдиний чип збігався б з усіма товарами розділу.
+        if (![...data.sizes].some(isRealSize)) return;
+
+        SIZE_GROUPS.push({
+            key: "auto-" + title.toLowerCase().replace(/\s+/g, "-"),
+            title: title,
+            categories: data.categories,
+            sizes: [...data.sizes].sort(compareSizes)
+        });
 
     });
 
@@ -175,7 +363,7 @@ async function loadCategoryDepartments() {
 
     try {
 
-        const response = await fetch("data/categories.json");
+        const response = await fetch(dataUrl("data/categories.json"));
 
         if (!response.ok) return [];
 
@@ -446,7 +634,7 @@ async function initCatalog() {
 
         loader.hidden = false;
 
-        const response = await fetch("data/products.json");
+        const response = await fetch(dataUrl("data/products.json"));
 
         if (!response.ok) {
             throw new Error("Не вдалося завантажити товари");
@@ -463,8 +651,18 @@ async function initCatalog() {
 
         // мапа «категорія → відділ» для фільтра department
         departmentByCategory = new Map();
+        categoryOrder = new Map();
+
         categoryDepartments.forEach(group => {
-            (group.categories || []).forEach(name => departmentByCategory.set(name, group.title));
+            (group.categories || []).forEach(name => {
+
+                departmentByCategory.set(name, group.title);
+
+                // номер у меню = порядок появи: розділи йдуть підряд,
+                // категорії всередині розділу — теж
+                if (!categoryOrder.has(name)) categoryOrder.set(name, categoryOrder.size);
+
+            });
         });
 
         // відділ з адреси лишаємо, лише якщо він справді існує:
@@ -2296,21 +2494,24 @@ function filterProducts(skip) {
 
     }
 
-    if (selectedCategories.size && skip !== "categories") {
+    // Відділ і категорія — ОДИН фільтр, значення в ньому додаються (АБО).
+    //
+    // Спершу вони працювали як І: товар мусив підходити і під обраний
+    // відділ, і під обрану категорію. У бічному меню це давало порожній
+    // каталог на найзвичайнішій дії — відмітили «Взуття», «Аксесуари» і
+    // три категорії сумок, а товару, який одночасно взуття й сумка, не
+    // існує.
+    //
+    // Правильно так само, як у решті фільтрів: кілька значень ОДНОГО
+    // фільтра розширюють вибірку (бренд Guess АБО Furla), і лише різні
+    // фільтри звужують її разом (бренд І колір). Відділ — це не окремий
+    // фільтр, а той самий «де шукати», тільки на рівень вище: відмітити
+    // відділ = відмітити всі його категорії.
+    if ((selectedCategories.size || selectedDepartments.size) && skip !== "categories") {
 
         list = list.filter(product =>
             selectedCategories.has(product.category)
-        );
-
-    }
-
-    // Відділ звужує так само, як категорія, тільки на рівень вище.
-    // Разом вони працюють як І: якщо людина прийшла з крихти «Аксесуари»
-    // й додала категорію, лишаються товари, що підходять під обидві умови.
-    if (selectedDepartments.size && skip !== "categories") {
-
-        list = list.filter(product =>
-            selectedDepartments.has(departmentByCategory.get(product.category))
+            || selectedDepartments.has(departmentByCategory.get(product.category))
         );
 
     }
@@ -2328,6 +2529,40 @@ function filterProducts(skip) {
         list = list.filter(product =>
             [...selectedSizes].some(key => matchesSizeKey(product, key))
         );
+
+    }
+
+    // Порядок за замовчуванням.
+    //
+    // Раніше його не було зовсім: список лишався таким, яким прийшов
+    // з products.json, тобто за зростанням id. Наслідок — щойно
+    // доданий товар потрапляв у самий кінець, на останню сторінку.
+    //
+    // Тепер три рівні, саме в цьому порядку:
+    //
+    //   1) категорія — у тому ж порядку, що в бічному меню, щоб
+    //      каталог читався так само, як навігація по ньому;
+    //   2) наявність — товари під замовлення в кінець свого розділу:
+    //      спершу те, що можна отримати одразу;
+    //   3) новизна — більший id означає пізніше додано, тож новий
+    //      товар стає першим у своєму розділі, а не останнім.
+    //
+    // Категорії, якої немає в меню (наприклад щойно створеної в
+    // адмінці й ще не додано в розділ), відправляємо в кінець, а не на
+    // початок: інакше товар без налаштованої категорії витіснив би
+    // згори весь каталог.
+    if (!currentSort) {
+
+        const rank = product => categoryOrder.has(product.category)
+            ? categoryOrder.get(product.category)
+            : Number.MAX_SAFE_INTEGER;
+
+        const later = product => (product.preOrder ? 1 : 0);
+
+        list.sort((a, b) =>
+            rank(a) - rank(b)
+            || later(a) - later(b)
+            || (Number(b.id) || 0) - (Number(a.id) || 0));
 
     }
 

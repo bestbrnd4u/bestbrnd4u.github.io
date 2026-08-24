@@ -2,6 +2,8 @@
 <html lang="uk">
 
 <head>
+    <meta name="robots" content="noindex,nofollow">
+<script>window.ASSET_VERSIONS = {"data/categories.json":"4a7a5e05","data/collections.json":"d86aab5b","data/home.json":"fe5da8cb","data/image-fingerprints.json":"74aa1d01","data/image-variants.json":"e9b955d0","data/products.json":"46f2929c","data/promo-popups.json":"0940ece5","data/promotions.json":"65f883a6","data/search-banners.json":"82a85e36","data/size-groups.json":"e70d29de"};</script>
     <meta charset="UTF-8">
     <meta name="author" content="BestBrnd4u">
     <meta name="copyright" content="© 2026 BestBrnd4u. Усі права захищено.">
@@ -18,7 +20,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="assets/images/favicon-192.png">
     <title>Оформлення замовлення | BestBrnd4u</title>
 
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/style.css?v=66ceaad7">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -306,9 +308,13 @@
                 <div class="checkout-block">
 
                     <h2>Зв'язатися зі мною</h2>
-                    <p class="checkout-block-sub">
-                        Наш менеджер зателефонує вам, щоб підтвердити замовлення.
-                        Оберіть зручний спосіб зв'язку
+                    <!-- Текст залежить від вибору.
+                         Раніше тут завжди стояло «менеджер зателефонує вам» —
+                         і людина, яка обрала Telegram, усе одно читала про
+                         дзвінок. Тепер підпис оновлюється разом із вибором
+                         і називає, КУДИ саме ми напишемо. -->
+                    <p class="checkout-block-sub" id="contactChannelNote">
+                        Оберіть зручний спосіб зв'язку — ми підтвердимо замовлення
                     </p>
 
                     <div class="contact-channels">
@@ -333,6 +339,26 @@
                             <span class="contact-channel-chip">✉ Email</span>
                         </label>
 
+                    </div>
+
+                    <!-- Поле лише для Telegram.
+                         Телефон і email уже зібрані вище, і Viber працює за
+                         номером — для них додаткове поле було б зайвим
+                         клопотом. А от у Telegram номер часто прихований
+                         налаштуваннями приватності, і без ніка написати
+                         нікуди. Поле необов'язкове: не вкажете — спробуємо
+                         за номером. -->
+                    <div class="contact-channel-extra" id="telegramField" hidden>
+                        <label>
+                            Ваш нік у Telegram (необов'язково)
+                            <input type="text" name="Telegram" id="telegramHandle"
+                                   placeholder="@username" autocomplete="off">
+                        </label>
+                        <p class="contact-channel-hint">
+                            Якщо не вкажете — напишемо на номер, який ви ввели вище.
+                            Але якщо у ваших налаштуваннях Telegram номер прихований,
+                            ми вас не знайдемо.
+                        </p>
                     </div>
 
                 </div>
@@ -393,6 +419,47 @@
 
                 <button type="submit" form="checkoutForm" id="submitOrderBtn" class="btn">Оформити замовлення</button>
 
+                <!-- Прямо тут, а не лише в політиці.
+                     Питання «які дані ви збираєте» виникає саме в цю
+                     мить — коли людина вже ввела телефон і адресу й
+                     тримає палець над кнопкою. Посилання на окрему
+                     сторінку тут не відповідь: щоб його прочитати,
+                     треба піти зі сторінки оформлення. -->
+                <details class="order-data-note">
+                    <summary>Які дані ми збираємо для цього замовлення</summary>
+                    <div class="order-data-body">
+                        <p>
+                            <b>Що саме:</b> ім'я та прізвище, телефон, email,
+                            місто й відділення або адреса доставки, склад замовлення.
+                            По батькові — лише якщо ви його вкажете.
+                        </p>
+                        <p>
+                            <b>Навіщо:</b> зв'язатися щодо замовлення, оформити
+                            відправлення й повідомити номер накладної. Для іншого
+                            ці дані не використовуються.
+                        </p>
+                        <p>
+                            <b>Кому передаються:</b> службі доставки — щоб відправити
+                            посилку; сервісу EmailJS — щоб лист про замовлення дійшов
+                            до нас. Якщо ви увійшли в акаунт, замовлення й адреси
+                            зберігаються у Supabase, щоб наступного разу не вводити
+                            їх знову.
+                        </p>
+                        <p>
+                            <b>Чого ми НЕ робимо:</b> не передаємо дані рекламним
+                            мережам, не продаємо їх і не використовуємо для стеження.
+                            Оплату ми не приймаємо на сайті, тож дані картки нам
+                            не потрапляють узагалі.
+                        </p>
+                        <p>
+                            Повний перелік — у
+                            <a href="privacy-policy">Політиці конфіденційності</a>.
+                            Написати нам, щоб видалити свої дані, можна в
+                            <a href="contacts">контактах</a>.
+                        </p>
+                    </div>
+                </details>
+
             </aside>
 
         </div>
@@ -434,6 +501,8 @@
             <a href="return-warranty">Повернення та гарантія</a>
             <a href="bayer-service">Байєр-сервіс</a>
             <a href="privacy-policy">Політика конфіденційності</a>
+            <!-- Згоду треба вміти відкликати так само легко, як дати -->
+            <a href="#" data-consent-reopen>Налаштування даних</a>
 
         </div>
 
@@ -508,19 +577,21 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4.4.1/dist/email.min.js"></script>
-<script src="assets/js/supabase-client.js"></script>
+<script src="assets/js/supabase-client.js?v=42a4012d"></script>
 <!-- Кадрування фото товару. Той самий файл підключає адмінка,
      тож прев'ю в ній і картка на сайті рахуються однаково. -->
-<script src="assets/js/image-framing.js"></script>
+<script src="assets/js/image-framing.js?v=006d4dfb"></script>
 <!-- Хлібні крихти: спільний будівник для сторінки й розмітки BreadcrumbList -->
-<script src="assets/js/breadcrumbs.js"></script>
+<script src="assets/js/breadcrumbs.js?v=f8e67fc2"></script>
 <!-- Оформлення текстових блоків з адмінки (кольори, шрифт, кнопка) -->
-<script src="assets/js/text-styles.js"></script>
-<script src="assets/js/common.js"></script>
-<script src="assets/js/sync.js"></script>
-<script src="assets/js/mega-menu.js"></script>
-<script src="assets/js/ui.js"></script>
-<script src="assets/js/checkout.js"></script>
+<script src="assets/js/text-styles.js?v=7dc05c7d"></script>
+<!-- Згода на використання даних (банер + блокування вбудованого відео) -->
+<script src="assets/js/consent.js?v=f6d87dc1"></script>
+<script src="assets/js/common.js?v=94a654ef"></script>
+<script src="assets/js/sync.js?v=48ef002e"></script>
+<script src="assets/js/mega-menu.js?v=18cfdf18"></script>
+<script src="assets/js/ui.js?v=856958c8"></script>
+<script src="assets/js/checkout.js?v=20891e83"></script>
 
 </body>
 

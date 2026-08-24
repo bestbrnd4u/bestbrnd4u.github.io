@@ -12,6 +12,18 @@ updates:
   # -------------------------
   - package-ecosystem: "github-actions"
     directory: "/"
+
+    # Цілимось у dev, а не в гілку за замовчуванням.
+    #
+    # Без цього рядка Dependabot відкриває PR у main. А sync-branches.yml
+    # мержить із -X theirs — при розходженні перемагає гілка-джерело.
+    # Тобто після злиття апдейту в main найближчий Sync dev → main
+    # відкотив би package.json до версії з dev, і Dependabot за тиждень
+    # відкрив би той самий PR знову.
+    #
+    # З target-branch: dev оновлення приходить туди, де ведеться робота,
+    # і доїжджає в main штатним шляхом — тим самим Sync.
+    target-branch: "dev"
     schedule:
       interval: "weekly"
       day: "monday"
@@ -65,6 +77,18 @@ updates:
   # -------------------------
   - package-ecosystem: "npm"
     directory: "/"
+
+    # Цілимось у dev, а не в гілку за замовчуванням.
+    #
+    # Без цього рядка Dependabot відкриває PR у main. А sync-branches.yml
+    # мержить із -X theirs — при розходженні перемагає гілка-джерело.
+    # Тобто після злиття апдейту в main найближчий Sync dev → main
+    # відкотив би package.json до версії з dev, і Dependabot за тиждень
+    # відкрив би той самий PR знову.
+    #
+    # З target-branch: dev оновлення приходить туди, де ведеться робота,
+    # і доїжджає в main штатним шляхом — тим самим Sync.
+    target-branch: "dev"
     schedule:
       interval: "weekly"
       day: "monday"

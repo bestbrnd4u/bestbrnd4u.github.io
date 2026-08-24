@@ -56,6 +56,74 @@ const TEXT_EXT = [".json", ".js", ".html", ".css", ".xml", ".yml", ".md"];
 
 const VARIANT_RE = /-(300|600|1200)$/;
 
+// Відбиток вмісту в імені файлу.
+//
+// ПРОБЛЕМА, ЯКУ ЦЕ ЗАКРИВАЄ
+// --------------------------
+// Браузер і Cloudflare кешують картинку ЗА АДРЕСОЮ. Якщо через адмінку
+// завантажити нове фото під тим самим імʼям, адреса не зміниться — і
+// люди ще довго бачитимуть старе. Саме так плитки пошуку показували
+// попередні картинки, поки їх не перейменували вручну.
+//
+// Для JS і CSS це вирішено інакше — версією в адресі
+// (scripts/apply-cache-version.js додає ?v=відбиток). Для картинок так
+// не вийде: більшість із них приходить із data/*.json у рантаймі, і
+// щоб підставити версію, довелося б вкласти в кожну сторінку список
+// відбитків. Він важить 23 КБ, сторінок 66 — півтора мегабайта дублів
+// заради задачі, яку можна вирішити безкоштовно.
+//
+// Тому відбиток іде в саме імʼя: photo.webp → photo.a1b2c3d4.webp.
+// Змінився вміст — змінилось імʼя — змінилась адреса. Працює скрізь
+// однаково: і в JSON, і в розмітці, і в CSS, і в srcset — бо це
+// звичайне перейменування, а посилання скрипт переписує сам.
+//
+// ЧОМУ НЕ ПЕРЕЙМЕНОВУЄМО ВСЕ ОДРАЗУ
+// ----------------------------------
+// У теці 667 файлів. Разове перейменування всіх дало б величезний
+// коміт і, головне, ризик: досить одного місця, де посилання не
+// переписалось, — і картинка зникає з сайту. Тому відбиток
+// проставляється лише НОВИМ файлам, а ті, що вже лежать, лишаються як
+// є. Стара картинка й далі кешується за старою адресою — але вона й не
+// змінюється, тож це не шкодить. А кожне нове завантаження вже
+// захищене.
+const CONTENT_HASH_RE = /\.[0-9a-f]{8}$/;
+
+function contentHash(file) {
+
+    return crypto.createHash("sha1")
+        .update(fs.readFileSync(file))
+        .digest("hex")
+        .slice(0, 8);
+
+}
+
+// Імʼя з відбитком вмісту. Якщо відбиток уже стоїть і збігається —
+// повертаємо як є, щоб повторна збірка нічого не чіпала.
+function contentName(fileName, fullPath) {
+
+    const ext = path.extname(fileName);
+    let stem = path.basename(fileName, ext);
+
+    // суфікс розміру тримаємо в кінці — ресайзер упізнає свої варіанти
+    // саме за ним
+    const variantMatch = stem.match(VARIANT_RE);
+    const variant = variantMatch ? variantMatch[0] : "";
+
+    if (variant) stem = stem.slice(0, -variant.length);
+
+    const hash = contentHash(fullPath);
+
+    // Уже підписаний тим самим відбитком — нічого не робимо.
+    if (CONTENT_HASH_RE.test(stem) && stem.endsWith("." + hash)) return fileName;
+
+    // Підписаний іншим (вміст змінився) — стару позначку прибираємо,
+    // інакше імʼя обростало б хвостом .aaaa.bbbb.cccc
+    const clean = stem.replace(CONTENT_HASH_RE, "");
+
+    return `${clean}.${hash}${variant}${ext}`;
+
+}
+
 function shortName(fileName) {
 
     const ext = path.extname(fileName);
@@ -169,6 +237,103 @@ function main() {
         });
 
     });
+
+    // Заміна картинки під тим самим імʼям.
+    //
+    // ЯК МИ ПРО НЕЇ ДІЗНАЄМОСЬ
+    // -------------------------
+    // Тримаємо реєстр відбитків: data/image-fingerprints.json, «імʼя →
+    // відбиток вмісту». Файл, якого в реєстрі немає, — новий: просто
+    // записуємо. Файл, який у реєстрі є, але вміст інший, — саме той
+    // випадок: картинку замінили, лишивши імʼя. Тоді додаємо до імені
+    // відбиток, адреса стає новою, і кеш зобовʼязаний піти по свіже.
+    //
+    // ЧОМУ САМЕ ТАК, А НЕ ПІДПИСАТИ ВСЕ ОДРАЗУ
+    // -----------------------------------------
+    // У теці 667 файлів. Разове перейменування дало б величезний коміт
+    // і ризик: досить одного місця, де посилання не переписалось, — і
+    // картинка зникає з сайту. А користі нуль: ті файли не змінюються,
+    // тож їхній кеш і не протухає. Захист потрібен рівно там, де вміст
+    // МІНЯЄТЬСЯ, — і саме там він тепер і є.
+    //
+    // Перший запуск лише заповнює реєстр і нічого не чіпає.
+    const fingerprintFile = path.join(ROOT, "data", "image-fingerprints.json");
+
+    let fingerprints = {};
+
+    if (fs.existsSync(fingerprintFile)) {
+
+        try {
+            fingerprints = JSON.parse(fs.readFileSync(fingerprintFile, "utf8"));
+        } catch (error) {
+            fingerprints = {};   // побитий реєстр = починаємо заново
+        }
+
+    }
+
+    const nextFingerprints = {};
+
+    // Відбитки — лише для СПРАВЖНІХ картинок.
+    //
+    // walk() обходить усю теку assets/images, а там лежить і службове:
+    // manifest.json та pending.json архіватора, іконки сайту. Записувати
+    // їх у реєстр безглуздо (їх ніхто не замінює через адмінку) і шкідливо
+    // — перевірка цілісності реєстру червоніла б на порожньому місці.
+    const PHOTO_EXT = [".webp", ".jpg", ".jpeg", ".png", ".avif", ".gif"];
+
+    groups.forEach(files => {
+
+        const baseFile = files.find(f =>
+            !VARIANT_RE.test(path.basename(f.name, path.extname(f.name))));
+
+        if (!baseFile) return;
+
+        if (!PHOTO_EXT.includes(path.extname(baseFile.name).toLowerCase())) return;
+
+        // службові теки архіватора
+        if (baseFile.full.includes(`${path.sep}_archive${path.sep}`)) return;
+
+        const hash = contentHash(baseFile.full);
+        const known = fingerprints[baseFile.name];
+
+        // Уже перейменовується з іншої причини (задовге імʼя) — не
+        // втручаємось, реєстр допишеться наступного запуску.
+        if (files.some(f => renames.has(f.full))) return;
+
+        if (known === undefined || known === hash) {
+
+            nextFingerprints[baseFile.name] = hash;
+
+            return;
+
+        }
+
+        // Вміст змінився. Перейменовуємо ВСЮ групу: база й копії
+        // -300/-600 мусять мати однакову позначку, інакше srcset
+        // проситиме адресу, якої немає.
+        const wanted = contentName(baseFile.name, baseFile.full);
+        const newStem = path.basename(wanted, path.extname(wanted));
+
+        files.forEach(({ full, name }) => {
+
+            const ext = path.extname(name);
+            const variant = (path.basename(name, ext).match(VARIANT_RE) || [""])[0];
+
+            renames.set(full, path.join(path.dirname(full), newStem + variant + ext));
+
+        });
+
+        nextFingerprints[path.basename(wanted)] = hash;
+
+        console.log(`  вміст змінився: ${baseFile.name} → ${path.basename(wanted)}`);
+
+    });
+
+    // Реєстр пишемо завжди: інакше видалені картинки лишались би в
+    // ньому назавжди, а нові не потрапляли б до першої заміни.
+    fs.mkdirSync(path.dirname(fingerprintFile), { recursive: true });
+    fs.writeFileSync(fingerprintFile,
+        JSON.stringify(nextFingerprints, null, 0) + "\n", "utf8");
 
     if (renames.size === 0) {
         console.log(`Готово: задовгих імен немає (межа ${MAX_NAME} символів)`);

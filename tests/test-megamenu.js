@@ -1,4 +1,5 @@
 const fs = require("fs");
+const { installBrowserStubs } = require("./helpers/browser-stubs");
 const { JSDOM } = require("jsdom");
 const ROOT = require("path").join(__dirname, "..");
 
@@ -34,6 +35,7 @@ async function build() {
     ok:true,
     json: () => Promise.resolve(String(url).includes("categories") ? CATEGORIES : PRODUCTS)
   });
+  installBrowserStubs(window);
   window.eval(fs.readFileSync(ROOT + "/assets/js/mega-menu.js", "utf8"));
   await new Promise(r => setTimeout(r, 60));
   return window;

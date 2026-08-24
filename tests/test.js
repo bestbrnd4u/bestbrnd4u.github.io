@@ -221,10 +221,20 @@ const catalogTopEl = document.querySelector(".catalog-top");
 
 filtersBar.getBoundingClientRect = () => ({ top: 0 });
 
-// теж мок розкладки: без нього ціль скролу (catalogTop) має
+// теж мок розкладки: без нього ціль скролу має
 // getBoundingClientRect().top === 0, дистанція скролу виходить 0px,
-// і armAutoScrollGuard() у коді каталогу просто не викликається
+// і armAutoScrollGuard() у коді каталогу просто не викликається.
+//
+// Ціллю тепер може бути панель активних фільтрів — саме її треба
+// показати після застосування фільтра, а не рядок «Знайдено N».
+// Мокаємо обидві, щоб тест не залежав від того, яка з них видима.
 catalogTopEl.getBoundingClientRect = () => ({ top: 640 });
+
+const activeFiltersBarEl = document.getElementById("activeFiltersBar");
+
+if (activeFiltersBarEl) {
+    activeFiltersBarEl.getBoundingClientRect = () => ({ top: 640 });
+}
 
 {
     Object.defineProperty(window, "scrollY", { value: 0, configurable: true });

@@ -1,4 +1,5 @@
 const fs=require("fs"),path=require("path"),{JSDOM}=require("jsdom");
+const { installBrowserStubs } = require("./helpers/browser-stubs");
 const ROOT = require("path").join(__dirname, "..");
 const { loadYaml } = require("./helpers/yaml");
 let failures=0;
@@ -33,6 +34,7 @@ async function render(product, homeOk=true){
         buttonText:"Підписатися · @bestbrnd4u",link:"https://instagram.com/bestbrnd4u"}})})
     : Promise.reject(new Error("offline"));
   const js=fs.readFileSync(path.join(ROOT,"assets/js/product.js"),"utf8");
+  installBrowserStubs(window);
   window.eval(js.match(/async function renderProductInstagram[\s\S]*?\n}\n/)[0]);
   await window.renderProductInstagram(product);
   const d=window.document;

@@ -1,5 +1,6 @@
 (async()=>{
 const fs=require("fs"),path=require("path"),{JSDOM}=require("jsdom");
+const { installBrowserStubs } = require("./helpers/browser-stubs");
 const ROOT = require("path").join(__dirname, "..");
 let failures=0;
 const check=(n,c,e)=>{if(c)console.log("  ✓",n);else{console.log("  ✗",n,e!==undefined?"→ "+e:"");failures++;}};
@@ -22,6 +23,7 @@ async function load(payload){
   const dom=new JSDOM("",{runScripts:"outside-only"});
   const {window}=dom;
   const cs=fs.readFileSync(path.join(ROOT,"assets/js/common.js"),"utf8");
+  installBrowserStubs(window);
   window.eval("window.FALLBACK_SIZE_GROUPS = "+cs.match(/const FALLBACK_SIZE_GROUPS = (\[[\s\S]*?\n\]);\n/)[1]+";");
   window.eval(cs.match(/let sizeGroupsPromise[\s\S]*?\n}\n/)[0]
       .replace("FALLBACK_SIZE_GROUPS","window.FALLBACK_SIZE_GROUPS"));

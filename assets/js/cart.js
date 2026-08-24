@@ -21,7 +21,7 @@ async function initCart() {
 
     try {
 
-        const response = await fetch("data/products.json");
+        const response = await fetch(dataUrl("data/products.json"));
 
         if (!response.ok) {
             throw new Error("Не вдалося завантажити товари");
@@ -106,15 +106,32 @@ function renderCart() {
 
         const image = activeVariant.images?.[0] || product.images?.[0] || "assets/images/no-image.png";
 
-        const colorButtons = variants.map(variant => `
+        // Кольори, які вже лежать у кошику окремими рядками, позначаємо
+        // одразу — щоб людина не тицяла в них і не отримувала відмову.
+        // Краще показати межу заздалегідь, ніж пояснювати після дії.
+        const takenColors = new Set(
+            lines
+                .filter(other => other.id === line.id
+                    && (other.size || null) === (line.size || null)
+                    && (other.color || null) !== (line.color || null))
+                .map(other => other.color)
+        );
+
+        const colorButtons = variants.map(variant => {
+
+            const taken = takenColors.has(variant.color);
+
+            return `
             <button
                 type="button"
-                class="mini-color ${variant.color === activeColor ? "active" : ""}"
+                class="mini-color ${variant.color === activeColor ? "active" : ""}${taken ? " is-taken" : ""}"
                 data-color="${escapeHtml(variant.color)}"
                 data-images='${escapeAttrSingleQuoted(JSON.stringify(variant.images || []))}'
-                title="${escapeHtml(variant.color)}"
+                title="${escapeHtml(variant.color)}${taken ? " — уже окремим рядком у кошику" : ""}"
                 style="background:${escapeHtml(variant.hex)}"></button>
-        `).join("");
+        `;
+
+        }).join("");
 
         const sizeButtons = sizes.map(size => `
             <button
@@ -124,10 +141,25 @@ function renderCart() {
             </button>
         `).join("");
 
+        // Посилання веде на ТОЙ САМИЙ колір і розмір, що в кошику.
+        //
+        // Раніше тут стояв productUrl(product) без параметрів, тож із
+        // кошика завжди відкривався перший колір товару — людина
+        // клацала коричневу сумку, а бачила світло-сіру. productUrl
+        // уміє приймати параметри, їх просто не передавали.
+        const lineUrl = productUrl(product, { color: line.color, size: line.size });
+
+        // Назва кольору поруч із кружечками: самі кружечки не
+        // підписані, і в кошику «який саме це відтінок» доводилось
+        // згадувати по пам'яті.
+        const colorLabel = line.color
+            ? `<div class="cart-item-color">Колір: <b>${escapeHtml(line.color)}</b></div>`
+            : "";
+
         return `
             <div class="cart-item" data-id="${line.id}" data-color="${line.color || ""}" data-size="${line.size || ""}">
 
-                <a href="${productUrl(product)}" class="cart-item-image">
+                <a href="${lineUrl}" class="cart-item-image">
                     <img
                         src="${image}"
                         alt="${escapeHtml(product.title)}"
@@ -136,10 +168,11 @@ function renderCart() {
 
                 <div class="cart-item-info">
                     <div class="cart-item-brand">${product.brand || ""}</div>
-                    <a href="${productUrl(product)}" class="cart-item-title">
+                    <a href="${lineUrl}" class="cart-item-title">
                         ${escapeHtml(product.title)}
                     </a>
                     ${product.preOrder ? `<div class="preorder-tag">📦 Під замовлення</div>` : ""}
+                    ${colorLabel}
                     <div class="product-options cart-item-options">
 <div class="product-colors-wrap">
                             <button type="button" class="colors-arrow colors-arrow-left" aria-label="Попередні кольори" tabindex="-1">‹</button>
@@ -270,19 +303,41 @@ function changeVariant(id, oldColor, oldSize, field, value) {
 
     const cart = getCart();
 
-    cart.forEach(entry => {
+    const matches = entry =>
+        entry.id === id &&
+        (entry.color || null) === (oldColor || null) &&
+        (entry.size || null) === (oldSize || null);
 
-        if (
-            entry.id === id &&
-            (entry.color || null) === (oldColor || null) &&
-            (entry.size || null) === (oldSize || null)
-        ) {
+    // Куди перемикаємо
+    const target = { color: oldColor || null, size: oldSize || null };
 
-            entry[field] = value;
+    target[field] = value || null;
 
-        }
+    // Такий рядок уже є в кошику — НЕ перемикаємо.
+    //
+    // Кошик групує позиції за id + колір + розмір і показує кількість.
+    // Тому перемикання на колір, який уже лежить окремим рядком, не
+    // «переносило» товар, а зливало два рядки в один із кількістю 2 —
+    // тобто мовчки міняло замовлення. Людина натискала колір, а їй
+    // змінювали кількість.
+    //
+    // Відмовляємо і називаємо причину: обидва рядки лишаються, як були.
+    const collides = cart.some(entry =>
+        !matches(entry) &&
+        entry.id === id &&
+        (entry.color || null) === target.color &&
+        (entry.size || null) === target.size
+    );
 
-    });
+    if (collides) {
+
+        showToast("Такий варіант уже є в кошику");
+
+        return;
+
+    }
+
+    cart.forEach(entry => { if (matches(entry)) entry[field] = value; });
 
     saveCart(cart);
 
@@ -333,6 +388,29 @@ cartItemsEl?.addEventListener("click", event => {
 
     if (minus) {
 
+        // Мінус при кількості 1 — це видалення рядка, просто інакше
+        // названа кнопка. Раніше воно відбувалось мовчки: людина
+        // зменшувала кількість, а товар зникав із кошика без попередження.
+        //
+        // Питаємо ЛИШЕ в цьому випадку. При кількості 2 і більше товар
+        // у кошику лишається, і підтвердження там тільки заважало б.
+        const line = getGroupedCartLines().find(entry =>
+            entry.id === id
+            && (entry.color || null) === (color || null)
+            && (entry.size || null) === (size || null)
+        );
+
+        if (line && line.qty <= 1) {
+
+            askConfirm({
+                title: "Видалити товар із кошика?",
+                text: "Це останній примірник — товар зникне з кошика."
+            }).then(yes => { if (yes) changeQty(id, color, size, -1); });
+
+            return;
+
+        }
+
         changeQty(id, color, size, -1);
 
     } else if (plus) {
@@ -341,7 +419,12 @@ cartItemsEl?.addEventListener("click", event => {
 
     } else if (remove) {
 
-        removeCartItem(id, color, size);
+        // Кнопка «✕» стоїть поруч із кількістю, а повернути видалене
+        // нічим — тому питаємо.
+        askConfirm({
+            title: "Видалити товар із кошика?",
+            text: "Товар зникне з кошика. Додати його знову можна буде з каталогу."
+        }).then(yes => { if (yes) removeCartItem(id, color, size); });
 
     }
 

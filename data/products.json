@@ -11,7 +11,7 @@
         "color": "Темно-сірий",
         "hex": "#56535a",
         "images": [
-          "assets/images/products/uploads/a05042-0037354-1.webp",
+          "assets/images/products/uploads/a05042-0037354-1.26b9d653.webp",
           "assets/images/products/uploads/a05042-0037354-2.webp",
           "assets/images/products/uploads/a05042-0037354-3.webp"
         ],
@@ -41,7 +41,7 @@
     "instagramBlock": "general",
     "preOrder": false,
     "images": [
-      "assets/images/products/uploads/a05042-0037354-1.webp",
+      "assets/images/products/uploads/a05042-0037354-1.26b9d653.webp",
       "assets/images/products/uploads/a05042-0037354-2.webp",
       "assets/images/products/uploads/a05042-0037354-3.webp"
     ],
@@ -2477,6 +2477,580 @@
       "/assets/images/products/uploads/894a2223-e123-468a-9c5e-6949a9f72643_size2000x2000_cropcenter.webp",
       "/assets/images/products/uploads/02e9fde1-b8ec-4df3-812c-6869dbcfb37c_size2000x2000_cropcenter.webp",
       "/assets/images/products/uploads/1e18c52b-9cf3-411f-8897-4c0830babd56_size2000x2000_cropcenter.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "5–10 робочих днів",
+    "forcePublish": false,
+    "material": "Штучне хутро",
+    "brand": "Marc Jacobs",
+    "price": 8600,
+    "preOrder": false,
+    "dimensions": "32 × 26 × 17 см",
+    "variants": [
+      {
+        "color": "Чорний",
+        "hex": "#000000",
+        "images": [
+          "/assets/images/products/uploads/25077124~black_0.webp",
+          "/assets/images/products/uploads/25077124~black_2.webp",
+          "/assets/images/products/uploads/25077124~black_4.webp",
+          "/assets/images/products/uploads/25077124~black_3.webp",
+          "/assets/images/products/uploads/25077124~black_1.webp"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 50,
+    "strapInfo": "Ремінь знімний, регульований",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "searchKeywords": [
+      "Marc Jacobs",
+      "Marc Jacobs сумка",
+      "Marc Jacobs The Creature Tote",
+      "The Creature Tote Bag",
+      "Marc Jacobs Creature",
+      "сумка Marc Jacobs чорна",
+      "чорна жіноча сумка",
+      "жіноча сумка Marc Jacobs",
+      "сумка тоут",
+      "tote bag",
+      "shopper",
+      "сумка зі штучного хутра",
+      "хутряна сумка",
+      "сумка на плече",
+      "сумка кросбоді",
+      "брендова сумка",
+      "оригінальна сумка Marc Jacobs"
+    ],
+    "isNew": false,
+    "title": "Жіноча сумочка Marc Jacobs The Creature Tote Bag Black",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильна сумка Marc Jacobs The Creature Tote Bag у чорному кольорі — ефектна модель із колекції бренду, яка поєднує впізнаваний дизайн та оригінальну фактуру. Сумка виконана з м’якого штучного хутра, доповнена шкіряними ручками та знімним регульованим ременем, що дозволяє носити її в руці, на плечі або через плече.\nМодель має містке основне відділення та практичну конструкцію, завдяки чому підходить як для повсякденних образів, так і для стильних виходів. Чорний колір легко поєднується з базовим гардеробом, а фактурний матеріал додає образу акцентності",
+    "sku": "H025M06RE22",
+    "rating": 5,
+    "category": "Жіночі сумки",
+    "slug": "жіноча-сумочка-marc-jacobs-the-creature-tote-bag-black",
+    "id": 45,
+    "color": "Чорний",
+    "images": [
+      "/assets/images/products/uploads/25077124~black_0.webp",
+      "/assets/images/products/uploads/25077124~black_2.webp",
+      "/assets/images/products/uploads/25077124~black_4.webp",
+      "/assets/images/products/uploads/25077124~black_3.webp",
+      "/assets/images/products/uploads/25077124~black_1.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "5–10 робочих днів",
+    "forcePublish": false,
+    "material": "Натуральна шкіра",
+    "brand": "Coach",
+    "price": 6800,
+    "preOrder": false,
+    "dimensions": "14 × 16,5 × 9 см",
+    "variants": [
+      {
+        "color": "Чорний",
+        "hex": "#000000",
+        "images": [
+          "/assets/images/products/uploads/cr144_svbk_a0.webp",
+          "/assets/images/products/uploads/cr144_svbk_a3.webp",
+          "/assets/images/products/uploads/cr144_svbk_a8.webp",
+          "/assets/images/products/uploads/cr144_svbk_a91.webp",
+          "/assets/images/products/uploads/cr144_svbk_a92.webp"
+        ],
+        "sizes": [
+          "ONESIZE"
+        ]
+      },
+      {
+        "color": "Білий",
+        "hex": "#fffefe",
+        "sizes": [
+          "ONESIZE"
+        ],
+        "images": [
+          "/assets/images/products/uploads/cr144_svha_a0.webp",
+          "/assets/images/products/uploads/cr144_svha_a3.webp",
+          "/assets/images/products/uploads/cr144_svha_a8.webp",
+          "/assets/images/products/uploads/cr144_svha_a91.webp"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 50,
+    "strapInfo": "Знімні",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "searchKeywords": [
+      "COACH",
+      "Coach Mini Bucket Bag",
+      "Coach CR144",
+      "сумка Coach",
+      "Coach сумка",
+      "жіноча сумка Coach",
+      "Mini Bucket Bag",
+      "Coach Bucket Bag",
+      "Coach чорна сумка",
+      "чорна сумка Coach",
+      "сумка через плече Coach",
+      "міні сумка",
+      "маленька сумка",
+      "bucket bag",
+      "сумка відро",
+      "шкіряна сумка",
+      "жіноча шкіряна сумка",
+      "брендова сумка",
+      "оригінальна Coach",
+      "сумка на плече",
+      "сумка кросбоді"
+    ],
+    "isNew": false,
+    "title": "Жіноча міні сумочка Coach Mini Bucket Bag Black",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильна міні-сумка COACH Mini Bucket Bag у поєднанні чорного кольору зі сріблястою фурнітурою. Лаконічний силует bucket та фірмовий логотип COACH роблять модель універсальним аксесуаром для повсякденних і вечірніх образів.\nСумка виготовлена з якісної натуральної шкіри та має зручне закриття на шнурок. Модель доповнена знімною ручкою та знімним ременем, тому її можна носити в руці, на плечі або через плече. Компактний розмір ідеально підходить для найнеобхідніших речей",
+    "sku": "CR144",
+    "rating": 5,
+    "category": "Жіночі сумки",
+    "slug": "жіноча-міні-сумочка-coach-mini-bucket-bag-black",
+    "id": 46,
+    "color": "Чорний",
+    "images": [
+      "/assets/images/products/uploads/cr144_svbk_a0.webp",
+      "/assets/images/products/uploads/cr144_svbk_a3.webp",
+      "/assets/images/products/uploads/cr144_svbk_a8.webp",
+      "/assets/images/products/uploads/cr144_svbk_a91.webp",
+      "/assets/images/products/uploads/cr144_svbk_a92.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "5–10 робочих днів",
+    "forcePublish": false,
+    "material": "Натуральна шкіра",
+    "brand": "Marc Jacobs",
+    "price": 9000,
+    "preOrder": false,
+    "dimensions": "25 × 16 × 5 см",
+    "variants": [
+      {
+        "color": "Bronze Green",
+        "hex": "#285d06",
+        "images": [
+          "/assets/images/products/uploads/the-j-marc-shoulder-bag-bronze-green-h956l01pf22-365-800x800.webp",
+          "/assets/images/products/uploads/the-j-marc-shoulder-bag-bronze-green-additional-image-5192-800x800.webp",
+          "/assets/images/products/uploads/the-j-marc-shoulder-bag-bronze-green-additional-image-5191-800x800.webp",
+          "/assets/images/products/uploads/the-j-marc-shoulder-bag-bronze-green-additional-image-5193-800x800.webp"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 50,
+    "strapInfo": "2 знімні регульований та ланцюжок",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "searchKeywords": [
+      "Marc Jacobs",
+      "The J Marc Shoulder Bag",
+      "Marc Jacobs J Marc",
+      "Marc Jacobs H956L01PF22",
+      "Marc Jacobs сумка",
+      "сумка Marc Jacobs",
+      "жіноча сумка Marc Jacobs",
+      "The J Marc",
+      "J Marc Shoulder Bag",
+      "сумка через плече",
+      "сумка на плече",
+      "шкіряна сумка",
+      "сумка хакі",
+      "зелена сумка",
+      "Bronze Green",
+      "сумка з ланцюжком",
+      "сумка клатч",
+      "сумка 3 в 1",
+      "брендова сумка",
+      "оригінальна Marc Jacobs"
+    ],
+    "isNew": false,
+    "title": "Жіноча сумочка Marc Jacobs The J Marc Shoulder Bag",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Елегантна сумка Marc Jacobs The J Marc Shoulder Bag у відтінку Bronze Green — стильна модель із гладкої натуральної шкіри, доповнена фірмовою застібкою у вигляді подвійної літери «J» та золотою фурнітурою.\nМодель має одне основне відділення, внутрішню кишеню на блискавці та накладну кишеню на зворотному боці. Сумка комплектується двома знімними ременями: регульованим шкіряним ременем та ременем-ланцюжком. Її можна носити на плечі, через плече або без ременів як клатч",
+    "sku": "H956L01PF22_365",
+    "rating": 5,
+    "category": "Жіночі сумки",
+    "slug": "жіноча-сумочка-marc-jacobs-the-j-marc-shoulder-bag",
+    "id": 47,
+    "color": "Bronze Green",
+    "images": [
+      "/assets/images/products/uploads/the-j-marc-shoulder-bag-bronze-green-h956l01pf22-365-800x800.webp",
+      "/assets/images/products/uploads/the-j-marc-shoulder-bag-bronze-green-additional-image-5192-800x800.webp",
+      "/assets/images/products/uploads/the-j-marc-shoulder-bag-bronze-green-additional-image-5191-800x800.webp",
+      "/assets/images/products/uploads/the-j-marc-shoulder-bag-bronze-green-additional-image-5193-800x800.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "5–10 робочих днів",
+    "forcePublish": false,
+    "material": "Фірмовий покритий канвас та гладка шкіра",
+    "brand": "Coach",
+    "price": 6500,
+    "preOrder": false,
+    "dimensions": "22 × 16 × 7 см",
+    "variants": [
+      {
+        "color": "Gold Chalk Glacier White Multi",
+        "hex": "#ddd8d1",
+        "images": [
+          "/assets/images/products/uploads/ca148_imrfi_a0.webp",
+          "/assets/images/products/uploads/ca148_imrfi_a3.webp",
+          "/assets/images/products/uploads/ca148_imrfi_a8.webp",
+          "/assets/images/products/uploads/ca148_imrfi_a92.webp",
+          "/assets/images/products/uploads/ca148_imrfi_a91.webp"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 50,
+    "strapInfo": "Регульований, знімний",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "searchKeywords": [
+      "COACH",
+      "Coach Klare",
+      "Klare Crossbody Bag",
+      "Coach CA148",
+      "Coach Signature Canvas",
+      "Coach сумка",
+      "сумка Coach",
+      "жіноча сумка Coach",
+      "Coach кросбоді",
+      "сумка через плече",
+      "сумка на плече",
+      "кросбоді Coach",
+      "Signature Canvas",
+      "сумка з логотипом",
+      "бежева сумка",
+      "світла сумка",
+      "біла сумка",
+      "брендова сумка",
+      "оригінальна Coach",
+      "жіноча кросбоді",
+      "маленька сумка"
+    ],
+    "isNew": false,
+    "title": "Сумка Coach Klare Crossbody Bag In Blocked Signature Canvas",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильна сумка COACH Klare Crossbody Bag у фірмовому принті Signature Canvas з контрастними відтінками Gold, Chalk та Glacier White. Елегантний структурований дизайн, золотиста фурнітура та впізнаваний логотип COACH роблять модель універсальним доповненням до повсякденних і більш святкових образів.\nСумка виготовлена з фірмового покритого канвасу та гладкої шкіри. Має основне відділення, внутрішню кишеню на блискавці, багатофункціональні кишені та зовнішню кишеню. Закривається на зручну застібку.\nРегульований ремінець можна носити коротко або довше на плечі, а також через плече.",
+    "sku": "CA148",
+    "rating": 5,
+    "category": "Жіночі сумки",
+    "slug": "сумка-coach-klare-crossbody-bag-in-blocked-signature-canvas",
+    "id": 48,
+    "color": "Gold Chalk Glacier White Multi",
+    "images": [
+      "/assets/images/products/uploads/ca148_imrfi_a0.webp",
+      "/assets/images/products/uploads/ca148_imrfi_a3.webp",
+      "/assets/images/products/uploads/ca148_imrfi_a8.webp",
+      "/assets/images/products/uploads/ca148_imrfi_a92.webp",
+      "/assets/images/products/uploads/ca148_imrfi_a91.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "5–10 робочих днів",
+    "forcePublish": false,
+    "material": "Натуральна зерниста шкіра",
+    "brand": "Marc Jacobs",
+    "price": 10000,
+    "preOrder": false,
+    "dimensions": "26 × 21 × 13 см",
+    "variants": [
+      {
+        "color": "Aspen Green зелений",
+        "hex": "#1c7e05",
+        "images": [
+          "/assets/images/products/uploads/aspen-green-cement-m.webp",
+          "/assets/images/products/uploads/aspen-green-cement4.webp",
+          "/assets/images/products/uploads/aspen-green-cement3.webp",
+          "/assets/images/products/uploads/aspen-green-cement-m1.webp"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 50,
+    "strapInfo": "Ремінь знімний та регульований",
+    "sizes": [
+      "S"
+    ],
+    "searchKeywords": [
+      "Marc Jacobs",
+      "Marc Jacobs The Tote Bag",
+      "The Leather Small Tote Bag",
+      "Marc Jacobs Small Tote",
+      "Marc Jacobs H004L01PF21",
+      "H004L01PF21-331",
+      "Marc Jacobs сумка",
+      "сумка Marc Jacobs",
+      "жіноча сумка Marc Jacobs",
+      "Marc Jacobs tote",
+      "small tote bag",
+      "сумка тоут",
+      "маленька сумка",
+      "шкіряна сумка",
+      "сумка з натуральної шкіри",
+      "зелена сумка",
+      "Aspen Green",
+      "зелений тоут",
+      "сумка на плече",
+      "сумка через плече",
+      "брендова сумка",
+      "оригінальна Marc Jacobs"
+    ],
+    "isNew": false,
+    "title": "Шопер Marc Jacobs The Leather Small Tote Bag Aspen Green Cement",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильна та містка сумка Marc Jacobs The Leather Small Tote Bag у благородному відтінку Aspen Green  універсальна модель для повсякденних образів, роботи, подорожей та прогулянок містом.\nСумка виготовлена з натуральної зернистої шкіри та доповнена фірмовим тисненим логотипом Marc Jacobs на передній панелі. Модель має просторе основне відділення із застібкою-блискавкою, внутрішню кишеню на блискавці, дві накладні кишені та слот для картки.\nНосити сумку можна за верхні ручки або за допомогою знімного регульованого шкіряного ремінця через плече",
+    "sku": "H004L01PF21",
+    "rating": 5,
+    "category": "Жіночі сумки",
+    "slug": "шопер-marc-jacobs-the-leather-small-tote-bag-aspen-green-cement",
+    "id": 49,
+    "color": "Aspen Green зелений",
+    "images": [
+      "/assets/images/products/uploads/aspen-green-cement-m.webp",
+      "/assets/images/products/uploads/aspen-green-cement4.webp",
+      "/assets/images/products/uploads/aspen-green-cement3.webp",
+      "/assets/images/products/uploads/aspen-green-cement-m1.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "5–10 робочих днів",
+    "forcePublish": false,
+    "material": "Натуральна шкіра",
+    "brand": "Marc Jacobs",
+    "price": 8600,
+    "preOrder": false,
+    "dimensions": "20 × 12 × 4 см",
+    "variants": [
+      {
+        "color": "Pink",
+        "hex": "#ff07db",
+        "images": [
+          "/assets/images/products/uploads/27687307_57865310_2048.webp",
+          "/assets/images/products/uploads/27687307_57865301_2048.webp",
+          "/assets/images/products/uploads/27687307_57865307_2048.webp",
+          "/assets/images/products/uploads/27687307_57865304_2048.webp"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 50,
+    "strapInfo": "Ремінець знімний та регульований",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "searchKeywords": [
+      "Marc Jacobs",
+      "The Leather Mini Bag",
+      "Marc Jacobs Mini Bag",
+      "Marc Jacobs 2S4SMN080",
+      "2S4SMN080S02678",
+      "Marc Jacobs сумка",
+      "сумка Marc Jacobs",
+      "жіноча сумка Marc Jacobs",
+      "міні сумка",
+      "маленька сумка",
+      "шкіряна сумка",
+      "сумка з натуральної шкіри",
+      "рожева сумка",
+      "рожева сумка Marc Jacobs",
+      "Bubblegum Pink",
+      "сумка через плече",
+      "сумка на плече",
+      "клатч",
+      "міні клатч",
+      "брендова сумка",
+      "оригінальна Marc Jacobs"
+    ],
+    "isNew": false,
+    "title": "Сумочка Marc Jacobs The Leather Mini Bag Pink",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Елегантна міні-сумка Marc Jacobs The Leather Mini Bag у ніжному рожевому відтінку — компактна модель із лаконічним дизайном та фірмовим стилем Marc Jacobs.\nСумка виготовлена зі 100% натуральної шкіри та має відкидний клапан із магнітною застібкою. Усередині розташовані основне відділення, кишеня для дрібниць та 8 слотів для карток. Модель можна носити як клатч або використовувати знімний регульований ремінець для носіння на плечі чи через плече",
+    "sku": "2S4SMN080S02678",
+    "rating": 5,
+    "category": "Жіночі сумки",
+    "slug": "сумочка-marc-jacobs-the-leather-mini-bag-pink",
+    "id": 50,
+    "color": "Pink",
+    "images": [
+      "/assets/images/products/uploads/27687307_57865310_2048.webp",
+      "/assets/images/products/uploads/27687307_57865301_2048.webp",
+      "/assets/images/products/uploads/27687307_57865307_2048.webp",
+      "/assets/images/products/uploads/27687307_57865304_2048.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "5–10 робочих днів",
+    "forcePublish": false,
+    "material": "Монограмний жакард, шкіряне оздоблення",
+    "brand": "Marc Jacobs",
+    "price": 10000,
+    "preOrder": false,
+    "dimensions": "34 × 27 × 15 см",
+    "variants": [
+      {
+        "color": "Black Beige  чорний  бежевий",
+        "hex": "#e5e0e0",
+        "images": [
+          "/assets/images/products/uploads/215896950_beige_in.webp",
+          "/assets/images/products/uploads/215896950_beige_bk.webp",
+          "/assets/images/products/uploads/215896950_beige_cu.webp",
+          "/assets/images/products/uploads/215896950_beige_e1.webp",
+          "/assets/images/products/uploads/215896950_beige_fr.webp"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 50,
+    "strapInfo": "Ремінець знімний та регульований",
+    "sizes": [
+      "M"
+    ],
+    "searchKeywords": [
+      "Marc Jacobs",
+      "Marc Jacobs The Tote Bag",
+      "The Medium Tote Bag",
+      "Marc Jacobs Medium Tote",
+      "Monogram Jacquard",
+      "Marc Jacobs Monogram Jacquard",
+      "Marc Jacobs сумка",
+      "сумка Marc Jacobs",
+      "жіноча сумка Marc Jacobs",
+      "Marc Jacobs tote",
+      "medium tote bag",
+      "сумка тоут",
+      "містка сумка",
+      "жакардова сумка",
+      "сумка з монограмою",
+      "чорна сумка",
+      "бежева сумка",
+      "Black Beige",
+      "сумка на плече",
+      "сумка через плече",
+      "брендова сумка",
+      "оригінальна Marc Jacobs"
+    ],
+    "isNew": false,
+    "title": "Сумка The Medium Tote Bag in Monogram Jacquard",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильна та містка сумка Marc Jacobs The Medium Tote Bag in Monogram Jacquard — культова модель The Tote Bag у вишуканому виконанні з фірмовим монограмним жакардом.\nСумка має впізнаваний дизайн Marc Jacobs із вишитим логотипом, шкіряною окантовкою та верхніми ручками. Просторе основне відділення закривається на блискавку та доповнене внутрішньою кишенею.\nМодель оснащена знімним та регульованим текстильним ремінцем, тому її можна носити в руці, на плечі або через плече",
+    "sku": "2F4HTT015H05",
+    "rating": 5,
+    "category": "Жіночі сумки",
+    "slug": "сумка-the-medium-tote-bag-in-monogram-jacquard",
+    "id": 51,
+    "color": "Black Beige  чорний  бежевий",
+    "images": [
+      "/assets/images/products/uploads/215896950_beige_in.webp",
+      "/assets/images/products/uploads/215896950_beige_bk.webp",
+      "/assets/images/products/uploads/215896950_beige_cu.webp",
+      "/assets/images/products/uploads/215896950_beige_e1.webp",
+      "/assets/images/products/uploads/215896950_beige_fr.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "5–10 робочих днів",
+    "forcePublish": false,
+    "material": "Натуральна шкіра",
+    "brand": "Marc Jacobs",
+    "price": 10000,
+    "preOrder": false,
+    "dimensions": "26 × 21 × 13 см",
+    "variants": [
+      {
+        "color": "Cement тауповий - сіро-бежевий",
+        "hex": "#bcb5b5",
+        "images": [
+          "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-ce-16a06f5f.webp",
+          "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-ce-00e1b92f.webp",
+          "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-ce-93206bc0.webp",
+          "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-cement-h009l01sp21-055-800x800.webp"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 50,
+    "strapInfo": "Ремінець знімний та регульований",
+    "sizes": [
+      "S"
+    ],
+    "searchKeywords": [
+      "Marc Jacobs",
+      "Marc Jacobs The Tote Bag",
+      "The Leather Small Tote Bag",
+      "Marc Jacobs Small Tote",
+      "Marc Jacobs H009L01SP21",
+      "H009L01SP21-055",
+      "Marc Jacobs сумка",
+      "сумка Marc Jacobs",
+      "жіноча сумка Marc Jacobs",
+      "Marc Jacobs tote",
+      "small tote bag",
+      "сумка тоут",
+      "маленька сумка",
+      "шкіряна сумка",
+      "сумка з натуральної шкіри",
+      "Cement",
+      "таупова сумка",
+      "сіро-бежева сумка",
+      "сумка на плече",
+      "сумка через плече",
+      "брендова сумка",
+      "оригінальна Marc Jacobs"
+    ],
+    "isNew": false,
+    "title": "Сумка Marc Jacobs The Leather Small Tote Bag Cement",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильна та універсальна сумка Marc Jacobs The Leather Small Tote Bag у витонченому відтінку Cement. Лаконічний дизайн, натуральна зерниста шкіра та фірмовий логотип Marc Jacobs роблять модель чудовим вибором для повсякденних образів.\nСумка виготовлена з натуральної зернистої шкіри з легкою глянцевою поверхнею. Має одне основне відділення на блискавці, внутрішню кишеню та кишеню для дрібниць. На передній панелі розташований фірмовий логотип The Tote Bag, а на задній — шкіряний патч із логотипом.\nМодель доповнена двома верхніми ручками та знімним регульованим шкіряним ремінцем, тому її можна носити в руці, на плечі або через плече",
+    "sku": "H009L01SP21-05",
+    "rating": 5,
+    "category": "Жіночі сумки",
+    "slug": "сумка-marc-jacobs-the-leather-small-tote-bag-cement",
+    "id": 52,
+    "color": "Cement тауповий - сіро-бежевий",
+    "images": [
+      "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-ce-16a06f5f.webp",
+      "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-ce-00e1b92f.webp",
+      "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-ce-93206bc0.webp",
+      "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-cement-h009l01sp21-055-800x800.webp"
     ]
   }
 ]

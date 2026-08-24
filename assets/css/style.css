@@ -4685,12 +4685,26 @@ body.mobile-filters-open .scroll-top{
         bottom:0;
         z-index:900;
         background:#fff;
-        /* мінімум 20px відступу знизу навіть якщо
-           env(safe-area-inset-bottom) дорівнює 0 — інакше
-           кнопка опиняється в "гарячій зоні" й перший тап
-           в Safari на iOS лише розгортає нижню панель
-           браузера замість натискання на кнопку */
-        padding:12px 16px max(20px, calc(12px + env(safe-area-inset-bottom, 0px)));
+        /* Відступ знизу такий самий, як зверху — 12px. Без додавання
+           env(safe-area-inset-bottom).
+           
+           ЧОМУ БЕЗПЕЧНУ ЗОНУ ПРИБРАНО. На iPhone Safari повідомляє
+           safe-area-inset-bottom ≈ 34px навіть тоді, коли його власна
+           нижня панель видима й уже відсуває вміст. Виходило подвійно:
+           панель браузера знизу плюс наш порожній білий відступ над
+           нею — смуга вдвічі вища за потрібну.
+           
+           Компенсацію бере на себе сама смуга: вона прибита до
+           bottom:0, тож її біле тло доходить до самого низу вікна, і
+           під кнопкою не лишається порожнього місця.
+           
+           ЩО ЦЕ КОШТУЄ. Коли панель Safari ховається при прокрутці,
+           нижні ~12px кнопки опиняються в зоні жестової смуги. На
+           натискання це не впливає (смуга перехоплює свайп угору, а не
+           тап), але перший свайп від самого низу піде системі, а не
+           сторінці. Якщо це заважатиме — поверніть
+           calc(12px + env(safe-area-inset-bottom, 0px)). */
+        padding:12px 16px;
         box-shadow:0 -10px 30px rgba(0,0,0,.1);
         transform:translateY(110%);
         transition:transform .3s ease;
@@ -7099,7 +7113,14 @@ body.mobile-filters-open .scroll-top{
 .search-promo-banners{
     flex:1 1 320px;
     display:grid;
-    grid-template-columns:1fr 1fr;
+    /* minmax(0,1fr), а не просто 1fr.
+       
+       Колонка 1fr за замовчуванням не може стати вужчою за свій вміст
+       (min-width:auto). Якщо плитка з якоїсь причини вимагає більше
+       місця — наприклад через конфлікт aspect-ratio з min-height —
+       колонка розтягується, сітка стає ширшою за контейнер, і сусідні
+       плитки накладаються. minmax(0,1fr) знімає цю нижню межу. */
+    grid-template-columns:minmax(0, 1fr) minmax(0, 1fr);
     gap:14px;
 }
 
@@ -7112,6 +7133,21 @@ body.mobile-filters-open .scroll-top{
        background-size:cover зрізав людям голови. З aspect-ratio кроп
        однаковий скрізь, тож картинку можна підготувати один раз. */
     aspect-ratio:2 / 1;
+    /* Ширину задаємо ЯВНО — інакше плитки наїжджають одна на одну.
+       
+       aspect-ratio і min-height разом утворюють конфлікт: ширина
+       приходить із колонки сітки (на телефоні ~160px), пропорція дає
+       висоту 80px, а min-height піднімає її до 104. Розв'язати це можна
+       двома способами — лишити ширину й збільшити висоту, або лишити
+       висоту й ПЕРЕРАХУВАТИ ШИРИНУ (104 × 2 = 208px). Safari обирає
+       друге, плитка вилазить за свою колонку й лягає на сусідню.
+       
+       width:100% робить ширину визначеною наперед, тож пропорції
+       лишається тільки порахувати висоту. min-width:0 не дає вмісту
+       (довгому підпису) розсунути колонку сітки — типова причина того
+       самого переповнення. */
+    width:100%;
+    min-width:0;
     min-height:104px;
     border-radius:16px;
     background-size:cover;
@@ -7147,8 +7183,18 @@ body.mobile-filters-open .scroll-top{
     z-index:1;
 }
 
+/* Градієнт — ЗАПАСНИЙ варіант, а не заміна фото.
+   
+   Плитки «Новинки» й «Акції» історично малювались кольором. Тепер їм
+   теж можна вибрати фото в адмінці, але поки його не вибрали, лишається
+   градієнт. Тому він записаний у background-image як друге значення:
+   --banner-lg порожня → діє градієнт; вибрали фото → воно лягає зверху
+   й градієнт із-під нього не видно.
+   
+   Якби тут стояв просто background-color, вибране фото перекрило б
+   його, але порожня змінна залишила б плитку голою. */
 .search-promo-new{
-    background:linear-gradient(135deg,#0f1729,#1b2540);
+    background-image:var(--banner-lg, linear-gradient(135deg,#0f1729,#1b2540));
 }
 
 .search-promo-new span{
@@ -7156,7 +7202,7 @@ body.mobile-filters-open .scroll-top{
 }
 
 .search-promo-sale{
-    background:linear-gradient(135deg,#7f1d1d,#b91c1c);
+    background-image:var(--banner-lg, linear-gradient(135deg,#7f1d1d,#b91c1c));
 }
 
 /* -- результати пошуку -- */
@@ -7301,11 +7347,43 @@ body.mobile-filters-open .scroll-top{
         width:100%;
     }
 
+    /* Скидаємо flex, успадкований від десктопної розкладки.
+       
+       .search-idle-main і .search-promo-banners мають flex:1 1 380px і
+       flex:1 1 320px — це писалося для рядка, де 320px означає ШИРИНУ.
+       Тут напрямок міняється на column, і та сама basis стає
+       МІНІМАЛЬНОЮ ВИСОТОЮ, а flex-grow:1 ще й розтягує блок на решту
+       місця. Через це між плитками зʼявлялися пусті провали у пів
+       екрана, а самі плитки розповзалися.
+       
+       flex:0 0 auto означає «висота така, скільки треба вмісту». */
+    .search-idle-main,
+    .search-promo-banners{
+        flex:0 0 auto;
+    }
+
+    /* Рядки сітки не тягнемо: інакше плитки переростають свою
+       пропорцію 2:1, і підпис опиняється далеко під картинкою. */
+    .search-promo-banners{
+        align-content:start;
+    }
+
     /* На телефоні плитка всього ~161px завширшки: смуга з трьох речей
        перетворюється на кашу. Якщо адміністратор завантажив окрему
        картинку — беремо її; ні — лишається та сама, що на комп'ютері. */
     .search-promo-banner{
         background-image:var(--banner-sm,var(--banner-lg,none));
+    }
+
+    /* «Новинки» й «Акції» без фото лишаються градієнтними і на
+       телефоні: правило вище закінчується на none, і без цих двох
+       рядків плитки стали б порожніми. */
+    .search-promo-new{
+        background-image:var(--banner-sm,var(--banner-lg, linear-gradient(135deg,#0f1729,#1b2540)));
+    }
+
+    .search-promo-sale{
+        background-image:var(--banner-sm,var(--banner-lg, linear-gradient(135deg,#7f1d1d,#b91c1c)));
     }
 
     .search-results{
@@ -10126,4 +10204,348 @@ body.mobile-filters-open .scroll-top{
     transform:scale(1.04);
 }
 
+}
+
+/* =====================================
+   ПІДТВЕРДЖЕННЯ ВИДАЛЕННЯ (common.js → askConfirm)
+   ===================================== */
+
+.confirm-overlay{
+    position:fixed;
+    inset:0;
+    z-index:3000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    background:rgba(17,24,39,.55);
+    animation:confirmFade .15s ease;
+}
+
+@keyframes confirmFade{ from{opacity:0} to{opacity:1} }
+
+.confirm-box{
+    width:100%;
+    max-width:380px;
+    background:#fff;
+    border-radius:18px;
+    padding:26px 24px 20px;
+    box-shadow:0 20px 60px rgba(0,0,0,.25);
+    text-align:center;
+}
+
+.confirm-title{
+    margin:0 0 10px;
+    font-size:19px;
+    line-height:1.3;
+}
+
+.confirm-text{
+    margin:0 0 22px;
+    font-size:14px;
+    line-height:1.55;
+    color:var(--gray700);
+}
+
+.confirm-actions{
+    display:flex;
+    gap:10px;
+}
+
+.confirm-actions .btn{
+    flex:1;
+    height:46px;
+    justify-content:center;
+}
+
+/* Видалення — дія, яку не відкотиш, тож кнопка червона: колір сам по
+   собі попереджає ще до читання тексту. */
+.confirm-danger{
+    background:#dc2626;
+    border-color:#dc2626;
+    color:#fff;
+}
+
+@media (hover:hover) and (pointer:fine){
+.confirm-danger:hover{
+    background:#b91c1c;
+    border-color:#b91c1c;
+}
+}
+
+/* поки діалог відкритий, сторінка під ним не гортається */
+body.confirm-open{
+    overflow:hidden;
+}
+
+/* назва кольору в кошику й обраному */
+.cart-item-color,
+.favorite-row-color{
+    font-size:13px;
+    color:var(--gray700);
+    margin:6px 0 2px;
+}
+
+.cart-item-color b,
+.favorite-row-color b{
+    color:var(--gray900);
+}
+
+/* =====================================
+   ЗГОДА НА ВИКОРИСТАННЯ ДАНИХ (assets/js/consent.js)
+   ===================================== */
+
+.consent-banner{
+    position:fixed;
+    left:0;
+    right:0;
+    bottom:0;
+    z-index:2500;
+    background:#fff;
+    border-top:1px solid var(--gray200);
+    box-shadow:0 -12px 40px rgba(0,0,0,.12);
+    /* нижче мобільної кнопки «Купити» (z-index:900), але вище решти;
+       і з урахуванням жестової смуги на iPhone */
+    padding:16px 20px calc(16px + env(safe-area-inset-bottom, 0px));
+    animation:consentUp .25s ease;
+}
+
+@keyframes consentUp{ from{transform:translateY(100%)} to{transform:translateY(0)} }
+
+.consent-inner{
+    max-width:1100px;
+    margin:0 auto;
+    display:flex;
+    align-items:center;
+    gap:24px;
+}
+
+.consent-text{
+    flex:1;
+    font-size:13.5px;
+    line-height:1.55;
+    color:var(--gray700);
+}
+
+.consent-text b{ color:var(--gray900); }
+
+.consent-actions{
+    display:flex;
+    gap:10px;
+    flex-shrink:0;
+}
+
+.consent-actions .btn{
+    height:44px;
+    white-space:nowrap;
+}
+
+@media(max-width:768px){
+
+    .consent-inner{
+        flex-direction:column;
+        align-items:stretch;
+        gap:14px;
+    }
+
+    .consent-actions .btn{ flex:1; }
+
+    /* банер не має закривати кнопку «Купити» на сторінці товару */
+    body:has(.mobile-sticky-cart.show) .consent-banner{
+        bottom:76px;
+    }
+
+}
+
+/* -- заглушка замість відео до згоди -- */
+
+.video-consent{
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:var(--gray100) var(--embed-thumb, none) center/cover no-repeat;
+}
+
+/* Обкладинку приглушуємо: інакше здається, що відео вже завантажилось
+   і просто не грає. */
+.video-consent::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:rgba(17,24,39,.55);
+}
+
+.video-consent-btn{
+    position:relative;
+    z-index:2;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:8px;
+    max-width:320px;
+    padding:22px 24px;
+    border:0;
+    border-radius:16px;
+    background:rgba(255,255,255,.95);
+    cursor:pointer;
+    text-align:center;
+}
+
+.video-consent-play{
+    font-size:22px;
+    line-height:1;
+    color:var(--secondary);
+}
+
+.video-consent-title{
+    font-weight:700;
+    font-size:15px;
+    color:var(--gray900);
+}
+
+/* Прямим текстом, що станеться після натискання, — інакше вибір
+   не є усвідомленим. */
+.video-consent-note{
+    font-size:12px;
+    line-height:1.45;
+    color:var(--gray700);
+}
+
+/* Пояснення про дані під кнопкою оформлення.
+   Згорнуте за замовчуванням: хто не питає — не бачить стіни тексту,
+   хто питає — знаходить відповідь не виходячи зі сторінки. */
+.order-data-note{
+    margin-top:14px;
+    font-size:13px;
+    border:1px solid var(--gray200);
+    border-radius:12px;
+    background:var(--gray50);
+}
+
+.order-data-note > summary{
+    padding:12px 14px;
+    cursor:pointer;
+    font-weight:600;
+    color:var(--gray900);
+    list-style:none;
+}
+
+.order-data-note > summary::-webkit-details-marker{ display:none; }
+
+.order-data-note > summary::after{
+    content:"▾";
+    float:right;
+    color:var(--gray500);
+    transition:transform .2s;
+}
+
+.order-data-note[open] > summary::after{
+    transform:rotate(180deg);
+    display:inline-block;
+}
+
+.order-data-body{
+    padding:0 14px 12px;
+    color:var(--gray700);
+    line-height:1.55;
+}
+
+.order-data-body p{ margin:0 0 10px; }
+.order-data-body p:last-child{ margin-bottom:0; }
+.order-data-body b{ color:var(--gray900); }
+
+/* Колір, який уже лежить окремим рядком у кошику чи обраному.
+   
+   Перемкнутись на нього не можна: два однакові рядки — це або мовчазне
+   видалення одного з них (обране), або злиття в один із подвоєною
+   кількістю (кошик). Тому позначаємо такі кольори заздалегідь —
+   краще показати межу до дії, ніж пояснювати після.
+   
+   Не приховуємо й не робимо disabled: кружечок лишається видимим, бо
+   він показує, ЩО такий колір у списку вже є. Зникни він — виглядало б,
+   ніби товар доступний не в усіх кольорах. */
+.mini-color.is-taken{
+    opacity:.4;
+    cursor:not-allowed;
+}
+
+/* позиціонування — від самого кружечка, інакше рамка поїде
+   до найближчого позиціонованого предка десь вище */
+.mini-color.is-taken{
+    position:relative;
+}
+
+.mini-color.is-taken::after{
+    content:"";
+    position:absolute;
+    inset:-3px;
+    border-radius:50%;
+    border:1px dashed var(--gray500);
+}
+
+/* =====================================
+   КНОПКА «НАЗАД» У ХЛІБНИХ КРИХТАХ
+   ===================================== */
+
+.crumb-back{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    font-weight:600;
+    /* Прилипає до лівого краю.
+       
+       На телефоні доріжку прокручено вправо — до назви товару, бо саме
+       вона відповідає на питання «де я зараз». Без sticky кнопка
+       «Назад» виїхала б за кадр разом із початком шляху, тобто саме те,
+       чим користуються найчастіше, довелося б шукати прокруткою. */
+    position:sticky;
+    left:0;
+    z-index:2;
+    /* тло те саме, що в смуги крихт: інакше під кнопкою просвічували б
+       пункти, які проїжджають повз неї при прокрутці */
+    background:#f7f7f7;
+    padding-right:14px;
+}
+
+/* Розділювач після кнопки — щоб вона читалась як окремий елемент, а не
+   як перший пункт шляху. */
+.crumb-back::after{
+    content:"";
+    width:1px;
+    height:16px;
+    margin-left:14px;
+    background:var(--gray300);
+}
+
+.breadcrumbs .crumb-back{
+    color:var(--gray900);
+}
+
+@media (hover:hover) and (pointer:fine){
+.breadcrumbs .crumb-back:hover{
+    color:var(--secondary);
+}
+}
+
+.crumb-back:focus-visible{
+    outline:2px solid var(--secondary);
+    outline-offset:2px;
+    border-radius:4px;
+}
+
+/* Поле ніка Telegram — з'являється лише при виборі цього способу */
+.contact-channel-extra{
+    margin-top:14px;
+}
+
+.contact-channel-extra[hidden]{
+    display:none;
+}
+
+.contact-channel-hint{
+    margin:6px 0 0;
+    font-size:12.5px;
+    line-height:1.5;
+    color:var(--gray500);
 }

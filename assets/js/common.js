@@ -234,7 +234,7 @@ async function getProductById(id) {
 
         try {
 
-            const response = await fetch("data/products.json");
+            const response = await fetch(dataUrl("data/products.json"));
 
             cachedProducts = await response.json();
 
@@ -258,7 +258,7 @@ async function getAllProductsCached() {
 
         try {
 
-            const response = await fetch("data/products.json");
+            const response = await fetch(dataUrl("data/products.json"));
 
             cachedProducts = await response.json();
 
@@ -693,17 +693,22 @@ function changeFavoriteVariant(id, oldColor, oldSize, field, value) {
         (entry.size || null) === (updated.size || null)
     );
 
-    if (duplicateIndex !== -1) {
+    // Такий варіант уже є у списку — НЕ змінюємо.
+    //
+    // Раніше тут стояло favorites.splice(index, 1): рядок, який
+    // редагували, мовчки зникав. Ззовні це виглядало як «два товари
+    // обʼєднались в один», хоча насправді один із них видалявся —
+    // і людина не просила його видаляти, вона лише перемикала колір.
+    //
+    // Відмовити чесніше: обидва рядки лишаються на місці, а причина
+    // називається вголос. Список зберігає рівно те, що в нього клали.
+    if (duplicateIndex !== -1) return false;
 
-        favorites.splice(index, 1);
-
-    } else {
-
-        favorites[index] = updated;
-
-    }
+    favorites[index] = updated;
 
     saveFavorites(favorites);
+
+    return true;
 
 }
 
@@ -738,6 +743,169 @@ function updateFavoriteCounter() {
 // -------------------------
 // Toast
 // -------------------------
+
+// -------------------------
+// Підтвердження перед видаленням
+//
+// Видалити товар із кошика чи обраного можна було одним випадковим
+// дотиком — кнопка «✕» стоїть поруч із кількістю, а повернути
+// видалене нічим. Тому питаємо.
+//
+// Свій діалог, а не вбудований confirm(): вбудований на телефоні
+// виглядає системним вікном браузера з адресою сайту, ламає стиль і
+// на iOS блокує сторінку цілком.
+// -------------------------
+
+function askConfirm(options) {
+
+    const {
+        title = "Видалити товар?",
+        text = "Цю дію не можна скасувати.",
+        confirmLabel = "Видалити",
+        cancelLabel = "Скасувати"
+    } = options || {};
+
+    return new Promise(resolve => {
+
+        const overlay = document.createElement("div");
+
+        overlay.className = "confirm-overlay";
+        overlay.innerHTML = `
+            <div class="confirm-box" role="dialog" aria-modal="true"
+                 aria-labelledby="confirmTitle">
+                <h3 class="confirm-title" id="confirmTitle">${escapeHtml(title)}</h3>
+                <p class="confirm-text">${escapeHtml(text)}</p>
+                <div class="confirm-actions">
+                    <button type="button" class="btn btn-outline" data-confirm="no">
+                        ${escapeHtml(cancelLabel)}
+                    </button>
+                    <button type="button" class="btn confirm-danger" data-confirm="yes">
+                        ${escapeHtml(confirmLabel)}
+                    </button>
+                </div>
+            </div>`;
+
+        // Куди повернути фокус після закриття: інакше людина, що
+        // ходить клавіатурою, опиниться на початку сторінки.
+        const returnTo = document.activeElement;
+
+        function close(answer) {
+
+            document.removeEventListener("keydown", onKey);
+            overlay.remove();
+            document.body.classList.remove("confirm-open");
+
+            if (returnTo && document.contains(returnTo)) returnTo.focus();
+
+            resolve(answer);
+
+        }
+
+        function onKey(event) {
+
+            if (event.key === "Escape") close(false);
+
+            // Tab по колу всередині вікна: без цього фокус іде на
+            // сторінку під діалогом, і незрозуміло, де ти зараз.
+            if (event.key === "Tab") {
+
+                const items = [...overlay.querySelectorAll("button")];
+
+                if (!items.length) return;
+
+                const first = items[0];
+                const last = items[items.length - 1];
+
+                if (event.shiftKey && document.activeElement === first) {
+                    event.preventDefault();
+                    last.focus();
+                } else if (!event.shiftKey && document.activeElement === last) {
+                    event.preventDefault();
+                    first.focus();
+                }
+
+            }
+
+        }
+
+        overlay.addEventListener("click", event => {
+
+            const answer = event.target.closest("[data-confirm]");
+
+            // клац повз вікно = скасувати
+            if (event.target === overlay) return close(false);
+
+            if (answer) close(answer.dataset.confirm === "yes");
+
+        });
+
+        document.addEventListener("keydown", onKey);
+        document.body.classList.add("confirm-open");
+        document.body.appendChild(overlay);
+
+        // Фокус на «Скасувати», а не на «Видалити»: випадковий Enter
+        // одразу після відкриття не має нічого стирати.
+        overlay.querySelector('[data-confirm="no"]')?.focus();
+
+    });
+
+}
+
+// Адреса файлу даних із версією.
+//
+// Файли data/*.json тягне fetch, і кеш зберігає їх за адресою — так
+// само, як скрипти. Тобто після викладки новий товар міг не зʼявитись
+// іще довго, хоча сам файл на сервері вже оновився.
+//
+// Версії кладе в HTML крок збірки scripts/apply-cache-version.js:
+//
+//     window.ASSET_VERSIONS = { "data/products.json": "9b2e01", ... }
+//
+// Тут ми просто дописуємо потрібну до адреси. Змінився файл —
+// змінилась версія — змінилась адреса — кеш іде по нову копію.
+// Не змінився — адреса та сама, і файл береться з кеша, як і має бути.
+//
+// Якщо версій чомусь немає (сторінку відкрили без цього кроку збірки),
+// повертаємо адресу як є: гірше, ніж могло б бути, але точно не зламано.
+function dataUrl(url) {
+
+    // Ключі у списку версій без початкового «/» (data/products.json),
+    // а в коді трапляється й абсолютний шлях (/data/products.json —
+    // сторінки товарів лежать у /p/<slug>/, тож відносний туди не
+    // веде). Шукаємо за обома формами, інакше саме той файл лишився б
+    // без версії й протухав би в кеші.
+    const key = String(url).replace(/^\//, "");
+
+    const version = window.ASSET_VERSIONS && window.ASSET_VERSIONS[key];
+
+    return version ? `${url}?v=${version}` : url;
+
+}
+
+// Куди йдуть листи з форм сайту.
+//
+// Це не адреса, а токен FormSubmit: сервіс видає його після
+// підтвердження пошти й сам підставляє справжній bestbrnd4u@proton.me.
+// Тримати адресу в коді відкритим текстом означало б віддати її
+// збирачам спаму.
+//
+// Константа тут, а не в checkout.js, бо форм тепер дві — оформлення
+// замовлення і «Написати нам» у контактах. Дві копії рано чи пізно
+// розійшлися б, і одна з форм почала б слати листи в нікуди.
+const FORMSUBMIT_TARGET = "b8e2e26d0dab4962153e7c42bfab1499";
+
+function sendViaFormSubmit(payload) {
+
+    return fetch(`https://formsubmit.co/ajax/${FORMSUBMIT_TARGET}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        },
+        body: JSON.stringify(payload)
+    });
+
+}
 
 function showToast(text) {
 
@@ -900,11 +1068,11 @@ function buildSearchOverlay() {
                             <span>Жінкам</span>
                         </a>
 
-                        <a href="catalog?section=new" class="search-promo-banner search-promo-new">
+                        <a href="catalog?section=new" class="search-promo-banner search-promo-new" data-banner="new">
                             <span>Новинки</span>
                         </a>
 
-                        <a href="catalog?section=sale" class="search-promo-banner search-promo-sale">
+                        <a href="catalog?section=sale" class="search-promo-banner search-promo-sale" data-banner="sale">
                             <span>Акції</span>
                         </a>
 
@@ -997,6 +1165,17 @@ function applySearchBanners(root) {
 
             set("--banner-lg", entry.desktop);
             set("--banner-sm", entry.mobile);
+
+            // Підпис на картинці вже є — свій не малюємо.
+            //
+            // Картинки, намальовані під ці плитки, часто вже містять
+            // напис («WOMEN», «SALE»). Якщо поверх нього покласти ще й
+            // підпис сайту, на плитці виявиться два тексти одночасно.
+            // Вибір лишається за адміністратором: у нього може бути й
+            // фото без напису, і тоді підпис потрібен.
+            const label = tile.querySelector("span");
+
+            if (label) label.hidden = !!entry.hideLabel;
 
         });
 
@@ -1628,7 +1807,24 @@ document.addEventListener("click", event => {
 
         const { color, size } = getSelectedVariant(scope);
 
-        toggleFavorite(Number(favorite.dataset.id), { color, size });
+        const id = Number(favorite.dataset.id);
+
+        // На сторінці «Обране» ця сама кнопка не перемикає, а ВИДАЛЯЄ
+        // рядок зі списку — і повернути його нічим. Тому там питаємо.
+        // Скрізь інде (картка, сторінка товару) це звичайне
+        // перемикання сердечка: спитати означало б заважати.
+        if (favorite.classList.contains("favorite-row-remove")) {
+
+            askConfirm({
+                title: "Видалити з обраного?",
+                text: "Товар зникне зі списку обраного."
+            }).then(yes => { if (yes) toggleFavorite(id, { color, size }); });
+
+            return;
+
+        }
+
+        toggleFavorite(id, { color, size });
 
         return;
 
@@ -2199,7 +2395,7 @@ function loadCategoryTree() {
 
     if (categoryTreePromise) return categoryTreePromise;
 
-    categoryTreePromise = fetch("data/categories.json")
+    categoryTreePromise = fetch(dataUrl("data/categories.json"))
         .then(response => response.ok ? response.json() : [])
         .then(categories => {
 
@@ -2235,7 +2431,7 @@ function loadSizeGroups() {
 
     if (sizeGroupsPromise) return sizeGroupsPromise;
 
-    sizeGroupsPromise = fetch("data/size-groups.json")
+    sizeGroupsPromise = fetch(dataUrl("data/size-groups.json"))
         .then(response => response.ok ? response.json() : null)
         .then(data => {
 
