@@ -1,13 +1,13 @@
 {
   "hero": {
-    "label": "Нова колекція",
+    "secondaryButtonLink": "#products",
+    "primaryButtonText": "Перейти до каталогу",
     "heading": "Знайдіть сумку,\nяка підкреслить\nваш стиль",
     "text": "Понад 500 оригінальних моделей від світових брендів. Швидка доставка, зручна оплата та гарантія якості.",
-    "image": "/assets/images/banners/home-hero.webp",
-    "primaryButtonText": "Перейти до каталогу",
     "primaryButtonLink": "catalog",
     "secondaryButtonText": "Популярні товари",
-    "secondaryButtonLink": "#products",
+    "label": "Нова колекція",
+    "image": "/assets/images/banners/hero-bags.jpg",
     "imageMobile": "/assets/images/banners/home-hero-sm.webp"
   },
   "instagram": {
@@ -45,7 +45,7 @@
     "label": "НОВА КОЛЕКЦІЯ",
     "heading": "Свіжі надходження вже в каталозі",
     "text": "Marc Jacobs, Michael Kors, Coach, JW PEI, Love Moschino — свіжі надходження сезону.",
-    "image": "/assets/images/banners/home-promo.webp",
+    "image": "/assets/images/banners/1am.png",
     "buttonText": "Дивитися новинки",
     "buttonLink": "catalog?section=new",
     "imageMobile": "/assets/images/banners/home-promo-sm.webp"
