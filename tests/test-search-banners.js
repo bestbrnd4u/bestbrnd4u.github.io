@@ -83,11 +83,15 @@ console.log("\n[2b] Картинки пошуку задаються в адмі
     check("розділ «Картинки в пошуку» є", !!entry);
     check("пише в data/search-banners.json", entry && entry.file === "data/search-banners.json");
 
-    const genders = (entry && entry.fields) || [];
+    // Плиток чотири: «Чоловікам», «Жінкам», «Новинки», «Акції».
+    // Останні дві історично малювались градієнтом — тепер їм теж можна
+    // вибрати фото, а без фото градієнт лишається (див. блок [2c]).
+    const tiles = (entry && entry.fields) || [];
 
-    check("є обидві статі", genders.length === 2);
+    check("налаштовуються всі чотири плитки", tiles.length === 4,
+        tiles.map(t => t.label).join(", "));
 
-    genders.forEach(gender => {
+    tiles.forEach(gender => {
 
         const sub = gender.fields || [];
         const desktop = sub.find(f => f.name === "desktop");
@@ -114,14 +118,27 @@ console.log("\n[2b] Картинки пошуку задаються в адмі
     // поле відкриється порожнім, а на сайті плитка буде без картинки.
     const data = JSON.parse(read("data/search-banners.json"));
 
-    ["men", "women"].forEach(key => {
+    ["men", "women", "new", "sale"].forEach(key => {
 
         const paths = data[key] || {};
 
+        check(`${key}: запис є в даних`, !!data[key]);
+
         ["desktop", "mobile"].forEach(size => {
+
             const rel = String(paths[size] || "").replace(/^\//, "");
+
+            // Порожньо — це нормальна відповідь: «Новинки» й «Акції»
+            // без фото лишаються градієнтними. Але якщо шлях указано,
+            // файл мусить існувати, інакше плитка буде порожньою.
+            if (!rel) {
+                check(`${key}.${size}: без фото (лишається колір)`, true);
+                return;
+            }
+
             check(`${key}.${size} веде на наявний файл`,
-                !!rel && fs.existsSync(path.join(ROOT, rel)), paths[size]);
+                fs.existsSync(path.join(ROOT, rel)), paths[size]);
+
         });
 
     });
@@ -131,6 +148,36 @@ console.log("\n[2b] Картинки пошуку задаються в адмі
         /--banner-sm,var\(--banner-lg,none\)/.test(css));
     check("без картинки плитка не ламається",
         /background-image:var\(--banner-lg,none\)/.test(css));
+}
+
+console.log("\n[2c] «Новинки» й «Акції» без фото лишаються кольоровими");
+{
+    // Ці дві плитки історично малювались градієнтом. Тепер їм теж можна
+    // вибрати фото — але поки не вибрали, має лишатись колір.
+    //
+    // Тому градієнт записаний ЗАПАСНИМ значенням у background-image:
+    //   var(--banner-lg, linear-gradient(...))
+    // Якби він стояв окремо в background-color, вибране фото перекрило б
+    // його, а порожня змінна лишила б плитку голою.
+    check("плитки позначені для JS",
+        /class="search-promo-banner search-promo-new" data-banner="new"/.test(common)
+        && /class="search-promo-banner search-promo-sale" data-banner="sale"/.test(common));
+
+    check("градієнт «Новинок» — запасне значення змінної",
+        /\.search-promo-new\{[\s\S]{0,140}background-image:var\(--banner-lg, linear-gradient/.test(css));
+    check("градієнт «Акцій» теж",
+        /\.search-promo-sale\{[\s\S]{0,140}background-image:var\(--banner-lg, linear-gradient/.test(css));
+
+    // Загальне мобільне правило закінчується на none — без окремих
+    // рядків ці дві плитки стали б на телефоні порожніми.
+    check("на телефоні градієнт теж зберігається",
+        /max-width:768px\)\{[\s\S]*?\.search-promo-new\{[\s\S]{0,180}linear-gradient/.test(css));
+
+    // Порожній рядок має ПРИБИРАТИ змінну, а не ставити url('') —
+    // інакше запасне значення не спрацює й плитка буде порожньою.
+    check("порожнє значення прибирає змінну",
+        /if \(value\) tile\.style\.setProperty[\s\S]{0,120}else tile\.style\.removeProperty\(name\)/
+            .test(common));
 }
 
 console.log("\n[3] Файли банерів існують і мають потрібний розмір");
@@ -194,6 +241,53 @@ console.log("\n[4] Банери можна перезібрати");
     check("мега-меню теж збирається", /width: 200, height: 200/.test(builder));
     check("розділ без товарів не лишає порожній <img>",
         /без фото \(немає товарів/.test(builder));
+}
+
+console.log("\n[6] Плитки не розповзаються на телефоні");
+{
+    // .search-idle-main і .search-promo-banners мають flex:1 1 380px і
+    // flex:1 1 320px — це писалося для РЯДКА, де basis означає ширину.
+    // У медіазапиті напрямок міняється на column, і та сама basis стає
+    // мінімальною ВИСОТОЮ, а flex-grow ще й розтягує блок. Через це між
+    // плитками зʼявлялися пусті провали у пів екрана.
+    const mobile = css.slice(css.indexOf("max-width:768px"));
+
+    check("flex скинутий у колонковій розкладці",
+        /\.search-idle-main,\s*\n\s*\.search-promo-banners\{\s*\n\s*flex:0 0 auto/.test(mobile));
+
+    check("рядки сітки не розтягуються", /align-content:start/.test(mobile));
+
+    // напрямок справді міняється — інакше перевірка вище безпредметна
+    check("на телефоні розкладка колонкою",
+        /\.search-idle\{[\s\S]{0,80}flex-direction:column/.test(mobile));
+}
+
+console.log("\n[7] Підпис не дублює текст на картинці");
+{
+    // Картинки під ці плитки часто вже містять напис («WOMEN», «SALE»).
+    // Якщо поверх покласти ще й підпис сайту — на плитці два тексти.
+    const { loadYaml } = require("./helpers/yaml");
+    const entry = loadYaml("admin/config.yml").collections
+        .find(c => c.name === "pages").files.find(f => f.name === "searchBanners");
+
+    (entry.fields || []).forEach(tile => {
+
+        const flag = (tile.fields || []).find(f => f.name === "hideLabel");
+
+        check(`«${tile.label}»: є перемикач підпису`, !!flag);
+        check(`«${tile.label}»: вимкнений за замовчуванням`,
+            flag && flag.default === false);
+
+    });
+
+    check("сайт ховає підпис за прапорцем",
+        /label\.hidden = !!entry\.hideLabel/.test(common));
+
+    // Вибір лишається за адміністратором: у нього може бути й фото без
+    // напису, і тоді підпис потрібен.
+    check("прапорець необовʼязковий",
+        (entry.fields || []).every(t =>
+            (t.fields || []).find(f => f.name === "hideLabel")?.required === false));
 }
 
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);

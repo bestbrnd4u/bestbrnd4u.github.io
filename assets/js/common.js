@@ -693,17 +693,22 @@ function changeFavoriteVariant(id, oldColor, oldSize, field, value) {
         (entry.size || null) === (updated.size || null)
     );
 
-    if (duplicateIndex !== -1) {
+    // Такий варіант уже є у списку — НЕ змінюємо.
+    //
+    // Раніше тут стояло favorites.splice(index, 1): рядок, який
+    // редагували, мовчки зникав. Ззовні це виглядало як «два товари
+    // обʼєднались в один», хоча насправді один із них видалявся —
+    // і людина не просила його видаляти, вона лише перемикала колір.
+    //
+    // Відмовити чесніше: обидва рядки лишаються на місці, а причина
+    // називається вголос. Список зберігає рівно те, що в нього клали.
+    if (duplicateIndex !== -1) return false;
 
-        favorites.splice(index, 1);
-
-    } else {
-
-        favorites[index] = updated;
-
-    }
+    favorites[index] = updated;
 
     saveFavorites(favorites);
+
+    return true;
 
 }
 
@@ -1007,11 +1012,11 @@ function buildSearchOverlay() {
                             <span>Жінкам</span>
                         </a>
 
-                        <a href="catalog?section=new" class="search-promo-banner search-promo-new">
+                        <a href="catalog?section=new" class="search-promo-banner search-promo-new" data-banner="new">
                             <span>Новинки</span>
                         </a>
 
-                        <a href="catalog?section=sale" class="search-promo-banner search-promo-sale">
+                        <a href="catalog?section=sale" class="search-promo-banner search-promo-sale" data-banner="sale">
                             <span>Акції</span>
                         </a>
 
@@ -1104,6 +1109,17 @@ function applySearchBanners(root) {
 
             set("--banner-lg", entry.desktop);
             set("--banner-sm", entry.mobile);
+
+            // Підпис на картинці вже є — свій не малюємо.
+            //
+            // Картинки, намальовані під ці плитки, часто вже містять
+            // напис («WOMEN», «SALE»). Якщо поверх нього покласти ще й
+            // підпис сайту, на плитці виявиться два тексти одночасно.
+            // Вибір лишається за адміністратором: у нього може бути й
+            // фото без напису, і тоді підпис потрібен.
+            const label = tile.querySelector("span");
+
+            if (label) label.hidden = !!entry.hideLabel;
 
         });
 

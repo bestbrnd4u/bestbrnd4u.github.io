@@ -57,15 +57,31 @@ function createFavoriteRow(product, favEntry) {
 
     const image = activeVariant.images?.[0] || product.images?.[0] || "assets/images/no-image.png";
 
-    const colorButtons = variants.map(variant => `
+    // Кольори, які вже лежать в обраному окремими рядками, позначаємо
+    // одразу — щоб людина не тицяла в них і не отримувала відмову.
+    const takenColors = new Set(
+        getFavorites()
+            .filter(entry => entry.id === product.id
+                && (entry.size || null) === (activeSize || null)
+                && (entry.color || null) !== (activeColor || null))
+            .map(entry => entry.color)
+    );
+
+    const colorButtons = variants.map(variant => {
+
+        const taken = takenColors.has(variant.color);
+
+        return `
         <button
             type="button"
-            class="mini-color ${variant.color === activeColor ? "active" : ""}"
+            class="mini-color ${variant.color === activeColor ? "active" : ""}${taken ? " is-taken" : ""}"
             data-color="${escapeHtml(variant.color)}"
             data-images='${escapeAttrSingleQuoted(JSON.stringify(variant.images || []))}'
-            title="${escapeHtml(variant.color)}"
+            title="${escapeHtml(variant.color)}${taken ? " — уже окремим рядком в обраному" : ""}"
             style="background:${escapeHtml(variant.hex)}"></button>
-    `).join("");
+    `;
+
+    }).join("");
 
     const sizeButtons = sizes.map(size => `
         <button
@@ -183,13 +199,26 @@ favoritesGrid?.addEventListener("click", event => {
     const oldColor = row.dataset.color || null;
     const oldSize = row.dataset.size || null;
 
+    // changeFavoriteVariant повертає false, якщо такий варіант уже є
+    // у списку. Тоді нічого не змінюється — і про це треба сказати,
+    // інакше виглядає, ніби кнопка не працює.
+    let applied = true;
+
     if (colorBtn) {
 
-        changeFavoriteVariant(id, oldColor, oldSize, "color", colorBtn.dataset.color);
+        applied = changeFavoriteVariant(id, oldColor, oldSize, "color", colorBtn.dataset.color);
 
     } else if (sizeBtn) {
 
-        changeFavoriteVariant(id, oldColor, oldSize, "size", sizeBtn.textContent.trim());
+        applied = changeFavoriteVariant(id, oldColor, oldSize, "size", sizeBtn.textContent.trim());
+
+    }
+
+    if (applied === false) {
+
+        showToast("Цей варіант уже є в обраному");
+
+        return;
 
     }
 

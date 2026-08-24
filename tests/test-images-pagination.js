@@ -55,13 +55,44 @@ console.log("\n[2] Кілька розмірів одного фото");
   check("галерея товару підключена", prod.includes('data-variant-sizes="(max-width: 900px) 100vw, 600px"'));
   check("мініатюри беруть найдрібніший розмір", prod.includes('data-variant-sizes="100px"'));
 
-  // вага каталожної версії — без зовнішніх інструментів,
-  // розмір файлу і так знає fs
-  const lightBytes = fs.readdirSync(DIR)
+  // Вага каталожної версії ВІДНОСНО повнорозмірної.
+  //
+  // Раніше тут стояв абсолютний поріг у 3 МБ на всі копії разом. Він
+  // вимірював не те: копії можуть бути ідеально стиснуті, але щойно
+  // магазин додасть десяток товарів, сума перевищить поріг і тест
+  // почервоніє на порожньому місці. Саме так і сталося при переході
+  // з 44 товарів на 52.
+  //
+  // Перевіряємо те, заради чого копії й існують: вони мусять бути
+  // ІСТОТНО легшими за оригінали. Це не залежить від розміру каталогу.
+  const size = f => fs.statSync(path.join(DIR, f)).size;
+
+  const all = fs.readdirSync(DIR);
+
+  const lightBytes = all.filter(f => f.endsWith("-600.webp")).reduce((s, f) => s + size(f), 0);
+
+  const fullBytes = all
     .filter(f => f.endsWith("-600.webp"))
-    .reduce((sum, f) => sum + fs.statSync(path.join(DIR, f)).size, 0);
-  const light = (lightBytes / 1048576).toFixed(2);
-  check(`каталожні версії важать ${light} МБ (легше за повнорозмірні)`, Number(light) < 3, light);
+    .map(f => f.replace("-600.webp", ".webp"))
+    .filter(f => all.includes(f))
+    .reduce((s, f) => s + size(f), 0);
+
+  const share = fullBytes ? Math.round((lightBytes / fullBytes) * 100) : 100;
+
+  check(`каталожні версії легші за повнорозмірні (${share}% ваги)`,
+        share < 60, `${share}%`);
+
+  // і жодна окрема копія не має бути важчою за свій оригінал —
+  // такий файл означає, що стиснення відпрацювало навпаки
+  const heavier = all
+    .filter(f => f.endsWith("-600.webp"))
+    .filter(f => {
+      const full = f.replace("-600.webp", ".webp");
+      return all.includes(full) && size(f) >= size(full);
+    });
+
+  check("жодна копія не важча за оригінал", heavier.length === 0,
+        heavier.slice(0, 3).join(", "));
 }
 
 console.log("\n[3] Пагінація");

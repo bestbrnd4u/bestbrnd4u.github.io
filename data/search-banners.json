@@ -1,10 +1,22 @@
 {
   "men": {
     "desktop": "/assets/images/banners/search-men.webp",
-    "mobile": "/assets/images/banners/search-men-sm.webp"
+    "mobile": "/assets/images/banners/search-men-sm.webp",
+    "hideLabel": true
   },
   "women": {
     "desktop": "/assets/images/banners/search-women.webp",
-    "mobile": "/assets/images/banners/search-women-sm.webp"
+    "mobile": "/assets/images/banners/search-women-sm.webp",
+    "hideLabel": true
+  },
+  "new": {
+    "desktop": "/assets/images/banners/search-new.webp",
+    "mobile": "/assets/images/banners/search-new-sm.webp",
+    "hideLabel": true
+  },
+  "sale": {
+    "desktop": "/assets/images/banners/search-sale.webp",
+    "mobile": "/assets/images/banners/search-sale-sm.webp",
+    "hideLabel": true
   }
 }

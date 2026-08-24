@@ -137,6 +137,17 @@ let selectedCategories = new Set();
 // категорію. З ним у крихтах стоїть коротке catalog?department=Аксесуари.
 let selectedDepartments = new Set();
 let departmentByCategory = new Map();
+
+// Порядок категорій такий самий, як у бічному меню.
+//
+// НАВІЩО: за замовчуванням каталог не сортувався взагалі — товари
+// йшли в порядку products.json, тобто за зростанням id. Через це
+// кожен доданий в адмінці товар опинявся в самому кінці, на останній
+// сторінці, де його ніхто не побачить. І категорії були перемішані:
+// сумка, окуляри, кросівки, знову сумка.
+//
+// Ключ — назва категорії, значення — її номер у меню.
+let categoryOrder = new Map();
 // фільтр ціни — діапазон "від / до" (повзунок + два поля вводу).
 // null означає "ще не ініціалізовано" — межі підставляються з
 // реальних цін каталогу після його завантаження
@@ -463,8 +474,18 @@ async function initCatalog() {
 
         // мапа «категорія → відділ» для фільтра department
         departmentByCategory = new Map();
+        categoryOrder = new Map();
+
         categoryDepartments.forEach(group => {
-            (group.categories || []).forEach(name => departmentByCategory.set(name, group.title));
+            (group.categories || []).forEach(name => {
+
+                departmentByCategory.set(name, group.title);
+
+                // номер у меню = порядок появи: розділи йдуть підряд,
+                // категорії всередині розділу — теж
+                if (!categoryOrder.has(name)) categoryOrder.set(name, categoryOrder.size);
+
+            });
         });
 
         // відділ з адреси лишаємо, лише якщо він справді існує:
@@ -2328,6 +2349,40 @@ function filterProducts(skip) {
         list = list.filter(product =>
             [...selectedSizes].some(key => matchesSizeKey(product, key))
         );
+
+    }
+
+    // Порядок за замовчуванням.
+    //
+    // Раніше його не було зовсім: список лишався таким, яким прийшов
+    // з products.json, тобто за зростанням id. Наслідок — щойно
+    // доданий товар потрапляв у самий кінець, на останню сторінку.
+    //
+    // Тепер три рівні, саме в цьому порядку:
+    //
+    //   1) категорія — у тому ж порядку, що в бічному меню, щоб
+    //      каталог читався так само, як навігація по ньому;
+    //   2) наявність — товари під замовлення в кінець свого розділу:
+    //      спершу те, що можна отримати одразу;
+    //   3) новизна — більший id означає пізніше додано, тож новий
+    //      товар стає першим у своєму розділі, а не останнім.
+    //
+    // Категорії, якої немає в меню (наприклад щойно створеної в
+    // адмінці й ще не додано в розділ), відправляємо в кінець, а не на
+    // початок: інакше товар без налаштованої категорії витіснив би
+    // згори весь каталог.
+    if (!currentSort) {
+
+        const rank = product => categoryOrder.has(product.category)
+            ? categoryOrder.get(product.category)
+            : Number.MAX_SAFE_INTEGER;
+
+        const later = product => (product.preOrder ? 1 : 0);
+
+        list.sort((a, b) =>
+            rank(a) - rank(b)
+            || later(a) - later(b)
+            || (Number(b.id) || 0) - (Number(a.id) || 0));
 
     }
 

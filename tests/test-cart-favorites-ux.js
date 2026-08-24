@@ -119,17 +119,27 @@ console.log("\n[5] Відступ під мобільною кнопкою «К�
 {
     const rule = (css.match(/\.mobile-sticky-cart\{[\s\S]*?\}/g) || []).join("\n");
 
-    check("відступ знизу дорівнює верхньому плюс безпечна зона",
-        /padding:12px 16px calc\(12px \+ env\(safe-area-inset-bottom, 0px\)\)/.test(css));
+    // Відступ знизу дорівнює верхньому — 12px, без додавання
+    // безпечної зони.
+    //
+    // Історія в двох кроках. Спершу тут стояв max(20px, …) — жорсткий
+    // поріг додавався навіть там, де вирізу немає. Замінили на
+    // calc(12px + env(safe-area-inset-bottom)) — і на iPhone смуга все
+    // одно лишилась удвічі вищою за потрібну: Safari повідомляє інсет
+    // ≈34px навіть коли його власна нижня панель видима й уже відсуває
+    // вміст. Виходила панель браузера плюс наш порожній білий відступ
+    // над нею.
+    check("відступ знизу дорівнює верхньому",
+        /\.mobile-sticky-cart\{[\s\S]{0,200}padding:12px 16px;/.test(css));
 
-    // Жорсткий поріг у 20px додавався навіть там, де вирізу немає, —
-    // і смуга виглядала помітно нижчою знизу, ніж зверху.
-    check("жорсткого порога 20px більше немає",
-        !/max\(20px, calc\(12px \+ env\(safe-area-inset-bottom/.test(css));
+    check("порога 20px немає", !/max\(20px, calc\(12px \+ env/.test(css));
+    check("безпечна зона більше не додається до відступу",
+        !/padding:12px 16px calc\(12px \+ env\(safe-area/.test(css));
 
-    // Безпечну зону прибирати не можна: на iPhone із жестовою смугою
-    // кнопка опиниться просто під нею.
-    check("безпечна зона врахована", /env\(safe-area-inset-bottom, 0px\)/.test(css));
+    // Порожнього місця під кнопкою не лишається саме тому, що смуга
+    // прибита до низу вікна: її тло доходить до краю.
+    check("смуга прибита до низу вікна",
+        /\.mobile-sticky-cart\{[\s\S]{0,160}bottom:0/.test(css));
 }
 
 console.log("\n[6] Dependabot цілиться в dev");
@@ -144,6 +154,81 @@ console.log("\n[6] Dependabot цілиться в dev");
     check("обидва блоки цілять у dev", blocks === 2, blocks);
 
     check("причина зафіксована в конфізі", /-X theirs/.test(yaml));
+}
+
+console.log("\n[7] Однакові варіанти не зливаються");
+{
+    // СИМПТОМ: додали товар у білому й у чорному, зайшли в обране й
+    // перемкнули білий на чорний — і один рядок зник. Ззовні це
+    // виглядало як «товари обʼєднались», а насправді один із них
+    // видалявся, хоча людина просила лише змінити колір.
+    //
+    // У кошику те саме проявлялось інакше: рядки групуються за
+    // id + колір + розмір, тож два однакові зливались в один із
+    // кількістю 2 — тобто мовчки мінялось замовлення.
+    check("обране більше не видаляє рядок при збігу",
+        !/favorites\.splice\(index, 1\)/.test(common));
+    check("обране відмовляє замість зміни",
+        /if \(duplicateIndex !== -1\) return false/.test(common));
+    check("кошик перевіряє збіг ДО зміни",
+        /const collides = cart\.some/.test(cart)
+        && cart.indexOf("const collides") < cart.indexOf("cart.forEach(entry => { if (matches(entry))"));
+
+    // Мовчазна відмова виглядає як «кнопка не працює».
+    check("обране повідомляє причину", /Цей варіант уже є в обраному/.test(favorites));
+    check("кошик повідомляє причину", /Такий варіант уже є в кошику/.test(cart));
+
+    // Краще показати межу до дії, ніж пояснювати після.
+    check("зайняті кольори позначені в кошику", /is-taken/.test(cart));
+    check("зайняті кольори позначені в обраному", /is-taken/.test(favorites));
+    check("підказка пояснює, чому колір недоступний",
+        /уже окремим рядком у кошику/.test(cart)
+        && /уже окремим рядком в обраному/.test(favorites));
+    check("є стилі позначки", /\.mini-color\.is-taken\{/.test(css));
+
+    // Позначаємо лише кольори ТОГО САМОГО розміру: у різних розмірів
+    // це різні рядки, і перемикання між ними конфлікту не створює.
+    check("збіг рахується в межах одного розміру",
+        /\(other\.size \|\| null\) === \(line\.size \|\| null\)/.test(cart)
+        && /\(entry\.size \|\| null\) === \(activeSize \|\| null\)/.test(favorites));
+}
+
+console.log("\n[7b] Поведінка обраного — на живих даних");
+{
+    // Перевіряємо саму логіку, а не текст: важливо, що після спроби
+    // перемкнути колір у списку лишаються ОБИДВА товари.
+    const src = common.match(/function changeFavoriteVariant[\s\S]*?\n\}/)[0];
+
+    let store = [
+        { id: 7, color: "Білий", size: "Onesize" },
+        { id: 7, color: "Чорний", size: "Onesize" }
+    ];
+
+    const sandbox = {
+        getFavorites: () => store.map(x => ({ ...x })),
+        saveFavorites: list => { store = list; }
+    };
+
+    const fn = new Function("getFavorites", "saveFavorites",
+        src + "; return changeFavoriteVariant;")(sandbox.getFavorites, sandbox.saveFavorites);
+
+    // спроба перемкнути білий на чорний — чорний уже є
+    const result = fn(7, "Білий", "Onesize", "color", "Чорний");
+
+    check("зміна відхилена", result === false, String(result));
+    check("обидва товари лишились", store.length === 2, store.length);
+    check("кольори не змінились",
+        store.map(x => x.color).sort().join(",") === "Білий,Чорний",
+        store.map(x => x.color).join(","));
+
+    // а перемикання на вільний колір має працювати як раніше
+    const ok = fn(7, "Білий", "Onesize", "color", "Червоний");
+
+    check("вільний колір застосовується", ok === true);
+    check("список не виріс", store.length === 2, store.length);
+    check("колір справді змінився",
+        store.some(x => x.color === "Червоний") && !store.some(x => x.color === "Білий"),
+        store.map(x => x.color).join(","));
 }
 
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
