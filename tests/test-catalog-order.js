@@ -200,5 +200,133 @@ console.log("\n[4] Товари під замовлення — на підст�
         bags[2].id === 10 && bags[3].id === 7);
 }
 
+console.log("\n[5] Сортування «новинки»");
+{
+    // СИМПТОМ: обираєш «новинки», а після позначених ідуть товари,
+    // доданих найпершими. Бо сортування дивилось лише на позначку, а
+    // решту лишало в порядку products.json — за зростанням id.
+    check("позначені вище, і всередині — новіші вище",
+        /\(markedNew\(b\) \? 1 : 0\) - \(markedNew\(a\) \? 1 : 0\)\s*\n\s*\|\| \(Number\(b\.id\)/.test(catalog));
+
+    // В адмінці позначок ДВІ: перемикач «Це новинка?» і бейдж NEW.
+    // Реагувати лише на одну означало б, що половина позначень не працює.
+    check("враховуються обидві позначки",
+        /product\.isNew \|\| String\(product\.badge \|\| ""\)\.toUpperCase\(\) === "NEW"/.test(catalog));
+
+    // Перевіряємо результат на справжніх даних
+    const src = catalog.match(/function markedNew[\s\S]*?\nfunction compareSizes/)[0]
+        .replace(/\nfunction compareSizes$/, "");
+
+    const helpers = new Function(src + "; return { markedNew, topRank, discountPercent };")();
+
+    const items = JSON.parse(read("data/products.json"));
+
+    const sorted = [...items].sort((a, b) =>
+        (helpers.markedNew(b) ? 1 : 0) - (helpers.markedNew(a) ? 1 : 0)
+        || (Number(b.id) || 0) - (Number(a.id) || 0));
+
+    const marked = sorted.filter(helpers.markedNew);
+
+    check("позначені стоять на початку",
+        sorted.slice(0, marked.length).every(helpers.markedNew), marked.length);
+
+    // всередині кожної групи id спадає
+    const ids = group => group.map(p => Number(p.id));
+    const falls = list => list.every((v, i) => i === 0 || list[i - 1] > v);
+
+    check("серед позначених новіші вище", falls(ids(marked)));
+    check("серед решти теж", falls(ids(sorted.filter(p => !helpers.markedNew(p)))));
+
+    // найстаріший товар мусить бути в самому кінці
+    const oldest = items.reduce((a, b) => (a.id < b.id ? a : b));
+
+    check("найстаріший — останній",
+        sorted[sorted.length - 1].id === oldest.id,
+        `id=${sorted[sorted.length - 1].id}, а найстаріший ${oldest.id}`);
+}
+
+console.log("\n[6] Сортування «топ» більше не порожня кнопка");
+{
+    // Раніше сортування шукало лише бейдж TOP. Його ніхто не ставив
+    // (у каталозі були тільки SALE і HOT), тож кнопка не робила
+    // НІЧОГО — список лишався в порядку id.
+    //
+    // Даних про продажі на сайті немає, тож «популярність» узяти
+    // нізвідки. HOT — та сама думка іншим бейджем, далі знижка:
+    // товар зі знижкою беруть охочіше.
+    check("HOT теж вважається топом", /badge === "HOT"\) return 1/.test(catalog));
+    check("далі — за розміром знижки", /discountPercent\(b\) - discountPercent\(a\)/.test(catalog));
+    check("наприкінці новіші вище",
+        /discountPercent\(a\)\)\s*\n\s*\|\| \(Number\(b\.id\)/.test(catalog));
+
+    const src = catalog.match(/function markedNew[\s\S]*?\nfunction compareSizes/)[0]
+        .replace(/\nfunction compareSizes$/, "");
+
+    const helpers = new Function(src + "; return { markedNew, topRank, discountPercent };")();
+
+    const items = JSON.parse(read("data/products.json"));
+
+    const sorted = [...items].sort((a, b) =>
+        (helpers.topRank(b) - helpers.topRank(a))
+        || (helpers.discountPercent(b) - helpers.discountPercent(a))
+        || (Number(b.id) || 0) - (Number(a.id) || 0));
+
+    // Головне: порядок мусить ВІДРІЗНЯТИСЯ від типового, інакше кнопка
+    // так само нічого не робить.
+    const byId = [...items].sort((a, b) => a.id - b.id).map(p => p.id);
+
+    check("порядок відрізняється від початкового",
+        JSON.stringify(sorted.map(p => p.id)) !== JSON.stringify(byId));
+
+    // бейджі попереду
+    const badged = sorted.filter(p => helpers.topRank(p) > 0);
+
+    check("товари з бейджем на початку",
+        sorted.slice(0, badged.length).every(p => helpers.topRank(p) > 0),
+        badged.length);
+
+    // знижка спадає серед решти
+    const rest = sorted.filter(p => helpers.topRank(p) === 0).map(helpers.discountPercent);
+
+    check("серед решти знижка спадає",
+        rest.every((v, i) => i === 0 || rest[i - 1] >= v));
+}
+
+console.log("\n[7] Листи з форм ідуть на робочу пошту");
+{
+    // Раніше стояв токен FormSubmit, виданий під особистий gmail. У коді
+    // адреси не було, тож знайти причину пошуком по проєкту не вдавалось
+    // — листи просто приходили не туди.
+    const common = read("assets/js/common.js");
+
+    const target = (common.match(/const FORMSUBMIT_TARGET = "([^"]*)"/) || [])[1];
+
+    check("адреса вказана явно", target === "bestbrnd4u@proton.me", target);
+    check("токена більше немає", !/^[0-9a-f]{32}$/.test(String(target)));
+
+    // Одна адреса на обидві форми: оформлення замовлення й контакти.
+    check("оформлення замовлення бере ту саму",
+        /FORM_TARGET_EMAIL = FORMSUBMIT_TARGET/.test(read("assets/js/checkout.js")));
+
+    // Жодної іншої особистої адреси в коді бути не має
+    const pages = fs.readdirSync(ROOT).filter(f => f.endsWith(".html"));
+
+    const scripts = fs.readdirSync(path.join(ROOT, "assets/js"))
+        .filter(f => f.endsWith(".js"))
+        .map(f => read(`assets/js/${f}`));
+
+    const found = new Set();
+
+    [...pages.map(f => read(f)), ...scripts].forEach(text => {
+        (text.match(/[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-z]{2,}/g) || [])
+            .forEach(mail => found.add(mail.toLowerCase()));
+    });
+
+    const allowed = new Set(["bestbrnd4u@proton.me", "name@example.com", "you@example.com"]);
+    const strangers = [...found].filter(m => !allowed.has(m));
+
+    check("сторонніх адрес у коді немає", strangers.length === 0, strangers.join(", "));
+}
+
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
 process.exit(failures === 0 ? 0 : 1);

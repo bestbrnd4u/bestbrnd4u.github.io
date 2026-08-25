@@ -13,6 +13,7 @@
 
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 // не даємо файлам зі зламаним ім'ям потрапити в зібраний JSON
 // (див. коментар у scripts/slug-safety.js)
 const { filterSafeEntryFiles } = require("./slug-safety");
@@ -53,6 +54,95 @@ function getMissingFields(data) {
     }
 
     return missing;
+
+}
+
+// Версія в адресі кожного фото: photo.webp?v=a1b2c3d4
+//
+// НАВІЩО
+// -------
+// Браузер і Cloudflare кешують картинку за адресою. Замінили фото
+// через адмінку, лишивши імʼя, — адреса та сама, і люди ще довго
+// бачать старе.
+//
+// ЧОМУ САМЕ ТАК, А НЕ ПЕРЕЙМЕНУВАННЯМ ФАЙЛУ
+// ------------------------------------------
+// Спершу я робив це перейменуванням: дописував відбиток у імʼя файлу.
+// Механізм виявився надто крихким і зламався на першому бойовому
+// запуску — файл переїхав, а посилання лишились на старому імені, і
+// фото зникло з товару.
+//
+// Тут ризику немає за побудовою: імʼя файлу НЕ змінюється, версія
+// живе лише в згенерованому products.json. Файл на диску й посилання
+// на нього завжди збігаються. Якщо версія колись не проставиться,
+// найгірше, що станеться, — картинка приїде з кеша; вона не зникне.
+//
+// products.json перезбирається щоразу, тож версія завжди свіжа. У
+// джерельних data/products/*.json її немає — там лишаються чисті
+// шляхи, з якими працює адмінка.
+function stampImageVersions(products) {
+
+    const cache = new Map();
+
+    function version(src) {
+
+        const clean = String(src).split("?")[0];
+
+        if (cache.has(clean)) return cache.get(clean);
+
+        const file = path.join(ROOT, clean.replace(/^\//, ""));
+
+        let stamp = "";
+
+        if (fs.existsSync(file)) {
+
+            stamp = crypto.createHash("sha1")
+                .update(fs.readFileSync(file))
+                .digest("hex")
+                .slice(0, 8);
+
+        }
+
+        cache.set(clean, stamp);
+
+        return stamp;
+
+    }
+
+    function stamp(src) {
+
+        if (!src || typeof src !== "string") return src;
+
+        const clean = src.split("?")[0];
+        const v = version(clean);
+
+        return v ? `${clean}?v=${v}` : clean;
+
+    }
+
+    let count = 0;
+
+    products.forEach(product => {
+
+        (product.variants || []).forEach(variant => {
+
+            if (!Array.isArray(variant.images)) return;
+
+            variant.images = variant.images.map(src => {
+
+                const next = stamp(src);
+
+                if (next !== src) count++;
+
+                return next;
+
+            });
+
+        });
+
+    });
+
+    console.log(`   версію проставлено фото: ${count}`);
 
 }
 
@@ -248,6 +338,8 @@ function main() {
     });
 
     products.sort((a, b) => a.id - b.id);
+
+    stampImageVersions(products);
 
     fs.writeFileSync(OUTPUT_FILE, JSON.stringify(products, null, 2) + "\n", "utf8");
 
