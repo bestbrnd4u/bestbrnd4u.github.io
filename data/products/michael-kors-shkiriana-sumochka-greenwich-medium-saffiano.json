@@ -11,11 +11,6 @@
       "zoom": 3,
       "x": 50,
       "y": 50
-    },
-    "30h1ggrl2l-487-1.webp": {
-      "zoom": 1.1,
-      "x": 52,
-      "y": 51
     }
   },
   "preOrder": false,
@@ -51,7 +46,7 @@
   "isNew": true,
   "title": "Шкіряна сумочка Greenwich Medium Saffiano",
   "images": [
-    "assets/images/products/uploads/30h1ggrl2l-487-1.webp",
+    "/assets/images/products/uploads/30h1ggrl2l-487-1-300.webp",
     "assets/images/products/uploads/30h1ggrl2l-487-2.webp",
     "assets/images/products/uploads/30h1ggrl2l-487-3.webp"
   ],
