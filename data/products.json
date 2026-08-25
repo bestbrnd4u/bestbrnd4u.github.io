@@ -1060,15 +1060,67 @@
     "color": "Темно-сірий"
   },
   {
-    "gender": [
-      "Жінкам"
+    "title": "Сумка крос-боді жіноча шкіряна Marc Jacobs The Snapshot",
+    "brand": "Marc Jacobs",
+    "category": "Жіночі сумки",
+    "gender": "Жінкам",
+    "price": 10000,
+    "description": "Крос-боді Marc Jacobs зі шкіри — акуратний прямокутний корпус і подвійна монограма J. Ремінець регулюється, тож сумку можна носити через плече або навскіс. Два кольори на вибір.",
+    "variants": [
+      {
+        "color": "Бежевий",
+        "hex": "#e3d1b6",
+        "images": [
+          "assets/images/products/uploads/2s3hcr500h03-134-1.webp?v=67d81cbd",
+          "assets/images/products/uploads/2s3hcr500h03-134-2.webp?v=b3a15be3",
+          "assets/images/products/uploads/2s3hcr500h03-134-3.webp?v=6f85764e"
+        ],
+        "sku": "2S3HCR500H03_134"
+      },
+      {
+        "color": "Чорний",
+        "hex": "#29282a",
+        "images": [
+          "assets/images/products/uploads/h153l01sp22-002-1.webp?v=b0fe28db",
+          "assets/images/products/uploads/h153l01sp22-002-2.webp?v=9aca5d47",
+          "assets/images/products/uploads/h153l01sp22-002-3.webp?v=0198e33b"
+        ],
+        "sku": "H153L01SP22-002"
+      }
     ],
     "oldPrice": 14300,
-    "color": "Бежевий",
     "badge": "SALE",
+    "isNew": false,
     "material": "Шкіра",
-    "brand": "Marc Jacobs",
-    "price": 10000,
+    "sku": "2S3HCR500H03_134",
+    "searchKeywords": [
+      "марк джейкобс",
+      "marc jacobs",
+      "mj",
+      "сумка жіноча",
+      "кросбоді",
+      "сумка через плече",
+      "клатч",
+      "бежевий",
+      "чорний",
+      "marc",
+      "jacobs",
+      "the",
+      "snapshot"
+    ],
+    "instagramBlock": "general",
+    "preOrder": false,
+    "images": [
+      "assets/images/products/uploads/2s3hcr500h03-134-1.webp",
+      "assets/images/products/uploads/2s3hcr500h03-134-2.webp",
+      "assets/images/products/uploads/2s3hcr500h03-134-3.webp"
+    ],
+    "slug": "marc-jacobs-sumka-kros-bodi-zhinocha-shkiriana-marc-jacobs-t",
+    "id": 20,
+    "color": "Бежевий",
+    "sizes": [
+      "ONESIZE"
+    ],
     "framing": {
       "2s3hcr500h03-134-1.webp": {
         "zoom": 2.34,
@@ -1085,61 +1137,7 @@
         "x": 50,
         "y": 50
       }
-    },
-    "preOrder": false,
-    "slug": "marc-jacobs-sumka-kros-bodi-zhinocha-shkiriana-marc-jacobs-t",
-    "variants": [
-      {
-        "color": "Бежевий",
-        "hex": "#e3d1b6",
-        "images": [
-          "/assets/images/products/uploads/2s3hcr500h03-134-1.webp?v=67d81cbd",
-          "/assets/images/products/uploads/2s3hcr500h03-134-2.webp?v=b3a15be3",
-          "assets/images/products/uploads/2s3hcr500h03-134-3.webp?v=6f85764e"
-        ],
-        "sku": "2S3HCR500H03_134"
-      },
-      {
-        "color": "Чорний",
-        "hex": "#29282a",
-        "images": [
-          "assets/images/products/uploads/h153l01sp22-002-1.webp?v=b0fe28db",
-          "assets/images/products/uploads/h153l01sp22-002-2.webp?v=9aca5d47",
-          "assets/images/products/uploads/h153l01sp22-002-3.webp?v=0198e33b"
-        ],
-        "sku": "H153L01SP22-002"
-      }
-    ],
-    "sizes": [
-      "ONESIZE"
-    ],
-    "searchKeywords": [
-      "марк джейкобс",
-      "marc jacobs",
-      "mj",
-      "сумка жіноча",
-      "кросбоді",
-      "сумка через плече",
-      "клатч",
-      "бежевий",
-      "чорний",
-      "marc",
-      "jacobs",
-      "the",
-      "snapshot"
-    ],
-    "isNew": false,
-    "title": "Сумка крос-боді жіноча шкіряна Marc Jacobs The Snapshot",
-    "images": [
-      "/assets/images/products/uploads/2s3hcr500h03-134-1.webp",
-      "/assets/images/products/uploads/2s3hcr500h03-134-2.webp",
-      "assets/images/products/uploads/2s3hcr500h03-134-3.webp"
-    ],
-    "id": 20,
-    "instagramBlock": "general",
-    "description": "Крос-боді Marc Jacobs зі шкіри — акуратний прямокутний корпус і подвійна монограма J. Ремінець регулюється, тож сумку можна носити через плече або навскіс. Два кольори на вибір.",
-    "sku": "2S3HCR500H03_134",
-    "category": "Жіночі сумки"
+    }
   },
   {
     "title": "Сумочка The Teddy J Marc Mini Bag Brown",
@@ -1389,7 +1387,7 @@
         "y": 50
       },
       "30h1ggrl2l-487-1.webp": {
-        "zoom": 3,
+        "zoom": 2.98,
         "x": 50,
         "y": 50
       }
@@ -1402,8 +1400,8 @@
         "hex": "#bacbdb",
         "images": [
           "/assets/images/products/uploads/30h1ggrl2l-487-1.webp?v=70048d23",
-          "/assets/images/products/uploads/30h1ggrl2l-487-2.webp?v=32d8a662",
-          "/assets/images/products/uploads/30h1ggrl2l-487-3.webp?v=01be7b92"
+          "assets/images/products/uploads/30h1ggrl2l-487-2.webp?v=32d8a662",
+          "assets/images/products/uploads/30h1ggrl2l-487-3.webp?v=01be7b92"
         ],
         "sku": "30H1GGRL2L-487"
       }
@@ -1428,8 +1426,8 @@
     "title": "Шкіряна сумочка Greenwich Medium Saffiano",
     "images": [
       "/assets/images/products/uploads/30h1ggrl2l-487-1.webp",
-      "/assets/images/products/uploads/30h1ggrl2l-487-2.webp",
-      "/assets/images/products/uploads/30h1ggrl2l-487-3.webp"
+      "assets/images/products/uploads/30h1ggrl2l-487-2.webp",
+      "assets/images/products/uploads/30h1ggrl2l-487-3.webp"
     ],
     "id": 25,
     "instagramBlock": "general",

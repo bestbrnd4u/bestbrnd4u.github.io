@@ -594,7 +594,9 @@ function buildThumbsMarkup(images, video, altText) {
 function buildTrackMarkup(images, video, altText) {
 
     const imageSlides = images.map(img => `
-        <img class="gallery-slide" src="${img}" style="${galleryFrameStyle(img)}" data-variant-src="${img}" data-variant-sizes="(max-width: 900px) 100vw, 600px" alt="${altText}" draggable="false" onerror="this.onerror=null;this.src='assets/images/no-image.png'">
+        <div class="gallery-slide gallery-slide-photo">
+            <img class="gallery-photo" src="${img}" style="${galleryFrameStyle(img)}" data-variant-src="${img}" data-variant-sizes="(max-width: 900px) 100vw, 600px" alt="${altText}" draggable="false" onerror="this.onerror=null;this.src='assets/images/no-image.png'">
+        </div>
     `).join("");
 
     const media = parseVideoEmbed(video);
@@ -662,7 +664,10 @@ function buildTrackMarkup(images, video, altText) {
 
     }
 
-    return imageSlides + videoSlide || `<img class="gallery-slide" src="assets/images/no-image.png" alt="${altText}">`;
+    return imageSlides + videoSlide
+        || `<div class="gallery-slide gallery-slide-photo">
+                <img class="gallery-photo" src="assets/images/no-image.png" alt="${altText}">
+            </div>`;
 
 }
 
@@ -1325,7 +1330,9 @@ function setupGallery() {
     if (!track) return;
 
     // Блокуємо drag'а картинок для Safari/iOS
-    document.querySelectorAll(".gallery-slide").forEach(img => {
+    // .gallery-photo, а не .gallery-slide: слайд тепер — обгортка, яка
+    // обрізає масштабоване фото (див. коментар у style.css).
+    document.querySelectorAll(".gallery-photo").forEach(img => {
         img.draggable = false;
         img.ondragstart = () => false;
     });
@@ -1611,7 +1618,19 @@ function setupGallery() {
 
                 }
 
-                return { type: "image", src: slide.src };
+                // Слайд-фото тепер обгортка, а не сам <img>: масштаб
+                // кадрування мусить обрізатися по межах слайда, інакше
+                // збільшене фото накриває сусідні (див. коментар до
+                // .gallery-slide-photo у style.css).
+                //
+                // Тому адресу беремо з вкладеного зображення, а не з
+                // самого слайда — у <div> немає src, і фото просто
+                // зникло б із повноекранного перегляду.
+                const photo = slide.tagName === "IMG"
+                    ? slide
+                    : slide.querySelector("img");
+
+                return { type: "image", src: photo && photo.src };
 
             }).filter(slide => slide.src);
 
