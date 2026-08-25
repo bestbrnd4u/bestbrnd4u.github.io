@@ -1019,12 +1019,29 @@
     "color": "Темно-сірий"
   },
   {
-    "title": "Сумка крос-боді жіноча шкіряна Marc Jacobs The Snapshot",
+    "gender": [
+      "Жінкам"
+    ],
+    "oldPrice": 14300,
+    "color": "Бежевий",
+    "badge": "SALE",
+    "material": "Шкіра",
     "brand": "Marc Jacobs",
-    "category": "Жіночі сумки",
-    "gender": "Жінкам",
     "price": 10000,
-    "description": "Крос-боді Marc Jacobs зі шкіри — акуратний прямокутний корпус і подвійна монограма J. Ремінець регулюється, тож сумку можна носити через плече або навскіс. Два кольори на вибір.",
+    "framing": {
+      "2s3hcr500h03-134-1.webp": {
+        "zoom": 2.51,
+        "x": 50,
+        "y": 50
+      },
+      "2s3hcr500h03-134-2.webp": {
+        "zoom": 2.35,
+        "x": 50,
+        "y": 50
+      }
+    },
+    "preOrder": false,
+    "slug": "marc-jacobs-sumka-kros-bodi-zhinocha-shkiriana-marc-jacobs-t",
     "variants": [
       {
         "color": "Бежевий",
@@ -1047,11 +1064,9 @@
         "sku": "H153L01SP22-002"
       }
     ],
-    "oldPrice": 14300,
-    "badge": "SALE",
-    "isNew": false,
-    "material": "Шкіра",
-    "sku": "2S3HCR500H03_134",
+    "sizes": [
+      "ONESIZE"
+    ],
     "searchKeywords": [
       "марк джейкобс",
       "marc jacobs",
@@ -1067,19 +1082,18 @@
       "the",
       "snapshot"
     ],
-    "instagramBlock": "general",
-    "preOrder": false,
+    "isNew": false,
+    "title": "Сумка крос-боді жіноча шкіряна Marc Jacobs The Snapshot",
     "images": [
       "assets/images/products/uploads/2s3hcr500h03-134-1.webp",
       "assets/images/products/uploads/2s3hcr500h03-134-2.webp",
       "assets/images/products/uploads/2s3hcr500h03-134-3.webp"
     ],
-    "slug": "marc-jacobs-sumka-kros-bodi-zhinocha-shkiriana-marc-jacobs-t",
     "id": 20,
-    "color": "Бежевий",
-    "sizes": [
-      "ONESIZE"
-    ]
+    "instagramBlock": "general",
+    "description": "Крос-боді Marc Jacobs зі шкіри — акуратний прямокутний корпус і подвійна монограма J. Ремінець регулюється, тож сумку можна носити через плече або навскіс. Два кольори на вибір.",
+    "sku": "2S3HCR500H03_134",
+    "category": "Жіночі сумки"
   },
   {
     "title": "Сумочка The Teddy J Marc Mini Bag Brown",
