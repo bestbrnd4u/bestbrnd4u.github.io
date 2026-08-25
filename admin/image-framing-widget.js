@@ -154,10 +154,7 @@
     var FrameEditor = createClass({
 
         getInitialState: function () {
-            // fitError — щоб «Підігнати» не мовчало, коли не вдалося:
-            // фото цілком біле, товар і так на весь кадр або знімок із
-            // чужого домену.
-            return { dragging: false, fitError: null };
+            return { dragging: false };
         },
 
         // Перетягування по кадру рухає точку фокуса. Рахуємо у відсотках
@@ -196,186 +193,6 @@
 
         handleUp: function () {
             if (this.state.dragging) this.setState({ dragging: false });
-        },
-
-        // Крок наближення кнопками.
-        //
-        // Повзунок дає плавність, але влучити ним у потрібне значення
-        // важко, а дрібний рух миші взагалі не дає видимого ефекту —
-        // через це складається враження, що інструмент не працює.
-        // Кнопки дають передбачуваний крок і одразу видимий результат.
-        step: function (delta) {
-
-            var lib = this.props.lib;
-            var next = Math.round((this.props.frame.zoom + delta) * 100) / 100;
-
-            next = Math.max(lib.MIN_ZOOM, Math.min(lib.MAX_ZOOM, next));
-
-            if (next === this.props.frame.zoom) return;
-
-            this.props.onChange({
-                zoom: next,
-                x: this.props.frame.x,
-                y: this.props.frame.y
-            });
-
-        },
-
-        // «Підігнати»: прибрати білі поля навколо товару.
-        //
-        // НАВІЩО
-        // -------
-        // Предметні фото знімають на білому тлі, і товар часто займає
-        // третину кадру. У картці він виглядає дрібним, а підбирати
-        // наближення повзунком доводиться навпомацки.
-        //
-        // ЯК
-        // ---
-        // Малюємо фото на canvas і шукаємо межі НЕбілих пікселів — це і
-        // є межі товару. Далі рахуємо, у скільки разів його треба
-        // збільшити, щоб він зайняв кадр, і де центр цих меж.
-        //
-        // Фото лежать на тому самому домені, що й адмінка, тож canvas
-        // не «псується» і пікселі читаються. Якщо колись зʼявиться фото
-        // з іншого домену — читання кине помилку, і ми просто нічого не
-        // робимо, а не ламаємо віджет.
-        autoFit: function () {
-
-            var self = this;
-            var url = this.props.url;
-
-            if (!url) return;
-
-            var img = new Image();
-
-            img.crossOrigin = "anonymous";
-
-            img.onload = function () {
-
-                var bounds = self.contentBounds(img);
-
-                if (!bounds) {
-                    self.setState({ fitError: "Не вдалося визначити межі товару" });
-                    return;
-                }
-
-                var lib = self.props.lib;
-
-                // Скільки треба збільшити, щоб товар зайняв кадр. Беремо
-                // менший коефіцієнт із двох — інакше по одній зі сторін
-                // товар вилізе за межі.
-                var zoom = Math.min(1 / bounds.w, 1 / bounds.h);
-
-                // Трохи менше, ніж «упритул»: невелике поле навколо
-                // товару виглядає навмисним, а зріз по краю — недбалим.
-                zoom = Math.round(zoom * 0.88 * 100) / 100;
-
-                // Підганяти нема чого.
-                //
-                // Якщо товар займає майже весь кадр, розрахунок із
-                // запасом дає значення НИЖЧЕ 1×. Раніше воно просто
-                // затискалось до 1 — кнопка вдавала, що спрацювала, а
-                // нічого не змінювалось. Краще сказати прямо.
-                if (zoom < 1.05) {
-                    self.setState({ fitError: "Товар і так займає майже весь кадр" });
-                    return;
-                }
-
-                zoom = Math.min(lib.MAX_ZOOM, zoom);
-
-                self.setState({ fitError: null });
-
-                self.props.onChange({
-                    zoom: zoom,
-                    x: Math.round(bounds.cx * 100),
-                    y: Math.round(bounds.cy * 100)
-                });
-
-            };
-
-            img.onerror = function () {
-                self.setState({ fitError: "Фото не завантажилось" });
-            };
-
-            img.src = url;
-
-        },
-
-        // Межі товару у частках від розміру фото.
-        contentBounds: function (img) {
-
-            // Зменшуємо перед аналізом: 200px по довшій стороні
-            // достатньо, щоб знайти межі, і в рази швидше за повний
-            // розмір.
-            var max = 200;
-            var scale = Math.min(1, max / Math.max(img.width, img.height));
-
-            var w = Math.max(1, Math.round(img.width * scale));
-            var h = Math.max(1, Math.round(img.height * scale));
-
-            var canvas = document.createElement("canvas");
-
-            canvas.width = w;
-            canvas.height = h;
-
-            var ctx = canvas.getContext("2d");
-
-            ctx.drawImage(img, 0, 0, w, h);
-
-            var data;
-
-            try {
-                data = ctx.getImageData(0, 0, w, h).data;
-            } catch (error) {
-                return null;   // фото з іншого домену
-            }
-
-            // Поріг «це вже не тло». Чисто білого на фото майже не
-            // буває — тіні й компресія дають 245–252, тож беремо 244.
-            var LIMIT = 244;
-
-            var minX = w;
-            var minY = h;
-            var maxX = -1;
-            var maxY = -1;
-
-            for (var y = 0; y < h; y++) {
-
-                for (var x = 0; x < w; x++) {
-
-                    var i = (y * w + x) * 4;
-
-                    var alpha = data[i + 3];
-
-                    // прозорий піксель — теж тло
-                    if (alpha < 16) continue;
-
-                    if (data[i] > LIMIT && data[i + 1] > LIMIT && data[i + 2] > LIMIT) continue;
-
-                    if (x < minX) minX = x;
-                    if (x > maxX) maxX = x;
-                    if (y < minY) minY = y;
-                    if (y > maxY) maxY = y;
-
-                }
-
-            }
-
-            if (maxX < 0) return null;   // фото цілком біле
-
-            var bw = (maxX - minX + 1) / w;
-            var bh = (maxY - minY + 1) / h;
-
-            // Товар і так на весь кадр — підганяти нічого
-            if (bw > 0.95 && bh > 0.95) return null;
-
-            return {
-                w: bw,
-                h: bh,
-                cx: (minX + maxX + 1) / 2 / w,
-                cy: (minY + maxY + 1) / 2 / h
-            };
-
         },
 
         handleZoom: function (event) {
@@ -440,15 +257,8 @@
                             : null
                     ),
 
-                    h("div", { className: "framing-zoom" },
+                    h("label", { className: "framing-zoom" },
                         h("span", null, "Наближення"),
-                        h("button", {
-                            type: "button",
-                            className: "framing-step",
-                            "aria-label": "Зменшити",
-                            disabled: frame.zoom <= this.props.lib.MIN_ZOOM,
-                            onClick: function () { self.step(-0.1); }
-                        }, "−"),
                         h("input", {
                             type: "range",
                             min: this.props.lib.MIN_ZOOM,
@@ -457,44 +267,20 @@
                             value: frame.zoom,
                             onChange: this.handleZoom
                         }),
-                        h("button", {
-                            type: "button",
-                            className: "framing-step",
-                            "aria-label": "Збільшити",
-                            disabled: frame.zoom >= this.props.lib.MAX_ZOOM,
-                            onClick: function () { self.step(0.1); }
-                        }, "+"),
                         h("b", null, frame.zoom.toFixed(2) + "×")
                     ),
 
-                    // «Підігнати» — те, що потрібно найчастіше: предметні
-                    // фото зняті на білому тлі, і товар займає третину
-                    // кадру. Одне натискання замість підбору повзунком.
-                    h("div", { className: "framing-actions" },
-                        h("button", {
-                            type: "button",
-                            className: "framing-fit",
-                            onClick: function () { self.autoFit(); }
-                        }, "Підігнати по товару"),
-
-                        h("button", {
-                            type: "button",
-                            className: "framing-reset",
-                            disabled: !zoomed && frame.x === 50 && frame.y === 50,
-                            onClick: function () { self.props.onChange(null); }
-                        }, "Скинути кадр")
-                    ),
-
-                    // Підказка залежить від стану: при 1× головне —
-                    // сказати, ЯК зробити товар більшим, а не те, що
-                    // фото показується повністю (це й так видно).
                     h("p", { className: "framing-hint" },
-                        this.state.fitError
-                            ? this.state.fitError
-                            : zoomed
-                                ? "Точку в кадрі перетягніть — саме вона лишиться в центрі."
-                                : "Товар виглядає дрібним? Натисніть «Підігнати по товару» — "
-                                  + "білі поля навколо обріжуться. Або наблизьте вручну.")
+                        zoomed
+                            ? "Точку в кадрі можна перетягнути — саме вона лишається на місці."
+                            : "1× — фото показується повністю, як зараз."),
+
+                    h("button", {
+                        type: "button",
+                        className: "framing-reset",
+                        disabled: !zoomed,
+                        onClick: function () { self.props.onChange(null); }
+                    }, "Скинути кадр")
                 )
             );
 

@@ -129,36 +129,12 @@ async function buildMissingVariants(file) {
     const full = path.join(DIR, file);
     const stem = file.slice(0, -".webp".length);
 
-    const source = fs.readFileSync(full);
-
-    // Копію перезбираємо, якщо її НЕМАЄ або якщо вона застаріла.
-    //
-    // ЩО БУЛО НЕ ТАК
-    // ---------------
-    // Тут перевірялась тільки наявність файлу. Замінили фото товару в
-    // адмінці під тим самим імʼям — база оновилась, а -300 і -600
-    // лишились від попереднього знімка. Далі найгірше: каталог бере
-    // саме зменшені копії через srcset, тож у картці й далі висіло
-    // СТАРЕ фото, хоча на сторінці товару вже було нове. Ззовні це
-    // виглядало як «кеш не скидається», а насправді файли справді
-    // різні.
-    //
-    // Порівнюємо за часом зміни: копія, старша за базу, зроблена не з
-    // неї. Це дешевше за порівняння вмісту й для цієї задачі досить —
-    // збірка перезаписує базу лише коли та справді змінилась.
-    const baseTime = fs.statSync(full).mtimeMs;
-
-    const missing = VARIANT_WIDTHS.filter(width => {
-
-        const variant = path.join(DIR, `${stem}-${width}.webp`);
-
-        if (!fs.existsSync(variant)) return true;
-
-        return fs.statSync(variant).mtimeMs < baseTime - 1000;
-
-    });
+    const missing = VARIANT_WIDTHS.filter(width =>
+        !fs.existsSync(path.join(DIR, `${stem}-${width}.webp`)));
 
     if (!missing.length) return false;
+
+    const source = fs.readFileSync(full);
 
     for (const width of missing) {
 

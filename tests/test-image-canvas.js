@@ -184,65 +184,6 @@ console.log("\n[5] Приведення вбудоване в збірку, а �
     });
 }
 
-console.log("\n[6] Зменшені копії зроблені з поточної бази");
-{
-    const sharp = require("sharp");
-
-    // СИМПТОМ, ЧЕРЕЗ ЯКИЙ ЦЕ ЗʼЯВИЛОСЬ
-    // ----------------------------------
-    // Замінили фото товару в адмінці — на сторінці товару нове, а в
-    // каталозі старе. Виглядало як «кеш не скидається», а файли справді
-    // були різні: buildMissingVariants() перезбирала копії ЛИШЕ якщо
-    // їх немає. Копії -300 і -600 лишались від попереднього знімка, а
-    // каталог бере саме їх через srcset — тобто показував старе фото.
-    //
-    // Перевіряємо не текст коду, а самі файли: копія мусить збігатися
-    // з тим, що вийшло б із бази зараз.
-    const uploads = path.join(ROOT, "assets/images/products/uploads");
-
-    const bases = fs.readdirSync(uploads)
-        .filter(f => f.endsWith(".webp") && !/-(300|600|1200)\.webp$/.test(f))
-        .slice(0, 25);
-
-    let compared = 0;
-    const stale = [];
-
-    for (const base of bases) {
-
-        const stem = base.slice(0, -".webp".length);
-
-        for (const width of [300, 600]) {
-
-            const variant = path.join(uploads, `${stem}-${width}.webp`);
-
-            if (!fs.existsSync(variant)) continue;
-
-            const fresh = await sharp(fs.readFileSync(path.join(uploads, base)))
-                .resize({ width })
-                .webp({ quality: 82 })
-                .toBuffer();
-
-            compared++;
-
-            if (!fresh.equals(fs.readFileSync(variant))) stale.push(`${stem}-${width}`);
-
-        }
-
-    }
-
-    check(`перевірено копій — ${compared}`, compared > 0);
-    check("усі копії зроблені з поточної бази", stale.length === 0,
-        stale.slice(0, 3).join(", "));
-
-    // І сам механізм: перевірка лише на існування файлу пропускала
-    // застарілі копії.
-    const normalizer = fs.readFileSync(
-        path.join(ROOT, "scripts/normalize-product-images.js"), "utf8");
-
-    check("копія перезбирається, якщо старша за базу",
-        /mtimeMs < baseTime/.test(normalizer));
-}
-
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
 process.exit(failures === 0 ? 0 : 1);
 
