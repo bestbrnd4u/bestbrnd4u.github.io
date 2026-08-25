@@ -5,13 +5,6 @@
   "color": "Темно-сірий",
   "brand": "Alain Mikli",
   "price": 6500,
-  "framing": {
-    "a05042-0037354-1.webp": {
-      "zoom": 1,
-      "x": 2,
-      "y": 52
-    }
-  },
   "preOrder": false,
   "slug": "alain-mikli-sontsezakhysni-okuliary-alain-mikli-dark-grey-re",
   "variants": [
@@ -47,7 +40,7 @@
   "isNew": false,
   "title": "Сонцезахисні окуляри ALAIN MIKLI Dark Grey Rectangular Unisex",
   "images": [
-    "assets/images/products/uploads/a05042-0037354-1.webp",
+    "/assets/images/products/uploads/a05042-0037354-1.26b9d653-300.webp",
     "assets/images/products/uploads/a05042-0037354-2.webp",
     "assets/images/products/uploads/a05042-0037354-3.webp"
   ],
