@@ -2238,6 +2238,17 @@ document.addEventListener("click", function (e) {
         // на сторінку товару, щоб не обирати заново
         const { color, size } = getSelectedVariant(card);
 
+        // Статистика: клац по картці в списку.
+        //
+        // Разом із view_item_list це дає найкорисніше зіставлення —
+        // які картки показуються часто, а натискають на них рідко.
+        // Саме там зазвичай проблема з фото або ціною.
+        const clicked = findCachedProduct(Number(id));
+
+        if (clicked) {
+            window.Analytics?.selectItem(clicked, "Каталог", { color, size });
+        }
+
         // картка знає лише id; slug дістаємо з кешу каталогу, щоб піти
         // одразу на канонічну адресу, а не через редірект
         window.location.href = productUrl(
