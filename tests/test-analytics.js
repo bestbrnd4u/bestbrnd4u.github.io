@@ -47,9 +47,14 @@ console.log("\n[1] Без згоди Google не завантажується");
     check("згода посеред сесії вмикає без перезавантаження",
         /consent:change[\s\S]{0,140}enable\(\)/.test(code));
 
-    // Порожній ідентифікатор = вимкнено повністю.
-    check("без ідентифікатора запитів немає",
-        /if \(!measurementId\) return/.test(code));
+    // Порожній ідентифікатор = вимкнено повністю. Подія при цьому не
+    // «виходить одразу», а лягає в чергу — інакше губились би події,
+    // що сталися до завантаження налаштувань. Черга просто ніколи не
+    // відправиться і очищається.
+    check("без ідентифікатора нічого не відправляється",
+        /if \(!measurementId \|\| !loaded\)/.test(code));
+    check("черга очищається, коли статистика вимкнена",
+        /if \(!measurementId\) \{[\s\S]{0,200}pending\.length = 0/.test(code));
 }
 
 console.log("\n[2] Персональні дані не передаються");
@@ -178,5 +183,92 @@ console.log("\n[6] Згода питає саме про статистику");
         /Google Analytics/.test(policy) && /ЛИШЕ після вашої/.test(policy));
 }
 
-console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
-process.exit(failures === 0 ? 0 : 1);
+console.log("\n[7] Подія до завантаження налаштувань не губиться");
+{
+    // СИМПТОМ: у звітах не було view_item, хоча сторінки товарів
+    // відкривали. Причина: data/analytics.json тягнеться запитом, а
+    // подія на сторінці товару стається при відмальовці — РАНІШЕ.
+    // Стояла перевірка «немає measurementId → виходимо», і такі події
+    // просто зникали.
+    const { JSDOM } = require("jsdom");
+
+    const run = (config, consent, delay) => {
+
+        const dom = new JSDOM("<head></head><body></body>", {
+            runScripts: "outside-only",
+            url: "https://bestbrnd4u.com/p/x/"
+        });
+
+        const w = dom.window;
+
+        w.fetch = () => new Promise(res => setTimeout(() => res({
+            ok: true,
+            json: () => Promise.resolve(config)
+        }), delay || 0));
+
+        w.Consent = { has: () => consent };
+
+        w.eval(analytics);
+
+        // подія одразу, ще до завантаження налаштувань
+        w.Analytics.viewItem({ id: 9, title: "Тест", price: 100 }, { color: "Синій" });
+
+        return new Promise(res => setTimeout(() => res({
+            events: (w.dataLayer || []).filter(a => a[0] === "event").map(a => a[1]),
+            script: !!w.document.querySelector("script[src*=googletagmanager]")
+        }), (delay || 0) + 120));
+
+    };
+
+    return run({ measurementId: "G-TEST" }, true, 120).then(early => {
+
+        check("рання подія доходить після завантаження",
+            early.events.includes("view_item"), early.events.join(", "));
+
+        return run({ measurementId: "" }, true, 0);
+
+    }).then(off => {
+
+        // Порожній ідентифікатор = статистика вимкнена. Черга не має
+        // «прорватись» після завантаження.
+        check("зі вимкненою статистикою подій немає", off.events.length === 0,
+            off.events.join(", "));
+        check("і скрипт Google не вантажиться", off.script === false);
+
+        return run({ measurementId: "G-TEST" }, false, 0);
+
+    }).then(denied => {
+
+        check("без згоди подій немає", denied.events.length === 0);
+        check("без згоди скрипт не вантажиться", denied.script === false);
+
+        // select_item був описаний, але ніде не викликався — подія
+        // «клац по картці» не відправлялась зовсім.
+        check("клац по картці відправляє select_item",
+            /Analytics\?\.selectItem\(clicked, "Каталог"/.test(read("assets/js/common.js")));
+
+        // Кожна описана подія мусить десь викликатись, інакше вона
+        // існує лише на папері.
+        const defined = [...analytics.matchAll(/^        ([a-zA-Z]+): function/gm)]
+            .map(m => m[1]);
+
+        const wired = ["assets/js/common.js", "assets/js/cart.js", "assets/js/product.js",
+            "assets/js/catalog.js", "assets/js/checkout.js"]
+            .map(f => read(f)).join("\n");
+
+        const unused = defined.filter(name =>
+            !new RegExp(`Analytics\\?\\.${name}\\(`).test(wired)
+            && !new RegExp(`Analytics\\.${name}\\(`).test(wired));
+
+        check("усі описані події справді викликаються", unused.length === 0,
+            unused.join(", "));
+
+        console.log(failures === 0
+            ? "\n✅ Усі перевірки пройдено"
+            : `\n❌ Провалено: ${failures}`);
+
+        process.exit(failures === 0 ? 0 : 1);
+
+    });
+}
+

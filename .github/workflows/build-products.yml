@@ -127,9 +127,19 @@ jobs:
         run: |
           git config user.name "bestbrnd4u-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data/products.json data/products/*.json data/categories.json \
-                  data/promotions.json data/collections.json \
-                  data/promo-popups.json sitemap.xml
+          # -A по всій теці data, а не перелік файлів.
+          #
+          # Перелік доводилось доповнювати щоразу, коли в адмінці
+          # з'являвся новий розділ, — і про це щоразу забували. Так
+          # загубились data/analytics.json, data/telegram.json і
+          # data/search-banners.json: у дев-гілці вони працювали (там
+          # `git add -A data`), а на прод не потрапляли взагалі.
+          #
+          # Помітити це важко: сайт не падає, просто налаштування
+          # мовчки не діють. Саме так «тег Google не знайдено» на
+          # проді при правильно вписаному ідентифікаторі.
+          git add -A data
+          git add sitemap.xml
           # -A по теці p/: додає нові сторінки І фіксує видалення тек
           # товарів, яких уже немає (звичайний git add видалення не бачить)
           git add index.html robots.txt CNAME admin/config.yml

@@ -376,7 +376,52 @@ console.log("\n[6] Дев-збірка налаштована в CI");
 
     console.log(`\n↩ середовище дерева повернуто: ${envBefore}`);
 
-    console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
+    console.log("\n[N] Прод-збірка комітить УСІ налаштування адмінки");
+{
+    // СИМПТОМ, ЧЕРЕЗ ЯКИЙ ЦЕ ЗʼЯВИЛОСЬ
+    // ----------------------------------
+    // Вписали ідентифікатор Google Analytics, опублікували, зробили
+    // реліз — а на проді «тег не знайдено». Причина не в тезі:
+    // data/analytics.json просто не потрапляв у коміт. Прод-збірка
+    // перелічувала файли поіменно, і перелік доповнювали не щоразу.
+    //
+    // Так само мовчки губились data/telegram.json (посилання в бота) і
+    // data/search-banners.json (картинки в пошуку). Сайт при цьому не
+    // падає — налаштування просто не діють, і причину зі сторони не
+    // видно.
+    const prod = read(".github/workflows/build-products.yml");
+    const dev = read(".github/workflows/build-dev.yml");
+
+    // Тека цілком, а не перелік: інакше кожен новий розділ адмінки
+    // доведеться згадувати руками.
+    check("прод бере теку data цілком", /git add -A data\b/.test(prod));
+    check("дев теж", /git add -A data\b/.test(dev));
+
+    // І перевіряємо по факту: кожен файл, у який пише адмінка, мусить
+    // потрапляти в коміт.
+    const { loadYaml } = require("./helpers/yaml");
+
+    const pages = loadYaml("admin/config.yml").collections
+        .find(c => c.name === "pages");
+
+    const files = (pages.files || []).map(f => f.file).filter(Boolean);
+
+    check(`розділів адмінки — ${files.length}`, files.length > 0);
+
+    const missed = files.filter(file => {
+
+        // або згадан поіменно, або покритий `git add -A` по своїй теці
+        const dir = file.split("/")[0];
+
+        return !prod.includes(file) && !new RegExp(`git add -A ${dir}\\b`).test(prod);
+
+    });
+
+    check("жодне налаштування не губиться на проді", missed.length === 0,
+        missed.join(", "));
+}
+
+console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
     process.exit(failures === 0 ? 0 : 1);
 
 }
