@@ -25,7 +25,7 @@
   "preOrderPrepayment": 50,
   "strapInfo": "Ремінець знімний та регульований",
   "sizes": [
-    "Onesize"
+    "ONESIZE"
   ],
   "splitByColor": true,
   "searchKeywords": [
@@ -57,5 +57,15 @@
   "description": "Елегантна сумка COACH Soft Tabby Shoulder Bag у класичному чорному кольорі. Модель переосмислює культовий силует Tabby 1970-х років у більш м'якому та розслабленому виконанні.\nСумка виготовлена з гладкої натуральної шкіри та доповнена фірмовою застібкою Signature. Усередині розташована кишеня на блискавці, зовні — додаткова кишеня на блискавці для зручного зберігання дрібниць.\nМодель має знімний ремінець, завдяки якому сумку можна носити в руці, на плечі або через плече",
   "sku": "CAM98",
   "rating": 5,
-  "category": "Жіночі сумки"
+  "category": "Жіночі сумки",
+  "slug": "сумка-coach-soft-tabby-shoulder-bag-black",
+  "id": 58,
+  "color": "Black чорний",
+  "images": [
+    "/assets/images/products/uploads/1.1_5a5d6ea8-1bba-4803-951d-520a38d4aa66.webp",
+    "/assets/images/products/uploads/1.3_ce9bb568-0aad-4321-a7e0-b14d24c39654.webp",
+    "/assets/images/products/uploads/1.4_25460987-0b5f-4461-8974-b1763e92ae4a.webp",
+    "/assets/images/products/uploads/1.6_e50f3e2f-9bc0-46c8-90db-1fbc061785eb.webp",
+    "/assets/images/products/uploads/1.7_f4726ced-2357-4efe-8aac-fe254f85c889.webp"
+  ]
 }
