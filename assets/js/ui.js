@@ -483,8 +483,28 @@ function createProductCard(product) {
                     ${product.preOrder ? `<span class="preorder-inline">📦 Під замовлення</span>` : ""}
                 </div>
                 <div class="product-title">
-                    <a href="${productUrl(product)}" class="product-title-link">${escapeHtml(product.title)}</a>
+                    <!-- Посилання несе колір картки.
+                         У каталозі кожен колір показується окремою
+                         карткою (splitProductsByColor у catalog.js), тож
+                         без ?color= клац по назві відкривав би перший
+                         колір товару, а не той, що на картці. Клац по
+                         самій картці колір переносить уже давно — тут
+                         вирівнюємо поведінку. -->
+                    <a href="${productUrl(product, product.cardColor ? { color: product.cardColor } : null)}"
+                       class="product-title-link">${escapeHtml(product.title)}</a>
                 </div>
+                <!-- Назва кольору під заголовком.
+                     Потрібна саме тому, що кожен колір тепер окрема
+                     картка: дві картки одного товару мають однакові
+                     бренд, назву й ціну, і відрізняє їх лише фото. Без
+                     підпису це виглядає як дубль у каталозі, а не як
+                     вибір кольору.
+                     Показуємо ЛИШЕ коли товар розгорнуто (є cardColor)
+                     — у товару з одним кольором такий рядок ні про що
+                     не повідомляє. -->
+                ${product.cardColor
+                    ? `<div class="product-color-name">${escapeHtml(product.cardColor)}</div>`
+                    : ""}
                 <div class="product-meta-row">
                     <div class="product-price">
                         <span class="price">${formatPrice(product.price)}</span>

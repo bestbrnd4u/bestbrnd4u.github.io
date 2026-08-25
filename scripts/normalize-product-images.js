@@ -212,7 +212,19 @@ async function main() {
     if (apply) {
 
         for (const file of baseWebpFiles()) {
-            if (await buildMissingVariants(file)) patched.push(file);
+            const built = await buildMissingVariants(file);
+
+            // Реєструємо фото, навіть якщо копії вже були.
+            //
+            // Раніше сюди потрапляли лише ті, кому копії ЩОЙНО зробили.
+            // Фото, яке прийшло вже у форматі 4:5 і з готовими копіями,
+            // не реєструвалось узагалі — і верстка не знала, що для
+            // нього є srcset. На нових товарах це давало шість
+            // незареєстрованих знімків.
+            const hasCopies = VARIANT_WIDTHS.every(width =>
+                fs.existsSync(path.join(DIR, file.replace(/\.webp$/, `-${width}.webp`))));
+
+            if (built || hasCopies) patched.push(file);
         }
 
         if (patched.length) {

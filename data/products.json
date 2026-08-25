@@ -425,6 +425,38 @@
     "material": "Шкіра",
     "brand": "Coach",
     "price": 11000,
+    "framing": {
+      "coach73995chalk-1.webp": {
+        "zoom": 1.53,
+        "x": 50,
+        "y": 50
+      },
+      "coach73995chalk-4.webp": {
+        "zoom": 2.02,
+        "x": 50,
+        "y": 50
+      },
+      "coach73995-dark-stone-1.webp": {
+        "zoom": 2.52,
+        "x": 50,
+        "y": 50
+      },
+      "coach73995-dark-stone-2.webp": {
+        "zoom": 2.93,
+        "x": 50,
+        "y": 50
+      },
+      "coach73995-dark-stone-3.webp": {
+        "zoom": 2.85,
+        "x": 50,
+        "y": 50
+      },
+      "4.2_a5d008bc-5f9d-4f34-8908-6df68e0bb528.webp": {
+        "zoom": 1.61,
+        "x": 50,
+        "y": 63
+      }
+    },
     "preOrder": false,
     "slug": "coach-shkiriana-sumochka-coach-tabby-26",
     "variants": [
@@ -466,8 +498,34 @@
           "/assets/images/products/uploads/91215-b4ooh_7d995c2e069841c5ad45599ee803592d.webp?v=de06ce9b",
           "/assets/images/products/uploads/91215-b4ooh-1_b3aea35bcebe4922a51b66ad7b2bb0a1_master.webp?v=5c61315b",
           "/assets/images/products/uploads/91215-b4ooh-2_ea0908385fb449c5a786a9c58e2e20cb_master.webp?v=d2db59ae"
+        ],
+        "sku": "coachB4OOH"
+      },
+      {
+        "color": "Brown — коричневий",
+        "hex": "#b66813",
+        "images": [
+          "/assets/images/products/uploads/4.1_cd948ddf-55be-4b35-9a4c-3437a5ac5842.webp?v=5f99ad7a",
+          "/assets/images/products/uploads/4.2_a5d008bc-5f9d-4f34-8908-6df68e0bb528.webp?v=add85d9b",
+          "/assets/images/products/uploads/4.3_3c1ef4e9-0d2f-4d62-a413-703f855d833b.webp?v=b4ebd30b",
+          "/assets/images/products/uploads/4.6_b585e107-3532-4dd2-ad9c-2d2383b92dd0.webp?v=e5318137"
+        ],
+        "sku": "coach73995brown"
+      },
+      {
+        "color": "Light Antique Nickel/Taupe — світлий тауп / сіро-бежевий",
+        "hex": "#c5aea1",
+        "sku": "Coach73995LHTP",
+        "images": [
+          "/assets/images/products/uploads/73995_lhtau_a0.webp?v=b89a4e74",
+          "/assets/images/products/uploads/73995_lhtau_a5.webp?v=37ff4c82",
+          "/assets/images/products/uploads/73995_lhtau_a8.webp?v=51295a60",
+          "/assets/images/products/uploads/73995_lhtau_a91.webp?v=a0c36903"
         ]
       }
+    ],
+    "sizes": [
+      "ONESIZE"
     ],
     "searchKeywords": [
       "коуч",
@@ -491,39 +549,9 @@
     ],
     "id": 9,
     "instagramBlock": "general",
-    "description": "Coach Tabby 26 — одна з найвпізнаваніших моделей бренду. Шкіряний корпус, фірмова застібка-турнікет у формі літери C, знімний ремінець. Доступна у трьох відтінках, тримає форму й однаково доречна з денним і вечірнім образом.",
+    "description": "Coach Tabby 26 — одна з найвпізнаваніших моделей бренду.\nМодель натхненна архівним дизайном COACH 1970-х років та доповнена фірмовою застібкою з Signature-фурнітурою.\nСумка виготовлена з натуральної шкіри Polished Pebble Leather — фактурної шкіри з легкою глянцевою поверхнею. Має зовнішню відкриту кишеню, внутрішню кишеню на блискавці та багатофункціональну кишеню.\nМодель комплектується двома знімними ременями: коротким для носіння в руці або на плечі та довгим регульованим для носіння через плече",
     "sku": "coach73995black",
-    "category": "Жіночі сумки",
-    "sizes": [
-      "ONESIZE"
-    ],
-    "framing": {
-      "coach73995chalk-1.webp": {
-        "zoom": 1.53,
-        "x": 50,
-        "y": 50
-      },
-      "coach73995chalk-4.webp": {
-        "zoom": 2.02,
-        "x": 50,
-        "y": 50
-      },
-      "coach73995-dark-stone-1.webp": {
-        "zoom": 2.52,
-        "x": 50,
-        "y": 50
-      },
-      "coach73995-dark-stone-2.webp": {
-        "zoom": 2.93,
-        "x": 50,
-        "y": 50
-      },
-      "coach73995-dark-stone-3.webp": {
-        "zoom": 2.85,
-        "x": 50,
-        "y": 50
-      }
-    }
+    "category": "Жіночі сумки"
   },
   {
     "gender": "Жінкам",
@@ -3511,6 +3539,322 @@
       "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-de081418.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-628c7ef0.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-twine-h009l01sp21-914-800x800.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "5–10 робочих днів",
+    "forcePublish": false,
+    "material": "Натуральна шкіра",
+    "brand": "Marc Jacobs",
+    "price": 9000,
+    "preOrder": false,
+    "dimensions": "25 × 16 × 5 см",
+    "variants": [
+      {
+        "color": "Green Glow — яскравий зелений",
+        "hex": "#71dd00",
+        "images": [
+          "/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow.webp?v=9272e572",
+          "/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow2.webp?v=9acbbebd",
+          "/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow6.webp?v=127bb491",
+          "/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow3.webp?v=da6ccb40",
+          "/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow1.webp?v=96e5c5ae"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 50,
+    "strapInfo": "Два знімні — ланцюжок та регульований текстильний",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "searchKeywords": [
+      "Marc Jacobs",
+      "The J Marc Shoulder Bag",
+      "Marc Jacobs J Marc",
+      "Marc Jacobs H956L01PF22",
+      "H956L01PF22-325",
+      "Marc Jacobs сумка",
+      "сумка Marc Jacobs",
+      "жіноча сумка Marc Jacobs",
+      "J Marc",
+      "The J Marc",
+      "shoulder bag",
+      "сумка через плече",
+      "сумка на плече",
+      "кросбоді",
+      "зелена сумка",
+      "Green Glow",
+      "яскрава зелена сумка",
+      "шкіряна сумка",
+      "сумка з натуральної шкіри",
+      "сумка з ланцюжком",
+      "сумка клатч",
+      "брендова сумка",
+      "оригінальна Marc Jacobs"
+    ],
+    "isNew": false,
+    "title": "Сумка Marc Jacobs The J Marc Shoulder Bag Green Glow",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Яскрава та стильна сумка Marc Jacobs The J Marc Shoulder Bag у насиченому відтінку Green Glow. Модель виконана з гладкої натуральної шкіри та доповнена фірмовою застібкою J Marc, яка робить дизайн впізнаваним і виразним.\nСумка має компактну прямокутну форму та зручне основне відділення, внутрішню кишеню на блискавці, відкриту кишеню та зовнішню кишеню на задній стороні.\nМодель комплектується двома знімними ременями: елегантним ременем-ланцюжком та регульованим текстильним ременем. Її можна носити на плечі, через плече або без ременів як клатч",
+    "sku": "H956L01PF22-325",
+    "rating": 5,
+    "category": "Жіночі сумки",
+    "slug": "сумка-marc-jacobs-the-j-marc-shoulder-bag-green-glow",
+    "id": 57,
+    "color": "Green Glow — яскравий зелений",
+    "images": [
+      "/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow.webp",
+      "/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow2.webp",
+      "/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow6.webp",
+      "/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow3.webp",
+      "/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow1.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "5–10 робочих днів",
+    "color": "Black чорний",
+    "forcePublish": false,
+    "material": "Гладка натуральна шкіра",
+    "brand": "Coach",
+    "price": 7100,
+    "preOrder": false,
+    "slug": "сумка-coach-soft-tabby-shoulder-bag-black",
+    "dimensions": "26 × 16,5 × 8,3 см",
+    "variants": [
+      {
+        "color": "Black чорний",
+        "hex": "#000000",
+        "images": [
+          "/assets/images/products/uploads/1.1_5a5d6ea8-1bba-4803-951d-520a38d4aa66.webp?v=6d4fe10c",
+          "/assets/images/products/uploads/1.3_ce9bb568-0aad-4321-a7e0-b14d24c39654.webp?v=596df409",
+          "/assets/images/products/uploads/1.4_25460987-0b5f-4461-8974-b1763e92ae4a.webp?v=36867f76",
+          "/assets/images/products/uploads/1.6_e50f3e2f-9bc0-46c8-90db-1fbc061785eb.webp?v=21034b52",
+          "/assets/images/products/uploads/1.7_f4726ced-2357-4efe-8aac-fe254f85c889.webp?v=e56209d6"
+        ]
+      },
+      {
+        "color": "Brass/Ivory",
+        "hex": "#e4ddda",
+        "sku": "C4823B4IY",
+        "sizes": [
+          "ONESIZE"
+        ],
+        "images": [
+          "/assets/images/products/uploads/91993377994530.webp?v=04223bd6",
+          "/assets/images/products/uploads/26067173821878.webp?v=ae528554",
+          "/assets/images/products/uploads/49502081584862.webp?v=fb19116f",
+          "/assets/images/products/uploads/51655546705003.webp?v=1210f892",
+          "/assets/images/products/uploads/56611343404440.webp?v=09832c3b"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 50,
+    "strapInfo": "Ремінець знімний та регульований",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "COACH",
+      "Coach Soft Tabby",
+      "Soft Tabby Shoulder Bag",
+      "Coach CAM98",
+      "CAM98",
+      "Coach сумка",
+      "сумка Coach",
+      "жіноча сумка Coach",
+      "Soft Tabby",
+      "Tabby Shoulder Bag",
+      "чорна сумка Coach",
+      "чорна шкіряна сумка",
+      "сумка з натуральної шкіри",
+      "шкіряна сумка",
+      "сумка на плече",
+      "сумка через плече",
+      "кросбоді",
+      "shoulder bag",
+      "брендова сумка",
+      "оригінальна Coach"
+    ],
+    "isNew": false,
+    "title": "Сумка Coach Soft Tabby Shoulder Bag Black",
+    "images": [
+      "/assets/images/products/uploads/1.1_5a5d6ea8-1bba-4803-951d-520a38d4aa66.webp",
+      "/assets/images/products/uploads/1.3_ce9bb568-0aad-4321-a7e0-b14d24c39654.webp",
+      "/assets/images/products/uploads/1.4_25460987-0b5f-4461-8974-b1763e92ae4a.webp",
+      "/assets/images/products/uploads/1.6_e50f3e2f-9bc0-46c8-90db-1fbc061785eb.webp",
+      "/assets/images/products/uploads/1.7_f4726ced-2357-4efe-8aac-fe254f85c889.webp"
+    ],
+    "reviews": 0,
+    "id": 58,
+    "instagramBlock": "general",
+    "description": "Елегантна сумка COACH Soft Tabby Shoulder Bag у класичному чорному кольорі. Модель переосмислює культовий силует Tabby 1970-х років у більш м'якому та розслабленому виконанні.\nСумка виготовлена з гладкої натуральної шкіри та доповнена фірмовою застібкою Signature. Усередині розташована кишеня на блискавці, зовні — додаткова кишеня на блискавці для зручного зберігання дрібниць.\nМодель має знімний ремінець, завдяки якому сумку можна носити в руці, на плечі або через плече",
+    "sku": "CAM98",
+    "rating": 5,
+    "category": "Жіночі сумки"
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "5–10 робочих днів",
+    "forcePublish": false,
+    "material": "Натуральна шкіра",
+    "brand": "Coach",
+    "price": 7100,
+    "preOrder": false,
+    "dimensions": "18 × 10 × 3 см",
+    "variants": [
+      {
+        "color": "Brass/Chalk — айворі / золотистий",
+        "hex": "#e9e4e4",
+        "images": [
+          "/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model.webp?v=56092103",
+          "/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model3.webp?v=d7a3fd39",
+          "/assets/images/products/uploads/11a5edba3e0242ac110004.webp?v=879458dc",
+          "/assets/images/products/uploads/71-zo1liwrl._ac_sy625_.webp?v=60a173c1",
+          "/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model2.webp?v=d02399b3",
+          "/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model4.webp?v=13f6c6e2"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 50,
+    "strapInfo": "2 знімні — на зап'ястя та ланцюжок",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "COACH",
+      "Coach Tabby",
+      "Tabby Crossbody Wristlet",
+      "Coach CJ925",
+      "CJ925B4/CH",
+      "Coach сумка",
+      "сумка Coach",
+      "жіноча сумка Coach",
+      "Tabby Wristlet",
+      "міні сумка",
+      "сумка на зап'ястя",
+      "wristlet",
+      "клатч Coach",
+      "біла сумка",
+      "айворі сумка",
+      "Chalk",
+      "сумка з ланцюжком",
+      "шкіряна сумка",
+      "сумка з натуральної шкіри",
+      "сумка через плече",
+      "кросбоді",
+      "брендова сумка",
+      "оригінальна Coach"
+    ],
+    "isNew": false,
+    "title": "Міні сумочка Coach Tabby Crossbody Wristlet",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильна та компактна сумка COACH Tabby Crossbody Wristlet у ніжному відтінку Chalk із золотистою фурнітурою. Модель натхненна архівним дизайном COACH 1970-х років та доповнена фірмовою застібкою Signature.\nСумка виготовлена з натуральної фактурної шкіри Polished Pebble Leather. Компактний формат дозволяє розмістити найнеобхідніше: картки, готівку та телефон. Має зовнішню відкриту кишеню, внутрішню багатофункціональну кишеню та два слоти для карток.\nМодель комплектується двома знімними ремінцями: коротким ремінцем на зап'ястя та елегантним ременем-ланцюжком. Її можна носити як браслет-сумку, клатч або через плече.",
+    "sku": "CJ925B4/CH",
+    "rating": 5,
+    "category": "Жіночі сумки",
+    "slug": "міні-сумочка-coach-tabby-crossbody-wristlet",
+    "id": 59,
+    "color": "Brass/Chalk — айворі / золотистий",
+    "images": [
+      "/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model.webp",
+      "/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model3.webp",
+      "/assets/images/products/uploads/11a5edba3e0242ac110004.webp",
+      "/assets/images/products/uploads/71-zo1liwrl._ac_sy625_.webp",
+      "/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model2.webp",
+      "/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model4.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "5–10 робочих днів",
+    "forcePublish": false,
+    "material": "Натуральна шкіра",
+    "brand": "JACQUEMUS",
+    "price": 25000,
+    "preOrder": false,
+    "dimensions": "24 × 14 × 7 см",
+    "variants": [
+      {
+        "color": "Beige — бежевий",
+        "hex": "#d4cfcf",
+        "images": [
+          "/assets/images/products/uploads/rtlafd950301_33497199_1_v1_2x.webp?v=2bf0efa9",
+          "/assets/images/products/uploads/rtlafd950301_33497201_2_v1_2x.webp?v=1495f53c",
+          "/assets/images/products/uploads/rtlafd950301_33497202_3_v1_2x.webp?v=47418234",
+          "/assets/images/products/uploads/rtlafd950301_33497204_4_v1_2x.webp?v=45e8e115",
+          "/assets/images/products/uploads/rtlafd950301_33526729_9_v1_2x.webp?v=f716ea50"
+        ],
+        "sku": "213BA007-3063-510"
+      },
+      {
+        "color": "Midnight Brown",
+        "hex": "#6f1d1d",
+        "sku": "213BA007-3128-890",
+        "images": [
+          "/assets/images/products/uploads/rtlafe837901_33595360_1_v1_2x.webp?v=bac0e52b",
+          "/assets/images/products/uploads/rtlafe837901_33595361_2_v1_2x.webp?v=7ff27603",
+          "/assets/images/products/uploads/rtlafe837901_33595363_4_v1_2x.webp?v=cd6c1754",
+          "/assets/images/products/uploads/rtlafe837901_33634337_9_v1_2x.webp?v=8717973d"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 50,
+    "strapInfo": "Знімний та регульований",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "JACQUEMUS",
+      "Jacquemus Le Grand Bambino",
+      "Le Grand Bambino",
+      "Jacquemus Bambino",
+      "Jacquemus 213BA007",
+      "213BA007-3063-510",
+      "сумка Jacquemus",
+      "жіноча сумка Jacquemus",
+      "бежева сумка",
+      "бежева сумка Jacquemus",
+      "Le Grand Bambino Beige",
+      "Beige",
+      "шкіряна сумка",
+      "сумка з натуральної шкіри",
+      "сумка через плече",
+      "сумка на плече",
+      "кросбоді",
+      "брендова сумка",
+      "оригінальна Jacquemus"
+    ],
+    "isNew": false,
+    "title": "Сумка JACQUEMUS Le Grand Bambino Beige",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Елегантна сумка JACQUEMUS Le Grand Bambino. Впізнаваний мінімалістичний дизайн доповнений фірмовим логотипом JACQUEMUS та акуратною золотою фурнітурою.\nМодель виготовлена з натуральної шкіри та має структуровану прямокутну форму. Сумка оснащена верхньою ручкою, магнітною застібкою та знімним регульованим ремінцем, завдяки якому її можна носити на плечі або через плече. На задній стороні розташована кишеня для картки.",
+    "rating": 5,
+    "category": "Жіночі сумки",
+    "slug": "сумка-jacquemus-le-grand-bambino-beige",
+    "id": 60,
+    "color": "Beige — бежевий",
+    "images": [
+      "/assets/images/products/uploads/rtlafd950301_33497199_1_v1_2x.webp",
+      "/assets/images/products/uploads/rtlafd950301_33497201_2_v1_2x.webp",
+      "/assets/images/products/uploads/rtlafd950301_33497202_3_v1_2x.webp",
+      "/assets/images/products/uploads/rtlafd950301_33497204_4_v1_2x.webp",
+      "/assets/images/products/uploads/rtlafd950301_33526729_9_v1_2x.webp"
     ]
   }
 ]

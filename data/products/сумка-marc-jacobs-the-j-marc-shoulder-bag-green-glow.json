@@ -1,0 +1,73 @@
+{
+  "gender": [
+    "Жінкам"
+  ],
+  "preOrderDays": "5–10 робочих днів",
+  "forcePublish": false,
+  "material": "Натуральна шкіра",
+  "brand": "Marc Jacobs",
+  "price": 9000,
+  "preOrder": false,
+  "dimensions": "25 × 16 × 5 см",
+  "variants": [
+    {
+      "color": "Green Glow — яскравий зелений",
+      "hex": "#71dd00",
+      "images": [
+        "/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow.webp",
+        "/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow2.webp",
+        "/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow6.webp",
+        "/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow3.webp",
+        "/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow1.webp"
+      ]
+    }
+  ],
+  "preOrderPrepayment": 50,
+  "strapInfo": "Два знімні — ланцюжок та регульований текстильний",
+  "sizes": [
+    "ONESIZE"
+  ],
+  "searchKeywords": [
+    "Marc Jacobs",
+    "The J Marc Shoulder Bag",
+    "Marc Jacobs J Marc",
+    "Marc Jacobs H956L01PF22",
+    "H956L01PF22-325",
+    "Marc Jacobs сумка",
+    "сумка Marc Jacobs",
+    "жіноча сумка Marc Jacobs",
+    "J Marc",
+    "The J Marc",
+    "shoulder bag",
+    "сумка через плече",
+    "сумка на плече",
+    "кросбоді",
+    "зелена сумка",
+    "Green Glow",
+    "яскрава зелена сумка",
+    "шкіряна сумка",
+    "сумка з натуральної шкіри",
+    "сумка з ланцюжком",
+    "сумка клатч",
+    "брендова сумка",
+    "оригінальна Marc Jacobs"
+  ],
+  "isNew": false,
+  "title": "Сумка Marc Jacobs The J Marc Shoulder Bag Green Glow",
+  "reviews": 0,
+  "instagramBlock": "general",
+  "description": "Яскрава та стильна сумка Marc Jacobs The J Marc Shoulder Bag у насиченому відтінку Green Glow. Модель виконана з гладкої натуральної шкіри та доповнена фірмовою застібкою J Marc, яка робить дизайн впізнаваним і виразним.\nСумка має компактну прямокутну форму та зручне основне відділення, внутрішню кишеню на блискавці, відкриту кишеню та зовнішню кишеню на задній стороні.\nМодель комплектується двома знімними ременями: елегантним ременем-ланцюжком та регульованим текстильним ременем. Її можна носити на плечі, через плече або без ременів як клатч",
+  "sku": "H956L01PF22-325",
+  "rating": 5,
+  "category": "Жіночі сумки",
+  "slug": "сумка-marc-jacobs-the-j-marc-shoulder-bag-green-glow",
+  "id": 57,
+  "color": "Green Glow — яскравий зелений",
+  "images": [
+    "/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow.webp",
+    "/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow2.webp",
+    "/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow6.webp",
+    "/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow3.webp",
+    "/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow1.webp"
+  ]
+}

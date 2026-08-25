@@ -435,6 +435,10 @@ async function addToCart(id, options = {}) {
 
     if (product) {
 
+        // Статистика: подія йде лише після згоди — модуль сам це
+        // перевіряє (assets/js/analytics.js).
+        window.Analytics?.addToCart(product, { color, size });
+
         showCartPopup(product, { color, size });
 
     } else {
@@ -656,6 +660,12 @@ function toggleFavorite(id, options = {}) {
     } else {
 
         favorites.push({ id: Number(id), color, size });
+
+        // Статистика: що додають в обране, показує, чого бракує в
+        // магазині — люди відкладають те, що хочуть, але поки не беруть.
+        const cached = findCachedProduct(Number(id));
+
+        if (cached) window.Analytics?.addToWishlist(cached, { color, size });
 
         showToast("Додано в обране");
 
@@ -1195,6 +1205,9 @@ function applySearchBanners(root) {
 
 }
 
+// Тримає таймер відкладеного надсилання пошукового запиту.
+function reportSearch() {}
+
 function matchesQuery(product, q) {
 
     const haystack = [
@@ -1234,6 +1247,19 @@ async function runGlobalSearch(query) {
     await getProductById(-1); // гарантовано підвантажує cachedProducts
 
     const matches = (cachedProducts || []).filter(product => matchesQuery(product, q));
+
+    // Статистика: що шукають і чи знаходять.
+    //
+    // Найцінніше тут — запити з нулем результатів: це прямий список
+    // того, чого в магазині бракує, сказаний словами покупців.
+    //
+    // Надсилаємо із затримкою: людина набирає по літері, і без неї
+    // у звіт полетіли б «с», «су», «сум», «сумк», «сумка».
+    clearTimeout(reportSearch.timer);
+
+    reportSearch.timer = setTimeout(function () {
+        window.Analytics?.search(q, matches.length);
+    }, 900);
 
     const suggestionsEl = document.getElementById("searchSuggestions");
     const gridEl = document.getElementById("searchResultsGrid");

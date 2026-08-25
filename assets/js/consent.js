@@ -49,10 +49,17 @@
     "use strict";
 
     var KEY = "consent";
-    var VERSION = 1;
+
+    // Версію піднято з 1 на 2, бо додалась категорія «аналітика».
+    //
+    // Це не формальність: людина, яка колись натиснула «Лише
+    // необхідне», відповідала на питання БЕЗ аналітики. Мовчки
+    // застосувати ту відповідь до нового питання означало б вирішити
+    // за неї. Стара відповідь більше не діє — запитаємо ще раз.
+    var VERSION = 2;
 
     // Категорії, які взагалі можна вимкнути.
-    var OPTIONAL = ["embeds"];
+    var OPTIONAL = ["embeds", "analytics"];
 
     function read() {
 
@@ -87,6 +94,7 @@
             localStorage.setItem(KEY, JSON.stringify({
                 version: VERSION,
                 embeds: !!choice.embeds,
+                analytics: !!choice.analytics,
                 at: new Date().toISOString()
             }));
 
@@ -121,7 +129,7 @@
     function announce() {
 
         document.dispatchEvent(new CustomEvent("consent:change", {
-            detail: { embeds: has("embeds") }
+            detail: { embeds: has("embeds"), analytics: has("analytics") }
         }));
 
     }
@@ -158,19 +166,22 @@
             '<div class="consent-inner">',
             '  <div class="consent-text">',
             '    <b>Ми зберігаємо мінімум даних.</b>',
-            '    Кошик, обране й вхід в акаунт зберігаються у вашому браузері —',
-            '    без них магазин не працює. Ми не використовуємо аналітику,',
-            '    рекламні мережі чи стеження між сайтами.',
-            '    Окремо питаємо лише про відео з YouTube і Vimeo у картках',
-            '    товарів: якщо їх увімкнути, ці сервіси отримають вашу',
-            '    IP-адресу. <a href="privacy-policy">Що саме ми збираємо</a>',
+            '    Кошик, обране й вхід в акаунт живуть у вашому браузері —',
+            '    без них магазин не працює, і згоди вони не потребують.',
+            '    Окремо питаємо про два речі:',
+            '    <b>статистику відвідувань</b> (Google Analytics — які товари',
+            '    дивляться, щоб розуміти, чого бракує в магазині) і',
+            '    <b>відео</b> з YouTube та Vimeo у картках товарів.',
+            '    Обидва отримають вашу IP-адресу.',
+            '    Рекламних мереж і стеження між сайтами в нас немає.',
+            '    <a href="privacy-policy">Що саме ми збираємо</a>',
             '  </div>',
             '  <div class="consent-actions">',
             '    <button type="button" class="btn btn-outline" data-consent="necessary">',
             '      Лише необхідне',
             '    </button>',
             '    <button type="button" class="btn" data-consent="all">',
-            '      Дозволити відео',
+            '      Прийняти все',
             '    </button>',
             '  </div>',
             '</div>'
@@ -182,7 +193,9 @@
 
             if (!btn) return;
 
-            decide({ embeds: btn.dataset.consent === "all" });
+            var yes = btn.dataset.consent === "all";
+
+            decide({ embeds: yes, analytics: yes });
 
         });
 
