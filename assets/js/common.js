@@ -1995,13 +1995,22 @@ document.addEventListener("click", event => {
 
                 if (images.length) {
 
+                    // Слайд — обгортка, фото всередині.
+                    //
+                    // Кадрування масштабує фото через transform, а той
+                    // не обрізається елементом: при 3× знімок займає
+                    // три ширини смуги, накриваючи сусідні слайди.
+                    // Обгортка з overflow:hidden тримає масштаб у межах
+                    // свого слайда (див. .photo-slide-photo у style.css).
                     carouselTrack.innerHTML = images.map(img => `
-                        <img
-                            class="product-main-image photo-slide"
-                            src="${img}"
-                            alt=""
-                            loading="lazy"
-                            onerror="this.src='assets/images/no-image.png'">
+                        <div class="photo-slide photo-slide-photo">
+                            <img
+                                class="product-main-image"
+                                src="${img}"
+                                alt=""
+                                loading="lazy"
+                                onerror="this.src='assets/images/no-image.png'">
+                        </div>
                     `).join("");
 
                     carouselTrack.scrollLeft = 0;

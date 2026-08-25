@@ -654,6 +654,78 @@ console.log("\n[9b] Розрахунок кадру — на справжніх 
     check("усі кадри в допустимих межах", bad.length === 0, bad.slice(0, 3).join(", "));
 }
 
+console.log("\n[11] Масштаб не накриває сусідні слайди");
+{
+    // Та сама причина, що в галереї: transform не обрізається
+    // елементом і не змінює розкладку. При 3× знімок займає три ширини
+    // картки, слайди йдуть підряд — і наступний малюється ЗВЕРХУ. У
+    // каталозі показувалось друге фото замість першого, ще й зрізане
+    // низом картки.
+    const ui = read("assets/js/ui.js");
+    const common = read("assets/js/common.js");
+    const css = read("assets/css/style.css");
+
+    // Карусель карточки є у ДВОХ місцях: шаблон картки й перемальовка
+    // при зміні кольору. Полагодити одне й забути про інше означало б,
+    // що баг вертається при перемиканні кольору.
+    check("картка каталогу — обгортка",
+        /<div class="photo-slide photo-slide-photo">/.test(ui));
+    check("перемальовка при зміні кольору теж",
+        /<div class="photo-slide photo-slide-photo">/.test(common));
+
+    check("обгортка обрізає",
+        /\.photo-slide-photo\{[\s\S]{0,240}overflow:hidden/.test(css));
+    check("подвійного масштабу немає",
+        /\.photo-slide-photo\{[\s\S]{0,300}transform:none/.test(css));
+
+    // Мініатюри на сторінці товару теж масштабуються
+    check("мініатюри обрізають", /\.thumbs-vertical \.thumb\{[^}]*overflow:hidden/.test(css));
+
+    // Навігація карусели рахує дітей смуги — обгортки дають те саме
+    // число, що й раніше, тож стрілки й точки не збиваються.
+    check("навігація рахує слайди, а не картинки",
+        /track\.children\.length/.test(ui));
+
+    // Підміна фото при зміні кольору шукає .product-main-image —
+    // клас лишився на самому зображенні.
+    check("клас фото лишився на зображенні",
+        /class="product-main-image"/.test(ui)
+        && /querySelector\("\.product-main-image/.test(common));
+}
+
+console.log("\n[12] Свотч кольору показує той самий кадр");
+{
+    // Свотч — 40px. Якщо фото знято з великими полями, товар на ньому
+    // займає кілька пікселів і виглядає плямою. Той самий кадр робить
+    // його видимим.
+    //
+    // Для фону це не transform, а background-size/position — але
+    // математика мусить бути СПІЛЬНА, інакше свотч і галерея показують
+    // різні кадри одного знімка.
+    const lib = require("../assets/js/image-framing.js");
+
+    check("є розрахунок кадру для фону",
+        typeof lib.frameBackgroundStyle === "function");
+
+    const framing = { "photo.webp": { zoom: 2.98, x: 40, y: 60 } };
+    const style = lib.frameBackgroundStyle(framing, "/a/photo.webp");
+
+    check("наближення переходить у background-size",
+        /background-size:298%/.test(style), style);
+    check("точка фокуса — у background-position",
+        /background-position:40% 60%/.test(style), style);
+
+    // Без кадру нічого не додаємо: свотч лишається таким, як був.
+    check("без кадру порожньо", lib.frameBackgroundStyle({}, "/a/photo.webp") === "");
+
+    const product = read("assets/js/product.js");
+
+    check("свотч користується спільним розрахунком",
+        /frameBackgroundStyle\(currentFraming, swatchImage\)/.test(product));
+    check("запасний варіант лишився",
+        /swatchFrame \|\| "background-size:cover;background-position:center"/.test(product));
+}
+
 console.log(failures === 0
             ? "\n✅ Усі перевірки пройдено"
             : `\n❌ Провалено: ${failures}`);

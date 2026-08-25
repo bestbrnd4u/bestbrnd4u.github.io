@@ -736,8 +736,23 @@ function renderProduct(product) {
         // url('...') (одинарні). Це посилання на файл, завантажений
         // через адмінку/масовий імпорт, тож апостроф чи лапка в назві
         // файлу інакше розірвали б або HTML-атрибут, або CSS url().
+        // Кадр застосовуємо і до свотча.
+        //
+        // Свотч — 40px. Якщо фото знято з великими полями (а таких у
+        // каталозі чимало), товар на ньому займає кілька пікселів і
+        // виглядає як пляма. Той самий кадр, що на великому фото,
+        // робить його видимим — і, головне, свотч показує ТЕ САМЕ, що
+        // й галерея, а не інший кадр того ж знімка.
+        //
+        // Для фону це не transform, а background-size/position — але
+        // математика спільна (assets/js/image-framing.js).
+        const swatchFrame = swatchImage && window.ImageFraming
+            ? window.ImageFraming.frameBackgroundStyle(currentFraming, swatchImage)
+            : "";
+
         const swatchStyle = swatchImage
-            ? `background-color:${swatchColor};background-image:url('${escapeAttrSingleQuoted(swatchImage)}');background-size:cover;background-position:center`
+            ? `background-color:${swatchColor};background-image:url('${escapeAttrSingleQuoted(swatchImage)}');`
+              + (swatchFrame || "background-size:cover;background-position:center")
             : `background-color:${swatchColor}`;
 
         return `
