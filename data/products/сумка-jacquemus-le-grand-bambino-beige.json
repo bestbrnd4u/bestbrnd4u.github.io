@@ -1,0 +1,71 @@
+{
+  "gender": [
+    "Жінкам"
+  ],
+  "preOrderDays": "5–10 робочих днів",
+  "forcePublish": false,
+  "material": "Натуральна шкіра",
+  "brand": "JACQUEMUS",
+  "price": 25000,
+  "preOrder": false,
+  "dimensions": "24 × 14 × 7 см",
+  "variants": [
+    {
+      "color": "Beige — бежевий",
+      "hex": "#d4cfcf",
+      "images": [
+        "/assets/images/products/uploads/rtlafd950301_33497199_1_v1_2x.webp",
+        "/assets/images/products/uploads/rtlafd950301_33497201_2_v1_2x.webp",
+        "/assets/images/products/uploads/rtlafd950301_33497202_3_v1_2x.webp",
+        "/assets/images/products/uploads/rtlafd950301_33497204_4_v1_2x.webp",
+        "/assets/images/products/uploads/rtlafd950301_33526729_9_v1_2x.webp"
+      ],
+      "sku": "213BA007-3063-510"
+    },
+    {
+      "color": "Midnight Brown",
+      "hex": "#6f1d1d",
+      "sku": "213BA007-3128-890",
+      "images": [
+        "/assets/images/products/uploads/rtlafe837901_33595360_1_v1_2x.webp",
+        "/assets/images/products/uploads/rtlafe837901_33595361_2_v1_2x.webp",
+        "/assets/images/products/uploads/rtlafe837901_33595363_4_v1_2x.webp",
+        "/assets/images/products/uploads/rtlafe837901_33634337_9_v1_2x.webp"
+      ]
+    }
+  ],
+  "preOrderPrepayment": 50,
+  "strapInfo": "Знімний та регульований",
+  "sizes": [
+    "Onesize"
+  ],
+  "splitByColor": true,
+  "searchKeywords": [
+    "JACQUEMUS",
+    "Jacquemus Le Grand Bambino",
+    "Le Grand Bambino",
+    "Jacquemus Bambino",
+    "Jacquemus 213BA007",
+    "213BA007-3063-510",
+    "сумка Jacquemus",
+    "жіноча сумка Jacquemus",
+    "бежева сумка",
+    "бежева сумка Jacquemus",
+    "Le Grand Bambino Beige",
+    "Beige",
+    "шкіряна сумка",
+    "сумка з натуральної шкіри",
+    "сумка через плече",
+    "сумка на плече",
+    "кросбоді",
+    "брендова сумка",
+    "оригінальна Jacquemus"
+  ],
+  "isNew": false,
+  "title": "Сумка JACQUEMUS Le Grand Bambino Beige",
+  "reviews": 0,
+  "instagramBlock": "general",
+  "description": "Елегантна сумка JACQUEMUS Le Grand Bambino. Впізнаваний мінімалістичний дизайн доповнений фірмовим логотипом JACQUEMUS та акуратною золотою фурнітурою.\nМодель виготовлена з натуральної шкіри та має структуровану прямокутну форму. Сумка оснащена верхньою ручкою, магнітною застібкою та знімним регульованим ремінцем, завдяки якому її можна носити на плечі або через плече. На задній стороні розташована кишеня для картки.",
+  "rating": 5,
+  "category": "Жіночі сумки"
+}
