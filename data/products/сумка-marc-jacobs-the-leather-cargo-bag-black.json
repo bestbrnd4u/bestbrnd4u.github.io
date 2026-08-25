@@ -14,19 +14,19 @@
       "color": "Black чорний",
       "hex": "#000000",
       "images": [
-        "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black-shkiryana-sumka-kargo-00611-800x800.webp",
-        "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black-shkiryana-sumka-kargo-additional-image-10703-800x800.webp",
-        "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black-shkiryana-sumka-kargo-additional-image-10704-800x800.webp",
-        "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black-shkiryana-sumka-kargo-additional-image-10707-800x800.webp",
-        "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black-shkiryana-sumka-kargo-additional-image-10814-800x800.webp",
-        "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black-shkiryana-sumka-kargo-additional-image-10815-800x800.webp"
+        "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--2013c7eb.webp",
+        "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--3eeb5b5d.webp",
+        "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--e6d79062.webp",
+        "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--8fc5eccc.webp",
+        "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--20634337.webp",
+        "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--3bae4de6.webp"
       ]
     }
   ],
   "preOrderPrepayment": 50,
   "strapInfo": "Два знімні ремені",
   "sizes": [
-    "Onesize"
+    "ONESIZE"
   ],
   "searchKeywords": [
     "Marc Jacobs",
@@ -58,5 +58,16 @@
   "description": "Стильна та функціональна сумка Marc Jacobs The Leather Cargo Bag у класичному чорному кольорі. Модель поєднує лаконічний дизайн із практичною конструкцією cargo та великою кількістю функціональних кишень.\nСумка виготовлена зі 100% натуральної шкіри та доповнена сріблястою фурнітурою. Має основне відділення на блискавці, дві зовнішні кишені на блискавці та дві накладні кишені з магнітними застібками.\nМодель комплектується двома знімними ременями: шкіряним ременем та регульованим текстильним ременем. Її можна носити на плечі або через плече",
   "sku": "2S4HSH085H02-001",
   "rating": 5,
-  "category": "Жіночі сумки"
+  "category": "Жіночі сумки",
+  "slug": "сумка-marc-jacobs-the-leather-cargo-bag-black",
+  "id": 55,
+  "color": "Black чорний",
+  "images": [
+    "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--2013c7eb.webp",
+    "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--3eeb5b5d.webp",
+    "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--e6d79062.webp",
+    "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--8fc5eccc.webp",
+    "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--20634337.webp",
+    "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--3bae4de6.webp"
+  ]
 }
