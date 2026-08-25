@@ -26,7 +26,7 @@
   "preOrderPrepayment": 50,
   "strapInfo": "2 знімні — на зап'ястя та ланцюжок",
   "sizes": [
-    "Onesize"
+    "ONESIZE"
   ],
   "splitByColor": true,
   "searchKeywords": [
@@ -61,5 +61,16 @@
   "description": "Стильна та компактна сумка COACH Tabby Crossbody Wristlet у ніжному відтінку Chalk із золотистою фурнітурою. Модель натхненна архівним дизайном COACH 1970-х років та доповнена фірмовою застібкою Signature.\nСумка виготовлена з натуральної фактурної шкіри Polished Pebble Leather. Компактний формат дозволяє розмістити найнеобхідніше: картки, готівку та телефон. Має зовнішню відкриту кишеню, внутрішню багатофункціональну кишеню та два слоти для карток.\nМодель комплектується двома знімними ремінцями: коротким ремінцем на зап'ястя та елегантним ременем-ланцюжком. Її можна носити як браслет-сумку, клатч або через плече.",
   "sku": "CJ925B4/CH",
   "rating": 5,
-  "category": "Жіночі сумки"
+  "category": "Жіночі сумки",
+  "slug": "міні-сумочка-coach-tabby-crossbody-wristlet",
+  "id": 59,
+  "color": "Brass/Chalk — айворі / золотистий",
+  "images": [
+    "/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model.webp",
+    "/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model3.webp",
+    "/assets/images/products/uploads/11a5edba3e0242ac110004.webp",
+    "/assets/images/products/uploads/71-zo1liwrl._ac_sy625_.webp",
+    "/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model2.webp",
+    "/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model4.webp"
+  ]
 }
