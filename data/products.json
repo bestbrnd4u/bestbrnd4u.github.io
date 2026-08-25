@@ -425,6 +425,38 @@
     "material": "Шкіра",
     "brand": "Coach",
     "price": 11000,
+    "framing": {
+      "coach73995chalk-1.webp": {
+        "zoom": 1.53,
+        "x": 50,
+        "y": 50
+      },
+      "coach73995chalk-4.webp": {
+        "zoom": 2.02,
+        "x": 50,
+        "y": 50
+      },
+      "coach73995-dark-stone-1.webp": {
+        "zoom": 2.52,
+        "x": 50,
+        "y": 50
+      },
+      "coach73995-dark-stone-2.webp": {
+        "zoom": 2.93,
+        "x": 50,
+        "y": 50
+      },
+      "coach73995-dark-stone-3.webp": {
+        "zoom": 2.85,
+        "x": 50,
+        "y": 50
+      },
+      "4.2_a5d008bc-5f9d-4f34-8908-6df68e0bb528.webp": {
+        "zoom": 1.61,
+        "x": 50,
+        "y": 63
+      }
+    },
     "preOrder": false,
     "slug": "coach-shkiriana-sumochka-coach-tabby-26",
     "variants": [
@@ -467,7 +499,21 @@
           "/assets/images/products/uploads/91215-b4ooh-1_b3aea35bcebe4922a51b66ad7b2bb0a1_master.webp?v=5c61315b",
           "/assets/images/products/uploads/91215-b4ooh-2_ea0908385fb449c5a786a9c58e2e20cb_master.webp?v=d2db59ae"
         ]
+      },
+      {
+        "color": "Brown — коричневий",
+        "hex": "#b66813",
+        "images": [
+          "/assets/images/products/uploads/4.1_cd948ddf-55be-4b35-9a4c-3437a5ac5842.webp?v=5f99ad7a",
+          "/assets/images/products/uploads/4.2_a5d008bc-5f9d-4f34-8908-6df68e0bb528.webp?v=add85d9b",
+          "/assets/images/products/uploads/4.3_3c1ef4e9-0d2f-4d62-a413-703f855d833b.webp?v=b4ebd30b",
+          "/assets/images/products/uploads/4.6_b585e107-3532-4dd2-ad9c-2d2383b92dd0.webp?v=e5318137"
+        ],
+        "sku": "coach73995brown"
       }
+    ],
+    "sizes": [
+      "ONESIZE"
     ],
     "searchKeywords": [
       "коуч",
@@ -493,37 +539,7 @@
     "instagramBlock": "general",
     "description": "Coach Tabby 26 — одна з найвпізнаваніших моделей бренду. Шкіряний корпус, фірмова застібка-турнікет у формі літери C, знімний ремінець. Доступна у трьох відтінках, тримає форму й однаково доречна з денним і вечірнім образом.",
     "sku": "coach73995black",
-    "category": "Жіночі сумки",
-    "sizes": [
-      "ONESIZE"
-    ],
-    "framing": {
-      "coach73995chalk-1.webp": {
-        "zoom": 1.53,
-        "x": 50,
-        "y": 50
-      },
-      "coach73995chalk-4.webp": {
-        "zoom": 2.02,
-        "x": 50,
-        "y": 50
-      },
-      "coach73995-dark-stone-1.webp": {
-        "zoom": 2.52,
-        "x": 50,
-        "y": 50
-      },
-      "coach73995-dark-stone-2.webp": {
-        "zoom": 2.93,
-        "x": 50,
-        "y": 50
-      },
-      "coach73995-dark-stone-3.webp": {
-        "zoom": 2.85,
-        "x": 50,
-        "y": 50
-      }
-    }
+    "category": "Жіночі сумки"
   },
   {
     "gender": "Жінкам",
