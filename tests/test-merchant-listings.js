@@ -41,8 +41,18 @@ const schemas = products.map(p => ({ p, ld: schemaOf(p.slug) })).filter(x => x.l
 
 // Генератор схлопує пробіли в артикулі, тож порівнюємо нормалізовано:
 // інакше виправлений пробіл виглядав би як «артикул не з варіанта».
-const sameSku = (a, b) =>
-    String(a || "").replace(/\s+/g, " ").trim() === String(b || "").replace(/\s+/g, " ").trim();
+// Порівнюємо артикули ЗА ТИМ САМИМ правилом, яке застосовує збірка.
+//
+// Google забороняє пробіли в sku, тож збірка замінює їх на дефіс:
+// «NENA/S 807 51» → «NENA/S-807-51». Порівняння «як є» після цього
+// завжди хибне — тест падав не через дані, а через власну наївність.
+const normalizeSku = value => String(value || "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/ /g, "-")
+    .replace(/-{2,}/g, "-");
+
+const sameSku = (a, b) => normalizeSku(a) === normalizeSku(b);
 
 console.log("\n[1] Артикул є в кожного товару");
 {
@@ -223,11 +233,70 @@ console.log("\n[5] Обидва генератори розмітки узгод
         /function sanitizeSku/.test(productJs) && /function sanitizeSku/.test(builder));
     check("межа довжини артикула однакова",
         /SKU_MAX_LENGTH = 50/.test(productJs) && /SKU_MAX_LENGTH = 50/.test(builder));
-    check("межа кількості пробілів однакова",
-        /SKU_MAX_SPACES = 3/.test(productJs) && /SKU_MAX_SPACES = 3/.test(builder));
+    // Раніше тут перевірялась межа SKU_MAX_SPACES = 3 — тобто до трьох
+    // пробілів вважались нормою. Документація Google натомість каже:
+    // «The sku value must not contain any whitespace characters».
+    // Тепер межа рахує СЛОВА (щоб назва товару не пролізла як артикул),
+    // а самі пробіли замінюються дефісом.
+    check("межа кількості слів однакова",
+        /SKU_MAX_WORDS = 4/.test(productJs) && /SKU_MAX_WORDS = 4/.test(builder));
+    // Дивимось на КОД: у коментарях старий поріг згадується навмисно,
+    // щоб ніхто не повернув його, не прочитавши чому.
+    const strip = t => t.replace(/\/\/[^\n]*/g, "").replace(/\/\*[\s\S]*?\*\//g, "");
+
+    check("порога пробілів більше немає",
+        !/SKU_MAX_SPACES/.test(strip(productJs)) && !/SKU_MAX_SPACES/.test(strip(builder)));
+    check("обидва замінюють пробіли на дефіс",
+        /replace\(\/ \/g, "-"\)/.test(productJs) && /replace\(\/ \/g, "-"\)/.test(builder));
     check("порожній артикул не йде в розмітку (undefined, а не \"\")",
         /schemaSku\(product\) \|\| undefined/.test(productJs)
         && /firstSku\(product\) \|\| undefined/.test(builder));
+}
+
+console.log("\n[9] Артикул без пробілів — вимога Google");
+{
+    // Документація merchant listings: «The sku value must not contain
+    // any whitespace characters». Раніше тут стояв поріг у три
+    // пробіли — я прочитав вимогу неуважно, і Search Console
+    // справедливо показувала помилку на 16 товарах із 56.
+    const withSpace = schemas.filter(x => x.ld.sku && /\s/.test(String(x.ld.sku)));
+
+    check("жодного артикула з пробілом у розмітці", withSpace.length === 0,
+        withSpace.map(x => `${x.p.id}: «${x.ld.sku}»`).slice(0, 3).join(", "));
+
+    // Замінюємо на дефіс, а не склеюємо: «A05042 0037354» →
+    // «A05042-0037354» лишається схожим на код постачальника, а
+    // «A050420037354» злило б дві частини в одну незрозумілу.
+    const raw = products.flatMap(p =>
+        [p.sku, ...(p.variants || []).map(v => v && v.sku)].filter(Boolean));
+
+    const hadSpaces = raw.filter(v => /\s/.test(String(v)));
+
+    check(`у даних пробіли є (${hadSpaces.length}) — отже правило працює, а не збіг`,
+        hadSpaces.length > 0);
+
+    // Перевіряємо саме перетворення на реальному значенні
+    const sample = hadSpaces[0];
+
+    if (sample) {
+
+        const expected = String(sample).replace(/\s+/g, " ").trim()
+            .replace(/ /g, "-").replace(/-{2,}/g, "-");
+
+        const rendered = schemas
+            .map(x => x.ld.sku)
+            .find(v => v === expected);
+
+        check(`«${sample}» → «${expected}»`, !!rendered,
+            "у розмітці такого значення немає");
+
+    }
+
+    // Довгі багатослівні значення все одно відкидаємо: без пробілів
+    // назва товару не стає артикулом.
+    check("межа за кількістю слів лишилась",
+        /SKU_MAX_WORDS/.test(
+            fs.readFileSync(path.join(ROOT, "scripts/build-product-pages.js"), "utf8")));
 }
 
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);

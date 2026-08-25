@@ -13,15 +13,9 @@
         "color": "Темно-сірий",
         "hex": "#56535a",
         "images": [
-<<<<<<< Updated upstream
-          "/assets/images/products/uploads/a05042-0037354-1.26b9d653-300.webp",
-          "assets/images/products/uploads/a05042-0037354-2.webp",
-          "assets/images/products/uploads/a05042-0037354-3.webp"
-=======
-          "assets/images/products/uploads/a05042-0037354-1.webp?v=26b9d653",
+          "/assets/images/products/uploads/a05042-0037354-1-300.webp?v=a5d3ae7c",
           "assets/images/products/uploads/a05042-0037354-2.webp?v=05e229f6",
           "assets/images/products/uploads/a05042-0037354-3.webp?v=249dd5fb"
->>>>>>> Stashed changes
         ],
         "sku": "A05042 0037354",
         "sizes": [
@@ -47,7 +41,7 @@
     "isNew": false,
     "title": "Сонцезахисні окуляри ALAIN MIKLI Dark Grey Rectangular Unisex",
     "images": [
-      "/assets/images/products/uploads/a05042-0037354-1.26b9d653-300.webp",
+      "/assets/images/products/uploads/a05042-0037354-1-300.webp",
       "assets/images/products/uploads/a05042-0037354-2.webp",
       "assets/images/products/uploads/a05042-0037354-3.webp"
     ],
@@ -3077,19 +3071,11 @@
         "color": "Cotton/Silver — молочний",
         "hex": "#fafafa",
         "images": [
-<<<<<<< Updated upstream
-          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-4a08b27e.webp",
-          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-d6f46dd3.webp",
-          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-def1e99f.webp",
-          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-c1370464.webp",
-          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-28c7d0f9.webp"
-=======
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-4a08b27e.webp?v=02bd32c1",
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-d6f46dd3.webp?v=641d718b",
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-def1e99f.webp?v=d34aac37",
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-c1370464.webp?v=29b67e21",
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-28c7d0f9.webp?v=18766020"
->>>>>>> Stashed changes
         ]
       }
     ],
@@ -3156,21 +3142,12 @@
         "color": "Camel — карамельний, світло-коричневий",
         "hex": "#d4cbb7",
         "images": [
-<<<<<<< Updated upstream
-          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--d9f458f8.webp",
-          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--3f139d71.webp",
-          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--b0481126.webp",
-          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--f7ef8033.webp",
-          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--c2093755.webp",
-          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--e63574a7.webp"
-=======
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--d9f458f8.webp?v=14107657",
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--3f139d71.webp?v=f67824c9",
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--b0481126.webp?v=5c43d40d",
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--f7ef8033.webp?v=ce0b4dc8",
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--c2093755.webp?v=aaba56ea",
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--e63574a7.webp?v=72269e74"
->>>>>>> Stashed changes
         ]
       }
     ],
@@ -3239,21 +3216,12 @@
         "color": "Black чорний",
         "hex": "#000000",
         "images": [
-<<<<<<< Updated upstream
-          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--2013c7eb.webp",
-          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--3eeb5b5d.webp",
-          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--e6d79062.webp",
-          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--8fc5eccc.webp",
-          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--20634337.webp",
-          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--3bae4de6.webp"
-=======
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--2013c7eb.webp?v=25c5ff7f",
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--3eeb5b5d.webp?v=92578216",
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--e6d79062.webp?v=40d15638",
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--8fc5eccc.webp?v=4e0dd752",
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--20634337.webp?v=77e63951",
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--3bae4de6.webp?v=315e2785"
->>>>>>> Stashed changes
         ]
       }
     ],
@@ -3321,17 +3289,10 @@
         "color": "Twine — бежево-кремовий",
         "hex": "#bb993c",
         "images": [
-<<<<<<< Updated upstream
-          "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-d0dd33cf.webp",
-          "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-de081418.webp",
-          "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-628c7ef0.webp",
-          "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-twine-h009l01sp21-914-800x800.48806234.webp"
-=======
           "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-d0dd33cf.webp?v=89145062",
           "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-de081418.webp?v=1d737f86",
           "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-628c7ef0.webp?v=4e2139a7",
           "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-twine-h009l01sp21-914-800x800.webp?v=48806234"
->>>>>>> Stashed changes
         ]
       }
     ],
@@ -3380,11 +3341,7 @@
       "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-d0dd33cf.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-de081418.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-628c7ef0.webp",
-<<<<<<< Updated upstream
-      "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-twine-h009l01sp21-914-800x800.48806234.webp"
-=======
       "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-twine-h009l01sp21-914-800x800.webp"
->>>>>>> Stashed changes
     ]
   }
 ]

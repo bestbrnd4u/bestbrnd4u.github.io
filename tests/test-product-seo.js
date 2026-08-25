@@ -80,8 +80,10 @@ function seoSandbox() {
     // і надто довге значення, і порожній рядок (див. test-merchant-listings).
     window.eval(productJs.match(/const SKU_MAX_LENGTH = \d+;/)[0]
         .replace("const SKU_MAX_LENGTH =", "window.SKU_MAX_LENGTH ="));
-    window.eval(productJs.match(/const SKU_MAX_SPACES = \d+;/)[0]
-        .replace("const SKU_MAX_SPACES =", "window.SKU_MAX_SPACES ="));
+    // Константа перейменована: пробіли Google забороняє повністю, тож
+    // межа тепер рахує слова, а самі пробіли замінюються дефісом.
+    window.eval(productJs.match(/const SKU_MAX_WORDS = \d+;/)[0]
+        .replace("const SKU_MAX_WORDS =", "window.SKU_MAX_WORDS ="));
     window.eval(productJs.match(/function sanitizeSku\(value\) \{[\s\S]*?\n\}\n/)[0]
         .replace("function sanitizeSku(value) {", "window.sanitizeSku = function (value) {"));
     window.eval(productJs.match(/function schemaSku\(product\) \{[\s\S]*?\n\}\n/)[0]

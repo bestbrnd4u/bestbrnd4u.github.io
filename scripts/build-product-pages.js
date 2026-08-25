@@ -167,30 +167,55 @@ const FREE_SHIPPING_FROM = 3500;
 // необов'язкове поле, ніж віддати Google завідомо биті дані, — і одразу
 // написати в лог збірки, щоб дані виправили в адмінці.
 const SKU_MAX_LENGTH = 50;
-const SKU_MAX_SPACES = 3;
+
+// Скільки слів ще схоже на артикул.
+//
+// Пробіли в артикулі Google забороняє повністю, тож ми їх замінюємо на
+// дефіс. Але заміна не має перетворювати назву товару на «артикул»:
+// «Gabbi-Ruched-Hobo-Handbag-Grass-Green» формально без пробілів, а
+// артикулом не є. Тому довгі багатослівні значення так само
+// відкидаємо — просто рахуємо слова до заміни.
+const SKU_MAX_WORDS = 4;
 
 const skuWarnings = [];
 
+// Артикул для розмітки Google.
+//
+// ВИМОГА, ЯКУ Я РАНІШЕ ПРОЧИТАВ НЕУВАЖНО
+// ---------------------------------------
+// Документація merchant listings каже прямо: «The sku value must not
+// contain any whitespace characters». Тут стояв поріг SKU_MAX_SPACES=3,
+// тобто до трьох пробілів вважались нормою — і Search Console справедливо
+// показувала помилку на 16 товарах із 56.
+//
+// Пробіли замінюємо на дефіс, а не прибираємо: «A05042 0037354» →
+// «A05042-0037354» лишається схожим на код постачальника, і пошук по
+// артикулу на сайті чи в листі його впізнає. Склеювання в
+// «A050420037354» зробило б із двох частин одну незрозумілу.
 function sanitizeSku(value, context) {
 
-    const sku = String(value === undefined || value === null ? "" : value)
+    const raw = String(value === undefined || value === null ? "" : value)
         .replace(/\s+/g, " ")
         .trim();
 
-    if (!sku) return "";
+    if (!raw) return "";
 
-    const reason = sku.length > SKU_MAX_LENGTH
-        ? `довший за ${SKU_MAX_LENGTH} символів (${sku.length})`
-        : (sku.split(" ").length - 1) > SKU_MAX_SPACES
-            ? `більше ${SKU_MAX_SPACES} пробілів — схоже на назву, а не на артикул`
+    const words = raw.split(" ").length;
+
+    const reason = raw.length > SKU_MAX_LENGTH
+        ? `довший за ${SKU_MAX_LENGTH} символів (${raw.length})`
+        : words > SKU_MAX_WORDS
+            ? `${words} слів — схоже на назву, а не на артикул`
             : "";
 
     if (reason) {
-        if (context) skuWarnings.push(`${context}: «${sku}» — ${reason}`);
+        if (context) skuWarnings.push(`${context}: «${raw}» — ${reason}`);
         return "";
     }
 
-    return sku;
+    // Пробіли → дефіси. Подвійні дефіси стягуємо: «A05042 - 0037354» не
+    // має ставати «A05042---0037354».
+    return raw.replace(/ /g, "-").replace(/-{2,}/g, "-");
 
 }
 
