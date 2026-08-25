@@ -53,5 +53,12 @@
     "/assets/images/products/uploads/802ff4ae-b7b9-48c7-bcde-7862f3e83810_size2000x2000_cropcenter.webp",
     "/assets/images/products/uploads/13949588-c4af-47dc-ad68-2a22e3971c3d_size2000x2000_cropcenter.webp",
     "/assets/images/products/uploads/eea98936-ada5-48dc-b7d4-f61f2e2da8ec_size2000x2000_cropcenter-1-.webp"
-  ]
+  ],
+  "framing": {
+    "eea98936-ada5-48dc-b7d4-f61f2e2da8ec_size2000x2000_cropcenter-1-.webp": {
+      "zoom": 1.46,
+      "x": 51,
+      "y": 52
+    }
+  }
 }
