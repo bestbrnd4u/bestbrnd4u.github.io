@@ -511,6 +511,17 @@
           "/assets/images/products/uploads/4.6_b585e107-3532-4dd2-ad9c-2d2383b92dd0.webp?v=e5318137"
         ],
         "sku": "coach73995brown"
+      },
+      {
+        "color": "Light Antique Nickel/Taupe — світлий тауп / сіро-бежевий",
+        "hex": "#c5aea1",
+        "sku": "Coach73995LHTP",
+        "images": [
+          "/assets/images/products/uploads/73995_lhtau_a0.webp?v=b89a4e74",
+          "/assets/images/products/uploads/73995_lhtau_a5.webp?v=37ff4c82",
+          "/assets/images/products/uploads/73995_lhtau_a8.webp?v=51295a60",
+          "/assets/images/products/uploads/73995_lhtau_a91.webp?v=a0c36903"
+        ]
       }
     ],
     "sizes": [
@@ -538,7 +549,7 @@
     ],
     "id": 9,
     "instagramBlock": "general",
-    "description": "Coach Tabby 26 — одна з найвпізнаваніших моделей бренду. Шкіряний корпус, фірмова застібка-турнікет у формі літери C, знімний ремінець. Доступна у трьох відтінках, тримає форму й однаково доречна з денним і вечірнім образом.",
+    "description": "Coach Tabby 26 — одна з найвпізнаваніших моделей бренду.\nМодель натхненна архівним дизайном COACH 1970-х років та доповнена фірмовою застібкою з Signature-фурнітурою.\nСумка виготовлена з натуральної шкіри Polished Pebble Leather — фактурної шкіри з легкою глянцевою поверхнею. Має зовнішню відкриту кишеню, внутрішню кишеню на блискавці та багатофункціональну кишеню.\nМодель комплектується двома знімними ременями: коротким для носіння в руці або на плечі та довгим регульованим для носіння через плече",
     "sku": "coach73995black",
     "category": "Жіночі сумки"
   },
