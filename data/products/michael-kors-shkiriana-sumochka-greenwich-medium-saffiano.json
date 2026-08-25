@@ -14,8 +14,8 @@
     },
     "30h1ggrl2l-487-1.webp": {
       "zoom": 3,
-      "x": 50,
-      "y": 50
+      "x": 19,
+      "y": 0
     }
   },
   "preOrder": false,
@@ -25,9 +25,9 @@
       "color": "Синій",
       "hex": "#bacbdb",
       "images": [
-        "/assets/images/products/uploads/30h1ggrl2l-487-1.webp",
-        "assets/images/products/uploads/30h1ggrl2l-487-2.webp",
-        "assets/images/products/uploads/30h1ggrl2l-487-3.webp"
+        "/assets/images/products/uploads/30h1ggrl2l-487-1-600.webp",
+        "/assets/images/products/uploads/30h1ggrl2l-487-2-600.webp",
+        "/assets/images/products/uploads/30h1ggrl2l-487-3-600.webp"
       ],
       "sku": "30H1GGRL2L-487"
     }
