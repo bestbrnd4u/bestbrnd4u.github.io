@@ -14,19 +14,19 @@
       "color": "Camel — карамельний, світло-коричневий",
       "hex": "#d4cbb7",
       "images": [
-        "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel-zhinocha-crossbody-sumka-z-naturalnoyi-shkiri-00613-800x800.webp",
-        "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel-zhinocha-crossbody-sumka-z-naturalnoyi-shkiri-additional-image-10696-800x800.webp",
-        "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel-zhinocha-crossbody-sumka-z-naturalnoyi-shkiri-additional-image-10697-800x800.webp",
-        "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel-zhinocha-crossbody-sumka-z-naturalnoyi-shkiri-additional-image-10699-800x800.webp",
-        "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel-zhinocha-crossbody-sumka-z-naturalnoyi-shkiri-additional-image-10700-800x800.webp",
-        "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel-zhinocha-crossbody-sumka-z-naturalnoyi-shkiri-additional-image-10701-800x800.webp"
+        "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--d9f458f8.webp",
+        "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--3f139d71.webp",
+        "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--b0481126.webp",
+        "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--f7ef8033.webp",
+        "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--c2093755.webp",
+        "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--e63574a7.webp"
       ]
     }
   ],
   "preOrderPrepayment": 50,
   "strapInfo": "Два знімні ремені",
   "sizes": [
-    "Onesize"
+    "ONESIZE"
   ],
   "searchKeywords": [
     "Marc Jacobs",
@@ -59,5 +59,16 @@
   "description": "Стильна та функціональна сумка Marc Jacobs The Leather Cargo Bag у теплому відтінку Camel. Модель поєднує лаконічний дизайн із практичною конструкцією та великою кількістю зручних зовнішніх кишень.\nСумка виготовлена з натуральної зернистої шкіри та доповнена фірмовим логотипом Marc Jacobs. Має основне відділення на блискавці, дві зовнішні кишені на блискавці та дві накладні кишені з магнітними застібками.\nМодель комплектується двома знімними ременями: шкіряним ременем для носіння на плечі та регульованим текстильним ременем для носіння через плече",
   "sku": "2S4HSH085H02",
   "rating": 5,
-  "category": "Жіночі сумки"
+  "category": "Жіночі сумки",
+  "slug": "сумка-marc-jacobs-the-leather-cargo-bag-camel",
+  "id": 54,
+  "color": "Camel — карамельний, світло-коричневий",
+  "images": [
+    "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--d9f458f8.webp",
+    "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--3f139d71.webp",
+    "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--b0481126.webp",
+    "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--f7ef8033.webp",
+    "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--c2093755.webp",
+    "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--e63574a7.webp"
+  ]
 }
