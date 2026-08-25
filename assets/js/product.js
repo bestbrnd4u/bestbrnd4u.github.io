@@ -594,7 +594,9 @@ function buildThumbsMarkup(images, video, altText) {
 function buildTrackMarkup(images, video, altText) {
 
     const imageSlides = images.map(img => `
-        <img class="gallery-slide" src="${img}" style="${galleryFrameStyle(img)}" data-variant-src="${img}" data-variant-sizes="(max-width: 900px) 100vw, 600px" alt="${altText}" draggable="false" onerror="this.onerror=null;this.src='assets/images/no-image.png'">
+        <div class="gallery-slide gallery-slide-photo">
+            <img class="gallery-photo" src="${img}" style="${galleryFrameStyle(img)}" data-variant-src="${img}" data-variant-sizes="(max-width: 900px) 100vw, 600px" alt="${altText}" draggable="false" onerror="this.onerror=null;this.src='assets/images/no-image.png'">
+        </div>
     `).join("");
 
     const media = parseVideoEmbed(video);
@@ -662,7 +664,10 @@ function buildTrackMarkup(images, video, altText) {
 
     }
 
-    return imageSlides + videoSlide || `<img class="gallery-slide" src="assets/images/no-image.png" alt="${altText}">`;
+    return imageSlides + videoSlide
+        || `<div class="gallery-slide gallery-slide-photo">
+                <img class="gallery-photo" src="assets/images/no-image.png" alt="${altText}">
+            </div>`;
 
 }
 
@@ -731,8 +736,23 @@ function renderProduct(product) {
         // url('...') (одинарні). Це посилання на файл, завантажений
         // через адмінку/масовий імпорт, тож апостроф чи лапка в назві
         // файлу інакше розірвали б або HTML-атрибут, або CSS url().
+        // Кадр застосовуємо і до свотча.
+        //
+        // Свотч — 40px. Якщо фото знято з великими полями (а таких у
+        // каталозі чимало), товар на ньому займає кілька пікселів і
+        // виглядає як пляма. Той самий кадр, що на великому фото,
+        // робить його видимим — і, головне, свотч показує ТЕ САМЕ, що
+        // й галерея, а не інший кадр того ж знімка.
+        //
+        // Для фону це не transform, а background-size/position — але
+        // математика спільна (assets/js/image-framing.js).
+        const swatchFrame = swatchImage && window.ImageFraming
+            ? window.ImageFraming.frameBackgroundStyle(currentFraming, swatchImage)
+            : "";
+
         const swatchStyle = swatchImage
-            ? `background-color:${swatchColor};background-image:url('${escapeAttrSingleQuoted(swatchImage)}');background-size:cover;background-position:center`
+            ? `background-color:${swatchColor};background-image:url('${escapeAttrSingleQuoted(swatchImage)}');`
+              + (swatchFrame || "background-size:cover;background-position:center")
             : `background-color:${swatchColor}`;
 
         return `
@@ -1325,7 +1345,9 @@ function setupGallery() {
     if (!track) return;
 
     // Блокуємо drag'а картинок для Safari/iOS
-    document.querySelectorAll(".gallery-slide").forEach(img => {
+    // .gallery-photo, а не .gallery-slide: слайд тепер — обгортка, яка
+    // обрізає масштабоване фото (див. коментар у style.css).
+    document.querySelectorAll(".gallery-photo").forEach(img => {
         img.draggable = false;
         img.ondragstart = () => false;
     });
@@ -1611,7 +1633,19 @@ function setupGallery() {
 
                 }
 
-                return { type: "image", src: slide.src };
+                // Слайд-фото тепер обгортка, а не сам <img>: масштаб
+                // кадрування мусить обрізатися по межах слайда, інакше
+                // збільшене фото накриває сусідні (див. коментар до
+                // .gallery-slide-photo у style.css).
+                //
+                // Тому адресу беремо з вкладеного зображення, а не з
+                // самого слайда — у <div> немає src, і фото просто
+                // зникло б із повноекранного перегляду.
+                const photo = slide.tagName === "IMG"
+                    ? slide
+                    : slide.querySelector("img");
+
+                return { type: "image", src: photo && photo.src };
 
             }).filter(slide => slide.src);
 

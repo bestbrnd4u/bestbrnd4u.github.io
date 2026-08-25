@@ -414,15 +414,17 @@ function createProductCard(product) {
                 <div class="product-carousel">
                     <div class="photo-track">
                         ${images.map(img => `
-                            <img
-                                class="product-main-image photo-slide"
-                                src="${img}"
-                                style="${cardFrameStyle(product.framing, img)}"
-                                data-variant-src="${img}"
-                                data-variant-sizes="(max-width: 768px) 50vw, 300px"
-                                alt="${escapeHtml(product.title)}"
-                                loading="lazy"
-                                onerror="this.src='assets/images/no-image.png'">
+                            <div class="photo-slide photo-slide-photo">
+                                <img
+                                    class="product-main-image"
+                                    src="${img}"
+                                    style="${cardFrameStyle(product.framing, img)}"
+                                    data-variant-src="${img}"
+                                    data-variant-sizes="(max-width: 768px) 50vw, 300px"
+                                    alt="${escapeHtml(product.title)}"
+                                    loading="lazy"
+                                    onerror="this.src='assets/images/no-image.png'">
+                            </div>
                         `).join("")}
                         ${video ? `
                             <video

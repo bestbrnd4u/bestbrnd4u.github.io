@@ -152,6 +152,26 @@
 
     }
 
+    // Кадр для ФОНОВОГО зображення (background-image).
+    //
+    // Свотч кольору й мініатюри показують фото через background, а не
+    // <img>, тож transform до них не застосуєш. Але математика та сама:
+    // «наблизити в N разів» для фону — це background-size у N×100%, а
+    // точка фокуса — background-position.
+    //
+    // Тримати це тут, а не дублювати на місці, важливо: інакше свотч і
+    // велике фото показували б різні кадри одного знімка.
+    function frameBackgroundStyle(framing, src) {
+
+        var frame = frameFor(framing, src);
+
+        if (!frame) return "";
+
+        return "background-size:" + Math.round(frame.zoom * 100) + "%"
+            + ";background-position:" + frame.x + "% " + frame.y + "%";
+
+    }
+
     root.ImageFraming = {
         MIN_ZOOM: MIN_ZOOM,
         MAX_ZOOM: MAX_ZOOM,
@@ -159,7 +179,8 @@
         normalizeFrame: normalizeFrame,
         frameFor: frameFor,
         frameStyleObject: frameStyleObject,
-        frameStyleAttr: frameStyleAttr
+        frameStyleAttr: frameStyleAttr,
+        frameBackgroundStyle: frameBackgroundStyle
     };
 
 }(typeof window !== "undefined" ? window : globalThis));

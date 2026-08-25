@@ -13,7 +13,7 @@
         "color": "Темно-сірий",
         "hex": "#56535a",
         "images": [
-          "/assets/images/products/uploads/a05042-0037354-1.26b9d653-300.webp?v=a5d3ae7c",
+          "/assets/images/products/uploads/a05042-0037354-1.webp?v=26b9d653",
           "assets/images/products/uploads/a05042-0037354-2.webp?v=05e229f6",
           "assets/images/products/uploads/a05042-0037354-3.webp?v=249dd5fb"
         ],
@@ -41,7 +41,7 @@
     "isNew": false,
     "title": "Сонцезахисні окуляри ALAIN MIKLI Dark Grey Rectangular Unisex",
     "images": [
-      "/assets/images/products/uploads/a05042-0037354-1.26b9d653-300.webp",
+      "/assets/images/products/uploads/a05042-0037354-1.webp",
       "assets/images/products/uploads/a05042-0037354-2.webp",
       "assets/images/products/uploads/a05042-0037354-3.webp"
     ],
@@ -197,7 +197,14 @@
     ],
     "slug": "balenciaga-balenciaga-sontsezakhysni-okuliary-grey-rectangul-2",
     "id": 4,
-    "color": "Темно-сірий"
+    "color": "Темно-сірий",
+    "framing": {
+      "bb0096s-001-51-2.webp": {
+        "zoom": 2.19,
+        "x": 50,
+        "y": 50
+      }
+    }
   },
   {
     "title": "Balenciaga Сонцезахисні окуляри Grey Rectangular Unisex Sunglasses",
@@ -489,7 +496,34 @@
     "category": "Жіночі сумки",
     "sizes": [
       "ONESIZE"
-    ]
+    ],
+    "framing": {
+      "coach73995chalk-1.webp": {
+        "zoom": 1.53,
+        "x": 50,
+        "y": 50
+      },
+      "coach73995chalk-4.webp": {
+        "zoom": 2.02,
+        "x": 50,
+        "y": 50
+      },
+      "coach73995-dark-stone-1.webp": {
+        "zoom": 2.52,
+        "x": 50,
+        "y": 50
+      },
+      "coach73995-dark-stone-2.webp": {
+        "zoom": 2.93,
+        "x": 50,
+        "y": 50
+      },
+      "coach73995-dark-stone-3.webp": {
+        "zoom": 2.85,
+        "x": 50,
+        "y": 50
+      }
+    }
   },
   {
     "gender": "Жінкам",
@@ -661,7 +695,14 @@
     "instagramBlock": "general",
     "description": "Чоловічий годинник Invicta Pro Diver — модель у стилі класичних дайверських годинників. Обертовий безель, комбінований браслет, темно-синій циферблат із позначкою дати.",
     "sku": "invicta-pro-diver-blue-dial 22058",
-    "category": "Годинники"
+    "category": "Годинники",
+    "framing": {
+      "invicta-pro-diver-blue-dial-22058-1.webp": {
+        "zoom": 1.53,
+        "x": 50,
+        "y": 50
+      }
+    }
   },
   {
     "title": "Сумочка на плече Jw Pei TESSA",
@@ -1079,7 +1120,24 @@
     "color": "Бежевий",
     "sizes": [
       "ONESIZE"
-    ]
+    ],
+    "framing": {
+      "2s3hcr500h03-134-1.webp": {
+        "zoom": 2.34,
+        "x": 50,
+        "y": 50
+      },
+      "2s3hcr500h03-134-2.webp": {
+        "zoom": 2.19,
+        "x": 50,
+        "y": 50
+      },
+      "h153l01sp22-002-3.webp": {
+        "zoom": 1.77,
+        "x": 50,
+        "y": 50
+      }
+    }
   },
   {
     "title": "Сумочка The Teddy J Marc Mini Bag Brown",
@@ -1130,7 +1188,24 @@
     "color": "Коричневий",
     "sizes": [
       "ONESIZE"
-    ]
+    ],
+    "framing": {
+      "2f3hsh042h02-230-1.webp": {
+        "zoom": 1.68,
+        "x": 50,
+        "y": 50
+      },
+      "2f3hsh042h02-230-2.webp": {
+        "zoom": 1.58,
+        "x": 50,
+        "y": 50
+      },
+      "2f3hsh042h02-230-3.webp": {
+        "zoom": 1.68,
+        "x": 50,
+        "y": 50
+      }
+    }
   },
   {
     "title": "Жіноча шкіряна сумочка крос-боді Marc Jacobs the leather bucket bag",
@@ -1231,7 +1306,14 @@
     ],
     "slug": "mathey-tissot-hodynnyk-zhinochyy-mathey-tissot-city-metal",
     "id": 23,
-    "color": "Світло-сірий"
+    "color": "Світло-сірий",
+    "framing": {
+      "d31186mabu-1.webp": {
+        "zoom": 1.61,
+        "x": 50,
+        "y": 50
+      }
+    }
   },
   {
     "title": "Годинник жіночий Mathey Tissot Mathey II Quartz Crystal Black Dial Ladies Watch",
@@ -1281,30 +1363,52 @@
     ],
     "slug": "mathey-tissot-hodynnyk-zhinochyy-mathey-tissot-mathey-ii-qua",
     "id": 24,
-    "color": "Темно-сірий"
+    "color": "Темно-сірий",
+    "framing": {
+      "d710bn-1.webp": {
+        "zoom": 1.58,
+        "x": 50,
+        "y": 50
+      }
+    }
   },
   {
-    "title": "Шкіряна сумочка Greenwich Medium Saffiano",
+    "gender": [
+      "Жінкам"
+    ],
+    "color": "Синій",
+    "material": "Шкіра",
     "brand": "Michael Kors",
-    "category": "Жіночі сумки",
-    "gender": "Жінкам",
     "price": 8900,
-    "description": "Michael Kors Greenwich у середньому розмірі зі шкіри сафʼяно з дрібнозернистою текстурою. Клапан із фірменою круглою емблемою MK, знімний ремінець. Практична модель, що не втрачає вигляд у щоденному носінні.",
+    "framing": {
+      "30h1ggrl2l-487-2.webp": {
+        "zoom": 3,
+        "x": 50,
+        "y": 50
+      },
+      "30h1ggrl2l-487-1.webp": {
+        "zoom": 2.98,
+        "x": 50,
+        "y": 50
+      }
+    },
+    "preOrder": false,
+    "slug": "michael-kors-shkiriana-sumochka-greenwich-medium-saffiano",
     "variants": [
       {
         "color": "Синій",
         "hex": "#bacbdb",
         "images": [
-          "assets/images/products/uploads/30h1ggrl2l-487-1.webp?v=70048d23",
+          "/assets/images/products/uploads/30h1ggrl2l-487-1.webp?v=70048d23",
           "assets/images/products/uploads/30h1ggrl2l-487-2.webp?v=32d8a662",
           "assets/images/products/uploads/30h1ggrl2l-487-3.webp?v=01be7b92"
         ],
         "sku": "30H1GGRL2L-487"
       }
     ],
-    "isNew": true,
-    "material": "Шкіра",
-    "sku": "30H1GGRL2L-487",
+    "sizes": [
+      "ONESIZE"
+    ],
     "searchKeywords": [
       "майкл корс",
       "michael kors",
@@ -1318,19 +1422,18 @@
       "medium",
       "saffiano"
     ],
-    "instagramBlock": "general",
-    "preOrder": false,
+    "isNew": true,
+    "title": "Шкіряна сумочка Greenwich Medium Saffiano",
     "images": [
-      "assets/images/products/uploads/30h1ggrl2l-487-1.webp",
+      "/assets/images/products/uploads/30h1ggrl2l-487-1.webp",
       "assets/images/products/uploads/30h1ggrl2l-487-2.webp",
       "assets/images/products/uploads/30h1ggrl2l-487-3.webp"
     ],
-    "slug": "michael-kors-shkiriana-sumochka-greenwich-medium-saffiano",
     "id": 25,
-    "color": "Синій",
-    "sizes": [
-      "ONESIZE"
-    ]
+    "instagramBlock": "general",
+    "description": "Michael Kors Greenwich у середньому розмірі зі шкіри сафʼяно з дрібнозернистою текстурою. Клапан із фірменою круглою емблемою MK, знімний ремінець. Практична модель, що не втрачає вигляд у щоденному носінні.",
+    "sku": "30H1GGRL2L-487",
+    "category": "Жіночі сумки"
   },
   {
     "title": "Жіночий годинник MICHAEL KORS MK4619",
@@ -1379,7 +1482,19 @@
     ],
     "slug": "michael-kors-zhinochyy-hodynnyk-michael-kors-mk4619",
     "id": 26,
-    "color": "Бежевий"
+    "color": "Бежевий",
+    "framing": {
+      "mk4619-1.webp": {
+        "zoom": 1.61,
+        "x": 50,
+        "y": 50
+      },
+      "mk4619-2.webp": {
+        "zoom": 1.49,
+        "x": 50,
+        "y": 50
+      }
+    }
   },
   {
     "title": "Сонцезахисні окуляри PRADA 20WS 1AB5S0 DARK GREY",
@@ -1429,7 +1544,14 @@
     ],
     "slug": "prada-sontsezakhysni-okuliary-prada-20ws-1ab5s0-dark-grey",
     "id": 27,
-    "color": "Темно-сірий"
+    "color": "Темно-сірий",
+    "framing": {
+      "pr-20ws-1ab5s0-49-3.webp": {
+        "zoom": 1.56,
+        "x": 50,
+        "y": 50
+      }
+    }
   },
   {
     "gender": [
@@ -2024,7 +2146,14 @@
     "description": "Стильні жіночі кросівки Lacoste L003 — сучасна модель для повсякденного гардероба, що поєднує спортивний характер, комфорт і впізнаваний французький стиль. Легкий нейлоновий верх доповнений синтетичними елементами та оригінальною конструкцією шнурівки.\nСпеціальна система шнурівки та конструкція язичка забезпечують надійну фіксацію стопи й комфортну посадку. Текстильна підкладка та м’яка устілка роблять модель зручною для тривалого носіння.\nПідошва поєднує гуму та EVA, забезпечуючи амортизацію, гнучкість і хороше зчеплення з поверхнею. Фірмовий тиснений логотип-крокодил на п’яті додає моделі характерної для Lacoste впізнаваності.",
     "sku": "744SFA0020.080",
     "rating": 5,
-    "category": "Кросівки"
+    "category": "Кросівки",
+    "framing": {
+      "f7e4b799-732f-44f2-975b-40cd657042ed_size2000x2000_cropcenter.webp": {
+        "zoom": 1.64,
+        "x": 51,
+        "y": 57
+      }
+    }
   },
   {
     "gender": [
@@ -2085,7 +2214,14 @@
       "/assets/images/products/uploads/d1ac0ffd-1eaf-49fa-a647-4367eb3903ec_size2000x2000_cropcenter.webp",
       "/assets/images/products/uploads/b7842f76-5f88-4078-92a4-f026770f790e_size2000x2000_cropcenter.webp",
       "/assets/images/products/uploads/510f13a6-c954-47f8-beda-b551a9557a8e_size2000x2000_cropcenter.webp"
-    ]
+    ],
+    "framing": {
+      "510f13a6-c954-47f8-beda-b551a9557a8e_size2000x2000_cropcenter.webp": {
+        "zoom": 1.64,
+        "x": 51,
+        "y": 55
+      }
+    }
   },
   {
     "gender": [
@@ -2251,7 +2387,19 @@
     "description": "Lacoste Neocroc Checkboard Strap Camera Bag\nКомпактна чоловіча сумка через плече Lacoste Neocroc із контрастним картатим ременем та фірмовим логотипом. Практична модель для щоденного використання: два зовнішні кишені на блискавці та внутрішні відділення допомагають зручно розмістити необхідні речі. Виготовлена зі зносостійкого легкого поліестеру",
     "sku": "NH4040NZ",
     "rating": 5,
-    "category": "Чоловічі сумки"
+    "category": "Чоловічі сумки",
+    "framing": {
+      "nh4040nz_793_24.webp": {
+        "zoom": 1.85,
+        "x": 50,
+        "y": 56
+      },
+      "nh4040nz_793_31.webp": {
+        "zoom": 1.8,
+        "x": 53,
+        "y": 56
+      }
+    }
   },
   {
     "gender": [
@@ -2422,7 +2570,14 @@
       "/assets/images/products/uploads/802ff4ae-b7b9-48c7-bcde-7862f3e83810_size2000x2000_cropcenter.webp",
       "/assets/images/products/uploads/13949588-c4af-47dc-ad68-2a22e3971c3d_size2000x2000_cropcenter.webp",
       "/assets/images/products/uploads/eea98936-ada5-48dc-b7d4-f61f2e2da8ec_size2000x2000_cropcenter-1-.webp"
-    ]
+    ],
+    "framing": {
+      "eea98936-ada5-48dc-b7d4-f61f2e2da8ec_size2000x2000_cropcenter-1-.webp": {
+        "zoom": 1.46,
+        "x": 51,
+        "y": 52
+      }
+    }
   },
   {
     "gender": [
@@ -2479,7 +2634,14 @@
       "/assets/images/products/uploads/894a2223-e123-468a-9c5e-6949a9f72643_size2000x2000_cropcenter.webp",
       "/assets/images/products/uploads/02e9fde1-b8ec-4df3-812c-6869dbcfb37c_size2000x2000_cropcenter.webp",
       "/assets/images/products/uploads/1e18c52b-9cf3-411f-8897-4c0830babd56_size2000x2000_cropcenter.webp"
-    ]
+    ],
+    "framing": {
+      "1e18c52b-9cf3-411f-8897-4c0830babd56_size2000x2000_cropcenter.webp": {
+        "zoom": 1.6,
+        "x": 51,
+        "y": 54
+      }
+    }
   },
   {
     "gender": [
@@ -3198,7 +3360,14 @@
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--f7ef8033.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--c2093755.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--e63574a7.webp"
-    ]
+    ],
+    "framing": {
+      "marc-jacobs-the-leather-cargo-bag-camel--3f139d71.webp": {
+        "zoom": 1.4,
+        "x": 49,
+        "y": 40
+      }
+    }
   },
   {
     "gender": [
@@ -3292,7 +3461,7 @@
           "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-d0dd33cf.webp?v=89145062",
           "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-de081418.webp?v=1d737f86",
           "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-628c7ef0.webp?v=4e2139a7",
-          "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-twine-h009l01sp21-914-800x800.webp"
+          "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-twine-h009l01sp21-914-800x800.webp?v=48806234"
         ]
       }
     ],

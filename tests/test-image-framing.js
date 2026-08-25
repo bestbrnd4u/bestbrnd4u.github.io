@@ -102,8 +102,11 @@ console.log("\n[3] Файл обчислень — один на сайт і а�
     // би, що адмін бачить не те, що покупець.
     const admin = read("admin/index.html");
 
+    // Версія в адресі («?v=abc12345») тепер ставиться і в адмінці —
+    // без неї браузер після виливки віддавав би старі віджети. Тому
+    // хвіст після імені файлу допускаємо.
     check("адмінка підключає спільний файл",
-        /src="\.\.\/assets\/js\/image-framing\.js"/.test(admin));
+        /src="\.\.\/assets\/js\/image-framing\.js(\?v=[a-f0-9]+)?"/.test(admin));
     check("адмінка підключає поле кадрування",
         /image-framing-widget\.js/.test(admin));
 
@@ -250,7 +253,18 @@ console.log("\n[8] Оригінали фото не змінюються");
     // це свідомо, а не помітити по втраченій деталі товару.
     const widget = read("admin/image-framing-widget.js");
 
-    check("віджет не малює на canvas", !/getContext\(/.test(widget));
+    // Canvas сам по собі не порушує обіцянку: «Підігнати по товару»
+    // ЧИТАЄ пікселі, щоб знайти межі товару й порахувати наближення.
+    // Порушенням було б ЗАПИСАТИ результат — вивести з canvas новий
+    // файл і підмінити ним оригінал.
+    //
+    // Тому перевіряємо саме вивід, а не наявність canvas: заборона на
+    // getContext змусила б відмовитись від автопідгонки, хоча вона
+    // оригінал не чіпає.
+    check("з canvas нічого не вивантажується",
+        !/toDataURL|toBlob|convertToBlob/.test(widget));
+    check("canvas використовується лише для читання",
+        !/putImageData/.test(widget) && /getImageData/.test(widget));
     check("віджет не кодує зображення", !/toDataURL|toBlob/.test(widget));
     check("віджет не чіпає медіатеку", !/persistMedia|addAsset/.test(widget));
 
@@ -401,5 +415,323 @@ console.log("\n[8c] Стилі прев'ю не залипають у кеші")
         /registerPreviewStyle\("preview-styles\.css" \+ noCache\)/.test(preview));
 }
 
-console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
-process.exit(failures === 0 ? 0 : 1);
+console.log("\n[9] «Підігнати по товару»");
+{
+    // ЧОМУ ЦЕ ЗʼЯВИЛОСЬ
+    // ------------------
+    // Предметні фото знімають на білому тлі, і товар часто займає
+    // третину кадру — у картці він виглядає дрібним. Підбирати
+    // наближення повзунком доводилось навпомацки, через що складалось
+    // враження, що інструмент узагалі не працює.
+    const widget = read("admin/image-framing-widget.js");
+
+    check("є кнопка автопідгонки", /autoFit: function/.test(widget));
+    check("межі товару шукаються по пікселях", /contentBounds: function/.test(widget));
+
+    // Прозорий піксель — теж тло, інакше фото з альфою давали б межі
+    // на весь кадр.
+    check("прозорість вважається тлом", /alpha < 16/.test(widget));
+
+    // Чисто білого на фото майже не буває: тіні й компресія дають
+    // 245–252, тож поріг мусить бути нижчим за 255.
+    const limit = Number((widget.match(/var LIMIT = (\d+)/) || [])[1]);
+
+    check("поріг тла нижчий за чистий білий", limit > 200 && limit < 255, limit);
+
+    check("фото цілком біле не ламає підгонку", /if \(maxX < 0\) return null/.test(widget));
+    check("товар на весь кадр не підганяється",
+        /bw > 0\.95 && bh > 0\.95/.test(widget));
+    check("невдача не мовчить", /fitError/.test(widget));
+
+    // Кнопки кроку: повзунком важко влучити, а дрібний рух мишею не
+    // дає видимого ефекту.
+    check("є крок наближення кнопками", /step: function \(delta\)/.test(widget));
+    check("крок не виходить за межі",
+        /Math\.max\(lib\.MIN_ZOOM, Math\.min\(lib\.MAX_ZOOM/.test(widget));
+
+    // Підказка при 1× мусить казати, ЯК зробити товар більшим, а не те,
+    // що фото показується повністю — це й так видно.
+    check("підказка підказує дію", /Підігнати по товару/.test(widget));
+}
+
+console.log("\n[9b] Розрахунок кадру — на справжніх фото");
+{
+    // Перевіряємо саму арифметику на реальних знімках. Якщо межі товару
+    // визначаються неправильно, «Підігнати» дасть випадковий кадр, і
+    // помітити це можна буде лише очима в адмінці.
+    //
+    // Важливо перевірити ОБА випадки: фото з великими полями (там
+    // підгонка й потрібна) і фото, що вже займає кадр (там вона мусить
+    // відмовитись, а не «наблизити» на 0.99×).
+    const sharp = require("sharp");
+
+    const products = JSON.parse(read("data/products.json"));
+
+    const photos = [...new Set(products.flatMap(p =>
+        (p.variants || []).flatMap(v => v.images || [])))]
+        .map(src => src.split("?")[0].replace(/^\//, ""))
+        .filter(rel => fs.existsSync(path.join(ROOT, rel)))
+        .slice(0, 12);
+
+    const bounds = rel => {
+
+        const file = path.join(ROOT, rel);
+
+        return sharp(file).metadata().then(meta => {
+
+            const max = 200;
+            const scale = Math.min(1, max / Math.max(meta.width, meta.height));
+            const w = Math.max(1, Math.round(meta.width * scale));
+            const h = Math.max(1, Math.round(meta.height * scale));
+
+            return sharp(file).resize(w, h).ensureAlpha().raw().toBuffer()
+                .then(data => {
+
+                    const LIMIT = 244;
+
+                    let minX = w, minY = h, maxX = -1, maxY = -1;
+
+                    for (let y = 0; y < h; y++) {
+                        for (let x = 0; x < w; x++) {
+
+                            const i = (y * w + x) * 4;
+
+                            if (data[i + 3] < 16) continue;
+                            if (data[i] > LIMIT && data[i + 1] > LIMIT
+                                && data[i + 2] > LIMIT) continue;
+
+                            if (x < minX) minX = x;
+                            if (x > maxX) maxX = x;
+                            if (y < minY) minY = y;
+                            if (y > maxY) maxY = y;
+
+                        }
+                    }
+
+                    if (maxX < 0) return null;
+
+                    return {
+                        rel: rel,
+                        w: (maxX - minX + 1) / w,
+                        h: (maxY - minY + 1) / h,
+                        cx: (minX + maxX + 1) / 2 / w,
+                        cy: (minY + maxY + 1) / 2 / h
+                    };
+
+                });
+
+        });
+
+    };
+
+    return Promise.all(photos.map(bounds)).then(list => {
+
+        const found = list.filter(Boolean);
+
+        check(`межі визначено для всіх ${photos.length} фото`,
+            found.length === photos.length, `${found.length} з ${photos.length}`);
+
+        check("межі завжди всередині кадру",
+            found.every(b => b.w > 0 && b.w <= 1 && b.h > 0 && b.h <= 1));
+        check("точка фокуса завжди в межах кадру",
+            found.every(b => b.cx >= 0 && b.cx <= 1 && b.cy >= 0 && b.cy <= 1));
+
+        // Розрахунок такий самий, як у віджеті.
+        const fitZoom = b => Math.round(Math.min(1 / b.w, 1 / b.h) * 0.88 * 100) / 100;
+
+        // Фото з ПОМІТНИМИ полями — саме заради них функція й існує.
+        const roomy = found.filter(b => fitZoom(b) >= 1.05);
+
+        check(`є фото, де підгонка справді потрібна (${roomy.length})`,
+            roomy.length > 0);
+
+        roomy.forEach(b => {
+
+            check(`${b.rel.split("/").pop()}: наближення ${fitZoom(b).toFixed(2)}×`,
+                fitZoom(b) > 1);
+
+        });
+
+        // Фото з ледь помітними полями: розрахунок із запасом дає
+        // значення нижче 1×. Раніше воно затискалось до 1 — кнопка
+        // вдавала, що спрацювала, а нічого не змінювалось.
+        const marginal = found.filter(b => fitZoom(b) < 1.05);
+
+        check("віджет відмовляється підганяти, коли нема чого",
+            /if \(zoom < 1\.05\)/.test(read("admin/image-framing-widget.js")));
+        check(`і каже про це вголос (${marginal.length} таких фото)`,
+            /Товар і так займає майже весь кадр/.test(read("admin/image-framing-widget.js")));
+
+        // Фото, що вже займає кадр: contentBounds має вернути null, щоб
+        // «Підігнати» не робило безглуздого наближення на 0.99×.
+        const tight = found.filter(b => b.w > 0.95 && b.h > 0.95);
+
+        check(`фото на весь кадр підгонка відхиляє (${tight.length})`,
+            tight.every(b => b.w > 0.95 && b.h > 0.95));
+
+        // Наближення обмежене згори: за 3× картинка стає мʼякою, бо
+        // показується надто малий шматок оригіналу.
+        const capped = roomy
+            .map(b => Math.min(1 / b.w, 1 / b.h) * 0.88)
+            .filter(z => z > 3);
+
+        check(`де потрібно більше за 3× — обмежиться межею (${capped.length})`,
+            /MAX_ZOOM/.test(read("assets/js/image-framing.js")));
+
+        console.log("\n[10] Автоматичний кадр для фото з завеликими полями");
+{
+    // ЧОМУ ЦЕ ЗʼЯВИЛОСЬ
+    // ------------------
+    // Фото приходять від різних постачальників, і товар займає кадр
+    // хто скільки: у більшості 80–90%, у частини — 27–35%. У каталозі
+    // сусідні картки виглядали нерівно, ніби одну сумку зняли впритул,
+    // а іншу з іншого кінця кімнати.
+    //
+    // Обрізати оригінали не стали: це необоротно. Замість цього збірка
+    // рахує КАДР — ті самі zoom/x/y, які ставить віджет в адмінці.
+    const script = read("scripts/auto-frame-products.js");
+
+    check("скрипт є", script.length > 0);
+
+    // Свій вибір важливіший за розрахунок.
+    check("ручний кадр не перебивається",
+        /if \(framing\[key\]\) continue/.test(script));
+
+    // Без --apply нічого не змінює: можна подивитись, що буде.
+    check("є режим перегляду без змін",
+        /includes\("--apply"\)/.test(script) && /if \(apply\)/.test(script));
+
+    // Визначення «де тут товар» мусить бути те саме, що у віджеті —
+    // інакше автоматика й кнопка дадуть різні кадри для одного знімка.
+    const widget = read("admin/image-framing-widget.js");
+
+    check("поріг тла однаковий",
+        /LIMIT = 244/.test(script) && /LIMIT = 244/.test(widget));
+    check("прозорість вважається тлом в обох",
+        /alpha < 16|data\[i \+ 3\] < 16/.test(script) && /alpha < 16/.test(widget));
+
+    // Наближення обмежене: за 3× показується надто малий шматок
+    // оригіналу, і картинка стає мʼякою.
+    check("наближення обмежене згори", /MAX_ZOOM = 3/.test(script));
+
+    // Крок вбудований у збірку, а не разова ручна дія — інакше нові
+    // фото знову виглядатимуть дрібними.
+    const pkg = JSON.parse(read("package.json"));
+
+    check("крок у build:media",
+        /auto-frame-products\.js --apply/.test(pkg.scripts["build:media"]));
+
+    // І результат на справжніх даних: фото, які заповнювали менше 60%,
+    // мусять отримати кадр.
+    const dir = path.join(ROOT, "data/products");
+
+    const sources = fs.readdirSync(dir).filter(f => f.endsWith(".json"))
+        .map(f => JSON.parse(fs.readFileSync(path.join(dir, f), "utf8")));
+
+    const framed = sources.filter(p => p.framing && Object.keys(p.framing).length);
+
+    check(`товари з кадром — ${framed.length}`, framed.length > 0);
+
+    // Кадр мусить бути валідним: інакше сайт його просто відкине, і
+    // фото лишиться дрібним, а причину шукати буде ніде.
+    const bad = [];
+
+    framed.forEach(p => {
+
+        Object.entries(p.framing).forEach(([key, frame]) => {
+
+            const okZoom = typeof frame.zoom === "number"
+                && frame.zoom >= 1 && frame.zoom <= 3;
+            const okXY = [frame.x, frame.y].every(v =>
+                typeof v === "number" && v >= 0 && v <= 100);
+
+            if (!okZoom || !okXY) bad.push(`${p.slug}/${key}`);
+
+        });
+
+    });
+
+    check("усі кадри в допустимих межах", bad.length === 0, bad.slice(0, 3).join(", "));
+}
+
+console.log("\n[11] Масштаб не накриває сусідні слайди");
+{
+    // Та сама причина, що в галереї: transform не обрізається
+    // елементом і не змінює розкладку. При 3× знімок займає три ширини
+    // картки, слайди йдуть підряд — і наступний малюється ЗВЕРХУ. У
+    // каталозі показувалось друге фото замість першого, ще й зрізане
+    // низом картки.
+    const ui = read("assets/js/ui.js");
+    const common = read("assets/js/common.js");
+    const css = read("assets/css/style.css");
+
+    // Карусель карточки є у ДВОХ місцях: шаблон картки й перемальовка
+    // при зміні кольору. Полагодити одне й забути про інше означало б,
+    // що баг вертається при перемиканні кольору.
+    check("картка каталогу — обгортка",
+        /<div class="photo-slide photo-slide-photo">/.test(ui));
+    check("перемальовка при зміні кольору теж",
+        /<div class="photo-slide photo-slide-photo">/.test(common));
+
+    check("обгортка обрізає",
+        /\.photo-slide-photo\{[\s\S]{0,240}overflow:hidden/.test(css));
+    check("подвійного масштабу немає",
+        /\.photo-slide-photo\{[\s\S]{0,300}transform:none/.test(css));
+
+    // Мініатюри на сторінці товару теж масштабуються
+    check("мініатюри обрізають", /\.thumbs-vertical \.thumb\{[^}]*overflow:hidden/.test(css));
+
+    // Навігація карусели рахує дітей смуги — обгортки дають те саме
+    // число, що й раніше, тож стрілки й точки не збиваються.
+    check("навігація рахує слайди, а не картинки",
+        /track\.children\.length/.test(ui));
+
+    // Підміна фото при зміні кольору шукає .product-main-image —
+    // клас лишився на самому зображенні.
+    check("клас фото лишився на зображенні",
+        /class="product-main-image"/.test(ui)
+        && /querySelector\("\.product-main-image/.test(common));
+}
+
+console.log("\n[12] Свотч кольору показує той самий кадр");
+{
+    // Свотч — 40px. Якщо фото знято з великими полями, товар на ньому
+    // займає кілька пікселів і виглядає плямою. Той самий кадр робить
+    // його видимим.
+    //
+    // Для фону це не transform, а background-size/position — але
+    // математика мусить бути СПІЛЬНА, інакше свотч і галерея показують
+    // різні кадри одного знімка.
+    const lib = require("../assets/js/image-framing.js");
+
+    check("є розрахунок кадру для фону",
+        typeof lib.frameBackgroundStyle === "function");
+
+    const framing = { "photo.webp": { zoom: 2.98, x: 40, y: 60 } };
+    const style = lib.frameBackgroundStyle(framing, "/a/photo.webp");
+
+    check("наближення переходить у background-size",
+        /background-size:298%/.test(style), style);
+    check("точка фокуса — у background-position",
+        /background-position:40% 60%/.test(style), style);
+
+    // Без кадру нічого не додаємо: свотч лишається таким, як був.
+    check("без кадру порожньо", lib.frameBackgroundStyle({}, "/a/photo.webp") === "");
+
+    const product = read("assets/js/product.js");
+
+    check("свотч користується спільним розрахунком",
+        /frameBackgroundStyle\(currentFraming, swatchImage\)/.test(product));
+    check("запасний варіант лишився",
+        /swatchFrame \|\| "background-size:cover;background-position:center"/.test(product));
+}
+
+console.log(failures === 0
+            ? "\n✅ Усі перевірки пройдено"
+            : `\n❌ Провалено: ${failures}`);
+
+        process.exit(failures === 0 ? 0 : 1);
+
+    });
+}
+

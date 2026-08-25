@@ -144,5 +144,59 @@ console.log("\n[4] Нормалізація вбудована в збірку, 
     });
 }
 
+console.log("\n[N] Товар посилається на оригінал, а не на копію");
+{
+    // ЯК ЦЕ ТРАПЛЯЄТЬСЯ
+    // ------------------
+    // Медіатека Decap показує ВСІ файли теки, зокрема згенеровані копії
+    // -300 і -600. Для людини це просто ще один рядок у списку, і за
+    // схожою назвою легко вибрати копію замість оригіналу. Саме так і
+    // сталося: у двох товарах головним фото стояла копія 300px.
+    //
+    // ЧИМ ЦЕ ПОГАНО
+    // --------------
+    // Копія 300px розтягується на сторінці товару до 750 і виглядає
+    // мильною. Гірше: srcset будується дописуванням суфікса, тож із
+    // «photo-300.webp» виходить «photo-300-300.webp» — адреси не існує,
+    // і браузер лишається без потрібного розміру.
+    // Читаємо ДЖЕРЕЛА, а не data/products.json.
+    //
+    // Агрегат збирається скриптом, який сам зрізає суфікс копії — на
+    // ньому перевірка була б безглуздою: вона підтверджувала б роботу
+    // збірки, а не те, що в даних усе гаразд. Помилка ж живе саме в
+    // джерелі, куди пише адмінка.
+    const dir = path.join(ROOT, "data/products");
+
+    const sources = fs.readdirSync(dir)
+        .filter(f => f.endsWith(".json"))
+        .map(f => JSON.parse(fs.readFileSync(path.join(dir, f), "utf8")));
+
+    const refs = sources.flatMap(p =>
+        [...(p.images || []), ...(p.variants || []).flatMap(v => v.images || [])]);
+
+    const variants = refs.filter(src =>
+        /-(300|600|1200)\.[a-z0-9]+$/i.test(String(src).split("?")[0]));
+
+    check("жодне фото товару не є зменшеною копією", variants.length === 0,
+        [...new Set(variants.map(s => s.split("/").pop()))].slice(0, 3).join(", "));
+
+    // Прибирається автоматично: адміністратор не має тримати в голові,
+    // які файли в теці справжні, а які службові.
+    check("збірка сама зрізає суфікс копії",
+        /stripVariant/.test(fs.readFileSync(path.join(ROOT, "scripts/build-products.js"), "utf8")));
+
+    // І жодного посилання на неіснуючий файл — саме так виглядала
+    // поломка після того, як імена з відбитком повернули до звичайних.
+    const uploads = path.join(ROOT, "assets/images/products/uploads");
+    const onDisk = new Set(fs.readdirSync(uploads));
+
+    const missing = [...new Set(refs
+        .map(src => String(src).split("?")[0].split("/").pop())
+        .filter(name => !onDisk.has(name)))];
+
+    check("усі фото товарів існують на диску", missing.length === 0,
+        missing.slice(0, 3).join(", "));
+}
+
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
 process.exit(failures === 0 ? 0 : 1);

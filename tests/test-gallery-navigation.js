@@ -124,5 +124,98 @@ console.log("\n[5] Крапки в картці каталогу лишилис�
         !/\.photo-dot\{[\s\S]{0,200}cursor:pointer/.test(css));
 }
 
+console.log("\n[N] Масштаб не виходить за межі свого слайда");
+{
+    // СИМПТОМ
+    // --------
+    // Обрано перше фото — мітка й точка це підтверджують, — а
+    // показується друге. Порядок фото в даних при цьому правильний.
+    //
+    // ЧОМУ
+    // -----
+    // Кадрування застосовувалось transform:scale() прямо на <img>, і
+    // сам img був слайдом. transform не обрізається елементом: при 3×
+    // фото візуально займає три ширини смуги, зокрема місце сусідів.
+    // Слайди йдуть підряд, тож той, що пізніше в розмітці, малюється
+    // ЗВЕРХУ — фото №2 накривало фото №1.
+    //
+    // Помітно стало лише тепер: доти масштаб майже ніде не перевищував
+    // 1×, і виходити за межі було нічому.
+    const product = read("assets/js/product.js");
+    const css = read("assets/css/style.css");
+
+    // Слайд — обгортка, масштабується вміст.
+    check("слайд фото — обгортка",
+        /<div class="gallery-slide gallery-slide-photo">/.test(product));
+    check("фото всередині має власний клас",
+        /<img class="gallery-photo"/.test(product));
+    check("кадр застосовується до фото, не до обгортки",
+        /class="gallery-photo"[^>]*style="\$\{galleryFrameStyle/.test(product));
+
+    // Головне: обгортка мусить ОБРІЗАТИ вміст.
+    check("обгортка обрізає масштабоване фото",
+        /\.gallery-slide-photo\{[\s\S]{0,200}overflow:hidden/.test(css));
+
+    // Обгортка успадкувала масштаб від .gallery-slide — без скидання
+    // вийшло б подвійне збільшення.
+    check("подвійного масштабу немає",
+        /\.gallery-slide-photo\{[\s\S]{0,60}transform:none/.test(css));
+
+    // Обгортці потрібна висота: єдиний вміст усередині — звичайне
+    // зображення, і без пропорції слайд склався б.
+    check("обгортка має пропорцію",
+        /\.gallery-slide-photo\{[\s\S]{0,200}aspect-ratio:4\/5/.test(css));
+
+    // Побічний ефект, який легко пропустити: лайтбокс брав slide.src, а
+    // в <div> його немає — фото зникло б із повноекранного перегляду.
+    check("лайтбокс шукає вкладене зображення",
+        /slide\.tagName === "IMG"\s*\n?\s*\? slide\s*\n?\s*: slide\.querySelector\("img"\)/.test(product));
+
+    // srcset теж перебирає фото, а не обгортки
+    check("srcset перебирає фото",
+        /querySelectorAll\("\.gallery-photo"\)/.test(product));
+}
+
+console.log("\n[N2] Смуга слайдів — на живому DOM");
+{
+    const { JSDOM } = require("jsdom");
+
+    const dom = new JSDOM(`
+        <div class="main-photo"><div class="gallery-track" id="t">
+          <div class="gallery-slide gallery-slide-photo">
+            <img class="gallery-photo" src="/a/one.webp" style="--frame-zoom:2.98"></div>
+          <div class="gallery-slide gallery-slide-photo">
+            <img class="gallery-photo" src="/a/two.webp" style="--frame-zoom:3"></div>
+          <div class="gallery-slide gallery-slide-photo">
+            <img class="gallery-photo" src="/a/three.webp"></div>
+        </div></div>`, { pretendToBeVisual: true });
+
+    const slides = [...dom.window.document.getElementById("t").children];
+
+    // та сама логіка, що в product.js
+    const lightbox = slides.map(slide => {
+
+        if (slide.tagName === "VIDEO") return { type: "video", src: slide.getAttribute("src") };
+        if (slide.classList.contains("gallery-slide-embed")) return { type: "embed" };
+
+        const photo = slide.tagName === "IMG" ? slide : slide.querySelector("img");
+
+        return { type: "image", src: photo && photo.src };
+
+    }).filter(x => x.src);
+
+    check("усі фото доходять до лайтбокса", lightbox.length === slides.length,
+        `${lightbox.length} з ${slides.length}`);
+
+    check("порядок збережено",
+        lightbox.map(x => x.src.split("/").pop()).join(",") === "one.webp,two.webp,three.webp",
+        lightbox.map(x => x.src.split("/").pop()).join(","));
+
+    // Кадр живе на зображенні, а не на слайді
+    check("масштаб на зображенні",
+        slides[0].querySelector("img").getAttribute("style").includes("--frame-zoom"));
+    check("на обгортці кадру немає", !slides[0].getAttribute("style"));
+}
+
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
 process.exit(failures === 0 ? 0 : 1);

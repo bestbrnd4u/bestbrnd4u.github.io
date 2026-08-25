@@ -1,0 +1,70 @@
+{
+  "gender": [
+    "Жінкам"
+  ],
+  "preOrderDays": "5–10 робочих днів",
+  "forcePublish": false,
+  "material": "Натуральна шкіра",
+  "brand": "Marc Jacobs",
+  "price": 10000,
+  "preOrder": false,
+  "dimensions": "26 × 21 × 13 см",
+  "variants": [
+    {
+      "color": "Cement тауповий - сіро-бежевий",
+      "hex": "#bcb5b5",
+      "images": [
+        "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-ce-16a06f5f.webp",
+        "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-ce-00e1b92f.webp",
+        "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-ce-93206bc0.webp",
+        "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-cement-h009l01sp21-055-800x800.webp"
+      ]
+    }
+  ],
+  "preOrderPrepayment": 50,
+  "strapInfo": "Ремінець знімний та регульований",
+  "sizes": [
+    "S"
+  ],
+  "searchKeywords": [
+    "Marc Jacobs",
+    "Marc Jacobs The Tote Bag",
+    "The Leather Small Tote Bag",
+    "Marc Jacobs Small Tote",
+    "Marc Jacobs H009L01SP21",
+    "H009L01SP21-055",
+    "Marc Jacobs сумка",
+    "сумка Marc Jacobs",
+    "жіноча сумка Marc Jacobs",
+    "Marc Jacobs tote",
+    "small tote bag",
+    "сумка тоут",
+    "маленька сумка",
+    "шкіряна сумка",
+    "сумка з натуральної шкіри",
+    "Cement",
+    "таупова сумка",
+    "сіро-бежева сумка",
+    "сумка на плече",
+    "сумка через плече",
+    "брендова сумка",
+    "оригінальна Marc Jacobs"
+  ],
+  "isNew": false,
+  "title": "Сумка Marc Jacobs The Leather Small Tote Bag Cement",
+  "reviews": 0,
+  "instagramBlock": "general",
+  "description": "Стильна та універсальна сумка Marc Jacobs The Leather Small Tote Bag у витонченому відтінку Cement. Лаконічний дизайн, натуральна зерниста шкіра та фірмовий логотип Marc Jacobs роблять модель чудовим вибором для повсякденних образів.\nСумка виготовлена з натуральної зернистої шкіри з легкою глянцевою поверхнею. Має одне основне відділення на блискавці, внутрішню кишеню та кишеню для дрібниць. На передній панелі розташований фірмовий логотип The Tote Bag, а на задній — шкіряний патч із логотипом.\nМодель доповнена двома верхніми ручками та знімним регульованим шкіряним ремінцем, тому її можна носити в руці, на плечі або через плече",
+  "sku": "H009L01SP21-05",
+  "rating": 5,
+  "category": "Жіночі сумки",
+  "slug": "сумка-marc-jacobs-the-leather-small-tote-bag-cement",
+  "id": 52,
+  "color": "Cement тауповий - сіро-бежевий",
+  "images": [
+    "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-ce-16a06f5f.webp",
+    "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-ce-00e1b92f.webp",
+    "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-ce-93206bc0.webp",
+    "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-cement-h009l01sp21-055-800x800.webp"
+  ]
+}
