@@ -206,8 +206,17 @@ console.log("\n[6] Одна адреса на товар — без розсин
     });
 
     const ui = fs.readFileSync(path.join(ROOT, "assets/js/ui.js"), "utf8");
+    // Суть перевірки — що назва це справжнє <a href> з адресою товару,
+    // а не onclick. Точний вигляд виклику productUrl() змінюється:
+    // тепер він несе ще й колір картки, бо в каталозі кожен колір
+    // показується окремою карткою.
     check("назва в картці каталогу — справжнє <a href> (робот має по чому пройти)",
-        /<a href="\$\{productUrl\(product\)\}" class="product-title-link"/.test(ui));
+        /<a href="\$\{productUrl\(product[\s\S]*?\}"\s*\n?\s*class="product-title-link"/.test(ui));
+
+    // І колір мусить бути в адресі: без нього клац по назві відкривав би
+    // перший колір товару, а не той, що на картці.
+    check("посилання несе колір картки",
+        /productUrl\(product, product\.cardColor \? \{ color: product\.cardColor \} : null\)/.test(ui));
 
     const sitemap = fs.readFileSync(path.join(ROOT, "sitemap.xml"), "utf8");
     check("у sitemap немає старих /product?id=", !sitemap.includes("/product?id="));
