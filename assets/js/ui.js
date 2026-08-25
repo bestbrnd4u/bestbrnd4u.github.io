@@ -550,13 +550,22 @@ function loadImageVariants() {
 
 function buildSrcSet(src) {
 
-    const name = String(src || "").split("/").pop();
+    // Адреса може мати версію: photo.webp?v=a1b2c3d4 (її додає збірка,
+    // щоб замінене фото не приїхало з кеша). Розділяємо шлях і версію,
+    // інакше «відрізання .webp» від хвоста з версією дало б безглузду
+    // адресу на кшталт photo.webp?v=a1b2c3-600.webp.
+    const [pathPart, query] = String(src || "").split("?");
+
+    const name = pathPart.split("/").pop();
 
     if (!name.endsWith(".webp")) return null;
 
-    const base = src.slice(0, -".webp".length);
+    const base = pathPart.slice(0, -".webp".length);
+    const v = query ? `?${query}` : "";
 
-    return `${base}-300.webp 300w, ${base}-600.webp 600w, ${src} 1200w`;
+    // Версію отримують і зменшені копії: їх перезбирають разом із
+    // базовим фото, тож кеш має оновитись і для них.
+    return `${base}-300.webp${v} 300w, ${base}-600.webp${v} 600w, ${pathPart}${v} 1200w`;
 
 }
 

@@ -1,16 +1,18 @@
 {
-  "title": "Сонцезахисні окуляри ALAIN MIKLI Dark Grey Rectangular Unisex",
+  "gender": [
+    "Унісекс"
+  ],
+  "color": "Темно-сірий",
   "brand": "Alain Mikli",
-  "category": "Окуляри і оправи",
-  "gender": "Унісекс",
   "price": 6500,
-  "description": "Сонцезахисні окуляри Alain Mikli в оправі «черепаха». Широкі скроневі дуги, темні лінзи. Універсальна форма, що підходить і жінкам, і чоловікам.",
+  "preOrder": false,
+  "slug": "alain-mikli-sontsezakhysni-okuliary-alain-mikli-dark-grey-re",
   "variants": [
     {
       "color": "Темно-сірий",
       "hex": "#56535a",
       "images": [
-        "assets/images/products/uploads/a05042-0037354-1.webp",
+        "/assets/images/products/uploads/a05042-0037354-1.26b9d653-300.webp",
         "assets/images/products/uploads/a05042-0037354-2.webp",
         "assets/images/products/uploads/a05042-0037354-3.webp"
       ],
@@ -20,11 +22,9 @@
       ]
     }
   ],
-  "isNew": false,
   "sizes": [
     "ONESIZE"
   ],
-  "sku": "A05042 0037354",
   "searchKeywords": [
     "ален міклі",
     "alain mikli",
@@ -37,14 +37,16 @@
     "dark",
     "grey"
   ],
-  "instagramBlock": "general",
-  "preOrder": false,
+  "isNew": false,
+  "title": "Сонцезахисні окуляри ALAIN MIKLI Dark Grey Rectangular Unisex",
   "images": [
-    "assets/images/products/uploads/a05042-0037354-1.webp",
+    "/assets/images/products/uploads/a05042-0037354-1.26b9d653-300.webp",
     "assets/images/products/uploads/a05042-0037354-2.webp",
     "assets/images/products/uploads/a05042-0037354-3.webp"
   ],
-  "slug": "alain-mikli-sontsezakhysni-okuliary-alain-mikli-dark-grey-re",
   "id": 1,
-  "color": "Темно-сірий"
+  "instagramBlock": "general",
+  "description": "Сонцезахисні окуляри Alain Mikli в оправі «черепаха». Широкі скроневі дуги, темні лінзи. Універсальна форма, що підходить і жінкам, і чоловікам.",
+  "sku": "A05042 0037354",
+  "category": "Окуляри і оправи"
 }

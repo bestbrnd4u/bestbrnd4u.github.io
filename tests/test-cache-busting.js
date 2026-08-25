@@ -153,95 +153,112 @@ console.log("\n[5] Заміна картинки під тим самим імʼ
 {
     // Браузер і Cloudflare кешують картинку ЗА АДРЕСОЮ. Замінили фото
     // через адмінку, лишивши імʼя, — адреса та сама, і люди ще довго
-    // бачать старе. Саме так плитки пошуку показували попередні
-    // картинки, поки їх не перейменували руками.
+    // бачать старе.
     //
-    // Для JS і CSS це вирішено версією в адресі. Для картинок так не
-    // вийде: більшість приходить із data/*.json у рантаймі, і список
-    // відбитків довелося б вкласти в кожну сторінку — 23 КБ × 66
-    // сторінок. Тому відбиток іде в саме імʼя файлу.
+    // ЧОМУ НЕ ПЕРЕЙМЕНУВАННЯМ ФАЙЛУ
+    // ------------------------------
+    // Спершу це робилось саме так: у імʼя дописувався відбиток вмісту.
+    // Механізм зламався на першому бойовому запуску — файл переїхав, а
+    // посилання лишились на старому імені, і фото зникло з товару.
+    //
+    // Ціна помилки несиметрична: застарілий кеш — це «попередня
+    // картинка кілька годин», розʼїхане посилання — «товар без фото».
+    // Тому версія тепер живе в АДРЕСІ, а імʼя файлу не змінюється:
+    // розійтися нічому за побудовою.
+    const builder = read("scripts/build-products.js");
+
+    check("версію проставляє збірка", /function stampImageVersions/.test(builder));
+    check("відбиток від вмісту файлу",
+        /createHash\("sha1"\)\s*\n?\s*\.update\(fs\.readFileSync\(file\)\)/.test(builder));
+
+    // Перейменування за вмістом прибрано — і в самому перейменовувачі
+    // про це сказано, щоб ніхто не повернув його наосліп.
     const renamer = read("scripts/normalize-media-names.js");
 
-    check("відбиток рахується від вмісту, а не від імені",
-        /function contentHash[\s\S]{0,200}readFileSync\(file\)/.test(renamer));
+    // Дивимось на КОД, а не на пояснення: у комментарі механізм названий
+    // своїм імʼям навмисно, щоб його не повернули наосліп.
+    const renamerCode = renamer
+        .replace(/\/\/[^\n]*/g, "").replace(/\/\*[\s\S]*?\*\//g, "");
 
-    check("є реєстр відбитків", /image-fingerprints\.json/.test(renamer));
-    check("реєстр існує", fs.existsSync(path.join(ROOT, "data/image-fingerprints.json")));
+    check("перейменування за вмістом прибрано",
+        !/image-fingerprints/.test(renamerCode) && !/contentHash/.test(renamerCode));
+    check("причину зафіксовано в коді",
+        /ЧОМУ ТУТ БІЛЬШЕ НЕМА ПЕРЕЙМЕНУВАННЯ ЗА ВМІСТОМ/.test(renamer));
+    check("реєстра відбитків більше немає",
+        !fs.existsSync(path.join(ROOT, "data/image-fingerprints.json")));
 
-    // Перший запуск лише заповнює реєстр: 667 файлів разом
-    // перейменовувати не можна — величезний коміт і ризик, що десь
-    // посилання не перепишеться.
-    check("невідомий файл не перейменовується",
-        /known === undefined \|\| known === hash/.test(renamer));
-
-    // База й копії -300/-600 мусять отримати однакову позначку,
-    // інакше srcset проситиме адресу, якої немає.
-    check("група перейменовується цілком",
-        /files\.forEach\(\(\{ full, name \}\) => \{[\s\S]{0,300}newStem \+ variant \+ ext/.test(renamer));
-
-    // Імʼя не має обростати хвостом .aaaa.bbbb.cccc
-    check("стара позначка прибирається перед новою",
-        /stem\.replace\(CONTENT_HASH_RE, ""\)/.test(renamer));
-
-    // Без коміту реєстру наступна збірка не побачить заміни.
-    const prodWf = read(".github/workflows/build-products.yml");
-    const devWf = read(".github/workflows/build-dev.yml");
-
-    check("прод-збірка комітить реєстр", /git add data\/image-fingerprints\.json/.test(prodWf));
-    check("дев-збірка теж (git add -A data)", /git add -A data/.test(devWf));
+    // Перейменування задовгих імен лишається: воно потрібне через
+    // обмеження файлової системи й спрацьовує при завантаженні.
+    check("обмеження довжини імені лишилось", /MAX_NAME/.test(renamer));
 }
 
-console.log("\n[5b] Реєстр відповідає файлам на диску");
+console.log("\n[5b] Версії у згенерованих даних відповідають файлам");
 {
     const crypto = require("crypto");
 
-    const registry = JSON.parse(read("data/image-fingerprints.json"));
+    const products = JSON.parse(read("data/products.json"));
 
-    // Картинки лежать у кількох теках — uploads, banners, categories.
-    // Тому будуємо покажчик по ВСЬОМУ дереву: жорсткий список тек
-    // ламався б щоразу, коли зʼявляється нова.
-    const byName = new Map();
+    const images = products.flatMap(p =>
+        (p.variants || []).flatMap(v => v.images || []));
 
-    (function walk(dir) {
+    check("фото знайдено", images.length > 0, images.length);
 
-        fs.readdirSync(dir, { withFileTypes: true }).forEach(entry => {
+    // У кожного фото мусить бути версія, інакше заміна лишиться
+    // непоміченою браузером.
+    const noVersion = images.filter(src => !/\?v=[0-9a-f]{8}$/.test(src));
 
-            const full = path.join(dir, entry.name);
+    check("у всіх фото є версія", noVersion.length === 0,
+        noVersion.slice(0, 3).join(", "));
 
-            if (entry.isDirectory()) {
-                if (entry.name !== "_archive") walk(full);
-                return;
-            }
+    // І вона мусить збігатися з реальним вмістом: розбіжність означала
+    // б, що версія застаріла й заміну знову не побачать.
+    const wrong = [...new Set(images)].filter(src => {
 
-            if (!byName.has(entry.name)) byName.set(entry.name, full);
+        const [clean, query] = src.split("?");
+        const file = path.join(ROOT, clean.replace(/^\//, ""));
 
-        });
-
-    }(path.join(ROOT, "assets/images")));
-
-    const findFile = name => byName.get(name);
-
-    const names = Object.keys(registry);
-
-    check("реєстр не порожній", names.length > 0, names.length);
-
-    // Кожен запис має вказувати на наявний файл із таким самим вмістом:
-    // розбіжність означала б, що реєстр застарів і заміну не помітять.
-    const stale = names.filter(name => {
-
-        const file = findFile(name);
-
-        if (!file) return true;
+        if (!fs.existsSync(file)) return true;
 
         const hash = crypto.createHash("sha1")
             .update(fs.readFileSync(file)).digest("hex").slice(0, 8);
 
-        return hash !== registry[name];
+        return query !== `v=${hash}`;
 
     });
 
-    check("усі відбитки збігаються з файлами", stale.length === 0,
-        stale.slice(0, 3).join(", "));
+    check("версії збігаються з вмістом файлів", wrong.length === 0,
+        wrong.slice(0, 3).join(", "));
+
+    // Джерельні файли адмінки лишаються чистими: версія — справа
+    // збірки, і в редакторі шляхи мають бути звичайними.
+    const sources = fs.readdirSync(path.join(ROOT, "data/products"))
+        .filter(f => f.endsWith(".json"))
+        .filter(f => /\?v=/.test(read(`data/products/${f}`)));
+
+    check("у джерелах версій немає", sources.length === 0, sources.slice(0, 3).join(", "));
+}
+
+console.log("\n[5c] srcset розуміє адресу з версією");
+{
+    // «Відрізання .webp» від хвоста з версією дало б безглузду адресу
+    // на кшталт photo.webp?v=abc-600.webp.
+    const ui = read("assets/js/ui.js");
+    const fn = new Function(
+        ui.match(/function buildSrcSet[\s\S]*?\n\}/)[0] + "; return buildSrcSet;")();
+
+    const plain = fn("a/photo.webp");
+
+    check("без версії працює як раніше",
+        plain === "a/photo-300.webp 300w, a/photo-600.webp 600w, a/photo.webp 1200w", plain);
+
+    const versioned = fn("a/photo.webp?v=abc12345");
+
+    check("версія переходить на всі розміри",
+        versioned === "a/photo-300.webp?v=abc12345 300w, "
+            + "a/photo-600.webp?v=abc12345 600w, "
+            + "a/photo.webp?v=abc12345 1200w", versioned);
+
+    check("не-webp і далі без srcset", fn("a/photo.jpg") === null);
 }
 
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);

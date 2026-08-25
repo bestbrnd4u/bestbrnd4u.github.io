@@ -1,19 +1,21 @@
 [
   {
-    "title": "Сонцезахисні окуляри ALAIN MIKLI Dark Grey Rectangular Unisex",
+    "gender": [
+      "Унісекс"
+    ],
+    "color": "Темно-сірий",
     "brand": "Alain Mikli",
-    "category": "Окуляри і оправи",
-    "gender": "Унісекс",
     "price": 6500,
-    "description": "Сонцезахисні окуляри Alain Mikli в оправі «черепаха». Широкі скроневі дуги, темні лінзи. Універсальна форма, що підходить і жінкам, і чоловікам.",
+    "preOrder": false,
+    "slug": "alain-mikli-sontsezakhysni-okuliary-alain-mikli-dark-grey-re",
     "variants": [
       {
         "color": "Темно-сірий",
         "hex": "#56535a",
         "images": [
-          "assets/images/products/uploads/a05042-0037354-1.webp",
-          "assets/images/products/uploads/a05042-0037354-2.webp",
-          "assets/images/products/uploads/a05042-0037354-3.webp"
+          "/assets/images/products/uploads/a05042-0037354-1.26b9d653-300.webp?v=a5d3ae7c",
+          "assets/images/products/uploads/a05042-0037354-2.webp?v=05e229f6",
+          "assets/images/products/uploads/a05042-0037354-3.webp?v=249dd5fb"
         ],
         "sku": "A05042 0037354",
         "sizes": [
@@ -21,11 +23,9 @@
         ]
       }
     ],
-    "isNew": false,
     "sizes": [
       "ONESIZE"
     ],
-    "sku": "A05042 0037354",
     "searchKeywords": [
       "ален міклі",
       "alain mikli",
@@ -38,16 +38,18 @@
       "dark",
       "grey"
     ],
-    "instagramBlock": "general",
-    "preOrder": false,
+    "isNew": false,
+    "title": "Сонцезахисні окуляри ALAIN MIKLI Dark Grey Rectangular Unisex",
     "images": [
-      "assets/images/products/uploads/a05042-0037354-1.webp",
+      "/assets/images/products/uploads/a05042-0037354-1.26b9d653-300.webp",
       "assets/images/products/uploads/a05042-0037354-2.webp",
       "assets/images/products/uploads/a05042-0037354-3.webp"
     ],
-    "slug": "alain-mikli-sontsezakhysni-okuliary-alain-mikli-dark-grey-re",
     "id": 1,
-    "color": "Темно-сірий"
+    "instagramBlock": "general",
+    "description": "Сонцезахисні окуляри Alain Mikli в оправі «черепаха». Широкі скроневі дуги, темні лінзи. Універсальна форма, що підходить і жінкам, і чоловікам.",
+    "sku": "A05042 0037354",
+    "category": "Окуляри і оправи"
   },
   {
     "title": "Чоловіча сумка Armani Exchange Crossbody Bag Black",
@@ -61,9 +63,9 @@
         "color": "Чорний",
         "hex": "#1d1f22",
         "images": [
-          "assets/images/products/uploads/arc54h01t-q11-1.webp",
-          "assets/images/products/uploads/arc54h01t-q11-2.webp",
-          "assets/images/products/uploads/arc54h01t-q11-3.webp"
+          "assets/images/products/uploads/arc54h01t-q11-1.webp?v=9ca2f189",
+          "assets/images/products/uploads/arc54h01t-q11-2.webp?v=80dec0bf",
+          "assets/images/products/uploads/arc54h01t-q11-3.webp?v=715b7bc3"
         ],
         "sku": "ARC54H01T-Q11"
       }
@@ -110,10 +112,10 @@
         "color": "Чорний",
         "hex": "#1f2223",
         "images": [
-          "assets/images/products/uploads/rtladf952201-1.webp",
-          "assets/images/products/uploads/rtladf952201-2.webp",
-          "assets/images/products/uploads/rtladf952201-3.webp",
-          "assets/images/products/uploads/rtladf952201-4.webp"
+          "assets/images/products/uploads/rtladf952201-1.webp?v=0a157b8f",
+          "assets/images/products/uploads/rtladf952201-2.webp?v=1d80f672",
+          "assets/images/products/uploads/rtladf952201-3.webp?v=d1127195",
+          "assets/images/products/uploads/rtladf952201-4.webp?v=7b1f6308"
         ],
         "sku": "RTLADF952201"
       }
@@ -159,8 +161,8 @@
         "color": "Темно-сірий",
         "hex": "#706c69",
         "images": [
-          "assets/images/products/uploads/bb0096s-001-51-1.webp",
-          "assets/images/products/uploads/bb0096s-001-51-2.webp"
+          "assets/images/products/uploads/bb0096s-001-51-1.webp?v=c71bce05",
+          "assets/images/products/uploads/bb0096s-001-51-2.webp?v=7f314b99"
         ],
         "sku": "BB0096S 001 51",
         "sizes": [
@@ -209,10 +211,10 @@
         "color": "Темно-сірий",
         "hex": "#484445",
         "images": [
-          "assets/images/products/uploads/bb0041s-001-99-1.webp",
-          "assets/images/products/uploads/bb0041s-001-99-2.webp",
-          "assets/images/products/uploads/bb0041s-001-99-3.webp",
-          "assets/images/products/uploads/bb0041s-001-99-4.webp"
+          "assets/images/products/uploads/bb0041s-001-99-1.webp?v=c94020af",
+          "assets/images/products/uploads/bb0041s-001-99-2.webp?v=abaf76ab",
+          "assets/images/products/uploads/bb0041s-001-99-3.webp?v=09d63ff1",
+          "assets/images/products/uploads/bb0041s-001-99-4.webp?v=03af5e4c"
         ],
         "sku": "BB0041S 001 99",
         "sizes": [
@@ -263,10 +265,10 @@
         "color": "Темно-сірий",
         "hex": "#3a383b",
         "images": [
-          "assets/images/products/uploads/be4361f-300187-51-1.webp",
-          "assets/images/products/uploads/be4361f-300187-51-2.webp",
-          "assets/images/products/uploads/be4361f-300187-51-3.webp",
-          "assets/images/products/uploads/be4361f-300187-51-4.webp"
+          "assets/images/products/uploads/be4361f-300187-51-1.webp?v=1322d35c",
+          "assets/images/products/uploads/be4361f-300187-51-2.webp?v=821d54b7",
+          "assets/images/products/uploads/be4361f-300187-51-3.webp?v=e5ad3ae1",
+          "assets/images/products/uploads/be4361f-300187-51-4.webp?v=a0278b08"
         ],
         "sku": "BE4361F 300187 51",
         "sizes": [
@@ -317,10 +319,10 @@
         "color": "Коричневий",
         "hex": "#866751",
         "images": [
-          "assets/images/products/uploads/coach-ethan-cv918-qbnrx-1.webp",
-          "assets/images/products/uploads/coach-ethan-cv918-qbnrx-2.webp",
-          "assets/images/products/uploads/coach-ethan-cv918-qbnrx-3.webp",
-          "assets/images/products/uploads/coach-ethan-cv918-qbnrx-4.webp"
+          "assets/images/products/uploads/coach-ethan-cv918-qbnrx-1.webp?v=49acf219",
+          "assets/images/products/uploads/coach-ethan-cv918-qbnrx-2.webp?v=e23fa060",
+          "assets/images/products/uploads/coach-ethan-cv918-qbnrx-3.webp?v=0b3ab868",
+          "assets/images/products/uploads/coach-ethan-cv918-qbnrx-4.webp?v=180016b7"
         ],
         "sku": "coach ethan cv918 qbnrx"
       }
@@ -370,9 +372,9 @@
         "color": "Чорний",
         "hex": "#252525",
         "images": [
-          "assets/images/products/uploads/coach-ct714-qbml5-1.webp",
-          "assets/images/products/uploads/coach-ct714-qbml5-2.webp",
-          "assets/images/products/uploads/coach-ct714-qbml5-3.webp"
+          "assets/images/products/uploads/coach-ct714-qbml5-1.webp?v=a4a25be7",
+          "assets/images/products/uploads/coach-ct714-qbml5-2.webp?v=63d65680",
+          "assets/images/products/uploads/coach-ct714-qbml5-3.webp?v=deb975dc"
         ],
         "sku": "coach ct714 qbml5"
       }
@@ -423,9 +425,9 @@
         "color": "Темно-сірий",
         "hex": "#3f3f3f",
         "images": [
-          "assets/images/products/uploads/coach73995black-1.webp",
-          "assets/images/products/uploads/coach73995black-2.webp",
-          "assets/images/products/uploads/coach73995black-3.webp"
+          "assets/images/products/uploads/coach73995black-1.webp?v=4f4f5572",
+          "assets/images/products/uploads/coach73995black-2.webp?v=d5dab78d",
+          "assets/images/products/uploads/coach73995black-3.webp?v=430642cf"
         ],
         "sku": "coach73995black"
       },
@@ -433,10 +435,10 @@
         "color": "Світло-сірий",
         "hex": "#d2cac4",
         "images": [
-          "assets/images/products/uploads/coach73995chalk-1.webp",
-          "assets/images/products/uploads/coach73995chalk-2.webp",
-          "assets/images/products/uploads/coach73995chalk-3.webp",
-          "assets/images/products/uploads/coach73995chalk-4.webp"
+          "assets/images/products/uploads/coach73995chalk-1.webp?v=827030be",
+          "assets/images/products/uploads/coach73995chalk-2.webp?v=82111959",
+          "assets/images/products/uploads/coach73995chalk-3.webp?v=a489de50",
+          "assets/images/products/uploads/coach73995chalk-4.webp?v=80b7610f"
         ],
         "sku": "coach73995chalk"
       },
@@ -444,9 +446,9 @@
         "color": "Коричневий",
         "hex": "#8c6f63",
         "images": [
-          "assets/images/products/uploads/coach73995-dark-stone-1.webp",
-          "assets/images/products/uploads/coach73995-dark-stone-2.webp",
-          "assets/images/products/uploads/coach73995-dark-stone-3.webp"
+          "assets/images/products/uploads/coach73995-dark-stone-1.webp?v=0a85c450",
+          "assets/images/products/uploads/coach73995-dark-stone-2.webp?v=c9095f73",
+          "assets/images/products/uploads/coach73995-dark-stone-3.webp?v=0a136a87"
         ],
         "sku": "coach73995 dark stone"
       },
@@ -454,9 +456,9 @@
         "hex": "#433636",
         "color": "Brass Tan Black",
         "images": [
-          "/assets/images/products/uploads/91215-b4ooh_7d995c2e069841c5ad45599ee803592d.webp",
-          "/assets/images/products/uploads/91215-b4ooh-1_b3aea35bcebe4922a51b66ad7b2bb0a1_master.webp",
-          "/assets/images/products/uploads/91215-b4ooh-2_ea0908385fb449c5a786a9c58e2e20cb_master.webp"
+          "/assets/images/products/uploads/91215-b4ooh_7d995c2e069841c5ad45599ee803592d.webp?v=de06ce9b",
+          "/assets/images/products/uploads/91215-b4ooh-1_b3aea35bcebe4922a51b66ad7b2bb0a1_master.webp?v=5c61315b",
+          "/assets/images/products/uploads/91215-b4ooh-2_ea0908385fb449c5a786a9c58e2e20cb_master.webp?v=d2db59ae"
         ]
       }
     ],
@@ -506,10 +508,10 @@
         "color": "Світло-сірий",
         "hex": "#d4cac2",
         "images": [
-          "assets/images/products/uploads/coach-cp150-b4ha-1.webp",
-          "assets/images/products/uploads/coach-cp150-b4ha-2.webp",
-          "assets/images/products/uploads/coach-cp150-b4ha-3.webp",
-          "assets/images/products/uploads/coach-cp150-b4ha-4.webp"
+          "assets/images/products/uploads/coach-cp150-b4ha-1.webp?v=5db05181",
+          "assets/images/products/uploads/coach-cp150-b4ha-2.webp?v=8898c35a",
+          "assets/images/products/uploads/coach-cp150-b4ha-3.webp?v=0e7762f5",
+          "assets/images/products/uploads/coach-cp150-b4ha-4.webp?v=b87c559c"
         ],
         "sku": "coach cp150 b4ha"
       },
@@ -517,9 +519,9 @@
         "color": "Чорний",
         "hex": "#232323",
         "images": [
-          "assets/images/products/uploads/cp150-b4bk-a0-1.webp",
-          "assets/images/products/uploads/cp150-b4bk-a0-2.webp",
-          "assets/images/products/uploads/cp150-b4bk-a0-3.webp"
+          "assets/images/products/uploads/cp150-b4bk-a0-1.webp?v=808c4911",
+          "assets/images/products/uploads/cp150-b4bk-a0-2.webp?v=0a816477",
+          "assets/images/products/uploads/cp150-b4bk-a0-3.webp?v=e3281eea"
         ],
         "sku": "cp150_b4bk_a0"
       },
@@ -527,9 +529,9 @@
         "color": "Темно-коричневий",
         "hex": "#41251d",
         "images": [
-          "assets/images/products/uploads/cp150-b4mpl-1.webp",
-          "assets/images/products/uploads/cp150-b4mpl-2.webp",
-          "assets/images/products/uploads/cp150-b4mpl-3.webp"
+          "assets/images/products/uploads/cp150-b4mpl-1.webp?v=2965155c",
+          "assets/images/products/uploads/cp150-b4mpl-2.webp?v=068ef263",
+          "assets/images/products/uploads/cp150-b4mpl-3.webp?v=9978c22d"
         ],
         "sku": "cp150_b4mpl"
       }
@@ -578,9 +580,9 @@
         "color": "Темно-сірий",
         "hex": "#5c5954",
         "images": [
-          "assets/images/products/uploads/gg0516s-001-52-1.webp",
-          "assets/images/products/uploads/gg0516s-001-52-2.webp",
-          "assets/images/products/uploads/gg0516s-001-52-3.webp"
+          "assets/images/products/uploads/gg0516s-001-52-1.webp?v=47f34711",
+          "assets/images/products/uploads/gg0516s-001-52-2.webp?v=63bb217e",
+          "assets/images/products/uploads/gg0516s-001-52-3.webp?v=e92bad07"
         ],
         "sku": "GG0516S 001 52",
         "sizes": [
@@ -632,7 +634,7 @@
         "color": "Темно-синій",
         "hex": "#0c2354",
         "images": [
-          "assets/images/products/uploads/invicta-pro-diver-blue-dial-22058-1.webp"
+          "assets/images/products/uploads/invicta-pro-diver-blue-dial-22058-1.webp?v=7f58e0ba"
         ],
         "sku": "invicta-pro-diver-blue-dial 22058",
         "sizes": [
@@ -673,9 +675,9 @@
         "color": "Чорний",
         "hex": "#242523",
         "images": [
-          "assets/images/products/uploads/jwpr-wy46-1.webp",
-          "assets/images/products/uploads/jwpr-wy46-2.webp",
-          "assets/images/products/uploads/jwpr-wy46-3.webp"
+          "assets/images/products/uploads/jwpr-wy46-1.webp?v=3cef0f1b",
+          "assets/images/products/uploads/jwpr-wy46-2.webp?v=764f55c0",
+          "assets/images/products/uploads/jwpr-wy46-3.webp?v=0ba4725a"
         ],
         "sku": "JWPR-WY46"
       }
@@ -720,9 +722,9 @@
         "color": "Зелений",
         "hex": "#06b454",
         "images": [
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp",
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-2.webp",
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp"
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=73e62267",
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-2.webp?v=0d86b503",
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=1e1a7bf3"
         ],
         "sku": "B094QT219C"
       },
@@ -730,9 +732,9 @@
         "color": "Карамельний",
         "hex": "#f49657",
         "images": [
-          "assets/images/products/uploads/jwp-ma123-1.webp",
-          "assets/images/products/uploads/jwp-ma123-2.webp",
-          "assets/images/products/uploads/jwp-ma123-3.webp"
+          "assets/images/products/uploads/jwp-ma123-1.webp?v=78eae4e0",
+          "assets/images/products/uploads/jwp-ma123-2.webp?v=e92a472a",
+          "assets/images/products/uploads/jwp-ma123-3.webp?v=cd356942"
         ],
         "sku": "JWP-MA123"
       }
@@ -780,9 +782,9 @@
         "color": "Коричневий",
         "hex": "#af734e",
         "images": [
-          "assets/images/products/uploads/jwp-ma106-1.webp",
-          "assets/images/products/uploads/jwp-ma106-2.webp",
-          "assets/images/products/uploads/jwp-ma106-3.webp"
+          "assets/images/products/uploads/jwp-ma106-1.webp?v=5a874295",
+          "assets/images/products/uploads/jwp-ma106-2.webp?v=549b17a5",
+          "assets/images/products/uploads/jwp-ma106-3.webp?v=b0f30608"
         ],
         "sku": "JWP-MA106"
       }
@@ -828,10 +830,10 @@
         "color": "Синій",
         "hex": "#a084c4",
         "images": [
-          "assets/images/products/uploads/jwp-ma080-1.webp",
-          "assets/images/products/uploads/jwp-ma080-2.webp",
-          "assets/images/products/uploads/jwp-ma080-3.webp",
-          "assets/images/products/uploads/jwp-ma080-4.webp"
+          "assets/images/products/uploads/jwp-ma080-1.webp?v=fc0fc7bf",
+          "assets/images/products/uploads/jwp-ma080-2.webp?v=cdd88c6a",
+          "assets/images/products/uploads/jwp-ma080-3.webp?v=50298665",
+          "assets/images/products/uploads/jwp-ma080-4.webp?v=9fad1846"
         ],
         "sku": "JWP-MA080"
       }
@@ -879,10 +881,10 @@
         "color": "Темно-сірий",
         "hex": "#6d6d6f",
         "images": [
-          "assets/images/products/uploads/mj-1028s-0807ir-54-1.webp",
-          "assets/images/products/uploads/mj-1028s-0807ir-54-2.webp",
-          "assets/images/products/uploads/mj-1028s-0807ir-54-3.webp",
-          "assets/images/products/uploads/mj-1028s-0807ir-54-4.webp"
+          "assets/images/products/uploads/mj-1028s-0807ir-54-1.webp?v=a9c0ad01",
+          "assets/images/products/uploads/mj-1028s-0807ir-54-2.webp?v=b84ebecf",
+          "assets/images/products/uploads/mj-1028s-0807ir-54-3.webp?v=a8445457",
+          "assets/images/products/uploads/mj-1028s-0807ir-54-4.webp?v=e3155cbf"
         ],
         "sku": "MJ 1028S 0807IR 54",
         "sizes": [
@@ -930,9 +932,9 @@
         "color": "Темно-коричневий",
         "hex": "#6c2621",
         "images": [
-          "assets/images/products/uploads/mj-1061s-009qha-59-1.webp",
-          "assets/images/products/uploads/mj-1061s-009qha-59-2.webp",
-          "assets/images/products/uploads/mj-1061s-009qha-59-3.webp"
+          "assets/images/products/uploads/mj-1061s-009qha-59-1.webp?v=7827cf67",
+          "assets/images/products/uploads/mj-1061s-009qha-59-2.webp?v=17df7834",
+          "assets/images/products/uploads/mj-1061s-009qha-59-3.webp?v=e590adaf"
         ],
         "sku": "MJ 1061S 009QHA 59",
         "sizes": [
@@ -979,9 +981,9 @@
         "color": "Темно-сірий",
         "hex": "#534f54",
         "images": [
-          "assets/images/products/uploads/marc-409s-08079o-54-1.webp",
-          "assets/images/products/uploads/marc-409s-08079o-54-2.webp",
-          "assets/images/products/uploads/marc-409s-08079o-54-3.webp"
+          "assets/images/products/uploads/marc-409s-08079o-54-1.webp?v=e84ce983",
+          "assets/images/products/uploads/marc-409s-08079o-54-2.webp?v=28adce5a",
+          "assets/images/products/uploads/marc-409s-08079o-54-3.webp?v=0c71a0e9"
         ],
         "sku": "MARC 409S 08079O 54",
         "sizes": [
@@ -1028,9 +1030,9 @@
         "color": "Бежевий",
         "hex": "#e3d1b6",
         "images": [
-          "assets/images/products/uploads/2s3hcr500h03-134-1.webp",
-          "assets/images/products/uploads/2s3hcr500h03-134-2.webp",
-          "assets/images/products/uploads/2s3hcr500h03-134-3.webp"
+          "assets/images/products/uploads/2s3hcr500h03-134-1.webp?v=67d81cbd",
+          "assets/images/products/uploads/2s3hcr500h03-134-2.webp?v=b3a15be3",
+          "assets/images/products/uploads/2s3hcr500h03-134-3.webp?v=6f85764e"
         ],
         "sku": "2S3HCR500H03_134"
       },
@@ -1038,9 +1040,9 @@
         "color": "Чорний",
         "hex": "#29282a",
         "images": [
-          "assets/images/products/uploads/h153l01sp22-002-1.webp",
-          "assets/images/products/uploads/h153l01sp22-002-2.webp",
-          "assets/images/products/uploads/h153l01sp22-002-3.webp"
+          "assets/images/products/uploads/h153l01sp22-002-1.webp?v=b0fe28db",
+          "assets/images/products/uploads/h153l01sp22-002-2.webp?v=9aca5d47",
+          "assets/images/products/uploads/h153l01sp22-002-3.webp?v=0198e33b"
         ],
         "sku": "H153L01SP22-002"
       }
@@ -1091,9 +1093,9 @@
         "color": "Коричневий",
         "hex": "#996f4f",
         "images": [
-          "assets/images/products/uploads/2f3hsh042h02-230-1.webp",
-          "assets/images/products/uploads/2f3hsh042h02-230-2.webp",
-          "assets/images/products/uploads/2f3hsh042h02-230-3.webp"
+          "assets/images/products/uploads/2f3hsh042h02-230-1.webp?v=d0240bf3",
+          "assets/images/products/uploads/2f3hsh042h02-230-2.webp?v=503a3353",
+          "assets/images/products/uploads/2f3hsh042h02-230-3.webp?v=6b7b7e54"
         ],
         "sku": "2F3HSH042H02-230"
       }
@@ -1142,9 +1144,9 @@
         "color": "Чорний",
         "hex": "#242426",
         "images": [
-          "assets/images/products/uploads/h652l01pf22-1.webp",
-          "assets/images/products/uploads/h652l01pf22-2.webp",
-          "assets/images/products/uploads/h652l01pf22-3.webp"
+          "assets/images/products/uploads/h652l01pf22-1.webp?v=e3ecd3c4",
+          "assets/images/products/uploads/h652l01pf22-2.webp?v=482a8e79",
+          "assets/images/products/uploads/h652l01pf22-3.webp?v=9f9b5c09"
         ],
         "sku": "H652L01PF22"
       }
@@ -1194,8 +1196,8 @@
         "color": "Світло-сірий",
         "hex": "#cecdc6",
         "images": [
-          "assets/images/products/uploads/d31186mabu-1.webp",
-          "assets/images/products/uploads/d31186mabu-2.webp"
+          "assets/images/products/uploads/d31186mabu-1.webp?v=69938abb",
+          "assets/images/products/uploads/d31186mabu-2.webp?v=6854d847"
         ],
         "sku": "D31186MABU",
         "sizes": [
@@ -1243,9 +1245,9 @@
         "color": "Темно-сірий",
         "hex": "#3c3b3a",
         "images": [
-          "assets/images/products/uploads/d710bn-1.webp",
-          "assets/images/products/uploads/d710bn-2.webp",
-          "assets/images/products/uploads/d710bn-3.webp"
+          "assets/images/products/uploads/d710bn-1.webp?v=18aa5b81",
+          "assets/images/products/uploads/d710bn-2.webp?v=ad949bc2",
+          "assets/images/products/uploads/d710bn-3.webp?v=c6792282"
         ],
         "sku": "D710BN",
         "sizes": [
@@ -1293,9 +1295,9 @@
         "color": "Синій",
         "hex": "#bacbdb",
         "images": [
-          "assets/images/products/uploads/30h1ggrl2l-487-1.webp",
-          "assets/images/products/uploads/30h1ggrl2l-487-2.webp",
-          "assets/images/products/uploads/30h1ggrl2l-487-3.webp"
+          "assets/images/products/uploads/30h1ggrl2l-487-1.webp?v=70048d23",
+          "assets/images/products/uploads/30h1ggrl2l-487-2.webp?v=32d8a662",
+          "assets/images/products/uploads/30h1ggrl2l-487-3.webp?v=01be7b92"
         ],
         "sku": "30H1GGRL2L-487"
       }
@@ -1342,9 +1344,9 @@
         "color": "Бежевий",
         "hex": "#cdb89a",
         "images": [
-          "assets/images/products/uploads/mk4619-1.webp",
-          "assets/images/products/uploads/mk4619-2.webp",
-          "assets/images/products/uploads/mk4619-3.webp"
+          "assets/images/products/uploads/mk4619-1.webp?v=3d7e34cb",
+          "assets/images/products/uploads/mk4619-2.webp?v=a388213f",
+          "assets/images/products/uploads/mk4619-3.webp?v=f3b08e90"
         ],
         "sku": "MK4619",
         "sizes": [
@@ -1391,9 +1393,9 @@
         "color": "Темно-сірий",
         "hex": "#3e3b3c",
         "images": [
-          "assets/images/products/uploads/pr-20ws-1ab5s0-49-1.webp",
-          "assets/images/products/uploads/pr-20ws-1ab5s0-49-2.webp",
-          "assets/images/products/uploads/pr-20ws-1ab5s0-49-3.webp"
+          "assets/images/products/uploads/pr-20ws-1ab5s0-49-1.webp?v=a3dfd4b5",
+          "assets/images/products/uploads/pr-20ws-1ab5s0-49-2.webp?v=0d5e7ad7",
+          "assets/images/products/uploads/pr-20ws-1ab5s0-49-3.webp?v=6906e73f"
         ],
         "sku": "PR 20WS 1AB5S0 49",
         "sizes": [
@@ -1447,9 +1449,9 @@
         "hex": "#0a0000",
         "sku": "35F1GX0C5U",
         "images": [
-          "/assets/images/products/uploads/35f1gx0c5u-1-.webp",
-          "/assets/images/products/uploads/35f1gx0c5u-2-.webp",
-          "/assets/images/products/uploads/c9149295-ab22-4007-afc5-eedc1ba4ff80.jpg"
+          "/assets/images/products/uploads/35f1gx0c5u-1-.webp?v=3c55c3c3",
+          "/assets/images/products/uploads/35f1gx0c5u-2-.webp?v=9fd6dd13",
+          "/assets/images/products/uploads/c9149295-ab22-4007-afc5-eedc1ba4ff80.jpg?v=54e285a7"
         ]
       },
       {
@@ -1457,14 +1459,14 @@
         "hex": "#c1bfbf",
         "sku": "35F0SX0C5T",
         "images": [
-          "/assets/images/products/uploads/000001_1644393747.webp"
+          "/assets/images/products/uploads/000001_1644393747.webp?v=5488289d"
         ]
       },
       {
         "images": [
-          "/assets/images/products/uploads/35f1gx0c5u.webp",
-          "/assets/images/products/uploads/35f1gx0c5u-3-.webp",
-          "/assets/images/products/uploads/d14f4ff9-1527-4de8-9c0e-b5bc28f0ce69.jpg"
+          "/assets/images/products/uploads/35f1gx0c5u.webp?v=55ab1748",
+          "/assets/images/products/uploads/35f1gx0c5u-3-.webp?v=7a11ae81",
+          "/assets/images/products/uploads/d14f4ff9-1527-4de8-9c0e-b5bc28f0ce69.jpg?v=760197b0"
         ],
         "video": "",
         "color": "Racing Green",
@@ -1476,10 +1478,10 @@
         "sku": "35F1GX0C5U",
         "hex": "#0e5fbc",
         "images": [
-          "/assets/images/products/uploads/michael-kors-rose-small-top-handle-crossbody-quilted-navy-front-scaled.webp",
-          "/assets/images/products/uploads/michael-kors-rose-small-top-handle-crossbody-quilted-navy-angle-scaled.webp",
-          "/assets/images/products/uploads/2ed9179f-687b-4e08-8769-ddcff453b8a1.jpg",
-          "/assets/images/products/uploads/35f1gx0c5u-1-navy.webp"
+          "/assets/images/products/uploads/michael-kors-rose-small-top-handle-crossbody-quilted-navy-front-scaled.webp?v=a454d829",
+          "/assets/images/products/uploads/michael-kors-rose-small-top-handle-crossbody-quilted-navy-angle-scaled.webp?v=4b52a04e",
+          "/assets/images/products/uploads/2ed9179f-687b-4e08-8769-ddcff453b8a1.jpg?v=eb189c34",
+          "/assets/images/products/uploads/35f1gx0c5u-1-navy.webp?v=a4c240ac"
         ]
       }
     ],
@@ -1549,10 +1551,10 @@
         "hex": "#f0ca4d",
         "sku": "JC4118PP1FLT0",
         "images": [
-          "/assets/images/products/uploads/8hybhuwa8-pieihdxmmy4qa25el9a4rw-3c4axbydv-smd.webp",
-          "/assets/images/products/uploads/txvdeftbnijzrfdwvf4win8rqlzsyr-8wmrxlu7dxtu-smd.webp",
-          "/assets/images/products/uploads/vgridejhnrc1qnilkwjvdn0bstqu39-ztwyqjz8eql-smd.webp",
-          "/assets/images/products/uploads/18674373_41344477_2048.webp"
+          "/assets/images/products/uploads/8hybhuwa8-pieihdxmmy4qa25el9a4rw-3c4axbydv-smd.webp?v=25c5e07c",
+          "/assets/images/products/uploads/txvdeftbnijzrfdwvf4win8rqlzsyr-8wmrxlu7dxtu-smd.webp?v=2f22ee73",
+          "/assets/images/products/uploads/vgridejhnrc1qnilkwjvdn0bstqu39-ztwyqjz8eql-smd.webp?v=66909171",
+          "/assets/images/products/uploads/18674373_41344477_2048.webp?v=d0ab9325"
         ]
       }
     ],
@@ -1592,10 +1594,10 @@
         "hex": "#272626",
         "sku": "JC4116PP1FLT0000",
         "images": [
-          "/assets/images/products/uploads/800070279777-1.jpg",
-          "/assets/images/products/uploads/800070279777-3.jpg",
-          "/assets/images/products/uploads/800070279777-4.jpg",
-          "/assets/images/products/uploads/torbica-love-moschino-jc4116pp1flt0000-nero.webp"
+          "/assets/images/products/uploads/800070279777-1.jpg?v=7c99f762",
+          "/assets/images/products/uploads/800070279777-3.jpg?v=9ed8bfc4",
+          "/assets/images/products/uploads/800070279777-4.jpg?v=0bb2503d",
+          "/assets/images/products/uploads/torbica-love-moschino-jc4116pp1flt0000-nero.webp?v=59a731c3"
         ],
         "video": "/assets/images/products/uploads/video360_8058051562499_ak_1022p.mp4"
       }
@@ -1657,10 +1659,10 @@
         "hex": "#f0c0e6",
         "sku": "35F2GCCS2L",
         "images": [
-          "/assets/images/products/uploads/gambar-depan-michael-kors-carine-medium--de0afdc3.webp",
-          "/assets/images/products/uploads/gambar-belakang-michael-kors-carine-medi-5af6b1f4.webp",
-          "/assets/images/products/uploads/gambar-dalam-michael-kors-carine-medium--a53019fe.webp",
-          "/assets/images/products/uploads/on-model-michael-kors-carine-medium-pebb-3455daed.webp"
+          "/assets/images/products/uploads/gambar-depan-michael-kors-carine-medium--de0afdc3.webp?v=ae066f46",
+          "/assets/images/products/uploads/gambar-belakang-michael-kors-carine-medi-5af6b1f4.webp?v=46bae80a",
+          "/assets/images/products/uploads/gambar-dalam-michael-kors-carine-medium--a53019fe.webp?v=2fc1f888",
+          "/assets/images/products/uploads/on-model-michael-kors-carine-medium-pebb-3455daed.webp?v=9c956937"
         ]
       }
     ],
@@ -1731,9 +1733,9 @@
         "hex": "#0d0000",
         "sku": "NENA/S 807 51",
         "images": [
-          "/assets/images/products/uploads/jimmy-choo-sunglasses-nena-s-807-afw1500fh937.5.webp",
-          "/assets/images/products/uploads/41my3jtmifl.webp",
-          "/assets/images/products/uploads/30486-34-550x550.webp"
+          "/assets/images/products/uploads/jimmy-choo-sunglasses-nena-s-807-afw1500fh937.5.webp?v=48a63580",
+          "/assets/images/products/uploads/41my3jtmifl.webp?v=f0a220bb",
+          "/assets/images/products/uploads/30486-34-550x550.webp?v=3b7a962c"
         ]
       }
     ],
@@ -1792,9 +1794,9 @@
         "color": "Nero",
         "hex": "#000000",
         "images": [
-          "/assets/images/products/uploads/marc-jacobs-grey-shaded-cat-eye-ladies-s-bcd8d8a1.webp",
-          "/assets/images/products/uploads/marc-jacobs-grey-shaded-cat-eye-ladies-s-1aa9cb62.webp",
-          "/assets/images/products/uploads/marc-jacobs-grey-shaded-cat-eye-ladies-s-c65576ec.webp"
+          "/assets/images/products/uploads/marc-jacobs-grey-shaded-cat-eye-ladies-s-bcd8d8a1.webp?v=650eab9d",
+          "/assets/images/products/uploads/marc-jacobs-grey-shaded-cat-eye-ladies-s-1aa9cb62.webp?v=20b41051",
+          "/assets/images/products/uploads/marc-jacobs-grey-shaded-cat-eye-ladies-s-c65576ec.webp?v=1e4d788c"
         ],
         "video": "/assets/images/products/uploads/marc-jacobs-grey-shaded-cat-eye-ladies-s-c65576ec.webp"
       }
@@ -1851,10 +1853,10 @@
         "color": "White",
         "hex": "#f6f6f4",
         "images": [
-          "/assets/images/products/uploads/61nzkwkzmsl._sx700_-1-.webp",
-          "/assets/images/products/uploads/612qqlnx4al._sx700_.webp",
-          "/assets/images/products/uploads/613xarv4knl._sx700_.webp",
-          "/assets/images/products/uploads/61z3jdbac7l._sx700_.webp"
+          "/assets/images/products/uploads/61nzkwkzmsl._sx700_-1-.webp?v=9bc0dae8",
+          "/assets/images/products/uploads/612qqlnx4al._sx700_.webp?v=4ac37f6e",
+          "/assets/images/products/uploads/613xarv4knl._sx700_.webp?v=fefa9b1c",
+          "/assets/images/products/uploads/61z3jdbac7l._sx700_.webp?v=052ee141"
         ]
       }
     ],
@@ -1908,10 +1910,10 @@
         "color": "White",
         "hex": "#eff1ea",
         "images": [
-          "/assets/images/products/uploads/124849469.webp",
-          "/assets/images/products/uploads/124849470.webp",
-          "/assets/images/products/uploads/124849471.webp",
-          "/assets/images/products/uploads/124849473.webp"
+          "/assets/images/products/uploads/124849469.webp?v=14033d6d",
+          "/assets/images/products/uploads/124849470.webp?v=d6c256f5",
+          "/assets/images/products/uploads/124849471.webp?v=76d576b0",
+          "/assets/images/products/uploads/124849473.webp?v=b3ab9591"
         ]
       }
     ],
@@ -1974,10 +1976,10 @@
         "hex": "#f8faf6",
         "color": "Барвистий",
         "images": [
-          "/assets/images/products/uploads/e5de78de-29a2-40ba-8edd-a70c4e1ea31b_size2000x2000_cropcenter.webp",
-          "/assets/images/products/uploads/f7e4b799-732f-44f2-975b-40cd657042ed_size2000x2000_cropcenter.webp",
-          "/assets/images/products/uploads/f33f16ca-2354-4bb1-a195-063ef2737099_size2000x2000_cropcenter.webp",
-          "/assets/images/products/uploads/8bfe46ad-4152-486e-af2b-0e8f2715354a_size2000x2000_cropcenter-1-.webp"
+          "/assets/images/products/uploads/e5de78de-29a2-40ba-8edd-a70c4e1ea31b_size2000x2000_cropcenter.webp?v=214fd1a4",
+          "/assets/images/products/uploads/f7e4b799-732f-44f2-975b-40cd657042ed_size2000x2000_cropcenter.webp?v=64d49660",
+          "/assets/images/products/uploads/f33f16ca-2354-4bb1-a195-063ef2737099_size2000x2000_cropcenter.webp?v=15fbe7f8",
+          "/assets/images/products/uploads/8bfe46ad-4152-486e-af2b-0e8f2715354a_size2000x2000_cropcenter-1-.webp?v=9a98d03d"
         ]
       }
     ],
@@ -2041,10 +2043,10 @@
           "38"
         ],
         "images": [
-          "/assets/images/products/uploads/88bdc44c-fb6f-4884-b458-b19cc1e62afa_size2000x2000_cropcenter.webp",
-          "/assets/images/products/uploads/d1ac0ffd-1eaf-49fa-a647-4367eb3903ec_size2000x2000_cropcenter.webp",
-          "/assets/images/products/uploads/b7842f76-5f88-4078-92a4-f026770f790e_size2000x2000_cropcenter.webp",
-          "/assets/images/products/uploads/510f13a6-c954-47f8-beda-b551a9557a8e_size2000x2000_cropcenter.webp"
+          "/assets/images/products/uploads/88bdc44c-fb6f-4884-b458-b19cc1e62afa_size2000x2000_cropcenter.webp?v=3afcabe5",
+          "/assets/images/products/uploads/d1ac0ffd-1eaf-49fa-a647-4367eb3903ec_size2000x2000_cropcenter.webp?v=14847d04",
+          "/assets/images/products/uploads/b7842f76-5f88-4078-92a4-f026770f790e_size2000x2000_cropcenter.webp?v=37303533",
+          "/assets/images/products/uploads/510f13a6-c954-47f8-beda-b551a9557a8e_size2000x2000_cropcenter.webp?v=c963f1cd"
         ]
       }
     ],
@@ -2099,9 +2101,9 @@
         "color": "Рожевий",
         "hex": "#e10cc0",
         "images": [
-          "/assets/images/products/uploads/f7f0e509c4be46ffb9d3ef22b5ba170e.webp",
-          "/assets/images/products/uploads/c8995a203d3b4b9291e3348646974342.webp",
-          "/assets/images/products/uploads/c126c8e7b28b4046bbabd9d5194d182b.webp"
+          "/assets/images/products/uploads/f7f0e509c4be46ffb9d3ef22b5ba170e.webp?v=fac6f6ab",
+          "/assets/images/products/uploads/c8995a203d3b4b9291e3348646974342.webp?v=e84d738a",
+          "/assets/images/products/uploads/c126c8e7b28b4046bbabd9d5194d182b.webp?v=d117cef2"
         ]
       }
     ],
@@ -2157,9 +2159,9 @@
         "hex": "#161616",
         "sizes": [],
         "images": [
-          "/assets/images/products/uploads/45sfa0001_075_02-1-.webp",
-          "/assets/images/products/uploads/45sfa0001_075_01.webp",
-          "/assets/images/products/uploads/ss23-obm1w1-99x_f4.webp"
+          "/assets/images/products/uploads/45sfa0001_075_02-1-.webp?v=301d19ee",
+          "/assets/images/products/uploads/45sfa0001_075_01.webp?v=959d7b89",
+          "/assets/images/products/uploads/ss23-obm1w1-99x_f4.webp?v=4b8396fd"
         ]
       }
     ],
@@ -2214,8 +2216,8 @@
         "hex": "#031578",
         "color": "Marine daphne 793",
         "images": [
-          "/assets/images/products/uploads/nh4040nz_793_24.webp",
-          "/assets/images/products/uploads/nh4040nz_793_31.webp"
+          "/assets/images/products/uploads/nh4040nz_793_24.webp?v=7d5db841",
+          "/assets/images/products/uploads/nh4040nz_793_31.webp?v=c690ab21"
         ],
         "video": ""
       }
@@ -2265,10 +2267,10 @@
         "color": "Білий Wht-Dk Grn 286",
         "hex": "#ffffff",
         "images": [
-          "/assets/images/products/uploads/sneakers-lacoste-elite-active-746sma0008-wht-dk-grn-286-0000303494858.webp",
-          "/assets/images/products/uploads/sneakers-lacoste-elite-active-746sma0008-46ba82b5.webp",
-          "/assets/images/products/uploads/sneakers-lacoste-elite-active-746sma0008-fa044eec.webp",
-          "/assets/images/products/uploads/sneakers-lacoste-elite-active-746sma0008-e10010fd.webp"
+          "/assets/images/products/uploads/sneakers-lacoste-elite-active-746sma0008-wht-dk-grn-286-0000303494858.webp?v=abc7198e",
+          "/assets/images/products/uploads/sneakers-lacoste-elite-active-746sma0008-46ba82b5.webp?v=98368b98",
+          "/assets/images/products/uploads/sneakers-lacoste-elite-active-746sma0008-fa044eec.webp?v=b8081c1f",
+          "/assets/images/products/uploads/sneakers-lacoste-elite-active-746sma0008-e10010fd.webp?v=8c0bb0bb"
         ]
       }
     ],
@@ -2322,10 +2324,10 @@
         "color": "Біло-помаранчевий",
         "hex": "#ffffff",
         "images": [
-          "/assets/images/products/uploads/9a6de5f3db734534b849269b9b8efda3.webp",
-          "/assets/images/products/uploads/5e7f76a3740344a884d67834efc5cef8.webp",
-          "/assets/images/products/uploads/6b15e7dfca384ec797dbde12aad79176.webp",
-          "/assets/images/products/uploads/6c62a95311fd499f8cd54c4c96e0143f.webp"
+          "/assets/images/products/uploads/9a6de5f3db734534b849269b9b8efda3.webp?v=9498d6e6",
+          "/assets/images/products/uploads/5e7f76a3740344a884d67834efc5cef8.webp?v=cfa7a458",
+          "/assets/images/products/uploads/6b15e7dfca384ec797dbde12aad79176.webp?v=fd70db58",
+          "/assets/images/products/uploads/6c62a95311fd499f8cd54c4c96e0143f.webp?v=5ca04306"
         ]
       }
     ],
@@ -2379,10 +2381,10 @@
         "color": "Білий White 21G",
         "hex": "#ffffff",
         "images": [
-          "/assets/images/products/uploads/f24af44f-75d6-44a6-95a6-4f3655e50909_size2000x2000_cropcenter.webp",
-          "/assets/images/products/uploads/802ff4ae-b7b9-48c7-bcde-7862f3e83810_size2000x2000_cropcenter.webp",
-          "/assets/images/products/uploads/13949588-c4af-47dc-ad68-2a22e3971c3d_size2000x2000_cropcenter.webp",
-          "/assets/images/products/uploads/eea98936-ada5-48dc-b7d4-f61f2e2da8ec_size2000x2000_cropcenter-1-.webp"
+          "/assets/images/products/uploads/f24af44f-75d6-44a6-95a6-4f3655e50909_size2000x2000_cropcenter.webp?v=ebd132f3",
+          "/assets/images/products/uploads/802ff4ae-b7b9-48c7-bcde-7862f3e83810_size2000x2000_cropcenter.webp?v=40233201",
+          "/assets/images/products/uploads/13949588-c4af-47dc-ad68-2a22e3971c3d_size2000x2000_cropcenter.webp?v=96c795cf",
+          "/assets/images/products/uploads/eea98936-ada5-48dc-b7d4-f61f2e2da8ec_size2000x2000_cropcenter-1-.webp?v=52d97504"
         ]
       }
     ],
@@ -2436,10 +2438,10 @@
         "color": "Бежевий  1R5",
         "hex": "#e5e4e4",
         "images": [
-          "/assets/images/products/uploads/bc4302e5-037f-4a05-b3b7-d6f959c4c00c_size2000x2000_cropcenter.webp",
-          "/assets/images/products/uploads/894a2223-e123-468a-9c5e-6949a9f72643_size2000x2000_cropcenter.webp",
-          "/assets/images/products/uploads/02e9fde1-b8ec-4df3-812c-6869dbcfb37c_size2000x2000_cropcenter.webp",
-          "/assets/images/products/uploads/1e18c52b-9cf3-411f-8897-4c0830babd56_size2000x2000_cropcenter.webp"
+          "/assets/images/products/uploads/bc4302e5-037f-4a05-b3b7-d6f959c4c00c_size2000x2000_cropcenter.webp?v=ef5b6dd4",
+          "/assets/images/products/uploads/894a2223-e123-468a-9c5e-6949a9f72643_size2000x2000_cropcenter.webp?v=af928db3",
+          "/assets/images/products/uploads/02e9fde1-b8ec-4df3-812c-6869dbcfb37c_size2000x2000_cropcenter.webp?v=6fbf0f18",
+          "/assets/images/products/uploads/1e18c52b-9cf3-411f-8897-4c0830babd56_size2000x2000_cropcenter.webp?v=91d33102"
         ]
       }
     ],
@@ -2495,11 +2497,11 @@
         "color": "Чорний",
         "hex": "#000000",
         "images": [
-          "/assets/images/products/uploads/25077124~black_0.webp",
-          "/assets/images/products/uploads/25077124~black_2.webp",
-          "/assets/images/products/uploads/25077124~black_4.webp",
-          "/assets/images/products/uploads/25077124~black_3.webp",
-          "/assets/images/products/uploads/25077124~black_1.webp"
+          "/assets/images/products/uploads/25077124~black_0.webp?v=e133ec5c",
+          "/assets/images/products/uploads/25077124~black_2.webp?v=4a53f677",
+          "/assets/images/products/uploads/25077124~black_4.webp?v=54ac35fa",
+          "/assets/images/products/uploads/25077124~black_3.webp?v=5600db41",
+          "/assets/images/products/uploads/25077124~black_1.webp?v=00086367"
         ]
       }
     ],
@@ -2562,11 +2564,11 @@
         "color": "Чорний",
         "hex": "#000000",
         "images": [
-          "/assets/images/products/uploads/cr144_svbk_a0.webp",
-          "/assets/images/products/uploads/cr144_svbk_a3.webp",
-          "/assets/images/products/uploads/cr144_svbk_a8.webp",
-          "/assets/images/products/uploads/cr144_svbk_a91.webp",
-          "/assets/images/products/uploads/cr144_svbk_a92.webp"
+          "/assets/images/products/uploads/cr144_svbk_a0.webp?v=61a11201",
+          "/assets/images/products/uploads/cr144_svbk_a3.webp?v=29349f7b",
+          "/assets/images/products/uploads/cr144_svbk_a8.webp?v=3396099d",
+          "/assets/images/products/uploads/cr144_svbk_a91.webp?v=9b216b0d",
+          "/assets/images/products/uploads/cr144_svbk_a92.webp?v=cd7d11a6"
         ],
         "sizes": [
           "ONESIZE"
@@ -2579,10 +2581,10 @@
           "ONESIZE"
         ],
         "images": [
-          "/assets/images/products/uploads/cr144_svha_a0.webp",
-          "/assets/images/products/uploads/cr144_svha_a3.webp",
-          "/assets/images/products/uploads/cr144_svha_a8.webp",
-          "/assets/images/products/uploads/cr144_svha_a91.webp"
+          "/assets/images/products/uploads/cr144_svha_a0.webp?v=ea8f1914",
+          "/assets/images/products/uploads/cr144_svha_a3.webp?v=28de9b52",
+          "/assets/images/products/uploads/cr144_svha_a8.webp?v=aee08df9",
+          "/assets/images/products/uploads/cr144_svha_a91.webp?v=bd826000"
         ]
       }
     ],
@@ -2649,10 +2651,10 @@
         "color": "Bronze Green",
         "hex": "#285d06",
         "images": [
-          "/assets/images/products/uploads/the-j-marc-shoulder-bag-bronze-green-h956l01pf22-365-800x800.webp",
-          "/assets/images/products/uploads/the-j-marc-shoulder-bag-bronze-green-additional-image-5192-800x800.webp",
-          "/assets/images/products/uploads/the-j-marc-shoulder-bag-bronze-green-additional-image-5191-800x800.webp",
-          "/assets/images/products/uploads/the-j-marc-shoulder-bag-bronze-green-additional-image-5193-800x800.webp"
+          "/assets/images/products/uploads/the-j-marc-shoulder-bag-bronze-green-h956l01pf22-365-800x800.webp?v=d84aca80",
+          "/assets/images/products/uploads/the-j-marc-shoulder-bag-bronze-green-additional-image-5192-800x800.webp?v=cbed9928",
+          "/assets/images/products/uploads/the-j-marc-shoulder-bag-bronze-green-additional-image-5191-800x800.webp?v=b5dd5095",
+          "/assets/images/products/uploads/the-j-marc-shoulder-bag-bronze-green-additional-image-5193-800x800.webp?v=5b4df788"
         ]
       }
     ],
@@ -2717,11 +2719,11 @@
         "color": "Gold Chalk Glacier White Multi",
         "hex": "#ddd8d1",
         "images": [
-          "/assets/images/products/uploads/ca148_imrfi_a0.webp",
-          "/assets/images/products/uploads/ca148_imrfi_a3.webp",
-          "/assets/images/products/uploads/ca148_imrfi_a8.webp",
-          "/assets/images/products/uploads/ca148_imrfi_a92.webp",
-          "/assets/images/products/uploads/ca148_imrfi_a91.webp"
+          "/assets/images/products/uploads/ca148_imrfi_a0.webp?v=e0ef2093",
+          "/assets/images/products/uploads/ca148_imrfi_a3.webp?v=52f3e05f",
+          "/assets/images/products/uploads/ca148_imrfi_a8.webp?v=c3e24695",
+          "/assets/images/products/uploads/ca148_imrfi_a92.webp?v=8cfbaddc",
+          "/assets/images/products/uploads/ca148_imrfi_a91.webp?v=b41ba610"
         ]
       }
     ],
@@ -2788,10 +2790,10 @@
         "color": "Aspen Green зелений",
         "hex": "#1c7e05",
         "images": [
-          "/assets/images/products/uploads/aspen-green-cement-m.webp",
-          "/assets/images/products/uploads/aspen-green-cement4.webp",
-          "/assets/images/products/uploads/aspen-green-cement3.webp",
-          "/assets/images/products/uploads/aspen-green-cement-m1.webp"
+          "/assets/images/products/uploads/aspen-green-cement-m.webp?v=f80ccdb0",
+          "/assets/images/products/uploads/aspen-green-cement4.webp?v=529db0e3",
+          "/assets/images/products/uploads/aspen-green-cement3.webp?v=7fbd39ee",
+          "/assets/images/products/uploads/aspen-green-cement-m1.webp?v=dce978f4"
         ]
       }
     ],
@@ -2858,10 +2860,10 @@
         "color": "Pink",
         "hex": "#ff07db",
         "images": [
-          "/assets/images/products/uploads/27687307_57865310_2048.webp",
-          "/assets/images/products/uploads/27687307_57865301_2048.webp",
-          "/assets/images/products/uploads/27687307_57865307_2048.webp",
-          "/assets/images/products/uploads/27687307_57865304_2048.webp"
+          "/assets/images/products/uploads/27687307_57865310_2048.webp?v=ad162858",
+          "/assets/images/products/uploads/27687307_57865301_2048.webp?v=3aab993d",
+          "/assets/images/products/uploads/27687307_57865307_2048.webp?v=e3c159b9",
+          "/assets/images/products/uploads/27687307_57865304_2048.webp?v=c05d5a38"
         ]
       }
     ],
@@ -2927,11 +2929,11 @@
         "color": "Black Beige  чорний  бежевий",
         "hex": "#e5e0e0",
         "images": [
-          "/assets/images/products/uploads/215896950_beige_in.webp",
-          "/assets/images/products/uploads/215896950_beige_bk.webp",
-          "/assets/images/products/uploads/215896950_beige_cu.webp",
-          "/assets/images/products/uploads/215896950_beige_e1.webp",
-          "/assets/images/products/uploads/215896950_beige_fr.webp"
+          "/assets/images/products/uploads/215896950_beige_in.webp?v=b64baf37",
+          "/assets/images/products/uploads/215896950_beige_bk.webp?v=2805791c",
+          "/assets/images/products/uploads/215896950_beige_cu.webp?v=4d09af91",
+          "/assets/images/products/uploads/215896950_beige_e1.webp?v=f94f6dd2",
+          "/assets/images/products/uploads/215896950_beige_fr.webp?v=49580f5a"
         ]
       }
     ],
@@ -2999,10 +3001,10 @@
         "color": "Cement тауповий - сіро-бежевий",
         "hex": "#bcb5b5",
         "images": [
-          "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-ce-16a06f5f.webp",
-          "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-ce-00e1b92f.webp",
-          "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-ce-93206bc0.webp",
-          "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-cement-h009l01sp21-055-800x800.webp"
+          "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-ce-16a06f5f.webp?v=86197255",
+          "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-ce-00e1b92f.webp?v=1dea684d",
+          "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-ce-93206bc0.webp?v=578f1915",
+          "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-cement-h009l01sp21-055-800x800.webp?v=d578d3a6"
         ]
       }
     ],
@@ -3051,6 +3053,295 @@
       "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-ce-00e1b92f.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-ce-93206bc0.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-cement-h009l01sp21-055-800x800.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "5–10 робочих днів",
+    "forcePublish": false,
+    "material": "Натуральна шкіра",
+    "brand": "Marc Jacobs",
+    "price": 9800,
+    "preOrder": false,
+    "dimensions": "22 × 12 × 7 см",
+    "variants": [
+      {
+        "color": "Cotton/Silver — молочний",
+        "hex": "#fafafa",
+        "images": [
+          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-4a08b27e.webp?v=02bd32c1",
+          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-d6f46dd3.webp?v=641d718b",
+          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-def1e99f.webp?v=d34aac37",
+          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-c1370464.webp?v=29b67e21",
+          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-28c7d0f9.webp?v=18766020"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 50,
+    "strapInfo": "2 знімні ремені — шкіряний та текстильний регульований",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "searchKeywords": [
+      "Marc Jacobs",
+      "The Leather Cargo Bag",
+      "Marc Jacobs Cargo Bag",
+      "Marc Jacobs 2S4HSH085H02",
+      "2S4HSH085H02-140",
+      "Marc Jacobs сумка",
+      "сумка Marc Jacobs",
+      "жіноча сумка Marc Jacobs",
+      "Cargo Bag",
+      "cargo сумка",
+      "шкіряна сумка",
+      "сумка з натуральної шкіри",
+      "молочна сумка",
+      "біла сумка",
+      "Cotton Silver",
+      "срібляста фурнітура",
+      "сумка через плече",
+      "сумка на плече",
+      "кросбоді",
+      "брендова сумка",
+      "оригінальна Marc Jacobs"
+    ],
+    "isNew": false,
+    "title": "Сумка Marc Jacobs The Leather Cargo Bag Cotton Silver",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильна та функціональна сумка Marc Jacobs The Leather Cargo Bag у відтінку Cotton/Silver — модель із виразним дизайном у стилі cargo та практичною системою кишень.\nСумка виготовлена з натуральної зернистої шкіри та доповнена сріблястою фурнітурою. На передній частині розташовані дві накладні кишені з клапанами, з боків — кишені на блискавці. Основне відділення закривається на блискавку.\nМодель має два знімні ремені: шкіряний ремінь для носіння на плечі та широкий регульований текстильний ремінь із логотипом. Завдяки цьому сумку можна носити на плечі або через плече",
+    "sku": "2S4HSH085H02-140",
+    "rating": 5,
+    "category": "Жіночі сумки",
+    "slug": "сумка-marc-jacobs-the-leather-cargo-bag-cotton-silver",
+    "id": 53,
+    "color": "Cotton/Silver — молочний",
+    "images": [
+      "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-4a08b27e.webp",
+      "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-d6f46dd3.webp",
+      "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-def1e99f.webp",
+      "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-c1370464.webp",
+      "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-28c7d0f9.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "5–10 робочих днів",
+    "forcePublish": false,
+    "material": "Натуральна шкіра",
+    "brand": "Marc Jacobs",
+    "price": 9800,
+    "preOrder": false,
+    "dimensions": "22 × 12 × 7 см",
+    "variants": [
+      {
+        "color": "Camel — карамельний, світло-коричневий",
+        "hex": "#d4cbb7",
+        "images": [
+          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--d9f458f8.webp?v=14107657",
+          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--3f139d71.webp?v=f67824c9",
+          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--b0481126.webp?v=5c43d40d",
+          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--f7ef8033.webp?v=ce0b4dc8",
+          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--c2093755.webp?v=aaba56ea",
+          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--e63574a7.webp?v=72269e74"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 50,
+    "strapInfo": "Два знімні ремені",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "searchKeywords": [
+      "Marc Jacobs",
+      "The Leather Cargo Bag",
+      "Marc Jacobs Cargo Bag",
+      "Marc Jacobs 2S4HSH085H02",
+      "2S4HSH085H02",
+      "Marc Jacobs сумка",
+      "сумка Marc Jacobs",
+      "жіноча сумка Marc Jacobs",
+      "Cargo Bag",
+      "The Cargo",
+      "cargo сумка",
+      "шкіряна сумка",
+      "сумка з натуральної шкіри",
+      "коричнева сумка",
+      "карамельна сумка",
+      "Camel",
+      "сумка на плече",
+      "сумка через плече",
+      "кросбоді",
+      "сумка з кишенями",
+      "брендова сумка",
+      "оригінальна Marc Jacobs"
+    ],
+    "isNew": false,
+    "title": "Сумка Marc Jacobs The Leather Cargo Bag Camel",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильна та функціональна сумка Marc Jacobs The Leather Cargo Bag у теплому відтінку Camel. Модель поєднує лаконічний дизайн із практичною конструкцією та великою кількістю зручних зовнішніх кишень.\nСумка виготовлена з натуральної зернистої шкіри та доповнена фірмовим логотипом Marc Jacobs. Має основне відділення на блискавці, дві зовнішні кишені на блискавці та дві накладні кишені з магнітними застібками.\nМодель комплектується двома знімними ременями: шкіряним ременем для носіння на плечі та регульованим текстильним ременем для носіння через плече",
+    "sku": "2S4HSH085H02",
+    "rating": 5,
+    "category": "Жіночі сумки",
+    "slug": "сумка-marc-jacobs-the-leather-cargo-bag-camel",
+    "id": 54,
+    "color": "Camel — карамельний, світло-коричневий",
+    "images": [
+      "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--d9f458f8.webp",
+      "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--3f139d71.webp",
+      "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--b0481126.webp",
+      "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--f7ef8033.webp",
+      "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--c2093755.webp",
+      "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--e63574a7.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "5–10 робочих днів",
+    "forcePublish": false,
+    "material": "Натуральна шкіра",
+    "brand": "Marc Jacobs",
+    "price": 9800,
+    "preOrder": false,
+    "dimensions": "22 × 12 × 7 см",
+    "variants": [
+      {
+        "color": "Black чорний",
+        "hex": "#000000",
+        "images": [
+          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--2013c7eb.webp?v=25c5ff7f",
+          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--3eeb5b5d.webp?v=92578216",
+          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--e6d79062.webp?v=40d15638",
+          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--8fc5eccc.webp?v=4e0dd752",
+          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--20634337.webp?v=77e63951",
+          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--3bae4de6.webp?v=315e2785"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 50,
+    "strapInfo": "Два знімні ремені",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "searchKeywords": [
+      "Marc Jacobs",
+      "The Leather Cargo Bag",
+      "Marc Jacobs Cargo Bag",
+      "Marc Jacobs 2S4HSH085H02",
+      "2S4HSH085H02-001",
+      "Marc Jacobs сумка",
+      "сумка Marc Jacobs",
+      "жіноча сумка Marc Jacobs",
+      "Cargo Bag",
+      "cargo сумка",
+      "шкіряна сумка",
+      "сумка з натуральної шкіри",
+      "чорна сумка",
+      "чорна сумка Marc Jacobs",
+      "Black",
+      "сумка на плече",
+      "сумка через плече",
+      "кросбоді",
+      "сумка з кишенями",
+      "брендова сумка",
+      "оригінальна Marc Jacobs"
+    ],
+    "isNew": false,
+    "title": "Сумка Marc Jacobs The Leather Cargo Bag Black",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильна та функціональна сумка Marc Jacobs The Leather Cargo Bag у класичному чорному кольорі. Модель поєднує лаконічний дизайн із практичною конструкцією cargo та великою кількістю функціональних кишень.\nСумка виготовлена зі 100% натуральної шкіри та доповнена сріблястою фурнітурою. Має основне відділення на блискавці, дві зовнішні кишені на блискавці та дві накладні кишені з магнітними застібками.\nМодель комплектується двома знімними ременями: шкіряним ременем та регульованим текстильним ременем. Її можна носити на плечі або через плече",
+    "sku": "2S4HSH085H02-001",
+    "rating": 5,
+    "category": "Жіночі сумки",
+    "slug": "сумка-marc-jacobs-the-leather-cargo-bag-black",
+    "id": 55,
+    "color": "Black чорний",
+    "images": [
+      "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--2013c7eb.webp",
+      "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--3eeb5b5d.webp",
+      "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--e6d79062.webp",
+      "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--8fc5eccc.webp",
+      "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--20634337.webp",
+      "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--3bae4de6.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "5–10 робочих днів",
+    "forcePublish": false,
+    "material": "Натуральна шкіра",
+    "brand": "Marc Jacobs",
+    "price": 10000,
+    "preOrder": false,
+    "dimensions": "25,5 × 20 × 13 см",
+    "variants": [
+      {
+        "color": "Twine — бежево-кремовий",
+        "hex": "#bb993c",
+        "images": [
+          "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-d0dd33cf.webp?v=89145062",
+          "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-de081418.webp?v=1d737f86",
+          "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-628c7ef0.webp?v=4e2139a7",
+          "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-twine-h009l01sp21-914-800x800.webp"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 50,
+    "strapInfo": "Ремінець знімний та регульований",
+    "sizes": [
+      "S"
+    ],
+    "searchKeywords": [
+      "Marc Jacobs",
+      "Marc Jacobs The Tote Bag",
+      "The Leather Small Tote Bag",
+      "Marc Jacobs Small Tote",
+      "Marc Jacobs H009L01SP21",
+      "H009L01SP21",
+      "Marc Jacobs сумка",
+      "сумка Marc Jacobs",
+      "жіноча сумка Marc Jacobs",
+      "Marc Jacobs tote",
+      "small tote bag",
+      "сумка тоут",
+      "маленька сумка",
+      "шкіряна сумка",
+      "сумка з натуральної шкіри",
+      "Twine",
+      "бежева сумка",
+      "кремова сумка",
+      "нейтральна сумка",
+      "сумка на плече",
+      "сумка через плече",
+      "брендова сумка",
+      "оригінальна Marc Jacobs"
+    ],
+    "isNew": false,
+    "title": "Шопер Marc Jacobs The Leather Small Tote Bag",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильна та універсальна сумка Marc Jacobs The Leather Small Tote Bag у нейтральному відтінку Twine. Лаконічний дизайн, натуральна зерниста шкіра та фірмовий логотип Marc Jacobs роблять модель чудовим доповненням до повсякденних образів.\nСумка має просторе основне відділення, внутрішню відкриту кишеню та фірмову шкіряну нашивку з логотипом на задній панелі. Модель доповнена двома верхніми ручками та знімним регульованим ремінцем, тому її можна носити в руці, на плечі або через плече",
+    "sku": "H009L01SP21",
+    "rating": 5,
+    "category": "Жіночі сумки",
+    "slug": "шопер-marc-jacobs-the-leather-small-tote-bag",
+    "id": 56,
+    "color": "Twine — бежево-кремовий",
+    "images": [
+      "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-d0dd33cf.webp",
+      "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-de081418.webp",
+      "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-628c7ef0.webp",
+      "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-twine-h009l01sp21-914-800x800.webp"
     ]
   }
 ]

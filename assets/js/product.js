@@ -136,21 +136,23 @@ const FREE_SHIPPING_FROM = 3500;
 // порожній рядок — JSON.stringify прибирає тільки undefined, тож
 // "sku": "" пішло б у розмітку як є. Пояснення до меж — у генераторі.
 const SKU_MAX_LENGTH = 50;
-const SKU_MAX_SPACES = 3;
+const SKU_MAX_WORDS = 4;
 
 function sanitizeSku(value) {
 
-    const sku = String(value === undefined || value === null ? "" : value)
+    const raw = String(value === undefined || value === null ? "" : value)
         .replace(/\s+/g, " ")
         .trim();
 
-    if (!sku) return "";
+    if (!raw) return "";
 
-    if (sku.length > SKU_MAX_LENGTH) return "";
+    if (raw.length > SKU_MAX_LENGTH) return "";
 
-    if ((sku.split(" ").length - 1) > SKU_MAX_SPACES) return "";
+    if (raw.split(" ").length > SKU_MAX_WORDS) return "";
 
-    return sku;
+    // Пробіли Google в артикулі забороняє — замінюємо на дефіс.
+    // Пояснення до правила — у генераторі.
+    return raw.replace(/ /g, "-").replace(/-{2,}/g, "-");
 
 }
 
