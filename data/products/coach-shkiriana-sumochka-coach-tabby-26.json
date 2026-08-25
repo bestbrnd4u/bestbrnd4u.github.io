@@ -33,11 +33,6 @@
       "zoom": 2.85,
       "x": 50,
       "y": 50
-    },
-    "4.2_a5d008bc-5f9d-4f34-8908-6df68e0bb528.webp": {
-      "zoom": 1.61,
-      "x": 50,
-      "y": 63
     }
   },
   "preOrder": false,
@@ -81,7 +76,8 @@
         "/assets/images/products/uploads/91215-b4ooh_7d995c2e069841c5ad45599ee803592d.webp",
         "/assets/images/products/uploads/91215-b4ooh-1_b3aea35bcebe4922a51b66ad7b2bb0a1_master.webp",
         "/assets/images/products/uploads/91215-b4ooh-2_ea0908385fb449c5a786a9c58e2e20cb_master.webp"
-      ]
+      ],
+      "sku": "coachB4OOH"
     },
     {
       "color": "Brown — коричневий",
