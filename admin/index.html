@@ -1,10 +1,18 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
+<script>window.ASSET_VERSIONS = {"data/categories.json":"4a7a5e05","data/collections.json":"d86aab5b","data/home.json":"fe5da8cb","data/image-variants.json":"a2d55f8f","data/products.json":"612b80ec","data/promo-popups.json":"0940ece5","data/promotions.json":"65f883a6","data/search-banners.json":"82a85e36","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BestBrnd4u — Адмінка</title>
     <link rel="icon" href="../assets/images/favicon.png">
+
+    <!-- Стилі власних віджетів панелі редактора.
+         Раніше вони лежали в preview-styles.css, який підключається
+         через registerPreviewStyle() — тобто лише в панель прев'ю. У
+         редакторі вони не діяли, і рамка кадрування лишалась без
+         розмірів. -->
+    <link rel="stylesheet" href="editor-styles.css?v=52eade17">
     <!--SITE_ENVIRONMENT-->
     <script>window.SITE_ENVIRONMENT = {"name":"development","host":"dev.bestbrnd4u.com","branch":"dev","productionUrl":"https://bestbrnd4u.com"};</script>
 </head>
@@ -157,30 +165,30 @@
          в assets/js і підключається В ОБИДВА боки навмисно — якби прев'ю
          рахувало кадр власною копією, вона рано чи пізно розійшлася б
          із каталогом, і адмін бачив би не те, що покупець. -->
-    <script src="../assets/js/image-framing.js"></script>
+    <script src="../assets/js/image-framing.js?v=006d4dfb"></script>
 
     <!-- Оформлення текстових блоків: той самий модуль, що на сайті,
          щоб прев'ю показувало реальні кольори й шрифт -->
-    <script src="../assets/js/text-styles.js"></script>
+    <script src="../assets/js/text-styles.js?v=7dc05c7d"></script>
 
-    <script src="size-widget.js"></script>
+    <script src="size-widget.js?v=460176d3"></script>
 
     <!-- Свій вибір товарів: стандартний relation шукає підпослідовністю
          і на «coach» видавав Armani/Marc Jacobs/Michael Kors -->
-    <script src="product-picker.js"></script>
+    <script src="product-picker.js?v=31436ee0"></script>
 
     <!-- Редактор кадру: наближення й точка фокуса для кожного фото,
          з живим прев'ю картки каталогу просто в полі. -->
-    <script src="image-framing-widget.js"></script>
+    <script src="image-framing-widget.js?v=dff96073"></script>
 
     <!-- Посилання на товар для постів у Telegram -->
-    <script src="order-link-widget.js"></script>
+    <script src="order-link-widget.js?v=b579b785"></script>
 
     <!-- Смуга-індикатор середовища. Адмінок дві, виглядають однаково,
          і переплутати бойову з тестовою — питання однієї вкладки.
          Дані підставляє scripts/apply-site-env.js (блок нижче). -->
-    <script src="env-badge.js"></script>
+    <script src="env-badge.js?v=95bfa2df"></script>
 
-    <script src="preview-templates.js"></script>
+    <script src="preview-templates.js?v=3445094c"></script>
 </body>
 </html>

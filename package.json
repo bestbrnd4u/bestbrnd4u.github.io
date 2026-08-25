@@ -6,7 +6,7 @@
   "scripts": {
     "test": "node tests/run-all.js",
     "build": "node scripts/apply-site-env.js && node scripts/build-categories.js && node scripts/build-products.js && node scripts/build-product-pages.js && node scripts/build-promotions.js && node scripts/build-collections.js && node scripts/build-promo-popups.js && node scripts/build-home-static.js && node scripts/build-sitemap.js && node scripts/apply-cache-version.js",
-    "build:media": "node scripts/normalize-media-names.js && node scripts/normalize-product-images.js --apply",
+    "build:media": "node scripts/normalize-media-names.js && node scripts/normalize-product-images.js --apply && node scripts/auto-frame-products.js --apply",
     "images:report": "node scripts/archive-unused-images.js",
     "images:archive": "node scripts/archive-unused-images.js --apply",
     "images:restore": "node scripts/archive-unused-images.js --restore",

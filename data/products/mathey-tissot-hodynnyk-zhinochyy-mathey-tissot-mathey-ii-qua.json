@@ -46,5 +46,12 @@
   ],
   "slug": "mathey-tissot-hodynnyk-zhinochyy-mathey-tissot-mathey-ii-qua",
   "id": 24,
-  "color": "Темно-сірий"
+  "color": "Темно-сірий",
+  "framing": {
+    "d710bn-1.webp": {
+      "zoom": 1.58,
+      "x": 50,
+      "y": 50
+    }
+  }
 }

@@ -70,5 +70,12 @@
     "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--f7ef8033.webp",
     "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--c2093755.webp",
     "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--e63574a7.webp"
-  ]
+  ],
+  "framing": {
+    "marc-jacobs-the-leather-cargo-bag-camel--3f139d71.webp": {
+      "zoom": 1.4,
+      "x": 49,
+      "y": 40
+    }
+  }
 }

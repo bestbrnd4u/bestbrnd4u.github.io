@@ -102,8 +102,11 @@ console.log("\n[3] Файл обчислень — один на сайт і а�
     // би, що адмін бачить не те, що покупець.
     const admin = read("admin/index.html");
 
+    // Версія в адресі («?v=abc12345») тепер ставиться і в адмінці —
+    // без неї браузер після виливки віддавав би старі віджети. Тому
+    // хвіст після імені файлу допускаємо.
     check("адмінка підключає спільний файл",
-        /src="\.\.\/assets\/js\/image-framing\.js"/.test(admin));
+        /src="\.\.\/assets\/js\/image-framing\.js(\?v=[a-f0-9]+)?"/.test(admin));
     check("адмінка підключає поле кадрування",
         /image-framing-widget\.js/.test(admin));
 
@@ -575,7 +578,83 @@ console.log("\n[9b] Розрахунок кадру — на справжніх 
         check(`де потрібно більше за 3× — обмежиться межею (${capped.length})`,
             /MAX_ZOOM/.test(read("assets/js/image-framing.js")));
 
-        console.log(failures === 0
+        console.log("\n[10] Автоматичний кадр для фото з завеликими полями");
+{
+    // ЧОМУ ЦЕ ЗʼЯВИЛОСЬ
+    // ------------------
+    // Фото приходять від різних постачальників, і товар займає кадр
+    // хто скільки: у більшості 80–90%, у частини — 27–35%. У каталозі
+    // сусідні картки виглядали нерівно, ніби одну сумку зняли впритул,
+    // а іншу з іншого кінця кімнати.
+    //
+    // Обрізати оригінали не стали: це необоротно. Замість цього збірка
+    // рахує КАДР — ті самі zoom/x/y, які ставить віджет в адмінці.
+    const script = read("scripts/auto-frame-products.js");
+
+    check("скрипт є", script.length > 0);
+
+    // Свій вибір важливіший за розрахунок.
+    check("ручний кадр не перебивається",
+        /if \(framing\[key\]\) continue/.test(script));
+
+    // Без --apply нічого не змінює: можна подивитись, що буде.
+    check("є режим перегляду без змін",
+        /includes\("--apply"\)/.test(script) && /if \(apply\)/.test(script));
+
+    // Визначення «де тут товар» мусить бути те саме, що у віджеті —
+    // інакше автоматика й кнопка дадуть різні кадри для одного знімка.
+    const widget = read("admin/image-framing-widget.js");
+
+    check("поріг тла однаковий",
+        /LIMIT = 244/.test(script) && /LIMIT = 244/.test(widget));
+    check("прозорість вважається тлом в обох",
+        /alpha < 16|data\[i \+ 3\] < 16/.test(script) && /alpha < 16/.test(widget));
+
+    // Наближення обмежене: за 3× показується надто малий шматок
+    // оригіналу, і картинка стає мʼякою.
+    check("наближення обмежене згори", /MAX_ZOOM = 3/.test(script));
+
+    // Крок вбудований у збірку, а не разова ручна дія — інакше нові
+    // фото знову виглядатимуть дрібними.
+    const pkg = JSON.parse(read("package.json"));
+
+    check("крок у build:media",
+        /auto-frame-products\.js --apply/.test(pkg.scripts["build:media"]));
+
+    // І результат на справжніх даних: фото, які заповнювали менше 60%,
+    // мусять отримати кадр.
+    const dir = path.join(ROOT, "data/products");
+
+    const sources = fs.readdirSync(dir).filter(f => f.endsWith(".json"))
+        .map(f => JSON.parse(fs.readFileSync(path.join(dir, f), "utf8")));
+
+    const framed = sources.filter(p => p.framing && Object.keys(p.framing).length);
+
+    check(`товари з кадром — ${framed.length}`, framed.length > 0);
+
+    // Кадр мусить бути валідним: інакше сайт його просто відкине, і
+    // фото лишиться дрібним, а причину шукати буде ніде.
+    const bad = [];
+
+    framed.forEach(p => {
+
+        Object.entries(p.framing).forEach(([key, frame]) => {
+
+            const okZoom = typeof frame.zoom === "number"
+                && frame.zoom >= 1 && frame.zoom <= 3;
+            const okXY = [frame.x, frame.y].every(v =>
+                typeof v === "number" && v >= 0 && v <= 100);
+
+            if (!okZoom || !okXY) bad.push(`${p.slug}/${key}`);
+
+        });
+
+    });
+
+    check("усі кадри в допустимих межах", bad.length === 0, bad.slice(0, 3).join(", "));
+}
+
+console.log(failures === 0
             ? "\n✅ Усі перевірки пройдено"
             : `\n❌ Провалено: ${failures}`);
 

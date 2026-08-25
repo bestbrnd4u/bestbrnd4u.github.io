@@ -54,7 +54,10 @@ const crypto = require("crypto");
 const ROOT = path.join(__dirname, "..");
 
 // Файли, адреси яких переписуємо прямо в розмітці.
-const ASSET_DIRS = ["assets/js", "assets/css"];
+// admin — теж свій: у ньому стилі панелі редактора
+// (admin/editor-styles.css). Без версії браузер після виливки
+// віддавав би старий файл, і виправлення верстки не доїхало б.
+const ASSET_DIRS = ["assets/js", "assets/css", "admin"];
 
 // Дані, які тягне JS. Версії для них ідуть у window.ASSET_VERSIONS.
 const DATA_DIR = "data";
@@ -86,6 +89,13 @@ function htmlFiles() {
     const out = fs.readdirSync(ROOT).filter(f => f.endsWith(".html"))
         .map(f => path.join(ROOT, f));
 
+    // Адмінка теж: у ній свої стилі й віджети, і без версії браузер
+    // після виливки віддає старі файли. Раніше сюди не заглядали —
+    // тому виправлення верстки редактора не доїхало б до людини.
+    const admin = path.join(ROOT, "admin", "index.html");
+
+    if (fs.existsSync(admin)) out.push(admin);
+
     // згенеровані сторінки товарів
     const pages = path.join(ROOT, "p");
 
@@ -107,10 +117,14 @@ function htmlFiles() {
 
 function main() {
 
-    const assets = [
-        ...collect("assets/js", f => f.endsWith(".js")),
-        ...collect("assets/css", f => f.endsWith(".css"))
-    ];
+    // Список тек — з ASSET_DIRS, а не жорстко тут.
+    //
+    // Раніше константа існувала, але main() її не читав: перелік був
+    // продубльований нижче. Через це додавання теки в ASSET_DIRS ніяк
+    // не діяло — саме так admin/editor-styles.css лишився без версії,
+    // і після виливки браузер віддавав би старий файл.
+    const assets = ASSET_DIRS.flatMap(dir =>
+        collect(dir, f => f.endsWith(".js") || f.endsWith(".css")));
 
     const data = collect(DATA_DIR, f => f.endsWith(".json"));
 
@@ -135,12 +149,25 @@ function main() {
             //
             // Стару версію спершу прибираємо: без цього повторна збірка
             // дала б ?v=старе?v=нове.
-            const escaped = rel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+            // Адмінка посилається на свої файли ВІДНОСНО себе:
+            // href="editor-styles.css", а не "admin/editor-styles.css".
+            // Тому для таких файлів пробуємо ще й шлях без префікса
+            // теки — інакше версія не проставлялась би саме там, де
+            // вона щойно й знадобилась.
+            const forms = rel.startsWith("admin/")
+                ? [rel, rel.slice("admin/".length)]
+                : [rel];
 
-            html = html.replace(
-                new RegExp(`(["'])((?:[^"']*\\/)?${escaped})(?:\\?v=[a-f0-9]+)?\\1`, "g"),
-                `$1$2?v=${hash}$1`
-            );
+            forms.forEach(form => {
+
+                const escaped = form.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+                html = html.replace(
+                    new RegExp(`(["'])((?:[^"']*\\/)?${escaped})(?:\\?v=[a-f0-9]+)?\\1`, "g"),
+                    `$1$2?v=${hash}$1`
+                );
+
+            });
 
         });
 

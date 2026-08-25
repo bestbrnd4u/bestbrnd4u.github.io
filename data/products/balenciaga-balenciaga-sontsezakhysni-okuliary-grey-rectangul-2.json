@@ -46,5 +46,12 @@
   ],
   "slug": "balenciaga-balenciaga-sontsezakhysni-okuliary-grey-rectangul-2",
   "id": 4,
-  "color": "Темно-сірий"
+  "color": "Темно-сірий",
+  "framing": {
+    "bb0096s-001-51-2.webp": {
+      "zoom": 2.19,
+      "x": 50,
+      "y": 50
+    }
+  }
 }

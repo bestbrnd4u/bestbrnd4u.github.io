@@ -39,5 +39,12 @@
   "instagramBlock": "general",
   "description": "Чоловічий годинник Invicta Pro Diver — модель у стилі класичних дайверських годинників. Обертовий безель, комбінований браслет, темно-синій циферблат із позначкою дати.",
   "sku": "invicta-pro-diver-blue-dial 22058",
-  "category": "Годинники"
+  "category": "Годинники",
+  "framing": {
+    "invicta-pro-diver-blue-dial-22058-1.webp": {
+      "zoom": 1.53,
+      "x": 50,
+      "y": 50
+    }
+  }
 }

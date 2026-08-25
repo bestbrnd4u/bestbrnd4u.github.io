@@ -45,5 +45,12 @@
   ],
   "slug": "mathey-tissot-hodynnyk-zhinochyy-mathey-tissot-city-metal",
   "id": 23,
-  "color": "Світло-сірий"
+  "color": "Світло-сірий",
+  "framing": {
+    "d31186mabu-1.webp": {
+      "zoom": 1.61,
+      "x": 50,
+      "y": 50
+    }
+  }
 }

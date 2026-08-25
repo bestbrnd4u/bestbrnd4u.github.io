@@ -46,5 +46,12 @@
   ],
   "slug": "prada-sontsezakhysni-okuliary-prada-20ws-1ab5s0-dark-grey",
   "id": 27,
-  "color": "Темно-сірий"
+  "color": "Темно-сірий",
+  "framing": {
+    "pr-20ws-1ab5s0-49-3.webp": {
+      "zoom": 1.56,
+      "x": 50,
+      "y": 50
+    }
+  }
 }

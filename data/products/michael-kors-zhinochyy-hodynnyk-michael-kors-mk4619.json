@@ -45,5 +45,17 @@
   ],
   "slug": "michael-kors-zhinochyy-hodynnyk-michael-kors-mk4619",
   "id": 26,
-  "color": "Бежевий"
+  "color": "Бежевий",
+  "framing": {
+    "mk4619-1.webp": {
+      "zoom": 1.61,
+      "x": 50,
+      "y": 50
+    },
+    "mk4619-2.webp": {
+      "zoom": 1.49,
+      "x": 50,
+      "y": 50
+    }
+  }
 }
