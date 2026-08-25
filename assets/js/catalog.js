@@ -3079,10 +3079,16 @@ function render() {
 
     const from = (currentPage - 1) * PER_PAGE;
 
-    grid.innerHTML = list
-        .slice(from, from + PER_PAGE)
+    const shown = list.slice(from, from + PER_PAGE);
+
+    grid.innerHTML = shown
         .map(product => createProductCard(product))
         .join("");
+
+    // Статистика: які товари побачили в каталозі. Разом із select_item
+    // це дає найкорисніше — які картки показуються часто, а натискають
+    // на них рідко.
+    window.Analytics?.viewItemList(shown, "Каталог");
 
     renderPagination(list.length);
     syncPageToUrl();

@@ -34,6 +34,24 @@ collections:
   - name: "pages"
     label: "Сторінки"
     files:
+      - name: "analytics"
+        label: "Google Analytics"
+        file: "data/analytics.json"
+        description: >
+          Статистика відвідувань. Працює лише після згоди відвідувача —
+          без неї Google Analytics не завантажується взагалі.
+        fields:
+          - label: "Ідентифікатор (Measurement ID)"
+            name: "measurementId"
+            widget: "string"
+            required: false
+            pattern: ["^(G-[A-Z0-9]{6,12})?$", "Формат: G- і далі літери та цифри"]
+            hint: >
+              Знайти: Google Analytics → Адміністрування → Потоки даних →
+              оберіть свій сайт. Ідентифікатор показано вгорі праворуч і
+              він завжди починається з «G-». Порожнє поле = статистика
+              вимкнена, жодних запитів до Google не буде.
+
       - name: "telegram"
         label: "Telegram-бот"
         file: "data/telegram.json"

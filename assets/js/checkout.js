@@ -86,6 +86,44 @@ document.addEventListener("change", event => {
 
 updateContactChannelNote();
 
+// Склад кошика для статистики.
+//
+// Один помічник на дві події: begin_checkout і purchase описують той
+// самий кошик, і збирати його двома різними способами означало б рано
+// чи пізно отримати розбіжність у звітах.
+function reportCheckout(event, orderId) {
+
+    if (!window.Analytics) return;
+
+    const lines = getGroupedCartLines().map(line => ({
+        product: findCachedProduct(line.id),
+        color: line.color,
+        size: line.size,
+        qty: line.qty
+    })).filter(x => x.product);
+
+    if (!lines.length) return;
+
+    const total = lines.reduce((sum, line) =>
+        sum + (Number(line.product.price) || 0) * line.qty, 0);
+
+    if (event === "purchase") {
+
+        window.Analytics.purchase({
+            id: orderId,
+            total: total,
+            lines: lines,
+            promo: appliedPromo?.code || undefined
+        });
+
+        return;
+
+    }
+
+    window.Analytics.beginCheckout(lines, total);
+
+}
+
 function generateOrderId() {
 
     // 10-значний цифровий номер замовлення: останні 7 цифр
@@ -848,6 +886,10 @@ checkoutForm?.addEventListener("submit", event => {
     submitOrderBtn.disabled = true;
     submitOrderBtn.textContent = "Надсилаємо...";
 
+    // Статистика: початок оформлення. Разом із purchase це показує,
+    // скільки людей дійшли до кнопки, але замовлення не завершили.
+    reportCheckout("beginCheckout");
+
     // 1) сповіщення нам на пошту — деталі замовлення (FormSubmit)
     const formData = new FormData(checkoutForm);
     const payload = {};
@@ -891,6 +933,13 @@ checkoutForm?.addEventListener("submit", event => {
                 total: orderTotalEl.textContent,
                 firstName: document.getElementById("firstName")?.value.trim() || ""
             }));
+
+            // Статистика: оформлене замовлення. Ловимо ДО очищення
+            // кошика — після saveCart([]) складу вже не дізнатись.
+            //
+            // Персональних даних не передаємо: тільки номер, сума й
+            // склад. Ім'я, телефон і адреса лишаються в магазині.
+            reportCheckout("purchase", orderId);
 
             saveOrderToSupabase(orderId).finally(() => {
 

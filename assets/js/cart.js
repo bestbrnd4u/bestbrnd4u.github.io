@@ -238,6 +238,24 @@ function renderCart() {
     cartItemsCountEl.textContent = itemsCount;
     cartSubtotalEl.textContent = formatPrice(subtotalFull);
 
+    // Статистика: склад кошика на момент перегляду. Разом із
+    // begin_checkout це показує, на якому кроці люди відмовляються.
+    if (!renderCart.reported) {
+
+        renderCart.reported = true;
+
+        window.Analytics?.viewCart(
+            lines.map(line => ({
+                product: findCachedProduct(line.id),
+                color: line.color,
+                size: line.size,
+                qty: line.qty
+            })).filter(x => x.product),
+            subtotal
+        );
+
+    }
+
     const discount = subtotalFull - subtotal;
 
     if (discount > 0 && cartDiscountRowEl) {
@@ -284,6 +302,25 @@ function changeQty(id, color, size, delta) {
 }
 
 function removeCartItem(id, color, size) {
+
+    // Статистика: що саме прибирають із кошика. Ловимо ДО збереження,
+    // поки рядок ще існує — інакше не буде звідки взяти ціну й назву.
+    const removed = getGroupedCartLines().find(line =>
+        line.id === id
+        && (line.color || null) === (color || null)
+        && (line.size || null) === (size || null));
+
+    if (removed) {
+
+        const product = findCachedProduct(id);
+
+        if (product) {
+            window.Analytics?.removeFromCart(product, {
+                color: color, size: size, quantity: removed.qty
+            });
+        }
+
+    }
 
     const cart = getCart().filter(entry => !(
         entry.id === id &&

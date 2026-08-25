@@ -694,6 +694,17 @@ function buildDotsMarkup(images, video) {
 
 function renderProduct(product) {
 
+    // Статистика: перегляд товару. Колір і розмір беремо з адреси —
+    // саме в них людина сюди прийшла (з каталогу, з кошика, з поста).
+    // Без них у звіті всі кольори злились би в один рядок.
+    const seen = new URLSearchParams(location.search);
+
+    window.Analytics?.viewItem(product, {
+        color: seen.get("color") || undefined,
+        size: seen.get("size") || undefined
+    });
+
+
     // Рамки кадрування діють на всю сторінку товару — і на великі
     // слайди, і на мініатюри, і після перемикання кольору
     // (updateGalleryForColor малює галерею наново вже без product).
