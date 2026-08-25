@@ -1047,8 +1047,8 @@
         "color": "Бежевий",
         "hex": "#e3d1b6",
         "images": [
-          "assets/images/products/uploads/2s3hcr500h03-134-1.webp?v=67d81cbd",
-          "assets/images/products/uploads/2s3hcr500h03-134-2.webp?v=b3a15be3",
+          "/assets/images/products/uploads/2s3hcr500h03-134-1.webp?v=67d81cbd",
+          "/assets/images/products/uploads/2s3hcr500h03-134-2.webp?v=b3a15be3",
           "assets/images/products/uploads/2s3hcr500h03-134-3.webp?v=6f85764e"
         ],
         "sku": "2S3HCR500H03_134"
@@ -1085,8 +1085,8 @@
     "isNew": false,
     "title": "Сумка крос-боді жіноча шкіряна Marc Jacobs The Snapshot",
     "images": [
-      "assets/images/products/uploads/2s3hcr500h03-134-1.webp",
-      "assets/images/products/uploads/2s3hcr500h03-134-2.webp",
+      "/assets/images/products/uploads/2s3hcr500h03-134-1.webp",
+      "/assets/images/products/uploads/2s3hcr500h03-134-2.webp",
       "assets/images/products/uploads/2s3hcr500h03-134-3.webp"
     ],
     "id": 20,
