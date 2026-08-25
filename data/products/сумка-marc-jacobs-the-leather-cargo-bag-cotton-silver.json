@@ -14,18 +14,18 @@
       "color": "Cotton/Silver — молочний",
       "hex": "#fafafa",
       "images": [
-        "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-silver-zhinocha-shkiryana-crossbody-sumka-00612-800x800.webp",
-        "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-silver-zhinocha-shkiryana-crossbody-sumka-additional-image-10718-800x800.webp",
-        "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-silver-zhinocha-shkiryana-crossbody-sumka-additional-image-10720-800x800.webp",
-        "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-silver-zhinocha-shkiryana-crossbody-sumka-additional-image-10722-800x800.webp",
-        "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-silver-zhinocha-shkiryana-crossbody-sumka-additional-image-10723-800x800.webp"
+        "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-4a08b27e.webp",
+        "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-d6f46dd3.webp",
+        "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-def1e99f.webp",
+        "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-c1370464.webp",
+        "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-28c7d0f9.webp"
       ]
     }
   ],
   "preOrderPrepayment": 50,
   "strapInfo": "2 знімні ремені — шкіряний та текстильний регульований",
   "sizes": [
-    "Onesize"
+    "ONESIZE"
   ],
   "searchKeywords": [
     "Marc Jacobs",
@@ -57,5 +57,15 @@
   "description": "Стильна та функціональна сумка Marc Jacobs The Leather Cargo Bag у відтінку Cotton/Silver — модель із виразним дизайном у стилі cargo та практичною системою кишень.\nСумка виготовлена з натуральної зернистої шкіри та доповнена сріблястою фурнітурою. На передній частині розташовані дві накладні кишені з клапанами, з боків — кишені на блискавці. Основне відділення закривається на блискавку.\nМодель має два знімні ремені: шкіряний ремінь для носіння на плечі та широкий регульований текстильний ремінь із логотипом. Завдяки цьому сумку можна носити на плечі або через плече",
   "sku": "2S4HSH085H02-140",
   "rating": 5,
-  "category": "Жіночі сумки"
+  "category": "Жіночі сумки",
+  "slug": "сумка-marc-jacobs-the-leather-cargo-bag-cotton-silver",
+  "id": 53,
+  "color": "Cotton/Silver — молочний",
+  "images": [
+    "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-4a08b27e.webp",
+    "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-d6f46dd3.webp",
+    "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-def1e99f.webp",
+    "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-c1370464.webp",
+    "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-28c7d0f9.webp"
+  ]
 }
