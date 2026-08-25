@@ -13,7 +13,7 @@
         "color": "Темно-сірий",
         "hex": "#56535a",
         "images": [
-          "/assets/images/products/uploads/a05042-0037354-1.26b9d653-300.webp?v=a5d3ae7c",
+          "/assets/images/products/uploads/a05042-0037354-1.webp?v=26b9d653",
           "assets/images/products/uploads/a05042-0037354-2.webp?v=05e229f6",
           "assets/images/products/uploads/a05042-0037354-3.webp?v=249dd5fb"
         ],
@@ -41,7 +41,7 @@
     "isNew": false,
     "title": "Сонцезахисні окуляри ALAIN MIKLI Dark Grey Rectangular Unisex",
     "images": [
-      "/assets/images/products/uploads/a05042-0037354-1.26b9d653-300.webp",
+      "/assets/images/products/uploads/a05042-0037354-1.webp",
       "assets/images/products/uploads/a05042-0037354-2.webp",
       "assets/images/products/uploads/a05042-0037354-3.webp"
     ],
@@ -1305,7 +1305,15 @@
         "color": "Синій",
         "hex": "#bacbdb",
         "images": [
+<<<<<<< Updated upstream
           "/assets/images/products/uploads/30h1ggrl2l-487-1-300.webp?v=bb8b71f5",
+=======
+<<<<<<< HEAD
+          "/assets/images/products/uploads/30h1ggrl2l-487-1.webp?v=70048d23",
+=======
+          "/assets/images/products/uploads/30h1ggrl2l-487-1-300.webp?v=bb8b71f5",
+>>>>>>> 0726426eadba12c02290cb6869b354c2963537b8
+>>>>>>> Stashed changes
           "assets/images/products/uploads/30h1ggrl2l-487-2.webp?v=32d8a662",
           "assets/images/products/uploads/30h1ggrl2l-487-3.webp?v=01be7b92"
         ],
@@ -1331,7 +1339,7 @@
     "isNew": true,
     "title": "Шкіряна сумочка Greenwich Medium Saffiano",
     "images": [
-      "/assets/images/products/uploads/30h1ggrl2l-487-1-300.webp",
+      "/assets/images/products/uploads/30h1ggrl2l-487-1.webp",
       "assets/images/products/uploads/30h1ggrl2l-487-2.webp",
       "assets/images/products/uploads/30h1ggrl2l-487-3.webp"
     ],
