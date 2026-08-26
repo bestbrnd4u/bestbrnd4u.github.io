@@ -25,7 +25,7 @@
   "preOrderPrepayment": 50,
   "strapInfo": "Регульований ремінь. Ремінь дозволяє носити сумку трьома способами: коротко або довго на плечі, а також кросбоді",
   "sizes": [
-    "Onesize"
+    "ONESIZE"
   ],
   "splitByColor": true,
   "searchKeywords": [
@@ -50,5 +50,15 @@
   "description": "Стильна жіноча сумка Coach Klare Crossbody 25 у фірмовому принті Signature — елегантна модель на кожен день. Поєднання фірмового покритого полотна Signature та фактурної шкіри refined pebble leather надає сумці преміального вигляду.\nМодель має зручне основне відділення із застібкою-кнопкою, внутрішню кишеню на блискавці та багатофункціональну кишеню, а також зовнішню кишеню для речей, які мають бути під рукою.\nЛаконічний дизайн і універсальний темно-коричневий відтінок легко поєднуються як із повсякденними, так і з більш елегантними образами",
   "sku": "CC878",
   "rating": 5,
-  "category": "Жіночі сумки"
+  "category": "Жіночі сумки",
+  "slug": "сумочка-coach-klare-crossbody-25-in-signature-canvas",
+  "id": 65,
+  "color": "Dark Brown темно-коричневий",
+  "images": [
+    "/assets/images/products/uploads/3248708-4324-8078423-1.webp",
+    "/assets/images/products/uploads/3248708-4324-8078423-2.webp",
+    "/assets/images/products/uploads/3248708-4324-8078423-3.webp",
+    "/assets/images/products/uploads/3248708-4324-8078423-4.webp",
+    "/assets/images/products/uploads/3248708-4324-8078423-5.webp"
+  ]
 }

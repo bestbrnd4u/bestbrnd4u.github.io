@@ -368,27 +368,31 @@
     ]
   },
   {
-    "title": "Чоловіча шкіряна сумка Racer Belt Bag In Signature Canvas",
+    "gender": [
+      "Чоловікам"
+    ],
+    "color": "Чорний",
+    "material": "Шкіра",
     "brand": "Coach",
-    "category": "Унісекс сумки",
-    "gender": "Унісекс",
     "price": 7500,
-    "description": "Coach Racer Belt Bag зі шкіри — поясна сумка з монограмним рельєфом. Регульований ремінь, носиться на поясі, через плече або навскіс. Унісекс-модель.",
+    "preOrder": false,
+    "slug": "coach-cholovicha-shkiriana-sumka-racer-belt-bag-in-signature",
     "variants": [
       {
         "color": "Чорний",
         "hex": "#252525",
         "images": [
-          "assets/images/products/uploads/coach-ct714-qbml5-1.webp?v=a4a25be7",
-          "assets/images/products/uploads/coach-ct714-qbml5-2.webp?v=63d65680",
-          "assets/images/products/uploads/coach-ct714-qbml5-3.webp?v=deb975dc"
+          "/assets/images/products/uploads/ct714_qbmi5_1_1100x1100-1-.webp?v=b44dc043",
+          "/assets/images/products/uploads/ct714_qbmi5_2_1100x1100.webp?v=7c4290d6",
+          "/assets/images/products/uploads/ct714_qbmi5_3_1100x1100.webp?v=23e2fbb9",
+          "/assets/images/products/uploads/ct714_qbmi5_4_1100x1100.webp?v=a306c84b"
         ],
         "sku": "coach ct714 qbml5"
       }
     ],
-    "isNew": false,
-    "material": "Шкіра",
-    "sku": "coach ct714 qbml5",
+    "sizes": [
+      "ONESIZE"
+    ],
     "searchKeywords": [
       "коуч",
       "coach",
@@ -401,36 +405,19 @@
       "bag",
       "signature"
     ],
-    "instagramBlock": "general",
-    "preOrder": false,
+    "isNew": false,
+    "title": "Чоловіча шкіряна сумка Racer Belt Bag In Signature Canvas",
     "images": [
-      "assets/images/products/uploads/coach-ct714-qbml5-1.webp",
-      "assets/images/products/uploads/coach-ct714-qbml5-2.webp",
-      "assets/images/products/uploads/coach-ct714-qbml5-3.webp"
+      "/assets/images/products/uploads/ct714_qbmi5_1_1100x1100-1-.webp",
+      "/assets/images/products/uploads/ct714_qbmi5_2_1100x1100.webp",
+      "/assets/images/products/uploads/ct714_qbmi5_3_1100x1100.webp",
+      "/assets/images/products/uploads/ct714_qbmi5_4_1100x1100.webp"
     ],
-    "slug": "coach-cholovicha-shkiriana-sumka-racer-belt-bag-in-signature",
     "id": 8,
-    "color": "Чорний",
-    "sizes": [
-      "ONESIZE"
-    ],
-    "framing": {
-      "coach-ct714-qbml5-1.webp": {
-        "zoom": 3,
-        "x": 50,
-        "y": 50
-      },
-      "coach-ct714-qbml5-2.webp": {
-        "zoom": 3,
-        "x": 50,
-        "y": 50
-      },
-      "coach-ct714-qbml5-3.webp": {
-        "zoom": 3,
-        "x": 50,
-        "y": 50
-      }
-    }
+    "instagramBlock": "general",
+    "description": "Coach Racer Belt Bag зі шкіри — поясна сумка з монограмним рельєфом. Регульований ремінь, носиться на поясі, через плече або навскіс. Унісекс-модель.",
+    "sku": "coach ct714 qbml5",
+    "category": "Чоловічі сумки"
   },
   {
     "gender": [
@@ -4134,6 +4121,143 @@
       "/assets/images/products/uploads/00570556_s.jpg",
       "/assets/images/products/uploads/00570556_i.jpg",
       "/assets/images/products/uploads/00570556_m.jpg"
+    ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "5–10 робочих днів",
+    "forcePublish": false,
+    "material": "Натуральна гладка шкіра",
+    "brand": "Jacquemus",
+    "price": 19000,
+    "preOrder": false,
+    "dimensions": "17,5 × 8,5 × 6,5 см",
+    "variants": [
+      {
+        "color": "White білий",
+        "hex": "#ffffff",
+        "images": [
+          "/assets/images/products/uploads/ihjbihj.webp?v=3dd19685",
+          "/assets/images/products/uploads/p00545136_d2.webp?v=c636a98b",
+          "/assets/images/products/uploads/p00545136_d1.webp?v=4940d6cf",
+          "/assets/images/products/uploads/uhjvbyubjhmyjhbmn.webp?v=d959e7a2",
+          "/assets/images/products/uploads/jbb.webp?v=4f6dde29"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 50,
+    "strapInfo": "Ремінець знімний та регульований, ручка незнімна",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "JACQUEMUS",
+      "Jacquemus Le Bambino",
+      "The Bambino",
+      "Le Bambino",
+      "Jacquemus Bambino",
+      "213BA006",
+      "213BA006-3000-100",
+      "сумка Jacquemus",
+      "жіноча сумка Jacquemus",
+      "біла сумка",
+      "біла сумка Jacquemus",
+      "White Jacquemus",
+      "Panna",
+      "шкіряна сумка",
+      "сумка з натуральної шкіри",
+      "міні сумка",
+      "маленька сумка",
+      "сумка на плече",
+      "сумка через плече",
+      "кросбоді",
+      "брендова сумка",
+      "оригінальна Jacquemus"
+    ],
+    "isNew": false,
+    "title": "Сумочка Jacquemus Le Bambino White",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Мініатюрна та елегантна сумка Jacquemus Le Bambino у класичному білому кольорі. Модель виконана з гладкої натуральної шкіри та доповнена фірмовим золотистим логотипом Jacquemus на клапані.\nСумка має компактне основне відділення, задню кишеню для картки та магнітну застібку. Оснащена верхньою ручкою та знімним регульованим ремінцем, тому її можна носити в руці, на плечі або через плече. Виготовлена в Італії.",
+    "sku": "213BA006-3000-100",
+    "rating": 5,
+    "category": "Жіночі сумки",
+    "slug": "сумочка-jacquemus-le-bambino-white",
+    "id": 64,
+    "color": "White білий",
+    "images": [
+      "/assets/images/products/uploads/ihjbihj.webp",
+      "/assets/images/products/uploads/p00545136_d2.webp",
+      "/assets/images/products/uploads/p00545136_d1.webp",
+      "/assets/images/products/uploads/uhjvbyubjhmyjhbmn.webp",
+      "/assets/images/products/uploads/jbb.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "5–10 робочих днів",
+    "forcePublish": false,
+    "material": "Фірмове покрите полотно Signature та фактурна шкіра refined pebble leather; текстильна підкладка",
+    "brand": "Coach",
+    "price": 7100,
+    "preOrder": false,
+    "dimensions": "26 × 17 × 8 см",
+    "variants": [
+      {
+        "color": "Dark Brown темно-коричневий",
+        "hex": "#624949",
+        "images": [
+          "/assets/images/products/uploads/3248708-4324-8078423-1.webp?v=1e7a3655",
+          "/assets/images/products/uploads/3248708-4324-8078423-2.webp?v=0018247e",
+          "/assets/images/products/uploads/3248708-4324-8078423-3.webp?v=860a8ff4",
+          "/assets/images/products/uploads/3248708-4324-8078423-4.webp?v=0e467211",
+          "/assets/images/products/uploads/3248708-4324-8078423-5.webp?v=dedc20e7"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 50,
+    "strapInfo": "Регульований ремінь. Ремінь дозволяє носити сумку трьома способами: коротко або довго на плечі, а також кросбоді",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Coach Klare",
+      "Coach Klare Crossbody",
+      "Coach Klare 25",
+      "сумка Coach",
+      "жіноча сумка Coach",
+      "сумка через плече",
+      "кросбоді Coach",
+      "шкіряна сумка Coach",
+      "сумка Signature",
+      "коричнева сумка",
+      "темно-коричнева сумка",
+      "брендові сумки",
+      "оригінальна Coach"
+    ],
+    "isNew": false,
+    "title": "Сумочка Coach Klare Crossbody 25 In Signature Canvas",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильна жіноча сумка Coach Klare Crossbody 25 у фірмовому принті Signature — елегантна модель на кожен день. Поєднання фірмового покритого полотна Signature та фактурної шкіри refined pebble leather надає сумці преміального вигляду.\nМодель має зручне основне відділення із застібкою-кнопкою, внутрішню кишеню на блискавці та багатофункціональну кишеню, а також зовнішню кишеню для речей, які мають бути під рукою.\nЛаконічний дизайн і універсальний темно-коричневий відтінок легко поєднуються як із повсякденними, так і з більш елегантними образами",
+    "sku": "CC878",
+    "rating": 5,
+    "category": "Жіночі сумки",
+    "slug": "сумочка-coach-klare-crossbody-25-in-signature-canvas",
+    "id": 65,
+    "color": "Dark Brown темно-коричневий",
+    "images": [
+      "/assets/images/products/uploads/3248708-4324-8078423-1.webp",
+      "/assets/images/products/uploads/3248708-4324-8078423-2.webp",
+      "/assets/images/products/uploads/3248708-4324-8078423-3.webp",
+      "/assets/images/products/uploads/3248708-4324-8078423-4.webp",
+      "/assets/images/products/uploads/3248708-4324-8078423-5.webp"
     ]
   }
 ]
