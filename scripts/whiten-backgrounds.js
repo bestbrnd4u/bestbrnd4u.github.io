@@ -127,7 +127,48 @@ function fillFromEdges(data, w, h, bg) {
 
 }
 
-async function whiten(file, apply) {
+// Рішення з адмінки: "white" — примусово, "keep" — не чіпати.
+//
+// Зберігається в кадрі фото (framing), бо стосується конкретного
+// файлу — а кадр уже саме такий запис «на файл». Друге поле означало
+// б два місця, які легко розсинхронити.
+function adminChoice() {
+
+    const dir = path.join(ROOT, "data", "products");
+
+    const choice = {};
+
+    if (!fs.existsSync(dir)) return choice;
+
+    fs.readdirSync(dir).filter(f => f.endsWith(".json")).forEach(file => {
+
+        let data;
+
+        try {
+            data = JSON.parse(fs.readFileSync(path.join(dir, file), "utf8"));
+        } catch (error) {
+            return;
+        }
+
+        const framing = data.framing;
+
+        if (!framing || typeof framing !== "object") return;
+
+        Object.keys(framing).forEach(name => {
+
+            const bg = framing[name] && framing[name].bg;
+
+            if (bg === "white" || bg === "keep") choice[name] = bg;
+
+        });
+
+    });
+
+    return choice;
+
+}
+
+async function whiten(file, apply, choice) {
 
     const full = path.join(DIR, file);
 
@@ -153,11 +194,23 @@ async function whiten(file, apply) {
     const spread = Math.max(...corners.map(p =>
         Math.max(...[0, 1, 2].map(c => Math.abs(p[c] - bg[c])))));
 
+    const decided = choice ? choice[file] : null;
+
+    // «Не чіпати» з адмінки сильніше за автоматику.
+    if (decided === "keep") return { skip: "адмін лишив як є" };
+
     // Запобіжник 2: тло неоднорідне.
+    //
+    // Цей запобіжник не обходиться навіть примусово: на фото в
+    // інтерʼєрі чи на моделі «тлом» слугує сам знімок, і заливка
+    // зʼїла б половину кадру.
     if (spread > MAX_SPREAD) return { skip: "тло неоднорідне" };
 
-    // Запобіжник 1: тло вже біле.
-    if (Math.min(...bg) >= ALREADY_WHITE) return { skip: "тло вже біле" };
+    // Запобіжник 1: тло вже біле. Його адмін МОЖЕ обійти — буває, що
+    // тло 250 і виглядає сірим поруч із чисто білою карткою.
+    if (Math.min(...bg) >= ALREADY_WHITE && decided !== "white") {
+        return { skip: "тло вже біле" };
+    }
 
     // Запобіжник 3: заливка від країв.
     const painted = fillFromEdges(data, w, h, bg);
@@ -200,6 +253,15 @@ async function main() {
     const files = fs.readdirSync(DIR)
         .filter(f => /\.webp$/i.test(f) && !/-(300|600|1200)\.webp$/i.test(f));
 
+    const choice = adminChoice();
+
+    const forced = Object.values(choice).filter(v => v === "white").length;
+    const kept = Object.values(choice).filter(v => v === "keep").length;
+
+    if (forced || kept) {
+        console.log(`   рішення з адмінки: примусово ${forced}, лишити як є ${kept}`);
+    }
+
     let touched = 0;
     const skipped = {};
 
@@ -208,7 +270,7 @@ async function main() {
         let result;
 
         try {
-            result = await whiten(file, apply);
+            result = await whiten(file, apply, choice);
         } catch (error) {
             skipped["не зчиталось"] = (skipped["не зчиталось"] || 0) + 1;
             continue;

@@ -34,8 +34,11 @@ console.log("\n[1] Три запобіжники на місці");
 {
     // 1. Тільки НЕбіле тло: 270 фото з 303 не треба чіпати взагалі.
     check("біле тло пропускається", /ALREADY_WHITE = 250/.test(script));
+    // Умову доповнено: адмін МОЖЕ примусово вирівняти навіть біле тло
+    // (буває, що воно 250 і виглядає сірим поруч із чисто білою
+    // карткою). Автоматика без такого рішення біле не чіпає.
     check("перевірка перед обробкою",
-        /Math\.min\(\.\.\.bg\) >= ALREADY_WHITE\) return/.test(script));
+        /Math\.min\(\.\.\.bg\) >= ALREADY_WHITE && decided !== "white"/.test(script));
 
     // 2. Тільки однорідне тло: градієнт чи зйомка в інтерʼєрі — не наш
     //    випадок, там межі товару по кольору не знайти.
@@ -83,6 +86,64 @@ console.log("\n[2] Оригінали можна повернути");
             orphans.slice(0, 3).join(", "));
 
     }
+}
+
+console.log("\n[2b] Керування з адмінки");
+{
+    // Адмінка не може перезаписати файл фото — Decap не дає віджетам
+    // такого доступу. Тому вона зберігає РІШЕННЯ, а файл змінює
+    // збірка. Так само влаштоване кадрування.
+    const widget = read("admin/image-framing-widget.js");
+    const lib = read("assets/js/image-framing.js");
+
+    // Рішення живе в кадрі фото: воно стосується конкретного файлу, а
+    // кадр — уже саме такий запис «на файл». Окреме поле означало б два
+    // місця, які легко розсинхронити.
+    check("значення тла зберігається в кадрі",
+        /frame\.bg === "white" \|\| frame\.bg === "keep"/.test(lib));
+    check("сміття не зберігається",
+        /: null;[\s\S]{0,200}if \(bg\) out\.bg = bg/.test(lib));
+
+    // Рішення без кадру теж має зберігатись: інакше «зробити білим»
+    // на фото з наближенням 1× тихо зникало б.
+    const framing = require("../assets/js/image-framing.js");
+
+    check("рішення без кадру не губиться",
+        (framing.normalizeFrame({ bg: "white" }) || {}).bg === "white");
+    check("порожній кадр без рішення — усе ще порожній",
+        framing.normalizeFrame({ zoom: 1, x: 50, y: 50 }) === null);
+
+    // У віджеті: визначення кольору й показ результату ДО публікації.
+    check("колір тла визначається", /detectBackground: function/.test(widget));
+    check("є попередній перегляд", /whitenedPreview: function/.test(widget));
+    check("перегляд показується замість оригіналу",
+        /frame\.bg === "white" && this\.whitenedPreview\(\)/.test(widget));
+
+    // Алгоритм у віджеті мусить бути ТОЙ САМИЙ, що в збірці — інакше
+    // показане не збігатиметься з результатом.
+    check("заливка від країв і у віджеті",
+        /push\(x, 0\); push\(x, h - 1\)/.test(widget));
+    check("допуск однаковий",
+        /TOLERANCE = 14/.test(widget) && /TOLERANCE = 14/.test(script));
+
+    // Неоднорідне тло не пропонуємо чіпати навіть кнопкою.
+    check("для фото на моделі вибору немає",
+        /this\.state\.bgUniform\s*\n\s*\? h\("div", \{ className: "framing-bg-actions"/.test(widget));
+
+    // Збірка мусить слухати рішення.
+    check("збірка читає рішення", /function adminChoice/.test(script));
+    check("«не чіпати» сильніше за автоматику",
+        /decided === "keep"\) return \{ skip: "адмін лишив як є" \}/.test(script));
+    check("«зробити білим» обходить перевірку на біле",
+        /ALREADY_WHITE && decided !== "white"/.test(script));
+
+    // А от неоднорідне тло не обходиться навіть примусово: там заливка
+    // зʼїла б половину кадру.
+    const uniformCheck = script.indexOf("spread > MAX_SPREAD");
+    const whiteCheck = script.indexOf("ALREADY_WHITE && decided");
+
+    check("неоднорідність перевіряється до примусу",
+        uniformCheck > 0 && uniformCheck < whiteCheck);
 }
 
 console.log("\n[3] Результат на справжніх фото");
