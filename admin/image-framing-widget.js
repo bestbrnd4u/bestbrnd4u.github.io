@@ -151,6 +151,63 @@
 
     // ---------- один рядок: фото + керування ----------
 
+    // Адреси фото: розвʼязуємо ОДИН раз і запамʼятовуємо.
+    //
+    // ЩО БУЛО НЕ ТАК
+    // ---------------
+    // getAsset(шлях) викликався прямо в render(). Віджет
+    // перемальовується на кожен рух повзунка й на кожне перетягування
+    // точки — десятки разів за секунду. Кожен виклик просив Decap
+    // розвʼязати файл заново.
+    //
+    // Наслідок було видно в інструментах браузера: 1917 запитів,
+    // «Wait Action timed out» триста разів, і головне — фото не
+    // показувались зовсім. Розвʼязування не встигало завершитись, бо
+    // його щоразу починали спочатку. Натиснеш «−» — картинка раптом
+    // зʼявляється: чергова перемальовка встигла зловити готовий
+    // результат. Точку перетягнути теж не виходило: адмінка була
+    // зайнята запитами.
+    //
+    // ЯК ЗАРАЗ
+    // ---------
+    // Фото з репозиторію мають звичайний шлях /assets/images/..., а
+    // адмінка віддається з того самого домену — такий шлях працює
+    // напряму, без жодного запиту через Decap.
+    //
+    // getAsset лишається лише для щойно вибраного файлу, який ще не
+    // залитий. Результат кладемо в кеш, тож повторно не питаємо.
+    var assetCache = {};
+
+    function publicUrl(src, getAsset) {
+
+        var key = String(src || "");
+
+        if (!key) return "";
+
+        if (assetCache[key]) return assetCache[key];
+
+        // Шлях із репозиторію — беремо як є.
+        if (/^\/?assets\//.test(key)) {
+
+            assetCache[key] = key.charAt(0) === "/" ? key : "/" + key;
+
+            return assetCache[key];
+
+        }
+
+        if (!getAsset) return key;
+
+        var asset = getAsset(key);
+        var url = asset ? (asset.toString ? asset.toString() : asset) : key;
+
+        // blob-адресу не кешуємо: вона живе лише до перезавантаження
+        // сторінки, і збережена в кеші стала б битим посиланням.
+        if (url && url.indexOf("blob:") !== 0) assetCache[key] = url;
+
+        return url || key;
+
+    }
+
     var FrameEditor = createClass({
 
         getInitialState: function () {
@@ -629,10 +686,7 @@
                 this.state.open
                     ? h("div", null, images.map(function (item, index) {
 
-                        // getAsset розуміє і щойно вибраний файл (ще не
-                        // залитий у репозиторій), і вже збережений шлях
-                        var asset = getAsset ? getAsset(item.src) : null;
-                        var url = asset ? (asset.toString ? asset.toString() : asset) : item.src;
+                        var url = publicUrl(item.src, getAsset);
 
                         return h(FrameEditor, {
                             key: item.src + index,
