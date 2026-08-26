@@ -88,7 +88,9 @@ console.log("\n[3] Назви подій — стандартні для GA4");
     const required = [
         "view_item_list", "select_item", "view_item",
         "add_to_cart", "remove_from_cart", "view_cart",
-        "begin_checkout", "add_to_wishlist", "purchase", "search"
+        "begin_checkout", "add_shipping_info", "add_payment_info",
+        "add_to_wishlist", "purchase", "search",
+        "view_promotion", "select_promotion"
     ];
 
     const missing = required.filter(name => !new RegExp(`"${name}"`).test(code));
@@ -252,9 +254,12 @@ console.log("\n[7] Подія до завантаження налаштуван
         const defined = [...analytics.matchAll(/^        ([a-zA-Z]+): function/gm)]
             .map(m => m[1]);
 
-        const wired = ["assets/js/common.js", "assets/js/cart.js", "assets/js/product.js",
-            "assets/js/catalog.js", "assets/js/checkout.js"]
-            .map(f => read(f)).join("\n");
+        // Скануємо ВСІ скрипти сайту, а не список: акції живуть в
+        // app.js, і жорсткий перелік доводилось би доповнювати щоразу.
+        const wired = fs.readdirSync(path.join(ROOT, "assets/js"))
+            .filter(f => f.endsWith(".js"))
+            .map(f => read(`assets/js/${f}`))
+            .join("\n");
 
         const unused = defined.filter(name =>
             !new RegExp(`Analytics\\?\\.${name}\\(`).test(wired)
@@ -262,6 +267,37 @@ console.log("\n[7] Подія до завантаження налаштуван
 
         check("усі описані події справді викликаються", unused.length === 0,
             unused.join(", "));
+
+        // Воронка мусить бути повною.
+        //
+        // begin_checkout і purchase показують лише крайні точки:
+        // скільки почали й скільки завершили. Різниця між ними — цифра
+        // без пояснення. Кроки доставки й оплати ділять проміжок
+        // навпіл, і стає видно, де саме людина передумала.
+        const checkoutJs = read("assets/js/checkout.js");
+
+        check("крок доставки відправляється",
+            /reportCheckout\("shipping", radio\.value\)/.test(checkoutJs));
+        check("крок оплати відправляється",
+            /reportCheckout\("payment", radio\.value\)/.test(checkoutJs));
+
+        // Один помічник на всі події кошика: збирати склад п'ятьма
+        // способами означало б рано чи пізно отримати розбіжність між
+        // подіями однієї сесії.
+        check("склад кошика збирається одним помічником",
+            (analytics.match(/cartItems\(/g) || []).length >= 5);
+
+        // Акції: ми зробили для банерів кадрування, стилі й окремі
+        // картинки під телефон — але не знали, чи на них натискають.
+        const app = read("assets/js/app.js");
+
+        check("показ акції відправляється", /Analytics\?\.viewPromotion/.test(app));
+        check("клац по акції відправляється", /Analytics\?\.selectPromotion/.test(app));
+
+        // Обробник один на документ: типів банерів чотири, і в кожному
+        // згадувати про статистику ніхто не буде.
+        check("клац ловиться одним обробником",
+            /closest\('a\[href\^="promo\?id="\]'\)/.test(app));
 
         console.log(failures === 0
             ? "\n✅ Усі перевірки пройдено"

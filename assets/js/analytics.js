@@ -158,6 +158,24 @@
 
     }
 
+    // Рядки кошика → товари для GA4.
+    //
+    // Один помічник на view_cart, begin_checkout, add_shipping_info,
+    // add_payment_info і purchase: усі вони описують той самий кошик, і
+    // збирати його п'ятьма способами означало б рано чи пізно отримати
+    // розбіжність між подіями однієї сесії.
+    function cartItems(lines) {
+
+        return (lines || []).map(function (line) {
+            return itemOf(line.product, {
+                color: line.color,
+                size: line.size,
+                quantity: line.qty
+            });
+        }).filter(Boolean);
+
+    }
+
     function send(name, params) {
 
         if (!allowed()) return;       // немає згоди — не збираємо взагалі
@@ -259,13 +277,7 @@
 
         viewCart: function (lines, total) {
 
-            var items = (lines || []).map(function (line) {
-                return itemOf(line.product, {
-                    color: line.color,
-                    size: line.size,
-                    quantity: line.qty
-                });
-            }).filter(Boolean);
+            var items = cartItems(lines);
 
             if (!items.length) return;
 
@@ -275,13 +287,7 @@
 
         beginCheckout: function (lines, total) {
 
-            var items = (lines || []).map(function (line) {
-                return itemOf(line.product, {
-                    color: line.color,
-                    size: line.size,
-                    quantity: line.qty
-                });
-            }).filter(Boolean);
+            var items = cartItems(lines);
 
             if (!items.length) return;
 
@@ -289,17 +295,83 @@
 
         },
 
+        // Крок «доставка» і крок «оплата».
+        //
+        // НАВІЩО САМЕ ЦІ ДВА
+        // -------------------
+        // begin_checkout і purchase показують лише крайні точки: скільки
+        // почали оформлення й скільки завершили. Різниця між ними —
+        // цифра без пояснення.
+        //
+        // Ці дві події ділять проміжок навпіл. Якщо люди зникають після
+        // add_shipping_info, справа в доставці: не влаштовує спосіб або
+        // ціна. Якщо після add_payment_info — справа в оплаті. Це вже
+        // не «щось не так», а конкретне місце, куди дивитись.
+        addShippingInfo: function (lines, total, method) {
+
+            var items = cartItems(lines);
+
+            if (!items.length) return;
+
+            send("add_shipping_info", {
+                currency: "UAH",
+                value: Number(total) || 0,
+                shipping_tier: method || undefined,
+                items: items
+            });
+
+        },
+
+        addPaymentInfo: function (lines, total, method) {
+
+            var items = cartItems(lines);
+
+            if (!items.length) return;
+
+            send("add_payment_info", {
+                currency: "UAH",
+                value: Number(total) || 0,
+                payment_type: method || undefined,
+                items: items
+            });
+
+        },
+
+        // Акції на головній.
+        //
+        // Ми зробили для банерів кадрування, стилі й окремі картинки під
+        // телефон — але досі не знали, чи на них узагалі натискають.
+        // view_promotion і select_promotion дають саме це: скільки разів
+        // банер побачили й скільки разів по ньому пішли.
+        viewPromotion: function (promo, position) {
+
+            if (!promo) return;
+
+            send("view_promotion", {
+                promotion_id: String(promo.slug || promo.id || ""),
+                promotion_name: String(promo.title || ""),
+                creative_slot: position || undefined
+            });
+
+        },
+
+        selectPromotion: function (promo, position) {
+
+            if (!promo) return;
+
+            send("select_promotion", {
+                promotion_id: String(promo.slug || promo.id || ""),
+                promotion_name: String(promo.title || ""),
+                creative_slot: position || undefined
+            });
+
+        },
+
         purchase: function (order) {
 
             if (!order) return;
 
-            var items = (order.lines || []).map(function (line) {
-                return itemOf(line.product, {
-                    color: line.color,
-                    size: line.size,
-                    quantity: line.qty
-                });
-            }).filter(Boolean);
+            var items = cartItems(order.lines);
 
             // Ні імені, ні телефону, ні адреси — тільки те, що потрібно
             // для звіту про продажі.
