@@ -65,7 +65,10 @@ console.log("\n[3] Ціна захищена від обрізання скрі�
   const price = rule(".product-card .price");
   const old = rule(".product-card .old-price");
   check("зменшений розмір ціни — universal", price !== null && /font-size\s*:\s*15px/.test(price));
-  check("зменшений розмір старої ціни — universal", old !== null && /font-size\s*:\s*11\.5px/.test(old));
+  // Було 11.5px. Напівпіксельні розміри звели до цілих: різницю між
+  // 11.5 і 12 не видно, а рішень «який тут розмір» стало на шість
+  // менше. Суть перевірки — стара ціна помітно дрібніша за поточну.
+  check("зменшений розмір старої ціни — universal", old !== null && /font-size\s*:\s*12px/.test(old));
 }
 
 console.log("\n[4] Бейджі компактніші скрізь");
