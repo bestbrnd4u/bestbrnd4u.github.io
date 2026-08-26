@@ -73,5 +73,17 @@
   "category": "Жіночі сумки",
   "sizes": [
     "ONESIZE"
-  ]
+  ],
+  "framing": {
+    "cp150-b4bk-a0-1.webp": {
+      "zoom": 1.4,
+      "x": 50,
+      "y": 50
+    },
+    "cp150-b4mpl-1.webp": {
+      "zoom": 1.41,
+      "x": 50,
+      "y": 50
+    }
+  }
 }

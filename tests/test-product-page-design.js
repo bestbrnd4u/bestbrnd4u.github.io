@@ -33,10 +33,19 @@ const css = fs.readFileSync(path.join(ROOT, "assets/css/style.css"), "utf8");
 const MARKER = "СТОРІНКА ТОВАРУ: типографіка й ритм";
 const markerAt = css.indexOf(MARKER);
 
+// Десктопні значення тепер розкидані по файлу — там, де оголошений
+// селектор. Тож «десктопна частина» це весь css поза мобільним
+// блоком наших правок, а не хвіст файлу.
 const newBlock = markerAt >= 0 ? css.slice(markerAt) : "";
 const mobileAt = newBlock.indexOf("@media(max-width:768px)");
 
-const desktopPart = mobileAt >= 0 ? newBlock.slice(0, mobileAt) : newBlock;
+// Десктопні значення — усе, що ПОЗА мобільним медіазапитом.
+//
+// Раніше тут був хвіст файлу (наш окремий блок). Тепер значення
+// стоять там, де оголошений селектор, тож «десктопна частина» — це
+// файл без мобільних блоків. Інакше valueIn() підхоплював мобільні
+// розміри й порівнював їх між собою.
+const desktopPart = css.replace(/@media\s*\(max-width:\s*768px\)\s*\{[\s\S]*?\n\}/g, "");
 const mobilePart = mobileAt >= 0 ? newBlock.slice(mobileAt) : "";
 
 const valueIn = (text, selector, prop) => {
@@ -59,29 +68,60 @@ const valueIn = (text, selector, prop) => {
 
 };
 
-console.log("\n[1] Новий блок стоїть після старих правил");
+console.log("\n[1] Значення живуть в одному правилі, а не в двох");
 {
-    check("блок є у файлі", markerAt > 0);
+    // ЧОМУ ЦЕ ПЕРЕПИСАНО
+    // -------------------
+    // Спершу правки типографіки лежали окремим блоком у кінці файлу й
+    // перекривали ранні правила ПОЗИЦІЄЮ. Працювало, але трималось на
+    // порядку рядків: переставили блок — і все тихо повернулось до
+    // старих розмірів.
+    //
+    // Тепер значення стоять там, де сам селектор оголошений. Перевірка
+    // відповідно змінилась: стежимо не за порядком, а за тим, що кожен
+    // селектор оголошений РІВНО ОДИН раз поза медіазапитами.
+    // Рахуємо оголошення напряму: селектор на початку рядка (без
+    // відступу) означає, що він поза медіазапитом — усередині @media
+    // правила зсунуті вправо.
+    //
+    // Раніше тут був власний розбір CSS по дужках, і він спотикався на
+    // комментарях усередині правил: селектор «зникав», перевірка
+    // червоніла на порожньому місці.
+    const declaredTimes = sel => {
 
-    // Порядок — єдине, що дає йому перевагу: специфічність у частини
-    // правил однакова.
-    [
-        ["h3 24px (глобальний)", "h3{\n    font-size:24px"],
-        ["h1 товару 40px", ".product-wrapper .product-info h1{\n    font-size:40px"],
-        ["ціна 38px", ".price-box .price{\n    font-size:38px"],
-        [".similar 80px", ".similar{\n    padding:80px 0"],
-        [".spec-block 22px", ".spec-block{\n    margin-top:22px"]
-    ].forEach(([label, snippet]) => {
+        const escaped = sel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-        const at = css.indexOf(snippet);
+        return (css.match(new RegExp(`^${escaped}\\s*\\{`, "gm")) || []).length;
 
-        check(`${label} — вище нового блока`, at >= 0 && at < markerAt, at);
+    };
+
+    const watched = [
+        ".product-wrapper",
+        ".product-wrapper .product-info",
+        ".product-wrapper .product-info h1",
+        ".price-box .price",
+        ".price-box .old-price",
+        ".spec-block-header h3",
+        ".similar"
+    ];
+
+    watched.forEach(sel => {
+
+        const times = declaredTimes(sel);
+
+        check(`${sel} — одне оголошення`, times === 1, times);
 
     });
 
-    // мобільна частина нового блока мусить бути ПІСЛЯ старої
-    check("мобільні правила теж перекривають старі",
-        mobileAt >= 0 && css.indexOf("@media(max-width:768px)") < markerAt + mobileAt);
+    // Старих значень не має лишитись узагалі: якщо десь вигулькне
+    // font-size:40px для назви товару, це означає, що правило
+    // роздвоїлось знову.
+    check("старий розмір назви прибраний",
+        !/\.product-wrapper \.product-info h1\{[^}]*font-size:40px/.test(css));
+    check("стара ціна прибрана",
+        !/\.price-box \.price\{[^}]*font-size:38px/.test(css));
+    check("старий відступ розділу прибраний",
+        !/\.similar\{[^}]*padding:80px 0/.test(css));
 }
 
 console.log("\n[2] Ієрархія розмірів");

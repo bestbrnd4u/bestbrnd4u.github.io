@@ -1304,6 +1304,9 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
 
 .product-image{
     position:relative;
+    /* обрізає масштабоване кадруванням фото — інакше воно вилазить
+       за межі картки й накриває сусідні */
+    overflow:hidden;
 }
 
 .product-video-slide{
@@ -2607,7 +2610,7 @@ footer{
     .promo-hero-quicklinks a{
         flex:1 1 0;
         padding:10px 6px;
-        font-size:12.5px;
+        font-size:12px;
         text-align:center;
     }
 
@@ -2919,7 +2922,7 @@ body.mobile-filters-open .scroll-top{
     width:100%;
     padding:9px 12px;
     border-radius:10px;
-    font-size:14.5px;
+    font-size:14px;
     color:var(--gray700);
     text-align:left;
     transition:background .15s ease, color .15s ease;
@@ -3013,6 +3016,17 @@ body.mobile-filters-open .scroll-top{
 }
 
 .sidebar-group-icon::before,
+/* Вертикальна риска знака «+».
+   
+   Стан за замовчуванням — РОЗГОРНУТО: риска складається в
+   горизонтальну й зникає, лишається «−». Згорнутий стан нижче
+   повертає її на 90° і робить видимою.
+   
+   Раніше це були ДВА правила з тим самим селектором: базове й
+   одразу за ним те, що перевизначало transform і додавало opacity.
+   Працювало лише доки другий блок стоїть після першого — переставили
+   б, і знак завжди показував «+». Тепер значення одні, у єдиному
+   правилі. */
 .sidebar-group-icon::after{
     content:"";
     position:absolute;
@@ -3022,15 +3036,9 @@ body.mobile-filters-open .scroll-top{
     height:2px;
     background:currentColor;
     border-radius:1px;
-    transform:translateY(-50%);
-    transition:transform .18s ease, opacity .18s ease;
-}
-
-/* розгорнуто: вертикальна лінія «складається» в горизонтальну
-   і зникає → лишається «−» */
-.sidebar-group-icon::after{
     transform:translateY(-50%) rotate(0deg);
     opacity:0;
+    transition:transform .18s ease, opacity .18s ease;
 }
 
 /* згорнуто: вертикальна лінія повертається на 90° і стає видимою → «+» */
@@ -3622,7 +3630,7 @@ body.mobile-filters-open .scroll-top{
     border-radius:10px;
     border:1.5px solid var(--gray200);
     background:#fff;
-    font-size:13.5px;
+    font-size:13px;
     font-weight:600;
     color:var(--gray700);
     text-align:center;
@@ -3714,7 +3722,7 @@ body.mobile-filters-open .scroll-top{
     padding:16px 14px;
     text-align:center;
     color:var(--gray500);
-    font-size:13.5px;
+    font-size:13px;
 }
 
 /* -- панель активних фільтрів -- */
@@ -4134,8 +4142,8 @@ body.mobile-filters-open .scroll-top{
 .product-wrapper{
     display:grid;
     grid-template-columns:minmax(320px,560px) 1fr;
-    gap:60px;
-    padding:30px 0 60px;
+    gap:48px;
+    padding:24px 0 56px;
     align-items:start;
 }
 
@@ -4452,11 +4460,12 @@ body.mobile-filters-open .scroll-top{
 .product-wrapper .product-info{
     display:flex;
     flex-direction:column;
-    gap:20px;
+    gap:18px;
 }
 
 .product-wrapper .product-info h1{
-    font-size:40px;
+    font-size:32px;
+    letter-spacing:-.4px;
     line-height:1.2;
 }
 
@@ -4480,7 +4489,7 @@ body.mobile-filters-open .scroll-top{
 
 .product-meta-line{
     margin-top:-12px;
-    font-size:13.5px;
+    font-size:13px;
     color:var(--gray500);
 }
 
@@ -4491,13 +4500,13 @@ body.mobile-filters-open .scroll-top{
 }
 
 .price-box .price{
-    font-size:38px;
+    font-size:32px;
     font-weight:800;
     color:var(--gray900);
 }
 
 .price-box .old-price{
-    font-size:20px;
+    font-size:18px;
     text-decoration:line-through;
     color:var(--gray300);
 }
@@ -4545,7 +4554,7 @@ body.mobile-filters-open .scroll-top{
 .size-error{
     margin-top:10px;
     color:#dc2626;
-    font-size:13.5px;
+    font-size:13px;
     font-weight:600;
 }
 
@@ -4583,7 +4592,7 @@ body.mobile-filters-open .scroll-top{
     padding:12px 10px;
     text-align:left;
     border-bottom:1px solid var(--gray100);
-    font-size:14.5px;
+    font-size:14px;
 }
 
 .size-guide-table th{
@@ -4868,7 +4877,7 @@ body.mobile-filters-open .scroll-top{
     align-items:baseline;
     gap:6px;
     padding:7px 0;
-    font-size:14.5px;
+    font-size:14px;
     line-height:1.55;
 }
 
@@ -4909,6 +4918,13 @@ body.mobile-filters-open .scroll-top{
 }
 
 .spec-block-header h3{
+    /* 16px, а не успадковані 24: це підпис до групи полів, а не назва
+       розділу сторінки. Раніше заголовок конкурував зі значенням під
+       ним — «Артикул» виглядав важливішим за сам артикул. */
+    font-size:16px;
+    font-weight:700;
+    letter-spacing:.2px;
+    line-height:1.35;
     margin-bottom:0;
 }
 
@@ -4986,7 +5002,7 @@ body.mobile-filters-open .scroll-top{
 .spec-plain{
     padding:6px 0 14px;
     color:var(--gray700);
-    font-size:14.5px;
+    font-size:14px;
     line-height:1.6;
 }
 
@@ -5049,7 +5065,7 @@ body.mobile-filters-open .scroll-top{
     color:#fff;
     padding:10px 18px;
     border-radius:8px;
-    font-size:13.5px;
+    font-size:13px;
     font-weight:600;
     transition:.2s;
 }
@@ -5219,7 +5235,7 @@ body.mobile-filters-open .scroll-top{
 /* -- похожие товары -- */
 
 .similar{
-    padding:80px 0;
+    padding:64px 0;
     background:#fafafa;
 }
 
@@ -5462,7 +5478,7 @@ body.mobile-filters-open .scroll-top{
     background:transparent;
     box-shadow:none;
     color:var(--gray500);
-    font-size:13.5px;
+    font-size:13px;
     font-weight:600;
 }
 
@@ -5491,9 +5507,7 @@ body.mobile-filters-open .scroll-top{
 
 /* -- горизонтальные строки избранного -- */
 
-.favorites-list[hidden]{
-    display:none;
-}
+
 
 .favorites-list[hidden]{
     display:none;
@@ -6503,12 +6517,12 @@ body.mobile-filters-open .scroll-top{
     }
 
     .product-card .product-category{
-        font-size:10.5px;
+        font-size:10px;
         margin-bottom:4px;
     }
 
     .product-card .product-title{
-        font-size:13.5px;
+        font-size:13px;
         line-height:1.3;
         margin-bottom:8px;
         /* той самий резерв під 2 рядки, що і в десктопному правилі
@@ -6640,7 +6654,7 @@ body.mobile-filters-open .scroll-top{
     }
 
     .product-card .old-price{
-        font-size:11.5px;
+        font-size:12px;
     }
 
     .product-card .discount{
@@ -6651,7 +6665,7 @@ body.mobile-filters-open .scroll-top{
     .product-card .buy-btn{
         height:38px;
         padding:0 12px;
-        font-size:12.5px;
+        font-size:12px;
         border-radius:10px;
     }
 
@@ -7227,7 +7241,7 @@ body.mobile-filters-open .scroll-top{
     text-align:left;
     padding:11px 10px;
     border-radius:8px;
-    font-size:14.5px;
+    font-size:14px;
     color:var(--gray700);
     transition:.15s;
 }
@@ -7241,7 +7255,7 @@ body.mobile-filters-open .scroll-top{
 
 .search-no-suggestions{
     color:var(--gray300);
-    font-size:13.5px;
+    font-size:13px;
 }
 
 .search-results-grid{
@@ -7300,7 +7314,7 @@ body.mobile-filters-open .scroll-top{
 
 .search-no-results{
     color:var(--gray500);
-    font-size:14.5px;
+    font-size:14px;
     padding:8px 0;
 }
 
@@ -7897,7 +7911,7 @@ body.mobile-filters-open .scroll-top{
 .order-item-refuse{
     align-self:flex-start;
     margin-top:4px;
-    font-size:12.5px;
+    font-size:12px;
     font-weight:600;
     color:var(--gray500);
     transition:.2s;
@@ -8125,7 +8139,7 @@ body.mobile-filters-open .scroll-top{
 
 .address-card-detail{
     margin-top:4px;
-    font-size:13.5px;
+    font-size:13px;
     color:var(--gray500);
 }
 
@@ -8272,7 +8286,7 @@ body.mobile-filters-open .scroll-top{
 }
 
 .saved-address-chip-title{
-    font-size:13.5px;
+    font-size:13px;
     font-weight:700;
     color:var(--gray900);
 }
@@ -8453,7 +8467,7 @@ body.mobile-filters-open .scroll-top{
     border-radius:50px;
     background:var(--secondary);
     color:#fff;
-    font-size:11.5px;
+    font-size:12px;
     font-weight:800;
 }
 
@@ -8545,7 +8559,7 @@ body.mobile-filters-open .scroll-top{
     padding:18px 16px;
     border-bottom:1px solid var(--gray100);
     text-align:left;
-    font-size:15.5px;
+    font-size:15px;
     font-weight:600;
     color:var(--gray900);
 }
@@ -8925,7 +8939,7 @@ body.mobile-filters-open .scroll-top{
     z-index:2;
     text-align:center;
     color:rgba(255,255,255,.55);
-    font-size:12.5px;
+    font-size:12px;
     padding:0 24px 22px;
 }
 
@@ -9026,7 +9040,7 @@ body.mobile-filters-open .scroll-top{
     border-radius:50px;
     background:var(--gray100);
     color:var(--gray500);
-    font-size:13.5px;
+    font-size:13px;
     font-weight:600;
     margin-bottom:36px;
 }
@@ -9044,7 +9058,7 @@ body.mobile-filters-open .scroll-top{
 
 .legal-content p{
     color:var(--gray500);
-    font-size:15.5px;
+    font-size:15px;
     line-height:1.8;
     margin-bottom:16px;
 }
@@ -9062,7 +9076,7 @@ body.mobile-filters-open .scroll-top{
     position:relative;
     padding-left:26px;
     color:var(--gray500);
-    font-size:15.5px;
+    font-size:15px;
     line-height:1.7;
 }
 
@@ -9211,7 +9225,7 @@ body.mobile-filters-open .scroll-top{
 
 .bayer-benefit-card p{
     color:var(--gray500);
-    font-size:14.5px;
+    font-size:14px;
     line-height:1.6;
 }
 
@@ -9409,7 +9423,7 @@ body.mobile-filters-open .scroll-top{
     padding:20px 24px;
     text-align:left;
     font-weight:600;
-    font-size:15.5px;
+    font-size:15px;
     color:var(--gray900);
     cursor:pointer;
     -webkit-tap-highlight-color:transparent;
@@ -9696,7 +9710,7 @@ body.mobile-filters-open .scroll-top{
 }
 
 .collection-product-title{
-    font-size:13.5px;
+    font-size:13px;
     color:var(--gray900);
     line-height:1.4;
 }
@@ -9767,11 +9781,11 @@ body.mobile-filters-open .scroll-top{
     }
 
     .collection-product-title{
-        font-size:11.5px;
+        font-size:12px;
     }
 
     .collection-product-price{
-        font-size:12.5px;
+        font-size:12px;
     }
 
     .collection-nav{
@@ -10322,7 +10336,7 @@ body.confirm-open{
 
 .consent-text{
     flex:1;
-    font-size:13.5px;
+    font-size:13px;
     line-height:1.55;
     color:var(--gray700);
 }
@@ -10468,13 +10482,12 @@ body.confirm-open{
 .mini-color.is-taken{
     opacity:.4;
     cursor:not-allowed;
-}
-
-/* позиціонування — від самого кружечка, інакше рамка поїде
-   до найближчого позиціонованого предка десь вище */
-.mini-color.is-taken{
+    /* позиціонування — від самого кружечка, інакше пунктирна рамка
+       поїде до найближчого позиціонованого предка десь вище */
     position:relative;
 }
+
+
 
 .mini-color.is-taken::after{
     content:"";
@@ -10545,7 +10558,7 @@ body.confirm-open{
 
 .contact-channel-hint{
     margin:6px 0 0;
-    font-size:12.5px;
+    font-size:12px;
     line-height:1.5;
     color:var(--gray500);
 }
@@ -10585,12 +10598,7 @@ body.confirm-open{
    основний текст назви й на крок більший за значення. Легкий
    letter-spacing відділяє його від значень візуально, без збільшення
    розміру. */
-.spec-block-header h3{
-    font-size:16px;
-    font-weight:700;
-    letter-spacing:.2px;
-    line-height:1.35;
-}
+
 
 /* -- 2. Ритм між блоками --
 
@@ -10636,9 +10644,7 @@ body.confirm-open{
 
    Два блоки з тим самим тлом підряд не мають подвоювати відступ: вони
    читаються як одна смуга, тож розділяє їх лише внутрішній ритм. */
-.similar{
-    padding:64px 0;
-}
+
 
 .similar + .similar{
     padding-top:0;
@@ -10654,28 +10660,15 @@ body.confirm-open{
    40px для назви завеликі: довга назва в дві-три стрічки відтісняла
    ціну й кнопку за межі першого екрана. 32px лишають назву головною,
    але не єдиною. */
-.product-wrapper{
-    gap:48px;
-    padding:24px 0 56px;
-}
 
-.product-wrapper .product-info{
-    gap:18px;
-}
 
-.product-wrapper .product-info h1{
-    font-size:32px;
-    line-height:1.25;
-    letter-spacing:-.4px;
-}
 
-.price-box .price{
-    font-size:32px;
-}
 
-.price-box .old-price{
-    font-size:18px;
-}
+
+
+
+
+
 
 @media(max-width:768px){
 
@@ -10731,7 +10724,7 @@ body.confirm-open{
        підпис і значення в один рядок або переносяться посередині
        слова, або тиснуть одне одного до неможливості прочитати. */
     .specifications .spec-row{
-        font-size:14.5px;
+        font-size:14px;
         padding:5px 0;
     }
 
@@ -10759,13 +10752,9 @@ body.confirm-open{
    верстки, а не як інструмент.
    ========================================================== */
 
-.product-image{
-    overflow:hidden;
-}
 
-.thumbs-vertical .thumb{
-    overflow:hidden;
-}
+
+
 
 /* ==========================================================
    ГАЛЕРЕЯ ТОВАРУ: масштаб не має виходити за межі свого слайда
@@ -10801,6 +10790,9 @@ body.confirm-open{
        б висоти, бо єдиний вміст у ній позиційно звичайний. */
     aspect-ratio:4/5;
     background:#fff;
+    /* Обгортка успадкувала від .gallery-slide масштаб — знімаємо,
+       інакше вийшло б подвійне збільшення: і на слайді, і на фото. */
+    transform:none;
 }
 
 .gallery-photo{
@@ -10820,11 +10812,7 @@ body.confirm-open{
     user-select:none;
 }
 
-/* Обгортка успадкувала від .gallery-slide масштаб — знімаємо, інакше
-   вийшло б подвійне збільшення: і на слайді, і на фото. */
-.gallery-slide-photo{
-    transform:none;
-}
+
 
 /* ==========================================================
    КАРТКА КАТАЛОГУ: масштаб у межах свого слайда
@@ -10874,4 +10862,81 @@ body.confirm-open{
     font-size:13px;
     line-height:1.4;
     color:var(--gray500);
+}
+
+/* ==========================================================
+   ЯКІСНИЙ МІНІМУМ: рух і фокус
+   ==========================================================
+
+   Дві речі, яких на сайті бракувало. Обидві не про смак — про те,
+   чи можна ним користуватись.
+
+   1. РУХ. У стилях 130 переходів і 11 анімацій, а
+      prefers-reduced-motion покривав РІВНО ОДНЕ правило. Люди, що
+      вмикають цю системну настройку, роблять це не з примхи: рух на
+      екрані викликає нудоту при вестибулярних розладах, мігрені,
+      після сотрясіння. Для них сайт лишався таким самим рухливим.
+
+   2. ФОКУС. Правил :focus-visible було чотири на весь сайт. Людина,
+      що ходить клавіатурою — бо не користується мишею, бо зламався
+      тачпад, бо так швидше, — не бачила, де вона зараз.
+
+   Обидва блоки в кінці файлу навмисно: вони мусять перекривати
+   поодинокі правила вище, а не змагатися з ними специфічністю.
+   ========================================================== */
+
+@media (prefers-reduced-motion: reduce){
+
+    /* Не «трохи повільніше», а прибрати.
+       
+       0.01ms замість 0 — щоб події transitionend і animationend усе
+       одно спрацьовували: на них тримається частина логіки (наприклад
+       приховування шторки після закриття), і з нулем вона зависла б. */
+    *,
+    *::before,
+    *::after{
+        animation-duration:.01ms !important;
+        animation-iteration-count:1 !important;
+        transition-duration:.01ms !important;
+        scroll-behavior:auto !important;
+    }
+
+    /* Плавна прокрутка теж рух: автоскрол до результатів фільтра
+       смикає екран сильніше за будь-яку анімацію. */
+    html{
+        scroll-behavior:auto !important;
+    }
+
+}
+
+/* -- Видимий фокус для всього, що можна натиснути --
+
+   :focus-visible, а не :focus: рамка з'являється при керуванні
+   клавіатурою й НЕ з'являється при клацанні мишею. Саме через це
+   старий :focus прибирали через outline:none — він шумів на кожному
+   натисканні. Тепер шуму немає, а видимість є.
+
+   Правило базове: окремі елементи мають свої, точніші, і вони
+   лишаються — цей блок лише закриває те, що ніхто не описав. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible,
+[role="button"]:focus-visible{
+    outline:3px solid var(--secondary);
+    outline-offset:2px;
+    /* Скруглення успадковується від елемента, тож рамка обіймає
+       кнопку по формі, а не прямокутником поверх неї. */
+    border-radius:inherit;
+}
+
+/* На темних смугах синя рамка тоне — там світла. */
+.footer a:focus-visible,
+.hero a:focus-visible,
+.hero button:focus-visible,
+.promo-hero-slide a:focus-visible{
+    outline-color:#fff;
 }

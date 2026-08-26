@@ -430,13 +430,19 @@ console.log("\n[9] «Підігнати по товару»");
 
     // Прозорий піксель — теж тло, інакше фото з альфою давали б межі
     // на весь кадр.
-    check("прозорість вважається тлом", /alpha < 16/.test(widget));
+    check("прозорість вважається тлом", /data\[i \+ 3\] < 16/.test(widget));
 
-    // Чисто білого на фото майже не буває: тіні й компресія дають
-    // 245–252, тож поріг мусить бути нижчим за 255.
-    const limit = Number((widget.match(/var LIMIT = (\d+)/) || [])[1]);
-
-    check("поріг тла нижчий за чистий білий", limit > 200 && limit < 255, limit);
+    // Колір тла беремо З КУТІВ, а не з зашитого числа.
+    //
+    // Раніше стояв поріг 244 — «світліше значить біле тло». Але
+    // предметні фото знімають не тільки на білому: у частини товарів
+    // тло 240/240/240, світло-сіре. Поріг його не визнавав, «не-фоном»
+    // виявлявся ВЕСЬ кадр, і кнопка честно відповідала «не вдалося
+    // визначити межі товару».
+    check("зашитого порога більше немає", !/var LIMIT = \d+/.test(widget));
+    check("тло визначається по кутах", /var corners = \[at\(1, 1\)/.test(widget));
+    check("є допуск навколо кольору тла", /TOLERANCE = 12/.test(widget));
+    check("неоднорідне тло відхиляється", /if \(spread > 24\) return null/.test(widget));
 
     check("фото цілком біле не ламає підгонку", /if \(maxX < 0\) return null/.test(widget));
     check("товар на весь кадр не підганяється",
@@ -578,7 +584,103 @@ console.log("\n[9b] Розрахунок кадру — на справжніх 
         check(`де потрібно більше за 3× — обмежиться межею (${capped.length})`,
             /MAX_ZOOM/.test(read("assets/js/image-framing.js")));
 
-        console.log("\n[10] Автоматичний кадр для фото з завеликими полями");
+        console.log("\n[9c] Адреса фото не перезапитується на кожну перемальовку");
+{
+    // СИМПТОМ
+    // --------
+    // Фото в адмінці не показувались — сірі квадрати. Точку не
+    // перетягнути, зміни в прев'ю праворуч не видно. У Network 1917
+    // запитів, у консолі «Wait Action timed out» триста разів.
+    //
+    // ПРИЧИНА
+    // --------
+    // getAsset(шлях) стояв прямо в render(). Віджет перемальовується на
+    // кожен рух повзунка й кожне перетягування — десятки разів за
+    // секунду, і щоразу Decap просили розвʼязати файл заново.
+    // Розвʼязування не встигало завершитись, бо його починали спочатку.
+    //
+    // Натиснеш «−» — картинка раптом зʼявляється: чергова перемальовка
+    // встигла зловити готовий результат. Саме це й збивало з пантелику.
+    const widget = read("admin/image-framing-widget.js");
+
+    check("є кеш адрес", /var assetCache = \{\}/.test(widget));
+    check("шлях із репозиторію береться напряму",
+        /\/\^\\\/\?assets\\\//.test(widget) || /assets\\\//.test(widget));
+
+    // blob-адреса живе лише до перезавантаження сторінки — у кеші вона
+    // стала б битим посиланням.
+    check("blob не кешується", /indexOf\("blob:"\) !== 0/.test(widget));
+
+    // Головне: getAsset не має викликатись у render.
+    const renderPart = widget.slice(widget.indexOf("var ImageFramingControl"));
+
+    check("у render немає прямого getAsset",
+        !/getAsset\(item\.src\)/.test(renderPart));
+    check("render користується помічником",
+        /publicUrl\(item\.src, getAsset\)/.test(renderPart));
+
+    // І перевіряємо поведінку, а не текст: тридцять перемальовок
+    // мусять дати НУЛЬ запитів для фото з репозиторію.
+    const registered = {};
+
+    const sandbox = {
+        CMS: { registerWidget: (name, control) => { registered[name] = control; } }
+    };
+
+    sandbox.window = sandbox;
+    sandbox.ImageFraming = require("../assets/js/image-framing.js");
+    sandbox.h = (type, props, ...kids) => ({ type, props: props || {}, kids: kids.flat() });
+    sandbox.createClass = spec => {
+        function C(props) {
+            this.props = props;
+            this.state = spec.getInitialState ? spec.getInitialState.call(this) : {};
+        }
+        Object.assign(C.prototype, spec);
+        C.prototype.setState = function (s) { Object.assign(this.state, s); };
+        return C;
+    };
+    sandbox.document = { addEventListener() {}, removeEventListener() {} };
+
+    require("vm").createContext(sandbox);
+    require("vm").runInContext(widget, sandbox);
+
+    const data = {
+        variants: [{
+            color: "Чорний",
+            images: ["/assets/images/products/uploads/coach-ct714-qbml5-1.webp"]
+        }]
+    };
+
+    let calls = 0;
+
+    const instance = new registered.imageFraming({
+        value: {},
+        onChange: () => {},
+        entry: { get: key => (key === "data" ? data : null) },
+        getAsset: () => { calls++; return null; }
+    });
+
+    instance.state.open = true;
+
+    const rows = [];
+
+    (function walk(node) {
+        if (!node || typeof node !== "object") return;
+        if (node.props && node.props.url) rows.push(node.props);
+        (node.kids || []).forEach(walk);
+    }(instance.render()));
+
+    check("рядок кадрування побудовано", rows.length === 1, rows.length);
+    check("адреса — звичайний шлях",
+        rows.length > 0 && rows[0].url.startsWith("/assets/images/"),
+        rows.length ? rows[0].url : "—");
+
+    for (let i = 0; i < 30; i++) instance.render();
+
+    check("30 перемальовок — жодного запиту", calls === 0, calls);
+}
+
+console.log("\n[10] Автоматичний кадр для фото з завеликими полями");
 {
     // ЧОМУ ЦЕ ЗʼЯВИЛОСЬ
     // ------------------
@@ -605,10 +707,15 @@ console.log("\n[9b] Розрахунок кадру — на справжніх 
     // інакше автоматика й кнопка дадуть різні кадри для одного знімка.
     const widget = read("admin/image-framing-widget.js");
 
-    check("поріг тла однаковий",
-        /LIMIT = 244/.test(script) && /LIMIT = 244/.test(widget));
+    // Логіка мусить бути ТА САМА, інакше кнопка «Підігнати» й
+    // автоматика дадуть різні кадри для одного знімка.
+    check("тло по кутах в обох", /corners/.test(script) && /corners/.test(widget));
+    check("допуск однаковий",
+        /TOLERANCE = 12/.test(script) && /TOLERANCE = 12/.test(widget));
+    check("межа однорідності однакова",
+        /spread > 24/.test(script) && /spread > 24/.test(widget));
     check("прозорість вважається тлом в обох",
-        /alpha < 16|data\[i \+ 3\] < 16/.test(script) && /alpha < 16/.test(widget));
+        /data\[i \+ 3\] < 16/.test(script) && /data\[i \+ 3\] < 16/.test(widget));
 
     // Наближення обмежене: за 3× показується надто малий шматок
     // оригіналу, і картинка стає мʼякою.

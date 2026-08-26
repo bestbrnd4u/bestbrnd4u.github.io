@@ -186,9 +186,34 @@ function registerVariants(files) {
         console.error(`Не вдалося прочитати ${path.relative(ROOT, VARIANTS_FILE)}: ${error.message}`);
     }
 
-    const merged = [...new Set([...list, ...files])].sort();
+    // Прибираємо записи, для яких файлу вже немає.
+    //
+    // ЧОМУ ЦЕ ПОТРІБНО
+    // -----------------
+    // Раніше реєстр лише ДОПОВНЮВАВСЯ: [...list, ...files]. Видалили
+    // фото — запис лишався назавжди. Наслідок не косметичний:
+    //
+    //   • верстка бачить запис і просить srcset для файлу, якого нема;
+    //   • перевірка цілісності падає на «фото є в реєстрі, а на диску
+    //     немає» — і щоб її пройти, доводиться чистити руками;
+    //   • у git-історії щоразу зʼявляється рядок «+ ...webp», і
+    //     здається, ніби збірка живе своїм життям.
+    //
+    // Реєстр — це опис того, що є НА ДИСКУ. Значить він мусить і
+    // втрачати записи, а не тільки набирати.
+    const exists = new Set(fs.readdirSync(DIR));
+
+    const merged = [...new Set([...list, ...files])]
+        .filter(name => exists.has(name))
+        .sort();
 
     fs.writeFileSync(VARIANTS_FILE, JSON.stringify(merged, null, 2) + "\n", "utf8");
+
+    const dropped = list.filter(name => !exists.has(name));
+
+    if (dropped.length) {
+        console.log(`   з реєстру прибрано записів без файлу: ${dropped.length}`);
+    }
 
     return merged.length - list.length;
 

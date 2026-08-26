@@ -511,6 +511,31 @@ async function initPromotions() {
             window.TextStyles.ensureFonts(promotions.map(p => p.style));
         }
 
+        // Статистика: акції на головній.
+        //
+        // Для банерів ми зробили кадрування, стилі й окремі картинки під
+        // телефон — але досі не знали, чи на них узагалі натискають.
+        // Тепер видно і показ, і переходи.
+        //
+        // Клац ловимо одним обробником на весь документ, а не в кожному
+        // з чотирьох типів банерів: типів може стати більше, і кожного
+        // разу згадувати про статистику ніхто не буде.
+        promotions.forEach((promo, index) =>
+            window.Analytics?.viewPromotion(promo, promo.displayType + " #" + (index + 1)));
+
+        document.addEventListener("click", event => {
+
+            const link = event.target.closest('a[href^="promo?id="]');
+
+            if (!link) return;
+
+            const slug = decodeURIComponent(link.getAttribute("href").split("id=")[1] || "");
+            const promo = promotions.find(p => p.slug === slug);
+
+            if (promo) window.Analytics?.selectPromotion(promo, promo.displayType);
+
+        });
+
         const regular = promotions.filter(promo => promo.displayType === "card");
         const heroSliderPromos = promotions.filter(promo => promo.displayType === "hero_slider");
         const bannersWithProducts = promotions.filter(promo => promo.displayType === "banner_products");

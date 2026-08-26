@@ -1,0 +1,71 @@
+{
+  "gender": [
+    "Жінкам"
+  ],
+  "preOrderDays": "5–10 робочих днів",
+  "forcePublish": false,
+  "material": "Фірмовий покритий Signature Canvas та гладка шкіра",
+  "brand": "Coach",
+  "price": 6000,
+  "preOrder": false,
+  "dimensions": "32 × 27 × 14 см",
+  "variants": [
+    {
+      "color": "Brown/Black коричневий",
+      "hex": "#593131",
+      "images": [
+        "/assets/images/products/uploads/00570556_d.jpg",
+        "/assets/images/products/uploads/00570556_s.jpg",
+        "/assets/images/products/uploads/00570556_i.jpg",
+        "/assets/images/products/uploads/00570556_m.jpg"
+      ]
+    }
+  ],
+  "preOrderPrepayment": 50,
+  "strapInfo": "Ручки подвійні, незнімні",
+  "sizes": [
+    "ONESIZE"
+  ],
+  "splitByColor": true,
+  "searchKeywords": [
+    "COACH",
+    "Coach Gallery Tote",
+    "Gallery Tote Bag",
+    "Coach 79609",
+    "79609IMAA8",
+    "Coach Signature Canvas",
+    "Coach сумка",
+    "сумка Coach",
+    "жіноча сумка Coach",
+    "Gallery Tote",
+    "tote bag",
+    "сумка тоут",
+    "містка сумка",
+    "коричнева сумка",
+    "чорна сумка",
+    "Brown Black",
+    "Signature Canvas",
+    "сумка з логотипом",
+    "сумка для ноутбука",
+    "сумка на кожен день",
+    "брендова сумка",
+    "оригінальна Coach"
+  ],
+  "isNew": false,
+  "title": "Шопер Coach Gallery Tote Bag In Signature Canvas",
+  "reviews": 0,
+  "instagramBlock": "general",
+  "description": "Стильна та містка сумка COACH Gallery Tote Bag In Signature Canvas у фірмовому поєднанні коричневого та чорного кольорів. Модель виконана з фірмового Signature Canvas зі шкіряними деталями та доповнена золотою фурнітурою.\nСумка має просторе основне відділення із застібкою-блискавкою, внутрішні кишені для телефону та дрібниць, кишеню на блискавці та зовнішню кишеню на блискавці. Завдяки місткому формату модель підходить для роботи, повсякденного використання та легко вміщує ноутбук до 13\"",
+  "sku": "79609IMAA8",
+  "rating": 5,
+  "category": "Жіночі сумки",
+  "slug": "шопер-coach-gallery-tote-bag-in-signature-canvas",
+  "id": 63,
+  "color": "Brown/Black коричневий",
+  "images": [
+    "/assets/images/products/uploads/00570556_d.jpg",
+    "/assets/images/products/uploads/00570556_s.jpg",
+    "/assets/images/products/uploads/00570556_i.jpg",
+    "/assets/images/products/uploads/00570556_m.jpg"
+  ]
+}

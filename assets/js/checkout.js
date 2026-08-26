@@ -91,7 +91,7 @@ updateContactChannelNote();
 // Один помічник на дві події: begin_checkout і purchase описують той
 // самий кошик, і збирати його двома різними способами означало б рано
 // чи пізно отримати розбіжність у звітах.
-function reportCheckout(event, orderId) {
+function reportCheckout(event, detail) {
 
     if (!window.Analytics) return;
 
@@ -110,11 +110,27 @@ function reportCheckout(event, orderId) {
     if (event === "purchase") {
 
         window.Analytics.purchase({
-            id: orderId,
+            id: detail,
             total: total,
             lines: lines,
             promo: appliedPromo?.code || undefined
         });
+
+        return;
+
+    }
+
+    if (event === "shipping") {
+
+        window.Analytics.addShippingInfo(lines, total, detail);
+
+        return;
+
+    }
+
+    if (event === "payment") {
+
+        window.Analytics.addPaymentInfo(lines, total, detail);
 
         return;
 
@@ -545,6 +561,20 @@ function updateTotals() {
 // Способи доставки
 // -------------------------
 
+// Статистика: крок «оплата».
+//
+// Свого обробника на вибір оплати не було — нічого, крім статистики,
+// тут і не потрібно. Разом із кроком доставки це ділить проміжок між
+// «почав оформлення» і «замовив» навпіл: видно, на якому саме кроці
+// людина передумала.
+document.querySelectorAll('input[name="paymentMethod"]').forEach(radio => {
+
+    radio.addEventListener("change", () => {
+        reportCheckout("payment", radio.value);
+    });
+
+});
+
 document.querySelectorAll('input[name="deliveryMethod"]').forEach(radio => {
 
     radio.addEventListener("change", () => {
@@ -556,6 +586,10 @@ document.querySelectorAll('input[name="deliveryMethod"]').forEach(radio => {
         clearFieldError("deliveryMethod");
 
         updateTotals();
+
+        // Статистика: крок «доставка». Разом із begin_checkout і purchase
+        // показує, чи не втрачаємо людей саме на виборі доставки.
+        reportCheckout("shipping", radio.value);
 
     });
 

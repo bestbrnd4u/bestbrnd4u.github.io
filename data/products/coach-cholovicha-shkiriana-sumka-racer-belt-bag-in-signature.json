@@ -1,25 +1,29 @@
 {
-  "title": "Чоловіча шкіряна сумка Racer Belt Bag In Signature Canvas",
+  "gender": [
+    "Чоловікам"
+  ],
+  "color": "Чорний",
+  "material": "Шкіра",
   "brand": "Coach",
-  "category": "Унісекс сумки",
-  "gender": "Унісекс",
   "price": 7500,
-  "description": "Coach Racer Belt Bag зі шкіри — поясна сумка з монограмним рельєфом. Регульований ремінь, носиться на поясі, через плече або навскіс. Унісекс-модель.",
+  "preOrder": false,
+  "slug": "coach-cholovicha-shkiriana-sumka-racer-belt-bag-in-signature",
   "variants": [
     {
       "color": "Чорний",
       "hex": "#252525",
       "images": [
-        "assets/images/products/uploads/coach-ct714-qbml5-1.webp",
-        "assets/images/products/uploads/coach-ct714-qbml5-2.webp",
-        "assets/images/products/uploads/coach-ct714-qbml5-3.webp"
+        "/assets/images/products/uploads/ct714_qbmi5_1_1100x1100-1-.webp",
+        "/assets/images/products/uploads/ct714_qbmi5_2_1100x1100.webp",
+        "/assets/images/products/uploads/ct714_qbmi5_3_1100x1100.webp",
+        "/assets/images/products/uploads/ct714_qbmi5_4_1100x1100.webp"
       ],
       "sku": "coach ct714 qbml5"
     }
   ],
-  "isNew": false,
-  "material": "Шкіра",
-  "sku": "coach ct714 qbml5",
+  "sizes": [
+    "ONESIZE"
+  ],
   "searchKeywords": [
     "коуч",
     "coach",
@@ -32,17 +36,17 @@
     "bag",
     "signature"
   ],
-  "instagramBlock": "general",
-  "preOrder": false,
+  "isNew": false,
+  "title": "Чоловіча шкіряна сумка Racer Belt Bag In Signature Canvas",
   "images": [
-    "assets/images/products/uploads/coach-ct714-qbml5-1.webp",
-    "assets/images/products/uploads/coach-ct714-qbml5-2.webp",
-    "assets/images/products/uploads/coach-ct714-qbml5-3.webp"
+    "/assets/images/products/uploads/ct714_qbmi5_1_1100x1100-1-.webp",
+    "/assets/images/products/uploads/ct714_qbmi5_2_1100x1100.webp",
+    "/assets/images/products/uploads/ct714_qbmi5_3_1100x1100.webp",
+    "/assets/images/products/uploads/ct714_qbmi5_4_1100x1100.webp"
   ],
-  "slug": "coach-cholovicha-shkiriana-sumka-racer-belt-bag-in-signature",
   "id": 8,
-  "color": "Чорний",
-  "sizes": [
-    "ONESIZE"
-  ]
+  "instagramBlock": "general",
+  "description": "Coach Racer Belt Bag зі шкіри — поясна сумка з монограмним рельєфом. Регульований ремінь, носиться на поясі, через плече або навскіс. Унісекс-модель.",
+  "sku": "coach ct714 qbml5",
+  "category": "Чоловічі сумки"
 }

@@ -151,6 +151,63 @@
 
     // ---------- один рядок: фото + керування ----------
 
+    // Адреси фото: розвʼязуємо ОДИН раз і запамʼятовуємо.
+    //
+    // ЩО БУЛО НЕ ТАК
+    // ---------------
+    // getAsset(шлях) викликався прямо в render(). Віджет
+    // перемальовується на кожен рух повзунка й на кожне перетягування
+    // точки — десятки разів за секунду. Кожен виклик просив Decap
+    // розвʼязати файл заново.
+    //
+    // Наслідок було видно в інструментах браузера: 1917 запитів,
+    // «Wait Action timed out» триста разів, і головне — фото не
+    // показувались зовсім. Розвʼязування не встигало завершитись, бо
+    // його щоразу починали спочатку. Натиснеш «−» — картинка раптом
+    // зʼявляється: чергова перемальовка встигла зловити готовий
+    // результат. Точку перетягнути теж не виходило: адмінка була
+    // зайнята запитами.
+    //
+    // ЯК ЗАРАЗ
+    // ---------
+    // Фото з репозиторію мають звичайний шлях /assets/images/..., а
+    // адмінка віддається з того самого домену — такий шлях працює
+    // напряму, без жодного запиту через Decap.
+    //
+    // getAsset лишається лише для щойно вибраного файлу, який ще не
+    // залитий. Результат кладемо в кеш, тож повторно не питаємо.
+    var assetCache = {};
+
+    function publicUrl(src, getAsset) {
+
+        var key = String(src || "");
+
+        if (!key) return "";
+
+        if (assetCache[key]) return assetCache[key];
+
+        // Шлях із репозиторію — беремо як є.
+        if (/^\/?assets\//.test(key)) {
+
+            assetCache[key] = key.charAt(0) === "/" ? key : "/" + key;
+
+            return assetCache[key];
+
+        }
+
+        if (!getAsset) return key;
+
+        var asset = getAsset(key);
+        var url = asset ? (asset.toString ? asset.toString() : asset) : key;
+
+        // blob-адресу не кешуємо: вона живе лише до перезавантаження
+        // сторінки, і збережена в кеші стала б битим посиланням.
+        if (url && url.indexOf("blob:") !== 0) assetCache[key] = url;
+
+        return url || key;
+
+    }
+
     var FrameEditor = createClass({
 
         getInitialState: function () {
@@ -330,9 +387,64 @@
                 return null;   // фото з іншого домену
             }
 
-            // Поріг «це вже не тло». Чисто білого на фото майже не
-            // буває — тіні й компресія дають 245–252, тож беремо 244.
-            var LIMIT = 244;
+            // Колір тла беремо З КУТІВ КАДРУ, а не з зашитого числа.
+            //
+            // ЧОМУ. Тут стояв поріг 244: «світліше — значить біле тло».
+            // Але предметні фото знімають не тільки на білому: у Coach
+            // тло 240/240/240, тобто світло-сіре. Поріг його не
+            // визнавав, «не-фоном» виявлявся ВЕСЬ кадр, межі товару
+            // виходили на всю картинку — і кнопка честно відповідала
+            // «не вдалося визначити межі товару».
+            //
+            // Кути — надійне джерело: товар у центрі, а по кутах
+            // практично завжди тло. Беремо всі чотири й перевіряємо,
+            // що вони схожі між собою: якщо ні — фото не на однотонному
+            // тлі, і підгонка тут не застосовна.
+            function at(x, y) {
+
+                var i = (y * w + x) * 4;
+
+                return [data[i], data[i + 1], data[i + 2]];
+
+            }
+
+            var corners = [at(1, 1), at(w - 2, 1), at(1, h - 2), at(w - 2, h - 2)];
+
+            // середній колір кутів
+            var bg = [0, 1, 2].map(function (c) {
+                return Math.round(corners.reduce(function (sum, p) {
+                    return sum + p[c];
+                }, 0) / corners.length);
+            });
+
+            // Кути мусять бути схожі: різниця більша за 24 означає, що
+            // тло неоднорідне (градієнт, кадр у інтерʼєрі) — тоді межі
+            // товару по кольору не знайти.
+            var spread = Math.max.apply(null, corners.map(function (p) {
+                return Math.max(
+                    Math.abs(p[0] - bg[0]),
+                    Math.abs(p[1] - bg[1]),
+                    Math.abs(p[2] - bg[2]));
+            }));
+
+            if (spread > 24) return null;
+
+            // Допуск навколо кольору тла: тіні й компресія дають
+            // відхилення на кілька одиниць, і без запасу межі товару
+            // «розпливуться» на весь кадр.
+            var TOLERANCE = 12;
+
+            function isBackground(x, y) {
+
+                var i = (y * w + x) * 4;
+
+                if (data[i + 3] < 16) return true;   // прозорий — теж тло
+
+                return Math.abs(data[i] - bg[0]) <= TOLERANCE
+                    && Math.abs(data[i + 1] - bg[1]) <= TOLERANCE
+                    && Math.abs(data[i + 2] - bg[2]) <= TOLERANCE;
+
+            }
 
             var minX = w;
             var minY = h;
@@ -343,14 +455,7 @@
 
                 for (var x = 0; x < w; x++) {
 
-                    var i = (y * w + x) * 4;
-
-                    var alpha = data[i + 3];
-
-                    // прозорий піксель — теж тло
-                    if (alpha < 16) continue;
-
-                    if (data[i] > LIMIT && data[i + 1] > LIMIT && data[i + 2] > LIMIT) continue;
+                    if (isBackground(x, y)) continue;
 
                     if (x < minX) minX = x;
                     if (x > maxX) maxX = x;
@@ -581,10 +686,7 @@
                 this.state.open
                     ? h("div", null, images.map(function (item, index) {
 
-                        // getAsset розуміє і щойно вибраний файл (ще не
-                        // залитий у репозиторій), і вже збережений шлях
-                        var asset = getAsset ? getAsset(item.src) : null;
-                        var url = asset ? (asset.toString ? asset.toString() : asset) : item.src;
+                        var url = publicUrl(item.src, getAsset);
 
                         return h(FrameEditor, {
                             key: item.src + index,

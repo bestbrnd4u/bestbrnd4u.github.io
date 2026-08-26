@@ -71,9 +71,49 @@ async function contentBounds(file) {
 
     const data = await sharp(file).resize(w, h).ensureAlpha().raw().toBuffer();
 
-    // Чисто білого на фото майже не буває: тіні й компресія дають
-    // 245–252, тож поріг нижчий за 255.
-    const LIMIT = 244;
+    // Колір тла беремо З КУТІВ, а не з зашитого числа.
+    //
+    // Тут стояв поріг 244 — «світліше значить біле тло». Але предметні
+    // фото знімають не тільки на білому: у частини товарів тло
+    // 240/240/240, світло-сіре. Поріг його не визнавав, «не-фоном»
+    // виявлявся весь кадр, і підгонка відмовлялась працювати.
+    //
+    // Логіка мусить бути та сама, що у віджеті адмінки
+    // (admin/image-framing-widget.js): інакше кнопка «Підігнати» й
+    // автоматика дадуть різні кадри для одного знімка.
+    const at = (x, y) => {
+
+        const i = (y * w + x) * 4;
+
+        return [data[i], data[i + 1], data[i + 2]];
+
+    };
+
+    const corners = [at(1, 1), at(w - 2, 1), at(1, h - 2), at(w - 2, h - 2)];
+
+    const bg = [0, 1, 2].map(c =>
+        Math.round(corners.reduce((sum, p) => sum + p[c], 0) / corners.length));
+
+    // Кути мусять бути схожі: інакше тло неоднорідне, і межі товару
+    // по кольору не знайти.
+    const spread = Math.max(...corners.map(p =>
+        Math.max(...[0, 1, 2].map(c => Math.abs(p[c] - bg[c])))));
+
+    if (spread > 24) return null;
+
+    const TOLERANCE = 12;
+
+    const isBackground = (x, y) => {
+
+        const i = (y * w + x) * 4;
+
+        if (data[i + 3] < 16) return true;   // прозорий — теж тло
+
+        return Math.abs(data[i] - bg[0]) <= TOLERANCE
+            && Math.abs(data[i + 1] - bg[1]) <= TOLERANCE
+            && Math.abs(data[i + 2] - bg[2]) <= TOLERANCE;
+
+    };
 
     let minX = w;
     let minY = h;
@@ -84,11 +124,7 @@ async function contentBounds(file) {
 
         for (let x = 0; x < w; x++) {
 
-            const i = (y * w + x) * 4;
-
-            if (data[i + 3] < 16) continue;   // прозорий піксель — теж тло
-
-            if (data[i] > LIMIT && data[i + 1] > LIMIT && data[i + 2] > LIMIT) continue;
+            if (isBackground(x, y)) continue;
 
             if (x < minX) minX = x;
             if (x > maxX) maxX = x;

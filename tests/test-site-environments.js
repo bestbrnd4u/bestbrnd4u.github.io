@@ -421,6 +421,60 @@ console.log("\n[6] Дев-збірка налаштована в CI");
         missed.join(", "));
 }
 
+console.log("\n[N2] robots.txt збирається заново, а не правиться");
+{
+    // СИМПТОМ
+    // --------
+    // Файл розпух до 428 рядків: сотні порожніх, правила повторені
+    // тричі й маркери конфлікту злиття посередині.
+    //
+    // ПРИЧИНА
+    // --------
+    // Скрипт середовища РЕДАГУВАВ наявний текст: вирізав блок
+    // регулярним виразом і дописував інший. Порожні рядки від
+    // вирізаного лишалися, правила дописувались ще раз — і так на
+    // кожній збірці.
+    //
+    // Пошуковик такий файл читає до першої незрозумілої стрічки, тож
+    // частина правил могла не діяти. Помітити це можна лише відкривши
+    // файл очима — жодної помилки при цьому не виникає.
+    const robots = read("robots.txt");
+    const lines = robots.split("\n");
+
+    check(`робots.txt — ${lines.length} рядків`, lines.length < 20, lines.length);
+
+    // Маркери конфлікту в robots.txt означають, що файл зламаний.
+    check("немає маркерів злиття",
+        !/<<<<<<<|>>>>>>>|Updated upstream|Stashed changes/.test(robots));
+
+    // Порожні рядки допустимі як розділювачі, але не сотнями.
+    const blank = lines.filter(l => l.trim() === "").length;
+
+    check(`порожніх рядків — ${blank}`, blank <= 3, blank);
+
+    // Правила не мають повторюватись: тричі «Disallow: /admin/» це
+    // слід накопичення, а не намір.
+    const rules = lines.filter(l => /^(Allow|Disallow|User-agent|Sitemap):/i.test(l));
+    const unique = new Set(rules);
+
+    check("жодне правило не повторюється", rules.length === unique.size,
+        `${rules.length} рядків, ${unique.size} унікальних`);
+
+    // Sitemap мусить бути рівно один і вести на поточне середовище.
+    const sitemaps = lines.filter(l => /^Sitemap:/i.test(l));
+
+    check("Sitemap рівно один", sitemaps.length === 1, sitemaps.length);
+
+    // І сам механізм: вміст не має залежати від того, що лежало у
+    // файлі раніше.
+    const script = read("scripts/apply-site-env.js");
+
+    check("файл збирається з нуля",
+        /rewrite\("robots\.txt", \(\) =>/.test(script));
+    check("наявний текст не читається",
+        !/rewrite\("robots\.txt", text =>/.test(script));
+}
+
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
     process.exit(failures === 0 ? 0 : 1);
 

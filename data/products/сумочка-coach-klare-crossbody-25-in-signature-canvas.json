@@ -1,0 +1,64 @@
+{
+  "gender": [
+    "Жінкам"
+  ],
+  "preOrderDays": "5–10 робочих днів",
+  "forcePublish": false,
+  "material": "Фірмове покрите полотно Signature та фактурна шкіра refined pebble leather; текстильна підкладка",
+  "brand": "Coach",
+  "price": 7100,
+  "preOrder": false,
+  "dimensions": "26 × 17 × 8 см",
+  "variants": [
+    {
+      "color": "Dark Brown темно-коричневий",
+      "hex": "#624949",
+      "images": [
+        "/assets/images/products/uploads/3248708-4324-8078423-1.webp",
+        "/assets/images/products/uploads/3248708-4324-8078423-2.webp",
+        "/assets/images/products/uploads/3248708-4324-8078423-3.webp",
+        "/assets/images/products/uploads/3248708-4324-8078423-4.webp",
+        "/assets/images/products/uploads/3248708-4324-8078423-5.webp"
+      ]
+    }
+  ],
+  "preOrderPrepayment": 50,
+  "strapInfo": "Регульований ремінь. Ремінь дозволяє носити сумку трьома способами: коротко або довго на плечі, а також кросбоді",
+  "sizes": [
+    "ONESIZE"
+  ],
+  "splitByColor": true,
+  "searchKeywords": [
+    "Coach Klare",
+    "Coach Klare Crossbody",
+    "Coach Klare 25",
+    "сумка Coach",
+    "жіноча сумка Coach",
+    "сумка через плече",
+    "кросбоді Coach",
+    "шкіряна сумка Coach",
+    "сумка Signature",
+    "коричнева сумка",
+    "темно-коричнева сумка",
+    "брендові сумки",
+    "оригінальна Coach"
+  ],
+  "isNew": false,
+  "title": "Сумочка Coach Klare Crossbody 25 In Signature Canvas",
+  "reviews": 0,
+  "instagramBlock": "general",
+  "description": "Стильна жіноча сумка Coach Klare Crossbody 25 у фірмовому принті Signature — елегантна модель на кожен день. Поєднання фірмового покритого полотна Signature та фактурної шкіри refined pebble leather надає сумці преміального вигляду.\nМодель має зручне основне відділення із застібкою-кнопкою, внутрішню кишеню на блискавці та багатофункціональну кишеню, а також зовнішню кишеню для речей, які мають бути під рукою.\nЛаконічний дизайн і універсальний темно-коричневий відтінок легко поєднуються як із повсякденними, так і з більш елегантними образами",
+  "sku": "CC878",
+  "rating": 5,
+  "category": "Жіночі сумки",
+  "slug": "сумочка-coach-klare-crossbody-25-in-signature-canvas",
+  "id": 65,
+  "color": "Dark Brown темно-коричневий",
+  "images": [
+    "/assets/images/products/uploads/3248708-4324-8078423-1.webp",
+    "/assets/images/products/uploads/3248708-4324-8078423-2.webp",
+    "/assets/images/products/uploads/3248708-4324-8078423-3.webp",
+    "/assets/images/products/uploads/3248708-4324-8078423-4.webp",
+    "/assets/images/products/uploads/3248708-4324-8078423-5.webp"
+  ]
+}
