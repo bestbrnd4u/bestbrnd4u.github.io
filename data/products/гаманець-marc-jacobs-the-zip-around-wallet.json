@@ -22,7 +22,7 @@
   ],
   "preOrderPrepayment": 50,
   "sizes": [
-    "Onesize"
+    "ONESIZE"
   ],
   "splitByColor": true,
   "searchKeywords": [
@@ -47,5 +47,20 @@
   "description": "Компактний та стильний жіночий гаманець Marc Jacobs The Zip Around Wallet у трендовому кольорі хакі. Практична модель із застібкою на блискавку по периметру забезпечує надійне зберігання карток, купюр та інших необхідних дрібниць.\nЛаконічний дизайн із фірмовим логотипом Marc Jacobs робить гаманець універсальним аксесуаром для повсякденного використання. Компактний формат легко поміщається як у невелику сумку, так і в більшу модель",
   "sku": "3083092-3054",
   "rating": 5,
-  "category": "Гаманці"
+  "category": "Гаманці",
+  "framing": {
+    "s150l03fa22-223_1.webp": {
+      "zoom": 1.53,
+      "x": 51,
+      "y": 52
+    }
+  },
+  "slug": "гаманець-marc-jacobs-the-zip-around-wallet",
+  "id": 67,
+  "color": "Khaki хакі",
+  "images": [
+    "/assets/images/products/uploads/s150l03fa22-223_1.webp",
+    "/assets/images/products/uploads/f540b0f9-f29c-31d6-8bdf-03912d1cc134.jpg",
+    "/assets/images/products/uploads/s150l03fa22-223_3.webp"
+  ]
 }
