@@ -33,7 +33,7 @@
   "preOrderPrepayment": 50,
   "strapInfo": "Знімний ремінець, що дозволяє носити гаманець на зап'ясті або використовувати його як компактний самостійний аксесуар",
   "sizes": [
-    "Onesize"
+    "ONESIZE"
   ],
   "splitByColor": true,
   "searchKeywords": [
@@ -58,5 +58,13 @@
   "description": "Компактний та практичний жіночий гаманець Marc Jacobs The Top Zip Wallet with Strap. Лаконічний дизайн доповнений фірмовим логотипом Marc Jacobs та зручним верхнім застібанням на блискавку.\nМодель поєднує функціональність гаманця та аксесуара, який можна носити окремо завдяки ремінцю. Всередині передбачені відділення для карток та необхідних дрібниць. Ідеальний варіант для тих, хто цінує компактність, але не хоче відмовлятися від фірмового стилю",
   "sku": "S125L01RE22212",
   "rating": 5,
-  "category": "Гаманці"
+  "category": "Гаманці",
+  "slug": "гаманець-marc-jacobs-the-top-zip-wallet-with-strap",
+  "id": 66,
+  "color": "Brown коричневий",
+  "images": [
+    "/assets/images/products/uploads/sl10757-021_01-384fad.jpg",
+    "/assets/images/products/uploads/sl10757-021_02-384fad.jpg",
+    "/assets/images/products/uploads/sl10757-021_03-384fad.jpg"
+  ]
 }
