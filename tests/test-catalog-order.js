@@ -128,12 +128,39 @@ console.log("\n[2] Порядок на справжніх даних катал�
     check("у кожній категорії: наявні → під замовлення, новіші вище",
         problems.length === 0, problems.slice(0, 3).join("; "));
 
-    // 4. головне, заради чого все це: найновіший товар не в кінці
+    // 4. головне, заради чого все це: найновіший товар — ПЕРШИЙ У СВОЇЙ
+    //    категорії.
+    //
+    // Раніше тут перевірялось, що він у першій половині каталогу. Це
+    // хибне мірило: порядок будується за розділами бічного меню, і
+    // товар із категорії, яка стоїть у меню останньою, законно
+    // опиниться внизу — навіть якщо він найновіший у магазині.
+    //
+    // Саме так тест і впав: додали гаманець, а «Аксесуари» — останній
+    // розділ. Правило спрацювало правильно, помилковим було
+    // очікування.
     const newest = products.reduce((a, b) => (a.id > b.id ? a : b));
     const position = sorted.findIndex(p => p.id === newest.id);
 
-    check("найновіший товар не опиняється в кінці каталогу",
-        position < products.length / 2,
+    const sameCategory = sorted.filter(p => p.category === newest.category);
+
+    check("найновіший товар перший у своїй категорії",
+        sameCategory.length > 0 && sameCategory[0].id === newest.id,
+        `${newest.category}: ${sameCategory.slice(0, 3).map(p => p.id).join(", ")}`);
+
+    // І він не має провалюватись нижче за товари СВОГО ж розділу, які
+    // додали раніше.
+    // «категорія → відділ» з довідника категорій
+    const departmentOf = new Map(categories.map(c => [c.name, c.department]));
+
+    const department = departmentOf.get(newest.category);
+
+    const sameDepartment = sorted.filter(p =>
+        departmentOf.get(p.category) === department);
+    const olderBelow = sameDepartment.slice(sameDepartment.findIndex(p => p.id === newest.id) + 1);
+
+    check("у своєму розділі нижче — лише старіші або інші категорії",
+        olderBelow.every(p => p.id < newest.id || p.category !== newest.category),
         `позиція ${position + 1} з ${products.length}`);
 
     // і він перший у своїй категорії
