@@ -243,6 +243,39 @@ console.log("\n[6] Зменшені копії зроблені з поточн�
         /mtimeMs < baseTime/.test(normalizer));
 }
 
+console.log("\n[7] Реєстр копій не накопичує привидів");
+{
+    // СИМПТОМ, ЧЕРЕЗ ЯКИЙ ЦЕ ЗʼЯВИЛОСЬ
+    // ----------------------------------
+    // Після кожного пуша бот додавав у data/image-variants.json рядок
+    // із файлом, якого на диску давно немає. Виглядало так, ніби
+    // збірка живе своїм життям.
+    //
+    // Причина: реєстр лише ДОПОВНЮВАВСЯ — [...list, ...files].
+    // Видалили фото, а запис лишався назавжди. Верстка потім просила
+    // srcset для неіснуючого файлу.
+    //
+    // Реєстр описує те, що є НА ДИСКУ, тож мусить і втрачати записи.
+    const script = fs.readFileSync(
+        path.join(ROOT, "scripts/normalize-product-images.js"), "utf8");
+
+    check("реєстр відкидає записи без файлу",
+        /\.filter\(name => exists\.has\(name\)\)/.test(script));
+
+    // І перевіряємо по факту, а не лише код.
+    const list = JSON.parse(fs.readFileSync(
+        path.join(ROOT, "data/image-variants.json"), "utf8"));
+
+    const onDisk = new Set(fs.readdirSync(
+        path.join(ROOT, "assets/images/products/uploads")));
+
+    const ghosts = list.filter(name => !onDisk.has(name));
+
+    check(`записів у реєстрі — ${list.length}`, list.length > 0);
+    check("жодного запису без файлу", ghosts.length === 0,
+        ghosts.slice(0, 3).join(", "));
+}
+
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
 process.exit(failures === 0 ? 0 : 1);
 
