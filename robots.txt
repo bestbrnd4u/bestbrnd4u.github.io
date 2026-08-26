@@ -1,5 +1,12 @@
-# Тестове середовище — повністю закрите від пошуку
 User-agent: *
-Disallow: /
+Allow: /
 
-Sitemap: https://dev.bestbrnd4u.com/sitemap.xml
+# Службові сторінки: індексувати нічого, вміст у них особистий
+Disallow: /admin/
+Disallow: /account
+Disallow: /cart
+Disallow: /checkout
+Disallow: /favorites
+Disallow: /thanks
+
+Sitemap: https://bestbrnd4u.com/sitemap.xml
