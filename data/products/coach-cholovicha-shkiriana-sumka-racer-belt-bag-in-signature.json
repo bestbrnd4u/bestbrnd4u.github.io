@@ -44,5 +44,22 @@
   "color": "Чорний",
   "sizes": [
     "ONESIZE"
-  ]
+  ],
+  "framing": {
+    "coach-ct714-qbml5-1.webp": {
+      "zoom": 3,
+      "x": 50,
+      "y": 50
+    },
+    "coach-ct714-qbml5-2.webp": {
+      "zoom": 3,
+      "x": 50,
+      "y": 50
+    },
+    "coach-ct714-qbml5-3.webp": {
+      "zoom": 3,
+      "x": 50,
+      "y": 50
+    }
+  }
 }

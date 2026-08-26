@@ -44,5 +44,12 @@
   "color": "Коричневий",
   "sizes": [
     "ONESIZE"
-  ]
+  ],
+  "framing": {
+    "jwp-ma106-2.webp": {
+      "zoom": 1.4,
+      "x": 50,
+      "y": 50
+    }
+  }
 }

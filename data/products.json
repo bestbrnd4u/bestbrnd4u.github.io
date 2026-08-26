@@ -413,7 +413,24 @@
     "color": "Чорний",
     "sizes": [
       "ONESIZE"
-    ]
+    ],
+    "framing": {
+      "coach-ct714-qbml5-1.webp": {
+        "zoom": 3,
+        "x": 50,
+        "y": 50
+      },
+      "coach-ct714-qbml5-2.webp": {
+        "zoom": 3,
+        "x": 50,
+        "y": 50
+      },
+      "coach-ct714-qbml5-3.webp": {
+        "zoom": 3,
+        "x": 50,
+        "y": 50
+      }
+    }
   },
   {
     "gender": [
@@ -455,6 +472,21 @@
         "zoom": 1.61,
         "x": 50,
         "y": 63
+      },
+      "coach73995black-2.webp": {
+        "zoom": 2.05,
+        "x": 50,
+        "y": 50
+      },
+      "coach73995black-3.webp": {
+        "zoom": 1.46,
+        "x": 50,
+        "y": 50
+      },
+      "coach73995chalk-2.webp": {
+        "zoom": 1.78,
+        "x": 50,
+        "y": 50
       }
     },
     "preOrder": false,
@@ -628,7 +660,19 @@
     "category": "Жіночі сумки",
     "sizes": [
       "ONESIZE"
-    ]
+    ],
+    "framing": {
+      "cp150-b4bk-a0-1.webp": {
+        "zoom": 1.4,
+        "x": 50,
+        "y": 50
+      },
+      "cp150-b4mpl-1.webp": {
+        "zoom": 1.41,
+        "x": 50,
+        "y": 50
+      }
+    }
   },
   {
     "title": "Сонцезахисні окуляри GUCCI GG0516S Grey Rectangula",
@@ -885,7 +929,14 @@
     "color": "Коричневий",
     "sizes": [
       "ONESIZE"
-    ]
+    ],
+    "framing": {
+      "jwp-ma106-2.webp": {
+        "zoom": 1.4,
+        "x": 50,
+        "y": 50
+      }
+    }
   },
   {
     "title": "Жіноча сумочка JW PEI Mila Shoulder Bag",
