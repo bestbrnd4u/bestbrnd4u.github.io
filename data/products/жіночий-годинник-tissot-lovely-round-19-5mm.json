@@ -14,17 +14,17 @@
       "color": "Сріблястий",
       "hex": "#b7b4b4",
       "images": [
-        "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-dial-ladies-watch-t0580091103100_1.webp",
-        "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-dial-ladies-watch-t0580091103100_2_1.webp",
-        "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-dial-ladies-watch-t0580091103100_3_1.webp",
-        "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-dial-ladies-watch-t0580091103100_4_1.webp"
+        "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-a120faed.webp",
+        "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-10e4ff8d.webp",
+        "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-f393bd11.webp",
+        "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-8e88d0d9.webp"
       ]
     }
   ],
   "preOrderPrepayment": 100,
   "strapInfo": "Браслет із нержавіючої сталі сріблястого кольору, ширина 11 мм, застібка-метелик із кнопками",
   "sizes": [
-    "Onesize"
+    "ONESIZE"
   ],
   "splitByColor": true,
   "searchKeywords": [
@@ -50,5 +50,14 @@
   "description": "Вишуканий жіночий годинник Tissot Lovely Round 19.5mm — мініатюрна модель із круглим корпусом, створена для тих, хто цінує елегантність і стриманий дизайн.\nГодинник має сріблястий циферблат із лаконічними індексами, корпус із нержавіючої сталі 316L та стійке до подряпин сапфірове скло. Усередині встановлений надійний швейцарський кварцовий механізм ETA 901.001. Металевий браслет доповнений застібкою-метеликом із кнопками. Водостійкість — до 30 метрів (3 ATM)",
   "sku": "T058.009.11.031.00",
   "rating": 5,
-  "category": "Годинники"
+  "category": "Годинники",
+  "slug": "жіночий-годинник-tissot-lovely-round-19-5mm",
+  "id": 73,
+  "color": "Сріблястий",
+  "images": [
+    "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-a120faed.webp",
+    "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-10e4ff8d.webp",
+    "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-f393bd11.webp",
+    "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-8e88d0d9.webp"
+  ]
 }

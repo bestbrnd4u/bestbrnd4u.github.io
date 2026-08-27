@@ -4709,5 +4709,68 @@
       "/assets/images/products/uploads/33751393-b64e-49d3-b0c9-2e3bde1afaff.jpg",
       "/assets/images/products/uploads/aa00-okd0j9_99x_f9.webp"
     ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Корпус і браслет — нержавіюча сталь 316L; скло — стійке до подряпин сапфірове",
+    "brand": "Tissot",
+    "price": 16500,
+    "preOrder": true,
+    "dimensions": "19,5 × 19,5 × 5 мм",
+    "variants": [
+      {
+        "color": "Сріблястий",
+        "hex": "#b7b4b4",
+        "images": [
+          "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-a120faed.webp?v=d03727de",
+          "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-10e4ff8d.webp?v=bed48427",
+          "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-f393bd11.webp?v=8405c1f4",
+          "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-8e88d0d9.webp?v=c4177bd4"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Браслет із нержавіючої сталі сріблястого кольору, ширина 11 мм, застібка-метелик із кнопками",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Tissot Lovely",
+      "Tissot Lovely Round",
+      "Tissot T058.009.11.031.00",
+      "T0580091103100",
+      "годинник Tissot",
+      "жіночий годинник Tissot",
+      "жіночий наручний годинник",
+      "швейцарський годинник",
+      "сріблястий годинник",
+      "годинник зі сталевим браслетом",
+      "класичний жіночий годинник",
+      "елегантний годинник",
+      "брендовий годинник",
+      "оригінальний Tissot"
+    ],
+    "isNew": false,
+    "title": "Жіночий годинник Tissot Lovely Round 19.5mm",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Вишуканий жіночий годинник Tissot Lovely Round 19.5mm — мініатюрна модель із круглим корпусом, створена для тих, хто цінує елегантність і стриманий дизайн.\nГодинник має сріблястий циферблат із лаконічними індексами, корпус із нержавіючої сталі 316L та стійке до подряпин сапфірове скло. Усередині встановлений надійний швейцарський кварцовий механізм ETA 901.001. Металевий браслет доповнений застібкою-метеликом із кнопками. Водостійкість — до 30 метрів (3 ATM)",
+    "sku": "T058.009.11.031.00",
+    "rating": 5,
+    "category": "Годинники",
+    "slug": "жіночий-годинник-tissot-lovely-round-19-5mm",
+    "id": 73,
+    "color": "Сріблястий",
+    "images": [
+      "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-a120faed.webp",
+      "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-10e4ff8d.webp",
+      "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-f393bd11.webp",
+      "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-8e88d0d9.webp"
+    ]
   }
 ]
