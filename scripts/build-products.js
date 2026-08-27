@@ -80,6 +80,74 @@ function getMissingFields(data) {
 // products.json перезбирається щоразу, тож версія завжди свіжа. У
 // джерельних data/products/*.json її немає — там лишаються чисті
 // шляхи, з якими працює адмінка.
+// Ручний порядок: зводимо номери до 1, 2, 3… без пропусків і збігів.
+//
+// НАВІЩО
+// -------
+// Поставили новому товару 2, а двійка вже зайнята — і тепер їх дві.
+// Порядок між ними випадковий, а щоб вставити товар «посередині»,
+// доводиться перенумеровувати решту руками.
+//
+// Тепер збірка робить це сама: новий товар стає другим, колишній
+// другий — третім, і далі по ланцюжку.
+//
+// ЧОМУ САМЕ В ЗБІРЦІ
+// -------------------
+// Адмінка зберігає ЛИШЕ поточний товар — чужі файли вона не чіпає, і
+// перенумерувати сусідів під час збереження не може. А збірка бачить
+// усі товари одразу, тож це єдине місце, де таке можливо.
+//
+// ЯК ВИРІШУЄТЬСЯ НІЧИЯ
+// ---------------------
+// Коли два товари мають однаковий номер, вище стає той, у якого
+// БІЛЬШИЙ id — тобто доданий пізніше. Це відповідає наміру: ви щойно
+// поставили двійку новому товару й очікуєте, що другим стане саме він,
+// а не той, що там був.
+//
+// Оновлені номери записуємо назад у файли товарів, щоб в адмінці ви
+// бачили той самий порядок, що й на сайті.
+function renumberSortOrder(products) {
+
+    const pinned = products
+        .filter(p => Number.isFinite(Number(p.sortOrder)))
+        .sort((a, b) =>
+            Number(a.sortOrder) - Number(b.sortOrder)
+            || (Number(b.id) || 0) - (Number(a.id) || 0));
+
+    if (!pinned.length) return;
+
+    let changed = 0;
+
+    pinned.forEach((product, index) => {
+
+        const next = index + 1;
+
+        if (Number(product.sortOrder) === next) return;
+
+        product.sortOrder = next;
+        changed++;
+
+        // Пишемо в джерело, а не лише в агрегат: інакше в адмінці
+        // лишиться старий номер, і наступне збереження поверне збіг.
+        const file = product.__sourceFile
+            ? path.join(PRODUCTS_DIR, product.__sourceFile)
+            : null;
+
+        if (!file || !fs.existsSync(file)) return;
+
+        const data = JSON.parse(fs.readFileSync(file, "utf8"));
+
+        data.sortOrder = next;
+
+        fs.writeFileSync(file, JSON.stringify(data, null, 2) + "\n", "utf8");
+
+    });
+
+    console.log(`   ручний порядок: ${pinned.length} товарів`
+        + (changed ? `, перенумеровано ${changed}` : ""));
+
+}
+
 function stampImageVersions(products) {
 
     const cache = new Map();
@@ -163,14 +231,51 @@ function main() {
         process.exit(1);
     }
 
+    const broken = [];
+
     const parsed = files.map(file => {
 
         const filePath = path.join(PRODUCTS_DIR, file);
-        const data = JSON.parse(fs.readFileSync(filePath, "utf8"));
+        const raw = fs.readFileSync(filePath, "utf8");
+
+        // Порожній або битий файл товару.
+        //
+        // ЧОМУ ОКРЕМА ОБРОБКА. Простий JSON.parse падає з
+        // «Unexpected end of JSON input» і НЕ КАЖЕ, у якому файлі
+        // проблема. Так само поводиться адмінка: показує ту саму
+        // помилку в консолі й порожню форму товару, а який файл винен —
+        // здогадуйся сам.
+        //
+        // Найчастіша причина — файл, що приїхав із зіпа з зіпсованим
+        // імʼям (кирилиця перетворюється в «#U0436…») і нульовим
+        // розміром. Такі копії треба просто видалити.
+        if (!raw.trim()) {
+            broken.push(`${file}: файл порожній`);
+            return null;
+        }
+
+        let data;
+
+        try {
+            data = JSON.parse(raw);
+        } catch (error) {
+            broken.push(`${file}: ${error.message}`);
+            return null;
+        }
 
         return { file, filePath, data };
 
-    });
+    }).filter(Boolean);
+
+    if (broken.length) {
+
+        console.error("\nБиті файли товарів — їх треба видалити або виправити:");
+        broken.forEach(line => console.error("  " + line));
+        console.error("");
+
+        process.exit(1);
+
+    }
 
     let maxId = 0;
 
@@ -378,9 +483,18 @@ function main() {
 
         }
 
+        // Запамʼятовуємо файл-джерело: перенумерація ручного порядку
+        // (renumberSortOrder) пише номер назад саме туди.
+        Object.defineProperty(data, "__sourceFile", {
+            value: file,
+            enumerable: false   // у products.json це поле не потрапить
+        });
+
         products.push(data);
 
     });
+
+    renumberSortOrder(products);
 
     products.sort((a, b) => a.id - b.id);
 

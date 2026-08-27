@@ -164,6 +164,86 @@ console.log("\n[7] Статус доставки в кабінеті — не п
         `однакові формулювання у ${2 - different.length} станах`);
 }
 
+console.log("\n[N] Строк відмови — 14 днів від доставки");
+{
+    // Закон про захист прав споживачів: товар належної якості можна
+    // повернути протягом 14 днів. Строк рахується від ОТРИМАННЯ, а не
+    // від оформлення — замовлення могло тиждень чекати у відділенні,
+    // і рахунок від оформлення забрав би півстроку.
+    check("строк заданий одним числом", /const REFUSAL_DAYS = 14/.test(ACC));
+
+    // Ознака доставки — з тієї самої функції, що показує статус
+    // клієнту. Колонку delivery_status ніхто не заповнює: перевірка по
+    // ній ніколи не спрацювала б, і строк не закінчувався б НІКОЛИ.
+    check("ознака доставки — з deliveryStatusLabel",
+        /const delivered = \/доставлен\/i\.test\(deliveryStatusLabel\(order\)\)/.test(ACC));
+
+    // Строк минув — кажемо прямо, а не ховаємо кнопку. Схована кнопка
+    // виглядає як поломка: покупець пам'ятає, що вона була.
+    check("минулий строк пояснюється",
+        /Строк відмови \(\$\{REFUSAL_DAYS\} днів\) минув/.test(ACC));
+    check("останні дні показуються",
+        /лишилось \$\{window\.daysLeft\} дн\./.test(ACC));
+
+    const win = new Function(
+        ACC.match(/function deliveryStatusLabel[\s\S]*?\n\}/)[0] + "\n"
+        + ACC.match(/const REFUSAL_DAYS = 14;[\s\S]*?\n\}\n/)[0]
+        + "; return refusalWindow;")();
+
+    const ago = n => new Date(Date.now() - n * 86400000).toISOString();
+
+    check("доставлено 5 днів тому — можна",
+        win({ status: "completed", created_at: ago(5) }).allowed === true);
+    check("доставлено 13 днів тому — ще можна",
+        win({ status: "completed", created_at: ago(13) }).allowed === true);
+    check("14-й день — уже не можна",
+        win({ status: "completed", created_at: ago(14) }).allowed === false);
+    check("30 днів — не можна",
+        win({ status: "completed", created_at: ago(30) }).allowed === false);
+
+    // Поки не доставлено, строк не починався.
+    check("не доставлено — можна попри давність",
+        win({ status: "shipped", created_at: ago(60) }).allowed === true);
+
+    // Без дати не блокуємо: краще дати відмовитись зайвий раз, ніж
+    // відмовити людині через відсутні дані.
+    check("без дати — можна", win({ status: "completed" }).allowed === true);
+
+    check("залишок після 12 днів — 2",
+        win({ status: "completed", created_at: ago(12) }).daysLeft === 2);
+}
+
+console.log("\n[N2] Сповіщення про відмову не залежить від бази");
+{
+    // Сповіщення в Telegram надсилає тригер у Supabase. Якщо він не
+    // розгорнутий чи зламався — заявка тихо лягає в таблицю, магазин
+    // не дізнається, а покупець бачить «менеджер зв'яжеться» і чекає.
+    //
+    // Тому другий, незалежний канал: лист тим самим шляхом, що й
+    // замовлення.
+    check("є лист магазину", /async function notifyRefusal/.test(ACC));
+    check("лист іде через FormSubmit", /sendViaFormSubmit\(\{/.test(ACC));
+
+    const sendAt = ACC.indexOf("notifyRefusal(order, orderNumber)");
+    const errAt = ACC.indexOf('console.error("Заявка на відмову:"');
+
+    check("лист надсилається до перевірки помилки бази",
+        sendAt > 0 && errAt > 0 && sendAt < errAt);
+
+    check("при помилці бази клієнту не кажуть «не вдалося»",
+        /Запит надіслано менеджеру/.test(ACC));
+
+    ["Замовлення", "Клієнт", "Телефон", "Пошта", "Доставка", "ТТН", "Товари"]
+        .forEach(field =>
+            check(`у листі є «${field}»`, new RegExp(`"${field}":`).test(ACC)));
+
+    // ТТН і статус — з полів, які справді заповнюються.
+    check("ТТН береться з tracking_number",
+        /"ТТН": order\.tracking_number/.test(ACC));
+    check("статус доставки — обчислений",
+        /"Статус доставки": deliveryStatusLabel\(order\)/.test(ACC));
+}
+
 console.log(failures===0?"\n✅ Усі перевірки пройдено":`\n❌ Провалено: ${failures}`);
 process.exit(failures===0?0:1);
 

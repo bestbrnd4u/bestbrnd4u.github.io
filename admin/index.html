@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"287afbe3","data/categories.json":"c3f4c8fa","data/collections.json":"d86aab5b","data/home.json":"fe5da8cb","data/image-fingerprints.json":"0b0d4b65","data/image-variants.json":"9ad81d3c","data/products.json":"792354cb","data/promo-popups.json":"0940ece5","data/promotions.json":"65f883a6","data/search-banners.json":"82a85e36","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"287afbe3","data/categories.json":"c3f4c8fa","data/collections.json":"d86aab5b","data/home.json":"fe5da8cb","data/image-variants.json":"4f23f4d2","data/products.json":"9e0f42d9","data/promo-popups.json":"0940ece5","data/promotions.json":"65f883a6","data/search-banners.json":"82a85e36","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BestBrnd4u — Адмінка</title>
@@ -12,7 +12,7 @@
          через registerPreviewStyle() — тобто лише в панель прев'ю. У
          редакторі вони не діяли, і рамка кадрування лишалась без
          розмірів. -->
-    <link rel="stylesheet" href="editor-styles.css?v=52eade17">
+    <link rel="stylesheet" href="editor-styles.css?v=e11e7057">
     <!--SITE_ENVIRONMENT-->
     <script>window.SITE_ENVIRONMENT = {"name":"production","host":"bestbrnd4u.com","branch":"main","productionUrl":"https://bestbrnd4u.com"};</script>
 </head>
@@ -71,9 +71,23 @@
             // висотою ділиться через --env-badge-h. Без цього зсуву
             // кнопка опинялась ПІД смугою. Значення за замовчуванням —
             // 0px: змінної не буде, якщо смуга не намалювалась.
+            // Кнопка стоїть ПО ЦЕНТРУ, а не біля правого краю.
+            //
+            // Раніше було right:76px — і вона накривала власні кнопки
+            // Decap: «Check for Preview» і меню публікації. Праворуч
+            // місця немає й не буде: Decap додає туди свої елементи, і
+            // кожне оновлення могло зсунути їх ще лівіше.
+            //
+            // Центр вільний: ліворуч заголовок і кнопки збереження,
+            // праворуч кнопки Decap, а посередині порожньо на будь-якій
+            // ширині екрана.
+            //
+            // transform, а не margin: ширина кнопки залежить від тексту,
+            // і зсув на половину власної ширини тримає її по центру
+            // незалежно від того, що на ній написано.
             root.style.cssText =
                 "position:fixed;top:calc(var(--env-badge-h, 0px) + 14px);" +
-                "right:76px;z-index:999999;" +
+                "left:50%;transform:translateX(-50%);z-index:999999;" +
                 "font:600 13.5px/1.2 -apple-system,Inter,sans-serif;";
 
             var toggle = document.createElement("button");
@@ -90,8 +104,14 @@
             var menu = document.createElement("div");
             menu.id = "adminMenuList";
             menu.hidden = true;
+            // Випадний список — теж по центру кнопки.
+            //
+            // Було right:0 — воно тягнулось від правого краю кнопки. Це
+            // мало сенс, поки кнопка стояла праворуч. Тепер вона в
+            // центрі, і список поїхав би вбік.
             menu.style.cssText =
-                "position:absolute;top:calc(100% + 8px);right:0;min-width:230px;" +
+                "position:absolute;top:calc(100% + 8px);left:50%;" +
+                "transform:translateX(-50%);min-width:230px;" +
                 "background:#fff;border:1px solid #e5e7eb;border-radius:12px;" +
                 "box-shadow:0 12px 34px rgba(0,0,0,.16);overflow:hidden;";
 
@@ -165,7 +185,7 @@
          в assets/js і підключається В ОБИДВА боки навмисно — якби прев'ю
          рахувало кадр власною копією, вона рано чи пізно розійшлася б
          із каталогом, і адмін бачив би не те, що покупець. -->
-    <script src="../assets/js/image-framing.js?v=e29d6a4c"></script>
+    <script src="../assets/js/image-framing.js?v=e7cb3d86"></script>
 
     <!-- Оформлення текстових блоків: той самий модуль, що на сайті,
          щоб прев'ю показувало реальні кольори й шрифт -->
@@ -179,7 +199,7 @@
 
     <!-- Редактор кадру: наближення й точка фокуса для кожного фото,
          з живим прев'ю картки каталогу просто в полі. -->
-    <script src="image-framing-widget.js?v=70900e0c"></script>
+    <script src="image-framing-widget.js?v=3b48440e"></script>
 
     <!-- Посилання на товар для постів у Telegram -->
     <script src="order-link-widget.js?v=708b2deb"></script>

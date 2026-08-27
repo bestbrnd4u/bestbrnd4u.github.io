@@ -9882,10 +9882,14 @@ body.mobile-filters-open .scroll-top{
 
 .pagination{
     display:flex;
+    /* Стовпцем: рахунок, кнопка «Показати ще», номери сторінок —
+       один під одним. Раніше все стояло в рядок, бо був лише
+       перелік номерів. */
+    flex-direction:column;
     justify-content:center;
     align-items:center;
     flex-wrap:wrap;
-    gap:6px;
+    gap:14px;
     margin:34px 0 8px;
 }
 
@@ -10939,4 +10943,88 @@ summary:focus-visible,
 .hero button:focus-visible,
 .promo-hero-slide a:focus-visible{
     outline-color:#fff;
+}
+
+/* ==========================================================
+   ПАГІНАЦІЯ: рахунок і «Показати ще»
+   ==========================================================
+
+   Нумерація сама по собі не каже, скільки товарів усього й скільки
+   вже видно. «Показати ще» без рахунку — кнопка навмання: незрозуміло,
+   чи там ще два товари, чи двісті.
+
+   Тому три елементи один під одним: рахунок, кнопка, номери сторінок.
+   Кнопка для «мало, дай ще», номери — для «хочу стрибнути далеко».
+   ========================================================== */
+
+.pagination-counter{
+    font-size:13px;
+    color:var(--gray500);
+}
+
+.pagination-more{
+    min-width:220px;
+    padding:13px 26px;
+    border:1px solid var(--dark);
+    border-radius:10px;
+    background:var(--dark);
+    color:#fff;
+    font:600 14px/1.2 inherit;
+    cursor:pointer;
+    transition:background .2s ease, color .2s ease;
+}
+
+@media (hover:hover) and (pointer:fine){
+
+    .pagination-more:hover{
+        background:#fff;
+        color:var(--dark);
+    }
+
+}
+
+/* Номери лишаються в рядок — це окрема група під кнопкою. */
+.pagination-pages{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+    justify-content:center;
+}
+
+/* ==========================================================
+   ВІДМОВА ВІД ТОВАРУ: строк і його закінчення
+   ==========================================================
+
+   Строк відмови — 14 днів від ДОСТАВКИ (закон про захист прав
+   споживачів). Коли він минув, кнопку не ховаємо, а замінюємо
+   поясненням: схована кнопка виглядає як поломка сайту, і покупець
+   починає шукати, куди вона зникла.
+   ========================================================== */
+
+/* Строк минув. Тон нейтральний, не червоний: це не помилка покупця
+   й не аварія, а просто закінчився час. */
+.order-item-refuse-expired{
+    display:inline-block;
+    margin-top:6px;
+    font-size:13px;
+    line-height:1.4;
+    color:var(--gray500);
+    cursor:help;
+    border-bottom:1px dotted var(--gray300);
+}
+
+/* Останні дні. Помітно, але без паніки — людина може не пам'ятати,
+   коли отримала посилку. */
+.order-item-refuse-left{
+    margin-left:8px;
+    font-size:12.5px;
+    color:#b45309;
+}
+
+.order-item-refuse-done{
+    display:inline-block;
+    margin-top:6px;
+    font-size:13px;
+    color:var(--gray500);
 }

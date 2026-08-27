@@ -1,0 +1,58 @@
+{
+  "gender": [
+    "Чоловікам"
+  ],
+  "preOrderDays": "5–10 робочих днів",
+  "forcePublish": false,
+  "material": "Натуральна теляча шкіра",
+  "brand": "Coach",
+  "price": 3800,
+  "preOrder": false,
+  "dimensions": "11 × 9,5 × 2 см",
+  "variants": [
+    {
+      "color": "Black",
+      "hex": "#000000",
+      "images": [
+        "/assets/images/products/uploads/set-vi-coach-men-s-coin-wallet-black-one-ecc71a62.webp",
+        "/assets/images/products/uploads/lussocitta_coach_cr957_blk_1_700x.webp",
+        "/assets/images/products/uploads/lussocitta_coach_cr957_blk_2_700x.webp"
+      ]
+    }
+  ],
+  "preOrderPrepayment": 50,
+  "sizes": [
+    "ONESIZE"
+  ],
+  "splitByColor": true,
+  "searchKeywords": [
+    "Coach CR957",
+    "Coach 3-In-1 Wallet",
+    "Coach Men's Wallet",
+    "гаманець Coach чоловічий",
+    "чоловічий гаманець Coach",
+    "чоловічий шкіряний гаманець",
+    "чорний гаманець",
+    "шкіряний гаманець",
+    "гаманець для карток",
+    "гаманець для купюр",
+    "брендовий чоловічий гаманець",
+    "оригінальний Coach"
+  ],
+  "isNew": false,
+  "title": "Гаманець Coach 3-In-1 Wallet In Signature Leather",
+  "reviews": 0,
+  "instagramBlock": "general",
+  "description": "Практичний чоловічий гаманець Coach 3-In-1 Wallet In Signature Leather у класичному чорному кольорі. Модель поєднує місткий гаманець та знімну внутрішню вставку, яку можна використовувати окремо.\nОсновне відділення має 8 слотів для банківських карток та повнорозмірні відділення для купюр. Знімна вставка оснащена віконцем для ID та двома додатковими слотами для карток. Лаконічний дизайн із фірмовим логотипом Coach робить модель універсальним варіантом для повсякденного використання",
+  "sku": "CR957",
+  "rating": 5,
+  "category": "Гаманці",
+  "slug": "гаманець-coach-3-in-1-wallet-in-signature-leather",
+  "id": 69,
+  "color": "Black",
+  "images": [
+    "/assets/images/products/uploads/set-vi-coach-men-s-coin-wallet-black-one-ecc71a62.webp",
+    "/assets/images/products/uploads/lussocitta_coach_cr957_blk_1_700x.webp",
+    "/assets/images/products/uploads/lussocitta_coach_cr957_blk_2_700x.webp"
+  ]
+}

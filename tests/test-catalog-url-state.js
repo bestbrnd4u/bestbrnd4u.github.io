@@ -484,5 +484,76 @@ console.log("\n[11] Автоскрол показує застосовані ф�
         /visibleFiltersBar \|\| catalogTop \|\| firstCard \|\| grid/.test(catalog));
 }
 
+console.log("\n[N] Пагінація: рахунок і «Показати ще»");
+{
+    // НАВІЩО
+    // -------
+    // Нумерація не каже, скільки товарів усього й скільки вже видно.
+    // А кнопка без рахунку — навмання: незрозуміло, там ще два товари
+    // чи двісті.
+    //
+    // Тому обидва разом: кнопка для «мало, дай ще», номери — для
+    // «хочу стрибнути далеко». Вони не конкурують.
+    check("є рахунок показаного", /class="pagination-counter"/.test(catalog));
+    check("рахунок називає обидва числа",
+        /\$\{seen\} з \$\{count\} товарів/.test(catalog));
+
+    check("є кнопка «Показати ще»", /class="pagination-more"/.test(catalog));
+
+    // Кнопка мусить зникати, коли показано все — інакше вона обіцяє
+    // те, чого немає.
+    check("кнопка лише коли є що показувати",
+        /const hasMore = seen < count/.test(catalog)
+        && /hasMore\s*\n?\s*\? `<button[^`]*pagination-more/.test(catalog));
+
+    // Кнопка ДОПИСУЄ, номер — ПЕРЕХОДИТЬ. Різні задачі.
+    check("кнопка додає порцію", /extraPages \+= 1/.test(catalog));
+    check("номер сторінки скидає дописане",
+        /\/\/ Номер сторінки[\s\S]{0,200}extraPages = 0;[\s\S]{0,80}currentPage = Number/.test(catalog));
+
+    // Після «Показати ще» прокручувати НЕ треба: людина стоїть біля
+    // кнопки й дивиться, що зʼявилось.
+    check("після додавання сторінка не стрибає",
+        /if \(moreBtn\) \{[\s\S]{0,200}render\(\);\s*\n\s*return;/.test(catalog));
+
+    // Зміна фільтра теж скидає: інакше лишалось би «показано 72 з 5».
+    check("зміна фільтра скидає дописане",
+        /currentPage = 1;[\s\S]{0,300}extraPages = 0;/.test(catalog));
+
+    // Зріз мусить враховувати дописані порції.
+    check("показується (1 + додані) сторінок",
+        /PER_PAGE \* \(1 \+ extraPages\)/.test(catalog));
+
+    // Арифметика на числах: 85 товарів по 24 на сторінку.
+    const PER = 24;
+
+    const state = (total, page, extra) => {
+
+        const from = (page - 1) * PER;
+        const shown = Math.min(from + PER * (1 + extra), total) - from;
+        const seen = Math.min(from + shown, total);
+
+        return { seen, hasMore: seen < total };
+
+    };
+
+    check("перша сторінка — 24 з 85", state(85, 1, 0).seen === 24);
+    check("після одного «ще» — 48", state(85, 1, 1).seen === 48);
+    check("після трьох — усі 85", state(85, 1, 3).seen === 85);
+    check("коли все показано, кнопки немає", state(85, 1, 3).hasMore === false);
+    check("зайве натискання не ламає рахунок", state(85, 1, 9).seen === 85);
+
+    // Остання сторінка неповна — рахунок не має її перебільшувати.
+    check("остання сторінка: 85 з 85", state(85, 4, 0).seen === 85);
+    check("і кнопки там немає", state(85, 4, 0).hasMore === false);
+
+    // Стилі: номери лишаються в рядок під кнопкою.
+    const css = read("assets/css/style.css");
+
+    check("номери окремою групою", /\.pagination-pages\{[^}]*display:flex/.test(css));
+    check("блок став вертикальним",
+        /\.pagination\{[^}]*flex-direction:column/.test(css));
+}
+
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
 process.exit(failures === 0 ? 0 : 1);

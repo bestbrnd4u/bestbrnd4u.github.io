@@ -355,5 +355,143 @@ console.log("\n[7] Листи з форм ідуть на робочу пошт�
     check("сторонніх адрес у коді немає", strangers.length === 0, strangers.join(", "));
 }
 
+console.log("\n[N] Ручний порядок із адмінки");
+{
+    // НАВІЩО
+    // -------
+    // Порядок каталогу будувався сам: за розділами меню, новіші вище.
+    // Підняти конкретний товар було неможливо — хіба що видалити й
+    // створити заново, щоб він отримав більший id.
+    //
+    // ЧОМУ НОМЕР, А НЕ ПЕРЕТЯГУВАННЯ
+    // -------------------------------
+    // Порядковий номер КОЖНОМУ товару не годиться: їх 67, і щоб
+    // вставити щось між третім і четвертим, довелося б перенумерувати
+    // половину каталогу руками. Такий порядок не переживе й тижня.
+    //
+    // Тут номер потрібен лише тим, кого піднімають. Решта живе своїм
+    // життям, і додавання товару нічого не ламає.
+    const catalogSrc = read("assets/js/catalog.js");
+
+    check("ручний порядок враховується", /const pinned = product =>/.test(catalogSrc));
+
+    // 0 — теж значення: перевірка мусить бути на «є число», а не на
+    // істинність, інакше нуль поводився б як порожнє поле.
+    check("нуль вважається значенням",
+        /Number\.isFinite\(value\) \? value : null/.test(catalogSrc));
+
+    check("товар із номером вище за товар без номера",
+        /if \(pa !== null\) return -1;[\s\S]{0,60}if \(pb !== null\) return 1;/.test(catalogSrc));
+
+    // Поле в адмінці — необовʼязкове, інакше довелося б заповнювати всі.
+    const { loadYaml } = require("./helpers/yaml");
+
+    const field = loadYaml("admin/config.yml").collections
+        .find(c => c.name === "products").fields
+        .find(f => f.name === "sortOrder");
+
+    check("поле є", !!field);
+    check("це число", field && field.widget === "number");
+    check("необовʼязкове", field && field.required === false);
+    check("підказка радить крок 10", /10, 20, 30/.test(String(field && field.hint)));
+
+    // Поведінка на справжніх даних.
+    const items = JSON.parse(read("data/products.json"))
+        .map(p => ({ ...p }));
+
+    const byDep = new Map();
+
+    JSON.parse(read("data/categories.json")).forEach(c => {
+        if (!byDep.has(c.department)) byDep.set(c.department, []);
+        byDep.get(c.department).push(c.name);
+    });
+
+    const catOrder = new Map();
+
+    let i = 0;
+
+    byDep.forEach(list => list.forEach(n => catOrder.set(n, i++)));
+
+    const rank = p => catOrder.has(p.category) ? catOrder.get(p.category) : Number.MAX_SAFE_INTEGER;
+    const pin = p => Number.isFinite(Number(p.sortOrder)) ? Number(p.sortOrder) : null;
+
+    const sortAll = list => [...list].sort((a, b) => {
+
+        const pa = pin(a);
+        const pb = pin(b);
+
+        if (pa !== null && pb !== null) return pa - pb;
+        if (pa !== null) return -1;
+        if (pb !== null) return 1;
+
+        return rank(a) - rank(b)
+            || (a.preOrder ? 1 : 0) - (b.preOrder ? 1 : 0)
+            || (Number(b.id) || 0) - (Number(a.id) || 0);
+
+    });
+
+    // Порядок без номерів — той самий, що був.
+    const before = sortAll(items).map(p => p.id);
+
+    // Беремо три товари з РІЗНИХ категорій, щоб перевірити, що ручний
+    // порядок сильніший за групування по розділах.
+    const picks = [];
+
+    items.forEach(p => {
+        if (picks.length < 3 && !picks.some(x => x.category === p.category)) picks.push(p);
+    });
+
+    check("знайдено три різні категорії", picks.length === 3);
+
+    picks.forEach((p, n) => { p.sortOrder = (n + 1) * 10; });
+
+    const after = sortAll(items);
+
+    check("товари з номерами стоять першими",
+        after.slice(0, 3).every(p => pin(p) !== null),
+        after.slice(0, 3).map(p => p.sortOrder).join(", "));
+
+    check("і саме в заданому порядку",
+        after[0].sortOrder === 10 && after[1].sortOrder === 20 && after[2].sortOrder === 30,
+        after.slice(0, 3).map(p => p.sortOrder).join(", "));
+
+    // Головне: решта каталогу не перемішалась.
+    const restBefore = before.filter(id => !picks.some(p => p.id === id));
+    const restAfter = after.slice(3).map(p => p.id);
+
+    check("решта товарів лишилась у тому ж порядку",
+        JSON.stringify(restBefore) === JSON.stringify(restAfter));
+
+    // І ручний порядок діє лише в сортуванні за замовчуванням: обрали
+    // «за зростанням ціни» — номери не мають нічого перебивати.
+    check("явне сортування не зачіпається",
+        /if \(!currentSort\) \{[\s\S]{0,3000}const pinned/.test(catalogSrc));
+
+    // ГОЛОВНЕ: перенумерація НЕ ЧІПАЄ id.
+    //
+    // На id тримаються посилання, які вже пішли в світ: глибоке
+    // посилання в бота (?start=product_8) у рілсах і шапці профілю,
+    // адреси в кошику й обраному. Якщо id зміниться, посилання
+    // приведе на інший товар — і дізнаємось ми про це від покупця.
+    const builder = read("scripts/build-products.js");
+
+    const renumber = (builder.match(/function renumberSortOrder[\s\S]*?\n\}/) || [""])[0];
+
+    check("перенумерація існує", renumber.length > 0);
+
+    // У функції не має бути жодного запису в id.
+    check("перенумерація не пише id",
+        !/\.id\s*=/.test(renumber) && !/data\.id/.test(renumber),
+        (renumber.match(/[^\n]*\.id[^\n]*/g) || []).slice(0, 2).join(" | "));
+
+    // Вона змінює РІВНО одне поле.
+    const writes = (renumber.match(/(?:product|data)\.[a-zA-Z]+\s*=/g) || [])
+        .map(x => x.replace(/\s*=$/, ""));
+
+    check("змінюється лише sortOrder",
+        writes.every(w => /sortOrder$/.test(w)),
+        writes.join(", "));
+}
+
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
 process.exit(failures === 0 ? 0 : 1);

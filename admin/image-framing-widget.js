@@ -214,7 +214,16 @@
             // fitError — щоб «Підігнати» не мовчало, коли не вдалося:
             // фото цілком біле, товар і так на весь кадр або знімок із
             // чужого домену.
-            return { dragging: false, fitError: null };
+            return {
+                dragging: false,
+                fitError: null,
+                // тло: визначаємо один раз при показі рядка
+                bgChecked: false,
+                bgColor: null,
+                bgUniform: false,
+                bgIsWhite: false,
+                bgSource: null
+            };
         },
 
         // Перетягування по кадру рухає точку фокуса. Рахуємо у відсотках
@@ -253,6 +262,179 @@
 
         handleUp: function () {
             if (this.state.dragging) this.setState({ dragging: false });
+        },
+
+        // Тло фото: визначаємо колір і, за потреби, показуємо, яким
+        // воно стане білим.
+        //
+        // ЧОМУ ПОКАЗУЄМО, А НЕ ПРОСТО ПЕРЕМИКАЄМО
+        // ----------------------------------------
+        // Заміна тла необоротна для файлу: після збірки оригінал уже
+        // перезаписаний (копія лишається в _originals, але лізти туди —
+        // окрема історія). Тому рішення приймається, коли видно
+        // результат, а не наосліп.
+        //
+        // Малюємо на canvas ту саму заливку від країв, що робить
+        // збірка. Це не «схоже на результат» — це він і є, тим самим
+        // алгоритмом.
+        detectBackground: function () {
+
+            var self = this;
+            var url = this.props.url;
+
+            if (!url || this.state.bgChecked) return;
+
+            this.setState({ bgChecked: true });
+
+            var img = new Image();
+
+            img.crossOrigin = "anonymous";
+
+            img.onload = function () {
+
+                var max = 160;
+                var scale = Math.min(1, max / Math.max(img.width, img.height));
+
+                var w = Math.max(1, Math.round(img.width * scale));
+                var h = Math.max(1, Math.round(img.height * scale));
+
+                var canvas = document.createElement("canvas");
+
+                canvas.width = w;
+                canvas.height = h;
+
+                var ctx = canvas.getContext("2d");
+
+                ctx.drawImage(img, 0, 0, w, h);
+
+                var data;
+
+                try {
+                    data = ctx.getImageData(0, 0, w, h);
+                } catch (error) {
+                    return;   // фото з іншого домену
+                }
+
+                var px = data.data;
+
+                function at(x, y) {
+                    var i = (y * w + x) * 4;
+                    return [px[i], px[i + 1], px[i + 2]];
+                }
+
+                var corners = [at(1, 1), at(w - 2, 1), at(1, h - 2), at(w - 2, h - 2)];
+
+                var bg = [0, 1, 2].map(function (c) {
+                    return Math.round(corners.reduce(function (sum, p) {
+                        return sum + p[c];
+                    }, 0) / corners.length);
+                });
+
+                var spread = Math.max.apply(null, corners.map(function (p) {
+                    return Math.max(
+                        Math.abs(p[0] - bg[0]),
+                        Math.abs(p[1] - bg[1]),
+                        Math.abs(p[2] - bg[2]));
+                }));
+
+                self.setState({
+                    bgColor: bg,
+                    bgUniform: spread <= 24,
+                    bgIsWhite: Math.min(bg[0], bg[1], bg[2]) >= 250,
+                    bgSource: { px: px, w: w, h: h, bg: bg }
+                });
+
+            };
+
+            img.src = url;
+
+        },
+
+        // Заливка від країв — та сама, що в scripts/whiten-backgrounds.js.
+        //
+        // Йдемо від рамки всередину й зупиняємось на першому пікселі
+        // товару. Світла пряжка в центрі сумки лишається пряжкою: шлях
+        // до неї перекритий самим товаром.
+        whitenedPreview: function () {
+
+            var source = this.state.bgSource;
+
+            if (!source) return null;
+
+            var w = source.w;
+            var h = source.h;
+            var bg = source.bg;
+
+            var px = new Uint8ClampedArray(source.px);
+
+            var TOLERANCE = 14;
+
+            var visited = new Uint8Array(w * h);
+            var queue = [];
+
+            function push(x, y) {
+
+                if (x < 0 || y < 0 || x >= w || y >= h) return;
+
+                var p = y * w + x;
+
+                if (visited[p]) return;
+
+                var i = p * 4;
+
+                if (px[i + 3] < 16) { visited[p] = 1; return; }
+
+                if (Math.abs(px[i] - bg[0]) > TOLERANCE
+                    || Math.abs(px[i + 1] - bg[1]) > TOLERANCE
+                    || Math.abs(px[i + 2] - bg[2]) > TOLERANCE) return;
+
+                visited[p] = 1;
+                queue.push(p);
+
+            }
+
+            for (var x = 0; x < w; x++) { push(x, 0); push(x, h - 1); }
+            for (var y = 0; y < h; y++) { push(0, y); push(w - 1, y); }
+
+            while (queue.length) {
+
+                var p = queue.pop();
+                var i = p * 4;
+
+                px[i] = 255;
+                px[i + 1] = 255;
+                px[i + 2] = 255;
+
+                var cx = p % w;
+                var cy = (p - cx) / w;
+
+                push(cx - 1, cy);
+                push(cx + 1, cy);
+                push(cx, cy - 1);
+                push(cx, cy + 1);
+
+            }
+
+            var canvas = document.createElement("canvas");
+
+            canvas.width = w;
+            canvas.height = h;
+
+            canvas.getContext("2d").putImageData(new ImageData(px, w, h), 0, 0);
+
+            return canvas.toDataURL("image/png");
+
+        },
+
+        setBackground: function (value) {
+
+            this.props.onChange({
+                zoom: this.props.frame.zoom,
+                x: this.props.frame.x,
+                y: this.props.frame.y,
+                bg: value
+            });
+
         },
 
         // Крок наближення кнопками.
@@ -524,7 +706,15 @@
                     title: "Потягніть, щоб обрати, яка частина кадру лишиться в центрі"
                 },
                     url
-                        ? h("img", { src: url, style: imageStyle, draggable: false, alt: "" })
+                        ? h("img", {
+                            // Коли обрано «біле», показуємо ПЕРЕМАЛЬОВАНЕ
+                            // фото, а не оригінал: рішення приймається,
+                            // коли результат видно.
+                            src: (frame.bg === "white" && this.whitenedPreview()) || url,
+                            style: imageStyle,
+                            draggable: false,
+                            alt: ""
+                        })
                         : h("div", { className: "framing-empty" }, "фото не завантажилось"),
 
                     zoomed
@@ -571,6 +761,69 @@
                         }, "+"),
                         h("b", null, frame.zoom.toFixed(2) + "×")
                     ),
+
+                    // Тло фото.
+                    //
+                    // Показуємо, який колір знайдено, і даємо вибір. Без
+                    // цього рядка людина не знає, чому одне фото
+                    // автоматика вирівняла, а інше ні — і чи взагалі
+                    // тут є що вирівнювати.
+                    this.state.bgColor
+                        ? h("div", { className: "framing-bg" },
+
+                            h("span", { className: "framing-bg-label" },
+                                h("i", {
+                                    className: "framing-bg-dot",
+                                    style: {
+                                        background: "rgb(" + this.state.bgColor.join(",") + ")"
+                                    }
+                                }),
+                                this.state.bgIsWhite
+                                    ? "Тло вже біле"
+                                    : this.state.bgUniform
+                                        ? "Тло сіре або бежеве"
+                                        : "Тло неоднорідне"),
+
+                            // Неоднорідне тло не чіпаємо взагалі: це фото
+                            // на моделі або в інтерʼєрі, там «тлом»
+                            // слугує сам знімок.
+                            this.state.bgUniform
+                                ? h("div", { className: "framing-bg-actions" },
+
+                                    h("button", {
+                                        type: "button",
+                                        className: "framing-bg-btn"
+                                            + (frame.bg === "white" ? " is-active" : ""),
+                                        onClick: function () { self.setBackground("white"); }
+                                    }, "Зробити білим"),
+
+                                    h("button", {
+                                        type: "button",
+                                        className: "framing-bg-btn"
+                                            + (frame.bg === "keep" ? " is-active" : ""),
+                                        onClick: function () { self.setBackground("keep"); }
+                                    }, "Не чіпати"),
+
+                                    frame.bg
+                                        ? h("button", {
+                                            type: "button",
+                                            className: "framing-bg-btn",
+                                            onClick: function () { self.setBackground(null); }
+                                        }, "Автоматично")
+                                        : null)
+                                : null,
+
+                            h("p", { className: "framing-hint" },
+                                !this.state.bgUniform
+                                    ? "Фото на моделі або в інтерʼєрі — тло тут замінити не можна."
+                                    : frame.bg === "white"
+                                        ? "Ліворуч показано, яким стане фото після публікації."
+                                        : frame.bg === "keep"
+                                            ? "Це фото лишиться як є."
+                                            : this.state.bgIsWhite
+                                                ? "Нічого робити не потрібно."
+                                                : "Збірка вирівняє тло сама. «Не чіпати» — щоб залишила як є."))
+                        : null,
 
                     // «Підігнати» — те, що потрібно найчастіше: предметні
                     // фото зняті на білому тлі, і товар займає третину

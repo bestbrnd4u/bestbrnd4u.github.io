@@ -261,11 +261,25 @@ console.log("\n[8] Оригінали фото не змінюються");
     // Тому перевіряємо саме вивід, а не наявність canvas: заборона на
     // getContext змусила б відмовитись від автопідгонки, хоча вона
     // оригінал не чіпає.
-    check("з canvas нічого не вивантажується",
-        !/toDataURL|toBlob|convertToBlob/.test(widget));
-    check("canvas використовується лише для читання",
-        !/putImageData/.test(widget) && /getImageData/.test(widget));
-    check("віджет не кодує зображення", !/toDataURL|toBlob/.test(widget));
+    // Canvas тепер і МАЛЮЄ — але тільки для попереднього перегляду.
+    //
+    // Обіцянка була «оригінали не змінюються», і вона в силі: віджет
+    // показує, яким стане фото з білим тлом, і зберігає лише РІШЕННЯ
+    // ("bg": "white"). Файл змінює збірка, а копію оригіналу кладе в
+    // assets/images/_originals.
+    //
+    // Порушенням було б завантажити результат назад у медіатеку —
+    // саме це й перевіряємо.
+    check("результат не вивантажується в медіатеку",
+        !/onAddAsset|persistMedia|toBlob\(/.test(widget));
+
+    check("canvas використовується для показу, не для запису у файл",
+        /toDataURL\("image\/png"\)/.test(widget) && /getImageData/.test(widget));
+
+    // І сам віджет не має чіпати шлях до фото: він працює з тим, що
+    // вже лежить у товарі.
+    check("шлях до фото не переписується",
+        !/variant\.images\[|data\.images\[/.test(widget));
     check("віджет не чіпає медіатеку", !/persistMedia|addAsset/.test(widget));
 
     const normalizer = read("scripts/normalize-product-images.js");
