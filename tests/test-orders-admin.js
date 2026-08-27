@@ -222,9 +222,22 @@ console.log("\n[N2] Сповіщення про відмову не залежи
     // Тому другий, незалежний канал: лист тим самим шляхом, що й
     // замовлення.
     check("є лист магазину", /async function notifyRefusal/.test(ACC));
-    check("лист іде через FormSubmit", /sendViaFormSubmit\(\{/.test(ACC));
 
-    const sendAt = ACC.indexOf("notifyRefusal(order, orderNumber)");
+    // Два шляхи: без фото — звичайним JSON, з фото — multipart, бо
+    // FormSubmit приймає файли лише так.
+    check("лист без фото — звичайним шляхом",
+        /if \(!files\.length\)[\s\S]{0,200}sendViaFormSubmit\(payload\)/.test(ACC));
+    check("лист із фото — multipart",
+        /const form = new FormData\(\)/.test(ACC)
+        && /formsubmit\.co\/ajax\/\$\{FORMSUBMIT_TARGET\}/.test(ACC));
+
+    // Content-Type не ставимо вручну: браузер додає його разом із
+    // межею multipart, а виставлений руками ламає розбір — файли не
+    // доходять.
+    check("Content-Type не виставляється вручну",
+        !/"Content-Type": "multipart/.test(ACC));
+
+    const sendAt = ACC.indexOf("notifyRefusal(order, orderNumber, choice)");
     const errAt = ACC.indexOf('console.error("Заявка на відмову:"');
 
     check("лист надсилається до перевірки помилки бази",
@@ -234,7 +247,9 @@ console.log("\n[N2] Сповіщення про відмову не залежи
         /Запит надіслано менеджеру/.test(ACC));
 
     ["Замовлення", "Дата замовлення", "Клієнт", "Телефон", "Пошта",
-     "Доставка", "Статус доставки", "ТТН", "Оплата", "Сума", "Товари"]
+     "Доставка", "Статус доставки", "ТТН", "Оплата",
+     "Причина відмови", "Товари, від яких відмова",
+     "Сума до повернення", "Сума всього замовлення", "Фото додано"]
         .forEach(field =>
             check(`у листі є «${field}»`, new RegExp(`"${field}":`).test(ACC)));
 
@@ -252,8 +267,34 @@ console.log("\n[N2] Сповіщення про відмову не залежи
     check("старий select(\"id\") прибрано",
         !/\.select\("id"\)\s*\n\s*\.eq\("order_number"/.test(ACC));
 
-    // Сума через formatPrice: «4 359 грн» замість «4359 грн».
-    check("сума відформатована", /"Сума": order\.total \? formatPrice/.test(ACC));
+    // ГОЛОВНЕ: у листі сума ЛИШЕ обраних товарів.
+    //
+    // Раніше йшов order.total: людина відмовлялась від однієї пари
+    // кросівок, а магазин бачив повну суму на дві речі й не розумів,
+    // скільки повертати.
+    check("сума до повернення рахується з обраного",
+        /const refundSum = chosen\.reduce/.test(ACC));
+    check("повна сума замовлення теж показана, окремо",
+        /"Сума всього замовлення": order\.total \? formatPrice/.test(ACC));
+
+    // Причину вимагаємо у вікні: без неї магазин не знає, що робити з
+    // товаром і чи можна продати його далі.
+    const dialog = fs.readFileSync(
+        path.join(ROOT, "assets/js/refusal-dialog.js"), "utf8");
+
+    check("вікно відмови існує", /function askRefusal/.test(dialog));
+    check("товар під кнопкою відмічений одразу",
+        /index === preselectedIndex/.test(dialog));
+    check("причина обовʼязкова", /reason\.length < 5/.test(dialog));
+    check("порожній вибір не пропускається",
+        /if \(!checked\.length\)/.test(dialog));
+
+    // Ліміт перевіряємо ДО надсилання: інакше лист піде й тихо не
+    // дійде, а людина побачить «надіслано».
+    check("розмір фото перевіряється до надсилання",
+        /totalBytes > MAX_TOTAL_BYTES/.test(dialog));
+    check("ліміт із запасом під текст листа",
+        /MAX_TOTAL_BYTES = 8 \* 1024 \* 1024/.test(dialog));
 
     // Спосіб оплати вирішує, що робити далі: карткою — повертати
     // гроші, на пошті — просто скасувати відправлення.

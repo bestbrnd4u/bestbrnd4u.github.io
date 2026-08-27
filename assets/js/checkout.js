@@ -838,7 +838,13 @@ function buildOrderItemsSnapshot() {
         title: product.title,
         brand: product.brand,
         price: product.price,
-        image: product.images?.[0] || null,
+        // АБСОЛЮТНА адреса, а не /assets/images/…
+        //
+        // ЧОМУ. Цей знімок замовлення йде і в базу, і в лист. Відносний
+        // шлях працює лише на сторінці сайту: у листі його нема від чого
+        // відкладати, і почтовик показує заглушку замість фото. Саме це
+        // й було видно в листі «дякуємо за замовлення».
+        image: absoluteUrl(product.images?.[0]) || null,
         qty,
         color,
         size

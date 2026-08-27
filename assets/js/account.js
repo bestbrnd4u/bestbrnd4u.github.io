@@ -471,7 +471,7 @@ function renderOrderCard(order) {
 
     const items = Array.isArray(order.items) ? order.items : [];
 
-    const itemsHtml = items.map(item => {
+    const itemsHtml = items.map((item, index) => {
 
         const metaParts = [];
 
@@ -490,7 +490,7 @@ function renderOrderCard(order) {
                     ${item.brand ? `<span class="order-item-brand">${item.brand}</span>` : ""}
                     <span class="order-item-title">${item.title}</span>
                     <span class="order-item-meta">${metaParts.join("&nbsp;&nbsp;&nbsp;")}</span>
-                    ${refusalMarkup(order)}
+                    ${refusalMarkup(order, index)}
                 </div>
 
             </div>
@@ -644,13 +644,15 @@ function renderOrderCard(order) {
 // зателефонувати й не шукати нічого: номер замовлення, ім'я, телефон,
 // пошта, спосіб доставки й ТТН. Без ТТН неясно, чи посилка вже в
 // покупця.
-async function notifyRefusal(order, orderNumber) {
+async function notifyRefusal(order, orderNumber, choice) {
 
-    if (typeof sendViaFormSubmit !== "function") return;
+    const chosen = (choice && choice.items) || order.items || [];
+    const reason = (choice && choice.reason) || "";
+    const files = (choice && choice.files) || [];
 
-    const window = refusalWindow(order);
+    const window_ = refusalWindow(order);
 
-    const items = (order.items || [])
+    const items = chosen
         .map(item => {
 
             const parts = [item.title];
@@ -659,12 +661,22 @@ async function notifyRefusal(order, orderNumber) {
             if (item.size) parts.push("розмір " + item.size);
             if (item.qty > 1) parts.push(item.qty + " шт.");
 
-            return "• " + parts.join(", ");
+            const sum = (Number(item.price) || 0) * (Number(item.qty) || 1);
+
+            return "• " + parts.join(", ") + (sum ? ` — ${formatPrice(sum)}` : "");
 
         })
         .join("\n");
 
-    await sendViaFormSubmit({
+    // Сума ЛИШЕ обраних товарів, а не всього замовлення.
+    //
+    // Раніше в лист ішов order.total: людина відмовлялась від однієї
+    // пари кросівок, а магазин бачив повну суму на дві речі й не
+    // розумів, скільки повертати.
+    const refundSum = chosen.reduce((total, item) =>
+        total + (Number(item.price) || 0) * (Number(item.qty) || 1), 0);
+
+    const payload = {
         _subject: `Відмова від замовлення ${orderNumber}`,
         _template: "table",
         "Замовлення": orderNumber,
@@ -676,25 +688,43 @@ async function notifyRefusal(order, orderNumber) {
         "Пошта": order.email || "—",
         "Доставка": [order.delivery_method, order.delivery_city, order.delivery_detail]
             .filter(Boolean).join(", ") || "—",
-        // deliveryStatusLabel(), а не колонка напряму: вона порожня, і
-        // менеджер отримав би прочерк саме там, де важливо розуміти —
-        // посилка вже в покупця чи ще їде.
         "Статус доставки": deliveryStatusLabel(order),
-        // tracking_number, а не ttn: старе поле лишилось у базі, але
-        // не заповнюється — і в листі ТТН був би порожнім саме тоді,
-        // коли він потрібен найбільше.
         "ТТН": order.tracking_number || "—",
-        // Спосіб оплати вирішує, що робити далі: при оплаті карткою
-        // гроші треба повернути, при оплаті на пошті — просто
-        // скасувати відправлення.
         "Оплата": order.payment_method || "—",
-        // formatPrice, а не склеювання: «4359 грн» проти «4 359 грн».
-        // Дрібниця, але менеджер читає це в поспіху, і розділені
-        // тисячі помітно швидше сприймаються.
-        "Сума": order.total ? formatPrice(order.total) : "—",
-        "Товари": items || "—",
-        // Скільки днів минуло — щоб менеджер бачив, чи заявка в строку.
-        "Днів після доставки": window.started ? String(window.daysPassed) : "ще не доставлено"
+        "Причина відмови": reason || "не вказано",
+        "Товари, від яких відмова": items || "—",
+        "Сума до повернення": refundSum ? formatPrice(refundSum) : "—",
+        "Сума всього замовлення": order.total ? formatPrice(order.total) : "—",
+        "Днів після доставки": window_.started ? String(window_.daysPassed) : "ще не доставлено",
+        "Фото додано": files.length ? String(files.length) : "немає"
+    };
+
+    // Фото відправляємо разом із листом.
+    //
+    // FormSubmit приймає файли лише через multipart/form-data — JSON із
+    // ними не працює. Тому коли є знімки, збираємо FormData; коли їх
+    // немає, лишаємо звичайний шлях, яким ідуть усі інші листи сайту.
+    if (!files.length) {
+
+        if (typeof sendViaFormSubmit === "function") await sendViaFormSubmit(payload);
+
+        return;
+
+    }
+
+    const form = new FormData();
+
+    Object.keys(payload).forEach(key => form.append(key, payload[key]));
+
+    files.forEach((file, index) => form.append(`Фото ${index + 1}`, file, file.name));
+
+    await fetch(`https://formsubmit.co/ajax/${FORMSUBMIT_TARGET}`, {
+        method: "POST",
+        // Content-Type НЕ ставимо: браузер додасть його сам разом із
+        // межею multipart. Вручну виставлений заголовок ламає розбір на
+        // боці сервера — файли просто не доходять.
+        headers: { Accept: "application/json" },
+        body: form
     });
 
 }
@@ -744,7 +774,7 @@ function refusalWindow(order) {
 }
 
 // Підпис під товаром: кнопка, залишок днів або «строк минув».
-function refusalMarkup(order) {
+function refusalMarkup(order, itemIndex) {
 
     // Заявку вже надіслано — кнопка ні до чого.
     if (order.refusal_requested_at) {
@@ -775,13 +805,19 @@ function refusalMarkup(order) {
         ? ` <span class="order-item-refuse-left">лишилось ${window.daysLeft} дн.</span>`
         : "";
 
-    return `<button type="button" class="order-item-refuse" data-order="${order.order_number}">
+    // data-index — щоб знати, під ЯКИМ товаром натиснули.
+    //
+    // Раніше кнопка знала лише номер замовлення, і відмова йшла від
+    // усього замовлення: у листі опинялись усі товари й повна сума.
+    return `<button type="button" class="order-item-refuse"
+                    data-order="${order.order_number}"
+                    data-index="${itemIndex}">
                 ↩ Відмова
             </button>${hint}`;
 
 }
 
-async function requestRefusal(button) {
+async function requestRefusal(button, itemIndex) {
 
     const orderNumber = button.dataset.order;
 
@@ -844,6 +880,24 @@ async function requestRefusal(button) {
             .from("order_refusals")
             .insert({ order_id: order.id, user_id: user.id });
 
+        // Питаємо, від ЧОГО саме відмовляються.
+        //
+        // Вікно показуємо після того, як замовлення завантажене: у ньому
+        // видно склад із фото й сумами, а без даних показувати нічого.
+        const choice = window.RefusalDialog
+            ? await window.RefusalDialog.ask(order, itemIndex)
+            : { items: order.items || [], reason: "", files: [] };
+
+        // Закрив вікно — нічого не сталось.
+        if (!choice) {
+
+            button.disabled = false;
+            button.textContent = "↩ Відмова";
+
+            return;
+
+        }
+
         // Лист магазину — НЕЗАЛЕЖНО від того, чи спрацював тригер у базі.
         //
         // ЧОМУ ТАК
@@ -860,7 +914,7 @@ async function requestRefusal(button) {
         //
         // Надсилаємо ДО перевірки помилки: навіть якщо запис у базу не
         // вдався, магазин мусить дізнатись про відмову.
-        notifyRefusal(order, orderNumber).catch(() => {});
+        notifyRefusal(order, orderNumber, choice).catch(() => {});
 
         if (error) {
 
@@ -900,7 +954,7 @@ ordersListEl?.addEventListener("click", event => {
 
     if (refuseBtn) {
 
-        requestRefusal(refuseBtn);
+        requestRefusal(refuseBtn, Number(refuseBtn.dataset.index));
 
         return;
 
