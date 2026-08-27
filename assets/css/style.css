@@ -11131,3 +11131,162 @@ summary:focus-visible,
     }
 
 }
+
+/* ==========================================================
+   ВІКНО ВІДМОВИ ВІД ТОВАРУ
+   ==========================================================
+
+   Кнопка «Відмова» стояла під конкретним товаром, але надсилала
+   відмову від УСЬОГО замовлення. Тепер вікно: видно склад, товар під
+   кнопкою відмічений одразу, причина обов'язкова, фото — за бажанням.
+   ========================================================== */
+
+.refusal-overlay{
+    position:fixed;
+    inset:0;
+    z-index:10000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    background:rgba(17,24,39,.55);
+    overflow-y:auto;
+}
+
+body.refusal-open{
+    overflow:hidden;
+}
+
+.refusal-dialog{
+    width:100%;
+    max-width:520px;
+    background:#fff;
+    border-radius:18px;
+    padding:24px;
+    box-shadow:0 24px 60px rgba(0,0,0,.28);
+}
+
+.refusal-dialog h3{
+    font-size:19px;
+    margin:0 0 6px;
+}
+
+.refusal-hint{
+    margin:0 0 16px;
+    font-size:13.5px;
+    color:var(--gray500);
+}
+
+.refusal-items{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    margin-bottom:18px;
+}
+
+.refusal-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px;
+    border:1px solid var(--gray200);
+    border-radius:12px;
+    cursor:pointer;
+}
+
+/* Відмічений товар видно одразу — інакше в списку з трьох речей
+   незрозуміло, що саме поїде у відмову. */
+.refusal-item:has(input:checked){
+    border-color:var(--secondary);
+    background:rgba(37,99,235,.05);
+}
+
+.refusal-item img{
+    width:44px;
+    height:55px;
+    flex-shrink:0;
+    object-fit:cover;
+    border-radius:7px;
+}
+
+.refusal-item-info{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    min-width:0;
+    flex:1;
+    font-size:13.5px;
+}
+
+.refusal-item-meta{
+    font-size:12px;
+    color:var(--gray500);
+}
+
+.refusal-item-sum{
+    flex-shrink:0;
+    font-size:13.5px;
+    font-weight:600;
+    white-space:nowrap;
+}
+
+.refusal-field{
+    display:block;
+    margin-bottom:16px;
+    font-size:13.5px;
+}
+
+.refusal-field > span{
+    display:block;
+    margin-bottom:5px;
+    font-weight:600;
+}
+
+.refusal-field textarea,
+.refusal-field input[type="file"]{
+    width:100%;
+    font-family:inherit;
+    font-size:14px;
+    padding:10px 12px;
+    border:1px solid var(--gray200);
+    border-radius:10px;
+    background:#fff;
+}
+
+.refusal-field small{
+    display:block;
+    margin-top:5px;
+    font-size:12px;
+    line-height:1.45;
+    color:var(--gray500);
+}
+
+/* Помилка поруч із кнопками, а не вгорі: людина дивиться туди, куди
+   щойно натиснула. */
+.refusal-error{
+    margin:0 0 12px;
+    font-size:13px;
+    color:#dc2626;
+}
+
+.refusal-actions{
+    display:flex;
+    gap:10px;
+}
+
+.refusal-actions .btn{
+    flex:1;
+}
+
+@media(max-width:520px){
+
+    .refusal-dialog{
+        padding:18px;
+    }
+
+    .refusal-item img{
+        width:38px;
+        height:47px;
+    }
+
+}
