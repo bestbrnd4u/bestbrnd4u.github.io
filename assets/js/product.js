@@ -19,7 +19,18 @@ const productSlug = (typeof window.PRODUCT_SLUG === "string" && window.PRODUCT_S
 
 const productId = Number(params.get("id")) || Number(window.PRODUCT_ID) || 0;
 
-const isLegacyUrl = !pathSlug && params.has("id");
+// Назва товару як запасний спосіб його знайти.
+//
+// НАВІЩО. Склад замовлення зберігається знімком (buildOrderItemsSnapshot
+// у checkout.js), і в замовленнях, оформлених раніше, поля id у ньому
+// немає — тільки назва. Щоб фото й назва в історії замовлень вели куди
+// слід і в таких записах, приймаємо ще й ?title=.
+//
+// Це саме запасний шлях: назви не унікальні й змінюються, тож для нових
+// посилань завжди id або slug.
+const productTitle = (params.get("title") || "").trim();
+
+const isLegacyUrl = !pathSlug && (params.has("id") || params.has("title"));
 
 function findRequestedProduct(list) {
 
@@ -30,6 +41,14 @@ function findRequestedProduct(list) {
 
     if (productId) {
         return list.find(p => p.id === productId);
+    }
+
+    if (productTitle) {
+
+        const wanted = productTitle.toLowerCase();
+
+        return list.find(p => String(p.title || "").trim().toLowerCase() === wanted);
+
     }
 
     return undefined;
@@ -57,7 +76,13 @@ if(!product){
 // як ще одну копію шаблону
 markProductPageNotFound();
 
-document.getElementById("productPage").innerHTML="<h2>Товар не знайдено</h2>";
+renderProductNotFound();
+
+// Переглянуті товари лишаємо: людина, яка прийшла за знятим з продажу
+// товаром, найчастіше шукає щось на нього схоже — а це саме те, що
+// вона щойно дивилась. Порожній екран був би найгіршим варіантом
+// сторінки помилки.
+renderRecentlyViewed();
 
 return;
 
@@ -194,6 +219,45 @@ function shippingDetailsFor(price) {
     }
 
     return details;
+
+}
+
+// Сторінка «такого товару немає».
+//
+// ЧОМУ ЦЕ ВАЖЛИВО. Сюди приходять не з нізвідки: з історії замовлень
+// (товар зняли з продажу), зі збереженого посилання, з обраного, зі
+// старої розсилки. Раніше на всіх цих шляхах людина бачила один рядок
+// «Товар не знайдено» посеред білого екрана — без пояснення й без
+// жодного виходу, окрім кнопки «Назад».
+//
+// Тому тут три речі: що сталося, чому (товар міг бути розпроданий або
+// знятий з продажу — це найчастіша причина, і вона не схожа на помилку
+// сайту) і куди йти далі.
+function renderProductNotFound() {
+
+    const page = document.getElementById("productPage");
+
+    if (!page) return;
+
+    // Що саме шукали — показуємо, якщо знаємо. Так видно, що сайт
+    // зрозумів запит, а не просто зламався.
+    const wanted = productTitle
+        ? `<p class="empty-state-note">Ми шукали: «${escapeHtml(productTitle)}»</p>`
+        : "";
+
+    page.innerHTML = `
+        <div class="empty-state product-not-found">
+            <h2>🔍</h2>
+            <h3>Товар не знайдено</h3>
+            <p>
+                Можливо, його вже розпродано або знято з продажу,
+                а посилання застаріло. Схожі моделі майже завжди є —
+                напишіть нам, і ми підберемо заміну.
+            </p>
+            ${wanted}
+            <a href="/catalog" class="btn">Перейти в каталог</a>
+            <a href="/contacts" class="btn btn-outline">Написати нам</a>
+        </div>`;
 
 }
 

@@ -677,6 +677,40 @@ function toggleFavorite(id, options = {}) {
 
 }
 
+// ВИДАЛЕННЯ, а не перемикання.
+//
+// ЧОМУ ОКРЕМА ФУНКЦІЯ
+// --------------------
+// На сторінці «Обране» кнопка «✕ Видалити з обраного» означає рівно
+// одне: прибрати рядок. Раніше вона кликала toggleFavorite() — а це
+// перемикач. Достатньо було, щоб рядок лишився на екрані на секунду
+// довше (наприклад, поки відкрите вікно підтвердження), і другий клац
+// по тій самій кнопці ДОДАВАВ товар назад: у списку його вже не було,
+// тож перемикач працював у зворотний бік.
+//
+// Видалення мусить бути ідемпотентним: другий, третій, десятий виклик
+// не може нічого повернути. Повертаємо true/false — чи справді щось
+// прибрали, щоб не показувати «Видалено» на порожню дію.
+function removeFavorite(id, options = {}) {
+
+    const { color = null, size = null } = options;
+
+    const favorites = getFavorites();
+
+    const rest = favorites.filter(entry =>
+        !(entry.id === Number(id) && entry.color === color && entry.size === size)
+    );
+
+    if (rest.length === favorites.length) return false;
+
+    saveFavorites(rest);
+
+    updateFavoriteButtons();
+
+    return true;
+
+}
+
 // зміна кольору/розміру вже доданого в обране товару.
 // На відміну від кошика, тут кожен запис унікальний за
 // (id, колір, розмір) — тож якщо користувач перемикає
@@ -1848,15 +1882,35 @@ document.addEventListener("click", event => {
         const id = Number(favorite.dataset.id);
 
         // На сторінці «Обране» ця сама кнопка не перемикає, а ВИДАЛЯЄ
-        // рядок зі списку — і повернути його нічим. Тому там питаємо.
-        // Скрізь інде (картка, сторінка товару) це звичайне
-        // перемикання сердечка: спитати означало б заважати.
+        // рядок зі списку.
+        //
+        // Раніше тут стояло вікно «Видалити з обраного?» і toggleFavorite
+        // у відповіді. Два наслідки, обидва погані:
+        //
+        //   1. Перемикач у ролі видалення. Товар уже прибрано, рядок ще
+        //      на екрані — другий клац ДОДАВАВ його назад.
+        //   2. Питання перед дією, яку легко скасувати після неї. Діалог
+        //      зупиняє людину на кожному видаленні, хоча в 99 випадках
+        //      зі 100 відповідь відома.
+        //
+        // Тепер навпаки: видаляємо одразу, але не миттєво — 5 секунд
+        // рядок лишається на місці з кнопкою «Залишити товар». Не встиг
+        // або не хотів — товар зникає сам. Дію видно, скасувати її можна
+        // одним дотиком, і жодне повторне натискання нічого не повертає:
+        // прибирає завжди removeFavorite(), а він працює в один бік.
         if (favorite.classList.contains("favorite-row-remove")) {
 
-            askConfirm({
-                title: "Видалити з обраного?",
-                text: "Товар зникне зі списку обраного."
-            }).then(yes => { if (yes) toggleFavorite(id, { color, size }); });
+            if (typeof startFavoriteRemoval === "function") {
+
+                startFavoriteRemoval(favorite.closest(".favorite-row"), id, { color, size });
+
+            } else {
+
+                // сторінки без цього сценарію (раптом кнопка опиниться
+                // деінде) — просто прибираємо, без вікна очікування
+                removeFavorite(id, { color, size });
+
+            }
 
             return;
 
@@ -2224,6 +2278,15 @@ document.addEventListener("click", function (e) {
 
     // Вибір кольору/розміру на картці
     if (e.target.closest(".product-options")) {
+        return;
+    }
+
+    // Рядок обраного, який зараз чекає видалення (йде 5-секундний
+    // відлік). Клац по ньому не має вести на сторінку товару: людина
+    // тягнеться до «Залишити товар», а не до самого товару, і промах
+    // мимо кнопки не мусить забирати її зі сторінки — інакше відлік
+    // добіжить у неї за спиною.
+    if (e.target.closest(".favorite-row.is-removing")) {
         return;
     }
 
@@ -2653,6 +2716,326 @@ function getProductColors(product) {
     }
 
     return colors;
+
+}
+
+// ======================================
+// СІМ'Ї КОЛЬОРІВ
+// ======================================
+//
+// ЗАДАЧА
+// -------
+// Назви кольорів у даних — це те, що написав постачальник: «Бежевий
+// 1R5», «Білий White 21G», «Wht-Dk Grn 286», «Marine daphne 793»,
+// «Brass/Chalk — айворі / золотистий», «Nero», «Black чорний». На 71
+// товар — 83 різні написання, і у фільтрі «Колір» вони ставали 83
+// пунктами: «Чорний», «Black», «Black чорний» і «Nero» окремими
+// рядками. Щоб знайти чорну сумку, треба було відмітити п'ять пунктів
+// і не бути певним, що не проґавив шостий.
+//
+// РІШЕННЯ
+// --------
+// Дві незалежні речі:
+//
+//   1. Назви на вході НОРМАЛІЗУЮТЬСЯ під час збірки
+//      (scripts/normalize-colors.js) — у даних лишається чиста
+//      українська назва замість артикула відтінку.
+//   2. Фільтр працює не назвами, а СІМ'ЯМИ кольорів — коротким
+//      списком того, як колір називає покупець.
+//
+// Другого мало без першого (у картці лишався б «Wht-Dk Grn 286»), а
+// першого мало без другого: «Темно-сірий», «Світло-сірий» і
+// «Сіро-бежевий» — усе одно три пункти на один сірий.
+//
+// ЯК ВИЗНАЧАЄТЬСЯ СІМ'Я
+// ----------------------
+// 1. Сильне слово-колір у назві. Якщо їх кілька — виграє те, що
+//    СТОЇТЬ ПЕРШИМ: у «Коричнево-чорний» головний коричневий, у
+//    «Чорно-бежевий» — чорний. Так само читає назву людина.
+// 2. Немає сильного слова — дивимось на hex свотча. Він надійніший за
+//    слова про фурнітуру: «Brass/Chalk» — це не золотий колір, це
+//    золота фурнітура, а сам товар #e9e4e4, тобто майже білий.
+// 3. Немає ні того, ні того — слабкі слова (brass, chalk, ivory…).
+// 4. Зовсім нічого — «Інші».
+// ======================================
+
+// Порядок важливий: у фільтрі сім'ї показуються саме в ньому — від
+// найчастіших до рідких. Алфавіт тут гірший: він розкидав би «Білий»,
+// «Сірий» і «Чорний» по трьох кінцях списку.
+const COLOR_FAMILIES = [
+    {
+        name: "Чорний",
+        hex: "#111111",
+        keywords: ["чорн", "black", "blk", "nero", "noir"]
+    },
+    {
+        name: "Білий",
+        hex: "#ffffff",
+        keywords: ["біл", "white", "wht", "bianco", "blanc", "cotton", "молочн", "milk"]
+    },
+    {
+        name: "Сірий",
+        hex: "#9ca3af",
+        keywords: ["сір", "grey", "gray", "graphite", "графіт", "silver", "срібн", "steel", "сталев", "cement", "антрацит"]
+    },
+    {
+        name: "Бежевий",
+        hex: "#d6c3a5",
+        keywords: ["беж", "beige", "tan", "camel", "кемел", "sand", "піск", "cream", "крем", "nude", "twine", "taupe", "тауп", "khaki", "хакі", "latte", "капучин", "айвор", "ivory"]
+    },
+    {
+        name: "Коричневий",
+        hex: "#8b5e3c",
+        keywords: ["коричнев", "brown", "chocolate", "шокол", "mocha", "мокко", "espresso", "cognac", "коньяк", "черепахов", "tortoise"]
+    },
+    {
+        name: "Синій",
+        hex: "#2563eb",
+        keywords: ["син", "блакит", "blue", "navy", "marine", "denim", "джинс", "indigo", "індиго", "cobalt", "кобальт"]
+    },
+    {
+        name: "Зелений",
+        hex: "#16a34a",
+        keywords: ["зелен", "green", "grn", "olive", "олив", "mint", "м'ят", "mʼят", "emerald", "смарагд", "verde"]
+    },
+    {
+        name: "Червоний",
+        hex: "#dc2626",
+        keywords: ["червон", "red", "rosso", "бордов", "bordeaux", "burgundy", "wine", "вин", "cherry", "вишн", "coral", "корал"]
+    },
+    {
+        name: "Рожевий",
+        hex: "#ec4899",
+        keywords: ["рожев", "pink", "rose", "fuchsia", "фукс", "пудров"]
+    },
+    {
+        name: "Помаранчевий",
+        hex: "#f97316",
+        keywords: ["помаранч", "оранж", "orange", "карамел", "терракот", "terracot", "персик", "peach", "apricot"]
+    },
+    {
+        name: "Жовтий",
+        hex: "#facc15",
+        keywords: ["жовт", "yellow", "гірчич", "mustard", "lemon", "лимон"]
+    },
+    {
+        name: "Фіолетовий",
+        hex: "#7c3aed",
+        keywords: ["фіолет", "purple", "violet", "лілов", "lilac", "lavender", "лаванд", "plum", "слив"]
+    },
+    {
+        name: "Золотий",
+        hex: "#c9a227",
+        // слабка група: у назвах Coach і Michael Kors це майже завжди
+        // фурнітура, а не колір самої речі
+        keywords: [],
+        weakKeywords: ["золот", "gold", "brass", "латун"]
+    },
+    {
+        name: "Мультиколір",
+        hex: "linear-gradient(135deg,#f87171,#facc15,#4ade80,#60a5fa)",
+        keywords: ["мульти", "multi", "барвист", "різнокольор", "colorblock", "колорблок", "камуфляж", "camo"]
+    },
+    {
+        name: "Інші",
+        hex: "#e5e7eb",
+        keywords: [],
+        // сюди нічого не потрапляє за словами — лише як остання
+        // відповідь, коли ні назва, ні hex нічого не сказали
+        weakKeywords: ["blush", "chalk", "nickel", "pearl", "перлам"]
+    }
+];
+
+const COLOR_FAMILY_ORDER = COLOR_FAMILIES.map(family => family.name);
+
+function hexToRgb(hex) {
+
+    const value = String(hex || "").trim().replace(/^#/, "");
+
+    if (!/^([0-9a-f]{3}|[0-9a-f]{6})$/i.test(value)) return null;
+
+    const full = value.length === 3
+        ? value.split("").map(c => c + c).join("")
+        : value;
+
+    return {
+        r: parseInt(full.slice(0, 2), 16),
+        g: parseInt(full.slice(2, 4), 16),
+        b: parseInt(full.slice(4, 6), 16)
+    };
+
+}
+
+// Відтінок і світлість: у них «майже чорний» і «майже білий»
+// відрізняються одним числом, а в RGB — трьома й купою умов.
+function rgbToHsl({ r, g, b }) {
+
+    const rn = r / 255;
+    const gn = g / 255;
+    const bn = b / 255;
+
+    const max = Math.max(rn, gn, bn);
+    const min = Math.min(rn, gn, bn);
+    const delta = max - min;
+
+    const lightness = (max + min) / 2;
+
+    let hue = 0;
+    let saturation = 0;
+
+    if (delta) {
+
+        saturation = lightness > 0.5
+            ? delta / (2 - max - min)
+            : delta / (max + min);
+
+        if (max === rn) hue = ((gn - bn) / delta) % 6;
+        else if (max === gn) hue = (bn - rn) / delta + 2;
+        else hue = (rn - gn) / delta + 4;
+
+        hue = (hue * 60 + 360) % 360;
+
+    }
+
+    return { h: hue, s: saturation, l: lightness };
+
+}
+
+function colorFamilyByHex(hex) {
+
+    const rgb = hexToRgb(hex);
+
+    if (!rgb) return null;
+
+    const { h, l } = rgbToHsl(rgb);
+
+    // ЧОМУ ТУТ ХРОМА, А НЕ НАСИЧЕНІСТЬ HSL
+    // -------------------------------------
+    // Насиченість у HSL ділиться на світлість, тому в дуже світлих і
+    // дуже темних кольорах роздувається: #e9e4e4 — майже білий (канали
+    // різняться на 5 з 255), а s виходить 0.10. На цьому спіткнувся
+    // перший варіант: відтінок такого свотча обчислюється як 0°, і
+    // «Brass/Chalk — айворі» потрапляв у ЧЕРВОНІ.
+    //
+    // Хрома (max - min) такого фокуса не робить: 5/255 = 0.02 — кольору
+    // тут справді немає, хоч світлий він, хоч темний.
+    const chroma = (Math.max(rgb.r, rgb.g, rgb.b) - Math.min(rgb.r, rgb.g, rgb.b)) / 255;
+
+    // Сіра вісь: кольору немає, лишається світлість. Межі саме такі,
+    // бо «чорні» свотчі товарів реально лежать на 0.07–0.21, а не на
+    // нулі, а «білі» — на 0.86–1.0.
+    if (chroma < 0.1) {
+
+        if (l < 0.22) return "Чорний";
+
+        if (l > 0.85) return "Білий";
+
+        return "Сірий";
+
+    }
+
+    // Бежевий — не окремий відтінок, а тепла пастель: мало кольору
+    // плюс висока світлість. Без цього правила пісок, крем і карамель
+    // розлітаються по «жовтому» й «помаранчевому».
+    if (chroma < 0.28 && l > 0.62 && h >= 15 && h <= 75) return "Бежевий";
+
+    // Той самий теплий відтінок, але темний, — це коричневий,
+    // а не помаранчевий.
+    if (l < 0.45 && h >= 10 && h <= 45) return "Коричневий";
+
+    if (h < 15 || h >= 345) return "Червоний";
+    if (h < 45) return "Помаранчевий";
+    if (h < 70) return "Жовтий";
+    if (h < 170) return "Зелений";
+    if (h < 255) return "Синій";
+    if (h < 290) return "Фіолетовий";
+
+    return "Рожевий";
+
+}
+
+// Сім'я одного кольору. name — назва з даних товару, hex — його свотч.
+function colorFamily(name, hex) {
+
+    const text = String(name || "").toLowerCase();
+
+    // 1. Сильне слово-колір. Виграє те, що стоїть у назві першим.
+    let best = null;
+
+    if (text) {
+
+        COLOR_FAMILIES.forEach(family => {
+
+            (family.keywords || []).forEach(keyword => {
+
+                const at = text.indexOf(keyword);
+
+                if (at === -1) return;
+
+                if (!best || at < best.at) best = { name: family.name, at };
+
+            });
+
+        });
+
+    }
+
+    if (best) return best.name;
+
+    // 2. Сам свотч.
+    const byHex = colorFamilyByHex(hex);
+
+    if (byHex) return byHex;
+
+    // 3. Слабкі слова — про фурнітуру й обробку.
+    let weak = null;
+
+    if (text) {
+
+        COLOR_FAMILIES.forEach(family => {
+
+            (family.weakKeywords || []).forEach(keyword => {
+
+                const at = text.indexOf(keyword);
+
+                if (at === -1) return;
+
+                if (!weak || at < weak.at) weak = { name: family.name, at };
+
+            });
+
+        });
+
+    }
+
+    return weak ? weak.name : "Інші";
+
+}
+
+// Сім'ї кольорів товару: сім'я -> { hex, names }.
+//
+// names потрібні у підказці фільтра: під пунктом «Бежевий» можуть
+// лежати «Бежевий», «Тауп» і «Бежево-кремовий» — і побачити це
+// корисно, інакше незрозуміло, чому товар знайшовся.
+function getProductColorFamilies(product) {
+
+    const families = new Map();
+
+    getProductColors(product).forEach((hex, name) => {
+
+        const family = colorFamily(name, hex);
+
+        if (!families.has(family)) {
+            families.set(family, { hex: hex || null, names: [] });
+        }
+
+        const entry = families.get(family);
+
+        if (!entry.names.includes(name)) entry.names.push(name);
+
+    });
+
+    return families;
 
 }
 

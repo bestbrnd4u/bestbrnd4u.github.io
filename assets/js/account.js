@@ -461,6 +461,27 @@ async function loadOrders(userId) {
 
 }
 
+// Адреса товару з рядка замовлення.
+//
+// У замовленні лежить ЗНІМОК товару на момент покупки
+// (buildOrderItemsSnapshot у checkout.js): id, назва, бренд, фото,
+// ціна. Slug у ньому не зберігається — і це правильно: slug може
+// змінитись, а замовлення мусить лишитись таким, яким його зробили.
+//
+// Тому ведемо на /product?id=… — стару форму адреси, яку сторінка
+// товару вміє читати й сама перекидає на канонічну /p/<slug>/. Знімки
+// зі старих замовлень поля id не мають: там шукаємо за назвою, бо це
+// єдине, що є. Не знайшлось — сторінка скаже «Товар не знайдено».
+function orderItemUrl(item) {
+
+    if (item && item.id) return `/product?id=${encodeURIComponent(item.id)}`;
+
+    if (item && item.title) return `/product?title=${encodeURIComponent(item.title)}`;
+
+    return "/catalog";
+
+}
+
 function renderOrderCard(order) {
 
     const date = new Date(order.created_at).toLocaleDateString("uk-UA", {
@@ -479,16 +500,36 @@ function renderOrderCard(order) {
         if (item.color) metaParts.push(`Колір: ${item.color}`);
         if (Number(item.qty) > 1) metaParts.push(`Кількість: ${item.qty}`);
 
+        // Фото, назва й бренд — посилання.
+        //
+        // ЧОМУ. Історія замовлень — найчастіше місце, звідки товар
+        // замовляють ПОВТОРНО («візьму ще одну, іншого кольору») і де
+        // його передивляють перед відмовою. І фото, і назва виглядали
+        // як посилання (курсор, зміна кольору при наведенні) — але клац
+        // по них не робив нічого, доводилось копіювати назву в пошук.
+        //
+        // Товар міг зникнути з продажу з часів замовлення — сторінка
+        // товару це передбачає й показує «Товар не знайдено» замість
+        // порожнього шаблону. Тому посилання ставимо завжди: гірший
+        // випадок — зрозуміла відповідь «уже немає».
+        const productHref = orderItemUrl(item);
+
+        const brandHref = item.brand
+            ? `/catalog?brand=${encodeURIComponent(item.brand)}`
+            : "";
+
         return `
             <div class="order-item">
 
-                <div class="order-item-image">
-                    <img src="${item.image || "assets/images/no-image.png"}" alt="${item.title}" onerror="this.src='assets/images/no-image.png'">
-                </div>
+                <a class="order-item-image" href="${productHref}">
+                    <img src="${item.image || "assets/images/no-image.png"}" alt="${escapeHtml(item.title || "")}" onerror="this.src='assets/images/no-image.png'">
+                </a>
 
                 <div class="order-item-info">
-                    ${item.brand ? `<span class="order-item-brand">${item.brand}</span>` : ""}
-                    <span class="order-item-title">${item.title}</span>
+                    ${item.brand
+                        ? `<a class="order-item-brand" href="${brandHref}">${escapeHtml(item.brand)}</a>`
+                        : ""}
+                    <a class="order-item-title" href="${productHref}">${escapeHtml(item.title || "Товар")}</a>
                     <span class="order-item-meta">${metaParts.join("&nbsp;&nbsp;&nbsp;")}</span>
                     ${refusalMarkup(order, index)}
                 </div>

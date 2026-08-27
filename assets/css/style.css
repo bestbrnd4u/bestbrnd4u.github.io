@@ -11314,3 +11314,303 @@ body.refusal-open{
     color:var(--secondary);
     background:rgba(37,99,235,.06);
 }
+
+/* ==========================================================
+   ОБРАНЕ: 5 СЕКУНД НА СКАСУВАННЯ ВИДАЛЕННЯ
+   ==========================================================
+
+   Було: вікно «Видалити з обраного?» ПЕРЕД дією. Питання зупиняло на
+   кожному видаленні, а рядок при відкритому вікні лишався на екрані —
+   і другий клац по кнопці додавав товар назад (кнопка викликала
+   перемикач).
+
+   Стало: дія відбувається одразу, але 5 секунд її можна відкликати.
+   Рядок не зникає, а гасне під напівпрозорою плашкою з відліком і
+   кнопкою «Залишити товар». Смужка внизу показує залишок часу — щоб не
+   гадати, чи ще встигаєш.
+
+   Плашка накриває рядок ЦІЛКОМ (position:absolute + inset:0), а не
+   стоїть збоку: так видно, що зараз рядок недоторканний, і випадковий
+   клац по «Додати в кошик» чи по свотчу кольору неможливий. */
+
+.favorite-row{
+    position:relative;
+}
+
+.favorite-row.is-removing{
+    cursor:default;
+}
+
+/* Вміст рядка притишуємо, але лишаємо видимим: людина мусить бачити,
+   ЯКИЙ товар зникає — інакше кнопка «Залишити» безадресна. */
+.favorite-row.is-removing > *:not(.favorite-row-undo){
+    opacity:.35;
+    pointer-events:none;
+}
+
+.favorite-row-undo{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:16px 20px;
+    border-radius:16px;
+    background:rgba(255,255,255,.92);
+    backdrop-filter:blur(2px);
+    z-index:2;
+}
+
+.favorite-row-undo-inner{
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:14px;
+    width:100%;
+    max-width:560px;
+    padding-bottom:14px;
+}
+
+.favorite-row-undo-spinner{
+    width:22px;
+    height:22px;
+    flex:0 0 auto;
+    border:2.5px solid var(--gray200);
+    border-top-color:var(--danger);
+    border-radius:50%;
+    animation:spin .8s linear infinite;
+}
+
+.favorite-row-undo-text{
+    margin:0;
+    font-size:14px;
+    font-weight:600;
+    color:var(--gray700);
+}
+
+.favorite-row-undo-text b{
+    /* Цифра відліку не має «стрибати» шириною при зміні 5 → 4 → 3,
+       інакше текст поруч смикається. */
+    display:inline-block;
+    min-width:1ch;
+    text-align:center;
+    color:var(--danger);
+}
+
+.favorite-row-undo-cancel{
+    height:40px;
+    padding:0 18px;
+    border-radius:10px;
+    font-size:13px;
+    white-space:nowrap;
+}
+
+/* Смужка часу. Тонка й унизу плашки: це підказка про залишок, а не ще
+   один елемент керування. */
+.favorite-row-undo-bar{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:0;
+    height:3px;
+    border-radius:3px;
+    background:var(--gray100);
+    overflow:hidden;
+}
+
+.favorite-row-undo-bar span{
+    display:block;
+    height:100%;
+    background:var(--danger);
+    /* transition під крок оновлення (100 мс) — щоб рух читався як
+       плавний, а не як 50 окремих стрибків */
+    transition:width .1s linear;
+}
+
+@media(max-width:700px){
+
+    .favorite-row-undo-inner{
+        gap:10px;
+    }
+
+    .favorite-row-undo-text{
+        width:100%;
+        font-size:13px;
+        text-align:center;
+    }
+
+    .favorite-row-undo-spinner{
+        display:none;
+    }
+
+}
+
+/* ==========================================================
+   КАТАЛОГ: СТИК ПАГІНАЦІЇ Й «ПЕРЕГЛЯНУТИХ ТОВАРІВ»
+   ==========================================================
+
+   Під номерами сторінок зяяла смуга майже на 150 px. Вона склалась із
+   трьох окремо розумних відступів:
+
+       .pagination      margin-bottom  8px
+       .catalog-page    padding-bottom 80px
+       .similar         padding-top    64px
+
+   Кожен доречний сам по собі, разом — порожній екран між списком
+   товарів і наступним блоком.
+
+   Прибираємо не всі, а зайвий: коли ОДРАЗУ під каталогом іде видимий
+   блок «Переглянуті товари», нижній відступ каталогу вже не потрібен —
+   роль розділювача бере на себе padding самого блока (він ще й з іншим
+   тлом, тож межа видна без пустоти). Якщо блока немає (новим покупцям
+   він не показується), відступ лишається як був — інакше підвал
+   прилипне до останнього рядка товарів. */
+.catalog-page:has(+ .similar:not([hidden])){
+    padding-bottom:24px;
+}
+
+@media(max-width:768px){
+
+    .catalog-page:has(+ .similar:not([hidden])){
+        padding-bottom:12px;
+    }
+
+}
+
+/* ==========================================================
+   ФІЛЬТР «КОЛІР»: СІМ'Ї ЗАМІСТЬ ПЕРЕЛІКУ ВІДТІНКІВ
+   ==========================================================
+
+   Список кольорів був довгим не тому, що кольорів багато, а тому, що
+   той самий колір називався по-різному: «Чорний», «Black», «Black
+   чорний», «Nero», «Neo» — 83 пункти на 71 товар. Написання тепер
+   зводить збірка (scripts/normalize-colors.js), а фільтр додатково
+   групує відтінки в сім'ї: «Темно-сірий», «Світло-сірий» і
+   «Сіро-бежевий» у картці різні, у фільтрі — один «Сірий».
+
+   Число поруч каже, скільки відтінків зведено в пункт: воно
+   об'єднує, а не рахує товари, тому й виглядає тихо — це підпис, а не
+   бейдж із кількістю. Повний перелік назв — у title. */
+
+.filter-option-note{
+    margin-left:auto;
+    padding:1px 7px;
+    border-radius:20px;
+    background:var(--gray100);
+    color:var(--gray500);
+    font-size:11px;
+    font-weight:600;
+    line-height:1.6;
+}
+
+.filter-option.active .filter-option-note{
+    background:rgba(255,255,255,.22);
+    color:#fff;
+}
+
+/* Свотч «Мультиколір» — градієнт, а не один колір: одним кольором
+   мультиколір показати неможливо, і будь-який обраний брехав би. */
+.filter-option-color .filter-color-swatch{
+    background-size:cover;
+}
+
+/* ==========================================================
+   ТОВАР У ЗАМОВЛЕННІ — ПОСИЛАННЯ
+   ==========================================================
+
+   Фото, назва й бренд у складі замовлення (кабінет і сторінка
+   «Дякуємо») ведуть на сторінку товару та в каталог цього бренду. Це
+   найчастіші дії з історії замовлень: замовити ще одну, передивитись
+   перед відмовою, подивитись, що ще є в того ж бренду.
+
+   Підкреслення не ставимо: у складі замовлення чотири-п'ять рядків
+   поспіль, і суцільні підкреслення перетворили б перелік на кашу. Роль
+   посилання показує курсор і зміна кольору при наведенні. */
+
+.order-item-brand,
+.order-item-title,
+.order-confirm-item-brand,
+.order-confirm-item-title{
+    text-decoration:none;
+}
+
+/* Посилання-блок у колонці розтягнулося б на всю ширину рядка, і
+   «клікабельним» став би порожній простір праворуч від короткої назви
+   бренду. align-self лишає активною саму назву. */
+.order-item-brand,
+.order-confirm-item-brand{
+    align-self:flex-start;
+}
+
+.order-confirm-item-image{
+    flex-shrink:0;
+    line-height:0;
+}
+
+.order-confirm-item-image img,
+.order-item-image img{
+    transition:opacity .2s ease;
+}
+
+@media (hover:hover) and (pointer:fine){
+
+    .order-item-brand:hover,
+    .order-confirm-item-brand:hover,
+    .order-confirm-item-title:hover{
+        color:var(--secondary);
+    }
+
+    .order-confirm-item-image:hover img{
+        opacity:.85;
+    }
+
+}
+
+/* ==========================================================
+   СТОРІНКА ТОВАРУ, ЯКОГО НЕМА
+   ==========================================================
+
+   Раніше на цьому місці був рядок «Товар не знайдено» — h2 посеред
+   білого екрана. Сюди приходять із живих посилань: з історії замовлень
+   (товар зняли з продажу), з обраного, зі старої розсилки, зі
+   збереженого посилання. Тобто це не глухий кут випадкового переходу,
+   а нормальний шлях покупця — і закінчуватись він мусить не
+   повідомленням, а виходом.
+
+   Оформлення таке саме, як у порожнього каталогу (.empty-state):
+   людина вже бачила цей блок і не мусить розбиратись двічі. */
+
+.product-not-found{
+    max-width:620px;
+    margin:0 auto;
+}
+
+.product-not-found h3{
+    margin-bottom:12px;
+    font-size:26px;
+}
+
+.product-not-found p{
+    max-width:480px;
+    margin:0 auto 24px;
+    color:var(--gray500);
+}
+
+/* Що саме шукали. Тихо й окремим рядком: це технічна довідка, яка
+   доводить, що запит прочитано, а не частина звернення до покупця. */
+.empty-state-note{
+    margin-bottom:24px;
+    font-size:13px;
+    color:var(--gray300);
+    word-break:break-word;
+}
+
+@media(max-width:520px){
+
+    .product-not-found h3{
+        font-size:21px;
+    }
+
+}

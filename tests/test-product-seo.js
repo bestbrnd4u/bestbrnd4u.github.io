@@ -190,7 +190,18 @@ console.log("\n[5] Сторінка без товару не йде в інде�
         meta(w, 'meta[name="robots"]'));
     check("title змінено на «не знайдено»", /не знайдено/.test(w.document.title), w.document.title);
     check("виклик є в гілці «товар не знайдено»",
-        /markProductPageNotFound\(\);[\s\S]{0,200}Товар не знайдено/.test(productJs));
+        /markProductPageNotFound\(\);[\s\S]{0,200}renderProductNotFound\(\);/.test(productJs)
+        && /Товар не знайдено/.test(productJs));
+
+    // Сторінка мусить не лише повідомляти, а й давати вихід: сюди
+    // приходять із живих посилань — з історії замовлень, з обраного,
+    // зі старої розсилки, — а не тільки з випадкового переходу.
+    check("сторінка пропонує куди йти далі",
+        /href="\/catalog" class="btn"/.test(productJs)
+        && /href="\/contacts"/.test(productJs));
+
+    check("переглянуті товари лишаються на сторінці помилки",
+        /renderProductNotFound\(\);[\s\S]{0,600}renderRecentlyViewed\(\);/.test(productJs));
 }
 
 console.log("\n[6] Запасні теги в сирому HTML (перший прохід Googlebot)");

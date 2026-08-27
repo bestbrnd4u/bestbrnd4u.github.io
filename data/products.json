@@ -501,7 +501,7 @@
         "sku": "coach73995chalk"
       },
       {
-        "color": "Коричневий",
+        "color": "Сіро-коричневий",
         "hex": "#8c6f63",
         "images": [
           "assets/images/products/uploads/coach73995-dark-stone-1.webp?v=0a85c450",
@@ -512,7 +512,7 @@
       },
       {
         "hex": "#433636",
-        "color": "Brass Tan Black",
+        "color": "Коричнево-чорний",
         "images": [
           "/assets/images/products/uploads/91215-b4ooh_7d995c2e069841c5ad45599ee803592d.webp?v=de06ce9b",
           "/assets/images/products/uploads/91215-b4ooh-1_b3aea35bcebe4922a51b66ad7b2bb0a1_master.webp?v=5c61315b",
@@ -521,7 +521,7 @@
         "sku": "coachB4OOH"
       },
       {
-        "color": "Brown — коричневий",
+        "color": "Коричневий",
         "hex": "#b66813",
         "images": [
           "/assets/images/products/uploads/4.1_cd948ddf-55be-4b35-9a4c-3437a5ac5842.webp?v=5f99ad7a",
@@ -532,7 +532,7 @@
         "sku": "coach73995brown"
       },
       {
-        "color": "Light Antique Nickel/Taupe — світлий тауп / сіро-бежевий",
+        "color": "Тауп",
         "hex": "#c5aea1",
         "sku": "Coach73995LHTP",
         "images": [
@@ -1624,7 +1624,7 @@
       "Жінкам"
     ],
     "preOrderDays": "5–10 робочих днів",
-    "color": "Black",
+    "color": "Чорний",
     "forcePublish": true,
     "brand": "Michael Kors",
     "price": 8000,
@@ -1633,7 +1633,7 @@
     "dimensions": " 18 см × 13 см × 7,5 см",
     "variants": [
       {
-        "color": "Black",
+        "color": "Чорний",
         "hex": "#0a0000",
         "sku": "35F1GX0C5U",
         "images": [
@@ -1643,7 +1643,7 @@
         ]
       },
       {
-        "color": "Pearl Grey",
+        "color": "Світло-сірий",
         "hex": "#c1bfbf",
         "sku": "35F0SX0C5T",
         "images": [
@@ -1657,12 +1657,12 @@
           "/assets/images/products/uploads/d14f4ff9-1527-4de8-9c0e-b5bc28f0ce69.jpg?v=760197b0"
         ],
         "video": "",
-        "color": "Racing Green",
+        "color": "Зелений",
         "hex": "#0e9409",
         "sku": "35F0GX0C5T"
       },
       {
-        "color": "Navy",
+        "color": "Темно-синій",
         "sku": "35F1GX0C5U",
         "hex": "#0e5fbc",
         "images": [
@@ -1724,7 +1724,7 @@
     ],
     "preOrderDays": "5–10 робочих днів",
     "oldPrice": 11450,
-    "color": "Blush Beige",
+    "color": "Бежево-рожевий",
     "badge": "HOT",
     "forcePublish": true,
     "material": "100% натуральна теляча шкіра ",
@@ -1735,7 +1735,7 @@
     "dimensions": "23 × 15 × 7 см",
     "variants": [
       {
-        "color": "Blush Beige",
+        "color": "Бежево-рожевий",
         "hex": "#f0ca4d",
         "sku": "JC4118PP1FLT0",
         "images": [
@@ -1778,7 +1778,7 @@
     "dimensions": "25 × 15 × 7 см",
     "variants": [
       {
-        "color": "Nero",
+        "color": "Чорний",
         "hex": "#272626",
         "sku": "JC4116PP1FLT0000",
         "images": [
@@ -1822,7 +1822,7 @@
     "category": "Жіночі сумки",
     "slug": "сумочка-love-moschino-logo-plaque-quilted-shoulder-bag",
     "id": 30,
-    "color": "Nero",
+    "color": "Чорний",
     "images": [
       "/assets/images/products/uploads/800070279777-1.jpg",
       "/assets/images/products/uploads/800070279777-3.jpg",
@@ -1843,7 +1843,7 @@
     "dimensions": "28,5 × 12 × 21 см",
     "variants": [
       {
-        "color": "Powder Blush",
+        "color": "Пудрово-рожевий",
         "hex": "#f0c0e6",
         "sku": "35F2GCCS2L",
         "images": [
@@ -1897,7 +1897,7 @@
     "category": "Жіночі сумки",
     "slug": "сумочка-з-натуральної-шкіри-michael-kors-carine-medium-pebbled-leather-satchel-powder-blush",
     "id": 31,
-    "color": "Powder Blush",
+    "color": "Пудрово-рожевий",
     "images": [
       "/assets/images/products/uploads/gambar-depan-michael-kors-carine-medium--de0afdc3.webp",
       "/assets/images/products/uploads/gambar-belakang-michael-kors-carine-medi-5af6b1f4.webp",
@@ -1917,7 +1917,7 @@
     "dimensions": "51",
     "variants": [
       {
-        "color": "Nero",
+        "color": "Чорний",
         "hex": "#0d0000",
         "sku": "NENA/S 807 51",
         "images": [
@@ -1959,7 +1959,7 @@
     "category": "Окуляри і оправи",
     "slug": "сонцезахисні-окуляри-jimmy-choo-nena-s-807-51",
     "id": 32,
-    "color": "Nero",
+    "color": "Чорний",
     "images": [
       "/assets/images/products/uploads/jimmy-choo-sunglasses-nena-s-807-afw1500fh937.5.webp",
       "/assets/images/products/uploads/41my3jtmifl.webp",
@@ -1971,7 +1971,7 @@
       "Жінкам"
     ],
     "preOrderDays": "5–10 робочих днів",
-    "color": "Nero",
+    "color": "Чорний",
     "forcePublish": true,
     "brand": "Marc Jacobs",
     "price": 6500,
@@ -1979,7 +1979,7 @@
     "slug": "стильні-жіночі-сонцезахисні-окуляри-marc-jacobs-mj-1010-s",
     "variants": [
       {
-        "color": "Nero",
+        "color": "Чорний",
         "hex": "#000000",
         "images": [
           "/assets/images/products/uploads/marc-jacobs-grey-shaded-cat-eye-ladies-s-bcd8d8a1.webp?v=650eab9d",
@@ -2030,7 +2030,7 @@
       "Жінкам"
     ],
     "preOrderDays": "5–10 робочих днів",
-    "color": "White",
+    "color": "Білий",
     "forcePublish": false,
     "brand": "Lacoste",
     "price": 5900,
@@ -2038,7 +2038,7 @@
     "slug": "кросівки-lacoste-l003",
     "variants": [
       {
-        "color": "White",
+        "color": "Білий",
         "hex": "#f6f6f4",
         "images": [
           "/assets/images/products/uploads/61nzkwkzmsl._sx700_-1-.webp?v=9bc0dae8",
@@ -2095,7 +2095,7 @@
     "preOrder": false,
     "variants": [
       {
-        "color": "White",
+        "color": "Білий",
         "hex": "#eff1ea",
         "images": [
           "/assets/images/products/uploads/124849469.webp?v=14033d6d",
@@ -2140,7 +2140,7 @@
     "category": "Кросівки",
     "slug": "кросівки-adidas-by-stella-mccartney-solarglide",
     "id": 35,
-    "color": "White",
+    "color": "Білий",
     "images": [
       "/assets/images/products/uploads/124849469.webp",
       "/assets/images/products/uploads/124849470.webp",
@@ -2153,7 +2153,7 @@
       "Жінкам"
     ],
     "preOrderDays": "5–10 робочих днів",
-    "color": "Барвистий",
+    "color": "Мультиколір",
     "forcePublish": false,
     "brand": "Lacoste",
     "price": 6200,
@@ -2162,7 +2162,7 @@
     "variants": [
       {
         "hex": "#f8faf6",
-        "color": "Барвистий",
+        "color": "Мультиколір",
         "images": [
           "/assets/images/products/uploads/e5de78de-29a2-40ba-8edd-a70c4e1ea31b_size2000x2000_cropcenter.webp?v=214fd1a4",
           "/assets/images/products/uploads/f7e4b799-732f-44f2-975b-40cd657042ed_size2000x2000_cropcenter.webp?v=64d49660",
@@ -2357,7 +2357,7 @@
     "preOrder": false,
     "variants": [
       {
-        "color": "Neo",
+        "color": "Чорний",
         "hex": "#161616",
         "sizes": [],
         "images": [
@@ -2393,7 +2393,7 @@
     "category": "Кросівки",
     "slug": "lacoste-l003-neo-sneakers",
     "id": 39,
-    "color": "Neo",
+    "color": "Чорний",
     "images": [
       "/assets/images/products/uploads/45sfa0001_075_02-1-.webp",
       "/assets/images/products/uploads/45sfa0001_075_01.webp",
@@ -2405,7 +2405,7 @@
       "Чоловікам"
     ],
     "preOrderDays": "5–10 робочих днів",
-    "color": "Marine daphne 793",
+    "color": "Темно-синій",
     "forcePublish": false,
     "brand": "Lacoste",
     "price": 4000,
@@ -2416,7 +2416,7 @@
     "variants": [
       {
         "hex": "#031578",
-        "color": "Marine daphne 793",
+        "color": "Темно-синій",
         "images": [
           "/assets/images/products/uploads/nh4040nz_793_24.webp?v=7d5db841",
           "/assets/images/products/uploads/nh4040nz_793_31.webp?v=c690ab21"
@@ -2478,7 +2478,7 @@
     "preOrder": false,
     "variants": [
       {
-        "color": "Білий Wht-Dk Grn 286",
+        "color": "Білий із зеленим",
         "hex": "#ffffff",
         "images": [
           "/assets/images/products/uploads/sneakers-lacoste-elite-active-746sma0008-wht-dk-grn-286-0000303494858.webp?v=abc7198e",
@@ -2516,7 +2516,7 @@
     "category": "Кросівки",
     "slug": "жіночі-кросівки-lacoste-womens-elite-active-sneakers",
     "id": 41,
-    "color": "Білий Wht-Dk Grn 286",
+    "color": "Білий із зеленим",
     "images": [
       "/assets/images/products/uploads/sneakers-lacoste-elite-active-746sma0008-wht-dk-grn-286-0000303494858.webp",
       "/assets/images/products/uploads/sneakers-lacoste-elite-active-746sma0008-46ba82b5.webp",
@@ -2592,7 +2592,7 @@
     "preOrder": false,
     "variants": [
       {
-        "color": "Білий White 21G",
+        "color": "Білий",
         "hex": "#ffffff",
         "images": [
           "/assets/images/products/uploads/f24af44f-75d6-44a6-95a6-4f3655e50909_size2000x2000_cropcenter.webp?v=ebd132f3",
@@ -2630,7 +2630,7 @@
     "category": "Кросівки",
     "slug": "жіночі-білі-кросівки-lacoste-lineshot-746sma0110-21g",
     "id": 43,
-    "color": "Білий White 21G",
+    "color": "Білий",
     "images": [
       "/assets/images/products/uploads/f24af44f-75d6-44a6-95a6-4f3655e50909_size2000x2000_cropcenter.webp",
       "/assets/images/products/uploads/802ff4ae-b7b9-48c7-bcde-7862f3e83810_size2000x2000_cropcenter.webp",
@@ -2656,7 +2656,7 @@
     "preOrder": false,
     "variants": [
       {
-        "color": "Бежевий  1R5",
+        "color": "Бежевий",
         "hex": "#e5e4e4",
         "images": [
           "/assets/images/products/uploads/bc4302e5-037f-4a05-b3b7-d6f959c4c00c_size2000x2000_cropcenter.webp?v=ef5b6dd4",
@@ -2694,7 +2694,7 @@
     "category": "Кросівки",
     "slug": "жіночі-бежеві-кросівки-з-чорними-деталями-lacoste-lineshot-746sfa0075-1r5",
     "id": 44,
-    "color": "Бежевий  1R5",
+    "color": "Бежевий",
     "images": [
       "/assets/images/products/uploads/bc4302e5-037f-4a05-b3b7-d6f959c4c00c_size2000x2000_cropcenter.webp",
       "/assets/images/products/uploads/894a2223-e123-468a-9c5e-6949a9f72643_size2000x2000_cropcenter.webp",
@@ -2876,7 +2876,7 @@
     "dimensions": "25 × 16 × 5 см",
     "variants": [
       {
-        "color": "Bronze Green",
+        "color": "Темно-зелений",
         "hex": "#285d06",
         "images": [
           "/assets/images/products/uploads/the-j-marc-shoulder-bag-bronze-green-h956l01pf22-365-800x800.webp?v=d84aca80",
@@ -2923,7 +2923,7 @@
     "category": "Жіночі сумки",
     "slug": "жіноча-сумочка-marc-jacobs-the-j-marc-shoulder-bag",
     "id": 47,
-    "color": "Bronze Green",
+    "color": "Темно-зелений",
     "images": [
       "/assets/images/products/uploads/the-j-marc-shoulder-bag-bronze-green-h956l01pf22-365-800x800.webp",
       "/assets/images/products/uploads/the-j-marc-shoulder-bag-bronze-green-additional-image-5192-800x800.webp",
@@ -2944,7 +2944,7 @@
     "dimensions": "22 × 16 × 7 см",
     "variants": [
       {
-        "color": "Gold Chalk Glacier White Multi",
+        "color": "Білий комбінований",
         "hex": "#ddd8d1",
         "images": [
           "/assets/images/products/uploads/ca148_imrfi_a0.webp?v=e0ef2093",
@@ -2993,7 +2993,7 @@
     "category": "Жіночі сумки",
     "slug": "сумка-coach-klare-crossbody-bag-in-blocked-signature-canvas",
     "id": 48,
-    "color": "Gold Chalk Glacier White Multi",
+    "color": "Білий комбінований",
     "images": [
       "/assets/images/products/uploads/ca148_imrfi_a0.webp",
       "/assets/images/products/uploads/ca148_imrfi_a3.webp",
@@ -3015,7 +3015,7 @@
     "dimensions": "26 × 21 × 13 см",
     "variants": [
       {
-        "color": "Aspen Green зелений",
+        "color": "Зелений",
         "hex": "#1c7e05",
         "images": [
           "/assets/images/products/uploads/aspen-green-cement-m.webp?v=f80ccdb0",
@@ -3064,7 +3064,7 @@
     "category": "Жіночі сумки",
     "slug": "шопер-marc-jacobs-the-leather-small-tote-bag-aspen-green-cement",
     "id": 49,
-    "color": "Aspen Green зелений",
+    "color": "Зелений",
     "images": [
       "/assets/images/products/uploads/aspen-green-cement-m.webp",
       "/assets/images/products/uploads/aspen-green-cement4.webp",
@@ -3085,7 +3085,7 @@
     "dimensions": "20 × 12 × 4 см",
     "variants": [
       {
-        "color": "Pink",
+        "color": "Рожевий",
         "hex": "#ff07db",
         "images": [
           "/assets/images/products/uploads/27687307_57865310_2048.webp?v=ad162858",
@@ -3133,7 +3133,7 @@
     "category": "Жіночі сумки",
     "slug": "сумочка-marc-jacobs-the-leather-mini-bag-pink",
     "id": 50,
-    "color": "Pink",
+    "color": "Рожевий",
     "images": [
       "/assets/images/products/uploads/27687307_57865310_2048.webp",
       "/assets/images/products/uploads/27687307_57865301_2048.webp",
@@ -3154,7 +3154,7 @@
     "dimensions": "34 × 27 × 15 см",
     "variants": [
       {
-        "color": "Black Beige  чорний  бежевий",
+        "color": "Чорно-бежевий",
         "hex": "#e5e0e0",
         "images": [
           "/assets/images/products/uploads/215896950_beige_in.webp?v=b64baf37",
@@ -3204,7 +3204,7 @@
     "category": "Жіночі сумки",
     "slug": "сумка-the-medium-tote-bag-in-monogram-jacquard",
     "id": 51,
-    "color": "Black Beige  чорний  бежевий",
+    "color": "Чорно-бежевий",
     "images": [
       "/assets/images/products/uploads/215896950_beige_in.webp",
       "/assets/images/products/uploads/215896950_beige_bk.webp",
@@ -3226,7 +3226,7 @@
     "dimensions": "26 × 21 × 13 см",
     "variants": [
       {
-        "color": "Cement тауповий - сіро-бежевий",
+        "color": "Сіро-бежевий",
         "hex": "#bcb5b5",
         "images": [
           "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-ce-16a06f5f.webp?v=86197255",
@@ -3275,7 +3275,7 @@
     "category": "Жіночі сумки",
     "slug": "сумка-marc-jacobs-the-leather-small-tote-bag-cement",
     "id": 52,
-    "color": "Cement тауповий - сіро-бежевий",
+    "color": "Сіро-бежевий",
     "images": [
       "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-ce-16a06f5f.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-ce-00e1b92f.webp",
@@ -3296,7 +3296,7 @@
     "dimensions": "22 × 12 × 7 см",
     "variants": [
       {
-        "color": "Cotton/Silver — молочний",
+        "color": "Молочний",
         "hex": "#fafafa",
         "images": [
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-4a08b27e.webp?v=02bd32c1",
@@ -3345,7 +3345,7 @@
     "category": "Жіночі сумки",
     "slug": "сумка-marc-jacobs-the-leather-cargo-bag-cotton-silver",
     "id": 53,
-    "color": "Cotton/Silver — молочний",
+    "color": "Молочний",
     "images": [
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-4a08b27e.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-d6f46dd3.webp",
@@ -3367,7 +3367,7 @@
     "dimensions": "22 × 12 × 7 см",
     "variants": [
       {
-        "color": "Camel — карамельний, світло-коричневий",
+        "color": "Кемел",
         "hex": "#d4cbb7",
         "images": [
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--d9f458f8.webp?v=14107657",
@@ -3418,7 +3418,7 @@
     "category": "Жіночі сумки",
     "slug": "сумка-marc-jacobs-the-leather-cargo-bag-camel",
     "id": 54,
-    "color": "Camel — карамельний, світло-коричневий",
+    "color": "Кемел",
     "images": [
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--d9f458f8.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--3f139d71.webp",
@@ -3448,7 +3448,7 @@
     "dimensions": "22 × 12 × 7 см",
     "variants": [
       {
-        "color": "Black чорний",
+        "color": "Чорний",
         "hex": "#000000",
         "images": [
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--2013c7eb.webp?v=25c5ff7f",
@@ -3498,7 +3498,7 @@
     "category": "Жіночі сумки",
     "slug": "сумка-marc-jacobs-the-leather-cargo-bag-black",
     "id": 55,
-    "color": "Black чорний",
+    "color": "Чорний",
     "images": [
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--2013c7eb.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--3eeb5b5d.webp",
@@ -3521,7 +3521,7 @@
     "dimensions": "25,5 × 20 × 13 см",
     "variants": [
       {
-        "color": "Twine — бежево-кремовий",
+        "color": "Бежево-кремовий",
         "hex": "#bb993c",
         "images": [
           "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-d0dd33cf.webp?v=89145062",
@@ -3571,7 +3571,7 @@
     "category": "Жіночі сумки",
     "slug": "шопер-marc-jacobs-the-leather-small-tote-bag",
     "id": 56,
-    "color": "Twine — бежево-кремовий",
+    "color": "Бежево-кремовий",
     "images": [
       "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-d0dd33cf.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-de081418.webp",
@@ -3592,7 +3592,7 @@
     "dimensions": "25 × 16 × 5 см",
     "variants": [
       {
-        "color": "Green Glow — яскравий зелений",
+        "color": "Яскраво-зелений",
         "hex": "#71dd00",
         "images": [
           "/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow.webp?v=9272e572",
@@ -3643,7 +3643,7 @@
     "category": "Жіночі сумки",
     "slug": "сумка-marc-jacobs-the-j-marc-shoulder-bag-green-glow",
     "id": 57,
-    "color": "Green Glow — яскравий зелений",
+    "color": "Яскраво-зелений",
     "images": [
       "/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow.webp",
       "/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow2.webp",
@@ -3657,7 +3657,7 @@
       "Жінкам"
     ],
     "preOrderDays": "5–10 робочих днів",
-    "color": "Black чорний",
+    "color": "Чорний",
     "forcePublish": false,
     "material": "Гладка натуральна шкіра",
     "brand": "Coach",
@@ -3667,7 +3667,7 @@
     "dimensions": "26 × 16,5 × 8,3 см",
     "variants": [
       {
-        "color": "Black чорний",
+        "color": "Чорний",
         "hex": "#000000",
         "images": [
           "/assets/images/products/uploads/1.1_5a5d6ea8-1bba-4803-951d-520a38d4aa66.webp?v=6d4fe10c",
@@ -3678,7 +3678,7 @@
         ]
       },
       {
-        "color": "Brass/Ivory",
+        "color": "Айворі",
         "hex": "#e4ddda",
         "sku": "C4823B4IY",
         "sizes": [
@@ -3751,7 +3751,7 @@
     "dimensions": "18 × 10 × 3 см",
     "variants": [
       {
-        "color": "Brass/Chalk — айворі / золотистий",
+        "color": "Айворі",
         "hex": "#e9e4e4",
         "images": [
           "/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model.webp?v=b0d006b5",
@@ -3804,7 +3804,7 @@
     "category": "Жіночі сумки",
     "slug": "міні-сумочка-coach-tabby-crossbody-wristlet",
     "id": 59,
-    "color": "Brass/Chalk — айворі / золотистий",
+    "color": "Айворі",
     "images": [
       "/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model.webp",
       "/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model3.webp",
@@ -3827,7 +3827,7 @@
     "dimensions": "24 × 14 × 7 см",
     "variants": [
       {
-        "color": "Beige — бежевий",
+        "color": "Бежевий",
         "hex": "#d4cfcf",
         "images": [
           "/assets/images/products/uploads/rtlafd950301_33497199_1_v1_2x.webp?v=2bf0efa9",
@@ -3839,7 +3839,7 @@
         "sku": "213BA007-3063-510"
       },
       {
-        "color": "Midnight Brown",
+        "color": "Темно-коричневий",
         "hex": "#6f1d1d",
         "sku": "213BA007-3128-890",
         "images": [
@@ -3886,7 +3886,7 @@
     "category": "Жіночі сумки",
     "slug": "сумка-jacquemus-le-grand-bambino-beige",
     "id": 60,
-    "color": "Beige — бежевий",
+    "color": "Бежевий",
     "images": [
       "/assets/images/products/uploads/rtlafd950301_33497199_1_v1_2x.webp",
       "/assets/images/products/uploads/rtlafd950301_33497201_2_v1_2x.webp",
@@ -3909,7 +3909,7 @@
     "variants": [
       {
         "hex": "#0361b0",
-        "color": "Blue синій-блакитний",
+        "color": "Синій",
         "images": [
           "/assets/images/products/uploads/215679033_blue_in.webp?v=d508b58e",
           "/assets/images/products/uploads/215679033_blue_bk.webp?v=0fee1b0a",
@@ -3972,7 +3972,7 @@
     },
     "slug": "шопер-marc-jacobs-the-denim-small-tote-bag-blue",
     "id": 61,
-    "color": "Blue синій-блакитний",
+    "color": "Синій",
     "images": [
       "/assets/images/products/uploads/215679033_blue_in.webp",
       "/assets/images/products/uploads/215679033_blue_bk.webp",
@@ -3994,7 +3994,7 @@
     "dimensions": "26 × 15,5 × 7 см",
     "variants": [
       {
-        "color": "Tan / Chalk / Brass — бежевий / білий / золотистий",
+        "color": "Бежево-білий",
         "hex": "#cdbdbd",
         "images": [
           "/assets/images/products/uploads/ca173_svvfq_a0.webp?v=bae25e8c",
@@ -4043,7 +4043,7 @@
     "category": "Жіночі сумки",
     "slug": "сумочка-coach-teri-shoulder-bag-in-colorblock",
     "id": 62,
-    "color": "Tan / Chalk / Brass — бежевий / білий / золотистий",
+    "color": "Бежево-білий",
     "images": [
       "/assets/images/products/uploads/ca173_svvfq_a0.webp",
       "/assets/images/products/uploads/ca173_svvfq_a5.webp",
@@ -4065,7 +4065,7 @@
     "dimensions": "32 × 27 × 14 см",
     "variants": [
       {
-        "color": "Brown/Black коричневий",
+        "color": "Коричнево-чорний",
         "hex": "#593131",
         "images": [
           "/assets/images/products/uploads/00570556_d.jpg?v=43709838",
@@ -4115,7 +4115,7 @@
     "category": "Жіночі сумки",
     "slug": "шопер-coach-gallery-tote-bag-in-signature-canvas",
     "id": 63,
-    "color": "Brown/Black коричневий",
+    "color": "Коричнево-чорний",
     "images": [
       "/assets/images/products/uploads/00570556_d.jpg",
       "/assets/images/products/uploads/00570556_s.jpg",
@@ -4136,7 +4136,7 @@
     "dimensions": "17,5 × 8,5 × 6,5 см",
     "variants": [
       {
-        "color": "White білий",
+        "color": "Білий",
         "hex": "#ffffff",
         "images": [
           "/assets/images/products/uploads/ihjbihj.webp?v=3dd19685",
@@ -4187,7 +4187,7 @@
     "category": "Жіночі сумки",
     "slug": "сумочка-jacquemus-le-bambino-white",
     "id": 64,
-    "color": "White білий",
+    "color": "Білий",
     "images": [
       "/assets/images/products/uploads/ihjbihj.webp",
       "/assets/images/products/uploads/p00545136_d2.webp",
@@ -4209,7 +4209,7 @@
     "dimensions": "26 × 17 × 8 см",
     "variants": [
       {
-        "color": "Dark Brown темно-коричневий",
+        "color": "Темно-коричневий",
         "hex": "#624949",
         "images": [
           "/assets/images/products/uploads/3248708-4324-8078423-1.webp?v=1e7a3655",
@@ -4251,7 +4251,7 @@
     "category": "Жіночі сумки",
     "slug": "сумочка-coach-klare-crossbody-25-in-signature-canvas",
     "id": 65,
-    "color": "Dark Brown темно-коричневий",
+    "color": "Темно-коричневий",
     "images": [
       "/assets/images/products/uploads/3248708-4324-8078423-1.webp",
       "/assets/images/products/uploads/3248708-4324-8078423-2.webp",
@@ -4273,7 +4273,7 @@
     "dimensions": "13 × 7,5 см",
     "variants": [
       {
-        "color": "Brown коричневий",
+        "color": "Коричневий",
         "hex": "#9e530c",
         "images": [
           "/assets/images/products/uploads/sl10757-021_01-384fad.jpg?v=2787a17d",
@@ -4282,7 +4282,7 @@
         ]
       },
       {
-        "color": "Black чорний",
+        "color": "Чорний",
         "hex": "#000000",
         "images": [
           "/assets/images/products/uploads/27541025~black_0.webp?v=a0356567",
@@ -4323,7 +4323,7 @@
     "category": "Гаманці",
     "slug": "гаманець-marc-jacobs-the-top-zip-wallet-with-strap",
     "id": 66,
-    "color": "Brown коричневий",
+    "color": "Коричневий",
     "images": [
       "/assets/images/products/uploads/sl10757-021_01-384fad.jpg",
       "/assets/images/products/uploads/sl10757-021_02-384fad.jpg",
@@ -4344,7 +4344,7 @@
     "variants": [
       {
         "hex": "#ccc2b8",
-        "color": "Khaki хакі",
+        "color": "Хакі",
         "images": [
           "/assets/images/products/uploads/s150l03fa22-223_1.webp?v=fd403c07",
           "/assets/images/products/uploads/f540b0f9-f29c-31d6-8bdf-03912d1cc134.jpg?v=7e7c73e2",
@@ -4389,7 +4389,7 @@
     },
     "slug": "гаманець-marc-jacobs-the-zip-around-wallet",
     "id": 67,
-    "color": "Khaki хакі",
+    "color": "Хакі",
     "images": [
       "/assets/images/products/uploads/s150l03fa22-223_1.webp",
       "/assets/images/products/uploads/f540b0f9-f29c-31d6-8bdf-03912d1cc134.jpg",
@@ -4409,7 +4409,7 @@
     "dimensions": "11 × 9 × 2,5 см",
     "variants": [
       {
-        "color": "Black Multi",
+        "color": "Чорний з принтом",
         "hex": "#000000",
         "images": [
           "/assets/images/products/uploads/l_wp_6788ff7fdc327dcb277cb548.webp?v=1e85b70f",
@@ -4437,7 +4437,7 @@
     "category": "Гаманці",
     "slug": "гаманець-coach-snap-wallet-with-heart-bolt-print",
     "id": 68,
-    "color": "Black Multi",
+    "color": "Чорний з принтом",
     "images": [
       "/assets/images/products/uploads/l_wp_6788ff7fdc327dcb277cb548.webp",
       "/assets/images/products/uploads/cw537_sva47_a8.webp",
@@ -4457,7 +4457,7 @@
     "dimensions": "11 × 9,5 × 2 см",
     "variants": [
       {
-        "color": "Black",
+        "color": "Чорний",
         "hex": "#000000",
         "images": [
           "/assets/images/products/uploads/set-vi-coach-men-s-coin-wallet-black-one-ecc71a62.webp?v=0e2c3d35",
@@ -4495,7 +4495,7 @@
     "category": "Гаманці",
     "slug": "гаманець-coach-3-in-1-wallet-in-signature-leather",
     "id": 69,
-    "color": "Black",
+    "color": "Чорний",
     "images": [
       "/assets/images/products/uploads/set-vi-coach-men-s-coin-wallet-black-one-ecc71a62.webp",
       "/assets/images/products/uploads/lussocitta_coach_cr957_blk_1_700x.webp",
@@ -4574,7 +4574,7 @@
     "dimensions": "Ширина лінзи × місток × довжина завушника: 53 × 21 × 140 мм",
     "variants": [
       {
-        "color": "Коричневий / черепаховий (WR953HA)",
+        "color": "Черепаховий",
         "hex": "#704c22",
         "images": [
           "/assets/images/products/uploads/3421a7ab3bf6a820540093959ae69699.webp?v=c9f9f312",
@@ -4614,7 +4614,7 @@
     "category": "Окуляри і оправи",
     "slug": "сонцезахисні-окуляри-marc-jacobs-1011-s-wr953ha",
     "id": 71,
-    "color": "Коричневий / черепаховий (WR953HA)",
+    "color": "Черепаховий",
     "images": [
       "/assets/images/products/uploads/3421a7ab3bf6a820540093959ae69699.webp",
       "/assets/images/products/uploads/ach3atrpdjdyd181s4gcstgpa4qzgzrh.webp",

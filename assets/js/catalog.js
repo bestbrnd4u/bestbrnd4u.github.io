@@ -723,7 +723,20 @@ function readUrlState() {
     // category, і то лише поодинокими значеннями). Через це скопійоване
     // посилання відкривалось із порожнім фільтром.
     selectedDepartments = readSetParam(params, "department");
-    selectedColors = readSetParam(params, "color");
+
+    // Колір з адреси проводимо через сім'ї.
+    //
+    // ЧОМУ. Фільтр зберігає в адресі сім'ю («?color=Чорний»), а не
+    // назву з даних. Але посилання з ?color=Black чи ?color=Nero вже
+    // розіслані й проіндексовані, та й назви кольорів у даних тепер
+    // зведені — без цього перетворення старе посилання відкривало б
+    // каталог із порожнім фільтром (keepKnown() викинув би невідоме
+    // значення, і людина не зрозуміла б, чому фільтр не застосувався).
+    // Для нових значень виклик нічого не змінює: сім'я від своєї ж
+    // назви — вона сама.
+    selectedColors = new Set(
+        [...readSetParam(params, "color")].map(value => colorFamily(value))
+    );
     selectedSizes = readSetParam(params, "size");
 
     const sort = params.get("sort");
@@ -929,7 +942,10 @@ function availableFacets() {
 
     forColors.forEach(product => {
 
-        getProductColors(product).forEach((hex, name) => colors.add(name));
+        // Фільтр працює сім'ями кольорів — доступність рахуємо теж
+        // сім'ями, інакше пункт «Бежевий» позначався б недоступним
+        // через те, що в даних лежить «Тауп».
+        getProductColorFamilies(product).forEach((info, family) => colors.add(family));
 
     });
 
@@ -1077,42 +1093,63 @@ function fillColors() {
 
     if (!colorOptionsList) return;
 
-    const colorSwatches = new Map(); // назва -> hex
+    // Фільтр показує СІМ'Ї кольорів, а не кожну назву з даних.
+    //
+    // ЧОМУ. Навіть після зведення написань (scripts/normalize-colors.js)
+    // назв лишається 33 на 71 товар: «Темно-сірий», «Світло-сірий» і
+    // «Сіро-бежевий» — це три різні відтінки, і в картці товару вони
+    // мусять бути різними. Але у фільтрі це три пункти на один сірий, і
+    // покупець, який хоче «щось сіре», відмічає всі три.
+    //
+    // Тому пунктів рівно стільки, скільки кольорів справді розрізняє
+    // покупець. Правила зведення — у colorFamily() в common.js.
+    const families = new Map(); // сім'я -> Set назв, що в неї увійшли
 
     products.forEach(product => {
 
-        getProductColors(product).forEach((hex, name) => {
+        getProductColorFamilies(product).forEach((info, family) => {
 
-            if (!colorSwatches.has(name) || (!colorSwatches.get(name) && hex)) {
-                colorSwatches.set(name, hex);
-            }
+            if (!families.has(family)) families.set(family, new Set());
+
+            info.names.forEach(name => families.get(family).add(name));
 
         });
 
     });
 
-    [...colorSwatches.keys()]
-        .sort((a, b) => a.localeCompare(b, "uk"))
-        .forEach(name => {
+    // Порядок — з COLOR_FAMILY_ORDER, а не алфавітний: алфавіт розкидав
+    // би найчастіші «Білий», «Сірий» і «Чорний» по трьох кінцях списку.
+    COLOR_FAMILY_ORDER.filter(family => families.has(family)).forEach(family => {
 
-            const hex = colorSwatches.get(name) || "#e5e7eb";
+        const swatch = COLOR_FAMILIES.find(item => item.name === family)?.hex || "#e5e7eb";
 
-            const option = document.createElement("button");
+        const names = [...families.get(family)].sort((a, b) => a.localeCompare(b, "uk"));
 
-            option.type = "button";
-            option.className = "filter-option filter-option-color";
-            option.dataset.color = name;
-            option.innerHTML = `
-                <span class="filter-checkbox"></span>
-                <span class="filter-color-swatch" style="background:${hex}"></span>
-                ${name}
-            `;
+        const option = document.createElement("button");
 
-            option.addEventListener("click", () => toggleColor(name));
+        option.type = "button";
+        option.className = "filter-option filter-option-color";
+        option.dataset.color = family;
 
-            colorOptionsList.appendChild(option);
+        // Підказка перелічує, які саме відтінки сюди зведені. Без неї
+        // незрозуміло, чому за фільтром «Бежевий» знайшовся товар,
+        // підписаний «Тауп».
+        option.title = names.length > 1
+            ? `${family}: ${names.join(", ")}`
+            : family;
 
-        });
+        option.innerHTML = `
+            <span class="filter-checkbox"></span>
+            <span class="filter-color-swatch" style="background:${swatch}"></span>
+            ${escapeHtml(family)}
+            ${names.length > 1 ? `<span class="filter-option-note">${names.length}</span>` : ""}
+        `;
+
+        option.addEventListener("click", () => toggleColor(family));
+
+        colorOptionsList.appendChild(option);
+
+    });
 
 }
 
@@ -2607,9 +2644,9 @@ function filterProducts(skip) {
 
         list = list.filter(product => {
 
-            const productColorNames = new Set(getProductColors(product).keys());
+            const productFamilies = new Set(getProductColorFamilies(product).keys());
 
-            return [...selectedColors].some(color => productColorNames.has(color));
+            return [...selectedColors].some(family => productFamilies.has(family));
 
         });
 
@@ -3076,7 +3113,7 @@ function pageNumbers(total, current) {
 
 }
 
-function renderPagination(count, shownCount) {
+function renderPagination(count, shownCount, lastShown) {
 
     if (!paginationEl) return;
 
@@ -3093,11 +3130,40 @@ function renderPagination(count, shownCount) {
     // скільки ще залишилось і чи варто тиснути. З ним видно і прогрес,
     // і масштаб: «24 з 85» відразу каже, що попереду ще три таких
     // порції.
+    //
+    // ЩО ТУТ БУЛО НЕ ТАК
+    // -------------------
+    // Раніше сюди передавалось from + shown.length — «скільком товарам
+    // від початку списку дійшла черга». На першій сторінці це збігалось
+    // із дійсністю, а на другій — ні: сторінка показує товари 25–48,
+    // тобто 24 картки, а рахунок писав «48 з 85». Число не сходилось ні
+    // з чим, що видно на екрані, — а перевіряти хочеться саме такі
+    // числа.
+    //
+    // Тепер рахуємо РІВНО те, що зараз на сторінці: 24 на будь-якій
+    // сторінці, 48 після «Показати ще». Кнопка при цьому лишається
+    // чесною: «ще» є, поки останній показаний товар не останній у
+    // вибірці.
     const seen = Math.min(shownCount || 0, count);
-    const hasMore = seen < count;
+
+    // Кінець показаного відрізка. Рахуємо «ще» від нього, а не від
+    // seen: на другій сторінці показано 24 товари, але позаду вже 24
+    // інших — «ще» стосується лише того, що попереду.
+    const lastShownIndex = Math.min(lastShown || 0, count);
+
+    const hasMore = lastShownIndex < count;
+
+    // Номер першого товару на сторінці. Діапазон показуємо лише коли
+    // сторінка не перша: «1–24 з 85» нічого не додає до «24 з 85», а от
+    // «25–48» одразу знімає питання, чому товарів 24, а не 48.
+    const firstShownIndex = lastShownIndex - seen + 1;
+
+    const counterText = firstShownIndex > 1
+        ? `${firstShownIndex}–${lastShownIndex} з ${count} товарів`
+        : `${seen} з ${count} товарів`;
 
     const counter = `
-        <div class="pagination-counter">${seen} з ${count} товарів</div>`;
+        <div class="pagination-counter">${counterText}</div>`;
 
     // Кнопка дописує наступну порцію знизу, не перегортаючи сторінку.
     //
@@ -3207,7 +3273,10 @@ function render() {
     // на них рідко.
     window.Analytics?.viewItemList(shown, "Каталог");
 
-    renderPagination(list.length, from + shown.length);
+    // shown.length — скільки карток НА ЕКРАНІ, from + shown.length —
+    // де закінчується показаний відрізок. Перше йде в рахунок, друге —
+    // у перевірку «чи є ще».
+    renderPagination(list.length, shown.length, from + shown.length);
     syncPageToUrl();
 
     initProductCarousels(grid);

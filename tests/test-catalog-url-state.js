@@ -65,9 +65,17 @@ console.log("\n[2] Стан із адреси читається назад");
     check("категорії теж (це ж і бічне меню каталогу)",
         /readSetParam\(new URLSearchParams\(location\.search\), "category"\)/.test(catalog));
 
+    // Колір читається через сім'ї: фільтр зберігає в адресі сім'ю
+    // («?color=Чорний»), а старі посилання несуть назву з даних
+    // («?color=Black»). Без перетворення старе посилання відкривало б
+    // каталог із порожнім фільтром — keepKnown() викинув би невідоме
+    // значення, і людина не зрозуміла б, чому фільтр не застосувався.
     check("колір і розмір читаються з адреси",
-        /selectedColors = readSetParam\(params, "color"\)/.test(catalog)
+        /readSetParam\(params, "color"\)/.test(catalog)
         && /selectedSizes = readSetParam\(params, "size"\)/.test(catalog));
+
+    check("колір з адреси зводиться до сім'ї",
+        /\.map\(value => colorFamily\(value\)\)/.test(catalog));
     check("сортування читається з адреси", /const sort = params\.get\("sort"\)/.test(catalog));
     check("ціна читається з адреси", /readNumberParam\(params, "priceMin"\)/.test(catalog));
 
@@ -498,12 +506,29 @@ console.log("\n[N] Пагінація: рахунок і «Показати ще
     check("рахунок називає обидва числа",
         /\$\{seen\} з \$\{count\} товарів/.test(catalog));
 
+    // Рахунок мусить називати те, що ВИДНО НА ЕКРАНІ.
+    //
+    // Раніше туди йшло from + shown.length — «скільком товарам від
+    // початку списку дійшла черга». На другій сторінці видно 24 картки,
+    // а рахунок писав «48 з 85»: число не сходилось ні з чим, що видно.
+    check("рахунок = карток на екрані",
+        /renderPagination\(list\.length, shown\.length, from \+ shown\.length\)/.test(catalog));
+
+    // На другій і далі сторінках — діапазон: «25–48 з 85» одразу знімає
+    // питання, чому товарів 24, а не 48.
+    check("на не-першій сторінці показується діапазон",
+        /firstShownIndex > 1/.test(catalog)
+        && /\$\{firstShownIndex\}–\$\{lastShownIndex\} з \$\{count\} товарів/.test(catalog));
+
     check("є кнопка «Показати ще»", /class="pagination-more"/.test(catalog));
 
     // Кнопка мусить зникати, коли показано все — інакше вона обіцяє
     // те, чого немає.
+    // «Ще» рахується від КІНЦЯ показаного відрізка, а не від кількості
+    // карток на екрані: на другій сторінці видно 24 товари, але позаду
+    // вже 24 інших — кнопка стосується лише того, що попереду.
     check("кнопка лише коли є що показувати",
-        /const hasMore = seen < count/.test(catalog)
+        /const hasMore = lastShownIndex < count/.test(catalog)
         && /hasMore\s*\n?\s*\? `<button[^`]*pagination-more/.test(catalog));
 
     // Кнопка ДОПИСУЄ, номер — ПЕРЕХОДИТЬ. Різні задачі.
