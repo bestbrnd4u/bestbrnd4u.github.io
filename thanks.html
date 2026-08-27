@@ -19,7 +19,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="assets/images/favicon-192.png">
     <title>Замовлення прийнято | BestBrnd4u</title>
 
-    <link rel="stylesheet" href="assets/css/style.css?v=361572d3">
+    <link rel="stylesheet" href="assets/css/style.css?v=ce8a8e6b">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -140,6 +140,13 @@
                     <strong id="thanksItemsCount">—</strong>
                 </div>
 
+                <!-- Список товарів.
+                     
+                     Раніше тут стояло лише число. Покупець не міг
+                     перевірити, ЩО саме замовив, — а це останній момент,
+                     коли помилку ще легко виправити телефоном. -->
+                <div id="thanksItems" class="order-confirm-items" hidden></div>
+
                 <div class="order-confirm-row order-confirm-total">
                     <span>До сплати</span>
                     <strong id="thanksTotal">—</strong>
@@ -256,7 +263,7 @@
 <!-- Оформлення текстових блоків з адмінки (кольори, шрифт, кнопка) -->
 <script src="assets/js/text-styles.js?v=7dc05c7d"></script>
 <!-- Згода на використання даних (банер + блокування вбудованого відео) -->
-<script src="assets/js/consent.js?v=50a49f16"></script>
+<script src="assets/js/consent.js?v=159b1cfe"></script>
 <!-- Статистика відвідувань. Не завантажує Google без згоди. -->
 <script src="assets/js/analytics.js?v=d1829aaf"></script>
 <script src="assets/js/common.js?v=59e1bc3a"></script>
@@ -280,6 +287,41 @@
                 document.getElementById("thanksOrderId").textContent = order.orderId || "—";
                 document.getElementById("thanksOrderDate").textContent = order.orderDate || "—";
                 document.getElementById("thanksItemsCount").textContent = order.itemsCount ?? "—";
+
+                // Товари: фото, назва, різновид, кількість і сума.
+                const itemsBox = document.getElementById("thanksItems");
+
+                if (Array.isArray(order.items) && order.items.length) {
+
+                    itemsBox.innerHTML = order.items.map(item => {
+
+                        // Колір, розмір і кількість — в одну стрічку,
+                        // через розділювач. Кількість показуємо лише
+                        // коли її більше однієї: «× 1» нічого не додає.
+                        const meta = [
+                            item.color,
+                            item.size,
+                            item.qty > 1 ? `${item.qty} шт.` : ""
+                        ].filter(Boolean).join(" · ");
+
+                        return `
+                            <div class="order-confirm-item">
+                                <img src="${item.image || "assets/images/no-image.png"}"
+                                     alt=""
+                                     onerror="this.onerror=null;this.src='assets/images/no-image.png'">
+                                <div class="order-confirm-item-info">
+                                    ${item.brand ? `<span class="order-confirm-item-brand">${item.brand}</span>` : ""}
+                                    <span class="order-confirm-item-title">${item.title}</span>
+                                    ${meta ? `<span class="order-confirm-item-meta">${meta}</span>` : ""}
+                                </div>
+                                <span class="order-confirm-item-sum">${item.sum.toLocaleString("uk-UA")} грн</span>
+                            </div>`;
+
+                    }).join("");
+
+                    itemsBox.hidden = false;
+
+                }
                 document.getElementById("thanksTotal").textContent = order.total || "—";
 
                 document.getElementById("orderConfirmCard").hidden = false;
