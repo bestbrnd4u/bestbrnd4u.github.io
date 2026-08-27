@@ -28,9 +28,9 @@
         "53"
       ],
       "images": [
-        "/assets/images/products/uploads/saint-laurent-grey-cat-eye-ladies-sunglasses-sl-276-mica-002-53-sl-276-mica-002-53_1.webp",
-        "/assets/images/products/uploads/saint-laurent-grey-cat-eye-ladies-sunglasses-sl-276-mica-002-53-sl-276-mica-002-53_3.webp",
-        "/assets/images/products/uploads/saint-laurent-grey-cat-eye-ladies-sunglasses-sl-276-mica-002-53-sl-276-mica-002-53_4.webp"
+        "/assets/images/products/uploads/saint-laurent-grey-cat-eye-ladies-sungla-99d23704.webp",
+        "/assets/images/products/uploads/saint-laurent-grey-cat-eye-ladies-sungla-175c8e88.webp",
+        "/assets/images/products/uploads/saint-laurent-grey-cat-eye-ladies-sungla-6b05dcda.webp"
       ]
     },
     {
@@ -75,5 +75,14 @@
   "description": "Елегантні жіночі сонцезахисні окуляри Saint Laurent SL 276 MICA з виразною оправою форми Cat Eye. Оправ створює лаконічний та водночас ефектний образ.\nМодель має повноободкову ацетатну оправу та сірі лінзи з 100% захистом від UVA/UVB-променів. На завушниках нанесено фірмовий напис SAINT LAURENT PARIS. Окуляри виготовлені в Італії",
   "sku": "SL 276 MICA 001 53",
   "rating": 5,
-  "category": "Окуляри і оправи"
+  "category": "Окуляри і оправи",
+  "slug": "сонцезахисні-окуляри-saint-laurent-sl-276-mica-001-53",
+  "id": 72,
+  "color": "Чорний",
+  "images": [
+    "/assets/images/products/uploads/a0e43776-063b-4643-8c36-5024406361e9.webp",
+    "/assets/images/products/uploads/cfeba1dc-4b88-4f3b-984b-b5bebd478c1f.jpg",
+    "/assets/images/products/uploads/33751393-b64e-49d3-b0c9-2e3bde1afaff.jpg",
+    "/assets/images/products/uploads/aa00-okd0j9_99x_f9.webp"
+  ]
 }

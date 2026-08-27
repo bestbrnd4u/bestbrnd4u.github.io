@@ -4621,5 +4621,93 @@
       "/assets/images/products/uploads/9dzhcfvjorauhd1nzfwyq9o69vh3iff1.webp",
       "/assets/images/products/uploads/u87036v1ioy7rp72btz5kw3oti8m25rs.webp"
     ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "10- 14 робочих днів",
+    "forcePublish": false,
+    "material": "Ацетатна оправа, полімерні, нейлонові лінзи",
+    "brand": "Saint Laurent",
+    "price": 12400,
+    "preOrder": true,
+    "dimensions": "Ширина лінзи: 53 мм Місток: 16 мм Довжина завушника: 145 мм",
+    "variants": [
+      {
+        "color": "Чорний",
+        "hex": "#000000",
+        "images": [
+          "/assets/images/products/uploads/a0e43776-063b-4643-8c36-5024406361e9.webp?v=01af95e4",
+          "/assets/images/products/uploads/cfeba1dc-4b88-4f3b-984b-b5bebd478c1f.jpg?v=0f28bad7",
+          "/assets/images/products/uploads/33751393-b64e-49d3-b0c9-2e3bde1afaff.jpg?v=7b1a8ec9",
+          "/assets/images/products/uploads/aa00-okd0j9_99x_f9.webp?v=5c7f8ff0"
+        ]
+      },
+      {
+        "color": "Черепаховий Havana",
+        "hex": "#543c22",
+        "sku": "SL 276 MICA 002 53",
+        "sizes": [
+          "53"
+        ],
+        "images": [
+          "/assets/images/products/uploads/saint-laurent-grey-cat-eye-ladies-sungla-99d23704.webp?v=dd135198",
+          "/assets/images/products/uploads/saint-laurent-grey-cat-eye-ladies-sungla-175c8e88.webp?v=ac28aea8",
+          "/assets/images/products/uploads/saint-laurent-grey-cat-eye-ladies-sungla-6b05dcda.webp?v=de137cb5"
+        ]
+      },
+      {
+        "color": "Чорний / жовтий",
+        "hex": "#dcd9d9",
+        "sku": "SL 276 MICA 038 53",
+        "sizes": [
+          "53"
+        ],
+        "images": [
+          "/assets/images/products/uploads/saint-laurent-yellow-cat-eye-ladies-sunglasses-sl-276-mica-038-53.webp?v=b904204e",
+          "/assets/images/products/uploads/saint-laurent-yellow-cat-eye-ladies-sunglasses-sl-276-mica-038-53_3-1-.webp?v=7b228098",
+          "/assets/images/products/uploads/saint-laurent-yellow-cat-eye-ladies-sunglasses-sl-276-mica-038-53_4.webp?v=e9241d93"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "sizes": [
+      "53"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Saint Laurent",
+      "Saint Laurent SL 276 MICA",
+      "SL 276 MICA 001 53",
+      "окуляри Saint Laurent",
+      "сонцезахисні окуляри Saint Laurent",
+      "жіночі сонцезахисні окуляри",
+      "жіночі окуляри",
+      "окуляри Cat Eye",
+      "окуляри котяче око",
+      "чорні окуляри",
+      "окуляри із сірими лінзами",
+      "брендові окуляри",
+      "оригінальні Saint Laurent",
+      "YSL окуляри"
+    ],
+    "isNew": false,
+    "title": "Сонцезахисні окуляри Saint Laurent SL 276 MICA 001 53",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Елегантні жіночі сонцезахисні окуляри Saint Laurent SL 276 MICA з виразною оправою форми Cat Eye. Оправ створює лаконічний та водночас ефектний образ.\nМодель має повноободкову ацетатну оправу та сірі лінзи з 100% захистом від UVA/UVB-променів. На завушниках нанесено фірмовий напис SAINT LAURENT PARIS. Окуляри виготовлені в Італії",
+    "sku": "SL 276 MICA 001 53",
+    "rating": 5,
+    "category": "Окуляри і оправи",
+    "slug": "сонцезахисні-окуляри-saint-laurent-sl-276-mica-001-53",
+    "id": 72,
+    "color": "Чорний",
+    "images": [
+      "/assets/images/products/uploads/a0e43776-063b-4643-8c36-5024406361e9.webp",
+      "/assets/images/products/uploads/cfeba1dc-4b88-4f3b-984b-b5bebd478c1f.jpg",
+      "/assets/images/products/uploads/33751393-b64e-49d3-b0c9-2e3bde1afaff.jpg",
+      "/assets/images/products/uploads/aa00-okd0j9_99x_f9.webp"
+    ]
   }
 ]
