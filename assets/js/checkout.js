@@ -95,12 +95,17 @@ function reportCheckout(event, detail) {
 
     if (!window.Analytics) return;
 
-    const lines = getGroupedCartLines().map(line => ({
-        product: findCachedProduct(line.id),
-        color: line.color,
-        size: line.size,
-        qty: line.qty
-    })).filter(x => x.product);
+    // getCartLines(), а не своя збірка через findCachedProduct.
+    //
+    // ЧОМУ ЦЕ ВАЖЛИВО. На сторінці оформлення товари шукаються
+    // findProductById() — вона дивиться в allProducts, які тут
+    // завантажені. Кеш каталогу (findCachedProduct) на цій сторінці
+    // порожній, тож усі рядки відпадали на filter(x => x.product) — і
+    // події begin_checkout та purchase не надсилались ЗОВСІМ.
+    //
+    // Помітити це було майже неможливо: у звітах просто не було
+    // покупок, а виглядало як «ще ніхто не замовляв».
+    const lines = getCartLines();
 
     if (!lines.length) return;
 
@@ -738,6 +743,83 @@ function validateForm() {
 // Формування тексту замовлення для листа
 // -------------------------
 
+// Склад замовлення для листа покупцеві — у вигляді HTML-таблиці.
+//
+// НАВІЩО
+// -------
+// Раніше в лист ішов один рядок тексту на товар: «Michael Kors —
+// Сумочка …, колір: …, розмір: …, кількість: 1, ціна за од.: 8 500 грн,
+// сума: 8 500 грн». Усе правда, але читати це важко: суцільний абзац
+// без пробілів для ока, і немає головного — фото. Людина щойно
+// вибирала річ очима, а в підтвердженні бачить опис словами.
+//
+// ЧОМУ ТАБЛИЦЯ, А НЕ FLEXBOX
+// ---------------------------
+// Пошта — не браузер. Gmail вирізає теги <style> цілком, Outlook
+// рендерить через Word і не розуміє flexbox та grid. Працює надійно
+// лише те, що працювало в 2005-му: таблиці й СТИЛІ ПРЯМО В АТРИБУТАХ.
+// Тому тут table, а не div, і style="" на кожному елементі.
+//
+// ЧОМУ АДРЕСИ ФОТО АБСОЛЮТНІ
+// ---------------------------
+// У листі відносний шлях нема від чого відкладати: почтовик не знає
+// адреси сайту й показує заглушку. absoluteUrl() уже застосовано в
+// buildOrderItemsSnapshot(), тут просто беремо готове.
+function buildOrderCompositionHtml() {
+
+    const items = buildOrderItemsSnapshot();
+
+    if (!items.length) return "";
+
+    const rows = items.map(item => {
+
+        const meta = [
+            item.color ? `Колір: ${escapeHtml(item.color)}` : "",
+            item.size ? `Розмір: ${escapeHtml(item.size)}` : ""
+        ].filter(Boolean).join(" · ");
+
+        const lineSum = (Number(item.price) || 0) * (Number(item.qty) || 1);
+
+        // Кількість показуємо лише коли її більше однієї: «× 1» нічого
+        // не додає, а рядок захаращує.
+        const qtyLine = Number(item.qty) > 1
+            ? `<div style="font-size:13px;color:#6b7280;margin-top:3px;">`
+              + `${item.qty} × ${escapeHtml(formatPrice(item.price))}</div>`
+            : "";
+
+        return `
+            <tr>
+                <td width="72" valign="top" style="padding:12px 12px 12px 0;">
+                    <img src="${escapeHtml(item.image || "")}" width="64" height="80"
+                         alt=""
+                         style="display:block;width:64px;height:80px;object-fit:cover;
+                                border-radius:8px;border:1px solid #e5e7eb;background:#fff;">
+                </td>
+                <td valign="top" style="padding:12px 0;font-family:Arial,Helvetica,sans-serif;">
+                    ${item.brand ? `<div style="font-size:11px;letter-spacing:1px;
+                        text-transform:uppercase;color:#9ca3af;">${escapeHtml(item.brand)}</div>` : ""}
+                    <div style="font-size:15px;font-weight:bold;color:#111827;
+                                line-height:1.35;margin-top:2px;">${escapeHtml(item.title)}</div>
+                    ${meta ? `<div style="font-size:13px;color:#6b7280;
+                        margin-top:3px;">${meta}</div>` : ""}
+                    ${qtyLine}
+                </td>
+                <td width="90" valign="top" align="right"
+                    style="padding:12px 0;font-family:Arial,Helvetica,sans-serif;
+                           font-size:15px;font-weight:bold;color:#111827;white-space:nowrap;">
+                    ${escapeHtml(formatPrice(lineSum))}
+                </td>
+            </tr>`;
+
+    }).join("");
+
+    // border-collapse в атрибутах теж: Outlook інакше додає власні
+    // відступи між клітинками.
+    return `<table width="100%" cellpadding="0" cellspacing="0" border="0"
+                   style="border-collapse:collapse;width:100%;">${rows}</table>`;
+
+}
+
 function buildOrderCompositionText() {
 
     const lines = getCartLines();
@@ -817,6 +899,15 @@ function buildEmailTemplateParams(orderId, orderDate) {
         to_name: `${firstName} ${lastName}`.trim(),
         order_id: orderId,
         order_date: orderDate,
+        // Два варіанти складу замовлення.
+        //
+        // order_items_html — таблиця з фото, для {{{order_items_html}}}
+        //   у шаблоні EmailJS (три дужки: інакше HTML екранується й
+        //   покупець побачить теги).
+        // order_items — той самий склад текстом. Лишається як запас:
+        //   поки шаблон не оновлено, лист приходить як раніше, а не
+        //   порожнім.
+        order_items_html: buildOrderCompositionHtml(),
         order_items: buildOrderCompositionText(),
         order_subtotal: formatPrice(subtotal),
         order_discount: totalDiscount > 0 ? `-${formatPrice(totalDiscount)}` : "0 грн",
@@ -982,31 +1073,32 @@ checkoutForm?.addEventListener("submit", event => {
 
             const itemsCount = lines.reduce((sum, line) => sum + line.qty, 0);
 
-            // Зберігаємо й самі товари: назву, фото, кількість і суму.
+            // Товари беремо з ГОТОВОГО знімка замовлення.
             //
-            // Без них сторінка підтвердження показує лише число, і
-            // покупець не може перевірити, ЩО саме він замовив. А це
-            // останній момент, коли помилку ще легко виправити
-            // телефоном.
-            const items = lines.map(line => {
-
-                const product = findCachedProduct(line.id) || {};
-
-                const price = Number(product.price) || 0;
-
-                return {
-                    title: product.title || "Товар",
-                    brand: product.brand || "",
-                    image: (product.images || [])[0]
-                        || (product.variants?.[0]?.images || [])[0]
-                        || "",
-                    color: line.color || "",
-                    size: line.size || "",
-                    qty: line.qty,
-                    sum: price * line.qty
-                };
-
-            });
+            // ЧОМУ НЕ СВОЯ ЗБІРКА
+            // --------------------
+            // Спершу я збирав список тут же: getGroupedCartLines() плюс
+            // findCachedProduct(line.id). Виявилось, що на сторінці
+            // оформлення товари шукаються ІНШОЮ функцією —
+            // findProductById(), яка дивиться в allProducts. Кеш
+            // каталогу тут не заповнений, тож findCachedProduct
+            // повертала undefined: у списку стояло «Товар», «0 грн» і
+            // порожні картинки.
+            //
+            // buildOrderItemsSnapshot() уже робить саме те, що потрібно,
+            // і робить це правильно — тим самим шляхом, яким склад
+            // замовлення йде в базу й у лист. Дві незалежні збірки того
+            // самого списку рано чи пізно розійшлися б; тепер джерело
+            // одне.
+            const items = buildOrderItemsSnapshot().map(item => ({
+                title: item.title,
+                brand: item.brand,
+                image: item.image || "",
+                color: item.color || "",
+                size: item.size || "",
+                qty: item.qty,
+                sum: (Number(item.price) || 0) * (Number(item.qty) || 1)
+            }));
 
             sessionStorage.setItem("bestbrnd4uLastOrder", JSON.stringify({
                 orderId,
