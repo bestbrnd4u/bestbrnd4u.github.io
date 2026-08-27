@@ -14,16 +14,16 @@
       "color": "Сріблястий",
       "hex": "#c0c0c0",
       "images": [
-        "/assets/images/products/uploads/tissot-tclassic-automatic-diamond-green-dial-ladies-watch-t1320071109100.webp",
-        "/assets/images/products/uploads/tissot-tclassic-automatic-diamond-green-dial-ladies-watch-t1320071109100_2.webp",
-        "/assets/images/products/uploads/tissot-tclassic-automatic-diamond-green-dial-ladies-watch-t1320071109100_3.webp"
+        "/assets/images/products/uploads/tissot-tclassic-automatic-diamond-green--6ebe14d1.webp",
+        "/assets/images/products/uploads/tissot-tclassic-automatic-diamond-green--dff156d2.webp",
+        "/assets/images/products/uploads/tissot-tclassic-automatic-diamond-green--8822ff6e.webp"
       ]
     }
   ],
   "preOrderPrepayment": 100,
   "strapInfo": "Сталевий браслет сріблястого кольору з системою швидкого знімання та застібкою-метеликом із кнопками. Ширина кріплення — 1,5 см",
   "sizes": [
-    "Onesize"
+    "ONESIZE"
   ],
   "splitByColor": true,
   "searchKeywords": [
@@ -51,5 +51,13 @@
   "description": "Елегантний жіночий годинник Tissot T-My Lady Automatic із круглим сталевим корпусом та красивим зеленим циферблатом. Лаконічний дизайн поєднується із сучасним швейцарським автоматичним механізмом, що робить модель чудовим вибором як для повсякденних, так і для більш елегантних образів.\nГодинник оснащений швейцарським автоматичним механізмом Powermatic 48.111 із запасом ходу до 48 годин та балансовою пружиною Nivachron, стійкою до впливу магнітних полів. Зелену циферблат із віконцем дати захищає куполоподібне сапфірове скло. Прозора задня кришка дозволяє спостерігати за роботою механізму. Водонепроникність — до 100 м (10 bar)",
   "sku": "T132.007.11.091.00",
   "rating": 5,
-  "category": "Годинники"
+  "category": "Годинники",
+  "slug": "годинник-tissot-t-my-lady-automatic-t132-007-11-091-00",
+  "id": 75,
+  "color": "Сріблястий",
+  "images": [
+    "/assets/images/products/uploads/tissot-tclassic-automatic-diamond-green--6ebe14d1.webp",
+    "/assets/images/products/uploads/tissot-tclassic-automatic-diamond-green--dff156d2.webp",
+    "/assets/images/products/uploads/tissot-tclassic-automatic-diamond-green--8822ff6e.webp"
+  ]
 }

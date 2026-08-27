@@ -4836,5 +4836,68 @@
       "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_3_2.webp",
       "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-dial-ladies-watch-t0580091103100_4_1.webp"
     ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Корпус і браслет — нержавіюча сталь 316L; скло — стійке до подряпин сапфірове",
+    "brand": "Tissot",
+    "price": 15400,
+    "preOrder": true,
+    "dimensions": "2,93 × 2,93 × 1,06 см",
+    "variants": [
+      {
+        "color": "Сріблястий",
+        "hex": "#c0c0c0",
+        "images": [
+          "/assets/images/products/uploads/tissot-tclassic-automatic-diamond-green--6ebe14d1.webp?v=1326d5ab",
+          "/assets/images/products/uploads/tissot-tclassic-automatic-diamond-green--dff156d2.webp?v=3836ad46",
+          "/assets/images/products/uploads/tissot-tclassic-automatic-diamond-green--8822ff6e.webp?v=046e0acb"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Сталевий браслет сріблястого кольору з системою швидкого знімання та застібкою-метеликом із кнопками. Ширина кріплення — 1,5 см",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Tissot T-My Lady",
+      "Tissot T-My Lady Automatic",
+      "Tissot T132.007.11.091.00",
+      "T1320071109100",
+      "годинник Tissot",
+      "жіночий годинник Tissot",
+      "жіночий автоматичний годинник",
+      "швейцарський годинник",
+      "швейцарський автоматичний годинник",
+      "зелений годинник",
+      "годинник із зеленим циферблатом",
+      "годинник зі сталевим браслетом",
+      "класичний жіночий годинник",
+      "елегантний годинник",
+      "брендовий годинник",
+      "оригінальний Tissot"
+    ],
+    "isNew": false,
+    "title": "Годинник Tissot T-My Lady Automatic T132.007.11.091.00",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Елегантний жіночий годинник Tissot T-My Lady Automatic із круглим сталевим корпусом та красивим зеленим циферблатом. Лаконічний дизайн поєднується із сучасним швейцарським автоматичним механізмом, що робить модель чудовим вибором як для повсякденних, так і для більш елегантних образів.\nГодинник оснащений швейцарським автоматичним механізмом Powermatic 48.111 із запасом ходу до 48 годин та балансовою пружиною Nivachron, стійкою до впливу магнітних полів. Зелену циферблат із віконцем дати захищає куполоподібне сапфірове скло. Прозора задня кришка дозволяє спостерігати за роботою механізму. Водонепроникність — до 100 м (10 bar)",
+    "sku": "T132.007.11.091.00",
+    "rating": 5,
+    "category": "Годинники",
+    "slug": "годинник-tissot-t-my-lady-automatic-t132-007-11-091-00",
+    "id": 75,
+    "color": "Сріблястий",
+    "images": [
+      "/assets/images/products/uploads/tissot-tclassic-automatic-diamond-green--6ebe14d1.webp",
+      "/assets/images/products/uploads/tissot-tclassic-automatic-diamond-green--dff156d2.webp",
+      "/assets/images/products/uploads/tissot-tclassic-automatic-diamond-green--8822ff6e.webp"
+    ]
   }
 ]
