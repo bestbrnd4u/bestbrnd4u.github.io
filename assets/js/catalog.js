@@ -3108,22 +3108,34 @@ function renderPagination(count, shownCount) {
         ? `<button type="button" class="pagination-more" data-more="1">Показати ще</button>`
         : "";
 
-    const buttons = pageNumbers(total, currentPage).map(n =>
+    // Підсвічуємо ОСТАННЮ завантажену сторінку, а не першу.
+    //
+    // ЧОМУ. «Показати ще» дописує наступну порцію знизу, і на екрані
+    // тепер сторінки 1–2. Якщо підсвічена лишається перша, номери
+    // брешуть: людина вже прогорнула другу, а каталог показує, що вона
+    // на першій. І стрілка «далі» веде на другу — ту, що вже видно.
+    //
+    // Тому активна = currentPage + дописані порції. Стрілки рахуються
+    // від неї ж: «далі» веде на наступну ЩЕ НЕ показану.
+    const activePage = Math.min(currentPage + extraPages, total);
+
+    const buttons = pageNumbers(total, activePage).map(n =>
         n === "…"
             ? `<span class="pagination-gap">…</span>`
-            : `<button type="button" class="pagination-page${n === currentPage ? " active" : ""}"
-                       data-page="${n}"${n === currentPage ? ' aria-current="page"' : ""}>${n}</button>`
+            : `<button type="button" class="pagination-page${n === activePage ? " active" : ""}${
+                    n >= currentPage && n < activePage ? " is-loaded" : ""}"
+                       data-page="${n}"${n === activePage ? ' aria-current="page"' : ""}>${n}</button>`
     ).join("");
 
     paginationEl.innerHTML = `
         ${counter}
         ${more}
         <div class="pagination-pages">
-            <button type="button" class="pagination-arrow" data-page="${currentPage - 1}"
-                    ${currentPage === 1 ? "disabled" : ""} aria-label="Попередня сторінка">‹</button>
+            <button type="button" class="pagination-arrow" data-page="${activePage - 1}"
+                    ${activePage === 1 ? "disabled" : ""} aria-label="Попередня сторінка">‹</button>
             ${buttons}
-            <button type="button" class="pagination-arrow" data-page="${currentPage + 1}"
-                    ${currentPage === total ? "disabled" : ""} aria-label="Наступна сторінка">›</button>
+            <button type="button" class="pagination-arrow" data-page="${activePage + 1}"
+                    ${activePage === total ? "disabled" : ""} aria-label="Наступна сторінка">›</button>
         </div>
     `;
 
