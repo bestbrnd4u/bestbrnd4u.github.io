@@ -547,8 +547,64 @@ console.log("\n[N] Пагінація: рахунок і «Показати ще
     check("остання сторінка: 85 з 85", state(85, 4, 0).seen === 85);
     check("і кнопки там немає", state(85, 4, 0).hasMore === false);
 
+    // Підсвічена — ОСТАННЯ завантажена сторінка, а не перша.
+    //
+    // ЧОМУ. «Показати ще» дописує порцію знизу, і на екрані сторінки
+    // 1–2. Якщо підсвічена лишається перша, номери брешуть: людина вже
+    // прогорнула другу, а каталог показує, що вона на першій. І стрілка
+    // «далі» веде на другу — ту, що вже видно.
+    check("активна = поточна + дописані",
+        /const activePage = Math\.min\(currentPage \+ extraPages, total\)/.test(catalog));
+    check("підсвітка по activePage",
+        /n === activePage \? " active" : ""/.test(catalog));
+
+    // Проміжні сторінки позначені тихо: якщо натиснути «ще» тричі, на
+    // екрані 1–4, і без позначки незрозуміло, чому під активною
+    // четвіркою стоять товари з першої.
+    check("показані раніше позначені",
+        /n >= currentPage && n < activePage \? " is-loaded" : ""/.test(catalog));
+
+    // Стрілки рахуються від активної: «далі» веде на наступну ЩЕ НЕ
+    // показану.
+    check("стрілки від активної сторінки",
+        /data-page="\$\{activePage - 1\}"/.test(catalog)
+        && /data-page="\$\{activePage \+ 1\}"/.test(catalog));
+    check("стрілки вимикаються по краях",
+        /activePage === 1 \? "disabled"/.test(catalog)
+        && /activePage === total \? "disabled"/.test(catalog));
+
+    // Арифметика на числах: 85 товарів по 24 = 4 сторінки.
+    const pageState = (page, extra, total = 4) => {
+
+        const active = Math.min(page + extra, total);
+
+        const loaded = [];
+
+        for (let n = page; n < active; n++) loaded.push(n);
+
+        return { active, loaded };
+
+    };
+
+    check("без додавань активна — перша", pageState(1, 0).active === 1);
+    check("після одного «ще» активна — друга", pageState(1, 1).active === 2);
+    check("і перша позначена як показана",
+        pageState(1, 1).loaded.join(",") === "1");
+    check("після трьох активна — четверта", pageState(1, 3).active === 4);
+    check("позначені 1,2,3", pageState(1, 3).loaded.join(",") === "1,2,3");
+
+    // Зайві натискання не виводять активну за межі.
+    check("більше сторінок не буває", pageState(1, 9).active === 4);
+
+    // Клац по номеру скидає дописане — активна саме та, куди пішли.
+    check("перехід на сторінку 3 нічого не позначає",
+        pageState(3, 0).loaded.length === 0 && pageState(3, 0).active === 3);
+
     // Стилі: номери лишаються в рядок під кнопкою.
     const css = read("assets/css/style.css");
+
+    check("є стиль показаних сторінок",
+        /\.pagination-page\.is-loaded\{/.test(css));
 
     check("номери окремою групою", /\.pagination-pages\{[^}]*display:flex/.test(css));
     check("блок став вертикальним",

@@ -45,7 +45,26 @@ console.log("\n[1] Кількість більше не NaN");
 console.log("\n[2] Товари зберігаються для сторінки");
 {
     check("склад замовлення записується", /items,/.test(checkout));
-    check("зібраний із рядків кошика", /const items = lines\.map/.test(checkout));
+
+    // Список беремо з ГОТОВОГО знімка замовлення, а не збираємо вдруге.
+    //
+    // Спершу я збирав його тут же: getGroupedCartLines() плюс
+    // findCachedProduct(). Виявилось, що на сторінці оформлення товари
+    // шукаються ІНШОЮ функцією — findProductById(), а кеш каталогу тут
+    // порожній. findCachedProduct повертала undefined: у списку стояло
+    // «Товар», «0 грн» і порожні картинки.
+    //
+    // buildOrderItemsSnapshot() робить це правильно й тим самим шляхом,
+    // яким склад іде в базу та в лист. Дві незалежні збірки того самого
+    // списку рано чи пізно розійшлися б.
+    check("список — із знімка замовлення",
+        /const items = buildOrderItemsSnapshot\(\)\.map/.test(checkout));
+
+    // Кеш каталогу на цій сторінці не використовується взагалі.
+    const code = checkout.replace(/\/\/[^\n]*/g, "");
+
+    check("findCachedProduct тут не використовується",
+        !/findCachedProduct\(/.test(code));
 
     // Кожне поле, потрібне покупцеві, щоб упізнати товар.
     ["title", "brand", "image", "color", "size", "qty", "sum"].forEach(field =>
@@ -54,12 +73,12 @@ console.log("\n[2] Товари зберігаються для сторінки
     // Сума рядка — ціна × кількість, а не просто ціна: інакше при двох
     // однакових товарах цифра брехала б.
     check("сума рядка враховує кількість",
-        /sum: price \* line\.qty/.test(checkout));
+        /sum: \(Number\(item\.price\) \|\| 0\) \* \(Number\(item\.qty\) \|\| 1\)/.test(checkout));
 
-    // Фото шукаємо і в товарі, і у варіанті: у частини товарів
-    // images лежить лише на варіанті.
-    check("фото шукається і у варіанті",
-        /product\.variants\?\.\[0\]\?\.images/.test(checkout));
+    // Адреса фото — абсолютна: у листі відносний шлях нема від чого
+    // відкладати, і почтовик показує заглушку.
+    check("адреса фото абсолютна",
+        /image: absoluteUrl\(product\.images\?\.\[0\]\)/.test(checkout));
 }
 
 console.log("\n[3] Сторінка показує список");
@@ -198,6 +217,56 @@ console.log("\n[5] Фото в листі — абсолютна адреса");
 
     check("повна адреса лишається як є",
         /if \(\/\^https\?:\\\/\\\/\/i\.test\(url\)\) return url/.test(common));
+}
+
+console.log("\n[6] Лист покупцеві: склад із фото");
+{
+    // ЩО БУЛО НЕ ТАК
+    // ---------------
+    // У лист ішов один рядок тексту на товар: «Бренд — Назва, колір: …,
+    // розмір: …, кількість: 1, ціна за од.: … , сума: …». Усе правда,
+    // але читати важко: суцільний абзац і немає головного — фото.
+    // Людина щойно вибирала річ очима, а в підтвердженні бачить опис
+    // словами.
+    check("є збірка HTML-складу", /function buildOrderCompositionHtml/.test(checkout));
+
+    // Текстовий варіант ЛИШАЄТЬСЯ: поки шаблон EmailJS не оновлено,
+    // лист приходить як раніше, а не порожнім.
+    check("текстовий варіант не прибрано",
+        /function buildOrderCompositionText/.test(checkout));
+    check("у шаблон ідуть обидва",
+        /order_items_html: buildOrderCompositionHtml\(\)/.test(checkout)
+        && /order_items: buildOrderCompositionText\(\)/.test(checkout));
+
+    // ПОШТА — НЕ БРАУЗЕР
+    // -------------------
+    // Gmail вирізає теги <style> цілком, Outlook рендерить через Word і
+    // не розуміє flexbox та grid. Працює лише таблична розкладка зі
+    // стилями в атрибутах.
+    const html = (checkout.match(/function buildOrderCompositionHtml[\s\S]*?\n\}/) || [""])[0];
+
+    check("розкладка на таблиці", /<table/.test(html) && /<tr>/.test(html));
+    check("стилі в атрибутах", /style="/.test(html));
+    check("окремого <style> немає", !/<style/.test(html));
+    check("flexbox і grid не використовуються",
+        !/display:\s*(flex|grid)/.test(html));
+
+    // Outlook додає власні відступи між клітинками, якщо не сказати
+    // інакше атрибутами.
+    check("відступи таблиці задані атрибутами",
+        /cellpadding="0" cellspacing="0"/.test(html));
+
+    // Розміри фото — в атрибутах width/height, а не лише в CSS:
+    // частина клієнтів не застосовує стилі до зображень до їх
+    // завантаження, і лист «стрибає».
+    check("розміри фото в атрибутах", /width="64" height="80"/.test(html));
+
+    // Дані покупця й товару екрануємо: назва може містити лапки або <.
+    check("значення екрануються",
+        /escapeHtml\(item\.title\)/.test(html) && /escapeHtml\(item\.brand\)/.test(html));
+
+    // Кількість — лише коли більше однієї.
+    check("кількість лише при qty > 1", /Number\(item\.qty\) > 1/.test(html));
 }
 
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
