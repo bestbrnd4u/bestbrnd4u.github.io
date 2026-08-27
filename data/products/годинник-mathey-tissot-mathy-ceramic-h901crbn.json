@@ -23,7 +23,7 @@
   "preOrderPrepayment": 100,
   "strapInfo": "Двоколірний браслет із нержавіючої сталі 316L — сріблястий із золотистими елементами. Ширина кріплення — 2 см. Застібка — розкладна із захисним фіксатором",
   "sizes": [
-    "Onesize"
+    "ONESIZE"
   ],
   "splitByColor": true,
   "searchKeywords": [
@@ -50,5 +50,13 @@
   "description": "Стильний чоловічий годинник Mathey-Tissot Mathy Ceramic у класичному поєднанні сріблястого, чорного та золотистого відтінків. Модель має виразний чорний циферблат, чорний односпрямований керамічний безель та елегантний двоколірний сталевий браслет.\nГодинник оснащений швейцарським кварцовим механізмом Ronda 505 із функцією відображення дати. Чорний циферблат доповнений золотистими стрілками та індексами з люмінесцентним покриттям для комфортного зчитування часу в умовах недостатнього освітлення. Корпус має загвинчувану заводну головку, а водонепроникність становить 200 м (20 ATM)",
   "sku": "H901CRBN",
   "rating": 5,
-  "category": "Годинники"
+  "category": "Годинники",
+  "slug": "годинник-mathey-tissot-mathy-ceramic-h901crbn",
+  "id": 79,
+  "color": "Сріблястий / золотистий / чорний",
+  "images": [
+    "/assets/images/products/uploads/matheytissot-mathy-ceramic-quartz-black-dial-mens-watch-h901crbn.webp",
+    "/assets/images/products/uploads/matheytissot-mathy-ceramic-quartz-black-dial-mens-watch-h901crbn_2.webp",
+    "/assets/images/products/uploads/matheytissot-mathy-ceramic-quartz-black-dial-mens-watch-h901crbn_3.webp"
+  ]
 }
