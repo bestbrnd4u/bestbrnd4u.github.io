@@ -125,6 +125,12 @@ function applyFilterChange() {
     // користувач, стоячи на 3-й сторінці, звузив би вибірку до двох
     // товарів і побачив порожнечу замість результату.
     currentPage = 1;
+    // Дописані порції теж скидаємо.
+    //
+    // Інакше після зміни фільтра лишалося б «показано 72 з 5»: людина
+    // натиснула «Показати ще» тричі, потім звузила вибірку — і рахунок
+    // став би брехати.
+    extraPages = 0;
 
     render();
 
@@ -2826,6 +2832,16 @@ function refreshFacets() {
 
 const PER_PAGE = 24;
 
+// Скільки сторінок ДОДАНО кнопкою «Показати ще» до поточної.
+//
+// Нумерація й кнопка вирішують різні задачі, тому працюють разом:
+//   • номер сторінки — «хочу побачити саме цю частину», перехід;
+//   • «Показати ще» — «мало, дай ще», дописування знизу.
+//
+// Тому натискання на номер обнуляє додані сторінки: людина попросила
+// конкретну сторінку, а не її та ще чотири під нею.
+let extraPages = 0;
+
 let currentPage = 1;
 
 const paginationEl = document.getElementById("pagination");
@@ -3060,7 +3076,7 @@ function pageNumbers(total, current) {
 
 }
 
-function renderPagination(count) {
+function renderPagination(count, shownCount) {
 
     if (!paginationEl) return;
 
@@ -3071,6 +3087,27 @@ function renderPagination(count) {
 
     if (total <= 1) { paginationEl.innerHTML = ""; return; }
 
+    // Скільки товарів уже видно і скільки всього.
+    //
+    // Без цього рядка «Показати ще» — кнопка навмання: незрозуміло,
+    // скільки ще залишилось і чи варто тиснути. З ним видно і прогрес,
+    // і масштаб: «24 з 85» відразу каже, що попереду ще три таких
+    // порції.
+    const seen = Math.min(shownCount || 0, count);
+    const hasMore = seen < count;
+
+    const counter = `
+        <div class="pagination-counter">${seen} з ${count} товарів</div>`;
+
+    // Кнопка дописує наступну порцію знизу, не перегортаючи сторінку.
+    //
+    // Нумерація лишається під нею: вона для тих, хто хоче стрибнути
+    // одразу далеко, і для повернення на конкретну сторінку з історії
+    // браузера.
+    const more = hasMore
+        ? `<button type="button" class="pagination-more" data-more="1">Показати ще</button>`
+        : "";
+
     const buttons = pageNumbers(total, currentPage).map(n =>
         n === "…"
             ? `<span class="pagination-gap">…</span>`
@@ -3079,20 +3116,45 @@ function renderPagination(count) {
     ).join("");
 
     paginationEl.innerHTML = `
-        <button type="button" class="pagination-arrow" data-page="${currentPage - 1}"
-                ${currentPage === 1 ? "disabled" : ""} aria-label="Попередня сторінка">‹</button>
-        ${buttons}
-        <button type="button" class="pagination-arrow" data-page="${currentPage + 1}"
-                ${currentPage === total ? "disabled" : ""} aria-label="Наступна сторінка">›</button>
+        ${counter}
+        ${more}
+        <div class="pagination-pages">
+            <button type="button" class="pagination-arrow" data-page="${currentPage - 1}"
+                    ${currentPage === 1 ? "disabled" : ""} aria-label="Попередня сторінка">‹</button>
+            ${buttons}
+            <button type="button" class="pagination-arrow" data-page="${currentPage + 1}"
+                    ${currentPage === total ? "disabled" : ""} aria-label="Наступна сторінка">›</button>
+        </div>
     `;
 
 }
 
 paginationEl?.addEventListener("click", event => {
 
+    // «Показати ще» — дописуємо порцію знизу й лишаємось на місці.
+    //
+    // Прокручувати тут НЕ треба: людина стоїть біля кнопки й дивиться,
+    // що зʼявилось. Стрибок до початку списку відкинув би її від того
+    // місця, куди вона щойно дійшла.
+    const moreBtn = event.target.closest("[data-more]");
+
+    if (moreBtn) {
+
+        extraPages += 1;
+
+        render();
+
+        return;
+
+    }
+
     const btn = event.target.closest("[data-page]");
 
     if (!btn || btn.disabled) return;
+
+    // Номер сторінки — це перехід, а не додавання: людина попросила
+    // конкретну частину, тож дописані порції скидаємо.
+    extraPages = 0;
 
     currentPage = Number(btn.dataset.page);
 
@@ -3121,7 +3183,8 @@ function render() {
 
     const from = (currentPage - 1) * PER_PAGE;
 
-    const shown = list.slice(from, from + PER_PAGE);
+    // (1 + extraPages) сторінок від поточної
+    const shown = list.slice(from, from + PER_PAGE * (1 + extraPages));
 
     grid.innerHTML = shown
         .map(product => createProductCard(product))
@@ -3132,7 +3195,7 @@ function render() {
     // на них рідко.
     window.Analytics?.viewItemList(shown, "Каталог");
 
-    renderPagination(list.length);
+    renderPagination(list.length, from + shown.length);
     syncPageToUrl();
 
     initProductCarousels(grid);

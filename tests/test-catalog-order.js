@@ -466,6 +466,31 @@ console.log("\n[N] Ручний порядок із адмінки");
     // «за зростанням ціни» — номери не мають нічого перебивати.
     check("явне сортування не зачіпається",
         /if \(!currentSort\) \{[\s\S]{0,3000}const pinned/.test(catalogSrc));
+
+    // ГОЛОВНЕ: перенумерація НЕ ЧІПАЄ id.
+    //
+    // На id тримаються посилання, які вже пішли в світ: глибоке
+    // посилання в бота (?start=product_8) у рілсах і шапці профілю,
+    // адреси в кошику й обраному. Якщо id зміниться, посилання
+    // приведе на інший товар — і дізнаємось ми про це від покупця.
+    const builder = read("scripts/build-products.js");
+
+    const renumber = (builder.match(/function renumberSortOrder[\s\S]*?\n\}/) || [""])[0];
+
+    check("перенумерація існує", renumber.length > 0);
+
+    // У функції не має бути жодного запису в id.
+    check("перенумерація не пише id",
+        !/\.id\s*=/.test(renumber) && !/data\.id/.test(renumber),
+        (renumber.match(/[^\n]*\.id[^\n]*/g) || []).slice(0, 2).join(" | "));
+
+    // Вона змінює РІВНО одне поле.
+    const writes = (renumber.match(/(?:product|data)\.[a-zA-Z]+\s*=/g) || [])
+        .map(x => x.replace(/\s*=$/, ""));
+
+    check("змінюється лише sortOrder",
+        writes.every(w => /sortOrder$/.test(w)),
+        writes.join(", "));
 }
 
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);

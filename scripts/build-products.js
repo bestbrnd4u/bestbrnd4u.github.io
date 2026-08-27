@@ -231,14 +231,51 @@ function main() {
         process.exit(1);
     }
 
+    const broken = [];
+
     const parsed = files.map(file => {
 
         const filePath = path.join(PRODUCTS_DIR, file);
-        const data = JSON.parse(fs.readFileSync(filePath, "utf8"));
+        const raw = fs.readFileSync(filePath, "utf8");
+
+        // Порожній або битий файл товару.
+        //
+        // ЧОМУ ОКРЕМА ОБРОБКА. Простий JSON.parse падає з
+        // «Unexpected end of JSON input» і НЕ КАЖЕ, у якому файлі
+        // проблема. Так само поводиться адмінка: показує ту саму
+        // помилку в консолі й порожню форму товару, а який файл винен —
+        // здогадуйся сам.
+        //
+        // Найчастіша причина — файл, що приїхав із зіпа з зіпсованим
+        // імʼям (кирилиця перетворюється в «#U0436…») і нульовим
+        // розміром. Такі копії треба просто видалити.
+        if (!raw.trim()) {
+            broken.push(`${file}: файл порожній`);
+            return null;
+        }
+
+        let data;
+
+        try {
+            data = JSON.parse(raw);
+        } catch (error) {
+            broken.push(`${file}: ${error.message}`);
+            return null;
+        }
 
         return { file, filePath, data };
 
-    });
+    }).filter(Boolean);
+
+    if (broken.length) {
+
+        console.error("\nБиті файли товарів — їх треба видалити або виправити:");
+        broken.forEach(line => console.error("  " + line));
+        console.error("");
+
+        process.exit(1);
+
+    }
 
     let maxId = 0;
 

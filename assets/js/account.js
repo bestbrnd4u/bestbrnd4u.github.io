@@ -490,9 +490,7 @@ function renderOrderCard(order) {
                     ${item.brand ? `<span class="order-item-brand">${item.brand}</span>` : ""}
                     <span class="order-item-title">${item.title}</span>
                     <span class="order-item-meta">${metaParts.join("&nbsp;&nbsp;&nbsp;")}</span>
-                    <button type="button" class="order-item-refuse" data-order="${order.order_number}">
-                        ↩ Відмова
-                    </button>
+                    ${refusalMarkup(order)}
                 </div>
 
             </div>
@@ -640,6 +638,142 @@ function renderOrderCard(order) {
 // своє (див. міграцію 005).
 // -------------------------
 
+// Лист магазину про відмову.
+//
+// Склад листа продиктований тим, що потрібно менеджеру, щоб одразу
+// зателефонувати й не шукати нічого: номер замовлення, ім'я, телефон,
+// пошта, спосіб доставки й ТТН. Без ТТН неясно, чи посилка вже в
+// покупця.
+async function notifyRefusal(order, orderNumber) {
+
+    if (typeof sendViaFormSubmit !== "function") return;
+
+    const window = refusalWindow(order);
+
+    const items = (order.items || [])
+        .map(item => {
+
+            const parts = [item.title];
+
+            if (item.color) parts.push("колір " + item.color);
+            if (item.size) parts.push("розмір " + item.size);
+            if (item.qty > 1) parts.push(item.qty + " шт.");
+
+            return "• " + parts.join(", ");
+
+        })
+        .join("\n");
+
+    await sendViaFormSubmit({
+        _subject: `Відмова від замовлення ${orderNumber}`,
+        _template: "table",
+        "Замовлення": orderNumber,
+        "Дата замовлення": order.created_at
+            ? new Date(order.created_at).toLocaleDateString("uk-UA")
+            : "—",
+        "Клієнт": [order.first_name, order.last_name].filter(Boolean).join(" ") || "—",
+        "Телефон": order.phone || "—",
+        "Пошта": order.email || "—",
+        "Доставка": [order.delivery_method, order.delivery_city, order.delivery_detail]
+            .filter(Boolean).join(", ") || "—",
+        // deliveryStatusLabel(), а не колонка напряму: вона порожня, і
+        // менеджер отримав би прочерк саме там, де важливо розуміти —
+        // посилка вже в покупця чи ще їде.
+        "Статус доставки": deliveryStatusLabel(order),
+        // tracking_number, а не ttn: старе поле лишилось у базі, але
+        // не заповнюється — і в листі ТТН був би порожнім саме тоді,
+        // коли він потрібен найбільше.
+        "ТТН": order.tracking_number || "—",
+        "Сума": order.total ? order.total + " грн" : "—",
+        "Товари": items || "—",
+        // Скільки днів минуло — щоб менеджер бачив, чи заявка в строку.
+        "Днів після доставки": window.started ? String(window.daysPassed) : "ще не доставлено"
+    });
+
+}
+
+// Скільки днів на відмову лишилось.
+//
+// ЗВІДКИ 14 ДНІВ
+// ---------------
+// Закон України про захист прав споживачів: товар належної якості
+// можна повернути протягом 14 днів. Строк рахується від ОТРИМАННЯ, а
+// не від оформлення — тому за точку відліку беремо дату доставки, і
+// лише якщо її немає, дату замовлення.
+//
+// Це не педантизм: замовлення могло чекати у відділенні тиждень, і
+// рахунок від оформлення забрав би в покупця половину строку.
+const REFUSAL_DAYS = 14;
+
+function refusalWindow(order) {
+
+    // Доставлено — рахуємо від доставки. Поки не доставлено, строк ще
+    // не почався, і відмовитись можна будь-коли.
+    //
+    // Ознаку беремо з deliveryStatusLabel(), а не з order.delivery_status
+    // напряму. Причина: цю колонку ніхто не заповнює — статус
+    // виводиться з order.status. Перевірка «доставлено» по порожній
+    // колонці ніколи не спрацювала б, і строк відмови не закінчувався
+    // б НІКОЛИ. Та сама функція, що показує статус клієнту, — щоб
+    // видиме й обчислене не розходились.
+
+    const delivered = /доставлен/i.test(deliveryStatusLabel(order));
+
+    if (!delivered) return { allowed: true, started: false };
+
+    const from = order.delivered_at || order.created_at;
+
+    if (!from) return { allowed: true, started: false };
+
+    const days = Math.floor((Date.now() - new Date(from).getTime()) / 86400000);
+
+    return {
+        allowed: days < REFUSAL_DAYS,
+        started: true,
+        daysLeft: Math.max(0, REFUSAL_DAYS - days),
+        daysPassed: days
+    };
+
+}
+
+// Підпис під товаром: кнопка, залишок днів або «строк минув».
+function refusalMarkup(order) {
+
+    // Заявку вже надіслано — кнопка ні до чого.
+    if (order.refusal_requested_at) {
+
+        return `<span class="order-item-refuse-done">✓ Відмову надіслано</span>`;
+
+    }
+
+    const window = refusalWindow(order);
+
+    if (!window.allowed) {
+
+        // Кажемо ПРЯМО, що строк минув, а не просто ховаємо кнопку.
+        //
+        // Схована кнопка виглядає як поломка сайту: покупець пам'ятає,
+        // що вона була, і починає шукати, куди зникла. Пояснення знімає
+        // питання й заодно нагадує правило.
+        return `<span class="order-item-refuse-expired"
+                      title="Строк відмови рахується від дати доставки">
+                    Строк відмови (${REFUSAL_DAYS} днів) минув
+                </span>`;
+
+    }
+
+    // Останні дні показуємо окремо: людина може не пам'ятати, коли
+    // отримала посилку.
+    const hint = window.started && window.daysLeft <= 5
+        ? ` <span class="order-item-refuse-left">лишилось ${window.daysLeft} дн.</span>`
+        : "";
+
+    return `<button type="button" class="order-item-refuse" data-order="${order.order_number}">
+                ↩ Відмова
+            </button>${hint}`;
+
+}
+
 async function requestRefusal(button) {
 
     const orderNumber = button.dataset.order;
@@ -687,11 +821,34 @@ async function requestRefusal(button) {
             .from("order_refusals")
             .insert({ order_id: order.id, user_id: user.id });
 
+        // Лист магазину — НЕЗАЛЕЖНО від того, чи спрацював тригер у базі.
+        //
+        // ЧОМУ ТАК
+        // ---------
+        // Сповіщення в Telegram надсилає тригер у Supabase. Якщо він не
+        // розгорнутий, зламався або впав ліміт — заявка тихо лягає в
+        // таблицю, і магазин про неї не дізнається. Покупець при цьому
+        // бачить «менеджер зв'яжеться» і чекає.
+        //
+        // Лист іде тим самим шляхом, що й замовлення (FormSubmit), і не
+        // залежить від бази взагалі. Два незалежні канали замість
+        // одного — бо ціна пропущеної відмови це не помилка в логах, а
+        // людина, якій ніхто не відповів.
+        //
+        // Надсилаємо ДО перевірки помилки: навіть якщо запис у базу не
+        // вдався, магазин мусить дізнатись про відмову.
+        notifyRefusal(order, orderNumber).catch(() => {});
+
         if (error) {
 
             console.error("Заявка на відмову:", error);
 
-            showToast("Не вдалося надіслати запит. Зателефонуйте нам, будь ласка");
+            // Запис не вдався, але лист пішов — кажемо правду: заявку
+            // прийнято, хоча в акаунті вона не відобразиться.
+            showToast("Запит надіслано менеджеру. Він зв'яжеться з вами найближчим часом");
+
+            button.textContent = "✓ Відмову надіслано";
+            button.disabled = true;
 
             return;
 

@@ -176,5 +176,48 @@ console.log("\n[6] Посилання на акцію будуються з ко
     check("app.js: усі посилання кодують slug", !rawUse.test(appJs));
 }
 
+console.log("\n[N] Битий файл товару називає себе");
+{
+    // СИМПТОМ
+    // --------
+    // В адмінці «SyntaxError: Unexpected end of JSON input» і порожня
+    // форма товару. Яким саме файлом вона викликана — не сказано ні
+    // словом, і адреса в рядку браузера теж зіпсована.
+    //
+    // ПРИЧИНА, ЯКА ТРАПЛЯЄТЬСЯ РЕАЛЬНО
+    // ---------------------------------
+    // Файл приїхав із зіпа зі зіпсованим імʼям (кирилиця стає
+    // «#U0436…») і нульовим розміром. JSON.parse на ньому падає.
+    //
+    // Збірка раніше падала так само безмовно. Тепер вона перебирає ВСІ
+    // файли, збирає список битих і виводить його — щоб не шукати
+    // винного вручну по шістдесяти семи товарах.
+    const builder = fs.readFileSync(
+        path.join(ROOT, "scripts/build-products.js"), "utf8");
+
+    check("порожній файл ловиться окремо", /!raw\.trim\(\)/.test(builder));
+    check("розбір у try", /try \{[\s\S]{0,120}JSON\.parse\(raw\)/.test(builder));
+    check("імʼя файлу в повідомленні",
+        /broken\.push\(`\$\{file\}/.test(builder));
+    check("збірка не продовжує з битими даними",
+        /if \(broken\.length\) \{[\s\S]{0,400}process\.exit\(1\)/.test(builder));
+
+    // І перевіряємо стан ЗАРАЗ: жодного порожнього чи зіпсованого файлу.
+    const dir = path.join(ROOT, "data/products");
+
+    const files = fs.readdirSync(dir).filter(f => f.endsWith(".json"));
+
+    const empty = files.filter(f =>
+        !fs.readFileSync(path.join(dir, f), "utf8").trim());
+
+    check("порожніх файлів товарів немає", empty.length === 0, empty.join(", "));
+
+    // Зіпсовані імена — той самий слід зіпа.
+    const mangled = files.filter(f => f.includes("#U"));
+
+    check("імен зі «#U» немає", mangled.length === 0,
+        mangled.slice(0, 3).join(", "));
+}
+
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
 process.exit(failures === 0 ? 0 : 1);
