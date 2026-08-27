@@ -1,0 +1,61 @@
+{
+  "gender": [
+    "Жінкам"
+  ],
+  "preOrderDays": "5–10 робочих днів",
+  "forcePublish": false,
+  "material": "Пластикова оправа, полімерні лінзи",
+  "brand": "Marc Jacobs",
+  "price": 5000,
+  "preOrder": false,
+  "dimensions": "Ширина лінзи × місток × довжина завушника: 53 × 21 × 140 мм",
+  "variants": [
+    {
+      "color": "Коричневий / черепаховий (WR953HA)",
+      "hex": "#704c22",
+      "images": [
+        "/assets/images/products/uploads/3421a7ab3bf6a820540093959ae69699.webp",
+        "/assets/images/products/uploads/ach3atrpdjdyd181s4gcstgpa4qzgzrh.webp",
+        "/assets/images/products/uploads/9dzhcfvjorauhd1nzfwyq9o69vh3iff1.webp",
+        "/assets/images/products/uploads/u87036v1ioy7rp72btz5kw3oti8m25rs.webp"
+      ]
+    }
+  ],
+  "preOrderPrepayment": 50,
+  "sizes": [
+    "53"
+  ],
+  "splitByColor": true,
+  "searchKeywords": [
+    "Marc Jacobs",
+    "Marc Jacobs MJ 1011/S",
+    "MJ 1011/S WR953HA",
+    "окуляри Marc Jacobs",
+    "сонцезахисні окуляри Marc Jacobs",
+    "жіночі сонцезахисні окуляри",
+    "жіночі окуляри",
+    "круглі окуляри",
+    "окуляри з круглою оправою",
+    "брендові окуляри",
+    "оригінальні Marc Jacobs",
+    "окуляри від сонця",
+    "модні сонцезахисні окуляри"
+  ],
+  "isNew": false,
+  "title": "Сонцезахисні окуляри Marc Jacobs 1011/S WR953HA",
+  "reviews": 0,
+  "instagramBlock": "general",
+  "description": "Стильні жіночі сонцезахисні окуляри Marc Jacobs MJ 1011/S із круглою оправою — елегантна модель, що додає образу виразності та сучасного акценту.\nОкуляри мають легку пластикову оправу та полікарбонатні лінзи. Класична форма легко поєднується як із повсякденними, так і з більш елегантними образами. Фірмовий дизайн Marc Jacobs робить модель універсальним аксесуаром для сонячних днів",
+  "sku": "MJ 1011/S WR953HA",
+  "rating": 5,
+  "category": "Окуляри і оправи",
+  "slug": "сонцезахисні-окуляри-marc-jacobs-1011-s-wr953ha",
+  "id": 71,
+  "color": "Коричневий / черепаховий (WR953HA)",
+  "images": [
+    "/assets/images/products/uploads/3421a7ab3bf6a820540093959ae69699.webp",
+    "/assets/images/products/uploads/ach3atrpdjdyd181s4gcstgpa4qzgzrh.webp",
+    "/assets/images/products/uploads/9dzhcfvjorauhd1nzfwyq9o69vh3iff1.webp",
+    "/assets/images/products/uploads/u87036v1ioy7rp72btz5kw3oti8m25rs.webp"
+  ]
+}

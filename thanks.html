@@ -2,7 +2,8 @@
 <html lang="uk">
 
 <head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"287afbe3","data/categories.json":"c3f4c8fa","data/collections.json":"d86aab5b","data/home.json":"fe5da8cb","data/image-fingerprints.json":"0b0d4b65","data/image-variants.json":"4f23f4d2","data/products.json":"9e0f42d9","data/promo-popups.json":"0940ece5","data/promotions.json":"65f883a6","data/search-banners.json":"82a85e36","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
+    <meta name="robots" content="noindex,nofollow">
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"287afbe3","data/categories.json":"c3f4c8fa","data/collections.json":"d86aab5b","data/home.json":"fe5da8cb","data/image-fingerprints.json":"0b0d4b65","data/image-variants.json":"8bb9d87a","data/products.json":"fd1ba0b1","data/promo-popups.json":"0940ece5","data/promotions.json":"65f883a6","data/search-banners.json":"82a85e36","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
     <meta charset="UTF-8">
     <meta name="author" content="BestBrnd4u">
     <meta name="copyright" content="© 2026 BestBrnd4u. Усі права захищено.">
@@ -18,7 +19,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="assets/images/favicon-192.png">
     <title>Замовлення прийнято | BestBrnd4u</title>
 
-    <link rel="stylesheet" href="assets/css/style.css?v=3ce35e26">
+    <link rel="stylesheet" href="assets/css/style.css?v=b2c5f20e">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -265,7 +266,7 @@
 <script src="assets/js/consent.js?v=159b1cfe"></script>
 <!-- Статистика відвідувань. Не завантажує Google без згоди. -->
 <script src="assets/js/analytics.js?v=d1829aaf"></script>
-<script src="assets/js/common.js?v=a9d5c5ba"></script>
+<script src="assets/js/common.js?v=4f28146d"></script>
 <script src="assets/js/sync.js?v=48ef002e"></script>
 <script src="assets/js/mega-menu.js?v=18cfdf18"></script>
 
@@ -303,14 +304,34 @@
                             item.qty > 1 ? `${item.qty} шт.` : ""
                         ].filter(Boolean).join(" · ");
 
+                        // Фото, назва й бренд — посилання, як і в
+                        // історії замовлень у кабінеті.
+                        //
+                        // ЧОМУ. Це останній екран замовлення, і саме
+                        // тут найчастіше хочеться передивитись товар:
+                        // перевірити колір, дочитати опис, показати
+                        // комусь. Раніше клац по фото й назві не робив
+                        // нічого — виглядало як зламане посилання.
+                        //
+                        // Ведемо на /product?id=… — сторінка товару сама
+                        // перекине на канонічну адресу, а якщо товару
+                        // вже немає, скаже про це прямо.
+                        const productHref = item.id
+                            ? `/product?id=${encodeURIComponent(item.id)}`
+                            : (item.title ? `/product?title=${encodeURIComponent(item.title)}` : "/catalog");
+
+                        const brandHref = `/catalog?brand=${encodeURIComponent(item.brand || "")}`;
+
                         return `
                             <div class="order-confirm-item">
-                                <img src="${item.image || "assets/images/no-image.png"}"
-                                     alt=""
-                                     onerror="this.onerror=null;this.src='assets/images/no-image.png'">
+                                <a class="order-confirm-item-image" href="${productHref}">
+                                    <img src="${item.image || "assets/images/no-image.png"}"
+                                         alt=""
+                                         onerror="this.onerror=null;this.src='assets/images/no-image.png'">
+                                </a>
                                 <div class="order-confirm-item-info">
-                                    ${item.brand ? `<span class="order-confirm-item-brand">${item.brand}</span>` : ""}
-                                    <span class="order-confirm-item-title">${item.title}</span>
+                                    ${item.brand ? `<a class="order-confirm-item-brand" href="${brandHref}">${item.brand}</a>` : ""}
+                                    <a class="order-confirm-item-title" href="${productHref}">${item.title}</a>
                                     ${meta ? `<span class="order-confirm-item-meta">${meta}</span>` : ""}
                                 </div>
                                 <span class="order-confirm-item-sum">${item.sum.toLocaleString("uk-UA")} грн</span>

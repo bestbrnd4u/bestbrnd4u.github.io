@@ -501,7 +501,7 @@
         "sku": "coach73995chalk"
       },
       {
-        "color": "Коричневий",
+        "color": "Сіро-коричневий",
         "hex": "#8c6f63",
         "images": [
           "assets/images/products/uploads/coach73995-dark-stone-1.webp?v=0a85c450",
@@ -512,7 +512,7 @@
       },
       {
         "hex": "#433636",
-        "color": "Brass Tan Black",
+        "color": "Коричнево-чорний",
         "images": [
           "/assets/images/products/uploads/91215-b4ooh_7d995c2e069841c5ad45599ee803592d.webp?v=de06ce9b",
           "/assets/images/products/uploads/91215-b4ooh-1_b3aea35bcebe4922a51b66ad7b2bb0a1_master.webp?v=5c61315b",
@@ -521,7 +521,7 @@
         "sku": "coachB4OOH"
       },
       {
-        "color": "Brown — коричневий",
+        "color": "Коричневий",
         "hex": "#b66813",
         "images": [
           "/assets/images/products/uploads/4.1_cd948ddf-55be-4b35-9a4c-3437a5ac5842.webp?v=5f99ad7a",
@@ -532,7 +532,7 @@
         "sku": "coach73995brown"
       },
       {
-        "color": "Light Antique Nickel/Taupe — світлий тауп / сіро-бежевий",
+        "color": "Тауп",
         "hex": "#c5aea1",
         "sku": "Coach73995LHTP",
         "images": [
@@ -1126,12 +1126,34 @@
     "color": "Темно-сірий"
   },
   {
-    "title": "Сумка крос-боді жіноча шкіряна Marc Jacobs The Snapshot",
+    "gender": [
+      "Жінкам"
+    ],
+    "oldPrice": 14300,
+    "color": "Бежевий",
+    "badge": "SALE",
+    "material": "Шкіра",
     "brand": "Marc Jacobs",
-    "category": "Жіночі сумки",
-    "gender": "Жінкам",
     "price": 10000,
-    "description": "Крос-боді Marc Jacobs зі шкіри — акуратний прямокутний корпус і подвійна монограма J. Ремінець регулюється, тож сумку можна носити через плече або навскіс. Два кольори на вибір.",
+    "framing": {
+      "2s3hcr500h03-134-1.webp": {
+        "zoom": 2.34,
+        "x": 50,
+        "y": 50
+      },
+      "2s3hcr500h03-134-2.webp": {
+        "zoom": 2.19,
+        "x": 50,
+        "y": 50
+      },
+      "h153l01sp22-002-3.webp": {
+        "zoom": 1.77,
+        "x": 50,
+        "y": 50
+      }
+    },
+    "preOrder": false,
+    "slug": "marc-jacobs-sumka-kros-bodi-zhinocha-shkiriana-marc-jacobs-t",
     "variants": [
       {
         "color": "Бежевий",
@@ -1154,11 +1176,10 @@
         "sku": "H153L01SP22-002"
       }
     ],
-    "oldPrice": 14300,
-    "badge": "SALE",
-    "isNew": false,
-    "material": "Шкіра",
-    "sku": "2S3HCR500H03_134",
+    "sortOrder": 1,
+    "sizes": [
+      "ONESIZE"
+    ],
     "searchKeywords": [
       "марк джейкобс",
       "marc jacobs",
@@ -1174,87 +1195,28 @@
       "the",
       "snapshot"
     ],
-    "instagramBlock": "general",
-    "preOrder": false,
+    "isNew": false,
+    "title": "Сумка крос-боді жіноча шкіряна Marc Jacobs The Snapshot",
     "images": [
       "assets/images/products/uploads/2s3hcr500h03-134-1.webp",
       "assets/images/products/uploads/2s3hcr500h03-134-2.webp",
       "assets/images/products/uploads/2s3hcr500h03-134-3.webp"
     ],
-    "slug": "marc-jacobs-sumka-kros-bodi-zhinocha-shkiriana-marc-jacobs-t",
     "id": 20,
-    "color": "Бежевий",
-    "sizes": [
-      "ONESIZE"
-    ],
-    "framing": {
-      "2s3hcr500h03-134-1.webp": {
-        "zoom": 2.34,
-        "x": 50,
-        "y": 50
-      },
-      "2s3hcr500h03-134-2.webp": {
-        "zoom": 2.19,
-        "x": 50,
-        "y": 50
-      },
-      "h153l01sp22-002-3.webp": {
-        "zoom": 1.77,
-        "x": 50,
-        "y": 50
-      }
-    }
+    "instagramBlock": "general",
+    "description": "Крос-боді Marc Jacobs зі шкіри — акуратний прямокутний корпус і подвійна монограма J. Ремінець регулюється, тож сумку можна носити через плече або навскіс. Два кольори на вибір.",
+    "sku": "2S3HCR500H03_134",
+    "category": "Жіночі сумки"
   },
   {
-    "title": "Сумочка The Teddy J Marc Mini Bag Brown",
-    "brand": "Marc Jacobs",
-    "category": "Жіночі сумки",
-    "gender": "Жінкам",
-    "price": 9000,
-    "description": "Компактна сумочка Marc Jacobs із колекції The Teddy — м'який ворсистий верх і фірмова монограма J на клапані. Носиться на ланцюжку через плече або в руці. Модель на щодень, коли потрібно взяти лише необхідне.",
-    "variants": [
-      {
-        "color": "Коричневий",
-        "hex": "#996f4f",
-        "images": [
-          "assets/images/products/uploads/2f3hsh042h02-230-1.webp?v=d0240bf3",
-          "assets/images/products/uploads/2f3hsh042h02-230-2.webp?v=503a3353",
-          "assets/images/products/uploads/2f3hsh042h02-230-3.webp?v=6b7b7e54"
-        ],
-        "sku": "2F3HSH042H02-230"
-      }
+    "gender": [
+      "Жінкам"
     ],
     "oldPrice": 12900,
-    "badge": "SALE",
-    "isNew": false,
-    "sku": "2F3HSH042H02-230",
-    "searchKeywords": [
-      "марк джейкобс",
-      "marc jacobs",
-      "mj",
-      "сумка жіноча",
-      "кросбоді",
-      "сумка через плече",
-      "клатч",
-      "коричневий",
-      "the",
-      "teddy",
-      "marc",
-      "mini"
-    ],
-    "instagramBlock": "general",
-    "preOrder": false,
-    "images": [
-      "assets/images/products/uploads/2f3hsh042h02-230-1.webp",
-      "assets/images/products/uploads/2f3hsh042h02-230-2.webp",
-      "assets/images/products/uploads/2f3hsh042h02-230-3.webp"
-    ],
-    "slug": "marc-jacobs-sumochka-the-teddy-j-marc-mini-bag-brown",
-    "id": 21,
     "color": "Коричневий",
-    "sizes": [
-      "ONESIZE"
-    ],
+    "badge": "SALE",
+    "brand": "Marc Jacobs",
+    "price": 9000,
     "framing": {
       "2f3hsh042h02-230-1.webp": {
         "zoom": 1.68,
@@ -1271,7 +1233,51 @@
         "x": 50,
         "y": 50
       }
-    }
+    },
+    "preOrder": false,
+    "slug": "marc-jacobs-sumochka-the-teddy-j-marc-mini-bag-brown",
+    "variants": [
+      {
+        "color": "Коричневий",
+        "hex": "#996f4f",
+        "images": [
+          "assets/images/products/uploads/2f3hsh042h02-230-1.webp?v=d0240bf3",
+          "assets/images/products/uploads/2f3hsh042h02-230-2.webp?v=503a3353",
+          "assets/images/products/uploads/2f3hsh042h02-230-3.webp?v=6b7b7e54"
+        ],
+        "sku": "2F3HSH042H02-230"
+      }
+    ],
+    "sortOrder": 2,
+    "sizes": [
+      "ONESIZE"
+    ],
+    "searchKeywords": [
+      "марк джейкобс",
+      "marc jacobs",
+      "mj",
+      "сумка жіноча",
+      "кросбоді",
+      "сумка через плече",
+      "клатч",
+      "коричневий",
+      "the",
+      "teddy",
+      "marc",
+      "mini"
+    ],
+    "isNew": false,
+    "title": "Сумочка The Teddy J Marc Mini Bag Brown",
+    "images": [
+      "assets/images/products/uploads/2f3hsh042h02-230-1.webp",
+      "assets/images/products/uploads/2f3hsh042h02-230-2.webp",
+      "assets/images/products/uploads/2f3hsh042h02-230-3.webp"
+    ],
+    "id": 21,
+    "instagramBlock": "general",
+    "description": "Компактна сумочка Marc Jacobs із колекції The Teddy — м'який ворсистий верх і фірмова монограма J на клапані. Носиться на ланцюжку через плече або в руці. Модель на щодень, коли потрібно взяти лише необхідне.",
+    "sku": "2F3HSH042H02-230",
+    "category": "Жіночі сумки"
   },
   {
     "title": "Жіноча шкіряна сумочка крос-боді Marc Jacobs the leather bucket bag",
@@ -1624,7 +1630,7 @@
       "Жінкам"
     ],
     "preOrderDays": "5–10 робочих днів",
-    "color": "Black",
+    "color": "Чорний",
     "forcePublish": true,
     "brand": "Michael Kors",
     "price": 8000,
@@ -1633,7 +1639,7 @@
     "dimensions": " 18 см × 13 см × 7,5 см",
     "variants": [
       {
-        "color": "Black",
+        "color": "Чорний",
         "hex": "#0a0000",
         "sku": "35F1GX0C5U",
         "images": [
@@ -1643,7 +1649,7 @@
         ]
       },
       {
-        "color": "Pearl Grey",
+        "color": "Світло-сірий",
         "hex": "#c1bfbf",
         "sku": "35F0SX0C5T",
         "images": [
@@ -1657,12 +1663,12 @@
           "/assets/images/products/uploads/d14f4ff9-1527-4de8-9c0e-b5bc28f0ce69.jpg?v=760197b0"
         ],
         "video": "",
-        "color": "Racing Green",
+        "color": "Зелений",
         "hex": "#0e9409",
         "sku": "35F0GX0C5T"
       },
       {
-        "color": "Navy",
+        "color": "Темно-синій",
         "sku": "35F1GX0C5U",
         "hex": "#0e5fbc",
         "images": [
@@ -1724,7 +1730,7 @@
     ],
     "preOrderDays": "5–10 робочих днів",
     "oldPrice": 11450,
-    "color": "Blush Beige",
+    "color": "Бежево-рожевий",
     "badge": "HOT",
     "forcePublish": true,
     "material": "100% натуральна теляча шкіра ",
@@ -1735,7 +1741,7 @@
     "dimensions": "23 × 15 × 7 см",
     "variants": [
       {
-        "color": "Blush Beige",
+        "color": "Бежево-рожевий",
         "hex": "#f0ca4d",
         "sku": "JC4118PP1FLT0",
         "images": [
@@ -1778,7 +1784,7 @@
     "dimensions": "25 × 15 × 7 см",
     "variants": [
       {
-        "color": "Nero",
+        "color": "Чорний",
         "hex": "#272626",
         "sku": "JC4116PP1FLT0000",
         "images": [
@@ -1822,7 +1828,7 @@
     "category": "Жіночі сумки",
     "slug": "сумочка-love-moschino-logo-plaque-quilted-shoulder-bag",
     "id": 30,
-    "color": "Nero",
+    "color": "Чорний",
     "images": [
       "/assets/images/products/uploads/800070279777-1.jpg",
       "/assets/images/products/uploads/800070279777-3.jpg",
@@ -1843,7 +1849,7 @@
     "dimensions": "28,5 × 12 × 21 см",
     "variants": [
       {
-        "color": "Powder Blush",
+        "color": "Пудрово-рожевий",
         "hex": "#f0c0e6",
         "sku": "35F2GCCS2L",
         "images": [
@@ -1897,7 +1903,7 @@
     "category": "Жіночі сумки",
     "slug": "сумочка-з-натуральної-шкіри-michael-kors-carine-medium-pebbled-leather-satchel-powder-blush",
     "id": 31,
-    "color": "Powder Blush",
+    "color": "Пудрово-рожевий",
     "images": [
       "/assets/images/products/uploads/gambar-depan-michael-kors-carine-medium--de0afdc3.webp",
       "/assets/images/products/uploads/gambar-belakang-michael-kors-carine-medi-5af6b1f4.webp",
@@ -1917,7 +1923,7 @@
     "dimensions": "51",
     "variants": [
       {
-        "color": "Nero",
+        "color": "Чорний",
         "hex": "#0d0000",
         "sku": "NENA/S 807 51",
         "images": [
@@ -1959,7 +1965,7 @@
     "category": "Окуляри і оправи",
     "slug": "сонцезахисні-окуляри-jimmy-choo-nena-s-807-51",
     "id": 32,
-    "color": "Nero",
+    "color": "Чорний",
     "images": [
       "/assets/images/products/uploads/jimmy-choo-sunglasses-nena-s-807-afw1500fh937.5.webp",
       "/assets/images/products/uploads/41my3jtmifl.webp",
@@ -1971,7 +1977,7 @@
       "Жінкам"
     ],
     "preOrderDays": "5–10 робочих днів",
-    "color": "Nero",
+    "color": "Чорний",
     "forcePublish": true,
     "brand": "Marc Jacobs",
     "price": 6500,
@@ -1979,7 +1985,7 @@
     "slug": "стильні-жіночі-сонцезахисні-окуляри-marc-jacobs-mj-1010-s",
     "variants": [
       {
-        "color": "Nero",
+        "color": "Чорний",
         "hex": "#000000",
         "images": [
           "/assets/images/products/uploads/marc-jacobs-grey-shaded-cat-eye-ladies-s-bcd8d8a1.webp?v=650eab9d",
@@ -2030,7 +2036,7 @@
       "Жінкам"
     ],
     "preOrderDays": "5–10 робочих днів",
-    "color": "White",
+    "color": "Білий",
     "forcePublish": false,
     "brand": "Lacoste",
     "price": 5900,
@@ -2038,7 +2044,7 @@
     "slug": "кросівки-lacoste-l003",
     "variants": [
       {
-        "color": "White",
+        "color": "Білий",
         "hex": "#f6f6f4",
         "images": [
           "/assets/images/products/uploads/61nzkwkzmsl._sx700_-1-.webp?v=9bc0dae8",
@@ -2095,7 +2101,7 @@
     "preOrder": false,
     "variants": [
       {
-        "color": "White",
+        "color": "Білий",
         "hex": "#eff1ea",
         "images": [
           "/assets/images/products/uploads/124849469.webp?v=14033d6d",
@@ -2140,7 +2146,7 @@
     "category": "Кросівки",
     "slug": "кросівки-adidas-by-stella-mccartney-solarglide",
     "id": 35,
-    "color": "White",
+    "color": "Білий",
     "images": [
       "/assets/images/products/uploads/124849469.webp",
       "/assets/images/products/uploads/124849470.webp",
@@ -2153,7 +2159,7 @@
       "Жінкам"
     ],
     "preOrderDays": "5–10 робочих днів",
-    "color": "Барвистий",
+    "color": "Мультиколір",
     "forcePublish": false,
     "brand": "Lacoste",
     "price": 6200,
@@ -2162,7 +2168,7 @@
     "variants": [
       {
         "hex": "#f8faf6",
-        "color": "Барвистий",
+        "color": "Мультиколір",
         "images": [
           "/assets/images/products/uploads/e5de78de-29a2-40ba-8edd-a70c4e1ea31b_size2000x2000_cropcenter.webp?v=214fd1a4",
           "/assets/images/products/uploads/f7e4b799-732f-44f2-975b-40cd657042ed_size2000x2000_cropcenter.webp?v=64d49660",
@@ -2357,7 +2363,7 @@
     "preOrder": false,
     "variants": [
       {
-        "color": "Neo",
+        "color": "Чорний",
         "hex": "#161616",
         "sizes": [],
         "images": [
@@ -2393,7 +2399,7 @@
     "category": "Кросівки",
     "slug": "lacoste-l003-neo-sneakers",
     "id": 39,
-    "color": "Neo",
+    "color": "Чорний",
     "images": [
       "/assets/images/products/uploads/45sfa0001_075_02-1-.webp",
       "/assets/images/products/uploads/45sfa0001_075_01.webp",
@@ -2405,7 +2411,7 @@
       "Чоловікам"
     ],
     "preOrderDays": "5–10 робочих днів",
-    "color": "Marine daphne 793",
+    "color": "Темно-синій",
     "forcePublish": false,
     "brand": "Lacoste",
     "price": 4000,
@@ -2416,7 +2422,7 @@
     "variants": [
       {
         "hex": "#031578",
-        "color": "Marine daphne 793",
+        "color": "Темно-синій",
         "images": [
           "/assets/images/products/uploads/nh4040nz_793_24.webp?v=7d5db841",
           "/assets/images/products/uploads/nh4040nz_793_31.webp?v=c690ab21"
@@ -2478,7 +2484,7 @@
     "preOrder": false,
     "variants": [
       {
-        "color": "Білий Wht-Dk Grn 286",
+        "color": "Білий із зеленим",
         "hex": "#ffffff",
         "images": [
           "/assets/images/products/uploads/sneakers-lacoste-elite-active-746sma0008-wht-dk-grn-286-0000303494858.webp?v=abc7198e",
@@ -2516,7 +2522,7 @@
     "category": "Кросівки",
     "slug": "жіночі-кросівки-lacoste-womens-elite-active-sneakers",
     "id": 41,
-    "color": "Білий Wht-Dk Grn 286",
+    "color": "Білий із зеленим",
     "images": [
       "/assets/images/products/uploads/sneakers-lacoste-elite-active-746sma0008-wht-dk-grn-286-0000303494858.webp",
       "/assets/images/products/uploads/sneakers-lacoste-elite-active-746sma0008-46ba82b5.webp",
@@ -2592,7 +2598,7 @@
     "preOrder": false,
     "variants": [
       {
-        "color": "Білий White 21G",
+        "color": "Білий",
         "hex": "#ffffff",
         "images": [
           "/assets/images/products/uploads/f24af44f-75d6-44a6-95a6-4f3655e50909_size2000x2000_cropcenter.webp?v=ebd132f3",
@@ -2630,7 +2636,7 @@
     "category": "Кросівки",
     "slug": "жіночі-білі-кросівки-lacoste-lineshot-746sma0110-21g",
     "id": 43,
-    "color": "Білий White 21G",
+    "color": "Білий",
     "images": [
       "/assets/images/products/uploads/f24af44f-75d6-44a6-95a6-4f3655e50909_size2000x2000_cropcenter.webp",
       "/assets/images/products/uploads/802ff4ae-b7b9-48c7-bcde-7862f3e83810_size2000x2000_cropcenter.webp",
@@ -2656,7 +2662,7 @@
     "preOrder": false,
     "variants": [
       {
-        "color": "Бежевий  1R5",
+        "color": "Бежевий",
         "hex": "#e5e4e4",
         "images": [
           "/assets/images/products/uploads/bc4302e5-037f-4a05-b3b7-d6f959c4c00c_size2000x2000_cropcenter.webp?v=ef5b6dd4",
@@ -2694,7 +2700,7 @@
     "category": "Кросівки",
     "slug": "жіночі-бежеві-кросівки-з-чорними-деталями-lacoste-lineshot-746sfa0075-1r5",
     "id": 44,
-    "color": "Бежевий  1R5",
+    "color": "Бежевий",
     "images": [
       "/assets/images/products/uploads/bc4302e5-037f-4a05-b3b7-d6f959c4c00c_size2000x2000_cropcenter.webp",
       "/assets/images/products/uploads/894a2223-e123-468a-9c5e-6949a9f72643_size2000x2000_cropcenter.webp",
@@ -2876,7 +2882,7 @@
     "dimensions": "25 × 16 × 5 см",
     "variants": [
       {
-        "color": "Bronze Green",
+        "color": "Темно-зелений",
         "hex": "#285d06",
         "images": [
           "/assets/images/products/uploads/the-j-marc-shoulder-bag-bronze-green-h956l01pf22-365-800x800.webp?v=d84aca80",
@@ -2923,7 +2929,7 @@
     "category": "Жіночі сумки",
     "slug": "жіноча-сумочка-marc-jacobs-the-j-marc-shoulder-bag",
     "id": 47,
-    "color": "Bronze Green",
+    "color": "Темно-зелений",
     "images": [
       "/assets/images/products/uploads/the-j-marc-shoulder-bag-bronze-green-h956l01pf22-365-800x800.webp",
       "/assets/images/products/uploads/the-j-marc-shoulder-bag-bronze-green-additional-image-5192-800x800.webp",
@@ -2944,7 +2950,7 @@
     "dimensions": "22 × 16 × 7 см",
     "variants": [
       {
-        "color": "Gold Chalk Glacier White Multi",
+        "color": "Білий комбінований",
         "hex": "#ddd8d1",
         "images": [
           "/assets/images/products/uploads/ca148_imrfi_a0.webp?v=e0ef2093",
@@ -2993,7 +2999,7 @@
     "category": "Жіночі сумки",
     "slug": "сумка-coach-klare-crossbody-bag-in-blocked-signature-canvas",
     "id": 48,
-    "color": "Gold Chalk Glacier White Multi",
+    "color": "Білий комбінований",
     "images": [
       "/assets/images/products/uploads/ca148_imrfi_a0.webp",
       "/assets/images/products/uploads/ca148_imrfi_a3.webp",
@@ -3015,7 +3021,7 @@
     "dimensions": "26 × 21 × 13 см",
     "variants": [
       {
-        "color": "Aspen Green зелений",
+        "color": "Зелений",
         "hex": "#1c7e05",
         "images": [
           "/assets/images/products/uploads/aspen-green-cement-m.webp?v=f80ccdb0",
@@ -3064,7 +3070,7 @@
     "category": "Жіночі сумки",
     "slug": "шопер-marc-jacobs-the-leather-small-tote-bag-aspen-green-cement",
     "id": 49,
-    "color": "Aspen Green зелений",
+    "color": "Зелений",
     "images": [
       "/assets/images/products/uploads/aspen-green-cement-m.webp",
       "/assets/images/products/uploads/aspen-green-cement4.webp",
@@ -3085,7 +3091,7 @@
     "dimensions": "20 × 12 × 4 см",
     "variants": [
       {
-        "color": "Pink",
+        "color": "Рожевий",
         "hex": "#ff07db",
         "images": [
           "/assets/images/products/uploads/27687307_57865310_2048.webp?v=ad162858",
@@ -3133,7 +3139,7 @@
     "category": "Жіночі сумки",
     "slug": "сумочка-marc-jacobs-the-leather-mini-bag-pink",
     "id": 50,
-    "color": "Pink",
+    "color": "Рожевий",
     "images": [
       "/assets/images/products/uploads/27687307_57865310_2048.webp",
       "/assets/images/products/uploads/27687307_57865301_2048.webp",
@@ -3154,7 +3160,7 @@
     "dimensions": "34 × 27 × 15 см",
     "variants": [
       {
-        "color": "Black Beige  чорний  бежевий",
+        "color": "Чорно-бежевий",
         "hex": "#e5e0e0",
         "images": [
           "/assets/images/products/uploads/215896950_beige_in.webp?v=b64baf37",
@@ -3204,7 +3210,7 @@
     "category": "Жіночі сумки",
     "slug": "сумка-the-medium-tote-bag-in-monogram-jacquard",
     "id": 51,
-    "color": "Black Beige  чорний  бежевий",
+    "color": "Чорно-бежевий",
     "images": [
       "/assets/images/products/uploads/215896950_beige_in.webp",
       "/assets/images/products/uploads/215896950_beige_bk.webp",
@@ -3226,7 +3232,7 @@
     "dimensions": "26 × 21 × 13 см",
     "variants": [
       {
-        "color": "Cement тауповий - сіро-бежевий",
+        "color": "Сіро-бежевий",
         "hex": "#bcb5b5",
         "images": [
           "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-ce-16a06f5f.webp?v=86197255",
@@ -3275,7 +3281,7 @@
     "category": "Жіночі сумки",
     "slug": "сумка-marc-jacobs-the-leather-small-tote-bag-cement",
     "id": 52,
-    "color": "Cement тауповий - сіро-бежевий",
+    "color": "Сіро-бежевий",
     "images": [
       "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-ce-16a06f5f.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-ce-00e1b92f.webp",
@@ -3296,7 +3302,7 @@
     "dimensions": "22 × 12 × 7 см",
     "variants": [
       {
-        "color": "Cotton/Silver — молочний",
+        "color": "Молочний",
         "hex": "#fafafa",
         "images": [
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-4a08b27e.webp?v=02bd32c1",
@@ -3345,7 +3351,7 @@
     "category": "Жіночі сумки",
     "slug": "сумка-marc-jacobs-the-leather-cargo-bag-cotton-silver",
     "id": 53,
-    "color": "Cotton/Silver — молочний",
+    "color": "Молочний",
     "images": [
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-4a08b27e.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-d6f46dd3.webp",
@@ -3367,7 +3373,7 @@
     "dimensions": "22 × 12 × 7 см",
     "variants": [
       {
-        "color": "Camel — карамельний, світло-коричневий",
+        "color": "Кемел",
         "hex": "#d4cbb7",
         "images": [
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--d9f458f8.webp?v=14107657",
@@ -3418,7 +3424,7 @@
     "category": "Жіночі сумки",
     "slug": "сумка-marc-jacobs-the-leather-cargo-bag-camel",
     "id": 54,
-    "color": "Camel — карамельний, світло-коричневий",
+    "color": "Кемел",
     "images": [
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--d9f458f8.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--3f139d71.webp",
@@ -3448,7 +3454,7 @@
     "dimensions": "22 × 12 × 7 см",
     "variants": [
       {
-        "color": "Black чорний",
+        "color": "Чорний",
         "hex": "#000000",
         "images": [
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--2013c7eb.webp?v=25c5ff7f",
@@ -3498,7 +3504,7 @@
     "category": "Жіночі сумки",
     "slug": "сумка-marc-jacobs-the-leather-cargo-bag-black",
     "id": 55,
-    "color": "Black чорний",
+    "color": "Чорний",
     "images": [
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--2013c7eb.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--3eeb5b5d.webp",
@@ -3521,7 +3527,7 @@
     "dimensions": "25,5 × 20 × 13 см",
     "variants": [
       {
-        "color": "Twine — бежево-кремовий",
+        "color": "Бежево-кремовий",
         "hex": "#bb993c",
         "images": [
           "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-d0dd33cf.webp?v=89145062",
@@ -3571,7 +3577,7 @@
     "category": "Жіночі сумки",
     "slug": "шопер-marc-jacobs-the-leather-small-tote-bag",
     "id": 56,
-    "color": "Twine — бежево-кремовий",
+    "color": "Бежево-кремовий",
     "images": [
       "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-d0dd33cf.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-de081418.webp",
@@ -3584,15 +3590,17 @@
       "Жінкам"
     ],
     "preOrderDays": "5–10 робочих днів",
+    "color": "Яскраво-зелений",
     "forcePublish": false,
     "material": "Натуральна шкіра",
     "brand": "Marc Jacobs",
     "price": 9000,
     "preOrder": false,
+    "slug": "сумка-marc-jacobs-the-j-marc-shoulder-bag-green-glow",
     "dimensions": "25 × 16 × 5 см",
     "variants": [
       {
-        "color": "Green Glow — яскравий зелений",
+        "color": "Яскраво-зелений",
         "hex": "#71dd00",
         "images": [
           "/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow.webp?v=9272e572",
@@ -3605,6 +3613,7 @@
     ],
     "preOrderPrepayment": 50,
     "strapInfo": "Два знімні — ланцюжок та регульований текстильний",
+    "sortOrder": 3,
     "sizes": [
       "ONESIZE"
     ],
@@ -3635,29 +3644,27 @@
     ],
     "isNew": false,
     "title": "Сумка Marc Jacobs The J Marc Shoulder Bag Green Glow",
-    "reviews": 0,
-    "instagramBlock": "general",
-    "description": "Яскрава та стильна сумка Marc Jacobs The J Marc Shoulder Bag у насиченому відтінку Green Glow. Модель виконана з гладкої натуральної шкіри та доповнена фірмовою застібкою J Marc, яка робить дизайн впізнаваним і виразним.\nСумка має компактну прямокутну форму та зручне основне відділення, внутрішню кишеню на блискавці, відкриту кишеню та зовнішню кишеню на задній стороні.\nМодель комплектується двома знімними ременями: елегантним ременем-ланцюжком та регульованим текстильним ременем. Її можна носити на плечі, через плече або без ременів як клатч",
-    "sku": "H956L01PF22-325",
-    "rating": 5,
-    "category": "Жіночі сумки",
-    "slug": "сумка-marc-jacobs-the-j-marc-shoulder-bag-green-glow",
-    "id": 57,
-    "color": "Green Glow — яскравий зелений",
     "images": [
       "/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow.webp",
       "/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow2.webp",
       "/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow6.webp",
       "/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow3.webp",
       "/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow1.webp"
-    ]
+    ],
+    "reviews": 0,
+    "id": 57,
+    "instagramBlock": "general",
+    "description": "Яскрава та стильна сумка Marc Jacobs The J Marc Shoulder Bag у насиченому відтінку Green Glow. Модель виконана з гладкої натуральної шкіри та доповнена фірмовою застібкою J Marc, яка робить дизайн впізнаваним і виразним.\nСумка має компактну прямокутну форму та зручне основне відділення, внутрішню кишеню на блискавці, відкриту кишеню та зовнішню кишеню на задній стороні.\nМодель комплектується двома знімними ременями: елегантним ременем-ланцюжком та регульованим текстильним ременем. Її можна носити на плечі, через плече або без ременів як клатч",
+    "sku": "H956L01PF22-325",
+    "rating": 5,
+    "category": "Жіночі сумки"
   },
   {
     "gender": [
       "Жінкам"
     ],
     "preOrderDays": "5–10 робочих днів",
-    "color": "Black чорний",
+    "color": "Чорний",
     "forcePublish": false,
     "material": "Гладка натуральна шкіра",
     "brand": "Coach",
@@ -3667,7 +3674,7 @@
     "dimensions": "26 × 16,5 × 8,3 см",
     "variants": [
       {
-        "color": "Black чорний",
+        "color": "Чорний",
         "hex": "#000000",
         "images": [
           "/assets/images/products/uploads/1.1_5a5d6ea8-1bba-4803-951d-520a38d4aa66.webp?v=6d4fe10c",
@@ -3678,7 +3685,7 @@
         ]
       },
       {
-        "color": "Brass/Ivory",
+        "color": "Айворі",
         "hex": "#e4ddda",
         "sku": "C4823B4IY",
         "sizes": [
@@ -3751,7 +3758,7 @@
     "dimensions": "18 × 10 × 3 см",
     "variants": [
       {
-        "color": "Brass/Chalk — айворі / золотистий",
+        "color": "Айворі",
         "hex": "#e9e4e4",
         "images": [
           "/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model.webp?v=b0d006b5",
@@ -3804,7 +3811,7 @@
     "category": "Жіночі сумки",
     "slug": "міні-сумочка-coach-tabby-crossbody-wristlet",
     "id": 59,
-    "color": "Brass/Chalk — айворі / золотистий",
+    "color": "Айворі",
     "images": [
       "/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model.webp",
       "/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model3.webp",
@@ -3827,7 +3834,7 @@
     "dimensions": "24 × 14 × 7 см",
     "variants": [
       {
-        "color": "Beige — бежевий",
+        "color": "Бежевий",
         "hex": "#d4cfcf",
         "images": [
           "/assets/images/products/uploads/rtlafd950301_33497199_1_v1_2x.webp?v=2bf0efa9",
@@ -3839,7 +3846,7 @@
         "sku": "213BA007-3063-510"
       },
       {
-        "color": "Midnight Brown",
+        "color": "Темно-коричневий",
         "hex": "#6f1d1d",
         "sku": "213BA007-3128-890",
         "images": [
@@ -3886,7 +3893,7 @@
     "category": "Жіночі сумки",
     "slug": "сумка-jacquemus-le-grand-bambino-beige",
     "id": 60,
-    "color": "Beige — бежевий",
+    "color": "Бежевий",
     "images": [
       "/assets/images/products/uploads/rtlafd950301_33497199_1_v1_2x.webp",
       "/assets/images/products/uploads/rtlafd950301_33497201_2_v1_2x.webp",
@@ -3909,7 +3916,7 @@
     "variants": [
       {
         "hex": "#0361b0",
-        "color": "Blue синій-блакитний",
+        "color": "Синій",
         "images": [
           "/assets/images/products/uploads/215679033_blue_in.webp?v=d508b58e",
           "/assets/images/products/uploads/215679033_blue_bk.webp?v=0fee1b0a",
@@ -3972,7 +3979,7 @@
     },
     "slug": "шопер-marc-jacobs-the-denim-small-tote-bag-blue",
     "id": 61,
-    "color": "Blue синій-блакитний",
+    "color": "Синій",
     "images": [
       "/assets/images/products/uploads/215679033_blue_in.webp",
       "/assets/images/products/uploads/215679033_blue_bk.webp",
@@ -3994,7 +4001,7 @@
     "dimensions": "26 × 15,5 × 7 см",
     "variants": [
       {
-        "color": "Tan / Chalk / Brass — бежевий / білий / золотистий",
+        "color": "Бежево-білий",
         "hex": "#cdbdbd",
         "images": [
           "/assets/images/products/uploads/ca173_svvfq_a0.webp?v=bae25e8c",
@@ -4043,7 +4050,7 @@
     "category": "Жіночі сумки",
     "slug": "сумочка-coach-teri-shoulder-bag-in-colorblock",
     "id": 62,
-    "color": "Tan / Chalk / Brass — бежевий / білий / золотистий",
+    "color": "Бежево-білий",
     "images": [
       "/assets/images/products/uploads/ca173_svvfq_a0.webp",
       "/assets/images/products/uploads/ca173_svvfq_a5.webp",
@@ -4065,7 +4072,7 @@
     "dimensions": "32 × 27 × 14 см",
     "variants": [
       {
-        "color": "Brown/Black коричневий",
+        "color": "Коричнево-чорний",
         "hex": "#593131",
         "images": [
           "/assets/images/products/uploads/00570556_d.jpg?v=43709838",
@@ -4115,7 +4122,7 @@
     "category": "Жіночі сумки",
     "slug": "шопер-coach-gallery-tote-bag-in-signature-canvas",
     "id": 63,
-    "color": "Brown/Black коричневий",
+    "color": "Коричнево-чорний",
     "images": [
       "/assets/images/products/uploads/00570556_d.jpg",
       "/assets/images/products/uploads/00570556_s.jpg",
@@ -4136,7 +4143,7 @@
     "dimensions": "17,5 × 8,5 × 6,5 см",
     "variants": [
       {
-        "color": "White білий",
+        "color": "Білий",
         "hex": "#ffffff",
         "images": [
           "/assets/images/products/uploads/ihjbihj.webp?v=3dd19685",
@@ -4187,7 +4194,7 @@
     "category": "Жіночі сумки",
     "slug": "сумочка-jacquemus-le-bambino-white",
     "id": 64,
-    "color": "White білий",
+    "color": "Білий",
     "images": [
       "/assets/images/products/uploads/ihjbihj.webp",
       "/assets/images/products/uploads/p00545136_d2.webp",
@@ -4209,7 +4216,7 @@
     "dimensions": "26 × 17 × 8 см",
     "variants": [
       {
-        "color": "Dark Brown темно-коричневий",
+        "color": "Темно-коричневий",
         "hex": "#624949",
         "images": [
           "/assets/images/products/uploads/3248708-4324-8078423-1.webp?v=1e7a3655",
@@ -4251,7 +4258,7 @@
     "category": "Жіночі сумки",
     "slug": "сумочка-coach-klare-crossbody-25-in-signature-canvas",
     "id": 65,
-    "color": "Dark Brown темно-коричневий",
+    "color": "Темно-коричневий",
     "images": [
       "/assets/images/products/uploads/3248708-4324-8078423-1.webp",
       "/assets/images/products/uploads/3248708-4324-8078423-2.webp",
@@ -4273,7 +4280,7 @@
     "dimensions": "13 × 7,5 см",
     "variants": [
       {
-        "color": "Brown коричневий",
+        "color": "Коричневий",
         "hex": "#9e530c",
         "images": [
           "/assets/images/products/uploads/sl10757-021_01-384fad.jpg?v=2787a17d",
@@ -4282,7 +4289,7 @@
         ]
       },
       {
-        "color": "Black чорний",
+        "color": "Чорний",
         "hex": "#000000",
         "images": [
           "/assets/images/products/uploads/27541025~black_0.webp?v=a0356567",
@@ -4323,7 +4330,7 @@
     "category": "Гаманці",
     "slug": "гаманець-marc-jacobs-the-top-zip-wallet-with-strap",
     "id": 66,
-    "color": "Brown коричневий",
+    "color": "Коричневий",
     "images": [
       "/assets/images/products/uploads/sl10757-021_01-384fad.jpg",
       "/assets/images/products/uploads/sl10757-021_02-384fad.jpg",
@@ -4344,7 +4351,7 @@
     "variants": [
       {
         "hex": "#ccc2b8",
-        "color": "Khaki хакі",
+        "color": "Хакі",
         "images": [
           "/assets/images/products/uploads/s150l03fa22-223_1.webp?v=fd403c07",
           "/assets/images/products/uploads/f540b0f9-f29c-31d6-8bdf-03912d1cc134.jpg?v=7e7c73e2",
@@ -4389,7 +4396,7 @@
     },
     "slug": "гаманець-marc-jacobs-the-zip-around-wallet",
     "id": 67,
-    "color": "Khaki хакі",
+    "color": "Хакі",
     "images": [
       "/assets/images/products/uploads/s150l03fa22-223_1.webp",
       "/assets/images/products/uploads/f540b0f9-f29c-31d6-8bdf-03912d1cc134.jpg",
@@ -4409,7 +4416,7 @@
     "dimensions": "11 × 9 × 2,5 см",
     "variants": [
       {
-        "color": "Black Multi",
+        "color": "Чорний з принтом",
         "hex": "#000000",
         "images": [
           "/assets/images/products/uploads/l_wp_6788ff7fdc327dcb277cb548.webp?v=1e85b70f",
@@ -4437,7 +4444,7 @@
     "category": "Гаманці",
     "slug": "гаманець-coach-snap-wallet-with-heart-bolt-print",
     "id": 68,
-    "color": "Black Multi",
+    "color": "Чорний з принтом",
     "images": [
       "/assets/images/products/uploads/l_wp_6788ff7fdc327dcb277cb548.webp",
       "/assets/images/products/uploads/cw537_sva47_a8.webp",
@@ -4457,7 +4464,7 @@
     "dimensions": "11 × 9,5 × 2 см",
     "variants": [
       {
-        "color": "Black",
+        "color": "Чорний",
         "hex": "#000000",
         "images": [
           "/assets/images/products/uploads/set-vi-coach-men-s-coin-wallet-black-one-ecc71a62.webp?v=0e2c3d35",
@@ -4495,11 +4502,662 @@
     "category": "Гаманці",
     "slug": "гаманець-coach-3-in-1-wallet-in-signature-leather",
     "id": 69,
-    "color": "Black",
+    "color": "Чорний",
     "images": [
       "/assets/images/products/uploads/set-vi-coach-men-s-coin-wallet-black-one-ecc71a62.webp",
       "/assets/images/products/uploads/lussocitta_coach_cr957_blk_1_700x.webp",
       "/assets/images/products/uploads/lussocitta_coach_cr957_blk_2_700x.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Чоловікам"
+    ],
+    "preOrderDays": "5–10 робочих днів",
+    "forcePublish": false,
+    "brand": "Armani Exchange",
+    "price": 5000,
+    "preOrder": false,
+    "dimensions": "20 × 22 × 4 см",
+    "variants": [
+      {
+        "color": "Чорний",
+        "hex": "#000000",
+        "images": [
+          "/assets/images/products/uploads/main.webp?v=bac2648f",
+          "/assets/images/products/uploads/1.webp?v=b5921ccc",
+          "/assets/images/products/uploads/3.webp?v=dfe1876e",
+          "/assets/images/products/uploads/81.webp?v=a20b2a6a"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 50,
+    "strapInfo": "Регульований плечовий ремінь довжиною 80–150 см, що дозволяє носити сумку через плече або кросбоді",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Armani Exchange",
+      "Armani Exchange 952137",
+      "952137 2F882 00020",
+      "чоловіча сумка Armani Exchange",
+      "чоловіча сумка через плече",
+      "сумка кросбоді чоловіча",
+      "чоловіча сумка кросбоді",
+      "чорна чоловіча сумка",
+      "сумка через плече Armani Exchange",
+      "брендові чоловічі сумки",
+      "оригінальний Armani Exchange"
+    ],
+    "isNew": false,
+    "title": "Чоловіча сумка Armani Exchange Crossbody",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильна чоловіча сумка Armani Exchange у класичному чорному кольорі — практичний аксесуар для повсякденних образів. Компактний формат дозволяє зручно носити необхідні речі, не перевантажуючи образ.\nМодель має основне відділення із застібкою-блискавкою, внутрішню кишеню на блискавці, передню кишеню на блискавці та задню накладну кишеню для речей, які мають бути швидко доступними. Лаконічний дизайн доповнений фірмовим логотипом Armani Exchange",
+    "sku": "952137-2F882-00020",
+    "rating": 5,
+    "category": "Чоловічі сумки",
+    "slug": "чоловіча-сумка-armani-exchange-crossbody",
+    "id": 70,
+    "color": "Чорний",
+    "images": [
+      "/assets/images/products/uploads/main.webp",
+      "/assets/images/products/uploads/1.webp",
+      "/assets/images/products/uploads/3.webp",
+      "/assets/images/products/uploads/81.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "5–10 робочих днів",
+    "forcePublish": false,
+    "material": "Пластикова оправа, полімерні лінзи",
+    "brand": "Marc Jacobs",
+    "price": 5000,
+    "preOrder": false,
+    "dimensions": "Ширина лінзи × місток × довжина завушника: 53 × 21 × 140 мм",
+    "variants": [
+      {
+        "color": "Черепаховий",
+        "hex": "#704c22",
+        "images": [
+          "/assets/images/products/uploads/3421a7ab3bf6a820540093959ae69699.webp?v=c9f9f312",
+          "/assets/images/products/uploads/ach3atrpdjdyd181s4gcstgpa4qzgzrh.webp?v=c8889145",
+          "/assets/images/products/uploads/9dzhcfvjorauhd1nzfwyq9o69vh3iff1.webp?v=e9d3d330",
+          "/assets/images/products/uploads/u87036v1ioy7rp72btz5kw3oti8m25rs.webp?v=39641864"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 50,
+    "sizes": [
+      "53"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Marc Jacobs",
+      "Marc Jacobs MJ 1011/S",
+      "MJ 1011/S WR953HA",
+      "окуляри Marc Jacobs",
+      "сонцезахисні окуляри Marc Jacobs",
+      "жіночі сонцезахисні окуляри",
+      "жіночі окуляри",
+      "круглі окуляри",
+      "окуляри з круглою оправою",
+      "брендові окуляри",
+      "оригінальні Marc Jacobs",
+      "окуляри від сонця",
+      "модні сонцезахисні окуляри"
+    ],
+    "isNew": false,
+    "title": "Сонцезахисні окуляри Marc Jacobs 1011/S WR953HA",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильні жіночі сонцезахисні окуляри Marc Jacobs MJ 1011/S із круглою оправою — елегантна модель, що додає образу виразності та сучасного акценту.\nОкуляри мають легку пластикову оправу та полікарбонатні лінзи. Класична форма легко поєднується як із повсякденними, так і з більш елегантними образами. Фірмовий дизайн Marc Jacobs робить модель універсальним аксесуаром для сонячних днів",
+    "sku": "MJ 1011/S WR953HA",
+    "rating": 5,
+    "category": "Окуляри і оправи",
+    "slug": "сонцезахисні-окуляри-marc-jacobs-1011-s-wr953ha",
+    "id": 71,
+    "color": "Черепаховий",
+    "images": [
+      "/assets/images/products/uploads/3421a7ab3bf6a820540093959ae69699.webp",
+      "/assets/images/products/uploads/ach3atrpdjdyd181s4gcstgpa4qzgzrh.webp",
+      "/assets/images/products/uploads/9dzhcfvjorauhd1nzfwyq9o69vh3iff1.webp",
+      "/assets/images/products/uploads/u87036v1ioy7rp72btz5kw3oti8m25rs.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "10- 14 робочих днів",
+    "forcePublish": false,
+    "material": "Ацетатна оправа, полімерні, нейлонові лінзи",
+    "brand": "Saint Laurent",
+    "price": 12400,
+    "preOrder": true,
+    "dimensions": "Ширина лінзи: 53 мм Місток: 16 мм Довжина завушника: 145 мм",
+    "variants": [
+      {
+        "color": "Чорний",
+        "hex": "#000000",
+        "images": [
+          "/assets/images/products/uploads/a0e43776-063b-4643-8c36-5024406361e9.webp?v=01af95e4",
+          "/assets/images/products/uploads/cfeba1dc-4b88-4f3b-984b-b5bebd478c1f.jpg?v=0f28bad7",
+          "/assets/images/products/uploads/33751393-b64e-49d3-b0c9-2e3bde1afaff.jpg?v=7b1a8ec9",
+          "/assets/images/products/uploads/aa00-okd0j9_99x_f9.webp?v=5c7f8ff0"
+        ]
+      },
+      {
+        "color": "Черепаховий",
+        "hex": "#543c22",
+        "sku": "SL 276 MICA 002 53",
+        "sizes": [
+          "53"
+        ],
+        "images": [
+          "/assets/images/products/uploads/saint-laurent-grey-cat-eye-ladies-sungla-99d23704.webp?v=dd135198",
+          "/assets/images/products/uploads/saint-laurent-grey-cat-eye-ladies-sungla-175c8e88.webp?v=ac28aea8",
+          "/assets/images/products/uploads/saint-laurent-grey-cat-eye-ladies-sungla-6b05dcda.webp?v=de137cb5"
+        ]
+      },
+      {
+        "color": "Світло-чорний",
+        "hex": "#dcd9d9",
+        "sku": "SL 276 MICA 038 53",
+        "sizes": [
+          "53"
+        ],
+        "images": [
+          "/assets/images/products/uploads/saint-laurent-yellow-cat-eye-ladies-sunglasses-sl-276-mica-038-53.webp?v=b904204e",
+          "/assets/images/products/uploads/saint-laurent-yellow-cat-eye-ladies-sunglasses-sl-276-mica-038-53_3-1-.webp?v=7b228098",
+          "/assets/images/products/uploads/saint-laurent-yellow-cat-eye-ladies-sunglasses-sl-276-mica-038-53_4.webp?v=e9241d93"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "sizes": [
+      "53"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Saint Laurent",
+      "Saint Laurent SL 276 MICA",
+      "SL 276 MICA 001 53",
+      "окуляри Saint Laurent",
+      "сонцезахисні окуляри Saint Laurent",
+      "жіночі сонцезахисні окуляри",
+      "жіночі окуляри",
+      "окуляри Cat Eye",
+      "окуляри котяче око",
+      "чорні окуляри",
+      "окуляри із сірими лінзами",
+      "брендові окуляри",
+      "оригінальні Saint Laurent",
+      "YSL окуляри"
+    ],
+    "isNew": false,
+    "title": "Сонцезахисні окуляри Saint Laurent SL 276 MICA 001 53",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Елегантні жіночі сонцезахисні окуляри Saint Laurent SL 276 MICA з виразною оправою форми Cat Eye. Оправ створює лаконічний та водночас ефектний образ.\nМодель має повноободкову ацетатну оправу та сірі лінзи з 100% захистом від UVA/UVB-променів. На завушниках нанесено фірмовий напис SAINT LAURENT PARIS. Окуляри виготовлені в Італії",
+    "sku": "SL 276 MICA 001 53",
+    "rating": 5,
+    "category": "Окуляри і оправи",
+    "slug": "сонцезахисні-окуляри-saint-laurent-sl-276-mica-001-53",
+    "id": 72,
+    "color": "Чорний",
+    "images": [
+      "/assets/images/products/uploads/a0e43776-063b-4643-8c36-5024406361e9.webp",
+      "/assets/images/products/uploads/cfeba1dc-4b88-4f3b-984b-b5bebd478c1f.jpg",
+      "/assets/images/products/uploads/33751393-b64e-49d3-b0c9-2e3bde1afaff.jpg",
+      "/assets/images/products/uploads/aa00-okd0j9_99x_f9.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Корпус і браслет — нержавіюча сталь 316L; скло — стійке до подряпин сапфірове",
+    "brand": "Tissot",
+    "price": 16500,
+    "preOrder": true,
+    "dimensions": "19,5 × 19,5 × 5 мм",
+    "variants": [
+      {
+        "color": "Сріблястий",
+        "hex": "#b7b4b4",
+        "images": [
+          "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-a120faed.webp?v=d03727de",
+          "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-10e4ff8d.webp?v=bed48427",
+          "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-f393bd11.webp?v=8405c1f4",
+          "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-8e88d0d9.webp?v=c4177bd4"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Браслет із нержавіючої сталі сріблястого кольору, ширина 11 мм, застібка-метелик із кнопками",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Tissot Lovely",
+      "Tissot Lovely Round",
+      "Tissot T058.009.11.031.00",
+      "T0580091103100",
+      "годинник Tissot",
+      "жіночий годинник Tissot",
+      "жіночий наручний годинник",
+      "швейцарський годинник",
+      "сріблястий годинник",
+      "годинник зі сталевим браслетом",
+      "класичний жіночий годинник",
+      "елегантний годинник",
+      "брендовий годинник",
+      "оригінальний Tissot"
+    ],
+    "isNew": false,
+    "title": "Жіночий годинник Tissot Lovely Round 19.5mm",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Вишуканий жіночий годинник Tissot Lovely Round 19.5mm — мініатюрна модель із круглим корпусом, створена для тих, хто цінує елегантність і стриманий дизайн.\nГодинник має сріблястий циферблат із лаконічними індексами, корпус із нержавіючої сталі 316L та стійке до подряпин сапфірове скло. Усередині встановлений надійний швейцарський кварцовий механізм ETA 901.001. Металевий браслет доповнений застібкою-метеликом із кнопками. Водостійкість — до 30 метрів (3 ATM)",
+    "sku": "T058.009.11.031.00",
+    "rating": 5,
+    "category": "Годинники",
+    "slug": "жіночий-годинник-tissot-lovely-round-19-5mm",
+    "id": 73,
+    "color": "Сріблястий",
+    "images": [
+      "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-a120faed.webp",
+      "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-10e4ff8d.webp",
+      "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-f393bd11.webp",
+      "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-8e88d0d9.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Корпус — нержавіюча сталь 316L із PVD-покриттям; браслет — нержавіюча сталь із PVD-покриттям; скло — сапфірове",
+    "brand": "Tissot",
+    "price": 19000,
+    "preOrder": true,
+    "dimensions": "1,95 × 1,95 × 0,5 см",
+    "variants": [
+      {
+        "color": "Золотистий",
+        "hex": "#c7c15e",
+        "images": [
+          "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_5.webp?v=c816fc6e",
+          "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_2_2.webp?v=4b6d0dc8",
+          "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_3_2.webp?v=7a97fcb9",
+          "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-dial-ladies-watch-t0580091103100_4_1.webp"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Золотистий сталевий браслет із PVD-покриттям, застібка — розкладна із захисним замком. Ширина кріплення — 0,6 см",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Tissot Lovely",
+      "Tissot Lovely Round",
+      "Tissot T058.009.33.031.00",
+      "T0580093303100",
+      "годинник Tissot",
+      "жіночий годинник Tissot",
+      "жіночий наручний годинник",
+      "швейцарський годинник",
+      "золотий годинник",
+      "золотистий годинник",
+      "годинник із металевим браслетом",
+      "класичний жіночий годинник",
+      "елегантний годинник",
+      "брендовий годинник",
+      "оригінальний Tissot*"
+    ],
+    "isNew": false,
+    "title": "Годинник Tissot Lovely Round 19.5mm",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Вишуканий жіночий годинник Tissot Lovely Round 19.5mm — мініатюрна модель із круглим корпусом, що поєднує елегантність, жіночність та швейцарську якість.\nГодинник має сріблястий циферблат із лаконічними індексами, корпус із нержавіючої сталі 316L із PVD-покриттям кольору жовтого золота та стійке до подряпин сапфірове скло. Швейцарський кварцовий механізм забезпечує точний хід. Модель доповнена золотистим сталевим браслетом із розкладною застібкою та захисним замком. Водонепроникність — до 30 м (3 ATM)",
+    "sku": "T058.009.33.031.00",
+    "rating": 5,
+    "category": "Годинники",
+    "slug": "годинник-tissot-lovely-round-19-5mm",
+    "id": 74,
+    "color": "Золотистий",
+    "images": [
+      "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_5.webp",
+      "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_2_2.webp",
+      "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_3_2.webp",
+      "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-dial-ladies-watch-t0580091103100_4_1.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Корпус і браслет — нержавіюча сталь 316L; скло — стійке до подряпин сапфірове",
+    "brand": "Tissot",
+    "price": 15400,
+    "preOrder": true,
+    "dimensions": "2,93 × 2,93 × 1,06 см",
+    "variants": [
+      {
+        "color": "Сріблястий",
+        "hex": "#c0c0c0",
+        "images": [
+          "/assets/images/products/uploads/tissot-tclassic-automatic-diamond-green--6ebe14d1.webp?v=1326d5ab",
+          "/assets/images/products/uploads/tissot-tclassic-automatic-diamond-green--dff156d2.webp?v=3836ad46",
+          "/assets/images/products/uploads/tissot-tclassic-automatic-diamond-green--8822ff6e.webp?v=046e0acb"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Сталевий браслет сріблястого кольору з системою швидкого знімання та застібкою-метеликом із кнопками. Ширина кріплення — 1,5 см",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Tissot T-My Lady",
+      "Tissot T-My Lady Automatic",
+      "Tissot T132.007.11.091.00",
+      "T1320071109100",
+      "годинник Tissot",
+      "жіночий годинник Tissot",
+      "жіночий автоматичний годинник",
+      "швейцарський годинник",
+      "швейцарський автоматичний годинник",
+      "зелений годинник",
+      "годинник із зеленим циферблатом",
+      "годинник зі сталевим браслетом",
+      "класичний жіночий годинник",
+      "елегантний годинник",
+      "брендовий годинник",
+      "оригінальний Tissot"
+    ],
+    "isNew": false,
+    "title": "Годинник Tissot T-My Lady Automatic T132.007.11.091.00",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Елегантний жіночий годинник Tissot T-My Lady Automatic із круглим сталевим корпусом та красивим зеленим циферблатом. Лаконічний дизайн поєднується із сучасним швейцарським автоматичним механізмом, що робить модель чудовим вибором як для повсякденних, так і для більш елегантних образів.\nГодинник оснащений швейцарським автоматичним механізмом Powermatic 48.111 із запасом ходу до 48 годин та балансовою пружиною Nivachron, стійкою до впливу магнітних полів. Зелену циферблат із віконцем дати захищає куполоподібне сапфірове скло. Прозора задня кришка дозволяє спостерігати за роботою механізму. Водонепроникність — до 100 м (10 bar)",
+    "sku": "T132.007.11.091.00",
+    "rating": 5,
+    "category": "Годинники",
+    "slug": "годинник-tissot-t-my-lady-automatic-t132-007-11-091-00",
+    "id": 75,
+    "color": "Сріблястий",
+    "images": [
+      "/assets/images/products/uploads/tissot-tclassic-automatic-diamond-green--6ebe14d1.webp",
+      "/assets/images/products/uploads/tissot-tclassic-automatic-diamond-green--dff156d2.webp",
+      "/assets/images/products/uploads/tissot-tclassic-automatic-diamond-green--8822ff6e.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Корпус і браслет — нержавіюча сталь 316L; скло — сапфірове, стійке до подряпин",
+    "brand": "Tissot",
+    "price": 8800,
+    "preOrder": true,
+    "dimensions": "3,4 × 3,4 × 0,69 см",
+    "variants": [
+      {
+        "color": "Сріблястий",
+        "hex": "#d9d9d9",
+        "images": [
+          "/assets/images/products/uploads/tissot-everytime-quartz-silver-dial-ladies-watch-t1432101103300.webp?v=02ef1e05",
+          "/assets/images/products/uploads/tissot-everytime-quartz-silver-dial-ladies-watch-t1432101103300_2.webp?v=161a41cd",
+          "/assets/images/products/uploads/tissot-everytime-quartz-silver-dial-ladies-watch-t1432101103300_3.webp?v=c1964b3a"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Сталевий браслет сріблястого кольору шириною 1,6 см із швидкознімною системою та застібкою-метеликом",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Tissot Everytime",
+      "Tissot Everytime 34mm",
+      "Tissot T143.210.11.033.00",
+      "T1432101103300",
+      "годинник Tissot",
+      "жіночий годинник Tissot",
+      "жіночий наручний годинник",
+      "швейцарський годинник",
+      "кварцовий годинник",
+      "сріблястий годинник",
+      "годинник зі сталевим браслетом",
+      "класичний жіночий годинник",
+      "елегантний годинник",
+      "брендовий годинник",
+      "оригінальний Tissot"
+    ],
+    "isNew": false,
+    "title": "Годинник Tissot Everytime 34mm T143.210.11.033.00",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Елегантний жіночий годинник Tissot Everytime 34mm із мінімалістичним дизайном та круглим сталевим корпусом. Модель легко поєднується як із повсякденними, так і з діловими та більш елегантними образами.\nГодинник оснащений швейцарським кварцовим механізмом ETA F05.412, сапфіровим склом, стійким до подряпин, та сталевим браслетом із системою швидкого знімання. Сріблястий корпус доповнений світлим циферблатом із лаконічними індексами. Водонепроникність — до 50 м (5 bar)",
+    "sku": "T143.210.11.033.00",
+    "rating": 5,
+    "category": "Годинники",
+    "slug": "годинник-tissot-everytime-34mm-t143-210-11-033-00",
+    "id": 76,
+    "color": "Сріблястий",
+    "images": [
+      "/assets/images/products/uploads/tissot-everytime-quartz-silver-dial-ladies-watch-t1432101103300.webp",
+      "/assets/images/products/uploads/tissot-everytime-quartz-silver-dial-ladies-watch-t1432101103300_2.webp",
+      "/assets/images/products/uploads/tissot-everytime-quartz-silver-dial-ladies-watch-t1432101103300_3.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Чоловікам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Корпус і браслет — нержавіюча сталь 316L; скло — сапфірове, стійке до подряпин",
+    "brand": "Tissot",
+    "price": 13800,
+    "preOrder": true,
+    "dimensions": "4 × 4 × 0,825 см",
+    "variants": [
+      {
+        "color": "Сріблястий",
+        "hex": "#cecece",
+        "images": [
+          "/assets/images/products/uploads/tissot-pr-100-quartz-blue-dial-mens-watch-t1504101104100_1.webp?v=286c6b76",
+          "/assets/images/products/uploads/tissot-pr-100-quartz-blue-dial-mens-watch-t1504101104100_2.webp?v=0fc480bf",
+          "/assets/images/products/uploads/tissot-pr-100-quartz-blue-dial-mens-watch-t1504101104100_3.webp?v=33ce3f73"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Сталевий браслет сріблястого кольору з системою швидкого знімання та застібкою-метеликом із кнопками. Ширина кріплення — 2 см",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Tissot PR 100",
+      "Tissot PR 100 40mm",
+      "Tissot T150.410.11.041.00",
+      "T1504101104100",
+      "годинник Tissot",
+      "чоловічий годинник Tissot",
+      "чоловічий наручний годинник",
+      "швейцарський годинник",
+      "кварцовий годинник",
+      "синій годинник",
+      "годинник із синім циферблатом",
+      "годинник зі сталевим браслетом",
+      "класичний чоловічий годинник",
+      "елегантний годинник",
+      "брендовий годинник",
+      "оригінальний Tissot"
+    ],
+    "isNew": false,
+    "title": "Годинник Tissot PR 100 40mm T150.410.11.041.00",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Класичний чоловічий годинник Tissot PR 100 40mm із насиченим синім циферблатом та елегантним сталевим корпусом. Лаконічний дизайн робить модель універсальною — вона гармонійно доповнить як діловий костюм, так і повсякденний образ.\nГодинник оснащений точним швейцарським кварцовим механізмом, індикацією дати та сапфіровим склом, стійким до подряпин. Сріблястий корпус і сталевий браслет підкреслюють стриманий преміальний стиль моделі. Водонепроникність до 100 м (10 bar) дозволяє комфортно використовувати годинник у повсякденному житті",
+    "sku": "T150.410.11.041.00",
+    "rating": 5,
+    "category": "Годинники",
+    "slug": "годинник-tissot-pr-100-40mm-t150-410-11-041-00",
+    "id": 77,
+    "color": "Сріблястий",
+    "images": [
+      "/assets/images/products/uploads/tissot-pr-100-quartz-blue-dial-mens-watch-t1504101104100_1.webp",
+      "/assets/images/products/uploads/tissot-pr-100-quartz-blue-dial-mens-watch-t1504101104100_2.webp",
+      "/assets/images/products/uploads/tissot-pr-100-quartz-blue-dial-mens-watch-t1504101104100_3.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Чоловікам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Корпус і браслет — нержавіюча сталь 316L; рожево-золотисті елементи — PVD-покриття; скло — сапфірове, стійке до подряпин",
+    "brand": "Tissot",
+    "price": 12300,
+    "preOrder": true,
+    "dimensions": "4,2 × 4,2 × 1,15 см",
+    "variants": [
+      {
+        "color": "Сріблястий",
+        "hex": "#bcbcbc",
+        "images": [
+          "/assets/images/products/uploads/tissot-classic-dream-swissmatic-silver-d-f03a52ef.webp?v=bf3826fc",
+          "/assets/images/products/uploads/tissot-classic-dream-swissmatic-silver-d-ea41ed3e.webp?v=34a76e5b",
+          "/assets/images/products/uploads/tissot-classic-dream-swissmatic-silver-d-88843986.webp?v=9b3867c0"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Двоколірний браслет із нержавіючої сталі сріблястого та рожево-золотистого кольорів, ширина кріплення — 2,2 см. Застібка-метелик із кнопками",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Tissot Classic Dream",
+      "Tissot Classic Dream Swissmatic",
+      "Tissot T129.407.22.031.00",
+      "T1294072203100",
+      "годинник Tissot",
+      "чоловічий годинник Tissot",
+      "чоловічий наручний годинник",
+      "швейцарський годинник",
+      "автоматичний годинник",
+      "швейцарський автоматичний годинник",
+      "двоколірний годинник",
+      "годинник сріблястий",
+      "годинник із сріблястим циферблатом",
+      "годинник із золотистими деталями",
+      "годинник зі сталевим браслетом",
+      "класичний чоловічий годинник",
+      "елегантний годинник",
+      "брендовий годинник",
+      "оригінальний Tissot"
+    ],
+    "isNew": false,
+    "title": "Годинник Tissot Classic Dream Swissmatic T129.407.22.031.00",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Годинник оснащений швейцарським автоматичним механізмом Swissmatic із запасом ходу до 72 годин, функцією відображення дати та сапфіровим склом із захистом від подряпин. Прозора задня кришка дозволяє спостерігати за роботою механізму. Корпус і браслет виконані з нержавіючої сталі, доповненої PVD-покриттям кольору рожевого золота. Водонепроникність — до 50 м (5 bar)",
+    "sku": "T129.407.22.031.00",
+    "rating": 5,
+    "category": "Годинники",
+    "slug": "годинник-tissot-classic-dream-swissmatic-t129-407-22-031-00",
+    "id": 78,
+    "color": "Сріблястий",
+    "images": [
+      "/assets/images/products/uploads/tissot-classic-dream-swissmatic-silver-d-f03a52ef.webp",
+      "/assets/images/products/uploads/tissot-classic-dream-swissmatic-silver-d-ea41ed3e.webp",
+      "/assets/images/products/uploads/tissot-classic-dream-swissmatic-silver-d-88843986.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Чоловікам"
+    ],
+    "preOrderDays": "10 -14 робочих днів",
+    "forcePublish": false,
+    "material": "Корпус і браслет — нержавіюча сталь 316L; безель — керамічний; скло — із сапфіровим покриттям",
+    "brand": "Mathey-Tissot",
+    "price": 11000,
+    "preOrder": true,
+    "dimensions": "4,2 × 4,2 × 1,2 см",
+    "variants": [
+      {
+        "color": "Сріблястий",
+        "hex": "#b9b9b9",
+        "images": [
+          "/assets/images/products/uploads/matheytissot-mathy-ceramic-quartz-black-dial-mens-watch-h901crbn.webp?v=3474f80f",
+          "/assets/images/products/uploads/matheytissot-mathy-ceramic-quartz-black-dial-mens-watch-h901crbn_2.webp?v=6d1a28bc",
+          "/assets/images/products/uploads/matheytissot-mathy-ceramic-quartz-black-dial-mens-watch-h901crbn_3.webp?v=908fca90"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Двоколірний браслет із нержавіючої сталі 316L — сріблястий із золотистими елементами. Ширина кріплення — 2 см. Застібка — розкладна із захисним фіксатором",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Mathey-Tissot",
+      "Mathey Tissot Mathy Ceramic",
+      "Mathy Ceramic",
+      "Mathey-Tissot H901CRBN",
+      "H901CRBN",
+      "чоловічий годинник Mathey-Tissot",
+      "чоловічий швейцарський годинник",
+      "швейцарський годинник",
+      "кварцовий годинник",
+      "годинник із чорним циферблатом",
+      "годинник із керамічним безелем",
+      "двоколірний годинник",
+      "годинник зі сталевим браслетом",
+      "золотисто-сріблястий годинник",
+      "брендовий чоловічий годинник"
+    ],
+    "isNew": false,
+    "title": "Годинник Mathey-Tissot Mathy Ceramic H901CRBN",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильний чоловічий годинник Mathey-Tissot Mathy Ceramic у класичному поєднанні сріблястого, чорного та золотистого відтінків. Модель має виразний чорний циферблат, чорний односпрямований керамічний безель та елегантний двоколірний сталевий браслет.\nГодинник оснащений швейцарським кварцовим механізмом Ronda 505 із функцією відображення дати. Чорний циферблат доповнений золотистими стрілками та індексами з люмінесцентним покриттям для комфортного зчитування часу в умовах недостатнього освітлення. Корпус має загвинчувану заводну головку, а водонепроникність становить 200 м (20 ATM)",
+    "sku": "H901CRBN",
+    "rating": 5,
+    "category": "Годинники",
+    "slug": "годинник-mathey-tissot-mathy-ceramic-h901crbn",
+    "id": 79,
+    "color": "Сріблястий",
+    "images": [
+      "/assets/images/products/uploads/matheytissot-mathy-ceramic-quartz-black-dial-mens-watch-h901crbn.webp",
+      "/assets/images/products/uploads/matheytissot-mathy-ceramic-quartz-black-dial-mens-watch-h901crbn_2.webp",
+      "/assets/images/products/uploads/matheytissot-mathy-ceramic-quartz-black-dial-mens-watch-h901crbn_3.webp"
     ]
   }
 ]

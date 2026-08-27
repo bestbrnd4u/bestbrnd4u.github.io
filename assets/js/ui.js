@@ -330,6 +330,29 @@ function initProductCarousels(root) {
 // горизонтальний (трекпад-свайп) — гортання каруселі.
 // -------------------------
 
+// Підпис кольору під назвою в картці.
+//
+// Джерела за спаданням певності:
+//   1. cardColor — картка розгорнута по кольору, це рівно той колір,
+//      фото якого показане;
+//   2. колір активного (першого) варіанта — товар з одним кольором;
+//   3. поле color самого товару — старі записи без variants.
+//
+// «Основний» відсіюємо: це заглушка з fallback-варіанта нижче, а не
+// назва кольору.
+function cardColorLabel(product, variants) {
+
+    const name = product.cardColor
+        || variants?.[0]?.color
+        || product.color
+        || "";
+
+    if (!name || name === "Основний") return "";
+
+    return `<div class="product-color-name">${escapeHtml(name)}</div>`;
+
+}
+
 function createProductCard(product) {
 
     const badge = product.badge
@@ -494,17 +517,22 @@ function createProductCard(product) {
                        class="product-title-link">${escapeHtml(product.title)}</a>
                 </div>
                 <!-- Назва кольору під заголовком.
-                     Потрібна саме тому, що кожен колір тепер окрема
+                     Потрібна насамперед тому, що кожен колір — окрема
                      картка: дві картки одного товару мають однакові
                      бренд, назву й ціну, і відрізняє їх лише фото. Без
                      підпису це виглядає як дубль у каталозі, а не як
                      вибір кольору.
-                     Показуємо ЛИШЕ коли товар розгорнуто (є cardColor)
-                     — у товару з одним кольором такий рядок ні про що
-                     не повідомляє. -->
-                ${product.cardColor
-                    ? `<div class="product-color-name">${escapeHtml(product.cardColor)}</div>`
-                    : ""}
+
+                     РАНІШЕ підпис показувався ЛИШЕ для розгорнутих
+                     карток (умова була product.cardColor). Наслідок
+                     видно на скріншоті каталогу: у сусідніх карток
+                     стоїть «Карамельний» і «Світло-сірий», а в товару з
+                     ОДНИМ кольором рядка немає взагалі — і читається це
+                     не як «колір один», а як «колір не вказали». Ряд
+                     карток стає нерівним, і найчастіше питання покупця
+                     («якого воно кольору?») лишається без відповіді
+                     саме там, де відповідь однозначна. -->
+                ${cardColorLabel(product, variants)}
                 <div class="product-meta-row">
                     <div class="product-price">
                         <span class="price">${formatPrice(product.price)}</span>

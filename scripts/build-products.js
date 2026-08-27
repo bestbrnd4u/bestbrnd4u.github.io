@@ -17,6 +17,8 @@ const crypto = require("crypto");
 // не даємо файлам зі зламаним ім'ям потрапити в зібраний JSON
 // (див. коментар у scripts/slug-safety.js)
 const { filterSafeEntryFiles } = require("./slug-safety");
+// зводить написання кольорів до одного вигляду (див. коментар у файлі)
+const { normalizeProductColors } = require("./normalize-colors");
 
 const ROOT = path.join(__dirname, "..");
 const PRODUCTS_DIR = path.join(ROOT, "data", "products");
@@ -497,6 +499,35 @@ function main() {
     renumberSortOrder(products);
 
     products.sort((a, b) => a.id - b.id);
+
+    // Назви кольорів зводимо до одного вигляду ТУТ, а не в даних.
+    //
+    // ЧОМУ ТУТ. Колір заповнюється руками, і кожен постачальник пише
+    // по-своєму: «Black чорний», «Nero», «Бежевий 1R5», «Wht-Dk Grn
+    // 286». Це не помилка заповнення — так написано в джерелі, і
+    // копіювати звідти нормально. Але на сайт мусить потрапляти один
+    // вигляд, інакше фільтр «Колір» перетворюється на 83 пункти на 71
+    // товар, а в картці під назвою стоїть артикул відтінку.
+    //
+    // Виправляти дані руками означало б робити це заново після
+    // кожного нового товару. Тут це робиться саме, і правило видно в
+    // одному місці — scripts/normalize-colors.js.
+    //
+    // Файли-джерела не змінюються: в адмінці лишається те, що
+    // написали, разом з артикулом постачальника.
+    let renamedColors = 0;
+
+    products.forEach(product => {
+
+        renamedColors += normalizeProductColors(product).size;
+
+    });
+
+    if (renamedColors) {
+
+        console.log(`Кольори зведено до єдиного вигляду: ${renamedColors} назв`);
+
+    }
 
     stampImageVersions(products);
 
