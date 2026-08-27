@@ -24,7 +24,7 @@
   "preOrderPrepayment": 100,
   "strapInfo": "Золотистий сталевий браслет із PVD-покриттям, застібка — розкладна із захисним замком. Ширина кріплення — 0,6 см",
   "sizes": [
-    "Onesize"
+    "ONESIZE"
   ],
   "splitByColor": true,
   "searchKeywords": [
@@ -51,5 +51,14 @@
   "description": "Вишуканий жіночий годинник Tissot Lovely Round 19.5mm — мініатюрна модель із круглим корпусом, що поєднує елегантність, жіночність та швейцарську якість.\nГодинник має сріблястий циферблат із лаконічними індексами, корпус із нержавіючої сталі 316L із PVD-покриттям кольору жовтого золота та стійке до подряпин сапфірове скло. Швейцарський кварцовий механізм забезпечує точний хід. Модель доповнена золотистим сталевим браслетом із розкладною застібкою та захисним замком. Водонепроникність — до 30 м (3 ATM)",
   "sku": "T058.009.33.031.00",
   "rating": 5,
-  "category": "Годинники"
+  "category": "Годинники",
+  "slug": "годинник-tissot-lovely-round-19-5mm",
+  "id": 74,
+  "color": "Золотистий",
+  "images": [
+    "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_5.webp",
+    "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_2_2.webp",
+    "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_3_2.webp",
+    "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-dial-ladies-watch-t0580091103100_4_1.webp"
+  ]
 }
