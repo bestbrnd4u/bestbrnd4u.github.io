@@ -23,7 +23,7 @@
   "preOrderPrepayment": 100,
   "strapInfo": "Сталевий браслет сріблястого кольору шириною 1,6 см із швидкознімною системою та застібкою-метеликом",
   "sizes": [
-    "Onesize"
+    "ONESIZE"
   ],
   "splitByColor": true,
   "searchKeywords": [
@@ -50,5 +50,13 @@
   "description": "Елегантний жіночий годинник Tissot Everytime 34mm із мінімалістичним дизайном та круглим сталевим корпусом. Модель легко поєднується як із повсякденними, так і з діловими та більш елегантними образами.\nГодинник оснащений швейцарським кварцовим механізмом ETA F05.412, сапфіровим склом, стійким до подряпин, та сталевим браслетом із системою швидкого знімання. Сріблястий корпус доповнений світлим циферблатом із лаконічними індексами. Водонепроникність — до 50 м (5 bar)",
   "sku": "T143.210.11.033.00",
   "rating": 5,
-  "category": "Годинники"
+  "category": "Годинники",
+  "slug": "годинник-tissot-everytime-34mm-t143-210-11-033-00",
+  "id": 76,
+  "color": "Сріблястий",
+  "images": [
+    "/assets/images/products/uploads/tissot-everytime-quartz-silver-dial-ladies-watch-t1432101103300.webp",
+    "/assets/images/products/uploads/tissot-everytime-quartz-silver-dial-ladies-watch-t1432101103300_2.webp",
+    "/assets/images/products/uploads/tissot-everytime-quartz-silver-dial-ladies-watch-t1432101103300_3.webp"
+  ]
 }
