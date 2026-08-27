@@ -14,16 +14,16 @@
       "color": "Сріблястий",
       "hex": "#bcbcbc",
       "images": [
-        "/assets/images/products/uploads/tissot-classic-dream-swissmatic-silver-dial-mens-watch-t1294072203100-t1294072203100.webp",
-        "/assets/images/products/uploads/tissot-classic-dream-swissmatic-silver-dial-mens-watch-t1294072203100-t1294072203100_2.webp",
-        "/assets/images/products/uploads/tissot-classic-dream-swissmatic-silver-dial-mens-watch-t1294072203100-t1294072203100_3.webp"
+        "/assets/images/products/uploads/tissot-classic-dream-swissmatic-silver-d-f03a52ef.webp",
+        "/assets/images/products/uploads/tissot-classic-dream-swissmatic-silver-d-ea41ed3e.webp",
+        "/assets/images/products/uploads/tissot-classic-dream-swissmatic-silver-d-88843986.webp"
       ]
     }
   ],
   "preOrderPrepayment": 100,
   "strapInfo": "Двоколірний браслет із нержавіючої сталі сріблястого та рожево-золотистого кольорів, ширина кріплення — 2,2 см. Застібка-метелик із кнопками",
   "sizes": [
-    "Onesize"
+    "ONESIZE"
   ],
   "splitByColor": true,
   "searchKeywords": [
@@ -54,5 +54,13 @@
   "description": "Годинник оснащений швейцарським автоматичним механізмом Swissmatic із запасом ходу до 72 годин, функцією відображення дати та сапфіровим склом із захистом від подряпин. Прозора задня кришка дозволяє спостерігати за роботою механізму. Корпус і браслет виконані з нержавіючої сталі, доповненої PVD-покриттям кольору рожевого золота. Водонепроникність — до 50 м (5 bar)",
   "sku": "T129.407.22.031.00",
   "rating": 5,
-  "category": "Годинники"
+  "category": "Годинники",
+  "slug": "годинник-tissot-classic-dream-swissmatic-t129-407-22-031-00",
+  "id": 78,
+  "color": "Сріблястий",
+  "images": [
+    "/assets/images/products/uploads/tissot-classic-dream-swissmatic-silver-d-f03a52ef.webp",
+    "/assets/images/products/uploads/tissot-classic-dream-swissmatic-silver-d-ea41ed3e.webp",
+    "/assets/images/products/uploads/tissot-classic-dream-swissmatic-silver-d-88843986.webp"
+  ]
 }
