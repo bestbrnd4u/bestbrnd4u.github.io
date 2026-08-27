@@ -1209,55 +1209,14 @@
     "category": "Жіночі сумки"
   },
   {
-    "title": "Сумочка The Teddy J Marc Mini Bag Brown",
-    "brand": "Marc Jacobs",
-    "category": "Жіночі сумки",
-    "gender": "Жінкам",
-    "price": 9000,
-    "description": "Компактна сумочка Marc Jacobs із колекції The Teddy — м'який ворсистий верх і фірмова монограма J на клапані. Носиться на ланцюжку через плече або в руці. Модель на щодень, коли потрібно взяти лише необхідне.",
-    "variants": [
-      {
-        "color": "Коричневий",
-        "hex": "#996f4f",
-        "images": [
-          "assets/images/products/uploads/2f3hsh042h02-230-1.webp?v=d0240bf3",
-          "assets/images/products/uploads/2f3hsh042h02-230-2.webp?v=503a3353",
-          "assets/images/products/uploads/2f3hsh042h02-230-3.webp?v=6b7b7e54"
-        ],
-        "sku": "2F3HSH042H02-230"
-      }
+    "gender": [
+      "Жінкам"
     ],
     "oldPrice": 12900,
-    "badge": "SALE",
-    "isNew": false,
-    "sku": "2F3HSH042H02-230",
-    "searchKeywords": [
-      "марк джейкобс",
-      "marc jacobs",
-      "mj",
-      "сумка жіноча",
-      "кросбоді",
-      "сумка через плече",
-      "клатч",
-      "коричневий",
-      "the",
-      "teddy",
-      "marc",
-      "mini"
-    ],
-    "instagramBlock": "general",
-    "preOrder": false,
-    "images": [
-      "assets/images/products/uploads/2f3hsh042h02-230-1.webp",
-      "assets/images/products/uploads/2f3hsh042h02-230-2.webp",
-      "assets/images/products/uploads/2f3hsh042h02-230-3.webp"
-    ],
-    "slug": "marc-jacobs-sumochka-the-teddy-j-marc-mini-bag-brown",
-    "id": 21,
     "color": "Коричневий",
-    "sizes": [
-      "ONESIZE"
-    ],
+    "badge": "SALE",
+    "brand": "Marc Jacobs",
+    "price": 9000,
     "framing": {
       "2f3hsh042h02-230-1.webp": {
         "zoom": 1.68,
@@ -1274,7 +1233,51 @@
         "x": 50,
         "y": 50
       }
-    }
+    },
+    "preOrder": false,
+    "slug": "marc-jacobs-sumochka-the-teddy-j-marc-mini-bag-brown",
+    "variants": [
+      {
+        "color": "Коричневий",
+        "hex": "#996f4f",
+        "images": [
+          "assets/images/products/uploads/2f3hsh042h02-230-1.webp?v=d0240bf3",
+          "assets/images/products/uploads/2f3hsh042h02-230-2.webp?v=503a3353",
+          "assets/images/products/uploads/2f3hsh042h02-230-3.webp?v=6b7b7e54"
+        ],
+        "sku": "2F3HSH042H02-230"
+      }
+    ],
+    "sortOrder": 2,
+    "sizes": [
+      "ONESIZE"
+    ],
+    "searchKeywords": [
+      "марк джейкобс",
+      "marc jacobs",
+      "mj",
+      "сумка жіноча",
+      "кросбоді",
+      "сумка через плече",
+      "клатч",
+      "коричневий",
+      "the",
+      "teddy",
+      "marc",
+      "mini"
+    ],
+    "isNew": false,
+    "title": "Сумочка The Teddy J Marc Mini Bag Brown",
+    "images": [
+      "assets/images/products/uploads/2f3hsh042h02-230-1.webp",
+      "assets/images/products/uploads/2f3hsh042h02-230-2.webp",
+      "assets/images/products/uploads/2f3hsh042h02-230-3.webp"
+    ],
+    "id": 21,
+    "instagramBlock": "general",
+    "description": "Компактна сумочка Marc Jacobs із колекції The Teddy — м'який ворсистий верх і фірмова монограма J на клапані. Носиться на ланцюжку через плече або в руці. Модель на щодень, коли потрібно взяти лише необхідне.",
+    "sku": "2F3HSH042H02-230",
+    "category": "Жіночі сумки"
   },
   {
     "title": "Жіноча шкіряна сумочка крос-боді Marc Jacobs the leather bucket bag",
