@@ -4645,7 +4645,7 @@
         ]
       },
       {
-        "color": "Черепаховий Havana",
+        "color": "Черепаховий",
         "hex": "#543c22",
         "sku": "SL 276 MICA 002 53",
         "sizes": [
@@ -4658,7 +4658,7 @@
         ]
       },
       {
-        "color": "Чорний / жовтий",
+        "color": "Світло-чорний",
         "hex": "#dcd9d9",
         "sku": "SL 276 MICA 038 53",
         "sizes": [
@@ -5104,7 +5104,7 @@
     "dimensions": "4,2 × 4,2 × 1,2 см",
     "variants": [
       {
-        "color": "Сріблястий / золотистий / чорний",
+        "color": "Сріблястий",
         "hex": "#b9b9b9",
         "images": [
           "/assets/images/products/uploads/matheytissot-mathy-ceramic-quartz-black-dial-mens-watch-h901crbn.webp?v=3474f80f",
@@ -5146,7 +5146,7 @@
     "category": "Годинники",
     "slug": "годинник-mathey-tissot-mathy-ceramic-h901crbn",
     "id": 79,
-    "color": "Сріблястий / золотистий / чорний",
+    "color": "Сріблястий",
     "images": [
       "/assets/images/products/uploads/matheytissot-mathy-ceramic-quartz-black-dial-mens-watch-h901crbn.webp",
       "/assets/images/products/uploads/matheytissot-mathy-ceramic-quartz-black-dial-mens-watch-h901crbn_2.webp",
