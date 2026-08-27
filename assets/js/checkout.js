@@ -958,12 +958,55 @@ checkoutForm?.addEventListener("submit", event => {
 
             leaveGuardActive = false;
 
-            const itemsCount = getCart().reduce((sum, line) => sum + line.qty, 0);
+            // Склад замовлення для сторінки «Дякуємо».
+            //
+            // ЧОМУ ТУТ БУВ ПРОЧЕРК
+            // ---------------------
+            // Раніше кількість рахувалась так:
+            //   getCart().reduce((sum, line) => sum + line.qty, 0)
+            // Але getCart() віддає ОКРЕМИЙ запис на кожну одиницю
+            // товару, і поля qty в них немає. Сума виходила NaN, а
+            // JSON.stringify перетворює NaN на null — на сторінці
+            // з'являлось «—».
+            //
+            // getGroupedCartLines() групує записи й рахує qty — саме
+            // те, що потрібно. Ним же користується сам кошик, тож
+            // цифри на обох сторінках тепер з одного джерела.
+            const lines = getGroupedCartLines();
+
+            const itemsCount = lines.reduce((sum, line) => sum + line.qty, 0);
+
+            // Зберігаємо й самі товари: назву, фото, кількість і суму.
+            //
+            // Без них сторінка підтвердження показує лише число, і
+            // покупець не може перевірити, ЩО саме він замовив. А це
+            // останній момент, коли помилку ще легко виправити
+            // телефоном.
+            const items = lines.map(line => {
+
+                const product = findCachedProduct(line.id) || {};
+
+                const price = Number(product.price) || 0;
+
+                return {
+                    title: product.title || "Товар",
+                    brand: product.brand || "",
+                    image: (product.images || [])[0]
+                        || (product.variants?.[0]?.images || [])[0]
+                        || "",
+                    color: line.color || "",
+                    size: line.size || "",
+                    qty: line.qty,
+                    sum: price * line.qty
+                };
+
+            });
 
             sessionStorage.setItem("bestbrnd4uLastOrder", JSON.stringify({
                 orderId,
                 orderDate,
                 itemsCount,
+                items,
                 total: orderTotalEl.textContent,
                 firstName: document.getElementById("firstName")?.value.trim() || ""
             }));

@@ -11028,3 +11028,106 @@ summary:focus-visible,
     font-size:13px;
     color:var(--gray500);
 }
+
+/* Стрічка про обробку даних під кнопкою оформлення.
+   
+   Тут був розкривний блок на чотири абзаци — прямо під «Оформити
+   замовлення». Людина хотіла купити, а читала про передачу даних
+   службі доставки. Тепер одна стрічка, а текст переїхав у політику. */
+.order-data-link{
+    margin:12px 0 0;
+    font-size:12.5px;
+    line-height:1.5;
+    color:var(--gray500);
+    text-align:center;
+}
+
+.order-data-link a{
+    color:var(--gray700);
+    text-decoration:underline;
+}
+
+/* ==========================================================
+   СТОРІНКА «ДЯКУЄМО»: склад замовлення
+   ==========================================================
+
+   Раніше тут стояло лише число товарів — та ще й прочерк замість
+   нього. Покупець не міг перевірити, ЩО саме замовив, а це останній
+   момент, коли помилку легко виправити телефоном.
+   ========================================================== */
+
+.order-confirm-items{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    padding:14px 0;
+    border-top:1px solid var(--gray100);
+    border-bottom:1px solid var(--gray100);
+    margin:4px 0;
+}
+
+.order-confirm-item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    text-align:left;
+}
+
+.order-confirm-item img{
+    width:54px;
+    height:68px;
+    flex-shrink:0;
+    object-fit:cover;
+    border-radius:8px;
+    background:#fff;
+}
+
+.order-confirm-item-info{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    min-width:0;
+    flex:1;
+}
+
+.order-confirm-item-brand{
+    font-size:11px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    color:var(--gray500);
+}
+
+.order-confirm-item-title{
+    font-size:14px;
+    font-weight:600;
+    line-height:1.35;
+    color:var(--gray900);
+}
+
+.order-confirm-item-meta{
+    font-size:12.5px;
+    color:var(--gray500);
+}
+
+/* Сума не переноситься: рядок із цифрою, розірваний навпіл, читається
+   як помилка. */
+.order-confirm-item-sum{
+    flex-shrink:0;
+    font-size:14px;
+    font-weight:600;
+    white-space:nowrap;
+    color:var(--gray900);
+}
+
+@media(max-width:520px){
+
+    .order-confirm-item img{
+        width:44px;
+        height:55px;
+    }
+
+    .order-confirm-item-title{
+        font-size:13px;
+    }
+
+}
