@@ -23,7 +23,7 @@
   "preOrderPrepayment": 50,
   "strapInfo": "Регульований плечовий ремінь довжиною 80–150 см, що дозволяє носити сумку через плече або кросбоді",
   "sizes": [
-    "Onesize"
+    "ONESIZE"
   ],
   "splitByColor": true,
   "searchKeywords": [
@@ -46,5 +46,14 @@
   "description": "Стильна чоловіча сумка Armani Exchange у класичному чорному кольорі — практичний аксесуар для повсякденних образів. Компактний формат дозволяє зручно носити необхідні речі, не перевантажуючи образ.\nМодель має основне відділення із застібкою-блискавкою, внутрішню кишеню на блискавці, передню кишеню на блискавці та задню накладну кишеню для речей, які мають бути швидко доступними. Лаконічний дизайн доповнений фірмовим логотипом Armani Exchange",
   "sku": "952137-2F882-00020",
   "rating": 5,
-  "category": "Чоловічі сумки"
+  "category": "Чоловічі сумки",
+  "slug": "чоловіча-сумка-armani-exchange-crossbody",
+  "id": 70,
+  "color": "Чорний",
+  "images": [
+    "/assets/images/products/uploads/main.webp",
+    "/assets/images/products/uploads/1.webp",
+    "/assets/images/products/uploads/3.webp",
+    "/assets/images/products/uploads/81.webp"
+  ]
 }
