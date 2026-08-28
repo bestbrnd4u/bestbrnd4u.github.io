@@ -184,12 +184,26 @@ function cleanupColorName(name) {
 
     if (cyrillic) {
 
-        const longest = cyrillic
+        const parts = cyrillic
             .map(part => part.trim())
-            .filter(part => part.length > 2)
-            .sort((a, b) => b.length - a.length)[0];
+            // 2 символи — це не колір, а хвіст на кшталт «і»;
+            // довше за 20 — уже опис, а не назва відтінку
+            .filter(part => part.length > 2 && part.length <= 20);
 
-        if (longest) return capitalize(tidySpaces(longest));
+        // ЗБЕРІГАЄМО ВСІ КОЛЬОРИ, А НЕ НАЙДОВШИЙ.
+        //
+        // Тут стояв вибір найдовшого слова — і на «Чорний / жовтий»
+        // (окуляри Saint Laurent) він мовчки викидав жовтий. У товару
+        // ставало два варіанти «Чорний», спрацьовував розвідник
+        // зіткнень і робив із другого «Світло-чорний» — назву, якої не
+        // буває, для оправи, що насправді чорно-жовта.
+        //
+        // Втрата половини назви гірша за довгий підпис: покупець
+        // обирає саме за нею.
+        // Кожну частину чистимо окремо й лише потім склеюємо:
+        // tidySpaces() стискає пробіли навколо косої, і на склеєному
+        // рядку «Чорний / жовтий» перетворилось би на «Чорний/жовтий».
+        if (parts.length) return capitalize(parts.map(tidySpaces).join(" / "));
 
     }
 
@@ -272,7 +286,14 @@ function normalizeProductColors(product) {
             const mine = hexLightness(variant.hex);
             const theirs = hexLightness(takenHex.get(after));
 
-            if (mine !== null && theirs !== null && Math.abs(mine - theirs) > 0.02) {
+            // «Світло-чорний» і «Темно-білий» — не кольори.
+            //
+            // Чорний і білий уже крайні, далі світлішати чи темнішати
+            // нікуди: приставка до них дає назву, якої не буває. Для
+            // таких лишаємо вихідний підпис — незграбний, зате чесний.
+            const extreme = /^(чорний|білий)$/i.test(after);
+
+            if (!extreme && mine !== null && theirs !== null && Math.abs(mine - theirs) > 0.02) {
 
                 const prefix = mine < theirs ? "Темно-" : "Світло-";
 
