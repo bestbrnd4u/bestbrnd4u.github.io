@@ -114,10 +114,16 @@ console.log("\n[2b] Керування з адмінки");
         framing.normalizeFrame({ zoom: 1, x: 50, y: 50 }) === null);
 
     // У віджеті: визначення кольору й показ результату ДО публікації.
-    check("колір тла визначається", /detectBackground: function/.test(widget));
-    check("є попередній перегляд", /whitenedPreview: function/.test(widget));
+    //
+    // whitenedPreview() розділився надвоє: ensureWhitePreview() малює
+    // кадр (більший за той, на якому розбирається колір — інакше
+    // передперегляд виходив мутним) і кладе результат у стан, а
+    // whitenPixels() робить саму заливку. Рахувати це в render(), як
+    // було, не можна: на 640px браузер став би колом.
+    check("колір фону визначається", /detectBackground: function/.test(widget));
+    check("є попередній перегляд", /ensureWhitePreview: function/.test(widget));
     check("перегляд показується замість оригіналу",
-        /frame\.bg === "white" && this\.whitenedPreview\(\)/.test(widget));
+        /frame\.bg === "white" && this\.state\.whitePreview/.test(widget));
 
     // Алгоритм у віджеті мусить бути ТОЙ САМИЙ, що в збірці — інакше
     // показане не збігатиметься з результатом.

@@ -210,10 +210,76 @@
 
     }
 
+    // Та сама подія, що й у admin/image-framing-widget.js — там же
+    // пояснення, навіщо саме подія, а не спільний стан.
+    var ACTIVE_EVENT = "bb4u:framing-active";
+
+    function sameImage(a, b) {
+
+        var name = function (v) {
+            return String(v || "").split("?")[0].split("#")[0].split("/").pop();
+        };
+
+        return !!a && !!b && name(a) === name(b);
+
+    }
+
     var PreviewGallery = createClass({
 
         getInitialState: function () {
             return { index: 0 };
+        },
+
+        // Перегортаємо картку на те фото, яке правлять у віджеті
+        // кадрування.
+        //
+        // НАВІЩО. Ви налаштовуєте третє фото, а картка показує перше —
+        // і побачити, що вийшло, можна лише окремо догортавши сюди
+        // стрілками, здогадавшись, яке з пʼяти відповідає вашому рядку.
+        // Заради цього прев'ю й існує, тож хай воно саме йде за роботою.
+        componentDidMount: function () {
+
+            var self = this;
+
+            this.onActive = function (event) {
+
+                var images = self.props.images || [];
+
+                for (var i = 0; i < images.length; i++) {
+
+                    if (!sameImage(images[i], event.detail)) continue;
+
+                    if (self.state.index !== i) self.setState({ index: i });
+
+                    return;
+
+                }
+
+            };
+
+            window.addEventListener(ACTIVE_EVENT, this.onActive);
+
+        },
+
+        componentWillUnmount: function () {
+            if (this.onActive) window.removeEventListener(ACTIVE_EVENT, this.onActive);
+        },
+
+        // Звʼязок у зворотний бік: перегорнули картку — підсвітився
+        // потрібний рядок у кадруванні.
+        //
+        // Розсилаємо ЛИШЕ зі своїх обробників кліку, а не з відповіді
+        // на подію: інакше два компоненти ганяли б її по колу.
+        announce: function (index) {
+
+            var images = this.props.images || [];
+
+            if (!images[index] || typeof window.CustomEvent !== "function") return;
+
+            window.dispatchEvent(new CustomEvent(ACTIVE_EVENT, {
+                detail: String(images[index])
+            }));
+
         },
 
         // Фото могли видалити або переставити, поки прев'ю відкрите:
@@ -225,8 +291,14 @@
         },
 
         step: function (delta, total) {
+
             if (!total) return;
-            this.setState({ index: (this.clampIndex(total) + delta + total) % total });
+
+            var next = (this.clampIndex(total) + delta + total) % total;
+
+            this.setState({ index: next });
+            this.announce(next);
+
         },
 
         render: function () {
@@ -280,7 +352,7 @@
                             key: src + i,
                             type: "button",
                             className: "cms-preview-thumb" + (i === index ? " is-active" : ""),
-                            onClick: function () { self.setState({ index: i }); },
+                            onClick: function () { self.setState({ index: i }); self.announce(i); },
                             title: String(src).split("/").pop()
                         }, h(AssetImage, {
                             path: src,

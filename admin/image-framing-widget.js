@@ -230,6 +230,49 @@
 
     }
 
+    // ---------- звʼязок із прев'ю картки ----------
+
+    // Праворуч у Decap стоїть прев'ю картки товару, і воно жило власним
+    // життям: ви правите третє фото, а картка вперто показує перше.
+    // Щоб побачити результат, доводилось окремо гортати її стрілками й
+    // самому здогадуватись, яке з пʼяти фото відповідає рядку, у якому
+    // ви зараз стоїте.
+    //
+    // Тепер обидві сторони говорять про «поточне фото» через одну
+    // подію: клац по рядку — картка перегортається на це фото; клац по
+    // стрілці чи мініатюрі в картці — підсвічується відповідний рядок.
+    //
+    // ЧОМУ ПОДІЯ, А НЕ СПІЛЬНИЙ СТАН
+    // -------------------------------
+    // Віджет і шаблон прев'ю — два незалежні компоненти Decap: вони не
+    // мають спільного батька, і передати щось пропсами нема через кого.
+    // Прев'ю малюється в окремому iframe, але САМ КОД виконується у
+    // головному вікні (Decap рендерить туди порталом), тож window у них
+    // спільне — цього досить.
+    //
+    // Порівнюємо за ІМЕНЕМ ФАЙЛУ, а не за повним шляхом: у віджеті це
+    // шлях із запису, у прев'ю той самий шлях може приїхати вже
+    // розвʼязаним через getAsset.
+    var ACTIVE_EVENT = "bb4u:framing-active";
+
+    function announceActive(src) {
+
+        if (!src || typeof window.CustomEvent !== "function") return;
+
+        window.dispatchEvent(new CustomEvent(ACTIVE_EVENT, { detail: String(src) }));
+
+    }
+
+    function sameImage(a, b) {
+
+        var name = function (v) {
+            return String(v || "").split("?")[0].split("#")[0].split("/").pop();
+        };
+
+        return !!a && !!b && name(a) === name(b);
+
+    }
+
     var FrameEditor = createClass({
 
         getInitialState: function () {
@@ -239,12 +282,18 @@
             return {
                 dragging: false,
                 fitError: null,
-                // тло: адреса фото, яку вже розібрали (див. detectBackground)
+                // фон: адреса фото, яку вже розібрали (див. detectBackground)
                 bgChecked: null,
                 bgColor: null,
                 bgUniform: false,
                 bgIsWhite: false,
-                bgSource: null
+                // Пікселі розбору тут більше не тримаємо: передперегляд
+                // малюється зі свого, більшого кадру, а копія ImageData
+                // на кожен рядок — це мегабайти в стані ні за чим.
+                //
+                // відбілений передперегляд і фото, для якого його рахували
+                whitePreview: null,
+                whitePreviewFor: null
             };
         },
 
@@ -256,7 +305,35 @@
         // а весь блок про тло (кружечок кольору, підпис, три кнопки й
         // передперегляд) просто не малювався. Код був, функції не було.
         componentDidMount: function () {
+
+            var self = this;
+
+            this.alive = true;
+
+            // Підсвічуємо рядок, коли картку праворуч перегорнули на
+            // це фото — щоб не шукати очима, який із десяти рядків
+            // зараз показаний.
+            this.onActive = function (event) {
+
+                var active = sameImage(event.detail, self.props.src);
+
+                if (active !== self.state.active) self.setState({ active: active });
+
+            };
+
+            window.addEventListener(ACTIVE_EVENT, this.onActive);
+
             this.detectBackground();
+            this.ensureWhitePreview();
+
+        },
+
+        // Малювання передперегляду асинхронне: рядок може зникнути
+        // (прибрали фото, згорнули блок) раніше, ніж воно завершиться.
+        // Без цього прапорця setState прилетів би в неживий компонент.
+        componentWillUnmount: function () {
+            this.alive = false;
+            if (this.onActive) window.removeEventListener(ACTIVE_EVENT, this.onActive);
         },
 
         // Адреса фото приходить не одразу: getAsset розвʼязує файл
@@ -265,6 +342,7 @@
         // фото — до перезавантаження сторінки.
         componentDidUpdate: function () {
             this.detectBackground();
+            this.ensureWhitePreview();
         },
 
         // Перетягування по кадру рухає точку фокуса. Рахуємо у відсотках
@@ -396,8 +474,7 @@
                 self.setState({
                     bgColor: bg,
                     bgUniform: spread <= 24,
-                    bgIsWhite: Math.min(bg[0], bg[1], bg[2]) >= 250,
-                    bgSource: { px: px, w: w, h: h, bg: bg }
+                    bgIsWhite: Math.min(bg[0], bg[1], bg[2]) >= 250
                 });
 
             };
@@ -411,17 +488,121 @@
         // Йдемо від рамки всередину й зупиняємось на першому пікселі
         // товару. Світла пряжка в центрі сумки лишається пряжкою: шлях
         // до неї перекритий самим товаром.
-        whitenedPreview: function () {
+        // Передперегляд «як стане після публікації».
+        //
+        // ЩО БУЛО НЕ ТАК
+        // ---------------
+        // Заливку рахували на тих самих пікселях, що й РОЗБІР тла, — а
+        // розбір навмисно працює на зменшеній копії 160px: йому треба
+        // лише колір кутів, і читати заради цього повний файл ні до
+        // чого.
+        //
+        // Для передперегляду ті самі 160px — це вирок. Рамка в адмінці
+        // близько 145px завширшки, при наближенні 1.5× у неї
+        // розтягується сотня пікселів джерела. Фото після натискання
+        // «Зробити білим» помітно мутніло — і виглядало це так, ніби
+        // кнопка псує знімок.
+        //
+        // Тому передперегляд малюємо окремо й більшим (640px по довгій
+        // стороні — учетверо більше за рамку навіть на екрані з
+        // подвоєною щільністю).
+        //
+        // І РАХУЄМО ОДИН РАЗ
+        // -------------------
+        // Раніше whitenedPreview() викликався прямо в render(), тобто
+        // заливка всього кадру + toDataURL проганялись на кожне
+        // перемальовування — а воно трапляється на кожен рух повзунка й
+        // на кожен піксель перетягування точки. На 160px це просто
+        // марна робота; на 640px браузер би став колом. Тому результат
+        // рахується один раз на фото й лежить у стані.
+        ensureWhitePreview: function () {
 
-            var source = this.state.bgSource;
+            var self = this;
+            var url = this.props.url;
 
-            if (!source) return null;
+            var potribno = url && this.props.frame && this.props.frame.bg === "white";
 
-            var w = source.w;
-            var h = source.h;
-            var bg = source.bg;
+            // Зняли «Зробити білим» — прибираємо й картинку, інакше
+            // рамка показувала б відбілене фото після скасування.
+            if (!potribno) {
 
-            var px = new Uint8ClampedArray(source.px);
+                if (this.state.whitePreviewFor) {
+                    this.setState({ whitePreview: null, whitePreviewFor: null });
+                }
+
+                return;
+
+            }
+
+            // Колір фону ще не порахований.
+            //
+            // Кнопки в цей момент і не видно — весь блок малюється лише
+            // коли bgColor є. Але рішення «білим» могло бути ЗБЕРЕЖЕНЕ
+            // раніше, і тоді ми приходимо сюди на самому монтуванні,
+            // поки розбір ще летить. Мовчки зайняти адресу означало б
+            // ніколи не намалювати передперегляд: повторної спроби вже
+            // не буде. Тому просто чекаємо наступного оновлення.
+            if (!this.state.bgColor) return;
+
+            if (this.state.whitePreviewFor === url) return;
+
+            this.setState({ whitePreviewFor: url });
+
+            var img = new Image();
+
+            img.crossOrigin = "anonymous";
+
+            img.onerror = function () {
+                console.warn("Кадрування: не вдалось прочитати фото для передперегляду:", url);
+            };
+
+            img.onload = function () {
+
+                var max = 640;
+                var scale = Math.min(1, max / Math.max(img.width, img.height));
+
+                var w = Math.max(1, Math.round(img.width * scale));
+                var h = Math.max(1, Math.round(img.height * scale));
+
+                var canvas = document.createElement("canvas");
+
+                canvas.width = w;
+                canvas.height = h;
+
+                canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+
+                var data;
+
+                try {
+                    data = canvas.getContext("2d").getImageData(0, 0, w, h);
+                } catch (error) {
+                    return;   // фото з іншого домену
+                }
+
+                // Колір тла беремо з РОЗБОРУ, а не міряємо заново:
+                // інакше підпис («Фон сірий або бежевий») і картинка
+                // могли б розійтись на кілька одиниць і суперечити одне
+                // одному.
+                var bg = self.state.bgColor;
+
+                if (!bg) return;
+
+                var url_ = self.whitenPixels(data.data, w, h, bg, canvas);
+
+                if (self.alive !== false) self.setState({ whitePreview: url_ });
+
+            };
+
+            img.src = url;
+
+        },
+
+        // Сама заливка від країв — та сама, що в збірці
+        // (scripts/whiten-backgrounds.js), із тим самим допуском.
+        // Це не «схоже на результат», а він і є.
+        whitenPixels: function (source, w, h, bg, canvas) {
+
+            var px = new Uint8ClampedArray(source);
 
             var TOLERANCE = 14;
 
@@ -470,11 +651,6 @@
                 push(cx, cy + 1);
 
             }
-
-            var canvas = document.createElement("canvas");
-
-            canvas.width = w;
-            canvas.height = h;
 
             canvas.getContext("2d").putImageData(new ImageData(px, w, h), 0, 0);
 
@@ -758,7 +934,17 @@
                 transformOrigin: frame.x + "% " + frame.y + "%"
             };
 
-            return h("div", { className: "framing-row" },
+            return h("div", {
+
+                className: "framing-row" + (this.state.active ? " is-active" : ""),
+
+                // Клац будь-де в рядку — картка праворуч показує саме це
+                // фото. Слухаємо mousedown на всьому рядку, а не окремі
+                // кнопки: людина може почати з повзунка, з рамки чи з
+                // «Зробити білим» — намір скрізь один.
+                onMouseDown: function () { announceActive(self.props.src); }
+
+            },
 
                 // ----- рамка 4:5, у ній фото і мітка фокуса -----
                 h("div", {
@@ -778,7 +964,7 @@
                             // Коли обрано «біле», показуємо ПЕРЕМАЛЬОВАНЕ
                             // фото, а не оригінал: рішення приймається,
                             // коли результат видно.
-                            src: (frame.bg === "white" && this.whitenedPreview()) || url,
+                            src: (frame.bg === "white" && this.state.whitePreview) || url,
                             style: imageStyle,
                             draggable: false,
                             alt: ""
@@ -847,13 +1033,13 @@
                                     }
                                 }),
                                 this.state.bgIsWhite
-                                    ? "Тло вже біле"
+                                    ? "Фон вже білий"
                                     : this.state.bgUniform
-                                        ? "Тло сіре або бежеве"
-                                        : "Тло неоднорідне"),
+                                        ? "Фон сірий або бежевий"
+                                        : "Фон неоднорідний"),
 
-                            // Неоднорідне тло не чіпаємо взагалі: це фото
-                            // на моделі або в інтерʼєрі, там «тлом»
+                            // Неоднорідний фон не чіпаємо взагалі: це фото
+                            // на моделі або в інтерʼєрі, там фоном
                             // слугує сам знімок.
                             this.state.bgUniform
                                 ? h("div", { className: "framing-bg-actions" },
@@ -883,14 +1069,19 @@
 
                             h("p", { className: "framing-hint" },
                                 !this.state.bgUniform
-                                    ? "Фото на моделі або в інтерʼєрі — тло тут замінити не можна."
+                                    ? "Фото на моделі або в інтерʼєрі — фон тут замінити не можна."
                                     : frame.bg === "white"
-                                        ? "Ліворуч показано, яким стане фото після публікації."
+                                        // Прямо кажемо, ДЕ дивитись. Картка
+                                        // праворуч показує файл як він є —
+                                        // вона про верстку, не про фон, — і
+                                        // незмінене фото в ній читається як
+                                        // «кнопка не спрацювала».
+                                        ? "Результат видно ліворуч. У картці праворуч фон ще старий — він зміниться при публікації."
                                         : frame.bg === "keep"
                                             ? "Це фото лишиться як є."
                                             : this.state.bgIsWhite
                                                 ? "Нічого робити не потрібно."
-                                                : "Збірка вирівняє тло сама. «Не чіпати» — щоб залишила як є."))
+                                                : "Збірка вирівняє фон сама. «Не чіпати» — щоб залишила як є."))
                         : null,
 
                     // «Підігнати» — те, що потрібно найчастіше: предметні
