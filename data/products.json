@@ -1126,34 +1126,12 @@
     "color": "Темно-сірий"
   },
   {
-    "gender": [
-      "Жінкам"
-    ],
-    "oldPrice": 14300,
-    "color": "Бежевий",
-    "badge": "SALE",
-    "material": "Шкіра",
+    "title": "Сумка крос-боді жіноча шкіряна Marc Jacobs The Snapshot",
     "brand": "Marc Jacobs",
+    "category": "Жіночі сумки",
+    "gender": "Жінкам",
     "price": 10000,
-    "framing": {
-      "2s3hcr500h03-134-1.webp": {
-        "zoom": 2.34,
-        "x": 50,
-        "y": 50
-      },
-      "2s3hcr500h03-134-2.webp": {
-        "zoom": 2.19,
-        "x": 50,
-        "y": 50
-      },
-      "h153l01sp22-002-3.webp": {
-        "zoom": 1.77,
-        "x": 50,
-        "y": 50
-      }
-    },
-    "preOrder": false,
-    "slug": "marc-jacobs-sumka-kros-bodi-zhinocha-shkiriana-marc-jacobs-t",
+    "description": "Крос-боді Marc Jacobs зі шкіри — акуратний прямокутний корпус і подвійна монограма J. Ремінець регулюється, тож сумку можна носити через плече або навскіс. Два кольори на вибір.",
     "variants": [
       {
         "color": "Бежевий",
@@ -1176,10 +1154,11 @@
         "sku": "H153L01SP22-002"
       }
     ],
-    "sortOrder": 1,
-    "sizes": [
-      "ONESIZE"
-    ],
+    "oldPrice": 14300,
+    "badge": "SALE",
+    "isNew": false,
+    "material": "Шкіра",
+    "sku": "2S3HCR500H03_134",
     "searchKeywords": [
       "марк джейкобс",
       "marc jacobs",
@@ -1195,28 +1174,87 @@
       "the",
       "snapshot"
     ],
-    "isNew": false,
-    "title": "Сумка крос-боді жіноча шкіряна Marc Jacobs The Snapshot",
+    "instagramBlock": "general",
+    "preOrder": false,
     "images": [
       "assets/images/products/uploads/2s3hcr500h03-134-1.webp",
       "assets/images/products/uploads/2s3hcr500h03-134-2.webp",
       "assets/images/products/uploads/2s3hcr500h03-134-3.webp"
     ],
+    "slug": "marc-jacobs-sumka-kros-bodi-zhinocha-shkiriana-marc-jacobs-t",
     "id": 20,
-    "instagramBlock": "general",
-    "description": "Крос-боді Marc Jacobs зі шкіри — акуратний прямокутний корпус і подвійна монограма J. Ремінець регулюється, тож сумку можна носити через плече або навскіс. Два кольори на вибір.",
-    "sku": "2S3HCR500H03_134",
-    "category": "Жіночі сумки"
+    "color": "Бежевий",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "framing": {
+      "2s3hcr500h03-134-1.webp": {
+        "zoom": 2.34,
+        "x": 50,
+        "y": 50
+      },
+      "2s3hcr500h03-134-2.webp": {
+        "zoom": 2.19,
+        "x": 50,
+        "y": 50
+      },
+      "h153l01sp22-002-3.webp": {
+        "zoom": 1.77,
+        "x": 50,
+        "y": 50
+      }
+    }
   },
   {
-    "gender": [
-      "Жінкам"
+    "title": "Сумочка The Teddy J Marc Mini Bag Brown",
+    "brand": "Marc Jacobs",
+    "category": "Жіночі сумки",
+    "gender": "Жінкам",
+    "price": 9000,
+    "description": "Компактна сумочка Marc Jacobs із колекції The Teddy — м'який ворсистий верх і фірмова монограма J на клапані. Носиться на ланцюжку через плече або в руці. Модель на щодень, коли потрібно взяти лише необхідне.",
+    "variants": [
+      {
+        "color": "Коричневий",
+        "hex": "#996f4f",
+        "images": [
+          "assets/images/products/uploads/2f3hsh042h02-230-1.webp?v=d0240bf3",
+          "assets/images/products/uploads/2f3hsh042h02-230-2.webp?v=503a3353",
+          "assets/images/products/uploads/2f3hsh042h02-230-3.webp?v=6b7b7e54"
+        ],
+        "sku": "2F3HSH042H02-230"
+      }
     ],
     "oldPrice": 12900,
-    "color": "Коричневий",
     "badge": "SALE",
-    "brand": "Marc Jacobs",
-    "price": 9000,
+    "isNew": false,
+    "sku": "2F3HSH042H02-230",
+    "searchKeywords": [
+      "марк джейкобс",
+      "marc jacobs",
+      "mj",
+      "сумка жіноча",
+      "кросбоді",
+      "сумка через плече",
+      "клатч",
+      "коричневий",
+      "the",
+      "teddy",
+      "marc",
+      "mini"
+    ],
+    "instagramBlock": "general",
+    "preOrder": false,
+    "images": [
+      "assets/images/products/uploads/2f3hsh042h02-230-1.webp",
+      "assets/images/products/uploads/2f3hsh042h02-230-2.webp",
+      "assets/images/products/uploads/2f3hsh042h02-230-3.webp"
+    ],
+    "slug": "marc-jacobs-sumochka-the-teddy-j-marc-mini-bag-brown",
+    "id": 21,
+    "color": "Коричневий",
+    "sizes": [
+      "ONESIZE"
+    ],
     "framing": {
       "2f3hsh042h02-230-1.webp": {
         "zoom": 1.68,
@@ -1233,51 +1271,7 @@
         "x": 50,
         "y": 50
       }
-    },
-    "preOrder": false,
-    "slug": "marc-jacobs-sumochka-the-teddy-j-marc-mini-bag-brown",
-    "variants": [
-      {
-        "color": "Коричневий",
-        "hex": "#996f4f",
-        "images": [
-          "assets/images/products/uploads/2f3hsh042h02-230-1.webp?v=d0240bf3",
-          "assets/images/products/uploads/2f3hsh042h02-230-2.webp?v=503a3353",
-          "assets/images/products/uploads/2f3hsh042h02-230-3.webp?v=6b7b7e54"
-        ],
-        "sku": "2F3HSH042H02-230"
-      }
-    ],
-    "sortOrder": 2,
-    "sizes": [
-      "ONESIZE"
-    ],
-    "searchKeywords": [
-      "марк джейкобс",
-      "marc jacobs",
-      "mj",
-      "сумка жіноча",
-      "кросбоді",
-      "сумка через плече",
-      "клатч",
-      "коричневий",
-      "the",
-      "teddy",
-      "marc",
-      "mini"
-    ],
-    "isNew": false,
-    "title": "Сумочка The Teddy J Marc Mini Bag Brown",
-    "images": [
-      "assets/images/products/uploads/2f3hsh042h02-230-1.webp",
-      "assets/images/products/uploads/2f3hsh042h02-230-2.webp",
-      "assets/images/products/uploads/2f3hsh042h02-230-3.webp"
-    ],
-    "id": 21,
-    "instagramBlock": "general",
-    "description": "Компактна сумочка Marc Jacobs із колекції The Teddy — м'який ворсистий верх і фірмова монограма J на клапані. Носиться на ланцюжку через плече або в руці. Модель на щодень, коли потрібно взяти лише необхідне.",
-    "sku": "2F3HSH042H02-230",
-    "category": "Жіночі сумки"
+    }
   },
   {
     "title": "Жіноча шкіряна сумочка крос-боді Marc Jacobs the leather bucket bag",
@@ -3590,13 +3584,11 @@
       "Жінкам"
     ],
     "preOrderDays": "5–10 робочих днів",
-    "color": "Яскраво-зелений",
     "forcePublish": false,
     "material": "Натуральна шкіра",
     "brand": "Marc Jacobs",
     "price": 9000,
     "preOrder": false,
-    "slug": "сумка-marc-jacobs-the-j-marc-shoulder-bag-green-glow",
     "dimensions": "25 × 16 × 5 см",
     "variants": [
       {
@@ -3613,7 +3605,6 @@
     ],
     "preOrderPrepayment": 50,
     "strapInfo": "Два знімні — ланцюжок та регульований текстильний",
-    "sortOrder": 3,
     "sizes": [
       "ONESIZE"
     ],
@@ -3644,20 +3635,22 @@
     ],
     "isNew": false,
     "title": "Сумка Marc Jacobs The J Marc Shoulder Bag Green Glow",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Яскрава та стильна сумка Marc Jacobs The J Marc Shoulder Bag у насиченому відтінку Green Glow. Модель виконана з гладкої натуральної шкіри та доповнена фірмовою застібкою J Marc, яка робить дизайн впізнаваним і виразним.\nСумка має компактну прямокутну форму та зручне основне відділення, внутрішню кишеню на блискавці, відкриту кишеню та зовнішню кишеню на задній стороні.\nМодель комплектується двома знімними ременями: елегантним ременем-ланцюжком та регульованим текстильним ременем. Її можна носити на плечі, через плече або без ременів як клатч",
+    "sku": "H956L01PF22-325",
+    "rating": 5,
+    "category": "Жіночі сумки",
+    "slug": "сумка-marc-jacobs-the-j-marc-shoulder-bag-green-glow",
+    "id": 57,
+    "color": "Яскраво-зелений",
     "images": [
       "/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow.webp",
       "/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow2.webp",
       "/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow6.webp",
       "/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow3.webp",
       "/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow1.webp"
-    ],
-    "reviews": 0,
-    "id": 57,
-    "instagramBlock": "general",
-    "description": "Яскрава та стильна сумка Marc Jacobs The J Marc Shoulder Bag у насиченому відтінку Green Glow. Модель виконана з гладкої натуральної шкіри та доповнена фірмовою застібкою J Marc, яка робить дизайн впізнаваним і виразним.\nСумка має компактну прямокутну форму та зручне основне відділення, внутрішню кишеню на блискавці, відкриту кишеню та зовнішню кишеню на задній стороні.\nМодель комплектується двома знімними ременями: елегантним ременем-ланцюжком та регульованим текстильним ременем. Її можна носити на плечі, через плече або без ременів як клатч",
-    "sku": "H956L01PF22-325",
-    "rating": 5,
-    "category": "Жіночі сумки"
+    ]
   },
   {
     "gender": [
@@ -4627,537 +4620,6 @@
       "/assets/images/products/uploads/ach3atrpdjdyd181s4gcstgpa4qzgzrh.webp",
       "/assets/images/products/uploads/9dzhcfvjorauhd1nzfwyq9o69vh3iff1.webp",
       "/assets/images/products/uploads/u87036v1ioy7rp72btz5kw3oti8m25rs.webp"
-    ]
-  },
-  {
-    "gender": [
-      "Жінкам"
-    ],
-    "preOrderDays": "10- 14 робочих днів",
-    "forcePublish": false,
-    "material": "Ацетатна оправа, полімерні, нейлонові лінзи",
-    "brand": "Saint Laurent",
-    "price": 12400,
-    "preOrder": true,
-    "dimensions": "Ширина лінзи: 53 мм Місток: 16 мм Довжина завушника: 145 мм",
-    "variants": [
-      {
-        "color": "Чорний",
-        "hex": "#000000",
-        "images": [
-          "/assets/images/products/uploads/a0e43776-063b-4643-8c36-5024406361e9.webp?v=01af95e4",
-          "/assets/images/products/uploads/cfeba1dc-4b88-4f3b-984b-b5bebd478c1f.jpg?v=0f28bad7",
-          "/assets/images/products/uploads/33751393-b64e-49d3-b0c9-2e3bde1afaff.jpg?v=7b1a8ec9",
-          "/assets/images/products/uploads/aa00-okd0j9_99x_f9.webp?v=5c7f8ff0"
-        ]
-      },
-      {
-        "color": "Черепаховий",
-        "hex": "#543c22",
-        "sku": "SL 276 MICA 002 53",
-        "sizes": [
-          "53"
-        ],
-        "images": [
-          "/assets/images/products/uploads/saint-laurent-grey-cat-eye-ladies-sungla-99d23704.webp?v=dd135198",
-          "/assets/images/products/uploads/saint-laurent-grey-cat-eye-ladies-sungla-175c8e88.webp?v=ac28aea8",
-          "/assets/images/products/uploads/saint-laurent-grey-cat-eye-ladies-sungla-6b05dcda.webp?v=de137cb5"
-        ]
-      },
-      {
-        "color": "Світло-чорний",
-        "hex": "#dcd9d9",
-        "sku": "SL 276 MICA 038 53",
-        "sizes": [
-          "53"
-        ],
-        "images": [
-          "/assets/images/products/uploads/saint-laurent-yellow-cat-eye-ladies-sunglasses-sl-276-mica-038-53.webp?v=b904204e",
-          "/assets/images/products/uploads/saint-laurent-yellow-cat-eye-ladies-sunglasses-sl-276-mica-038-53_3-1-.webp?v=7b228098",
-          "/assets/images/products/uploads/saint-laurent-yellow-cat-eye-ladies-sunglasses-sl-276-mica-038-53_4.webp?v=e9241d93"
-        ]
-      }
-    ],
-    "preOrderPrepayment": 100,
-    "sizes": [
-      "53"
-    ],
-    "splitByColor": true,
-    "searchKeywords": [
-      "Saint Laurent",
-      "Saint Laurent SL 276 MICA",
-      "SL 276 MICA 001 53",
-      "окуляри Saint Laurent",
-      "сонцезахисні окуляри Saint Laurent",
-      "жіночі сонцезахисні окуляри",
-      "жіночі окуляри",
-      "окуляри Cat Eye",
-      "окуляри котяче око",
-      "чорні окуляри",
-      "окуляри із сірими лінзами",
-      "брендові окуляри",
-      "оригінальні Saint Laurent",
-      "YSL окуляри"
-    ],
-    "isNew": false,
-    "title": "Сонцезахисні окуляри Saint Laurent SL 276 MICA 001 53",
-    "reviews": 0,
-    "instagramBlock": "general",
-    "description": "Елегантні жіночі сонцезахисні окуляри Saint Laurent SL 276 MICA з виразною оправою форми Cat Eye. Оправ створює лаконічний та водночас ефектний образ.\nМодель має повноободкову ацетатну оправу та сірі лінзи з 100% захистом від UVA/UVB-променів. На завушниках нанесено фірмовий напис SAINT LAURENT PARIS. Окуляри виготовлені в Італії",
-    "sku": "SL 276 MICA 001 53",
-    "rating": 5,
-    "category": "Окуляри і оправи",
-    "slug": "сонцезахисні-окуляри-saint-laurent-sl-276-mica-001-53",
-    "id": 72,
-    "color": "Чорний",
-    "images": [
-      "/assets/images/products/uploads/a0e43776-063b-4643-8c36-5024406361e9.webp",
-      "/assets/images/products/uploads/cfeba1dc-4b88-4f3b-984b-b5bebd478c1f.jpg",
-      "/assets/images/products/uploads/33751393-b64e-49d3-b0c9-2e3bde1afaff.jpg",
-      "/assets/images/products/uploads/aa00-okd0j9_99x_f9.webp"
-    ]
-  },
-  {
-    "gender": [
-      "Жінкам"
-    ],
-    "preOrderDays": "10-14 робочих днів",
-    "forcePublish": false,
-    "material": "Корпус і браслет — нержавіюча сталь 316L; скло — стійке до подряпин сапфірове",
-    "brand": "Tissot",
-    "price": 16500,
-    "preOrder": true,
-    "dimensions": "19,5 × 19,5 × 5 мм",
-    "variants": [
-      {
-        "color": "Сріблястий",
-        "hex": "#b7b4b4",
-        "images": [
-          "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-a120faed.webp?v=d03727de",
-          "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-10e4ff8d.webp?v=bed48427",
-          "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-f393bd11.webp?v=8405c1f4",
-          "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-8e88d0d9.webp?v=c4177bd4"
-        ]
-      }
-    ],
-    "preOrderPrepayment": 100,
-    "strapInfo": "Браслет із нержавіючої сталі сріблястого кольору, ширина 11 мм, застібка-метелик із кнопками",
-    "sizes": [
-      "ONESIZE"
-    ],
-    "splitByColor": true,
-    "searchKeywords": [
-      "Tissot Lovely",
-      "Tissot Lovely Round",
-      "Tissot T058.009.11.031.00",
-      "T0580091103100",
-      "годинник Tissot",
-      "жіночий годинник Tissot",
-      "жіночий наручний годинник",
-      "швейцарський годинник",
-      "сріблястий годинник",
-      "годинник зі сталевим браслетом",
-      "класичний жіночий годинник",
-      "елегантний годинник",
-      "брендовий годинник",
-      "оригінальний Tissot"
-    ],
-    "isNew": false,
-    "title": "Жіночий годинник Tissot Lovely Round 19.5mm",
-    "reviews": 0,
-    "instagramBlock": "general",
-    "description": "Вишуканий жіночий годинник Tissot Lovely Round 19.5mm — мініатюрна модель із круглим корпусом, створена для тих, хто цінує елегантність і стриманий дизайн.\nГодинник має сріблястий циферблат із лаконічними індексами, корпус із нержавіючої сталі 316L та стійке до подряпин сапфірове скло. Усередині встановлений надійний швейцарський кварцовий механізм ETA 901.001. Металевий браслет доповнений застібкою-метеликом із кнопками. Водостійкість — до 30 метрів (3 ATM)",
-    "sku": "T058.009.11.031.00",
-    "rating": 5,
-    "category": "Годинники",
-    "slug": "жіночий-годинник-tissot-lovely-round-19-5mm",
-    "id": 73,
-    "color": "Сріблястий",
-    "images": [
-      "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-a120faed.webp",
-      "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-10e4ff8d.webp",
-      "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-f393bd11.webp",
-      "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-8e88d0d9.webp"
-    ]
-  },
-  {
-    "gender": [
-      "Жінкам"
-    ],
-    "preOrderDays": "10-14 робочих днів",
-    "forcePublish": false,
-    "material": "Корпус — нержавіюча сталь 316L із PVD-покриттям; браслет — нержавіюча сталь із PVD-покриттям; скло — сапфірове",
-    "brand": "Tissot",
-    "price": 19000,
-    "preOrder": true,
-    "dimensions": "1,95 × 1,95 × 0,5 см",
-    "variants": [
-      {
-        "color": "Золотистий",
-        "hex": "#c7c15e",
-        "images": [
-          "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_5.webp?v=c816fc6e",
-          "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_2_2.webp?v=4b6d0dc8",
-          "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_3_2.webp?v=7a97fcb9",
-          "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-dial-ladies-watch-t0580091103100_4_1.webp"
-        ]
-      }
-    ],
-    "preOrderPrepayment": 100,
-    "strapInfo": "Золотистий сталевий браслет із PVD-покриттям, застібка — розкладна із захисним замком. Ширина кріплення — 0,6 см",
-    "sizes": [
-      "ONESIZE"
-    ],
-    "splitByColor": true,
-    "searchKeywords": [
-      "Tissot Lovely",
-      "Tissot Lovely Round",
-      "Tissot T058.009.33.031.00",
-      "T0580093303100",
-      "годинник Tissot",
-      "жіночий годинник Tissot",
-      "жіночий наручний годинник",
-      "швейцарський годинник",
-      "золотий годинник",
-      "золотистий годинник",
-      "годинник із металевим браслетом",
-      "класичний жіночий годинник",
-      "елегантний годинник",
-      "брендовий годинник",
-      "оригінальний Tissot*"
-    ],
-    "isNew": false,
-    "title": "Годинник Tissot Lovely Round 19.5mm",
-    "reviews": 0,
-    "instagramBlock": "general",
-    "description": "Вишуканий жіночий годинник Tissot Lovely Round 19.5mm — мініатюрна модель із круглим корпусом, що поєднує елегантність, жіночність та швейцарську якість.\nГодинник має сріблястий циферблат із лаконічними індексами, корпус із нержавіючої сталі 316L із PVD-покриттям кольору жовтого золота та стійке до подряпин сапфірове скло. Швейцарський кварцовий механізм забезпечує точний хід. Модель доповнена золотистим сталевим браслетом із розкладною застібкою та захисним замком. Водонепроникність — до 30 м (3 ATM)",
-    "sku": "T058.009.33.031.00",
-    "rating": 5,
-    "category": "Годинники",
-    "slug": "годинник-tissot-lovely-round-19-5mm",
-    "id": 74,
-    "color": "Золотистий",
-    "images": [
-      "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_5.webp",
-      "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_2_2.webp",
-      "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_3_2.webp",
-      "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-dial-ladies-watch-t0580091103100_4_1.webp"
-    ]
-  },
-  {
-    "gender": [
-      "Жінкам"
-    ],
-    "preOrderDays": "10-14 робочих днів",
-    "forcePublish": false,
-    "material": "Корпус і браслет — нержавіюча сталь 316L; скло — стійке до подряпин сапфірове",
-    "brand": "Tissot",
-    "price": 15400,
-    "preOrder": true,
-    "dimensions": "2,93 × 2,93 × 1,06 см",
-    "variants": [
-      {
-        "color": "Сріблястий",
-        "hex": "#c0c0c0",
-        "images": [
-          "/assets/images/products/uploads/tissot-tclassic-automatic-diamond-green--6ebe14d1.webp?v=1326d5ab",
-          "/assets/images/products/uploads/tissot-tclassic-automatic-diamond-green--dff156d2.webp?v=3836ad46",
-          "/assets/images/products/uploads/tissot-tclassic-automatic-diamond-green--8822ff6e.webp?v=046e0acb"
-        ]
-      }
-    ],
-    "preOrderPrepayment": 100,
-    "strapInfo": "Сталевий браслет сріблястого кольору з системою швидкого знімання та застібкою-метеликом із кнопками. Ширина кріплення — 1,5 см",
-    "sizes": [
-      "ONESIZE"
-    ],
-    "splitByColor": true,
-    "searchKeywords": [
-      "Tissot T-My Lady",
-      "Tissot T-My Lady Automatic",
-      "Tissot T132.007.11.091.00",
-      "T1320071109100",
-      "годинник Tissot",
-      "жіночий годинник Tissot",
-      "жіночий автоматичний годинник",
-      "швейцарський годинник",
-      "швейцарський автоматичний годинник",
-      "зелений годинник",
-      "годинник із зеленим циферблатом",
-      "годинник зі сталевим браслетом",
-      "класичний жіночий годинник",
-      "елегантний годинник",
-      "брендовий годинник",
-      "оригінальний Tissot"
-    ],
-    "isNew": false,
-    "title": "Годинник Tissot T-My Lady Automatic T132.007.11.091.00",
-    "reviews": 0,
-    "instagramBlock": "general",
-    "description": "Елегантний жіночий годинник Tissot T-My Lady Automatic із круглим сталевим корпусом та красивим зеленим циферблатом. Лаконічний дизайн поєднується із сучасним швейцарським автоматичним механізмом, що робить модель чудовим вибором як для повсякденних, так і для більш елегантних образів.\nГодинник оснащений швейцарським автоматичним механізмом Powermatic 48.111 із запасом ходу до 48 годин та балансовою пружиною Nivachron, стійкою до впливу магнітних полів. Зелену циферблат із віконцем дати захищає куполоподібне сапфірове скло. Прозора задня кришка дозволяє спостерігати за роботою механізму. Водонепроникність — до 100 м (10 bar)",
-    "sku": "T132.007.11.091.00",
-    "rating": 5,
-    "category": "Годинники",
-    "slug": "годинник-tissot-t-my-lady-automatic-t132-007-11-091-00",
-    "id": 75,
-    "color": "Сріблястий",
-    "images": [
-      "/assets/images/products/uploads/tissot-tclassic-automatic-diamond-green--6ebe14d1.webp",
-      "/assets/images/products/uploads/tissot-tclassic-automatic-diamond-green--dff156d2.webp",
-      "/assets/images/products/uploads/tissot-tclassic-automatic-diamond-green--8822ff6e.webp"
-    ]
-  },
-  {
-    "gender": [
-      "Жінкам"
-    ],
-    "preOrderDays": "10-14 робочих днів",
-    "forcePublish": false,
-    "material": "Корпус і браслет — нержавіюча сталь 316L; скло — сапфірове, стійке до подряпин",
-    "brand": "Tissot",
-    "price": 8800,
-    "preOrder": true,
-    "dimensions": "3,4 × 3,4 × 0,69 см",
-    "variants": [
-      {
-        "color": "Сріблястий",
-        "hex": "#d9d9d9",
-        "images": [
-          "/assets/images/products/uploads/tissot-everytime-quartz-silver-dial-ladies-watch-t1432101103300.webp?v=02ef1e05",
-          "/assets/images/products/uploads/tissot-everytime-quartz-silver-dial-ladies-watch-t1432101103300_2.webp?v=161a41cd",
-          "/assets/images/products/uploads/tissot-everytime-quartz-silver-dial-ladies-watch-t1432101103300_3.webp?v=c1964b3a"
-        ]
-      }
-    ],
-    "preOrderPrepayment": 100,
-    "strapInfo": "Сталевий браслет сріблястого кольору шириною 1,6 см із швидкознімною системою та застібкою-метеликом",
-    "sizes": [
-      "ONESIZE"
-    ],
-    "splitByColor": true,
-    "searchKeywords": [
-      "Tissot Everytime",
-      "Tissot Everytime 34mm",
-      "Tissot T143.210.11.033.00",
-      "T1432101103300",
-      "годинник Tissot",
-      "жіночий годинник Tissot",
-      "жіночий наручний годинник",
-      "швейцарський годинник",
-      "кварцовий годинник",
-      "сріблястий годинник",
-      "годинник зі сталевим браслетом",
-      "класичний жіночий годинник",
-      "елегантний годинник",
-      "брендовий годинник",
-      "оригінальний Tissot"
-    ],
-    "isNew": false,
-    "title": "Годинник Tissot Everytime 34mm T143.210.11.033.00",
-    "reviews": 0,
-    "instagramBlock": "general",
-    "description": "Елегантний жіночий годинник Tissot Everytime 34mm із мінімалістичним дизайном та круглим сталевим корпусом. Модель легко поєднується як із повсякденними, так і з діловими та більш елегантними образами.\nГодинник оснащений швейцарським кварцовим механізмом ETA F05.412, сапфіровим склом, стійким до подряпин, та сталевим браслетом із системою швидкого знімання. Сріблястий корпус доповнений світлим циферблатом із лаконічними індексами. Водонепроникність — до 50 м (5 bar)",
-    "sku": "T143.210.11.033.00",
-    "rating": 5,
-    "category": "Годинники",
-    "slug": "годинник-tissot-everytime-34mm-t143-210-11-033-00",
-    "id": 76,
-    "color": "Сріблястий",
-    "images": [
-      "/assets/images/products/uploads/tissot-everytime-quartz-silver-dial-ladies-watch-t1432101103300.webp",
-      "/assets/images/products/uploads/tissot-everytime-quartz-silver-dial-ladies-watch-t1432101103300_2.webp",
-      "/assets/images/products/uploads/tissot-everytime-quartz-silver-dial-ladies-watch-t1432101103300_3.webp"
-    ]
-  },
-  {
-    "gender": [
-      "Чоловікам"
-    ],
-    "preOrderDays": "10-14 робочих днів",
-    "forcePublish": false,
-    "material": "Корпус і браслет — нержавіюча сталь 316L; скло — сапфірове, стійке до подряпин",
-    "brand": "Tissot",
-    "price": 13800,
-    "preOrder": true,
-    "dimensions": "4 × 4 × 0,825 см",
-    "variants": [
-      {
-        "color": "Сріблястий",
-        "hex": "#cecece",
-        "images": [
-          "/assets/images/products/uploads/tissot-pr-100-quartz-blue-dial-mens-watch-t1504101104100_1.webp?v=286c6b76",
-          "/assets/images/products/uploads/tissot-pr-100-quartz-blue-dial-mens-watch-t1504101104100_2.webp?v=0fc480bf",
-          "/assets/images/products/uploads/tissot-pr-100-quartz-blue-dial-mens-watch-t1504101104100_3.webp?v=33ce3f73"
-        ]
-      }
-    ],
-    "preOrderPrepayment": 100,
-    "strapInfo": "Сталевий браслет сріблястого кольору з системою швидкого знімання та застібкою-метеликом із кнопками. Ширина кріплення — 2 см",
-    "sizes": [
-      "ONESIZE"
-    ],
-    "splitByColor": true,
-    "searchKeywords": [
-      "Tissot PR 100",
-      "Tissot PR 100 40mm",
-      "Tissot T150.410.11.041.00",
-      "T1504101104100",
-      "годинник Tissot",
-      "чоловічий годинник Tissot",
-      "чоловічий наручний годинник",
-      "швейцарський годинник",
-      "кварцовий годинник",
-      "синій годинник",
-      "годинник із синім циферблатом",
-      "годинник зі сталевим браслетом",
-      "класичний чоловічий годинник",
-      "елегантний годинник",
-      "брендовий годинник",
-      "оригінальний Tissot"
-    ],
-    "isNew": false,
-    "title": "Годинник Tissot PR 100 40mm T150.410.11.041.00",
-    "reviews": 0,
-    "instagramBlock": "general",
-    "description": "Класичний чоловічий годинник Tissot PR 100 40mm із насиченим синім циферблатом та елегантним сталевим корпусом. Лаконічний дизайн робить модель універсальною — вона гармонійно доповнить як діловий костюм, так і повсякденний образ.\nГодинник оснащений точним швейцарським кварцовим механізмом, індикацією дати та сапфіровим склом, стійким до подряпин. Сріблястий корпус і сталевий браслет підкреслюють стриманий преміальний стиль моделі. Водонепроникність до 100 м (10 bar) дозволяє комфортно використовувати годинник у повсякденному житті",
-    "sku": "T150.410.11.041.00",
-    "rating": 5,
-    "category": "Годинники",
-    "slug": "годинник-tissot-pr-100-40mm-t150-410-11-041-00",
-    "id": 77,
-    "color": "Сріблястий",
-    "images": [
-      "/assets/images/products/uploads/tissot-pr-100-quartz-blue-dial-mens-watch-t1504101104100_1.webp",
-      "/assets/images/products/uploads/tissot-pr-100-quartz-blue-dial-mens-watch-t1504101104100_2.webp",
-      "/assets/images/products/uploads/tissot-pr-100-quartz-blue-dial-mens-watch-t1504101104100_3.webp"
-    ]
-  },
-  {
-    "gender": [
-      "Чоловікам"
-    ],
-    "preOrderDays": "10-14 робочих днів",
-    "forcePublish": false,
-    "material": "Корпус і браслет — нержавіюча сталь 316L; рожево-золотисті елементи — PVD-покриття; скло — сапфірове, стійке до подряпин",
-    "brand": "Tissot",
-    "price": 12300,
-    "preOrder": true,
-    "dimensions": "4,2 × 4,2 × 1,15 см",
-    "variants": [
-      {
-        "color": "Сріблястий",
-        "hex": "#bcbcbc",
-        "images": [
-          "/assets/images/products/uploads/tissot-classic-dream-swissmatic-silver-d-f03a52ef.webp?v=bf3826fc",
-          "/assets/images/products/uploads/tissot-classic-dream-swissmatic-silver-d-ea41ed3e.webp?v=34a76e5b",
-          "/assets/images/products/uploads/tissot-classic-dream-swissmatic-silver-d-88843986.webp?v=9b3867c0"
-        ]
-      }
-    ],
-    "preOrderPrepayment": 100,
-    "strapInfo": "Двоколірний браслет із нержавіючої сталі сріблястого та рожево-золотистого кольорів, ширина кріплення — 2,2 см. Застібка-метелик із кнопками",
-    "sizes": [
-      "ONESIZE"
-    ],
-    "splitByColor": true,
-    "searchKeywords": [
-      "Tissot Classic Dream",
-      "Tissot Classic Dream Swissmatic",
-      "Tissot T129.407.22.031.00",
-      "T1294072203100",
-      "годинник Tissot",
-      "чоловічий годинник Tissot",
-      "чоловічий наручний годинник",
-      "швейцарський годинник",
-      "автоматичний годинник",
-      "швейцарський автоматичний годинник",
-      "двоколірний годинник",
-      "годинник сріблястий",
-      "годинник із сріблястим циферблатом",
-      "годинник із золотистими деталями",
-      "годинник зі сталевим браслетом",
-      "класичний чоловічий годинник",
-      "елегантний годинник",
-      "брендовий годинник",
-      "оригінальний Tissot"
-    ],
-    "isNew": false,
-    "title": "Годинник Tissot Classic Dream Swissmatic T129.407.22.031.00",
-    "reviews": 0,
-    "instagramBlock": "general",
-    "description": "Годинник оснащений швейцарським автоматичним механізмом Swissmatic із запасом ходу до 72 годин, функцією відображення дати та сапфіровим склом із захистом від подряпин. Прозора задня кришка дозволяє спостерігати за роботою механізму. Корпус і браслет виконані з нержавіючої сталі, доповненої PVD-покриттям кольору рожевого золота. Водонепроникність — до 50 м (5 bar)",
-    "sku": "T129.407.22.031.00",
-    "rating": 5,
-    "category": "Годинники",
-    "slug": "годинник-tissot-classic-dream-swissmatic-t129-407-22-031-00",
-    "id": 78,
-    "color": "Сріблястий",
-    "images": [
-      "/assets/images/products/uploads/tissot-classic-dream-swissmatic-silver-d-f03a52ef.webp",
-      "/assets/images/products/uploads/tissot-classic-dream-swissmatic-silver-d-ea41ed3e.webp",
-      "/assets/images/products/uploads/tissot-classic-dream-swissmatic-silver-d-88843986.webp"
-    ]
-  },
-  {
-    "gender": [
-      "Чоловікам"
-    ],
-    "preOrderDays": "10 -14 робочих днів",
-    "forcePublish": false,
-    "material": "Корпус і браслет — нержавіюча сталь 316L; безель — керамічний; скло — із сапфіровим покриттям",
-    "brand": "Mathey-Tissot",
-    "price": 11000,
-    "preOrder": true,
-    "dimensions": "4,2 × 4,2 × 1,2 см",
-    "variants": [
-      {
-        "color": "Сріблястий",
-        "hex": "#b9b9b9",
-        "images": [
-          "/assets/images/products/uploads/matheytissot-mathy-ceramic-quartz-black-dial-mens-watch-h901crbn.webp?v=3474f80f",
-          "/assets/images/products/uploads/matheytissot-mathy-ceramic-quartz-black-dial-mens-watch-h901crbn_2.webp?v=6d1a28bc",
-          "/assets/images/products/uploads/matheytissot-mathy-ceramic-quartz-black-dial-mens-watch-h901crbn_3.webp?v=908fca90"
-        ]
-      }
-    ],
-    "preOrderPrepayment": 100,
-    "strapInfo": "Двоколірний браслет із нержавіючої сталі 316L — сріблястий із золотистими елементами. Ширина кріплення — 2 см. Застібка — розкладна із захисним фіксатором",
-    "sizes": [
-      "ONESIZE"
-    ],
-    "splitByColor": true,
-    "searchKeywords": [
-      "Mathey-Tissot",
-      "Mathey Tissot Mathy Ceramic",
-      "Mathy Ceramic",
-      "Mathey-Tissot H901CRBN",
-      "H901CRBN",
-      "чоловічий годинник Mathey-Tissot",
-      "чоловічий швейцарський годинник",
-      "швейцарський годинник",
-      "кварцовий годинник",
-      "годинник із чорним циферблатом",
-      "годинник із керамічним безелем",
-      "двоколірний годинник",
-      "годинник зі сталевим браслетом",
-      "золотисто-сріблястий годинник",
-      "брендовий чоловічий годинник"
-    ],
-    "isNew": false,
-    "title": "Годинник Mathey-Tissot Mathy Ceramic H901CRBN",
-    "reviews": 0,
-    "instagramBlock": "general",
-    "description": "Стильний чоловічий годинник Mathey-Tissot Mathy Ceramic у класичному поєднанні сріблястого, чорного та золотистого відтінків. Модель має виразний чорний циферблат, чорний односпрямований керамічний безель та елегантний двоколірний сталевий браслет.\nГодинник оснащений швейцарським кварцовим механізмом Ronda 505 із функцією відображення дати. Чорний циферблат доповнений золотистими стрілками та індексами з люмінесцентним покриттям для комфортного зчитування часу в умовах недостатнього освітлення. Корпус має загвинчувану заводну головку, а водонепроникність становить 200 м (20 ATM)",
-    "sku": "H901CRBN",
-    "rating": 5,
-    "category": "Годинники",
-    "slug": "годинник-mathey-tissot-mathy-ceramic-h901crbn",
-    "id": 79,
-    "color": "Сріблястий",
-    "images": [
-      "/assets/images/products/uploads/matheytissot-mathy-ceramic-quartz-black-dial-mens-watch-h901crbn.webp",
-      "/assets/images/products/uploads/matheytissot-mathy-ceramic-quartz-black-dial-mens-watch-h901crbn_2.webp",
-      "/assets/images/products/uploads/matheytissot-mathy-ceramic-quartz-black-dial-mens-watch-h901crbn_3.webp"
     ]
   }
 ]

@@ -418,10 +418,122 @@ function orderStatusLabel(status) {
         processing: "В обробці",
         shipped: "Відправлено",
         completed: "Виконано",
-        cancelled: "Скасовано"
+        cancelled: "Скасовано",
+        returned: "Повернення"
     };
 
     return labels[status] || "Нове";
+
+}
+
+// Ключ позиції замовлення.
+//
+// Порівнюємо за назвою, кольором і розміром, а не за номером у списку:
+// номер прив'язаний до порядку, а він може змінитись, і тоді відмова
+// «переїхала» б на сусідній товар.
+function orderItemKey(item) {
+
+    return [item && item.title, item && item.color, item && item.size]
+        .map(part => String(part || ""))
+        .join("|");
+
+}
+
+// Від яких позицій замовлення вже відмовились.
+//
+// Заявки лежать в order_refusals (див. loadOrders). У старих заявках
+// переліку немає — вони створювались до того, як вікно почало питати,
+// від ЧОГО саме відмова. Такі вважаємо відмовою від усього замовлення:
+// саме так вони тоді й працювали.
+function refusedItemKeys(order) {
+
+    const refusals = order.__refusals || [];
+
+    if (!refusals.length) return null;
+
+    const legacy = refusals.some(refusal => !Array.isArray(refusal.items) || !refusal.items.length);
+
+    if (legacy) return "all";
+
+    const keys = new Set();
+
+    refusals.forEach(refusal => refusal.items.forEach(item => keys.add(orderItemKey(item))));
+
+    return keys;
+
+}
+
+// Ключі вже відмовлених позицій — набором, придатним для вікна.
+// «all» (стара заявка без переліку) розкриваємо в ключі всіх позицій.
+function refusedKeySet(order) {
+
+    const keys = refusedItemKeys(order);
+
+    if (!keys) return new Set();
+
+    if (keys !== "all") return keys;
+
+    return new Set((order.items || []).map(orderItemKey));
+
+}
+
+function isItemRefused(order, item) {
+
+    const keys = refusedItemKeys(order);
+
+    if (!keys) return false;
+
+    if (keys === "all") return true;
+
+    return keys.has(orderItemKey(item));
+
+}
+
+// Чи відмовились від замовлення ЦІЛКОМ.
+function isOrderFullyRefused(order) {
+
+    const keys = refusedItemKeys(order);
+
+    if (!keys) return false;
+
+    if (keys === "all") return true;
+
+    const items = Array.isArray(order.items) ? order.items : [];
+
+    if (!items.length) return true;
+
+    return items.every(item => keys.has(orderItemKey(item)));
+
+}
+
+// Статус, який бачить покупець.
+//
+// ЧОМУ НЕ ПРОСТО order.status
+// ----------------------------
+// Після відмови в картці лишався бейдж «Нове»: покупець щойно
+// відмовився від товару, під товаром написано «✓ Відмову надіслано» —
+// а замовлення все ще «нове». Виглядає так, ніби відмову не почули.
+//
+// Статус у базі ставить тригер (міграція 006), але поки її не
+// застосували — або поки менеджер не дійшов до замовлення — кабінет
+// мусить показувати правду сам.
+//
+// ЧОМУ «ПОВЕРНЕННЯ», А НЕ «СКАСОВАНО», ПІСЛЯ ДОСТАВКИ
+// ----------------------------------------------------
+// Скасувати можна те, що ще не виконали. Замовлення, яке вже приїхало,
+// не скасовують — його повертають, і це інша робота: прийняти посилку
+// назад, оглянути товар, віддати гроші. Одне слово на два різні
+// процеси плутало б і покупця, і магазин.
+//
+// ЧАСТКОВА ВІДМОВА статус не змінює: решта товарів їде як їхала, і
+// назвати таке замовлення скасованим означало б збрехати.
+function displayOrderStatus(order) {
+
+    if (order.status === "cancelled") return "cancelled";
+
+    if (!isOrderFullyRefused(order)) return order.status || "new";
+
+    return order.status === "completed" ? "returned" : "cancelled";
 
 }
 
@@ -457,7 +569,54 @@ async function loadOrders(userId) {
 
     }
 
+    await attachRefusals(data);
+
     ordersListEl.innerHTML = data.map(renderOrderCard).join("");
+
+}
+
+// Підтягуємо заявки на відмову до завантажених замовлень.
+//
+// НАВІЩО ОКРЕМИЙ ЗАПИТ. На самому замовленні є лише дата відмови
+// (refusal_requested_at) — прапорець «щось відмовили». Від ЧОГО саме,
+// знає тільки таблиця order_refusals, а без цього кабінет не може ні
+// поставити позначку на потрібному товарі, ні відрізнити відмову від
+// усього замовлення від відмови від однієї речі.
+//
+// Запит один на всі замовлення, а не по одному на картку.
+async function attachRefusals(orders) {
+
+    const withRefusal = orders.filter(order => order.refusal_requested_at);
+
+    if (!withRefusal.length) return;
+
+    const { data, error } = await supabaseClient
+        .from("order_refusals")
+        .select("order_id, items")
+        .in("order_id", withRefusal.map(order => order.id));
+
+    if (error) {
+
+        // Не показуємо помилку: історія замовлень важливіша за
+        // подробиці відмов. Без цих даних працює як раніше — відмова
+        // вважається відмовою від усього замовлення.
+        console.error("Заявки на відмову:", error);
+
+        return;
+
+    }
+
+    const byOrder = new Map();
+
+    (data || []).forEach(refusal => {
+
+        if (!byOrder.has(refusal.order_id)) byOrder.set(refusal.order_id, []);
+
+        byOrder.get(refusal.order_id).push(refusal);
+
+    });
+
+    orders.forEach(order => { order.__refusals = byOrder.get(order.id) || []; });
 
 }
 
@@ -565,6 +724,10 @@ function renderOrderCard(order) {
         briefParts.push(`<span class="order-card-brief-discount">Знижка ${discountLine}</span>`);
     }
 
+    // Статус рахуємо один раз: він потрібен і в бейджі, і в тексті
+    // під ним, і вони не мають розійтись.
+    const displayStatus = displayOrderStatus(order);
+
     briefParts.push(`Доставка ${deliveryPriceText}`);
     briefParts.push(`<span class="order-card-brief-total">Разом ${formatPrice(order.total)}</span>`);
 
@@ -577,7 +740,7 @@ function renderOrderCard(order) {
 
                     <div class="order-card-title-group">
                         <span class="order-card-number">Замовлення ${order.order_number}</span>
-                        <span class="order-status order-status-${order.status || "new"}">${orderStatusLabel(order.status)}</span>
+                        <span class="order-status order-status-${displayStatus}">${orderStatusLabel(displayStatus)}</span>
                     </div>
 
                     <div class="order-card-header-right">
@@ -615,7 +778,11 @@ function renderOrderCard(order) {
                                 : "—"
                         }</p>
                         ${order.refusal_requested_at ? `
-                        <p class="order-refusal-note"><strong>Відмова:</strong> запит надіслано, менеджер зв'яжеться</p>
+                        <p class="order-refusal-note"><strong>Відмова:</strong> ${
+                            isOrderFullyRefused(order)
+                                ? "запит надіслано, менеджер зв'яжеться"
+                                : "запит на частину товарів надіслано, решта замовлення лишається"
+                        }</p>
                         ` : ""}
                     </div>
 
@@ -740,11 +907,7 @@ async function notifyRefusal(order, orderNumber, choice) {
         "Фото додано": files.length ? String(files.length) : "немає"
     };
 
-    // Фото відправляємо разом із листом.
-    //
-    // FormSubmit приймає файли лише через multipart/form-data — JSON із
-    // ними не працює. Тому коли є знімки, збираємо FormData; коли їх
-    // немає, лишаємо звичайний шлях, яким ідуть усі інші листи сайту.
+    // Без фото — звичайний шлях, яким ідуть усі листи сайту.
     if (!files.length) {
 
         if (typeof sendViaFormSubmit === "function") await sendViaFormSubmit(payload);
@@ -753,20 +916,191 @@ async function notifyRefusal(order, orderNumber, choice) {
 
     }
 
-    const form = new FormData();
+    await sendRefusalWithPhotos(payload, choice, files.length);
 
-    Object.keys(payload).forEach(key => form.append(key, payload[key]));
+}
 
-    files.forEach((file, index) => form.append(`Фото ${index + 1}`, file, file.name));
+// Лист із фото.
+//
+// ЩО БУЛО НЕ ТАК
+// ---------------
+// Знімки збирались у FormData й летіли на /ajax/-адресу FormSubmit.
+// Лист приходив — з усіма полями й рядком «Фото додано: 1», — але БЕЗ
+// самого фото. Найгірший вид поломки: усе виглядає справним, і
+// дізнаєшся про втрату, лише коли менеджер попросить фото, якого
+// покупець «точно надсилав».
+//
+// Причин дві, і кожної досить:
+//   1. /ajax/ приймає JSON і повертає JSON; вкладення цей шлях не
+//      переносить — у документації файли описані лише для звичайного
+//      надсилання форми з enctype="multipart/form-data";
+//   2. поля звались «Фото 1», «Фото 2», а FormSubmit чекає на поле
+//      attachment.
+//
+// ЯК ЗАРАЗ
+// ---------
+// Справжня форма з enctype="multipart/form-data", яка йде в прихований
+// iframe: сторінка нікуди не переходить, а надсилання відбувається
+// рівно так, як його описує FormSubmit. Файли беруться з того самого
+// поля, у яке їх обрали (вікно віддає його вузлом), тож копіювати
+// вміст не доводиться.
+async function sendRefusalWithPhotos(payload, choice, photoCount) {
 
-    await fetch(`https://formsubmit.co/ajax/${FORMSUBMIT_TARGET}`, {
-        method: "POST",
-        // Content-Type НЕ ставимо: браузер додасть його сам разом із
-        // межею multipart. Вручну виставлений заголовок ламає розбір на
-        // боці сервера — файли просто не доходять.
-        headers: { Accept: "application/json" },
-        body: form
+    const sent = await postRefusalForm(payload, choice);
+
+    if (sent) return;
+
+    // Запасний шлях. Якщо форма не дійшла (FormSubmit не відповів,
+    // блокувальник вирізав iframe, впала мережа), магазин мусить хоча б
+    // дізнатись про відмову — інакше людина чекає на дзвінок, якого
+    // ніхто не збирається робити.
+    //
+    // Лист піде без вкладень, тому прямо кажемо про це в тексті: краще
+    // «фото не долетіли, попросіть окремо», ніж тиша.
+    if (typeof sendViaFormSubmit !== "function") return;
+
+    await sendViaFormSubmit({
+        ...payload,
+        "Фото додано": `${photoCount} — НЕ долетіли, попросіть у покупця окремо`
     });
+
+}
+
+// Надсилання прихованою формою. true — відповідь від FormSubmit
+// прийшла, false — не дочекались.
+function postRefusalForm(payload, choice) {
+
+    return new Promise(resolve => {
+
+        const fileInputs = buildAttachmentInputs(choice);
+
+        if (!fileInputs.length) { resolve(false); return; }
+
+        const frameName = `refusal-mail-${Date.now()}`;
+
+        const frame = document.createElement("iframe");
+
+        frame.name = frameName;
+        frame.style.display = "none";
+
+        const form = document.createElement("form");
+
+        form.action = `https://formsubmit.co/${FORMSUBMIT_TARGET}`;
+        form.method = "POST";
+        form.enctype = "multipart/form-data";
+        form.target = frameName;
+        form.style.display = "none";
+
+        const hidden = (name, value) => {
+
+            const input = document.createElement("input");
+
+            input.type = "hidden";
+            input.name = name;
+            input.value = value;
+
+            form.appendChild(input);
+
+        };
+
+        Object.keys(payload).forEach(key => hidden(key, payload[key]));
+
+        // Без цього FormSubmit показує сторінку з капчею замість того,
+        // щоб прийняти форму, — а в прихованому iframe її ніхто не
+        // побачить і не пройде.
+        hidden("_captcha", "false");
+
+        // Куди FormSubmit поверне iframe після прийому. Значення
+        // технічне: сторінку побачить лише прихований кадр.
+        hidden("_next", `${location.origin}/account`);
+
+        fileInputs.forEach(input => form.appendChild(input));
+
+        document.body.appendChild(frame);
+        document.body.appendChild(form);
+
+        let settled = false;
+
+        const finish = ok => {
+
+            if (settled) return;
+
+            settled = true;
+
+            // Прибираємо ПІСЛЯ відповіді: знести форму з iframe раніше
+            // означало б обірвати запит на півдорозі.
+            form.remove();
+            frame.remove();
+
+            resolve(ok);
+
+        };
+
+        // Порожній iframe теж викликає load одразу після вставки —
+        // тому чекаємо на подію лише після надсилання.
+        form.submit();
+
+        frame.addEventListener("load", () => finish(true), { once: true });
+
+        // Стільки ж, скільки браузер тримає повільне завантаження
+        // 8 МБ фото на слабкому мобільному зв'язку.
+        setTimeout(() => finish(false), 30000);
+
+    });
+
+}
+
+// Поля з файлами для форми.
+//
+// Кожен знімок окремим полем, бо кілька файлів під одним іменем
+// звичайний бекенд лишає лише останнім. Перше поле зветься attachment —
+// саме це ім'я названо в документації FormSubmit, тож хоча б один
+// знімок дійде навіть якщо решту імен там не розпізнають.
+function buildAttachmentInputs(choice) {
+
+    const files = (choice && choice.files) || [];
+
+    const original = choice && choice.fileInput;
+
+    const attachmentName = index => (index === 0 ? "attachment" : `attachment${index + 1}`);
+
+    // DataTransfer дозволяє зібрати поле з одним конкретним файлом.
+    if (files.length && typeof DataTransfer === "function") {
+
+        try {
+
+            return files.map((file, index) => {
+
+                const input = document.createElement("input");
+
+                input.type = "file";
+                input.name = attachmentName(index);
+
+                const data = new DataTransfer();
+
+                data.items.add(file);
+
+                input.files = data.files;
+
+                return input;
+
+            });
+
+        } catch (error) {
+
+            // Старий браузер без DataTransfer — падаємо на просте поле
+            // нижче. Одне фото краще, ніж жодного.
+            console.warn("Не вдалось розкласти фото по полях:", error);
+
+        }
+
+    }
+
+    if (!original) return [];
+
+    original.name = "attachment";
+
+    return [original];
 
 }
 
@@ -817,8 +1151,16 @@ function refusalWindow(order) {
 // Підпис під товаром: кнопка, залишок днів або «строк минув».
 function refusalMarkup(order, itemIndex) {
 
-    // Заявку вже надіслано — кнопка ні до чого.
-    if (order.refusal_requested_at) {
+    const item = (order.items || [])[itemIndex];
+
+    // Позначка стоїть на ТОМУ товарі, від якого відмовились.
+    //
+    // Раніше умовою було order.refusal_requested_at — позначка на
+    // замовленні. Відмовився від однієї речі з трьох — «✓ Відмову
+    // надіслано» з'являлось під усіма трьома, а кнопки зникали. Тобто
+    // від решти вже не можна було відмовитись, хоча ніхто про них і не
+    // говорив.
+    if (isItemRefused(order, item)) {
 
         return `<span class="order-item-refuse-done">✓ Відмову надіслано</span>`;
 
@@ -855,6 +1197,114 @@ function refusalMarkup(order, itemIndex) {
                     data-index="${itemIndex}">
                 ↩ Відмова
             </button>${hint}`;
+
+}
+
+// Кнопка під товаром перетворюється на позначку.
+//
+// Потрібно там, де перемальовувати картку нічого: заявку не подавали
+// щойно, вона вже була — просто ця вкладка про неї не знала.
+function markItemRefused(button) {
+
+    if (!button || !button.replaceWith) return;
+
+    const done = document.createElement("span");
+
+    done.className = "order-item-refuse-done";
+    done.textContent = "✓ Відмову надіслано";
+
+    button.replaceWith(done);
+
+}
+
+// Перемальовування однієї картки замовлення.
+//
+// ЧОМУ НЕ loadOrders(). Перезавантаження списку згорнуло б усі картки —
+// зокрема ту, у якій людина щойно працювала, і вона б не побачила
+// результату своєї ж дії. Тут оновлюється рівно одна картка, і стан
+// «розгорнуто» переноситься на нову.
+async function refreshOrderCard(button, order) {
+
+    const card = button.closest(".order-card");
+
+    if (!card) return;
+
+    // Статус міняє тригер у базі, тому замовлення перечитуємо: у
+    // локального об'єкта статус лишився таким, яким був до відмови.
+    const { data: fresh } = await supabaseClient
+        .from("orders")
+        .select("*")
+        .eq("id", order.id)
+        .maybeSingle();
+
+    const updated = fresh || order;
+
+    await attachRefusals([updated]);
+
+    const wasExpanded = card.classList.contains("expanded");
+
+    card.outerHTML = renderOrderCard(updated);
+
+    if (!wasExpanded) return;
+
+    // outerHTML замінює вузол — старе посилання вже ні на що не вказує,
+    // тому шукаємо нову картку за номером замовлення.
+    const rebuilt = [...ordersListEl.querySelectorAll(".order-card")]
+        .find(node => node.querySelector(".order-card-number")
+            ?.textContent.includes(updated.order_number));
+
+    if (!rebuilt) return;
+
+    rebuilt.classList.add("expanded");
+
+    // Клас лише повертає стрілку й тло: сам вміст ховає атрибут hidden,
+    // який ставить перемикач. Без цього рядка картка лишилась би
+    // «розгорнутою» і порожньою.
+    const details = rebuilt.querySelector(".order-card-details");
+
+    if (details) details.hidden = false;
+
+}
+
+// Запис заявки на відмову.
+//
+// СУМІСНІСТЬ ІЗ БАЗОЮ, ДЕ МІГРАЦІЮ ЩЕ НЕ ЗАСТОСУВАЛИ
+// ---------------------------------------------------
+// Колонка items з'явилась у міграції 006. Міграції тут застосовують
+// руками, через SQL Editor, — і поки цього не зробили, запит із полем
+// items відхиляється цілком: PostgREST не знає такої колонки.
+//
+// Тобто нове поле могло б зламати саму відмову — найгіршим способом,
+// бо покупець побачив би помилку там, де раніше все працювало. Тому
+// пробуємо з переліком, а на відмову через невідому колонку
+// повторюємо без нього: заявка важливіша за подробиці.
+async function saveRefusal(order, user, choice) {
+
+    const base = { order_id: order.id, user_id: user.id };
+
+    const reason = (choice && choice.reason) || "";
+
+    const full = {
+        ...base,
+        note: reason || null,
+        items: (choice && choice.items) || null
+    };
+
+    const first = await supabaseClient.from("order_refusals").insert(full);
+
+    if (!first.error) return first;
+
+    // 42703 / PGRST204 — «немає такої колонки». Інші помилки (права,
+    // мережа) повторювати немає сенсу: вони повторяться так само.
+    const message = `${first.error.code || ""} ${first.error.message || ""}`;
+
+    const unknownColumn = /42703|PGRST204|column .* does not exist|items/i.test(message);
+
+    if (!unknownColumn) return first;
+
+    console.warn("order_refusals без колонки items — застосуйте міграцію 006:", first.error);
+
+    return supabaseClient.from("order_refusals").insert({ ...base, note: reason || null });
 
 }
 
@@ -917,16 +1367,40 @@ async function requestRefusal(button, itemIndex) {
 
         }
 
-        const { error } = await supabaseClient
-            .from("order_refusals")
-            .insert({ order_id: order.id, user_id: user.id });
+        // Що вже відмовлено — питаємо базу, а не сторінку.
+        //
+        // ЧОМУ НЕ ДОСИТЬ ВИМКНЕНОЇ КНОПКИ. Після надісланої заявки
+        // кнопка під тим товаром зникає — але картка не перемальовується,
+        // і вікно, відкрите з СУСІДНЬОГО товару, показувало повний склад
+        // замовлення з усіма галочками. Відмітити щойно відмовлений
+        // товар удруге ніщо не заважало: летів другий лист і друге
+        // сповіщення менеджеру про те саме повернення, а для магазину це
+        // виглядає як два різні.
+        //
+        // Те саме стосується вкладки, відкритої зі вчора, і другого
+        // пристрою: сторінка там не знає про сьогоднішню заявку.
+        await attachRefusals([order]);
+
+        const alreadyRefused = refusedKeySet(order);
+
+        const clicked = (order.items || [])[itemIndex];
+
+        if (clicked && alreadyRefused.has(orderItemKey(clicked))) {
+
+            showToast("Заявку на цей товар уже надіслано");
+
+            markItemRefused(button);
+
+            return;
+
+        }
 
         // Питаємо, від ЧОГО саме відмовляються.
         //
         // Вікно показуємо після того, як замовлення завантажене: у ньому
         // видно склад із фото й сумами, а без даних показувати нічого.
         const choice = window.RefusalDialog
-            ? await window.RefusalDialog.ask(order, itemIndex)
+            ? await window.RefusalDialog.ask(order, itemIndex, alreadyRefused)
             : { items: order.items || [], reason: "", files: [] };
 
         // Закрив вікно — нічого не сталось.
@@ -938,6 +1412,36 @@ async function requestRefusal(button, itemIndex) {
             return;
 
         }
+
+        // Остання перевірка перед надсиланням.
+        //
+        // Вікно вже не дає відмітити відмовлене, але між відкриттям
+        // вікна й натисканням «Надіслати» минає час — за нього заявку
+        // могли подати з іншої вкладки. Дешевше перевірити ще раз, ніж
+        // надіслати магазину другий лист про те саме.
+        choice.items = (choice.items || [])
+            .filter(item => !alreadyRefused.has(orderItemKey(item)));
+
+        if (!choice.items.length) {
+
+            showToast("Заявку на ці товари вже надіслано");
+
+            markItemRefused(button);
+
+            return;
+
+        }
+
+        // Запис у базу — ПІСЛЯ вікна, а не до нього.
+        //
+        // Раніше заявка створювалась одразу по натисканню, ще до того,
+        // як людина щось обрала. Закрив вікно — а відмова вже в базі, і
+        // менеджеру пішло сповіщення про те, чого не було.
+        //
+        // Разом із заявкою зберігаємо перелік позицій і причину: без
+        // них у базі лишався голий факт «щось відмовили», і ні кабінет,
+        // ні менеджер не бачили, від чого саме.
+        const { error } = await saveRefusal(order, user, choice);
 
         // Лист магазину — НЕЗАЛЕЖНО від того, чи спрацював тригер у базі.
         //
@@ -972,11 +1476,14 @@ async function requestRefusal(button, itemIndex) {
 
         }
 
-        // Показуємо результат на самій кнопці, а не тільки тостом:
-        // інакше після перемальовування списку не видно, що заявку
-        // вже надіслано, і клієнт тисне повторно.
-        button.textContent = "✓ Відмову надіслано";
-        button.disabled = true;
+        // Перемальовуємо картку цілком, а не саму кнопку.
+        //
+        // Зміниться не лише вона: у товару з'явиться позначка, у
+        // замовлення — новий статус («Скасовано», якщо відмовились від
+        // усього), у складі — рядок про часткову відмову. Якщо оновити
+        // тільки кнопку, картка лишиться наполовину зі старими даними,
+        // і людина побачить розбіжність.
+        await refreshOrderCard(button, order);
 
         showToast("Запит на відмову надіслано. Менеджер зв'яжеться з вами найближчим часом");
 
