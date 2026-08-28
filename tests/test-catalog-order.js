@@ -144,9 +144,23 @@ console.log("\n[2] Порядок на справжніх даних катал�
 
     const sameCategory = sorted.filter(p => p.category === newest.category);
 
-    check("найновіший товар перший у своїй категорії",
-        sameCategory.length > 0 && sameCategory[0].id === newest.id,
-        `${newest.category}: ${sameCategory.slice(0, 3).map(p => p.id).join(", ")}`);
+    // Порівнюємо в межах ОДНАКОВОЇ наявності.
+    //
+    // Правило сортування має два рівні: спершу наявні, потім «під
+    // замовлення», і вже всередині кожної групи — новіші вище. Тест
+    // перевіряв лише другий рівень і падав, щойно найновіший товар
+    // виявився під замовлення: сім нових годинників Tissot стали нижче
+    // за наявні — і це саме те, що правило й наказує.
+    //
+    // Тобто впало очікування, а не сортування: перевірка [3] вище
+    // («наявні → під замовлення, новіші вище») при цьому проходить.
+    const sameAvailability = sameCategory.filter(p =>
+        Boolean(p.preOrder) === Boolean(newest.preOrder));
+
+    check("найновіший товар перший серед таких самих у своїй категорії",
+        sameAvailability.length > 0 && sameAvailability[0].id === newest.id,
+        `${newest.category}${newest.preOrder ? " (під замовлення)" : ""}: `
+        + sameAvailability.slice(0, 3).map(p => p.id).join(", "));
 
     // І він не має провалюватись нижче за товари СВОГО ж розділу, які
     // додали раніше.
@@ -159,16 +173,23 @@ console.log("\n[2] Порядок на справжніх даних катал�
         departmentOf.get(p.category) === department);
     const olderBelow = sameDepartment.slice(sameDepartment.findIndex(p => p.id === newest.id) + 1);
 
-    check("у своєму розділі нижче — лише старіші або інші категорії",
-        olderBelow.every(p => p.id < newest.id || p.category !== newest.category),
+    check("у своєму розділі нижче — лише старіші, інші категорії або інша наявність",
+        olderBelow.every(p => p.id < newest.id
+            || p.category !== newest.category
+            || Boolean(p.preOrder) !== Boolean(newest.preOrder)),
         `позиція ${position + 1} з ${products.length}`);
 
     // і він перший у своїй категорії
     const inHisCategory = sorted.filter(p => p.category === newest.category);
 
-    check("найновіший — перший у своїй категорії",
-        inHisCategory[0].id === newest.id,
-        `${inHisCategory[0].id} замість ${newest.id}`);
+    // Знову ж таки — серед товарів з такою самою наявністю: найновіший
+    // товар під замовлення законно стоїть нижче за наявні.
+    const inHisGroup = inHisCategory.filter(p =>
+        Boolean(p.preOrder) === Boolean(newest.preOrder));
+
+    check("найновіший — перший серед таких самих у своїй категорії",
+        inHisGroup[0] && inHisGroup[0].id === newest.id,
+        `${inHisGroup[0] && inHisGroup[0].id} замість ${newest.id}`);
 }
 
 console.log("\n[3] Явне сортування не зачіпається");
@@ -396,8 +417,18 @@ console.log("\n[N] Ручний порядок із адмінки");
     check("підказка радить крок 10", /10, 20, 30/.test(String(field && field.hint)));
 
     // Поведінка на справжніх даних.
+    //
+    // sortOrder СКИДАЄМО. Далі тест сам розставляє номери трьом товарам
+    // і перевіряє, що вони стали першими саме в такому порядку. Але в
+    // каталозі вже є товари, закріплені руками з адмінки (зараз три), і
+    // їхні номери — 1, 2, 3 — виявлялись меншими за призначені тестом
+    // 10, 20, 30. Тест падав на власній підготовці даних, а не на
+    // сортуванні.
+    //
+    // Чисте поле тут правильніше: перевіряється поведінка правила, а
+    // не те, які товари магазин закріпив сьогодні.
     const items = JSON.parse(read("data/products.json"))
-        .map(p => ({ ...p }));
+        .map(p => ({ ...p, sortOrder: undefined }));
 
     const byDep = new Map();
 

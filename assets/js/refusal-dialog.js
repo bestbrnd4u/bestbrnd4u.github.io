@@ -47,7 +47,9 @@
     // Показує вікно й повертає Promise з рішенням користувача:
     // { items: [...], reason: "…", files: [File, …] } або null, якщо
     // відмовився від самої відмови.
-    function askRefusal(order, preselectedIndex) {
+    // refusedKeys — позиції, на які заявку вже подали. Такі рядки
+    // показуємо, але відмітити їх не можна: див. коментар нижче.
+    function askRefusal(order, preselectedIndex, refusedKeys) {
 
         return new Promise(function (resolve) {
 
@@ -57,6 +59,16 @@
 
             overlay.className = "refusal-overlay";
 
+            var refused = refusedKeys instanceof Set ? refusedKeys : new Set(refusedKeys || []);
+
+            function itemKey(item) {
+
+                return [item && item.title, item && item.color, item && item.size]
+                    .map(function (part) { return String(part || ""); })
+                    .join("|");
+
+            }
+
             var rows = items.map(function (item, index) {
 
                 var meta = [item.color, item.size, item.qty > 1 ? item.qty + " шт." : ""]
@@ -64,19 +76,34 @@
 
                 var sum = (Number(item.price) || 0) * (Number(item.qty) || 1);
 
+                // Позиція, на яку заявку вже подали.
+                //
+                // ЧОМУ ПОКАЗУЄМО, А НЕ ХОВАЄМО. Вікно показує СКЛАД
+                // замовлення — прибрана позиція виглядала б як помилка
+                // («а де друга сумка?»), та й відмітити решту було б
+                // важче: список більше не збігається з тим, що в картці.
+                //
+                // Але відмітити її не можна: друга заявка на той самий
+                // товар — це другий лист і друге сповіщення менеджеру
+                // про те саме. Для магазину це виглядає як два різні
+                // повернення.
+                var alreadySent = refused.has(itemKey(item));
+
                 // Товар, під яким натиснули, відмічений одразу: у
                 // більшості випадків відмовляються саме від нього, і
                 // зайвий клац ні до чого.
-                var checked = index === preselectedIndex ? " checked" : "";
+                var checked = index === preselectedIndex && !alreadySent ? " checked" : "";
 
                 return ''
-                    + '<label class="refusal-item">'
-                    + '  <input type="checkbox" value="' + index + '"' + checked + '>'
+                    + '<label class="refusal-item' + (alreadySent ? ' refusal-item-sent' : '') + '">'
+                    + '  <input type="checkbox" value="' + index + '"' + checked
+                    + (alreadySent ? ' disabled' : '') + '>'
                     + '  <img src="' + (item.image || "assets/images/no-image.png") + '"'
                     + '       alt="" onerror="this.onerror=null;this.src=\'assets/images/no-image.png\'">'
                     + '  <span class="refusal-item-info">'
                     + '    <b>' + (item.title || "Товар") + '</b>'
                     + (meta ? '<span class="refusal-item-meta">' + meta + '</span>' : "")
+                    + (alreadySent ? '<span class="refusal-item-sent-note">Заявку вже надіслано</span>' : "")
                     + '  </span>'
                     + '  <span class="refusal-item-sum">' + sum.toLocaleString("uk-UA") + ' грн</span>'
                     + '</label>';
@@ -156,7 +183,11 @@
 
                 var checked = [...overlay.querySelectorAll('input[type="checkbox"]:checked')]
                     .map(function (box) { return items[Number(box.value)]; })
-                    .filter(Boolean);
+                    .filter(Boolean)
+                    // Ще одна перевірка вже після вибору: disabled можна
+                    // зняти через інструменти розробника, а другий лист
+                    // про те саме повернення магазину не потрібен.
+                    .filter(function (item) { return !refused.has(itemKey(item)); });
 
                 if (!checked.length) {
                     fail("Відмітьте хоча б один товар.");
@@ -191,7 +222,24 @@
                     return;
                 }
 
-                close({ items: checked, reason: reason, files: files });
+                // Поле з файлами віддаємо ВУЗЛОМ, а не лише списком File.
+                //
+                // НАВІЩО. Лист із фото йде звичайним multipart-POST у
+                // прихований iframe — так вимагає FormSubmit. Зібрати
+                // такий POST найпростіше, переставивши в приховану форму
+                // те саме поле, у яке людина щойно обрала знімки: файли
+                // подорожують разом з ним, і нічого копіювати не треба.
+                //
+                // Забираємо його з вікна ДО close(): там overlay
+                // видаляється разом з усім вмістом, і поле зникло б.
+                fileInput.remove();
+
+                close({
+                    items: checked,
+                    reason: reason,
+                    files: files,
+                    fileInput: fileInput
+                });
 
             });
 

@@ -227,13 +227,23 @@ console.log("\n[N2] Сповіщення про відмову не залежи
     // FormSubmit приймає файли лише так.
     check("лист без фото — звичайним шляхом",
         /if \(!files\.length\)[\s\S]{0,200}sendViaFormSubmit\(payload\)/.test(ACC));
-    check("лист із фото — multipart",
-        /const form = new FormData\(\)/.test(ACC)
-        && /formsubmit\.co\/ajax\/\$\{FORMSUBMIT_TARGET\}/.test(ACC));
+    // ФОТО ЙДУТЬ НЕ FormData, А СПРАВЖНЬОЮ ФОРМОЮ.
+    //
+    // FormData на /ajax/-адресу давала лист з усіма полями й рядком
+    // «Фото додано: 1» — але без самого фото: вкладення цей шлях не
+    // переносить, а поля звались «Фото 1» замість attachment. Тепер —
+    // multipart-форма в прихований iframe, тобто рівно те надсилання,
+    // яке описує FormSubmit. Подробиці в tests/test-refusal-dialog.js.
+    check("лист із фото — справжня multipart-форма",
+        /form\.enctype = "multipart\/form-data"/.test(ACC)
+        && /form\.action = `https:\/\/formsubmit\.co\/\$\{FORMSUBMIT_TARGET\}`/.test(ACC));
 
-    // Content-Type не ставимо вручну: браузер додає його разом із
-    // межею multipart, а виставлений руками ламає розбір — файли не
-    // доходять.
+    check("фото не йдуть через /ajax/",
+        !/const form = new FormData\(\)/.test(ACC));
+
+    // Content-Type не виставляємо вручну ніде: браузер додає його разом
+    // із межею multipart, а вписаний руками ламає розбір на боці
+    // сервера — файли просто не доходять.
     check("Content-Type не виставляється вручну",
         !/"Content-Type": "multipart/.test(ACC));
 
