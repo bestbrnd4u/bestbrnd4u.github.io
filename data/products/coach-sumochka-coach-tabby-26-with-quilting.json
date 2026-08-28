@@ -20,7 +20,7 @@
         "assets/images/products/uploads/coach-cp150-b4ha-3.webp",
         "assets/images/products/uploads/coach-cp150-b4ha-4.webp"
       ],
-      "sku": "coach cp150 b4ha"
+      "sku": "coach-cp150-b4ha"
     },
     {
       "color": "Чорний",
@@ -69,7 +69,7 @@
   "id": 10,
   "instagramBlock": "reels",
   "description": "Coach Tabby Pillow стильна сумочка, яка стане акцентом будь-якого образу \nМ’який силует, та культовий дизайн Coach роблять цю модель ідеальним вибором як на кожен день, так і для особливих випадків ",
-  "sku": "coach cp150 b4ha",
+  "sku": "coach-cp150-b4ha",
   "category": "Жіночі сумки",
   "sizes": [
     "ONESIZE"

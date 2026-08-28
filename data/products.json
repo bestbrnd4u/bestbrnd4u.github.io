@@ -17,7 +17,7 @@
           "assets/images/products/uploads/a05042-0037354-2.webp?v=05e229f6",
           "assets/images/products/uploads/a05042-0037354-3.webp?v=249dd5fb"
         ],
-        "sku": "A05042 0037354",
+        "sku": "A05042-0037354",
         "sizes": [
           "ONESIZE"
         ]
@@ -48,7 +48,7 @@
     "id": 1,
     "instagramBlock": "general",
     "description": "Сонцезахисні окуляри Alain Mikli в оправі «черепаха». Широкі скроневі дуги, темні лінзи. Універсальна форма, що підходить і жінкам, і чоловікам.",
-    "sku": "A05042 0037354",
+    "sku": "A05042-0037354",
     "category": "Окуляри і оправи"
   },
   {
@@ -164,7 +164,7 @@
           "assets/images/products/uploads/bb0096s-001-51-1.webp?v=c71bce05",
           "assets/images/products/uploads/bb0096s-001-51-2.webp?v=7f314b99"
         ],
-        "sku": "BB0096S 001 51",
+        "sku": "BB0096S-001-51",
         "sizes": [
           "ONESIZE"
         ]
@@ -176,7 +176,7 @@
     "sizes": [
       "ONESIZE"
     ],
-    "sku": "BB0096S 001 51",
+    "sku": "BB0096S-001-51",
     "searchKeywords": [
       "баленсіага",
       "balenciaga",
@@ -223,7 +223,7 @@
           "assets/images/products/uploads/bb0041s-001-99-3.webp?v=09d63ff1",
           "assets/images/products/uploads/bb0041s-001-99-4.webp?v=03af5e4c"
         ],
-        "sku": "BB0041S 001 99",
+        "sku": "BB0041S-001-99",
         "sizes": [
           "ONESIZE"
         ]
@@ -235,7 +235,7 @@
     "sizes": [
       "ONESIZE"
     ],
-    "sku": "BB0041S 001 99",
+    "sku": "BB0041S-001-99",
     "searchKeywords": [
       "баленсіага",
       "balenciaga",
@@ -277,7 +277,7 @@
           "assets/images/products/uploads/be4361f-300187-51-3.webp?v=e5ad3ae1",
           "assets/images/products/uploads/be4361f-300187-51-4.webp?v=a0278b08"
         ],
-        "sku": "BE4361F 300187 51",
+        "sku": "BE4361F-300187-51",
         "sizes": [
           "ONESIZE"
         ]
@@ -289,7 +289,7 @@
     "sizes": [
       "ONESIZE"
     ],
-    "sku": "BE4361F 300187 51",
+    "sku": "BE4361F-300187-51",
     "searchKeywords": [
       "барбері",
       "burberry",
@@ -331,14 +331,14 @@
           "assets/images/products/uploads/coach-ethan-cv918-qbnrx-3.webp?v=0b3ab868",
           "assets/images/products/uploads/coach-ethan-cv918-qbnrx-4.webp?v=180016b7"
         ],
-        "sku": "coach ethan cv918 qbnrx"
+        "sku": "coach-ethan-cv918-qbnrx"
       }
     ],
     "oldPrice": 12300,
     "badge": "SALE",
     "isNew": false,
     "material": "Шкіра",
-    "sku": "coach ethan cv918 qbnrx",
+    "sku": "coach-ethan-cv918-qbnrx",
     "searchKeywords": [
       "коуч",
       "coach",
@@ -387,7 +387,7 @@
           "/assets/images/products/uploads/ct714_qbmi5_3_1100x1100.webp?v=23e2fbb9",
           "/assets/images/products/uploads/ct714_qbmi5_4_1100x1100.webp?v=a306c84b"
         ],
-        "sku": "coach ct714 qbml5"
+        "sku": "coach-ct714-qbml5"
       }
     ],
     "sizes": [
@@ -416,7 +416,7 @@
     "id": 8,
     "instagramBlock": "general",
     "description": "Coach Racer Belt Bag зі шкіри — поясна сумка з монограмним рельєфом. Регульований ремінь, носиться на поясі, через плече або навскіс. Унісекс-модель.",
-    "sku": "coach ct714 qbml5",
+    "sku": "coach-ct714-qbml5",
     "category": "Чоловічі сумки"
   },
   {
@@ -508,7 +508,7 @@
           "assets/images/products/uploads/coach73995-dark-stone-2.webp?v=c9095f73",
           "assets/images/products/uploads/coach73995-dark-stone-3.webp?v=0a136a87"
         ],
-        "sku": "coach73995 dark stone"
+        "sku": "coach73995-dark-stone"
       },
       {
         "hex": "#433636",
@@ -594,7 +594,7 @@
           "assets/images/products/uploads/coach-cp150-b4ha-3.webp?v=0e7762f5",
           "assets/images/products/uploads/coach-cp150-b4ha-4.webp?v=b87c559c"
         ],
-        "sku": "coach cp150 b4ha"
+        "sku": "coach-cp150-b4ha"
       },
       {
         "color": "Чорний",
@@ -643,7 +643,7 @@
     "id": 10,
     "instagramBlock": "reels",
     "description": "Coach Tabby Pillow стильна сумочка, яка стане акцентом будь-якого образу \nМ’який силует, та культовий дизайн Coach роблять цю модель ідеальним вибором як на кожен день, так і для особливих випадків ",
-    "sku": "coach cp150 b4ha",
+    "sku": "coach-cp150-b4ha",
     "category": "Жіночі сумки",
     "sizes": [
       "ONESIZE"
@@ -677,7 +677,7 @@
           "assets/images/products/uploads/gg0516s-001-52-2.webp?v=63bb217e",
           "assets/images/products/uploads/gg0516s-001-52-3.webp?v=e92bad07"
         ],
-        "sku": "GG0516S 001 52",
+        "sku": "GG0516S-001-52",
         "sizes": [
           "ONESIZE"
         ]
@@ -689,7 +689,7 @@
     "sizes": [
       "ONESIZE"
     ],
-    "sku": "GG0516S 001 52",
+    "sku": "GG0516S-001-52",
     "searchKeywords": [
       "гуччі",
       "gucci",
@@ -729,7 +729,7 @@
         "images": [
           "assets/images/products/uploads/invicta-pro-diver-blue-dial-22058-1.webp?v=7f58e0ba"
         ],
-        "sku": "invicta-pro-diver-blue-dial 22058",
+        "sku": "invicta-pro-diver-blue-dial-22058",
         "sizes": [
           "ONESIZE"
         ]
@@ -753,7 +753,7 @@
     "id": 12,
     "instagramBlock": "general",
     "description": "Чоловічий годинник Invicta Pro Diver — модель у стилі класичних дайверських годинників. Обертовий безель, комбінований браслет, темно-синій циферблат із позначкою дати.",
-    "sku": "invicta-pro-diver-blue-dial 22058",
+    "sku": "invicta-pro-diver-blue-dial-22058",
     "category": "Годинники",
     "framing": {
       "invicta-pro-diver-blue-dial-22058-1.webp": {
@@ -993,7 +993,7 @@
           "assets/images/products/uploads/mj-1028s-0807ir-54-3.webp?v=a8445457",
           "assets/images/products/uploads/mj-1028s-0807ir-54-4.webp?v=e3155cbf"
         ],
-        "sku": "MJ 1028S 0807IR 54",
+        "sku": "MJ-1028S-0807IR-54",
         "sizes": [
           "ONESIZE"
         ]
@@ -1003,7 +1003,7 @@
     "sizes": [
       "ONESIZE"
     ],
-    "sku": "MJ 1028S 0807IR 54",
+    "sku": "MJ-1028S-0807IR-54",
     "searchKeywords": [
       "марк джейкобс",
       "marc jacobs",
@@ -1043,7 +1043,7 @@
           "assets/images/products/uploads/mj-1061s-009qha-59-2.webp?v=17df7834",
           "assets/images/products/uploads/mj-1061s-009qha-59-3.webp?v=e590adaf"
         ],
-        "sku": "MJ 1061S 009QHA 59",
+        "sku": "MJ-1061S-009QHA-59",
         "sizes": [
           "ONESIZE"
         ]
@@ -1053,7 +1053,7 @@
     "sizes": [
       "ONESIZE"
     ],
-    "sku": "MJ 1061S 009QHA 59",
+    "sku": "MJ-1061S-009QHA-59",
     "searchKeywords": [
       "марк джейкобс",
       "marc jacobs",
@@ -1092,7 +1092,7 @@
           "assets/images/products/uploads/marc-409s-08079o-54-2.webp?v=28adce5a",
           "assets/images/products/uploads/marc-409s-08079o-54-3.webp?v=0c71a0e9"
         ],
-        "sku": "MARC 409S 08079O 54",
+        "sku": "MARC-409S-08079O-54",
         "sizes": [
           "ONESIZE"
         ]
@@ -1102,7 +1102,7 @@
     "sizes": [
       "ONESIZE"
     ],
-    "sku": "MARC 409S 08079O 54",
+    "sku": "MARC-409S-08079O-54",
     "searchKeywords": [
       "марк джейкобс",
       "marc jacobs",
@@ -1584,7 +1584,7 @@
           "assets/images/products/uploads/pr-20ws-1ab5s0-49-2.webp?v=0d5e7ad7",
           "assets/images/products/uploads/pr-20ws-1ab5s0-49-3.webp?v=6906e73f"
         ],
-        "sku": "PR 20WS 1AB5S0 49",
+        "sku": "PR-20WS-1AB5S0-49",
         "sizes": [
           "ONESIZE"
         ]
@@ -1594,7 +1594,7 @@
     "sizes": [
       "ONESIZE"
     ],
-    "sku": "PR 20WS 1AB5S0 49",
+    "sku": "PR-20WS-1AB5S0-49",
     "searchKeywords": [
       "прада",
       "prada",
@@ -1934,7 +1934,7 @@
       {
         "color": "Чорний",
         "hex": "#0d0000",
-        "sku": "NENA/S 807 51",
+        "sku": "NENA/S-807-51",
         "images": [
           "/assets/images/products/uploads/jimmy-choo-sunglasses-nena-s-807-afw1500fh937.5.webp?v=48a63580",
           "/assets/images/products/uploads/41my3jtmifl.webp?v=f0a220bb",
@@ -2039,7 +2039,7 @@
     "id": 33,
     "instagramBlock": "general",
     "description": "Стильні жіночі сонцезахисні окуляри Marc Jacobs MJ 1010/S з елегантною прямокутною формою оправи. Модель поєднує сучасний дизайн і впізнавану естетику бренду, легко доповнюючи як повсякденні, так і більш вишукані образи",
-    "sku": "MJ 1010/S 0807/9O 54",
+    "sku": "MJ-1010/S-0807/9O-54",
     "rating": 5,
     "category": "Окуляри і оправи",
     "legacySlugs": [
@@ -4736,7 +4736,7 @@
     "reviews": 0,
     "instagramBlock": "general",
     "description": "Стильні жіночі сонцезахисні окуляри Marc Jacobs MJ 1011/S із круглою оправою — елегантна модель, що додає образу виразності та сучасного акценту.\nОкуляри мають легку пластикову оправу та полікарбонатні лінзи. Класична форма легко поєднується як із повсякденними, так і з більш елегантними образами. Фірмовий дизайн Marc Jacobs робить модель універсальним аксесуаром для сонячних днів",
-    "sku": "MJ 1011/S WR953HA",
+    "sku": "MJ-1011/S-WR953HA",
     "rating": 5,
     "category": "Окуляри і оправи",
     "slug": "sontsezakhysni-okuliary-marc-jacobs-1011-s-wr953ha",
@@ -4779,7 +4779,7 @@
       {
         "color": "Черепаховий",
         "hex": "#543c22",
-        "sku": "SL 276 MICA 002 53",
+        "sku": "SL-276-MICA-002-53",
         "sizes": [
           "53"
         ],
@@ -4792,7 +4792,7 @@
       {
         "color": "Чорний / жовтий",
         "hex": "#dcd9d9",
-        "sku": "SL 276 MICA 038 53",
+        "sku": "SL-276-MICA-038-53",
         "sizes": [
           "53"
         ],
@@ -4914,11 +4914,13 @@
       "Жінкам"
     ],
     "preOrderDays": "10-14 робочих днів",
+    "color": "Золотистий",
     "forcePublish": false,
     "material": "Корпус — нержавіюча сталь 316L із PVD-покриттям; браслет — нержавіюча сталь із PVD-покриттям; скло — сапфірове",
     "brand": "Tissot",
     "price": 19000,
     "preOrder": true,
+    "slug": "hodynnyk-tissot-lovely-round-19-5mm",
     "dimensions": "1,95 × 1,95 × 0,5 см",
     "variants": [
       {
@@ -4928,7 +4930,7 @@
           "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_5.webp?v=c816fc6e",
           "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_2_2.webp?v=4b6d0dc8",
           "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_3_2.webp?v=7a97fcb9",
-          "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-dial-ladies-watch-t0580091103100_4_1.webp"
+          "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-e13260a2.webp?v=c4177bd4"
         ]
       }
     ],
@@ -4957,21 +4959,19 @@
     ],
     "isNew": false,
     "title": "Годинник Tissot Lovely Round 19.5mm",
+    "images": [
+      "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_5.webp",
+      "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_2_2.webp",
+      "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_3_2.webp",
+      "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-e13260a2.webp"
+    ],
     "reviews": 0,
+    "id": 74,
     "instagramBlock": "general",
     "description": "Вишуканий жіночий годинник Tissot Lovely Round 19.5mm — мініатюрна модель із круглим корпусом, що поєднує елегантність, жіночність та швейцарську якість.\nГодинник має сріблястий циферблат із лаконічними індексами, корпус із нержавіючої сталі 316L із PVD-покриттям кольору жовтого золота та стійке до подряпин сапфірове скло. Швейцарський кварцовий механізм забезпечує точний хід. Модель доповнена золотистим сталевим браслетом із розкладною застібкою та захисним замком. Водонепроникність — до 30 м (3 ATM)",
     "sku": "T058.009.33.031.00",
     "rating": 5,
     "category": "Годинники",
-    "slug": "hodynnyk-tissot-lovely-round-19-5mm",
-    "id": 74,
-    "color": "Золотистий",
-    "images": [
-      "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_5.webp",
-      "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_2_2.webp",
-      "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_3_2.webp",
-      "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-dial-ladies-watch-t0580091103100_4_1.webp"
-    ],
     "legacySlugs": [
       "годинник-tissot-lovely-round-19-5mm"
     ]
@@ -5305,6 +5305,145 @@
     ],
     "legacySlugs": [
       "годинник-mathey-tissot-mathy-ceramic-h901crbn"
+    ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Натуральна шкіра Polished Pebble Leather",
+    "brand": "Coach",
+    "price": 11900,
+    "preOrder": true,
+    "dimensions": "26 × 15 × 8 см",
+    "variants": [
+      {
+        "color": "/",
+        "hex": "#e6e1e1",
+        "sku": "CH857-B4/HA",
+        "images": [
+          "/assets/images/products/uploads/ch857_b4ha_a0.webp?v=e4bdcada",
+          "/assets/images/products/uploads/ch857_b4ha_a3.webp?v=e04856fb",
+          "/assets/images/products/uploads/ch857_b4ha_a8.webp?v=9e3d5b13",
+          "/assets/images/products/uploads/ch857_b4ha_a21.webp?v=dda2a793",
+          "/assets/images/products/uploads/ch857_b4ha_a99.webp?v=6421aab0",
+          "/assets/images/products/uploads/ch857_b4ha_a61.webp?v=5fdb8a47",
+          "/assets/images/products/uploads/ch857_b4ha_a92.webp?v=a86a0515"
+        ]
+      },
+      {
+        "sku": "CH857-B4/BK",
+        "hex": "#000000",
+        "color": "Чорний",
+        "images": [
+          "/assets/images/products/uploads/ch857_b4bk_a0.webp?v=186970bc",
+          "/assets/images/products/uploads/ch857_b4bk_a3.webp?v=e7985540",
+          "/assets/images/products/uploads/ch857_b4bk_a8.webp?v=6d143b15",
+          "/assets/images/products/uploads/ch857_b4bk_a61.webp?v=984a7b86",
+          "/assets/images/products/uploads/ch857_b4bk_a92.webp?v=49ce0f4f"
+        ]
+      },
+      {
+        "color": "Amber Brown",
+        "hex": "#bc7316",
+        "sku": "CH857-B4/Amber-Brown.",
+        "images": [
+          "/assets/images/products/uploads/ch857_b4yu1_a0.webp?v=0a2184cd",
+          "/assets/images/products/uploads/ch857_b4yu1_a3.webp?v=4a2a38ca",
+          "/assets/images/products/uploads/ch857_b4yu1_a8.webp?v=c32ebbf2"
+        ]
+      },
+      {
+        "color": "/Maple",
+        "hex": "#771e1e",
+        "sku": "CH857-B4MPL",
+        "images": [
+          "/assets/images/products/uploads/ch857_b4mpl_a0.webp?v=50fd17fa",
+          "/assets/images/products/uploads/ch857_b4mpl_a5.webp?v=ce55b0f7",
+          "/assets/images/products/uploads/ch857_b4mpl_a6.webp?v=7765093b",
+          "/assets/images/products/uploads/ch857_b4mpl_a62.webp?v=b80bbd61",
+          "/assets/images/products/uploads/ch857_b4mpl_a92.webp?v=86f4ee2e"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Коротка знімна ручка + довгий знімний ремінь для носіння через плече",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Coach Tabby 26",
+      "Coach Tabby",
+      "Coach сумка",
+      "Coach жіноча сумка",
+      "шкіряна сумка Coach",
+      "Tabby Shoulder Bag",
+      "CH857",
+      "Coach Chalk",
+      "Coach 26"
+    ],
+    "isNew": false,
+    "title": "Жіноча сумочка Coach Tabby Shoulder Bag 26",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Структурована сумка Coach Tabby 26 — культова модель бренду з впізнаваною фірмовою застібкою Signature. Компактна, але містка, доповнена двома знімними ремінцями: коротким для носіння на плечі та довгим для носіння через плече.\nІдеально поєднується як із повсякденними образами, так і з більш елегантними.",
+    "sku": "CH857-B4/HA",
+    "rating": 5,
+    "category": "Жіночі сумки",
+    "framing": {
+      "ch857_b4ha_a3.webp": {
+        "zoom": 1.93,
+        "x": 48,
+        "y": 56
+      },
+      "ch857_b4ha_a8.webp": {
+        "zoom": 1.43,
+        "x": 48,
+        "y": 51
+      },
+      "ch857_b4bk_a0.webp": {
+        "zoom": 1.4,
+        "x": 50,
+        "y": 56
+      },
+      "ch857_b4bk_a3.webp": {
+        "zoom": 1.95,
+        "x": 49,
+        "y": 56
+      },
+      "ch857_b4bk_a8.webp": {
+        "zoom": 1.43,
+        "x": 48,
+        "y": 51
+      },
+      "ch857_b4yu1_a3.webp": {
+        "zoom": 1.71,
+        "x": 49,
+        "y": 55
+      },
+      "ch857_b4yu1_a8.webp": {
+        "zoom": 1.48,
+        "x": 48,
+        "y": 50
+      }
+    },
+    "legacySlugs": [
+      "жіноча-сумочка-coach-tabby-shoulder-bag-26"
+    ],
+    "slug": "zhinocha-sumochka-coach-tabby-shoulder-bag-26",
+    "id": 80,
+    "color": "/",
+    "images": [
+      "/assets/images/products/uploads/ch857_b4ha_a0.webp",
+      "/assets/images/products/uploads/ch857_b4ha_a3.webp",
+      "/assets/images/products/uploads/ch857_b4ha_a8.webp",
+      "/assets/images/products/uploads/ch857_b4ha_a21.webp",
+      "/assets/images/products/uploads/ch857_b4ha_a99.webp",
+      "/assets/images/products/uploads/ch857_b4ha_a61.webp",
+      "/assets/images/products/uploads/ch857_b4ha_a92.webp"
     ]
   }
 ]
