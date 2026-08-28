@@ -4914,11 +4914,13 @@
       "Жінкам"
     ],
     "preOrderDays": "10-14 робочих днів",
+    "color": "Золотистий",
     "forcePublish": false,
     "material": "Корпус — нержавіюча сталь 316L із PVD-покриттям; браслет — нержавіюча сталь із PVD-покриттям; скло — сапфірове",
     "brand": "Tissot",
     "price": 19000,
     "preOrder": true,
+    "slug": "hodynnyk-tissot-lovely-round-19-5mm",
     "dimensions": "1,95 × 1,95 × 0,5 см",
     "variants": [
       {
@@ -4928,7 +4930,7 @@
           "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_5.webp?v=c816fc6e",
           "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_2_2.webp?v=4b6d0dc8",
           "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_3_2.webp?v=7a97fcb9",
-          "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-dial-ladies-watch-t0580091103100_4_1.webp"
+          "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-e13260a2.webp?v=c4177bd4"
         ]
       }
     ],
@@ -4957,21 +4959,19 @@
     ],
     "isNew": false,
     "title": "Годинник Tissot Lovely Round 19.5mm",
+    "images": [
+      "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_5.webp",
+      "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_2_2.webp",
+      "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_3_2.webp",
+      "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-e13260a2.webp"
+    ],
     "reviews": 0,
+    "id": 74,
     "instagramBlock": "general",
     "description": "Вишуканий жіночий годинник Tissot Lovely Round 19.5mm — мініатюрна модель із круглим корпусом, що поєднує елегантність, жіночність та швейцарську якість.\nГодинник має сріблястий циферблат із лаконічними індексами, корпус із нержавіючої сталі 316L із PVD-покриттям кольору жовтого золота та стійке до подряпин сапфірове скло. Швейцарський кварцовий механізм забезпечує точний хід. Модель доповнена золотистим сталевим браслетом із розкладною застібкою та захисним замком. Водонепроникність — до 30 м (3 ATM)",
     "sku": "T058.009.33.031.00",
     "rating": 5,
     "category": "Годинники",
-    "slug": "hodynnyk-tissot-lovely-round-19-5mm",
-    "id": 74,
-    "color": "Золотистий",
-    "images": [
-      "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_5.webp",
-      "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_2_2.webp",
-      "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_3_2.webp",
-      "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-dial-ladies-watch-t0580091103100_4_1.webp"
-    ],
     "legacySlugs": [
       "годинник-tissot-lovely-round-19-5mm"
     ]
