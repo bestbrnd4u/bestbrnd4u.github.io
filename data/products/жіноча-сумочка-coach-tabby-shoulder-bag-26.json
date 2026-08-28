@@ -1,0 +1,87 @@
+{
+  "gender": [
+    "Жінкам"
+  ],
+  "preOrderDays": "10-14 робочих днів",
+  "forcePublish": false,
+  "material": "Натуральна шкіра Polished Pebble Leather",
+  "brand": "Coach",
+  "price": 11900,
+  "preOrder": true,
+  "dimensions": "26 × 15 × 8 см",
+  "variants": [
+    {
+      "color": "Chalk / Brass",
+      "hex": "#e6e1e1",
+      "sku": "CH857 B4/HA",
+      "images": [
+        "/assets/images/products/uploads/ch857_b4ha_a0.webp",
+        "/assets/images/products/uploads/ch857_b4ha_a3.webp",
+        "/assets/images/products/uploads/ch857_b4ha_a8.webp",
+        "/assets/images/products/uploads/ch857_b4ha_a21.webp",
+        "/assets/images/products/uploads/ch857_b4ha_a99.webp",
+        "/assets/images/products/uploads/ch857_b4ha_a61.webp",
+        "/assets/images/products/uploads/ch857_b4ha_a92.webp"
+      ]
+    },
+    {
+      "sku": "CH857 B4/BK",
+      "hex": "#000000",
+      "color": "Чорний / Brass",
+      "images": [
+        "/assets/images/products/uploads/ch857_b4bk_a0.webp",
+        "/assets/images/products/uploads/ch857_b4bk_a3.webp",
+        "/assets/images/products/uploads/ch857_b4bk_a8.webp",
+        "/assets/images/products/uploads/ch857_b4bk_a61.webp",
+        "/assets/images/products/uploads/ch857_b4bk_a92.webp"
+      ]
+    },
+    {
+      "color": "Amber Brown",
+      "hex": "#bc7316",
+      "sku": "CH857 B4/Amber Brown.",
+      "images": [
+        "/assets/images/products/uploads/ch857_b4yu1_a0.webp",
+        "/assets/images/products/uploads/ch857_b4yu1_a3.webp",
+        "/assets/images/products/uploads/ch857_b4yu1_a8.webp"
+      ]
+    },
+    {
+      "color": "Brass/Maple",
+      "hex": "#771e1e",
+      "sku": "CH857 B4MPL",
+      "images": [
+        "/assets/images/products/uploads/ch857_b4mpl_a0.webp",
+        "/assets/images/products/uploads/ch857_b4mpl_a5.webp",
+        "/assets/images/products/uploads/ch857_b4mpl_a6.webp",
+        "/assets/images/products/uploads/ch857_b4mpl_a62.webp",
+        "/assets/images/products/uploads/ch857_b4mpl_a92.webp"
+      ]
+    }
+  ],
+  "preOrderPrepayment": 100,
+  "strapInfo": "Коротка знімна ручка + довгий знімний ремінь для носіння через плече",
+  "sizes": [
+    "Onesize"
+  ],
+  "splitByColor": true,
+  "searchKeywords": [
+    "Coach Tabby 26",
+    "Coach Tabby",
+    "Coach сумка",
+    "Coach жіноча сумка",
+    "шкіряна сумка Coach",
+    "Tabby Shoulder Bag",
+    "CH857",
+    "Coach Chalk",
+    "Coach 26"
+  ],
+  "isNew": false,
+  "title": "Жіноча сумочка Coach Tabby Shoulder Bag 26",
+  "reviews": 0,
+  "instagramBlock": "general",
+  "description": "Структурована сумка Coach Tabby 26 — культова модель бренду з впізнаваною фірмовою застібкою Signature. Компактна, але містка, доповнена двома знімними ремінцями: коротким для носіння на плечі та довгим для носіння через плече.\nІдеально поєднується як із повсякденними образами, так і з більш елегантними.",
+  "sku": "CH857 B4/HA",
+  "rating": 5,
+  "category": "Жіночі сумки"
+}
