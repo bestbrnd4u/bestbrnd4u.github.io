@@ -5306,5 +5306,144 @@
     "legacySlugs": [
       "годинник-mathey-tissot-mathy-ceramic-h901crbn"
     ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Натуральна шкіра Polished Pebble Leather",
+    "brand": "Coach",
+    "price": 11900,
+    "preOrder": true,
+    "dimensions": "26 × 15 × 8 см",
+    "variants": [
+      {
+        "color": "/",
+        "hex": "#e6e1e1",
+        "sku": "CH857 B4/HA",
+        "images": [
+          "/assets/images/products/uploads/ch857_b4ha_a0.webp?v=e4bdcada",
+          "/assets/images/products/uploads/ch857_b4ha_a3.webp?v=e04856fb",
+          "/assets/images/products/uploads/ch857_b4ha_a8.webp?v=9e3d5b13",
+          "/assets/images/products/uploads/ch857_b4ha_a21.webp?v=dda2a793",
+          "/assets/images/products/uploads/ch857_b4ha_a99.webp?v=6421aab0",
+          "/assets/images/products/uploads/ch857_b4ha_a61.webp?v=5fdb8a47",
+          "/assets/images/products/uploads/ch857_b4ha_a92.webp?v=a86a0515"
+        ]
+      },
+      {
+        "sku": "CH857 B4/BK",
+        "hex": "#000000",
+        "color": "Чорний",
+        "images": [
+          "/assets/images/products/uploads/ch857_b4bk_a0.webp?v=186970bc",
+          "/assets/images/products/uploads/ch857_b4bk_a3.webp?v=e7985540",
+          "/assets/images/products/uploads/ch857_b4bk_a8.webp?v=6d143b15",
+          "/assets/images/products/uploads/ch857_b4bk_a61.webp?v=984a7b86",
+          "/assets/images/products/uploads/ch857_b4bk_a92.webp?v=49ce0f4f"
+        ]
+      },
+      {
+        "color": "Amber Brown",
+        "hex": "#bc7316",
+        "sku": "CH857 B4/Amber Brown.",
+        "images": [
+          "/assets/images/products/uploads/ch857_b4yu1_a0.webp?v=0a2184cd",
+          "/assets/images/products/uploads/ch857_b4yu1_a3.webp?v=4a2a38ca",
+          "/assets/images/products/uploads/ch857_b4yu1_a8.webp?v=c32ebbf2"
+        ]
+      },
+      {
+        "color": "/Maple",
+        "hex": "#771e1e",
+        "sku": "CH857 B4MPL",
+        "images": [
+          "/assets/images/products/uploads/ch857_b4mpl_a0.webp?v=50fd17fa",
+          "/assets/images/products/uploads/ch857_b4mpl_a5.webp?v=ce55b0f7",
+          "/assets/images/products/uploads/ch857_b4mpl_a6.webp?v=7765093b",
+          "/assets/images/products/uploads/ch857_b4mpl_a62.webp?v=b80bbd61",
+          "/assets/images/products/uploads/ch857_b4mpl_a92.webp?v=86f4ee2e"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Коротка знімна ручка + довгий знімний ремінь для носіння через плече",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Coach Tabby 26",
+      "Coach Tabby",
+      "Coach сумка",
+      "Coach жіноча сумка",
+      "шкіряна сумка Coach",
+      "Tabby Shoulder Bag",
+      "CH857",
+      "Coach Chalk",
+      "Coach 26"
+    ],
+    "isNew": false,
+    "title": "Жіноча сумочка Coach Tabby Shoulder Bag 26",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Структурована сумка Coach Tabby 26 — культова модель бренду з впізнаваною фірмовою застібкою Signature. Компактна, але містка, доповнена двома знімними ремінцями: коротким для носіння на плечі та довгим для носіння через плече.\nІдеально поєднується як із повсякденними образами, так і з більш елегантними.",
+    "sku": "CH857 B4/HA",
+    "rating": 5,
+    "category": "Жіночі сумки",
+    "framing": {
+      "ch857_b4ha_a3.webp": {
+        "zoom": 1.93,
+        "x": 48,
+        "y": 56
+      },
+      "ch857_b4ha_a8.webp": {
+        "zoom": 1.43,
+        "x": 48,
+        "y": 51
+      },
+      "ch857_b4bk_a0.webp": {
+        "zoom": 1.4,
+        "x": 50,
+        "y": 56
+      },
+      "ch857_b4bk_a3.webp": {
+        "zoom": 1.95,
+        "x": 49,
+        "y": 56
+      },
+      "ch857_b4bk_a8.webp": {
+        "zoom": 1.43,
+        "x": 48,
+        "y": 51
+      },
+      "ch857_b4yu1_a3.webp": {
+        "zoom": 1.71,
+        "x": 49,
+        "y": 55
+      },
+      "ch857_b4yu1_a8.webp": {
+        "zoom": 1.48,
+        "x": 48,
+        "y": 50
+      }
+    },
+    "legacySlugs": [
+      "жіноча-сумочка-coach-tabby-shoulder-bag-26"
+    ],
+    "slug": "zhinocha-sumochka-coach-tabby-shoulder-bag-26",
+    "id": 80,
+    "color": "/",
+    "images": [
+      "/assets/images/products/uploads/ch857_b4ha_a0.webp",
+      "/assets/images/products/uploads/ch857_b4ha_a3.webp",
+      "/assets/images/products/uploads/ch857_b4ha_a8.webp",
+      "/assets/images/products/uploads/ch857_b4ha_a21.webp",
+      "/assets/images/products/uploads/ch857_b4ha_a99.webp",
+      "/assets/images/products/uploads/ch857_b4ha_a61.webp",
+      "/assets/images/products/uploads/ch857_b4ha_a92.webp"
+    ]
   }
 ]

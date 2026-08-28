@@ -62,7 +62,7 @@
   "preOrderPrepayment": 100,
   "strapInfo": "Коротка знімна ручка + довгий знімний ремінь для носіння через плече",
   "sizes": [
-    "Onesize"
+    "ONESIZE"
   ],
   "splitByColor": true,
   "searchKeywords": [
@@ -83,5 +83,57 @@
   "description": "Структурована сумка Coach Tabby 26 — культова модель бренду з впізнаваною фірмовою застібкою Signature. Компактна, але містка, доповнена двома знімними ремінцями: коротким для носіння на плечі та довгим для носіння через плече.\nІдеально поєднується як із повсякденними образами, так і з більш елегантними.",
   "sku": "CH857 B4/HA",
   "rating": 5,
-  "category": "Жіночі сумки"
+  "category": "Жіночі сумки",
+  "framing": {
+    "ch857_b4ha_a3.webp": {
+      "zoom": 1.93,
+      "x": 48,
+      "y": 56
+    },
+    "ch857_b4ha_a8.webp": {
+      "zoom": 1.43,
+      "x": 48,
+      "y": 51
+    },
+    "ch857_b4bk_a0.webp": {
+      "zoom": 1.4,
+      "x": 50,
+      "y": 56
+    },
+    "ch857_b4bk_a3.webp": {
+      "zoom": 1.95,
+      "x": 49,
+      "y": 56
+    },
+    "ch857_b4bk_a8.webp": {
+      "zoom": 1.43,
+      "x": 48,
+      "y": 51
+    },
+    "ch857_b4yu1_a3.webp": {
+      "zoom": 1.71,
+      "x": 49,
+      "y": 55
+    },
+    "ch857_b4yu1_a8.webp": {
+      "zoom": 1.48,
+      "x": 48,
+      "y": 50
+    }
+  },
+  "legacySlugs": [
+    "жіноча-сумочка-coach-tabby-shoulder-bag-26"
+  ],
+  "slug": "zhinocha-sumochka-coach-tabby-shoulder-bag-26",
+  "id": 80,
+  "color": "Chalk / Brass",
+  "images": [
+    "/assets/images/products/uploads/ch857_b4ha_a0.webp",
+    "/assets/images/products/uploads/ch857_b4ha_a3.webp",
+    "/assets/images/products/uploads/ch857_b4ha_a8.webp",
+    "/assets/images/products/uploads/ch857_b4ha_a21.webp",
+    "/assets/images/products/uploads/ch857_b4ha_a99.webp",
+    "/assets/images/products/uploads/ch857_b4ha_a61.webp",
+    "/assets/images/products/uploads/ch857_b4ha_a92.webp"
+  ]
 }
