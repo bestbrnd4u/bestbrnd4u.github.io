@@ -13,7 +13,7 @@
     {
       "color": "Chalk / Brass",
       "hex": "#e6e1e1",
-      "sku": "CH857 B4/HA",
+      "sku": "CH857-B4/HA",
       "images": [
         "/assets/images/products/uploads/ch857_b4ha_a0.webp",
         "/assets/images/products/uploads/ch857_b4ha_a3.webp",
@@ -25,7 +25,7 @@
       ]
     },
     {
-      "sku": "CH857 B4/BK",
+      "sku": "CH857-B4/BK",
       "hex": "#000000",
       "color": "Чорний / Brass",
       "images": [
@@ -39,7 +39,7 @@
     {
       "color": "Amber Brown",
       "hex": "#bc7316",
-      "sku": "CH857 B4/Amber Brown.",
+      "sku": "CH857-B4/Amber-Brown.",
       "images": [
         "/assets/images/products/uploads/ch857_b4yu1_a0.webp",
         "/assets/images/products/uploads/ch857_b4yu1_a3.webp",
@@ -49,7 +49,7 @@
     {
       "color": "Brass/Maple",
       "hex": "#771e1e",
-      "sku": "CH857 B4MPL",
+      "sku": "CH857-B4MPL",
       "images": [
         "/assets/images/products/uploads/ch857_b4mpl_a0.webp",
         "/assets/images/products/uploads/ch857_b4mpl_a5.webp",
@@ -81,7 +81,7 @@
   "reviews": 0,
   "instagramBlock": "general",
   "description": "Структурована сумка Coach Tabby 26 — культова модель бренду з впізнаваною фірмовою застібкою Signature. Компактна, але містка, доповнена двома знімними ремінцями: коротким для носіння на плечі та довгим для носіння через плече.\nІдеально поєднується як із повсякденними образами, так і з більш елегантними.",
-  "sku": "CH857 B4/HA",
+  "sku": "CH857-B4/HA",
   "rating": 5,
   "category": "Жіночі сумки",
   "framing": {

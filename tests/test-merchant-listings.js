@@ -272,25 +272,57 @@ console.log("\n[9] Артикул без пробілів — вимога Googl
 
     const hadSpaces = raw.filter(v => /\s/.test(String(v)));
 
-    check(`у даних пробіли є (${hadSpaces.length}) — отже правило працює, а не збіг`,
-        hadSpaces.length > 0);
+    // Тут стояло «пробіли в даних мусять бути — інакше правило нічого
+    // не доводить». Так і було, поки пробіли жили в даних, а дефіс
+    // з'являвся лише на виході: у товарі одне значення, на сайті інше.
+    //
+    // Тепер пробілів немає вже в даних (normalizeSkus у
+    // build-products.js), а адмінка нових не пропускає (pattern у
+    // admin/config.yml). Вимагати їхньої наявності означало б вимагати
+    // саме тієї розбіжності, від якої ми пішли.
+    check("у даних теж не лишилось жодного пробілу в артикулі",
+        hadSpaces.length === 0, hadSpaces.slice(0, 3).join(", "));
 
-    // Перевіряємо саме перетворення на реальному значенні
-    const sample = hadSpaces[0];
+    // Правило все одно мусить доводити себе на реальному значенні —
+    // просто інакше: беремо артикул, який дефіс уже отримав, і
+    // звіряємо, що саме він дійшов до розмітки.
+    const sample = raw.find(v => /-/.test(String(v)));
+
+    check("артикули з дефісом у даних є — правило не порожнє", !!sample);
 
     if (sample) {
 
-        const expected = String(sample).replace(/\s+/g, " ").trim()
-            .replace(/ /g, "-").replace(/-{2,}/g, "-");
+        const rendered = schemas.map(x => x.ld.sku).find(v => v === String(sample));
 
-        const rendered = schemas
-            .map(x => x.ld.sku)
-            .find(v => v === expected);
-
-        check(`«${sample}» → «${expected}»`, !!rendered,
+        check(`«${sample}» дійшов до розмітки як є`, !!rendered,
             "у розмітці такого значення немає");
 
     }
+
+    // Два місця, які тримають правило: адмінка не дає ввести пробіл, а
+    // збірка лікує те, що вже лежить у даних. Без другого старі товари
+    // неможливо було б зберегти — адмінка відхиляла б їхній власний,
+    // нікким не змінений артикул.
+    const cfg = fs.readFileSync(path.join(ROOT, "admin/config.yml"), "utf8");
+
+    const patterns = cfg.split("\n")
+        .filter(line => /pattern:\s*\["\^\\\\S\*\$"/.test(line));
+
+    check("адмінка не приймає пробіл в артикулі (обидва поля)",
+        patterns.length === 2, String(patterns.length));
+
+    check("і пояснює, що ставити замість пробілу",
+        /Замість пробілу — дефіс/.test(cfg));
+
+    const builder = fs.readFileSync(path.join(ROOT, "scripts/build-products.js"), "utf8");
+
+    check("збірка лікує артикули, що вже в даних",
+        /function normalizeSkus/.test(builder)
+        && /replace\(\/\\s\+\/g, "-"\)/.test(builder));
+
+    check("і чіпає артикул товару, і артикули кольорів",
+        /data\.sku = fix\(data\.sku\)/.test(builder)
+        && /variant\.sku = fix\(variant\.sku\)/.test(builder));
 
     // Довгі багатослівні значення все одно відкидаємо: без пробілів
     // назва товару не стає артикулом.
