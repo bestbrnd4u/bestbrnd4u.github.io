@@ -439,6 +439,142 @@ function orderItemKey(item) {
 
 }
 
+// --------------------------------------
+// Слід надісланих заявок у самому браузері
+//
+// НАВІЩО ВІН ПОТРІБЕН
+// --------------------
+// Захист від повторної відмови тримається на рядку в order_refusals.
+// Але лист магазину йде ОКРЕМИМ каналом і незалежно від бази — саме
+// щоб відмова не загубилась, коли база чи тригер відмовили. Звідси
+// пара, якої раніше ніхто не передбачив: лист магазину пішов, рядка в
+// базі немає.
+//
+// У такому стані сторінка про заявку не знає взагалі. Кнопка
+// «Відмова» повертається після оновлення, вікно показує той самий
+// товар з увімкненою галочкою — і покупець надсилає другу відмову на
+// те саме. Магазин отримує два листи й читає їх як два різні
+// повернення.
+//
+// Тому слід лишається тут — РІВНО для випадку «заявка була, база її
+// не прийняла». Коли рядок у базі є, веде база: сюди нічого не
+// пишеться, інакше заявка, яку менеджер зняв, вічно блокувала б кнопку
+// в цьому браузері.
+//
+// Це не заміна базі: інший пристрій сліду не побачить. Але дірку там,
+// де можемо, закриваємо.
+// --------------------------------------
+const REFUSAL_LEDGER_KEY = "bb4u:refusals";
+
+// 60 днів — строк відмови (14) із добрим запасом. Далі запис уже
+// нічого не вирішує, а місце в сховищі займає.
+const REFUSAL_LEDGER_DAYS = 60;
+
+// Розібраний слід тримаємо в пам'яті: під час малювання списку його
+// питають на кожен товар кожного замовлення, а це десятки розборів
+// JSON поспіль заради того самого рядка.
+let refusalLedgerCache = null;
+
+function readRefusalLedger() {
+
+    if (refusalLedgerCache) return refusalLedgerCache;
+
+    try {
+
+        const parsed = JSON.parse(localStorage.getItem(REFUSAL_LEDGER_KEY) || "{}");
+
+        refusalLedgerCache = parsed && typeof parsed === "object" ? parsed : {};
+
+    } catch (error) {
+
+        // Приватний режим, вимкнене сховище, зіпсований запис — жодна з
+        // цих причин не варта зламаної історії замовлень.
+        refusalLedgerCache = {};
+
+    }
+
+    return refusalLedgerCache;
+
+}
+
+// Ключі позицій, про які знає лише цей браузер.
+function localRefusedKeys(order) {
+
+    const keys = new Set();
+
+    const entry = readRefusalLedger()[String((order && order.order_number) || "")];
+
+    if (!entry || typeof entry !== "object") return keys;
+
+    const edge = Date.now() - REFUSAL_LEDGER_DAYS * 86400000;
+
+    Object.keys(entry).forEach(key => {
+
+        if (Date.parse(entry[key]) >= edge) keys.add(key);
+
+    });
+
+    return keys;
+
+}
+
+// Запам'ятати заявку, якої немає в базі.
+function rememberRefusal(order, items) {
+
+    const number = String((order && order.order_number) || "");
+
+    if (!number || !Array.isArray(items) || !items.length) return;
+
+    try {
+
+        const ledger = readRefusalLedger();
+        const now = new Date().toISOString();
+        const edge = Date.now() - REFUSAL_LEDGER_DAYS * 86400000;
+
+        const entry = ledger[number] && typeof ledger[number] === "object"
+            ? ledger[number]
+            : {};
+
+        items.forEach(item => { entry[orderItemKey(item)] = now; });
+
+        ledger[number] = entry;
+
+        // Прибирання простроченого — тут, а не окремим таймером:
+        // сховище чіпаємо рідко, і зайвий механізм ні до чого.
+        //
+        // Чистимо по КЛЮЧАХ, а не по замовленнях: у замовленні з двох
+        // сумок друга відмова оновлює дату всього запису, і перша,
+        // давно прострочена, лежала б у сховищі вічно.
+        Object.keys(ledger).forEach(key => {
+
+            const kept = ledger[key] || {};
+
+            Object.keys(kept).forEach(itemKey => {
+
+                const at = Date.parse(kept[itemKey]);
+
+                if (Number.isNaN(at) || at < edge) delete kept[itemKey];
+
+            });
+
+            if (!Object.keys(kept).length) delete ledger[key];
+
+        });
+
+        localStorage.setItem(REFUSAL_LEDGER_KEY, JSON.stringify(ledger));
+
+        refusalLedgerCache = ledger;
+
+    } catch (error) {
+
+        // Сховище переповнене або недоступне. Втрачений слід прикрий,
+        // але не вартий помилки на екрані: заявка вже пішла магазину.
+        console.warn("Слід заявки на відмову не збережено:", error);
+
+    }
+
+}
+
 // Від яких позицій замовлення вже відмовились.
 //
 // Заявки лежать в order_refusals (див. loadOrders). У старих заявках
@@ -447,15 +583,19 @@ function orderItemKey(item) {
 // саме так вони тоді й працювали.
 function refusedItemKeys(order) {
 
+    // Слід цього браузера — те, що сторінка надіслала, а база не
+    // прийняла. Без нього кнопка поверталась після оновлення.
+    const local = localRefusedKeys(order);
+
     const refusals = order.__refusals || [];
 
-    if (!refusals.length) return null;
+    if (!refusals.length) return local.size ? local : null;
 
     const legacy = refusals.some(refusal => !Array.isArray(refusal.items) || !refusal.items.length);
 
     if (legacy) return "all";
 
-    const keys = new Set();
+    const keys = new Set(local);
 
     refusals.forEach(refusal => refusal.items.forEach(item => keys.add(orderItemKey(item))));
 
@@ -584,23 +724,52 @@ async function loadOrders(userId) {
 // усього замовлення від відмови від однієї речі.
 //
 // Запит один на всі замовлення, а не по одному на картку.
+//
+// ЧОМУ ПИТАЄМО ПРО ВСІ ЗАМОВЛЕННЯ, А НЕ ЛИШЕ ПРО ПОЗНАЧЕНІ
+// ---------------------------------------------------------
+// Раніше запит ішов тільки для замовлень із refusal_requested_at — щоб
+// не смикати базу дарма. Але цю позначку ставить ТРИГЕР у Supabase, а
+// заявку створює сайт: це дві різні дії, і вони розходяться. Міграцію
+// не застосували, тригер зняли, він упав на сповіщенні — рядок у
+// order_refusals є, позначки на замовленні немає, і кабінет проходить
+// повз власні заявки.
+//
+// Наслідок був саме той, на який скаржаться: заявку надіслано, лист
+// прийшов, а після оновлення сторінки кнопка «Відмова» на місці й
+// вікно пропонує відмовитись від того самого товару вдруге.
+//
+// Тепер джерело одне — сама таблиця заявок. Запит той самий, один на
+// всі замовлення; різниця в тому, що він більше не залежить від
+// стороннього прапорця.
 async function attachRefusals(orders) {
 
-    const withRefusal = orders.filter(order => order.refusal_requested_at);
+    // Слід у браузері міг змінитись в іншій вкладці — перечитаємо.
+    refusalLedgerCache = null;
 
-    if (!withRefusal.length) return;
+    const list = (orders || []).filter(order => order && order.id !== null && order.id !== undefined);
+
+    if (!list.length) return;
 
     const { data, error } = await supabaseClient
         .from("order_refusals")
         .select("order_id, items")
-        .in("order_id", withRefusal.map(order => order.id));
+        .in("order_id", list.map(order => order.id));
 
     if (error) {
 
         // Не показуємо помилку: історія замовлень важливіша за
-        // подробиці відмов. Без цих даних працює як раніше — відмова
-        // вважається відмовою від усього замовлення.
+        // подробиці відмов.
+        //
+        // Але й не вдаємо, що відмов не було. Позначка на замовленні
+        // каже, що якась заявка є; від ЧОГО саме — ми щойно не
+        // дізнались. Читаємо як відмову від усього замовлення: зайвий
+        // раз не дати відмовитись (людина подзвонить) дешевше, ніж
+        // мовчки надіслати магазину другу заявку про те саме.
         console.error("Заявки на відмову:", error);
+
+        list.forEach(order => {
+            order.__refusals = order.refusal_requested_at ? [{ items: null }] : [];
+        });
 
         return;
 
@@ -610,13 +779,18 @@ async function attachRefusals(orders) {
 
     (data || []).forEach(refusal => {
 
-        if (!byOrder.has(refusal.order_id)) byOrder.set(refusal.order_id, []);
+        // Ключ рядком: id замовлення — bigint, і те, числом він
+        // приїхав чи рядком, залежить від налаштувань PostgREST.
+        // Порівняння через Map таку різницю не пробачає.
+        const key = String(refusal.order_id);
 
-        byOrder.get(refusal.order_id).push(refusal);
+        if (!byOrder.has(key)) byOrder.set(key, []);
+
+        byOrder.get(key).push(refusal);
 
     });
 
-    orders.forEach(order => { order.__refusals = byOrder.get(order.id) || []; });
+    list.forEach(order => { order.__refusals = byOrder.get(String(order.id)) || []; });
 
 }
 
@@ -1389,7 +1563,37 @@ async function requestRefusal(button, itemIndex) {
 
             showToast("Заявку на цей товар уже надіслано");
 
+            // Перемальовуємо картку, а не саму кнопку: якщо заявку
+            // подали з іншої вкладки, застаріла тут не тільки вона —
+            // ще позначка на товарі, статус замовлення й рядок про
+            // часткову відмову.
+            await refreshOrderCard(button, order);
+
+            // Картки не знайшли (перемальовувати нічого) — прибираємо
+            // хоча б кнопку, щоб вона не запрошувала натиснути ще раз.
+            // На перемальованій картці кнопки вже немає, і виклик
+            // нічого не робить.
             markItemRefused(button);
+
+            return;
+
+        }
+
+        // Строк відмови перевіряємо ЩЕ РАЗ, а не лише коли малюємо
+        // кнопку.
+        //
+        // На свіжій сторінці простроченої кнопки немає — але сторінка
+        // могла бути відкрита два тижні тому, і там вона ще є. Та й
+        // дата доставки могла з'явитись уже після того, як картку
+        // намалювали. В обох випадках магазин отримував відмову поза
+        // строком і мусив пояснювати це покупцю вручну.
+        const period = refusalWindow(order);
+
+        if (!period.allowed) {
+
+            showToast(`Строк відмови (${REFUSAL_DAYS} днів) минув`);
+
+            await refreshOrderCard(button, order);
 
             return;
 
@@ -1425,6 +1629,8 @@ async function requestRefusal(button, itemIndex) {
         if (!choice.items.length) {
 
             showToast("Заявку на ці товари вже надіслано");
+
+            await refreshOrderCard(button, order);
 
             markItemRefused(button);
 
@@ -1465,12 +1671,21 @@ async function requestRefusal(button, itemIndex) {
 
             console.error("Заявка на відмову:", error);
 
-            // Запис не вдався, але лист пішов — кажемо правду: заявку
-            // прийнято, хоча в акаунті вона не відобразиться.
+            // Рядка в базі немає, лист магазину пішов. Спиратись
+            // сторінці більше немає на що — тому лишаємо слід у
+            // браузері.
+            //
+            // Без нього виходило те, з чого почалась ця правка: кнопка
+            // повертається після оновлення, вікно пропонує той самий
+            // товар, і магазин отримує другу відмову про те саме.
+            //
+            // Раніше тут просто підмінявся підпис кнопки. Підпис живе
+            // до першого F5 — тобто не робив нічого.
+            rememberRefusal(order, choice.items);
+
             showToast("Запит надіслано менеджеру. Він зв'яжеться з вами найближчим часом");
 
-            button.textContent = "✓ Відмову надіслано";
-            button.disabled = true;
+            await refreshOrderCard(button, order);
 
             return;
 

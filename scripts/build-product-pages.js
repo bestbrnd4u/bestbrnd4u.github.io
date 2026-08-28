@@ -594,6 +594,70 @@ function buildBody(product) {
 
 }
 
+// Сторінки-перенаправлення зі старих адрес.
+//
+// НАВІЩО
+// -------
+// Половина каталогу жила за адресами з кирилицею, і збірка перевела їх
+// на латиницю (див. renameToLatinSlugs у build-products.js). Але старі
+// адреси вже пішли в пости, в повідомлення покупцям і в пошуковий
+// індекс. Просто змінити slug означало б перетворити кожне з тих
+// посилань на 404 — і дізнатись про це аж коли хтось поскаржиться.
+//
+// ЧОМУ САМЕ ТАК, А НЕ 301
+// ------------------------
+// Сайт лежить на GitHub Pages — це статика, серверних правил
+// перенаправлення там немає взагалі. Тому працює зв'язка з трьох
+// частин, і кожна для свого:
+//
+//   • <link rel="canonical"> — для пошуковика. Він бачить, що це та
+//     сама сторінка за новою адресою, і переносить на неї вагу старої;
+//   • <meta http-equiv="refresh" content="0"> — для браузера без JS;
+//   • location.replace() — щоб стара адреса не лишилась в історії й
+//     кнопка «назад» не заганяла в петлю.
+//
+// Видимий текст із посиланням потрібен для випадку, коли не спрацювало
+// ні те, ні те: порожня біла сторінка виглядає як поломка сайту.
+function writeLegacyRedirects(product, written) {
+
+    const legacy = Array.isArray(product.legacySlugs) ? product.legacySlugs : [];
+
+    legacy.forEach(old => {
+
+        if (!old || old === product.slug || written.has(old)) return;
+
+        if (slugProblem(old)) return;
+
+        const target = `/p/${encodeURIComponent(product.slug)}/`;
+        const full = `${SITE_URL}/p/${encodeURIComponent(product.slug)}/`;
+
+        const html = `<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${escapeHtml(product.title || "Товар")} | BestBrnd4u</title>
+<link rel="canonical" href="${full}">
+<meta http-equiv="refresh" content="0; url=${target}">
+<script>location.replace(${JSON.stringify(target)});</script>
+</head>
+<body>
+<p>Сторінка переїхала: <a href="${target}">${escapeHtml(product.title || "перейти до товару")}</a></p>
+</body>
+</html>
+`;
+
+        const dir = path.join(OUTPUT_DIR, old);
+
+        fs.mkdirSync(dir, { recursive: true });
+        fs.writeFileSync(path.join(dir, "index.html"), html, "utf8");
+
+        written.add(old);
+
+    });
+
+}
+
 // ---------------------------------------------------------------
 
 function main() {
@@ -641,6 +705,8 @@ function main() {
         fs.writeFileSync(path.join(dir, "index.html"), html, "utf8");
 
         written.add(product.slug);
+
+        writeLegacyRedirects(product, written);
 
     });
 

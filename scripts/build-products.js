@@ -19,6 +19,8 @@ const crypto = require("crypto");
 const { filterSafeEntryFiles } = require("./slug-safety");
 // зводить написання кольорів до одного вигляду (див. коментар у файлі)
 const { normalizeProductColors } = require("./normalize-colors");
+// кирилиця в імені файлу → латиниця в адресі (див. коментар у файлі)
+const { toSlug } = require("./translit");
 
 const ROOT = path.join(__dirname, "..");
 const PRODUCTS_DIR = path.join(ROOT, "data", "products");
@@ -216,6 +218,145 @@ function stampImageVersions(products) {
 
 }
 
+// Кирилиця в імені файлу → латиниця в адресі.
+//
+// ЩО БУЛО НЕ ТАК
+// ---------------
+// Ім'я файлу товару стає slug-ом, а slug — адресою /p/<slug>/. Адмінка
+// збирає ім'я з назви товару, а назви українські — тож половина
+// каталогу жила за адресами на кшталт
+//
+//   /p/%D0%B3%D0%BE%D0%B4%D0%B8%D0%BD%D0%BD%D0%B8%D0%BA-tissot-…/
+//
+// Браузер показує таку адресу розшифрованою, і на сайті проблеми не
+// видно. Вона вилазить там, де адресу КОПІЮЮТЬ: у полі «Посилання на
+// товар», у постах, у повідомленнях. А коли адресу кладуть у параметр
+// (t.me/…?text=…), вона кодується вдруге — %25D0%25B3 — і посилання на
+// один годинник займає 300 символів.
+//
+// ЧОМУ ПЕРЕЙМЕНОВУЄМО ФАЙЛ, А НЕ ЛИШЕ ПИШЕМО ІНШИЙ slug
+// ------------------------------------------------------
+// «slug = ім'я файлу» — правило, на якому тут тримається все: і
+// перевірка slug-safety, і адреса запису в адмінці
+// (…/entries/<slug>), і пошук товару. Розвести їх означало б завести
+// дві правди про одну річ і потім усе життя стежити, щоб вони не
+// розійшлись.
+//
+// СТАРІ АДРЕСИ НЕ ВМИРАЮТЬ
+// -------------------------
+// Попереднє ім'я лишається в legacySlugs, і build-product-pages.js
+// ставить на нього сторінку-перенаправлення. Інакше кожне посилання,
+// яке вже пішло в пост чи в пошук, привело б покупця на 404.
+function renameToLatinSlugs(parsed, dir) {
+
+    const productsDir = dir || PRODUCTS_DIR;
+
+    // Спершу закріплюємо за собою імена, які міняти не треба: інакше
+    // перейменований товар міг би зайняти чуже місце.
+    const taken = new Map();
+
+    parsed.forEach(entry => {
+
+        const name = entry.file.replace(/\.json$/, "");
+
+        if (toSlug(name) === name) taken.set(name, entry);
+
+    });
+
+    // Записи, які виявились копією того самого товару, — див. нижче.
+    const superseded = new Set();
+
+    let renamed = 0;
+
+    parsed.forEach(entry => {
+
+        const current = entry.file.replace(/\.json$/, "");
+        const base = toSlug(current);
+
+        if (base === current) return;
+
+        // Порожній результат означає ім'я без жодної літери й цифри —
+        // такого не буває, але вигадувати адресу з нічого не можна.
+        if (!base) {
+            console.error(`::error::${entry.file}: з імені не виходить адреса — перейменуйте товар в адмінці`);
+            return;
+        }
+
+        let wanted = base;
+        let n = 1;
+
+        while (taken.has(wanted)) {
+
+            const occupant = taken.get(wanted);
+
+            // Той самий товар, а не тезка.
+            //
+            // ЯК ЦЕ ВИХОДИТЬ. Ви створили товар, збірка перейменувала
+            // файл — але вкладка адмінки лишилась на старій сторінці.
+            // Наступне «Зберегти» пише за СТАРОЮ адресою й відтворює
+            // кириличний файл. Без цієї гілки збірка вирішила б, що
+            // товарів два, і дала б другому адресу з «-2»: у каталозі
+            // з'явився б дубль, який ніхто не створював.
+            //
+            // Ознака — однаковий id. Свіжіша версія (та, яку щойно
+            // зберегли) перемагає, стара просто зникає.
+            if (typeof occupant.data.id === "number"
+                && occupant.data.id === entry.data.id) {
+
+                superseded.add(occupant);
+                taken.delete(wanted);
+
+                console.log(`↩ ${current}.json — повторне збереження товару id=${entry.data.id}, лишаємо одну копію`);
+
+                break;
+
+            }
+
+            n += 1;
+            wanted = `${base}-${n}`;
+
+        }
+
+        if (n > 1) {
+            console.warn(`::warning::${current} → ${wanted}: адресу ${base} вже зайнято іншим товаром`);
+        }
+
+        taken.set(wanted, entry);
+
+        const nextFile = `${wanted}.json`;
+        const nextPath = path.join(productsDir, nextFile);
+
+        // Стара адреса лишається робочою — див. коментар вище.
+        const legacy = Array.isArray(entry.data.legacySlugs) ? entry.data.legacySlugs : [];
+
+        entry.data.legacySlugs = [...new Set([...legacy, current])];
+        entry.data.slug = wanted;
+
+        fs.writeFileSync(nextPath, JSON.stringify(entry.data, null, 2) + "\n", "utf8");
+        fs.rmSync(entry.filePath, { force: true });
+
+        entry.file = nextFile;
+        entry.filePath = nextPath;
+
+        console.log(`✎ ${current}.json → ${nextFile}`);
+
+        renamed++;
+
+    });
+
+    // Копії прибираємо з розбору вже після перейменувань: викидати
+    // елементи з масиву, який саме обходиш, — вірний спосіб пропустити
+    // сусідній.
+    for (let i = parsed.length - 1; i >= 0; i--) {
+        if (superseded.has(parsed[i])) parsed.splice(i, 1);
+    }
+
+    if (renamed) {
+        console.log(`   адрес перекладено на латиницю: ${renamed}`);
+    }
+
+}
+
 function main() {
 
     if (!fs.existsSync(PRODUCTS_DIR)) {
@@ -288,6 +429,8 @@ function main() {
         }
 
     });
+
+    renameToLatinSlugs(parsed);
 
     const products = [];
 
@@ -537,4 +680,8 @@ function main() {
 
 }
 
-main();
+// Експортуємо для тестів: перейменування адрес перевіряється на
+// тимчасовій теці, а не на справжньому каталозі.
+module.exports = { renameToLatinSlugs };
+
+if (require.main === module) main();

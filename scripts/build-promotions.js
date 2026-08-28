@@ -13,10 +13,105 @@ const path = require("path");
 // не даємо файлам зі зламаним ім'ям потрапити в зібраний JSON
 // (див. коментар у scripts/slug-safety.js)
 const { filterSafeEntryFiles } = require("./slug-safety");
+// кирилиця в імені файлу → латиниця в адресі (див. коментар у файлі)
+const { planLatinRenames } = require("./translit");
 
 const ROOT = path.join(__dirname, "..");
 const PROMOTIONS_DIR = path.join(ROOT, "data", "promotions");
+const POPUPS_DIR = path.join(ROOT, "data", "promo-popups");
 const OUTPUT_FILE = path.join(ROOT, "data", "promotions.json");
+
+// Кирилиця в імені файлу акції → латиниця в адресі.
+//
+// Те саме, що з товарами (див. renameToLatinSlugs у build-products.js):
+// ім'я файлу стає slug-ом, а slug — адресою /promo?id=<slug>. Поки в
+// імені кирилиця, посилання на акцію виглядає як
+// /promo?id=%D0%B1%D1%96%D0%BB%D1%8C%D1%88%D0%B5-… — 130 символів, які
+// не вставиш ні в пост, ні в сторіс.
+//
+// ЧИМ ЦЕ СКЛАДНІШЕ ЗА ТОВАРИ
+// ---------------------------
+// На товар посилаються за id, а на акцію — САМЕ ЗА SLUG: спливні
+// вікна тримають його в полі promoSlug. Перейменувати файл і не
+// поправити їх означало б, що банер веде в нікуди — і помітили б це
+// не одразу, бо вікно показується не на кожній сторінці.
+//
+// Тому перейменування й правка посилань — одна операція, а не дві.
+//
+// СТАРІ АДРЕСИ НЕ ВМИРАЮТЬ
+// -------------------------
+// Попереднє ім'я лишається в legacySlugs, і сторінка акції знаходить
+// акцію й за ним (див. assets/js/promo.js), після чого підміняє адресу
+// в рядку браузера на канонічну.
+function renameToLatinSlugs(files, dirs) {
+
+    const promotionsDir = (dirs && dirs.promotions) || PROMOTIONS_DIR;
+    const popupsDir = (dirs && dirs.popups) || POPUPS_DIR;
+
+    const plan = planLatinRenames(files.map(f => f.replace(/\.json$/, "")));
+
+    if (!plan.size) return files;
+
+    plan.forEach((wanted, current) => {
+
+        const from = path.join(promotionsDir, `${current}.json`);
+        const to = path.join(promotionsDir, `${wanted}.json`);
+
+        const data = JSON.parse(fs.readFileSync(from, "utf8"));
+
+        const legacy = Array.isArray(data.legacySlugs) ? data.legacySlugs : [];
+
+        data.legacySlugs = [...new Set([...legacy, current])];
+
+        fs.writeFileSync(to, JSON.stringify(data, null, 2) + "\n", "utf8");
+        fs.rmSync(from, { force: true });
+
+        console.log(`✎ ${current}.json → ${wanted}.json`);
+
+    });
+
+    retargetPopups(plan, popupsDir);
+
+    console.log(`   адрес акцій перекладено на латиницю: ${plan.size}`);
+
+    return files.map(file => {
+
+        const current = file.replace(/\.json$/, "");
+
+        return plan.has(current) ? `${plan.get(current)}.json` : file;
+
+    });
+
+}
+
+// Спливні вікна посилаються на акцію за slug-ом — переставляємо їх
+// разом із перейменуванням.
+function retargetPopups(plan, dir) {
+
+    const popupsDir = dir || POPUPS_DIR;
+
+    if (!fs.existsSync(popupsDir)) return;
+
+    fs.readdirSync(popupsDir)
+        .filter(f => f.endsWith(".json"))
+        .forEach(file => {
+
+            const filePath = path.join(popupsDir, file);
+            const data = JSON.parse(fs.readFileSync(filePath, "utf8"));
+
+            if (!plan.has(data.promoSlug)) return;
+
+            const next = plan.get(data.promoSlug);
+
+            console.log(`   ↻ ${file}: акція ${data.promoSlug} → ${next}`);
+
+            data.promoSlug = next;
+
+            fs.writeFileSync(filePath, JSON.stringify(data, null, 2) + "\n", "utf8");
+
+        });
+
+}
 
 function main() {
 
@@ -37,7 +132,7 @@ function main() {
 
     const promotions = [];
 
-    files.forEach(file => {
+    renameToLatinSlugs(files).forEach(file => {
 
         const filePath = path.join(PROMOTIONS_DIR, file);
         const data = JSON.parse(fs.readFileSync(filePath, "utf8"));
@@ -72,6 +167,12 @@ function main() {
 
         promotions.push({
             slug,
+            // Адреси, за якими акція жила раніше. Сторінка акції
+            // знаходить її і за ними, тож посилання, які вже пішли в
+            // пости, не перетворюються на «акцію не знайдено».
+            ...(Array.isArray(data.legacySlugs) && data.legacySlugs.length
+                ? { legacySlugs: data.legacySlugs }
+                : {}),
             title: data.title,
             text: data.text || "",
             badge: data.badge || "",
@@ -111,4 +212,8 @@ function main() {
 
 }
 
-main();
+// Експортуємо для тестів: перейменування перевіряється на
+// тимчасовій теці, а не на справжніх акціях.
+module.exports = { renameToLatinSlugs };
+
+if (require.main === module) main();

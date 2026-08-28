@@ -1737,7 +1737,7 @@
     "brand": "Love Moschino",
     "price": 8000,
     "preOrder": false,
-    "slug": "шкіряна-сумочка-крос-боді-love-moschino-quilted",
+    "slug": "shkiriana-sumochka-kros-bodi-love-moschino-quilted",
     "dimensions": "23 × 15 × 7 см",
     "variants": [
       {
@@ -1770,7 +1770,10 @@
     "description": "Love Moschino Logo-plaque Quilted Cross-body Bag\nЕлегантна стьобана сумка Love Moschino у ніжному бежевому відтінку. Модель прикрашена фірмовою металевою пластиною з логотипом бренду, що додає образу впізнаваного акценту. Матеріал 100% натуральна теляча шкіра (calf leather)\nСумка має компактний, але практичний формат, основне відділення для необхідних речей та довгий ремінець для носіння через плече або кросбоді.",
     "sku": "JC4118PP1FLT0",
     "rating": 5,
-    "category": "Жіночі сумки"
+    "category": "Жіночі сумки",
+    "legacySlugs": [
+      "шкіряна-сумочка-крос-боді-love-moschino-quilted"
+    ]
   },
   {
     "gender": [
@@ -1826,7 +1829,7 @@
     "description": "Стильна стьобана сумка Love Moschino у класичному чорному кольорі. Модель доповнена фірмовим логотипом Love Moschino та має елегантний компактний дизайн.\nСумка оснащена зручним плечовим ремінцем, що дозволяє носити її через плече або кросбоді. Компактний розмір робить модель чудовим варіантом для повсякденних образів, коли все необхідне має бути під рукою.",
     "rating": 5,
     "category": "Жіночі сумки",
-    "slug": "сумочка-love-moschino-logo-plaque-quilted-shoulder-bag",
+    "slug": "sumochka-love-moschino-logo-plaque-quilted-shoulder-bag",
     "id": 30,
     "color": "Чорний",
     "images": [
@@ -1834,6 +1837,9 @@
       "/assets/images/products/uploads/800070279777-3.jpg",
       "/assets/images/products/uploads/800070279777-4.jpg",
       "/assets/images/products/uploads/torbica-love-moschino-jc4116pp1flt0000-nero.webp"
+    ],
+    "legacySlugs": [
+      "сумочка-love-moschino-logo-plaque-quilted-shoulder-bag"
     ]
   },
   {
@@ -1901,7 +1907,7 @@
     "sku": "35F2GCCS2L",
     "rating": 5,
     "category": "Жіночі сумки",
-    "slug": "сумочка-з-натуральної-шкіри-michael-kors-carine-medium-pebbled-leather-satchel-powder-blush",
+    "slug": "sumochka-z-naturalnoi-shkiry-michael-kors-carine-medium-pebbled-leather-satchel-powder-blush",
     "id": 31,
     "color": "Пудрово-рожевий",
     "images": [
@@ -1909,6 +1915,9 @@
       "/assets/images/products/uploads/gambar-belakang-michael-kors-carine-medi-5af6b1f4.webp",
       "/assets/images/products/uploads/gambar-dalam-michael-kors-carine-medium--a53019fe.webp",
       "/assets/images/products/uploads/on-model-michael-kors-carine-medium-pebb-3455daed.webp"
+    ],
+    "legacySlugs": [
+      "сумочка-з-натуральної-шкіри-michael-kors-carine-medium-pebbled-leather-satchel-powder-blush"
     ]
   },
   {
@@ -1963,13 +1972,16 @@
     "description": "Стильні жіночі сонцезахисні окуляри Jimmy Choo NENA/S із виразною прямокутною оправою. Модель виконана з ацетату в чорному кольорі та доповнена темно-сірими градієнтними лінзами. Масивні завушники прикрашені об’ємним логотипом JC, що додає аксесуару впізнаваного акценту Jimmy Choo",
     "rating": 5,
     "category": "Окуляри і оправи",
-    "slug": "сонцезахисні-окуляри-jimmy-choo-nena-s-807-51",
+    "slug": "sontsezakhysni-okuliary-jimmy-choo-nena-s-807-51",
     "id": 32,
     "color": "Чорний",
     "images": [
       "/assets/images/products/uploads/jimmy-choo-sunglasses-nena-s-807-afw1500fh937.5.webp",
       "/assets/images/products/uploads/41my3jtmifl.webp",
       "/assets/images/products/uploads/30486-34-550x550.webp"
+    ],
+    "legacySlugs": [
+      "сонцезахисні-окуляри-jimmy-choo-nena-s-807-51"
     ]
   },
   {
@@ -1982,7 +1994,7 @@
     "brand": "Marc Jacobs",
     "price": 6500,
     "preOrder": false,
-    "slug": "стильні-жіночі-сонцезахисні-окуляри-marc-jacobs-mj-1010-s",
+    "slug": "stylni-zhinochi-sontsezakhysni-okuliary-marc-jacobs-mj-1010-s",
     "variants": [
       {
         "color": "Чорний",
@@ -2029,7 +2041,10 @@
     "description": "Стильні жіночі сонцезахисні окуляри Marc Jacobs MJ 1010/S з елегантною прямокутною формою оправи. Модель поєднує сучасний дизайн і впізнавану естетику бренду, легко доповнюючи як повсякденні, так і більш вишукані образи",
     "sku": "MJ 1010/S 0807/9O 54",
     "rating": 5,
-    "category": "Окуляри і оправи"
+    "category": "Окуляри і оправи",
+    "legacySlugs": [
+      "стильні-жіночі-сонцезахисні-окуляри-marc-jacobs-mj-1010-s"
+    ]
   },
   {
     "gender": [
@@ -2041,7 +2056,7 @@
     "brand": "Lacoste",
     "price": 5900,
     "preOrder": false,
-    "slug": "кросівки-lacoste-l003",
+    "slug": "krosivky-lacoste-l003",
     "variants": [
       {
         "color": "Білий",
@@ -2088,7 +2103,10 @@
     "description": "Lacoste L003 0722 1 SMА\nСтильні повсякденні кросівки Lacoste L003 0722 1 SMA — сучасна модель із виразним спортивним дизайном, натхненним тенісною естетикою. Верх поєднує текстильні та синтетичні матеріали, забезпечуючи комфортну посадку та легкість у повсякденному носінні.",
     "sku": "43SMA0064",
     "rating": 5,
-    "category": "Кросівки"
+    "category": "Кросівки",
+    "legacySlugs": [
+      "кросівки-lacoste-l003"
+    ]
   },
   {
     "gender": [
@@ -2144,7 +2162,7 @@
     "sku": "GY6095",
     "rating": 5,
     "category": "Кросівки",
-    "slug": "кросівки-adidas-by-stella-mccartney-solarglide",
+    "slug": "krosivky-adidas-by-stella-mccartney-solarglide",
     "id": 35,
     "color": "Білий",
     "images": [
@@ -2152,6 +2170,9 @@
       "/assets/images/products/uploads/124849470.webp",
       "/assets/images/products/uploads/124849471.webp",
       "/assets/images/products/uploads/124849473.webp"
+    ],
+    "legacySlugs": [
+      "кросівки-adidas-by-stella-mccartney-solarglide"
     ]
   },
   {
@@ -2164,7 +2185,7 @@
     "brand": "Lacoste",
     "price": 6200,
     "preOrder": false,
-    "slug": "lacoste-кросівки-жіночі-l003",
+    "slug": "lacoste-krosivky-zhinochi-l003",
     "variants": [
       {
         "hex": "#f8faf6",
@@ -2225,7 +2246,10 @@
         "x": 51,
         "y": 57
       }
-    }
+    },
+    "legacySlugs": [
+      "lacoste-кросівки-жіночі-l003"
+    ]
   },
   {
     "gender": [
@@ -2278,7 +2302,7 @@
     "sku": "746SFA0077.ANI",
     "rating": 5,
     "category": "Кросівки",
-    "slug": "кросівки-lacoste-l-guard-breaker",
+    "slug": "krosivky-lacoste-l-guard-breaker",
     "id": 37,
     "color": "Зелений",
     "images": [
@@ -2293,7 +2317,10 @@
         "x": 51,
         "y": 55
       }
-    }
+    },
+    "legacySlugs": [
+      "кросівки-lacoste-l-guard-breaker"
+    ]
   },
   {
     "gender": [
@@ -2417,7 +2444,7 @@
     "price": 4000,
     "composition": "100% поліестр",
     "preOrder": false,
-    "slug": "чоловіча-сумка-lacoste-neocroc-checkboard-strap-camera-bag",
+    "slug": "cholovicha-sumka-lacoste-neocroc-checkboard-strap-camera-bag",
     "dimensions": "17 × 23 × 9 см",
     "variants": [
       {
@@ -2471,7 +2498,10 @@
         "x": 53,
         "y": 56
       }
-    }
+    },
+    "legacySlugs": [
+      "чоловіча-сумка-lacoste-neocroc-checkboard-strap-camera-bag"
+    ]
   },
   {
     "gender": [
@@ -2520,7 +2550,7 @@
     "sku": "746SMA0008-286",
     "rating": 5,
     "category": "Кросівки",
-    "slug": "жіночі-кросівки-lacoste-womens-elite-active-sneakers",
+    "slug": "zhinochi-krosivky-lacoste-womens-elite-active-sneakers",
     "id": 41,
     "color": "Білий із зеленим",
     "images": [
@@ -2528,6 +2558,9 @@
       "/assets/images/products/uploads/sneakers-lacoste-elite-active-746sma0008-46ba82b5.webp",
       "/assets/images/products/uploads/sneakers-lacoste-elite-active-746sma0008-fa044eec.webp",
       "/assets/images/products/uploads/sneakers-lacoste-elite-active-746sma0008-e10010fd.webp"
+    ],
+    "legacySlugs": [
+      "жіночі-кросівки-lacoste-womens-elite-active-sneakers"
     ]
   },
   {
@@ -2577,7 +2610,7 @@
     "sku": "LA211A0QU-A12",
     "rating": 5,
     "category": "Кросівки",
-    "slug": "жіночі-кросівки-lacoste-womens-l003-neo-sneakers",
+    "slug": "zhinochi-krosivky-lacoste-womens-l003-neo-sneakers",
     "id": 42,
     "color": "Біло-помаранчевий",
     "images": [
@@ -2585,6 +2618,9 @@
       "/assets/images/products/uploads/5e7f76a3740344a884d67834efc5cef8.webp",
       "/assets/images/products/uploads/6b15e7dfca384ec797dbde12aad79176.webp",
       "/assets/images/products/uploads/6c62a95311fd499f8cd54c4c96e0143f.webp"
+    ],
+    "legacySlugs": [
+      "жіночі-кросівки-lacoste-womens-l003-neo-sneakers"
     ]
   },
   {
@@ -2634,7 +2670,7 @@
     "sku": "746SMA0110.21G",
     "rating": 5,
     "category": "Кросівки",
-    "slug": "жіночі-білі-кросівки-lacoste-lineshot-746sma0110-21g",
+    "slug": "zhinochi-bili-krosivky-lacoste-lineshot-746sma0110-21g",
     "id": 43,
     "color": "Білий",
     "images": [
@@ -2649,7 +2685,10 @@
         "x": 51,
         "y": 52
       }
-    }
+    },
+    "legacySlugs": [
+      "жіночі-білі-кросівки-lacoste-lineshot-746sma0110-21g"
+    ]
   },
   {
     "gender": [
@@ -2698,7 +2737,7 @@
     "sku": "746SFA0075.1R5",
     "rating": 5,
     "category": "Кросівки",
-    "slug": "жіночі-бежеві-кросівки-з-чорними-деталями-lacoste-lineshot-746sfa0075-1r5",
+    "slug": "zhinochi-bezhevi-krosivky-z-chornymy-detaliamy-lacoste-lineshot-746sfa0075-1r5",
     "id": 44,
     "color": "Бежевий",
     "images": [
@@ -2713,7 +2752,10 @@
         "x": 51,
         "y": 54
       }
-    }
+    },
+    "legacySlugs": [
+      "жіночі-бежеві-кросівки-з-чорними-деталями-lacoste-lineshot-746sfa0075-1r5"
+    ]
   },
   {
     "gender": [
@@ -2771,7 +2813,7 @@
     "sku": "H025M06RE22",
     "rating": 5,
     "category": "Жіночі сумки",
-    "slug": "жіноча-сумочка-marc-jacobs-the-creature-tote-bag-black",
+    "slug": "zhinocha-sumochka-marc-jacobs-the-creature-tote-bag-black",
     "id": 45,
     "color": "Чорний",
     "images": [
@@ -2780,6 +2822,9 @@
       "/assets/images/products/uploads/25077124~black_4.webp",
       "/assets/images/products/uploads/25077124~black_3.webp",
       "/assets/images/products/uploads/25077124~black_1.webp"
+    ],
+    "legacySlugs": [
+      "жіноча-сумочка-marc-jacobs-the-creature-tote-bag-black"
     ]
   },
   {
@@ -2858,7 +2903,7 @@
     "sku": "CR144",
     "rating": 5,
     "category": "Жіночі сумки",
-    "slug": "жіноча-міні-сумочка-coach-mini-bucket-bag-black",
+    "slug": "zhinocha-mini-sumochka-coach-mini-bucket-bag-black",
     "id": 46,
     "color": "Чорний",
     "images": [
@@ -2867,6 +2912,9 @@
       "/assets/images/products/uploads/cr144_svbk_a8.webp",
       "/assets/images/products/uploads/cr144_svbk_a91.webp",
       "/assets/images/products/uploads/cr144_svbk_a92.webp"
+    ],
+    "legacySlugs": [
+      "жіноча-міні-сумочка-coach-mini-bucket-bag-black"
     ]
   },
   {
@@ -2927,7 +2975,7 @@
     "sku": "H956L01PF22_365",
     "rating": 5,
     "category": "Жіночі сумки",
-    "slug": "жіноча-сумочка-marc-jacobs-the-j-marc-shoulder-bag",
+    "slug": "zhinocha-sumochka-marc-jacobs-the-j-marc-shoulder-bag",
     "id": 47,
     "color": "Темно-зелений",
     "images": [
@@ -2935,6 +2983,9 @@
       "/assets/images/products/uploads/the-j-marc-shoulder-bag-bronze-green-additional-image-5192-800x800.webp",
       "/assets/images/products/uploads/the-j-marc-shoulder-bag-bronze-green-additional-image-5191-800x800.webp",
       "/assets/images/products/uploads/the-j-marc-shoulder-bag-bronze-green-additional-image-5193-800x800.webp"
+    ],
+    "legacySlugs": [
+      "жіноча-сумочка-marc-jacobs-the-j-marc-shoulder-bag"
     ]
   },
   {
@@ -2997,7 +3048,7 @@
     "sku": "CA148",
     "rating": 5,
     "category": "Жіночі сумки",
-    "slug": "сумка-coach-klare-crossbody-bag-in-blocked-signature-canvas",
+    "slug": "sumka-coach-klare-crossbody-bag-in-blocked-signature-canvas",
     "id": 48,
     "color": "Білий комбінований",
     "images": [
@@ -3006,6 +3057,9 @@
       "/assets/images/products/uploads/ca148_imrfi_a8.webp",
       "/assets/images/products/uploads/ca148_imrfi_a92.webp",
       "/assets/images/products/uploads/ca148_imrfi_a91.webp"
+    ],
+    "legacySlugs": [
+      "сумка-coach-klare-crossbody-bag-in-blocked-signature-canvas"
     ]
   },
   {
@@ -3068,7 +3122,7 @@
     "sku": "H004L01PF21",
     "rating": 5,
     "category": "Жіночі сумки",
-    "slug": "шопер-marc-jacobs-the-leather-small-tote-bag-aspen-green-cement",
+    "slug": "shoper-marc-jacobs-the-leather-small-tote-bag-aspen-green-cement",
     "id": 49,
     "color": "Зелений",
     "images": [
@@ -3076,6 +3130,9 @@
       "/assets/images/products/uploads/aspen-green-cement4.webp",
       "/assets/images/products/uploads/aspen-green-cement3.webp",
       "/assets/images/products/uploads/aspen-green-cement-m1.webp"
+    ],
+    "legacySlugs": [
+      "шопер-marc-jacobs-the-leather-small-tote-bag-aspen-green-cement"
     ]
   },
   {
@@ -3137,7 +3194,7 @@
     "sku": "2S4SMN080S02678",
     "rating": 5,
     "category": "Жіночі сумки",
-    "slug": "сумочка-marc-jacobs-the-leather-mini-bag-pink",
+    "slug": "sumochka-marc-jacobs-the-leather-mini-bag-pink",
     "id": 50,
     "color": "Рожевий",
     "images": [
@@ -3145,6 +3202,9 @@
       "/assets/images/products/uploads/27687307_57865301_2048.webp",
       "/assets/images/products/uploads/27687307_57865307_2048.webp",
       "/assets/images/products/uploads/27687307_57865304_2048.webp"
+    ],
+    "legacySlugs": [
+      "сумочка-marc-jacobs-the-leather-mini-bag-pink"
     ]
   },
   {
@@ -3208,7 +3268,7 @@
     "sku": "2F4HTT015H05",
     "rating": 5,
     "category": "Жіночі сумки",
-    "slug": "сумка-the-medium-tote-bag-in-monogram-jacquard",
+    "slug": "sumka-the-medium-tote-bag-in-monogram-jacquard",
     "id": 51,
     "color": "Чорно-бежевий",
     "images": [
@@ -3217,6 +3277,9 @@
       "/assets/images/products/uploads/215896950_beige_cu.webp",
       "/assets/images/products/uploads/215896950_beige_e1.webp",
       "/assets/images/products/uploads/215896950_beige_fr.webp"
+    ],
+    "legacySlugs": [
+      "сумка-the-medium-tote-bag-in-monogram-jacquard"
     ]
   },
   {
@@ -3279,7 +3342,7 @@
     "sku": "H009L01SP21-05",
     "rating": 5,
     "category": "Жіночі сумки",
-    "slug": "сумка-marc-jacobs-the-leather-small-tote-bag-cement",
+    "slug": "sumka-marc-jacobs-the-leather-small-tote-bag-cement",
     "id": 52,
     "color": "Сіро-бежевий",
     "images": [
@@ -3287,6 +3350,9 @@
       "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-ce-00e1b92f.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-ce-93206bc0.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-cement-h009l01sp21-055-800x800.webp"
+    ],
+    "legacySlugs": [
+      "сумка-marc-jacobs-the-leather-small-tote-bag-cement"
     ]
   },
   {
@@ -3349,7 +3415,7 @@
     "sku": "2S4HSH085H02-140",
     "rating": 5,
     "category": "Жіночі сумки",
-    "slug": "сумка-marc-jacobs-the-leather-cargo-bag-cotton-silver",
+    "slug": "sumka-marc-jacobs-the-leather-cargo-bag-cotton-silver",
     "id": 53,
     "color": "Молочний",
     "images": [
@@ -3358,6 +3424,9 @@
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-def1e99f.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-c1370464.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-28c7d0f9.webp"
+    ],
+    "legacySlugs": [
+      "сумка-marc-jacobs-the-leather-cargo-bag-cotton-silver"
     ]
   },
   {
@@ -3422,7 +3491,7 @@
     "sku": "2S4HSH085H02",
     "rating": 5,
     "category": "Жіночі сумки",
-    "slug": "сумка-marc-jacobs-the-leather-cargo-bag-camel",
+    "slug": "sumka-marc-jacobs-the-leather-cargo-bag-camel",
     "id": 54,
     "color": "Кемел",
     "images": [
@@ -3439,7 +3508,10 @@
         "x": 49,
         "y": 40
       }
-    }
+    },
+    "legacySlugs": [
+      "сумка-marc-jacobs-the-leather-cargo-bag-camel"
+    ]
   },
   {
     "gender": [
@@ -3502,7 +3574,7 @@
     "sku": "2S4HSH085H02-001",
     "rating": 5,
     "category": "Жіночі сумки",
-    "slug": "сумка-marc-jacobs-the-leather-cargo-bag-black",
+    "slug": "sumka-marc-jacobs-the-leather-cargo-bag-black",
     "id": 55,
     "color": "Чорний",
     "images": [
@@ -3512,6 +3584,9 @@
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--8fc5eccc.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--20634337.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--3bae4de6.webp"
+    ],
+    "legacySlugs": [
+      "сумка-marc-jacobs-the-leather-cargo-bag-black"
     ]
   },
   {
@@ -3575,7 +3650,7 @@
     "sku": "H009L01SP21",
     "rating": 5,
     "category": "Жіночі сумки",
-    "slug": "шопер-marc-jacobs-the-leather-small-tote-bag",
+    "slug": "shoper-marc-jacobs-the-leather-small-tote-bag",
     "id": 56,
     "color": "Бежево-кремовий",
     "images": [
@@ -3583,6 +3658,9 @@
       "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-de081418.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-628c7ef0.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-twine-h009l01sp21-914-800x800.webp"
+    ],
+    "legacySlugs": [
+      "шопер-marc-jacobs-the-leather-small-tote-bag"
     ]
   },
   {
@@ -3596,7 +3674,7 @@
     "brand": "Marc Jacobs",
     "price": 9000,
     "preOrder": false,
-    "slug": "сумка-marc-jacobs-the-j-marc-shoulder-bag-green-glow",
+    "slug": "sumka-marc-jacobs-the-j-marc-shoulder-bag-green-glow",
     "dimensions": "25 × 16 × 5 см",
     "variants": [
       {
@@ -3657,7 +3735,10 @@
     "description": "Яскрава та стильна сумка Marc Jacobs The J Marc Shoulder Bag у насиченому відтінку Green Glow. Модель виконана з гладкої натуральної шкіри та доповнена фірмовою застібкою J Marc, яка робить дизайн впізнаваним і виразним.\nСумка має компактну прямокутну форму та зручне основне відділення, внутрішню кишеню на блискавці, відкриту кишеню та зовнішню кишеню на задній стороні.\nМодель комплектується двома знімними ременями: елегантним ременем-ланцюжком та регульованим текстильним ременем. Її можна носити на плечі, через плече або без ременів як клатч",
     "sku": "H956L01PF22-325",
     "rating": 5,
-    "category": "Жіночі сумки"
+    "category": "Жіночі сумки",
+    "legacySlugs": [
+      "сумка-marc-jacobs-the-j-marc-shoulder-bag-green-glow"
+    ]
   },
   {
     "gender": [
@@ -3670,7 +3751,7 @@
     "brand": "Coach",
     "price": 7100,
     "preOrder": false,
-    "slug": "сумка-coach-soft-tabby-shoulder-bag-black",
+    "slug": "sumka-coach-soft-tabby-shoulder-bag-black",
     "dimensions": "26 × 16,5 × 8,3 см",
     "variants": [
       {
@@ -3743,7 +3824,10 @@
     "description": "Елегантна сумка COACH Soft Tabby Shoulder Bag у класичному чорному кольорі. Модель переосмислює культовий силует Tabby 1970-х років у більш м'якому та розслабленому виконанні.\nСумка виготовлена з гладкої натуральної шкіри та доповнена фірмовою застібкою Signature. Усередині розташована кишеня на блискавці, зовні — додаткова кишеня на блискавці для зручного зберігання дрібниць.\nМодель має знімний ремінець, завдяки якому сумку можна носити в руці, на плечі або через плече",
     "sku": "CAM98",
     "rating": 5,
-    "category": "Жіночі сумки"
+    "category": "Жіночі сумки",
+    "legacySlugs": [
+      "сумка-coach-soft-tabby-shoulder-bag-black"
+    ]
   },
   {
     "gender": [
@@ -3809,7 +3893,7 @@
     "sku": "CJ925B4/CH",
     "rating": 5,
     "category": "Жіночі сумки",
-    "slug": "міні-сумочка-coach-tabby-crossbody-wristlet",
+    "slug": "mini-sumochka-coach-tabby-crossbody-wristlet",
     "id": 59,
     "color": "Айворі",
     "images": [
@@ -3819,6 +3903,9 @@
       "/assets/images/products/uploads/71-zo1liwrl._ac_sy625_.webp",
       "/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model2.webp",
       "/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model4.webp"
+    ],
+    "legacySlugs": [
+      "міні-сумочка-coach-tabby-crossbody-wristlet"
     ]
   },
   {
@@ -3891,7 +3978,7 @@
     "description": "Елегантна сумка JACQUEMUS Le Grand Bambino. Впізнаваний мінімалістичний дизайн доповнений фірмовим логотипом JACQUEMUS та акуратною золотою фурнітурою.\nМодель виготовлена з натуральної шкіри та має структуровану прямокутну форму. Сумка оснащена верхньою ручкою, магнітною застібкою та знімним регульованим ремінцем, завдяки якому її можна носити на плечі або через плече. На задній стороні розташована кишеня для картки.",
     "rating": 5,
     "category": "Жіночі сумки",
-    "slug": "сумка-jacquemus-le-grand-bambino-beige",
+    "slug": "sumka-jacquemus-le-grand-bambino-beige",
     "id": 60,
     "color": "Бежевий",
     "images": [
@@ -3900,6 +3987,9 @@
       "/assets/images/products/uploads/rtlafd950301_33497202_3_v1_2x.webp",
       "/assets/images/products/uploads/rtlafd950301_33497204_4_v1_2x.webp",
       "/assets/images/products/uploads/rtlafd950301_33526729_9_v1_2x.webp"
+    ],
+    "legacySlugs": [
+      "сумка-jacquemus-le-grand-bambino-beige"
     ]
   },
   {
@@ -3977,7 +4067,7 @@
         "y": 65
       }
     },
-    "slug": "шопер-marc-jacobs-the-denim-small-tote-bag-blue",
+    "slug": "shoper-marc-jacobs-the-denim-small-tote-bag-blue",
     "id": 61,
     "color": "Синій",
     "images": [
@@ -3986,6 +4076,9 @@
       "/assets/images/products/uploads/215679033_blue_cu.webp",
       "/assets/images/products/uploads/215679033_blue_e1.webp",
       "/assets/images/products/uploads/215679033_blue_fr.webp"
+    ],
+    "legacySlugs": [
+      "шопер-marc-jacobs-the-denim-small-tote-bag-blue"
     ]
   },
   {
@@ -4048,7 +4141,7 @@
     "sku": "CA173IMTAP",
     "rating": 5,
     "category": "Жіночі сумки",
-    "slug": "сумочка-coach-teri-shoulder-bag-in-colorblock",
+    "slug": "sumochka-coach-teri-shoulder-bag-in-colorblock",
     "id": 62,
     "color": "Бежево-білий",
     "images": [
@@ -4057,6 +4150,9 @@
       "/assets/images/products/uploads/ca173_svvfq_a8.webp",
       "/assets/images/products/uploads/ca173_svvfq_a92.webp",
       "/assets/images/products/uploads/ca173_svvfq_a91.webp"
+    ],
+    "legacySlugs": [
+      "сумочка-coach-teri-shoulder-bag-in-colorblock"
     ]
   },
   {
@@ -4120,7 +4216,7 @@
     "sku": "79609IMAA8",
     "rating": 5,
     "category": "Жіночі сумки",
-    "slug": "шопер-coach-gallery-tote-bag-in-signature-canvas",
+    "slug": "shoper-coach-gallery-tote-bag-in-signature-canvas",
     "id": 63,
     "color": "Коричнево-чорний",
     "images": [
@@ -4128,6 +4224,9 @@
       "/assets/images/products/uploads/00570556_s.jpg",
       "/assets/images/products/uploads/00570556_i.jpg",
       "/assets/images/products/uploads/00570556_m.jpg"
+    ],
+    "legacySlugs": [
+      "шопер-coach-gallery-tote-bag-in-signature-canvas"
     ]
   },
   {
@@ -4192,7 +4291,7 @@
     "sku": "213BA006-3000-100",
     "rating": 5,
     "category": "Жіночі сумки",
-    "slug": "сумочка-jacquemus-le-bambino-white",
+    "slug": "sumochka-jacquemus-le-bambino-white",
     "id": 64,
     "color": "Білий",
     "images": [
@@ -4201,6 +4300,9 @@
       "/assets/images/products/uploads/p00545136_d1.webp",
       "/assets/images/products/uploads/uhjvbyubjhmyjhbmn.webp",
       "/assets/images/products/uploads/jbb.webp"
+    ],
+    "legacySlugs": [
+      "сумочка-jacquemus-le-bambino-white"
     ]
   },
   {
@@ -4256,7 +4358,7 @@
     "sku": "CC878",
     "rating": 5,
     "category": "Жіночі сумки",
-    "slug": "сумочка-coach-klare-crossbody-25-in-signature-canvas",
+    "slug": "sumochka-coach-klare-crossbody-25-in-signature-canvas",
     "id": 65,
     "color": "Темно-коричневий",
     "images": [
@@ -4265,6 +4367,9 @@
       "/assets/images/products/uploads/3248708-4324-8078423-3.webp",
       "/assets/images/products/uploads/3248708-4324-8078423-4.webp",
       "/assets/images/products/uploads/3248708-4324-8078423-5.webp"
+    ],
+    "legacySlugs": [
+      "сумочка-coach-klare-crossbody-25-in-signature-canvas"
     ]
   },
   {
@@ -4328,13 +4433,16 @@
     "sku": "S125L01RE22212",
     "rating": 5,
     "category": "Гаманці",
-    "slug": "гаманець-marc-jacobs-the-top-zip-wallet-with-strap",
+    "slug": "hamanets-marc-jacobs-the-top-zip-wallet-with-strap",
     "id": 66,
     "color": "Коричневий",
     "images": [
       "/assets/images/products/uploads/sl10757-021_01-384fad.jpg",
       "/assets/images/products/uploads/sl10757-021_02-384fad.jpg",
       "/assets/images/products/uploads/sl10757-021_03-384fad.jpg"
+    ],
+    "legacySlugs": [
+      "гаманець-marc-jacobs-the-top-zip-wallet-with-strap"
     ]
   },
   {
@@ -4394,13 +4502,16 @@
         "y": 52
       }
     },
-    "slug": "гаманець-marc-jacobs-the-zip-around-wallet",
+    "slug": "hamanets-marc-jacobs-the-zip-around-wallet",
     "id": 67,
     "color": "Хакі",
     "images": [
       "/assets/images/products/uploads/s150l03fa22-223_1.webp",
       "/assets/images/products/uploads/f540b0f9-f29c-31d6-8bdf-03912d1cc134.jpg",
       "/assets/images/products/uploads/s150l03fa22-223_3.webp"
+    ],
+    "legacySlugs": [
+      "гаманець-marc-jacobs-the-zip-around-wallet"
     ]
   },
   {
@@ -4442,13 +4553,16 @@
     "sku": "CW537",
     "rating": 5,
     "category": "Гаманці",
-    "slug": "гаманець-coach-snap-wallet-with-heart-bolt-print",
+    "slug": "hamanets-coach-snap-wallet-with-heart-bolt-print",
     "id": 68,
     "color": "Чорний з принтом",
     "images": [
       "/assets/images/products/uploads/l_wp_6788ff7fdc327dcb277cb548.webp",
       "/assets/images/products/uploads/cw537_sva47_a8.webp",
       "/assets/images/products/uploads/cw537_sva47_a91.webp"
+    ],
+    "legacySlugs": [
+      "гаманець-coach-snap-wallet-with-heart-bolt-print"
     ]
   },
   {
@@ -4500,13 +4614,16 @@
     "sku": "CR957",
     "rating": 5,
     "category": "Гаманці",
-    "slug": "гаманець-coach-3-in-1-wallet-in-signature-leather",
+    "slug": "hamanets-coach-3-in-1-wallet-in-signature-leather",
     "id": 69,
     "color": "Чорний",
     "images": [
       "/assets/images/products/uploads/set-vi-coach-men-s-coin-wallet-black-one-ecc71a62.webp",
       "/assets/images/products/uploads/lussocitta_coach_cr957_blk_1_700x.webp",
       "/assets/images/products/uploads/lussocitta_coach_cr957_blk_2_700x.webp"
+    ],
+    "legacySlugs": [
+      "гаманець-coach-3-in-1-wallet-in-signature-leather"
     ]
   },
   {
@@ -4558,7 +4675,7 @@
     "sku": "952137-2F882-00020",
     "rating": 5,
     "category": "Чоловічі сумки",
-    "slug": "чоловіча-сумка-armani-exchange-crossbody",
+    "slug": "cholovicha-sumka-armani-exchange-crossbody",
     "id": 70,
     "color": "Чорний",
     "images": [
@@ -4566,6 +4683,9 @@
       "/assets/images/products/uploads/1.webp",
       "/assets/images/products/uploads/3.webp",
       "/assets/images/products/uploads/81.webp"
+    ],
+    "legacySlugs": [
+      "чоловіча-сумка-armani-exchange-crossbody"
     ]
   },
   {
@@ -4619,7 +4739,7 @@
     "sku": "MJ 1011/S WR953HA",
     "rating": 5,
     "category": "Окуляри і оправи",
-    "slug": "сонцезахисні-окуляри-marc-jacobs-1011-s-wr953ha",
+    "slug": "sontsezakhysni-okuliary-marc-jacobs-1011-s-wr953ha",
     "id": 71,
     "color": "Черепаховий",
     "images": [
@@ -4627,6 +4747,9 @@
       "/assets/images/products/uploads/ach3atrpdjdyd181s4gcstgpa4qzgzrh.webp",
       "/assets/images/products/uploads/9dzhcfvjorauhd1nzfwyq9o69vh3iff1.webp",
       "/assets/images/products/uploads/u87036v1ioy7rp72btz5kw3oti8m25rs.webp"
+    ],
+    "legacySlugs": [
+      "сонцезахисні-окуляри-marc-jacobs-1011-s-wr953ha"
     ]
   },
   {
@@ -4640,7 +4763,7 @@
     "brand": "Saint Laurent",
     "price": 12400,
     "preOrder": true,
-    "slug": "сонцезахисні-окуляри-saint-laurent-sl-276-mica-001-53",
+    "slug": "sontsezakhysni-okuliary-saint-laurent-sl-276-mica-001-53",
     "dimensions": "Ширина лінзи: 53 мм Місток: 16 мм Довжина завушника: 145 мм",
     "variants": [
       {
@@ -4715,7 +4838,10 @@
     "description": "Елегантні жіночі сонцезахисні окуляри Saint Laurent SL 276 MICA з виразною оправою форми Cat Eye. Оправ створює лаконічний та водночас ефектний образ.\nМодель має повноободкову ацетатну оправу та сірі лінзи з 100% захистом від UVA/UVB-променів. На завушниках нанесено фірмовий напис SAINT LAURENT PARIS. Окуляри виготовлені в Італії",
     "sku": "SL-276-MICA-001-53",
     "rating": 5,
-    "category": "Окуляри і оправи"
+    "category": "Окуляри і оправи",
+    "legacySlugs": [
+      "сонцезахисні-окуляри-saint-laurent-sl-276-mica-001-53"
+    ]
   },
   {
     "gender": [
@@ -4770,7 +4896,7 @@
     "sku": "T058.009.11.031.00",
     "rating": 5,
     "category": "Годинники",
-    "slug": "жіночий-годинник-tissot-lovely-round-19-5mm",
+    "slug": "zhinochyi-hodynnyk-tissot-lovely-round-19-5mm",
     "id": 73,
     "color": "Сріблястий",
     "images": [
@@ -4778,6 +4904,9 @@
       "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-10e4ff8d.webp",
       "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-f393bd11.webp",
       "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-8e88d0d9.webp"
+    ],
+    "legacySlugs": [
+      "жіночий-годинник-tissot-lovely-round-19-5mm"
     ]
   },
   {
@@ -4834,7 +4963,7 @@
     "sku": "T058.009.33.031.00",
     "rating": 5,
     "category": "Годинники",
-    "slug": "годинник-tissot-lovely-round-19-5mm",
+    "slug": "hodynnyk-tissot-lovely-round-19-5mm",
     "id": 74,
     "color": "Золотистий",
     "images": [
@@ -4842,6 +4971,9 @@
       "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_2_2.webp",
       "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_3_2.webp",
       "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-dial-ladies-watch-t0580091103100_4_1.webp"
+    ],
+    "legacySlugs": [
+      "годинник-tissot-lovely-round-19-5mm"
     ]
   },
   {
@@ -4898,13 +5030,16 @@
     "sku": "T132.007.11.091.00",
     "rating": 5,
     "category": "Годинники",
-    "slug": "годинник-tissot-t-my-lady-automatic-t132-007-11-091-00",
+    "slug": "hodynnyk-tissot-t-my-lady-automatic-t132-007-11-091-00",
     "id": 75,
     "color": "Сріблястий",
     "images": [
       "/assets/images/products/uploads/tissot-tclassic-automatic-diamond-green--6ebe14d1.webp",
       "/assets/images/products/uploads/tissot-tclassic-automatic-diamond-green--dff156d2.webp",
       "/assets/images/products/uploads/tissot-tclassic-automatic-diamond-green--8822ff6e.webp"
+    ],
+    "legacySlugs": [
+      "годинник-tissot-t-my-lady-automatic-t132-007-11-091-00"
     ]
   },
   {
@@ -4960,13 +5095,16 @@
     "sku": "T143.210.11.033.00",
     "rating": 5,
     "category": "Годинники",
-    "slug": "годинник-tissot-everytime-34mm-t143-210-11-033-00",
+    "slug": "hodynnyk-tissot-everytime-34mm-t143-210-11-033-00",
     "id": 76,
     "color": "Сріблястий",
     "images": [
       "/assets/images/products/uploads/tissot-everytime-quartz-silver-dial-ladies-watch-t1432101103300.webp",
       "/assets/images/products/uploads/tissot-everytime-quartz-silver-dial-ladies-watch-t1432101103300_2.webp",
       "/assets/images/products/uploads/tissot-everytime-quartz-silver-dial-ladies-watch-t1432101103300_3.webp"
+    ],
+    "legacySlugs": [
+      "годинник-tissot-everytime-34mm-t143-210-11-033-00"
     ]
   },
   {
@@ -5023,13 +5161,16 @@
     "sku": "T150.410.11.041.00",
     "rating": 5,
     "category": "Годинники",
-    "slug": "годинник-tissot-pr-100-40mm-t150-410-11-041-00",
+    "slug": "hodynnyk-tissot-pr-100-40mm-t150-410-11-041-00",
     "id": 77,
     "color": "Сріблястий",
     "images": [
       "/assets/images/products/uploads/tissot-pr-100-quartz-blue-dial-mens-watch-t1504101104100_1.webp",
       "/assets/images/products/uploads/tissot-pr-100-quartz-blue-dial-mens-watch-t1504101104100_2.webp",
       "/assets/images/products/uploads/tissot-pr-100-quartz-blue-dial-mens-watch-t1504101104100_3.webp"
+    ],
+    "legacySlugs": [
+      "годинник-tissot-pr-100-40mm-t150-410-11-041-00"
     ]
   },
   {
@@ -5089,13 +5230,16 @@
     "sku": "T129.407.22.031.00",
     "rating": 5,
     "category": "Годинники",
-    "slug": "годинник-tissot-classic-dream-swissmatic-t129-407-22-031-00",
+    "slug": "hodynnyk-tissot-classic-dream-swissmatic-t129-407-22-031-00",
     "id": 78,
     "color": "Сріблястий",
     "images": [
       "/assets/images/products/uploads/tissot-classic-dream-swissmatic-silver-d-f03a52ef.webp",
       "/assets/images/products/uploads/tissot-classic-dream-swissmatic-silver-d-ea41ed3e.webp",
       "/assets/images/products/uploads/tissot-classic-dream-swissmatic-silver-d-88843986.webp"
+    ],
+    "legacySlugs": [
+      "годинник-tissot-classic-dream-swissmatic-t129-407-22-031-00"
     ]
   },
   {
@@ -5151,13 +5295,16 @@
     "sku": "H901CRBN",
     "rating": 5,
     "category": "Годинники",
-    "slug": "годинник-mathey-tissot-mathy-ceramic-h901crbn",
+    "slug": "hodynnyk-mathey-tissot-mathy-ceramic-h901crbn",
     "id": 79,
     "color": "Сріблястий / золотистий / чорний",
     "images": [
       "/assets/images/products/uploads/matheytissot-mathy-ceramic-quartz-black-dial-mens-watch-h901crbn.webp",
       "/assets/images/products/uploads/matheytissot-mathy-ceramic-quartz-black-dial-mens-watch-h901crbn_2.webp",
       "/assets/images/products/uploads/matheytissot-mathy-ceramic-quartz-black-dial-mens-watch-h901crbn_3.webp"
+    ],
+    "legacySlugs": [
+      "годинник-mathey-tissot-mathy-ceramic-h901crbn"
     ]
   }
 ]

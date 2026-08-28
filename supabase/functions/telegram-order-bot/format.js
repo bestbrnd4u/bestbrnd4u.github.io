@@ -53,32 +53,41 @@ export function money(value) {
   return Number.isFinite(n) ? `${n.toLocaleString("uk-UA")} грн` : "—";
 }
 
+// items приходить або масивом, або JSON-рядком — залежно від того, як
+// драйвер віддав jsonb-колонку. Те саме стосується переліку в заявці
+// на відмову, тож розбір спільний.
+export function parseItems(value) {
+
+  try {
+    const items = typeof value === "string" ? JSON.parse(value) : (value ?? []);
+    return Array.isArray(items) ? items : [];
+  } catch {
+    return [];
+  }
+
+}
+
+// Рядок складу: назва, варіант, кількість × ціна.
+function itemLine(item) {
+
+  const details = [item.color, item.size].filter(Boolean).join(" / ");
+
+  return [
+    `• <b>${escapeHtml(item.title)}</b>`,
+    item.brand ? ` (${escapeHtml(item.brand)})` : "",
+    details ? `\n   ${escapeHtml(details)}` : "",
+    `\n   ${item.qty ?? 1} × ${money(item.price)}`,
+  ].join("");
+
+}
+
 export function formatOrder(order) {
 
   const status = STATUSES[normalizeStatus(order.status)] ?? STATUSES.new;
 
-  // items приходить або масивом, або JSON-рядком — залежно від того,
-  // як драйвер віддав jsonb-колонку
-  let items = [];
+  const items = parseItems(order.items);
 
-  try {
-    items = typeof order.items === "string" ? JSON.parse(order.items) : (order.items ?? []);
-  } catch {
-    items = [];
-  }
-
-  const lines = items.map((item) => {
-
-    const details = [item.color, item.size].filter(Boolean).join(" / ");
-
-    return [
-      `• <b>${escapeHtml(item.title)}</b>`,
-      item.brand ? ` (${escapeHtml(item.brand)})` : "",
-      details ? `\n   ${escapeHtml(details)}` : "",
-      `\n   ${item.qty ?? 1} × ${money(item.price)}`,
-    ].join("");
-
-  }).join("\n");
+  const lines = items.map(itemLine).join("\n");
 
   const customer = [order.first_name, order.last_name].filter(Boolean).join(" ");
 
@@ -107,6 +116,80 @@ export function formatOrder(order) {
   ];
 
   return rows.filter((r) => r !== "").join("\n");
+
+}
+
+// Повідомлення про заявку на відмову.
+//
+// ЩО БУЛО НЕ ТАК
+// ---------------
+// Тут стояли лише номер замовлення, сума й телефон. Менеджер бачив
+// «клієнт просить відмову» — і не знав, ЩО саме забирати. У замовленні
+// з двох сумок доводилось відкривати пошту, шукати лист і звіряти.
+//
+// Перелік у заявці був увесь цей час: тригер шле record.items, база їх
+// зберігає. Просто повідомлення їх не читало.
+//
+// ЩО ТУТ Є І ЧОМУ САМЕ ЦЕ
+// ------------------------
+// Менеджеру треба вирішити одне: приймати повернення чи ні, — і для
+// цього знати, що повертають, скільки віддавати грошей і чи їде решта
+// замовлення далі. Звідси перелік, сума до повернення й рядок «N з M
+// позицій»: часткова відмова й повна — це дві різні дії на складі.
+//
+// ТТН тут же, бо від нього залежить розмова: посилка ще в дорозі — її
+// можна завернути, вже отримана — це повернення з оглядом товару.
+export function formatRefusal(record, order) {
+
+  const refused = parseItems(record && record.items);
+  const all = parseItems(order && order.items);
+
+  const refund = refused.reduce(
+    (sum, item) => sum + (Number(item.price) || 0) * (Number(item.qty) || 1),
+    0,
+  );
+
+  // Заявки, створені до появи переліку (і ті, що лягли без нього, коли
+  // база ще не знала колонки items), означали відмову від усього
+  // замовлення. Так їх і показуємо — але чесно кажемо, що складу немає.
+  const noList = refused.length === 0;
+
+  const whole = !noList && all.length > 0 && refused.length >= all.length;
+
+  const scope = noList
+    ? `Перелік не вказано — заявка на все замовлення${order && order.total ? ` на ${money(order.total)}` : ""}`
+    : whole
+      ? `Відмова від усього замовлення · до повернення <b>${money(refund)}</b>`
+      : `Відмова від ${refused.length} з ${all.length} позицій · до повернення <b>${money(refund)}</b>`;
+
+  const rows = [
+    "❗️ <b>Клієнт просить відмову</b>",
+    "",
+    `Замовлення: <b>${escapeHtml((order && order.order_number) || "")}</b>`,
+    scope,
+    !noList && !whole && order && order.total
+      ? `Сума всього замовлення: ${money(order.total)}`
+      : null,
+    noList ? null : "",
+    noList ? null : refused.map(itemLine).join("\n"),
+    "",
+    record && record.note
+      ? `Причина: ${escapeHtml(record.note)}`
+      : "Причину не вказано",
+    "",
+    order && order.phone
+      ? `📞 <a href="tel:${escapeHtml(order.phone)}">${escapeHtml(order.phone)}</a>`
+      : null,
+    order && order.tracking_number
+      ? `📦 ТТН: <code>${escapeHtml(order.tracking_number)}</code>`
+      : null,
+    "",
+    "Зателефонуйте клієнту й вирішіть, чи приймати повернення.",
+  ];
+
+  // Відсіюємо тільки null: порожній рядок тут — це навмисний відступ
+  // між блоками, і саме він робить повідомлення читабельним.
+  return rows.filter((row) => row !== null).join("\n");
 
 }
 

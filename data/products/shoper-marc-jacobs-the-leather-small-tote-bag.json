@@ -1,0 +1,74 @@
+{
+  "gender": [
+    "Жінкам"
+  ],
+  "preOrderDays": "5–10 робочих днів",
+  "forcePublish": false,
+  "material": "Натуральна шкіра",
+  "brand": "Marc Jacobs",
+  "price": 10000,
+  "preOrder": false,
+  "dimensions": "25,5 × 20 × 13 см",
+  "variants": [
+    {
+      "color": "Twine — бежево-кремовий",
+      "hex": "#bb993c",
+      "images": [
+        "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-d0dd33cf.webp",
+        "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-de081418.webp",
+        "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-628c7ef0.webp",
+        "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-twine-h009l01sp21-914-800x800.webp"
+      ]
+    }
+  ],
+  "preOrderPrepayment": 50,
+  "strapInfo": "Ремінець знімний та регульований",
+  "sizes": [
+    "S"
+  ],
+  "searchKeywords": [
+    "Marc Jacobs",
+    "Marc Jacobs The Tote Bag",
+    "The Leather Small Tote Bag",
+    "Marc Jacobs Small Tote",
+    "Marc Jacobs H009L01SP21",
+    "H009L01SP21",
+    "Marc Jacobs сумка",
+    "сумка Marc Jacobs",
+    "жіноча сумка Marc Jacobs",
+    "Marc Jacobs tote",
+    "small tote bag",
+    "сумка тоут",
+    "маленька сумка",
+    "шкіряна сумка",
+    "сумка з натуральної шкіри",
+    "Twine",
+    "бежева сумка",
+    "кремова сумка",
+    "нейтральна сумка",
+    "сумка на плече",
+    "сумка через плече",
+    "брендова сумка",
+    "оригінальна Marc Jacobs"
+  ],
+  "isNew": false,
+  "title": "Шопер Marc Jacobs The Leather Small Tote Bag",
+  "reviews": 0,
+  "instagramBlock": "general",
+  "description": "Стильна та універсальна сумка Marc Jacobs The Leather Small Tote Bag у нейтральному відтінку Twine. Лаконічний дизайн, натуральна зерниста шкіра та фірмовий логотип Marc Jacobs роблять модель чудовим доповненням до повсякденних образів.\nСумка має просторе основне відділення, внутрішню відкриту кишеню та фірмову шкіряну нашивку з логотипом на задній панелі. Модель доповнена двома верхніми ручками та знімним регульованим ремінцем, тому її можна носити в руці, на плечі або через плече",
+  "sku": "H009L01SP21",
+  "rating": 5,
+  "category": "Жіночі сумки",
+  "slug": "shoper-marc-jacobs-the-leather-small-tote-bag",
+  "id": 56,
+  "color": "Twine — бежево-кремовий",
+  "images": [
+    "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-d0dd33cf.webp",
+    "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-de081418.webp",
+    "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-628c7ef0.webp",
+    "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-twine-h009l01sp21-914-800x800.webp"
+  ],
+  "legacySlugs": [
+    "шопер-marc-jacobs-the-leather-small-tote-bag"
+  ]
+}

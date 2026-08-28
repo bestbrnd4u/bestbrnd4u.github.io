@@ -1,0 +1,89 @@
+{
+  "gender": [
+    "Жінкам"
+  ],
+  "preOrderDays": "5–10 робочих днів",
+  "forcePublish": false,
+  "material": "Денім",
+  "brand": "Marc Jacobs",
+  "price": 8600,
+  "preOrder": false,
+  "dimensions": "26 × 21 × 13 см",
+  "variants": [
+    {
+      "hex": "#0361b0",
+      "color": "Blue синій-блакитний",
+      "images": [
+        "/assets/images/products/uploads/215679033_blue_in.webp",
+        "/assets/images/products/uploads/215679033_blue_bk.webp",
+        "/assets/images/products/uploads/215679033_blue_cu.webp",
+        "/assets/images/products/uploads/215679033_blue_e1.webp",
+        "/assets/images/products/uploads/215679033_blue_fr.webp"
+      ]
+    }
+  ],
+  "preOrderPrepayment": 50,
+  "strapInfo": "Ремінець знімний та регульований",
+  "sizes": [
+    "S"
+  ],
+  "splitByColor": true,
+  "searchKeywords": [
+    "Marc Jacobs",
+    "Marc Jacobs The Tote Bag",
+    "The Denim Small Tote Bag",
+    "Marc Jacobs Denim Tote",
+    "Marc Jacobs MJ451H057",
+    "MJ451H057-K11",
+    "Marc Jacobs сумка",
+    "сумка Marc Jacobs",
+    "жіноча сумка Marc Jacobs",
+    "denim bag",
+    "denim tote",
+    "джинсова сумка",
+    "сумка з деніму",
+    "синя сумка",
+    "блакитна сумка",
+    "The Tote Bag",
+    "сумка тоут",
+    "small tote bag",
+    "сумка на плече",
+    "сумка через плече",
+    "кросбоді",
+    "брендова сумка",
+    "оригінальна Marc Jacobs"
+  ],
+  "isNew": false,
+  "title": "Шопер Marc Jacobs The Denim Small Tote Bag Blue",
+  "reviews": 0,
+  "instagramBlock": "general",
+  "description": "Стильна та оригінальна сумка Marc Jacobs The Denim Small Tote Bag у блакитно-синьому денімі. Модель виконана у фірмовому силуеті The Tote Bag та доповнена контрастними шкіряними деталями й написом The Tote Bag на передній панелі.\nДжинсовий матеріал та поєднання різних відтінків синього надають сумці сучасного та невимушеного вигляду. Модель має дві верхні ручки та знімний ремінець для носіння на плечі або через плече",
+  "sku": "MJ451H057-K11",
+  "rating": 5,
+  "category": "Жіночі сумки",
+  "framing": {
+    "215679033_blue_in.webp": {
+      "zoom": 1.43,
+      "x": 50,
+      "y": 70
+    },
+    "215679033_blue_bk.webp": {
+      "zoom": 1.46,
+      "x": 49,
+      "y": 65
+    }
+  },
+  "slug": "shoper-marc-jacobs-the-denim-small-tote-bag-blue",
+  "id": 61,
+  "color": "Blue синій-блакитний",
+  "images": [
+    "/assets/images/products/uploads/215679033_blue_in.webp",
+    "/assets/images/products/uploads/215679033_blue_bk.webp",
+    "/assets/images/products/uploads/215679033_blue_cu.webp",
+    "/assets/images/products/uploads/215679033_blue_e1.webp",
+    "/assets/images/products/uploads/215679033_blue_fr.webp"
+  ],
+  "legacySlugs": [
+    "шопер-marc-jacobs-the-denim-small-tote-bag-blue"
+  ]
+}

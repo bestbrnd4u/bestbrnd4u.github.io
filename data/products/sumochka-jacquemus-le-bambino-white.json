@@ -1,0 +1,76 @@
+{
+  "gender": [
+    "Жінкам"
+  ],
+  "preOrderDays": "5–10 робочих днів",
+  "forcePublish": false,
+  "material": "Натуральна гладка шкіра",
+  "brand": "Jacquemus",
+  "price": 19000,
+  "preOrder": false,
+  "dimensions": "17,5 × 8,5 × 6,5 см",
+  "variants": [
+    {
+      "color": "White білий",
+      "hex": "#ffffff",
+      "images": [
+        "/assets/images/products/uploads/ihjbihj.webp",
+        "/assets/images/products/uploads/p00545136_d2.webp",
+        "/assets/images/products/uploads/p00545136_d1.webp",
+        "/assets/images/products/uploads/uhjvbyubjhmyjhbmn.webp",
+        "/assets/images/products/uploads/jbb.webp"
+      ]
+    }
+  ],
+  "preOrderPrepayment": 50,
+  "strapInfo": "Ремінець знімний та регульований, ручка незнімна",
+  "sizes": [
+    "ONESIZE"
+  ],
+  "splitByColor": true,
+  "searchKeywords": [
+    "JACQUEMUS",
+    "Jacquemus Le Bambino",
+    "The Bambino",
+    "Le Bambino",
+    "Jacquemus Bambino",
+    "213BA006",
+    "213BA006-3000-100",
+    "сумка Jacquemus",
+    "жіноча сумка Jacquemus",
+    "біла сумка",
+    "біла сумка Jacquemus",
+    "White Jacquemus",
+    "Panna",
+    "шкіряна сумка",
+    "сумка з натуральної шкіри",
+    "міні сумка",
+    "маленька сумка",
+    "сумка на плече",
+    "сумка через плече",
+    "кросбоді",
+    "брендова сумка",
+    "оригінальна Jacquemus"
+  ],
+  "isNew": false,
+  "title": "Сумочка Jacquemus Le Bambino White",
+  "reviews": 0,
+  "instagramBlock": "general",
+  "description": "Мініатюрна та елегантна сумка Jacquemus Le Bambino у класичному білому кольорі. Модель виконана з гладкої натуральної шкіри та доповнена фірмовим золотистим логотипом Jacquemus на клапані.\nСумка має компактне основне відділення, задню кишеню для картки та магнітну застібку. Оснащена верхньою ручкою та знімним регульованим ремінцем, тому її можна носити в руці, на плечі або через плече. Виготовлена в Італії.",
+  "sku": "213BA006-3000-100",
+  "rating": 5,
+  "category": "Жіночі сумки",
+  "slug": "sumochka-jacquemus-le-bambino-white",
+  "id": 64,
+  "color": "White білий",
+  "images": [
+    "/assets/images/products/uploads/ihjbihj.webp",
+    "/assets/images/products/uploads/p00545136_d2.webp",
+    "/assets/images/products/uploads/p00545136_d1.webp",
+    "/assets/images/products/uploads/uhjvbyubjhmyjhbmn.webp",
+    "/assets/images/products/uploads/jbb.webp"
+  ],
+  "legacySlugs": [
+    "сумочка-jacquemus-le-bambino-white"
+  ]
+}

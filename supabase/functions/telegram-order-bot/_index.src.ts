@@ -24,7 +24,7 @@
 // Чиста логіка (форматування картки, кнопки) винесена окремо —
 // щоб її можна було запускати й тестувати в Node без Deno.
 import {
-  STATUSES, normalizeStatus, formatOrder, buildKeyboard,
+  STATUSES, normalizeStatus, formatOrder, formatRefusal, buildKeyboard,
   parseStartPayload, formatProductCard, buildProductKeyboard, absoluteImageUrl,
   customerStatusMessage, customerStatusKeyboard, validateTracking, parseTtnCommand,
   orderListLine, orderListKeyboard,
@@ -802,24 +802,13 @@ async function applyTracking(orderId: string, tracking: string) {
 
 async function handleRefusal(record: Record<string, any>, order: Record<string, any> | null) {
 
+  // Замовлення тягнемо з бази, якщо тригер його не доклав: без складу
+  // замовлення не порахувати ні «N з M позицій», ні суму до повернення.
   const ord = order ?? await findOrderById(record.order_id);
-
-  const number = escapeHtml(ord?.order_number ?? "");
-
-  const lines = [
-    `❗️ <b>Клієнт просить відмову</b>`,
-    "",
-    `Замовлення: <b>${number}</b>`,
-    ord?.total ? `Сума: ${money(ord.total)}` : "",
-    ord?.phone ? `📞 <a href="tel:${escapeHtml(ord.phone)}">${escapeHtml(ord.phone)}</a>` : "",
-    record.note ? `\nКоментар клієнта: ${escapeHtml(record.note)}` : "",
-    "",
-    `Зателефонуйте клієнту й вирішіть, чи скасовувати.`,
-  ].filter((l) => l !== "");
 
   await telegram("sendMessage", {
     chat_id: TELEGRAM_CHAT_ID,
-    text: lines.join("\n"),
+    text: formatRefusal(record, ord),
     parse_mode: "HTML",
     disable_web_page_preview: true,
     reply_markup: ord

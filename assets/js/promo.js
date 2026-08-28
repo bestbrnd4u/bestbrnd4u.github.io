@@ -45,15 +45,38 @@ async function initPromoPage() {
         const promotions = await promoRes.json();
         const allProducts = await productsRes.json();
 
-        const promo = Array.isArray(promotions)
-            ? promotions.find(p => p.slug === slug)
-            : null;
+        const list = Array.isArray(promotions) ? promotions : [];
+
+        // Спершу за поточною адресою, потім — за старими.
+        //
+        // НАВІЩО ДРУГА СПРОБА. Адреси акцій перекладено з кирилиці на
+        // латиницю (див. scripts/translit.js), а посилання на стару вже
+        // пішли в пости й сторіс. Без цього рядка кожне з них
+        // показувало б «акцію не знайдено» — на сторінці, яка
+        // насправді існує.
+        const promo = list.find(p => p.slug === slug)
+            || list.find(p => Array.isArray(p.legacySlugs) && p.legacySlugs.includes(slug))
+            || null;
 
         loader.hidden = true;
 
         if (!promo) {
             showPromoNotFound();
             return;
+        }
+
+        // Прийшли за старою адресою — тихо міняємо її на канонічну.
+        //
+        // replaceState, а не редирект: сторінка вже намальована, і
+        // перезавантажувати її заради адреси означало б зайве
+        // мигання. У історії лишається один запис, тож «назад»
+        // повертає туди, звідки прийшли, а не по колу.
+        if (promo.slug !== slug) {
+
+            const canonical = `${location.pathname}?id=${encodeURIComponent(promo.slug)}`;
+
+            history.replaceState(null, "", canonical + location.hash);
+
         }
 
         renderPromoHero(promo);
