@@ -290,6 +290,48 @@ console.log("\n[3c] Картка праворуч показує те фото, 
         !sameImage("", "") && !sameImage(шлях, null));
 }
 
+console.log("\n[3d] Правка в адмінці взагалі доїжджає");
+{
+    // Останній крок збірки — apply-cache-version.js: він проставляє
+    // ?v=<відбиток> кожному скрипту й стилю в розмітці. Поки він не
+    // відпрацював, адреса файлу лишається старою, і браузер віддає з
+    // кеша стару версію — хоч у гілці вже нова.
+    //
+    // А запускався він лише коли коміт чіпав data/**, assets/images/**,
+    // site.config.json або scripts/**. Коміт, який торкався тільки
+    // admin/**, збірку не запускав узагалі: файл новий, ?v= старий, в
+    // адмінці працює попередня версія. Виглядає як «правка не поїхала»,
+    // і зрозуміти чому майже неможливо.
+    //
+    // Дірку прикривало те, що більшість правок заодно чіпали data/**.
+    const yaml = require("js-yaml");
+
+    ["build-dev", "build-products"].forEach(name => {
+
+        const cfg = yaml.load(fs.readFileSync(
+            path.join(ROOT, ".github/workflows", name + ".yml"), "utf8"));
+
+        // ключ "on" у YAML читається як булеве true — це відома
+        // особливість YAML 1.1, а не помилка конфігу
+        const on = cfg.on || cfg[true];
+        const paths = (on && on.push && on.push.paths) || [];
+
+        ["admin/**", "assets/**", "scripts/**", "data/**"].forEach(p => {
+            check(`${name}: збірка реагує на ${p}`, paths.includes(p),
+                JSON.stringify(paths));
+        });
+
+    });
+
+    // Самі версії проставляються останнім кроком — якщо його
+    // переставити вище, усе описане вище повернеться.
+    const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, "package.json"), "utf8"));
+    const steps = pkg.scripts.build.split("&&").map(s => s.trim());
+
+    check("apply-cache-version лишається останнім кроком збірки",
+        /apply-cache-version/.test(steps[steps.length - 1]), steps[steps.length - 1]);
+}
+
 console.log("\n[4] Кадр і фон — різні рішення й не скасовують одне одного");
 {
     const код = widget.replace(/\/\/[^\n]*/g, "");
