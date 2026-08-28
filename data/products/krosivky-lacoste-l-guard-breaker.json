@@ -1,0 +1,71 @@
+{
+  "gender": [
+    "Жінкам"
+  ],
+  "preOrderDays": "5–10 робочих днів",
+  "forcePublish": false,
+  "brand": "Lacoste",
+  "price": 5600,
+  "preOrder": false,
+  "variants": [
+    {
+      "color": "Зелений",
+      "hex": "#4b9b54",
+      "sizes": [
+        "38"
+      ],
+      "images": [
+        "/assets/images/products/uploads/88bdc44c-fb6f-4884-b458-b19cc1e62afa_size2000x2000_cropcenter.webp",
+        "/assets/images/products/uploads/d1ac0ffd-1eaf-49fa-a647-4367eb3903ec_size2000x2000_cropcenter.webp",
+        "/assets/images/products/uploads/b7842f76-5f88-4078-92a4-f026770f790e_size2000x2000_cropcenter.webp",
+        "/assets/images/products/uploads/510f13a6-c954-47f8-beda-b551a9557a8e_size2000x2000_cropcenter.webp"
+      ]
+    }
+  ],
+  "preOrderPrepayment": 50,
+  "sizes": [
+    "38"
+  ],
+  "searchKeywords": [
+    "Lacoste",
+    "Lacoste L-Guard Breaker",
+    "L-Guard Breaker",
+    "746SFA0077",
+    "746SFA0077.ANI",
+    "жіночі кросівки Lacoste",
+    "кросівки Lacoste жіночі",
+    "брендові кросівки",
+    "оригінальні Lacoste",
+    "повсякденні кросівки",
+    "спортивні кросівки",
+    "міські кросівки",
+    "кросівки outdoor"
+  ],
+  "isNew": false,
+  "title": "Кросівки Lacoste L-Guard Breaker",
+  "reviews": 0,
+  "instagramBlock": "general",
+  "description": "Стильні жіночі кросівки Lacoste L-Guard Breaker у сучасному outdoor-стилі. Модель виконана з міцного текстилю Ripstop із шкіряними та синтетичними вставками, доповнена світловідбиваючими деталями. Підошва з гуми та EVA забезпечує комфорт, амортизацію та надійне зчеплення з поверхнею. Чудовий варіант для міських образів, прогулянок і активного повсякденного носіння.",
+  "sku": "746SFA0077.ANI",
+  "rating": 5,
+  "category": "Кросівки",
+  "slug": "krosivky-lacoste-l-guard-breaker",
+  "id": 37,
+  "color": "Зелений",
+  "images": [
+    "/assets/images/products/uploads/88bdc44c-fb6f-4884-b458-b19cc1e62afa_size2000x2000_cropcenter.webp",
+    "/assets/images/products/uploads/d1ac0ffd-1eaf-49fa-a647-4367eb3903ec_size2000x2000_cropcenter.webp",
+    "/assets/images/products/uploads/b7842f76-5f88-4078-92a4-f026770f790e_size2000x2000_cropcenter.webp",
+    "/assets/images/products/uploads/510f13a6-c954-47f8-beda-b551a9557a8e_size2000x2000_cropcenter.webp"
+  ],
+  "framing": {
+    "510f13a6-c954-47f8-beda-b551a9557a8e_size2000x2000_cropcenter.webp": {
+      "zoom": 1.64,
+      "x": 51,
+      "y": 55
+    }
+  },
+  "legacySlugs": [
+    "кросівки-lacoste-l-guard-breaker"
+  ]
+}

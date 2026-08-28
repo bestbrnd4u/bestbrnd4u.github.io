@@ -14,7 +14,7 @@ const SRC = fs.readFileSync(path.join(ROOT,"supabase/functions/telegram-order-bo
 // TypeScript-анотацій регулярками — воно ламалось на union-типах
 // і, головне, тестувало б не той самий код, а його перекручену
 // копію. Тепер логіка живе в звичайному .js і перевіряється як є.
-let formatOrder, buildKeyboard, STATUSES;
+let formatOrder, formatRefusal, buildKeyboard, STATUSES;
 
 async function loadFormatModule(){
   const url = require("url").pathToFileURL(
@@ -22,6 +22,7 @@ async function loadFormatModule(){
   ).href;
   const mod = await import(url);
   formatOrder = mod.formatOrder;
+  formatRefusal = mod.formatRefusal;
   buildKeyboard = mod.buildKeyboard;
   STATUSES = mod.STATUSES;
 }
@@ -307,6 +308,78 @@ console.log("\n[10] Webhook відповідає ОДРАЗУ, не тримаю
     background(Promise.reject(new Error("bang"))).then(() => { caught = true; });
     check("без waitUntil помилка у фоні перехоплена, а не кине наверх", caught);
   }
+}
+
+console.log("\n[11] Заявка на відмову: менеджер бачить, ЩО забирати");
+{
+  // Раніше в повідомленні були лише номер, сума й телефон. Перелік
+  // приходив у record.items увесь цей час — його просто не читали, і в
+  // замовленні з двох сумок менеджер ішов звіряти з поштою.
+  // money() розділяє тисячі нерозривним пробілом — у тексті перевірок
+  // його не видно, тож звіряємо на звичайних.
+  const рівно = text => text.replace(/ /g, " ");
+
+  const частково = рівно(formatRefusal(
+    { note: "не підійшов розмір", items: [ORDER.items[0]] }, ORDER));
+
+  check("видно, від чого саме відмовляються",
+        частково.includes("Urban Sneakers") && !частково.includes("City Tote"));
+
+  check("видно, скільки віддавати грошей",
+        частково.includes("до повернення <b>4 299 грн</b>"), частково);
+
+  // Часткова відмова й повна — дві різні дії на складі.
+  check("часткова відмова названа часткою",
+        частково.includes("Відмова від 1 з 2 позицій"));
+
+  check("для часткової видно й суму всього замовлення",
+        частково.includes("Сума всього замовлення: 21 877 грн"));
+
+  check("причина клієнта на місці", частково.includes("не підійшов розмір"));
+
+  check("телефон лишається клікабельним",
+        частково.includes('<a href="tel:+380737288291">'));
+
+  const повністю = рівно(formatRefusal({ note: "передумав", items: ORDER.items }, ORDER));
+
+  check("повна відмова названа повною",
+        повністю.includes("Відмова від усього замовлення")
+        && !повністю.includes("з 2 позицій"));
+
+  check("у повній перелічені всі позиції",
+        повністю.includes("Urban Sneakers") && повністю.includes("City Tote"));
+
+  // Заявки до появи колонки items означали відмову від усього
+  // замовлення. Так їх і читаємо — але чесно кажемо, що складу немає.
+  const стара = рівно(formatRefusal({ note: null, items: null }, ORDER));
+
+  check("стара заявка без переліку не ламає повідомлення",
+        стара.includes("Перелік не вказано") && стара.includes("21 877 грн"));
+
+  check("відсутня причина названа, а не пропущена",
+        стара.includes("Причину не вказано"));
+
+  // items приходить то масивом, то JSON-рядком — залежно від драйвера.
+  const рядком = рівно(formatRefusal(
+    { note: "x", items: JSON.stringify([ORDER.items[1]]) }, ORDER));
+
+  check("items у вигляді JSON-рядка теж читаються",
+        рядком.includes("City Tote") && рядком.includes("Відмова від 1 з 2"));
+
+  // parse_mode:"HTML" — назва товару з чужого каталогу могла б внести
+  // розмітку.
+  const злий = formatRefusal(
+    { note: "<b>жирний</b>", items: [{ title: "<script>x</script>", price: 1, qty: 1 }] },
+    { order_number: "<i>1</i>", items: [{}] });
+
+  check("розмітка в даних екранується",
+        !злий.includes("<script>")
+        && !злий.includes("<i>1</i>")
+        && злий.includes("&lt;script&gt;"), злий);
+
+  // Блоки мусять лишитись розділеними: суцільна стіна тексту в
+  // Telegram не читається.
+  check("між блоками є порожні рядки", /\n\n/.test(частково));
 }
 
 console.log(failures===0?"\n✅ Усі перевірки пройдено":`\n❌ Провалено: ${failures}`);

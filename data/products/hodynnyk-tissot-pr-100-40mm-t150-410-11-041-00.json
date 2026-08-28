@@ -1,0 +1,66 @@
+{
+  "gender": [
+    "Чоловікам"
+  ],
+  "preOrderDays": "10-14 робочих днів",
+  "forcePublish": false,
+  "material": "Корпус і браслет — нержавіюча сталь 316L; скло — сапфірове, стійке до подряпин",
+  "brand": "Tissot",
+  "price": 13800,
+  "preOrder": true,
+  "dimensions": "4 × 4 × 0,825 см",
+  "variants": [
+    {
+      "color": "Сріблястий",
+      "hex": "#cecece",
+      "images": [
+        "/assets/images/products/uploads/tissot-pr-100-quartz-blue-dial-mens-watch-t1504101104100_1.webp",
+        "/assets/images/products/uploads/tissot-pr-100-quartz-blue-dial-mens-watch-t1504101104100_2.webp",
+        "/assets/images/products/uploads/tissot-pr-100-quartz-blue-dial-mens-watch-t1504101104100_3.webp"
+      ]
+    }
+  ],
+  "preOrderPrepayment": 100,
+  "strapInfo": "Сталевий браслет сріблястого кольору з системою швидкого знімання та застібкою-метеликом із кнопками. Ширина кріплення — 2 см",
+  "sizes": [
+    "ONESIZE"
+  ],
+  "splitByColor": true,
+  "searchKeywords": [
+    "Tissot PR 100",
+    "Tissot PR 100 40mm",
+    "Tissot T150.410.11.041.00",
+    "T1504101104100",
+    "годинник Tissot",
+    "чоловічий годинник Tissot",
+    "чоловічий наручний годинник",
+    "швейцарський годинник",
+    "кварцовий годинник",
+    "синій годинник",
+    "годинник із синім циферблатом",
+    "годинник зі сталевим браслетом",
+    "класичний чоловічий годинник",
+    "елегантний годинник",
+    "брендовий годинник",
+    "оригінальний Tissot"
+  ],
+  "isNew": false,
+  "title": "Годинник Tissot PR 100 40mm T150.410.11.041.00",
+  "reviews": 0,
+  "instagramBlock": "general",
+  "description": "Класичний чоловічий годинник Tissot PR 100 40mm із насиченим синім циферблатом та елегантним сталевим корпусом. Лаконічний дизайн робить модель універсальною — вона гармонійно доповнить як діловий костюм, так і повсякденний образ.\nГодинник оснащений точним швейцарським кварцовим механізмом, індикацією дати та сапфіровим склом, стійким до подряпин. Сріблястий корпус і сталевий браслет підкреслюють стриманий преміальний стиль моделі. Водонепроникність до 100 м (10 bar) дозволяє комфортно використовувати годинник у повсякденному житті",
+  "sku": "T150.410.11.041.00",
+  "rating": 5,
+  "category": "Годинники",
+  "slug": "hodynnyk-tissot-pr-100-40mm-t150-410-11-041-00",
+  "id": 77,
+  "color": "Сріблястий",
+  "images": [
+    "/assets/images/products/uploads/tissot-pr-100-quartz-blue-dial-mens-watch-t1504101104100_1.webp",
+    "/assets/images/products/uploads/tissot-pr-100-quartz-blue-dial-mens-watch-t1504101104100_2.webp",
+    "/assets/images/products/uploads/tissot-pr-100-quartz-blue-dial-mens-watch-t1504101104100_3.webp"
+  ],
+  "legacySlugs": [
+    "годинник-tissot-pr-100-40mm-t150-410-11-041-00"
+  ]
+}

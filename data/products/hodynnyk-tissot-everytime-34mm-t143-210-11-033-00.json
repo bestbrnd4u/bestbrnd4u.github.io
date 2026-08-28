@@ -1,0 +1,65 @@
+{
+  "gender": [
+    "Жінкам"
+  ],
+  "preOrderDays": "10-14 робочих днів",
+  "forcePublish": false,
+  "material": "Корпус і браслет — нержавіюча сталь 316L; скло — сапфірове, стійке до подряпин",
+  "brand": "Tissot",
+  "price": 8800,
+  "preOrder": true,
+  "dimensions": "3,4 × 3,4 × 0,69 см",
+  "variants": [
+    {
+      "color": "Сріблястий",
+      "hex": "#d9d9d9",
+      "images": [
+        "/assets/images/products/uploads/tissot-everytime-quartz-silver-dial-ladies-watch-t1432101103300.webp",
+        "/assets/images/products/uploads/tissot-everytime-quartz-silver-dial-ladies-watch-t1432101103300_2.webp",
+        "/assets/images/products/uploads/tissot-everytime-quartz-silver-dial-ladies-watch-t1432101103300_3.webp"
+      ]
+    }
+  ],
+  "preOrderPrepayment": 100,
+  "strapInfo": "Сталевий браслет сріблястого кольору шириною 1,6 см із швидкознімною системою та застібкою-метеликом",
+  "sizes": [
+    "ONESIZE"
+  ],
+  "splitByColor": true,
+  "searchKeywords": [
+    "Tissot Everytime",
+    "Tissot Everytime 34mm",
+    "Tissot T143.210.11.033.00",
+    "T1432101103300",
+    "годинник Tissot",
+    "жіночий годинник Tissot",
+    "жіночий наручний годинник",
+    "швейцарський годинник",
+    "кварцовий годинник",
+    "сріблястий годинник",
+    "годинник зі сталевим браслетом",
+    "класичний жіночий годинник",
+    "елегантний годинник",
+    "брендовий годинник",
+    "оригінальний Tissot"
+  ],
+  "isNew": false,
+  "title": "Годинник Tissot Everytime 34mm T143.210.11.033.00",
+  "reviews": 0,
+  "instagramBlock": "general",
+  "description": "Елегантний жіночий годинник Tissot Everytime 34mm із мінімалістичним дизайном та круглим сталевим корпусом. Модель легко поєднується як із повсякденними, так і з діловими та більш елегантними образами.\nГодинник оснащений швейцарським кварцовим механізмом ETA F05.412, сапфіровим склом, стійким до подряпин, та сталевим браслетом із системою швидкого знімання. Сріблястий корпус доповнений світлим циферблатом із лаконічними індексами. Водонепроникність — до 50 м (5 bar)",
+  "sku": "T143.210.11.033.00",
+  "rating": 5,
+  "category": "Годинники",
+  "slug": "hodynnyk-tissot-everytime-34mm-t143-210-11-033-00",
+  "id": 76,
+  "color": "Сріблястий",
+  "images": [
+    "/assets/images/products/uploads/tissot-everytime-quartz-silver-dial-ladies-watch-t1432101103300.webp",
+    "/assets/images/products/uploads/tissot-everytime-quartz-silver-dial-ladies-watch-t1432101103300_2.webp",
+    "/assets/images/products/uploads/tissot-everytime-quartz-silver-dial-ladies-watch-t1432101103300_3.webp"
+  ],
+  "legacySlugs": [
+    "годинник-tissot-everytime-34mm-t143-210-11-033-00"
+  ]
+}

@@ -38,9 +38,55 @@
     var MAX_TOTAL_BYTES = 8 * 1024 * 1024;
     var MAX_FILES = 5;
 
+    // Кома, а не крапка: українською дробову частину відділяють комою,
+    // і решта чисел на сайті так і виводиться (toLocaleString("uk-UA")).
+    // «8.0 МБ» посеред українського тексту читається як недогляд.
     function bytesLabel(bytes) {
 
-        return (bytes / 1024 / 1024).toFixed(1) + " МБ";
+        return (bytes / 1024 / 1024).toFixed(1).replace(".", ",") + " МБ";
+
+    }
+
+    // Розмір обраного показуємо дрібніше, ніж ліміт.
+    //
+    // Ліміт завжди в мегабайтах — 8.0 МБ читається однозначно. А от
+    // один знімок з телефона часто важить 300 КБ, і «0.3 МБ» виглядає
+    // як помилка округлення.
+    function sizeLabel(bytes) {
+
+        if (bytes < 1024 * 1024) return Math.max(1, Math.round(bytes / 1024)) + " КБ";
+
+        return bytesLabel(bytes);
+
+    }
+
+    function shotsWord(count) {
+
+        var tail100 = count % 100;
+        var tail10 = count % 10;
+
+        if (tail100 >= 11 && tail100 <= 14) return "знімків";
+        if (tail10 === 1) return "знімок";
+        if (tail10 >= 2 && tail10 <= 4) return "знімки";
+
+        return "знімків";
+
+    }
+
+    // Підпис поруч із кнопкою вибору.
+    //
+    // Один файл називаємо на ім'я: людина бачить, що обрала саме те
+    // фото. Кілька — рахуємо, бо п'ять імен у рядок не влазять і
+    // нічого не пояснюють.
+    function filesLabel(files) {
+
+        if (!files.length) return "Фото не вибрано";
+
+        var bytes = files.reduce(function (sum, file) { return sum + file.size; }, 0);
+
+        if (files.length === 1) return files[0].name + " · " + sizeLabel(bytes);
+
+        return files.length + " " + shotsWord(files.length) + " · " + sizeLabel(bytes);
 
     }
 
@@ -121,12 +167,32 @@
                 + '    <textarea rows="3" maxlength="1000"'
                 + '              placeholder="Наприклад: не підійшов розмір, замалий у плечах"></textarea>'
                 + '  </label>'
-                + '  <label class="refusal-field">'
+                // ВЛАСНА КНОПКА ЗАМІСТЬ СИСТЕМНОЇ
+                //
+                // Голий <input type="file"> малює браузер, і малює він
+                // його мовою СВОГО інтерфейсу: у Chrome з російською
+                // мовою це «Выбрать файлы / Файл не выбран» посеред
+                // українського вікна. З розмітки цей текст не міняється
+                // ніяк — його немає в документі, це частина браузера.
+                //
+                // Тому справжнє поле ховаємо (лишаючи робочим і
+                // доступним з клавіатури), а показуємо звичайний label,
+                // який його відкриває. Заразом підпис поруч називає
+                // обране: скільки знімків і скільки важать — інакше
+                // людина дізнається про перевищення ліміту аж на
+                // «Надіслати».
+                + '  <div class="refusal-field">'
                 + '    <span>Фото (за бажанням)</span>'
-                + '    <input type="file" accept="image/*" multiple>'
+                + '    <div class="refusal-file">'
+                + '      <label class="refusal-file-pick">'
+                + '        <input type="file" accept="image/*" multiple>'
+                + '        <span>Обрати фото</span>'
+                + '      </label>'
+                + '      <span class="refusal-file-state">Фото не вибрано</span>'
+                + '    </div>'
                 + '    <small>Якщо йдеться про стан товару — покажіть на фото.'
                 + ' До ' + MAX_FILES + ' знімків, разом до ' + bytesLabel(MAX_TOTAL_BYTES) + '.</small>'
-                + '  </label>'
+                + '  </div>'
                 + '  <p class="refusal-error" hidden></p>'
                 + '  <div class="refusal-actions">'
                 + '    <button type="button" class="btn btn-outline" data-refusal="cancel">Скасувати</button>'
@@ -140,7 +206,36 @@
             var dialog = overlay.querySelector(".refusal-dialog");
             var textarea = overlay.querySelector("textarea");
             var fileInput = overlay.querySelector('input[type="file"]');
+            var fileState = overlay.querySelector(".refusal-file-state");
             var errorBox = overlay.querySelector(".refusal-error");
+
+            // Обране показуємо одразу, а не аж на «Надіслати».
+            //
+            // Ліміт вісім мегабайтів людина перебирає трьома знімками з
+            // сучасного телефона й дізнається про це останньою. Тому
+            // перевищення видно тут же — і причина названа словами, а
+            // не самим лише червоним кольором.
+            fileInput.addEventListener("change", function () {
+
+                var files = [...(fileInput.files || [])];
+
+                var bytes = files.reduce(function (sum, file) {
+                    return sum + file.size;
+                }, 0);
+
+                var tooMany = files.length > MAX_FILES;
+                var tooHeavy = bytes > MAX_TOTAL_BYTES;
+
+                fileState.textContent = tooMany
+                    ? filesLabel(files) + " — це більше за " + MAX_FILES
+                    : tooHeavy
+                        ? filesLabel(files) + " — це більше за " + bytesLabel(MAX_TOTAL_BYTES)
+                        : filesLabel(files);
+
+                fileState.classList.toggle("is-chosen", files.length > 0 && !tooMany && !tooHeavy);
+                fileState.classList.toggle("is-over", tooMany || tooHeavy);
+
+            });
 
             function fail(message) {
 

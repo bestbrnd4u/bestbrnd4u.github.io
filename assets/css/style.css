@@ -11323,9 +11323,6 @@ body.refusal-open{
     white-space:nowrap;
 }
 
-/* Те саме загальне правило для полів форми ламало й поле вибору файлів
-   у наступному блоці — там воно вже враховане окремим правилом. */
-
 .refusal-field{
     display:block;
     margin-bottom:16px;
@@ -11338,8 +11335,7 @@ body.refusal-open{
     font-weight:600;
 }
 
-.refusal-field textarea,
-.refusal-field input[type="file"]{
+.refusal-field textarea{
     width:100%;
     font-family:inherit;
     font-size:14px;
@@ -11347,6 +11343,81 @@ body.refusal-open{
     border:1px solid var(--gray200);
     border-radius:10px;
     background:#fff;
+}
+
+/* ВИБІР ФОТО
+
+   Голий <input type="file"> малює браузер — і малює мовою СВОГО
+   інтерфейсу: у Chrome з російською це «Выбрать файлы / Файл не
+   выбран» посеред українського вікна. З розмітки той текст не
+   міняється: його немає в документі.
+
+   Тому поле ховаємо (лишаючи робочим), а натискають на label, який
+   його відкриває. Не display:none — так поле випало б із таблиці
+   фокусування, і з клавіатури фото було б не обрати. */
+
+.refusal-file{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+.refusal-file-pick{
+    display:inline-flex;
+    align-items:center;
+    flex:0 0 auto;
+    padding:10px 20px;
+    border:2px solid var(--gray300);
+    border-radius:50px;
+    background:#fff;
+    color:var(--primary);
+    font-size:13.5px;
+    font-weight:700;
+    cursor:pointer;
+    transition:var(--transition);
+}
+
+@media (hover:hover) and (pointer:fine){
+.refusal-file-pick:hover{
+    background:var(--gray100);
+}
+}
+
+/* Обведення на label, бо саме поле невидиме: інакше під час обходу з
+   клавіатури фокус зникав би нізвідки в нікуди. */
+.refusal-file-pick:has(input:focus-visible){
+    outline:2px solid var(--secondary);
+    outline-offset:2px;
+}
+
+.refusal-file-pick input[type="file"]{
+    position:absolute;
+    width:1px;
+    height:1px;
+    padding:0;
+    margin:-1px;
+    border:0;
+    overflow:hidden;
+    clip-path:inset(50%);
+    white-space:nowrap;
+}
+
+.refusal-file-state{
+    min-width:0;
+    font-size:13px;
+    color:var(--gray500);
+    overflow-wrap:anywhere;
+}
+
+.refusal-file-state.is-chosen{
+    color:var(--primary);
+    font-weight:600;
+}
+
+.refusal-file-state.is-over{
+    color:#dc2626;
+    font-weight:600;
 }
 
 .refusal-field small{

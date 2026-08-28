@@ -53,14 +53,25 @@ console.log("\n[1] Сторінка є в кожного товару і зай�
     check(`усі ${products.length} товарів мають сторінку`, missing.length === 0,
         missing.map(p => p.slug).join(", "));
 
+    // Крім самих товарів, у p/ лежать перенаправлення зі старих
+    // кириличних адрес (legacySlugs — див. scripts/translit.js). Це не
+    // сироти: адреси вже пішли в пости й у пошуковий індекс, і кожна
+    // мусить приводити на нову.
     const knownSlugs = new Set(products.map(p => p.slug));
+    const legacySlugs = new Set(products.flatMap(p => p.legacySlugs || []));
+
     const orphans = fs.readdirSync(PAGES_DIR, { withFileTypes: true })
-        .filter(e => e.isDirectory() && !knownSlugs.has(e.name))
+        .filter(e => e.isDirectory() && !knownSlugs.has(e.name) && !legacySlugs.has(e.name))
         .map(e => e.name);
 
     // сторінка видаленого товару = вічний 200 OK на неіснуючий товар
     check("немає сторінок товарів, яких уже немає в каталозі",
         orphans.length === 0, orphans.join(", "));
+
+    const безСторінки = [...legacySlugs].filter(slug => !fs.existsSync(pageFor(slug)));
+
+    check("кожна стара адреса має перенаправлення",
+        безСторінки.length === 0, безСторінки.slice(0, 3).join(", "));
 }
 
 console.log("\n[2] Кожна сторінка самодостатня без JS");
