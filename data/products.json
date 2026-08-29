@@ -209,12 +209,18 @@
     }
   },
   {
-    "title": "Balenciaga Сонцезахисні окуляри Grey Rectangular Unisex Sunglasses",
+    "gender": [
+      "Унісекс",
+      "Жінкам",
+      "Чоловікам"
+    ],
+    "oldPrice": 18600,
+    "color": "Темно-сірий",
+    "badge": "SALE",
     "brand": "Balenciaga",
-    "category": "Окуляри і оправи",
-    "gender": "Унісекс",
     "price": 13000,
-    "description": "Сонцезахисні окуляри Balenciaga з масивною оправою й темними лінзами. Виразна геометрія, логотип бренду на скроневій дузі. Модель, що працює як самостійний акцент образу.",
+    "preOrder": false,
+    "slug": "balenciaga-balenciaga-sontsezakhysni-okuliary-grey-rectangul",
     "variants": [
       {
         "color": "Темно-сірий",
@@ -231,13 +237,9 @@
         ]
       }
     ],
-    "oldPrice": 18600,
-    "badge": "SALE",
-    "isNew": false,
     "sizes": [
       "ONESIZE"
     ],
-    "sku": "BB0041S-001-99",
     "searchKeywords": [
       "баленсіага",
       "balenciaga",
@@ -250,17 +252,19 @@
       "rectangular",
       "unisex"
     ],
-    "instagramBlock": "general",
-    "preOrder": false,
+    "isNew": false,
+    "title": "Balenciaga Сонцезахисні окуляри Grey Rectangular Unisex Sunglasses",
     "images": [
       "assets/images/products/uploads/bb0041s-001-99-1.webp",
       "assets/images/products/uploads/bb0041s-001-99-2.webp",
       "assets/images/products/uploads/bb0041s-001-99-3.webp",
       "assets/images/products/uploads/bb0041s-001-99-4.webp"
     ],
-    "slug": "balenciaga-balenciaga-sontsezakhysni-okuliary-grey-rectangul",
     "id": 5,
-    "color": "Темно-сірий"
+    "instagramBlock": "general",
+    "description": "Сонцезахисні окуляри Balenciaga з масивною оправою й темними лінзами. Виразна геометрія, логотип бренду на скроневій дузі. Модель, що працює як самостійний акцент образу.",
+    "sku": "BB0041S-001-99",
+    "category": "Окуляри і оправи"
   },
   {
     "title": "Сонцезахисні окуляри Burberry Sophia Dark Grey Cat Eye",
@@ -875,9 +879,9 @@
         "color": "Зелений",
         "hex": "#06b454",
         "images": [
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=34c05752",
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=b03789af",
           "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-2.webp?v=7f7d7a02",
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=36871106"
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=e2bebe48"
         ],
         "sku": "B094QT219C"
       },
@@ -885,9 +889,9 @@
         "color": "Карамельний",
         "hex": "#f49657",
         "images": [
-          "assets/images/products/uploads/jwp-ma123-1.webp?v=5a90c872",
+          "assets/images/products/uploads/jwp-ma123-1.webp?v=5fd6e507",
           "assets/images/products/uploads/jwp-ma123-2.webp?v=189c38d2",
-          "assets/images/products/uploads/jwp-ma123-3.webp?v=d871eb1e"
+          "assets/images/products/uploads/jwp-ma123-3.webp?v=34a04892"
         ],
         "sku": "JWP-MA123"
       }
@@ -4269,8 +4273,8 @@
           "/assets/images/products/uploads/ca173_svvfq_a0.webp?v=274cb8ee",
           "/assets/images/products/uploads/ca173_svvfq_a5.webp?v=c14cae6b",
           "/assets/images/products/uploads/ca173_svvfq_a8.webp?v=b75e933e",
-          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=d089c2da",
-          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=c5b42e07"
+          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=c0c0f939",
+          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=0389c082"
         ]
       }
     ],
