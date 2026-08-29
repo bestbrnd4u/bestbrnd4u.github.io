@@ -4186,11 +4186,42 @@
       "Жінкам"
     ],
     "preOrderDays": "5–10 робочих днів",
+    "color": "Бежево-білий",
     "forcePublish": false,
     "material": "Фірмовий покритий канвас та натуральна шкіра",
     "brand": "Coach",
     "price": 6000,
+    "framing": {
+      "ca173_svvfq_a5.webp": {
+        "zoom": 1.7,
+        "x": 51,
+        "y": 52
+      },
+      "ca173_svvfq_a8.webp": {
+        "zoom": 1.49,
+        "x": 50,
+        "y": 50
+      },
+      "ca173_svvfq_a92.webp": {
+        "zoom": 1,
+        "x": 50,
+        "y": 50,
+        "bg": "cutout"
+      },
+      "ca173_svvfq_a91.webp": {
+        "zoom": 1,
+        "x": 50,
+        "y": 50,
+        "bg": "cutout"
+      },
+      "ca173_svvfq_a0.webp": {
+        "zoom": 1.7,
+        "x": 50,
+        "y": 50
+      }
+    },
     "preOrder": false,
+    "slug": "sumochka-coach-teri-shoulder-bag-in-colorblock",
     "dimensions": "26 × 15,5 × 7 см",
     "variants": [
       {
@@ -4200,8 +4231,8 @@
           "/assets/images/products/uploads/ca173_svvfq_a0.webp?v=274cb8ee",
           "/assets/images/products/uploads/ca173_svvfq_a5.webp?v=c14cae6b",
           "/assets/images/products/uploads/ca173_svvfq_a8.webp?v=b75e933e",
-          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=0f831d15",
-          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=fa5a9cc7"
+          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=e8ca440c",
+          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=fdffcca3"
         ]
       }
     ],
@@ -4235,15 +4266,6 @@
     ],
     "isNew": false,
     "title": "Сумочка Coach Teri Shoulder Bag In Colorblock",
-    "reviews": 0,
-    "instagramBlock": "general",
-    "description": "Стильна сумка Coach Teri Shoulder Bag In Colorblock у гармонійному поєднанні бежевого, білого та золотистого відтінків. Модель доповнена фірмовим принтом Signature та елегантною золотою фурнітурою.\nСумка має компактний структурований силует, просторе основне відділення та внутрішні кишені для зручного зберігання необхідних речей. Поєднання фірмового канвасу та гладкої шкіри робить модель практичною та стильною.\nМодель оснащена знімною ручкою та знімним регульованим ремінцем, тому її можна носити в руці, на плечі або через плече",
-    "sku": "CA173IMTAP",
-    "rating": 5,
-    "category": "Жіночі сумки",
-    "slug": "sumochka-coach-teri-shoulder-bag-in-colorblock",
-    "id": 62,
-    "color": "Бежево-білий",
     "images": [
       "/assets/images/products/uploads/ca173_svvfq_a0.webp",
       "/assets/images/products/uploads/ca173_svvfq_a5.webp",
@@ -4251,26 +4273,16 @@
       "/assets/images/products/uploads/ca173_svvfq_a92.webp",
       "/assets/images/products/uploads/ca173_svvfq_a91.webp"
     ],
+    "reviews": 0,
+    "id": 62,
+    "instagramBlock": "general",
+    "description": "Стильна сумка Coach Teri Shoulder Bag In Colorblock у гармонійному поєднанні бежевого, білого та золотистого відтінків. Модель доповнена фірмовим принтом Signature та елегантною золотою фурнітурою.\nСумка має компактний структурований силует, просторе основне відділення та внутрішні кишені для зручного зберігання необхідних речей. Поєднання фірмового канвасу та гладкої шкіри робить модель практичною та стильною.\nМодель оснащена знімною ручкою та знімним регульованим ремінцем, тому її можна носити в руці, на плечі або через плече",
+    "sku": "CA173IMTAP",
+    "rating": 5,
+    "category": "Жіночі сумки",
     "legacySlugs": [
       "сумочка-coach-teri-shoulder-bag-in-colorblock"
-    ],
-    "framing": {
-      "ca173_svvfq_a0.webp": {
-        "zoom": 1.56,
-        "x": 48,
-        "y": 54
-      },
-      "ca173_svvfq_a5.webp": {
-        "zoom": 1.64,
-        "x": 51,
-        "y": 52
-      },
-      "ca173_svvfq_a8.webp": {
-        "zoom": 1.49,
-        "x": 50,
-        "y": 50
-      }
-    }
+    ]
   },
   {
     "gender": [
