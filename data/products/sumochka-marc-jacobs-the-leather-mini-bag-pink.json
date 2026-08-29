@@ -3,11 +3,13 @@
     "Жінкам"
   ],
   "preOrderDays": "5–10 робочих днів",
+  "color": "Pink",
   "forcePublish": false,
   "material": "Натуральна шкіра",
   "brand": "Marc Jacobs",
   "price": 8600,
   "preOrder": false,
+  "slug": "sumochka-marc-jacobs-the-leather-mini-bag-pink",
   "dimensions": "20 × 12 × 4 см",
   "variants": [
     {
@@ -23,6 +25,7 @@
   ],
   "preOrderPrepayment": 50,
   "strapInfo": "Ремінець знімний та регульований",
+  "sortOrder": 16,
   "sizes": [
     "ONESIZE"
   ],
@@ -51,21 +54,19 @@
   ],
   "isNew": false,
   "title": "Сумочка Marc Jacobs The Leather Mini Bag Pink",
-  "reviews": 0,
-  "instagramBlock": "general",
-  "description": "Елегантна міні-сумка Marc Jacobs The Leather Mini Bag у ніжному рожевому відтінку — компактна модель із лаконічним дизайном та фірмовим стилем Marc Jacobs.\nСумка виготовлена зі 100% натуральної шкіри та має відкидний клапан із магнітною застібкою. Усередині розташовані основне відділення, кишеня для дрібниць та 8 слотів для карток. Модель можна носити як клатч або використовувати знімний регульований ремінець для носіння на плечі чи через плече",
-  "sku": "2S4SMN080S02678",
-  "rating": 5,
-  "category": "Жіночі сумки",
-  "slug": "sumochka-marc-jacobs-the-leather-mini-bag-pink",
-  "id": 50,
-  "color": "Pink",
   "images": [
     "/assets/images/products/uploads/27687307_57865310_2048.webp",
     "/assets/images/products/uploads/27687307_57865301_2048.webp",
     "/assets/images/products/uploads/27687307_57865307_2048.webp",
     "/assets/images/products/uploads/27687307_57865304_2048.webp"
   ],
+  "reviews": 0,
+  "id": 50,
+  "instagramBlock": "general",
+  "description": "Елегантна міні-сумка Marc Jacobs The Leather Mini Bag у ніжному рожевому відтінку — компактна модель із лаконічним дизайном та фірмовим стилем Marc Jacobs.\nСумка виготовлена зі 100% натуральної шкіри та має відкидний клапан із магнітною застібкою. Усередині розташовані основне відділення, кишеня для дрібниць та 8 слотів для карток. Модель можна носити як клатч або використовувати знімний регульований ремінець для носіння на плечі чи через плече",
+  "sku": "2S4SMN080S02678",
+  "rating": 5,
+  "category": "Жіночі сумки",
   "legacySlugs": [
     "сумочка-marc-jacobs-the-leather-mini-bag-pink"
   ]
