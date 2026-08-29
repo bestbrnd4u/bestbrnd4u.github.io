@@ -879,9 +879,9 @@
         "color": "Зелений",
         "hex": "#06b454",
         "images": [
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=a2617ff1",
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=d4cbe362",
           "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-2.webp?v=7f7d7a02",
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=8e2b99e2"
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=4528d749"
         ],
         "sku": "B094QT219C"
       },
@@ -889,9 +889,9 @@
         "color": "Карамельний",
         "hex": "#f49657",
         "images": [
-          "assets/images/products/uploads/jwp-ma123-1.webp?v=77ba8a25",
+          "assets/images/products/uploads/jwp-ma123-1.webp?v=827a9a7b",
           "assets/images/products/uploads/jwp-ma123-2.webp?v=189c38d2",
-          "assets/images/products/uploads/jwp-ma123-3.webp?v=13b6968a"
+          "assets/images/products/uploads/jwp-ma123-3.webp?v=929bf954"
         ],
         "sku": "JWP-MA123"
       }
@@ -2864,7 +2864,7 @@
     ],
     "preOrderPrepayment": 50,
     "strapInfo": "Ремінь знімний, регульований",
-    "sortOrder": 10,
+    "sortOrder": 11,
     "sizes": [
       "ONESIZE"
     ],
@@ -3516,7 +3516,7 @@
     ],
     "preOrderPrepayment": 50,
     "strapInfo": "2 знімні ремені — шкіряний та текстильний регульований",
-    "sortOrder": 11,
+    "sortOrder": 12,
     "sizes": [
       "ONESIZE"
     ],
@@ -3568,11 +3568,20 @@
       "Жінкам"
     ],
     "preOrderDays": "5–10 робочих днів",
+    "color": "Кемел",
     "forcePublish": false,
     "material": "Натуральна шкіра",
     "brand": "Marc Jacobs",
     "price": 9800,
+    "framing": {
+      "marc-jacobs-the-leather-cargo-bag-camel--3f139d71.webp": {
+        "zoom": 1.4,
+        "x": 49,
+        "y": 40
+      }
+    },
     "preOrder": false,
+    "slug": "sumka-marc-jacobs-the-leather-cargo-bag-camel",
     "dimensions": "22 × 12 × 7 см",
     "variants": [
       {
@@ -3590,6 +3599,7 @@
     ],
     "preOrderPrepayment": 50,
     "strapInfo": "Два знімні ремені",
+    "sortOrder": 13,
     "sizes": [
       "ONESIZE"
     ],
@@ -3619,15 +3629,6 @@
     ],
     "isNew": false,
     "title": "Сумка Marc Jacobs The Leather Cargo Bag Camel",
-    "reviews": 0,
-    "instagramBlock": "general",
-    "description": "Стильна та функціональна сумка Marc Jacobs The Leather Cargo Bag у теплому відтінку Camel. Модель поєднує лаконічний дизайн із практичною конструкцією та великою кількістю зручних зовнішніх кишень.\nСумка виготовлена з натуральної зернистої шкіри та доповнена фірмовим логотипом Marc Jacobs. Має основне відділення на блискавці, дві зовнішні кишені на блискавці та дві накладні кишені з магнітними застібками.\nМодель комплектується двома знімними ременями: шкіряним ременем для носіння на плечі та регульованим текстильним ременем для носіння через плече",
-    "sku": "2S4HSH085H02",
-    "rating": 5,
-    "category": "Жіночі сумки",
-    "slug": "sumka-marc-jacobs-the-leather-cargo-bag-camel",
-    "id": 54,
-    "color": "Кемел",
     "images": [
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--d9f458f8.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--3f139d71.webp",
@@ -3636,13 +3637,13 @@
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--c2093755.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--e63574a7.webp"
     ],
-    "framing": {
-      "marc-jacobs-the-leather-cargo-bag-camel--3f139d71.webp": {
-        "zoom": 1.4,
-        "x": 49,
-        "y": 40
-      }
-    },
+    "reviews": 0,
+    "id": 54,
+    "instagramBlock": "general",
+    "description": "Стильна та функціональна сумка Marc Jacobs The Leather Cargo Bag у теплому відтінку Camel. Модель поєднує лаконічний дизайн із практичною конструкцією та великою кількістю зручних зовнішніх кишень.\nСумка виготовлена з натуральної зернистої шкіри та доповнена фірмовим логотипом Marc Jacobs. Має основне відділення на блискавці, дві зовнішні кишені на блискавці та дві накладні кишені з магнітними застібками.\nМодель комплектується двома знімними ременями: шкіряним ременем для носіння на плечі та регульованим текстильним ременем для носіння через плече",
+    "sku": "2S4HSH085H02",
+    "rating": 5,
+    "category": "Жіночі сумки",
     "legacySlugs": [
       "сумка-marc-jacobs-the-leather-cargo-bag-camel"
     ]
@@ -3652,11 +3653,13 @@
       "Жінкам"
     ],
     "preOrderDays": "5–10 робочих днів",
+    "color": "Чорний",
     "forcePublish": false,
     "material": "Натуральна шкіра",
     "brand": "Marc Jacobs",
     "price": 9800,
     "preOrder": false,
+    "slug": "sumka-marc-jacobs-the-leather-cargo-bag-black",
     "dimensions": "22 × 12 × 7 см",
     "variants": [
       {
@@ -3674,6 +3677,7 @@
     ],
     "preOrderPrepayment": 50,
     "strapInfo": "Два знімні ремені",
+    "sortOrder": 14,
     "sizes": [
       "ONESIZE"
     ],
@@ -3702,15 +3706,6 @@
     ],
     "isNew": false,
     "title": "Сумка Marc Jacobs The Leather Cargo Bag Black",
-    "reviews": 0,
-    "instagramBlock": "general",
-    "description": "Стильна та функціональна сумка Marc Jacobs The Leather Cargo Bag у класичному чорному кольорі. Модель поєднує лаконічний дизайн із практичною конструкцією cargo та великою кількістю функціональних кишень.\nСумка виготовлена зі 100% натуральної шкіри та доповнена сріблястою фурнітурою. Має основне відділення на блискавці, дві зовнішні кишені на блискавці та дві накладні кишені з магнітними застібками.\nМодель комплектується двома знімними ременями: шкіряним ременем та регульованим текстильним ременем. Її можна носити на плечі або через плече",
-    "sku": "2S4HSH085H02-001",
-    "rating": 5,
-    "category": "Жіночі сумки",
-    "slug": "sumka-marc-jacobs-the-leather-cargo-bag-black",
-    "id": 55,
-    "color": "Чорний",
     "images": [
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--2013c7eb.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--3eeb5b5d.webp",
@@ -3719,6 +3714,13 @@
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--20634337.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--3bae4de6.webp"
     ],
+    "reviews": 0,
+    "id": 55,
+    "instagramBlock": "general",
+    "description": "Стильна та функціональна сумка Marc Jacobs The Leather Cargo Bag у класичному чорному кольорі. Модель поєднує лаконічний дизайн із практичною конструкцією cargo та великою кількістю функціональних кишень.\nСумка виготовлена зі 100% натуральної шкіри та доповнена сріблястою фурнітурою. Має основне відділення на блискавці, дві зовнішні кишені на блискавці та дві накладні кишені з магнітними застібками.\nМодель комплектується двома знімними ременями: шкіряним ременем та регульованим текстильним ременем. Її можна носити на плечі або через плече",
+    "sku": "2S4HSH085H02-001",
+    "rating": 5,
+    "category": "Жіночі сумки",
     "legacySlugs": [
       "сумка-marc-jacobs-the-leather-cargo-bag-black"
     ]
@@ -4283,8 +4285,8 @@
           "/assets/images/products/uploads/ca173_svvfq_a0.webp?v=274cb8ee",
           "/assets/images/products/uploads/ca173_svvfq_a5.webp?v=c14cae6b",
           "/assets/images/products/uploads/ca173_svvfq_a8.webp?v=b75e933e",
-          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=79034ecc",
-          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=dd51c626"
+          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=682abf48",
+          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=a0952a96"
         ]
       }
     ],
@@ -5493,11 +5495,50 @@
       "Жінкам"
     ],
     "preOrderDays": "10-14 робочих днів",
+    "color": "/",
     "forcePublish": false,
     "material": "Натуральна шкіра Polished Pebble Leather",
     "brand": "Coach",
     "price": 11900,
+    "framing": {
+      "ch857_b4ha_a3.webp": {
+        "zoom": 1.93,
+        "x": 48,
+        "y": 56
+      },
+      "ch857_b4ha_a8.webp": {
+        "zoom": 1.43,
+        "x": 48,
+        "y": 51
+      },
+      "ch857_b4bk_a0.webp": {
+        "zoom": 1.4,
+        "x": 50,
+        "y": 56
+      },
+      "ch857_b4bk_a3.webp": {
+        "zoom": 1.95,
+        "x": 49,
+        "y": 56
+      },
+      "ch857_b4bk_a8.webp": {
+        "zoom": 1.43,
+        "x": 48,
+        "y": 51
+      },
+      "ch857_b4yu1_a3.webp": {
+        "zoom": 1.71,
+        "x": 49,
+        "y": 55
+      },
+      "ch857_b4yu1_a8.webp": {
+        "zoom": 1.48,
+        "x": 48,
+        "y": 50
+      }
+    },
     "preOrder": true,
+    "slug": "zhinocha-sumochka-coach-tabby-shoulder-bag-26",
     "dimensions": "26 × 15 × 8 см",
     "variants": [
       {
@@ -5551,6 +5592,7 @@
     ],
     "preOrderPrepayment": 100,
     "strapInfo": "Коротка знімна ручка + довгий знімний ремінь для носіння через плече",
+    "sortOrder": 10,
     "sizes": [
       "ONESIZE"
     ],
@@ -5568,55 +5610,6 @@
     ],
     "isNew": false,
     "title": "Жіноча сумочка Coach Tabby Shoulder Bag 26",
-    "reviews": 0,
-    "instagramBlock": "general",
-    "description": "Структурована сумка Coach Tabby 26 — культова модель бренду з впізнаваною фірмовою застібкою Signature. Компактна, але містка, доповнена двома знімними ремінцями: коротким для носіння на плечі та довгим для носіння через плече.\nІдеально поєднується як із повсякденними образами, так і з більш елегантними.",
-    "sku": "CH857-B4/HA",
-    "rating": 5,
-    "category": "Жіночі сумки",
-    "framing": {
-      "ch857_b4ha_a3.webp": {
-        "zoom": 1.93,
-        "x": 48,
-        "y": 56
-      },
-      "ch857_b4ha_a8.webp": {
-        "zoom": 1.43,
-        "x": 48,
-        "y": 51
-      },
-      "ch857_b4bk_a0.webp": {
-        "zoom": 1.4,
-        "x": 50,
-        "y": 56
-      },
-      "ch857_b4bk_a3.webp": {
-        "zoom": 1.95,
-        "x": 49,
-        "y": 56
-      },
-      "ch857_b4bk_a8.webp": {
-        "zoom": 1.43,
-        "x": 48,
-        "y": 51
-      },
-      "ch857_b4yu1_a3.webp": {
-        "zoom": 1.71,
-        "x": 49,
-        "y": 55
-      },
-      "ch857_b4yu1_a8.webp": {
-        "zoom": 1.48,
-        "x": 48,
-        "y": 50
-      }
-    },
-    "legacySlugs": [
-      "жіноча-сумочка-coach-tabby-shoulder-bag-26"
-    ],
-    "slug": "zhinocha-sumochka-coach-tabby-shoulder-bag-26",
-    "id": 80,
-    "color": "/",
     "images": [
       "/assets/images/products/uploads/ch857_b4ha_a0.webp",
       "/assets/images/products/uploads/ch857_b4ha_a3.webp",
@@ -5625,6 +5618,16 @@
       "/assets/images/products/uploads/ch857_b4ha_a99.webp",
       "/assets/images/products/uploads/ch857_b4ha_a61.webp",
       "/assets/images/products/uploads/ch857_b4ha_a92.webp"
+    ],
+    "reviews": 0,
+    "id": 80,
+    "instagramBlock": "general",
+    "description": "Структурована сумка Coach Tabby 26 — культова модель бренду з впізнаваною фірмовою застібкою Signature. Компактна, але містка, доповнена двома знімними ремінцями: коротким для носіння на плечі та довгим для носіння через плече.\nІдеально поєднується як із повсякденними образами, так і з більш елегантними.",
+    "sku": "CH857-B4/HA",
+    "rating": 5,
+    "category": "Жіночі сумки",
+    "legacySlugs": [
+      "жіноча-сумочка-coach-tabby-shoulder-bag-26"
     ]
   },
   {
