@@ -58,6 +58,14 @@
     // Залито майже весь кадр — щось не так із визначенням фону.
     var MAX_SHARE = 0.97;
 
+    // Темніше за це — не фон, а предмет, який торкнувся краю кадру.
+    // Пояснення й замір — у scripts/whiten-backgrounds.js.
+    var DARK_BACKGROUND = 140;
+
+    // Яку частку сторони кадру може займати товар, щоб фото ще
+    // вважалось предметним.
+    var EDGE_SHARE = 0.05;
+
     // Розбір кольору: треба лише периметр, повний файл читати ні до чого.
     var PROBE_MAX = 160;
 
@@ -110,10 +118,56 @@
             .filter(function (g) { return g.n / total >= 0.05; })
             .sort(function (a, b) { return b.n - a.n; });
 
+        // ТЕМНЕ НА ПЕРИМЕТРІ — ЦЕ НЕ ФОН.
+        //
+        // Модель у чорній сукні стоїть так, що сукня торкається краю
+        // кадру, її колір набирає понад 5% периметра — і заливка,
+        // приймаючи будь-який колір зі списку, розтікається по всій
+        // сукні. Від моделі лишалась половина.
+        //
+        // Скрипт ВИРІВНЮЄ світлий фон до білого. Темний колір не можна
+        // «дорівняти» до білого — його можна тільки стерти.
+        var light = kept.filter(function (g) {
+            return Math.min(g.c[0], g.c[1], g.c[2]) >= DARK_BACKGROUND;
+        });
+
+        // Покриття — по світлих: інакше темна пляма ще й підвищувала б
+        // однорідність, тобто сама себе пропускала.
         return {
-            colors: kept.map(function (g) { return g.c; }),
-            coverage: kept.reduce(function (s, g) { return s + g.n; }, 0) / total
+            colors: light.map(function (g) { return g.c; }),
+            coverage: light.reduce(function (s, g) { return s + g.n; }, 0) / total
         };
+
+    }
+
+    // Чи впирається товар у межу кадру.
+    //
+    // Предметне фото — це товар УСЕРЕДИНІ кадру, з фоном навколо. Якщо
+    // кадр обрізає знімок (модель по пояс, макрозйомка нутрощів
+    // сумки), заливка йде вздовж товару всередину й з'їдає його.
+    function runsOffFrame(px, w, h, colors) {
+
+        var band = Math.max(2, Math.round(Math.min(w, h) * 0.01));
+
+        var top = 0, bottom = 0, left = 0, right = 0;
+        var x, y, d;
+
+        for (x = 0; x < w; x++) {
+            for (d = 0; d < band; d++) {
+                if (!matchesBackground(px, (d * w + x) * 4, colors)) top++;
+                if (!matchesBackground(px, ((h - 1 - d) * w + x) * 4, colors)) bottom++;
+            }
+        }
+
+        for (y = 0; y < h; y++) {
+            for (d = 0; d < band; d++) {
+                if (!matchesBackground(px, (y * w + d) * 4, colors)) left++;
+                if (!matchesBackground(px, (y * w + (w - 1 - d)) * 4, colors)) right++;
+            }
+        }
+
+        return Math.max(top / (w * band), bottom / (w * band),
+            left / (h * band), right / (h * band)) > EDGE_SHARE;
 
     }
 
@@ -280,7 +334,9 @@
             // кутів: кути після приведення до 4:5 показують добивку.
             uniform: found.coverage >= 0.9,
 
-            isWhite: found.colors.every(white)
+            isWhite: found.colors.every(white),
+
+            cropped: runsOffFrame(px, w, h, found.colors)
 
         };
 
@@ -310,6 +366,12 @@
 
         if (found.isWhite && chosen !== "white") {
             return { act: "keep", why: "фон уже білий" };
+        }
+
+        // Кадр обрізає товар — це не предметне фото. Не обходиться
+        // навіть примусово: саме тут заливка з'їдала моделей.
+        if (found.cropped) {
+            return { act: "keep", why: "кадр обрізає товар — фон тут не замінюємо" };
         }
 
         return { act: "white", why: null };
@@ -494,6 +556,8 @@
         MAX_VARIANCE: MAX_VARIANCE,
         ALREADY_WHITE: ALREADY_WHITE,
         MAX_SHARE: MAX_SHARE,
+        DARK_BACKGROUND: DARK_BACKGROUND,
+        EDGE_SHARE: EDGE_SHARE,
         PROBE_MAX: PROBE_MAX,
         PREVIEW_MAX: PREVIEW_MAX,
 

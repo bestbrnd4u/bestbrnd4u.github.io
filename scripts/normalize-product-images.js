@@ -68,7 +68,24 @@ function baseWebpFiles() {
 
 async function inspect(file) {
 
-    const meta = await sharp(path.join(DIR, file)).metadata();
+    const image = sharp(path.join(DIR, file));
+
+    const meta = await image.metadata();
+
+    // Закриваємо файл ОДРАЗУ.
+    //
+    // ЩО БУЛО НЕ ТАК. findOffCanvas() проганяє inspect по всіх 368
+    // знімках через Promise.all — тобто відкриває їх усі й тримає
+    // відкритими, поки не завершиться обхід. Далі normalize() пише в
+    // ті самі файли, і на Windows це падає:
+    //
+    //   Error: UNKNOWN: unknown error, open '…/ch857_b4mpl_a62.webp'
+    //
+    // Обробка зупинялась на першому ж такому файлі, а решта черги
+    // лишалась незачепленою. У CI (Linux) запис поверх відкритого
+    // файлу проходить, тож помилка чекала на того, хто запустить
+    // `npm run build:media` у себе.
+    if (typeof image.destroy === "function") image.destroy();
 
     return { file, width: meta.width, height: meta.height, ratio: +(meta.width / meta.height).toFixed(3) };
 
