@@ -4292,8 +4292,28 @@ body.mobile-filters-open .scroll-top{
 
 .gallery-slide-video,
 .gallery-slide-embed{
-    cursor:default;
     background:#000;
+}
+
+/* Відео в галереї — «живе фото»: смуги керування немає, тап по кадру
+   ставить на паузу й знімає з неї (див. assets/js/product.js).
+   Курсор мусить це показувати — інакше єдина підказка, що кадр
+   натискний, зникає разом зі смугою. */
+.gallery-slide-video{
+    cursor:pointer;
+}
+
+.gallery-slide-embed{
+    cursor:default;
+}
+
+/* Клавіатурний фокус видно: без смуги керування це єдина ознака, що
+   Пробіл зараз зупинить саме відео, а не гортатиме сторінку. */
+.gallery-slide-video:focus-visible{
+    outline:2px solid var(--secondary);
+    /* всередину, а не назовні: слайд обрізається по межах галереї,
+       і зовнішня рамка просто не була б видна */
+    outline-offset:-2px;
 }
 
 .gallery-slide-embed{
@@ -4952,7 +4972,18 @@ body.mobile-filters-open .scroll-top{
     transition:transform .25s ease;
 }
 
-.accordion-item.open .accordion-chevron{
+/* Стрілка розвертається у ВСІХ акордеонів, а не лише в характеристиках
+   товару.
+
+   ЩО БУЛО НЕ ТАК. Правило слухало тільки .accordion-item.open, а «Часті
+   запитання» на байєр-сервісі позначають відкритий пункт класом
+   .bayer-faq-item.open. Текст розгортався, стрілка лишалась дивитись
+   униз — тобто єдина позначка «відкрито / закрито» показувала неправду.
+
+   Селектор спільний навмисно: окреме правило поруч із .bayer-faq
+   означало б, що наступний акордеон повторить ту саму помилку. */
+.accordion-item.open .accordion-chevron,
+.bayer-faq-item.open .accordion-chevron{
     transform:rotate(180deg);
 }
 

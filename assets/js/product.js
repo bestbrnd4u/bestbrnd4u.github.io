@@ -673,16 +673,42 @@ function buildTrackMarkup(images, video, altText) {
         // а не порожній/чорний кадр, поки відео ще не почало
         // програватись; muted — без цього автозапуск при свайпі
         // (нижче, в setupGallery) заблокував би сам браузер
+        //
+        // БЕЗ controls — НАВМИСНО
+        // ------------------------
+        // У галереї відео стоїть у ряд із фотографіями й має читатись
+        // як «живе фото», а не як окремий плеєр. Смуга керування знизу
+        // (пауза, гучність, повний екран, три крапки) ламала цей ряд:
+        // на четвертому слайді фото, на пʼятому раптом чорна панель
+        // поверх товару.
+        //
+        // Керування нікуди не зникло:
+        //
+        //   тап по відео        пауза / продовження з того ж місця
+        //                       (setupGallery нижче);
+        //   тап по будь-якому   лайтбокс, а там відео вже зі
+        //   фото поруч         справжнім плеєром і повним екраном
+        //                       (assets/js/lightbox.js).
+        //
+        // Так само зроблено у швидкому перегляді картки
+        // (assets/js/ui.js) — щоб відео поводилось однаково скрізь,
+        // де воно стоїть поруч із фото.
+        //
+        // tabindex і role — щоб пауза лишалась доступною з клавіатури:
+        // рухома картинка без способу її зупинити це WCAG 2.2.2.
         videoSlide = `
             <video
                 class="gallery-slide gallery-slide-video"
                 src="${media.videoUrl}"
                 poster="${images[0] || "assets/images/no-image.png"}"
-                controls
                 muted
                 playsinline
                 loop
-                preload="metadata"></video>
+                preload="metadata"
+                disablepictureinpicture
+                tabindex="0"
+                role="button"
+                aria-label="Відео товару. Натисніть, щоб зупинити або продовжити"></video>
         `;
 
     } else if (media?.type === "embed") {
@@ -1411,6 +1437,35 @@ function setupMobileStickyCart() {
 
 }
 
+// Тап по відео в галереї: пауза ↔ продовження.
+//
+// ЧОМУ ОКРЕМА ФУНКЦІЯ, А НЕ ДВА РЯДКИ НА МІСЦІ
+// ---------------------------------------------
+// Її викликають із двох місць — клік мишею/пальцем і Пробіл/Enter із
+// клавіатури, — і обидва мусять однаково виставляти позначку
+// userPaused. Розійдуться — і пауза з клавіатури проживе до першого
+// скролу (див. syncActiveState).
+//
+// currentTime тут не чіпається НІДЕ: у цьому й суть — продовжуємо з
+// того місця, де зупинили.
+function toggleGalleryVideo(video) {
+
+    if (video.paused) {
+
+        delete video.dataset.userPaused;
+
+        video.play().catch(() => {});
+
+    } else {
+
+        video.dataset.userPaused = "1";
+
+        video.pause();
+
+    }
+
+}
+
 function setupGallery() {
 
     const track = document.getElementById("mainGalleryTrack");
@@ -1486,11 +1541,25 @@ function setupGallery() {
 
             if (i === index) {
 
+                // Людина сама зупинила відео тапом — не чіпаємо.
+                //
+                // Без цієї перевірки пауза жила б долі секунди:
+                // syncActiveState викликається на кожен скрол треку,
+                // і найближчий же виклик перемотав би відео на нуль і
+                // запустив знову. Тобто кнопки паузи ніби й немає.
+                if (slide.dataset.userPaused) return;
+
                 if (slide.paused) slide.currentTime = 0;
 
                 slide.play().catch(() => {});
 
             } else {
+
+                // Пішли з цього слайда — знімаємо позначку ручної
+                // паузи. Повернувшись, людина очікує знову побачити
+                // «живе фото», а не завмерлий кадр, який вона
+                // зупинила три слайди тому.
+                delete slide.dataset.userPaused;
 
                 slide.pause();
 
@@ -1669,22 +1738,64 @@ function setupGallery() {
 
         });
 
+        // Пауза з клавіатури.
+        //
+        // Смуги керування в галереї немає, а рухома картинка без
+        // способу її зупинити — це WCAG 2.2.2. Тому відео у фокусі
+        // слухає Пробіл і Enter, як звичайна кнопка (role="button"
+        // на ньому вже стоїть).
+        //
+        // preventDefault обовʼязковий: Пробіл за замовчуванням гортає
+        // сторінку, і галерея поїхала б з-під людини.
+        track.addEventListener("keydown", event => {
+
+            if (event.key !== " " && event.key !== "Enter") return;
+
+            const video = event.target.closest?.("video.gallery-slide-video");
+
+            if (!video) return;
+
+            event.preventDefault();
+
+            toggleGalleryVideo(video);
+
+        });
+
+        // Контекстне меню браузера на <video> пропонує «Показати
+        // елементи керування» й «Зберегти відео» — тобто рівно те, що
+        // ми щойно прибрали. Поруч фотографії, у яких перетягування
+        // теж вимкнене, тож поводимось однаково.
+        track.addEventListener("contextmenu", event => {
+
+            if (event.target.closest("video.gallery-slide-video")) event.preventDefault();
+
+        });
+
         // клік/тап по фото — відкриваємо повноекранний перегляд
         // з зумом (не спрацьовує, якщо це був свайп)
         track.addEventListener("click", event => {
 
             if (axis === "x") return;
 
+            // Тап по відео керує відтворенням, а не відкриває лайтбокс.
+            //
+            // Смуги керування в галереї немає навмисно (див.
+            // buildTrackMarkup), тож пауза тримається саме на цьому
+            // тапі — і тільки на ньому. Повторний тап продовжує з того
+            // ж місця: currentTime не чіпаємо взагалі.
+            const video = event.target.closest("video");
+
+            if (video) { toggleGalleryVideo(video); return; }
+
+            // iframe (YouTube/Vimeo) має власний плеєр усередині —
+            // клік туди наш, а не його.
+            if (event.target.closest("iframe")) return;
+
             if (typeof window.openLightbox !== "function") return;
 
             const slides = [...track.children];
             const activeIndex = currentSlideIndex();
             const activeSlide = slides[activeIndex];
-
-            // На слайді з відео тап по самому плеєру має керувати
-            // відтворенням, а не відкривати лайтбокс — інакше не
-            // можна було б поставити на паузу чи перемотати.
-            if (event.target.closest("video, iframe")) return;
 
             // Лайтбокс тепер показує і відео, тож передаємо ВСІ слайди
             // галереї, а не лише фото — інакше на відео зум просто
