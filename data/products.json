@@ -826,20 +826,48 @@
     ]
   },
   {
-    "title": "Жіноча сумка на плече JW PEI Gabbi Ruched Hobo Handbag",
+    "gender": [
+      "Жінкам"
+    ],
+    "color": "Зелений",
     "brand": "JW PEI",
-    "category": "Жіночі сумки",
-    "gender": "Жінкам",
     "price": 4400,
-    "description": "JW PEI Gabbi — сумка-хобо з характерною драпіровкою, яка зробила модель відомою. Округла форма, коротка ручка, носиться в руці або на згині лікоття. Два насичених кольори.",
+    "framing": {
+      "gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp": {
+        "zoom": 1,
+        "x": 50,
+        "y": 50,
+        "bg": "white"
+      },
+      "gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp": {
+        "zoom": 1,
+        "x": 50,
+        "y": 50,
+        "bg": "white"
+      },
+      "jwp-ma123-1.webp": {
+        "zoom": 1,
+        "x": 50,
+        "y": 50,
+        "bg": "white"
+      },
+      "jwp-ma123-3.webp": {
+        "zoom": 1,
+        "x": 50,
+        "y": 50,
+        "bg": "white"
+      }
+    },
+    "preOrder": false,
+    "slug": "jw-pei-zhinocha-sumka-na-pleche-jw-pei-gabbi-ruched-hobo-han",
     "variants": [
       {
         "color": "Зелений",
         "hex": "#06b454",
         "images": [
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=fb722b46",
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=42f811f7",
           "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-2.webp?v=0131a963",
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=71993a10"
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=2ff353f3"
         ],
         "sku": "B094QT219C"
       },
@@ -847,15 +875,16 @@
         "color": "Карамельний",
         "hex": "#f49657",
         "images": [
-          "assets/images/products/uploads/jwp-ma123-1.webp?v=68ce16e6",
+          "assets/images/products/uploads/jwp-ma123-1.webp?v=b592667d",
           "assets/images/products/uploads/jwp-ma123-2.webp?v=77a05cff",
-          "assets/images/products/uploads/jwp-ma123-3.webp?v=14dac462"
+          "assets/images/products/uploads/jwp-ma123-3.webp?v=d07299b5"
         ],
         "sku": "JWP-MA123"
       }
     ],
-    "isNew": false,
-    "sku": "B094QT219C",
+    "sizes": [
+      "ONESIZE"
+    ],
     "searchKeywords": [
       "джей ві пей",
       "jw pei",
@@ -871,19 +900,18 @@
       "ruched",
       "hobo"
     ],
-    "instagramBlock": "general",
-    "preOrder": false,
+    "isNew": false,
+    "title": "Жіноча сумка на плече JW PEI Gabbi Ruched Hobo Handbag",
     "images": [
       "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp",
       "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-2.webp",
       "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp"
     ],
-    "slug": "jw-pei-zhinocha-sumka-na-pleche-jw-pei-gabbi-ruched-hobo-han",
     "id": 14,
-    "color": "Зелений",
-    "sizes": [
-      "ONESIZE"
-    ]
+    "instagramBlock": "general",
+    "description": "JW PEI Gabbi — сумка-хобо з характерною драпіровкою, яка зробила модель відомою. Округла форма, коротка ручка, носиться в руці або на згині лікоття. Два насичених кольори.",
+    "sku": "B094QT219C",
+    "category": "Жіночі сумки"
   },
   {
     "title": "Жіноча сумочка JW PEI Maze Crossbody",
@@ -4231,8 +4259,8 @@
           "/assets/images/products/uploads/ca173_svvfq_a0.webp?v=274cb8ee",
           "/assets/images/products/uploads/ca173_svvfq_a5.webp?v=c14cae6b",
           "/assets/images/products/uploads/ca173_svvfq_a8.webp?v=b75e933e",
-          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=e8ca440c",
-          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=fdffcca3"
+          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=963c31ac",
+          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=b2e36bdd"
         ]
       }
     ],
