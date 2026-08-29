@@ -63,9 +63,9 @@
         "color": "Чорний",
         "hex": "#1d1f22",
         "images": [
-          "assets/images/products/uploads/arc54h01t-q11-1.webp?v=5f9196dd",
-          "assets/images/products/uploads/arc54h01t-q11-2.webp?v=d347b5b2",
-          "assets/images/products/uploads/arc54h01t-q11-3.webp?v=60bd0128"
+          "assets/images/products/uploads/arc54h01t-q11-1.webp?v=d4912cd3",
+          "assets/images/products/uploads/arc54h01t-q11-2.webp?v=08f5197d",
+          "assets/images/products/uploads/arc54h01t-q11-3.webp?v=bfeb6120"
         ],
         "sku": "ARC54H01T-Q11"
       }
@@ -112,9 +112,9 @@
         "color": "Чорний",
         "hex": "#1f2223",
         "images": [
-          "assets/images/products/uploads/rtladf952201-1.webp?v=6953871f",
-          "assets/images/products/uploads/rtladf952201-2.webp?v=82df2add",
-          "assets/images/products/uploads/rtladf952201-3.webp?v=2f414076",
+          "assets/images/products/uploads/rtladf952201-1.webp?v=dc7b43e3",
+          "assets/images/products/uploads/rtladf952201-2.webp?v=fbf3f3c3",
+          "assets/images/products/uploads/rtladf952201-3.webp?v=d1481e45",
           "assets/images/products/uploads/rtladf952201-4.webp?v=7b1f6308"
         ],
         "sku": "RTLADF952201"
@@ -326,7 +326,7 @@
         "color": "Коричневий",
         "hex": "#866751",
         "images": [
-          "assets/images/products/uploads/coach-ethan-cv918-qbnrx-1.webp?v=d8044e9d",
+          "assets/images/products/uploads/coach-ethan-cv918-qbnrx-1.webp?v=13ba89f4",
           "assets/images/products/uploads/coach-ethan-cv918-qbnrx-2.webp?v=e23fa060",
           "assets/images/products/uploads/coach-ethan-cv918-qbnrx-3.webp?v=0b3ab868",
           "assets/images/products/uploads/coach-ethan-cv918-qbnrx-4.webp?v=180016b7"
@@ -499,8 +499,8 @@
         "hex": "#3f3f3f",
         "images": [
           "assets/images/products/uploads/coach73995black-1.webp?v=4f4f5572",
-          "assets/images/products/uploads/coach73995black-2.webp?v=de9c949b",
-          "assets/images/products/uploads/coach73995black-3.webp?v=068ea85f"
+          "assets/images/products/uploads/coach73995black-2.webp?v=7ab21280",
+          "assets/images/products/uploads/coach73995black-3.webp?v=fadd972b"
         ],
         "sku": "coach73995black"
       },
@@ -509,8 +509,8 @@
         "hex": "#d2cac4",
         "images": [
           "assets/images/products/uploads/coach73995chalk-1.webp?v=827030be",
-          "assets/images/products/uploads/coach73995chalk-2.webp?v=53f8ee1e",
-          "assets/images/products/uploads/coach73995chalk-3.webp?v=0ac94559",
+          "assets/images/products/uploads/coach73995chalk-2.webp?v=3ee5bd38",
+          "assets/images/products/uploads/coach73995chalk-3.webp?v=af762261",
           "assets/images/products/uploads/coach73995chalk-4.webp?v=80b7610f"
         ],
         "sku": "coach73995chalk"
@@ -615,7 +615,7 @@
         "color": "Чорний",
         "hex": "#232323",
         "images": [
-          "assets/images/products/uploads/cp150-b4bk-a0-1.webp?v=5f9eb665",
+          "assets/images/products/uploads/cp150-b4bk-a0-1.webp?v=1ffffe4c",
           "assets/images/products/uploads/cp150-b4bk-a0-2.webp?v=0a816477",
           "assets/images/products/uploads/cp150-b4bk-a0-3.webp?v=e3281eea"
         ],
@@ -625,7 +625,7 @@
         "color": "Темно-коричневий",
         "hex": "#41251d",
         "images": [
-          "assets/images/products/uploads/cp150-b4mpl-1.webp?v=27aea95a",
+          "assets/images/products/uploads/cp150-b4mpl-1.webp?v=3d554c8a",
           "assets/images/products/uploads/cp150-b4mpl-2.webp?v=068ef263",
           "assets/images/products/uploads/cp150-b4mpl-3.webp?v=9978c22d"
         ],
@@ -790,9 +790,9 @@
         "color": "Чорний",
         "hex": "#242523",
         "images": [
-          "assets/images/products/uploads/jwpr-wy46-1.webp?v=d4a2a7b8",
-          "assets/images/products/uploads/jwpr-wy46-2.webp?v=22fd1b7c",
-          "assets/images/products/uploads/jwpr-wy46-3.webp?v=2a91d291"
+          "assets/images/products/uploads/jwpr-wy46-1.webp?v=38dbeb64",
+          "assets/images/products/uploads/jwpr-wy46-2.webp?v=ca0454c5",
+          "assets/images/products/uploads/jwpr-wy46-3.webp?v=0ba4725a"
         ],
         "sku": "JWPR-WY46"
       }
@@ -823,7 +823,15 @@
     "color": "Чорний",
     "sizes": [
       "ONESIZE"
-    ]
+    ],
+    "framing": {
+      "jwpr-wy46-3.webp": {
+        "zoom": 1,
+        "x": 50,
+        "y": 50,
+        "bg": "keep"
+      }
+    }
   },
   {
     "gender": [
@@ -865,9 +873,9 @@
         "color": "Зелений",
         "hex": "#06b454",
         "images": [
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=42f811f7",
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-2.webp?v=0131a963",
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=2ff353f3"
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=e8699724",
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-2.webp?v=7f7d7a02",
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=c164c532"
         ],
         "sku": "B094QT219C"
       },
@@ -875,9 +883,9 @@
         "color": "Карамельний",
         "hex": "#f49657",
         "images": [
-          "assets/images/products/uploads/jwp-ma123-1.webp?v=b592667d",
-          "assets/images/products/uploads/jwp-ma123-2.webp?v=77a05cff",
-          "assets/images/products/uploads/jwp-ma123-3.webp?v=d07299b5"
+          "assets/images/products/uploads/jwp-ma123-1.webp?v=65859f64",
+          "assets/images/products/uploads/jwp-ma123-2.webp?v=189c38d2",
+          "assets/images/products/uploads/jwp-ma123-3.webp?v=70cd8a18"
         ],
         "sku": "JWP-MA123"
       }
@@ -925,8 +933,8 @@
         "color": "Коричневий",
         "hex": "#af734e",
         "images": [
-          "assets/images/products/uploads/jwp-ma106-1.webp?v=3dbe36a0",
-          "assets/images/products/uploads/jwp-ma106-2.webp?v=239385ce",
+          "assets/images/products/uploads/jwp-ma106-1.webp?v=9dab5084",
+          "assets/images/products/uploads/jwp-ma106-2.webp?v=0bf0efb5",
           "assets/images/products/uploads/jwp-ma106-3.webp?v=b0f30608"
         ],
         "sku": "JWP-MA106"
@@ -980,10 +988,10 @@
         "color": "Синій",
         "hex": "#a084c4",
         "images": [
-          "assets/images/products/uploads/jwp-ma080-1.webp?v=bdc231a8",
-          "assets/images/products/uploads/jwp-ma080-2.webp?v=9d9e7be2",
-          "assets/images/products/uploads/jwp-ma080-3.webp?v=1f4d5e91",
-          "assets/images/products/uploads/jwp-ma080-4.webp?v=fea86f2c"
+          "assets/images/products/uploads/jwp-ma080-1.webp?v=5f5f4df2",
+          "assets/images/products/uploads/jwp-ma080-2.webp?v=417f553d",
+          "assets/images/products/uploads/jwp-ma080-3.webp?v=b072be2d",
+          "assets/images/products/uploads/jwp-ma080-4.webp?v=535c1575"
         ],
         "sku": "JWP-MA080"
       }
@@ -1334,9 +1342,9 @@
         "color": "Чорний",
         "hex": "#242426",
         "images": [
-          "assets/images/products/uploads/h652l01pf22-1.webp?v=93fbd3c2",
-          "assets/images/products/uploads/h652l01pf22-2.webp?v=549a59c2",
-          "assets/images/products/uploads/h652l01pf22-3.webp?v=2775a094"
+          "assets/images/products/uploads/h652l01pf22-1.webp?v=1ced16f7",
+          "assets/images/products/uploads/h652l01pf22-2.webp?v=62ce8928",
+          "assets/images/products/uploads/h652l01pf22-3.webp?v=911cb61c"
         ],
         "sku": "H652L01PF22"
       }
@@ -1837,7 +1845,7 @@
           "/assets/images/products/uploads/800070279777-1.jpg?v=7c99f762",
           "/assets/images/products/uploads/800070279777-3.jpg?v=9ed8bfc4",
           "/assets/images/products/uploads/800070279777-4.jpg?v=0bb2503d",
-          "/assets/images/products/uploads/torbica-love-moschino-jc4116pp1flt0000-nero.webp?v=8e91c4c4"
+          "/assets/images/products/uploads/torbica-love-moschino-jc4116pp1flt0000-nero.webp?v=59a731c3"
         ],
         "video": "/assets/images/products/uploads/video360_8058051562499_ak_1022p.mp4"
       }
@@ -2444,8 +2452,8 @@
         "hex": "#161616",
         "sizes": [],
         "images": [
-          "/assets/images/products/uploads/45sfa0001_075_02-1-.webp?v=f84c196d",
-          "/assets/images/products/uploads/45sfa0001_075_01.webp?v=eeff591f",
+          "/assets/images/products/uploads/45sfa0001_075_02-1-.webp?v=a2e31f48",
+          "/assets/images/products/uploads/45sfa0001_075_01.webp?v=967a2f31",
           "/assets/images/products/uploads/ss23-obm1w1-99x_f4.webp?v=eaf3d10c"
         ]
       }
@@ -2838,8 +2846,8 @@
           "/assets/images/products/uploads/25077124~black_0.webp?v=e133ec5c",
           "/assets/images/products/uploads/25077124~black_2.webp?v=4a53f677",
           "/assets/images/products/uploads/25077124~black_4.webp?v=54ac35fa",
-          "/assets/images/products/uploads/25077124~black_3.webp?v=85a462a5",
-          "/assets/images/products/uploads/25077124~black_1.webp?v=b1ebe30b"
+          "/assets/images/products/uploads/25077124~black_3.webp?v=5600db41",
+          "/assets/images/products/uploads/25077124~black_1.webp?v=00086367"
         ]
       }
     ],
@@ -3265,7 +3273,7 @@
           "/assets/images/products/uploads/27687307_57865310_2048.webp?v=ad162858",
           "/assets/images/products/uploads/27687307_57865301_2048.webp?v=3aab993d",
           "/assets/images/products/uploads/27687307_57865307_2048.webp?v=e3c159b9",
-          "/assets/images/products/uploads/27687307_57865304_2048.webp?v=64a4b6a7"
+          "/assets/images/products/uploads/27687307_57865304_2048.webp?v=c05d5a38"
         ]
       }
     ],
@@ -3644,7 +3652,7 @@
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--3eeb5b5d.webp?v=92578216",
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--e6d79062.webp?v=40d15638",
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--8fc5eccc.webp?v=4e0dd752",
-          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--20634337.webp?v=3c7d310d",
+          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--20634337.webp?v=77e63951",
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--3bae4de6.webp?v=666555e6"
         ]
       }
@@ -3719,7 +3727,7 @@
           "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-d0dd33cf.webp?v=89145062",
           "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-de081418.webp?v=1d737f86",
           "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-628c7ef0.webp?v=4e2139a7",
-          "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-twine-h009l01sp21-914-800x800.webp?v=e0d17288"
+          "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-twine-h009l01sp21-914-800x800.webp?v=48806234"
         ]
       }
     ],
@@ -3973,12 +3981,12 @@
         "color": "Айворі",
         "hex": "#e9e4e4",
         "images": [
-          "/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model.webp?v=b0d006b5",
-          "/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model3.webp?v=8956bcf6",
+          "/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model.webp?v=c45247a5",
+          "/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model3.webp?v=d7a3fd39",
           "/assets/images/products/uploads/11a5edba3e0242ac110004.webp?v=879458dc",
           "/assets/images/products/uploads/71-zo1liwrl._ac_sy625_.webp?v=68440b8b",
-          "/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model2.webp?v=953c35f7",
-          "/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model4.webp?v=85170b83"
+          "/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model2.webp?v=d02399b3",
+          "/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model4.webp?v=13f6c6e2"
         ]
       }
     ],
@@ -4053,10 +4061,10 @@
         "hex": "#d4cfcf",
         "images": [
           "/assets/images/products/uploads/rtlafd950301_33497199_1_v1_2x.webp?v=97ae59fa",
-          "/assets/images/products/uploads/rtlafd950301_33497201_2_v1_2x.webp?v=5a605c15",
+          "/assets/images/products/uploads/rtlafd950301_33497201_2_v1_2x.webp?v=1495f53c",
           "/assets/images/products/uploads/rtlafd950301_33497202_3_v1_2x.webp?v=b98abf60",
           "/assets/images/products/uploads/rtlafd950301_33497204_4_v1_2x.webp?v=45e8e115",
-          "/assets/images/products/uploads/rtlafd950301_33526729_9_v1_2x.webp?v=b6c951e2"
+          "/assets/images/products/uploads/rtlafd950301_33526729_9_v1_2x.webp?v=f716ea50"
         ],
         "sku": "213BA007-3063-510"
       },
@@ -4067,7 +4075,7 @@
         "images": [
           "/assets/images/products/uploads/rtlafe837901_33595360_1_v1_2x.webp?v=b5328c67",
           "/assets/images/products/uploads/rtlafe837901_33595361_2_v1_2x.webp?v=c834b78e",
-          "/assets/images/products/uploads/rtlafe837901_33595363_4_v1_2x.webp?v=cf322183",
+          "/assets/images/products/uploads/rtlafe837901_33595363_4_v1_2x.webp?v=cd6c1754",
           "/assets/images/products/uploads/rtlafe837901_33634337_9_v1_2x.webp?v=8717973d"
         ]
       }
@@ -4140,7 +4148,7 @@
           "/assets/images/products/uploads/215679033_blue_bk.webp?v=0fee1b0a",
           "/assets/images/products/uploads/215679033_blue_cu.webp?v=98af55d3",
           "/assets/images/products/uploads/215679033_blue_e1.webp?v=84f25ad7",
-          "/assets/images/products/uploads/215679033_blue_fr.webp?v=c9c59833"
+          "/assets/images/products/uploads/215679033_blue_fr.webp?v=eafc13bd"
         ]
       }
     ],
@@ -4259,8 +4267,8 @@
           "/assets/images/products/uploads/ca173_svvfq_a0.webp?v=274cb8ee",
           "/assets/images/products/uploads/ca173_svvfq_a5.webp?v=c14cae6b",
           "/assets/images/products/uploads/ca173_svvfq_a8.webp?v=b75e933e",
-          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=963c31ac",
-          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=b2e36bdd"
+          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=14fe819e",
+          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=b9a3dfce"
         ]
       }
     ],
@@ -4404,7 +4412,7 @@
         "images": [
           "/assets/images/products/uploads/ihjbihj.webp?v=3dd19685",
           "/assets/images/products/uploads/p00545136_d2.webp?v=c636a98b",
-          "/assets/images/products/uploads/p00545136_d1.webp?v=d2302f85",
+          "/assets/images/products/uploads/p00545136_d1.webp?v=4940d6cf",
           "/assets/images/products/uploads/uhjvbyubjhmyjhbmn.webp?v=d959e7a2",
           "/assets/images/products/uploads/jbb.webp?v=4f6dde29"
         ]
@@ -4798,9 +4806,9 @@
         "color": "Чорний",
         "hex": "#000000",
         "images": [
-          "/assets/images/products/uploads/main.webp?v=bac2648f",
-          "/assets/images/products/uploads/1.webp?v=b5921ccc",
-          "/assets/images/products/uploads/3.webp?v=52d7596f",
+          "/assets/images/products/uploads/main.webp?v=802e1bcb",
+          "/assets/images/products/uploads/1.webp?v=c6cbc64e",
+          "/assets/images/products/uploads/3.webp?v=dfe1876e",
           "/assets/images/products/uploads/81.webp?v=a20b2a6a"
         ]
       }
@@ -4927,7 +4935,7 @@
         "color": "Чорний",
         "hex": "#000000",
         "images": [
-          "/assets/images/products/uploads/a0e43776-063b-4643-8c36-5024406361e9.webp?v=01af95e4",
+          "/assets/images/products/uploads/a0e43776-063b-4643-8c36-5024406361e9.webp?v=7144a95e",
           "/assets/images/products/uploads/cfeba1dc-4b88-4f3b-984b-b5bebd478c1f.jpg?v=0f28bad7",
           "/assets/images/products/uploads/33751393-b64e-49d3-b0c9-2e3bde1afaff.jpg?v=7b1a8ec9",
           "/assets/images/products/uploads/aa00-okd0j9_99x_f9.webp?v=5c7f8ff0"
@@ -5481,13 +5489,13 @@
         "hex": "#e6e1e1",
         "sku": "CH857-B4/HA",
         "images": [
-          "/assets/images/products/uploads/ch857_b4ha_a0.webp?v=e4bdcada",
-          "/assets/images/products/uploads/ch857_b4ha_a3.webp?v=e04856fb",
-          "/assets/images/products/uploads/ch857_b4ha_a8.webp?v=9e3d5b13",
-          "/assets/images/products/uploads/ch857_b4ha_a21.webp?v=dda2a793",
-          "/assets/images/products/uploads/ch857_b4ha_a99.webp?v=6421aab0",
-          "/assets/images/products/uploads/ch857_b4ha_a61.webp?v=5fdb8a47",
-          "/assets/images/products/uploads/ch857_b4ha_a92.webp?v=a86a0515"
+          "/assets/images/products/uploads/ch857_b4ha_a0.webp?v=5509ea0e",
+          "/assets/images/products/uploads/ch857_b4ha_a3.webp?v=7480d9d4",
+          "/assets/images/products/uploads/ch857_b4ha_a8.webp?v=4fb9833a",
+          "/assets/images/products/uploads/ch857_b4ha_a21.webp?v=2c9c1a74",
+          "/assets/images/products/uploads/ch857_b4ha_a99.webp?v=a94afef4",
+          "/assets/images/products/uploads/ch857_b4ha_a61.webp?v=19ded042",
+          "/assets/images/products/uploads/ch857_b4ha_a92.webp?v=208577da"
         ]
       },
       {
@@ -5495,11 +5503,11 @@
         "hex": "#000000",
         "color": "Чорний",
         "images": [
-          "/assets/images/products/uploads/ch857_b4bk_a0.webp?v=186970bc",
-          "/assets/images/products/uploads/ch857_b4bk_a3.webp?v=e7985540",
-          "/assets/images/products/uploads/ch857_b4bk_a8.webp?v=6d143b15",
-          "/assets/images/products/uploads/ch857_b4bk_a61.webp?v=984a7b86",
-          "/assets/images/products/uploads/ch857_b4bk_a92.webp?v=49ce0f4f"
+          "/assets/images/products/uploads/ch857_b4bk_a0.webp?v=4a2c4a69",
+          "/assets/images/products/uploads/ch857_b4bk_a3.webp?v=815dd9f6",
+          "/assets/images/products/uploads/ch857_b4bk_a8.webp?v=32da6375",
+          "/assets/images/products/uploads/ch857_b4bk_a61.webp?v=bf5c9a7a",
+          "/assets/images/products/uploads/ch857_b4bk_a92.webp?v=2dfea921"
         ]
       },
       {
@@ -5507,9 +5515,9 @@
         "hex": "#bc7316",
         "sku": "CH857-B4/Amber-Brown.",
         "images": [
-          "/assets/images/products/uploads/ch857_b4yu1_a0.webp?v=0a2184cd",
-          "/assets/images/products/uploads/ch857_b4yu1_a3.webp?v=4a2a38ca",
-          "/assets/images/products/uploads/ch857_b4yu1_a8.webp?v=c32ebbf2"
+          "/assets/images/products/uploads/ch857_b4yu1_a0.webp?v=1ca4b3b9",
+          "/assets/images/products/uploads/ch857_b4yu1_a3.webp?v=cd25b8e8",
+          "/assets/images/products/uploads/ch857_b4yu1_a8.webp?v=5302f3a2"
         ]
       },
       {
@@ -5517,11 +5525,11 @@
         "hex": "#771e1e",
         "sku": "CH857-B4MPL",
         "images": [
-          "/assets/images/products/uploads/ch857_b4mpl_a0.webp?v=50fd17fa",
-          "/assets/images/products/uploads/ch857_b4mpl_a5.webp?v=ce55b0f7",
-          "/assets/images/products/uploads/ch857_b4mpl_a6.webp?v=7765093b",
-          "/assets/images/products/uploads/ch857_b4mpl_a62.webp?v=b80bbd61",
-          "/assets/images/products/uploads/ch857_b4mpl_a92.webp?v=86f4ee2e"
+          "/assets/images/products/uploads/ch857_b4mpl_a0.webp?v=d75a1a37",
+          "/assets/images/products/uploads/ch857_b4mpl_a5.webp?v=fc448556",
+          "/assets/images/products/uploads/ch857_b4mpl_a6.webp?v=5adb2de6",
+          "/assets/images/products/uploads/ch857_b4mpl_a62.webp?v=bf32151d",
+          "/assets/images/products/uploads/ch857_b4mpl_a92.webp?v=521625a5"
         ]
       }
     ],
