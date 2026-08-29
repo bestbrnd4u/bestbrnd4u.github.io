@@ -1,0 +1,56 @@
+{
+  "gender": [
+    "Жінкам"
+  ],
+  "preOrderDays": "10-14 робочих днів",
+  "forcePublish": false,
+  "material": "Корпус і браслет — нержавіюча сталь; скло — мінеральне",
+  "brand": "Michael Kors",
+  "price": 5100,
+  "preOrder": true,
+  "dimensions": "2,6 × 2,6 × 0,8 см",
+  "variants": [
+    {
+      "color": "Сріблястий / червоний",
+      "hex": "#891919",
+      "images": [
+        "/assets/images/products/uploads/michael-kors-mini-lexington-quartz-red-dial-ladies-watch-mk4968.webp",
+        "/assets/images/products/uploads/michael-kors-mini-lexington-quartz-red-dial-ladies-watch-mk4968_2.webp",
+        "/assets/images/products/uploads/michael-kors-mini-lexington-quartz-red-dial-ladies-watch-mk4968_3.webp"
+      ]
+    }
+  ],
+  "preOrderPrepayment": 100,
+  "strapInfo": "Сталевий браслет сріблястого кольору шириною 1,4 см із розкладною застібкою",
+  "sizes": [
+    "Onesize"
+  ],
+  "splitByColor": true,
+  "searchKeywords": [
+    "Michael Kors Lexington",
+    "Michael Kors Mini Lexington",
+    "Michael Kors MK4968",
+    "MK4968",
+    "годинник Michael Kors",
+    "жіночий годинник Michael Kors",
+    "жіночий наручний годинник",
+    "кварцовий годинник",
+    "сріблястий годинник",
+    "червоний годинник",
+    "годинник із червоним циферблатом",
+    "годинник зі сталевим браслетом",
+    "годинник із pavé",
+    "мініатюрний жіночий годинник",
+    "елегантний годинник",
+    "брендовий годинник",
+    "оригінальний Michael Kors"
+  ],
+  "isNew": false,
+  "title": "Жіночий годинник Michael Kors Mini Lexington Pavé MK4968",
+  "reviews": 0,
+  "instagramBlock": "general",
+  "description": "Елегантний жіночий годинник Michael Kors Mini Lexington Pavé у сріблястому виконанні з виразним червоним циферблатом. Мініатюрний круглий корпус доповнений декоративним безелем та pavé-індексами, що додають моделі витонченого блиску.\nГодинник оснащений точним кварцовим механізмом із трьома стрілками. Червоний циферблат має ефектний променистий фініш, а корпус і браслет виконані з нержавіючої сталі. Мінеральне скло захищає циферблат, водонепроникність — до 50 м (5 ATM)",
+  "sku": "MK4968",
+  "rating": 5,
+  "category": "Годинники"
+}
