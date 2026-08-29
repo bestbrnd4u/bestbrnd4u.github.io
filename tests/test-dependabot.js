@@ -89,5 +89,40 @@ console.log("\n[4] Конфіг відповідає реальному репо
         distinct.length > 1, `${distinct.length} шт.`);
 }
 
+console.log("\n[lock] package.json і package-lock.json не розходяться");
+{
+  // РЕГРЕСІЯ, ЯКА ПОКЛАЛА CI
+  //
+  // Пакет поставили з --no-save, а в package.json дописали руками. У
+  // локі його не з'явилось — і `npm ci` впав:
+  //
+  //   npm error `npm ci` can only install packages when your
+  //   package.json and package-lock.json are in sync.
+  //   npm error Missing: onnxruntime-node@1.29.0 from lock file
+  //
+  // Локально нічого не падає: там уже стоїть `npm install`, який
+  // розбіжність мовчки лікує. Видно її тільки в CI, на чистій установці.
+  const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, "package.json"), "utf8"));
+  const lock = JSON.parse(fs.readFileSync(path.join(ROOT, "package-lock.json"), "utf8"));
+
+  const root = (lock.packages && lock.packages[""]) || {};
+
+  const wanted = pkg.devDependencies || {};
+  const mirrored = root.devDependencies || {};
+
+  const розійшлись = Object.keys(wanted)
+    .filter(name => mirrored[name] !== wanted[name])
+    .map(name => `${name}: package.json ${wanted[name]}, лок ${mirrored[name] || "немає"}`);
+
+  check("діапазони версій у локі ті самі, що в package.json",
+        розійшлись.length === 0, розійшлись.join("; "));
+
+  const безЗапису = Object.keys(wanted)
+    .filter(name => !lock.packages[`node_modules/${name}`]);
+
+  check("кожна залежність має запис у локі",
+        безЗапису.length === 0, безЗапису.join(", "));
+}
+
 console.log(failures===0?"\n✅ Усі перевірки пройдено":`\n❌ Провалено: ${failures}`);
 process.exit(failures===0?0:1);
