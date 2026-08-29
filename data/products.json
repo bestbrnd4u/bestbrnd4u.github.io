@@ -1,7 +1,9 @@
 [
   {
     "gender": [
-      "Унісекс"
+      "Унісекс",
+      "Жінкам",
+      "Чоловікам"
     ],
     "color": "Темно-сірий",
     "brand": "Alain Mikli",
@@ -873,9 +875,9 @@
         "color": "Зелений",
         "hex": "#06b454",
         "images": [
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=e20bbf0e",
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=34c05752",
           "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-2.webp?v=7f7d7a02",
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=45e0781f"
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=36871106"
         ],
         "sku": "B094QT219C"
       },
@@ -883,9 +885,9 @@
         "color": "Карамельний",
         "hex": "#f49657",
         "images": [
-          "assets/images/products/uploads/jwp-ma123-1.webp?v=555671ea",
+          "assets/images/products/uploads/jwp-ma123-1.webp?v=5a90c872",
           "assets/images/products/uploads/jwp-ma123-2.webp?v=189c38d2",
-          "assets/images/products/uploads/jwp-ma123-3.webp?v=b4aae822"
+          "assets/images/products/uploads/jwp-ma123-3.webp?v=d871eb1e"
         ],
         "sku": "JWP-MA123"
       }
@@ -4267,8 +4269,8 @@
           "/assets/images/products/uploads/ca173_svvfq_a0.webp?v=274cb8ee",
           "/assets/images/products/uploads/ca173_svvfq_a5.webp?v=c14cae6b",
           "/assets/images/products/uploads/ca173_svvfq_a8.webp?v=b75e933e",
-          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=4311ebf9",
-          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=0daecfd8"
+          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=d089c2da",
+          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=c5b42e07"
         ]
       }
     ],
