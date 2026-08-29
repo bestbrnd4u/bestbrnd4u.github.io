@@ -24,7 +24,7 @@
   "preOrderPrepayment": 100,
   "strapInfo": "Браслет із нержавіючої сталі",
   "sizes": [
-    "Onesize"
+    "ONESIZE"
   ],
   "splitByColor": true,
   "searchKeywords": [
@@ -52,5 +52,17 @@
   "description": "Стильний чоловічий годинник Michael Kors Billie з функцією хронографа — поєднання спортивного характеру та класичної елегантності. Модель оснащена кварцовим механізмом, багатофункціональним циферблатом та міцним металевим браслетом.\nГодинник має виразний корпус і деталі циферблата, що створюють сучасний та впевнений образ. Завдяки універсальному дизайну модель підходить як для повсякденного носіння, так і для більш ділових образів",
   "sku": "MK9254",
   "rating": 5,
-  "category": "Годинники"
+  "category": "Годинники",
+  "legacySlugs": [
+    "чоловічий-годинник-michael-kors-billie-chronograph"
+  ],
+  "slug": "cholovichyi-hodynnyk-michael-kors-billie-chronograph",
+  "id": 88,
+  "color": "Чорний / золотистий",
+  "images": [
+    "/assets/images/products/uploads/загрузка.webp",
+    "/assets/images/products/uploads/загрузка-1-.webp",
+    "/assets/images/products/uploads/загрузка-2-.webp",
+    "/assets/images/products/uploads/загрузка-1-1-.webp"
+  ]
 }

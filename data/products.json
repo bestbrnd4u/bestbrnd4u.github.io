@@ -879,9 +879,9 @@
         "color": "Зелений",
         "hex": "#06b454",
         "images": [
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=5cf46460",
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=aadc81d7",
           "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-2.webp?v=7f7d7a02",
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=cd8451f3"
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=d0800e16"
         ],
         "sku": "B094QT219C"
       },
@@ -889,9 +889,9 @@
         "color": "Карамельний",
         "hex": "#f49657",
         "images": [
-          "assets/images/products/uploads/jwp-ma123-1.webp?v=9e27af1f",
+          "assets/images/products/uploads/jwp-ma123-1.webp?v=694d69e0",
           "assets/images/products/uploads/jwp-ma123-2.webp?v=189c38d2",
-          "assets/images/products/uploads/jwp-ma123-3.webp?v=c565ff7d"
+          "assets/images/products/uploads/jwp-ma123-3.webp?v=bbd0e428"
         ],
         "sku": "JWP-MA123"
       }
@@ -4287,8 +4287,8 @@
           "/assets/images/products/uploads/ca173_svvfq_a0.webp?v=274cb8ee",
           "/assets/images/products/uploads/ca173_svvfq_a5.webp?v=c14cae6b",
           "/assets/images/products/uploads/ca173_svvfq_a8.webp?v=b75e933e",
-          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=9127de96",
-          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=b388b2b9"
+          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=9935b6d6",
+          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=87bde765"
         ]
       }
     ],
@@ -6278,6 +6278,74 @@
       "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_2.webp",
       "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_3.webp",
       "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_5.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Чоловікам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Нержавіюча сталь",
+    "brand": "Michael Kors",
+    "price": 6600,
+    "preOrder": true,
+    "dimensions": "Корпус — 4,4 см у діаметрі",
+    "variants": [
+      {
+        "color": "Чорний / золотистий",
+        "hex": "#1f2f8c",
+        "images": [
+          "/assets/images/products/uploads/загрузка.webp?v=6b354cc1",
+          "/assets/images/products/uploads/загрузка-1-.webp?v=af6915c8",
+          "/assets/images/products/uploads/загрузка-2-.webp?v=f55a0f58",
+          "/assets/images/products/uploads/загрузка-1-1-.webp?v=c7db06fb"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Браслет із нержавіючої сталі",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Michael Kors",
+      "Michael Kors Billie",
+      "Billie Chronograph",
+      "MK9254",
+      "годинник Michael Kors",
+      "чоловічий годинник",
+      "чоловічий наручний годинник",
+      "кварцовий годинник",
+      "годинник з хронографом",
+      "хронограф",
+      "металевий годинник",
+      "брендовий годинник",
+      "оригінальний Michael Kors",
+      "стильний чоловічий годинник",
+      "класичний чоловічий годинник",
+      "модний годинник"
+    ],
+    "isNew": false,
+    "title": "Чоловічий годинник Michael Kors Billie Chronograph",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильний чоловічий годинник Michael Kors Billie з функцією хронографа — поєднання спортивного характеру та класичної елегантності. Модель оснащена кварцовим механізмом, багатофункціональним циферблатом та міцним металевим браслетом.\nГодинник має виразний корпус і деталі циферблата, що створюють сучасний та впевнений образ. Завдяки універсальному дизайну модель підходить як для повсякденного носіння, так і для більш ділових образів",
+    "sku": "MK9254",
+    "rating": 5,
+    "category": "Годинники",
+    "legacySlugs": [
+      "чоловічий-годинник-michael-kors-billie-chronograph"
+    ],
+    "slug": "cholovichyi-hodynnyk-michael-kors-billie-chronograph",
+    "id": 88,
+    "color": "Чорний / золотистий",
+    "images": [
+      "/assets/images/products/uploads/загрузка.webp",
+      "/assets/images/products/uploads/загрузка-1-.webp",
+      "/assets/images/products/uploads/загрузка-2-.webp",
+      "/assets/images/products/uploads/загрузка-1-1-.webp"
     ]
   }
 ]
