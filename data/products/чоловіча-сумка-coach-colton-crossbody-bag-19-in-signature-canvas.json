@@ -1,0 +1,103 @@
+{
+  "gender": [
+    "Чоловікам"
+  ],
+  "preOrderDays": "10-14 робочих днів",
+  "forcePublish": false,
+  "material": "Зерниста натуральна шкіра - Refined Pebble Leather",
+  "brand": "COACH",
+  "price": 7400,
+  "preOrder": true,
+  "dimensions": "18 × 10 × 5 см",
+  "variants": [
+    {
+      "color": "Silver/Deep Blue",
+      "hex": "#1d4e86",
+      "sku": "CET66SV/SMU",
+      "images": [
+        "/assets/images/products/uploads/cet66_svsmu_a0.webp",
+        "/assets/images/products/uploads/cet66_svsmu_a3.webp",
+        "/assets/images/products/uploads/cet66_svsmu_a8.webp",
+        "/assets/images/products/uploads/cet66_svsmu_a91.webp"
+      ]
+    },
+    {
+      "color": "Signature Canvas / Matte Black / Tan Black",
+      "hex": "#6f3913",
+      "sku": "CET55MWNQ6",
+      "images": [
+        "/assets/images/products/uploads/cet55_mwnq6_a0.webp",
+        "/assets/images/products/uploads/cet55_mwnq6_a3.webp",
+        "/assets/images/products/uploads/cet55_mwnq6_a8.webp",
+        "/assets/images/products/uploads/cet55_mwnq6_a91.webp"
+      ]
+    },
+    {
+      "color": "Signature canvas/Matte Black/Black Signature",
+      "hex": "#5c5757",
+      "sku": "CET55MWNQ6",
+      "images": [
+        "/assets/images/products/uploads/cet55_mwoy2_a0.webp",
+        "/assets/images/products/uploads/cet55_mwoy2_a3.webp",
+        "/assets/images/products/uploads/cet55_mwoy2_a8.webp",
+        "/assets/images/products/uploads/cet55_mwoy2_a91.webp"
+      ]
+    },
+    {
+      "color": "Pebbled leather/Silver/Black",
+      "hex": "#0b0000",
+      "sku": "CET55SV/BK",
+      "images": [
+        "/assets/images/products/uploads/cet66_svbk_a0.webp",
+        "/assets/images/products/uploads/cet66_svbk_a3.webp",
+        "/assets/images/products/uploads/cet66_svbk_a8.webp",
+        "/assets/images/products/uploads/cet66_svbk_a91.webp"
+      ]
+    },
+    {
+      "color": "Pebbled leather/Silver/Maple",
+      "hex": "#641313",
+      "sku": "SVMPL",
+      "images": [
+        "/assets/images/products/uploads/cet66_svmpl_a0.webp",
+        "/assets/images/products/uploads/cet66_svmpl_a3.webp",
+        "/assets/images/products/uploads/cet66_svmpl_a8.webp",
+        "/assets/images/products/uploads/cet66_svmpl_a91.webp"
+      ]
+    }
+  ],
+  "preOrderPrepayment": 100,
+  "strapInfo": "Регульований плечовий ремінь для носіння через плече або кросбоді",
+  "sizes": [
+    "Onesize"
+  ],
+  "splitByColor": true,
+  "searchKeywords": [
+    "COACH",
+    "Coach Colton",
+    "Colton Crossbody Bag 19",
+    "сумка Coach",
+    "Coach кросбоді",
+    "сумка кросбоді",
+    "чоловіча сумка Coach",
+    "жіноча сумка Coach",
+    "шкіряна сумка",
+    "шкіряна сумка через плече",
+    "сумка через плече",
+    "кросбоді Coach",
+    "маленька сумка",
+    "компактна сумка",
+    "синя сумка",
+    "темно-синя сумка",
+    "брендові сумки",
+    "оригінальна Coach",
+    "сумка на кожен день"
+  ],
+  "isNew": false,
+  "title": "Чоловіча сумка COACH Colton Crossbody Bag 19 In Signature Canvas",
+  "reviews": 0,
+  "instagramBlock": "general",
+  "description": "Компактна та практична сумка COACH Colton Crossbody Bag 19 — чудовий варіант для повсякденного використання. Модель виготовлена з високоякісної зернистої шкіри та має лаконічний дизайн із металевою фурнітурою сріблястого кольору.\nСумка закривається на блискавку та має зовнішню кишеню на блискавці з двома слотами для банківських карток. Компактний формат дозволяє зручно розмістити необхідні речі, а сумка вміщує навіть iPhone 14 Pro Max.\nРегульований ремінь дозволяє носити модель через плече або кросбоді, забезпечуючи комфорт у повсякденному використанні",
+  "rating": 5,
+  "category": "Чоловічі сумки"
+}
