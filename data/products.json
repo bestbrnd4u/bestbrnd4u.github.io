@@ -879,9 +879,9 @@
         "color": "Зелений",
         "hex": "#06b454",
         "images": [
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=d214114a",
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=9956c96d",
           "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-2.webp?v=7f7d7a02",
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=7eb30d16"
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=4d859be5"
         ],
         "sku": "B094QT219C"
       },
@@ -889,9 +889,9 @@
         "color": "Карамельний",
         "hex": "#f49657",
         "images": [
-          "assets/images/products/uploads/jwp-ma123-1.webp?v=f0aa1bf4",
+          "assets/images/products/uploads/jwp-ma123-1.webp?v=cbbfcb8f",
           "assets/images/products/uploads/jwp-ma123-2.webp?v=189c38d2",
-          "assets/images/products/uploads/jwp-ma123-3.webp?v=96a562c8"
+          "assets/images/products/uploads/jwp-ma123-3.webp?v=8328392d"
         ],
         "sku": "JWP-MA123"
       }
@@ -4287,8 +4287,8 @@
           "/assets/images/products/uploads/ca173_svvfq_a0.webp?v=274cb8ee",
           "/assets/images/products/uploads/ca173_svvfq_a5.webp?v=c14cae6b",
           "/assets/images/products/uploads/ca173_svvfq_a8.webp?v=b75e933e",
-          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=9fc4bee6",
-          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=ba9c8930"
+          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=47fbd67a",
+          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=ba565fb2"
         ]
       }
     ],
@@ -5866,7 +5866,7 @@
           "/assets/images/products/uploads/4011_qbbk_a0.webp?v=0e192fb2",
           "/assets/images/products/uploads/4011_qbbk_a3.webp?v=99595213",
           "/assets/images/products/uploads/houstonflightbag2propfamily_a6.webp?v=aff55aaf",
-          "/assets/images/products/uploads/4011_qbbk_a91.webp?v=246af01f"
+          "/assets/images/products/uploads/4011_qbbk_a91.webp?v=0b48a827"
         ]
       }
     ],
@@ -5936,6 +5936,87 @@
       "/assets/images/products/uploads/cz398_qbmi5_a3.webp",
       "/assets/images/products/uploads/cz398_qbmi5_a8.webp",
       "/assets/images/products/uploads/cz398_qbmi5_a91.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Чоловікам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Фірмова зерниста шкіра Signature та зерниста шкіра; внутрішня підкладка — перероблений поліестер",
+    "brand": "Coach",
+    "price": 8000,
+    "preOrder": true,
+    "dimensions": "22 × 26 × 5 см",
+    "variants": [
+      {
+        "color": "Чорний",
+        "hex": "#000000",
+        "images": [
+          "/assets/images/products/uploads/ces89_svbk_a0.webp?v=ef9e6e56",
+          "/assets/images/products/uploads/ces89_svbk_a5.webp?v=1891e188",
+          "/assets/images/products/uploads/ces89_svbk_a8.webp?v=cb4034fd",
+          "/assets/images/products/uploads/ces89_svbk_a91.webp?v=23e0971b"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Регульований плечовий ремінь. Можна носити через плече або кросбоді. Довжина падіння ременя — приблизно",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "COACH",
+      "Coach Tristan",
+      "Tristan Crossbody Bag 22",
+      "сумка Coach",
+      "сумка кросбоді Coach",
+      "чоловіча сумка Coach",
+      "жіноча сумка Coach",
+      "шкіряна сумка",
+      "шкіряна сумка через плече",
+      "сумка через плече",
+      "кросбоді",
+      "чорна сумка",
+      "чорна шкіряна сумка",
+      "брендові сумки",
+      "оригінальна Coach",
+      "сумка на кожен день",
+      "повсякденна сумка"
+    ],
+    "isNew": false,
+    "title": "Чоловіча сумка COACH Tristan Crossbody Bag In Signature Leather",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильна та функціональна сумка COACH Tristan Crossbody Bag 22, виконана з фірмової зернистої шкіри Signature. Модель має зручний вертикальний формат та продуманий внутрішній простір для повсякденних речей.\nСумка оснащена основним відділенням на блискавці, внутрішньою кишенею на кнопці, а також зовнішніми кишенями на блискавці та магнітній кнопці. Регульований ремінь дозволяє носити модель через плече або кросбоді.\nЛаконічний дизайн, фірмове виконання COACH та практичний формат роблять Tristan чудовим вибором на кожен день",
+    "sku": "CES89SV/BK",
+    "rating": 5,
+    "category": "Чоловічі сумки",
+    "framing": {
+      "ces89_svbk_a5.webp": {
+        "zoom": 1.49,
+        "x": 46,
+        "y": 59
+      },
+      "ces89_svbk_a8.webp": {
+        "zoom": 1.49,
+        "x": 46,
+        "y": 50
+      }
+    },
+    "legacySlugs": [
+      "чоловіча-сумка-coach-tristan-crossbody-bag-in-signature-leather"
+    ],
+    "slug": "cholovicha-sumka-coach-tristan-crossbody-bag-in-signature-leather",
+    "id": 85,
+    "color": "Чорний",
+    "images": [
+      "/assets/images/products/uploads/ces89_svbk_a0.webp",
+      "/assets/images/products/uploads/ces89_svbk_a5.webp",
+      "/assets/images/products/uploads/ces89_svbk_a8.webp",
+      "/assets/images/products/uploads/ces89_svbk_a91.webp"
     ]
   }
 ]

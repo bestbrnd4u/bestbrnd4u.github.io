@@ -24,7 +24,7 @@
   "preOrderPrepayment": 100,
   "strapInfo": "Регульований плечовий ремінь. Можна носити через плече або кросбоді. Довжина падіння ременя — приблизно",
   "sizes": [
-    "Onesize"
+    "ONESIZE"
   ],
   "splitByColor": true,
   "searchKeywords": [
@@ -53,5 +53,29 @@
   "description": "Стильна та функціональна сумка COACH Tristan Crossbody Bag 22, виконана з фірмової зернистої шкіри Signature. Модель має зручний вертикальний формат та продуманий внутрішній простір для повсякденних речей.\nСумка оснащена основним відділенням на блискавці, внутрішньою кишенею на кнопці, а також зовнішніми кишенями на блискавці та магнітній кнопці. Регульований ремінь дозволяє носити модель через плече або кросбоді.\nЛаконічний дизайн, фірмове виконання COACH та практичний формат роблять Tristan чудовим вибором на кожен день",
   "sku": "CES89SV/BK",
   "rating": 5,
-  "category": "Чоловічі сумки"
+  "category": "Чоловічі сумки",
+  "framing": {
+    "ces89_svbk_a5.webp": {
+      "zoom": 1.49,
+      "x": 46,
+      "y": 59
+    },
+    "ces89_svbk_a8.webp": {
+      "zoom": 1.49,
+      "x": 46,
+      "y": 50
+    }
+  },
+  "legacySlugs": [
+    "чоловіча-сумка-coach-tristan-crossbody-bag-in-signature-leather"
+  ],
+  "slug": "cholovicha-sumka-coach-tristan-crossbody-bag-in-signature-leather",
+  "id": 85,
+  "color": "Чорний",
+  "images": [
+    "/assets/images/products/uploads/ces89_svbk_a0.webp",
+    "/assets/images/products/uploads/ces89_svbk_a5.webp",
+    "/assets/images/products/uploads/ces89_svbk_a8.webp",
+    "/assets/images/products/uploads/ces89_svbk_a91.webp"
+  ]
 }
