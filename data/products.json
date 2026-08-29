@@ -879,9 +879,9 @@
         "color": "Зелений",
         "hex": "#06b454",
         "images": [
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=b03789af",
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=46f5b4b6",
           "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-2.webp?v=7f7d7a02",
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=e2bebe48"
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=d16612fe"
         ],
         "sku": "B094QT219C"
       },
@@ -889,9 +889,9 @@
         "color": "Карамельний",
         "hex": "#f49657",
         "images": [
-          "assets/images/products/uploads/jwp-ma123-1.webp?v=5fd6e507",
+          "assets/images/products/uploads/jwp-ma123-1.webp?v=6a75506e",
           "assets/images/products/uploads/jwp-ma123-2.webp?v=189c38d2",
-          "assets/images/products/uploads/jwp-ma123-3.webp?v=34a04892"
+          "assets/images/products/uploads/jwp-ma123-3.webp?v=5fa065a6"
         ],
         "sku": "JWP-MA123"
       }
@@ -3030,11 +3030,13 @@
       "Жінкам"
     ],
     "preOrderDays": "5–10 робочих днів",
+    "color": "Темно-зелений",
     "forcePublish": false,
     "material": "Натуральна шкіра",
     "brand": "Marc Jacobs",
     "price": 9000,
     "preOrder": false,
+    "slug": "zhinocha-sumochka-marc-jacobs-the-j-marc-shoulder-bag",
     "dimensions": "25 × 16 × 5 см",
     "variants": [
       {
@@ -3050,6 +3052,7 @@
     ],
     "preOrderPrepayment": 50,
     "strapInfo": "2 знімні регульований та ланцюжок",
+    "sortOrder": 4,
     "sizes": [
       "ONESIZE"
     ],
@@ -3077,21 +3080,19 @@
     ],
     "isNew": false,
     "title": "Жіноча сумочка Marc Jacobs The J Marc Shoulder Bag",
-    "reviews": 0,
-    "instagramBlock": "general",
-    "description": "Елегантна сумка Marc Jacobs The J Marc Shoulder Bag у відтінку Bronze Green — стильна модель із гладкої натуральної шкіри, доповнена фірмовою застібкою у вигляді подвійної літери «J» та золотою фурнітурою.\nМодель має одне основне відділення, внутрішню кишеню на блискавці та накладну кишеню на зворотному боці. Сумка комплектується двома знімними ременями: регульованим шкіряним ременем та ременем-ланцюжком. Її можна носити на плечі, через плече або без ременів як клатч",
-    "sku": "H956L01PF22_365",
-    "rating": 5,
-    "category": "Жіночі сумки",
-    "slug": "zhinocha-sumochka-marc-jacobs-the-j-marc-shoulder-bag",
-    "id": 47,
-    "color": "Темно-зелений",
     "images": [
       "/assets/images/products/uploads/the-j-marc-shoulder-bag-bronze-green-h956l01pf22-365-800x800.webp",
       "/assets/images/products/uploads/the-j-marc-shoulder-bag-bronze-green-additional-image-5192-800x800.webp",
       "/assets/images/products/uploads/the-j-marc-shoulder-bag-bronze-green-additional-image-5191-800x800.webp",
       "/assets/images/products/uploads/the-j-marc-shoulder-bag-bronze-green-additional-image-5193-800x800.webp"
     ],
+    "reviews": 0,
+    "id": 47,
+    "instagramBlock": "general",
+    "description": "Елегантна сумка Marc Jacobs The J Marc Shoulder Bag у відтінку Bronze Green — стильна модель із гладкої натуральної шкіри, доповнена фірмовою застібкою у вигляді подвійної літери «J» та золотою фурнітурою.\nМодель має одне основне відділення, внутрішню кишеню на блискавці та накладну кишеню на зворотному боці. Сумка комплектується двома знімними ременями: регульованим шкіряним ременем та ременем-ланцюжком. Її можна носити на плечі, через плече або без ременів як клатч",
+    "sku": "H956L01PF22_365",
+    "rating": 5,
+    "category": "Жіночі сумки",
     "legacySlugs": [
       "жіноча-сумочка-marc-jacobs-the-j-marc-shoulder-bag"
     ]
@@ -4273,8 +4274,8 @@
           "/assets/images/products/uploads/ca173_svvfq_a0.webp?v=274cb8ee",
           "/assets/images/products/uploads/ca173_svvfq_a5.webp?v=c14cae6b",
           "/assets/images/products/uploads/ca173_svvfq_a8.webp?v=b75e933e",
-          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=c0c0f939",
-          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=0389c082"
+          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=c634a587",
+          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=f65901e4"
         ]
       }
     ],
