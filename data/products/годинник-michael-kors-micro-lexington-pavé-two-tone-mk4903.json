@@ -1,0 +1,58 @@
+{
+  "gender": [
+    "Жінкам"
+  ],
+  "preOrderDays": "10-14 робочих днів",
+  "forcePublish": false,
+  "material": "Нержавіюча сталь; декоративні pavé-акценти — кристали; скло — мінеральне",
+  "brand": "Michael Kors",
+  "price": 6900,
+  "preOrder": true,
+  "dimensions": "1,3 × 1,3 см - розмір циферблату",
+  "variants": [
+    {
+      "color": "Сріблястий / золотистий",
+      "hex": "#cac8c0",
+      "images": [
+        "/assets/images/products/uploads/michael-kors-micro-lexington-quartz-ladies-watch-mk4903.webp",
+        "/assets/images/products/uploads/michael-kors-micro-lexington-quartz-ladies-watch-mk4903_2.webp",
+        "/assets/images/products/uploads/michael-kors-micro-lexington-quartz-ladies-watch-mk4903_3.webp"
+      ]
+    }
+  ],
+  "preOrderPrepayment": 100,
+  "strapInfo": "Двоколірний браслет із нержавіючої сталі у сріблястому та золотистому відтінках із розкладною застібкою-кліпсою. Ширина браслета — 1 см",
+  "sizes": [
+    "Onesize"
+  ],
+  "splitByColor": true,
+  "searchKeywords": [
+    "Michael Kors Lexington",
+    "Michael Kors Micro Lexington",
+    "Michael Kors Micro Lexington Pavé",
+    "Michael Kors MK4903",
+    "MK4903",
+    "годинник Michael Kors",
+    "жіночий годинник Michael Kors",
+    "жіночий наручний годинник",
+    "кварцовий годинник",
+    "мініатюрний годинник",
+    "сріблястий годинник",
+    "золотистий годинник",
+    "двоколірний годинник",
+    "годинник із кристалами",
+    "годинник із pavé",
+    "годинник зі сталевим браслетом",
+    "елегантний жіночий годинник",
+    "брендовий годинник",
+    "оригінальний Michael Kors"
+  ],
+  "isNew": false,
+  "title": "Годинник Michael Kors Micro Lexington Pavé Two-Tone MK4903",
+  "reviews": 0,
+  "instagramBlock": "general",
+  "description": "Вишуканий жіночий годинник Michael Kors Micro Lexington Pavé Two-Tone у мініатюрному форматі. Модель поєднує сріблясті та золотисті відтінки, доповнені сяючими pavé-акцентами, створюючи елегантний та жіночний образ.\nМініатюрний круглий корпус має діаметр лише 13 мм та доповнений фасетованим безелем. Сріблястий циферблат прикрашений блискучими кристалами. Годинник оснащений надійним кварцовим механізмом із трьома стрілками. Корпус і двоколірний браслет повністю виконані з нержавіючої сталі. Водонепроникність — до 50 м (5 ATM)",
+  "sku": "MK4903",
+  "rating": 5,
+  "category": "Годинники"
+}
