@@ -879,9 +879,9 @@
         "color": "Зелений",
         "hex": "#06b454",
         "images": [
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=8d9f0b3e",
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=d6d618cb",
           "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-2.webp?v=7f7d7a02",
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=b925a860"
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=2d005e08"
         ],
         "sku": "B094QT219C"
       },
@@ -889,9 +889,9 @@
         "color": "Карамельний",
         "hex": "#f49657",
         "images": [
-          "assets/images/products/uploads/jwp-ma123-1.webp?v=47b00ee3",
+          "assets/images/products/uploads/jwp-ma123-1.webp?v=eadf6601",
           "assets/images/products/uploads/jwp-ma123-2.webp?v=189c38d2",
-          "assets/images/products/uploads/jwp-ma123-3.webp?v=a8efeaf1"
+          "assets/images/products/uploads/jwp-ma123-3.webp?v=fee3f62e"
         ],
         "sku": "JWP-MA123"
       }
@@ -3269,11 +3269,13 @@
       "Жінкам"
     ],
     "preOrderDays": "5–10 робочих днів",
+    "color": "Рожевий",
     "forcePublish": false,
     "material": "Натуральна шкіра",
     "brand": "Marc Jacobs",
     "price": 8600,
     "preOrder": false,
+    "slug": "sumochka-marc-jacobs-the-leather-mini-bag-pink",
     "dimensions": "20 × 12 × 4 см",
     "variants": [
       {
@@ -3289,6 +3291,7 @@
     ],
     "preOrderPrepayment": 50,
     "strapInfo": "Ремінець знімний та регульований",
+    "sortOrder": 7,
     "sizes": [
       "ONESIZE"
     ],
@@ -3317,21 +3320,19 @@
     ],
     "isNew": false,
     "title": "Сумочка Marc Jacobs The Leather Mini Bag Pink",
-    "reviews": 0,
-    "instagramBlock": "general",
-    "description": "Елегантна міні-сумка Marc Jacobs The Leather Mini Bag у ніжному рожевому відтінку — компактна модель із лаконічним дизайном та фірмовим стилем Marc Jacobs.\nСумка виготовлена зі 100% натуральної шкіри та має відкидний клапан із магнітною застібкою. Усередині розташовані основне відділення, кишеня для дрібниць та 8 слотів для карток. Модель можна носити як клатч або використовувати знімний регульований ремінець для носіння на плечі чи через плече",
-    "sku": "2S4SMN080S02678",
-    "rating": 5,
-    "category": "Жіночі сумки",
-    "slug": "sumochka-marc-jacobs-the-leather-mini-bag-pink",
-    "id": 50,
-    "color": "Рожевий",
     "images": [
       "/assets/images/products/uploads/27687307_57865310_2048.webp",
       "/assets/images/products/uploads/27687307_57865301_2048.webp",
       "/assets/images/products/uploads/27687307_57865307_2048.webp",
       "/assets/images/products/uploads/27687307_57865304_2048.webp"
     ],
+    "reviews": 0,
+    "id": 50,
+    "instagramBlock": "general",
+    "description": "Елегантна міні-сумка Marc Jacobs The Leather Mini Bag у ніжному рожевому відтінку — компактна модель із лаконічним дизайном та фірмовим стилем Marc Jacobs.\nСумка виготовлена зі 100% натуральної шкіри та має відкидний клапан із магнітною застібкою. Усередині розташовані основне відділення, кишеня для дрібниць та 8 слотів для карток. Модель можна носити як клатч або використовувати знімний регульований ремінець для носіння на плечі чи через плече",
+    "sku": "2S4SMN080S02678",
+    "rating": 5,
+    "category": "Жіночі сумки",
     "legacySlugs": [
       "сумочка-marc-jacobs-the-leather-mini-bag-pink"
     ]
@@ -4278,8 +4279,8 @@
           "/assets/images/products/uploads/ca173_svvfq_a0.webp?v=274cb8ee",
           "/assets/images/products/uploads/ca173_svvfq_a5.webp?v=c14cae6b",
           "/assets/images/products/uploads/ca173_svvfq_a8.webp?v=b75e933e",
-          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=7b3abd39",
-          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=e364be90"
+          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=982e9d3e",
+          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=dab52b2b"
         ]
       }
     ],
