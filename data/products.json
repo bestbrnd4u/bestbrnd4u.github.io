@@ -879,9 +879,9 @@
         "color": "Зелений",
         "hex": "#06b454",
         "images": [
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=b5269cf8",
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=cfe05b41",
           "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-2.webp?v=7f7d7a02",
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=c8caaff2"
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=cdc3cb2c"
         ],
         "sku": "B094QT219C"
       },
@@ -889,9 +889,9 @@
         "color": "Карамельний",
         "hex": "#f49657",
         "images": [
-          "assets/images/products/uploads/jwp-ma123-1.webp?v=1d1e4c43",
+          "assets/images/products/uploads/jwp-ma123-1.webp?v=880f2908",
           "assets/images/products/uploads/jwp-ma123-2.webp?v=189c38d2",
-          "assets/images/products/uploads/jwp-ma123-3.webp?v=eee747b4"
+          "assets/images/products/uploads/jwp-ma123-3.webp?v=bd248574"
         ],
         "sku": "JWP-MA123"
       }
@@ -4274,8 +4274,8 @@
           "/assets/images/products/uploads/ca173_svvfq_a0.webp?v=274cb8ee",
           "/assets/images/products/uploads/ca173_svvfq_a5.webp?v=c14cae6b",
           "/assets/images/products/uploads/ca173_svvfq_a8.webp?v=b75e933e",
-          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=68d316b7",
-          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=9ae82c2b"
+          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=29ead07e",
+          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=5140c2b7"
         ]
       }
     ],
@@ -5683,6 +5683,73 @@
       "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-silver-dial-ladies-watch-mk4843.webp",
       "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-silver-dial-ladies-watch-mk4843_2.webp",
       "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-silver-dial-ladies-watch-mk4843_3.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Корпус і браслет — нержавіюча сталь; скло — мінеральне",
+    "brand": "Michael Kors",
+    "price": 5100,
+    "preOrder": true,
+    "dimensions": "2,6 × 2,6 × 0,8 см",
+    "variants": [
+      {
+        "color": "Сріблястий / червоний",
+        "hex": "#891919",
+        "images": [
+          "/assets/images/products/uploads/michael-kors-mini-lexington-quartz-red-dial-ladies-watch-mk4968.webp?v=c93db63b",
+          "/assets/images/products/uploads/michael-kors-mini-lexington-quartz-red-dial-ladies-watch-mk4968_2.webp?v=545b4cb8",
+          "/assets/images/products/uploads/michael-kors-mini-lexington-quartz-red-dial-ladies-watch-mk4968_3.webp?v=d224c14b"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Сталевий браслет сріблястого кольору шириною 1,4 см із розкладною застібкою",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Michael Kors Lexington",
+      "Michael Kors Mini Lexington",
+      "Michael Kors MK4968",
+      "MK4968",
+      "годинник Michael Kors",
+      "жіночий годинник Michael Kors",
+      "жіночий наручний годинник",
+      "кварцовий годинник",
+      "сріблястий годинник",
+      "червоний годинник",
+      "годинник із червоним циферблатом",
+      "годинник зі сталевим браслетом",
+      "годинник із pavé",
+      "мініатюрний жіночий годинник",
+      "елегантний годинник",
+      "брендовий годинник",
+      "оригінальний Michael Kors"
+    ],
+    "isNew": false,
+    "title": "Жіночий годинник Michael Kors Mini Lexington Pavé MK4968",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Елегантний жіночий годинник Michael Kors Mini Lexington Pavé у сріблястому виконанні з виразним червоним циферблатом. Мініатюрний круглий корпус доповнений декоративним безелем та pavé-індексами, що додають моделі витонченого блиску.\nГодинник оснащений точним кварцовим механізмом із трьома стрілками. Червоний циферблат має ефектний променистий фініш, а корпус і браслет виконані з нержавіючої сталі. Мінеральне скло захищає циферблат, водонепроникність — до 50 м (5 ATM)",
+    "sku": "MK4968",
+    "rating": 5,
+    "category": "Годинники",
+    "legacySlugs": [
+      "жіночий-годинник-michael-kors-mini-lexington-pavé-mk4968"
+    ],
+    "slug": "zhinochyi-hodynnyk-michael-kors-mini-lexington-pav-mk4968",
+    "id": 82,
+    "color": "Сріблястий / червоний",
+    "images": [
+      "/assets/images/products/uploads/michael-kors-mini-lexington-quartz-red-dial-ladies-watch-mk4968.webp",
+      "/assets/images/products/uploads/michael-kors-mini-lexington-quartz-red-dial-ladies-watch-mk4968_2.webp",
+      "/assets/images/products/uploads/michael-kors-mini-lexington-quartz-red-dial-ladies-watch-mk4968_3.webp"
     ]
   }
 ]
