@@ -1,0 +1,57 @@
+{
+  "gender": [
+    "Чоловікам"
+  ],
+  "preOrderDays": "10-14 робочих днів",
+  "forcePublish": false,
+  "material": "Фірмова зерниста шкіра Signature та зерниста шкіра; внутрішня підкладка — перероблений поліестер",
+  "brand": "Coach",
+  "price": 8000,
+  "preOrder": true,
+  "dimensions": "22 × 26 × 5 см",
+  "variants": [
+    {
+      "color": "Чорний",
+      "hex": "#000000",
+      "images": [
+        "/assets/images/products/uploads/ces89_svbk_a0.webp",
+        "/assets/images/products/uploads/ces89_svbk_a5.webp",
+        "/assets/images/products/uploads/ces89_svbk_a8.webp",
+        "/assets/images/products/uploads/ces89_svbk_a91.webp"
+      ]
+    }
+  ],
+  "preOrderPrepayment": 100,
+  "strapInfo": "Регульований плечовий ремінь. Можна носити через плече або кросбоді. Довжина падіння ременя — приблизно",
+  "sizes": [
+    "Onesize"
+  ],
+  "splitByColor": true,
+  "searchKeywords": [
+    "COACH",
+    "Coach Tristan",
+    "Tristan Crossbody Bag 22",
+    "сумка Coach",
+    "сумка кросбоді Coach",
+    "чоловіча сумка Coach",
+    "жіноча сумка Coach",
+    "шкіряна сумка",
+    "шкіряна сумка через плече",
+    "сумка через плече",
+    "кросбоді",
+    "чорна сумка",
+    "чорна шкіряна сумка",
+    "брендові сумки",
+    "оригінальна Coach",
+    "сумка на кожен день",
+    "повсякденна сумка"
+  ],
+  "isNew": false,
+  "title": "Чоловіча сумка COACH Tristan Crossbody Bag In Signature Leather",
+  "reviews": 0,
+  "instagramBlock": "general",
+  "description": "Стильна та функціональна сумка COACH Tristan Crossbody Bag 22, виконана з фірмової зернистої шкіри Signature. Модель має зручний вертикальний формат та продуманий внутрішній простір для повсякденних речей.\nСумка оснащена основним відділенням на блискавці, внутрішньою кишенею на кнопці, а також зовнішніми кишенями на блискавці та магнітній кнопці. Регульований ремінь дозволяє носити модель через плече або кросбоді.\nЛаконічний дизайн, фірмове виконання COACH та практичний формат роблять Tristan чудовим вибором на кожен день",
+  "sku": "CES89SV/BK",
+  "rating": 5,
+  "category": "Чоловічі сумки"
+}
