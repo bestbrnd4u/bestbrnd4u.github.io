@@ -879,9 +879,9 @@
         "color": "Зелений",
         "hex": "#06b454",
         "images": [
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=aadc81d7",
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=927d256b",
           "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-2.webp?v=7f7d7a02",
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=d0800e16"
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=ea404cd1"
         ],
         "sku": "B094QT219C"
       },
@@ -889,9 +889,9 @@
         "color": "Карамельний",
         "hex": "#f49657",
         "images": [
-          "assets/images/products/uploads/jwp-ma123-1.webp?v=694d69e0",
+          "assets/images/products/uploads/jwp-ma123-1.webp?v=b665b855",
           "assets/images/products/uploads/jwp-ma123-2.webp?v=189c38d2",
-          "assets/images/products/uploads/jwp-ma123-3.webp?v=bbd0e428"
+          "assets/images/products/uploads/jwp-ma123-3.webp?v=0a34de46"
         ],
         "sku": "JWP-MA123"
       }
@@ -4287,8 +4287,8 @@
           "/assets/images/products/uploads/ca173_svvfq_a0.webp?v=274cb8ee",
           "/assets/images/products/uploads/ca173_svvfq_a5.webp?v=c14cae6b",
           "/assets/images/products/uploads/ca173_svvfq_a8.webp?v=b75e933e",
-          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=9935b6d6",
-          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=87bde765"
+          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=af6ad881",
+          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=7032f5b9"
         ]
       }
     ],
@@ -6346,6 +6346,73 @@
       "/assets/images/products/uploads/загрузка-1-.webp",
       "/assets/images/products/uploads/загрузка-2-.webp",
       "/assets/images/products/uploads/загрузка-1-1-.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Чоловікам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Нержавіюча сталь",
+    "brand": "Michael Kors",
+    "price": 6000,
+    "preOrder": true,
+    "dimensions": "Корпус — 4,4 см у діаметрі",
+    "variants": [
+      {
+        "color": "Сріблястий / синій",
+        "hex": "#2d4ba7",
+        "images": [
+          "/assets/images/products/uploads/michael-kors-maritime-chronograph-quartz-blue-dial-mens-watch-mk9202_1.webp?v=cfad8a64",
+          "/assets/images/products/uploads/michael-kors-maritime-chronograph-quartz-blue-dial-mens-watch-mk9202_2.webp?v=27768112",
+          "/assets/images/products/uploads/michael-kors-maritime-chronograph-quartz-blue-dial-mens-watch-mk9202_3.webp?v=3ebf16bf"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Браслет із нержавіючої сталі",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Michael Kors",
+      "Michael Kors Maritime",
+      "Maritime Chronograph",
+      "MK9202",
+      "годинник Michael Kors",
+      "чоловічий годинник",
+      "чоловічий наручний годинник",
+      "кварцовий годинник",
+      "годинник з хронографом",
+      "хронограф",
+      "спортивний годинник",
+      "металевий годинник",
+      "годинник із синім циферблатом",
+      "синій циферблат",
+      "брендовий годинник",
+      "оригінальний Michael Kors",
+      "стильний чоловічий годинник"
+    ],
+    "isNew": false,
+    "title": "Чоловічий годинник Michael Kors Maritime Chronograph",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильний чоловічий годинник Michael Kors Maritime з функцією хронографа та виразним синім циферблатом. Модель поєднує спортивний дизайн із класичними деталями, завдяки чому легко доповнює повсякденні та ділові образи.\nГодинник оснащений кварцовим механізмом, аналоговим циферблатом і функцією хронографа. Міцний сталевий корпус та браслет забезпечують практичність і комфорт у щоденному використанні",
+    "sku": "MK9202",
+    "rating": 5,
+    "category": "Годинники",
+    "legacySlugs": [
+      "чоловічий-годинник-michael-kors-maritime-chronograph"
+    ],
+    "slug": "cholovichyi-hodynnyk-michael-kors-maritime-chronograph",
+    "id": 89,
+    "color": "Сріблястий / синій",
+    "images": [
+      "/assets/images/products/uploads/michael-kors-maritime-chronograph-quartz-blue-dial-mens-watch-mk9202_1.webp",
+      "/assets/images/products/uploads/michael-kors-maritime-chronograph-quartz-blue-dial-mens-watch-mk9202_2.webp",
+      "/assets/images/products/uploads/michael-kors-maritime-chronograph-quartz-blue-dial-mens-watch-mk9202_3.webp"
     ]
   }
 ]

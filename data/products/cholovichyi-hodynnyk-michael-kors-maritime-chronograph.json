@@ -23,7 +23,7 @@
   "preOrderPrepayment": 100,
   "strapInfo": "Браслет із нержавіючої сталі",
   "sizes": [
-    "Onesize"
+    "ONESIZE"
   ],
   "splitByColor": true,
   "searchKeywords": [
@@ -52,5 +52,16 @@
   "description": "Стильний чоловічий годинник Michael Kors Maritime з функцією хронографа та виразним синім циферблатом. Модель поєднує спортивний дизайн із класичними деталями, завдяки чому легко доповнює повсякденні та ділові образи.\nГодинник оснащений кварцовим механізмом, аналоговим циферблатом і функцією хронографа. Міцний сталевий корпус та браслет забезпечують практичність і комфорт у щоденному використанні",
   "sku": "MK9202",
   "rating": 5,
-  "category": "Годинники"
+  "category": "Годинники",
+  "legacySlugs": [
+    "чоловічий-годинник-michael-kors-maritime-chronograph"
+  ],
+  "slug": "cholovichyi-hodynnyk-michael-kors-maritime-chronograph",
+  "id": 89,
+  "color": "Сріблястий / синій",
+  "images": [
+    "/assets/images/products/uploads/michael-kors-maritime-chronograph-quartz-blue-dial-mens-watch-mk9202_1.webp",
+    "/assets/images/products/uploads/michael-kors-maritime-chronograph-quartz-blue-dial-mens-watch-mk9202_2.webp",
+    "/assets/images/products/uploads/michael-kors-maritime-chronograph-quartz-blue-dial-mens-watch-mk9202_3.webp"
+  ]
 }
