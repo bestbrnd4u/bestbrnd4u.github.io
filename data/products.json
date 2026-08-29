@@ -879,9 +879,9 @@
         "color": "Зелений",
         "hex": "#06b454",
         "images": [
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=ada02626",
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=5cf46460",
           "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-2.webp?v=7f7d7a02",
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=95fad6c9"
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=cd8451f3"
         ],
         "sku": "B094QT219C"
       },
@@ -889,9 +889,9 @@
         "color": "Карамельний",
         "hex": "#f49657",
         "images": [
-          "assets/images/products/uploads/jwp-ma123-1.webp?v=8ddceaf9",
+          "assets/images/products/uploads/jwp-ma123-1.webp?v=9e27af1f",
           "assets/images/products/uploads/jwp-ma123-2.webp?v=189c38d2",
-          "assets/images/products/uploads/jwp-ma123-3.webp?v=16d7cf7f"
+          "assets/images/products/uploads/jwp-ma123-3.webp?v=c565ff7d"
         ],
         "sku": "JWP-MA123"
       }
@@ -4287,8 +4287,8 @@
           "/assets/images/products/uploads/ca173_svvfq_a0.webp?v=274cb8ee",
           "/assets/images/products/uploads/ca173_svvfq_a5.webp?v=c14cae6b",
           "/assets/images/products/uploads/ca173_svvfq_a8.webp?v=b75e933e",
-          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=87ce89fc",
-          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=5bda969d"
+          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=9127de96",
+          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=b388b2b9"
         ]
       }
     ],
@@ -6039,7 +6039,7 @@
           "/assets/images/products/uploads/cet66_svsmu_a0.webp?v=e4ade0d7",
           "/assets/images/products/uploads/cet66_svsmu_a3.webp?v=f807b4f7",
           "/assets/images/products/uploads/cet66_svsmu_a8.webp?v=f9211b3a",
-          "/assets/images/products/uploads/cet66_svsmu_a91.webp?v=1b6cb2f6"
+          "/assets/images/products/uploads/cet66_svsmu_a91.webp?v=9d2ca445"
         ]
       },
       {
@@ -6050,7 +6050,7 @@
           "/assets/images/products/uploads/cet55_mwnq6_a0.webp?v=24144c5c",
           "/assets/images/products/uploads/cet55_mwnq6_a3.webp?v=374df151",
           "/assets/images/products/uploads/cet55_mwnq6_a8.webp?v=e3748c46",
-          "/assets/images/products/uploads/cet55_mwnq6_a91.webp?v=6322a470"
+          "/assets/images/products/uploads/cet55_mwnq6_a91.webp?v=6b2f7649"
         ]
       },
       {
@@ -6061,7 +6061,7 @@
           "/assets/images/products/uploads/cet55_mwoy2_a0.webp?v=179f43f7",
           "/assets/images/products/uploads/cet55_mwoy2_a3.webp?v=f8fbe6b4",
           "/assets/images/products/uploads/cet55_mwoy2_a8.webp?v=9af9e7b6",
-          "/assets/images/products/uploads/cet55_mwoy2_a91.webp?v=9859def6"
+          "/assets/images/products/uploads/cet55_mwoy2_a91.webp?v=9c2c4a59"
         ]
       },
       {
@@ -6072,7 +6072,7 @@
           "/assets/images/products/uploads/cet66_svbk_a0.webp?v=091acb6c",
           "/assets/images/products/uploads/cet66_svbk_a3.webp?v=2b9cf0f7",
           "/assets/images/products/uploads/cet66_svbk_a8.webp?v=aeafdac1",
-          "/assets/images/products/uploads/cet66_svbk_a91.webp?v=05cff8dc"
+          "/assets/images/products/uploads/cet66_svbk_a91.webp?v=4a0a2302"
         ]
       },
       {
@@ -6083,7 +6083,7 @@
           "/assets/images/products/uploads/cet66_svmpl_a0.webp?v=c6e1b50a",
           "/assets/images/products/uploads/cet66_svmpl_a3.webp?v=bdefdd95",
           "/assets/images/products/uploads/cet66_svmpl_a8.webp?v=5774d884",
-          "/assets/images/products/uploads/cet66_svmpl_a91.webp?v=359adfc9"
+          "/assets/images/products/uploads/cet66_svmpl_a91.webp?v=2adbf71a"
         ]
       }
     ],
@@ -6209,6 +6209,75 @@
       "/assets/images/products/uploads/cet66_svsmu_a3.webp",
       "/assets/images/products/uploads/cet66_svsmu_a8.webp",
       "/assets/images/products/uploads/cet66_svsmu_a91.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Нержавіюча сталь",
+    "brand": "Michael Kors",
+    "price": 7000,
+    "preOrder": true,
+    "dimensions": "Корпус — 2,8 см у діаметрі",
+    "variants": [
+      {
+        "color": "Золотистий",
+        "hex": "#e6cfaa",
+        "images": [
+          "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set.webp?v=19b8a9d9",
+          "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_2.webp?v=e7afb90b",
+          "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_3.webp?v=7b116d7b",
+          "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_5.webp?v=776d47c5"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Браслет із нержавіючої сталі",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Michael Kors",
+      "Michael Kors годинник",
+      "годинник Michael Kors",
+      "Petite Lexington",
+      "Michael Kors Petite Lexington",
+      "MK4944",
+      "MK4944SET",
+      "жіночий годинник",
+      "жіночий наручний годинник",
+      "кварцовий годинник",
+      "подарунковий набір",
+      "годинник у подарунок",
+      "брендовий годинник",
+      "оригінальний Michael Kors",
+      "класичний годинник",
+      "елегантний годинник",
+      "модний годинник"
+    ],
+    "isNew": false,
+    "title": "Годинник Michael Kors Petite Lexington Gift Set",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Елегантний подарунковий набір Michael Kors Petite Lexington — стильний аксесуар для повсякденних та особливих образів. Вишуканий дизайн годинника поєднує класичний циферблат, тонкий корпус та фірмову естетику Michael Kors.\nГодинник працює на кварцовому механізмі та має аналоговий циферблат. Компактний розмір корпусу робить модель витонченою та комфортною для щоденного носіння.\nНабір стане чудовим варіантом для подарунка завдяки презентабельному оформленню та універсальному дизайну",
+    "sku": "MK4944SET",
+    "rating": 5,
+    "category": "Годинники",
+    "legacySlugs": [
+      "годинник-michael-kors-petite-lexington-gift-set"
+    ],
+    "slug": "hodynnyk-michael-kors-petite-lexington-gift-set",
+    "id": 87,
+    "color": "Золотистий",
+    "images": [
+      "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set.webp",
+      "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_2.webp",
+      "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_3.webp",
+      "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_5.webp"
     ]
   }
 ]
