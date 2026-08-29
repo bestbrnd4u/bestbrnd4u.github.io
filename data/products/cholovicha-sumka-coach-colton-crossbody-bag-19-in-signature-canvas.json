@@ -69,7 +69,7 @@
   "preOrderPrepayment": 100,
   "strapInfo": "Регульований плечовий ремінь для носіння через плече або кросбоді",
   "sizes": [
-    "Onesize"
+    "ONESIZE"
   ],
   "splitByColor": true,
   "searchKeywords": [
@@ -99,5 +99,94 @@
   "instagramBlock": "general",
   "description": "Компактна та практична сумка COACH Colton Crossbody Bag 19 — чудовий варіант для повсякденного використання. Модель виготовлена з високоякісної зернистої шкіри та має лаконічний дизайн із металевою фурнітурою сріблястого кольору.\nСумка закривається на блискавку та має зовнішню кишеню на блискавці з двома слотами для банківських карток. Компактний формат дозволяє зручно розмістити необхідні речі, а сумка вміщує навіть iPhone 14 Pro Max.\nРегульований ремінь дозволяє носити модель через плече або кросбоді, забезпечуючи комфорт у повсякденному використанні",
   "rating": 5,
-  "category": "Чоловічі сумки"
+  "category": "Чоловічі сумки",
+  "framing": {
+    "cet66_svsmu_a0.webp": {
+      "zoom": 1.4,
+      "x": 48,
+      "y": 68
+    },
+    "cet66_svsmu_a3.webp": {
+      "zoom": 1.51,
+      "x": 48,
+      "y": 68
+    },
+    "cet66_svsmu_a8.webp": {
+      "zoom": 1.49,
+      "x": 48,
+      "y": 50
+    },
+    "cet55_mwnq6_a0.webp": {
+      "zoom": 1.4,
+      "x": 48,
+      "y": 68
+    },
+    "cet55_mwnq6_a3.webp": {
+      "zoom": 1.8,
+      "x": 47,
+      "y": 69
+    },
+    "cet55_mwnq6_a8.webp": {
+      "zoom": 1.49,
+      "x": 49,
+      "y": 50
+    },
+    "cet55_mwoy2_a0.webp": {
+      "zoom": 1.38,
+      "x": 47,
+      "y": 68
+    },
+    "cet55_mwoy2_a3.webp": {
+      "zoom": 1.73,
+      "x": 46,
+      "y": 68
+    },
+    "cet55_mwoy2_a8.webp": {
+      "zoom": 1.49,
+      "x": 49,
+      "y": 50
+    },
+    "cet66_svbk_a0.webp": {
+      "zoom": 1.4,
+      "x": 48,
+      "y": 68
+    },
+    "cet66_svbk_a3.webp": {
+      "zoom": 1.53,
+      "x": 48,
+      "y": 68
+    },
+    "cet66_svbk_a8.webp": {
+      "zoom": 1.49,
+      "x": 48,
+      "y": 50
+    },
+    "cet66_svmpl_a0.webp": {
+      "zoom": 1.4,
+      "x": 48,
+      "y": 68
+    },
+    "cet66_svmpl_a3.webp": {
+      "zoom": 1.51,
+      "x": 48,
+      "y": 68
+    },
+    "cet66_svmpl_a8.webp": {
+      "zoom": 1.5,
+      "x": 48,
+      "y": 50
+    }
+  },
+  "legacySlugs": [
+    "чоловіча-сумка-coach-colton-crossbody-bag-19-in-signature-canvas"
+  ],
+  "slug": "cholovicha-sumka-coach-colton-crossbody-bag-19-in-signature-canvas",
+  "id": 86,
+  "color": "Silver/Deep Blue",
+  "images": [
+    "/assets/images/products/uploads/cet66_svsmu_a0.webp",
+    "/assets/images/products/uploads/cet66_svsmu_a3.webp",
+    "/assets/images/products/uploads/cet66_svsmu_a8.webp",
+    "/assets/images/products/uploads/cet66_svsmu_a91.webp"
+  ]
 }
