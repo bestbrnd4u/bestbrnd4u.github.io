@@ -879,9 +879,9 @@
         "color": "Зелений",
         "hex": "#06b454",
         "images": [
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=f8c6ca41",
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=a2617ff1",
           "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-2.webp?v=7f7d7a02",
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=d3623f41"
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=8e2b99e2"
         ],
         "sku": "B094QT219C"
       },
@@ -889,9 +889,9 @@
         "color": "Карамельний",
         "hex": "#f49657",
         "images": [
-          "assets/images/products/uploads/jwp-ma123-1.webp?v=dd3cc556",
+          "assets/images/products/uploads/jwp-ma123-1.webp?v=77ba8a25",
           "assets/images/products/uploads/jwp-ma123-2.webp?v=189c38d2",
-          "assets/images/products/uploads/jwp-ma123-3.webp?v=8a002869"
+          "assets/images/products/uploads/jwp-ma123-3.webp?v=13b6968a"
         ],
         "sku": "JWP-MA123"
       }
@@ -3493,11 +3493,13 @@
       "Жінкам"
     ],
     "preOrderDays": "5–10 робочих днів",
+    "color": "Молочний",
     "forcePublish": false,
     "material": "Натуральна шкіра",
     "brand": "Marc Jacobs",
     "price": 9800,
     "preOrder": false,
+    "slug": "sumka-marc-jacobs-the-leather-cargo-bag-cotton-silver",
     "dimensions": "22 × 12 × 7 см",
     "variants": [
       {
@@ -3514,6 +3516,7 @@
     ],
     "preOrderPrepayment": 50,
     "strapInfo": "2 знімні ремені — шкіряний та текстильний регульований",
+    "sortOrder": 11,
     "sizes": [
       "ONESIZE"
     ],
@@ -3542,15 +3545,6 @@
     ],
     "isNew": false,
     "title": "Сумка Marc Jacobs The Leather Cargo Bag Cotton Silver",
-    "reviews": 0,
-    "instagramBlock": "general",
-    "description": "Стильна та функціональна сумка Marc Jacobs The Leather Cargo Bag у відтінку Cotton/Silver — модель із виразним дизайном у стилі cargo та практичною системою кишень.\nСумка виготовлена з натуральної зернистої шкіри та доповнена сріблястою фурнітурою. На передній частині розташовані дві накладні кишені з клапанами, з боків — кишені на блискавці. Основне відділення закривається на блискавку.\nМодель має два знімні ремені: шкіряний ремінь для носіння на плечі та широкий регульований текстильний ремінь із логотипом. Завдяки цьому сумку можна носити на плечі або через плече",
-    "sku": "2S4HSH085H02-140",
-    "rating": 5,
-    "category": "Жіночі сумки",
-    "slug": "sumka-marc-jacobs-the-leather-cargo-bag-cotton-silver",
-    "id": 53,
-    "color": "Молочний",
     "images": [
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-4a08b27e.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-d6f46dd3.webp",
@@ -3558,6 +3552,13 @@
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-c1370464.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-28c7d0f9.webp"
     ],
+    "reviews": 0,
+    "id": 53,
+    "instagramBlock": "general",
+    "description": "Стильна та функціональна сумка Marc Jacobs The Leather Cargo Bag у відтінку Cotton/Silver — модель із виразним дизайном у стилі cargo та практичною системою кишень.\nСумка виготовлена з натуральної зернистої шкіри та доповнена сріблястою фурнітурою. На передній частині розташовані дві накладні кишені з клапанами, з боків — кишені на блискавці. Основне відділення закривається на блискавку.\nМодель має два знімні ремені: шкіряний ремінь для носіння на плечі та широкий регульований текстильний ремінь із логотипом. Завдяки цьому сумку можна носити на плечі або через плече",
+    "sku": "2S4HSH085H02-140",
+    "rating": 5,
+    "category": "Жіночі сумки",
     "legacySlugs": [
       "сумка-marc-jacobs-the-leather-cargo-bag-cotton-silver"
     ]
@@ -4282,8 +4283,8 @@
           "/assets/images/products/uploads/ca173_svvfq_a0.webp?v=274cb8ee",
           "/assets/images/products/uploads/ca173_svvfq_a5.webp?v=c14cae6b",
           "/assets/images/products/uploads/ca173_svvfq_a8.webp?v=b75e933e",
-          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=ff368ad1",
-          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=8c7c4b18"
+          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=79034ecc",
+          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=dd51c626"
         ]
       }
     ],
