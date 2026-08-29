@@ -2,7 +2,8 @@
 <html lang="uk">
 
 <head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"287afbe3","data/categories.json":"c3f4c8fa","data/collections.json":"d86aab5b","data/home.json":"fe5da8cb","data/image-variants.json":"f0469e68","data/products.json":"e290f787","data/promo-popups.json":"0940ece5","data/promotions.json":"99e1952f","data/search-banners.json":"82a85e36","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
+    <meta name="robots" content="noindex,nofollow">
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"287afbe3","data/categories.json":"c3f4c8fa","data/collections.json":"d86aab5b","data/home.json":"fe5da8cb","data/image-variants.json":"f0469e68","data/products.json":"746f08cb","data/promo-popups.json":"0940ece5","data/promotions.json":"99e1952f","data/search-banners.json":"82a85e36","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
     <meta charset="UTF-8">
     <meta name="author" content="BestBrnd4u">
     <meta name="copyright" content="© 2026 BestBrnd4u. Усі права захищено.">
@@ -25,7 +26,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="assets/images/favicon-192.png">
     <title>Політика конфіденційності | BestBrnd4u</title>
 
-    <link rel="stylesheet" href="assets/css/style.css?v=9efbb3c0">
+    <link rel="stylesheet" href="assets/css/style.css?v=49a57f1f">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -384,7 +385,7 @@
         <div class="bayer-faq-list">
 
             <div class="bayer-faq-item">
-                <button type="button" class="bayer-faq-question">
+                <button type="button" class="bayer-faq-question" aria-expanded="false">
                     Чи передаєте ви мої дані рекламним компаніям?
                     <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
                 </button>
@@ -396,7 +397,7 @@
             </div>
 
             <div class="bayer-faq-item">
-                <button type="button" class="bayer-faq-question">
+                <button type="button" class="bayer-faq-question" aria-expanded="false">
                     Як видалити мій обліковий запис і дані?
                     <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
                 </button>
@@ -408,7 +409,7 @@
             </div>
 
             <div class="bayer-faq-item">
-                <button type="button" class="bayer-faq-question">
+                <button type="button" class="bayer-faq-question" aria-expanded="false">
                     Чи зберігаєте ви дані моєї картки?
                     <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
                 </button>
@@ -420,7 +421,7 @@
             </div>
 
             <div class="bayer-faq-item">
-                <button type="button" class="bayer-faq-question">
+                <button type="button" class="bayer-faq-question" aria-expanded="false">
                     Як відписатися від розсилки?
                     <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
                 </button>
@@ -536,7 +537,7 @@
 <script src="assets/js/consent.js?v=159b1cfe"></script>
 <!-- Статистика відвідувань. Не завантажує Google без згоди. -->
 <script src="assets/js/analytics.js?v=d1829aaf"></script>
-<script src="assets/js/common.js?v=2ad23111"></script>
+<script src="assets/js/common.js?v=0def90b6"></script>
 <script src="assets/js/sync.js?v=48ef002e"></script>
 <script src="assets/js/mega-menu.js?v=18cfdf18"></script>
 <script src="assets/js/ui.js?v=29864ab4"></script>
@@ -547,7 +548,15 @@
 
         question.addEventListener("click", () => {
 
-            question.closest(".bayer-faq-item")?.classList.toggle("open");
+            const item = question.closest(".bayer-faq-item");
+
+            if (!item) return;
+
+            const open = item.classList.toggle("open");
+
+            // Стрілка розвертається через CSS і видна оком. Зчитувачу
+            // екрана вона не каже нічого — стан читається саме звідси.
+            question.setAttribute("aria-expanded", String(open));
 
         });
 

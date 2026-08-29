@@ -79,8 +79,49 @@ console.log("\n[5] Сторінка товару віддає всі слайд�
         !js.includes('if (activeSlide && activeSlide.tagName !== "IMG") return;'));
   check("VIDEO мапиться у слайд", js.includes('type: "video"'));
   check("embed мапиться у слайд", js.includes('type: "embed"'));
-  check("тап по самому плеєру не відкриває лайтбокс",
-        js.includes('event.target.closest("video, iframe")'));
+  // Раніше тут перевірялось одне closest("video, iframe") — обидва
+  // випадки просто виходили з обробника. Тепер вони різні:
+  //
+  //   відео   смуги керування в галереї більше немає (вона ламала
+  //           ряд із фотографіями), тож тап по кадру САМ ставить
+  //           на паузу й знімає з неї;
+  //   iframe  усередині власний плеєр YouTube/Vimeo — клік його.
+  //
+  // Спільне лишилось одне: ані те, ані те не відкриває лайтбокс.
+  check("тап по відео керує відтворенням, а не відкриває лайтбокс",
+        /const video = event\.target\.closest\("video"\);[\s\S]{0,200}toggleGalleryVideo\(video\); return;/.test(js));
+
+  check("тап по iframe віддається його власному плеєру",
+        js.includes('event.target.closest("iframe")'));
+
+  check("смуги керування в галереї немає",
+        !/class="gallery-slide gallery-slide-video"[\s\S]{0,400}\bcontrols\b/.test(js));
+
+  // Повний екран для відео нікуди не дівся: у лайтбокс заходять
+  // тапом по будь-якому фото, а він показує ВСІ слайди, зокрема відео.
+  check("відео лишається досяжним через лайтбокс із фото",
+        js.includes('type: "video"'));
+
+  // Пауза мусить переживати перемальовку галереї: syncActiveState
+  // викликається на кожен скрол треку, і без цієї позначки він
+  // перемотав би відео на нуль і запустив знову — тобто паузи ніби
+  // й немає.
+  check("ручна пауза не збивається скролом",
+        /if \(slide\.dataset\.userPaused\) return;/.test(js));
+
+  // Продовження саме з того місця, де зупинили: currentTime у
+  // перемикачі не чіпається взагалі.
+  const toggle = js.slice(js.indexOf("function toggleGalleryVideo"),
+                          js.indexOf("function setupGallery"));
+
+  check("продовжує з того ж місця, а не з початку",
+        toggle.length > 0 && !/currentTime/.test(toggle));
+
+  // Рухома картинка без способу її зупинити — це WCAG 2.2.2. Смуги
+  // керування немає, тож пауза мусить лишатись доступною з клавіатури.
+  check("паузу можна поставити з клавіатури",
+        /event\.key !== " " && event\.key !== "Enter"/.test(js)
+        && js.includes('role="button"'));
 }
 
 console.log(failures===0?"\n✅ Усі перевірки пройдено":`\n❌ Провалено: ${failures}`);

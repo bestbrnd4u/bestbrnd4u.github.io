@@ -691,13 +691,31 @@ function main() {
             return;
         }
 
+        // Порожній слот шукаємо РЕГУЛЯРКОЮ, а не двома точними рядками.
+        //
+        // ЩО БУЛО НЕ ТАК. Стояло два .replace() з літералами
+        // '<div id="productPage">\n\n</div>' і '<div id="productPage"></div>'.
+        // На Windows git при виписуванні робить із них
+        // '<div id="productPage">\r\n\r\n</div>' — жоден літерал не
+        // збігається, заміна мовчки не відбувається, і сторінка товару
+        // виходить БЕЗ статичного блоку: без <h1>, без опису, без ціни
+        // для пошукового робота.
+        //
+        // Мовчки: скрипт бадьоро звітує «Готово: 130 сторінок». Помітно
+        // це лише тестом, який шукає <h1>. У CI (Linux) переноси LF,
+        // тож там усе працювало — помилка чекала на того, хто збере
+        // сайт у себе.
+        const SLOT = /<div id="productPage">\s*<\/div>/;
+
+        if (!SLOT.test(template)) {
+            throw new Error("У product.html немає порожнього <div id=\"productPage\"></div> — "
+                + "статичний блок нема куди вставити");
+        }
+
         const html = template
             .replace("<!--SEO_HEAD-->", buildHead(product))
             .replace(BREADCRUMB_SLOT_RE, breadcrumbsMarkup(product))
-            .replace('<div id="productPage">\n\n</div>',
-                `<div id="productPage">${buildBody(product)}</div>`)
-            .replace('<div id="productPage"></div>',
-                `<div id="productPage">${buildBody(product)}</div>`);
+            .replace(SLOT, () => `<div id="productPage">${buildBody(product)}</div>`);
 
         const dir = path.join(OUTPUT_DIR, product.slug);
 
