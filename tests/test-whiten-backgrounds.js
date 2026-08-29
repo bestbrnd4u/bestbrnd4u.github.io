@@ -37,13 +37,19 @@ console.log("\n[1] Три запобіжники на місці");
     // Умову доповнено: адмін МОЖЕ примусово вирівняти навіть біле тло
     // (буває, що воно 250 і виглядає сірим поруч із чисто білою
     // карткою). Автоматика без такого рішення біле не чіпає.
+    // «Уже білий» тепер означає «ВСІ знайдені кольори периметра білі».
+    // Одного кольору мало: після приведення до 4:5 у кадрі їх два —
+    // біла добивка й фон самого знімка.
     check("перевірка перед обробкою",
-        /Math\.min\(\.\.\.bg\) >= ALREADY_WHITE && decided !== "white"/.test(script));
+        /allWhite && decided !== "white"/.test(script)
+        && /colors\.every/.test(script));
 
     // 2. Тільки однорідне тло: градієнт чи зйомка в інтерʼєрі — не наш
     //    випадок, там межі товару по кольору не знайти.
+    // Однорідність міряємо покриттям периметра, а не розкидом кутів:
+    // кути після приведення до 4:5 показують добивку, а не фон знімка.
     check("неоднорідне тло пропускається",
-        /spread > MAX_SPREAD\) return/.test(script));
+        /coverage < 0\.9\) return/.test(script));
 
     // 3. Заливка ВІД КРАЮ, а не по всьому кадру. Це головне: світла
     //    пряжка в центрі сумки лишається пряжкою, бо шлях до неї
@@ -114,10 +120,16 @@ console.log("\n[2b] Керування з адмінки");
         framing.normalizeFrame({ zoom: 1, x: 50, y: 50 }) === null);
 
     // У віджеті: визначення кольору й показ результату ДО публікації.
-    check("колір тла визначається", /detectBackground: function/.test(widget));
-    check("є попередній перегляд", /whitenedPreview: function/.test(widget));
+    //
+    // whitenedPreview() розділився надвоє: ensureWhitePreview() малює
+    // кадр (більший за той, на якому розбирається колір — інакше
+    // передперегляд виходив мутним) і кладе результат у стан, а
+    // whitenPixels() робить саму заливку. Рахувати це в render(), як
+    // було, не можна: на 640px браузер став би колом.
+    check("колір фону визначається", /detectBackground: function/.test(widget));
+    check("є попередній перегляд", /ensureWhitePreview: function/.test(widget));
     check("перегляд показується замість оригіналу",
-        /frame\.bg === "white" && this\.whitenedPreview\(\)/.test(widget));
+        /frame\.bg === "white" && this\.state\.whitePreview/.test(widget));
 
     // Алгоритм у віджеті мусить бути ТОЙ САМИЙ, що в збірці — інакше
     // показане не збігатиметься з результатом.
@@ -135,12 +147,12 @@ console.log("\n[2b] Керування з адмінки");
     check("«не чіпати» сильніше за автоматику",
         /decided === "keep"\) return \{ skip: "адмін лишив як є" \}/.test(script));
     check("«зробити білим» обходить перевірку на біле",
-        /ALREADY_WHITE && decided !== "white"/.test(script));
+        /allWhite && decided !== "white"/.test(script));
 
     // А от неоднорідне тло не обходиться навіть примусово: там заливка
     // зʼїла б половину кадру.
-    const uniformCheck = script.indexOf("spread > MAX_SPREAD");
-    const whiteCheck = script.indexOf("ALREADY_WHITE && decided");
+    const uniformCheck = script.indexOf("coverage < 0.9");
+    const whiteCheck = script.indexOf("allWhite && decided");
 
     check("неоднорідність перевіряється до примусу",
         uniformCheck > 0 && uniformCheck < whiteCheck);

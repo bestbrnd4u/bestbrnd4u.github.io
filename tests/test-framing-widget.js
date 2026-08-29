@@ -121,18 +121,24 @@ console.log("\n[2] Immutable-значення теж не ламається");
         впало[1]["c.webp"].zoom === lib.MAX_ZOOM, JSON.stringify(впало[1]["c.webp"]));
 }
 
-console.log("\n[3] Тло: блок узагалі має зʼявлятись");
+console.log("\n[3] Фон: блок узагалі має зʼявлятись");
 {
     const код = widget.replace(/\/\/[^\n]*/g, "");
 
-    check("розбір тла хтось викликає",
-        /componentDidMount: function \(\) \{\s*this\.detectBackground\(\);/.test(код));
+    // Дивимось у тіло методу, а не «в межах N символів»: componentDidMount
+    // ще й підписується на подію, і будь-яка відстань тут — це майбутнє
+    // хибне падіння через додану поруч кнопку.
+    const тіло = (name, next) => код.slice(код.indexOf(name + ": function"),
+        код.indexOf(next + ": function"));
+
+    check("розбір фону хтось викликає",
+        /this\.detectBackground\(\);/.test(тіло("componentDidMount", "componentWillUnmount")));
 
     // Адреса фото приходить не одразу — getAsset розвʼязує файл
     // асинхронно. Без повторної спроби щойно додане фото лишалось би
-    // без блоку про тло до перезавантаження сторінки.
+    // без блоку про фон до перезавантаження сторінки.
     check("і повторює спробу, коли адреса зʼявилась",
-        /componentDidUpdate: function \(\) \{\s*this\.detectBackground\(\);/.test(код));
+        /this\.detectBackground\(\);/.test(тіло("componentDidUpdate", "pointTo")));
 
     // Прапорець-булеан лишав би на підміненому фото чужий результат
     // розбору: кружечок показував би колір попереднього знімка.
@@ -144,20 +150,201 @@ console.log("\n[3] Тло: блок узагалі має зʼявлятись")
 
     // Три кнопки й підписи — те, заради чого все це.
     ["Зробити білим", "Не чіпати", "Автоматично",
-        "Тло вже біле", "Тло сіре або бежеве", "Тло неоднорідне"].forEach(text => {
+        "Фон вже білий", "Фон сірий або бежевий", "Фон неоднорідний"].forEach(text => {
         check(`у розмітці є «${text}»`, widget.includes(text));
     });
 
-    // Неоднорідне тло — фото на моделі чи в інтерʼєрі: заливка зʼїла б
-    //半 кадру. Цей запобіжник не обходиться навіть примусово.
-    check("для неоднорідного тла кнопок немає",
+    // «Тло» замінили на «фон» на прохання власника: у підписах має бути
+    // одне слово, а не два для однієї речі.
+    check("старе слово «тло» в підписах не лишилось",
+        !/"[^"]*[Тт]ло[^"]*"/.test(код));
+
+    // Неоднорідний фон — фото на моделі чи в інтерʼєрі: заливка зʼїла б
+    // пів кадру. Цей запобіжник не обходиться навіть примусово.
+    check("для неоднорідного фону кнопок немає",
         /this\.state\.bgUniform\s*\?\s*h\("div", \{ className: "framing-bg-actions" \}/.test(код));
 
     check("передперегляд показує саме майбутній результат",
-        /frame\.bg === "white" && this\.whitenedPreview\(\)/.test(код));
+        /frame\.bg === "white" && this\.state\.whitePreview/.test(код));
 }
 
-console.log("\n[4] Кадр і тло — різні рішення й не скасовують одне одного");
+console.log("\n[3b] Передперегляд не мутний і рахується один раз");
+{
+    const код = widget.replace(/\/\/[^\n]*/g, "");
+
+    // Заливку рахували на пікселях РОЗБОРУ, а він навмисно працює на
+    // копії 160px — йому треба лише колір кутів. Для передперегляду це
+    // вирок: рамка 145px, при 1.5× у неї розтягується сотня пікселів
+    // джерела. Виглядало так, ніби кнопка псує знімок.
+    const розбір = код.slice(код.indexOf("detectBackground:"), код.indexOf("ensureWhitePreview:"));
+    const перегляд = код.slice(код.indexOf("ensureWhitePreview:"), код.indexOf("whitenPixels:"));
+
+    check("розбір лишається дешевим — 160px", /var max = 160;/.test(розбір));
+
+    check("передперегляд малюється більшим", /var max = 640;/.test(перегляд));
+
+    check("і не бере пікселі з розбору", !/bgSource/.test(перегляд));
+
+    // Раніше заливка + toDataURL проганялись у render() — тобто на
+    // кожен рух повзунка. На 640px це підвісило б браузер.
+    const рендер = код.slice(код.indexOf("render: function"));
+
+    check("у render немає ані заливки, ані toDataURL",
+        !/whitenPixels|toDataURL/.test(рендер));
+
+    check("результат рахується один раз на фото",
+        /this\.state\.whitePreviewFor === url/.test(перегляд));
+
+    // Зняли «Зробити білим» — рамка не має далі показувати відбілене.
+    check("скасування прибирає передперегляд",
+        /whitePreview: null, whitePreviewFor: null/.test(перегляд));
+
+    check("кольори беремо з розбору, щоб підпис і картинка не розходились",
+        /var colors = self\.state\.bgColors;/.test(перегляд));
+
+    // Той самий допуск, що в збірці, — інакше це «схоже на результат»,
+    // а не він.
+    const заливка = код.slice(код.indexOf("whitenPixels:"), код.indexOf("setBackground:"));
+    const script = fs.readFileSync(path.join(ROOT, "scripts/whiten-backgrounds.js"), "utf8");
+
+    // Допуск і поріг однорідності живуть у віджеті на рівні модуля —
+    // розійдуться зі збіркою, і передперегляд почне показувати не те,
+    // що вийде після публікації.
+    check("допуск заливки збігається зі збіркою",
+        /var TOLERANCE = 14;/.test(код) && /TOLERANCE = 14/.test(script));
+
+    check("поріг однорідності кишень теж однаковий",
+        /var MAX_VARIANCE = 3;/.test(код) && /MAX_VARIANCE = 3/.test(script));
+
+    // Кишені фону — те, куди заливці немає ходу. Без них передперегляд
+    // показував би сірий острівець, якого в опублікованому фото не буде.
+    check("передперегляд теж заливає замкнені кишені",
+        /matchesBackground\(px, start \* 4, colors\)/.test(заливка)
+        && /fillPockets/.test(script));
+
+    check("асинхронний setState не летить у мертвий компонент",
+        /componentWillUnmount: function \(\)[\s\S]{0,80}this\.alive = false/.test(код)
+        && /self\.alive !== false/.test(перегляд));
+
+    // Рішення «білим» могло бути збережене раніше — тоді ми приходимо
+    // сюди на монтуванні, поки розбір ще летить. Зайняти адресу мовчки
+    // означало б не намалювати передперегляд ніколи: повторної спроби
+    // вже не буде.
+    check("не займаємо адресу, поки колір фону не порахований",
+        /if \(!this\.state\.bgColor\) return;[\s\S]{0,120}whitePreviewFor === url/.test(перегляд));
+}
+
+console.log("\n[3c] Картка праворуч показує те фото, яке правлять");
+{
+    const код = widget.replace(/\/\/[^\n]*/g, "");
+
+    const preview = fs.readFileSync(path.join(ROOT, "admin/preview-templates.js"), "utf8")
+        .replace(/\/\/[^\n]*/g, "");
+
+    const css = fs.readFileSync(path.join(ROOT, "admin/editor-styles.css"), "utf8");
+
+    // Прев'ю жило власним життям: правиш третє фото, а картка вперто
+    // показує перше. Щоб побачити результат, доводилось окремо гортати
+    // її стрілками й здогадуватись, яке з пʼяти відповідає рядку.
+    check("обидві сторони знають одну назву події",
+        /ACTIVE_EVENT = "bb4u:framing-active"/.test(код)
+        && /ACTIVE_EVENT = "bb4u:framing-active"/.test(preview));
+
+    check("клац по рядку розсилає подію",
+        /onMouseDown: function \(\) \{ announceActive\(self\.props\.src\); \}/.test(код));
+
+    check("картка слухає й перегортається",
+        /addEventListener\(ACTIVE_EVENT/.test(preview)
+        && /setState\(\{ index: i \}\)/.test(preview));
+
+    // Зворотний бік: перегорнули картку — підсвітився рядок.
+    check("стрілки й мініатюри картки теж розсилають",
+        /this\.announce\(next\)/.test(preview)
+        && /self\.announce\(i\)/.test(preview));
+
+    check("рядок підсвічується", /is-active/.test(код) && /\.framing-row\.is-active\{/.test(css));
+
+    // Розсилати у відповідь на подію означало б ганяти її по колу між
+    // двома компонентами.
+    const слухач = preview.slice(preview.indexOf("this.onActive = function"),
+        preview.indexOf("componentWillUnmount"));
+
+    check("у відповідь на подію ніхто не відповідає", !/announce\(/.test(слухач));
+
+    // Слухачі на window: без зняття кожне перевідкриття товару
+    // додавало б ще один, і подія множилась би.
+    check("слухачі знімаються при закритті",
+        /removeEventListener\(ACTIVE_EVENT/.test(код)
+        && /removeEventListener\(ACTIVE_EVENT/.test(preview));
+
+    // У віджеті шлях із запису, у прев'ю той самий файл може приїхати
+    // вже розвʼязаним через getAsset — тому порівнюємо за імʼям.
+    check("порівнюємо за імʼям файлу, а не за повним шляхом",
+        /function sameImage/.test(код) && /function sameImage/.test(preview));
+
+    // Не на слово: витягуємо саме звіряння й ганяємо на тих формах
+    // шляху, які реально трапляються з обох боків.
+    const sameImage = new Function(
+        extract("    function sameImage(a, b) {", "\n    }") + "; return sameImage;")();
+
+    const шлях = "/assets/images/products/uploads/ca173_svvfq_a8.webp";
+
+    check("повний шлях і саме імʼя — одне фото",
+        sameImage(шлях, "ca173_svvfq_a8.webp"));
+
+    check("версія в адресі не заважає",
+        sameImage(шлях, шлях + "?v=1a2b3c4d"));
+
+    check("різні фото не плутаються",
+        !sameImage(шлях, "/assets/images/products/uploads/ca173_svvfq_a92.webp"));
+
+    check("порожнє ні з чим не збігається",
+        !sameImage("", "") && !sameImage(шлях, null));
+}
+
+console.log("\n[3d] Правка в адмінці взагалі доїжджає");
+{
+    // Останній крок збірки — apply-cache-version.js: він проставляє
+    // ?v=<відбиток> кожному скрипту й стилю в розмітці. Поки він не
+    // відпрацював, адреса файлу лишається старою, і браузер віддає з
+    // кеша стару версію — хоч у гілці вже нова.
+    //
+    // А запускався він лише коли коміт чіпав data/**, assets/images/**,
+    // site.config.json або scripts/**. Коміт, який торкався тільки
+    // admin/**, збірку не запускав узагалі: файл новий, ?v= старий, в
+    // адмінці працює попередня версія. Виглядає як «правка не поїхала»,
+    // і зрозуміти чому майже неможливо.
+    //
+    // Дірку прикривало те, що більшість правок заодно чіпали data/**.
+    const yaml = require("js-yaml");
+
+    ["build-dev", "build-products"].forEach(name => {
+
+        const cfg = yaml.load(fs.readFileSync(
+            path.join(ROOT, ".github/workflows", name + ".yml"), "utf8"));
+
+        // ключ "on" у YAML читається як булеве true — це відома
+        // особливість YAML 1.1, а не помилка конфігу
+        const on = cfg.on || cfg[true];
+        const paths = (on && on.push && on.push.paths) || [];
+
+        ["admin/**", "assets/**", "scripts/**", "data/**"].forEach(p => {
+            check(`${name}: збірка реагує на ${p}`, paths.includes(p),
+                JSON.stringify(paths));
+        });
+
+    });
+
+    // Самі версії проставляються останнім кроком — якщо його
+    // переставити вище, усе описане вище повернеться.
+    const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, "package.json"), "utf8"));
+    const steps = pkg.scripts.build.split("&&").map(s => s.trim());
+
+    check("apply-cache-version лишається останнім кроком збірки",
+        /apply-cache-version/.test(steps[steps.length - 1]), steps[steps.length - 1]);
+}
+
+console.log("\n[4] Кадр і фон — різні рішення й не скасовують одне одного");
 {
     const код = widget.replace(/\/\/[^\n]*/g, "");
 
@@ -165,18 +352,18 @@ console.log("\n[4] Кадр і тло — різні рішення й не ск
     // зникав. Помітили б це аж на сайті.
     const крок = код.slice(код.indexOf("step: function"), код.indexOf("autoFit: function"));
 
-    check("наближення переносить вибір тла", /bg: this\.props\.frame\.bg \|\| null/.test(крок));
+    check("наближення переносить вибір фону", /bg: this\.props\.frame\.bg \|\| null/.test(крок));
 
     const підгін = код.slice(код.indexOf("autoFit: function"), код.indexOf("contentBounds:"));
 
-    check("«Підігнати» переносить вибір тла", /bg: self\.props\.frame\.bg \|\| null/.test(підгін));
+    check("«Підігнати» переносить вибір фону", /bg: self\.props\.frame\.bg \|\| null/.test(підгін));
 
-    check("«Скинути кадр» лишає тло на місці",
+    check("«Скинути кадр» лишає фон на місці",
         /className: "framing-reset"[\s\S]{0,400}zoom: 1, x: 50, y: 50, bg: frame\.bg \|\| null/.test(код));
 
     // Перевіряємо на самій бібліотеці: кадр «1× і центр», але з тлом,
     // мусить лишитись записом, інакше рішення нікуди не збережеться.
-    check("рамка тільки з тлом не викидається",
+    check("рамка тільки з фоном не викидається",
         JSON.stringify(lib.normalizeFrame({ zoom: 1, x: 50, y: 50, bg: "white" }))
             === JSON.stringify({ zoom: 1, x: 50, y: 50, bg: "white" }),
         JSON.stringify(lib.normalizeFrame({ zoom: 1, x: 50, y: 50, bg: "white" })));
@@ -188,6 +375,7 @@ console.log("\n[4] Кадр і тло — різні рішення й не ск
 console.log("\n[5] Рішення з адмінки доходить до збірки");
 {
     const script = fs.readFileSync(path.join(ROOT, "scripts/whiten-backgrounds.js"), "utf8");
+    const код = widget.replace(/\/\/[^\n]*/g, "");
 
     check("збірка читає bg саме з кадру фото",
         /framing\[name\] && framing\[name\]\.bg/.test(script));
@@ -197,11 +385,21 @@ console.log("\n[5] Рішення з адмінки доходить до збі
 
     // Заради цього кнопка «Зробити білим» і потрібна: тло 250
     // формально біле, а поруч із чисто білою карткою виглядає сірим.
-    check("«Зробити білим» обходить перевірку «тло вже біле»",
-        />= ALREADY_WHITE && decided !== "white"/.test(script));
+    check("«Зробити білим» обходить перевірку «фон уже білий»",
+        /allWhite && decided !== "white"/.test(script));
 
-    check("неоднорідне тло не обходиться навіть примусово",
-        script.indexOf("spread > MAX_SPREAD") < script.indexOf("ALREADY_WHITE && decided"));
+    check("неоднорідний фон не обходиться навіть примусово",
+        script.indexOf("coverage < 0.9") < script.indexOf("allWhite && decided"));
+
+    // Обидві сторони мусять читати фон однаково: інакше підпис в
+    // адмінці й результат публікації розійдуться — рівно те, з чого
+    // почалась ця правка.
+    check("віджет і збірка дивляться на весь периметр, а не на кути",
+        /function borderColors/.test(код) && /function borderColors/.test(script));
+
+    check("кути як єдине джерело правди більше не використовуються",
+        !/at\(1, 1\), at\(w - 2, 1\)/.test(код)
+        && !/at\(1, 1\), at\(w - 2, 1\)/.test(script));
 }
 
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);

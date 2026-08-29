@@ -13,20 +13,24 @@
 // Замінюємо тло на біле. Не «видаляємо фон» — саме вирівнюємо колір
 // того, що вже є тлом.
 //
-// ЧОГО НЕ РОБИМО І ЧОМУ
-// ----------------------
-// Не намагаємось відокремити товар від складного тла. Це задача
-// сегментації, і на предметних фото вона зайва: тло й так однотонне.
-// А головне — помилка тут коштує дорого: з'їдений край сумки не
-// повернеш, оригінал уже перезаписаний.
+// ЧОГО НЕ РОБИТЬ АВТОМАТИКА
+// --------------------------
+// Сама вона не намагається відокремити товар від складного фону.
+// Помилка тут коштує дорого: з'їдений край сумки не повернеш, оригінал
+// уже перезаписаний.
+//
+// Для таких знімків є ОКРЕМИЙ інструмент — вирізання нейромережею
+// (scripts/cutout.js). Він вмикається вручну, кнопкою «Вирізати товар»
+// в адмінці, і ніколи не спрацьовує сам.
 //
 // Тому три запобіжники:
 //
-//   1. Тільки НЕбіле тло. Якщо тло вже 250+, чіпати нічого — 270 фото
-//      з 303 просто пропускаються.
+//   1. Тільки НЕбіле тло. Якщо тло вже 250+, чіпати нічого — 275 фото
+//      з 368 просто пропускаються.
 //
-//   2. Тільки ОДНОРІДНЕ тло. Кути кадру мусять бути схожі між собою:
-//      градієнт чи зйомка в інтер'єрі — не наш випадок.
+//   2. Тільки ОДНОРІДНИЙ фон. Периметр кадру мусить складатись із
+//      кількох рівних кольорів; градієнт чи зйомка в інтерʼєрі — не
+//      наш випадок.
 //
 //   3. Заливка ВІД КРАЮ, а не по всьому кадру. Йдемо від рамки
 //      всередину й зупиняємось на першому пікселі товару. Світла
@@ -45,6 +49,9 @@
 const fs = require("fs");
 const path = require("path");
 const sharp = require("sharp");
+// вирізання товару нейромережею — підключається лише за потреби
+// (див. коментар у файлі: onnxruntime важкий)
+const cutout = require("./cutout");
 
 const ROOT = path.join(__dirname, "..");
 const DIR = path.join(ROOT, "assets/images/products/uploads");
@@ -53,18 +60,170 @@ const BACKUP = path.join(ROOT, "assets/images/_originals");
 // Тло, світліше за це, вважаємо вже білим — не чіпаємо.
 const ALREADY_WHITE = 250;
 
-// Наскільки схожими мусять бути кути, щоб тло вважалось однорідним.
-const MAX_SPREAD = 24;
-
 // Допуск навколо кольору тла. Той самий, що у віджеті кадрування:
 // тіні й компресія дають відхилення на кілька одиниць.
 const TOLERANCE = 14;
 
-function isBackground(data, i, bg) {
+// Наскільки рівною має бути замкнена область, щоб вважатись фоном.
+// Фон однорідний; шкіра, тканина й підкладка мають фактуру.
+const MAX_VARIANCE = 3;
 
-    return Math.abs(data[i] - bg[0]) <= TOLERANCE
-        && Math.abs(data[i + 1] - bg[1]) <= TOLERANCE
-        && Math.abs(data[i + 2] - bg[2]) <= TOLERANCE;
+function isBackground(data, i, colors) {
+
+    for (const bg of colors) {
+
+        if (Math.abs(data[i] - bg[0]) <= TOLERANCE
+            && Math.abs(data[i + 1] - bg[1]) <= TOLERANCE
+            && Math.abs(data[i + 2] - bg[2]) <= TOLERANCE) return true;
+
+    }
+
+    return false;
+
+}
+
+// Кольори фону — з УСІЄЇ рамки кадру, а не з чотирьох кутів.
+//
+// ЩО БУЛО НЕ ТАК (знайдено на живому каталозі)
+// ---------------------------------------------
+// Кути брались як єдине джерело правди. Але перед цим кроком фото
+// проходить normalize-product-images.js, який вписує знімок у полотно
+// 4:5 і добиває поля БІЛИМ. У кадрі 1200×1500 виходить так:
+//
+//   кути                255,255,255   ← добивка, якої в оригіналі не було
+//   фон самого знімка   240,240,240   ← справжнє тло, 63% кадру
+//
+// Далі все складалось одне до одного:
+//
+//   1. «Тло вже біле» — 255 у кутах, отже чіпати нічого. Фото
+//      пропускалось, хоча дві третини кадру сірі;
+//   2. навіть примусово («Зробити білим» в адмінці) заливка стартувала
+//      в білій добивці, розтікалась по ній і зупинялась на межі
+//      255→240: різниця 15, а допуск 14. Рівно на одиницю.
+//
+// Тобто кнопка була, натискалась — і не робила нічого. Тепер кольори
+// збираємо по всьому периметру: там і біла добивка, і сірий фон.
+//
+// Випадкові кольори (товар торкнувся краю кадру) відсіюємо за часткою
+// периметра: фон займає його помітну частину, край сумки — ні.
+function borderColors(data, w, h) {
+
+    const groups = [];
+
+    const add = (x, y) => {
+
+        const i = (y * w + x) * 4;
+
+        if (data[i + 3] < 16) return;   // прозорий — не колір
+
+        for (const g of groups) {
+
+            if (Math.abs(g.c[0] - data[i]) <= TOLERANCE
+                && Math.abs(g.c[1] - data[i + 1]) <= TOLERANCE
+                && Math.abs(g.c[2] - data[i + 2]) <= TOLERANCE) { g.n++; return; }
+
+        }
+
+        groups.push({ c: [data[i], data[i + 1], data[i + 2]], n: 1 });
+
+    };
+
+    const step = Math.max(1, Math.round(Math.min(w, h) / 100));
+
+    for (let x = 0; x < w; x += step) { add(x, 0); add(x, h - 1); }
+    for (let y = 0; y < h; y += step) { add(0, y); add(w - 1, y); }
+
+    const total = groups.reduce((sum, g) => sum + g.n, 0) || 1;
+
+    const kept = groups
+        .filter(g => g.n / total >= 0.05)
+        .sort((a, b) => b.n - a.n);
+
+    // Покриття — яку частку периметра пояснюють знайдені кольори.
+    // Саме воно й відповідає на питання «фон однорідний чи ні».
+    return {
+        colors: kept.map(g => g.c),
+        coverage: kept.reduce((sum, g) => sum + g.n, 0) / total
+    };
+
+}
+
+// Замкнені кишені фону.
+//
+// Заливка від країв не дістає туди, куди немає шляху ззовні: усередині
+// петлі ремня, під ручкою, у прорізі. На білій картці такий сірий
+// острівець помітний одразу — саме його й видно було на сумці Coach.
+//
+// Тому другим кроком беремо зв'язні області, які лишились: якщо
+// область збігається з фоном за кольором І однорідна, це фон, до якого
+// просто не було ходу.
+//
+// Однорідність — той самий запобіжник, що й скрізь у цьому файлі: без
+// нього світла підкладка всередині сумки, яка випадково збіглась із
+// фоном, стала б білою дірою. Фон рівний, підкладка має фактуру.
+function fillPockets(data, w, h, colors, visited) {
+
+    let painted = 0;
+
+    for (let start = 0; start < w * h; start++) {
+
+        if (visited[start] || !isBackground(data, start * 4, colors)) continue;
+
+        const cells = [];
+        const queue = [start];
+
+        visited[start] = 1;
+
+        let sum = 0;
+        let sum2 = 0;
+
+        while (queue.length) {
+
+            const p = queue.pop();
+            const i = p * 4;
+
+            cells.push(p);
+
+            const lum = (data[i] + data[i + 1] + data[i + 2]) / 3;
+
+            sum += lum;
+            sum2 += lum * lum;
+
+            const x = p % w;
+            const y = (p - x) / w;
+
+            [[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]].forEach(([nx, ny]) => {
+
+                if (nx < 0 || ny < 0 || nx >= w || ny >= h) return;
+
+                const q = ny * w + nx;
+
+                if (visited[q] || !isBackground(data, q * 4, colors)) return;
+
+                visited[q] = 1;
+                queue.push(q);
+
+            });
+
+        }
+
+        const mean = sum / cells.length;
+        const variance = Math.sqrt(Math.max(0, sum2 / cells.length - mean * mean));
+
+        if (variance > MAX_VARIANCE) continue;
+
+        cells.forEach(p => {
+            const i = p * 4;
+            data[i] = 255;
+            data[i + 1] = 255;
+            data[i + 2] = 255;
+        });
+
+        painted += cells.length;
+
+    }
+
+    return painted;
 
 }
 
@@ -73,9 +232,8 @@ function isBackground(data, i, bg) {
 // Класичний обхід у ширину зі стартом на рамці кадру. Пікселі товару
 // не зачіпаються, навіть якщо їхній колір збігається з тлом: до них
 // просто не дійде черга, бо шлях перекритий самим товаром.
-function fillFromEdges(data, w, h, bg) {
+function fillFromEdges(data, w, h, colors, visited) {
 
-    const visited = new Uint8Array(w * h);
     const queue = [];
 
     const push = (x, y) => {
@@ -90,7 +248,7 @@ function fillFromEdges(data, w, h, bg) {
 
         if (data[i + 3] < 16) { visited[p] = 1; return; }   // прозорий — уже тло
 
-        if (!isBackground(data, i, bg)) return;
+        if (!isBackground(data, i, colors)) return;
 
         visited[p] = 1;
         queue.push(p);
@@ -158,7 +316,7 @@ function adminChoice() {
 
             const bg = framing[name] && framing[name].bg;
 
-            if (bg === "white" || bg === "keep") choice[name] = bg;
+            if (bg === "white" || bg === "keep" || bg === "cutout") choice[name] = bg;
 
         });
 
@@ -181,39 +339,84 @@ async function whiten(file, apply, choice) {
     const w = info.width;
     const h = info.height;
 
-    const at = (x, y) => {
-        const i = (y * w + x) * 4;
-        return [data[i], data[i + 1], data[i + 2]];
-    };
-
-    const corners = [at(1, 1), at(w - 2, 1), at(1, h - 2), at(w - 2, h - 2)];
-
-    const bg = [0, 1, 2].map(c =>
-        Math.round(corners.reduce((sum, p) => sum + p[c], 0) / corners.length));
-
-    const spread = Math.max(...corners.map(p =>
-        Math.max(...[0, 1, 2].map(c => Math.abs(p[c] - bg[c])))));
+    const { colors, coverage } = borderColors(data, w, h);
 
     const decided = choice ? choice[file] : null;
 
     // «Не чіпати» з адмінки сильніше за автоматику.
     if (decided === "keep") return { skip: "адмін лишив як є" };
 
-    // Запобіжник 2: тло неоднорідне.
+    // «Вирізати» — інший інструмент, не заливка.
     //
-    // Цей запобіжник не обходиться навіть примусово: на фото в
-    // інтерʼєрі чи на моделі «тлом» слугує сам знімок, і заливка
-    // зʼїла б половину кадру.
-    if (spread > MAX_SPREAD) return { skip: "тло неоднорідне" };
+    // Заливка вміє лише однотонний фон: іде від країв і зупиняється на
+    // товарі. Знімок на столі чи з градієнтом вона чесно пропускає, і
+    // саме для таких випадків тут нейромережа (див. scripts/cutout.js).
+    //
+    // Вмикається ЛИШЕ вручну: тінь вона з'їдає, а на предметних фото з
+    // рівним фоном заливка дає кращий результат.
+    if (decided === "cutout") {
 
-    // Запобіжник 1: тло вже біле. Його адмін МОЖЕ обійти — буває, що
-    // тло 250 і виглядає сірим поруч із чисто білою карткою.
-    if (Math.min(...bg) >= ALREADY_WHITE && decided !== "white") {
-        return { skip: "тло вже біле" };
+        try {
+
+            const cut = await cutout.cutoutToWhite(full);
+
+            // Той самий запобіжник, що й для заливки, тільки навпаки:
+            // якщо «товару» лишилось менше відсотка, маска порожня —
+            // зберігати такий кадр означало б стерти фото.
+            if (cut.share < 0.01) return { skip: "маска порожня — товар не знайдено" };
+
+            if (!apply) return { would: Math.round(cut.share * 100), bg: null, cut: true };
+
+            fs.mkdirSync(BACKUP, { recursive: true });
+
+            const backup = path.join(BACKUP, file);
+
+            if (!fs.existsSync(backup)) fs.copyFileSync(full, backup);
+
+            await sharp(cut.data, {
+                raw: { width: cut.width, height: cut.height, channels: 3 }
+            }).webp({ quality: 88 }).toFile(full);
+
+            return { done: Math.round(cut.share * 100), bg: null, cut: true };
+
+        } catch (error) {
+
+            // Немає onnxruntime чи моделі — фото просто лишається як є.
+            // Валити всю збірку через один знімок не варто.
+            return { skip: `вирізання недоступне: ${error.message}` };
+
+        }
+
+    }
+
+    // Запобіжник 2: фон неоднорідний.
+    //
+    // Раніше це перевірялось за розкидом чотирьох кутів. Кути виявились
+    // ненадійним джерелом: після приведення до 4:5 вони показують білу
+    // добивку, а не фон знімка (див. borderColors вище).
+    //
+    // Тепер питаємо інакше: чи складається периметр із кількох рівних
+    // кольорів? На предметному фото так — фон і, можливо, добивка. На
+    // фото в інтерʼєрі чи на моделі периметр строкатий, жоден колір не
+    // набирає помітної частки, і покриття виходить низьким.
+    //
+    // Цей запобіжник не обходиться навіть примусово: там «фоном»
+    // слугує сам знімок, і заливка зʼїла б половину кадру.
+    if (!colors.length || coverage < 0.9) return { skip: "фон неоднорідний" };
+
+    // Запобіжник 1: фон уже білий. Його адмін МОЖЕ обійти — буває, що
+    // фон 250 і виглядає сірим поруч із чисто білою карткою.
+    const allWhite = colors.every(c => Math.min(c[0], c[1], c[2]) >= ALREADY_WHITE);
+
+    if (allWhite && decided !== "white") {
+        return { skip: "фон уже білий" };
     }
 
     // Запобіжник 3: заливка від країв.
-    const painted = fillFromEdges(data, w, h, bg);
+    const visited = new Uint8Array(w * h);
+
+    const painted = fillFromEdges(data, w, h, colors, visited)
+        + fillPockets(data, w, h, colors, visited);
 
     const share = painted / (w * h);
 
@@ -221,7 +424,7 @@ async function whiten(file, apply, choice) {
     // визначенням, і зберігати такий результат небезпечно.
     if (share > 0.97) return { skip: "залито майже весь кадр" };
 
-    if (!apply) return { would: Math.round(share * 100), bg: bg[0] };
+    if (!apply) return { would: Math.round(share * 100), bg: (colors.find(c => Math.min(c[0], c[1], c[2]) < ALREADY_WHITE) || colors[0])[0] };
 
     fs.mkdirSync(BACKUP, { recursive: true });
 
@@ -237,7 +440,7 @@ async function whiten(file, apply, choice) {
 
     fs.renameSync(full + ".tmp", full);
 
-    return { done: Math.round(share * 100), bg: bg[0] };
+    return { done: Math.round(share * 100), bg: (colors.find(c => Math.min(c[0], c[1], c[2]) < ALREADY_WHITE) || colors[0])[0] };
 
 }
 

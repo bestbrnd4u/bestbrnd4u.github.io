@@ -20,16 +20,21 @@ name: Build catalog data
 on:
   push:
     branches: [main]
+    # Той самий список, що й у build-dev.yml, і з тієї ж причини:
+    # останній крок збірки проставляє ?v= кожному скрипту й стилю, і
+    # без нього браузер віддає з кеша стару версію файлу за незмінною
+    # адресою. Коміт, який чіпає лише admin/** чи assets/js/**, збірку
+    # раніше не запускав — правка мовчки не доїжджала.
     paths:
-      - "data/products/**"
-      - "data/categories/**"
-      - "data/promotions/**"
-      - "data/collections/**"
-      - "data/promo-popups/**"
+      - "data/**"
       # завантажені через адмінку картинки: серед них трапляються імена
       # по 196 символів (вставка з буфера/чужої CDN), через які потім
       # падає git pull з "Filename too long" — ловимо одразу
-      - "assets/images/**"
+      - "assets/**"
+      - "admin/**"
+      - "*.html"
+      - "site.config.json"
+      - "scripts/**"
   workflow_dispatch: {}
 
 permissions:

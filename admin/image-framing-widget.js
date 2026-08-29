@@ -230,6 +230,124 @@
 
     }
 
+    // ---------- фон: ті самі правила, що в збірці ----------
+
+    // Допуск і поріг однорідності — ті самі, що в
+    // scripts/whiten-backgrounds.js. Розійдуться — і передперегляд
+    // почне показувати не те, що вийде після публікації.
+    var TOLERANCE = 14;
+    var MAX_VARIANCE = 3;
+
+    // Кольори фону — з УСЬОГО периметра, а не з чотирьох кутів.
+    //
+    // ЩО БУЛО НЕ ТАК. Кути брались як єдине джерело правди. Але перед
+    // публікацією фото проходить normalize-product-images.js: знімок
+    // вписується в полотно 4:5, а поля добиваються БІЛИМ. У кутах
+    // опиняється саме ця добивка — 255, — а фон самого знімка (240)
+    // лишається непоміченим.
+    //
+    // Звідси й скарга: підпис казав «Фон вже білий» над фото, у якого
+    // дві третини кадру сірі.
+    function borderColors(px, w, h) {
+
+        var groups = [];
+
+        function add(x, y) {
+
+            var i = (y * w + x) * 4;
+
+            if (px[i + 3] < 16) return;
+
+            for (var k = 0; k < groups.length; k++) {
+
+                var g = groups[k];
+
+                if (Math.abs(g.c[0] - px[i]) <= TOLERANCE
+                    && Math.abs(g.c[1] - px[i + 1]) <= TOLERANCE
+                    && Math.abs(g.c[2] - px[i + 2]) <= TOLERANCE) { g.n++; return; }
+
+            }
+
+            groups.push({ c: [px[i], px[i + 1], px[i + 2]], n: 1 });
+
+        }
+
+        var step = Math.max(1, Math.round(Math.min(w, h) / 100));
+        var x, y;
+
+        for (x = 0; x < w; x += step) { add(x, 0); add(x, h - 1); }
+        for (y = 0; y < h; y += step) { add(0, y); add(w - 1, y); }
+
+        var total = groups.reduce(function (s, g) { return s + g.n; }, 0) || 1;
+
+        var kept = groups
+            .filter(function (g) { return g.n / total >= 0.05; })
+            .sort(function (a, b) { return b.n - a.n; });
+
+        return {
+            colors: kept.map(function (g) { return g.c; }),
+            coverage: kept.reduce(function (s, g) { return s + g.n; }, 0) / total
+        };
+
+    }
+
+    function matchesBackground(px, i, colors) {
+
+        for (var k = 0; k < colors.length; k++) {
+
+            if (Math.abs(px[i] - colors[k][0]) <= TOLERANCE
+                && Math.abs(px[i + 1] - colors[k][1]) <= TOLERANCE
+                && Math.abs(px[i + 2] - colors[k][2]) <= TOLERANCE) return true;
+
+        }
+
+        return false;
+
+    }
+
+    // ---------- звʼязок із прев'ю картки ----------
+
+    // Праворуч у Decap стоїть прев'ю картки товару, і воно жило власним
+    // життям: ви правите третє фото, а картка вперто показує перше.
+    // Щоб побачити результат, доводилось окремо гортати її стрілками й
+    // самому здогадуватись, яке з пʼяти фото відповідає рядку, у якому
+    // ви зараз стоїте.
+    //
+    // Тепер обидві сторони говорять про «поточне фото» через одну
+    // подію: клац по рядку — картка перегортається на це фото; клац по
+    // стрілці чи мініатюрі в картці — підсвічується відповідний рядок.
+    //
+    // ЧОМУ ПОДІЯ, А НЕ СПІЛЬНИЙ СТАН
+    // -------------------------------
+    // Віджет і шаблон прев'ю — два незалежні компоненти Decap: вони не
+    // мають спільного батька, і передати щось пропсами нема через кого.
+    // Прев'ю малюється в окремому iframe, але САМ КОД виконується у
+    // головному вікні (Decap рендерить туди порталом), тож window у них
+    // спільне — цього досить.
+    //
+    // Порівнюємо за ІМЕНЕМ ФАЙЛУ, а не за повним шляхом: у віджеті це
+    // шлях із запису, у прев'ю той самий шлях може приїхати вже
+    // розвʼязаним через getAsset.
+    var ACTIVE_EVENT = "bb4u:framing-active";
+
+    function announceActive(src) {
+
+        if (!src || typeof window.CustomEvent !== "function") return;
+
+        window.dispatchEvent(new CustomEvent(ACTIVE_EVENT, { detail: String(src) }));
+
+    }
+
+    function sameImage(a, b) {
+
+        var name = function (v) {
+            return String(v || "").split("?")[0].split("#")[0].split("/").pop();
+        };
+
+        return !!a && !!b && name(a) === name(b);
+
+    }
+
     var FrameEditor = createClass({
 
         getInitialState: function () {
@@ -239,12 +357,20 @@
             return {
                 dragging: false,
                 fitError: null,
-                // тло: адреса фото, яку вже розібрали (див. detectBackground)
+                // фон: адреса фото, яку вже розібрали (див. detectBackground)
                 bgChecked: null,
                 bgColor: null,
+                // усі кольори фону: біла добивка до 4:5 і фон знімка
+                bgColors: null,
                 bgUniform: false,
                 bgIsWhite: false,
-                bgSource: null
+                // Пікселі розбору тут більше не тримаємо: передперегляд
+                // малюється зі свого, більшого кадру, а копія ImageData
+                // на кожен рядок — це мегабайти в стані ні за чим.
+                //
+                // відбілений передперегляд і фото, для якого його рахували
+                whitePreview: null,
+                whitePreviewFor: null
             };
         },
 
@@ -256,7 +382,35 @@
         // а весь блок про тло (кружечок кольору, підпис, три кнопки й
         // передперегляд) просто не малювався. Код був, функції не було.
         componentDidMount: function () {
+
+            var self = this;
+
+            this.alive = true;
+
+            // Підсвічуємо рядок, коли картку праворуч перегорнули на
+            // це фото — щоб не шукати очима, який із десяти рядків
+            // зараз показаний.
+            this.onActive = function (event) {
+
+                var active = sameImage(event.detail, self.props.src);
+
+                if (active !== self.state.active) self.setState({ active: active });
+
+            };
+
+            window.addEventListener(ACTIVE_EVENT, this.onActive);
+
             this.detectBackground();
+            this.ensureWhitePreview();
+
+        },
+
+        // Малювання передперегляду асинхронне: рядок може зникнути
+        // (прибрали фото, згорнули блок) раніше, ніж воно завершиться.
+        // Без цього прапорця setState прилетів би в неживий компонент.
+        componentWillUnmount: function () {
+            this.alive = false;
+            if (this.onActive) window.removeEventListener(ACTIVE_EVENT, this.onActive);
         },
 
         // Адреса фото приходить не одразу: getAsset розвʼязує файл
@@ -265,6 +419,7 @@
         // фото — до перезавантаження сторінки.
         componentDidUpdate: function () {
             this.detectBackground();
+            this.ensureWhitePreview();
         },
 
         // Перетягування по кадру рухає точку фокуса. Рахуємо у відсотках
@@ -371,33 +526,29 @@
                     return;   // фото з іншого домену
                 }
 
-                var px = data.data;
+                var found = borderColors(data.data, w, h);
 
-                function at(x, y) {
-                    var i = (y * w + x) * 4;
-                    return [px[i], px[i + 1], px[i + 2]];
-                }
+                var colors = found.colors;
 
-                var corners = [at(1, 1), at(w - 2, 1), at(1, h - 2), at(w - 2, h - 2)];
+                if (!colors.length) return;
 
-                var bg = [0, 1, 2].map(function (c) {
-                    return Math.round(corners.reduce(function (sum, p) {
-                        return sum + p[c];
-                    }, 0) / corners.length);
-                });
-
-                var spread = Math.max.apply(null, corners.map(function (p) {
-                    return Math.max(
-                        Math.abs(p[0] - bg[0]),
-                        Math.abs(p[1] - bg[1]),
-                        Math.abs(p[2] - bg[2]));
-                }));
+                // Фон знімка — це НЕбілий колір, якщо він є. Біле
+                // здебільшого виявляється добивкою до 4:5, і показувати
+                // її як «знайдений колір» означає брехати підписом.
+                var bg = colors.filter(function (c) {
+                    return Math.min(c[0], c[1], c[2]) < 250;
+                })[0] || colors[0];
 
                 self.setState({
+                    bgColors: colors,
                     bgColor: bg,
-                    bgUniform: spread <= 24,
-                    bgIsWhite: Math.min(bg[0], bg[1], bg[2]) >= 250,
-                    bgSource: { px: px, w: w, h: h, bg: bg }
+                    // Однорідність міряємо покриттям периметра, а не
+                    // розкидом кутів: кути після приведення до 4:5
+                    // показують добивку, а не фон знімка.
+                    bgUniform: found.coverage >= 0.9,
+                    bgIsWhite: colors.every(function (c) {
+                        return Math.min(c[0], c[1], c[2]) >= 250;
+                    })
                 });
 
             };
@@ -411,19 +562,121 @@
         // Йдемо від рамки всередину й зупиняємось на першому пікселі
         // товару. Світла пряжка в центрі сумки лишається пряжкою: шлях
         // до неї перекритий самим товаром.
-        whitenedPreview: function () {
+        // Передперегляд «як стане після публікації».
+        //
+        // ЩО БУЛО НЕ ТАК
+        // ---------------
+        // Заливку рахували на тих самих пікселях, що й РОЗБІР тла, — а
+        // розбір навмисно працює на зменшеній копії 160px: йому треба
+        // лише колір кутів, і читати заради цього повний файл ні до
+        // чого.
+        //
+        // Для передперегляду ті самі 160px — це вирок. Рамка в адмінці
+        // близько 145px завширшки, при наближенні 1.5× у неї
+        // розтягується сотня пікселів джерела. Фото після натискання
+        // «Зробити білим» помітно мутніло — і виглядало це так, ніби
+        // кнопка псує знімок.
+        //
+        // Тому передперегляд малюємо окремо й більшим (640px по довгій
+        // стороні — учетверо більше за рамку навіть на екрані з
+        // подвоєною щільністю).
+        //
+        // І РАХУЄМО ОДИН РАЗ
+        // -------------------
+        // Раніше whitenedPreview() викликався прямо в render(), тобто
+        // заливка всього кадру + toDataURL проганялись на кожне
+        // перемальовування — а воно трапляється на кожен рух повзунка й
+        // на кожен піксель перетягування точки. На 160px це просто
+        // марна робота; на 640px браузер би став колом. Тому результат
+        // рахується один раз на фото й лежить у стані.
+        ensureWhitePreview: function () {
 
-            var source = this.state.bgSource;
+            var self = this;
+            var url = this.props.url;
 
-            if (!source) return null;
+            var potribno = url && this.props.frame && this.props.frame.bg === "white";
 
-            var w = source.w;
-            var h = source.h;
-            var bg = source.bg;
+            // Зняли «Зробити білим» — прибираємо й картинку, інакше
+            // рамка показувала б відбілене фото після скасування.
+            if (!potribno) {
 
-            var px = new Uint8ClampedArray(source.px);
+                if (this.state.whitePreviewFor) {
+                    this.setState({ whitePreview: null, whitePreviewFor: null });
+                }
 
-            var TOLERANCE = 14;
+                return;
+
+            }
+
+            // Колір фону ще не порахований.
+            //
+            // Кнопки в цей момент і не видно — весь блок малюється лише
+            // коли bgColor є. Але рішення «білим» могло бути ЗБЕРЕЖЕНЕ
+            // раніше, і тоді ми приходимо сюди на самому монтуванні,
+            // поки розбір ще летить. Мовчки зайняти адресу означало б
+            // ніколи не намалювати передперегляд: повторної спроби вже
+            // не буде. Тому просто чекаємо наступного оновлення.
+            if (!this.state.bgColor) return;
+
+            if (this.state.whitePreviewFor === url) return;
+
+            this.setState({ whitePreviewFor: url });
+
+            var img = new Image();
+
+            img.crossOrigin = "anonymous";
+
+            img.onerror = function () {
+                console.warn("Кадрування: не вдалось прочитати фото для передперегляду:", url);
+            };
+
+            img.onload = function () {
+
+                var max = 640;
+                var scale = Math.min(1, max / Math.max(img.width, img.height));
+
+                var w = Math.max(1, Math.round(img.width * scale));
+                var h = Math.max(1, Math.round(img.height * scale));
+
+                var canvas = document.createElement("canvas");
+
+                canvas.width = w;
+                canvas.height = h;
+
+                canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+
+                var data;
+
+                try {
+                    data = canvas.getContext("2d").getImageData(0, 0, w, h);
+                } catch (error) {
+                    return;   // фото з іншого домену
+                }
+
+                // Кольори фону беремо з РОЗБОРУ, а не міряємо заново:
+                // інакше підпис («Фон сірий або бежевий») і картинка
+                // могли б розійтись на кілька одиниць і суперечити одне
+                // одному.
+                var colors = self.state.bgColors;
+
+                if (!colors || !colors.length) return;
+
+                var url_ = self.whitenPixels(data.data, w, h, colors, canvas);
+
+                if (self.alive !== false) self.setState({ whitePreview: url_ });
+
+            };
+
+            img.src = url;
+
+        },
+
+        // Сама заливка від країв — та сама, що в збірці
+        // (scripts/whiten-backgrounds.js), із тим самим допуском.
+        // Це не «схоже на результат», а він і є.
+        whitenPixels: function (source, w, h, colors, canvas) {
+
+            var px = new Uint8ClampedArray(source);
 
             var visited = new Uint8Array(w * h);
             var queue = [];
@@ -440,9 +693,7 @@
 
                 if (px[i + 3] < 16) { visited[p] = 1; return; }
 
-                if (Math.abs(px[i] - bg[0]) > TOLERANCE
-                    || Math.abs(px[i + 1] - bg[1]) > TOLERANCE
-                    || Math.abs(px[i + 2] - bg[2]) > TOLERANCE) return;
+                if (!matchesBackground(px, i, colors)) return;
 
                 visited[p] = 1;
                 queue.push(p);
@@ -471,10 +722,66 @@
 
             }
 
-            var canvas = document.createElement("canvas");
+            // Замкнені кишені фону — те, куди заливці не було ходу:
+            // всередині петлі ремня, під ручкою. Без цього кроку
+            // передперегляд показував би сірий острівець, якого в
+            // опублікованому фото вже не буде — і показував би неправду.
+            //
+            // Однорідність (розкид яскравості) — той самий запобіжник,
+            // що в збірці: підкладка з фактурою фоном не вважається.
+            for (var start = 0; start < w * h; start++) {
 
-            canvas.width = w;
-            canvas.height = h;
+                if (visited[start] || !matchesBackground(px, start * 4, colors)) continue;
+
+                var cells = [];
+                var pocket = [start];
+                var sum = 0;
+                var sum2 = 0;
+
+                visited[start] = 1;
+
+                while (pocket.length) {
+
+                    var q = pocket.pop();
+                    var qi = q * 4;
+
+                    cells.push(q);
+
+                    var lum = (px[qi] + px[qi + 1] + px[qi + 2]) / 3;
+
+                    sum += lum;
+                    sum2 += lum * lum;
+
+                    var qx = q % w;
+                    var qy = (q - qx) / w;
+
+                    [[qx - 1, qy], [qx + 1, qy], [qx, qy - 1], [qx, qy + 1]].forEach(function (pt) {
+
+                        if (pt[0] < 0 || pt[1] < 0 || pt[0] >= w || pt[1] >= h) return;
+
+                        var n = pt[1] * w + pt[0];
+
+                        if (visited[n] || !matchesBackground(px, n * 4, colors)) return;
+
+                        visited[n] = 1;
+                        pocket.push(n);
+
+                    });
+
+                }
+
+                var mean = sum / cells.length;
+                var variance = Math.sqrt(Math.max(0, sum2 / cells.length - mean * mean));
+
+                if (variance > MAX_VARIANCE) continue;
+
+                cells.forEach(function (c) {
+                    px[c * 4] = 255;
+                    px[c * 4 + 1] = 255;
+                    px[c * 4 + 2] = 255;
+                });
+
+            }
 
             canvas.getContext("2d").putImageData(new ImageData(px, w, h), 0, 0);
 
@@ -646,53 +953,37 @@
             // виходили на всю картинку — і кнопка честно відповідала
             // «не вдалося визначити межі товару».
             //
-            // Кути — надійне джерело: товар у центрі, а по кутах
-            // практично завжди тло. Беремо всі чотири й перевіряємо,
-            // що вони схожі між собою: якщо ні — фото не на однотонному
-            // тлі, і підгонка тут не застосовна.
-            function at(x, y) {
+            // Кольори фону беремо з усього периметра — той самий розбір,
+            // що й для кнопки «Зробити білим».
+            //
+            // Раніше тут брались чотири кути. На фото, приведеному до
+            // 4:5, у кутах лежить БІЛА ДОБИВКА, а фон знімка сірий — і
+            // «межею товару» ставав край цієї добивки. Виходило, що
+            // товар займає майже весь кадр, і «Підігнати» чесно
+            // відповідало «підганяти нема чого», нічого не зробивши.
+            var found = borderColors(data, w, h);
 
-                var i = (y * w + x) * 4;
+            if (!found.colors.length || found.coverage < 0.9) return null;
 
-                return [data[i], data[i + 1], data[i + 2]];
-
-            }
-
-            var corners = [at(1, 1), at(w - 2, 1), at(1, h - 2), at(w - 2, h - 2)];
-
-            // середній колір кутів
-            var bg = [0, 1, 2].map(function (c) {
-                return Math.round(corners.reduce(function (sum, p) {
-                    return sum + p[c];
-                }, 0) / corners.length);
-            });
-
-            // Кути мусять бути схожі: різниця більша за 24 означає, що
-            // тло неоднорідне (градієнт, кадр у інтерʼєрі) — тоді межі
-            // товару по кольору не знайти.
-            var spread = Math.max.apply(null, corners.map(function (p) {
-                return Math.max(
-                    Math.abs(p[0] - bg[0]),
-                    Math.abs(p[1] - bg[1]),
-                    Math.abs(p[2] - bg[2]));
-            }));
-
-            if (spread > 24) return null;
-
-            // Допуск навколо кольору тла: тіні й компресія дають
-            // відхилення на кілька одиниць, і без запасу межі товару
-            // «розпливуться» на весь кадр.
+            // Свій допуск, вужчий за той, що в заливці (14).
+            //
+            // Тут ми шукаємо МЕЖІ товару, і кожна зайва одиниця допуску
+            // з'їдає його край: тінь під сумкою чи світлий шов
+            // зараховуються до фону, і кадр обрізається по живому.
+            // Заливці ж запас потрібен — вона фон замінює, а не міряє.
             var TOLERANCE = 12;
 
             function isBackground(x, y) {
 
                 var i = (y * w + x) * 4;
 
-                if (data[i + 3] < 16) return true;   // прозорий — теж тло
+                if (data[i + 3] < 16) return true;   // прозорий — теж фон
 
-                return Math.abs(data[i] - bg[0]) <= TOLERANCE
-                    && Math.abs(data[i + 1] - bg[1]) <= TOLERANCE
-                    && Math.abs(data[i + 2] - bg[2]) <= TOLERANCE;
+                return found.colors.some(function (c) {
+                    return Math.abs(data[i] - c[0]) <= TOLERANCE
+                        && Math.abs(data[i + 1] - c[1]) <= TOLERANCE
+                        && Math.abs(data[i + 2] - c[2]) <= TOLERANCE;
+                });
 
             }
 
@@ -758,7 +1049,17 @@
                 transformOrigin: frame.x + "% " + frame.y + "%"
             };
 
-            return h("div", { className: "framing-row" },
+            return h("div", {
+
+                className: "framing-row" + (this.state.active ? " is-active" : ""),
+
+                // Клац будь-де в рядку — картка праворуч показує саме це
+                // фото. Слухаємо mousedown на всьому рядку, а не окремі
+                // кнопки: людина може почати з повзунка, з рамки чи з
+                // «Зробити білим» — намір скрізь один.
+                onMouseDown: function () { announceActive(self.props.src); }
+
+            },
 
                 // ----- рамка 4:5, у ній фото і мітка фокуса -----
                 h("div", {
@@ -778,7 +1079,7 @@
                             // Коли обрано «біле», показуємо ПЕРЕМАЛЬОВАНЕ
                             // фото, а не оригінал: рішення приймається,
                             // коли результат видно.
-                            src: (frame.bg === "white" && this.whitenedPreview()) || url,
+                            src: (frame.bg === "white" && this.state.whitePreview) || url,
                             style: imageStyle,
                             draggable: false,
                             alt: ""
@@ -847,13 +1148,13 @@
                                     }
                                 }),
                                 this.state.bgIsWhite
-                                    ? "Тло вже біле"
+                                    ? "Фон вже білий"
                                     : this.state.bgUniform
-                                        ? "Тло сіре або бежеве"
-                                        : "Тло неоднорідне"),
+                                        ? "Фон сірий або бежевий"
+                                        : "Фон неоднорідний"),
 
-                            // Неоднорідне тло не чіпаємо взагалі: це фото
-                            // на моделі або в інтерʼєрі, там «тлом»
+                            // Неоднорідний фон не чіпаємо взагалі: це фото
+                            // на моделі або в інтерʼєрі, там фоном
                             // слугує сам знімок.
                             this.state.bgUniform
                                 ? h("div", { className: "framing-bg-actions" },
@@ -881,16 +1182,38 @@
                                         : null)
                                 : null,
 
+                            // «Вирізати» пропонуємо ЗАВЖДИ, зокрема на
+                            // неоднорідному фоні — це якраз той випадок,
+                            // де заливка безсила, а нейромережа дає раду.
+                            h("div", { className: "framing-bg-actions" },
+
+                                h("button", {
+                                    type: "button",
+                                    className: "framing-bg-btn"
+                                        + (frame.bg === "cutout" ? " is-active" : ""),
+                                    onClick: function () { self.setBackground("cutout"); }
+                                }, "Вирізати товар"),
+
+                                h("span", { className: "framing-hint" },
+                                    frame.bg === "cutout"
+                                        ? "Товар виріжеться при публікації. Тінь при цьому зникне."
+                                        : "Для фото на столі чи з візерунком — там, де заливка безсила.")),
+
                             h("p", { className: "framing-hint" },
                                 !this.state.bgUniform
-                                    ? "Фото на моделі або в інтерʼєрі — тло тут замінити не можна."
+                                    ? "Фото на моделі або в інтерʼєрі — фон тут замінити не можна."
                                     : frame.bg === "white"
-                                        ? "Ліворуч показано, яким стане фото після публікації."
+                                        // Прямо кажемо, ДЕ дивитись. Картка
+                                        // праворуч показує файл як він є —
+                                        // вона про верстку, не про фон, — і
+                                        // незмінене фото в ній читається як
+                                        // «кнопка не спрацювала».
+                                        ? "Результат видно ліворуч. У картці праворуч фон ще старий — він зміниться при публікації."
                                         : frame.bg === "keep"
                                             ? "Це фото лишиться як є."
                                             : this.state.bgIsWhite
                                                 ? "Нічого робити не потрібно."
-                                                : "Збірка вирівняє тло сама. «Не чіпати» — щоб залишила як є."))
+                                                : "Збірка вирівняє фон сама. «Не чіпати» — щоб залишила як є."))
                         : null,
 
                     // «Підігнати» — те, що потрібно найчастіше: предметні

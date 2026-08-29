@@ -454,9 +454,15 @@ console.log("\n[9] «Підігнати по товару»");
     // виявлявся ВЕСЬ кадр, і кнопка честно відповідала «не вдалося
     // визначити межі товару».
     check("зашитого порога більше немає", !/var LIMIT = \d+/.test(widget));
-    check("тло визначається по кутах", /var corners = \[at\(1, 1\)/.test(widget));
-    check("є допуск навколо кольору тла", /TOLERANCE = 12/.test(widget));
-    check("неоднорідне тло відхиляється", /if \(spread > 24\) return null/.test(widget));
+    // Кути як джерело правди прибрані: після приведення до 4:5 у них
+    // біла добивка, а не фон знімка. «Межею товару» ставав край цієї
+    // добивки, і виходило, що товар займає весь кадр — кнопка чесно
+    // відповідала «підганяти нема чого».
+    check("фон визначається по всьому периметру",
+        /found = borderColors\(data, w, h\)/.test(widget));
+    check("є допуск навколо кольору фону", /TOLERANCE = 12/.test(widget));
+    check("неоднорідний фон відхиляється",
+        /found\.coverage < 0\.9\) return null/.test(widget));
 
     check("фото цілком біле не ламає підгонку", /if \(maxX < 0\) return null/.test(widget));
     check("товар на весь кадр не підганяється",
@@ -723,11 +729,12 @@ console.log("\n[10] Автоматичний кадр для фото з зав�
 
     // Логіка мусить бути ТА САМА, інакше кнопка «Підігнати» й
     // автоматика дадуть різні кадри для одного знімка.
-    check("тло по кутах в обох", /corners/.test(script) && /corners/.test(widget));
+    check("фон по периметру в обох",
+        /coverage/.test(script) && /coverage/.test(widget));
     check("допуск однаковий",
         /TOLERANCE = 12/.test(script) && /TOLERANCE = 12/.test(widget));
     check("межа однорідності однакова",
-        /spread > 24/.test(script) && /spread > 24/.test(widget));
+        /coverage < 0\.9/.test(script) && /coverage < 0\.9/.test(widget));
     check("прозорість вважається тлом в обох",
         /data\[i \+ 3\] < 16/.test(script) && /data\[i \+ 3\] < 16/.test(widget));
 
