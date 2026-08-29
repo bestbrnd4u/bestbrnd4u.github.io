@@ -23,7 +23,7 @@
   "preOrderPrepayment": 100,
   "strapInfo": "Двоколірний браслет із нержавіючої сталі у сріблястому та золотистому відтінках із розкладною застібкою-кліпсою. Ширина браслета — 1 см",
   "sizes": [
-    "Onesize"
+    "ONESIZE"
   ],
   "splitByColor": true,
   "searchKeywords": [
@@ -54,5 +54,16 @@
   "description": "Вишуканий жіночий годинник Michael Kors Micro Lexington Pavé Two-Tone у мініатюрному форматі. Модель поєднує сріблясті та золотисті відтінки, доповнені сяючими pavé-акцентами, створюючи елегантний та жіночний образ.\nМініатюрний круглий корпус має діаметр лише 13 мм та доповнений фасетованим безелем. Сріблястий циферблат прикрашений блискучими кристалами. Годинник оснащений надійним кварцовим механізмом із трьома стрілками. Корпус і двоколірний браслет повністю виконані з нержавіючої сталі. Водонепроникність — до 50 м (5 ATM)",
   "sku": "MK4903",
   "rating": 5,
-  "category": "Годинники"
+  "category": "Годинники",
+  "legacySlugs": [
+    "годинник-michael-kors-micro-lexington-pavé-two-tone-mk4903"
+  ],
+  "slug": "hodynnyk-michael-kors-micro-lexington-pav-two-tone-mk4903",
+  "id": 83,
+  "color": "Сріблястий / золотистий",
+  "images": [
+    "/assets/images/products/uploads/michael-kors-micro-lexington-quartz-ladies-watch-mk4903.webp",
+    "/assets/images/products/uploads/michael-kors-micro-lexington-quartz-ladies-watch-mk4903_2.webp",
+    "/assets/images/products/uploads/michael-kors-micro-lexington-quartz-ladies-watch-mk4903_3.webp"
+  ]
 }
