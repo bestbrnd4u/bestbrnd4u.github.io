@@ -1,10 +1,38 @@
 {
-  "title": "Жіноча сумка на плече JW PEI Gabbi Ruched Hobo Handbag",
+  "gender": [
+    "Жінкам"
+  ],
+  "color": "Зелений",
   "brand": "JW PEI",
-  "category": "Жіночі сумки",
-  "gender": "Жінкам",
   "price": 4400,
-  "description": "JW PEI Gabbi — сумка-хобо з характерною драпіровкою, яка зробила модель відомою. Округла форма, коротка ручка, носиться в руці або на згині лікоття. Два насичених кольори.",
+  "framing": {
+    "gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp": {
+      "zoom": 1,
+      "x": 50,
+      "y": 50,
+      "bg": "white"
+    },
+    "gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp": {
+      "zoom": 1,
+      "x": 50,
+      "y": 50,
+      "bg": "white"
+    },
+    "jwp-ma123-1.webp": {
+      "zoom": 1,
+      "x": 50,
+      "y": 50,
+      "bg": "white"
+    },
+    "jwp-ma123-3.webp": {
+      "zoom": 1,
+      "x": 50,
+      "y": 50,
+      "bg": "white"
+    }
+  },
+  "preOrder": false,
+  "slug": "jw-pei-zhinocha-sumka-na-pleche-jw-pei-gabbi-ruched-hobo-han",
   "variants": [
     {
       "color": "Зелений",
@@ -27,8 +55,9 @@
       "sku": "JWP-MA123"
     }
   ],
-  "isNew": false,
-  "sku": "B094QT219C",
+  "sizes": [
+    "ONESIZE"
+  ],
   "searchKeywords": [
     "джей ві пей",
     "jw pei",
@@ -44,17 +73,16 @@
     "ruched",
     "hobo"
   ],
-  "instagramBlock": "general",
-  "preOrder": false,
+  "isNew": false,
+  "title": "Жіноча сумка на плече JW PEI Gabbi Ruched Hobo Handbag",
   "images": [
     "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp",
     "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-2.webp",
     "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp"
   ],
-  "slug": "jw-pei-zhinocha-sumka-na-pleche-jw-pei-gabbi-ruched-hobo-han",
   "id": 14,
-  "color": "Зелений",
-  "sizes": [
-    "ONESIZE"
-  ]
+  "instagramBlock": "general",
+  "description": "JW PEI Gabbi — сумка-хобо з характерною драпіровкою, яка зробила модель відомою. Округла форма, коротка ручка, носиться в руці або на згині лікоття. Два насичених кольори.",
+  "sku": "B094QT219C",
+  "category": "Жіночі сумки"
 }
