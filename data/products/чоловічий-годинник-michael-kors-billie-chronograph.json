@@ -1,0 +1,56 @@
+{
+  "gender": [
+    "Чоловікам"
+  ],
+  "preOrderDays": "10-14 робочих днів",
+  "forcePublish": false,
+  "material": "Нержавіюча сталь",
+  "brand": "Michael Kors",
+  "price": 6600,
+  "preOrder": true,
+  "dimensions": "Корпус — 4,4 см у діаметрі",
+  "variants": [
+    {
+      "color": "Чорний / золотистий",
+      "hex": "#1f2f8c",
+      "images": [
+        "/assets/images/products/uploads/загрузка.webp",
+        "/assets/images/products/uploads/загрузка-1-.webp",
+        "/assets/images/products/uploads/загрузка-2-.webp",
+        "/assets/images/products/uploads/загрузка-1-1-.webp"
+      ]
+    }
+  ],
+  "preOrderPrepayment": 100,
+  "strapInfo": "Браслет із нержавіючої сталі",
+  "sizes": [
+    "Onesize"
+  ],
+  "splitByColor": true,
+  "searchKeywords": [
+    "Michael Kors",
+    "Michael Kors Billie",
+    "Billie Chronograph",
+    "MK9254",
+    "годинник Michael Kors",
+    "чоловічий годинник",
+    "чоловічий наручний годинник",
+    "кварцовий годинник",
+    "годинник з хронографом",
+    "хронограф",
+    "металевий годинник",
+    "брендовий годинник",
+    "оригінальний Michael Kors",
+    "стильний чоловічий годинник",
+    "класичний чоловічий годинник",
+    "модний годинник"
+  ],
+  "isNew": false,
+  "title": "Чоловічий годинник Michael Kors Billie Chronograph",
+  "reviews": 0,
+  "instagramBlock": "general",
+  "description": "Стильний чоловічий годинник Michael Kors Billie з функцією хронографа — поєднання спортивного характеру та класичної елегантності. Модель оснащена кварцовим механізмом, багатофункціональним циферблатом та міцним металевим браслетом.\nГодинник має виразний корпус і деталі циферблата, що створюють сучасний та впевнений образ. Завдяки універсальному дизайну модель підходить як для повсякденного носіння, так і для більш ділових образів",
+  "sku": "MK9254",
+  "rating": 5,
+  "category": "Годинники"
+}
