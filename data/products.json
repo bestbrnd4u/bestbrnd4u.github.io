@@ -879,9 +879,9 @@
         "color": "Зелений",
         "hex": "#06b454",
         "images": [
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=cfe05b41",
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=5532336b",
           "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-2.webp?v=7f7d7a02",
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=cdc3cb2c"
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=a75c732f"
         ],
         "sku": "B094QT219C"
       },
@@ -889,9 +889,9 @@
         "color": "Карамельний",
         "hex": "#f49657",
         "images": [
-          "assets/images/products/uploads/jwp-ma123-1.webp?v=880f2908",
+          "assets/images/products/uploads/jwp-ma123-1.webp?v=9947b155",
           "assets/images/products/uploads/jwp-ma123-2.webp?v=189c38d2",
-          "assets/images/products/uploads/jwp-ma123-3.webp?v=bd248574"
+          "assets/images/products/uploads/jwp-ma123-3.webp?v=f20c24ae"
         ],
         "sku": "JWP-MA123"
       }
@@ -1337,12 +1337,17 @@
     "category": "Жіночі сумки"
   },
   {
-    "title": "Жіноча шкіряна сумочка крос-боді Marc Jacobs the leather bucket bag",
+    "gender": [
+      "Жінкам"
+    ],
+    "oldPrice": 18600,
+    "color": "Чорний",
+    "badge": "SALE",
+    "material": "Шкіра",
     "brand": "Marc Jacobs",
-    "category": "Жіночі сумки",
-    "gender": "Жінкам",
     "price": 13000,
-    "description": "Крос-боді Marc Jacobs зі шкіри. Компактний корпус, фірмова монограма, ремінець через плече. Модель, у яку вміщається все потрібне, але яка не виглядає громіздкою.",
+    "preOrder": false,
+    "slug": "marc-jacobs-zhinocha-shkiriana-sumochka-kros-bodi-marc-jacob",
     "variants": [
       {
         "color": "Чорний",
@@ -1355,11 +1360,10 @@
         "sku": "H652L01PF22"
       }
     ],
-    "oldPrice": 18600,
-    "badge": "SALE",
-    "isNew": true,
-    "material": "Шкіра",
-    "sku": "H652L01PF22",
+    "sortOrder": 5,
+    "sizes": [
+      "ONESIZE"
+    ],
     "searchKeywords": [
       "марк джейкобс",
       "marc jacobs",
@@ -1374,19 +1378,18 @@
       "the",
       "leather"
     ],
-    "instagramBlock": "general",
-    "preOrder": false,
+    "isNew": true,
+    "title": "Жіноча шкіряна сумочка крос-боді Marc Jacobs the leather bucket bag",
     "images": [
       "assets/images/products/uploads/h652l01pf22-1.webp",
       "assets/images/products/uploads/h652l01pf22-2.webp",
       "assets/images/products/uploads/h652l01pf22-3.webp"
     ],
-    "slug": "marc-jacobs-zhinocha-shkiriana-sumochka-kros-bodi-marc-jacob",
     "id": 22,
-    "color": "Чорний",
-    "sizes": [
-      "ONESIZE"
-    ]
+    "instagramBlock": "general",
+    "description": "Крос-боді Marc Jacobs зі шкіри. Компактний корпус, фірмова монограма, ремінець через плече. Модель, у яку вміщається все потрібне, але яка не виглядає громіздкою.",
+    "sku": "H652L01PF22",
+    "category": "Жіночі сумки"
   },
   {
     "title": "Годинник жіночий Mathey Tissot City Metal",
@@ -4274,8 +4277,8 @@
           "/assets/images/products/uploads/ca173_svvfq_a0.webp?v=274cb8ee",
           "/assets/images/products/uploads/ca173_svvfq_a5.webp?v=c14cae6b",
           "/assets/images/products/uploads/ca173_svvfq_a8.webp?v=b75e933e",
-          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=29ead07e",
-          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=5140c2b7"
+          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=b7b4bde0",
+          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=2d34b830"
         ]
       }
     ],
