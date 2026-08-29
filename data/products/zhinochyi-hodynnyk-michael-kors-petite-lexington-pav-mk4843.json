@@ -22,7 +22,7 @@
   ],
   "preOrderPrepayment": 100,
   "sizes": [
-    "Onesize"
+    "ONESIZE"
   ],
   "splitByColor": true,
   "searchKeywords": [
@@ -52,5 +52,16 @@
   "description": "Елегантний жіночий годинник Michael Kors Petite Lexington Pavé у сріблястому виконанні. Мініатюрний круглий корпус діаметром 26 мм доповнений кремовим перламутровим циферблатом із делікатними pavé-акцентами та римськими індексами.\nМодель оснащена надійним кварцовим механізмом із трьома стрілками. Корпус, безель і браслет повністю виконані з нержавіючої сталі. Мінеральне скло захищає циферблат, а водонепроникність до 50 м (5 ATM) робить годинник практичним для щоденного носіння",
   "sku": "MK4843",
   "rating": 5,
-  "category": "Годинники"
+  "category": "Годинники",
+  "legacySlugs": [
+    "жіночий-годинник-michael-kors-petite-lexington-pavé-mk4843"
+  ],
+  "slug": "zhinochyi-hodynnyk-michael-kors-petite-lexington-pav-mk4843",
+  "id": 81,
+  "color": "Сріблястий / кремовий",
+  "images": [
+    "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-silver-dial-ladies-watch-mk4843.webp",
+    "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-silver-dial-ladies-watch-mk4843_2.webp",
+    "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-silver-dial-ladies-watch-mk4843_3.webp"
+  ]
 }
