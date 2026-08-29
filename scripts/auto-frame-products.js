@@ -81,37 +81,66 @@ async function contentBounds(file) {
     // Логіка мусить бути та сама, що у віджеті адмінки
     // (admin/image-framing-widget.js): інакше кнопка «Підігнати» й
     // автоматика дадуть різні кадри для одного знімка.
-    const at = (x, y) => {
+    // Кольори фону — з УСЬОГО периметра, а не з чотирьох кутів.
+    //
+    // ЩО БУЛО НЕ ТАК. Кути брались як єдине джерело правди. Але перед
+    // цим кроком фото приводиться до 4:5, і поля добиваються БІЛИМ —
+    // саме вона й опиняється в кутах. Фон самого знімка (сірий 240)
+    // лишався непоміченим, «межею товару» ставав край добивки, і
+    // виходило, що товар займає майже весь кадр. Автокадрування чесно
+    // вирішувало, що підганяти нема чого.
+    //
+    // Та сама правка зроблена у віджеті адмінки й у
+    // scripts/whiten-backgrounds.js — усі три місця мусять читати фон
+    // однаково.
+    const TOLERANCE = 12;
+
+    const groups = [];
+
+    const add = (x, y) => {
 
         const i = (y * w + x) * 4;
 
-        return [data[i], data[i + 1], data[i + 2]];
+        if (data[i + 3] < 16) return;
+
+        for (const g of groups) {
+
+            if (Math.abs(g.c[0] - data[i]) <= TOLERANCE
+                && Math.abs(g.c[1] - data[i + 1]) <= TOLERANCE
+                && Math.abs(g.c[2] - data[i + 2]) <= TOLERANCE) { g.n++; return; }
+
+        }
+
+        groups.push({ c: [data[i], data[i + 1], data[i + 2]], n: 1 });
 
     };
 
-    const corners = [at(1, 1), at(w - 2, 1), at(1, h - 2), at(w - 2, h - 2)];
+    const step = Math.max(1, Math.round(Math.min(w, h) / 100));
 
-    const bg = [0, 1, 2].map(c =>
-        Math.round(corners.reduce((sum, p) => sum + p[c], 0) / corners.length));
+    for (let x = 0; x < w; x += step) { add(x, 0); add(x, h - 1); }
+    for (let y = 0; y < h; y += step) { add(0, y); add(w - 1, y); }
 
-    // Кути мусять бути схожі: інакше тло неоднорідне, і межі товару
-    // по кольору не знайти.
-    const spread = Math.max(...corners.map(p =>
-        Math.max(...[0, 1, 2].map(c => Math.abs(p[c] - bg[c])))));
+    const total = groups.reduce((sum, g) => sum + g.n, 0) || 1;
 
-    if (spread > 24) return null;
+    const kept = groups.filter(g => g.n / total >= 0.05);
+    const coverage = kept.reduce((sum, g) => sum + g.n, 0) / total;
 
-    const TOLERANCE = 12;
+    // Периметр строкатий — фон неоднорідний, межі товару по кольору не
+    // знайти.
+    if (!kept.length || coverage < 0.9) return null;
+
+    const colors = kept.map(g => g.c);
 
     const isBackground = (x, y) => {
 
         const i = (y * w + x) * 4;
 
-        if (data[i + 3] < 16) return true;   // прозорий — теж тло
+        if (data[i + 3] < 16) return true;   // прозорий — теж фон
 
-        return Math.abs(data[i] - bg[0]) <= TOLERANCE
-            && Math.abs(data[i + 1] - bg[1]) <= TOLERANCE
-            && Math.abs(data[i + 2] - bg[2]) <= TOLERANCE;
+        return colors.some(c =>
+            Math.abs(data[i] - c[0]) <= TOLERANCE
+            && Math.abs(data[i + 1] - c[1]) <= TOLERANCE
+            && Math.abs(data[i + 2] - c[2]) <= TOLERANCE);
 
     };
 

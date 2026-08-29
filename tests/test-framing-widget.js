@@ -199,16 +199,28 @@ console.log("\n[3b] Передперегляд не мутний і рахуєт
     check("скасування прибирає передперегляд",
         /whitePreview: null, whitePreviewFor: null/.test(перегляд));
 
-    check("колір беремо з розбору, щоб підпис і картинка не розходились",
-        /var bg = self\.state\.bgColor;/.test(перегляд));
+    check("кольори беремо з розбору, щоб підпис і картинка не розходились",
+        /var colors = self\.state\.bgColors;/.test(перегляд));
 
     // Той самий допуск, що в збірці, — інакше це «схоже на результат»,
     // а не він.
     const заливка = код.slice(код.indexOf("whitenPixels:"), код.indexOf("setBackground:"));
     const script = fs.readFileSync(path.join(ROOT, "scripts/whiten-backgrounds.js"), "utf8");
 
+    // Допуск і поріг однорідності живуть у віджеті на рівні модуля —
+    // розійдуться зі збіркою, і передперегляд почне показувати не те,
+    // що вийде після публікації.
     check("допуск заливки збігається зі збіркою",
-        /TOLERANCE = 14/.test(заливка) && /TOLERANCE = 14/.test(script));
+        /var TOLERANCE = 14;/.test(код) && /TOLERANCE = 14/.test(script));
+
+    check("поріг однорідності кишень теж однаковий",
+        /var MAX_VARIANCE = 3;/.test(код) && /MAX_VARIANCE = 3/.test(script));
+
+    // Кишені фону — те, куди заливці немає ходу. Без них передперегляд
+    // показував би сірий острівець, якого в опублікованому фото не буде.
+    check("передперегляд теж заливає замкнені кишені",
+        /matchesBackground\(px, start \* 4, colors\)/.test(заливка)
+        && /fillPockets/.test(script));
 
     check("асинхронний setState не летить у мертвий компонент",
         /componentWillUnmount: function \(\)[\s\S]{0,80}this\.alive = false/.test(код)
@@ -363,6 +375,7 @@ console.log("\n[4] Кадр і фон — різні рішення й не ск
 console.log("\n[5] Рішення з адмінки доходить до збірки");
 {
     const script = fs.readFileSync(path.join(ROOT, "scripts/whiten-backgrounds.js"), "utf8");
+    const код = widget.replace(/\/\/[^\n]*/g, "");
 
     check("збірка читає bg саме з кадру фото",
         /framing\[name\] && framing\[name\]\.bg/.test(script));
@@ -373,10 +386,20 @@ console.log("\n[5] Рішення з адмінки доходить до збі
     // Заради цього кнопка «Зробити білим» і потрібна: тло 250
     // формально біле, а поруч із чисто білою карткою виглядає сірим.
     check("«Зробити білим» обходить перевірку «фон уже білий»",
-        />= ALREADY_WHITE && decided !== "white"/.test(script));
+        /allWhite && decided !== "white"/.test(script));
 
     check("неоднорідний фон не обходиться навіть примусово",
-        script.indexOf("spread > MAX_SPREAD") < script.indexOf("ALREADY_WHITE && decided"));
+        script.indexOf("coverage < 0.9") < script.indexOf("allWhite && decided"));
+
+    // Обидві сторони мусять читати фон однаково: інакше підпис в
+    // адмінці й результат публікації розійдуться — рівно те, з чого
+    // почалась ця правка.
+    check("віджет і збірка дивляться на весь периметр, а не на кути",
+        /function borderColors/.test(код) && /function borderColors/.test(script));
+
+    check("кути як єдине джерело правди більше не використовуються",
+        !/at\(1, 1\), at\(w - 2, 1\)/.test(код)
+        && !/at\(1, 1\), at\(w - 2, 1\)/.test(script));
 }
 
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
