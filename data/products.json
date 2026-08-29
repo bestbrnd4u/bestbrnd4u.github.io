@@ -879,9 +879,9 @@
         "color": "Зелений",
         "hex": "#06b454",
         "images": [
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=5532336b",
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=8d9f0b3e",
           "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-2.webp?v=7f7d7a02",
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=a75c732f"
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=b925a860"
         ],
         "sku": "B094QT219C"
       },
@@ -889,9 +889,9 @@
         "color": "Карамельний",
         "hex": "#f49657",
         "images": [
-          "assets/images/products/uploads/jwp-ma123-1.webp?v=9947b155",
+          "assets/images/products/uploads/jwp-ma123-1.webp?v=47b00ee3",
           "assets/images/products/uploads/jwp-ma123-2.webp?v=189c38d2",
-          "assets/images/products/uploads/jwp-ma123-3.webp?v=f20c24ae"
+          "assets/images/products/uploads/jwp-ma123-3.webp?v=a8efeaf1"
         ],
         "sku": "JWP-MA123"
       }
@@ -4143,11 +4143,25 @@
       "Жінкам"
     ],
     "preOrderDays": "5–10 робочих днів",
+    "color": "Синій",
     "forcePublish": false,
     "material": "Денім",
     "brand": "Marc Jacobs",
     "price": 8600,
+    "framing": {
+      "215679033_blue_in.webp": {
+        "zoom": 1.43,
+        "x": 50,
+        "y": 70
+      },
+      "215679033_blue_bk.webp": {
+        "zoom": 1.46,
+        "x": 49,
+        "y": 65
+      }
+    },
     "preOrder": false,
+    "slug": "shoper-marc-jacobs-the-denim-small-tote-bag-blue",
     "dimensions": "26 × 21 × 13 см",
     "variants": [
       {
@@ -4164,6 +4178,7 @@
     ],
     "preOrderPrepayment": 50,
     "strapInfo": "Ремінець знімний та регульований",
+    "sortOrder": 6,
     "sizes": [
       "S"
     ],
@@ -4195,27 +4210,6 @@
     ],
     "isNew": false,
     "title": "Шопер Marc Jacobs The Denim Small Tote Bag Blue",
-    "reviews": 0,
-    "instagramBlock": "general",
-    "description": "Стильна та оригінальна сумка Marc Jacobs The Denim Small Tote Bag у блакитно-синьому денімі. Модель виконана у фірмовому силуеті The Tote Bag та доповнена контрастними шкіряними деталями й написом The Tote Bag на передній панелі.\nДжинсовий матеріал та поєднання різних відтінків синього надають сумці сучасного та невимушеного вигляду. Модель має дві верхні ручки та знімний ремінець для носіння на плечі або через плече",
-    "sku": "MJ451H057-K11",
-    "rating": 5,
-    "category": "Жіночі сумки",
-    "framing": {
-      "215679033_blue_in.webp": {
-        "zoom": 1.43,
-        "x": 50,
-        "y": 70
-      },
-      "215679033_blue_bk.webp": {
-        "zoom": 1.46,
-        "x": 49,
-        "y": 65
-      }
-    },
-    "slug": "shoper-marc-jacobs-the-denim-small-tote-bag-blue",
-    "id": 61,
-    "color": "Синій",
     "images": [
       "/assets/images/products/uploads/215679033_blue_in.webp",
       "/assets/images/products/uploads/215679033_blue_bk.webp",
@@ -4223,6 +4217,13 @@
       "/assets/images/products/uploads/215679033_blue_e1.webp",
       "/assets/images/products/uploads/215679033_blue_fr.webp"
     ],
+    "reviews": 0,
+    "id": 61,
+    "instagramBlock": "general",
+    "description": "Стильна та оригінальна сумка Marc Jacobs The Denim Small Tote Bag у блакитно-синьому денімі. Модель виконана у фірмовому силуеті The Tote Bag та доповнена контрастними шкіряними деталями й написом The Tote Bag на передній панелі.\nДжинсовий матеріал та поєднання різних відтінків синього надають сумці сучасного та невимушеного вигляду. Модель має дві верхні ручки та знімний ремінець для носіння на плечі або через плече",
+    "sku": "MJ451H057-K11",
+    "rating": 5,
+    "category": "Жіночі сумки",
     "legacySlugs": [
       "шопер-marc-jacobs-the-denim-small-tote-bag-blue"
     ]
@@ -4277,8 +4278,8 @@
           "/assets/images/products/uploads/ca173_svvfq_a0.webp?v=274cb8ee",
           "/assets/images/products/uploads/ca173_svvfq_a5.webp?v=c14cae6b",
           "/assets/images/products/uploads/ca173_svvfq_a8.webp?v=b75e933e",
-          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=b7b4bde0",
-          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=2d34b830"
+          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=7b3abd39",
+          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=e364be90"
         ]
       }
     ],
