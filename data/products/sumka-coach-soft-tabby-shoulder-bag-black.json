@@ -85,5 +85,22 @@
   "category": "Жіночі сумки",
   "legacySlugs": [
     "сумка-coach-soft-tabby-shoulder-bag-black"
-  ]
+  ],
+  "framing": {
+    "91993377994530.webp": {
+      "zoom": 1.38,
+      "x": 48,
+      "y": 52
+    },
+    "26067173821878.webp": {
+      "zoom": 1.66,
+      "x": 48,
+      "y": 52
+    },
+    "49502081584862.webp": {
+      "zoom": 1.43,
+      "x": 48,
+      "y": 51
+    }
+  }
 }

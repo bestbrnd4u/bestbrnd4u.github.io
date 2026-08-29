@@ -273,8 +273,14 @@ console.log("\n[8] Оригінали фото не змінюються");
     check("результат не вивантажується в медіатеку",
         !/onAddAsset|persistMedia|toBlob\(/.test(widget));
 
+    // Малює тепер admin/white-preview.js — той самий результат
+    // потрібен і рядку кадрування, і картці праворуч, а дві копії
+    // заливки розійшлися б на першій же правці.
+    const біле = read("admin/white-preview.js");
+
     check("canvas використовується для показу, не для запису у файл",
-        /toDataURL\("image\/png"\)/.test(widget) && /getImageData/.test(widget));
+        /toDataURL\("image\//.test(біле) && /getImageData/.test(біле)
+        && !/onAddAsset|persistMedia|toBlob\(/.test(біле));
 
     // І сам віджет не має чіпати шлях до фото: він працює з тим, що
     // вже лежить у товарі.
@@ -458,8 +464,10 @@ console.log("\n[9] «Підігнати по товару»");
     // біла добивка, а не фон знімка. «Межею товару» ставав край цієї
     // добивки, і виходило, що товар займає весь кадр — кнопка чесно
     // відповідала «підганяти нема чого».
+    // Розбір периметра спільний із заливкою (admin/white-preview.js):
+    // інакше «межа товару» і «межа фону» рано чи пізно розійшлись би.
     check("фон визначається по всьому периметру",
-        /found = borderColors\(data, w, h\)/.test(widget));
+        /found = white\.borderColors\(data, w, h\)/.test(widget));
     check("є допуск навколо кольору фону", /TOLERANCE = 12/.test(widget));
     check("неоднорідний фон відхиляється",
         /found\.coverage < 0\.9\) return null/.test(widget));

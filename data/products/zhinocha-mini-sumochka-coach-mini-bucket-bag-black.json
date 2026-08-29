@@ -86,5 +86,37 @@
   ],
   "legacySlugs": [
     "жіноча-міні-сумочка-coach-mini-bucket-bag-black"
-  ]
+  ],
+  "framing": {
+    "cr144_svbk_a0.webp": {
+      "zoom": 1.55,
+      "x": 46,
+      "y": 52
+    },
+    "cr144_svbk_a3.webp": {
+      "zoom": 1.52,
+      "x": 46,
+      "y": 52
+    },
+    "cr144_svbk_a8.webp": {
+      "zoom": 1.48,
+      "x": 46,
+      "y": 50
+    },
+    "cr144_svha_a0.webp": {
+      "zoom": 1.53,
+      "x": 47,
+      "y": 51
+    },
+    "cr144_svha_a3.webp": {
+      "zoom": 1.49,
+      "x": 48,
+      "y": 52
+    },
+    "cr144_svha_a8.webp": {
+      "zoom": 1.48,
+      "x": 46,
+      "y": 50
+    }
+  }
 }

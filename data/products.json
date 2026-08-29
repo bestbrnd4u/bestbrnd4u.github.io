@@ -382,10 +382,10 @@
         "color": "Чорний",
         "hex": "#252525",
         "images": [
-          "/assets/images/products/uploads/ct714_qbmi5_1_1100x1100-1-.webp?v=b44dc043",
-          "/assets/images/products/uploads/ct714_qbmi5_2_1100x1100.webp?v=7c4290d6",
-          "/assets/images/products/uploads/ct714_qbmi5_3_1100x1100.webp?v=23e2fbb9",
-          "/assets/images/products/uploads/ct714_qbmi5_4_1100x1100.webp?v=a306c84b"
+          "/assets/images/products/uploads/ct714_qbmi5_1_1100x1100-1-.webp?v=430ec45f",
+          "/assets/images/products/uploads/ct714_qbmi5_2_1100x1100.webp?v=930d7a76",
+          "/assets/images/products/uploads/ct714_qbmi5_3_1100x1100.webp?v=17bd8d9d",
+          "/assets/images/products/uploads/ct714_qbmi5_4_1100x1100.webp?v=cc22bbd6"
         ],
         "sku": "coach-ct714-qbml5"
       }
@@ -474,6 +474,21 @@
         "zoom": 1.78,
         "x": 50,
         "y": 50
+      },
+      "91215-b4ooh-1_b3aea35bcebe4922a51b66ad7b2bb0a1_master.webp": {
+        "zoom": 1.89,
+        "x": 49,
+        "y": 55
+      },
+      "91215-b4ooh-2_ea0908385fb449c5a786a9c58e2e20cb_master.webp": {
+        "zoom": 1.41,
+        "x": 48,
+        "y": 51
+      },
+      "73995_lhtau_a8.webp": {
+        "zoom": 1.38,
+        "x": 49,
+        "y": 52
       }
     },
     "preOrder": false,
@@ -515,8 +530,8 @@
         "color": "Коричнево-чорний",
         "images": [
           "/assets/images/products/uploads/91215-b4ooh_7d995c2e069841c5ad45599ee803592d.webp?v=de06ce9b",
-          "/assets/images/products/uploads/91215-b4ooh-1_b3aea35bcebe4922a51b66ad7b2bb0a1_master.webp?v=5c61315b",
-          "/assets/images/products/uploads/91215-b4ooh-2_ea0908385fb449c5a786a9c58e2e20cb_master.webp?v=d2db59ae"
+          "/assets/images/products/uploads/91215-b4ooh-1_b3aea35bcebe4922a51b66ad7b2bb0a1_master.webp?v=d1b4d1ce",
+          "/assets/images/products/uploads/91215-b4ooh-2_ea0908385fb449c5a786a9c58e2e20cb_master.webp?v=2d97b604"
         ],
         "sku": "coachB4OOH"
       },
@@ -536,10 +551,10 @@
         "hex": "#c5aea1",
         "sku": "Coach73995LHTP",
         "images": [
-          "/assets/images/products/uploads/73995_lhtau_a0.webp?v=b89a4e74",
-          "/assets/images/products/uploads/73995_lhtau_a5.webp?v=37ff4c82",
-          "/assets/images/products/uploads/73995_lhtau_a8.webp?v=51295a60",
-          "/assets/images/products/uploads/73995_lhtau_a91.webp?v=a0c36903"
+          "/assets/images/products/uploads/73995_lhtau_a0.webp?v=7a5f1a79",
+          "/assets/images/products/uploads/73995_lhtau_a5.webp?v=1dc33e64",
+          "/assets/images/products/uploads/73995_lhtau_a8.webp?v=9e3412da",
+          "/assets/images/products/uploads/73995_lhtau_a91.webp?v=dd650601"
         ]
       }
     ],
@@ -1794,7 +1809,7 @@
           "/assets/images/products/uploads/800070279777-1.jpg?v=7c99f762",
           "/assets/images/products/uploads/800070279777-3.jpg?v=9ed8bfc4",
           "/assets/images/products/uploads/800070279777-4.jpg?v=0bb2503d",
-          "/assets/images/products/uploads/torbica-love-moschino-jc4116pp1flt0000-nero.webp?v=59a731c3"
+          "/assets/images/products/uploads/torbica-love-moschino-jc4116pp1flt0000-nero.webp?v=8e91c4c4"
         ],
         "video": "/assets/images/products/uploads/video360_8058051562499_ak_1022p.mp4"
       }
@@ -2122,10 +2137,10 @@
         "color": "Білий",
         "hex": "#eff1ea",
         "images": [
-          "/assets/images/products/uploads/124849469.webp?v=14033d6d",
-          "/assets/images/products/uploads/124849470.webp?v=d6c256f5",
-          "/assets/images/products/uploads/124849471.webp?v=76d576b0",
-          "/assets/images/products/uploads/124849473.webp?v=b3ab9591"
+          "/assets/images/products/uploads/124849469.webp?v=1766fc41",
+          "/assets/images/products/uploads/124849470.webp?v=12d13bcd",
+          "/assets/images/products/uploads/124849471.webp?v=424fc196",
+          "/assets/images/products/uploads/124849473.webp?v=af39b431"
         ]
       }
     ],
@@ -2377,7 +2392,14 @@
       "/assets/images/products/uploads/f7f0e509c4be46ffb9d3ef22b5ba170e.webp",
       "/assets/images/products/uploads/c8995a203d3b4b9291e3348646974342.webp",
       "/assets/images/products/uploads/c126c8e7b28b4046bbabd9d5194d182b.webp"
-    ]
+    ],
+    "framing": {
+      "c126c8e7b28b4046bbabd9d5194d182b.webp": {
+        "zoom": 1.46,
+        "x": 50,
+        "y": 50
+      }
+    }
   },
   {
     "gender": [
@@ -2396,7 +2418,7 @@
         "images": [
           "/assets/images/products/uploads/45sfa0001_075_02-1-.webp?v=f84c196d",
           "/assets/images/products/uploads/45sfa0001_075_01.webp?v=eeff591f",
-          "/assets/images/products/uploads/ss23-obm1w1-99x_f4.webp?v=4b8396fd"
+          "/assets/images/products/uploads/ss23-obm1w1-99x_f4.webp?v=eaf3d10c"
         ]
       }
     ],
@@ -2621,7 +2643,19 @@
     ],
     "legacySlugs": [
       "жіночі-кросівки-lacoste-womens-l003-neo-sneakers"
-    ]
+    ],
+    "framing": {
+      "9a6de5f3db734534b849269b9b8efda3.webp": {
+        "zoom": 1.51,
+        "x": 50,
+        "y": 51
+      },
+      "6c62a95311fd499f8cd54c4c96e0143f.webp": {
+        "zoom": 1.49,
+        "x": 50,
+        "y": 51
+      }
+    }
   },
   {
     "gender": [
@@ -2776,8 +2810,8 @@
           "/assets/images/products/uploads/25077124~black_0.webp?v=e133ec5c",
           "/assets/images/products/uploads/25077124~black_2.webp?v=4a53f677",
           "/assets/images/products/uploads/25077124~black_4.webp?v=54ac35fa",
-          "/assets/images/products/uploads/25077124~black_3.webp?v=5600db41",
-          "/assets/images/products/uploads/25077124~black_1.webp?v=00086367"
+          "/assets/images/products/uploads/25077124~black_3.webp?v=85a462a5",
+          "/assets/images/products/uploads/25077124~black_1.webp?v=b1ebe30b"
         ]
       }
     ],
@@ -2843,11 +2877,11 @@
         "color": "Чорний",
         "hex": "#000000",
         "images": [
-          "/assets/images/products/uploads/cr144_svbk_a0.webp?v=61a11201",
-          "/assets/images/products/uploads/cr144_svbk_a3.webp?v=29349f7b",
-          "/assets/images/products/uploads/cr144_svbk_a8.webp?v=3396099d",
-          "/assets/images/products/uploads/cr144_svbk_a91.webp?v=9b216b0d",
-          "/assets/images/products/uploads/cr144_svbk_a92.webp?v=cd7d11a6"
+          "/assets/images/products/uploads/cr144_svbk_a0.webp?v=2aae1578",
+          "/assets/images/products/uploads/cr144_svbk_a3.webp?v=c9e84613",
+          "/assets/images/products/uploads/cr144_svbk_a8.webp?v=9bcac9b0",
+          "/assets/images/products/uploads/cr144_svbk_a91.webp?v=7e4a94bd",
+          "/assets/images/products/uploads/cr144_svbk_a92.webp?v=5236fa67"
         ],
         "sizes": [
           "ONESIZE"
@@ -2860,10 +2894,10 @@
           "ONESIZE"
         ],
         "images": [
-          "/assets/images/products/uploads/cr144_svha_a0.webp?v=ea8f1914",
-          "/assets/images/products/uploads/cr144_svha_a3.webp?v=28de9b52",
-          "/assets/images/products/uploads/cr144_svha_a8.webp?v=aee08df9",
-          "/assets/images/products/uploads/cr144_svha_a91.webp?v=bd826000"
+          "/assets/images/products/uploads/cr144_svha_a0.webp?v=df7f3ecb",
+          "/assets/images/products/uploads/cr144_svha_a3.webp?v=91580caf",
+          "/assets/images/products/uploads/cr144_svha_a8.webp?v=34986be6",
+          "/assets/images/products/uploads/cr144_svha_a91.webp?v=04150dc8"
         ]
       }
     ],
@@ -2915,7 +2949,39 @@
     ],
     "legacySlugs": [
       "жіноча-міні-сумочка-coach-mini-bucket-bag-black"
-    ]
+    ],
+    "framing": {
+      "cr144_svbk_a0.webp": {
+        "zoom": 1.55,
+        "x": 46,
+        "y": 52
+      },
+      "cr144_svbk_a3.webp": {
+        "zoom": 1.52,
+        "x": 46,
+        "y": 52
+      },
+      "cr144_svbk_a8.webp": {
+        "zoom": 1.48,
+        "x": 46,
+        "y": 50
+      },
+      "cr144_svha_a0.webp": {
+        "zoom": 1.53,
+        "x": 47,
+        "y": 51
+      },
+      "cr144_svha_a3.webp": {
+        "zoom": 1.49,
+        "x": 48,
+        "y": 52
+      },
+      "cr144_svha_a8.webp": {
+        "zoom": 1.48,
+        "x": 46,
+        "y": 50
+      }
+    }
   },
   {
     "gender": [
@@ -3004,11 +3070,11 @@
         "color": "Білий комбінований",
         "hex": "#ddd8d1",
         "images": [
-          "/assets/images/products/uploads/ca148_imrfi_a0.webp?v=e0ef2093",
-          "/assets/images/products/uploads/ca148_imrfi_a3.webp?v=52f3e05f",
-          "/assets/images/products/uploads/ca148_imrfi_a8.webp?v=c3e24695",
-          "/assets/images/products/uploads/ca148_imrfi_a92.webp?v=8cfbaddc",
-          "/assets/images/products/uploads/ca148_imrfi_a91.webp?v=b41ba610"
+          "/assets/images/products/uploads/ca148_imrfi_a0.webp?v=d1b3c19c",
+          "/assets/images/products/uploads/ca148_imrfi_a3.webp?v=cd9818e1",
+          "/assets/images/products/uploads/ca148_imrfi_a8.webp?v=58e960a6",
+          "/assets/images/products/uploads/ca148_imrfi_a92.webp?v=b0363e66",
+          "/assets/images/products/uploads/ca148_imrfi_a91.webp?v=c712064b"
         ]
       }
     ],
@@ -3060,7 +3126,24 @@
     ],
     "legacySlugs": [
       "сумка-coach-klare-crossbody-bag-in-blocked-signature-canvas"
-    ]
+    ],
+    "framing": {
+      "ca148_imrfi_a0.webp": {
+        "zoom": 1.58,
+        "x": 47,
+        "y": 64
+      },
+      "ca148_imrfi_a3.webp": {
+        "zoom": 1.93,
+        "x": 49,
+        "y": 64
+      },
+      "ca148_imrfi_a8.webp": {
+        "zoom": 1.38,
+        "x": 48,
+        "y": 52
+      }
+    }
   },
   {
     "gender": [
@@ -3154,7 +3237,7 @@
           "/assets/images/products/uploads/27687307_57865310_2048.webp?v=ad162858",
           "/assets/images/products/uploads/27687307_57865301_2048.webp?v=3aab993d",
           "/assets/images/products/uploads/27687307_57865307_2048.webp?v=e3c159b9",
-          "/assets/images/products/uploads/27687307_57865304_2048.webp?v=c05d5a38"
+          "/assets/images/products/uploads/27687307_57865304_2048.webp?v=64a4b6a7"
         ]
       }
     ],
@@ -3375,7 +3458,7 @@
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-d6f46dd3.webp?v=641d718b",
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-def1e99f.webp?v=d34aac37",
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-c1370464.webp?v=29b67e21",
-          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-28c7d0f9.webp?v=18766020"
+          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-28c7d0f9.webp?v=d0cdb879"
         ]
       }
     ],
@@ -3449,7 +3532,7 @@
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--3f139d71.webp?v=f67824c9",
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--b0481126.webp?v=5c43d40d",
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--f7ef8033.webp?v=ce0b4dc8",
-          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--c2093755.webp?v=aaba56ea",
+          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--c2093755.webp?v=640c71cb",
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--e63574a7.webp?v=72269e74"
         ]
       }
@@ -3533,8 +3616,8 @@
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--3eeb5b5d.webp?v=92578216",
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--e6d79062.webp?v=40d15638",
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--8fc5eccc.webp?v=4e0dd752",
-          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--20634337.webp?v=77e63951",
-          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--3bae4de6.webp?v=315e2785"
+          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--20634337.webp?v=3c7d310d",
+          "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--3bae4de6.webp?v=666555e6"
         ]
       }
     ],
@@ -3608,7 +3691,7 @@
           "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-d0dd33cf.webp?v=89145062",
           "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-de081418.webp?v=1d737f86",
           "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-628c7ef0.webp?v=4e2139a7",
-          "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-twine-h009l01sp21-914-800x800.webp?v=48806234"
+          "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-twine-h009l01sp21-914-800x800.webp?v=e0d17288"
         ]
       }
     ],
@@ -3773,11 +3856,11 @@
           "ONESIZE"
         ],
         "images": [
-          "/assets/images/products/uploads/91993377994530.webp?v=04223bd6",
-          "/assets/images/products/uploads/26067173821878.webp?v=ae528554",
-          "/assets/images/products/uploads/49502081584862.webp?v=fb19116f",
-          "/assets/images/products/uploads/51655546705003.webp?v=1210f892",
-          "/assets/images/products/uploads/56611343404440.webp?v=09832c3b"
+          "/assets/images/products/uploads/91993377994530.webp?v=af095389",
+          "/assets/images/products/uploads/26067173821878.webp?v=d40b8db1",
+          "/assets/images/products/uploads/49502081584862.webp?v=00237fe7",
+          "/assets/images/products/uploads/51655546705003.webp?v=1f4eeacf",
+          "/assets/images/products/uploads/56611343404440.webp?v=4ce87ec6"
         ]
       }
     ],
@@ -3827,7 +3910,24 @@
     "category": "Жіночі сумки",
     "legacySlugs": [
       "сумка-coach-soft-tabby-shoulder-bag-black"
-    ]
+    ],
+    "framing": {
+      "91993377994530.webp": {
+        "zoom": 1.38,
+        "x": 48,
+        "y": 52
+      },
+      "26067173821878.webp": {
+        "zoom": 1.66,
+        "x": 48,
+        "y": 52
+      },
+      "49502081584862.webp": {
+        "zoom": 1.43,
+        "x": 48,
+        "y": 51
+      }
+    }
   },
   {
     "gender": [
@@ -3848,7 +3948,7 @@
           "/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model.webp?v=b0d006b5",
           "/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model3.webp?v=8956bcf6",
           "/assets/images/products/uploads/11a5edba3e0242ac110004.webp?v=879458dc",
-          "/assets/images/products/uploads/71-zo1liwrl._ac_sy625_.webp?v=60a173c1",
+          "/assets/images/products/uploads/71-zo1liwrl._ac_sy625_.webp?v=68440b8b",
           "/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model2.webp?v=953c35f7",
           "/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model4.webp?v=85170b83"
         ]
@@ -3924,11 +4024,11 @@
         "color": "Бежевий",
         "hex": "#d4cfcf",
         "images": [
-          "/assets/images/products/uploads/rtlafd950301_33497199_1_v1_2x.webp?v=2bf0efa9",
-          "/assets/images/products/uploads/rtlafd950301_33497201_2_v1_2x.webp?v=1495f53c",
-          "/assets/images/products/uploads/rtlafd950301_33497202_3_v1_2x.webp?v=47418234",
+          "/assets/images/products/uploads/rtlafd950301_33497199_1_v1_2x.webp?v=97ae59fa",
+          "/assets/images/products/uploads/rtlafd950301_33497201_2_v1_2x.webp?v=5a605c15",
+          "/assets/images/products/uploads/rtlafd950301_33497202_3_v1_2x.webp?v=b98abf60",
           "/assets/images/products/uploads/rtlafd950301_33497204_4_v1_2x.webp?v=45e8e115",
-          "/assets/images/products/uploads/rtlafd950301_33526729_9_v1_2x.webp?v=f716ea50"
+          "/assets/images/products/uploads/rtlafd950301_33526729_9_v1_2x.webp?v=b6c951e2"
         ],
         "sku": "213BA007-3063-510"
       },
@@ -3937,9 +4037,9 @@
         "hex": "#6f1d1d",
         "sku": "213BA007-3128-890",
         "images": [
-          "/assets/images/products/uploads/rtlafe837901_33595360_1_v1_2x.webp?v=bac0e52b",
-          "/assets/images/products/uploads/rtlafe837901_33595361_2_v1_2x.webp?v=7ff27603",
-          "/assets/images/products/uploads/rtlafe837901_33595363_4_v1_2x.webp?v=cd6c1754",
+          "/assets/images/products/uploads/rtlafe837901_33595360_1_v1_2x.webp?v=b5328c67",
+          "/assets/images/products/uploads/rtlafe837901_33595361_2_v1_2x.webp?v=c834b78e",
+          "/assets/images/products/uploads/rtlafe837901_33595363_4_v1_2x.webp?v=cf322183",
           "/assets/images/products/uploads/rtlafe837901_33634337_9_v1_2x.webp?v=8717973d"
         ]
       }
@@ -4012,7 +4112,7 @@
           "/assets/images/products/uploads/215679033_blue_bk.webp?v=0fee1b0a",
           "/assets/images/products/uploads/215679033_blue_cu.webp?v=98af55d3",
           "/assets/images/products/uploads/215679033_blue_e1.webp?v=84f25ad7",
-          "/assets/images/products/uploads/215679033_blue_fr.webp?v=eafc13bd"
+          "/assets/images/products/uploads/215679033_blue_fr.webp?v=c9c59833"
         ]
       }
     ],
@@ -4097,11 +4197,11 @@
         "color": "Бежево-білий",
         "hex": "#cdbdbd",
         "images": [
-          "/assets/images/products/uploads/ca173_svvfq_a0.webp?v=bae25e8c",
-          "/assets/images/products/uploads/ca173_svvfq_a5.webp?v=5ed588cf",
-          "/assets/images/products/uploads/ca173_svvfq_a8.webp?v=5a5e5d74",
-          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=14fe819e",
-          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=b9a3dfce"
+          "/assets/images/products/uploads/ca173_svvfq_a0.webp?v=274cb8ee",
+          "/assets/images/products/uploads/ca173_svvfq_a5.webp?v=c14cae6b",
+          "/assets/images/products/uploads/ca173_svvfq_a8.webp?v=b75e933e",
+          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=0f831d15",
+          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=fa5a9cc7"
         ]
       }
     ],
@@ -4153,7 +4253,24 @@
     ],
     "legacySlugs": [
       "сумочка-coach-teri-shoulder-bag-in-colorblock"
-    ]
+    ],
+    "framing": {
+      "ca173_svvfq_a0.webp": {
+        "zoom": 1.56,
+        "x": 48,
+        "y": 54
+      },
+      "ca173_svvfq_a5.webp": {
+        "zoom": 1.64,
+        "x": 51,
+        "y": 52
+      },
+      "ca173_svvfq_a8.webp": {
+        "zoom": 1.49,
+        "x": 50,
+        "y": 50
+      }
+    }
   },
   {
     "gender": [
@@ -4247,7 +4364,7 @@
         "images": [
           "/assets/images/products/uploads/ihjbihj.webp?v=3dd19685",
           "/assets/images/products/uploads/p00545136_d2.webp?v=c636a98b",
-          "/assets/images/products/uploads/p00545136_d1.webp?v=4940d6cf",
+          "/assets/images/products/uploads/p00545136_d1.webp?v=d2302f85",
           "/assets/images/products/uploads/uhjvbyubjhmyjhbmn.webp?v=d959e7a2",
           "/assets/images/products/uploads/jbb.webp?v=4f6dde29"
         ]
@@ -4530,8 +4647,8 @@
         "color": "Чорний з принтом",
         "hex": "#000000",
         "images": [
-          "/assets/images/products/uploads/l_wp_6788ff7fdc327dcb277cb548.webp?v=1e85b70f",
-          "/assets/images/products/uploads/cw537_sva47_a8.webp?v=7a2c69c9",
+          "/assets/images/products/uploads/l_wp_6788ff7fdc327dcb277cb548.webp?v=6c3a22c5",
+          "/assets/images/products/uploads/cw537_sva47_a8.webp?v=bcc736c1",
           "/assets/images/products/uploads/cw537_sva47_a91.webp?v=8a5e5544"
         ]
       }
@@ -4582,8 +4699,8 @@
         "hex": "#000000",
         "images": [
           "/assets/images/products/uploads/set-vi-coach-men-s-coin-wallet-black-one-ecc71a62.webp?v=0e2c3d35",
-          "/assets/images/products/uploads/lussocitta_coach_cr957_blk_1_700x.webp?v=f652bb8d",
-          "/assets/images/products/uploads/lussocitta_coach_cr957_blk_2_700x.webp?v=e09558f5"
+          "/assets/images/products/uploads/lussocitta_coach_cr957_blk_1_700x.webp?v=91b0a7fb",
+          "/assets/images/products/uploads/lussocitta_coach_cr957_blk_2_700x.webp?v=3ccbe611"
         ]
       }
     ],
@@ -4643,7 +4760,7 @@
         "images": [
           "/assets/images/products/uploads/main.webp?v=bac2648f",
           "/assets/images/products/uploads/1.webp?v=b5921ccc",
-          "/assets/images/products/uploads/3.webp?v=dfe1876e",
+          "/assets/images/products/uploads/3.webp?v=52d7596f",
           "/assets/images/products/uploads/81.webp?v=a20b2a6a"
         ]
       }
