@@ -59,26 +59,82 @@
     var AssetImage = createClass({
 
         getInitialState: function () {
-            return { url: "", failed: false };
+            return { url: "", failed: false, white: null };
         },
 
         componentDidMount: function () {
             this.resolve();
+            this.applyWhite();
         },
 
         componentDidUpdate: function (prevProps) {
 
-            if (prevProps.path === this.props.path) return;
+            if (prevProps.path !== this.props.path) {
 
-            // замінили фото — пробуємо наново, з чистого аркуша
-            this.retried = false;
-            this.setState({ failed: false });
-            this.resolve();
+                // замінили фото — пробуємо наново, з чистого аркуша
+                this.retried = false;
+                this.whiteFor = null;
+                this.setState({ failed: false, white: null });
+                this.resolve();
+
+                return;
+
+            }
+
+            // Адреса могла щойно розвʼязатись, а рішення про фон —
+            // змінитись («Не чіпати» замість «Зробити білим»). І те, і
+            // те приходить сюди.
+            this.applyWhite();
 
         },
 
         componentWillUnmount: function () {
             this.gone = true;
+        },
+
+        // Фон таким, яким він стане після публікації.
+        //
+        // ЩО БУЛО НЕ ТАК
+        // ---------------
+        // Картка показувала файл як є. Виглядало це так: у рядку
+        // кадрування ліворуч фон уже білий, а тут, у картці, — той
+        // самий сірий, що й був. Підпис під кнопкою виправдовувався
+        // («у картці праворуч фон ще старий»), і власник справедливо
+        // читав це як «нічого не працює».
+        //
+        // Прев'ю існує рівно заради «побачити, як буде». Показувати в
+        // ньому те, чого після публікації вже не буде, — гірше, ніж не
+        // показувати нічого.
+        //
+        // Рахує не цей файл, а admin/white-preview.js: тим самим
+        // алгоритмом, що й збірка, і з тим самим кешем, що й віджет
+        // кадрування. Тобто одне фото обробляється ОДИН раз на всю
+        // адмінку, скільки б місць його не просило — тут їх до восьми:
+        // рядок кадрування, велике фото картки, мініатюра під ним і те
+        // саме на вкладці «Сторінка товару».
+        applyWhite: function () {
+
+            var self = this;
+            var url = this.state.url;
+
+            if (!this.props.whiten || !url || !window.WhitePreview) return;
+
+            // Ключ — адреса ПЛЮС рішення: те саме фото з «Не чіпати»
+            // має інший результат.
+            var key = url + "|" + ((this.props.frame && this.props.frame.bg) || "авто");
+
+            if (this.whiteFor === key) return;
+
+            this.whiteFor = key;
+
+            window.WhitePreview.resolve(url, this.props.frame, function (result) {
+
+                if (self.gone || self.whiteFor !== key) return;
+
+                self.setState({ white: result.url });
+
+            });
+
         },
 
         resolve: function () {
@@ -141,7 +197,7 @@
             }
 
             return h("img", {
-                src: this.state.url,
+                src: this.state.white || this.state.url,
                 className: this.props.className,
                 // кадрування: ті самі CSS-змінні, що на сайті
                 style: this.props.style || null,
@@ -207,6 +263,15 @@
         var style = window.ImageFraming.frameStyleObject(framing, src);
 
         return Object.keys(style).length ? style : null;
+
+    }
+
+    // Рішення про фон цього фото — «зробити білим», «не чіпати»,
+    // «вирізати» або порожньо (як вирішить збірка). Лежить у тому
+    // самому кадрі, тож дістаємо тією ж бібліотекою, що й наближення.
+    function frameFor(framing, src) {
+
+        return window.ImageFraming ? window.ImageFraming.frameFor(framing, src) : null;
 
     }
 
@@ -325,7 +390,14 @@
                         path: images[index],
                         getAsset: getAsset,
                         className: this.props.imageClass,
-                        style: frameStyleFor(framing, images[index])
+                        style: frameStyleFor(framing, images[index]),
+                        // Фон вирівнює лише збірка фото товарів
+                        // (scripts/whiten-backgrounds.js обходить
+                        // assets/images/products/uploads), тож прапорець
+                        // стоїть саме тут, а не в самому AssetImage:
+                        // банер акції чи фото добірки ніхто не відбілює.
+                        whiten: true,
+                        frame: frameFor(framing, images[index])
                     }),
 
                     many ? h("button", {
@@ -358,7 +430,9 @@
                             path: src,
                             getAsset: getAsset,
                             className: "cms-preview-thumb-img",
-                            style: frameStyleFor(framing, src)
+                            style: frameStyleFor(framing, src),
+                            whiten: true,
+                            frame: frameFor(framing, src)
                         }));
                     })
                 ) : null
