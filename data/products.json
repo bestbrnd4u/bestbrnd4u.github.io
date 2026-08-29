@@ -879,9 +879,9 @@
         "color": "Зелений",
         "hex": "#06b454",
         "images": [
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=5f0b1a77",
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=d214114a",
           "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-2.webp?v=7f7d7a02",
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=c7b5db71"
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=7eb30d16"
         ],
         "sku": "B094QT219C"
       },
@@ -889,9 +889,9 @@
         "color": "Карамельний",
         "hex": "#f49657",
         "images": [
-          "assets/images/products/uploads/jwp-ma123-1.webp?v=cd2c3bbb",
+          "assets/images/products/uploads/jwp-ma123-1.webp?v=f0aa1bf4",
           "assets/images/products/uploads/jwp-ma123-2.webp?v=189c38d2",
-          "assets/images/products/uploads/jwp-ma123-3.webp?v=1e8ba21f"
+          "assets/images/products/uploads/jwp-ma123-3.webp?v=96a562c8"
         ],
         "sku": "JWP-MA123"
       }
@@ -4287,8 +4287,8 @@
           "/assets/images/products/uploads/ca173_svvfq_a0.webp?v=274cb8ee",
           "/assets/images/products/uploads/ca173_svvfq_a5.webp?v=c14cae6b",
           "/assets/images/products/uploads/ca173_svvfq_a8.webp?v=b75e933e",
-          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=3ade86f8",
-          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=1565f99c"
+          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=9fc4bee6",
+          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=ba9c8930"
         ]
       }
     ],
@@ -5833,6 +5833,109 @@
       "/assets/images/products/uploads/michael-kors-micro-lexington-quartz-ladies-watch-mk4903.webp",
       "/assets/images/products/uploads/michael-kors-micro-lexington-quartz-ladies-watch-mk4903_2.webp",
       "/assets/images/products/uploads/michael-kors-micro-lexington-quartz-ladies-watch-mk4903_3.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Чоловікам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Фірмове покрите полотно Signature та гладка теляча шкіра; текстильна підкладк",
+    "brand": "Coach",
+    "price": 7400,
+    "preOrder": true,
+    "dimensions": "22 × 26 × 5 см",
+    "variants": [
+      {
+        "color": "Темно-сірий / чорний / графітовий",
+        "hex": "#494848",
+        "sku": "CZ398",
+        "images": [
+          "/assets/images/products/uploads/cz398_qbmi5_a0.webp?v=864a0602",
+          "/assets/images/products/uploads/cz398_qbmi5_a3.webp?v=7632d642",
+          "/assets/images/products/uploads/cz398_qbmi5_a8.webp?v=617e6eb5",
+          "/assets/images/products/uploads/cz398_qbmi5_a91.webp?v=732c7458"
+        ]
+      },
+      {
+        "color": "Чорний",
+        "hex": "#010000",
+        "sku": "4011QB/BK",
+        "images": [
+          "/assets/images/products/uploads/4011_qbbk_a0.webp?v=0e192fb2",
+          "/assets/images/products/uploads/4011_qbbk_a3.webp?v=99595213",
+          "/assets/images/products/uploads/houstonflightbag2propfamily_a6.webp?v=aff55aaf",
+          "/assets/images/products/uploads/4011_qbbk_a91.webp?v=246af01f"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Регульований плечовий ремінь із довжиною звисання 63,5 см, що дозволяє носити сумку на плечі або кросбоді",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Coach Houston Flight Bag",
+      "Coach CZ398",
+      "Houston Flight Bag Signature Canvas",
+      "сумка Coach",
+      "чоловіча сумка Coach",
+      "чоловіча сумка через плече",
+      "чоловіча сумка кросбоді",
+      "сумка кросбоді Coach",
+      "сумка Signature Coach",
+      "чоловіча брендовa сумка",
+      "чорна сумка",
+      "коричнева сумка",
+      "оригінальний Coach"
+    ],
+    "isNew": false,
+    "title": "Чоловіча сумка Coach Houston Flight Bag In Signature Canvas",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильна та практична чоловіча сумка Coach Houston Flight Bag у фірмовому принті Signature. Модель виконана у поєднанні фірмового покритого полотна та гладкої шкіри, доповнена металевими деталями та лаконічним дизайном.\nСумка має основне відділення із застібкою-блискавкою, зовнішні кишені на блискавці та без застібки, а також внутрішню багатофункціональну кишеню для зручної організації речей. Компактний, але місткий формат дозволяє розмістити гаманець, навушники, смартфон та інші необхідні речі. Регульований ремінь дає змогу носити сумку на плечі або кросбоді",
+    "rating": 5,
+    "category": "Чоловічі сумки",
+    "framing": {
+      "cz398_qbmi5_a0.webp": {
+        "zoom": 1.47,
+        "x": 48,
+        "y": 59
+      },
+      "cz398_qbmi5_a3.webp": {
+        "zoom": 1.77,
+        "x": 46,
+        "y": 60
+      },
+      "cz398_qbmi5_a8.webp": {
+        "zoom": 1.38,
+        "x": 47,
+        "y": 50
+      },
+      "4011_qbbk_a0.webp": {
+        "zoom": 1.49,
+        "x": 50,
+        "y": 59
+      },
+      "4011_qbbk_a3.webp": {
+        "zoom": 1.96,
+        "x": 46,
+        "y": 59
+      }
+    },
+    "legacySlugs": [
+      "чоловіча-сумка-coach-houston-flight-bag-in-signature-canvas"
+    ],
+    "slug": "cholovicha-sumka-coach-houston-flight-bag-in-signature-canvas",
+    "id": 84,
+    "color": "Темно-сірий / чорний / графітовий",
+    "images": [
+      "/assets/images/products/uploads/cz398_qbmi5_a0.webp",
+      "/assets/images/products/uploads/cz398_qbmi5_a3.webp",
+      "/assets/images/products/uploads/cz398_qbmi5_a8.webp",
+      "/assets/images/products/uploads/cz398_qbmi5_a91.webp"
     ]
   }
 ]
