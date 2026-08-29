@@ -3,11 +3,13 @@
     "Жінкам"
   ],
   "preOrderDays": "5–10 робочих днів",
+  "color": "Cotton/Silver — молочний",
   "forcePublish": false,
   "material": "Натуральна шкіра",
   "brand": "Marc Jacobs",
   "price": 9800,
   "preOrder": false,
+  "slug": "sumka-marc-jacobs-the-leather-cargo-bag-cotton-silver",
   "dimensions": "22 × 12 × 7 см",
   "variants": [
     {
@@ -24,6 +26,7 @@
   ],
   "preOrderPrepayment": 50,
   "strapInfo": "2 знімні ремені — шкіряний та текстильний регульований",
+  "sortOrder": 20,
   "sizes": [
     "ONESIZE"
   ],
@@ -52,15 +55,6 @@
   ],
   "isNew": false,
   "title": "Сумка Marc Jacobs The Leather Cargo Bag Cotton Silver",
-  "reviews": 0,
-  "instagramBlock": "general",
-  "description": "Стильна та функціональна сумка Marc Jacobs The Leather Cargo Bag у відтінку Cotton/Silver — модель із виразним дизайном у стилі cargo та практичною системою кишень.\nСумка виготовлена з натуральної зернистої шкіри та доповнена сріблястою фурнітурою. На передній частині розташовані дві накладні кишені з клапанами, з боків — кишені на блискавці. Основне відділення закривається на блискавку.\nМодель має два знімні ремені: шкіряний ремінь для носіння на плечі та широкий регульований текстильний ремінь із логотипом. Завдяки цьому сумку можна носити на плечі або через плече",
-  "sku": "2S4HSH085H02-140",
-  "rating": 5,
-  "category": "Жіночі сумки",
-  "slug": "sumka-marc-jacobs-the-leather-cargo-bag-cotton-silver",
-  "id": 53,
-  "color": "Cotton/Silver — молочний",
   "images": [
     "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-4a08b27e.webp",
     "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-d6f46dd3.webp",
@@ -68,6 +62,13 @@
     "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-c1370464.webp",
     "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-28c7d0f9.webp"
   ],
+  "reviews": 0,
+  "id": 53,
+  "instagramBlock": "general",
+  "description": "Стильна та функціональна сумка Marc Jacobs The Leather Cargo Bag у відтінку Cotton/Silver — модель із виразним дизайном у стилі cargo та практичною системою кишень.\nСумка виготовлена з натуральної зернистої шкіри та доповнена сріблястою фурнітурою. На передній частині розташовані дві накладні кишені з клапанами, з боків — кишені на блискавці. Основне відділення закривається на блискавку.\nМодель має два знімні ремені: шкіряний ремінь для носіння на плечі та широкий регульований текстильний ремінь із логотипом. Завдяки цьому сумку можна носити на плечі або через плече",
+  "sku": "2S4HSH085H02-140",
+  "rating": 5,
+  "category": "Жіночі сумки",
   "legacySlugs": [
     "сумка-marc-jacobs-the-leather-cargo-bag-cotton-silver"
   ]
