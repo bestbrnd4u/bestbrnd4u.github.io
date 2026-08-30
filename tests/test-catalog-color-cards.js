@@ -321,6 +321,54 @@ console.log("\n[N+1] Число поруч із кольором — це тов
     // наведенні, а не число поруч.
     check("перелік відтінків лишився в підказці",
         /option\.title = names\.length > 1/.test(catalogSrc));
+
+    // ЧИСЛО МУСИТЬ БУТИ ВИДНО
+    //
+    // .filter-option — це flex, і підпис ішов у нього ГОЛИМ ТЕКСТОМ:
+    // такий вузол стає анонімним елементом флексу й стискатись не
+    // вміє. Довга назва («Помаранчевий», «Adidas by Stella McCartney»)
+    // виштовхувала число за межу меню, а меню з overflow:hidden просто
+    // його ховало. Коротка ж лишала число там, де закінчився текст, —
+    // колонка «їхала».
+    const css = fs.readFileSync(path.join(ROOT, "assets/css/style.css"), "utf8");
+
+    ["filter-option-label\">\\$\\{escapeHtml\\(family\\)\\}",
+        "filter-option-label\">\\$\\{item\\}",
+        "filter-option-label\">\\$\\{escapeHtml\\(name\\)\\}"].forEach(pattern => {
+
+        check(`підпис обгорнутий (${pattern.slice(21, 40)}…)`,
+            new RegExp(pattern).test(catalogSrc));
+
+    });
+
+    // min-width:0 тут обовʼязковий: без нього елемент флексу не
+    // стискається менше за свій вміст, і обгортка нічого не рятує.
+    const label = css.slice(css.indexOf(".filter-option-label{"),
+        css.indexOf(".filter-option-label{") + 260);
+
+    check("підпис стискається й обрізається трикрапкою",
+        /min-width:0/.test(label) && /text-overflow:ellipsis/.test(label),
+        label.replace(/\s+/g, " ").slice(0, 120));
+
+    const note = css.slice(css.indexOf(".filter-option-note{"),
+        css.indexOf(".filter-option-note{") + 320);
+
+    check("число не стискається", /flex:0 0 auto/.test(note));
+
+    check("число притиснуте праворуч", /margin-left:auto/.test(note));
+
+    // Кнопки «Колір» і «Бренд» вузькі — меню за замовчуванням
+    // розтягується рівно на них, і довге просто не влазило.
+    check("меню кольору ширше за кнопку",
+        /\.filter-menu\.filter-menu-colors\{[^}]*width:280px/.test(css));
+
+    check("меню брендів ширше за кнопку",
+        /#brandDropdown \.filter-menu\{[^}]*width:300px/.test(css));
+
+    // На телефоні дропдаун і так на всю ширину — фіксована ширина там
+    // зламала б розкладку.
+    check("на телефоні ширина не фіксується",
+        /@media\(max-width:768px\)\{[\s\S]{0,200}#brandDropdown \.filter-menu\{[^}]*width:auto/.test(css));
 }
 
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);

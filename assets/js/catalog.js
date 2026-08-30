@@ -1017,7 +1017,8 @@ function fillBrands() {
         option.type = "button";
         option.className = "filter-option";
         option.dataset.brand = item;
-        option.innerHTML = `<span class="filter-checkbox"></span>${item}`;
+        option.innerHTML = `<span class="filter-checkbox"></span>`
+            + `<span class="filter-option-label">${item}</span>`;
 
         option.addEventListener("click", () => toggleBrand(item));
 
@@ -1311,10 +1312,21 @@ function fillColors() {
         // лишається.
         const count = counts.get(family) || 0;
 
+        // Назва — В ОКРЕМОМУ span, а не голим текстом.
+        //
+        // ЩО БУЛО НЕ ТАК. .filter-option це flex, і голий текст ставав
+        // анонімним елементом флексу. Стискатись такий елемент не вміє,
+        // тож довга назва («Помаранчевий», «Мультиколір») просто
+        // виштовхувала лічильник за межу меню, а меню має
+        // overflow:hidden — число зникало зовсім.
+        //
+        // Обгортка з min-width:0 стискається й обрізається трикрапкою,
+        // а число лишається на місці (див. .filter-option-label у
+        // style.css).
         option.innerHTML = `
             <span class="filter-checkbox"></span>
             <span class="filter-color-swatch" style="background:${swatch}"></span>
-            ${escapeHtml(family)}
+            <span class="filter-option-label">${escapeHtml(family)}</span>
             <span class="filter-option-note">${count}</span>
         `;
 
@@ -1491,7 +1503,8 @@ function fillCategories(categoryDepartments) {
             option.type = "button";
             option.className = "filter-option";
             option.dataset.category = name;
-            option.innerHTML = `<span class="filter-checkbox"></span>${escapeHtml(name)}`;
+            option.innerHTML = `<span class="filter-checkbox"></span>`
+                + `<span class="filter-option-label">${escapeHtml(name)}</span>`;
 
             option.addEventListener("click", () => toggleCategory(name));
 
