@@ -14,17 +14,17 @@
       "color": "Коричневий / золотистий",
       "hex": "#845c3d",
       "images": [
-        "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectangular-mens-sunglasses-rb3498-029t5-61-rb3498-029t5-61.webp",
-        "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectangular-mens-sunglasses-rb3498-029t5-61-rb3498-029t5-61_3.webp",
-        "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectangular-mens-sunglasses-rb3498-029t5-61-rb3498-029t5-61_4_1.webp",
-        "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectangular-mens-sunglasses-rb3498-029t5-61-rb3498-029t5-61_10.webp"
+        "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-1db8136f.webp",
+        "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-d6f54bf0.webp",
+        "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-4b1f82a5.webp",
+        "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-960c6b7f.webp"
       ]
     }
   ],
   "preOrderPrepayment": 100,
   "strapInfo": "Металеві дужки",
   "sizes": [
-    "Onesize"
+    "ONESIZE"
   ],
   "splitByColor": true,
   "searchKeywords": [
@@ -54,5 +54,17 @@
   "description": "Стильні чоловічі сонцезахисні окуляри Ray-Ban RB3498 із прямокутною формою оправи. Модель поєднує сучасний спортивний дизайн із фірмовою естетикою Ray-Ban.\nОкуляри оснащені поляризованими лінзами з коричневим градієнтом, які допомагають зменшити відблиски та забезпечують комфортне сприйняття яскравого світла. Лаконічна форма та універсальний дизайн чудово підходять для повсякденного використання, подорожей і відпочинку",
   "sku": "RB3498029/T561",
   "rating": 5,
-  "category": "Окуляри і оправи"
+  "category": "Окуляри і оправи",
+  "legacySlugs": [
+    "сонцезахисні-окуляри-ray-ban-rb3498"
+  ],
+  "slug": "sontsezakhysni-okuliary-ray-ban-rb3498",
+  "id": 93,
+  "color": "Коричневий / золотистий",
+  "images": [
+    "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-1db8136f.webp",
+    "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-d6f54bf0.webp",
+    "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-4b1f82a5.webp",
+    "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-960c6b7f.webp"
+  ]
 }
