@@ -879,9 +879,9 @@
         "color": "Зелений",
         "hex": "#06b454",
         "images": [
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=11054a8a",
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=f1083e17",
           "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-2.webp?v=7f7d7a02",
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=92ded767"
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=b5b2c31a"
         ],
         "sku": "B094QT219C"
       },
@@ -889,9 +889,9 @@
         "color": "Карамельний",
         "hex": "#f49657",
         "images": [
-          "assets/images/products/uploads/jwp-ma123-1.webp?v=86a57501",
+          "assets/images/products/uploads/jwp-ma123-1.webp?v=63d9dafe",
           "assets/images/products/uploads/jwp-ma123-2.webp?v=189c38d2",
-          "assets/images/products/uploads/jwp-ma123-3.webp?v=f6fe5389"
+          "assets/images/products/uploads/jwp-ma123-3.webp?v=35168707"
         ],
         "sku": "JWP-MA123"
       }
@@ -4287,8 +4287,8 @@
           "/assets/images/products/uploads/ca173_svvfq_a0.webp?v=274cb8ee",
           "/assets/images/products/uploads/ca173_svvfq_a5.webp?v=c14cae6b",
           "/assets/images/products/uploads/ca173_svvfq_a8.webp?v=b75e933e",
-          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=9895a1b9",
-          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=8efe936e"
+          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=334d4294",
+          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=d30aa51b"
         ]
       }
     ],
@@ -6415,6 +6415,73 @@
       "/assets/images/products/uploads/michael-kors-maritime-chronograph-quartz-blue-dial-mens-watch-mk9202_1.webp",
       "/assets/images/products/uploads/michael-kors-maritime-chronograph-quartz-blue-dial-mens-watch-mk9202_2.webp",
       "/assets/images/products/uploads/michael-kors-maritime-chronograph-quartz-blue-dial-mens-watch-mk9202_3.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Чоловікам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "brand": "Ray-Ban",
+    "price": 6400,
+    "preOrder": true,
+    "dimensions": "13,9 × 3,3 см; ширина лінзи — 6,3 см; міст — 1,5 см; довжина дужки — 12,5 см.",
+    "variants": [
+      {
+        "color": "Чорний / зелений",
+        "colorFamily": "Зелений",
+        "hex": "#7a8f59",
+        "images": [
+          "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasse-a6093c62.webp?v=229224e2",
+          "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasse-d4cf8613.webp?v=9c8d2a79",
+          "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasse-c873f7c8.webp?v=3dcc20af",
+          "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasse-dfb377a8.webp?v=0114f5da"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Тонкі металеві дужки",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Ray-Ban",
+      "Ray-Ban RB3183",
+      "RB3183",
+      "RB3183 006/71 63",
+      "сонцезахисні окуляри Ray-Ban",
+      "чоловічі окуляри",
+      "чоловічі сонцезахисні окуляри",
+      "прямокутні окуляри",
+      "окуляри з зеленими лінзами",
+      "зелені лінзи",
+      "брендові окуляри",
+      "оригінальні Ray-Ban",
+      "окуляри Ray-Ban чоловічі",
+      "металеві окуляри",
+      "окуляри від сонця"
+    ],
+    "isNew": false,
+    "title": "Сонцезахисні окуляри Ray-Ban RB3183",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильні чоловічі сонцезахисні окуляри Ray-Ban RB3183 із прямокутною формою оправи. Лаконічний дизайн моделі поєднує спортивний характер із фірмовою естетикою Ray-Ban.\nЗелені лінзи забезпечують комфортне сприйняття яскравого світла, а легка металева оправа робить окуляри зручними для щоденного носіння. Універсальна прямокутна форма добре доповнює сучасні повсякденні образи",
+    "sku": "RB3183006/7163",
+    "rating": 5,
+    "category": "Окуляри і оправи",
+    "legacySlugs": [
+      "сонцезахисні-окуляри-ray-ban-rb3183"
+    ],
+    "slug": "sontsezakhysni-okuliary-ray-ban-rb3183",
+    "id": 90,
+    "color": "Чорний / зелений",
+    "images": [
+      "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasse-a6093c62.webp",
+      "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasse-d4cf8613.webp",
+      "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasse-c873f7c8.webp",
+      "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasse-dfb377a8.webp"
     ]
   }
 ]

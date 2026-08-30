@@ -14,17 +14,17 @@
       "colorFamily": "Зелений",
       "hex": "#7a8f59",
       "images": [
-        "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasses-rb3183-00671-63-rb3183-00671-63.webp",
-        "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasses-rb3183-00671-63-rb3183-00671-63_3.webp",
-        "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasses-rb3183-00671-63-rb3183-00671-63_4.webp",
-        "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasses-rb3183-00671-63-rb3183-00671-63_10.webp"
+        "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasse-a6093c62.webp",
+        "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasse-d4cf8613.webp",
+        "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasse-c873f7c8.webp",
+        "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasse-dfb377a8.webp"
       ]
     }
   ],
   "preOrderPrepayment": 100,
   "strapInfo": "Тонкі металеві дужки",
   "sizes": [
-    "Onesize"
+    "ONESIZE"
   ],
   "splitByColor": true,
   "searchKeywords": [
@@ -51,5 +51,17 @@
   "description": "Стильні чоловічі сонцезахисні окуляри Ray-Ban RB3183 із прямокутною формою оправи. Лаконічний дизайн моделі поєднує спортивний характер із фірмовою естетикою Ray-Ban.\nЗелені лінзи забезпечують комфортне сприйняття яскравого світла, а легка металева оправа робить окуляри зручними для щоденного носіння. Універсальна прямокутна форма добре доповнює сучасні повсякденні образи",
   "sku": "RB3183006/7163",
   "rating": 5,
-  "category": "Окуляри і оправи"
+  "category": "Окуляри і оправи",
+  "legacySlugs": [
+    "сонцезахисні-окуляри-ray-ban-rb3183"
+  ],
+  "slug": "sontsezakhysni-okuliary-ray-ban-rb3183",
+  "id": 90,
+  "color": "Чорний / зелений",
+  "images": [
+    "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasse-a6093c62.webp",
+    "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasse-d4cf8613.webp",
+    "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasse-c873f7c8.webp",
+    "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasse-dfb377a8.webp"
+  ]
 }
