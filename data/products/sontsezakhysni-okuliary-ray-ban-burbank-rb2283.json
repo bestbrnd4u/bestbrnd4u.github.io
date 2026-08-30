@@ -14,17 +14,17 @@
       "color": "Чорний / зелений",
       "hex": "#2c6044",
       "images": [
-        "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-sunglasses-rb2283-90131-55-rb2283-90131-55.jpg",
-        "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-sunglasses-rb2283-90131-55-rb2283-90131-55_3_1.jpg",
-        "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-sunglasses-rb2283-90131-55-rb2283-90131-55_4.jpg",
-        "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-sunglasses-rb2283-90131-55-rb2283-90131-55_10.jpg"
+        "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-s-72af81a8.jpg",
+        "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-s-0f4f3c17.jpg",
+        "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-s-e881ab77.jpg",
+        "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-s-f4bc13e6.jpg"
       ]
     }
   ],
   "preOrderPrepayment": 100,
   "strapInfo": "Ацетатні дужки",
   "sizes": [
-    "Onesize"
+    "ONESIZE"
   ],
   "splitByColor": true,
   "searchKeywords": [
@@ -52,5 +52,17 @@
   "description": "Стильні чоловічі сонцезахисні окуляри Ray-Ban Burbank RB2283 із прямокутною формою оправи. Модель поєднує класичний силует із сучасними деталями та фірмовою естетикою Ray-Ban.\nЗелені лінзи гармонійно доповнюють оправу та забезпечують комфортне сприйняття яскравого світла. Універсальна форма чудово підходить для повсякденних образів і легко поєднується з різним стилем одягу",
   "sku": "RB2283901/3155",
   "rating": 5,
-  "category": "Окуляри і оправи"
+  "category": "Окуляри і оправи",
+  "legacySlugs": [
+    "сонцезахисні-окуляри-ray-ban-burbank-rb2283"
+  ],
+  "slug": "sontsezakhysni-okuliary-ray-ban-burbank-rb2283",
+  "id": 92,
+  "color": "Чорний / зелений",
+  "images": [
+    "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-s-72af81a8.jpg",
+    "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-s-0f4f3c17.jpg",
+    "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-s-e881ab77.jpg",
+    "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-s-f4bc13e6.jpg"
+  ]
 }

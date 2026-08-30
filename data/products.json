@@ -879,9 +879,9 @@
         "color": "Зелений",
         "hex": "#06b454",
         "images": [
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=0d8861ff",
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=749d806f",
           "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-2.webp?v=7f7d7a02",
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=fe586d43"
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=80533c70"
         ],
         "sku": "B094QT219C"
       },
@@ -889,9 +889,9 @@
         "color": "Карамельний",
         "hex": "#f49657",
         "images": [
-          "assets/images/products/uploads/jwp-ma123-1.webp?v=9b7451e2",
+          "assets/images/products/uploads/jwp-ma123-1.webp?v=932a3129",
           "assets/images/products/uploads/jwp-ma123-2.webp?v=189c38d2",
-          "assets/images/products/uploads/jwp-ma123-3.webp?v=4eebbe20"
+          "assets/images/products/uploads/jwp-ma123-3.webp?v=b15b5fcb"
         ],
         "sku": "JWP-MA123"
       }
@@ -4287,8 +4287,8 @@
           "/assets/images/products/uploads/ca173_svvfq_a0.webp?v=274cb8ee",
           "/assets/images/products/uploads/ca173_svvfq_a5.webp?v=c14cae6b",
           "/assets/images/products/uploads/ca173_svvfq_a8.webp?v=b75e933e",
-          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=da4cae55",
-          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=47fade7b"
+          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=d7c6102c",
+          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=2f4ef326"
         ]
       }
     ],
@@ -6552,6 +6552,74 @@
       "/assets/images/products/uploads/ray-ban-green-irregular-unisex-sunglasses-rb4451-630631-50_2.webp",
       "/assets/images/products/uploads/ray-ban-green-irregular-unisex-sunglasses-rb4451-630631-50_4.webp",
       "/assets/images/products/uploads/ray-ban-green-irregular-unisex-sunglasses-rb4451-630631-50_10.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Чоловікам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Ацетат",
+    "brand": "Ray-Ban",
+    "price": 4900,
+    "preOrder": true,
+    "dimensions": "14,1 × 4,5 см; ширина лінзи — 5,5 см; міст — 1,8 см; довжина дужки — 14 см",
+    "variants": [
+      {
+        "color": "Чорний / зелений",
+        "hex": "#2c6044",
+        "images": [
+          "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-s-72af81a8.jpg?v=1df2740b",
+          "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-s-0f4f3c17.jpg?v=bde310da",
+          "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-s-e881ab77.jpg?v=9a2823b9",
+          "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-s-f4bc13e6.jpg?v=a4470357"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Ацетатні дужки",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Ray-Ban",
+      "Ray-Ban Burbank",
+      "Burbank RB2283",
+      "RB2283",
+      "RB2283 901/31 55",
+      "сонцезахисні окуляри Ray-Ban",
+      "чоловічі окуляри",
+      "чоловічі сонцезахисні окуляри",
+      "прямокутні окуляри",
+      "зелені окуляри",
+      "окуляри із зеленими лінзами",
+      "зелені лінзи",
+      "брендові окуляри",
+      "оригінальні Ray-Ban",
+      "окуляри Ray-Ban чоловічі",
+      "модні окуляри"
+    ],
+    "isNew": false,
+    "title": "Сонцезахисні окуляри Ray-Ban Burbank RB2283",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильні чоловічі сонцезахисні окуляри Ray-Ban Burbank RB2283 із прямокутною формою оправи. Модель поєднує класичний силует із сучасними деталями та фірмовою естетикою Ray-Ban.\nЗелені лінзи гармонійно доповнюють оправу та забезпечують комфортне сприйняття яскравого світла. Універсальна форма чудово підходить для повсякденних образів і легко поєднується з різним стилем одягу",
+    "sku": "RB2283901/3155",
+    "rating": 5,
+    "category": "Окуляри і оправи",
+    "legacySlugs": [
+      "сонцезахисні-окуляри-ray-ban-burbank-rb2283"
+    ],
+    "slug": "sontsezakhysni-okuliary-ray-ban-burbank-rb2283",
+    "id": 92,
+    "color": "Чорний / зелений",
+    "images": [
+      "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-s-72af81a8.jpg",
+      "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-s-0f4f3c17.jpg",
+      "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-s-e881ab77.jpg",
+      "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-s-f4bc13e6.jpg"
     ]
   }
 ]
