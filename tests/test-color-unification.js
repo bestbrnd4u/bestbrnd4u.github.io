@@ -45,7 +45,7 @@ const { normalizeColorName, normalizeProductColors } = require("../scripts/norma
 
 // Сім'ї беремо з САМОГО common.js, а не копіюємо: копія розійшлася б із
 // оригіналом, і тест перевіряв би не те, що на сайті.
-const { colorFamily, COLOR_FAMILY_ORDER } = new Function(
+const { colorFamily, COLOR_FAMILY_ORDER, getProductColorFamilies } = new Function(
     common.match(/function getProductColors[\s\S]*?\n\}/)[0]
     + common.slice(common.indexOf("const COLOR_FAMILIES"), common.indexOf("function getDiscountPercent"))
     + "; return { colorFamily, COLOR_FAMILY_ORDER, getProductColorFamilies };"
@@ -267,6 +267,119 @@ console.log("\n[6] Фільтр працює сім'ями");
     // Старі посилання (?color=Black) мусять і далі відкривати фільтр.
     check("старі посилання не ламаються",
         /\.map\(value => colorFamily\(value\)\)/.test(catalog));
+}
+
+console.log("\n[X] Чищення не з'їдає назву цілком");
+{
+    // ЩО БУЛО НА САЙТІ
+    // -----------------
+    // У щойно доданих товарах підпис кольору зникав — і на сторінці
+    // товару, і в картці каталогу, — а в адресі стояло ?color=%2F.
+    //
+    // Причина: cleanupColorName викидає службові слова, і після цього
+    // від назви могли лишитись самі роздільники:
+    //
+    //     "Chalk / Brass"               → "/"
+    //     "Brass/Maple"                 → "/Maple"
+    //     "Pebbled leather/Brass/Black" → "Pebbled leather//Black"
+    //
+    // Перевірка на порожнечу такого не ловила: "/" — рядок непорожній.
+    const назви = {
+        "Chalk / Brass": "Chalk",
+        "Brass/Maple": "Maple",
+        "Brass / Deep Blue": "Deep Blue",
+        "Pebbled leather / Brass / Black": "Pebbled leather/Black"
+    };
+
+    Object.entries(назви).forEach(([було, стало]) => {
+        check(`«${було}» → «${стало}»`, normalizeColorName(було) === стало,
+            normalizeColorName(було));
+    });
+
+    // Головне правило, а не перелік випадків: у назві кольору мусить
+    // лишитись хоч одна літера. Інакше показуємо сировину
+    // постачальника — незграбно, зате покупець бачить, що обирає.
+    ["Brass", "Gold / Silver", "Antique Nickel"].forEach(назва => {
+        check(`«${назва}» лишається назвою, а не пунктуацією`,
+            /[a-zа-яїієґ]/i.test(normalizeColorName(назва)),
+            normalizeColorName(назва));
+    });
+
+    // chalk стояв у списку «слів про фурнітуру» всупереч власному
+    // коментарю поруч: у «Brass/Chalk» фурнітура це brass, а chalk —
+    // колір самої речі.
+    check("chalk більше не вважається фурнітурою",
+        !/\|chalk\||\(chalk\|/.test(
+            fs.readFileSync(path.join(ROOT, "scripts/normalize-colors.js"), "utf8")
+                .match(/const HARDWARE_WORDS = [^\n]*/)[0]));
+
+    // Словник має пріоритет над чищенням — записи з chalk усередині
+    // мусили лишитись робочими.
+    check("записи словника не зачепило",
+        normalizeColorName("Brass/Ivory") === "Айворі"
+        && normalizeColorName("Gold chalk glacier white multi") === "Білий комбінований",
+        `${normalizeColorName("Brass/Ivory")} / ${normalizeColorName("Gold chalk glacier white multi")}`);
+}
+
+console.log("\n[Y] Сімʼю для фільтра можна задати з адмінки");
+{
+    // НАВІЩО. Фільтр показує сімʼї, а не назви: одна позначка «Білий»
+    // замість Chalk, Ivory, Off-white. Сімʼю вгадує colorFamily, і
+    // здебільшого вгадує добре — але «Chalk» англійською нічого не
+    // каже, а свотч #e6e1e1 світлий рівно настільки, щоб залежати від
+    // межі між «Білий» і «Сірий».
+    const chalk = { color: "Chalk", hex: "#e6e1e1" };
+
+    const здогад = [...getProductColorFamilies({ variants: [chalk] }).keys()];
+
+    check("без підказки сімʼя вгадується", здогад.length === 1, здогад.join(", "));
+
+    const обране = [...getProductColorFamilies({
+        variants: [Object.assign({}, chalk, { colorFamily: "Білий" })]
+    }).keys()];
+
+    check("рішення з адмінки сильніше за здогад",
+        обране.length === 1 && обране[0] === "Білий", обране.join(", "));
+
+    // Кілька різних «білих» одного товару мусять зійтись в одну позначку.
+    const різніБілі = [...getProductColorFamilies({
+        variants: [
+            { color: "Chalk", hex: "#e6e1e1", colorFamily: "Білий" },
+            { color: "Optic White", hex: "#f4f4f2", colorFamily: "Білий" },
+            { color: "Ivory", hex: "#efe9dd", colorFamily: "Білий" }
+        ]
+    }).keys()];
+
+    check("три різні назви — одна позначка у фільтрі",
+        різніБілі.length === 1 && різніБілі[0] === "Білий", різніБілі.join(", "));
+
+    // Дані переживають правки config.yml: значення, якого немає серед
+    // сімей, мусить бути проігнороване, а не потрапити у фільтр.
+    const сміття = [...getProductColorFamilies({
+        variants: [Object.assign({}, chalk, { colorFamily: "Смарагдовий" })]
+    }).keys()];
+
+    check("невідома сімʼя ігнорується",
+        !сміття.includes("Смарагдовий"), сміття.join(", "));
+
+    // Поле мусить бути в адмінці, інакше задати його нема де.
+    const config = fs.readFileSync(path.join(ROOT, "admin/config.yml"), "utf8");
+
+    check("поле є в адмінці", /name: "colorFamily"/.test(config));
+
+    check("вибір зі списку, а не вільний текст",
+        /name: "colorFamily"[\s\S]{0,120}widget: "select"/.test(config));
+
+    // Список в адмінці й список на сайті — те саме, інакше адмін обере
+    // позначку, якої фільтр не знає.
+    const options = (config.match(/name: "colorFamily"[\s\S]{0,900}?options:([\s\S]*?)hint:/) || [])[1] || "";
+
+    const зКонфіга = [...options.matchAll(/- "([^"]+)"/g)].map(m => m[1]);
+
+    check("список в адмінці збігається з сімʼями сайту",
+        зКонфіга.length === COLOR_FAMILY_ORDER.length
+        && зКонфіга.every(name => COLOR_FAMILY_ORDER.includes(name)),
+        `адмінка ${зКонфіга.length}, сайт ${COLOR_FAMILY_ORDER.length}`);
 }
 
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);

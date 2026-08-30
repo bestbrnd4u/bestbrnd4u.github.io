@@ -5497,7 +5497,7 @@
       "Жінкам"
     ],
     "preOrderDays": "10-14 робочих днів",
-    "color": "/",
+    "color": "Chalk",
     "forcePublish": false,
     "material": "Натуральна шкіра Polished Pebble Leather",
     "brand": "Coach",
@@ -5544,7 +5544,7 @@
     "dimensions": "26 × 15 × 8 см",
     "variants": [
       {
-        "color": "/",
+        "color": "Chalk",
         "hex": "#e6e1e1",
         "sku": "CH857-B4/HA",
         "images": [
@@ -5580,7 +5580,7 @@
         ]
       },
       {
-        "color": "/Maple",
+        "color": "Maple",
         "hex": "#771e1e",
         "sku": "CH857-B4MPL",
         "images": [
@@ -6026,13 +6026,13 @@
     "preOrderDays": "10-14 робочих днів",
     "forcePublish": false,
     "material": "Зерниста натуральна шкіра - Refined Pebble Leather",
-    "brand": "COACH",
+    "brand": "Coach",
     "price": 7400,
     "preOrder": true,
     "dimensions": "18 × 10 × 5 см",
     "variants": [
       {
-        "color": "/Deep Blue",
+        "color": "Deep Blue",
         "hex": "#1d4e86",
         "sku": "CET66SV/SMU",
         "images": [
@@ -6065,7 +6065,7 @@
         ]
       },
       {
-        "color": "Pebbled leather//Black",
+        "color": "Pebbled leather/Black",
         "hex": "#0b0000",
         "sku": "CET55SV/BK",
         "images": [
@@ -6076,7 +6076,7 @@
         ]
       },
       {
-        "color": "Pebbled leather//Maple",
+        "color": "Pebbled leather/Maple",
         "hex": "#641313",
         "sku": "SVMPL",
         "images": [
@@ -6203,7 +6203,7 @@
     ],
     "slug": "cholovicha-sumka-coach-colton-crossbody-bag-19-in-signature-canvas",
     "id": 86,
-    "color": "/Deep Blue",
+    "color": "Deep Blue",
     "images": [
       "/assets/images/products/uploads/cet66_svsmu_a0.webp",
       "/assets/images/products/uploads/cet66_svsmu_a3.webp",

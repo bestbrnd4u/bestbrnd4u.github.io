@@ -3032,13 +3032,47 @@ function colorFamily(name, hex) {
 // names потрібні у підказці фільтра: під пунктом «Бежевий» можуть
 // лежати «Бежевий», «Тауп» і «Бежево-кремовий» — і побачити це
 // корисно, інакше незрозуміло, чому товар знайшовся.
+// Рішення з адмінки: «цей колір шукати під позначкою Білий».
+//
+// НАВІЩО. Фільтр показує не назви, а сімʼї — одна позначка «Білий»
+// замість Chalk, Ivory, Off-white і ще десятка назв від постачальників.
+// Сімʼю вгадує colorFamily(): спершу за словом у назві, далі за
+// кружечком кольору.
+//
+// Вгадує добре, але не завжди. «Chalk» англійською фільтру нічого не
+// каже, а свотч #e6e1e1 світлий рівно настільки, щоб залежати від межі:
+// трохи темніший — і білий колір поїде в «Сірий». Сперечатися з
+// автоматикою порогами не варто — простіше дати сказати прямо.
+//
+// Значення, якого немає серед сімей, ігноруємо: у config.yml стоїть
+// select із тим самим списком, але дані переживають правки конфіга.
+function chosenColorFamily(variant) {
+
+    const value = variant && variant.colorFamily;
+
+    return value && COLOR_FAMILY_ORDER.includes(value) ? value : null;
+
+}
+
 function getProductColorFamilies(product) {
 
     const families = new Map();
 
+    const chosen = new Map();   // назва кольору -> сімʼя з адмінки
+
+    (product.variants || []).forEach(variant => {
+
+        const family = chosenColorFamily(variant);
+
+        if (variant && variant.color && family && !chosen.has(variant.color)) {
+            chosen.set(variant.color, family);
+        }
+
+    });
+
     getProductColors(product).forEach((hex, name) => {
 
-        const family = colorFamily(name, hex);
+        const family = chosen.get(name) || colorFamily(name, hex);
 
         if (!families.has(family)) {
             families.set(family, { hex: hex || null, names: [] });
