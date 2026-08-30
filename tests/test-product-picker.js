@@ -110,5 +110,125 @@ console.log("\n[4] Віджет підключений і поля переве�
         !/collection: "products"[\s\S]{0,200}?value_field: "id"/.test(config));
 }
 
-console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
-process.exit(failures === 0 ? 0 : 1);
+console.log("\n[N] Розділ додається цілком");
+{
+    // НАВІЩО. Акція «на всі сумки» — це кілька десятків товарів.
+    // Шукати їх по одному негуманно, а пропустити один при цьому
+    // легше легкого.
+    //
+    // Піднімаємо віджет ПО-СПРАВЖНЬОМУ, із заглушками CMS і React:
+    // незареєстрований віджет Decap підміняє контролом "unknown", і
+    // запис після цього не зберігається (див. коментар у
+    // admin/image-framing-widget.js).
+    const src = fs.readFileSync(path.join(ROOT, "admin/product-picker.js"), "utf8");
+
+    // Вихідні файли товарів, а не згенерований агрегат (правило з
+    // tests/test-migration-types.js). Сам віджет в адмінці читає саме
+    // агрегат — там це доречно, він показує опубліковане, — але тесту
+    // потрібні дані, а не результат збірки.
+    const products = fs.readdirSync(path.join(ROOT, "data/products"))
+        .filter(f => f.endsWith(".json"))
+        .map(f => JSON.parse(fs.readFileSync(path.join(ROOT, "data/products", f), "utf8")))
+        .filter(p => typeof p.id === "number");
+
+    // Категорії — теж із вихідних файлів (data/categories/*.json), а не
+    // з агрегату. Віджет отримує їх у тому самому вигляді {name,
+    // department}, тож заглушка нічим не відрізняється від бойового
+    // data/categories.json.
+    const categories = fs.readdirSync(path.join(ROOT, "data/categories"))
+        .filter(f => f.endsWith(".json"))
+        .map(f => JSON.parse(fs.readFileSync(path.join(ROOT, "data/categories", f), "utf8")))
+        .filter(c => c.name && c.department)
+        .map(c => ({ name: c.name, department: c.department }));
+
+    const registered = {};
+
+    const stubH = (tag, props, ...kids) => ({
+        tag, props: props || {}, kids: kids.flat().filter(x => x != null)
+    });
+
+    const stubWindow = { h: stubH, createClass: spec => spec };
+
+    const stubFetch = url => Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve(/categories/.test(url) ? categories : products)
+    });
+
+    new Function("CMS", "window", "createClass", "h", "fetch", "console", src)(
+        { registerWidget: (name, control) => { registered[name] = control; } },
+        stubWindow, stubWindow.createClass, stubH, stubFetch, console
+    );
+
+    const control = registered.productPicker;
+
+    check("віджет піднявся", !!control);
+
+    const instance = Object.assign(Object.create(control), {
+        state: control.getInitialState(),
+        props: { value: [], onChange(next) { instance.props.value = next; } },
+        setState(patch) { Object.assign(instance.state, patch); }
+    });
+
+    control.componentDidMount.call(instance);
+
+    // Дерево збирається з двох джерел, і обидва асинхронні.
+    return new Promise(resolve => setTimeout(resolve, 300)).then(() => {
+
+        const groups = instance.state.groups;
+
+        check("розділи зібрані", groups.length > 0, String(groups.length));
+
+        // КІЛЬКОСТІ рахуються по товарах, а не беруться з категорій:
+        // у довіднику може бути записано що завгодно, а в акцію піде
+        // рівно те, що є в каталозі.
+        const сумки = groups.find(g => g.name === "Сумки");
+
+        check("у розділі є підрозділи", сумки && сумки.cats.length > 1,
+            сумки ? сумки.cats.map(c => c.name).join(", ") : "розділу немає");
+
+        check("розділ = сума підрозділів",
+            сумки && сумки.ids.length === сумки.cats.reduce((s, c) => s + c.ids.length, 0),
+            сумки ? `${сумки.ids.length} проти ${сумки.cats.reduce((s, c) => s + c.ids.length, 0)}` : "");
+
+        // Найбільший розділ угорі: саме його додають цілком найчастіше.
+        check("розділи впорядковані за розміром",
+            groups.every((g, i) => i === 0 || groups[i - 1].ids.length >= g.ids.length),
+            groups.map(g => `${g.name}:${g.ids.length}`).join(" "));
+
+        control.addMany.call(instance, сумки.ids);
+
+        check("«Додати» кладе весь розділ",
+            instance.props.value.length === сумки.ids.length,
+            `${instance.props.value.length} з ${сумки.ids.length}`);
+
+        // Повторний клік по підрозділу не має плодити дублікатів:
+        // сайт малює перелік як є.
+        control.addMany.call(instance, сумки.cats[0].ids);
+
+        check("повторне додавання не дублює",
+            instance.props.value.length === сумки.ids.length,
+            String(instance.props.value.length));
+
+        control.removeMany.call(instance, сумки.ids);
+
+        check("«Прибрати» знімає весь розділ",
+            instance.props.value.length === 0, String(instance.props.value.length));
+
+        // Мертва кнопка гірша за відсутню: коли додано все, вона
+        // мусить прибирати, а не нічого не робити.
+        check("кнопка перемикається на «Прибрати»",
+            /all \? "Прибрати" : "Додати"/.test(src));
+
+        // Знімок, а не правило — про це має бути сказано і в коді, і в
+        // підказці адмінки.
+        check("про знімок сказано в коді", /це ЗНІМОК/.test(src));
+
+        const config = fs.readFileSync(path.join(ROOT, "admin/config.yml"), "utf8");
+
+        check("і в підказці адмінки", /Це знімок на зараз/.test(config));
+
+        console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
+        process.exit(failures === 0 ? 0 : 1);
+
+    });
+}

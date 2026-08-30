@@ -92,6 +92,76 @@
 
     }
 
+    // Розділи й підрозділи — щоб додавати не по одному товару.
+    //
+    // НАВІЩО. Акція «на всі сумки» — це 68 товарів. Шукати їх по
+    // одному через пошук просто негуманно, а пропустити один товар при
+    // цьому легше легкого.
+    //
+    // Дерево беремо з data/categories.json (звідки категорія й до якого
+    // розділу належить), а КІЛЬКОСТІ рахуємо по самих товарах: у
+    // категорії може бути записано що завгодно, а в акцію піде рівно
+    // те, що справді є в каталозі.
+    var catsCache = null;
+
+    function loadCategories() {
+
+        if (catsCache) return catsCache;
+
+        catsCache = fetch("../data/categories.json")
+            .then(function (r) { return r.ok ? r.json() : []; })
+            .then(function (list) { return Array.isArray(list) ? list : []; })
+            .catch(function () { return []; });
+
+        return catsCache;
+
+    }
+
+    function buildGroups(products, categories) {
+
+        var deptOf = {};
+
+        categories.forEach(function (c) {
+            if (c && c.name) deptOf[c.name] = c.department || "Інше";
+        });
+
+        var byDept = {};
+
+        products.forEach(function (p) {
+
+            var cat = p && p.category;
+
+            if (!cat) return;
+
+            var dept = deptOf[cat] || "Інше";
+
+            if (!byDept[dept]) byDept[dept] = { ids: [], cats: {} };
+            if (!byDept[dept].cats[cat]) byDept[dept].cats[cat] = [];
+
+            byDept[dept].ids.push(Number(p.id));
+            byDept[dept].cats[cat].push(Number(p.id));
+
+        });
+
+        // Найбільші розділи вгорі: саме їх додають цілком найчастіше.
+        return Object.keys(byDept)
+            .sort(function (a, b) { return byDept[b].ids.length - byDept[a].ids.length; })
+            .map(function (dept) {
+
+                var cats = byDept[dept].cats;
+
+                return {
+                    name: dept,
+                    ids: byDept[dept].ids,
+                    cats: Object.keys(cats)
+                        .sort(function (a, b) { return cats[b].length - cats[a].length; })
+                        .map(function (cat) { return { name: cat, ids: cats[cat] }; })
+                };
+
+            });
+
+    }
+
     function toIds(value) {
 
         if (!value) return [];
@@ -105,15 +175,23 @@
     var ProductPickerControl = createClass({
 
         getInitialState: function () {
-            return { input: "", products: [], loaded: false };
+            return { input: "", products: [], loaded: false, groups: [], open: {} };
         },
 
         componentDidMount: function () {
 
             var self = this;
 
-            loadProducts().then(function (list) {
-                if (!self.gone) self.setState({ products: list, loaded: true });
+            Promise.all([loadProducts(), loadCategories()]).then(function (both) {
+
+                if (self.gone) return;
+
+                self.setState({
+                    products: both[0],
+                    groups: buildGroups(both[0], both[1]),
+                    loaded: true
+                });
+
             });
 
         },
@@ -150,6 +228,33 @@
             this.commit(this.ids().filter(function (x) { return x !== id; }));
         },
 
+        // Цілим розділом. Додаємо СПИСОК ID, а не правило «всі сумки».
+        //
+        // ЧОМУ САМЕ ТАК. В акції зберігається перелік товарів
+        // (productIds), і сайт малює рівно його. Правило довелося б
+        // навчитись читати і збірці, і сторінці акції — це інша,
+        // більша робота.
+        //
+        // Наслідок, про який варто знати: це ЗНІМОК. Товар, доданий у
+        // «Сумки» завтра, сам в акцію не потрапить — треба зайти й
+        // натиснути ще раз. Тому поруч і показано «12 з 45»: видно,
+        // що розділ додано не цілком.
+        addMany: function (list) {
+
+            this.commit(this.ids().concat(list.map(Number)));
+
+        },
+
+        removeMany: function (list) {
+
+            var drop = {};
+
+            list.forEach(function (id) { drop[Number(id)] = true; });
+
+            this.commit(this.ids().filter(function (id) { return !drop[id]; }));
+
+        },
+
         byId: function (id) {
 
             var found = null;
@@ -159,6 +264,67 @@
             });
 
             return found;
+
+        },
+
+        // Рядок розділу або підрозділу: назва, скільки вже додано і
+        // кнопка. Коли додано все — кнопка стає «Прибрати»: інакше
+        // вона просто нічого не робила б, а мертва кнопка гірша за
+        // відсутню.
+        groupRow: function (item, level, extra) {
+
+            var self = this;
+            var chosen = this.ids();
+
+            var already = item.ids.filter(function (id) {
+                return chosen.indexOf(id) !== -1;
+            }).length;
+
+            var all = already === item.ids.length && item.ids.length > 0;
+
+            return h("div", {
+                key: (level ? "c:" : "d:") + item.name,
+                style: {
+                    display: "flex", alignItems: "center", gap: "8px",
+                    padding: level ? "4px 8px 4px 26px" : "6px 8px",
+                    borderTop: level ? "none" : "1px solid #f3f4f6"
+                }
+            },
+
+                extra || null,
+
+                h("span", {
+                    style: {
+                        flex: "1 1 auto", minWidth: 0, overflow: "hidden",
+                        textOverflow: "ellipsis", whiteSpace: "nowrap",
+                        fontSize: "13px",
+                        fontWeight: level ? 400 : 600,
+                        color: level ? "#374151" : "#111827"
+                    }
+                }, item.name),
+
+                h("span", {
+                    style: {
+                        flex: "0 0 auto", fontSize: "12px",
+                        color: already ? "#1e3a8a" : "#6b7280"
+                    }
+                }, already ? already + " з " + item.ids.length : String(item.ids.length)),
+
+                h("button", {
+                    type: "button",
+                    onClick: function () {
+                        if (all) self.removeMany(item.ids);
+                        else self.addMany(item.ids);
+                    },
+                    style: {
+                        flex: "0 0 auto", cursor: "pointer", fontSize: "12px",
+                        padding: "3px 10px", borderRadius: "6px",
+                        border: "1px solid " + (all ? "#fecaca" : "#c7d2fe"),
+                        background: all ? "#fee2e2" : "#eef2ff",
+                        color: all ? "#991b1b" : "#1e3a8a"
+                    }
+                }, all ? "Прибрати" : "Додати")
+            );
 
         },
 
@@ -242,9 +408,67 @@
 
             }
 
+            // Розділи. Підрозділи ховаємо під стрілкою: інакше блок
+            // із десяти рядків заступав би сам пошук, яким користуються
+            // частіше.
+            var sections = this.state.groups.length
+                ? h("div", {
+                    style: {
+                        border: "1px solid #e5e7eb", borderRadius: "8px",
+                        marginBottom: "8px", background: "#fff", overflow: "hidden"
+                    }
+                },
+
+                    h("div", {
+                        style: {
+                            padding: "6px 8px", fontSize: "12px", color: "#6b7280",
+                            background: "#f9fafb", borderBottom: "1px solid #f3f4f6"
+                        }
+                    }, "Додати цілим розділом"),
+
+                    this.state.groups.map(function (dept) {
+
+                        var opened = !!self.state.open[dept.name];
+
+                        var toggle = h("button", {
+                            type: "button",
+                            "aria-expanded": String(opened),
+                            onClick: function () {
+
+                                var open = {};
+
+                                Object.keys(self.state.open).forEach(function (k) {
+                                    open[k] = self.state.open[k];
+                                });
+
+                                open[dept.name] = !opened;
+
+                                self.setState({ open: open });
+
+                            },
+                            style: {
+                                flex: "0 0 auto", width: "18px", border: "none",
+                                background: "transparent", cursor: "pointer",
+                                color: "#6b7280", fontSize: "11px", padding: 0
+                            }
+                        }, opened ? "▾" : "▸");
+
+                        return h("div", { key: dept.name },
+                            self.groupRow(dept, 0, toggle),
+                            opened
+                                ? dept.cats.map(function (cat) { return self.groupRow(cat, 1); })
+                                : null
+                        );
+
+                    })
+                )
+                : null;
+
             return h("div", { className: this.props.classNameWrapper },
 
                 chosen.length ? h("div", { style: { marginBottom: "6px" } }, chosen) : null,
+
+                sections,
 
                 h("input", {
                     type: "text",
