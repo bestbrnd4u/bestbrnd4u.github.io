@@ -1,0 +1,58 @@
+{
+  "gender": [
+    "Чоловікам",
+    "Унісекс"
+  ],
+  "preOrderDays": "10-14 робочих днів",
+  "forcePublish": false,
+  "material": "Ацетат",
+  "brand": "Ray-Ban",
+  "price": 5900,
+  "preOrder": true,
+  "dimensions": "13,7 × 4,7 см; ширина лінзи — 5 см; міст — 2,1 см; довжина дужки — 14 см",
+  "variants": [
+    {
+      "color": "Зелений / прозорий",
+      "hex": "#596053",
+      "images": [
+        "/assets/images/products/uploads/ray-ban-green-irregular-unisex-sunglasses-rb4451-630631-50.webp",
+        "/assets/images/products/uploads/ray-ban-green-irregular-unisex-sunglasses-rb4451-630631-50_2.webp",
+        "/assets/images/products/uploads/ray-ban-green-irregular-unisex-sunglasses-rb4451-630631-50_4.webp",
+        "/assets/images/products/uploads/ray-ban-green-irregular-unisex-sunglasses-rb4451-630631-50_10.webp"
+      ]
+    }
+  ],
+  "preOrderPrepayment": 100,
+  "strapInfo": "Пластикові дужки",
+  "sizes": [
+    "Onesize"
+  ],
+  "splitByColor": true,
+  "searchKeywords": [
+    "Ray-Ban",
+    "Ray-Ban RB4451",
+    "RB4451",
+    "RB4451 630631 50",
+    "сонцезахисні окуляри Ray-Ban",
+    "окуляри Ray-Ban",
+    "унісекс окуляри",
+    "жіночі окуляри",
+    "чоловічі окуляри",
+    "сонцезахисні окуляри",
+    "окуляри з зеленими лінзами",
+    "зелені лінзи",
+    "окуляри неправильної форми",
+    "незвичайна форма окулярів",
+    "брендові окуляри",
+    "оригінальні Ray-Ban",
+    "модні окуляри"
+  ],
+  "isNew": false,
+  "title": "Сонцезахисні окуляри Ray-Ban RB4451",
+  "reviews": 0,
+  "instagramBlock": "general",
+  "description": "Стильні сонцезахисні окуляри Ray-Ban RB4451 з оригінальною неправильною формою оправи. Універсальна модель із сучасним дизайном, яка легко доповнить як жіночі, так і чоловічі образи.\nЗелені лінзи та виразна оправа створюють ефектний акцент в образі, а легка конструкція забезпечує комфорт під час щоденного носіння. Модель чудово підійде для міських образів, відпочинку та подорожей",
+  "sku": "RB445163063150",
+  "rating": 5,
+  "category": "Окуляри і оправи"
+}
