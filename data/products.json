@@ -879,9 +879,9 @@
         "color": "Зелений",
         "hex": "#06b454",
         "images": [
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=f1083e17",
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=0d8861ff",
           "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-2.webp?v=7f7d7a02",
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=b5b2c31a"
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=fe586d43"
         ],
         "sku": "B094QT219C"
       },
@@ -889,9 +889,9 @@
         "color": "Карамельний",
         "hex": "#f49657",
         "images": [
-          "assets/images/products/uploads/jwp-ma123-1.webp?v=63d9dafe",
+          "assets/images/products/uploads/jwp-ma123-1.webp?v=9b7451e2",
           "assets/images/products/uploads/jwp-ma123-2.webp?v=189c38d2",
-          "assets/images/products/uploads/jwp-ma123-3.webp?v=35168707"
+          "assets/images/products/uploads/jwp-ma123-3.webp?v=4eebbe20"
         ],
         "sku": "JWP-MA123"
       }
@@ -4287,8 +4287,8 @@
           "/assets/images/products/uploads/ca173_svvfq_a0.webp?v=274cb8ee",
           "/assets/images/products/uploads/ca173_svvfq_a5.webp?v=c14cae6b",
           "/assets/images/products/uploads/ca173_svvfq_a8.webp?v=b75e933e",
-          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=334d4294",
-          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=d30aa51b"
+          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=da4cae55",
+          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=47fade7b"
         ]
       }
     ],
@@ -6482,6 +6482,76 @@
       "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasse-d4cf8613.webp",
       "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasse-c873f7c8.webp",
       "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasse-dfb377a8.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Чоловікам",
+      "Унісекс"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Ацетат",
+    "brand": "Ray-Ban",
+    "price": 5900,
+    "preOrder": true,
+    "dimensions": "13,7 × 4,7 см; ширина лінзи — 5 см; міст — 2,1 см; довжина дужки — 14 см",
+    "variants": [
+      {
+        "color": "Зелений / прозорий",
+        "hex": "#596053",
+        "images": [
+          "/assets/images/products/uploads/ray-ban-green-irregular-unisex-sunglasses-rb4451-630631-50.webp?v=6ec43da4",
+          "/assets/images/products/uploads/ray-ban-green-irregular-unisex-sunglasses-rb4451-630631-50_2.webp?v=dbe12c80",
+          "/assets/images/products/uploads/ray-ban-green-irregular-unisex-sunglasses-rb4451-630631-50_4.webp?v=cfd60fb6",
+          "/assets/images/products/uploads/ray-ban-green-irregular-unisex-sunglasses-rb4451-630631-50_10.webp?v=0114f5da"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Пластикові дужки",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Ray-Ban",
+      "Ray-Ban RB4451",
+      "RB4451",
+      "RB4451 630631 50",
+      "сонцезахисні окуляри Ray-Ban",
+      "окуляри Ray-Ban",
+      "унісекс окуляри",
+      "жіночі окуляри",
+      "чоловічі окуляри",
+      "сонцезахисні окуляри",
+      "окуляри з зеленими лінзами",
+      "зелені лінзи",
+      "окуляри неправильної форми",
+      "незвичайна форма окулярів",
+      "брендові окуляри",
+      "оригінальні Ray-Ban",
+      "модні окуляри"
+    ],
+    "isNew": false,
+    "title": "Сонцезахисні окуляри Ray-Ban RB4451",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильні сонцезахисні окуляри Ray-Ban RB4451 з оригінальною неправильною формою оправи. Універсальна модель із сучасним дизайном, яка легко доповнить як жіночі, так і чоловічі образи.\nЗелені лінзи та виразна оправа створюють ефектний акцент в образі, а легка конструкція забезпечує комфорт під час щоденного носіння. Модель чудово підійде для міських образів, відпочинку та подорожей",
+    "sku": "RB445163063150",
+    "rating": 5,
+    "category": "Окуляри і оправи",
+    "legacySlugs": [
+      "сонцезахисні-окуляри-ray-ban-rb4451"
+    ],
+    "slug": "sontsezakhysni-okuliary-ray-ban-rb4451",
+    "id": 91,
+    "color": "Зелений / прозорий",
+    "images": [
+      "/assets/images/products/uploads/ray-ban-green-irregular-unisex-sunglasses-rb4451-630631-50.webp",
+      "/assets/images/products/uploads/ray-ban-green-irregular-unisex-sunglasses-rb4451-630631-50_2.webp",
+      "/assets/images/products/uploads/ray-ban-green-irregular-unisex-sunglasses-rb4451-630631-50_4.webp",
+      "/assets/images/products/uploads/ray-ban-green-irregular-unisex-sunglasses-rb4451-630631-50_10.webp"
     ]
   }
 ]
