@@ -1,0 +1,56 @@
+{
+  "gender": [
+    "Чоловікам"
+  ],
+  "preOrderDays": "10-14 робочих днів",
+  "forcePublish": false,
+  "material": "Ацетат",
+  "brand": "Ray-Ban",
+  "price": 4900,
+  "preOrder": true,
+  "dimensions": "14,1 × 4,5 см; ширина лінзи — 5,5 см; міст — 1,8 см; довжина дужки — 14 см",
+  "variants": [
+    {
+      "color": "Чорний / зелений",
+      "hex": "#2c6044",
+      "images": [
+        "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-sunglasses-rb2283-90131-55-rb2283-90131-55.jpg",
+        "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-sunglasses-rb2283-90131-55-rb2283-90131-55_3_1.jpg",
+        "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-sunglasses-rb2283-90131-55-rb2283-90131-55_4.jpg",
+        "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-sunglasses-rb2283-90131-55-rb2283-90131-55_10.jpg"
+      ]
+    }
+  ],
+  "preOrderPrepayment": 100,
+  "strapInfo": "Ацетатні дужки",
+  "sizes": [
+    "Onesize"
+  ],
+  "splitByColor": true,
+  "searchKeywords": [
+    "Ray-Ban",
+    "Ray-Ban Burbank",
+    "Burbank RB2283",
+    "RB2283",
+    "RB2283 901/31 55",
+    "сонцезахисні окуляри Ray-Ban",
+    "чоловічі окуляри",
+    "чоловічі сонцезахисні окуляри",
+    "прямокутні окуляри",
+    "зелені окуляри",
+    "окуляри із зеленими лінзами",
+    "зелені лінзи",
+    "брендові окуляри",
+    "оригінальні Ray-Ban",
+    "окуляри Ray-Ban чоловічі",
+    "модні окуляри"
+  ],
+  "isNew": false,
+  "title": "Сонцезахисні окуляри Ray-Ban Burbank RB2283",
+  "reviews": 0,
+  "instagramBlock": "general",
+  "description": "Стильні чоловічі сонцезахисні окуляри Ray-Ban Burbank RB2283 із прямокутною формою оправи. Модель поєднує класичний силует із сучасними деталями та фірмовою естетикою Ray-Ban.\nЗелені лінзи гармонійно доповнюють оправу та забезпечують комфортне сприйняття яскравого світла. Універсальна форма чудово підходить для повсякденних образів і легко поєднується з різним стилем одягу",
+  "sku": "RB2283901/3155",
+  "rating": 5,
+  "category": "Окуляри і оправи"
+}
