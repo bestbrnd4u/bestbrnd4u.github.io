@@ -1,0 +1,69 @@
+{
+  "gender": [
+    "Жінкам"
+  ],
+  "preOrderDays": "10-14 робочих днів",
+  "forcePublish": false,
+  "material": "Нержавіюча сталь",
+  "brand": "Michael Kors",
+  "price": 7000,
+  "preOrder": true,
+  "dimensions": "Корпус — 2,8 см у діаметрі",
+  "variants": [
+    {
+      "color": "Золотистий",
+      "hex": "#e6cfaa",
+      "images": [
+        "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set.webp",
+        "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_2.webp",
+        "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_3.webp",
+        "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_5.webp"
+      ]
+    }
+  ],
+  "preOrderPrepayment": 100,
+  "strapInfo": "Браслет із нержавіючої сталі",
+  "sizes": [
+    "ONESIZE"
+  ],
+  "splitByColor": true,
+  "searchKeywords": [
+    "Michael Kors",
+    "Michael Kors годинник",
+    "годинник Michael Kors",
+    "Petite Lexington",
+    "Michael Kors Petite Lexington",
+    "MK4944",
+    "MK4944SET",
+    "жіночий годинник",
+    "жіночий наручний годинник",
+    "кварцовий годинник",
+    "подарунковий набір",
+    "годинник у подарунок",
+    "брендовий годинник",
+    "оригінальний Michael Kors",
+    "класичний годинник",
+    "елегантний годинник",
+    "модний годинник"
+  ],
+  "isNew": false,
+  "title": "Годинник Michael Kors Petite Lexington Gift Set",
+  "reviews": 0,
+  "instagramBlock": "general",
+  "description": "Елегантний подарунковий набір Michael Kors Petite Lexington — стильний аксесуар для повсякденних та особливих образів. Вишуканий дизайн годинника поєднує класичний циферблат, тонкий корпус та фірмову естетику Michael Kors.\nГодинник працює на кварцовому механізмі та має аналоговий циферблат. Компактний розмір корпусу робить модель витонченою та комфортною для щоденного носіння.\nНабір стане чудовим варіантом для подарунка завдяки презентабельному оформленню та універсальному дизайну",
+  "sku": "MK4944SET",
+  "rating": 5,
+  "category": "Годинники",
+  "legacySlugs": [
+    "годинник-michael-kors-petite-lexington-gift-set"
+  ],
+  "slug": "hodynnyk-michael-kors-petite-lexington-gift-set",
+  "id": 87,
+  "color": "Золотистий",
+  "images": [
+    "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set.webp",
+    "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_2.webp",
+    "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_3.webp",
+    "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_5.webp"
+  ]
+}

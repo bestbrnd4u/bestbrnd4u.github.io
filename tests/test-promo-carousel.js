@@ -12,6 +12,13 @@ function loadPicker(){
   const dom=new JSDOM("",{runScripts:"outside-only"});
   const {window}=dom;
   const src=fs.readFileSync(path.join(ROOT,"assets/js/app.js"),"utf8");
+  // Саме правило набору переїхало в common.js: те саме потрібне
+  // сторінці акції, а дві копії вже встигли розійтись (див.
+  // tests/test-promo-rules.js). pickPromotionProducts лишилась
+  // тонкою обгорткою, тож без цього рядка вона кличе порожнечу.
+  const common=fs.readFileSync(path.join(ROOT,"assets/js/common.js"),"utf8");
+  window.eval(common.slice(common.indexOf("function promotionProducts"),
+                           common.indexOf("function getDiscountPercent")));
   window.eval(src.match(/function pickPromotionProducts[\s\S]*?\n}\n/)[0]);
   return window.pickPromotionProducts;
 }

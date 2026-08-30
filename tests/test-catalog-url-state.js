@@ -74,8 +74,12 @@ console.log("\n[2] Стан із адреси читається назад");
         /readSetParam\(params, "color"\)/.test(catalog)
         && /selectedSizes = readSetParam\(params, "size"\)/.test(catalog));
 
+    // Зведення до сімʼї переїхало з readUrlState() у resolveUrlTokens():
+    // в адресі тепер латиниця («?color=chornyi»), і зводити до сімʼї є
+    // сенс лише для того, чого не впізнали за slug-ом, — тобто для
+    // старих посилань на кшталт ?color=Black.
     check("колір з адреси зводиться до сім'ї",
-        /\.map\(value => colorFamily\(value\)\)/.test(catalog));
+        /families\.has\(value\) \? value : colorFamily\(value\)/.test(catalog));
     check("сортування читається з адреси", /const sort = params\.get\("sort"\)/.test(catalog));
     check("ціна читається з адреси", /readNumberParam\(params, "priceMin"\)/.test(catalog));
 
@@ -84,8 +88,26 @@ console.log("\n[2] Стан із адреси читається назад");
     // товари відфільтровані, а фільтри виглядають незайманими.
     check("прочитане відображається в інтерфейсі",
         /function applyUiFromUrlState/.test(catalog));
+    // Порядок звіряємо ВСЕРЕДИНІ initCatalog, а не по всьому файлу:
+    // indexOf по файлу знаходив оголошення функції, а не її виклик, і
+    // перевірка залежала від того, у якому місці файлу лежить код.
+    const init = catalog.slice(catalog.indexOf("async function initCatalog"));
+
+    const порядок = name => init.indexOf(name);
+
     check("виклик стоїть після заповнення фільтрів",
-        catalog.indexOf("applyUiFromUrlState()") > catalog.indexOf("fillSizeGroups()"));
+        порядок("applyUiFromUrlState()") > порядок("fillSizeGroups()"),
+        `applyUiFromUrlState ${порядок("applyUiFromUrlState()")}, `
+        + `fillSizeGroups ${порядок("fillSizeGroups()")}`);
+
+    // Переклад латиниці з адреси мусить стояти ДО будь-якого
+    // фільтрування й до розкладки фільтрів: далі каталог порівнює
+    // значення як є («Чорний»), а не токен із адреси («chornyi»).
+    check("переклад адреси — одразу після завантаження товарів",
+        порядок("resolveUrlTokens()") > 0
+        && порядок("resolveUrlTokens()") < порядок("fillColors()"),
+        `resolveUrlTokens ${порядок("resolveUrlTokens()")}, `
+        + `fillColors ${порядок("fillColors()")}`);
 
     // Підроблена або застаріла адреса не повинна давати порожній
     // каталог без жодного видимого фільтра.

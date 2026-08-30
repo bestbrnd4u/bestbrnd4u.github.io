@@ -1,0 +1,67 @@
+{
+  "gender": [
+    "Жінкам"
+  ],
+  "preOrderDays": "10-14 робочих днів",
+  "forcePublish": false,
+  "material": "Корпус і браслет — нержавіюча сталь; скло — мінеральне",
+  "brand": "Michael Kors",
+  "price": 6500,
+  "preOrder": true,
+  "dimensions": "2,6 × 2,6 × 0,7 см",
+  "variants": [
+    {
+      "color": "Сріблястий / кремовий",
+      "hex": "#cbcbcb",
+      "images": [
+        "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-silver-dial-ladies-watch-mk4843.webp",
+        "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-silver-dial-ladies-watch-mk4843_2.webp",
+        "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-silver-dial-ladies-watch-mk4843_3.webp"
+      ]
+    }
+  ],
+  "preOrderPrepayment": 100,
+  "sizes": [
+    "ONESIZE"
+  ],
+  "splitByColor": true,
+  "searchKeywords": [
+    "Michael Kors Lexington",
+    "Michael Kors Petite Lexington",
+    "Michael Kors MK4843",
+    "MK4843",
+    "годинник Michael Kors",
+    "жіночий годинник Michael Kors",
+    "жіночий наручний годинник",
+    "кварцовий годинник",
+    "сріблястий годинник",
+    "годинник зі сталевим браслетом",
+    "годинник із перламутровим циферблатом",
+    "годинник із pavé",
+    "класичний жіночий годинник",
+    "елегантний годинник",
+    "брендовий годинник",
+    "оригінальний Michael Kors"
+  ],
+  "isNew": false,
+  "country": "",
+  "title": "Жіночий годинник Michael Kors Petite Lexington Pavé MK4843",
+  "reviews": 0,
+  "closure": "Сталевий браслет сріблястого кольору шириною 1,4 см із розкладною застібкою-кліпсою",
+  "instagramBlock": "general",
+  "description": "Елегантний жіночий годинник Michael Kors Petite Lexington Pavé у сріблястому виконанні. Мініатюрний круглий корпус діаметром 26 мм доповнений кремовим перламутровим циферблатом із делікатними pavé-акцентами та римськими індексами.\nМодель оснащена надійним кварцовим механізмом із трьома стрілками. Корпус, безель і браслет повністю виконані з нержавіючої сталі. Мінеральне скло захищає циферблат, а водонепроникність до 50 м (5 ATM) робить годинник практичним для щоденного носіння",
+  "sku": "MK4843",
+  "rating": 5,
+  "category": "Годинники",
+  "legacySlugs": [
+    "жіночий-годинник-michael-kors-petite-lexington-pavé-mk4843"
+  ],
+  "slug": "zhinochyi-hodynnyk-michael-kors-petite-lexington-pav-mk4843",
+  "id": 81,
+  "color": "Сріблястий / кремовий",
+  "images": [
+    "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-silver-dial-ladies-watch-mk4843.webp",
+    "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-silver-dial-ladies-watch-mk4843_2.webp",
+    "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-silver-dial-ladies-watch-mk4843_3.webp"
+  ]
+}

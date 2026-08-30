@@ -21,17 +21,20 @@ const check = (n, c, e) => {
     else { console.log("  ✗", n, e !== undefined ? "→ " + e : ""); failures++; }
 };
 
-// Логіка пошуку — дзеркало тієї, що у віджеті. Тримається поруч
-// свідомо: віджет виконується у браузері адмінки, імпортувати його
-// в node не можна (він одразу чіпає CMS і window).
-const LOOKALIKE = { "а": "a", "с": "c", "е": "e", "о": "o", "р": "p", "х": "x", "і": "i", "у": "y" };
-const norm = v => String(v === undefined || v === null ? "" : v)
-    .toLowerCase().replace(/[асеорхіу]/g, c => LOOKALIKE[c] || c);
-const hay = p => norm([p.title, p.brand, p.category, p.sku, p.id].filter(Boolean).join(" "));
-const matches = (p, q) => {
-    const w = norm(q).split(/\s+/).filter(Boolean);
-    return w.length > 0 && w.every(x => hay(p).indexOf(x) !== -1);
-};
+// Логіка пошуку — САМА, з файлу віджета, а не її копія поруч.
+//
+// ЩО БУЛО НЕ ТАК. Тут лежало дзеркало: ті самі три функції,
+// переписані для node. Дзеркало показувало, що пошук працює, навіть
+// коли у віджеті його не лишилось узагалі: при винесенні спільного
+// коду в admin/catalog-tree.js із product-picker.js зникли norm,
+// haystack і matches. Тести були зелені, а адмінка на запит «coach»
+// падала з «ReferenceError: matches is not defined».
+//
+// Тому беремо функції з самого файлу — розійтись їм тепер нема як.
+const { matches } = new Function(
+    SRC.slice(SRC.indexOf("    var LOOKALIKE = "), SRC.indexOf("    function toIds(value) {"))
+    + "; return { matches };"
+)();
 
 const products = fs.readdirSync(path.join(ROOT, "data/products"))
     .filter(f => f.endsWith(".json"))
@@ -110,5 +113,178 @@ console.log("\n[4] Віджет підключений і поля переве�
         !/collection: "products"[\s\S]{0,200}?value_field: "id"/.test(config));
 }
 
-console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
-process.exit(failures === 0 ? 0 : 1);
+console.log("\n[N] Розділ додається цілком");
+{
+    // НАВІЩО. Акція «на всі сумки» — це кілька десятків товарів.
+    // Шукати їх по одному негуманно, а пропустити один при цьому
+    // легше легкого.
+    //
+    // Піднімаємо віджет ПО-СПРАВЖНЬОМУ, із заглушками CMS і React:
+    // незареєстрований віджет Decap підміняє контролом "unknown", і
+    // запис після цього не зберігається (див. коментар у
+    // admin/image-framing-widget.js).
+    const src = fs.readFileSync(path.join(ROOT, "admin/product-picker.js"), "utf8");
+
+    // Вихідні файли товарів, а не згенерований агрегат (правило з
+    // tests/test-migration-types.js). Сам віджет в адмінці читає саме
+    // агрегат — там це доречно, він показує опубліковане, — але тесту
+    // потрібні дані, а не результат збірки.
+    const products = fs.readdirSync(path.join(ROOT, "data/products"))
+        .filter(f => f.endsWith(".json"))
+        .map(f => JSON.parse(fs.readFileSync(path.join(ROOT, "data/products", f), "utf8")))
+        .filter(p => typeof p.id === "number");
+
+    // Категорії — теж із вихідних файлів (data/categories/*.json), а не
+    // з агрегату. Віджет отримує їх у тому самому вигляді {name,
+    // department}, тож заглушка нічим не відрізняється від бойового
+    // data/categories.json.
+    const categories = fs.readdirSync(path.join(ROOT, "data/categories"))
+        .filter(f => f.endsWith(".json"))
+        .map(f => JSON.parse(fs.readFileSync(path.join(ROOT, "data/categories", f), "utf8")))
+        .filter(c => c.name && c.department)
+        .map(c => ({ name: c.name, department: c.department }));
+
+    const registered = {};
+
+    const stubH = (tag, props, ...kids) => ({
+        tag, props: props || {}, kids: kids.flat().filter(x => x != null)
+    });
+
+    const stubWindow = { h: stubH, createClass: spec => spec };
+
+    const stubFetch = url => Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve(/categories/.test(url) ? categories : products)
+    });
+
+    // Каталог і дерево розділів живуть в admin/catalog-tree.js — тим
+    // самим користується admin/section-picker.js. Піднімаємо його
+    // ПЕРШИМ: без window.CatalogTree віджет мовчки лишається з
+    // порожнім деревом, і перевірки нижче падатимуть не на тому.
+    new Function("window", "fetch",
+        fs.readFileSync(path.join(ROOT, "admin/catalog-tree.js"), "utf8"))(stubWindow, stubFetch);
+
+    check("дерево каталогу піднялось", !!stubWindow.CatalogTree);
+
+    new Function("CMS", "window", "createClass", "h", "fetch", "console", src)(
+        { registerWidget: (name, control) => { registered[name] = control; } },
+        stubWindow, stubWindow.createClass, stubH, stubFetch, console
+    );
+
+    const control = registered.productPicker;
+
+    check("віджет піднявся", !!control);
+
+    const instance = Object.assign(Object.create(control), {
+        state: control.getInitialState(),
+        props: { value: [], onChange(next) { instance.props.value = next; } },
+        setState(patch) { Object.assign(instance.state, patch); }
+    });
+
+    control.componentDidMount.call(instance);
+
+    // Дерево збирається з двох джерел, і обидва асинхронні.
+    return new Promise(resolve => setTimeout(resolve, 300)).then(() => {
+
+        const groups = instance.state.groups;
+
+        check("розділи зібрані", groups.length > 0, String(groups.length));
+
+        // КІЛЬКОСТІ рахуються по товарах, а не беруться з категорій:
+        // у довіднику може бути записано що завгодно, а в акцію піде
+        // рівно те, що є в каталозі.
+        const сумки = groups.find(g => g.name === "Сумки");
+
+        check("у розділі є підрозділи", сумки && сумки.cats.length > 1,
+            сумки ? сумки.cats.map(c => c.name).join(", ") : "розділу немає");
+
+        check("розділ = сума підрозділів",
+            сумки && сумки.ids.length === сумки.cats.reduce((s, c) => s + c.ids.length, 0),
+            сумки ? `${сумки.ids.length} проти ${сумки.cats.reduce((s, c) => s + c.ids.length, 0)}` : "");
+
+        // Найбільший розділ угорі: саме його додають цілком найчастіше.
+        check("розділи впорядковані за розміром",
+            groups.every((g, i) => i === 0 || groups[i - 1].ids.length >= g.ids.length),
+            groups.map(g => `${g.name}:${g.ids.length}`).join(" "));
+
+        control.addMany.call(instance, сумки.ids);
+
+        check("«Додати» кладе весь розділ",
+            instance.props.value.length === сумки.ids.length,
+            `${instance.props.value.length} з ${сумки.ids.length}`);
+
+        // Повторний клік по підрозділу не має плодити дублікатів:
+        // сайт малює перелік як є.
+        control.addMany.call(instance, сумки.cats[0].ids);
+
+        check("повторне додавання не дублює",
+            instance.props.value.length === сумки.ids.length,
+            String(instance.props.value.length));
+
+        control.removeMany.call(instance, сумки.ids);
+
+        check("«Прибрати» знімає весь розділ",
+            instance.props.value.length === 0, String(instance.props.value.length));
+
+        // РЕНДЕР ІЗ ЗАПИТОМ — те, що впало в адмінці.
+        //
+        // «ReferenceError: matches is not defined» на запит «coach»:
+        // при винесенні спільного коду з файла зникли функції пошуку.
+        // Жодна перевірка вище цього не бачила — вони працювали з
+        // копією логіки, а не з віджетом.
+        const flatten = node => {
+
+            const out = [];
+
+            (function walk(n) {
+                if (!n || typeof n !== "object") return;
+                out.push(n);
+                (n.kids || []).forEach(walk);
+            })(node);
+
+            return out;
+
+        };
+
+        instance.props.classNameWrapper = "";
+        instance.state.input = "coach";
+
+        let знайдено = null;
+
+        try {
+            знайдено = flatten(control.render.call(instance))
+                .filter(n => n.tag === "button"
+                    && n.kids.some(k => k && k.tag === "strong")).length;
+        } catch (error) {
+            знайдено = "впало: " + error.message;
+        }
+
+        check("пошук малюється без помилки", typeof знайдено === "number" && знайдено > 0,
+            String(знайдено));
+
+        instance.state.input = "zzzqqq";
+
+        const порожньо = flatten(control.render.call(instance))
+            .some(n => (n.kids || []).some(k =>
+                typeof k === "string" && k.indexOf("Нічого не знайдено") !== -1));
+
+        check("порожній результат теж малюється", порожньо);
+
+        // Мертва кнопка гірша за відсутню: коли додано все, вона
+        // мусить прибирати, а не нічого не робити.
+        check("кнопка перемикається на «Прибрати»",
+            /all \? "Прибрати" : "Додати"/.test(src));
+
+        // Знімок, а не правило — про це має бути сказано і в коді, і в
+        // підказці адмінки.
+        check("про знімок сказано в коді", /це ЗНІМОК/.test(src));
+
+        const config = fs.readFileSync(path.join(ROOT, "admin/config.yml"), "utf8");
+
+        check("і в підказці адмінки", /Це знімок на зараз/.test(config));
+
+        console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
+        process.exit(failures === 0 ? 0 : 1);
+
+    });
+}

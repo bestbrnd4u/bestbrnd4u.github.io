@@ -3,11 +3,13 @@
     "Жінкам"
   ],
   "preOrderDays": "5–10 робочих днів",
+  "color": "Black Beige  чорний  бежевий",
   "forcePublish": false,
   "material": "Монограмний жакард, шкіряне оздоблення",
   "brand": "Marc Jacobs",
   "price": 10000,
   "preOrder": false,
+  "slug": "sumka-the-medium-tote-bag-in-monogram-jacquard",
   "dimensions": "34 × 27 × 15 см",
   "variants": [
     {
@@ -24,6 +26,7 @@
   ],
   "preOrderPrepayment": 50,
   "strapInfo": "Ремінець знімний та регульований",
+  "sortOrder": 15,
   "sizes": [
     "M"
   ],
@@ -53,15 +56,6 @@
   ],
   "isNew": false,
   "title": "Сумка The Medium Tote Bag in Monogram Jacquard",
-  "reviews": 0,
-  "instagramBlock": "general",
-  "description": "Стильна та містка сумка Marc Jacobs The Medium Tote Bag in Monogram Jacquard — культова модель The Tote Bag у вишуканому виконанні з фірмовим монограмним жакардом.\nСумка має впізнаваний дизайн Marc Jacobs із вишитим логотипом, шкіряною окантовкою та верхніми ручками. Просторе основне відділення закривається на блискавку та доповнене внутрішньою кишенею.\nМодель оснащена знімним та регульованим текстильним ремінцем, тому її можна носити в руці, на плечі або через плече",
-  "sku": "2F4HTT015H05",
-  "rating": 5,
-  "category": "Жіночі сумки",
-  "slug": "sumka-the-medium-tote-bag-in-monogram-jacquard",
-  "id": 51,
-  "color": "Black Beige  чорний  бежевий",
   "images": [
     "/assets/images/products/uploads/215896950_beige_in.webp",
     "/assets/images/products/uploads/215896950_beige_bk.webp",
@@ -69,6 +63,13 @@
     "/assets/images/products/uploads/215896950_beige_e1.webp",
     "/assets/images/products/uploads/215896950_beige_fr.webp"
   ],
+  "reviews": 0,
+  "id": 51,
+  "instagramBlock": "general",
+  "description": "Стильна та містка сумка Marc Jacobs The Medium Tote Bag in Monogram Jacquard — культова модель The Tote Bag у вишуканому виконанні з фірмовим монограмним жакардом.\nСумка має впізнаваний дизайн Marc Jacobs із вишитим логотипом, шкіряною окантовкою та верхніми ручками. Просторе основне відділення закривається на блискавку та доповнене внутрішньою кишенею.\nМодель оснащена знімним та регульованим текстильним ремінцем, тому її можна носити в руці, на плечі або через плече",
+  "sku": "2F4HTT015H05",
+  "rating": 5,
+  "category": "Жіночі сумки",
   "legacySlugs": [
     "сумка-the-medium-tote-bag-in-monogram-jacquard"
   ]

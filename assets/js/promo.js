@@ -32,10 +32,13 @@ async function initPromoPage() {
 
     try {
 
-        const [promoRes, productsRes, categoryDepartments] = await Promise.all([
+        const [promoRes, productsRes, categoryDepartments, departmentOf] = await Promise.all([
             fetch(dataUrl("data/promotions.json")),
             fetch(dataUrl("data/products.json")),
-            loadCategoryDepartments()
+            loadCategoryDepartments(),
+            // «категорія → розділ»: щоб розгорнути розділ, указаний в
+            // автопідхопленні акції, у перелік його категорій
+            loadDepartmentOf()
         ]);
 
         if (!promoRes.ok || !productsRes.ok) {
@@ -80,7 +83,7 @@ async function initPromoPage() {
         }
 
         renderPromoHero(promo);
-        setupPromoCatalog(promo, allProducts, categoryDepartments);
+        setupPromoCatalog(promo, allProducts, categoryDepartments, departmentOf);
 
     } catch (error) {
 
@@ -181,18 +184,17 @@ function renderPromoHero(promo) {
 // зазвичай керує initCatalog() на сторінці каталогу
 // -------------------------
 
-function setupPromoCatalog(promo, allProducts, categoryDepartments) {
+function setupPromoCatalog(promo, allProducts, categoryDepartments, departmentOf) {
 
     // без цього виклику фільтр за статтю в URL (?gender=...) ігнорувався б:
     // saveGenderFilter/selectedGenders в catalog.js заповнюються лише тут
     readUrlState();
 
-    const productIds = new Set(promo.productIds || []);
-
-    let curated = allProducts.filter(product =>
-        productIds.has(product.id) ||
-        (promo.brand && product.brand === promo.brand)
-    );
+    // Правило набору — спільне з головною (promotionProducts у
+    // common.js). Доки воно жило тут окремо, сторінка акції віддавала
+    // товари в порядку каталогу, а головна — у порядку, у якому їх
+    // перетягнув адмін.
+    let curated = promotionProducts(promo, allProducts, departmentOf);
 
     // якщо для товару не задана власна знижка (oldPrice), але в акції
     // є відсоток за замовчуванням — рахуємо "стару" ціну лише для показу

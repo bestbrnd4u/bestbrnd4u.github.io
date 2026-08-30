@@ -138,7 +138,37 @@ const ARTICLE_CODE = /\b(?=[a-z0-9-]*\d)[a-z0-9]{1,4}(?:-[a-z0-9]+)*\b/gi;
 
 // Слова про фурнітуру й обробку. Самі по собі кольором речі не є:
 // «Brass/Chalk» — золота фурнітура на айворі, а не золотий колір.
-const HARDWARE_WORDS = /\b(brass|chalk|nickel|antique|glacier|gold|silver)\b/gi;
+//
+// CHALK ЗВІДСИ ПРИБРАНО. Коментар вище каже про нього прямо: у
+// «Brass/Chalk» фурнітура — brass, а chalk — це і є колір речі, айворі.
+// Тобто слово стояло в списку всупереч власному поясненню, і
+// «Chalk / Brass» лишався зовсім без назви.
+const HARDWARE_WORDS = /\b(brass|nickel|antique|glacier|gold|silver)\b/gi;
+
+// Що лишилось після чищення — назва чи самі роздільники.
+//
+// ЩО БУЛО НЕ ТАК
+// ---------------
+// Після викидання службових слів рядок міг стати пунктуацією:
+//
+//     "Chalk / Brass"              → "/"
+//     "Brass/Maple"                → "/Maple"
+//     "Pebbled leather/Brass/Black" → "Pebbled leather//Black"
+//
+// Перевірка на порожнечу (`text ? …`) такого не ловила: "/" — рядок
+// непорожній. У товар потрапляв колір «/», і на сторінці та в картці
+// підпис кольору зникав, а в адресі лишалось ?color=%2F.
+const HAS_LETTERS = /[a-zа-яїієґ]/i;
+
+// Осиротілі роздільники: подвоєні, на початку й у кінці.
+function tidySeparators(text) {
+
+    return String(text || "")
+        .replace(/([/,])\s*(?:[/,]\s*)+/g, "$1")
+        .replace(/^[\s/,]+|[\s/,]+$/g, "")
+        .trim();
+
+}
 
 function tidySpaces(text) {
 
@@ -213,9 +243,14 @@ function cleanupColorName(name) {
         .replace(ARTICLE_CODE, " ")
         .replace(/[—–]/g, " ");
 
-    text = tidySpaces(text);
+    text = tidySeparators(tidySpaces(text));
 
-    return text ? capitalize(text) : capitalize(tidySpaces(name));
+    // Лишились самі роздільники — чищення з'їло всю назву. Краще
+    // показати сировину постачальника, ніж «/»: покупець обирає саме
+    // за цим підписом.
+    if (!HAS_LETTERS.test(text)) return capitalize(tidySpaces(name));
+
+    return capitalize(text);
 
 }
 

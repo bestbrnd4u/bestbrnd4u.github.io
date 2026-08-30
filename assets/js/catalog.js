@@ -710,6 +710,136 @@ function readNumberParam(params, key) {
 
 }
 
+// Значення фільтра для адреси: «Чорний» → «chornyi».
+//
+// Перетворювач один на весь сайт (assets/js/translit.js) — той самий,
+// яким латиницею стали адреси товарів і акцій. Немає його (не
+// підключився) — лишаємо значення як є: борода в адресі неприємна,
+// мовчазно зламаний фільтр гірший.
+function latinParam(value) {
+
+    const slug = window.Translit ? window.Translit.toSlug(value) : "";
+
+    return slug || String(value === undefined || value === null ? "" : value);
+
+}
+
+// Покажчик «латиниця з адреси → справжнє значення».
+//
+// Один на всі фільтри: бренд і категорію каталог читає з адреси
+// окремо й пізніше за решту (їх список зʼявляється лише після
+// розкладки бічного меню), і без спільного покажчика правило
+// зіставлення розповзлося б по трьох місцях.
+function slugIndex(known) {
+
+    const bySlug = new Map();
+
+    known.forEach(value => {
+
+        const slug = latinParam(value);
+
+        if (slug && !bySlug.has(slug)) bySlug.set(slug, value);
+
+    });
+
+    return bySlug;
+
+}
+
+// Адреса → справжні значення фільтра.
+//
+// НАВІЩО ОКРЕМИЙ КРОК. В адресі лежить латиниця («chornyi»), а весь
+// каталог порівнює значення як є («Чорний»): selectedColors.has(family),
+// product.category === value і так далі. Тобто десь між читанням
+// адреси й фільтруванням токен треба перекласти назад.
+//
+// Робимо це ОДИН раз і в одному місці — щойно завантажились товари,
+// бо саме вони й дають перелік справжніх значень. Розкидати переклад
+// по кожному фільтру означало б шість місць, які розійдуться.
+//
+// СТАРІ ПОСИЛАННЯ ПРАЦЮЮТЬ. Кирилиця з уже розісланих і
+// проіндексованих адрес дає той самий slug, що й латиниця, — тож
+// «?color=Чорний» і «?color=chornyi» ведуть в одне місце.
+function resolveUrlTokens() {
+
+    const fix = (set, known) => {
+
+        if (!set || !set.size) return;
+
+        const bySlug = slugIndex(known);
+
+        const resolved = new Set();
+
+        set.forEach(token => {
+
+            const real = bySlug.get(token) || bySlug.get(latinParam(token));
+
+            // Не впізнали — лишаємо як є: далі його або підбере
+            // colorFamily() (старі ?color=Black), або відкине
+            // applyUiFromUrlState().
+            resolved.add(real === undefined ? token : real);
+
+        });
+
+        set.clear();
+        resolved.forEach(value => set.add(value));
+
+    };
+
+    const fieldValues = key => {
+
+        const out = new Set();
+
+        products.forEach(product => {
+
+            const value = product[key];
+
+            if (Array.isArray(value)) value.forEach(item => item && out.add(item));
+            else if (value) out.add(value);
+
+        });
+
+        return out;
+
+    };
+
+    fix(selectedGenders, new Set(GENDERS));
+
+    // Стать — закритий перелік. Те, що не з нього, у фільтрі не
+    // потрібне: раніше це відсіював readSetParam(params, "gender",
+    // GENDERS), але тепер з адреси приходить латиниця, і відсіювати
+    // можна лише ПІСЛЯ перекладу.
+    [...selectedGenders].forEach(value => {
+        if (!GENDERS.includes(value)) selectedGenders.delete(value);
+    });
+
+    fix(selectedDepartments, fieldValues("department"));
+    fix(selectedSizes, fieldValues("sizes"));
+
+    // Бренд і категорію тут не чіпаємо: каталог читає їх з адреси
+    // окремо й пізніше — у applyBrandFromUrl() і applyCategoryFromUrl(),
+    // коли вже є розкладка бічного меню. Зіставлення там таке саме,
+    // через slugIndex().
+
+    const families = new Set();
+
+    products.forEach(product => {
+        getProductColorFamilies(product).forEach((info, family) => families.add(family));
+    });
+
+    fix(selectedColors, families);
+
+    // Колір, який не впізнали за slug-ом, проводимо через сімʼї:
+    // посилання з ?color=Black чи ?color=Nero вже розіслані й
+    // проіндексовані, а назви кольорів у даних відтоді зведені.
+    const colors = new Set([...selectedColors].map(value =>
+        families.has(value) ? value : colorFamily(value)));
+
+    selectedColors.clear();
+    colors.forEach(value => selectedColors.add(value));
+
+}
+
 function readUrlState() {
 
     const params = new URLSearchParams(location.search);
@@ -717,7 +847,10 @@ function readUrlState() {
     const section = params.get("section");
     currentSection = (section === "new" || section === "sale") ? section : "";
 
-    selectedGenders = readSetParam(params, "gender", GENDERS);
+    // БЕЗ перевірки по GENDERS: з адреси тепер приходить латиниця
+    // («zhinkam»), і закритий перелік відсік би її ще до перекладу.
+    // Відсіювання переїхало в resolveUrlTokens(), одразу після нього.
+    selectedGenders = readSetParam(params, "gender");
 
     // Решта фільтрів раніше з адреси не читалась зовсім (крім brand і
     // category, і то лише поодинокими значеннями). Через це скопійоване
@@ -734,9 +867,10 @@ function readUrlState() {
     // значення, і людина не зрозуміла б, чому фільтр не застосувався).
     // Для нових значень виклик нічого не змінює: сім'я від своєї ж
     // назви — вона сама.
-    selectedColors = new Set(
-        [...readSetParam(params, "color")].map(value => colorFamily(value))
-    );
+    // Переклад із адреси — у resolveUrlTokens(), одразу після
+    // завантаження товарів: саме вони дають перелік справжніх значень,
+    // а тут їх іще немає.
+    selectedColors = readSetParam(params, "color");
     selectedSizes = readSetParam(params, "size");
 
     const sort = params.get("sort");
@@ -775,6 +909,13 @@ async function initCatalog() {
         }
 
         products = splitProductsByColor(await response.json());
+
+        // Адреса прочитана до цього місця, але в ній латиниця
+        // («?color=chornyi»), а фільтри порівнюють значення як є
+        // («Чорний»). Перелік справжніх значень дають саме товари —
+        // тому переклад стоїть тут, одразу після завантаження і до
+        // будь-якого фільтрування чи розкладки фільтрів.
+        resolveUrlTokens();
 
         const categoryDepartments = await loadCategoryDepartments();
 
@@ -876,7 +1017,8 @@ function fillBrands() {
         option.type = "button";
         option.className = "filter-option";
         option.dataset.brand = item;
-        option.innerHTML = `<span class="filter-checkbox"></span>${item}`;
+        option.innerHTML = `<span class="filter-checkbox"></span>`
+            + `<span class="filter-option-label">${item}</span>`;
 
         option.addEventListener("click", () => toggleBrand(item));
 
@@ -1024,13 +1166,21 @@ function applyBrandFromUrl() {
 
     if (!wanted.size) return;
 
-    const known = new Set([...brandOptionsList.querySelectorAll(".filter-option")]
-        .map(o => o.dataset.brand));
+    // Зіставляємо за slug-ом, а не за точним рядком: в адресі лежить
+    // латиниця («coach», «marc-jacobs»), а в data-атрибуті — справжня
+    // назва бренду. Кирилиця зі старих посилань дає той самий slug,
+    // тож вони теж відкриваються.
+    const bySlug = slugIndex(new Set([...brandOptionsList.querySelectorAll(".filter-option")]
+        .map(o => o.dataset.brand)));
 
     let added = false;
 
-    wanted.forEach(brand => {
-        if (known.has(brand)) { selectedBrands.add(brand); added = true; }
+    wanted.forEach(token => {
+
+        const brand = bySlug.get(token) || bySlug.get(latinParam(token));
+
+        if (brand) { selectedBrands.add(brand); added = true; }
+
     });
 
     if (added) updateBrandUI();
@@ -1104,6 +1254,8 @@ function fillColors() {
     // Тому пунктів рівно стільки, скільки кольорів справді розрізняє
     // покупець. Правила зведення — у colorFamily() в common.js.
     const families = new Map(); // сім'я -> Set назв, що в неї увійшли
+    const swatches = new Map(); // сім'я -> колір кружечка
+    const counts = new Map();   // сім'я -> скільки товарів знайдеться
 
     products.forEach(product => {
 
@@ -1111,17 +1263,27 @@ function fillColors() {
 
             if (!families.has(family)) families.set(family, new Set());
 
+            counts.set(family, (counts.get(family) || 0) + 1);
+
             info.names.forEach(name => families.get(family).add(name));
+
+            // Кружечок для дописаної в адмінці позначки: у
+            // COLOR_FAMILIES її немає, тож беремо свотч першого товару,
+            // який до неї потрапив. Інакше «Бірюзовий» стояв би у
+            // фільтрі сірою крапкою.
+            if (info.hex && !swatches.has(family)) swatches.set(family, info.hex);
 
         });
 
     });
 
-    // Порядок — з COLOR_FAMILY_ORDER, а не алфавітний: алфавіт розкидав
-    // би найчастіші «Білий», «Сірий» і «Чорний» по трьох кінцях списку.
-    COLOR_FAMILY_ORDER.filter(family => families.has(family)).forEach(family => {
+    // Порядок вирішує orderColorFamilies() у common.js: вбудовані
+    // звичним рядом, дописані в адмінці — за ними.
+    orderColorFamilies(new Set(families.keys())).forEach(family => {
 
-        const swatch = COLOR_FAMILIES.find(item => item.name === family)?.hex || "#e5e7eb";
+        const swatch = COLOR_FAMILIES.find(item => item.name === family)?.hex
+            || swatches.get(family)
+            || "#e5e7eb";
 
         const names = [...families.get(family)].sort((a, b) => a.localeCompare(b, "uk"));
 
@@ -1138,11 +1300,34 @@ function fillColors() {
             ? `${family}: ${names.join(", ")}`
             : family;
 
+        // Число поруч — СКІЛЬКИ ТОВАРІВ знайдеться.
+        //
+        // ЩО БУЛО НЕ ТАК. Тут стояло names.length — кількість відтінків,
+        // зведених у цю сімʼю. Тобто «Синій 3» означало «сюди зведено
+        // три назви», а не «три товари». Натискаєш — і каталог пише
+        // «Знайдено 14 товарів».
+        //
+        // Число поруч із фільтром читається однозначно: стільки й буде.
+        // Скільки назв злилось — це підказка при наведенні, там воно й
+        // лишається.
+        const count = counts.get(family) || 0;
+
+        // Назва — В ОКРЕМОМУ span, а не голим текстом.
+        //
+        // ЩО БУЛО НЕ ТАК. .filter-option це flex, і голий текст ставав
+        // анонімним елементом флексу. Стискатись такий елемент не вміє,
+        // тож довга назва («Помаранчевий», «Мультиколір») просто
+        // виштовхувала лічильник за межу меню, а меню має
+        // overflow:hidden — число зникало зовсім.
+        //
+        // Обгортка з min-width:0 стискається й обрізається трикрапкою,
+        // а число лишається на місці (див. .filter-option-label у
+        // style.css).
         option.innerHTML = `
             <span class="filter-checkbox"></span>
             <span class="filter-color-swatch" style="background:${swatch}"></span>
-            ${escapeHtml(family)}
-            ${names.length > 1 ? `<span class="filter-option-note">${names.length}</span>` : ""}
+            <span class="filter-option-label">${escapeHtml(family)}</span>
+            <span class="filter-option-note">${count}</span>
         `;
 
         option.addEventListener("click", () => toggleColor(family));
@@ -1318,7 +1503,8 @@ function fillCategories(categoryDepartments) {
             option.type = "button";
             option.className = "filter-option";
             option.dataset.category = name;
-            option.innerHTML = `<span class="filter-checkbox"></span>${escapeHtml(name)}`;
+            option.innerHTML = `<span class="filter-checkbox"></span>`
+                + `<span class="filter-option-label">${escapeHtml(name)}</span>`;
 
             option.addEventListener("click", () => toggleCategory(name));
 
@@ -1771,13 +1957,19 @@ function applyCategoryFromUrl() {
 
     if (!wanted.size) return;
 
-    const known = new Set([...categoryOptionsList.querySelectorAll(".filter-option")]
-        .map(o => o.dataset.category));
+    // Так само за slug-ом: «?category=zhinochi-sumky» замість
+    // %D0%B6%D1%96%D0%BD%D0%BE%D1%87%D1%96-%D1%81%D1%83%D0%BC%D0%BA%D0%B8.
+    const bySlug = slugIndex(new Set([...categoryOptionsList.querySelectorAll(".filter-option")]
+        .map(o => o.dataset.category)));
 
     let added = false;
 
-    wanted.forEach(category => {
-        if (known.has(category)) { selectedCategories.add(category); added = true; }
+    wanted.forEach(token => {
+
+        const category = bySlug.get(token) || bySlug.get(latinParam(token));
+
+        if (category) { selectedCategories.add(category); added = true; }
+
     });
 
     if (added) updateCategoryUI();
@@ -3054,7 +3246,20 @@ function syncStateToUrl() {
 
         // множинні фільтри — через кому: читабельно в адресному рядку
         // й не роздуває посилання, як повторювані ключі
-        const joinSet = set => (set && set.size) ? [...set].join(",") : "";
+        //
+        // ЛАТИНИЦЯ, А НЕ КИРИЛИЦЯ
+        // ------------------------
+        // «?color=Чорний» браузер кодує як %D0%A7%D0%BE%D1%80%D0%BD%D0%B8%D0%B9
+        // — девʼять символів на літеру. В адресному рядку видно
+        // розшифроване, а от скрізь, де посилання СКОПІЮВАТИ (пост,
+        // повідомлення, лист), вилазить саме ця борода. А в параметрі
+        // (t.me/…?text=…) вона кодується вдруге й стає втричі довшою.
+        //
+        // Та сама причина, з якої латиницею вже стали адреси товарів і
+        // акцій, — і той самий перетворювач: assets/js/translit.js.
+        const joinSet = set => (set && set.size)
+            ? [...set].map(latinParam).join(",")
+            : "";
 
         setOrDelete(p, URL_KEYS.section, currentSection);
         setOrDelete(p, URL_KEYS.gender, joinSet(selectedGenders));
@@ -3076,7 +3281,15 @@ function syncStateToUrl() {
         setOrDelete(p, URL_KEYS.sort, currentSort);
         setOrDelete(p, URL_KEYS.page, currentPage > 1 ? currentPage : "");
 
-        window.history.replaceState(null, "", url);
+        // Кому в адресі лишаємо комою.
+        //
+        // URLSearchParams кодує її як %2C — і «?color=chornyi,bilyi»
+        // стає «?color=chornyi%2Cbilyi». Заради читабельності ми ж і
+        // обрали кому роздільником, тож кодувати її означає втратити
+        // половину зиску. У запиті кома дозволена (RFC 3986 sub-delims),
+        // а на читанні split(",") бачить її однаково.
+        window.history.replaceState(null, "",
+            url.pathname + url.search.replace(/%2C/gi, ",") + url.hash);
 
     } catch (error) {
 

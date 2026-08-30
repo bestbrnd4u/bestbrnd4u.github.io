@@ -1,4 +1,14 @@
 {
+  "genderButtons": [
+    {
+      "color": "#111827",
+      "gender": "Жінкам"
+    },
+    {
+      "color": "#111827",
+      "gender": "Чоловікам"
+    }
+  ],
   "badge": "",
   "products": [
     2,
@@ -18,7 +28,34 @@
     28,
     29,
     30,
-    31
+    31,
+    40,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    70,
+    80,
+    84,
+    85,
+    86
   ],
   "discountPercent": 0,
   "active": true,
@@ -28,11 +65,14 @@
   "link": "catalog",
   "image": "/assets/images/banners/1hero_c.png",
   "displayType": "hero_slider",
+  "autoSections": [
+    "Сумки"
+  ],
   "imageMobile": "/assets/images/banners/03_banner_compact_800x1000.jpg",
   "promoPageImage": "/assets/images/banners/2.png",
-  "promoPageImageMobile": "/assets/images/banners/coach-teaser-mobile.jpg",
-  "buttonText": "Дивитись усі товари",
   "legacySlugs": [
     "більше-стилю-для-яскравого-літа"
-  ]
+  ],
+  "promoPageImageMobile": "/assets/images/banners/coach-teaser-mobile.jpg",
+  "buttonText": "Дивитись усі товари"
 }

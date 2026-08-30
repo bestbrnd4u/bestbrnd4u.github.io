@@ -1,0 +1,103 @@
+{
+  "gender": [
+    "Чоловікам"
+  ],
+  "preOrderDays": "10-14 робочих днів",
+  "forcePublish": false,
+  "material": "Фірмове покрите полотно Signature та гладка теляча шкіра; текстильна підкладк",
+  "brand": "Coach",
+  "price": 7400,
+  "preOrder": true,
+  "dimensions": "22 × 26 × 5 см",
+  "variants": [
+    {
+      "color": "Темно-сірий / чорний / графітовий",
+      "hex": "#494848",
+      "sku": "CZ398",
+      "images": [
+        "/assets/images/products/uploads/cz398_qbmi5_a0.webp",
+        "/assets/images/products/uploads/cz398_qbmi5_a3.webp",
+        "/assets/images/products/uploads/cz398_qbmi5_a8.webp",
+        "/assets/images/products/uploads/cz398_qbmi5_a91.webp"
+      ]
+    },
+    {
+      "color": "Чорний / Gunmetal",
+      "hex": "#010000",
+      "sku": "4011QB/BK",
+      "images": [
+        "/assets/images/products/uploads/4011_qbbk_a0.webp",
+        "/assets/images/products/uploads/4011_qbbk_a3.webp",
+        "/assets/images/products/uploads/houstonflightbag2propfamily_a6.webp",
+        "/assets/images/products/uploads/4011_qbbk_a91.webp"
+      ]
+    }
+  ],
+  "preOrderPrepayment": 100,
+  "strapInfo": "Регульований плечовий ремінь із довжиною звисання 63,5 см, що дозволяє носити сумку на плечі або кросбоді",
+  "sizes": [
+    "ONESIZE"
+  ],
+  "splitByColor": true,
+  "searchKeywords": [
+    "Coach Houston Flight Bag",
+    "Coach CZ398",
+    "Houston Flight Bag Signature Canvas",
+    "сумка Coach",
+    "чоловіча сумка Coach",
+    "чоловіча сумка через плече",
+    "чоловіча сумка кросбоді",
+    "сумка кросбоді Coach",
+    "сумка Signature Coach",
+    "чоловіча брендовa сумка",
+    "чорна сумка",
+    "коричнева сумка",
+    "оригінальний Coach"
+  ],
+  "isNew": false,
+  "title": "Чоловіча сумка Coach Houston Flight Bag In Signature Canvas",
+  "reviews": 0,
+  "instagramBlock": "general",
+  "description": "Стильна та практична чоловіча сумка Coach Houston Flight Bag у фірмовому принті Signature. Модель виконана у поєднанні фірмового покритого полотна та гладкої шкіри, доповнена металевими деталями та лаконічним дизайном.\nСумка має основне відділення із застібкою-блискавкою, зовнішні кишені на блискавці та без застібки, а також внутрішню багатофункціональну кишеню для зручної організації речей. Компактний, але місткий формат дозволяє розмістити гаманець, навушники, смартфон та інші необхідні речі. Регульований ремінь дає змогу носити сумку на плечі або кросбоді",
+  "rating": 5,
+  "category": "Чоловічі сумки",
+  "framing": {
+    "cz398_qbmi5_a0.webp": {
+      "zoom": 1.47,
+      "x": 48,
+      "y": 59
+    },
+    "cz398_qbmi5_a3.webp": {
+      "zoom": 1.77,
+      "x": 46,
+      "y": 60
+    },
+    "cz398_qbmi5_a8.webp": {
+      "zoom": 1.38,
+      "x": 47,
+      "y": 50
+    },
+    "4011_qbbk_a0.webp": {
+      "zoom": 1.49,
+      "x": 50,
+      "y": 59
+    },
+    "4011_qbbk_a3.webp": {
+      "zoom": 1.96,
+      "x": 46,
+      "y": 59
+    }
+  },
+  "legacySlugs": [
+    "чоловіча-сумка-coach-houston-flight-bag-in-signature-canvas"
+  ],
+  "slug": "cholovicha-sumka-coach-houston-flight-bag-in-signature-canvas",
+  "id": 84,
+  "color": "Темно-сірий / чорний / графітовий",
+  "images": [
+    "/assets/images/products/uploads/cz398_qbmi5_a0.webp",
+    "/assets/images/products/uploads/cz398_qbmi5_a3.webp",
+    "/assets/images/products/uploads/cz398_qbmi5_a8.webp",
+    "/assets/images/products/uploads/cz398_qbmi5_a91.webp"
+  ]
+}

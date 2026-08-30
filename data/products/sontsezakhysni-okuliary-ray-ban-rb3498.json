@@ -1,0 +1,70 @@
+{
+  "gender": [
+    "Чоловікам"
+  ],
+  "preOrderDays": "10-14 робочих днів",
+  "forcePublish": false,
+  "material": "Метал",
+  "brand": "Ray-Ban",
+  "price": 7800,
+  "preOrder": true,
+  "dimensions": "14,0 × 4,8 см; ширина лінзи — 6 см; міст — 1,7 см; довжина дужки — 13,5 см",
+  "variants": [
+    {
+      "color": "Коричневий / золотистий",
+      "hex": "#845c3d",
+      "images": [
+        "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-1db8136f.webp",
+        "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-d6f54bf0.webp",
+        "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-4b1f82a5.webp",
+        "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-960c6b7f.webp"
+      ]
+    }
+  ],
+  "preOrderPrepayment": 100,
+  "strapInfo": "Металеві дужки",
+  "sizes": [
+    "ONESIZE"
+  ],
+  "splitByColor": true,
+  "searchKeywords": [
+    "Ray-Ban",
+    "Ray-Ban RB3498",
+    "RB3498",
+    "RB3498 029/T5 61",
+    "сонцезахисні окуляри Ray-Ban",
+    "чоловічі окуляри",
+    "чоловічі сонцезахисні окуляри",
+    "прямокутні окуляри",
+    "поляризовані окуляри",
+    "поляризація",
+    "окуляри з коричневими лінзами",
+    "коричневі лінзи",
+    "градієнтні лінзи",
+    "окуляри від сонця",
+    "брендові окуляри",
+    "оригінальні Ray-Ban",
+    "спортивні окуляри",
+    "окуляри Ray-Ban чоловічі"
+  ],
+  "isNew": false,
+  "title": "Сонцезахисні окуляри Ray-Ban RB3498",
+  "reviews": 0,
+  "instagramBlock": "general",
+  "description": "Стильні чоловічі сонцезахисні окуляри Ray-Ban RB3498 із прямокутною формою оправи. Модель поєднує сучасний спортивний дизайн із фірмовою естетикою Ray-Ban.\nОкуляри оснащені поляризованими лінзами з коричневим градієнтом, які допомагають зменшити відблиски та забезпечують комфортне сприйняття яскравого світла. Лаконічна форма та універсальний дизайн чудово підходять для повсякденного використання, подорожей і відпочинку",
+  "sku": "RB3498029/T561",
+  "rating": 5,
+  "category": "Окуляри і оправи",
+  "legacySlugs": [
+    "сонцезахисні-окуляри-ray-ban-rb3498"
+  ],
+  "slug": "sontsezakhysni-okuliary-ray-ban-rb3498",
+  "id": 93,
+  "color": "Коричневий / золотистий",
+  "images": [
+    "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-1db8136f.webp",
+    "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-d6f54bf0.webp",
+    "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-4b1f82a5.webp",
+    "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-960c6b7f.webp"
+  ]
+}

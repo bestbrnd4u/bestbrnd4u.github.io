@@ -23,10 +23,21 @@ const out = JSON.stringify({
 
 const info = JSON.parse(out);
 
-check("варіант кольору має рівно 6 полів (не 20+ від зіпсованого options)",
-      info.variant_fields.length === 6, JSON.stringify(info.variant_fields));
-check("порядок полів: color, hex, sku, sizes, images, video",
-      info.variant_fields.join(",") === "color,hex,sku,sizes,images,video", info.variant_fields.join(","));
+// Перелік навмисно точний, а не «не менше ніж».
+//
+// Він стоїть тут через реальну поломку: зіпсований блок options
+// розсипався в двадцять із гаком полів варіанта, і редактор кольору
+// перетворювався на простирадло. Тому нове поле мусить бути додане
+// сюди свідомо — інакше та сама поломка проїде непоміченою.
+//
+// colorFamily — «Колір для фільтра»: під якою позначкою шукати цей
+// відтінок у каталозі, коли автоматика вгадує не те (Chalk, Ivory,
+// Off-white — усе це один «Білий»).
+check("варіант кольору має рівно 7 полів (не 20+ від зіпсованого options)",
+      info.variant_fields.length === 7, JSON.stringify(info.variant_fields));
+check("порядок полів: color, hex, colorFamily, sku, sizes, images, video",
+      info.variant_fields.join(",") === "color,hex,colorFamily,sku,sizes,images,video",
+      info.variant_fields.join(","));
 // Регресія навпаки: раніше тут стежили за закритим переліком із 20
 // розмірів. Тепер поле — власний віджет, який дозволяє і вибрати
 // наявний розмір, і вписати новий (ONESIZE, 39.5 тощо).

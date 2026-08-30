@@ -1,10 +1,15 @@
 {
-  "title": "Жіноча шкіряна сумочка крос-боді Marc Jacobs the leather bucket bag",
+  "gender": [
+    "Жінкам"
+  ],
+  "oldPrice": 18600,
+  "color": "Чорний",
+  "badge": "SALE",
+  "material": "Шкіра",
   "brand": "Marc Jacobs",
-  "category": "Жіночі сумки",
-  "gender": "Жінкам",
   "price": 13000,
-  "description": "Крос-боді Marc Jacobs зі шкіри. Компактний корпус, фірмова монограма, ремінець через плече. Модель, у яку вміщається все потрібне, але яка не виглядає громіздкою.",
+  "preOrder": false,
+  "slug": "marc-jacobs-zhinocha-shkiriana-sumochka-kros-bodi-marc-jacob",
   "variants": [
     {
       "color": "Чорний",
@@ -17,11 +22,10 @@
       "sku": "H652L01PF22"
     }
   ],
-  "oldPrice": 18600,
-  "badge": "SALE",
-  "isNew": true,
-  "material": "Шкіра",
-  "sku": "H652L01PF22",
+  "sortOrder": 5,
+  "sizes": [
+    "ONESIZE"
+  ],
   "searchKeywords": [
     "марк джейкобс",
     "marc jacobs",
@@ -36,17 +40,16 @@
     "the",
     "leather"
   ],
-  "instagramBlock": "general",
-  "preOrder": false,
+  "isNew": true,
+  "title": "Жіноча шкіряна сумочка крос-боді Marc Jacobs the leather bucket bag",
   "images": [
     "assets/images/products/uploads/h652l01pf22-1.webp",
     "assets/images/products/uploads/h652l01pf22-2.webp",
     "assets/images/products/uploads/h652l01pf22-3.webp"
   ],
-  "slug": "marc-jacobs-zhinocha-shkiriana-sumochka-kros-bodi-marc-jacob",
   "id": 22,
-  "color": "Чорний",
-  "sizes": [
-    "ONESIZE"
-  ]
+  "instagramBlock": "general",
+  "description": "Крос-боді Marc Jacobs зі шкіри. Компактний корпус, фірмова монограма, ремінець через плече. Модель, у яку вміщається все потрібне, але яка не виглядає громіздкою.",
+  "sku": "H652L01PF22",
+  "category": "Жіночі сумки"
 }

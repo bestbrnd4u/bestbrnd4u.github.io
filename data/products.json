@@ -1,7 +1,9 @@
 [
   {
     "gender": [
-      "Унісекс"
+      "Унісекс",
+      "Жінкам",
+      "Чоловікам"
     ],
     "color": "Темно-сірий",
     "brand": "Alain Mikli",
@@ -207,12 +209,18 @@
     }
   },
   {
-    "title": "Balenciaga Сонцезахисні окуляри Grey Rectangular Unisex Sunglasses",
+    "gender": [
+      "Унісекс",
+      "Жінкам",
+      "Чоловікам"
+    ],
+    "oldPrice": 18600,
+    "color": "Темно-сірий",
+    "badge": "SALE",
     "brand": "Balenciaga",
-    "category": "Окуляри і оправи",
-    "gender": "Унісекс",
     "price": 13000,
-    "description": "Сонцезахисні окуляри Balenciaga з масивною оправою й темними лінзами. Виразна геометрія, логотип бренду на скроневій дузі. Модель, що працює як самостійний акцент образу.",
+    "preOrder": false,
+    "slug": "balenciaga-balenciaga-sontsezakhysni-okuliary-grey-rectangul",
     "variants": [
       {
         "color": "Темно-сірий",
@@ -229,13 +237,9 @@
         ]
       }
     ],
-    "oldPrice": 18600,
-    "badge": "SALE",
-    "isNew": false,
     "sizes": [
       "ONESIZE"
     ],
-    "sku": "BB0041S-001-99",
     "searchKeywords": [
       "баленсіага",
       "balenciaga",
@@ -248,17 +252,19 @@
       "rectangular",
       "unisex"
     ],
-    "instagramBlock": "general",
-    "preOrder": false,
+    "isNew": false,
+    "title": "Balenciaga Сонцезахисні окуляри Grey Rectangular Unisex Sunglasses",
     "images": [
       "assets/images/products/uploads/bb0041s-001-99-1.webp",
       "assets/images/products/uploads/bb0041s-001-99-2.webp",
       "assets/images/products/uploads/bb0041s-001-99-3.webp",
       "assets/images/products/uploads/bb0041s-001-99-4.webp"
     ],
-    "slug": "balenciaga-balenciaga-sontsezakhysni-okuliary-grey-rectangul",
     "id": 5,
-    "color": "Темно-сірий"
+    "instagramBlock": "general",
+    "description": "Сонцезахисні окуляри Balenciaga з масивною оправою й темними лінзами. Виразна геометрія, логотип бренду на скроневій дузі. Модель, що працює як самостійний акцент образу.",
+    "sku": "BB0041S-001-99",
+    "category": "Окуляри і оправи"
   },
   {
     "title": "Сонцезахисні окуляри Burberry Sophia Dark Grey Cat Eye",
@@ -873,9 +879,9 @@
         "color": "Зелений",
         "hex": "#06b454",
         "images": [
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=e20bbf0e",
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=6f0e8407",
           "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-2.webp?v=7f7d7a02",
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=45e0781f"
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=40fd85f2"
         ],
         "sku": "B094QT219C"
       },
@@ -883,9 +889,9 @@
         "color": "Карамельний",
         "hex": "#f49657",
         "images": [
-          "assets/images/products/uploads/jwp-ma123-1.webp?v=555671ea",
+          "assets/images/products/uploads/jwp-ma123-1.webp?v=3220fe09",
           "assets/images/products/uploads/jwp-ma123-2.webp?v=189c38d2",
-          "assets/images/products/uploads/jwp-ma123-3.webp?v=b4aae822"
+          "assets/images/products/uploads/jwp-ma123-3.webp?v=38d8e4ac"
         ],
         "sku": "JWP-MA123"
       }
@@ -1331,12 +1337,17 @@
     "category": "Жіночі сумки"
   },
   {
-    "title": "Жіноча шкіряна сумочка крос-боді Marc Jacobs the leather bucket bag",
+    "gender": [
+      "Жінкам"
+    ],
+    "oldPrice": 18600,
+    "color": "Чорний",
+    "badge": "SALE",
+    "material": "Шкіра",
     "brand": "Marc Jacobs",
-    "category": "Жіночі сумки",
-    "gender": "Жінкам",
     "price": 13000,
-    "description": "Крос-боді Marc Jacobs зі шкіри. Компактний корпус, фірмова монограма, ремінець через плече. Модель, у яку вміщається все потрібне, але яка не виглядає громіздкою.",
+    "preOrder": false,
+    "slug": "marc-jacobs-zhinocha-shkiriana-sumochka-kros-bodi-marc-jacob",
     "variants": [
       {
         "color": "Чорний",
@@ -1349,11 +1360,10 @@
         "sku": "H652L01PF22"
       }
     ],
-    "oldPrice": 18600,
-    "badge": "SALE",
-    "isNew": true,
-    "material": "Шкіра",
-    "sku": "H652L01PF22",
+    "sortOrder": 5,
+    "sizes": [
+      "ONESIZE"
+    ],
     "searchKeywords": [
       "марк джейкобс",
       "marc jacobs",
@@ -1368,19 +1378,18 @@
       "the",
       "leather"
     ],
-    "instagramBlock": "general",
-    "preOrder": false,
+    "isNew": true,
+    "title": "Жіноча шкіряна сумочка крос-боді Marc Jacobs the leather bucket bag",
     "images": [
       "assets/images/products/uploads/h652l01pf22-1.webp",
       "assets/images/products/uploads/h652l01pf22-2.webp",
       "assets/images/products/uploads/h652l01pf22-3.webp"
     ],
-    "slug": "marc-jacobs-zhinocha-shkiriana-sumochka-kros-bodi-marc-jacob",
     "id": 22,
-    "color": "Чорний",
-    "sizes": [
-      "ONESIZE"
-    ]
+    "instagramBlock": "general",
+    "description": "Крос-боді Marc Jacobs зі шкіри. Компактний корпус, фірмова монограма, ремінець через плече. Модель, у яку вміщається все потрібне, але яка не виглядає громіздкою.",
+    "sku": "H652L01PF22",
+    "category": "Жіночі сумки"
   },
   {
     "title": "Годинник жіночий Mathey Tissot City Metal",
@@ -2832,11 +2841,13 @@
       "Жінкам"
     ],
     "preOrderDays": "5–10 робочих днів",
+    "color": "Чорний",
     "forcePublish": false,
     "material": "Штучне хутро",
     "brand": "Marc Jacobs",
     "price": 8600,
     "preOrder": false,
+    "slug": "zhinocha-sumochka-marc-jacobs-the-creature-tote-bag-black",
     "dimensions": "32 × 26 × 17 см",
     "variants": [
       {
@@ -2853,6 +2864,7 @@
     ],
     "preOrderPrepayment": 50,
     "strapInfo": "Ремінь знімний, регульований",
+    "sortOrder": 11,
     "sizes": [
       "ONESIZE"
     ],
@@ -2877,15 +2889,6 @@
     ],
     "isNew": false,
     "title": "Жіноча сумочка Marc Jacobs The Creature Tote Bag Black",
-    "reviews": 0,
-    "instagramBlock": "general",
-    "description": "Стильна сумка Marc Jacobs The Creature Tote Bag у чорному кольорі — ефектна модель із колекції бренду, яка поєднує впізнаваний дизайн та оригінальну фактуру. Сумка виконана з м’якого штучного хутра, доповнена шкіряними ручками та знімним регульованим ременем, що дозволяє носити її в руці, на плечі або через плече.\nМодель має містке основне відділення та практичну конструкцію, завдяки чому підходить як для повсякденних образів, так і для стильних виходів. Чорний колір легко поєднується з базовим гардеробом, а фактурний матеріал додає образу акцентності",
-    "sku": "H025M06RE22",
-    "rating": 5,
-    "category": "Жіночі сумки",
-    "slug": "zhinocha-sumochka-marc-jacobs-the-creature-tote-bag-black",
-    "id": 45,
-    "color": "Чорний",
     "images": [
       "/assets/images/products/uploads/25077124~black_0.webp",
       "/assets/images/products/uploads/25077124~black_2.webp",
@@ -2893,6 +2896,13 @@
       "/assets/images/products/uploads/25077124~black_3.webp",
       "/assets/images/products/uploads/25077124~black_1.webp"
     ],
+    "reviews": 0,
+    "id": 45,
+    "instagramBlock": "general",
+    "description": "Стильна сумка Marc Jacobs The Creature Tote Bag у чорному кольорі — ефектна модель із колекції бренду, яка поєднує впізнаваний дизайн та оригінальну фактуру. Сумка виконана з м’якого штучного хутра, доповнена шкіряними ручками та знімним регульованим ременем, що дозволяє носити її в руці, на плечі або через плече.\nМодель має містке основне відділення та практичну конструкцію, завдяки чому підходить як для повсякденних образів, так і для стильних виходів. Чорний колір легко поєднується з базовим гардеробом, а фактурний матеріал додає образу акцентності",
+    "sku": "H025M06RE22",
+    "rating": 5,
+    "category": "Жіночі сумки",
     "legacySlugs": [
       "жіноча-сумочка-marc-jacobs-the-creature-tote-bag-black"
     ]
@@ -3024,11 +3034,13 @@
       "Жінкам"
     ],
     "preOrderDays": "5–10 робочих днів",
+    "color": "Темно-зелений",
     "forcePublish": false,
     "material": "Натуральна шкіра",
     "brand": "Marc Jacobs",
     "price": 9000,
     "preOrder": false,
+    "slug": "zhinocha-sumochka-marc-jacobs-the-j-marc-shoulder-bag",
     "dimensions": "25 × 16 × 5 см",
     "variants": [
       {
@@ -3044,6 +3056,7 @@
     ],
     "preOrderPrepayment": 50,
     "strapInfo": "2 знімні регульований та ланцюжок",
+    "sortOrder": 4,
     "sizes": [
       "ONESIZE"
     ],
@@ -3071,21 +3084,19 @@
     ],
     "isNew": false,
     "title": "Жіноча сумочка Marc Jacobs The J Marc Shoulder Bag",
-    "reviews": 0,
-    "instagramBlock": "general",
-    "description": "Елегантна сумка Marc Jacobs The J Marc Shoulder Bag у відтінку Bronze Green — стильна модель із гладкої натуральної шкіри, доповнена фірмовою застібкою у вигляді подвійної літери «J» та золотою фурнітурою.\nМодель має одне основне відділення, внутрішню кишеню на блискавці та накладну кишеню на зворотному боці. Сумка комплектується двома знімними ременями: регульованим шкіряним ременем та ременем-ланцюжком. Її можна носити на плечі, через плече або без ременів як клатч",
-    "sku": "H956L01PF22_365",
-    "rating": 5,
-    "category": "Жіночі сумки",
-    "slug": "zhinocha-sumochka-marc-jacobs-the-j-marc-shoulder-bag",
-    "id": 47,
-    "color": "Темно-зелений",
     "images": [
       "/assets/images/products/uploads/the-j-marc-shoulder-bag-bronze-green-h956l01pf22-365-800x800.webp",
       "/assets/images/products/uploads/the-j-marc-shoulder-bag-bronze-green-additional-image-5192-800x800.webp",
       "/assets/images/products/uploads/the-j-marc-shoulder-bag-bronze-green-additional-image-5191-800x800.webp",
       "/assets/images/products/uploads/the-j-marc-shoulder-bag-bronze-green-additional-image-5193-800x800.webp"
     ],
+    "reviews": 0,
+    "id": 47,
+    "instagramBlock": "general",
+    "description": "Елегантна сумка Marc Jacobs The J Marc Shoulder Bag у відтінку Bronze Green — стильна модель із гладкої натуральної шкіри, доповнена фірмовою застібкою у вигляді подвійної літери «J» та золотою фурнітурою.\nМодель має одне основне відділення, внутрішню кишеню на блискавці та накладну кишеню на зворотному боці. Сумка комплектується двома знімними ременями: регульованим шкіряним ременем та ременем-ланцюжком. Її можна носити на плечі, через плече або без ременів як клатч",
+    "sku": "H956L01PF22_365",
+    "rating": 5,
+    "category": "Жіночі сумки",
     "legacySlugs": [
       "жіноча-сумочка-marc-jacobs-the-j-marc-shoulder-bag"
     ]
@@ -3186,11 +3197,13 @@
       "Жінкам"
     ],
     "preOrderDays": "5–10 робочих днів",
+    "color": "Зелений",
     "forcePublish": false,
     "material": "Натуральна зерниста шкіра",
     "brand": "Marc Jacobs",
     "price": 10000,
     "preOrder": false,
+    "slug": "shoper-marc-jacobs-the-leather-small-tote-bag-aspen-green-cement",
     "dimensions": "26 × 21 × 13 см",
     "variants": [
       {
@@ -3206,6 +3219,7 @@
     ],
     "preOrderPrepayment": 50,
     "strapInfo": "Ремінь знімний та регульований",
+    "sortOrder": 8,
     "sizes": [
       "S"
     ],
@@ -3235,21 +3249,19 @@
     ],
     "isNew": false,
     "title": "Шопер Marc Jacobs The Leather Small Tote Bag Aspen Green Cement",
-    "reviews": 0,
-    "instagramBlock": "general",
-    "description": "Стильна та містка сумка Marc Jacobs The Leather Small Tote Bag у благородному відтінку Aspen Green  універсальна модель для повсякденних образів, роботи, подорожей та прогулянок містом.\nСумка виготовлена з натуральної зернистої шкіри та доповнена фірмовим тисненим логотипом Marc Jacobs на передній панелі. Модель має просторе основне відділення із застібкою-блискавкою, внутрішню кишеню на блискавці, дві накладні кишені та слот для картки.\nНосити сумку можна за верхні ручки або за допомогою знімного регульованого шкіряного ремінця через плече",
-    "sku": "H004L01PF21",
-    "rating": 5,
-    "category": "Жіночі сумки",
-    "slug": "shoper-marc-jacobs-the-leather-small-tote-bag-aspen-green-cement",
-    "id": 49,
-    "color": "Зелений",
     "images": [
       "/assets/images/products/uploads/aspen-green-cement-m.webp",
       "/assets/images/products/uploads/aspen-green-cement4.webp",
       "/assets/images/products/uploads/aspen-green-cement3.webp",
       "/assets/images/products/uploads/aspen-green-cement-m1.webp"
     ],
+    "reviews": 0,
+    "id": 49,
+    "instagramBlock": "general",
+    "description": "Стильна та містка сумка Marc Jacobs The Leather Small Tote Bag у благородному відтінку Aspen Green  універсальна модель для повсякденних образів, роботи, подорожей та прогулянок містом.\nСумка виготовлена з натуральної зернистої шкіри та доповнена фірмовим тисненим логотипом Marc Jacobs на передній панелі. Модель має просторе основне відділення із застібкою-блискавкою, внутрішню кишеню на блискавці, дві накладні кишені та слот для картки.\nНосити сумку можна за верхні ручки або за допомогою знімного регульованого шкіряного ремінця через плече",
+    "sku": "H004L01PF21",
+    "rating": 5,
+    "category": "Жіночі сумки",
     "legacySlugs": [
       "шопер-marc-jacobs-the-leather-small-tote-bag-aspen-green-cement"
     ]
@@ -3259,11 +3271,13 @@
       "Жінкам"
     ],
     "preOrderDays": "5–10 робочих днів",
+    "color": "Рожевий",
     "forcePublish": false,
     "material": "Натуральна шкіра",
     "brand": "Marc Jacobs",
     "price": 8600,
     "preOrder": false,
+    "slug": "sumochka-marc-jacobs-the-leather-mini-bag-pink",
     "dimensions": "20 × 12 × 4 см",
     "variants": [
       {
@@ -3279,6 +3293,7 @@
     ],
     "preOrderPrepayment": 50,
     "strapInfo": "Ремінець знімний та регульований",
+    "sortOrder": 7,
     "sizes": [
       "ONESIZE"
     ],
@@ -3307,21 +3322,19 @@
     ],
     "isNew": false,
     "title": "Сумочка Marc Jacobs The Leather Mini Bag Pink",
-    "reviews": 0,
-    "instagramBlock": "general",
-    "description": "Елегантна міні-сумка Marc Jacobs The Leather Mini Bag у ніжному рожевому відтінку — компактна модель із лаконічним дизайном та фірмовим стилем Marc Jacobs.\nСумка виготовлена зі 100% натуральної шкіри та має відкидний клапан із магнітною застібкою. Усередині розташовані основне відділення, кишеня для дрібниць та 8 слотів для карток. Модель можна носити як клатч або використовувати знімний регульований ремінець для носіння на плечі чи через плече",
-    "sku": "2S4SMN080S02678",
-    "rating": 5,
-    "category": "Жіночі сумки",
-    "slug": "sumochka-marc-jacobs-the-leather-mini-bag-pink",
-    "id": 50,
-    "color": "Рожевий",
     "images": [
       "/assets/images/products/uploads/27687307_57865310_2048.webp",
       "/assets/images/products/uploads/27687307_57865301_2048.webp",
       "/assets/images/products/uploads/27687307_57865307_2048.webp",
       "/assets/images/products/uploads/27687307_57865304_2048.webp"
     ],
+    "reviews": 0,
+    "id": 50,
+    "instagramBlock": "general",
+    "description": "Елегантна міні-сумка Marc Jacobs The Leather Mini Bag у ніжному рожевому відтінку — компактна модель із лаконічним дизайном та фірмовим стилем Marc Jacobs.\nСумка виготовлена зі 100% натуральної шкіри та має відкидний клапан із магнітною застібкою. Усередині розташовані основне відділення, кишеня для дрібниць та 8 слотів для карток. Модель можна носити як клатч або використовувати знімний регульований ремінець для носіння на плечі чи через плече",
+    "sku": "2S4SMN080S02678",
+    "rating": 5,
+    "category": "Жіночі сумки",
     "legacySlugs": [
       "сумочка-marc-jacobs-the-leather-mini-bag-pink"
     ]
@@ -3331,11 +3344,13 @@
       "Жінкам"
     ],
     "preOrderDays": "5–10 робочих днів",
+    "color": "Чорно-бежевий",
     "forcePublish": false,
     "material": "Монограмний жакард, шкіряне оздоблення",
     "brand": "Marc Jacobs",
     "price": 10000,
     "preOrder": false,
+    "slug": "sumka-the-medium-tote-bag-in-monogram-jacquard",
     "dimensions": "34 × 27 × 15 см",
     "variants": [
       {
@@ -3352,6 +3367,7 @@
     ],
     "preOrderPrepayment": 50,
     "strapInfo": "Ремінець знімний та регульований",
+    "sortOrder": 15,
     "sizes": [
       "M"
     ],
@@ -3381,15 +3397,6 @@
     ],
     "isNew": false,
     "title": "Сумка The Medium Tote Bag in Monogram Jacquard",
-    "reviews": 0,
-    "instagramBlock": "general",
-    "description": "Стильна та містка сумка Marc Jacobs The Medium Tote Bag in Monogram Jacquard — культова модель The Tote Bag у вишуканому виконанні з фірмовим монограмним жакардом.\nСумка має впізнаваний дизайн Marc Jacobs із вишитим логотипом, шкіряною окантовкою та верхніми ручками. Просторе основне відділення закривається на блискавку та доповнене внутрішньою кишенею.\nМодель оснащена знімним та регульованим текстильним ремінцем, тому її можна носити в руці, на плечі або через плече",
-    "sku": "2F4HTT015H05",
-    "rating": 5,
-    "category": "Жіночі сумки",
-    "slug": "sumka-the-medium-tote-bag-in-monogram-jacquard",
-    "id": 51,
-    "color": "Чорно-бежевий",
     "images": [
       "/assets/images/products/uploads/215896950_beige_in.webp",
       "/assets/images/products/uploads/215896950_beige_bk.webp",
@@ -3397,6 +3404,13 @@
       "/assets/images/products/uploads/215896950_beige_e1.webp",
       "/assets/images/products/uploads/215896950_beige_fr.webp"
     ],
+    "reviews": 0,
+    "id": 51,
+    "instagramBlock": "general",
+    "description": "Стильна та містка сумка Marc Jacobs The Medium Tote Bag in Monogram Jacquard — культова модель The Tote Bag у вишуканому виконанні з фірмовим монограмним жакардом.\nСумка має впізнаваний дизайн Marc Jacobs із вишитим логотипом, шкіряною окантовкою та верхніми ручками. Просторе основне відділення закривається на блискавку та доповнене внутрішньою кишенею.\nМодель оснащена знімним та регульованим текстильним ремінцем, тому її можна носити в руці, на плечі або через плече",
+    "sku": "2F4HTT015H05",
+    "rating": 5,
+    "category": "Жіночі сумки",
     "legacySlugs": [
       "сумка-the-medium-tote-bag-in-monogram-jacquard"
     ]
@@ -3406,11 +3420,13 @@
       "Жінкам"
     ],
     "preOrderDays": "5–10 робочих днів",
+    "color": "Сіро-бежевий",
     "forcePublish": false,
     "material": "Натуральна шкіра",
     "brand": "Marc Jacobs",
     "price": 10000,
     "preOrder": false,
+    "slug": "sumka-marc-jacobs-the-leather-small-tote-bag-cement",
     "dimensions": "26 × 21 × 13 см",
     "variants": [
       {
@@ -3426,6 +3442,7 @@
     ],
     "preOrderPrepayment": 50,
     "strapInfo": "Ремінець знімний та регульований",
+    "sortOrder": 9,
     "sizes": [
       "S"
     ],
@@ -3455,21 +3472,19 @@
     ],
     "isNew": false,
     "title": "Сумка Marc Jacobs The Leather Small Tote Bag Cement",
-    "reviews": 0,
-    "instagramBlock": "general",
-    "description": "Стильна та універсальна сумка Marc Jacobs The Leather Small Tote Bag у витонченому відтінку Cement. Лаконічний дизайн, натуральна зерниста шкіра та фірмовий логотип Marc Jacobs роблять модель чудовим вибором для повсякденних образів.\nСумка виготовлена з натуральної зернистої шкіри з легкою глянцевою поверхнею. Має одне основне відділення на блискавці, внутрішню кишеню та кишеню для дрібниць. На передній панелі розташований фірмовий логотип The Tote Bag, а на задній — шкіряний патч із логотипом.\nМодель доповнена двома верхніми ручками та знімним регульованим шкіряним ремінцем, тому її можна носити в руці, на плечі або через плече",
-    "sku": "H009L01SP21-05",
-    "rating": 5,
-    "category": "Жіночі сумки",
-    "slug": "sumka-marc-jacobs-the-leather-small-tote-bag-cement",
-    "id": 52,
-    "color": "Сіро-бежевий",
     "images": [
       "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-ce-16a06f5f.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-ce-00e1b92f.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-ce-93206bc0.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-cement-h009l01sp21-055-800x800.webp"
     ],
+    "reviews": 0,
+    "id": 52,
+    "instagramBlock": "general",
+    "description": "Стильна та універсальна сумка Marc Jacobs The Leather Small Tote Bag у витонченому відтінку Cement. Лаконічний дизайн, натуральна зерниста шкіра та фірмовий логотип Marc Jacobs роблять модель чудовим вибором для повсякденних образів.\nСумка виготовлена з натуральної зернистої шкіри з легкою глянцевою поверхнею. Має одне основне відділення на блискавці, внутрішню кишеню та кишеню для дрібниць. На передній панелі розташований фірмовий логотип The Tote Bag, а на задній — шкіряний патч із логотипом.\nМодель доповнена двома верхніми ручками та знімним регульованим шкіряним ремінцем, тому її можна носити в руці, на плечі або через плече",
+    "sku": "H009L01SP21-05",
+    "rating": 5,
+    "category": "Жіночі сумки",
     "legacySlugs": [
       "сумка-marc-jacobs-the-leather-small-tote-bag-cement"
     ]
@@ -3479,11 +3494,13 @@
       "Жінкам"
     ],
     "preOrderDays": "5–10 робочих днів",
+    "color": "Молочний",
     "forcePublish": false,
     "material": "Натуральна шкіра",
     "brand": "Marc Jacobs",
     "price": 9800,
     "preOrder": false,
+    "slug": "sumka-marc-jacobs-the-leather-cargo-bag-cotton-silver",
     "dimensions": "22 × 12 × 7 см",
     "variants": [
       {
@@ -3500,6 +3517,7 @@
     ],
     "preOrderPrepayment": 50,
     "strapInfo": "2 знімні ремені — шкіряний та текстильний регульований",
+    "sortOrder": 12,
     "sizes": [
       "ONESIZE"
     ],
@@ -3528,15 +3546,6 @@
     ],
     "isNew": false,
     "title": "Сумка Marc Jacobs The Leather Cargo Bag Cotton Silver",
-    "reviews": 0,
-    "instagramBlock": "general",
-    "description": "Стильна та функціональна сумка Marc Jacobs The Leather Cargo Bag у відтінку Cotton/Silver — модель із виразним дизайном у стилі cargo та практичною системою кишень.\nСумка виготовлена з натуральної зернистої шкіри та доповнена сріблястою фурнітурою. На передній частині розташовані дві накладні кишені з клапанами, з боків — кишені на блискавці. Основне відділення закривається на блискавку.\nМодель має два знімні ремені: шкіряний ремінь для носіння на плечі та широкий регульований текстильний ремінь із логотипом. Завдяки цьому сумку можна носити на плечі або через плече",
-    "sku": "2S4HSH085H02-140",
-    "rating": 5,
-    "category": "Жіночі сумки",
-    "slug": "sumka-marc-jacobs-the-leather-cargo-bag-cotton-silver",
-    "id": 53,
-    "color": "Молочний",
     "images": [
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-4a08b27e.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-d6f46dd3.webp",
@@ -3544,6 +3553,13 @@
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-c1370464.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-28c7d0f9.webp"
     ],
+    "reviews": 0,
+    "id": 53,
+    "instagramBlock": "general",
+    "description": "Стильна та функціональна сумка Marc Jacobs The Leather Cargo Bag у відтінку Cotton/Silver — модель із виразним дизайном у стилі cargo та практичною системою кишень.\nСумка виготовлена з натуральної зернистої шкіри та доповнена сріблястою фурнітурою. На передній частині розташовані дві накладні кишені з клапанами, з боків — кишені на блискавці. Основне відділення закривається на блискавку.\nМодель має два знімні ремені: шкіряний ремінь для носіння на плечі та широкий регульований текстильний ремінь із логотипом. Завдяки цьому сумку можна носити на плечі або через плече",
+    "sku": "2S4HSH085H02-140",
+    "rating": 5,
+    "category": "Жіночі сумки",
     "legacySlugs": [
       "сумка-marc-jacobs-the-leather-cargo-bag-cotton-silver"
     ]
@@ -3553,11 +3569,20 @@
       "Жінкам"
     ],
     "preOrderDays": "5–10 робочих днів",
+    "color": "Кемел",
     "forcePublish": false,
     "material": "Натуральна шкіра",
     "brand": "Marc Jacobs",
     "price": 9800,
+    "framing": {
+      "marc-jacobs-the-leather-cargo-bag-camel--3f139d71.webp": {
+        "zoom": 1.4,
+        "x": 49,
+        "y": 40
+      }
+    },
     "preOrder": false,
+    "slug": "sumka-marc-jacobs-the-leather-cargo-bag-camel",
     "dimensions": "22 × 12 × 7 см",
     "variants": [
       {
@@ -3575,6 +3600,7 @@
     ],
     "preOrderPrepayment": 50,
     "strapInfo": "Два знімні ремені",
+    "sortOrder": 13,
     "sizes": [
       "ONESIZE"
     ],
@@ -3604,15 +3630,6 @@
     ],
     "isNew": false,
     "title": "Сумка Marc Jacobs The Leather Cargo Bag Camel",
-    "reviews": 0,
-    "instagramBlock": "general",
-    "description": "Стильна та функціональна сумка Marc Jacobs The Leather Cargo Bag у теплому відтінку Camel. Модель поєднує лаконічний дизайн із практичною конструкцією та великою кількістю зручних зовнішніх кишень.\nСумка виготовлена з натуральної зернистої шкіри та доповнена фірмовим логотипом Marc Jacobs. Має основне відділення на блискавці, дві зовнішні кишені на блискавці та дві накладні кишені з магнітними застібками.\nМодель комплектується двома знімними ременями: шкіряним ременем для носіння на плечі та регульованим текстильним ременем для носіння через плече",
-    "sku": "2S4HSH085H02",
-    "rating": 5,
-    "category": "Жіночі сумки",
-    "slug": "sumka-marc-jacobs-the-leather-cargo-bag-camel",
-    "id": 54,
-    "color": "Кемел",
     "images": [
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--d9f458f8.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--3f139d71.webp",
@@ -3621,13 +3638,13 @@
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--c2093755.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--e63574a7.webp"
     ],
-    "framing": {
-      "marc-jacobs-the-leather-cargo-bag-camel--3f139d71.webp": {
-        "zoom": 1.4,
-        "x": 49,
-        "y": 40
-      }
-    },
+    "reviews": 0,
+    "id": 54,
+    "instagramBlock": "general",
+    "description": "Стильна та функціональна сумка Marc Jacobs The Leather Cargo Bag у теплому відтінку Camel. Модель поєднує лаконічний дизайн із практичною конструкцією та великою кількістю зручних зовнішніх кишень.\nСумка виготовлена з натуральної зернистої шкіри та доповнена фірмовим логотипом Marc Jacobs. Має основне відділення на блискавці, дві зовнішні кишені на блискавці та дві накладні кишені з магнітними застібками.\nМодель комплектується двома знімними ременями: шкіряним ременем для носіння на плечі та регульованим текстильним ременем для носіння через плече",
+    "sku": "2S4HSH085H02",
+    "rating": 5,
+    "category": "Жіночі сумки",
     "legacySlugs": [
       "сумка-marc-jacobs-the-leather-cargo-bag-camel"
     ]
@@ -3637,11 +3654,13 @@
       "Жінкам"
     ],
     "preOrderDays": "5–10 робочих днів",
+    "color": "Чорний",
     "forcePublish": false,
     "material": "Натуральна шкіра",
     "brand": "Marc Jacobs",
     "price": 9800,
     "preOrder": false,
+    "slug": "sumka-marc-jacobs-the-leather-cargo-bag-black",
     "dimensions": "22 × 12 × 7 см",
     "variants": [
       {
@@ -3659,6 +3678,7 @@
     ],
     "preOrderPrepayment": 50,
     "strapInfo": "Два знімні ремені",
+    "sortOrder": 14,
     "sizes": [
       "ONESIZE"
     ],
@@ -3687,15 +3707,6 @@
     ],
     "isNew": false,
     "title": "Сумка Marc Jacobs The Leather Cargo Bag Black",
-    "reviews": 0,
-    "instagramBlock": "general",
-    "description": "Стильна та функціональна сумка Marc Jacobs The Leather Cargo Bag у класичному чорному кольорі. Модель поєднує лаконічний дизайн із практичною конструкцією cargo та великою кількістю функціональних кишень.\nСумка виготовлена зі 100% натуральної шкіри та доповнена сріблястою фурнітурою. Має основне відділення на блискавці, дві зовнішні кишені на блискавці та дві накладні кишені з магнітними застібками.\nМодель комплектується двома знімними ременями: шкіряним ременем та регульованим текстильним ременем. Її можна носити на плечі або через плече",
-    "sku": "2S4HSH085H02-001",
-    "rating": 5,
-    "category": "Жіночі сумки",
-    "slug": "sumka-marc-jacobs-the-leather-cargo-bag-black",
-    "id": 55,
-    "color": "Чорний",
     "images": [
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--2013c7eb.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--3eeb5b5d.webp",
@@ -3704,6 +3715,13 @@
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--20634337.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--3bae4de6.webp"
     ],
+    "reviews": 0,
+    "id": 55,
+    "instagramBlock": "general",
+    "description": "Стильна та функціональна сумка Marc Jacobs The Leather Cargo Bag у класичному чорному кольорі. Модель поєднує лаконічний дизайн із практичною конструкцією cargo та великою кількістю функціональних кишень.\nСумка виготовлена зі 100% натуральної шкіри та доповнена сріблястою фурнітурою. Має основне відділення на блискавці, дві зовнішні кишені на блискавці та дві накладні кишені з магнітними застібками.\nМодель комплектується двома знімними ременями: шкіряним ременем та регульованим текстильним ременем. Її можна носити на плечі або через плече",
+    "sku": "2S4HSH085H02-001",
+    "rating": 5,
+    "category": "Жіночі сумки",
     "legacySlugs": [
       "сумка-marc-jacobs-the-leather-cargo-bag-black"
     ]
@@ -3713,11 +3731,13 @@
       "Жінкам"
     ],
     "preOrderDays": "5–10 робочих днів",
+    "color": "Бежево-кремовий",
     "forcePublish": false,
     "material": "Натуральна шкіра",
     "brand": "Marc Jacobs",
     "price": 10000,
     "preOrder": false,
+    "slug": "shoper-marc-jacobs-the-leather-small-tote-bag",
     "dimensions": "25,5 × 20 × 13 см",
     "variants": [
       {
@@ -3733,6 +3753,7 @@
     ],
     "preOrderPrepayment": 50,
     "strapInfo": "Ремінець знімний та регульований",
+    "sortOrder": 16,
     "sizes": [
       "S"
     ],
@@ -3763,21 +3784,19 @@
     ],
     "isNew": false,
     "title": "Шопер Marc Jacobs The Leather Small Tote Bag",
-    "reviews": 0,
-    "instagramBlock": "general",
-    "description": "Стильна та універсальна сумка Marc Jacobs The Leather Small Tote Bag у нейтральному відтінку Twine. Лаконічний дизайн, натуральна зерниста шкіра та фірмовий логотип Marc Jacobs роблять модель чудовим доповненням до повсякденних образів.\nСумка має просторе основне відділення, внутрішню відкриту кишеню та фірмову шкіряну нашивку з логотипом на задній панелі. Модель доповнена двома верхніми ручками та знімним регульованим ремінцем, тому її можна носити в руці, на плечі або через плече",
-    "sku": "H009L01SP21",
-    "rating": 5,
-    "category": "Жіночі сумки",
-    "slug": "shoper-marc-jacobs-the-leather-small-tote-bag",
-    "id": 56,
-    "color": "Бежево-кремовий",
     "images": [
       "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-d0dd33cf.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-de081418.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-628c7ef0.webp",
       "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-twine-h009l01sp21-914-800x800.webp"
     ],
+    "reviews": 0,
+    "id": 56,
+    "instagramBlock": "general",
+    "description": "Стильна та універсальна сумка Marc Jacobs The Leather Small Tote Bag у нейтральному відтінку Twine. Лаконічний дизайн, натуральна зерниста шкіра та фірмовий логотип Marc Jacobs роблять модель чудовим доповненням до повсякденних образів.\nСумка має просторе основне відділення, внутрішню відкриту кишеню та фірмову шкіряну нашивку з логотипом на задній панелі. Модель доповнена двома верхніми ручками та знімним регульованим ремінцем, тому її можна носити в руці, на плечі або через плече",
+    "sku": "H009L01SP21",
+    "rating": 5,
+    "category": "Жіночі сумки",
     "legacySlugs": [
       "шопер-marc-jacobs-the-leather-small-tote-bag"
     ]
@@ -4051,7 +4070,7 @@
     "preOrderDays": "5–10 робочих днів",
     "forcePublish": false,
     "material": "Натуральна шкіра",
-    "brand": "JACQUEMUS",
+    "brand": "Jacquemus",
     "price": 25000,
     "preOrder": false,
     "dimensions": "24 × 14 × 7 см",
@@ -4133,11 +4152,25 @@
       "Жінкам"
     ],
     "preOrderDays": "5–10 робочих днів",
+    "color": "Синій",
     "forcePublish": false,
     "material": "Денім",
     "brand": "Marc Jacobs",
     "price": 8600,
+    "framing": {
+      "215679033_blue_in.webp": {
+        "zoom": 1.43,
+        "x": 50,
+        "y": 70
+      },
+      "215679033_blue_bk.webp": {
+        "zoom": 1.46,
+        "x": 49,
+        "y": 65
+      }
+    },
     "preOrder": false,
+    "slug": "shoper-marc-jacobs-the-denim-small-tote-bag-blue",
     "dimensions": "26 × 21 × 13 см",
     "variants": [
       {
@@ -4154,6 +4187,7 @@
     ],
     "preOrderPrepayment": 50,
     "strapInfo": "Ремінець знімний та регульований",
+    "sortOrder": 6,
     "sizes": [
       "S"
     ],
@@ -4185,27 +4219,6 @@
     ],
     "isNew": false,
     "title": "Шопер Marc Jacobs The Denim Small Tote Bag Blue",
-    "reviews": 0,
-    "instagramBlock": "general",
-    "description": "Стильна та оригінальна сумка Marc Jacobs The Denim Small Tote Bag у блакитно-синьому денімі. Модель виконана у фірмовому силуеті The Tote Bag та доповнена контрастними шкіряними деталями й написом The Tote Bag на передній панелі.\nДжинсовий матеріал та поєднання різних відтінків синього надають сумці сучасного та невимушеного вигляду. Модель має дві верхні ручки та знімний ремінець для носіння на плечі або через плече",
-    "sku": "MJ451H057-K11",
-    "rating": 5,
-    "category": "Жіночі сумки",
-    "framing": {
-      "215679033_blue_in.webp": {
-        "zoom": 1.43,
-        "x": 50,
-        "y": 70
-      },
-      "215679033_blue_bk.webp": {
-        "zoom": 1.46,
-        "x": 49,
-        "y": 65
-      }
-    },
-    "slug": "shoper-marc-jacobs-the-denim-small-tote-bag-blue",
-    "id": 61,
-    "color": "Синій",
     "images": [
       "/assets/images/products/uploads/215679033_blue_in.webp",
       "/assets/images/products/uploads/215679033_blue_bk.webp",
@@ -4213,6 +4226,13 @@
       "/assets/images/products/uploads/215679033_blue_e1.webp",
       "/assets/images/products/uploads/215679033_blue_fr.webp"
     ],
+    "reviews": 0,
+    "id": 61,
+    "instagramBlock": "general",
+    "description": "Стильна та оригінальна сумка Marc Jacobs The Denim Small Tote Bag у блакитно-синьому денімі. Модель виконана у фірмовому силуеті The Tote Bag та доповнена контрастними шкіряними деталями й написом The Tote Bag на передній панелі.\nДжинсовий матеріал та поєднання різних відтінків синього надають сумці сучасного та невимушеного вигляду. Модель має дві верхні ручки та знімний ремінець для носіння на плечі або через плече",
+    "sku": "MJ451H057-K11",
+    "rating": 5,
+    "category": "Жіночі сумки",
     "legacySlugs": [
       "шопер-marc-jacobs-the-denim-small-tote-bag-blue"
     ]
@@ -4267,8 +4287,8 @@
           "/assets/images/products/uploads/ca173_svvfq_a0.webp?v=274cb8ee",
           "/assets/images/products/uploads/ca173_svvfq_a5.webp?v=c14cae6b",
           "/assets/images/products/uploads/ca173_svvfq_a8.webp?v=b75e933e",
-          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=4311ebf9",
-          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=0daecfd8"
+          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=32b3f0fa",
+          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=7b15bd7e"
         ]
       }
     ],
@@ -5477,87 +5497,11 @@
       "Жінкам"
     ],
     "preOrderDays": "10-14 робочих днів",
+    "color": "Chalk",
     "forcePublish": false,
     "material": "Натуральна шкіра Polished Pebble Leather",
     "brand": "Coach",
     "price": 11900,
-    "preOrder": true,
-    "dimensions": "26 × 15 × 8 см",
-    "variants": [
-      {
-        "color": "/",
-        "hex": "#e6e1e1",
-        "sku": "CH857-B4/HA",
-        "images": [
-          "/assets/images/products/uploads/ch857_b4ha_a0.webp?v=5509ea0e",
-          "/assets/images/products/uploads/ch857_b4ha_a3.webp?v=7480d9d4",
-          "/assets/images/products/uploads/ch857_b4ha_a8.webp?v=4fb9833a",
-          "/assets/images/products/uploads/ch857_b4ha_a21.webp?v=2c9c1a74",
-          "/assets/images/products/uploads/ch857_b4ha_a99.webp?v=3b68f270",
-          "/assets/images/products/uploads/ch857_b4ha_a61.webp?v=19ded042",
-          "/assets/images/products/uploads/ch857_b4ha_a92.webp?v=919707ef"
-        ]
-      },
-      {
-        "sku": "CH857-B4/BK",
-        "hex": "#000000",
-        "color": "Чорний",
-        "images": [
-          "/assets/images/products/uploads/ch857_b4bk_a0.webp?v=4a2c4a69",
-          "/assets/images/products/uploads/ch857_b4bk_a3.webp?v=815dd9f6",
-          "/assets/images/products/uploads/ch857_b4bk_a8.webp?v=32da6375",
-          "/assets/images/products/uploads/ch857_b4bk_a61.webp?v=bf5c9a7a",
-          "/assets/images/products/uploads/ch857_b4bk_a92.webp?v=39ecbc1c"
-        ]
-      },
-      {
-        "color": "Amber Brown",
-        "hex": "#bc7316",
-        "sku": "CH857-B4/Amber-Brown.",
-        "images": [
-          "/assets/images/products/uploads/ch857_b4yu1_a0.webp?v=1ca4b3b9",
-          "/assets/images/products/uploads/ch857_b4yu1_a3.webp?v=cd25b8e8",
-          "/assets/images/products/uploads/ch857_b4yu1_a8.webp?v=5302f3a2"
-        ]
-      },
-      {
-        "color": "/Maple",
-        "hex": "#771e1e",
-        "sku": "CH857-B4MPL",
-        "images": [
-          "/assets/images/products/uploads/ch857_b4mpl_a0.webp?v=d75a1a37",
-          "/assets/images/products/uploads/ch857_b4mpl_a5.webp?v=fc448556",
-          "/assets/images/products/uploads/ch857_b4mpl_a6.webp?v=5adb2de6",
-          "/assets/images/products/uploads/ch857_b4mpl_a62.webp?v=1c67302c",
-          "/assets/images/products/uploads/ch857_b4mpl_a92.webp?v=1d3393f4"
-        ]
-      }
-    ],
-    "preOrderPrepayment": 100,
-    "strapInfo": "Коротка знімна ручка + довгий знімний ремінь для носіння через плече",
-    "sizes": [
-      "ONESIZE"
-    ],
-    "splitByColor": true,
-    "searchKeywords": [
-      "Coach Tabby 26",
-      "Coach Tabby",
-      "Coach сумка",
-      "Coach жіноча сумка",
-      "шкіряна сумка Coach",
-      "Tabby Shoulder Bag",
-      "CH857",
-      "Coach Chalk",
-      "Coach 26"
-    ],
-    "isNew": false,
-    "title": "Жіноча сумочка Coach Tabby Shoulder Bag 26",
-    "reviews": 0,
-    "instagramBlock": "general",
-    "description": "Структурована сумка Coach Tabby 26 — культова модель бренду з впізнаваною фірмовою застібкою Signature. Компактна, але містка, доповнена двома знімними ремінцями: коротким для носіння на плечі та довгим для носіння через плече.\nІдеально поєднується як із повсякденними образами, так і з більш елегантними.",
-    "sku": "CH857-B4/HA",
-    "rating": 5,
-    "category": "Жіночі сумки",
     "framing": {
       "ch857_b4ha_a3.webp": {
         "zoom": 1.93,
@@ -5595,12 +5539,80 @@
         "y": 50
       }
     },
-    "legacySlugs": [
-      "жіноча-сумочка-coach-tabby-shoulder-bag-26"
-    ],
+    "preOrder": true,
     "slug": "zhinocha-sumochka-coach-tabby-shoulder-bag-26",
-    "id": 80,
-    "color": "/",
+    "dimensions": "26 × 15 × 8 см",
+    "variants": [
+      {
+        "color": "Chalk",
+        "hex": "#e6e1e1",
+        "sku": "CH857-B4/HA",
+        "images": [
+          "/assets/images/products/uploads/ch857_b4ha_a0.webp?v=5509ea0e",
+          "/assets/images/products/uploads/ch857_b4ha_a3.webp?v=7480d9d4",
+          "/assets/images/products/uploads/ch857_b4ha_a8.webp?v=4fb9833a",
+          "/assets/images/products/uploads/ch857_b4ha_a21.webp?v=2c9c1a74",
+          "/assets/images/products/uploads/ch857_b4ha_a99.webp?v=3b68f270",
+          "/assets/images/products/uploads/ch857_b4ha_a61.webp?v=19ded042",
+          "/assets/images/products/uploads/ch857_b4ha_a92.webp?v=919707ef"
+        ]
+      },
+      {
+        "sku": "CH857-B4/BK",
+        "hex": "#000000",
+        "color": "Чорний",
+        "images": [
+          "/assets/images/products/uploads/ch857_b4bk_a0.webp?v=4a2c4a69",
+          "/assets/images/products/uploads/ch857_b4bk_a3.webp?v=815dd9f6",
+          "/assets/images/products/uploads/ch857_b4bk_a8.webp?v=32da6375",
+          "/assets/images/products/uploads/ch857_b4bk_a61.webp?v=bf5c9a7a",
+          "/assets/images/products/uploads/ch857_b4bk_a92.webp?v=39ecbc1c"
+        ]
+      },
+      {
+        "color": "Amber Brown",
+        "hex": "#bc7316",
+        "sku": "CH857-B4/Amber-Brown.",
+        "images": [
+          "/assets/images/products/uploads/ch857_b4yu1_a0.webp?v=1ca4b3b9",
+          "/assets/images/products/uploads/ch857_b4yu1_a3.webp?v=cd25b8e8",
+          "/assets/images/products/uploads/ch857_b4yu1_a8.webp?v=5302f3a2"
+        ]
+      },
+      {
+        "color": "Maple",
+        "hex": "#771e1e",
+        "sku": "CH857-B4MPL",
+        "images": [
+          "/assets/images/products/uploads/ch857_b4mpl_a0.webp?v=d75a1a37",
+          "/assets/images/products/uploads/ch857_b4mpl_a5.webp?v=fc448556",
+          "/assets/images/products/uploads/ch857_b4mpl_a6.webp?v=5adb2de6",
+          "/assets/images/products/uploads/ch857_b4mpl_a62.webp?v=1c67302c",
+          "/assets/images/products/uploads/ch857_b4mpl_a92.webp?v=1d3393f4"
+        ],
+        "colorFamily": "Коричневий"
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Коротка знімна ручка + довгий знімний ремінь для носіння через плече",
+    "sortOrder": 10,
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Coach Tabby 26",
+      "Coach Tabby",
+      "Coach сумка",
+      "Coach жіноча сумка",
+      "шкіряна сумка Coach",
+      "Tabby Shoulder Bag",
+      "CH857",
+      "Coach Chalk",
+      "Coach 26"
+    ],
+    "isNew": false,
+    "title": "Жіноча сумочка Coach Tabby Shoulder Bag 26",
     "images": [
       "/assets/images/products/uploads/ch857_b4ha_a0.webp",
       "/assets/images/products/uploads/ch857_b4ha_a3.webp",
@@ -5609,6 +5621,1075 @@
       "/assets/images/products/uploads/ch857_b4ha_a99.webp",
       "/assets/images/products/uploads/ch857_b4ha_a61.webp",
       "/assets/images/products/uploads/ch857_b4ha_a92.webp"
+    ],
+    "reviews": 0,
+    "id": 80,
+    "instagramBlock": "general",
+    "description": "Структурована сумка Coach Tabby 26 — культова модель бренду з впізнаваною фірмовою застібкою Signature. Компактна, але містка, доповнена двома знімними ремінцями: коротким для носіння на плечі та довгим для носіння через плече.\nІдеально поєднується як із повсякденними образами, так і з більш елегантними.",
+    "sku": "CH857-B4/HA",
+    "rating": 5,
+    "category": "Жіночі сумки",
+    "legacySlugs": [
+      "жіноча-сумочка-coach-tabby-shoulder-bag-26"
+    ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Корпус і браслет — нержавіюча сталь; скло — мінеральне",
+    "brand": "Michael Kors",
+    "price": 6500,
+    "preOrder": true,
+    "dimensions": "2,6 × 2,6 × 0,7 см",
+    "variants": [
+      {
+        "color": "Сріблястий / кремовий",
+        "hex": "#cbcbcb",
+        "images": [
+          "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-silver-dial-ladies-watch-mk4843.webp?v=7f09ea29",
+          "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-silver-dial-ladies-watch-mk4843_2.webp?v=c08ddbf4",
+          "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-silver-dial-ladies-watch-mk4843_3.webp?v=fbf2bfca"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Michael Kors Lexington",
+      "Michael Kors Petite Lexington",
+      "Michael Kors MK4843",
+      "MK4843",
+      "годинник Michael Kors",
+      "жіночий годинник Michael Kors",
+      "жіночий наручний годинник",
+      "кварцовий годинник",
+      "сріблястий годинник",
+      "годинник зі сталевим браслетом",
+      "годинник із перламутровим циферблатом",
+      "годинник із pavé",
+      "класичний жіночий годинник",
+      "елегантний годинник",
+      "брендовий годинник",
+      "оригінальний Michael Kors"
+    ],
+    "isNew": false,
+    "country": "",
+    "title": "Жіночий годинник Michael Kors Petite Lexington Pavé MK4843",
+    "reviews": 0,
+    "closure": "Сталевий браслет сріблястого кольору шириною 1,4 см із розкладною застібкою-кліпсою",
+    "instagramBlock": "general",
+    "description": "Елегантний жіночий годинник Michael Kors Petite Lexington Pavé у сріблястому виконанні. Мініатюрний круглий корпус діаметром 26 мм доповнений кремовим перламутровим циферблатом із делікатними pavé-акцентами та римськими індексами.\nМодель оснащена надійним кварцовим механізмом із трьома стрілками. Корпус, безель і браслет повністю виконані з нержавіючої сталі. Мінеральне скло захищає циферблат, а водонепроникність до 50 м (5 ATM) робить годинник практичним для щоденного носіння",
+    "sku": "MK4843",
+    "rating": 5,
+    "category": "Годинники",
+    "legacySlugs": [
+      "жіночий-годинник-michael-kors-petite-lexington-pavé-mk4843"
+    ],
+    "slug": "zhinochyi-hodynnyk-michael-kors-petite-lexington-pav-mk4843",
+    "id": 81,
+    "color": "Сріблястий / кремовий",
+    "images": [
+      "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-silver-dial-ladies-watch-mk4843.webp",
+      "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-silver-dial-ladies-watch-mk4843_2.webp",
+      "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-silver-dial-ladies-watch-mk4843_3.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Корпус і браслет — нержавіюча сталь; скло — мінеральне",
+    "brand": "Michael Kors",
+    "price": 5100,
+    "preOrder": true,
+    "dimensions": "2,6 × 2,6 × 0,8 см",
+    "variants": [
+      {
+        "color": "Сріблястий / червоний",
+        "hex": "#891919",
+        "images": [
+          "/assets/images/products/uploads/michael-kors-mini-lexington-quartz-red-dial-ladies-watch-mk4968.webp?v=c93db63b",
+          "/assets/images/products/uploads/michael-kors-mini-lexington-quartz-red-dial-ladies-watch-mk4968_2.webp?v=545b4cb8",
+          "/assets/images/products/uploads/michael-kors-mini-lexington-quartz-red-dial-ladies-watch-mk4968_3.webp?v=d224c14b"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Сталевий браслет сріблястого кольору шириною 1,4 см із розкладною застібкою",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Michael Kors Lexington",
+      "Michael Kors Mini Lexington",
+      "Michael Kors MK4968",
+      "MK4968",
+      "годинник Michael Kors",
+      "жіночий годинник Michael Kors",
+      "жіночий наручний годинник",
+      "кварцовий годинник",
+      "сріблястий годинник",
+      "червоний годинник",
+      "годинник із червоним циферблатом",
+      "годинник зі сталевим браслетом",
+      "годинник із pavé",
+      "мініатюрний жіночий годинник",
+      "елегантний годинник",
+      "брендовий годинник",
+      "оригінальний Michael Kors"
+    ],
+    "isNew": false,
+    "title": "Жіночий годинник Michael Kors Mini Lexington Pavé MK4968",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Елегантний жіночий годинник Michael Kors Mini Lexington Pavé у сріблястому виконанні з виразним червоним циферблатом. Мініатюрний круглий корпус доповнений декоративним безелем та pavé-індексами, що додають моделі витонченого блиску.\nГодинник оснащений точним кварцовим механізмом із трьома стрілками. Червоний циферблат має ефектний променистий фініш, а корпус і браслет виконані з нержавіючої сталі. Мінеральне скло захищає циферблат, водонепроникність — до 50 м (5 ATM)",
+    "sku": "MK4968",
+    "rating": 5,
+    "category": "Годинники",
+    "legacySlugs": [
+      "жіночий-годинник-michael-kors-mini-lexington-pavé-mk4968"
+    ],
+    "slug": "zhinochyi-hodynnyk-michael-kors-mini-lexington-pav-mk4968",
+    "id": 82,
+    "color": "Сріблястий / червоний",
+    "images": [
+      "/assets/images/products/uploads/michael-kors-mini-lexington-quartz-red-dial-ladies-watch-mk4968.webp",
+      "/assets/images/products/uploads/michael-kors-mini-lexington-quartz-red-dial-ladies-watch-mk4968_2.webp",
+      "/assets/images/products/uploads/michael-kors-mini-lexington-quartz-red-dial-ladies-watch-mk4968_3.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Нержавіюча сталь; декоративні pavé-акценти — кристали; скло — мінеральне",
+    "brand": "Michael Kors",
+    "price": 6900,
+    "preOrder": true,
+    "dimensions": "1,3 × 1,3 см - розмір циферблату",
+    "variants": [
+      {
+        "color": "Сріблястий / золотистий",
+        "hex": "#cac8c0",
+        "images": [
+          "/assets/images/products/uploads/michael-kors-micro-lexington-quartz-ladies-watch-mk4903.webp?v=9fa5f052",
+          "/assets/images/products/uploads/michael-kors-micro-lexington-quartz-ladies-watch-mk4903_2.webp?v=1a203b80",
+          "/assets/images/products/uploads/michael-kors-micro-lexington-quartz-ladies-watch-mk4903_3.webp?v=44cf106d"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Двоколірний браслет із нержавіючої сталі у сріблястому та золотистому відтінках із розкладною застібкою-кліпсою. Ширина браслета — 1 см",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Michael Kors Lexington",
+      "Michael Kors Micro Lexington",
+      "Michael Kors Micro Lexington Pavé",
+      "Michael Kors MK4903",
+      "MK4903",
+      "годинник Michael Kors",
+      "жіночий годинник Michael Kors",
+      "жіночий наручний годинник",
+      "кварцовий годинник",
+      "мініатюрний годинник",
+      "сріблястий годинник",
+      "золотистий годинник",
+      "двоколірний годинник",
+      "годинник із кристалами",
+      "годинник із pavé",
+      "годинник зі сталевим браслетом",
+      "елегантний жіночий годинник",
+      "брендовий годинник",
+      "оригінальний Michael Kors"
+    ],
+    "isNew": false,
+    "title": "Годинник Michael Kors Micro Lexington Pavé Two-Tone MK4903",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Вишуканий жіночий годинник Michael Kors Micro Lexington Pavé Two-Tone у мініатюрному форматі. Модель поєднує сріблясті та золотисті відтінки, доповнені сяючими pavé-акцентами, створюючи елегантний та жіночний образ.\nМініатюрний круглий корпус має діаметр лише 13 мм та доповнений фасетованим безелем. Сріблястий циферблат прикрашений блискучими кристалами. Годинник оснащений надійним кварцовим механізмом із трьома стрілками. Корпус і двоколірний браслет повністю виконані з нержавіючої сталі. Водонепроникність — до 50 м (5 ATM)",
+    "sku": "MK4903",
+    "rating": 5,
+    "category": "Годинники",
+    "legacySlugs": [
+      "годинник-michael-kors-micro-lexington-pavé-two-tone-mk4903"
+    ],
+    "slug": "hodynnyk-michael-kors-micro-lexington-pav-two-tone-mk4903",
+    "id": 83,
+    "color": "Сріблястий / золотистий",
+    "images": [
+      "/assets/images/products/uploads/michael-kors-micro-lexington-quartz-ladies-watch-mk4903.webp",
+      "/assets/images/products/uploads/michael-kors-micro-lexington-quartz-ladies-watch-mk4903_2.webp",
+      "/assets/images/products/uploads/michael-kors-micro-lexington-quartz-ladies-watch-mk4903_3.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Чоловікам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Фірмове покрите полотно Signature та гладка теляча шкіра; текстильна підкладк",
+    "brand": "Coach",
+    "price": 7400,
+    "preOrder": true,
+    "dimensions": "22 × 26 × 5 см",
+    "variants": [
+      {
+        "color": "Темно-сірий / чорний / графітовий",
+        "hex": "#494848",
+        "sku": "CZ398",
+        "images": [
+          "/assets/images/products/uploads/cz398_qbmi5_a0.webp?v=864a0602",
+          "/assets/images/products/uploads/cz398_qbmi5_a3.webp?v=7632d642",
+          "/assets/images/products/uploads/cz398_qbmi5_a8.webp?v=617e6eb5",
+          "/assets/images/products/uploads/cz398_qbmi5_a91.webp?v=732c7458"
+        ]
+      },
+      {
+        "color": "Чорний",
+        "hex": "#010000",
+        "sku": "4011QB/BK",
+        "images": [
+          "/assets/images/products/uploads/4011_qbbk_a0.webp?v=0e192fb2",
+          "/assets/images/products/uploads/4011_qbbk_a3.webp?v=99595213",
+          "/assets/images/products/uploads/houstonflightbag2propfamily_a6.webp?v=aff55aaf",
+          "/assets/images/products/uploads/4011_qbbk_a91.webp?v=0b48a827"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Регульований плечовий ремінь із довжиною звисання 63,5 см, що дозволяє носити сумку на плечі або кросбоді",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Coach Houston Flight Bag",
+      "Coach CZ398",
+      "Houston Flight Bag Signature Canvas",
+      "сумка Coach",
+      "чоловіча сумка Coach",
+      "чоловіча сумка через плече",
+      "чоловіча сумка кросбоді",
+      "сумка кросбоді Coach",
+      "сумка Signature Coach",
+      "чоловіча брендовa сумка",
+      "чорна сумка",
+      "коричнева сумка",
+      "оригінальний Coach"
+    ],
+    "isNew": false,
+    "title": "Чоловіча сумка Coach Houston Flight Bag In Signature Canvas",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильна та практична чоловіча сумка Coach Houston Flight Bag у фірмовому принті Signature. Модель виконана у поєднанні фірмового покритого полотна та гладкої шкіри, доповнена металевими деталями та лаконічним дизайном.\nСумка має основне відділення із застібкою-блискавкою, зовнішні кишені на блискавці та без застібки, а також внутрішню багатофункціональну кишеню для зручної організації речей. Компактний, але місткий формат дозволяє розмістити гаманець, навушники, смартфон та інші необхідні речі. Регульований ремінь дає змогу носити сумку на плечі або кросбоді",
+    "rating": 5,
+    "category": "Чоловічі сумки",
+    "framing": {
+      "cz398_qbmi5_a0.webp": {
+        "zoom": 1.47,
+        "x": 48,
+        "y": 59
+      },
+      "cz398_qbmi5_a3.webp": {
+        "zoom": 1.77,
+        "x": 46,
+        "y": 60
+      },
+      "cz398_qbmi5_a8.webp": {
+        "zoom": 1.38,
+        "x": 47,
+        "y": 50
+      },
+      "4011_qbbk_a0.webp": {
+        "zoom": 1.49,
+        "x": 50,
+        "y": 59
+      },
+      "4011_qbbk_a3.webp": {
+        "zoom": 1.96,
+        "x": 46,
+        "y": 59
+      }
+    },
+    "legacySlugs": [
+      "чоловіча-сумка-coach-houston-flight-bag-in-signature-canvas"
+    ],
+    "slug": "cholovicha-sumka-coach-houston-flight-bag-in-signature-canvas",
+    "id": 84,
+    "color": "Темно-сірий / чорний / графітовий",
+    "images": [
+      "/assets/images/products/uploads/cz398_qbmi5_a0.webp",
+      "/assets/images/products/uploads/cz398_qbmi5_a3.webp",
+      "/assets/images/products/uploads/cz398_qbmi5_a8.webp",
+      "/assets/images/products/uploads/cz398_qbmi5_a91.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Чоловікам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Фірмова зерниста шкіра Signature та зерниста шкіра; внутрішня підкладка — перероблений поліестер",
+    "brand": "Coach",
+    "price": 8000,
+    "preOrder": true,
+    "dimensions": "22 × 26 × 5 см",
+    "variants": [
+      {
+        "color": "Чорний",
+        "hex": "#000000",
+        "images": [
+          "/assets/images/products/uploads/ces89_svbk_a0.webp?v=ef9e6e56",
+          "/assets/images/products/uploads/ces89_svbk_a5.webp?v=1891e188",
+          "/assets/images/products/uploads/ces89_svbk_a8.webp?v=cb4034fd",
+          "/assets/images/products/uploads/ces89_svbk_a91.webp?v=39a217a9"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Регульований плечовий ремінь. Можна носити через плече або кросбоді. Довжина падіння ременя — приблизно",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "COACH",
+      "Coach Tristan",
+      "Tristan Crossbody Bag 22",
+      "сумка Coach",
+      "сумка кросбоді Coach",
+      "чоловіча сумка Coach",
+      "жіноча сумка Coach",
+      "шкіряна сумка",
+      "шкіряна сумка через плече",
+      "сумка через плече",
+      "кросбоді",
+      "чорна сумка",
+      "чорна шкіряна сумка",
+      "брендові сумки",
+      "оригінальна Coach",
+      "сумка на кожен день",
+      "повсякденна сумка"
+    ],
+    "isNew": false,
+    "title": "Чоловіча сумка COACH Tristan Crossbody Bag In Signature Leather",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильна та функціональна сумка COACH Tristan Crossbody Bag 22, виконана з фірмової зернистої шкіри Signature. Модель має зручний вертикальний формат та продуманий внутрішній простір для повсякденних речей.\nСумка оснащена основним відділенням на блискавці, внутрішньою кишенею на кнопці, а також зовнішніми кишенями на блискавці та магнітній кнопці. Регульований ремінь дозволяє носити модель через плече або кросбоді.\nЛаконічний дизайн, фірмове виконання COACH та практичний формат роблять Tristan чудовим вибором на кожен день",
+    "sku": "CES89SV/BK",
+    "rating": 5,
+    "category": "Чоловічі сумки",
+    "framing": {
+      "ces89_svbk_a5.webp": {
+        "zoom": 1.49,
+        "x": 46,
+        "y": 59
+      },
+      "ces89_svbk_a8.webp": {
+        "zoom": 1.49,
+        "x": 46,
+        "y": 50
+      }
+    },
+    "legacySlugs": [
+      "чоловіча-сумка-coach-tristan-crossbody-bag-in-signature-leather"
+    ],
+    "slug": "cholovicha-sumka-coach-tristan-crossbody-bag-in-signature-leather",
+    "id": 85,
+    "color": "Чорний",
+    "images": [
+      "/assets/images/products/uploads/ces89_svbk_a0.webp",
+      "/assets/images/products/uploads/ces89_svbk_a5.webp",
+      "/assets/images/products/uploads/ces89_svbk_a8.webp",
+      "/assets/images/products/uploads/ces89_svbk_a91.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Чоловікам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Зерниста натуральна шкіра - Refined Pebble Leather",
+    "brand": "Coach",
+    "price": 7400,
+    "preOrder": true,
+    "dimensions": "18 × 10 × 5 см",
+    "variants": [
+      {
+        "color": "Deep Blue",
+        "hex": "#1d4e86",
+        "sku": "CET66SV/SMU",
+        "images": [
+          "/assets/images/products/uploads/cet66_svsmu_a0.webp?v=e4ade0d7",
+          "/assets/images/products/uploads/cet66_svsmu_a3.webp?v=f807b4f7",
+          "/assets/images/products/uploads/cet66_svsmu_a8.webp?v=f9211b3a",
+          "/assets/images/products/uploads/cet66_svsmu_a91.webp?v=9d2ca445"
+        ]
+      },
+      {
+        "color": "Signature Canvas/Matte Black/Tan Black",
+        "hex": "#6f3913",
+        "sku": "CET55MWNQ6",
+        "images": [
+          "/assets/images/products/uploads/cet55_mwnq6_a0.webp?v=24144c5c",
+          "/assets/images/products/uploads/cet55_mwnq6_a3.webp?v=374df151",
+          "/assets/images/products/uploads/cet55_mwnq6_a8.webp?v=e3748c46",
+          "/assets/images/products/uploads/cet55_mwnq6_a91.webp?v=6b2f7649"
+        ]
+      },
+      {
+        "color": "Signature canvas/Matte Black/Black Signature",
+        "hex": "#5c5757",
+        "sku": "CET55MWNQ6",
+        "images": [
+          "/assets/images/products/uploads/cet55_mwoy2_a0.webp?v=179f43f7",
+          "/assets/images/products/uploads/cet55_mwoy2_a3.webp?v=f8fbe6b4",
+          "/assets/images/products/uploads/cet55_mwoy2_a8.webp?v=9af9e7b6",
+          "/assets/images/products/uploads/cet55_mwoy2_a91.webp?v=9c2c4a59"
+        ]
+      },
+      {
+        "color": "Pebbled leather/Black",
+        "hex": "#0b0000",
+        "sku": "CET55SV/BK",
+        "images": [
+          "/assets/images/products/uploads/cet66_svbk_a0.webp?v=091acb6c",
+          "/assets/images/products/uploads/cet66_svbk_a3.webp?v=2b9cf0f7",
+          "/assets/images/products/uploads/cet66_svbk_a8.webp?v=aeafdac1",
+          "/assets/images/products/uploads/cet66_svbk_a91.webp?v=4a0a2302"
+        ]
+      },
+      {
+        "color": "Pebbled leather/Maple",
+        "hex": "#641313",
+        "sku": "SVMPL",
+        "images": [
+          "/assets/images/products/uploads/cet66_svmpl_a0.webp?v=c6e1b50a",
+          "/assets/images/products/uploads/cet66_svmpl_a3.webp?v=bdefdd95",
+          "/assets/images/products/uploads/cet66_svmpl_a8.webp?v=5774d884",
+          "/assets/images/products/uploads/cet66_svmpl_a91.webp?v=2adbf71a"
+        ],
+        "colorFamily": "Коричневий"
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Регульований плечовий ремінь для носіння через плече або кросбоді",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "COACH",
+      "Coach Colton",
+      "Colton Crossbody Bag 19",
+      "сумка Coach",
+      "Coach кросбоді",
+      "сумка кросбоді",
+      "чоловіча сумка Coach",
+      "жіноча сумка Coach",
+      "шкіряна сумка",
+      "шкіряна сумка через плече",
+      "сумка через плече",
+      "кросбоді Coach",
+      "маленька сумка",
+      "компактна сумка",
+      "синя сумка",
+      "темно-синя сумка",
+      "брендові сумки",
+      "оригінальна Coach",
+      "сумка на кожен день"
+    ],
+    "isNew": false,
+    "title": "Чоловіча сумка COACH Colton Crossbody Bag 19 In Signature Canvas",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Компактна та практична сумка COACH Colton Crossbody Bag 19 — чудовий варіант для повсякденного використання. Модель виготовлена з високоякісної зернистої шкіри та має лаконічний дизайн із металевою фурнітурою сріблястого кольору.\nСумка закривається на блискавку та має зовнішню кишеню на блискавці з двома слотами для банківських карток. Компактний формат дозволяє зручно розмістити необхідні речі, а сумка вміщує навіть iPhone 14 Pro Max.\nРегульований ремінь дозволяє носити модель через плече або кросбоді, забезпечуючи комфорт у повсякденному використанні",
+    "rating": 5,
+    "category": "Чоловічі сумки",
+    "framing": {
+      "cet66_svsmu_a0.webp": {
+        "zoom": 1.4,
+        "x": 48,
+        "y": 68
+      },
+      "cet66_svsmu_a3.webp": {
+        "zoom": 1.51,
+        "x": 48,
+        "y": 68
+      },
+      "cet66_svsmu_a8.webp": {
+        "zoom": 1.49,
+        "x": 48,
+        "y": 50
+      },
+      "cet55_mwnq6_a0.webp": {
+        "zoom": 1.4,
+        "x": 48,
+        "y": 68
+      },
+      "cet55_mwnq6_a3.webp": {
+        "zoom": 1.8,
+        "x": 47,
+        "y": 69
+      },
+      "cet55_mwnq6_a8.webp": {
+        "zoom": 1.49,
+        "x": 49,
+        "y": 50
+      },
+      "cet55_mwoy2_a0.webp": {
+        "zoom": 1.38,
+        "x": 47,
+        "y": 68
+      },
+      "cet55_mwoy2_a3.webp": {
+        "zoom": 1.73,
+        "x": 46,
+        "y": 68
+      },
+      "cet55_mwoy2_a8.webp": {
+        "zoom": 1.49,
+        "x": 49,
+        "y": 50
+      },
+      "cet66_svbk_a0.webp": {
+        "zoom": 1.4,
+        "x": 48,
+        "y": 68
+      },
+      "cet66_svbk_a3.webp": {
+        "zoom": 1.53,
+        "x": 48,
+        "y": 68
+      },
+      "cet66_svbk_a8.webp": {
+        "zoom": 1.49,
+        "x": 48,
+        "y": 50
+      },
+      "cet66_svmpl_a0.webp": {
+        "zoom": 1.4,
+        "x": 48,
+        "y": 68
+      },
+      "cet66_svmpl_a3.webp": {
+        "zoom": 1.51,
+        "x": 48,
+        "y": 68
+      },
+      "cet66_svmpl_a8.webp": {
+        "zoom": 1.5,
+        "x": 48,
+        "y": 50
+      }
+    },
+    "legacySlugs": [
+      "чоловіча-сумка-coach-colton-crossbody-bag-19-in-signature-canvas"
+    ],
+    "slug": "cholovicha-sumka-coach-colton-crossbody-bag-19-in-signature-canvas",
+    "id": 86,
+    "color": "Deep Blue",
+    "images": [
+      "/assets/images/products/uploads/cet66_svsmu_a0.webp",
+      "/assets/images/products/uploads/cet66_svsmu_a3.webp",
+      "/assets/images/products/uploads/cet66_svsmu_a8.webp",
+      "/assets/images/products/uploads/cet66_svsmu_a91.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Нержавіюча сталь",
+    "brand": "Michael Kors",
+    "price": 7000,
+    "preOrder": true,
+    "dimensions": "Корпус — 2,8 см у діаметрі",
+    "variants": [
+      {
+        "color": "Золотистий",
+        "hex": "#e6cfaa",
+        "images": [
+          "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set.webp?v=19b8a9d9",
+          "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_2.webp?v=e7afb90b",
+          "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_3.webp?v=7b116d7b",
+          "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_5.webp?v=776d47c5"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Браслет із нержавіючої сталі",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Michael Kors",
+      "Michael Kors годинник",
+      "годинник Michael Kors",
+      "Petite Lexington",
+      "Michael Kors Petite Lexington",
+      "MK4944",
+      "MK4944SET",
+      "жіночий годинник",
+      "жіночий наручний годинник",
+      "кварцовий годинник",
+      "подарунковий набір",
+      "годинник у подарунок",
+      "брендовий годинник",
+      "оригінальний Michael Kors",
+      "класичний годинник",
+      "елегантний годинник",
+      "модний годинник"
+    ],
+    "isNew": false,
+    "title": "Годинник Michael Kors Petite Lexington Gift Set",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Елегантний подарунковий набір Michael Kors Petite Lexington — стильний аксесуар для повсякденних та особливих образів. Вишуканий дизайн годинника поєднує класичний циферблат, тонкий корпус та фірмову естетику Michael Kors.\nГодинник працює на кварцовому механізмі та має аналоговий циферблат. Компактний розмір корпусу робить модель витонченою та комфортною для щоденного носіння.\nНабір стане чудовим варіантом для подарунка завдяки презентабельному оформленню та універсальному дизайну",
+    "sku": "MK4944SET",
+    "rating": 5,
+    "category": "Годинники",
+    "legacySlugs": [
+      "годинник-michael-kors-petite-lexington-gift-set"
+    ],
+    "slug": "hodynnyk-michael-kors-petite-lexington-gift-set",
+    "id": 87,
+    "color": "Золотистий",
+    "images": [
+      "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set.webp",
+      "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_2.webp",
+      "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_3.webp",
+      "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_5.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Чоловікам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Нержавіюча сталь",
+    "brand": "Michael Kors",
+    "price": 6600,
+    "preOrder": true,
+    "dimensions": "Корпус — 4,4 см у діаметрі",
+    "variants": [
+      {
+        "color": "Чорний / золотистий",
+        "hex": "#1f2f8c",
+        "images": [
+          "/assets/images/products/uploads/загрузка.webp?v=6b354cc1",
+          "/assets/images/products/uploads/загрузка-1-.webp?v=af6915c8",
+          "/assets/images/products/uploads/загрузка-2-.webp?v=f55a0f58",
+          "/assets/images/products/uploads/загрузка-1-1-.webp?v=c7db06fb"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Браслет із нержавіючої сталі",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Michael Kors",
+      "Michael Kors Billie",
+      "Billie Chronograph",
+      "MK9254",
+      "годинник Michael Kors",
+      "чоловічий годинник",
+      "чоловічий наручний годинник",
+      "кварцовий годинник",
+      "годинник з хронографом",
+      "хронограф",
+      "металевий годинник",
+      "брендовий годинник",
+      "оригінальний Michael Kors",
+      "стильний чоловічий годинник",
+      "класичний чоловічий годинник",
+      "модний годинник"
+    ],
+    "isNew": false,
+    "title": "Чоловічий годинник Michael Kors Billie Chronograph",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильний чоловічий годинник Michael Kors Billie з функцією хронографа — поєднання спортивного характеру та класичної елегантності. Модель оснащена кварцовим механізмом, багатофункціональним циферблатом та міцним металевим браслетом.\nГодинник має виразний корпус і деталі циферблата, що створюють сучасний та впевнений образ. Завдяки універсальному дизайну модель підходить як для повсякденного носіння, так і для більш ділових образів",
+    "sku": "MK9254",
+    "rating": 5,
+    "category": "Годинники",
+    "legacySlugs": [
+      "чоловічий-годинник-michael-kors-billie-chronograph"
+    ],
+    "slug": "cholovichyi-hodynnyk-michael-kors-billie-chronograph",
+    "id": 88,
+    "color": "Чорний / золотистий",
+    "images": [
+      "/assets/images/products/uploads/загрузка.webp",
+      "/assets/images/products/uploads/загрузка-1-.webp",
+      "/assets/images/products/uploads/загрузка-2-.webp",
+      "/assets/images/products/uploads/загрузка-1-1-.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Чоловікам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Нержавіюча сталь",
+    "brand": "Michael Kors",
+    "price": 6000,
+    "preOrder": true,
+    "dimensions": "Корпус — 4,4 см у діаметрі",
+    "variants": [
+      {
+        "color": "Сріблястий / синій",
+        "hex": "#2d4ba7",
+        "images": [
+          "/assets/images/products/uploads/michael-kors-maritime-chronograph-quartz-blue-dial-mens-watch-mk9202_1.webp?v=cfad8a64",
+          "/assets/images/products/uploads/michael-kors-maritime-chronograph-quartz-blue-dial-mens-watch-mk9202_2.webp?v=27768112",
+          "/assets/images/products/uploads/michael-kors-maritime-chronograph-quartz-blue-dial-mens-watch-mk9202_3.webp?v=3ebf16bf"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Браслет із нержавіючої сталі",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Michael Kors",
+      "Michael Kors Maritime",
+      "Maritime Chronograph",
+      "MK9202",
+      "годинник Michael Kors",
+      "чоловічий годинник",
+      "чоловічий наручний годинник",
+      "кварцовий годинник",
+      "годинник з хронографом",
+      "хронограф",
+      "спортивний годинник",
+      "металевий годинник",
+      "годинник із синім циферблатом",
+      "синій циферблат",
+      "брендовий годинник",
+      "оригінальний Michael Kors",
+      "стильний чоловічий годинник"
+    ],
+    "isNew": false,
+    "title": "Чоловічий годинник Michael Kors Maritime Chronograph",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильний чоловічий годинник Michael Kors Maritime з функцією хронографа та виразним синім циферблатом. Модель поєднує спортивний дизайн із класичними деталями, завдяки чому легко доповнює повсякденні та ділові образи.\nГодинник оснащений кварцовим механізмом, аналоговим циферблатом і функцією хронографа. Міцний сталевий корпус та браслет забезпечують практичність і комфорт у щоденному використанні",
+    "sku": "MK9202",
+    "rating": 5,
+    "category": "Годинники",
+    "legacySlugs": [
+      "чоловічий-годинник-michael-kors-maritime-chronograph"
+    ],
+    "slug": "cholovichyi-hodynnyk-michael-kors-maritime-chronograph",
+    "id": 89,
+    "color": "Сріблястий / синій",
+    "images": [
+      "/assets/images/products/uploads/michael-kors-maritime-chronograph-quartz-blue-dial-mens-watch-mk9202_1.webp",
+      "/assets/images/products/uploads/michael-kors-maritime-chronograph-quartz-blue-dial-mens-watch-mk9202_2.webp",
+      "/assets/images/products/uploads/michael-kors-maritime-chronograph-quartz-blue-dial-mens-watch-mk9202_3.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Чоловікам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "brand": "Ray-Ban",
+    "price": 6400,
+    "preOrder": true,
+    "dimensions": "13,9 × 3,3 см; ширина лінзи — 6,3 см; міст — 1,5 см; довжина дужки — 12,5 см.",
+    "variants": [
+      {
+        "color": "Чорний / зелений",
+        "colorFamily": "Зелений",
+        "hex": "#7a8f59",
+        "images": [
+          "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasse-a6093c62.webp?v=229224e2",
+          "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasse-d4cf8613.webp?v=9c8d2a79",
+          "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasse-c873f7c8.webp?v=3dcc20af",
+          "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasse-dfb377a8.webp?v=0114f5da"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Тонкі металеві дужки",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Ray-Ban",
+      "Ray-Ban RB3183",
+      "RB3183",
+      "RB3183 006/71 63",
+      "сонцезахисні окуляри Ray-Ban",
+      "чоловічі окуляри",
+      "чоловічі сонцезахисні окуляри",
+      "прямокутні окуляри",
+      "окуляри з зеленими лінзами",
+      "зелені лінзи",
+      "брендові окуляри",
+      "оригінальні Ray-Ban",
+      "окуляри Ray-Ban чоловічі",
+      "металеві окуляри",
+      "окуляри від сонця"
+    ],
+    "isNew": false,
+    "title": "Сонцезахисні окуляри Ray-Ban RB3183",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильні чоловічі сонцезахисні окуляри Ray-Ban RB3183 із прямокутною формою оправи. Лаконічний дизайн моделі поєднує спортивний характер із фірмовою естетикою Ray-Ban.\nЗелені лінзи забезпечують комфортне сприйняття яскравого світла, а легка металева оправа робить окуляри зручними для щоденного носіння. Універсальна прямокутна форма добре доповнює сучасні повсякденні образи",
+    "sku": "RB3183006/7163",
+    "rating": 5,
+    "category": "Окуляри і оправи",
+    "legacySlugs": [
+      "сонцезахисні-окуляри-ray-ban-rb3183"
+    ],
+    "slug": "sontsezakhysni-okuliary-ray-ban-rb3183",
+    "id": 90,
+    "color": "Чорний / зелений",
+    "images": [
+      "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasse-a6093c62.webp",
+      "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasse-d4cf8613.webp",
+      "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasse-c873f7c8.webp",
+      "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasse-dfb377a8.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Чоловікам",
+      "Унісекс"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Ацетат",
+    "brand": "Ray-Ban",
+    "price": 5900,
+    "preOrder": true,
+    "dimensions": "13,7 × 4,7 см; ширина лінзи — 5 см; міст — 2,1 см; довжина дужки — 14 см",
+    "variants": [
+      {
+        "color": "Зелений / прозорий",
+        "hex": "#596053",
+        "images": [
+          "/assets/images/products/uploads/ray-ban-green-irregular-unisex-sunglasses-rb4451-630631-50.webp?v=6ec43da4",
+          "/assets/images/products/uploads/ray-ban-green-irregular-unisex-sunglasses-rb4451-630631-50_2.webp?v=dbe12c80",
+          "/assets/images/products/uploads/ray-ban-green-irregular-unisex-sunglasses-rb4451-630631-50_4.webp?v=cfd60fb6",
+          "/assets/images/products/uploads/ray-ban-green-irregular-unisex-sunglasses-rb4451-630631-50_10.webp?v=0114f5da"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Пластикові дужки",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Ray-Ban",
+      "Ray-Ban RB4451",
+      "RB4451",
+      "RB4451 630631 50",
+      "сонцезахисні окуляри Ray-Ban",
+      "окуляри Ray-Ban",
+      "унісекс окуляри",
+      "жіночі окуляри",
+      "чоловічі окуляри",
+      "сонцезахисні окуляри",
+      "окуляри з зеленими лінзами",
+      "зелені лінзи",
+      "окуляри неправильної форми",
+      "незвичайна форма окулярів",
+      "брендові окуляри",
+      "оригінальні Ray-Ban",
+      "модні окуляри"
+    ],
+    "isNew": false,
+    "title": "Сонцезахисні окуляри Ray-Ban RB4451",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильні сонцезахисні окуляри Ray-Ban RB4451 з оригінальною неправильною формою оправи. Універсальна модель із сучасним дизайном, яка легко доповнить як жіночі, так і чоловічі образи.\nЗелені лінзи та виразна оправа створюють ефектний акцент в образі, а легка конструкція забезпечує комфорт під час щоденного носіння. Модель чудово підійде для міських образів, відпочинку та подорожей",
+    "sku": "RB445163063150",
+    "rating": 5,
+    "category": "Окуляри і оправи",
+    "legacySlugs": [
+      "сонцезахисні-окуляри-ray-ban-rb4451"
+    ],
+    "slug": "sontsezakhysni-okuliary-ray-ban-rb4451",
+    "id": 91,
+    "color": "Зелений / прозорий",
+    "images": [
+      "/assets/images/products/uploads/ray-ban-green-irregular-unisex-sunglasses-rb4451-630631-50.webp",
+      "/assets/images/products/uploads/ray-ban-green-irregular-unisex-sunglasses-rb4451-630631-50_2.webp",
+      "/assets/images/products/uploads/ray-ban-green-irregular-unisex-sunglasses-rb4451-630631-50_4.webp",
+      "/assets/images/products/uploads/ray-ban-green-irregular-unisex-sunglasses-rb4451-630631-50_10.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Чоловікам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Ацетат",
+    "brand": "Ray-Ban",
+    "price": 4900,
+    "preOrder": true,
+    "dimensions": "14,1 × 4,5 см; ширина лінзи — 5,5 см; міст — 1,8 см; довжина дужки — 14 см",
+    "variants": [
+      {
+        "color": "Чорний / зелений",
+        "hex": "#2c6044",
+        "images": [
+          "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-s-72af81a8.jpg?v=1df2740b",
+          "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-s-0f4f3c17.jpg?v=bde310da",
+          "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-s-e881ab77.jpg?v=9a2823b9",
+          "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-s-f4bc13e6.jpg?v=a4470357"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Ацетатні дужки",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Ray-Ban",
+      "Ray-Ban Burbank",
+      "Burbank RB2283",
+      "RB2283",
+      "RB2283 901/31 55",
+      "сонцезахисні окуляри Ray-Ban",
+      "чоловічі окуляри",
+      "чоловічі сонцезахисні окуляри",
+      "прямокутні окуляри",
+      "зелені окуляри",
+      "окуляри із зеленими лінзами",
+      "зелені лінзи",
+      "брендові окуляри",
+      "оригінальні Ray-Ban",
+      "окуляри Ray-Ban чоловічі",
+      "модні окуляри"
+    ],
+    "isNew": false,
+    "title": "Сонцезахисні окуляри Ray-Ban Burbank RB2283",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильні чоловічі сонцезахисні окуляри Ray-Ban Burbank RB2283 із прямокутною формою оправи. Модель поєднує класичний силует із сучасними деталями та фірмовою естетикою Ray-Ban.\nЗелені лінзи гармонійно доповнюють оправу та забезпечують комфортне сприйняття яскравого світла. Універсальна форма чудово підходить для повсякденних образів і легко поєднується з різним стилем одягу",
+    "sku": "RB2283901/3155",
+    "rating": 5,
+    "category": "Окуляри і оправи",
+    "legacySlugs": [
+      "сонцезахисні-окуляри-ray-ban-burbank-rb2283"
+    ],
+    "slug": "sontsezakhysni-okuliary-ray-ban-burbank-rb2283",
+    "id": 92,
+    "color": "Чорний / зелений",
+    "images": [
+      "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-s-72af81a8.jpg",
+      "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-s-0f4f3c17.jpg",
+      "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-s-e881ab77.jpg",
+      "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-s-f4bc13e6.jpg"
+    ]
+  },
+  {
+    "gender": [
+      "Чоловікам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Метал",
+    "brand": "Ray-Ban",
+    "price": 7800,
+    "preOrder": true,
+    "dimensions": "14,0 × 4,8 см; ширина лінзи — 6 см; міст — 1,7 см; довжина дужки — 13,5 см",
+    "variants": [
+      {
+        "color": "Коричневий / золотистий",
+        "hex": "#845c3d",
+        "images": [
+          "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-1db8136f.webp?v=c87f9676",
+          "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-d6f54bf0.webp?v=c0d14189",
+          "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-4b1f82a5.webp?v=3b38241c",
+          "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-960c6b7f.webp?v=0114f5da"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Металеві дужки",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Ray-Ban",
+      "Ray-Ban RB3498",
+      "RB3498",
+      "RB3498 029/T5 61",
+      "сонцезахисні окуляри Ray-Ban",
+      "чоловічі окуляри",
+      "чоловічі сонцезахисні окуляри",
+      "прямокутні окуляри",
+      "поляризовані окуляри",
+      "поляризація",
+      "окуляри з коричневими лінзами",
+      "коричневі лінзи",
+      "градієнтні лінзи",
+      "окуляри від сонця",
+      "брендові окуляри",
+      "оригінальні Ray-Ban",
+      "спортивні окуляри",
+      "окуляри Ray-Ban чоловічі"
+    ],
+    "isNew": false,
+    "title": "Сонцезахисні окуляри Ray-Ban RB3498",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильні чоловічі сонцезахисні окуляри Ray-Ban RB3498 із прямокутною формою оправи. Модель поєднує сучасний спортивний дизайн із фірмовою естетикою Ray-Ban.\nОкуляри оснащені поляризованими лінзами з коричневим градієнтом, які допомагають зменшити відблиски та забезпечують комфортне сприйняття яскравого світла. Лаконічна форма та універсальний дизайн чудово підходять для повсякденного використання, подорожей і відпочинку",
+    "sku": "RB3498029/T561",
+    "rating": 5,
+    "category": "Окуляри і оправи",
+    "legacySlugs": [
+      "сонцезахисні-окуляри-ray-ban-rb3498"
+    ],
+    "slug": "sontsezakhysni-okuliary-ray-ban-rb3498",
+    "id": 93,
+    "color": "Коричневий / золотистий",
+    "images": [
+      "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-1db8136f.webp",
+      "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-d6f54bf0.webp",
+      "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-4b1f82a5.webp",
+      "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-960c6b7f.webp"
     ]
   }
 ]

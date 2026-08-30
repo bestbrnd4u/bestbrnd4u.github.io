@@ -2703,7 +2703,37 @@ function getProductColors(product) {
 
     const colors = new Map(); // назва -> hex
 
-    (product.variants || []).forEach(variant => {
+    const variants = product.variants || [];
+
+    // КАРТКА, РОЗГОРНУТА ПО КОЛЬОРУ, — ЦЕ ОДИН КОЛІР
+    //
+    // Каталог розкладає товар на кілька карток, по одній на колір
+    // (splitProductsByColor). Кожна картка носить УСІ варіанти —
+    // потрібний просто стоїть першим, — а який із них її власний,
+    // сказано в cardColor.
+    //
+    // Без цієї перевірки картка «Карамельний» відповідала й за зелений,
+    // і за чорний. Наслідків було два, і обидва помітив власник:
+    //
+    //   • фільтр «Помаранчевий» видавав ту саму сумку двічі —
+    //     карамельну й зелену: підходила одна, а лишались обидві;
+    //   • у фільтрі кожна картка додавала всі свої кольори, тож
+    //     кольорів у списку було більше, ніж карток під ними.
+    if (product.cardColor) {
+
+        const own = variants.find(variant => variant.color === product.cardColor);
+
+        if (own) {
+
+            colors.set(own.color, own.hex || null);
+
+            return colors;
+
+        }
+
+    }
+
+    variants.forEach(variant => {
 
         if (variant.color && !colors.has(variant.color)) {
             colors.set(variant.color, variant.hex || null);
@@ -3032,13 +3062,79 @@ function colorFamily(name, hex) {
 // names потрібні у підказці фільтра: під пунктом «Бежевий» можуть
 // лежати «Бежевий», «Тауп» і «Бежево-кремовий» — і побачити це
 // корисно, інакше незрозуміло, чому товар знайшовся.
+// Рішення з адмінки: «цей колір шукати під позначкою Білий».
+//
+// НАВІЩО. Фільтр показує не назви, а сімʼї — одна позначка «Білий»
+// замість Chalk, Ivory, Off-white і ще десятка назв від постачальників.
+// Сімʼю вгадує colorFamily(): спершу за словом у назві, далі за
+// кружечком кольору.
+//
+// Вгадує добре, але не завжди. «Chalk» англійською фільтру нічого не
+// каже, а свотч #e6e1e1 світлий рівно настільки, щоб залежати від межі:
+// трохи темніший — і білий колір поїде в «Сірий». Сперечатися з
+// автоматикою порогами не варто — простіше дати сказати прямо.
+//
+// СВОЮ ПОЗНАЧКУ ТЕЖ МОЖНА
+//
+// Спершу тут стояла перевірка «є серед п'ятнадцяти вбудованих — беремо,
+// немає — ігноруємо». Вона захищала від застарілих значень у даних, але
+// заразом робила неможливим найпростіше: додати «Бірюзовий» під товар,
+// у якого його справді треба.
+//
+// Тому тепер приймаємо будь-яку осмислену позначку, а порядок у фільтрі
+// вирішує orderColorFamilies() нижче: вбудовані йдуть звичним рядом,
+// дописані — за ними.
+//
+// 40 символів — це вже опис, а не позначка у фільтрі; такому в списку
+// не місце, хай там опиниться воно хоч як.
+function chosenColorFamily(variant) {
+
+    const value = variant && typeof variant.colorFamily === "string"
+        ? variant.colorFamily.trim()
+        : "";
+
+    return value && value.length <= 40 ? value : null;
+
+}
+
+// Порядок сімей у фільтрі.
+//
+// Вбудовані — у своєму, продуманому порядку: алфавіт розкидав би
+// найчастіші «Білий», «Сірий» і «Чорний» по трьох кінцях списку.
+// Дописані в адмінці йдуть після них за абеткою — інакше нова позначка
+// або зникала б із фільтра зовсім (так було), або вклинювалась між
+// звичними пунктами й перемішувала б їх щоразу.
+function orderColorFamilies(families) {
+
+    const present = families instanceof Set ? families : new Set(families || []);
+
+    const extra = [...present]
+        .filter(name => !COLOR_FAMILY_ORDER.includes(name))
+        .sort((a, b) => a.localeCompare(b, "uk"));
+
+    return COLOR_FAMILY_ORDER.filter(name => present.has(name)).concat(extra);
+
+}
+
 function getProductColorFamilies(product) {
 
     const families = new Map();
 
+    const chosen = new Map();   // назва кольору -> сімʼя з адмінки
+
+    (product.variants || []).forEach(variant => {
+
+        const family = chosenColorFamily(variant);
+
+        if (variant && variant.color && family && !chosen.has(variant.color)) {
+            chosen.set(variant.color, family);
+        }
+
+    });
+
     getProductColors(product).forEach((hex, name) => {
 
-        const family = colorFamily(name, hex);
+        const family = chosen.get(name) || colorFamily(name, hex);
 
         if (!families.has(family)) {
             families.set(family, { hex: hex || null, names: [] });
@@ -3051,6 +3147,108 @@ function getProductColorFamilies(product) {
     });
 
     return families;
+
+}
+
+// ======================================
+// ТОВАРИ АКЦІЇ — ОДНЕ ПРАВИЛО НА ВЕСЬ САЙТ
+// ======================================
+//
+// ЧОМУ ТУТ, А НЕ НА КОЖНІЙ СТОРІНЦІ
+// ----------------------------------
+// Правило жило у двох місцях — assets/js/app.js (головна) і
+// assets/js/promo.js (сторінка акції) — і вже встигло розійтись:
+// головна зберігала порядок, у якому адмін перетягнув товари, а
+// сторінка акції віддавала їх у порядку каталогу. Тобто той самий
+// набір товарів виглядав по-різному залежно від того, звідки на нього
+// подивитись.
+//
+// ЯК НАБИРАЄТЬСЯ СПИСОК
+// ----------------------
+//   1. обрані вручну — у тому порядку, у якому вони в адмінці;
+//   2. товари бренду акції, якщо підхоплення бренду не вимкнене;
+//   3. товари з розділів і категорій, перелічених в автопідхопленні.
+//
+// Пункти 2 і 3 — ПРАВИЛА, а не знімки: товар, доданий у каталог
+// завтра, потрапить в акцію сам. Пункт 1 лишається знімком, і це
+// навмисно: обраний вручну товар має лишатись у списку, навіть якщо
+// завтра йому змінять категорію.
+//
+// Дублікати прибираються, порядок зберігається — саме тому тут цикл,
+// а не три filter із конкатенацією.
+function promotionProducts(promo, allProducts, departmentOf) {
+
+    const byId = new Map((allProducts || []).map(product => [product.id, product]));
+
+    const seen = new Set();
+    const out = [];
+
+    const push = product => {
+
+        if (!product || seen.has(product.id)) return;
+
+        seen.add(product.id);
+        out.push(product);
+
+    };
+
+    (promo.productIds || []).forEach(id => push(byId.get(id)));
+
+    // Бренд підхоплюється, поки його явно не вимкнули. Так поводились
+    // обидві сторінки до появи прапорця, тож уже опубліковані акції
+    // нічого не помічають.
+    if (promo.brand && promo.autoBrand !== false) {
+
+        (allProducts || []).forEach(product => {
+            if (product.brand === promo.brand) push(product);
+        });
+
+    }
+
+    const sections = new Set(promo.autoSections || []);
+
+    if (sections.size) {
+
+        (allProducts || []).forEach(product => {
+
+            const category = product.category;
+
+            if (!category) return;
+
+            // У списку може стояти і категорія («Жіночі сумки»), і цілий
+            // розділ («Сумки») — розділ розгортається через довідник
+            // категорій.
+            const department = departmentOf ? departmentOf.get(category) : null;
+
+            if (sections.has(category) || (department && sections.has(department))) {
+                push(product);
+            }
+
+        });
+
+    }
+
+    return out;
+
+}
+
+// Довідник «категорія → розділ». Потрібен, щоб розгорнути розділ у
+// перелік його категорій; кешуємо, бо сторінка акції просить його
+// разом із каталогом, а головна — окремо.
+let departmentOfCache = null;
+
+function loadDepartmentOf() {
+
+    if (departmentOfCache) return departmentOfCache;
+
+    departmentOfCache = fetch(dataUrl("data/categories.json"))
+        .then(response => response.ok ? response.json() : [])
+        .then(list => new Map((Array.isArray(list) ? list : [])
+            .filter(item => item && item.name)
+            .map(item => [item.name, item.department])))
+        .catch(() => new Map());
+
+    return departmentOfCache;
 
 }
 
@@ -3148,6 +3346,31 @@ function productUrl(product, params) {
 
     // прибираємо порожні значення, щоб не плодити ?color=&size=
     [...query.keys()].forEach(k => { if (!query.get(k)) query.delete(k); });
+
+    // Колір в адресу йде латиницею.
+    //
+    // «?color=Бежевий» браузер показує як
+    // ?color=%D0%91%D0%B5%D0%B6%D0%B5%D0%B2%D0%B8%D0%B9 — 42 символи
+    // замість восьми. Таке посилання не вставиш ні в пост, ні в
+    // сторіс, а в месенджері воно ще й переноситься навпіл.
+    //
+    // Те саме правило вже діє у фільтрі каталогу (latinParam у
+    // catalog.js) і в адресах самих товарів та акцій — цей рядок
+    // добиває останнє місце, де кирилиця лишалась.
+    //
+    // РОЗМІР НЕ ЧІПАЄМО: ONESIZE, S, M — там кирилиці не буває.
+    //
+    // Немає Translit (не підключився) — лишаємо як є: довга адреса
+    // неприємна, мовчазно зламане посилання гірше.
+    const color = query.get("color");
+
+    if (color && window.Translit) {
+
+        const latin = window.Translit.toSlug(color);
+
+        if (latin) query.set("color", latin);
+
+    }
 
     const qs = query.toString();
 
