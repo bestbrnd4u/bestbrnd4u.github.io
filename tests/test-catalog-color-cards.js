@@ -216,5 +216,112 @@ console.log("\n[6] Назва кольору в картці");
         /color:var\(--gray500\)/.test(rule) && /font-size:13px/.test(rule), rule);
 }
 
+console.log("\n[N] Розгорнута по кольору картка відповідає за ОДИН колір");
+{
+    // ЩО БУЛО НЕ ТАК
+    // ---------------
+    // Каталог розкладає товар на кілька карток, по одній на колір. Але
+    // кожна картка носить УСІ варіанти (потрібний просто стоїть
+    // першим), і getProductColorFamilies() бачив їх усі. Тобто картка
+    // «Карамельний» відповідала й за зелений, і за чорний.
+    //
+    // Власник помітив обидва наслідки:
+    //
+    //   • фільтр «Помаранчевий» видавав ту саму сумку двічі —
+    //     карамельну й зелену: підходила одна, а лишались обидві;
+    //   • число поруч із кольором не збігалося з «Знайдено N товарів»:
+    //     кожна картка додавала до лічильника всі свої кольори.
+    const catalogSrc = fs.readFileSync(path.join(ROOT, "assets/js/catalog.js"), "utf8");
+    const commonSrc = fs.readFileSync(path.join(ROOT, "assets/js/common.js"), "utf8");
+
+    const env = new Function(
+        commonSrc.match(/function getProductColors[\s\S]*?\n\}/)[0]
+        + commonSrc.slice(commonSrc.indexOf("const COLOR_FAMILIES"),
+            commonSrc.indexOf("function getDiscountPercent"))
+        + catalogSrc.match(/function splitProductsByColor[\s\S]*?\n\}\n/)[0]
+        + "; return { splitProductsByColor, getProductColorFamilies };"
+    )();
+
+    // Вихідні файли товарів, а не згенерований агрегат
+    // (правило з tests/test-migration-types.js): агрегат — результат
+    // збірки, і тест на ньому перевіряв би збірку, а не дані.
+    const source = fs.readdirSync(path.join(ROOT, "data/products"))
+        .filter(f => f.endsWith(".json"))
+        .map(f => JSON.parse(fs.readFileSync(path.join(ROOT, "data/products", f), "utf8")))
+        .filter(p => typeof p.id === "number");
+
+    const cards = env.splitProductsByColor(source);
+
+    const familiesOf = card => new Set(env.getProductColorFamilies(card).keys());
+
+    check("каталог справді розкладає товари по кольорах",
+        cards.length > 0 && cards.some(c => c.cardColor), String(cards.length));
+
+    // ГОЛОВНЕ ПРАВИЛО. Розгорнута картка — це один колір, тож і сімʼя
+    // в неї рівно одна. Інакше вона знайдеться під двома фільтрами
+    // одразу, і покупець побачить той самий товар двічі.
+    const багатоколірні = cards.filter(c => c.cardColor && familiesOf(c).size > 1);
+
+    check("у розгорнутої картки рівно одна сімʼя кольору",
+        багатоколірні.length === 0,
+        багатоколірні.slice(0, 3).map(c => `${c.title} (${c.cardColor})`).join("; "));
+
+    // Наслідок, який видно у фільтрі: сума по сімʼях мусить дорівнювати
+    // кількості карток. Розійдеться — значить, якась картка рахується
+    // двічі, і число поруч із кольором знову збреше.
+    const families = new Set();
+
+    cards.forEach(card => familiesOf(card).forEach(f => families.add(f)));
+
+    const сума = [...families]
+        .reduce((total, f) => total + cards.filter(c => familiesOf(c).has(f)).length, 0);
+
+    check("сума по сімʼях дорівнює кількості карток",
+        сума === cards.length, `${сума} проти ${cards.length}`);
+
+    // Живий випадок від власника: помаранчевий фільтр видавав
+    // карамельну сумку І її ж зелений варіант.
+    const помаранчеві = cards.filter(c => familiesOf(c).has("Помаранчевий"));
+
+    check("під «Помаранчевий» немає зайвих кольорів",
+        помаранчеві.every(c => !c.cardColor || familiesOf(c).has("Помаранчевий")),
+        помаранчеві.map(c => c.cardColor).join(", "));
+
+    check("той самий товар не потрапляє двічі",
+        new Set(помаранчеві.map(c => c.id)).size === помаранчеві.length,
+        помаранчеві.map(c => `${c.id}/${c.cardColor}`).join(", "));
+
+    // І сам механізм: без cardColor картка й далі відповідає за всі
+    // свої кольори — це нерозгорнутий товар, там так і треба.
+    check("нерозгорнутий товар лишається з усіма кольорами",
+        cards.filter(c => !c.cardColor).every(c => familiesOf(c).size >= 1));
+
+    check("правило живе в getProductColors, а не в каталозі",
+        /if \(product\.cardColor\)/.test(commonSrc));
+}
+
+console.log("\n[N+1] Число поруч із кольором — це товари");
+{
+    // Тут стояло names.length — кількість відтінків, зведених у сімʼю.
+    // Тобто «Синій 3» означало «сюди зведено три назви», а не «три
+    // товари»: натискаєш — і каталог пише «Знайдено 14 товарів».
+    const catalogSrc = fs.readFileSync(path.join(ROOT, "assets/js/catalog.js"), "utf8");
+
+    check("лічильник рахує картки, а не назви відтінків",
+        /counts\.set\(family, \(counts\.get\(family\) \|\| 0\) \+ 1\)/.test(catalogSrc));
+
+    check("у розмітку йде саме він",
+        /const count = counts\.get\(family\) \|\| 0;/.test(catalogSrc)
+        && /filter-option-note">\$\{count\}/.test(catalogSrc));
+
+    check("старого names.length у розмітці немає",
+        !/filter-option-note">\$\{names\.length\}/.test(catalogSrc));
+
+    // Скільки назв злилось — усе ще корисно, але це підказка при
+    // наведенні, а не число поруч.
+    check("перелік відтінків лишився в підказці",
+        /option\.title = names\.length > 1/.test(catalogSrc));
+}
+
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
 process.exit(failures === 0 ? 0 : 1);

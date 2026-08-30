@@ -1254,12 +1254,15 @@ function fillColors() {
     // покупець. Правила зведення — у colorFamily() в common.js.
     const families = new Map(); // сім'я -> Set назв, що в неї увійшли
     const swatches = new Map(); // сім'я -> колір кружечка
+    const counts = new Map();   // сім'я -> скільки товарів знайдеться
 
     products.forEach(product => {
 
         getProductColorFamilies(product).forEach((info, family) => {
 
             if (!families.has(family)) families.set(family, new Set());
+
+            counts.set(family, (counts.get(family) || 0) + 1);
 
             info.names.forEach(name => families.get(family).add(name));
 
@@ -1296,11 +1299,23 @@ function fillColors() {
             ? `${family}: ${names.join(", ")}`
             : family;
 
+        // Число поруч — СКІЛЬКИ ТОВАРІВ знайдеться.
+        //
+        // ЩО БУЛО НЕ ТАК. Тут стояло names.length — кількість відтінків,
+        // зведених у цю сімʼю. Тобто «Синій 3» означало «сюди зведено
+        // три назви», а не «три товари». Натискаєш — і каталог пише
+        // «Знайдено 14 товарів».
+        //
+        // Число поруч із фільтром читається однозначно: стільки й буде.
+        // Скільки назв злилось — це підказка при наведенні, там воно й
+        // лишається.
+        const count = counts.get(family) || 0;
+
         option.innerHTML = `
             <span class="filter-checkbox"></span>
             <span class="filter-color-swatch" style="background:${swatch}"></span>
             ${escapeHtml(family)}
-            ${names.length > 1 ? `<span class="filter-option-note">${names.length}</span>` : ""}
+            <span class="filter-option-note">${count}</span>
         `;
 
         option.addEventListener("click", () => toggleColor(family));

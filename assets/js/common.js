@@ -2703,7 +2703,37 @@ function getProductColors(product) {
 
     const colors = new Map(); // назва -> hex
 
-    (product.variants || []).forEach(variant => {
+    const variants = product.variants || [];
+
+    // КАРТКА, РОЗГОРНУТА ПО КОЛЬОРУ, — ЦЕ ОДИН КОЛІР
+    //
+    // Каталог розкладає товар на кілька карток, по одній на колір
+    // (splitProductsByColor). Кожна картка носить УСІ варіанти —
+    // потрібний просто стоїть першим, — а який із них її власний,
+    // сказано в cardColor.
+    //
+    // Без цієї перевірки картка «Карамельний» відповідала й за зелений,
+    // і за чорний. Наслідків було два, і обидва помітив власник:
+    //
+    //   • фільтр «Помаранчевий» видавав ту саму сумку двічі —
+    //     карамельну й зелену: підходила одна, а лишались обидві;
+    //   • у фільтрі кожна картка додавала всі свої кольори, тож
+    //     кольорів у списку було більше, ніж карток під ними.
+    if (product.cardColor) {
+
+        const own = variants.find(variant => variant.color === product.cardColor);
+
+        if (own) {
+
+            colors.set(own.color, own.hex || null);
+
+            return colors;
+
+        }
+
+    }
+
+    variants.forEach(variant => {
 
         if (variant.color && !colors.has(variant.color)) {
             colors.set(variant.color, variant.hex || null);
