@@ -38,6 +38,8 @@ function installColorFamilies(window) {
         // його першим рядком, і без нього стенд падав із
         // ReferenceError ще на розкладці фільтрів.
         /function chosenColorFamily[\s\S]*?\n}\n/,
+        // Порядок сімей у фільтрі — fillColors() кличе його щоразу.
+        /function orderColorFamilies[\s\S]*?\n}\n/,
         /function getProductColorFamilies[\s\S]*?\n}\n/
     ].forEach(pattern => window.eval(common.match(pattern)[0]));
 

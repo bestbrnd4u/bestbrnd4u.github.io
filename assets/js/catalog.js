@@ -1104,6 +1104,7 @@ function fillColors() {
     // Тому пунктів рівно стільки, скільки кольорів справді розрізняє
     // покупець. Правила зведення — у colorFamily() в common.js.
     const families = new Map(); // сім'я -> Set назв, що в неї увійшли
+    const swatches = new Map(); // сім'я -> колір кружечка
 
     products.forEach(product => {
 
@@ -1113,15 +1114,23 @@ function fillColors() {
 
             info.names.forEach(name => families.get(family).add(name));
 
+            // Кружечок для дописаної в адмінці позначки: у
+            // COLOR_FAMILIES її немає, тож беремо свотч першого товару,
+            // який до неї потрапив. Інакше «Бірюзовий» стояв би у
+            // фільтрі сірою крапкою.
+            if (info.hex && !swatches.has(family)) swatches.set(family, info.hex);
+
         });
 
     });
 
-    // Порядок — з COLOR_FAMILY_ORDER, а не алфавітний: алфавіт розкидав
-    // би найчастіші «Білий», «Сірий» і «Чорний» по трьох кінцях списку.
-    COLOR_FAMILY_ORDER.filter(family => families.has(family)).forEach(family => {
+    // Порядок вирішує orderColorFamilies() у common.js: вбудовані
+    // звичним рядом, дописані в адмінці — за ними.
+    orderColorFamilies(new Set(families.keys())).forEach(family => {
 
-        const swatch = COLOR_FAMILIES.find(item => item.name === family)?.hex || "#e5e7eb";
+        const swatch = COLOR_FAMILIES.find(item => item.name === family)?.hex
+            || swatches.get(family)
+            || "#e5e7eb";
 
         const names = [...families.get(family)].sort((a, b) => a.localeCompare(b, "uk"));
 

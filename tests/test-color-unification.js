@@ -45,10 +45,13 @@ const { normalizeColorName, normalizeProductColors } = require("../scripts/norma
 
 // Сім'ї беремо з САМОГО common.js, а не копіюємо: копія розійшлася б із
 // оригіналом, і тест перевіряв би не те, що на сайті.
-const { colorFamily, COLOR_FAMILY_ORDER, getProductColorFamilies } = new Function(
+const {
+    colorFamily, COLOR_FAMILY_ORDER, getProductColorFamilies, orderColorFamilies
+} = new Function(
     common.match(/function getProductColors[\s\S]*?\n\}/)[0]
     + common.slice(common.indexOf("const COLOR_FAMILIES"), common.indexOf("function getDiscountPercent"))
-    + "; return { colorFamily, COLOR_FAMILY_ORDER, getProductColorFamilies };"
+    + "; return { colorFamily, COLOR_FAMILY_ORDER, getProductColorFamilies,"
+    + " orderColorFamilies };"
 )();
 
 console.log("\n[1] Зведення назв");
@@ -248,8 +251,13 @@ console.log("\n[6] Фільтр працює сім'ями");
     check("пункти будуються з сімей",
         /getProductColorFamilies\(product\)\.forEach\(\(info, family\)/.test(catalog));
 
-    check("порядок пунктів — з COLOR_FAMILY_ORDER",
-        /COLOR_FAMILY_ORDER\.filter\(family => families\.has\(family\)\)/.test(catalog));
+    // Раніше тут стояв COLOR_FAMILY_ORDER.filter(...) прямо в каталозі.
+    // Він відкидав усе, чого немає серед вбудованих, — тобто дописану
+    // в адмінці позначку у фільтр не пускав узагалі. Порядок переїхав
+    // в orderColorFamilies(), деталі — у розділі [Z].
+    check("порядок пунктів — з orderColorFamilies",
+        /orderColorFamilies\(new Set\(families\.keys\(\)\)\)/.test(catalog)
+        && !/COLOR_FAMILY_ORDER\.filter\(family => families\.has\(family\)\)/.test(catalog));
 
     check("фільтрація теж сім'ями",
         /const productFamilies = new Set\(getProductColorFamilies\(product\)\.keys\(\)\)/.test(catalog));
@@ -353,33 +361,189 @@ console.log("\n[Y] Сімʼю для фільтра можна задати з �
     check("три різні назви — одна позначка у фільтрі",
         різніБілі.length === 1 && різніБілі[0] === "Білий", різніБілі.join(", "));
 
-    // Дані переживають правки config.yml: значення, якого немає серед
-    // сімей, мусить бути проігнороване, а не потрапити у фільтр.
-    const сміття = [...getProductColorFamilies({
-        variants: [Object.assign({}, chalk, { colorFamily: "Смарагдовий" })]
+    // СВОЯ ПОЗНАЧКА
+    //
+    // Список сімей не константа світу: зʼявиться бірюзова лінійка — і
+    // покласти її нікуди. Раніше тут стояла перевірка «немає серед
+    // вбудованих — ігноруємо», і саме вона це блокувала.
+    const своя = [...getProductColorFamilies({
+        variants: [Object.assign({}, chalk, { colorFamily: "Бірюзовий" })]
     }).keys()];
 
-    check("невідома сімʼя ігнорується",
-        !сміття.includes("Смарагдовий"), сміття.join(", "));
+    check("своя позначка доходить до фільтра",
+        своя.length === 1 && своя[0] === "Бірюзовий", своя.join(", "));
 
-    // Поле мусить бути в адмінці, інакше задати його нема де.
+    // Але не будь-що: опис замість позначки у фільтрі не потрібен.
+    const довге = [...getProductColorFamilies({
+        variants: [Object.assign({}, chalk, {
+            colorFamily: "Дуже світлий відтінок слонової кістки з теплим підтоном"
+        })]
+    }).keys()];
+
+    check("опис замість позначки не приймається",
+        !довге.some(name => name.length > 40), довге.join(", "));
+
+    // Порожнє поле — це «вирішуй сам», а не позначка з пробілів.
+    const порожнє = [...getProductColorFamilies({
+        variants: [Object.assign({}, chalk, { colorFamily: "   " })]
+    }).keys()];
+
+    check("порожнє поле віддає рішення сайту",
+        порожнє.length === 1 && порожнє[0] === "Білий", порожнє.join(", "));
+}
+
+console.log("\n[Z] Порядок сімей у фільтрі");
+{
+    // Вбудовані йдуть своїм, продуманим рядом: алфавіт розкидав би
+    // найчастіші «Білий», «Сірий» і «Чорний» по трьох кінцях списку.
+    // Дописані в адмінці — після них за абеткою: інакше нова позначка
+    // або зникала б із фільтра зовсім (так і було), або вклинювалась
+    // між звичними пунктами й перемішувала б їх щоразу.
+    const порядок = orderColorFamilies(
+        new Set(["Бірюзовий", "Білий", "Чорний", "Аквамарин", "Сірий"]));
+
+    check("вбудовані попереду, у своєму порядку",
+        порядок.slice(0, 3).join(",") === "Чорний,Білий,Сірий", порядок.join(","));
+
+    check("дописані — після них за абеткою",
+        порядок.slice(3).join(",") === "Аквамарин,Бірюзовий", порядок.join(","));
+
+    check("нічого не загубилось", порядок.length === 5, порядок.join(","));
+
+    // Фільтр каталогу мусить користуватись саме цим порядком, а не
+    // фільтрувати COLOR_FAMILY_ORDER (тоді дописані зникають).
+    check("каталог бере порядок звідси",
+        /orderColorFamilies\(new Set\(families\.keys\(\)\)\)/.test(catalog));
+}
+
+console.log("\n[W] Нову позначку можна завести з товару");
+{
     const config = fs.readFileSync(path.join(ROOT, "admin/config.yml"), "utf8");
+    const widget = fs.readFileSync(path.join(ROOT, "admin/color-family-widget.js"), "utf8");
+    const adminHtml = fs.readFileSync(path.join(ROOT, "admin/index.html"), "utf8");
 
     check("поле є в адмінці", /name: "colorFamily"/.test(config));
 
-    check("вибір зі списку, а не вільний текст",
-        /name: "colorFamily"[\s\S]{0,120}widget: "select"/.test(config));
+    // Select не дав би вписати нову позначку — саме тому власний віджет.
+    check("це власний віджет, а не закритий select",
+        /name: "colorFamily"[\s\S]{0,160}widget: "colorFamily"/.test(config)
+        && !/name: "colorFamily"[\s\S]{0,160}widget: "select"/.test(config));
 
-    // Список в адмінці й список на сайті — те саме, інакше адмін обере
-    // позначку, якої фільтр не знає.
-    const options = (config.match(/name: "colorFamily"[\s\S]{0,900}?options:([\s\S]*?)hint:/) || [])[1] || "";
+    check("віджет зареєстрований", /registerWidget\("colorFamily"/.test(widget));
 
-    const зКонфіга = [...options.matchAll(/- "([^"]+)"/g)].map(m => m[1]);
+    check("віджет підключений в адмінці", /color-family-widget\.js/.test(adminHtml));
 
-    check("список в адмінці збігається з сімʼями сайту",
-        зКонфіга.length === COLOR_FAMILY_ORDER.length
-        && зКонфіга.every(name => COLOR_FAMILY_ORDER.includes(name)),
-        `адмінка ${зКонфіга.length}, сайт ${COLOR_FAMILY_ORDER.length}`);
+    // Підказка складається з двох джерел: вбудовані сімʼї плюс усе,
+    // що вже дописали в інших товарах. Другий пункт і робить позначку
+    // спільною — інакше кожен товар заводив би своє написання.
+    check("підказки беруться і з уже вживаних позначок",
+        /data\/products\.json/.test(widget) && /colorFamily/.test(widget));
+
+    check("нова позначка не мовчить",
+        /Нова позначка/.test(widget));
+
+    // Порожнє поле мусить прибирати ключ, а не лишати "" — інакше
+    // чиста автоматика виглядала б у даних як зроблений вибір.
+    check("очищення прибирає поле, а не лишає порожній рядок",
+        /onChange\(clean \|\| undefined\)/.test(widget));
+
+    // Копія списку у віджеті мусить збігатися з сімʼями сайту: у
+    // common.js вони лежать разом із правилами вгадування, тягти той
+    // файл в адмінку ні до чого — але й розійтись копія не має права.
+    const зВіджета = [...(widget.match(/var BUILT_IN = \[([\s\S]*?)\];/) || ["", ""])[1]
+        .matchAll(/"([^"]+)"/g)].map(m => m[1]);
+
+    check("список у віджеті збігається з сімʼями сайту",
+        зВіджета.length === COLOR_FAMILY_ORDER.length
+        && зВіджета.every((name, i) => name === COLOR_FAMILY_ORDER[i]),
+        `віджет [${зВіджета.join(",")}] проти сайту [${COLOR_FAMILY_ORDER.join(",")}]`);
+
+    // ВІДЖЕТ МУСИТЬ ПІДНЯТИСЬ, А НЕ ЛИШЕ ІСНУВАТИ
+    //
+    // Незареєстрований віджет Decap підміняє контролом "unknown", і
+    // товар після цього НЕ ЗБЕРІГАЄТЬСЯ: «Oops, you've missed a
+    // required field» на формі, де все заповнено (докладно — у
+    // коментарі до admin/image-framing-widget.js). Тому піднімаємо
+    // його по-справжньому: із заглушками CMS і React.
+    const registered = {};
+
+    const stubH = (tag, props, ...kids) => ({ tag, props: props || {}, kids: kids.flat() });
+
+    // Віджет бере h і createClass із window — так само, як усі решта
+    // в admin/: їх туди кладе сама Decap.
+    const stubWindow = { h: stubH, createClass: spec => spec };
+
+    const sandbox = {
+        CMS: { registerWidget: (name, control) => { registered[name] = control; } },
+        window: stubWindow,
+        createClass: stubWindow.createClass,
+        h: stubH,
+        fetch: () => Promise.resolve({ ok: false }),
+        console
+    };
+
+    new Function(...Object.keys(sandbox), widget)(...Object.values(sandbox));
+
+    check("віджет піднявся під іменем colorFamily", !!registered.colorFamily);
+
+    const control = registered.colorFamily;
+
+    // Форма Decap питає isValid() у контролів із ref. Поле
+    // необовʼязкове й ніколи не має блокувати збереження.
+    check("поле не блокує збереження", control.isValid.call({}) === true);
+
+    const змінили = [];
+
+    const instance = Object.assign(Object.create(control), {
+        state: control.getInitialState(),
+        props: { value: "Chalk", forID: "f1", onChange: v => змінили.push(v) }
+    });
+
+    const tree = control.render.call(instance);
+
+    const flat = [];
+
+    (function walk(node) {
+        if (!node || typeof node !== "object") return;
+        flat.push(node);
+        (node.kids || []).forEach(walk);
+    })(tree);
+
+    const input = flat.find(n => n.tag === "input");
+    const list = flat.find(n => n.tag === "datalist");
+
+    check("малює поле введення", !!input && input.props.type === "text");
+
+    check("із підказками", !!list && list.kids.length === COLOR_FAMILY_ORDER.length,
+        list ? String(list.kids.length) : "немає");
+
+    // Ключова поведінка: своє значення приймається, порожнє — прибирає
+    // ключ, а не лишає "".
+    control.set.call(instance, "Бірюзовий");
+    control.set.call(instance, "   ");
+
+    check("своя позначка доходить до запису", змінили[0] === "Бірюзовий", змінили[0]);
+
+    check("очищення віддає undefined, а не порожній рядок",
+        змінили[1] === undefined, JSON.stringify(змінили[1]));
+
+    // Нова позначка мусить бути помічена: одруківка тихо створила б у
+    // фільтрі другий пункт поруч зі справжнім.
+    const зНовою = Object.assign(Object.create(control), {
+        state: control.getInitialState(),
+        props: { value: "Бірюзовй", forID: "f2", onChange: () => {} }
+    });
+
+    const текст = JSON.stringify(control.render.call(зНовою));
+
+    check("про нову позначку попереджає", /Нова позначка/.test(текст));
+
+    check("а про відому — ні",
+        !/Нова позначка/.test(JSON.stringify(control.render.call(
+            Object.assign(Object.create(control), {
+                state: control.getInitialState(),
+                props: { value: "Білий", forID: "f3", onChange: () => {} }
+            })))));
 }
 
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);

@@ -3044,13 +3044,45 @@ function colorFamily(name, hex) {
 // трохи темніший — і білий колір поїде в «Сірий». Сперечатися з
 // автоматикою порогами не варто — простіше дати сказати прямо.
 //
-// Значення, якого немає серед сімей, ігноруємо: у config.yml стоїть
-// select із тим самим списком, але дані переживають правки конфіга.
+// СВОЮ ПОЗНАЧКУ ТЕЖ МОЖНА
+//
+// Спершу тут стояла перевірка «є серед п'ятнадцяти вбудованих — беремо,
+// немає — ігноруємо». Вона захищала від застарілих значень у даних, але
+// заразом робила неможливим найпростіше: додати «Бірюзовий» під товар,
+// у якого його справді треба.
+//
+// Тому тепер приймаємо будь-яку осмислену позначку, а порядок у фільтрі
+// вирішує orderColorFamilies() нижче: вбудовані йдуть звичним рядом,
+// дописані — за ними.
+//
+// 40 символів — це вже опис, а не позначка у фільтрі; такому в списку
+// не місце, хай там опиниться воно хоч як.
 function chosenColorFamily(variant) {
 
-    const value = variant && variant.colorFamily;
+    const value = variant && typeof variant.colorFamily === "string"
+        ? variant.colorFamily.trim()
+        : "";
 
-    return value && COLOR_FAMILY_ORDER.includes(value) ? value : null;
+    return value && value.length <= 40 ? value : null;
+
+}
+
+// Порядок сімей у фільтрі.
+//
+// Вбудовані — у своєму, продуманому порядку: алфавіт розкидав би
+// найчастіші «Білий», «Сірий» і «Чорний» по трьох кінцях списку.
+// Дописані в адмінці йдуть після них за абеткою — інакше нова позначка
+// або зникала б із фільтра зовсім (так було), або вклинювалась між
+// звичними пунктами й перемішувала б їх щоразу.
+function orderColorFamilies(families) {
+
+    const present = families instanceof Set ? families : new Set(families || []);
+
+    const extra = [...present]
+        .filter(name => !COLOR_FAMILY_ORDER.includes(name))
+        .sort((a, b) => a.localeCompare(b, "uk"));
+
+    return COLOR_FAMILY_ORDER.filter(name => present.has(name)).concat(extra);
 
 }
 
