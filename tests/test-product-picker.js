@@ -21,17 +21,20 @@ const check = (n, c, e) => {
     else { console.log("  ✗", n, e !== undefined ? "→ " + e : ""); failures++; }
 };
 
-// Логіка пошуку — дзеркало тієї, що у віджеті. Тримається поруч
-// свідомо: віджет виконується у браузері адмінки, імпортувати його
-// в node не можна (він одразу чіпає CMS і window).
-const LOOKALIKE = { "а": "a", "с": "c", "е": "e", "о": "o", "р": "p", "х": "x", "і": "i", "у": "y" };
-const norm = v => String(v === undefined || v === null ? "" : v)
-    .toLowerCase().replace(/[асеорхіу]/g, c => LOOKALIKE[c] || c);
-const hay = p => norm([p.title, p.brand, p.category, p.sku, p.id].filter(Boolean).join(" "));
-const matches = (p, q) => {
-    const w = norm(q).split(/\s+/).filter(Boolean);
-    return w.length > 0 && w.every(x => hay(p).indexOf(x) !== -1);
-};
+// Логіка пошуку — САМА, з файлу віджета, а не її копія поруч.
+//
+// ЩО БУЛО НЕ ТАК. Тут лежало дзеркало: ті самі три функції,
+// переписані для node. Дзеркало показувало, що пошук працює, навіть
+// коли у віджеті його не лишилось узагалі: при винесенні спільного
+// коду в admin/catalog-tree.js із product-picker.js зникли norm,
+// haystack і matches. Тести були зелені, а адмінка на запит «coach»
+// падала з «ReferenceError: matches is not defined».
+//
+// Тому беремо функції з самого файлу — розійтись їм тепер нема як.
+const { matches } = new Function(
+    SRC.slice(SRC.indexOf("    var LOOKALIKE = "), SRC.indexOf("    function toIds(value) {"))
+    + "; return { matches };"
+)();
 
 const products = fs.readdirSync(path.join(ROOT, "data/products"))
     .filter(f => f.endsWith(".json"))
@@ -222,6 +225,50 @@ console.log("\n[N] Розділ додається цілком");
 
         check("«Прибрати» знімає весь розділ",
             instance.props.value.length === 0, String(instance.props.value.length));
+
+        // РЕНДЕР ІЗ ЗАПИТОМ — те, що впало в адмінці.
+        //
+        // «ReferenceError: matches is not defined» на запит «coach»:
+        // при винесенні спільного коду з файла зникли функції пошуку.
+        // Жодна перевірка вище цього не бачила — вони працювали з
+        // копією логіки, а не з віджетом.
+        const flatten = node => {
+
+            const out = [];
+
+            (function walk(n) {
+                if (!n || typeof n !== "object") return;
+                out.push(n);
+                (n.kids || []).forEach(walk);
+            })(node);
+
+            return out;
+
+        };
+
+        instance.props.classNameWrapper = "";
+        instance.state.input = "coach";
+
+        let знайдено = null;
+
+        try {
+            знайдено = flatten(control.render.call(instance))
+                .filter(n => n.tag === "button"
+                    && n.kids.some(k => k && k.tag === "strong")).length;
+        } catch (error) {
+            знайдено = "впало: " + error.message;
+        }
+
+        check("пошук малюється без помилки", typeof знайдено === "number" && знайдено > 0,
+            String(знайдено));
+
+        instance.state.input = "zzzqqq";
+
+        const порожньо = flatten(control.render.call(instance))
+            .some(n => (n.kids || []).some(k =>
+                typeof k === "string" && k.indexOf("Нічого не знайдено") !== -1));
+
+        check("порожній результат теж малюється", порожньо);
 
         // Мертва кнопка гірша за відсутню: коли додано все, вона
         // мусить прибирати, а не нічого не робити.

@@ -42,6 +42,46 @@
     // підрахунків розійшлася б із першою на першій же правці.
     var tree = window.CatalogTree || null;
 
+    // Приводимо до вигляду, у якому порівнюємо: нижній регістр і
+    // однакові на вигляд літери. Кирилична «і» та латинська «i»
+    // (так само о/о, а/а, с/с, е/е, р/р, х/х) в назвах товарів
+    // трапляються впереміш — без цього «coach» не знаходив би
+    // «Coach» з кириличною «о».
+    var LOOKALIKE = { "а": "a", "с": "c", "е": "e", "о": "o", "р": "p", "х": "x", "і": "i", "у": "y" };
+
+    function norm(value) {
+
+        return String(value === undefined || value === null ? "" : value)
+            .toLowerCase()
+            .replace(/[асеорхіу]/g, function (ch) { return LOOKALIKE[ch] || ch; });
+
+    }
+
+    function haystack(product) {
+
+        return norm([
+            product.title,
+            product.brand,
+            product.category,
+            product.sku,
+            product.id
+        ].filter(Boolean).join(" "));
+
+    }
+
+    function matches(product, query) {
+
+        var words = norm(query).split(/\s+/).filter(Boolean);
+
+        if (!words.length) return false;
+
+        var hay = haystack(product);
+
+        // потрібні ВСІ слова запиту, кожне — саме підрядком
+        return words.every(function (w) { return hay.indexOf(w) !== -1; });
+
+    }
+
     function toIds(value) {
 
         if (!value) return [];
