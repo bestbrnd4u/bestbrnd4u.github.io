@@ -154,6 +154,15 @@ console.log("\n[N] Розділ додається цілком");
         json: () => Promise.resolve(/categories/.test(url) ? categories : products)
     });
 
+    // Каталог і дерево розділів живуть в admin/catalog-tree.js — тим
+    // самим користується admin/section-picker.js. Піднімаємо його
+    // ПЕРШИМ: без window.CatalogTree віджет мовчки лишається з
+    // порожнім деревом, і перевірки нижче падатимуть не на тому.
+    new Function("window", "fetch",
+        fs.readFileSync(path.join(ROOT, "admin/catalog-tree.js"), "utf8"))(stubWindow, stubFetch);
+
+    check("дерево каталогу піднялось", !!stubWindow.CatalogTree);
+
     new Function("CMS", "window", "createClass", "h", "fetch", "console", src)(
         { registerWidget: (name, control) => { registered[name] = control; } },
         stubWindow, stubWindow.createClass, stubH, stubFetch, console

@@ -718,23 +718,13 @@ function setupPromoHeroSlider({ track, total, prevBtn, nextBtn, counterEl, contr
 // разом із товарами, які адмін обрав явно. Саме тому "Urban
 // Sneakers" (5-й у списку) зникав, а решта показувались не в тому
 // порядку, що в адмінці.
-function pickPromotionProducts(promo, allProducts) {
+// Правило набору переїхало в promotionProducts() (common.js): те саме
+// потрібне сторінці акції, а дві копії вже встигли розійтись — тут
+// порядок адмінки зберігався, там ні. Заразом звідти приходить
+// підхоплення розділів, якого тут не було зовсім.
+function pickPromotionProducts(promo, allProducts, departmentOf) {
 
-    const byId = new Map(allProducts.map(product => [product.id, product]));
-
-    const manual = (promo.productIds || [])
-        .map(id => byId.get(id))
-        .filter(Boolean);
-
-    const manualIds = new Set(manual.map(product => product.id));
-
-    const byBrand = promo.brand
-        ? allProducts.filter(product =>
-            product.brand === promo.brand && !manualIds.has(product.id)
-          )
-        : [];
-
-    return [...manual, ...byBrand];
+    return promotionProducts(promo, allProducts, departmentOf);
 
 }
 
@@ -746,11 +736,20 @@ async function renderFeaturedPromotions(featuredPromotions) {
 
     let allProducts = [];
 
+    // «категорія → розділ»: без нього розділ, указаний в
+    // автопідхопленні акції, не розгорнувся б у свої категорії.
+    let departmentOf = new Map();
+
     try {
 
-        const response = await fetch(dataUrl("data/products.json"));
+        const [response, deptMap] = await Promise.all([
+            fetch(dataUrl("data/products.json")),
+            loadDepartmentOf()
+        ]);
 
         if (response.ok) allProducts = await response.json();
+
+        departmentOf = deptMap;
 
     } catch (error) {
 
@@ -760,7 +759,7 @@ async function renderFeaturedPromotions(featuredPromotions) {
 
     section.innerHTML = featuredPromotions.map(promo => {
 
-        const curated = pickPromotionProducts(promo, allProducts);
+        const curated = pickPromotionProducts(promo, allProducts, departmentOf);
 
         return `
             <div class="brand-campaign">

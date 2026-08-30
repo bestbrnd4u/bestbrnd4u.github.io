@@ -189,6 +189,16 @@ function main() {
             brand: data.brand || "",
             discountPercent: typeof data.discountPercent === "number" ? data.discountPercent : null,
             productIds: Array.isArray(data.products) ? data.products.map(Number) : [],
+            // ПРАВИЛА набору, на відміну від productIds вище — знімка.
+            //
+            // autoBrand за замовчуванням увімкнене: саме так обидві
+            // сторінки поводились до появи прапорця, і вже опубліковані
+            // акції не мають нічого помітити. Пишемо ЛИШЕ коли вимкнено —
+            // щоб у даних не з'явилось сто рядків "autoBrand": true.
+            ...(data.autoBrand === false ? { autoBrand: false } : {}),
+            ...(Array.isArray(data.autoSections) && data.autoSections.length
+                ? { autoSections: data.autoSections.map(String) }
+                : {}),
             genderButtons,
             displayType: ["card", "hero_slider", "banner_products", "banner_compact"].includes(data.displayType)
                 ? data.displayType

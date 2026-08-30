@@ -37,130 +37,10 @@
 
     if (!h || !createClass) return;
 
-    var cache = null;
-
-    function loadProducts() {
-
-        if (cache) return cache;
-
-        cache = fetch("../data/products.json")
-            .then(function (r) { return r.ok ? r.json() : []; })
-            .then(function (list) { return Array.isArray(list) ? list : []; })
-            .catch(function () { return []; });
-
-        return cache;
-
-    }
-
-    // Приводимо до вигляду, у якому порівнюємо: нижній регістр і
-    // однакові на вигляд літери. Кирилична «і» та латинська «i»
-    // (так само о/о, а/а, с/с, е/е, р/р, х/х) в назвах товарів
-    // трапляються впереміш — без цього «coach» не знаходив би
-    // «Coach» з кириличною «о».
-    var LOOKALIKE = { "а": "a", "с": "c", "е": "e", "о": "o", "р": "p", "х": "x", "і": "i", "у": "y" };
-
-    function norm(value) {
-
-        return String(value === undefined || value === null ? "" : value)
-            .toLowerCase()
-            .replace(/[асеорхіу]/g, function (ch) { return LOOKALIKE[ch] || ch; });
-
-    }
-
-    function haystack(product) {
-
-        return norm([
-            product.title,
-            product.brand,
-            product.category,
-            product.sku,
-            product.id
-        ].filter(Boolean).join(" "));
-
-    }
-
-    function matches(product, query) {
-
-        var words = norm(query).split(/\s+/).filter(Boolean);
-
-        if (!words.length) return false;
-
-        var hay = haystack(product);
-
-        // потрібні ВСІ слова запиту, кожне — саме підрядком
-        return words.every(function (w) { return hay.indexOf(w) !== -1; });
-
-    }
-
-    // Розділи й підрозділи — щоб додавати не по одному товару.
-    //
-    // НАВІЩО. Акція «на всі сумки» — це 68 товарів. Шукати їх по
-    // одному через пошук просто негуманно, а пропустити один товар при
-    // цьому легше легкого.
-    //
-    // Дерево беремо з data/categories.json (звідки категорія й до якого
-    // розділу належить), а КІЛЬКОСТІ рахуємо по самих товарах: у
-    // категорії може бути записано що завгодно, а в акцію піде рівно
-    // те, що справді є в каталозі.
-    var catsCache = null;
-
-    function loadCategories() {
-
-        if (catsCache) return catsCache;
-
-        catsCache = fetch("../data/categories.json")
-            .then(function (r) { return r.ok ? r.json() : []; })
-            .then(function (list) { return Array.isArray(list) ? list : []; })
-            .catch(function () { return []; });
-
-        return catsCache;
-
-    }
-
-    function buildGroups(products, categories) {
-
-        var deptOf = {};
-
-        categories.forEach(function (c) {
-            if (c && c.name) deptOf[c.name] = c.department || "Інше";
-        });
-
-        var byDept = {};
-
-        products.forEach(function (p) {
-
-            var cat = p && p.category;
-
-            if (!cat) return;
-
-            var dept = deptOf[cat] || "Інше";
-
-            if (!byDept[dept]) byDept[dept] = { ids: [], cats: {} };
-            if (!byDept[dept].cats[cat]) byDept[dept].cats[cat] = [];
-
-            byDept[dept].ids.push(Number(p.id));
-            byDept[dept].cats[cat].push(Number(p.id));
-
-        });
-
-        // Найбільші розділи вгорі: саме їх додають цілком найчастіше.
-        return Object.keys(byDept)
-            .sort(function (a, b) { return byDept[b].ids.length - byDept[a].ids.length; })
-            .map(function (dept) {
-
-                var cats = byDept[dept].cats;
-
-                return {
-                    name: dept,
-                    ids: byDept[dept].ids,
-                    cats: Object.keys(cats)
-                        .sort(function (a, b) { return cats[b].length - cats[a].length; })
-                        .map(function (cat) { return { name: cat, ids: cats[cat] }; })
-                };
-
-            });
-
-    }
+    // Каталог і дерево розділів — зі спільного admin/catalog-tree.js:
+    // тим самим користується admin/section-picker.js, і друга копія
+    // підрахунків розійшлася б із першою на першій же правці.
+    var tree = window.CatalogTree || null;
 
     function toIds(value) {
 
@@ -182,13 +62,15 @@
 
             var self = this;
 
-            Promise.all([loadProducts(), loadCategories()]).then(function (both) {
+            if (!tree) return;
+
+            tree.loadGroups().then(function (data) {
 
                 if (self.gone) return;
 
                 self.setState({
-                    products: both[0],
-                    groups: buildGroups(both[0], both[1]),
+                    products: data.products,
+                    groups: data.groups,
                     loaded: true
                 });
 

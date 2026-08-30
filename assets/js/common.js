@@ -3150,6 +3150,108 @@ function getProductColorFamilies(product) {
 
 }
 
+// ======================================
+// ТОВАРИ АКЦІЇ — ОДНЕ ПРАВИЛО НА ВЕСЬ САЙТ
+// ======================================
+//
+// ЧОМУ ТУТ, А НЕ НА КОЖНІЙ СТОРІНЦІ
+// ----------------------------------
+// Правило жило у двох місцях — assets/js/app.js (головна) і
+// assets/js/promo.js (сторінка акції) — і вже встигло розійтись:
+// головна зберігала порядок, у якому адмін перетягнув товари, а
+// сторінка акції віддавала їх у порядку каталогу. Тобто той самий
+// набір товарів виглядав по-різному залежно від того, звідки на нього
+// подивитись.
+//
+// ЯК НАБИРАЄТЬСЯ СПИСОК
+// ----------------------
+//   1. обрані вручну — у тому порядку, у якому вони в адмінці;
+//   2. товари бренду акції, якщо підхоплення бренду не вимкнене;
+//   3. товари з розділів і категорій, перелічених в автопідхопленні.
+//
+// Пункти 2 і 3 — ПРАВИЛА, а не знімки: товар, доданий у каталог
+// завтра, потрапить в акцію сам. Пункт 1 лишається знімком, і це
+// навмисно: обраний вручну товар має лишатись у списку, навіть якщо
+// завтра йому змінять категорію.
+//
+// Дублікати прибираються, порядок зберігається — саме тому тут цикл,
+// а не три filter із конкатенацією.
+function promotionProducts(promo, allProducts, departmentOf) {
+
+    const byId = new Map((allProducts || []).map(product => [product.id, product]));
+
+    const seen = new Set();
+    const out = [];
+
+    const push = product => {
+
+        if (!product || seen.has(product.id)) return;
+
+        seen.add(product.id);
+        out.push(product);
+
+    };
+
+    (promo.productIds || []).forEach(id => push(byId.get(id)));
+
+    // Бренд підхоплюється, поки його явно не вимкнули. Так поводились
+    // обидві сторінки до появи прапорця, тож уже опубліковані акції
+    // нічого не помічають.
+    if (promo.brand && promo.autoBrand !== false) {
+
+        (allProducts || []).forEach(product => {
+            if (product.brand === promo.brand) push(product);
+        });
+
+    }
+
+    const sections = new Set(promo.autoSections || []);
+
+    if (sections.size) {
+
+        (allProducts || []).forEach(product => {
+
+            const category = product.category;
+
+            if (!category) return;
+
+            // У списку може стояти і категорія («Жіночі сумки»), і цілий
+            // розділ («Сумки») — розділ розгортається через довідник
+            // категорій.
+            const department = departmentOf ? departmentOf.get(category) : null;
+
+            if (sections.has(category) || (department && sections.has(department))) {
+                push(product);
+            }
+
+        });
+
+    }
+
+    return out;
+
+}
+
+// Довідник «категорія → розділ». Потрібен, щоб розгорнути розділ у
+// перелік його категорій; кешуємо, бо сторінка акції просить його
+// разом із каталогом, а головна — окремо.
+let departmentOfCache = null;
+
+function loadDepartmentOf() {
+
+    if (departmentOfCache) return departmentOfCache;
+
+    departmentOfCache = fetch(dataUrl("data/categories.json"))
+        .then(response => response.ok ? response.json() : [])
+        .then(list => new Map((Array.isArray(list) ? list : [])
+            .filter(item => item && item.name)
+            .map(item => [item.name, item.department])))
+        .catch(() => new Map());
+
+    return departmentOfCache;
+
+}
+
 function getDiscountPercent(product) {
 
     if (!product.oldPrice || product.oldPrice <= product.price) return 0;
