@@ -273,8 +273,12 @@ console.log("\n[6] Фільтр працює сім'ями");
         /option\.title = names\.length > 1/.test(catalog));
 
     // Старі посилання (?color=Black) мусять і далі відкривати фільтр.
+    //
+    // Зведення переїхало з readUrlState() у resolveUrlTokens(): в
+    // адресі тепер латиниця, і сімʼю можна шукати лише ПІСЛЯ того, як
+    // токен не впізнали за slug-ом.
     check("старі посилання не ламаються",
-        /\.map\(value => colorFamily\(value\)\)/.test(catalog));
+        /families\.has\(value\) \? value : colorFamily\(value\)/.test(catalog));
 }
 
 console.log("\n[X] Чищення не з'їдає назву цілком");
