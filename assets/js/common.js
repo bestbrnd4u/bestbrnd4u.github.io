@@ -3347,6 +3347,31 @@ function productUrl(product, params) {
     // прибираємо порожні значення, щоб не плодити ?color=&size=
     [...query.keys()].forEach(k => { if (!query.get(k)) query.delete(k); });
 
+    // Колір в адресу йде латиницею.
+    //
+    // «?color=Бежевий» браузер показує як
+    // ?color=%D0%91%D0%B5%D0%B6%D0%B5%D0%B2%D0%B8%D0%B9 — 42 символи
+    // замість восьми. Таке посилання не вставиш ні в пост, ні в
+    // сторіс, а в месенджері воно ще й переноситься навпіл.
+    //
+    // Те саме правило вже діє у фільтрі каталогу (latinParam у
+    // catalog.js) і в адресах самих товарів та акцій — цей рядок
+    // добиває останнє місце, де кирилиця лишалась.
+    //
+    // РОЗМІР НЕ ЧІПАЄМО: ONESIZE, S, M — там кирилиці не буває.
+    //
+    // Немає Translit (не підключився) — лишаємо як є: довга адреса
+    // неприємна, мовчазно зламане посилання гірше.
+    const color = query.get("color");
+
+    if (color && window.Translit) {
+
+        const latin = window.Translit.toSlug(color);
+
+        if (latin) query.set("color", latin);
+
+    }
+
     const qs = query.toString();
 
     if (!qs) return base;

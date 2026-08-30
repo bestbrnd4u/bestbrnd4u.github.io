@@ -782,6 +782,43 @@ function buildDotsMarkup(images, video) {
 
 }
 
+// Знаходить варіант за кольором з адреси.
+//
+// В адресі лежить латиниця («bezhevyi»), а у варіанті — справжня
+// назва («Бежевий»), тож просте порівняння тут не працює.
+//
+// СТАРІ ПОСИЛАННЯ ПРАЦЮЮТЬ. До переходу на латиницю адреси писались
+// кирилицею, і такі вже розіслані в постах і збережені в закладках.
+// Тому пробуємо ТРИ зіставлення: точний збіг (кирилиця зі старого
+// посилання), збіг за slug-ом (нова латиниця) і збіг без урахування
+// регістру. Не знайшли — -1, і виклична сторона відкриє перший колір,
+// як робила завжди.
+function findVariantByColor(variants, requested) {
+
+    if (!requested) return -1;
+
+    const exact = variants.findIndex(variant => variant.color === requested);
+
+    if (exact >= 0) return exact;
+
+    const wanted = String(requested).toLowerCase();
+
+    return variants.findIndex(variant => {
+
+        const color = String(variant.color || "");
+
+        if (color.toLowerCase() === wanted) return true;
+
+        // Translit може не підключитись — тоді лишається лише точний
+        // збіг вище, і сторінка просто відкриється на першому кольорі.
+        if (!window.Translit) return false;
+
+        return window.Translit.toSlug(color) === window.Translit.toSlug(requested);
+
+    });
+
+}
+
 function renderProduct(product) {
 
     // Статистика: перегляд товару. Колір і розмір беремо з адреси —
@@ -813,10 +850,7 @@ function renderProduct(product) {
     // першому кольорі і вибір користувача губився.
     const requestedColor = new URLSearchParams(location.search).get("color");
 
-    const activeIndex = Math.max(
-        variants.findIndex(variant => variant.color === requestedColor),
-        0
-    );
+    const activeIndex = Math.max(findVariantByColor(variants, requestedColor), 0);
 
     const activeVariant = variants[activeIndex];
     const galleryImages = activeVariant.images?.length ? activeVariant.images : (product.images || []);

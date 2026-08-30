@@ -53,9 +53,20 @@ console.log("\n[2] Сторінка товару відкриває саме ц�
 {
   const js=fs.readFileSync(path.join(ROOT,"assets/js/product.js"),"utf8");
   check("читає ?color з URL", js.includes('get("color")'));
-  check("активний варіант шукається за кольором", js.includes("variants.findIndex(variant => variant.color === requestedColor)"));
+  // Пошук варіанта переїхав у findVariantByColor: в адресі тепер
+  // латиниця, і просте порівняння рядків там більше не працює.
+  // Перевіряємо ПОВЕДІНКУ, а не текст рядка у файлі — саме дзеркало
+  // тексту колись пропустило падіння пошуку в адмінці.
+  const pickVariant=new Function("window",
+      js.slice(js.indexOf("function findVariantByColor"),
+               js.indexOf("function renderProduct(product) {"))
+      + "; return findVariantByColor;")({Translit:require("../assets/js/translit.js")});
+  const vs=[{color:"Чорний"},{color:"Білий"}];
+  check("активний варіант шукається за кольором", pickVariant(vs,"bilyi")===1);
+  check("кирилиця зі старих посилань теж знаходить", pickVariant(vs,"Білий")===1);
   check("якщо кольору немає в URL — перший (Math.max з 0)",
-        /Math\.max\(\s*\n?\s*variants\.findIndex[\s\S]{0,80}?,\s*0\s*\n?\s*\)/.test(js));
+        pickVariant(vs,null)===-1
+        && /Math\.max\(findVariantByColor\(variants, requestedColor\), 0\)/.test(js));
   check("свотч підсвічується за activeIndex", js.includes('index === activeIndex ? "active"'));
   check("галерея бере фото активного кольору", js.includes("activeVariant.images"));
   check("артикул — активного кольору", js.includes("getVariantSku(product, activeVariant)"));
