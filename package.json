@@ -16,10 +16,10 @@
     "banners": "node scripts/build-banners.js"
   },
   "devDependencies": {
-    "js-yaml": "^5.3.0",
+    "js-yaml": "^5.4.1",
     "jsdom": "^30.0.1",
     "onnxruntime-node": "^1.29.0",
-    "sharp": "^0.35.3"
+    "sharp": "^0.35.4"
   },
   "engines": {
     "node": ">=20"
