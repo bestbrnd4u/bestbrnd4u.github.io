@@ -722,9 +722,13 @@ function setupPromoHeroSlider({ track, total, prevBtn, nextBtn, counterEl, contr
 // потрібне сторінці акції, а дві копії вже встигли розійтись — тут
 // порядок адмінки зберігався, там ні. Заразом звідти приходить
 // підхоплення розділів, якого тут не було зовсім.
+//
+// Кличемо promotionCards(): це набір ПЛЮС розгортання по кольорах,
+// тобто ряд під банером виглядає так само заповнено, як каталог.
+// Вимикається прапорцем «Кожен колір — окрема картка» в самій акції.
 function pickPromotionProducts(promo, allProducts, departmentOf) {
 
-    return promotionProducts(promo, allProducts, departmentOf);
+    return promotionCards(promo, allProducts, departmentOf);
 
 }
 

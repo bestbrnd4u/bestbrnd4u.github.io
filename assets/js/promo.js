@@ -190,11 +190,16 @@ function setupPromoCatalog(promo, allProducts, categoryDepartments, departmentOf
     // saveGenderFilter/selectedGenders в catalog.js заповнюються лише тут
     readUrlState();
 
-    // Правило набору — спільне з головною (promotionProducts у
+    // Правило набору — спільне з головною (promotionCards у
     // common.js). Доки воно жило тут окремо, сторінка акції віддавала
     // товари в порядку каталогу, а головна — у порядку, у якому їх
     // перетягнув адмін.
-    let curated = promotionProducts(promo, allProducts, departmentOf);
+    //
+    // promotionCards, а не promotionProducts: у ту саму функцію
+    // входить і розгортання по кольорах, яким акція виглядає
+    // заповненою, — рівно як каталог. Вимикається прапорцем «Кожен
+    // колір — окрема картка» в самій акції.
+    let curated = promotionCards(promo, allProducts, departmentOf);
 
     // якщо для товару не задана власна знижка (oldPrice), але в акції
     // є відсоток за замовчуванням — рахуємо "стару" ціну лише для показу

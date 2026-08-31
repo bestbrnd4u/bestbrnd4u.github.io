@@ -33,9 +33,14 @@ const read = rel => fs.readFileSync(path.join(ROOT, rel), "utf8");
 const catalog = read("assets/js/catalog.js");
 const ui = read("assets/js/ui.js");
 
+// Сама функція живе в common.js, а не в catalog.js: те саме
+// розгортання потрібне акціям, а головна catalog.js не підключає
+// (див. tests/test-promo-color-cards.js).
+const commonSource = read("assets/js/common.js");
+
 // беремо саму функцію з коду, а не її копію
 const split = new Function(
-    catalog.match(/function splitProductsByColor[\s\S]*?\n\}/)[0]
+    commonSource.match(/function splitProductsByColor[\s\S]*?\n\}/)[0]
     + "; return splitProductsByColor;")();
 
 console.log("\n[1] Правило описане в коді");
@@ -43,17 +48,23 @@ console.log("\n[1] Правило описане в коді");
     check("розгортання застосовується при завантаженні",
         /products = splitProductsByColor\(await response\.json\(\)\)/.test(catalog));
 
+    // Копії в catalog.js лишитись не мусить: вона вже один раз
+    // розійшлась із двійником (promotionProducts) і кожна сторінка
+    // мала свою поведінку.
+    check("у catalog.js лишився тільки виклик",
+        !/function splitProductsByColor/.test(catalog));
+
     // Прапорець за замовчуванням увімкнений: у більшості товарів
     // кольори справді різні.
-    check("вимикається прапорцем", /product\.splitByColor !== false/.test(catalog));
+    check("вимикається прапорцем", /product\.splitByColor !== false/.test(commonSource));
 
     // Товар з одним кольором розгортати нічого.
-    check("один колір не розгортається", /variants\.length < 2/.test(catalog));
+    check("один колір не розгортається", /variants\.length < 2/.test(commonSource));
 
     // Копіювання товарів свідомо НЕ робимо — причина зафіксована в коді,
     // щоб її не довелося з'ясовувати заново.
     check("причина відмови від копіювання записана",
-        /duplicate content|дані задублюються/.test(catalog));
+        /duplicate content|дані задублюються/.test(commonSource));
 }
 
 console.log("\n[2] Кольори не перепутались");
@@ -238,7 +249,6 @@ console.log("\n[N] Розгорнута по кольору картка від�
         commonSrc.match(/function getProductColors[\s\S]*?\n\}/)[0]
         + commonSrc.slice(commonSrc.indexOf("const COLOR_FAMILIES"),
             commonSrc.indexOf("function getDiscountPercent"))
-        + catalogSrc.match(/function splitProductsByColor[\s\S]*?\n\}\n/)[0]
         + "; return { splitProductsByColor, getProductColorFamilies };"
     )();
 

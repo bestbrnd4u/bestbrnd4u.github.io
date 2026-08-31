@@ -2530,14 +2530,21 @@ footer{
     width:100%;
     height:100%;
     object-fit:cover;
-    object-position:top center;
+    /* Точка кадрування з адмінки — те саме, що в .promo-card-image img.
+       За замовчуванням 50% 0%, тобто той самий "top center", що стояв
+       тут раніше: акція без виставленої рамки виглядає точно як досі. */
+    object-position:var(--frame-x,50%) var(--frame-y,0%);
+    transform:scale(var(--frame-zoom,1));
     display:block;
     transition:.5s;
 }
 
 @media (hover:hover) and (pointer:fine){
+    /* ховер МНОЖИТЬСЯ на наближення, а не замінює його: інакше банер із
+       виставленим кадром при наведенні стрибком повертався б до
+       повного кадру. */
     .promo-hero-slide-image:hover img{
-        transform:scale(1.04);
+        transform:scale(calc(var(--frame-zoom,1) * 1.04));
     }
 }
 
@@ -5109,7 +5116,10 @@ body.mobile-filters-open .scroll-top{
     width:100%;
     height:100%;
     object-fit:cover;
-    object-position:top;
+    /* Точка кадрування з адмінки. За замовчуванням 50% 0% — це той
+       самий "top", що стояв тут раніше. */
+    object-position:var(--frame-x,50%) var(--frame-y,0%);
+    transform:scale(var(--frame-zoom,1));
     display:block;
     transition:.5s;
 }
@@ -5220,6 +5230,11 @@ body.mobile-filters-open .scroll-top{
     width:100%;
     height:100%;
     object-fit:cover;
+    /* Точка кадрування з адмінки. Тут за замовчуванням 50% 50% — саме
+       так браузер кадрував цей банер до появи рамки, тож уже
+       опубліковані акції не зсуваються. */
+    object-position:var(--frame-x,50%) var(--frame-y,50%);
+    transform:scale(var(--frame-zoom,1));
     display:block;
     transition:.5s;
 }
@@ -10275,9 +10290,12 @@ body.mobile-filters-open .scroll-top{
    лишалося б збільшеним доти, доки не торкнешся чогось іншого. */
 @media (hover:hover) and (pointer:fine){
 
+/* Наближення з рамки МНОЖИТЬСЯ на ховер, а не замінюється ним —
+   інакше банер із виставленим кадруванням при наведенні стрибком
+   повертався б до повного кадру. Так само зроблено в .promo-card. */
 .brand-campaign-image:hover img,
 .brand-teaser-image:hover img{
-    transform:scale(1.04);
+    transform:scale(calc(var(--frame-zoom,1) * 1.04));
 }
 
 }
