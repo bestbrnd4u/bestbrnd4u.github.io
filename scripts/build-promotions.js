@@ -199,6 +199,12 @@ function main() {
             ...(Array.isArray(data.autoSections) && data.autoSections.length
                 ? { autoSections: data.autoSections.map(String) }
                 : {}),
+            // Розгортання товарів по кольорах (promotionCards у
+            // common.js). Пишемо ЛИШЕ коли вимкнено — з тієї самої
+            // причини, що й autoBrand вище: за замовчуванням
+            // увімкнено, і сто рядків "splitByColor": true в даних
+            // нічого не додають.
+            ...(data.splitByColor === false ? { splitByColor: false } : {}),
             genderButtons,
             displayType: ["card", "hero_slider", "banner_products", "banner_compact"].includes(data.displayType)
                 ? data.displayType

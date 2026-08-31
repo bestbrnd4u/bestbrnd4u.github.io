@@ -61,11 +61,26 @@ console.log("\n[1] Правило одне на весь сайт");
     const app = read("assets/js/app.js");
     const promo = read("assets/js/promo.js");
 
+    // Обидві сторінки кличуть promotionCards() — набір ПЛЮС
+    // розгортання по кольорах. Раніше тут стояв promotionProducts:
+    // розгортання додали окремим кроком, і саме тому воно за одним
+    // викликом, а не двома рядками в кожному файлі (див.
+    // tests/test-promo-color-cards.js).
     check("головна кличе спільну функцію",
-        /return promotionProducts\(promo, allProducts, departmentOf\)/.test(app));
+        /return promotionCards\(promo, allProducts, departmentOf\)/.test(app));
 
     check("сторінка акції — теж",
-        /promotionProducts\(promo, allProducts, departmentOf\)/.test(promo));
+        /promotionCards\(promo, allProducts, departmentOf\)/.test(promo));
+
+    // Набір без розгортання жодна сторінка кликати не мусить —
+    // інакше та, що забула другий крок, тихо показувала б менше
+    // карток за сусідню. Коментарі при цьому згадувати його можуть,
+    // тож дивимось лише на код.
+    const code = src => src.split("\n").filter(line => !/^\s*\/\//.test(line)).join("\n");
+
+    check("голого набору в сторінках не лишилось",
+        !/promotionProducts\(/.test(code(app)) && !/promotionProducts\(/.test(code(promo)),
+        [app, promo].map(s => (code(s).match(/.*promotionProducts\(.*/) || [""])[0].trim()).join(" | "));
 
     // Саме ці два шматки й розійшлись, поки жили окремо.
     check("власної копії на головній не лишилось",
