@@ -15,14 +15,14 @@
       "hex": "#c0bfbf",
       "images": [
         "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7558.webp",
-        "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7558_2.webp",
-        "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7558_3.webp"
+        "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-ch-6d39ef48.webp",
+        "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-ch-d3f8077e.webp"
       ]
     }
   ],
   "preOrderPrepayment": 100,
   "sizes": [
-    "Onesize"
+    "ONESIZE"
   ],
   "splitByColor": true,
   "searchKeywords": [
@@ -49,5 +49,16 @@
   "description": "Елегантний жіночий годинник Michael Kors Billie у сріблястому відтінку з ефектом Frosted. Стильний браслет із нержавіючої сталі та блискучий циферблат створюють виразний акцент і чудово доповнюють як повсякденні, так і святкові образи.\nМодель оснащена кварцовим механізмом із функцією хронографа та відображенням дати. Мінеральне скло захищає циферблат від подряпин, а водозахист 5 ATM забезпечує комфорт у повсякденному використанні",
   "sku": "",
   "rating": 5,
-  "category": "Годинники"
+  "category": "Годинники",
+  "legacySlugs": [
+    "годинник-michael-kors-oversized-billie-frosted-chronograph-mk7558"
+  ],
+  "slug": "hodynnyk-michael-kors-oversized-billie-frosted-chronograph-mk7558",
+  "id": 95,
+  "color": "Сріблястий",
+  "images": [
+    "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7558.webp",
+    "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-ch-6d39ef48.webp",
+    "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-ch-d3f8077e.webp"
+  ]
 }
