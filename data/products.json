@@ -879,9 +879,9 @@
         "color": "Зелений",
         "hex": "#06b454",
         "images": [
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=81dd0a13",
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=cb264060",
           "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-2.webp?v=7f7d7a02",
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=2b569378"
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=c326ceed"
         ],
         "sku": "B094QT219C"
       },
@@ -889,9 +889,9 @@
         "color": "Карамельний",
         "hex": "#f49657",
         "images": [
-          "assets/images/products/uploads/jwp-ma123-1.webp?v=34d47f7c",
+          "assets/images/products/uploads/jwp-ma123-1.webp?v=4e914c6d",
           "assets/images/products/uploads/jwp-ma123-2.webp?v=189c38d2",
-          "assets/images/products/uploads/jwp-ma123-3.webp?v=10cf36db"
+          "assets/images/products/uploads/jwp-ma123-3.webp?v=a0015abc"
         ],
         "sku": "JWP-MA123"
       }
@@ -4287,8 +4287,8 @@
           "/assets/images/products/uploads/ca173_svvfq_a0.webp?v=274cb8ee",
           "/assets/images/products/uploads/ca173_svvfq_a5.webp?v=c14cae6b",
           "/assets/images/products/uploads/ca173_svvfq_a8.webp?v=b75e933e",
-          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=82515a32",
-          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=f8808159"
+          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=084f40a8",
+          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=af000d7a"
         ]
       }
     ],
@@ -6889,6 +6889,73 @@
       "/assets/images/products/uploads/michael-kors-slim-runway-white-dial-ladies-watch-mk7545.webp",
       "/assets/images/products/uploads/michael-kors-slim-runway-white-dial-ladies-watch-mk7545_2.webp",
       "/assets/images/products/uploads/michael-kors-slim-runway-white-dial-ladies-watch-mk7545_3.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Чоловікам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Нержавіюча сталь",
+    "brand": "Michael Kors",
+    "price": 8000,
+    "preOrder": true,
+    "dimensions": "Діаметр корпусу: 44 мм. Ширина браслета: 22 мм",
+    "variants": [
+      {
+        "color": "Чорний",
+        "hex": "#050505",
+        "images": [
+          "/assets/images/products/uploads/michael-kors-lexington-chronograph-quartz-black-dial-watch-mk9154.webp?v=792b4b87",
+          "/assets/images/products/uploads/michael-kors-lexington-chronograph-quartz-black-dial-watch-mk9154_2.webp?v=41dee65d",
+          "/assets/images/products/uploads/michael-kors-lexington-chronograph-quartz-black-dial-watch-mk9154_3.webp?v=009e930e"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Michael Kors",
+      "Michael Kors Lexington",
+      "Lexington Watch",
+      "Oversized Lexington",
+      "MK9154",
+      "Michael Kors MK9154",
+      "чоловічий годинник Michael Kors",
+      "годинник Michael Kors",
+      "чорний годинник",
+      "Black Watch",
+      "чорний чоловічий годинник",
+      "годинник з хронографом",
+      "кварцовий годинник",
+      "сталевий браслет",
+      "годинник 44 мм",
+      "брендований годинник",
+      "оригінальний Michael Kors"
+    ],
+    "isNew": false,
+    "title": "Годинник Michael Kors Oversized Lexington Chronograph MK9154",
+    "reviews": 0,
+    "closure": "Розкладна з фіксатором",
+    "instagramBlock": "general",
+    "description": "Стильний чоловічий годинник Michael Kors Lexington у повністю чорному виконанні. Масивний корпус, чорний циферблат та сталевий браслет створюють виразний монохромний дизайн, який чудово доповнить як повсякденний, так і діловий образ.\nМодель оснащена кварцовим механізмом із функцією хронографа та відображенням дати. Циферблат доповнений римськими цифрами та трьома субциферблатами. Корпус і браслет виготовлені з нержавіючої сталі, а мінеральне скло захищає циферблат",
+    "sku": "MK9154",
+    "rating": 5,
+    "category": "Годинники",
+    "legacySlugs": [
+      "годинник-michael-kors-oversized-lexington-chronograph-mk9154"
+    ],
+    "slug": "hodynnyk-michael-kors-oversized-lexington-chronograph-mk9154",
+    "id": 97,
+    "color": "Чорний",
+    "images": [
+      "/assets/images/products/uploads/michael-kors-lexington-chronograph-quartz-black-dial-watch-mk9154.webp",
+      "/assets/images/products/uploads/michael-kors-lexington-chronograph-quartz-black-dial-watch-mk9154_2.webp",
+      "/assets/images/products/uploads/michael-kors-lexington-chronograph-quartz-black-dial-watch-mk9154_3.webp"
     ]
   }
 ]
