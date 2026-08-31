@@ -879,9 +879,9 @@
         "color": "Зелений",
         "hex": "#06b454",
         "images": [
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=02a8f2ff",
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=4921da1f",
           "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-2.webp?v=7f7d7a02",
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=3c769c8f"
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=26e80bce"
         ],
         "sku": "B094QT219C"
       },
@@ -889,9 +889,9 @@
         "color": "Карамельний",
         "hex": "#f49657",
         "images": [
-          "assets/images/products/uploads/jwp-ma123-1.webp?v=461de562",
+          "assets/images/products/uploads/jwp-ma123-1.webp?v=98c9cf55",
           "assets/images/products/uploads/jwp-ma123-2.webp?v=189c38d2",
-          "assets/images/products/uploads/jwp-ma123-3.webp?v=387848b2"
+          "assets/images/products/uploads/jwp-ma123-3.webp?v=05e688cb"
         ],
         "sku": "JWP-MA123"
       }
@@ -4287,8 +4287,8 @@
           "/assets/images/products/uploads/ca173_svvfq_a0.webp?v=274cb8ee",
           "/assets/images/products/uploads/ca173_svvfq_a5.webp?v=c14cae6b",
           "/assets/images/products/uploads/ca173_svvfq_a8.webp?v=b75e933e",
-          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=06efeb78",
-          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=8c38c487"
+          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=f93fbf82",
+          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=84b0fc61"
         ]
       }
     ],
@@ -6690,6 +6690,74 @@
       "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-d6f54bf0.webp",
       "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-4b1f82a5.webp",
       "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-960c6b7f.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Нержавіюча сталь",
+    "brand": "Michael Kors",
+    "price": 7300,
+    "preOrder": true,
+    "dimensions": "Діаметр корпусу: 40 мм Ширина браслета: 20 мм",
+    "variants": [
+      {
+        "color": "Рожеве золото",
+        "hex": "#c5a4c4",
+        "images": [
+          "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7557.jpg?v=7ba565fb",
+          "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7557_2.jpg?v=791ac262",
+          "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7557_3.jpg?v=ab9ead93"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Michael Kors",
+      "Michael Kors Watch",
+      "Michael Kors Billie",
+      "Billie Watch",
+      "Oversized Billie",
+      "MK7557",
+      "Michael Kors MK7557",
+      "жіночий годинник Michael Kors",
+      "годинник Michael Kors",
+      "рожеве золото",
+      "Rose Gold",
+      "рожеве золото Michael Kors",
+      "годинник з хронографом",
+      "кварцовий годинник",
+      "жіночий хронограф",
+      "сталевий браслет",
+      "брендований годинник",
+      "оригінальний Michael Kors"
+    ],
+    "isNew": false,
+    "title": "Годинник Michael Kors Oversized Billie Frosted Chronograph MK7557",
+    "reviews": 0,
+    "closure": "Розкладна з кнопковим фіксатором",
+    "instagramBlock": "general",
+    "description": "Стильний жіночий годинник Michael Kors Billie у розкішному відтінку рожевого золота з ефектом Frosted. Браслет із нержавіючої сталі з комбінованим оздобленням красиво відбиває світло, а блискучий циферблат додає моделі елегантності та glamour-акценту.\nГодинник оснащений кварцовим механізмом із функцією хронографа та відображенням дати. Мінеральне скло захищає циферблат, а розкладна застібка з кнопковим фіксатором забезпечує комфортну посадку на зап'ясті",
+    "sku": "MK7557",
+    "rating": 5,
+    "category": "Годинники",
+    "legacySlugs": [
+      "годинник-michael-kors-oversized-billie-frosted-chronograph-mk7557"
+    ],
+    "slug": "hodynnyk-michael-kors-oversized-billie-frosted-chronograph-mk7557",
+    "id": 94,
+    "color": "Рожеве золото",
+    "images": [
+      "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7557.jpg",
+      "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7557_2.jpg",
+      "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7557_3.jpg"
     ]
   }
 ]

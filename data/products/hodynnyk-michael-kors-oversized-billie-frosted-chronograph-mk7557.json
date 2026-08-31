@@ -22,7 +22,7 @@
   ],
   "preOrderPrepayment": 100,
   "sizes": [
-    "Onesize"
+    "ONESIZE"
   ],
   "splitByColor": true,
   "searchKeywords": [
@@ -53,5 +53,16 @@
   "description": "Стильний жіночий годинник Michael Kors Billie у розкішному відтінку рожевого золота з ефектом Frosted. Браслет із нержавіючої сталі з комбінованим оздобленням красиво відбиває світло, а блискучий циферблат додає моделі елегантності та glamour-акценту.\nГодинник оснащений кварцовим механізмом із функцією хронографа та відображенням дати. Мінеральне скло захищає циферблат, а розкладна застібка з кнопковим фіксатором забезпечує комфортну посадку на зап'ясті",
   "sku": "MK7557",
   "rating": 5,
-  "category": "Годинники"
+  "category": "Годинники",
+  "legacySlugs": [
+    "годинник-michael-kors-oversized-billie-frosted-chronograph-mk7557"
+  ],
+  "slug": "hodynnyk-michael-kors-oversized-billie-frosted-chronograph-mk7557",
+  "id": 94,
+  "color": "Рожеве золото",
+  "images": [
+    "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7557.jpg",
+    "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7557_2.jpg",
+    "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7557_3.jpg"
+  ]
 }
