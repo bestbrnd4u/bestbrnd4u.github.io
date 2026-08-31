@@ -23,7 +23,7 @@
   "preOrderPrepayment": 100,
   "strapInfo": "Металевий браслет із нержавіючої сталі золотистого кольору, застібка-метелик із кнопковим фіксатором",
   "sizes": [
-    "Onesize"
+    "ONESIZE"
   ],
   "splitByColor": true,
   "searchKeywords": [
@@ -50,5 +50,16 @@
   "description": "Стильний чоловічий годинник Michael Kors Slim Runway MK8621 із контрастним чорним циферблатом та золотистим корпусом. Лаконічний дизайн із мінімалістичними індексами легко поєднується як із діловим, так і з повсякденним образом.\nМодель оснащена кварцовим механізмом, мінеральним склом із захистом від подряпин та аналоговим циферблатом із трьома стрілками. Корпус і браслет виконані з нержавіючої сталі із золотистим покриттям.\nГодинник має водозахист до 50 метрів (5 ATM), що робить його практичним для щоденного носіння. Масивний корпус діаметром 44 мм надає моделі виразного чоловічого характеру",
   "sku": "MK8621",
   "rating": 5,
-  "category": "Годинники"
+  "category": "Годинники",
+  "legacySlugs": [
+    "годинник-michael-kors-slim-runway-mk8621"
+  ],
+  "slug": "hodynnyk-michael-kors-slim-runway-mk8621",
+  "id": 98,
+  "color": "Золотистий / чорний",
+  "images": [
+    "/assets/images/products/uploads/michael-kors-slim-runway-black-dial-mens-watch-mk8621-.webp",
+    "/assets/images/products/uploads/michael-kors-slim-runway-black-dial-mens-watch-mk8621-_2.webp",
+    "/assets/images/products/uploads/michael-kors-slim-runway-black-dial-mens-watch-mk8621-_3.webp"
+  ]
 }
