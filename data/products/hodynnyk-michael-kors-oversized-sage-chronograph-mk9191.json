@@ -14,16 +14,16 @@
       "color": "Сріблястий / зелений циферблат",
       "hex": "#336c2d",
       "images": [
-        "/assets/images/products/uploads/michael-kors-oversized-sage-chronograph-quartz-green-dial-mens-watch-mk9191.webp",
-        "/assets/images/products/uploads/michael-kors-oversized-sage-chronograph-quartz-green-dial-mens-watch-mk9191_2.webp",
-        "/assets/images/products/uploads/michael-kors-oversized-sage-chronograph-quartz-green-dial-mens-watch-mk9191_3.webp"
+        "/assets/images/products/uploads/michael-kors-oversized-sage-chronograph--b10c945d.webp",
+        "/assets/images/products/uploads/michael-kors-oversized-sage-chronograph--52ba3cb7.webp",
+        "/assets/images/products/uploads/michael-kors-oversized-sage-chronograph--6cbadb1a.webp"
       ]
     }
   ],
   "preOrderPrepayment": 100,
   "strapInfo": "Браслет із нержавіючої сталі сріблястого кольору із застібкою-кліпсою",
   "sizes": [
-    "Onesize"
+    "ONESIZE"
   ],
   "splitByColor": true,
   "searchKeywords": [
@@ -52,5 +52,16 @@
   "description": "Стильний чоловічий годинник Michael Kors Oversized Sage Chronograph MK9191 із виразним зеленим циферблатом та сріблястим корпусом і браслетом. Великий корпус надає моделі сучасного та впевненого вигляду, а контраст зеленого циферблата зі сталевими деталями робить годинник акцентним елементом образу.\nМодель оснащена кварцовим механізмом із функцією хронографа та відображенням дати. Циферблат доповнений сріблястими індексами та стрілками, а мінеральне скло захищає його від подряпин.\nГодинник виконаний із нержавіючої сталі та має зручний металевий браслет із застібкою. Водозахист до 30 метрів дозволяє використовувати модель у повсякденному житті",
   "sku": "MK9191",
   "rating": 5,
-  "category": "Годинники"
+  "category": "Годинники",
+  "legacySlugs": [
+    "годинник-michael-kors-oversized-sage-chronograph-mk9191"
+  ],
+  "slug": "hodynnyk-michael-kors-oversized-sage-chronograph-mk9191",
+  "id": 100,
+  "color": "Сріблястий / зелений циферблат",
+  "images": [
+    "/assets/images/products/uploads/michael-kors-oversized-sage-chronograph--b10c945d.webp",
+    "/assets/images/products/uploads/michael-kors-oversized-sage-chronograph--52ba3cb7.webp",
+    "/assets/images/products/uploads/michael-kors-oversized-sage-chronograph--6cbadb1a.webp"
+  ]
 }

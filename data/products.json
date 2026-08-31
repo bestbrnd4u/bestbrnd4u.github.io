@@ -879,9 +879,9 @@
         "color": "Зелений",
         "hex": "#06b454",
         "images": [
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=61518c9f",
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=dc89f0a0",
           "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-2.webp?v=7f7d7a02",
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=98a87a18"
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=5e81fda0"
         ],
         "sku": "B094QT219C"
       },
@@ -889,9 +889,9 @@
         "color": "Карамельний",
         "hex": "#f49657",
         "images": [
-          "assets/images/products/uploads/jwp-ma123-1.webp?v=eb3cb0f5",
+          "assets/images/products/uploads/jwp-ma123-1.webp?v=58b9b693",
           "assets/images/products/uploads/jwp-ma123-2.webp?v=189c38d2",
-          "assets/images/products/uploads/jwp-ma123-3.webp?v=69d47af4"
+          "assets/images/products/uploads/jwp-ma123-3.webp?v=f3bba289"
         ],
         "sku": "JWP-MA123"
       }
@@ -4287,8 +4287,8 @@
           "/assets/images/products/uploads/ca173_svvfq_a0.webp?v=274cb8ee",
           "/assets/images/products/uploads/ca173_svvfq_a5.webp?v=c14cae6b",
           "/assets/images/products/uploads/ca173_svvfq_a8.webp?v=b75e933e",
-          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=48e2bca4",
-          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=fe280234"
+          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=df0365cf",
+          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=ebcf7835"
         ]
       }
     ],
@@ -7087,6 +7087,73 @@
       "/assets/images/products/uploads/michael-kors-slim-runway-quartz-green-dial-mens-watch-mk9149.webp",
       "/assets/images/products/uploads/michael-kors-slim-runway-quartz-green-dial-mens-watch-mk9149_2_1.webp",
       "/assets/images/products/uploads/michael-kors-slim-runway-quartz-green-dial-mens-watch-mk9149_3.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Чоловікам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Нержавіюча сталь; скло — мінеральне, стійке до подряпин",
+    "brand": "Michael Kors",
+    "price": 7400,
+    "preOrder": true,
+    "dimensions": "Розмір (габарити), см: Діаметр корпусу — 4,4 см.Товщина корпусу — близько 1,1 см.Ширина браслета — 2,2 см",
+    "variants": [
+      {
+        "color": "Сріблястий / зелений циферблат",
+        "hex": "#336c2d",
+        "images": [
+          "/assets/images/products/uploads/michael-kors-oversized-sage-chronograph--b10c945d.webp?v=7fe3bcdc",
+          "/assets/images/products/uploads/michael-kors-oversized-sage-chronograph--52ba3cb7.webp?v=fa8f9e17",
+          "/assets/images/products/uploads/michael-kors-oversized-sage-chronograph--6cbadb1a.webp?v=7c03297c"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Браслет із нержавіючої сталі сріблястого кольору із застібкою-кліпсою",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Michael Kors",
+      "Michael Kors MK9191",
+      "MK9191",
+      "Michael Kors Sage",
+      "Oversized Sage",
+      "чоловічий годинник Michael Kors",
+      "чоловічий годинник",
+      "брендовий чоловічий годинник",
+      "зелений циферблат",
+      "годинник із зеленим циферблатом",
+      "сріблястий годинник",
+      "сріблястий чоловічий годинник",
+      "годинник хронограф",
+      "чоловічий хронограф",
+      "кварцовий годинник",
+      "годинник на браслеті",
+      "сталевий годинник"
+    ],
+    "isNew": false,
+    "title": "Годинник Michael Kors Oversized Sage Chronograph MK9191",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильний чоловічий годинник Michael Kors Oversized Sage Chronograph MK9191 із виразним зеленим циферблатом та сріблястим корпусом і браслетом. Великий корпус надає моделі сучасного та впевненого вигляду, а контраст зеленого циферблата зі сталевими деталями робить годинник акцентним елементом образу.\nМодель оснащена кварцовим механізмом із функцією хронографа та відображенням дати. Циферблат доповнений сріблястими індексами та стрілками, а мінеральне скло захищає його від подряпин.\nГодинник виконаний із нержавіючої сталі та має зручний металевий браслет із застібкою. Водозахист до 30 метрів дозволяє використовувати модель у повсякденному житті",
+    "sku": "MK9191",
+    "rating": 5,
+    "category": "Годинники",
+    "legacySlugs": [
+      "годинник-michael-kors-oversized-sage-chronograph-mk9191"
+    ],
+    "slug": "hodynnyk-michael-kors-oversized-sage-chronograph-mk9191",
+    "id": 100,
+    "color": "Сріблястий / зелений циферблат",
+    "images": [
+      "/assets/images/products/uploads/michael-kors-oversized-sage-chronograph--b10c945d.webp",
+      "/assets/images/products/uploads/michael-kors-oversized-sage-chronograph--52ba3cb7.webp",
+      "/assets/images/products/uploads/michael-kors-oversized-sage-chronograph--6cbadb1a.webp"
     ]
   }
 ]
