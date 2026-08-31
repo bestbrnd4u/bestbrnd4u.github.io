@@ -1,0 +1,56 @@
+{
+  "gender": [
+    "Жінкам"
+  ],
+  "preOrderDays": "10-14 робочих днів",
+  "forcePublish": false,
+  "material": "Матеріал корпусу: нержавіюча стал. Матеріал ремінця: натуральна шкіра",
+  "brand": "Michael Kors",
+  "price": 5000,
+  "preOrder": true,
+  "dimensions": "Діаметр корпусу: 38 мм.Товщина корпусу: 8 мм Ширина ремінця: 18 мм. Довжина ремінця: 17,5 см",
+  "variants": [
+    {
+      "color": "Rose Gold / Soft Pink / White",
+      "hex": "#dfa3dc",
+      "images": [
+        "/assets/images/products/uploads/michael-kors-slim-runway-white-dial-ladies-watch-mk7545.webp",
+        "/assets/images/products/uploads/michael-kors-slim-runway-white-dial-ladies-watch-mk7545_2.webp",
+        "/assets/images/products/uploads/michael-kors-slim-runway-white-dial-ladies-watch-mk7545_3.webp"
+      ]
+    }
+  ],
+  "preOrderPrepayment": 100,
+  "strapInfo": "",
+  "sizes": [
+    "Onesize"
+  ],
+  "splitByColor": true,
+  "searchKeywords": [
+    "Michael Kors",
+    "Michael Kors Slim Runway",
+    "Slim Runway",
+    "MK7545",
+    "Michael Kors MK7545",
+    "жіночий годинник Michael Kors",
+    "годинник Michael Kors",
+    "рожеве золото",
+    "Rose Gold",
+    "рожевий ремінець",
+    "білий циферблат",
+    "шкіряний ремінець",
+    "кварцовий годинник",
+    "жіночий годинник",
+    "брендований годинник",
+    "оригінальний Michael Kors"
+  ],
+  "isNew": false,
+  "title": "Годинник Michael Kors Slim Runway MK7545",
+  "reviews": 0,
+  "closure": "Застібка: пряжка",
+  "instagramBlock": "general",
+  "description": "Елегантний жіночий годинник Michael Kors Slim Runway у ніжному поєднанні рожевого золота, білого циферблата та світло-рожевого шкіряного ремінця. Мінімалістичний дизайн робить модель універсальною — вона легко доповнить як повсякденний, так і діловий образ.\nГодинник оснащений точним кварцовим механізмом із трьома стрілками. Корпус виготовлений із нержавіючої сталі, циферблат захищений стійким до подряпин мінеральним склом, а шкіряний ремінець доповнений класичною застібкою-пряжкою",
+  "sku": "MK7545",
+  "rating": 5,
+  "category": "Годинники"
+}
