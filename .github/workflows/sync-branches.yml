@@ -146,6 +146,22 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run deploy-pages.yml --ref main
 
+      # Товар додають в адмінці — вона комітить у dev. На прод він
+      # приїжджає саме цим перенесенням, тож і пошуковики треба
+      # повідомляти тут: на боці dev адреси закриті robots.txt-ом, і
+      # сам скрипт там відмовляється надсилати.
+      #
+      # Лише напрямок у main: перенесення main -> dev нічого нового в
+      # індекс не додає.
+      #
+      # continue-on-error: пінг прискорює обхід, але не є частиною
+      # випуску. Недоступний api.indexnow.org не має робити перенесення
+      # червоним.
+      - name: Notify search engines (IndexNow)
+        if: steps.pick.outputs.to == 'main'
+        continue-on-error: true
+        run: node scripts/ping-indexnow.js
+
       - name: Підсумок
         run: |
           echo "### Перенесено: ${{ steps.pick.outputs.from }} → ${{ steps.pick.outputs.to }}" >> $GITHUB_STEP_SUMMARY

@@ -174,3 +174,17 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run deploy-pages.yml --ref main
+
+      # Повідомляємо пошуковики про нові й змінені адреси (IndexNow:
+      # Bing, Yandex, Seznam, Naver). Без цього новий товар чекає, поки
+      # робот зайде сам, — у нового домену це дні або тижні.
+      #
+      # ПІСЛЯ деплою, а не до: пошуковик прийде за адресою в межах
+      # хвилин, і сторінка вже має віддаватись новою.
+      #
+      # continue-on-error: пінг — прискорювач, а не частина випуску.
+      # Недоступний api.indexnow.org не має робити випуск червоним.
+      - name: Notify search engines (IndexNow)
+        if: steps.commit.outputs.pushed == 'true'
+        continue-on-error: true
+        run: node scripts/ping-indexnow.js
