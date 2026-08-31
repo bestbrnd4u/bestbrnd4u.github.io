@@ -879,9 +879,9 @@
         "color": "Зелений",
         "hex": "#06b454",
         "images": [
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=e9ddedd8",
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=61518c9f",
           "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-2.webp?v=7f7d7a02",
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=61b89d05"
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=98a87a18"
         ],
         "sku": "B094QT219C"
       },
@@ -889,9 +889,9 @@
         "color": "Карамельний",
         "hex": "#f49657",
         "images": [
-          "assets/images/products/uploads/jwp-ma123-1.webp?v=c980985c",
+          "assets/images/products/uploads/jwp-ma123-1.webp?v=eb3cb0f5",
           "assets/images/products/uploads/jwp-ma123-2.webp?v=189c38d2",
-          "assets/images/products/uploads/jwp-ma123-3.webp?v=df6e55e9"
+          "assets/images/products/uploads/jwp-ma123-3.webp?v=69d47af4"
         ],
         "sku": "JWP-MA123"
       }
@@ -4287,8 +4287,8 @@
           "/assets/images/products/uploads/ca173_svvfq_a0.webp?v=274cb8ee",
           "/assets/images/products/uploads/ca173_svvfq_a5.webp?v=c14cae6b",
           "/assets/images/products/uploads/ca173_svvfq_a8.webp?v=b75e933e",
-          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=b0b26ecf",
-          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=054f3905"
+          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=48e2bca4",
+          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=fe280234"
         ]
       }
     ],
@@ -7021,6 +7021,72 @@
       "/assets/images/products/uploads/michael-kors-slim-runway-black-dial-mens-watch-mk8621-.webp",
       "/assets/images/products/uploads/michael-kors-slim-runway-black-dial-mens-watch-mk8621-_2.webp",
       "/assets/images/products/uploads/michael-kors-slim-runway-black-dial-mens-watch-mk8621-_3.webp"
+    ]
+  },
+  {
+    "gender": [
+      "Чоловікам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Нержавіюча сталь; мінеральне скло",
+    "brand": "Michael Kors",
+    "price": 5900,
+    "preOrder": true,
+    "dimensions": "Діаметр корпусу — 4,4 см.Товщина корпусу — 0,8 см.Ширина браслета — 2,2 см",
+    "variants": [
+      {
+        "color": "Зелений",
+        "hex": "#355c1d",
+        "images": [
+          "/assets/images/products/uploads/michael-kors-slim-runway-quartz-green-dial-mens-watch-mk9149.webp?v=d2c1165d",
+          "/assets/images/products/uploads/michael-kors-slim-runway-quartz-green-dial-mens-watch-mk9149_2_1.webp?v=9c7e4cbd",
+          "/assets/images/products/uploads/michael-kors-slim-runway-quartz-green-dial-mens-watch-mk9149_3.webp?v=f7f0bf8d"
+        ]
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Металевий браслет із нержавіючої сталі у двоколірному виконанні — сріблястий + золотистий. Застібка-кліпса",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Michael Kors",
+      "Michael Kors MK9149",
+      "MK9149",
+      "Slim Runway",
+      "Oversized Slim Runway",
+      "чоловічий годинник Michael Kors",
+      "чоловічий годинник",
+      "годинник Michael Kors",
+      "зелений циферблат",
+      "годинник із зеленим циферблатом",
+      "двоколірний годинник",
+      "золотисто-сріблястий годинник",
+      "кварцовий годинник",
+      "годинник на браслеті",
+      "сталевий годинник",
+      "брендовий чоловічий годинник"
+    ],
+    "isNew": false,
+    "title": "Годинник Michael Kors Oversized Slim Runway MK9149",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильний чоловічий годинник Michael Kors Oversized Slim Runway MK9149 із насиченим зеленим циферблатом та елегантним двоколірним браслетом. Поєднання сріблястих і золотистих відтінків надає моделі універсальності та дозволяє легко поєднувати її з різними образами.\nМодель оснащена кварцовим механізмом, аналоговим циферблатом із мінімалістичними індексами та мінеральним склом. Корпус і браслет виготовлені з нержавіючої сталі.\nЗавдяки великому корпусу діаметром 44 мм годинник має виразний вигляд на зап'ясті. Водозахист до 50 метрів дозволяє комфортно використовувати модель у повсякденному житті",
+    "sku": "MK9149",
+    "rating": 5,
+    "category": "Годинники",
+    "legacySlugs": [
+      "годинник-michael-kors-oversized-slim-runway-mk9149"
+    ],
+    "slug": "hodynnyk-michael-kors-oversized-slim-runway-mk9149",
+    "id": 99,
+    "color": "Зелений",
+    "images": [
+      "/assets/images/products/uploads/michael-kors-slim-runway-quartz-green-dial-mens-watch-mk9149.webp",
+      "/assets/images/products/uploads/michael-kors-slim-runway-quartz-green-dial-mens-watch-mk9149_2_1.webp",
+      "/assets/images/products/uploads/michael-kors-slim-runway-quartz-green-dial-mens-watch-mk9149_3.webp"
     ]
   }
 ]

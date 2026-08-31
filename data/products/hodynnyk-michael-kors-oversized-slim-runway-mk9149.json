@@ -23,7 +23,7 @@
   "preOrderPrepayment": 100,
   "strapInfo": "Металевий браслет із нержавіючої сталі у двоколірному виконанні — сріблястий + золотистий. Застібка-кліпса",
   "sizes": [
-    "Onesize"
+    "ONESIZE"
   ],
   "splitByColor": true,
   "searchKeywords": [
@@ -51,5 +51,16 @@
   "description": "Стильний чоловічий годинник Michael Kors Oversized Slim Runway MK9149 із насиченим зеленим циферблатом та елегантним двоколірним браслетом. Поєднання сріблястих і золотистих відтінків надає моделі універсальності та дозволяє легко поєднувати її з різними образами.\nМодель оснащена кварцовим механізмом, аналоговим циферблатом із мінімалістичними індексами та мінеральним склом. Корпус і браслет виготовлені з нержавіючої сталі.\nЗавдяки великому корпусу діаметром 44 мм годинник має виразний вигляд на зап'ясті. Водозахист до 50 метрів дозволяє комфортно використовувати модель у повсякденному житті",
   "sku": "MK9149",
   "rating": 5,
-  "category": "Годинники"
+  "category": "Годинники",
+  "legacySlugs": [
+    "годинник-michael-kors-oversized-slim-runway-mk9149"
+  ],
+  "slug": "hodynnyk-michael-kors-oversized-slim-runway-mk9149",
+  "id": 99,
+  "color": "Зелений",
+  "images": [
+    "/assets/images/products/uploads/michael-kors-slim-runway-quartz-green-dial-mens-watch-mk9149.webp",
+    "/assets/images/products/uploads/michael-kors-slim-runway-quartz-green-dial-mens-watch-mk9149_2_1.webp",
+    "/assets/images/products/uploads/michael-kors-slim-runway-quartz-green-dial-mens-watch-mk9149_3.webp"
+  ]
 }
