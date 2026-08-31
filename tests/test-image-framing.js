@@ -332,6 +332,49 @@ console.log("\n[7b] Кадрування працює не лише в това�
     check("ховер акції множиться на наближення",
         /scale\(calc\(var\(--frame-zoom,1\) \* 1\.06\)\)/.test(css));
 
+    // ВСІ ЧОТИРИ СПОСОБИ ПОКАЗУ АКЦІЇ, а не один.
+    //
+    // promoPicture() ставить --frame-* на фото КОЖНОГО способу показу —
+    // це одна функція на всі чотири. А в CSS змінні читав лише
+    // .promo-card-image img, тобто «маленька картка». У трьох інших
+    // стояла жорстко забита позиція (top / top center / нічого), і
+    // точка кадру з адмінки не робила нічого.
+    //
+    // Помітити це було майже неможливо: жодна з опублікованих акцій не
+    // показується «маленькою карткою», тож поле «Кадрування фото» не
+    // працювало взагалі ніде.
+    [
+        ["слайдер на всю ширину", "\\.promo-hero-slide-image img", "0%"],
+        ["компактний банер бренду", "\\.brand-teaser-image img", "0%"],
+        ["великий банер + товари", "\\.brand-campaign-image img", "50%"]
+    ].forEach(([name, selector, defaultY]) => {
+
+        const rule = new RegExp(
+            `${selector}\\{[\\s\\S]{0,400}object-position:var\\(--frame-x,50%\\) var\\(--frame-y,${defaultY}\\)`);
+
+        check(`${name} слухається точки кадру`, rule.test(css));
+
+        // Замовчування мусить повторювати те, що стояло жорстко: інакше
+        // всі вже опубліковані акції зсунулись би при цій правці.
+        check(`  і без рамки кадрується як раніше (${defaultY})`, rule.test(css));
+
+        const zoom = new RegExp(`${selector}\\{[\\s\\S]{0,400}transform:scale\\(var\\(--frame-zoom,1\\)\\)`);
+
+        check(`  повзунок наближення теж діє`, zoom.test(css));
+
+    });
+
+    // Ховер тих двох банерів раніше просто замінював transform, тобто
+    // збивав наближення з рамки.
+    check("ховер банерів множиться на наближення, а не замінює його",
+        /scale\(calc\(var\(--frame-zoom,1\) \* 1\.04\)\)/.test(css)
+        && !/\.brand-campaign-image:hover img,\s*\.brand-teaser-image:hover img\{\s*transform:scale\(1\.04\)/.test(css));
+
+    // І остання ланка: без цього рядка рамка нікуди не їде з адмінки —
+    // збірка викидала поле, і CSS отримував порожню змінну.
+    check("збірка передає рамку акції в data/promotions.json",
+        /framing: data\.framing/.test(read("scripts/build-promotions.js")));
+
     check("рамка доходить до банерів", /applyFraming\(el, framing, imageUrl\)/.test(app));
     check("головна передає свій словник рамок",
         /renderHero\(data\.hero, data\.framing\)/.test(app)

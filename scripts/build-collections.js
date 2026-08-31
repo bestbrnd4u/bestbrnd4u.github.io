@@ -66,6 +66,16 @@ function main() {
             imageMobile: data.imageMobile || "",
             imageAlt: data.imageAlt || data.title,
             productIds: data.products.map(Number),
+            // Оформлення тексту. renderCollectionWidget() у app.js його
+            // вже читає (blockStyleClass/blockStyleAttr), але сюди воно
+            // не потрапляло — тобто розділ «Оформлення тексту і кнопки»
+            // в адмінці зберігався і не робив нічого. Та сама помилка
+            // була в акціях; за переліком полів тепер стежить
+            // tests/test-admin-fields-reach-site.js.
+            ...(data.style && typeof data.style === "object"
+                && Object.keys(data.style).length
+                ? { style: data.style }
+                : {}),
             order: typeof data.order === "number" ? data.order : 1
         });
 

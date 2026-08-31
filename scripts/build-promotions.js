@@ -206,6 +206,27 @@ function main() {
             // нічого не додають.
             ...(data.splitByColor === false ? { splitByColor: false } : {}),
             genderButtons,
+            // Кадрування фото і оформлення тексту.
+            //
+            // Обидва поля вже читає головна: framing — у promoPicture()
+            // через ImageFraming.frameStyleAttr(), style — у
+            // blockStyleClass()/blockStyleAttr()/applyBlockStyle() на
+            // картці, слайдері й великому банері. Але сюди вони не
+            // потрапляли, і сайт читає САМЕ цей файл — тобто «Кадрування
+            // фото» і весь розділ «Оформлення тексту і кнопки» в адмінці
+            // зберігались і не робили нічого.
+            //
+            // Мовчки: адмінка не має способу сказати «я зберегла, але це
+            // нікуди не поїде». Тому за переліком полів тепер стежить
+            // tests/test-admin-fields-reach-site.js.
+            ...(data.framing && typeof data.framing === "object"
+                && Object.keys(data.framing).length
+                ? { framing: data.framing }
+                : {}),
+            ...(data.style && typeof data.style === "object"
+                && Object.keys(data.style).length
+                ? { style: data.style }
+                : {}),
             displayType: ["card", "hero_slider", "banner_products", "banner_compact"].includes(data.displayType)
                 ? data.displayType
                 : "card",
