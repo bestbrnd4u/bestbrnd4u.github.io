@@ -271,6 +271,34 @@ console.log("\n[6] robots.txt відповідає середовищу");
     }
 }
 
+console.log("\n[6b] Пошуковики дізнаються про новину самі");
+{
+    // sitemap відповідає на «що є на сайті», але не на «коли про це
+    // дізнаються». Друге — IndexNow, і в нього своя тиха точка збою:
+    // файл із ключем. Немає його в корені — пошуковик відповідає 403,
+    // і видно це лише в логах через тиждень.
+    const key = config.indexNowKey;
+
+    check("ключ IndexNow заданий", !!key && /^[a-zA-Z0-9-]{8,128}$/.test(key), key);
+
+    check(`файл ${key}.txt на місці`, fs.existsSync(path.join(ROOT, `${key}.txt`)));
+
+    check("у файлі рівно ключ",
+        fs.existsSync(path.join(ROOT, `${key}.txt`))
+        && read(`${key}.txt`).trim() === key);
+
+    // Крок є в обох збірках, які випускають прод. Товар з адмінки їде
+    // dev -> main перенесенням, тож без другого кроку про нього не
+    // дізнався б ніхто.
+    check("прод-збірка повідомляє пошуковики",
+        /ping-indexnow\.js/.test(read(".github/workflows/build-products.yml")));
+
+    check("перенесення dev -> main теж",
+        /ping-indexnow\.js/.test(read(".github/workflows/sync-branches.yml")));
+
+    // Подробиці протоколу — у tests/test-indexnow.js.
+}
+
 console.log("\n[7] Адреси в sitemap коректні");
 {
     check("усі адреси на домені середовища",

@@ -33,5 +33,10 @@ module.exports = {
     // домен, за яким Netlify впізнає сайт і на який ВІДПРАВЛЯЄ токен
     // назад через postMessage (див. site.config.json)
     OAUTH_SITE_ID: env.oauthSiteId || env.url.replace(/^https?:\/\//, ""),
+    // Ключ IndexNow — спільний на весь сайт, не на середовище: файл із
+    // ним лежить у корені репозиторію, отже потрапляє в обидві гілки.
+    // Надсилати адреси має право ЛИШЕ індексоване середовище — за це
+    // відповідає сам scripts/ping-indexnow.js.
+    INDEXNOW_KEY: config.indexNowKey || "",
     ALL: config
 };
