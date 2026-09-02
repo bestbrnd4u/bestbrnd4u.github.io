@@ -1001,7 +1001,24 @@ function showToast(text) {
 // Глобальний пошук (оверлей у стилі Nike)
 // -------------------------
 
-const POPULAR_SEARCHES = ["Guess", "Michael Kors", "Рюкзаки", "Жіночі сумки", "Чоловічі сумки", "Furla"];
+// «Популярні запити» — чипи під полем пошуку, поки нічого не ввели.
+//
+// РЕДАГУЮТЬСЯ В АДМІНЦІ: «Сторінки» → «Пошук» → «Популярні запити».
+// Цей перелік — лише запас на випадок, коли файл налаштувань не
+// приїхав.
+//
+// ЧОМУ ЙОГО ВЗАГАЛІ ЗАЧІПАЛИ. Тут стояло Guess, Рюкзаки і Furla —
+// бренди й категорія, яких у каталозі вже немає. Тобто половина
+// підказок вела в «нічого не знайдено»: гірше, ніж не підказувати
+// зовсім, бо покупець вирішує, що магазин порожній.
+//
+// Щоб це не повторилось, tests/test-search-banners.js перевіряє, що
+// КОЖЕН запит — і звідси, і з адмінки — справді щось знаходить у
+// каталозі.
+const POPULAR_SEARCHES = [
+    "Marc Jacobs", "Coach", "Michael Kors",
+    "Жіночі сумки", "Годинники", "Окуляри"
+];
 const RECENT_SEARCHES_KEY = "recentSearches";
 const MAX_RECENT_SEARCHES = 6;
 const MAX_SEARCH_RESULTS = 6;
@@ -1184,6 +1201,10 @@ function buildSearchOverlay() {
 // Якщо файл не приїде або в ньому нічого не вибрано, плитка лишиться
 // темною (background-color) з читабельним білим підписом — краще так,
 // ніж порожній світлий прямокутник із невидимим текстом.
+// dataUrl(), а не голий шлях: інакше браузер віддає файл із кешу, і
+// зміна в адмінці не видно доти, доки людина не почистить кеш. Раніше
+// це стосувалось лише картинок (їх міняють раз на сезон), а тепер тут
+// ще й «Популярні запити» — те, що правлять частіше за все інше.
 const SEARCH_BANNERS_URL = "data/search-banners.json";
 
 let searchBannersPromise = null;
@@ -1192,7 +1213,7 @@ function loadSearchBanners() {
 
     if (!searchBannersPromise) {
 
-        searchBannersPromise = fetch(SEARCH_BANNERS_URL)
+        searchBannersPromise = fetch(dataUrl(SEARCH_BANNERS_URL))
             .then(response => response.ok ? response.json() : {})
             .catch(() => ({}));
 
@@ -1351,14 +1372,12 @@ async function runGlobalSearch(query) {
 
 }
 
-function renderSearchIdleLists() {
+// Чипи «Популярні запити». Текст приходить від адміністратора, тож
+// екранується — інакше «<b>сумки» перетворилось би на розмітку.
+function renderPopularChips(popularEl, terms) {
 
-    const popularEl = document.getElementById("searchPopular");
-    const recentSection = document.getElementById("searchRecentSection");
-    const recentEl = document.getElementById("searchRecent");
-
-    popularEl.innerHTML = POPULAR_SEARCHES.map(term =>
-        `<button type="button" class="search-chip">${term}</button>`
+    popularEl.innerHTML = terms.map(term =>
+        `<button type="button" class="search-chip">${escapeHtml(term)}</button>`
     ).join("");
 
     popularEl.querySelectorAll(".search-chip").forEach(chip => {
@@ -1372,6 +1391,34 @@ function renderSearchIdleLists() {
             runGlobalSearch(chip.textContent);
 
         });
+
+    });
+
+}
+
+function renderSearchIdleLists() {
+
+    const popularEl = document.getElementById("searchPopular");
+    const recentSection = document.getElementById("searchRecentSection");
+    const recentEl = document.getElementById("searchRecent");
+
+    // Спершу малюємо запас, потім — те, що в адмінці.
+    //
+    // Оверлей відкривають клацом, тобто зазвичай уже після
+    // завантаження файла, і другий малюнок нічого не мигає. А якщо
+    // файл ще їде, людина бачить робочі підказки, а не порожнє місце.
+    renderPopularChips(popularEl, POPULAR_SEARCHES);
+
+    loadSearchBanners().then(config => {
+
+        const terms = (config && Array.isArray(config.popularSearches))
+            ? config.popularSearches.filter(term => typeof term === "string" && term.trim())
+            : [];
+
+        // Порожній перелік в адмінці — це «показувати запас», а не
+        // «прибрати блок»: підказки допомагають, і залишати людину без
+        // них через незаповнене поле не варто.
+        if (terms.length) renderPopularChips(popularEl, terms);
 
     });
 

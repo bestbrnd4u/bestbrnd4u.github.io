@@ -18,5 +18,13 @@
     "desktop": "/assets/images/banners/search-tile-sale.webp",
     "mobile": "/assets/images/banners/search-tile-sale-sm.webp",
     "hideLabel": true
-  }
+  },
+  "popularSearches": [
+    "Marc Jacobs",
+    "Coach",
+    "Michael Kors",
+    "Жіночі сумки",
+    "Годинники",
+    "Окуляри"
+  ]
 }
