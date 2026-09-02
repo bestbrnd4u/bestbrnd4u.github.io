@@ -216,6 +216,29 @@ console.log("\n[6] Назва кольору в картці");
     check("назва екранується",
         /product-color-name">\$\{escapeHtml\(name\)\}/.test(ui));
 
+    // ПІДПИС МУСИТЬ ЙТИ ЗА СВОТЧЕМ
+    //
+    // Картку можна не тільки відкрити, а й перемкнути свотчем прямо в
+    // каталозі. Обробник міняв фото, розміри й артикул — а підпис
+    // кольору лишався той, з яким картку намалювали: власник перемкнув
+    // на бежевий, фото стало бежевим, а під назвою й далі «Чорний».
+    //
+    // Саме підпис відрізняє дві картки одного товару, розкладені по
+    // кольорах, тож брехати він не має права.
+    const commonSrc = read("assets/js/common.js");
+
+    check("перемикання свотча оновлює підпис кольору",
+        /scope\.querySelector\("\.product-color-name"\)/.test(commonSrc));
+
+    check("і робить це в обробнику свотча, а не деінде",
+        commonSrc.indexOf('scope.querySelector(".product-color-name")')
+            > commonSrc.indexOf('const colorBtn = event.target.closest(".mini-color, .color")'));
+
+    // «Основний» — та сама заглушка, що й у cardColorLabel: показувати
+    // її гірше, ніж не показувати нічого.
+    check("заглушка «Основний» не потрапляє в підпис і при перемиканні",
+        /name === "Основний" \? "" : name/.test(commonSrc));
+
     const css = read("assets/css/style.css");
 
     check("є стилі підпису", /\.product-color-name\{/.test(css));

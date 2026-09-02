@@ -2009,6 +2009,31 @@ document.addEventListener("click", event => {
 
         }
 
+        // Підпис кольору під назвою — той самий рядок, що малює
+        // cardColorLabel() в ui.js.
+        //
+        // Без цього рядка картка після перемикання показувала фото
+        // одного кольору, а підпис — іншого: власник перемкнув на
+        // бежевий, а під назвою лишалось «Чорний». Саме підпис і
+        // відрізняє дві картки одного товару, розкладені по кольорах,
+        // тож брехати він не має права.
+        //
+        // «Основний» не показуємо: це заглушка з запасного варіанта
+        // (див. cardColorLabel), а не назва кольору.
+        if (scope && colorBtn.dataset.color) {
+
+            const label = scope.querySelector(".product-color-name");
+
+            if (label) {
+
+                const name = colorBtn.dataset.color;
+
+                label.textContent = name === "Основний" ? "" : name;
+
+            }
+
+        }
+
         // Артикул теж свій у кожного кольору — оновлюємо підпис під
         // назвою товару і рядок у характеристиках. data-sku порожній →
         // артикула немає взагалі, тоді просто чистимо текст.
@@ -2075,23 +2100,27 @@ document.addEventListener("click", event => {
 
                 if (images.length) {
 
-                    // Слайд — обгортка, фото всередині.
+                    // Розмітка слайда — СПІЛЬНА з createProductCard
+                    // (cardPhotoSlide у ui.js). Тут стояла своя копія,
+                    // і вона розійшлася з оригіналом: без style із
+                    // кадруванням і без data-variant-src. Наслідок
+                    // власник побачив на скріншоті — перемкнув колір, і
+                    // сумка з наближенням 2.34× стала дрібною посеред
+                    // білого тла, бо --frame-zoom зникав.
                     //
-                    // Кадрування масштабує фото через transform, а той
-                    // не обрізається елементом: при 3× знімок займає
-                    // три ширини смуги, накриваючи сусідні слайди.
-                    // Обгортка з overflow:hidden тримає масштаб у межах
-                    // свого слайда (див. .photo-slide-photo у style.css).
-                    carouselTrack.innerHTML = images.map(img => `
-                        <div class="photo-slide photo-slide-photo">
-                            <img
-                                class="product-main-image"
-                                src="${img}"
-                                alt=""
-                                loading="lazy"
-                                onerror="this.src='assets/images/no-image.png'">
-                        </div>
-                    `).join("");
+                    // Словник кадрів їде в самій картці (data-framing).
+                    // НЕ з кешу товарів: на сторінці каталогу
+                    // cachedProducts порожній — його наповнюють
+                    // сторінка товару, кошик, обране й пошук, — тож
+                    // пошук по ньому повертав null і кадр однаково
+                    // зникав.
+                    const framing = cardFramingFrom(cardScope);
+
+                    const title = scope.querySelector(".product-title-link")?.textContent.trim();
+
+                    carouselTrack.innerHTML = images
+                        .map(img => cardPhotoSlide({ framing, title }, img))
+                        .join("");
 
                     carouselTrack.scrollLeft = 0;
 
