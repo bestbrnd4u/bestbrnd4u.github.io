@@ -3,7 +3,27 @@
     12,
     23,
     24,
-    26
+    26,
+    73,
+    74,
+    75,
+    76,
+    77,
+    78,
+    79,
+    81,
+    82,
+    83,
+    87,
+    88,
+    89,
+    94,
+    95,
+    96,
+    97,
+    98,
+    99,
+    100
   ],
   "active": true,
   "eyebrow": "ДОБІРКА",
@@ -11,8 +31,5 @@
   "order": 1,
   "title": "Годинники для твого стилю",
   "image": "/assets/images/banners/collection-watches.jpg",
-  "autoSections": [
-    "Годинники"
-  ],
   "imageMobile": "/assets/images/banners/collection-watches-mobile.jpg"
 }
