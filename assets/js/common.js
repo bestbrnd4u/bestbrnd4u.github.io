@@ -2089,7 +2089,11 @@ document.addEventListener("click", event => {
 
             const inlineSku = scope.querySelector("[data-product-sku]");
 
-            if (inlineSku) inlineSku.textContent = sku ? ` · ${sku}` : "";
+            // «Артикул: 20-2», а не « · 20-2»: у рядку під назвою
+            // більше немає бренду, до якого точка приклеювалась (див.
+            // product-meta-line в product.js), тож підпис пише сам
+            // обробник — інакше при перемиканні кольору він зникав.
+            if (inlineSku) inlineSku.textContent = sku ? `Артикул: ${sku}` : "";
 
             const specSku = scope.querySelector("[data-spec-sku]");
 
