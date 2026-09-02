@@ -1008,8 +1008,16 @@ function renderProduct(product) {
 
         </h1>
 
+        <!-- Артикул під назвою.
+             Тут стояло «Marc Jacobs · 20-1»: бренд і артикул через
+             точку. Бренд у цьому рядку був ЗАЙВИЙ — він уже є вище
+             окремим посиланням <a class="brand"> над заголовком, тобто
+             на сторінці читався двічі підряд. Лишився артикул, і тепер
+             з підписом: без нього «20-1» саме по собі нічого не казало.
+             Значення оновлює обробник свотча (common.js) за
+             data-product-sku — підпис він теж пише. -->
         <div class="product-meta-line">
-            ${escapeHtml(product.brand)}<span data-product-sku>${activeSku ? ` · ${escapeHtml(activeSku)}` : ""}</span>
+            <span data-product-sku>${activeSku ? `Артикул: ${escapeHtml(activeSku)}` : ""}</span>
         </div>
 
         <div class="price-box">

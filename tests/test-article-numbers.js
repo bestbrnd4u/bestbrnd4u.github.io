@@ -202,6 +202,26 @@ console.log("\n[6] На сайті видно номер, а не порожнє
     check("сторінка товару показує саме його",
         /const activeSku = getVariantArticle\(product, activeVariant\)/.test(product));
 
+    // РЯДОК ПІД НАЗВОЮ — «Артикул: 20-1», а не «Marc Jacobs · 20-1».
+    //
+    // Бренд у цьому рядку був зайвий: він уже є вище окремим
+    // посиланням <a class="brand"> над заголовком, тобто читався двічі
+    // підряд. А сам номер без підпису нічого не казав.
+    check("під назвою — підписаний артикул, без бренду",
+        /<span data-product-sku>\$\{activeSku \? `Артикул: \$\{escapeHtml\(activeSku\)\}`/.test(product));
+
+    check("бренду в цьому рядку більше немає",
+        !/product-meta-line">\s*\$\{escapeHtml\(product\.brand\)\}/.test(product));
+
+    // Бренд мусить лишитись вище — прибрали дубль, а не бренд.
+    check("посилання на бренд над заголовком лишилось",
+        /<a class="brand" href="catalog\?brand=/.test(product));
+
+    // Підпис пише й обробник свотча: інакше при перемиканні кольору
+    // «Артикул:» зникав, і лишався голий номер.
+    check("при перемиканні кольору підпис не зникає",
+        /inlineSku\.textContent = sku \? `Артикул: \$\{sku\}` : ""/.test(common));
+
     check("заводський код — окремий рядок",
         /const supplierSku = getVariantSku\(product, activeVariant\)/.test(product)
         && /data-spec-supplier-sku/.test(product));
