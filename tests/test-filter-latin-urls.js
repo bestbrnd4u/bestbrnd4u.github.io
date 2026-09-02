@@ -204,5 +204,103 @@ console.log("\n[4] Старі посилання не ламаються");
         && /if \(!GENDERS\.includes\(value\)\) selectedGenders\.delete\(value\)/.test(catalog));
 }
 
+console.log("\n[5] Розділ: адреса, яку каталог пише, він мусить і читати");
+{
+    // ЩО БУЛО НЕ ТАК
+    // ---------------
+    // «?department=aksesuary» відкривало ПОВНИЙ каталог: параметр
+    // зникав з адреси, фільтр не застосовувався. При цьому латиницю в
+    // адресу пише сам каталог, тож посилання, скопійоване з власного
+    // адресного рядка, не працювало. Власник наткнувся на це, коли
+    // ставив таке посилання в «Популярні категорії» на головній.
+    //
+    // Причина: переклад латиниці робився по переліку значень із
+    // ТОВАРІВ (fieldValues("department")), а поля department у товарі
+    // немає — розділ лежить у довіднику категорій. Перелік був
+    // порожній, переклад не відбувався, і сторож прибирав розділ як
+    // невідомий.
+    //
+    // ЧОМУ ЦЬОГО НЕ ЛОВИВ ТЕСТ. Блок [3] вище перевіряє замкнене коло
+    // на полях товару — і про розділ не знав з тієї самої причини, що
+    // й код. Тому джерело значень тут інше: data/categories.json.
+    const categories = JSON.parse(read("data/categories.json"));
+
+    const departments = [...new Set(categories.map(c => c && c.department).filter(Boolean))];
+
+    check(`розділи в довіднику є (${departments.length})`, departments.length > 0);
+
+    check("у кожного розділу є що покласти в адресу",
+        departments.every(d => toSlug(d)),
+        departments.filter(d => !toSlug(d)).join(", "));
+
+    const slugs = departments.map(toSlug);
+
+    check("два розділи не дають один slug",
+        new Set(slugs).size === slugs.length, slugs.join(","));
+
+    check("адреса лишається читабельною",
+        slugs.every(s => encodeURIComponent(s) === s), slugs.join(","));
+
+    // Беремо СПРАВЖНІЙ блок перекладу з catalog.js, а не його опис
+    // регуляркою: саме розбіжність копії й оригіналу тут і сховалась.
+    const початок = catalog.indexOf("const departmentBySlug = slugIndex(");
+    const кінець = catalog.indexOf("realDepartments.forEach(name => selectedDepartments.add(name));");
+
+    check("блок перекладу розділу знайдено", початок > 0 && кінець > початок);
+
+    const переклади = tokens => {
+
+        const selectedDepartments = new Set(tokens);
+
+        const departmentByCategory = new Map(
+            categories.filter(c => c && c.name && c.department).map(c => [c.name, c.department]));
+
+        new Function("window", "selectedDepartments", "departmentByCategory",
+            catalog.match(/function latinParam[\s\S]*?\n\}/)[0]
+            + catalog.match(/function slugIndex\(known\)[\s\S]*?\n\}/)[0]
+            + catalog.slice(початок, кінець)
+            + "realDepartments.forEach(name => selectedDepartments.add(name));"
+        )({ Translit: { toSlug } }, selectedDepartments, departmentByCategory);
+
+        return [...selectedDepartments];
+
+    };
+
+    // ГОЛОВНЕ: рівно та адреса, яку каталог пише сам.
+    departments.forEach(department => {
+
+        check(`«${department}» відкривається за ?department=${toSlug(department)}`,
+            переклади([toSlug(department)]).join(",") === department,
+            переклади([toSlug(department)]).join(",") || "фільтр зник");
+
+    });
+
+    // Кирилиця з уже розісланих посилань мусить працювати й далі.
+    check("кирилиця зі старого посилання ще працює",
+        переклади(["Аксесуари"]).join(",") === "Аксесуари",
+        переклади(["Аксесуари"]).join(",") || "фільтр зник");
+
+    // Кілька розділів через кому — так каталог пише мультивибір.
+    check("кілька розділів через кому",
+        переклади(["aksesuary", "vzuttia"]).sort().join(",") === ["Аксесуари", "Взуття"].sort().join(","),
+        переклади(["aksesuary", "vzuttia"]).join(","));
+
+    // Невідомий розділ і далі відкидається: застаріле посилання має
+    // показати каталог, а не порожнечу.
+    check("невідомий розділ відкидається", переклади(["nemaje-takoho"]).length === 0);
+
+    check("невідомий не тягне за собою відомий",
+        переклади(["nemaje-takoho", "vzuttia"]).join(",") === "Взуття",
+        переклади(["nemaje-takoho", "vzuttia"]).join(","));
+
+    // І сторож проти повернення: перелік розділів мусить приходити з
+    // довідника категорій, а не з полів товару.
+    check("переклад більше не питає товари про розділ",
+        !/fieldValues\("department"\)\s*\)/.test(catalog.replace(/\/\/.*$/gm, "")));
+
+    check("перелік розділів беруть із довідника категорій",
+        /slugIndex\(new Set\(departmentByCategory\.values\(\)\)\)/.test(catalog));
+}
+
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
 process.exit(failures === 0 ? 0 : 1);
