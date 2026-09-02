@@ -31,5 +31,8 @@
   "order": 1,
   "title": "Годинники для твого стилю",
   "image": "/assets/images/banners/collection-watches.jpg",
+  "autoSections": [
+    "Годинники"
+  ],
   "imageMobile": "/assets/images/banners/collection-watches-mobile.jpg"
 }
