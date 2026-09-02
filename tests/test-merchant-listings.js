@@ -63,12 +63,37 @@ console.log("\n[1] Артикул є в кожного товару");
     check("жодного товару без sku", bad.length === 0,
         bad.map(x => x.p.id).join(", "));
 
-    // артикул може бути не в товара, а у варіанта — саме через це
-    // в одного товару поле раніше не потрапляло в розмітку
-    const fromVariant = schemas.filter(x => !x.p.sku && x.ld.sku);
-    check(`артикул підхвачено з варіанта там, де його немає в товарі (${fromVariant.length})`,
-        fromVariant.every(x => (x.p.variants || []).some(v => v && sameSku(v.sku, x.ld.sku))),
-        fromVariant.map(x => x.p.id).join(", "));
+    // sku — АРТИКУЛ КАТАЛОГУ, і його ставить система.
+    //
+    // Раніше в sku йшов заводський код, який заповнювали руками: у
+    // годинника MK7558 (id=95) його не було ні в товарі, ні в кольорі,
+    // поле не потрапляло в розмітку, і Search Console писав «Invalid
+    // value in field "sku"». Порожнього артикула тепер не буває —
+    // номер видає збірка з id (scripts/build-products.js).
+    // article у вихідних файлах не лежить (він вичислюється зі id при
+    // збірці, див. build-products.js), тож очікуване значення беремо
+    // так само — з id.
+    const очікуванийSku = product => String(product.id);
+
+    check("sku — це номер каталогу, а не заводський код",
+        schemas.every(x => String(x.ld.sku) === очікуванийSku(x.p)),
+        schemas.filter(x => String(x.ld.sku) !== очікуванийSku(x.p))
+            .slice(0, 3).map(x => `id=${x.p.id}: ${x.ld.sku} ≠ ${очікуванийSku(x.p)}`).join("; "));
+
+    // Заводський код не зник — він переїхав у mpn, бо саме так Google
+    // розрізняє «позначка товару в магазині» і «код виробника».
+    const зКодом = schemas.filter(x => x.p.sku);
+
+    check(`код виробника доїжджає в mpn (${зКодом.length} товарів)`,
+        зКодом.every(x => x.ld.mpn && sameSku(x.ld.mpn, x.p.sku)),
+        зКодом.filter(x => !x.ld.mpn || !sameSku(x.ld.mpn, x.p.sku))
+            .slice(0, 3).map(x => `id=${x.p.id}: ${x.ld.mpn} ≠ ${x.p.sku}`).join("; "));
+
+    // Порожнє поле не має ставати «mpn»: "" Google теж вважає невалідним.
+    check("без коду виробника mpn просто немає",
+        schemas.filter(x => !x.p.sku).every(x => x.ld.mpn === undefined),
+        schemas.filter(x => !x.p.sku && x.ld.mpn !== undefined)
+            .slice(0, 3).map(x => `id=${x.p.id}`).join(", "));
 }
 
 console.log("\n[1b] Артикул виглядає як артикул, а не як назва товару");
@@ -292,7 +317,10 @@ console.log("\n[9] Артикул без пробілів — вимога Googl
 
     if (sample) {
 
-        const rendered = schemas.map(x => x.ld.sku).find(v => v === String(sample));
+        // Заводський код тепер їде в mpn, а не в sku: у sku лежить
+        // номер каталогу. Правило про дефіс від цього не змінилось —
+        // змінилось лише поле, у яке дивитись.
+        const rendered = schemas.map(x => x.ld.mpn).find(v => v === String(sample));
 
         check(`«${sample}» дійшов до розмітки як є`, !!rendered,
             "у розмітці такого значення немає");

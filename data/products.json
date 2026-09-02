@@ -22,7 +22,8 @@
         "sku": "A05042-0037354",
         "sizes": [
           "ONESIZE"
-        ]
+        ],
+        "article": "1-1"
       }
     ],
     "sizes": [
@@ -51,7 +52,8 @@
     "instagramBlock": "general",
     "description": "Сонцезахисні окуляри Alain Mikli в оправі «черепаха». Широкі скроневі дуги, темні лінзи. Універсальна форма, що підходить і жінкам, і чоловікам.",
     "sku": "A05042-0037354",
-    "category": "Окуляри і оправи"
+    "category": "Окуляри і оправи",
+    "article": "1"
   },
   {
     "title": "Чоловіча сумка Armani Exchange Crossbody Bag Black",
@@ -69,7 +71,8 @@
           "assets/images/products/uploads/arc54h01t-q11-2.webp?v=08f5197d",
           "assets/images/products/uploads/arc54h01t-q11-3.webp?v=bfeb6120"
         ],
-        "sku": "ARC54H01T-Q11"
+        "sku": "ARC54H01T-Q11",
+        "article": "2-1"
       }
     ],
     "isNew": false,
@@ -100,7 +103,8 @@
     "color": "Чорний",
     "sizes": [
       "ONESIZE"
-    ]
+    ],
+    "article": "2"
   },
   {
     "title": "Чоловіча сумка Armani Exchange",
@@ -119,7 +123,8 @@
           "assets/images/products/uploads/rtladf952201-3.webp?v=d1481e45",
           "assets/images/products/uploads/rtladf952201-4.webp?v=7b1f6308"
         ],
-        "sku": "RTLADF952201"
+        "sku": "RTLADF952201",
+        "article": "3-1"
       }
     ],
     "isNew": false,
@@ -149,7 +154,8 @@
     "color": "Чорний",
     "sizes": [
       "ONESIZE"
-    ]
+    ],
+    "article": "3"
   },
   {
     "title": "Balenciaga Сонцезахисні окуляри Grey Rectangular Ladies Sunglasses",
@@ -169,7 +175,8 @@
         "sku": "BB0096S-001-51",
         "sizes": [
           "ONESIZE"
-        ]
+        ],
+        "article": "4-1"
       }
     ],
     "oldPrice": 17900,
@@ -206,7 +213,8 @@
         "x": 50,
         "y": 50
       }
-    }
+    },
+    "article": "4"
   },
   {
     "gender": [
@@ -234,7 +242,8 @@
         "sku": "BB0041S-001-99",
         "sizes": [
           "ONESIZE"
-        ]
+        ],
+        "article": "5-1"
       }
     ],
     "sizes": [
@@ -264,7 +273,8 @@
     "instagramBlock": "general",
     "description": "Сонцезахисні окуляри Balenciaga з масивною оправою й темними лінзами. Виразна геометрія, логотип бренду на скроневій дузі. Модель, що працює як самостійний акцент образу.",
     "sku": "BB0041S-001-99",
-    "category": "Окуляри і оправи"
+    "category": "Окуляри і оправи",
+    "article": "5"
   },
   {
     "title": "Сонцезахисні окуляри Burberry Sophia Dark Grey Cat Eye",
@@ -286,7 +296,8 @@
         "sku": "BE4361F-300187-51",
         "sizes": [
           "ONESIZE"
-        ]
+        ],
+        "article": "6-1"
       }
     ],
     "oldPrice": 12900,
@@ -318,7 +329,8 @@
     ],
     "slug": "burberry-sontsezakhysni-okuliary-burberry-sophia-dark-grey-c",
     "id": 6,
-    "color": "Темно-сірий"
+    "color": "Темно-сірий",
+    "article": "6"
   },
   {
     "title": "Чоловіча шкіряна сумка Coach Ethan Signature Canvas",
@@ -337,7 +349,8 @@
           "assets/images/products/uploads/coach-ethan-cv918-qbnrx-3.webp?v=0b3ab868",
           "assets/images/products/uploads/coach-ethan-cv918-qbnrx-4.webp?v=180016b7"
         ],
-        "sku": "coach-ethan-cv918-qbnrx"
+        "sku": "coach-ethan-cv918-qbnrx",
+        "article": "7-1"
       }
     ],
     "oldPrice": 12300,
@@ -371,7 +384,8 @@
     "color": "Коричневий",
     "sizes": [
       "ONESIZE"
-    ]
+    ],
+    "article": "7"
   },
   {
     "gender": [
@@ -393,7 +407,8 @@
           "/assets/images/products/uploads/ct714_qbmi5_3_1100x1100.webp?v=17bd8d9d",
           "/assets/images/products/uploads/ct714_qbmi5_4_1100x1100.webp?v=cc22bbd6"
         ],
-        "sku": "coach-ct714-qbml5"
+        "sku": "coach-ct714-qbml5",
+        "article": "8-1"
       }
     ],
     "sizes": [
@@ -423,7 +438,8 @@
     "instagramBlock": "general",
     "description": "Coach Racer Belt Bag зі шкіри — поясна сумка з монограмним рельєфом. Регульований ремінь, носиться на поясі, через плече або навскіс. Унісекс-модель.",
     "sku": "coach-ct714-qbml5",
-    "category": "Чоловічі сумки"
+    "category": "Чоловічі сумки",
+    "article": "8"
   },
   {
     "gender": [
@@ -508,7 +524,8 @@
           "assets/images/products/uploads/coach73995black-2.webp?v=7ab21280",
           "assets/images/products/uploads/coach73995black-3.webp?v=fadd972b"
         ],
-        "sku": "coach73995black"
+        "sku": "coach73995black",
+        "article": "9-1"
       },
       {
         "color": "Світло-сірий",
@@ -519,7 +536,8 @@
           "assets/images/products/uploads/coach73995chalk-3.webp?v=af762261",
           "assets/images/products/uploads/coach73995chalk-4.webp?v=80b7610f"
         ],
-        "sku": "coach73995chalk"
+        "sku": "coach73995chalk",
+        "article": "9-2"
       },
       {
         "color": "Сіро-коричневий",
@@ -529,7 +547,8 @@
           "assets/images/products/uploads/coach73995-dark-stone-2.webp?v=c9095f73",
           "assets/images/products/uploads/coach73995-dark-stone-3.webp?v=0a136a87"
         ],
-        "sku": "coach73995-dark-stone"
+        "sku": "coach73995-dark-stone",
+        "article": "9-3"
       },
       {
         "hex": "#433636",
@@ -539,7 +558,8 @@
           "/assets/images/products/uploads/91215-b4ooh-1_b3aea35bcebe4922a51b66ad7b2bb0a1_master.webp?v=d1b4d1ce",
           "/assets/images/products/uploads/91215-b4ooh-2_ea0908385fb449c5a786a9c58e2e20cb_master.webp?v=2d97b604"
         ],
-        "sku": "coachB4OOH"
+        "sku": "coachB4OOH",
+        "article": "9-4"
       },
       {
         "color": "Коричневий",
@@ -550,7 +570,8 @@
           "/assets/images/products/uploads/4.3_3c1ef4e9-0d2f-4d62-a413-703f855d833b.webp?v=b4ebd30b",
           "/assets/images/products/uploads/4.6_b585e107-3532-4dd2-ad9c-2d2383b92dd0.webp?v=e5318137"
         ],
-        "sku": "coach73995brown"
+        "sku": "coach73995brown",
+        "article": "9-5"
       },
       {
         "color": "Тауп",
@@ -561,7 +582,8 @@
           "/assets/images/products/uploads/73995_lhtau_a5.webp?v=1dc33e64",
           "/assets/images/products/uploads/73995_lhtau_a8.webp?v=9e3412da",
           "/assets/images/products/uploads/73995_lhtau_a91.webp?v=dd650601"
-        ]
+        ],
+        "article": "9-6"
       }
     ],
     "sizes": [
@@ -591,7 +613,8 @@
     "instagramBlock": "general",
     "description": "Coach Tabby 26 — одна з найвпізнаваніших моделей бренду.\nМодель натхненна архівним дизайном COACH 1970-х років та доповнена фірмовою застібкою з Signature-фурнітурою.\nСумка виготовлена з натуральної шкіри Polished Pebble Leather — фактурної шкіри з легкою глянцевою поверхнею. Має зовнішню відкриту кишеню, внутрішню кишеню на блискавці та багатофункціональну кишеню.\nМодель комплектується двома знімними ременями: коротким для носіння в руці або на плечі та довгим регульованим для носіння через плече",
     "sku": "coach73995black",
-    "category": "Жіночі сумки"
+    "category": "Жіночі сумки",
+    "article": "9"
   },
   {
     "gender": "Жінкам",
@@ -615,7 +638,8 @@
           "assets/images/products/uploads/coach-cp150-b4ha-3.webp?v=0e7762f5",
           "assets/images/products/uploads/coach-cp150-b4ha-4.webp?v=b87c559c"
         ],
-        "sku": "coach-cp150-b4ha"
+        "sku": "coach-cp150-b4ha",
+        "article": "10-1"
       },
       {
         "color": "Чорний",
@@ -625,7 +649,8 @@
           "assets/images/products/uploads/cp150-b4bk-a0-2.webp?v=0a816477",
           "assets/images/products/uploads/cp150-b4bk-a0-3.webp?v=e3281eea"
         ],
-        "sku": "cp150_b4bk_a0"
+        "sku": "cp150_b4bk_a0",
+        "article": "10-2"
       },
       {
         "color": "Темно-коричневий",
@@ -635,7 +660,8 @@
           "assets/images/products/uploads/cp150-b4mpl-2.webp?v=068ef263",
           "assets/images/products/uploads/cp150-b4mpl-3.webp?v=9978c22d"
         ],
-        "sku": "cp150_b4mpl"
+        "sku": "cp150_b4mpl",
+        "article": "10-3"
       }
     ],
     "searchKeywords": [
@@ -680,7 +706,8 @@
         "x": 50,
         "y": 50
       }
-    }
+    },
+    "article": "10"
   },
   {
     "title": "Сонцезахисні окуляри GUCCI GG0516S Grey Rectangula",
@@ -701,7 +728,8 @@
         "sku": "GG0516S-001-52",
         "sizes": [
           "ONESIZE"
-        ]
+        ],
+        "article": "11-1"
       }
     ],
     "oldPrice": 18300,
@@ -732,7 +760,8 @@
     ],
     "slug": "gucci-sontsezakhysni-okuliary-gucci-gg0516s-grey-rectangula",
     "id": 11,
-    "color": "Темно-сірий"
+    "color": "Темно-сірий",
+    "article": "11"
   },
   {
     "gender": [
@@ -753,7 +782,8 @@
         "sku": "invicta-pro-diver-blue-dial-22058",
         "sizes": [
           "ONESIZE"
-        ]
+        ],
+        "article": "12-1"
       }
     ],
     "sizes": [
@@ -782,7 +812,8 @@
         "x": 50,
         "y": 50
       }
-    }
+    },
+    "article": "12"
   },
   {
     "title": "Сумочка на плече Jw Pei TESSA",
@@ -800,7 +831,8 @@
           "assets/images/products/uploads/jwpr-wy46-2.webp?v=ca0454c5",
           "assets/images/products/uploads/jwpr-wy46-3.webp?v=0ba4725a"
         ],
-        "sku": "JWPR-WY46"
+        "sku": "JWPR-WY46",
+        "article": "13-1"
       }
     ],
     "isNew": false,
@@ -837,7 +869,8 @@
         "y": 50,
         "bg": "keep"
       }
-    }
+    },
+    "article": "13"
   },
   {
     "gender": [
@@ -879,21 +912,23 @@
         "color": "Зелений",
         "hex": "#06b454",
         "images": [
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=02a8f2ff",
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=1948e135",
           "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-2.webp?v=7f7d7a02",
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=3c769c8f"
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=cc82d12e"
         ],
-        "sku": "B094QT219C"
+        "sku": "B094QT219C",
+        "article": "14-1"
       },
       {
         "color": "Карамельний",
         "hex": "#f49657",
         "images": [
-          "assets/images/products/uploads/jwp-ma123-1.webp?v=461de562",
+          "assets/images/products/uploads/jwp-ma123-1.webp?v=b77d600a",
           "assets/images/products/uploads/jwp-ma123-2.webp?v=189c38d2",
-          "assets/images/products/uploads/jwp-ma123-3.webp?v=387848b2"
+          "assets/images/products/uploads/jwp-ma123-3.webp?v=b36b2b8a"
         ],
-        "sku": "JWP-MA123"
+        "sku": "JWP-MA123",
+        "article": "14-2"
       }
     ],
     "sizes": [
@@ -925,7 +960,8 @@
     "instagramBlock": "general",
     "description": "JW PEI Gabbi — сумка-хобо з характерною драпіровкою, яка зробила модель відомою. Округла форма, коротка ручка, носиться в руці або на згині лікоття. Два насичених кольори.",
     "sku": "B094QT219C",
-    "category": "Жіночі сумки"
+    "category": "Жіночі сумки",
+    "article": "14"
   },
   {
     "title": "Жіноча сумочка JW PEI Maze Crossbody",
@@ -943,7 +979,8 @@
           "assets/images/products/uploads/jwp-ma106-2.webp?v=0bf0efb5",
           "assets/images/products/uploads/jwp-ma106-3.webp?v=b0f30608"
         ],
-        "sku": "JWP-MA106"
+        "sku": "JWP-MA106",
+        "article": "15-1"
       }
     ],
     "isNew": false,
@@ -980,7 +1017,8 @@
         "x": 50,
         "y": 50
       }
-    }
+    },
+    "article": "15"
   },
   {
     "title": "Жіноча сумочка JW PEI Mila Shoulder Bag",
@@ -999,7 +1037,8 @@
           "assets/images/products/uploads/jwp-ma080-3.webp?v=b072be2d",
           "assets/images/products/uploads/jwp-ma080-4.webp?v=535c1575"
         ],
-        "sku": "JWP-MA080"
+        "sku": "JWP-MA080",
+        "article": "16-1"
       }
     ],
     "isNew": false,
@@ -1031,7 +1070,8 @@
     "color": "Синій",
     "sizes": [
       "ONESIZE"
-    ]
+    ],
+    "article": "16"
   },
   {
     "title": "Сонцезахисні окуляри Marc Jacobs",
@@ -1053,7 +1093,8 @@
         "sku": "MJ-1028S-0807IR-54",
         "sizes": [
           "ONESIZE"
-        ]
+        ],
+        "article": "17-1"
       }
     ],
     "isNew": false,
@@ -1082,7 +1123,8 @@
     ],
     "slug": "marc-jacobs-sontsezakhysni-okuliary-marc-jacobs-2",
     "id": 17,
-    "color": "Темно-сірий"
+    "color": "Темно-сірий",
+    "article": "17"
   },
   {
     "title": "Сонцезахисні окуляри Marc Jacobs",
@@ -1103,7 +1145,8 @@
         "sku": "MJ-1061S-009QHA-59",
         "sizes": [
           "ONESIZE"
-        ]
+        ],
+        "article": "18-1"
       }
     ],
     "isNew": false,
@@ -1131,7 +1174,8 @@
     ],
     "slug": "marc-jacobs-sontsezakhysni-okuliary-marc-jacobs-3",
     "id": 18,
-    "color": "Темно-коричневий"
+    "color": "Темно-коричневий",
+    "article": "18"
   },
   {
     "title": "Сонцезахисні окуляри Marc Jacobs",
@@ -1152,7 +1196,8 @@
         "sku": "MARC-409S-08079O-54",
         "sizes": [
           "ONESIZE"
-        ]
+        ],
+        "article": "19-1"
       }
     ],
     "isNew": false,
@@ -1180,7 +1225,8 @@
     ],
     "slug": "marc-jacobs-sontsezakhysni-okuliary-marc-jacobs",
     "id": 19,
-    "color": "Темно-сірий"
+    "color": "Темно-сірий",
+    "article": "19"
   },
   {
     "gender": [
@@ -1220,7 +1266,8 @@
           "assets/images/products/uploads/2s3hcr500h03-134-2.webp?v=b3a15be3",
           "assets/images/products/uploads/2s3hcr500h03-134-3.webp?v=6f85764e"
         ],
-        "sku": "2S3HCR500H03_134"
+        "sku": "2S3HCR500H03_134",
+        "article": "20-1"
       },
       {
         "color": "Чорний",
@@ -1230,7 +1277,8 @@
           "assets/images/products/uploads/h153l01sp22-002-2.webp?v=9aca5d47",
           "assets/images/products/uploads/h153l01sp22-002-3.webp?v=0198e33b"
         ],
-        "sku": "H153L01SP22-002"
+        "sku": "H153L01SP22-002",
+        "article": "20-2"
       }
     ],
     "sortOrder": 1,
@@ -1263,7 +1311,8 @@
     "instagramBlock": "general",
     "description": "Крос-боді Marc Jacobs зі шкіри — акуратний прямокутний корпус і подвійна монограма J. Ремінець регулюється, тож сумку можна носити через плече або навскіс. Два кольори на вибір.",
     "sku": "2S3HCR500H03_134",
-    "category": "Жіночі сумки"
+    "category": "Жіночі сумки",
+    "article": "20"
   },
   {
     "gender": [
@@ -1302,7 +1351,8 @@
           "assets/images/products/uploads/2f3hsh042h02-230-2.webp?v=503a3353",
           "assets/images/products/uploads/2f3hsh042h02-230-3.webp?v=6b7b7e54"
         ],
-        "sku": "2F3HSH042H02-230"
+        "sku": "2F3HSH042H02-230",
+        "article": "21-1"
       }
     ],
     "sortOrder": 2,
@@ -1334,7 +1384,8 @@
     "instagramBlock": "general",
     "description": "Компактна сумочка Marc Jacobs із колекції The Teddy — м'який ворсистий верх і фірмова монограма J на клапані. Носиться на ланцюжку через плече або в руці. Модель на щодень, коли потрібно взяти лише необхідне.",
     "sku": "2F3HSH042H02-230",
-    "category": "Жіночі сумки"
+    "category": "Жіночі сумки",
+    "article": "21"
   },
   {
     "gender": [
@@ -1357,7 +1408,8 @@
           "assets/images/products/uploads/h652l01pf22-2.webp?v=62ce8928",
           "assets/images/products/uploads/h652l01pf22-3.webp?v=911cb61c"
         ],
-        "sku": "H652L01PF22"
+        "sku": "H652L01PF22",
+        "article": "22-1"
       }
     ],
     "sortOrder": 5,
@@ -1389,7 +1441,8 @@
     "instagramBlock": "general",
     "description": "Крос-боді Marc Jacobs зі шкіри. Компактний корпус, фірмова монограма, ремінець через плече. Модель, у яку вміщається все потрібне, але яка не виглядає громіздкою.",
     "sku": "H652L01PF22",
-    "category": "Жіночі сумки"
+    "category": "Жіночі сумки",
+    "article": "22"
   },
   {
     "title": "Годинник жіночий Mathey Tissot City Metal",
@@ -1409,7 +1462,8 @@
         "sku": "D31186MABU",
         "sizes": [
           "ONESIZE"
-        ]
+        ],
+        "article": "23-1"
       }
     ],
     "oldPrice": 9300,
@@ -1445,7 +1499,8 @@
         "x": 50,
         "y": 50
       }
-    }
+    },
+    "article": "23"
   },
   {
     "title": "Годинник жіночий Mathey Tissot Mathey II Quartz Crystal Black Dial Ladies Watch",
@@ -1466,7 +1521,8 @@
         "sku": "D710BN",
         "sizes": [
           "ONESIZE"
-        ]
+        ],
+        "article": "24-1"
       }
     ],
     "oldPrice": 9300,
@@ -1502,7 +1558,8 @@
         "x": 50,
         "y": 50
       }
-    }
+    },
+    "article": "24"
   },
   {
     "gender": [
@@ -1535,7 +1592,8 @@
           "assets/images/products/uploads/30h1ggrl2l-487-2.webp?v=32d8a662",
           "assets/images/products/uploads/30h1ggrl2l-487-3.webp?v=01be7b92"
         ],
-        "sku": "30H1GGRL2L-487"
+        "sku": "30H1GGRL2L-487",
+        "article": "25-1"
       }
     ],
     "sizes": [
@@ -1565,7 +1623,8 @@
     "instagramBlock": "general",
     "description": "Michael Kors Greenwich у середньому розмірі зі шкіри сафʼяно з дрібнозернистою текстурою. Клапан із фірменою круглою емблемою MK, знімний ремінець. Практична модель, що не втрачає вигляд у щоденному носінні.",
     "sku": "30H1GGRL2L-487",
-    "category": "Жіночі сумки"
+    "category": "Жіночі сумки",
+    "article": "25"
   },
   {
     "title": "Жіночий годинник MICHAEL KORS MK4619",
@@ -1586,7 +1645,8 @@
         "sku": "MK4619",
         "sizes": [
           "ONESIZE"
-        ]
+        ],
+        "article": "26-1"
       }
     ],
     "isNew": true,
@@ -1626,7 +1686,8 @@
         "x": 50,
         "y": 50
       }
-    }
+    },
+    "article": "26"
   },
   {
     "title": "Сонцезахисні окуляри PRADA 20WS 1AB5S0 DARK GREY",
@@ -1647,7 +1708,8 @@
         "sku": "PR-20WS-1AB5S0-49",
         "sizes": [
           "ONESIZE"
-        ]
+        ],
+        "article": "27-1"
       }
     ],
     "isNew": true,
@@ -1683,7 +1745,8 @@
         "x": 50,
         "y": 50
       }
-    }
+    },
+    "article": "27"
   },
   {
     "gender": [
@@ -1706,7 +1769,8 @@
           "/assets/images/products/uploads/35f1gx0c5u-1-.webp?v=3c55c3c3",
           "/assets/images/products/uploads/35f1gx0c5u-2-.webp?v=9fd6dd13",
           "/assets/images/products/uploads/c9149295-ab22-4007-afc5-eedc1ba4ff80.jpg?v=54e285a7"
-        ]
+        ],
+        "article": "28-1"
       },
       {
         "color": "Світло-сірий",
@@ -1714,7 +1778,8 @@
         "sku": "35F0SX0C5T",
         "images": [
           "/assets/images/products/uploads/000001_1644393747.webp?v=5488289d"
-        ]
+        ],
+        "article": "28-2"
       },
       {
         "images": [
@@ -1725,7 +1790,8 @@
         "video": "",
         "color": "Зелений",
         "hex": "#0e9409",
-        "sku": "35F0GX0C5T"
+        "sku": "35F0GX0C5T",
+        "article": "28-3"
       },
       {
         "color": "Темно-синій",
@@ -1736,7 +1802,8 @@
           "/assets/images/products/uploads/michael-kors-rose-small-top-handle-crossbody-quilted-navy-angle-scaled.webp?v=4b52a04e",
           "/assets/images/products/uploads/2ed9179f-687b-4e08-8769-ddcff453b8a1.jpg?v=eb189c34",
           "/assets/images/products/uploads/35f1gx0c5u-1-navy.webp?v=a4c240ac"
-        ]
+        ],
+        "article": "28-4"
       }
     ],
     "preOrderPrepayment": 50,
@@ -1782,7 +1849,8 @@
     "description": "Michael Kors Rose Small Top Handle Crossbody — стьобана сумка в насиченому відтінку Racing Green\nЕлегантна компактна сумка Michael Kors Rose поєднує жіночний дизайн і практичний формат. Стьобана фактура додає моделі виразності, а глибокий зелений відтінок Racing Green робить її стильним акцентом образу.\nКомпактна модель, яка легко доповнить як повсякденний, так і більш елегантний образ.\n",
     "sku": "35F1GX0C5U",
     "rating": 5,
-    "category": "Жіночі сумки"
+    "category": "Жіночі сумки",
+    "article": "28"
   },
   {
     "gender": [
@@ -1809,7 +1877,8 @@
           "/assets/images/products/uploads/txvdeftbnijzrfdwvf4win8rqlzsyr-8wmrxlu7dxtu-smd.webp?v=2f22ee73",
           "/assets/images/products/uploads/vgridejhnrc1qnilkwjvdn0bstqu39-ztwyqjz8eql-smd.webp?v=66909171",
           "/assets/images/products/uploads/18674373_41344477_2048.webp?v=d0ab9325"
-        ]
+        ],
+        "article": "29-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -1833,7 +1902,8 @@
     "category": "Жіночі сумки",
     "legacySlugs": [
       "шкіряна-сумочка-крос-боді-love-moschino-quilted"
-    ]
+    ],
+    "article": "29"
   },
   {
     "gender": [
@@ -1856,7 +1926,8 @@
           "/assets/images/products/uploads/800070279777-4.jpg?v=0bb2503d",
           "/assets/images/products/uploads/torbica-love-moschino-jc4116pp1flt0000-nero.webp?v=59a731c3"
         ],
-        "video": "/assets/images/products/uploads/video360_8058051562499_ak_1022p.mp4"
+        "video": "/assets/images/products/uploads/video360_8058051562499_ak_1022p.mp4",
+        "article": "30-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -1900,7 +1971,8 @@
     ],
     "legacySlugs": [
       "сумочка-love-moschino-logo-plaque-quilted-shoulder-bag"
-    ]
+    ],
+    "article": "30"
   },
   {
     "gender": [
@@ -1923,7 +1995,8 @@
           "/assets/images/products/uploads/gambar-belakang-michael-kors-carine-medi-5af6b1f4.webp?v=46bae80a",
           "/assets/images/products/uploads/gambar-dalam-michael-kors-carine-medium--a53019fe.webp?v=2fc1f888",
           "/assets/images/products/uploads/on-model-michael-kors-carine-medium-pebb-3455daed.webp?v=9c956937"
-        ]
+        ],
+        "article": "31-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -1978,7 +2051,8 @@
     ],
     "legacySlugs": [
       "сумочка-з-натуральної-шкіри-michael-kors-carine-medium-pebbled-leather-satchel-powder-blush"
-    ]
+    ],
+    "article": "31"
   },
   {
     "gender": [
@@ -1999,7 +2073,8 @@
           "/assets/images/products/uploads/jimmy-choo-sunglasses-nena-s-807-afw1500fh937.5.webp?v=48a63580",
           "/assets/images/products/uploads/41my3jtmifl.webp?v=f0a220bb",
           "/assets/images/products/uploads/30486-34-550x550.webp?v=3b7a962c"
-        ]
+        ],
+        "article": "32-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -2042,7 +2117,8 @@
     ],
     "legacySlugs": [
       "сонцезахисні-окуляри-jimmy-choo-nena-s-807-51"
-    ]
+    ],
+    "article": "32"
   },
   {
     "gender": [
@@ -2064,7 +2140,8 @@
           "/assets/images/products/uploads/marc-jacobs-grey-shaded-cat-eye-ladies-s-1aa9cb62.webp?v=20b41051",
           "/assets/images/products/uploads/marc-jacobs-grey-shaded-cat-eye-ladies-s-c65576ec.webp?v=1e4d788c"
         ],
-        "video": "/assets/images/products/uploads/marc-jacobs-grey-shaded-cat-eye-ladies-s-c65576ec.webp"
+        "video": "/assets/images/products/uploads/marc-jacobs-grey-shaded-cat-eye-ladies-s-c65576ec.webp",
+        "article": "33-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -2104,7 +2181,8 @@
     "category": "Окуляри і оправи",
     "legacySlugs": [
       "стильні-жіночі-сонцезахисні-окуляри-marc-jacobs-mj-1010-s"
-    ]
+    ],
+    "article": "33"
   },
   {
     "gender": [
@@ -2126,7 +2204,8 @@
           "/assets/images/products/uploads/612qqlnx4al._sx700_.webp?v=4ac37f6e",
           "/assets/images/products/uploads/613xarv4knl._sx700_.webp?v=fefa9b1c",
           "/assets/images/products/uploads/61z3jdbac7l._sx700_.webp?v=052ee141"
-        ]
+        ],
+        "article": "34-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -2166,7 +2245,8 @@
     "category": "Кросівки",
     "legacySlugs": [
       "кросівки-lacoste-l003"
-    ]
+    ],
+    "article": "34"
   },
   {
     "gender": [
@@ -2186,7 +2266,8 @@
           "/assets/images/products/uploads/124849470.webp?v=12d13bcd",
           "/assets/images/products/uploads/124849471.webp?v=424fc196",
           "/assets/images/products/uploads/124849473.webp?v=af39b431"
-        ]
+        ],
+        "article": "35-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -2233,7 +2314,8 @@
     ],
     "legacySlugs": [
       "кросівки-adidas-by-stella-mccartney-solarglide"
-    ]
+    ],
+    "article": "35"
   },
   {
     "gender": [
@@ -2255,7 +2337,8 @@
           "/assets/images/products/uploads/f7e4b799-732f-44f2-975b-40cd657042ed_size2000x2000_cropcenter.webp?v=64d49660",
           "/assets/images/products/uploads/f33f16ca-2354-4bb1-a195-063ef2737099_size2000x2000_cropcenter.webp?v=15fbe7f8",
           "/assets/images/products/uploads/8bfe46ad-4152-486e-af2b-0e8f2715354a_size2000x2000_cropcenter-1-.webp?v=9a98d03d"
-        ]
+        ],
+        "article": "36-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -2309,7 +2392,8 @@
     },
     "legacySlugs": [
       "lacoste-кросівки-жіночі-l003"
-    ]
+    ],
+    "article": "36"
   },
   {
     "gender": [
@@ -2332,7 +2416,8 @@
           "/assets/images/products/uploads/d1ac0ffd-1eaf-49fa-a647-4367eb3903ec_size2000x2000_cropcenter.webp?v=14847d04",
           "/assets/images/products/uploads/b7842f76-5f88-4078-92a4-f026770f790e_size2000x2000_cropcenter.webp?v=37303533",
           "/assets/images/products/uploads/510f13a6-c954-47f8-beda-b551a9557a8e_size2000x2000_cropcenter.webp?v=c963f1cd"
-        ]
+        ],
+        "article": "37-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -2380,7 +2465,8 @@
     },
     "legacySlugs": [
       "кросівки-lacoste-l-guard-breaker"
-    ]
+    ],
+    "article": "37"
   },
   {
     "gender": [
@@ -2399,7 +2485,8 @@
           "/assets/images/products/uploads/f7f0e509c4be46ffb9d3ef22b5ba170e.webp?v=fac6f6ab",
           "/assets/images/products/uploads/c8995a203d3b4b9291e3348646974342.webp?v=e84d738a",
           "/assets/images/products/uploads/c126c8e7b28b4046bbabd9d5194d182b.webp?v=d117cef2"
-        ]
+        ],
+        "article": "38-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -2444,7 +2531,8 @@
         "x": 50,
         "y": 50
       }
-    }
+    },
+    "article": "38"
   },
   {
     "gender": [
@@ -2464,7 +2552,8 @@
           "/assets/images/products/uploads/45sfa0001_075_02-1-.webp?v=a2e31f48",
           "/assets/images/products/uploads/45sfa0001_075_01.webp?v=967a2f31",
           "/assets/images/products/uploads/ss23-obm1w1-99x_f4.webp?v=eaf3d10c"
-        ]
+        ],
+        "article": "39-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -2498,7 +2587,8 @@
       "/assets/images/products/uploads/45sfa0001_075_02-1-.webp",
       "/assets/images/products/uploads/45sfa0001_075_01.webp",
       "/assets/images/products/uploads/ss23-obm1w1-99x_f4.webp"
-    ]
+    ],
+    "article": "39"
   },
   {
     "gender": [
@@ -2521,7 +2611,8 @@
           "/assets/images/products/uploads/nh4040nz_793_24.webp?v=7d5db841",
           "/assets/images/products/uploads/nh4040nz_793_31.webp?v=c690ab21"
         ],
-        "video": ""
+        "video": "",
+        "article": "40-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -2568,7 +2659,8 @@
     },
     "legacySlugs": [
       "чоловіча-сумка-lacoste-neocroc-checkboard-strap-camera-bag"
-    ]
+    ],
+    "article": "40"
   },
   {
     "gender": [
@@ -2588,7 +2680,8 @@
           "/assets/images/products/uploads/sneakers-lacoste-elite-active-746sma0008-46ba82b5.webp?v=98368b98",
           "/assets/images/products/uploads/sneakers-lacoste-elite-active-746sma0008-fa044eec.webp?v=b8081c1f",
           "/assets/images/products/uploads/sneakers-lacoste-elite-active-746sma0008-e10010fd.webp?v=8c0bb0bb"
-        ]
+        ],
+        "article": "41-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -2628,7 +2721,8 @@
     ],
     "legacySlugs": [
       "жіночі-кросівки-lacoste-womens-elite-active-sneakers"
-    ]
+    ],
+    "article": "41"
   },
   {
     "gender": [
@@ -2648,7 +2742,8 @@
           "/assets/images/products/uploads/5e7f76a3740344a884d67834efc5cef8.webp?v=cfa7a458",
           "/assets/images/products/uploads/6b15e7dfca384ec797dbde12aad79176.webp?v=fd70db58",
           "/assets/images/products/uploads/6c62a95311fd499f8cd54c4c96e0143f.webp?v=5ca04306"
-        ]
+        ],
+        "article": "42-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -2700,7 +2795,8 @@
         "x": 50,
         "y": 51
       }
-    }
+    },
+    "article": "42"
   },
   {
     "gender": [
@@ -2720,7 +2816,8 @@
           "/assets/images/products/uploads/802ff4ae-b7b9-48c7-bcde-7862f3e83810_size2000x2000_cropcenter.webp?v=40233201",
           "/assets/images/products/uploads/13949588-c4af-47dc-ad68-2a22e3971c3d_size2000x2000_cropcenter.webp?v=96c795cf",
           "/assets/images/products/uploads/eea98936-ada5-48dc-b7d4-f61f2e2da8ec_size2000x2000_cropcenter-1-.webp?v=52d97504"
-        ]
+        ],
+        "article": "43-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -2767,7 +2864,8 @@
     },
     "legacySlugs": [
       "жіночі-білі-кросівки-lacoste-lineshot-746sma0110-21g"
-    ]
+    ],
+    "article": "43"
   },
   {
     "gender": [
@@ -2787,7 +2885,8 @@
           "/assets/images/products/uploads/894a2223-e123-468a-9c5e-6949a9f72643_size2000x2000_cropcenter.webp?v=af928db3",
           "/assets/images/products/uploads/02e9fde1-b8ec-4df3-812c-6869dbcfb37c_size2000x2000_cropcenter.webp?v=6fbf0f18",
           "/assets/images/products/uploads/1e18c52b-9cf3-411f-8897-4c0830babd56_size2000x2000_cropcenter.webp?v=91d33102"
-        ]
+        ],
+        "article": "44-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -2834,7 +2933,8 @@
     },
     "legacySlugs": [
       "жіночі-бежеві-кросівки-з-чорними-деталями-lacoste-lineshot-746sfa0075-1r5"
-    ]
+    ],
+    "article": "44"
   },
   {
     "gender": [
@@ -2859,7 +2959,8 @@
           "/assets/images/products/uploads/25077124~black_4.webp?v=54ac35fa",
           "/assets/images/products/uploads/25077124~black_3.webp?v=5600db41",
           "/assets/images/products/uploads/25077124~black_1.webp?v=00086367"
-        ]
+        ],
+        "article": "45-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -2905,7 +3006,8 @@
     "category": "Жіночі сумки",
     "legacySlugs": [
       "жіноча-сумочка-marc-jacobs-the-creature-tote-bag-black"
-    ]
+    ],
+    "article": "45"
   },
   {
     "gender": [
@@ -2931,7 +3033,8 @@
         ],
         "sizes": [
           "ONESIZE"
-        ]
+        ],
+        "article": "46-1"
       },
       {
         "color": "Білий",
@@ -2944,7 +3047,8 @@
           "/assets/images/products/uploads/cr144_svha_a3.webp?v=91580caf",
           "/assets/images/products/uploads/cr144_svha_a8.webp?v=34986be6",
           "/assets/images/products/uploads/cr144_svha_a91.webp?v=04150dc8"
-        ]
+        ],
+        "article": "46-2"
       }
     ],
     "preOrderPrepayment": 50,
@@ -3027,7 +3131,8 @@
         "x": 46,
         "y": 50
       }
-    }
+    },
+    "article": "46"
   },
   {
     "gender": [
@@ -3051,7 +3156,8 @@
           "/assets/images/products/uploads/the-j-marc-shoulder-bag-bronze-green-additional-image-5192-800x800.webp?v=cbed9928",
           "/assets/images/products/uploads/the-j-marc-shoulder-bag-bronze-green-additional-image-5191-800x800.webp?v=b5dd5095",
           "/assets/images/products/uploads/the-j-marc-shoulder-bag-bronze-green-additional-image-5193-800x800.webp?v=5b4df788"
-        ]
+        ],
+        "article": "47-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -3099,7 +3205,8 @@
     "category": "Жіночі сумки",
     "legacySlugs": [
       "жіноча-сумочка-marc-jacobs-the-j-marc-shoulder-bag"
-    ]
+    ],
+    "article": "47"
   },
   {
     "gender": [
@@ -3122,7 +3229,8 @@
           "/assets/images/products/uploads/ca148_imrfi_a8.webp?v=58e960a6",
           "/assets/images/products/uploads/ca148_imrfi_a92.webp?v=b0363e66",
           "/assets/images/products/uploads/ca148_imrfi_a91.webp?v=c712064b"
-        ]
+        ],
+        "article": "48-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -3190,7 +3298,8 @@
         "x": 48,
         "y": 52
       }
-    }
+    },
+    "article": "48"
   },
   {
     "gender": [
@@ -3214,7 +3323,8 @@
           "/assets/images/products/uploads/aspen-green-cement4.webp?v=529db0e3",
           "/assets/images/products/uploads/aspen-green-cement3.webp?v=7fbd39ee",
           "/assets/images/products/uploads/aspen-green-cement-m1.webp?v=dce978f4"
-        ]
+        ],
+        "article": "49-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -3264,7 +3374,8 @@
     "category": "Жіночі сумки",
     "legacySlugs": [
       "шопер-marc-jacobs-the-leather-small-tote-bag-aspen-green-cement"
-    ]
+    ],
+    "article": "49"
   },
   {
     "gender": [
@@ -3288,7 +3399,8 @@
           "/assets/images/products/uploads/27687307_57865301_2048.webp?v=3aab993d",
           "/assets/images/products/uploads/27687307_57865307_2048.webp?v=e3c159b9",
           "/assets/images/products/uploads/27687307_57865304_2048.webp?v=c05d5a38"
-        ]
+        ],
+        "article": "50-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -3337,7 +3449,8 @@
     "category": "Жіночі сумки",
     "legacySlugs": [
       "сумочка-marc-jacobs-the-leather-mini-bag-pink"
-    ]
+    ],
+    "article": "50"
   },
   {
     "gender": [
@@ -3362,7 +3475,8 @@
           "/assets/images/products/uploads/215896950_beige_cu.webp?v=4d09af91",
           "/assets/images/products/uploads/215896950_beige_e1.webp?v=f94f6dd2",
           "/assets/images/products/uploads/215896950_beige_fr.webp?v=49580f5a"
-        ]
+        ],
+        "article": "51-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -3413,7 +3527,8 @@
     "category": "Жіночі сумки",
     "legacySlugs": [
       "сумка-the-medium-tote-bag-in-monogram-jacquard"
-    ]
+    ],
+    "article": "51"
   },
   {
     "gender": [
@@ -3437,7 +3552,8 @@
           "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-ce-00e1b92f.webp?v=1dea684d",
           "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-ce-93206bc0.webp?v=578f1915",
           "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-cement-h009l01sp21-055-800x800.webp?v=d578d3a6"
-        ]
+        ],
+        "article": "52-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -3487,7 +3603,8 @@
     "category": "Жіночі сумки",
     "legacySlugs": [
       "сумка-marc-jacobs-the-leather-small-tote-bag-cement"
-    ]
+    ],
+    "article": "52"
   },
   {
     "gender": [
@@ -3512,7 +3629,8 @@
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-def1e99f.webp?v=d34aac37",
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-c1370464.webp?v=29b67e21",
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-28c7d0f9.webp?v=d0cdb879"
-        ]
+        ],
+        "article": "53-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -3562,7 +3680,8 @@
     "category": "Жіночі сумки",
     "legacySlugs": [
       "сумка-marc-jacobs-the-leather-cargo-bag-cotton-silver"
-    ]
+    ],
+    "article": "53"
   },
   {
     "gender": [
@@ -3595,7 +3714,8 @@
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--f7ef8033.webp?v=ce0b4dc8",
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--c2093755.webp?v=640c71cb",
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-camel--e63574a7.webp?v=72269e74"
-        ]
+        ],
+        "article": "54-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -3647,7 +3767,8 @@
     "category": "Жіночі сумки",
     "legacySlugs": [
       "сумка-marc-jacobs-the-leather-cargo-bag-camel"
-    ]
+    ],
+    "article": "54"
   },
   {
     "gender": [
@@ -3673,7 +3794,8 @@
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--8fc5eccc.webp?v=4e0dd752",
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--20634337.webp?v=77e63951",
           "/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--3bae4de6.webp?v=666555e6"
-        ]
+        ],
+        "article": "55-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -3724,7 +3846,8 @@
     "category": "Жіночі сумки",
     "legacySlugs": [
       "сумка-marc-jacobs-the-leather-cargo-bag-black"
-    ]
+    ],
+    "article": "55"
   },
   {
     "gender": [
@@ -3748,7 +3871,8 @@
           "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-de081418.webp?v=1d737f86",
           "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-tw-628c7ef0.webp?v=4e2139a7",
           "/assets/images/products/uploads/marc-jacobs-the-leather-mini-tote-bag-twine-h009l01sp21-914-800x800.webp?v=48806234"
-        ]
+        ],
+        "article": "56-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -3799,7 +3923,8 @@
     "category": "Жіночі сумки",
     "legacySlugs": [
       "шопер-marc-jacobs-the-leather-small-tote-bag"
-    ]
+    ],
+    "article": "56"
   },
   {
     "gender": [
@@ -3824,7 +3949,8 @@
           "/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow6.webp?v=127bb491",
           "/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow3.webp?v=da6ccb40",
           "/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow1.webp?v=96e5c5ae"
-        ]
+        ],
+        "article": "57-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -3876,7 +4002,8 @@
     "category": "Жіночі сумки",
     "legacySlugs": [
       "сумка-marc-jacobs-the-j-marc-shoulder-bag-green-glow"
-    ]
+    ],
+    "article": "57"
   },
   {
     "gender": [
@@ -3901,7 +4028,8 @@
           "/assets/images/products/uploads/1.4_25460987-0b5f-4461-8974-b1763e92ae4a.webp?v=36867f76",
           "/assets/images/products/uploads/1.6_e50f3e2f-9bc0-46c8-90db-1fbc061785eb.webp?v=21034b52",
           "/assets/images/products/uploads/1.7_f4726ced-2357-4efe-8aac-fe254f85c889.webp?v=e56209d6"
-        ]
+        ],
+        "article": "58-1"
       },
       {
         "color": "Айворі",
@@ -3916,7 +4044,8 @@
           "/assets/images/products/uploads/49502081584862.webp?v=00237fe7",
           "/assets/images/products/uploads/51655546705003.webp?v=1f4eeacf",
           "/assets/images/products/uploads/56611343404440.webp?v=4ce87ec6"
-        ]
+        ],
+        "article": "58-2"
       }
     ],
     "preOrderPrepayment": 50,
@@ -3982,7 +4111,8 @@
         "x": 48,
         "y": 51
       }
-    }
+    },
+    "article": "58"
   },
   {
     "gender": [
@@ -4006,7 +4136,8 @@
           "/assets/images/products/uploads/71-zo1liwrl._ac_sy625_.webp?v=68440b8b",
           "/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model2.webp?v=d02399b3",
           "/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model4.webp?v=13f6c6e2"
-        ]
+        ],
+        "article": "59-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -4061,7 +4192,8 @@
     ],
     "legacySlugs": [
       "міні-сумочка-coach-tabby-crossbody-wristlet"
-    ]
+    ],
+    "article": "59"
   },
   {
     "gender": [
@@ -4085,7 +4217,8 @@
           "/assets/images/products/uploads/rtlafd950301_33497204_4_v1_2x.webp?v=45e8e115",
           "/assets/images/products/uploads/rtlafd950301_33526729_9_v1_2x.webp?v=f716ea50"
         ],
-        "sku": "213BA007-3063-510"
+        "sku": "213BA007-3063-510",
+        "article": "60-1"
       },
       {
         "color": "Темно-коричневий",
@@ -4096,7 +4229,8 @@
           "/assets/images/products/uploads/rtlafe837901_33595361_2_v1_2x.webp?v=c834b78e",
           "/assets/images/products/uploads/rtlafe837901_33595363_4_v1_2x.webp?v=cd6c1754",
           "/assets/images/products/uploads/rtlafe837901_33634337_9_v1_2x.webp?v=8717973d"
-        ]
+        ],
+        "article": "60-2"
       }
     ],
     "preOrderPrepayment": 50,
@@ -4145,7 +4279,8 @@
     ],
     "legacySlugs": [
       "сумка-jacquemus-le-grand-bambino-beige"
-    ]
+    ],
+    "article": "60"
   },
   {
     "gender": [
@@ -4182,7 +4317,8 @@
           "/assets/images/products/uploads/215679033_blue_cu.webp?v=98af55d3",
           "/assets/images/products/uploads/215679033_blue_e1.webp?v=84f25ad7",
           "/assets/images/products/uploads/215679033_blue_fr.webp?v=eafc13bd"
-        ]
+        ],
+        "article": "61-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -4235,7 +4371,8 @@
     "category": "Жіночі сумки",
     "legacySlugs": [
       "шопер-marc-jacobs-the-denim-small-tote-bag-blue"
-    ]
+    ],
+    "article": "61"
   },
   {
     "gender": [
@@ -4287,9 +4424,10 @@
           "/assets/images/products/uploads/ca173_svvfq_a0.webp?v=274cb8ee",
           "/assets/images/products/uploads/ca173_svvfq_a5.webp?v=c14cae6b",
           "/assets/images/products/uploads/ca173_svvfq_a8.webp?v=b75e933e",
-          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=06efeb78",
-          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=8c38c487"
-        ]
+          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=517539ab",
+          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=0975bbc5"
+        ],
+        "article": "62-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -4338,7 +4476,8 @@
     "category": "Жіночі сумки",
     "legacySlugs": [
       "сумочка-coach-teri-shoulder-bag-in-colorblock"
-    ]
+    ],
+    "article": "62"
   },
   {
     "gender": [
@@ -4360,7 +4499,8 @@
           "/assets/images/products/uploads/00570556_s.jpg?v=1ebf34ee",
           "/assets/images/products/uploads/00570556_i.jpg?v=0024032d",
           "/assets/images/products/uploads/00570556_m.jpg?v=778b2fb1"
-        ]
+        ],
+        "article": "63-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -4412,7 +4552,8 @@
     ],
     "legacySlugs": [
       "шопер-coach-gallery-tote-bag-in-signature-canvas"
-    ]
+    ],
+    "article": "63"
   },
   {
     "gender": [
@@ -4435,7 +4576,8 @@
           "/assets/images/products/uploads/p00545136_d1.webp?v=4940d6cf",
           "/assets/images/products/uploads/uhjvbyubjhmyjhbmn.webp?v=d959e7a2",
           "/assets/images/products/uploads/jbb.webp?v=4f6dde29"
-        ]
+        ],
+        "article": "64-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -4488,7 +4630,8 @@
     ],
     "legacySlugs": [
       "сумочка-jacquemus-le-bambino-white"
-    ]
+    ],
+    "article": "64"
   },
   {
     "gender": [
@@ -4511,7 +4654,8 @@
           "/assets/images/products/uploads/3248708-4324-8078423-3.webp?v=860a8ff4",
           "/assets/images/products/uploads/3248708-4324-8078423-4.webp?v=0e467211",
           "/assets/images/products/uploads/3248708-4324-8078423-5.webp?v=dedc20e7"
-        ]
+        ],
+        "article": "65-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -4555,7 +4699,8 @@
     ],
     "legacySlugs": [
       "сумочка-coach-klare-crossbody-25-in-signature-canvas"
-    ]
+    ],
+    "article": "65"
   },
   {
     "gender": [
@@ -4576,7 +4721,8 @@
           "/assets/images/products/uploads/sl10757-021_01-384fad.jpg?v=2787a17d",
           "/assets/images/products/uploads/sl10757-021_02-384fad.jpg?v=720dcb71",
           "/assets/images/products/uploads/sl10757-021_03-384fad.jpg?v=fb36f571"
-        ]
+        ],
+        "article": "66-1"
       },
       {
         "color": "Чорний",
@@ -4586,7 +4732,8 @@
           "/assets/images/products/uploads/l000001_1676684440.webp?v=fc6d6be3",
           "/assets/images/products/uploads/l000002_1676684441.webp?v=ffbea8fb"
         ],
-        "sku": "S125L01RE22-001"
+        "sku": "S125L01RE22-001",
+        "article": "66-2"
       }
     ],
     "preOrderPrepayment": 50,
@@ -4628,7 +4775,8 @@
     ],
     "legacySlugs": [
       "гаманець-marc-jacobs-the-top-zip-wallet-with-strap"
-    ]
+    ],
+    "article": "66"
   },
   {
     "gender": [
@@ -4649,7 +4797,8 @@
           "/assets/images/products/uploads/s150l03fa22-223_1.webp?v=fd403c07",
           "/assets/images/products/uploads/f540b0f9-f29c-31d6-8bdf-03912d1cc134.jpg?v=7e7c73e2",
           "/assets/images/products/uploads/s150l03fa22-223_3.webp?v=1649b213"
-        ]
+        ],
+        "article": "67-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -4697,7 +4846,8 @@
     ],
     "legacySlugs": [
       "гаманець-marc-jacobs-the-zip-around-wallet"
-    ]
+    ],
+    "article": "67"
   },
   {
     "gender": [
@@ -4718,7 +4868,8 @@
           "/assets/images/products/uploads/l_wp_6788ff7fdc327dcb277cb548.webp?v=6c3a22c5",
           "/assets/images/products/uploads/cw537_sva47_a8.webp?v=bcc736c1",
           "/assets/images/products/uploads/cw537_sva47_a91.webp?v=8a5e5544"
-        ]
+        ],
+        "article": "68-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -4748,7 +4899,8 @@
     ],
     "legacySlugs": [
       "гаманець-coach-snap-wallet-with-heart-bolt-print"
-    ]
+    ],
+    "article": "68"
   },
   {
     "gender": [
@@ -4769,7 +4921,8 @@
           "/assets/images/products/uploads/set-vi-coach-men-s-coin-wallet-black-one-ecc71a62.webp?v=0e2c3d35",
           "/assets/images/products/uploads/lussocitta_coach_cr957_blk_1_700x.webp?v=91b0a7fb",
           "/assets/images/products/uploads/lussocitta_coach_cr957_blk_2_700x.webp?v=3ccbe611"
-        ]
+        ],
+        "article": "69-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -4809,7 +4962,8 @@
     ],
     "legacySlugs": [
       "гаманець-coach-3-in-1-wallet-in-signature-leather"
-    ]
+    ],
+    "article": "69"
   },
   {
     "gender": [
@@ -4830,7 +4984,8 @@
           "/assets/images/products/uploads/1.webp?v=c6cbc64e",
           "/assets/images/products/uploads/3.webp?v=dfe1876e",
           "/assets/images/products/uploads/81.webp?v=a20b2a6a"
-        ]
+        ],
+        "article": "70-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -4871,7 +5026,8 @@
     ],
     "legacySlugs": [
       "чоловіча-сумка-armani-exchange-crossbody"
-    ]
+    ],
+    "article": "70"
   },
   {
     "gender": [
@@ -4893,7 +5049,8 @@
           "/assets/images/products/uploads/ach3atrpdjdyd181s4gcstgpa4qzgzrh.webp?v=c8889145",
           "/assets/images/products/uploads/9dzhcfvjorauhd1nzfwyq9o69vh3iff1.webp?v=e9d3d330",
           "/assets/images/products/uploads/u87036v1ioy7rp72btz5kw3oti8m25rs.webp?v=39641864"
-        ]
+        ],
+        "article": "71-1"
       }
     ],
     "preOrderPrepayment": 50,
@@ -4935,7 +5092,8 @@
     ],
     "legacySlugs": [
       "сонцезахисні-окуляри-marc-jacobs-1011-s-wr953ha"
-    ]
+    ],
+    "article": "71"
   },
   {
     "gender": [
@@ -4959,7 +5117,8 @@
           "/assets/images/products/uploads/cfeba1dc-4b88-4f3b-984b-b5bebd478c1f.jpg?v=0f28bad7",
           "/assets/images/products/uploads/33751393-b64e-49d3-b0c9-2e3bde1afaff.jpg?v=7b1a8ec9",
           "/assets/images/products/uploads/aa00-okd0j9_99x_f9.webp?v=5c7f8ff0"
-        ]
+        ],
+        "article": "72-1"
       },
       {
         "color": "Черепаховий",
@@ -4972,7 +5131,8 @@
           "/assets/images/products/uploads/saint-laurent-grey-cat-eye-ladies-sungla-99d23704.webp?v=dd135198",
           "/assets/images/products/uploads/saint-laurent-grey-cat-eye-ladies-sungla-175c8e88.webp?v=ac28aea8",
           "/assets/images/products/uploads/saint-laurent-grey-cat-eye-ladies-sungla-6b05dcda.webp?v=de137cb5"
-        ]
+        ],
+        "article": "72-2"
       },
       {
         "color": "Чорний / жовтий",
@@ -4985,7 +5145,8 @@
           "/assets/images/products/uploads/saint-laurent-yellow-cat-eye-ladies-sunglasses-sl-276-mica-038-53.webp?v=b904204e",
           "/assets/images/products/uploads/saint-laurent-yellow-cat-eye-ladies-sunglasses-sl-276-mica-038-53_3-1-.webp?v=7b228098",
           "/assets/images/products/uploads/saint-laurent-yellow-cat-eye-ladies-sunglasses-sl-276-mica-038-53_4.webp?v=e9241d93"
-        ]
+        ],
+        "article": "72-3"
       }
     ],
     "preOrderPrepayment": 100,
@@ -5026,7 +5187,8 @@
     "category": "Окуляри і оправи",
     "legacySlugs": [
       "сонцезахисні-окуляри-saint-laurent-sl-276-mica-001-53"
-    ]
+    ],
+    "article": "72"
   },
   {
     "gender": [
@@ -5048,7 +5210,8 @@
           "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-10e4ff8d.webp?v=bed48427",
           "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-f393bd11.webp?v=8405c1f4",
           "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-8e88d0d9.webp?v=c4177bd4"
-        ]
+        ],
+        "article": "73-1"
       }
     ],
     "preOrderPrepayment": 100,
@@ -5092,7 +5255,8 @@
     ],
     "legacySlugs": [
       "жіночий-годинник-tissot-lovely-round-19-5mm"
-    ]
+    ],
+    "article": "73"
   },
   {
     "gender": [
@@ -5116,7 +5280,8 @@
           "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_2_2.webp?v=4b6d0dc8",
           "/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_3_2.webp?v=7a97fcb9",
           "/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-e13260a2.webp?v=c4177bd4"
-        ]
+        ],
+        "article": "74-1"
       }
     ],
     "preOrderPrepayment": 100,
@@ -5159,7 +5324,8 @@
     "category": "Годинники",
     "legacySlugs": [
       "годинник-tissot-lovely-round-19-5mm"
-    ]
+    ],
+    "article": "74"
   },
   {
     "gender": [
@@ -5180,7 +5346,8 @@
           "/assets/images/products/uploads/tissot-tclassic-automatic-diamond-green--6ebe14d1.webp?v=1326d5ab",
           "/assets/images/products/uploads/tissot-tclassic-automatic-diamond-green--dff156d2.webp?v=3836ad46",
           "/assets/images/products/uploads/tissot-tclassic-automatic-diamond-green--8822ff6e.webp?v=046e0acb"
-        ]
+        ],
+        "article": "75-1"
       }
     ],
     "preOrderPrepayment": 100,
@@ -5225,7 +5392,8 @@
     ],
     "legacySlugs": [
       "годинник-tissot-t-my-lady-automatic-t132-007-11-091-00"
-    ]
+    ],
+    "article": "75"
   },
   {
     "gender": [
@@ -5246,7 +5414,8 @@
           "/assets/images/products/uploads/tissot-everytime-quartz-silver-dial-ladies-watch-t1432101103300.webp?v=02ef1e05",
           "/assets/images/products/uploads/tissot-everytime-quartz-silver-dial-ladies-watch-t1432101103300_2.webp?v=161a41cd",
           "/assets/images/products/uploads/tissot-everytime-quartz-silver-dial-ladies-watch-t1432101103300_3.webp?v=c1964b3a"
-        ]
+        ],
+        "article": "76-1"
       }
     ],
     "preOrderPrepayment": 100,
@@ -5290,7 +5459,8 @@
     ],
     "legacySlugs": [
       "годинник-tissot-everytime-34mm-t143-210-11-033-00"
-    ]
+    ],
+    "article": "76"
   },
   {
     "gender": [
@@ -5311,7 +5481,8 @@
           "/assets/images/products/uploads/tissot-pr-100-quartz-blue-dial-mens-watch-t1504101104100_1.webp?v=286c6b76",
           "/assets/images/products/uploads/tissot-pr-100-quartz-blue-dial-mens-watch-t1504101104100_2.webp?v=0fc480bf",
           "/assets/images/products/uploads/tissot-pr-100-quartz-blue-dial-mens-watch-t1504101104100_3.webp?v=33ce3f73"
-        ]
+        ],
+        "article": "77-1"
       }
     ],
     "preOrderPrepayment": 100,
@@ -5356,7 +5527,8 @@
     ],
     "legacySlugs": [
       "годинник-tissot-pr-100-40mm-t150-410-11-041-00"
-    ]
+    ],
+    "article": "77"
   },
   {
     "gender": [
@@ -5377,7 +5549,8 @@
           "/assets/images/products/uploads/tissot-classic-dream-swissmatic-silver-d-f03a52ef.webp?v=bf3826fc",
           "/assets/images/products/uploads/tissot-classic-dream-swissmatic-silver-d-ea41ed3e.webp?v=34a76e5b",
           "/assets/images/products/uploads/tissot-classic-dream-swissmatic-silver-d-88843986.webp?v=9b3867c0"
-        ]
+        ],
+        "article": "78-1"
       }
     ],
     "preOrderPrepayment": 100,
@@ -5425,7 +5598,8 @@
     ],
     "legacySlugs": [
       "годинник-tissot-classic-dream-swissmatic-t129-407-22-031-00"
-    ]
+    ],
+    "article": "78"
   },
   {
     "gender": [
@@ -5446,7 +5620,8 @@
           "/assets/images/products/uploads/matheytissot-mathy-ceramic-quartz-black-dial-mens-watch-h901crbn.webp?v=3474f80f",
           "/assets/images/products/uploads/matheytissot-mathy-ceramic-quartz-black-dial-mens-watch-h901crbn_2.webp?v=6d1a28bc",
           "/assets/images/products/uploads/matheytissot-mathy-ceramic-quartz-black-dial-mens-watch-h901crbn_3.webp?v=908fca90"
-        ]
+        ],
+        "article": "79-1"
       }
     ],
     "preOrderPrepayment": 100,
@@ -5490,7 +5665,8 @@
     ],
     "legacySlugs": [
       "годинник-mathey-tissot-mathy-ceramic-h901crbn"
-    ]
+    ],
+    "article": "79"
   },
   {
     "gender": [
@@ -5555,7 +5731,8 @@
           "/assets/images/products/uploads/ch857_b4ha_a99.webp?v=3b68f270",
           "/assets/images/products/uploads/ch857_b4ha_a61.webp?v=19ded042",
           "/assets/images/products/uploads/ch857_b4ha_a92.webp?v=919707ef"
-        ]
+        ],
+        "article": "80-1"
       },
       {
         "sku": "CH857-B4/BK",
@@ -5567,7 +5744,8 @@
           "/assets/images/products/uploads/ch857_b4bk_a8.webp?v=32da6375",
           "/assets/images/products/uploads/ch857_b4bk_a61.webp?v=bf5c9a7a",
           "/assets/images/products/uploads/ch857_b4bk_a92.webp?v=39ecbc1c"
-        ]
+        ],
+        "article": "80-2"
       },
       {
         "color": "Amber Brown",
@@ -5577,7 +5755,8 @@
           "/assets/images/products/uploads/ch857_b4yu1_a0.webp?v=1ca4b3b9",
           "/assets/images/products/uploads/ch857_b4yu1_a3.webp?v=cd25b8e8",
           "/assets/images/products/uploads/ch857_b4yu1_a8.webp?v=5302f3a2"
-        ]
+        ],
+        "article": "80-3"
       },
       {
         "color": "Maple",
@@ -5590,7 +5769,8 @@
           "/assets/images/products/uploads/ch857_b4mpl_a62.webp?v=1c67302c",
           "/assets/images/products/uploads/ch857_b4mpl_a92.webp?v=1d3393f4"
         ],
-        "colorFamily": "Коричневий"
+        "colorFamily": "Коричневий",
+        "article": "80-4"
       }
     ],
     "preOrderPrepayment": 100,
@@ -5631,7 +5811,8 @@
     "category": "Жіночі сумки",
     "legacySlugs": [
       "жіноча-сумочка-coach-tabby-shoulder-bag-26"
-    ]
+    ],
+    "article": "80"
   },
   {
     "gender": [
@@ -5652,7 +5833,8 @@
           "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-silver-dial-ladies-watch-mk4843.webp?v=7f09ea29",
           "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-silver-dial-ladies-watch-mk4843_2.webp?v=c08ddbf4",
           "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-silver-dial-ladies-watch-mk4843_3.webp?v=fbf2bfca"
-        ]
+        ],
+        "article": "81-1"
       }
     ],
     "preOrderPrepayment": 100,
@@ -5698,7 +5880,8 @@
       "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-silver-dial-ladies-watch-mk4843.webp",
       "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-silver-dial-ladies-watch-mk4843_2.webp",
       "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-silver-dial-ladies-watch-mk4843_3.webp"
-    ]
+    ],
+    "article": "81"
   },
   {
     "gender": [
@@ -5719,7 +5902,8 @@
           "/assets/images/products/uploads/michael-kors-mini-lexington-quartz-red-dial-ladies-watch-mk4968.webp?v=c93db63b",
           "/assets/images/products/uploads/michael-kors-mini-lexington-quartz-red-dial-ladies-watch-mk4968_2.webp?v=545b4cb8",
           "/assets/images/products/uploads/michael-kors-mini-lexington-quartz-red-dial-ladies-watch-mk4968_3.webp?v=d224c14b"
-        ]
+        ],
+        "article": "82-1"
       }
     ],
     "preOrderPrepayment": 100,
@@ -5765,7 +5949,8 @@
       "/assets/images/products/uploads/michael-kors-mini-lexington-quartz-red-dial-ladies-watch-mk4968.webp",
       "/assets/images/products/uploads/michael-kors-mini-lexington-quartz-red-dial-ladies-watch-mk4968_2.webp",
       "/assets/images/products/uploads/michael-kors-mini-lexington-quartz-red-dial-ladies-watch-mk4968_3.webp"
-    ]
+    ],
+    "article": "82"
   },
   {
     "gender": [
@@ -5786,7 +5971,8 @@
           "/assets/images/products/uploads/michael-kors-micro-lexington-quartz-ladies-watch-mk4903.webp?v=9fa5f052",
           "/assets/images/products/uploads/michael-kors-micro-lexington-quartz-ladies-watch-mk4903_2.webp?v=1a203b80",
           "/assets/images/products/uploads/michael-kors-micro-lexington-quartz-ladies-watch-mk4903_3.webp?v=44cf106d"
-        ]
+        ],
+        "article": "83-1"
       }
     ],
     "preOrderPrepayment": 100,
@@ -5834,7 +6020,8 @@
       "/assets/images/products/uploads/michael-kors-micro-lexington-quartz-ladies-watch-mk4903.webp",
       "/assets/images/products/uploads/michael-kors-micro-lexington-quartz-ladies-watch-mk4903_2.webp",
       "/assets/images/products/uploads/michael-kors-micro-lexington-quartz-ladies-watch-mk4903_3.webp"
-    ]
+    ],
+    "article": "83"
   },
   {
     "gender": [
@@ -5857,7 +6044,8 @@
           "/assets/images/products/uploads/cz398_qbmi5_a3.webp?v=7632d642",
           "/assets/images/products/uploads/cz398_qbmi5_a8.webp?v=617e6eb5",
           "/assets/images/products/uploads/cz398_qbmi5_a91.webp?v=732c7458"
-        ]
+        ],
+        "article": "84-1"
       },
       {
         "color": "Чорний",
@@ -5868,7 +6056,8 @@
           "/assets/images/products/uploads/4011_qbbk_a3.webp?v=99595213",
           "/assets/images/products/uploads/houstonflightbag2propfamily_a6.webp?v=aff55aaf",
           "/assets/images/products/uploads/4011_qbbk_a91.webp?v=0b48a827"
-        ]
+        ],
+        "article": "84-2"
       }
     ],
     "preOrderPrepayment": 100,
@@ -5937,7 +6126,8 @@
       "/assets/images/products/uploads/cz398_qbmi5_a3.webp",
       "/assets/images/products/uploads/cz398_qbmi5_a8.webp",
       "/assets/images/products/uploads/cz398_qbmi5_a91.webp"
-    ]
+    ],
+    "article": "84"
   },
   {
     "gender": [
@@ -5959,7 +6149,8 @@
           "/assets/images/products/uploads/ces89_svbk_a5.webp?v=1891e188",
           "/assets/images/products/uploads/ces89_svbk_a8.webp?v=cb4034fd",
           "/assets/images/products/uploads/ces89_svbk_a91.webp?v=39a217a9"
-        ]
+        ],
+        "article": "85-1"
       }
     ],
     "preOrderPrepayment": 100,
@@ -6018,7 +6209,8 @@
       "/assets/images/products/uploads/ces89_svbk_a5.webp",
       "/assets/images/products/uploads/ces89_svbk_a8.webp",
       "/assets/images/products/uploads/ces89_svbk_a91.webp"
-    ]
+    ],
+    "article": "85"
   },
   {
     "gender": [
@@ -6041,7 +6233,8 @@
           "/assets/images/products/uploads/cet66_svsmu_a3.webp?v=f807b4f7",
           "/assets/images/products/uploads/cet66_svsmu_a8.webp?v=f9211b3a",
           "/assets/images/products/uploads/cet66_svsmu_a91.webp?v=9d2ca445"
-        ]
+        ],
+        "article": "86-1"
       },
       {
         "color": "Signature Canvas/Matte Black/Tan Black",
@@ -6052,7 +6245,8 @@
           "/assets/images/products/uploads/cet55_mwnq6_a3.webp?v=374df151",
           "/assets/images/products/uploads/cet55_mwnq6_a8.webp?v=e3748c46",
           "/assets/images/products/uploads/cet55_mwnq6_a91.webp?v=6b2f7649"
-        ]
+        ],
+        "article": "86-2"
       },
       {
         "color": "Signature canvas/Matte Black/Black Signature",
@@ -6063,7 +6257,8 @@
           "/assets/images/products/uploads/cet55_mwoy2_a3.webp?v=f8fbe6b4",
           "/assets/images/products/uploads/cet55_mwoy2_a8.webp?v=9af9e7b6",
           "/assets/images/products/uploads/cet55_mwoy2_a91.webp?v=9c2c4a59"
-        ]
+        ],
+        "article": "86-3"
       },
       {
         "color": "Pebbled leather/Black",
@@ -6074,7 +6269,8 @@
           "/assets/images/products/uploads/cet66_svbk_a3.webp?v=2b9cf0f7",
           "/assets/images/products/uploads/cet66_svbk_a8.webp?v=aeafdac1",
           "/assets/images/products/uploads/cet66_svbk_a91.webp?v=4a0a2302"
-        ]
+        ],
+        "article": "86-4"
       },
       {
         "color": "Pebbled leather/Maple",
@@ -6086,7 +6282,8 @@
           "/assets/images/products/uploads/cet66_svmpl_a8.webp?v=5774d884",
           "/assets/images/products/uploads/cet66_svmpl_a91.webp?v=2adbf71a"
         ],
-        "colorFamily": "Коричневий"
+        "colorFamily": "Коричневий",
+        "article": "86-5"
       }
     ],
     "preOrderPrepayment": 100,
@@ -6211,7 +6408,8 @@
       "/assets/images/products/uploads/cet66_svsmu_a3.webp",
       "/assets/images/products/uploads/cet66_svsmu_a8.webp",
       "/assets/images/products/uploads/cet66_svsmu_a91.webp"
-    ]
+    ],
+    "article": "86"
   },
   {
     "gender": [
@@ -6233,7 +6431,8 @@
           "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_2.webp?v=e7afb90b",
           "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_3.webp?v=7b116d7b",
           "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_5.webp?v=776d47c5"
-        ]
+        ],
+        "article": "87-1"
       }
     ],
     "preOrderPrepayment": 100,
@@ -6280,7 +6479,8 @@
       "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_2.webp",
       "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_3.webp",
       "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_5.webp"
-    ]
+    ],
+    "article": "87"
   },
   {
     "gender": [
@@ -6302,7 +6502,8 @@
           "/assets/images/products/uploads/загрузка-1-.webp?v=af6915c8",
           "/assets/images/products/uploads/загрузка-2-.webp?v=f55a0f58",
           "/assets/images/products/uploads/загрузка-1-1-.webp?v=c7db06fb"
-        ]
+        ],
+        "article": "88-1"
       }
     ],
     "preOrderPrepayment": 100,
@@ -6348,7 +6549,8 @@
       "/assets/images/products/uploads/загрузка-1-.webp",
       "/assets/images/products/uploads/загрузка-2-.webp",
       "/assets/images/products/uploads/загрузка-1-1-.webp"
-    ]
+    ],
+    "article": "88"
   },
   {
     "gender": [
@@ -6369,7 +6571,8 @@
           "/assets/images/products/uploads/michael-kors-maritime-chronograph-quartz-blue-dial-mens-watch-mk9202_1.webp?v=cfad8a64",
           "/assets/images/products/uploads/michael-kors-maritime-chronograph-quartz-blue-dial-mens-watch-mk9202_2.webp?v=27768112",
           "/assets/images/products/uploads/michael-kors-maritime-chronograph-quartz-blue-dial-mens-watch-mk9202_3.webp?v=3ebf16bf"
-        ]
+        ],
+        "article": "89-1"
       }
     ],
     "preOrderPrepayment": 100,
@@ -6415,7 +6618,8 @@
       "/assets/images/products/uploads/michael-kors-maritime-chronograph-quartz-blue-dial-mens-watch-mk9202_1.webp",
       "/assets/images/products/uploads/michael-kors-maritime-chronograph-quartz-blue-dial-mens-watch-mk9202_2.webp",
       "/assets/images/products/uploads/michael-kors-maritime-chronograph-quartz-blue-dial-mens-watch-mk9202_3.webp"
-    ]
+    ],
+    "article": "89"
   },
   {
     "gender": [
@@ -6437,7 +6641,8 @@
           "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasse-d4cf8613.webp?v=9c8d2a79",
           "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasse-c873f7c8.webp?v=3dcc20af",
           "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasse-dfb377a8.webp?v=0114f5da"
-        ]
+        ],
+        "article": "90-1"
       }
     ],
     "preOrderPrepayment": 100,
@@ -6482,7 +6687,8 @@
       "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasse-d4cf8613.webp",
       "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasse-c873f7c8.webp",
       "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasse-dfb377a8.webp"
-    ]
+    ],
+    "article": "90"
   },
   {
     "gender": [
@@ -6505,7 +6711,8 @@
           "/assets/images/products/uploads/ray-ban-green-irregular-unisex-sunglasses-rb4451-630631-50_2.webp?v=dbe12c80",
           "/assets/images/products/uploads/ray-ban-green-irregular-unisex-sunglasses-rb4451-630631-50_4.webp?v=cfd60fb6",
           "/assets/images/products/uploads/ray-ban-green-irregular-unisex-sunglasses-rb4451-630631-50_10.webp?v=0114f5da"
-        ]
+        ],
+        "article": "91-1"
       }
     ],
     "preOrderPrepayment": 100,
@@ -6552,7 +6759,8 @@
       "/assets/images/products/uploads/ray-ban-green-irregular-unisex-sunglasses-rb4451-630631-50_2.webp",
       "/assets/images/products/uploads/ray-ban-green-irregular-unisex-sunglasses-rb4451-630631-50_4.webp",
       "/assets/images/products/uploads/ray-ban-green-irregular-unisex-sunglasses-rb4451-630631-50_10.webp"
-    ]
+    ],
+    "article": "91"
   },
   {
     "gender": [
@@ -6574,7 +6782,8 @@
           "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-s-0f4f3c17.jpg?v=bde310da",
           "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-s-e881ab77.jpg?v=9a2823b9",
           "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-s-f4bc13e6.jpg?v=a4470357"
-        ]
+        ],
+        "article": "92-1"
       }
     ],
     "preOrderPrepayment": 100,
@@ -6620,7 +6829,8 @@
       "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-s-0f4f3c17.jpg",
       "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-s-e881ab77.jpg",
       "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-s-f4bc13e6.jpg"
-    ]
+    ],
+    "article": "92"
   },
   {
     "gender": [
@@ -6642,7 +6852,8 @@
           "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-d6f54bf0.webp?v=c0d14189",
           "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-4b1f82a5.webp?v=3b38241c",
           "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-960c6b7f.webp?v=0114f5da"
-        ]
+        ],
+        "article": "93-1"
       }
     ],
     "preOrderPrepayment": 100,
@@ -6690,6 +6901,485 @@
       "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-d6f54bf0.webp",
       "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-4b1f82a5.webp",
       "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-960c6b7f.webp"
-    ]
+    ],
+    "article": "93"
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Нержавіюча сталь",
+    "brand": "Michael Kors",
+    "price": 7300,
+    "preOrder": true,
+    "dimensions": "Діаметр корпусу: 40 мм Ширина браслета: 20 мм",
+    "variants": [
+      {
+        "color": "Рожеве золото",
+        "hex": "#c5a4c4",
+        "images": [
+          "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7557.jpg?v=7ba565fb",
+          "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7557_2.jpg?v=791ac262",
+          "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7557_3.jpg?v=ab9ead93"
+        ],
+        "article": "94-1"
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Michael Kors",
+      "Michael Kors Watch",
+      "Michael Kors Billie",
+      "Billie Watch",
+      "Oversized Billie",
+      "MK7557",
+      "Michael Kors MK7557",
+      "жіночий годинник Michael Kors",
+      "годинник Michael Kors",
+      "рожеве золото",
+      "Rose Gold",
+      "рожеве золото Michael Kors",
+      "годинник з хронографом",
+      "кварцовий годинник",
+      "жіночий хронограф",
+      "сталевий браслет",
+      "брендований годинник",
+      "оригінальний Michael Kors"
+    ],
+    "isNew": false,
+    "title": "Годинник Michael Kors Oversized Billie Frosted Chronograph MK7557",
+    "reviews": 0,
+    "closure": "Розкладна з кнопковим фіксатором",
+    "instagramBlock": "general",
+    "description": "Стильний жіночий годинник Michael Kors Billie у розкішному відтінку рожевого золота з ефектом Frosted. Браслет із нержавіючої сталі з комбінованим оздобленням красиво відбиває світло, а блискучий циферблат додає моделі елегантності та glamour-акценту.\nГодинник оснащений кварцовим механізмом із функцією хронографа та відображенням дати. Мінеральне скло захищає циферблат, а розкладна застібка з кнопковим фіксатором забезпечує комфортну посадку на зап'ясті",
+    "sku": "MK7557",
+    "rating": 5,
+    "category": "Годинники",
+    "legacySlugs": [
+      "годинник-michael-kors-oversized-billie-frosted-chronograph-mk7557"
+    ],
+    "slug": "hodynnyk-michael-kors-oversized-billie-frosted-chronograph-mk7557",
+    "id": 94,
+    "color": "Рожеве золото",
+    "images": [
+      "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7557.jpg",
+      "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7557_2.jpg",
+      "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7557_3.jpg"
+    ],
+    "article": "94"
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Нержавіюча сталь",
+    "brand": "Michael Kors",
+    "price": 6300,
+    "preOrder": true,
+    "dimensions": "Діаметр корпусу: 40 мм Товщина корпусу: 10,5 мм Ширина браслета: 20 мм",
+    "variants": [
+      {
+        "color": "Сріблястий",
+        "hex": "#c0bfbf",
+        "images": [
+          "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7558.webp?v=837bc57f",
+          "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-ch-6d39ef48.webp?v=f8aa3bba",
+          "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-ch-d3f8077e.webp?v=a858e17d"
+        ],
+        "article": "95-1"
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Michael Kors",
+      "Michael Kors Billie",
+      "Billie Watch",
+      "MK7558",
+      "Michael Kors MK7558",
+      "жіночий годинник",
+      "сріблястий годинник",
+      "Silver Watch",
+      "годинник Michael Kors",
+      "жіночий хронограф",
+      "кварцовий годинник",
+      "сталевий браслет",
+      "брендований годинник",
+      "оригінальний Michael Kors"
+    ],
+    "isNew": false,
+    "title": "Годинник Michael Kors Oversized Billie Frosted Chronograph MK7558",
+    "reviews": 0,
+    "closure": "Розкладна з кнопковим фіксатором",
+    "instagramBlock": "general",
+    "description": "Елегантний жіночий годинник Michael Kors Billie у сріблястому відтінку з ефектом Frosted. Стильний браслет із нержавіючої сталі та блискучий циферблат створюють виразний акцент і чудово доповнюють як повсякденні, так і святкові образи.\nМодель оснащена кварцовим механізмом із функцією хронографа та відображенням дати. Мінеральне скло захищає циферблат від подряпин, а водозахист 5 ATM забезпечує комфорт у повсякденному використанні",
+    "sku": "",
+    "rating": 5,
+    "category": "Годинники",
+    "legacySlugs": [
+      "годинник-michael-kors-oversized-billie-frosted-chronograph-mk7558"
+    ],
+    "slug": "hodynnyk-michael-kors-oversized-billie-frosted-chronograph-mk7558",
+    "id": 95,
+    "color": "Сріблястий",
+    "images": [
+      "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7558.webp",
+      "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-ch-6d39ef48.webp",
+      "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-ch-d3f8077e.webp"
+    ],
+    "article": "95"
+  },
+  {
+    "gender": [
+      "Жінкам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Матеріал корпусу: нержавіюча стал. Матеріал ремінця: натуральна шкіра",
+    "brand": "Michael Kors",
+    "price": 5000,
+    "preOrder": true,
+    "dimensions": "Діаметр корпусу: 38 мм.Товщина корпусу: 8 мм Ширина ремінця: 18 мм. Довжина ремінця: 17,5 см",
+    "variants": [
+      {
+        "color": "Rose/Soft Pink/White",
+        "hex": "#dfa3dc",
+        "images": [
+          "/assets/images/products/uploads/michael-kors-slim-runway-white-dial-ladies-watch-mk7545.webp?v=35140b33",
+          "/assets/images/products/uploads/michael-kors-slim-runway-white-dial-ladies-watch-mk7545_2.webp?v=8f17acbc",
+          "/assets/images/products/uploads/michael-kors-slim-runway-white-dial-ladies-watch-mk7545_3.webp?v=72b8347d"
+        ],
+        "article": "96-1"
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Michael Kors",
+      "Michael Kors Slim Runway",
+      "Slim Runway",
+      "MK7545",
+      "Michael Kors MK7545",
+      "жіночий годинник Michael Kors",
+      "годинник Michael Kors",
+      "рожеве золото",
+      "Rose Gold",
+      "рожевий ремінець",
+      "білий циферблат",
+      "шкіряний ремінець",
+      "кварцовий годинник",
+      "жіночий годинник",
+      "брендований годинник",
+      "оригінальний Michael Kors"
+    ],
+    "isNew": false,
+    "title": "Годинник Michael Kors Slim Runway MK7545",
+    "reviews": 0,
+    "closure": "Застібка: пряжка",
+    "instagramBlock": "general",
+    "description": "Елегантний жіночий годинник Michael Kors Slim Runway у ніжному поєднанні рожевого золота, білого циферблата та світло-рожевого шкіряного ремінця. Мінімалістичний дизайн робить модель універсальною — вона легко доповнить як повсякденний, так і діловий образ.\nГодинник оснащений точним кварцовим механізмом із трьома стрілками. Корпус виготовлений із нержавіючої сталі, циферблат захищений стійким до подряпин мінеральним склом, а шкіряний ремінець доповнений класичною застібкою-пряжкою",
+    "sku": "MK7545",
+    "rating": 5,
+    "category": "Годинники",
+    "legacySlugs": [
+      "годинник-michael-kors-slim-runway-mk7545"
+    ],
+    "slug": "hodynnyk-michael-kors-slim-runway-mk7545",
+    "id": 96,
+    "color": "Rose/Soft Pink/White",
+    "images": [
+      "/assets/images/products/uploads/michael-kors-slim-runway-white-dial-ladies-watch-mk7545.webp",
+      "/assets/images/products/uploads/michael-kors-slim-runway-white-dial-ladies-watch-mk7545_2.webp",
+      "/assets/images/products/uploads/michael-kors-slim-runway-white-dial-ladies-watch-mk7545_3.webp"
+    ],
+    "article": "96"
+  },
+  {
+    "gender": [
+      "Чоловікам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Нержавіюча сталь",
+    "brand": "Michael Kors",
+    "price": 8000,
+    "preOrder": true,
+    "dimensions": "Діаметр корпусу: 44 мм. Ширина браслета: 22 мм",
+    "variants": [
+      {
+        "color": "Чорний",
+        "hex": "#050505",
+        "images": [
+          "/assets/images/products/uploads/michael-kors-lexington-chronograph-quartz-black-dial-watch-mk9154.webp?v=792b4b87",
+          "/assets/images/products/uploads/michael-kors-lexington-chronograph-quartz-black-dial-watch-mk9154_2.webp?v=41dee65d",
+          "/assets/images/products/uploads/michael-kors-lexington-chronograph-quartz-black-dial-watch-mk9154_3.webp?v=009e930e"
+        ],
+        "article": "97-1"
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Michael Kors",
+      "Michael Kors Lexington",
+      "Lexington Watch",
+      "Oversized Lexington",
+      "MK9154",
+      "Michael Kors MK9154",
+      "чоловічий годинник Michael Kors",
+      "годинник Michael Kors",
+      "чорний годинник",
+      "Black Watch",
+      "чорний чоловічий годинник",
+      "годинник з хронографом",
+      "кварцовий годинник",
+      "сталевий браслет",
+      "годинник 44 мм",
+      "брендований годинник",
+      "оригінальний Michael Kors"
+    ],
+    "isNew": false,
+    "title": "Годинник Michael Kors Oversized Lexington Chronograph MK9154",
+    "reviews": 0,
+    "closure": "Розкладна з фіксатором",
+    "instagramBlock": "general",
+    "description": "Стильний чоловічий годинник Michael Kors Lexington у повністю чорному виконанні. Масивний корпус, чорний циферблат та сталевий браслет створюють виразний монохромний дизайн, який чудово доповнить як повсякденний, так і діловий образ.\nМодель оснащена кварцовим механізмом із функцією хронографа та відображенням дати. Циферблат доповнений римськими цифрами та трьома субциферблатами. Корпус і браслет виготовлені з нержавіючої сталі, а мінеральне скло захищає циферблат",
+    "sku": "MK9154",
+    "rating": 5,
+    "category": "Годинники",
+    "legacySlugs": [
+      "годинник-michael-kors-oversized-lexington-chronograph-mk9154"
+    ],
+    "slug": "hodynnyk-michael-kors-oversized-lexington-chronograph-mk9154",
+    "id": 97,
+    "color": "Чорний",
+    "images": [
+      "/assets/images/products/uploads/michael-kors-lexington-chronograph-quartz-black-dial-watch-mk9154.webp",
+      "/assets/images/products/uploads/michael-kors-lexington-chronograph-quartz-black-dial-watch-mk9154_2.webp",
+      "/assets/images/products/uploads/michael-kors-lexington-chronograph-quartz-black-dial-watch-mk9154_3.webp"
+    ],
+    "article": "97"
+  },
+  {
+    "gender": [
+      "Чоловікам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Нержавіюча сталь; золотисте покриття корпусу та браслета. Скло — мінеральне, стійке до подряпин",
+    "brand": "Michael Kors",
+    "price": 6300,
+    "preOrder": true,
+    "dimensions": "Діаметр корпусу — 4,4 см.Товщина корпусу — 1,0 см.Ширина браслета — 2,2 см",
+    "variants": [
+      {
+        "color": "Золотистий / чорний",
+        "hex": "#111111",
+        "images": [
+          "/assets/images/products/uploads/michael-kors-slim-runway-black-dial-mens-watch-mk8621-.webp?v=c3ab4597",
+          "/assets/images/products/uploads/michael-kors-slim-runway-black-dial-mens-watch-mk8621-_2.webp?v=72c91470",
+          "/assets/images/products/uploads/michael-kors-slim-runway-black-dial-mens-watch-mk8621-_3.webp?v=396c5675"
+        ],
+        "article": "98-1"
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Металевий браслет із нержавіючої сталі золотистого кольору, застібка-метелик із кнопковим фіксатором",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Michael Kors",
+      "Michael Kors MK8621",
+      "MK8621",
+      "Slim Runway",
+      "чоловічий годинник Michael Kors",
+      "чоловічий годинник",
+      "годинник Michael Kors",
+      "золотий годинник",
+      "чорний циферблат",
+      "годинник із чорним циферблатом",
+      "чоловічий золотий годинник",
+      "кварцовий годинник",
+      "сталевий годинник",
+      "годинник на браслеті",
+      "брендовий чоловічий годинник"
+    ],
+    "isNew": false,
+    "title": "Годинник Michael Kors Slim Runway MK8621",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильний чоловічий годинник Michael Kors Slim Runway MK8621 із контрастним чорним циферблатом та золотистим корпусом. Лаконічний дизайн із мінімалістичними індексами легко поєднується як із діловим, так і з повсякденним образом.\nМодель оснащена кварцовим механізмом, мінеральним склом із захистом від подряпин та аналоговим циферблатом із трьома стрілками. Корпус і браслет виконані з нержавіючої сталі із золотистим покриттям.\nГодинник має водозахист до 50 метрів (5 ATM), що робить його практичним для щоденного носіння. Масивний корпус діаметром 44 мм надає моделі виразного чоловічого характеру",
+    "sku": "MK8621",
+    "rating": 5,
+    "category": "Годинники",
+    "legacySlugs": [
+      "годинник-michael-kors-slim-runway-mk8621"
+    ],
+    "slug": "hodynnyk-michael-kors-slim-runway-mk8621",
+    "id": 98,
+    "color": "Золотистий / чорний",
+    "images": [
+      "/assets/images/products/uploads/michael-kors-slim-runway-black-dial-mens-watch-mk8621-.webp",
+      "/assets/images/products/uploads/michael-kors-slim-runway-black-dial-mens-watch-mk8621-_2.webp",
+      "/assets/images/products/uploads/michael-kors-slim-runway-black-dial-mens-watch-mk8621-_3.webp"
+    ],
+    "article": "98"
+  },
+  {
+    "gender": [
+      "Чоловікам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Нержавіюча сталь; мінеральне скло",
+    "brand": "Michael Kors",
+    "price": 5900,
+    "preOrder": true,
+    "dimensions": "Діаметр корпусу — 4,4 см.Товщина корпусу — 0,8 см.Ширина браслета — 2,2 см",
+    "variants": [
+      {
+        "color": "Зелений",
+        "hex": "#355c1d",
+        "images": [
+          "/assets/images/products/uploads/michael-kors-slim-runway-quartz-green-dial-mens-watch-mk9149.webp?v=d2c1165d",
+          "/assets/images/products/uploads/michael-kors-slim-runway-quartz-green-dial-mens-watch-mk9149_2_1.webp?v=9c7e4cbd",
+          "/assets/images/products/uploads/michael-kors-slim-runway-quartz-green-dial-mens-watch-mk9149_3.webp?v=f7f0bf8d"
+        ],
+        "article": "99-1"
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Металевий браслет із нержавіючої сталі у двоколірному виконанні — сріблястий + золотистий. Застібка-кліпса",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Michael Kors",
+      "Michael Kors MK9149",
+      "MK9149",
+      "Slim Runway",
+      "Oversized Slim Runway",
+      "чоловічий годинник Michael Kors",
+      "чоловічий годинник",
+      "годинник Michael Kors",
+      "зелений циферблат",
+      "годинник із зеленим циферблатом",
+      "двоколірний годинник",
+      "золотисто-сріблястий годинник",
+      "кварцовий годинник",
+      "годинник на браслеті",
+      "сталевий годинник",
+      "брендовий чоловічий годинник"
+    ],
+    "isNew": false,
+    "title": "Годинник Michael Kors Oversized Slim Runway MK9149",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильний чоловічий годинник Michael Kors Oversized Slim Runway MK9149 із насиченим зеленим циферблатом та елегантним двоколірним браслетом. Поєднання сріблястих і золотистих відтінків надає моделі універсальності та дозволяє легко поєднувати її з різними образами.\nМодель оснащена кварцовим механізмом, аналоговим циферблатом із мінімалістичними індексами та мінеральним склом. Корпус і браслет виготовлені з нержавіючої сталі.\nЗавдяки великому корпусу діаметром 44 мм годинник має виразний вигляд на зап'ясті. Водозахист до 50 метрів дозволяє комфортно використовувати модель у повсякденному житті",
+    "sku": "MK9149",
+    "rating": 5,
+    "category": "Годинники",
+    "legacySlugs": [
+      "годинник-michael-kors-oversized-slim-runway-mk9149"
+    ],
+    "slug": "hodynnyk-michael-kors-oversized-slim-runway-mk9149",
+    "id": 99,
+    "color": "Зелений",
+    "images": [
+      "/assets/images/products/uploads/michael-kors-slim-runway-quartz-green-dial-mens-watch-mk9149.webp",
+      "/assets/images/products/uploads/michael-kors-slim-runway-quartz-green-dial-mens-watch-mk9149_2_1.webp",
+      "/assets/images/products/uploads/michael-kors-slim-runway-quartz-green-dial-mens-watch-mk9149_3.webp"
+    ],
+    "article": "99"
+  },
+  {
+    "gender": [
+      "Чоловікам"
+    ],
+    "preOrderDays": "10-14 робочих днів",
+    "forcePublish": false,
+    "material": "Нержавіюча сталь; скло — мінеральне, стійке до подряпин",
+    "brand": "Michael Kors",
+    "price": 7400,
+    "preOrder": true,
+    "dimensions": "Розмір (габарити), см: Діаметр корпусу — 4,4 см.Товщина корпусу — близько 1,1 см.Ширина браслета — 2,2 см",
+    "variants": [
+      {
+        "color": "Сріблястий / зелений циферблат",
+        "hex": "#336c2d",
+        "images": [
+          "/assets/images/products/uploads/michael-kors-oversized-sage-chronograph--b10c945d.webp?v=7fe3bcdc",
+          "/assets/images/products/uploads/michael-kors-oversized-sage-chronograph--52ba3cb7.webp?v=fa8f9e17",
+          "/assets/images/products/uploads/michael-kors-oversized-sage-chronograph--6cbadb1a.webp?v=7c03297c"
+        ],
+        "article": "100-1"
+      }
+    ],
+    "preOrderPrepayment": 100,
+    "strapInfo": "Браслет із нержавіючої сталі сріблястого кольору із застібкою-кліпсою",
+    "sizes": [
+      "ONESIZE"
+    ],
+    "splitByColor": true,
+    "searchKeywords": [
+      "Michael Kors",
+      "Michael Kors MK9191",
+      "MK9191",
+      "Michael Kors Sage",
+      "Oversized Sage",
+      "чоловічий годинник Michael Kors",
+      "чоловічий годинник",
+      "брендовий чоловічий годинник",
+      "зелений циферблат",
+      "годинник із зеленим циферблатом",
+      "сріблястий годинник",
+      "сріблястий чоловічий годинник",
+      "годинник хронограф",
+      "чоловічий хронограф",
+      "кварцовий годинник",
+      "годинник на браслеті",
+      "сталевий годинник"
+    ],
+    "isNew": false,
+    "title": "Годинник Michael Kors Oversized Sage Chronograph MK9191",
+    "reviews": 0,
+    "instagramBlock": "general",
+    "description": "Стильний чоловічий годинник Michael Kors Oversized Sage Chronograph MK9191 із виразним зеленим циферблатом та сріблястим корпусом і браслетом. Великий корпус надає моделі сучасного та впевненого вигляду, а контраст зеленого циферблата зі сталевими деталями робить годинник акцентним елементом образу.\nМодель оснащена кварцовим механізмом із функцією хронографа та відображенням дати. Циферблат доповнений сріблястими індексами та стрілками, а мінеральне скло захищає його від подряпин.\nГодинник виконаний із нержавіючої сталі та має зручний металевий браслет із застібкою. Водозахист до 30 метрів дозволяє використовувати модель у повсякденному житті",
+    "sku": "MK9191",
+    "rating": 5,
+    "category": "Годинники",
+    "legacySlugs": [
+      "годинник-michael-kors-oversized-sage-chronograph-mk9191"
+    ],
+    "slug": "hodynnyk-michael-kors-oversized-sage-chronograph-mk9191",
+    "id": 100,
+    "color": "Сріблястий / зелений циферблат",
+    "images": [
+      "/assets/images/products/uploads/michael-kors-oversized-sage-chronograph--b10c945d.webp",
+      "/assets/images/products/uploads/michael-kors-oversized-sage-chronograph--52ba3cb7.webp",
+      "/assets/images/products/uploads/michael-kors-oversized-sage-chronograph--6cbadb1a.webp"
+    ],
+    "article": "100"
   }
 ]

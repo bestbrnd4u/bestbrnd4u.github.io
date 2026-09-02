@@ -159,6 +159,32 @@ console.log("\n[4] Старі посилання не ламаються");
         && noTranslit.findVariantByColor(variants, "bezhevyi") === -1);
 }
 
+console.log("\n[4b] Перемикання кольору на сторінці товару теж пише латиницю");
+{
+    // Це було останнє місце, яке повертало кирилицю в адресний рядок:
+    // перемкнув колір — і «?color=Коричнево-чорний» у скопійованому
+    // посиланні знову перетворювався на «?color=%D0%9A%D0%BE%D1%80…».
+    //
+    // Адреси товарів, акцій і фільтрів каталогу латиницею вже були, і
+    // саме цю невідповідність найлегше не помітити: у власному
+    // адресному рядку кирилиця видна нормальним текстом.
+    const common = read("assets/js/common.js");
+
+    const блок = common.slice(common.indexOf('if (document.getElementById("productPage"))'),
+        common.indexOf('if (document.getElementById("productPage"))') + 1400);
+
+    check("колір перед записом переганяється в латиницю",
+        /window\.Translit\.toSlug\(colorBtn\.dataset\.color\)/.test(блок), блок.slice(0, 80));
+
+    check("кирилиця як є більше не пишеться",
+        !/url\.searchParams\.set\("color", colorBtn\.dataset\.color\)/.test(common));
+
+    // Без перетворювача (не підключився) лишаємо як було: адресний
+    // рядок — не причина ламати сторінку.
+    check("без Translit відкат на старе значення",
+        /latin \|\| colorBtn\.dataset\.color/.test(блок));
+}
+
 console.log("\n[5] Перетворювач підключено скрізь, де збирається адреса");
 {
     // productUrl живе в common.js. Сторінка з common.js, але без

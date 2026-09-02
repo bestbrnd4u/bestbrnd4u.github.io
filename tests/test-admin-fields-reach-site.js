@@ -155,8 +155,13 @@ const GROUPS = [
         collection: "collections",
         script: "scripts/build-collections.js",
         aggregate: "data/collections.json",
-        accessor: "collection",
-        consumers: ["assets/js/app.js"],
+        // Два імені, бо набір товарів добірка бере СПІЛЬНИМ правилом з
+        // акціями (collectionProducts → promotionProducts у common.js),
+        // і там запис зветься promo. Без другого імені поле, яке читає
+        // саме правило — autoSections, productIds, — виглядало б
+        // нікому не потрібним.
+        accessor: ["collection", "promo"],
+        consumers: ["assets/js/app.js", "assets/js/common.js"],
         internal: {
             active: "фільтр самої збірки",
             products: "перейменоване в productIds"
@@ -209,8 +214,12 @@ GROUPS.forEach(group => {
 
         const name = field.name;
 
-        // Чи звертається фронт до цього поля запису.
-        const used = new RegExp(`\\b${group.accessor}\\.${name}\\b`).test(consumerSource);
+        // Чи звертається фронт до цього поля запису. Імен може бути
+        // кілька: спільне правило набору зветься всередині promo.
+        const accessors = Array.isArray(group.accessor) ? group.accessor : [group.accessor];
+
+        const used = accessors.some(accessor =>
+            new RegExp(`\\b${accessor}\\.${name}\\b`).test(consumerSource));
 
         const excuse = Object.prototype.hasOwnProperty.call(group.internal, name)
             ? group.internal[name]
@@ -220,7 +229,7 @@ GROUPS.forEach(group => {
 
             check(`«${field.label || name}» (${name}) доїжджає до сайту`,
                 emitted.has(name),
-                "сайт читає " + group.accessor + "." + name + ", а збірка поле не передає");
+                "сайт читає " + accessors.join("|") + "." + name + ", а збірка поле не передає");
 
             // Виправдання для поля, яке насправді читається, — це
             // застаріле виправдання: саме так помилка й ховається.

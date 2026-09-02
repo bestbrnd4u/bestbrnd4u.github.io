@@ -57,7 +57,12 @@ console.log("\n[3] Успадкування артикула");
 console.log("\n[4] Сторінка товару показує артикул кольору");
 {
   const js=fs.readFileSync(path.join(ROOT,"assets/js/product.js"),"utf8");
-  check("свотчі несуть data-sku", js.includes('data-sku="${escapeHtml(getVariantSku'));
+  // Свотч несе АРТИКУЛ КАТАЛОГУ («9-4»): його ставить система, тож він
+  // є завжди. Заводський код їде поруч, окремим атрибутом, і буває
+  // порожнім.
+  check("свотчі несуть артикул кольору",
+        js.includes('data-sku="${escapeHtml(getVariantArticle'));
+  check("і заводський код окремо", js.includes("data-supplier-sku="));
   check("підпис під назвою має маркер", js.includes("data-product-sku"));
   check("рядок характеристик має маркер", js.includes("data-spec-sku"));
   // У розмітку артикул іде НЕ через getVariantSku: той віддає значення
@@ -72,8 +77,16 @@ console.log("\n[4] Сторінка товару показує артикул �
   // показується як є і перемикається разом з кольором (перевірки вище).
   check("JSON-LD бере артикул через schemaSku", js.includes("sku: schemaSku(product) || undefined"));
   check("порожній артикул у розмітку не потрапляє", js.includes("|| undefined"));
-  check("schemaSku починає з артикула товару, як і генератор сторінок",
-        /function schemaSku\(product\) \{\s*\n\s*const own = sanitizeSku\(product\.sku\);/.test(js));
+  // Порядок мусить збігатися з firstSku() у генераторі сторінок:
+  // спершу артикул каталогу (він є завжди), і лише як запас — старий
+  // перебір заводських кодів, потрібний на даних, зібраних до появи
+  // article.
+  const pages = fs.readFileSync(path.join(ROOT, "scripts/build-product-pages.js"), "utf8");
+  const першийРядок = /const article = String\(product\.article \|\| ""\)\.trim\(\);/;
+  check("schemaSku починає з артикула каталогу", першийРядок.test(js));
+  check("генератор сторінок — так само", першийРядок.test(pages));
+  check("заводський код лишився запасом",
+        /if \(article\) return article;[\s\S]{0,40}const own = sanitizeSku\(product\.sku\);/.test(js));
   const cs=fs.readFileSync(path.join(ROOT,"assets/js/common.js"),"utf8");
   check("перемикання кольору оновлює артикул", cs.includes("[data-product-sku]") && cs.includes("[data-spec-sku]"));
 }

@@ -147,7 +147,7 @@ console.log("\n[4] Кадр застосовується скрізь, де по
         /\.thumb img,[\s\S]{0,400}--frame-zoom/.test(css));
 
     check("картка каталогу проставляє style",
-        /style="\$\{cardFrameStyle\(product\.framing, img\)\}"/.test(read("assets/js/ui.js")));
+        /style="\$\{cardFrameStyle\(product && product\.framing, img\)\}"/.test(read("assets/js/ui.js")));
 
     const productJs = read("assets/js/product.js");
     check("галерея товару проставляє style",
@@ -844,13 +844,38 @@ console.log("\n[11] Масштаб не накриває сусідні слай
     const common = read("assets/js/common.js");
     const css = read("assets/css/style.css");
 
-    // Карусель карточки є у ДВОХ місцях: шаблон картки й перемальовка
-    // при зміні кольору. Полагодити одне й забути про інше означало б,
-    // що баг вертається при перемиканні кольору.
-    check("картка каталогу — обгортка",
-        /<div class="photo-slide photo-slide-photo">/.test(ui));
-    check("перемальовка при зміні кольору теж",
-        /<div class="photo-slide photo-slide-photo">/.test(common));
+    // Карусель картки малюється у ДВОХ місцях: шаблон картки й
+    // перемальовка при зміні кольору. Раніше тут перевірялось, що
+    // обгортка є в обох файлах — і саме дві копії розмітки й дали баг,
+    // який власник побачив: у копії з common.js не було style із
+    // кадруванням, тож перемикання кольору скидало наближення 2.34×
+    // до 1, і сумка ставала дрібною посеред білого тла.
+    //
+    // Тепер розмітка ОДНА (cardPhotoSlide в ui.js), і перевіряємо саме
+    // це: копії в common.js бути не повинно.
+    check("слайд малює одна функція",
+        /function cardPhotoSlide\(product, img\)/.test(ui)
+        && /<div class="photo-slide photo-slide-photo">/.test(ui));
+
+    check("перемальовка при зміні кольору кличе її, а не свою копію",
+        /cardPhotoSlide\(\{ framing, title \}, img\)/.test(common)
+        && !/<div class="photo-slide photo-slide-photo">/.test(common));
+
+    // Кадр мусить долітати саме до перемальовки — інакше все вище
+    // правда, а на екрані знову дрібна сумка.
+    check("шаблон картки везе словник кадрів у розмітці",
+        /data-framing='\$\{escapeAttrSingleQuoted\(JSON\.stringify\(framing\)\)\}'/.test(ui)
+        && /\$\{cardFramingAttr\(product\)\}/.test(ui));
+
+    check("перемальовка читає його з картки",
+        /const framing = cardFramingFrom\(cardScope\)/.test(common));
+
+    // ЧОМУ НЕ З КЕШУ ТОВАРІВ. На сторінці каталогу cachedProducts
+    // порожній — його наповнюють сторінка товару, кошик, обране й
+    // пошук. Спроба взяти кадр звідти давала null, і кадр однаково
+    // зникав; саме на цьому перша спроба виправлення й спіткнулась.
+    check("кадр не шукається в порожньому кеші каталогу",
+        !/findCachedProduct\(scope\.dataset\.id\)/.test(common));
 
     check("обгортка обрізає",
         /\.photo-slide-photo\{[\s\S]{0,240}overflow:hidden/.test(css));

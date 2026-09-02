@@ -1,0 +1,65 @@
+{
+  "gender": [
+    "Чоловікам"
+  ],
+  "preOrderDays": "10-14 робочих днів",
+  "forcePublish": false,
+  "material": "Нержавіюча сталь; золотисте покриття корпусу та браслета. Скло — мінеральне, стійке до подряпин",
+  "brand": "Michael Kors",
+  "price": 6300,
+  "preOrder": true,
+  "dimensions": "Діаметр корпусу — 4,4 см.Товщина корпусу — 1,0 см.Ширина браслета — 2,2 см",
+  "variants": [
+    {
+      "color": "Золотистий / чорний",
+      "hex": "#111111",
+      "images": [
+        "/assets/images/products/uploads/michael-kors-slim-runway-black-dial-mens-watch-mk8621-.webp",
+        "/assets/images/products/uploads/michael-kors-slim-runway-black-dial-mens-watch-mk8621-_2.webp",
+        "/assets/images/products/uploads/michael-kors-slim-runway-black-dial-mens-watch-mk8621-_3.webp"
+      ]
+    }
+  ],
+  "preOrderPrepayment": 100,
+  "strapInfo": "Металевий браслет із нержавіючої сталі золотистого кольору, застібка-метелик із кнопковим фіксатором",
+  "sizes": [
+    "ONESIZE"
+  ],
+  "splitByColor": true,
+  "searchKeywords": [
+    "Michael Kors",
+    "Michael Kors MK8621",
+    "MK8621",
+    "Slim Runway",
+    "чоловічий годинник Michael Kors",
+    "чоловічий годинник",
+    "годинник Michael Kors",
+    "золотий годинник",
+    "чорний циферблат",
+    "годинник із чорним циферблатом",
+    "чоловічий золотий годинник",
+    "кварцовий годинник",
+    "сталевий годинник",
+    "годинник на браслеті",
+    "брендовий чоловічий годинник"
+  ],
+  "isNew": false,
+  "title": "Годинник Michael Kors Slim Runway MK8621",
+  "reviews": 0,
+  "instagramBlock": "general",
+  "description": "Стильний чоловічий годинник Michael Kors Slim Runway MK8621 із контрастним чорним циферблатом та золотистим корпусом. Лаконічний дизайн із мінімалістичними індексами легко поєднується як із діловим, так і з повсякденним образом.\nМодель оснащена кварцовим механізмом, мінеральним склом із захистом від подряпин та аналоговим циферблатом із трьома стрілками. Корпус і браслет виконані з нержавіючої сталі із золотистим покриттям.\nГодинник має водозахист до 50 метрів (5 ATM), що робить його практичним для щоденного носіння. Масивний корпус діаметром 44 мм надає моделі виразного чоловічого характеру",
+  "sku": "MK8621",
+  "rating": 5,
+  "category": "Годинники",
+  "legacySlugs": [
+    "годинник-michael-kors-slim-runway-mk8621"
+  ],
+  "slug": "hodynnyk-michael-kors-slim-runway-mk8621",
+  "id": 98,
+  "color": "Золотистий / чорний",
+  "images": [
+    "/assets/images/products/uploads/michael-kors-slim-runway-black-dial-mens-watch-mk8621-.webp",
+    "/assets/images/products/uploads/michael-kors-slim-runway-black-dial-mens-watch-mk8621-_2.webp",
+    "/assets/images/products/uploads/michael-kors-slim-runway-black-dial-mens-watch-mk8621-_3.webp"
+  ]
+}

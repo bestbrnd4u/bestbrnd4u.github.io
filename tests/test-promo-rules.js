@@ -274,5 +274,111 @@ console.log("\n[6] Віджет розділів піднімається");
         && /section-picker\.js/.test(read("admin/index.html")));
 }
 
+console.log("\n[N] Добірка бере той самий набір, що й акція");
+{
+    // Правило «вручну обрані плюс автопідхоплення розділів» тепер
+    // працює і в добірках: у них зʼявилось те саме поле
+    // «Підхоплювати розділи автоматично».
+    //
+    // ЧОМУ ЦЕ ТУТ, А НЕ В ОКРЕМОМУ ФАЙЛІ. Реалізація одна на два
+    // місця (collectionProducts кличе promotionProducts), і перевіряти
+    // її окремо означало б дозволити їм розійтись — саме те, що вже
+    // одного разу сталося з promo.js і app.js.
+    const { collectionProducts } = new Function(
+        common.slice(common.indexOf("function promotionProducts"),
+            common.indexOf("function getDiscountPercent"))
+        + "; return { collectionProducts };"
+    )();
+
+    const каталог = products.slice(0, 3);
+
+    const категорія = products.find(p => p.category);
+
+    // Ручний список — знімок, у порядку адмінки.
+    const вручну = collectionProducts(
+        { productIds: [каталог[2].id, каталог[0].id] }, products, departmentOf);
+
+    check("обрані вручну беруться в порядку адмінки",
+        вручну.map(p => p.id).join(",") === `${каталог[2].id},${каталог[0].id}`,
+        вручну.map(p => p.id).join(","));
+
+    // Правило — не знімок: категорія віддає все, що в ній зараз є.
+    const заПравилом = collectionProducts(
+        { autoSections: [категорія.category] }, products, departmentOf);
+
+    const очікуємо = products.filter(p => p.category === категорія.category).length;
+
+    check(`розділ підхоплюється сам (${категорія.category}: ${очікуємо})`,
+        заПравилом.length === очікуємо, String(заПравилом.length));
+
+    // Разом: спершу обрані вручну, далі решта з розділу, без дублів.
+    const разом = collectionProducts(
+        { productIds: [категорія.id], autoSections: [категорія.category] },
+        products, departmentOf);
+
+    check("обраний вручну лишається першим",
+        разом[0] && разом[0].id === категорія.id, разом[0] && String(разом[0].id));
+
+    check("товар не дублюється двома джерелами",
+        new Set(разом.map(p => p.id)).size === разом.length);
+
+    check("порожня добірка лишається порожньою",
+        collectionProducts({}, products, departmentOf).length === 0);
+
+    // Головна мусить кликати саме це, і з довідником розділів —
+    // інакше «Сумки» не розгорнулись би у свої категорії.
+    const app = read("assets/js/app.js");
+
+    check("головна кличе collectionProducts для добірки",
+        /collectionProducts\(collection, allProducts, departmentOf\)/.test(app));
+
+    check("і завантажує довідник «категорія → розділ»",
+        /loadDepartmentOf\(\)/.test(app.slice(app.indexOf("async function initCollections"),
+            app.indexOf("function getCollectionPageSize"))));
+
+    // Старого перебору лишитись не мусить: він ігнорував правило.
+    check("ручного перебору productIds на головній немає",
+        !/\(collection\.productIds \|\| \[\]\)\s*\n?\s*\.map/.test(app));
+
+    // Друга реалізація — те, чого тут не має бути.
+    check("правило одне, а не скопійоване",
+        /return promotionProducts\(collection, allProducts, departmentOf\)/.test(common));
+
+    console.log("\n[N+1] Правило доїжджає з адмінки в дані добірки");
+    {
+        const { loadYaml } = require("./helpers/yaml");
+
+        const collections = loadYaml("admin/config.yml").collections
+            .find(c => c.name === "collections");
+
+        const поле = (collections.fields || []).find(f => f.name === "autoSections");
+
+        check("поле є в добірках", !!поле);
+
+        check("це той самий віджет, що в акціях",
+            поле && поле.widget === "sectionPicker", поле && поле.widget);
+
+        check("поле необовʼязкове", поле && поле.required === false);
+
+        // Ручний список більше не обовʼязковий: добірку можна зібрати
+        // одним правилом, і вимагати ще й перелік означало б не давати
+        // її зберегти.
+        const ручний = (collections.fields || []).find(f => f.name === "products");
+
+        check("ручний список став необовʼязковим",
+            ручний && ручний.required === false, ручний && String(ручний.required));
+
+        const build = read("scripts/build-collections.js");
+
+        check("збірка переносить правило в дані",
+            /autoSections: data\.autoSections\.map\(String\)/.test(build));
+
+        // Доки тут вимагався саме ручний перелік, добірка, зібрана
+        // одним правилом, тихо не потрапляла на сайт.
+        check("добірка з одним лише правилом не пропускається",
+            /\(!обрані && !правило\)/.test(build));
+    }
+}
+
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
 process.exit(failures === 0 ? 0 : 1);

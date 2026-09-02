@@ -419,7 +419,7 @@ function createProductCard(product) {
         : "";
 
     return `
-        <div class="product-card" data-id="${product.id}">
+        <div class="product-card" data-id="${product.id}"${cardFramingAttr(product)}>
             <div class="product-image">
                 <div class="badge-stack">
                     ${badge}
@@ -437,17 +437,7 @@ function createProductCard(product) {
                 <div class="product-carousel">
                     <div class="photo-track">
                         ${images.map(img => `
-                            <div class="photo-slide photo-slide-photo">
-                                <img
-                                    class="product-main-image"
-                                    src="${img}"
-                                    style="${cardFrameStyle(product.framing, img)}"
-                                    data-variant-src="${img}"
-                                    data-variant-sizes="(max-width: 768px) 50vw, 300px"
-                                    alt="${escapeHtml(product.title)}"
-                                    loading="lazy"
-                                    onerror="this.src='assets/images/no-image.png'">
-                            </div>
+                            ${cardPhotoSlide(product, img)}
                         `).join("")}
                         ${video ? `
                             <video
@@ -632,6 +622,91 @@ function buildSrcSet(src) {
 function cardFrameStyle(framing, src) {
 
     return (window.ImageFraming && window.ImageFraming.frameStyleAttr(framing, src)) || "";
+
+}
+
+// Один слайд фото в картці товару.
+//
+// НАВІЩО ОКРЕМА ФУНКЦІЯ
+// ----------------------
+// Ця розмітка потрібна ДВІЧІ: коли картка малюється (createProductCard)
+// і коли покупець перемикає колір свотчем — тоді трек фото
+// перебудовується під новий колір (обробник .mini-color у common.js).
+//
+// Друга копія вже розійшлася з першою, і власник побачив обидва
+// наслідки на скріншоті каталогу:
+//
+//   • у копії не було style із кадруванням. Адмін виставив для того
+//     знімка наближення 2.34×, тож у щойно намальованій картці сумка
+//     заповнювала кадр, а після перемикання кольору та сама сумка
+//     ставала дрібною посеред білого тла — бо --frame-zoom зникав і
+//     scale() падав до 1;
+//   • у копії не було data-variant-src, тож зникав і srcset: замість
+//     знімка на 300/600 px браузер тягнув повнорозмірний.
+//
+// Тепер розмітка одна. Кадрування залежить від САМОГО ФАЙЛА (словник
+// «ім'я файлу → кадр»), тому фото кожного кольору отримує свій кадр
+// без жодних додаткових умов.
+//
+// ЗВІДКИ КАДР БЕРЕ ОБРОБНИК СВОТЧА. Не з кешу товарів: на сторінці
+// каталогу cachedProducts порожній (його наповнюють сторінка товару,
+// кошик, обране й пошук), тож пошук по ньому повертав null і кадр
+// однаково зникав. Тому словник кадрів їде в самій картці —
+// data-framing на .product-card.
+// Словник кадрів на самій картці — щоб обробник свотча міг дати
+// новому фото той самий кадр, який виставив адмін. Немає кадрувань —
+// немає й атрибута: у переважної більшості товарів його не буває, і
+// data-framing="{}" у кожній картці був би просто сміттям у розмітці.
+function cardFramingAttr(product) {
+
+    const framing = product && product.framing;
+
+    if (!framing || typeof framing !== "object" || !Object.keys(framing).length) return "";
+
+    return ` data-framing='${escapeAttrSingleQuoted(JSON.stringify(framing))}'`;
+
+}
+
+// Словник кадрів картки назад із розмітки. Зіпсований JSON — не
+// причина лишати покупця без фото: кадру не буде, знімок покажеться
+// повністю.
+function cardFramingFrom(card) {
+
+    if (!card || !card.dataset || !card.dataset.framing) return null;
+
+    try {
+
+        return JSON.parse(card.dataset.framing);
+
+    } catch (error) {
+
+        return null;
+
+    }
+
+}
+
+function cardPhotoSlide(product, img) {
+
+    // Слайд — обгортка, фото всередині.
+    //
+    // Кадрування масштабує фото через transform, а той не обрізається
+    // елементом: при 3× знімок займає три ширини смуги, накриваючи
+    // сусідні слайди. Обгортка з overflow:hidden тримає масштаб у
+    // межах свого слайда (див. .photo-slide-photo у style.css).
+    return `
+        <div class="photo-slide photo-slide-photo">
+            <img
+                class="product-main-image"
+                src="${img}"
+                style="${cardFrameStyle(product && product.framing, img)}"
+                data-variant-src="${img}"
+                data-variant-sizes="(max-width: 768px) 50vw, 300px"
+                alt="${escapeHtml((product && product.title) || "")}"
+                loading="lazy"
+                onerror="this.src='assets/images/no-image.png'">
+        </div>
+    `;
 
 }
 

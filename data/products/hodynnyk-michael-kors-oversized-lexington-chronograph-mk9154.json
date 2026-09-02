@@ -1,0 +1,67 @@
+{
+  "gender": [
+    "Чоловікам"
+  ],
+  "preOrderDays": "10-14 робочих днів",
+  "forcePublish": false,
+  "material": "Нержавіюча сталь",
+  "brand": "Michael Kors",
+  "price": 8000,
+  "preOrder": true,
+  "dimensions": "Діаметр корпусу: 44 мм. Ширина браслета: 22 мм",
+  "variants": [
+    {
+      "color": "Чорний",
+      "hex": "#050505",
+      "images": [
+        "/assets/images/products/uploads/michael-kors-lexington-chronograph-quartz-black-dial-watch-mk9154.webp",
+        "/assets/images/products/uploads/michael-kors-lexington-chronograph-quartz-black-dial-watch-mk9154_2.webp",
+        "/assets/images/products/uploads/michael-kors-lexington-chronograph-quartz-black-dial-watch-mk9154_3.webp"
+      ]
+    }
+  ],
+  "preOrderPrepayment": 100,
+  "sizes": [
+    "ONESIZE"
+  ],
+  "splitByColor": true,
+  "searchKeywords": [
+    "Michael Kors",
+    "Michael Kors Lexington",
+    "Lexington Watch",
+    "Oversized Lexington",
+    "MK9154",
+    "Michael Kors MK9154",
+    "чоловічий годинник Michael Kors",
+    "годинник Michael Kors",
+    "чорний годинник",
+    "Black Watch",
+    "чорний чоловічий годинник",
+    "годинник з хронографом",
+    "кварцовий годинник",
+    "сталевий браслет",
+    "годинник 44 мм",
+    "брендований годинник",
+    "оригінальний Michael Kors"
+  ],
+  "isNew": false,
+  "title": "Годинник Michael Kors Oversized Lexington Chronograph MK9154",
+  "reviews": 0,
+  "closure": "Розкладна з фіксатором",
+  "instagramBlock": "general",
+  "description": "Стильний чоловічий годинник Michael Kors Lexington у повністю чорному виконанні. Масивний корпус, чорний циферблат та сталевий браслет створюють виразний монохромний дизайн, який чудово доповнить як повсякденний, так і діловий образ.\nМодель оснащена кварцовим механізмом із функцією хронографа та відображенням дати. Циферблат доповнений римськими цифрами та трьома субциферблатами. Корпус і браслет виготовлені з нержавіючої сталі, а мінеральне скло захищає циферблат",
+  "sku": "MK9154",
+  "rating": 5,
+  "category": "Годинники",
+  "legacySlugs": [
+    "годинник-michael-kors-oversized-lexington-chronograph-mk9154"
+  ],
+  "slug": "hodynnyk-michael-kors-oversized-lexington-chronograph-mk9154",
+  "id": 97,
+  "color": "Чорний",
+  "images": [
+    "/assets/images/products/uploads/michael-kors-lexington-chronograph-quartz-black-dial-watch-mk9154.webp",
+    "/assets/images/products/uploads/michael-kors-lexington-chronograph-quartz-black-dial-watch-mk9154_2.webp",
+    "/assets/images/products/uploads/michael-kors-lexington-chronograph-quartz-black-dial-watch-mk9154_3.webp"
+  ]
+}

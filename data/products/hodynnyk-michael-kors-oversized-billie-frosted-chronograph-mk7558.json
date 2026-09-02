@@ -1,0 +1,64 @@
+{
+  "gender": [
+    "Жінкам"
+  ],
+  "preOrderDays": "10-14 робочих днів",
+  "forcePublish": false,
+  "material": "Нержавіюча сталь",
+  "brand": "Michael Kors",
+  "price": 6300,
+  "preOrder": true,
+  "dimensions": "Діаметр корпусу: 40 мм Товщина корпусу: 10,5 мм Ширина браслета: 20 мм",
+  "variants": [
+    {
+      "color": "Сріблястий",
+      "hex": "#c0bfbf",
+      "images": [
+        "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7558.webp",
+        "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-ch-6d39ef48.webp",
+        "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-ch-d3f8077e.webp"
+      ]
+    }
+  ],
+  "preOrderPrepayment": 100,
+  "sizes": [
+    "ONESIZE"
+  ],
+  "splitByColor": true,
+  "searchKeywords": [
+    "Michael Kors",
+    "Michael Kors Billie",
+    "Billie Watch",
+    "MK7558",
+    "Michael Kors MK7558",
+    "жіночий годинник",
+    "сріблястий годинник",
+    "Silver Watch",
+    "годинник Michael Kors",
+    "жіночий хронограф",
+    "кварцовий годинник",
+    "сталевий браслет",
+    "брендований годинник",
+    "оригінальний Michael Kors"
+  ],
+  "isNew": false,
+  "title": "Годинник Michael Kors Oversized Billie Frosted Chronograph MK7558",
+  "reviews": 0,
+  "closure": "Розкладна з кнопковим фіксатором",
+  "instagramBlock": "general",
+  "description": "Елегантний жіночий годинник Michael Kors Billie у сріблястому відтінку з ефектом Frosted. Стильний браслет із нержавіючої сталі та блискучий циферблат створюють виразний акцент і чудово доповнюють як повсякденні, так і святкові образи.\nМодель оснащена кварцовим механізмом із функцією хронографа та відображенням дати. Мінеральне скло захищає циферблат від подряпин, а водозахист 5 ATM забезпечує комфорт у повсякденному використанні",
+  "sku": "",
+  "rating": 5,
+  "category": "Годинники",
+  "legacySlugs": [
+    "годинник-michael-kors-oversized-billie-frosted-chronograph-mk7558"
+  ],
+  "slug": "hodynnyk-michael-kors-oversized-billie-frosted-chronograph-mk7558",
+  "id": 95,
+  "color": "Сріблястий",
+  "images": [
+    "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7558.webp",
+    "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-ch-6d39ef48.webp",
+    "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-ch-d3f8077e.webp"
+  ]
+}

@@ -86,7 +86,13 @@ console.log("\n[2b] Картинки пошуку задаються в адмі
     // Плиток чотири: «Чоловікам», «Жінкам», «Новинки», «Акції».
     // Останні дві історично малювались градієнтом — тепер їм теж можна
     // вибрати фото, а без фото градієнт лишається (див. блок [2c]).
-    const tiles = (entry && entry.fields) || [];
+    //
+    // Беремо саме ці чотири за іменами, а не «всі поля розділу»: у
+    // ньому тепер є ще й «Популярні запити» (звичайний список слів,
+    // не плитка) — див. блок [10].
+    const TILES = ["men", "women", "new", "sale"];
+
+    const tiles = ((entry && entry.fields) || []).filter(f => TILES.includes(f.name));
 
     check("налаштовуються всі чотири плитки", tiles.length === 4,
         tiles.map(t => t.label).join(", "));
@@ -208,8 +214,20 @@ console.log("\n[3] Файли банерів існують і мають пот
 
         try {
             const sharp = require("sharp");
+
+            // Прямі слеші обовʼязкові. Шлях на Windows містить «\U»,
+            // «\D», «\b» — усередині подвійних лапок оболонка їх
+            // зʼїдала, і sharp отримував
+            // «C:UsersIlyaDocumentsGitHubestbrnd4u…».
+            //
+            // Виглядало це не як провал, а як вісім стек-трейсів у
+            // виводі й тихий відкат на «файл не порожній»: розмір, який
+            // цей блок нібито перевіряє, на Windows не перевірявся
+            // ніколи. Node приймає прямі слеші на всіх системах.
+            const safe = file.replace(/\\/g, "/");
+
             size = require("child_process").execSync(
-                `node -e "require('sharp')('${file}').metadata().then(m=>console.log(m.width+'x'+m.height))"`,
+                `node -e "require('sharp')('${safe}').metadata().then(m=>console.log(m.width+'x'+m.height))"`,
                 { encoding: "utf8" }).trim();
         } catch (error) {
             size = null;
@@ -285,7 +303,12 @@ console.log("\n[7] Підпис не дублює текст на картинц
     const entry = loadYaml("admin/config.yml").collections
         .find(c => c.name === "pages").files.find(f => f.name === "searchBanners");
 
-    (entry.fields || []).forEach(tile => {
+    // Лише плитки: у розділі є ще «Популярні запити» — список слів, у
+    // якого підпису на картинці немає за визначенням (блок [10]).
+    const плитки = (entry.fields || []).filter(f =>
+        ["men", "women", "new", "sale"].includes(f.name));
+
+    плитки.forEach(tile => {
 
         const flag = (tile.fields || []).find(f => f.name === "hideLabel");
 
@@ -301,7 +324,7 @@ console.log("\n[7] Підпис не дублює текст на картинц
     // Вибір лишається за адміністратором: у нього може бути й фото без
     // напису, і тоді підпис потрібен.
     check("прапорець необовʼязковий",
-        (entry.fields || []).every(t =>
+        плитки.every(t =>
             (t.fields || []).find(f => f.name === "hideLabel")?.required === false));
 }
 
@@ -359,6 +382,102 @@ console.log("\n[9] Плитки не наїжджають одна на одну
     check("колонки можуть стискатись",
         /minmax\(0, 1fr\) minmax\(0, 1fr\)/.test(grid), grid.slice(0, 120));
     check("між плитками є проміжок", /gap:14px/.test(grid));
+}
+
+console.log("\n[10] Популярні запити щось знаходять");
+{
+    // ЩО БУЛО НЕ ТАК
+    // ---------------
+    // Під полем пошуку стояли чипи Guess, Рюкзаки і Furla — бренди й
+    // категорія, яких у каталозі вже немає. Половина підказок вела в
+    // «нічого не знайдено», і власник це помітив.
+    //
+    // Це не одноразова помилка, а те, що ГНИЄ САМО: асортимент
+    // змінюється, а підказка лишається. Тому перевіряємо не «список
+    // правильний», а «кожен запит справді щось знаходить», причому
+    // справжнім пошуком сайту.
+    const common = read("assets/js/common.js");
+
+    const matchesQuery = new Function(
+        "return " + common.match(/function matchesQuery[\s\S]*?\n\}/)[0] + ";")();
+
+    // Вихідні файли товарів, а не агрегат (правило з
+    // tests/test-migration-types.js).
+    const products = fs.readdirSync(path.join(ROOT, "data/products"))
+        .filter(f => f.endsWith(".json"))
+        .map(f => JSON.parse(read(`data/products/${f}`)))
+        .filter(p => typeof p.id === "number");
+
+    const скільки = term => products.filter(p => matchesQuery(p, term.toLowerCase())).length;
+
+    // 1. Запас у коді — на випадок, коли файл налаштувань не приїхав.
+    const запас = JSON.parse("[" + common
+        .slice(common.indexOf("const POPULAR_SEARCHES = ["))
+        .match(/\[([\s\S]*?)\]/)[1] + "]");
+
+    check(`запас у коді не порожній (${запас.length})`, запас.length > 0);
+
+    const мертвіВЗапасі = запас.filter(term => !скільки(term));
+
+    check("кожна стандартна підказка щось знаходить",
+        мертвіВЗапасі.length === 0, мертвіВЗапасі.join(", "));
+
+    // 2. Те, що зараз стоїть в адмінці.
+    const config = JSON.parse(read("data/search-banners.json"));
+
+    check("перелік є у файлі налаштувань",
+        Array.isArray(config.popularSearches) && config.popularSearches.length > 0);
+
+    const мертвіВАдмінці = (config.popularSearches || []).filter(term => !скільки(term));
+
+    check("кожна підказка з адмінки щось знаходить",
+        мертвіВАдмінці.length === 0,
+        мертвіВАдмінці.map(t => `${t} → 0 товарів`).join(", "));
+
+    // Живий випадок: саме ці три й були мертвими.
+    ["Guess", "Рюкзаки", "Furla"].forEach(term => {
+
+        check(`«${term}» не повернувся в підказки`,
+            !запас.includes(term) && !(config.popularSearches || []).includes(term));
+
+    });
+
+    // 3. Підключення: перелік мусить читатись з адмінки, а не лишатись
+    // зашитим у коді.
+    check("чипи малюються з файла налаштувань",
+        /config\.popularSearches/.test(common));
+
+    check("запас лишається, якщо файл не приїхав",
+        /renderPopularChips\(popularEl, POPULAR_SEARCHES\)/.test(common));
+
+    // Текст пише адміністратор — екранування обовʼязкове.
+    check("текст підказки екранується",
+        /search-chip">\$\{escapeHtml\(term\)\}/.test(common));
+
+    // Без dataUrl() браузер віддає файл із кешу, і зміна в адмінці не
+    // видно доти, доки людина не почистить кеш.
+    check("файл налаштувань читається з версією",
+        /fetch\(dataUrl\(SEARCH_BANNERS_URL\)\)/.test(common));
+
+    const { loadYaml } = require("./helpers/yaml");
+
+    const файл = loadYaml("admin/config.yml").collections
+        .find(c => c.name === "pages").files
+        .find(f => f.file === "data/search-banners.json");
+
+    const поле = (файл.fields || []).find(f => f.name === "popularSearches");
+
+    check("поле є в адмінці", !!поле);
+
+    check("це список, який можна доповнювати",
+        поле && поле.widget === "list", поле && поле.widget);
+
+    // default без явного required — пастка Decap: старі записи
+    // перестають зберігатись (див. tests/test-entries-savable.js).
+    check("поле необовʼязкове", поле && поле.required === false);
+
+    check("підказка попереджає про мертві запити",
+        /нічого не знайдено/.test(String(поле && поле.hint)));
 }
 
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);

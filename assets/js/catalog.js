@@ -734,13 +734,26 @@ function resolveUrlTokens() {
         if (!GENDERS.includes(value)) selectedGenders.delete(value);
     });
 
-    fix(selectedDepartments, fieldValues("department"));
     fix(selectedSizes, fieldValues("sizes"));
 
-    // Бренд і категорію тут не чіпаємо: каталог читає їх з адреси
-    // окремо й пізніше — у applyBrandFromUrl() і applyCategoryFromUrl(),
-    // коли вже є розкладка бічного меню. Зіставлення там таке саме,
-    // через slugIndex().
+    // РОЗДІЛУ ТУТ НЕМА, І ЦЕ БУЛА ПОМИЛКА.
+    //
+    // Тут стояло fix(selectedDepartments, fieldValues("department")).
+    // Виглядало правильно, а не робило нічого: fieldValues() збирає
+    // значення з ТОВАРІВ, а поля department у товарі немає — розділ
+    // лежить у довіднику категорій (data/categories.json). Перелік
+    // виходив порожній, «?department=aksesuary» не перекладався, і
+    // сторож нижче прибирав його як невідомий.
+    //
+    // Наслідок бачив власник: каталог САМ пише латиницю в адресу
+    // (pushUrlState нижче), тобто адресу зі свого ж адресного рядка
+    // не можна було вставити в меню — вона відкривала повний каталог.
+    //
+    // Переклад переїхав туди, де довідник уже завантажений, — до
+    // сторожа в initCatalog(). З тієї самої причини тут немає бренда
+    // й категорії: каталог читає їх пізніше, у applyBrandFromUrl() і
+    // applyCategoryFromUrl(), коли вже є розкладка бічного меню.
+    // Зіставлення там таке саме, через slugIndex().
 
     const families = new Set();
 
@@ -866,11 +879,36 @@ async function initCatalog() {
             });
         });
 
-        // відділ з адреси лишаємо, лише якщо він справді існує:
-        // застаріле посилання інакше давало б порожній каталог
-        [...selectedDepartments].forEach(name => {
-            if (![...departmentByCategory.values()].includes(name)) selectedDepartments.delete(name);
+        // Розділ з адреси: спершу переклад із латиниці, і лише потім
+        // сторож «лишаємо, якщо справді існує» (застаріле посилання
+        // інакше давало б порожній каталог).
+        //
+        // ПОРЯДОК ТУТ І БУВ ЗЛАМАНИЙ. Перекладу не було зовсім (він
+        // стояв у resolveUrlTokens() і працював по порожньому переліку
+        // — див. коментар там), тож сторож бачив «aksesuary», не
+        // знаходив такого розділу й прибирав фільтр. Каталог при цьому
+        // сам пише в адресу саме латиницю, тобто ламав власні
+        // посилання: скопійована з адресного рядка адреса відкривала
+        // повний каталог.
+        //
+        // Кирилиця з уже розісланих посилань працює й далі:
+        // «Аксесуари» дає той самий slug, що й «aksesuary».
+        const departmentBySlug = slugIndex(new Set(departmentByCategory.values()));
+
+        const realDepartments = new Set();
+
+        selectedDepartments.forEach(token => {
+
+            const real = departmentBySlug.get(token)
+                || departmentBySlug.get(latinParam(token));
+
+            if (real !== undefined) realDepartments.add(real);
+
         });
+
+        selectedDepartments.clear();
+
+        realDepartments.forEach(name => selectedDepartments.add(name));
 
         fillBrands();
 

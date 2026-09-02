@@ -30,14 +30,14 @@
         "link": "catalog?gender=Чоловікам"
       },
       {
-        "label": "Унісекс",
+        "label": "Аксесуари",
         "image": "/assets/images/products/uploads/5cdd14ae-5b4e-43da-9407-a94306ff33e1.png",
-        "link": "catalog?gender=Унісекс"
+        "link": "catalog?department=aksesuary"
       },
       {
-        "label": "Дітям",
-        "image": "/assets/images/products/uploads/4023d633-a77f-4d81-a050-114803ea78a4.png",
-        "link": "catalog?gender=Дітям"
+        "label": "Взуття",
+        "image": "/assets/images/products/uploads/188c0bdd-51a4-482f-9e14-ec17c79e9b09.png",
+        "link": "catalog?department=vzuttia"
       }
     ]
   },

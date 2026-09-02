@@ -39,7 +39,14 @@ function main() {
         const data = JSON.parse(fs.readFileSync(filePath, "utf8"));
         const slug = file.replace(/\.json$/, "");
 
-        if (!data.title || !data.image || !Array.isArray(data.products) || !data.products.length) {
+        const обрані = Array.isArray(data.products) && data.products.length;
+
+        // Розділи, підхоплені автоматично, — рівноправне джерело
+        // товарів. Доки тут вимагався саме ручний перелік, добірка,
+        // зібрана одним правилом, тихо не потрапляла на сайт.
+        const правило = Array.isArray(data.autoSections) && data.autoSections.length;
+
+        if (!data.title || !data.image || (!обрані && !правило)) {
 
             console.log(`⏭  ПРОПУЩЕНО (не заповнено): ${file}`);
 
@@ -65,7 +72,19 @@ function main() {
             // тож уже створені добірки без цього поля не ламаються.
             imageMobile: data.imageMobile || "",
             imageAlt: data.imageAlt || data.title,
-            productIds: data.products.map(Number),
+            // Умови тут повторюються замість готових `обрані`/`правило`
+            // вище НАВМИСНО: вихідний об'єкт мусить залежати лише від
+            // самого запису. За переліком полів стежить
+            // tests/test-admin-fields-reach-site.js — він виконує саме
+            // цей літерал, і зовнішня змінна перетворила б перевірку на
+            // падіння з ReferenceError.
+            productIds: Array.isArray(data.products) ? data.products.map(Number) : [],
+            // ПРАВИЛО набору, на відміну від productIds вище — знімка.
+            // Пишемо лише коли заповнене, як у акціях: порожній масив у
+            // ста добірках нічого не означає.
+            ...(Array.isArray(data.autoSections) && data.autoSections.length
+                ? { autoSections: data.autoSections.map(String) }
+                : {}),
             // Оформлення тексту. renderCollectionWidget() у app.js його
             // вже читає (blockStyleClass/blockStyleAttr), але сюди воно
             // не потрапляло — тобто розділ «Оформлення тексту і кнопки»

@@ -1001,7 +1001,24 @@ function showToast(text) {
 // Глобальний пошук (оверлей у стилі Nike)
 // -------------------------
 
-const POPULAR_SEARCHES = ["Guess", "Michael Kors", "Рюкзаки", "Жіночі сумки", "Чоловічі сумки", "Furla"];
+// «Популярні запити» — чипи під полем пошуку, поки нічого не ввели.
+//
+// РЕДАГУЮТЬСЯ В АДМІНЦІ: «Сторінки» → «Пошук» → «Популярні запити».
+// Цей перелік — лише запас на випадок, коли файл налаштувань не
+// приїхав.
+//
+// ЧОМУ ЙОГО ВЗАГАЛІ ЗАЧІПАЛИ. Тут стояло Guess, Рюкзаки і Furla —
+// бренди й категорія, яких у каталозі вже немає. Тобто половина
+// підказок вела в «нічого не знайдено»: гірше, ніж не підказувати
+// зовсім, бо покупець вирішує, що магазин порожній.
+//
+// Щоб це не повторилось, tests/test-search-banners.js перевіряє, що
+// КОЖЕН запит — і звідси, і з адмінки — справді щось знаходить у
+// каталозі.
+const POPULAR_SEARCHES = [
+    "Marc Jacobs", "Coach", "Michael Kors",
+    "Жіночі сумки", "Годинники", "Окуляри"
+];
 const RECENT_SEARCHES_KEY = "recentSearches";
 const MAX_RECENT_SEARCHES = 6;
 const MAX_SEARCH_RESULTS = 6;
@@ -1184,6 +1201,10 @@ function buildSearchOverlay() {
 // Якщо файл не приїде або в ньому нічого не вибрано, плитка лишиться
 // темною (background-color) з читабельним білим підписом — краще так,
 // ніж порожній світлий прямокутник із невидимим текстом.
+// dataUrl(), а не голий шлях: інакше браузер віддає файл із кешу, і
+// зміна в адмінці не видно доти, доки людина не почистить кеш. Раніше
+// це стосувалось лише картинок (їх міняють раз на сезон), а тепер тут
+// ще й «Популярні запити» — те, що правлять частіше за все інше.
 const SEARCH_BANNERS_URL = "data/search-banners.json";
 
 let searchBannersPromise = null;
@@ -1192,7 +1213,7 @@ function loadSearchBanners() {
 
     if (!searchBannersPromise) {
 
-        searchBannersPromise = fetch(SEARCH_BANNERS_URL)
+        searchBannersPromise = fetch(dataUrl(SEARCH_BANNERS_URL))
             .then(response => response.ok ? response.json() : {})
             .catch(() => ({}));
 
@@ -1351,14 +1372,12 @@ async function runGlobalSearch(query) {
 
 }
 
-function renderSearchIdleLists() {
+// Чипи «Популярні запити». Текст приходить від адміністратора, тож
+// екранується — інакше «<b>сумки» перетворилось би на розмітку.
+function renderPopularChips(popularEl, terms) {
 
-    const popularEl = document.getElementById("searchPopular");
-    const recentSection = document.getElementById("searchRecentSection");
-    const recentEl = document.getElementById("searchRecent");
-
-    popularEl.innerHTML = POPULAR_SEARCHES.map(term =>
-        `<button type="button" class="search-chip">${term}</button>`
+    popularEl.innerHTML = terms.map(term =>
+        `<button type="button" class="search-chip">${escapeHtml(term)}</button>`
     ).join("");
 
     popularEl.querySelectorAll(".search-chip").forEach(chip => {
@@ -1372,6 +1391,34 @@ function renderSearchIdleLists() {
             runGlobalSearch(chip.textContent);
 
         });
+
+    });
+
+}
+
+function renderSearchIdleLists() {
+
+    const popularEl = document.getElementById("searchPopular");
+    const recentSection = document.getElementById("searchRecentSection");
+    const recentEl = document.getElementById("searchRecent");
+
+    // Спершу малюємо запас, потім — те, що в адмінці.
+    //
+    // Оверлей відкривають клацом, тобто зазвичай уже після
+    // завантаження файла, і другий малюнок нічого не мигає. А якщо
+    // файл ще їде, людина бачить робочі підказки, а не порожнє місце.
+    renderPopularChips(popularEl, POPULAR_SEARCHES);
+
+    loadSearchBanners().then(config => {
+
+        const terms = (config && Array.isArray(config.popularSearches))
+            ? config.popularSearches.filter(term => typeof term === "string" && term.trim())
+            : [];
+
+        // Порожній перелік в адмінці — це «показувати запас», а не
+        // «прибрати блок»: підказки допомагають, і залишати людину без
+        // них через незаповнене поле не варто.
+        if (terms.length) renderPopularChips(popularEl, terms);
 
     });
 
@@ -1996,7 +2043,27 @@ document.addEventListener("click", event => {
                 // тепер сама сторінка товару, а не форма її адреси.
                 if (document.getElementById("productPage")) {
 
-                    url.searchParams.set("color", colorBtn.dataset.color);
+                    // ЛАТИНИЦЯ, як і в усіх інших адресах сайту.
+                    //
+                    // Тут стояв dataset.color як є, тобто сторінка сама
+                    // писала собі в адресний рядок кирилицю:
+                    // «?color=Коричнево-чорний» → у скопійованому
+                    // посиланні «?color=%D0%9A%D0%BE%D1%80…».
+                    //
+                    // Рівно від цієї бороди й пішли: адреси товарів,
+                    // акцій і фільтрів каталогу вже латиницею (той самий
+                    // перетворювач assets/js/translit.js). Перемикання
+                    // кольору на сторінці товару лишалось єдиним місцем,
+                    // яке її повертало.
+                    //
+                    // Старі посилання з кирилицею працюють і далі:
+                    // findVariantByColor() у product.js зіставляє колір
+                    // за slug-ом, тож обидві форми ведуть в одне місце.
+                    const latin = window.Translit
+                        ? window.Translit.toSlug(colorBtn.dataset.color)
+                        : "";
+
+                    url.searchParams.set("color", latin || colorBtn.dataset.color);
                     window.history.replaceState(null, "", url);
 
                 }
@@ -2009,9 +2076,34 @@ document.addEventListener("click", event => {
 
         }
 
-        // Артикул теж свій у кожного кольору — оновлюємо підпис під
-        // назвою товару і рядок у характеристиках. data-sku порожній →
-        // артикула немає взагалі, тоді просто чистимо текст.
+        // Підпис кольору під назвою — той самий рядок, що малює
+        // cardColorLabel() в ui.js.
+        //
+        // Без цього рядка картка після перемикання показувала фото
+        // одного кольору, а підпис — іншого: власник перемкнув на
+        // бежевий, а під назвою лишалось «Чорний». Саме підпис і
+        // відрізняє дві картки одного товару, розкладені по кольорах,
+        // тож брехати він не має права.
+        //
+        // «Основний» не показуємо: це заглушка з запасного варіанта
+        // (див. cardColorLabel), а не назва кольору.
+        if (scope && colorBtn.dataset.color) {
+
+            const label = scope.querySelector(".product-color-name");
+
+            if (label) {
+
+                const name = colorBtn.dataset.color;
+
+                label.textContent = name === "Основний" ? "" : name;
+
+            }
+
+        }
+
+        // Артикул свій у кожного кольору («95-1», «95-2») — оновлюємо
+        // підпис під назвою товару і рядок у характеристиках. data-sku
+        // порожній → артикула немає взагалі, тоді просто чистимо текст.
         if (scope && colorBtn.dataset.sku !== undefined) {
 
             const sku = colorBtn.dataset.sku;
@@ -2023,6 +2115,25 @@ document.addEventListener("click", event => {
             const specSku = scope.querySelector("[data-spec-sku]");
 
             if (specSku) specSku.textContent = sku;
+
+        }
+
+        // Заводський код — окремий рядок, і в різних кольорів він
+        // різний. Порожній у цього кольору — рядок ховаємо, а не
+        // лишаємо код попереднього кольору.
+        if (scope && colorBtn.dataset.supplierSku !== undefined) {
+
+            const supplier = colorBtn.dataset.supplierSku;
+
+            const row = scope.querySelector("[data-spec-supplier-sku]");
+
+            if (row) {
+
+                row.textContent = supplier ? `Код виробника: ${supplier}` : "";
+
+                row.hidden = !supplier;
+
+            }
 
         }
 
@@ -2075,23 +2186,27 @@ document.addEventListener("click", event => {
 
                 if (images.length) {
 
-                    // Слайд — обгортка, фото всередині.
+                    // Розмітка слайда — СПІЛЬНА з createProductCard
+                    // (cardPhotoSlide у ui.js). Тут стояла своя копія,
+                    // і вона розійшлася з оригіналом: без style із
+                    // кадруванням і без data-variant-src. Наслідок
+                    // власник побачив на скріншоті — перемкнув колір, і
+                    // сумка з наближенням 2.34× стала дрібною посеред
+                    // білого тла, бо --frame-zoom зникав.
                     //
-                    // Кадрування масштабує фото через transform, а той
-                    // не обрізається елементом: при 3× знімок займає
-                    // три ширини смуги, накриваючи сусідні слайди.
-                    // Обгортка з overflow:hidden тримає масштаб у межах
-                    // свого слайда (див. .photo-slide-photo у style.css).
-                    carouselTrack.innerHTML = images.map(img => `
-                        <div class="photo-slide photo-slide-photo">
-                            <img
-                                class="product-main-image"
-                                src="${img}"
-                                alt=""
-                                loading="lazy"
-                                onerror="this.src='assets/images/no-image.png'">
-                        </div>
-                    `).join("");
+                    // Словник кадрів їде в самій картці (data-framing).
+                    // НЕ з кешу товарів: на сторінці каталогу
+                    // cachedProducts порожній — його наповнюють
+                    // сторінка товару, кошик, обране й пошук, — тож
+                    // пошук по ньому повертав null і кадр однаково
+                    // зникав.
+                    const framing = cardFramingFrom(cardScope);
+
+                    const title = scope.querySelector(".product-title-link")?.textContent.trim();
+
+                    carouselTrack.innerHTML = images
+                        .map(img => cardPhotoSlide({ framing, title }, img))
+                        .join("");
 
                     carouselTrack.scrollLeft = 0;
 
@@ -2611,10 +2726,39 @@ function findSizeGroupForCategory(groups, category, categoryDepartments) {
 
 }
 
-// Артикул варіанта кольору. У різних кольорів однієї моделі артикул
-// зазвичай різний, тож він задається в самому кольорі; якщо там
-// порожньо — береться загальний артикул товару (так влаштовані всі
-// товари, додані до появи артикула в кольорах).
+// АРТИКУЛ КАТАЛОГУ варіанта кольору: «95-2».
+//
+// Номер ставить система — його вичислює збірка з id товару
+// (scripts/build-products.js), тож порожнім він не буває. Це той
+// артикул, який видно покупцеві й за яким товар шукають в адмінці.
+//
+// Запас на випадок, коли сторінка відкрилась на старих даних (у
+// браузері закешований products.json без article): краще показати
+// артикул постачальника, ніж порожнє місце.
+function getVariantArticle(product, variant) {
+
+    const own = (variant?.article || "").trim();
+
+    if (own) return own;
+
+    const productArticle = (product?.article || "").trim();
+
+    if (productArticle) return productArticle;
+
+    return getVariantSku(product, variant);
+
+}
+
+// Артикул ПОСТАЧАЛЬНИКА варіанта кольору — заводський код («BB0096S-001-51»).
+//
+// Заповнюється руками й буває порожнім; у різних кольорів однієї моделі
+// він зазвичай різний, тож задається в самому кольорі, а якщо там
+// порожньо — береться загальний код товару (так влаштовані всі товари,
+// додані до появи цього поля в кольорах).
+//
+// Не плутати з артикулом каталогу вище: цей код потрібен, щоб замовити
+// модель у постачальника, і саме за ним імпорт розпізнає, що товар уже
+// є (див. admin/import.js).
 function getVariantSku(product, variant) {
 
     const variantSku = (variant?.sku || "").trim();
@@ -3229,6 +3373,27 @@ function promotionProducts(promo, allProducts, departmentOf) {
     }
 
     return out;
+
+}
+
+// Товари добірки — те саме правило, що в акції.
+//
+// ЧОМУ ВИКЛИК, А НЕ ДРУГА РЕАЛІЗАЦІЯ
+// -----------------------------------
+// Набір у добірки складається так само: вручну обрані (знімок, у
+// порядку адмінки) плюс автопідхоплення розділів. Копія цього правила
+// в проєкті вже була — по одній в promo.js і app.js, — і вони
+// розійшлися: на головній порядок адмінки зберігався, на сторінці
+// акції ні. Другий раз цю яму копати не будемо.
+//
+// РІЗНИЦЯ ОДНА: у добірки немає поля «Бренд», тож правило бренду
+// просто не спрацьовує — promotionProducts дивиться на entry.brand,
+// якого тут не буває. Окрема назва потрібна саме щоб це було видно:
+// «чому добірка кличе promotionProducts» — питання, на яке інакше
+// довелося б відповідати щоразу.
+function collectionProducts(collection, allProducts, departmentOf) {
+
+    return promotionProducts(collection, allProducts, departmentOf);
 
 }
 

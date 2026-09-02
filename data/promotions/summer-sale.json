@@ -20,6 +20,9 @@
   "link": "catalog?category=Окуляри%20і%20оправи",
   "image": "/assets/images/banners/02_banner_products_1800x900-1-.jpg",
   "displayType": "banner_products",
+  "autoSections": [
+    "Окуляри і оправи"
+  ],
   "imageMobile": "/assets/images/banners/mob009.png",
   "promoPageImage": "/assets/images/banners/02_banner_products_1800x900-1-.jpg",
   "promoPageImageMobile": "/assets/images/banners/01_hero_slider_1000x1160.jpg",

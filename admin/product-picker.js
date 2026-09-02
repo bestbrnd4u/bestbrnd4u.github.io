@@ -59,13 +59,24 @@
 
     function haystack(product) {
 
+        // Артикули кольорів — «95-1», «95-2». Без них пошук за
+        // артикулом конкретного кольору не знаходив нічого: у списку
+        // лежав лише номер товару.
+        var colorArticles = (product.variants || [])
+            .map(function (variant) { return variant && variant.article; })
+            .filter(Boolean);
+
         return norm([
             product.title,
             product.brand,
             product.category,
+            // артикул каталогу (він же id) і заводський код
+            product.article,
             product.sku,
             product.id
-        ].filter(Boolean).join(" "));
+        ].concat(colorArticles)
+            .concat((product.variants || []).map(function (v) { return v && v.sku; }))
+            .filter(Boolean).join(" "));
 
     }
 

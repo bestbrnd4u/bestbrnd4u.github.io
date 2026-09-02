@@ -219,8 +219,20 @@ function sanitizeSku(value, context) {
 
 }
 
-// Артикул: спершу власний, далі — першого варіанта з придатним.
+// sku для розмітки — АРТИКУЛ КАТАЛОГУ («95»).
+//
+// Для Google sku — позначка товару в НАШОМУ магазині, а не код
+// виробника (для того є mpn нижче). Номер ставить збірка з id
+// (build-products.js), тож поле є завжди — і «Invalid value in field
+// "sku"» більше не може повернутись через незаповнений артикул.
+//
+// Далі лишається старий порядок (код постачальника з товару, потім з
+// кольорів): він потрібен, якщо сторінку збирають на даних без article.
 function firstSku(product) {
+
+    const article = String(product.article || "").trim();
+
+    if (article) return article;
 
     const context = product.slug || product.title || "товар без slug";
 
@@ -420,6 +432,10 @@ function buildHead(product) {
         // взагалі не потрапляло в розмітку — Search Console скаржився
         // на sku в розділі Merchant listings.
         sku: firstSku(product) || undefined,
+        // Код виробника — це mpn, а не sku: саме так їх розрізняє
+        // Google. Заповнюється руками й буває порожнім, тож
+        // необов'язковий і проходить ту саму перевірку довжини.
+        mpn: sanitizeSku(product.sku, product.sku ? (product.slug || product.title) : "") || undefined,
         brand: product.brand ? { "@type": "Brand", name: product.brand } : undefined,
         category: product.category || undefined,
         offers: {
@@ -556,7 +572,10 @@ function buildBody(product) {
         ["Бренд", product.brand],
         ["Категорія", product.category],
         ["Стать", product.gender],
-        ["Артикул", product.sku],
+        // Артикул каталогу — той, що ставить система: він є завжди.
+        // Заводський код лишається окремим рядком і лише коли він є.
+        ["Артикул", product.article || product.sku],
+        ["Код виробника", product.article ? product.sku : ""],
         ["Кольори", colors.join(", ")],
         ["Розміри", sizes.join(", ")]
     ]

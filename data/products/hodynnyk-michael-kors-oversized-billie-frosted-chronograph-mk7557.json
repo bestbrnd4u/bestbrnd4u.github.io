@@ -1,0 +1,68 @@
+{
+  "gender": [
+    "Жінкам"
+  ],
+  "preOrderDays": "10-14 робочих днів",
+  "forcePublish": false,
+  "material": "Нержавіюча сталь",
+  "brand": "Michael Kors",
+  "price": 7300,
+  "preOrder": true,
+  "dimensions": "Діаметр корпусу: 40 мм Ширина браслета: 20 мм",
+  "variants": [
+    {
+      "color": "Рожеве золото",
+      "hex": "#c5a4c4",
+      "images": [
+        "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7557.jpg",
+        "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7557_2.jpg",
+        "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7557_3.jpg"
+      ]
+    }
+  ],
+  "preOrderPrepayment": 100,
+  "sizes": [
+    "ONESIZE"
+  ],
+  "splitByColor": true,
+  "searchKeywords": [
+    "Michael Kors",
+    "Michael Kors Watch",
+    "Michael Kors Billie",
+    "Billie Watch",
+    "Oversized Billie",
+    "MK7557",
+    "Michael Kors MK7557",
+    "жіночий годинник Michael Kors",
+    "годинник Michael Kors",
+    "рожеве золото",
+    "Rose Gold",
+    "рожеве золото Michael Kors",
+    "годинник з хронографом",
+    "кварцовий годинник",
+    "жіночий хронограф",
+    "сталевий браслет",
+    "брендований годинник",
+    "оригінальний Michael Kors"
+  ],
+  "isNew": false,
+  "title": "Годинник Michael Kors Oversized Billie Frosted Chronograph MK7557",
+  "reviews": 0,
+  "closure": "Розкладна з кнопковим фіксатором",
+  "instagramBlock": "general",
+  "description": "Стильний жіночий годинник Michael Kors Billie у розкішному відтінку рожевого золота з ефектом Frosted. Браслет із нержавіючої сталі з комбінованим оздобленням красиво відбиває світло, а блискучий циферблат додає моделі елегантності та glamour-акценту.\nГодинник оснащений кварцовим механізмом із функцією хронографа та відображенням дати. Мінеральне скло захищає циферблат, а розкладна застібка з кнопковим фіксатором забезпечує комфортну посадку на зап'ясті",
+  "sku": "MK7557",
+  "rating": 5,
+  "category": "Годинники",
+  "legacySlugs": [
+    "годинник-michael-kors-oversized-billie-frosted-chronograph-mk7557"
+  ],
+  "slug": "hodynnyk-michael-kors-oversized-billie-frosted-chronograph-mk7557",
+  "id": 94,
+  "color": "Рожеве золото",
+  "images": [
+    "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7557.jpg",
+    "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7557_2.jpg",
+    "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7557_3.jpg"
+  ]
+}
