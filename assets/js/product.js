@@ -181,9 +181,21 @@ function sanitizeSku(value) {
 
 }
 
-// Перший придатний артикул: власний товару, далі — варіантів.
-// Порядок такий самий, як у firstSku() генератора статичних сторінок.
+// sku для розмітки — АРТИКУЛ КАТАЛОГУ («95»).
+//
+// Для Google sku — це позначка товару в НАШОМУ магазині, а не код
+// виробника (для того є mpn). Номер ставить система, тож поле є завжди,
+// і «Invalid value in field "sku"» більше не може повернутись через
+// незаповнений артикул — саме через це його й переробили.
+//
+// Далі — старий порядок (код постачальника з товару, потім з кольорів):
+// потрібен, якщо сторінка малюється на даних, зібраних до появи
+// article.
 function schemaSku(product) {
+
+    const article = String(product.article || "").trim();
+
+    if (article) return article;
 
     const own = sanitizeSku(product.sku);
 
@@ -318,6 +330,10 @@ function updateProductSeoMetadata(product) {
         // значення як є і може повернути порожній рядок — обидва випадки
         // Search Console позначає як «Invalid value in field "sku"».
         sku: schemaSku(product) || undefined,
+        // Код виробника — це mpn, а не sku: саме так їх розрізняє
+        // Google. Заповнений руками й буває порожнім, тож лишається
+        // необов'язковим і проходить ту саму перевірку довжини.
+        mpn: sanitizeSku(product.sku) || undefined,
         brand: product.brand ? { "@type": "Brand", name: product.brand } : undefined,
         offers: {
             "@type": "Offer",
@@ -896,7 +912,8 @@ function renderProduct(product) {
             data-color="${escapeHtml(variant.color)}"
             data-images='${escapeAttrSingleQuoted(JSON.stringify(variant.images || []))}'
             data-sizes='${escapeAttrSingleQuoted(JSON.stringify(getVariantSizes(product, variant)))}'
-            data-sku="${escapeHtml(getVariantSku(product, variant))}"
+            data-sku="${escapeHtml(getVariantArticle(product, variant))}"
+            data-supplier-sku="${escapeHtml(getVariantSku(product, variant))}"
             data-video="${escapeHtml(variant.video || "")}"
             title="${escapeHtml(variant.color)}"
             aria-label="Колір: ${escapeHtml(variant.color)}"
@@ -907,9 +924,17 @@ function renderProduct(product) {
 
     // розміри першого (активного за замовчуванням) кольору;
     // при перемиканні кольору список оновлює common.js
-    // артикул активного (першого) кольору; при перемиканні кольору
-    // його оновлює обробник у common.js за data-sku
-    const activeSku = getVariantSku(product, activeVariant);
+    // Артикул активного (першого) кольору; при перемиканні кольору
+    // його оновлює обробник у common.js за data-article.
+    //
+    // Показуємо артикул КАТАЛОГУ («95-2»), а не заводський код: номер
+    // ставить система, тож він є завжди, і саме його покупець назве в
+    // замовленні, а власник знайде в адмінці. Заводський код лишається
+    // окремим рядком у характеристиках — він потрібен для замовлення в
+    // постачальника, але буває порожнім.
+    const activeSku = getVariantArticle(product, activeVariant);
+
+    const supplierSku = getVariantSku(product, activeVariant);
 
     const firstVariantSizes = getVariantSizes(product, activeVariant);
     const sizes = firstVariantSizes.length ? firstVariantSizes : PRODUCT_SIZES;
@@ -1102,6 +1127,8 @@ ${sizeButtons}
                 <div class="spec-block-content">
                     <div class="spec-block-inner">
                         <p class="spec-plain" data-spec-sku>${escapeHtml(activeSku)}</p>
+                        ${supplierSku ? `
+                        <p class="spec-plain spec-supplier-sku" data-spec-supplier-sku>Код виробника: ${escapeHtml(supplierSku)}</p>` : ""}
                     </div>
                 </div>
             </div>` : ""}

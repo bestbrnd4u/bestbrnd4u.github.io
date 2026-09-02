@@ -2081,9 +2081,9 @@ document.addEventListener("click", event => {
 
         }
 
-        // Артикул теж свій у кожного кольору — оновлюємо підпис під
-        // назвою товару і рядок у характеристиках. data-sku порожній →
-        // артикула немає взагалі, тоді просто чистимо текст.
+        // Артикул свій у кожного кольору («95-1», «95-2») — оновлюємо
+        // підпис під назвою товару і рядок у характеристиках. data-sku
+        // порожній → артикула немає взагалі, тоді просто чистимо текст.
         if (scope && colorBtn.dataset.sku !== undefined) {
 
             const sku = colorBtn.dataset.sku;
@@ -2095,6 +2095,25 @@ document.addEventListener("click", event => {
             const specSku = scope.querySelector("[data-spec-sku]");
 
             if (specSku) specSku.textContent = sku;
+
+        }
+
+        // Заводський код — окремий рядок, і в різних кольорів він
+        // різний. Порожній у цього кольору — рядок ховаємо, а не
+        // лишаємо код попереднього кольору.
+        if (scope && colorBtn.dataset.supplierSku !== undefined) {
+
+            const supplier = colorBtn.dataset.supplierSku;
+
+            const row = scope.querySelector("[data-spec-supplier-sku]");
+
+            if (row) {
+
+                row.textContent = supplier ? `Код виробника: ${supplier}` : "";
+
+                row.hidden = !supplier;
+
+            }
 
         }
 
@@ -2687,10 +2706,39 @@ function findSizeGroupForCategory(groups, category, categoryDepartments) {
 
 }
 
-// Артикул варіанта кольору. У різних кольорів однієї моделі артикул
-// зазвичай різний, тож він задається в самому кольорі; якщо там
-// порожньо — береться загальний артикул товару (так влаштовані всі
-// товари, додані до появи артикула в кольорах).
+// АРТИКУЛ КАТАЛОГУ варіанта кольору: «95-2».
+//
+// Номер ставить система — його вичислює збірка з id товару
+// (scripts/build-products.js), тож порожнім він не буває. Це той
+// артикул, який видно покупцеві й за яким товар шукають в адмінці.
+//
+// Запас на випадок, коли сторінка відкрилась на старих даних (у
+// браузері закешований products.json без article): краще показати
+// артикул постачальника, ніж порожнє місце.
+function getVariantArticle(product, variant) {
+
+    const own = (variant?.article || "").trim();
+
+    if (own) return own;
+
+    const productArticle = (product?.article || "").trim();
+
+    if (productArticle) return productArticle;
+
+    return getVariantSku(product, variant);
+
+}
+
+// Артикул ПОСТАЧАЛЬНИКА варіанта кольору — заводський код («BB0096S-001-51»).
+//
+// Заповнюється руками й буває порожнім; у різних кольорів однієї моделі
+// він зазвичай різний, тож задається в самому кольорі, а якщо там
+// порожньо — береться загальний код товару (так влаштовані всі товари,
+// додані до появи цього поля в кольорах).
+//
+// Не плутати з артикулом каталогу вище: цей код потрібен, щоб замовити
+// модель у постачальника, і саме за ним імпорт розпізнає, що товар уже
+// є (див. admin/import.js).
 function getVariantSku(product, variant) {
 
     const variantSku = (variant?.sku || "").trim();
