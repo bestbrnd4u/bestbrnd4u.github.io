@@ -2043,7 +2043,27 @@ document.addEventListener("click", event => {
                 // тепер сама сторінка товару, а не форма її адреси.
                 if (document.getElementById("productPage")) {
 
-                    url.searchParams.set("color", colorBtn.dataset.color);
+                    // ЛАТИНИЦЯ, як і в усіх інших адресах сайту.
+                    //
+                    // Тут стояв dataset.color як є, тобто сторінка сама
+                    // писала собі в адресний рядок кирилицю:
+                    // «?color=Коричнево-чорний» → у скопійованому
+                    // посиланні «?color=%D0%9A%D0%BE%D1%80…».
+                    //
+                    // Рівно від цієї бороди й пішли: адреси товарів,
+                    // акцій і фільтрів каталогу вже латиницею (той самий
+                    // перетворювач assets/js/translit.js). Перемикання
+                    // кольору на сторінці товару лишалось єдиним місцем,
+                    // яке її повертало.
+                    //
+                    // Старі посилання з кирилицею працюють і далі:
+                    // findVariantByColor() у product.js зіставляє колір
+                    // за slug-ом, тож обидві форми ведуть в одне місце.
+                    const latin = window.Translit
+                        ? window.Translit.toSlug(colorBtn.dataset.color)
+                        : "";
+
+                    url.searchParams.set("color", latin || colorBtn.dataset.color);
                     window.history.replaceState(null, "", url);
 
                 }
