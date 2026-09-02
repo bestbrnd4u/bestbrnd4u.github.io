@@ -899,9 +899,14 @@ async function initCollections() {
 
     try {
 
-        const [collectionsResponse, productsResponse] = await Promise.all([
+        const [collectionsResponse, productsResponse, departmentOf] = await Promise.all([
             fetch(dataUrl("data/collections.json")),
-            fetch(dataUrl("data/products.json"))
+            fetch(dataUrl("data/products.json")),
+            // «категорія → розділ»: без нього розділ, указаний в
+            // автопідхопленні добірки, не розгорнувся б у свої
+            // категорії. Довідник кешується (loadDepartmentOf), тож
+            // акції на цій самій сторінці не тягнуть його вдруге.
+            loadDepartmentOf()
         ]);
 
         if (!collectionsResponse.ok) return;
@@ -918,9 +923,12 @@ async function initCollections() {
 
         section.innerHTML = collections.map(collection => {
 
-            const items = (collection.productIds || [])
-                .map(id => allProducts.find(product => product.id === id))
-                .filter(Boolean);
+            // Вручну обрані ПЛЮС автопідхоплення розділів — те саме
+            // правило, що в акції (collectionProducts у common.js).
+            // Раніше тут стояв тільки перебір productIds, тобто
+            // «Підхоплювати розділи автоматично» в добірці не працювало
+            // б навіть із заповненим полем.
+            const items = collectionProducts(collection, allProducts, departmentOf);
 
             if (!items.length) return "";
 
