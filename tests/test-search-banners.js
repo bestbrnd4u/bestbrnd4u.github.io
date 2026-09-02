@@ -214,8 +214,20 @@ console.log("\n[3] Файли банерів існують і мають пот
 
         try {
             const sharp = require("sharp");
+
+            // Прямі слеші обовʼязкові. Шлях на Windows містить «\U»,
+            // «\D», «\b» — усередині подвійних лапок оболонка їх
+            // зʼїдала, і sharp отримував
+            // «C:UsersIlyaDocumentsGitHubestbrnd4u…».
+            //
+            // Виглядало це не як провал, а як вісім стек-трейсів у
+            // виводі й тихий відкат на «файл не порожній»: розмір, який
+            // цей блок нібито перевіряє, на Windows не перевірявся
+            // ніколи. Node приймає прямі слеші на всіх системах.
+            const safe = file.replace(/\\/g, "/");
+
             size = require("child_process").execSync(
-                `node -e "require('sharp')('${file}').metadata().then(m=>console.log(m.width+'x'+m.height))"`,
+                `node -e "require('sharp')('${safe}').metadata().then(m=>console.log(m.width+'x'+m.height))"`,
                 { encoding: "utf8" }).trim();
         } catch (error) {
             size = null;
