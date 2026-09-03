@@ -65,6 +65,25 @@ const розділити = s => {
 
 const ast = csstree.parse(css, { positions: true });
 
+// Тривалість переходу в БАЗОВОМУ правилі елемента (без станів). Потрібна
+// блоку [4]: правило :active може не задавати свою, якщо база вже швидка.
+const базоваТривалість = new Map();
+csstree.walk(csstree.parse(css), {
+    visit: "Rule",
+    enter(node) {
+        const selText = csstree.generate(node.prelude);
+        if (/:(hover|active|focus)/.test(selText)) return;
+        csstree.walk(node.block, {
+            visit: "Declaration",
+            enter(d) {
+                if (d.property !== "transition" && d.property !== "transition-duration") return;
+                const v = csstree.generate(d.value);
+                for (const sel of розділити(selText)) базоваТривалість.set(key(sel), v);
+            }
+        });
+    }
+});
+
 // Збираємо ВСІ правила, що задають transform, за ключем елемента
 const заTransform = new Map();
 csstree.walk(ast, {
@@ -178,7 +197,56 @@ console.log("\n[3] Натискання не зсуває елемент з мі
         зсунуті.length === 0, prettify(зсунуті));
 }
 
-console.log("\n[4] Присідання можна побачити");
+console.log("\n[4] Присідання швидке");
+{
+    // Ця перевірка НЕСЕ НАВАНТАЖЕННЯ, а не просто наглядає.
+    //
+    // Базові тривалості на сайті — 200…500ms: наведення на картку чи
+    // наїзд фото навмисно плавні. Але натискання так тривати не може:
+    // відповідь на дію мусить бути негайною, інакше кнопка «думає».
+    // Тому кожне правило :active перебиває тривалість власною,
+    // короткою. Забудеш її — присідання поїде 350ms і відчуття
+    // «кнопка не слухається» повернеться.
+    const МЕЖА = 200;
+    const повільні = [];
+    const ast2 = csstree.parse(css, { positions: true });
+    csstree.walk(ast2, {
+        visit: "Rule",
+        enter(node) {
+            const sel = csstree.generate(node.prelude);
+            if (!/:active/.test(sel)) return;
+            let transform = null, duration = null, transition = null;
+            csstree.walk(node.block, {
+                visit: "Declaration",
+                enter(d) {
+                    const v = csstree.generate(d.value);
+                    if (d.property === "transform") transform = v;
+                    if (d.property === "transition-duration") duration = v;
+                    if (d.property === "transition") transition = v;
+                }
+            });
+            if (!transform) return;
+            // :hover:active бере тривалість від сусіднього :active тієї ж
+            // основи — там вона вже перевірена, дублювати не потрібно
+            if (/:hover/.test(sel)) return;
+
+            // Діє або власна тривалість правила :active, або та, що вже
+            // стоїть у базовому правилі елемента. Друге теж годиться:
+            // у бігунка ціни база — 150ms, і перебивати нічого не треба.
+            const джерело = duration || transition ||
+                базоваТривалість.get(розділити(sel).map(key)[0]);
+            if (!джерело) { повільні.push(`${sel} (рядок ${node.loc.start.line}): тривалість ніде не задана`); return; }
+            const m = джерело.match(/(\d*\.?\d+)(ms|s)\b/);
+            const ms = m ? (m[2] === "s" ? parseFloat(m[1]) * 1000 : parseFloat(m[1])) : null;
+            if (ms === null || ms > МЕЖА)
+                повільні.push(`${sel} (рядок ${node.loc.start.line}): ${ms}ms`);
+        }
+    });
+    check(`кожне :active має власну тривалість не довшу за ${МЕЖА}ms`,
+        повільні.length === 0, prettify(повільні));
+}
+
+console.log("\n[5] Присідання можна побачити");
 {
     // transform без переходу — це стрибок. Правило :active мусить мати
     // transform у списку переходу свого елемента.

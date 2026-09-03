@@ -213,12 +213,12 @@ p{
     background:var(--secondary);
     color:#fff;
     font-weight:700;
-    transition:background-color 200ms var(--ease-out),
-               border-color 200ms var(--ease-out),
-               box-shadow 200ms var(--ease-out),
-               color 200ms var(--ease-out),
-               opacity 200ms var(--ease-out),
-               transform 200ms var(--ease-out);
+    transition:background-color 350ms cubic-bezier(.4,0,.2,1),
+               border-color 350ms cubic-bezier(.4,0,.2,1),
+               box-shadow 350ms cubic-bezier(.4,0,.2,1),
+               color 350ms cubic-bezier(.4,0,.2,1),
+               opacity 350ms cubic-bezier(.4,0,.2,1),
+               transform 350ms cubic-bezier(.4,0,.2,1);
     box-shadow:var(--shadow);
 }
 
@@ -389,7 +389,7 @@ nav li.has-mega > a::after{
     border-bottom:2px solid currentColor;
     transform:rotate(45deg) translateY(-2px);
     opacity:.6;
-    transition:transform 250ms var(--ease-out);
+    transition:transform 250ms ease;
 }
 
 @media (hover:hover) and (pointer:fine){
@@ -413,9 +413,9 @@ nav li.has-mega:hover > a::after{
     opacity:0;
     visibility:hidden;
     pointer-events:none;
-    transition:opacity 250ms var(--ease-out),
-               transform 250ms var(--ease-out),
-               visibility 250ms var(--ease-out);
+    transition:opacity 250ms ease,
+               transform 250ms ease,
+               visibility 250ms ease;
     z-index:500;
 }
 
@@ -584,9 +584,9 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
     justify-content:center;
     background:white;
     box-shadow:var(--shadow-sm);
-    transition:background-color 300ms var(--ease-out),
-               color 300ms var(--ease-out),
-               transform 300ms var(--ease-out);
+    transition:background-color 300ms ease,
+               color 300ms ease,
+               transform 300ms ease;
     font-size:20px;
 }
 
@@ -615,9 +615,9 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
     justify-content:center;
     background:white;
     box-shadow:var(--shadow-sm);
-    transition:background-color 300ms var(--ease-out),
-               color 300ms var(--ease-out),
-               transform 300ms var(--ease-out);
+    transition:background-color 300ms ease,
+               color 300ms ease,
+               transform 300ms ease;
     font-size:20px;
     flex-shrink:0;
 }
@@ -662,8 +662,8 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
     height:2px;
     border-radius:2px;
     background:var(--gray900);
-    transition:opacity 250ms var(--ease-out),
-               transform 250ms var(--ease-out);
+    transition:opacity 250ms ease,
+               transform 250ms ease;
 }
 
 .mobile-menu-btn.open span:nth-child(1){
@@ -696,9 +696,9 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
     opacity:0;
     visibility:hidden;
     transform:translateY(-8px);
-    transition:opacity 250ms var(--ease-out),
-               transform 250ms var(--ease-out),
-               visibility 250ms var(--ease-out);
+    transition:opacity 250ms ease,
+               transform 250ms ease,
+               visibility 250ms ease;
     z-index:600;
 }
 
@@ -816,10 +816,10 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
     font-weight:700;
     color:var(--gray700);
     text-decoration:none;
-    transition:background-color 200ms var(--ease-out),
-               border-color 200ms var(--ease-out),
-               color 200ms var(--ease-out),
-               transform 200ms var(--ease-out);
+    transition:background-color 200ms ease,
+               border-color 200ms ease,
+               color 200ms ease,
+               transform 200ms ease;
     background:none;
     box-shadow:none;
 }
@@ -1095,7 +1095,7 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
     border-radius:22px;
     overflow:hidden;
     box-shadow:var(--shadow);
-    transition:transform 200ms var(--ease-out);
+    transition:transform 350ms cubic-bezier(.4,0,.2,1);
     cursor:pointer;
 }
 
@@ -1109,7 +1109,7 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
     width:100%;
     height:300px;
     object-fit:cover;
-    transition:transform 260ms var(--ease-out);
+    transition:transform 500ms ease;
 }
 
 @media (hover:hover) and (pointer:fine){
@@ -1142,8 +1142,8 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
     padding:40px;
     border-radius:20px;
     background:var(--gray50);
-    transition:box-shadow 300ms var(--ease-out),
-               transform 300ms var(--ease-out);
+    transition:box-shadow 300ms ease,
+               transform 300ms ease;
 }
 
 @media (hover:hover) and (pointer:fine){
@@ -1235,10 +1235,10 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
     justify-content:center;
     color:var(--gray900);
     z-index:5;
-    transition:background-color 200ms var(--ease-out),
-               color 200ms var(--ease-out),
-               opacity 200ms var(--ease-out),
-               transform 200ms var(--ease-out);
+    transition:background-color 350ms cubic-bezier(.4,0,.2,1),
+               color 350ms cubic-bezier(.4,0,.2,1),
+               opacity 350ms cubic-bezier(.4,0,.2,1),
+               transform 350ms cubic-bezier(.4,0,.2,1);
 }
 
 .carousel-arrow svg{
@@ -1307,8 +1307,8 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
        «all» на картці означає, що браузер стежить за КОЖНОЮ
        властивістю, включно з тими, що змінює JS при перемиканні
        кольору, і плавно їх тягне. Називаємо рівно те, що анімуємо. */
-    transition:transform 180ms var(--ease-out),
-               box-shadow 180ms var(--ease-out);
+    transition:transform 350ms cubic-bezier(.4,0,.2,1),
+               box-shadow 350ms cubic-bezier(.4,0,.2,1);
     /* Було animation:fadeUp .5s — з півсекундним зсувом на 30px.
        render() у catalog.js перезбирає grid.innerHTML цілком, тож
        КОЖНЕ натискання фільтра створювало картки заново й
@@ -1378,7 +1378,7 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
     border-radius:20px;
     border:2px solid transparent;
     /* змінюється рівно border-color — його й називаємо */
-    transition:border-color 180ms ease;
+    transition:border-color 350ms ease;
     pointer-events:none;
 }
 
@@ -1417,10 +1417,16 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
     object-position:center;
     transform:scale(var(--frame-zoom,1));
     transform-origin:var(--frame-x,50%) var(--frame-y,50%);
-    /* 450ms на «all» → 260ms на одному transform: наближення при
-       наведенні встигало почутись як затримка, а стежити за всіма
-       властивостями фото не потрібно — рухається лише масштаб */
-    transition:transform 260ms var(--ease-out);
+    /* Названо одну властивість замість «all»: рухається лише масштаб,
+       стежити за рештою немає потреби.
+
+       Тривалість і крива — 450ms + ease — лишаються як були. Я їх
+       спершу скоротив до 260ms і поставив сильний ease-out, і це було
+       помилкою: та крива проходить майже весь шлях у першій четверті
+       часу, тому наїзд читався як щиглик, а не як плавність. Наведення
+       на фото — це декоративне розкриття, а не відповідь на дію, і йому
+       потрібен саме спокійний ease. */
+    transition:transform 450ms ease;
 }
 
 
@@ -1524,9 +1530,9 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
     border-radius:50%;
     background:rgba(255,255,255,.65);
     box-shadow:0 0 0 1px rgba(0,0,0,.08);
-    transition:background-color 200ms var(--ease-out),
-               border-radius 200ms var(--ease-out),
-               width 200ms var(--ease-out);
+    transition:background-color 200ms ease,
+               border-radius 200ms ease,
+               width 200ms ease;
 }
 
 .photo-dot.active{
@@ -1627,8 +1633,8 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
     justify-content:center;
     align-items:center;
     cursor:pointer;
-    transition:background-color 300ms var(--ease-out),
-               transform 300ms var(--ease-out);
+    transition:background-color 300ms ease,
+               transform 300ms ease;
     box-shadow:0 6px 20px rgba(0,0,0,.08);
 }
 
@@ -1701,8 +1707,8 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
         opacity:0;
         transform:translateY(10px);
         pointer-events:none;
-        transition:opacity 200ms var(--ease-out),
-                   transform 200ms var(--ease-out);
+        transition:opacity 250ms ease,
+                   transform 250ms ease;
     }
 
     .products-grid:not(.list-view) .product-card:hover .product-hover-panel{
@@ -1970,9 +1976,9 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
     border-radius:50%;
     border:2px solid #fff;
     box-shadow:0 0 0 1.5px var(--gray200);
-    transition:box-shadow 200ms var(--ease-out),
-               opacity 200ms var(--ease-out),
-               transform 200ms var(--ease-out);
+    transition:box-shadow 200ms ease,
+               opacity 200ms ease,
+               transform 200ms ease;
 }
 
 @media (hover:hover) and (pointer:fine){
@@ -2176,8 +2182,8 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
     color:white;
     font-size:15px;
     font-weight:700;
-    transition:background-color 160ms ease,
-               transform 160ms var(--ease-out);
+    transition:background-color 300ms ease,
+               transform 300ms ease;
 }
 
 @media (hover:hover) and (pointer:fine){
@@ -2329,8 +2335,8 @@ footer{
     display:block;
     margin-bottom:10px;
     color:var(--gray300);
-    transition:color 300ms var(--ease-out),
-               padding-left 300ms var(--ease-out);
+    transition:color 300ms ease,
+               padding-left 300ms ease;
 }
 
 @media (hover:hover) and (pointer:fine){
@@ -2461,8 +2467,8 @@ footer{
     border-radius:20px;
     overflow:hidden;
     box-shadow:0 8px 30px rgba(0,0,0,.06);
-    transition:box-shadow 300ms var(--ease-out),
-               transform 300ms var(--ease-out);
+    transition:box-shadow 300ms ease,
+               transform 300ms ease;
 }
 
 @media (hover:hover) and (pointer:fine){
@@ -2487,7 +2493,7 @@ footer{
        без виставленої рамки картки виглядають точно як досі. */
     object-position:var(--frame-x,50%) var(--frame-y,0%);
     transform:scale(var(--frame-zoom,1));
-    transition:transform 260ms var(--ease-out);
+    transition:transform 450ms ease;
 }
 
 @media (hover:hover) and (pointer:fine){
@@ -2636,6 +2642,8 @@ footer{
     .promo-hero-quicklinks a:active{
         transform:translateY(-1px) scale(1.01);
         box-shadow:0 6px 14px rgba(17,24,39,.22);
+        /* база 250ms — для натискання задовго */
+        transition-duration:110ms;
     }
 }
 
@@ -2668,7 +2676,7 @@ footer{
     object-position:var(--frame-x,50%) var(--frame-y,0%);
     transform:scale(var(--frame-zoom,1));
     display:block;
-    transition:transform 260ms var(--ease-out);
+    transition:transform 500ms ease;
 }
 
 @media (hover:hover) and (pointer:fine){
@@ -2788,9 +2796,9 @@ footer{
     font-size:24px;
     font-weight:800;
     letter-spacing:2px;
-    transition:background-color 200ms var(--ease-out),
-               color 200ms var(--ease-out),
-               transform 200ms var(--ease-out);
+    transition:background-color 350ms ease,
+               color 350ms ease,
+               transform 350ms ease;
     box-shadow:0 8px 25px rgba(0,0,0,.05);
 }
 
@@ -2798,6 +2806,9 @@ footer{
     background:var(--primary);
     color:white;
     transform:scale(.97);
+    /* Базова тривалість картки — 350ms: це для плавного наведення.
+       Натискання так тривати не може, тому перебиваємо. */
+    transition-duration:110ms;
 }
 
 @media (hover:hover) and (pointer:fine){
@@ -2822,8 +2833,8 @@ footer{
     border-radius:10px;
     opacity:0;
     transform:translateY(20px);
-    transition:opacity 300ms var(--ease-out),
-               transform 300ms var(--ease-out);
+    transition:opacity 300ms ease,
+               transform 300ms ease;
     z-index:9999;
 }
 
@@ -2850,8 +2861,8 @@ footer{
     z-index:9998;
     opacity:0;
     transform:translateY(-14px);
-    transition:opacity 300ms var(--ease-out),
-               transform 300ms var(--ease-out);
+    transition:opacity 300ms ease,
+               transform 300ms ease;
     pointer-events:none;
 }
 
@@ -2877,9 +2888,9 @@ footer{
     box-shadow:var(--shadow);
     opacity:0;
     pointer-events:none;
-    transition:bottom 300ms var(--ease-out),
-               opacity 300ms var(--ease-out),
-               transform 300ms var(--ease-out);
+    transition:bottom 300ms ease,
+               opacity 300ms ease,
+               transform 300ms ease;
     z-index:999;
 }
 
@@ -3334,10 +3345,10 @@ body.mobile-filters-open .scroll-top{
     background:#fff;
     text-align:center;
     white-space:nowrap;
-    transition:background-color 200ms var(--ease-out),
-               border-color 200ms var(--ease-out),
-               color 200ms var(--ease-out),
-               opacity 200ms var(--ease-out);
+    transition:background-color 200ms ease,
+               border-color 200ms ease,
+               color 200ms ease,
+               opacity 200ms ease;
 }
 
 @media (hover:hover) and (pointer:fine){
@@ -4373,8 +4384,8 @@ body.mobile-filters-open .scroll-top{
     cursor:pointer;
     border-radius:14px;
     border:2px solid transparent;
-    transition:border-color 250ms var(--ease-out),
-               transform 250ms var(--ease-out);
+    transition:border-color 250ms ease,
+               transform 250ms ease;
     overflow:hidden;
     position:relative;
 }
@@ -4559,9 +4570,9 @@ body.mobile-filters-open .scroll-top{
     border:0;
     border-radius:50%;
     background:rgba(17,24,39,.25);
-    transition:background-color 200ms var(--ease-out),
-               border-radius 200ms var(--ease-out),
-               width 200ms var(--ease-out);
+    transition:background-color 200ms ease,
+               border-radius 200ms ease,
+               width 200ms ease;
     cursor:pointer;
     position:relative;
 }
@@ -4849,9 +4860,9 @@ body.mobile-filters-open .scroll-top{
     background-color:var(--gray100);
     cursor:pointer;
     padding:0;
-    transition:border-color 200ms var(--ease-out),
-               box-shadow 200ms var(--ease-out),
-               transform 200ms var(--ease-out);
+    transition:border-color 200ms ease,
+               box-shadow 200ms ease,
+               transform 200ms ease;
 }
 
 @media (hover:hover) and (pointer:fine){
@@ -5038,10 +5049,10 @@ body.mobile-filters-open .scroll-top{
     justify-content:center;
     opacity:0;
     transform:scale(.5);
-    transition:border-color 250ms var(--ease-out),
-               box-shadow 250ms var(--ease-out),
-               opacity 250ms var(--ease-out),
-               transform 250ms var(--ease-out);
+    transition:border-color 250ms ease,
+               box-shadow 250ms ease,
+               opacity 250ms ease,
+               transform 250ms ease;
     pointer-events:none;
 }
 
@@ -5285,7 +5296,7 @@ body.mobile-filters-open .scroll-top{
     object-position:var(--frame-x,50%) var(--frame-y,0%);
     transform:scale(var(--frame-zoom,1));
     display:block;
-    transition:transform 260ms var(--ease-out);
+    transition:transform 500ms ease;
 }
 
 .brand-teaser-content{
@@ -5316,8 +5327,8 @@ body.mobile-filters-open .scroll-top{
     border-radius:8px;
     font-size:13px;
     font-weight:600;
-    transition:background-color 200ms var(--ease-out),
-               transform 200ms var(--ease-out);
+    transition:background-color 200ms ease,
+               transform 200ms ease;
 }
 
 .brand-teaser-btn:hover{
@@ -5401,7 +5412,7 @@ body.mobile-filters-open .scroll-top{
     object-position:var(--frame-x,50%) var(--frame-y,50%);
     transform:scale(var(--frame-zoom,1));
     display:block;
-    transition:transform 260ms var(--ease-out);
+    transition:transform 500ms ease;
 }
 
 .brand-campaign-content{
@@ -5640,8 +5651,8 @@ body.mobile-filters-open .scroll-top{
     font-size:16px;
     font-weight:700;
     box-shadow:var(--shadow-sm);
-    transition:background-color 200ms ease,
-               color 200ms ease;
+    transition:background-color 350ms cubic-bezier(.4,0,.2,1),
+               color 350ms cubic-bezier(.4,0,.2,1);
 }
 
 @media (hover:hover) and (pointer:fine){
@@ -5880,9 +5891,9 @@ body.mobile-filters-open .scroll-top{
     font-weight:600;
     color:var(--gray500);
     white-space:nowrap;
-    transition:background-color 200ms var(--ease-out),
-               color 200ms var(--ease-out),
-               transform 200ms var(--ease-out);
+    transition:background-color 200ms ease,
+               color 200ms ease,
+               transform 200ms ease;
 }
 
 @media (hover:hover) and (pointer:fine){
@@ -6140,8 +6151,8 @@ body.mobile-filters-open .scroll-top{
     border:2px solid var(--gray200);
     border-radius:14px;
     padding:16px 18px;
-    transition:background-color 200ms ease,
-               border-color 200ms ease;
+    transition:background-color 350ms cubic-bezier(.4,0,.2,1),
+               border-color 350ms cubic-bezier(.4,0,.2,1);
     background:var(--gray50);
 }
 
@@ -6212,9 +6223,9 @@ body.mobile-filters-open .scroll-top{
     font-size:14px;
     font-weight:600;
     color:var(--gray700);
-    transition:background-color 200ms ease,
-               border-color 200ms ease,
-               color 200ms ease;
+    transition:background-color 350ms cubic-bezier(.4,0,.2,1),
+               border-color 350ms cubic-bezier(.4,0,.2,1),
+               color 350ms cubic-bezier(.4,0,.2,1);
 }
 
 .contact-channel input:checked + .contact-channel-chip{
@@ -6344,7 +6355,7 @@ body.mobile-filters-open .scroll-top{
     padding:0 18px;
     border-radius:12px;
     white-space:nowrap;
-    transition:background-color 200ms ease;
+    transition:background-color 350ms cubic-bezier(.4,0,.2,1);
 }
 
 @media (hover:hover) and (pointer:fine){
@@ -6506,8 +6517,8 @@ body.mobile-filters-open .scroll-top{
     background:var(--gray100);
     color:var(--gray500);
     font-size:14px;
-    transition:background-color 200ms ease,
-               color 200ms ease;
+    transition:background-color 350ms cubic-bezier(.4,0,.2,1),
+               color 350ms cubic-bezier(.4,0,.2,1);
 }
 
 @media (hover:hover) and (pointer:fine){
@@ -6535,9 +6546,9 @@ body.mobile-filters-open .scroll-top{
     border-radius:14px;
     font-size:14px;
     font-weight:700;
-    transition:background-color 200ms var(--ease-out),
-               border-color 200ms var(--ease-out),
-               transform 200ms var(--ease-out);
+    transition:background-color 350ms cubic-bezier(.4,0,.2,1),
+               border-color 350ms cubic-bezier(.4,0,.2,1),
+               transform 350ms cubic-bezier(.4,0,.2,1);
 }
 
 .btn-modal-confirm{
@@ -7121,9 +7132,9 @@ body.mobile-filters-open .scroll-top{
     opacity:0;
     visibility:hidden;
     pointer-events:none;
-    transition:opacity 250ms var(--ease-out),
-               transform 250ms var(--ease-out),
-               visibility 250ms var(--ease-out);
+    transition:opacity 250ms ease,
+               transform 250ms ease,
+               visibility 250ms ease;
 }
 
 .mobile-nav.open{
@@ -7201,8 +7212,8 @@ body.mobile-filters-open .scroll-top{
     box-shadow:var(--shadow-lg);
     transform:translateY(-16px);
     opacity:0;
-    transition:opacity 250ms var(--ease-out),
-               transform 250ms var(--ease-out);
+    transition:opacity 250ms ease,
+               transform 250ms ease;
 }
 
 .search-overlay.open .search-overlay-panel{
@@ -7558,7 +7569,7 @@ body.mobile-filters-open .scroll-top{
     width:100%;
     height:100%;
     object-fit:cover;
-    transition:transform 300ms var(--ease-out);
+    transition:transform 300ms ease;
 }
 
 @media (hover:hover) and (pointer:fine){
@@ -7796,8 +7807,8 @@ body.mobile-filters-open .scroll-top{
     background-repeat:no-repeat;
     background-position:right 16px center;
     cursor:pointer;
-    transition:border-color 200ms ease,
-               box-shadow 200ms ease;
+    transition:border-color 350ms cubic-bezier(.4,0,.2,1),
+               box-shadow 350ms cubic-bezier(.4,0,.2,1);
 }
 
 @media (hover:hover) and (pointer:fine){
@@ -7834,8 +7845,8 @@ body.mobile-filters-open .scroll-top{
     align-items:center;
     justify-content:center;
     color:var(--gray400, var(--gray300));
-    transition:background-color 200ms ease,
-               color 200ms ease;
+    transition:background-color 350ms cubic-bezier(.4,0,.2,1),
+               color 350ms cubic-bezier(.4,0,.2,1);
 }
 
 @media (hover:hover) and (pointer:fine){
@@ -9150,8 +9161,8 @@ body.mobile-filters-open .scroll-top{
     align-items:center;
     justify-content:center;
     flex-shrink:0;
-    transition:background-color 200ms var(--ease-out),
-               opacity 200ms var(--ease-out);
+    transition:background-color 200ms ease,
+               opacity 200ms ease;
 }
 
 @media (hover:hover) and (pointer:fine){
@@ -9913,11 +9924,11 @@ body.mobile-filters-open .scroll-top{
     justify-content:center;
     font-size:15px;
     color:var(--gray900);
-    transition:background-color 200ms var(--ease-out),
-               border-color 200ms var(--ease-out),
-               color 200ms var(--ease-out),
-               opacity 200ms var(--ease-out),
-               transform 200ms var(--ease-out);
+    transition:background-color 200ms ease,
+               border-color 200ms ease,
+               color 200ms ease,
+               opacity 200ms ease,
+               transform 200ms ease;
 }
 
 .collection-arrow:disabled{
@@ -9972,7 +9983,7 @@ body.mobile-filters-open .scroll-top{
     height:100%;
     object-fit:cover;
     display:block;
-    transition:transform 260ms var(--ease-out);
+    transition:transform 400ms ease;
 }
 
 @media (hover:hover) and (pointer:fine){
@@ -10153,9 +10164,9 @@ body.mobile-filters-open .scroll-top{
     align-items:center;
     justify-content:center;
     box-shadow:0 6px 16px rgba(0,0,0,.2);
-    transition:background-color 200ms var(--ease-out),
-               color 200ms var(--ease-out),
-               transform 200ms var(--ease-out);
+    transition:background-color 200ms ease,
+               color 200ms ease,
+               transform 200ms ease;
     z-index:1;
 }
 
@@ -10209,10 +10220,10 @@ body.mobile-filters-open .scroll-top{
     color:var(--gray700);
     font:600 14px/1 Inter, -apple-system, sans-serif;
     cursor:pointer;
-    transition:background-color 200ms var(--ease-out),
-               border-color 200ms var(--ease-out),
-               color 200ms var(--ease-out),
-               opacity 200ms var(--ease-out);
+    transition:background-color 200ms ease,
+               border-color 200ms ease,
+               color 200ms ease,
+               opacity 200ms ease;
 }
 
 .pagination-page:hover:not(.active),
@@ -10524,7 +10535,7 @@ body.mobile-filters-open .scroll-top{
 @media (hover:hover) and (pointer:fine){
 
 .collection-image.is-pager img{
-    transition:transform 260ms var(--ease-out);
+    transition:transform 500ms ease;
 }
 
 .collection-image.is-pager:hover img{
@@ -11793,7 +11804,7 @@ body.refusal-open{
     font-size:13.5px;
     font-weight:700;
     cursor:pointer;
-    transition:background-color 200ms ease;
+    transition:background-color 350ms cubic-bezier(.4,0,.2,1);
 }
 
 @media (hover:hover) and (pointer:fine){
