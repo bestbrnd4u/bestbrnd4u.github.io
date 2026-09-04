@@ -307,6 +307,43 @@
 
             }
 
+            // Посилання на КОЖЕН колір.
+            //
+            // Потрібні, коли ввімкнено «Кожен колір — окрема картка в
+            // каталозі»: у каталозі колір стоїть окремою карткою, у
+            // нього можуть бути власні назва й ціна, — і в пост про
+            // конкретний відтінок треба класти адресу саме цього
+            // відтінку, а не товару взагалі.
+            //
+            // Slug кольору робить ТОЙ САМИЙ перетворювач, що й сайт
+            // (assets/js/translit.js, підключений в admin/index.html).
+            // Своя копія транслітерації тут неминуче розійшлася б із
+            // сайтом, і посилання вели б у нікуди.
+            var variants = data.get("variants");
+            var splitByColor = data.get("splitByColor") !== false;
+            var colorRows = [];
+
+            if (splitByColor && variants && variants.size > 1 && window.Translit) {
+
+                variants.forEach(function (variant) {
+
+                    var color = variant && variant.get ? (variant.get("color") || "") : "";
+
+                    if (!color) return;
+
+                    var slugColor = window.Translit.toSlug(color) || color;
+
+                    colorRows.push(h(Row, {
+                        key: "color-" + color,
+                        label: "Колір: " + color,
+                        value: link + "?color=" + encodeURIComponent(slugColor),
+                        hint: "Відкриває товар одразу в цьому кольорі."
+                    }));
+
+                });
+
+            }
+
             var id = data.get("id");
             var deepLink = this.state.ready ? botLink(id) : "";
 
@@ -315,8 +352,12 @@
                 h(Row, {
                     label: "Посилання на товар",
                     value: link,
-                    hint: "Це посилання кладіть у пост."
+                    hint: colorRows.length
+                        ? "Товар узагалі — відкриється в першому кольорі. Нижче адреси окремих кольорів."
+                        : "Це посилання кладіть у пост."
                 }),
+
+                colorRows,
 
                 h(Row, {
                     label: "Замовити в Telegram",

@@ -23,6 +23,12 @@ window.eval(commonSrc.match(/function getAllProductSizes[\s\S]*?\n}\n/)[0]);
 window.eval(commonSrc.match(/function getProductColors[\s\S]*?\n}\n/)[0]);
 // сім'ї кольорів — фільтр «Колір» працює ними (див. хелпер)
 require(require("path").join(__dirname,"helpers/color-families")).installColorFamilies(window);
+// Перевизначення полів кольором: коли колір має власну назву, ціну
+// чи позначку, createProductCard кладе на свотч готовий вигляд —
+// і питає саме ці три функції.
+window.eval(commonSrc.match(/function colorOverrides[\s\S]*?\n}\n/)[0]);
+window.eval(commonSrc.match(/function applyColorOverrides[\s\S]*?\n}\n/)[0]);
+window.eval(commonSrc.match(/function baseProduct[\s\S]*?\n}\n/)[0]);
 // назва в картці тепер посилання — createProductCard кличе productUrl
 window.eval(commonSrc.match(/function productUrl[\s\S]*?\n}\n/)[0]);
 window.eval(fs.readFileSync(ROOT + "assets/js/ui.js", "utf8").replace(

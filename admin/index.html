@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"287afbe3","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"20bbd7bb","data/image-variants.json":"5d9b13ee","data/products.json":"0834638c","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"287afbe3","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"20bbd7bb","data/image-variants.json":"5d9b13ee","data/products.json":"57f0d993","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BestBrnd4u — Адмінка</title>
@@ -254,8 +254,14 @@
          з живим прев'ю картки каталогу просто в полі. -->
     <script src="image-framing-widget.js?v=da247a52"></script>
 
+    <!-- Той самий перетворювач кирилиці в латиницю, що на сайті.
+         Потрібен віджету посилань нижче: він показує адресу кожного
+         кольору (?color=bezhevyi), і slug мусить збігатися з тим, що
+         робить сайт. Своя копія транслітерації розійшлася б. -->
+    <script src="../assets/js/translit.js?v=c0957cb7"></script>
+
     <!-- Посилання на товар для постів у Telegram -->
-    <script src="order-link-widget.js?v=20987a56"></script>
+    <script src="order-link-widget.js?v=28724d26"></script>
 
     <!-- Смуга-індикатор середовища. Адмінок дві, виглядають однаково,
          і переплутати бойову з тестовою — питання однієї вкладки.

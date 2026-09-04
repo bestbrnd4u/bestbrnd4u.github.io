@@ -33,10 +33,17 @@ const info = JSON.parse(out);
 // colorFamily — «Колір для фільтра»: під якою позначкою шукати цей
 // відтінок у каталозі, коли автоматика вгадує не те (Chalk, Ivory,
 // Off-white — усе це один «Білий»).
-check("варіант кольору має рівно 7 полів (не 20+ від зіпсованого options)",
-      info.variant_fields.length === 7, JSON.stringify(info.variant_fields));
-check("порядок полів: color, hex, colorFamily, sku, sizes, images, video",
-      info.variant_fields.join(",") === "color,hex,colorFamily,sku,sizes,images,video",
+//
+// title…instagramReels — перевизначення для конкретного кольору. Діють,
+// коли ввімкнено «Кожен колір — окрема картка в каталозі»: тоді колір
+// стоїть у каталозі власною карткою, і в неї може бути своя назва,
+// ціна, стара ціна, позначка, опис і Reels. Порожнє поле означає
+// «взяти значення товару».
+check("варіант кольору має рівно 13 полів (не 20+ від зіпсованого options)",
+      info.variant_fields.length === 13, JSON.stringify(info.variant_fields));
+check("порядок полів: спершу опис кольору, потім перевизначення",
+      info.variant_fields.join(",") === "color,hex,colorFamily,sku,sizes,images,video,"
+          + "title,description,price,oldPrice,badge,instagramReels",
       info.variant_fields.join(","));
 // Регресія навпаки: раніше тут стежили за закритим переліком із 20
 // розмірів. Тепер поле — власний віджет, який дозволяє і вибрати

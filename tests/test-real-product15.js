@@ -18,7 +18,10 @@ const check=(n,c,e)=>{if(c)console.log("  ✓",n);else{console.log("  ✗",n,e!=
 const dom=new JSDOM("<!doctype html><body><div id='r'></div></body>",{runScripts:"outside-only"});
 const {window}=dom;
 const common=fs.readFileSync(path.join(ROOT,"assets/js/common.js"),"utf8");
-["escapeHtml","escapeAttrSingleQuoted","getProductColors","getVariantSizes","getAllProductSizes","getProductGenders","getProductGenderLabel","productUrl"]
+["escapeHtml","escapeAttrSingleQuoted","getProductColors","getVariantSizes","getAllProductSizes","getProductGenders","getProductGenderLabel","productUrl",
+     // Перевизначення полів кольором: без них createProductCard падає з
+     // ReferenceError, бо свотчі несуть готовий вигляд кожного кольору.
+     "colorOverrides","applyColorOverrides","baseProduct"]
   .forEach(fn=>window.eval(common.match(new RegExp("function "+fn+"[\\s\\S]*?\\n}\\n"))[0]));
 window.eval(fs.readFileSync(path.join(ROOT,"assets/js/ui.js"),"utf8").replace(
   "function createProductCard(product) {",
