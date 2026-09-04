@@ -273,5 +273,64 @@ console.log("\n[5c] srcset розуміє адресу з версією");
     check("не-webp і далі без srcset", fn("a/photo.jpg") === null);
 }
 
+console.log("\n[6] Проставлені штампи доїжджають до гілки");
+{
+    // ЩО ЦЕ ЗАКРИВАЄ
+    // ---------------
+    // Штамп можна проставити правильно — і не закомітити. Саме так і
+    // було: у крокові «Commit result» воркфлоу перелічував сторінки
+    // руками й називав із кореневих лише index.html. Решта (catalog,
+    // cart, checkout, account, product…) і admin/index.html не
+    // комітились НІКОЛИ.
+    //
+    // Наслідок тихий: дані в гілці свіжі, а сторінки посилаються на
+    // старий відбиток — у відвідувача з кешованим products.json ціни
+    // в каталозі лишались старі, бо адреса файлу не змінилась. Замір
+    // на гілці dev: 14 сторінок відставали, а штамп products.json —
+    // на два покоління.
+    //
+    // Перевіряємо МАСКУ, а не перелік: перелік тут уже одного разу
+    // застарів, і саме це й було помилкою.
+    ["build-dev.yml", "build-products.yml"].forEach(name => {
+
+        const yml = read(".github/workflows/" + name);
+
+        check(name + ": сторінки додаються маскою",
+            /git add -A "\*\.html"/.test(yml),
+            (yml.match(/git add[^\n]*/g) || []).join(" · "));
+
+        // Без лапок маску розкриє оболонка — і в git поїде знову
+        // перелік файлів кореня, без admin/ і p/.
+        check(name + ": маска в лапках", !/git add -A \*\.html/.test(yml));
+
+        // Решта виходу збірки — теками цілком, теж не переліком.
+        ["data", "assets/images"].forEach(dir => {
+            check(name + ": «" + dir + "» додається цілком",
+                new RegExp("git add -A [^\\n]*" + dir.replace("/", "\\/")).test(yml));
+        });
+
+        check(name + ": sitemap.xml комітиться", /sitemap\.xml/.test(yml));
+        check(name + ": admin/config.yml комітиться", /admin\/config\.yml/.test(yml));
+
+    });
+
+    // І головне: маска мусить покривати ВСЕ, що штампує
+    // apply-cache-version.js. Беремо його власне правило вибору
+    // сторінок, а не свій список.
+    const stamper = read("scripts/apply-cache-version.js");
+
+    check("штампувач дивиться в корінь, admin/index.html і p/**",
+        /readdirSync\(ROOT\)\.filter\(f => f\.endsWith\("\.html"\)\)/.test(stamper)
+        && /"admin", "index\.html"/.test(stamper)
+        && /path\.join\(pages, slug, "index\.html"\)/.test(stamper));
+
+    // Переписує він РІВНО те, що дає htmlFiles() — тобто лише
+    // сторінки. Якби він почав правити щось інше, маски "*.html" уже
+    // не хватило б, і цей рядок довелось би оновити разом із нею.
+    check("штампувач переписує лише сторінки з htmlFiles()",
+        /htmlFiles\(\)\.forEach\(file =>/.test(stamper)
+        && (stamper.match(/writeFileSync/g) || []).length === 1);
+}
+
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
 process.exit(failures === 0 ? 0 : 1);

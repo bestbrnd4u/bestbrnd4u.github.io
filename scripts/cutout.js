@@ -82,13 +82,15 @@ async function getSession() {
 
 /**
  * Маска товару: 0 — фон, 255 — товар. Розмір як в оригіналу.
+ *
+ * photo — байти фото або шлях до нього; sharp приймає і те, і те.
  */
-async function productMask(file, width, height) {
+async function productMask(photo, width, height) {
 
     const s = await getSession();
     const ort = s.__ort;
 
-    const small = await sharp(file)
+    const small = await sharp(photo)
         .resize(SIZE, SIZE, { fit: "fill" })
         .removeAlpha()
         .raw()
@@ -148,14 +150,24 @@ async function productMask(file, width, height) {
  */
 async function cutoutToWhite(file) {
 
-    const meta = await sharp(file).metadata();
+    // Байти читаємо САМІ, а не передаємо шлях у sharp.
+    //
+    // sharp (libvips) мапить файл у памʼять і тримає дескриптор,
+    // поки живий кеш операцій. У Linux це нікому не муляє, а у
+    // Windows не дає перейменувати результат ПОВЕРХ джерела — rename
+    // падає з EPERM, і вирізання не працювало на машині розробника
+    // взагалі. Помітили це лише тоді, коли з'ясувалось, що в CI воно
+    // працює — і з кожною збіркою обгризає фото далі.
+    const input = Buffer.isBuffer(file) ? file : fs.readFileSync(file);
+
+    const meta = await sharp(input).metadata();
 
     const width = meta.width;
     const height = meta.height;
 
-    const mask = await productMask(file, width, height);
+    const mask = await productMask(input, width, height);
 
-    const rgb = await sharp(file).removeAlpha().raw().toBuffer();
+    const rgb = await sharp(input).removeAlpha().raw().toBuffer();
 
     const out = Buffer.alloc(width * height * 3);
 

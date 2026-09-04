@@ -168,6 +168,138 @@ console.log("\n[2b] Керування з адмінки");
         uniformCheck > 0 && uniformCheck < whiteCheck);
 }
 
+console.log("\n[2c] Обробка робиться РАЗ, а не на кожній збірці");
+{
+    // ЩО ЦЕ ЗАКРИВАЄ
+    // ---------------
+    // Рішення з адмінки («зробити білим», «вирізати товар») — це вибір
+    // на ОДИН раз. А працювали вони як постійні: кожна збірка бралась
+    // обробляти те саме фото знову.
+    //
+    // Заміри на цьому репозиторії:
+    //
+    //   • 6 фото перезаписувались у КОЖНІЙ збірці — 73 коміти підряд;
+    //
+    //   • заливка крутилась по колу: вона робить тло рівно білим, запис
+    //     у webp (quality 88) повертає в цю площину шум ±TOLERANCE,
+    //     наступна збірка зафарбовує його знову. ~20 000 пікселів за
+    //     прогін, і кількість не спадала;
+    //
+    //   • вирізання щоразу різало ВЖЕ ВИРІЗАНЕ: за 20 збірок 12% кадру
+    //     змінилось у середньому на 50 рівнів — від фото моделі лишився
+    //     обгризений силует без обличчя, рук і ніг.
+    //
+    // Плюс постійний шум у гілці: перезаписане фото — це новий ?v= у
+    // data/products.json, а за ним штампи кеша в усіх сторінках.
+
+    // Ознака «робота вже зроблена»: периметр РІВНО білий. І заливка, і
+    // вирізання лишають по краях чисті 255, тож інших ознак не треба.
+    check("є перевірка «тло вже рівно біле»",
+        /const pureWhite = coverage >= 0\.9/.test(script)
+        && /c\[0\] === 255 && c\[1\] === 255 && c\[2\] === 255/.test(script));
+
+    // Порожній перелік кольорів — це НЕ «біле»: [].every() дає true, і
+    // без перевірки довжини скрипт пропускав би все підряд.
+    check("порожній перелік кольорів не вважається білим",
+        /colors\.length > 0/.test(script));
+
+    const pureAt = script.indexOf("const pureWhite");
+    const cutAt = script.indexOf('decided === "cutout"');
+    const forcedAt = script.indexOf('allWhite && decided !== "white"');
+
+    check("перевірка стоїть ДО вирізання", pureAt > 0 && pureAt < cutAt, pureAt + " / " + cutAt);
+    check("і до примусової заливки", pureAt < forcedAt, pureAt + " / " + forcedAt);
+
+    // Запис ПОВЕРХ джерела: у Linux проходить, у Windows ні — libvips
+    // не може відкрити на запис файл, який ще тримає читач. Через це
+    // вирізання не працювало локально взагалі, а в CI відпрацьовувало
+    // й з кожною збіркою обгризало фото далі. Таке помітити складно:
+    // на машині розробника «нічого не відбувається».
+    check("вирізане пишеться через тимчасовий файл",
+        /webp\(\{ quality: 88 \}\)\.toFile\(full \+ "\.tmp"\)/.test(script));
+    check("і перейменовується на місце",
+        (script.match(/renameSync\(full \+ "\.tmp", full\)/g) || []).length === 2);
+    // Дивимось на КОД без коментарів: у поясненні вище згадано
+    // «.toFile(full)» як те, що тут стояло раніше, — і перевірка
+    // спіймала б власний текст.
+    const code = script.replace(/^\s*\/\/.*$/gm, "");
+
+    check("поверх джерела не пишемо", !/\.toFile\(full\)/.test(code));
+
+    // Те саме з іншого боку: sharp тримає відкритий дескриптор, поки
+    // живий кеш операцій, і перейменування падає з EPERM.
+    const cutSrc = read("scripts/cutout.js");
+
+    check("вирізальник читає байти сам, а не дає шлях у sharp",
+        /Buffer\.isBuffer\(file\) \? file : fs\.readFileSync\(file\)/.test(cutSrc));
+    check("далі працює з буфером",
+        /sharp\(input\)/.test(cutSrc) && !/sharp\(file\)/.test(cutSrc));
+}
+
+// Перевірка на СПРАВЖНІХ файлах: у кожного фото з рішенням адмінки
+// периметр мусить бути рівно білим — тоді наступна збірка його
+// пропустить.
+//
+// Перелік беремо з каталогу, а не вписуємо руками: рішень стане
+// більше, і жорсткий список тут швидко застаріє.
+function decidedPhotosStayPut() {
+
+    const sharp = require("sharp");
+
+    const dir = path.join(ROOT, "data/products");
+    const uploads = path.join(ROOT, "assets/images/products/uploads");
+
+    const decided = [];
+
+    fs.readdirSync(dir).filter(f => f.endsWith(".json")).forEach(file => {
+
+        let data;
+
+        try { data = JSON.parse(fs.readFileSync(path.join(dir, file), "utf8")); }
+        catch (error) { return; }
+
+        Object.entries(data.framing || {}).forEach(([name, frame]) => {
+            const bg = frame && frame.bg;
+            if (bg === "white" || bg === "cutout") decided.push({ name: name, bg: bg });
+        });
+
+    });
+
+    console.log("\n[2d] Фото з рішенням адмінки більше не переробляються");
+
+    check("рішення в каталозі є (інакше перевіряти нічого)", decided.length > 0, decided.length);
+
+    const border = async ({ name, bg }) => {
+
+        const full = path.join(uploads, name);
+
+        if (!fs.existsSync(full)) { check(name + " — файл на місці", false); return; }
+
+        const { data, info } = await sharp(full).ensureAlpha().raw()
+            .toBuffer({ resolveWithObject: true });
+
+        const w = info.width;
+        const h = info.height;
+
+        let dirty = 0;
+
+        const look = (x, y) => {
+            const i = (y * w + x) * 4;
+            if (data[i] !== 255 || data[i + 1] !== 255 || data[i + 2] !== 255) dirty++;
+        };
+
+        for (let x = 0; x < w; x++) { look(x, 0); look(x, h - 1); }
+        for (let y = 0; y < h; y++) { look(0, y); look(w - 1, y); }
+
+        check(name + " (" + bg + "): периметр рівно білий — збірка пропустить",
+            dirty === 0, "небілих пікселів по рамці: " + dirty);
+
+    };
+
+    return decided.reduce((chain, item) => chain.then(() => border(item)), Promise.resolve());
+
+}
+
 console.log("\n[3] Результат на справжніх фото");
 {
     const sharp = require("sharp");
@@ -204,7 +336,8 @@ console.log("\n[3] Результат на справжніх фото");
 
     };
 
-    return Promise.all(files.map(f => cornerColour(f).then(r => ({ f, ...r }))))
+    return decidedPhotosStayPut()
+        .then(() => Promise.all(files.map(f => cornerColour(f).then(r => ({ f, ...r })))))
         .then(results => {
 
             check(`перевірено фото — ${results.length}`, results.length > 0);

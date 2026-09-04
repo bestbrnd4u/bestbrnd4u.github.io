@@ -125,8 +125,12 @@ async function main() {
 
         // Оригінал зберігається так само, як і при заливці: результат
         // необоротний для файлу.
-        const branch = script.slice(script.indexOf('decided === "cutout"'),
-            script.indexOf('decided === "cutout"') + 1600);
+        // Межі гілки — за структурою коду, а не «плюс 1600 символів».
+        // Фіксована довжина ламається від будь-якого дописаного
+        // коментаря: так і сталося, коли в гілці зʼявилось пояснення
+        // про запис через тимчасовий файл.
+        const branchStart = script.indexOf('decided === "cutout"');
+        const branch = script.slice(branchStart, script.indexOf("Запобіжник 2", branchStart));
 
         check("оригінал кладеться в _originals", /copyFileSync\(full, backup\)/.test(branch));
 
