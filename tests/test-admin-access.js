@@ -128,10 +128,27 @@ console.log("\n[5] Меню в шапці адмінки");
 
   d.getElementById("adminMenuToggle").dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
   check("відкривається кліком", menu.hidden === false);
-  check("три пункти", menu.children.length === 3, menu.children.length);
+  // Перевіряємо СКЛАД меню, а не кількість пунктів: список поповнюється
+  // (так до нього додалась панель замовлень), і число тут означало б
+  // лише «нічого не додавали».
+  const items = [...menu.children].map(item => item.textContent);
+
+  [
+    ["Замовлення", "orders.html"],
+    ["Масовий імпорт", "import.html"],
+    ["Доступи для колег", "access.html"],
+  ].forEach(([label, href]) => {
+    check(`у меню є «${label}»`,
+          items.some(text => text.includes(label))
+          && [...menu.children].some(item => item.getAttribute("href") === href),
+          items.join(" | "));
+  });
+
+  const last = menu.children[menu.children.length - 1];
+
   check("вихід останній і виділений кольором",
-        menu.children[2].textContent.includes("Вийти") &&
-        menu.children[2].style.color === "rgb(220, 38, 38)");
+        last.textContent.includes("Вийти") && last.style.color === "rgb(220, 38, 38)",
+        `${last.textContent} / ${last.style.color}`);
 
   d.body.dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
   check("клік поза меню закриває", menu.hidden === true);

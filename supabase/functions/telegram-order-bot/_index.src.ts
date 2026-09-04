@@ -30,6 +30,11 @@ import {
   orderListLine, orderListKeyboard,
 } from "./format.js";
 import {
+  ADMIN_TOKEN_HEADER, corsHeaders, isAllowedOrigin, parseAdminRequest,
+  adminTransitions, buildListQuery, buildCountQuery, buildRefusalsQuery,
+  parseTotal, orderView, refusalView, listResponse, STATUS_ORDER,
+} from "./admin-api.js";
+import {
   DELIVERY_OPTIONS, deliveryById, colorsOf, sizesOf, autoFill, nextStep,
   colorKeyboard, sizeKeyboard, qtyKeyboard, deliveryKeyboard, phoneKeyboard,
   confirmKeyboard, stepPrompt, summaryText, computeTotals,
@@ -53,6 +58,11 @@ const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 // Адреса сайту — з неї бот бере каталог і будує посилання на товар.
 // Можна перевизначити секретом SITE_URL, якщо домен зміниться.
 const SITE_URL = (Deno.env.get("SITE_URL") ?? "https://bestbrnd4u.github.io").replace(/\/$/, "");
+
+// Репозиторій сайту — за правами на нього визначається, кому можна
+// керувати замовленнями з панелі адмінки (див. verifyAdmin).
+// Перевизначається секретом ADMIN_REPO, якщо репозиторій переїде.
+const ADMIN_REPO = Deno.env.get("ADMIN_REPO") ?? "bestbrnd4u/bestbrnd4u.github.io";
 
 const TELEGRAM_API = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}`;
 
@@ -394,13 +404,17 @@ async function handleNewOrder(record: Record<string, any>) {
 
   const text = formatOrder(record);
 
-  await telegram("sendMessage", {
+  const sent = await telegram("sendMessage", {
     chat_id: TELEGRAM_CHAT_ID,
     text,
     parse_mode: "HTML",
     disable_web_page_preview: true,
     reply_markup: buildKeyboard(record.id, record.status ?? "new", { hasTracking: Boolean(record.tracking_number) }),
   });
+
+  // Щоб панель адмінки могла перемалювати саме цю картку, коли
+  // статус зміниться там (див. refreshOwnerCard).
+  await rememberCardMessage(record.id, sent?.result?.message_id);
 
 }
 
@@ -447,7 +461,7 @@ async function handleCallback(callback: Record<string, any>) {
 
     }
 
-    await telegram("sendMessage", {
+    const sent = await telegram("sendMessage", {
       chat_id: callback.message.chat.id,
       text: formatOrder(order),
       parse_mode: "HTML",
@@ -456,6 +470,10 @@ async function handleCallback(callback: Record<string, any>) {
         hasTracking: Boolean(order.tracking_number),
       }),
     });
+
+    // Відкрита зі списку картка стає поточною: саме її власник бачить
+    // перед собою, і саме її має перемальовувати панель адмінки.
+    await rememberCardMessage(order.id, sent?.result?.message_id);
 
     return;
 
@@ -569,6 +587,11 @@ async function handleCallback(callback: Record<string, any>) {
     disable_web_page_preview: true,
     reply_markup: buildKeyboard(updated.id, status, { hasTracking: Boolean(updated.tracking_number) }),
   });
+
+  // Власник щойно натиснув кнопку саме під цією карткою — отже, це
+  // вона в нього перед очима. Панель адмінки має міняти статус у ній,
+  // а не в старшому дублі з історії чату.
+  await rememberCardMessage(updated.id, callback.message.message_id);
 
   await telegram("answerCallbackQuery", {
     callback_query_id: callback.id,
@@ -775,7 +798,7 @@ async function findOrderByNumber(orderNumber: string) {
 
 // Зберігає накладну і повідомляє клієнта. Повертає оновлене
 // замовлення або null.
-async function applyTracking(orderId: string, tracking: string) {
+async function applyTracking(orderId: string, tracking: string | null) {
 
   const response = await supabaseRest(`orders?id=eq.${encodeURIComponent(orderId)}`, {
     method: "PATCH",
@@ -786,9 +809,76 @@ async function applyTracking(orderId: string, tracking: string) {
   const rows = response.ok ? await response.json() : [];
   const order = Array.isArray(rows) ? rows[0] ?? null : null;
 
-  if (order) await notifyCustomer(order, "shipped");
+  // Повідомляємо ЛИШЕ про відправлене замовлення.
+  //
+  // У боті інакше й не буває: номер просять одразу після
+  // «Відправлено». Але той самий шлях тепер має панель адмінки, де
+  // накладну можна вписати завчасно — і клієнту прилетіло б
+  // «Замовлення відправлено!» про посилку, яка ще на столі.
+  if (order && tracking && normalizeStatus(order.status) === "shipped") {
+
+    await notifyCustomer(order, "shipped");
+
+  }
 
   return order;
+
+}
+
+// -------------------------
+// Картка замовлення в Telegram
+//
+// Замовленнями керують із двох місць: кнопками в чаті й панеллю
+// адмінки. Якщо панель змінить статус, картка в чаті так і показувала
+// б старий — і, що гірше, її кнопки лишились би від старого статусу:
+// натиснувши «В обробці» під уже відправленим замовленням, власник
+// молча відкотив би зміну назад.
+//
+// Тому id повідомлення з карткою зберігається в замовленні
+// (orders.bot_message_id), і панель перемальовує ту саму картку — так
+// само, як це робить натискання кнопки.
+// -------------------------
+
+async function rememberCardMessage(orderId: unknown, messageId: unknown) {
+
+  if (!orderId || !messageId) return;
+
+  try {
+
+    const response = await supabaseRest(`orders?id=eq.${encodeURIComponent(String(orderId))}`, {
+      method: "PATCH",
+      body: JSON.stringify({ bot_message_id: messageId }),
+    });
+
+    // Найімовірніша причина — не виконана міграція 009 (немає
+    // колонки). Бот від цього не ламається: просто картку не вийде
+    // перемалювати з панелі.
+    if (!response.ok) {
+      console.error("Не вдалося запам'ятати картку замовлення:", await response.text());
+    }
+
+  } catch (error) {
+
+    console.error("Не вдалося запам'ятати картку замовлення:", error);
+
+  }
+
+}
+
+async function refreshOwnerCard(order: Record<string, any> | null) {
+
+  if (!order || !order.bot_message_id || !TELEGRAM_CHAT_ID) return;
+
+  await telegram("editMessageText", {
+    chat_id: TELEGRAM_CHAT_ID,
+    message_id: order.bot_message_id,
+    text: formatOrder(order),
+    parse_mode: "HTML",
+    disable_web_page_preview: true,
+    reply_markup: buildKeyboard(order.id, order.status ?? "new", {
+      hasTracking: Boolean(order.tracking_number),
+    }),
+  });
 
 }
 
@@ -1255,6 +1345,264 @@ async function handleOrderCallback(callback: Record<string, any>, data: string) 
 
 }
 
+// ======================================
+// Панель «Замовлення» в адмінці
+//
+// ХТО МАЄ ПРАВО
+// --------------
+// Замовлення — це телефони, адреси й суми, тож питання «хто це
+// питає» тут головне. Своїх паролів панель не заводить: вона
+// надсилає токен GitHub, під яким людина вже зайшла в адмінку, а
+// функція питає в GitHub, чи має цей токен право ЗАПИСУ в
+// репозиторій сайту.
+//
+// Чому саме так:
+//
+//   • право писати в репозиторій = право змінити будь-яку сторінку
+//     сайту. Хто його має — уже має все; окремий пароль до
+//     замовлень нічого не додав би, зате був би ще одним секретом,
+//     який можна забути й загубити;
+//
+//   • нікого не треба заводити окремо. Дали колезі доступ до
+//     репозиторію (admin/access.html) — він одразу бачить і
+//     замовлення. Забрали — доступ зникає сам;
+//
+//   • у браузері не лежить нічого нового. Токен там уже є — його
+//     зберігає сама Decap CMS, інакше вона не змогла б комітити.
+//
+// Права перевіряються в GitHub, а не тут: підробити відповідь
+// api.github.com неможливо, а «список дозволених логінів» у коді
+// функції розійшовся б із реальними доступами до репозиторію.
+// ======================================
+
+// Відповідь GitHub кешуємо на кілька хвилин: інакше кожен клік у
+// панелі — це зайвий похід в api.github.com.
+//
+// Ключ — не сам токен, а його відпечаток: тримати в довгоживучій
+// структурі значення, яким можна писати в репозиторій, не варто.
+const ADMIN_TOKEN_TTL_MS = 5 * 60 * 1000;
+const adminTokens = new Map<string, number>();
+
+async function fingerprint(token: string): Promise<string> {
+
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(token));
+
+  return Array.from(new Uint8Array(digest))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+
+}
+
+async function verifyAdmin(token: string): Promise<boolean> {
+
+  if (!token) return false;
+
+  const key = await fingerprint(token);
+  const until = adminTokens.get(key);
+
+  if (until && until > Date.now()) return true;
+
+  // Прибираємо протерміноване, щоб карта не росла без межі —
+  // ізолят функції живе довго.
+  if (adminTokens.size > 50) {
+
+    for (const [entry, expires] of adminTokens) {
+      if (expires <= Date.now()) adminTokens.delete(entry);
+    }
+
+  }
+
+  const response = await fetch(`https://api.github.com/repos/${ADMIN_REPO}`, {
+    headers: {
+      Authorization: `token ${token}`,
+      Accept: "application/vnd.github+json",
+      "User-Agent": "bestbrnd4u-admin-orders",
+    },
+  });
+
+  if (!response.ok) {
+
+    console.error("GitHub не підтвердив доступ:", response.status);
+
+    return false;
+
+  }
+
+  const repo = await response.json();
+
+  // push — це саме право записувати. Одного лише доступу на читання
+  // (публічний репозиторій видно всім) недостатньо: інакше будь-хто
+  // з токеном GitHub читав би замовлення.
+  const allowed = Boolean(repo?.permissions?.push);
+
+  if (allowed) adminTokens.set(key, Date.now() + ADMIN_TOKEN_TTL_MS);
+
+  return allowed;
+
+}
+
+function adminJson(payload: unknown, status: number, origin: string | null) {
+
+  return new Response(JSON.stringify(payload), {
+    status,
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      ...corsHeaders(origin),
+    },
+  });
+
+}
+
+// Скільки замовлень у кожній вкладці. Рядки не потрібні — лише
+// число з Content-Range, тож просимо один рядок і читаємо заголовок.
+async function countOrders(params: Record<string, unknown>): Promise<number | null> {
+
+  const response = await supabaseRest(buildCountQuery(params), {
+    headers: { Prefer: "count=exact" },
+  });
+
+  if (!response.ok) return null;
+
+  // тіло треба прочитати, інакше зʼєднання лишиться відкритим
+  await response.text();
+
+  return parseTotal(response.headers.get("content-range"));
+
+}
+
+async function adminCounts(): Promise<Record<string, number | null>> {
+
+  const keys = [...STATUS_ORDER, "refusal"];
+
+  const values = await Promise.all([
+    ...STATUS_ORDER.map((status: string) => countOrders({ status })),
+    countOrders({ refusal: true }),
+  ]);
+
+  const counts: Record<string, number | null> = {};
+
+  keys.forEach((key: string, index: number) => { counts[key] = values[index]; });
+
+  return counts;
+
+}
+
+async function handleAdmin(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  // Перевірка доступу — ПЕРЕД усім іншим. Жоден запит без
+  // підтверджених прав не доходить до бази.
+  const token = request.headers.get(ADMIN_TOKEN_HEADER) ?? "";
+
+  if (!await verifyAdmin(token)) {
+
+    return adminJson({
+      ok: false,
+      error: "Немає доступу до замовлень. Потрібне право запису в репозиторій сайту.",
+    }, 403, origin);
+
+  }
+
+  const parsed = parseAdminRequest(body);
+
+  if (!parsed.ok) return adminJson({ ok: false, error: parsed.error }, 400, origin);
+
+  const { action, params } = parsed;
+
+  if (action === "list") {
+
+    const response = await supabaseRest(buildListQuery(params), {
+      headers: { Prefer: "count=exact" },
+    });
+
+    if (!response.ok) {
+
+      console.error("Не вдалося отримати замовлення:", await response.text());
+
+      return adminJson({ ok: false, error: "База не віддала замовлення." }, 502, origin);
+
+    }
+
+    const rows = await response.json();
+
+    return adminJson(listResponse({
+      orders: Array.isArray(rows) ? rows : [],
+      total: parseTotal(response.headers.get("content-range")),
+      counts: await adminCounts(),
+    }), 200, origin);
+
+  }
+
+  if (action === "get") {
+
+    const order = await findOrderById(params.id);
+
+    if (!order) return adminJson({ ok: false, error: "Замовлення не знайдено." }, 404, origin);
+
+    const refusals = await supabaseRest(buildRefusalsQuery(params.id));
+
+    const rows = refusals.ok ? await refusals.json() : [];
+
+    return adminJson({
+      ok: true,
+      order: orderView(order),
+      refusals: (Array.isArray(rows) ? rows : []).map(refusalView),
+    }, 200, origin);
+
+  }
+
+  if (action === "status") {
+
+    const current = await findOrderById(params.id);
+
+    if (!current) return adminJson({ ok: false, error: "Замовлення не знайдено." }, 404, origin);
+
+    // Звіряємось із базою, а не з тим, що показує сторінка. Статус
+    // могли змінити кнопкою в Telegram хвилину тому — тоді відкритий
+    // список уже застарілий, і його кнопка означала б перехід, якого
+    // з поточного статусу робити не можна.
+    if (!adminTransitions(current.status).includes(params.status)) {
+
+      return adminJson({
+        ok: false,
+        error: `Замовлення вже «${(STATUSES[normalizeStatus(current.status)] ?? STATUSES.new).label}» — цей перехід недоступний.`,
+        order: orderView(current),
+      }, 409, origin);
+
+    }
+
+    const updated = await updateOrderStatus(params.id, params.status);
+
+    if (!updated) {
+      return adminJson({ ok: false, error: "Не вдалося оновити статус." }, 502, origin);
+    }
+
+    // Далі — рівно те саме, що робить кнопка в Telegram: сповіщення
+    // клієнту й перемальовка картки власника. Керування з панелі не
+    // має відрізнятись від керування з чату нічим, крім місця
+    // натискання.
+    await notifyCustomer(updated, params.status);
+
+    await refreshOwnerCard(updated);
+
+    return adminJson({ ok: true, order: orderView(updated) }, 200, origin);
+
+  }
+
+  // tracking
+  const updated = await applyTracking(params.id, params.tracking);
+
+  if (!updated) {
+    return adminJson({ ok: false, error: "Не вдалося зберегти накладну." }, 502, origin);
+  }
+
+  await refreshOwnerCard(updated);
+
+  return adminJson({ ok: true, order: orderView(updated) }, 200, origin);
+
+}
+
 // -------------------------
 // Точка входу
 // -------------------------
@@ -1275,15 +1623,26 @@ Deno.serve(async (request) => {
 
 async function handleRequest(request: Request): Promise<Response> {
 
+  const origin = request.headers.get("origin");
+
+  // Запит-дозвіл від браузера (CORS preflight). Панель адмінки живе
+  // на домені сайту, функція — на supabase.co, тож браузер спершу
+  // питає, чи можна взагалі звертатись. Без цієї відповіді панель не
+  // отримає ані байта — і, що підступніше, у логах функції не буде
+  // жодного сліду: preflight до коду просто не дійшов би.
+  if (request.method === "OPTIONS") {
+
+    return new Response(null, {
+      status: isAllowedOrigin(origin) ? 204 : 403,
+      headers: corsHeaders(origin),
+    });
+
+  }
+
   // GET — проста перевірка «чи жива функція»: відкрийте URL функції
   // в браузері, має показати ok. Якщо висить — функція не стартує.
   if (request.method !== "POST") {
     return new Response("ok", { status: 200 });
-  }
-
-  if (!TELEGRAM_BOT_TOKEN) {
-    console.error("TELEGRAM_BOT_TOKEN не заданий");
-    return new Response("misconfigured", { status: 500 });
   }
 
   let body: Record<string, any>;
@@ -1292,6 +1651,30 @@ async function handleRequest(request: Request): Promise<Response> {
     body = await request.json();
   } catch {
     return new Response("bad request", { status: 400 });
+  }
+
+  // --- запит від панелі «Замовлення» в адмінці ---
+  //
+  // Розпізнаємо за власним полем admin_action. Ні Telegram, ні
+  // Database Webhook такого не надсилають, тож переплутати не можна.
+  //
+  // Стоїть ПЕРШИМ: далі йдуть перевірки секретів, які до панелі не
+  // стосуються — вона підтверджує права своїм способом (verifyAdmin).
+  if (typeof body.admin_action !== "undefined") {
+
+    return await handleAdmin(request, body);
+
+  }
+
+  // Перевірка нижче — саме для Telegram. Панель до неї не доходить
+  // навмисно: без токена бота вона все одно вміє показувати
+  // замовлення й міняти статуси, просто не надішле сповіщень. А ще
+  // ця відповідь пішла б без заголовків CORS — і замість зрозумілого
+  // «не заданий токен» браузер показав би панелі невиразну помилку
+  // мережі.
+  if (!TELEGRAM_BOT_TOKEN) {
+    console.error("TELEGRAM_BOT_TOKEN не заданий");
+    return new Response("misconfigured", { status: 500 });
   }
 
   // --- запит від Telegram ---

@@ -51,7 +51,9 @@ const parts = [
         'return order.status === "completed" ? "returned" : "cancelled";\n\n}'),
     slice("async function attachRefusals(orders) {",
         "list.forEach(order => { order.__refusals = byOrder.get(String(order.id)) || []; });\n\n}"),
-    slice("const REFUSAL_DAYS = 14;", "daysPassed: days\n    };\n\n}")
+    slice("const REFUSAL_DAYS = 14;", "daysPassed: days\n    };\n\n}"),
+    slice("// Чому відмовитись не можна — словами для покупця.",
+        "</button>${hint}`;\n\n}")
 ].join("\n\n");
 
 // Підроблене сховище: у Node його немає, а слід заявок живе саме там.
@@ -276,7 +278,119 @@ async function main() {
             periodAt > 0 && periodAt < askAt, `period=${periodAt}, ask=${askAt}`);
     }
 
-    console.log("\n[7] Повна відмова міняє статус");
+    console.log("\n[7] Скасоване замовлення відмови не приймає");
+    {
+        // ЩО БУЛО НЕ ТАК
+        //
+        // Під товарами СКАСОВАНОГО замовлення кнопка «Відмова»
+        // лишалась активною. Причина — у тому, як рахується строк:
+        // скасоване замовлення не доставляють, тож перевірка
+        // «доставлено» вважала, що 14 днів ще не почались, і кнопка
+        // висіла там назавжди.
+        //
+        // Для магазину це заявка, з якою нічого не зробиш: подзвонити,
+        // з'ясувати, що замовлення скасували ще тиждень тому, і
+        // закрити її ні з чим. Для покупця — обіцянка дії, якої немає.
+        const { api } = load({ data: [], error: null });
+
+        const скасоване = order();
+
+        скасоване.status = "cancelled";
+
+        const period = api.refusalWindow(скасоване);
+
+        check("відмова не дозволена", period.allowed === false);
+        check("причина названа", period.reason === "cancelled", period.reason);
+
+        // Саме та комбінація зі скріншота: скасоване й недоставлене.
+        скасоване.created_at = new Date(Date.now() - 40 * 86400000).toISOString();
+
+        check("давність не робить відмову можливою",
+            api.refusalWindow(скасоване).allowed === false);
+
+        const markup = api.refusalMarkup(скасоване, 1);
+
+        check("кнопки під товаром немає", !/<button/.test(markup), markup);
+
+        // Пояснення, а не приховування: схована кнопка виглядає як
+        // поломка сайту — покупець пам'ятає, що вона була.
+        check("замість неї — пояснення, а не порожнє місце",
+            /Замовлення скасовано/.test(markup), markup);
+        check("пояснення оформлене як підпис", /order-item-refuse-void/.test(markup), markup);
+
+        // Уже надіслана заявка нікуди не зникає: її справді надіслали,
+        // і сказати інакше означало б збрехати.
+        const зчастковою = order();
+
+        зчастковою.status = "cancelled";
+        зчастковою.__refusals = [{ items: [БЕЖЕВА] }];
+
+        check("на відмовленому товарі лишається «Відмову надіслано»",
+            /Відмову надіслано/.test(api.refusalMarkup(зчастковою, 0)),
+            api.refusalMarkup(зчастковою, 0));
+        check("а на решті — все одно не кнопка",
+            !/<button/.test(api.refusalMarkup(зчастковою, 1)));
+
+        // Не зламали звичайний випадок.
+        const живе = order();
+
+        check("у незакритому замовленні кнопка на місці",
+            /<button/.test(api.refusalMarkup(живе, 0))
+            && /↩ Відмова/.test(api.refusalMarkup(живе, 0)));
+
+        // Дві причини відмови в доступі не мусять плутатись.
+        const прострочене = order();
+
+        прострочене.created_at = new Date(Date.now() - 40 * 86400000).toISOString();
+
+        check("прострочене й далі каже саме про строк",
+            /Строк відмови \(14 днів\) минув/.test(api.refusalMarkup(прострочене, 0)),
+            api.refusalMarkup(прострочене, 0));
+
+        // Кнопка — не єдиний шлях: замовлення міг скасувати менеджер
+        // уже після того, як покупець відкрив кабінет. Тому перед
+        // надсиланням стан читається з бази й перевіряється ще раз, а
+        // текст причини в обох місцях один.
+        check("текст причини — спільний для підпису й повідомлення",
+            /function refusalBlockedText/.test(src)
+            && /showToast\(refusalBlockedText\(period\)\)/.test(src));
+
+        const selectAt = src.indexOf('.eq("order_number", orderNumber)');
+        const periodAt = src.indexOf("const period = refusalWindow(order);");
+
+        check("перевіряється замовлення з бази, а не зі сторінки",
+            selectAt > 0 && periodAt > selectAt, `select=${selectAt}, period=${periodAt}`);
+
+        const css = fs.readFileSync(path.join(ROOT, "assets/css/style.css"), "utf8");
+
+        check("для пояснення є стиль", /\.order-item-refuse-void\{/.test(css));
+
+        // Той самий рядок «Відмова: …» у деталях замовлення. Для
+        // часткової відмови він обіцяв, що «решта замовлення
+        // лишається», — і стояв прямо під бейджем «Скасовано»,
+        // сперечаючись із ним у тій самій картці.
+        const частковаЖива = order();
+
+        частковаЖива.__refusals = [{ items: [БЕЖЕВА] }];
+
+        check("у живому замовленні решта справді лишається",
+            /решта замовлення лишається/.test(api.refusalNoteText(частковаЖива)),
+            api.refusalNoteText(частковаЖива));
+
+        const частковаСкасована = order();
+
+        частковаСкасована.status = "cancelled";
+        частковаСкасована.__refusals = [{ items: [БЕЖЕВА] }];
+
+        check("у скасованому нічого не «лишається»",
+            !/лишається/.test(api.refusalNoteText(частковаСкасована)),
+            api.refusalNoteText(частковаСкасована));
+        check("натомість — що заявку прийняли",
+            /менеджер зв'яжеться/.test(api.refusalNoteText(частковаСкасована)),
+            api.refusalNoteText(частковаСкасована));
+    }
+
+    console.log("\n[8] Повна відмова міняє статус");
     {
         const { api } = load({ data: [{ order_id: 42, items: [БЕЖЕВА, ЧОРНА] }], error: null });
 
@@ -294,7 +408,7 @@ async function main() {
             api.displayOrderStatus(o) === "returned", api.displayOrderStatus(o));
     }
 
-    console.log("\n[8] Саме вікно: відмовлену позицію не відмітити");
+    console.log("\n[9] Саме вікно: відмовлену позицію не відмітити");
     {
         // Те, що на скріншоті: вікно відкрите з другого товару, а
         // перший — той, на який заявка вже пішла.
@@ -350,7 +464,7 @@ async function main() {
             choice && JSON.stringify(choice.items.map(i => i.color)));
     }
 
-    console.log("\n[9] База: сповіщення не має права скасувати заявку");
+    console.log("\n[10] База: сповіщення не має права скасувати заявку");
     {
         // Знайдено в бою на замовленні 8126866876: лист магазину
         // прийшов, у order_refusals — порожньо, refusal_requested_at
@@ -488,7 +602,7 @@ async function main() {
             && /like '%''<HOOK_SECRET>''%'/.test(вісім));
     }
 
-    console.log("\n[10] Вибір фото говорить українською");
+    console.log("\n[11] Вибір фото говорить українською");
     {
         // Голий <input type="file"> малює браузер мовою свого
         // інтерфейсу: у Chrome з російською це «Выбрать файлы / Файл не

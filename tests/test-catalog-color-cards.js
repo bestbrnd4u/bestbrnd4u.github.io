@@ -40,7 +40,11 @@ const commonSource = read("assets/js/common.js");
 
 // беремо саму функцію з коду, а не її копію
 const split = new Function(
-    commonSource.match(/function splitProductsByColor[\s\S]*?\n\}/)[0]
+    // Перевизначення полів кольором: splitProductsByColor питає їх, щоб
+    // картка кожного кольору отримала його власну назву, ціну й позначку.
+    commonSource.match(/function colorOverrides[\s\S]*?\n\}/)[0]
+    + commonSource.match(/function applyColorOverrides[\s\S]*?\n\}/)[0]
+    + commonSource.match(/function splitProductsByColor[\s\S]*?\n\}/)[0]
     + "; return splitProductsByColor;")();
 
 console.log("\n[1] Правило описане в коді");

@@ -46,13 +46,15 @@
         "assets/images/products/uploads/h153l01sp22-002-2.webp",
         "assets/images/products/uploads/h153l01sp22-002-3.webp"
       ],
-      "sku": "H153L01SP22-002"
+      "sku": "H153L01SP22-002",
+      "price": 12000
     }
   ],
   "sortOrder": 1,
   "sizes": [
     "ONESIZE"
   ],
+  "splitByColor": true,
   "searchKeywords": [
     "марк джейкобс",
     "marc jacobs",

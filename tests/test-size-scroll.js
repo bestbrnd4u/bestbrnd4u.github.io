@@ -13,6 +13,12 @@ window.eval(common.match(/function escapeAttrSingleQuoted[\s\S]*?\n}\n/)[0]);
 // на сайті файл підключений повністю, у тесті додаємо явно
 window.eval(fs.readFileSync(path.join(ROOT,"assets/js/common.js"),"utf8").match(/function getVariantSizes[\s\S]*?\n}\n/)[0]);
 window.eval(fs.readFileSync(path.join(ROOT,"assets/js/common.js"),"utf8").match(/function getAllProductSizes[\s\S]*?\n}\n/)[0]);
+// Перевизначення полів кольором: коли колір має власну назву, ціну
+// чи позначку, createProductCard кладе на свотч готовий вигляд —
+// і питає саме ці три функції.
+window.eval(common.match(/function colorOverrides[\s\S]*?\n}\n/)[0]);
+window.eval(common.match(/function applyColorOverrides[\s\S]*?\n}\n/)[0]);
+window.eval(common.match(/function baseProduct[\s\S]*?\n}\n/)[0]);
 // назва в картці тепер посилання — createProductCard кличе productUrl
 window.eval(common.match(/function productUrl[\s\S]*?\n}\n/)[0]);
 window.eval(fs.readFileSync(path.join(ROOT,"assets/js/ui.js"),"utf8").replace(

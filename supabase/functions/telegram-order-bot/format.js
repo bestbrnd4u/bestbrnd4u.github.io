@@ -193,9 +193,14 @@ export function formatRefusal(record, order) {
 
 }
 
-// Показуємо лише ті статуси, у які має сенс переходити з поточного —
-// щоб не тицьнути «Відправлено» на скасованому замовленні.
-export function buildKeyboard(orderId, current, options = {}) {
+// У які статуси має сенс переходити з поточного.
+//
+// ЄДИНЕ ДЖЕРЕЛО ПРАВДИ для обох способів керування: кнопки в Telegram
+// (buildKeyboard нижче) і панель «Замовлення» в адмінці (admin-api.js)
+// беруть ланцюжок звідси. Якби кожна сторона мала свій список, одна з
+// них рано чи пізно дозволила б перехід, якого інша не знає, — і
+// статус залежав би від того, звідки його змінили.
+export function allowedTransitions(current) {
 
   const status = normalizeStatus(current);
 
@@ -213,7 +218,17 @@ export function buildKeyboard(orderId, current, options = {}) {
   // час формування кнопок — тобто через друкарську помилку в одному
   // рядку бот перестав би відповідати взагалі. Тепер у гіршому разі
   // зникне одна кнопка, а решта працює.
-  const valid = next.filter((key) => STATUSES[key]);
+  return next.filter((key) => STATUSES[key]);
+
+}
+
+// Показуємо лише ті статуси, у які має сенс переходити з поточного —
+// щоб не тицьнути «Відправлено» на скасованому замовленні.
+export function buildKeyboard(orderId, current, options = {}) {
+
+  const status = normalizeStatus(current);
+
+  const valid = allowedTransitions(status);
 
   const rows = [];
 
@@ -371,14 +386,20 @@ export function trackingUrl(ttn) {
 
 // ТТН Нової пошти — 14 цифр. Перевіряємо, щоб не надіслати клієнту
 // випадковий текст замість номера.
+//
+// Разом із текстом помилки повертаємо reason — коротку причину
+// відмови. Тексти тут написані для чату з ботом («надішліть»,
+// «/skip»), а той самий номер тепер вводять і в панелі адмінки, де
+// про /skip не знають. Правило перевірки при цьому мусить лишатись
+// одне: два окремі списки «скільки цифр у ТТН» неминуче розійшлися б.
 export function validateTracking(text) {
 
   const raw = String(text ?? "").trim();
   const digits = raw.replace(/\D/g, "");
 
-  if (!digits) return { ok: false, error: "Це не схоже на номер накладної. Надішліть 14 цифр або /skip." };
-  if (digits.length < 10) return { ok: false, error: `Замало цифр (${digits.length}). ТТН Нової пошти — 14 цифр. Або /skip.` };
-  if (digits.length > 20) return { ok: false, error: "Забагато цифр для номера накладної. Або /skip." };
+  if (!digits) return { ok: false, reason: "empty", error: "Це не схоже на номер накладної. Надішліть 14 цифр або /skip." };
+  if (digits.length < 10) return { ok: false, reason: "short", error: `Замало цифр (${digits.length}). ТТН Нової пошти — 14 цифр. Або /skip.` };
+  if (digits.length > 20) return { ok: false, reason: "long", error: "Забагато цифр для номера накладної. Або /skip." };
 
   return { ok: true, value: digits };
 

@@ -912,9 +912,9 @@
         "color": "Зелений",
         "hex": "#06b454",
         "images": [
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=423950d5",
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=8efb16d4",
           "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-2.webp?v=7f7d7a02",
-          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=38d54b30"
+          "assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=886fec91"
         ],
         "sku": "B094QT219C",
         "article": "14-1"
@@ -923,9 +923,9 @@
         "color": "Карамельний",
         "hex": "#f49657",
         "images": [
-          "assets/images/products/uploads/jwp-ma123-1.webp?v=49e78dcf",
+          "assets/images/products/uploads/jwp-ma123-1.webp?v=d9e72c51",
           "assets/images/products/uploads/jwp-ma123-2.webp?v=189c38d2",
-          "assets/images/products/uploads/jwp-ma123-3.webp?v=ad98853a"
+          "assets/images/products/uploads/jwp-ma123-3.webp?v=ac991bf8"
         ],
         "sku": "JWP-MA123",
         "article": "14-2"
@@ -1278,6 +1278,7 @@
           "assets/images/products/uploads/h153l01sp22-002-3.webp?v=0198e33b"
         ],
         "sku": "H153L01SP22-002",
+        "price": 12000,
         "article": "20-2"
       }
     ],
@@ -1285,6 +1286,7 @@
     "sizes": [
       "ONESIZE"
     ],
+    "splitByColor": true,
     "searchKeywords": [
       "марк джейкобс",
       "marc jacobs",
@@ -4424,8 +4426,8 @@
           "/assets/images/products/uploads/ca173_svvfq_a0.webp?v=274cb8ee",
           "/assets/images/products/uploads/ca173_svvfq_a5.webp?v=c14cae6b",
           "/assets/images/products/uploads/ca173_svvfq_a8.webp?v=b75e933e",
-          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=e818d858",
-          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=712d58ec"
+          "/assets/images/products/uploads/ca173_svvfq_a92.webp?v=4311ebf9",
+          "/assets/images/products/uploads/ca173_svvfq_a91.webp?v=0daecfd8"
         ],
         "article": "62-1"
       }

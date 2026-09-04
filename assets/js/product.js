@@ -835,6 +835,29 @@ function findVariantByColor(variants, requested) {
 
 }
 
+// Готовий вигляд СТОРІНКИ ТОВАРУ в одному кольорі — для перемикача.
+//
+// Розмітку збирає саме product.js, а не спільний помічник: на сторінці
+// товару вона своя (h1, .price-box, .product-badge), і якби її збирало
+// щось спільне з карткою каталогу, одна з двох розкладок рано чи пізно
+// розійшлася б із власним шаблоном. Кожна поверхня описує себе сама.
+function pageColorView(base, variant) {
+
+    const view = applyColorOverrides(base, variant);
+
+    const oldPrice = view.oldPrice
+        ? `<span class="old-price">${formatPrice(view.oldPrice)}</span>`
+        : "";
+
+    return {
+        title: view.title || "",
+        badge: view.badge || "",
+        priceBox: `${oldPrice}<span class="price">${formatPrice(view.price)}</span>`,
+        description: view.description || ""
+    };
+
+}
+
 function renderProduct(product) {
 
     // Статистика: перегляд товару. Колір і розмір беремо з адреси —
@@ -848,15 +871,12 @@ function renderProduct(product) {
     });
 
 
-    // Рамки кадрування діють на всю сторінку товару — і на великі
-    // слайди, і на мініатюри, і після перемикання кольору
-    // (updateGalleryForColor малює галерею наново вже без product).
-    currentFraming = product.framing || null;
-
-    renderBreadcrumbs(product);
-
-    updateProductSeoMetadata(product);
-
+    // Активний колір визначаємо ОДРАЗУ, до першого малювання.
+    //
+    // ЧОМУ САМЕ ТУТ. Колір може перевизначати назву, опис, ціну, стару
+    // ціну, позначку й Reels. Крихти і SEO малюються нижче — якби колір
+    // визначався після них, заголовок сторінки й og:title лишились би зі
+    // значеннями товару, а сама сторінка показувала б значення кольору.
     const variants = product.variants?.length
         ? product.variants
         : [{ color: product.color || "Основний", hex: "#999", images: product.images || [] }];
@@ -869,8 +889,32 @@ function renderProduct(product) {
     const activeIndex = Math.max(findVariantByColor(variants, requestedColor), 0);
 
     const activeVariant = variants[activeIndex];
+
+    // Товар ДО перевизначень. Потрібен, щоб зібрати вигляд КОЖНОГО
+    // кольору для перемикача: накладати колір на вже перевизначені
+    // значення означало б змішати два кольори — поля, яких новий колір
+    // не задає, лишились би від попереднього.
+    const productBase = product;
+
+    // Далі по функції товар показується ОЧИМА активного кольору.
+    // Перевизначень немає — applyColorOverrides повертає той самий обʼєкт.
+    product = applyColorOverrides(product, activeVariant);
+
+    // Рамки кадрування діють на всю сторінку товару — і на великі
+    // слайди, і на мініатюри, і після перемикання кольору
+    // (updateGalleryForColor малює галерею наново вже без product).
+    currentFraming = product.framing || null;
+
+    renderBreadcrumbs(product);
+
+    updateProductSeoMetadata(product);
+
     const galleryImages = activeVariant.images?.length ? activeVariant.images : (product.images || []);
     const galleryVideo = activeVariant.video || "";
+
+    // data-page-view ставимо ЛИШЕ коли хоч один колір щось перевизначає:
+    // інакше атрибут висів би на кожному свотчі й нічого не змінював.
+    const hasColorViews = variants.some(v => Object.keys(colorOverrides(productBase, v)).length);
 
     const colorButtons = variants.map((variant, index) => {
 
@@ -915,6 +959,7 @@ function renderProduct(product) {
             data-sku="${escapeHtml(getVariantArticle(product, variant))}"
             data-supplier-sku="${escapeHtml(getVariantSku(product, variant))}"
             data-video="${escapeHtml(variant.video || "")}"
+            ${hasColorViews ? `data-page-view='${escapeAttrSingleQuoted(JSON.stringify(pageColorView(productBase, variant)))}'` : ""}
             title="${escapeHtml(variant.color)}"
             aria-label="Колір: ${escapeHtml(variant.color)}"
             style="${swatchStyle}"></button>
@@ -1233,7 +1278,7 @@ ${sizeButtons}
                 </button>
                 <div class="spec-block-content">
                     <div class="spec-block-inner">
-                        <p class="spec-plain">${product.description || "Стильна сумка преміальної якості. Підходить для щоденного використання та чудово поєднується з будь-яким образом."}</p>
+                        <p class="spec-plain" data-product-description>${product.description || "Стильна сумка преміальної якості. Підходить для щоденного використання та чудово поєднується з будь-яким образом."}</p>
                     </div>
                 </div>
             </div>

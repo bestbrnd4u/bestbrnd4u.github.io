@@ -2080,6 +2080,113 @@ document.addEventListener("click", event => {
         // cardColorLabel() в ui.js), тож і оновлювати його не потрібно.
         // Тут стояв цей блок — прибраний разом із самим підписом.
 
+        // Колір може мати власні назву, опис, ціну, стару ціну, позначку
+        // й посилання. Тоді на свотчі лежить ГОТОВА розмітка (data-view,
+        // збирає cardColorView в ui.js) — підставляємо її.
+        //
+        // Саме підставляємо, а не збираємо тут: друга копія правил про
+        // відсоток знижки й «під замовлення» неминуче розійшлася б із
+        // карткою. Так уже сталося зі слайдом фото нижче.
+        if (scope && colorBtn.dataset.view) {
+
+            try {
+
+                const view = JSON.parse(colorBtn.dataset.view);
+
+                const titleLink = scope.querySelector(".product-title-link");
+
+                if (titleLink) {
+
+                    if (view.title) titleLink.textContent = view.title;
+
+                    // Посилання несе ?color= — без цього клац по назві
+                    // відкривав би колір, з яким картку намалювали.
+                    if (view.href) titleLink.setAttribute("href", view.href);
+
+                }
+
+                const priceBox = scope.querySelector(".product-price");
+
+                if (priceBox && view.price) priceBox.innerHTML = view.price;
+
+                // Стовпчик позначок міняється ЦІЛКОМ: у одного кольору
+                // може бути SALE і відсоток знижки, у сусіднього — нічого,
+                // і тоді елементів там просто немає.
+                const badges = scope.querySelector(".badge-stack");
+
+                if (badges && view.badges !== undefined) badges.innerHTML = view.badges;
+
+                const desc = scope.querySelector(".product-desc");
+
+                if (desc && view.description) desc.textContent = view.description;
+
+            } catch (error) {
+
+                // зіпсований JSON у data-view — лишаємо картку як є
+
+            }
+
+        }
+
+        // Сторінка товару має власну розкладку (h1, .price-box,
+        // .product-badge), тож і власний вигляд кольору — його збирає
+        // product.js (pageColorView).
+        if (scope && colorBtn.dataset.pageView) {
+
+            try {
+
+                const view = JSON.parse(colorBtn.dataset.pageView);
+
+                const heading = scope.querySelector("h1");
+
+                if (heading && view.title) heading.textContent = view.title;
+
+                const priceBox = scope.querySelector(".price-box");
+
+                if (priceBox && view.priceBox) priceBox.innerHTML = view.priceBox;
+
+                // Позначки може не бути ні в поточному кольорі, ні в
+                // новому — тому елемент і створюємо за потреби, і ховаємо.
+                const photo = scope.querySelector(".main-photo");
+
+                if (photo) {
+
+                    let badge = photo.querySelector(".product-badge");
+
+                    if (view.badge && !badge) {
+
+                        badge = document.createElement("span");
+                        badge.className = "product-badge";
+                        photo.prepend(badge);
+
+                    }
+
+                    if (badge) {
+
+                        badge.textContent = view.badge;
+                        badge.hidden = !view.badge;
+
+                    }
+
+                }
+
+                // Опис товару на сторінці — САМЕ за позначкою.
+                //
+                // Тут стояло querySelector(".spec-plain") — «перший такий
+                // абзац». У характеристиках їх чотири, і перший — це
+                // артикул: перемикання кольору затирало артикул описом.
+                const pageDesc = scope.querySelector("[data-product-description]");
+
+                if (pageDesc && view.description) pageDesc.textContent = view.description;
+
+            } catch (error) {
+
+                // зіпсований JSON у data-page-view — лишаємо як є
+
+            }
+
+        }
+
         // Артикул свій у кожного кольору («95-1», «95-2») — оновлюємо
         // підпис під назвою товару і рядок у характеристиках. data-sku
         // порожній → артикула немає взагалі, тоді просто чистимо текст.
@@ -3450,6 +3557,87 @@ function promotionCards(promo, allProducts, departmentOf) {
 //     однакові чорні);
 //   • «Кожен колір — окрема картка» в самій АКЦІЇ — лише для акцій,
 //     через promotionCards().
+// Що саме цей колір перевизначає — або порожній обʼєкт.
+//
+// ПОРОЖНЄ ПОЛЕ = УСПАДКУВАННЯ. Те саме правило, що вже діє для коду
+// виробника й розмірів варіанта, тож на весь варіант воно одне.
+//
+// Прапорець splitByColor обовʼязковий: при вимкненому колір не має
+// власної картки, і показувати для нього іншу назву чи ціну ніде.
+function colorOverrides(product, variant) {
+
+    const out = {};
+
+    if (!product || !variant) return out;
+
+    if (product.splitByColor === false) return out;
+
+    // Перелік полів ЖИВЕ ТУТ, а не окремою константою поруч.
+    //
+    // ЧОМУ. Тести цього репозиторію витягують із common.js окремі
+    // функції регуляркою «function NAME …» і виконують їх у jsdom. До
+    // const поза функцією їм не дістатися — набір карток падав би з
+    // ReferenceError. Тож функція самодостатня, а решта коду питає
+    // перелік у неї.
+    ["title", "description", "price", "oldPrice", "badge", "instagramReels"].forEach(field => {
+
+        const value = variant[field];
+
+        if (value === undefined || value === null) return;
+
+        // Порожній рядок у CMS — це «не заповнено», а не «пусто напиши».
+        if (typeof value === "string") {
+
+            const text = value.trim();
+
+            if (text) out[field] = text;
+
+            return;
+
+        }
+
+        // Ціна 0 (як і NaN з порожнього числового поля) — не ціна.
+        if (typeof value === "number") {
+
+            if (value > 0) out[field] = value;
+
+            return;
+
+        }
+
+        out[field] = value;
+
+    });
+
+    return out;
+
+}
+
+// Товар БЕЗ перевизначень кольору — такий, яким його завів власник.
+//
+// Потрібен перемикачу кольору на картці. Картка розділеного товару вже
+// несе значення СВОГО кольору (їх підставив splitProductsByColor), і
+// накладати на них інший колір означало б змішати два: поля, яких
+// новий колір не задає, лишились би від попереднього замість того, щоб
+// повернутись до значень товару.
+function baseProduct(product) {
+
+    return product && product.colorBase
+        ? { ...product, ...product.colorBase }
+        : product;
+
+}
+
+// Товар очима одного кольору. Повертає ТОЙ САМИЙ обʼєкт, якщо колір
+// нічого не перевизначає — щоб не плодити копій на кожен виклик.
+function applyColorOverrides(product, variant) {
+
+    const over = colorOverrides(product, variant);
+
+    return Object.keys(over).length ? { ...product, ...over } : product;
+
+}
+
 function splitProductsByColor(list) {
 
     const out = [];
@@ -3477,8 +3665,23 @@ function splitProductsByColor(list) {
             // тож підміняти щось інше не потрібно.
             const rotated = [variant, ...variants.filter((_, i) => i !== index)];
 
-            out.push({
+            // Кольору можна задати власні назву, опис, ціну, стару ціну,
+            // позначку й Reels — застосовуємо їх ТУТ, один раз. Далі все
+            // працює саме собою: картка малює перевизначену ціну,
+            // сортування бере її ж, фільтр «від / до» теж.
+            // Значення товару до перевизначень — щоб перемикач кольору
+            // на картці мав від чого відштовхуватись (див. baseProduct).
+            //
+            // Беремо РІВНО ті поля, які цей колір перебиває: решти він
+            // не чіпав, і відновлювати там нічого.
+            const colorBase = {};
+
+            Object.keys(colorOverrides(product, variant))
+                .forEach(field => { colorBase[field] = product[field]; });
+
+            out.push(applyColorOverrides({
                 ...product,
+                colorBase,
                 variants: rotated,
                 // images верхнього рівня йдуть за активним кольором —
                 // інакше картка показала б фото іншого варіанта
@@ -3488,7 +3691,7 @@ function splitProductsByColor(list) {
                 // Позначка для картки: за нею вона додає ?color= у
                 // посилання, щоб клац відкривав саме цей колір.
                 cardColor: variant.color
-            });
+            }, variant));
 
         });
 

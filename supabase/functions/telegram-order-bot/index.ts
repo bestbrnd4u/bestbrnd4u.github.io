@@ -3,6 +3,7 @@
 // Джерела:
 //   supabase/functions/telegram-order-bot/format.js      (картка замовлення)
 //   supabase/functions/telegram-order-bot/order-flow.js  (діалог оформлення)
+//   supabase/functions/telegram-order-bot/admin-api.js   (панель замовлень в адмінці)
 //   supabase/functions/telegram-order-bot/_index.src.ts  (мережа й база)
 //
 // Перезібрати:  node scripts/build-edge-function.js
@@ -205,9 +206,14 @@ function formatRefusal(record, order) {
 
 }
 
-// Показуємо лише ті статуси, у які має сенс переходити з поточного —
-// щоб не тицьнути «Відправлено» на скасованому замовленні.
-function buildKeyboard(orderId, current, options = {}) {
+// У які статуси має сенс переходити з поточного.
+//
+// ЄДИНЕ ДЖЕРЕЛО ПРАВДИ для обох способів керування: кнопки в Telegram
+// (buildKeyboard нижче) і панель «Замовлення» в адмінці (admin-api.js)
+// беруть ланцюжок звідси. Якби кожна сторона мала свій список, одна з
+// них рано чи пізно дозволила б перехід, якого інша не знає, — і
+// статус залежав би від того, звідки його змінили.
+function allowedTransitions(current) {
 
   const status = normalizeStatus(current);
 
@@ -225,7 +231,17 @@ function buildKeyboard(orderId, current, options = {}) {
   // час формування кнопок — тобто через друкарську помилку в одному
   // рядку бот перестав би відповідати взагалі. Тепер у гіршому разі
   // зникне одна кнопка, а решта працює.
-  const valid = next.filter((key) => STATUSES[key]);
+  return next.filter((key) => STATUSES[key]);
+
+}
+
+// Показуємо лише ті статуси, у які має сенс переходити з поточного —
+// щоб не тицьнути «Відправлено» на скасованому замовленні.
+function buildKeyboard(orderId, current, options = {}) {
+
+  const status = normalizeStatus(current);
+
+  const valid = allowedTransitions(status);
 
   const rows = [];
 
@@ -383,14 +399,20 @@ function trackingUrl(ttn) {
 
 // ТТН Нової пошти — 14 цифр. Перевіряємо, щоб не надіслати клієнту
 // випадковий текст замість номера.
+//
+// Разом із текстом помилки повертаємо reason — коротку причину
+// відмови. Тексти тут написані для чату з ботом («надішліть»,
+// «/skip»), а той самий номер тепер вводять і в панелі адмінки, де
+// про /skip не знають. Правило перевірки при цьому мусить лишатись
+// одне: два окремі списки «скільки цифр у ТТН» неминуче розійшлися б.
 function validateTracking(text) {
 
   const raw = String(text ?? "").trim();
   const digits = raw.replace(/\D/g, "");
 
-  if (!digits) return { ok: false, error: "Це не схоже на номер накладної. Надішліть 14 цифр або /skip." };
-  if (digits.length < 10) return { ok: false, error: `Замало цифр (${digits.length}). ТТН Нової пошти — 14 цифр. Або /skip.` };
-  if (digits.length > 20) return { ok: false, error: "Забагато цифр для номера накладної. Або /skip." };
+  if (!digits) return { ok: false, reason: "empty", error: "Це не схоже на номер накладної. Надішліть 14 цифр або /skip." };
+  if (digits.length < 10) return { ok: false, reason: "short", error: `Замало цифр (${digits.length}). ТТН Нової пошти — 14 цифр. Або /skip.` };
+  if (digits.length > 20) return { ok: false, reason: "long", error: "Забагато цифр для номера накладної. Або /skip." };
 
   return { ok: true, value: digits };
 
@@ -918,6 +940,462 @@ function buildOrderRow(product, session, orderNumber) {
 
 }
 
+
+// ======================================
+// Панель «Замовлення» в адмінці — чиста логіка.
+//
+// НАВІЩО ЦЕ ВЗАГАЛІ
+// ------------------
+// Замовленнями можна було керувати лише з Telegram: статуси —
+// кнопками під карткою, ТТН — відповіддю боту. Це працює, поки
+// замовлення одне-два на день і поки телефон під рукою. Далі
+// починаються незручності, яких кнопками не вирішити:
+//
+//   • знайти замовлення тижневої давнини = гортати чат;
+//   • подивитись усі «Нові» = /orders показує останні десять;
+//   • працювати з компʼютера = чат на телефоні;
+//   • передати роботу колезі = дати доступ до свого чату з ботом.
+//
+// Тому в адмінці зʼявилась своя сторінка. Бот НЕ прибирається:
+// сповіщення про нове замовлення так і приходять у Telegram, кнопки
+// так і працюють. Це другий спосіб, а не заміна.
+//
+// ЧОМУ ЦЕ НЕ РОБИТЬ САМА АДМІНКА
+// -------------------------------
+// Замовлення лежать у Supabase під RLS: клієнт бачить лише свої, а
+// гостьових (user_id is null) з браузера не видно взагалі — і так має
+// бути, інакше публічний ключ сайту відкривав би чужі телефони й
+// адреси. Прочитати всі замовлення може лише серверний код із
+// service-ключем, а такий тут один — ця Edge Function.
+//
+// ЩО В ЦЬОМУ ФАЙЛІ
+// -----------------
+// Тільки чиста логіка: розбір і перевірка запиту, побудова запиту до
+// PostgREST, проєкція рядка бази у те, що бачить браузер. Без мережі
+// й без бази — щоб усе це ганяли тести в Node, як і решту логіки
+// бота (format.js, order-flow.js).
+// ======================================
+
+
+// -------------------------
+// Звідки можна звертатись
+//
+// Адмінка живе на домені сайту, функція — на supabase.co, тобто це
+// завжди міждоменний запит. Браузер спершу питає дозволу (preflight),
+// і без цього переліку панель не отримає ані байта.
+//
+// Перелік — не заміна перевірці доступу (її обходить будь-який curl),
+// а гігієна: сторонній сторінці в браузері власника нема чого
+// звертатись до цього API.
+// -------------------------
+
+const ADMIN_ORIGINS = [
+    "https://bestbrnd4u.com",
+    "https://www.bestbrnd4u.com",
+    "https://dev.bestbrnd4u.com",
+    "https://bestbrnd4u.github.io",
+];
+
+function isAllowedOrigin(origin) {
+
+    const value = String(origin ?? "").trim();
+
+    if (!value) return false;
+
+    if (ADMIN_ORIGINS.includes(value)) return true;
+
+    // Локальний перегляд адмінки (python -m http.server тощо).
+    // Тільки http і тільки петля — жодних сторонніх адрес.
+    return /^http:\/\/(localhost|127\.0\.0\.1)(:\d{1,5})?$/.test(value);
+
+}
+
+// Заголовок, яким браузер надсилає доказ доступу. НЕ Authorization:
+// його на шляху до функції розбирає сам Supabase (шукає там свій JWT),
+// а тут їде токен GitHub — інша річ.
+const ADMIN_TOKEN_HEADER = "x-admin-token";
+
+function corsHeaders(origin) {
+
+    const headers = {
+        "Vary": "Origin",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": `Content-Type, ${ADMIN_TOKEN_HEADER}`,
+        "Access-Control-Max-Age": "600",
+    };
+
+    // Дозволяємо конкретний домен, а не «*»: із зіркою браузер не
+    // пропустив би власний заголовок з токеном.
+    if (isAllowedOrigin(origin)) headers["Access-Control-Allow-Origin"] = origin;
+
+    return headers;
+
+}
+
+// -------------------------
+// Дії
+// -------------------------
+
+const ADMIN_ACTIONS = ["list", "get", "status", "tracking"];
+
+const LIST_LIMIT_DEFAULT = 25;
+const LIST_LIMIT_MAX = 100;
+
+// Порядок вкладок у панелі. Тримається тут, а не в браузері, щоб
+// новий статус не довелося додавати у двох місцях.
+const STATUS_ORDER = ["new", "processing", "shipped", "completed", "cancelled"];
+
+// Куди дозволено переходити з панелі.
+//
+// Основний ланцюжок — спільний із ботом (allowedTransitions), тож
+// «Відправлено» на скасованому замовленні не натиснути ні там, ні тут.
+//
+// РІЗНИЦЯ ОДНА, І ВОНА НАВМИСНА: із «Скасовано» та «Виконано» панель
+// дозволяє повернути замовлення в роботу. У боті такої кнопки немає —
+// і там це не проблема, бо статус міняють, дивлячись на картку. У
+// панелі ж поруч стоять кнопки й список: один зайвий клік по
+// «Скасувати» — і замовлення застигло б назавжди, без жодного способу
+// це виправити, крім Table editor у Supabase.
+function adminTransitions(current) {
+
+    const status = normalizeStatus(current);
+
+    if (status === "cancelled" || status === "completed") return ["processing"];
+
+    return allowedTransitions(status);
+
+}
+
+// -------------------------
+// Пошук
+//
+// Значення їде в параметр or=(...) PostgREST, де кома, дужки й лапки —
+// частина синтаксису. Замість екранування прибираємо все, що не
+// схоже на текст запиту: так рядок не може зламати фільтр незалежно
+// від того, що ввели в поле.
+// -------------------------
+
+const SEARCH_FIELDS = [
+    "order_number",
+    "first_name",
+    "last_name",
+    "phone",
+    "email",
+    "tracking_number",
+];
+
+// Поля, у яких має сенс шукати «просто цифри»: номер замовлення,
+// телефон, накладна.
+const DIGIT_FIELDS = ["order_number", "phone", "tracking_number"];
+
+function sanitizeSearch(text) {
+
+    return String(text ?? "")
+        .replace(/[^\p{L}\p{N}\s@._+-]/gu, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, 60);
+
+}
+
+function searchClause(text) {
+
+    const term = sanitizeSearch(text);
+
+    if (!term) return "";
+
+    // Пробіл стає зіркою: «Іван Петренко» знайдеться і як «Іван
+    // Петренко», і як «Іван Б. Петренко». Заодно в адресу не
+    // потрапляють пробіли.
+    const pattern = `*${term.replace(/\s+/g, "*")}*`;
+
+    const parts = SEARCH_FIELDS.map((field) => `${field}.ilike.${pattern}`);
+
+    // Телефон у базі лежить як +380…, а диктують його по-різному:
+    // «050 123 45 67». Тому для номерів шукаємо ще й самі цифри.
+    const digits = term.replace(/\D/g, "");
+
+    if (digits.length >= 4 && digits !== term) {
+
+        DIGIT_FIELDS.forEach((field) => parts.push(`${field}.ilike.*${digits}*`));
+
+    }
+
+    return `or=(${parts.join(",")})`;
+
+}
+
+// -------------------------
+// Запити до PostgREST
+// -------------------------
+
+// Колонки для списку. Перелічені навмисно: select=* тягнув би все,
+// включно з полями, яким у браузері нема чого робити.
+const LIST_COLUMNS = [
+    "id",
+    "order_number",
+    "created_at",
+    "status",
+    "items",
+    "total",
+    "first_name",
+    "last_name",
+    "phone",
+    "delivery_method",
+    "delivery_city",
+    "tracking_number",
+    "refusal_requested_at",
+    "user_id",
+    "telegram_chat_id",
+];
+
+function listFilters(params) {
+
+    const parts = [];
+
+    if (params.status) parts.push(`status=eq.${params.status}`);
+
+    if (params.refusal) parts.push("refusal_requested_at=not.is.null");
+
+    const search = searchClause(params.query);
+
+    if (search) parts.push(search);
+
+    return parts;
+
+}
+
+function buildListQuery(params = {}) {
+
+    const parts = [
+        `select=${LIST_COLUMNS.join(",")}`,
+        "order=created_at.desc",
+        ...listFilters(params),
+        `limit=${clampLimit(params.limit)}`,
+        `offset=${Math.max(0, Math.trunc(Number(params.offset) || 0))}`,
+    ];
+
+    return `orders?${parts.join("&")}`;
+
+}
+
+// Скільки всього замовлень у кожній вкладці. Рядки не потрібні —
+// лише число з Content-Range, тож просимо одну колонку й один рядок.
+function buildCountQuery(params = {}) {
+
+    return `orders?${["select=id", ...listFilters(params), "limit=1"].join("&")}`;
+
+}
+
+// Заявки на відмову цього замовлення — щоб у картці було видно, від
+// чого саме відмовляються, а не лише позначку «клієнт просив відмову».
+function buildRefusalsQuery(id) {
+
+    return `order_refusals?select=*&order_id=eq.${id}&order=created_at.desc`;
+
+}
+
+// Загальна кількість рядків із заголовка Content-Range: «0-24/137».
+function parseTotal(contentRange) {
+
+    const match = /\/(\d+|\*)\s*$/.exec(String(contentRange ?? ""));
+
+    if (!match || match[1] === "*") return null;
+
+    return Number(match[1]);
+
+}
+
+// -------------------------
+// Розбір і перевірка запиту
+// -------------------------
+
+function clampLimit(value) {
+
+    const number = Math.trunc(Number(value));
+
+    if (!Number.isFinite(number) || number < 1) return LIST_LIMIT_DEFAULT;
+
+    return Math.min(number, LIST_LIMIT_MAX);
+
+}
+
+// id замовлення — bigint identity, тобто самі цифри. Перевіряємо це
+// не «для порядку»: id підставляється в адресу запиту до бази, і
+// довільний рядок там означав би можливість дописати свій фільтр.
+function parseOrderId(value) {
+
+    const raw = String(value ?? "").trim();
+
+    return /^\d{1,18}$/.test(raw) ? raw : null;
+
+}
+
+// Те саме правило, що в боті (validateTracking), але словами панелі:
+// у полі введення немає ні «надішліть», ні команди /skip.
+function trackingError(checked) {
+
+    if (checked?.reason === "short") return "Замало цифр — ТТН Нової пошти складається з 14.";
+    if (checked?.reason === "long") return "Завелика кількість цифр для номера накладної.";
+
+    return "Це не схоже на номер накладної — потрібні 14 цифр.";
+
+}
+
+function parseAdminRequest(body) {
+
+    const action = String(body?.admin_action ?? "").trim();
+
+    if (!ADMIN_ACTIONS.includes(action)) {
+        return { ok: false, error: `Невідома дія: ${action || "(порожня)"}` };
+    }
+
+    if (action === "list") {
+
+        const status = String(body.status ?? "").trim();
+
+        if (status && !STATUSES[status]) {
+            return { ok: false, error: `Невідомий статус: ${status}` };
+        }
+
+        return {
+            ok: true,
+            action,
+            params: {
+                status,
+                refusal: Boolean(body.refusal),
+                query: sanitizeSearch(body.query),
+                limit: clampLimit(body.limit),
+                offset: Math.max(0, Math.trunc(Number(body.offset) || 0)),
+            },
+        };
+
+    }
+
+    const id = parseOrderId(body.id);
+
+    if (!id) return { ok: false, error: "Не вказано замовлення" };
+
+    if (action === "get") return { ok: true, action, params: { id } };
+
+    if (action === "status") {
+
+        const status = String(body.status ?? "").trim();
+
+        if (!STATUSES[status]) {
+            return { ok: false, error: `Невідомий статус: ${status || "(порожній)"}` };
+        }
+
+        return { ok: true, action, params: { id, status } };
+
+    }
+
+    // tracking
+    const raw = String(body.tracking ?? "").trim();
+
+    // Порожнє значення — це «прибрати накладну». Потрібно, коли номер
+    // вписали не в те замовлення: інакше помилковий ТТН лишався б у
+    // картці клієнта назавжди.
+    if (!raw) return { ok: true, action, params: { id, tracking: null } };
+
+    const checked = validateTracking(raw);
+
+    if (!checked.ok) return { ok: false, error: trackingError(checked) };
+
+    return { ok: true, action, params: { id, tracking: checked.value } };
+
+}
+
+// -------------------------
+// Що бачить браузер
+//
+// Не сам рядок бази, а проєкція. Дві причини:
+//
+//   • у рядку є те, чому в браузері не місце: user_id клієнта,
+//     telegram_chat_id, id повідомлення бота. Замість них — ознаки
+//     «гість» і «замовляв у боті», яких достатньо менеджеру;
+//
+//   • назви полів стають контрактом. Колонку в базі можна
+//     перейменувати, не переписуючи сторінку.
+// -------------------------
+
+function orderView(order) {
+
+    const status = normalizeStatus(order?.status) || "new";
+    const meta = STATUSES[status] ?? STATUSES.new;
+
+    return {
+        id: String(order?.id ?? ""),
+        orderNumber: order?.order_number ?? "",
+        createdAt: order?.created_at ?? null,
+
+        status,
+        statusLabel: meta.label,
+        statusEmoji: meta.emoji,
+        transitions: adminTransitions(status),
+
+        items: parseItems(order?.items),
+
+        subtotal: Number(order?.subtotal) || 0,
+        discount: Number(order?.discount) || 0,
+        deliveryPrice: Number(order?.delivery_price) || 0,
+        total: Number(order?.total) || 0,
+
+        firstName: order?.first_name ?? "",
+        lastName: order?.last_name ?? "",
+        phone: order?.phone ?? "",
+        email: order?.email ?? "",
+
+        deliveryMethod: order?.delivery_method ?? "",
+        deliveryCity: order?.delivery_city ?? "",
+        deliveryDetail: order?.delivery_detail ?? "",
+        paymentMethod: order?.payment_method ?? "",
+        promoCode: order?.promo_code ?? "",
+
+        trackingNumber: order?.tracking_number ?? "",
+        trackingUrl: trackingUrl(order?.tracking_number),
+
+        // Гість — це замовлення без реєстрації. Важливо для менеджера:
+        // такому клієнту не видно історії в кабінеті, і всі уточнення
+        // йдуть телефоном.
+        guest: !order?.user_id,
+
+        // Замовляв у боті — отже, про зміну статусу він отримає
+        // повідомлення в Telegram. Для замовлень із сайту сповіщень
+        // немає, і про відправлення доводиться казати телефоном.
+        fromBot: Boolean(order?.telegram_chat_id),
+
+        refusalRequestedAt: order?.refusal_requested_at ?? null,
+    };
+
+}
+
+function refusalView(record) {
+
+    return {
+        id: String(record?.id ?? ""),
+        createdAt: record?.created_at ?? null,
+        note: record?.note ?? "",
+        items: parseItems(record?.items),
+    };
+
+}
+
+// Відповідь на list: усе, що потрібно панелі для першої ж
+// відмальовки — рядки, підписи статусів і кількості для вкладок.
+function listResponse({ orders, total, counts }) {
+
+    return {
+        ok: true,
+        statuses: STATUSES,
+        statusOrder: STATUS_ORDER,
+        counts: counts ?? {},
+        total: typeof total === "number" ? total : null,
+        orders: (orders ?? []).map(orderView),
+    };
+
+}
+
 // ======================================
 // Telegram-бот для заявок BestBrnd4u
 //
@@ -945,6 +1423,7 @@ function buildOrderRow(product, session, orderNumber) {
 // щоб її можна було запускати й тестувати в Node без Deno.
 
 
+
 const TELEGRAM_BOT_TOKEN = Deno.env.get("TELEGRAM_BOT_TOKEN") ?? "";
 const TELEGRAM_CHAT_ID = Deno.env.get("TELEGRAM_CHAT_ID") ?? "";
 
@@ -961,6 +1440,11 @@ const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 // Адреса сайту — з неї бот бере каталог і будує посилання на товар.
 // Можна перевизначити секретом SITE_URL, якщо домен зміниться.
 const SITE_URL = (Deno.env.get("SITE_URL") ?? "https://bestbrnd4u.github.io").replace(/\/$/, "");
+
+// Репозиторій сайту — за правами на нього визначається, кому можна
+// керувати замовленнями з панелі адмінки (див. verifyAdmin).
+// Перевизначається секретом ADMIN_REPO, якщо репозиторій переїде.
+const ADMIN_REPO = Deno.env.get("ADMIN_REPO") ?? "bestbrnd4u/bestbrnd4u.github.io";
 
 const TELEGRAM_API = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}`;
 
@@ -1302,13 +1786,17 @@ async function handleNewOrder(record: Record<string, any>) {
 
   const text = formatOrder(record);
 
-  await telegram("sendMessage", {
+  const sent = await telegram("sendMessage", {
     chat_id: TELEGRAM_CHAT_ID,
     text,
     parse_mode: "HTML",
     disable_web_page_preview: true,
     reply_markup: buildKeyboard(record.id, record.status ?? "new", { hasTracking: Boolean(record.tracking_number) }),
   });
+
+  // Щоб панель адмінки могла перемалювати саме цю картку, коли
+  // статус зміниться там (див. refreshOwnerCard).
+  await rememberCardMessage(record.id, sent?.result?.message_id);
 
 }
 
@@ -1355,7 +1843,7 @@ async function handleCallback(callback: Record<string, any>) {
 
     }
 
-    await telegram("sendMessage", {
+    const sent = await telegram("sendMessage", {
       chat_id: callback.message.chat.id,
       text: formatOrder(order),
       parse_mode: "HTML",
@@ -1364,6 +1852,10 @@ async function handleCallback(callback: Record<string, any>) {
         hasTracking: Boolean(order.tracking_number),
       }),
     });
+
+    // Відкрита зі списку картка стає поточною: саме її власник бачить
+    // перед собою, і саме її має перемальовувати панель адмінки.
+    await rememberCardMessage(order.id, sent?.result?.message_id);
 
     return;
 
@@ -1477,6 +1969,11 @@ async function handleCallback(callback: Record<string, any>) {
     disable_web_page_preview: true,
     reply_markup: buildKeyboard(updated.id, status, { hasTracking: Boolean(updated.tracking_number) }),
   });
+
+  // Власник щойно натиснув кнопку саме під цією карткою — отже, це
+  // вона в нього перед очима. Панель адмінки має міняти статус у ній,
+  // а не в старшому дублі з історії чату.
+  await rememberCardMessage(updated.id, callback.message.message_id);
 
   await telegram("answerCallbackQuery", {
     callback_query_id: callback.id,
@@ -1683,7 +2180,7 @@ async function findOrderByNumber(orderNumber: string) {
 
 // Зберігає накладну і повідомляє клієнта. Повертає оновлене
 // замовлення або null.
-async function applyTracking(orderId: string, tracking: string) {
+async function applyTracking(orderId: string, tracking: string | null) {
 
   const response = await supabaseRest(`orders?id=eq.${encodeURIComponent(orderId)}`, {
     method: "PATCH",
@@ -1694,9 +2191,76 @@ async function applyTracking(orderId: string, tracking: string) {
   const rows = response.ok ? await response.json() : [];
   const order = Array.isArray(rows) ? rows[0] ?? null : null;
 
-  if (order) await notifyCustomer(order, "shipped");
+  // Повідомляємо ЛИШЕ про відправлене замовлення.
+  //
+  // У боті інакше й не буває: номер просять одразу після
+  // «Відправлено». Але той самий шлях тепер має панель адмінки, де
+  // накладну можна вписати завчасно — і клієнту прилетіло б
+  // «Замовлення відправлено!» про посилку, яка ще на столі.
+  if (order && tracking && normalizeStatus(order.status) === "shipped") {
+
+    await notifyCustomer(order, "shipped");
+
+  }
 
   return order;
+
+}
+
+// -------------------------
+// Картка замовлення в Telegram
+//
+// Замовленнями керують із двох місць: кнопками в чаті й панеллю
+// адмінки. Якщо панель змінить статус, картка в чаті так і показувала
+// б старий — і, що гірше, її кнопки лишились би від старого статусу:
+// натиснувши «В обробці» під уже відправленим замовленням, власник
+// молча відкотив би зміну назад.
+//
+// Тому id повідомлення з карткою зберігається в замовленні
+// (orders.bot_message_id), і панель перемальовує ту саму картку — так
+// само, як це робить натискання кнопки.
+// -------------------------
+
+async function rememberCardMessage(orderId: unknown, messageId: unknown) {
+
+  if (!orderId || !messageId) return;
+
+  try {
+
+    const response = await supabaseRest(`orders?id=eq.${encodeURIComponent(String(orderId))}`, {
+      method: "PATCH",
+      body: JSON.stringify({ bot_message_id: messageId }),
+    });
+
+    // Найімовірніша причина — не виконана міграція 009 (немає
+    // колонки). Бот від цього не ламається: просто картку не вийде
+    // перемалювати з панелі.
+    if (!response.ok) {
+      console.error("Не вдалося запам'ятати картку замовлення:", await response.text());
+    }
+
+  } catch (error) {
+
+    console.error("Не вдалося запам'ятати картку замовлення:", error);
+
+  }
+
+}
+
+async function refreshOwnerCard(order: Record<string, any> | null) {
+
+  if (!order || !order.bot_message_id || !TELEGRAM_CHAT_ID) return;
+
+  await telegram("editMessageText", {
+    chat_id: TELEGRAM_CHAT_ID,
+    message_id: order.bot_message_id,
+    text: formatOrder(order),
+    parse_mode: "HTML",
+    disable_web_page_preview: true,
+    reply_markup: buildKeyboard(order.id, order.status ?? "new", {
+      hasTracking: Boolean(order.tracking_number),
+    }),
+  });
 
 }
 
@@ -2163,6 +2727,264 @@ async function handleOrderCallback(callback: Record<string, any>, data: string) 
 
 }
 
+// ======================================
+// Панель «Замовлення» в адмінці
+//
+// ХТО МАЄ ПРАВО
+// --------------
+// Замовлення — це телефони, адреси й суми, тож питання «хто це
+// питає» тут головне. Своїх паролів панель не заводить: вона
+// надсилає токен GitHub, під яким людина вже зайшла в адмінку, а
+// функція питає в GitHub, чи має цей токен право ЗАПИСУ в
+// репозиторій сайту.
+//
+// Чому саме так:
+//
+//   • право писати в репозиторій = право змінити будь-яку сторінку
+//     сайту. Хто його має — уже має все; окремий пароль до
+//     замовлень нічого не додав би, зате був би ще одним секретом,
+//     який можна забути й загубити;
+//
+//   • нікого не треба заводити окремо. Дали колезі доступ до
+//     репозиторію (admin/access.html) — він одразу бачить і
+//     замовлення. Забрали — доступ зникає сам;
+//
+//   • у браузері не лежить нічого нового. Токен там уже є — його
+//     зберігає сама Decap CMS, інакше вона не змогла б комітити.
+//
+// Права перевіряються в GitHub, а не тут: підробити відповідь
+// api.github.com неможливо, а «список дозволених логінів» у коді
+// функції розійшовся б із реальними доступами до репозиторію.
+// ======================================
+
+// Відповідь GitHub кешуємо на кілька хвилин: інакше кожен клік у
+// панелі — це зайвий похід в api.github.com.
+//
+// Ключ — не сам токен, а його відпечаток: тримати в довгоживучій
+// структурі значення, яким можна писати в репозиторій, не варто.
+const ADMIN_TOKEN_TTL_MS = 5 * 60 * 1000;
+const adminTokens = new Map<string, number>();
+
+async function fingerprint(token: string): Promise<string> {
+
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(token));
+
+  return Array.from(new Uint8Array(digest))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+
+}
+
+async function verifyAdmin(token: string): Promise<boolean> {
+
+  if (!token) return false;
+
+  const key = await fingerprint(token);
+  const until = adminTokens.get(key);
+
+  if (until && until > Date.now()) return true;
+
+  // Прибираємо протерміноване, щоб карта не росла без межі —
+  // ізолят функції живе довго.
+  if (adminTokens.size > 50) {
+
+    for (const [entry, expires] of adminTokens) {
+      if (expires <= Date.now()) adminTokens.delete(entry);
+    }
+
+  }
+
+  const response = await fetch(`https://api.github.com/repos/${ADMIN_REPO}`, {
+    headers: {
+      Authorization: `token ${token}`,
+      Accept: "application/vnd.github+json",
+      "User-Agent": "bestbrnd4u-admin-orders",
+    },
+  });
+
+  if (!response.ok) {
+
+    console.error("GitHub не підтвердив доступ:", response.status);
+
+    return false;
+
+  }
+
+  const repo = await response.json();
+
+  // push — це саме право записувати. Одного лише доступу на читання
+  // (публічний репозиторій видно всім) недостатньо: інакше будь-хто
+  // з токеном GitHub читав би замовлення.
+  const allowed = Boolean(repo?.permissions?.push);
+
+  if (allowed) adminTokens.set(key, Date.now() + ADMIN_TOKEN_TTL_MS);
+
+  return allowed;
+
+}
+
+function adminJson(payload: unknown, status: number, origin: string | null) {
+
+  return new Response(JSON.stringify(payload), {
+    status,
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      ...corsHeaders(origin),
+    },
+  });
+
+}
+
+// Скільки замовлень у кожній вкладці. Рядки не потрібні — лише
+// число з Content-Range, тож просимо один рядок і читаємо заголовок.
+async function countOrders(params: Record<string, unknown>): Promise<number | null> {
+
+  const response = await supabaseRest(buildCountQuery(params), {
+    headers: { Prefer: "count=exact" },
+  });
+
+  if (!response.ok) return null;
+
+  // тіло треба прочитати, інакше зʼєднання лишиться відкритим
+  await response.text();
+
+  return parseTotal(response.headers.get("content-range"));
+
+}
+
+async function adminCounts(): Promise<Record<string, number | null>> {
+
+  const keys = [...STATUS_ORDER, "refusal"];
+
+  const values = await Promise.all([
+    ...STATUS_ORDER.map((status: string) => countOrders({ status })),
+    countOrders({ refusal: true }),
+  ]);
+
+  const counts: Record<string, number | null> = {};
+
+  keys.forEach((key: string, index: number) => { counts[key] = values[index]; });
+
+  return counts;
+
+}
+
+async function handleAdmin(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  // Перевірка доступу — ПЕРЕД усім іншим. Жоден запит без
+  // підтверджених прав не доходить до бази.
+  const token = request.headers.get(ADMIN_TOKEN_HEADER) ?? "";
+
+  if (!await verifyAdmin(token)) {
+
+    return adminJson({
+      ok: false,
+      error: "Немає доступу до замовлень. Потрібне право запису в репозиторій сайту.",
+    }, 403, origin);
+
+  }
+
+  const parsed = parseAdminRequest(body);
+
+  if (!parsed.ok) return adminJson({ ok: false, error: parsed.error }, 400, origin);
+
+  const { action, params } = parsed;
+
+  if (action === "list") {
+
+    const response = await supabaseRest(buildListQuery(params), {
+      headers: { Prefer: "count=exact" },
+    });
+
+    if (!response.ok) {
+
+      console.error("Не вдалося отримати замовлення:", await response.text());
+
+      return adminJson({ ok: false, error: "База не віддала замовлення." }, 502, origin);
+
+    }
+
+    const rows = await response.json();
+
+    return adminJson(listResponse({
+      orders: Array.isArray(rows) ? rows : [],
+      total: parseTotal(response.headers.get("content-range")),
+      counts: await adminCounts(),
+    }), 200, origin);
+
+  }
+
+  if (action === "get") {
+
+    const order = await findOrderById(params.id);
+
+    if (!order) return adminJson({ ok: false, error: "Замовлення не знайдено." }, 404, origin);
+
+    const refusals = await supabaseRest(buildRefusalsQuery(params.id));
+
+    const rows = refusals.ok ? await refusals.json() : [];
+
+    return adminJson({
+      ok: true,
+      order: orderView(order),
+      refusals: (Array.isArray(rows) ? rows : []).map(refusalView),
+    }, 200, origin);
+
+  }
+
+  if (action === "status") {
+
+    const current = await findOrderById(params.id);
+
+    if (!current) return adminJson({ ok: false, error: "Замовлення не знайдено." }, 404, origin);
+
+    // Звіряємось із базою, а не з тим, що показує сторінка. Статус
+    // могли змінити кнопкою в Telegram хвилину тому — тоді відкритий
+    // список уже застарілий, і його кнопка означала б перехід, якого
+    // з поточного статусу робити не можна.
+    if (!adminTransitions(current.status).includes(params.status)) {
+
+      return adminJson({
+        ok: false,
+        error: `Замовлення вже «${(STATUSES[normalizeStatus(current.status)] ?? STATUSES.new).label}» — цей перехід недоступний.`,
+        order: orderView(current),
+      }, 409, origin);
+
+    }
+
+    const updated = await updateOrderStatus(params.id, params.status);
+
+    if (!updated) {
+      return adminJson({ ok: false, error: "Не вдалося оновити статус." }, 502, origin);
+    }
+
+    // Далі — рівно те саме, що робить кнопка в Telegram: сповіщення
+    // клієнту й перемальовка картки власника. Керування з панелі не
+    // має відрізнятись від керування з чату нічим, крім місця
+    // натискання.
+    await notifyCustomer(updated, params.status);
+
+    await refreshOwnerCard(updated);
+
+    return adminJson({ ok: true, order: orderView(updated) }, 200, origin);
+
+  }
+
+  // tracking
+  const updated = await applyTracking(params.id, params.tracking);
+
+  if (!updated) {
+    return adminJson({ ok: false, error: "Не вдалося зберегти накладну." }, 502, origin);
+  }
+
+  await refreshOwnerCard(updated);
+
+  return adminJson({ ok: true, order: orderView(updated) }, 200, origin);
+
+}
+
 // -------------------------
 // Точка входу
 // -------------------------
@@ -2183,15 +3005,26 @@ Deno.serve(async (request) => {
 
 async function handleRequest(request: Request): Promise<Response> {
 
+  const origin = request.headers.get("origin");
+
+  // Запит-дозвіл від браузера (CORS preflight). Панель адмінки живе
+  // на домені сайту, функція — на supabase.co, тож браузер спершу
+  // питає, чи можна взагалі звертатись. Без цієї відповіді панель не
+  // отримає ані байта — і, що підступніше, у логах функції не буде
+  // жодного сліду: preflight до коду просто не дійшов би.
+  if (request.method === "OPTIONS") {
+
+    return new Response(null, {
+      status: isAllowedOrigin(origin) ? 204 : 403,
+      headers: corsHeaders(origin),
+    });
+
+  }
+
   // GET — проста перевірка «чи жива функція»: відкрийте URL функції
   // в браузері, має показати ok. Якщо висить — функція не стартує.
   if (request.method !== "POST") {
     return new Response("ok", { status: 200 });
-  }
-
-  if (!TELEGRAM_BOT_TOKEN) {
-    console.error("TELEGRAM_BOT_TOKEN не заданий");
-    return new Response("misconfigured", { status: 500 });
   }
 
   let body: Record<string, any>;
@@ -2200,6 +3033,30 @@ async function handleRequest(request: Request): Promise<Response> {
     body = await request.json();
   } catch {
     return new Response("bad request", { status: 400 });
+  }
+
+  // --- запит від панелі «Замовлення» в адмінці ---
+  //
+  // Розпізнаємо за власним полем admin_action. Ні Telegram, ні
+  // Database Webhook такого не надсилають, тож переплутати не можна.
+  //
+  // Стоїть ПЕРШИМ: далі йдуть перевірки секретів, які до панелі не
+  // стосуються — вона підтверджує права своїм способом (verifyAdmin).
+  if (typeof body.admin_action !== "undefined") {
+
+    return await handleAdmin(request, body);
+
+  }
+
+  // Перевірка нижче — саме для Telegram. Панель до неї не доходить
+  // навмисно: без токена бота вона все одно вміє показувати
+  // замовлення й міняти статуси, просто не надішле сповіщень. А ще
+  // ця відповідь пішла б без заголовків CORS — і замість зрозумілого
+  // «не заданий токен» браузер показав би панелі невиразну помилку
+  // мережі.
+  if (!TELEGRAM_BOT_TOKEN) {
+    console.error("TELEGRAM_BOT_TOKEN не заданий");
+    return new Response("misconfigured", { status: 500 });
   }
 
   // --- запит від Telegram ---

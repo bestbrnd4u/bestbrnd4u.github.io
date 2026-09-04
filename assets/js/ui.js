@@ -347,11 +347,81 @@ function initProductCarousels(root) {
 // рядок. Разом із ним прибрано .product-color-name зі style.css і
 // оновлення підпису в обробнику свотча (common.js).
 
-function createProductCard(product) {
+// Стовпчик позначок і рядок ціни — окремими функціями.
+//
+// ЧОМУ. Ту саму розмітку тепер треба зібрати не один раз, а на кожен
+// колір: коли колір перевизначає ціну або позначку, перемикач кольору
+// на картці мусить підставити готове. Якби перемикач збирав розмітку
+// сам, з'явилася б друга копія правил про відсоток знижки й «під
+// замовлення» — і вона рано чи пізно розійшлася б із першою.
+//
+// Це вже одного разу сталося саме тут: слайд фото в перемикачі кольору
+// збирався власною копією й розійшовся з карткою — зникало кадрування
+// (див. коментар біля cardPhotoSlide нижче). Тому одне джерело.
+
+function cardBadgeStack(product) {
 
     const badge = product.badge
         ? `<div class="badge">${product.badge}</div>`
         : "";
+
+    const discount = product.oldPrice
+        ? Math.round((1 - product.price / product.oldPrice) * 100)
+        : 0;
+
+    // Відсоток знижки — ЛИШЕ тут, у стовпчику позначок. Унизу картки
+    // поруч із закресленою ціною його немає: рядок ціни не вміщався в
+    // один рядок на вузьких картках каталогу.
+    const discountBadge = discount > 0
+        ? `<div class="badge badge-discount">-${discount}%</div>`
+        : "";
+
+    const preOrderBadge = product.preOrder
+        ? `<div class="badge badge-preorder"><span class="badge-preorder-icon">📦</span><span class="badge-preorder-text">Під замовлення</span></div>`
+        : "";
+
+    return `${badge}${discountBadge}${preOrderBadge}`;
+
+}
+
+function cardPriceHtml(product) {
+
+    const oldPrice = product.oldPrice
+        ? `<span class="old-price">${formatPrice(product.oldPrice)}</span>`
+        : "";
+
+    return `<span class="price">${formatPrice(product.price)}</span>${oldPrice}`;
+
+}
+
+// Готовий вигляд картки в одному кольорі — для перемикача кольору.
+//
+// Імʼя навмисно НЕ cardColorView: test-promo-color-cards стежить, щоб
+// розмітка свотчів не залежала від product.cardColor, і робить це
+// пошуком підрядка «cardColor». Функція з такою назвою давала б
+// фальшиве спрацювання, а сторожа ослаблювати не варто — він ловить
+// справжню помилку (свотчі мусять малюватись з УСІХ варіантів).
+//
+// Відштовхуємось від baseProduct(), а не від того, що показано на
+// картці: розділена картка вже несе значення свого кольору, і накладати
+// на них інший колір означало б змішати два.
+function swatchColorView(product, variant) {
+
+    const view = applyColorOverrides(baseProduct(product), variant);
+
+    return {
+        title: view.title || "",
+        // Посилання теж своє: воно несе ?color=, тож при перемиканні
+        // кольору на картці назва мусить вести саме в цей колір.
+        href: productUrl(view, { color: variant.color }),
+        price: cardPriceHtml(view),
+        badges: cardBadgeStack(view),
+        description: view.description || ""
+    };
+
+}
+
+function createProductCard(product) {
 
     const variants = product.variants?.length
         ? product.variants
@@ -367,19 +437,17 @@ function createProductCard(product) {
 
     const brand = product.brand || "Без бренду";
 
-    const oldPrice = product.oldPrice
-        ? `<span class="old-price">${formatPrice(product.oldPrice)}</span>`
-        : "";
-
-    const discount = product.oldPrice
-        ? Math.round((1 - product.price / product.oldPrice) * 100)
-        : 0;
 
     // показуємо розміри ПЕРШОГО кольору (він активний за
     // замовчуванням); при перемиканні кольору список оновлює
     // обробник у common.js за data-sizes
     const firstVariantSizes = getVariantSizes(product, variants[0]);
     const sizes = firstVariantSizes.length ? firstVariantSizes : PRODUCT_SIZES;
+
+    // data-view ставимо на свотчі ЛИШЕ коли хоч один колір щось
+    // перевизначає. Інакше атрибут висів би в кожній картці каталогу
+    // з розміткою, яка нічого не змінює.
+    const swatchColorViews = variants.some(v => Object.keys(colorOverrides(product, v)).length);
 
     const colorButtons = variants.map((variant, index) => `
         <button
@@ -388,6 +456,7 @@ function createProductCard(product) {
             data-color="${escapeHtml(variant.color)}"
             data-images='${escapeAttrSingleQuoted(JSON.stringify(variant.images || []))}'
             data-sizes='${escapeAttrSingleQuoted(JSON.stringify(getVariantSizes(product, variant)))}'
+            ${swatchColorViews ? `data-view='${escapeAttrSingleQuoted(JSON.stringify(swatchColorView(product, variant)))}'` : ""}
             title="${escapeHtml(variant.color)}"
             style="background:${escapeHtml(variant.hex)}"></button>
     `).join("");
@@ -400,26 +469,11 @@ function createProductCard(product) {
         </button>
     `).join("");
 
-    // Бейдж знижки у стовпчику бейджів (під NEW/TOP). Відсоток
-    // показуємо ЛИШЕ тут: унизу картки поруч із закресленою ціною
-    // його більше немає — інакше рядок ціни не вміщався в один
-    // рядок на вузьких картках каталогу.
-    const discountBadge = discount > 0
-        ? `<div class="badge badge-discount">-${discount}%</div>`
-        : "";
-
-    const preOrderBadge = product.preOrder
-        ? `<div class="badge badge-preorder"><span class="badge-preorder-icon">📦</span><span class="badge-preorder-text">Під замовлення</span></div>`
-        : "";
 
     return `
         <div class="product-card" data-id="${product.id}"${cardFramingAttr(product)}>
             <div class="product-image">
-                <div class="badge-stack">
-                    ${badge}
-                    ${discountBadge}
-                    ${preOrderBadge}
-                </div>
+                <div class="badge-stack">${cardBadgeStack(product)}</div>
                 <button
                     class="favorite"
                     data-id="${product.id}"
@@ -502,8 +556,7 @@ function createProductCard(product) {
                 </div>
                 <div class="product-meta-row">
                     <div class="product-price">
-                        <span class="price">${formatPrice(product.price)}</span>
-                        ${oldPrice}
+                        ${cardPriceHtml(product)}
                     </div>
                     <div class="product-options">
                         <div class="product-colors-wrap">
