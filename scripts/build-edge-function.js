@@ -20,24 +20,27 @@ const path = require("path");
 
 const DIR = path.join(__dirname, "..", "supabase", "functions", "telegram-order-bot");
 
-const FORMAT = path.join(DIR, "format.js");
-const FLOW = path.join(DIR, "order-flow.js");
-const SOURCE = path.join(DIR, "_index.src.ts");
 const OUTPUT = path.join(DIR, "index.ts");
+const SOURCE = path.join(DIR, "_index.src.ts");
+
+// Чисті модулі, які вклеюються у зібраний файл. Порядок — той, у
+// якому їх зручно читати; на роботу він не впливає, бо всередині
+// лише оголошення.
+const MODULES = ["format.js", "order-flow.js", "admin-api.js"];
 
 function build() {
 
-    const format = fs.readFileSync(FORMAT, "utf8");
-    const flow = fs.readFileSync(FLOW, "utf8");
     const source = fs.readFileSync(SOURCE, "utf8");
 
     // прибираємо ключове слово export — усе стає локальним у межах
     // одного файлу
-    // order-flow.js імпортує з format.js — у зібраному файлі все
-    // лежить поруч, тож і цей імпорт прибираємо
-    const inlined = [format, flow]
+    // модулі імпортують один з одного (order-flow.js і admin-api.js
+    // беруть спільне з format.js) — у зібраному файлі все лежить
+    // поруч, тож і ці імпорти прибираємо
+    const inlined = MODULES
+        .map(name => fs.readFileSync(path.join(DIR, name), "utf8"))
         .map(src => src.replace(/^export\s+/gm, ""))
-        .map(src => src.replace(/^import\s*\{[\s\S]*?\}\s*from\s*["']\.\/[^"']+["'];?\s*$/m, ""))
+        .map(src => src.replace(/^import\s*\{[\s\S]*?\}\s*from\s*["']\.\/[^"']+["'];?\s*$/gm, ""))
         .join("\n\n");
 
     // прибираємо рядок імпорту: те, що він імпортував, тепер лежить
@@ -55,6 +58,7 @@ function build() {
         "// Джерела:",
         "//   supabase/functions/telegram-order-bot/format.js      (картка замовлення)",
         "//   supabase/functions/telegram-order-bot/order-flow.js  (діалог оформлення)",
+        "//   supabase/functions/telegram-order-bot/admin-api.js   (панель замовлень в адмінці)",
         "//   supabase/functions/telegram-order-bot/_index.src.ts  (мережа й база)",
         "//",
         "// Перезібрати:  node scripts/build-edge-function.js",

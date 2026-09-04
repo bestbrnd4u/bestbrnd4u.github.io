@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex" />
+<title>BestBrnd4u — Замовлення</title>
+<link rel="icon" href="../assets/images/favicon.png">
+<style>
+
+    *{ box-sizing:border-box; }
+
+    body{
+        margin:0;
+        font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+        background:#f8fafc;
+        color:#111827;
+        line-height:1.55;
+    }
+
+    .wrap{
+        max-width:1180px;
+        margin:0 auto;
+        padding:28px 20px 80px;
+    }
+
+    a.back{
+        display:inline-flex;
+        align-items:center;
+        gap:6px;
+        color:#2563eb;
+        text-decoration:none;
+        font-weight:600;
+        font-size:14px;
+        margin-bottom:16px;
+    }
+
+    h1{
+        font-size:26px;
+        margin:0 0 4px;
+    }
+
+    .lead{
+        color:#4b5563;
+        margin:0 0 22px;
+        font-size:14px;
+    }
+
+    /* -------- загальні дрібниці -------- */
+
+    .btn{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:7px;
+        background:#2563eb;
+        color:#fff;
+        border:none;
+        padding:10px 18px;
+        border-radius:10px;
+        font:600 14px/1.2 inherit;
+        cursor:pointer;
+        text-decoration:none;
+        transition:background 160ms ease, transform 160ms ease;
+    }
+
+    .btn-ghost{
+        background:#fff;
+        color:#111827;
+        border:1px solid #e5e7eb;
+    }
+
+    .btn-danger{ background:#dc2626; }
+
+    .btn:disabled{
+        background:#cbd5e1;
+        color:#f8fafc;
+        cursor:not-allowed;
+    }
+
+    .btn-ghost:disabled{
+        background:#f3f4f6;
+        color:#9ca3af;
+        border-color:#e5e7eb;
+    }
+
+    @media (hover:hover) and (pointer:fine){
+        .btn:hover:not(:disabled){ background:#1d4ed8; }
+        .btn-ghost:hover:not(:disabled){ background:#f9fafb; }
+        .btn-danger:hover:not(:disabled){ background:#b91c1c; }
+    }
+
+    .btn:active:not(:disabled){
+        transform:scale(.97);
+        transition-duration:110ms;
+    }
+
+    .muted{ color:#6b7280; }
+
+    /* -------- вхід -------- */
+
+    .gate{
+        background:#fff;
+        border-radius:16px;
+        box-shadow:0 8px 24px rgba(0,0,0,.06);
+        padding:28px 26px;
+        max-width:560px;
+    }
+
+    .gate h2{ font-size:17px; margin:0 0 8px; }
+    .gate p{ color:#4b5563; font-size:14px; margin:0 0 18px; }
+
+    /* -------- панель інструментів -------- */
+
+    .toolbar{
+        display:flex;
+        gap:10px;
+        align-items:center;
+        flex-wrap:wrap;
+        margin-bottom:14px;
+    }
+
+    .search{
+        flex:1 1 260px;
+        min-width:0;
+        position:relative;
+    }
+
+    .search input{
+        width:100%;
+        padding:11px 14px 11px 38px;
+        border:1px solid #e5e7eb;
+        border-radius:10px;
+        font:14px/1.2 inherit;
+        background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-4-4'/%3E%3C/svg%3E") no-repeat 12px center;
+        background-size:16px;
+        transition:border-color 160ms ease, box-shadow 160ms ease;
+    }
+
+    .search input:focus{
+        outline:none;
+        border-color:#2563eb;
+        box-shadow:0 0 0 3px rgba(37,99,235,.14);
+    }
+
+    .tabs{
+        display:flex;
+        gap:8px;
+        flex-wrap:wrap;
+        margin-bottom:16px;
+    }
+
+    .tab{
+        border:1px solid #e5e7eb;
+        background:#fff;
+        color:#374151;
+        border-radius:999px;
+        padding:7px 14px;
+        font:600 13px/1.2 inherit;
+        cursor:pointer;
+        display:inline-flex;
+        align-items:center;
+        gap:7px;
+        transition:background 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
+    }
+
+    @media (hover:hover) and (pointer:fine){
+        .tab:hover{ background:#f9fafb; }
+    }
+
+    .tab:active{
+        transform:scale(.96);
+        transition-duration:110ms;
+    }
+
+    .tab[aria-selected="true"]{
+        background:#111827;
+        border-color:#111827;
+        color:#fff;
+    }
+
+    .tab .count{
+        font-size:11.5px;
+        font-weight:700;
+        padding:1px 7px;
+        border-radius:999px;
+        background:#f3f4f6;
+        color:#374151;
+    }
+
+    .tab[aria-selected="true"] .count{
+        background:rgba(255,255,255,.22);
+        color:#fff;
+    }
+
+    /* -------- сітка «список + картка» -------- */
+
+    .layout{
+        display:grid;
+        grid-template-columns:minmax(0,380px) minmax(0,1fr);
+        gap:18px;
+        align-items:start;
+    }
+
+    .list{
+        background:#fff;
+        border-radius:14px;
+        box-shadow:0 6px 20px rgba(0,0,0,.05);
+        overflow:hidden;
+    }
+
+    .row{
+        display:block;
+        width:100%;
+        text-align:left;
+        border:0;
+        border-top:1px solid #f3f4f6;
+        background:#fff;
+        padding:13px 15px 13px 18px;
+        cursor:pointer;
+        font:inherit;
+        position:relative;
+        transition:background 160ms ease;
+    }
+
+    .row:first-child{ border-top:0; }
+
+    @media (hover:hover) and (pointer:fine){
+        .row:hover{ background:#f9fafb; }
+    }
+
+    .row[aria-current="true"]{ background:#eff6ff; }
+
+    /* Смужка статусу ліворуч: у списку з тридцяти рядків колір
+       читається швидше за підпис. */
+    .row::before{
+        content:"";
+        position:absolute;
+        left:0; top:0; bottom:0;
+        width:4px;
+        background:var(--status-color,#e5e7eb);
+    }
+
+    .row-top{
+        display:flex;
+        justify-content:space-between;
+        gap:10px;
+        align-items:baseline;
+    }
+
+    .row-number{ font-weight:700; font-size:14.5px; }
+    .row-total{ font-weight:700; font-size:14px; white-space:nowrap; }
+
+    .row-line{
+        font-size:13px;
+        color:#4b5563;
+        overflow:hidden;
+        text-overflow:ellipsis;
+        white-space:nowrap;
+    }
+
+    .row-marks{
+        display:flex;
+        gap:6px;
+        flex-wrap:wrap;
+        align-items:center;
+        margin-top:6px;
+    }
+
+    .row-date{ font-size:12px; color:#6b7280; }
+
+    .pill{
+        font:600 11px/1.5 inherit;
+        padding:1px 8px;
+        border-radius:999px;
+        background:#f3f4f6;
+        color:#374151;
+        white-space:nowrap;
+    }
+
+    .pill-status{ color:#fff; background:var(--status-color,#6b7280); }
+    .pill-warn{ background:#fef3c7; color:#92400e; }
+    .pill-alarm{ background:#fee2e2; color:#991b1b; }
+
+    /* -------- картка замовлення -------- */
+
+    .detail{
+        background:#fff;
+        border-radius:14px;
+        box-shadow:0 6px 20px rgba(0,0,0,.05);
+        padding:20px 22px;
+        min-height:220px;
+    }
+
+    .detail h2{
+        font-size:19px;
+        margin:0;
+        display:flex;
+        align-items:center;
+        gap:10px;
+        flex-wrap:wrap;
+    }
+
+    .detail-date{ font-size:13px; color:#6b7280; margin:2px 0 16px; }
+
+    .actions{
+        display:flex;
+        gap:8px;
+        flex-wrap:wrap;
+        padding:14px 0;
+        border-top:1px solid #f3f4f6;
+        border-bottom:1px solid #f3f4f6;
+        margin-bottom:16px;
+    }
+
+    .section{ margin-bottom:16px; }
+
+    .section h3{
+        font-size:12px;
+        text-transform:uppercase;
+        letter-spacing:.05em;
+        color:#6b7280;
+        margin:0 0 8px;
+    }
+
+    .item{
+        display:flex;
+        justify-content:space-between;
+        gap:12px;
+        padding:8px 0;
+        border-bottom:1px solid #f9fafb;
+        font-size:14px;
+    }
+
+    .item:last-child{ border-bottom:0; }
+    .item-variant{ font-size:12.5px; color:#6b7280; }
+    .item-sum{ white-space:nowrap; font-weight:600; }
+
+    .facts{
+        display:grid;
+        grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+        gap:10px 22px;
+        font-size:14px;
+    }
+
+    .fact-label{ font-size:12px; color:#6b7280; }
+    .fact-value{ word-break:break-word; }
+    .fact-value a{ color:#2563eb; }
+
+    .totals{
+        font-size:14px;
+        max-width:320px;
+    }
+
+    .totals div{
+        display:flex;
+        justify-content:space-between;
+        gap:12px;
+        padding:3px 0;
+    }
+
+    .totals .grand{
+        font-weight:700;
+        font-size:16px;
+        border-top:1px solid #e5e7eb;
+        margin-top:5px;
+        padding-top:7px;
+    }
+
+    .ttn{
+        display:flex;
+        gap:8px;
+        flex-wrap:wrap;
+        align-items:center;
+    }
+
+    .ttn input{
+        flex:1 1 190px;
+        min-width:0;
+        padding:9px 12px;
+        border:1px solid #e5e7eb;
+        border-radius:10px;
+        font:14px/1.2 inherit;
+        transition:border-color 160ms ease, box-shadow 160ms ease;
+    }
+
+    .ttn input:focus{
+        outline:none;
+        border-color:#2563eb;
+        box-shadow:0 0 0 3px rgba(37,99,235,.14);
+    }
+
+    .note{
+        background:#fef3c7;
+        border-radius:10px;
+        padding:12px 14px;
+        font-size:13.5px;
+        color:#78350f;
+        margin-bottom:16px;
+    }
+
+    .note-alarm{ background:#fee2e2; color:#7f1d1d; }
+    .note strong{ display:block; margin-bottom:4px; }
+
+    .msg{
+        border-radius:10px;
+        padding:11px 14px;
+        font-size:13.5px;
+        margin-bottom:14px;
+    }
+
+    .msg-error{ background:#fee2e2; color:#991b1b; }
+    .msg-ok{ background:#dcfce7; color:#166534; }
+
+    .empty{
+        padding:34px 20px;
+        text-align:center;
+        color:#6b7280;
+        font-size:14px;
+    }
+
+    .pager{
+        display:flex;
+        gap:10px;
+        align-items:center;
+        justify-content:center;
+        margin-top:14px;
+        font-size:13.5px;
+        color:#4b5563;
+    }
+
+    .pager .btn{ padding:8px 12px; }
+
+    /* Кнопка «назад до списку» потрібна лише на вузькому екрані,
+       де список і картка не вміщаються поруч. */
+    .to-list{ display:none; }
+
+    @media (max-width:860px){
+
+        .layout{ grid-template-columns:minmax(0,1fr); }
+
+        .to-list{ display:inline-flex; margin-bottom:14px; }
+
+        /* На телефоні показуємо або список, або картку — інакше
+           доведеться гортати весь список, щоб дійти до картки. */
+        body.detail-open .list-col,
+        body.detail-open .tabs,
+        body.detail-open .toolbar{ display:none; }
+
+        body:not(.detail-open) .detail{ display:none; }
+
+    }
+
+    @media (prefers-reduced-motion:reduce){
+        *{ transition-duration:1ms !important; }
+    }
+
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+    <a class="back" href="index.html">← В адмінку</a>
+
+    <h1>Замовлення</h1>
+    <p class="lead">
+        Те саме, що кнопками в Telegram: статус, накладна, склад замовлення й контакти —
+        але з пошуком по всіх замовленнях і з компʼютера. Бот працює як раніше:
+        сповіщення про нові замовлення приходять у чат, а зміна статусу тут
+        одразу перемальовує там картку.
+    </p>
+
+    <!-- Поки не відомо, чим усе закінчиться, сторінка інакше стояла б
+         порожньою: і панель, і блок входу приховані, а перша відповідь
+         включає похід функції в GitHub за правами. -->
+    <p class="muted" id="boot">Завантажую замовлення…</p>
+
+    <!-- Доступ. Панель нічого не показує, поки GitHub не підтвердить
+         право запису в репозиторій сайту. -->
+    <div class="gate" id="gate" hidden>
+        <h2 id="gateTitle">Потрібен вхід через GitHub</h2>
+        <p id="gateText">
+            Замовлення показуються тим, хто має право змінювати сайт. Це той самий
+            вхід, що й в адмінці, — окремого пароля немає.
+        </p>
+        <button class="btn" id="gateBtn">Увійти через GitHub</button>
+    </div>
+
+    <div id="panel" hidden>
+
+        <div class="toolbar">
+            <div class="search">
+                <input id="search" type="search" autocomplete="off"
+                       placeholder="Номер замовлення, телефон, імʼя, ТТН…"
+                       aria-label="Пошук замовлення">
+            </div>
+            <button class="btn btn-ghost" id="refreshBtn">↻ Оновити</button>
+        </div>
+
+        <div class="tabs" id="tabs" role="tablist"></div>
+
+        <div id="listMsg"></div>
+
+        <div class="layout">
+
+            <div class="list-col">
+                <div class="list" id="list" role="list"></div>
+                <div class="pager" id="pager"></div>
+            </div>
+
+            <div class="detail" id="detail">
+                <div class="empty">Оберіть замовлення зі списку.</div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="github-publish.js"></script>
+<script src="orders.js"></script>
+
+</body>
+</html>
