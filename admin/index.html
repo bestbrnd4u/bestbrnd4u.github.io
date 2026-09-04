@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"287afbe3","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"20bbd7bb","data/image-variants.json":"5d9b13ee","data/products.json":"57f0d993","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"287afbe3","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"20bbd7bb","data/image-variants.json":"5d9b13ee","data/products.json":"fcd5473f","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BestBrnd4u — Адмінка</title>
@@ -218,6 +218,14 @@
     <script src="../assets/js/text-styles.js?v=7dc05c7d"></script>
 
     <script src="size-widget.js?v=460176d3"></script>
+
+    <!-- Пошук товару за артикулом у списку «Товари».
+         Вбудований пошук Decap короткі номери не знаходить у принципі:
+         він відкидає все, що набрало ≤5 балів нечіткого зіставлення, а
+         запит із двох символів більше 4 набрати не може. Подробиці й
+         виміри — у самому файлі. ПІСЛЯ catalog-tree.js: список товарів
+         бере звідти. -->
+    <script src="article-search.js?v=b54bfed0"></script>
 
     <!-- Свій вибір товарів: стандартний relation шукає підпослідовністю
          і на «coach» видавав Armani/Marc Jacobs/Michael Kors -->
