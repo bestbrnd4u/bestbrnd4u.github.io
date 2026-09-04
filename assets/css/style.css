@@ -11474,7 +11474,11 @@ summary:focus-visible,
     color:#b45309;
 }
 
-.order-item-refuse-done{
+/* «Відмову надіслано» і «замовлення скасовано» — два різні факти, але
+   одна роль: спокійний підпис на місці кнопки. Спільне правило, щоб
+   вони не почали виглядати по-різному. */
+.order-item-refuse-done,
+.order-item-refuse-void{
     display:inline-block;
     margin-top:6px;
     font-size:13px;
