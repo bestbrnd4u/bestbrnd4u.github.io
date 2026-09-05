@@ -91,7 +91,8 @@ jobs:
       - name: Порахувати, що списати
         id: plan
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          # Один секрет. Адресу проєкту крок бере з коду сайту — вона
+          # й так відкрита, інакше браузер не зміг би до неї звертатись.
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           node scripts/apply-order-stock.js --plan-out="$RUNNER_TEMP/plan.json"
@@ -175,7 +176,6 @@ jobs:
       - name: Позначити замовлення врахованими
         if: steps.plan.outputs.has == 'true'
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: node scripts/apply-order-stock.js --plan-in="$RUNNER_TEMP/plan.json" --mark
 
