@@ -31,6 +31,12 @@
 // скасування скасують (у панелі адмінки таке можна), товар спишеться
 // знову.
 //
+// ВІД ЯКОЇ ДАТИ
+// --------------
+// Тільки замовлення, зроблені ПІСЛЯ появи залишків (STOCK_SINCE):
+// у проставлених числах усе давніше вже враховано. Перевизначається
+// змінною середовища, якщо колись знадобиться перерахувати інакше.
+//
 // ЗАПУСК
 //   node scripts/apply-order-stock.js                     звіт, нічого не пише
 //   node scripts/apply-order-stock.js --apply             змінює data/products/*.json
@@ -87,6 +93,23 @@ function supabaseUrl() {
     return found ? found[1] : "";
 
 }
+
+// ЗВІДКИ ПОЧИНАЄМО РАХУВАТИ
+//
+// Залишки з'явились 5 вересня 2026-го: тоді кожному товару проставили,
+// скільки його є НА ТОЙ МОМЕНТ. Усе, що замовили раніше, у цих числах
+// уже враховано — власник рахував те, що лежить на полиці, а не те, що
+// колись було.
+//
+// Перший же запуск це й показав: у таблиці замовлень лежить уся
+// історія магазину, включно з тестами часів демо-каталогу («Urban
+// Sneakers», «Metropolis Mini»). Крок чесно взявся списувати їх усі —
+// і 12 товарів пішли в нуль за продажі, яких сьогодні вже немає.
+//
+// Тому все, що старше за цю мітку, крок не чіпає взагалі: ні списує,
+// ні позначає. Скасування такого замовлення теж нічого не поверне — і
+// це правильно, бо його одиниці ніколи не були зайняті.
+const STOCK_SINCE = process.env.STOCK_SINCE || "2026-09-05T17:35:47Z";
 
 // Скасоване замовлення нічого не займає. Ключі статусів — ті самі, що
 // в боті й у кабінеті (supabase/functions/telegram-order-bot/format.js).
@@ -286,6 +309,9 @@ function planChanges(orders, products) {
                 size: where.size,
                 delta: direction.sign * qty,
                 order: order.order_number || String(order.id),
+                // Дата замовлення в логу — щоб з першого погляду було
+                // видно, чи це сьогоднішній продаж, чи щось давнє.
+                date: (order.created_at || "").slice(0, 10),
                 title: item.title || ""
             });
 
@@ -453,7 +479,8 @@ async function main() {
 
         // Беремо тільки те, що може щось змінити: неврaховані
         // замовлення й скасовані, які ще числяться врахованими.
-        const query = "orders?select=id,order_number,status,items,stock_applied"
+        const query = "orders?select=id,order_number,created_at,status,items,stock_applied"
+            + `&created_at=gte.${encodeURIComponent(STOCK_SINCE)}`
             + "&or=(stock_applied.is.false,and(stock_applied.is.true,status.eq.cancelled))"
             + "&order=created_at.asc&limit=500";
 
@@ -478,7 +505,7 @@ async function main() {
     plan.changes.forEach(change => {
         console.log(`   ${change.delta < 0 ? "−" : "+"}${Math.abs(change.delta)} `
             + `${change.file} · ${change.color} / ${change.size} `
-            + `(замовлення ${change.order})`);
+            + `(замовлення ${change.order}${change.date ? " від " + change.date : ""})`);
     });
 
     if (apply) {

@@ -1134,9 +1134,18 @@ function renderProduct(product) {
 
     <div class="product-info">
 
-        <a class="brand" href="catalog?brand=${encodeURIComponent(product.brand)}">
+        <!-- Бренд: логотип, якщо він заведений в адмінці, інакше назва.
+             Назва лишається в розмітці ЗАВЖДИ, просто ховається з очей
+             при логотипі. Так її й далі читає програма для незрячих,
+             і бере лайтбокс (він шукає .product-info .brand). Через це
+             ж у картинки alt="" — інакше бренд озвучувався б двічі. -->
+        <a class="brand${product.brandLogo ? " brand-has-logo" : ""}" href="catalog?brand=${encodeURIComponent(product.brand)}">
 
-            ${escapeHtml(product.brand)}
+            ${product.brandLogo
+                ? `<img class="brand-logo" src="${escapeHtml(product.brandLogo)}" alt="" loading="lazy" decoding="async">`
+                : ""}
+
+            <span class="brand-name">${escapeHtml(product.brand)}</span>
 
         </a>
 

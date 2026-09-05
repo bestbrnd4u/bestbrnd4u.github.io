@@ -420,6 +420,42 @@ function renameToLatinSlugs(parsed, dir) {
 
 }
 
+// Логотипи брендів: «назва бренду» → шлях до картинки.
+//
+// Кладемо логотип у КОЖЕН товар, а не змушуємо сторінку робити ще
+// один запит: так його бачать однаково і жива сторінка, і статична
+// (p/<slug>/index.html), і майбутні споживачі на кшталт картки.
+//
+// Порівнюємо назви без зайвих пробілів і регістру: у даних трапляється
+// «Invicta » з хвостом, і через нього логотип мовчки не знайшовся б.
+function brandLogos() {
+
+    const file = path.join(ROOT, "data", "brands.json");
+
+    if (!fs.existsSync(file)) return new Map();
+
+    let brands;
+
+    try {
+        brands = JSON.parse(fs.readFileSync(file, "utf8"));
+    } catch (error) {
+        return new Map();
+    }
+
+    const logos = new Map();
+
+    (Array.isArray(brands) ? brands : []).forEach(brand => {
+
+        if (brand && brand.name && brand.logo) {
+            logos.set(String(brand.name).trim().toLowerCase(), brand.logo);
+        }
+
+    });
+
+    return logos;
+
+}
+
 function main() {
 
     if (!fs.existsSync(PRODUCTS_DIR)) {
@@ -496,6 +532,8 @@ function main() {
     renameToLatinSlugs(parsed);
 
     const products = [];
+
+    const LOGOS = brandLogos();
 
     parsed.forEach(({ file, filePath, data }) => {
 
@@ -804,6 +842,11 @@ function main() {
         // яка може розійтися з id — а розходження такого поля помітити
         // найважче.
         data.article = String(data.id);
+
+        const logo = LOGOS.get(String(data.brand || "").trim().toLowerCase());
+
+        if (logo) data.brandLogo = logo;
+        else delete data.brandLogo;
 
         (data.variants || []).forEach((variant, index) => {
             if (variant) variant.article = `${data.id}-${index + 1}`;

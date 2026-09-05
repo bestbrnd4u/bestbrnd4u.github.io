@@ -591,7 +591,9 @@ function buildBody(product) {
 
     <h1>${escapeHtml(product.title)}</h1>
 
-    <p class="product-static-brand">${escapeHtml(product.brand || "")}</p>
+    <p class="product-static-brand">${product.brand
+        ? `<a href="/catalog?brand=${encodeURIComponent(product.brand)}">${escapeHtml(product.brand)}</a>`
+        : ""}</p>
 
     <p class="product-static-price">
         <span class="price">${escapeHtml(priceText)}</span>
