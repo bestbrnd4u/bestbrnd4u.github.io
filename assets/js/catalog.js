@@ -858,6 +858,10 @@ async function initCatalog() {
 
         const categoryDepartments = await loadCategoryDepartments();
 
+        // Логотипи, банери й описи брендів. Потрібні заголовку
+        // сторінки, тож мають бути тут — до renderBreadcrumbsAndTitle().
+        await loadBrands();
+
         // групи розмірів з адмінки — до побудови фільтра «Розмір»
         SIZE_GROUPS = (await loadSizeGroups()).map(group => ({ ...group }));
 
@@ -2650,6 +2654,180 @@ function setupGenderFilter() {
 }
 
 // -------------------------
+// Каталог бренду
+// -------------------------
+//
+// Бренд у товарі — просто рядок, і сторінка з ?brand=... завжди була
+// звичайним фільтром: заголовок «Каталог товарів», жодного слова про
+// сам бренд. Записи з адмінки (data/brands.json) дають цій самій
+// сторінці обличчя — банер, назву в заголовку й опис.
+//
+// ЧОМУ ЦЕ НЕ ОКРЕМА СТОРІНКА
+// ---------------------------
+// Довелося б удруге зробити фільтри, сортування, пагінацію й поділ
+// карток за кольором. А головне — вибір статі мав би кудись вести: на
+// md-fashion.ua він лишає людину на тій самій сторінці бренду, і тут
+// так само, бо це той самий каталог із дописаним фільтром.
+//
+// ЗАПИС НЕОБОВ'ЯЗКОВИЙ
+// ---------------------
+// Немає запису — лишається назва бренду в заголовку й крихтах, без
+// банера й опису. Тобто бренди, яких ніхто не заводив, працюють як
+// працювали.
+
+const brandHero = document.getElementById("brandHero");
+const brandAbout = document.getElementById("brandAbout");
+
+// назва бренду (без регістру й зайвих пробілів) → запис із адмінки
+const brandInfo = new Map();
+
+// «Invicta » з хвостовим пробілом у даних справді трапляється, тому
+// ключем служить назва, зведена до одного вигляду. Той самий ключ
+// рахує scripts/build-brands.js — інакше запис мовчки не знайшовся б.
+function brandKey(name) {
+    return String(name || "").trim().toLowerCase();
+}
+
+async function loadBrands() {
+
+    try {
+
+        const response = await fetch(dataUrl("data/brands.json"));
+
+        if (!response.ok) return;
+
+        const list = await response.json();
+
+        (Array.isArray(list) ? list : []).forEach(brand => {
+            if (brand && brand.name) brandInfo.set(brandKey(brand.name), brand);
+        });
+
+    } catch (error) {
+
+        // Бренди — доповнення, а не умова роботи каталогу: не
+        // завантажились — сторінка лишається такою, якою була.
+        console.warn("Не вдалося завантажити бренди:", error);
+
+    }
+
+}
+
+// Сторінкою бренду вважаємо каталог, у якому обрано РІВНО один бренд.
+// Два бренди у фільтрі — це вже не «каталог Tommy Hilfiger», і банер
+// одного з них брехав би про вміст сторінки.
+function selectedBrandName() {
+    return selectedBrands.size === 1 ? [...selectedBrands][0] : "";
+}
+
+// Стать дописуємо до заголовка, а не змінюємо сторінку: людина обрала
+// «Жінкам» усередині каталогу бренду й лишається там само.
+const GENDER_SUFFIX = {
+    "Жінкам": "для жінок",
+    "Чоловікам": "для чоловіків",
+    "Дітям": "для дітей",
+    "Унісекс": "унісекс"
+};
+
+function brandPageTitle(name) {
+
+    const brand = brandInfo.get(brandKey(name));
+
+    const base = (brand && brand.title) || `Товари ${name}`;
+
+    if (selectedGenders.size !== 1) return base;
+
+    const suffix = GENDER_SUFFIX[[...selectedGenders][0]];
+
+    return suffix ? `${base} ${suffix}` : base;
+
+}
+
+// Опис бренду з адмінки — звичайний текст, не HTML. Тому екрануємо
+// його й самі робимо абзаци з порожніх рядків: інакше випадкова «<»
+// з'їла б половину тексту, а всі абзаци злилися б в одну стіну.
+function brandDescriptionHtml(text) {
+
+    return String(text).trim().split(/\n\s*\n/)
+        .map(block => `<p>${escapeHtml(block.trim()).replace(/\n/g, "<br>")}</p>`)
+        .join("");
+
+}
+
+// Який бренд уже намальований. Потрібно, бо renderBrandHero()
+// викликається на КОЖНУ зміну фільтра: без цієї памʼяті вибір статі
+// чи розміру щоразу збирав би блок заново й згортав опис, який людина
+// щойно розгорнула (та ще й гасив би картинку на мить).
+let renderedBrand = null;
+
+function renderBrandHero() {
+
+    // promo.html підключає цей самий файл, але цих блоків не має —
+    // і заголовок із крихтами там свої, чіпати їх не можна.
+    if (!brandHero || !brandAbout) return;
+
+    const name = selectedBrandName();
+    const brand = name ? brandInfo.get(brandKey(name)) : null;
+
+    // Заголовок і крихти перечитуємо щоразу: бренд могли обрати вже
+    // після завантаження сторінки, а стать — перемкнути будь-коли.
+    renderBreadcrumbsAndTitle();
+
+    // Бренд той самий — далі нічого не змінюється: вміст блоків від
+    // решти фільтрів не залежить, а заголовок уже перемальовано вище.
+    const brandStamp = brand ? brandKey(name) : "";
+
+    if (brandStamp === renderedBrand) return;
+
+    renderedBrand = brandStamp;
+
+    // Без loading="lazy": банер стоїть найвище на сторінці, і
+    // відкладати саме його означало б показати порожнє місце.
+    // Банер, а якщо його не заклали — логотип. Порожній блок з рамкою
+    // виглядав би як «картинка не завантажилась», тому ховаємо його.
+    const banner = brand && (brand.banner || brand.logo);
+
+    brandHero.innerHTML = banner
+        ? `<img class="${brand.banner ? "brand-hero-banner" : "brand-hero-logo"}"
+                src="${escapeHtml(banner)}" alt="${escapeHtml(name)}"
+                decoding="async">`
+        : "";
+
+    brandHero.hidden = !banner;
+
+    const text = brand && brand.description ? String(brand.description).trim() : "";
+
+    brandAbout.innerHTML = text
+        ? `<div class="brand-about-text">${brandDescriptionHtml(text)}</div>
+           <button type="button" class="brand-about-toggle" hidden>Детальніше</button>`
+        : "";
+
+    brandAbout.hidden = !text;
+    brandAbout.classList.remove("is-open");
+
+    if (!text) return;
+
+    const textEl = brandAbout.querySelector(".brand-about-text");
+    const toggle = brandAbout.querySelector(".brand-about-toggle");
+
+    // Кнопку показуємо, лише якщо текст справді не вміщується у два
+    // рядки: під коротким описом «Детальніше» нічого не розкриває й
+    // виглядає зламаним. Міряти можна тільки після розкладки, тому
+    // requestAnimationFrame.
+    requestAnimationFrame(() => {
+        toggle.hidden = textEl.scrollHeight <= textEl.clientHeight + 1;
+    });
+
+    toggle.addEventListener("click", () => {
+
+        const open = brandAbout.classList.toggle("is-open");
+
+        toggle.textContent = open ? "Згорнути" : "Детальніше";
+
+    });
+
+}
+
+// -------------------------
 // Хлібні крихти + заголовок
 // -------------------------
 
@@ -2685,12 +2863,30 @@ function renderBreadcrumbsAndTitle() {
 
     }
 
+    // Каталог одного бренду — це сторінка цього бренду: його назва в
+    // заголовку, у крихтах і у вкладці браузера. У «Новинках» і
+    // «Акціях» лишаємо їхні заголовки: там бренд — саме фільтр, а не
+    // тема сторінки.
+    const brandName = currentSection ? "" : selectedBrandName();
+
+    if (brandName) {
+
+        crumbs.push({ label: brandName, href: `catalog?brand=${latinParam(brandName)}` });
+
+        title = escapeHtml(brandPageTitle(brandName));
+        subtitle = `Сумки, одяг, взуття та аксесуари ${brandName}`;
+
+    }
+
     if (selectedGenders.size) {
 
         const label = [...selectedGenders].join(", ");
 
         crumbs.push({ label, href: "catalog" });
-        subtitle = `${subtitle} · ${label}`;
+
+        // На сторінці бренду стать уже стоїть у заголовку («…для
+        // жінок») — у підзаголовку вона була б удруге.
+        if (!brandName) subtitle = `${subtitle} · ${label}`;
 
     }
 
@@ -2723,7 +2919,9 @@ function renderBreadcrumbsAndTitle() {
         ? "Акції | BestBrnd4u"
         : currentSection === "new"
             ? "Новинки | BestBrnd4u"
-            : "Каталог | BestBrnd4u";
+            : brandName
+                ? `${brandPageTitle(brandName)} | BestBrnd4u`
+                : "Каталог | BestBrnd4u";
 
 }
 
@@ -3469,6 +3667,8 @@ function render() {
     }
 
     emptyState.hidden = list.length !== 0;
+
+    renderBrandHero();
 
     renderActiveFilters();
 
