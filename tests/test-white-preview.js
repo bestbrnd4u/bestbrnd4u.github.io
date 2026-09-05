@@ -357,9 +357,17 @@ console.log("\n[5] Модуль підключений і самодостатн
 
     // Порядок важливий: обидва споживачі шукають window.WhitePreview
     // під час монтування.
+    //
+    // Шукаємо саме ТЕГИ. Наївний indexOf по імені файлу ловився на
+    // коментарі: варто комусь згадати preview-templates.js у поясненні
+    // вище — і перевірка падає, хоча підключення на місці. Закриту
+    // лапку теж не пишемо: збірка дописує в адресу ?v=.
+    const tagAt = name => html.indexOf('src="' + name);
+
     check("підключений ДО обох споживачів",
-        html.indexOf("white-preview.js") < html.indexOf("image-framing-widget.js")
-        && html.indexOf("white-preview.js") < html.indexOf("preview-templates.js"));
+        tagAt("white-preview.js") > 0
+        && tagAt("white-preview.js") < tagAt("image-framing-widget.js")
+        && tagAt("white-preview.js") < tagAt("preview-templates.js"));
 
     const модуль = fs.readFileSync(path.join(ROOT, "admin/white-preview.js"), "utf8");
 

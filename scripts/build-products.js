@@ -22,6 +22,11 @@ const { normalizeProductColors } = require("./normalize-colors");
 // кирилиця в імені файлу → латиниця в адресі (див. коментар у файлі)
 const { toSlug } = require("./translit");
 
+// Правила залишків — той самий модуль, що працює на сайті й в адмінці.
+// Своя копія арифметики тут означала б, що «під замовлення» на сайті і
+// «під замовлення» в прев'ю адмінки колись розійдуться.
+const Stock = require("../assets/js/stock.js");
+
 const ROOT = path.join(__dirname, "..");
 const PRODUCTS_DIR = path.join(ROOT, "data", "products");
 const OUTPUT_FILE = path.join(ROOT, "data", "products.json");
@@ -625,6 +630,62 @@ function main() {
 
         });
 
+        // Залишки прибираємо разом із кольором і розміром.
+        //
+        // stock — це словник «колір → розмір → скільки» (див.
+        // assets/js/stock.js). Ключі не зникають самі: перейменували
+        // колір або прибрали розмір — запис лишався б назавжди. Гірше
+        // за смітник: «Чорний: 0» від кольору, якого вже немає, тягнув
+        // би товар у «під замовлення».
+        //
+        // Так само влаштоване прибирання framing нижче.
+        if (data.stock && typeof data.stock === "object") {
+
+            const kept = {};
+
+            (data.variants || []).forEach(variant => {
+
+                if (!variant || !variant.color) return;
+
+                const raw = data.stock[variant.color];
+
+                if (!raw || typeof raw !== "object") return;
+
+                const sizes = new Set(
+                    (Array.isArray(variant.sizes) && variant.sizes.length
+                        ? variant.sizes
+                        : (data.sizes || [])).map(String)
+                );
+
+                const cleaned = {};
+
+                Object.keys(raw).forEach(size => {
+
+                    if (!sizes.has(String(size))) return;
+
+                    const n = Stock.qty(raw[size]);
+
+                    if (n !== null) cleaned[String(size)] = n;
+
+                });
+
+                if (Object.keys(cleaned).length) kept[variant.color] = cleaned;
+
+            });
+
+            if (JSON.stringify(kept) !== JSON.stringify(data.stock)) {
+
+                if (Object.keys(kept).length) data.stock = kept;
+                else delete data.stock;
+
+                console.log(`   ↻ ${file}: залишки почищено (кольори/розміри, яких уже немає)`);
+
+                changed = true;
+
+            }
+
+        }
+
         // Кадрування прибираємо разом із фото.
         //
         // framing — це словник «ім'я файлу → рамка» (див.
@@ -722,6 +783,68 @@ function main() {
         (data.variants || []).forEach((variant, index) => {
             if (variant) variant.article = `${data.id}-${index + 1}`;
         });
+
+        // ЗАЛИШКИ → «ПІД ЗАМОВЛЕННЯ»
+        //
+        // В адмінці залишки редагуються одним словником на товар, за
+        // назвою кольору: так їх зручно бачити таблицею. Сайту ж
+        // потрібне інше — залишок поруч зі своїм варіантом, бо картку
+        // каталогу, свотч і розміри малюють саме з варіанта.
+        //
+        // Тому тут словник роз'їжджається по варіантах. І це не лише
+        // зручність: нижче normalizeProductColors() зводить назви
+        // кольорів до єдиного вигляду («Black чорний» → «Чорний»), і
+        // пошук залишку за назвою кольору після цього вже не знайшов
+        // би нічого. Залишок, покладений у сам варіант, переїзд назви
+        // переживає.
+        //
+        // preOrder рахується ТУТ, а не на сайті, — щоб усі споживачі
+        // (картка, сторінка товару, статичні сторінки, розмітка
+        // schema.org, кошик, бот у Telegram) далі читали одне поле й
+        // нічого про залишки не знали.
+        // Спершу відповідь по товару — з неї видно, чи є взагалі сенс
+        // писати щось у варіанти.
+        const productPreOrder = Stock.isPreOrder(data);
+
+        (data.variants || []).forEach(variant => {
+
+            if (!variant) return;
+
+            const stock = Stock.variantStock(data, variant);
+
+            if (Stock.tracked(stock)) {
+
+                variant.stock = stock;
+                variant.inStock = Stock.total(stock);
+
+            }
+
+            // Перемикач «товар під замовлення» сильніший: ним
+            // позначають те, що возять під замовлення завжди.
+            const colorPreOrder = Boolean(data.preOrder)
+                || Stock.colorSoldOut(stock, Stock.sizesOf(data, variant));
+
+            // Пишемо поле, ЛИШЕ коли колір відрізняється від товару.
+            //
+            // Відрізняється він в одному випадку: цього кольору немає, а
+            // товар загалом ще продається. Решта була б «preOrder: false»
+            // у кожному з 126 варіантів — 126 рядків у
+            // data/products.json, які нічого не повідомляють. Споживачі
+            // (картка, сторінка товару) і так відкочуються до значення
+            // товару, коли поля немає.
+            if (colorPreOrder !== productPreOrder) variant.preOrder = colorPreOrder;
+            else delete variant.preOrder;
+
+        });
+
+        if (Stock.productTracked(data)) data.inStock = Stock.productTotal(data);
+
+        data.preOrder = productPreOrder;
+
+        // Словник за кольорами далі не потрібен: усе, що з нього
+        // випливає, уже лежить у варіантах. Дві копії того самого
+        // рано чи пізно розійшлися б.
+        delete data.stock;
 
         // Запамʼятовуємо файл-джерело: перенумерація ручного порядку
         // (renumberSortOrder) пише номер назад саме туди.
