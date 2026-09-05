@@ -567,10 +567,9 @@
         "sku": "coach73995black",
         "article": "9-1",
         "stock": {
-          "ONESIZE": 0
+          "ONESIZE": 1
         },
-        "inStock": 0,
-        "preOrder": true
+        "inStock": 1
       },
       {
         "color": "Світло-сірий",
@@ -584,9 +583,9 @@
         "sku": "coach73995chalk",
         "article": "9-2",
         "stock": {
-          "ONESIZE": 3
+          "ONESIZE": 1
         },
-        "inStock": 3
+        "inStock": 1
       },
       {
         "color": "Сіро-коричневий",
@@ -597,7 +596,11 @@
           "assets/images/products/uploads/coach73995-dark-stone-3.webp?v=0a136a87"
         ],
         "sku": "coach73995-dark-stone",
-        "article": "9-3"
+        "article": "9-3",
+        "stock": {
+          "ONESIZE": 1
+        },
+        "inStock": 1
       },
       {
         "hex": "#433636",
@@ -608,7 +611,11 @@
           "/assets/images/products/uploads/91215-b4ooh-2_ea0908385fb449c5a786a9c58e2e20cb_master.webp?v=2d97b604"
         ],
         "sku": "coachB4OOH",
-        "article": "9-4"
+        "article": "9-4",
+        "stock": {
+          "ONESIZE": 1
+        },
+        "inStock": 1
       },
       {
         "color": "Коричневий",
@@ -620,7 +627,11 @@
           "/assets/images/products/uploads/4.6_b585e107-3532-4dd2-ad9c-2d2383b92dd0.webp?v=e5318137"
         ],
         "sku": "coach73995brown",
-        "article": "9-5"
+        "article": "9-5",
+        "stock": {
+          "ONESIZE": 1
+        },
+        "inStock": 1
       },
       {
         "color": "Тауп",
@@ -632,7 +643,11 @@
           "/assets/images/products/uploads/73995_lhtau_a8.webp?v=9e3412da",
           "/assets/images/products/uploads/73995_lhtau_a91.webp?v=dd650601"
         ],
-        "article": "9-6"
+        "article": "9-6",
+        "stock": {
+          "ONESIZE": 1
+        },
+        "inStock": 1
       }
     ],
     "sizes": [
@@ -664,7 +679,7 @@
     "sku": "coach73995black",
     "category": "Жіночі сумки",
     "article": "9",
-    "inStock": 3
+    "inStock": 6
   },
   {
     "gender": "Жінкам",
