@@ -66,5 +66,10 @@
   },
   "legacySlugs": [
     "чоловіча-сумка-lacoste-neocroc-checkboard-strap-camera-bag"
-  ]
+  ],
+  "stock": {
+    "Marine daphne 793": {
+      "ONESIZE": 1
+    }
+  }
 }

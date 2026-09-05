@@ -1,0 +1,183 @@
+# Списання залишків за замовленнями.
+#
+# НАВІЩО
+# -------
+# Залишки ставить людина (поле «Залишки на складі» в адмінці), але
+# зменшувати їх руками після кожного замовлення — робота, яку неминуче
+# забудуть. Цей крок робить це сам: бере замовлення, яких ще не
+# врахував, і зменшує залишок того кольору й розміру, який замовили.
+# Коли лишається нуль, товар САМ стає «під замовлення».
+#
+# Скасоване замовлення повертає товар на полицю — див. коментар у
+# scripts/apply-order-stock.js.
+#
+# ЧОМУ ЗА РОЗКЛАДОМ, А НЕ ПО ПОДІЇ
+# ---------------------------------
+# Замовлення створює сайт або бот — тобто база, а вона не вміє
+# комітити в репозиторій. Найкоротший шлях звідти сюди — щоб цей
+# workflow сам приходив і питав: «що нового?».
+#
+# Побічний і головний ефект: крок самовідновлюється. Пропустив запуск,
+# упав посеред роботи, замовлення приїхало із запізненням — наступний
+# запуск усе одно зробить рівно те, чого бракує. Черга подій такого не
+# вміє: пропущена подія втрачається назавжди.
+#
+# Затримка — до десяти хвилин. Для магазину, де кілька замовлень на
+# день, цього досить; кому треба одразу — «Run workflow» вручну.
+#
+# ЧОМУ ДВІ ГІЛКИ
+# ---------------
+# Залишки лежать і в dev (там їх редагує адмінка), і в main (звідти
+# працює магазин). Списати треба в обох: інакше наступне перенесення
+# dev → main поверне старе число, бо Sync branches віддає перевагу
+# гілці-джерелу.
+#
+# База при цьому питається ОДИН раз: план кладеться у файл і
+# застосовується до кожної гілки. Інакше замовлення, що приїхало між
+# двома запитами, потрапило б в одну гілку й не потрапило в іншу.
+# Позначка «враховано» ставиться в самому кінці — коли обидві гілки
+# вже збережені.
+
+name: Apply order stock
+
+on:
+  schedule:
+    # кожні 10 хвилин; GitHub може запізнюватись на кілька хвилин —
+    # для цього завдання це не має значення
+    - cron: "*/10 * * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  # потрібно, щоб покликати збірку: пуш, зроблений вбудованим
+  # GITHUB_TOKEN, події push НЕ породжує (GitHub так захищається від
+  # нескінченних ланцюжків), і без явного виклику залишки лежали б у
+  # гілці, а сайт показував би старі числа
+  actions: write
+
+# Два одночасні запуски списали б те саме двічі.
+concurrency:
+  group: apply-stock
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout dev
+        uses: actions/checkout@v7
+        with:
+          ref: dev
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+
+      # Плану може не бути взагалі (немає нових замовлень) — тоді
+      # решта кроків просто нічого не роблять.
+      - name: Порахувати, що списати
+        id: plan
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          node scripts/apply-order-stock.js --plan-out="$RUNNER_TEMP/plan.json"
+          if [ -s "$RUNNER_TEMP/plan.json" ] && node -e "process.exit(require('$RUNNER_TEMP/plan.json').marks.length ? 0 : 1)"; then
+            echo "has=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has=false" >> "$GITHUB_OUTPUT"
+            echo "Немає замовлень, які треба врахувати"
+          fi
+
+      - name: Списати в dev
+        id: dev
+        if: steps.plan.outputs.has == 'true'
+        run: |
+          node scripts/apply-order-stock.js --plan-in="$RUNNER_TEMP/plan.json" --apply
+          git config user.name "bestbrnd4u-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A data/products
+          if git diff --cached --quiet; then
+            echo "Змін немає"
+          else
+            git commit -m "chore: списано залишки за замовленнями"
+            git push origin dev
+            echo "pushed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Перезібрати dev
+        if: steps.dev.outputs.pushed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run build-dev.yml --ref dev
+
+      # main — та сама операція на гілці магазину.
+      #
+      # Гілка викачується ПОРУЧ, окремою текою, а не перемиканням
+      # git checkout. Причина проста: після перемикання в робочій теці
+      # був би вміст main, де цього скрипта ще немає — він зʼявиться
+      # там лише з наступним перенесенням dev → main. Тому скрипт
+      # лишається з dev, а працює над теками main через --dir.
+      #
+      # Збірку тут не запускаємо: у кожної гілки свій workflow збірки,
+      # і він спрацює від цього ж пуша.
+      - name: Checkout main
+        if: steps.plan.outputs.has == 'true'
+        uses: actions/checkout@v7
+        with:
+          ref: main
+          path: main-tree
+
+      - name: Списати в main
+        id: main
+        if: steps.plan.outputs.has == 'true'
+        run: |
+          node scripts/apply-order-stock.js \
+            --plan-in="$RUNNER_TEMP/plan.json" \
+            --dir="$GITHUB_WORKSPACE/main-tree/data/products" \
+            --apply
+          cd main-tree
+          git config user.name "bestbrnd4u-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A data/products
+          if git diff --cached --quiet; then
+            echo "Змін немає"
+          else
+            git commit -m "chore: списано залишки за замовленнями"
+            git push origin main
+            echo "pushed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # build-products.yml після перезбірки сам кличе deploy-pages.yml —
+      # тут цього робити не треба.
+      - name: Перезібрати main
+        if: steps.main.outputs.pushed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run build-products.yml --ref main
+
+      # Позначаємо в базі ЛИШЕ після того, як обидві гілки збережені.
+      # Якщо щось упало раніше — наступний запуск порахує ті самі
+      # замовлення заново й доробить, а не втратить їх.
+      - name: Позначити замовлення врахованими
+        if: steps.plan.outputs.has == 'true'
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/apply-order-stock.js --plan-in="$RUNNER_TEMP/plan.json" --mark
+
+      - name: Підсумок
+        if: steps.plan.outputs.has == 'true'
+        run: |
+          echo "### Залишки списано" >> "$GITHUB_STEP_SUMMARY"
+          node -e "
+            const plan = require('$RUNNER_TEMP/plan.json');
+            const lines = plan.changes.map(c =>
+              (c.delta < 0 ? '−' : '+') + Math.abs(c.delta) + ' · ' + c.file
+              + ' · ' + c.color + ' / ' + c.size + ' · замовлення ' + c.order);
+            console.log(lines.join('\n') || 'без змін у товарах');
+            (plan.notes || []).forEach(n => console.log('- ' + n));
+          " >> "$GITHUB_STEP_SUMMARY"

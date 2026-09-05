@@ -95,5 +95,19 @@
   "description": "Michael Kors Rose Small Top Handle Crossbody — стьобана сумка в насиченому відтінку Racing Green\nЕлегантна компактна сумка Michael Kors Rose поєднує жіночний дизайн і практичний формат. Стьобана фактура додає моделі виразності, а глибокий зелений відтінок Racing Green робить її стильним акцентом образу.\nКомпактна модель, яка легко доповнить як повсякденний, так і більш елегантний образ.\n",
   "sku": "35F1GX0C5U",
   "rating": 5,
-  "category": "Жіночі сумки"
+  "category": "Жіночі сумки",
+  "stock": {
+    "Black": {
+      "ONESIZE": 1
+    },
+    "Pearl Grey": {
+      "ONESIZE": 1
+    },
+    "Racing Green": {
+      "ONESIZE": 1
+    },
+    "Navy": {
+      "ONESIZE": 1
+    }
+  }
 }

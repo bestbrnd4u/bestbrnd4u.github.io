@@ -67,5 +67,10 @@
   },
   "legacySlugs": [
     "кросівки-lacoste-l-guard-breaker"
-  ]
+  ],
+  "stock": {
+    "Зелений": {
+      "38": 1
+    }
+  }
 }

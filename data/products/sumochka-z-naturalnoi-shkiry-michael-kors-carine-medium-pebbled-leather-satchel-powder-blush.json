@@ -74,5 +74,10 @@
   ],
   "legacySlugs": [
     "сумочка-з-натуральної-шкіри-michael-kors-carine-medium-pebbled-leather-satchel-powder-blush"
-  ]
+  ],
+  "stock": {
+    "Powder Blush": {
+      "ONESIZE": 1
+    }
+  }
 }

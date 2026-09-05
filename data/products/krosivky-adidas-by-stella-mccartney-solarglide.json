@@ -63,5 +63,10 @@
   ],
   "legacySlugs": [
     "кросівки-adidas-by-stella-mccartney-solarglide"
-  ]
+  ],
+  "stock": {
+    "White": {
+      "36": 1
+    }
+  }
 }

@@ -102,5 +102,13 @@
       "x": 48,
       "y": 51
     }
+  },
+  "stock": {
+    "Black чорний": {
+      "ONESIZE": 1
+    },
+    "Brass/Ivory": {
+      "ONESIZE": 1
+    }
   }
 }

@@ -71,5 +71,10 @@
   "category": "Жіночі сумки",
   "legacySlugs": [
     "шопер-marc-jacobs-the-leather-small-tote-bag"
-  ]
+  ],
+  "stock": {
+    "Twine — бежево-кремовий": {
+      "S": 1
+    }
+  }
 }

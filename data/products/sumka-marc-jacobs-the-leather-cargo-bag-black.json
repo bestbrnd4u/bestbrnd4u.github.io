@@ -73,5 +73,10 @@
   "category": "Жіночі сумки",
   "legacySlugs": [
     "сумка-marc-jacobs-the-leather-cargo-bag-black"
-  ]
+  ],
+  "stock": {
+    "Black чорний": {
+      "ONESIZE": 1
+    }
+  }
 }

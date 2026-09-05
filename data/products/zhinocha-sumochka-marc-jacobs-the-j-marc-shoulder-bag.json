@@ -68,5 +68,10 @@
   "category": "Жіночі сумки",
   "legacySlugs": [
     "жіноча-сумочка-marc-jacobs-the-j-marc-shoulder-bag"
-  ]
+  ],
+  "stock": {
+    "Bronze Green": {
+      "ONESIZE": 1
+    }
+  }
 }

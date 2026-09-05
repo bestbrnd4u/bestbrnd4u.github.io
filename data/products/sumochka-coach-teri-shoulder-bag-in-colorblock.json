@@ -99,5 +99,10 @@
   "category": "Жіночі сумки",
   "legacySlugs": [
     "сумочка-coach-teri-shoulder-bag-in-colorblock"
-  ]
+  ],
+  "stock": {
+    "Tan / Chalk / Brass — бежевий / білий / золотистий": {
+      "ONESIZE": 1
+    }
+  }
 }

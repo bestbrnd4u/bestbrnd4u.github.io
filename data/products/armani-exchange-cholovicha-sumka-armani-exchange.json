@@ -45,5 +45,10 @@
   "color": "Чорний",
   "sizes": [
     "ONESIZE"
-  ]
+  ],
+  "stock": {
+    "Чорний": {
+      "ONESIZE": 1
+    }
+  }
 }

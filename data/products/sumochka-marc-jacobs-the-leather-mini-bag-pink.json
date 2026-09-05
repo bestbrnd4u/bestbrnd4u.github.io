@@ -69,5 +69,10 @@
   "category": "Жіночі сумки",
   "legacySlugs": [
     "сумочка-marc-jacobs-the-leather-mini-bag-pink"
-  ]
+  ],
+  "stock": {
+    "Pink": {
+      "ONESIZE": 1
+    }
+  }
 }

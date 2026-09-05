@@ -540,6 +540,83 @@ console.log("\n[9в] Кошик рахує наявність по рядку, �
         page.indexOf('src="assets/js/stock.js') < page.indexOf('src="assets/js/cart.js'));
 }
 
+console.log("\n[9г] Розпродано: товар зникає з сайту, але лишається в адмінці");
+{
+    // ЩО ЦЕ ЗАКРИВАЄ
+    //
+    // Товар, якого більше не буде, доводилось видаляти з адмінки —
+    // разом із фото, описом, кадруванням і артикулом. А коли
+    // постачальник привозив те саме знову, все це заводили наново.
+    const yaml = read("admin/config.yml");
+
+    check("перемикач є", /name: "soldOut"\s*\n\s*widget: "boolean"/.test(yaml));
+    check("він необовʼязковий", /name: "soldOut"[\s\S]{0,200}required: false/.test(yaml));
+    check("підказка пояснює, що товар лишається в адмінці",
+        /лишається тут, в адмінці/.test(yaml));
+    check("і чесно попереджає про 404", /віддає 404/.test(yaml));
+
+    const build = read("scripts/build-products.js");
+
+    check("збірка не пускає розпродане на сайт", /if \(data\.soldOut\) \{/.test(build));
+    check("і каже про це в логу", /РОЗПРОДАНО \(не показуємо на сайті\)/.test(build));
+
+    // ЧОМУ ВИКЛЮЧЕННЯ, А НЕ ПРАПОРЕЦЬ У ДАНИХ: списки товарів
+    // будуються в шести місцях, і прапорець довелось би відфільтрувати
+    // в кожному.
+    check("пояснено, чому виключаємо, а не фільтруємо",
+        /Списки товарів[\s\S]{0,200}шести місцях/.test(build));
+
+    // Перевірка на СПРАВЖНІЙ збірці: позначаємо товар розпроданим,
+    // збираємо, дивимось. Дерево повертає охорона зверху.
+    const dir = path.join(ROOT, "data/products");
+
+    const file = fs.readdirSync(dir).filter(f => f.endsWith(".json"))[0];
+    const full = path.join(dir, file);
+    const before = JSON.parse(fs.readFileSync(full, "utf8"));
+
+    const total = JSON.parse(read("data/products.json")).length;
+
+    fs.writeFileSync(full, JSON.stringify({ ...before, soldOut: true }, null, 2) + "\n", "utf8");
+
+    execFileSync("node", [path.join(ROOT, "scripts/build-products.js")], { cwd: ROOT, encoding: "utf8" });
+
+    const built = JSON.parse(read("data/products.json"));
+
+    check("товару немає в каталозі", !built.some(p => p.slug === before.slug), before.slug);
+    check("решта на місці", built.length === total - 1, built.length + " з " + total);
+
+    const source = JSON.parse(fs.readFileSync(full, "utf8"));
+
+    check("сам товар лишився в адмінці", Boolean(source.title));
+    check("з тим самим номером", source.id === before.id, source.id + " ≠ " + before.id);
+    check("і тією самою адресою", source.slug === before.slug);
+
+    // Номер не має дістатись новому товару, інакше повернення
+    // розпроданого зіштовхнуло б два товари з одним id.
+    const ids = built.map(p => p.id);
+
+    check("номер не перевикористали", !ids.includes(before.id));
+
+    // Повертаємо перемикач — товар має повернутись на те саме місце.
+    fs.writeFileSync(full, JSON.stringify(before, null, 2) + "\n", "utf8");
+
+    execFileSync("node", [path.join(ROOT, "scripts/build-products.js")], { cwd: ROOT, encoding: "utf8" });
+
+    const returned = JSON.parse(read("data/products.json"));
+    const again = returned.find(p => p.slug === before.slug);
+
+    check("вимкнули — товар повернувся", Boolean(again));
+    check("з тим самим номером", again && again.id === before.id);
+
+    // Прев'ю мусить казати про це раніше, ніж менеджер почне
+    // роздивлятись картку товару, якого на сайті немає.
+    const preview = read("admin/preview-templates.js");
+
+    check("прев'ю попереджає про розпродане", /Розпродано: товару немає ні в каталозі/.test(preview));
+    check("і виглядає інакше", /cms-preview-hint-off/.test(preview));
+    check("для цього є стиль", /\.cms-preview-hint-off\{/.test(read("admin/preview-styles.css")));
+}
+
 console.log("\n[10] Одне правило на три сторони");
 {
     // Своя копія арифметики в збірці, на сайті чи в прев'ю означала б,

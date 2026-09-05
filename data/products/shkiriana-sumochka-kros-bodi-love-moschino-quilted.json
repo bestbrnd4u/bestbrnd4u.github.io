@@ -47,5 +47,10 @@
   "category": "Жіночі сумки",
   "legacySlugs": [
     "шкіряна-сумочка-крос-боді-love-moschino-quilted"
-  ]
+  ],
+  "stock": {
+    "Blush Beige": {
+      "ONESIZE": 1
+    }
+  }
 }

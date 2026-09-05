@@ -58,5 +58,10 @@
   ],
   "legacySlugs": [
     "чоловіча-сумка-armani-exchange-crossbody"
-  ]
+  ],
+  "stock": {
+    "Чорний": {
+      "ONESIZE": 1
+    }
+  }
 }
