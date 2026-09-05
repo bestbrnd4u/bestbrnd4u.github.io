@@ -63,5 +63,10 @@
   ],
   "legacySlugs": [
     "сумочка-love-moschino-logo-plaque-quilted-shoulder-bag"
-  ]
+  ],
+  "stock": {
+    "Nero": {
+      "ONESIZE": 1
+    }
+  }
 }

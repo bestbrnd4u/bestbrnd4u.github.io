@@ -81,5 +81,10 @@
   "category": "Жіночі сумки",
   "legacySlugs": [
     "сумка-marc-jacobs-the-leather-cargo-bag-camel"
-  ]
+  ],
+  "stock": {
+    "Camel — карамельний, світло-коричневий": {
+      "ONESIZE": 1
+    }
+  }
 }

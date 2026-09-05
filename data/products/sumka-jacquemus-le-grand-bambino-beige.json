@@ -80,5 +80,13 @@
   ],
   "legacySlugs": [
     "сумка-jacquemus-le-grand-bambino-beige"
-  ]
+  ],
+  "stock": {
+    "Beige — бежевий": {
+      "ONESIZE": 1
+    },
+    "Midnight Brown": {
+      "ONESIZE": 1
+    }
+  }
 }

@@ -50,5 +50,10 @@
     "/assets/images/products/uploads/45sfa0001_075_02-1-.webp",
     "/assets/images/products/uploads/45sfa0001_075_01.webp",
     "/assets/images/products/uploads/ss23-obm1w1-99x_f4.webp"
-  ]
+  ],
+  "stock": {
+    "Neo": {
+      "37": 1
+    }
+  }
 }

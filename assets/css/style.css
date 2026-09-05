@@ -4913,6 +4913,31 @@ body.mobile-filters-open .scroll-top{
     border-color:var(--primary);
 }
 
+/* Розмір, якого немає в наявності.
+   
+   НЕ ХОВАЄМО і не вимикаємо: покупець шукає свій розмір і має
+   побачити, що він існує, — просто під замовлення. Схований розмір
+   читається як «такого не буває», а вимкнена кнопка не пояснює нічого.
+   
+   Тому — приглушений вигляд і риска: видно, що це інший стан, але
+   обрати можна. Після вибору сторінка сама перейде в «під
+   замовлення» (refreshAvailability у product.js). */
+.size-out{
+    color:var(--gray500);
+    border-style:dashed;
+    text-decoration:line-through;
+    text-decoration-thickness:1px;
+}
+
+/* Обраний і водночас відсутній: колір заливки лишається, риска
+   зникає — інакше на темному тлі вона читається як помилка. */
+.size-out.active{
+    text-decoration:none;
+    background:var(--gray500);
+    border-color:var(--gray500);
+    color:#fff;
+}
+
 /* -- кнопки "Купить" + "В избранное" -- */
 
 .product-actions{

@@ -45,5 +45,10 @@
   ],
   "slug": "marc-jacobs-sontsezakhysni-okuliary-marc-jacobs-3",
   "id": 18,
-  "color": "Темно-коричневий"
+  "color": "Темно-коричневий",
+  "stock": {
+    "Темно-коричневий": {
+      "ONESIZE": 1
+    }
+  }
 }

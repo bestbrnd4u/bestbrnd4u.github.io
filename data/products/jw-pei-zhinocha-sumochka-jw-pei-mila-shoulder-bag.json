@@ -47,5 +47,10 @@
   "color": "Синій",
   "sizes": [
     "ONESIZE"
-  ]
+  ],
+  "stock": {
+    "Синій": {
+      "ONESIZE": 1
+    }
+  }
 }

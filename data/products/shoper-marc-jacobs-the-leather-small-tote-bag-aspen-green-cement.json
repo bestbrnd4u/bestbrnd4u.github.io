@@ -70,5 +70,10 @@
   "category": "Жіночі сумки",
   "legacySlugs": [
     "шопер-marc-jacobs-the-leather-small-tote-bag-aspen-green-cement"
-  ]
+  ],
+  "stock": {
+    "Aspen Green зелений": {
+      "S": 1
+    }
+  }
 }

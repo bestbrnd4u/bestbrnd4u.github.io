@@ -2179,6 +2179,15 @@ document.addEventListener("click", event => {
 
                 if (pageDesc && view.description) pageDesc.textContent = view.description;
 
+                // Наявність цього кольору. Саме на контейнері, а не в
+                // розмітці: показ перемикає refreshAvailability() у
+                // product.js, і в нього два джерела — колір і розмір.
+                const page = document.getElementById("productPage");
+
+                if (page && typeof view.preOrder === "boolean") {
+                    page.dataset.colorPreorder = view.preOrder ? "1" : "0";
+                }
+
             } catch (error) {
 
                 // зіпсований JSON у data-page-view — лишаємо як є
@@ -2262,6 +2271,52 @@ document.addEventListener("click", event => {
             }
 
         }
+
+        // Розміри, яких немає в НОВОМУ кольорі.
+        //
+        // Мітки ставимо тут, а не в product.js: список розмірів щойно
+        // перебудували вище рядком, і будь-які класи на старих кнопках
+        // зникли разом із ними. У кожного кольору цей перелік свій —
+        // тому він і лежить на свотчі.
+        if (scope && colorBtn.dataset.outSizes) {
+
+            try {
+
+                const out = new Set(JSON.parse(colorBtn.dataset.outSizes) || []);
+
+                // Тільки сторінка товару (.size). Картка каталогу
+                // навмисно лишається без позначок: у неї свій рівень
+                // відповіді — «цього КОЛЬОРУ немає», і кнопка на ній
+                // одна на всі розміри. Позначений розмір поруч із
+                // кнопкою «Купити» суперечив би сам собі.
+                scope.querySelectorAll(".size").forEach(button => {
+
+                    const size = button.dataset.size || button.textContent.trim();
+                    const isOut = out.has(size);
+
+                    button.classList.toggle("size-out", isOut);
+
+                    if (isOut) {
+                        button.dataset.out = "1";
+                        button.title = "Немає в наявності — можна замовити";
+                    } else {
+                        delete button.dataset.out;
+                        button.removeAttribute("title");
+                    }
+
+                });
+
+            } catch (error) {
+
+                // зіпсований JSON — лишаємо позначки як є
+
+            }
+
+        }
+
+        // Сторінка товару сама вирішує, що показати: у неї два джерела
+        // «під замовлення» — колір і обраний розмір.
+        if (typeof window.refreshAvailability === "function") window.refreshAvailability();
 
         const carousel = scope?.querySelector(".product-carousel");
         const carouselTrack = carousel?.querySelector(".photo-track");
@@ -3690,7 +3745,21 @@ function splitProductsByColor(list) {
                     : product.images,
                 // Позначка для картки: за нею вона додає ?color= у
                 // посилання, щоб клац відкривав саме цей колір.
-                cardColor: variant.color
+                cardColor: variant.color,
+                // «Під замовлення» — за ЦИМ кольором, а не за товаром.
+                //
+                // Залишки рахуються по кольорах (assets/js/stock.js), і
+                // збірка кладе готову відповідь у кожен варіант. Без
+                // цього рядка картка бежевої сумки, якої не лишилось,
+                // обіцяла б доставку за 1–3 дні — бо чорна ще є, і
+                // товар загалом не «під замовлення».
+                //
+                // Не через colorOverrides: там значення, які нічого не
+                // перебивають, відсіюються як порожні, а тут порожнє
+                // значення (false) — теж відповідь.
+                preOrder: typeof variant.preOrder === "boolean"
+                    ? variant.preOrder
+                    : product.preOrder
             }, variant));
 
         });

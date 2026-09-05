@@ -70,5 +70,10 @@
   "category": "Жіночі сумки",
   "legacySlugs": [
     "сумка-marc-jacobs-the-leather-small-tote-bag-cement"
-  ]
+  ],
+  "stock": {
+    "Cement тауповий - сіро-бежевий": {
+      "S": 1
+    }
+  }
 }

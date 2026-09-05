@@ -2,7 +2,7 @@
 <html lang="uk">
 
 <head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"287afbe3","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"20bbd7bb","data/image-variants.json":"5d9b13ee","data/products.json":"3506a234","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"287afbe3","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"20bbd7bb","data/image-variants.json":"5d9b13ee","data/products.json":"c442d89e","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
 
 <!-- Сторінка лежить у /p/<slug>/, а скрипти будують шляхи як
      з кореня ("data/products.json", "assets/images/…").
@@ -170,7 +170,7 @@ window.PRODUCT_ID = 26;
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="192x192" href="/assets/images/favicon-192.png">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=704abd59">
+<link rel="stylesheet" href="/assets/css/style.css?v=3e2ced46">
 
 <!-- MailerLite Universal -->
 <script>
@@ -535,8 +535,13 @@ BestBrnd4u
 <script src="/assets/js/analytics.js?v=d1829aaf"></script>
 <!-- Транслітерація: productUrl() кладе колір в адресу латиницею.
      Той самий файл використовує збірка для адрес товарів. -->
+<!-- Правила залишків: скільки лишилось і які розміри вже закінчились.
+     Той самий модуль читає збірка й адмінка — щоб «під замовлення» на
+     сайті й у прев'ю означало одне й те саме. ДО product.js. -->
+<script src="/assets/js/stock.js?v=85fa4aad"></script>
+
 <script src="/assets/js/translit.js?v=c0957cb7"></script>
-<script src="/assets/js/common.js?v=3542c905"></script>
+<script src="/assets/js/common.js?v=2bae8d12"></script>
 <script src="/assets/js/sync.js?v=48ef002e"></script>
 <script src="/assets/js/mega-menu.js?v=18cfdf18"></script>
 
@@ -546,7 +551,7 @@ BestBrnd4u
 
 <script src="/assets/js/lightbox.js?v=552b0982"></script>
 
-<script src="/assets/js/product.js?v=6e85378a"></script>
+<script src="/assets/js/product.js?v=1dae9440"></script>
 
 </body>
 

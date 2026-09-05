@@ -77,13 +77,42 @@ function renderCart() {
     let itemsCount = 0;
     let hasPreOrder = false;
 
+    // «Під замовлення» для КОНКРЕТНОГО рядка кошика.
+    //
+    // У товару це одна відповідь на всіх, а в кошику лежить конкретний
+    // колір і конкретний розмір — і саме їх могло не лишитись. Бежевої
+    // сумки немає, коли чорна є; 39-го немає, коли 40-й на складі.
+    // Без цього кошик обіцяв би доставку за 1–3 дні того, що сторінка
+    // товару вже показала як «під замовлення».
+    const linePreOrder = (product, line) => {
+
+        if (product.preOrder) return true;
+
+        const stock = window.Stock;
+
+        if (!stock) return false;
+
+        const variants = product.variants || [];
+
+        const variant = variants.find(v => v && v.color === line.color) || variants[0];
+
+        if (!variant) return false;
+
+        if (stock.colorPreOrder(product, variant)) return true;
+
+        return line.size ? stock.sizePreOrder(product, variant, line.size) : false;
+
+    };
+
     const rows = lines.map(line => {
 
         const product = findProductById(line.id);
 
         if (!product) return "";
 
-        if (product.preOrder) hasPreOrder = true;
+        const preOrder = linePreOrder(product, line);
+
+        if (preOrder) hasPreOrder = true;
 
         const qty = line.qty;
         const lineTotal = product.price * qty;
@@ -171,7 +200,7 @@ function renderCart() {
                     <a href="${lineUrl}" class="cart-item-title">
                         ${escapeHtml(product.title)}
                     </a>
-                    ${product.preOrder ? `<div class="preorder-tag">📦 Під замовлення</div>` : ""}
+                    ${preOrder ? `<div class="preorder-tag">📦 Під замовлення</div>` : ""}
                     ${colorLabel}
                     <div class="product-options cart-item-options">
 <div class="product-colors-wrap">

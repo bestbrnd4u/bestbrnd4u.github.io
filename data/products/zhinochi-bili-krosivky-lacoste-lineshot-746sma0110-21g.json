@@ -63,5 +63,10 @@
   },
   "legacySlugs": [
     "жіночі-білі-кросівки-lacoste-lineshot-746sma0110-21g"
-  ]
+  ],
+  "stock": {
+    "Білий White 21G": {
+      "38": 1
+    }
+  }
 }

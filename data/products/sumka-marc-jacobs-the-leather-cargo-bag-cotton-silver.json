@@ -71,5 +71,10 @@
   "category": "Жіночі сумки",
   "legacySlugs": [
     "сумка-marc-jacobs-the-leather-cargo-bag-cotton-silver"
-  ]
+  ],
+  "stock": {
+    "Cotton/Silver — молочний": {
+      "ONESIZE": 1
+    }
+  }
 }

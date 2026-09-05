@@ -48,5 +48,10 @@
   ],
   "slug": "gucci-sontsezakhysni-okuliary-gucci-gg0516s-grey-rectangula",
   "id": 11,
-  "color": "Темно-сірий"
+  "color": "Темно-сірий",
+  "stock": {
+    "Темно-сірий": {
+      "ONESIZE": 1
+    }
+  }
 }

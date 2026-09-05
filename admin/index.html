@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"287afbe3","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"20bbd7bb","data/image-variants.json":"5d9b13ee","data/products.json":"3506a234","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"287afbe3","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"20bbd7bb","data/image-variants.json":"5d9b13ee","data/products.json":"c442d89e","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BestBrnd4u — Адмінка</title>
@@ -12,7 +12,7 @@
          через registerPreviewStyle() — тобто лише в панель прев'ю. У
          редакторі вони не діяли, і рамка кадрування лишалась без
          розмірів. -->
-    <link rel="stylesheet" href="editor-styles.css?v=630504e1">
+    <link rel="stylesheet" href="editor-styles.css?v=0008a1ed">
     <!--SITE_ENVIRONMENT-->
     <script>window.SITE_ENVIRONMENT = {"name":"production","host":"bestbrnd4u.com","branch":"main","productionUrl":"https://bestbrnd4u.com"};</script>
 
@@ -223,6 +223,15 @@
 
     <script src="size-widget.js?v=460176d3"></script>
 
+    <!-- Правила залишків: скільки лишилось і коли товар стає «під
+         замовлення». Той самий файл читає збірка й сайт — щоб
+         арифметика в адмінці не розійшлася з тим, що побачить покупець.
+         ПІДКЛЮЧАЄТЬСЯ ДО stock-widget.js і preview-templates.js. -->
+    <script src="../assets/js/stock.js?v=85fa4aad"></script>
+
+    <!-- Таблиця залишків: рядок на колір, клітинка на розмір. -->
+    <script src="stock-widget.js?v=beeb291f"></script>
+
     <!-- Пошук товару за артикулом у списку «Товари».
          Вбудований пошук Decap короткі номери не знаходить у принципі:
          він відкидає все, що набрало ≤5 балів нечіткого зіставлення, а
@@ -280,6 +289,6 @@
          Дані підставляє scripts/apply-site-env.js (блок нижче). -->
     <script src="env-badge.js?v=95bfa2df"></script>
 
-    <script src="preview-templates.js?v=d47eb766"></script>
+    <script src="preview-templates.js?v=35e46123"></script>
 </body>
 </html>

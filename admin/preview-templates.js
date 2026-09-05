@@ -521,6 +521,30 @@
     // ТОВАР — справжня картка каталогу
     // -------------------------
 
+    // Залишки коротким рядком: «Бежевий 3 · Чорний немає».
+    //
+    // У характеристиках прев'ю це єдине місце, де видно, чому товар
+    // раптом «під замовлення»: сама таблиця залишків живе в редакторі
+    // ліворуч, і, гортаючи прев'ю, її не видно.
+    function stockSummary(data) {
+
+        if (!window.Stock || !window.Stock.productTracked(data)) return "";
+
+        return (data.variants || []).map(function (variant) {
+
+            var stock = window.Stock.variantStock(data, variant);
+
+            if (!window.Stock.tracked(stock)) return variant.color + " — не рахуємо";
+
+            var soldOut = window.Stock.colorSoldOut(stock, window.Stock.sizesOf(data, variant));
+
+            return variant.color + " — "
+                + (soldOut ? "немає" : window.Stock.total(stock) + " шт");
+
+        }).join(" · ");
+
+    }
+
     var ProductPreview = createClass({
 
         getInitialState: function () {
@@ -561,6 +585,15 @@
                 ? first.sizes
                 : (e.get("sizes") ? e.get("sizes").toJS() : []);
 
+            // «Під замовлення» рахуємо ТИМ САМИМ модулем, що збірка й
+            // сайт (assets/js/stock.js): перемикач АБО нульові залишки.
+            // Своя копія правила тут означала б, що прев'ю показує одне,
+            // а опублікований товар — інше.
+            var entryData = e.toJS ? e.toJS() : {};
+            var preOrder = window.Stock
+                ? window.Stock.isPreOrder(entryData)
+                : Boolean(e.get("preOrder"));
+
             var card = h("div", { className: "product-card cms-preview-card" },
 
                 h("div", { className: "product-image" },
@@ -568,7 +601,7 @@
                     h("div", { className: "badge-stack" },
                         e.get("badge") ? h("div", { className: "badge" }, e.get("badge")) : null,
                         discount > 0 ? h("div", { className: "badge badge-discount" }, "-" + discount + "%") : null,
-                        e.get("preOrder") ? h("div", { className: "badge badge-preorder" }, "📦") : null
+                        preOrder ? h("div", { className: "badge badge-preorder" }, "📦") : null
                     ),
 
                     h(PreviewGallery, {
@@ -617,7 +650,7 @@
                     ),
 
                     h("button", { className: "buy-btn", type: "button" },
-                        e.get("preOrder") ? "Замовити" : "Купити")
+                        preOrder ? "Замовити" : "Купити")
                 )
             );
 
@@ -692,10 +725,19 @@
                     })
                 ),
 
-                h("div", { className: "cms-preview-hint" },
-                    view === "card"
-                        ? "Так товар виглядатиме в каталозі. Гортайте фото стрілками."
-                        : "Так виглядатиме сторінка товару. Нижче — решта даних."),
+                h("div", {
+                    className: "cms-preview-hint"
+                        + (e.get("soldOut") ? " cms-preview-hint-off" : "")
+                },
+                    e.get("soldOut")
+                        // Найважливіше про цей товар: його на сайті
+                        // немає. Показувати замість цього «так він
+                        // виглядатиме в каталозі» означало б збрехати.
+                        ? "🚫 Розпродано: товару немає ні в каталозі, ні в пошуку, "
+                          + "ні за прямим посиланням. Вимкніть перемикач унизу — повернеться."
+                        : view === "card"
+                            ? "Так товар виглядатиме в каталозі. Гортайте фото стрілками."
+                            : "Так виглядатиме сторінка товару. Нижче — решта даних."),
 
                 h("div", { className: "cms-preview-stage" },
                     view === "card" ? card : pageView),
@@ -712,7 +754,11 @@
                     ["Знижка", discount > 0 ? "-" + discount + "%" : ""],
                     ["Бейдж", e.get("badge")],
                     ["Новинка", e.get("isNew") ? "так" : ""],
-                    ["Під замовлення", e.get("preOrder") ? "так" : ""],
+                    ["Розпродано", e.get("soldOut") ? "так — товар прибрано з сайту" : ""],
+                    ["Під замовлення", e.get("preOrder")
+                        ? "так — перемикач «завжди під замовлення»"
+                        : (preOrder ? "так — нульові залишки" : "")],
+                    ["Залишки", stockSummary(entryData)],
                     ["Термін виготовлення", e.get("preOrderDays")],
                     ["Передоплата, %", e.get("preOrderPrepayment")]
                 ])),

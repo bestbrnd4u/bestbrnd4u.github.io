@@ -67,5 +67,10 @@
   "category": "Жіночі сумки",
   "legacySlugs": [
     "жіноча-сумочка-marc-jacobs-the-creature-tote-bag-black"
-  ]
+  ],
+  "stock": {
+    "Чорний": {
+      "ONESIZE": 1
+    }
+  }
 }

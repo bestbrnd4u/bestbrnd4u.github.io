@@ -50,5 +50,10 @@
   ],
   "slug": "burberry-sontsezakhysni-okuliary-burberry-sophia-dark-grey-c",
   "id": 6,
-  "color": "Темно-сірий"
+  "color": "Темно-сірий",
+  "stock": {
+    "Темно-сірий": {
+      "ONESIZE": 1
+    }
+  }
 }

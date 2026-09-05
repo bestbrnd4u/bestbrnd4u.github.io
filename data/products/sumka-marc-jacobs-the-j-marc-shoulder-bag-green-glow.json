@@ -73,5 +73,10 @@
   "category": "Жіночі сумки",
   "legacySlugs": [
     "сумка-marc-jacobs-the-j-marc-shoulder-bag-green-glow"
-  ]
+  ],
+  "stock": {
+    "Green Glow — яскравий зелений": {
+      "ONESIZE": 1
+    }
+  }
 }

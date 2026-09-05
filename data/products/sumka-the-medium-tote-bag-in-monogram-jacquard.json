@@ -72,5 +72,10 @@
   "category": "Жіночі сумки",
   "legacySlugs": [
     "сумка-the-medium-tote-bag-in-monogram-jacquard"
-  ]
+  ],
+  "stock": {
+    "Black Beige  чорний  бежевий": {
+      "M": 1
+    }
+  }
 }

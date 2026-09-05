@@ -300,3 +300,141 @@
     color:#fff;
     font-weight:600;
 }
+
+/* ==========================================================
+   Залишки на складі (admin/stock-widget.js)
+
+   Рядок на колір, клітинка на розмір. Головне тут — щоб «нуль по
+   всьому кольору» було видно НЕ читаючи цифри: саме він відправляє
+   колір у «під замовлення».
+   ========================================================== */
+
+.stock-widget{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    padding:2px 0;
+}
+
+.stock-empty{
+    font-size:12.5px;
+    color:#6b7280;
+    padding:8px 10px;
+    background:#f9fafb;
+    border-radius:8px;
+}
+
+.stock-row{
+    border:1px solid #e5e7eb;
+    border-radius:8px;
+    padding:9px 11px;
+    background:#fff;
+}
+
+/* Колір, якого не лишилось. Не «помилка», а стан: спокійний бурштин,
+   як у позначки «без ТТН» у замовленнях. */
+.stock-row-out{
+    border-color:#fcd34d;
+    background:#fffbeb;
+}
+
+.stock-row-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    margin-bottom:7px;
+}
+
+.stock-color{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    font-size:13px;
+    font-weight:600;
+    color:#111827;
+    min-width:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.stock-dot{
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    border:1px solid rgba(0,0,0,.15);
+    flex-shrink:0;
+}
+
+.stock-total{
+    font-size:11.5px;
+    color:#6b7280;
+    white-space:nowrap;
+}
+
+.stock-row-out .stock-total{ color:#92400e; font-weight:600; }
+
+.stock-cells{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+}
+
+.stock-cell{
+    display:flex;
+    flex-direction:column;
+    gap:3px;
+    width:74px;
+}
+
+.stock-size{
+    font-size:11px;
+    color:#6b7280;
+    text-align:center;
+}
+
+.stock-cell input{
+    width:100%;
+    padding:6px 8px;
+    border:1px solid #d1d5db;
+    border-radius:6px;
+    font-size:13px;
+    text-align:center;
+}
+
+.stock-cell input:focus{
+    outline:none;
+    border-color:#2563eb;
+    box-shadow:0 0 0 3px rgba(37,99,235,.14);
+}
+
+.stock-row-actions{
+    display:flex;
+    gap:6px;
+    margin-top:8px;
+}
+
+.stock-mini{
+    padding:4px 9px;
+    border:1px solid #d1d5db;
+    border-radius:6px;
+    background:#fff;
+    font-size:11.5px;
+    cursor:pointer;
+    color:#374151;
+}
+
+.stock-summary{
+    font-size:12px;
+    color:#6b7280;
+    padding:7px 10px;
+    background:#f9fafb;
+    border-radius:8px;
+}
+
+.stock-summary-out{
+    background:#fffbeb;
+    color:#92400e;
+    font-weight:600;
+}

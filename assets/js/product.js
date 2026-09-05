@@ -853,8 +853,70 @@ function pageColorView(base, variant) {
         title: view.title || "",
         badge: view.badge || "",
         priceBox: `${oldPrice}<span class="price">${formatPrice(view.price)}</span>`,
-        description: view.description || ""
+        description: view.description || "",
+        // Стан наявності саме цього кольору: чи він «під замовлення» і
+        // яких розмірів немає. Перемикач кольору застосовує це до
+        // сторінки, не перемальовуючи її цілком (див. common.js).
+        preOrder: Boolean(variant && variant.preOrder),
+        soldOutSizes: soldOutSizes(base, variant)
     };
+
+}
+
+// Наявність на сторінці: позначка, текст кнопки й блок умов.
+//
+// ЧОМУ ОКРЕМА ФУНКЦІЯ, А НЕ ШАБЛОН
+// ---------------------------------
+// «Під замовлення» тут залежить від ДВОХ речей, і обидві міняються без
+// перемальовки сторінки: обраного кольору (у нього свій залишок) і
+// обраного розміру (39-го може не бути, коли 40-й лежить на складі).
+// Тому обидва блоки — умови замовлення й доставка — завжди в розмітці,
+// а показ перемикається тут.
+//
+// Викликає це і сторінка (клік по розміру), і спільний перемикач
+// кольору в common.js — щоб відповідь була одна.
+function refreshAvailability() {
+
+    const page = document.getElementById("productPage");
+
+    if (!page) return;
+
+    const preOrder = page.dataset.colorPreorder === "1"
+        || Boolean(page.querySelector(".size.active[data-out]"));
+
+    const tag = page.querySelector(".preorder-tag");
+
+    if (tag) tag.hidden = !preOrder;
+
+    const buy = page.querySelector(".buy-btn");
+
+    if (buy) buy.textContent = preOrder ? "📦 Замовити" : "🛒 Купити";
+
+    const box = page.querySelector(".preorder-box");
+
+    if (box) box.hidden = !preOrder;
+
+    const delivery = page.querySelector(".delivery-box");
+
+    if (delivery) delivery.hidden = preOrder;
+
+}
+
+// Розміри цього кольору, яких немає в наявності.
+//
+// Саме розміру, а не товару: у кросівок 39-го може не бути, а 40-й
+// лежить на складі. Порожній перелік = або залишки не рахують, або все є.
+function soldOutSizes(product, variant) {
+
+    const stock = window.Stock;
+
+    if (!stock || !variant) return [];
+
+    const map = stock.variantStock(product, variant);
+
+    if (!stock.tracked(map)) return [];
+
+    return getVariantSizes(product, variant).filter(size => stock.sizeSoldOut(map, size));
 
 }
 
@@ -900,6 +962,16 @@ function renderProduct(product) {
     // Перевизначень немає — applyColorOverrides повертає той самий обʼєкт.
     product = applyColorOverrides(product, activeVariant);
 
+    // «Під замовлення» — теж за активним кольором.
+    //
+    // Залишки рахуються по кольорах (assets/js/stock.js), і збірка
+    // кладе готову відповідь у кожен варіант. Без цього рядка сторінка
+    // бежевої сумки, якої не лишилось, обіцяла б доставку за 1–3 дні —
+    // бо чорна ще є, і товар ЗАГАЛОМ не «під замовлення».
+    if (typeof activeVariant.preOrder === "boolean") {
+        product = { ...product, preOrder: activeVariant.preOrder };
+    }
+
     // Рамки кадрування діють на всю сторінку товару — і на великі
     // слайди, і на мініатюри, і після перемикання кольору
     // (updateGalleryForColor малює галерею наново вже без product).
@@ -914,7 +986,12 @@ function renderProduct(product) {
 
     // data-page-view ставимо ЛИШЕ коли хоч один колір щось перевизначає:
     // інакше атрибут висів би на кожному свотчі й нічого не змінював.
-    const hasColorViews = variants.some(v => Object.keys(colorOverrides(productBase, v)).length);
+    // Наявність теж їде в data-page-view, тож атрибут потрібен і тоді,
+    // коли кольори нічого не перевизначають, але залишки рахуються:
+    // інакше перемикання кольору не оновило б ні позначку «під
+    // замовлення», ні перекреслені розміри.
+    const hasColorViews = variants.some(v => Object.keys(colorOverrides(productBase, v)).length)
+        || variants.some(v => soldOutSizes(productBase, v).length || v.preOrder);
 
     const colorButtons = variants.map((variant, index) => {
 
@@ -956,6 +1033,7 @@ function renderProduct(product) {
             data-color="${escapeHtml(variant.color)}"
             data-images='${escapeAttrSingleQuoted(JSON.stringify(variant.images || []))}'
             data-sizes='${escapeAttrSingleQuoted(JSON.stringify(getVariantSizes(product, variant)))}'
+            data-out-sizes='${escapeAttrSingleQuoted(JSON.stringify(soldOutSizes(productBase, variant)))}'
             data-sku="${escapeHtml(getVariantArticle(product, variant))}"
             data-supplier-sku="${escapeHtml(getVariantSku(product, variant))}"
             data-video="${escapeHtml(variant.video || "")}"
@@ -988,17 +1066,34 @@ function renderProduct(product) {
     // він приходить сюди через ?size= і має лишитися обраним
     const requestedSize = params.get("size");
 
+    // Розміри, яких немає в наявності. Не ховаємо їх: покупець шукає
+    // свій розмір і має побачити, що він існує, — просто під
+    // замовлення. Схований розмір читається як «такого не буває».
+    const outOfStock = new Set(soldOutSizes(productBase, activeVariant));
+
     const sizeButtons = sizes.map(size => {
 
         const isActive = sizes.length === 1 || size === requestedSize;
+        const isOut = outOfStock.has(size);
 
         return `
-        <button class="size ${isActive ? "active" : ""}">
+        <button type="button"
+                class="size ${isActive ? "active" : ""} ${isOut ? "size-out" : ""}"
+                data-size="${escapeHtml(size)}"
+                ${isOut ? 'data-out="1" title="Немає в наявності — можна замовити"' : ""}>
             ${size}
         </button>
     `;
 
     }).join("");
+
+    // Стан наявності КОЛЬОРУ тримаємо на самому контейнері.
+    //
+    // Далі його читає refreshAvailability(): чи показувати «під
+    // замовлення», вирішують дві речі — колір і обраний розмір, — і
+    // жодна з них не переживає перемальовку розмітки. Атрибут на
+    // елементі переживає: innerHTML міняє вміст, а не сам вузол.
+    document.getElementById("productPage").dataset.colorPreorder = product.preOrder ? "1" : "0";
 
     document.getElementById("productPage").innerHTML = `
 
@@ -1045,7 +1140,7 @@ function renderProduct(product) {
 
         </a>
 
-        ${product.preOrder ? `<div class="preorder-tag">📦 Під замовлення</div>` : ""}
+        <div class="preorder-tag" ${product.preOrder ? "" : "hidden"}>📦 Під замовлення</div>
 
         <h1>
 
@@ -1140,8 +1235,7 @@ ${sizeButtons}
 
         </div>
 
-        ${product.preOrder ? `
-        <div class="preorder-box">
+        <div class="preorder-box" ${product.preOrder ? "" : "hidden"}>
 
             <div class="preorder-box-title">📦 Цей товар під замовлення</div>
 
@@ -1157,8 +1251,8 @@ ${sizeButtons}
             </p>
 
         </div>
-        ` : `
-        <div class="delivery-box">
+
+        <div class="delivery-box" ${product.preOrder ? "hidden" : ""}>
 
             <div>🚚 Доставка по Україні 1–3 дні</div>
 
@@ -1167,7 +1261,6 @@ ${sizeButtons}
             <div>↩️ Повернення протягом 14 днів</div>
 
         </div>
-        `}
 
         <div class="specifications" id="productSpecifications">
 
@@ -1345,6 +1438,10 @@ ${sizeButtons}
             const errorEl = document.getElementById("sizeError");
 
             if (errorEl) errorEl.hidden = true;
+
+            // Обрали розмір, якого немає — сторінка переходить у «під
+            // замовлення»: позначка, текст кнопки й умови.
+            refreshAvailability();
 
         });
 
