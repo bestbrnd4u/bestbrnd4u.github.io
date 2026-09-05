@@ -256,8 +256,18 @@ console.log("\n[6] Памʼять кроку — прапорець у базі"
     check("позначаємо після запису, а не до",
         script.indexOf("if (apply)") < script.indexOf("if (mark)"));
 
-    check("без секретів крок мовчки завершується",
-        /не задані — крок пропущено/.test(script));
+    check("без секрету крок мовчки завершується",
+        /не заданий — крок пропущено/.test(script));
+
+    // Адреса проєкту — не секрет: вона відкрито лежить у коді сайту.
+    // Другий секрет означав би вибір «Secrets чи Variables» там, де
+    // вибирати нема чого.
+    check("адреса береться з коду сайту, а не з секрету",
+        /assets", "js", "supabase-client\.js"/.test(script));
+    check("і збігається з тією, яку вантажить сайт",
+        Stock.supabaseUrl()
+        === /SUPABASE_URL\s*=\s*"([^"]+)"/.exec(read("assets/js/supabase-client.js"))[1],
+        Stock.supabaseUrl());
 }
 
 console.log("\n[7] Дві гілки, один план");
@@ -298,8 +308,11 @@ console.log("\n[8] Інструкція");
 {
     const doc = read("docs/ЗАЛИШКИ.md");
 
-    check("описано, які секрети додати",
-        /SUPABASE_SERVICE_ROLE_KEY/.test(doc) && /Secrets and variables/.test(doc));
+    check("описано, який секрет додати",
+        /SUPABASE_SERVICE_ROLE_KEY/.test(doc) && /New repository secret/.test(doc));
+    check("сказано, чому саме repository, а не environment",
+        /не оголошує середовища/.test(doc));
+    check("і чому не Variables", /видно в логах/.test(doc));
     check("сказано про міграцію", /010-stock-applied\.sql/.test(doc));
     check("попереджено про ключ service_role", /обходить усі обмеження/.test(doc));
     check("пояснено головне правило", /Порожня клітинка — це не нуль/.test(doc));

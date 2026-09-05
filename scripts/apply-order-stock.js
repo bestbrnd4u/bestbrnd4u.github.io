@@ -43,9 +43,10 @@
 // між двома запитами, потрапило б в одну гілку й не потрапило в іншу.
 // Так це й робить .github/workflows/apply-stock.yml.
 //
-// Потрібні змінні середовища SUPABASE_URL і SUPABASE_SERVICE_ROLE_KEY.
-// Без них крок нічого не робить і завершується успішно — щоб розклад
-// не червонів, поки секрети не додали.
+// Потрібен ОДИН секрет — SUPABASE_SERVICE_ROLE_KEY. Адресу проєкту
+// беремо з коду сайту (див. supabaseUrl нижче): вона й так відкрита.
+// Без ключа крок нічого не робить і завершується успішно — щоб розклад
+// не червонів, поки секрет не додали.
 // ======================================
 
 const fs = require("fs");
@@ -62,6 +63,28 @@ function productsDir() {
     const found = process.argv.find(item => item.startsWith("--dir="));
 
     return found ? path.resolve(found.slice("--dir=".length)) : path.join(ROOT, "data", "products");
+
+}
+
+// Адреса проєкту Supabase.
+//
+// Це НЕ секрет: вона відкрито лежить у коді сайту, інакше браузер не
+// зміг би до неї звертатись. Тому беремо її звідти, а не вимагаємо
+// ще один секрет — секретом лишається тільки ключ.
+//
+// Змінна середовища все одно має перевагу: якщо проєкт колись
+// переїде, це можна полагодити, не чіпаючи код.
+function supabaseUrl() {
+
+    if (process.env.SUPABASE_URL) return process.env.SUPABASE_URL;
+
+    const client = path.join(ROOT, "assets", "js", "supabase-client.js");
+
+    if (!fs.existsSync(client)) return "";
+
+    const found = /SUPABASE_URL\s*=\s*"([^"]+)"/.exec(fs.readFileSync(client, "utf8"));
+
+    return found ? found[1] : "";
 
 }
 
@@ -405,7 +428,7 @@ async function main() {
     const planOut = arg("plan-out");
     const planIn = arg("plan-in");
 
-    const url = process.env.SUPABASE_URL;
+    const url = supabaseUrl();
     const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     let plan;
@@ -420,7 +443,7 @@ async function main() {
 
             // Не помилка: секрети могли ще не додати. Червоний розклад
             // щодесять хвилин нічого не пояснює, а лякає.
-            console.log("SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY не задані — крок пропущено");
+            console.log("SUPABASE_SERVICE_ROLE_KEY не заданий — крок пропущено");
 
             if (planOut) fs.writeFileSync(planOut, JSON.stringify({ changes: [], marks: [], notes: [] }), "utf8");
 
@@ -474,7 +497,7 @@ async function main() {
 
     if (mark) {
 
-        if (!url || !key) throw new Error("для --mark потрібні SUPABASE_URL і SUPABASE_SERVICE_ROLE_KEY");
+        if (!url || !key) throw new Error("для --mark потрібен секрет SUPABASE_SERVICE_ROLE_KEY");
 
         // Позначаємо В САМОМУ КІНЦІ: якщо крок упаде раніше, наступний
         // запуск повторить роботу, а не втратить її.
@@ -498,7 +521,7 @@ async function main() {
 
 }
 
-module.exports = { planChanges, applyChanges, locate, orderDirection, colorBridge };
+module.exports = { planChanges, applyChanges, locate, orderDirection, colorBridge, supabaseUrl };
 
 if (require.main === module) {
 
