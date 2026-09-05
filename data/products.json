@@ -247,7 +247,7 @@
     "badge": "SALE",
     "brand": "Balenciaga",
     "price": 13000,
-    "preOrder": true,
+    "preOrder": false,
     "slug": "balenciaga-balenciaga-sontsezakhysni-okuliary-grey-rectangul",
     "variants": [
       {
@@ -265,9 +265,9 @@
         ],
         "article": "5-1",
         "stock": {
-          "ONESIZE": 0
+          "ONESIZE": 1
         },
-        "inStock": 0
+        "inStock": 1
       }
     ],
     "sizes": [
@@ -299,7 +299,7 @@
     "sku": "BB0041S-001-99",
     "category": "Окуляри і оправи",
     "article": "5",
-    "inStock": 0
+    "inStock": 1
   },
   {
     "title": "Сонцезахисні окуляри Burberry Sophia Dark Grey Cat Eye",
@@ -1945,10 +1945,9 @@
         ],
         "article": "28-1",
         "stock": {
-          "ONESIZE": 0
+          "ONESIZE": 1
         },
-        "inStock": 0,
-        "preOrder": true
+        "inStock": 1
       },
       {
         "color": "Світло-сірий",
@@ -2041,7 +2040,7 @@
     "rating": 5,
     "category": "Жіночі сумки",
     "article": "28",
-    "inStock": 3
+    "inStock": 4
   },
   {
     "gender": [
@@ -2109,7 +2108,7 @@
     "forcePublish": true,
     "brand": "Love Moschino",
     "price": 8500,
-    "preOrder": true,
+    "preOrder": false,
     "dimensions": "25 × 15 × 7 см",
     "variants": [
       {
@@ -2125,9 +2124,9 @@
         "video": "/assets/images/products/uploads/video360_8058051562499_ak_1022p.mp4",
         "article": "30-1",
         "stock": {
-          "ONESIZE": 0
+          "ONESIZE": 1
         },
-        "inStock": 0
+        "inStock": 1
       }
     ],
     "preOrderPrepayment": 50,
@@ -2173,7 +2172,7 @@
       "сумочка-love-moschino-logo-plaque-quilted-shoulder-bag"
     ],
     "article": "30",
-    "inStock": 0
+    "inStock": 1
   },
   {
     "gender": [
@@ -2184,7 +2183,7 @@
     "material": "100% натуральна шкіра ",
     "brand": "Michael Kors",
     "price": 8500,
-    "preOrder": true,
+    "preOrder": false,
     "dimensions": "28,5 × 12 × 21 см",
     "variants": [
       {
@@ -2199,9 +2198,9 @@
         ],
         "article": "31-1",
         "stock": {
-          "ONESIZE": 0
+          "ONESIZE": 1
         },
-        "inStock": 0
+        "inStock": 1
       }
     ],
     "preOrderPrepayment": 50,
@@ -2258,7 +2257,7 @@
       "сумочка-з-натуральної-шкіри-michael-kors-carine-medium-pebbled-leather-satchel-powder-blush"
     ],
     "article": "31",
-    "inStock": 0
+    "inStock": 1
   },
   {
     "gender": [
@@ -3071,7 +3070,7 @@
     "forcePublish": false,
     "brand": "Lacoste",
     "price": 6000,
-    "preOrder": true,
+    "preOrder": false,
     "variants": [
       {
         "color": "Білий",
@@ -3084,9 +3083,9 @@
         ],
         "article": "43-1",
         "stock": {
-          "38": 0
+          "38": 1
         },
-        "inStock": 0
+        "inStock": 1
       }
     ],
     "preOrderPrepayment": 50,
@@ -3135,7 +3134,7 @@
       "жіночі-білі-кросівки-lacoste-lineshot-746sma0110-21g"
     ],
     "article": "43",
-    "inStock": 0
+    "inStock": 1
   },
   {
     "gender": [
@@ -3145,7 +3144,7 @@
     "forcePublish": false,
     "brand": "Lacoste",
     "price": 6000,
-    "preOrder": true,
+    "preOrder": false,
     "variants": [
       {
         "color": "Бежевий",
@@ -3158,9 +3157,9 @@
         ],
         "article": "44-1",
         "stock": {
-          "38": 0
+          "38": 1
         },
-        "inStock": 0
+        "inStock": 1
       }
     ],
     "preOrderPrepayment": 50,
@@ -3209,7 +3208,7 @@
       "жіночі-бежеві-кросівки-з-чорними-деталями-lacoste-lineshot-746sfa0075-1r5"
     ],
     "article": "44",
-    "inStock": 0
+    "inStock": 1
   },
   {
     "gender": [
@@ -4275,7 +4274,7 @@
     "material": "Натуральна шкіра",
     "brand": "Marc Jacobs",
     "price": 9000,
-    "preOrder": true,
+    "preOrder": false,
     "slug": "sumka-marc-jacobs-the-j-marc-shoulder-bag-green-glow",
     "dimensions": "25 × 16 × 5 см",
     "variants": [
@@ -4291,9 +4290,9 @@
         ],
         "article": "57-1",
         "stock": {
-          "ONESIZE": 0
+          "ONESIZE": 1
         },
-        "inStock": 0
+        "inStock": 1
       }
     ],
     "preOrderPrepayment": 50,
@@ -4347,7 +4346,7 @@
       "сумка-marc-jacobs-the-j-marc-shoulder-bag-green-glow"
     ],
     "article": "57",
-    "inStock": 0
+    "inStock": 1
   },
   {
     "gender": [
@@ -4594,10 +4593,9 @@
         ],
         "article": "60-2",
         "stock": {
-          "ONESIZE": 0
+          "ONESIZE": 1
         },
-        "inStock": 0,
-        "preOrder": true
+        "inStock": 1
       }
     ],
     "preOrderPrepayment": 50,
@@ -4648,7 +4646,7 @@
       "сумка-jacquemus-le-grand-bambino-beige"
     ],
     "article": "60",
-    "inStock": 1
+    "inStock": 2
   },
   {
     "gender": [
@@ -4672,7 +4670,7 @@
         "y": 65
       }
     },
-    "preOrder": true,
+    "preOrder": false,
     "slug": "shoper-marc-jacobs-the-denim-small-tote-bag-blue",
     "dimensions": "26 × 21 × 13 см",
     "variants": [
@@ -4688,9 +4686,9 @@
         ],
         "article": "61-1",
         "stock": {
-          "S": 0
+          "S": 1
         },
-        "inStock": 0
+        "inStock": 1
       }
     ],
     "preOrderPrepayment": 50,
@@ -4745,7 +4743,7 @@
       "шопер-marc-jacobs-the-denim-small-tote-bag-blue"
     ],
     "article": "61",
-    "inStock": 0
+    "inStock": 1
   },
   {
     "gender": [
@@ -4866,7 +4864,7 @@
     "material": "Фірмовий покритий Signature Canvas та гладка шкіра",
     "brand": "Coach",
     "price": 6000,
-    "preOrder": true,
+    "preOrder": false,
     "dimensions": "32 × 27 × 14 см",
     "variants": [
       {
@@ -4880,9 +4878,9 @@
         ],
         "article": "63-1",
         "stock": {
-          "ONESIZE": 0
+          "ONESIZE": 1
         },
-        "inStock": 0
+        "inStock": 1
       }
     ],
     "preOrderPrepayment": 50,
@@ -4936,7 +4934,7 @@
       "шопер-coach-gallery-tote-bag-in-signature-canvas"
     ],
     "article": "63",
-    "inStock": 0
+    "inStock": 1
   },
   {
     "gender": [
@@ -4947,7 +4945,7 @@
     "material": "Натуральна гладка шкіра",
     "brand": "Jacquemus",
     "price": 19000,
-    "preOrder": true,
+    "preOrder": false,
     "dimensions": "17,5 × 8,5 × 6,5 см",
     "variants": [
       {
@@ -4962,9 +4960,9 @@
         ],
         "article": "64-1",
         "stock": {
-          "ONESIZE": 0
+          "ONESIZE": 1
         },
-        "inStock": 0
+        "inStock": 1
       }
     ],
     "preOrderPrepayment": 50,
@@ -5019,7 +5017,7 @@
       "сумочка-jacquemus-le-bambino-white"
     ],
     "article": "64",
-    "inStock": 0
+    "inStock": 1
   },
   {
     "gender": [
@@ -5323,7 +5321,7 @@
     "material": "Натуральна теляча шкіра",
     "brand": "Coach",
     "price": 3800,
-    "preOrder": true,
+    "preOrder": false,
     "dimensions": "11 × 9,5 × 2 см",
     "variants": [
       {
@@ -5336,9 +5334,9 @@
         ],
         "article": "69-1",
         "stock": {
-          "ONESIZE": 0
+          "ONESIZE": 1
         },
-        "inStock": 0
+        "inStock": 1
       }
     ],
     "preOrderPrepayment": 50,
@@ -5380,7 +5378,7 @@
       "гаманець-coach-3-in-1-wallet-in-signature-leather"
     ],
     "article": "69",
-    "inStock": 0
+    "inStock": 1
   },
   {
     "gender": [
