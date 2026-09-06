@@ -49,6 +49,40 @@ console.log("\n[1] Згода — дія, а не бездіяльність");
     check("є спосіб змінити рішення", /reopen: function/.test(consentCode));
     check("посилання є в підвалі", /data-consent-reopen/.test(read("index.html")));
 
+    // ПОСИЛАННЯ МУСИТЬ ЩОСЬ РОБИТИ.
+    //
+    // Тут була мертва кнопка: render() виходив, якщо банер уже на
+    // екрані, — тобто клік по «Налаштування даних» у людини, яка ще не
+    // відповіла, не робив нічого видимого. Гірше: reopen() при цьому
+    // стирав збережений вибір, тобто мовчки вимикав статистику,
+    // рекламу й відео.
+    check("банер перемальовується, а не мовчить",
+        /function render\(mode\)[\s\S]{0,900}close\(\);/.test(consentCode)
+        && !/if \(document\.getElementById\("consentBanner"\)\) return;/.test(consentCode));
+
+    check("сам клік нічого не змінює",
+        !/reopen: function[\s\S]{0,300}removeItem/.test(consentCode));
+
+    // «Налаштування» мусять бути налаштуваннями: вимкнути саму лише
+    // рекламу, не втрачаючи відео й статистики.
+    check("є перемикачі по категоріях", /data-consent-option/.test(consentCode));
+
+    check("перемикачі показують поточний вибір",
+        /saved && saved\[name\] \? " checked" : ""/.test(consentCode));
+
+    check("вибір зберігається кнопкою", /action === "save"/.test(consentCode));
+
+    check("людина бачить, що вибір збережено", /showToast/.test(consentCode));
+
+    // Видимість банера не має залежати від того, чи встигла
+    // програтись анімація: у присплений вкладці вона не починається
+    // взагалі, і банер лишався б за межами екрана.
+    const css = read("assets/css/style.css");
+
+    check("анімація не ховає банер за екран",
+        /@keyframes consentUp\{ from\{transform:translateY\(1?\dpx\)\}/.test(css),
+        (css.match(/@keyframes consentUp[^}]*\}[^}]*\}/) || [""])[0]);
+
     // Приватний режим: чесніше питати щоразу, ніж мовчки вважати
     // згоду отриманою.
     check("збій сховища не дає мовчазної згоди",
@@ -122,17 +156,20 @@ console.log("\n[3] Текст банера відповідає дійсност
         && /реклам/.test(consent));
     check("є посилання на політику", /href="privacy-policy"/.test(consent));
 
-    // Банер мусить лишатись коротким: це і є суть правки.
-    const bannerText = (consent.match(/box\.innerHTML = \[([\s\S]*?)\]\.join/) || ["", ""])[1]
-        .match(/'[^']*'/g)
+    // Банер ПЕРШОГО показу мусить лишатись коротким: це і є суть
+    // правки. Текст лежить окремою константою саме для цього — раніше
+    // тут вишкрібалися всі рядки з innerHTML, і перевірка почала
+    // рахувати заразом текст режиму «Налаштування», тобто вимірювала
+    // не те.
+    const askText = (consent.match(/var ASK_TEXT = ([\s\S]*?);\n/) || ["", ""])[1]
+        .match(/"[^"]*"/g)
         .map(x => x.slice(1, -1))
-        .join(" ")
-        .replace(/<[^>]*>/g, "")
+        .join("")
         .replace(/\s+/g, " ")
         .trim();
 
-    check(`текст банера — ${bannerText.length} символів`,
-        bannerText.length < 200, bannerText.length);
+    check(`текст банера — ${askText.length} символів`,
+        askText.length > 0 && askText.length < 200, askText.length);
 
     // А повний опис мусить бути в політиці — там, куди веде посилання.
     check("статистика описана в політиці", /Google Analytics/.test(policy));
