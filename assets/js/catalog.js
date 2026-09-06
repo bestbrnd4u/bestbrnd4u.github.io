@@ -2654,6 +2654,52 @@ function setupGenderFilter() {
 }
 
 // -------------------------
+// Значок «скільки фільтрів обрано» на кнопці «Фільтри»
+// -------------------------
+//
+// ТРИ СИМПТОМИ, ЯКІ ЦЕ ЗАКРИВАЄ
+//
+// 1. Значок з'являвся лише з ДРУГОГО фільтра. Насправді він завжди
+//    показував стан на крок назад: обчислювався тільки при відкритті
+//    шторки «Всі фільтри», тобто ще до того, як людина щось у ній
+//    обрала. Обрала один — при наступному відкритті побачила «1»,
+//    хоч фільтрів уже два.
+//
+// 2. Після «Скинути фільтри» значок лишався висіти: скидання шторку
+//    не відкриває, отже й не перераховувалось нічого.
+//
+// 3. Посилання з фільтрами (?brand=coach&color=chornyi) відкривалось
+//    із зовсім порожньою кнопкою — з тієї ж причини.
+//
+// Тепер рахунок живе поруч зі станом фільтрів, а значок оновлює
+// render() — той самий крок, що малює картки й чіпи активних
+// фільтрів. Будь-який шлях зміни фільтрів проходить через нього.
+function activeFilterCount() {
+
+    return selectedGenders.size
+        + selectedBrands.size
+        + selectedColors.size
+        + selectedCategories.size
+        + selectedDepartments.size
+        + (priceFilterActive() ? 1 : 0)
+        + selectedSizes.size;
+
+}
+
+function updateMobileFilterCount() {
+
+    const badge = document.getElementById("mobileFiltersCount");
+
+    if (!badge) return;
+
+    const count = activeFilterCount();
+
+    badge.hidden = count === 0;
+    badge.textContent = count;
+
+}
+
+// -------------------------
 // Каталог бренду
 // -------------------------
 //
@@ -3672,6 +3718,8 @@ function render() {
 
     renderActiveFilters();
 
+    updateMobileFilterCount();
+
     refreshFacets();
 
 }
@@ -4053,7 +4101,6 @@ if (!window.CATALOG_SKIP_AUTO_INIT) {
 
     const mobileFilterBar = document.getElementById("mobileFilterBar");
     const mobileFiltersBtn = document.getElementById("mobileFiltersBtn");
-    const mobileFiltersCount = document.getElementById("mobileFiltersCount");
     const mobileFiltersModal = document.getElementById("mobileFiltersModal");
     const mobileFiltersMain = document.getElementById("mobileFiltersMain");
     const mobileFiltersSub = document.getElementById("mobileFiltersSub");
@@ -4107,18 +4154,6 @@ if (!window.CATALOG_SKIP_AUTO_INIT) {
 
     }
 
-    function activeFilterCount() {
-
-        return selectedGenders.size
-            + selectedBrands.size
-            + selectedColors.size
-            + selectedCategories.size
-            + selectedDepartments.size
-            + (priceFilterActive() ? 1 : 0)
-            + selectedSizes.size;
-
-    }
-
     function refreshRowLabels() {
 
         if (mfRows.category) mfRows.category.textContent = categoryLabel ? categoryLabel.textContent : "";
@@ -4128,12 +4163,7 @@ if (!window.CATALOG_SKIP_AUTO_INIT) {
         if (mfRows.price) mfRows.price.textContent = priceLabel ? priceLabel.textContent : "";
         if (mfRows.gender) mfRows.gender.textContent = getMultiSelectLabel(selectedGenders, "Всі", "Стать");
 
-        const count = activeFilterCount();
-
-        if (mobileFiltersCount) {
-            mobileFiltersCount.hidden = count === 0;
-            mobileFiltersCount.textContent = count;
-        }
+        updateMobileFilterCount();
 
     }
 
