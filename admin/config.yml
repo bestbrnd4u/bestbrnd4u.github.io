@@ -86,6 +86,72 @@ collections:
               /mybots і оберіть свого бота, логін показано під назвою і
               завжди закінчується на «bot». Вводьте без символу @.
 
+      - name: "legal"
+        label: "Продавець і оферта"
+        file: "data/legal.json"
+        description: >
+          Реквізити в кінці публічної оферти (сторінка «Умови продажу»)
+          і дата чинної редакції. Порожнє поле просто не показується:
+          недописаний рядок у договорі гірший за його відсутність.
+        fields:
+          - label: "Назва магазину"
+            name: "sellerName"
+            widget: "string"
+            required: false
+            hint: >
+              Те, як магазин називають покупці. Це не юридична назва —
+              для неї є окреме поле нижче.
+
+          - label: "Юридична назва"
+            name: "legalName"
+            widget: "string"
+            required: false
+            hint: >
+              Наприклад «ФОП Іваненко Іван Іванович» або назва ТОВ.
+              Поки ФОП не зареєстрований — лишіть порожнім, рядка в
+              оферті просто не буде.
+
+          - label: "Реєстраційний номер"
+            name: "registrationNumber"
+            widget: "string"
+            required: false
+            hint: >
+              ЄДРПОУ для юридичної особи або РНОКПП (ідентифікаційний
+              код) для ФОП. Порожнє поле = рядка немає.
+
+          - label: "Адреса"
+            name: "address"
+            widget: "string"
+            required: false
+            hint: "Місто або повна адреса — те, що ви готові показувати покупцям."
+
+          - label: "Email"
+            name: "email"
+            widget: "string"
+            required: false
+
+          - label: "Телефон"
+            name: "phone"
+            widget: "string"
+            required: false
+            hint: "У зручному для читання вигляді: +380 73 728 82 91. Посилання для дзвінка збереться саме."
+
+          - label: "Telegram (логін без @)"
+            name: "telegram"
+            widget: "string"
+            required: false
+            pattern: ["^[A-Za-z0-9_]{0,32}$", "Лише латиниця, цифри та підкреслення, без @"]
+
+          - label: "Дата чинної редакції"
+            name: "revision"
+            widget: "string"
+            required: false
+            pattern: ["^\\d{4}-\\d{2}-\\d{2}$", "Формат: 2026-09-06"]
+            hint: >
+              Дата, з якої діють поточні умови. Міняйте її, коли
+              змінюєте сам текст оферти: для кожного замовлення чинна
+              та редакція, що була на сайті в момент оформлення.
+
       - name: "searchBanners"
         label: "Пошук"
         file: "data/search-banners.json"
