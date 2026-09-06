@@ -188,6 +188,26 @@
 
         if (typeof renderRecentlyViewed === "function") renderRecentlyViewed();
 
+        // Розповідаємо власнику про биту адресу.
+        //
+        // Разом із джерелом переходу: саме так знаходиться посилання,
+        // поставлене колись у рекламі або в описі профілю. Без цього
+        // про биті адреси дізнаються тільки від покупця — тобто
+        // майже ніколи.
+        if (root.ErrorReport) {
+
+            var from = "";
+
+            try {
+                from = document.referrer || "";
+            } catch (error) {
+                from = "";
+            }
+
+            root.ErrorReport.report("not_found", from ? "Прийшли з: " + from : "Прямий перехід", "");
+
+        }
+
     }
 
     root.NotFound = {

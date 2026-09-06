@@ -1,0 +1,254 @@
+// Чи живий сайт і чи не зламала його остання збірка.
+//
+// НАВІЩО
+// -------
+// Сайт статичний, тобто «впасти» в звичному сенсі не може — але може
+// виїхати зламаним. Порожній каталог, robots.txt із дев-середовища,
+// сторінка товару, яка більше не відкривається: усе це публікується
+// автоматично й нікому нічого не каже. Досі про таке дізнавались від
+// покупця.
+//
+// Цей крок раз на пів години відкриває сайт ззовні — так само, як це
+// зробив би покупець, — і перевіряє, що магазин на місці. Впала хоч
+// одна перевірка — GitHub надсилає лист про провалений workflow.
+//
+// НАЙВАЖЛИВІШІ ПЕРЕВІРКИ ТУТ — НЕ «ЧИ ВІДКРИЄТЬСЯ»
+// --------------------------------------------------
+// Сторінка, що віддає 200 з порожнім каталогом, гірша за сторінку,
+// яка не відкрилась: другу видно одразу. Тому перевіряється ще й
+// вміст: скільки товарів у каталозі, що robots.txt не забороняє
+// індексацію (це буквально зникнення з пошуку) і що адреси в sitemap
+// ведуть на цей самий домен, а не на дев.
+//
+// ЗАПУСК
+//   node scripts/monitor.js                перевірити прод
+//   node scripts/monitor.js --env=development     перевірити дев
+//   node scripts/monitor.js --url=https://…       довільна адреса
+
+const fs = require("fs");
+const path = require("path");
+
+const ROOT = path.join(__dirname, "..");
+
+const config = JSON.parse(fs.readFileSync(path.join(ROOT, "site.config.json"), "utf8"));
+
+function arg(name) {
+
+    const found = process.argv.find(a => a.startsWith(`--${name}=`));
+
+    return found ? found.split("=").slice(1).join("=") : "";
+
+}
+
+const ENV = arg("env") || process.env.SITE_ENV || "production";
+
+const SITE = (arg("url") || (config[ENV] && config[ENV].url) || "").replace(/\/+$/, "");
+
+if (!SITE) {
+    console.error(`Не знаю адреси середовища «${ENV}»`);
+    process.exit(1);
+}
+
+const INDEXABLE = arg("url") ? ENV === "production" : Boolean(config[ENV] && config[ENV].indexable);
+
+const results = [];
+
+function record(name, ok, detail) {
+    results.push({ name, ok, detail });
+    console.log(`  ${ok ? "✓" : "✗"} ${name}${detail ? " → " + detail : ""}`);
+}
+
+// Одна спроба нічого не доводить: GitHub Pages і Cloudflare іноді
+// віддають 5xx на пару секунд під час викладки. Лист про падіння
+// сайту, який насправді живий, швидко привчають ігнорувати — а тоді
+// й справжній лишиться непрочитаним.
+async function get(url, attempt) {
+
+    try {
+
+        const response = await fetch(url, {
+            redirect: "follow",
+            headers: { "User-Agent": "bestbrnd4u-monitor" }
+        });
+
+        const body = await response.text();
+
+        if (response.status >= 500 && (attempt || 0) < 1) throw new Error(`HTTP ${response.status}`);
+
+        return { status: response.status, body };
+
+    } catch (error) {
+
+        if ((attempt || 0) < 1) {
+
+            await new Promise(resolve => setTimeout(resolve, 5000));
+
+            return get(url, (attempt || 0) + 1);
+
+        }
+
+        return { status: 0, body: "", error: error.message };
+
+    }
+
+}
+
+async function main() {
+
+    console.log(`\nПеревіряю ${SITE}\n`);
+
+    // ---- 1. сторінки відкриваються ----
+
+    const home = await get(`${SITE}/`);
+
+    record("головна відкривається", home.status === 200, `HTTP ${home.status}${home.error ? " " + home.error : ""}`);
+
+    record("головна — це магазин, а не заглушка",
+        /id="cartCount"/.test(home.body) && /<footer/.test(home.body));
+
+    const catalog = await get(`${SITE}/catalog`);
+
+    record("каталог відкривається", catalog.status === 200, `HTTP ${catalog.status}`);
+
+    record("каталог має куди малювати товари", /id="catalogGrid"/.test(catalog.body));
+
+    // ---- 2. дані каталогу ----
+
+    const data = await get(`${SITE}/data/products.json`);
+
+    let live = [];
+
+    try {
+        live = JSON.parse(data.body);
+    } catch (error) {
+        live = null;
+    }
+
+    record("data/products.json — коректний JSON", Array.isArray(live),
+        Array.isArray(live) ? "" : (data.status === 200 ? "не розібрався" : `HTTP ${data.status}`));
+
+    if (Array.isArray(live)) {
+
+        // Скільки товарів МАЄ бути — беремо з репозиторію, який
+        // перевірка й так має під рукою. Жорстке число тут довелося б
+        // правити щоразу, коли каталог росте.
+        const expected = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "products.json"), "utf8")).length;
+
+        // Половина — не «майже все»: це запас на те, що репозиторій
+        // попереду сайту на одну збірку. Провал тут означає, що
+        // каталог виїхав порожнім або майже порожнім.
+        record(`товарів у каталозі: ${live.length}`, live.length >= Math.floor(expected / 2),
+            `у репозиторії ${expected}`);
+
+        record("у товарів є ціни", live.every(p => Number(p.price) > 0),
+            live.filter(p => !(Number(p.price) > 0)).slice(0, 3).map(p => p.slug).join(", "));
+
+    }
+
+    // ---- 3. сторінка товару ----
+
+    const sitemap = await get(`${SITE}/sitemap.xml`);
+
+    record("sitemap.xml віддається", sitemap.status === 200, `HTTP ${sitemap.status}`);
+
+    const locs = [...sitemap.body.matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => m[1]);
+
+    // Адреси в карті сайту мусять вести на ЦЕЙ домен. Якщо туди
+    // потрапив дев — Google піде індексувати тестову копію.
+    const foreign = locs.filter(loc => !loc.startsWith(SITE));
+
+    record("усі адреси в sitemap — з цього домену", foreign.length === 0,
+        foreign.slice(0, 2).join(", "));
+
+    const productUrl = locs.find(loc => loc.includes("/p/"));
+
+    if (productUrl) {
+
+        const product = await get(productUrl);
+
+        record("сторінка товару відкривається", product.status === 200,
+            `${productUrl} → HTTP ${product.status}`);
+
+        // Кнопку «Купити» малює JavaScript, тож її наявність у
+        // відповіді нічого не доводить. А от розмітка товару
+        // (schema.org) стоїть у сторінці статично — і саме її читають
+        // Google, Meta й будь-хто, кому потрібна ціна. Зникла ціна
+        // означає зламану збірку сторінок товарів.
+        const schema = (product.body.match(
+            /<script type="application\/ld\+json" id="productSchema">([\s\S]*?)<\/script>/) || [])[1];
+
+        let parsed = null;
+
+        try {
+            parsed = JSON.parse(schema);
+        } catch (error) {
+            parsed = null;
+        }
+
+        record("сторінка товару несе назву й ціну",
+            Boolean(parsed && parsed.name && Number(parsed.offers && parsed.offers.price) > 0),
+            parsed ? `${parsed.name} · ${parsed.offers && parsed.offers.price}` : "розмітки товару немає");
+
+    } else {
+        record("у sitemap є хоч один товар", false, `знайдено адрес: ${locs.length}`);
+    }
+
+    // ---- 4. те, чого не видно оком ----
+
+    const robots = await get(`${SITE}/robots.txt`);
+
+    record("robots.txt віддається", robots.status === 200, `HTTP ${robots.status}`);
+
+    // Найдорожча помилка з можливих: robots.txt дев-середовища на
+    // проді прибирає магазин із пошуку цілком, і жодна сторінка при
+    // цьому не виглядає зламаною.
+    if (INDEXABLE) {
+
+        record("robots.txt не забороняє індексацію",
+            !/^\s*Disallow:\s*\/\s*$/mi.test(robots.body));
+
+        record("сторінки не позначені noindex",
+            !/name="robots"[^>]*content="[^"]*noindex/i.test(home.body));
+
+    }
+
+    const feed = await get(`${SITE}/feed.xml`);
+
+    const items = (feed.body.match(/<item>/g) || []).length;
+
+    record(`товарний фід: ${items} позицій`, feed.status === 200 && items > 0,
+        `HTTP ${feed.status}`);
+
+    // ---- 5. сторінка 404 ----
+
+    const missing = await get(`${SITE}/monitor-check-${Date.now()}`);
+
+    record("неіснуюча адреса віддає 404", missing.status === 404, `HTTP ${missing.status}`);
+
+    record("сторінка 404 — це магазин, а не заглушка хостингу",
+        /notFoundGrid/.test(missing.body) || /Такої сторінки немає/.test(missing.body));
+
+    // ---- підсумок ----
+
+    const failed = results.filter(r => !r.ok);
+
+    console.log(`\n${"─".repeat(50)}`);
+    console.log(`Перевірок: ${results.length}   Провалено: ${failed.length}`);
+
+    if (failed.length) {
+
+        console.log(`\n❌ ${SITE} — проблеми:`);
+        failed.forEach(r => console.log(`   • ${r.name}${r.detail ? " (" + r.detail + ")" : ""}`));
+
+        process.exit(1);
+
+    }
+
+    console.log(`\n✅ ${SITE} — магазин на місці\n`);
+
+}
+
+main().catch(error => {
+    console.error("Моніторинг не зміг відпрацювати:", error);
+    process.exit(1);
+});
