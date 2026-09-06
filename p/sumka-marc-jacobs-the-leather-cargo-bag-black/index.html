@@ -2,7 +2,7 @@
 <html lang="uk">
 
 <head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"955f692b","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"5d9b13ee","data/legal.json":"857b431b","data/products.json":"80f07012","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"955f692b","data/catalog.json":"dea622c7","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"5d9b13ee","data/legal.json":"857b431b","data/products.json":"7218a078","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
 
 <!-- Сторінка лежить у /p/<slug>/, а скрипти будують шляхи як
      з кореня ("data/products.json", "assets/images/…").
@@ -165,6 +165,10 @@
 // вгадувати його з адреси
 window.PRODUCT_SLUG = "sumka-marc-jacobs-the-leather-cargo-bag-black";
 window.PRODUCT_ID = 55;
+// повний запис товару прямо в сторінці: із ним product.js
+// малює картку одразу, а каталог довантажує лише заради
+// «схожих» і «переглянутих» — і бере полегшений
+window.PRODUCT_DATA = {"gender":["Жінкам"],"preOrderDays":"5–10 робочих днів","color":"Чорний","forcePublish":false,"material":"Натуральна шкіра","brand":"Marc Jacobs","price":9800,"preOrder":false,"slug":"sumka-marc-jacobs-the-leather-cargo-bag-black","dimensions":"22 × 12 × 7 см","variants":[{"color":"Чорний","hex":"#000000","images":["/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--2013c7eb.webp?v=25c5ff7f","/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--3eeb5b5d.webp?v=92578216","/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--e6d79062.webp?v=40d15638","/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--8fc5eccc.webp?v=4e0dd752","/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--20634337.webp?v=77e63951","/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--3bae4de6.webp?v=666555e6"],"article":"55-1","stock":{"ONESIZE":1},"inStock":1}],"preOrderPrepayment":50,"strapInfo":"Два знімні ремені","sortOrder":14,"sizes":["ONESIZE"],"searchKeywords":["Marc Jacobs","The Leather Cargo Bag","Marc Jacobs Cargo Bag","Marc Jacobs 2S4HSH085H02","2S4HSH085H02-001","Marc Jacobs сумка","сумка Marc Jacobs","жіноча сумка Marc Jacobs","Cargo Bag","cargo сумка","шкіряна сумка","сумка з натуральної шкіри","чорна сумка","чорна сумка Marc Jacobs","Black","сумка на плече","сумка через плече","кросбоді","сумка з кишенями","брендова сумка","оригінальна Marc Jacobs"],"isNew":false,"title":"Сумка Marc Jacobs The Leather Cargo Bag Black","images":["/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--2013c7eb.webp","/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--3eeb5b5d.webp","/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--e6d79062.webp","/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--8fc5eccc.webp","/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--20634337.webp","/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--3bae4de6.webp"],"reviews":0,"id":55,"instagramBlock":"general","description":"Стильна та функціональна сумка Marc Jacobs The Leather Cargo Bag у класичному чорному кольорі. Модель поєднує лаконічний дизайн із практичною конструкцією cargo та великою кількістю функціональних кишень.\nСумка виготовлена зі 100% натуральної шкіри та доповнена сріблястою фурнітурою. Має основне відділення на блискавці, дві зовнішні кишені на блискавці та дві накладні кишені з магнітними застібками.\nМодель комплектується двома знімними ременями: шкіряним ременем та регульованим текстильним ременем. Її можна носити на плечі або через плече","sku":"2S4HSH085H02-001","rating":5,"category":"Жіночі сумки","legacySlugs":["сумка-marc-jacobs-the-leather-cargo-bag-black"],"article":"55","inStock":1};
 </script>
 
 
@@ -560,18 +564,18 @@ BestBrnd4u
 <script src="/assets/js/stock.js?v=85fa4aad"></script>
 
 <script src="/assets/js/translit.js?v=c0957cb7"></script>
-<script src="/assets/js/common.js?v=2bae8d12"></script>
+<script src="/assets/js/common.js?v=a6b0fed9"></script>
 <script src="/assets/js/sync.js?v=48ef002e"></script>
-<script src="/assets/js/mega-menu.js?v=b254fbf6"></script>
+<script src="/assets/js/mega-menu.js?v=803d52cc"></script>
 
 <script src="/assets/js/ui.js?v=c1453fdd"></script>
 
-<script src="/assets/js/app.js?v=d2c171bf"></script>
+<script src="/assets/js/app.js?v=dc04bec0"></script>
 
 <script src="/assets/js/lightbox.js?v=552b0982"></script>
 
 <script src="/assets/js/live-stock.js?v=288763d6"></script>
-<script src="/assets/js/product.js?v=c453f251"></script>
+<script src="/assets/js/product.js?v=8482b5d8"></script>
 
 </body>
 

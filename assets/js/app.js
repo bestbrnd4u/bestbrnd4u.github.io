@@ -11,13 +11,7 @@ async function initHome() {
 
     try {
 
-        const response = await fetch(dataUrl("data/products.json"));
-
-        if (!response.ok) {
-            throw new Error("Не вдалося завантажити товари");
-        }
-
-        const products = await response.json();
+        const products = await loadCatalog();
 
         // Показуємо товари з найвищим рейтингом
         const featured = [...products]
@@ -746,12 +740,12 @@ async function renderFeaturedPromotions(featuredPromotions) {
 
     try {
 
-        const [response, deptMap] = await Promise.all([
-            fetch(dataUrl("data/products.json")),
+        const [products, deptMap] = await Promise.all([
+            loadCatalog(),
             loadDepartmentOf()
         ]);
 
-        if (response.ok) allProducts = await response.json();
+        allProducts = products;
 
         departmentOf = deptMap;
 
@@ -899,9 +893,9 @@ async function initCollections() {
 
     try {
 
-        const [collectionsResponse, productsResponse, departmentOf] = await Promise.all([
+        const [collectionsResponse, products, departmentOf] = await Promise.all([
             fetch(dataUrl("data/collections.json")),
-            fetch(dataUrl("data/products.json")),
+            loadCatalog(),
             // «категорія → розділ»: без нього розділ, указаний в
             // автопідхопленні добірки, не розгорнувся б у свої
             // категорії. Довідник кешується (loadDepartmentOf), тож
@@ -919,7 +913,7 @@ async function initCollections() {
             window.TextStyles.ensureFonts(collections.map(c => c.style));
         }
 
-        const allProducts = productsResponse.ok ? await productsResponse.json() : [];
+        const allProducts = products;
 
         section.innerHTML = collections.map(collection => {
 

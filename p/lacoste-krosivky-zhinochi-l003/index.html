@@ -2,7 +2,7 @@
 <html lang="uk">
 
 <head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"955f692b","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"5d9b13ee","data/legal.json":"857b431b","data/products.json":"80f07012","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"955f692b","data/catalog.json":"dea622c7","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"5d9b13ee","data/legal.json":"857b431b","data/products.json":"7218a078","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
 
 <!-- Сторінка лежить у /p/<slug>/, а скрипти будують шляхи як
      з кореня ("data/products.json", "assets/images/…").
@@ -163,6 +163,10 @@
 // вгадувати його з адреси
 window.PRODUCT_SLUG = "lacoste-krosivky-zhinochi-l003";
 window.PRODUCT_ID = 36;
+// повний запис товару прямо в сторінці: із ним product.js
+// малює картку одразу, а каталог довантажує лише заради
+// «схожих» і «переглянутих» — і бере полегшений
+window.PRODUCT_DATA = {"gender":["Жінкам"],"preOrderDays":"5–10 робочих днів","color":"Мультиколір","forcePublish":false,"brand":"Lacoste","price":6200,"preOrder":false,"slug":"lacoste-krosivky-zhinochi-l003","variants":[{"hex":"#f8faf6","color":"Мультиколір","images":["/assets/images/products/uploads/e5de78de-29a2-40ba-8edd-a70c4e1ea31b_size2000x2000_cropcenter.webp?v=214fd1a4","/assets/images/products/uploads/f7e4b799-732f-44f2-975b-40cd657042ed_size2000x2000_cropcenter.webp?v=64d49660","/assets/images/products/uploads/f33f16ca-2354-4bb1-a195-063ef2737099_size2000x2000_cropcenter.webp?v=15fbe7f8","/assets/images/products/uploads/8bfe46ad-4152-486e-af2b-0e8f2715354a_size2000x2000_cropcenter-1-.webp?v=9a98d03d"],"article":"36-1","stock":{"37":1,"38":1,"39":1},"inStock":3}],"preOrderPrepayment":50,"sizes":["37","38","39"],"searchKeywords":["Lacoste","Lacoste L003","L003","744SFA0020","744SFA0020.080","кросівки Lacoste","жіночі кросівки Lacoste","кросівки Lacoste жіночі","Lacoste L003 жіночі","жіночі брендові кросівки","оригінальні Lacoste","брендові кросівки","повсякденні кросівки","кросівки на кожен день","спортивні кросівки","міські кросівки","жіночі снікерси","модні кросівки","кросівки Lacoste L003 744SFA0020"],"isNew":false,"title":"Lacoste кросівки жіночі L003 Extile Color-Block Sneakers","images":["/assets/images/products/uploads/e5de78de-29a2-40ba-8edd-a70c4e1ea31b_size2000x2000_cropcenter.webp","/assets/images/products/uploads/f7e4b799-732f-44f2-975b-40cd657042ed_size2000x2000_cropcenter.webp","/assets/images/products/uploads/f33f16ca-2354-4bb1-a195-063ef2737099_size2000x2000_cropcenter.webp","/assets/images/products/uploads/8bfe46ad-4152-486e-af2b-0e8f2715354a_size2000x2000_cropcenter-1-.webp"],"reviews":0,"id":36,"instagramBlock":"general","description":"Стильні жіночі кросівки Lacoste L003 — сучасна модель для повсякденного гардероба, що поєднує спортивний характер, комфорт і впізнаваний французький стиль. Легкий нейлоновий верх доповнений синтетичними елементами та оригінальною конструкцією шнурівки.\nСпеціальна система шнурівки та конструкція язичка забезпечують надійну фіксацію стопи й комфортну посадку. Текстильна підкладка та м’яка устілка роблять модель зручною для тривалого носіння.\nПідошва поєднує гуму та EVA, забезпечуючи амортизацію, гнучкість і хороше зчеплення з поверхнею. Фірмовий тиснений логотип-крокодил на п’яті додає моделі характерної для Lacoste впізнаваності.","sku":"744SFA0020.080","rating":5,"category":"Кросівки","framing":{"f7e4b799-732f-44f2-975b-40cd657042ed_size2000x2000_cropcenter.webp":{"zoom":1.64,"x":51,"y":57}},"legacySlugs":["lacoste-кросівки-жіночі-l003"],"article":"36","inStock":3};
 </script>
 
 
@@ -553,18 +557,18 @@ BestBrnd4u
 <script src="/assets/js/stock.js?v=85fa4aad"></script>
 
 <script src="/assets/js/translit.js?v=c0957cb7"></script>
-<script src="/assets/js/common.js?v=2bae8d12"></script>
+<script src="/assets/js/common.js?v=a6b0fed9"></script>
 <script src="/assets/js/sync.js?v=48ef002e"></script>
-<script src="/assets/js/mega-menu.js?v=b254fbf6"></script>
+<script src="/assets/js/mega-menu.js?v=803d52cc"></script>
 
 <script src="/assets/js/ui.js?v=c1453fdd"></script>
 
-<script src="/assets/js/app.js?v=d2c171bf"></script>
+<script src="/assets/js/app.js?v=dc04bec0"></script>
 
 <script src="/assets/js/lightbox.js?v=552b0982"></script>
 
 <script src="/assets/js/live-stock.js?v=288763d6"></script>
-<script src="/assets/js/product.js?v=c453f251"></script>
+<script src="/assets/js/product.js?v=8482b5d8"></script>
 
 </body>
 

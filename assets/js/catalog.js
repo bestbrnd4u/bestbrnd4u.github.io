@@ -853,22 +853,16 @@ async function initCatalog() {
         // очікування на нього нічого не додає. Якщо ж база не
         // відповість за 1,2 с, модуль сам повернеться ні з чим і
         // каталог покажеться з наявністю зі збірки — як було досі.
-        const [response, live] = await Promise.all([
-            fetch(dataUrl("data/products.json")),
+        const [catalogData, live] = await Promise.all([
+            loadCatalog(),
             window.LiveStock ? window.LiveStock.load() : Promise.resolve(null)
         ]);
-
-        if (!response.ok) {
-            throw new Error("Не вдалося завантажити товари");
-        }
 
         // Кожен колір — окрема картка. Сама функція живе в common.js:
         // те саме розгортання потрібне акціям (сторінка акції й ряд під
         // банером на головній), а catalog.js головна не підключає
         // взагалі. Копія в двох файлах у цьому проєкті вже
         // закінчувалась розходженням — див. promotionProducts там же.
-        const catalogData = await response.json();
-
         // Наявність із бази переносимо ДО поділу за кольорами:
         // splitProductsByColor копіює «під замовлення» в кожну картку,
         // і зробити це після означало б виправити товар, але не

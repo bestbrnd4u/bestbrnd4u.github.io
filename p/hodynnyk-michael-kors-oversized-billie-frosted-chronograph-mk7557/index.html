@@ -2,7 +2,7 @@
 <html lang="uk">
 
 <head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"955f692b","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"5d9b13ee","data/legal.json":"857b431b","data/products.json":"80f07012","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"955f692b","data/catalog.json":"dea622c7","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"5d9b13ee","data/legal.json":"857b431b","data/products.json":"7218a078","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
 
 <!-- Сторінка лежить у /p/<slug>/, а скрипти будують шляхи як
      з кореня ("data/products.json", "assets/images/…").
@@ -162,6 +162,10 @@
 // вгадувати його з адреси
 window.PRODUCT_SLUG = "hodynnyk-michael-kors-oversized-billie-frosted-chronograph-mk7557";
 window.PRODUCT_ID = 94;
+// повний запис товару прямо в сторінці: із ним product.js
+// малює картку одразу, а каталог довантажує лише заради
+// «схожих» і «переглянутих» — і бере полегшений
+window.PRODUCT_DATA = {"gender":["Жінкам"],"preOrderDays":"10-14 робочих днів","forcePublish":false,"material":"Нержавіюча сталь","brand":"Michael Kors","price":7300,"preOrder":true,"dimensions":"Діаметр корпусу: 40 мм Ширина браслета: 20 мм","variants":[{"color":"Рожеве золото","hex":"#c5a4c4","images":["/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7557.jpg?v=7ba565fb","/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7557_2.jpg?v=791ac262","/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7557_3.jpg?v=ab9ead93"],"article":"94-1"}],"preOrderPrepayment":100,"sizes":["ONESIZE"],"splitByColor":true,"searchKeywords":["Michael Kors","Michael Kors Watch","Michael Kors Billie","Billie Watch","Oversized Billie","MK7557","Michael Kors MK7557","жіночий годинник Michael Kors","годинник Michael Kors","рожеве золото","Rose Gold","рожеве золото Michael Kors","годинник з хронографом","кварцовий годинник","жіночий хронограф","сталевий браслет","брендований годинник","оригінальний Michael Kors"],"isNew":false,"title":"Годинник Michael Kors Oversized Billie Frosted Chronograph MK7557","reviews":0,"closure":"Розкладна з кнопковим фіксатором","instagramBlock":"general","description":"Стильний жіночий годинник Michael Kors Billie у розкішному відтінку рожевого золота з ефектом Frosted. Браслет із нержавіючої сталі з комбінованим оздобленням красиво відбиває світло, а блискучий циферблат додає моделі елегантності та glamour-акценту.\nГодинник оснащений кварцовим механізмом із функцією хронографа та відображенням дати. Мінеральне скло захищає циферблат, а розкладна застібка з кнопковим фіксатором забезпечує комфортну посадку на зап'ясті","sku":"MK7557","rating":5,"category":"Годинники","legacySlugs":["годинник-michael-kors-oversized-billie-frosted-chronograph-mk7557"],"slug":"hodynnyk-michael-kors-oversized-billie-frosted-chronograph-mk7557","id":94,"color":"Рожеве золото","images":["/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7557.jpg","/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7557_2.jpg","/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7557_3.jpg"],"article":"94","preOrderAlways":true};
 </script>
 
 
@@ -544,18 +548,18 @@ BestBrnd4u
 <script src="/assets/js/stock.js?v=85fa4aad"></script>
 
 <script src="/assets/js/translit.js?v=c0957cb7"></script>
-<script src="/assets/js/common.js?v=2bae8d12"></script>
+<script src="/assets/js/common.js?v=a6b0fed9"></script>
 <script src="/assets/js/sync.js?v=48ef002e"></script>
-<script src="/assets/js/mega-menu.js?v=b254fbf6"></script>
+<script src="/assets/js/mega-menu.js?v=803d52cc"></script>
 
 <script src="/assets/js/ui.js?v=c1453fdd"></script>
 
-<script src="/assets/js/app.js?v=d2c171bf"></script>
+<script src="/assets/js/app.js?v=dc04bec0"></script>
 
 <script src="/assets/js/lightbox.js?v=552b0982"></script>
 
 <script src="/assets/js/live-stock.js?v=288763d6"></script>
-<script src="/assets/js/product.js?v=c453f251"></script>
+<script src="/assets/js/product.js?v=8482b5d8"></script>
 
 </body>
 

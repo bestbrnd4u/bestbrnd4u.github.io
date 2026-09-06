@@ -2,7 +2,7 @@
 <html lang="uk">
 
 <head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"955f692b","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"5d9b13ee","data/legal.json":"857b431b","data/products.json":"80f07012","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"955f692b","data/catalog.json":"dea622c7","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"5d9b13ee","data/legal.json":"857b431b","data/products.json":"7218a078","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
 
 <!-- Сторінка лежить у /p/<slug>/, а скрипти будують шляхи як
      з кореня ("data/products.json", "assets/images/…").
@@ -163,6 +163,10 @@
 // вгадувати його з адреси
 window.PRODUCT_SLUG = "zhinochi-bezhevi-krosivky-z-chornymy-detaliamy-lacoste-lineshot-746sfa0075-1r5";
 window.PRODUCT_ID = 44;
+// повний запис товару прямо в сторінці: із ним product.js
+// малює картку одразу, а каталог довантажує лише заради
+// «схожих» і «переглянутих» — і бере полегшений
+window.PRODUCT_DATA = {"gender":["Жінкам"],"preOrderDays":"5–10 робочих днів","forcePublish":false,"brand":"Lacoste","price":6000,"preOrder":false,"variants":[{"color":"Бежевий","hex":"#e5e4e4","images":["/assets/images/products/uploads/bc4302e5-037f-4a05-b3b7-d6f959c4c00c_size2000x2000_cropcenter.webp?v=ef5b6dd4","/assets/images/products/uploads/894a2223-e123-468a-9c5e-6949a9f72643_size2000x2000_cropcenter.webp?v=af928db3","/assets/images/products/uploads/02e9fde1-b8ec-4df3-812c-6869dbcfb37c_size2000x2000_cropcenter.webp?v=6fbf0f18","/assets/images/products/uploads/1e18c52b-9cf3-411f-8897-4c0830babd56_size2000x2000_cropcenter.webp?v=91d33102"],"article":"44-1","stock":{"38":1},"inStock":1}],"preOrderPrepayment":50,"sizes":["38"],"searchKeywords":["Lacoste Lineshot","Lacoste 746SFA0075","746SFA0075.1R5","жіночі кросівки Lacoste","Lacoste жіночі кросівки","кросівки Lacoste","жіночі кросівки","бежеві кросівки Lacoste","Lacoste sneakers","брендові кросівки","оригінальні кросівки","жіноче брендове взуття"],"isNew":false,"title":"Жіночі бежеві кросівки з чорними деталями Lacoste Lineshot 746SFA0075.1R5","reviews":0,"instagramBlock":"general","description":"Стильні жіночі кросівки Lacoste Lineshot у бежевому кольорі. Класичний тенісний силует 90-х поєднується із сучасними деталями, дихаючим верхом та комфортною підошвою Ortholite. Універсальна модель для повсякденних образів і активного міського ритму","sku":"746SFA0075.1R5","rating":5,"category":"Кросівки","slug":"zhinochi-bezhevi-krosivky-z-chornymy-detaliamy-lacoste-lineshot-746sfa0075-1r5","id":44,"color":"Бежевий","images":["/assets/images/products/uploads/bc4302e5-037f-4a05-b3b7-d6f959c4c00c_size2000x2000_cropcenter.webp","/assets/images/products/uploads/894a2223-e123-468a-9c5e-6949a9f72643_size2000x2000_cropcenter.webp","/assets/images/products/uploads/02e9fde1-b8ec-4df3-812c-6869dbcfb37c_size2000x2000_cropcenter.webp","/assets/images/products/uploads/1e18c52b-9cf3-411f-8897-4c0830babd56_size2000x2000_cropcenter.webp"],"framing":{"1e18c52b-9cf3-411f-8897-4c0830babd56_size2000x2000_cropcenter.webp":{"zoom":1.6,"x":51,"y":54}},"legacySlugs":["жіночі-бежеві-кросівки-з-чорними-деталями-lacoste-lineshot-746sfa0075-1r5"],"article":"44","inStock":1};
 </script>
 
 
@@ -551,18 +555,18 @@ BestBrnd4u
 <script src="/assets/js/stock.js?v=85fa4aad"></script>
 
 <script src="/assets/js/translit.js?v=c0957cb7"></script>
-<script src="/assets/js/common.js?v=2bae8d12"></script>
+<script src="/assets/js/common.js?v=a6b0fed9"></script>
 <script src="/assets/js/sync.js?v=48ef002e"></script>
-<script src="/assets/js/mega-menu.js?v=b254fbf6"></script>
+<script src="/assets/js/mega-menu.js?v=803d52cc"></script>
 
 <script src="/assets/js/ui.js?v=c1453fdd"></script>
 
-<script src="/assets/js/app.js?v=d2c171bf"></script>
+<script src="/assets/js/app.js?v=dc04bec0"></script>
 
 <script src="/assets/js/lightbox.js?v=552b0982"></script>
 
 <script src="/assets/js/live-stock.js?v=288763d6"></script>
-<script src="/assets/js/product.js?v=c453f251"></script>
+<script src="/assets/js/product.js?v=8482b5d8"></script>
 
 </body>
 

@@ -2,7 +2,7 @@
 <html lang="uk">
 
 <head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"955f692b","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"5d9b13ee","data/legal.json":"857b431b","data/products.json":"80f07012","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"955f692b","data/catalog.json":"dea622c7","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"5d9b13ee","data/legal.json":"857b431b","data/products.json":"7218a078","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
 
 <!-- Сторінка лежить у /p/<slug>/, а скрипти будують шляхи як
      з кореня ("data/products.json", "assets/images/…").
@@ -162,6 +162,10 @@
 // вгадувати його з адреси
 window.PRODUCT_SLUG = "hamanets-marc-jacobs-the-top-zip-wallet-with-strap";
 window.PRODUCT_ID = 66;
+// повний запис товару прямо в сторінці: із ним product.js
+// малює картку одразу, а каталог довантажує лише заради
+// «схожих» і «переглянутих» — і бере полегшений
+window.PRODUCT_DATA = {"gender":["Жінкам"],"preOrderDays":"5–10 робочих днів","forcePublish":false,"material":"Натуральна шкіра","brand":"Marc Jacobs","price":3600,"preOrder":false,"dimensions":"13 × 7,5 см","variants":[{"color":"Коричневий","hex":"#9e530c","images":["/assets/images/products/uploads/sl10757-021_01-384fad.jpg?v=2787a17d","/assets/images/products/uploads/sl10757-021_02-384fad.jpg?v=720dcb71","/assets/images/products/uploads/sl10757-021_03-384fad.jpg?v=fb36f571"],"article":"66-1","stock":{"ONESIZE":1},"inStock":1},{"color":"Чорний","hex":"#000000","images":["/assets/images/products/uploads/27541025~black_0.webp?v=a0356567","/assets/images/products/uploads/l000001_1676684440.webp?v=fc6d6be3","/assets/images/products/uploads/l000002_1676684441.webp?v=ffbea8fb"],"sku":"S125L01RE22-001","article":"66-2","stock":{"ONESIZE":1},"inStock":1}],"preOrderPrepayment":50,"strapInfo":"Знімний ремінець, що дозволяє носити гаманець на зап'ясті або використовувати його як компактний самостійний аксесуар","sizes":["ONESIZE"],"splitByColor":true,"searchKeywords":["Marc Jacobs","Marc Jacobs The Top Zip","Marc Jacobs Wallet","гаманець Marc Jacobs","жіночий гаманець","коричневий гаманець","шкіряний гаманець","гаманець з ремінцем","гаманець на ремінці","компактний гаманець","брендовий гаманець","оригінальний Marc Jacobs","аксесуари Marc Jacobs"],"isNew":false,"title":"Гаманець Marc Jacobs The Top Zip Wallet with Strap","reviews":0,"instagramBlock":"general","description":"Компактний та практичний жіночий гаманець Marc Jacobs The Top Zip Wallet with Strap. Лаконічний дизайн доповнений фірмовим логотипом Marc Jacobs та зручним верхнім застібанням на блискавку.\nМодель поєднує функціональність гаманця та аксесуара, який можна носити окремо завдяки ремінцю. Всередині передбачені відділення для карток та необхідних дрібниць. Ідеальний варіант для тих, хто цінує компактність, але не хоче відмовлятися від фірмового стилю","sku":"S125L01RE22212","rating":5,"category":"Гаманці","slug":"hamanets-marc-jacobs-the-top-zip-wallet-with-strap","id":66,"color":"Коричневий","images":["/assets/images/products/uploads/sl10757-021_01-384fad.jpg","/assets/images/products/uploads/sl10757-021_02-384fad.jpg","/assets/images/products/uploads/sl10757-021_03-384fad.jpg"],"legacySlugs":["гаманець-marc-jacobs-the-top-zip-wallet-with-strap"],"article":"66","inStock":2};
 </script>
 
 
@@ -544,18 +548,18 @@ BestBrnd4u
 <script src="/assets/js/stock.js?v=85fa4aad"></script>
 
 <script src="/assets/js/translit.js?v=c0957cb7"></script>
-<script src="/assets/js/common.js?v=2bae8d12"></script>
+<script src="/assets/js/common.js?v=a6b0fed9"></script>
 <script src="/assets/js/sync.js?v=48ef002e"></script>
-<script src="/assets/js/mega-menu.js?v=b254fbf6"></script>
+<script src="/assets/js/mega-menu.js?v=803d52cc"></script>
 
 <script src="/assets/js/ui.js?v=c1453fdd"></script>
 
-<script src="/assets/js/app.js?v=d2c171bf"></script>
+<script src="/assets/js/app.js?v=dc04bec0"></script>
 
 <script src="/assets/js/lightbox.js?v=552b0982"></script>
 
 <script src="/assets/js/live-stock.js?v=288763d6"></script>
-<script src="/assets/js/product.js?v=c453f251"></script>
+<script src="/assets/js/product.js?v=8482b5d8"></script>
 
 </body>
 

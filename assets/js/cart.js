@@ -24,16 +24,12 @@ async function initCart() {
         // Наявність питаємо в бази паралельно з каталогом: кошик —
         // останнє місце перед оформленням, де людина бачить «під
         // замовлення», і саме тут застаріла наявність дорожча за все.
-        const [response, live] = await Promise.all([
-            fetch(dataUrl("data/products.json")),
+        const [products, live] = await Promise.all([
+            loadCatalog(),
             window.LiveStock ? window.LiveStock.load() : Promise.resolve(null)
         ]);
 
-        if (!response.ok) {
-            throw new Error("Не вдалося завантажити товари");
-        }
-
-        allProducts = await response.json();
+        allProducts = products;
 
         if (window.LiveStock) window.LiveStock.apply(allProducts, live);
 

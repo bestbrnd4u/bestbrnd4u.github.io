@@ -2,7 +2,7 @@
 <html lang="uk">
 
 <head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"955f692b","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"5d9b13ee","data/legal.json":"857b431b","data/products.json":"80f07012","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"955f692b","data/catalog.json":"dea622c7","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"5d9b13ee","data/legal.json":"857b431b","data/products.json":"7218a078","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
 
 <!-- Сторінка лежить у /p/<slug>/, а скрипти будують шляхи як
      з кореня ("data/products.json", "assets/images/…").
@@ -163,6 +163,10 @@
 // вгадувати його з адреси
 window.PRODUCT_SLUG = "coach-cholovicha-shkiriana-sumka-racer-belt-bag-in-signature";
 window.PRODUCT_ID = 8;
+// повний запис товару прямо в сторінці: із ним product.js
+// малює картку одразу, а каталог довантажує лише заради
+// «схожих» і «переглянутих» — і бере полегшений
+window.PRODUCT_DATA = {"gender":["Чоловікам"],"color":"Чорний","material":"Шкіра","brand":"Coach","price":7500,"preOrder":false,"slug":"coach-cholovicha-shkiriana-sumka-racer-belt-bag-in-signature","variants":[{"color":"Чорний","hex":"#252525","images":["/assets/images/products/uploads/ct714_qbmi5_1_1100x1100-1-.webp?v=430ec45f","/assets/images/products/uploads/ct714_qbmi5_2_1100x1100.webp?v=930d7a76","/assets/images/products/uploads/ct714_qbmi5_3_1100x1100.webp?v=17bd8d9d","/assets/images/products/uploads/ct714_qbmi5_4_1100x1100.webp?v=cc22bbd6"],"sku":"coach-ct714-qbml5","article":"8-1","stock":{"ONESIZE":1},"inStock":1}],"sizes":["ONESIZE"],"searchKeywords":["коуч","coach","сумка унісекс","поясна сумка","бананка","чорний","racer","belt","bag","signature"],"isNew":false,"title":"Чоловіча шкіряна сумка Racer Belt Bag In Signature Canvas","images":["/assets/images/products/uploads/ct714_qbmi5_1_1100x1100-1-.webp","/assets/images/products/uploads/ct714_qbmi5_2_1100x1100.webp","/assets/images/products/uploads/ct714_qbmi5_3_1100x1100.webp","/assets/images/products/uploads/ct714_qbmi5_4_1100x1100.webp"],"id":8,"instagramBlock":"general","description":"Coach Racer Belt Bag зі шкіри — поясна сумка з монограмним рельєфом. Регульований ремінь, носиться на поясі, через плече або навскіс. Унісекс-модель.","sku":"coach-ct714-qbml5","category":"Чоловічі сумки","article":"8","inStock":1};
 </script>
 
 
@@ -550,18 +554,18 @@ BestBrnd4u
 <script src="/assets/js/stock.js?v=85fa4aad"></script>
 
 <script src="/assets/js/translit.js?v=c0957cb7"></script>
-<script src="/assets/js/common.js?v=2bae8d12"></script>
+<script src="/assets/js/common.js?v=a6b0fed9"></script>
 <script src="/assets/js/sync.js?v=48ef002e"></script>
-<script src="/assets/js/mega-menu.js?v=b254fbf6"></script>
+<script src="/assets/js/mega-menu.js?v=803d52cc"></script>
 
 <script src="/assets/js/ui.js?v=c1453fdd"></script>
 
-<script src="/assets/js/app.js?v=d2c171bf"></script>
+<script src="/assets/js/app.js?v=dc04bec0"></script>
 
 <script src="/assets/js/lightbox.js?v=552b0982"></script>
 
 <script src="/assets/js/live-stock.js?v=288763d6"></script>
-<script src="/assets/js/product.js?v=c453f251"></script>
+<script src="/assets/js/product.js?v=8482b5d8"></script>
 
 </body>
 

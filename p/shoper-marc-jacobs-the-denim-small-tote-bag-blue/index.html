@@ -2,7 +2,7 @@
 <html lang="uk">
 
 <head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"955f692b","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"5d9b13ee","data/legal.json":"857b431b","data/products.json":"80f07012","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"955f692b","data/catalog.json":"dea622c7","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"5d9b13ee","data/legal.json":"857b431b","data/products.json":"7218a078","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
 
 <!-- Сторінка лежить у /p/<slug>/, а скрипти будують шляхи як
      з кореня ("data/products.json", "assets/images/…").
@@ -164,6 +164,10 @@
 // вгадувати його з адреси
 window.PRODUCT_SLUG = "shoper-marc-jacobs-the-denim-small-tote-bag-blue";
 window.PRODUCT_ID = 61;
+// повний запис товару прямо в сторінці: із ним product.js
+// малює картку одразу, а каталог довантажує лише заради
+// «схожих» і «переглянутих» — і бере полегшений
+window.PRODUCT_DATA = {"gender":["Жінкам"],"preOrderDays":"5–10 робочих днів","color":"Синій","forcePublish":false,"material":"Денім","brand":"Marc Jacobs","price":8600,"framing":{"215679033_blue_in.webp":{"zoom":1.43,"x":50,"y":70},"215679033_blue_bk.webp":{"zoom":1.46,"x":49,"y":65}},"preOrder":false,"slug":"shoper-marc-jacobs-the-denim-small-tote-bag-blue","dimensions":"26 × 21 × 13 см","variants":[{"hex":"#0361b0","color":"Синій","images":["/assets/images/products/uploads/215679033_blue_in.webp?v=d508b58e","/assets/images/products/uploads/215679033_blue_bk.webp?v=0fee1b0a","/assets/images/products/uploads/215679033_blue_cu.webp?v=98af55d3","/assets/images/products/uploads/215679033_blue_e1.webp?v=84f25ad7","/assets/images/products/uploads/215679033_blue_fr.webp?v=eafc13bd"],"article":"61-1","stock":{"S":1},"inStock":1}],"preOrderPrepayment":50,"strapInfo":"Ремінець знімний та регульований","sortOrder":6,"sizes":["S"],"splitByColor":true,"searchKeywords":["Marc Jacobs","Marc Jacobs The Tote Bag","The Denim Small Tote Bag","Marc Jacobs Denim Tote","Marc Jacobs MJ451H057","MJ451H057-K11","Marc Jacobs сумка","сумка Marc Jacobs","жіноча сумка Marc Jacobs","denim bag","denim tote","джинсова сумка","сумка з деніму","синя сумка","блакитна сумка","The Tote Bag","сумка тоут","small tote bag","сумка на плече","сумка через плече","кросбоді","брендова сумка","оригінальна Marc Jacobs"],"isNew":false,"title":"Шопер Marc Jacobs The Denim Small Tote Bag Blue","images":["/assets/images/products/uploads/215679033_blue_in.webp","/assets/images/products/uploads/215679033_blue_bk.webp","/assets/images/products/uploads/215679033_blue_cu.webp","/assets/images/products/uploads/215679033_blue_e1.webp","/assets/images/products/uploads/215679033_blue_fr.webp"],"reviews":0,"id":61,"instagramBlock":"general","description":"Стильна та оригінальна сумка Marc Jacobs The Denim Small Tote Bag у блакитно-синьому денімі. Модель виконана у фірмовому силуеті The Tote Bag та доповнена контрастними шкіряними деталями й написом The Tote Bag на передній панелі.\nДжинсовий матеріал та поєднання різних відтінків синього надають сумці сучасного та невимушеного вигляду. Модель має дві верхні ручки та знімний ремінець для носіння на плечі або через плече","sku":"MJ451H057-K11","rating":5,"category":"Жіночі сумки","legacySlugs":["шопер-marc-jacobs-the-denim-small-tote-bag-blue"],"article":"61","inStock":1};
 </script>
 
 
@@ -560,18 +564,18 @@ BestBrnd4u
 <script src="/assets/js/stock.js?v=85fa4aad"></script>
 
 <script src="/assets/js/translit.js?v=c0957cb7"></script>
-<script src="/assets/js/common.js?v=2bae8d12"></script>
+<script src="/assets/js/common.js?v=a6b0fed9"></script>
 <script src="/assets/js/sync.js?v=48ef002e"></script>
-<script src="/assets/js/mega-menu.js?v=b254fbf6"></script>
+<script src="/assets/js/mega-menu.js?v=803d52cc"></script>
 
 <script src="/assets/js/ui.js?v=c1453fdd"></script>
 
-<script src="/assets/js/app.js?v=d2c171bf"></script>
+<script src="/assets/js/app.js?v=dc04bec0"></script>
 
 <script src="/assets/js/lightbox.js?v=552b0982"></script>
 
 <script src="/assets/js/live-stock.js?v=288763d6"></script>
-<script src="/assets/js/product.js?v=c453f251"></script>
+<script src="/assets/js/product.js?v=8482b5d8"></script>
 
 </body>
 

@@ -276,8 +276,15 @@ console.log("\n[5] Сторінки питають базу паралельно
 
         const code = read(file);
 
-        check(`${path.basename(file)}: запит паралельно з каталогом`,
-            /Promise\.all\(\[\s*\n?\s*fetch\(dataUrl\("\/?data\/products\.json"\)\),\s*\n?\s*window\.LiveStock/.test(code));
+        // Правило, а не точний рядок: наявність питається В ОДНОМУ
+        // Promise.all із товарами. Звідки саме беруться товари —
+        // полегшений каталог, повний файл чи спільний кеш — тут
+        // неважливо; важливо, що сторінка не чекає двічі.
+        const parallel = (code.match(/Promise\.all\(\[[\s\S]{0,600}?\]\)/g) || [])
+            .some(block => /window\.LiveStock/.test(block)
+                && /loadCatalog\(\)|catalogUrl\(\)|products\.json|getAllProductsCached/.test(block));
+
+        check(`${path.basename(file)}: запит паралельно з каталогом`, parallel);
 
         check(`${path.basename(file)}: наявність переноситься в товари`,
             new RegExp(`window\\.LiveStock\\.apply\\(${target}, live\\)`).test(code));

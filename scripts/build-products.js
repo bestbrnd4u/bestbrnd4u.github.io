@@ -31,6 +31,52 @@ const ROOT = path.join(__dirname, "..");
 const PRODUCTS_DIR = path.join(ROOT, "data", "products");
 const OUTPUT_FILE = path.join(ROOT, "data", "products.json");
 
+// Полегшений каталог для списків товарів.
+//
+// НАВІЩО ДРУГИЙ ФАЙЛ
+// -------------------
+// Кожна сторінка зі списком товарів (каталог, головна, кошик, пошук,
+// обране) вантажить УВЕСЬ каталог — інакше не порахувати фільтри й не
+// показати картку. Але картці не потрібні характеристики, які видно
+// лише на сторінці товару: матеріал, габарити, ремінь, блок
+// Instagram, строк і передоплата під замовлення.
+//
+// Поки полів сім, це десята частина файлу. Важливіше інше: кожне нове
+// поле опису товару інакше дорожчало б для КОЖНОГО відвідувача
+// каталогу, хоча його ніхто там не бачить. Тепер дані списку й дані
+// картки — різні файли, і подробиці можна додавати вільно.
+const CATALOG_FILE = path.join(ROOT, "data", "catalog.json");
+
+// Ці поля показує тільки сторінка товару. Перелік перевіряється
+// тестом: якщо якесь із них знадобиться в списках — тест впаде.
+const PRODUCT_PAGE_ONLY = [
+    "material",
+    "dimensions",
+    "strapInfo",
+    "instagramBlock",
+    "preOrderDays",
+    "preOrderPrepayment",
+    "legacySlugs"
+];
+
+// Товар на рядок, без відступів усередині.
+//
+// ЧОМУ НЕ JSON.stringify(products, null, 2). Відступи в цих файлах —
+// це третина ваги: 326 КБ проти 211 КБ на сотні товарів. Читає їх
+// браузер, а не людина: джерело правди лежить у data/products/*.json,
+// і саме там на нього дивляться.
+//
+// Але й не суцільний рядок: зібраний файл лежить у репозиторії, і
+// «змінився один товар» має лишатись видимим у git diff. Тому рядок
+// на товар — і вага менша, і зміни читаються.
+function serialize(list) {
+
+    if (!list.length) return "[]\n";
+
+    return "[\n" + list.map(item => JSON.stringify(item)).join(",\n") + "\n]\n";
+
+}
+
 // Перевіряє, чи заповнені всі поля, обов'язкові для показу на сайті.
 // Список свідомо дублює required:true поля з admin/config.yml.
 function getMissingFields(data) {
@@ -966,14 +1012,29 @@ function main() {
 
     stampImageVersions(products);
 
-    fs.writeFileSync(OUTPUT_FILE, JSON.stringify(products, null, 2) + "\n", "utf8");
+    fs.writeFileSync(OUTPUT_FILE, serialize(products), "utf8");
 
-    console.log(`Готово: ${products.length} товарів → ${path.relative(ROOT, OUTPUT_FILE)}`);
+    const catalog = products.map(product => {
+
+        const light = { ...product };
+
+        PRODUCT_PAGE_ONLY.forEach(field => delete light[field]);
+
+        return light;
+
+    });
+
+    fs.writeFileSync(CATALOG_FILE, serialize(catalog), "utf8");
+
+    const size = file => (fs.statSync(file).size / 1024).toFixed(0);
+
+    console.log(`Готово: ${products.length} товарів → ${path.relative(ROOT, OUTPUT_FILE)}`
+        + ` (${size(OUTPUT_FILE)} КБ) + ${path.relative(ROOT, CATALOG_FILE)} (${size(CATALOG_FILE)} КБ)`);
 
 }
 
 // Експортуємо для тестів: перейменування адрес перевіряється на
 // тимчасовій теці, а не на справжньому каталозі.
-module.exports = { renameToLatinSlugs };
+module.exports = { renameToLatinSlugs, serialize, PRODUCT_PAGE_ONLY };
 
 if (require.main === module) main();

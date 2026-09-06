@@ -2,7 +2,7 @@
 <html lang="uk">
 
 <head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"955f692b","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"5d9b13ee","data/legal.json":"857b431b","data/products.json":"80f07012","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"955f692b","data/catalog.json":"dea622c7","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"5d9b13ee","data/legal.json":"857b431b","data/products.json":"7218a078","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
 
 <!-- Сторінка лежить у /p/<slug>/, а скрипти будують шляхи як
      з кореня ("data/products.json", "assets/images/…").
@@ -162,6 +162,10 @@
 // вгадувати його з адреси
 window.PRODUCT_SLUG = "cholovichyi-hodynnyk-michael-kors-maritime-chronograph";
 window.PRODUCT_ID = 89;
+// повний запис товару прямо в сторінці: із ним product.js
+// малює картку одразу, а каталог довантажує лише заради
+// «схожих» і «переглянутих» — і бере полегшений
+window.PRODUCT_DATA = {"gender":["Чоловікам"],"preOrderDays":"10-14 робочих днів","forcePublish":false,"material":"Нержавіюча сталь","brand":"Michael Kors","price":6000,"preOrder":true,"dimensions":"Корпус — 4,4 см у діаметрі","variants":[{"color":"Сріблястий / синій","hex":"#2d4ba7","images":["/assets/images/products/uploads/michael-kors-maritime-chronograph-quartz-blue-dial-mens-watch-mk9202_1.webp?v=cfad8a64","/assets/images/products/uploads/michael-kors-maritime-chronograph-quartz-blue-dial-mens-watch-mk9202_2.webp?v=27768112","/assets/images/products/uploads/michael-kors-maritime-chronograph-quartz-blue-dial-mens-watch-mk9202_3.webp?v=3ebf16bf"],"article":"89-1"}],"preOrderPrepayment":100,"strapInfo":"Браслет із нержавіючої сталі","sizes":["ONESIZE"],"splitByColor":true,"searchKeywords":["Michael Kors","Michael Kors Maritime","Maritime Chronograph","MK9202","годинник Michael Kors","чоловічий годинник","чоловічий наручний годинник","кварцовий годинник","годинник з хронографом","хронограф","спортивний годинник","металевий годинник","годинник із синім циферблатом","синій циферблат","брендовий годинник","оригінальний Michael Kors","стильний чоловічий годинник"],"isNew":false,"title":"Чоловічий годинник Michael Kors Maritime Chronograph","reviews":0,"instagramBlock":"general","description":"Стильний чоловічий годинник Michael Kors Maritime з функцією хронографа та виразним синім циферблатом. Модель поєднує спортивний дизайн із класичними деталями, завдяки чому легко доповнює повсякденні та ділові образи.\nГодинник оснащений кварцовим механізмом, аналоговим циферблатом і функцією хронографа. Міцний сталевий корпус та браслет забезпечують практичність і комфорт у щоденному використанні","sku":"MK9202","rating":5,"category":"Годинники","legacySlugs":["чоловічий-годинник-michael-kors-maritime-chronograph"],"slug":"cholovichyi-hodynnyk-michael-kors-maritime-chronograph","id":89,"color":"Сріблястий / синій","images":["/assets/images/products/uploads/michael-kors-maritime-chronograph-quartz-blue-dial-mens-watch-mk9202_1.webp","/assets/images/products/uploads/michael-kors-maritime-chronograph-quartz-blue-dial-mens-watch-mk9202_2.webp","/assets/images/products/uploads/michael-kors-maritime-chronograph-quartz-blue-dial-mens-watch-mk9202_3.webp"],"article":"89","preOrderAlways":true};
 </script>
 
 
@@ -544,18 +548,18 @@ BestBrnd4u
 <script src="/assets/js/stock.js?v=85fa4aad"></script>
 
 <script src="/assets/js/translit.js?v=c0957cb7"></script>
-<script src="/assets/js/common.js?v=2bae8d12"></script>
+<script src="/assets/js/common.js?v=a6b0fed9"></script>
 <script src="/assets/js/sync.js?v=48ef002e"></script>
-<script src="/assets/js/mega-menu.js?v=b254fbf6"></script>
+<script src="/assets/js/mega-menu.js?v=803d52cc"></script>
 
 <script src="/assets/js/ui.js?v=c1453fdd"></script>
 
-<script src="/assets/js/app.js?v=d2c171bf"></script>
+<script src="/assets/js/app.js?v=dc04bec0"></script>
 
 <script src="/assets/js/lightbox.js?v=552b0982"></script>
 
 <script src="/assets/js/live-stock.js?v=288763d6"></script>
-<script src="/assets/js/product.js?v=c453f251"></script>
+<script src="/assets/js/product.js?v=8482b5d8"></script>
 
 </body>
 

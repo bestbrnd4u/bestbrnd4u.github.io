@@ -2,7 +2,7 @@
 <html lang="uk">
 
 <head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"955f692b","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"5d9b13ee","data/legal.json":"857b431b","data/products.json":"80f07012","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"955f692b","data/catalog.json":"dea622c7","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"5d9b13ee","data/legal.json":"857b431b","data/products.json":"7218a078","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
 
 <!-- Сторінка лежить у /p/<slug>/, а скрипти будують шляхи як
      з кореня ("data/products.json", "assets/images/…").
@@ -162,6 +162,10 @@
 // вгадувати його з адреси
 window.PRODUCT_SLUG = "jw-pei-zhinocha-sumka-na-pleche-jw-pei-gabbi-ruched-hobo-han";
 window.PRODUCT_ID = 14;
+// повний запис товару прямо в сторінці: із ним product.js
+// малює картку одразу, а каталог довантажує лише заради
+// «схожих» і «переглянутих» — і бере полегшений
+window.PRODUCT_DATA = {"gender":["Жінкам"],"color":"Зелений","brand":"JW PEI","price":4400,"framing":{"gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp":{"zoom":1,"x":50,"y":50,"bg":"white"},"gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp":{"zoom":1,"x":50,"y":50,"bg":"white"},"jwp-ma123-1.webp":{"zoom":1,"x":50,"y":50,"bg":"white"},"jwp-ma123-3.webp":{"zoom":1,"x":50,"y":50,"bg":"white"}},"preOrder":false,"slug":"jw-pei-zhinocha-sumka-na-pleche-jw-pei-gabbi-ruched-hobo-han","variants":[{"color":"Зелений","hex":"#06b454","images":["assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp?v=8efb16d4","assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-2.webp?v=7f7d7a02","assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp?v=886fec91"],"sku":"B094QT219C","article":"14-1","stock":{"ONESIZE":1},"inStock":1},{"color":"Карамельний","hex":"#f49657","images":["assets/images/products/uploads/jwp-ma123-1.webp?v=d9e72c51","assets/images/products/uploads/jwp-ma123-2.webp?v=189c38d2","assets/images/products/uploads/jwp-ma123-3.webp?v=ac991bf8"],"sku":"JWP-MA123","article":"14-2","stock":{"ONESIZE":1},"inStock":1}],"sizes":["ONESIZE"],"searchKeywords":["джей ві пей","jw pei","jwpei","сумка жіноча","кросбоді","сумка через плече","клатч","зелений","карамельний","pei","gabbi","ruched","hobo"],"isNew":false,"title":"Жіноча сумка на плече JW PEI Gabbi Ruched Hobo Handbag","images":["assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-1.webp","assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-2.webp","assets/images/products/uploads/gabbi-ruched-hobo-handbag-grass-green-b094qt219c-3.webp"],"id":14,"instagramBlock":"general","description":"JW PEI Gabbi — сумка-хобо з характерною драпіровкою, яка зробила модель відомою. Округла форма, коротка ручка, носиться в руці або на згині лікоття. Два насичених кольори.","sku":"B094QT219C","category":"Жіночі сумки","article":"14","inStock":2};
 </script>
 
 
@@ -545,18 +549,18 @@ BestBrnd4u
 <script src="/assets/js/stock.js?v=85fa4aad"></script>
 
 <script src="/assets/js/translit.js?v=c0957cb7"></script>
-<script src="/assets/js/common.js?v=2bae8d12"></script>
+<script src="/assets/js/common.js?v=a6b0fed9"></script>
 <script src="/assets/js/sync.js?v=48ef002e"></script>
-<script src="/assets/js/mega-menu.js?v=b254fbf6"></script>
+<script src="/assets/js/mega-menu.js?v=803d52cc"></script>
 
 <script src="/assets/js/ui.js?v=c1453fdd"></script>
 
-<script src="/assets/js/app.js?v=d2c171bf"></script>
+<script src="/assets/js/app.js?v=dc04bec0"></script>
 
 <script src="/assets/js/lightbox.js?v=552b0982"></script>
 
 <script src="/assets/js/live-stock.js?v=288763d6"></script>
-<script src="/assets/js/product.js?v=c453f251"></script>
+<script src="/assets/js/product.js?v=8482b5d8"></script>
 
 </body>
 

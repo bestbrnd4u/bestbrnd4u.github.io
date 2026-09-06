@@ -22,6 +22,20 @@ function installBrowserStubs(window) {
         window.dataUrl = url => url;
     }
 
+    // Адреса полегшеного каталогу. На сайті її дає common.js — з неї
+    // беруть товари всі списки (див. scripts/build-products.js).
+    if (typeof window.catalogUrl !== "function") {
+        window.catalogUrl = () => "data/catalog.json";
+    }
+
+    // Спільний кеш товарів. Тести, які виконують окремий файл, самі
+    // підміняють fetch — тож тут просто ходимо через нього.
+    if (typeof window.getAllProductsCached !== "function") {
+        window.getAllProductsCached = () => window.fetch(window.catalogUrl())
+            .then(response => response.json())
+            .catch(() => []);
+    }
+
     // Показ повідомлень — у тестах не потрібен, але код його викликає.
     if (typeof window.showToast !== "function") {
         window.showToast = () => {};

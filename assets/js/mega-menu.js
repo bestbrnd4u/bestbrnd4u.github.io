@@ -133,15 +133,17 @@
 
     try {
 
-        const [categoriesRes, productsRes] = await Promise.all([
+        // Товари беремо зі спільного кешу, а не своїм fetch: на
+        // сторінці товару той самий список уже вантажать «схожі» та
+        // «переглянуті». Два запити на один файл нічого не додавали.
+        const [categoriesRes, products] = await Promise.all([
             fetch(dataUrl("data/categories.json")),
-            fetch(dataUrl("data/products.json"))
+            getAllProductsCached()
         ]);
 
-        if (!categoriesRes.ok || !productsRes.ok) return;
+        if (!categoriesRes.ok) return;
 
         const categories = await categoriesRes.json();
-        const products = await productsRes.json();
 
         if (!Array.isArray(products) || products.length === 0) return;
 
