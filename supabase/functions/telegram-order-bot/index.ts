@@ -123,6 +123,14 @@ function formatOrder(order) {
     Number(order.discount) > 0 ? `Знижка: −${money(order.discount)}` : "",
     Number(order.delivery_price) > 0 ? `Доставка: ${money(order.delivery_price)}` : "",
     `<b>Разом: ${money(order.total)}</b>`,
+    // Суму рахує браузер, а перевіряє база — своїми цінами
+    // (supabase/migrations/014-order-pricing.sql). Розбіжність означає
+    // або підроблене замовлення, або ціну, що змінилась між
+    // відкриттям сторінки й натисканням кнопки. Обидва випадки варті
+    // погляду ДО того, як товар поїде.
+    order.price_check === "mismatch"
+      ? `⚠️ <b>сума не збігається</b> — за цінами бази ${money(order.total_expected)}`
+      : "",
     "",
     customer ? `👤 ${escapeHtml(customer)}` : "",
     order.phone ? `📞 <a href="tel:${escapeHtml(order.phone)}">${escapeHtml(order.phone)}</a>` : "",
@@ -1156,6 +1164,9 @@ const LIST_COLUMNS = [
     "refusal_requested_at",
     "user_id",
     "telegram_chat_id",
+    // Щоб позначку «сума не збігається» було видно вже в списку, а не
+    // тільки в картці замовлення.
+    "price_check",
 ];
 
 function listFilters(params) {
@@ -1349,6 +1360,12 @@ function orderView(order) {
         discount: Number(order?.discount) || 0,
         deliveryPrice: Number(order?.delivery_price) || 0,
         total: Number(order?.total) || 0,
+
+        // Що сказала база, коли перерахувала суму своїми цінами
+        // (supabase/migrations/014-order-pricing.sql): ok, mismatch,
+        // unknown або порожньо для замовлень до тієї міграції.
+        priceCheck: order?.price_check ?? "",
+        totalExpected: Number(order?.total_expected) || 0,
 
         firstName: order?.first_name ?? "",
         lastName: order?.last_name ?? "",
