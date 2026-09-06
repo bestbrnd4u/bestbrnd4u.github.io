@@ -56,6 +56,8 @@ const OUTPUT_DIR = path.join(ROOT, "p");
 const { SITE_URL } = require("./site-env");
 
 const { slugProblem } = require("./slug-safety");
+// кирилиця в назві бренду → латиниця в адресі /brands/<slug>/
+const { toSlug } = require("./translit");
 
 // Кадрування фото — той самий файл, що виконується в браузері й в
 // адмінці (assets/js/image-framing.js). Статична розмітка мусить
@@ -592,7 +594,7 @@ function buildBody(product) {
     <h1>${escapeHtml(product.title)}</h1>
 
     <p class="product-static-brand">${product.brand
-        ? `<a href="/catalog?brand=${encodeURIComponent(product.brand)}">${escapeHtml(product.brand)}</a>`
+        ? `<a href="/brands/${toSlug(product.brand)}/">${escapeHtml(product.brand)}</a>`
         : ""}</p>
 
     <p class="product-static-price">

@@ -108,7 +108,7 @@ jobs:
           # маску розкриє оболонка, і в git поїде знову перелік.
           git add -A "*.html"
           git add -A data assets/images robots.txt admin/config.yml sitemap.xml feed.xml
-          git add -A p
+          git add -A p brands categories departments
           if git diff --cached --quiet; then
             echo "Змін немає"
           else

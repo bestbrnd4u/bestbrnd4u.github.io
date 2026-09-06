@@ -49,8 +49,14 @@ const split = new Function(
 
 console.log("\n[1] Правило описане в коді");
 {
+    // Каталог тепер спершу переносить у товари живу наявність із бази
+    // (assets/js/live-stock.js), і лише тоді ділить їх за кольорами —
+    // інакше картки лишились би зі старим «під замовлення». Тому
+    // перевіряємо ще й порядок цих двох кроків.
     check("розгортання застосовується при завантаженні",
-        /products = splitProductsByColor\(await response\.json\(\)\)/.test(catalog));
+        /products = splitProductsByColor\(catalogData\)/.test(catalog)
+        && catalog.indexOf("LiveStock.apply(catalogData, live)")
+            < catalog.indexOf("splitProductsByColor(catalogData)"));
 
     // Копії в catalog.js лишитись не мусить: вона вже один раз
     // розійшлась із двійником (promotionProducts) і кожна сторінка

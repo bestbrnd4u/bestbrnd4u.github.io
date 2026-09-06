@@ -866,7 +866,9 @@ function renderOrderCard(order) {
         const productHref = orderItemUrl(item);
 
         const brandHref = item.brand
-            ? `/catalog?brand=${encodeURIComponent(item.brand)}`
+            ? (window.Translit
+                ? `/brands/${window.Translit.toSlug(item.brand)}/`
+                : `/catalog?brand=${encodeURIComponent(item.brand)}`)
             : "";
 
         return `

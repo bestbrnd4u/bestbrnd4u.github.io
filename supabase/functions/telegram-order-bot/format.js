@@ -68,6 +68,14 @@ export function parseItems(value) {
 }
 
 // Рядок складу: назва, варіант, кількість × ціна.
+//
+// stockShort проставляє база в мить створення замовлення: цієї одиниці
+// на полиці вже не було — її щойно замовив хтось інший (див.
+// supabase/migrations/011-stock-reservation.sql).
+//
+// Рядок навмисно різкий і стоїть одразу під товаром: це єдине місце,
+// де власник дізнається про це вчасно — до того, як пообіцяє покупцю
+// доставку за три дні.
 function itemLine(item) {
 
   const details = [item.color, item.size].filter(Boolean).join(" / ");
@@ -77,6 +85,7 @@ function itemLine(item) {
     item.brand ? ` (${escapeHtml(item.brand)})` : "",
     details ? `\n   ${escapeHtml(details)}` : "",
     `\n   ${item.qty ?? 1} × ${money(item.price)}`,
+    item.stockShort ? "\n   ⚠️ <b>залишку не було</b> — під замовлення" : "",
   ].join("");
 
 }

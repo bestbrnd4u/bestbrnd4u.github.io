@@ -121,6 +121,17 @@ function scrollToFirstProduct() {
 // одразу підкручуємо сторінку до результатів
 function applyFilterChange() {
 
+    // Зняли бренд сторінки (або додали другий) — сторінка більше не
+    // про нього. Йдемо в загальний каталог, а не показуємо чужі товари
+    // за адресою /brands/coach/.
+    if (!presetHolds()) {
+
+        leavePreset();
+
+        return;
+
+    }
+
     // Будь-яка зміна фільтра повертає на першу сторінку: інакше
     // користувач, стоячи на 3-й сторінці, звузив би вибірку до двох
     // товарів і побачив порожнечу замість результату.
@@ -836,7 +847,16 @@ async function initCatalog() {
 
         loader.hidden = false;
 
-        const response = await fetch(dataUrl("data/products.json"));
+        // Каталог і живий залишок — одночасно, а не одне за одним.
+        //
+        // Запит до бази зазвичай швидший за 326 КБ каталогу, тож
+        // очікування на нього нічого не додає. Якщо ж база не
+        // відповість за 1,2 с, модуль сам повернеться ні з чим і
+        // каталог покажеться з наявністю зі збірки — як було досі.
+        const [response, live] = await Promise.all([
+            fetch(dataUrl("data/products.json")),
+            window.LiveStock ? window.LiveStock.load() : Promise.resolve(null)
+        ]);
 
         if (!response.ok) {
             throw new Error("Не вдалося завантажити товари");
@@ -847,7 +867,15 @@ async function initCatalog() {
         // банером на головній), а catalog.js головна не підключає
         // взагалі. Копія в двох файлах у цьому проєкті вже
         // закінчувалась розходженням — див. promotionProducts там же.
-        products = splitProductsByColor(await response.json());
+        const catalogData = await response.json();
+
+        // Наявність із бази переносимо ДО поділу за кольорами:
+        // splitProductsByColor копіює «під замовлення» в кожну картку,
+        // і зробити це після означало б виправити товар, але не
+        // картки, які з нього зробили.
+        if (window.LiveStock) window.LiveStock.apply(catalogData, live);
+
+        products = splitProductsByColor(catalogData);
 
         // Адреса прочитана до цього місця, але в ній латиниця
         // («?color=chornyi»), а фільтри порівнюють значення як є
@@ -917,6 +945,10 @@ async function initCatalog() {
         fillBrands();
 
         applyBrandFromUrl();
+
+        // Фільтр сторінки — після фільтрів з адреси: на /brands/coach/
+        // адреса може нести ще й ?gender=, і одне одному не заважає.
+        applyPreset();
 
         fillColors();
 
@@ -2700,6 +2732,72 @@ function updateMobileFilterCount() {
 }
 
 // -------------------------
+// Сторінка бренду або категорії
+// -------------------------
+//
+// /brands/coach/ і /categories/zhinochi-sumky/ — це ТОЙ САМИЙ каталог.
+// Різниця одна: фільтр приходить не з адреси, а зі сторінки, бо
+// адреса тут — шлях. Сторінку будує scripts/build-taxonomy-pages.js,
+// вона й кладе window.CATALOG_PRESET.
+//
+// ЧОМУ НЕ ОКРЕМА СТОРІНКА З ВЛАСНИМ КОДОМ
+// ----------------------------------------
+// Довелося б удруге зробити фільтри, сортування, пагінацію, поділ
+// карток за кольором і мобільну шторку. Дві копії такого розходяться
+// за місяць — і сторінка бренду почала б показувати не те, що каталог.
+const PRESET = (window.CATALOG_PRESET && typeof window.CATALOG_PRESET === "object")
+    ? window.CATALOG_PRESET
+    : null;
+
+function presetActive() {
+    return Boolean(PRESET && (PRESET.brand || PRESET.category || PRESET.department));
+}
+
+function applyPreset() {
+
+    if (!presetActive()) return;
+
+    if (PRESET.brand) selectedBrands.add(PRESET.brand);
+    if (PRESET.category) selectedCategories.add(PRESET.category);
+    if (PRESET.department) selectedDepartments.add(PRESET.department);
+
+}
+
+// Чи сторінка й далі відповідає своїй адресі.
+//
+// Людина може зняти бренд у фільтрі або додати другий — і тоді
+// /brands/coach/ показував би товари Guess. Замість цього йдемо в
+// загальний каталог із тим самим станом (leavePreset нижче): адреса
+// має відповідати вмісту, інакше вона бреше і людині, і пошуку.
+function presetHolds() {
+
+    if (!presetActive()) return true;
+
+    if (PRESET.brand) {
+        return selectedBrands.size === 1 && selectedBrands.has(PRESET.brand);
+    }
+
+    if (PRESET.department) {
+        return selectedDepartments.size === 1 && selectedDepartments.has(PRESET.department);
+    }
+
+    return selectedCategories.size === 1 && selectedCategories.has(PRESET.category);
+
+}
+
+function leavePreset() {
+
+    const params = new URLSearchParams();
+
+    writeState(params, { includePreset: true });
+
+    const query = params.toString().replace(/%2C/gi, ",");
+
+    window.location.assign(query ? `/catalog?${query}` : "/catalog");
+
+}
+
+// -------------------------
 // Каталог бренду
 // -------------------------
 //
@@ -2805,6 +2903,39 @@ function brandDescriptionHtml(text) {
 // щойно розгорнула (та ще й гасив би картинку на мить).
 let renderedBrand = null;
 
+// Кнопка «Детальніше» для опису, який уже лежить у розмітці.
+//
+// Виконується один раз: розмітку тут ніхто не перебудовує, тож і
+// вішати обробник удруге ні до чого.
+let aboutHydrated = false;
+
+function hydrateAbout() {
+
+    if (aboutHydrated || !brandAbout) return;
+
+    const textEl = brandAbout.querySelector(".brand-about-text");
+    const toggle = brandAbout.querySelector(".brand-about-toggle");
+
+    if (!textEl || !toggle) return;
+
+    aboutHydrated = true;
+
+    // Кнопку показуємо, лише якщо текст справді не вміщується у два
+    // рядки. Міряти можна тільки після розкладки, тому rAF.
+    requestAnimationFrame(() => {
+        toggle.hidden = textEl.scrollHeight <= textEl.clientHeight + 1;
+    });
+
+    toggle.addEventListener("click", () => {
+
+        const open = brandAbout.classList.toggle("is-open");
+
+        toggle.textContent = open ? "Згорнути" : "Детальніше";
+
+    });
+
+}
+
 function renderBrandHero() {
 
     // promo.html підключає цей самий файл, але цих блоків не має —
@@ -2817,6 +2948,22 @@ function renderBrandHero() {
     // Заголовок і крихти перечитуємо щоразу: бренд могли обрати вже
     // після завантаження сторінки, а стать — перемкнути будь-коли.
     renderBreadcrumbsAndTitle();
+
+    // Згенерована сторінка (бренд, категорія, розділ) уже несе і банер,
+    // і опис — їх поставив scripts/build-taxonomy-pages.js, щоб їх
+    // побачив пошуковий робот ще до JS.
+    //
+    // Перемальовувати їх звідси не можна: на сторінці категорії
+    // бренда немає, і код нижче просто СТЕР би авторський текст —
+    // єдине, чим сторінка відрізняється від сусідніх для пошуку.
+    // Лишається оживити кнопку «Детальніше».
+    if (PRESET) {
+
+        hydrateAbout();
+
+        return;
+
+    }
 
     // Бренд той самий — далі нічого не змінюється: вміст блоків від
     // решти фільтрів не залежить, а заголовок уже перемальовано вище.
@@ -2852,24 +2999,70 @@ function renderBrandHero() {
 
     if (!text) return;
 
-    const textEl = brandAbout.querySelector(".brand-about-text");
-    const toggle = brandAbout.querySelector(".brand-about-toggle");
+    // Розмітку щойно перебудували — обробник треба вішати заново.
+    aboutHydrated = false;
 
-    // Кнопку показуємо, лише якщо текст справді не вміщується у два
-    // рядки: під коротким описом «Детальніше» нічого не розкриває й
-    // виглядає зламаним. Міряти можна тільки після розкладки, тому
-    // requestAnimationFrame.
-    requestAnimationFrame(() => {
-        toggle.hidden = textEl.scrollHeight <= textEl.clientHeight + 1;
-    });
+    hydrateAbout();
 
-    toggle.addEventListener("click", () => {
+}
 
-        const open = brandAbout.classList.toggle("is-open");
+// Canonical для адрес-фільтрів.
+//
+// ЩО БУЛО НЕ ТАК
+// ---------------
+// /catalog?brand=coach казав пошуку canonical: /catalog. Тобто ми
+// самі оголошували сторінку бренду копією каталогу — і вона не могла
+// виграти жоден запит про бренд.
+//
+// Тепер у бренду й категорії є власна адреса (/brands/coach/), тож
+// адреса-фільтр вказує на неї: усі сигнали збираються на одній
+// сторінці замість двох напів-порожніх.
+//
+// Лише коли фільтр РІВНО один. «Coach + чорний + 38» — це вже не та
+// сторінка, і відправляти на неї було б обманом: людина з пошуку
+// побачила б не те, що їй обіцяли.
+function syncCanonical() {
 
-        toggle.textContent = open ? "Згорнути" : "Детальніше";
+    const link = document.querySelector('link[rel="canonical"]');
 
-    });
+    // Перевіряємо саме НАЯВНІСТЬ preset, а не його вміст: у хабів
+    // (/brands/, /categories/) фільтра немає, але canonical у них
+    // власний — і цей рядок переписував його на /catalog.
+    if (!link || PRESET) return;
+
+    const base = location.origin;
+
+    const onlyBrand = selectedBrands.size === 1
+        && !selectedCategories.size && !selectedColors.size && !selectedSizes.size
+        && !selectedGenders.size && !selectedDepartments.size
+        && !currentSection && !priceFilterActive() && currentPage === 1;
+
+    const onlyCategory = selectedCategories.size === 1
+        && !selectedBrands.size && !selectedColors.size && !selectedSizes.size
+        && !selectedGenders.size && !selectedDepartments.size
+        && !currentSection && !priceFilterActive() && currentPage === 1;
+
+    const onlyDepartment = selectedDepartments.size === 1
+        && !selectedBrands.size && !selectedColors.size && !selectedSizes.size
+        && !selectedGenders.size && !selectedCategories.size
+        && !currentSection && !priceFilterActive() && currentPage === 1;
+
+    if (onlyBrand) {
+        link.href = `${base}/brands/${latinParam([...selectedBrands][0])}/`;
+        return;
+    }
+
+    if (onlyCategory) {
+        link.href = `${base}/categories/${latinParam([...selectedCategories][0])}/`;
+        return;
+    }
+
+    if (onlyDepartment) {
+        link.href = `${base}/departments/${latinParam([...selectedDepartments][0])}/`;
+        return;
+    }
+
+    link.href = `${base}/catalog`;
 
 }
 
@@ -2878,6 +3071,17 @@ function renderBrandHero() {
 // -------------------------
 
 function renderBreadcrumbsAndTitle() {
+
+    // На згенерованій сторінці (бренд, категорія, хаб) заголовок,
+    // підзаголовок, крихти й <title> уже стоять у розмітці — їх
+    // поставив генератор, і саме вони описують цю адресу.
+    // Перемальовувати їх станом фільтрів означало б, що вибір статі
+    // підміняє <h1> сторінки, під яку її проіндексували.
+    //
+    // Перевіряємо НАЯВНІСТЬ preset, а не його вміст: у хабів фільтра
+    // немає, і при перевірці на presetActive() перший же рендер
+    // перетворював «Бренди» на «Каталог товарів».
+    if (PRESET) return;
 
     // Кожна крихта — це {label, href}, а не готовий HTML: href===null
     // означає "це поточна сторінка", і саме тому останню крихту
@@ -2955,6 +3159,8 @@ function renderBreadcrumbsAndTitle() {
         return index === 0 ? node : `<span class="crumb-sep">→</span>\n${node}`;
 
     }).join("\n");
+
+    syncCanonical();
 
     if (breadcrumbsList) breadcrumbsList.innerHTML = html;
 
@@ -3445,49 +3651,68 @@ function setOrDelete(params, key, value) {
 
 }
 
+// Стан фільтрів → параметри адреси.
+//
+// Винесено з syncStateToUrl(), бо той самий запис потрібен двічі: у
+// власну адресу (без виміру сторінки — він уже в шляху) і в адресу
+// загального каталогу, коли зі сторінки бренду йдуть (там вимір
+// потрібен, інакше фільтр загубиться).
+function writeState(p, options) {
+
+    // множинні фільтри — через кому: читабельно в адресному рядку
+    // й не роздуває посилання, як повторювані ключі
+    //
+    // ЛАТИНИЦЯ, А НЕ КИРИЛИЦЯ
+    // ------------------------
+    // «?color=Чорний» браузер кодує як %D0%A7%D0%BE%D1%80%D0%BD%D0%B8%D0%B9
+    // — девʼять символів на літеру. В адресному рядку видно
+    // розшифроване, а от скрізь, де посилання СКОПІЮВАТИ (пост,
+    // повідомлення, лист), вилазить саме ця борода. А в параметрі
+    // (t.me/…?text=…) вона кодується вдруге й стає втричі довшою.
+    //
+    // Та сама причина, з якої латиницею вже стали адреси товарів і
+    // акцій, — і той самий перетворювач: assets/js/translit.js.
+    const joinSet = set => (set && set.size)
+        ? [...set].map(latinParam).join(",")
+        : "";
+
+    // На сторінці бренду сам бренд у запит не пишемо: він уже є в
+    // шляху, і «/brands/coach/?brand=coach» було б тим самим двічі.
+    const keepPreset = Boolean(options && options.includePreset);
+
+    const skipBrand = !keepPreset && presetActive() && Boolean(PRESET.brand);
+    const skipCategory = !keepPreset && presetActive() && Boolean(PRESET.category);
+    const skipDepartment = !keepPreset && presetActive() && Boolean(PRESET.department);
+
+    setOrDelete(p, URL_KEYS.section, currentSection);
+    setOrDelete(p, URL_KEYS.gender, joinSet(selectedGenders));
+    setOrDelete(p, URL_KEYS.department, skipDepartment ? "" : joinSet(selectedDepartments));
+    setOrDelete(p, URL_KEYS.category, skipCategory ? "" : joinSet(selectedCategories));
+    setOrDelete(p, URL_KEYS.brand, skipBrand ? "" : joinSet(selectedBrands));
+    setOrDelete(p, URL_KEYS.color, joinSet(selectedColors));
+    setOrDelete(p, URL_KEYS.size, joinSet(selectedSizes));
+
+    // ціну пишемо, лише якщо людина її справді рухала: інакше
+    // посилання тягло б за собою межі поточного асортименту, і
+    // завтра, коли зʼявиться дорожчий товар, воно б його ховало
+    const movedMin = priceRange.min !== null && priceRange.min !== priceBounds.min;
+    const movedMax = priceRange.max !== null && priceRange.max !== priceBounds.max;
+
+    setOrDelete(p, URL_KEYS.priceMin, movedMin ? priceRange.min : "");
+    setOrDelete(p, URL_KEYS.priceMax, movedMax ? priceRange.max : "");
+
+    setOrDelete(p, URL_KEYS.sort, currentSort);
+    setOrDelete(p, URL_KEYS.page, currentPage > 1 ? currentPage : "");
+
+}
+
 function syncStateToUrl() {
 
     try {
 
         const url = new URL(window.location.href);
-        const p = url.searchParams;
 
-        // множинні фільтри — через кому: читабельно в адресному рядку
-        // й не роздуває посилання, як повторювані ключі
-        //
-        // ЛАТИНИЦЯ, А НЕ КИРИЛИЦЯ
-        // ------------------------
-        // «?color=Чорний» браузер кодує як %D0%A7%D0%BE%D1%80%D0%BD%D0%B8%D0%B9
-        // — девʼять символів на літеру. В адресному рядку видно
-        // розшифроване, а от скрізь, де посилання СКОПІЮВАТИ (пост,
-        // повідомлення, лист), вилазить саме ця борода. А в параметрі
-        // (t.me/…?text=…) вона кодується вдруге й стає втричі довшою.
-        //
-        // Та сама причина, з якої латиницею вже стали адреси товарів і
-        // акцій, — і той самий перетворювач: assets/js/translit.js.
-        const joinSet = set => (set && set.size)
-            ? [...set].map(latinParam).join(",")
-            : "";
-
-        setOrDelete(p, URL_KEYS.section, currentSection);
-        setOrDelete(p, URL_KEYS.gender, joinSet(selectedGenders));
-        setOrDelete(p, URL_KEYS.department, joinSet(selectedDepartments));
-        setOrDelete(p, URL_KEYS.category, joinSet(selectedCategories));
-        setOrDelete(p, URL_KEYS.brand, joinSet(selectedBrands));
-        setOrDelete(p, URL_KEYS.color, joinSet(selectedColors));
-        setOrDelete(p, URL_KEYS.size, joinSet(selectedSizes));
-
-        // ціну пишемо, лише якщо людина її справді рухала: інакше
-        // посилання тягло б за собою межі поточного асортименту, і
-        // завтра, коли зʼявиться дорожчий товар, воно б його ховало
-        const movedMin = priceRange.min !== null && priceRange.min !== priceBounds.min;
-        const movedMax = priceRange.max !== null && priceRange.max !== priceBounds.max;
-
-        setOrDelete(p, URL_KEYS.priceMin, movedMin ? priceRange.min : "");
-        setOrDelete(p, URL_KEYS.priceMax, movedMax ? priceRange.max : "");
-
-        setOrDelete(p, URL_KEYS.sort, currentSort);
-        setOrDelete(p, URL_KEYS.page, currentPage > 1 ? currentPage : "");
+        writeState(url.searchParams);
 
         // Кому в адресі лишаємо комою.
         //

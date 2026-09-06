@@ -907,6 +907,12 @@ function main() {
 
         if (Stock.productTracked(data)) data.inStock = Stock.productTotal(data);
 
+        // Перемикач із адмінки — окремим полем, ДО того як preOrder
+        // стане результатом. Його читає assets/js/live-stock.js: те,
+        // що возять під замовлення завжди, живий залишок не скасовує.
+        if (data.preOrder) data.preOrderAlways = true;
+        else delete data.preOrderAlways;
+
         data.preOrder = productPreOrder;
 
         // Словник за кольорами далі не потрібен: усе, що з нього

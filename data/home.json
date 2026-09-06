@@ -32,12 +32,12 @@
       {
         "label": "Аксесуари",
         "image": "/assets/images/products/uploads/5cdd14ae-5b4e-43da-9407-a94306ff33e1.png",
-        "link": "catalog?department=aksesuary"
+        "link": "/departments/aksesuary/"
       },
       {
         "label": "Взуття",
         "image": "/assets/images/products/uploads/188c0bdd-51a4-482f-9e14-ec17c79e9b09.png",
-        "link": "catalog?department=vzuttia"
+        "link": "/departments/vzuttia/"
       }
     ]
   },
@@ -55,27 +55,27 @@
     "items": [
       {
         "name": "MARC JACOBS",
-        "link": "catalog?brand=Marc%20Jacobs"
+        "link": "/brands/marc-jacobs/"
       },
       {
         "name": "COACH",
-        "link": "catalog?brand=Coach"
+        "link": "/brands/coach/"
       },
       {
         "name": "JW PEI",
-        "link": "catalog?brand=JW%20PEI"
+        "link": "/brands/jw-pei/"
       },
       {
         "name": "MICHAEL KORS",
-        "link": "catalog?brand=Michael%20Kors"
+        "link": "/brands/michael-kors/"
       },
       {
         "name": "LOVE MOSCHINO",
-        "link": "catalog?brand=Love%20Moschino"
+        "link": "/brands/love-moschino/"
       },
       {
         "name": "BALENCIAGA",
-        "link": "catalog?brand=Balenciaga"
+        "link": "/brands/balenciaga/"
       }
     ]
   },

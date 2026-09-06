@@ -331,11 +331,20 @@
         const variant = [item.color, item.size].filter(Boolean).join(" / ");
         const qty = Number(item.qty) || 1;
 
+        // stockShort проставила база в мить створення замовлення:
+        // цієї одиниці на полиці вже не було. Показуємо поруч із
+        // товаром, а не окремим блоком, — інакше в замовленні з пʼяти
+        // позицій незрозуміло, якої саме воно стосується.
+        const short = item.stockShort
+            ? `<span class="item-variant"><br>⚠️ залишку не було — під замовлення</span>`
+            : "";
+
         return `
             <div class="item">
                 <span>
                     ${item.brand ? `<span class="muted">${esc(item.brand)}</span> ` : ""}${esc(item.title || "")}
                     ${variant ? `<span class="item-variant"><br>${esc(variant)}</span>` : ""}
+                    ${short}
                 </span>
                 <span class="item-sum">${qty} × ${esc(money(item.price))}</span>
             </div>`;

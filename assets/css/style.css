@@ -3071,6 +3071,114 @@ body.mobile-filters-open .scroll-top{
     margin-top:8px;
 }
 
+/* -- сторінки брендів і категорій -- */
+
+/* Перелік на хабі (/brands/, /categories/) — лишається назавжди:
+   він і є змістом цих сторінок. Сітка товарів під ним показує весь
+   асортимент, тож перелік має читатись як навігація, а не як картки. */
+.taxonomy-hub{
+    margin:-8px 0 28px;
+}
+
+.taxonomy-hub-list{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    list-style:none;
+    padding:0;
+    margin:0;
+}
+
+.taxonomy-hub-list li{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:8px 14px;
+    border-radius:50px;
+    border:1.5px solid var(--gray200);
+    background:#fff;
+    font-size:14px;
+    font-weight:600;
+}
+
+.taxonomy-hub-list a{
+    color:var(--gray900);
+    text-decoration:none;
+}
+
+@media (hover:hover) and (pointer:fine){
+.taxonomy-hub-list li:hover{
+    border-color:var(--secondary);
+}
+.taxonomy-hub-list li:hover a{
+    color:var(--secondary);
+}
+}
+
+.taxonomy-count{
+    color:var(--gray500);
+    font-weight:700;
+    font-size:12px;
+}
+
+/* Перелік товарів у розмітці до JS.
+
+   Його бачить пошуковий робот і людина з вимкненим JS; щойно
+   завантажиться catalog.js, на його місці з'являються звичайні
+   картки. Тому оформлення тут мінімальне — це текст, а не вітрина. */
+.taxonomy-static-list{
+    grid-column:1 / -1;
+    list-style:none;
+    padding:0;
+    margin:0;
+    display:grid;
+    gap:10px;
+}
+
+.taxonomy-static-list li{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:baseline;
+    gap:10px;
+    padding-bottom:10px;
+    border-bottom:1px solid var(--gray200);
+}
+
+.taxonomy-static-list a{
+    color:var(--gray900);
+    font-weight:600;
+    text-decoration:none;
+}
+
+.taxonomy-static-list .taxonomy-brand{
+    color:var(--gray500);
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+}
+
+.taxonomy-static-list .taxonomy-price{
+    margin-left:auto;
+    font-weight:700;
+}
+
+@media(max-width:768px){
+
+    .taxonomy-hub{
+        margin:-4px 0 18px;
+    }
+
+    .taxonomy-hub-list{
+        gap:8px;
+    }
+
+    .taxonomy-hub-list li{
+        padding:7px 12px;
+        font-size:13px;
+    }
+
+}
+
 /* -- каталог бренду: банер над заголовком, опис під ним -- */
 
 .brand-hero{
