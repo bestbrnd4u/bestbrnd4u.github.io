@@ -31,12 +31,12 @@
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://dev.bestbrnd4u.com/offer</loc>
+    <loc>https://bestbrnd4u.com/offer</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://dev.bestbrnd4u.com/contacts</loc>
+    <loc>https://bestbrnd4u.com/contacts</loc>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
