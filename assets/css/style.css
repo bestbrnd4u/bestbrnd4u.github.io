@@ -8973,6 +8973,13 @@ body.mobile-filters-open .scroll-top{
         transform:translateY(-140%);
     }
 
+    /* 14px замість 18px: чотири пікселі з кожного боку віддаємо
+       сортуванню — саме їх бракувало, щоб напис поруч зі значком
+       кількості фільтрів вміщався повністю. */
+    .mobile-filter-bar .mobile-filter-btn{
+        padding:0 14px;
+    }
+
     .mobile-filter-bar .sort-dropdown{
         flex:1 1 auto;
         min-width:0;
@@ -8999,6 +9006,13 @@ body.mobile-filters-open .scroll-top{
         justify-content:center;
         min-width:0;
         overflow:hidden;
+        /* Тісніше за десктопні 16px: із ними значення сортування
+           обрізалось трикрапкою вже на 375px («за замовчуван…»), хоч
+           бракувало всього 11px. Разом із вужчою кнопкою «Фільтри»
+           нижче цього досить і для найдовшого значення — «за
+           зменшенням ціни» (потрібно 145px, є 145px). */
+        padding:10px;
+        gap:4px;
     }
 
     .mobile-filter-bar .sort-toggle-label{
