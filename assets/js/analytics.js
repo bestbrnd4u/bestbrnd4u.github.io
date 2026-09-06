@@ -44,8 +44,19 @@
     var CONFIG_URL = "data/analytics.json";
 
     var measurementId = null;
+    var pixelId = null;
     var loaded = false;
-    var pending = [];      // події, що сталися до завантаження
+    var metaLoaded = false;
+    var pending = [];      // події, що сталися до завантаження GA4
+    var pendingMeta = [];  // те саме для пікселя Meta
+
+    // ЧОМУ ЧЕРГИ ДВІ, А НЕ ОДНА
+    // --------------------------
+    // Системи вмикаються НЕЗАЛЕЖНО: згода на статистику й згода на
+    // рекламу — різні галочки, та й налаштування вантажаться не
+    // синхронно. Спільна черга спорожнилась би на першій із них, і
+    // друга не отримала б нічого — тобто перший view_item сесії
+    // (найцінніший для ретаргетингу) зник би тихо.
 
     // ------------------------------------------------------------------
     // Черга gtag. Оголошуємо ДО завантаження скрипта, як вимагає Google:
@@ -73,8 +84,63 @@
         wait_for_update: 500
     });
 
+    // ------------------------------------------------------------------
+    // Піксель Meta
+    //
+    // ЧОМУ ТУТ, А НЕ ОКРЕМИМ ФАЙЛОМ
+    // ------------------------------
+    // Події магазину вже проходять через одну воронку — send() нижче.
+    // Другий модуль означав би другий набір викликів у product.js,
+    // common.js і checkout.js, і рано чи пізно подію додали б в одне
+    // місце, а в інше забули. Тут таке неможливе: обидві системи
+    // бачать рівно те саме.
+    //
+    // ЧОМУ НЕ ОФІЦІЙНИЙ СНІПЕТ META
+    // ------------------------------
+    // Той сніпет — один мінімізований рядок, у якому не видно ні
+    // порядку викликів, ні що він робить зі згодою. Нижче те саме,
+    // тільки читабельно: fbq складає виклики в чергу, поки
+    // fbevents.js не завантажився й не підмінив її своєю реалізацією.
+    // ------------------------------------------------------------------
+    if (!root.fbq) {
+
+        var queue = function () {
+            queue.callMethod
+                ? queue.callMethod.apply(queue, arguments)
+                : queue.queue.push(arguments);
+        };
+
+        queue.push = queue;
+        queue.loaded = true;
+        queue.version = "2.0";
+        queue.queue = [];
+
+        root.fbq = queue;
+        root._fbq = root._fbq || queue;
+
+    }
+
+    function fb() {
+        if (root.fbq) root.fbq.apply(null, arguments);
+    }
+
+    // Заборона одразу, ще до завантаження скрипта — та сама причина,
+    // що в gtag вище: якщо fbevents.js колись з'явиться на сторінці
+    // іншим шляхом, він застане «revoke», а не почне збирати.
+    fb("consent", "revoke");
+
     function allowed() {
         return !root.Consent || root.Consent.has("analytics");
+    }
+
+    // Реклама — ОКРЕМА згода, не та сама, що статистика.
+    //
+    // Статистика відповідає магазину, чого бракує в каталозі. Піксель
+    // віддає дані рекламній компанії, щоб та наздогнала людину
+    // оголошенням в іншому місці. Це різні цілі, тож і галочки різні
+    // (див. коментар до категорій в assets/js/consent.js).
+    function adsAllowed() {
+        return !root.Consent || root.Consent.has("ads");
     }
 
     function loadScript() {
@@ -101,10 +167,45 @@
             anonymize_ip: true
         });
 
-        // Події, що сталися до згоди, надсилаємо тепер — вони описують
-        // ту саму сесію.
+        // Що тут насправді дозаливається.
+        //
+        // НЕ події «до згоди» — тих немає взагалі: gaSend() виходить
+        // на !allowed() ще до черги, тобто без згоди нічого не
+        // збирається навіть у пам'ять. У черзі лежить інший проміжок:
+        // згода вже є, а data/analytics.json (і скрипт Google) ще
+        // вантажаться. На сторінці товару це реальні пів секунди, і
+        // саме в них стається view_item.
         pending.splice(0).forEach(function (item) {
             gtag("event", item.name, item.params);
+        });
+
+    }
+
+    function loadMetaScript() {
+
+        if (metaLoaded || !pixelId) return;
+
+        metaLoaded = true;
+
+        var script = document.createElement("script");
+
+        script.async = true;
+        script.src = "https://connect.facebook.net/en_US/fbevents.js";
+
+        document.head.appendChild(script);
+
+        fb("consent", "grant");
+        fb("init", pixelId);
+
+        // PageView — базова подія пікселя: без неї Meta не бачить
+        // навіть того, що людина була на сайті.
+        fb("track", "PageView");
+
+        // Той самий проміжок, що в GA4 вище: згода є, скрипт ще ні.
+        // Події до згоди сюди не потрапляють — metaSend() виходить на
+        // !adsAllowed() раніше за чергу.
+        pendingMeta.splice(0).forEach(function (item) {
+            metaSend(item.name, item.params);
         });
 
     }
@@ -117,9 +218,84 @@
 
     }
 
+    function enableAds() {
+        loadMetaScript();
+    }
+
+    // Згоду можна не лише дати, а й відкликати — посиланням
+    // «Налаштування даних» у підвалі. Тоді мало перестати надсилати
+    // події: скрипти вже на сторінці, і сказати їм про це треба прямо.
+    function disable() {
+
+        gtag("consent", "update", { analytics_storage: "denied" });
+
+        fb("consent", "revoke");
+
+    }
+
     // ------------------------------------------------------------------
     // Опис товару у форматі GA4
     // ------------------------------------------------------------------
+
+    // Ідентифікатор товару в термінах каталогу Meta.
+    //
+    // НАВІЩО ОКРЕМИЙ ВІД item_id
+    // ---------------------------
+    // Динамічний ретаргетинг («людина дивилася цю сумку — покажемо їй
+    // саме її») працює ЛИШЕ коли id з пікселя збігається з id у фіді. А
+    // у фіді рядок — це колір і розмір (scripts/build-feed.js), тобто
+    // «9-1» і «34-1-38», а не «9» і «34».
+    //
+    // item_id для GA4 лишаємо як був: там за ним уже зібрана історія
+    // звітів, і зміна id розірвала б її навпіл.
+    //
+    // ЧОМУ КОЛІР ШУКАЄМО І ЗА НАЗВОЮ, І ЗА SLUG-ОМ
+    // ---------------------------------------------
+    // Сторінка товару бере колір з адреси, а там він латиницею
+    // («temno-siryi»); картка каталогу передає справжню назву
+    // («Темно-сірий»). Обидва мусять знайти той самий варіант.
+    //
+    // За збігом цієї формули з формулою фіда стежить
+    // tests/test-meta-pixel.js — розійдуться, і ретаргетинг мовчки
+    // перестане знаходити товари.
+    function metaContentId(product, extra) {
+
+        if (!product) return "";
+
+        var variants = Array.isArray(product.variants) ? product.variants : [];
+        var wanted = extra && extra.color ? String(extra.color).trim().toLowerCase() : "";
+
+        var index = 0;
+
+        if (wanted) {
+
+            for (var i = 0; i < variants.length; i++) {
+
+                var name = String(variants[i].color || "").trim().toLowerCase();
+                var slug = root.Translit ? root.Translit.toSlug(name) : "";
+
+                if (name === wanted || (slug && slug === wanted)) {
+                    index = i;
+                    break;
+                }
+
+            }
+
+        }
+
+        var variant = variants[index];
+
+        var base = variant && variant.article
+            ? String(variant.article)
+            : String(product.id || "") + "-1";
+
+        var size = extra && extra.size ? String(extra.size).trim() : "";
+
+        // ONESIZE — наша заглушка для товарів без розмірів, і у фіді її
+        // теж немає.
+        return (size && size !== "ONESIZE") ? base + "-" + size : base;
+
+    }
 
     function itemOf(product, extra) {
 
@@ -147,6 +323,15 @@
             if (typeof extra.index === "number") item.index = extra.index;
 
         }
+
+        // Ідентифікатор для пікселя їде разом із товаром.
+        //
+        // GA4 таке зайве поле просто ігнорує (це item-scoped
+        // параметр), а send() нижче бере його для Meta. Складати
+        // другий, паралельний список товарів заради цього означало б
+        // мати два описи того самого кошика — рівно те, чого cartItems
+        // вище й позбувся.
+        item.content_id = metaContentId(product, extra);
 
         // Знижка Google рахує окремим полем — інакше у звітах видно
         // тільки кінцеву ціну, і незрозуміло, скільки продано за акцією.
@@ -176,7 +361,20 @@
 
     }
 
+    // Одна подія магазину — дві адресати, кожен зі своєю згодою.
+    //
+    // Раніше тут стояло одне «if (!allowed()) return» на все. Це
+    // означало, що галочка «статистика» вирішує й за рекламу: людина,
+    // яка дозволила рекламу й заборонила статистику, не давала пікселю
+    // жодної події. Тепер кожна система питає своє.
     function send(name, params) {
+
+        gaSend(name, params);
+        metaSend(name, params);
+
+    }
+
+    function gaSend(name, params) {
 
         if (!allowed()) return;       // немає згоди — не збираємо взагалі
 
@@ -202,6 +400,89 @@
         }
 
         gtag("event", name, params);
+
+    }
+
+    // Назви подій Meta для наших подій GA4.
+    //
+    // Тут лише ті, у яких є СТАНДАРТНИЙ відповідник: саме на них Meta
+    // будує оптимізацію й динамічну рекламу. Решту (view_item_list,
+    // select_item, view_cart, remove_from_cart, кроки доставки й
+    // оплати, акції) не переливаємо власними назвами — це був би шум,
+    // який нікуди не підключений і нічого не оптимізує.
+    var META_EVENTS = {
+        view_item: "ViewContent",
+        add_to_cart: "AddToCart",
+        add_to_wishlist: "AddToWishlist",
+        begin_checkout: "InitiateCheckout",
+        add_payment_info: "AddPaymentInfo",
+        purchase: "Purchase",
+        search: "Search"
+    };
+
+    function metaSend(name, params) {
+
+        if (!adsAllowed()) return;    // немає згоди на рекламу — нічого
+
+        var event = META_EVENTS[name];
+
+        if (!event) return;
+
+        // Скрипт ще не завантажився (або згоду щойно дали) — у чергу,
+        // з тим самим запобіжником на розмір, що в GA4.
+        if (!pixelId || !metaLoaded) {
+
+            if (pendingMeta.length < 40) pendingMeta.push({ name: name, params: params });
+
+            return;
+
+        }
+
+        if (name === "search") {
+
+            fb("track", "Search", { search_string: params.search_term });
+
+            return;
+
+        }
+
+        var items = params.items || [];
+
+        var payload = {
+            content_type: "product",
+            content_ids: items.map(function (item) { return item.content_id; })
+                .filter(Boolean),
+            // contents — багатша форма того самого: Meta бере з неї
+            // кількість і ціну кожного рядка, а не лише перелік id.
+            contents: items.map(function (item) {
+                return {
+                    id: item.content_id,
+                    quantity: item.quantity || 1,
+                    item_price: Number(item.price) || 0
+                };
+            }),
+            currency: params.currency || "UAH",
+            value: Number(params.value) || 0
+        };
+
+        if (items.length === 1 && items[0].item_name) {
+            payload.content_name = items[0].item_name;
+        }
+
+        if (items.length > 1 || name === "purchase") {
+            payload.num_items = items.reduce(function (sum, item) {
+                return sum + (item.quantity || 1);
+            }, 0);
+        }
+
+        // Номер замовлення потрібен, щоб потім, коли додамо серверні
+        // події (Conversions API), Meta склеїла їх з браузерними, а не
+        // порахувала покупку двічі.
+        if (name === "purchase" && params.transaction_id) {
+            payload.order_id = params.transaction_id;
+        }
+
+        fb("track", event, payload);
 
     }
 
@@ -413,20 +694,23 @@
             .then(function (data) {
 
                 measurementId = String((data && data.measurementId) || "").trim();
+                pixelId = String((data && data.metaPixelId) || "").trim();
 
-                // Порожній ідентифікатор = статистика вимкнена. Жодного
-                // запиту до Google не буде навіть за наявності згоди.
-                if (!measurementId) {
+                // Порожній ідентифікатор = вимкнено. Жодного запиту до
+                // Google чи Meta не буде навіть за наявності згоди.
+                if (!measurementId && !pixelId) {
 
-                    // Черга накопичених подій більше ні до чого — і
-                    // тримати її в пам'яті всю сесію теж ні до чого.
+                    // Черги накопичених подій більше ні до чого — і
+                    // тримати їх у пам'яті всю сесію теж ні до чого.
                     pending.length = 0;
+                    pendingMeta.length = 0;
 
                     return;
 
                 }
 
-                if (allowed()) enable();
+                if (measurementId && allowed()) enable();
+                if (pixelId && adsAllowed()) enableAds();
 
             });
 
@@ -436,7 +720,13 @@
     // вмикаємось на місці, без перезавантаження.
     document.addEventListener("consent:change", function (event) {
 
-        if (event.detail && event.detail.analytics) enable();
+        var detail = event.detail || {};
+
+        if (detail.analytics && measurementId) enable();
+        if (detail.ads && pixelId) enableAds();
+
+        // Відкликали — гасимо обидві системи на місці.
+        if (!detail.analytics && !detail.ads) disable();
 
     });
 

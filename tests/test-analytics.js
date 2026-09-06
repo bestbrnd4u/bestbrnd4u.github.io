@@ -42,7 +42,13 @@ console.log("\n[1] Без згоди Google не завантажується");
     // Перевірка згоди мусить бути перед КОЖНОЮ подією, а не лише при
     // завантаженні: людина може відкликати згоду посеред сесії.
     check("кожна подія перевіряє згоду",
-        /function send\([\s\S]{0,220}if \(!allowed\(\)\) return/.test(code));
+        /function gaSend\(name, params\) \{\s*if \(!allowed\(\)\) return/.test(code));
+
+    // Статистика й реклама вмикаються окремо, тож і питати згоду
+    // мусять окремо: одне «if» на дві системи означало б, що галочка
+    // про статистику вирішує й за піксель.
+    check("статистика не вирішує за рекламу",
+        /function send\(name, params\) \{\s*gaSend\(name, params\);\s*metaSend\(name, params\);/.test(code));
 
     check("згода посеред сесії вмикає без перезавантаження",
         /consent:change[\s\S]{0,140}enable\(\)/.test(code));
@@ -53,8 +59,8 @@ console.log("\n[1] Без згоди Google не завантажується");
     // відправиться і очищається.
     check("без ідентифікатора нічого не відправляється",
         /if \(!measurementId \|\| !loaded\)/.test(code));
-    check("черга очищається, коли статистика вимкнена",
-        /if \(!measurementId\) \{[\s\S]{0,200}pending\.length = 0/.test(code));
+    check("черга очищається, коли все вимкнено",
+        /if \(!measurementId && !pixelId\) \{[\s\S]{0,200}pending\.length = 0/.test(code));
 }
 
 console.log("\n[2] Персональні дані не передаються");
@@ -183,10 +189,14 @@ console.log("\n[6] Згода питає саме про статистику");
     const consent = read("assets/js/consent.js");
 
     check("категорія «аналітика» є",
-        /var OPTIONAL = \["embeds", "analytics"\]/.test(consent));
+        /"analytics"/.test(consent) && /var OPTIONAL = \[/.test(consent));
 
-    // Додалась категорія — стара відповідь більше не діє.
-    check("версію згоди піднято", /var VERSION = 2/.test(consent));
+    // Повний перелік категорій і версію стережуть tests/test-consent.js
+    // і tests/test-meta-pixel.js. Дублювати тут точний рядок означало б
+    // правити його в трьох файлах при кожній новій категорії — саме це
+    // й сталось, коли додався піксель.
+    check("статистика не вмикається галочкою про рекламу",
+        /detail\.analytics && measurementId\) enable\(\)/.test(read("assets/js/analytics.js")));
 
     check("банер називає Google Analytics", /Google Analytics/.test(consent));
 
