@@ -139,7 +139,16 @@ begin
 
     for v_item in select value from jsonb_array_elements(v_items) loop
 
-        v_id    := nullif(v_item->>'id', '')::bigint;
+        -- Через регулярку, а не прямим ::bigint.
+        --
+        -- Один товар із нечисловим id завалив би приведення типу — а
+        -- разом із ним і вставку замовлення. Тобто захист від
+        -- подвійного продажу зупинив би продажі взагалі.
+        v_id := case
+            when coalesce(v_item->>'id', '') ~ '^[0-9]{1,18}$'
+            then (v_item->>'id')::bigint
+        end;
+
         v_color := coalesce(v_item->>'color', '');
         v_size  := coalesce(v_item->>'size', '');
         v_qty   := greatest(coalesce((v_item->>'qty')::int, 1), 1);
@@ -170,6 +179,24 @@ begin
     new.items := v_out;
 
     return new;
+
+exception
+
+    -- ЗАМОВЛЕННЯ ВАЖЛИВІШЕ ЗА ПОЗНАЧКУ.
+    --
+    -- Цей тригер стоїть на шляху КОЖНОГО замовлення — і з сайту, і з
+    -- бота. Будь-яка несподіванка тут (дивні дані в кошику, зміна
+    -- схеми, помилка в самій функції) без цього блоку означала б, що
+    -- магазин перестає приймати замовлення взагалі.
+    --
+    -- Тому падаємо тихо: замовлення проходить, просто без позначки.
+    -- Втратити попередження — неприємно; втратити продажі — інша
+    -- категорія подій.
+    when others then
+
+        raise warning 'orders_flag_stock_shortfall: %', sqlerrm;
+
+        return new;
 
 end;
 $$;
