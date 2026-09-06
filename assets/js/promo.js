@@ -32,21 +32,21 @@ async function initPromoPage() {
 
     try {
 
-        const [promoRes, productsRes, categoryDepartments, departmentOf] = await Promise.all([
+        const [promoRes, products, categoryDepartments, departmentOf] = await Promise.all([
             fetch(dataUrl("data/promotions.json")),
-            fetch(dataUrl("data/products.json")),
+            loadCatalog(),
             loadCategoryDepartments(),
             // «категорія → розділ»: щоб розгорнути розділ, указаний в
             // автопідхопленні акції, у перелік його категорій
             loadDepartmentOf()
         ]);
 
-        if (!promoRes.ok || !productsRes.ok) {
+        if (!promoRes.ok) {
             throw new Error("Не вдалося завантажити дані");
         }
 
         const promotions = await promoRes.json();
-        const allProducts = await productsRes.json();
+        const allProducts = products;
 
         const list = Array.isArray(promotions) ? promotions : [];
 

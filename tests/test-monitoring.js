@@ -1,0 +1,206 @@
+// Моніторинг: хто перший дізнається, що магазин зламався.
+//
+// ЩО ЦЕ ЗАКРІПЛЮЄ
+// ----------------
+// 1. ПЕРЕВІРКА ПАДАЄ, А НЕ ПИШЕ В ЛОГ. Лист від GitHub про
+//    провалений запуск — єдиний канал повідомлення. Крок, який
+//    завершується успішно й лише друкує проблему, не повідомляє
+//    нікого.
+//
+// 2. ПЕРЕВІРЯЄТЬСЯ НЕ ЛИШЕ «ЧИ ВІДКРИЄТЬСЯ». Сайт із дев-налаштуваннями
+//    на проді працює бездоганно і при цьому зникає з пошуку. Порожній
+//    каталог теж віддає 200.
+//
+// 3. ЖУРНАЛ ПОМИЛОК НЕ ЛАМАЄ СТОРІНКУ. Він для того й існує, щоб
+//    ловити поломки, — тому сам не має права стати поломкою.
+//
+// 4. У ЖУРНАЛ НЕ ПОТРАПЛЯЄ ОСОБИСТЕ. Ні пошти, ні кошика, ні
+//    пошукового запиту (він буває в параметрах адреси).
+
+const fs = require("fs");
+const path = require("path");
+
+const ROOT = path.join(__dirname, "..");
+
+let failures = 0;
+const check = (n, c, e) => {
+    if (c) console.log("  ✓", n);
+    else { console.log("  ✗", n, e !== undefined ? "→ " + e : ""); failures++; }
+};
+
+const read = rel => fs.readFileSync(path.join(ROOT, rel), "utf8");
+
+const monitor = read("scripts/monitor.js");
+const digest = read("scripts/report-issues.js");
+const workflow = read(".github/workflows/monitor.yml");
+const client = read("assets/js/error-report.js");
+const sql = read("supabase/migrations/013-site-issues.sql");
+
+console.log("\n[1] Перевірка доступності справді перевіряє");
+{
+    check("падає, коли щось не так", /process\.exit\(1\)/.test(monitor));
+
+    // Найдорожчі поломки — ті, що не видно оком.
+    check("ловить robots.txt, який закриває сайт від пошуку",
+        /Disallow/.test(monitor));
+
+    check("ловить noindex на проді", /noindex/.test(monitor));
+
+    check("ловить чужий домен у sitemap",
+        /усі адреси в sitemap/.test(monitor));
+
+    check("ловить порожній каталог",
+        /products\.json/.test(monitor) && /expected \/ 2|expected\/2/.test(monitor));
+
+    check("перевіряє сторінку товару за розміткою, а не за кнопкою",
+        /productSchema/.test(monitor) && !/addToCartBtn/.test(monitor));
+
+    check("перевіряє, що 404 віддає саме 404",
+        /=== 404/.test(monitor));
+
+    // Одна невдала спроба нічого не доводить: хостинг іноді віддає
+    // 5xx на кілька секунд під час викладки.
+    check("повторює спробу перед тим, як бити на сполох",
+        /attempt/.test(monitor) && /setTimeout/.test(monitor));
+
+    check("середовище береться з site.config.json",
+        /site\.config\.json/.test(monitor));
+}
+
+console.log("\n[2] Зведення помилок доходить до власника");
+{
+    check("падає, коли є нові помилки", /process\.exit\(1\)/.test(digest));
+
+    check("позначає показане, щоб не повторюватись",
+        /notified: true/.test(digest) && /notified=eq\.false/.test(digest));
+
+    // Без секрета крок мовчить і не червонить розклад — рівно так само
+    // поводиться знімок залишків.
+    check("без ключа просто нічого не робить",
+        /Немає SUPABASE_SERVICE_ROLE_KEY/.test(digest));
+
+    check("без міграції теж не падає", /404/.test(digest) && /site_issues/.test(digest));
+}
+
+console.log("\n[3] Розклад");
+{
+    check("є розклад доступності", /cron: "\*\/30 \* \* \* \*"/.test(workflow));
+
+    check("є добове зведення помилок", /cron: "0 9 \* \* \*"/.test(workflow));
+
+    // Дві роботи в одному workflow з двома розкладами: без розділення
+    // зведення помилок приходило б щопівгодини.
+    check("кожна робота бере свій розклад",
+        (workflow.match(/github\.event\.schedule ==/g) || []).length === 2);
+
+    check("сказано, що розклад працює лише з main",
+        /ЛИШЕ ПІСЛЯ ПЕРЕНЕСЕННЯ В MAIN/.test(workflow));
+
+    check("можна запустити руками", /workflow_dispatch/.test(workflow));
+
+    check("ключ передається лише туди, де потрібен",
+        /SUPABASE_SERVICE_ROLE_KEY/.test(workflow));
+}
+
+console.log("\n[4] Журнал помилок безпечний для сторінки");
+{
+    check("модуль підключено на сторінках",
+        fs.readdirSync(ROOT).filter(f => f.endsWith(".html"))
+            .every(f => read(f).includes("assets/js/error-report.js")));
+
+    // Обробник має стояти ПЕРЕД рештою скриптів, інакше не побачить
+    // їхніх падінь.
+    const html = read("catalog.html");
+
+    check("підключений раніше за решту скриптів",
+        html.indexOf("error-report.js") < html.indexOf("assets/js/common.js"));
+
+    check("сторінка не чекає на відповідь бази",
+        !/await /.test(client));
+
+    check("виклик обгорнутий", /try \{/.test(client) && /catch \(error\)/.test(client));
+
+    check("клієнт бази читається через typeof",
+        /typeof supabaseClient !== "undefined"/.test(client));
+
+    check("більше трьох повідомлень зі сторінки не йде",
+        /PER_PAGE = 3/.test(client));
+
+    check("однакові повідомлення не дублюються", /seen\[key\]/.test(client));
+
+    // «Script error.» від чужого скрипта не несе жодної інформації.
+    check("порожні помилки чужих скриптів відкидаються", /isOpaque/.test(client));
+
+    // А от зниклий файл коду — це саме те, заради чого все робиться.
+    check("зниклий скрипт або стиль записується",
+        /Не завантажився файл/.test(client));
+}
+
+console.log("\n[5] У журнал не потрапляє особисте");
+{
+    check("адреса без параметрів запиту",
+        /location\.pathname/.test(client) && !/location\.search/.test(client),
+        "у ?search= буває пошуковий запит");
+
+    check("нічого з кошика чи форм",
+        !/localStorage/.test(client) && !/getCart|email|phone/.test(client));
+
+    check("у політиці конфіденційності це описано",
+        /Звіти про помилки/.test(read("privacy-policy.html")));
+}
+
+console.log("\n[6] Таблиця журналу закрита від чужих");
+{
+    check("міграція є", sql.length > 0);
+
+    check("RLS увімкнено", /enable row level security/.test(sql));
+
+    // Політик немає навмисно: читати й писати таблицю напряму з
+    // браузера не можна взагалі, лише через функцію.
+    check("прямих політик немає", !/create policy/.test(sql));
+
+    check("функція з правами власника", /security definer/.test(sql));
+
+    check("search_path закріплений", /set search_path = public/.test(sql));
+
+    check("сторонні різновиди не приймаються",
+        /not in \('js_error', 'not_found'\)/.test(sql));
+
+    check("тексти обрізаються в базі", /left\(coalesce\(p_message/.test(sql));
+
+    check("однакове йде в лічильник", /hits\s*=\s*hits \+ 1/.test(sql));
+
+    check("є стеля нових записів за годину",
+        /v_recent >= 200/.test(sql) && /interval '1 hour'/.test(sql));
+
+    check("помилка запису не валить замовлення",
+        /exception when others/.test(sql));
+
+    check("викликати може відвідувач",
+        /grant execute on function public\.report_issue/.test(sql));
+
+    // Назви параметрів у базі й у клієнті мусять збігатися: інакше
+    // виклик мовчки не спрацює.
+    ["p_kind", "p_page", "p_message", "p_source", "p_agent"].forEach(param => {
+        check(`параметр ${param} є з обох боків`,
+            new RegExp(`${param}\\s`).test(sql) && client.includes(param + ":"));
+    });
+}
+
+console.log("\n[7] Биті посилання видно");
+{
+    const notFound = read("assets/js/not-found.js");
+
+    check("сторінка 404 повідомляє про себе",
+        /ErrorReport\.report\("not_found"/.test(notFound));
+
+    check("разом із тим, звідки прийшли", /referrer/.test(notFound));
+
+    check("документація є", fs.existsSync(path.join(ROOT, "docs/МОНІТОРИНГ.md")));
+}
+
+console.log(failures === 0
+    ? "\n✅ Моніторинг: про поломку дізнається власник, а не покупець\n"
+    : `\n❌ Проблем: ${failures}\n`);
+
+process.exit(failures === 0 ? 0 : 1);

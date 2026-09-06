@@ -2,7 +2,7 @@
 <html lang="uk">
 
 <head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"955f692b","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"5d9b13ee","data/products.json":"80f07012","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"955f692b","data/catalog.json":"dea622c7","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"5d9b13ee","data/legal.json":"857b431b","data/products.json":"7218a078","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/security.json":"34f399a1","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
 
 <!-- Сторінка лежить у /p/<slug>/, а скрипти будують шляхи як
      з кореня ("data/products.json", "assets/images/…").
@@ -162,6 +162,10 @@
 // вгадувати його з адреси
 window.PRODUCT_SLUG = "cholovicha-sumka-coach-tristan-crossbody-bag-in-signature-leather";
 window.PRODUCT_ID = 85;
+// повний запис товару прямо в сторінці: із ним product.js
+// малює картку одразу, а каталог довантажує лише заради
+// «схожих» і «переглянутих» — і бере полегшений
+window.PRODUCT_DATA = {"gender":["Чоловікам"],"preOrderDays":"10-14 робочих днів","forcePublish":false,"material":"Фірмова зерниста шкіра Signature та зерниста шкіра; внутрішня підкладка — перероблений поліестер","brand":"Coach","price":8000,"preOrder":true,"dimensions":"22 × 26 × 5 см","variants":[{"color":"Чорний","hex":"#000000","images":["/assets/images/products/uploads/ces89_svbk_a0.webp?v=ef9e6e56","/assets/images/products/uploads/ces89_svbk_a5.webp?v=1891e188","/assets/images/products/uploads/ces89_svbk_a8.webp?v=cb4034fd","/assets/images/products/uploads/ces89_svbk_a91.webp?v=39a217a9"],"article":"85-1"}],"preOrderPrepayment":100,"strapInfo":"Регульований плечовий ремінь. Можна носити через плече або кросбоді. Довжина падіння ременя — приблизно","sizes":["ONESIZE"],"splitByColor":true,"searchKeywords":["COACH","Coach Tristan","Tristan Crossbody Bag 22","сумка Coach","сумка кросбоді Coach","чоловіча сумка Coach","жіноча сумка Coach","шкіряна сумка","шкіряна сумка через плече","сумка через плече","кросбоді","чорна сумка","чорна шкіряна сумка","брендові сумки","оригінальна Coach","сумка на кожен день","повсякденна сумка"],"isNew":false,"title":"Чоловіча сумка COACH Tristan Crossbody Bag In Signature Leather","reviews":0,"instagramBlock":"general","description":"Стильна та функціональна сумка COACH Tristan Crossbody Bag 22, виконана з фірмової зернистої шкіри Signature. Модель має зручний вертикальний формат та продуманий внутрішній простір для повсякденних речей.\nСумка оснащена основним відділенням на блискавці, внутрішньою кишенею на кнопці, а також зовнішніми кишенями на блискавці та магнітній кнопці. Регульований ремінь дозволяє носити модель через плече або кросбоді.\nЛаконічний дизайн, фірмове виконання COACH та практичний формат роблять Tristan чудовим вибором на кожен день","sku":"CES89SV/BK","rating":5,"category":"Чоловічі сумки","framing":{"ces89_svbk_a5.webp":{"zoom":1.49,"x":46,"y":59},"ces89_svbk_a8.webp":{"zoom":1.49,"x":46,"y":50}},"legacySlugs":["чоловіча-сумка-coach-tristan-crossbody-bag-in-signature-leather"],"slug":"cholovicha-sumka-coach-tristan-crossbody-bag-in-signature-leather","id":85,"color":"Чорний","images":["/assets/images/products/uploads/ces89_svbk_a0.webp","/assets/images/products/uploads/ces89_svbk_a5.webp","/assets/images/products/uploads/ces89_svbk_a8.webp","/assets/images/products/uploads/ces89_svbk_a91.webp"],"article":"85","preOrderAlways":true};
 </script>
 
 
@@ -171,7 +175,7 @@ window.PRODUCT_ID = 85;
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="192x192" href="/assets/images/favicon-192.png">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=5361b8d9">
+<link rel="stylesheet" href="/assets/css/style.css?v=c952189d">
 
 <!-- MailerLite Universal -->
 <script>
@@ -467,6 +471,7 @@ BestBrnd4u
 <a href="/return-warranty">Повернення та гарантія</a>
 <a href="/bayer-service">Байєр-сервіс</a>
 <a href="/privacy-policy">Політика конфіденційності</a>
+<a href="/offer">Публічна оферта</a>
             <!-- Згоду треба вміти відкликати так само легко, як дати -->
             <a href="#" data-consent-reopen>Налаштування даних</a>
 
@@ -530,6 +535,8 @@ BestBrnd4u
     </div>
 </div>
 
+<!-- Журнал помилок: сторінка сама розповідає, що в неї зламалось -->
+<script src="/assets/js/error-report.js?v=65f3d8ee"></script>
 <script src="/assets/js/supabase-client.js?v=42a4012d"></script>
 <!-- Кадрування фото товару. Той самий файл підключає адмінка,
      тож прев'ю в ній і картка на сайті рахуються однаково. -->
@@ -539,7 +546,7 @@ BestBrnd4u
 <!-- Оформлення текстових блоків з адмінки (кольори, шрифт, кнопка) -->
 <script src="/assets/js/text-styles.js?v=7dc05c7d"></script>
 <!-- Згода на використання даних (банер + блокування вбудованого відео) -->
-<script src="/assets/js/consent.js?v=63cbf725"></script>
+<script src="/assets/js/consent.js?v=b6cc5d45"></script>
 <!-- Статистика відвідувань. Не завантажує Google без згоди. -->
 <script src="/assets/js/analytics.js?v=9b4797b8"></script>
 <!-- Транслітерація: productUrl() кладе колір в адресу латиницею.
@@ -550,18 +557,18 @@ BestBrnd4u
 <script src="/assets/js/stock.js?v=85fa4aad"></script>
 
 <script src="/assets/js/translit.js?v=c0957cb7"></script>
-<script src="/assets/js/common.js?v=2f96b86e"></script>
+<script src="/assets/js/common.js?v=a6b0fed9"></script>
 <script src="/assets/js/sync.js?v=48ef002e"></script>
-<script src="/assets/js/mega-menu.js?v=b254fbf6"></script>
+<script src="/assets/js/mega-menu.js?v=803d52cc"></script>
 
 <script src="/assets/js/ui.js?v=c1453fdd"></script>
 
-<script src="/assets/js/app.js?v=d2c171bf"></script>
+<script src="/assets/js/app.js?v=dc04bec0"></script>
 
 <script src="/assets/js/lightbox.js?v=552b0982"></script>
 
 <script src="/assets/js/live-stock.js?v=288763d6"></script>
-<script src="/assets/js/product.js?v=c453f251"></script>
+<script src="/assets/js/product.js?v=8482b5d8"></script>
 
 </body>
 

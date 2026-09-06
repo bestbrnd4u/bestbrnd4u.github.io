@@ -73,6 +73,16 @@
     // Категорії, які взагалі можна вимкнути.
     var OPTIONAL = ["embeds", "analytics", "ads"];
 
+    // Текст першого показу. Одна стрічка — і це вимога, а не смак:
+    // див. коментар про стіну тексту в render(). Тримаємо окремою
+    // константою, щоб довжину можна було перевіряти тестом.
+    var ASK_TEXT = "Ми використовуємо cookie для роботи магазину, статистики"
+        + " відвідувань, відео в картках товарів і рекламу у Facebook та Instagram.";
+
+    // Текст, коли банер відкрили самі — з підвалу.
+    var SETTINGS_TEXT = "Оберіть, що дозволяєте. Кошик, обране й вхід працюють"
+        + " завжди — без них магазин не працює.";
+
     function read() {
 
         try {
@@ -157,6 +167,13 @@
         close();
         announce();
 
+        // Підтвердження. Банер зникає — і без жодного сліду незрозуміло,
+        // чи вибір узагалі зберігся. Особливо коли його відкривали
+        // навмисно, щоб щось змінити.
+        if (typeof root.showToast === "function") {
+            root.showToast("Налаштування збережено");
+        }
+
     }
 
     function close() {
@@ -167,9 +184,60 @@
 
     }
 
-    function render() {
+    // Перемикачі для режиму «Налаштування даних».
+    //
+    // ЧОМУ ВОНИ ТУТ, А НЕ В ПЕРШОМУ ПОКАЗІ
+    // -------------------------------------
+    // Перший банер має бути коротким: три галочки перед людиною, яка
+    // щойно відкрила магазин, — це не усвідомлений вибір, а перешкода
+    // (див. коментар нижче про стіну тексту).
+    //
+    // Але посилання в підвалі називається «Налаштування даних» — і
+    // мусить давати саме налаштування. Досі воно показувало той самий
+    // банер із двома кнопками: єдиним способом вимкнути рекламу було
+    // вимкнути заразом статистику й відео.
+    function optionsMarkup(saved) {
 
-        if (document.getElementById("consentBanner")) return;
+        var LABELS = {
+            embeds: ["Відео в картках товарів", "YouTube і Vimeo. Без згоди замість відео — заглушка."],
+            analytics: ["Статистика відвідувань", "Google Analytics: які товари дивляться і що шукають."],
+            ads: ["Реклама у Facebook та Instagram", "Піксель Meta: показувати вам саме ті товари, які ви дивились."]
+        };
+
+        return '<div class="consent-options">'
+            + OPTIONAL.map(function (name) {
+
+                return [
+                    '<label class="consent-option">',
+                    '  <input type="checkbox" data-consent-option="' + name + '"',
+                    saved && saved[name] ? " checked" : "", ">",
+                    '  <span>',
+                    '    <b>' + LABELS[name][0] + '</b>',
+                    '    <i>' + LABELS[name][1] + '</i>',
+                    '  </span>',
+                    '</label>'
+                ].join("");
+
+            }).join("")
+            + "</div>";
+
+    }
+
+    // mode: "ask" — перший показ, "settings" — з підвалу.
+    function render(mode) {
+
+        // Перемальовуємо завжди.
+        //
+        // ЩО БУЛО НЕ ТАК. Тут стояло «якщо банер уже є — вийти». Через
+        // це клік по «Налаштування даних» у людини, яка ще не
+        // відповіла на банер, не робив НІЧОГО видимого: банер уже
+        // висів, функція мовчки поверталась. Ззовні це виглядало як
+        // мертве посилання.
+        close();
+
+        var settings = mode === "settings";
+
+        var saved = read();
 
         var box = document.createElement("div");
 
@@ -195,17 +263,16 @@
         box.innerHTML = [
             '<div class="consent-inner">',
             '  <div class="consent-text">',
-            '    Ми використовуємо cookie для роботи магазину, статистики',
-            '    відвідувань, відео в картках товарів і рекламу у Facebook',
-            '    та Instagram.',
+            "    " + (settings ? SETTINGS_TEXT : ASK_TEXT),
             '    <a href="privacy-policy">Докладніше</a>',
+            settings ? optionsMarkup(saved) : "",
             '  </div>',
             '  <div class="consent-actions">',
-            '    <button type="button" class="btn btn-outline" data-consent="necessary">',
-            '      Лише необхідне',
-            '    </button>',
+            settings
+                ? '    <button type="button" class="btn btn-outline" data-consent="save">Зберегти вибір</button>'
+                : '    <button type="button" class="btn btn-outline" data-consent="necessary">Лише необхідне</button>',
             '    <button type="button" class="btn" data-consent="all">',
-            '      Прийняти',
+            settings ? "      Дозволити все" : "      Прийняти",
             '    </button>',
             '  </div>',
             '</div>'
@@ -217,7 +284,27 @@
 
             if (!btn) return;
 
-            var yes = btn.dataset.consent === "all";
+            var action = btn.dataset.consent;
+
+            if (action === "save") {
+
+                var choice = {};
+
+                OPTIONAL.forEach(function (name) {
+
+                    var input = box.querySelector('[data-consent-option="' + name + '"]');
+
+                    choice[name] = !!(input && input.checked);
+
+                });
+
+                decide(choice);
+
+                return;
+
+            }
+
+            var yes = action === "all";
 
             decide({ embeds: yes, analytics: yes, ads: yes });
 
@@ -239,11 +326,19 @@
     root.Consent = {
         has: has,
         answered: answered,
-        // «Змінити рішення» — посилання в підвалі: згоду треба вміти
-        // відкликати так само легко, як дати
+        // «Налаштування даних» — посилання в підвалі: згоду треба вміти
+        // відкликати так само легко, як дати.
+        //
+        // САМ КЛІК НІЧОГО НЕ ЗМІНЮЄ. Раніше тут стояло
+        // localStorage.removeItem(KEY) — тобто натискання вже
+        // скасовувало згоду, ще до того, як людина щось обрала. Якщо
+        // банер при цьому не з'являвся (а він не з'являвся, коли вже
+        // висів), виходило найгірше: клік мовчки вимикав статистику,
+        // відео й рекламу, а на вигляд не робив нічого.
+        //
+        // Тепер вибір змінюється тільки кнопкою у банері.
         reopen: function () {
-            try { localStorage.removeItem(KEY); } catch (error) { /* нічого */ }
-            render();
+            render("settings");
         }
     };
 

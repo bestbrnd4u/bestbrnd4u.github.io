@@ -37,6 +37,7 @@ const STATIC_PAGES = [
     { loc: "/delivery-payment", changefreq: "monthly", priority: "0.5" },
     { loc: "/return-warranty", changefreq: "monthly", priority: "0.5" },
     { loc: "/privacy-policy", changefreq: "yearly", priority: "0.3" },
+    { loc: "/offer", changefreq: "yearly", priority: "0.3" },
     { loc: "/contacts", changefreq: "monthly", priority: "0.3" }
 ];
 

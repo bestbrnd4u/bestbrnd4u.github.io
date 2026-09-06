@@ -78,7 +78,10 @@ export function corsHeaders(origin) {
     const headers = {
         "Vary": "Origin",
         "Access-Control-Allow-Methods": "POST, OPTIONS",
-        "Access-Control-Allow-Headers": `Content-Type, ${ADMIN_TOKEN_HEADER}`,
+        // Authorization — для замовлення з сайту: клієнт Supabase
+        // кладе туди токен покупця (або публічний ключ у гостя).
+        // apikey — той самий клієнт додає його поруч.
+        "Access-Control-Allow-Headers": `Content-Type, Authorization, apikey, x-client-info, ${ADMIN_TOKEN_HEADER}`,
         "Access-Control-Max-Age": "600",
     };
 
@@ -205,6 +208,9 @@ export const LIST_COLUMNS = [
     "refusal_requested_at",
     "user_id",
     "telegram_chat_id",
+    // Щоб позначку «сума не збігається» було видно вже в списку, а не
+    // тільки в картці замовлення.
+    "price_check",
 ];
 
 function listFilters(params) {
@@ -398,6 +404,12 @@ export function orderView(order) {
         discount: Number(order?.discount) || 0,
         deliveryPrice: Number(order?.delivery_price) || 0,
         total: Number(order?.total) || 0,
+
+        // Що сказала база, коли перерахувала суму своїми цінами
+        // (supabase/migrations/014-order-pricing.sql): ok, mismatch,
+        // unknown або порожньо для замовлень до тієї міграції.
+        priceCheck: order?.price_check ?? "",
+        totalExpected: Number(order?.total_expected) || 0,
 
         firstName: order?.first_name ?? "",
         lastName: order?.last_name ?? "",

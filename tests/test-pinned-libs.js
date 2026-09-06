@@ -69,7 +69,18 @@ console.log("\n[3] supabase-js — найважливіший випадок");
 {
   const pages = files.filter(f => read(f).includes("supabase-js"));
 
-  check("підключений там, де й був (14 сторінок)", pages.length === 14, pages.length);
+  // Правило, а не число: бібліотека мусить бути на КОЖНІЙ сторінці
+  // сайту. Так перевірка ловить те, заради чого існує (нову сторінку
+  // зробили копіюванням, а підключення не доїхало) і не падає щоразу,
+  // коли сторінок стає більше.
+  //
+  // Адмінка сюди не входить: у неї свій набір скриптів.
+  const site = files.filter(f => !f.startsWith("admin/"));
+
+  const without = site.filter(f => !pages.includes(f));
+
+  check(`підключений на всіх ${site.length} сторінках сайту`,
+        without.length === 0, without.join(", "));
 
   const unpinned = pages.filter(f => /supabase-js@2["'/]/.test(read(f)));
   check("немає жодного @2 без уточнення", unpinned.length === 0, unpinned.join(", "));

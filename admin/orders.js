@@ -260,6 +260,11 @@
 
         if (order.refusalRequestedAt) marks.push('<span class="pill pill-alarm">❗ просить відмову</span>');
         if (order.status === "shipped" && !order.trackingNumber) marks.push('<span class="pill pill-warn">без ТТН</span>');
+        // Сума, яку прислав браузер, не збіглася з тією, що база
+        // порахувала своїми цінами. Причин дві: підроблене замовлення
+        // або ціна, що змінилась, поки людина думала. Обидві варті
+        // погляду ДО відправлення.
+        if (order.priceCheck === "mismatch") marks.push('<span class="pill pill-alarm">⚠ сума</span>');
 
         const line = [customerName(order), order.phone].filter(Boolean).join(" · ")
             || `${order.items.length} поз.`;
@@ -430,6 +435,9 @@
                 ${order.discount > 0 ? `<div><span>Знижка</span><span>−${esc(money(order.discount))}</span></div>` : ""}
                 ${order.deliveryPrice > 0 ? `<div><span>Доставка</span><span>${esc(money(order.deliveryPrice))}</span></div>` : ""}
                 <div class="grand"><span>Разом</span><span>${esc(money(order.total))}</span></div>
+                ${order.priceCheck === "mismatch"
+                    ? `<div class="note note-alarm"><strong>Сума не збігається</strong><br>За цінами бази: ${esc(money(order.totalExpected))}</div>`
+                    : ""}
             </div>
 
             <div class="section">

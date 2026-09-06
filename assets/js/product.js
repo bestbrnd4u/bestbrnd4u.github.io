@@ -64,14 +64,47 @@ try {
 // Каталог і живий залишок — одночасно (див. коментар у
 // assets/js/live-stock.js). Наявність саме тут найважливіша: людина
 // на цій сторінці вирішує, купувати чи ні.
-const [response, live]=await Promise.all([
-    fetch(dataUrl("/data/products.json")),
+// Повний запис ЦЬОГО товару лежить у самій сторінці — його кладе
+// туди scripts/build-product-pages.js. Тому каталог тут потрібен лише
+// для «схожих» і «переглянутих товарів», а для карток вистачає
+// полегшеного data/catalog.json.
+//
+// Раніше сторінка товару вантажила ввесь повний каталог заради одного
+// запису — і чекала на нього, перш ніж намалювати те, за чим людина
+// прийшла.
+const embedded = window.PRODUCT_DATA && typeof window.PRODUCT_DATA === "object"
+    ? window.PRODUCT_DATA
+    : null;
+
+const [list, live]=await Promise.all([
+    // Стара адреса /product?id=… вбудованого запису не має: там
+    // лишається повний каталог, як було.
+    embedded
+        ? getAllProductsCached()
+        : fetch(dataUrl("/data/products.json")).then(response => {
+            if (!response.ok) throw new Error("Не вдалося завантажити товари");
+            return response.json();
+        }),
     window.LiveStock ? window.LiveStock.load() : Promise.resolve(null)
 ]);
 
-if (!response.ok) throw new Error("Не вдалося завантажити товари");
+products = Array.isArray(list) && list.length ? list : [];
 
-products=await response.json();
+if (embedded) {
+
+    // Деталі поверх картки: у каталозі цього товару лежить полегшений
+    // запис, а тут є повний. Кладемо його на місце — і далі вся
+    // сторінка працює з одним об'єктом, як робила завжди.
+    const index = products.findIndex(item => Number(item.id) === Number(embedded.id));
+
+    if (index >= 0) products[index] = { ...products[index], ...embedded };
+    else products.push(embedded);
+
+} else if (typeof primeProductsCache === "function") {
+
+    primeProductsCache(products);
+
+}
 
 if (window.LiveStock) window.LiveStock.apply(products, live);
 

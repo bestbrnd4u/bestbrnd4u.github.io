@@ -2,7 +2,8 @@
 <html lang="uk">
 
 <head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"955f692b","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"5d9b13ee","data/products.json":"80f07012","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"955f692b","data/catalog.json":"dea622c7","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"5d9b13ee","data/legal.json":"857b431b","data/products.json":"7218a078","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/security.json":"34f399a1","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
+    <meta name="robots" content="noindex,nofollow">
     <meta charset="UTF-8">
     <meta name="author" content="BestBrnd4u">
     <meta name="copyright" content="© 2026 BestBrnd4u. Усі права захищено.">
@@ -19,7 +20,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="assets/images/favicon-192.png">
     <title>Оформлення замовлення | BestBrnd4u</title>
 
-    <link rel="stylesheet" href="assets/css/style.css?v=5361b8d9">
+    <link rel="stylesheet" href="assets/css/style.css?v=c952189d">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -416,6 +417,12 @@
                     <span id="orderTotal">0 грн</span>
                 </div>
 
+                <!-- Перевірка «ви людина». З'являється, лише якщо в
+                     адмінці заданий ключ Turnstile; порожній ключ —
+                     блок лишається схованим, і сторінка поводиться
+                     точно як раніше. Див. docs/ЗАХИСТ-ЗАМОВЛЕНЬ.md -->
+                <div id="turnstileBox" class="turnstile-box" hidden></div>
+
                 <button type="submit" form="checkoutForm" id="submitOrderBtn" class="btn">Оформити замовлення</button>
 
                 <!-- Прямо тут, а не лише в політиці.
@@ -433,8 +440,12 @@
                      
                      Текст переїхав у політику конфіденційності, у розділ
                      із якорем. Кому цікаво — прочитає; решті не заважає. -->
+                <!-- Оферта згадана саме тут, а не десь у підвалі: договір
+                     укладається натисканням цієї кнопки, тож людина має
+                     бачити, з чим погоджується, у момент погодження. -->
                 <p class="order-data-link">
-                    Оформлюючи замовлення, ви погоджуєтесь із
+                    Оформлюючи замовлення, ви погоджуєтесь з
+                    <a href="offer">умовами продажу</a> та
                     <a href="privacy-policy#order-data">обробкою даних</a>.
                 </p>
 
@@ -479,6 +490,7 @@
             <a href="return-warranty">Повернення та гарантія</a>
             <a href="bayer-service">Байєр-сервіс</a>
             <a href="privacy-policy">Політика конфіденційності</a>
+            <a href="offer">Публічна оферта</a>
             <!-- Згоду треба вміти відкликати так само легко, як дати -->
             <a href="#" data-consent-reopen>Налаштування даних</a>
 
@@ -555,6 +567,8 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4.4.1/dist/email.min.js"></script>
+<!-- Журнал помилок: сторінка сама розповідає, що в неї зламалось -->
+<script src="assets/js/error-report.js?v=65f3d8ee"></script>
 <script src="assets/js/supabase-client.js?v=42a4012d"></script>
 <!-- Кадрування фото товару. Той самий файл підключає адмінка,
      тож прев'ю в ній і картка на сайті рахуються однаково. -->
@@ -564,17 +578,19 @@
 <!-- Оформлення текстових блоків з адмінки (кольори, шрифт, кнопка) -->
 <script src="assets/js/text-styles.js?v=7dc05c7d"></script>
 <!-- Згода на використання даних (банер + блокування вбудованого відео) -->
-<script src="assets/js/consent.js?v=63cbf725"></script>
+<script src="assets/js/consent.js?v=b6cc5d45"></script>
 <!-- Статистика відвідувань. Не завантажує Google без згоди. -->
 <script src="assets/js/analytics.js?v=9b4797b8"></script>
 <!-- Транслітерація: productUrl() кладе колір в адресу латиницею.
      Той самий файл використовує збірка для адрес товарів. -->
 <script src="assets/js/translit.js?v=c0957cb7"></script>
-<script src="assets/js/common.js?v=2f96b86e"></script>
+<script src="assets/js/common.js?v=a6b0fed9"></script>
 <script src="assets/js/sync.js?v=48ef002e"></script>
-<script src="assets/js/mega-menu.js?v=b254fbf6"></script>
+<script src="assets/js/mega-menu.js?v=803d52cc"></script>
 <script src="assets/js/ui.js?v=c1453fdd"></script>
-<script src="assets/js/checkout.js?v=ea950828"></script>
+<!-- Перевірка «ви людина» на оформленні (порожній ключ = вимкнено) -->
+<script src="assets/js/turnstile.js?v=808a55ba"></script>
+<script src="assets/js/checkout.js?v=d2e7368f"></script>
 
 </body>
 

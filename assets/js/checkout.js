@@ -176,10 +176,16 @@ function getFormattedOrderDate() {
 
 }
 
-// демо-промокоди: у коді зберігаються НЕ самі коди, а їх SHA-256 хеші,
-// щоб коди не було видно у вихідному коді / вкладці Network через F12.
-// Порівняння відбувається так: хешуємо те, що ввів користувач, і звіряємо
-// з хешем у списку нижче.
+// Промокоди тепер живуть у базі (supabase/migrations/014).
+//
+// ЧОМУ ПЕРЕЇХАЛИ. Хеш ховав сам код, але не відсоток: підмінити
+// знижку в браузері це не заважало. Тепер відсоток каже база — і той
+// самий список читає перевірка суми при створенні замовлення.
+//
+// СПИСОК НИЖЧЕ — ЗАПАСНИЙ ВАРІАНТ, а не джерело правди. Поки міграція
+// не виконана (або база недоступна), промокоди працюють, як працювали
+// досі. Коли 014 буде на місці всюди, цей блок можна прибрати —
+// перевірка суми на сервері від нього не залежить.
 const PROMO_CODE_HASHES = {
     "c9e488ab31fa759d6b8fab82285ea82e2c2bde7055560b03a60242e0e3512819": 0.05,
     "52d409d2e035f5b361fecd6c952ee4a1ad00cec281f1fb94405c91aae35d3307": 0.05,
@@ -192,6 +198,39 @@ const PROMO_CODE_HASHES = {
     "f1908dcd504cdf1ea8dcac9169f5182e4fcb9b6ca90ceea06d405a155f4366ff": 0.10,
     "184806b2107cb6a666a29ad6a4dad4477ab85342b1ea390345ae5cf3eaba78cb": 0.10
 };
+
+// Скільки дає промокод: питаємо базу, а список у коді лишається
+// запасним варіантом.
+//
+// У базу йде ХЕШ, а не сам код: так код не з'являється ні в запиті, ні
+// в логах — рівно та причина, з якої він і був хешем.
+async function promoPercent(hash) {
+
+    if (typeof supabaseClient !== "undefined" && supabaseClient) {
+
+        try {
+
+            const { data, error } = await supabaseClient.rpc("promo_check", { p_hash: hash });
+
+            // Немає функції (міграція ще не виконана) або база не
+            // відповіла — відкочуємось на список у коді. Мовчки
+            // відмовити в чинній знижці гірше, ніж дати її за старим
+            // списком: суму все одно перевірить сервер.
+            if (!error) return Number(data) || 0;
+
+            console.warn("Перевірка промокоду в базі недоступна:", error.message);
+
+        } catch (error) {
+
+            console.warn("Перевірка промокоду в базі недоступна:", error && error.message);
+
+        }
+
+    }
+
+    return PROMO_CODE_HASHES[hash] || 0;
+
+}
 
 async function sha256Hex(text) {
 
@@ -369,13 +408,7 @@ async function initCheckout() {
 
     try {
 
-        const response = await fetch(dataUrl("data/products.json"));
-
-        if (!response.ok) {
-            throw new Error("Не вдалося завантажити товари");
-        }
-
-        allProducts = await response.json();
+        allProducts = await loadCatalog();
 
         renderOrderSummary();
 
@@ -628,7 +661,7 @@ applyPromoBtn?.addEventListener("click", async () => {
         return;
     }
 
-    const percent = PROMO_CODE_HASHES[hash];
+    const percent = await promoPercent(hash);
 
     applyPromoBtn.disabled = false;
 
@@ -955,6 +988,50 @@ function buildOrderItemsSnapshot() {
 //
 // Це best-effort: якщо збереження не вдалося, оформлення
 // замовлення все одно вважається успішним (лист вже надіслано).
+// Замовлення через функцію — там, де стоїть перевірка «ви людина».
+//
+// ЧОМУ НЕ ПРЯМО В БАЗУ. Токен Turnstile нічого не вартий, доки його не
+// звірили з Cloudflare секретним ключем; секрет у коді сайту лежати не
+// може. Тому запис іде через функцію, яка спершу звіряє токен, а вже
+// потім пише службовим ключем.
+//
+// Повертає true, якщо замовлення збережене. false означає «спробуй
+// звичайним шляхом» — і це нормальний, очікуваний варіант: перевірка
+// не налаштована, функція старої версії, Cloudflare мовчить.
+async function placeOrderThroughFunction(order) {
+
+    if (!window.Turnstile || !window.Turnstile.enabled()) return false;
+
+    const token = window.Turnstile.token();
+
+    if (!token) return false;
+
+    try {
+
+        const { data, error } = await supabaseClient.functions.invoke("telegram-order-bot", {
+            body: { site_action: "place-order", turnstile_token: token, order }
+        });
+
+        // Токен одноразовий: після спроби віджет треба скинути,
+        // інакше повторне оформлення піде з використаним токеном.
+        window.Turnstile.reset();
+
+        if (!error && data && data.ok) return true;
+
+        console.warn("Замовлення через функцію не пройшло:", error || data);
+
+    } catch (failure) {
+
+        console.warn("Функція замовлення недоступна:", failure && failure.message);
+
+        window.Turnstile.reset();
+
+    }
+
+    return false;
+
+}
+
 async function saveOrderToSupabase(orderId) {
 
     if (!supabaseClient) return;
@@ -963,8 +1040,7 @@ async function saveOrderToSupabase(orderId) {
 
     const { subtotal, totalDiscount, delivery, total } = computeOrderTotals();
 
-    const { error } = await supabaseClient.from("orders").insert({
-        user_id: user ? user.id : null,
+    const order = {
         order_number: orderId,
         status: "new",
         items: buildOrderItemsSnapshot(),
@@ -981,6 +1057,20 @@ async function saveOrderToSupabase(orderId) {
         last_name: document.getElementById("lastName")?.value.trim() || null,
         phone: document.getElementById("phone")?.value.trim() || null,
         email: document.getElementById("email")?.value.trim() || null
+    };
+
+    // Якщо на сторінці стоїть перевірка «ви людина» — замовлення йде
+    // через функцію, бо підтвердити токен можна тільки на сервері.
+    //
+    // Не вийшло (функція не оновлена, Cloudflare не відповів) —
+    // зберігаємо звичайним шляхом. Втратити захист від потоку
+    // неприємно; втратити замовлення — інша категорія подій. Від
+    // потоку в базі лишається власна межа (міграція 015).
+    if (await placeOrderThroughFunction(order)) return;
+
+    const { error } = await supabaseClient.from("orders").insert({
+        user_id: user ? user.id : null,
+        ...order
     });
 
     if (error) {
@@ -1002,6 +1092,28 @@ checkoutForm?.addEventListener("submit", event => {
         const firstError = checkoutForm.querySelector(".field-error:not(:empty)");
 
         firstError?.closest("label, .delivery-options")?.scrollIntoView({ behavior: "smooth", block: "center" });
+
+        return;
+
+    }
+
+    // Перевірка «ви людина» ще не пройдена. Turnstile зазвичай
+    // проходить сам за секунду, тож сюди потрапляють ті, у кого вона
+    // не встигла або не завантажилась.
+    //
+    // Не блокуємо намертво: якщо віджет узагалі не з'явився,
+    // enabled() поверне false — і оформлення піде як завжди. Магазин,
+    // який не продає через недоступний Cloudflare, гірший за магазин
+    // без перевірки.
+    if (window.Turnstile && window.Turnstile.enabled() && !window.Turnstile.token()) {
+
+        const box = document.getElementById("turnstileBox");
+
+        box?.scrollIntoView({ behavior: "smooth", block: "center" });
+
+        if (typeof showToast === "function") {
+            showToast("Підтвердіть, що ви не робот");
+        }
 
         return;
 

@@ -2,7 +2,7 @@
 <html lang="uk">
 
 <head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"955f692b","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"5d9b13ee","data/products.json":"80f07012","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"955f692b","data/catalog.json":"dea622c7","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"5d9b13ee","data/legal.json":"857b431b","data/products.json":"7218a078","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/security.json":"34f399a1","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
 
 <!-- Сторінка лежить у /p/<slug>/, а скрипти будують шляхи як
      з кореня ("data/products.json", "assets/images/…").
@@ -162,6 +162,10 @@
 // вгадувати його з адреси
 window.PRODUCT_SLUG = "marc-jacobs-sontsezakhysni-okuliary-marc-jacobs-2";
 window.PRODUCT_ID = 17;
+// повний запис товару прямо в сторінці: із ним product.js
+// малює картку одразу, а каталог довантажує лише заради
+// «схожих» і «переглянутих» — і бере полегшений
+window.PRODUCT_DATA = {"title":"Сонцезахисні окуляри Marc Jacobs","brand":"Marc Jacobs","category":"Окуляри і оправи","gender":"Жінкам","price":6000,"description":"Сонцезахисні окуляри Marc Jacobs у формі «котяче око» з темними лінзами. Виразний вигин оправи, фірмовий логотип на скроневій дузі.","variants":[{"color":"Темно-сірий","hex":"#6d6d6f","images":["assets/images/products/uploads/mj-1028s-0807ir-54-1.webp?v=a9c0ad01","assets/images/products/uploads/mj-1028s-0807ir-54-2.webp?v=b84ebecf","assets/images/products/uploads/mj-1028s-0807ir-54-3.webp?v=a8445457","assets/images/products/uploads/mj-1028s-0807ir-54-4.webp?v=e3155cbf"],"sku":"MJ-1028S-0807IR-54","sizes":["ONESIZE"],"article":"17-1","stock":{"ONESIZE":1},"inStock":1}],"isNew":false,"sizes":["ONESIZE"],"sku":"MJ-1028S-0807IR-54","searchKeywords":["марк джейкобс","marc jacobs","mj","сонцезахисні окуляри","окуляри від сонця","оправа","темно-сірий","marc","jacobs"],"instagramBlock":"general","preOrder":false,"images":["assets/images/products/uploads/mj-1028s-0807ir-54-1.webp","assets/images/products/uploads/mj-1028s-0807ir-54-2.webp","assets/images/products/uploads/mj-1028s-0807ir-54-3.webp","assets/images/products/uploads/mj-1028s-0807ir-54-4.webp"],"slug":"marc-jacobs-sontsezakhysni-okuliary-marc-jacobs-2","id":17,"color":"Темно-сірий","article":"17","inStock":1};
 </script>
 
 
@@ -171,7 +175,7 @@ window.PRODUCT_ID = 17;
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="192x192" href="/assets/images/favicon-192.png">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=5361b8d9">
+<link rel="stylesheet" href="/assets/css/style.css?v=c952189d">
 
 <!-- MailerLite Universal -->
 <script>
@@ -463,6 +467,7 @@ BestBrnd4u
 <a href="/return-warranty">Повернення та гарантія</a>
 <a href="/bayer-service">Байєр-сервіс</a>
 <a href="/privacy-policy">Політика конфіденційності</a>
+<a href="/offer">Публічна оферта</a>
             <!-- Згоду треба вміти відкликати так само легко, як дати -->
             <a href="#" data-consent-reopen>Налаштування даних</a>
 
@@ -526,6 +531,8 @@ BestBrnd4u
     </div>
 </div>
 
+<!-- Журнал помилок: сторінка сама розповідає, що в неї зламалось -->
+<script src="/assets/js/error-report.js?v=65f3d8ee"></script>
 <script src="/assets/js/supabase-client.js?v=42a4012d"></script>
 <!-- Кадрування фото товару. Той самий файл підключає адмінка,
      тож прев'ю в ній і картка на сайті рахуються однаково. -->
@@ -535,7 +542,7 @@ BestBrnd4u
 <!-- Оформлення текстових блоків з адмінки (кольори, шрифт, кнопка) -->
 <script src="/assets/js/text-styles.js?v=7dc05c7d"></script>
 <!-- Згода на використання даних (банер + блокування вбудованого відео) -->
-<script src="/assets/js/consent.js?v=63cbf725"></script>
+<script src="/assets/js/consent.js?v=b6cc5d45"></script>
 <!-- Статистика відвідувань. Не завантажує Google без згоди. -->
 <script src="/assets/js/analytics.js?v=9b4797b8"></script>
 <!-- Транслітерація: productUrl() кладе колір в адресу латиницею.
@@ -546,18 +553,18 @@ BestBrnd4u
 <script src="/assets/js/stock.js?v=85fa4aad"></script>
 
 <script src="/assets/js/translit.js?v=c0957cb7"></script>
-<script src="/assets/js/common.js?v=2f96b86e"></script>
+<script src="/assets/js/common.js?v=a6b0fed9"></script>
 <script src="/assets/js/sync.js?v=48ef002e"></script>
-<script src="/assets/js/mega-menu.js?v=b254fbf6"></script>
+<script src="/assets/js/mega-menu.js?v=803d52cc"></script>
 
 <script src="/assets/js/ui.js?v=c1453fdd"></script>
 
-<script src="/assets/js/app.js?v=d2c171bf"></script>
+<script src="/assets/js/app.js?v=dc04bec0"></script>
 
 <script src="/assets/js/lightbox.js?v=552b0982"></script>
 
 <script src="/assets/js/live-stock.js?v=288763d6"></script>
-<script src="/assets/js/product.js?v=c453f251"></script>
+<script src="/assets/js/product.js?v=8482b5d8"></script>
 
 </body>
 

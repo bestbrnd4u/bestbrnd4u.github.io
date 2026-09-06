@@ -110,6 +110,14 @@ export function formatOrder(order) {
     Number(order.discount) > 0 ? `Знижка: −${money(order.discount)}` : "",
     Number(order.delivery_price) > 0 ? `Доставка: ${money(order.delivery_price)}` : "",
     `<b>Разом: ${money(order.total)}</b>`,
+    // Суму рахує браузер, а перевіряє база — своїми цінами
+    // (supabase/migrations/014-order-pricing.sql). Розбіжність означає
+    // або підроблене замовлення, або ціну, що змінилась між
+    // відкриттям сторінки й натисканням кнопки. Обидва випадки варті
+    // погляду ДО того, як товар поїде.
+    order.price_check === "mismatch"
+      ? `⚠️ <b>сума не збігається</b> — за цінами бази ${money(order.total_expected)}`
+      : "",
     "",
     customer ? `👤 ${escapeHtml(customer)}` : "",
     order.phone ? `📞 <a href="tel:${escapeHtml(order.phone)}">${escapeHtml(order.phone)}</a>` : "",

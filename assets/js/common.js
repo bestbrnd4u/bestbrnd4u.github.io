@@ -228,51 +228,87 @@ function findCachedProduct(id) {
 
 }
 
-async function getProductById(id) {
+// ОДИН запит на сторінку, скільки б місць його не просило.
+//
+// ЩО БУЛО НЕ ТАК. Кожен, кому потрібні товари, робив свій fetch:
+// каталог — свій, мега-меню в шапці — свій. Адреса та сама, тож обидва
+// запити стартували одночасно, і браузер чесно качав файл ДВІЧІ. На
+// каталозі це були зайві 240 КБ на кожне відкриття сторінки.
+//
+// Тепер у кеші лежить сама ОБІЦЯНКА: другий охочий отримує ту саму,
+// навіть якщо перший ще не приїхав.
+let catalogRequest = null;
 
-    if (!cachedProducts) {
+function loadCatalog() {
 
-        try {
+    if (cachedProducts) return Promise.resolve(cachedProducts);
 
-            const response = await fetch(dataUrl("data/products.json"));
+    if (!catalogRequest) {
 
-            cachedProducts = await response.json();
+        catalogRequest = fetch(catalogUrl())
+            .then(response => {
 
-        } catch (error) {
+                if (!response.ok) throw new Error("Не вдалося завантажити товари");
 
-            console.error(error);
+                return response.json();
 
-            return null;
+            })
+            .then(list => {
 
-        }
+                cachedProducts = list;
+
+                return list;
+
+            });
+
+        // Невдалий запит не має лишатись у кеші назавжди: наступна
+        // спроба мусить піти в мережу, а не повертати ту саму помилку.
+        catalogRequest.catch(() => { catalogRequest = null; });
 
     }
 
-    return cachedProducts.find(item => Number(item.id) === Number(id));
+    return catalogRequest;
 
 }
 
+// Сторінка товару вже має ПОВНИЙ список — віддає його спільному кешу.
+//
+// Без цього виходило б гірше, ніж було: сторінка вантажить повний
+// файл заради характеристик, а «переглянуті товари» слідом просили б
+// ще й полегшений каталог.
+function primeProductsCache(list) {
+
+    if (!Array.isArray(list) || !list.length) return;
+
+    cachedProducts = list;
+    catalogRequest = Promise.resolve(list);
+
+}
+
+async function getProductById(id) {
+
+    const list = await getAllProductsCached();
+
+    return list.find(item => Number(item.id) === Number(id)) || null;
+
+}
+
+// Те саме, що loadCatalog(), але для тих, кому нічого показувати в
+// разі помилки: віджет «переглянуті товари» на невдалому запиті
+// просто не з'являється, а не валить сторінку.
 async function getAllProductsCached() {
 
-    if (!cachedProducts) {
+    try {
 
-        try {
+        return await loadCatalog();
 
-            const response = await fetch(dataUrl("data/products.json"));
+    } catch (error) {
 
-            cachedProducts = await response.json();
+        console.error(error);
 
-        } catch (error) {
-
-            console.error(error);
-
-            return [];
-
-        }
+        return [];
 
     }
-
-    return cachedProducts;
 
 }
 
@@ -924,6 +960,24 @@ function dataUrl(url) {
 
     return version ? `${url}?v=${version}` : url;
 
+}
+
+// Дані для СПИСКІВ товарів.
+//
+// Каталог, головна, кошик, обране й пошук показують картки — їм не
+// потрібні характеристики, які видно лише на сторінці товару
+// (матеріал, габарити, ремінь, блок Instagram, строк під замовлення).
+// Тому вони беруть полегшений data/catalog.json, а повний
+// data/products.json лишається сторінці товару й адмінці.
+//
+// Різниця сьогодні — п'ята частина ваги. Головне не це: кожне нове
+// поле опису товару інакше дорожчало б для кожного відвідувача
+// каталогу, хоча його ніхто там не бачить.
+//
+// Обидва файли збирає scripts/build-products.js з одних джерел, тож
+// id, порядок і решта полів у них однакові.
+function catalogUrl() {
+    return dataUrl("data/catalog.json");
 }
 
 // Куди йдуть листи з форм сайту.

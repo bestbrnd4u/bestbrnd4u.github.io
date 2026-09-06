@@ -197,6 +197,16 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: node scripts/push-stock.js
 
+      # Ціни — щоб база могла перевірити суму замовлення власним
+      # еталоном (supabase/migrations/014-order-pricing.sql).
+      # continue-on-error з тієї ж причини, що й вище: перевірка суми
+      # це запобіжник, а не частина випуску сайту.
+      - name: Оновити знімок цін у базі
+        continue-on-error: true
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/push-prices.js
+
       - name: Trigger deploy
         if: steps.commit.outputs.pushed == 'true'
         env:

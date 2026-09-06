@@ -2,7 +2,7 @@
 <html lang="uk">
 
 <head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"955f692b","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"5d9b13ee","data/products.json":"80f07012","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"955f692b","data/catalog.json":"dea622c7","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"5d9b13ee","data/legal.json":"857b431b","data/products.json":"7218a078","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/security.json":"34f399a1","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
 
 <!-- Сторінка лежить у /p/<slug>/, а скрипти будують шляхи як
      з кореня ("data/products.json", "assets/images/…").
@@ -162,6 +162,10 @@
 // вгадувати його з адреси
 window.PRODUCT_SLUG = "krosivky-lacoste-l003";
 window.PRODUCT_ID = 34;
+// повний запис товару прямо в сторінці: із ним product.js
+// малює картку одразу, а каталог довантажує лише заради
+// «схожих» і «переглянутих» — і бере полегшений
+window.PRODUCT_DATA = {"gender":["Жінкам"],"preOrderDays":"5–10 робочих днів","color":"Білий","forcePublish":false,"brand":"Lacoste","price":5900,"preOrder":false,"slug":"krosivky-lacoste-l003","variants":[{"color":"Білий","hex":"#f6f6f4","images":["/assets/images/products/uploads/61nzkwkzmsl._sx700_-1-.webp?v=9bc0dae8","/assets/images/products/uploads/612qqlnx4al._sx700_.webp?v=4ac37f6e","/assets/images/products/uploads/613xarv4knl._sx700_.webp?v=fefa9b1c","/assets/images/products/uploads/61z3jdbac7l._sx700_.webp?v=052ee141"],"article":"34-1","stock":{"37":1,"38":1,"39":1},"inStock":3}],"preOrderPrepayment":50,"sizes":["38","37","39"],"searchKeywords":["Lacoste","Lacoste L003","L003 0722 1 SMA","кросівки Lacoste","жіночі кросівки Lacoste","кросівки Lacoste чоловічі","брендові кросівки","оригінальні Lacoste","спортивні кросівки","повсякденні кросівки","кросівки на кожен день","Lacoste L003 SMA"],"isNew":false,"title":"Кросівки Lacoste L003 Textile Sneakers","images":["/assets/images/products/uploads/61nzkwkzmsl._sx700_-1-.webp","/assets/images/products/uploads/612qqlnx4al._sx700_.webp","/assets/images/products/uploads/613xarv4knl._sx700_.webp","/assets/images/products/uploads/61z3jdbac7l._sx700_.webp"],"reviews":0,"id":34,"instagramBlock":"general","description":"Lacoste L003 0722 1 SMА\nСтильні повсякденні кросівки Lacoste L003 0722 1 SMA — сучасна модель із виразним спортивним дизайном, натхненним тенісною естетикою. Верх поєднує текстильні та синтетичні матеріали, забезпечуючи комфортну посадку та легкість у повсякденному носінні.","sku":"43SMA0064","rating":5,"category":"Кросівки","legacySlugs":["кросівки-lacoste-l003"],"article":"34","inStock":3};
 </script>
 
 
@@ -171,7 +175,7 @@ window.PRODUCT_ID = 34;
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="192x192" href="/assets/images/favicon-192.png">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=5361b8d9">
+<link rel="stylesheet" href="/assets/css/style.css?v=c952189d">
 
 <!-- MailerLite Universal -->
 <script>
@@ -464,6 +468,7 @@ BestBrnd4u
 <a href="/return-warranty">Повернення та гарантія</a>
 <a href="/bayer-service">Байєр-сервіс</a>
 <a href="/privacy-policy">Політика конфіденційності</a>
+<a href="/offer">Публічна оферта</a>
             <!-- Згоду треба вміти відкликати так само легко, як дати -->
             <a href="#" data-consent-reopen>Налаштування даних</a>
 
@@ -527,6 +532,8 @@ BestBrnd4u
     </div>
 </div>
 
+<!-- Журнал помилок: сторінка сама розповідає, що в неї зламалось -->
+<script src="/assets/js/error-report.js?v=65f3d8ee"></script>
 <script src="/assets/js/supabase-client.js?v=42a4012d"></script>
 <!-- Кадрування фото товару. Той самий файл підключає адмінка,
      тож прев'ю в ній і картка на сайті рахуються однаково. -->
@@ -536,7 +543,7 @@ BestBrnd4u
 <!-- Оформлення текстових блоків з адмінки (кольори, шрифт, кнопка) -->
 <script src="/assets/js/text-styles.js?v=7dc05c7d"></script>
 <!-- Згода на використання даних (банер + блокування вбудованого відео) -->
-<script src="/assets/js/consent.js?v=63cbf725"></script>
+<script src="/assets/js/consent.js?v=b6cc5d45"></script>
 <!-- Статистика відвідувань. Не завантажує Google без згоди. -->
 <script src="/assets/js/analytics.js?v=9b4797b8"></script>
 <!-- Транслітерація: productUrl() кладе колір в адресу латиницею.
@@ -547,18 +554,18 @@ BestBrnd4u
 <script src="/assets/js/stock.js?v=85fa4aad"></script>
 
 <script src="/assets/js/translit.js?v=c0957cb7"></script>
-<script src="/assets/js/common.js?v=2f96b86e"></script>
+<script src="/assets/js/common.js?v=a6b0fed9"></script>
 <script src="/assets/js/sync.js?v=48ef002e"></script>
-<script src="/assets/js/mega-menu.js?v=b254fbf6"></script>
+<script src="/assets/js/mega-menu.js?v=803d52cc"></script>
 
 <script src="/assets/js/ui.js?v=c1453fdd"></script>
 
-<script src="/assets/js/app.js?v=d2c171bf"></script>
+<script src="/assets/js/app.js?v=dc04bec0"></script>
 
 <script src="/assets/js/lightbox.js?v=552b0982"></script>
 
 <script src="/assets/js/live-stock.js?v=288763d6"></script>
-<script src="/assets/js/product.js?v=c453f251"></script>
+<script src="/assets/js/product.js?v=8482b5d8"></script>
 
 </body>
 

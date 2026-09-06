@@ -339,6 +339,21 @@ function formatPrice(price) {
 
 }
 
+// Повний запис товару для window.PRODUCT_DATA.
+//
+// НАВІЩО. Сторінка товару вантажила ввесь каталог заради одного
+// запису — і чекала на нього, перш ніж намалювати те, за чим людина
+// прийшла. Тепер запис лежить у самій сторінці (близько кілобайта), а
+// каталог потрібен лише для «схожих» товарів, тобто нижче екрана.
+//
+// «<» екрануємо з тієї ж причини, що й у JSON-LD: "</script>" в описі
+// товару закрив би тег передчасно.
+function productData(product) {
+
+    return JSON.stringify(product).replace(/</g, "\u003c");
+
+}
+
 // JSON-LD всередині <script> — щоб "</script>" в описі товару не
 // закрив тег передчасно
 function jsonLdScript(id, data) {
@@ -496,6 +511,10 @@ function buildHead(product) {
         `// вгадувати його з адреси`,
         `window.PRODUCT_SLUG = ${JSON.stringify(product.slug)};`,
         `window.PRODUCT_ID = ${JSON.stringify(product.id)};`,
+        `// повний запис товару прямо в сторінці: із ним product.js`,
+        `// малює картку одразу, а каталог довантажує лише заради`,
+        `// «схожих» і «переглянутих» — і бере полегшений`,
+        `window.PRODUCT_DATA = ${productData(product)};`,
         `</script>`
     ].join("\n");
 
