@@ -131,8 +131,10 @@ console.log("\n[2] Логотип на сторінці товару");
     check("у картинки порожній alt — назву вже озвучує span",
         /class="brand-logo"[^>]*alt=""/.test(productJs));
 
-    check("логотип веде в каталог цього бренду",
-        /<a class="brand\$\{[^}]+\}" href="catalog\?brand=\$\{encodeURIComponent\(product\.brand\)\}">/.test(productJs));
+    // Раніше вело на адресу-фільтр (catalog?brand=…). Тепер у бренду
+    // є власна сторінка — див. tests/test-taxonomy-pages.js.
+    check("логотип веде на сторінку бренду",
+        /<a class="brand\$\{[^}]+\}" href="\$\{brandHref\(product\.brand\)\}">/.test(productJs));
 
     // Приховуємо назву саме класами, а не видаленням з DOM.
     check("назва прибрана з очей, а не з дерева",
@@ -151,7 +153,7 @@ console.log("\n[2] Логотип на сторінці товару");
     const linked = staticPages.filter(slug => {
         const file = path.join(ROOT, "p", slug, "index.html");
         return fs.existsSync(file)
-            && /<p class="product-static-brand"><a href="\/catalog\?brand=/.test(fs.readFileSync(file, "utf8"));
+            && /<p class="product-static-brand"><a href="\/brands\//.test(fs.readFileSync(file, "utf8"));
     });
 
     check("на статичній сторінці бренд — посилання",

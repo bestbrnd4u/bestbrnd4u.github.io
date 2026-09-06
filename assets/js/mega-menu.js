@@ -60,6 +60,30 @@
 
     }
 
+    // Бренд у меню веде на його сторінку — але лише коли меню не
+    // звужене розділом. «Новинки Coach» власної сторінки не мають, і
+    // підміняти їх повним каталогом бренду означало б показати не те,
+    // на що натиснули.
+    function brandHref(section, brand) {
+
+        if (section || !window.Translit) return buildQuery(section, [["brand", brand]]);
+
+        return `/brands/${window.Translit.toSlug(brand)}/`;
+
+    }
+
+    // Те саме для категорії. Стать лишається запитом: сторінка
+    // категорії одна, а «жіночі» й «чоловічі» — її стан.
+    function categoryHref(section, gender, name) {
+
+        if (section || !window.Translit) {
+            return buildQuery(section, [["gender", gender], ["category", name]]);
+        }
+
+        return `/categories/${window.Translit.toSlug(name)}/?gender=${encodeURIComponent(gender)}`;
+
+    }
+
     function buildQuery(section, extra) {
 
         const parts = [];
@@ -173,7 +197,7 @@
                 );
 
                 const links = names.map(name => `
-                    <a href="${buildQuery(section, [["gender", gender], ["category", name]])}">${escapeHtml(name)}</a>
+                    <a href="${categoryHref(section, gender, name)}">${escapeHtml(name)}</a>
                 `).join("");
 
                 return `
@@ -206,9 +230,9 @@
                 <div class="mega-col">
                     <div class="mega-col-title">Бренди</div>
                     ${topBrands.map(brand => `
-                        <a href="${buildQuery(section, [["brand", brand]])}">${escapeHtml(brand)}</a>
+                        <a href="${brandHref(section, brand)}">${escapeHtml(brand)}</a>
                     `).join("")}
-                    <a class="mega-col-all" href="${buildQuery(section, [])}">Усі бренди</a>
+                    <a class="mega-col-all" href="${section ? buildQuery(section, []) : "/brands/"}">Усі бренди</a>
                 </div>
             ` : "";
 

@@ -96,20 +96,36 @@ function htmlFiles() {
 
     if (fs.existsSync(admin)) out.push(admin);
 
-    // згенеровані сторінки товарів
-    const pages = path.join(ROOT, "p");
+    // Згенеровані сторінки: товари, бренди, категорії.
+    //
+    // Тека «p» тут стояла сама. Коли з'явились /brands/ і
+    // /categories/, вони лишились без версій: сторінка будується з
+    // catalog.html, тобто несе версії ПОПЕРЕДНЬОЇ збірки — і після
+    // виливки браузер тягнув би з кеша старий catalog.js рівно там,
+    // де він найпотрібніший.
+    ["p", "brands", "categories"].forEach(dir => {
 
-    if (fs.existsSync(pages)) {
+        const base = path.join(ROOT, dir);
 
-        fs.readdirSync(pages).forEach(slug => {
+        if (!fs.existsSync(base)) return;
 
-            const file = path.join(pages, slug, "index.html");
+        // Хаб (/brands/index.html) лежить у самій теці, сторінки — у
+        // підтеках. Треба обидва.
+        const hub = path.join(base, "index.html");
 
-            if (fs.existsSync(file)) out.push(file);
+        if (fs.existsSync(hub)) out.push(hub);
 
-        });
+        fs.readdirSync(base, { withFileTypes: true })
+            .filter(entry => entry.isDirectory())
+            .forEach(entry => {
 
-    }
+                const file = path.join(base, entry.name, "index.html");
+
+                if (fs.existsSync(file)) out.push(file);
+
+            });
+
+    });
 
     return out;
 

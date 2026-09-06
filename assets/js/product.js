@@ -1139,7 +1139,7 @@ function renderProduct(product) {
              при логотипі. Так її й далі читає програма для незрячих,
              і бере лайтбокс (він шукає .product-info .brand). Через це
              ж у картинки alt="" — інакше бренд озвучувався б двічі. -->
-        <a class="brand${product.brandLogo ? " brand-has-logo" : ""}" href="catalog?brand=${encodeURIComponent(product.brand)}">
+        <a class="brand${product.brandLogo ? " brand-has-logo" : ""}" href="${brandHref(product.brand)}">
 
             ${product.brandLogo
                 ? `<img class="brand-logo" src="${escapeHtml(product.brandLogo)}" alt="" loading="lazy" decoding="async">`
@@ -1631,6 +1631,27 @@ function setupSizeGuideModal() {
 // (scroll-snap) синхронізована з крапками-індикаторами
 // та вертикальними мініатюрами
 // -------------------------
+
+// Адреса сторінки бренду.
+//
+// Раніше тут стояло catalog?brand=…, тобто адреса-фільтр. У бренду
+// тепер є власна сторінка (/brands/coach/) з власним заголовком і
+// canonical — і посилання мусить вести саме на неї, інакше вага
+// внутрішніх посилань і далі збиралась би на каталозі.
+//
+// Немає Translit (не підключився) — лишаємо старий вигляд: він
+// робочий, просто гірший. Мовчазне посилання в нікуди було б гіршим.
+function brandHref(brand) {
+
+    const name = String(brand || "").trim();
+
+    if (!name) return "catalog";
+
+    return window.Translit
+        ? `/brands/${window.Translit.toSlug(name)}/`
+        : `catalog?brand=${encodeURIComponent(name)}`;
+
+}
 
 // -------------------------
 // Мобільна закріплена панель "Додати в кошик" — з'являється

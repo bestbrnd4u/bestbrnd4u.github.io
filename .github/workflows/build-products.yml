@@ -163,7 +163,7 @@ jobs:
           # маску розкриє оболонка, і в git поїде знову перелік.
           git add -A "*.html"
           git add robots.txt CNAME admin/config.yml
-          git add -A p
+          git add -A p brands categories
           # -A по картинках: фіксує і нові імена, і зникнення старих
           # після кроку "Normalize media file names"
           git add -A assets/images

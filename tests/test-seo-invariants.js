@@ -97,9 +97,23 @@ console.log("\n[3] sitemap і noindex не перетинаються");
     // свідомо закриває noindex-ом УСІ сторінки — dev-копія не має
     // конкурувати з продом за ті самі запити. Там це не конфлікт, а
     // задум, тож правило перевіряємо на індексованому середовищі.
-    const pages = fs.readdirSync(ROOT).filter(f => f.endsWith(".html"));
+    // Читаємо КОЖЕН файл, на який вказує sitemap, а не заздалегідь
+    // складений перелік кореневих сторінок.
+    //
+    // ЩО БУЛО НЕ ТАК. Перелік будувався з readdirSync(ROOT), тобто
+    // бачив лише *.html у корені. Сторінки товарів сюди не потрапляли
+    // взагалі (served() віддавав для них null), а щойно з'явились
+    // /brands/coach/ і /categories/…/ — перевірка почала вважати їх
+    // «відкритими» просто тому, що не знайшла файлів. Тобто мовчки
+    // перевіряла не те.
+    const noindexFile = file => {
 
-    const noindex = pages.filter(f => /name="robots"[^>]*content="[^"]*noindex/.test(read(f)));
+        const full = path.join(ROOT, file);
+
+        return fs.existsSync(full)
+            && /name="robots"[^>]*content="[^"]*noindex/.test(fs.readFileSync(full, "utf8"));
+
+    };
 
     // Адреса в sitemap → який файл її віддає.
     const served = loc => {
@@ -108,9 +122,18 @@ console.log("\n[3] sitemap і noindex не перетинаються");
 
         if (url === "/") return "index.html";
 
-        if (url.startsWith("/p/")) return null;      // згенерована сторінка товару
+        // Згенеровані сторінки — теж файли, і теж мусять слухатись
+        // середовища: саме через них dev-копія найлегше потрапляє в
+        // індекс (їх сотні, і на кожну є посилання з sitemap).
+        if (url.startsWith("/p/")) return url.replace(/^\//, "") + "index.html";
 
         if (url === "/promo") return "promo.html";
+
+        // Сторінки брендів і категорій — теж теки з index.html
+        // (/brands/coach/), а не файли поруч із коренем. Без цього
+        // рядка тест шукав би «brands/coach/.html» і не знаходив
+        // нічого — тобто мовчки перевіряв би порожнечу.
+        if (url.endsWith("/")) return url.replace(/^\//, "") + "index.html";
 
         return url.replace(/^\//, "") + ".html";
 
@@ -118,7 +141,7 @@ console.log("\n[3] sitemap і noindex не перетинаються");
 
     const conflict = locs
         .map(loc => ({ loc, file: served(loc) }))
-        .filter(x => x.file && noindex.includes(x.file));
+        .filter(x => x.file && noindexFile(x.file));
 
     if (env.indexable !== false) {
 
@@ -132,7 +155,7 @@ console.log("\n[3] sitemap і noindex не перетинаються");
         // Відкрита тестова копія — це дублікат усього каталогу в
         // індексі, і зводиться він місяцями.
         const open = locs.map(loc => ({ loc, file: served(loc) }))
-            .filter(x => x.file && !noindex.includes(x.file));
+            .filter(x => x.file && !noindexFile(x.file));
 
         check("на тестовому середовищі закриті всі сторінки з sitemap",
             open.length === 0,

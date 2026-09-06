@@ -319,10 +319,13 @@ console.log("\n[6] Проставлені штампи доїжджають до
     // сторінок, а не свій список.
     const stamper = read("scripts/apply-cache-version.js");
 
-    check("штампувач дивиться в корінь, admin/index.html і p/**",
+    check("штампувач дивиться в корінь, admin/index.html і згенеровані теки",
         /readdirSync\(ROOT\)\.filter\(f => f\.endsWith\("\.html"\)\)/.test(stamper)
         && /"admin", "index\.html"/.test(stamper)
-        && /path\.join\(pages, slug, "index\.html"\)/.test(stamper));
+        // Теки згенерованих сторінок: товари, бренди, категорії. Нову
+        // забудуть додати сюди — і після виливки саме там браузер
+        // тягтиме старий catalog.js із кеша.
+        && /\["p", "brands", "categories"\]\.forEach/.test(stamper));
 
     // Переписує він РІВНО те, що дає htmlFiles() — тобто лише
     // сторінки. Якби він почав правити щось інше, маски "*.html" уже

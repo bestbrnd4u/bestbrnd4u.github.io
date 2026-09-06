@@ -20,6 +20,13 @@ const { SITE_URL } = require("./site-env");
 
 const PRODUCTS_FILE = path.join(ROOT, "data", "products.json");
 const PROMOTIONS_FILE = path.join(ROOT, "data", "promotions.json");
+const BRANDS_FILE = path.join(ROOT, "data", "brands.json");
+const CATEGORIES_FILE = path.join(ROOT, "data", "categories.json");
+
+// Перелік сторінок брендів і категорій беремо в того ж модуля, що їх
+// і будує. Свій список тут означав би, що sitemap колись почне
+// обіцяти сторінки, яких немає, — або мовчки не показувати наявні.
+const { brandPages, categoryPages } = require("./build-taxonomy-pages");
 const OUTPUT_FILE = path.join(ROOT, "sitemap.xml");
 
 const STATIC_PAGES = [
@@ -91,6 +98,19 @@ function main() {
 
     });
 
+    // Хаби й сторінки таксономії. Пріоритет вищий за товар: саме вони
+    // виграють запити на кшталт «сумки Coach купити», і саме через них
+    // робот знаходить решту.
+    const brands = brandPages(products, readJsonSafe(BRANDS_FILE));
+    const categories = categoryPages(products, readJsonSafe(CATEGORIES_FILE));
+
+    if (brands.length) entries.push(urlEntry(`${SITE_URL}/brands/`, "weekly", "0.7"));
+    if (categories.length) entries.push(urlEntry(`${SITE_URL}/categories/`, "weekly", "0.7"));
+
+    [...brands, ...categories].forEach(page => {
+        entries.push(urlEntry(page.url, "weekly", "0.9"));
+    });
+
     promotions.forEach(promo => {
 
         if (!promo || !promo.slug) return;
@@ -111,6 +131,7 @@ function main() {
 
     console.log(
         `Готово: ${STATIC_PAGES.length} статичних + ${products.length} товарів + ` +
+        `${brands.length} брендів + ${categories.length} категорій + ` +
         `${promotions.length} акцій → ${path.relative(ROOT, OUTPUT_FILE)}`
     );
 
