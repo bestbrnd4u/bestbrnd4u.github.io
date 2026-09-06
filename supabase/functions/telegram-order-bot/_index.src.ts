@@ -34,6 +34,7 @@ import {
   adminTransitions, buildListQuery, buildCountQuery, buildRefusalsQuery,
   parseTotal, orderView, refusalView, listResponse, STATUS_ORDER,
 } from "./admin-api.js";
+import { cleanOrder, turnstileVerdict } from "./place-order.js";
 import {
   DELIVERY_OPTIONS, deliveryById, colorsOf, sizesOf, autoFill, nextStep,
   colorKeyboard, sizeKeyboard, qtyKeyboard, deliveryKeyboard, phoneKeyboard,
@@ -63,6 +64,12 @@ const SITE_URL = (Deno.env.get("SITE_URL") ?? "https://bestbrnd4u.github.io").re
 // керувати замовленнями з панелі адмінки (див. verifyAdmin).
 // Перевизначається секретом ADMIN_REPO, якщо репозиторій переїде.
 const ADMIN_REPO = Deno.env.get("ADMIN_REPO") ?? "bestbrnd4u/bestbrnd4u.github.io";
+
+// Секретний ключ Cloudflare Turnstile — ним підтверджується, що
+// перевірку «ви людина» справді пройшли. Порожній = перевірки немає, і
+// маршрут замовлення з сайту відповідає «не налаштовано»: сторінка
+// тоді кладе замовлення в базу сама, як робила досі.
+const TURNSTILE_SECRET = Deno.env.get("TURNSTILE_SECRET") ?? "";
 
 const TELEGRAM_API = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}`;
 
@@ -1487,6 +1494,147 @@ async function adminCounts(): Promise<Record<string, number | null>> {
 
 }
 
+// -------------------------
+// Замовлення з сайту
+//
+// ЧОМУ ЧЕРЕЗ ФУНКЦІЮ, А НЕ ПРЯМО В БАЗУ
+//
+// Перевірку «ви людина» неможливо підтвердити в браузері: токен
+// Turnstile має значення лише тоді, коли його звірили з Cloudflare
+// секретним ключем. Секрет у коді сайту лежати не може — отже,
+// звіряти мусить сервер.
+//
+// ЩО ТУТ ГОЛОВНЕ
+//
+// Функція пише СЛУЖБОВИМ ключем, тобто обмеження бази на неї не
+// діють. Тому payload не «чиститься», а перебирається за білим
+// списком (place-order.js), а чиє це замовлення — вирішує
+// підтверджений токен користувача, а не те, що прислали.
+// -------------------------
+
+async function verifyUser(token: string): Promise<string | null> {
+
+  if (!token) return null;
+
+  try {
+
+    const response = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+      headers: { apikey: SERVICE_ROLE_KEY, Authorization: `Bearer ${token}` },
+    });
+
+    if (!response.ok) return null;
+
+    const user = await response.json();
+
+    return typeof user?.id === "string" ? user.id : null;
+
+  } catch (error) {
+
+    console.error("Не вдалося перевірити користувача:", error);
+
+    return null;
+
+  }
+
+}
+
+async function handlePlaceOrder(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  // Без секрета перевіряти нічого. Відповідаємо чесно, а не «ок»:
+  // сторінка на це відкотиться на прямий запис у базу — тобто на те,
+  // як магазин працював досі.
+  if (!TURNSTILE_SECRET) {
+    return adminJson({ ok: false, error: "turnstile_not_configured" }, 501, origin);
+  }
+
+  const token = String(body.turnstile_token ?? "");
+
+  if (!token) {
+    return adminJson({ ok: false, error: "no_token" }, 400, origin);
+  }
+
+  let verdict;
+
+  try {
+
+    const response = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        secret: TURNSTILE_SECRET,
+        response: token,
+        // Адреса допомагає Cloudflare відрізняти живу людину від
+        // перевикористаного токена.
+        remoteip: request.headers.get("cf-connecting-ip")
+          ?? (request.headers.get("x-forwarded-for") ?? "").split(",")[0].trim()
+          ?? undefined,
+      }),
+    });
+
+    verdict = turnstileVerdict(await response.json());
+
+  } catch (error) {
+
+    console.error("Turnstile недоступний:", error);
+
+    // Cloudflare не відповів — це наша проблема, а не покупця.
+    // Відповідаємо так само, як без налаштування: сторінка збереже
+    // замовлення сама.
+    return adminJson({ ok: false, error: "turnstile_unavailable" }, 503, origin);
+
+  }
+
+  if (!verdict.ok) {
+
+    console.warn("Turnstile не пройдено:", verdict.reason);
+
+    return adminJson({ ok: false, error: "turnstile_failed" }, 403, origin);
+
+  }
+
+  const clean = cleanOrder(body.order);
+
+  if (!clean.ok) {
+
+    console.warn("Замовлення відхилено:", clean.reason);
+
+    return adminJson({ ok: false, error: "bad_order" }, 400, origin);
+
+  }
+
+  // Кабінет: замовлення прив'язується до людини лише за підтвердженим
+  // токеном із заголовка Authorization — його кладе туди сам клієнт
+  // Supabase. Те, що прислали в тілі запиту, тут не має ваги взагалі:
+  // інакше будь-хто міг би записати замовлення на чужий акаунт.
+  //
+  // Гість надсилає публічний ключ проєкту — на нього /auth/v1/user
+  // відповість відмовою, і замовлення лишиться гостьовим.
+  const bearer = (request.headers.get("authorization") ?? "").replace(/^Bearers+/i, "");
+
+  const userId = await verifyUser(bearer);
+
+  const response = await supabaseRest("orders", {
+    method: "POST",
+    headers: { Prefer: "return=minimal" },
+    body: JSON.stringify({ ...clean.row, user_id: userId }),
+  });
+
+  if (!response.ok) {
+
+    const detail = await response.text();
+
+    console.error("Не вдалося зберегти замовлення:", detail);
+
+    return adminJson({ ok: false, error: "insert_failed" }, 502, origin);
+
+  }
+
+  return adminJson({ ok: true }, 200, origin);
+
+}
+
 async function handleAdmin(request: Request, body: Record<string, any>): Promise<Response> {
 
   const origin = request.headers.get("origin");
@@ -1663,6 +1811,16 @@ async function handleRequest(request: Request): Promise<Response> {
   if (typeof body.admin_action !== "undefined") {
 
     return await handleAdmin(request, body);
+
+  }
+
+  // --- замовлення з сайту (перевірка «ви людина») ---
+  //
+  // Розпізнаємо за власним полем site_action. Ні Telegram, ні
+  // Database Webhook такого не надсилають.
+  if (body.site_action === "place-order") {
+
+    return await handlePlaceOrder(request, body);
 
   }
 

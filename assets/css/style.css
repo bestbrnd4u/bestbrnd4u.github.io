@@ -12647,3 +12647,15 @@ body.refusal-open{
     }
 
 }
+
+/* -- Перевірка «ви людина» на оформленні замовлення.
+   Порожній ключ = блок лишається схованим і місця не займає
+   (assets/js/turnstile.js). -- */
+.turnstile-box{
+    margin:12px 0 0;
+    min-height:0;
+}
+
+.turnstile-box:not([hidden]){
+    min-height:65px;
+}

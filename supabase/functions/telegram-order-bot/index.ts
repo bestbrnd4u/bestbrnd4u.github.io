@@ -4,6 +4,7 @@
 //   supabase/functions/telegram-order-bot/format.js      (картка замовлення)
 //   supabase/functions/telegram-order-bot/order-flow.js  (діалог оформлення)
 //   supabase/functions/telegram-order-bot/admin-api.js   (панель замовлень в адмінці)
+//   supabase/functions/telegram-order-bot/place-order.js (замовлення з сайту)
 //   supabase/functions/telegram-order-bot/_index.src.ts  (мережа й база)
 //
 // Перезібрати:  node scripts/build-edge-function.js
@@ -1037,7 +1038,10 @@ function corsHeaders(origin) {
     const headers = {
         "Vary": "Origin",
         "Access-Control-Allow-Methods": "POST, OPTIONS",
-        "Access-Control-Allow-Headers": `Content-Type, ${ADMIN_TOKEN_HEADER}`,
+        // Authorization — для замовлення з сайту: клієнт Supabase
+        // кладе туди токен покупця (або публічний ключ у гостя).
+        // apikey — той самий клієнт додає його поруч.
+        "Access-Control-Allow-Headers": `Content-Type, Authorization, apikey, x-client-info, ${ADMIN_TOKEN_HEADER}`,
         "Access-Control-Max-Age": "600",
     };
 
@@ -1422,6 +1426,195 @@ function listResponse({ orders, total, counts }) {
 
 }
 
+
+// Замовлення з сайту, яке проходить через функцію.
+//
+// НАВІЩО
+// -------
+// Досі браузер клав замовлення в базу сам — публічним ключем, який
+// лежить у коді сайту. Так і має бути: інакше гість не зміг би
+// замовити. Але це означає, що надіслати замовлення може будь-хто, не
+// відкриваючи сайту взагалі: сотня підроблених рядків це сотня
+// повідомлень у Telegram і — найгірше — зайняті залишки, бо перевірка
+// «останній екземпляр» вважає кожне відкрите замовлення зайнятою
+// одиницею.
+//
+// Тепер між браузером і базою може стояти перевірка «ви людина»
+// (Cloudflare Turnstile). Підтвердити її можна лише на сервері — у
+// браузері будь-яка така перевірка нічого не варта.
+//
+// ЩО В ЦЬОМУ ФАЙЛІ
+// -----------------
+// Тільки чиста логіка: перевірка й чистка того, що прислали. Мережа й
+// база — у _index.src.ts. Так це можна ганяти тестами в Node.
+//
+// ГОЛОВНЕ ПРАВИЛО: ФУНКЦІЯ ПИШЕ СЛУЖБОВИМ КЛЮЧЕМ
+// -----------------------------------------------
+// Тобто обмеження бази на неї не діють — вона може записати будь-що в
+// будь-яку колонку. Саме тому нижче не «прибрати зайве», а БІЛИЙ
+// СПИСОК: у рядок потрапляють рівно ті поля, які надсилає сторінка
+// оформлення, і нічого більше. Статус завжди «new»; чиє це замовлення
+// — вирішує не payload, а підтверджений токен.
+
+// Скільки позицій може бути в замовленні. Не обмеження магазину, а
+// стеля здорового глузду: більше — це вже не покупка.
+const MAX_ITEMS = 50;
+
+// Стеля суми (₴). Захищає від «замовлення» на мільярд, яке зіпсує
+// звіти й підсумки.
+const MAX_MONEY = 10000000;
+
+const TEXT_LIMITS = {
+    order_number: 40,
+    delivery_method: 120,
+    delivery_city: 120,
+    delivery_detail: 300,
+    payment_method: 120,
+    promo_code: 40,
+    first_name: 80,
+    last_name: 80,
+    phone: 40,
+    email: 160,
+};
+
+function text(value, limit) {
+
+    const clean = String(value ?? "").trim();
+
+    return clean ? clean.slice(0, limit) : null;
+
+}
+
+// Число грошей: не менше нуля, не більше стелі, дві цифри після коми.
+//
+// Назва навмисно не money(): у зібраному файлі всі модулі лежать
+// поруч, а money() там уже зайнята — це форматування суми для
+// Telegram. Дві функції з однією назвою тихо перекрили б одна одну.
+function amount(value) {
+
+    const number = Number(value);
+
+    if (!Number.isFinite(number) || number < 0 || number > MAX_MONEY) return 0;
+
+    return Math.round(number * 100) / 100;
+
+}
+
+// Позиція замовлення. Склад той самий, що кладе сторінка оформлення
+// (buildOrderItemsSnapshot у assets/js/checkout.js): назва, бренд,
+// ціна, фото, кількість, колір, розмір.
+function item(raw) {
+
+    if (!raw || typeof raw !== "object") return null;
+
+    const title = text(raw.title, 200);
+
+    if (!title) return null;
+
+    const id = Number(raw.id);
+
+    return {
+        id: Number.isFinite(id) && id > 0 ? Math.trunc(id) : null,
+        title,
+        brand: text(raw.brand, 100),
+        price: amount(raw.price),
+        image: text(raw.image, 500),
+        qty: Math.min(Math.max(Math.trunc(Number(raw.qty) || 1), 1), 100),
+        color: text(raw.color, 100),
+        size: text(raw.size, 50),
+    };
+
+}
+
+// Перевірка й чистка замовлення.
+//
+// Повертає { ok: true, row } або { ok: false, reason } — reason іде в
+// логи функції, а не покупцеві: йому досить «не вдалося оформити».
+function cleanOrder(payload) {
+
+    if (!payload || typeof payload !== "object") {
+        return { ok: false, reason: "порожній запит" };
+    }
+
+    const orderNumber = text(payload.order_number, TEXT_LIMITS.order_number);
+
+    if (!orderNumber || !/^[0-9A-Za-z-]{4,40}$/.test(orderNumber)) {
+        return { ok: false, reason: "номер замовлення не схожий на номер" };
+    }
+
+    const rawItems = Array.isArray(payload.items) ? payload.items : [];
+
+    if (!rawItems.length) {
+        return { ok: false, reason: "порожній склад замовлення" };
+    }
+
+    if (rawItems.length > MAX_ITEMS) {
+        return { ok: false, reason: `позицій більше за ${MAX_ITEMS}` };
+    }
+
+    const items = rawItems.map(item).filter(Boolean);
+
+    if (!items.length) {
+        return { ok: false, reason: "жодної придатної позиції" };
+    }
+
+    // Хоч якісь контакти: замовлення, за яким неможливо зателефонувати
+    // чи написати, — це не замовлення.
+    const phone = text(payload.phone, TEXT_LIMITS.phone);
+    const email = text(payload.email, TEXT_LIMITS.email);
+
+    if (!phone && !email) {
+        return { ok: false, reason: "немає ні телефону, ні пошти" };
+    }
+
+    return {
+        ok: true,
+        row: {
+            order_number: orderNumber,
+
+            // Статус НЕ з payload: нове замовлення завжди нове.
+            // Інакше підроблений запит міг би одразу прикинутись
+            // відправленим і проскочити повз перевірку менеджера.
+            status: "new",
+
+            items,
+
+            subtotal: amount(payload.subtotal),
+            discount: amount(payload.discount),
+            delivery_price: amount(payload.delivery_price),
+            total: amount(payload.total),
+
+            delivery_method: text(payload.delivery_method, TEXT_LIMITS.delivery_method),
+            delivery_city: text(payload.delivery_city, TEXT_LIMITS.delivery_city),
+            delivery_detail: text(payload.delivery_detail, TEXT_LIMITS.delivery_detail),
+            payment_method: text(payload.payment_method, TEXT_LIMITS.payment_method),
+            promo_code: text(payload.promo_code, TEXT_LIMITS.promo_code),
+
+            first_name: text(payload.first_name, TEXT_LIMITS.first_name),
+            last_name: text(payload.last_name, TEXT_LIMITS.last_name),
+            phone,
+            email,
+        },
+    };
+
+}
+
+// Відповідь Cloudflare на перевірку токена.
+//
+// Виносимо в чисту функцію, щоб розбір відповіді перевірявся тестом:
+// сам мережевий виклик у Deno не протестуєш.
+function turnstileVerdict(data) {
+
+    if (!data || typeof data !== "object") return { ok: false, reason: "порожня відповідь" };
+
+    if (data.success === true) return { ok: true };
+
+    const codes = Array.isArray(data["error-codes"]) ? data["error-codes"].join(", ") : "";
+
+    return { ok: false, reason: codes || "перевірку не пройдено" };
+
+}
+
 // ======================================
 // Telegram-бот для заявок BestBrnd4u
 //
@@ -1450,6 +1643,7 @@ function listResponse({ orders, total, counts }) {
 
 
 
+
 const TELEGRAM_BOT_TOKEN = Deno.env.get("TELEGRAM_BOT_TOKEN") ?? "";
 const TELEGRAM_CHAT_ID = Deno.env.get("TELEGRAM_CHAT_ID") ?? "";
 
@@ -1471,6 +1665,12 @@ const SITE_URL = (Deno.env.get("SITE_URL") ?? "https://bestbrnd4u.github.io").re
 // керувати замовленнями з панелі адмінки (див. verifyAdmin).
 // Перевизначається секретом ADMIN_REPO, якщо репозиторій переїде.
 const ADMIN_REPO = Deno.env.get("ADMIN_REPO") ?? "bestbrnd4u/bestbrnd4u.github.io";
+
+// Секретний ключ Cloudflare Turnstile — ним підтверджується, що
+// перевірку «ви людина» справді пройшли. Порожній = перевірки немає, і
+// маршрут замовлення з сайту відповідає «не налаштовано»: сторінка
+// тоді кладе замовлення в базу сама, як робила досі.
+const TURNSTILE_SECRET = Deno.env.get("TURNSTILE_SECRET") ?? "";
 
 const TELEGRAM_API = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}`;
 
@@ -2895,6 +3095,147 @@ async function adminCounts(): Promise<Record<string, number | null>> {
 
 }
 
+// -------------------------
+// Замовлення з сайту
+//
+// ЧОМУ ЧЕРЕЗ ФУНКЦІЮ, А НЕ ПРЯМО В БАЗУ
+//
+// Перевірку «ви людина» неможливо підтвердити в браузері: токен
+// Turnstile має значення лише тоді, коли його звірили з Cloudflare
+// секретним ключем. Секрет у коді сайту лежати не може — отже,
+// звіряти мусить сервер.
+//
+// ЩО ТУТ ГОЛОВНЕ
+//
+// Функція пише СЛУЖБОВИМ ключем, тобто обмеження бази на неї не
+// діють. Тому payload не «чиститься», а перебирається за білим
+// списком (place-order.js), а чиє це замовлення — вирішує
+// підтверджений токен користувача, а не те, що прислали.
+// -------------------------
+
+async function verifyUser(token: string): Promise<string | null> {
+
+  if (!token) return null;
+
+  try {
+
+    const response = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+      headers: { apikey: SERVICE_ROLE_KEY, Authorization: `Bearer ${token}` },
+    });
+
+    if (!response.ok) return null;
+
+    const user = await response.json();
+
+    return typeof user?.id === "string" ? user.id : null;
+
+  } catch (error) {
+
+    console.error("Не вдалося перевірити користувача:", error);
+
+    return null;
+
+  }
+
+}
+
+async function handlePlaceOrder(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  // Без секрета перевіряти нічого. Відповідаємо чесно, а не «ок»:
+  // сторінка на це відкотиться на прямий запис у базу — тобто на те,
+  // як магазин працював досі.
+  if (!TURNSTILE_SECRET) {
+    return adminJson({ ok: false, error: "turnstile_not_configured" }, 501, origin);
+  }
+
+  const token = String(body.turnstile_token ?? "");
+
+  if (!token) {
+    return adminJson({ ok: false, error: "no_token" }, 400, origin);
+  }
+
+  let verdict;
+
+  try {
+
+    const response = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        secret: TURNSTILE_SECRET,
+        response: token,
+        // Адреса допомагає Cloudflare відрізняти живу людину від
+        // перевикористаного токена.
+        remoteip: request.headers.get("cf-connecting-ip")
+          ?? (request.headers.get("x-forwarded-for") ?? "").split(",")[0].trim()
+          ?? undefined,
+      }),
+    });
+
+    verdict = turnstileVerdict(await response.json());
+
+  } catch (error) {
+
+    console.error("Turnstile недоступний:", error);
+
+    // Cloudflare не відповів — це наша проблема, а не покупця.
+    // Відповідаємо так само, як без налаштування: сторінка збереже
+    // замовлення сама.
+    return adminJson({ ok: false, error: "turnstile_unavailable" }, 503, origin);
+
+  }
+
+  if (!verdict.ok) {
+
+    console.warn("Turnstile не пройдено:", verdict.reason);
+
+    return adminJson({ ok: false, error: "turnstile_failed" }, 403, origin);
+
+  }
+
+  const clean = cleanOrder(body.order);
+
+  if (!clean.ok) {
+
+    console.warn("Замовлення відхилено:", clean.reason);
+
+    return adminJson({ ok: false, error: "bad_order" }, 400, origin);
+
+  }
+
+  // Кабінет: замовлення прив'язується до людини лише за підтвердженим
+  // токеном із заголовка Authorization — його кладе туди сам клієнт
+  // Supabase. Те, що прислали в тілі запиту, тут не має ваги взагалі:
+  // інакше будь-хто міг би записати замовлення на чужий акаунт.
+  //
+  // Гість надсилає публічний ключ проєкту — на нього /auth/v1/user
+  // відповість відмовою, і замовлення лишиться гостьовим.
+  const bearer = (request.headers.get("authorization") ?? "").replace(/^Bearers+/i, "");
+
+  const userId = await verifyUser(bearer);
+
+  const response = await supabaseRest("orders", {
+    method: "POST",
+    headers: { Prefer: "return=minimal" },
+    body: JSON.stringify({ ...clean.row, user_id: userId }),
+  });
+
+  if (!response.ok) {
+
+    const detail = await response.text();
+
+    console.error("Не вдалося зберегти замовлення:", detail);
+
+    return adminJson({ ok: false, error: "insert_failed" }, 502, origin);
+
+  }
+
+  return adminJson({ ok: true }, 200, origin);
+
+}
+
 async function handleAdmin(request: Request, body: Record<string, any>): Promise<Response> {
 
   const origin = request.headers.get("origin");
@@ -3071,6 +3412,16 @@ async function handleRequest(request: Request): Promise<Response> {
   if (typeof body.admin_action !== "undefined") {
 
     return await handleAdmin(request, body);
+
+  }
+
+  // --- замовлення з сайту (перевірка «ви людина») ---
+  //
+  // Розпізнаємо за власним полем site_action. Ні Telegram, ні
+  // Database Webhook такого не надсилають.
+  if (body.site_action === "place-order") {
+
+    return await handlePlaceOrder(request, body);
 
   }
 

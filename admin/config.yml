@@ -86,6 +86,25 @@ collections:
               /mybots і оберіть свого бота, логін показано під назвою і
               завжди закінчується на «bot». Вводьте без символу @.
 
+      - name: "security"
+        label: "Захист замовлень"
+        file: "data/security.json"
+        description: >
+          Перевірка «ви людина» на кроці оформлення (Cloudflare
+          Turnstile). Порожнє поле = перевірки немає, сторінка працює
+          як раніше. Покрокове налаштування — docs/ЗАХИСТ-ЗАМОВЛЕНЬ.md.
+        fields:
+          - label: "Turnstile — ключ сайту (Site Key)"
+            name: "turnstileSiteKey"
+            widget: "string"
+            required: false
+            pattern: ["^([0-9]x[A-Za-z0-9_-]{10,60})?$", "Ключ виду 0x…; або лишіть порожнім"]
+            hint: >
+              Знайти: dash.cloudflare.com → Turnstile → ваш віджет →
+              Site Key. Це ВІДКРИТИЙ ключ, він і має лежати в коді
+              сайту. Секретний ключ сюди вписувати НЕ МОЖНА — його
+              місце в секретах Supabase (TURNSTILE_SECRET).
+
       - name: "legal"
         label: "Продавець і оферта"
         file: "data/legal.json"

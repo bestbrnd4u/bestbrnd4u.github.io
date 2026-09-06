@@ -988,6 +988,50 @@ function buildOrderItemsSnapshot() {
 //
 // Це best-effort: якщо збереження не вдалося, оформлення
 // замовлення все одно вважається успішним (лист вже надіслано).
+// Замовлення через функцію — там, де стоїть перевірка «ви людина».
+//
+// ЧОМУ НЕ ПРЯМО В БАЗУ. Токен Turnstile нічого не вартий, доки його не
+// звірили з Cloudflare секретним ключем; секрет у коді сайту лежати не
+// може. Тому запис іде через функцію, яка спершу звіряє токен, а вже
+// потім пише службовим ключем.
+//
+// Повертає true, якщо замовлення збережене. false означає «спробуй
+// звичайним шляхом» — і це нормальний, очікуваний варіант: перевірка
+// не налаштована, функція старої версії, Cloudflare мовчить.
+async function placeOrderThroughFunction(order) {
+
+    if (!window.Turnstile || !window.Turnstile.enabled()) return false;
+
+    const token = window.Turnstile.token();
+
+    if (!token) return false;
+
+    try {
+
+        const { data, error } = await supabaseClient.functions.invoke("telegram-order-bot", {
+            body: { site_action: "place-order", turnstile_token: token, order }
+        });
+
+        // Токен одноразовий: після спроби віджет треба скинути,
+        // інакше повторне оформлення піде з використаним токеном.
+        window.Turnstile.reset();
+
+        if (!error && data && data.ok) return true;
+
+        console.warn("Замовлення через функцію не пройшло:", error || data);
+
+    } catch (failure) {
+
+        console.warn("Функція замовлення недоступна:", failure && failure.message);
+
+        window.Turnstile.reset();
+
+    }
+
+    return false;
+
+}
+
 async function saveOrderToSupabase(orderId) {
 
     if (!supabaseClient) return;
@@ -996,8 +1040,7 @@ async function saveOrderToSupabase(orderId) {
 
     const { subtotal, totalDiscount, delivery, total } = computeOrderTotals();
 
-    const { error } = await supabaseClient.from("orders").insert({
-        user_id: user ? user.id : null,
+    const order = {
         order_number: orderId,
         status: "new",
         items: buildOrderItemsSnapshot(),
@@ -1014,6 +1057,20 @@ async function saveOrderToSupabase(orderId) {
         last_name: document.getElementById("lastName")?.value.trim() || null,
         phone: document.getElementById("phone")?.value.trim() || null,
         email: document.getElementById("email")?.value.trim() || null
+    };
+
+    // Якщо на сторінці стоїть перевірка «ви людина» — замовлення йде
+    // через функцію, бо підтвердити токен можна тільки на сервері.
+    //
+    // Не вийшло (функція не оновлена, Cloudflare не відповів) —
+    // зберігаємо звичайним шляхом. Втратити захист від потоку
+    // неприємно; втратити замовлення — інша категорія подій. Від
+    // потоку в базі лишається власна межа (міграція 015).
+    if (await placeOrderThroughFunction(order)) return;
+
+    const { error } = await supabaseClient.from("orders").insert({
+        user_id: user ? user.id : null,
+        ...order
     });
 
     if (error) {
@@ -1035,6 +1092,28 @@ checkoutForm?.addEventListener("submit", event => {
         const firstError = checkoutForm.querySelector(".field-error:not(:empty)");
 
         firstError?.closest("label, .delivery-options")?.scrollIntoView({ behavior: "smooth", block: "center" });
+
+        return;
+
+    }
+
+    // Перевірка «ви людина» ще не пройдена. Turnstile зазвичай
+    // проходить сам за секунду, тож сюди потрапляють ті, у кого вона
+    // не встигла або не завантажилась.
+    //
+    // Не блокуємо намертво: якщо віджет узагалі не з'явився,
+    // enabled() поверне false — і оформлення піде як завжди. Магазин,
+    // який не продає через недоступний Cloudflare, гірший за магазин
+    // без перевірки.
+    if (window.Turnstile && window.Turnstile.enabled() && !window.Turnstile.token()) {
+
+        const box = document.getElementById("turnstileBox");
+
+        box?.scrollIntoView({ behavior: "smooth", block: "center" });
+
+        if (typeof showToast === "function") {
+            showToast("Підтвердіть, що ви не робот");
+        }
 
         return;
 

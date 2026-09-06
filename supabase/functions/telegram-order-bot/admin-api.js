@@ -78,7 +78,10 @@ export function corsHeaders(origin) {
     const headers = {
         "Vary": "Origin",
         "Access-Control-Allow-Methods": "POST, OPTIONS",
-        "Access-Control-Allow-Headers": `Content-Type, ${ADMIN_TOKEN_HEADER}`,
+        // Authorization — для замовлення з сайту: клієнт Supabase
+        // кладе туди токен покупця (або публічний ключ у гостя).
+        // apikey — той самий клієнт додає його поруч.
+        "Access-Control-Allow-Headers": `Content-Type, Authorization, apikey, x-client-info, ${ADMIN_TOKEN_HEADER}`,
         "Access-Control-Max-Age": "600",
     };
 
