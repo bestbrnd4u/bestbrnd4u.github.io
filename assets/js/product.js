@@ -61,11 +61,19 @@ async function init(){
 
 try {
 
-const response=await fetch(dataUrl("/data/products.json"));
+// Каталог і живий залишок — одночасно (див. коментар у
+// assets/js/live-stock.js). Наявність саме тут найважливіша: людина
+// на цій сторінці вирішує, купувати чи ні.
+const [response, live]=await Promise.all([
+    fetch(dataUrl("/data/products.json")),
+    window.LiveStock ? window.LiveStock.load() : Promise.resolve(null)
+]);
 
 if (!response.ok) throw new Error("Не вдалося завантажити товари");
 
 products=await response.json();
+
+if (window.LiveStock) window.LiveStock.apply(products, live);
 
 const product=findRequestedProduct(products);
 
