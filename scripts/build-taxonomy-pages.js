@@ -1,4 +1,7 @@
-// Сторінки брендів і категорій: /brands/coach/, /categories/zhinochi-sumky/
+// Сторінки розділів, брендів і категорій:
+//   /departments/sumky/          — розділ (найширший запит: «сумки купити»)
+//   /brands/coach/               — бренд
+//   /categories/zhinochi-sumky/  — категорія
 //
 // НАВІЩО
 // -------
@@ -45,8 +48,11 @@ const PRODUCTS_FILE = path.join(ROOT, "data", "products.json");
 const BRANDS_FILE = path.join(ROOT, "data", "brands.json");
 const CATEGORIES_FILE = path.join(ROOT, "data", "categories.json");
 
+const DEPARTMENTS_SRC = path.join(ROOT, "data", "departments");
+
 const BRANDS_DIR = path.join(ROOT, "brands");
 const CATEGORIES_DIR = path.join(ROOT, "categories");
+const DEPARTMENTS_DIR = path.join(ROOT, "departments");
 
 const { SITE_URL } = require("./site-env");
 const { toSlug } = require("./translit");
@@ -112,6 +118,7 @@ const BREADCRUMB_SLOT_RE = /<div class="container" id="breadcrumbsList">[\s\S]*?
 const GRID_SLOT_RE = /<div\s*\n?\s*id="catalogGrid"\s*\n?\s*class="products-grid">\s*<\/div>/;
 const TITLE_SLOT = '<span id="catalogTitle">Каталог товарів</span>';
 const ABOUT_SLOT = '<div class="brand-about" id="brandAbout" hidden></div>';
+const HERO_SLOT = '<div class="brand-hero" id="brandHero" hidden></div>';
 const SUBTITLE_RE = /<p id="catalogSubtitle">[\s\S]*?<\/p>/;
 
 function buildTemplate() {
@@ -189,6 +196,38 @@ function factsLine(products) {
 
 }
 
+// Записи з адмінки: назва → { title, description }.
+//
+// Для брендів це data/brands.json (його збирає build-brands.js), для
+// категорій — поля всередині data/categories.json, для розділів —
+// окремі файли data/departments/*.json. Запис НЕОБОВʼЯЗКОВИЙ скрізь:
+// без нього сторінка існує, просто без авторського тексту.
+function readRecords(dir) {
+
+    const out = new Map();
+
+    if (!fs.existsSync(dir)) return out;
+
+    fs.readdirSync(dir).filter(f => f.endsWith(".json")).forEach(file => {
+
+        try {
+
+            const data = JSON.parse(fs.readFileSync(path.join(dir, file), "utf8"));
+
+            if (data && data.name) out.set(String(data.name).trim().toLowerCase(), data);
+
+        } catch (error) {
+
+            console.warn(`⚠  ${file}: не читається як JSON — пропущено`);
+
+        }
+
+    });
+
+    return out;
+
+}
+
 function listLine(label, values) {
 
     const clean = [...new Set(values.filter(Boolean))];
@@ -238,6 +277,8 @@ function brandPages(products, brands) {
             dir: path.join(BRANDS_DIR, slug),
             url: `${SITE_URL}/brands/${slug}/`,
             heading: record.title || `Товари ${name}`,
+            banner: record.banner || "",
+            logo: record.logo || "",
             title: `${name} — купити в Україні | BestBrnd4u`,
             intro: [
                 factsLine(items),
@@ -275,9 +316,15 @@ function categoryPages(products, categories) {
     });
 
     const departments = new Map();
+    const records = new Map();
 
     (categories || []).forEach(category => {
-        if (category && category.name) departments.set(category.name, category.department || "");
+
+        if (!category || !category.name) return;
+
+        departments.set(category.name, category.department || "");
+        records.set(category.name.toLowerCase(), category);
+
     });
 
     return [...byCategory.entries()].map(([name, items]) => {
@@ -291,10 +338,12 @@ function categoryPages(products, categories) {
         ];
 
         if (department) {
-            crumbs.push({ label: department, href: `catalog?department=${toSlug(department)}` });
+            crumbs.push({ label: department, href: `departments/${toSlug(department)}/` });
         }
 
         crumbs.push({ label: name, href: null, current: true });
+
+        const record = records.get(name.toLowerCase()) || {};
 
         return {
             kind: "category",
@@ -303,16 +352,84 @@ function categoryPages(products, categories) {
             department,
             dir: path.join(CATEGORIES_DIR, slug),
             url: `${SITE_URL}/categories/${slug}/`,
-            heading: name,
+            heading: record.title || name,
             title: `${name} — купити в Україні | BestBrnd4u`,
             intro: [
                 factsLine(items),
                 listLine("Бренди", items.map(p => p.brand))
             ].filter(Boolean).join(" "),
-            description: "",
+            description: record.description || "",
             preset: { category: name },
             crumbs,
             products: items
+        };
+
+    }).sort((a, b) => a.name.localeCompare(b.name, "uk"));
+
+}
+
+// Розділ — рівень над категорією: «Сумки» проти «Жіночі сумки».
+//
+// НАВІЩО ОКРЕМІ СТОРІНКИ
+// -----------------------
+// Саме сюди йдуть найширші запити («сумки купити»), і саме їх не
+// виграє ні сторінка категорії (вона вужча), ні каталог (він про все
+// одразу). У фільтрах каталогу розділ уже є — лишалось дати йому
+// адресу.
+function departmentPages(products, categories, records) {
+
+    const byCategory = new Map();
+
+    (categories || []).forEach(category => {
+        if (category && category.name) byCategory.set(category.name, category.department || "");
+    });
+
+    const byDepartment = new Map();
+
+    products.forEach(product => {
+
+        const department = byCategory.get(String(product.category || "").trim());
+
+        if (!department) return;
+
+        if (!byDepartment.has(department)) byDepartment.set(department, []);
+
+        byDepartment.get(department).push(product);
+
+    });
+
+    return [...byDepartment.entries()].map(([name, items]) => {
+
+        const record = records.get(name.toLowerCase()) || {};
+
+        const slug = toSlug(name);
+
+        // Категорії цього розділу — і в тексті, і посиланнями нижче:
+        // так робот від широкої сторінки доходить до вужчих.
+        const inside = [...new Set(items.map(p => p.category).filter(Boolean))];
+
+        return {
+            kind: "department",
+            name,
+            slug,
+            dir: path.join(DEPARTMENTS_DIR, slug),
+            url: `${SITE_URL}/departments/${slug}/`,
+            heading: record.title || name,
+            title: `${name} — купити в Україні | BestBrnd4u`,
+            intro: [
+                factsLine(items),
+                listLine("Категорії", inside),
+                listLine("Бренди", items.map(p => p.brand))
+            ].filter(Boolean).join(" "),
+            description: record.description || "",
+            preset: { department: name },
+            crumbs: [
+                { label: "Головна", href: "/" },
+                { label: "Каталог", href: "catalog" },
+                { label: name, href: null, current: true }
+            ],
+            products: items,
+            inside
         };
 
     }).sort((a, b) => a.name.localeCompare(b.name, "uk"));
@@ -380,6 +497,20 @@ ${items}
 // означав би, що після виконання JS той самий текст стоїть на
 // сторінці двічі. Тож пишемо рівно ту розмітку, яку catalog.js
 // збудує сам, — він її просто перебудує тією самою.
+function heroMarkup(page) {
+
+    const image = page.banner || page.logo;
+
+    if (!image) return "";
+
+    const cls = page.banner ? "brand-hero-banner" : "brand-hero-logo";
+
+    return `<div class="brand-hero" id="brandHero">`
+        + `<img class="${cls}" src="${escapeHtml(image)}" alt="${escapeHtml(page.name)}" decoding="async">`
+        + `</div>`;
+
+}
+
 function aboutMarkup(page) {
 
     if (!page.description) return "";
@@ -460,6 +591,27 @@ function headMarkup(page) {
 
 }
 
+// Перелік категорій усередині розділу.
+//
+// Це не прикраса: без нього від «Сумок» немає жодного посилання до
+// «Жіночих сумок», і вужчі сторінки лишаються досяжними хіба що з
+// sitemap — тобто найгіршим із можливих способів.
+function insideMarkup(page) {
+
+    if (!page.inside || !page.inside.length) return "";
+
+    const items = page.inside.map(name => `        <li>
+            <a href="/categories/${toSlug(name)}/">${escapeHtml(name)}</a>
+        </li>`).join("\n");
+
+    return `<nav class="taxonomy-hub" aria-label="Категорії розділу">
+    <ul class="taxonomy-hub-list">
+${items}
+    </ul>
+</nav>`;
+
+}
+
 function buildPage(template, page) {
 
     let html = template
@@ -469,9 +621,15 @@ function buildPage(template, page) {
         .replace(SUBTITLE_RE, () => `<p id="catalogSubtitle">${escapeHtml(page.intro || "")}</p>`)
         .replace(GRID_SLOT_RE, () => productsMarkup(page.products));
 
+    const hero = heroMarkup(page);
     const about = aboutMarkup(page);
+    const inside = insideMarkup(page);
 
-    if (about) html = html.replace(ABOUT_SLOT, () => about);
+    if (hero) html = html.replace(HERO_SLOT, () => hero);
+
+    if (about || inside) {
+        html = html.replace(ABOUT_SLOT, () => (about || ABOUT_SLOT) + (inside ? `\n\n${inside}` : ""));
+    }
 
     return html;
 
@@ -481,24 +639,28 @@ function buildPage(template, page) {
 // Хаби: /brands/ і /categories/
 // ---------------------------------------------------------------
 
+const HUB_TITLES = {
+    brand: { heading: "Бренди", dir: "brands", word: "брендів" },
+    category: { heading: "Категорії", dir: "categories", word: "категорій" },
+    department: { heading: "Розділи каталогу", dir: "departments", word: "розділів" }
+};
+
 function hubPage(kind, pages) {
 
-    const isBrands = kind === "brand";
+    const meta = HUB_TITLES[kind];
 
-    const heading = isBrands ? "Бренди" : "Категорії";
-    const slugDir = isBrands ? "brands" : "categories";
+    const heading = meta.heading;
+    const slugDir = meta.dir;
 
     const url = `${SITE_URL}/${slugDir}/`;
 
-    const intro = isBrands
-        ? `${pages.length} брендів у каталозі BestBrnd4u.`
-        : `${pages.length} категорій у каталозі BestBrnd4u.`;
+    const intro = `${pages.length} ${meta.word} у каталозі BestBrnd4u.`;
 
     return {
         kind: `${kind}-hub`,
         name: heading,
         slug: "",
-        dir: isBrands ? BRANDS_DIR : CATEGORIES_DIR,
+        dir: path.join(ROOT, slugDir),
         url,
         heading,
         title: `${heading} — BestBrnd4u`,
@@ -530,7 +692,7 @@ function hubMarkup(hub) {
 
     const items = hub.links.map(page => {
 
-        const href = page.kind === "brand" ? `/brands/${page.slug}/` : `/categories/${page.slug}/`;
+        const href = `/${HUB_TITLES[page.kind].dir}/${page.slug}/`;
 
         return `        <li>
             <a href="${escapeHtml(href)}">${escapeHtml(page.name)}</a>
@@ -611,13 +773,16 @@ function main() {
 
     const template = buildTemplate();
 
+    const categoryData = readJsonSafe(CATEGORIES_FILE, []);
+
     const brands = brandPages(products, readJsonSafe(BRANDS_FILE, []));
-    const categories = categoryPages(products, readJsonSafe(CATEGORIES_FILE, []));
+    const categories = categoryPages(products, categoryData);
+    const departments = departmentPages(products, categoryData, readRecords(DEPARTMENTS_SRC));
 
     let written = 0;
     const skipped = [];
 
-    [...brands, ...categories].forEach(page => {
+    [...brands, ...categories, ...departments].forEach(page => {
 
         const problem = slugProblem(page.slug);
 
@@ -635,22 +800,36 @@ function main() {
 
     // Хаби: з них починається обхід роботом, і саме вони роблять
     // сторінки брендів досяжними не лише з sitemap.
-    [hubPage("brand", brands), hubPage("category", categories)].forEach(hub => {
+    [
+        hubPage("brand", brands),
+        hubPage("category", categories),
+        hubPage("department", departments)
+    ].forEach(hub => {
         fs.mkdirSync(hub.dir, { recursive: true });
         fs.writeFileSync(path.join(hub.dir, "index.html"), buildHub(template, hub), "utf8");
     });
 
     const removed = pruneStale(BRANDS_DIR, new Set(brands.map(p => p.slug)))
-        + pruneStale(CATEGORIES_DIR, new Set(categories.map(p => p.slug)));
+        + pruneStale(CATEGORIES_DIR, new Set(categories.map(p => p.slug)))
+        + pruneStale(DEPARTMENTS_DIR, new Set(departments.map(p => p.slug)));
 
     skipped.forEach(line => console.warn(`⚠  ${line}`));
 
     console.log(`Готово: ${brands.length} брендів + ${categories.length} категорій`
-        + ` (+2 хаби) → brands/<slug>/, categories/<slug>/`
+        + ` + ${departments.length} розділів (+3 хаби)`
         + (removed ? `, прибрано зайвих: ${removed}` : ""));
 
 }
 
 if (require.main === module) main();
 
-module.exports = { brandPages, categoryPages, factsLine, listLine, STATIC_LIMIT };
+module.exports = {
+    brandPages,
+    categoryPages,
+    departmentPages,
+    readRecords,
+    factsLine,
+    listLine,
+    STATIC_LIMIT,
+    DEPARTMENTS_SRC
+};

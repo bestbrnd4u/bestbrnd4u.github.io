@@ -59,7 +59,17 @@ function main() {
 
         }
 
-        categories.push({ name: data.name, department: data.department });
+        // Заголовок і опис — необовʼязкові: якщо їх не заповнили, у
+        // зібраному файлі полів просто немає, і сторінка категорії
+        // обходиться автоматичним рядком про кількість і ціни.
+        const category = { name: data.name, department: data.department };
+
+        if (data.title && String(data.title).trim()) category.title = String(data.title).trim();
+        if (data.description && String(data.description).trim()) {
+            category.description = String(data.description).trim();
+        }
+
+        categories.push(category);
 
     });
 

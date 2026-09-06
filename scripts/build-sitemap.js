@@ -26,7 +26,8 @@ const CATEGORIES_FILE = path.join(ROOT, "data", "categories.json");
 // Перелік сторінок брендів і категорій беремо в того ж модуля, що їх
 // і будує. Свій список тут означав би, що sitemap колись почне
 // обіцяти сторінки, яких немає, — або мовчки не показувати наявні.
-const { brandPages, categoryPages } = require("./build-taxonomy-pages");
+const { brandPages, categoryPages, departmentPages, readRecords, DEPARTMENTS_SRC }
+    = require("./build-taxonomy-pages");
 const OUTPUT_FILE = path.join(ROOT, "sitemap.xml");
 
 const STATIC_PAGES = [
@@ -101,11 +102,20 @@ function main() {
     // Хаби й сторінки таксономії. Пріоритет вищий за товар: саме вони
     // виграють запити на кшталт «сумки Coach купити», і саме через них
     // робот знаходить решту.
+    const categoryData = readJsonSafe(CATEGORIES_FILE);
+
     const brands = brandPages(products, readJsonSafe(BRANDS_FILE));
-    const categories = categoryPages(products, readJsonSafe(CATEGORIES_FILE));
+    const categories = categoryPages(products, categoryData);
+    const departments = departmentPages(products, categoryData, readRecords(DEPARTMENTS_SRC));
 
     if (brands.length) entries.push(urlEntry(`${SITE_URL}/brands/`, "weekly", "0.7"));
     if (categories.length) entries.push(urlEntry(`${SITE_URL}/categories/`, "weekly", "0.7"));
+    if (departments.length) entries.push(urlEntry(`${SITE_URL}/departments/`, "weekly", "0.7"));
+
+    // Розділ ширший за категорію й за бренд — і пріоритет у нього
+    // найвищий після головної: саме на такі запити («сумки купити»)
+    // припадає найбільший попит.
+    departments.forEach(page => entries.push(urlEntry(page.url, "weekly", "0.95")));
 
     [...brands, ...categories].forEach(page => {
         entries.push(urlEntry(page.url, "weekly", "0.9"));
@@ -132,6 +142,7 @@ function main() {
     console.log(
         `Готово: ${STATIC_PAGES.length} статичних + ${products.length} товарів + ` +
         `${brands.length} брендів + ${categories.length} категорій + ` +
+        `${departments.length} розділів + ` +
         `${promotions.length} акцій → ${path.relative(ROOT, OUTPUT_FILE)}`
     );
 

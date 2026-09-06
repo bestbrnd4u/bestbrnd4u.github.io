@@ -103,7 +103,7 @@ function htmlFiles() {
     // catalog.html, тобто несе версії ПОПЕРЕДНЬОЇ збірки — і після
     // виливки браузер тягнув би з кеша старий catalog.js рівно там,
     // де він найпотрібніший.
-    ["p", "brands", "categories"].forEach(dir => {
+    ["p", "brands", "categories", "departments"].forEach(dir => {
 
         const base = path.join(ROOT, dir);
 

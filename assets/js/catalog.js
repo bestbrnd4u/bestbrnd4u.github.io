@@ -2733,7 +2733,7 @@ const PRESET = (window.CATALOG_PRESET && typeof window.CATALOG_PRESET === "objec
     : null;
 
 function presetActive() {
-    return Boolean(PRESET && (PRESET.brand || PRESET.category));
+    return Boolean(PRESET && (PRESET.brand || PRESET.category || PRESET.department));
 }
 
 function applyPreset() {
@@ -2742,6 +2742,7 @@ function applyPreset() {
 
     if (PRESET.brand) selectedBrands.add(PRESET.brand);
     if (PRESET.category) selectedCategories.add(PRESET.category);
+    if (PRESET.department) selectedDepartments.add(PRESET.department);
 
 }
 
@@ -2757,6 +2758,10 @@ function presetHolds() {
 
     if (PRESET.brand) {
         return selectedBrands.size === 1 && selectedBrands.has(PRESET.brand);
+    }
+
+    if (PRESET.department) {
+        return selectedDepartments.size === 1 && selectedDepartments.has(PRESET.department);
     }
 
     return selectedCategories.size === 1 && selectedCategories.has(PRESET.category);
@@ -2881,6 +2886,39 @@ function brandDescriptionHtml(text) {
 // щойно розгорнула (та ще й гасив би картинку на мить).
 let renderedBrand = null;
 
+// Кнопка «Детальніше» для опису, який уже лежить у розмітці.
+//
+// Виконується один раз: розмітку тут ніхто не перебудовує, тож і
+// вішати обробник удруге ні до чого.
+let aboutHydrated = false;
+
+function hydrateAbout() {
+
+    if (aboutHydrated || !brandAbout) return;
+
+    const textEl = brandAbout.querySelector(".brand-about-text");
+    const toggle = brandAbout.querySelector(".brand-about-toggle");
+
+    if (!textEl || !toggle) return;
+
+    aboutHydrated = true;
+
+    // Кнопку показуємо, лише якщо текст справді не вміщується у два
+    // рядки. Міряти можна тільки після розкладки, тому rAF.
+    requestAnimationFrame(() => {
+        toggle.hidden = textEl.scrollHeight <= textEl.clientHeight + 1;
+    });
+
+    toggle.addEventListener("click", () => {
+
+        const open = brandAbout.classList.toggle("is-open");
+
+        toggle.textContent = open ? "Згорнути" : "Детальніше";
+
+    });
+
+}
+
 function renderBrandHero() {
 
     // promo.html підключає цей самий файл, але цих блоків не має —
@@ -2893,6 +2931,22 @@ function renderBrandHero() {
     // Заголовок і крихти перечитуємо щоразу: бренд могли обрати вже
     // після завантаження сторінки, а стать — перемкнути будь-коли.
     renderBreadcrumbsAndTitle();
+
+    // Згенерована сторінка (бренд, категорія, розділ) уже несе і банер,
+    // і опис — їх поставив scripts/build-taxonomy-pages.js, щоб їх
+    // побачив пошуковий робот ще до JS.
+    //
+    // Перемальовувати їх звідси не можна: на сторінці категорії
+    // бренда немає, і код нижче просто СТЕР би авторський текст —
+    // єдине, чим сторінка відрізняється від сусідніх для пошуку.
+    // Лишається оживити кнопку «Детальніше».
+    if (PRESET) {
+
+        hydrateAbout();
+
+        return;
+
+    }
 
     // Бренд той самий — далі нічого не змінюється: вміст блоків від
     // решти фільтрів не залежить, а заголовок уже перемальовано вище.
@@ -2928,24 +2982,10 @@ function renderBrandHero() {
 
     if (!text) return;
 
-    const textEl = brandAbout.querySelector(".brand-about-text");
-    const toggle = brandAbout.querySelector(".brand-about-toggle");
+    // Розмітку щойно перебудували — обробник треба вішати заново.
+    aboutHydrated = false;
 
-    // Кнопку показуємо, лише якщо текст справді не вміщується у два
-    // рядки: під коротким описом «Детальніше» нічого не розкриває й
-    // виглядає зламаним. Міряти можна тільки після розкладки, тому
-    // requestAnimationFrame.
-    requestAnimationFrame(() => {
-        toggle.hidden = textEl.scrollHeight <= textEl.clientHeight + 1;
-    });
-
-    toggle.addEventListener("click", () => {
-
-        const open = brandAbout.classList.toggle("is-open");
-
-        toggle.textContent = open ? "Згорнути" : "Детальніше";
-
-    });
+    hydrateAbout();
 
 }
 
@@ -2985,6 +3025,11 @@ function syncCanonical() {
         && !selectedGenders.size && !selectedDepartments.size
         && !currentSection && !priceFilterActive() && currentPage === 1;
 
+    const onlyDepartment = selectedDepartments.size === 1
+        && !selectedBrands.size && !selectedColors.size && !selectedSizes.size
+        && !selectedGenders.size && !selectedCategories.size
+        && !currentSection && !priceFilterActive() && currentPage === 1;
+
     if (onlyBrand) {
         link.href = `${base}/brands/${latinParam([...selectedBrands][0])}/`;
         return;
@@ -2992,6 +3037,11 @@ function syncCanonical() {
 
     if (onlyCategory) {
         link.href = `${base}/categories/${latinParam([...selectedCategories][0])}/`;
+        return;
+    }
+
+    if (onlyDepartment) {
+        link.href = `${base}/departments/${latinParam([...selectedDepartments][0])}/`;
         return;
     }
 
@@ -3615,10 +3665,11 @@ function writeState(p, options) {
 
     const skipBrand = !keepPreset && presetActive() && Boolean(PRESET.brand);
     const skipCategory = !keepPreset && presetActive() && Boolean(PRESET.category);
+    const skipDepartment = !keepPreset && presetActive() && Boolean(PRESET.department);
 
     setOrDelete(p, URL_KEYS.section, currentSection);
     setOrDelete(p, URL_KEYS.gender, joinSet(selectedGenders));
-    setOrDelete(p, URL_KEYS.department, joinSet(selectedDepartments));
+    setOrDelete(p, URL_KEYS.department, skipDepartment ? "" : joinSet(selectedDepartments));
     setOrDelete(p, URL_KEYS.category, skipCategory ? "" : joinSet(selectedCategories));
     setOrDelete(p, URL_KEYS.brand, skipBrand ? "" : joinSet(selectedBrands));
     setOrDelete(p, URL_KEYS.color, joinSet(selectedColors));

@@ -291,8 +291,141 @@ console.log("\n[8] Сторінки в sitemap і з версіями файлі
     });
 }
 
+console.log("\n[9] Розділи — рівень над категорією");
+{
+    const categoryData = JSON.parse(read("data/categories.json"));
+
+    const departments = taxonomy.departmentPages(
+        products, categoryData, taxonomy.readRecords(taxonomy.DEPARTMENTS_SRC));
+
+    // Найширші запити («сумки купити») йдуть саме сюди: ні категорія
+    // (вона вужча), ні каталог (він про все одразу) їх не виграють.
+    const expected = new Set(categoryData
+        .filter(c => products.some(p => p.category === c.name))
+        .map(c => c.department));
+
+    check(`розділів із товарами — ${expected.size}, сторінок — ${departments.length}`,
+        departments.length === expected.size);
+
+    const problems = [];
+
+    departments.forEach(page => {
+
+        const file = `departments/${page.slug}/index.html`;
+
+        if (!exists(file)) { problems.push(`${page.name}: сторінки немає`); return; }
+
+        const html = read(file);
+
+        const canonical = (html.match(/<link rel="canonical" href="([^"]+)"/) || [])[1];
+
+        if (canonical !== page.url) problems.push(`${page.name}: canonical ${canonical}`);
+
+        if (!new RegExp(`CATALOG_PRESET = \\{"department":${JSON.stringify(page.name)}\\}`).test(html)) {
+            problems.push(`${page.name}: не той preset`);
+        }
+
+        // Від широкої сторінки мусить бути шлях до вужчих — інакше
+        // категорії досяжні хіба що з sitemap.
+        if (!/href="\/categories\/[a-z0-9-]+\//.test(html)) {
+            problems.push(`${page.name}: немає посилань на категорії`);
+        }
+
+    });
+
+    check("сторінки розділів на місці й правильні", problems.length === 0,
+        problems.slice(0, 3).join(" | "));
+
+    check("хаб розділів", exists("departments/index.html"));
+
+    const catalog = read("assets/js/catalog.js");
+
+    check("каталог знає розділ як фільтр сторінки",
+        /if \(PRESET\.department\) selectedDepartments\.add\(PRESET\.department\)/.test(catalog));
+
+    check("розділ не дублюється в запиті",
+        /const skipDepartment = !keepPreset && presetActive\(\) && Boolean\(PRESET\.department\)/.test(catalog));
+
+    check("зняли розділ — виходимо зі сторінки",
+        /if \(PRESET\.department\) \{\s*\n\s*return selectedDepartments\.size === 1/.test(catalog));
+
+    check("один розділ → canonical на його сторінку",
+        /link\.href = `\$\{base\}\/departments\/\$\{latinParam\(\[\.\.\.selectedDepartments\]\[0\]\)\}\/`/.test(catalog));
+
+    const home = JSON.parse(read("data/home.json"));
+
+    check("картки розділів на головній ведуть на сторінки",
+        (home.categories.items || []).every(item =>
+            !/department=/.test(item.link || "")),
+        (home.categories.items || []).map(i => i.link).join(" "));
+
+    const sitemap = read("sitemap.xml");
+
+    check("розділи в sitemap",
+        departments.every(page => sitemap.includes(`<loc>${page.url}</loc>`))
+        && sitemap.includes(`<loc>${SITE_URL}/departments/</loc>`));
+}
+
+console.log("\n[10] Свій текст для категорій і розділів");
+{
+    const admin = read("admin/config.yml");
+
+    // У бренда такі поля були від початку; тепер вони є і в двох
+    // інших видів сторінок — без них сторінка має лише автоматичний
+    // рядок про кількість і ціни, однаковий за формою в усіх.
+    check("колекція «Розділи» заведена", /- name: "departments"/.test(admin));
+
+    ["title", "description"].forEach(field => {
+        check(`поле ${field} є у розділів і категорій`,
+            (admin.match(new RegExp(`name: "${field}"`, "g")) || []).length >= 3);
+    });
+
+    check("тексти категорії доїжджають у зібраний файл",
+        /if \(data\.title && String\(data\.title\)\.trim\(\)\) category\.title/.test(
+            read("scripts/build-categories.js")));
+
+    // Перевіряємо не текст коду, а результат: заголовок і опис із
+    // запису мусять опинитись на сторінці.
+    const withText = taxonomy.categoryPages(
+        [{ slug: "x", title: "Товар", price: 100, category: "Тест", brand: "B" }],
+        [{ name: "Тест", department: "Сумки", title: "Свій заголовок", description: "Свій опис." }]
+    )[0];
+
+    check("категорія бере заголовок із адмінки", withText.heading === "Свій заголовок", withText.heading);
+    check("категорія бере опис із адмінки", withText.description === "Свій опис.", withText.description);
+
+    const noText = taxonomy.categoryPages(
+        [{ slug: "x", title: "Товар", price: 100, category: "Тест", brand: "B" }],
+        [{ name: "Тест", department: "Сумки" }]
+    )[0];
+
+    check("без запису — назва категорії як заголовок", noText.heading === "Тест");
+    check("без запису — опису немає", noText.description === "");
+
+    const dept = taxonomy.departmentPages(
+        [{ slug: "x", title: "Товар", price: 100, category: "Тест", brand: "B" }],
+        [{ name: "Тест", department: "Сумки" }],
+        new Map([["сумки", { name: "Сумки", title: "Сумки на кожен день", description: "Текст." }]])
+    )[0];
+
+    check("розділ бере заголовок із адмінки", dept.heading === "Сумки на кожен день", dept.heading);
+    check("розділ бере опис із адмінки", dept.description === "Текст.");
+
+    // Опис лежить у тому ж блоці, який на звичайному каталозі малює
+    // JS. На згенерованій сторінці JS мусить його НЕ чіпати — інакше
+    // єдиний авторський текст сторінки зникає одразу після рендеру.
+    const catalog = read("assets/js/catalog.js");
+
+    check("на згенерованій сторінці опис не перемальовується",
+        /if \(PRESET\) \{\s*\n\s*hydrateAbout\(\);/.test(catalog));
+
+    check("кнопка «Детальніше» все одно оживає",
+        /function hydrateAbout\(\)/.test(catalog)
+        && /aboutHydrated = false;\s*\n\s*hydrateAbout\(\);/.test(catalog));
+}
+
 console.log(failures === 0
-    ? `\n✅ Таксономія: ${brands.length} брендів + ${categories.length} категорій мають власні адреси\n`
+    ? `\n✅ Таксономія: ${brands.length} брендів + ${categories.length} категорій + розділи мають власні адреси\n`
     : `\n❌ Проблем: ${failures}\n`);
 
 process.exit(failures === 0 ? 0 : 1);
