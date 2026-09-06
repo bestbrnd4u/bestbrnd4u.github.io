@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"955f692b","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"5d9b13ee","data/products.json":"80f07012","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
+    <meta name="robots" content="noindex,nofollow">
+    <meta charset="UTF-8">
+
+<!-- Сторінка віддається під будь-якою адресою, зокрема глибокою
+     (/p/<slug>/). Без <base> відносні шляхи до стилів і скриптів
+     рахувались би від неї, і сторінка помилки приїхала б голою. -->
+<base href="/">
+    <meta name="author" content="BestBrnd4u">
+    <meta name="copyright" content="© 2026 BestBrnd4u. Усі права захищено.">
+    <link rel="license" href="/LICENSE">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Сторінку не знайдено. Можливо, посилання застаріло або товар уже розпродано — знайдіть потрібне через пошук і каталог BestBrnd4u.">
+    <meta name="theme-color" content="#111827">
+    <meta name="robots" content="noindex">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Сторінку не знайдено | BestBrnd4u">
+    <meta property="og:description" content="Такої сторінки немає. Знайдіть потрібне через пошук і каталог.">
+    <link rel="icon" href="favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicon-16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/images/favicon-192.png">
+    <title>Сторінку не знайдено | BestBrnd4u</title>
+
+    <link rel="stylesheet" href="assets/css/style.css?v=5361b8d9">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+<!-- MailerLite Universal -->
+<script>
+    (function(w,d,e,u,f,l,n){w[f]=w[f]||function(){(w[f].q=w[f].q||[])
+    .push(arguments);},l=d.createElement(e),l.async=1,l.src=u,
+    n=d.getElementsByTagName(e)[0],n.parentNode.insertBefore(l,n);})
+    (window,document,'script','https://assets.mailerlite.com/js/universal.js','ml');
+    ml('account', '2520119');
+</script>
+<!-- End MailerLite Universal -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"></script>
+
+</head>
+
+<body>
+
+
+<header>
+
+    <div class="container header">
+
+        <a href="/" class="logo">
+            BestBrnd4u
+        </a>
+
+        <nav>
+
+            <ul>
+
+                <li><a href="/">Головна</a></li>
+
+                <li class="has-mega"><a href="catalog" id="navCatalogLink">Каталог</a><div class="mega-menu" id="catalogMegaMenu">
+<a class="mega-item" href="catalog?gender=Жінкам"><img src="assets/images/banners/mega-women.webp" alt="Жінкам"><span>Жінкам</span></a>
+<a class="mega-item" href="catalog?gender=Чоловікам"><img src="assets/images/banners/mega-men.webp" alt="Чоловікам"><span>Чоловікам</span></a>
+<a class="mega-item" href="catalog?gender=Унісекс"><img src="assets/images/banners/mega-unisex.webp" alt="Унісекс"><span>Унісекс</span></a>
+<a class="mega-item" href="catalog?gender=Дітям"><img src="assets/images/banners/mega-kids.webp" alt="Дітям"><span>Дітям</span></a>
+</div></li>
+
+                <li class="has-mega"><a href="catalog?section=new" id="navNewLink">Новинки</a><div class="mega-menu">
+<a class="mega-item" href="catalog?section=new&gender=Жінкам"><img src="assets/images/banners/mega-women.webp" alt="Жінкам"><span>Жінкам</span></a>
+<a class="mega-item" href="catalog?section=new&gender=Чоловікам"><img src="assets/images/banners/mega-men.webp" alt="Чоловікам"><span>Чоловікам</span></a>
+<a class="mega-item" href="catalog?section=new&gender=Унісекс"><img src="assets/images/banners/mega-unisex.webp" alt="Унісекс"><span>Унісекс</span></a>
+<a class="mega-item" href="catalog?section=new&gender=Дітям"><img src="assets/images/banners/mega-kids.webp" alt="Дітям"><span>Дітям</span></a>
+</div></li>
+
+                <li class="has-mega"><a href="catalog?section=sale" id="navSaleLink" class="sale-text">Акції</a><div class="mega-menu">
+<a class="mega-item" href="catalog?section=sale&gender=Жінкам"><img src="assets/images/banners/mega-women.webp" alt="Жінкам"><span>Жінкам</span></a>
+<a class="mega-item" href="catalog?section=sale&gender=Чоловікам"><img src="assets/images/banners/mega-men.webp" alt="Чоловікам"><span>Чоловікам</span></a>
+<a class="mega-item" href="catalog?section=sale&gender=Унісекс"><img src="assets/images/banners/mega-unisex.webp" alt="Унісекс"><span>Унісекс</span></a>
+<a class="mega-item" href="catalog?section=sale&gender=Дітям"><img src="assets/images/banners/mega-kids.webp" alt="Дітям"><span>Дітям</span></a>
+</div></li>
+
+                <li><a href="bayer-service">Байєр-сервіс</a></li>
+
+                <li><a href="contacts">Контакти</a></li>
+
+            </ul>
+
+        </nav>
+
+        <div class="header-icons">
+
+            <button id="searchBtn">🔍</button>
+<a href="account" id="accountLink">👤</a>
+
+            <a href="favorites">         ❤         <span id="favCount">0</span>     </a>
+
+            <div class="cart-icon-wrap">
+    <a href="cart" id="cartIconLink">
+        🛒
+        <span id="cartCount">0</span>
+    </a>
+    <div id="cartPopup" class="cart-popup" hidden></div>
+</div>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+<section class="breadcrumbs">
+
+    <div class="container">
+
+        <a href="/">Головна</a>
+
+        <span class="crumb-sep">→</span>
+
+        <span>Сторінку не знайдено</span>
+
+    </div>
+
+</section>
+
+<section class="bayer-section" style="padding-top:36px;">
+
+    <div class="container">
+
+        <div class="bayer-hero-banner dp-hero-banner">
+
+            <div class="bayer-hero-content">
+
+                <span class="bayer-hero-badge">404</span>
+
+                <h1>Такої сторінки немає</h1>
+
+                <p>
+                    Найчастіше це одне з трьох: посилання застаріло, в адресі
+                    загубився символ — або товар уже розпродано, і ми прибрали
+                    його зі сайту. Магазин на місці, зникла тільки ця адреса.
+                </p>
+
+                <div class="bayer-hero-actions">
+                    <button type="button" class="btn" id="notFoundSearchBtn">Пошук по каталогу</button>
+                    <a href="catalog" class="btn btn-outline">Усі товари</a>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- Схожі товари. Наповнює assets/js/not-found.js: якщо адреса схожа
+     на сторінку товару, шукає найближчі за назвою й брендом. Поки
+     нічого не знайдено — блок прихований, а не порожній. -->
+<section class="similar" id="notFoundSuggestions" hidden>
+
+    <div class="container">
+
+        <h2 id="notFoundSuggestionsTitle">Схожі товари</h2>
+
+        <div class="carousel" id="notFoundCarousel">
+
+            <button type="button" class="carousel-arrow carousel-prev" aria-label="Попередні товари">
+                <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+
+            <div id="notFoundGrid" class="products-grid carousel-track"></div>
+
+            <button type="button" class="carousel-arrow carousel-next" aria-label="Наступні товари">
+                <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- Переглянуті товари: той самий блок, що в каталозі й на сторінці
+     товару. Людина, яка прийшла по битому посиланню, найшвидше
+     повертається саме до того, що вже дивилась. -->
+<section class="similar" id="recentlyViewedSection" hidden>
+
+    <div class="container">
+
+        <h2>Переглянуті товари</h2>
+
+        <div class="carousel" id="recentlyViewedCarousel">
+
+            <button type="button" class="carousel-arrow carousel-prev" aria-label="Попередні товари">
+                <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+
+            <div id="recentlyViewedGrid" class="products-grid carousel-track"></div>
+
+            <button type="button" class="carousel-arrow carousel-next" aria-label="Наступні товари">
+                <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="bayer-section">
+
+    <div class="container">
+
+        <div class="bayer-benefits-grid">
+
+            <div class="bayer-benefit-card">
+                <div class="bayer-benefit-icon">🛍</div>
+                <h3>Каталог</h3>
+                <p>Сумки, взуття й аксесуари — з фільтрами за брендом, розміром і ціною.
+                    <a href="catalog">Перейти в каталог →</a></p>
+            </div>
+
+            <div class="bayer-benefit-card">
+                <div class="bayer-benefit-icon">✈</div>
+                <h3>Не знайшли потрібне?</h3>
+                <p>Привозимо під замовлення з європейських бутиків — навіть те, чого немає в каталозі.
+                    <a href="bayer-service">Байєр-сервіс →</a></p>
+            </div>
+
+            <div class="bayer-benefit-card">
+                <div class="bayer-benefit-icon">✉</div>
+                <h3>Питання лишилось</h3>
+                <p>Напишіть у Telegram або на пошту — відповідаємо щодня з 09:00 до 20:00.
+                    <a href="contacts">Контакти →</a></p>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<footer>
+
+    <div class="container footer">
+
+        <div>
+
+            <h3>BestBrnd4u</h3>
+
+            <p>
+                Інтернет-магазин сумок
+та аксесуарів.
+            </p>
+
+            <div class="footer-social">
+                <a href="https://www.instagram.com/bestbrnd4u" target="_blank" rel="noopener" aria-label="Instagram">
+                    Instagram
+                </a>
+                <a href="https://t.me/bestbrnd4u" target="_blank" rel="noopener" aria-label="Telegram">
+                    Telegram
+                </a>
+            </div>
+
+        </div>
+
+        <div>
+
+            <h3>Покупцям</h3>
+
+            <a href="delivery-payment#delivery">Доставка</a>
+            <a href="delivery-payment#payment">Оплата</a>
+            <a href="return-warranty">Повернення та гарантія</a>
+            <a href="bayer-service">Байєр-сервіс</a>
+            <a href="privacy-policy">Політика конфіденційності</a>
+            <!-- Згоду треба вміти відкликати так само легко, як дати -->
+            <a href="#" data-consent-reopen>Налаштування даних</a>
+
+        </div>
+
+        <div>
+
+            <h3>Каталог</h3>
+
+            <a href="catalog">Всі товари</a>
+
+            <a href="catalog?section=new">Новинки</a>
+
+            <a href="catalog?section=sale" class="sale-text">Акції</a>
+
+            <a href="#">Бренди</a>
+
+        </div>
+
+        <div>
+
+            <h3>Зв'яжіться з нами</h3>
+
+            <p>📍 Україна</p>
+
+            <p>✉ <a class="mail-link" href="mailto:bestbrnd4u@proton.me">bestbrnd4u@proton.me</a></p>
+
+            <p>✈ <a class="tg-link" href="https://t.me/bestbrnd4u" target="_blank" rel="noopener">@bestbrnd4u</a></p>
+
+            <p>☎ <a class="phone-link" href="tel:+380000000000">+380 73 728 82 91</a></p>
+
+            <p>🕘 Пн–Нд 09:00–20:00</p>
+
+        </div>
+
+    </div>
+
+</footer>
+
+<div class="copyright">
+
+    <div class="container">
+
+    © 2026 bestbrnd4u.
+    Всі права захищені.
+
+    </div>
+
+</div>
+
+<button id="scrollTop" class="scroll-top" aria-label="Нагору">
+    ↑
+</button>
+
+<script src="assets/js/supabase-client.js?v=42a4012d"></script>
+<!-- Кадрування фото товару. Той самий файл підключає адмінка,
+     тож прев'ю в ній і картка на сайті рахуються однаково. -->
+<script src="assets/js/image-framing.js?v=80b29a57"></script>
+<!-- Хлібні крихти: спільний будівник для сторінки й розмітки BreadcrumbList -->
+<script src="assets/js/breadcrumbs.js?v=f8e67fc2"></script>
+<!-- Оформлення текстових блоків з адмінки (кольори, шрифт, кнопка) -->
+<script src="assets/js/text-styles.js?v=7dc05c7d"></script>
+<!-- Згода на використання даних (банер + блокування вбудованого відео) -->
+<script src="assets/js/consent.js?v=63cbf725"></script>
+<!-- Статистика відвідувань. Не завантажує Google без згоди. -->
+<script src="assets/js/analytics.js?v=9b4797b8"></script>
+<!-- Транслітерація: productUrl() кладе колір в адресу латиницею.
+     Той самий файл використовує збірка для адрес товарів. -->
+<script src="assets/js/translit.js?v=c0957cb7"></script>
+<script src="assets/js/common.js?v=2bae8d12"></script>
+<script src="assets/js/sync.js?v=48ef002e"></script>
+<script src="assets/js/mega-menu.js?v=b254fbf6"></script>
+<script src="assets/js/ui.js?v=c1453fdd"></script>
+
+<!-- Що показати замість зниклої сторінки -->
+<script src="assets/js/not-found.js?v=e3a059e2"></script>
+
+
+</body>
+
+</html>

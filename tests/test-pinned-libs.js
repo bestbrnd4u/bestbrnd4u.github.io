@@ -69,7 +69,10 @@ console.log("\n[3] supabase-js — найважливіший випадок");
 {
   const pages = files.filter(f => read(f).includes("supabase-js"));
 
-  check("підключений там, де й був (14 сторінок)", pages.length === 14, pages.length);
+  // 15 = усі сторінки в корені. Число тут навмисне: воно ловить
+  // випадок, коли нову сторінку зробили копіюванням і бібліотека до
+  // неї не доїхала (або, навпаки, доїхала друга копія).
+  check("підключений на всіх 15 сторінках", pages.length === 15, pages.length);
 
   const unpinned = pages.filter(f => /supabase-js@2["'/]/.test(read(f)));
   check("немає жодного @2 без уточнення", unpinned.length === 0, unpinned.join(", "));
