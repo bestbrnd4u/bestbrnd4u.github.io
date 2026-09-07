@@ -7,6 +7,11 @@
 // вони позначені <meta name="robots" content="noindex"> в самих
 // сторінках, і в sitemap їм не місце.
 //
+// У сторінок товару йдуть ще й ФОТО (розширення image sitemap).
+// Галерея малюється скриптом, тож у статичній розмітці немає ані
+// одного <img> із фото товару — sitemap лишається єдиним надійним
+// шляхом, яким Google Images про них дізнається.
+//
 // Запускається автоматично через GitHub Actions після build-products.js
 // і build-promotions.js — тож sitemap.xml завжди актуальний і не
 // вимагає ручного оновлення при додаванні товару через адмінку.
@@ -28,6 +33,11 @@ const CATEGORIES_FILE = path.join(ROOT, "data", "categories.json");
 // обіцяти сторінки, яких немає, — або мовчки не показувати наявні.
 const { brandPages, categoryPages, departmentPages, readRecords, DEPARTMENTS_SRC }
     = require("./build-taxonomy-pages");
+// Абсолютні адреси картинок будує той самий помічник, що й фід:
+// у даних трапляються обидві форми («/assets/…» і «assets/…»), і
+// друга реалізація цього правила колись розійшлася б із першою.
+const { absolute } = require("./build-feed");
+
 const OUTPUT_FILE = path.join(ROOT, "sitemap.xml");
 
 const STATIC_PAGES = [
@@ -62,13 +72,68 @@ function xmlEscape(value) {
 
 }
 
-function urlEntry(loc, changefreq, priority) {
+// Скільки фото віддаємо на товар.
+//
+// Google приймає до 1000 на адресу, але сенсу в такій кількості
+// немає: після кількох ракурсів однієї речі решта не ранжується, а
+// sitemap росте. Шість — це три ракурси двох кольорів, тобто
+// типовий товар цілком.
+const MAX_IMAGES = 6;
+
+// Фото сторінки товару: власні фото товару плюс фото кожного
+// кольору.
+//
+// ЧОМУ ВСІ КОЛЬОРИ, А НЕ ЛИШЕ АКТИВНИЙ. Вони на ТІЙ САМІЙ сторінці:
+// перемикач кольору не веде нікуди, він перемальовує галерею. Тож
+// це фото цієї адреси, і саме так їх треба заявити.
+function productImages(product, siteUrl) {
+
+    const raw = [
+        ...(Array.isArray(product.images) ? product.images : []),
+        ...(Array.isArray(product.variants) ? product.variants : [])
+            .flatMap(variant => Array.isArray(variant && variant.images) ? variant.images : [])
+    ];
+
+    const seen = new Set();
+    const list = [];
+
+    raw.forEach(src => {
+
+        // Відбиток кеша прибираємо: у JSON-LD сторінки адреси без
+        // нього, і дві форми однієї картинки Google вважав би
+        // різними файлами.
+        const url = absolute(String(src || "").split("?")[0], siteUrl);
+
+        if (!url || seen.has(url)) return;
+
+        seen.add(url);
+        list.push(url);
+
+    });
+
+    return list.slice(0, MAX_IMAGES);
+
+}
+
+// Один запис sitemap. images — необов'язкові: їх мають лише
+// сторінки товару.
+function urlEntry(loc, changefreq, priority, images) {
+
+    const photos = (images || []).map(image => [
+        "    <image:image>",
+        `      <image:loc>${xmlEscape(image.loc)}</image:loc>`,
+        // Підпис допомагає Google зрозуміти, що на фото. Порожнього
+        // тега не лишаємо: він гірший за відсутній.
+        image.title ? `      <image:title>${xmlEscape(image.title)}</image:title>` : "",
+        "    </image:image>"
+    ].filter(Boolean).join("\n"));
 
     return [
         "  <url>",
         `    <loc>${xmlEscape(loc)}</loc>`,
         `    <changefreq>${changefreq}</changefreq>`,
         `    <priority>${priority}</priority>`,
+        ...photos,
         "  </url>"
     ].join("\n");
 
@@ -80,6 +145,8 @@ function main() {
     const promotions = readJsonSafe(PROMOTIONS_FILE);
 
     const entries = [];
+
+    let photos = 0;
 
     STATIC_PAGES.forEach(page => {
         entries.push(urlEntry(`${SITE_URL}${page.loc}`, page.changefreq, page.priority));
@@ -95,8 +162,20 @@ function main() {
         // просити Google індексувати редірект.
         if (!product || !product.slug) return;
 
+        // Назва в підписі — та сама, що в заголовку сторінки: бренд
+        // плюс модель. Саме за нею картинку й шукають.
+        const title = [product.brand, product.title]
+            .map(part => String(part || "").trim())
+            .filter(Boolean)
+            .join(" ");
+
+        const images = productImages(product, SITE_URL)
+            .map(loc => ({ loc, title }));
+
+        photos += images.length;
+
         entries.push(
-            urlEntry(`${SITE_URL}/p/${encodeURIComponent(product.slug)}/`, "weekly", "0.8")
+            urlEntry(`${SITE_URL}/p/${encodeURIComponent(product.slug)}/`, "weekly", "0.8", images)
         );
 
     });
@@ -135,7 +214,10 @@ function main() {
 
     const xml =
         `<?xml version="1.0" encoding="UTF-8"?>\n` +
-        `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
+        // Без цього простору імен теги image:* — просто невідома
+        // розмітка, і Google мовчки пропустить усі фото.
+        `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n` +
+        `        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n` +
         `${entries.join("\n")}\n` +
         `</urlset>\n`;
 
@@ -145,9 +227,16 @@ function main() {
         `Готово: ${STATIC_PAGES.length} статичних + ${products.length} товарів + ` +
         `${brands.length} брендів + ${categories.length} категорій + ` +
         `${departments.length} розділів + ` +
-        `${promotions.length} акцій → ${path.relative(ROOT, OUTPUT_FILE)}`
+        `${promotions.length} акцій + ${photos} фото → ${path.relative(ROOT, OUTPUT_FILE)}`
     );
 
 }
 
-main();
+// Охорона обов'язкова саме тому, що нижче з'явився module.exports:
+// без неї require() із тесту перезаписував би sitemap.xml.
+if (require.main === module) main();
+
+// Експортуємо, щоб тест перевіряв складання записів, а не
+// готовий файл: файл перезбирає CI, і в свіжому клоні він
+// відстає від джерел.
+module.exports = { urlEntry, productImages, MAX_IMAGES };
