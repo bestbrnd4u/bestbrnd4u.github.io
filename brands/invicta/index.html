@@ -2,7 +2,7 @@
 <html lang="uk">
 
 <head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"9da03b72","data/catalog.json":"8c0679da","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"5d9b13ee","data/legal.json":"f84751b2","data/notifications.json":"670aa3fa","data/products-updated.json":"94144576","data/products.json":"6a5dfc79","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/security.json":"34f399a1","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"9da03b72","data/catalog.json":"8c0679da","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"5d9b13ee","data/legal.json":"f84751b2","data/notifications.json":"670aa3fa","data/products-updated.json":"94144576","data/products.json":"6a5dfc79","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/security.json":"34f399a1","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
 
 <!-- Сторінка лежить у /brands/<slug>/ або /categories/<slug>/,
      а скрипти будують шляхи як з кореня ("data/products.json").
@@ -97,20 +97,11 @@
 // адреси: адреса тут — шлях, а не ?brand=.
 window.CATALOG_PRESET = {"brand":"Invicta"};
 </script>
-<link rel="stylesheet" href="/assets/css/style.css?v=cd2dbd66">
+<link rel="stylesheet" href="/assets/css/style.css?v=c3a75572">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
 rel="stylesheet">
-<!-- MailerLite Universal -->
-<script>
-    (function(w,d,e,u,f,l,n){w[f]=w[f]||function(){(w[f].q=w[f].q||[])
-    .push(arguments);},l=d.createElement(e),l.async=1,l.src=u,
-    n=d.getElementsByTagName(e)[0],n.parentNode.insertBefore(l,n);})
-    (window,document,'script','https://assets.mailerlite.com/js/universal.js','ml');
-    ml('account', '2520119');
-</script>
-<!-- End MailerLite Universal -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"></script>
 
@@ -577,6 +568,45 @@ Telegram
             <p>✈ <a class="tg-link" href="https://t.me/bestbrnd4u" target="_blank" rel="noopener">@bestbrnd4u</a></p>
 <p>☎ <a class="phone-link" href="tel:+380737288291">+380 73 728 82 91</a></p>
 <p>🕘 Пн–Нд 09:00–20:00</p>
+
+<!-- Підписка на листи.
+
+     Раніше на кожній сторінці вантажився universal.js
+     MailerLite (52 КБ) і не було жодної форми. Тепер
+     навпаки: скрипта немає, а форма надсилає адресу
+     через нашу функцію — ключ MailerLite живе в
+     секретах, а не в коді сайту.
+
+     Галочка НЕ проставлена заздалегідь: згода, якої
+     людина не ставила, згодою не є. -->
+<form class="subscribe" id="subscribeForm" novalidate>
+
+    <label class="subscribe-label" for="subscribeEmail">
+        Новинки й акції на пошту
+    </label>
+
+    <div class="subscribe-row">
+        <input
+            type="email"
+            id="subscribeEmail"
+            placeholder="you@example.com"
+            autocomplete="email"
+            required>
+        <button type="submit" id="subscribeSubmit">Підписатись</button>
+    </div>
+
+    <label class="subscribe-consent">
+        <input type="checkbox" id="subscribeConsent">
+        <span>
+            Згоден отримувати листи про новинки й акції.
+            Відписатись можна з будь-якого листа —
+            <a href="/privacy-policy">як ми поводимось із даними</a>.
+        </span>
+    </label>
+
+    <p class="subscribe-note" id="subscribeNote" hidden></p>
+
+</form>
 </div>
 </div>
 </footer>
@@ -612,11 +642,13 @@ aria-label="Нагору">
 <!-- Транслітерація: каталог кладе латиницю в адресу фільтра.
      Той самий файл використовує збірка для адрес товарів. -->
 <script src="/assets/js/translit.js?v=c0957cb7"></script>
-<script src="/assets/js/common.js?v=75d29d3a"></script>
+<script src="/assets/js/common.js?v=91437eec"></script>
+<!-- Підписка на листи магазину -->
+<script src="/assets/js/subscribe.js?v=2a90922b"></script>
 <script src="/assets/js/promo-popup.js?v=2317f6f3"></script>
 <script src="/assets/js/sync.js?v=48ef002e"></script>
 <script src="/assets/js/mega-menu.js?v=803d52cc"></script>
-<script src="/assets/js/ui.js?v=c1453fdd"></script>
+<script src="/assets/js/ui.js?v=50565c32"></script>
 <script src="/assets/js/stock.js?v=85fa4aad"></script>
 <script src="/assets/js/live-stock.js?v=288763d6"></script>
 <script src="/assets/js/catalog.js?v=9d3a0c8b"></script>

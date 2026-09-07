@@ -343,7 +343,24 @@ console.log("\n[6] Дев-збірка налаштована в CI");
         /node scripts\/build-dev\.js/.test(pkg2.scripts["build:dev"]));
 
     const prodWf = read(".github/workflows/build-products.yml");
-    check("прод-збірка застосовує середовище", prodWf.includes("apply-site-env.js"));
+
+    // Крок може бути виписаний окремо АБО входити в `npm run build` —
+    // перевіряємо досяжність, а не назву кроку. Раніше тут стояло
+    // просте prodWf.includes("apply-site-env.js"), і перевірка падала
+    // рівно тоді, коли перелік кроків замінили на один `npm run build`,
+    // хоч середовище від цього застосовуватись не перестало.
+    const prodRunsFullBuild = /run: npm run build\s*$/m.test(prodWf);
+
+    check("прод-збірка застосовує середовище",
+        prodWf.includes("apply-site-env.js")
+        || (prodRunsFullBuild && pkg2.scripts.build.includes("apply-site-env.js")));
+
+    // Найдорожча помилка в цьому файлі — прод, зібраний як дев:
+    // сайт працює бездоганно і при цьому має noindex та robots.txt із
+    // Disallow, тобто зникає з пошуку. Копія кроку з build-dev.yml
+    // (разом із `SITE_ENV: development`) дає рівно це.
+    check("прод-збірка не збирає під дев-середовище",
+        !/SITE_ENV: development/.test(prodWf));
 
     // КОЖЕН workflow, що пише в main, мусить сам запустити деплой.
     //

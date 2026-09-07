@@ -58,6 +58,9 @@ import {
   cleanReview, orderHasProduct, reviewCard, reviewKeyboard,
   parseReviewAction, reviewVerdictLine, reviewPhoneMatches,
 } from "./reviews.js";
+import {
+  cleanSubscriber, subscribeRequest, subscribeVerdict,
+} from "./subscribe.js";
 
 const TELEGRAM_BOT_TOKEN = Deno.env.get("TELEGRAM_BOT_TOKEN") ?? "";
 const TELEGRAM_CHAT_ID = Deno.env.get("TELEGRAM_CHAT_ID") ?? "";
@@ -132,6 +135,22 @@ const META_CAPI_TOKEN = Deno.env.get("META_CAPI_TOKEN") ?? "";
 // звіти — саме так переконуються, що інтеграція жива. Після перевірки
 // секрет прибирають, інакше жодна покупка не дійде до оптимізації.
 const META_CAPI_TEST_CODE = Deno.env.get("META_CAPI_TEST_CODE") ?? "";
+
+// Ключ MailerLite — для підписки на листи магазину.
+//
+// ЦЕ СЕКРЕТ. Він дає право читати й правити ВЕСЬ список підписників,
+// тому в коді сайту йому місця немає — так само, як ключу Нової пошти
+// й токену Meta.
+//
+// Порожній = форма підписки відповідає, що зараз не працює, і нічого
+// не надсилає.
+const MAILERLITE_API_KEY = Deno.env.get("MAILERLITE_API_KEY") ?? "";
+
+// Група, у яку складати тих, хто підписався на сайті.
+//
+// Необов'язкова. Без неї люди йдуть у загальний список; із нею видно,
+// хто прийшов саме з сайту, а не з іншого джерела.
+const MAILERLITE_GROUP_ID = Deno.env.get("MAILERLITE_GROUP_ID") ?? "";
 
 const TELEGRAM_API = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}`;
 
@@ -2365,6 +2384,82 @@ async function handleReviewCallback(callback: Record<string, any>, data: string)
 
 }
 
+// -------------------------
+// Підписка на листи магазину
+//
+// Чому без скрипта MailerLite і чому через нас — у subscribe.js.
+// -------------------------
+
+async function handleSubscribe(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  const clean = cleanSubscriber(body);
+
+  if (!clean.ok) {
+
+    console.warn("Підписку відхилено:", clean.reason);
+
+    return adminJson({ ok: false, error: "bad_email" }, 400, origin);
+
+  }
+
+  const plan = subscribeRequest(MAILERLITE_API_KEY, clean.subscriber, MAILERLITE_GROUP_ID);
+
+  if (!plan) {
+
+    // Ключа немає — форма про це й скаже. Не «ок»: інакше людина
+    // вважала б себе підписаною, а в списку її немає.
+    return adminJson({ ok: false, error: "not_configured" }, 501, origin);
+
+  }
+
+  // Межа звернень — та сама, що на сторінці «Де моє замовлення»
+  // (міграція 017). Без неї форму можна перетворити на спосіб
+  // завалити чужу скриньку листами підтвердження.
+  if (!(await lookupAllowed(clientIp(request)))) {
+    return adminJson({ ok: false, error: "too_many" }, 429, origin);
+  }
+
+  try {
+
+    const response = await fetch(plan.url, {
+      method: "POST",
+      headers: plan.headers,
+      body: JSON.stringify(plan.body),
+    });
+
+    const data = await response.json().catch(() => null);
+
+    const verdict = subscribeVerdict(response.status, data);
+
+    if (!verdict.ok) {
+
+      console.error("MailerLite відмовив:", verdict.reason);
+
+      // Недійсний ключ — це наша проблема, і про неї треба знати:
+      // форма при цьому мовчки перестає працювати, а людина бачить
+      // «спробуйте пізніше» й іде.
+      if (/недійсний/.test(verdict.reason ?? "")) {
+        await reportServerIssue("mail_list", `MailerLite: ${verdict.reason}`);
+      }
+
+      return adminJson({ ok: false, error: "rejected" }, 200, origin);
+
+    }
+
+    return adminJson({ ok: true, already: verdict.already === true }, 200, origin);
+
+  } catch (error) {
+
+    console.error("MailerLite недоступний:", error);
+
+    return adminJson({ ok: false, error: "unavailable" }, 200, origin);
+
+  }
+
+}
+
 async function handleAdmin(request: Request, body: Record<string, any>): Promise<Response> {
 
   const origin = request.headers.get("origin");
@@ -2579,6 +2674,13 @@ async function handleRequest(request: Request): Promise<Response> {
   if (body.site_action === "add-review") {
 
     return await handleAddReview(request, body);
+
+  }
+
+  // --- підписка на листи магазину ---
+  if (body.site_action === "subscribe") {
+
+    return await handleSubscribe(request, body);
 
   }
 

@@ -13246,3 +13246,117 @@ body.refusal-open{
     }
 
 }
+
+/* Рядок розмірів, у якому нічого, крім внутрішньої заглушки
+   ONESIZE (сумки, годинники, окуляри, гаманці).
+
+   display:none, а не видалення з розмітки: саме з кнопки
+   всередині сайт бере розмір для кошика (getCardSelection).
+   Прибрати її означало б, що той самий товар із картки й зі
+   сторінки дає різні рядки кошика. */
+.sizes-placeholder{
+    display:none !important;
+}
+
+/* =========================================================
+   Підписка на листи в підвалі
+
+   Раніше на кожній сторінці вантажився universal.js MailerLite
+   (52 КБ) і не було жодної форми. Тепер навпаки.
+   ========================================================= */
+
+.subscribe{
+    margin-top:18px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    max-width:320px;
+}
+
+.subscribe-label{
+    font-size:13px;
+    font-weight:600;
+    color:inherit;
+}
+
+.subscribe-row{
+    display:flex;
+    gap:8px;
+}
+
+.subscribe-row input{
+    flex:1;
+    min-width:0;
+    padding:9px 11px;
+    font-size:14px;
+    font-family:inherit;
+    border:1px solid rgba(255,255,255,.25);
+    border-radius:8px;
+    background:rgba(255,255,255,.06);
+    color:inherit;
+}
+
+.subscribe-row input::placeholder{
+    color:rgba(255,255,255,.45);
+}
+
+.subscribe-row input:focus{
+    outline:none;
+    border-color:rgba(255,255,255,.6);
+}
+
+.subscribe-row button{
+    flex-shrink:0;
+    padding:9px 14px;
+    font-size:14px;
+    font-family:inherit;
+    font-weight:600;
+    color:var(--gray900);
+    background:#fff;
+    border:0;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.subscribe-row button:disabled{
+    opacity:.6;
+    cursor:default;
+}
+
+/* Галочка згоди. Не проставлена заздалегідь: згода, якої людина не
+   ставила, згодою не є. */
+.subscribe-consent{
+    display:flex;
+    align-items:flex-start;
+    gap:8px;
+    font-size:12px;
+    line-height:1.45;
+    color:rgba(255,255,255,.6);
+    cursor:pointer;
+}
+
+.subscribe-consent input{
+    flex-shrink:0;
+    margin-top:2px;
+    accent-color:#fff;
+}
+
+.subscribe-consent a{
+    color:inherit;
+    text-decoration:underline;
+}
+
+.subscribe-note{
+    margin:0;
+    font-size:12.5px;
+    line-height:1.45;
+}
+
+.subscribe-note-ok{ color:#8fe0ad; }
+.subscribe-note-error{ color:#f3b0b0; }
+
+@media(max-width:640px){
+
+    .subscribe{ max-width:none; }
+
+}

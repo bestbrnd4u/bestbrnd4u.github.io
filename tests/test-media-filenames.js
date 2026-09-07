@@ -28,7 +28,12 @@ const check = (n, c, e) => {
 // близько 55 символів) плюс службові теки git.
 const MAX_PATH_IN_REPO = 150;
 
-const SKIP = new Set(["node_modules", ".git"]);
+// .claude — робочі копії репозиторію (git worktree), які створює
+// Claude Code для окремих завдань. Це ТОЙ САМИЙ репозиторій, тож
+// без цього пропуску сканер міряє шляхи всередині копії — а вони
+// довші рівно на її назву, і тест падає не через файли, а через
+// саму наявність копії.
+const SKIP = new Set(["node_modules", ".git", ".claude"]);
 
 function allPaths(dir, prefix = "") {
 

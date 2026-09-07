@@ -3292,6 +3292,44 @@ function getProductGenderLabel(product) {
 
 }
 
+// Заглушка «розміру немає».
+//
+// Її ставить збірка товарам без розмірів — сумкам, годинникам,
+// окулярам, гаманцям. Регістр різний навмисно: у даних свого часу
+// співіснували ONESIZE і Onesize (див. scripts/build-products.js).
+const NO_SIZE_LABEL = "ONESIZE";
+
+function isPlaceholderSize(size) {
+
+    return String(size || "").trim().toUpperCase() === NO_SIZE_LABEL;
+
+}
+
+// Чи цей рядок розмірів варто показувати.
+//
+// Не варто, коли в ньому НІЧОГО, крім заглушки: «ONESIZE» під
+// кожною сумкою покупець читає як помилку в даних — і має рацію.
+//
+// Кнопку при цьому НЕ прибираємо: саме з неї сайт бере розмір для
+// кошика. Ховається рядок, дані лишаються ті самі.
+//
+// ЧОМУ ВИКЛИКИ ОБГОРНУТІ В typeof. Рендерери (ui.js, cart.js,
+// favorites.js, product.js) кличуть цю функцію так:
+//
+//   typeof sizeRowHidden === "function" && sizeRowHidden(sizes)
+//
+// Не з обережності, а тому що дев'ять тестів витягують ці рендерери
+// поодинці й запускають без common.js — без обгортки вони падають на
+// ReferenceError. Той самий прийом уже вживається для supabaseClient
+// і initCarousel, і з тієї ж причини.
+function sizeRowHidden(sizes) {
+
+    const list = Array.isArray(sizes) ? sizes : [];
+
+    return list.length > 0 && list.every(isPlaceholderSize);
+
+}
+
 function getVariantSizes(product, variant) {
 
     if (variant && Array.isArray(variant.sizes) && variant.sizes.length) {

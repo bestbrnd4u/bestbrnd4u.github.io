@@ -33,6 +33,8 @@ const read = rel => fs.readFileSync(path.join(ROOT, rel), "utf8");
 const monitor = read("scripts/monitor.js");
 const digest = read("scripts/report-issues.js");
 const workflow = read(".github/workflows/monitor.yml");
+// еталон переліку кроків збірки: розділ [3] звіряє з ним обидва CI-workflow
+const pkg = JSON.parse(read("package.json"));
 const client = read("assets/js/error-report.js");
 const sql = read("supabase/migrations/013-site-issues.sql");
 
@@ -134,7 +136,82 @@ console.log("\n[3] Розклад");
         check(`${file}: збій знімка не ламає збірку`,
             /continue-on-error: true/.test(build));
 
+        // ЗБІРКА В CI НЕ МАЄ РОЗХОДИТИСЬ ІЗ `npm run build`
+        //
+        // У build-products.yml був виписаний перелік окремих
+        // `node scripts/…`, і він відстав від package.json на шість
+        // кроків: build-brands.js, build-taxonomy-pages.js,
+        // build-legal.js, build-feed.js, build-llms.js і
+        // apply-cache-version.js.
+        //
+        // Найдорожчі з них — саме ті, що не видно оком.
+        // build-products.js читає кириличні написання брендів із
+        // data/brands.json, а той збирає build-brands.js: без нього
+        // пошук по «Рей Бен» на проді не знаходив нічого, хоч на dev
+        // працював. А apply-cache-version.js проставляє ?v= — без
+        // нього браузер віддає з кеша старі скрипти й дані за
+        // незмінною адресою, тобто правка мовчки не доїжджає.
+        //
+        // Рятував це Sync branches своїм повним `npm run build` —
+        // тобто поломка була, але помітити її було майже неможливо.
+        const chain = [...pkg.scripts.build.matchAll(/scripts\/([\w-]+)\.js/g)]
+            .map(m => m[1]);
+
+        // перелік кроків прийнятний, якщо покриває всі скрипти збірки;
+        // один `npm run build` покриває їх за визначенням
+        const full = /run: npm run build\s*$/m.test(build);
+        const missing = chain.filter(name => !build.includes(`scripts/${name}.js`));
+
+        check(`${file}: збірка не розходиться з npm run build`,
+            full || missing.length === 0,
+            missing.length ? "бракує: " + missing.join(", ") : undefined);
+
+        // Перезібраний файл, який не потрапив у `git add`, не
+        // виїжджає на сайт. Так llms.txt їхав на прод лише з
+        // `git add -A` у Sync branches, хоч build-llms.js переписує
+        // його кожної збірки.
+        //
+        // assets/js/common.js тут не випадково: у ньому лежить
+        // SITE_URL, з якого сторінки будують canonical і og:url, і
+        // проставляє його apply-site-env.js. Перелік покривав лише
+        // assets/images, тож виправлення адреси нікуди б не поїхало.
+        ["sitemap.xml", "feed.xml", "llms.txt", "assets/js/common.js"].forEach(out => {
+            check(`${file}: комітить ${out}`, build.includes(out));
+        });
+
     });
+
+    // ПОРЯДОК КРОКІВ У `npm run build`
+    //
+    // Поки кроки були виписані в build-products.yml, порядок тримали
+    // коментарі біля кожного («ОБОВ'ЯЗКОВО після build-products.js»
+    // тощо). Тепер перелік — один рядок у package.json, коментаря
+    // туди не вставити, тож умови закріплені тут.
+    //
+    // Кожна з них — про мовчазну поломку: переставлені кроки не
+    // ламають збірку, вона просто збирає з ЩЕ НЕ ОНОВЛЕНИХ даних.
+    const order = [...pkg.scripts.build.matchAll(/scripts\/([\w-]+)\.js/g)].map(m => m[1]);
+    const before = (a, b) => order.indexOf(a) >= 0
+        && order.indexOf(a) < order.indexOf(b);
+
+    // кириличні написання брендів для пошуку build-products.js читає
+    // з data/brands.json — його збирає build-brands.js
+    check("бренди збираються до товарів", before("build-brands", "build-products"));
+
+    // рейтинг із відгуків build-products.js кладе в дані, а звідти
+    // він потрапляє в aggregateRating на сторінці товару
+    check("відгуки зводяться до товарів", before("pull-reviews", "build-products"));
+
+    // генератори читають уже зібраний data/products.json
+    ["build-product-pages", "build-taxonomy-pages", "build-home-static", "build-sitemap"]
+        .forEach(step => {
+            check(`${step} іде після товарів`, before("build-products", step));
+        });
+
+    // ?v= проставляється ОСТАННІМ: відбиток беруть із готових файлів,
+    // тож будь-який крок після нього лишає штампи від попередньої збірки
+    check("штампи ?v= проставляються останніми",
+        order[order.length - 1] === "apply-cache-version");
 
     check("є розклад доступності", /cron: "\*\/30 \* \* \* \*"/.test(workflow));
 
