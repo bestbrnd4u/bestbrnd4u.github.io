@@ -69,7 +69,16 @@ console.log("\n[3] Сторінка помилки не кличе в індек
 
     const sitemap = read("sitemap.xml");
 
-    check("немає в sitemap", !/404/.test(sitemap));
+    // ЧОМУ НЕ ПРОСТО /404/. Так тут і стояло — і зламалось, коли в
+    // sitemap поїхали фото товарів: серед імен файлів трапляється і
+    // «nh4040nz_793_24.webp», і хеш із «404» усередині. Перевірка
+    // мусить питати про АДРЕСУ сторінки помилки, а не про три цифри
+    // будь-де у файлі.
+    const listed = [...sitemap.matchAll(/<loc>([^<]*)<\/loc>/g)]
+        .map(match => match[1])
+        .filter(url => /\/404(\.html)?$/.test(url));
+
+    check("немає в sitemap", listed.length === 0, listed.join(", "));
 
     if (fs.existsSync(path.join(ROOT, "feed.xml"))) {
         check("немає у фіді", !/404\.html/.test(read("feed.xml")));

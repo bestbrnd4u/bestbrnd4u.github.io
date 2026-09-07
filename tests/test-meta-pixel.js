@@ -216,7 +216,19 @@ console.log("\n[4] Персональні дані в піксель не йду
         '"init", pixelId',
         '"track", "PageView"',
         '"track", "Search", { search_string: params.search_term }',
-        '"track", event, payload'
+        '"track", event, payload',
+
+        // Той самий track, але з четвертим аргументом { eventID }.
+        //
+        // З'явився разом із серверними конверсіями (Conversions API):
+        // ту саму покупку тепер надсилають браузер і сервер, і Meta
+        // зводить їх в одну лише за однаковим event_id. Без цього
+        // аргумента конверсія рахувалась би двічі — тобто ціна
+        // залучення виглядала б удвічі нижчою, ніж вона є.
+        //
+        // Персональних даних тут немає: eventID — це «purchase.» плюс
+        // номер замовлення. Див. docs/КОНВЕРСІЇ-META.md.
+        '"track", event, payload, options'
     ];
 
     const extra = calls.filter(call => allowed.indexOf(call) === -1);

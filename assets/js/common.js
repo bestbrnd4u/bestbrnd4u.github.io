@@ -386,6 +386,207 @@ async function renderRecentlyViewed(options) {
 }
 
 // -------------------------
+// «З цим часто беруть» — доповнення до кошика
+//
+// НАВІЩО
+// -------
+// Кошик — остання сторінка, де людина ще щось додає, і єдина, під
+// якою досі не було нічого. Далі йде оформлення, де показувати товари
+// вже шкідливо: воно відволікає від кнопки.
+//
+// ЧОМУ НЕ ТЕ САМЕ, ЩО «СХОЖІ ТОВАРИ»
+// -----------------------------------
+// На сторінці товару блок показує ЗАМІНУ: людина ще вибирає, і сусідні
+// сумки їй доречні. У кошику вибір уже зроблений — там доречне
+// ДОПОВНЕННЯ. Друга сумка до сумки нікому не потрібна; гаманець того
+// самого бренду — потрібен, і саме так ці речі продають у самих
+// брендах.
+//
+// Тому добір інший — і в кожній групі стать мусить збігатися:
+//
+//   1. той самий бренд, ІНША категорія   — Coach сумка → Coach гаманець
+//   2. інша категорія, будь-який бренд   — доповнення без бренду
+//   3. той самий бренд, будь-що          — щоб блок не був порожнім
+//
+// ЧОМУ СТАТЬ ВАЖЛИВІША, НІЖ ЗДАЄТЬСЯ
+// -----------------------------------
+// У каталозі «Чоловічі сумки» і «Жіночі сумки» — різні КАТЕГОРІЇ. Тож
+// перша версія цього добору вважала жіночу сумку доречним доповненням
+// до чоловічої: формально інша категорія, фактично та сама річ, тільки
+// не для цього покупця. Перевірка статі прибирає це сама собою —
+// чоловічі й жіночі сумки не мають спільної статі, — і заодно не дає
+// порадити жіночий годинник тому, хто купує чоловічу сумку.
+//
+// «Унісекс» вважається доречним для будь-якої дорослої статі: саме для
+// цього такі товари й позначають.
+//
+// Товари з кошика виключені: пропонувати те, що вже лежить у кошику,
+// — найпомітніший спосіб показати, що блок ніхто не думав.
+//
+// ЧОМУ ДЕШЕВШЕ ПОПЕРЕДУ
+// ----------------------
+// Доповнення дорожче за основну покупку не купує ніхто: воно читається
+// не як «додати», а як «почати вибір заново». Тому в межах кожної
+// групи спершу йде те, що дешевше за найдорожчу річ у кошику.
+// -------------------------
+
+// Скільки показуємо. Більше не має сенсу: це смуга з прокруткою під
+// кошиком, а не другий каталог.
+const CROSS_SELL_LIMIT = 8;
+
+// Розкладає товари на три групи в порядку доречності.
+//
+// Винесено окремо від показу, щоб перевірялось тестом без DOM.
+function pickCrossSell(products, cartLines, limit) {
+
+    const inCart = new Set((cartLines || []).map(line => Number(line && line.id)));
+
+    const cartProducts = (products || [])
+        .filter(product => inCart.has(Number(product.id)));
+
+    if (!cartProducts.length) return [];
+
+    const brands = new Set(cartProducts.map(product => String(product.brand || "")).filter(Boolean));
+    const categories = new Set(cartProducts.map(product => String(product.category || "")).filter(Boolean));
+
+    const gendersOf = product =>
+        (typeof getProductGenders === "function" ? getProductGenders(product) : []);
+
+    const genders = new Set();
+
+    cartProducts.forEach(product => {
+        gendersOf(product).forEach(gender => genders.add(gender));
+    });
+
+    // «Унісекс» доречний до дорослої покупки — для цього позначку й
+    // ставлять. До дитячої не додаємо: там це не те саме.
+    if (genders.has("Жінкам") || genders.has("Чоловікам") || genders.has("Унісекс")) {
+        genders.add("Унісекс");
+    }
+
+    const genderFits = product => {
+
+        const own = gendersOf(product);
+
+        // Товар без статі не суперечить нічому — не ховаємо його.
+        if (!own.length) return true;
+
+        return own.some(gender => genders.has(gender));
+
+    };
+
+    // Найдорожча річ у кошику — межа, до якої доповнення виглядає
+    // доповненням.
+    const ceiling = Math.max(...cartProducts.map(product => Number(product.price) || 0));
+
+    const rest = (products || []).filter(product => !inCart.has(Number(product.id)));
+
+    const sameBrandOtherCategory = [];
+    const otherCategorySameGender = [];
+    const sameBrandAny = [];
+
+    rest.forEach(product => {
+
+        // Чужа стать — не доповнення ні в якій групі.
+        if (!genderFits(product)) return;
+
+        const brand = String(product.brand || "");
+        const category = String(product.category || "");
+
+        const brandMatches = brand && brands.has(brand);
+        const categoryDiffers = !category || !categories.has(category);
+
+        if (brandMatches && categoryDiffers) {
+            sameBrandOtherCategory.push(product);
+            return;
+        }
+
+        if (categoryDiffers) {
+            otherCategorySameGender.push(product);
+            return;
+        }
+
+        // Та сама категорія — це заміна, а не доповнення. Лишаємо
+        // тільки як останній резерв, і тільки для свого бренду.
+        if (brandMatches) sameBrandAny.push(product);
+
+    });
+
+    // Дешевше за найдорожчу річ у кошику — попереду; далі за ціною
+    // спадаючи, щоб перший екран не був завалений дрібницями.
+    const order = (a, b) => {
+
+        const cheapA = (Number(a.price) || 0) <= ceiling ? 0 : 1;
+        const cheapB = (Number(b.price) || 0) <= ceiling ? 0 : 1;
+
+        if (cheapA !== cheapB) return cheapA - cheapB;
+
+        return (Number(b.price) || 0) - (Number(a.price) || 0);
+
+    };
+
+    return [
+        ...sameBrandOtherCategory.sort(order),
+        ...otherCategorySameGender.sort(order),
+        ...sameBrandAny.sort(order),
+    ].slice(0, limit || CROSS_SELL_LIMIT);
+
+}
+
+async function renderCrossSell(options) {
+
+    const {
+        sectionId = "crossSellSection",
+        gridId = "crossSellGrid",
+        carouselId = "crossSellCarousel",
+        limit = CROSS_SELL_LIMIT
+    } = options || {};
+
+    const section = document.getElementById(sectionId);
+    const grid = document.getElementById(gridId);
+
+    if (!section || !grid) return;
+
+    const lines = getCart();
+
+    // Порожній кошик — порожній блок. Ховаємо, а не лишаємо старе:
+    // після видалення останнього товару поради нижче виглядали б як
+    // залишок від чужої сторінки.
+    if (!lines.length) {
+
+        section.hidden = true;
+
+        return;
+
+    }
+
+    const allProducts = await getAllProductsCached();
+
+    const list = pickCrossSell(allProducts, lines, limit);
+
+    if (!list.length) {
+
+        section.hidden = true;
+
+        return;
+
+    }
+
+    grid.innerHTML = list.map(product => createProductCard(product)).join("");
+
+    if (typeof initProductCarousels === "function") initProductCarousels(grid);
+    if (typeof updateFavoriteButtons === "function") updateFavoriteButtons();
+    if (typeof initCarousel === "function" && carouselId) initCarousel(document.getElementById(carouselId));
+
+    section.hidden = false;
+
+    // Статистика: без неї неможливо сказати, чи блок узагалі щось
+    // додає до замовлень. Назва списку та сама, що в звіті GA4.
+    window.Analytics?.viewItemList(list, "Крос-сел у кошику");
+
+}
+
+// -------------------------
 // Кошик
 //
 // Кожна позиція — об'єкт { id, color, size },

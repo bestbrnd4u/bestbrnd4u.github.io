@@ -123,7 +123,12 @@ console.log("\n[7] Назва магазину — BestBrnd4u");
 
   const files = [];
   const walk = dir => fs.readdirSync(dir, { withFileTypes: true }).forEach(e => {
-    if (e.name === "node_modules" || e.name === ".git") return;
+    // .claude — робочі копії репозиторію (git worktree), які створює
+    // Claude Code для окремих завдань. Це ТОЙ САМИЙ репозиторій, тож
+    // без цього пропуску сканер знаходить кожен файл двічі, і перелік
+    // «де лишилась стара назва» перестає збігатися з очікуваним —
+    // тест падає не через код, а через наявність робочої копії.
+    if (e.name === "node_modules" || e.name === ".git" || e.name === ".claude") return;
     const full = path.join(dir, e.name);
     if (e.isDirectory()) walk(full);
     else if (/\.(html|js|ts|css|json|yml|md|sql)$/.test(e.name)) {

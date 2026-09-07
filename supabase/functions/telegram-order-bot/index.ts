@@ -7,6 +7,8 @@
 //   supabase/functions/telegram-order-bot/place-order.js (замовлення з сайту)
 //   supabase/functions/telegram-order-bot/mail.js         (листи покупцеві)
 //   supabase/functions/telegram-order-bot/nova-poshta.js  (довідник міст і відділень)
+//   supabase/functions/telegram-order-bot/meta-capi.js    (серверні конверсії Meta)
+//   supabase/functions/telegram-order-bot/order-lookup.js (перевірка замовлення гостем)
 //   supabase/functions/telegram-order-bot/_index.src.ts  (мережа й база)
 //
 // Перезібрати:  node scripts/build-edge-function.js
@@ -1758,7 +1760,13 @@ function itemsTable(items) {
 
     const rows = list.map(item => {
 
-        const variant = [item.color, item.size].filter(Boolean).join(" / ");
+        // ONESIZE — внутрішня заглушка для товарів без розмірів. У
+        // листі вона читалась би як помилка в даних; решта проєкту її
+        // так само ховає (фід, ідентифікатор для Meta).
+        const size = String(item.size ?? "").trim();
+
+        const variant = [item.color, size.toUpperCase() === "ONESIZE" ? "" : size]
+            .filter(Boolean).join(" / ");
 
         const title = escapeHtml(item.title || "");
 
@@ -1812,6 +1820,32 @@ function summaryBlock(order) {
 }
 
 // Лист «замовлення прийнято».
+// Посилання «перевірити стан замовлення».
+//
+// Номер підставлений в адресу, тож на сторінці лишається ввести лише
+// телефон. Переписувати десять цифр із листа руками — рівно те, чого
+// люди не роблять: вони пишуть у Telegram.
+//
+// Стилі вбудовані в атрибути: пошта не читає <style>, і будь-який
+// клас тут просто нічого не робив би.
+function lookupLine(orderNumber, siteUrl) {
+
+    const number = String(orderNumber ?? "").trim();
+
+    if (!number) return "";
+
+    const base = String(siteUrl ?? "").replace(/\/$/, "");
+
+    const url = `${base}/order-status?order=${encodeURIComponent(number)}`;
+
+    return `<div style="margin-top:18px;font-size:13px;line-height:1.6;color:#6b7280">`
+        + `Стан замовлення можна перевірити будь-коли: `
+        + `<a href="${escapeHtml(url)}" style="color:#111827;font-weight:600">Де моє замовлення</a>`
+        + ` — потрібні номер ${escapeHtml(number)} і ваш телефон.`
+        + `</div>`;
+
+}
+
 function orderLetter(order, siteUrl) {
 
     const number = String(order?.order_number ?? "");
@@ -1842,7 +1876,8 @@ function orderLetter(order, siteUrl) {
         delivery
             ? `<div style="margin-top:18px;font-weight:600;font-size:14px">Доставка</div>`
                 + `<table style="width:100%;border-collapse:collapse">${delivery}</table>`
-            : ""
+            : "",
+        lookupLine(number, siteUrl)
     ].join("");
 
     return {
@@ -2270,6 +2305,681 @@ function npError(payload) {
 
 }
 
+
+// Серверні конверсії Meta (Conversions API).
+//
+// НАВІЩО
+// -------
+// Досі про покупку Meta дізнавалась ЛИШЕ з браузера: піксель на
+// сторінці подяки надсилав Purchase. Проблема в тому, що цей піксель
+// доїжджає не завжди:
+//
+//   • блокувальники рекламних скриптів вирізають connect.facebook.net цілком;
+//   • Safari й iOS обмежують сторонні скрипти та куки;
+//   • людина закриває вкладку швидше, ніж скрипт устигає надіслати.
+//
+// Це не «трохи менше статистики». Meta оптимізує показ реклами за
+// конверсіями: якщо вона бачить половину покупок, вона й навчається на
+// половині — і шукає схожих людей за неповною картиною. Тобто гроші за
+// рекламу витрачаються гірше, ніж могли б.
+//
+// Conversions API — той самий Purchase, але надісланий СЕРВЕРОМ. Його
+// не блокує ніщо в браузері: запит іде з нашої функції в Meta.
+//
+// ЧОМУ НЕ ДУБЛЮЄТЬСЯ
+// -------------------
+// Meta склеює браузерну й серверну подію, якщо в них однакові
+// event_name і event_id. Тому event_id тут будується з НОМЕРА
+// ЗАМОВЛЕННЯ — те саме значення, що браузер кладе в eventID пікселя
+// (див. assets/js/analytics.js). Одне замовлення = один event_id, хоч
+// скільки разів його надішли.
+//
+// Додатково кладемо order_id: для Purchase Meta вміє склеювати ще й за
+// ним. Два незалежні способи — бо порахувати покупку двічі гірше, ніж
+// не порахувати взагалі: подвоєна конверсія бреше про ціну залучення.
+//
+// ЧОМУ ТІЛЬКИ PURCHASE
+// ---------------------
+// ViewContent і AddToCart — це подія на кожен перегляд товару, тобто
+// запит до Meta з сервера на кожен клік. Оптимізація ж будується на
+// покупці. Тож серверна тут одна, найдорожча подія; решта лишається
+// браузерною.
+//
+// ЧОГО ТУТ НЕМА
+// --------------
+// Мережі й хешування. У цьому файлі лише чисті функції — щоб їх можна
+// було ганяти тестами в Node, без Deno й без справжніх запитів у Meta.
+// Хешує й надсилає _index.src.ts.
+
+// Версія Graph API. Пін навмисний: Meta ламає сумісність між версіями,
+// і «остання» колись стане несумісною сама собою.
+const GRAPH_VERSION = "v21.0";
+
+// Скільки живе подія. Meta відкидає старші за 7 днів, і немає сенсу
+// намагатись надіслати вчорашнє замовлення повторно.
+const MAX_EVENT_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+
+
+// -------------------------
+// Нормалізація перед хешуванням
+//
+// Meta хешує не те, що ви прислали, а те, що ЇЇ нормалізатор зробив із
+// даних користувача на її боці. Якщо ми нормалізуємо інакше — хеші не
+// зійдуться, і збіг не знайдеться: подія долетить, але припишеться
+// нікому. Тому правила нижче — дослівно за документацією Meta.
+// -------------------------
+
+// Пошта: обрізати, у нижній регістр. Усе.
+function normalizeEmail(value) {
+
+    const clean = String(value ?? "").trim().toLowerCase();
+
+    // Без «@» це не пошта, а описка. Хеш від описки — сміття, яке
+    // тільки псує показник якості збігів у Events Manager.
+    return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(clean) ? clean : "";
+
+}
+
+// Телефон: лише цифри, обов'язково з кодом країни, без «+».
+//
+// ЧОМУ ЦЕ НЕ ОДИН replace. Той самий український номер люди пишуть
+// щонайменше чотирма способами, і всі чотири мусять дати ОДИН хеш —
+// інакше та сама людина виглядає для Meta як чотири різні:
+//
+//   +380 73 728 82 91  →  380737288291
+//   0737288291         →  380737288291
+//   80737288291        →  380737288291
+//   737288291          →  380737288291
+function normalizePhone(value) {
+
+    let digits = String(value ?? "").replace(/\D/g, "");
+
+    if (!digits) return "";
+
+    // «80…» — старий міжміський формат, який досі пишуть у візитках.
+    if (digits.length === 11 && digits.startsWith("80")) {
+        digits = "3" + digits;
+    }
+
+    // «0…» — місцевий запис: прибираємо нуль, ставимо код країни.
+    if (digits.length === 10 && digits.startsWith("0")) {
+        digits = "38" + digits;
+    }
+
+    // Дев'ять цифр — номер без жодного префікса.
+    if (digits.length === 9) {
+        digits = "380" + digits;
+    }
+
+    // Довжина поза межами телефонного номера — швидше описка або
+    // вставлений не той рядок. Порожнє краще за неправильний хеш.
+    if (digits.length < 11 || digits.length > 15) return "";
+
+    return digits;
+
+}
+
+// Ім'я, прізвище: нижній регістр, без пробілів, цифр і пунктуації.
+function normalizeName(value) {
+
+    return String(value ?? "")
+        .trim()
+        .toLowerCase()
+        .replace(/[^\p{L}]/gu, "");
+
+}
+
+// Місто: те саме, що ім'я. «м. Київ» і «Київ» мусять дати один хеш.
+function normalizeCity(value) {
+
+    return normalizeName(value);
+
+}
+
+// Країна: дволітерний код у нижньому регістрі.
+const COUNTRY_CODE = "ua";
+
+
+// -------------------------
+// Що саме хешувати
+// -------------------------
+
+// Ключі Meta для даних людини і значення з замовлення.
+//
+// Повертає ЩЕ НЕ ХЕШОВАНІ значення: хешує виклик у Deno, бо
+// crypto.subtle асинхронний, а цей файл має лишатись чистим.
+//
+// Порожні поля не потрапляють у результат зовсім. Хеш від порожнього
+// рядка — це не «немає даних», а конкретний хеш, однаковий у всіх
+// покупців: Meta склеїла б їх в одну людину.
+function userDataSources(order) {
+
+    const source = {
+        em: normalizeEmail(order?.email),
+        ph: normalizePhone(order?.phone),
+        fn: normalizeName(order?.first_name),
+        ln: normalizeName(order?.last_name),
+        ct: normalizeCity(order?.delivery_city),
+        country: COUNTRY_CODE,
+    };
+
+    const result = {};
+
+    Object.keys(source).forEach((key) => {
+        if (source[key]) result[key] = source[key];
+    });
+
+    return result;
+
+}
+
+// Чи є взагалі за чим шукати людину.
+//
+// Meta відхиляє подію без жодного ідентифікатора. Пошта або телефон —
+// найсильніші; fbp/fbc теж рахуються, але їх немає саме тоді, коли
+// піксель заблокований, тобто рівно в тих випадках, для яких усе це й
+// робиться.
+function hasIdentity(sources, browser) {
+
+    if (sources && (sources.em || sources.ph)) return true;
+
+    return Boolean(browser && (browser.fbp || browser.fbc));
+
+}
+
+
+// -------------------------
+// Склад покупки
+// -------------------------
+
+// Ідентифікатор товару для Meta.
+//
+// МУСИТЬ збігатися з тим, що надсилає піксель і що стоїть у фіді
+// (scripts/build-feed.js) — інакше динамічна реклама показує «товар не
+// знайдено», а конверсія не приписується жодному товару. Формат один
+// на три місця: числовий id товару рядком.
+function metaContentId(item) {
+
+    const id = Number(item?.id);
+
+    return Number.isFinite(id) && id > 0 ? String(Math.trunc(id)) : "";
+
+}
+
+// custom_data події: гроші й склад.
+//
+// Суму беремо з РЯДКА В БАЗІ, а не з того, що прислав браузер. Це той
+// самий принцип, що в перевірці ціни (міграція 014): числа, які
+// прийшли з браузера, — заявка, а не факт. Тут це ще й захист від
+// накрутки: інакше сторонній запит міг би записати Meta покупку на
+// мільйон і зіпсувати оптимізацію реклами.
+function customData(order) {
+
+    const items = Array.isArray(order?.items) ? order.items : [];
+
+    const contents = items
+        .map((item) => {
+
+            const id = metaContentId(item);
+
+            if (!id) return null;
+
+            const qty = Math.max(Math.trunc(Number(item.qty) || 1), 1);
+
+            return {
+                id,
+                quantity: qty,
+                item_price: Math.round((Number(item.price) || 0) * 100) / 100,
+            };
+
+        })
+        .filter(Boolean);
+
+    const data = {
+        currency: "UAH",
+        value: Math.round((Number(order?.total) || 0) * 100) / 100,
+        content_type: "product",
+        content_ids: contents.map((row) => row.id),
+        contents,
+        num_items: contents.reduce((sum, row) => sum + row.quantity, 0),
+    };
+
+    // Другий спосіб склеювання з браузерною подією.
+    if (order?.order_number) data.order_id = String(order.order_number);
+
+    return data;
+
+}
+
+
+// -------------------------
+// Сама подія
+// -------------------------
+
+// Ключ склеювання. Той самий рядок будує браузер — див.
+// Analytics.purchase у assets/js/analytics.js.
+function purchaseEventId(orderNumber) {
+
+    const clean = String(orderNumber ?? "").trim();
+
+    return clean ? `purchase.${clean}` : "";
+
+}
+
+// Готова подія для Meta.
+//
+// hashed — уже похешовані значення з userDataSources (SHA-256, hex).
+// Кладемо їх масивами: Meta приймає і рядок, і масив, але масив — це
+// документована форма, і саме її показує їхній же приклад.
+function buildEvent({ order, hashed, browser, sourceUrl, ip, userAgent, now }) {
+
+    const when = Number(now) || Date.now();
+
+    const created = Date.parse(order?.created_at ?? "");
+
+    // Час події — коли покупка сталась, а не коли ми про неї
+    // розповіли. Але якщо рядок у базі старший за межу Meta, вона
+    // відкине подію цілком, тож не вигадуємо: беремо поточний час.
+    const eventTime = Number.isFinite(created) && when - created < MAX_EVENT_AGE_MS
+        ? created
+        : when;
+
+    const userData = {};
+
+    Object.keys(hashed || {}).forEach((key) => {
+        if (hashed[key]) userData[key] = [hashed[key]];
+    });
+
+    // Ці три — НЕ хешуються. Meta вимагає їх у відкритому вигляді:
+    // адреса й браузер потрібні саме для того, щоб зіставити серверну
+    // подію з браузерною сесією.
+    if (ip) userData.client_ip_address = ip;
+    if (userAgent) userData.client_user_agent = userAgent;
+
+    if (browser?.fbp) userData.fbp = browser.fbp;
+    if (browser?.fbc) userData.fbc = browser.fbc;
+
+    return {
+        event_name: "Purchase",
+        event_time: Math.floor(eventTime / 1000),
+        event_id: purchaseEventId(order?.order_number),
+        action_source: "website",
+        ...(sourceUrl ? { event_source_url: sourceUrl } : {}),
+        user_data: userData,
+        custom_data: customData(order),
+    };
+
+}
+
+// Куди і що надсилати.
+//
+// Токен іде в ТІЛІ запиту, а не в адресі: адреси лишаються в логах
+// проксі, у метриках, у повідомленнях про помилки. Токен CAPI дає
+// право писати конверсії від імені рекламного акаунта — йому там не
+// місце.
+function capiRequest(pixelId, token, events, testCode) {
+
+    const pixel = String(pixelId ?? "").trim();
+
+    // Порожній піксель або токен = вимкнено. Жодного запиту в Meta не
+    // буде — той самий принцип, що з ключами пошти й Нової пошти.
+    if (!pixel || !/^\d{5,}$/.test(pixel) || !String(token ?? "").trim()) return null;
+
+    const list = (events || []).filter((event) => event && event.event_id);
+
+    if (!list.length) return null;
+
+    const body = {
+        data: list,
+        access_token: String(token).trim(),
+    };
+
+    // Код перевірки. Поки він заданий, події видно у вкладці
+    // Test Events в Events Manager і вони НЕ йдуть у звіти — саме тим
+    // і перевіряють, що інтеграція жива. Після перевірки секрет
+    // прибирають, інакше жодна покупка не дійде до оптимізації.
+    const test = String(testCode ?? "").trim();
+
+    if (test) body.test_event_code = test;
+
+    return {
+        url: `https://graph.facebook.com/${GRAPH_VERSION}/${pixel}/events`,
+        body,
+    };
+
+}
+
+// Розбір відповіді Meta.
+//
+// HTTP-код сам по собі нічого не каже: Meta відповідає 200 і на
+// «прийнято 0 подій». Успіх — це events_received > 0.
+function capiVerdict(status, data) {
+
+    if (data && data.error) {
+
+        const error = data.error;
+
+        return {
+            ok: false,
+            reason: `${error.type || "error"} ${error.code || ""}: ${error.message || "без опису"}`.trim(),
+        };
+
+    }
+
+    if (status < 200 || status >= 300) {
+        return { ok: false, reason: `HTTP ${status}` };
+    }
+
+    const received = Number(data?.events_received);
+
+    if (!Number.isFinite(received) || received <= 0) {
+        return { ok: false, reason: "Meta не прийняла жодної події" };
+    }
+
+    return { ok: true, received };
+
+}
+
+
+// -------------------------
+// Що прислав браузер
+// -------------------------
+
+// Куки пікселя, які браузер передає нам сам.
+//
+// _fbp ставить піксель, _fbc — це збережений fbclid із рекламного
+// переходу. Обидві різко піднімають якість збігів, і обидві — рівно
+// ті рядки, які піксель уже надіслав би сам. Ми їх не вигадуємо: якщо
+// піксель заблокований, їх просто немає.
+//
+// Формат жорсткий (fb.1.<час>.<число>), тому перевіряємо: у цьому
+// полі не має проїхати нічого, крім куки Meta.
+function cleanBrowserIds(payload) {
+
+    const pick = (value) => {
+
+        const clean = String(value ?? "").trim();
+
+        return /^fb\.[12]\.\d{10,16}\.[\w-]{1,120}$/.test(clean) ? clean : "";
+
+    };
+
+    return {
+        fbp: pick(payload?.fbp),
+        fbc: pick(payload?.fbc),
+    };
+
+}
+
+// Адреса сторінки, з якої прийшла подія.
+//
+// Приймаємо тільки власні домени: event_source_url із чужого сайту в
+// звітах Meta виглядав би так, ніби магазин продає деінде.
+function cleanSourceUrl(value, allowedOrigins) {
+
+    const clean = String(value ?? "").trim();
+
+    if (!clean) return "";
+
+    let url;
+
+    try {
+        url = new URL(clean);
+    } catch {
+        return "";
+    }
+
+    const list = Array.isArray(allowedOrigins) ? allowedOrigins : [];
+
+    return list.includes(url.origin) ? url.origin + url.pathname : "";
+
+}
+
+
+// Перевірка замовлення за номером і телефоном.
+//
+// НАВІЩО
+// -------
+// Замовити на сайті можна без реєстрації — і більшість так і робить.
+// Але кабінет шукає замовлення тільки за user_id (assets/js/account.js),
+// тобто гість не побачить свого замовлення НІКОЛИ. Єдине, що в нього
+// лишається, — лист і Telegram магазину.
+//
+// Листи це закривають лише частково: пошта могла піти в спам, людина
+// могла ввести її з опискою, а «де моє замовлення?» питають через
+// тиждень, коли лист уже загубився. Кожне таке питання приїжджає в
+// Telegram і забирає час власника на те, що сторінка може відповісти
+// сама.
+//
+// ЧОМУ САМЕ НОМЕР + ТЕЛЕФОН
+// --------------------------
+// Номер замовлення сам по собі не таємниця: він у листі, у смс, його
+// диктують уголос. Тому одного номера НЕ ДОСИТЬ — інакше будь-хто,
+// хто підгляне номер, побачить ім'я, адресу відділення й склад
+// покупки. Телефон — це те, що знає замовник і чого немає в номері.
+//
+// ЧОМУ ВІДПОВІДЬ ОДНАКОВА НА «НЕ ЗНАЙДЕНО» І «НЕ ТОЙ ТЕЛЕФОН»
+// ------------------------------------------------------------
+// Якби сторінка відповідала «замовлення є, але телефон не той», вона
+// стала б перевіркою існування номерів: перебором можна було б
+// дізнатись, які номери замовлень справжні, а потім підбирати до них
+// телефони. Одна відповідь на два випадки нічого не підказує.
+//
+// ЧОГО ТУТ НЕМА
+// --------------
+// Мережі й бази. Лише чисті функції — щоб перевірялись тестами в Node.
+
+// Скільки позицій показуємо. Замовлення на 50 рядків буває тільки
+// підроблене, але сторінка не має падати й на ньому.
+const MAX_VIEW_ITEMS = 50;
+
+// Заглушка для товарів без розмірів: сумки, годинники, окуляри,
+// гаманці — тобто майже весь каталог.
+//
+// Це ВНУТРІШНЄ значення, і решта проєкту його ховає: у фід воно не
+// потрапляє (scripts/build-feed.js), в ідентифікатор для Meta теж
+// (assets/js/analytics.js). «Чорний, ONESIZE» у картці замовлення
+// покупець читає як помилку в даних — і має рацію.
+const NO_SIZE = "ONESIZE";
+
+// Розмір, який видно покупцеві. Порожній, якщо розміру насправді немає.
+function viewSize(value) {
+
+    const clean = String(value ?? "").trim();
+
+    // Регістр різний навмисно: у даних свого часу співіснували
+    // ONESIZE і Onesize (див. scripts/build-products.js).
+    return clean.toUpperCase() === NO_SIZE ? "" : clean;
+
+}
+
+
+// -------------------------
+// Телефон
+// -------------------------
+
+// Ключ порівняння: останні 9 цифр.
+//
+// ЧОМУ НЕ ПОВНИЙ НОМЕР. У базі лежить те, що людина набрала в
+// оформленні, а на сторінці перевірки вона набере те, що згадає —
+// і це майже ніколи не той самий рядок:
+//
+//   +380 73 728 82 91   0737288291   380737288291   73 728 82 91
+//
+// Останні 9 цифр однакові в усіх чотирьох: це номер абонента без
+// коду країни й міжміського нуля. Коротше брати не можна — 6-7 цифр
+// почали б випадково збігатися в різних людей.
+function phoneKey(value) {
+
+    const digits = String(value ?? "").replace(/\D/g, "");
+
+    return digits.length >= 9 ? digits.slice(-9) : "";
+
+}
+
+// Чи це той самий телефон.
+//
+// Порожній ключ не збігається ні з чим — включно з іншим порожнім.
+// Інакше замовлення без телефону відкривалось би будь-кому, хто
+// надіслав порожнє поле.
+function phoneMatches(stored, typed) {
+
+    const a = phoneKey(stored);
+    const b = phoneKey(typed);
+
+    return Boolean(a) && a === b;
+
+}
+
+
+// -------------------------
+// Що прислала сторінка
+// -------------------------
+
+// Розбір запиту. Повертає { ok, orderNumber, phone } або { ok: false }.
+//
+// Номер перевіряємо тим самим правилом, що при оформленні
+// (place-order.js): 4-40 символів, цифри й латиниця. Так у базу не
+// поїде запит із дужками, лапками й крапками — і ми не витратимо
+// звернення до бази на те, що номером бути не може.
+function cleanLookup(payload) {
+
+    const orderNumber = String(payload?.order_number ?? "").trim();
+
+    if (!/^[0-9A-Za-z-]{4,40}$/.test(orderNumber)) {
+        return { ok: false, reason: "номер не схожий на номер" };
+    }
+
+    const phone = String(payload?.phone ?? "").trim();
+
+    if (!phoneKey(phone)) {
+        return { ok: false, reason: "телефон коротший за 9 цифр" };
+    }
+
+    return { ok: true, orderNumber, phone };
+
+}
+
+
+// -------------------------
+// Що показуємо покупцеві
+// -------------------------
+
+// Стан замовлення словами покупця, а не менеджера.
+//
+// У панелі статус «Нове» означає «менеджер ще не брав» — покупцеві це
+// нічого не каже й навіть трохи ображає. Формулювання тут ті самі, що
+// в кабінеті (deliveryStatusLabel у assets/js/account.js): дві різні
+// назви одного стану — гірше, ніж будь-яка з них.
+const LOOKUP_STATUS = {
+    new: {
+        label: "Очікує обробки",
+        note: "Замовлення отримано. Ми зв'яжемось із вами, щоб підтвердити деталі.",
+    },
+    processing: {
+        label: "Готується до відправлення",
+        note: "Замовлення прийнято в роботу й пакується.",
+    },
+    shipped: {
+        label: "Передано в доставку",
+        note: "Замовлення в дорозі. Відстежити його можна за номером накладної.",
+    },
+    completed: {
+        label: "Доставлено",
+        note: "Замовлення виконано. Дякуємо за покупку!",
+    },
+    cancelled: {
+        label: "Скасовано",
+        note: "Замовлення скасовано. Якщо це помилка — напишіть нам, ми все виправимо.",
+    },
+};
+
+// Статуси першої версії бота — щоб старе замовлення не виглядало
+// зламаним. Той самий перелік, що LEGACY_STATUSES у format.js.
+const LOOKUP_LEGACY = {
+    taken: "processing",
+    confirmed: "processing",
+};
+
+function lookupStatus(status) {
+
+    const key = String(status ?? "").trim().toLowerCase();
+
+    const real = LOOKUP_LEGACY[key] || key;
+
+    return LOOKUP_STATUS[real] ? { key: real, ...LOOKUP_STATUS[real] } : { key: "new", ...LOOKUP_STATUS.new };
+
+}
+
+// Рядок доставки: спосіб, місто, відділення — одним текстом.
+function deliveryLine(order) {
+
+    return [order?.delivery_method, order?.delivery_city, order?.delivery_detail]
+        .map((part) => String(part ?? "").trim())
+        .filter(Boolean)
+        .join(", ");
+
+}
+
+// БІЛИЙ СПИСОК того, що віддаємо сторінці.
+//
+// ЧОМУ САМЕ БІЛИЙ СПИСОК, А НЕ «ПРИБРАТИ ЗАЙВЕ». Функція читає
+// замовлення службовим ключем, тобто бачить рядок цілком: пошту,
+// user_id, службові позначки перевірки ціни, дату відмови. Якби тут
+// стояло «віддати все, крім кількох полів», то будь-яка НОВА колонка
+// в таблиці автоматично поїхала б у браузер — і ніхто б цього не
+// помітив, бо сторінка її просто не показала б.
+//
+// Телефон і пошту не віддаємо навмисно: той, хто відкриває сторінку,
+// їх і так знає (без телефону він сюди не потрапив), а от підказувати
+// пошту на випадок, якщо телефон вгадали, — ні до чого.
+function publicOrderView(order) {
+
+    if (!order) return null;
+
+    const state = lookupStatus(order.status);
+
+    const items = (Array.isArray(order.items) ? order.items : [])
+        .slice(0, MAX_VIEW_ITEMS)
+        .map((item) => ({
+            title: String(item?.title ?? ""),
+            brand: String(item?.brand ?? ""),
+            image: String(item?.image ?? ""),
+            color: item?.color ? String(item.color) : null,
+            size: viewSize(item?.size) || null,
+            qty: Math.max(Math.trunc(Number(item?.qty) || 1), 1),
+            price: Number(item?.price) || 0,
+        }));
+
+    return {
+        order_number: String(order.order_number ?? ""),
+        created_at: order.created_at ?? null,
+
+        status: state.key,
+        status_label: state.label,
+        status_note: state.note,
+
+        items,
+
+        subtotal: Number(order.subtotal) || 0,
+        discount: Number(order.discount) || 0,
+        total: Number(order.total) || 0,
+
+        // Доставку магазин не бере — покупець платить перевізнику при
+        // отриманні (див. tests/test-delivery.js). Тому суми доставки
+        // тут немає взагалі: нуль читався б як «безкоштовно».
+        delivery: deliveryLine(order),
+        payment_method: String(order.payment_method ?? ""),
+
+        tracking_number: order.tracking_number ? String(order.tracking_number) : null,
+
+        // Позначка «є заявка на відмову» — щоб людина не надсилала її
+        // вдруге, не дочекавшись відповіді.
+        refusal_requested: Boolean(order.refusal_requested_at),
+    };
+
+}
+
 // ======================================
 // Telegram-бот для заявок BestBrnd4u
 //
@@ -2295,6 +3005,8 @@ function npError(payload) {
 
 // Чиста логіка (форматування картки, кнопки) винесена окремо —
 // щоб її можна було запускати й тестувати в Node без Deno.
+
+
 
 
 
@@ -2357,6 +3069,23 @@ const MAIL_REPLY_TO = Deno.env.get("MAIL_REPLY_TO") ?? "";
 // ⚠️ Цей ключ дає право створювати накладні на вашому рахунку, тому
 // він і живе тут, а не в коді сайту.
 const NOVAPOSHTA_API_KEY = Deno.env.get("NOVAPOSHTA_API_KEY") ?? "";
+
+// Токен Conversions API — серверні конверсії Meta.
+//
+// ЦЕ СЕКРЕТ. Він дає право писати конверсії в рекламний акаунт
+// магазину: чужими руками туди можна залити вигадані покупки й
+// зіпсувати оптимізацію реклами. У коді сайту йому місця немає — на
+// відміну від ідентифікатора пікселя, який публічний за задумом.
+//
+// Порожній = вимкнено. Жодного запиту в Meta не буде.
+const META_CAPI_TOKEN = Deno.env.get("META_CAPI_TOKEN") ?? "";
+
+// Код перевірки з Events Manager → Test Events.
+//
+// Поки він заданий, події видно у вкладці перевірки й вони НЕ йдуть у
+// звіти — саме так переконуються, що інтеграція жива. Після перевірки
+// секрет прибирають, інакше жодна покупка не дійде до оптимізації.
+const META_CAPI_TEST_CODE = Deno.env.get("META_CAPI_TEST_CODE") ?? "";
 
 const TELEGRAM_API = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}`;
 
@@ -4084,7 +4813,15 @@ async function handlePlaceOrder(request: Request, body: Record<string, any>): Pr
   //
   // Гість надсилає публічний ключ проєкту — на нього /auth/v1/user
   // відповість відмовою, і замовлення лишиться гостьовим.
-  const bearer = (request.headers.get("authorization") ?? "").replace(/^Bearers+/i, "");
+  //
+  // ЩО БУЛО НЕ ТАК. Тут стояло /^Bearers+/i — регулярка без
+  // зворотного слеша перед s. Замість «Bearer і пробіли» вона шукала
+  // «Bearer» і одну-кілька літер s, тобто не збігалась ніколи, і в
+  // verifyUser їхав рядок разом зі словом Bearer. Той будував
+  // «Bearer Bearer eyJ…», Supabase відповідав відмовою — і кожне
+  // замовлення через функцію ставало ГОСТЬОВИМ. Покупець із
+  // акаунтом не бачив свого замовлення в кабінеті.
+  const bearer = (request.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "");
 
   const userId = await verifyUser(bearer);
 
@@ -4105,6 +4842,290 @@ async function handlePlaceOrder(request: Request, body: Record<string, any>): Pr
   }
 
   return adminJson({ ok: true }, 200, origin);
+
+}
+
+// -------------------------
+// Адреса відвідувача
+//
+// За Cloudflare і проксі Supabase справжня адреса лежить у
+// заголовках, а не в самому з'єднанні. cf-connecting-ip надійніший:
+// x-forwarded-for клієнт може підробити, дописавши свій рядок, тому з
+// нього беремо ПЕРШУ адресу — її ставить найближчий до клієнта проксі.
+// -------------------------
+
+function clientIp(request: Request): string {
+
+  const direct = request.headers.get("cf-connecting-ip");
+
+  if (direct) return direct.trim();
+
+  return (request.headers.get("x-forwarded-for") ?? "").split(",")[0].trim();
+
+}
+
+// -------------------------
+// Скарга на саму функцію
+//
+// Помилка серверної інтеграції нікому не видна: у браузері нічого не
+// ламається, покупець нічого не помічає, а в логах функції ніхто не
+// сидить. Тому пишемо в той самий журнал, що й помилки сторінок
+// (міграція 013) — його раз на добу надсилає scripts/report-issues.js.
+// -------------------------
+
+async function reportServerIssue(kind: string, message: string) {
+
+  try {
+
+    const response = await supabaseRest("rpc/report_issue", {
+      method: "POST",
+      body: JSON.stringify({
+        p_kind: kind,
+        p_page: "edge-function",
+        p_message: message.slice(0, 500),
+        p_source: "",
+        p_agent: "",
+      }),
+    });
+
+    await response.text();
+
+  } catch (error) {
+
+    // Журнал помилок не має права ламати те, що його покликало.
+    console.error("Не вдалося записати скаргу:", error);
+
+  }
+
+}
+
+// -------------------------
+// Серверні конверсії Meta (Conversions API)
+//
+// Навіщо це взагалі й чому подія не дублюється — у meta-capi.js.
+// Тут лише мережа: ідентифікатор пікселя, хешування, запит.
+// -------------------------
+
+// Ідентифікатор пікселя беремо з САЙТУ, а не з окремого секрету.
+//
+// Він публічний за задумом (лежить у data/analytics.json і в коді
+// кожної сторінки) і його правлять в адмінці. Другий екземпляр у
+// секретах означав би два джерела правди: власник міняє піксель в
+// адмінці, а функція ще пів року надсилає конверсії в старий.
+let pixelCache: { at: number; id: string } | null = null;
+
+const PIXEL_TTL_MS = 10 * 60 * 1000;
+
+async function loadPixelId(): Promise<string> {
+
+  if (pixelCache && Date.now() - pixelCache.at < PIXEL_TTL_MS) {
+    return pixelCache.id;
+  }
+
+  try {
+
+    const response = await fetch(`${SITE_URL}/data/analytics.json`);
+
+    if (!response.ok) return pixelCache?.id ?? "";
+
+    const data = await response.json();
+
+    const id = String(data?.metaPixelId ?? "").trim();
+
+    pixelCache = { at: Date.now(), id };
+
+    return id;
+
+  } catch (error) {
+
+    console.error("Не вдалося прочитати налаштування статистики:", error);
+
+    return pixelCache?.id ?? "";
+
+  }
+
+}
+
+async function handleMetaPurchase(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  // Немає токена — нічого не робимо і кажемо про це чесно. Сторінка на
+  // це не реагує ніяк: браузерний піксель працює сам по собі.
+  if (!META_CAPI_TOKEN) {
+    return adminJson({ ok: false, error: "capi_not_configured" }, 200, origin);
+  }
+
+  // ЗГОДА. Браузерний піксель питає її сам (assets/js/consent.js), і
+  // серверна подія не може бути винятком: інакше магазин надсилав би
+  // у Meta дані саме тих людей, які рекламу відхилили.
+  //
+  // Прапорець ставить сторінка. Підробити його з чужого запиту можна,
+  // але це не дає нічого, чого не дає власна відкрита сторінка.
+  if (body.consent !== true) {
+    return adminJson({ ok: false, error: "no_consent" }, 200, origin);
+  }
+
+  const orderNumber = String(body.order_number ?? "").trim();
+
+  if (!/^[0-9A-Za-z-]{4,40}$/.test(orderNumber)) {
+    return adminJson({ ok: false, error: "bad_order" }, 400, origin);
+  }
+
+  const pixelId = await loadPixelId();
+
+  if (!pixelId) {
+    return adminJson({ ok: false, error: "no_pixel" }, 200, origin);
+  }
+
+  // Замовлення читаємо з БАЗИ. Усе, що прислав браузер, — це номер
+  // замовлення й куки пікселя; гроші, склад і контакти беруться з
+  // рядка. Інакше сторонній запит міг би записати Meta покупку на
+  // будь-яку суму.
+  const order = await findOrderByNumber(orderNumber);
+
+  if (!order) {
+    return adminJson({ ok: false, error: "order_not_found" }, 200, origin);
+  }
+
+  const created = Date.parse(order.created_at ?? "");
+
+  if (Number.isFinite(created) && Date.now() - created > MAX_EVENT_AGE_MS) {
+    return adminJson({ ok: false, error: "too_old" }, 200, origin);
+  }
+
+  const browser = cleanBrowserIds(body);
+  const sources = userDataSources(order);
+
+  // Подія без жодного ідентифікатора людини нічого не додає: Meta не
+  // має до кого її приписати.
+  if (!hasIdentity(sources, browser)) {
+    return adminJson({ ok: false, error: "no_identity" }, 200, origin);
+  }
+
+  const hashed: Record<string, string> = {};
+
+  for (const key of Object.keys(sources)) {
+    hashed[key] = await fingerprint(sources[key]);
+  }
+
+  const event = buildEvent({
+    order,
+    hashed,
+    browser,
+    sourceUrl: cleanSourceUrl(body.source_url, ADMIN_ORIGINS),
+    ip: clientIp(request),
+    userAgent: request.headers.get("user-agent") ?? "",
+    now: Date.now(),
+  });
+
+  const plan = capiRequest(pixelId, META_CAPI_TOKEN, [event], META_CAPI_TEST_CODE);
+
+  if (!plan) {
+    return adminJson({ ok: false, error: "capi_not_configured" }, 200, origin);
+  }
+
+  try {
+
+    const response = await fetch(plan.url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(plan.body),
+    });
+
+    const data = await response.json().catch(() => null);
+
+    const verdict = capiVerdict(response.status, data);
+
+    if (!verdict.ok) {
+
+      console.error("Meta не прийняла подію:", verdict.reason);
+
+      // Тихий збій тут найгірший: реклама далі оптимізується за
+      // половиною покупок, і дізнатись про це нізвідки.
+      await reportServerIssue("meta_capi",
+        `Meta не прийняла Purchase ${orderNumber}: ${verdict.reason}`);
+
+      return adminJson({ ok: false, error: "capi_rejected" }, 200, origin);
+
+    }
+
+    return adminJson({ ok: true }, 200, origin);
+
+  } catch (error) {
+
+    console.error("Meta недоступна:", error);
+
+    // Недоступна Meta не має жодного стосунку до замовлення: воно вже
+    // збережене. Відповідаємо спокійно.
+    return adminJson({ ok: false, error: "capi_unavailable" }, 200, origin);
+
+  }
+
+}
+
+// -------------------------
+// «Де моє замовлення» для гостя
+//
+// Чому потрібен телефон і чому відповідь однакова на «немає» та «не
+// той телефон» — у order-lookup.js.
+// -------------------------
+
+async function lookupAllowed(ip: string): Promise<boolean> {
+
+  try {
+
+    const response = await supabaseRest("rpc/order_lookup_allowed", {
+      method: "POST",
+      body: JSON.stringify({ p_ip: ip }),
+    });
+
+    if (!response.ok) {
+
+      // Міграцію ще не застосували — межі немає. Пропускаємо: справжня
+      // перевірка тут збіг телефону, а не лічильник.
+      await response.text();
+
+      return true;
+
+    }
+
+    return (await response.json()) !== false;
+
+  } catch (error) {
+
+    console.error("Лічильник звернень недоступний:", error);
+
+    return true;
+
+  }
+
+}
+
+async function handleOrderStatus(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  const clean = cleanLookup(body);
+
+  if (!clean.ok) {
+    return adminJson({ ok: false, error: "bad_request" }, 400, origin);
+  }
+
+  // Лічильник ПЕРЕД зверненням до бази: сенс межі саме в тому, щоб
+  // перебір не доходив до таблиці замовлень.
+  if (!(await lookupAllowed(clientIp(request)))) {
+    return adminJson({ ok: false, error: "too_many" }, 429, origin);
+  }
+
+  const order = await findOrderByNumber(clean.orderNumber);
+
+  // ОДНА відповідь на два випадки — навмисно.
+  if (!order || !phoneMatches(order.phone, clean.phone)) {
+    return adminJson({ ok: false, error: "not_found" }, 200, origin);
+  }
+
+  return adminJson({ ok: true, order: publicOrderView(order) }, 200, origin);
 
 }
 
@@ -4301,6 +5322,20 @@ async function handleRequest(request: Request): Promise<Response> {
   if (body.site_action === "place-order") {
 
     return await handlePlaceOrder(request, body);
+
+  }
+
+  // --- серверна конверсія Meta після оформлення ---
+  if (body.site_action === "meta-purchase") {
+
+    return await handleMetaPurchase(request, body);
+
+  }
+
+  // --- «Де моє замовлення» для гостя ---
+  if (body.site_action === "order-status") {
+
+    return await handleOrderStatus(request, body);
 
   }
 

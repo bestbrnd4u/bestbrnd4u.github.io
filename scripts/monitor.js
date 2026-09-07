@@ -93,6 +93,55 @@ async function get(url, attempt) {
 
 }
 
+// Публічний ключ проєкту беремо з коду сайту, а не дублюємо тут:
+// два екземпляри одного ключа рано чи пізно розійдуться, і
+// моніторинг почне падати на власній копії. Ключ публічний за
+// задумом Supabase — прав в обхід політик бази він не дає.
+function publicKey() {
+
+    const src = fs.readFileSync(path.join(ROOT, "assets/js/supabase-client.js"), "utf8");
+
+    const url = src.match(/const SUPABASE_URL = "([^"]+)"/);
+    const key = src.match(/const SUPABASE_PUBLISHABLE_KEY = "([^"]+)"/);
+
+    return url && key ? { url: url[1], key: key[1] } : null;
+
+}
+
+// Наявність очима відвідувача: та сама функція, яку кличе
+// assets/js/live-stock.js із браузера.
+async function liveStock() {
+
+    const client = publicKey();
+
+    if (!client) return null;
+
+    try {
+
+        const response = await fetch(`${client.url}/rest/v1/rpc/stock_live`, {
+            method: "POST",
+            headers: {
+                apikey: client.key,
+                Authorization: `Bearer ${client.key}`,
+                "Content-Type": "application/json"
+            },
+            body: "{}"
+        });
+
+        if (!response.ok) return null;
+
+        const rows = await response.json();
+
+        return Array.isArray(rows) ? rows : null;
+
+    } catch (error) {
+
+        return null;
+
+    }
+
+}
+
 async function main() {
 
     console.log(`\nПеревіряю ${SITE}\n`);
@@ -219,7 +268,74 @@ async function main() {
     record(`товарний фід: ${items} позицій`, feed.status === 200 && items > 0,
         `HTTP ${feed.status}`);
 
-    // ---- 5. сторінка 404 ----
+    // ---- 5. живий залишок не суперечить каталогу ----
+    //
+    // Скільки одиниць мусить обіцяти каталог, щоб «немає» з бази
+    // читалось як застарілий знімок, а не як зайняті замовленнями
+    // одиниці.
+    //
+    // Резерв — це відкриті замовлення на ТОЙ САМИЙ колір і розмір.
+    // Одне-два бувають щодня, п'яти на одну клітинку не буває.
+    const STOCK_TRUST_FROM = 5;
+
+    const liveRows = await liveStock();
+
+    if (!liveRows) {
+
+        // Недоступна база — не привід кричати про залишки: сайт при
+        // цьому працює, живий залишок просто не уточнює наявність.
+        record("живий залишок відповідає", false, "stock_live не відповіла");
+
+    } else {
+
+        // Товари вже завантажені вище (data/products.json) — другий
+        // раз тягнути 260 КБ ні до чого. Наявність у ньому та сама,
+        // що в лайт-каталозі: variants[].stock.
+        const products = Array.isArray(live) ? live : [];
+
+        record(`є з чим порівнювати: ${products.length} товарів`, products.length > 0);
+
+        const unavailable = new Set(liveRows
+            .filter(row => row.available !== true)
+            .map(row => `${row.product_id}|${row.color || ""}|${row.size || ""}`));
+
+        const hidden = [];
+
+        products.forEach(product => {
+
+            (product.variants || []).forEach(variant => {
+
+                const stock = variant && variant.stock;
+
+                if (!stock || typeof stock !== "object") return;
+
+                Object.keys(stock).forEach(size => {
+
+                    const qty = Number(stock[size]);
+
+                    if (!Number.isFinite(qty) || qty < STOCK_TRUST_FROM) return;
+
+                    if (!unavailable.has(`${product.id}|${variant.color || ""}|${size}`)) return;
+
+                    hidden.push(`${product.title || product.id}: ${variant.color} — у каталозі ${qty}, база каже «немає»`);
+
+                });
+
+            });
+
+        });
+
+        // ЩО ЦЕ ЛОВИТЬ. Знімок залишків у базі застарів, і живий
+        // залишок ховає з продажу товар, який у каталозі є. Окремо
+        // жодне джерело не виглядає зламаним — видно тільки в
+        // зіставленні.
+        record("живий залишок не ховає товар, якого повно в каталозі",
+            hidden.length === 0,
+            hidden.slice(0, 5).join("; ") + (hidden.length > 5 ? ` … і ще ${hidden.length - 5}` : ""));
+
+    }
+
+    // ---- 6. сторінка 404 ----
 
     const missing = await get(`${SITE}/monitor-check-${Date.now()}`);
 

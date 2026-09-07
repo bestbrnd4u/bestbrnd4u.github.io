@@ -306,6 +306,11 @@ function renderCart() {
 
     updateCartCounter();
 
+    // Доповнення до кошика. Перемальовуємо разом із кошиком: склад
+    // змінився — змінились і поради. Не чекаємо: кошик уже на екрані,
+    // а блок нижче може з'явитись за мить.
+    if (typeof renderCrossSell === "function") renderCrossSell();
+
 }
 
 function changeQty(id, color, size, delta) {

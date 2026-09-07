@@ -26,7 +26,7 @@ const SOURCE = path.join(DIR, "_index.src.ts");
 // Чисті модулі, які вклеюються у зібраний файл. Порядок — той, у
 // якому їх зручно читати; на роботу він не впливає, бо всередині
 // лише оголошення.
-const MODULES = ["format.js", "order-flow.js", "admin-api.js", "place-order.js", "mail.js", "nova-poshta.js"];
+const MODULES = ["format.js", "order-flow.js", "admin-api.js", "place-order.js", "mail.js", "nova-poshta.js", "meta-capi.js", "order-lookup.js"];
 
 function build() {
 
@@ -62,6 +62,8 @@ function build() {
         "//   supabase/functions/telegram-order-bot/place-order.js (замовлення з сайту)",
         "//   supabase/functions/telegram-order-bot/mail.js         (листи покупцеві)",
         "//   supabase/functions/telegram-order-bot/nova-poshta.js  (довідник міст і відділень)",
+        "//   supabase/functions/telegram-order-bot/meta-capi.js    (серверні конверсії Meta)",
+        "//   supabase/functions/telegram-order-bot/order-lookup.js (перевірка замовлення гостем)",
         "//   supabase/functions/telegram-order-bot/_index.src.ts  (мережа й база)",
         "//",
         "// Перезібрати:  node scripts/build-edge-function.js",

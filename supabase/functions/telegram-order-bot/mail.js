@@ -124,7 +124,13 @@ function itemsTable(items) {
 
     const rows = list.map(item => {
 
-        const variant = [item.color, item.size].filter(Boolean).join(" / ");
+        // ONESIZE — внутрішня заглушка для товарів без розмірів. У
+        // листі вона читалась би як помилка в даних; решта проєкту її
+        // так само ховає (фід, ідентифікатор для Meta).
+        const size = String(item.size ?? "").trim();
+
+        const variant = [item.color, size.toUpperCase() === "ONESIZE" ? "" : size]
+            .filter(Boolean).join(" / ");
 
         const title = escapeHtml(item.title || "");
 
@@ -178,6 +184,32 @@ function summaryBlock(order) {
 }
 
 // Лист «замовлення прийнято».
+// Посилання «перевірити стан замовлення».
+//
+// Номер підставлений в адресу, тож на сторінці лишається ввести лише
+// телефон. Переписувати десять цифр із листа руками — рівно те, чого
+// люди не роблять: вони пишуть у Telegram.
+//
+// Стилі вбудовані в атрибути: пошта не читає <style>, і будь-який
+// клас тут просто нічого не робив би.
+export function lookupLine(orderNumber, siteUrl) {
+
+    const number = String(orderNumber ?? "").trim();
+
+    if (!number) return "";
+
+    const base = String(siteUrl ?? "").replace(/\/$/, "");
+
+    const url = `${base}/order-status?order=${encodeURIComponent(number)}`;
+
+    return `<div style="margin-top:18px;font-size:13px;line-height:1.6;color:#6b7280">`
+        + `Стан замовлення можна перевірити будь-коли: `
+        + `<a href="${escapeHtml(url)}" style="color:#111827;font-weight:600">Де моє замовлення</a>`
+        + ` — потрібні номер ${escapeHtml(number)} і ваш телефон.`
+        + `</div>`;
+
+}
+
 export function orderLetter(order, siteUrl) {
 
     const number = String(order?.order_number ?? "");
@@ -208,7 +240,8 @@ export function orderLetter(order, siteUrl) {
         delivery
             ? `<div style="margin-top:18px;font-weight:600;font-size:14px">Доставка</div>`
                 + `<table style="width:100%;border-collapse:collapse">${delivery}</table>`
-            : ""
+            : "",
+        lookupLine(number, siteUrl)
     ].join("");
 
     return {
