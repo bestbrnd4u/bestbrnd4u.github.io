@@ -36,6 +36,7 @@ import {
 } from "./admin-api.js";
 import { cleanOrder, turnstileVerdict } from "./place-order.js";
 import { orderLetter, statusLetter, mailRequest } from "./mail.js";
+import { npRequest, parseSettlements, parseWarehouses, npError } from "./nova-poshta.js";
 import {
   DELIVERY_OPTIONS, deliveryById, colorsOf, sizesOf, autoFill, nextStep,
   colorKeyboard, sizeKeyboard, qtyKeyboard, deliveryKeyboard, phoneKeyboard,
@@ -92,6 +93,14 @@ const MAIL_FROM = Deno.env.get("MAIL_FROM") ?? "";
 // на яку ніхто не читає, і не дати куди відповісти — гірше, ніж не
 // слати зовсім.
 const MAIL_REPLY_TO = Deno.env.get("MAIL_REPLY_TO") ?? "";
+
+// Ключ API Нової пошти — для довідника міст і відділень на сторінці
+// оформлення. Порожній = підказок немає, поля лишаються звичайними
+// текстовими, як були.
+//
+// ⚠️ Цей ключ дає право створювати накладні на вашому рахунку, тому
+// він і живе тут, а не в коді сайту.
+const NOVAPOSHTA_API_KEY = Deno.env.get("NOVAPOSHTA_API_KEY") ?? "";
 
 const TELEGRAM_API = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}`;
 
@@ -1648,6 +1657,64 @@ async function verifyUser(token: string): Promise<string | null> {
 
 }
 
+// -------------------------
+// Довідник Нової пошти
+//
+// Браузер не може питати НП сам: ключ дає право створювати накладні на
+// рахунку магазину. Тому питає нас, а ми — НП, і віддаємо назад лише
+// назви й номери (див. nova-poshta.js).
+// -------------------------
+
+async function handleNovaPoshta(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  const payload = npRequest(NOVAPOSHTA_API_KEY, body);
+
+  // Немає ключа або запит не схожий на пошук адреси — відповідаємо
+  // чесно. Сторінка на це лишає звичайне текстове поле.
+  if (!payload) {
+    return adminJson({ ok: false, error: "novaposhta_unavailable", items: [] }, 200, origin);
+  }
+
+  try {
+
+    const response = await fetch("https://api.novaposhta.ua/v2.0/json/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+
+    const failure = npError(data);
+
+    if (failure) {
+
+      console.error("Нова пошта відмовила:", failure);
+
+      return adminJson({ ok: false, error: "novaposhta_failed", items: [] }, 200, origin);
+
+    }
+
+    const items = body.method === "settlements"
+      ? parseSettlements(data)
+      : parseWarehouses(data);
+
+    return adminJson({ ok: true, items }, 200, origin);
+
+  } catch (error) {
+
+    console.error("Нова пошта недоступна:", error);
+
+    // Недоступний довідник не має ламати оформлення: сторінка
+    // повернеться до текстового поля.
+    return adminJson({ ok: false, error: "novaposhta_unavailable", items: [] }, 200, origin);
+
+  }
+
+}
+
 async function handlePlaceOrder(request: Request, body: Record<string, any>): Promise<Response> {
 
   const origin = request.headers.get("origin");
@@ -1921,6 +1988,13 @@ async function handleRequest(request: Request): Promise<Response> {
   if (typeof body.admin_action !== "undefined") {
 
     return await handleAdmin(request, body);
+
+  }
+
+  // --- довідник Нової пошти для сторінки оформлення ---
+  if (body.site_action === "nova-poshta") {
+
+    return await handleNovaPoshta(request, body);
 
   }
 

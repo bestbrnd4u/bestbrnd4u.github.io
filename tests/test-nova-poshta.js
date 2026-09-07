@@ -1,0 +1,243 @@
+// Підказки Нової пошти: місто й відділення вибирають, а не вписують.
+//
+// ЩО ЦЕ ЗАКРІПЛЮЄ
+// ----------------
+// 1. КЛЮЧ НП НЕ ПОПАДАЄ В БРАУЗЕР. Він дає право створювати накладні
+//    на рахунку магазину — у коді сайту йому не місце.
+//
+// 2. ПРОКСІ ВМІЄ ЛИШЕ ЧИТАТИ ДОВІДНИК. Дві операції, і жодного
+//    створення накладних: інакше відкритий проксі став би способом
+//    оформлювати відправлення від імені магазину.
+//
+// 3. БЕЗ ДОВІДНИКА ЗАМОВЛЕННЯ ОФОРМЛЮЄТЬСЯ. Немає ключа, НП не
+//    відповіла — поле лишається звичайним текстовим.
+//
+// 4. ВІДДІЛЕННЯ — ТІЛЬКИ ВИБРАНОГО МІСТА. Список «усієї України» не
+//    має сенсу, а старе відділення з іншого міста в замовленні —
+//    гірше за порожнє поле.
+
+const fs = require("fs");
+const path = require("path");
+
+const ROOT = path.join(__dirname, "..");
+
+let failures = 0;
+const check = (n, c, e) => {
+    if (c) console.log("  ✓", n);
+    else { console.log("  ✗", n, e !== undefined ? "→ " + e : ""); failures++; }
+};
+
+const read = rel => fs.readFileSync(path.join(ROOT, rel), "utf8");
+
+const np = require("../supabase/functions/telegram-order-bot/nova-poshta.js");
+
+const src = read("supabase/functions/telegram-order-bot/_index.src.ts");
+const built = read("supabase/functions/telegram-order-bot/index.ts");
+const page = read("assets/js/nova-poshta.js");
+const checkout = read("checkout.html");
+
+const CITY_REF = "8d5a980d-391c-11dd-90d9-001a92567626";
+
+console.log("\n[1] Ключ НП лишається на сервері");
+{
+    check("ключ читається з секретів",
+        /NOVAPOSHTA_API_KEY = Deno\.env\.get\("NOVAPOSHTA_API_KEY"\)/.test(src));
+
+    // Найважливіша перевірка цього файлу: у коді сайту не має бути ні
+    // ключа, ні прямого звернення до НП. Назва модуля (NovaPoshta) —
+    // це не те й не інше, тому шукаємо саме адресу API й ім'я секрета.
+    const site = page.replace(/\/\/.*$/gm, "");
+
+    check("прямих запитів до НП із браузера немає",
+        !/novaposhta\.ua/.test(site), "знайдено звернення до api.novaposhta.ua");
+
+    check("ключа в коді сайту немає",
+        !/NOVAPOSHTA_API_KEY/.test(site) && !/apiKey/.test(site));
+
+    check("браузер питає нашу функцію",
+        /functions\.invoke\("telegram-order-bot"/.test(page)
+        && /site_action: "nova-poshta"/.test(page));
+
+    check("описано в інструкції по секретах",
+        /NOVAPOSHTA_API_KEY/.test(read("supabase/README-telegram-bot.md")));
+
+    check("є покрокова документація",
+        fs.existsSync(path.join(ROOT, "docs/НОВА-ПОШТА.md")));
+}
+
+console.log("\n[2] Проксі вміє тільки довідник");
+{
+    check("рівно два методи", Object.keys(np.NP_METHODS).length === 2);
+
+    check("це пошук міста й перелік відділень",
+        np.NP_METHODS.settlements.calledMethod === "searchSettlements"
+        && np.NP_METHODS.warehouses.calledMethod === "getWarehouses");
+
+    check("чужий метод не проходить",
+        np.npRequest("KEY", { method: "save", query: "x" }) === null);
+
+    check("створення накладних не згадується в коді проксі",
+        !/InternetDocument|save|delete/i.test(read("supabase/functions/telegram-order-bot/nova-poshta.js")
+            .replace(/\/\/.*$/gm, "")));
+
+    // Ref міста підставляється в запит до НП — форму треба перевіряти.
+    check("сміття замість ref не проходить",
+        np.npRequest("KEY", { method: "warehouses", cityRef: "'; drop" }) === null);
+
+    check("справжній ref проходить",
+        np.npRequest("KEY", { method: "warehouses", cityRef: CITY_REF }).methodProperties.CityRef === CITY_REF);
+
+    // Одна літера — це півтисячі міст і жодної користі.
+    check("одна літера не йде в НП",
+        np.npRequest("KEY", { method: "settlements", query: "К" }) === null);
+
+    check("дві вже йдуть",
+        np.npRequest("KEY", { method: "settlements", query: "Ки" }).methodProperties.CityName === "Ки");
+
+    check("довгий запит обрізається",
+        np.npRequest("KEY", { method: "settlements", query: "х".repeat(200) })
+            .methodProperties.CityName.length === 60);
+
+    check("без ключа запиту немає",
+        np.npRequest("", { method: "settlements", query: "Київ" }) === null);
+}
+
+console.log("\n[3] Відповідь НП розбирається обережно");
+{
+    const cities = np.parseSettlements({
+        data: [{ Addresses: [
+            { Present: "м. Київ, Київська обл.", DeliveryCity: CITY_REF },
+            { Present: "с. Київець", DeliveryCity: "" }
+        ] }]
+    });
+
+    check("місто з назвою й ref", cities.length === 1 && cities[0].ref === CITY_REF);
+
+    check("місто без ref відкидається (відділень не спитати)",
+        !cities.some(c => c.name === "с. Київець"));
+
+    // Формат НП може змінитись — це не має валити сторінку оформлення.
+    [null, {}, { data: [] }, { data: [{}] }, { data: "щось" }].forEach((shape, i) => {
+        check(`несподівана відповідь #${i} не валить розбір`,
+            Array.isArray(np.parseSettlements(shape)) && np.parseSettlements(shape).length === 0);
+    });
+
+    const houses = np.parseWarehouses({ data: [
+        { Description: "Відділення №1: вул. Хрещатик, 1", Number: "1", CategoryOfWarehouse: "Branch" },
+        { Description: "Поштомат №1234", Number: "1234", CategoryOfWarehouse: "Postomat" },
+        { Description: "", Number: "9" }
+    ] });
+
+    check("відділення й поштомат розрізняються",
+        houses.length === 2 && houses[0].postomat === false && houses[1].postomat === true);
+
+    check("рядок без назви відкидається", !houses.some(h => h.name === ""));
+
+    // НП відповідає HTTP 200 навіть на невдалий запит: успіх лежить у
+    // полі success. Без цього «недійсний ключ» виглядав би як «немає
+    // такого міста».
+    check("відмова НП розпізнається",
+        np.npError({ success: false, errors: ["API key expired"] }) === "API key expired");
+
+    check("успіх розпізнається", np.npError({ success: true }) === null);
+
+    check("порожня відповідь — теж відмова", Boolean(np.npError(null)));
+}
+
+console.log("\n[4] Сторінка не залежить від довідника");
+{
+    check("модуль підключено", /assets\/js\/nova-poshta\.js/.test(checkout));
+
+    check("без ключа функція відповідає «недоступно»",
+        /novaposhta_unavailable/.test(src));
+
+    // Головне: відповідь 200, а не помилка. Помилка в консолі на
+    // сторінці оформлення виглядає як «магазин зламався».
+    check("відмова не виглядає як поломка",
+        /novaposhta_unavailable", items: \[\] \}, 200/.test(src));
+
+    check("після відмови сторінка більше не питає",
+        /available = false/.test(page));
+
+    check("недоступна НП не ламає оформлення",
+        /catch/.test(page) && /return null/.test(page));
+
+    check("поля лишились звичайними полями",
+        /id="city"/.test(checkout) && /id="branchNumber"/.test(checkout));
+}
+
+console.log("\n[5] Відділення — тільки вибраного міста");
+{
+    check("без міста відділення не питаються",
+        /if \(!cityRef\) return Promise\.resolve\(null\)/.test(page));
+
+    // Людина виправила місто руками після вибору — ref уже не про це
+    // місто, і старе відділення поїхало б у замовлення з новим містом.
+    check("зміна міста скидає ref", /cityRef = "";/.test(page));
+
+    check("і чистить поле відділення",
+        /\[branch, postomat\]\.forEach/.test(page));
+
+    check("поштомати не змішані з відділеннями",
+        /Boolean\(item\.postomat\) === wantPostomat/.test(page));
+
+    check("шукає і за номером, і за адресою",
+        /item\.name\.toLowerCase\(\)\.indexOf\(needle\)/.test(page)
+        && /String\(item\.number\)\.indexOf\(needle\)/.test(page));
+
+    // Відділення міста змінюються раз на місяць, а покупець перебирає
+    // поля туди-сюди.
+    check("список міста не питається двічі", /warehousesByCity\[cityRef\]/.test(page));
+}
+
+console.log("\n[6] Підказки придатні для клавіатури");
+{
+    check("стрілки", /ArrowDown/.test(page) && /ArrowUp/.test(page));
+    check("Enter вибирає", /event\.key === "Enter"/.test(page));
+    check("Escape закриває", /event\.key === "Escape"/.test(page));
+
+    // mousedown, а не click: інакше поле встигає втратити фокус,
+    // список закривається — і клік іде в порожнє місце.
+    check("клік по підказці спрацьовує", /mousedown/.test(page));
+
+    check("запит не на кожну літеру", /DEBOUNCE = 250/.test(page));
+
+    // Поріг у дві літери має сенс ЛИШЕ для міста, де кожен запит іде в
+    // НП. У полі відділення список уже завантажений, а «1» — найчастіший
+    // запит узагалі (перше відділення в кожному місті). Із порогом на
+    // «1» покупець бачив порожнечу й вирішував, що підказки не працюють
+    // — саме це й показала перевірка в браузері.
+    check("у відділенні порогу немає",
+        /attach\(branch, warehouses\(false\), null, 0\)/.test(page)
+        && /attach\(postomat, warehouses\(true\), null, 0\)/.test(page));
+
+    check("місто лишається з порогом",
+        /var limit = typeof min === "number" \? min : MIN_QUERY/.test(page));
+
+    // Список на фокус: покупцеві не треба вгадувати, що вводити.
+    check("список видно одразу, щойно поставили курсор",
+        /if \(limit === 0\)/.test(page) && /addEventListener\("focus"/.test(page));
+
+    // Двічі на одне поле чіплятись не можна: другий список ліг би
+    // поверх першого.
+    check("двічі на поле не чіпляємось", /npReady/.test(page));
+
+    check("автозаповнення браузера не накриває список",
+        /setAttribute\("autocomplete", "off"\)/.test(page));
+
+    // Назви приходять із чужого API — вставляти їх у розмітку як є
+    // не можна.
+    check("назви екрануються", /function escape\(text\)/.test(page)
+        && /replace\(\/</.test(page));
+
+    check("список не розсовує форму", /position:absolute/.test(read("assets/css/style.css")));
+
+    check("зібрана функція не застаріла",
+        built.includes("api.novaposhta.ua/v2.0/json/") && built.includes("nova-poshta"));
+}
+
+console.log(failures === 0
+    ? "\n✅ Нова пошта: адресу вибирають зі довідника, ключ лишається на сервері\n"
+    : `\n❌ Проблем: ${failures}\n`);
+
+process.exit(failures === 0 ? 0 : 1);
