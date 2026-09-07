@@ -6,62 +6,62 @@
 
 ## Умови
 
-- [Оплата і доставка](https://dev.bestbrnd4u.com/delivery-payment): Нова пошта (відділення, поштомат, курʼєр) та інші перевізники. Доставку оплачує покупець перевізнику при отриманні, у суму замовлення вона не входить
-- [Повернення та гарантія](https://dev.bestbrnd4u.com/return-warranty): 14 днів на повернення, кошти повертаються протягом 3 робочих днів
-- [Публічна оферта](https://dev.bestbrnd4u.com/offer): договір, за яким магазин продає
-- [Політика конфіденційності](https://dev.bestbrnd4u.com/privacy-policy): які дані збираються і як ними керувати
-- [Байєр-сервіс](https://dev.bestbrnd4u.com/bayer-service): як замовити річ, якої немає в каталозі
-- [Де моє замовлення](https://dev.bestbrnd4u.com/order-status): стан замовлення за номером і телефоном, без реєстрації
-- [Контакти](https://dev.bestbrnd4u.com/contacts): +380 73 728 82 91, bestbrnd4u@proton.me
+- [Оплата і доставка](https://bestbrnd4u.com/delivery-payment): Нова пошта (відділення, поштомат, курʼєр) та інші перевізники. Доставку оплачує покупець перевізнику при отриманні, у суму замовлення вона не входить
+- [Повернення та гарантія](https://bestbrnd4u.com/return-warranty): 14 днів на повернення, кошти повертаються протягом 3 робочих днів
+- [Публічна оферта](https://bestbrnd4u.com/offer): договір, за яким магазин продає
+- [Політика конфіденційності](https://bestbrnd4u.com/privacy-policy): які дані збираються і як ними керувати
+- [Байєр-сервіс](https://bestbrnd4u.com/bayer-service): як замовити річ, якої немає в каталозі
+- [Де моє замовлення](https://bestbrnd4u.com/order-status): стан замовлення за номером і телефоном, без реєстрації
+- [Контакти](https://bestbrnd4u.com/contacts): +380 73 728 82 91, bestbrnd4u@proton.me
 
 ## Каталог
 
-- [Усі товари](https://dev.bestbrnd4u.com/catalog): фільтри за брендом, категорією, кольором, розміром і ціною
-- [Новинки](https://dev.bestbrnd4u.com/catalog?section=new)
-- [Акції](https://dev.bestbrnd4u.com/catalog?section=sale): товари зі знижкою
+- [Усі товари](https://bestbrnd4u.com/catalog): фільтри за брендом, категорією, кольором, розміром і ціною
+- [Новинки](https://bestbrnd4u.com/catalog?section=new)
+- [Акції](https://bestbrnd4u.com/catalog?section=sale): товари зі знижкою
 
 ### Розділи
 
-- [Аксесуари](https://dev.bestbrnd4u.com/departments/aksesuary/)
-- [Взуття](https://dev.bestbrnd4u.com/departments/vzuttia/)
-- [Сумки](https://dev.bestbrnd4u.com/departments/sumky/)
+- [Аксесуари](https://bestbrnd4u.com/departments/aksesuary/)
+- [Взуття](https://bestbrnd4u.com/departments/vzuttia/)
+- [Сумки](https://bestbrnd4u.com/departments/sumky/)
 
 ### Категорії
 
-- [Гаманці](https://dev.bestbrnd4u.com/categories/hamantsi/)
-- [Годинники](https://dev.bestbrnd4u.com/categories/hodynnyky/)
-- [Жіночі сумки](https://dev.bestbrnd4u.com/categories/zhinochi-sumky/)
-- [Кросівки](https://dev.bestbrnd4u.com/categories/krosivky/)
-- [Окуляри і оправи](https://dev.bestbrnd4u.com/categories/okuliary-i-opravy/)
-- [Чоловічі сумки](https://dev.bestbrnd4u.com/categories/cholovichi-sumky/)
+- [Гаманці](https://bestbrnd4u.com/categories/hamantsi/)
+- [Годинники](https://bestbrnd4u.com/categories/hodynnyky/)
+- [Жіночі сумки](https://bestbrnd4u.com/categories/zhinochi-sumky/)
+- [Кросівки](https://bestbrnd4u.com/categories/krosivky/)
+- [Окуляри і оправи](https://bestbrnd4u.com/categories/okuliary-i-opravy/)
+- [Чоловічі сумки](https://bestbrnd4u.com/categories/cholovichi-sumky/)
 
 ### Бренди
 
-- [Adidas by Stella Mccartney](https://dev.bestbrnd4u.com/brands/adidas-by-stella-mccartney/)
-- [Alain Mikli](https://dev.bestbrnd4u.com/brands/alain-mikli/)
-- [Armani Exchange](https://dev.bestbrnd4u.com/brands/armani-exchange/)
-- [Balenciaga](https://dev.bestbrnd4u.com/brands/balenciaga/)
-- [Burberry](https://dev.bestbrnd4u.com/brands/burberry/)
-- [Coach](https://dev.bestbrnd4u.com/brands/coach/)
-- [Gucci](https://dev.bestbrnd4u.com/brands/gucci/)
-- [Invicta](https://dev.bestbrnd4u.com/brands/invicta/)
-- [Jacquemus](https://dev.bestbrnd4u.com/brands/jacquemus/)
-- [Jimmy Choo](https://dev.bestbrnd4u.com/brands/jimmy-choo/)
-- [JW PEI](https://dev.bestbrnd4u.com/brands/jw-pei/)
-- [Lacoste](https://dev.bestbrnd4u.com/brands/lacoste/)
-- [Love Moschino](https://dev.bestbrnd4u.com/brands/love-moschino/)
-- [Marc Jacobs](https://dev.bestbrnd4u.com/brands/marc-jacobs/)
-- [Mathey-Tissot](https://dev.bestbrnd4u.com/brands/mathey-tissot/)
-- [Michael Kors](https://dev.bestbrnd4u.com/brands/michael-kors/)
-- [Prada](https://dev.bestbrnd4u.com/brands/prada/)
-- [Ray-Ban](https://dev.bestbrnd4u.com/brands/ray-ban/)
-- [Saint Laurent](https://dev.bestbrnd4u.com/brands/saint-laurent/)
-- [Tissot](https://dev.bestbrnd4u.com/brands/tissot/)
+- [Adidas by Stella Mccartney](https://bestbrnd4u.com/brands/adidas-by-stella-mccartney/)
+- [Alain Mikli](https://bestbrnd4u.com/brands/alain-mikli/)
+- [Armani Exchange](https://bestbrnd4u.com/brands/armani-exchange/)
+- [Balenciaga](https://bestbrnd4u.com/brands/balenciaga/)
+- [Burberry](https://bestbrnd4u.com/brands/burberry/)
+- [Coach](https://bestbrnd4u.com/brands/coach/)
+- [Gucci](https://bestbrnd4u.com/brands/gucci/)
+- [Invicta](https://bestbrnd4u.com/brands/invicta/)
+- [Jacquemus](https://bestbrnd4u.com/brands/jacquemus/)
+- [Jimmy Choo](https://bestbrnd4u.com/brands/jimmy-choo/)
+- [JW PEI](https://bestbrnd4u.com/brands/jw-pei/)
+- [Lacoste](https://bestbrnd4u.com/brands/lacoste/)
+- [Love Moschino](https://bestbrnd4u.com/brands/love-moschino/)
+- [Marc Jacobs](https://bestbrnd4u.com/brands/marc-jacobs/)
+- [Mathey-Tissot](https://bestbrnd4u.com/brands/mathey-tissot/)
+- [Michael Kors](https://bestbrnd4u.com/brands/michael-kors/)
+- [Prada](https://bestbrnd4u.com/brands/prada/)
+- [Ray-Ban](https://bestbrnd4u.com/brands/ray-ban/)
+- [Saint Laurent](https://bestbrnd4u.com/brands/saint-laurent/)
+- [Tissot](https://bestbrnd4u.com/brands/tissot/)
 
 ## Машинні дані
 
-- [Товарний фід](https://dev.bestbrnd4u.com/feed.xml): усі позиції з цінами, наявністю та фото (RSS 2.0, формат Google Merchant)
-- [Карта сайту](https://dev.bestbrnd4u.com/sitemap.xml): усі сторінки та фото товарів
+- [Товарний фід](https://bestbrnd4u.com/feed.xml): усі позиції з цінами, наявністю та фото (RSS 2.0, формат Google Merchant)
+- [Карта сайту](https://bestbrnd4u.com/sitemap.xml): усі сторінки та фото товарів
 
 ## Чого на сайті немає
 
