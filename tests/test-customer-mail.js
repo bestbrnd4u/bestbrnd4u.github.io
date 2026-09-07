@@ -1,0 +1,241 @@
+// Покупець із сайту дізнається про своє замовлення.
+//
+// ЩО БУЛО НЕ ТАК
+// ---------------
+// Сповіщення про статус ішли в telegram_chat_id, а він є ЛИШЕ в
+// замовлень із бота. Покупець із сайту не отримував нічого: ні
+// «прийнято в роботу», ні «відправлено, накладна така-то», ні
+// «скасовано». Це половина всіх покупців.
+//
+// ЩО ЦЕ ЗАКРІПЛЮЄ
+// ----------------
+// 1. ОДИН КАНАЛ НА ПОКУПЦЯ. Є чат — пишемо в чат, немає — листом.
+//    Двох повідомлень про одне й те саме бути не повинно.
+// 2. БЕЗ КЛЮЧА НІЧОГО НЕ ЛАМАЄТЬСЯ. Немає розсилки — немає листів, і
+//    все інше працює як раніше.
+// 3. ЛИСТ НЕ ЗУПИНЯЄ ТЕ, ЧЕРЕЗ ЩО ВИНИК: ні зміну статусу, ні
+//    створення замовлення.
+// 4. ТЕКСТ ЛИСТА Й ТЕКСТ У TELEGRAM РОЗПОВІДАЮТЬ ОДНЕ Й ТЕ САМЕ.
+
+const fs = require("fs");
+const path = require("path");
+
+const ROOT = path.join(__dirname, "..");
+
+let failures = 0;
+const check = (n, c, e) => {
+    if (c) console.log("  ✓", n);
+    else { console.log("  ✗", n, e !== undefined ? "→ " + e : ""); failures++; }
+};
+
+const read = rel => fs.readFileSync(path.join(ROOT, rel), "utf8");
+
+const src = read("supabase/functions/telegram-order-bot/_index.src.ts");
+const built = read("supabase/functions/telegram-order-bot/index.ts");
+const checkout = read("assets/js/checkout.js");
+
+const mail = require("../supabase/functions/telegram-order-bot/mail.js");
+
+const ORDER = {
+    order_number: "0708553442",
+    email: "buyer@example.com",
+    total: 11000,
+    subtotal: 12000,
+    discount: 1000,
+    delivery_price: 90,
+    delivery_method: "Нова пошта, відділення",
+    delivery_city: "Київ",
+    tracking_number: "20450000000000",
+    items: [{ title: "Сумка Coach Tabby 26", brand: "Coach", price: 11000, qty: 1, color: "Чорний", size: "ONESIZE" }]
+};
+
+console.log("\n[1] Лист про замовлення");
+{
+    const letter = mail.orderLetter(ORDER, "https://bestbrnd4u.com");
+
+    check("є тема з номером", /0708553442/.test(letter.subject), letter.subject);
+
+    check("у листі є склад замовлення", /Coach Tabby 26/.test(letter.html));
+
+    check("є сума", /11\s?000/.test(letter.html.replace(/&nbsp;| /g, " ")));
+
+    check("є знижка й доставка",
+        /Знижка/.test(letter.html) && /Нова пошта/.test(letter.html));
+
+    check("є контакти магазину",
+        /t\.me\/bestbrnd4u/.test(letter.html) && /proton\.me/.test(letter.html));
+
+    // Пошта вирізає <style> і не знає сучасного CSS: усе оформлення
+    // мусить бути в атрибутах.
+    check("оформлення inline, без <style>", !/<style/.test(letter.html));
+
+    // Дані замовлення пише покупець.
+    const evil = mail.orderLetter({
+        ...ORDER,
+        items: [{ title: '<img src=x onerror=alert(1)>', price: 1, qty: 1 }]
+    }, "");
+
+    check("розмітка з даних екранується",
+        !/<img src=x/.test(evil.html) && /&lt;img/.test(evil.html));
+}
+
+console.log("\n[2] Лист про статус");
+{
+    const shipped = mail.statusLetter(ORDER, "shipped", "https://bestbrnd4u.com");
+
+    check("відправлення: є тема", /відправлено/i.test(shipped.subject));
+
+    check("відправлення: є накладна", /20450000000000/.test(shipped.html));
+
+    check("відправлення: є кнопка відстеження",
+        /Відстежити посилку/.test(shipped.html) && /novaposhta/i.test(shipped.html));
+
+    check("без накладної лист усе одно осмислений",
+        /надішлемо окремо/.test(mail.statusLetter({ order_number: "1" }, "shipped", "").html));
+
+    ["processing", "completed", "cancelled"].forEach(status => {
+        check(`статус ${status} має свій лист`, Boolean(mail.statusLetter(ORDER, status, "")));
+    });
+
+    // «Нове» покупцеві не повідомляють: він щойно оформив замовлення
+    // й уже отримав підтвердження.
+    check("про статус «нове» листа немає", mail.statusLetter(ORDER, "new", "") === null);
+
+    check("невідомий статус не вигадує листа", mail.statusLetter(ORDER, "щось", "") === null);
+
+    // Текст листа й текст у Telegram мусять говорити одне й те саме.
+    const format = read("supabase/functions/telegram-order-bot/format.js");
+
+    ["processing", "shipped", "completed", "cancelled"].forEach(status => {
+        check(`${status} є і в чаті, і в листі`,
+            new RegExp(`case "${status}"`).test(format)
+            && new RegExp(`case "${status}"`).test(read("supabase/functions/telegram-order-bot/mail.js")));
+    });
+}
+
+console.log("\n[3] Куди й чим надсилати");
+{
+    const config = {
+        to: "buyer@example.com",
+        from: "BestBrnd4u <noreply@bestbrnd4u.com>",
+        resendKey: "re_test"
+    };
+
+    const resend = mail.mailRequest(config, mail.orderLetter(ORDER, ""));
+
+    check("Resend: адреса сервісу", resend.url === "https://api.resend.com/emails");
+    check("Resend: ключ у заголовку", /Bearer re_test/.test(resend.headers.Authorization));
+    check("Resend: одержувач у тілі", resend.body.to[0] === "buyer@example.com");
+
+    const brevo = mail.mailRequest({ ...config, resendKey: "", brevoKey: "xkeysib" },
+        mail.orderLetter(ORDER, ""));
+
+    check("Brevo: адреса сервісу", brevo.url === "https://api.brevo.com/v3/smtp/email");
+    check("Brevo: ключ у своєму заголовку", brevo.headers["api-key"] === "xkeysib");
+
+    // Brevo хоче ім'я й адресу окремо — розбір «Ім'я <адреса>».
+    check("Brevo: ім'я й адреса розділені",
+        brevo.body.sender.name === "BestBrnd4u"
+        && brevo.body.sender.email === "noreply@bestbrnd4u.com",
+        JSON.stringify(brevo.body.sender));
+
+    check("проста адреса теж приймається",
+        mail.mailRequest({ to: "a@b.c", from: "shop@bestbrnd4u.com", brevoKey: "k" },
+            mail.orderLetter(ORDER, "")).body.sender.email === "shop@bestbrnd4u.com");
+
+    // Найважливіше: без налаштувань нічого не надсилається.
+    check("без ключа — жодного запиту",
+        mail.mailRequest({ to: "a@b.c", from: "s@b.c" }, mail.orderLetter(ORDER, "")) === null);
+
+    check("без пошти покупця — жодного запиту",
+        mail.mailRequest({ from: "s@b.c", resendKey: "k" }, mail.orderLetter(ORDER, "")) === null);
+
+    check("без адреси відправника — жодного запиту",
+        mail.mailRequest({ to: "a@b.c", resendKey: "k" }, mail.orderLetter(ORDER, "")) === null);
+
+    check("без листа — жодного запиту",
+        mail.mailRequest({ to: "a@b.c", from: "s@b.c", resendKey: "k" }, null) === null);
+}
+
+console.log("\n[4] Один канал на покупця");
+{
+    check("немає чату — йде лист",
+        /if \(!chatId\) \{[\s\S]{0,600}sendCustomerMail\(order, statusLetter/.test(src));
+
+    // Гілка з листом мусить ЗАВЕРШИТИСЬ раніше, ніж почнеться
+    // надсилання в чат: інакше покупець із бота, у якого колись
+    // з'явиться пошта, отримає і те, і те.
+    const mailAt = src.indexOf("sendCustomerMail(order, statusLetter");
+    const chatAt = src.indexOf("const text = customerStatusMessage");
+
+    check("є чат — лист не йде",
+        mailAt > 0 && chatAt > mailAt && /\breturn\b/.test(src.slice(mailAt, chatAt)));
+
+    check("підтвердження — лише для замовлень із сайту",
+        /if \(!record\?\.telegram_chat_id\) \{[\s\S]{0,200}orderLetter\(record/.test(src));
+
+    // Усі три місця, де змінюється статус (кнопка в Telegram, збереження
+    // ТТН, панель адмінки), ходять через notifyCustomer — тому лист
+    // додався одразу всім.
+    check("усі шляхи зміни статусу проходять через одну функцію",
+        (src.match(/await notifyCustomer\(/g) || []).length >= 3);
+}
+
+console.log("\n[5] Нічого не ламається без налаштувань");
+{
+    check("лист не кидає винятків",
+        /async function sendCustomerMail[\s\S]{0,900}try \{[\s\S]{0,600}catch \(error\)/.test(src));
+
+    check("немає ключа — просто нічого не робимо",
+        /if \(!request\) return false;/.test(src));
+
+    check("ключі читаються з секретів",
+        /RESEND_API_KEY = Deno\.env\.get\("RESEND_API_KEY"\)/.test(src)
+        && /BREVO_API_KEY = Deno\.env\.get\("BREVO_API_KEY"\)/.test(src)
+        && /MAIL_FROM = Deno\.env\.get\("MAIL_FROM"\)/.test(src));
+
+    check("зібрана функція не застаріла",
+        built.includes("api.resend.com/emails") && built.includes("sendCustomerMail"));
+
+    check("секрети описані в інструкції",
+        /RESEND_API_KEY/.test(read("supabase/README-telegram-bot.md"))
+        && /MAIL_FROM/.test(read("supabase/README-telegram-bot.md")));
+}
+
+console.log("\n[6] Два листи про одне замовлення неможливі");
+{
+    const config = JSON.parse(read("data/notifications.json"));
+
+    check("галочка є", "serverEmail" in config);
+
+    // За замовчуванням вимкнена: інакше після виливки покупець
+    // перестав би отримувати підтвердження, бо на сервері ще немає
+    // ключа розсилки.
+    check("за замовчуванням вимкнена", config.serverEmail === false);
+
+    check("сторінка не шле свій лист, коли шле сервер",
+        /config\.serverEmail === true\) return \{ skipped: true \}/.test(checkout));
+
+    // Налаштування читаються обіцянкою: якщо людина натисне кнопку
+    // раніше, ніж приїде файл, вибір мусить бути вже відомий.
+    check("вибір відомий до надсилання",
+        /notificationsConfig\(\)\.then\(config =>/.test(checkout));
+
+    check("галочка редагується в адмінці",
+        /data\/notifications\.json/.test(read("admin/config.yml")));
+
+    check("є покрокова документація",
+        fs.existsSync(path.join(ROOT, "docs/ЛИСТИ-ПОКУПЦЮ.md")));
+
+    // Друга половина тієї самої проблеми: листи входу в кабінет ідуть
+    // через вбудований SMTP Supabase з лімітом кілька листів на годину.
+    check("сказано, як полагодити листи кабінету",
+        /SMTP/.test(read("docs/ЛИСТИ-ПОКУПЦЮ.md"))
+        && /smtp\.resend\.com|smtp-relay\.brevo\.com/.test(read("docs/ЛИСТИ-ПОКУПЦЮ.md")));
+}
+
+console.log(failures === 0
+    ? "\n✅ Листи: покупець із сайту дізнається про замовлення так само, як із бота\n"
+    : `\n❌ Проблем: ${failures}\n`);
+
+process.exit(failures === 0 ? 0 : 1);

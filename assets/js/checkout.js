@@ -23,6 +23,35 @@ if (emailjsReady) {
     emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
 }
 
+// Хто саме шле лист-подяку покупцеві.
+//
+// Досі це робила сторінка через EmailJS: ключі відкриті в коді, ліміт
+// 200 листів на місяць, і лист залежить від того, чи не закрив покупець
+// вкладку. Тепер те саме вміє Edge Function — та сама, що пише власнику
+// в Telegram (docs/ЛИСТИ-ПОКУПЦЮ.md).
+//
+// Поки в адмінці не ввімкнули «листи надсилає сервер», лист шле
+// сторінка — як робила завжди. Після вмикання перестає: інакше
+// покупець отримає два однакових листи про одне замовлення.
+//
+// Налаштування читаємо ОБІЦЯНКОЮ, а не в фоні: якщо людина натисне
+// кнопку раніше, ніж приїде файл, вибір мусить бути вже відомий.
+let notificationsRequest = null;
+
+function notificationsConfig() {
+
+    if (!notificationsRequest) {
+
+        notificationsRequest = fetch(dataUrl("data/notifications.json"))
+            .then(response => (response.ok ? response.json() : {}))
+            .catch(() => ({}));
+
+    }
+
+    return notificationsRequest;
+
+}
+
 // -------------------------
 // Спосіб звʼязку
 //
@@ -1161,14 +1190,21 @@ checkoutForm?.addEventListener("submit", event => {
         body: JSON.stringify(payload)
     });
 
-    // 2) лист-подяка клієнту з деталями його замовлення (EmailJS)
-    const customerThankYou = emailjsReady
-        ? emailjs.send(
+    // 2) лист-подяка клієнту з деталями його замовлення
+    const customerThankYou = notificationsConfig().then(config => {
+
+        // Сервер уже вміє це сам — сторінка не дублює.
+        if (config && config.serverEmail === true) return { skipped: true };
+
+        if (!emailjsReady) throw new Error("EmailJS не налаштовано");
+
+        return emailjs.send(
             EMAILJS_SERVICE_ID,
             EMAILJS_TEMPLATE_ID_CUSTOMER,
             buildEmailTemplateParams(orderId, orderDate)
-        )
-        : Promise.reject(new Error("EmailJS не налаштовано"));
+        );
+
+    });
 
     // 3) саме замовлення — у базу. Разом із ним працюють Telegram,
     //    панель замовлень, перевірка залишків і перевірка суми.
