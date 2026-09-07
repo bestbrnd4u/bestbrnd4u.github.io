@@ -67,6 +67,19 @@ console.log("\n[1] Кого база вважає брошеним кошико�
 
     check("таблиця «кому писали» є",
         /create table if not exists public\.cart_reminders/.test(sql));
+
+    // Кошик уже існує — його створювали разом із кабінетом, і в нього
+    // свої політики. Спершу тут стояв «create table if not exists» як
+    // запобіжник; редактор Supabase справедливо попередив, що в такому
+    // створенні немає RLS, а кнопка «Run and enable RLS» дописала б
+    // увімкнення RLS до чужої таблиці. Якби політик не виявилось,
+    // кошик перестав би відкриватись у всіх, хто увійшов.
+    check("міграція не створює таблицю кошика",
+        !/create table if not exists public\.cart_items/.test(sql));
+
+    check("кожна створена тут таблиця одразу закривається",
+        (sql.match(/create table if not exists/g) || []).length
+        === (sql.match(/enable row level security/g) || []).length);
 }
 
 console.log("\n[2] Пошти покупців закриті від клієнта");

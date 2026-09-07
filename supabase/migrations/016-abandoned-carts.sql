@@ -35,18 +35,23 @@
 -- assets/js/sync.js). Тому окремого тригера не потрібно: час вставки
 -- рядка і є час останньої зміни кошика.
 --
--- create table if not exists — на випадок, коли таблиці ще немає;
--- якщо вона є (а вона є), рядок нічого не робить.
+-- ТАБЛИЦЮ ТУТ НЕ СТВОРЮЄМО.
+--
+-- public.cart_items уже існує — її створювали разом із кабінетом, і з
+-- нею працює assets/js/sync.js. Спершу тут стояло її створення «на
+-- випадок, коли таблиці немає», і редактор Supabase справедливо
+-- попередив: у такому створенні немає RLS.
+--
+-- Рядок був не лише зайвим, а й небезпечним у відповіді на те
+-- попередження: кнопка «Run and enable RLS» дописала б увімкнення RLS
+-- до таблиці, у якої вже є свої політики, — а якби політик не
+-- виявилось, кошик перестав би відкриватись у всіх, хто увійшов.
+--
+-- Тому тут лишається тільки те, чого справді бракує: колонка з часом
+-- останньої зміни. Якщо таблиці раптом немає, ALTER чесно впаде з
+-- зрозумілою помилкою — це краще, ніж мовчки створити таблицю з
+-- вгаданою схемою.
 -- --------------------------------------
-
-create table if not exists public.cart_items (
-    id         bigserial primary key,
-    user_id    uuid not null,
-    product_id bigint,
-    color      text,
-    size       text,
-    qty        integer not null default 1
-);
 
 alter table public.cart_items
     add column if not exists updated_at timestamptz not null default now();
@@ -162,6 +167,18 @@ grant execute on function public.abandoned_carts(interval, integer) to service_r
 
 -- --------------------------------------
 -- ЯК ПЕРЕВІРИТИ
+--
+-- Чи закритий кошик від чужих очей (мусить бути rls = true й хоча б
+-- одна політика):
+--
+--   select c.relrowsecurity as rls,
+--          (select count(*) from pg_policies
+--            where schemaname = 'public' and tablename = 'cart_items') as політик
+--     from pg_class c
+--     join pg_namespace n on n.oid = c.relnamespace
+--    where n.nspname = 'public' and c.relname = 'cart_items';
+--
+-- Кого нагадувати:
 --
 --   select user_id, email, jsonb_array_length(items) as позицій
 --     from public.abandoned_carts(interval '0 hours');
