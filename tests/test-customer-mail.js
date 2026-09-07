@@ -248,9 +248,21 @@ console.log("\n[6] Два листи про одне замовлення нем
 
     // Друга половина тієї самої проблеми: листи входу в кабінет ідуть
     // через вбудований SMTP Supabase з лімітом кілька листів на годину.
+    const doc = read("docs/ЛИСТИ-ПОКУПЦЮ.md");
+
     check("сказано, як полагодити листи кабінету",
-        /SMTP/.test(read("docs/ЛИСТИ-ПОКУПЦЮ.md"))
-        && /smtp\.resend\.com|smtp-relay\.brevo\.com/.test(read("docs/ЛИСТИ-ПОКУПЦЮ.md")));
+        /smtp\.resend\.com/.test(doc) && /smtp-relay\.brevo\.com/.test(doc));
+
+    // Панель Supabase перенесла SMTP із Project Settings у розділ
+    // Authentication. Інструкція, яка веде не туди, коштує часу —
+    // тому тут закріплено саме актуальний шлях.
+    check("шлях до SMTP — актуальний",
+        /auth\/smtp/.test(doc) && /Не в Project Settings/.test(doc));
+
+    // Свій SMTP без підняття ліміту — робота наполовину: вбудований
+    // відправник дає 2 листи на годину, і саме через це все й почалось.
+    check("сказано про ліміт листів",
+        /auth\/rate-limits/.test(doc) && /2 листи на годину/.test(doc));
 }
 
 console.log(failures === 0
