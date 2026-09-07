@@ -300,7 +300,53 @@ console.log("\n[4] Скрипт MailerLite більше не вантажить�
     check("і про подвійне підтвердження", /підтвердженням/.test(privacy));
 }
 
-console.log("\n[5] Доставка у фіді = доставці в розмітці");
+console.log("\n[5] «Не налаштовано» видно, а не приймається за «зроблено»");
+{
+    const env = require("../scripts/site-env.js");
+
+    // РЕГРЕСІЯ, ЯКУ ЦЕ ЛОВИТЬ.
+    //
+    // Кроки за розкладом, яким бракує ключа, виходять УСПІШНО —
+    // розклад не має червоніти через ненастроєну можливість. Але тоді
+    // в списку запусків стоїть галочка, а зроблено нічого.
+    //
+    // Заміряно в логу справжнього запуску Remind carts:
+    //   MAIL_FROM:
+    //   Немає ключа розсилки — нагадування пропускаю
+    //   → success
+    //
+    // Ключів пошти в GitHub Actions не було взагалі: вони лежали в
+    // секретах Supabase, а це ІНШЕ сховище. Тобто нагадування про
+    // брошений кошик не надіслали жодного листа з дня появи.
+    check("є помічник", typeof env.notConfigured === "function");
+
+    ["scripts/remind-carts.js", "scripts/request-reviews.js"].forEach(rel => {
+
+        const src = read(rel);
+
+        check(`${rel}: попереджає про відсутній ключ розсилки`,
+            /notConfigured\("Немає ключа розсилки/.test(src));
+
+        check(`${rel}: і про відсутній MAIL_FROM`,
+            /notConfigured\("Немає MAIL_FROM/.test(src));
+
+        // Крок і далі НЕ падає: інакше розклад червонів би через
+        // можливість, якої ще не налаштували.
+        check(`${rel}: але не падає через це`,
+            !/MAIL_FROM[\s\S]{0,120}process\.exit\(1\)/.test(src));
+
+    });
+
+    // ::warning:: лише в Actions — локально це був би шум.
+    check("формат Actions лише в Actions",
+        /process\.env\.GITHUB_ACTIONS/.test(read("scripts/site-env.js")));
+
+    // Копія веде себе так само: без пароля попереджає, а не мовчить.
+    check("копія теж попереджає",
+        /::warning::Немає секрету BACKUP_PASSPHRASE/.test(read(".github/workflows/backup.yml")));
+}
+
+console.log("\n[6] Доставка у фіді = доставці в розмітці");
 {
     const feedJs = read("scripts/build-feed.js");
     const productJs = read("assets/js/product.js");
@@ -335,7 +381,7 @@ console.log("\n[5] Доставка у фіді = доставці в розмі
         (feed.match(/<g:shipping>/g) || []).length === (feed.match(/<\/g:shipping>/g) || []).length);
 }
 
-console.log("\n[6] ONESIZE не видно, але кнопка лишається");
+console.log("\n[7] ONESIZE не видно, але кнопка лишається");
 {
     const common = read("assets/js/common.js");
 

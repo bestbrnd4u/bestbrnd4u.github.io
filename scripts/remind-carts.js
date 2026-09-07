@@ -36,6 +36,10 @@
 const fs = require("fs");
 const path = require("path");
 
+// Попередження «не налаштовано» так, щоб його було видно на
+// сторінці запуску (див. пояснення в scripts/site-env.js).
+const { notConfigured } = require("./site-env");
+
 const ROOT = path.join(__dirname, "..");
 
 const { cartLetter, mailRequest } = require("../supabase/functions/telegram-order-bot/mail.js");
@@ -194,12 +198,12 @@ async function main() {
     // Без розсилки нема чого й починати: інакше крок щогодини
     // перебирав би ті самі кошики й писав у лог одні й ті самі пошти.
     if (!DRY && !process.env.RESEND_API_KEY && !process.env.BREVO_API_KEY) {
-        console.log("Немає ключа розсилки — нагадування пропускаю (див. docs/БРОШЕНИЙ-КОШИК.md)");
+        notConfigured("Немає ключа розсилки — нагадування пропускаю (див. docs/БРОШЕНИЙ-КОШИК.md)");
         return;
     }
 
     if (!DRY && !process.env.MAIL_FROM) {
-        console.log("Немає MAIL_FROM — нагадування пропускаю");
+        notConfigured("Немає MAIL_FROM — нагадування пропускаю");
         return;
     }
 
