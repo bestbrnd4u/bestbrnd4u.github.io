@@ -21,6 +21,10 @@
       <g:gender>unisex</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>2-1</g:id>
@@ -39,6 +43,10 @@
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>3-1</g:id>
@@ -58,6 +66,10 @@
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>4-1</g:id>
@@ -76,6 +88,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
       <g:custom_label_0>акція</g:custom_label_0>
     </item>
     <item>
@@ -97,6 +113,10 @@
       <g:gender>unisex</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
       <g:custom_label_0>акція</g:custom_label_0>
     </item>
     <item>
@@ -118,6 +138,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
       <g:custom_label_0>акція</g:custom_label_0>
     </item>
     <item>
@@ -139,6 +163,10 @@
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
       <g:custom_label_0>акція</g:custom_label_0>
     </item>
     <item>
@@ -159,6 +187,10 @@
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>9-1</g:id>
@@ -179,6 +211,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
       <g:custom_label_0>акція</g:custom_label_0>
     </item>
     <item>
@@ -201,6 +237,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
       <g:custom_label_0>акція</g:custom_label_0>
     </item>
     <item>
@@ -222,6 +262,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
       <g:custom_label_0>акція</g:custom_label_0>
     </item>
     <item>
@@ -243,6 +287,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
       <g:custom_label_0>акція</g:custom_label_0>
     </item>
     <item>
@@ -265,6 +313,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
       <g:custom_label_0>акція</g:custom_label_0>
     </item>
     <item>
@@ -287,6 +339,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
       <g:custom_label_0>акція</g:custom_label_0>
     </item>
     <item>
@@ -309,6 +365,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
       <g:custom_label_0>акція</g:custom_label_0>
     </item>
     <item>
@@ -330,6 +390,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
       <g:custom_label_0>акція</g:custom_label_0>
     </item>
     <item>
@@ -351,6 +415,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
       <g:custom_label_0>акція</g:custom_label_0>
     </item>
     <item>
@@ -371,6 +439,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
       <g:custom_label_0>акція</g:custom_label_0>
     </item>
     <item>
@@ -388,6 +460,10 @@
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>13-1</g:id>
@@ -406,6 +482,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>14-1</g:id>
@@ -425,6 +505,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>14-2</g:id>
@@ -444,6 +528,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>15-1</g:id>
@@ -462,6 +550,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>16-1</g:id>
@@ -481,6 +573,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>17-1</g:id>
@@ -500,6 +596,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>18-1</g:id>
@@ -518,6 +618,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>19-1</g:id>
@@ -536,6 +640,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>20-1</g:id>
@@ -556,6 +664,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
       <g:custom_label_0>акція</g:custom_label_0>
     </item>
     <item>
@@ -577,6 +689,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
       <g:custom_label_0>акція</g:custom_label_0>
     </item>
     <item>
@@ -597,6 +713,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
       <g:custom_label_0>акція</g:custom_label_0>
     </item>
     <item>
@@ -617,6 +737,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
       <g:custom_label_0>акція</g:custom_label_0>
     </item>
     <item>
@@ -636,6 +760,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
       <g:custom_label_0>акція</g:custom_label_0>
     </item>
     <item>
@@ -656,6 +784,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
       <g:custom_label_0>акція</g:custom_label_0>
     </item>
     <item>
@@ -675,6 +807,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
       <g:custom_label_0>новинка</g:custom_label_0>
     </item>
     <item>
@@ -694,6 +830,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
       <g:custom_label_0>новинка</g:custom_label_0>
     </item>
     <item>
@@ -713,6 +853,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
       <g:custom_label_0>новинка</g:custom_label_0>
     </item>
     <item>
@@ -733,6 +877,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
       <g:custom_label_0>новинка</g:custom_label_0>
     </item>
     <item>
@@ -751,6 +899,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
       <g:custom_label_0>новинка</g:custom_label_0>
     </item>
     <item>
@@ -771,6 +923,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
       <g:custom_label_0>новинка</g:custom_label_0>
     </item>
     <item>
@@ -792,6 +948,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
       <g:custom_label_0>новинка</g:custom_label_0>
     </item>
     <item>
@@ -813,6 +973,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
       <g:custom_label_0>акція</g:custom_label_0>
     </item>
     <item>
@@ -833,6 +997,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
       <g:custom_label_0>новинка</g:custom_label_0>
     </item>
     <item>
@@ -853,6 +1021,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
       <g:custom_label_0>новинка</g:custom_label_0>
     </item>
     <item>
@@ -873,6 +1045,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
       <g:custom_label_0>новинка</g:custom_label_0>
     </item>
     <item>
@@ -893,6 +1069,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>34-1-38</g:id>
@@ -913,6 +1093,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Взуття &gt; Кросівки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>34-1-37</g:id>
@@ -933,6 +1117,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Взуття &gt; Кросівки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>34-1-39</g:id>
@@ -953,6 +1141,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Взуття &gt; Кросівки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>35-1-36</g:id>
@@ -973,6 +1165,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Взуття &gt; Кросівки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>36-1-37</g:id>
@@ -993,6 +1189,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Взуття &gt; Кросівки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>36-1-38</g:id>
@@ -1013,6 +1213,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Взуття &gt; Кросівки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>36-1-39</g:id>
@@ -1033,6 +1237,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Взуття &gt; Кросівки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>37-1-38</g:id>
@@ -1053,6 +1261,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Взуття &gt; Кросівки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>38-1-38</g:id>
@@ -1072,6 +1284,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Взуття &gt; Кросівки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>39-1-37</g:id>
@@ -1091,6 +1307,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Взуття &gt; Кросівки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>40-1</g:id>
@@ -1108,6 +1328,10 @@
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>41-1-37</g:id>
@@ -1128,6 +1352,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Взуття &gt; Кросівки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>42-1-37</g:id>
@@ -1148,6 +1376,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Взуття &gt; Кросівки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>43-1-38</g:id>
@@ -1168,6 +1400,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Взуття &gt; Кросівки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>44-1-38</g:id>
@@ -1188,6 +1424,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Взуття &gt; Кросівки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>45-1</g:id>
@@ -1208,6 +1448,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>46-1</g:id>
@@ -1229,6 +1473,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>46-2</g:id>
@@ -1249,6 +1497,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>47-1</g:id>
@@ -1268,6 +1520,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>48-1</g:id>
@@ -1288,6 +1544,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>49-1-S</g:id>
@@ -1308,6 +1568,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>50-1</g:id>
@@ -1327,6 +1591,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>51-1-M</g:id>
@@ -1348,6 +1616,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>52-1-S</g:id>
@@ -1368,6 +1640,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>53-1</g:id>
@@ -1388,6 +1664,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>54-1</g:id>
@@ -1409,6 +1689,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>55-1</g:id>
@@ -1430,6 +1714,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>56-1-S</g:id>
@@ -1450,6 +1738,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>57-1</g:id>
@@ -1470,6 +1762,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>58-1</g:id>
@@ -1491,6 +1787,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>58-2</g:id>
@@ -1512,6 +1812,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>59-1</g:id>
@@ -1533,6 +1837,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>60-1</g:id>
@@ -1554,6 +1862,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>60-2</g:id>
@@ -1574,6 +1886,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>61-1-S</g:id>
@@ -1595,6 +1911,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>62-1</g:id>
@@ -1615,6 +1935,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>63-1</g:id>
@@ -1634,6 +1958,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>64-1</g:id>
@@ -1654,6 +1982,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>65-1</g:id>
@@ -1674,6 +2006,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>66-1</g:id>
@@ -1693,6 +2029,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Гаманці</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>66-2</g:id>
@@ -1712,6 +2052,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Гаманці</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>67-1</g:id>
@@ -1730,6 +2074,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Гаманці</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>68-1</g:id>
@@ -1748,6 +2096,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Гаманці</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>69-1</g:id>
@@ -1766,6 +2118,10 @@
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Гаманці</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>70-1</g:id>
@@ -1785,6 +2141,10 @@
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>71-1-53</g:id>
@@ -1805,6 +2165,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>72-1-53</g:id>
@@ -1826,6 +2190,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>72-2-53</g:id>
@@ -1846,6 +2214,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>72-3-53</g:id>
@@ -1866,6 +2238,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>73-1</g:id>
@@ -1885,6 +2261,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>74-1</g:id>
@@ -1904,6 +2284,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>75-1</g:id>
@@ -1922,6 +2306,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>76-1</g:id>
@@ -1940,6 +2328,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>77-1</g:id>
@@ -1958,6 +2350,10 @@
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>78-1</g:id>
@@ -1976,6 +2372,10 @@
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>79-1</g:id>
@@ -1994,6 +2394,10 @@
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>80-1</g:id>
@@ -2017,6 +2421,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>80-2</g:id>
@@ -2038,6 +2446,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>80-3</g:id>
@@ -2057,6 +2469,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>80-4</g:id>
@@ -2078,6 +2494,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>81-1</g:id>
@@ -2096,6 +2516,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>82-1</g:id>
@@ -2114,6 +2538,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>83-1</g:id>
@@ -2132,6 +2560,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>84-1</g:id>
@@ -2152,6 +2584,10 @@
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>84-2</g:id>
@@ -2172,6 +2608,10 @@
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>85-1</g:id>
@@ -2191,6 +2631,10 @@
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>86-1</g:id>
@@ -2211,6 +2655,10 @@
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>86-2</g:id>
@@ -2231,6 +2679,10 @@
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>86-3</g:id>
@@ -2251,6 +2703,10 @@
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>86-4</g:id>
@@ -2271,6 +2727,10 @@
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>86-5</g:id>
@@ -2291,6 +2751,10 @@
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>87-1</g:id>
@@ -2310,6 +2774,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>88-1</g:id>
@@ -2329,6 +2797,10 @@
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>89-1</g:id>
@@ -2347,6 +2819,10 @@
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>90-1</g:id>
@@ -2366,6 +2842,10 @@
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>91-1</g:id>
@@ -2385,6 +2865,10 @@
       <g:gender>unisex</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>92-1</g:id>
@@ -2404,6 +2888,10 @@
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>93-1</g:id>
@@ -2423,6 +2911,10 @@
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>94-1</g:id>
@@ -2441,6 +2933,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>95-1</g:id>
@@ -2459,6 +2955,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>96-1</g:id>
@@ -2477,6 +2977,10 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>97-1</g:id>
@@ -2495,6 +2999,10 @@
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>98-1</g:id>
@@ -2513,6 +3021,10 @@
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>99-1</g:id>
@@ -2531,6 +3043,10 @@
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
     <item>
       <g:id>100-1</g:id>
@@ -2549,6 +3065,10 @@
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
     </item>
   </channel>
 </rss>

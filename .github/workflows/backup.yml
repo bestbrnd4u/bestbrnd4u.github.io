@@ -1,0 +1,121 @@
+# Резервна копія даних магазину.
+#
+# НАВІЩО
+# -------
+# Supabase на безкоштовному тарифі не робить резервних копій УЗАГАЛІ.
+# Не «сім днів», не «обмежено» — їхня власна документація радить
+# безкоштовним проєктам експортувати дані самостійно.
+#
+# А в базі лежить усе, чого немає більше ніде: історія замовлень,
+# відмови, відгуки, профілі покупців, адреси доставки, кошики. Сайт і
+# товари відновляться з git за хвилину; замовлення не відновляться
+# нізвідки.
+#
+# ЧОМУ АРХІВ ОБОВ'ЯЗКОВО ЗАШИФРОВАНИЙ
+# ------------------------------------
+# Репозиторій ПУБЛІЧНИЙ. GitHub пише, що для завантаження артефакта
+# потрібен «доступ на читання» — а в публічного репозиторію такий
+# доступ має будь-хто. Покладатись на це не можна: в архіві імена,
+# телефони й адреси покупців.
+#
+# Тому крок нижче ШИФРУЄ архів паролем із секретів і не вивантажує
+# нічого, поки цього пароля немає. Без пароля — жодного артефакта, і
+# це не помилка налаштування, а відмова робити небезпечну річ.
+#
+# ЧОМУ РАЗ НА ТИЖДЕНЬ
+# --------------------
+# Копія потрібна не «на кожну хвилину», а «щоб узагалі була». Тиждень
+# — це найбільше, що можна втратити, і водночас не сім архівів на
+# тиждень у сховищі. Треба зараз — Actions → Backup data → Run workflow.
+#
+# ⚠️ ЗАПРАЦЮЄ ЛИШЕ ПІСЛЯ ПЕРЕНЕСЕННЯ В MAIN
+#
+# GitHub бере розклад тільки з головної гілки. Поки цей файл лежить у
+# dev, копія не робиться. Actions → Sync branches → dev-to-main.
+
+name: Backup data
+
+on:
+  schedule:
+    # щонеділі о 03:00 UTC — коли магазин найтихіший
+    - cron: "0 3 * * 0"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backup-data
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: main
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+
+      # Без ключа крок нічого не робить і завершується успішно:
+      # розклад не має червоніти через ненастроєний секрет.
+      - name: Вивантажити дані
+        id: dump
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          node scripts/backup-data.js --out="$RUNNER_TEMP/backup"
+          if [ -d "$RUNNER_TEMP/backup" ] && [ -n "$(ls -A "$RUNNER_TEMP/backup" 2>/dev/null)" ]; then
+            echo "has=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has=false" >> "$GITHUB_OUTPUT"
+            echo "Копіювати нічого"
+          fi
+
+      # ШИФРУЄМО ДО ВИВАНТАЖЕННЯ, І БЕЗ ПАРОЛЯ НЕ ВИВАНТАЖУЄМО.
+      #
+      # Архів містить персональні дані покупців, а артефакти
+      # публічного репозиторію доступні на читання будь-кому. Тому
+      # порядок саме такий: спершу gpg, і лише потім upload.
+      #
+      # --batch і --passphrase-fd 0: gpg не має права спитати пароль
+      # інтерактивно, інакше крок повисне до таймауту.
+      - name: Зашифрувати
+        id: seal
+        if: steps.dump.outputs.has == 'true'
+        env:
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          if [ -z "$BACKUP_PASSPHRASE" ]; then
+            echo "::warning::Немає секрету BACKUP_PASSPHRASE — архів НЕ вивантажується."
+            echo "Додайте його в Settings → Secrets and variables → Actions."
+            echo "Без пароля копія лежала б відкритою для всіх, хто бачить репозиторій."
+            echo "sealed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          tar -czf "$RUNNER_TEMP/backup.tar.gz" -C "$RUNNER_TEMP" backup
+          printf '%s' "$BACKUP_PASSPHRASE" | gpg --batch --yes --passphrase-fd 0 \
+            --symmetric --cipher-algo AES256 \
+            --output "$RUNNER_TEMP/backup.tar.gz.gpg" \
+            "$RUNNER_TEMP/backup.tar.gz"
+          rm -f "$RUNNER_TEMP/backup.tar.gz"
+          # Прибираємо і відкриті файли: в артефакт має поїхати лише .gpg
+          rm -rf "$RUNNER_TEMP/backup"
+          echo "sealed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Зберегти артефакт
+        if: steps.seal.outputs.sealed == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: backup-${{ github.run_number }}
+          path: ${{ runner.temp }}/backup.tar.gz.gpg
+          # 90 днів — стеля GitHub. Тобто в будь-який момент під рукою
+          # близько тринадцяти щотижневих копій.
+          retention-days: 90
+          if-no-files-found: error

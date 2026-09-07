@@ -44,7 +44,10 @@ console.log("\n[3] Розмітка кошика й обраного місти�
 
   [["cart.js", cart], ["favorites.js", fav]].forEach(([name, src]) => {
     check(`${name}: обгортка кольору`, src.includes('class="product-colors-wrap"'));
-    check(`${name}: обгортка розміру`, src.includes('class="product-sizes-wrap"'));
+    // Обгортка тепер несе ще й клас-перемикач: рядок розмірів
+    // ховається, коли в ньому нічого, крім внутрішньої заглушки
+    // ONESIZE. Тому шукаємо початок класу, а не рядок цілком.
+    check(`${name}: обгортка розміру`, src.includes('class="product-sizes-wrap'));
     check(`${name}: стрілки кольору`, src.includes("colors-arrow-left") && src.includes("colors-arrow-right"));
     check(`${name}: стрілки розміру`, src.includes("sizes-arrow-left") && src.includes("sizes-arrow-right"));
   });

@@ -214,7 +214,7 @@ function renderCart() {
                             </div>
                             <button type="button" class="colors-arrow colors-arrow-right" aria-label="Наступні кольори" tabindex="-1">›</button>
                         </div>
-                        <div class="product-sizes-wrap">
+                        <div class="product-sizes-wrap ${typeof sizeRowHidden === "function" && sizeRowHidden(sizes) ? "sizes-placeholder" : ""}">
                             <button type="button" class="sizes-arrow sizes-arrow-left" aria-label="Попередні розміри" tabindex="-1">‹</button>
                             <div class="product-sizes">
                                 ${sizeButtons}

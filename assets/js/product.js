@@ -1254,7 +1254,7 @@ function renderProduct(product) {
     <button type="button" class="size-guide-link" id="sizeGuideBtn">Таблиця розмірів</button>
 </div>
 
-<div class="sizes">
+<div class="sizes ${typeof sizeRowHidden === "function" && sizeRowHidden(sizes) ? "sizes-placeholder" : ""}">
 
 ${sizeButtons}
 

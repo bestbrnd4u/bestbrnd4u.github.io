@@ -58,6 +58,22 @@ const PRODUCTS_FILE = path.join(ROOT, "data", "products.json");
 const CATEGORIES_FILE = path.join(ROOT, "data", "categories.json");
 const OUTPUT_FILE = path.join(ROOT, "feed.xml");
 
+// Типовий тариф перевізника (грн) — ТЕ САМЕ число, що в розмітці
+// сторінки товару (SHIPPING_RATE_UAH у assets/js/product.js).
+//
+// НАВІЩО ЦЕ У ФІДІ. Без g:shipping Merchant Center бере доставку з
+// налаштувань акаунта. Якщо вони не збігаються з розміткою
+// сторінки, Google скаржиться на розходження й може притримати
+// товари в Покупках — а розмітка в нас 60 ₴.
+//
+// Нуль тут ставити не можна: магазин за доставку не бере, але
+// покупець її платить перевізнику. «Безкоштовна доставка» в
+// Покупках показала б нижчу підсумкову ціну, ніж людина заплатить.
+const SHIPPING_RATE_UAH = 60;
+
+// Магазин возить лише по Україні.
+const SHIPPING_COUNTRY = "UA";
+
 // Поля, які колір може перебити.
 //
 // Дзеркало переліку з colorOverrides() у assets/js/common.js — там
@@ -330,6 +346,18 @@ function itemXml(item) {
         ? null
         : `      <g:${name}>${xmlEscape(value)}</g:${name}>`;
 
+    // Доставка. Складений тег: усередині країна й ціна, тому не через
+    // tag(), який віддає простий рядок.
+    //
+    // Один і той самий тариф на всі товари — від ціни товару він не
+    // залежить: платить покупець перевізнику при отриманні.
+    const shipping = [
+        "      <g:shipping>",
+        `        <g:country>${SHIPPING_COUNTRY}</g:country>`,
+        `        <g:price>${SHIPPING_RATE_UAH}.00 UAH</g:price>`,
+        "      </g:shipping>"
+    ].join("\n");
+
     const lines = [
         "    <item>",
         tag("id", item.id),
@@ -351,6 +379,7 @@ function itemXml(item) {
         tag("gender", item.gender),
         tag("age_group", item.age_group),
         tag("product_type", item.product_type),
+        shipping,
         tag("custom_label_0", item.custom_label_0),
         "    </item>"
     ];
