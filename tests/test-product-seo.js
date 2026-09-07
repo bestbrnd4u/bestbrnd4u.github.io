@@ -71,8 +71,12 @@ function seoSandbox() {
     // (та сама пастка, що колись була з SITE_URL).
     window.eval(productJs.match(/const RETURN_POLICY = \{[\s\S]*?\n\};\n/)[0]
         .replace("const RETURN_POLICY =", "window.RETURN_POLICY ="));
-    window.eval(productJs.match(/const FREE_SHIPPING_FROM = \d+;/)[0]
-        .replace("const FREE_SHIPPING_FROM =", "window.FREE_SHIPPING_FROM ="));
+    // Ставка доставки. Раніше тут був поріг безкоштовної доставки
+    // (FREE_SHIPPING_FROM): магазин перестав брати за доставку гроші —
+    // її оплачує покупець перевізнику, — і нуль у розмітці став би
+    // обіцянкою, якої магазин не виконує.
+    window.eval(productJs.match(/const SHIPPING_RATE_UAH = \d+;/)[0]
+        .replace("const SHIPPING_RATE_UAH =", "window.SHIPPING_RATE_UAH ="));
     window.eval(productJs.match(/function shippingDetailsFor\(price\) \{[\s\S]*?\n\}\n/)[0]
         .replace("function shippingDetailsFor(price) {", "window.shippingDetailsFor = function (price) {"));
 

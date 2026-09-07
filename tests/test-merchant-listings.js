@@ -192,20 +192,30 @@ console.log("\n[3] Доставка — і в розмітці, і на сайт
     const page = fs.readFileSync(path.join(ROOT, "delivery-payment.html"), "utf8");
     check("сторінка доставки теж говорить 1–2 дні на збірку", /1[–-]2\s*(робочих\s*)?дн/i.test(page));
     check("сторінка доставки теж говорить 1–3 дні доставки", /1[–-]3\s*дн/i.test(page));
-    check("порогом безкоштовної доставки на сайті вказано 3 500 грн",
-        /3\s*500/.test(page));
+    check("сторінка доставки називає тариф перевізника",
+        /від 60 грн/.test(page) && /перевізник/i.test(page));
 
-    // Нульова ставка — лише там, де вона правдива. Найдешевший товар
-    // каталогу дорожчий за поріг, тож зараз це так для всіх.
-    const wrong = schemas.filter(x => {
+    // НУЛЯ В РОЗМІТЦІ БУТИ НЕ ПОВИННО.
+    //
+    // Раніше товарам дорожче за 3 500 грн ішло shippingRate: 0 —
+    // «безкоштовна доставка». Магазин справді не бере за доставку
+    // грошей, але покупець її ПЛАТИТЬ: перевізнику при отриманні. Нуль
+    // у розмітці — це нижча підсумкова ціна в Google Shopping, ніж
+    // людина заплатить насправді, тобто обіцянка, якої магазин не
+    // виконує.
+    const zero = schemas.filter(x => {
         const rate = x.ld.offers.shippingDetails.shippingRate;
-        const free = Number(x.p.price) >= 3500;
-        return free ? !(rate && rate.value === 0) : !!rate;
+        return !rate || Number(rate.value) <= 0;
     });
 
-    check("ставка 0 стоїть саме там, де доставка справді безкоштовна",
-        wrong.length === 0,
-        wrong.map(x => `${x.p.id} (${x.p.price} грн)`).join(", "));
+    check("жоден товар не обіцяє безкоштовної доставки",
+        zero.length === 0,
+        zero.slice(0, 3).map(x => `${x.p.id} (${x.p.price} грн)`).join(", "));
+
+    // Ставка однакова для всіх: доставка не залежить від ціни товару.
+    const rates = new Set(schemas.map(x => Number(x.ld.offers.shippingDetails.shippingRate.value)));
+
+    check(`ставка однакова для всіх товарів: ${[...rates].join(", ")} грн`, rates.size === 1);
 }
 
 console.log("\n[4] Рейтинг — тільки за справжніми відгуками");
@@ -241,13 +251,16 @@ console.log("\n[5] Обидва генератори розмітки узгод
     const builder = fs.readFileSync(path.join(ROOT, "scripts/build-product-pages.js"), "utf8");
 
     ["hasMerchantReturnPolicy", "shippingDetails", "MerchantReturnFiniteReturnWindow",
-     "ReturnFeesCustomerResponsibility", "FREE_SHIPPING_FROM"].forEach(token => {
+     "ReturnFeesCustomerResponsibility", "SHIPPING_RATE_UAH"].forEach(token => {
         check(`«${token}» є в обох`, productJs.includes(token) && builder.includes(token),
             `product.js: ${productJs.includes(token)}, генератор: ${builder.includes(token)}`);
     });
 
-    check("поріг безкоштовної доставки однаковий",
-        /FREE_SHIPPING_FROM = 3500/.test(productJs) && /FREE_SHIPPING_FROM = 3500/.test(builder));
+    // Ставка мусить бути та сама у двох генераторах: розійдуться —
+    // Google побачить різну доставку на одній адресі до і після
+    // виконання JS.
+    check("ставка доставки однакова",
+        /SHIPPING_RATE_UAH = 60/.test(productJs) && /SHIPPING_RATE_UAH = 60/.test(builder));
     check("строк повернення однаковий",
         /merchantReturnDays: 14/.test(productJs) && /merchantReturnDays: 14/.test(builder));
 

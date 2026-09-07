@@ -137,7 +137,11 @@ const RETURN_POLICY = {
     returnFees: "https://schema.org/ReturnFeesCustomerResponsibility"
 };
 
-const FREE_SHIPPING_FROM = 3500;
+// Типовий тариф перевізника (грн) — див. пояснення в
+// assets/js/product.js. Раніше тут був поріг безкоштовної доставки, і
+// товарам дорожче за нього в розмітку йшов нуль — обіцянка, якої
+// магазин не виконує: доставку оплачує покупець перевізнику.
+const SHIPPING_RATE_UAH = 60;
 
 // Артикул для розмітки: перевірений і почищений.
 //
@@ -282,13 +286,13 @@ function shippingDetailsFor(price) {
         }
     };
 
-    if (Number(price) >= FREE_SHIPPING_FROM) {
-        details.shippingRate = {
-            "@type": "MonetaryAmount",
-            value: 0,
-            currency: "UAH"
-        };
-    }
+    // Ставка однакова для всіх товарів: доставку оплачує покупець
+    // перевізнику, і від ціни товару вона не залежить.
+    details.shippingRate = {
+        "@type": "MonetaryAmount",
+        value: SHIPPING_RATE_UAH,
+        currency: "UAH",
+    };
 
     return details;
 

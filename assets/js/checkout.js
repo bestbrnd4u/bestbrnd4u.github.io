@@ -524,6 +524,14 @@ function getDeliveryDetailValue() {
         return document.getElementById("courierAddress")?.value.trim() || null;
     }
 
+    // Інший перевізник: покупець пише сам і назву пошти, і адресу —
+    // довідника Укрпошти чи Meest у нас немає, а обмежувати людину
+    // трьома способами Нової пошти означало б втрачати замовлення
+    // там, де НП просто не працює.
+    if (delivery.label === "Інша пошта") {
+        return document.getElementById("otherCarrier")?.value.trim() || null;
+    }
+
     return null;
 
 }
@@ -603,9 +611,15 @@ function updateTotals() {
     const totalDiscount = productDiscount + promoDiscount;
 
     const delivery = getSelectedDelivery();
-    const deliveryPrice = delivery ? delivery.price : 0;
 
-    const total = priceTotal - promoDiscount + deliveryPrice;
+    // ДОСТАВКА НЕ ВХОДИТЬ У СУМУ ЗАМОВЛЕННЯ.
+    //
+    // Магазин її не бере: покупець платить перевізнику при отриманні,
+    // за його тарифом. Раніше сюди додавалось «від 60 грн» — тобто
+    // сума в кошику була вигаданою: ні магазин цих грошей не отримував,
+    // ні покупець стільки не платив (тариф залежить від ваги й
+    // габаритів, які до пакування невідомі).
+    const total = priceTotal - promoDiscount;
 
     orderSubtotalEl.textContent = formatPrice(subtotal);
 
@@ -617,7 +631,7 @@ function updateTotals() {
     }
 
     orderDeliveryPriceEl.textContent = delivery
-        ? `від ${formatPrice(deliveryPrice)}`
+        ? "за тарифом перевізника"
         : "Оберіть спосіб";
 
     orderTotalEl.textContent = formatPrice(Math.max(total, 0));
@@ -917,9 +931,13 @@ function computeOrderTotals() {
     const totalDiscount = productDiscount + promoDiscount;
 
     const delivery = getSelectedDelivery();
-    const deliveryPrice = delivery ? delivery.price : 0;
 
-    const total = Math.max(priceTotal - promoDiscount + deliveryPrice, 0);
+    // Без доставки — див. коментар в updateTotals(). deliveryPrice
+    // лишається нулем: його читають лист і рядок замовлення, і
+    // «0» там означає рівно те, що є — магазин за доставку не бере.
+    const deliveryPrice = 0;
+
+    const total = Math.max(priceTotal - promoDiscount, 0);
 
     return { subtotal, priceTotal, promoDiscount, totalDiscount, delivery, deliveryPrice, total };
 
@@ -937,7 +955,7 @@ function fillHiddenFields() {
         : "0 грн";
     document.getElementById("orderPromoField").value = appliedPromo ? appliedPromo.code : "—";
     document.getElementById("orderDeliveryField").value = delivery
-        ? `${delivery.label} — від ${formatPrice(deliveryPrice)}`
+        ? `${delivery.label} — оплата при отриманні`
         : "—";
     document.getElementById("orderTotalField").value = formatPrice(total);
     document.getElementById("orderReplyTo").value = document.getElementById("email").value.trim();
@@ -973,7 +991,7 @@ function buildEmailTemplateParams(orderId, orderDate) {
         order_items: buildOrderCompositionText(),
         order_subtotal: formatPrice(subtotal),
         order_discount: totalDiscount > 0 ? `-${formatPrice(totalDiscount)}` : "0 грн",
-        order_delivery_price: delivery ? `від ${formatPrice(deliveryPrice)}` : "—",
+        order_delivery_price: delivery ? "за тарифом перевізника" : "—",
         order_total: formatPrice(total),
         delivery_city: cityValue,
         delivery_method: delivery ? delivery.label : "—",

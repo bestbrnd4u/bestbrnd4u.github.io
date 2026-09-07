@@ -573,10 +573,21 @@ function orderListKeyboard(orders) {
 // ⚠️ Мусять збігатися з сайтом: назва їде в orders.delivery_method,
 // і якщо тексти розійдуться, у вашій Telegram-картці й в «Історії
 // замовлень» будуть різні формулювання для того самого способу.
+// price: 0 у всіх — і це не заготовка «допишемо потім».
+//
+// Магазин за доставку не бере: покупець платить перевізнику при
+// отриманні, за його тарифом. Поле лишається, бо його читає
+// buildOrderRow (delivery_price у замовленні), і нуль там означає рівно
+// те, що є.
+//
+// ЧОМУ ЦЕ ВАЖЛИВО САМЕ ТУТ. Сайт перестав додавати доставку в суму — і
+// якби бот далі додавав, та сама сумка коштувала б у Telegram на 60 грн
+// більше. Дві ціни на один товар — найгірше, що можна показати
+// покупцеві, який дивиться і сайт, і бот.
 const DELIVERY_OPTIONS = [
-  { id: "np_office",  label: "На відділення «Нова пошта»", price: 60, needsDetail: "Номер відділення" },
-  { id: "np_box",     label: "Поштомат «Нова пошта»",      price: 60, needsDetail: "Номер поштомата" },
-  { id: "np_courier", label: "Кур'єром «Нова пошта»",      price: 95, needsDetail: "Вулиця, будинок, квартира" },
+  { id: "np_office",  label: "На відділення «Нова пошта»", price: 0, needsDetail: "Номер відділення" },
+  { id: "np_box",     label: "Поштомат «Нова пошта»",      price: 0, needsDetail: "Номер поштомата" },
+  { id: "np_courier", label: "Кур'єром «Нова пошта»",      price: 0, needsDetail: "Вулиця, будинок, квартира" },
 ];
 
 const MAX_QTY = 10;
@@ -744,7 +755,7 @@ function qtyKeyboard() {
 function deliveryKeyboard() {
 
   const buttons = DELIVERY_OPTIONS.map((option) => ([{
-    text: `${option.label} — ${option.price} грн`,
+    text: `${option.label} — оплата при отриманні`,
     callback_data: `o:dlv:${option.id}`,
   }]));
 
@@ -845,7 +856,11 @@ function summaryText(product, session) {
     "",
     `Сума товарів: ${money(totals.subtotal)}`,
     totals.discount > 0 ? `Знижка: −${money(totals.discount)}` : "",
-    `Доставка: ${money(totals.delivery)}`,
+    // Нуля не показуємо: рядок «Доставка: 0 грн» читається як
+    // «безкоштовно», а насправді її оплачують перевізнику.
+    totals.delivery > 0
+      ? `Доставка: ${money(totals.delivery)}`
+      : "Доставка: за тарифом перевізника",
     `<b>Разом: ${money(totals.total)}</b>`,
   ];
 
