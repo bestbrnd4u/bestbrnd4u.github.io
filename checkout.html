@@ -2,7 +2,8 @@
 <html lang="uk">
 
 <head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"955f692b","data/catalog.json":"dea622c7","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"5d9b13ee","data/legal.json":"857b431b","data/notifications.json":"670aa3fa","data/products.json":"7218a078","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/security.json":"34f399a1","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"955f692b","data/catalog.json":"d2f7e3f9","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"5d9b13ee","data/legal.json":"f84751b2","data/notifications.json":"670aa3fa","data/products.json":"845225e9","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/security.json":"34f399a1","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
+    <meta name="robots" content="noindex,nofollow">
     <meta charset="UTF-8">
     <meta name="author" content="BestBrnd4u">
     <meta name="copyright" content="© 2026 BestBrnd4u. Усі права захищено.">
@@ -212,13 +213,13 @@
                     <div class="delivery-options">
 
                         <label class="delivery-option">
-                            <input type="radio" name="deliveryMethod" value="На відділення «Нова пошта»" data-price="60">
+                            <input type="radio" name="deliveryMethod" value="На відділення «Нова пошта»" data-price="0">
                             <span class="delivery-option-card">
                                 <span class="delivery-option-title">
                                     <span class="delivery-option-icon">📦</span>
                                     На відділення «Нова пошта»
                                 </span>
-                                <span class="delivery-option-price">від 60 грн</span>
+                                <span class="delivery-option-price">оплата при отриманні</span>
                             </span>
                         </label>
 
@@ -230,13 +231,13 @@
                         </div>
 
                         <label class="delivery-option">
-                            <input type="radio" name="deliveryMethod" value="Поштомат «Нова пошта»" data-price="60">
+                            <input type="radio" name="deliveryMethod" value="Поштомат «Нова пошта»" data-price="0">
                             <span class="delivery-option-card">
                                 <span class="delivery-option-title">
                                     <span class="delivery-option-icon">🏤</span>
                                     Поштомат «Нова пошта»
                                 </span>
-                                <span class="delivery-option-price">від 60 грн</span>
+                                <span class="delivery-option-price">оплата при отриманні</span>
                             </span>
                         </label>
 
@@ -248,13 +249,13 @@
                         </div>
 
                         <label class="delivery-option">
-                            <input type="radio" name="deliveryMethod" value="Кур'єром «Нова пошта»" data-price="95">
+                            <input type="radio" name="deliveryMethod" value="Кур'єром «Нова пошта»" data-price="0">
                             <span class="delivery-option-card">
                                 <span class="delivery-option-title">
                                     <span class="delivery-option-icon">🚚</span>
                                     Кур'єром «Нова пошта»
                                 </span>
-                                <span class="delivery-option-price">від 95 грн</span>
+                                <span class="delivery-option-price">оплата при отриманні</span>
                             </span>
                         </label>
 
@@ -262,6 +263,30 @@
                             <label>
                                 Адреса доставки (вулиця, будинок, квартира)
                                 <input type="text" id="courierAddress" name="Адреса доставки" placeholder="Вулиця, будинок, квартира">
+                            </label>
+                        </div>
+
+                        <!-- Інший перевізник.
+                             Сторінка «Оплата і доставка» обіцяє й Укрпошту, а
+                             обрати її тут було неможливо: усі три способи —
+                             Нова пошта. Довідника Укрпошти чи Meest у нас
+                             немає, тому перевізника й адресу покупець пише
+                             сам одним рядком. -->
+                        <label class="delivery-option">
+                            <input type="radio" name="deliveryMethod" value="Інша пошта" data-price="0">
+                            <span class="delivery-option-card">
+                                <span class="delivery-option-title">
+                                    <span class="delivery-option-icon">📮</span>
+                                    Інша пошта (Укрпошта, Meest, Justin)
+                                </span>
+                                <span class="delivery-option-price">оплата при отриманні</span>
+                            </span>
+                        </label>
+
+                        <div class="delivery-detail" data-detail-for="Інша пошта">
+                            <label>
+                                Перевізник, відділення або адреса
+                                <input type="text" id="otherCarrier" name="Інша пошта" placeholder="Наприклад: Укрпошта, відділення 03150, вул. Велика Васильківська, 100">
                             </label>
                         </div>
 
@@ -590,8 +615,8 @@
 <!-- Перевірка «ви людина» на оформленні (порожній ключ = вимкнено) -->
 <script src="assets/js/turnstile.js?v=808a55ba"></script>
 <!-- Підказки міст і відділень Нової пошти (порожній ключ = поле як було) -->
-<script src="assets/js/nova-poshta.js?v=72f87fd1"></script>
-<script src="assets/js/checkout.js?v=586d1c0d"></script>
+<script src="assets/js/nova-poshta.js?v=bc7bfa71"></script>
+<script src="assets/js/checkout.js?v=3ca7b861"></script>
 
 </body>
 

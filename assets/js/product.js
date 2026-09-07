@@ -193,7 +193,19 @@ const RETURN_POLICY = {
     returnFees: "https://schema.org/ReturnFeesCustomerResponsibility"
 };
 
-const FREE_SHIPPING_FROM = 3500;
+// Типовий тариф перевізника (грн).
+//
+// ЩО БУЛО НЕ ТАК. Тут стояло FREE_SHIPPING_FROM = 3500, і товарам
+// дорожче за поріг у розмітку йшло shippingRate: 0 — «безкоштовна
+// доставка». Магазин справді не бере за доставку грошей, але покупець
+// її платить: перевізнику при отриманні. Тобто нуль у розмітці —
+// обіцянка, якої магазин не виконує, і в Google Shopping це показує
+// нижчу підсумкову ціну, ніж людина заплатить насправді.
+//
+// Точну суму НП вважає за вагою й габаритами, яких магазин не знає до
+// пакування, — тому в розмітці типовий тариф, той самий, що на
+// сторінці «Оплата і доставка».
+const SHIPPING_RATE_UAH = 60;
 
 // Артикул для розмітки — ті самі межі, що в scripts/build-product-pages.js.
 //
@@ -266,10 +278,13 @@ function shippingDetailsFor(price) {
         }
     };
 
-    // ставку 0 ставимо лише коли доставка справді безкоштовна
-    if (Number(price) >= FREE_SHIPPING_FROM) {
-        details.shippingRate = { "@type": "MonetaryAmount", value: 0, currency: "UAH" };
-    }
+    // Ставка однакова для всіх товарів: доставку оплачує покупець
+    // перевізнику, і від ціни товару вона не залежить.
+    details.shippingRate = {
+        "@type": "MonetaryAmount",
+        value: SHIPPING_RATE_UAH,
+        currency: "UAH"
+    };
 
     return details;
 

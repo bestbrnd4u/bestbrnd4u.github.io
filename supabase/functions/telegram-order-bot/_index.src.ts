@@ -36,7 +36,9 @@ import {
 } from "./admin-api.js";
 import { cleanOrder, turnstileVerdict } from "./place-order.js";
 import { orderLetter, statusLetter, mailRequest } from "./mail.js";
-import { npRequest, parseSettlements, parseWarehouses, npError } from "./nova-poshta.js";
+import {
+  npRequest, parseSettlements, parseWarehouses, parseTypes, postomatTypeRef, npError,
+} from "./nova-poshta.js";
 import {
   DELIVERY_OPTIONS, deliveryById, colorsOf, sizesOf, autoFill, nextStep,
   colorKeyboard, sizeKeyboard, qtyKeyboard, deliveryKeyboard, phoneKeyboard,
@@ -1665,11 +1667,63 @@ async function verifyUser(token: string): Promise<string | null> {
 // назви й номери (див. nova-poshta.js).
 // -------------------------
 
+// Один запит до НП. Повертає розібрані дані або null.
+async function npCall(action: Record<string, any>): Promise<any> {
+
+  const payload = npRequest(NOVAPOSHTA_API_KEY, action);
+
+  if (!payload) return null;
+
+  const response = await fetch("https://api.novaposhta.ua/v2.0/json/", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await response.json();
+
+  const failure = npError(data);
+
+  if (failure) {
+    console.error("Нова пошта відмовила:", failure);
+    return null;
+  }
+
+  return data;
+
+}
+
+// Ref типу «Поштомат». Довідник типів у НП не змінюється роками, тож
+// питаємо його раз на життя інстансу функції.
+let postomatRef: string | null = null;
+
+async function typeRefFor(postomat: boolean): Promise<string> {
+
+  if (postomatRef === null) {
+
+    const data = await npCall({ method: "types" });
+
+    postomatRef = data ? postomatTypeRef(parseTypes(data)) : "";
+
+  }
+
+  // Для відділень типу не передаємо: їх у НП кілька («Відділення»,
+  // «Пункт приймання-видачі»), і обмежувати одним означало б ховати
+  // від покупця половину точок. Достатньо прибрати поштомати —
+  // це робиться при розборі відповіді.
+  return postomat ? (postomatRef || "") : "";
+
+}
+
 async function handleNovaPoshta(request: Request, body: Record<string, any>): Promise<Response> {
 
   const origin = request.headers.get("origin");
 
-  const payload = npRequest(NOVAPOSHTA_API_KEY, body);
+  const action = body.method === "warehouses"
+    ? { ...body, typeRef: await typeRefFor(body.postomat === true) }
+    : body;
+
+  const payload = npRequest(NOVAPOSHTA_API_KEY, action);
 
   // Немає ключа або запит не схожий на пошук адреси — відповідаємо
   // чесно. Сторінка на це лишає звичайне текстове поле.
@@ -1679,22 +1733,10 @@ async function handleNovaPoshta(request: Request, body: Record<string, any>): Pr
 
   try {
 
-    const response = await fetch("https://api.novaposhta.ua/v2.0/json/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    const data = await npCall(action);
 
-    const data = await response.json();
-
-    const failure = npError(data);
-
-    if (failure) {
-
-      console.error("Нова пошта відмовила:", failure);
-
+    if (!data) {
       return adminJson({ ok: false, error: "novaposhta_failed", items: [] }, 200, origin);
-
     }
 
     const items = body.method === "settlements"
