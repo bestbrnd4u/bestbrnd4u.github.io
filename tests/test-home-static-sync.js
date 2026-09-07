@@ -123,13 +123,23 @@ console.log("\n[5] Крок вбудований у збірку, а не раз
     check("build викликає build-home-static.js",
         pkg.scripts.build.includes("build-home-static.js"));
 
-    const wf = fs.readFileSync(path.join(ROOT, ".github/workflows/build-products.yml"), "utf8");
-    check("workflow викликає його теж", wf.includes("build-home-static.js"));
-    check("оновлений index.html комітиться", /git add[\s\S]{0,200}index\.html/.test(wf));
-
-    // порядок: спершу дані, потім розмітка з них
+    // ПОРЯДОК ЗВІРЯЄМО В package.json, А НЕ В WORKFLOW
+    //
+    // Спершу дані, потім розмітка з них. Раніше обидві перевірки
+    // читали build-products.yml, бо там був виписаний перелік
+    // кроків. Тепер перелік живе в ОДНОМУ місці — у package.json, —
+    // саме щоб workflow не відставав від нього, як це вже сталося з
+    // шістьма кроками (див. коментар угорі build-products.yml).
     check("крок іде після збірки даних",
-        wf.indexOf("build-products.js") < wf.indexOf("build-home-static.js"));
+        pkg.scripts.build.indexOf("build-products.js")
+        < pkg.scripts.build.indexOf("build-home-static.js"));
+
+    // Від прод-збірки потрібне одне: щоб вона до кроку доходила —
+    // чи то окремим кроком, чи то через `npm run build`.
+    const wf = fs.readFileSync(path.join(ROOT, ".github/workflows/build-products.yml"), "utf8");
+    check("прод-збірка доходить до нього",
+        wf.includes("build-home-static.js") || /run: npm run build\s*$/m.test(wf));
+    check("оновлений index.html комітиться", /git add[\s\S]{0,200}index\.html/.test(wf));
 }
 
 console.log("\n[6] Усі згадані в розмітці локальні фото існують");
