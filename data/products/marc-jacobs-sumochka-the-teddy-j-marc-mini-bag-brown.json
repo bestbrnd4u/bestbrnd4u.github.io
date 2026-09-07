@@ -57,6 +57,11 @@
     "mini"
   ],
   "isNew": false,
+  "stock": {
+    "Коричневий": {
+      "ONESIZE": 100
+    }
+  },
   "title": "Сумочка The Teddy J Marc Mini Bag Brown",
   "images": [
     "assets/images/products/uploads/2f3hsh042h02-230-1.webp",
@@ -67,10 +72,5 @@
   "instagramBlock": "general",
   "description": "Компактна сумочка Marc Jacobs із колекції The Teddy — м'який ворсистий верх і фірмова монограма J на клапані. Носиться на ланцюжку через плече або в руці. Модель на щодень, коли потрібно взяти лише необхідне.",
   "sku": "2F3HSH042H02-230",
-  "category": "Жіночі сумки",
-  "stock": {
-    "Коричневий": {
-      "ONESIZE": 0
-    }
-  }
+  "category": "Жіночі сумки"
 }
