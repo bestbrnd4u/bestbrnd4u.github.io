@@ -12983,3 +12983,266 @@ body.refusal-open{
     }
 
 }
+
+
+/* =========================================================
+   Відгуки покупців
+
+   Блок прихований, поки немає ні відгуків, ні бази: «відгуків
+   поки немає» під кожним зі ста товарів — це сто повідомлень
+   про те, що магазин новий.
+   ========================================================= */
+
+.reviews-section{
+    padding:36px 0;
+}
+
+.reviews-box{
+    max-width:820px;
+    margin:0 auto;
+}
+
+.reviews-head{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:16px;
+    margin-bottom:20px;
+}
+
+.reviews-head h2{
+    margin:0;
+    font-size:22px;
+}
+
+.reviews-summary{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:15px;
+    color:var(--gray500);
+}
+
+.reviews-summary b{
+    font-size:18px;
+    color:var(--gray900);
+}
+
+/* Зірки — єдине місце, де на сайті доречний жовтий: саме так їх
+   читають у будь-якому магазині, і сірі зірки виглядають як
+   «оцінки немає». */
+.reviews-stars{
+    color:#e8a33d;
+    letter-spacing:1px;
+    white-space:nowrap;
+}
+
+.reviews-count{
+    color:var(--gray500);
+}
+
+.reviews-list{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+}
+
+.review{
+    padding:18px 20px;
+    border:1px solid var(--gray100);
+    border-radius:14px;
+    background:#fff;
+}
+
+/* Понад три відгуки згорнуті: сторінка товару й так довга, а
+   десять відгуків підряд відтісняють характеристики за екран. */
+.review-hidden{
+    display:none;
+}
+
+.review-head{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:10px;
+    margin-bottom:10px;
+    font-size:14px;
+}
+
+.review-head b{
+    color:var(--gray900);
+}
+
+.review-date{
+    color:var(--gray500);
+    font-size:13px;
+}
+
+.review-body{
+    margin:0;
+    font-size:15px;
+    line-height:1.6;
+    color:var(--gray900);
+    /* Відгук пишуть у полі без розмітки, і перенос рядка там
+       означений тільки Enter. Без цього абзаци злипаються в
+       одну стіну. */
+    white-space:pre-line;
+}
+
+/* Відповідь магазину. Зсунута й на світлому тлі — щоб було
+   видно, що це вже не покупець. */
+.review-reply{
+    margin:12px 0 0;
+    padding:12px 14px;
+    border-left:3px solid var(--gray300);
+    background:var(--gray50);
+    border-radius:0 10px 10px 0;
+    font-size:14px;
+    line-height:1.55;
+    color:var(--gray500);
+}
+
+.review-reply b{
+    color:var(--gray900);
+}
+
+.reviews-more{
+    margin-top:18px;
+    align-self:flex-start;
+}
+
+.reviews-cta{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:14px;
+    margin-top:24px;
+    padding-top:20px;
+    border-top:1px solid var(--gray100);
+}
+
+.reviews-hint{
+    flex:1;
+    min-width:220px;
+    font-size:13px;
+    line-height:1.5;
+    color:var(--gray500);
+}
+
+.review-form-box{
+    margin-top:20px;
+}
+
+.review-form{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    padding:20px;
+    border:1px solid var(--gray200);
+    border-radius:14px;
+    background:#fff;
+}
+
+/* Оцінка: п'ять варіантів, найвищий першим. Не «зірочки, по яких
+   клікають» — звичайні радіокнопки, які працюють і з клавіатури,
+   і з програмою читання екрана. */
+.review-rating{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+}
+
+.review-rating label{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:8px 12px;
+    border:1px solid var(--gray200);
+    border-radius:10px;
+    cursor:pointer;
+    font-size:15px;
+    color:#e8a33d;
+    letter-spacing:1px;
+}
+
+.review-rating input{
+    accent-color:var(--gray900);
+}
+
+.review-rating label:has(input:checked){
+    border-color:var(--gray900);
+    background:var(--gray50);
+}
+
+.review-field{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+}
+
+.review-field span{
+    font-size:13px;
+    font-weight:600;
+    color:var(--gray900);
+}
+
+.review-field input,
+.review-field textarea{
+    width:100%;
+    padding:11px 13px;
+    font-size:15px;
+    font-family:inherit;
+    color:var(--gray900);
+    border:1px solid var(--gray200);
+    border-radius:10px;
+    background:#fff;
+}
+
+.review-field textarea{
+    resize:vertical;
+    line-height:1.5;
+}
+
+.review-field input:focus,
+.review-field textarea:focus{
+    outline:none;
+    border-color:var(--gray900);
+}
+
+.review-error{
+    margin:14px 0 0;
+    padding:12px 14px;
+    font-size:14px;
+    line-height:1.5;
+    color:#8a1c1c;
+    background:#fdf1f1;
+    border:1px solid #f3d4d4;
+    border-radius:10px;
+}
+
+.review-done{
+    margin:20px 0 0;
+    padding:14px 16px;
+    font-size:14.5px;
+    line-height:1.55;
+    color:#1f5c3a;
+    background:#f1f8f3;
+    border:1px solid #cfe6d8;
+    border-radius:10px;
+}
+
+@media(max-width:520px){
+
+    .reviews-head h2{ font-size:19px; }
+
+    .review{ padding:16px; }
+
+    .review-form{ padding:16px; }
+
+    /* Варіанти оцінки в один стовпець: п'ять рядків зірок у ряд на
+       телефоні перетворюються на кашу. */
+    .review-rating{
+        flex-direction:column;
+    }
+
+}

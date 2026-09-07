@@ -9,6 +9,7 @@
 //   supabase/functions/telegram-order-bot/nova-poshta.js  (довідник міст і відділень)
 //   supabase/functions/telegram-order-bot/meta-capi.js    (серверні конверсії Meta)
 //   supabase/functions/telegram-order-bot/order-lookup.js (перевірка замовлення гостем)
+//   supabase/functions/telegram-order-bot/reviews.js      (відгуки й модерація)
 //   supabase/functions/telegram-order-bot/_index.src.ts  (мережа й база)
 //
 // Перезібрати:  node scripts/build-edge-function.js
@@ -2024,6 +2025,79 @@ function cartLetter(items, siteUrl) {
 // Повертає null, якщо надсилати нічим або нікуди — тоді функція просто
 // не шле листа. Магазин без листів працює; магазин, який падає через
 // недоступну пошту, — ні.
+// Прохання написати відгук.
+//
+// items — склад замовлення (той самий знімок, що в базі). Показуємо
+// його з фото: людина мусить згадати, про що йдеться, не відкриваючи
+// сайт.
+//
+// ПОСИЛАННЯ ВЕДЕ НА СТОРІНКУ ТОВАРУ, А НЕ НА ЯКУСЬ ФОРМУ. Форма живе
+// там же, під відгуками, і просить номер замовлення — тому кладемо
+// його в адресу, щоб людині лишилось ввести телефон.
+function reviewLetter(order, siteUrl) {
+
+    const number = String(order?.order_number ?? "");
+
+    const base = String(siteUrl ?? "").replace(/\/$/, "");
+
+    const items = Array.isArray(order?.items) ? order.items.slice(0, 6) : [];
+
+    const rows = items.map((item) => {
+
+        const title = escapeHtml(item?.title ?? "");
+
+        // Посилання на конкретний товар: у нього ж і треба написати
+        // відгук. Без slug лишається просто рядок — це нормально,
+        // знімок замовлення міг бути зроблений до появи slug.
+        const url = item?.slug
+            ? `${base}/p/${encodeURIComponent(item.slug)}/?order=${encodeURIComponent(number)}#productReviews`
+            : "";
+
+        const photo = item?.image
+            ? `<img src="${escapeHtml(item.image)}" width="64" alt="${title}"`
+                + ` style="display:block;border:0;border-radius:8px;max-width:64px;height:auto">`
+            : "";
+
+        const cell = "padding:10px 0;border-top:1px solid #e5e7eb";
+
+        return `<tr>`
+            + `<td style="${cell};width:76px">${photo}</td>`
+            + `<td style="${cell}">`
+            + (url
+                ? `<a href="${escapeHtml(url)}" style="color:#111827;font-weight:600;text-decoration:none">${title}</a>`
+                : `<b>${title}</b>`)
+            + (url
+                ? `<div style="margin-top:6px"><a href="${escapeHtml(url)}" style="color:#2f6fb3">Написати відгук →</a></div>`
+                : "")
+            + `</td>`
+            + `</tr>`;
+
+    }).join("");
+
+    const body = [
+        `<div style="font-size:15px;line-height:1.6">`,
+        `Дякуємо за замовлення <b>${escapeHtml(number)}</b>! Сподіваємось, усе підійшло.`,
+        `</div>`,
+        `<div style="margin-top:14px;font-size:15px;line-height:1.6">`,
+        `Якщо у вас є хвилина — напишіть кілька слів про покупку. `,
+        `Це найкорисніше, що можна зробити для наступного покупця: він `,
+        `бачить ту саму річ, але не може її потримати.`,
+        `</div>`,
+        rows ? `<table style="width:100%;border-collapse:collapse;margin-top:18px">${rows}</table>` : "",
+        `<div style="margin-top:18px;font-size:13px;line-height:1.6;color:#6b7280">`,
+        `Знадобиться номер замовлення <b>${escapeHtml(number)}</b> і ваш телефон — `,
+        `так ми відрізняємо відгуки покупців від чужих. Відгук з'явиться `,
+        `на сайті після того, як ми його прочитаємо.`,
+        `</div>`,
+    ].join("");
+
+    return {
+        subject: `Як вам покупка? Замовлення ${number}`,
+        html: letterShell("Дякуємо за покупку 💬", body, siteUrl)
+    };
+
+}
+
 function mailRequest(config, letter) {
 
     const to = String(config?.to || "").trim();
@@ -2980,6 +3054,244 @@ function publicOrderView(order) {
 
 }
 
+
+// Відгуки: перевірка й картка для модерації.
+//
+// НАВІЩО ПЕРЕВІРКА ПОКУПКИ
+// -------------------------
+// Форма відгуку без перевірки — запрошення для конкурентів і ботів.
+// Тому відгук приймається лише разом із номером замовлення й
+// телефоном, і сервер звіряє три речі:
+//
+//   1. замовлення з таким номером існує;
+//   2. телефон збігається з тим, що в замовленні;
+//   3. цей товар справді є в його складі.
+//
+// Третя перевірка не менш важлива за другу: без неї той, хто купив
+// гаманець, міг би написати відгук про будь-яку сумку з каталогу.
+//
+// ЧОМУ НА СЕРВЕРІ
+// ----------------
+// У браузері будь-яка така перевірка нічого не варта: код сторінки
+// відкритий, і запит можна надіслати без сторінки взагалі. Тому
+// таблиця відгуків закрита від браузера повністю (RLS без політик), а
+// пише в неї функція службовим ключем — після перевірки.
+//
+// ЧОГО ТУТ НЕМА
+// --------------
+// Мережі й бази. Лише чисті функції — щоб перевірялись тестами в Node.
+
+// Межі тексту. Не обмеження магазину, а стеля здорового глузду: відгук
+// на дві тисячі знаків читає лише той, хто його написав.
+const REVIEW_LIMITS = {
+    author: 80,
+    body: 2000,
+    orderNumber: 40,
+};
+
+// Скільки знаків тексту досить, щоб це був відгук, а не «ок».
+//
+// Не заборона, а фільтр очевидного сміття: «+», «норм», «1» не кажуть
+// нічого ні наступному покупцеві, ні Google.
+const MIN_BODY = 10;
+
+
+// -------------------------
+// Телефон
+// -------------------------
+
+// Ключ порівняння — останні 9 цифр.
+//
+// Те саме правило, що на сторінці «Де моє замовлення»
+// (phoneKey в order-lookup.js), і з тієї самої причини: у базі лежить
+// те, що людина набрала при оформленні, а тут вона набере те, що
+// згадає.
+//
+// Назва інша навмисно: у зібраному файлі всі модули лежать поруч, і
+// дві функції з однією назвою тихо перекрили б одна одну.
+function reviewPhoneKey(value) {
+
+    const digits = String(value ?? "").replace(/\D/g, "");
+
+    return digits.length >= 9 ? digits.slice(-9) : "";
+
+}
+
+function reviewPhoneMatches(stored, typed) {
+
+    const a = reviewPhoneKey(stored);
+    const b = reviewPhoneKey(typed);
+
+    return Boolean(a) && a === b;
+
+}
+
+
+// -------------------------
+// Що прислала сторінка
+// -------------------------
+
+// Розбір і чистка. Повертає { ok: true, review } або { ok: false, reason }.
+//
+// reason іде в логи функції, а не покупцеві: йому досить «не вдалося
+// зберегти відгук».
+function cleanReview(payload) {
+
+    if (!payload || typeof payload !== "object") {
+        return { ok: false, reason: "порожній запит" };
+    }
+
+    const productId = Number(payload.product_id);
+
+    if (!Number.isFinite(productId) || productId <= 0) {
+        return { ok: false, reason: "немає товару" };
+    }
+
+    const orderNumber = String(payload.order_number ?? "").trim();
+
+    // Те саме правило, що при оформленні (place-order.js) і при
+    // перевірці замовлення: цифри й латиниця, 4-40 символів.
+    if (!/^[0-9A-Za-z-]{4,40}$/.test(orderNumber)) {
+        return { ok: false, reason: "номер не схожий на номер" };
+    }
+
+    const phone = String(payload.phone ?? "").trim();
+
+    if (!reviewPhoneKey(phone)) {
+        return { ok: false, reason: "телефон коротший за 9 цифр" };
+    }
+
+    const rating = Number(payload.rating);
+
+    if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+        return { ok: false, reason: "оцінка поза межами 1-5" };
+    }
+
+    const author = String(payload.author ?? "").trim().slice(0, REVIEW_LIMITS.author);
+
+    if (!author) {
+        return { ok: false, reason: "немає імені" };
+    }
+
+    const body = String(payload.body ?? "").trim().slice(0, REVIEW_LIMITS.body);
+
+    if (body.length < MIN_BODY) {
+        return { ok: false, reason: "текст коротший за мінімум" };
+    }
+
+    return {
+        ok: true,
+        review: { productId, orderNumber, phone, rating, author, body },
+    };
+
+}
+
+// Чи є цей товар у складі замовлення.
+//
+// БЕЗ ЦІЄЇ ПЕРЕВІРКИ той, хто купив гаманець за 3 800, міг би написати
+// відгук про сумку за 15 000 — номер і телефон у нього справжні.
+//
+// Порівнюємо за id. У складі замовлення він може лежати числом або
+// рядком (знімок кладе браузер), тож зводимо обидва до числа.
+function orderHasProduct(order, productId) {
+
+    const items = Array.isArray(order?.items) ? order.items : [];
+
+    const want = Number(productId);
+
+    return items.some(item => Number(item?.id) === want);
+
+}
+
+
+// -------------------------
+// Картка для модерації
+// -------------------------
+
+// Зірки словом і значком: у Telegram «4/5» читається гірше за «★★★★☆».
+function stars(rating) {
+
+    const value = Math.min(Math.max(Math.trunc(Number(rating) || 0), 0), 5);
+
+    return "★".repeat(value) + "☆".repeat(5 - value);
+
+}
+
+// Назва навмисно не escapeHtml(): у зібраному файлі всі модулі лежать
+// поруч, і така функція там уже є (format.js). Дві функції з однією
+// назвою тихо перекрили б одна одну — саме це й ловить
+// tests/test-no-function-collisions.js.
+function escapeReview(text) {
+
+    return String(text ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+
+}
+
+// Повідомлення власнику про новий відгук.
+//
+// Показуємо все, що потрібно для рішення: товар, оцінку, текст і те,
+// за яким замовленням він написаний. Останнє важливе: якщо відгук
+// виглядає дивно, номер дає змогу подивитись саму покупку.
+function reviewCard(review, productTitle) {
+
+    const lines = [
+        `💬 <b>Новий відгук</b> ${stars(review.rating)}`,
+        "",
+        productTitle ? `<b>${escapeReview(productTitle)}</b>` : `Товар #${review.productId}`,
+        "",
+        escapeReview(review.body),
+        "",
+        `👤 ${escapeReview(review.author)}`,
+        `🧾 замовлення <code>${escapeReview(review.orderNumber)}</code>`,
+    ];
+
+    return lines.join("\n");
+
+}
+
+// Кнопки під карткою.
+//
+// Дві дії й нічого більше: показати або відхилити. Відгук лежить
+// невідмодерованим, поки власник не натиснув, — і це навмисно: відгук,
+// який з'являється на сайті сам, рано чи пізно принесе або спам, або
+// чужу лайку.
+function reviewKeyboard(id) {
+
+    return {
+        inline_keyboard: [[
+            { text: "✅ Показати на сайті", callback_data: `rev:${id}:pub` },
+            { text: "🚫 Відхилити", callback_data: `rev:${id}:rej` },
+        ]],
+    };
+
+}
+
+// Розбір натискання. Повертає { id, status } або null.
+function parseReviewAction(data) {
+
+    const match = String(data ?? "").match(/^rev:(\d+):(pub|rej)$/);
+
+    if (!match) return null;
+
+    return {
+        id: Number(match[1]),
+        status: match[2] === "pub" ? "published" : "rejected",
+    };
+
+}
+
+// Що показати власнику після натискання — замість кнопок.
+function reviewVerdictLine(status) {
+
+    return status === "published"
+        ? "✅ Відгук показано на сайті"
+        : "🚫 Відгук відхилено";
+
+}
+
 // ======================================
 // Telegram-бот для заявок BestBrnd4u
 //
@@ -3005,6 +3317,7 @@ function publicOrderView(order) {
 
 // Чиста логіка (форматування картки, кнопки) винесена окремо —
 // щоб її можна було запускати й тестувати в Node без Deno.
+
 
 
 
@@ -3466,6 +3779,15 @@ async function handleCallback(callback: Record<string, any>) {
   if (data.startsWith("o:")) {
 
     await handleOrderCallback(callback, data);
+
+    return;
+
+  }
+
+  // Модерація відгуку (префікс "rev:")
+  if (data.startsWith("rev:")) {
+
+    await handleReviewCallback(callback, data);
 
     return;
 
@@ -5129,6 +5451,187 @@ async function handleOrderStatus(request: Request, body: Record<string, any>): P
 
 }
 
+// -------------------------
+// Відгуки
+//
+// Навіщо перевірка покупки й чому вона на сервері — у reviews.js.
+// Тут мережа: звірка з замовленням, запис і картка власнику.
+// -------------------------
+
+// Назва товару для картки модерації.
+//
+// Беремо з каталогу сайту (той самий loadCatalog, що для бота): у базі
+// товарів немає, вони живуть у репозиторії. Не знайшли — не страшно,
+// картка покаже номер.
+async function productTitle(productId: number): Promise<string> {
+
+  try {
+
+    const items = await loadCatalog();
+
+    const found = items.find((item) => Number(item?.id) === Number(productId));
+
+    return found ? String(found.title ?? "") : "";
+
+  } catch (error) {
+
+    return "";
+
+  }
+
+}
+
+async function handleAddReview(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  const clean = cleanReview(body);
+
+  if (!clean.ok) {
+
+    console.warn("Відгук відхилено:", clean.reason);
+
+    return adminJson({ ok: false, error: "bad_review" }, 400, origin);
+
+  }
+
+  const review = clean.review;
+
+  // Межа звернень — та сама, що на сторінці «Де моє замовлення»
+  // (міграція 017). Причина теж та сама: інакше номери замовлень можна
+  // перебирати, тільки тепер ще й з написанням відгуку.
+  if (!(await lookupAllowed(clientIp(request)))) {
+    return adminJson({ ok: false, error: "too_many" }, 429, origin);
+  }
+
+  const order = await findOrderByNumber(review.orderNumber);
+
+  // ОДНА відповідь на всі випадки «не зійшлось»: немає замовлення, не
+  // той телефон, немає цього товару в складі. Інакше форма стала б
+  // способом дізнатись, що саме людина купувала.
+  if (!order
+    || !reviewPhoneMatches(order.phone, review.phone)
+    || !orderHasProduct(order, review.productId)) {
+
+    return adminJson({ ok: false, error: "not_verified" }, 200, origin);
+
+  }
+
+  const response = await supabaseRest("rpc/add_review", {
+    method: "POST",
+    body: JSON.stringify({
+      p_product_id: review.productId,
+      p_order_number: review.orderNumber,
+      p_author: review.author,
+      p_rating: review.rating,
+      p_body: review.body,
+    }),
+  });
+
+  if (!response.ok) {
+
+    const detail = await response.text();
+
+    console.error("Не вдалося зберегти відгук:", detail);
+
+    return adminJson({ ok: false, error: "save_failed" }, 502, origin);
+
+  }
+
+  const id = await response.json();
+
+  if (!id) {
+
+    // База відхилила: міграцію 019 ще не застосували або дані не
+    // пройшли її власну перевірку.
+    return adminJson({ ok: false, error: "save_failed" }, 502, origin);
+
+  }
+
+  // Картка власнику з кнопками. У фон: покупець не має чекати на
+  // Telegram, щоб побачити «дякуємо».
+  await background((async () => {
+
+    const title = await productTitle(review.productId);
+
+    await telegram("sendMessage", {
+      chat_id: TELEGRAM_CHAT_ID,
+      text: reviewCard(review, title),
+      parse_mode: "HTML",
+      reply_markup: reviewKeyboard(id),
+    });
+
+  })());
+
+  return adminJson({ ok: true }, 200, origin);
+
+}
+
+// Натискання «Показати» / «Відхилити» під карткою відгуку.
+async function handleReviewCallback(callback: Record<string, any>, data: string) {
+
+  const action = parseReviewAction(data);
+
+  if (!action) return;
+
+  if (!isOwner(callback.message?.chat?.id)) {
+
+    await telegram("answerCallbackQuery", {
+      callback_query_id: callback.id,
+      text: "Ця дія доступна лише магазину",
+    });
+
+    return;
+
+  }
+
+  const response = await supabaseRest(`reviews?id=eq.${action.id}`, {
+    method: "PATCH",
+    headers: { Prefer: "return=minimal" },
+    body: JSON.stringify({ status: action.status }),
+  });
+
+  if (!response.ok) {
+
+    const detail = await response.text();
+
+    console.error("Не вдалося змінити статус відгуку:", detail);
+
+    await telegram("answerCallbackQuery", {
+      callback_query_id: callback.id,
+      text: "Не вдалося зберегти",
+    });
+
+    return;
+
+  }
+
+  await response.text();
+
+  await telegram("answerCallbackQuery", {
+    callback_query_id: callback.id,
+    text: action.status === "published" ? "Показано" : "Відхилено",
+  });
+
+  // Кнопки прибираємо й дописуємо рішення в саме повідомлення: інакше
+  // через тиждень незрозуміло, що з цим відгуком зробили.
+  //
+  // ЧОМУ editMessageText, А НЕ editMessageReplyMarkup. Друге лишило б
+  // картку без жодного слова про рішення — і власник тиснув би вдруге.
+  await telegram("editMessageText", {
+    chat_id: callback.message.chat.id,
+    message_id: callback.message.message_id,
+    text: `${callback.message.text ?? ""}\n\n${reviewVerdictLine(action.status)}`,
+    parse_mode: "HTML",
+  });
+
+  // Зірки в розмітці оновить наступна збірка: pull-reviews.js читає
+  // review_stats() і кладе числа в дані товару. Просити перезбірку
+  // звідси не варто — власник модерує кілька відгуків підряд, і кожен
+  // тягнув би повну збірку сайту.
+
+}
+
 async function handleAdmin(request: Request, body: Record<string, any>): Promise<Response> {
 
   const origin = request.headers.get("origin");
@@ -5336,6 +5839,13 @@ async function handleRequest(request: Request): Promise<Response> {
   if (body.site_action === "order-status") {
 
     return await handleOrderStatus(request, body);
+
+  }
+
+  // --- відгук про товар ---
+  if (body.site_action === "add-review") {
+
+    return await handleAddReview(request, body);
 
   }
 

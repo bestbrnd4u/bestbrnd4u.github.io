@@ -626,6 +626,29 @@ function stampUpdated(products) {
 
 }
 
+// Скільки відгуків і яка оцінка в кожного товару.
+//
+// Файл кладе scripts/pull-reviews.js — він читає базу службовим
+// ключем перед збіркою. Тут лише переносимо числа в товар: із них
+// product.js будує aggregateRating.
+//
+// ЧОМУ ЦЕ ВАЖЛИВО ЗРОБИТИ САМЕ ТУТ. Розмітка мусить лежати в HTML
+// на момент, коли сторінку читає Google, — а не з'являтись після
+// запиту в базу.
+function reviewStats() {
+
+    const file = path.join(ROOT, "data", "reviews.json");
+
+    if (!fs.existsSync(file)) return {};
+
+    try {
+        return JSON.parse(fs.readFileSync(file, "utf8")) || {};
+    } catch (error) {
+        return {};
+    }
+
+}
+
 function main() {
 
     if (!fs.existsSync(PRODUCTS_DIR)) {
@@ -1163,6 +1186,37 @@ function main() {
         });
 
         if (added) console.log(`   написань брендів у пошук: ${added}`);
+    }
+
+    // Відгуки з бази — у дані товару.
+    //
+    // ПЕРЕВАЖАЮТЬ над тим, що стоїть у файлі товару. Раніше
+    // rating заповнювали руками, і в 73 товарах зі 100 він є, а
+    // відгуків немає ні в одного — тож розмітка його свідомо не
+    // показує. Справжні числа з бази мусять цей ручний рейтинг
+    // замінити, а не додатись до нього.
+    //
+    // Стоїть ДО stampUpdated: зміна рейтингу теж мусить попасти
+    // у відбиток змісту, тобто в lastmod для sitemap.
+    {
+        const stats = reviewStats();
+
+        let withReviews = 0;
+
+        products.forEach(product => {
+
+            const own = stats[String(product.id)];
+
+            if (!own) return;
+
+            product.rating = own.rating;
+            product.reviews = own.reviews;
+
+            withReviews++;
+
+        });
+
+        if (withReviews) console.log(`   товарів із відгуками: ${withReviews}`);
     }
 
     stampImageVersions(products);

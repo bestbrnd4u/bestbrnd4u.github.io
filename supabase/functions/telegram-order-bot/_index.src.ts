@@ -54,6 +54,10 @@ import {
 import {
   cleanLookup, phoneMatches, publicOrderView,
 } from "./order-lookup.js";
+import {
+  cleanReview, orderHasProduct, reviewCard, reviewKeyboard,
+  parseReviewAction, reviewVerdictLine, reviewPhoneMatches,
+} from "./reviews.js";
 
 const TELEGRAM_BOT_TOKEN = Deno.env.get("TELEGRAM_BOT_TOKEN") ?? "";
 const TELEGRAM_CHAT_ID = Deno.env.get("TELEGRAM_CHAT_ID") ?? "";
@@ -508,6 +512,15 @@ async function handleCallback(callback: Record<string, any>) {
   if (data.startsWith("o:")) {
 
     await handleOrderCallback(callback, data);
+
+    return;
+
+  }
+
+  // Модерація відгуку (префікс "rev:")
+  if (data.startsWith("rev:")) {
+
+    await handleReviewCallback(callback, data);
 
     return;
 
@@ -2171,6 +2184,187 @@ async function handleOrderStatus(request: Request, body: Record<string, any>): P
 
 }
 
+// -------------------------
+// Відгуки
+//
+// Навіщо перевірка покупки й чому вона на сервері — у reviews.js.
+// Тут мережа: звірка з замовленням, запис і картка власнику.
+// -------------------------
+
+// Назва товару для картки модерації.
+//
+// Беремо з каталогу сайту (той самий loadCatalog, що для бота): у базі
+// товарів немає, вони живуть у репозиторії. Не знайшли — не страшно,
+// картка покаже номер.
+async function productTitle(productId: number): Promise<string> {
+
+  try {
+
+    const items = await loadCatalog();
+
+    const found = items.find((item) => Number(item?.id) === Number(productId));
+
+    return found ? String(found.title ?? "") : "";
+
+  } catch (error) {
+
+    return "";
+
+  }
+
+}
+
+async function handleAddReview(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  const clean = cleanReview(body);
+
+  if (!clean.ok) {
+
+    console.warn("Відгук відхилено:", clean.reason);
+
+    return adminJson({ ok: false, error: "bad_review" }, 400, origin);
+
+  }
+
+  const review = clean.review;
+
+  // Межа звернень — та сама, що на сторінці «Де моє замовлення»
+  // (міграція 017). Причина теж та сама: інакше номери замовлень можна
+  // перебирати, тільки тепер ще й з написанням відгуку.
+  if (!(await lookupAllowed(clientIp(request)))) {
+    return adminJson({ ok: false, error: "too_many" }, 429, origin);
+  }
+
+  const order = await findOrderByNumber(review.orderNumber);
+
+  // ОДНА відповідь на всі випадки «не зійшлось»: немає замовлення, не
+  // той телефон, немає цього товару в складі. Інакше форма стала б
+  // способом дізнатись, що саме людина купувала.
+  if (!order
+    || !reviewPhoneMatches(order.phone, review.phone)
+    || !orderHasProduct(order, review.productId)) {
+
+    return adminJson({ ok: false, error: "not_verified" }, 200, origin);
+
+  }
+
+  const response = await supabaseRest("rpc/add_review", {
+    method: "POST",
+    body: JSON.stringify({
+      p_product_id: review.productId,
+      p_order_number: review.orderNumber,
+      p_author: review.author,
+      p_rating: review.rating,
+      p_body: review.body,
+    }),
+  });
+
+  if (!response.ok) {
+
+    const detail = await response.text();
+
+    console.error("Не вдалося зберегти відгук:", detail);
+
+    return adminJson({ ok: false, error: "save_failed" }, 502, origin);
+
+  }
+
+  const id = await response.json();
+
+  if (!id) {
+
+    // База відхилила: міграцію 019 ще не застосували або дані не
+    // пройшли її власну перевірку.
+    return adminJson({ ok: false, error: "save_failed" }, 502, origin);
+
+  }
+
+  // Картка власнику з кнопками. У фон: покупець не має чекати на
+  // Telegram, щоб побачити «дякуємо».
+  await background((async () => {
+
+    const title = await productTitle(review.productId);
+
+    await telegram("sendMessage", {
+      chat_id: TELEGRAM_CHAT_ID,
+      text: reviewCard(review, title),
+      parse_mode: "HTML",
+      reply_markup: reviewKeyboard(id),
+    });
+
+  })());
+
+  return adminJson({ ok: true }, 200, origin);
+
+}
+
+// Натискання «Показати» / «Відхилити» під карткою відгуку.
+async function handleReviewCallback(callback: Record<string, any>, data: string) {
+
+  const action = parseReviewAction(data);
+
+  if (!action) return;
+
+  if (!isOwner(callback.message?.chat?.id)) {
+
+    await telegram("answerCallbackQuery", {
+      callback_query_id: callback.id,
+      text: "Ця дія доступна лише магазину",
+    });
+
+    return;
+
+  }
+
+  const response = await supabaseRest(`reviews?id=eq.${action.id}`, {
+    method: "PATCH",
+    headers: { Prefer: "return=minimal" },
+    body: JSON.stringify({ status: action.status }),
+  });
+
+  if (!response.ok) {
+
+    const detail = await response.text();
+
+    console.error("Не вдалося змінити статус відгуку:", detail);
+
+    await telegram("answerCallbackQuery", {
+      callback_query_id: callback.id,
+      text: "Не вдалося зберегти",
+    });
+
+    return;
+
+  }
+
+  await response.text();
+
+  await telegram("answerCallbackQuery", {
+    callback_query_id: callback.id,
+    text: action.status === "published" ? "Показано" : "Відхилено",
+  });
+
+  // Кнопки прибираємо й дописуємо рішення в саме повідомлення: інакше
+  // через тиждень незрозуміло, що з цим відгуком зробили.
+  //
+  // ЧОМУ editMessageText, А НЕ editMessageReplyMarkup. Друге лишило б
+  // картку без жодного слова про рішення — і власник тиснув би вдруге.
+  await telegram("editMessageText", {
+    chat_id: callback.message.chat.id,
+    message_id: callback.message.message_id,
+    text: `${callback.message.text ?? ""}\n\n${reviewVerdictLine(action.status)}`,
+    parse_mode: "HTML",
+  });
+
+  // Зірки в розмітці оновить наступна збірка: pull-reviews.js читає
+  // review_stats() і кладе числа в дані товару. Просити перезбірку
+  // звідси не варто — власник модерує кілька відгуків підряд, і кожен
+  // тягнув би повну збірку сайту.
+
+}
+
 async function handleAdmin(request: Request, body: Record<string, any>): Promise<Response> {
 
   const origin = request.headers.get("origin");
@@ -2378,6 +2572,13 @@ async function handleRequest(request: Request): Promise<Response> {
   if (body.site_action === "order-status") {
 
     return await handleOrderStatus(request, body);
+
+  }
+
+  // --- відгук про товар ---
+  if (body.site_action === "add-review") {
+
+    return await handleAddReview(request, body);
 
   }
 

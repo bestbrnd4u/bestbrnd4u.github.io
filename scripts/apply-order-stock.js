@@ -335,6 +335,13 @@ function applyChanges(changes, products) {
     const touched = new Map();   // file → data
     const notes = [];
 
+    // Клітинки, які САМЕ ЦЕ списання вивело в нуль.
+    //
+    // Не «усе, що зараз на нулі», а саме подія: товар закінчився.
+    // Різниця важлива — інакше про той самий нуль повідомлялось би
+    // щоразу, коли крок запускається (а він щодесять хвилин).
+    const emptied = [];
+
     changes.forEach(change => {
 
         const entry = [...products.values()].find(p => p.file === change.file);
@@ -368,11 +375,25 @@ function applyChanges(changes, products) {
 
         stock[change.color][change.size] = after;
 
+        // Був — і закінчився. Саме цю подію власник і мусить побачити:
+        // товар щойно перестав продаватись як «у наявності».
+        if (before > 0 && after === 0) {
+
+            emptied.push({
+                slug: entry.data.slug || "",
+                title: entry.data.title || "",
+                color: change.color,
+                size: change.size,
+                order: change.order,
+            });
+
+        }
+
         touched.set(change.file, entry.data);
 
     });
 
-    return { touched, notes };
+    return { touched, notes, emptied };
 
 }
 
@@ -510,9 +531,26 @@ async function main() {
 
     if (apply) {
 
-        const { touched, notes } = applyChanges(plan.changes, readProducts());
+        const { touched, notes, emptied } = applyChanges(plan.changes, readProducts());
 
         notes.forEach(note => console.log(`   ⚠ ${note}`));
+
+
+        // Список того, що закінчилось, — у файл для наступного кроку.
+        //
+        // Через файл, а не через власне повідомлення, бо повідомляє
+        // scripts/report-stock.js: цей крок не має падати через
+        // сповіщення, інакше червоним стане списання залишків, і
+        // власник щоразу думав би, що воно не відпрацювало.
+        const alertsOut = arg("alerts-out");
+
+        if (alertsOut) {
+
+            fs.writeFileSync(alertsOut, JSON.stringify(emptied, null, 1) + "\n", "utf8");
+
+            if (emptied.length) console.log(`   закінчилось позицій: ${emptied.length}`);
+
+        }
 
         touched.forEach((data, file) => {
             fs.writeFileSync(path.join(productsDir(), file), JSON.stringify(data, null, 2) + "\n", "utf8");

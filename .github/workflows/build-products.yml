@@ -98,6 +98,18 @@ jobs:
       - name: Build data/categories.json
         run: node scripts/build-categories.js
 
+      # Зведення відгуків — ПЕРЕД складанням товарів: саме
+      # build-products.js кладе рейтинг у дані, а звідти він
+      # потрапляє в aggregateRating на сторінці товару.
+      #
+      # Без ключа крок нічого не робить; continue-on-error — бо
+      # недоступна база не має робити виливку сайту червоною.
+      - name: Зведення відгуків із бази
+        continue-on-error: true
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/pull-reviews.js
+
       - name: Build data/products.json
         run: node scripts/build-products.js
 

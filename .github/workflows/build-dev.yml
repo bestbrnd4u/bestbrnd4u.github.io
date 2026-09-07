@@ -83,9 +83,14 @@ jobs:
       - name: Normalize media (names + 4:5 canvas + srcset copies)
         run: npm run build:media
 
+      # Ключ потрібен зведенню відгуків: npm run build кличе
+      # pull-reviews.js, а той читає базу. Без ключа крок просто
+      # нічого не робить, і зірки в розмітці лишаються
+      # вимкненими — збірка від цього не падає.
       - name: Build (development)
         env:
           SITE_ENV: development
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: npm run build
 
       - name: Commit result if changed

@@ -149,7 +149,8 @@ jobs:
           node scripts/apply-order-stock.js \
             --plan-in="$RUNNER_TEMP/plan.json" \
             --dir="$GITHUB_WORKSPACE/main-tree/data/products" \
-            --apply
+            --apply \
+            --alerts-out="$RUNNER_TEMP/emptied.json"
           cd main-tree
           git config user.name "bestbrnd4u-bot"
           git config user.email "actions@users.noreply.github.com"
@@ -196,6 +197,25 @@ jobs:
         env:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: node scripts/apply-order-stock.js --plan-in="$RUNNER_TEMP/plan.json" --mark
+
+      # Що закінчилось після цього списання.
+      #
+      # НАВІЩО. Коли замовлення забирає останню одиницю, товар на сайті
+      # стає «під замовлення» — і це правильно. Але власник про це не
+      # дізнавався ніяк, тільки якщо сам відкрив адмінку.
+      #
+      # Крок пише подію в журнал (site_issues, різновид stock_out), а
+      # лист власнику надсилає щоденне зведення
+      # (scripts/report-issues.js). Секретів не потрібно: журнал
+      # наповнює навіть публічний ключ.
+      #
+      # continue-on-error, і сам крок виходить нулем — щоб сповіщення
+      # ніколи не пофарбувало червоним саме СПИСАННЯ: інакше власник
+      # щоразу думав би, що залишки не списались.
+      - name: Повідомити, що закінчилось
+        if: steps.plan.outputs.has == 'true'
+        continue-on-error: true
+        run: node scripts/report-stock.js --in="$RUNNER_TEMP/emptied.json"
 
       - name: Підсумок
         if: steps.plan.outputs.has == 'true'
