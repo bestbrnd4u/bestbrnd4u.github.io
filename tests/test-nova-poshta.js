@@ -67,11 +67,19 @@ console.log("\n[1] Ключ НП лишається на сервері");
 
 console.log("\n[2] Проксі вміє тільки довідник");
 {
-    check("рівно два методи", Object.keys(np.NP_METHODS).length === 2);
+    // Не кількість, а СУТЬ: кожен дозволений метод — це читання
+    // довідника. Третій (types) додався, коли з'ясувалось, що тип
+    // точки мусить фільтрувати НП, а не ми; правило від цього не
+    // змінилось.
+    const methods = Object.values(np.NP_METHODS).map(m => m.calledMethod);
 
-    check("це пошук міста й перелік відділень",
+    check("методи лише на читання: " + methods.join(", "),
+        methods.every(name => /^(search|get)/.test(name)));
+
+    check("є пошук міста, перелік точок і довідник типів",
         np.NP_METHODS.settlements.calledMethod === "searchSettlements"
-        && np.NP_METHODS.warehouses.calledMethod === "getWarehouses");
+        && np.NP_METHODS.warehouses.calledMethod === "getWarehouses"
+        && np.NP_METHODS.types.calledMethod === "getWarehouseTypes");
 
     check("чужий метод не проходить",
         np.npRequest("KEY", { method: "save", query: "x" }) === null);
@@ -181,13 +189,35 @@ console.log("\n[5] Відділення — тільки вибраного мі
     check("поштомати не змішані з відділеннями",
         /Boolean\(item\.postomat\) === wantPostomat/.test(page));
 
-    check("шукає і за номером, і за адресою",
-        /item\.name\.toLowerCase\(\)\.indexOf\(needle\)/.test(page)
-        && /String\(item\.number\)\.indexOf\(needle\)/.test(page));
+    // ЩО БУЛО НЕ ТАК. Спершу сторінка вантажила весь список точок
+    // міста й фільтрувала його сама. На Києві це не працювало: точок
+    // кілька тисяч, НП віддає 500 за раз, а поштомати мають номери на
+    // 4xxxx — у ту сотню вони не потрапляли ніколи. Відділення
+    // знаходились, поштомати ні.
+    const proxy = read("supabase/functions/telegram-order-bot/nova-poshta.js");
 
-    // Відділення міста змінюються раз на місяць, а покупець перебирає
-    // поля туди-сюди.
-    check("список міста не питається двічі", /warehousesByCity\[cityRef\]/.test(page));
+    check("текст пошуку йде в НП, а не фільтрується на місці",
+        /query: query/.test(page) && !/indexOf\(needle\)/.test(page));
+
+    check("НП шукає і за номером, і за адресою", /FindByString/.test(proxy));
+
+    // Тип точки теж мусить фільтрувати НП: інакше з 50 знайдених могли
+    // б прийти лише відділення, і поштоматів у списку знову не було б.
+    check("тип точки просимо в НП",
+        /TypeOfWarehouseRef/.test(proxy) && /postomat: wantPostomat/.test(page));
+
+    // Ref типу беремо з довідника НП, а не зашиваємо в код: зашитий
+    // GUID колись перестане існувати, і ніхто не зрозуміє чому.
+    check("ref поштомату з довідника, а не з коду",
+        /getWarehouseTypes/.test(proxy) && /поштомат/i.test(proxy));
+
+    // Покупець стирає й дописує номер, повертається до поля — ту саму
+    // відповідь тривожити мережею не треба.
+    check("та сама відповідь не питається двічі",
+        /if \(answers\[key\]\) return Promise\.resolve\(answers\[key\]\)/.test(page));
+
+    check("кеш розрізняє місто, тип точки й запит",
+        /cityRef \+ "\|" \+ \(wantPostomat \? "p" : "b"\) \+ "\|" \+ query/.test(page));
 }
 
 console.log("\n[6] Підказки придатні для клавіатури");

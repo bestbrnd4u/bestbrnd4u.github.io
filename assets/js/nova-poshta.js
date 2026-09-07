@@ -41,9 +41,10 @@
 
     var available = true;
 
-    // Відділення міста змінюються раз на місяць, а покупець перебирає
-    // поля туди-сюди. Тримаємо в пам'яті сторінки.
-    var warehousesByCity = {};
+    // Відповіді НП на ту саму пару «місто + запит». Покупець стирає й
+    // дописує номер, повертається до поля — а мережу тривожити не
+    // треба.
+    var answers = {};
 
     function client() {
 
@@ -323,42 +324,49 @@
         // уже не про це місто.
         city.addEventListener("input", function () { cityRef = ""; });
 
+        // ПОШУК РОБИТЬ НОВА ПОШТА.
+        //
+        // Спершу тут завантажувався весь список точок міста, і фільтр
+        // працював у браузері. На Києві це не працювало: точок кілька
+        // тисяч, а НП віддає 500 за раз — поштомати з номерами на
+        // 4xxxx у ту сотню не потрапляли ніколи. Відділення
+        // знаходились, поштомати ні.
+        //
+        // Тепер запит іде в НП разом із текстом, і «40964» знаходиться
+        // незалежно від того, скільки точок у місті.
         function warehouses(wantPostomat) {
 
             return function (query) {
 
                 if (!cityRef) return Promise.resolve(null);
 
-                var cached = warehousesByCity[cityRef];
+                var key = cityRef + "|" + (wantPostomat ? "p" : "b") + "|" + query.toLowerCase();
 
-                var list = cached
-                    ? Promise.resolve(cached)
-                    : ask({ method: "warehouses", cityRef: cityRef }).then(function (items) {
+                if (answers[key]) return Promise.resolve(answers[key]);
 
-                        if (items) warehousesByCity[cityRef] = items;
-
-                        return items;
-
-                    });
-
-                return list.then(function (items) {
+                return ask({
+                    method: "warehouses",
+                    cityRef: cityRef,
+                    query: query,
+                    postomat: wantPostomat
+                }).then(function (items) {
 
                     if (!items) return null;
 
-                    var needle = query.toLowerCase();
-
-                    return items
+                    var list = items
+                        // Тип точки НП уже врахувала, але перевіряємо й
+                        // тут: якщо довідник типів колись не відповість,
+                        // поштомати не мусять просочитись у список
+                        // відділень.
                         .filter(function (item) { return Boolean(item.postomat) === wantPostomat; })
-                        .filter(function (item) {
-                            // Шукаємо і за номером, і за адресою: люди
-                            // вводять і «45», і «Хрещатик».
-                            return item.name.toLowerCase().indexOf(needle) !== -1
-                                || String(item.number).indexOf(needle) === 0;
-                        })
                         .slice(0, 20)
                         .map(function (item) {
                             return { label: item.name, value: item.name };
                         });
+
+                    answers[key] = list;
+
+                    return list;
 
                 });
 

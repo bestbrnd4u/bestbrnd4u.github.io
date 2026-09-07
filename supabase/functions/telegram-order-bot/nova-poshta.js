@@ -40,6 +40,14 @@ export const NP_METHODS = {
     warehouses: {
         modelName: "AddressGeneral",
         calledMethod: "getWarehouses"
+    },
+
+    // Типи точок: «Відділення», «Поштомат», «Пункт приймання-видачі».
+    // Потрібні, щоб просити в НП саме потрібний тип, а не відсіювати
+    // його в себе — див. коментар про 500 рядків нижче.
+    types: {
+        modelName: "Address",
+        calledMethod: "getWarehouseTypes"
     }
 
 };
@@ -73,22 +81,78 @@ export function npRequest(apiKey, action) {
 
     }
 
+    if (action.method === "types") {
+
+        return {
+            apiKey,
+            modelName: spec.modelName,
+            calledMethod: spec.calledMethod,
+            methodProperties: {}
+        };
+
+    }
+
     const cityRef = String(action.cityRef || "").trim();
 
     // Ref міста — це UUID від НП. Перевіряємо форму, щоб проксі не
     // перетворився на спосіб передавати в НП що завгодно.
     if (!/^[0-9a-f-]{36}$/i.test(cityRef)) return null;
 
+    const query = String(action.query || "").trim();
+    const typeRef = String(action.typeRef || "").trim();
+
+    // ЧОМУ ПОШУК ВІДДАЄМО НОВІЙ ПОШТІ
+    //
+    // Спершу тут стояв простий запит «усі точки міста, Limit 500», а
+    // фільтрував уже браузер. На Києві це не працювало: точок там
+    // кілька тисяч, у перші 500 потрапляють відділення (номери 1-500),
+    // а поштомати мають номери на 4xxxx — тобто в список вони не
+    // входили ніколи. Відділення знаходились, поштомати — ні.
+    //
+    // FindByString шукає по номеру й адресі на боці НП, тому «40964» і
+    // «Хрещатик» знаходяться незалежно від кількості точок у місті.
+    const properties = {
+        CityRef: cityRef,
+        Limit: query ? "50" : "500",
+        Page: "1"
+    };
+
+    if (query) properties.FindByString = query.slice(0, 60);
+
+    // Тип точки теж просимо в НП, а не відсіюємо в себе: інакше з 50
+    // знайдених могли б прийти лише відділення, і поштоматів у списку
+    // знову не було б.
+    if (/^[0-9a-f-]{36}$/i.test(typeRef)) properties.TypeOfWarehouseRef = typeRef;
+
     return {
         apiKey,
         modelName: spec.modelName,
         calledMethod: spec.calledMethod,
-        methodProperties: {
-            CityRef: cityRef,
-            Limit: "500",
-            Page: "1"
-        }
+        methodProperties: properties
     };
+
+}
+
+// Типи точок НП: {ref, name}. Нам потрібен лише той, у назві якого є
+// «поштомат» — решту просимо як «усе інше».
+export function parseTypes(payload) {
+
+    const list = payload && Array.isArray(payload.data) ? payload.data : [];
+
+    return list.map(item => ({
+        ref: String(item?.Ref || "").trim(),
+        name: String(item?.Description || "").trim()
+    })).filter(item => item.ref && item.name);
+
+}
+
+// Ref типу «Поштомат» із довідника типів.
+export function postomatTypeRef(types) {
+
+    const found = (Array.isArray(types) ? types : [])
+        .find(item => /поштомат/i.test(item.name));
+
+    return found ? found.ref : "";
 
 }
 
