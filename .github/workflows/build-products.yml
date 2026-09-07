@@ -3,8 +3,38 @@ name: Build catalog data
 # Запускається щоразу, коли адмінка (Decap CMS) або масовий імпорт
 # комітять зміни в data/products/**, data/categories/**,
 # data/promotions/**, data/collections/** або data/promo-popups/**,
-# і перезбирає відповідні data/*.json — саме ці файли реально
-# вантажить сайт. Результат комітиться назад у main.
+# і перезбирає сайт під прод. Результат комітиться назад у main.
+#
+# ЧОМУ ОДИН КРОК `npm run build`, А НЕ ПЕРЕЛІК КРОКІВ
+# ---------------------------------------------------
+# Тут був виписаний перелік окремих `node scripts/…`, і він розійшовся
+# з `npm run build` у package.json. Забутими лишились шість кроків:
+#
+#   build-brands.js          data/brands.json не перезбирався, а
+#                            build-products.js читає з нього кириличні
+#                            написання брендів (brandAliases) — тобто
+#                            пошук по «Рей Бен» на проді не знаходив
+#                            нічого, хоч на dev працював;
+#   build-taxonomy-pages.js  сторінки брендів і категорій лишались старі;
+#   build-legal.js           реквізити в offer.html І телефон на ВСІХ
+#                            сторінках (syncPhoneLinks) не оновлювались;
+#   build-feed.js            feed.xml не перезбирався;
+#   build-llms.js            llms.txt не перезбирався;
+#   apply-cache-version.js   не проставлялись ?v= штампи — а без них
+#                            браузер віддає з кеша старі скрипти й дані
+#                            за незмінною адресою.
+#
+# Наслідок: правка через ПРОД-адмінку давала частково перезібраний
+# сайт. На практиці це рятував Sync branches своїм повним
+# `npm run build`, тож помітити було майже неможливо — правка просто
+# «не доїжджала», причому саме через ?v= мовчки.
+#
+# Тому тут тепер рівно один крок збірки — той самий `npm run build`,
+# що й у build-dev.yml та sync-branches.yml. Перелік кроків живе в
+# ОДНОМУ місці (package.json), і розійтись більше нема чому.
+# Окремими кроками лишилось те, що у збірку не входить: нормалізація
+# фото (потребує sharp), знімки залишків і цін у базі, виклик деплою
+# й пінг пошуковиків. Набір звіряє tests/test-monitoring.js.
 #
 # ВАЖЛИВО ПРО ДЕПЛОЙ: пуш, зроблений з дефолтним GITHUB_TOKEN (як
 # коміт бота нижче), за правилами GitHub НЕ породжує подію push для
@@ -66,10 +96,8 @@ jobs:
           # Node.js 20 досяг EOL 30 квітня 2026 — патчів безпеки для
           # нього більше не буде. 22 — поточна LTS-версія
           node-version: "22"
+          cache: "npm"
 
-      # ПЕРШИМ кроком: коротшаємо задовгі імена картинок і правимо
-      # посилання на них. Саме до збірки даних — щоб у зібрані
-      # data/*.json одразу пішли вже нові імена.
       # Досі всі кроки збірки обходились самим Node без залежностей.
       # Нормалізація фото потребує sharp (обробка зображень), тож тут
       # з'явився npm ci. Саме ci, а не install — ставить рівно те, що
@@ -77,12 +105,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # Домен і налаштування середовища — з site.config.json.
-      # Першим кроком, щоб усе згенероване далі (сторінки товарів,
-      # sitemap, статична розмітка) одразу мало правильні адреси.
-      - name: Apply site environment
-        run: node scripts/apply-site-env.js
-
+      # ДО збірки даних: коротшаємо задовгі імена картинок і правимо
+      # посилання на них — щоб у зібрані data/*.json одразу пішли вже
+      # нові імена.
+      #
       # Фото, завантажені через адмінку, приходять у довільних
       # пропорціях, а картка каталогу й галерея — контейнери 4:5.
       # Без цього кроку контейнер ріже кадр (широкі окуляри втрачали
@@ -91,54 +117,28 @@ jobs:
       #
       # Той самий npm-скрипт викликає build-dev.yml: раніше кроки були
       # виписані тільки тут, дев про них не знав, і фото з дев-адмінки
-      # лишались нерізаними.
+      # лишались нерізаними. У `npm run build` крок навмисно НЕ
+      # входить: він потребує sharp і працює з файлами, а не з даними.
       - name: Normalize media (names + 4:5 canvas + srcset copies)
         run: npm run build:media
 
-      - name: Build data/categories.json
-        run: node scripts/build-categories.js
-
-      # Зведення відгуків — ПЕРЕД складанням товарів: саме
-      # build-products.js кладе рейтинг у дані, а звідти він
-      # потрапляє в aggregateRating на сторінці товару.
+      # Уся збірка — одним кроком, дзеркально до build-dev.yml.
       #
-      # Без ключа крок нічого не робить; continue-on-error — бо
-      # недоступна база не має робити виливку сайту червоною.
-      - name: Зведення відгуків із бази
-        continue-on-error: true
+      # SITE_ENV: production задано ЯВНО, хоч воно й за замовчуванням
+      # (scripts/site-env.js). Так видно, що гілка main збирається під
+      # bestbrnd4u.com, і крок читається без звірки з кодом.
+      #
+      # Ключ потрібен зведенню відгуків: npm run build кличе
+      # pull-reviews.js, а той читає базу. Без ключа (як і при
+      # недоступній базі) скрипт просто нічого не робить і НЕ падає —
+      # він сам глушить свої помилки, бо збірка сайту не має падати
+      # через відгуки. continue-on-error тут не потрібен, а й
+      # шкідливий: він приховав би справжній збій збірки.
+      - name: Build (production)
         env:
+          SITE_ENV: production
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-        run: node scripts/pull-reviews.js
-
-      - name: Build data/products.json
-        run: node scripts/build-products.js
-
-      - name: Build data/promotions.json
-        run: node scripts/build-promotions.js
-
-      # Статичні сторінки товарів p/<slug>/index.html — саме їх
-      # індексує Google. Крок ОБОВ'ЯЗКОВО після build-products.js:
-      # генератор читає вже зібраний data/products.json. Новий товар,
-      # доданий через адмінку, отримує свою сторінку тут автоматично,
-      # видалений — його тека прибирається.
-      - name: Build static product pages
-        run: node scripts/build-product-pages.js
-
-      - name: Build data/collections.json
-        run: node scripts/build-collections.js
-
-      - name: Build data/promo-popups.json
-        run: node scripts/build-promo-popups.js
-
-      # Статична розмітка головної: index.html містить готовий HTML, і
-      # саме його бачить браузер до виконання app.js. Якщо там лишиться
-      # стара картинка — вона блимне при кожному оновленні сторінки.
-      # Крок тримає її в згоді з data/home.json.
-      - name: Sync static homepage markup
-        run: node scripts/build-home-static.js
-
-      - name: Build sitemap.xml
-        run: node scripts/build-sitemap.js
+        run: npm run build
 
       - name: Commit result if changed
         run: |
@@ -156,7 +156,9 @@ jobs:
           # мовчки не діють. Саме так «тег Google не знайдено» на
           # проді при правильно вписаному ідентифікаторі.
           git add -A data
-          git add sitemap.xml feed.xml
+          # llms.txt тут не було, хоча build-llms.js його переписує:
+          # на прод файл їхав лише з `git add -A` у Sync branches.
+          git add -A sitemap.xml feed.xml llms.txt
           # -A по теці p/: додає нові сторінки І фіксує видалення тек
           # товарів, яких уже немає (звичайний git add видалення не бачить)
           # Сторінки — МАСКОЮ, а не переліком.
@@ -177,11 +179,17 @@ jobs:
           git add robots.txt CNAME admin/config.yml
           git add -A p brands categories departments
           # -A по картинках: фіксує і нові імена, і зникнення старих
-          # після кроку "Normalize media file names"
+          # після кроку "Normalize media"
           git add -A assets/images
-          # перелік фото зі зменшеними копіями оновлює крок
-          # "Normalize product photos to 4:5"
+          # перелік фото зі зменшеними копіями оновлює той самий крок
           git add data/image-variants.json
+          # SITE_URL у common.js проставляє apply-site-env.js — і це
+          # ЄДИНИЙ файл коду, який чіпає збірка. На main він і так уже
+          # має прод-адресу, тож коміту зазвичай немає. Але якщо адреса
+          # там колись з'їде (невдалий Sync, правка руками), збірка її
+          # виправить, а без цього рядка виправлення нікуди не поїде —
+          # і сторінки лишаться з чужим canonical.
+          git add assets/js/common.js
 
           if git diff --cached --quiet; then
             echo "Немає змін — пропускаємо коміт"
@@ -193,9 +201,6 @@ jobs:
           fi
         id: commit
 
-      # Пуш бота вище не породжує подію push (див. коментар угорі),
-      # тож деплоїмо явно. Якщо коміту не було (дані не змінились),
-      # деплой не потрібен — на сайті вже актуальна версія.
       # Знімок залишків у базу. Саме він дає базі змогу не продати
       # останню одиницю двічі (див. supabase/migrations/011-…).
       #
@@ -219,6 +224,9 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: node scripts/push-prices.js
 
+      # Пуш бота вище не породжує подію push (див. коментар угорі),
+      # тож деплоїмо явно. Якщо коміту не було (дані не змінились),
+      # деплой не потрібен — на сайті вже актуальна версія.
       - name: Trigger deploy
         if: steps.commit.outputs.pushed == 'true'
         env:
