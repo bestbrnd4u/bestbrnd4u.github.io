@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"955f692b","data/catalog.json":"d2f7e3f9","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"5d9b13ee","data/legal.json":"f84751b2","data/notifications.json":"670aa3fa","data/products.json":"845225e9","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/search-banners.json":"9adaab83","data/security.json":"34f399a1","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
+    <meta name="robots" content="noindex,nofollow">
+    <meta charset="UTF-8">
+    <meta name="author" content="BestBrnd4u">
+    <meta name="copyright" content="© 2026 BestBrnd4u. Усі права захищено.">
+    <link rel="license" href="/LICENSE">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Перевірте стан свого замовлення в BestBrnd4u за номером замовлення й телефоном: статус, склад, номер накладної Нової пошти.">
+    <meta name="theme-color" content="#111827">
+
+<link rel="icon" href="favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicon-16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/images/favicon-192.png">
+    <meta name="robots" content="index,follow">
+    <link rel="canonical" href="https://dev.bestbrnd4u.com/order-status">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Де моє замовлення | BestBrnd4u">
+    <meta property="og:description" content="Стан замовлення за номером і телефоном — без реєстрації.">
+    <meta property="og:url" content="https://dev.bestbrnd4u.com/order-status">
+
+    <title>Де моє замовлення | BestBrnd4u</title>
+
+    <link rel="stylesheet" href="assets/css/style.css?v=b9d9dfba">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+<!-- MailerLite Universal -->
+<script>
+    (function(w,d,e,u,f,l,n){w[f]=w[f]||function(){(w[f].q=w[f].q||[])
+    .push(arguments);},l=d.createElement(e),l.async=1,l.src=u,
+    n=d.getElementsByTagName(e)[0],n.parentNode.insertBefore(l,n);})
+    (window,document,'script','https://assets.mailerlite.com/js/universal.js','ml');
+    ml('account', '2520119');
+</script>
+<!-- End MailerLite Universal -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"></script>
+
+
+</head>
+
+<body>
+
+<header>
+
+    <div class="container header">
+
+        <a href="/" class="logo">
+            BestBrnd4u
+        </a>
+
+        <nav>
+
+            <ul>
+
+                <li><a href="/">Головна</a></li>
+
+                <li class="has-mega"><a href="catalog" id="navCatalogLink">Каталог</a><div class="mega-menu" id="catalogMegaMenu">
+<a class="mega-item" href="catalog?gender=Жінкам"><img src="assets/images/banners/mega-women.webp" alt="Жінкам"><span>Жінкам</span></a>
+<a class="mega-item" href="catalog?gender=Чоловікам"><img src="assets/images/banners/mega-men.webp" alt="Чоловікам"><span>Чоловікам</span></a>
+<a class="mega-item" href="catalog?gender=Унісекс"><img src="assets/images/banners/mega-unisex.webp" alt="Унісекс"><span>Унісекс</span></a>
+<a class="mega-item" href="catalog?gender=Дітям"><img src="assets/images/banners/mega-kids.webp" alt="Дітям"><span>Дітям</span></a>
+</div></li>
+
+                <li class="has-mega"><a href="catalog?section=new" id="navNewLink">Новинки</a><div class="mega-menu">
+<a class="mega-item" href="catalog?section=new&gender=Жінкам"><img src="assets/images/banners/mega-women.webp" alt="Жінкам"><span>Жінкам</span></a>
+<a class="mega-item" href="catalog?section=new&gender=Чоловікам"><img src="assets/images/banners/mega-men.webp" alt="Чоловікам"><span>Чоловікам</span></a>
+<a class="mega-item" href="catalog?section=new&gender=Унісекс"><img src="assets/images/banners/mega-unisex.webp" alt="Унісекс"><span>Унісекс</span></a>
+<a class="mega-item" href="catalog?section=new&gender=Дітям"><img src="assets/images/banners/mega-kids.webp" alt="Дітям"><span>Дітям</span></a>
+</div></li>
+
+                <li class="has-mega"><a href="catalog?section=sale" id="navSaleLink" class="sale-text">Акції</a><div class="mega-menu">
+<a class="mega-item" href="catalog?section=sale&gender=Жінкам"><img src="assets/images/banners/mega-women.webp" alt="Жінкам"><span>Жінкам</span></a>
+<a class="mega-item" href="catalog?section=sale&gender=Чоловікам"><img src="assets/images/banners/mega-men.webp" alt="Чоловікам"><span>Чоловікам</span></a>
+<a class="mega-item" href="catalog?section=sale&gender=Унісекс"><img src="assets/images/banners/mega-unisex.webp" alt="Унісекс"><span>Унісекс</span></a>
+<a class="mega-item" href="catalog?section=sale&gender=Дітям"><img src="assets/images/banners/mega-kids.webp" alt="Дітям"><span>Дітям</span></a>
+</div></li>
+                <li><a href="bayer-service">Байєр-сервіс</a></li>
+
+
+                <li><a href="contacts">Контакти</a></li>
+
+            </ul>
+
+        </nav>
+
+        <div class="header-icons">
+
+            <button id="searchBtn">🔍</button>
+<a href="account" id="accountLink">👤</a>
+
+            <a href="favorites">
+                ❤
+                <span id="favCount">0</span>
+            </a>
+
+            <div class="cart-icon-wrap">
+    <a href="cart" id="cartIconLink">
+        🛒
+        <span id="cartCount">0</span>
+    </a>
+    <div id="cartPopup" class="cart-popup" hidden></div>
+</div>
+
+        </div>
+
+    </div>
+
+</header>
+
+<section class="breadcrumbs">
+
+    <div class="container">
+
+        <a href="/">Головна</a>
+
+        <span class="crumb-sep">→</span>
+
+        <span>Де моє замовлення</span>
+
+    </div>
+
+</section>
+
+<section class="checkout-page">
+
+    <div class="container">
+
+        <div class="lookup-page">
+
+            <h1>Де моє замовлення</h1>
+
+            <p class="lookup-intro">
+                Замовляли без реєстрації? Стан замовлення можна перевірити
+                тут — потрібні номер замовлення та телефон, який ви вказали
+                при оформленні.
+            </p>
+
+            <!-- ЧОМУ ПОТРІБЕН ТЕЛЕФОН.
+                 Номер замовлення не таємниця: він у листі, його диктують
+                 уголос. Якби сторінка відкривалась за одним номером, будь-хто,
+                 хто його побачив, дізнався б ім'я, відділення й склад покупки.
+                 Телефон — це те, що знає замовник і чого немає в номері. -->
+            <form id="lookupForm" class="lookup-form" novalidate>
+
+                <label>
+                    <span>Номер замовлення</span>
+                    <input
+                        type="text"
+                        id="lookupOrder"
+                        name="order"
+                        inputmode="numeric"
+                        autocomplete="off"
+                        placeholder="напр. 4821507392"
+                        required>
+                </label>
+
+                <label>
+                    <span>Телефон із замовлення</span>
+                    <input
+                        type="tel"
+                        id="lookupPhone"
+                        name="phone"
+                        inputmode="tel"
+                        autocomplete="tel"
+                        placeholder="+380 __ ___ __ __"
+                        required>
+                </label>
+
+                <button type="submit" class="btn" id="lookupSubmit">Перевірити</button>
+
+            </form>
+
+            <p class="lookup-error" id="lookupError" hidden></p>
+
+            <!-- Результат. Класи ті самі, що на сторінці подяки:
+                 замовлення мусить виглядати однаково там і тут -->
+            <div class="order-confirm-card lookup-result" id="lookupResult" hidden>
+
+                <div class="lookup-status" id="lookupStatus">
+                    <strong id="lookupStatusLabel">—</strong>
+                    <span id="lookupStatusNote"></span>
+                </div>
+
+                <div class="order-confirm-row">
+                    <span>Номер замовлення</span>
+                    <strong id="lookupResultNumber">—</strong>
+                </div>
+
+                <div class="order-confirm-row">
+                    <span>Оформлено</span>
+                    <strong id="lookupResultDate">—</strong>
+                </div>
+
+                <div class="order-confirm-row" id="lookupDeliveryRow" hidden>
+                    <span>Доставка</span>
+                    <strong id="lookupResultDelivery">—</strong>
+                </div>
+
+                <div class="order-confirm-row" id="lookupPaymentRow" hidden>
+                    <span>Оплата</span>
+                    <strong id="lookupResultPayment">—</strong>
+                </div>
+
+                <div id="lookupItems" class="order-confirm-items" hidden></div>
+
+                <div class="order-confirm-row" id="lookupDiscountRow" hidden>
+                    <span>Знижка</span>
+                    <strong id="lookupResultDiscount">—</strong>
+                </div>
+
+                <div class="order-confirm-row order-confirm-total">
+                    <span>Сума замовлення</span>
+                    <strong id="lookupResultTotal">—</strong>
+                </div>
+
+                <!-- Доставку магазин не бере: покупець платить перевізнику
+                     при отриманні. Тому в сумі її немає, і про це треба
+                     сказати прямо, а не лишати «Доставка: 0 грн» -->
+                <p class="lookup-note">
+                    Доставку оплачуєте перевізнику при отриманні, за його тарифом.
+                    У суму замовлення вона не входить.
+                </p>
+
+                <div class="lookup-tracking" id="lookupTracking" hidden>
+                    <span>Накладна: <strong id="lookupTrackingNumber">—</strong></span>
+                    <a href="#" class="btn" id="lookupTrackingLink" target="_blank" rel="noopener">
+                        Відстежити на Новій пошті
+                    </a>
+                </div>
+
+                <p class="lookup-note" id="lookupRefusal" hidden>
+                    Ми отримали вашу заявку на відмову й опрацьовуємо її.
+                    Надсилати повторно не потрібно.
+                </p>
+
+            </div>
+
+            <p class="lookup-help">
+                Не знайшли замовлення або щось не так?
+                Напишіть нам у <a href="https://t.me/bestbrnd4u" target="_blank" rel="noopener">Telegram</a>
+                або на <a class="mail-link" href="mailto:bestbrnd4u@proton.me">bestbrnd4u@proton.me</a> —
+                допоможемо.
+            </p>
+
+            <p class="lookup-help">
+                Замовляли з акаунтом? Уся історія замовлень —
+                у <a href="account">кабінеті</a>.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+<footer>
+
+    <div class="container footer">
+
+        <div>
+
+            <h3>BestBrnd4u</h3>
+
+            <p>
+                Інтернет-магазин сумок
+та аксесуарів.
+            </p>
+
+            <div class="footer-social">
+                <a href="https://www.instagram.com/bestbrnd4u" target="_blank" rel="noopener" aria-label="Instagram">
+                    Instagram
+                </a>
+                <a href="https://t.me/bestbrnd4u" target="_blank" rel="noopener" aria-label="Telegram">
+                    Telegram
+                </a>
+            </div>
+
+        </div>
+
+        <div>
+
+            <h3>Покупцям</h3>
+
+            <!-- Гість не бачить замовлення в кабінеті: воно без user_id.
+                 Тому посилання стоїть ПЕРШИМ у розділі — це не політика,
+                 а дія, і саме її шукають найчастіше -->
+            <a href="order-status">Де моє замовлення</a>
+
+            <a href="delivery-payment#delivery">Доставка</a>
+            <a href="delivery-payment#payment">Оплата</a>
+            <a href="return-warranty">Повернення та гарантія</a>
+            <a href="bayer-service">Байєр-сервіс</a>
+            <a href="privacy-policy">Політика конфіденційності</a>
+            <a href="offer">Публічна оферта</a>
+            <!-- Згоду треба вміти відкликати так само легко, як дати -->
+            <a href="#" data-consent-reopen>Налаштування даних</a>
+
+        </div>
+
+        <div>
+
+            <h3>Каталог</h3>
+
+            <a href="catalog">Всі товари</a>
+
+            <a href="catalog?section=new">Новинки</a>
+
+            <a href="catalog?section=sale" class="sale-text">Акції</a>
+
+            <a href="#">Бренди</a>
+
+        </div>
+
+        <div>
+
+            <h3>Зв'яжіться з нами</h3>
+
+            <p>📍 Україна</p>
+
+            <p>✉ <a class="mail-link" href="mailto:bestbrnd4u@proton.me">bestbrnd4u@proton.me</a></p>
+
+            <p>✈ <a class="tg-link" href="https://t.me/bestbrnd4u" target="_blank" rel="noopener">@bestbrnd4u</a></p>
+
+            <p>☎ <a class="phone-link" href="tel:+380000000000">+380 73 728 82 91</a></p>
+
+            <p>🕘 Пн–Нд 09:00–20:00</p>
+
+        </div>
+
+    </div>
+
+</footer>
+
+<div class="copyright">
+
+    <div class="container">
+
+    © 2026 bestbrnd4u.
+    Всі права захищені.
+
+    </div>
+
+</div>
+
+<!-- Журнал помилок: сторінка сама розповідає, що в неї зламалось -->
+<script src="assets/js/error-report.js?v=65f3d8ee"></script>
+<script src="assets/js/supabase-client.js?v=42a4012d"></script>
+<!-- Кадрування фото товару. Той самий файл підключає адмінка,
+     тож прев'ю в ній і картка на сайті рахуються однаково. -->
+<script src="assets/js/image-framing.js?v=80b29a57"></script>
+<!-- Хлібні крихти: спільний будівник для сторінки й розмітки BreadcrumbList -->
+<script src="assets/js/breadcrumbs.js?v=f8e67fc2"></script>
+<!-- Оформлення текстових блоків з адмінки (кольори, шрифт, кнопка) -->
+<script src="assets/js/text-styles.js?v=7dc05c7d"></script>
+<!-- Згода на використання даних (банер + блокування вбудованого відео) -->
+<script src="assets/js/consent.js?v=b6cc5d45"></script>
+<!-- Статистика відвідувань. Не завантажує Google без згоди. -->
+<script src="assets/js/analytics.js?v=057602e5"></script>
+<!-- Транслітерація: productUrl() кладе колір в адресу латиницею.
+     Той самий файл використовує збірка для адрес товарів. -->
+<script src="assets/js/translit.js?v=c0957cb7"></script>
+<script src="assets/js/common.js?v=e552c570"></script>
+<script src="assets/js/sync.js?v=48ef002e"></script>
+<script src="assets/js/mega-menu.js?v=803d52cc"></script>
+
+<!-- Перевірка замовлення за номером і телефоном -->
+<script src="assets/js/order-status.js?v=c10ef0bd"></script>
+
+<script>
+    // Дані про щойно оформлене замовлення передаються з checkout.js
+    // через sessionStorage (на момент відкриття цієї сторінки кошик
+    // уже безпечно очищено там же).
+    (function () {
+
+        const raw = sessionStorage.getItem("bestbrnd4uLastOrder");
+
+        if (raw) {
+
+            try {
+
+                const order = JSON.parse(raw);
+
+                document.getElementById("thanksOrderId").textContent = order.orderId || "—";
+                document.getElementById("thanksOrderDate").textContent = order.orderDate || "—";
+                document.getElementById("thanksItemsCount").textContent = order.itemsCount ?? "—";
+
+                // Товари: фото, назва, різновид, кількість і сума.
+                const itemsBox = document.getElementById("thanksItems");
+
+                if (Array.isArray(order.items) && order.items.length) {
+
+                    itemsBox.innerHTML = order.items.map(item => {
+
+                        // Колір, розмір і кількість — в одну стрічку,
+                        // через розділювач. Кількість показуємо лише
+                        // коли її більше однієї: «× 1» нічого не додає.
+                        const meta = [
+                            item.color,
+                            item.size,
+                            item.qty > 1 ? `${item.qty} шт.` : ""
+                        ].filter(Boolean).join(" · ");
+
+                        // Фото, назва й бренд — посилання, як і в
+                        // історії замовлень у кабінеті.
+                        //
+                        // ЧОМУ. Це останній екран замовлення, і саме
+                        // тут найчастіше хочеться передивитись товар:
+                        // перевірити колір, дочитати опис, показати
+                        // комусь. Раніше клац по фото й назві не робив
+                        // нічого — виглядало як зламане посилання.
+                        //
+                        // Ведемо на /product?id=… — сторінка товару сама
+                        // перекине на канонічну адресу, а якщо товару
+                        // вже немає, скаже про це прямо.
+                        const productHref = item.id
+                            ? `/product?id=${encodeURIComponent(item.id)}`
+                            : (item.title ? `/product?title=${encodeURIComponent(item.title)}` : "/catalog");
+
+                        const brandHref = (item.brand && window.Translit)
+                            ? `/brands/${window.Translit.toSlug(item.brand)}/`
+                            : `/catalog?brand=${encodeURIComponent(item.brand || "")}`;
+
+                        return `
+                            <div class="order-confirm-item">
+                                <a class="order-confirm-item-image" href="${productHref}">
+                                    <img src="${item.image || "assets/images/no-image.png"}"
+                                         alt=""
+                                         onerror="this.onerror=null;this.src='assets/images/no-image.png'">
+                                </a>
+                                <div class="order-confirm-item-info">
+                                    ${item.brand ? `<a class="order-confirm-item-brand" href="${brandHref}">${item.brand}</a>` : ""}
+                                    <a class="order-confirm-item-title" href="${productHref}">${item.title}</a>
+                                    ${meta ? `<span class="order-confirm-item-meta">${meta}</span>` : ""}
+                                </div>
+                                <span class="order-confirm-item-sum">${item.sum.toLocaleString("uk-UA")} грн</span>
+                            </div>`;
+
+                    }).join("");
+
+                    itemsBox.hidden = false;
+
+                }
+                document.getElementById("thanksTotal").textContent = order.total || "—";
+
+                document.getElementById("orderConfirmCard").hidden = false;
+
+                if (order.firstName) {
+                    const greeting = document.getElementById("thanksGreeting");
+                    greeting.textContent = `Дякуємо, ${order.firstName}! Ваше замовлення прийнято в обробку.`;
+                    greeting.hidden = false;
+                    document.getElementById("thanksHeading").hidden = true;
+                }
+
+                sessionStorage.removeItem("bestbrnd4uLastOrder");
+
+            } catch (error) {
+                console.warn("Не вдалося прочитати дані замовлення:", error);
+            }
+
+        }
+
+        // підстраховка: якщо кошик з якоїсь причини ще не порожній — очищаємо
+        saveCart([]);
+
+    })();
+</script>
+
+</body>
+
+</html>

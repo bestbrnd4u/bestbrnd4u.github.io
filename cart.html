@@ -20,7 +20,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="assets/images/favicon-192.png">
     <title>Кошик | BestBrnd4u</title>
 
-    <link rel="stylesheet" href="assets/css/style.css?v=797b6d46">
+    <link rel="stylesheet" href="assets/css/style.css?v=b9d9dfba">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -163,7 +163,7 @@
 
                 <div class="summary-row">
                     <span>Доставка</span>
-                    <span>Безкоштовно</span>
+                    <span class="summary-note">за тарифом перевізника</span>
                 </div>
 
                 <div class="summary-row summary-total">
@@ -178,6 +178,27 @@
             </aside>
 
         </div>
+
+        <!-- Доповнення до кошика. Порожній кошик його не показує -->
+        <section class="similar" id="crossSellSection" hidden>
+
+            <h2>З цим часто беруть</h2>
+
+            <div class="carousel" id="crossSellCarousel">
+
+                <button type="button" class="carousel-arrow carousel-prev" aria-label="Попередні товари">
+                    <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
+
+                <div id="crossSellGrid" class="products-grid carousel-track"></div>
+
+                <button type="button" class="carousel-arrow carousel-next" aria-label="Наступні товари">
+                    <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                </button>
+
+            </div>
+
+        </section>
 
     </div>
 
@@ -210,6 +231,11 @@
         <div>
 
             <h3>Покупцям</h3>
+
+            <!-- Гість не бачить замовлення в кабінеті: воно без user_id.
+                 Тому посилання стоїть ПЕРШИМ у розділі — це не політика,
+                 а дія, і саме її шукають найчастіше -->
+            <a href="order-status">Де моє замовлення</a>
 
             <a href="delivery-payment#delivery">Доставка</a>
             <a href="delivery-payment#payment">Оплата</a>
@@ -284,7 +310,7 @@
 <!-- Згода на використання даних (банер + блокування вбудованого відео) -->
 <script src="assets/js/consent.js?v=b6cc5d45"></script>
 <!-- Статистика відвідувань. Не завантажує Google без згоди. -->
-<script src="assets/js/analytics.js?v=9b4797b8"></script>
+<script src="assets/js/analytics.js?v=057602e5"></script>
 <!-- Транслітерація: productUrl() кладе колір в адресу латиницею.
      Той самий файл використовує збірка для адрес товарів. -->
 <script src="assets/js/translit.js?v=c0957cb7"></script>
@@ -292,12 +318,12 @@
      саме їх могло не лишитись. ДО cart.js. -->
 <script src="assets/js/stock.js?v=85fa4aad"></script>
 
-<script src="assets/js/common.js?v=a6b0fed9"></script>
+<script src="assets/js/common.js?v=e552c570"></script>
 <script src="assets/js/sync.js?v=48ef002e"></script>
 <script src="assets/js/mega-menu.js?v=803d52cc"></script>
 <script src="assets/js/ui.js?v=c1453fdd"></script>
 <script src="assets/js/live-stock.js?v=288763d6"></script>
-<script src="assets/js/cart.js?v=b3a45bfb"></script>
+<script src="assets/js/cart.js?v=a37e6ce8"></script>
 
 </body>
 

@@ -38,7 +38,8 @@ const STATIC_PAGES = [
     { loc: "/return-warranty", changefreq: "monthly", priority: "0.5" },
     { loc: "/privacy-policy", changefreq: "yearly", priority: "0.3" },
     { loc: "/offer", changefreq: "yearly", priority: "0.3" },
-    { loc: "/contacts", changefreq: "monthly", priority: "0.3" }
+    { loc: "/contacts", changefreq: "monthly", priority: "0.3" },
+    { loc: "/order-status", changefreq: "monthly", priority: "0.4" }
 ];
 
 function readJsonSafe(filePath) {

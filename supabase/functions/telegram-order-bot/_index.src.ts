@@ -33,6 +33,7 @@ import {
   ADMIN_TOKEN_HEADER, corsHeaders, isAllowedOrigin, parseAdminRequest,
   adminTransitions, buildListQuery, buildCountQuery, buildRefusalsQuery,
   parseTotal, orderView, refusalView, listResponse, STATUS_ORDER,
+  ADMIN_ORIGINS,
 } from "./admin-api.js";
 import { cleanOrder, turnstileVerdict } from "./place-order.js";
 import { orderLetter, statusLetter, mailRequest } from "./mail.js";
@@ -46,6 +47,13 @@ import {
   validateCity, validateDetail, validatePhone,
   generateOrderNumber, buildOrderRow,
 } from "./order-flow.js";
+import {
+  MAX_EVENT_AGE_MS, userDataSources, hasIdentity, buildEvent,
+  capiRequest, capiVerdict, cleanBrowserIds, cleanSourceUrl,
+} from "./meta-capi.js";
+import {
+  cleanLookup, phoneMatches, publicOrderView,
+} from "./order-lookup.js";
 
 const TELEGRAM_BOT_TOKEN = Deno.env.get("TELEGRAM_BOT_TOKEN") ?? "";
 const TELEGRAM_CHAT_ID = Deno.env.get("TELEGRAM_CHAT_ID") ?? "";
@@ -103,6 +111,23 @@ const MAIL_REPLY_TO = Deno.env.get("MAIL_REPLY_TO") ?? "";
 // ⚠️ Цей ключ дає право створювати накладні на вашому рахунку, тому
 // він і живе тут, а не в коді сайту.
 const NOVAPOSHTA_API_KEY = Deno.env.get("NOVAPOSHTA_API_KEY") ?? "";
+
+// Токен Conversions API — серверні конверсії Meta.
+//
+// ЦЕ СЕКРЕТ. Він дає право писати конверсії в рекламний акаунт
+// магазину: чужими руками туди можна залити вигадані покупки й
+// зіпсувати оптимізацію реклами. У коді сайту йому місця немає — на
+// відміну від ідентифікатора пікселя, який публічний за задумом.
+//
+// Порожній = вимкнено. Жодного запиту в Meta не буде.
+const META_CAPI_TOKEN = Deno.env.get("META_CAPI_TOKEN") ?? "";
+
+// Код перевірки з Events Manager → Test Events.
+//
+// Поки він заданий, події видно у вкладці перевірки й вони НЕ йдуть у
+// звіти — саме так переконуються, що інтеграція жива. Після перевірки
+// секрет прибирають, інакше жодна покупка не дійде до оптимізації.
+const META_CAPI_TEST_CODE = Deno.env.get("META_CAPI_TEST_CODE") ?? "";
 
 const TELEGRAM_API = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}`;
 
@@ -1830,7 +1855,15 @@ async function handlePlaceOrder(request: Request, body: Record<string, any>): Pr
   //
   // Гість надсилає публічний ключ проєкту — на нього /auth/v1/user
   // відповість відмовою, і замовлення лишиться гостьовим.
-  const bearer = (request.headers.get("authorization") ?? "").replace(/^Bearers+/i, "");
+  //
+  // ЩО БУЛО НЕ ТАК. Тут стояло /^Bearers+/i — регулярка без
+  // зворотного слеша перед s. Замість «Bearer і пробіли» вона шукала
+  // «Bearer» і одну-кілька літер s, тобто не збігалась ніколи, і в
+  // verifyUser їхав рядок разом зі словом Bearer. Той будував
+  // «Bearer Bearer eyJ…», Supabase відповідав відмовою — і кожне
+  // замовлення через функцію ставало ГОСТЬОВИМ. Покупець із
+  // акаунтом не бачив свого замовлення в кабінеті.
+  const bearer = (request.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "");
 
   const userId = await verifyUser(bearer);
 
@@ -1851,6 +1884,290 @@ async function handlePlaceOrder(request: Request, body: Record<string, any>): Pr
   }
 
   return adminJson({ ok: true }, 200, origin);
+
+}
+
+// -------------------------
+// Адреса відвідувача
+//
+// За Cloudflare і проксі Supabase справжня адреса лежить у
+// заголовках, а не в самому з'єднанні. cf-connecting-ip надійніший:
+// x-forwarded-for клієнт може підробити, дописавши свій рядок, тому з
+// нього беремо ПЕРШУ адресу — її ставить найближчий до клієнта проксі.
+// -------------------------
+
+function clientIp(request: Request): string {
+
+  const direct = request.headers.get("cf-connecting-ip");
+
+  if (direct) return direct.trim();
+
+  return (request.headers.get("x-forwarded-for") ?? "").split(",")[0].trim();
+
+}
+
+// -------------------------
+// Скарга на саму функцію
+//
+// Помилка серверної інтеграції нікому не видна: у браузері нічого не
+// ламається, покупець нічого не помічає, а в логах функції ніхто не
+// сидить. Тому пишемо в той самий журнал, що й помилки сторінок
+// (міграція 013) — його раз на добу надсилає scripts/report-issues.js.
+// -------------------------
+
+async function reportServerIssue(kind: string, message: string) {
+
+  try {
+
+    const response = await supabaseRest("rpc/report_issue", {
+      method: "POST",
+      body: JSON.stringify({
+        p_kind: kind,
+        p_page: "edge-function",
+        p_message: message.slice(0, 500),
+        p_source: "",
+        p_agent: "",
+      }),
+    });
+
+    await response.text();
+
+  } catch (error) {
+
+    // Журнал помилок не має права ламати те, що його покликало.
+    console.error("Не вдалося записати скаргу:", error);
+
+  }
+
+}
+
+// -------------------------
+// Серверні конверсії Meta (Conversions API)
+//
+// Навіщо це взагалі й чому подія не дублюється — у meta-capi.js.
+// Тут лише мережа: ідентифікатор пікселя, хешування, запит.
+// -------------------------
+
+// Ідентифікатор пікселя беремо з САЙТУ, а не з окремого секрету.
+//
+// Він публічний за задумом (лежить у data/analytics.json і в коді
+// кожної сторінки) і його правлять в адмінці. Другий екземпляр у
+// секретах означав би два джерела правди: власник міняє піксель в
+// адмінці, а функція ще пів року надсилає конверсії в старий.
+let pixelCache: { at: number; id: string } | null = null;
+
+const PIXEL_TTL_MS = 10 * 60 * 1000;
+
+async function loadPixelId(): Promise<string> {
+
+  if (pixelCache && Date.now() - pixelCache.at < PIXEL_TTL_MS) {
+    return pixelCache.id;
+  }
+
+  try {
+
+    const response = await fetch(`${SITE_URL}/data/analytics.json`);
+
+    if (!response.ok) return pixelCache?.id ?? "";
+
+    const data = await response.json();
+
+    const id = String(data?.metaPixelId ?? "").trim();
+
+    pixelCache = { at: Date.now(), id };
+
+    return id;
+
+  } catch (error) {
+
+    console.error("Не вдалося прочитати налаштування статистики:", error);
+
+    return pixelCache?.id ?? "";
+
+  }
+
+}
+
+async function handleMetaPurchase(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  // Немає токена — нічого не робимо і кажемо про це чесно. Сторінка на
+  // це не реагує ніяк: браузерний піксель працює сам по собі.
+  if (!META_CAPI_TOKEN) {
+    return adminJson({ ok: false, error: "capi_not_configured" }, 200, origin);
+  }
+
+  // ЗГОДА. Браузерний піксель питає її сам (assets/js/consent.js), і
+  // серверна подія не може бути винятком: інакше магазин надсилав би
+  // у Meta дані саме тих людей, які рекламу відхилили.
+  //
+  // Прапорець ставить сторінка. Підробити його з чужого запиту можна,
+  // але це не дає нічого, чого не дає власна відкрита сторінка.
+  if (body.consent !== true) {
+    return adminJson({ ok: false, error: "no_consent" }, 200, origin);
+  }
+
+  const orderNumber = String(body.order_number ?? "").trim();
+
+  if (!/^[0-9A-Za-z-]{4,40}$/.test(orderNumber)) {
+    return adminJson({ ok: false, error: "bad_order" }, 400, origin);
+  }
+
+  const pixelId = await loadPixelId();
+
+  if (!pixelId) {
+    return adminJson({ ok: false, error: "no_pixel" }, 200, origin);
+  }
+
+  // Замовлення читаємо з БАЗИ. Усе, що прислав браузер, — це номер
+  // замовлення й куки пікселя; гроші, склад і контакти беруться з
+  // рядка. Інакше сторонній запит міг би записати Meta покупку на
+  // будь-яку суму.
+  const order = await findOrderByNumber(orderNumber);
+
+  if (!order) {
+    return adminJson({ ok: false, error: "order_not_found" }, 200, origin);
+  }
+
+  const created = Date.parse(order.created_at ?? "");
+
+  if (Number.isFinite(created) && Date.now() - created > MAX_EVENT_AGE_MS) {
+    return adminJson({ ok: false, error: "too_old" }, 200, origin);
+  }
+
+  const browser = cleanBrowserIds(body);
+  const sources = userDataSources(order);
+
+  // Подія без жодного ідентифікатора людини нічого не додає: Meta не
+  // має до кого її приписати.
+  if (!hasIdentity(sources, browser)) {
+    return adminJson({ ok: false, error: "no_identity" }, 200, origin);
+  }
+
+  const hashed: Record<string, string> = {};
+
+  for (const key of Object.keys(sources)) {
+    hashed[key] = await fingerprint(sources[key]);
+  }
+
+  const event = buildEvent({
+    order,
+    hashed,
+    browser,
+    sourceUrl: cleanSourceUrl(body.source_url, ADMIN_ORIGINS),
+    ip: clientIp(request),
+    userAgent: request.headers.get("user-agent") ?? "",
+    now: Date.now(),
+  });
+
+  const plan = capiRequest(pixelId, META_CAPI_TOKEN, [event], META_CAPI_TEST_CODE);
+
+  if (!plan) {
+    return adminJson({ ok: false, error: "capi_not_configured" }, 200, origin);
+  }
+
+  try {
+
+    const response = await fetch(plan.url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(plan.body),
+    });
+
+    const data = await response.json().catch(() => null);
+
+    const verdict = capiVerdict(response.status, data);
+
+    if (!verdict.ok) {
+
+      console.error("Meta не прийняла подію:", verdict.reason);
+
+      // Тихий збій тут найгірший: реклама далі оптимізується за
+      // половиною покупок, і дізнатись про це нізвідки.
+      await reportServerIssue("meta_capi",
+        `Meta не прийняла Purchase ${orderNumber}: ${verdict.reason}`);
+
+      return adminJson({ ok: false, error: "capi_rejected" }, 200, origin);
+
+    }
+
+    return adminJson({ ok: true }, 200, origin);
+
+  } catch (error) {
+
+    console.error("Meta недоступна:", error);
+
+    // Недоступна Meta не має жодного стосунку до замовлення: воно вже
+    // збережене. Відповідаємо спокійно.
+    return adminJson({ ok: false, error: "capi_unavailable" }, 200, origin);
+
+  }
+
+}
+
+// -------------------------
+// «Де моє замовлення» для гостя
+//
+// Чому потрібен телефон і чому відповідь однакова на «немає» та «не
+// той телефон» — у order-lookup.js.
+// -------------------------
+
+async function lookupAllowed(ip: string): Promise<boolean> {
+
+  try {
+
+    const response = await supabaseRest("rpc/order_lookup_allowed", {
+      method: "POST",
+      body: JSON.stringify({ p_ip: ip }),
+    });
+
+    if (!response.ok) {
+
+      // Міграцію ще не застосували — межі немає. Пропускаємо: справжня
+      // перевірка тут збіг телефону, а не лічильник.
+      await response.text();
+
+      return true;
+
+    }
+
+    return (await response.json()) !== false;
+
+  } catch (error) {
+
+    console.error("Лічильник звернень недоступний:", error);
+
+    return true;
+
+  }
+
+}
+
+async function handleOrderStatus(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  const clean = cleanLookup(body);
+
+  if (!clean.ok) {
+    return adminJson({ ok: false, error: "bad_request" }, 400, origin);
+  }
+
+  // Лічильник ПЕРЕД зверненням до бази: сенс межі саме в тому, щоб
+  // перебір не доходив до таблиці замовлень.
+  if (!(await lookupAllowed(clientIp(request)))) {
+    return adminJson({ ok: false, error: "too_many" }, 429, origin);
+  }
+
+  const order = await findOrderByNumber(clean.orderNumber);
+
+  // ОДНА відповідь на два випадки — навмисно.
+  if (!order || !phoneMatches(order.phone, clean.phone)) {
+    return adminJson({ ok: false, error: "not_found" }, 200, origin);
+  }
+
+  return adminJson({ ok: true, order: publicOrderView(order) }, 200, origin);
 
 }
 
@@ -2047,6 +2364,20 @@ async function handleRequest(request: Request): Promise<Response> {
   if (body.site_action === "place-order") {
 
     return await handlePlaceOrder(request, body);
+
+  }
+
+  // --- серверна конверсія Meta після оформлення ---
+  if (body.site_action === "meta-purchase") {
+
+    return await handleMetaPurchase(request, body);
+
+  }
+
+  // --- «Де моє замовлення» для гостя ---
+  if (body.site_action === "order-status") {
+
+    return await handleOrderStatus(request, body);
 
   }
 

@@ -12744,3 +12744,188 @@ body.refusal-open{
 .np-suggest-item.active{
     background:var(--gray100);
 }
+
+
+/* =========================================================
+   «Де моє замовлення» — перевірка за номером і телефоном
+   ========================================================= */
+
+.lookup-page{
+    max-width:620px;
+    margin:0 auto;
+}
+
+.lookup-page h1{
+    margin:0 0 10px;
+    font-size:26px;
+    line-height:1.25;
+}
+
+.lookup-intro{
+    margin:0 0 22px;
+    color:var(--gray500);
+    line-height:1.55;
+}
+
+.lookup-form{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    padding:20px;
+    border:1px solid var(--gray100);
+    border-radius:14px;
+    background:#fff;
+}
+
+.lookup-form label{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+}
+
+.lookup-form label span{
+    font-size:13px;
+    font-weight:600;
+    color:var(--gray900);
+}
+
+.lookup-form input{
+    width:100%;
+    padding:12px 14px;
+    font-size:15px;
+    font-family:inherit;
+    color:var(--gray900);
+    border:1px solid var(--gray200);
+    border-radius:10px;
+    background:#fff;
+}
+
+.lookup-form input:focus{
+    outline:none;
+    border-color:var(--gray900);
+}
+
+.lookup-form .btn{
+    margin-top:4px;
+}
+
+/* Помилка стоїть ПІД формою, а не поруч із полем: причина зазвичай
+   не в одному полі, а в парі «номер + телефон». */
+.lookup-error{
+    margin:16px 0 0;
+    padding:12px 14px;
+    font-size:14px;
+    line-height:1.5;
+    color:#8a1c1c;
+    background:#fdf1f1;
+    border:1px solid #f3d4d4;
+    border-radius:10px;
+}
+
+.lookup-result{
+    margin-top:22px;
+    text-align:left;
+}
+
+/* Статус — головне, за чим сюди приходять. Тому він великий і
+   зверху, а не рядком серед решти. */
+.lookup-status{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    padding:14px 16px;
+    margin:0 0 6px;
+    border-radius:10px;
+    background:var(--gray50);
+    border-left:3px solid var(--gray300);
+}
+
+.lookup-status strong{
+    font-size:17px;
+    color:var(--gray900);
+}
+
+.lookup-status span{
+    font-size:13.5px;
+    line-height:1.5;
+    color:var(--gray500);
+}
+
+/* Колір за станом. «Скасовано» не має виглядати так само бадьоро,
+   як «Доставлено», — інакше людина не помітить різниці. */
+.lookup-status-processing{ border-left-color:#c99a2e; }
+.lookup-status-shipped{    border-left-color:#2f6fb3; }
+.lookup-status-completed{  border-left-color:#2e8b57; }
+.lookup-status-cancelled{  border-left-color:#b34a4a; background:#fdf7f7; }
+
+.lookup-note{
+    margin:10px 0 0;
+    font-size:12.5px;
+    line-height:1.5;
+    color:var(--gray500);
+}
+
+.lookup-tracking{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:12px;
+    margin-top:16px;
+    padding-top:16px;
+    border-top:1px solid var(--gray100);
+}
+
+.lookup-tracking span{
+    font-size:14px;
+    color:var(--gray500);
+}
+
+.lookup-tracking strong{
+    color:var(--gray900);
+    /* Накладну диктують і переписують — цифри мусять бути однакової
+       ширини, інакше в чотирнадцяти знаках легко втратити місце. */
+    font-variant-numeric:tabular-nums;
+    letter-spacing:.5px;
+}
+
+.lookup-tracking .btn{
+    margin-left:auto;
+}
+
+.lookup-help{
+    margin:18px 0 0;
+    font-size:13.5px;
+    line-height:1.6;
+    color:var(--gray500);
+}
+
+.lookup-help a{
+    color:var(--gray900);
+    text-decoration:underline;
+}
+
+@media(max-width:520px){
+
+    .lookup-page h1{ font-size:22px; }
+
+    .lookup-form{ padding:16px; }
+
+    /* Кнопка відстеження на всю ширину: на телефоні вона головна
+       дія на цій сторінці. */
+    .lookup-tracking .btn{
+        margin-left:0;
+        width:100%;
+        text-align:center;
+    }
+
+}
+
+/* Рядок доставки в кошику.
+   Магазин за доставку не бере — платить покупець перевізнику при
+   отриманні. Це не сума, а пояснення, тож і виглядає як пояснення,
+   а не як цифра. */
+.summary-note{
+    font-size:13px;
+    color:var(--gray500);
+    text-align:right;
+}

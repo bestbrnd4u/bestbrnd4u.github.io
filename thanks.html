@@ -19,7 +19,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="assets/images/favicon-192.png">
     <title>Замовлення прийнято | BestBrnd4u</title>
 
-    <link rel="stylesheet" href="assets/css/style.css?v=797b6d46">
+    <link rel="stylesheet" href="assets/css/style.css?v=b9d9dfba">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -160,6 +160,17 @@
                 щоб підтвердити замовлення.
             </p>
 
+            <!-- Стан замовлення пізніше.
+                 Гість не побачить замовлення в кабінеті — воно
+                 записане без user_id. Тому даємо посилання з уже
+                 підставленим номером: переписувати десять цифр із
+                 листа нікому не хочеться. -->
+            <p class="thanks-lookup">
+                Стан замовлення можна перевірити будь-коли на сторінці
+                <a href="order-status" id="thanksLookupLink">Де моє замовлення</a>
+                — потрібні номер замовлення й ваш телефон.
+            </p>
+
             <div class="thanks-actions">
                 <a href="catalog" class="btn">Продовжити покупки</a>
                 <a href="/" class="btn btn-outline">На головну</a>
@@ -198,6 +209,11 @@
         <div>
 
             <h3>Покупцям</h3>
+
+            <!-- Гість не бачить замовлення в кабінеті: воно без user_id.
+                 Тому посилання стоїть ПЕРШИМ у розділі — це не політика,
+                 а дія, і саме її шукають найчастіше -->
+            <a href="order-status">Де моє замовлення</a>
 
             <a href="delivery-payment#delivery">Доставка</a>
             <a href="delivery-payment#payment">Оплата</a>
@@ -268,11 +284,11 @@
 <!-- Згода на використання даних (банер + блокування вбудованого відео) -->
 <script src="assets/js/consent.js?v=b6cc5d45"></script>
 <!-- Статистика відвідувань. Не завантажує Google без згоди. -->
-<script src="assets/js/analytics.js?v=9b4797b8"></script>
+<script src="assets/js/analytics.js?v=057602e5"></script>
 <!-- Транслітерація: productUrl() кладе колір в адресу латиницею.
      Той самий файл використовує збірка для адрес товарів. -->
 <script src="assets/js/translit.js?v=c0957cb7"></script>
-<script src="assets/js/common.js?v=a6b0fed9"></script>
+<script src="assets/js/common.js?v=e552c570"></script>
 <script src="assets/js/sync.js?v=48ef002e"></script>
 <script src="assets/js/mega-menu.js?v=803d52cc"></script>
 
@@ -291,6 +307,14 @@
                 const order = JSON.parse(raw);
 
                 document.getElementById("thanksOrderId").textContent = order.orderId || "—";
+
+                // Номер одразу в посиланні — щоб на сторінці перевірки
+                // лишилось ввести тільько телефон.
+                const lookupLink = document.getElementById("thanksLookupLink");
+
+                if (lookupLink && order.orderId) {
+                    lookupLink.href = "order-status?order=" + encodeURIComponent(order.orderId);
+                }
                 document.getElementById("thanksOrderDate").textContent = order.orderDate || "—";
                 document.getElementById("thanksItemsCount").textContent = order.itemsCount ?? "—";
 
