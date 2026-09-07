@@ -34,6 +34,19 @@
 
 import { escapeHtml, money, trackingUrl } from "./format.js";
 
+// Куда приходить відповідь покупця.
+//
+// НАВІЩО ОКРЕМО ВІД «ВІД КОГО». Слати листи найкраще з адреси на
+// підтвердженому домені — noreply@bestbrnd4u.com. Але скриньки за
+// такою адресою немає й не буде: домен налаштований лише на
+// ВІДПРАВКУ. Тобто покупець, який натисне «Відповісти» (а він
+// натисне — це найприродніша реакція на лист про своє замовлення),
+// написав би в нікуди.
+//
+// Тому в кожному листі стоїть Reply-To з живою скринькою. Та сама
+// адреса, що в підвалі листа, — одна на файл, щоб вони не розійшлися.
+export const SHOP_EMAIL = "bestbrnd4u@proton.me";
+
 // Загальний вигляд листа.
 //
 // Верстка навмисно проста й inline: клієнти пошти вирізають <style>,
@@ -53,7 +66,7 @@ function letterShell(title, bodyHtml, siteUrl) {
         'font-size:13px;line-height:1.6;color:#6b7280">',
         site ? `<a href="${escapeHtml(site)}" style="color:#111827">BestBrnd4u</a> · ` : "BestBrnd4u · ",
         '<a href="https://t.me/bestbrnd4u" style="color:#111827">Telegram</a> · ',
-        '<a href="mailto:bestbrnd4u@proton.me" style="color:#111827">bestbrnd4u@proton.me</a>',
+        `<a href="mailto:${SHOP_EMAIL}" style="color:#111827">${SHOP_EMAIL}</a>`,
         '<br>Пн–Нд 09:00–20:00',
         "</div>",
         "</div>",
@@ -229,6 +242,9 @@ export function mailRequest(config, letter) {
 
     if (!to || !from || !letter || !letter.subject) return null;
 
+    // Відповідь покупця мусить дійти до людини, а не в noreply.
+    const replyTo = String(config?.replyTo || "").trim() || SHOP_EMAIL;
+
     if (config?.resendKey) {
 
         return {
@@ -241,6 +257,7 @@ export function mailRequest(config, letter) {
             body: {
                 from,
                 to: [to],
+                reply_to: replyTo,
                 subject: letter.subject,
                 html: letter.html
             }
@@ -266,6 +283,7 @@ export function mailRequest(config, letter) {
                     ? { name: match[1] || "BestBrnd4u", email: match[2] }
                     : { name: "BestBrnd4u", email: from },
                 to: [{ email: to }],
+                replyTo: { email: replyTo },
                 subject: letter.subject,
                 htmlContent: letter.html
             }

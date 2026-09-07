@@ -1652,6 +1652,19 @@ function turnstileVerdict(data) {
 // однаково готовий до обох.
 
 
+// Куда приходить відповідь покупця.
+//
+// НАВІЩО ОКРЕМО ВІД «ВІД КОГО». Слати листи найкраще з адреси на
+// підтвердженому домені — noreply@bestbrnd4u.com. Але скриньки за
+// такою адресою немає й не буде: домен налаштований лише на
+// ВІДПРАВКУ. Тобто покупець, який натисне «Відповісти» (а він
+// натисне — це найприродніша реакція на лист про своє замовлення),
+// написав би в нікуди.
+//
+// Тому в кожному листі стоїть Reply-To з живою скринькою. Та сама
+// адреса, що в підвалі листа, — одна на файл, щоб вони не розійшлися.
+const SHOP_EMAIL = "bestbrnd4u@proton.me";
+
 // Загальний вигляд листа.
 //
 // Верстка навмисно проста й inline: клієнти пошти вирізають <style>,
@@ -1671,7 +1684,7 @@ function letterShell(title, bodyHtml, siteUrl) {
         'font-size:13px;line-height:1.6;color:#6b7280">',
         site ? `<a href="${escapeHtml(site)}" style="color:#111827">BestBrnd4u</a> · ` : "BestBrnd4u · ",
         '<a href="https://t.me/bestbrnd4u" style="color:#111827">Telegram</a> · ',
-        '<a href="mailto:bestbrnd4u@proton.me" style="color:#111827">bestbrnd4u@proton.me</a>',
+        `<a href="mailto:${SHOP_EMAIL}" style="color:#111827">${SHOP_EMAIL}</a>`,
         '<br>Пн–Нд 09:00–20:00',
         "</div>",
         "</div>",
@@ -1847,6 +1860,9 @@ function mailRequest(config, letter) {
 
     if (!to || !from || !letter || !letter.subject) return null;
 
+    // Відповідь покупця мусить дійти до людини, а не в noreply.
+    const replyTo = String(config?.replyTo || "").trim() || SHOP_EMAIL;
+
     if (config?.resendKey) {
 
         return {
@@ -1859,6 +1875,7 @@ function mailRequest(config, letter) {
             body: {
                 from,
                 to: [to],
+                reply_to: replyTo,
                 subject: letter.subject,
                 html: letter.html
             }
@@ -1884,6 +1901,7 @@ function mailRequest(config, letter) {
                     ? { name: match[1] || "BestBrnd4u", email: match[2] }
                     : { name: "BestBrnd4u", email: from },
                 to: [{ email: to }],
+                replyTo: { email: replyTo },
                 subject: letter.subject,
                 htmlContent: letter.html
             }
@@ -1967,6 +1985,12 @@ const BREVO_API_KEY = Deno.env.get("BREVO_API_KEY") ?? "";
 // адресу. Адреса мусить бути підтверджена в сервісі — інакше лист не
 // піде, і це не полагодиш кодом.
 const MAIL_FROM = Deno.env.get("MAIL_FROM") ?? "";
+
+// Куди приходить відповідь покупця. Не задано — беремо адресу
+// магазину з mail.js (та сама, що в підвалі листа): слати з noreply@,
+// на яку ніхто не читає, і не дати куди відповісти — гірше, ніж не
+// слати зовсім.
+const MAIL_REPLY_TO = Deno.env.get("MAIL_REPLY_TO") ?? "";
 
 const TELEGRAM_API = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}`;
 
@@ -2845,6 +2869,7 @@ async function sendCustomerMail(order: Record<string, any>, letter: any) {
   const request = mailRequest({
     to: order?.email,
     from: MAIL_FROM,
+    replyTo: MAIL_REPLY_TO,
     resendKey: RESEND_API_KEY,
     brevoKey: BREVO_API_KEY,
   }, letter);

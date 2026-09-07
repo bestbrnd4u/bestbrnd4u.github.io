@@ -87,6 +87,12 @@ const BREVO_API_KEY = Deno.env.get("BREVO_API_KEY") ?? "";
 // піде, і це не полагодиш кодом.
 const MAIL_FROM = Deno.env.get("MAIL_FROM") ?? "";
 
+// Куди приходить відповідь покупця. Не задано — беремо адресу
+// магазину з mail.js (та сама, що в підвалі листа): слати з noreply@,
+// на яку ніхто не читає, і не дати куди відповісти — гірше, ніж не
+// слати зовсім.
+const MAIL_REPLY_TO = Deno.env.get("MAIL_REPLY_TO") ?? "";
+
 const TELEGRAM_API = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}`;
 
 // -------------------------
@@ -964,6 +970,7 @@ async function sendCustomerMail(order: Record<string, any>, letter: any) {
   const request = mailRequest({
     to: order?.email,
     from: MAIL_FROM,
+    replyTo: MAIL_REPLY_TO,
     resendKey: RESEND_API_KEY,
     brevoKey: BREVO_API_KEY,
   }, letter);

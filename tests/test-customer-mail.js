@@ -155,6 +155,25 @@ console.log("\n[3] Куди й чим надсилати");
 
     check("без листа — жодного запиту",
         mail.mailRequest({ to: "a@b.c", from: "s@b.c", resendKey: "k" }, null) === null);
+
+    // Слати з noreply@ і не дати куди відповісти — гірше, ніж не слати
+    // зовсім: «Відповісти» на лист про своє замовлення це найприродніша
+    // реакція, а скриньки за такою адресою немає.
+    check("Resend: є куди відповісти",
+        resend.body.reply_to === mail.SHOP_EMAIL, resend.body.reply_to);
+
+    check("Brevo: є куди відповісти",
+        brevo.body.replyTo.email === mail.SHOP_EMAIL, JSON.stringify(brevo.body.replyTo));
+
+    check("адресу для відповіді можна перевизначити",
+        mail.mailRequest({ to: "a@b.c", from: "s@b.c", resendKey: "k", replyTo: "inbox@shop.ua" },
+            mail.orderLetter(ORDER, "")).body.reply_to === "inbox@shop.ua");
+
+    check("та сама адреса стоїть у підвалі листа",
+        mail.orderLetter(ORDER, "").html.includes(mail.SHOP_EMAIL));
+
+    check("секрет прокинутий у функції",
+        /replyTo: MAIL_REPLY_TO/.test(read("supabase/functions/telegram-order-bot/_index.src.ts")));
 }
 
 console.log("\n[4] Один канал на покупця");
