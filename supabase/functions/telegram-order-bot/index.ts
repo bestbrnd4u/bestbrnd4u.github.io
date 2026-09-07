@@ -1717,27 +1717,81 @@ function row(label, value, strong) {
 
 }
 
+// Склад замовлення з фотографіями.
+//
+// ЧОМУ ФОТО ВАЖЛИВІ САМЕ ТУТ. Лист про замовлення читають через
+// тиждень, коли назва «Сумка крос-боді жіноча шкіряна Marc Jacobs The
+// Snapshot» уже нічого не нагадує. Фото відповідає на питання «що це
+// було» швидше за будь-який текст.
+//
+// АДРЕСА ФОТО МУСИТЬ БУТИ АБСОЛЮТНОЮ — і вона така: знімок замовлення
+// складає assets/js/checkout.js, і там уже стоїть absoluteUrl(). У
+// листі відносний шлях нема від чого відкладати, і почтовик показав би
+// заглушку. Тому тут ми адресу НЕ чіпаємо, лише екрануємо.
+//
+// ВИСОТУ НЕ ЗАДАЄМО. Outlook не знає object-fit, тож фіксована висота
+// перетворила б фото на розтягнуте. Ширина 64 + height:auto виглядає
+// однаково всюди.
 function itemsTable(items) {
 
     const list = Array.isArray(items) ? items : [];
 
     if (!list.length) return "";
 
+    const cell = "padding:10px 0;border-top:1px solid #e5e7eb";
+
     const rows = list.map(item => {
 
         const variant = [item.color, item.size].filter(Boolean).join(" / ");
 
-        return `<tr><td style="padding:8px 0;border-top:1px solid #e5e7eb;font-size:14px">`
-            + `${escapeHtml(item.title || "")}`
+        const title = escapeHtml(item.title || "");
+
+        // alt на випадок, коли фото не показали: Gmail за
+        // замовчуванням не вантажить картинки, а Outlook не розуміє
+        // webp. Рядок мусить читатись і без них.
+        const photo = item.image
+            ? `<img src="${escapeHtml(item.image)}" width="64" alt="${title}"`
+                + ` style="display:block;border:0;border-radius:8px;max-width:64px;height:auto">`
+            : "";
+
+        return `<tr>`
+            + `<td width="64" valign="top" style="${cell};padding-right:12px;width:64px">${photo}</td>`
+            + `<td valign="top" style="${cell};font-size:14px">`
+            + title
             + (item.brand ? `<br><span style="color:#6b7280">${escapeHtml(item.brand)}</span>` : "")
             + (variant ? `<br><span style="color:#6b7280">${escapeHtml(variant)}</span>` : "")
-            + `</td><td style="padding:8px 0;border-top:1px solid #e5e7eb;text-align:right;font-size:14px;white-space:nowrap">`
+            + `</td>`
+            + `<td valign="top" style="${cell};text-align:right;font-size:14px;white-space:nowrap">`
             + `${item.qty ?? 1} × ${escapeHtml(money(item.price))}`
             + `</td></tr>`;
 
     }).join("");
 
     return `<table style="width:100%;border-collapse:collapse;margin:14px 0">${rows}</table>`;
+
+}
+
+// Короткий склад для листів про статус: товари й підсумок.
+//
+// НАВІЩО. Лист «замовлення відправлено» без складу відповідає на
+// питання «коли», але не на «що». Через тиждень після покупки це
+// різні питання, і другого покупець не пам'ятає.
+//
+// Повного розкладу (знижка, доставка, спосіб оплати) тут навмисно
+// немає: він уже був у листі-підтвердженні, а тут важливо не
+// повторити рахунок, а нагадати товар.
+function summaryBlock(order) {
+
+    const items = itemsTable(order?.items);
+
+    if (!items) return "";
+
+    return `<div style="margin-top:24px;padding-top:6px;border-top:1px solid #e5e7eb">`
+        + `<div style="font-weight:600;font-size:14px;margin-top:14px">Ваше замовлення</div>`
+        + items
+        + `<table style="width:100%;border-collapse:collapse">`
+        + row("Разом", escapeHtml(money(order?.total)), true)
+        + `</table></div>`;
 
 }
 
@@ -1805,7 +1859,8 @@ function statusLetter(order, status, siteUrl) {
                 subject: `Замовлення ${number} прийнято в роботу`,
                 html: letterShell("Замовлення в роботі 👌",
                     `<div style="font-size:15px;line-height:1.6">Ваше замовлення <b>${escapeHtml(number)}</b> `
-                    + `прийнято в роботу. Ми зв'яжемось із вами найближчим часом, щоб підтвердити деталі.</div>`,
+                    + `прийнято в роботу. Ми зв'яжемось із вами найближчим часом, щоб підтвердити деталі.</div>`
+                    + summaryBlock(order),
                     siteUrl)
             };
 
@@ -1817,7 +1872,7 @@ function statusLetter(order, status, siteUrl) {
                     + (ttn
                         ? `<br><br>Номер накладної: <b>${escapeHtml(ttn)}</b>`
                         : `<br><br>Номер накладної надішлемо окремо.`)
-                    + `</div>${button}`,
+                    + `</div>${button}` + summaryBlock(order),
                     siteUrl)
             };
 
@@ -1826,7 +1881,8 @@ function statusLetter(order, status, siteUrl) {
                 subject: `Замовлення ${number} виконано`,
                 html: letterShell("Замовлення виконано 🎉",
                     `<div style="font-size:15px;line-height:1.6">Замовлення <b>${escapeHtml(number)}</b> виконано. `
-                    + `Дякуємо за покупку — будемо раді бачити вас знову!</div>`,
+                    + `Дякуємо за покупку — будемо раді бачити вас знову!</div>`
+                    + summaryBlock(order),
                     siteUrl)
             };
 
@@ -1835,7 +1891,8 @@ function statusLetter(order, status, siteUrl) {
                 subject: `Замовлення ${number} скасовано`,
                 html: letterShell("Замовлення скасовано",
                     `<div style="font-size:15px;line-height:1.6">Замовлення <b>${escapeHtml(number)}</b> скасовано. `
-                    + `Якщо це помилка — просто напишіть нам, ми все виправимо.</div>`,
+                    + `Якщо це помилка — просто напишіть нам, ми все виправимо.</div>`
+                    + summaryBlock(order),
                     siteUrl)
             };
 

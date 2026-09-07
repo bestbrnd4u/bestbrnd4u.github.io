@@ -79,6 +79,39 @@ console.log("\n[1] Лист про замовлення");
         !/<img src=x/.test(evil.html) && /&lt;img/.test(evil.html));
 }
 
+console.log("\n[1a] Фото товарів у листі");
+{
+    const withPhoto = mail.orderLetter({
+        ...ORDER,
+        items: [{ ...ORDER.items[0], image: "https://bestbrnd4u.com/assets/images/x.webp?v=1" }]
+    }, "");
+
+    check("фото вставляється", /<img src="https:\/\/bestbrnd4u\.com\/assets\/images\/x\.webp\?v=1"/.test(withPhoto.html));
+
+    // Gmail за замовчуванням не вантажить картинки, а Outlook не знає
+    // webp — рядок мусить читатись і без фото.
+    check("є alt із назвою товару",
+        /alt="Сумка Coach Tabby 26"/.test(withPhoto.html));
+
+    // Фіксована висота + object-fit, якого Outlook не знає, дали б
+    // розтягнуте фото. Тому тільки ширина.
+    check("висота не задана", !/height="\d/.test(withPhoto.html)
+        && !/object-fit/.test(withPhoto.html));
+
+    check("ширина обмежена", /width="64"/.test(withPhoto.html));
+
+    // Відносний шлях у листі веде в нікуди: знімок замовлення робить
+    // адреси абсолютними ще на сайті (absoluteUrl у checkout.js).
+    check("сайт кладе в знімок абсолютну адресу",
+        /image: absoluteUrl\(product\.images/.test(read("assets/js/checkout.js")));
+
+    // Товар без фото не має ламати рядок.
+    const noPhoto = mail.orderLetter(ORDER, "");
+
+    check("без фото рядок цілий",
+        !/<img/.test(noPhoto.html) && /Coach Tabby 26/.test(noPhoto.html));
+}
+
 console.log("\n[2] Лист про статус");
 {
     const shipped = mail.statusLetter(ORDER, "shipped", "https://bestbrnd4u.com");
@@ -102,6 +135,36 @@ console.log("\n[2] Лист про статус");
     check("про статус «нове» листа немає", mail.statusLetter(ORDER, "new", "") === null);
 
     check("невідомий статус не вигадує листа", mail.statusLetter(ORDER, "щось", "") === null);
+
+    // Лист «відправлено» без складу відповідає на «коли», але не на
+    // «що». Через тиждень після покупки це різні питання, і другого
+    // покупець не пам'ятає.
+    ["processing", "shipped", "completed", "cancelled"].forEach(status => {
+
+        const letter = mail.statusLetter({
+            ...ORDER,
+            items: [{ ...ORDER.items[0], image: "https://bestbrnd4u.com/assets/images/x.webp" }]
+        }, status, "");
+
+        check(`${status}: є склад замовлення`,
+            /Ваше замовлення/.test(letter.html) && /Coach Tabby 26/.test(letter.html));
+
+        check(`${status}: є фото товару`, /<img src="https:/.test(letter.html));
+
+        check(`${status}: є підсумок`, /Разом/.test(letter.html));
+
+    });
+
+    // Повного рахунку в листах про статус бути не повинно: знижка й
+    // доставка вже були в підтвердженні, а тут важливо нагадати товар,
+    // а не переписати рахунок.
+    check("рахунок не дублюється",
+        !/Знижка/.test(mail.statusLetter(ORDER, "shipped", "").html));
+
+    // Замовлення без складу (таке буває в бота) не має лишати
+    // порожній блок із заголовком.
+    check("порожній склад не малює блока",
+        !/Ваше замовлення/.test(mail.statusLetter({ order_number: "1", items: [] }, "shipped", "").html));
 
     // Текст листа й текст у Telegram мусять говорити одне й те саме.
     const format = read("supabase/functions/telegram-order-bot/format.js");
@@ -227,10 +290,18 @@ console.log("\n[6] Два листи про одне замовлення нем
 
     check("галочка є", "serverEmail" in config);
 
-    // За замовчуванням вимкнена: інакше після виливки покупець
-    // перестав би отримувати підтвердження, бо на сервері ще немає
-    // ключа розсилки.
-    check("за замовчуванням вимкнена", config.serverEmail === false);
+    // Значення НЕ закріплюємо.
+    //
+    // Спершу тут стояло «мусить бути false» — на час, поки розсилка не
+    // працювала: увімкнена галочка тоді означала б, що сторінка вже не
+    // шле підтвердження, а сервер ще не почав. Розсилку налаштовано й
+    // перевірено на живих листах, тож тепер це просто вибір власника, і
+    // тест не має права його забороняти.
+    //
+    // Лишається те, що справді важливо: це або так, або ні — жодного
+    // третього стану, який код зрозумів би як «увімкнено».
+    check("значення — так або ні", typeof config.serverEmail === "boolean",
+        typeof config.serverEmail);
 
     check("сторінка не шле свій лист, коли шле сервер",
         /config\.serverEmail === true\) return \{ skipped: true \}/.test(checkout));
