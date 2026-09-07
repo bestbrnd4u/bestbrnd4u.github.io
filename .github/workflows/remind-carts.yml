@@ -1,0 +1,62 @@
+# Нагадування про брошений кошик.
+#
+# НАВІЩО
+# -------
+# Кошик авторизованого покупця вже лежить у базі — його синхронізує
+# сайт. Але далі з ним не відбувалось нічого: наповнив кошик, закрив
+# вкладку — і все. Лист «ви залишили щось у кошику» повертає людину,
+# яка вже все обрала сама.
+#
+# ЧОМУ ЩОГОДИНИ, А НЕ ЧАСТІШЕ
+# ----------------------------
+# Крок бере лише кошики, яких не торкались щонайменше чотири години —
+# тобто поспішати нема куди. Щогодинна перевірка означає, що лист
+# приходить максимум за годину після цього строку.
+#
+# ⚠️ ЗАПРАЦЮЄ ЛИШЕ ПІСЛЯ ПЕРЕНЕСЕННЯ В MAIN
+#
+# GitHub бере розклад тільки з головної гілки. Поки цей файл лежить у
+# dev, крок мовчить. Actions → Sync branches → dev-to-main.
+
+name: Remind carts
+
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+# Два одночасні запуски надіслали б два листи одному покупцю.
+concurrency:
+  group: remind-carts
+  cancel-in-progress: false
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Каталог потрібен для назв, цін і фото товарів: у базі лежить
+      # тільки product_id.
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: main
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+
+      # Без будь-якого з цих секретів крок нічого не робить і
+      # завершується успішно — розклад не червонітиме.
+      - name: Нагадати про кошики
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+          MAIL_FROM: ${{ secrets.MAIL_FROM }}
+          MAIL_REPLY_TO: ${{ secrets.MAIL_REPLY_TO }}
+        run: node scripts/remind-carts.js

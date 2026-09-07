@@ -295,6 +295,61 @@ export function statusLetter(order, status, siteUrl) {
 
 }
 
+// Лист «ви залишили щось у кошику».
+//
+// НАВІЩО. Кошик авторизованого покупця вже лежить у базі — сайт
+// синхронізує його, щоб людина бачила ті самі товари на телефоні й на
+// комп'ютері. Але далі з ним не відбувалось нічого: наповнив кошик,
+// закрив вкладку — і все.
+//
+// Це найдешевший спосіб повернути людину, яка вже все обрала: вона
+// прийшла сама, товар обрала сама, лишилось нагадати.
+//
+// ЧОМУ ЛИСТ ОДИН. Другий лист про ті самі три товари це вже не
+// нагадування, а надокучання — і найкоротший шлях у спам. Тому в
+// тексті прямо сказано, що він один.
+export function cartLetter(items, siteUrl) {
+
+    const list = Array.isArray(items) ? items : [];
+
+    if (!list.length) return null;
+
+    const site = String(siteUrl || "").replace(/\/+$/, "");
+
+    const total = list.reduce(function (sum, item) {
+        return sum + (Number(item.price) || 0) * (Number(item.qty) || 1);
+    }, 0);
+
+    const button = site
+        ? `<div style="margin-top:22px"><a href="${escapeHtml(site)}/cart" `
+            + `style="display:inline-block;background:#111827;color:#fff;text-decoration:none;`
+            + `padding:12px 22px;border-radius:8px;font-size:14px">Повернутись до кошика</a></div>`
+        : "";
+
+    const body = [
+        `<div style="font-size:15px;line-height:1.6">`,
+        list.length === 1
+            ? "У вашому кошику лишився товар — ми його зберегли."
+            : "У вашому кошику лишились товари — ми їх зберегли.",
+        `</div>`,
+        itemsTable(list),
+        `<table style="width:100%;border-collapse:collapse">`,
+        row("Разом", escapeHtml(money(total)), true),
+        `</table>`,
+        button,
+        `<div style="margin-top:20px;font-size:13px;line-height:1.6;color:#6b7280">`,
+        "Це єдине нагадування — більше про цей кошик ми не напишемо.",
+        " Якщо ви передумали, просто не звертайте уваги.",
+        `</div>`
+    ].join("");
+
+    return {
+        subject: list.length === 1 ? "Ви залишили товар у кошику" : "Ви залишили товари у кошику",
+        html: letterShell("Ваш кошик чекає 🛍", body, siteUrl)
+    };
+
+}
+
 // Запит до сервісу розсилки.
 //
 // Повертає null, якщо надсилати нічим або нікуди — тоді функція просто
