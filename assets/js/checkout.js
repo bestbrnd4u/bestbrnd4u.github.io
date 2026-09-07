@@ -1032,9 +1032,12 @@ async function placeOrderThroughFunction(order) {
 
 }
 
+// Повертає true, якщо замовлення справді збережене. Від цього
+// залежить, що побачить покупець, — тому «не вдалося» тут мусить бути
+// відрізнимим від «зберегли».
 async function saveOrderToSupabase(orderId) {
 
-    if (!supabaseClient) return;
+    if (!supabaseClient) return false;
 
     const user = await getCurrentUser();
 
@@ -1073,9 +1076,19 @@ async function saveOrderToSupabase(orderId) {
         ...order
     });
 
-    if (error) {
-        console.warn("Не вдалося зберегти замовлення в історію кабінету:", error);
+    if (!error) return true;
+
+    console.warn("Не вдалося зберегти замовлення:", error);
+
+    // У журнал помилок: інакше про це не дізнається ніхто. Замовлення,
+    // яке не доїхало до бази, не побачить ні панель, ні бот — а покупець
+    // при цьому вважає, що замовив.
+    if (window.ErrorReport) {
+        window.ErrorReport.report("js_error",
+            "Замовлення не збереглось у базі: " + (error.message || error.code || "невідомо"), "");
     }
+
+    return false;
 
 }
 
@@ -1157,13 +1170,50 @@ checkoutForm?.addEventListener("submit", event => {
         )
         : Promise.reject(new Error("EmailJS не налаштовано"));
 
-    Promise.allSettled([ownerNotification, customerThankYou]).then(([ownerResult, customerResult]) => {
+    // 3) саме замовлення — у базу. Разом із ним працюють Telegram,
+    //    панель замовлень, перевірка залишків і перевірка суми.
+    const orderSaved = saveOrderToSupabase(orderId);
+
+    Promise.allSettled([ownerNotification, customerThankYou, orderSaved])
+        .then(([ownerResult, customerResult, savedResult]) => {
 
         if (customerResult.status === "rejected") {
+
             console.warn("Лист клієнту не надіслано:", customerResult.reason);
+
+            // У журнал помилок — інакше про зламану пошту дізнаються
+            // від покупця, який не отримав підтвердження.
+            if (window.ErrorReport) {
+                window.ErrorReport.report("js_error",
+                    "Лист покупцю не надіслано: " + (customerResult.reason && customerResult.reason.text
+                        || customerResult.reason && customerResult.reason.message || "невідомо"), "");
+            }
+
         }
 
-        if (ownerResult.status === "fulfilled" && ownerResult.value.ok) {
+        const saved = savedResult.status === "fulfilled" && savedResult.value === true;
+
+        const ownerNotified = ownerResult.status === "fulfilled" && ownerResult.value.ok;
+
+        if (!ownerNotified && window.ErrorReport) {
+            window.ErrorReport.report("js_error", "Лист про замовлення не дійшов до магазину", "");
+        }
+
+        // ЗАМОВЛЕННЯ ОФОРМЛЕНЕ, ЯКЩО ВОНО ДЕСЬ Є.
+        //
+        // ЩО БУЛО НЕ ТАК. Успіх визначався ВИКЛЮЧНО відповіддю
+        // FormSubmit — чужого безкоштовного сервісу, адреса якого
+        // лежить у коді сайту. Він недоступний, змінив умови або хтось
+        // вичерпав його ліміт — і магазин відповідає «не вдалося
+        // надіслати замовлення», хоча база, бот і панель працюють.
+        //
+        // Гірше: збереження в базу стояло В ГІЛЦІ УСПІХУ. Тобто збій
+        // пошти означав не «замовлення без листа», а замовлення, якого
+        // не існує ніде.
+        //
+        // Тепер достатньо, щоб замовлення дійшло хоч одним шляхом:
+        // у базу (а звідти в Telegram і в панель) або листом власнику.
+        if (saved || ownerNotified) {
 
             leaveGuardActive = false;
 
@@ -1234,13 +1284,9 @@ checkoutForm?.addEventListener("submit", event => {
             // склад. Ім'я, телефон і адреса лишаються в магазині.
             reportCheckout("purchase", orderId);
 
-            saveOrderToSupabase(orderId).finally(() => {
+            saveCart([]);
 
-                saveCart([]);
-
-                window.location.href = "thanks";
-
-            });
+            window.location.href = "thanks";
 
         } else {
 
