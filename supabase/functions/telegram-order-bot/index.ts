@@ -5,6 +5,8 @@
 //   supabase/functions/telegram-order-bot/order-flow.js  (діалог оформлення)
 //   supabase/functions/telegram-order-bot/admin-api.js   (панель замовлень в адмінці)
 //   supabase/functions/telegram-order-bot/place-order.js (замовлення з сайту)
+//   supabase/functions/telegram-order-bot/mail.js         (листи покупцеві)
+//   supabase/functions/telegram-order-bot/nova-poshta.js  (довідник міст і відділень)
 //   supabase/functions/telegram-order-bot/_index.src.ts  (мережа й база)
 //
 // Перезібрати:  node scripts/build-edge-function.js
@@ -1615,6 +1617,580 @@ function turnstileVerdict(data) {
 
 }
 
+
+// Листи покупцеві: підтвердження замовлення й зміна статусу.
+//
+// НАВІЩО
+// -------
+// Покупець із сайту досі не отримував НІ ОДНОГО повідомлення після
+// листа «замовлення прийнято» (його шле сама сторінка через EmailJS).
+// Замовлення поїхало, номер накладної є, статус змінився — людина про
+// це не знає. Сповіщення в 003-customer-notifications.sql ідуть у
+// telegram_chat_id, а він є лише в замовлень із бота.
+//
+// Тобто половина покупців — ті, хто замовляв на сайті, — після
+// оформлення лишалась наодинці: або дзвони сам, або чекай.
+//
+// ОДИН КАНАЛ НА ПОКУПЦЯ
+// ----------------------
+// Замовлення з бота мають telegram_chat_id і не мають пошти;
+// замовлення з сайту — навпаки. Тому правило просте: є чат — пишемо в
+// чат, немає — пишемо листом. Двох повідомлень про одне й те саме не
+// буває за побудовою.
+//
+// ЧОМУ ЛИСТ ЗБИРАЄТЬСЯ ТУТ, А НЕ В СЕРВІСІ РОЗСИЛОК
+// --------------------------------------------------
+// Щоб текст листа лежав у репозиторії поруч із текстом повідомлення в
+// Telegram — і правився разом із ним. Шаблон у чужій панелі рано чи
+// пізно розходиться з тим, що каже бот.
+//
+// ЧОМУ ДВА ПРОВАЙДЕРИ
+// --------------------
+// Resend і Brevo — обидва мають безкоштовний тариф, якого магазину
+// вистачає з великим запасом, але вимагають різного: Resend хоче
+// підтверджений домен (DNS-записи), Brevo дозволяє почати з однієї
+// підтвердженої адреси. Хай власник обирає, що йому простіше; код
+// однаково готовий до обох.
+
+
+// Куда приходить відповідь покупця.
+//
+// НАВІЩО ОКРЕМО ВІД «ВІД КОГО». Слати листи найкраще з адреси на
+// підтвердженому домені — noreply@bestbrnd4u.com. Але скриньки за
+// такою адресою немає й не буде: домен налаштований лише на
+// ВІДПРАВКУ. Тобто покупець, який натисне «Відповісти» (а він
+// натисне — це найприродніша реакція на лист про своє замовлення),
+// написав би в нікуди.
+//
+// Тому в кожному листі стоїть Reply-To з живою скринькою. Та сама
+// адреса, що в підвалі листа, — одна на файл, щоб вони не розійшлися.
+const SHOP_EMAIL = "bestbrnd4u@proton.me";
+
+// Загальний вигляд листа.
+//
+// Верстка навмисно проста й inline: клієнти пошти вирізають <style>,
+// не знають flex і по-різному розуміють майже все інше. Лист, який
+// зламався в Outlook, гірший за лист без оформлення.
+function letterShell(title, bodyHtml, siteUrl) {
+
+    const site = String(siteUrl || "").replace(/\/+$/, "");
+
+    return [
+        '<div style="margin:0;padding:24px;background:#f3f4f6;',
+        'font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#111827">',
+        '<div style="max-width:560px;margin:0 auto;background:#fff;border-radius:12px;padding:28px">',
+        `<div style="font-size:20px;font-weight:700;letter-spacing:-.01em;margin-bottom:18px">${escapeHtml(title)}</div>`,
+        bodyHtml,
+        '<div style="margin-top:26px;padding-top:18px;border-top:1px solid #e5e7eb;',
+        'font-size:13px;line-height:1.6;color:#6b7280">',
+        site ? `<a href="${escapeHtml(site)}" style="color:#111827">BestBrnd4u</a> · ` : "BestBrnd4u · ",
+        '<a href="https://t.me/bestbrnd4u" style="color:#111827">Telegram</a> · ',
+        `<a href="mailto:${SHOP_EMAIL}" style="color:#111827">${SHOP_EMAIL}</a>`,
+        '<br>Пн–Нд 09:00–20:00',
+        "</div>",
+        "</div>",
+        "</div>"
+    ].join("");
+
+}
+
+// Рядок «підпис — значення».
+//
+// Підпис екранується, бо це текст; значення приходить уже готовою
+// розміткою (сума, посилання) — тому екранувати його треба ТАМ, де
+// воно збирається. Виділення підсумку — окремим прапорцем, а не
+// тегом у підписі: тег там перетворився б на видимий «<b>Разом</b>»
+// (саме так і вийшло з першого разу).
+function row(label, value, strong) {
+
+    const labelStyle = strong
+        ? "padding:8px 0 0;font-size:14px;font-weight:700"
+        : "padding:4px 0;color:#6b7280;font-size:14px";
+
+    const valueStyle = strong
+        ? "padding:8px 0 0;text-align:right;font-size:14px;font-weight:700"
+        : "padding:4px 0;text-align:right;font-size:14px";
+
+    return `<tr>`
+        + `<td style="${labelStyle}">${escapeHtml(label)}</td>`
+        + `<td style="${valueStyle}">${value}</td>`
+        + `</tr>`;
+
+}
+
+// Склад замовлення з фотографіями.
+//
+// ЧОМУ ФОТО ВАЖЛИВІ САМЕ ТУТ. Лист про замовлення читають через
+// тиждень, коли назва «Сумка крос-боді жіноча шкіряна Marc Jacobs The
+// Snapshot» уже нічого не нагадує. Фото відповідає на питання «що це
+// було» швидше за будь-який текст.
+//
+// АДРЕСА ФОТО МУСИТЬ БУТИ АБСОЛЮТНОЮ — і вона така: знімок замовлення
+// складає assets/js/checkout.js, і там уже стоїть absoluteUrl(). У
+// листі відносний шлях нема від чого відкладати, і почтовик показав би
+// заглушку. Тому тут ми адресу НЕ чіпаємо, лише екрануємо.
+//
+// ВИСОТУ НЕ ЗАДАЄМО. Outlook не знає object-fit, тож фіксована висота
+// перетворила б фото на розтягнуте. Ширина 64 + height:auto виглядає
+// однаково всюди.
+function itemsTable(items) {
+
+    const list = Array.isArray(items) ? items : [];
+
+    if (!list.length) return "";
+
+    const cell = "padding:10px 0;border-top:1px solid #e5e7eb";
+
+    const rows = list.map(item => {
+
+        const variant = [item.color, item.size].filter(Boolean).join(" / ");
+
+        const title = escapeHtml(item.title || "");
+
+        // alt на випадок, коли фото не показали: Gmail за
+        // замовчуванням не вантажить картинки, а Outlook не розуміє
+        // webp. Рядок мусить читатись і без них.
+        const photo = item.image
+            ? `<img src="${escapeHtml(item.image)}" width="64" alt="${title}"`
+                + ` style="display:block;border:0;border-radius:8px;max-width:64px;height:auto">`
+            : "";
+
+        return `<tr>`
+            + `<td width="64" valign="top" style="${cell};padding-right:12px;width:64px">${photo}</td>`
+            + `<td valign="top" style="${cell};font-size:14px">`
+            + title
+            + (item.brand ? `<br><span style="color:#6b7280">${escapeHtml(item.brand)}</span>` : "")
+            + (variant ? `<br><span style="color:#6b7280">${escapeHtml(variant)}</span>` : "")
+            + `</td>`
+            + `<td valign="top" style="${cell};text-align:right;font-size:14px;white-space:nowrap">`
+            + `${item.qty ?? 1} × ${escapeHtml(money(item.price))}`
+            + `</td></tr>`;
+
+    }).join("");
+
+    return `<table style="width:100%;border-collapse:collapse;margin:14px 0">${rows}</table>`;
+
+}
+
+// Короткий склад для листів про статус: товари й підсумок.
+//
+// НАВІЩО. Лист «замовлення відправлено» без складу відповідає на
+// питання «коли», але не на «що». Через тиждень після покупки це
+// різні питання, і другого покупець не пам'ятає.
+//
+// Повного розкладу (знижка, доставка, спосіб оплати) тут навмисно
+// немає: він уже був у листі-підтвердженні, а тут важливо не
+// повторити рахунок, а нагадати товар.
+function summaryBlock(order) {
+
+    const items = itemsTable(order?.items);
+
+    if (!items) return "";
+
+    return `<div style="margin-top:24px;padding-top:6px;border-top:1px solid #e5e7eb">`
+        + `<div style="font-weight:600;font-size:14px;margin-top:14px">Ваше замовлення</div>`
+        + items
+        + `<table style="width:100%;border-collapse:collapse">`
+        + row("Разом", escapeHtml(money(order?.total)), true)
+        + `</table></div>`;
+
+}
+
+// Лист «замовлення прийнято».
+function orderLetter(order, siteUrl) {
+
+    const number = String(order?.order_number ?? "");
+
+    const totals = [
+        Number(order?.subtotal) > 0 ? row("Сума товарів", escapeHtml(money(order.subtotal))) : "",
+        Number(order?.discount) > 0 ? row("Знижка", "−" + escapeHtml(money(order.discount))) : "",
+        Number(order?.delivery_price) > 0 ? row("Доставка", escapeHtml(money(order.delivery_price))) : "",
+        row("Разом", escapeHtml(money(order?.total)), true)
+    ].join("");
+
+    const delivery = [
+        // Не «Доставка»: цей блок і так називається «Доставка», а
+        // рядок «Доставка / Доставка: Нова пошта» читається як помилка.
+        order?.delivery_method ? row("Спосіб", escapeHtml(order.delivery_method)) : "",
+        order?.delivery_city ? row("Місто", escapeHtml(order.delivery_city)) : "",
+        order?.delivery_detail ? row("Відділення", escapeHtml(order.delivery_detail)) : "",
+        order?.payment_method ? row("Оплата", escapeHtml(order.payment_method)) : ""
+    ].join("");
+
+    const body = [
+        `<div style="font-size:15px;line-height:1.6">`,
+        `Дякуємо за замовлення <b>${escapeHtml(number)}</b>! Ми вже його бачимо `,
+        `й найближчим часом зв'яжемось, щоб підтвердити деталі.`,
+        `</div>`,
+        itemsTable(order?.items),
+        `<table style="width:100%;border-collapse:collapse">${totals}</table>`,
+        delivery
+            ? `<div style="margin-top:18px;font-weight:600;font-size:14px">Доставка</div>`
+                + `<table style="width:100%;border-collapse:collapse">${delivery}</table>`
+            : ""
+    ].join("");
+
+    return {
+        subject: `Замовлення ${number} прийнято`,
+        html: letterShell("Замовлення прийнято 🎉", body, siteUrl)
+    };
+
+}
+
+// Лист про зміну статусу. Текст той самий, що бачить покупець із бота
+// (customerStatusMessage у format.js) — інакше два канали розповідали
+// б різне.
+function statusLetter(order, status, siteUrl) {
+
+    const number = String(order?.order_number ?? "");
+    const ttn = order?.tracking_number;
+
+    const url = trackingUrl(ttn);
+
+    const button = url
+        ? `<div style="margin-top:20px"><a href="${escapeHtml(url)}" `
+            + `style="display:inline-block;background:#111827;color:#fff;text-decoration:none;`
+            + `padding:12px 20px;border-radius:8px;font-size:14px">Відстежити посилку</a></div>`
+        : "";
+
+    switch (String(status || "").toLowerCase()) {
+
+        case "processing":
+            return {
+                subject: `Замовлення ${number} прийнято в роботу`,
+                html: letterShell("Замовлення в роботі 👌",
+                    `<div style="font-size:15px;line-height:1.6">Ваше замовлення <b>${escapeHtml(number)}</b> `
+                    + `прийнято в роботу. Ми зв'яжемось із вами найближчим часом, щоб підтвердити деталі.</div>`
+                    + summaryBlock(order),
+                    siteUrl)
+            };
+
+        case "shipped":
+            return {
+                subject: `Замовлення ${number} відправлено`,
+                html: letterShell("Замовлення відправлено 📦",
+                    `<div style="font-size:15px;line-height:1.6">Замовлення <b>${escapeHtml(number)}</b> вже в дорозі.`
+                    + (ttn
+                        ? `<br><br>Номер накладної: <b>${escapeHtml(ttn)}</b>`
+                        : `<br><br>Номер накладної надішлемо окремо.`)
+                    // Порядок тут не косметика.
+                    //
+                    // Gmail ховає «обрізаний вміст» — те, що повторює
+                    // попередній лист у тій самій темі (а власник може
+                    // виправити накладну й надіслати лист удруге). Ріже
+                    // він ХВІСТ. Тому найважливіше стоїть вище: номер
+                    // накладної, потім склад, і лише потім кнопка з
+                    // підвалом — те, що можна втратити без шкоди.
+                    + `</div>` + summaryBlock(order) + button,
+                    siteUrl)
+            };
+
+        case "completed":
+            return {
+                subject: `Замовлення ${number} виконано`,
+                html: letterShell("Замовлення виконано 🎉",
+                    `<div style="font-size:15px;line-height:1.6">Замовлення <b>${escapeHtml(number)}</b> виконано. `
+                    + `Дякуємо за покупку — будемо раді бачити вас знову!</div>`
+                    + summaryBlock(order),
+                    siteUrl)
+            };
+
+        case "cancelled":
+            return {
+                subject: `Замовлення ${number} скасовано`,
+                html: letterShell("Замовлення скасовано",
+                    `<div style="font-size:15px;line-height:1.6">Замовлення <b>${escapeHtml(number)}</b> скасовано. `
+                    + `Якщо це помилка — просто напишіть нам, ми все виправимо.</div>`
+                    + summaryBlock(order),
+                    siteUrl)
+            };
+
+        default:
+            // «Нове» покупцеві не повідомляють: він щойно оформив
+            // замовлення й уже отримав лист-підтвердження.
+            return null;
+
+    }
+
+}
+
+// Лист «ви залишили щось у кошику».
+//
+// НАВІЩО. Кошик авторизованого покупця вже лежить у базі — сайт
+// синхронізує його, щоб людина бачила ті самі товари на телефоні й на
+// комп'ютері. Але далі з ним не відбувалось нічого: наповнив кошик,
+// закрив вкладку — і все.
+//
+// Це найдешевший спосіб повернути людину, яка вже все обрала: вона
+// прийшла сама, товар обрала сама, лишилось нагадати.
+//
+// ЧОМУ ЛИСТ ОДИН. Другий лист про ті самі три товари це вже не
+// нагадування, а надокучання — і найкоротший шлях у спам. Тому в
+// тексті прямо сказано, що він один.
+function cartLetter(items, siteUrl) {
+
+    const list = Array.isArray(items) ? items : [];
+
+    if (!list.length) return null;
+
+    const site = String(siteUrl || "").replace(/\/+$/, "");
+
+    const total = list.reduce(function (sum, item) {
+        return sum + (Number(item.price) || 0) * (Number(item.qty) || 1);
+    }, 0);
+
+    const button = site
+        ? `<div style="margin-top:22px"><a href="${escapeHtml(site)}/cart" `
+            + `style="display:inline-block;background:#111827;color:#fff;text-decoration:none;`
+            + `padding:12px 22px;border-radius:8px;font-size:14px">Повернутись до кошика</a></div>`
+        : "";
+
+    const body = [
+        `<div style="font-size:15px;line-height:1.6">`,
+        list.length === 1
+            ? "У вашому кошику лишився товар — ми його зберегли."
+            : "У вашому кошику лишились товари — ми їх зберегли.",
+        `</div>`,
+        itemsTable(list),
+        `<table style="width:100%;border-collapse:collapse">`,
+        row("Разом", escapeHtml(money(total)), true),
+        `</table>`,
+        button,
+        `<div style="margin-top:20px;font-size:13px;line-height:1.6;color:#6b7280">`,
+        "Це єдине нагадування — більше про цей кошик ми не напишемо.",
+        " Якщо ви передумали, просто не звертайте уваги.",
+        `</div>`
+    ].join("");
+
+    return {
+        subject: list.length === 1 ? "Ви залишили товар у кошику" : "Ви залишили товари у кошику",
+        html: letterShell("Ваш кошик чекає 🛍", body, siteUrl)
+    };
+
+}
+
+// Запит до сервісу розсилки.
+//
+// Повертає null, якщо надсилати нічим або нікуди — тоді функція просто
+// не шле листа. Магазин без листів працює; магазин, який падає через
+// недоступну пошту, — ні.
+function mailRequest(config, letter) {
+
+    const to = String(config?.to || "").trim();
+    const from = String(config?.from || "").trim();
+
+    if (!to || !from || !letter || !letter.subject) return null;
+
+    // Відповідь покупця мусить дійти до людини, а не в noreply.
+    const replyTo = String(config?.replyTo || "").trim() || SHOP_EMAIL;
+
+    if (config?.resendKey) {
+
+        return {
+            provider: "resend",
+            url: "https://api.resend.com/emails",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${config.resendKey}`
+            },
+            body: {
+                from,
+                to: [to],
+                reply_to: replyTo,
+                subject: letter.subject,
+                html: letter.html
+            }
+        };
+
+    }
+
+    if (config?.brevoKey) {
+
+        // Brevo хоче ім'я та адресу окремо. Приймаємо і «Магазин
+        // <shop@example.com>», і просту адресу.
+        const match = from.match(/^\s*(.*?)\s*<([^>]+)>\s*$/);
+
+        return {
+            provider: "brevo",
+            url: "https://api.brevo.com/v3/smtp/email",
+            headers: {
+                "Content-Type": "application/json",
+                "api-key": config.brevoKey
+            },
+            body: {
+                sender: match
+                    ? { name: match[1] || "BestBrnd4u", email: match[2] }
+                    : { name: "BestBrnd4u", email: from },
+                to: [{ email: to }],
+                replyTo: { email: replyTo },
+                subject: letter.subject,
+                htmlContent: letter.html
+            }
+        };
+
+    }
+
+    return null;
+
+}
+
+
+// Довідник Нової пошти: міста й відділення.
+//
+// НАВІЩО
+// -------
+// Місто й номер відділення покупець вписував руками. Наслідки видно на
+// кожному замовленні: «Відділення №45» замість «№145», «Кийв», «НП 12»
+// — і власник перед відправкою мусить вгадувати, що саме мали на увазі,
+// або дзвонити й перепитувати.
+//
+// ЧОМУ ЧЕРЕЗ ФУНКЦІЮ, А НЕ ПРЯМО З БРАУЗЕРА
+// ------------------------------------------
+// Ключ API Нової пошти дає право не лише читати довідник, а й
+// СТВОРЮВАТИ накладні на вашому рахунку. У коді сайту він лежати не
+// може — тому браузер питає нашу функцію, а вона вже ходить у НП зі
+// секретним ключем.
+//
+// ЩО В ЦЬОМУ ФАЙЛІ
+// -----------------
+// Тільки чиста логіка: зібрати запит і обрізати відповідь до того, що
+// потрібно сторінці. Мережа — у _index.src.ts, тому це можна ганяти
+// тестами в Node.
+//
+// ЧОМУ ВІДПОВІДЬ ОБРІЗАЄТЬСЯ
+// ---------------------------
+// НП на один запит віддає десятки полів на кожне відділення (графік,
+// координати, обмеження ваги, номери телефонів). Сторінці потрібні
+// назва й номер. Решта — це кілобайти, які поїхали б у браузер
+// кожного покупця й нічого йому не дали.
+
+// Обидва методи — тільки читання довідника. Жодного створення
+// накладних: перелік навмисно закритий, щоб через проксі не можна
+// було зробити нічого, крім пошуку адреси.
+const NP_METHODS = {
+
+    settlements: {
+        modelName: "Address",
+        calledMethod: "searchSettlements"
+    },
+
+    warehouses: {
+        modelName: "AddressGeneral",
+        calledMethod: "getWarehouses"
+    }
+
+};
+
+// Скільки міст показувати в підказці. Більше нікому не потрібно: якщо
+// потрібного немає в перших десяти, людина допише ще літеру.
+const SETTLEMENT_LIMIT = 12;
+
+function npRequest(apiKey, action) {
+
+    const spec = NP_METHODS[action?.method];
+
+    if (!spec || !apiKey) return null;
+
+    if (action.method === "settlements") {
+
+        const query = String(action.query || "").trim();
+
+        // Одна літера дає півтисячі міст і жодної користі.
+        if (query.length < 2) return null;
+
+        return {
+            apiKey,
+            modelName: spec.modelName,
+            calledMethod: spec.calledMethod,
+            methodProperties: {
+                CityName: query.slice(0, 60),
+                Limit: String(SETTLEMENT_LIMIT)
+            }
+        };
+
+    }
+
+    const cityRef = String(action.cityRef || "").trim();
+
+    // Ref міста — це UUID від НП. Перевіряємо форму, щоб проксі не
+    // перетворився на спосіб передавати в НП що завгодно.
+    if (!/^[0-9a-f-]{36}$/i.test(cityRef)) return null;
+
+    return {
+        apiKey,
+        modelName: spec.modelName,
+        calledMethod: spec.calledMethod,
+        methodProperties: {
+            CityRef: cityRef,
+            Limit: "500",
+            Page: "1"
+        }
+    };
+
+}
+
+// Міста з відповіді НП.
+//
+// Структура в них незвична: data — масив з ОДНОГО елемента, у якому
+// лежить Addresses. Пишемо обережно: зміниться формат — отримаємо
+// порожній список, а не помилку на сторінці оформлення.
+function parseSettlements(payload) {
+
+    const first = payload && Array.isArray(payload.data) ? payload.data[0] : null;
+
+    const list = first && Array.isArray(first.Addresses) ? first.Addresses : [];
+
+    return list.map(item => ({
+
+        // «Київ, Київська обл.» — саме те, що варто показати людині:
+        // однойменних сіл в Україні десятки.
+        name: String(item?.Present || item?.MainDescription || "").trim(),
+
+        // Ref, за яким далі просять відділення. У НП це окреме поле:
+        // Ref — це населений пункт, DeliveryCity — місто доставки.
+        ref: String(item?.DeliveryCity || "").trim()
+
+    })).filter(item => item.name && item.ref);
+
+}
+
+// Відділення міста, розділені на звичайні та поштомати.
+function parseWarehouses(payload) {
+
+    const list = payload && Array.isArray(payload.data) ? payload.data : [];
+
+    return list.map(item => ({
+
+        name: String(item?.Description || "").trim(),
+
+        number: String(item?.Number || "").trim(),
+
+        // Поштомат і відділення — різні способи доставки на сторінці,
+        // і мішати їх в одному списку означало б показувати людині
+        // те, чого вона не обирала.
+        postomat: String(item?.CategoryOfWarehouse || "") === "Postomat"
+
+    })).filter(item => item.name);
+
+}
+
+// Що з відповіді НП вважати помилкою.
+//
+// НП відповідає HTTP 200 навіть на невдалий запит — успіх лежить у
+// полі success, а причина в errors. Без цього «немає такого міста» і
+// «ключ недійсний» виглядали б однаково: порожній список.
+function npError(payload) {
+
+    if (!payload) return "порожня відповідь";
+
+    if (payload.success === true) return null;
+
+    const errors = Array.isArray(payload.errors) ? payload.errors.filter(Boolean) : [];
+
+    return errors.length ? errors.join("; ") : "запит не пройшов";
+
+}
+
 // ======================================
 // Telegram-бот для заявок BestBrnd4u
 //
@@ -1640,6 +2216,8 @@ function turnstileVerdict(data) {
 
 // Чиста логіка (форматування картки, кнопки) винесена окремо —
 // щоб її можна було запускати й тестувати в Node без Deno.
+
+
 
 
 
@@ -1671,6 +2249,35 @@ const ADMIN_REPO = Deno.env.get("ADMIN_REPO") ?? "bestbrnd4u/bestbrnd4u.github.i
 // маршрут замовлення з сайту відповідає «не налаштовано»: сторінка
 // тоді кладе замовлення в базу сама, як робила досі.
 const TURNSTILE_SECRET = Deno.env.get("TURNSTILE_SECRET") ?? "";
+
+// Листи покупцеві. Порожні ключі = листів немає, і функція про це
+// мовчить: магазин без листів працює, як працював досі.
+//
+// Обидва сервіси безкоштовні в обсягах, яких магазину вистачає з
+// запасом; різниця в тому, що Resend вимагає підтвердженого домену, а
+// Brevo дозволяє почати з однієї підтвердженої адреси. Достатньо
+// одного ключа — який знайдеться, той і використовується.
+const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY") ?? "";
+const BREVO_API_KEY = Deno.env.get("BREVO_API_KEY") ?? "";
+
+// Від кого. Приймає і «BestBrnd4u <noreply@bestbrnd4u.com>», і просту
+// адресу. Адреса мусить бути підтверджена в сервісі — інакше лист не
+// піде, і це не полагодиш кодом.
+const MAIL_FROM = Deno.env.get("MAIL_FROM") ?? "";
+
+// Куди приходить відповідь покупця. Не задано — беремо адресу
+// магазину з mail.js (та сама, що в підвалі листа): слати з noreply@,
+// на яку ніхто не читає, і не дати куди відповісти — гірше, ніж не
+// слати зовсім.
+const MAIL_REPLY_TO = Deno.env.get("MAIL_REPLY_TO") ?? "";
+
+// Ключ API Нової пошти — для довідника міст і відділень на сторінці
+// оформлення. Порожній = підказок немає, поля лишаються звичайними
+// текстовими, як були.
+//
+// ⚠️ Цей ключ дає право створювати накладні на вашому рахунку, тому
+// він і живе тут, а не в коді сайту.
+const NOVAPOSHTA_API_KEY = Deno.env.get("NOVAPOSHTA_API_KEY") ?? "";
 
 const TELEGRAM_API = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}`;
 
@@ -2023,6 +2630,21 @@ async function handleNewOrder(record: Record<string, any>) {
   // Щоб панель адмінки могла перемалювати саме цю картку, коли
   // статус зміниться там (див. refreshOwnerCard).
   await rememberCardMessage(record.id, sent?.result?.message_id);
+
+  // Підтвердження покупцеві — тільки для замовлень із сайту.
+  //
+  // У бота підтвердження вже є: там людина бачить картку замовлення в
+  // тому самому чаті, де його й оформила.
+  //
+  // Поки ключа розсилки немає, лист не йде, і підтвердження шле сама
+  // сторінка (EmailJS). Коли ключ з'явиться — вимкніть той шлях
+  // галочкою в адмінці, інакше покупець отримає два листи про одне
+  // замовлення. Див. docs/ЛИСТИ-ПОКУПЦЮ.md
+  if (!record?.telegram_chat_id) {
+
+    await sendCustomerMail(record, orderLetter(record, SITE_URL));
+
+  }
 
 }
 
@@ -2425,7 +3047,10 @@ async function applyTracking(orderId: string, tracking: string | null) {
   // «Замовлення відправлено!» про посилку, яка ще на столі.
   if (order && tracking && normalizeStatus(order.status) === "shipped") {
 
-    await notifyCustomer(order, "shipped");
+    // Канал кладемо на сам об'єкт: підтвердження власнику мусить
+    // сказати правду («надіслано листом» / «не вдалося»), а не
+    // вгадувати за наявністю чату. Поле службове й у базу не йде.
+    order.notifiedVia = await notifyCustomer(order, "shipped");
 
   }
 
@@ -2522,16 +3147,77 @@ async function handleRefusal(record: Record<string, any>, order: Record<string, 
 // Сповіщення клієнту
 // -------------------------
 
-async function notifyCustomer(order: Record<string, any>, status: string) {
+// Лист покупцеві.
+//
+// Ніколи не кидає винятків: сповіщення не має права зупинити те, через
+// що воно виникло, — ні зміну статусу, ні створення замовлення.
+async function sendCustomerMail(order: Record<string, any>, letter: any) {
+
+  const request = mailRequest({
+    to: order?.email,
+    from: MAIL_FROM,
+    replyTo: MAIL_REPLY_TO,
+    resendKey: RESEND_API_KEY,
+    brevoKey: BREVO_API_KEY,
+  }, letter);
+
+  // Немає ключа, немає адреси відправника або немає пошти покупця —
+  // просто нічого не робимо.
+  if (!request) return false;
+
+  try {
+
+    const response = await fetch(request.url, {
+      method: "POST",
+      headers: request.headers,
+      body: JSON.stringify(request.body),
+    });
+
+    if (!response.ok) {
+      console.error(`Лист покупцеві не пішов (${request.provider}):`, await response.text());
+      return false;
+    }
+
+    return true;
+
+  } catch (error) {
+
+    console.error("Сервіс розсилки недоступний:", error);
+
+    return false;
+
+  }
+
+}
+
+// Повертає канал, яким повідомили покупця: "telegram", "email" або
+// null. Це не косметика: підтвердження власнику залежить від того, чи
+// дійшло до людини хоч щось, — раніше він читав «передайте номер
+// телефоном» навіть тоді, коли лист уже пішов.
+async function notifyCustomer(order: Record<string, any>, status: string): Promise<string | null> {
 
   const chatId = order?.telegram_chat_id;
 
-  // замовлення з сайту — чату немає, це нормально
-  if (!chatId) return;
+  // ОДИН КАНАЛ НА ПОКУПЦЯ.
+  //
+  // Замовлення з бота мають chat_id і не мають пошти, із сайту —
+  // навпаки. Тому чат і лист не конкурують: людина отримує
+  // повідомлення там, де замовляла.
+  //
+  // Раніше тут стояло «немає чату — виходимо», і покупець із сайту не
+  // дізнавався ні про відправлення, ні про накладну, ні про
+  // скасування. Це була половина всіх покупців.
+  if (!chatId) {
+
+    const mailed = await sendCustomerMail(order, statusLetter(order, status, SITE_URL));
+
+    return mailed ? "email" : null;
+
+  }
 
   const text = customerStatusMessage(order, status);
 
-  if (!text) return;
+  if (!text) return null;
 
   await telegram("sendMessage", {
     chat_id: chatId,
@@ -2539,6 +3225,8 @@ async function notifyCustomer(order: Record<string, any>, status: string) {
     parse_mode: "HTML",
     reply_markup: customerStatusKeyboard(order, status),
   });
+
+  return "telegram";
 
 }
 
@@ -2628,13 +3316,19 @@ async function handleTrackingInput(message: Record<string, any>): Promise<boolea
 
     const updated = await applyTracking(order.id, command.tracking);
 
+    // Сповіщення вже надіслав applyTracking — тут лише читаємо, чим
+    // саме воно пішло. Другий виклик означав би два повідомлення
+    // покупцеві про одну накладну.
+    const channel = updated?.notifiedVia ?? null;
+
     await telegram("sendMessage", {
       chat_id: chatId,
-      text: updated?.telegram_chat_id
+      text: channel
         ? `✅ Накладну <code>${escapeHtml(command.tracking)}</code> збережено для замовлення ` +
-          `<b>${escapeHtml(command.orderNumber)}</b> і надіслано клієнту.`
+          `<b>${escapeHtml(command.orderNumber)}</b> і надіслано клієнту` +
+          (channel === "email" ? " листом." : ".")
         : `✅ Накладну збережено для замовлення <b>${escapeHtml(command.orderNumber)}</b>. ` +
-          `Клієнт замовляв на сайті — передайте номер телефоном.`,
+          `Повідомити клієнта не вдалося — передайте номер телефоном.`,
       parse_mode: "HTML",
     });
 
@@ -2690,11 +3384,12 @@ async function handleTrackingInput(message: Record<string, any>): Promise<boolea
   // саме пішов номер, а не просто «збережено»
   await telegram("sendMessage", {
     chat_id: chatId,
-    text: order.telegram_chat_id
+    text: order.notifiedVia
       ? `✅ Накладну <code>${escapeHtml(check.value)}</code> збережено для замовлення ` +
-        `<b>${escapeHtml(order.order_number ?? "")}</b> і надіслано клієнту.`
+        `<b>${escapeHtml(order.order_number ?? "")}</b> і надіслано клієнту` +
+        (order.notifiedVia === "email" ? " листом." : ".")
       : `✅ Накладну збережено для замовлення <b>${escapeHtml(order.order_number ?? "")}</b>. ` +
-        `Клієнт замовляв на сайті, тож у Telegram його не сповістити — передайте номер телефоном.`,
+        `Повідомити клієнта не вдалося — передайте номер телефоном.`,
     parse_mode: "HTML",
   });
 
@@ -3139,6 +3834,64 @@ async function verifyUser(token: string): Promise<string | null> {
 
 }
 
+// -------------------------
+// Довідник Нової пошти
+//
+// Браузер не може питати НП сам: ключ дає право створювати накладні на
+// рахунку магазину. Тому питає нас, а ми — НП, і віддаємо назад лише
+// назви й номери (див. nova-poshta.js).
+// -------------------------
+
+async function handleNovaPoshta(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  const payload = npRequest(NOVAPOSHTA_API_KEY, body);
+
+  // Немає ключа або запит не схожий на пошук адреси — відповідаємо
+  // чесно. Сторінка на це лишає звичайне текстове поле.
+  if (!payload) {
+    return adminJson({ ok: false, error: "novaposhta_unavailable", items: [] }, 200, origin);
+  }
+
+  try {
+
+    const response = await fetch("https://api.novaposhta.ua/v2.0/json/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+
+    const failure = npError(data);
+
+    if (failure) {
+
+      console.error("Нова пошта відмовила:", failure);
+
+      return adminJson({ ok: false, error: "novaposhta_failed", items: [] }, 200, origin);
+
+    }
+
+    const items = body.method === "settlements"
+      ? parseSettlements(data)
+      : parseWarehouses(data);
+
+    return adminJson({ ok: true, items }, 200, origin);
+
+  } catch (error) {
+
+    console.error("Нова пошта недоступна:", error);
+
+    // Недоступний довідник не має ламати оформлення: сторінка
+    // повернеться до текстового поля.
+    return adminJson({ ok: false, error: "novaposhta_unavailable", items: [] }, 200, origin);
+
+  }
+
+}
+
 async function handlePlaceOrder(request: Request, body: Record<string, any>): Promise<Response> {
 
   const origin = request.headers.get("origin");
@@ -3412,6 +4165,13 @@ async function handleRequest(request: Request): Promise<Response> {
   if (typeof body.admin_action !== "undefined") {
 
     return await handleAdmin(request, body);
+
+  }
+
+  // --- довідник Нової пошти для сторінки оформлення ---
+  if (body.site_action === "nova-poshta") {
+
+    return await handleNovaPoshta(request, body);
 
   }
 

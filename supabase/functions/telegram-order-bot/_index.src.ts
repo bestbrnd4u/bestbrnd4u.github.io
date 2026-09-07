@@ -35,6 +35,8 @@ import {
   parseTotal, orderView, refusalView, listResponse, STATUS_ORDER,
 } from "./admin-api.js";
 import { cleanOrder, turnstileVerdict } from "./place-order.js";
+import { orderLetter, statusLetter, mailRequest } from "./mail.js";
+import { npRequest, parseSettlements, parseWarehouses, npError } from "./nova-poshta.js";
 import {
   DELIVERY_OPTIONS, deliveryById, colorsOf, sizesOf, autoFill, nextStep,
   colorKeyboard, sizeKeyboard, qtyKeyboard, deliveryKeyboard, phoneKeyboard,
@@ -70,6 +72,35 @@ const ADMIN_REPO = Deno.env.get("ADMIN_REPO") ?? "bestbrnd4u/bestbrnd4u.github.i
 // маршрут замовлення з сайту відповідає «не налаштовано»: сторінка
 // тоді кладе замовлення в базу сама, як робила досі.
 const TURNSTILE_SECRET = Deno.env.get("TURNSTILE_SECRET") ?? "";
+
+// Листи покупцеві. Порожні ключі = листів немає, і функція про це
+// мовчить: магазин без листів працює, як працював досі.
+//
+// Обидва сервіси безкоштовні в обсягах, яких магазину вистачає з
+// запасом; різниця в тому, що Resend вимагає підтвердженого домену, а
+// Brevo дозволяє почати з однієї підтвердженої адреси. Достатньо
+// одного ключа — який знайдеться, той і використовується.
+const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY") ?? "";
+const BREVO_API_KEY = Deno.env.get("BREVO_API_KEY") ?? "";
+
+// Від кого. Приймає і «BestBrnd4u <noreply@bestbrnd4u.com>», і просту
+// адресу. Адреса мусить бути підтверджена в сервісі — інакше лист не
+// піде, і це не полагодиш кодом.
+const MAIL_FROM = Deno.env.get("MAIL_FROM") ?? "";
+
+// Куди приходить відповідь покупця. Не задано — беремо адресу
+// магазину з mail.js (та сама, що в підвалі листа): слати з noreply@,
+// на яку ніхто не читає, і не дати куди відповісти — гірше, ніж не
+// слати зовсім.
+const MAIL_REPLY_TO = Deno.env.get("MAIL_REPLY_TO") ?? "";
+
+// Ключ API Нової пошти — для довідника міст і відділень на сторінці
+// оформлення. Порожній = підказок немає, поля лишаються звичайними
+// текстовими, як були.
+//
+// ⚠️ Цей ключ дає право створювати накладні на вашому рахунку, тому
+// він і живе тут, а не в коді сайту.
+const NOVAPOSHTA_API_KEY = Deno.env.get("NOVAPOSHTA_API_KEY") ?? "";
 
 const TELEGRAM_API = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}`;
 
@@ -422,6 +453,21 @@ async function handleNewOrder(record: Record<string, any>) {
   // Щоб панель адмінки могла перемалювати саме цю картку, коли
   // статус зміниться там (див. refreshOwnerCard).
   await rememberCardMessage(record.id, sent?.result?.message_id);
+
+  // Підтвердження покупцеві — тільки для замовлень із сайту.
+  //
+  // У бота підтвердження вже є: там людина бачить картку замовлення в
+  // тому самому чаті, де його й оформила.
+  //
+  // Поки ключа розсилки немає, лист не йде, і підтвердження шле сама
+  // сторінка (EmailJS). Коли ключ з'явиться — вимкніть той шлях
+  // галочкою в адмінці, інакше покупець отримає два листи про одне
+  // замовлення. Див. docs/ЛИСТИ-ПОКУПЦЮ.md
+  if (!record?.telegram_chat_id) {
+
+    await sendCustomerMail(record, orderLetter(record, SITE_URL));
+
+  }
 
 }
 
@@ -824,7 +870,10 @@ async function applyTracking(orderId: string, tracking: string | null) {
   // «Замовлення відправлено!» про посилку, яка ще на столі.
   if (order && tracking && normalizeStatus(order.status) === "shipped") {
 
-    await notifyCustomer(order, "shipped");
+    // Канал кладемо на сам об'єкт: підтвердження власнику мусить
+    // сказати правду («надіслано листом» / «не вдалося»), а не
+    // вгадувати за наявністю чату. Поле службове й у базу не йде.
+    order.notifiedVia = await notifyCustomer(order, "shipped");
 
   }
 
@@ -921,16 +970,77 @@ async function handleRefusal(record: Record<string, any>, order: Record<string, 
 // Сповіщення клієнту
 // -------------------------
 
-async function notifyCustomer(order: Record<string, any>, status: string) {
+// Лист покупцеві.
+//
+// Ніколи не кидає винятків: сповіщення не має права зупинити те, через
+// що воно виникло, — ні зміну статусу, ні створення замовлення.
+async function sendCustomerMail(order: Record<string, any>, letter: any) {
+
+  const request = mailRequest({
+    to: order?.email,
+    from: MAIL_FROM,
+    replyTo: MAIL_REPLY_TO,
+    resendKey: RESEND_API_KEY,
+    brevoKey: BREVO_API_KEY,
+  }, letter);
+
+  // Немає ключа, немає адреси відправника або немає пошти покупця —
+  // просто нічого не робимо.
+  if (!request) return false;
+
+  try {
+
+    const response = await fetch(request.url, {
+      method: "POST",
+      headers: request.headers,
+      body: JSON.stringify(request.body),
+    });
+
+    if (!response.ok) {
+      console.error(`Лист покупцеві не пішов (${request.provider}):`, await response.text());
+      return false;
+    }
+
+    return true;
+
+  } catch (error) {
+
+    console.error("Сервіс розсилки недоступний:", error);
+
+    return false;
+
+  }
+
+}
+
+// Повертає канал, яким повідомили покупця: "telegram", "email" або
+// null. Це не косметика: підтвердження власнику залежить від того, чи
+// дійшло до людини хоч щось, — раніше він читав «передайте номер
+// телефоном» навіть тоді, коли лист уже пішов.
+async function notifyCustomer(order: Record<string, any>, status: string): Promise<string | null> {
 
   const chatId = order?.telegram_chat_id;
 
-  // замовлення з сайту — чату немає, це нормально
-  if (!chatId) return;
+  // ОДИН КАНАЛ НА ПОКУПЦЯ.
+  //
+  // Замовлення з бота мають chat_id і не мають пошти, із сайту —
+  // навпаки. Тому чат і лист не конкурують: людина отримує
+  // повідомлення там, де замовляла.
+  //
+  // Раніше тут стояло «немає чату — виходимо», і покупець із сайту не
+  // дізнавався ні про відправлення, ні про накладну, ні про
+  // скасування. Це була половина всіх покупців.
+  if (!chatId) {
+
+    const mailed = await sendCustomerMail(order, statusLetter(order, status, SITE_URL));
+
+    return mailed ? "email" : null;
+
+  }
 
   const text = customerStatusMessage(order, status);
 
-  if (!text) return;
+  if (!text) return null;
 
   await telegram("sendMessage", {
     chat_id: chatId,
@@ -938,6 +1048,8 @@ async function notifyCustomer(order: Record<string, any>, status: string) {
     parse_mode: "HTML",
     reply_markup: customerStatusKeyboard(order, status),
   });
+
+  return "telegram";
 
 }
 
@@ -1027,13 +1139,19 @@ async function handleTrackingInput(message: Record<string, any>): Promise<boolea
 
     const updated = await applyTracking(order.id, command.tracking);
 
+    // Сповіщення вже надіслав applyTracking — тут лише читаємо, чим
+    // саме воно пішло. Другий виклик означав би два повідомлення
+    // покупцеві про одну накладну.
+    const channel = updated?.notifiedVia ?? null;
+
     await telegram("sendMessage", {
       chat_id: chatId,
-      text: updated?.telegram_chat_id
+      text: channel
         ? `✅ Накладну <code>${escapeHtml(command.tracking)}</code> збережено для замовлення ` +
-          `<b>${escapeHtml(command.orderNumber)}</b> і надіслано клієнту.`
+          `<b>${escapeHtml(command.orderNumber)}</b> і надіслано клієнту` +
+          (channel === "email" ? " листом." : ".")
         : `✅ Накладну збережено для замовлення <b>${escapeHtml(command.orderNumber)}</b>. ` +
-          `Клієнт замовляв на сайті — передайте номер телефоном.`,
+          `Повідомити клієнта не вдалося — передайте номер телефоном.`,
       parse_mode: "HTML",
     });
 
@@ -1089,11 +1207,12 @@ async function handleTrackingInput(message: Record<string, any>): Promise<boolea
   // саме пішов номер, а не просто «збережено»
   await telegram("sendMessage", {
     chat_id: chatId,
-    text: order.telegram_chat_id
+    text: order.notifiedVia
       ? `✅ Накладну <code>${escapeHtml(check.value)}</code> збережено для замовлення ` +
-        `<b>${escapeHtml(order.order_number ?? "")}</b> і надіслано клієнту.`
+        `<b>${escapeHtml(order.order_number ?? "")}</b> і надіслано клієнту` +
+        (order.notifiedVia === "email" ? " листом." : ".")
       : `✅ Накладну збережено для замовлення <b>${escapeHtml(order.order_number ?? "")}</b>. ` +
-        `Клієнт замовляв на сайті, тож у Telegram його не сповістити — передайте номер телефоном.`,
+        `Повідомити клієнта не вдалося — передайте номер телефоном.`,
     parse_mode: "HTML",
   });
 
@@ -1538,6 +1657,64 @@ async function verifyUser(token: string): Promise<string | null> {
 
 }
 
+// -------------------------
+// Довідник Нової пошти
+//
+// Браузер не може питати НП сам: ключ дає право створювати накладні на
+// рахунку магазину. Тому питає нас, а ми — НП, і віддаємо назад лише
+// назви й номери (див. nova-poshta.js).
+// -------------------------
+
+async function handleNovaPoshta(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  const payload = npRequest(NOVAPOSHTA_API_KEY, body);
+
+  // Немає ключа або запит не схожий на пошук адреси — відповідаємо
+  // чесно. Сторінка на це лишає звичайне текстове поле.
+  if (!payload) {
+    return adminJson({ ok: false, error: "novaposhta_unavailable", items: [] }, 200, origin);
+  }
+
+  try {
+
+    const response = await fetch("https://api.novaposhta.ua/v2.0/json/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+
+    const failure = npError(data);
+
+    if (failure) {
+
+      console.error("Нова пошта відмовила:", failure);
+
+      return adminJson({ ok: false, error: "novaposhta_failed", items: [] }, 200, origin);
+
+    }
+
+    const items = body.method === "settlements"
+      ? parseSettlements(data)
+      : parseWarehouses(data);
+
+    return adminJson({ ok: true, items }, 200, origin);
+
+  } catch (error) {
+
+    console.error("Нова пошта недоступна:", error);
+
+    // Недоступний довідник не має ламати оформлення: сторінка
+    // повернеться до текстового поля.
+    return adminJson({ ok: false, error: "novaposhta_unavailable", items: [] }, 200, origin);
+
+  }
+
+}
+
 async function handlePlaceOrder(request: Request, body: Record<string, any>): Promise<Response> {
 
   const origin = request.headers.get("origin");
@@ -1811,6 +1988,13 @@ async function handleRequest(request: Request): Promise<Response> {
   if (typeof body.admin_action !== "undefined") {
 
     return await handleAdmin(request, body);
+
+  }
+
+  // --- довідник Нової пошти для сторінки оформлення ---
+  if (body.site_action === "nova-poshta") {
+
+    return await handleNovaPoshta(request, body);
 
   }
 

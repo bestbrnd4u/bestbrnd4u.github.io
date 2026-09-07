@@ -12707,3 +12707,40 @@ body.refusal-open{
 .turnstile-box:not([hidden]){
     min-height:65px;
 }
+
+/* -- Підказки Нової пошти на сторінці оформлення.
+   Список абсолютний: він не має розсовувати форму, інакше кнопка
+   «Оформити замовлення» стрибала б під пальцем на кожну літеру.
+   (assets/js/nova-poshta.js) -- */
+.np-suggest{
+    position:absolute;
+    left:0;
+    right:0;
+    top:100%;
+    z-index:60;
+    margin-top:4px;
+    max-height:260px;
+    overflow-y:auto;
+    background:#fff;
+    border:1px solid var(--gray200);
+    border-radius:10px;
+    box-shadow:0 12px 32px rgba(0,0,0,.12);
+}
+
+.np-suggest-item{
+    display:block;
+    width:100%;
+    padding:10px 14px;
+    border:0;
+    background:none;
+    text-align:left;
+    font-size:14px;
+    line-height:1.45;
+    color:var(--dark);
+    cursor:pointer;
+}
+
+.np-suggest-item:hover,
+.np-suggest-item.active{
+    background:var(--gray100);
+}
