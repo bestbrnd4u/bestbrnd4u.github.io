@@ -313,11 +313,65 @@ function renderCart() {
 
 }
 
+// Скільки цього кольору й розміру можна взяти.
+//
+// null означає «межі немає»: товар під замовлення або залишок не
+// рахується (порожня клітинка — це не нуль, а «не рахуємо»).
+function lineLimit(id, color, size) {
+
+    const stock = window.Stock;
+
+    if (!stock) return null;
+
+    const product = findProductById(id);
+
+    if (!product) return null;
+
+    // Під замовлення возять будь-яку кількість — це і є спосіб роботи
+    // магазину, а не виняток.
+    if (product.preOrder) return null;
+
+    const variants = product.variants || [];
+
+    const variant = variants.find(v => v && v.color === color) || variants[0];
+
+    if (!variant) return null;
+
+    const have = stock.sizeQty(stock.variantStock(product, variant), size || "ONESIZE");
+
+    // null — залишок не порахований. Не вигадуємо межу там, де магазин
+    // її не ставив.
+    return typeof have === "number" && have > 0 ? have : null;
+
+}
+
 function changeQty(id, color, size, delta) {
 
     const cart = getCart();
 
     if (delta > 0) {
+
+        const limit = lineLimit(id, color, size);
+
+        const already = cart.filter(entry =>
+            entry.id === id &&
+            (entry.color || null) === (color || null) &&
+            (entry.size || null) === (size || null)
+        ).length;
+
+        // Дійшли до межі — не додаємо і кажемо чому. Раніше кнопка
+        // просто працювала, а розбіжність вилазила вже в замовленні.
+        if (limit !== null && already >= limit) {
+
+            if (typeof showToast === "function") {
+                showToast(limit === 1
+                    ? "Це останній екземпляр"
+                    : `Більше немає: у наявності ${limit} шт.`);
+            }
+
+            return;
+
+        }
 
         cart.push({ id, color, size });
 

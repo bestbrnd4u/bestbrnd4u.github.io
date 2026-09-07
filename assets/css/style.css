@@ -12929,3 +12929,57 @@ body.refusal-open{
     color:var(--gray500);
     text-align:right;
 }
+
+
+/* =========================================================
+   Блок довіри на сторінці товару
+
+   Головне заперечення на полиці 3 000-15 000 ₴ — не ціна, а
+   «чи це не підробка». Тому блок стоїть одразу під смугою
+   доставки, а не під характеристиками, де його ніхто не читає.
+   ========================================================= */
+
+.trust-box{
+    padding:18px 20px;
+    border:1px solid var(--gray200);
+    border-radius:18px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    font-size:14px;
+    line-height:1.5;
+    color:var(--gray500);
+}
+
+.trust-row{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+}
+
+/* Значок не стискається й не переноситься разом із текстом:
+   рядок із «✅» на своєму рядку читається як помилка верстки. */
+.trust-icon{
+    flex-shrink:0;
+    font-size:16px;
+    line-height:1.4;
+}
+
+.trust-row b{
+    color:var(--gray900);
+    font-weight:600;
+}
+
+.trust-row a{
+    color:var(--gray900);
+    text-decoration:underline;
+}
+
+@media(max-width:520px){
+
+    .trust-box{
+        padding:16px;
+        font-size:13.5px;
+    }
+
+}

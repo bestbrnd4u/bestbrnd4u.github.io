@@ -398,8 +398,19 @@ console.log("\n[10] Популярні запити щось знаходять"
     // справжнім пошуком сайту.
     const common = read("assets/js/common.js");
 
-    const matchesQuery = new Function(
-        "return " + common.match(/function matchesQuery[\s\S]*?\n\}/)[0] + ";")();
+    // Беремо ВЕСЬ блок пошуку, а не одну функцію.
+    //
+    // Раніше тут витягувалась лише matchesQuery. Коли логіка збігу
+    // розклалась на помічники (searchTokens, hasSearchWord,
+    // searchHaystack), одної функції стало недостатньо — і тест упав
+    // не через підказки, а через свій спосіб читання коду.
+    const searchBlock = common.slice(
+        common.indexOf("function searchTokens"),
+        common.indexOf("async function runGlobalSearch")
+    );
+
+    const matchesQuery = new Function("product", "q",
+        searchBlock + "; return matchesQuery(product, q);");
 
     // Вихідні файли товарів, а не агрегат (правило з
     // tests/test-migration-types.js).

@@ -38,6 +38,12 @@ const { brandPages, categoryPages, departmentPages, readRecords, DEPARTMENTS_SRC
 // друга реалізація цього правила колись розійшлася б із першою.
 const { absolute } = require("./build-feed");
 
+// Коли товар останній раз змінювався. Журнал веде
+// build-products.js — у самих товарах поля з датою немає, а ні
+// git log, ні mtime у CI не годяться (поверхневий клон і час
+// викачування відповідно).
+const UPDATED_FILE = path.join(ROOT, "data", "products-updated.json");
+
 const OUTPUT_FILE = path.join(ROOT, "sitemap.xml");
 
 const STATIC_PAGES = [
@@ -117,7 +123,7 @@ function productImages(product, siteUrl) {
 
 // Один запис sitemap. images — необов'язкові: їх мають лише
 // сторінки товару.
-function urlEntry(loc, changefreq, priority, images) {
+function urlEntry(loc, changefreq, priority, images, lastmod) {
 
     const photos = (images || []).map(image => [
         "    <image:image>",
@@ -131,17 +137,35 @@ function urlEntry(loc, changefreq, priority, images) {
     return [
         "  <url>",
         `    <loc>${xmlEscape(loc)}</loc>`,
+        // Порожньої дати не буває: Google сам пише, що
+        // ігнорує lastmod, якому не довіряє, — а неточна дата
+        // гірша за відсутню.
+        lastmod ? `    <lastmod>${xmlEscape(lastmod)}</lastmod>` : "",
         `    <changefreq>${changefreq}</changefreq>`,
         `    <priority>${priority}</priority>`,
         ...photos,
         "  </url>"
-    ].join("\n");
+    ].filter(Boolean).join("\n");
 
 }
 
 function main() {
 
     const products = readJsonSafe(PRODUCTS_FILE);
+
+    // Журнал може ще не існувати (перший запуск, свіжий клон) —
+    // тоді дат просто не буде, і це нормально.
+    const updated = (() => {
+
+        if (!fs.existsSync(UPDATED_FILE)) return {};
+
+        try {
+            return JSON.parse(fs.readFileSync(UPDATED_FILE, "utf8")) || {};
+        } catch (error) {
+            return {};
+        }
+
+    })();
     const promotions = readJsonSafe(PROMOTIONS_FILE);
 
     const entries = [];
@@ -175,7 +199,8 @@ function main() {
         photos += images.length;
 
         entries.push(
-            urlEntry(`${SITE_URL}/p/${encodeURIComponent(product.slug)}/`, "weekly", "0.8", images)
+            urlEntry(`${SITE_URL}/p/${encodeURIComponent(product.slug)}/`, "weekly", "0.8",
+                images, (updated[product.slug] || {}).date)
         );
 
     });

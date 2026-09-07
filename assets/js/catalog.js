@@ -3216,19 +3216,14 @@ function filterProducts(skip) {
 
     if (text) {
 
-        list = list.filter(product => {
-
-            const haystack = [
-                product.title,
-                product.brand,
-                product.category,
-                product.description,
-                ...(product.searchKeywords || [])
-            ].filter(Boolean).join(" ").toLowerCase();
-
-            return haystack.includes(text);
-
-        });
+        // ТОЙ САМИЙ матчер, що в пошуковій панелі (matchesQuery у
+        // assets/js/common.js). Тут лежала його копія — той самий
+        // перелік полів і той самий includes(), — і копія жила своїм
+        // життям: правка в одному місці не діяла в іншому.
+        //
+        // Він розбиває запит на слова й вимагає всі, тож «coach
+        // гаманець» і «гаманець coach» тепер дають одне й те саме.
+        list = list.filter(product => matchesQuery(product, text));
 
     }
 

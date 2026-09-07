@@ -142,6 +142,39 @@ async function liveStock() {
 
 }
 
+// Запис DNS через HTTPS.
+//
+// Через HTTPS, а не системний резолвер: у CI його налаштування
+// невідомі, а тут потрібна однакова відповідь незалежно від того,
+// де запущено перевірку.
+async function dnsTxt(name) {
+
+    try {
+
+        const response = await fetch(
+            `https://dns.google/resolve?name=${encodeURIComponent(name)}&type=TXT`,
+            { headers: { Accept: "application/dns-json" } }
+        );
+
+        if (!response.ok) return null;
+
+        const data = await response.json();
+
+        // Status 3 — «такого імені немає». Це не збій запиту, це
+        // відповідь: записів немає.
+        if (!Array.isArray(data.Answer)) return [];
+
+        return data.Answer.map(row => String(row.data || "").replace(/"/g, ""));
+
+    } catch (error) {
+
+        // Немає мережі або DNS не відповів — це не «немає запису».
+        return null;
+
+    }
+
+}
+
 async function main() {
 
     console.log(`\nПеревіряю ${SITE}\n`);
@@ -335,7 +368,36 @@ async function main() {
 
     }
 
-    // ---- 6. сторінка 404 ----
+    // ---- 6. підписи пошти ----
+    //
+    // Перевіряємо лише на проді: на dev-домені пошта не
+    // налаштована й не має бути.
+    if (INDEXABLE) {
+
+        const host = SITE.replace(/^https?:\/\//, "").replace(/\/.*$/, "");
+
+        const dmarc = await dnsTxt(`_dmarc.${host}`);
+
+        if (dmarc === null) {
+
+            record("DMARC перевірено", false, "DNS не відповів");
+
+        } else {
+
+            // З лютого 2024 Gmail і Yahoo вимагають DMARC від усіх,
+            // хто розсилає листи. Без нього лист про замовлення має
+            // відчутно вищий шанс піти в спам — а магазин про це не
+            // дізнається: листи просто тихо не доходять.
+            const policy = dmarc.find(row => /^v=DMARC1/i.test(row.trim()));
+
+            record("DMARC налаштований", Boolean(policy),
+                policy ? "" : `немає TXT-запису _dmarc.${host} — листи про замовлення ризикують піти в спам`);
+
+        }
+
+    }
+
+    // ---- 7. сторінка 404 ----
 
     const missing = await get(`${SITE}/monitor-check-${Date.now()}`);
 

@@ -43,6 +43,15 @@ window.eval(_cs.match(/function getProductGenders[\s\S]*?\n}\n/)[0]);
 window.eval(_cs.match(/function getProductGenderLabel[\s\S]*?\n}\n/)[0]);
 window.eval(_cs.match(/let sizeGroupsPromise[\s\S]*?\n}\n/)[0]);
 
+// Логіка пошуку теж живе в common.js: фільтр каталогу кличе спільний
+// matchesQuery, а не свою копію (у ній був той самий includes(), і
+// копія розходилась з оригіналом). Доливаємо весь блок — окремі
+// функції залежать одна від одної.
+window.eval(_cs.slice(
+    _cs.indexOf("function searchTokens"),
+    _cs.indexOf("async function runGlobalSearch")
+));
+
 let code = fs.readFileSync(path.join(ROOT, "assets/js/catalog.js"), "utf8");
 code += `
 window.__t = {
