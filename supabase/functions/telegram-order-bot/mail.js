@@ -388,6 +388,79 @@ export function cartLetter(items, siteUrl) {
 // Повертає null, якщо надсилати нічим або нікуди — тоді функція просто
 // не шле листа. Магазин без листів працює; магазин, який падає через
 // недоступну пошту, — ні.
+// Прохання написати відгук.
+//
+// items — склад замовлення (той самий знімок, що в базі). Показуємо
+// його з фото: людина мусить згадати, про що йдеться, не відкриваючи
+// сайт.
+//
+// ПОСИЛАННЯ ВЕДЕ НА СТОРІНКУ ТОВАРУ, А НЕ НА ЯКУСЬ ФОРМУ. Форма живе
+// там же, під відгуками, і просить номер замовлення — тому кладемо
+// його в адресу, щоб людині лишилось ввести телефон.
+export function reviewLetter(order, siteUrl) {
+
+    const number = String(order?.order_number ?? "");
+
+    const base = String(siteUrl ?? "").replace(/\/$/, "");
+
+    const items = Array.isArray(order?.items) ? order.items.slice(0, 6) : [];
+
+    const rows = items.map((item) => {
+
+        const title = escapeHtml(item?.title ?? "");
+
+        // Посилання на конкретний товар: у нього ж і треба написати
+        // відгук. Без slug лишається просто рядок — це нормально,
+        // знімок замовлення міг бути зроблений до появи slug.
+        const url = item?.slug
+            ? `${base}/p/${encodeURIComponent(item.slug)}/?order=${encodeURIComponent(number)}#productReviews`
+            : "";
+
+        const photo = item?.image
+            ? `<img src="${escapeHtml(item.image)}" width="64" alt="${title}"`
+                + ` style="display:block;border:0;border-radius:8px;max-width:64px;height:auto">`
+            : "";
+
+        const cell = "padding:10px 0;border-top:1px solid #e5e7eb";
+
+        return `<tr>`
+            + `<td style="${cell};width:76px">${photo}</td>`
+            + `<td style="${cell}">`
+            + (url
+                ? `<a href="${escapeHtml(url)}" style="color:#111827;font-weight:600;text-decoration:none">${title}</a>`
+                : `<b>${title}</b>`)
+            + (url
+                ? `<div style="margin-top:6px"><a href="${escapeHtml(url)}" style="color:#2f6fb3">Написати відгук →</a></div>`
+                : "")
+            + `</td>`
+            + `</tr>`;
+
+    }).join("");
+
+    const body = [
+        `<div style="font-size:15px;line-height:1.6">`,
+        `Дякуємо за замовлення <b>${escapeHtml(number)}</b>! Сподіваємось, усе підійшло.`,
+        `</div>`,
+        `<div style="margin-top:14px;font-size:15px;line-height:1.6">`,
+        `Якщо у вас є хвилина — напишіть кілька слів про покупку. `,
+        `Це найкорисніше, що можна зробити для наступного покупця: він `,
+        `бачить ту саму річ, але не може її потримати.`,
+        `</div>`,
+        rows ? `<table style="width:100%;border-collapse:collapse;margin-top:18px">${rows}</table>` : "",
+        `<div style="margin-top:18px;font-size:13px;line-height:1.6;color:#6b7280">`,
+        `Знадобиться номер замовлення <b>${escapeHtml(number)}</b> і ваш телефон — `,
+        `так ми відрізняємо відгуки покупців від чужих. Відгук з'явиться `,
+        `на сайті після того, як ми його прочитаємо.`,
+        `</div>`,
+    ].join("");
+
+    return {
+        subject: `Як вам покупка? Замовлення ${number}`,
+        html: letterShell("Дякуємо за покупку 💬", body, siteUrl)
+    };
+
+}
+
 export function mailRequest(config, letter) {
 
     const to = String(config?.to || "").trim();

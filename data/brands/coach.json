@@ -1,3 +1,7 @@
 {
-  "name": "Coach"
+  "name": "Coach",
+  "aliases": [
+    "коуч",
+    "коач"
+  ]
 }

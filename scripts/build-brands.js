@@ -164,6 +164,19 @@ function main() {
                 banner: stamp(data.banner),
                 title: data.title || "",
                 description: data.description || "",
+
+                // Кириличні написання назви для пошуку. Звідси їх
+                // забирає build-products.js і розкладає по товарах
+                // цього бренду — інакше «сумка коач» не знаходило б
+                // нічого.
+                //
+                // Порожні рядки відкидаємо: у списку в адмінці легко
+                // лишити зайвий рядок, а порожнє слово в пошуку
+                // збігається з будь-чим.
+                aliases: (Array.isArray(data.aliases) ? data.aliases : [])
+                    .map(alias => String(alias || "").trim())
+                    .filter(Boolean),
+
                 products: found
             });
 

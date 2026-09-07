@@ -239,7 +239,80 @@ console.log("\n[6] Таблиця журналу закрита від чужи�
     });
 }
 
-console.log("\n[7] Биті посилання видно");
+console.log("\n[7] Власник дізнається, що товар закінчився");
+{
+    const migration = read("supabase/migrations/018-issue-kinds.sql");
+    const script = read("scripts/report-stock.js");
+    const applier = read("scripts/apply-order-stock.js");
+
+    // ЩО ЦЕ ЗАКРІПЛЮЄ. Залишки списуються самі, і коли замовлення
+    // забирає останню одиницю, товар стає «під замовлення». Власник
+    // про це не дізнавався ніяк — тільки якщо сам відкрив адмінку.
+    check("журнал приймає різновид stock_out",
+        /'js_error', 'not_found', 'meta_capi', 'stock_out'/.test(migration));
+
+    // МОЯ ПОМИЛКА, яку ця ж міграція виправляє: функція мовчки
+    // відкидала meta_capi, тобто запобіжник проти тихого збою
+    // серверних конверсій сам працював тихо.
+    check("і meta_capi, який досі відкидався",
+        /'meta_capi'/.test(migration)
+        && /meta_capi/.test(read("supabase/functions/telegram-order-bot/index.ts")));
+
+    // Перевірку не знято: функцію може кликати будь-який відвідувач.
+    check("чужі різновиди й далі не приймаються", /if v_kind not in \(/.test(migration));
+
+    // Подію ловить те місце, яке нуль і поставило.
+    check("списання запам'ятовує, що вийшло в нуль",
+        /if \(before > 0 && after === 0\)/.test(applier));
+
+    check("і віддає список назовні", /return \{ touched, notes, emptied \};/.test(applier));
+
+    check("список пишеться у файл", /alerts-out/.test(applier));
+
+    // Кожне «закінчився» мусить дійти окремо. Журнал склеює однакові
+    // події за відбитком і про повтор не пише — тому в тексті номер
+    // замовлення.
+    check("у тексті є номер замовлення", /замовлення \$\{cell\.order\}/.test(script));
+
+    const report = require("../scripts/report-stock.js");
+
+    const line = report.message({
+        title: "Сумка Coach Tabby", color: "Чорний", size: "ONESIZE", order: "4821507392"
+    });
+
+    check("текст читається",
+        /Сумка Coach Tabby/.test(line) && /Чорний/.test(line)
+        && /закінчився/.test(line) && /4821507392/.test(line), line);
+
+    // ONESIZE — внутрішня заглушка, покупець її ніде не бачить, і в
+    // листі власнику вона читалась би як помилка в даних.
+    check("ONESIZE у текст не потрапляє", !/ONESIZE/.test(line));
+
+    check("справжній розмір потрапляє",
+        /38/.test(report.message({ title: "Кросівки", color: "Білий", size: "38" })));
+
+    // Сповіщення не має пофарбувати червоним саме списання.
+    check("крок не падає, коли є про що сказати", !/process\.exit\(1\)/.test(script));
+
+    const workflow = read(".github/workflows/apply-stock.yml");
+
+    check("крок є у workflow списання", /report-stock\.js/.test(workflow));
+
+    check("і стоїть після позначки замовлень",
+        workflow.indexOf("report-stock.js") > workflow.indexOf("--mark"));
+
+    check("він не валить workflow",
+        /Повідомити, що закінчилось[\s\S]{0,300}continue-on-error: true/.test(workflow));
+
+    // Лист надсилає щоденне зведення — те саме, що для помилок.
+    check("лист іде зі щоденним зведенням", /зведення/.test(script));
+
+    // Секрети не потрібні: журнал наповнює навіть публічний ключ.
+    check("секретів не потрібно",
+        !/SERVICE_ROLE/.test(script) && /SUPABASE_PUBLISHABLE_KEY/.test(script));
+}
+
+console.log("\n[8] Биті посилання видно");
 {
     const notFound = read("assets/js/not-found.js");
 

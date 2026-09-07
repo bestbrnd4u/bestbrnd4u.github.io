@@ -1327,6 +1327,43 @@ ${sizeButtons}
 
         </div>
 
+        <!-- Чому це не підробка.
+
+             Головне заперечення покупця на цій полиці — не ціна.
+             Формулювання не вигадані: те саме магазин пише на
+             сторінках «Байєр-сервіс» і «Повернення та гарантія», і
+             посилання ведуть саме туди. -->
+        <div class="trust-box">
+
+            <div class="trust-row">
+                <span class="trust-icon">✅</span>
+                <span>
+                    <b>Тільки оригінал.</b>
+                    Викуповуємо з офіційних сайтів брендів і перевірених
+                    маркетплейсів — без підробок і сірого імпорту.
+                </span>
+            </div>
+
+            <div class="trust-row">
+                <span class="trust-icon">🌍</span>
+                <span>
+                    <b>Привозимо зі США та Європи.</b>
+                    Як це працює й чому виходить дешевше — на сторінці
+                    <a href="bayer-service">Байєр-сервіс</a>.
+                </span>
+            </div>
+
+            <div class="trust-row">
+                <span class="trust-icon">↩️</span>
+                <span>
+                    <b>14 днів на повернення.</b>
+                    Не підійшло — повертаємо кошти протягом 3 робочих днів.
+                    <a href="return-warranty">Умови</a>.
+                </span>
+            </div>
+
+        </div>
+
         <div class="specifications" id="productSpecifications">
 
             ${activeSku ? `

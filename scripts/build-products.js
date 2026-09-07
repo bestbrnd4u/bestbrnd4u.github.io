@@ -502,6 +502,153 @@ function brandLogos() {
 
 }
 
+// Кириличні написання назв брендів: «Coach» → «коуч», «коач».
+//
+// НАВІЩО ЦЕ ТУТ. Пошук на сайті шукає по ключових словах товару, а
+// написання лежать біля бренду — одне місце на всі його товари. Цей
+// крок і зводить одне з одним.
+//
+// Раніше написання вписували руками в кожен товар, і виходило
+// нерівно: у Coach вони були в 4 товарах із 17, у Lacoste — у жодному
+// з 10. Тобто «кросівки лакост» не знаходило нічого.
+//
+// Читаємо той самий data/brands.json, що brandLogos(): його збирає
+// build-brands.js, який у npm run build стоїть РАНІШЕ за цей крок.
+function brandAliases() {
+
+    const file = path.join(ROOT, "data", "brands.json");
+
+    if (!fs.existsSync(file)) return new Map();
+
+    let brands;
+
+    try {
+        brands = JSON.parse(fs.readFileSync(file, "utf8"));
+    } catch (error) {
+        return new Map();
+    }
+
+    const map = new Map();
+
+    (Array.isArray(brands) ? brands : []).forEach(brand => {
+
+        if (!brand || !brand.name || !Array.isArray(brand.aliases) || !brand.aliases.length) return;
+
+        // Ключ без регістру й зайвих пробілів — та сама причина, що в
+        // brandLogos(): у даних трапляється «Invicta » з хвостом.
+        map.set(String(brand.name).trim().toLowerCase(), brand.aliases);
+
+    });
+
+    return map;
+
+}
+
+// Журнал: коли зміст товару останній раз відрізнявся від
+// запам'ятованого.
+//
+// НАВІЩО. Для <lastmod> у sitemap. У товарах немає поля з датою, а
+// ні git log, ні час зміни файлу в CI не годяться: клон там
+// поверхневий, а mtime — час викачування.
+//
+// Порівнюємо ВІДБИТОК ЗМІСТУ, а не сам зміст: інакше файл журналу
+// був би другою копією каталогу.
+const UPDATED_FILE = path.join(ROOT, "data", "products-updated.json");
+
+function contentHash(product) {
+
+    // Службові поля в відбиток не беремо: version-штампи на фото
+    // (?v=…) міняються від перезбірки картинок, а не від правки
+    // товару — інакше кожна перезбірка виглядала б як зміна.
+    const clean = JSON.stringify(product, (key, value) =>
+        typeof value === "string" ? value.replace(/\?v=[0-9a-f]+/g, "") : value);
+
+    return crypto.createHash("sha1").update(clean).digest("hex").slice(0, 16);
+
+}
+
+// Повертає { slug: 'YYYY-MM-DD' } і зберігає журнал, якщо змінився.
+function stampUpdated(products) {
+
+    let log = {};
+
+    if (fs.existsSync(UPDATED_FILE)) {
+        try {
+            log = JSON.parse(fs.readFileSync(UPDATED_FILE, "utf8")) || {};
+        } catch (error) {
+            log = {};
+        }
+    }
+
+    const today = new Date().toISOString().slice(0, 10);
+
+    const next = {};
+
+    let changed = 0;
+
+    products.forEach(product => {
+
+        if (!product || !product.slug) return;
+
+        const hash = contentHash(product);
+
+        const before = log[product.slug];
+
+        // Той самий відбиток — лишаємо давню дату. Саме в цьому
+        // весь сенс: дата мусить показувати, коли товар
+        // ЗМІНЮВАВСЯ, а не коли ми останній раз перезбирали сайт.
+        if (before && before.hash === hash) {
+
+            next[product.slug] = before;
+
+            return;
+
+        }
+
+        next[product.slug] = { hash, date: today };
+
+        changed++;
+
+    });
+
+    // Товари, яких більше немає, з журналу зникають самі: він
+    // збирається заново з наявних.
+    const before = JSON.stringify(log);
+    const after = JSON.stringify(next, null, 1);
+
+    if (before !== JSON.stringify(JSON.parse(after))) {
+        fs.writeFileSync(UPDATED_FILE, after + "\n", "utf8");
+    }
+
+    if (changed) console.log(`   змінено товарів: ${changed}`);
+
+    return next;
+
+}
+
+// Скільки відгуків і яка оцінка в кожного товару.
+//
+// Файл кладе scripts/pull-reviews.js — він читає базу службовим
+// ключем перед збіркою. Тут лише переносимо числа в товар: із них
+// product.js будує aggregateRating.
+//
+// ЧОМУ ЦЕ ВАЖЛИВО ЗРОБИТИ САМЕ ТУТ. Розмітка мусить лежати в HTML
+// на момент, коли сторінку читає Google, — а не з'являтись після
+// запиту в базу.
+function reviewStats() {
+
+    const file = path.join(ROOT, "data", "reviews.json");
+
+    if (!fs.existsSync(file)) return {};
+
+    try {
+        return JSON.parse(fs.readFileSync(file, "utf8")) || {};
+    } catch (error) {
+        return {};
+    }
+
+}
+
 function main() {
 
     if (!fs.existsSync(PRODUCTS_DIR)) {
@@ -1010,7 +1157,73 @@ function main() {
 
     }
 
+    // Кириличні написання бренду — у ключові слова товару.
+    //
+    // Дописуємо, а не замінюємо: ключові слова товару пишуть руками, і
+    // там лежить те, чого немає у бренда («кросбоді», «клатч»).
+    {
+        const aliases = brandAliases();
+
+        let added = 0;
+
+        products.forEach(product => {
+
+            const list = aliases.get(String(product.brand || "").trim().toLowerCase());
+
+            if (!list) return;
+
+            const have = new Set((product.searchKeywords || [])
+                .map(word => String(word).trim().toLowerCase()));
+
+            const fresh = list.filter(alias => !have.has(alias.trim().toLowerCase()));
+
+            if (!fresh.length) return;
+
+            product.searchKeywords = [...(product.searchKeywords || []), ...fresh];
+
+            added += fresh.length;
+
+        });
+
+        if (added) console.log(`   написань брендів у пошук: ${added}`);
+    }
+
+    // Відгуки з бази — у дані товару.
+    //
+    // ПЕРЕВАЖАЮТЬ над тим, що стоїть у файлі товару. Раніше
+    // rating заповнювали руками, і в 73 товарах зі 100 він є, а
+    // відгуків немає ні в одного — тож розмітка його свідомо не
+    // показує. Справжні числа з бази мусять цей ручний рейтинг
+    // замінити, а не додатись до нього.
+    //
+    // Стоїть ДО stampUpdated: зміна рейтингу теж мусить попасти
+    // у відбиток змісту, тобто в lastmod для sitemap.
+    {
+        const stats = reviewStats();
+
+        let withReviews = 0;
+
+        products.forEach(product => {
+
+            const own = stats[String(product.id)];
+
+            if (!own) return;
+
+            product.rating = own.rating;
+            product.reviews = own.reviews;
+
+            withReviews++;
+
+        });
+
+        if (withReviews) console.log(`   товарів із відгуками: ${withReviews}`);
+    }
+
     stampImageVersions(products);
+
+    // Журнал дат — ПІСЛЯ штампів на фото: contentHash їх однаково
+    // не враховує, але порядок хай буде очевидним.
+    stampUpdated(products);
 
     fs.writeFileSync(OUTPUT_FILE, serialize(products), "utf8");
 
