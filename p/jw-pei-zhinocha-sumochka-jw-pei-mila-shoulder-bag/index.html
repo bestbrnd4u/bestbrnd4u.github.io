@@ -178,7 +178,15 @@ window.PRODUCT_TAXONOMY = {"category":{"Жіночі сумки":"categories/zhi
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="192x192" href="/assets/images/favicon-192.png">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=c3a75572">
+<!-- Шрифт. Тут, а не @import у CSS: @import видно лише після
+     завантаження таблиці стилів, і текст чекає на три запити
+     поспіль. Розкладає scripts/sync-fonts.js — правити руками
+     не треба. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+
+<link rel="stylesheet" href="/assets/css/style.css?v=8ded9400">
 
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"></script>
@@ -669,7 +677,7 @@ BestBrnd4u
 </div>
 
 <!-- Журнал помилок: сторінка сама розповідає, що в неї зламалось -->
-<script src="/assets/js/error-report.js?v=65f3d8ee"></script>
+<script src="/assets/js/error-report.js?v=79ba7cf3"></script>
 <script src="/assets/js/supabase-client.js?v=42a4012d"></script>
 <!-- Кадрування фото товару. Той самий файл підключає адмінка,
      тож прев'ю в ній і картка на сайті рахуються однаково. -->
@@ -696,7 +704,7 @@ BestBrnd4u
 <script src="/assets/js/sync.js?v=48ef002e"></script>
 <script src="/assets/js/mega-menu.js?v=7381e85d"></script>
 
-<script src="/assets/js/ui.js?v=7d0cc8b9"></script>
+<script src="/assets/js/ui.js?v=6ed398d2"></script>
 
 <script src="/assets/js/app.js?v=dc04bec0"></script>
 

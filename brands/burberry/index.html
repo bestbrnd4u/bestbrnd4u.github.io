@@ -97,11 +97,15 @@
 // адреси: адреса тут — шлях, а не ?brand=.
 window.CATALOG_PRESET = {"brand":"Burberry"};
 </script>
-<link rel="stylesheet" href="/assets/css/style.css?v=c3a75572">
+<!-- Шрифт. Тут, а не @import у CSS: @import видно лише після
+     завантаження таблиці стилів, і текст чекає на три запити
+     поспіль. Розкладає scripts/sync-fonts.js — правити руками
+     не треба. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+
+<link rel="stylesheet" href="/assets/css/style.css?v=8ded9400">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"></script>
 
@@ -626,7 +630,7 @@ aria-label="Нагору">
 </button>
 
 <!-- Журнал помилок: сторінка сама розповідає, що в неї зламалось -->
-<script src="/assets/js/error-report.js?v=65f3d8ee"></script>
+<script src="/assets/js/error-report.js?v=79ba7cf3"></script>
 <script src="/assets/js/supabase-client.js?v=42a4012d"></script>
 <!-- Кадрування фото товару. Той самий файл підключає адмінка,
      тож прев'ю в ній і картка на сайті рахуються однаково. -->
@@ -648,10 +652,10 @@ aria-label="Нагору">
 <script src="/assets/js/promo-popup.js?v=2317f6f3"></script>
 <script src="/assets/js/sync.js?v=48ef002e"></script>
 <script src="/assets/js/mega-menu.js?v=7381e85d"></script>
-<script src="/assets/js/ui.js?v=7d0cc8b9"></script>
+<script src="/assets/js/ui.js?v=6ed398d2"></script>
 <script src="/assets/js/stock.js?v=85fa4aad"></script>
 <script src="/assets/js/live-stock.js?v=288763d6"></script>
-<script src="/assets/js/catalog.js?v=9d3a0c8b"></script>
+<script src="/assets/js/catalog.js?v=9b7769ca"></script>
 </body>
 
 </html>

@@ -46,16 +46,92 @@ console.log("\n[2] Кілька розмірів одного фото");
         ss.includes("-300.webp 300w") && ss.includes("-600.webp 600w") && ss.includes("x.webp 1200w"), ss);
   check("не-webp не отримує srcset", build("a.png") === null);
 
-  check("srcset ставиться лише для відомих фото", ui.includes("known.has(src.split"));
+  // Тільки відомі фото: перелік — це те, для чого копії справді
+  // згенеровані. Ім'я в ньому шукаємо через variantName(), яка знімає
+  // відбиток кеша (нижче — перевірка на справжніх адресах).
+  check("srcset ставиться лише для відомих фото", ui.includes("known.has(variantName(src))"));
   // Порожній перелік — жодного srcset: інакше браузер просив би
   // -300/-600 файли, яких немає, і фото стало б «битим».
   //
   // Перевірка саме на обгортці, а не на ранньому return: свотчі
-  // кольору теперь малюють фон у тій самій функції, і ЇМ порожній
+  // кольору тепер малюють фон у тій самій функції, і ЇМ порожній
   // перелік не має заважати — вони просто беруть оригінал
   // (див. tests/test-page-weight.js).
   check("невідоме фото лишається звичайним (не «битим»)",
         /if \(known\.size\) \{[\s\S]{0,500}buildSrcSet\(src\)/.test(ui));
+
+  // ГОЛОВНА ПЕРЕВІРКА ЦЬОГО РОЗДІЛУ: пошук у переліку знаходить
+  // справжню адресу фото, а не тільки вигадану в тесті.
+  //
+  // ЩО БУЛО НЕ ТАК. Збірка ставить фото відбиток кеша, тож у товарі
+  // лежить «…/a05042-1.webp?v=26b9d653», а в переліку копій —
+  // «a05042-1.webp». Код брав ім'я через split("/").pop() РАЗОМ із
+  // «?v=…», known.has() не знаходив нічого, і srcset не
+  // проставлявся ЖОДНІЙ картці.
+  //
+  // Заміряно на проді (каталог із телефона, два екрани): 47 фото,
+  // 4158 КБ, зі зменшених копій — нуль, карток без srcset — 125 зі
+  // 125. Копії при цьому лежали поруч: -600 у середньому 16 КБ
+  // проти 70 КБ.
+  //
+  // Зламалось не одразу: srcset працював, поки фото не почали
+  // отримувати відбиток. Дві частини одного механізму розійшлись
+  // мовчки — сторінки виглядали так само.
+  {
+    const known = new Set(man);
+
+    const nameOf = new Function(ui.match(/function variantName[\s\S]*?\n}/)[0]
+      + "; return variantName;")();
+
+    // Адреси беремо з ДЖЕРЕЛ (data/products/*.json), а не з
+    // data/products.json: агрегат перезбирає CI, і в свіжому клоні
+    // він відстає — тест падав би через момент часу, а не через
+    // помилку (це правило стежить tests/test-migration-types.js).
+    const srcDir = path.join(ROOT, "data/products");
+
+    const shots = [];
+
+    fs.readdirSync(srcDir).filter(f => f.endsWith(".json")).forEach(f => {
+
+      const p = JSON.parse(fs.readFileSync(path.join(srcDir, f), "utf8"));
+
+      (p.variants || []).forEach(v => (v.images || []).forEach(s => shots.push(s)));
+
+    });
+
+    check(`фото в джерелах товарів: ${shots.length}`, shots.length > 0);
+
+    // Відбиток кеша ставить збірка — і саме через нього все зламалось.
+    const buildSrc = fs.readFileSync(path.join(ROOT, "scripts/build-products.js"), "utf8");
+
+    check("збірка ставить фото відбиток кеша",
+      /clean\}\?v=\$\{v\}/.test(buildSrc) && /variant\.images = variant\.images\.map/.test(buildSrc));
+
+    // Ім'я мусить бути без «?v=…» — саме таким воно лежить у переліку.
+    check("variantName знімає відбиток",
+      nameOf("/assets/images/products/uploads/x.webp?v=abc123") === "x.webp",
+      nameOf("/assets/images/products/uploads/x.webp?v=abc123"));
+
+    // І найважливіше: на адресах ТАКОЇ САМОЇ форми, як на сайті,
+    // перелік справді знаходить.
+    const stamped = shots.map(s => `${s}?v=deadbeef`);
+
+    const found = stamped.filter(s => known.has(nameOf(s)));
+
+    check(`перелік знаходить ${found.length} фото зі ${stamped.length}`,
+      found.length > stamped.length * 0.8,
+      `знайдено лише ${found.length} — srcset не проставиться`);
+
+    // Один спільний помічник на всі місця: раніше ім'я обчислювалось
+    // окремо для <img> і окремо для свотчів, і саме там вони
+    // розійшлись — свотчі відбиток знімали, картки ні.
+    check("ім'я обчислює один помічник",
+      (ui.match(/variantName\(/g) || []).length >= 3,
+      (ui.match(/variantName\(/g) || []).length);
+
+    check("жодного split(\"/\").pop() без зняття відбитка",
+      !/known\.has\(src\.split\("\/"\)\.pop\(\)\)/.test(ui));
+  }
 
   check("картка каталогу підключена", ui.includes('data-variant-sizes="(max-width: 768px) 50vw, 300px"'));
   const prod = fs.readFileSync(path.join(ROOT,"assets/js/product.js"),"utf8");

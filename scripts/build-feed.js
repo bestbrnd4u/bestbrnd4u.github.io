@@ -148,6 +148,61 @@ function availabilityOf(product, variant, size) {
 
 }
 
+// Скільки робочих днів чекати. Беремо БІЛЬШЕ число з «10-14 робочих
+// днів»: обіцяти покупцеві коротший строк, ніж буває, — найгірший вид
+// точності.
+//
+// Пробіли в полі стоять як завгодно («10- 14», «10 -14»), бо його
+// заповнюють руками в адмінці, тож числа виловлюємо регуляркою, а не
+// розбором за дефісом.
+function preOrderWorkDays(product) {
+
+    const numbers = String(product && product.preOrderDays || "").match(/\d+/g);
+
+    if (!numbers || !numbers.length) return 0;
+
+    return Math.max(...numbers.map(Number));
+
+}
+
+// Дата, до якої товар очікується — для g:availability_date.
+//
+// НАВІЩО. Для backorder Google вимагає дату; без неї позиція йде з
+// попередженням у Merchant Center. Заміряно у фіді: 39 позицій
+// backorder і жодної дати.
+//
+// Робочі дні → календарні: п'ять робочих на сім календарних. Округляємо
+// вгору — знову ж, щоб не обіцяти раніше, ніж буде.
+//
+// Формат ISO 8601 з зоною, як просить Google. Дата рахується від дня
+// збірки, тож із кожною перезбіркою вона зсувається вперед — це і є
+// «очікуємо через два тижні», а не фіксований день у минулому.
+function availabilityDate(product, from) {
+
+    const work = preOrderWorkDays(product);
+
+    if (!work) return "";
+
+    const days = Math.ceil(work * 7 / 5);
+
+    const date = new Date((from || new Date()).getTime() + days * 24 * 60 * 60 * 1000);
+
+    // Обрізаємо до ПОЧАТКУ дня.
+    //
+    // НАВІЩО. З точністю до секунди кожна перезбірка давала інший
+    // feed.xml, хоч у товарах нічого не змінювалось: перезбірка з CI і
+    // локальна розійшлись на 13 секунд — git видав конфлікт у
+    // згенерованому файлі, а в кожному коміті перезбірки лежав би діф
+    // на 39 рядків ні про що.
+    //
+    // Точність до дня — це рівно те, що означає це поле («очікуємо
+    // 28 вересня»), тож нічого не втрачаємо.
+    date.setUTCHours(0, 0, 0, 0);
+
+    return date.toISOString().replace(/\.\d{3}Z$/, "+00:00");
+
+}
+
 // Стать у термінах Google. Кілька значень або «Унісекс» → unisex:
 // це не втрата, а правда — товар справді для всіх.
 function genderOf(product) {
@@ -242,6 +297,58 @@ function priceTag(value) {
     return `${Number(value).toFixed(2)} UAH`;
 }
 
+// Короткі характеристики для g:product_highlight.
+//
+// Google показує їх у картці товару списком і просить від двох до
+// десяти, кожна — коротка й без реклами. Беремо рівно те, що вже
+// заповнено в адмінці: розміри (63 товари), ремінь (46), матеріал
+// (62), застібку (5), склад (1).
+//
+// Порядок — від найчастішого питання покупця: «який розмір», «з чого
+// зроблено», «як носити».
+const HIGHLIGHT_LIMIT = 150;
+
+function highlightsOf(product) {
+
+    // Матеріалу тут немає навмисно: у нього власний тег g:material,
+    // і той самий текст двічі в одній картці нічого не додає.
+    const rows = [
+        ["Розміри", product.dimensions],
+        ["Склад", product.composition],
+        ["", product.strapInfo],
+        ["Застібка", product.closure]
+    ];
+
+    return rows
+        .map(([label, value]) => {
+
+            const text = String(value || "").trim().replace(/\s+/g, " ");
+
+            if (!text) return "";
+
+            // Готову фразу («Ремінь знімний, регульований») не
+            // переписуємо — підпис потрібен лише там, де саме значення
+            // без нього незрозуміле («26 × 14 × 10 см»).
+            //
+            // І не додаємо підпис, якщо значення вже має свій: у
+            // окулярів dimensions — це «Ширина лінзи: 53 мм Місток:
+            // 16 мм», і «Розміри: Ширина лінзи: …» читалось би як
+            // помилка.
+            const full = label && !text.includes(":") ? `${label}: ${text}` : text;
+
+            return full.length > HIGHLIGHT_LIMIT
+                ? `${full.slice(0, HIGHLIGHT_LIMIT - 1).trimEnd()}…`
+                : full;
+
+        })
+        .filter(Boolean);
+
+}
+
+// Час збірки один на весь фід: інакше позиції, зібрані на межі
+// секунди, отримали б різні дати очікування.
+const BUILD_TIME = new Date();
+
 function feedItems(products, departmentByCategory, siteUrl) {
 
     const items = [];
@@ -320,8 +427,23 @@ function feedItems(products, departmentByCategory, siteUrl) {
                     // прямо: інакше Merchant Center чекає їх і обмежує показ.
                     identifier_exists: (variant.sku || product.sku) ? "" : "no",
                     item_group_id: String(product.id),
-                    color: variants.length > 1 ? (variant.color || "") : "",
+                    // Колір пишемо ЗАВЖДИ, коли він відомий.
+                    //
+                    // Раніше умовою було «більше одного кольору» — це
+                    // правило для НАЗВИ (щоб не дублювати колір у
+                    // заголовку), а тут воно лише губило дані: g:color —
+                    // фільтр у Shopping, і для одноколірного товару він
+                    // такий самий корисний.
+                    color: variant.color || "",
                     size: size || "",
+                    // Матеріал і характеристики — з полів товару, як їх
+                    // заповнили в адмінці. Нічого не вигадуємо: немає
+                    // поля — немає тега.
+                    material: product.material || "",
+                    product_highlight: highlightsOf(product),
+                    availability_date: availabilityOf(product, variant, size) === "backorder"
+                        ? availabilityDate(product, BUILD_TIME)
+                        : "",
                     gender: genderOf(product),
                     age_group: ageGroupOf(product),
                     product_type: productType(product, departmentByCategory),
@@ -367,6 +489,7 @@ function itemXml(item) {
         tag("image_link", item.image_link),
         ...item.additional_image_link.map(src => tag("additional_image_link", src)),
         tag("availability", item.availability),
+        tag("availability_date", item.availability_date),
         tag("price", item.price),
         tag("sale_price", item.sale_price),
         tag("brand", item.brand),
@@ -376,6 +499,8 @@ function itemXml(item) {
         tag("item_group_id", item.item_group_id),
         tag("color", item.color),
         tag("size", item.size),
+        tag("material", item.material),
+        ...item.product_highlight.map(text => tag("product_highlight", text)),
         tag("gender", item.gender),
         tag("age_group", item.age_group),
         tag("product_type", item.product_type),

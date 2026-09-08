@@ -952,6 +952,20 @@
     // перезавантаження тут дешевше за плутанину.
     var noCache = "?v=" + Date.now();
 
+    // Шрифт прев'ю — окремим стилем.
+    //
+    // Раніше Inter приходив разом зі style.css: у нього першим рядком
+    // стояв @import на Google Fonts. Для САЙТУ це було погано (текст
+    // чекав на три послідовних запити), тож @import прибрано, а на
+    // сторінках стоїть <link> — див. scripts/sync-fonts.js.
+    //
+    // Але iframe прев'ю Decap будує голову сам: жодного <link> зі
+    // сторінки в ньому немає. Тому шрифт реєструємо тут, інакше
+    // картка в адмінці малювалась би системним шрифтом, а на сайті
+    // Inter — і прев'ю перестало б показувати те саме, що покупець.
+    CMS.registerPreviewStyle(
+        "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
+
     CMS.registerPreviewStyle("../assets/css/style.css" + noCache);
     CMS.registerPreviewStyle("preview-styles.css" + noCache);
 

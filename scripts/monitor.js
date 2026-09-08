@@ -93,6 +93,49 @@ async function get(url, attempt) {
 
 }
 
+// Заголовки відповіді — для перевірки кешу.
+//
+// Окремий помічник, бо get() віддає лише статус і тіло, а тут
+// потрібні саме заголовки: cache-control і cf-cache-status.
+async function headers(url) {
+
+    try {
+
+        const response = await fetch(url, {
+            method: "GET",
+            redirect: "follow",
+            headers: { "User-Agent": "bestbrnd4u-monitor" }
+        });
+
+        // Тіло читаємо й відкидаємо: без цього з'єднання лишається
+        // висіти, і крок інколи не завершується.
+        await response.text();
+
+        const out = {};
+
+        response.headers.forEach((value, name) => {
+            out[name.toLowerCase()] = value;
+        });
+
+        return out;
+
+    } catch (error) {
+
+        return null;
+
+    }
+
+}
+
+// Скільки секунд браузеру дозволено тримати файл.
+function maxAge(value) {
+
+    const match = /max-age=(\d+)/i.exec(String(value || ""));
+
+    return match ? Number(match[1]) : 0;
+
+}
+
 // Публічний ключ проєкту беремо з коду сайту, а не дублюємо тут:
 // два екземпляри одного ключа рано чи пізно розійдуться, і
 // моніторинг почне падати на власній копії. Ключ публічний за
@@ -457,6 +500,63 @@ async function main() {
                 draft.status === 200 && !/saved/.test(draft.text)
                     ? "функцію не перерозгорнуто після міграції 020 — нагадування гостям не працюють"
                     : `HTTP ${draft.status} ${draft.text}`);
+
+        }
+
+    }
+
+    // ---- 6б. кеш на краю ----
+    //
+    // Тільки на бойовому: перед девом Cloudflare Pages зі своїми
+    // правилами, і порівнювати їх із цими немає сенсу.
+    if (INDEXABLE) {
+
+        // Файл коду з відбитком у адресі. Беремо той, що є на кожній
+        // сторінці, — і саму адресу з розмітки, щоб відбиток був
+        // справжній.
+        const home = await get(`${SITE}/`);
+
+        const asset = (home.body.match(/(?:href|src)="([^"]*assets\/(?:css|js)\/[^"]*\?v=[^"]*)"/) || [])[1];
+
+        if (asset) {
+
+            const url = asset.startsWith("http") ? asset : `${SITE}/${asset.replace(/^\/+/, "")}`;
+
+            const head = await headers(url);
+
+            if (!head) {
+
+                record("кеш файлів коду перевірено", false, "файл не відповів");
+
+            } else {
+
+                const age = maxAge(head["cache-control"]);
+
+                // Місяць — з великим запасом «надовго». Адреса несе
+                // відбиток, тож змінений файл однаково приїде під
+                // новою адресою, і старий кеш нікому не зашкодить.
+                record(`файли коду кешуються надовго (${age} с)`, age >= 2592000,
+                    age
+                        ? `зараз ${Math.round(age / 3600)} год — правило кешу в Cloudflare не налаштоване (див. docs/КЕШ.md)`
+                        : head["cache-control"] || "немає cache-control");
+
+            }
+
+        }
+
+        // HTML: Cloudflare або кешує його на краю, або віддає DYNAMIC —
+        // тобто щоразу йде до GitHub Pages.
+        const page = await headers(`${SITE}/`);
+
+        if (page) {
+
+            const status = String(page["cf-cache-status"] || "").toUpperCase();
+
+            record("сторінки кешуються на краю Cloudflare",
+                status !== "DYNAMIC" && status !== "",
+                status === "DYNAMIC"
+                    ? "DYNAMIC — правило кешу для HTML не налаштоване (див. docs/КЕШ.md)"
+                    : (status || "заголовка немає"));
 
         }
 
