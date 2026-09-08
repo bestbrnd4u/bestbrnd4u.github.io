@@ -73,9 +73,21 @@ export function npRequest(apiKey, action) {
             apiKey,
             modelName: spec.modelName,
             calledMethod: spec.calledMethod,
+            // Limit і Page — ЧИСЛАМИ.
+            //
+            // Тут стояло String(SETTLEMENT_LIMIT), і searchSettlements
+            // відмовляв, тоді як getWarehouseTypes на тій самій моделі
+            // Address працював. Опис методу в SDK називає обидва
+            // параметри числами; getWarehouses рядок приймає, але
+            // поблажливість одного методу нічого не обіцяє про інший.
+            //
+            // ЦЕ ГІПОТЕЗА, не доведена причина: точну скаже рядок
+            // «Нова пошта відмовила» — він тепер іде і в щоденний звіт
+            // (різновид np_directory).
             methodProperties: {
                 CityName: query.slice(0, 60),
-                Limit: String(SETTLEMENT_LIMIT)
+                Limit: SETTLEMENT_LIMIT,
+                Page: 1
             }
         };
 
@@ -149,10 +161,35 @@ export function parseTypes(payload) {
 // Ref типу «Поштомат» із довідника типів.
 export function postomatTypeRef(types) {
 
-    const found = (Array.isArray(types) ? types : [])
-        .find(item => /поштомат/i.test(item.name));
+    const list = (Array.isArray(types) ? types : [])
+        .filter(item => /поштомат/i.test(String(item?.name || "")));
 
-    return found ? found.ref : "";
+    if (!list.length) return "";
+
+    // ЧОМУ НЕ ПРОСТО ПЕРШИЙ ЗБІГ.
+    //
+    // У довіднику НП «поштоматів» ДВА, і чужий стоїть раніше:
+    //
+    //     Поштомат ПриватБанку
+    //     Поштомат
+    //
+    // find() брав перший — тобто пошук поштоматів Нової пошти
+    // фільтрувався за типом ПриватБанку й повертав порожній список
+    // ЗАВЖДИ. Ззовні це виглядало як «не знаходить поштомат за
+    // номером», і жодної помилки при цьому не було: НП чесно
+    // відповідала «нічого не знайдено».
+    const exact = list.find(item =>
+        String(item.name).trim().toLowerCase() === "поштомат");
+
+    if (exact) return exact.ref || "";
+
+    // Точного немає — беремо НАЙКОРОТШУ назву: чужі бренди додають
+    // слова («ПриватБанку»), а власний тип НП зветься одним словом.
+    // Це запас на випадок, якщо НП колись перейменує тип.
+    const shortest = list.slice().sort((a, b) =>
+        String(a.name).length - String(b.name).length)[0];
+
+    return shortest ? (shortest.ref || "") : "";
 
 }
 

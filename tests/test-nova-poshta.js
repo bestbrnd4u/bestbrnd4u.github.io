@@ -152,6 +152,64 @@ console.log("\n[3] Відповідь НП розбирається обереж
     check("порожня відповідь — теж відмова", Boolean(np.npError(null)));
 }
 
+console.log("\n[3b] Тип «Поштомат» — саме НП, а не чужий бренд");
+{
+    // ЦЕ СПРАВЖНЯ ВІДПОВІДЬ НОВОЇ ПОШТИ, знята живим запитом до
+    // нашої ж функції (site_action: nova-poshta, method: types).
+    //
+    // «Поштоматів» у ній ДВА, і чужий стоїть РАНІШЕ:
+    //
+    //     Поштомат ПриватБанку
+    //     Поштомат
+    //
+    // postomatTypeRef брала перший збіг за /поштомат/i — тобто пошук
+    // поштоматів Нової пошти фільтрувався за типом ПриватБанку й
+    // повертав порожній список ЗАВЖДИ. Помилки при цьому не було:
+    // НП чесно відповідала «нічого не знайдено», і ззовні це
+    // виглядало як «не знаходить поштомат за номером».
+    const REAL_TYPES = [
+        { name: "Поштове відділення з обмеження", ref: "limited" },
+        { name: "Поштове(ий)", ref: "branch" },
+        { name: "Поштомат ПриватБанку", ref: "privat" },
+        { name: "Вантажне(ий)", ref: "cargo" },
+        { name: "Поштомат", ref: "np" }
+    ];
+
+    check("береться поштомат НП, а не ПриватБанку",
+        np.postomatTypeRef(REAL_TYPES) === "np",
+        np.postomatTypeRef(REAL_TYPES));
+
+    // Порядок не має рятувати: якщо НП колись поміняє рядки місцями,
+    // правило мусить лишитись правильним.
+    check("порядок у відповіді нічого не вирішує",
+        np.postomatTypeRef(REAL_TYPES.slice().reverse()) === "np");
+
+    // Запас на перейменування: чужі бренди додають слова, власний
+    // тип НП зветься одним.
+    check("без точного збігу береться найкоротша назва",
+        np.postomatTypeRef([
+            { name: "Поштомат ПриватБанку", ref: "privat" },
+            { name: "Поштомати НП", ref: "np2" }
+        ]) === "np2");
+
+    check("немає поштоматів — немає й ref",
+        np.postomatTypeRef([{ name: "Вантажне(ий)", ref: "cargo" }]) === ""
+        && np.postomatTypeRef([]) === ""
+        && np.postomatTypeRef(null) === "");
+
+    // Пошук міста: Limit і Page числами. searchSettlements відмовляв,
+    // тоді як getWarehouseTypes на тій самій моделі Address працював,
+    // і єдина структурна різниця нашого запиту від документованого —
+    // тип цих двох полів.
+    const settlements = np.npRequest("KEY", { method: "settlements", query: "Київ" });
+
+    check("Limit числом, а не рядком",
+        typeof settlements.methodProperties.Limit === "number",
+        typeof settlements.methodProperties.Limit);
+
+    check("Page передається", settlements.methodProperties.Page === 1);
+}
+
 console.log("\n[4] Сторінка не залежить від довідника");
 {
     check("модуль підключено", /assets\/js\/nova-poshta\.js/.test(checkout));
