@@ -271,15 +271,17 @@ console.log("\n[5] Сторінки питають базу паралельно
 
     });
 
-    [["assets/js/catalog.js", "catalogData"], ["assets/js/product.js", "products"],
+    // Каталог і кошик питають наявність В ОДНОМУ Promise.all із
+    // товарами: там немає чого малювати до приходу товарів, тож
+    // єдине, що можна зробити не так, — це почекати двічі.
+    [["assets/js/catalog.js", "catalogData"],
         ["assets/js/cart.js", "allProducts"]].forEach(([file, target]) => {
 
         const code = read(file);
 
-        // Правило, а не точний рядок: наявність питається В ОДНОМУ
-        // Promise.all із товарами. Звідки саме беруться товари —
+        // Правило, а не точний рядок: звідки саме беруться товари —
         // полегшений каталог, повний файл чи спільний кеш — тут
-        // неважливо; важливо, що сторінка не чекає двічі.
+        // неважливо.
         const parallel = (code.match(/Promise\.all\(\[[\s\S]{0,600}?\]\)/g) || [])
             .some(block => /window\.LiveStock/.test(block)
                 && /loadCatalog\(\)|catalogUrl\(\)|products\.json|getAllProductsCached/.test(block));
@@ -290,6 +292,36 @@ console.log("\n[5] Сторінки питають базу паралельно
             new RegExp(`window\\.LiveStock\\.apply\\(${target}, live\\)`).test(code));
 
     });
+
+    // А СТОРІНКА ТОВАРУ БІЛЬШЕ НЕ ЧЕКАЄ ВЗАГАЛІ — і це сильніша
+    // властивість, ніж «паралельно».
+    //
+    // Тут раніше стояла та сама перевірка на Promise.all, і вона була
+    // правильною для свого часу. Але заміряно на проді: статична
+    // розмітка була на екрані на 576-й мілісекунді, а сторінка чекала
+    // базу (585 → 1235 мс) і лише потім перемальовувалась — LCP
+    // 1460 мс. Тобто «паралельно» все одно означало «людина дивиться
+    // на готовий товар і чекає».
+    //
+    // Тепер знімок читається з кеша синхронно, а свіжий доуточнює саме
+    // наявність. Подробиці — tests/test-stock-timing.js.
+    {
+        const code = read("assets/js/product.js");
+
+        const init = code.slice(0, code.indexOf("} catch (error) {"));
+
+        check("product.js: не чекає на наявність перед малюванням",
+            !/Promise\.all\(\[[\s\S]{0,600}LiveStock\.load\(\)/.test(init));
+
+        check("product.js: знімок із кеша — синхронно",
+            /window\.LiveStock\.cached\(\)/.test(init));
+
+        check("product.js: наявність переноситься в товари",
+            /window\.LiveStock\.apply\(products, live\)/.test(code));
+
+        check("product.js: свіжий знімок оновлює наявність",
+            /applyLiveStockToPage\(product\)/.test(code));
+    }
 
     // У каталозі порядок критичний: splitProductsByColor копіює «під
     // замовлення» в кожну картку, і виправляти товар після поділу

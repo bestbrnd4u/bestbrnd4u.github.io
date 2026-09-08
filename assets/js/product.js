@@ -95,18 +95,25 @@ const embeddedOnly = embedded ? [embedded] : [];
 // двом каруселям у самому низу: «схожі» й «переглянуті». Тепер він
 // довантажується, коли низ підходить до екрана (див. showRelated).
 //
-// Живий залишок лишається на критичному шляху: саме він відповідає
-// на питання «чи є в наявності», з яким людина сюди й прийшла.
-const [list, live]=await Promise.all([
-    // вбудований запис / повний каталог для старої адреси
-    embedded
-        ? Promise.resolve(embeddedOnly)
-        : fetch(dataUrl("/data/products.json")).then(response => {
-            if (!response.ok) throw new Error("Не вдалося завантажити товари");
-            return response.json();
-        }),
-    window.LiveStock ? window.LiveStock.load() : Promise.resolve(null)
-]);
+// А живий залишок БІЛЬШЕ НЕ ТРИМАЄ сторінку.
+//
+// Заміряно на проді (телефон): статична розмітка була на екрані на
+// 576-й мілісекунді, запит до бази йшов 585 → 1235 мс, і лише після
+// нього сторінка перемальовувалась — LCP 1460 мс. Фото при цьому
+// лежало готове з 538 мс. Тобто наявність коштувала ~900 мс.
+//
+// Тепер: якщо знімок уже в кеші вкладки — беремо його синхронно й
+// малюємо одразу з правильною наявністю. Якщо ні — малюємо з даних
+// збірки, а залишок доуточнює саме наявність, коли приїде
+// (applyLiveStockToPage). Обґрунтування вікна розбіжності — там же.
+const list = await (embedded
+    // вбудований запис
+    ? Promise.resolve(embeddedOnly)
+    // стара адреса /product?id=… — там без каталогу не знайти товар
+    : fetch(dataUrl("/data/products.json")).then(response => {
+        if (!response.ok) throw new Error("Не вдалося завантажити товари");
+        return response.json();
+    }));
 
 products = Array.isArray(list) && list.length ? list : [];
 
@@ -116,7 +123,12 @@ if (!embedded && typeof primeProductsCache === "function") {
 
 }
 
-if (window.LiveStock) window.LiveStock.apply(products, live);
+// Знімок із кеша — синхронно, ще до першого малювання.
+const live = window.LiveStock && window.LiveStock.cached
+    ? window.LiveStock.cached()
+    : null;
+
+if (live && window.LiveStock) window.LiveStock.apply(products, live);
 
 const product=findRequestedProduct(products);
 
@@ -176,6 +188,27 @@ updateFavoriteButtons();
 // товар дивились — навіть якщо до низу цієї людина не дійшла.
 trackRecentlyViewed(product.id);
 
+// Свіжий залишок — уже після того, як сторінка на екрані.
+//
+// Якщо знімок був у кеші, load() віддасть його ж і нічого не
+// зміниться. Якщо ні — приїде з мережі й оновить саму наявність.
+if (window.LiveStock) {
+
+    window.LiveStock.load().then(fresh => {
+
+        if (!fresh) return;
+
+        const changed = window.LiveStock.apply(products, fresh);
+
+        // Нічого не змінилось — і DOM чіпати нема сенсу.
+        if (!changed) return;
+
+        applyLiveStockToPage(product);
+
+    });
+
+}
+
 // «Схожі» й «переглянуті» — коли до них доходить справа.
 //
 // Слухаємо СЕКЦІЮ, а не саму карусель.
@@ -187,7 +220,7 @@ trackRecentlyViewed(product.id);
 // карусель, як було.
 whenNearViewport(
     document.querySelector("section.similar") || document.getElementById("similarCarousel"),
-    () => showRelated(product, live));
+    () => showRelated(product));
 
 } catch (error) {
 
@@ -1013,6 +1046,95 @@ function refreshAvailability() {
     const delivery = page.querySelector(".delivery-box");
 
     if (delivery) delivery.hidden = preOrder;
+
+}
+
+// Наявність приїхала пізніше за сторінку — оновлюємо ЛИШЕ її.
+//
+// НЕ перемальовуємо сторінку цілком: інакше блимнули б фото й ціна, а
+// CLS перестав би бути нулем. Змінюється рівно те, що залежить від
+// залишку:
+//
+//   • data-colorPreorder на контейнері — стан активного кольору;
+//   • перекреслені розміри (клас size-out і data-out);
+//   • data-out-sizes і data-page-view на свотчах — їх читає
+//     перемикач кольору в common.js;
+//   • і вже за цими даними refreshAvailability() перемальовує
+//     позначку, кнопку й блок доставки.
+function applyLiveStockToPage(product) {
+
+    const page = document.getElementById("productPage");
+
+    if (!page || !product) return;
+
+    const variants = product.variants?.length ? product.variants : [];
+
+    // Активний колір — той, що позначений у розмітці: саме його бачить
+    // людина, і саме його стан показує позначка.
+    const activeName = page.querySelector(".color.active")?.dataset.color;
+
+    const activeVariant = variants.find(v => v.color === activeName) || variants[0] || null;
+
+    // 1. Свотчі: перелік розпроданих розмірів кожного кольору.
+    page.querySelectorAll(".color").forEach(swatch => {
+
+        const variant = variants.find(v => v.color === swatch.dataset.color);
+
+        if (!variant) return;
+
+        const out = soldOutSizes(product, variant);
+
+        swatch.dataset.outSizes = JSON.stringify(out);
+
+        // data-page-view несе ще й preOrder — його теж перескладаємо,
+        // інакше перемикання кольору повернуло б старий стан.
+        if (swatch.dataset.pageView) {
+            swatch.dataset.pageView = JSON.stringify(pageColorView(product, variant));
+        }
+
+    });
+
+    // Товар без варіантів: renderProduct вигадує йому один
+    // («Основний»), але в даних його немає. Оновлюємо тоді сам товар —
+    // інакше вийшли б звідси, не торкнувшись позначки.
+    if (!activeVariant) {
+
+        page.dataset.colorPreorder = product.preOrder ? "1" : "0";
+
+        refreshAvailability();
+
+        return;
+
+    }
+
+    // 2. Стан активного кольору.
+    const preOrder = typeof activeVariant.preOrder === "boolean"
+        ? activeVariant.preOrder
+        : Boolean(product.preOrder);
+
+    page.dataset.colorPreorder = preOrder ? "1" : "0";
+
+    // 3. Перекреслені розміри активного кольору.
+    const out = new Set(soldOutSizes(product, activeVariant));
+
+    page.querySelectorAll(".size").forEach(button => {
+
+        const isOut = out.has(button.dataset.size);
+
+        button.classList.toggle("size-out", isOut);
+
+        if (isOut) {
+            button.dataset.out = "1";
+            button.title = "Немає в наявності — можна замовити";
+        } else {
+            delete button.dataset.out;
+            button.removeAttribute("title");
+        }
+
+    });
+
+    // 4. І видима частина.
+    refreshAvailability();
 
 }
 
@@ -2335,7 +2457,7 @@ function whenNearViewport(element, run) {
 // Повний запис цього товару лежить у сторінці, тож він накриває
 // полегшену картку з каталогу — далі вся сторінка працює з одним
 // об'єктом, як робила завжди.
-async function showRelated(product, live) {
+async function showRelated(product) {
 
     if (typeof getAllProductsCached === "function") {
 
@@ -2351,10 +2473,22 @@ async function showRelated(product, live) {
 
             products = merged;
 
-            // Залишок уже завантажений — застосовуємо його й до решти
-            // каталогу, інакше картки «схожих» показували б наявність
-            // зі збірки, а не справжню.
-            if (window.LiveStock) window.LiveStock.apply(products, live);
+            // Залишок беремо ТУТ, а не той, що був на початку.
+            //
+            // ЧОМУ. Сторінка більше не чекає на базу перед малюванням,
+            // тож на першій сторінці вкладки на той момент знімка ще
+            // немає. Захоплений null означав би, що картки «схожих»
+            // показують наявність зі збірки, а не справжню.
+            //
+            // load() на цей час уже відпрацював (людина доскролила до
+            // низу) і віддає готове значення без нового запиту.
+            if (window.LiveStock) {
+
+                const live = await window.LiveStock.load();
+
+                if (live) window.LiveStock.apply(products, live);
+
+            }
 
         }
 

@@ -46,8 +46,77 @@
 
     var pending = null;
 
+    // Скільки знімок вважається свіжим.
+    //
+    // Заміряно: сам запит займає близько 600 мс, і кешу не було —
+    // кожна сторінка платила його заново. Залишок змінюється, коли
+    // хтось оформлює замовлення (події раз на години), тож хвилина
+    // застарілості дешевша за шість секунд очікування на десяти
+    // сторінках.
+    var CACHE_MS = 60000;
+
+    // sessionStorage, а не localStorage: кеш мусить померти разом із
+    // вкладкою. Наступного дня людина має бачити сьогоднішню
+    // наявність, а не вчорашню.
+    var CACHE_KEY = "live-stock";
+
     function cell(id, color, size) {
         return String(id) + "|" + String(color || "") + "|" + String(size || "");
+    }
+
+    // Знімок із кеша — СИНХРОННО, щоб сторінка могла намалюватись
+    // одразу з правильною наявністю, не чекаючи на мережу.
+    //
+    // Повертає Map або null. Будь-яка помилка (приватне вікно, повне
+    // сховище, зіпсований JSON) — це просто null: тоді працює
+    // звичайний шлях через мережу.
+    function cached() {
+
+        try {
+
+            var raw = root.sessionStorage && root.sessionStorage.getItem(CACHE_KEY);
+
+            if (!raw) return null;
+
+            var saved = JSON.parse(raw);
+
+            if (!saved || !Array.isArray(saved.rows)) return null;
+
+            if (!(Date.now() - Number(saved.at) < CACHE_MS)) return null;
+
+            var map = new Map();
+
+            saved.rows.forEach(function (row) {
+                map.set(row[0], row[1] === true);
+            });
+
+            return map.size ? map : null;
+
+        } catch (error) {
+
+            return null;
+
+        }
+
+    }
+
+    function remember(map) {
+
+        try {
+
+            if (!map || !map.size || !root.sessionStorage) return;
+
+            root.sessionStorage.setItem(CACHE_KEY, JSON.stringify({
+                at: Date.now(),
+                rows: [...map.entries()]
+            }));
+
+        } catch (error) {
+
+            // Сховище недоступне або повне — просто не кешуємо.
+
+        }
+
     }
 
     // Один запит на завантаження сторінки. Повторні виклики отримують
@@ -57,7 +126,24 @@
 
         if (pending) return pending;
 
-        pending = fetchLive();
+        // Свіжий знімок із цієї ж вкладки — мережу не чіпаємо.
+        var ready = cached();
+
+        if (ready) {
+
+            pending = Promise.resolve(ready);
+
+            return pending;
+
+        }
+
+        pending = fetchLive().then(function (map) {
+
+            remember(map);
+
+            return map;
+
+        });
 
         return pending;
 
@@ -206,6 +292,8 @@
 
     root.LiveStock = {
         load: load,
+        cached: cached,
+        CACHE_MS: CACHE_MS,
         apply: apply,
         refresh: refresh,
         cell: cell,

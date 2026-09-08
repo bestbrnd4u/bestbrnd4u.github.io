@@ -618,7 +618,13 @@ function loadImageVariants() {
 
 }
 
-function buildSrcSet(src) {
+// format — "webp" (за замовчуванням) або "avif".
+//
+// AVIF на 36% легший при тій самій деталізації (заміряно на 24 файлах
+// каталогу: 399 КБ → 256 КБ), але існує ЛИШЕ для 600 і 300: широкий
+// кадр 1200 віддаємо в webp, бо він у статичній розмітці й вантажиться
+// ще до JS (див. scripts/normalize-product-images.js).
+function buildSrcSet(src, format) {
 
     // Адреса може мати версію: photo.webp?v=a1b2c3d4 (її додає збірка,
     // щоб замінене фото не приїхало з кеша). Розділяємо шлях і версію,
@@ -635,7 +641,45 @@ function buildSrcSet(src) {
 
     // Версію отримують і зменшені копії: їх перезбирають разом із
     // базовим фото, тож кеш має оновитись і для них.
+    if (format === "avif") {
+
+        // 1200 у переліку немає: у цьому форматі його не роблять.
+        // Браузер візьме 600 і для ширших екранів — це все одно
+        // легше й детальніше, ніж було до появи копій.
+        return `${base}-300.avif${v} 300w, ${base}-600.avif${v} 600w`;
+
+    }
+
     return `${base}-300.webp${v} 300w, ${base}-600.webp${v} 600w, ${pathPart}${v} 1200w`;
+
+}
+
+// Чи розуміє браузер AVIF.
+//
+// Перевіряємо ДЕКОДУВАННЯМ однопіксельної картинки, а не
+// canvas.toDataURL: той показує, чи браузер умієте avif ЗАПИСУВАТИ, а
+// це інша здатність (Safari довго вмів читати й не вмів писати).
+//
+// Питаємо один раз на сторінку: обіцянка кешується.
+let avifReady = null;
+
+function avifSupported() {
+
+    if (avifReady) return avifReady;
+
+    avifReady = new Promise(resolve => {
+
+        const probe = new Image();
+
+        probe.onload = () => resolve(probe.width === 1);
+        probe.onerror = () => resolve(false);
+
+        // Найкоротший валідний avif 1×1.
+        probe.src = "data:image/avif;base64,AAAAIGZ0eXBhdmlmAAAAAGF2aWZtaWYxbWlhZk1BMUIAAADybWV0YQAAAAAAAAAoaGRscgAAAAAAAAAAcGljdAAAAAAAAAAAAAAAAGxpYmF2aWYAAAAADnBpdG0AAAAAAAEAAAAeaWxvYwAAAABEAAABAAEAAAABAAABGgAAAB0AAAAoaWluZgAAAAAAAQAAABppbmZlAgAAAAABAABhdjAxQ29sb3IAAAAAamlwcnAAAABLaXBjbwAAABRpc3BlAAAAAAAAAAEAAAABAAAAEHBpeGkAAAAAAwgICAAAAAxhdjFDgQAMAAAAABNjb2xybmNseAACAAIABoAAAAAXaXBtYQAAAAAAAAABAAEEAQKDBAAAACVtZGF0EgAKCBgABogQEDQgMgkQAAAAB8dSLfI9pKg=";
+
+    });
+
+    return avifReady;
 
 }
 
@@ -811,6 +855,10 @@ async function applyImageVariants(root) {
 
     const known = await loadImageVariants();
 
+    // Формат обираємо один раз на сторінку. Обидві обіцянки
+    // кешовані, тож це не додає запитів.
+    const format = (await avifSupported()) ? "avif" : "webp";
+
     const scope = root || document;
 
     if (known.size) {
@@ -821,7 +869,7 @@ async function applyImageVariants(root) {
 
             if (!known.has(variantName(src))) return;
 
-            const srcset = buildSrcSet(src);
+            const srcset = buildSrcSet(src, format);
 
             if (!srcset) return;
 

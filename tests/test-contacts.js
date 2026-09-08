@@ -10,7 +10,13 @@ const MAIL = "bestbrnd4u@proton.me";
 const TG = "bestbrnd4u";
 const OLD_MAIL = "info@bestbrnd4u.ua";
 
-const pages = fs.readdirSync(ROOT).filter(f => f.endsWith(".html"));
+// tmp-*.html — не сторінки, а сміття від тестів: test-image-archive
+// створює такий файл, щоб перевірити пошук посилань, і прибирає його
+// у finally. Але якщо прогін урвали (Ctrl+C), файл лишається — і тоді
+// падав ЦЕЙ тест, повідомляючи «пошта у футері на 17 з 18 сторінок».
+// Причину такого повідомлення шукати найважче: воно про інший тест.
+const pages = fs.readdirSync(ROOT)
+    .filter(f => f.endsWith(".html") && !f.startsWith("tmp-"));
 const read = f => fs.readFileSync(path.join(ROOT, f), "utf8");
 
 console.log("\n[1] Стара пошта не лишилась ніде");
