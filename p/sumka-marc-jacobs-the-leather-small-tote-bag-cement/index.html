@@ -188,7 +188,7 @@ window.PRODUCT_TAXONOMY = {"category":{"Жіночі сумки":"categories/zhi
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=5e606e97">
+<link rel="stylesheet" href="/assets/css/style.css?v=4fb064fe">
 
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"></script>
@@ -434,6 +434,28 @@ BestBrnd4u
 
                     </div>
 
+                    <!-- ЩО СТАНЕ ПУБЛІЧНИМ — сказано до першого поля.
+
+                         Форма просить номер замовлення й телефон, і без
+                         пояснення це виглядає так, ніби вони теж
+                         з'являться під відгуком. Віддавати телефон у
+                         публічний відгук ніхто не хоче — тобто
+                         непояснена форма сама відмовляє людину писати.
+
+                         Перелік тут мусить збігатися з тим, що справді
+                         віддає база: функція product_reviews() повертає
+                         author, rating, body, reply, created_at — і
+                         більше нічого (див. supabase/migrations/
+                         019-reviews.sql). -->
+                    <p class="review-privacy">
+                        На сторінці буде видно <b>лише ім'я, оцінку й текст
+                        відгуку</b>. Номер замовлення й телефон потрібні,
+                        щоб переконатися, що ви справді купували цей товар —
+                        вони не показуються ні тут, ні будь-де на сайті.
+                    </p>
+
+                    <p class="review-group">Для перевірки покупки</p>
+
                     <label class="review-field">
                         <span>Номер замовлення</span>
                         <input type="text" id="reviewOrder" inputmode="numeric" autocomplete="off"
@@ -445,6 +467,8 @@ BestBrnd4u
                         <input type="tel" id="reviewPhone" inputmode="tel" autocomplete="tel"
                                placeholder="+380 __ ___ __ __" required>
                     </label>
+
+                    <p class="review-group">Це побачать інші покупці</p>
 
                     <label class="review-field">
                         <span>Як вас підписати</span>
@@ -723,7 +747,7 @@ BestBrnd4u
 <script src="/assets/js/product.js?v=314205f4"></script>
 
 <!-- Відгуки: показ, форма й перевірка покупки на сервері -->
-<script src="/assets/js/reviews.js?v=23932989"></script>
+<script src="/assets/js/reviews.js?v=44d0c9b2"></script>
 
 </body>
 

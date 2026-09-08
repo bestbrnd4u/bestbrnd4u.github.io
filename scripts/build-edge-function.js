@@ -26,7 +26,7 @@ const SOURCE = path.join(DIR, "_index.src.ts");
 // Чисті модулі, які вклеюються у зібраний файл. Порядок — той, у
 // якому їх зручно читати; на роботу він не впливає, бо всередині
 // лише оголошення.
-const MODULES = ["format.js", "order-flow.js", "admin-api.js", "place-order.js", "mail.js", "nova-poshta.js", "meta-capi.js", "order-lookup.js", "reviews.js", "subscribe.js", "checkout-draft.js"];
+const MODULES = ["format.js", "order-flow.js", "admin-api.js", "place-order.js", "mail.js", "nova-poshta.js", "meta-capi.js", "order-lookup.js", "reviews.js", "subscribe.js", "checkout-draft.js", "review-admin.js"];
 
 function build() {
 

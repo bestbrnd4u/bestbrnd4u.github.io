@@ -58,6 +58,14 @@ import {
   cleanReview, orderHasProduct, reviewCard, reviewKeyboard,
   parseReviewAction, reviewVerdictLine, reviewPhoneMatches,
 } from "./reviews.js";
+
+// Панель «Відгуки» в адмінці — другий спосіб модерації поруч із
+// кнопками в Telegram (пояснення — у review-admin.js).
+import {
+  isReviewAction, parseReviewAdminRequest, buildReviewListQuery,
+  buildReviewCountQuery, reviewListResponse, reviewView,
+  REVIEW_STATUS_ORDER,
+} from "./review-admin.js";
 import { cleanDraft } from "./checkout-draft.js";
 import {
   cleanSubscriber, subscribeRequest, subscribeVerdict,
@@ -2307,12 +2315,31 @@ async function handleAddReview(request: Request, body: Record<string, any>): Pro
 
     const title = await productTitle(review.productId);
 
-    await telegram("sendMessage", {
+    const sent = await telegram("sendMessage", {
       chat_id: TELEGRAM_CHAT_ID,
       text: reviewCard(review, title),
       parse_mode: "HTML",
       reply_markup: reviewKeyboard(id),
     });
+
+    // Запам'ятовуємо, ЯКЕ повідомлення показує цей відгук.
+    //
+    // Без цього панель в адмінці не могла б прибрати кнопки під
+    // карткою після свого рішення — і власник, натиснувши їх через
+    // тиждень, МОВЧКИ скасував би те, що сам же й ухвалив. Та сама
+    // пастка, яку для замовлень закрив bot_message_id.
+    const message = sent?.result;
+
+    if (message?.message_id) {
+      await supabaseRest(`reviews?id=eq.${id}`, {
+        method: "PATCH",
+        headers: { Prefer: "return=minimal" },
+        body: JSON.stringify({
+          owner_chat_id: message.chat?.id ?? null,
+          owner_message_id: message.message_id,
+        }),
+      }).then(response => response.text()).catch(() => {});
+    }
 
   })());
 
@@ -2338,10 +2365,19 @@ async function handleReviewCallback(callback: Record<string, any>, data: string)
 
   }
 
-  const response = await supabaseRest(`reviews?id=eq.${action.id}`, {
+  // Рішення могли вже ухвалити — у панелі адмінки. Тоді кнопки під
+  // цією карткою застаріли, і натискання означало б тихе скасування
+  // чужого (або свого ж) рішення. Тому пишемо ЛИШЕ поки статус
+  // «new»: умова стоїть у самому запиті, тож між перевіркою й
+  // записом нічого не встигне змінитись.
+  const response = await supabaseRest(`reviews?id=eq.${action.id}&status=eq.new`, {
     method: "PATCH",
-    headers: { Prefer: "return=minimal" },
-    body: JSON.stringify({ status: action.status }),
+    headers: { Prefer: "return=representation" },
+    body: JSON.stringify({
+      status: action.status,
+      moderated_at: new Date().toISOString(),
+      moderated_by: "telegram",
+    }),
   });
 
   if (!response.ok) {
@@ -2359,7 +2395,26 @@ async function handleReviewCallback(callback: Record<string, any>, data: string)
 
   }
 
-  await response.text();
+  const changed = await response.json().catch(() => []);
+
+  // Порожня відповідь = відгук уже не «new», тобто рішення ухвалили
+  // в панелі. Кажемо про це прямо й прибираємо застарілі кнопки,
+  // а не вдаємо, що натискання щось зробило.
+  if (!Array.isArray(changed) || !changed.length) {
+
+    await telegram("answerCallbackQuery", {
+      callback_query_id: callback.id,
+      text: "Цей відгук уже відмодерований — дивіться панель в адмінці",
+    });
+
+    await telegram("editMessageReplyMarkup", {
+      chat_id: callback.message.chat.id,
+      message_id: callback.message.message_id,
+    });
+
+    return;
+
+  }
 
   await telegram("answerCallbackQuery", {
     callback_query_id: callback.id,
@@ -2552,6 +2607,219 @@ async function handleCheckoutDraft(request: Request, body: Record<string, any>):
 
 }
 
+// -------------------------
+// Панель «Відгуки» в адмінці
+//
+// Другий спосіб модерації поруч із кнопками в Telegram. Навіщо він
+// і чому це не колекція Decap — у review-admin.js.
+//
+// Доступ перевіряє handleAdmin вище: право те саме, що для
+// замовлень — запис у репозиторій сайту.
+// -------------------------
+
+async function reviewCounts() {
+
+  const counts: Record<string, number | null> = {};
+
+  // По одному запиту на вкладку. Рядки не потрібні — лише число з
+  // Content-Range, тож просимо одну колонку й один рядок.
+  for (const status of REVIEW_STATUS_ORDER) {
+
+    const response = await supabaseRest(buildReviewCountQuery(status), {
+      headers: { Prefer: "count=exact" },
+    });
+
+    counts[status] = response.ok
+      ? parseTotal(response.headers.get("content-range"))
+      : null;
+
+    if (response.ok) await response.text();
+
+  }
+
+  return counts;
+
+}
+
+// Назви товарів для списку відгуків.
+//
+// У відгуку лежить лише product_id: товари живуть у репозиторії, а
+// не в базі. Без назви панель показувала б «Товар #57», і зрозуміти,
+// про що відгук, можна було б лише відкривши сайт.
+async function reviewTitles(ids: number[]) {
+
+  const titles: Record<string, string> = {};
+
+  for (const id of [...new Set(ids)].slice(0, 100)) {
+
+    if (!Number.isFinite(id)) continue;
+
+    const title = await productTitle(id);
+
+    if (title) titles[String(id)] = title;
+
+  }
+
+  return titles;
+
+}
+
+async function handleReviewAdmin(body: Record<string, any>, origin: string | null): Promise<Response> {
+
+  const parsed = parseReviewAdminRequest(body);
+
+  if (!parsed.ok) return adminJson({ ok: false, error: parsed.error }, 400, origin);
+
+  const { action, params } = parsed;
+
+  if (action === "reviews-list") {
+
+    const response = await supabaseRest(buildReviewListQuery(params), {
+      headers: { Prefer: "count=exact" },
+    });
+
+    if (!response.ok) {
+
+      console.error("Не вдалося отримати відгуки:", await response.text());
+
+      return adminJson({ ok: false, error: "База не віддала відгуки." }, 502, origin);
+
+    }
+
+    const rows = await response.json();
+    const list = Array.isArray(rows) ? rows : [];
+
+    const payload = reviewListResponse({
+      reviews: list,
+      total: parseTotal(response.headers.get("content-range")),
+      counts: await reviewCounts(),
+    });
+
+    return adminJson({
+      ...payload,
+      titles: await reviewTitles(list.map(row => Number(row.product_id))),
+    }, 200, origin);
+
+  }
+
+  // Далі — дії над одним відгуком. Обидві мусять знати, що було до
+  // зміни: рішення могли вже ухвалити кнопкою в Telegram.
+  const before = await supabaseRest(`reviews?select=*&id=eq.${params.id}&limit=1`);
+
+  const found = before.ok ? await before.json() : [];
+  const current = Array.isArray(found) ? found[0] : null;
+
+  if (!current) return adminJson({ ok: false, error: "Відгук не знайдено." }, 404, origin);
+
+  if (action === "review-reply") {
+
+    const saved = await supabaseRest(`reviews?id=eq.${params.id}`, {
+      method: "PATCH",
+      headers: { Prefer: "return=representation" },
+      body: JSON.stringify({ reply: params.reply }),
+    });
+
+    if (!saved.ok) {
+
+      console.error("Не вдалося зберегти відповідь:", await saved.text());
+
+      return adminJson({ ok: false, error: "Не вдалося зберегти відповідь." }, 502, origin);
+
+    }
+
+    const rows = await saved.json();
+
+    return adminJson({
+      ok: true,
+      review: reviewView(Array.isArray(rows) ? rows[0] : null),
+    }, 200, origin);
+
+  }
+
+  // review-status
+  //
+  // Повторне рішення — не помилка бази, а помилка людини: відгук уже
+  // або показаний, або відхилений, і панель просто застаріла (рішення
+  // ухвалили кнопкою в чаті). Кажемо про це й вертаємо свіжий стан,
+  // щоб сторінка перемалювалась правильно.
+  if (current.status !== "new") {
+
+    return adminJson({
+      ok: false,
+      error: `Цей відгук уже «${reviewView(current)?.statusLabel}» — рішення ухвалили раніше.`,
+      review: reviewView(current),
+    }, 409, origin);
+
+  }
+
+  const saved = await supabaseRest(`reviews?id=eq.${params.id}&status=eq.new`, {
+    method: "PATCH",
+    headers: { Prefer: "return=representation" },
+    body: JSON.stringify({
+      status: params.status,
+      moderated_at: new Date().toISOString(),
+      moderated_by: "admin",
+    }),
+  });
+
+  if (!saved.ok) {
+
+    console.error("Не вдалося змінити статус відгуку:", await saved.text());
+
+    return adminJson({ ok: false, error: "Не вдалося зберегти рішення." }, 502, origin);
+
+  }
+
+  const rows = await saved.json();
+  const updated = Array.isArray(rows) ? rows[0] : null;
+
+  if (!updated) {
+
+    // Між читанням і записом статус змінили кнопкою в чаті.
+    return adminJson({
+      ok: false,
+      error: "Рішення щойно ухвалили в Telegram — оновіть список.",
+    }, 409, origin);
+
+  }
+
+  // Картка в чаті мусить показати те саме рішення. Інакше під нею
+  // лишаться живі кнопки, і натискання через тиждень означало б тихе
+  // скасування — рівно те, що для замовлень закриває refreshOwnerCard.
+  await background(refreshReviewCard(updated));
+
+  return adminJson({ ok: true, review: reviewView(updated) }, 200, origin);
+
+}
+
+// Прибрати кнопки під карткою відгуку й дописати рішення.
+//
+// Старим відгукам owner_message_id лишився порожнім (колонка
+// з'явилась у міграції 022) — для них просто нічого не робимо: усе
+// інше працює.
+async function refreshReviewCard(review: Record<string, any>) {
+
+  if (!review?.owner_chat_id || !review?.owner_message_id) return;
+
+  const title = await productTitle(review.product_id);
+
+  const card = reviewCard({
+    productId: review.product_id,
+    orderNumber: review.order_number,
+    rating: review.rating,
+    author: review.author,
+    body: review.body,
+  }, title);
+
+  await telegram("editMessageText", {
+    chat_id: review.owner_chat_id,
+    message_id: review.owner_message_id,
+    text: `${card}\n\n${reviewVerdictLine(review.status)} (з адмінки)`,
+    parse_mode: "HTML",
+  });
+
+}
+
 async function handleAdmin(request: Request, body: Record<string, any>): Promise<Response> {
 
   const origin = request.headers.get("origin");
@@ -2567,6 +2835,16 @@ async function handleAdmin(request: Request, body: Record<string, any>): Promise
       error: "Немає доступу до замовлень. Потрібне право запису в репозиторій сайту.",
     }, 403, origin);
 
+  }
+
+  // Панель відгуків живе в тому самому полі admin_action, тож
+  // розводимо ДО parseAdminRequest: він знає лише дії замовлень і
+  // відкинув би «reviews-list» як невідому.
+  //
+  // Перевірка доступу вище — спільна: право те саме (запис у
+  // репозиторій сайту), і дублювати її не треба.
+  if (isReviewAction(body.admin_action)) {
+    return await handleReviewAdmin(body, origin);
   }
 
   const parsed = parseAdminRequest(body);
