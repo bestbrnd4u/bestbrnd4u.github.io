@@ -56,6 +56,13 @@ export const NP_METHODS = {
 // потрібного немає в перших десяти, людина допише ще літеру.
 export const SETTLEMENT_LIMIT = 12;
 
+// Чи є в рядку хоч одна кирилична літера.
+//
+// НП відкидає латиницю в назві міста з помилкою «CityName has
+// invalid characters» — заміряно живим запитом: «Київ» шукається,
+// «Kyiv» дає відмову.
+export const CYRILLIC = /[\u0400-\u04FF]/;
+
 export function npRequest(apiKey, action) {
 
     const spec = NP_METHODS[action?.method];
@@ -69,25 +76,21 @@ export function npRequest(apiKey, action) {
         // Одна літера дає півтисячі міст і жодної користі.
         if (query.length < 2) return null;
 
+        // НП приймає назву міста ЛИШЕ кирилицею.
+        //
+        // На «Kyiv» вона відповідає не порожнім списком, а помилкою
+        // запиту: «CityName has invalid characters». Тобто латиниця
+        // — це не «місто не знайдено», а зіпсований запит, і слати
+        // його немає сенсу: маршрут публічний, а квота НП спільна.
+        if (!CYRILLIC.test(query)) return null;
+
         return {
             apiKey,
             modelName: spec.modelName,
             calledMethod: spec.calledMethod,
-            // Limit і Page — ЧИСЛАМИ.
-            //
-            // Тут стояло String(SETTLEMENT_LIMIT), і searchSettlements
-            // відмовляв, тоді як getWarehouseTypes на тій самій моделі
-            // Address працював. Опис методу в SDK називає обидва
-            // параметри числами; getWarehouses рядок приймає, але
-            // поблажливість одного методу нічого не обіцяє про інший.
-            //
-            // ЦЕ ГІПОТЕЗА, не доведена причина: точну скаже рядок
-            // «Нова пошта відмовила» — він тепер іде і в щоденний звіт
-            // (різновид np_directory).
             methodProperties: {
                 CityName: query.slice(0, 60),
-                Limit: SETTLEMENT_LIMIT,
-                Page: 1
+                Limit: String(SETTLEMENT_LIMIT)
             }
         };
 

@@ -43,6 +43,10 @@
     // працюють.
     var MIN_QUERY = 2;
 
+    // Довідник НП знає назви міст лише українською: на латиницю він
+    // відповідає помилкою запиту, а не порожнім списком.
+    var CYRILLIC = /[\u0400-\u04FF]/;
+
 // Доки довідник вважаємо недоступним після відмови.
 //
 // Спершу тут стояло `var available = true`, і відмова гасила
@@ -350,7 +354,38 @@ function directoryDown() {
         // навмисно: список відділень «усієї України» не має сенсу.
         var cityRef = "";
 
+        // Підказка «введіть українською». Окремий рядок, а не
+        // повідомлення про помилку: людина нічого не порушила,
+        // просто довідник іншою мовою не вміє.
+        var cityHint = document.createElement("p");
+
+        cityHint.className = "np-notice";
+        cityHint.hidden = true;
+        cityHint.textContent = "Назву міста введіть українською —"
+            + " довідник Нової пошти шукає лише так.";
+
+        (city.parentElement || document.body).appendChild(cityHint);
+
+        function showCityHint(show) { cityHint.hidden = !show; }
+
         attach(city, function (query) {
+
+            // Довідник НП знає міста ЛИШЕ українською.
+            //
+            // На «Kyiv» він відповідає помилкою запиту, а не порожнім
+            // списком — тобто покупець із латинською розкладкою бачив
+            // просто мовчання. Кажемо йому це прямо й не витрачаємо
+            // звернення до НП.
+            //
+            // Самі не перекладаємо: «Kyiv», «Kiev», «Kyyiv» — три
+            // написання одного міста, і здогад тут означає посилку не
+            // туди.
+            if (!CYRILLIC.test(query)) {
+                showCityHint(true);
+                return Promise.resolve([]);
+            }
+
+            showCityHint(false);
 
             return ask({ method: "settlements", query: query }).then(function (items) {
 

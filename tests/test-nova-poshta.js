@@ -152,6 +152,55 @@ console.log("\n[3] Відповідь НП розбирається обереж
     check("порожня відповідь — теж відмова", Boolean(np.npError(null)));
 }
 
+console.log("\n[2b] Латиниця в назві міста — тупик, і про це сказано");
+{
+    // ЩО ЗМІРЯНО живими запитами до нашої ж функції:
+    //
+    //     Київ, Одеса, Львів, Харків  → знаходяться
+    //     Kyiv                        → novaposhta_failed
+    //
+    // А в журналі сайту (різновид np_directory):
+    //
+    //     settlements: CityName has invalid characters
+    //
+    // Тобто НП приймає назву міста ЛИШЕ кирилицею, а латиницю вважає
+    // зіпсованим запитом — не «нічого не знайдено», а помилкою.
+    //
+    // Для покупця з латинською розкладкою це було мовчання: підказок
+    // немає, причини не видно.
+    check("кирилиця йде в НП",
+        np.npRequest("KEY", { method: "settlements", query: "Київ" }) !== null);
+
+    check("латиниця не йде: НП відкине її помилкою",
+        np.npRequest("KEY", { method: "settlements", query: "Kyiv" }) === null);
+
+    check("самі цифри теж не йдуть",
+        np.npRequest("KEY", { method: "settlements", query: "12345" }) === null);
+
+    // Змішане написання лишаємо: у ньому є кирилиця, тож НП запит
+    // прийме, а що знайде — її справа.
+    check("змішане написання не відкидаємо",
+        np.npRequest("KEY", { method: "settlements", query: "Кyiv" }) !== null);
+
+    // ЩО НЕ РОБИМО: не перекладаємо самі. «Kyiv», «Kiev», «Kyyiv» —
+    // три написання одного міста, і здогад тут означає посилку не
+    // туди. Тому в коді не має бути таблиці зворотної транслітерації.
+    check("зворотної транслітерації немає — не вгадуємо місто за людину",
+        !/Kyiv["']?\s*:/.test(page) && !/kiev/i.test(page.replace(/\/\/.*$/gm, "")));
+
+    // Браузер мусить сказати це ДО запиту: інакше людина бачить
+    // мовчання й не знає, що робити.
+    check("браузер попереджає до запиту",
+        /CYRILLIC\.test\(query\)/.test(page) && /showCityHint/.test(page));
+
+    check("текст підказки називає причину",
+        /українською/.test(page));
+
+    // І це не «помилка людини»: вона нічого не порушила.
+    check("підказка не червона, а попереджувальна",
+        /cityHint\.className = "np-notice"/.test(page));
+}
+
 console.log("\n[3b] Тип «Поштомат» — саме НП, а не чужий бренд");
 {
     // ЦЕ СПРАВЖНЯ ВІДПОВІДЬ НОВОЇ ПОШТИ, знята живим запитом до
@@ -197,17 +246,6 @@ console.log("\n[3b] Тип «Поштомат» — саме НП, а не чу�
         && np.postomatTypeRef([]) === ""
         && np.postomatTypeRef(null) === "");
 
-    // Пошук міста: Limit і Page числами. searchSettlements відмовляв,
-    // тоді як getWarehouseTypes на тій самій моделі Address працював,
-    // і єдина структурна різниця нашого запиту від документованого —
-    // тип цих двох полів.
-    const settlements = np.npRequest("KEY", { method: "settlements", query: "Київ" });
-
-    check("Limit числом, а не рядком",
-        typeof settlements.methodProperties.Limit === "number",
-        typeof settlements.methodProperties.Limit);
-
-    check("Page передається", settlements.methodProperties.Page === 1);
 }
 
 console.log("\n[4] Сторінка не залежить від довідника");
