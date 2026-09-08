@@ -13177,6 +13177,38 @@ body.refusal-open{
     background:var(--gray50);
 }
 
+/* Що стане публічним.
+
+   Форма просить номер замовлення й телефон, і без пояснення це
+   виглядає так, ніби вони з'являться під відгуком. Тому блок
+   стоїть ДО першого поля й помітний: рамка й тло, а не сірий
+   дрібний текст, який пропускають. */
+.review-privacy{
+    margin:0;
+    padding:11px 13px;
+    border:1px solid var(--gray200);
+    border-radius:10px;
+    background:var(--gray50, #f9fafb);
+    font-size:12.5px;
+    line-height:1.5;
+    color:var(--gray700, #374151);
+}
+
+.review-privacy b{
+    color:var(--gray900);
+}
+
+/* Підзаголовок групи полів: «для перевірки» / «це побачать інші».
+   Робить поділ видимим і тому, хто пояснення не читав. */
+.review-group{
+    margin:6px 0 -4px;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.6px;
+    text-transform:uppercase;
+    color:var(--gray500, #6b7280);
+}
+
 .review-field{
     display:flex;
     flex-direction:column;

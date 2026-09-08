@@ -132,8 +132,18 @@ console.log("\n[3] Новий тест не зможе тихо забрудни
     const усі = fs.readdirSync(__dirname)
         .filter(f => f.startsWith("test-") && f.endsWith(".js"));
 
+    // Дивимось на КОД, а не на прозу: у коментарях цей зразок
+    // згадується навмисно — саме там пояснюють, чому підпроцесу в
+    // тесті немає. Перший такий коментар цю перевірку й завалив.
+    //
+    // Той самий підхід, що в tests/test-delivery.js: правило про код,
+    // а не про розповідь про код.
+    const безКоментарів = text => text
+        .replace(/\/\*[\s\S]*?\*\//g, "")
+        .replace(/^\s*\/\/.*$/gm, "");
+
     const пишутьУКорінь = усі.filter(f =>
-        /cwd:\s*ROOT/.test(fs.readFileSync(path.join(__dirname, f), "utf8")));
+        /cwd:\s*ROOT/.test(безКоментарів(fs.readFileSync(path.join(__dirname, f), "utf8"))));
 
     const беззахисні = пишутьУКорінь.filter(f =>
         !fs.readFileSync(path.join(__dirname, f), "utf8").includes("guardBuildOutputs")
