@@ -3500,22 +3500,74 @@ function subscribeRequest(apiKey, subscriber, groupId) {
 
 }
 
+// Стан підписки з тіла відповіді.
+//
+// MailerLite кладе запис у data.data, але буває віддає й плоско —
+// тому дивимось в обидва місця. Можливі значення: active,
+// unsubscribed, unconfirmed, bounced, junk.
+function subscriberStatus(data) {
+
+    const row = (data && typeof data === "object")
+        ? (data.data && typeof data.data === "object" ? data.data : data)
+        : null;
+
+    return String((row && row.status) || "").trim().toLowerCase();
+
+}
+
 // Розбір відповіді.
 //
-// MailerLite віддає 200 або 201 на успіх. 422 — «уже підписаний» або
-// «пошта не пройшла їхню перевірку»; для покупця це не помилка, він
-// однаково в списку.
+// РІЗНИЦЯ МІЖ 200 І 201 — ГОЛОВНЕ ТУТ.
+//
+// Документація MailerLite (POST /api/subscribers) каже прямо:
+//
+//   201 Created — підписника СТВОРЕНО;
+//   200 OK      — пошта ВЖЕ БУЛА в списку.
+//
+// Раніше обидва коди вважались просто успіхом, і той, хто
+// підписався пів року тому, знову читав «перевірте пошту, там
+// лист» — листа при цьому не було. Тепер стан повертається окремим
+// полем, і сторінка каже правду.
+//
+// state:
+//   new         — щойно додали, лист підтвердження в дорозі;
+//   active      — уже підписаний і підтверджений, листи отримує;
+//   unconfirmed — у списку є, але підтвердження не натиснуто, і
+//                 саме тому листів немає (найчастіша причина
+//                 «я ж підписувався»);
+//   again       — був у списку, але листів не отримував
+//                 (відписався / пошта відбивала); наш запит просить
+//                 status:"unconfirmed", тож підтвердження піде знову;
+//   already     — пошта в списку, стан невідомий.
 function subscribeVerdict(status, data) {
 
-    if (status === 200 || status === 201) return { ok: true };
+    if (status === 201) return { ok: true, state: "new" };
+
+    if (status === 200) {
+
+        const state = subscriberStatus(data);
+
+        if (state === "active") return { ok: true, already: true, state: "active" };
+
+        if (state === "unconfirmed") return { ok: true, already: true, state: "unconfirmed" };
+
+        if (state) return { ok: true, already: true, state: "again" };
+
+        return { ok: true, already: true, state: "already" };
+
+    }
 
     if (status === 422) {
 
-        // Уже в списку — це успіх з погляду людини, яка натиснула
-        // кнопку. Казати їй «помилка» було б неправдою.
+        // 422 приходить, коли пошта не пройшла їхню перевірку. Деякі
+        // відповіді при цьому кажуть «already»/«taken» — для людини,
+        // яка натиснула кнопку, це не помилка: вона в списку.
+        // Стану підписки тут немає, тож і не вигадуємо його.
         const message = JSON.stringify(data ?? "").toLowerCase();
 
-        if (message.includes("already") || message.includes("taken")) return { ok: true, already: true };
+        if (message.includes("already") || message.includes("taken")) {
+            return { ok: true, already: true, state: "already" };
+        }
 
         return { ok: false, reason: "пошту не прийнято" };
 
@@ -6044,7 +6096,15 @@ async function handleSubscribe(request: Request, body: Record<string, any>): Pro
 
     }
 
-    return adminJson({ ok: true, already: verdict.already === true }, 200, origin);
+    // state каже, ЩО саме сталося: нову пошту додали, чи вона вже
+    // була в списку, і чи підтверджена підписка. Без цього сторінка
+    // обіцяла лист підтвердження навіть тому, хто підписався давно
+    // (див. пояснення в subscribe.js).
+    return adminJson({
+      ok: true,
+      already: verdict.already === true,
+      state: verdict.state ?? "new",
+    }, 200, origin);
 
   } catch (error) {
 

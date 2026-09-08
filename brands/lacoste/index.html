@@ -160,7 +160,7 @@ window.CATALOG_PRESET = {"brand":"Lacoste"};
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=8ded9400">
+<link rel="stylesheet" href="/assets/css/style.css?v=5e606e97">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"></script>
 
@@ -602,14 +602,64 @@ class="btn btn-outline">
 
 </section>
 
+<!-- Підписка на листи — у найпомітнішому місці сторінки.
+
+     Раніше тут стояв порожній <div class="ml-embedded"> —
+     тримач вбудованої форми MailerLite, чий скрипт із сайту
+     прибрали (52 КБ на кожній сторінці). Смуга виходила
+     порожня, а справжня форма тулилась у футері під
+     годинами роботи. Тепер навпаки.
+
+     Ключ MailerLite живе в секретах: адресу приймає наша
+     функція, а не браузер. Галочка згоди НЕ проставлена
+     заздалегідь — згода, якої людина не ставила, згодою
+     не є.
+
+     Підпис поля лишається в розмітці для читалок екрана, а
+     видимим заголовком служить <h2> (див. .newsletter
+     .subscribe-label у style.css). -->
 <section class="newsletter">
-<div class="container">
-<div class="ml-embedded" data-form="vKcNi2"></div>
-<small>
-Жодного спаму.
-Тільки акції та нові колекції.
-</small>
-</div>
+
+    <div class="container">
+
+        <h2>Новинки й акції на пошту</h2>
+
+        <form class="subscribe" id="subscribeForm" novalidate>
+
+            <label class="subscribe-label" for="subscribeEmail">
+                Новинки й акції на пошту
+            </label>
+
+            <div class="subscribe-row">
+                <input
+                    type="email"
+                    id="subscribeEmail"
+                    placeholder="you@example.com"
+                    autocomplete="email"
+                    required>
+                <button type="submit" id="subscribeSubmit">Підписатись</button>
+            </div>
+
+            <label class="subscribe-consent">
+                <input type="checkbox" id="subscribeConsent">
+                <span>
+                    Згоден отримувати листи про новинки й акції.
+                    Відписатись можна з будь-якого листа —
+                    <a href="/privacy-policy">як ми поводимось із даними.</a>
+                </span>
+            </label>
+
+            <p class="subscribe-note" id="subscribeNote" hidden></p>
+
+        </form>
+
+        <small>
+        Жодного спаму.
+        Тільки акції та нові колекції.
+        </small>
+
+    </div>
+
 </section>
 
 <section class="instagram-promo" data-section="instagram">
@@ -673,44 +723,6 @@ Telegram
 <p>☎ <a class="phone-link" href="tel:+380737288291">+380 73 728 82 91</a></p>
 <p>🕘 Пн–Нд 09:00–20:00</p>
 
-<!-- Підписка на листи.
-
-     Раніше на кожній сторінці вантажився universal.js
-     MailerLite (52 КБ) і не було жодної форми. Тепер
-     навпаки: скрипта немає, а форма надсилає адресу
-     через нашу функцію — ключ MailerLite живе в
-     секретах, а не в коді сайту.
-
-     Галочка НЕ проставлена заздалегідь: згода, якої
-     людина не ставила, згодою не є. -->
-<form class="subscribe" id="subscribeForm" novalidate>
-
-    <label class="subscribe-label" for="subscribeEmail">
-        Новинки й акції на пошту
-    </label>
-
-    <div class="subscribe-row">
-        <input
-            type="email"
-            id="subscribeEmail"
-            placeholder="you@example.com"
-            autocomplete="email"
-            required>
-        <button type="submit" id="subscribeSubmit">Підписатись</button>
-    </div>
-
-    <label class="subscribe-consent">
-        <input type="checkbox" id="subscribeConsent">
-        <span>
-            Згоден отримувати листи про новинки й акції.
-            Відписатись можна з будь-якого листа —
-            <a href="/privacy-policy">як ми поводимось із даними.</a>
-        </span>
-    </label>
-
-    <p class="subscribe-note" id="subscribeNote" hidden></p>
-
-</form>
 </div>
 </div>
 </footer>
@@ -748,7 +760,7 @@ aria-label="Нагору">
 <script src="/assets/js/translit.js?v=c0957cb7"></script>
 <script src="/assets/js/common.js?v=91437eec"></script>
 <!-- Підписка на листи магазину -->
-<script src="/assets/js/subscribe.js?v=2a90922b"></script>
+<script src="/assets/js/subscribe.js?v=2367ff9d"></script>
 <script src="/assets/js/promo-popup.js?v=2317f6f3"></script>
 <script src="/assets/js/sync.js?v=48ef002e"></script>
 <script src="/assets/js/mega-menu.js?v=7381e85d"></script>

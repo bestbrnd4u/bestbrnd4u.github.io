@@ -16,7 +16,40 @@ const css=fs.readFileSync(path.join(ROOT,"assets/css/style.css"),"utf8");
 // правило кошика/обраного мало лягти одразу після неї, у тому самому
 // медіа-блоці
 const productCardFix = css.indexOf(".product-card .product-options{");
-const cartFavBlock = css.slice(productCardFix, productCardFix + 4000);
+
+// Вікно — ДО КІНЦЯ медіа-блоку, а не фіксовані N символів.
+//
+// Тут стояло css.slice(productCardFix, productCardFix + 4000), і
+// перевірка ламалась від довжини КОМЕНТАРІВ: коли правило вище
+// отримало на кілька рядків більше пояснень, .cart-item .mini-color
+// виїхало на 4092 символи — за межу вікна. CSS при цьому був цілий.
+//
+// Набір заявляє, що правило лежить «у тому самому мобільному
+// медіа-блоці» — тож і межу беремо з блоку: рахуємо фігурні дужки від
+// його початку до парної закривної.
+function mediaBlockAround(index) {
+
+    const start = css.lastIndexOf("@media", index);
+
+    if (start < 0) return css.slice(index);
+
+    let depth = 0;
+
+    for (let i = css.indexOf("{", start); i < css.length; i++) {
+
+        if (css[i] === "{") depth++;
+        else if (css[i] === "}") {
+            depth--;
+            if (!depth) return css.slice(index, i);
+        }
+
+    }
+
+    return css.slice(index);
+
+}
+
+const cartFavBlock = mediaBlockAround(productCardFix);
 
 console.log("\n[1] Прокрутка кольору/розміру в кошику й обраному працює і на мобільному");
 {
