@@ -134,19 +134,19 @@
       "@type": "ListItem",
       "position": 4,
       "name": "Аксесуари",
-      "item": "https://dev.bestbrnd4u.com/catalog?gender=%D0%A7%D0%BE%D0%BB%D0%BE%D0%B2%D1%96%D0%BA%D0%B0%D0%BC&department=%D0%90%D0%BA%D1%81%D0%B5%D1%81%D1%83%D0%B0%D1%80%D0%B8"
+      "item": "https://dev.bestbrnd4u.com/departments/aksesuary/"
     },
     {
       "@type": "ListItem",
       "position": 5,
       "name": "Окуляри і оправи",
-      "item": "https://dev.bestbrnd4u.com/catalog?gender=%D0%A7%D0%BE%D0%BB%D0%BE%D0%B2%D1%96%D0%BA%D0%B0%D0%BC&category=%D0%9E%D0%BA%D1%83%D0%BB%D1%8F%D1%80%D0%B8%20%D1%96%20%D0%BE%D0%BF%D1%80%D0%B0%D0%B2%D0%B8"
+      "item": "https://dev.bestbrnd4u.com/categories/okuliary-i-opravy/"
     },
     {
       "@type": "ListItem",
       "position": 6,
       "name": "Ray-Ban",
-      "item": "https://dev.bestbrnd4u.com/catalog?gender=%D0%A7%D0%BE%D0%BB%D0%BE%D0%B2%D1%96%D0%BA%D0%B0%D0%BC&category=%D0%9E%D0%BA%D1%83%D0%BB%D1%8F%D1%80%D0%B8%20%D1%96%20%D0%BE%D0%BF%D1%80%D0%B0%D0%B2%D0%B8&brand=Ray-Ban"
+      "item": "https://dev.bestbrnd4u.com/brands/ray-ban/"
     },
     {
       "@type": "ListItem",
@@ -167,6 +167,9 @@ window.PRODUCT_ID = 93;
 // малює картку одразу, а каталог довантажує лише заради
 // «схожих» і «переглянутих» — і бере полегшений
 window.PRODUCT_DATA = {"gender":["Чоловікам"],"preOrderDays":"10-14 робочих днів","forcePublish":false,"material":"Метал","brand":"Ray-Ban","price":7800,"preOrder":true,"dimensions":"14,0 × 4,8 см; ширина лінзи — 6 см; міст — 1,7 см; довжина дужки — 13,5 см","variants":[{"color":"Коричневий / золотистий","hex":"#845c3d","images":["/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-1db8136f.webp?v=c87f9676","/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-d6f54bf0.webp?v=c0d14189","/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-4b1f82a5.webp?v=3b38241c","/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-960c6b7f.webp?v=0114f5da"],"article":"93-1"}],"preOrderPrepayment":100,"strapInfo":"Металеві дужки","sizes":["ONESIZE"],"splitByColor":true,"searchKeywords":["Ray-Ban","Ray-Ban RB3498","RB3498","RB3498 029/T5 61","сонцезахисні окуляри Ray-Ban","чоловічі окуляри","чоловічі сонцезахисні окуляри","прямокутні окуляри","поляризовані окуляри","поляризація","окуляри з коричневими лінзами","коричневі лінзи","градієнтні лінзи","окуляри від сонця","брендові окуляри","оригінальні Ray-Ban","спортивні окуляри","окуляри Ray-Ban чоловічі","рей бен","рей бан","рейбен","рей-бан"],"isNew":false,"title":"Сонцезахисні окуляри Ray-Ban RB3498","reviews":0,"instagramBlock":"general","description":"Стильні чоловічі сонцезахисні окуляри Ray-Ban RB3498 із прямокутною формою оправи. Модель поєднує сучасний спортивний дизайн із фірмовою естетикою Ray-Ban.\nОкуляри оснащені поляризованими лінзами з коричневим градієнтом, які допомагають зменшити відблиски та забезпечують комфортне сприйняття яскравого світла. Лаконічна форма та універсальний дизайн чудово підходять для повсякденного використання, подорожей і відпочинку","sku":"RB3498029/T561","rating":5,"category":"Окуляри і оправи","legacySlugs":["сонцезахисні-окуляри-ray-ban-rb3498"],"slug":"sontsezakhysni-okuliary-ray-ban-rb3498","id":93,"color":"Коричневий / золотистий","images":["/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-1db8136f.webp","/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-d6f54bf0.webp","/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-4b1f82a5.webp","/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-960c6b7f.webp"],"article":"93","preOrderAlways":true};
+// адреси власних сторінок категорії, розділу й бренду — щоб
+// крихти після рендеру JS вели туди ж, куди в розмітці
+window.PRODUCT_TAXONOMY = {"category":{"Окуляри і оправи":"categories/okuliary-i-opravy/"},"department":{"Аксесуари":"departments/aksesuary/"},"brand":{"Ray-Ban":"brands/ray-ban/"}};
 </script>
 
 
@@ -265,11 +268,11 @@ BestBrnd4u
 <span class="crumb-sep">–</span>
 <a href="https://dev.bestbrnd4u.com/catalog?gender=%D0%A7%D0%BE%D0%BB%D0%BE%D0%B2%D1%96%D0%BA%D0%B0%D0%BC">Чоловікам</a>
 <span class="crumb-sep">–</span>
-<a href="https://dev.bestbrnd4u.com/catalog?gender=%D0%A7%D0%BE%D0%BB%D0%BE%D0%B2%D1%96%D0%BA%D0%B0%D0%BC&amp;department=%D0%90%D0%BA%D1%81%D0%B5%D1%81%D1%83%D0%B0%D1%80%D0%B8">Аксесуари</a>
+<a href="https://dev.bestbrnd4u.com/departments/aksesuary/">Аксесуари</a>
 <span class="crumb-sep">–</span>
-<a href="https://dev.bestbrnd4u.com/catalog?gender=%D0%A7%D0%BE%D0%BB%D0%BE%D0%B2%D1%96%D0%BA%D0%B0%D0%BC&amp;category=%D0%9E%D0%BA%D1%83%D0%BB%D1%8F%D1%80%D0%B8%20%D1%96%20%D0%BE%D0%BF%D1%80%D0%B0%D0%B2%D0%B8">Окуляри і оправи</a>
+<a href="https://dev.bestbrnd4u.com/categories/okuliary-i-opravy/">Окуляри і оправи</a>
 <span class="crumb-sep">–</span>
-<a href="https://dev.bestbrnd4u.com/catalog?gender=%D0%A7%D0%BE%D0%BB%D0%BE%D0%B2%D1%96%D0%BA%D0%B0%D0%BC&amp;category=%D0%9E%D0%BA%D1%83%D0%BB%D1%8F%D1%80%D0%B8%20%D1%96%20%D0%BE%D0%BF%D1%80%D0%B0%D0%B2%D0%B8&amp;brand=Ray-Ban">Ray-Ban</a>
+<a href="https://dev.bestbrnd4u.com/brands/ray-ban/">Ray-Ban</a>
 <span class="crumb-sep">–</span>
 <span class="crumb-current">Сонцезахисні окуляри Ray-Ban RB3498</span>
 </div>
@@ -674,7 +677,7 @@ BestBrnd4u
      тож прев'ю в ній і картка на сайті рахуються однаково. -->
 <script src="/assets/js/image-framing.js?v=80b29a57"></script>
 <!-- Хлібні крихти: спільний будівник для сторінки й розмітки BreadcrumbList -->
-<script src="/assets/js/breadcrumbs.js?v=f8e67fc2"></script>
+<script src="/assets/js/breadcrumbs.js?v=7fc6182d"></script>
 <!-- Оформлення текстових блоків з адмінки (кольори, шрифт, кнопка) -->
 <script src="/assets/js/text-styles.js?v=7dc05c7d"></script>
 <!-- Згода на використання даних (банер + блокування вбудованого відео) -->
@@ -693,16 +696,16 @@ BestBrnd4u
 <!-- Підписка на листи магазину -->
 <script src="/assets/js/subscribe.js?v=2a90922b"></script>
 <script src="/assets/js/sync.js?v=48ef002e"></script>
-<script src="/assets/js/mega-menu.js?v=803d52cc"></script>
+<script src="/assets/js/mega-menu.js?v=7381e85d"></script>
 
-<script src="/assets/js/ui.js?v=50565c32"></script>
+<script src="/assets/js/ui.js?v=7d0cc8b9"></script>
 
 <script src="/assets/js/app.js?v=dc04bec0"></script>
 
 <script src="/assets/js/lightbox.js?v=552b0982"></script>
 
 <script src="/assets/js/live-stock.js?v=288763d6"></script>
-<script src="/assets/js/product.js?v=0db83599"></script>
+<script src="/assets/js/product.js?v=0d4470fa"></script>
 
 <!-- Відгуки: показ, форма й перевірка покупки на сервері -->
 <script src="/assets/js/reviews.js?v=23932989"></script>

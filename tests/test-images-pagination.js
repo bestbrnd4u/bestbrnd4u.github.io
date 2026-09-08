@@ -47,8 +47,15 @@ console.log("\n[2] Кілька розмірів одного фото");
   check("не-webp не отримує srcset", build("a.png") === null);
 
   check("srcset ставиться лише для відомих фото", ui.includes("known.has(src.split"));
+  // Порожній перелік — жодного srcset: інакше браузер просив би
+  // -300/-600 файли, яких немає, і фото стало б «битим».
+  //
+  // Перевірка саме на обгортці, а не на ранньому return: свотчі
+  // кольору теперь малюють фон у тій самій функції, і ЇМ порожній
+  // перелік не має заважати — вони просто беруть оригінал
+  // (див. tests/test-page-weight.js).
   check("невідоме фото лишається звичайним (не «битим»)",
-        /if \(!known\.size\) return;/.test(ui));
+        /if \(known\.size\) \{[\s\S]{0,500}buildSrcSet\(src\)/.test(ui));
 
   check("картка каталогу підключена", ui.includes('data-variant-sizes="(max-width: 768px) 50vw, 300px"'));
   const prod = fs.readFileSync(path.join(ROOT,"assets/js/product.js"),"utf8");

@@ -135,19 +135,19 @@
       "@type": "ListItem",
       "position": 4,
       "name": "Сумки",
-      "item": "https://dev.bestbrnd4u.com/catalog?gender=%D0%96%D1%96%D0%BD%D0%BA%D0%B0%D0%BC&department=%D0%A1%D1%83%D0%BC%D0%BA%D0%B8"
+      "item": "https://dev.bestbrnd4u.com/departments/sumky/"
     },
     {
       "@type": "ListItem",
       "position": 5,
       "name": "Жіночі сумки",
-      "item": "https://dev.bestbrnd4u.com/catalog?gender=%D0%96%D1%96%D0%BD%D0%BA%D0%B0%D0%BC&category=%D0%96%D1%96%D0%BD%D0%BE%D1%87%D1%96%20%D1%81%D1%83%D0%BC%D0%BA%D0%B8"
+      "item": "https://dev.bestbrnd4u.com/categories/zhinochi-sumky/"
     },
     {
       "@type": "ListItem",
       "position": 6,
       "name": "Coach",
-      "item": "https://dev.bestbrnd4u.com/catalog?gender=%D0%96%D1%96%D0%BD%D0%BA%D0%B0%D0%BC&category=%D0%96%D1%96%D0%BD%D0%BE%D1%87%D1%96%20%D1%81%D1%83%D0%BC%D0%BA%D0%B8&brand=Coach"
+      "item": "https://dev.bestbrnd4u.com/brands/coach/"
     },
     {
       "@type": "ListItem",
@@ -168,6 +168,9 @@ window.PRODUCT_ID = 58;
 // малює картку одразу, а каталог довантажує лише заради
 // «схожих» і «переглянутих» — і бере полегшений
 window.PRODUCT_DATA = {"gender":["Жінкам"],"preOrderDays":"5–10 робочих днів","color":"Чорний","forcePublish":false,"material":"Гладка натуральна шкіра","brand":"Coach","price":7100,"preOrder":false,"slug":"sumka-coach-soft-tabby-shoulder-bag-black","dimensions":"26 × 16,5 × 8,3 см","variants":[{"color":"Чорний","hex":"#000000","images":["/assets/images/products/uploads/1.1_5a5d6ea8-1bba-4803-951d-520a38d4aa66.webp?v=6d4fe10c","/assets/images/products/uploads/1.3_ce9bb568-0aad-4321-a7e0-b14d24c39654.webp?v=596df409","/assets/images/products/uploads/1.4_25460987-0b5f-4461-8974-b1763e92ae4a.webp?v=36867f76","/assets/images/products/uploads/1.6_e50f3e2f-9bc0-46c8-90db-1fbc061785eb.webp?v=21034b52","/assets/images/products/uploads/1.7_f4726ced-2357-4efe-8aac-fe254f85c889.webp?v=e56209d6"],"article":"58-1","stock":{"ONESIZE":1},"inStock":1},{"color":"Айворі","hex":"#e4ddda","sku":"C4823B4IY","sizes":["ONESIZE"],"images":["/assets/images/products/uploads/91993377994530.webp?v=af095389","/assets/images/products/uploads/26067173821878.webp?v=d40b8db1","/assets/images/products/uploads/49502081584862.webp?v=00237fe7","/assets/images/products/uploads/51655546705003.webp?v=1f4eeacf","/assets/images/products/uploads/56611343404440.webp?v=4ce87ec6"],"article":"58-2","stock":{"ONESIZE":1},"inStock":1}],"preOrderPrepayment":50,"strapInfo":"Ремінець знімний та регульований","sizes":["ONESIZE"],"splitByColor":true,"searchKeywords":["COACH","Coach Soft Tabby","Soft Tabby Shoulder Bag","Coach CAM98","CAM98","Coach сумка","сумка Coach","жіноча сумка Coach","Soft Tabby","Tabby Shoulder Bag","чорна сумка Coach","чорна шкіряна сумка","сумка з натуральної шкіри","шкіряна сумка","сумка на плече","сумка через плече","кросбоді","shoulder bag","брендова сумка","оригінальна Coach","коуч","коач"],"isNew":false,"title":"Сумка Coach Soft Tabby Shoulder Bag Black","images":["/assets/images/products/uploads/1.1_5a5d6ea8-1bba-4803-951d-520a38d4aa66.webp","/assets/images/products/uploads/1.3_ce9bb568-0aad-4321-a7e0-b14d24c39654.webp","/assets/images/products/uploads/1.4_25460987-0b5f-4461-8974-b1763e92ae4a.webp","/assets/images/products/uploads/1.6_e50f3e2f-9bc0-46c8-90db-1fbc061785eb.webp","/assets/images/products/uploads/1.7_f4726ced-2357-4efe-8aac-fe254f85c889.webp"],"reviews":0,"id":58,"instagramBlock":"general","description":"Елегантна сумка COACH Soft Tabby Shoulder Bag у класичному чорному кольорі. Модель переосмислює культовий силует Tabby 1970-х років у більш м'якому та розслабленому виконанні.\nСумка виготовлена з гладкої натуральної шкіри та доповнена фірмовою застібкою Signature. Усередині розташована кишеня на блискавці, зовні — додаткова кишеня на блискавці для зручного зберігання дрібниць.\nМодель має знімний ремінець, завдяки якому сумку можна носити в руці, на плечі або через плече","sku":"CAM98","rating":5,"category":"Жіночі сумки","legacySlugs":["сумка-coach-soft-tabby-shoulder-bag-black"],"framing":{"91993377994530.webp":{"zoom":1.38,"x":48,"y":52},"26067173821878.webp":{"zoom":1.66,"x":48,"y":52},"49502081584862.webp":{"zoom":1.43,"x":48,"y":51}},"article":"58","inStock":2};
+// адреси власних сторінок категорії, розділу й бренду — щоб
+// крихти після рендеру JS вели туди ж, куди в розмітці
+window.PRODUCT_TAXONOMY = {"category":{"Жіночі сумки":"categories/zhinochi-sumky/"},"department":{"Сумки":"departments/sumky/"},"brand":{"Coach":"brands/coach/"}};
 </script>
 
 
@@ -266,11 +269,11 @@ BestBrnd4u
 <span class="crumb-sep">–</span>
 <a href="https://dev.bestbrnd4u.com/catalog?gender=%D0%96%D1%96%D0%BD%D0%BA%D0%B0%D0%BC">Жінкам</a>
 <span class="crumb-sep">–</span>
-<a href="https://dev.bestbrnd4u.com/catalog?gender=%D0%96%D1%96%D0%BD%D0%BA%D0%B0%D0%BC&amp;department=%D0%A1%D1%83%D0%BC%D0%BA%D0%B8">Сумки</a>
+<a href="https://dev.bestbrnd4u.com/departments/sumky/">Сумки</a>
 <span class="crumb-sep">–</span>
-<a href="https://dev.bestbrnd4u.com/catalog?gender=%D0%96%D1%96%D0%BD%D0%BA%D0%B0%D0%BC&amp;category=%D0%96%D1%96%D0%BD%D0%BE%D1%87%D1%96%20%D1%81%D1%83%D0%BC%D0%BA%D0%B8">Жіночі сумки</a>
+<a href="https://dev.bestbrnd4u.com/categories/zhinochi-sumky/">Жіночі сумки</a>
 <span class="crumb-sep">–</span>
-<a href="https://dev.bestbrnd4u.com/catalog?gender=%D0%96%D1%96%D0%BD%D0%BA%D0%B0%D0%BC&amp;category=%D0%96%D1%96%D0%BD%D0%BE%D1%87%D1%96%20%D1%81%D1%83%D0%BC%D0%BA%D0%B8&amp;brand=Coach">Coach</a>
+<a href="https://dev.bestbrnd4u.com/brands/coach/">Coach</a>
 <span class="crumb-sep">–</span>
 <span class="crumb-current">Сумка Coach Soft Tabby Shoulder Bag Black</span>
 </div>
@@ -682,7 +685,7 @@ BestBrnd4u
      тож прев'ю в ній і картка на сайті рахуються однаково. -->
 <script src="/assets/js/image-framing.js?v=80b29a57"></script>
 <!-- Хлібні крихти: спільний будівник для сторінки й розмітки BreadcrumbList -->
-<script src="/assets/js/breadcrumbs.js?v=f8e67fc2"></script>
+<script src="/assets/js/breadcrumbs.js?v=7fc6182d"></script>
 <!-- Оформлення текстових блоків з адмінки (кольори, шрифт, кнопка) -->
 <script src="/assets/js/text-styles.js?v=7dc05c7d"></script>
 <!-- Згода на використання даних (банер + блокування вбудованого відео) -->
@@ -701,16 +704,16 @@ BestBrnd4u
 <!-- Підписка на листи магазину -->
 <script src="/assets/js/subscribe.js?v=2a90922b"></script>
 <script src="/assets/js/sync.js?v=48ef002e"></script>
-<script src="/assets/js/mega-menu.js?v=803d52cc"></script>
+<script src="/assets/js/mega-menu.js?v=7381e85d"></script>
 
-<script src="/assets/js/ui.js?v=50565c32"></script>
+<script src="/assets/js/ui.js?v=7d0cc8b9"></script>
 
 <script src="/assets/js/app.js?v=dc04bec0"></script>
 
 <script src="/assets/js/lightbox.js?v=552b0982"></script>
 
 <script src="/assets/js/live-stock.js?v=288763d6"></script>
-<script src="/assets/js/product.js?v=0db83599"></script>
+<script src="/assets/js/product.js?v=0d4470fa"></script>
 
 <!-- Відгуки: показ, форма й перевірка покупки на сервері -->
 <script src="/assets/js/reviews.js?v=23932989"></script>

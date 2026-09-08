@@ -46,6 +46,12 @@ const ROOT = path.join(__dirname, "..");
 const SRC = path.join(ROOT, "data", "legal.json");
 const PAGE = path.join(ROOT, "offer.html");
 
+const HOME_SRC = path.join(ROOT, "data", "home.json");
+const HOME_PAGE = path.join(ROOT, "index.html");
+
+// Адреса сайту потрібна в розмітці Organization абсолютною.
+const { SITE_URL } = require("./site-env");
+
 const MONTHS = [
     "січня", "лютого", "березня", "квітня", "травня", "червня",
     "липня", "серпня", "вересня", "жовтня", "листопада", "грудня"
@@ -143,6 +149,87 @@ function buildRequisites(legal) {
 //
 // node_modules і .git пропускаємо очевидно, а .claude — це робочі
 // копії репозиторію (git worktree), тобто ті самі файли вдруге.
+// Розмітка «хто ми» для головної.
+//
+// НАВІЩО SAMEAS
+// --------------
+// Google звʼязує сайт із соцпрофілями в один бренд саме через sameAs.
+// Без нього instagram.com/bestbrnd4u, t.me/bestbrnd4u і сам сайт для
+// пошуку — три непов'язані речі, і жоден сигнал довіри з профілів на
+// сайт не переходить. Профілі при цьому вже стоять у підвалі кожної
+// сторінки — лишалось назвати їх машині.
+//
+// ЧОМУ ЗВІДСИ, А НЕ РУКАМИ В index.html
+// --------------------------------------
+// Телефон і пошта в адмінці змінюються (див. пояснення про 149
+// сторінок вище). Розмітка з номером, якого вже немає на сайті, гірша
+// за відсутність розмітки: Google перевіряє збіг із видимим текстом.
+//
+// ПОРОЖНЄ ПОЛЕ = КЛЮЧА НЕМАЄ. Недописаний контакт у розмітці —
+// це «telephone": ""», а не «телефону немає».
+function organizationSchema(legal, home) {
+
+    const sameAs = [];
+
+    const instagram = String((home && home.instagram && home.instagram.link) || "").trim();
+
+    if (/^https?:\/\//.test(instagram)) sameAs.push(instagram);
+
+    const telegram = String((legal && legal.telegram) || "").trim().replace(/^@/, "");
+
+    if (telegram) sameAs.push(`https://t.me/${telegram}`);
+
+    const schema = {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        name: (legal && legal.sellerName) || "BestBrnd4u",
+        url: `${SITE_URL}/`,
+        logo: `${SITE_URL}/assets/images/favicon-512.png`
+    };
+
+    const email = String((legal && legal.email) || "").trim();
+    const phone = String((legal && legal.phone) || "").trim();
+
+    if (email) schema.email = email;
+    if (phone) schema.telephone = phone;
+    if (sameAs.length) schema.sameAs = sameAs;
+
+    return JSON.stringify(schema, null, 4);
+
+}
+
+// Заміна вмісту саме ЦЬОГО блоку — за id, а не за типом script:
+// на головній колись з'явиться друга розмітка, і пошук за
+// application/ld+json перезаписав би не те.
+const ORG_SLOT_RE = /(<script type="application\/ld\+json" id="organizationSchema">)([\s\S]*?)(<\/script>)/;
+
+function syncOrganization(legal, home) {
+
+    if (!fs.existsSync(HOME_PAGE)) {
+        console.warn("Немає index.html — розмітку Organization пропускаю");
+        return;
+    }
+
+    const html = fs.readFileSync(HOME_PAGE, "utf8");
+
+    if (!ORG_SLOT_RE.test(html)) {
+        throw new Error('У index.html немає <script id="organizationSchema"> — розмітку «хто ми» нема куди вставити');
+    }
+
+    const next = html.replace(ORG_SLOT_RE, (all, open, body, close) =>
+        `${open}\n${organizationSchema(legal, home)}\n${close}`);
+
+    if (next === html) {
+        console.log("Готово: розмітка Organization уже збігається з даними");
+        return;
+    }
+
+    fs.writeFileSync(HOME_PAGE, next, "utf8");
+
+    console.log("Готово: розмітку Organization на головній оновлено");
+
+}
+
 function htmlPages(dir, found) {
 
     const list = found || [];
@@ -240,8 +327,30 @@ function main() {
         ? `Готово: телефон оновлено на ${fixed} сторінках`
         : "Готово: телефон на сторінках уже збігається з data/legal.json");
 
+    // 4. Розмітка «хто ми» на головній
+    //
+    // Instagram беремо з data/home.json: посилання на профіль уже
+    // лежить там (адмінка → Головна → Instagram-блок), і другого поля
+    // для того самого профілю не потрібно.
+    let home = {};
+
+    if (fs.existsSync(HOME_SRC)) {
+
+        try {
+            home = JSON.parse(fs.readFileSync(HOME_SRC, "utf8")) || {};
+        } catch (error) {
+            console.warn("data/home.json не читається — Instagram у розмітці пропускаю");
+        }
+
+    }
+
+    syncOrganization(legal, home);
+
 }
 
 if (require.main === module) main();
 
-module.exports = { buildRequisites, formatDate, telHref, syncPhoneLinks, htmlPages };
+module.exports = {
+    buildRequisites, formatDate, telHref, syncPhoneLinks, htmlPages,
+    organizationSchema
+};

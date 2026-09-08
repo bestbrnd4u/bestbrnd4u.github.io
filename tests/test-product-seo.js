@@ -93,6 +93,23 @@ function seoSandbox() {
     window.eval(productJs.match(/function schemaSku\(product\) \{[\s\S]*?\n\}\n/)[0]
         .replace("function schemaSku(product) {", "window.schemaSku = function (product) {"));
     window.eval(productJs.match(/function markProductPageNotFound\(\) \{[\s\S]*?\n\}\n/)[0]);
+
+    // Розмітка доріжки тепер теж частина updateProductSeoMetadata.
+    //
+    // Раніше тут стояли три ланки, набрані руками, і вони ЗАТИРАЛИ
+    // повну доріжку, яку кладе генератор у статичну сторінку. Тепер
+    // обидві збирає спільний будівник (assets/js/breadcrumbs.js), тож
+    // піщаниця потребує і його.
+    window.Breadcrumbs = require("../assets/js/breadcrumbs.js");
+
+    // let на верхньому рівні product.js властивістю window не стає —
+    // та сама пастка, що з const вище. Мапа відділів довантажується
+    // асинхронно, і на момент виклику вона справді null.
+    window.departmentByCategory = null;
+
+    window.eval(productJs.match(/function taxonomyPageFor\(kind, name\) \{[\s\S]*?\n\}\n/)[0]);
+    window.eval(productJs.match(/function paintBreadcrumbSchema\(product, pageUrl, map\) \{[\s\S]*?\n\}\n/)[0]);
+
     window.eval(productJs.match(/function updateProductSeoMetadata\(product\) \{[\s\S]*?\n\n\}\n/)[0]);
 
     return window;
@@ -167,8 +184,37 @@ console.log("\n[3] Структуровані дані Product");
     check("offers.itemCondition проставлено", !!ld.offers.itemCondition, ld.offers.itemCondition);
 
     const bread = JSON.parse(w.document.getElementById("breadcrumbSchema").textContent);
-    check("хлібні крихти — 3 рівні", bread.itemListElement.length === 3);
-    check("останній рівень — сам товар", bread.itemListElement[2].name === product.title);
+
+    // ТУТ БУЛО «3 рівні» — і це була помилка, а не вимога.
+    //
+    // Рантайм писав Головна → Каталог → товар і затирав ПОВНУ доріжку,
+    // яку генератор кладе в статичну сторінку (Головна → Каталог →
+    // стать → відділ → категорія → бренд → товар). Google виконує JS,
+    // тож бачив коротку — і вся робота над доріжкою до розмітки не
+    // доходила.
+    //
+    // Тепер видиму доріжку й розмітку збирає той самий будівник
+    // (assets/js/breadcrumbs.js), тому перевіряємо не число ланок, а
+    // збіг із ним.
+    const trail = w.Breadcrumbs.buildTrail(product, { departmentOf: () => "" });
+
+    check("доріжка не заглушка з трьох ланок", bread.itemListElement.length > 3,
+        bread.itemListElement.length);
+
+    check("розмітка збігається з видимою доріжкою",
+        bread.itemListElement.map(i => i.name).join(" → ") === trail.map(c => c.label).join(" → "),
+        bread.itemListElement.map(i => i.name).join(" → "));
+
+    check("починається з головної", bread.itemListElement[0].name === "Головна");
+
+    check("останній рівень — сам товар",
+        bread.itemListElement[bread.itemListElement.length - 1].name === product.title);
+
+    // Позиції нумеруються з 1 без пропусків — інакше Search Console
+    // позначає це як невідповідність розмітки.
+    check("позиції нумеруються з 1 без пропусків",
+        bread.itemListElement.every((item, index) => item.position === index + 1),
+        bread.itemListElement.map(i => i.position).join(","));
 }
 
 console.log("\n[4] availability відповідає реальному стану");

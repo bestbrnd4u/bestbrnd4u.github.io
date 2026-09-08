@@ -115,6 +115,126 @@ document.addEventListener("change", event => {
 
 updateContactChannelNote();
 
+// -------------------------
+// Незавершене оформлення: щоб гостю було куди нагадати
+//
+// НАВІЩО
+// -------
+// Кошик авторизованого покупця лежить у базі, і про нього є
+// нагадування (scripts/remind-carts.js). Кошик ГОСТЯ живе тільки в
+// localStorage його браузера — нагадати нема куди, хоча гості
+// становлять більшість замовлень.
+//
+// Пошта гостя вперше з'являється саме тут. Людина заповнила її й не
+// натиснула кнопку — це найгарячіша втрата, яка в магазині буває.
+//
+// ЩО НАДСИЛАЄМО
+// --------------
+// Пошту й склад кошика. Ні імені, ні телефону, ні адреси доставки:
+// для листа «ви не завершили замовлення» вони не потрібні.
+//
+// ЛИШЕ ГОСТЯМ. Для авторизованого те саме зробить нагадування про
+// кошик — а два листи про один кошик гірше за жоден.
+//
+// КОЛИ. Коли людина ЗАКІНЧИЛА вводити пошту (blur), а не на кожну
+// натиснуту літеру: інакше ми надіслали б двадцять запитів і половину
+// з них — з недописаною адресою.
+// -------------------------
+
+let draftSent = "";
+let draftIsGuest = null;
+
+async function guestForDraft() {
+
+    if (draftIsGuest !== null) return draftIsGuest;
+
+    try {
+        draftIsGuest = typeof getCurrentUser === "function" ? !(await getCurrentUser()) : true;
+    } catch (error) {
+        // Не змогли спитати — вважаємо гостем. Помилка тут означала б
+        // мовчазну втрату можливості; повторний лист гість не отримає
+        // однаково (перевірка є і в базі: abandoned_checkouts не бере
+        // адрес, що є в auth.users).
+        draftIsGuest = true;
+    }
+
+    return draftIsGuest;
+
+}
+
+async function saveCheckoutDraft() {
+
+    const email = (document.getElementById("email")?.value || "").trim().toLowerCase();
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return;
+
+    const items = typeof getGroupedCartLines === "function" ? getGroupedCartLines() : [];
+
+    if (!items.length) return;
+
+    // Той самий кошик і та сама пошта — надсилати вдруге нічого.
+    const mark = `${email}|${items.map(l => `${l.id}:${l.color || ""}:${l.size || ""}:${l.qty}`).join(",")}`;
+
+    if (mark === draftSent) return;
+
+    if (!(await guestForDraft())) return;
+
+    if (typeof SUPABASE_URL === "undefined" || typeof SUPABASE_PUBLISHABLE_KEY === "undefined") return;
+
+    draftSent = mark;
+
+    try {
+
+        // keepalive: людина може закрити вкладку тієї ж миті — саме
+        // цей випадок ми й намагаємось не втратити.
+        await fetch(`${SUPABASE_URL}/functions/v1/telegram-order-bot`, {
+            method: "POST",
+            keepalive: true,
+            headers: {
+                "Content-Type": "application/json",
+                apikey: SUPABASE_PUBLISHABLE_KEY,
+                Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`
+            },
+            body: JSON.stringify({
+                site_action: "checkout-draft",
+                email,
+                items: items.map(line => ({
+                    product_id: line.id,
+                    color: line.color || "",
+                    size: line.size || "",
+                    qty: line.qty
+                }))
+            })
+        });
+
+    } catch (error) {
+
+        // Тиша навмисно: людина зараз оформлює замовлення, і
+        // повідомлення про збій допоміжної можливості їй тільки
+        // зашкодить. Наступний blur спробує ще раз.
+        draftSent = "";
+
+    }
+
+}
+
+document.getElementById("email")?.addEventListener("blur", saveCheckoutDraft);
+
+// І коли сторінку залишають, не виходячи з поля.
+//
+// Саме цей випадок ми й намагаємось не втратити: людина дописала
+// пошту й закрила вкладку. Події blur тоді може не бути зовсім.
+//
+// visibilitychange, а не beforeunload: на мобільних Safari й Chrome
+// beforeunload при закритті вкладки не спрацьовує, а перехід у
+// hidden — спрацьовує завжди. Повторний виклик нічого не коштує:
+// той самий кошик і пошта вдруге не надсилаються (draftSent).
+document.addEventListener("visibilitychange", () => {
+
+    if (document.visibilityState === "hidden") saveCheckoutDraft();
+
+});
+
 // Склад кошика для статистики.
 //
 // Один помічник на дві події: begin_checkout і purchase описують той

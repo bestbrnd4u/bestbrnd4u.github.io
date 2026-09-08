@@ -135,19 +135,19 @@
       "@type": "ListItem",
       "position": 4,
       "name": "Сумки",
-      "item": "https://dev.bestbrnd4u.com/catalog?gender=%D0%96%D1%96%D0%BD%D0%BA%D0%B0%D0%BC&department=%D0%A1%D1%83%D0%BC%D0%BA%D0%B8"
+      "item": "https://dev.bestbrnd4u.com/departments/sumky/"
     },
     {
       "@type": "ListItem",
       "position": 5,
       "name": "Жіночі сумки",
-      "item": "https://dev.bestbrnd4u.com/catalog?gender=%D0%96%D1%96%D0%BD%D0%BA%D0%B0%D0%BC&category=%D0%96%D1%96%D0%BD%D0%BE%D1%87%D1%96%20%D1%81%D1%83%D0%BC%D0%BA%D0%B8"
+      "item": "https://dev.bestbrnd4u.com/categories/zhinochi-sumky/"
     },
     {
       "@type": "ListItem",
       "position": 6,
       "name": "Marc Jacobs",
-      "item": "https://dev.bestbrnd4u.com/catalog?gender=%D0%96%D1%96%D0%BD%D0%BA%D0%B0%D0%BC&category=%D0%96%D1%96%D0%BD%D0%BE%D1%87%D1%96%20%D1%81%D1%83%D0%BC%D0%BA%D0%B8&brand=Marc%20Jacobs"
+      "item": "https://dev.bestbrnd4u.com/brands/marc-jacobs/"
     },
     {
       "@type": "ListItem",
@@ -168,6 +168,9 @@ window.PRODUCT_ID = 53;
 // малює картку одразу, а каталог довантажує лише заради
 // «схожих» і «переглянутих» — і бере полегшений
 window.PRODUCT_DATA = {"gender":["Жінкам"],"preOrderDays":"5–10 робочих днів","color":"Молочний","forcePublish":false,"material":"Натуральна шкіра","brand":"Marc Jacobs","price":9800,"preOrder":false,"slug":"sumka-marc-jacobs-the-leather-cargo-bag-cotton-silver","dimensions":"22 × 12 × 7 см","variants":[{"color":"Молочний","hex":"#fafafa","images":["/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-4a08b27e.webp?v=02bd32c1","/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-d6f46dd3.webp?v=641d718b","/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-def1e99f.webp?v=d34aac37","/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-c1370464.webp?v=29b67e21","/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-28c7d0f9.webp?v=d0cdb879"],"article":"53-1","stock":{"ONESIZE":1},"inStock":1}],"preOrderPrepayment":50,"strapInfo":"2 знімні ремені — шкіряний та текстильний регульований","sortOrder":12,"sizes":["ONESIZE"],"searchKeywords":["Marc Jacobs","The Leather Cargo Bag","Marc Jacobs Cargo Bag","Marc Jacobs 2S4HSH085H02","2S4HSH085H02-140","Marc Jacobs сумка","сумка Marc Jacobs","жіноча сумка Marc Jacobs","Cargo Bag","cargo сумка","шкіряна сумка","сумка з натуральної шкіри","молочна сумка","біла сумка","Cotton Silver","срібляста фурнітура","сумка через плече","сумка на плече","кросбоді","брендова сумка","оригінальна Marc Jacobs","марк джейкобс","марк якобс","mj"],"isNew":false,"title":"Сумка Marc Jacobs The Leather Cargo Bag Cotton Silver","images":["/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-4a08b27e.webp","/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-d6f46dd3.webp","/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-def1e99f.webp","/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-c1370464.webp","/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-cotton-28c7d0f9.webp"],"reviews":0,"id":53,"instagramBlock":"general","description":"Стильна та функціональна сумка Marc Jacobs The Leather Cargo Bag у відтінку Cotton/Silver — модель із виразним дизайном у стилі cargo та практичною системою кишень.\nСумка виготовлена з натуральної зернистої шкіри та доповнена сріблястою фурнітурою. На передній частині розташовані дві накладні кишені з клапанами, з боків — кишені на блискавці. Основне відділення закривається на блискавку.\nМодель має два знімні ремені: шкіряний ремінь для носіння на плечі та широкий регульований текстильний ремінь із логотипом. Завдяки цьому сумку можна носити на плечі або через плече","sku":"2S4HSH085H02-140","rating":5,"category":"Жіночі сумки","legacySlugs":["сумка-marc-jacobs-the-leather-cargo-bag-cotton-silver"],"article":"53","inStock":1};
+// адреси власних сторінок категорії, розділу й бренду — щоб
+// крихти після рендеру JS вели туди ж, куди в розмітці
+window.PRODUCT_TAXONOMY = {"category":{"Жіночі сумки":"categories/zhinochi-sumky/"},"department":{"Сумки":"departments/sumky/"},"brand":{"Marc Jacobs":"brands/marc-jacobs/"}};
 </script>
 
 
@@ -266,11 +269,11 @@ BestBrnd4u
 <span class="crumb-sep">–</span>
 <a href="https://dev.bestbrnd4u.com/catalog?gender=%D0%96%D1%96%D0%BD%D0%BA%D0%B0%D0%BC">Жінкам</a>
 <span class="crumb-sep">–</span>
-<a href="https://dev.bestbrnd4u.com/catalog?gender=%D0%96%D1%96%D0%BD%D0%BA%D0%B0%D0%BC&amp;department=%D0%A1%D1%83%D0%BC%D0%BA%D0%B8">Сумки</a>
+<a href="https://dev.bestbrnd4u.com/departments/sumky/">Сумки</a>
 <span class="crumb-sep">–</span>
-<a href="https://dev.bestbrnd4u.com/catalog?gender=%D0%96%D1%96%D0%BD%D0%BA%D0%B0%D0%BC&amp;category=%D0%96%D1%96%D0%BD%D0%BE%D1%87%D1%96%20%D1%81%D1%83%D0%BC%D0%BA%D0%B8">Жіночі сумки</a>
+<a href="https://dev.bestbrnd4u.com/categories/zhinochi-sumky/">Жіночі сумки</a>
 <span class="crumb-sep">–</span>
-<a href="https://dev.bestbrnd4u.com/catalog?gender=%D0%96%D1%96%D0%BD%D0%BA%D0%B0%D0%BC&amp;category=%D0%96%D1%96%D0%BD%D0%BE%D1%87%D1%96%20%D1%81%D1%83%D0%BC%D0%BA%D0%B8&amp;brand=Marc%20Jacobs">Marc Jacobs</a>
+<a href="https://dev.bestbrnd4u.com/brands/marc-jacobs/">Marc Jacobs</a>
 <span class="crumb-sep">–</span>
 <span class="crumb-current">Сумка Marc Jacobs The Leather Cargo Bag Cotton Silver</span>
 </div>
@@ -682,7 +685,7 @@ BestBrnd4u
      тож прев'ю в ній і картка на сайті рахуються однаково. -->
 <script src="/assets/js/image-framing.js?v=80b29a57"></script>
 <!-- Хлібні крихти: спільний будівник для сторінки й розмітки BreadcrumbList -->
-<script src="/assets/js/breadcrumbs.js?v=f8e67fc2"></script>
+<script src="/assets/js/breadcrumbs.js?v=7fc6182d"></script>
 <!-- Оформлення текстових блоків з адмінки (кольори, шрифт, кнопка) -->
 <script src="/assets/js/text-styles.js?v=7dc05c7d"></script>
 <!-- Згода на використання даних (банер + блокування вбудованого відео) -->
@@ -701,16 +704,16 @@ BestBrnd4u
 <!-- Підписка на листи магазину -->
 <script src="/assets/js/subscribe.js?v=2a90922b"></script>
 <script src="/assets/js/sync.js?v=48ef002e"></script>
-<script src="/assets/js/mega-menu.js?v=803d52cc"></script>
+<script src="/assets/js/mega-menu.js?v=7381e85d"></script>
 
-<script src="/assets/js/ui.js?v=50565c32"></script>
+<script src="/assets/js/ui.js?v=7d0cc8b9"></script>
 
 <script src="/assets/js/app.js?v=dc04bec0"></script>
 
 <script src="/assets/js/lightbox.js?v=552b0982"></script>
 
 <script src="/assets/js/live-stock.js?v=288763d6"></script>
-<script src="/assets/js/product.js?v=0db83599"></script>
+<script src="/assets/js/product.js?v=0d4470fa"></script>
 
 <!-- Відгуки: показ, форма й перевірка покупки на сервері -->
 <script src="/assets/js/reviews.js?v=23932989"></script>

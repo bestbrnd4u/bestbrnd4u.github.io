@@ -37,14 +37,23 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"></script>
 
-<script type="application/ld+json">
+<!-- Хто ми — для Google. Наповнює scripts/build-legal.js із
+     data/legal.json (пошта, телефон, Telegram) і data/home.json
+     (Instagram), тож у розмітці не може стояти номер, якого вже
+     немає на сайті. Руками тут правити нічого. -->
+<script type="application/ld+json" id="organizationSchema">
 {
     "@context": "https://schema.org",
     "@type": "Organization",
     "name": "BestBrnd4u",
     "url": "https://dev.bestbrnd4u.com/",
     "logo": "https://dev.bestbrnd4u.com/assets/images/favicon-512.png",
-    "email": "bestbrnd4u@proton.me"
+    "email": "bestbrnd4u@proton.me",
+    "telephone": "+380 73 728 82 91",
+    "sameAs": [
+        "https://www.instagram.com/bestbrnd4u",
+        "https://t.me/bestbrnd4u"
+    ]
 }
 </script>
 
@@ -555,7 +564,7 @@
      тож прев'ю в ній і картка на сайті рахуються однаково. -->
 <script src="assets/js/image-framing.js?v=80b29a57"></script>
 <!-- Хлібні крихти: спільний будівник для сторінки й розмітки BreadcrumbList -->
-<script src="assets/js/breadcrumbs.js?v=f8e67fc2"></script>
+<script src="assets/js/breadcrumbs.js?v=7fc6182d"></script>
 <!-- Оформлення текстових блоків з адмінки (кольори, шрифт, кнопка) -->
 <script src="assets/js/text-styles.js?v=7dc05c7d"></script>
 <!-- Згода на використання даних (банер + блокування вбудованого відео) -->
@@ -570,8 +579,8 @@
 <script src="assets/js/subscribe.js?v=2a90922b"></script>
 <script src="assets/js/promo-popup.js?v=2317f6f3"></script>
 <script src="assets/js/sync.js?v=48ef002e"></script>
-<script src="assets/js/mega-menu.js?v=803d52cc"></script>
-<script src="assets/js/ui.js?v=50565c32"></script>
+<script src="assets/js/mega-menu.js?v=7381e85d"></script>
+<script src="assets/js/ui.js?v=7d0cc8b9"></script>
 <script src="assets/js/products.js?v=10fc9a51"></script>
 <script src="assets/js/app.js?v=dc04bec0"></script>
 

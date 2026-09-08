@@ -41,6 +41,22 @@ function installBrowserStubs(window) {
         window.showToast = () => {};
     }
 
+    // «Коли браузер звільниться». У jsdom цього немає, у браузерах є.
+    //
+    // Через нього меню шапки відкладає завантаження каталогу (42 КБ по
+    // дроту на КОЖНІЙ сторінці) — щоб той не змагався за мережу з
+    // фото товару. Без заглушки код пішов би запасним шляхом із
+    // setTimeout на секунду, і тест мусив би чекати на нього дарма.
+    //
+    // Викликаємо на наступному такті: саме так поводиться браузер,
+    // якому нічого більше робити.
+    if (typeof window.requestIdleCallback !== "function") {
+        window.requestIdleCallback = callback => setTimeout(() => callback({
+            didTimeout: false,
+            timeRemaining: () => 50
+        }), 0);
+    }
+
     return window;
 
 }

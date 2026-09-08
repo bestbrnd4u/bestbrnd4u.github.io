@@ -135,19 +135,19 @@
       "@type": "ListItem",
       "position": 4,
       "name": "Сумки",
-      "item": "https://dev.bestbrnd4u.com/catalog?gender=%D0%96%D1%96%D0%BD%D0%BA%D0%B0%D0%BC&department=%D0%A1%D1%83%D0%BC%D0%BA%D0%B8"
+      "item": "https://dev.bestbrnd4u.com/departments/sumky/"
     },
     {
       "@type": "ListItem",
       "position": 5,
       "name": "Жіночі сумки",
-      "item": "https://dev.bestbrnd4u.com/catalog?gender=%D0%96%D1%96%D0%BD%D0%BA%D0%B0%D0%BC&category=%D0%96%D1%96%D0%BD%D0%BE%D1%87%D1%96%20%D1%81%D1%83%D0%BC%D0%BA%D0%B8"
+      "item": "https://dev.bestbrnd4u.com/categories/zhinochi-sumky/"
     },
     {
       "@type": "ListItem",
       "position": 6,
       "name": "Coach",
-      "item": "https://dev.bestbrnd4u.com/catalog?gender=%D0%96%D1%96%D0%BD%D0%BA%D0%B0%D0%BC&category=%D0%96%D1%96%D0%BD%D0%BE%D1%87%D1%96%20%D1%81%D1%83%D0%BC%D0%BA%D0%B8&brand=Coach"
+      "item": "https://dev.bestbrnd4u.com/brands/coach/"
     },
     {
       "@type": "ListItem",
@@ -168,6 +168,9 @@ window.PRODUCT_ID = 48;
 // малює картку одразу, а каталог довантажує лише заради
 // «схожих» і «переглянутих» — і бере полегшений
 window.PRODUCT_DATA = {"gender":["Жінкам"],"preOrderDays":"5–10 робочих днів","forcePublish":false,"material":"Фірмовий покритий канвас та гладка шкіра","brand":"Coach","price":6500,"preOrder":false,"dimensions":"22 × 16 × 7 см","variants":[{"color":"Білий комбінований","hex":"#ddd8d1","images":["/assets/images/products/uploads/ca148_imrfi_a0.webp?v=d1b3c19c","/assets/images/products/uploads/ca148_imrfi_a3.webp?v=cd9818e1","/assets/images/products/uploads/ca148_imrfi_a8.webp?v=58e960a6","/assets/images/products/uploads/ca148_imrfi_a92.webp?v=b0363e66","/assets/images/products/uploads/ca148_imrfi_a91.webp?v=c712064b"],"article":"48-1","stock":{"ONESIZE":1},"inStock":1}],"preOrderPrepayment":50,"strapInfo":"Регульований, знімний","sizes":["ONESIZE"],"searchKeywords":["COACH","Coach Klare","Klare Crossbody Bag","Coach CA148","Coach Signature Canvas","Coach сумка","сумка Coach","жіноча сумка Coach","Coach кросбоді","сумка через плече","сумка на плече","кросбоді Coach","Signature Canvas","сумка з логотипом","бежева сумка","світла сумка","біла сумка","брендова сумка","оригінальна Coach","жіноча кросбоді","маленька сумка","коуч","коач"],"isNew":false,"title":"Сумка Coach Klare Crossbody Bag In Blocked Signature Canvas","reviews":0,"instagramBlock":"general","description":"Стильна сумка COACH Klare Crossbody Bag у фірмовому принті Signature Canvas з контрастними відтінками Gold, Chalk та Glacier White. Елегантний структурований дизайн, золотиста фурнітура та впізнаваний логотип COACH роблять модель універсальним доповненням до повсякденних і більш святкових образів.\nСумка виготовлена з фірмового покритого канвасу та гладкої шкіри. Має основне відділення, внутрішню кишеню на блискавці, багатофункціональні кишені та зовнішню кишеню. Закривається на зручну застібку.\nРегульований ремінець можна носити коротко або довше на плечі, а також через плече.","sku":"CA148","rating":5,"category":"Жіночі сумки","slug":"sumka-coach-klare-crossbody-bag-in-blocked-signature-canvas","id":48,"color":"Білий комбінований","images":["/assets/images/products/uploads/ca148_imrfi_a0.webp","/assets/images/products/uploads/ca148_imrfi_a3.webp","/assets/images/products/uploads/ca148_imrfi_a8.webp","/assets/images/products/uploads/ca148_imrfi_a92.webp","/assets/images/products/uploads/ca148_imrfi_a91.webp"],"legacySlugs":["сумка-coach-klare-crossbody-bag-in-blocked-signature-canvas"],"framing":{"ca148_imrfi_a0.webp":{"zoom":1.58,"x":47,"y":64},"ca148_imrfi_a3.webp":{"zoom":1.93,"x":49,"y":64},"ca148_imrfi_a8.webp":{"zoom":1.38,"x":48,"y":52}},"article":"48","inStock":1};
+// адреси власних сторінок категорії, розділу й бренду — щоб
+// крихти після рендеру JS вели туди ж, куди в розмітці
+window.PRODUCT_TAXONOMY = {"category":{"Жіночі сумки":"categories/zhinochi-sumky/"},"department":{"Сумки":"departments/sumky/"},"brand":{"Coach":"brands/coach/"}};
 </script>
 
 
@@ -266,11 +269,11 @@ BestBrnd4u
 <span class="crumb-sep">–</span>
 <a href="https://dev.bestbrnd4u.com/catalog?gender=%D0%96%D1%96%D0%BD%D0%BA%D0%B0%D0%BC">Жінкам</a>
 <span class="crumb-sep">–</span>
-<a href="https://dev.bestbrnd4u.com/catalog?gender=%D0%96%D1%96%D0%BD%D0%BA%D0%B0%D0%BC&amp;department=%D0%A1%D1%83%D0%BC%D0%BA%D0%B8">Сумки</a>
+<a href="https://dev.bestbrnd4u.com/departments/sumky/">Сумки</a>
 <span class="crumb-sep">–</span>
-<a href="https://dev.bestbrnd4u.com/catalog?gender=%D0%96%D1%96%D0%BD%D0%BA%D0%B0%D0%BC&amp;category=%D0%96%D1%96%D0%BD%D0%BE%D1%87%D1%96%20%D1%81%D1%83%D0%BC%D0%BA%D0%B8">Жіночі сумки</a>
+<a href="https://dev.bestbrnd4u.com/categories/zhinochi-sumky/">Жіночі сумки</a>
 <span class="crumb-sep">–</span>
-<a href="https://dev.bestbrnd4u.com/catalog?gender=%D0%96%D1%96%D0%BD%D0%BA%D0%B0%D0%BC&amp;category=%D0%96%D1%96%D0%BD%D0%BE%D1%87%D1%96%20%D1%81%D1%83%D0%BC%D0%BA%D0%B8&amp;brand=Coach">Coach</a>
+<a href="https://dev.bestbrnd4u.com/brands/coach/">Coach</a>
 <span class="crumb-sep">–</span>
 <span class="crumb-current">Сумка Coach Klare Crossbody Bag In Blocked Signature Canvas</span>
 </div>
@@ -685,7 +688,7 @@ BestBrnd4u
      тож прев'ю в ній і картка на сайті рахуються однаково. -->
 <script src="/assets/js/image-framing.js?v=80b29a57"></script>
 <!-- Хлібні крихти: спільний будівник для сторінки й розмітки BreadcrumbList -->
-<script src="/assets/js/breadcrumbs.js?v=f8e67fc2"></script>
+<script src="/assets/js/breadcrumbs.js?v=7fc6182d"></script>
 <!-- Оформлення текстових блоків з адмінки (кольори, шрифт, кнопка) -->
 <script src="/assets/js/text-styles.js?v=7dc05c7d"></script>
 <!-- Згода на використання даних (банер + блокування вбудованого відео) -->
@@ -704,16 +707,16 @@ BestBrnd4u
 <!-- Підписка на листи магазину -->
 <script src="/assets/js/subscribe.js?v=2a90922b"></script>
 <script src="/assets/js/sync.js?v=48ef002e"></script>
-<script src="/assets/js/mega-menu.js?v=803d52cc"></script>
+<script src="/assets/js/mega-menu.js?v=7381e85d"></script>
 
-<script src="/assets/js/ui.js?v=50565c32"></script>
+<script src="/assets/js/ui.js?v=7d0cc8b9"></script>
 
 <script src="/assets/js/app.js?v=dc04bec0"></script>
 
 <script src="/assets/js/lightbox.js?v=552b0982"></script>
 
 <script src="/assets/js/live-stock.js?v=288763d6"></script>
-<script src="/assets/js/product.js?v=0db83599"></script>
+<script src="/assets/js/product.js?v=0d4470fa"></script>
 
 <!-- Відгуки: показ, форма й перевірка покупки на сервері -->
 <script src="/assets/js/reviews.js?v=23932989"></script>
