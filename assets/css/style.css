@@ -2266,72 +2266,46 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
     margin-bottom:48px;
 }
 
-.newsletter-form{
-    display:flex;
-    justify-content:center;
-    align-items:flex-end;
-    gap:24px;
-    max-width:560px;
+/* Форма підписки в смузі.
+
+   .subscribe писалась під вузьку колонку футера — 320 пікселів і
+   ліворуч. Тут вона по центру широкої смуги, тож ширина інша, а
+   поля — світлі на кольоровому тлі.
+
+   Підпис поля лишається в розмітці (читалка екрана мусить знати,
+   що це за поле), але не показується: видимим заголовком служить
+   <h2> смуги, і два однакові рядки поспіль виглядали б помилкою.
+   Саме тому це clip, а не display:none — прихований display
+   читалки теж не читають. */
+.newsletter .subscribe{
+    max-width:460px;
     margin:0 auto;
+    text-align:left;
 }
 
-.newsletter-form input{
-    flex:1;
-    background:transparent;
-    border:none;
-    border-bottom:1.5px solid rgba(255,255,255,.3);
-    border-radius:0;
-    padding:12px 4px;
-    font-size:17px;
+.newsletter .subscribe-label{
+    position:absolute;
+    width:1px;
+    height:1px;
+    margin:-1px;
+    padding:0;
+    overflow:hidden;
+    clip:rect(0 0 0 0);
+    clip-path:inset(50%);
+    white-space:nowrap;
+    border:0;
+}
+
+.newsletter .subscribe-consent{
+    color:rgba(255,255,255,.7);
+}
+
+.newsletter .subscribe-consent a{
     color:#fff;
-    transition:border-bottom-color 250ms ease;
 }
 
-.newsletter-form input::placeholder{
-    color:rgba(255,255,255,.45);
-}
-
-.newsletter-form input:focus{
-    outline:none;
-    border-bottom-color:#fff;
-}
-
-.newsletter-form .btn{
-    flex-shrink:0;
-    background:#fff;
-    color:var(--primary);
-    padding:16px 38px;
-    font-size:13px;
-    text-transform:uppercase;
-    letter-spacing:1.5px;
-    box-shadow:none;
-}
-
-@media (hover:hover) and (pointer:fine){
-.newsletter-form .btn:hover{
-    background:var(--secondary);
-    color:#fff;
-    transform:translateY(-2px);
-}
-}
-
-.newsletter-form .btn:disabled{
-    opacity:.65;
-    cursor:not-allowed;
-    transform:none;
-}
-
-.newsletter-form input.has-error{
-    border-bottom-color:#ff9b9b;
-    animation:newsletterShake .3s;
-}
-
-@keyframes newsletterShake{
-    0%,100%{ transform:translateX(0); }
-    25%{ transform:translateX(-6px); }
-    75%{ transform:translateX(6px); }
-}
-
+/* Підпис під формою вже не «висить у повітрі»: тепер над ним є
+   форма, до якої він і належав. */
 .newsletter small{
     display:block;
     margin-top:28px;
@@ -2342,17 +2316,25 @@ nav li.has-mega:hover .mega-menu.mega-menu-columns{
 
 @media(max-width:600px){
 
-    .newsletter-form{
-        flex-direction:column;
-        align-items:stretch;
-        gap:20px;
+    /* 44 px — розмір під широку смугу десктопа, де заголовок
+       вкладається в один рядок. На телефоні він розповзався на два
+       й забирав пів висоти смуги, а форма під ним виглядала
+       дрібницею. */
+    .newsletter{
+        padding:38px 0;
     }
 
-    .newsletter-form .btn{
-        width:100%;
+    .newsletter h2{
+        font-size:26px;
+        margin-bottom:22px;
+    }
+
+    .newsletter small{
+        margin-top:20px;
     }
 
 }
+
 
 /* =====================================
    FOOTER
@@ -7186,15 +7168,24 @@ body.mobile-filters-open .scroll-top{
        а зайве прокручується пальцем усередині самої картки. */
     .product-card .product-options{
         gap:8px;
-        margin-bottom:10px;
-        /* Кільце активного кольору (box-shadow) виходить за межі
-           самого кружечка, а контейнер прокрутки обрізав його —
-           перший колір виглядав "зрізаним" зліва. Padding дає
-           кільцю місце, а від'ємний margin повертає рядок на
-           попереднє місце, щоб нічого не з'їхало. */
-        padding:0 3px;
+        /* Кільце активного кольору (box-shadow 0 0 0 2px) виходить
+           за межі самого кружечка, а контейнер прокрутки його
+           обрізав.
+
+           Спершу тут стояв padding:0 3px — і це вилікувало лише
+           горизонталь. По вертикалі рядок був заввишки РІВНО як
+           кружечок (16 px), а overflow-y:hidden зрізав кільце
+           згори й знизу точно на його товщину: колір виглядав
+           приплюснутим.
+
+           Тепер запас з усіх боків, а від'ємні margin повертають
+           рядок на попереднє місце. Нижній відступ через це 7, а
+           не 10: 7 + 3 (padding) = та сама відстань до ціни. */
+        padding:3px;
+        margin-top:-3px;
         margin-left:-3px;
         margin-right:-3px;
+        margin-bottom:7px;
         flex-wrap:nowrap;
         overflow-x:auto;
         overflow-y:hidden;

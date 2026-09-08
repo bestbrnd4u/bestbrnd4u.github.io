@@ -2449,7 +2449,15 @@ async function handleSubscribe(request: Request, body: Record<string, any>): Pro
 
     }
 
-    return adminJson({ ok: true, already: verdict.already === true }, 200, origin);
+    // state каже, ЩО саме сталося: нову пошту додали, чи вона вже
+    // була в списку, і чи підтверджена підписка. Без цього сторінка
+    // обіцяла лист підтвердження навіть тому, хто підписався давно
+    // (див. пояснення в subscribe.js).
+    return adminJson({
+      ok: true,
+      already: verdict.already === true,
+      state: verdict.state ?? "new",
+    }, 200, origin);
 
   } catch (error) {
 

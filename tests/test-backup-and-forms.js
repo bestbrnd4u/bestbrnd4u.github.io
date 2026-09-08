@@ -170,7 +170,7 @@ console.log("\n[3] Підписка на листи");
 {
     const sub = loadModule("supabase/functions/telegram-order-bot/subscribe.js", [
         "SUBSCRIBE_LIMITS", "cleanEmail", "cleanSubscriber",
-        "subscribeRequest", "subscribeVerdict",
+        "subscribeRequest", "subscribeVerdict", "subscriberStatus",
     ]);
 
     const pageJs = read("assets/js/subscribe.js");
@@ -306,11 +306,62 @@ console.log("\n[3] Підписка на листи");
     check("без групи поля немає",
         !("groups" in sub.subscribeRequest("KEY", { email: "a@b.co" }).body));
 
-    // «Уже підписаний» — не помилка для людини.
+    // РІЗНИЦЯ МІЖ 200 І 201 — головне в цьому розборі.
+    //
+    // Документація MailerLite (POST /api/subscribers): 201 — підписника
+    // створено, 200 — пошта вже була в списку. Раніше обидва коди
+    // вважались просто успіхом, тож людина, підписана давно, читала
+    // «перевірте пошту, там лист із підтвердженням» — а листа їй не
+    // надсилали. Прапорець «уже в списку» ставився лише на 422, якого
+    // MailerLite у цьому випадку не віддає.
+    check("201 — нова пошта",
+        sub.subscribeVerdict(201, { data: { status: "unconfirmed" } }).state === "new");
+
+    check("200 — уже в списку, а не нова",
+        sub.subscribeVerdict(200, { data: { status: "active" } }).already === true);
+
+    check("200 + active — підтверджений",
+        sub.subscribeVerdict(200, { data: { status: "active" } }).state === "active");
+
+    // Найважливіший стан: у списку є, але підтвердження не натиснуто,
+    // і саме тому листів немає. Без цього людина не знає, що робити.
+    check("200 + unconfirmed — підписку не підтверджено",
+        sub.subscribeVerdict(200, { data: { status: "unconfirmed" } }).state === "unconfirmed");
+
+    check("200 + unsubscribed — підтвердження піде заново",
+        sub.subscribeVerdict(200, { data: { status: "unsubscribed" } }).state === "again");
+
+    check("200 без стану — просто «вже в списку»",
+        sub.subscribeVerdict(200, {}).state === "already");
+
+    // Стан читається і з плоскої відповіді, і з вкладеної в data.
+    check("стан читається з обох виглядів відповіді",
+        sub.subscriberStatus({ status: "active" }) === "active"
+        && sub.subscriberStatus({ data: { status: "ACTIVE" } }) === "active"
+        && sub.subscriberStatus(null) === "");
+
+    // 422 лишається успіхом для людини, але стану ми там не знаємо —
+    // і не вигадуємо його.
     check("уже в списку — це успіх",
         sub.subscribeVerdict(422, { message: "already exists" }).ok === true);
 
-    check("201 — успіх", sub.subscribeVerdict(201, {}).ok === true);
+    check("422 не вдає підтверджену підписку",
+        sub.subscribeVerdict(422, { message: "already exists" }).state === "already");
+
+    check("погана пошта — не успіх",
+        sub.subscribeVerdict(422, { message: "invalid email" }).ok === false);
+
+    // Стан мусить доїхати до сторінки, інакше вона знову казатиме
+    // одне й те саме всім.
+    check("маршрут віддає стан сторінці", /state: verdict\.state/.test(indexTs));
+
+    check("сторінка розрізняє стани",
+        /function subscribeMessage/.test(pageJs)
+        && /state === "unconfirmed"/.test(pageJs)
+        && /state === "active"/.test(pageJs));
+
+    check("про непідтверджену підписку сказано прямо",
+        /не підтверджено/.test(pageJs) && /Спам/.test(pageJs));
 
     check("недійсний ключ розпізнається",
         /недійсний/.test(sub.subscribeVerdict(401, {}).reason));
@@ -331,6 +382,74 @@ console.log("\n[3] Підписка на листи");
     // Людина мусить знати про лист підтвердження.
     check("сказано про лист підтвердження",
         /лист із підтвердженням/.test(pageJs));
+}
+
+console.log("\n[3b] Форма підписки — у смузі, а не в порожньому тримачі");
+{
+    // ЩО БУЛО НЕ ТАК. У <section class="newsletter"> лежав
+    // <div class="ml-embedded" data-form="…"> — тримач вбудованої
+    // форми MailerLite, чий скрипт із сайту прибрали. Виходило:
+    //
+    //   • на головній — порожня смуга кольору бренду на пів екрана;
+    //   • на решті — самотній підпис «Жодного спаму» без форми;
+    //   • сама форма тулилась четвертою колонкою футера, під
+    //     годинами роботи, де її майже не видно.
+    //
+    // Тобто найпомітніше місце займав порожній div.
+    const pages = fs.readdirSync(ROOT).filter(f => f.endsWith(".html"));
+
+    const dead = pages.filter(f => /data-form=/.test(read(f)));
+
+    check("порожнього тримача MailerLite більше немає", dead.length === 0,
+        dead.join(", "));
+
+    const withBand = pages.filter(f => /<section class="newsletter">/.test(read(f)));
+
+    check(`сторінок зі смугою: ${withBand.length}`, withBand.length >= 6);
+
+    // У смузі мусить бути САМА форма, інакше смуга знову порожня.
+    const emptyBand = withBand.filter(f => {
+        const band = (read(f).match(/<section class="newsletter">[\s\S]*?<\/section>/) || [""])[0];
+        return !band.includes("id=\"subscribeForm\"");
+    });
+
+    check("жодна смуга не порожня", emptyBand.length === 0, emptyBand.join(", "));
+
+    // Рівно одна форма на сторінку: subscribe.js бере її через
+    // getElementById, тож друга була б мертвою.
+    const doubled = pages.filter(f => (read(f).match(/id="subscribeForm"/g) || []).length > 1);
+
+    check("форма на сторінці одна", doubled.length === 0, doubled.join(", "));
+
+    // Заголовок смуги замінює видимий підпис поля, але сам підпис
+    // лишається в розмітці — інакше читалка екрана не скаже, що це
+    // за поле. Тому він ховається через clip, а не display:none:
+    // прихований display читалки теж не читають.
+    const css = read("assets/css/style.css");
+
+    check("підпис поля лишився в розмітці",
+        withBand.every(f => read(f).includes("class=\"subscribe-label\"")));
+
+    check("у смузі підпис прихований, але доступний",
+        /\.newsletter \.subscribe-label\{[^}]*clip-path:inset\(50%\)/.test(css)
+        && !/\.newsletter \.subscribe-label\{[^}]*display:none/.test(css));
+
+    // Мертвий клас .newsletter-form: стилі форми, якої на сайті не
+    // було ні на одній сторінці.
+    check("мертвий .newsletter-form прибрано", !css.includes("newsletter-form"));
+
+    // На сторінках без смуги форма лишається у футері — велика
+    // рекламна смуга посеред оформлення замовлення відвертає від
+    // покупки. Але форма мусить бути ХОЧ ДЕСЬ.
+    const withoutForm = pages.filter(f => !read(f).includes("id=\"subscribeForm\""));
+
+    check("форма є на кожній сторінці", withoutForm.length === 0,
+        withoutForm.join(", "));
+
+    // Заголовок 44px писався під широку смугу десктопа; на телефоні
+    // він розповзався на два рядки й забирав пів висоти.
+    check("на телефоні заголовок смуги менший",
+        /@media\(max-width:600px\)\{[\s\S]{0,600}?\.newsletter h2\{[^}]*font-size:26px/.test(css));
 }
 
 console.log("\n[4] Скрипт MailerLite більше не вантажиться");
