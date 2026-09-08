@@ -500,6 +500,52 @@ console.log("\n[10] Колір, матеріал і характеристики
     check("у XML є product_highlight", /<g:product_highlight>/.test(xml));
 }
 
+console.log("\n[11] Розділ таксономії Google");
+{
+    // Розділ віддаємо ЧИСЛОВИМ ID з офіційного переліку Google.
+    // Раніше поле не заповнювалось узагалі, і розділ вибирав сам
+    // Merchant Center — сумку за назвою легко покласти в «Багаж».
+    //
+    // Правило тут не «поле є», а «поле є в КОЖНОЇ позиції, і це
+    // число»: рядок замість числа Google мусить розпізнавати сам, і
+    // може розпізнати не так.
+    const tags = xml.match(/<g:google_product_category>([^<]*)</g) || [];
+
+    check(`розділ у всіх ${items.length} позиціях`, tags.length === items.length,
+        `тегів: ${tags.length}`);
+
+    const values = tags.map(t => t.replace(/^.*>/, "").replace(/<$/, ""));
+
+    check("усі значення — числові ID", values.every(v => /^[0-9]+$/.test(v)),
+        values.filter(v => !/^[0-9]+$/.test(v)).slice(0, 3).join(", "));
+
+    // Кожен ID мусить бути в мапі — тобто звірений з переліком, а не
+    // вписаний навмання.
+    const feedSource = read("scripts/build-feed.js");
+
+    const mapped = new Set((feedSource.match(/^\s+"[^"]+": (\d+),?$/gm) || [])
+        .map(line => line.replace(/^.*: /, "").replace(/,$/, "")));
+
+    check("жодного ID поза мапою GOOGLE_CATEGORY",
+        values.every(v => mapped.has(v)),
+        values.filter(v => !mapped.has(v)).join(", "));
+
+    // Посилання на джерело мусить лишитись у коді: без нього
+    // наступний ID знову додадуть з пам'яті.
+    check("у коді є посилання на офіційний перелік",
+        feedSource.includes("taxonomy-with-ids"));
+
+    // Нова категорія без ID — не помилка збірки, але про неї мусить
+    // бути попередження, інакше про порожній розділ ніхто не дізнається.
+    check("категорія без ID дає попередження в журналі збірки",
+        /::warning::/.test(feedSource)
+        && /categoriesWithoutGoogleId/.test(feedSource));
+
+    // Розділ і НАША категорія — різні поля: product_type лишається
+    // зрозумілим у звітах Merchant Center.
+    check("product_type нікуди не зник", /<g:product_type>/.test(xml));
+}
+
 if (skipped.length) {
     console.log(`\n  ⓘ  не потрапили у фід (${skipped.length}): ${skipped.slice(0, 3).join("; ")}`);
 }

@@ -39,6 +39,26 @@ const tempFile = (rel, content) => {
     return full;
 };
 
+
+// Фікстури, залишені УБИТИМ прогоном.
+//
+// Прибирання нижче живе у finally, а вбитий процес до finally не
+// доходить. Залишений tmp-archive-ref-check.html згадує тестове фото —
+// і наступний прогон падає на перевірці «незгаданий файл потрапляє у
+// список», хоча код справний. Імена перелічені поштучно: маска
+// «test-*» зачепила б самі файли тестів.
+const FIXTURES = [
+    "tmp-archive-ref-check.html",
+    MEDIA_DIR_REL + "/test-orphan-fresh.png",
+    MEDIA_DIR_REL + "/test-orphan-move.png",
+    MEDIA_DIR_REL + "/тест-архів-перевірка.png",
+    MEDIA_DIR_REL + "/тест-самопосилання.png"
+];
+
+FIXTURES.forEach(rel => {
+    try { fs.rmSync(path.join(ROOT, rel), { force: true }); } catch (e) { /* байдуже */ }
+});
+
 try {
 
 console.log("\n[1] Архів лежить поза медіатекою адмінки");

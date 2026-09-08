@@ -438,15 +438,23 @@ console.log("\n[6] Доставка у фіді = доставці в розмі
     const feedJs = read("scripts/build-feed.js");
     const productJs = read("assets/js/product.js");
 
-    // Число мусить бути те саме у двох місцях, інакше Google
-    // скаржиться на розходження.
-    const inFeed = (feedJs.match(/const SHIPPING_RATE_UAH = (\d+);/) || [])[1];
-    const inPage = (productJs.match(/const SHIPPING_RATE_UAH = (\d+);/) || [])[1];
+    // Тариф написаний РАЗ — у assets/js/product-offer.js. Раніше тут
+    // звірялись два окремі рядки «const SHIPPING_RATE_UAH = 60» — у
+    // фіді й на сторінці; тест ловив розходження вже після того, як
+    // воно з'явилось. Тепер розійтись нема чому, і перевіряємо саме
+    // це: обидва читають модуль.
+    const offer = require("../assets/js/product-offer.js");
 
-    check(`тариф однаковий: фід ${inFeed}, сторінка ${inPage}`,
-        inFeed && inFeed === inPage);
+    check(`тариф із модуля: ${offer.SHIPPING_RATE_UAH}`,
+        offer.SHIPPING_RATE_UAH === 60);
 
-    check("нуля тут бути не може", inFeed !== "0");
+    check("нуля тут бути не може", offer.SHIPPING_RATE_UAH !== 0);
+
+    check("фід і сторінка беруть тариф з модуля",
+        /product-offer/.test(feedJs) && /product-offer/.test(productJs));
+
+    check("власних копій числа не лишилось",
+        !/SHIPPING_RATE_UAH = /.test(feedJs) && !/SHIPPING_RATE_UAH = /.test(productJs));
 
     const feed = read("feed.xml");
 

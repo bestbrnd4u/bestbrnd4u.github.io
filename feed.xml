@@ -21,6 +21,7 @@
       <g:color>Темно-сірий</g:color>
       <g:gender>unisex</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>178</g:google_product_category>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -44,6 +45,7 @@
       <g:color>Чорний</g:color>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -68,6 +70,7 @@
       <g:color>Чорний</g:color>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -91,6 +94,7 @@
       <g:color>Темно-сірий</g:color>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>178</g:google_product_category>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -117,6 +121,7 @@
       <g:color>Темно-сірий</g:color>
       <g:gender>unisex</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>178</g:google_product_category>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -143,6 +148,7 @@
       <g:color>Темно-сірий</g:color>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>178</g:google_product_category>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -170,6 +176,7 @@
       <g:material>Шкіра</g:material>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -196,6 +203,7 @@
       <g:material>Шкіра</g:material>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -221,6 +229,7 @@
       <g:material>Шкіра</g:material>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -248,6 +257,7 @@
       <g:material>Шкіра</g:material>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -274,6 +284,7 @@
       <g:material>Шкіра</g:material>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -300,6 +311,7 @@
       <g:material>Шкіра</g:material>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -327,6 +339,7 @@
       <g:material>Шкіра</g:material>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -354,6 +367,7 @@
       <g:material>Шкіра</g:material>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -381,6 +395,7 @@
       <g:product_highlight>Розміри: 26 × 14 × 10 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -407,6 +422,7 @@
       <g:product_highlight>Розміри: 26 × 14 × 10 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -433,6 +449,7 @@
       <g:product_highlight>Розміри: 26 × 14 × 10 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -458,6 +475,7 @@
       <g:color>Темно-сірий</g:color>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>178</g:google_product_category>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -480,6 +498,7 @@
       <g:color>Темно-синій</g:color>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>201</g:google_product_category>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -503,6 +522,7 @@
       <g:color>Чорний</g:color>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -526,6 +546,7 @@
       <g:color>Зелений</g:color>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -549,6 +570,7 @@
       <g:color>Карамельний</g:color>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -572,6 +594,7 @@
       <g:color>Коричневий</g:color>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -596,6 +619,7 @@
       <g:color>Синій</g:color>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -620,6 +644,7 @@
       <g:color>Темно-сірий</g:color>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>178</g:google_product_category>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -643,6 +668,7 @@
       <g:color>Темно-коричневий</g:color>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>178</g:google_product_category>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -666,6 +692,7 @@
       <g:color>Темно-сірий</g:color>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>178</g:google_product_category>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -691,6 +718,7 @@
       <g:material>Шкіра</g:material>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -717,6 +745,7 @@
       <g:material>Шкіра</g:material>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -742,6 +771,7 @@
       <g:color>Коричневий</g:color>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -768,6 +798,7 @@
       <g:material>Шкіра</g:material>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -792,6 +823,7 @@
       <g:color>Світло-сірий</g:color>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>201</g:google_product_category>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -817,6 +849,7 @@
       <g:color>Темно-сірий</g:color>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>201</g:google_product_category>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -842,6 +875,7 @@
       <g:material>Шкіра</g:material>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -866,6 +900,7 @@
       <g:color>Бежевий</g:color>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>201</g:google_product_category>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -890,6 +925,7 @@
       <g:color>Темно-сірий</g:color>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>178</g:google_product_category>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -915,6 +951,7 @@
       <g:product_highlight>Розміри: 18 см × 13 см × 7,5 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -938,6 +975,7 @@
       <g:product_highlight>Розміри: 18 см × 13 см × 7,5 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -963,6 +1001,7 @@
       <g:product_highlight>Розміри: 18 см × 13 см × 7,5 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -989,6 +1028,7 @@
       <g:product_highlight>Розміри: 18 см × 13 см × 7,5 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1017,6 +1057,7 @@
       <g:product_highlight>Розміри: 23 × 15 × 7 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1043,6 +1084,7 @@
       <g:product_highlight>Розміри: 25 × 15 × 7 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1070,6 +1112,7 @@
       <g:product_highlight>Розміри: 28,5 × 12 × 21 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1096,6 +1139,7 @@
       <g:product_highlight>Розміри: 51</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>178</g:google_product_category>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1121,6 +1165,7 @@
       <g:size>54</g:size>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>178</g:google_product_category>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1146,6 +1191,7 @@
       <g:size>38</g:size>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>187</g:google_product_category>
       <g:product_type>Взуття &gt; Кросівки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1171,6 +1217,7 @@
       <g:size>37</g:size>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>187</g:google_product_category>
       <g:product_type>Взуття &gt; Кросівки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1196,6 +1243,7 @@
       <g:size>39</g:size>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>187</g:google_product_category>
       <g:product_type>Взуття &gt; Кросівки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1221,6 +1269,7 @@
       <g:size>36</g:size>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>187</g:google_product_category>
       <g:product_type>Взуття &gt; Кросівки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1246,6 +1295,7 @@
       <g:size>37</g:size>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>187</g:google_product_category>
       <g:product_type>Взуття &gt; Кросівки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1271,6 +1321,7 @@
       <g:size>38</g:size>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>187</g:google_product_category>
       <g:product_type>Взуття &gt; Кросівки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1296,6 +1347,7 @@
       <g:size>39</g:size>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>187</g:google_product_category>
       <g:product_type>Взуття &gt; Кросівки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1321,6 +1373,7 @@
       <g:size>38</g:size>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>187</g:google_product_category>
       <g:product_type>Взуття &gt; Кросівки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1345,6 +1398,7 @@
       <g:size>38</g:size>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>187</g:google_product_category>
       <g:product_type>Взуття &gt; Кросівки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1369,6 +1423,7 @@
       <g:size>37</g:size>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>187</g:google_product_category>
       <g:product_type>Взуття &gt; Кросівки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1393,6 +1448,7 @@
       <g:product_highlight>Склад: 100% поліестр</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1418,6 +1474,7 @@
       <g:size>37</g:size>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>187</g:google_product_category>
       <g:product_type>Взуття &gt; Кросівки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1443,6 +1500,7 @@
       <g:size>37</g:size>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>187</g:google_product_category>
       <g:product_type>Взуття &gt; Кросівки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1468,6 +1526,7 @@
       <g:size>38</g:size>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>187</g:google_product_category>
       <g:product_type>Взуття &gt; Кросівки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1493,6 +1552,7 @@
       <g:size>38</g:size>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>187</g:google_product_category>
       <g:product_type>Взуття &gt; Кросівки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1521,6 +1581,7 @@
       <g:product_highlight>Ремінь знімний, регульований</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1549,6 +1610,7 @@
       <g:product_highlight>Знімні</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1576,6 +1638,7 @@
       <g:product_highlight>Знімні</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1603,6 +1666,7 @@
       <g:product_highlight>2 знімні регульований та ланцюжок</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1631,6 +1695,7 @@
       <g:product_highlight>Регульований, знімний</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1659,6 +1724,7 @@
       <g:product_highlight>Ремінь знімний та регульований</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1686,6 +1752,7 @@
       <g:product_highlight>Ремінець знімний та регульований</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1715,6 +1782,7 @@
       <g:product_highlight>Ремінець знімний та регульований</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1743,6 +1811,7 @@
       <g:product_highlight>Ремінець знімний та регульований</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1771,6 +1840,7 @@
       <g:product_highlight>2 знімні ремені — шкіряний та текстильний регульований</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1800,6 +1870,7 @@
       <g:product_highlight>Два знімні ремені</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1829,6 +1900,7 @@
       <g:product_highlight>Два знімні ремені</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1857,6 +1929,7 @@
       <g:product_highlight>Ремінець знімний та регульований</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1885,6 +1958,7 @@
       <g:product_highlight>Два знімні — ланцюжок та регульований текстильний</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1914,6 +1988,7 @@
       <g:product_highlight>Ремінець знімний та регульований</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1942,6 +2017,7 @@
       <g:product_highlight>Ремінець знімний та регульований</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1971,6 +2047,7 @@
       <g:product_highlight>2 знімні — на зап'ястя та ланцюжок</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -1999,6 +2076,7 @@
       <g:product_highlight>Знімний та регульований</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -2026,6 +2104,7 @@
       <g:product_highlight>Знімний та регульований</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -2055,6 +2134,7 @@
       <g:product_highlight>Ремінець знімний та регульований</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -2083,6 +2163,7 @@
       <g:product_highlight>Два ремінці знімні та регульовані</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -2110,6 +2191,7 @@
       <g:product_highlight>Ручки подвійні, незнімні</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -2138,6 +2220,7 @@
       <g:product_highlight>Ремінець знімний та регульований, ручка незнімна</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -2166,6 +2249,7 @@
       <g:product_highlight>Регульований ремінь. Ремінь дозволяє носити сумку трьома способами: коротко або довго на плечі, а також кросбоді</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -2192,6 +2276,7 @@
       <g:product_highlight>Знімний ремінець, що дозволяє носити гаманець на зап'ясті або використовувати його як компактний самостійний аксесуар</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>2668</g:google_product_category>
       <g:product_type>Аксесуари &gt; Гаманці</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -2218,6 +2303,7 @@
       <g:product_highlight>Знімний ремінець, що дозволяє носити гаманець на зап'ясті або використовувати його як компактний самостійний аксесуар</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>2668</g:google_product_category>
       <g:product_type>Аксесуари &gt; Гаманці</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -2243,6 +2329,7 @@
       <g:product_highlight>Розміри: 12 × 9 × 3 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>2668</g:google_product_category>
       <g:product_type>Аксесуари &gt; Гаманці</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -2268,6 +2355,7 @@
       <g:product_highlight>Розміри: 11 × 9 × 2,5 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>2668</g:google_product_category>
       <g:product_type>Аксесуари &gt; Гаманці</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -2293,6 +2381,7 @@
       <g:product_highlight>Розміри: 11 × 9,5 × 2 см</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>2668</g:google_product_category>
       <g:product_type>Аксесуари &gt; Гаманці</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -2319,6 +2408,7 @@
       <g:product_highlight>Регульований плечовий ремінь довжиною 80–150 см, що дозволяє носити сумку через плече або кросбоді</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -2346,6 +2436,7 @@
       <g:product_highlight>Ширина лінзи × місток × довжина завушника: 53 × 21 × 140 мм</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>178</g:google_product_category>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -2374,6 +2465,7 @@
       <g:product_highlight>Ширина лінзи: 53 мм Місток: 16 мм Довжина завушника: 145 мм</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>178</g:google_product_category>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -2401,6 +2493,7 @@
       <g:product_highlight>Ширина лінзи: 53 мм Місток: 16 мм Довжина завушника: 145 мм</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>178</g:google_product_category>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -2428,6 +2521,7 @@
       <g:product_highlight>Ширина лінзи: 53 мм Місток: 16 мм Довжина завушника: 145 мм</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>178</g:google_product_category>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -2456,6 +2550,7 @@
       <g:product_highlight>Браслет із нержавіючої сталі сріблястого кольору, ширина 11 мм, застібка-метелик із кнопками</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>201</g:google_product_category>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -2484,6 +2579,7 @@
       <g:product_highlight>Золотистий сталевий браслет із PVD-покриттям, застібка — розкладна із захисним замком. Ширина кріплення — 0,6 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>201</g:google_product_category>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -2511,6 +2607,7 @@
       <g:product_highlight>Сталевий браслет сріблястого кольору з системою швидкого знімання та застібкою-метеликом із кнопками. Ширина кріплення — 1,5 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>201</g:google_product_category>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -2538,6 +2635,7 @@
       <g:product_highlight>Сталевий браслет сріблястого кольору шириною 1,6 см із швидкознімною системою та застібкою-метеликом</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>201</g:google_product_category>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -2565,6 +2663,7 @@
       <g:product_highlight>Сталевий браслет сріблястого кольору з системою швидкого знімання та застібкою-метеликом із кнопками. Ширина кріплення — 2 см</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>201</g:google_product_category>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -2592,6 +2691,7 @@
       <g:product_highlight>Двоколірний браслет із нержавіючої сталі сріблястого та рожево-золотистого кольорів, ширина кріплення — 2,2 см. Застібка-метелик із кнопками</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>201</g:google_product_category>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -2619,6 +2719,7 @@
       <g:product_highlight>Двоколірний браслет із нержавіючої сталі 316L — сріблястий із золотистими елементами. Ширина кріплення — 2 см. Застібка — розкладна із захисним фікса…</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>201</g:google_product_category>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -2650,6 +2751,7 @@
       <g:product_highlight>Коротка знімна ручка + довгий знімний ремінь для носіння через плече</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -2679,6 +2781,7 @@
       <g:product_highlight>Коротка знімна ручка + довгий знімний ремінь для носіння через плече</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -2706,6 +2809,7 @@
       <g:product_highlight>Коротка знімна ручка + довгий знімний ремінь для носіння через плече</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -2735,6 +2839,7 @@
       <g:product_highlight>Коротка знімна ручка + довгий знімний ремінь для носіння через плече</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -2762,6 +2867,7 @@
       <g:product_highlight>Застібка: Сталевий браслет сріблястого кольору шириною 1,4 см із розкладною застібкою-кліпсою</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>201</g:google_product_category>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -2789,6 +2895,7 @@
       <g:product_highlight>Сталевий браслет сріблястого кольору шириною 1,4 см із розкладною застібкою</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>201</g:google_product_category>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -2816,6 +2923,7 @@
       <g:product_highlight>Двоколірний браслет із нержавіючої сталі у сріблястому та золотистому відтінках із розкладною застібкою-кліпсою. Ширина браслета — 1 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>201</g:google_product_category>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -2844,6 +2952,7 @@
       <g:product_highlight>Регульований плечовий ремінь із довжиною звисання 63,5 см, що дозволяє носити сумку на плечі або кросбоді</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -2872,6 +2981,7 @@
       <g:product_highlight>Регульований плечовий ремінь із довжиною звисання 63,5 см, що дозволяє носити сумку на плечі або кросбоді</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -2900,6 +3010,7 @@
       <g:product_highlight>Регульований плечовий ремінь. Можна носити через плече або кросбоді. Довжина падіння ременя — приблизно</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -2928,6 +3039,7 @@
       <g:product_highlight>Регульований плечовий ремінь для носіння через плече або кросбоді</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -2956,6 +3068,7 @@
       <g:product_highlight>Регульований плечовий ремінь для носіння через плече або кросбоді</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -2984,6 +3097,7 @@
       <g:product_highlight>Регульований плечовий ремінь для носіння через плече або кросбоді</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -3012,6 +3126,7 @@
       <g:product_highlight>Регульований плечовий ремінь для носіння через плече або кросбоді</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -3040,6 +3155,7 @@
       <g:product_highlight>Регульований плечовий ремінь для носіння через плече або кросбоді</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -3068,6 +3184,7 @@
       <g:product_highlight>Браслет із нержавіючої сталі</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>201</g:google_product_category>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -3096,6 +3213,7 @@
       <g:product_highlight>Браслет із нержавіючої сталі</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>201</g:google_product_category>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -3123,6 +3241,7 @@
       <g:product_highlight>Браслет із нержавіючої сталі</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>201</g:google_product_category>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -3150,6 +3269,7 @@
       <g:product_highlight>Тонкі металеві дужки</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>178</g:google_product_category>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -3178,6 +3298,7 @@
       <g:product_highlight>Пластикові дужки</g:product_highlight>
       <g:gender>unisex</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>178</g:google_product_category>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -3206,6 +3327,7 @@
       <g:product_highlight>Ацетатні дужки</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>178</g:google_product_category>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -3234,6 +3356,7 @@
       <g:product_highlight>Металеві дужки</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>178</g:google_product_category>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -3261,6 +3384,7 @@
       <g:product_highlight>Застібка: Розкладна з кнопковим фіксатором</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>201</g:google_product_category>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -3288,6 +3412,7 @@
       <g:product_highlight>Застібка: Розкладна з кнопковим фіксатором</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>201</g:google_product_category>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -3315,6 +3440,7 @@
       <g:product_highlight>Застібка: пряжка</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>201</g:google_product_category>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -3342,6 +3468,7 @@
       <g:product_highlight>Застібка: Розкладна з фіксатором</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>201</g:google_product_category>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -3369,6 +3496,7 @@
       <g:product_highlight>Металевий браслет із нержавіючої сталі золотистого кольору, застібка-метелик із кнопковим фіксатором</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>201</g:google_product_category>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -3396,6 +3524,7 @@
       <g:product_highlight>Металевий браслет із нержавіючої сталі у двоколірному виконанні — сріблястий + золотистий. Застібка-кліпса</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>201</g:google_product_category>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>
@@ -3423,6 +3552,7 @@
       <g:product_highlight>Браслет із нержавіючої сталі сріблястого кольору із застібкою-кліпсою</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
+      <g:google_product_category>201</g:google_product_category>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
       <g:shipping>
         <g:country>UA</g:country>

@@ -58,18 +58,15 @@ const PRODUCTS_FILE = path.join(ROOT, "data", "products.json");
 const CATEGORIES_FILE = path.join(ROOT, "data", "categories.json");
 const OUTPUT_FILE = path.join(ROOT, "feed.xml");
 
-// Типовий тариф перевізника (грн) — ТЕ САМЕ число, що в розмітці
-// сторінки товару (SHIPPING_RATE_UAH у assets/js/product.js).
+// Тариф перевізника — зі спільного модуля assets/js/product-offer.js,
+// того самого, з якого його бере розмітка сторінки товару.
 //
 // НАВІЩО ЦЕ У ФІДІ. Без g:shipping Merchant Center бере доставку з
-// налаштувань акаунта. Якщо вони не збігаються з розміткою
-// сторінки, Google скаржиться на розходження й може притримати
-// товари в Покупках — а розмітка в нас 60 ₴.
-//
-// Нуль тут ставити не можна: магазин за доставку не бере, але
-// покупець її платить перевізнику. «Безкоштовна доставка» в
-// Покупках показала б нижчу підсумкову ціну, ніж людина заплатить.
-const SHIPPING_RATE_UAH = 60;
+// налаштувань акаунта. Якщо вони не збігаються з розміткою сторінки,
+// Google скаржиться на розходження й може притримати товари в
+// Покупках. Доти число було написане тут окремо від розмітки — тобто
+// розійтись вони могли будь-якої миті, і ловив це лише тест.
+const { SHIPPING_RATE_UAH } = require("../assets/js/product-offer.js");
 
 // Магазин возить лише по Україні.
 const SHIPPING_COUNTRY = "UA";
@@ -230,12 +227,68 @@ function ageGroupOf(product) {
 
 }
 
-// product_type — НАША категорія, а не таксономія Google.
+// Розділ таксономії Google — ЧИСЛОВИМ ID.
 //
-// google_product_category свідомо не заповнюємо: вгадувати за нас
-// рядки чужої таксономії — найкращий спосіб отримати товар не в тому
-// розділі. Google визначає розділ сам, а product_type допомагає йому
-// і водночас лишається зрозумілим у звітах.
+// ЩО БУЛО НЕ ТАК. Поле лишалось порожнім, і в коді стояло
+// пояснення: «вгадувати за нас рядки чужої таксономії — найкращий
+// спосіб отримати товар не в тому розділі». Заперечення правильне,
+// але воно про ВГАДУВАННЯ. Кожен ID нижче звірено з офіційним
+// переліком Google:
+//
+//     https://www.google.com/basepages/producttype/taxonomy-with-ids.en-US.txt
+//
+// Числовий ID однозначний — на відміну від рядка, який Google
+// мусить розпізнати й може розпізнати не так. Без цього поля розділ
+// визначає сам Merchant Center, і саме він помиляється: сумку за
+// назвою легко покласти у «Багаж», а не в «Сумки».
+//
+// ЧОГО ТУТ НЕМАЄ. Категорій, яких немає в переліку нижче. Для них
+// поле лишається порожнім — тобто повертаємось до старого поводження
+// (Google визначає сам), а не підставляємо приблизний розділ. Нова
+// категорія засвітиться попередженням у журналі збірки: рівно там,
+// де її побачить той, хто цю категорію щойно додав.
+const GOOGLE_CATEGORY = {
+    // Handbags, Wallets & Cases > Handbags. Чоловічі сумки магазину —
+    // це crossbody/camera/belt, тобто та сама «сумка через плече», а
+    // не Luggage & Bags > Messenger Bags (106): той розділ про
+    // портфелі для документів і ноутбуків.
+    "Жіночі сумки": 3032,
+    "Чоловічі сумки": 3032,
+    // Handbags, Wallets & Cases > Wallets & Money Clips
+    "Гаманці": 2668,
+    // Jewelry > Watches
+    "Годинники": 201,
+    // Clothing Accessories > Sunglasses. Усі позиції розділу —
+    // сонцезахисні; з'являться оправи для зору, їм потрібен інший ID
+    // (Vision Care), і мапа тут стане не за категорією, а за товаром.
+    "Окуляри і оправи": 178,
+    // Apparel & Accessories > Shoes
+    "Кросівки": 187
+};
+
+// Категорії без розділу — збираємо, щоб сказати про них один раз у
+// кінці збірки, а не по разу на кожен варіант товару.
+const categoriesWithoutGoogleId = new Set();
+
+function googleCategory(product) {
+
+    const category = String(product.category || "").trim();
+
+    if (!category) return "";
+
+    const id = GOOGLE_CATEGORY[category];
+
+    if (id) return String(id);
+
+    categoriesWithoutGoogleId.add(category);
+
+    return "";
+
+}
+
+// product_type — НАША категорія, а не таксономія Google: вона
+// лишається зрозумілою у звітах Merchant Center і допомагає Google
+// навіть там, де розділу ми не дали.
 function productType(product, departmentByCategory) {
 
     const category = product.category;
@@ -446,6 +499,7 @@ function feedItems(products, departmentByCategory, siteUrl) {
                         : "",
                     gender: genderOf(product),
                     age_group: ageGroupOf(product),
+                    google_product_category: googleCategory(product),
                     product_type: productType(product, departmentByCategory),
                     // Мітка для кампаній: за нею в рекламі можна окремо
                     // піднімати акції й новинки.
@@ -503,6 +557,7 @@ function itemXml(item) {
         ...item.product_highlight.map(text => tag("product_highlight", text)),
         tag("gender", item.gender),
         tag("age_group", item.age_group),
+        tag("google_product_category", item.google_product_category),
         tag("product_type", item.product_type),
         shipping,
         tag("custom_label_0", item.custom_label_0),
@@ -567,6 +622,13 @@ function main() {
     fs.writeFileSync(OUTPUT_FILE, buildFeed(items, SITE_URL), "utf8");
 
     skipped.forEach(reason => console.log(`⏭  не у фіді — ${reason}`));
+
+    // Нова категорія без розділу Google — не помилка збірки, але про
+    // неї треба знати: без розділу Merchant Center вибирає його сам.
+    categoriesWithoutGoogleId.forEach(name => {
+        console.warn(`::warning::категорія «${name}» без google_product_category`
+            + " — додайте ID у GOOGLE_CATEGORY у scripts/build-feed.js");
+    });
 
     const backorder = items.filter(item => item.availability === "backorder").length;
 

@@ -64,21 +64,16 @@ function seoSandbox() {
     window.eval(grab(/function truncateForMeta\(text, maxLength = 155\) \{[\s\S]*?\n\}\n/));
 
     window.getVariantSku = (p, v) => (v && v.sku) || p.sku || undefined;
-    // умови повернення й доставки для offers — updateProductSeoMetadata
-    // тепер посилається на них (додано на запит Search Console)
-    // Через window.*, а не const: у jsdom оголошення const всередині
-    // window.eval лишається в межах того ж виклику і глобальним не стає
-    // (та сама пастка, що колись була з SITE_URL).
-    window.eval(productJs.match(/const RETURN_POLICY = \{[\s\S]*?\n\};\n/)[0]
-        .replace("const RETURN_POLICY =", "window.RETURN_POLICY ="));
-    // Ставка доставки. Раніше тут був поріг безкоштовної доставки
-    // (FREE_SHIPPING_FROM): магазин перестав брати за доставку гроші —
-    // її оплачує покупець перевізнику, — і нуль у розмітці став би
-    // обіцянкою, якої магазин не виконує.
-    window.eval(productJs.match(/const SHIPPING_RATE_UAH = \d+;/)[0]
-        .replace("const SHIPPING_RATE_UAH =", "window.SHIPPING_RATE_UAH ="));
-    window.eval(productJs.match(/function shippingDetailsFor\(price\) \{[\s\S]*?\n\}\n/)[0]
-        .replace("function shippingDetailsFor(price) {", "window.shippingDetailsFor = function (price) {"));
+    // Умови продажу (доставка, повернення, строк дії ціни) живуть в
+    // окремому модулі assets/js/product-offer.js — тому сторінка,
+    // генератор статичних сторінок і генератор фіду не можуть
+    // пообіцяти різне.
+    //
+    // Раніше цей блок витягував RETURN_POLICY, SHIPPING_RATE_UAH і
+    // shippingDetailsFor регулярками з product.js — тобто тест
+    // перевіряв КОПІЮ. Тепер кладемо у window той самий файл, який
+    // підключає product.html: якщо він зламається, зламається і тест.
+    window.ProductOffer = require("../assets/js/product-offer.js");
 
     // Артикул для розмітки чиститься окремо: Search Console відкидав
     // і надто довге значення, і порожній рядок (див. test-merchant-listings).

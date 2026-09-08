@@ -113,8 +113,22 @@ console.log("\n[3] Розмітка для Google не обіцяє безкош
     check("порогу безкоштовної доставки більше немає в коді",
         !/FREE_SHIPPING_FROM/.test(code(productJs)) && !/FREE_SHIPPING_FROM/.test(code(builder)));
 
-    check("ставка одна на всі товари",
-        /SHIPPING_RATE_UAH = 60/.test(productJs) && /SHIPPING_RATE_UAH = 60/.test(builder));
+    // Тариф написаний РАЗ — у assets/js/product-offer.js, і обидва
+    // місця беруть його звідти. Раніше тут перевірялось, що рядок
+    // «SHIPPING_RATE_UAH = 60» є і в рантаймі, і в генераторі: тобто
+    // тест стежив за двома копіями одного числа замість того, щоб
+    // вимагати одну.
+    const offer = require("../assets/js/product-offer.js");
+
+    check("ставка одна на всі товари", offer.SHIPPING_RATE_UAH === 60,
+        offer.SHIPPING_RATE_UAH);
+
+    check("власних копій тарифу ні в рантаймі, ні в генераторі немає",
+        !/SHIPPING_RATE_UAH = /.test(productJs) && !/SHIPPING_RATE_UAH = /.test(builder));
+
+    // Обидва мусять саме брати модуль, а не зібрати умови самотужки.
+    check("обидва підключають спільний модуль",
+        /product-offer/.test(productJs) && /product-offer/.test(builder));
 
     // Ставка мусить стояти беззастережно: умова «якщо ціна більша за
     // поріг» і була тим, що ставило нуль.

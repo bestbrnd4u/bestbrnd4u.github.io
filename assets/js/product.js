@@ -234,33 +234,14 @@ document.getElementById("productPage").innerHTML = `
 
 }
 
-// Умови повернення й доставки для розмітки товару — ті самі, що в
-// scripts/build-product-pages.js (статичні сторінки) і ті самі, що
-// написані на сторінках return-warranty і delivery-payment. Search
-// Console просив ці поля в offers (розділ Merchant listings).
-// Докладні пояснення до кожного значення — у генераторі сторінок.
-const RETURN_POLICY = {
-    "@type": "MerchantReturnPolicy",
-    applicableCountry: "UA",
-    returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
-    merchantReturnDays: 14,
-    returnMethod: "https://schema.org/ReturnByMail",
-    returnFees: "https://schema.org/ReturnFeesCustomerResponsibility"
-};
-
-// Типовий тариф перевізника (грн).
+// Умови продажу для розмітки — зі спільного модуля
+// assets/js/product-offer.js. Той самий модуль читають генератор
+// статичних сторінок і генератор фіду, тож обіцянки про доставку,
+// повернення й строк дії ціни на сайті, у розмітці та у фіді не
+// можуть розійтись. Раніше кожне місце мало власну копію — і вони
+// таки розійшлись (пояснення — у самому модулі).
 //
-// ЩО БУЛО НЕ ТАК. Тут стояло FREE_SHIPPING_FROM = 3500, і товарам
-// дорожче за поріг у розмітку йшло shippingRate: 0 — «безкоштовна
-// доставка». Магазин справді не бере за доставку грошей, але покупець
-// її платить: перевізнику при отриманні. Тобто нуль у розмітці —
-// обіцянка, якої магазин не виконує, і в Google Shopping це показує
-// нижчу підсумкову ціну, ніж людина заплатить насправді.
-//
-// Точну суму НП вважає за вагою й габаритами, яких магазин не знає до
-// пакування, — тому в розмітці типовий тариф, той самий, що на
-// сторінці «Оплата і доставка».
-const SHIPPING_RATE_UAH = 60;
+// Файл підключено в product.html ДО цього скрипта.
 
 // Артикул для розмітки — ті самі межі, що в scripts/build-product-pages.js.
 //
@@ -321,29 +302,6 @@ function schemaSku(product) {
 
 }
 
-function shippingDetailsFor(price) {
-
-    const details = {
-        "@type": "OfferShippingDetails",
-        shippingDestination: { "@type": "DefinedRegion", addressCountry: "UA" },
-        deliveryTime: {
-            "@type": "ShippingDeliveryTime",
-            handlingTime: { "@type": "QuantitativeValue", minValue: 1, maxValue: 2, unitCode: "DAY" },
-            transitTime: { "@type": "QuantitativeValue", minValue: 1, maxValue: 3, unitCode: "DAY" }
-        }
-    };
-
-    // Ставка однакова для всіх товарів: доставку оплачує покупець
-    // перевізнику, і від ціни товару вона не залежить.
-    details.shippingRate = {
-        "@type": "MonetaryAmount",
-        value: SHIPPING_RATE_UAH,
-        currency: "UAH"
-    };
-
-    return details;
-
-}
 
 // Сторінка «такого товару немає».
 //
@@ -431,7 +389,12 @@ function updateProductSeoMetadata(product) {
     setMetaByProperty("og:image", image);
     setMetaByProperty("og:url", pageUrl);
 
-    setJsonLd("productSchema", {
+    // Умови продажу — в окремому файлі (assets/js/product-offer.js),
+    // підключеному ДО цього скрипта. Немає його — розмітку не
+    // перемальовуємо: на статичній сторінці лежить повна версія від
+    // генератора, і лишити її краще, ніж покласти урізану. Раніше тут
+    // падав TypeError, а разом із ним і вся сторінка товару.
+    if (window.ProductOffer) setJsonLd("productSchema", {
         "@context": "https://schema.org",
         "@type": "Product",
         name: product.title,
@@ -446,21 +409,13 @@ function updateProductSeoMetadata(product) {
         // необов'язковим і проходить ту саму перевірку довжини.
         mpn: sanitizeSku(product.sku) || undefined,
         brand: product.brand ? { "@type": "Brand", name: product.brand } : undefined,
-        offers: {
-            "@type": "Offer",
-            url: pageUrl,
-            priceCurrency: "UAH",
-            price: product.price,
-            // товар "під замовлення" — це PreOrder, а не InStock;
-            // невідповідність розмітки реальному стану — привід для
-            // Google зняти rich-результат товару
-            availability: product.preOrder
-                ? "https://schema.org/PreOrder"
-                : "https://schema.org/InStock",
-            itemCondition: "https://schema.org/NewCondition",
-            hasMerchantReturnPolicy: RETURN_POLICY,
-            shippingDetails: shippingDetailsFor(product.price)
-        },
+        // Розділ каталогу. ЙОГО ТУТ НЕ БУЛО: генератор кладе
+        // category у статичну сторінку, а цей рендер її затирав —
+        // і оскільки Google виконує JS, поле до нього не доходило.
+        category: product.category || undefined,
+        // Умови продажу — зі спільного модуля, того самого, що в
+        // генератора сторінок і генератора фіду.
+        offers: window.ProductOffer.offerFor(product, pageUrl),
         // Рейтинг — ЛИШЕ якщо за ним стоять справжні відгуки.
         // Раніше умовою було саме product.rating, і в чотирьох товарів
         // із rating: 5, reviews: 0 у розмітку йшов reviewCount: 0 —
