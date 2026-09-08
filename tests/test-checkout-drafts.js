@@ -225,6 +225,46 @@ console.log("\n[6] Розсилка: інший лист, та сама обер
         /remindCheckouts[\s\S]{0,900}товарів уже немає в каталозі/.test(remindSrc));
 }
 
+console.log("\n[Форма] Помилки видно там, де курсор щойно був");
+{
+    const js = fs.readFileSync(path.join(ROOT, "assets/js/checkout.js"), "utf8");
+    const css = fs.readFileSync(path.join(ROOT, "assets/css/style.css"), "utf8");
+
+    // ЩО БУЛО НЕ ТАК. Помилки показувались лише після натискання
+    // «Оформити замовлення»: людина пропускає «Прізвище», доходить до
+    // кінця довгої форми — і аж там дізнається, що треба вертатись.
+    check("поле перевіряється при виході з нього",
+        /addEventListener\("blur"/.test(js) && /validateField/.test(js));
+
+    // Правило одне на дві перевірки: інакше «що сказали одразу» й
+    // «що сказали при надсиланні» рано чи пізно розійдуться.
+    check("правила не подвоєні: validateForm ходить тим самим validateField",
+        /function validateField/.test(js)
+        && /REQUIRED_FIELDS\.forEach\(id => \{\s*if \(!validateField\(id\)\)/.test(js));
+
+    // Порожнє поле, якого не торкались, червоніти не мусить: інакше
+    // прохід формою клавішею Tab дає п'ять червоних полів, і людина
+    // ще нічого не ввела.
+    check("незаймане порожнє поле мовчить",
+        /!field\.value\.trim\(\) && !field\.dataset\.touched/.test(js));
+
+    check("а стерте — вже ні (позначка ставиться при вводі)",
+        /dataset\.touched = "1"/.test(js));
+
+    // ВИГЛЯД. Синій на сайті означає дію — кнопки, посилання. Поле,
+    // у якому просто стоїть курсор, дією не є.
+    check("фокус поля темний, а не синій",
+        /\.checkout-form input:focus[\s\S]{0,200}?border-color:var\(--gray900\)/.test(css));
+
+    // Кільце робиться тінню, а не outline: тінь повторює
+    // border-radius, а outline Chrome малює прямокутником — саме
+    // через це кути виглядали гострими.
+    check("кільце кругле (box-shadow, не outline)",
+        /\.checkout-form input:focus[\s\S]{0,220}?box-shadow:0 0 0 4px/.test(css));
+
+    check("вибраний спосіб доставки теж темний",
+        /input:checked \+ \.delivery-option-card\{[^}]*border-color:var\(--gray900\)/.test(css));
+}
 console.log(failures ? `\n❌ Провалено: ${failures}` : "\n✅ Незавершене оформлення: нагадуємо один раз і нікого не підписуємо");
 
 process.exit(failures ? 1 : 0);

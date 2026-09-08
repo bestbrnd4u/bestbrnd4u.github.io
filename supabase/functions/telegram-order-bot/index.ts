@@ -5688,8 +5688,19 @@ async function npCall(action: Record<string, any>): Promise<any> {
   const failure = npError(data);
 
   if (failure) {
+
     console.error("Нова пошта відмовила:", failure);
+
+    // Причина йде ще й у щоденний звіт: журнал Edge Functions ніхто
+    // не читає, і саме тому «не знаходить поштомат за номером»
+    // з'ясувалось лише зі скарги покупця.
+    //
+    // Метод у сторінці — щоб було видно, що саме відмовило: пошук
+    // міста чи пошук точок.
+    await reportServerIssue("np_directory", `${action.method}: ${failure}`);
+
     return null;
+
   }
 
   return data;
@@ -5702,10 +5713,16 @@ let postomatRef: string | null = null;
 
 async function typeRefFor(postomat: boolean): Promise<string> {
 
-  if (postomatRef === null) {
+  if (!postomatRef) {
 
     const data = await npCall({ method: "types" });
 
+    // ЩО БУЛО НЕ ТАК. Умовою було `postomatRef === null`, а при
+    // невдачі сюди писався порожній рядок — тобто НАЗАВЖДИ, на весь
+    // час життя інстансу. Далі кожен пошук поштоматів ішов без
+    // фільтра типу й мовчки шукав не те: у списку були відділення.
+    //
+    // Тепер порожнє значення означає «спробуємо наступного разу».
     postomatRef = data ? postomatTypeRef(parseTypes(data)) : "";
 
   }

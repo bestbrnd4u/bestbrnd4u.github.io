@@ -24,6 +24,10 @@
 
     "use strict";
 
+    // Заповнюється в init(): знайти ref міста за його назвою.
+    // Потрібне тоді, коли поле заповнили не вибором із підказки.
+    var useCity = function () { return Promise.resolve(""); };
+
     // Скільки чекати після останньої натиснутої клавіші. Запит на
     // кожну літеру — це десяток запитів на слово «Хмельницький» і
     // підказки, які стрибають під пальцями.
@@ -39,7 +43,29 @@
     // працюють.
     var MIN_QUERY = 2;
 
-    var available = true;
+// Доки довідник вважаємо недоступним після відмови.
+//
+// Спершу тут стояло `var available = true`, і відмова гасила
+// довідник ДО ПЕРЕЗАВАНТАЖЕННЯ сторінки — один на всі поля. Пошук
+// поштомата не вдався, і місто теж перестало шукатись, хоч воно
+// щойно працювало.
+//
+// 20 секунд — компроміс: на кожну літеру в мережу не ходимо, але
+// короткий збій НП чи таймаут не ламає всю сторінку.
+var RETRY_AFTER = 20000;
+
+var silentUntil = 0;
+
+// Кому сказати, що довідник не відповідає. Заповнюється в attach().
+var listeners = [];
+
+function directoryDown() {
+
+    silentUntil = Date.now() + RETRY_AFTER;
+
+    listeners.forEach(function (fn) { fn(); });
+
+}
 
     // Відповіді НП на ту саму пару «місто + запит». Покупець стирає й
     // дописує номер, повертається до поля — а мережу тривожити не
@@ -58,7 +84,11 @@
 
         var api = client();
 
-        if (!api || !api.functions || !available) return Promise.resolve(null);
+        if (!api || !api.functions) return Promise.resolve(null);
+
+        // Щойно відмовили — не тривожимо мережу, але й не забуваємо
+        // назавжди: за 20 секунд спробуємо знову.
+        if (Date.now() < silentUntil) return Promise.resolve(null);
 
         return api.functions.invoke("telegram-order-bot", {
             body: Object.assign({ site_action: "nova-poshta" }, body)
@@ -68,10 +98,7 @@
 
             if (!data || data.ok !== true) {
 
-                // Довідник недоступний — більше не питаємо до
-                // перезавантаження сторінки. Інакше кожна літера
-                // ходила б у мережу по ту саму відмову.
-                available = false;
+                directoryDown();
 
                 return null;
 
@@ -81,7 +108,7 @@
 
         }).catch(function () {
 
-            available = false;
+            directoryDown();
 
             return null;
 
@@ -171,6 +198,24 @@
 
         var state = { box: buildList(input), items: [], active: -1 };
 
+        // Рядок «довідник не відповідає». Створюється один раз і
+        // лежить під полем прихованим: показати його треба саме тоді,
+        // коли підказок немає, — а це найгірший момент, щоб щось
+        // будувати.
+        var notice = document.createElement("p");
+
+        notice.className = "np-notice";
+        notice.hidden = true;
+        notice.textContent = "Довідник Нової пошти не відповідає."
+            + " Впишіть номер відділення або поштомата вручну —"
+            + " замовлення оформиться.";
+
+        (input.parentElement || document.body).appendChild(notice);
+
+        // Показуємо, коли довідник відмовив, і прибираємо, щойно
+        // підказки знову приходять.
+        listeners.push(function () { notice.hidden = false; });
+
         var timer = null;
 
         // Браузер підставляє в такі поля збережені адреси, і його
@@ -210,7 +255,16 @@
 
             timer = setTimeout(function () {
 
-                source(query).then(function (items) { render(state, items); });
+                source(query).then(function (items) {
+
+                    // Прийшов масив — довідник живий, рядок про
+                    // відмову більше не потрібен. null означає
+                    // «відмовив»: його показує сам listener.
+                    if (items) notice.hidden = true;
+
+                    render(state, items);
+
+                });
 
             }, DEBOUNCE);
 
@@ -374,12 +428,57 @@
 
         }
 
+        // Знайти ref за назвою міста — для випадків, коли поле
+        // заповнили НЕ вибором із підказки.
+        //
+        // Так буває, коли підтягується збережена адреса покупця
+        // (applySavedAddress у checkout.js) або коли адресу
+        // підставив сам браузер. Поле виглядає заповненим, людина
+        // впевнена, що місто вибране, — а ref порожній, і пошук
+        // відділень навіть не робить запиту.
+        //
+        // Беремо ПЕРШИЙ збіг: назва в збереженій адресі прийшла з
+        // цього ж довідника, тож збіг точний. Якщо НП не відповіла
+        // або міста немає — лишаємо порожній ref, і поле поводиться
+        // як звичайне текстове (замовлення однаково оформиться).
+        useCity = function (name) {
+
+            var query = String(name || "").trim();
+
+            if (query.length < MIN_QUERY) return Promise.resolve("");
+
+            return ask({ method: "settlements", query: query }).then(function (items) {
+
+                if (!items || !items.length) return "";
+
+                // Точний збіг кращий за перший-ліпший: «Київ» не має
+                // перетворитись на «Київець».
+                var exact = items.filter(function (item) {
+                    return String(item.name || "").trim() === query;
+                })[0];
+
+                cityRef = (exact || items[0]).ref || "";
+
+                return cityRef;
+
+            });
+
+        };
+
         attach(branch, warehouses(false), null, 0);
         attach(postomat, warehouses(true), null, 0);
 
     }
 
-    root.NovaPoshta = { init: init, attach: attach, MIN_QUERY: MIN_QUERY, DEBOUNCE: DEBOUNCE };
+    root.NovaPoshta = {
+        init: init,
+        attach: attach,
+        // Сторінка оформлення викликає це, коли підставляє збережену
+        // адресу: без ref пошук відділень мовчки не працює.
+        useCity: function (name) { return useCity(name); },
+        MIN_QUERY: MIN_QUERY,
+        DEBOUNCE: DEBOUNCE
+    };
 
     if (typeof document !== "undefined") {
 

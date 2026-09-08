@@ -450,6 +450,14 @@ async function prefillFromProfile() {
     fill("phone", data.phone);
     fill("city", data.city);
 
+    // Те саме, що в applySavedAddress: заповнене поле міста без ref
+    // означає, що пошук відділень мовчки не працюватиме.
+    const cityField = document.getElementById("city");
+
+    if (cityField && cityField.value && window.NovaPoshta && window.NovaPoshta.useCity) {
+        window.NovaPoshta.useCity(cityField.value);
+    }
+
 }
 
 // -------------------------
@@ -460,6 +468,17 @@ async function prefillFromProfile() {
 function applySavedAddress(address) {
 
     document.getElementById("city").value = address.city || "";
+
+    // Ref міста для довідника Нової пошти.
+    //
+    // Поле заповнене — і людина впевнена, що місто вибране. Але ref
+    // ставиться лише при виборі з підказки, тож пошук відділень
+    // мовчки не робив запиту взагалі: список порожній, пояснення
+    // немає. Ззовні це виглядало як «не знаходить поштомат за
+    // номером».
+    if (address.city && window.NovaPoshta && window.NovaPoshta.useCity) {
+        window.NovaPoshta.useCity(address.city);
+    }
 
     const radio = document.querySelector(
         `input[name="deliveryMethod"][value="${CSS.escape(address.delivery_method)}"]`
@@ -881,40 +900,53 @@ function clearFieldError(fieldId) {
 
 }
 
+// Поля, обов'язкові для замовлення. Перелік один на дві перевірки —
+// при виході з поля й при надсиланні форми.
+const REQUIRED_FIELDS = ["firstName", "lastName", "email", "phone", "city"];
+
+// Одне поле — одне правило.
+//
+// ЧОМУ ОКРЕМОЮ ФУНКЦІЄЮ. Правила лежали всередині validateForm, і
+// перевірка при виході з поля означала б їхню другу копію — тобто
+// рано чи пізно розходження між «що сказали одразу» і «що сказали
+// при надсиланні». Тепер джерело одне.
+//
+// Повертає true, якщо поле в порядку.
+function validateField(id) {
+
+    const field = document.getElementById(id);
+
+    if (!field) return true;
+
+    clearFieldError(id);
+
+    const value = field.value.trim();
+
+    if (!value) {
+        setFieldError(id, "Обов'язкове поле.");
+        return false;
+    }
+
+    if (id === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+        setFieldError(id, "Некоректний email.");
+        return false;
+    }
+
+    if (id === "phone" && field.value.replace(/\D/g, "").length < 10) {
+        setFieldError(id, "Некоректний номер телефону.");
+        return false;
+    }
+
+    return true;
+
+}
+
 function validateForm() {
 
     let isValid = true;
 
-    const requiredFields = [
-        { id: "firstName" },
-        { id: "lastName" },
-        { id: "email" },
-        { id: "phone" },
-        { id: "city" }
-    ];
-
-    requiredFields.forEach(({ id }) => {
-
-        const field = document.getElementById(id);
-
-        clearFieldError(id);
-
-        if (!field.value.trim()) {
-            setFieldError(id, "Обов'язкове поле.");
-            isValid = false;
-            return;
-        }
-
-        if (id === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(field.value.trim())) {
-            setFieldError(id, "Некоректний email.");
-            isValid = false;
-        }
-
-        if (id === "phone" && field.value.replace(/\D/g, "").length < 10) {
-            setFieldError(id, "Некоректний номер телефону.");
-            isValid = false;
-        }
-
+    REQUIRED_FIELDS.forEach(id => {
+        if (!validateField(id)) isValid = false;
     });
 
     clearFieldError("deliveryMethod");
@@ -928,10 +960,41 @@ function validateForm() {
 
 }
 
-// прибираємо помилку одразу після того, як користувач починає виправляти поле
-["firstName", "lastName", "email", "phone", "city"].forEach(id => {
+REQUIRED_FIELDS.forEach(id => {
 
-    document.getElementById(id)?.addEventListener("input", () => clearFieldError(id));
+    const field = document.getElementById(id);
+
+    if (!field) return;
+
+    // Помилку прибираємо, щойно людина почала виправляти: тримати
+    // червоне поле, поки в ньому вже правильне значення, — це
+    // сваритись на те, що вже виправлено.
+    field.addEventListener("input", () => clearFieldError(id));
+
+    // А показуємо — коли з поля пішли.
+    //
+    // ЧОМУ НЕ НА КОЖНУ ЛІТЕРУ. Бо тоді порожнє поле, у яке людина
+    // щойно поставила курсор, одразу стає червоним, а «і@» на шляху
+    // до «ірина@пошта» — «некоректним email». Сваритись на
+    // недописане — найшвидший спосіб змусити закрити сторінку.
+    //
+    // ЧОМУ НЕ ЧІПАЄМО ПОРОЖНЄ, ЯКОГО НЕ ТОРКАЛИСЬ. Проходячи форму
+    // клавішею Tab, людина отримала б п'ять червоних полів, нічого
+    // ще не ввівши. Тому порожнє поле червоніє лише якщо в ньому
+    // ЩОСЬ було й це стерли — або при надсиланні форми.
+    field.addEventListener("blur", () => {
+
+        if (!field.value.trim() && !field.dataset.touched) return;
+
+        validateField(id);
+
+    });
+
+    // «Торкались» = щось увели. Одного разу достатньо: далі порожнє
+    // поле вже означає стерте, а не незаповнене.
+    field.addEventListener("input", () => {
+        if (field.value.trim()) field.dataset.touched = "1";
+    });
 
 });
 
