@@ -2,7 +2,7 @@
 <html lang="uk">
 
 <head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"9da03b72","data/catalog.json":"073a2e55","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"5d9b13ee","data/legal.json":"f84751b2","data/notifications.json":"670aa3fa","data/products-updated.json":"4eeece07","data/products.json":"5377fd38","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/security.json":"34f399a1","data/size-groups.json":"e70d29de","data/telegram.json":"94d77add"};</script>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"9da03b72","data/catalog.json":"7894e2d3","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"5d9b13ee","data/legal.json":"f84751b2","data/notifications.json":"670aa3fa","data/product-texts.json":"4cb38a2b","data/products-updated.json":"bae94db7","data/products.json":"6cb9a8bc","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/security.json":"34f399a1","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script>
 
 <!-- Сторінка лежить у /p/<slug>/, а скрипти будують шляхи як
      з кореня ("data/products.json", "assets/images/…").
@@ -169,6 +169,10 @@ window.PRODUCT_DATA = {"gender":["Чоловікам"],"preOrderDays":"10-14 р�
 // адреси власних сторінок категорії, розділу й бренду — щоб
 // крихти після рендеру JS вели туди ж, куди в розмітці
 window.PRODUCT_TAXONOMY = {"category":{"Годинники":"categories/hodynnyky/"},"department":{"Аксесуари":"departments/aksesuary/"},"brand":{"Tissot":"brands/tissot/"}};
+// тексти на сторінці товару з адмінки (data/product-texts.json)
+// — вбудовані, а не довантажені: рядок «єдиний екземпляр»
+// стоїть високо, і запізнілий текст смикав би розмітку
+window.PRODUCT_TEXTS = {"onlyOneTitle":"Єдиний екземпляр.","onlyOneWithDays":"Якщо його купують, наступний веземо {строк}.","onlyOneWithoutDays":"Другого такого в наявності немає."};
 </script>
 
 
@@ -186,7 +190,7 @@ window.PRODUCT_TAXONOMY = {"category":{"Годинники":"categories/hodynnyk
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=4fb064fe">
+<link rel="stylesheet" href="/assets/css/style.css?v=83663c99">
 
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"></script>
@@ -722,7 +726,7 @@ BestBrnd4u
 <script src="/assets/js/stock.js?v=85fa4aad"></script>
 
 <script src="/assets/js/translit.js?v=c0957cb7"></script>
-<script src="/assets/js/common.js?v=04fa4cf3"></script>
+<script src="/assets/js/common.js?v=47033522"></script>
 <!-- Підписка на листи магазину -->
 <script src="/assets/js/subscribe.js?v=2367ff9d"></script>
 <script src="/assets/js/sync.js?v=48ef002e"></script>
@@ -735,7 +739,7 @@ BestBrnd4u
 <script src="/assets/js/lightbox.js?v=552b0982"></script>
 
 <script src="/assets/js/live-stock.js?v=ca9027dd"></script>
-<script src="/assets/js/product.js?v=314205f4"></script>
+<script src="/assets/js/product.js?v=f07c8487"></script>
 
 <!-- Відгуки: показ, форма й перевірка покупки на сервері -->
 <script src="/assets/js/reviews.js?v=41a0316a"></script>

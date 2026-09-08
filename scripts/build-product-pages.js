@@ -130,6 +130,29 @@ function loadCategoryIndex() {
 
 }
 
+// Тексти сторінки товару з адмінки.
+//
+// Читаються ОДИН раз на всю збірку: файл спільний для всіх ста
+// сторінок. Немає файлу — вертаємо порожнє, і сторінка підставить
+// запасні формулювання (див. product.js).
+const PRODUCT_TEXTS_FILE = path.join(ROOT, "data", "product-texts.json");
+
+let productTextsCache = null;
+
+function productTexts() {
+
+    if (productTextsCache) return productTextsCache;
+
+    try {
+        productTextsCache = JSON.parse(fs.readFileSync(PRODUCT_TEXTS_FILE, "utf8"));
+    } catch (error) {
+        productTextsCache = {};
+    }
+
+    return productTextsCache;
+
+}
+
 const categoryIndex = loadCategoryIndex();
 
 // Читаємо ті самі файли, з яких scripts/build-taxonomy-pages.js робить
@@ -517,6 +540,10 @@ function buildHead(product) {
         `// адреси власних сторінок категорії, розділу й бренду — щоб`,
         `// крихти після рендеру JS вели туди ж, куди в розмітці`,
         `window.PRODUCT_TAXONOMY = ${productTaxonomy(product)};`,
+        `// тексти на сторінці товару з адмінки (data/product-texts.json)`,
+        `// — вбудовані, а не довантажені: рядок «єдиний екземпляр»`,
+        `// стоїть високо, і запізнілий текст смикав би розмітку`,
+        `window.PRODUCT_TEXTS = ${JSON.stringify(productTexts())};`,
         `</script>`
     ].join("\n");
 

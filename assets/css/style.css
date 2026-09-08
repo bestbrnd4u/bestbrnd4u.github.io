@@ -5425,6 +5425,29 @@ body.mobile-filters-open .scroll-top{
 
 /* -- доставка / оплата / возврат -- */
 
+/* «Єдиний екземпляр. Якщо його купують, наступний веземо…»
+
+   Свідомо БЕЗ червоного, вогників і лічильників: 87 зі 91 позиції
+   в наявності — одна штука, тож будь-який натиск читався б як
+   накрутка терміновості й підривав би блок «тільки оригінал».
+
+   Це факт про товар, а не заклик. Тому спокійний темний текст на
+   світлій підкладці — тієї самої родини, що блок доставки поруч. */
+.only-one{
+    margin:14px 0 0;
+    padding:11px 14px;
+    border:1px solid var(--gray200);
+    border-radius:12px;
+    background:var(--gray50);
+    color:var(--gray700);
+    font-size:13.5px;
+    line-height:1.5;
+}
+
+.only-one b{
+    color:var(--gray900);
+}
+
 .delivery-box{
     padding:20px;
     background:var(--gray50);
@@ -5433,6 +5456,33 @@ body.mobile-filters-open .scroll-top{
     flex-direction:column;
     gap:12px;
     font-size:15px;
+}
+
+/* «Запитати про цей товар» — під кнопками купівлі.
+
+   Свідомо скромне посилання, а не друга кнопка: головна дія тут
+   одна — «Купити», і другий яскравий прямокутник поруч відбирав би
+   у неї увагу. Але й не сірий дрібний текст: питання про
+   оригінальність у діапазоні 3 000–15 000 ₴ виникає часто, і його
+   треба бачити без пошуку. */
+.ask-about{
+    margin:10px 0 0;
+    text-align:center;
+    font-size:13.5px;
+}
+
+.ask-about a{
+    color:var(--gray700);
+    text-decoration:underline;
+    text-decoration-color:var(--gray300);
+    text-underline-offset:3px;
+}
+
+@media (hover:hover) and (pointer:fine){
+.ask-about a:hover{
+    color:var(--gray900);
+    text-decoration-color:var(--gray900);
+}
 }
 
 .preorder-box{
@@ -6448,10 +6498,20 @@ body.mobile-filters-open .scroll-top{
     font-weight:600;
 }
 
+/* Фокус поля — темний, а не синій.
+
+   Синій на сайті означає ДІЮ: кнопки, посилання, ціна зі знижкою.
+   Поле, у якому просто стоїть курсор, дією не є — і підсвічувати
+   його тим самим кольором означає кричати про кожен клік.
+
+   Кільце робиться box-shadow, а НЕ outline: тінь повторює
+   border-radius поля, а outline Chrome малює прямокутником — саме
+   через це кути виглядали гострими. */
 .checkout-form input:focus,
 .checkout-form textarea:focus{
     outline:none;
-    border-color:var(--secondary);
+    border-color:var(--gray900);
+    box-shadow:0 0 0 4px rgba(17,24,39,.10);
 }
 
 .field-error{
@@ -6473,6 +6533,7 @@ body.mobile-filters-open .scroll-top{
 
 .checkout-form input.invalid:focus{
     border-color:var(--danger);
+    box-shadow:0 0 0 4px rgba(239,68,68,.12);
 }
 
 /* -- способи доставки -- */
@@ -6503,14 +6564,23 @@ body.mobile-filters-open .scroll-top{
     border:2px solid var(--gray200);
     border-radius:14px;
     padding:16px 18px;
+    /* box-shadow тут ЗАРАДИ кільця вибраного стану: без нього рамка й
+       тло переливались плавно, а кільце вискакувало ривком. */
     transition:background-color 350ms cubic-bezier(.4,0,.2,1),
-               border-color 350ms cubic-bezier(.4,0,.2,1);
+               border-color 350ms cubic-bezier(.4,0,.2,1),
+               box-shadow 350ms cubic-bezier(.4,0,.2,1);
     background:var(--gray50);
 }
 
+/* Вибраний спосіб доставки — темна рамка, а не синя.
+
+   Було: синя рамка й блакитне тло. Виходило, що вибраний рядок
+   виглядає як кнопка, тобто як щось, що ще треба натиснути.
+   Темна рамка читається саме як «оце вибрано». */
 .delivery-option input:checked + .delivery-option-card{
-    border-color:var(--secondary);
-    background:#eff6ff;
+    border-color:var(--gray900);
+    background:#fff;
+    box-shadow:0 0 0 4px rgba(17,24,39,.06);
 }
 
 @media (hover:hover) and (pointer:fine){
@@ -12715,6 +12785,25 @@ body.refusal-open{
    Список абсолютний: він не має розсовувати форму, інакше кнопка
    «Оформити замовлення» стрибала б під пальцем на кожну літеру.
    (assets/js/nova-poshta.js) -- */
+/* «Довідник Нової пошти не відповідає — впишіть номер вручну».
+
+   Раніше поле в такому разі просто перестало б підказувати, і
+   покупець не знав, чи він щось робить не так, чи сайт зламався.
+
+   Не червоний: людина ні в чому не винна. Це попередження про наш
+   бік і підказка, що робити далі. */
+.np-notice{
+    margin:6px 0 0;
+    padding:9px 12px;
+    border:1px solid #fde68a;
+    border-radius:10px;
+    background:#fffbeb;
+    color:#92400e;
+    font-size:12.5px;
+    font-weight:500;
+    line-height:1.45;
+}
+
 .np-suggest{
     position:absolute;
     left:0;

@@ -2300,6 +2300,13 @@ const NP_METHODS = {
 // потрібного немає в перших десяти, людина допише ще літеру.
 const SETTLEMENT_LIMIT = 12;
 
+// Чи є в рядку хоч одна кирилична літера.
+//
+// НП відкидає латиницю в назві міста з помилкою «CityName has
+// invalid characters» — заміряно живим запитом: «Київ» шукається,
+// «Kyiv» дає відмову.
+const CYRILLIC = /[\u0400-\u04FF]/;
+
 function npRequest(apiKey, action) {
 
     const spec = NP_METHODS[action?.method];
@@ -2312,6 +2319,14 @@ function npRequest(apiKey, action) {
 
         // Одна літера дає півтисячі міст і жодної користі.
         if (query.length < 2) return null;
+
+        // НП приймає назву міста ЛИШЕ кирилицею.
+        //
+        // На «Kyiv» вона відповідає не порожнім списком, а помилкою
+        // запиту: «CityName has invalid characters». Тобто латиниця
+        // — це не «місто не знайдено», а зіпсований запит, і слати
+        // його немає сенсу: маршрут публічний, а квота НП спільна.
+        if (!CYRILLIC.test(query)) return null;
 
         return {
             apiKey,
@@ -2393,10 +2408,35 @@ function parseTypes(payload) {
 // Ref типу «Поштомат» із довідника типів.
 function postomatTypeRef(types) {
 
-    const found = (Array.isArray(types) ? types : [])
-        .find(item => /поштомат/i.test(item.name));
+    const list = (Array.isArray(types) ? types : [])
+        .filter(item => /поштомат/i.test(String(item?.name || "")));
 
-    return found ? found.ref : "";
+    if (!list.length) return "";
+
+    // ЧОМУ НЕ ПРОСТО ПЕРШИЙ ЗБІГ.
+    //
+    // У довіднику НП «поштоматів» ДВА, і чужий стоїть раніше:
+    //
+    //     Поштомат ПриватБанку
+    //     Поштомат
+    //
+    // find() брав перший — тобто пошук поштоматів Нової пошти
+    // фільтрувався за типом ПриватБанку й повертав порожній список
+    // ЗАВЖДИ. Ззовні це виглядало як «не знаходить поштомат за
+    // номером», і жодної помилки при цьому не було: НП чесно
+    // відповідала «нічого не знайдено».
+    const exact = list.find(item =>
+        String(item.name).trim().toLowerCase() === "поштомат");
+
+    if (exact) return exact.ref || "";
+
+    // Точного немає — беремо НАЙКОРОТШУ назву: чужі бренди додають
+    // слова («ПриватБанку»), а власний тип НП зветься одним словом.
+    // Це запас на випадок, якщо НП колись перейменує тип.
+    const shortest = list.slice().sort((a, b) =>
+        String(a.name).length - String(b.name).length)[0];
+
+    return shortest ? (shortest.ref || "") : "";
 
 }
 
@@ -5688,8 +5728,19 @@ async function npCall(action: Record<string, any>): Promise<any> {
   const failure = npError(data);
 
   if (failure) {
+
     console.error("Нова пошта відмовила:", failure);
+
+    // Причина йде ще й у щоденний звіт: журнал Edge Functions ніхто
+    // не читає, і саме тому «не знаходить поштомат за номером»
+    // з'ясувалось лише зі скарги покупця.
+    //
+    // Метод у сторінці — щоб було видно, що саме відмовило: пошук
+    // міста чи пошук точок.
+    await reportServerIssue("np_directory", `${action.method}: ${failure}`);
+
     return null;
+
   }
 
   return data;
@@ -5702,10 +5753,16 @@ let postomatRef: string | null = null;
 
 async function typeRefFor(postomat: boolean): Promise<string> {
 
-  if (postomatRef === null) {
+  if (!postomatRef) {
 
     const data = await npCall({ method: "types" });
 
+    // ЩО БУЛО НЕ ТАК. Умовою було `postomatRef === null`, а при
+    // невдачі сюди писався порожній рядок — тобто НАЗАВЖДИ, на весь
+    // час життя інстансу. Далі кожен пошук поштоматів ішов без
+    // фільтра типу й мовчки шукав не те: у списку були відділення.
+    //
+    // Тепер порожнє значення означає «спробуємо наступного разу».
     postomatRef = data ? postomatTypeRef(parseTypes(data)) : "";
 
   }

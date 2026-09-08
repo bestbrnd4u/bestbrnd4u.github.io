@@ -56,6 +56,13 @@ export const NP_METHODS = {
 // потрібного немає в перших десяти, людина допише ще літеру.
 export const SETTLEMENT_LIMIT = 12;
 
+// Чи є в рядку хоч одна кирилична літера.
+//
+// НП відкидає латиницю в назві міста з помилкою «CityName has
+// invalid characters» — заміряно живим запитом: «Київ» шукається,
+// «Kyiv» дає відмову.
+export const CYRILLIC = /[\u0400-\u04FF]/;
+
 export function npRequest(apiKey, action) {
 
     const spec = NP_METHODS[action?.method];
@@ -68,6 +75,14 @@ export function npRequest(apiKey, action) {
 
         // Одна літера дає півтисячі міст і жодної користі.
         if (query.length < 2) return null;
+
+        // НП приймає назву міста ЛИШЕ кирилицею.
+        //
+        // На «Kyiv» вона відповідає не порожнім списком, а помилкою
+        // запиту: «CityName has invalid characters». Тобто латиниця
+        // — це не «місто не знайдено», а зіпсований запит, і слати
+        // його немає сенсу: маршрут публічний, а квота НП спільна.
+        if (!CYRILLIC.test(query)) return null;
 
         return {
             apiKey,
@@ -149,10 +164,35 @@ export function parseTypes(payload) {
 // Ref типу «Поштомат» із довідника типів.
 export function postomatTypeRef(types) {
 
-    const found = (Array.isArray(types) ? types : [])
-        .find(item => /поштомат/i.test(item.name));
+    const list = (Array.isArray(types) ? types : [])
+        .filter(item => /поштомат/i.test(String(item?.name || "")));
 
-    return found ? found.ref : "";
+    if (!list.length) return "";
+
+    // ЧОМУ НЕ ПРОСТО ПЕРШИЙ ЗБІГ.
+    //
+    // У довіднику НП «поштоматів» ДВА, і чужий стоїть раніше:
+    //
+    //     Поштомат ПриватБанку
+    //     Поштомат
+    //
+    // find() брав перший — тобто пошук поштоматів Нової пошти
+    // фільтрувався за типом ПриватБанку й повертав порожній список
+    // ЗАВЖДИ. Ззовні це виглядало як «не знаходить поштомат за
+    // номером», і жодної помилки при цьому не було: НП чесно
+    // відповідала «нічого не знайдено».
+    const exact = list.find(item =>
+        String(item.name).trim().toLowerCase() === "поштомат");
+
+    if (exact) return exact.ref || "";
+
+    // Точного немає — беремо НАЙКОРОТШУ назву: чужі бренди додають
+    // слова («ПриватБанку»), а власний тип НП зветься одним словом.
+    // Це запас на випадок, якщо НП колись перейменує тип.
+    const shortest = list.slice().sort((a, b) =>
+        String(a.name).length - String(b.name).length)[0];
+
+    return shortest ? (shortest.ref || "") : "";
 
 }
 

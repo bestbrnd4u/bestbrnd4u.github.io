@@ -1002,6 +1002,19 @@ function refreshAvailability() {
 
     if (delivery) delivery.hidden = preOrder;
 
+    // «Єдиний екземпляр» — лише коли обраного розміру справді одна
+    // штука І товар не під замовлення. Під замовлення кількості
+    // немає взагалі, і рядок там означав би протилежне.
+    const onlyOne = page.querySelector(".only-one");
+
+    if (onlyOne) {
+
+        const active = page.querySelector(".size.active");
+
+        onlyOne.hidden = preOrder || !active || active.dataset.qty !== "1";
+
+    }
+
 }
 
 // Наявність приїхала пізніше за сторінку — оновлюємо ЛИШЕ її.
@@ -1086,10 +1099,80 @@ function applyLiveStockToPage(product) {
             button.removeAttribute("title");
         }
 
+        // Кількість теж перескладаємо: інакше «єдиний екземпляр»
+        // лишився б від старих залишків — тобто саме тоді, коли він
+        // уже неправда.
+        const left = sizeLeft(product, activeVariant, button.dataset.size);
+
+        if (left === null) delete button.dataset.qty;
+        else button.dataset.qty = String(left);
+
     });
 
     // 4. І видима частина.
     refreshAvailability();
+
+}
+
+// Тексти рядка «єдиний екземпляр».
+//
+// Редагуються в адмінці: «Сторінки → Тексти на сторінці товару».
+// Генератор вбудовує їх у сторінку (window.PRODUCT_TEXTS), тож тут
+// вони є вже під час першого малювання — рядок стоїть високо, і
+// довантажувати його було б видно.
+//
+// Запасні формулювання лишаються в коді: сторінка мусить працювати
+// й тоді, коли файлу немає (стара збірка, порожня адмінка).
+const ONLY_ONE_FALLBACK = {
+    title: "Єдиний екземпляр.",
+    withDays: "Якщо його купують, наступний веземо {строк}.",
+    withoutDays: "Другого такого в наявності немає."
+};
+
+function onlyOneTitle() {
+
+    const texts = window.PRODUCT_TEXTS || {};
+
+    return String(texts.onlyOneTitle || ONLY_ONE_FALLBACK.title).trim();
+
+}
+
+function onlyOneText(product) {
+
+    const texts = window.PRODUCT_TEXTS || {};
+
+    const days = String(product?.preOrderDays || "").trim();
+
+    if (!days) {
+        return String(texts.onlyOneWithoutDays || ONLY_ONE_FALLBACK.withoutDays).trim();
+    }
+
+    // {строк} — місце, куди стає термін із картки товару. Якщо в
+    // тексті його забули, дописуємо термін у кінці: краще трохи
+    // кострубато, ніж без головного числа.
+    const template = String(texts.onlyOneWithDays || ONLY_ONE_FALLBACK.withDays).trim();
+
+    return template.includes("{строк}")
+        ? template.split("{строк}").join(days)
+        : `${template} ${days}`.trim();
+
+}
+
+// Скільки штук цього розміру лишилось: число або null.
+//
+// null означає «залишки не рахуємо» — тоді жодних слів про
+// кількість не говоримо. Порожнє місце краще за вигадку.
+function sizeLeft(product, variant, size) {
+
+    const stock = window.Stock;
+
+    if (!stock || !variant) return null;
+
+    const map = stock.variantStock(product, variant);
+
+    if (!stock.tracked(map)) return null;
+
+    return stock.sizeQty(map, size);
 
 }
 
@@ -1281,16 +1364,41 @@ function renderProduct(product) {
         const isActive = sizes.length === 1 || size === requestedSize;
         const isOut = outOfStock.has(size);
 
+        // Скільки лишилось ЦЬОГО розміру. Потрібно рядку «єдиний
+        // екземпляр», а живе в атрибуті, бо refreshAvailability()
+        // читає стан із розмітки, а не з товару (та сама причина, що
+        // в data-colorPreorder нижче).
+        const left = sizeLeft(productBase, activeVariant, size);
+
         return `
         <button type="button"
                 class="size ${isActive ? "active" : ""} ${isOut ? "size-out" : ""}"
                 data-size="${escapeHtml(size)}"
+                ${left === null ? "" : `data-qty="${left}"`}
                 ${isOut ? 'data-out="1" title="Немає в наявності — можна замовити"' : ""}>
             ${size}
         </button>
     `;
 
     }).join("");
+
+    // Чи показувати «Єдиний екземпляр» ОДРАЗУ.
+    //
+    // refreshAvailability() після першого малювання не викликається
+    // (її кличуть клік по розміру, перемикач кольору й прихід живих
+    // залишків), тож розмітка мусить народитись у правильному
+    // стані — так само, як .preorder-box і .delivery-box.
+    //
+    // Активний розмір — той самий, який позначає кнопку вище:
+    // єдиний зі списку або запитаний в адресі.
+    const activeSize = sizes.length === 1
+        ? sizes[0]
+        : (sizes.includes(requestedSize) ? requestedSize : null);
+
+    const onlyOneNow = !product.preOrder
+        && activeSize !== null
+        && !outOfStock.has(activeSize)
+        && sizeLeft(productBase, activeVariant, activeSize) === 1;
 
     // Стан наявності КОЛЬОРУ тримаємо на самому контейнері.
     //
@@ -1403,7 +1511,18 @@ function renderProduct(product) {
     <button type="button" class="size-guide-link" id="sizeGuideBtn">Таблиця розмірів</button>
 </div>
 
-<div class="sizes ${typeof sizeRowHidden === "function" && sizeRowHidden(sizes) ? "sizes-placeholder" : ""}">
+<!-- Рядок розмірів тут показується ЗАВЖДИ, зокрема з ONESIZE.
+
+     Раніше він ховався тим самим sizeRowHidden(), що в картці
+     каталогу, — а підпис «Розмір» над ним лишався. Виходив
+     заголовок без значення: заміряно на сумці Marc Jacobs, де
+     .size-row-head видно (698×38), а .sizes має display:none.
+     Виглядало як «розмір зник».
+
+     У компактних видах (картка, кошик, обране) рядок і далі
+     ховається: там підпису немає, тож і порожнечі не виникає, а
+     «ONESIZE» під кожною сумкою в сітці справді зайвий. -->
+<div class="sizes">
 
 ${sizeButtons}
 
@@ -1449,6 +1568,24 @@ ${sizeButtons}
 
         </div>
 
+        <!-- Запитати про ЦЕЙ товар.
+
+             До футера на сторінці товару не було жодного посилання,
+             щоб написати: щоб спитати «чи точно оригінал» або «чи є
+             в іншому кольорі», покупець мусив долистати до підвалу
+             й сам описати, про що мова.
+
+             Ведемо на форму контактів, а не на t.me: параметр ?text=
+             для звичайного акаунта Telegram більшість клієнтів
+             ігнорує, і повідомлення прийшло б порожнім. Форма вже
+             надсилає лист магазину, і товар у ній підставляється
+             сам (див. contacts.html). -->
+        <p class="ask-about">
+            <a href="contacts?about=${encodeURIComponent(activeSku || product.article || "")}&amp;name=${encodeURIComponent(product.title || "")}">
+                Запитати про цей товар
+            </a>
+        </p>
+
         <div class="preorder-box" ${product.preOrder ? "" : "hidden"}>
 
             <div class="preorder-box-title">📦 Цей товар під замовлення</div>
@@ -1465,6 +1602,24 @@ ${sizeButtons}
             </p>
 
         </div>
+
+        <!-- «Єдиний екземпляр».
+
+             87 із 91 позиції в наявності — одна штука: магазин
+             викуповує речі під замовлення, і те, що лежить, —
+             одиничне. Покупець про це не знав: бачив «в наявності»
+             й вважав, що річ нікуди не зникне.
+
+             Свідомо БЕЗ «остання одиниця» й лічильників: на 87
+             товарах зі 91 це читалось би як накрутка терміновості.
+             Кажемо наслідок, а не тиск.
+
+             Показує/ховає refreshAvailability() за data-qty
+             активного розміру. -->
+        <p class="only-one" ${onlyOneNow ? "" : "hidden"}>
+            <b>${escapeHtml(onlyOneTitle())}</b>
+            ${escapeHtml(onlyOneText(product))}
+        </p>
 
         <div class="delivery-box" ${product.preOrder ? "hidden" : ""}>
 

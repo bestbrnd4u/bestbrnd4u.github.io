@@ -225,6 +225,64 @@ console.log("\n[6] Розсилка: інший лист, та сама обер
         /remindCheckouts[\s\S]{0,900}товарів уже немає в каталозі/.test(remindSrc));
 }
 
+console.log("\n[Форма] Помилки видно там, де курсор щойно був");
+{
+    const js = fs.readFileSync(path.join(ROOT, "assets/js/checkout.js"), "utf8");
+    const css = fs.readFileSync(path.join(ROOT, "assets/css/style.css"), "utf8");
+
+    // ЩО БУЛО НЕ ТАК. Помилки показувались лише після натискання
+    // «Оформити замовлення»: людина пропускає «Прізвище», доходить до
+    // кінця довгої форми — і аж там дізнається, що треба вертатись.
+    check("поле перевіряється при виході з нього",
+        /addEventListener\("blur"/.test(js) && /validateField/.test(js));
+
+    // Правило одне на дві перевірки: інакше «що сказали одразу» й
+    // «що сказали при надсиланні» рано чи пізно розійдуться.
+    check("правила не подвоєні: validateForm ходить тим самим validateField",
+        /function validateField/.test(js)
+        && /REQUIRED_FIELDS\.forEach\(id => \{\s*if \(!validateField\(id\)\)/.test(js));
+
+    // ПОРОЖНЄ ОБОВ'ЯЗКОВЕ ПОЛЕ ЧЕРВОНІЄ ОДРАЗУ.
+    //
+    // Спершу тут була умова «лише якщо щось уводили» — щоб прохід
+    // формою через Tab не засвітив п'ять червоних полів. На живій
+    // сторінці вийшло гірше: людина проминає «Прізвище», не бачить
+    // жодного знаку, що воно обов'язкове, і дізнається про це аж у
+    // кінці довгої форми.
+    check("вихід із поля перевіряє його беззастережно",
+        /addEventListener\("blur", \(\) => validateField\(id\)\)/.test(js));
+
+    check("умови «лише якщо торкались» більше немає",
+        !/dataset\.touched/.test(js));
+
+    // По батькові — єдине необов'язкове поле блоку. Воно не має
+    // червоніти ніколи, і захищає це те, що його немає в переліку.
+    check("По батькові не в переліку обов'язкових",
+        /REQUIRED_FIELDS = \["firstName", "lastName", "email", "phone", "city"\]/.test(js)
+        && !/REQUIRED_FIELDS[^\]]*middleName/.test(js));
+
+    // І в розмітці воно підписане як необов'язкове — інакше людина
+    // однаково гадатиме.
+    check("і в самій формі сказано, що воно необов'язкове",
+        /id="middleName"[\s\S]{0,200}?необов/.test(
+            fs.readFileSync(path.join(ROOT, "checkout.html"), "utf8"))
+        || /необов[\s\S]{0,200}?id="middleName"/.test(
+            fs.readFileSync(path.join(ROOT, "checkout.html"), "utf8")));
+
+    // ВИГЛЯД. Синій на сайті означає дію — кнопки, посилання. Поле,
+    // у якому просто стоїть курсор, дією не є.
+    check("фокус поля темний, а не синій",
+        /\.checkout-form input:focus[\s\S]{0,200}?border-color:var\(--gray900\)/.test(css));
+
+    // Кільце робиться тінню, а не outline: тінь повторює
+    // border-radius, а outline Chrome малює прямокутником — саме
+    // через це кути виглядали гострими.
+    check("кільце кругле (box-shadow, не outline)",
+        /\.checkout-form input:focus[\s\S]{0,220}?box-shadow:0 0 0 4px/.test(css));
+
+    check("вибраний спосіб доставки теж темний",
+        /input:checked \+ \.delivery-option-card\{[^}]*border-color:var\(--gray900\)/.test(css));
+}
 console.log(failures ? `\n❌ Провалено: ${failures}` : "\n✅ Незавершене оформлення: нагадуємо один раз і нікого не підписуємо");
 
 process.exit(failures ? 1 : 0);
