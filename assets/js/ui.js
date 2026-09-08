@@ -664,6 +664,36 @@ function variantUrl(src, width) {
 
 }
 
+// Ім'я файлу так, як воно лежить у data/image-variants.json.
+//
+// ЧОМУ ЦЕ ОКРЕМА ФУНКЦІЯ, А НЕ split("/").pop() НА МІСЦІ
+// -------------------------------------------------------
+// Саме на цьому все й зламалось. Збірка ставить фото відбиток кеша
+// (build-products.js → stamp), тож у товарі лежить
+//
+//   /assets/images/products/uploads/a05042-1.webp?v=26b9d653
+//
+// а в переліку копій — «a05042-1.webp». Простий split("/").pop()
+// віддає ім'я РАЗОМ із «?v=…», known.has() не знаходить нічого, і
+// srcset не проставляється ЖОДНІЙ картці.
+//
+// Заміряно на проді (каталог із телефона, два екрани): 47 фото,
+// 4158 КБ, зі зменшених копій — нуль, карток без srcset — 125 зі 125.
+// Копії при цьому лежали поруч: -600 у середньому 16 КБ проти 70 КБ
+// (на 76% менше), -300 — 5 КБ.
+//
+// Зламалось не одразу: srcset з'явився 15 серпня й працював, поки
+// 25-го фото не почали отримувати версію. Дві частини одного
+// механізму розійшлись мовчки — сторінки виглядали так само.
+//
+// Тепер ім'я обчислює одна функція для всіх місць: розійтись їм
+// більше нема як.
+function variantName(src) {
+
+    return String(src || "").split("/").pop().split("?")[0];
+
+}
+
 // Значення для CSS background-image.
 //
 // Лапки й зворотні слеші в назві файлу екрануємо: назву дає адмінка
@@ -789,7 +819,7 @@ async function applyImageVariants(root) {
 
             const src = img.dataset.variantSrc;
 
-            if (!known.has(src.split("/").pop())) return;
+            if (!known.has(variantName(src))) return;
 
             const srcset = buildSrcSet(src);
 
@@ -815,9 +845,7 @@ async function applyImageVariants(root) {
 
         const src = el.dataset.swatchBg;
 
-        const name = src.split("/").pop().split("?")[0];
-
-        const small = known.has(name) ? variantUrl(src, 300) : null;
+        const small = known.has(variantName(src)) ? variantUrl(src, 300) : null;
 
         el.style.backgroundImage = cssUrl(small || src);
 

@@ -18,6 +18,7 @@
       <g:condition>new</g:condition>
       <g:mpn>A05042-0037354</g:mpn>
       <g:item_group_id>1</g:item_group_id>
+      <g:color>Темно-сірий</g:color>
       <g:gender>unisex</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
@@ -40,6 +41,7 @@
       <g:condition>new</g:condition>
       <g:mpn>ARC54H01T-Q11</g:mpn>
       <g:item_group_id>2</g:item_group_id>
+      <g:color>Чорний</g:color>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
@@ -63,6 +65,7 @@
       <g:condition>new</g:condition>
       <g:mpn>RTLADF952201</g:mpn>
       <g:item_group_id>3</g:item_group_id>
+      <g:color>Чорний</g:color>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
@@ -85,6 +88,7 @@
       <g:condition>new</g:condition>
       <g:mpn>BB0096S-001-51</g:mpn>
       <g:item_group_id>4</g:item_group_id>
+      <g:color>Темно-сірий</g:color>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
@@ -110,6 +114,7 @@
       <g:condition>new</g:condition>
       <g:mpn>BB0041S-001-99</g:mpn>
       <g:item_group_id>5</g:item_group_id>
+      <g:color>Темно-сірий</g:color>
       <g:gender>unisex</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
@@ -135,6 +140,7 @@
       <g:condition>new</g:condition>
       <g:mpn>BE4361F-300187-51</g:mpn>
       <g:item_group_id>6</g:item_group_id>
+      <g:color>Темно-сірий</g:color>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
@@ -160,6 +166,8 @@
       <g:condition>new</g:condition>
       <g:mpn>coach-ethan-cv918-qbnrx</g:mpn>
       <g:item_group_id>7</g:item_group_id>
+      <g:color>Коричневий</g:color>
+      <g:material>Шкіра</g:material>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
@@ -184,6 +192,8 @@
       <g:condition>new</g:condition>
       <g:mpn>coach-ct714-qbml5</g:mpn>
       <g:item_group_id>8</g:item_group_id>
+      <g:color>Чорний</g:color>
+      <g:material>Шкіра</g:material>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
@@ -208,6 +218,7 @@
       <g:mpn>coach73995black</g:mpn>
       <g:item_group_id>9</g:item_group_id>
       <g:color>Темно-сірий</g:color>
+      <g:material>Шкіра</g:material>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -234,6 +245,7 @@
       <g:mpn>coach73995chalk</g:mpn>
       <g:item_group_id>9</g:item_group_id>
       <g:color>Світло-сірий</g:color>
+      <g:material>Шкіра</g:material>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -259,6 +271,7 @@
       <g:mpn>coach73995-dark-stone</g:mpn>
       <g:item_group_id>9</g:item_group_id>
       <g:color>Сіро-коричневий</g:color>
+      <g:material>Шкіра</g:material>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -284,6 +297,7 @@
       <g:mpn>coachB4OOH</g:mpn>
       <g:item_group_id>9</g:item_group_id>
       <g:color>Коричнево-чорний</g:color>
+      <g:material>Шкіра</g:material>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -310,6 +324,7 @@
       <g:mpn>coach73995brown</g:mpn>
       <g:item_group_id>9</g:item_group_id>
       <g:color>Коричневий</g:color>
+      <g:material>Шкіра</g:material>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -336,6 +351,7 @@
       <g:mpn>Coach73995LHTP</g:mpn>
       <g:item_group_id>9</g:item_group_id>
       <g:color>Тауп</g:color>
+      <g:material>Шкіра</g:material>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -362,6 +378,7 @@
       <g:mpn>coach-cp150-b4ha</g:mpn>
       <g:item_group_id>10</g:item_group_id>
       <g:color>Світло-сірий</g:color>
+      <g:product_highlight>Розміри: 26 × 14 × 10 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -387,6 +404,7 @@
       <g:mpn>cp150_b4bk_a0</g:mpn>
       <g:item_group_id>10</g:item_group_id>
       <g:color>Чорний</g:color>
+      <g:product_highlight>Розміри: 26 × 14 × 10 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -412,6 +430,7 @@
       <g:mpn>cp150_b4mpl</g:mpn>
       <g:item_group_id>10</g:item_group_id>
       <g:color>Темно-коричневий</g:color>
+      <g:product_highlight>Розміри: 26 × 14 × 10 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -436,6 +455,7 @@
       <g:condition>new</g:condition>
       <g:mpn>GG0516S-001-52</g:mpn>
       <g:item_group_id>11</g:item_group_id>
+      <g:color>Темно-сірий</g:color>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
@@ -457,6 +477,7 @@
       <g:condition>new</g:condition>
       <g:mpn>invicta-pro-diver-blue-dial-22058</g:mpn>
       <g:item_group_id>12</g:item_group_id>
+      <g:color>Темно-синій</g:color>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
@@ -479,6 +500,7 @@
       <g:condition>new</g:condition>
       <g:mpn>JWPR-WY46</g:mpn>
       <g:item_group_id>13</g:item_group_id>
+      <g:color>Чорний</g:color>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -547,6 +569,7 @@
       <g:condition>new</g:condition>
       <g:mpn>JWP-MA106</g:mpn>
       <g:item_group_id>15</g:item_group_id>
+      <g:color>Коричневий</g:color>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -570,6 +593,7 @@
       <g:condition>new</g:condition>
       <g:mpn>JWP-MA080</g:mpn>
       <g:item_group_id>16</g:item_group_id>
+      <g:color>Синій</g:color>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -593,6 +617,7 @@
       <g:condition>new</g:condition>
       <g:mpn>MJ-1028S-0807IR-54</g:mpn>
       <g:item_group_id>17</g:item_group_id>
+      <g:color>Темно-сірий</g:color>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
@@ -615,6 +640,7 @@
       <g:condition>new</g:condition>
       <g:mpn>MJ-1061S-009QHA-59</g:mpn>
       <g:item_group_id>18</g:item_group_id>
+      <g:color>Темно-коричневий</g:color>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
@@ -637,6 +663,7 @@
       <g:condition>new</g:condition>
       <g:mpn>MARC-409S-08079O-54</g:mpn>
       <g:item_group_id>19</g:item_group_id>
+      <g:color>Темно-сірий</g:color>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
@@ -661,6 +688,7 @@
       <g:mpn>2S3HCR500H03_134</g:mpn>
       <g:item_group_id>20</g:item_group_id>
       <g:color>Бежевий</g:color>
+      <g:material>Шкіра</g:material>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -686,6 +714,7 @@
       <g:mpn>H153L01SP22-002</g:mpn>
       <g:item_group_id>20</g:item_group_id>
       <g:color>Чорний</g:color>
+      <g:material>Шкіра</g:material>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -710,6 +739,7 @@
       <g:condition>new</g:condition>
       <g:mpn>2F3HSH042H02-230</g:mpn>
       <g:item_group_id>21</g:item_group_id>
+      <g:color>Коричневий</g:color>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -734,6 +764,8 @@
       <g:condition>new</g:condition>
       <g:mpn>H652L01PF22</g:mpn>
       <g:item_group_id>22</g:item_group_id>
+      <g:color>Чорний</g:color>
+      <g:material>Шкіра</g:material>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -757,6 +789,7 @@
       <g:condition>new</g:condition>
       <g:mpn>D31186MABU</g:mpn>
       <g:item_group_id>23</g:item_group_id>
+      <g:color>Світло-сірий</g:color>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
@@ -781,6 +814,7 @@
       <g:condition>new</g:condition>
       <g:mpn>D710BN</g:mpn>
       <g:item_group_id>24</g:item_group_id>
+      <g:color>Темно-сірий</g:color>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
@@ -804,6 +838,8 @@
       <g:condition>new</g:condition>
       <g:mpn>30H1GGRL2L-487</g:mpn>
       <g:item_group_id>25</g:item_group_id>
+      <g:color>Синій</g:color>
+      <g:material>Шкіра</g:material>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -827,6 +863,7 @@
       <g:condition>new</g:condition>
       <g:mpn>MK4619</g:mpn>
       <g:item_group_id>26</g:item_group_id>
+      <g:color>Бежевий</g:color>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
@@ -850,6 +887,7 @@
       <g:condition>new</g:condition>
       <g:mpn>PR-20WS-1AB5S0-49</g:mpn>
       <g:item_group_id>27</g:item_group_id>
+      <g:color>Темно-сірий</g:color>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
@@ -874,6 +912,7 @@
       <g:mpn>35F1GX0C5U</g:mpn>
       <g:item_group_id>28</g:item_group_id>
       <g:color>Чорний</g:color>
+      <g:product_highlight>Розміри: 18 см × 13 см × 7,5 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -896,6 +935,7 @@
       <g:mpn>35F0SX0C5T</g:mpn>
       <g:item_group_id>28</g:item_group_id>
       <g:color>Світло-сірий</g:color>
+      <g:product_highlight>Розміри: 18 см × 13 см × 7,5 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -920,6 +960,7 @@
       <g:mpn>35F0GX0C5T</g:mpn>
       <g:item_group_id>28</g:item_group_id>
       <g:color>Зелений</g:color>
+      <g:product_highlight>Розміри: 18 см × 13 см × 7,5 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -945,6 +986,7 @@
       <g:mpn>35F1GX0C5U</g:mpn>
       <g:item_group_id>28</g:item_group_id>
       <g:color>Темно-синій</g:color>
+      <g:product_highlight>Розміри: 18 см × 13 см × 7,5 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -970,6 +1012,9 @@
       <g:condition>new</g:condition>
       <g:mpn>JC4118PP1FLT0</g:mpn>
       <g:item_group_id>29</g:item_group_id>
+      <g:color>Бежево-рожевий</g:color>
+      <g:material>100% натуральна теляча шкіра </g:material>
+      <g:product_highlight>Розміри: 23 × 15 × 7 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -994,6 +1039,8 @@
       <g:condition>new</g:condition>
       <g:mpn>JC4116PP1FLT0000</g:mpn>
       <g:item_group_id>30</g:item_group_id>
+      <g:color>Чорний</g:color>
+      <g:product_highlight>Розміри: 25 × 15 × 7 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -1018,6 +1065,9 @@
       <g:condition>new</g:condition>
       <g:mpn>35F2GCCS2L</g:mpn>
       <g:item_group_id>31</g:item_group_id>
+      <g:color>Пудрово-рожевий</g:color>
+      <g:material>100% натуральна шкіра </g:material>
+      <g:product_highlight>Розміри: 28,5 × 12 × 21 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -1041,7 +1091,9 @@
       <g:condition>new</g:condition>
       <g:mpn>NENA/S-807-51</g:mpn>
       <g:item_group_id>32</g:item_group_id>
+      <g:color>Чорний</g:color>
       <g:size>51</g:size>
+      <g:product_highlight>Розміри: 51</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
@@ -1065,6 +1117,7 @@
       <g:condition>new</g:condition>
       <g:mpn>MJ-1010/S-0807/9O-54</g:mpn>
       <g:item_group_id>33</g:item_group_id>
+      <g:color>Чорний</g:color>
       <g:size>54</g:size>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
@@ -1089,6 +1142,7 @@
       <g:condition>new</g:condition>
       <g:mpn>43SMA0064</g:mpn>
       <g:item_group_id>34</g:item_group_id>
+      <g:color>Білий</g:color>
       <g:size>38</g:size>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
@@ -1113,6 +1167,7 @@
       <g:condition>new</g:condition>
       <g:mpn>43SMA0064</g:mpn>
       <g:item_group_id>34</g:item_group_id>
+      <g:color>Білий</g:color>
       <g:size>37</g:size>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
@@ -1137,6 +1192,7 @@
       <g:condition>new</g:condition>
       <g:mpn>43SMA0064</g:mpn>
       <g:item_group_id>34</g:item_group_id>
+      <g:color>Білий</g:color>
       <g:size>39</g:size>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
@@ -1161,6 +1217,7 @@
       <g:condition>new</g:condition>
       <g:mpn>GY6095</g:mpn>
       <g:item_group_id>35</g:item_group_id>
+      <g:color>Білий</g:color>
       <g:size>36</g:size>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
@@ -1185,6 +1242,7 @@
       <g:condition>new</g:condition>
       <g:mpn>744SFA0020.080</g:mpn>
       <g:item_group_id>36</g:item_group_id>
+      <g:color>Мультиколір</g:color>
       <g:size>37</g:size>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
@@ -1209,6 +1267,7 @@
       <g:condition>new</g:condition>
       <g:mpn>744SFA0020.080</g:mpn>
       <g:item_group_id>36</g:item_group_id>
+      <g:color>Мультиколір</g:color>
       <g:size>38</g:size>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
@@ -1233,6 +1292,7 @@
       <g:condition>new</g:condition>
       <g:mpn>744SFA0020.080</g:mpn>
       <g:item_group_id>36</g:item_group_id>
+      <g:color>Мультиколір</g:color>
       <g:size>39</g:size>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
@@ -1257,6 +1317,7 @@
       <g:condition>new</g:condition>
       <g:mpn>746SFA0077.ANI</g:mpn>
       <g:item_group_id>37</g:item_group_id>
+      <g:color>Зелений</g:color>
       <g:size>38</g:size>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
@@ -1280,6 +1341,7 @@
       <g:condition>new</g:condition>
       <g:mpn>LA216D08D-J11</g:mpn>
       <g:item_group_id>38</g:item_group_id>
+      <g:color>Рожевий</g:color>
       <g:size>38</g:size>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
@@ -1303,6 +1365,7 @@
       <g:condition>new</g:condition>
       <g:mpn>45SFA0001</g:mpn>
       <g:item_group_id>39</g:item_group_id>
+      <g:color>Чорний</g:color>
       <g:size>37</g:size>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
@@ -1325,6 +1388,9 @@
       <g:condition>new</g:condition>
       <g:mpn>NH4040NZ</g:mpn>
       <g:item_group_id>40</g:item_group_id>
+      <g:color>Темно-синій</g:color>
+      <g:product_highlight>Розміри: 17 × 23 × 9 см</g:product_highlight>
+      <g:product_highlight>Склад: 100% поліестр</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
@@ -1348,6 +1414,7 @@
       <g:condition>new</g:condition>
       <g:mpn>746SMA0008-286</g:mpn>
       <g:item_group_id>41</g:item_group_id>
+      <g:color>Білий із зеленим</g:color>
       <g:size>37</g:size>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
@@ -1372,6 +1439,7 @@
       <g:condition>new</g:condition>
       <g:mpn>LA211A0QU-A12</g:mpn>
       <g:item_group_id>42</g:item_group_id>
+      <g:color>Біло-помаранчевий</g:color>
       <g:size>37</g:size>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
@@ -1396,6 +1464,7 @@
       <g:condition>new</g:condition>
       <g:mpn>746SMA0110.21G</g:mpn>
       <g:item_group_id>43</g:item_group_id>
+      <g:color>Білий</g:color>
       <g:size>38</g:size>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
@@ -1420,6 +1489,7 @@
       <g:condition>new</g:condition>
       <g:mpn>746SFA0075.1R5</g:mpn>
       <g:item_group_id>44</g:item_group_id>
+      <g:color>Бежевий</g:color>
       <g:size>38</g:size>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
@@ -1445,6 +1515,10 @@
       <g:condition>new</g:condition>
       <g:mpn>H025M06RE22</g:mpn>
       <g:item_group_id>45</g:item_group_id>
+      <g:color>Чорний</g:color>
+      <g:material>Штучне хутро</g:material>
+      <g:product_highlight>Розміри: 32 × 26 × 17 см</g:product_highlight>
+      <g:product_highlight>Ремінь знімний, регульований</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -1470,6 +1544,9 @@
       <g:mpn>CR144</g:mpn>
       <g:item_group_id>46</g:item_group_id>
       <g:color>Чорний</g:color>
+      <g:material>Натуральна шкіра</g:material>
+      <g:product_highlight>Розміри: 14 × 16,5 × 9 см</g:product_highlight>
+      <g:product_highlight>Знімні</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -1494,6 +1571,9 @@
       <g:mpn>CR144</g:mpn>
       <g:item_group_id>46</g:item_group_id>
       <g:color>Білий</g:color>
+      <g:material>Натуральна шкіра</g:material>
+      <g:product_highlight>Розміри: 14 × 16,5 × 9 см</g:product_highlight>
+      <g:product_highlight>Знімні</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -1517,6 +1597,10 @@
       <g:condition>new</g:condition>
       <g:mpn>H956L01PF22_365</g:mpn>
       <g:item_group_id>47</g:item_group_id>
+      <g:color>Темно-зелений</g:color>
+      <g:material>Натуральна шкіра</g:material>
+      <g:product_highlight>Розміри: 25 × 16 × 5 см</g:product_highlight>
+      <g:product_highlight>2 знімні регульований та ланцюжок</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -1541,6 +1625,10 @@
       <g:condition>new</g:condition>
       <g:mpn>CA148</g:mpn>
       <g:item_group_id>48</g:item_group_id>
+      <g:color>Білий комбінований</g:color>
+      <g:material>Фірмовий покритий канвас та гладка шкіра</g:material>
+      <g:product_highlight>Розміри: 22 × 16 × 7 см</g:product_highlight>
+      <g:product_highlight>Регульований, знімний</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -1564,7 +1652,11 @@
       <g:condition>new</g:condition>
       <g:mpn>H004L01PF21</g:mpn>
       <g:item_group_id>49</g:item_group_id>
+      <g:color>Зелений</g:color>
       <g:size>S</g:size>
+      <g:material>Натуральна зерниста шкіра</g:material>
+      <g:product_highlight>Розміри: 26 × 21 × 13 см</g:product_highlight>
+      <g:product_highlight>Ремінь знімний та регульований</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -1588,6 +1680,10 @@
       <g:condition>new</g:condition>
       <g:mpn>2S4SMN080S02678</g:mpn>
       <g:item_group_id>50</g:item_group_id>
+      <g:color>Рожевий</g:color>
+      <g:material>Натуральна шкіра</g:material>
+      <g:product_highlight>Розміри: 20 × 12 × 4 см</g:product_highlight>
+      <g:product_highlight>Ремінець знімний та регульований</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -1612,7 +1708,11 @@
       <g:condition>new</g:condition>
       <g:mpn>2F4HTT015H05</g:mpn>
       <g:item_group_id>51</g:item_group_id>
+      <g:color>Чорно-бежевий</g:color>
       <g:size>M</g:size>
+      <g:material>Монограмний жакард, шкіряне оздоблення</g:material>
+      <g:product_highlight>Розміри: 34 × 27 × 15 см</g:product_highlight>
+      <g:product_highlight>Ремінець знімний та регульований</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -1636,7 +1736,11 @@
       <g:condition>new</g:condition>
       <g:mpn>H009L01SP21-05</g:mpn>
       <g:item_group_id>52</g:item_group_id>
+      <g:color>Сіро-бежевий</g:color>
       <g:size>S</g:size>
+      <g:material>Натуральна шкіра</g:material>
+      <g:product_highlight>Розміри: 26 × 21 × 13 см</g:product_highlight>
+      <g:product_highlight>Ремінець знімний та регульований</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -1661,6 +1765,10 @@
       <g:condition>new</g:condition>
       <g:mpn>2S4HSH085H02-140</g:mpn>
       <g:item_group_id>53</g:item_group_id>
+      <g:color>Молочний</g:color>
+      <g:material>Натуральна шкіра</g:material>
+      <g:product_highlight>Розміри: 22 × 12 × 7 см</g:product_highlight>
+      <g:product_highlight>2 знімні ремені — шкіряний та текстильний регульований</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -1686,6 +1794,10 @@
       <g:condition>new</g:condition>
       <g:mpn>2S4HSH085H02</g:mpn>
       <g:item_group_id>54</g:item_group_id>
+      <g:color>Кемел</g:color>
+      <g:material>Натуральна шкіра</g:material>
+      <g:product_highlight>Розміри: 22 × 12 × 7 см</g:product_highlight>
+      <g:product_highlight>Два знімні ремені</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -1711,6 +1823,10 @@
       <g:condition>new</g:condition>
       <g:mpn>2S4HSH085H02-001</g:mpn>
       <g:item_group_id>55</g:item_group_id>
+      <g:color>Чорний</g:color>
+      <g:material>Натуральна шкіра</g:material>
+      <g:product_highlight>Розміри: 22 × 12 × 7 см</g:product_highlight>
+      <g:product_highlight>Два знімні ремені</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -1734,7 +1850,11 @@
       <g:condition>new</g:condition>
       <g:mpn>H009L01SP21</g:mpn>
       <g:item_group_id>56</g:item_group_id>
+      <g:color>Бежево-кремовий</g:color>
       <g:size>S</g:size>
+      <g:material>Натуральна шкіра</g:material>
+      <g:product_highlight>Розміри: 25,5 × 20 × 13 см</g:product_highlight>
+      <g:product_highlight>Ремінець знімний та регульований</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -1759,6 +1879,10 @@
       <g:condition>new</g:condition>
       <g:mpn>H956L01PF22-325</g:mpn>
       <g:item_group_id>57</g:item_group_id>
+      <g:color>Яскраво-зелений</g:color>
+      <g:material>Натуральна шкіра</g:material>
+      <g:product_highlight>Розміри: 25 × 16 × 5 см</g:product_highlight>
+      <g:product_highlight>Два знімні — ланцюжок та регульований текстильний</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -1784,6 +1908,9 @@
       <g:mpn>CAM98</g:mpn>
       <g:item_group_id>58</g:item_group_id>
       <g:color>Чорний</g:color>
+      <g:material>Гладка натуральна шкіра</g:material>
+      <g:product_highlight>Розміри: 26 × 16,5 × 8,3 см</g:product_highlight>
+      <g:product_highlight>Ремінець знімний та регульований</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -1809,6 +1936,9 @@
       <g:mpn>C4823B4IY</g:mpn>
       <g:item_group_id>58</g:item_group_id>
       <g:color>Айворі</g:color>
+      <g:material>Гладка натуральна шкіра</g:material>
+      <g:product_highlight>Розміри: 26 × 16,5 × 8,3 см</g:product_highlight>
+      <g:product_highlight>Ремінець знімний та регульований</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -1834,6 +1964,10 @@
       <g:condition>new</g:condition>
       <g:mpn>CJ925B4/CH</g:mpn>
       <g:item_group_id>59</g:item_group_id>
+      <g:color>Айворі</g:color>
+      <g:material>Натуральна шкіра</g:material>
+      <g:product_highlight>Розміри: 18 × 10 × 3 см</g:product_highlight>
+      <g:product_highlight>2 знімні — на зап'ястя та ланцюжок</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -1859,6 +1993,9 @@
       <g:mpn>213BA007-3063-510</g:mpn>
       <g:item_group_id>60</g:item_group_id>
       <g:color>Бежевий</g:color>
+      <g:material>Натуральна шкіра</g:material>
+      <g:product_highlight>Розміри: 24 × 14 × 7 см</g:product_highlight>
+      <g:product_highlight>Знімний та регульований</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -1883,6 +2020,9 @@
       <g:mpn>213BA007-3128-890</g:mpn>
       <g:item_group_id>60</g:item_group_id>
       <g:color>Темно-коричневий</g:color>
+      <g:material>Натуральна шкіра</g:material>
+      <g:product_highlight>Розміри: 24 × 14 × 7 см</g:product_highlight>
+      <g:product_highlight>Знімний та регульований</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -1907,7 +2047,11 @@
       <g:condition>new</g:condition>
       <g:mpn>MJ451H057-K11</g:mpn>
       <g:item_group_id>61</g:item_group_id>
+      <g:color>Синій</g:color>
       <g:size>S</g:size>
+      <g:material>Денім</g:material>
+      <g:product_highlight>Розміри: 26 × 21 × 13 см</g:product_highlight>
+      <g:product_highlight>Ремінець знімний та регульований</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -1932,6 +2076,10 @@
       <g:condition>new</g:condition>
       <g:mpn>CA173IMTAP</g:mpn>
       <g:item_group_id>62</g:item_group_id>
+      <g:color>Бежево-білий</g:color>
+      <g:material>Фірмовий покритий канвас та натуральна шкіра</g:material>
+      <g:product_highlight>Розміри: 26 × 15,5 × 7 см</g:product_highlight>
+      <g:product_highlight>Два ремінці знімні та регульовані</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -1955,6 +2103,10 @@
       <g:condition>new</g:condition>
       <g:mpn>79609IMAA8</g:mpn>
       <g:item_group_id>63</g:item_group_id>
+      <g:color>Коричнево-чорний</g:color>
+      <g:material>Фірмовий покритий Signature Canvas та гладка шкіра</g:material>
+      <g:product_highlight>Розміри: 32 × 27 × 14 см</g:product_highlight>
+      <g:product_highlight>Ручки подвійні, незнімні</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -1979,6 +2131,10 @@
       <g:condition>new</g:condition>
       <g:mpn>213BA006-3000-100</g:mpn>
       <g:item_group_id>64</g:item_group_id>
+      <g:color>Білий</g:color>
+      <g:material>Натуральна гладка шкіра</g:material>
+      <g:product_highlight>Розміри: 17,5 × 8,5 × 6,5 см</g:product_highlight>
+      <g:product_highlight>Ремінець знімний та регульований, ручка незнімна</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -2003,6 +2159,10 @@
       <g:condition>new</g:condition>
       <g:mpn>CC878</g:mpn>
       <g:item_group_id>65</g:item_group_id>
+      <g:color>Темно-коричневий</g:color>
+      <g:material>Фірмове покрите полотно Signature та фактурна шкіра refined pebble leather; текстильна підкладка</g:material>
+      <g:product_highlight>Розміри: 26 × 17 × 8 см</g:product_highlight>
+      <g:product_highlight>Регульований ремінь. Ремінь дозволяє носити сумку трьома способами: коротко або довго на плечі, а також кросбоді</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -2026,6 +2186,9 @@
       <g:mpn>S125L01RE22212</g:mpn>
       <g:item_group_id>66</g:item_group_id>
       <g:color>Коричневий</g:color>
+      <g:material>Натуральна шкіра</g:material>
+      <g:product_highlight>Розміри: 13 × 7,5 см</g:product_highlight>
+      <g:product_highlight>Знімний ремінець, що дозволяє носити гаманець на зап'ясті або використовувати його як компактний самостійний аксесуар</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Гаманці</g:product_type>
@@ -2049,6 +2212,9 @@
       <g:mpn>S125L01RE22-001</g:mpn>
       <g:item_group_id>66</g:item_group_id>
       <g:color>Чорний</g:color>
+      <g:material>Натуральна шкіра</g:material>
+      <g:product_highlight>Розміри: 13 × 7,5 см</g:product_highlight>
+      <g:product_highlight>Знімний ремінець, що дозволяє носити гаманець на зап'ясті або використовувати його як компактний самостійний аксесуар</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Гаманці</g:product_type>
@@ -2071,6 +2237,9 @@
       <g:condition>new</g:condition>
       <g:mpn>3083092-3054</g:mpn>
       <g:item_group_id>67</g:item_group_id>
+      <g:color>Хакі</g:color>
+      <g:material>Натуральна шкіра</g:material>
+      <g:product_highlight>Розміри: 12 × 9 × 3 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Гаманці</g:product_type>
@@ -2093,6 +2262,9 @@
       <g:condition>new</g:condition>
       <g:mpn>CW537</g:mpn>
       <g:item_group_id>68</g:item_group_id>
+      <g:color>Чорний з принтом</g:color>
+      <g:material>Натуральна шкіра</g:material>
+      <g:product_highlight>Розміри: 11 × 9 × 2,5 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Гаманці</g:product_type>
@@ -2115,6 +2287,9 @@
       <g:condition>new</g:condition>
       <g:mpn>CR957</g:mpn>
       <g:item_group_id>69</g:item_group_id>
+      <g:color>Чорний</g:color>
+      <g:material>Натуральна теляча шкіра</g:material>
+      <g:product_highlight>Розміри: 11 × 9,5 × 2 см</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Гаманці</g:product_type>
@@ -2138,6 +2313,9 @@
       <g:condition>new</g:condition>
       <g:mpn>952137-2F882-00020</g:mpn>
       <g:item_group_id>70</g:item_group_id>
+      <g:color>Чорний</g:color>
+      <g:product_highlight>Розміри: 20 × 22 × 4 см</g:product_highlight>
+      <g:product_highlight>Регульований плечовий ремінь довжиною 80–150 см, що дозволяє носити сумку через плече або кросбоді</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
@@ -2161,7 +2339,10 @@
       <g:condition>new</g:condition>
       <g:mpn>MJ-1011/S-WR953HA</g:mpn>
       <g:item_group_id>71</g:item_group_id>
+      <g:color>Черепаховий</g:color>
       <g:size>53</g:size>
+      <g:material>Пластикова оправа, полімерні лінзи</g:material>
+      <g:product_highlight>Ширина лінзи × місток × довжина завушника: 53 × 21 × 140 мм</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
@@ -2180,6 +2361,7 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/33751393-b64e-49d3-b0c9-2e3bde1afaff.jpg?v=7b1a8ec9</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/aa00-okd0j9_99x_f9.webp?v=5c7f8ff0</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>12400.00 UAH</g:price>
       <g:brand>Saint Laurent</g:brand>
       <g:condition>new</g:condition>
@@ -2187,6 +2369,8 @@
       <g:item_group_id>72</g:item_group_id>
       <g:color>Чорний</g:color>
       <g:size>53</g:size>
+      <g:material>Ацетатна оправа, полімерні, нейлонові лінзи</g:material>
+      <g:product_highlight>Ширина лінзи: 53 мм Місток: 16 мм Довжина завушника: 145 мм</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
@@ -2204,6 +2388,7 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/saint-laurent-grey-cat-eye-ladies-sungla-175c8e88.webp?v=ac28aea8</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/saint-laurent-grey-cat-eye-ladies-sungla-6b05dcda.webp?v=de137cb5</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>12400.00 UAH</g:price>
       <g:brand>Saint Laurent</g:brand>
       <g:condition>new</g:condition>
@@ -2211,6 +2396,8 @@
       <g:item_group_id>72</g:item_group_id>
       <g:color>Черепаховий</g:color>
       <g:size>53</g:size>
+      <g:material>Ацетатна оправа, полімерні, нейлонові лінзи</g:material>
+      <g:product_highlight>Ширина лінзи: 53 мм Місток: 16 мм Довжина завушника: 145 мм</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
@@ -2228,6 +2415,7 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/saint-laurent-yellow-cat-eye-ladies-sunglasses-sl-276-mica-038-53_3-1-.webp?v=7b228098</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/saint-laurent-yellow-cat-eye-ladies-sunglasses-sl-276-mica-038-53_4.webp?v=e9241d93</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>12400.00 UAH</g:price>
       <g:brand>Saint Laurent</g:brand>
       <g:condition>new</g:condition>
@@ -2235,6 +2423,8 @@
       <g:item_group_id>72</g:item_group_id>
       <g:color>Чорний / жовтий</g:color>
       <g:size>53</g:size>
+      <g:material>Ацетатна оправа, полімерні, нейлонові лінзи</g:material>
+      <g:product_highlight>Ширина лінзи: 53 мм Місток: 16 мм Довжина завушника: 145 мм</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
@@ -2253,11 +2443,16 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-f393bd11.webp?v=8405c1f4</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-8e88d0d9.webp?v=c4177bd4</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>16500.00 UAH</g:price>
       <g:brand>Tissot</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>T058.009.11.031.00</g:mpn>
       <g:item_group_id>73</g:item_group_id>
+      <g:color>Сріблястий</g:color>
+      <g:material>Корпус і браслет — нержавіюча сталь 316L; скло — стійке до подряпин сапфірове</g:material>
+      <g:product_highlight>Розміри: 19,5 × 19,5 × 5 мм</g:product_highlight>
+      <g:product_highlight>Браслет із нержавіючої сталі сріблястого кольору, ширина 11 мм, застібка-метелик із кнопками</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
@@ -2276,11 +2471,16 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/tissot-t-trend-lovely-silver-dial-ladies-watch-t0580093303100_3_2.webp?v=7a97fcb9</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/tissot-t-trend-lovely-mother-of-pearl-di-e13260a2.webp?v=c4177bd4</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>19000.00 UAH</g:price>
       <g:brand>Tissot</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>T058.009.33.031.00</g:mpn>
       <g:item_group_id>74</g:item_group_id>
+      <g:color>Золотистий</g:color>
+      <g:material>Корпус — нержавіюча сталь 316L із PVD-покриттям; браслет — нержавіюча сталь із PVD-покриттям; скло — сапфірове</g:material>
+      <g:product_highlight>Розміри: 1,95 × 1,95 × 0,5 см</g:product_highlight>
+      <g:product_highlight>Золотистий сталевий браслет із PVD-покриттям, застібка — розкладна із захисним замком. Ширина кріплення — 0,6 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
@@ -2298,11 +2498,16 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/tissot-tclassic-automatic-diamond-green--dff156d2.webp?v=3836ad46</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/tissot-tclassic-automatic-diamond-green--8822ff6e.webp?v=046e0acb</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>15400.00 UAH</g:price>
       <g:brand>Tissot</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>T132.007.11.091.00</g:mpn>
       <g:item_group_id>75</g:item_group_id>
+      <g:color>Сріблястий</g:color>
+      <g:material>Корпус і браслет — нержавіюча сталь 316L; скло — стійке до подряпин сапфірове</g:material>
+      <g:product_highlight>Розміри: 2,93 × 2,93 × 1,06 см</g:product_highlight>
+      <g:product_highlight>Сталевий браслет сріблястого кольору з системою швидкого знімання та застібкою-метеликом із кнопками. Ширина кріплення — 1,5 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
@@ -2320,11 +2525,16 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/tissot-everytime-quartz-silver-dial-ladies-watch-t1432101103300_2.webp?v=161a41cd</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/tissot-everytime-quartz-silver-dial-ladies-watch-t1432101103300_3.webp?v=c1964b3a</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>8800.00 UAH</g:price>
       <g:brand>Tissot</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>T143.210.11.033.00</g:mpn>
       <g:item_group_id>76</g:item_group_id>
+      <g:color>Сріблястий</g:color>
+      <g:material>Корпус і браслет — нержавіюча сталь 316L; скло — сапфірове, стійке до подряпин</g:material>
+      <g:product_highlight>Розміри: 3,4 × 3,4 × 0,69 см</g:product_highlight>
+      <g:product_highlight>Сталевий браслет сріблястого кольору шириною 1,6 см із швидкознімною системою та застібкою-метеликом</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
@@ -2342,11 +2552,16 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/tissot-pr-100-quartz-blue-dial-mens-watch-t1504101104100_2.webp?v=0fc480bf</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/tissot-pr-100-quartz-blue-dial-mens-watch-t1504101104100_3.webp?v=33ce3f73</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>13800.00 UAH</g:price>
       <g:brand>Tissot</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>T150.410.11.041.00</g:mpn>
       <g:item_group_id>77</g:item_group_id>
+      <g:color>Сріблястий</g:color>
+      <g:material>Корпус і браслет — нержавіюча сталь 316L; скло — сапфірове, стійке до подряпин</g:material>
+      <g:product_highlight>Розміри: 4 × 4 × 0,825 см</g:product_highlight>
+      <g:product_highlight>Сталевий браслет сріблястого кольору з системою швидкого знімання та застібкою-метеликом із кнопками. Ширина кріплення — 2 см</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
@@ -2364,11 +2579,16 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/tissot-classic-dream-swissmatic-silver-d-ea41ed3e.webp?v=34a76e5b</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/tissot-classic-dream-swissmatic-silver-d-88843986.webp?v=9b3867c0</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>12300.00 UAH</g:price>
       <g:brand>Tissot</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>T129.407.22.031.00</g:mpn>
       <g:item_group_id>78</g:item_group_id>
+      <g:color>Сріблястий</g:color>
+      <g:material>Корпус і браслет — нержавіюча сталь 316L; рожево-золотисті елементи — PVD-покриття; скло — сапфірове, стійке до подряпин</g:material>
+      <g:product_highlight>Розміри: 4,2 × 4,2 × 1,15 см</g:product_highlight>
+      <g:product_highlight>Двоколірний браслет із нержавіючої сталі сріблястого та рожево-золотистого кольорів, ширина кріплення — 2,2 см. Застібка-метелик із кнопками</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
@@ -2386,11 +2606,16 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/matheytissot-mathy-ceramic-quartz-black-dial-mens-watch-h901crbn_2.webp?v=6d1a28bc</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/matheytissot-mathy-ceramic-quartz-black-dial-mens-watch-h901crbn_3.webp?v=908fca90</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>11000.00 UAH</g:price>
       <g:brand>Mathey-Tissot</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>H901CRBN</g:mpn>
       <g:item_group_id>79</g:item_group_id>
+      <g:color>Сріблястий / золотистий / чорний</g:color>
+      <g:material>Корпус і браслет — нержавіюча сталь 316L; безель — керамічний; скло — із сапфіровим покриттям</g:material>
+      <g:product_highlight>Розміри: 4,2 × 4,2 × 1,2 см</g:product_highlight>
+      <g:product_highlight>Двоколірний браслет із нержавіючої сталі 316L — сріблястий із золотистими елементами. Ширина кріплення — 2 см. Застібка — розкладна із захисним фікса…</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
@@ -2412,12 +2637,16 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/ch857_b4ha_a61.webp?v=19ded042</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/ch857_b4ha_a92.webp?v=919707ef</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>11900.00 UAH</g:price>
       <g:brand>Coach</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>CH857-B4/HA</g:mpn>
       <g:item_group_id>80</g:item_group_id>
       <g:color>Chalk</g:color>
+      <g:material>Натуральна шкіра Polished Pebble Leather</g:material>
+      <g:product_highlight>Розміри: 26 × 15 × 8 см</g:product_highlight>
+      <g:product_highlight>Коротка знімна ручка + довгий знімний ремінь для носіння через плече</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -2437,12 +2666,16 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/ch857_b4bk_a61.webp?v=bf5c9a7a</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/ch857_b4bk_a92.webp?v=39ecbc1c</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>11900.00 UAH</g:price>
       <g:brand>Coach</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>CH857-B4/BK</g:mpn>
       <g:item_group_id>80</g:item_group_id>
       <g:color>Чорний</g:color>
+      <g:material>Натуральна шкіра Polished Pebble Leather</g:material>
+      <g:product_highlight>Розміри: 26 × 15 × 8 см</g:product_highlight>
+      <g:product_highlight>Коротка знімна ручка + довгий знімний ремінь для носіння через плече</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -2460,12 +2693,16 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/ch857_b4yu1_a3.webp?v=cd25b8e8</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/ch857_b4yu1_a8.webp?v=5302f3a2</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>11900.00 UAH</g:price>
       <g:brand>Coach</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>CH857-B4/Amber-Brown.</g:mpn>
       <g:item_group_id>80</g:item_group_id>
       <g:color>Amber Brown</g:color>
+      <g:material>Натуральна шкіра Polished Pebble Leather</g:material>
+      <g:product_highlight>Розміри: 26 × 15 × 8 см</g:product_highlight>
+      <g:product_highlight>Коротка знімна ручка + довгий знімний ремінь для носіння через плече</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -2485,12 +2722,16 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/ch857_b4mpl_a62.webp?v=1c67302c</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/ch857_b4mpl_a92.webp?v=1d3393f4</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>11900.00 UAH</g:price>
       <g:brand>Coach</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>CH857-B4MPL</g:mpn>
       <g:item_group_id>80</g:item_group_id>
       <g:color>Maple</g:color>
+      <g:material>Натуральна шкіра Polished Pebble Leather</g:material>
+      <g:product_highlight>Розміри: 26 × 15 × 8 см</g:product_highlight>
+      <g:product_highlight>Коротка знімна ручка + довгий знімний ремінь для носіння через плече</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
@@ -2508,11 +2749,16 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-petite-lexington-quartz-silver-dial-ladies-watch-mk4843_2.webp?v=c08ddbf4</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-petite-lexington-quartz-silver-dial-ladies-watch-mk4843_3.webp?v=fbf2bfca</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>6500.00 UAH</g:price>
       <g:brand>Michael Kors</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>MK4843</g:mpn>
       <g:item_group_id>81</g:item_group_id>
+      <g:color>Сріблястий / кремовий</g:color>
+      <g:material>Корпус і браслет — нержавіюча сталь; скло — мінеральне</g:material>
+      <g:product_highlight>Розміри: 2,6 × 2,6 × 0,7 см</g:product_highlight>
+      <g:product_highlight>Застібка: Сталевий браслет сріблястого кольору шириною 1,4 см із розкладною застібкою-кліпсою</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
@@ -2530,11 +2776,16 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-mini-lexington-quartz-red-dial-ladies-watch-mk4968_2.webp?v=545b4cb8</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-mini-lexington-quartz-red-dial-ladies-watch-mk4968_3.webp?v=d224c14b</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>5100.00 UAH</g:price>
       <g:brand>Michael Kors</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>MK4968</g:mpn>
       <g:item_group_id>82</g:item_group_id>
+      <g:color>Сріблястий / червоний</g:color>
+      <g:material>Корпус і браслет — нержавіюча сталь; скло — мінеральне</g:material>
+      <g:product_highlight>Розміри: 2,6 × 2,6 × 0,8 см</g:product_highlight>
+      <g:product_highlight>Сталевий браслет сріблястого кольору шириною 1,4 см із розкладною застібкою</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
@@ -2552,11 +2803,16 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-micro-lexington-quartz-ladies-watch-mk4903_2.webp?v=1a203b80</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-micro-lexington-quartz-ladies-watch-mk4903_3.webp?v=44cf106d</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>6900.00 UAH</g:price>
       <g:brand>Michael Kors</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>MK4903</g:mpn>
       <g:item_group_id>83</g:item_group_id>
+      <g:color>Сріблястий / золотистий</g:color>
+      <g:material>Нержавіюча сталь; декоративні pavé-акценти — кристали; скло — мінеральне</g:material>
+      <g:product_highlight>Розміри: 1,3 × 1,3 см - розмір циферблату</g:product_highlight>
+      <g:product_highlight>Двоколірний браслет із нержавіючої сталі у сріблястому та золотистому відтінках із розкладною застібкою-кліпсою. Ширина браслета — 1 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
@@ -2575,12 +2831,16 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/cz398_qbmi5_a8.webp?v=617e6eb5</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/cz398_qbmi5_a91.webp?v=732c7458</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>7400.00 UAH</g:price>
       <g:brand>Coach</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>CZ398</g:mpn>
       <g:item_group_id>84</g:item_group_id>
       <g:color>Темно-сірий / чорний / графітовий</g:color>
+      <g:material>Фірмове покрите полотно Signature та гладка теляча шкіра; текстильна підкладк</g:material>
+      <g:product_highlight>Розміри: 22 × 26 × 5 см</g:product_highlight>
+      <g:product_highlight>Регульований плечовий ремінь із довжиною звисання 63,5 см, що дозволяє носити сумку на плечі або кросбоді</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
@@ -2599,12 +2859,16 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/houstonflightbag2propfamily_a6.webp?v=aff55aaf</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/4011_qbbk_a91.webp?v=0b48a827</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>7400.00 UAH</g:price>
       <g:brand>Coach</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>4011QB/BK</g:mpn>
       <g:item_group_id>84</g:item_group_id>
       <g:color>Чорний</g:color>
+      <g:material>Фірмове покрите полотно Signature та гладка теляча шкіра; текстильна підкладк</g:material>
+      <g:product_highlight>Розміри: 22 × 26 × 5 см</g:product_highlight>
+      <g:product_highlight>Регульований плечовий ремінь із довжиною звисання 63,5 см, що дозволяє носити сумку на плечі або кросбоді</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
@@ -2623,11 +2887,16 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/ces89_svbk_a8.webp?v=cb4034fd</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/ces89_svbk_a91.webp?v=39a217a9</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>8000.00 UAH</g:price>
       <g:brand>Coach</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>CES89SV/BK</g:mpn>
       <g:item_group_id>85</g:item_group_id>
+      <g:color>Чорний</g:color>
+      <g:material>Фірмова зерниста шкіра Signature та зерниста шкіра; внутрішня підкладка — перероблений поліестер</g:material>
+      <g:product_highlight>Розміри: 22 × 26 × 5 см</g:product_highlight>
+      <g:product_highlight>Регульований плечовий ремінь. Можна носити через плече або кросбоді. Довжина падіння ременя — приблизно</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
@@ -2646,12 +2915,16 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/cet66_svsmu_a8.webp?v=f9211b3a</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/cet66_svsmu_a91.webp?v=9d2ca445</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>7400.00 UAH</g:price>
       <g:brand>Coach</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>CET66SV/SMU</g:mpn>
       <g:item_group_id>86</g:item_group_id>
       <g:color>Deep Blue</g:color>
+      <g:material>Зерниста натуральна шкіра - Refined Pebble Leather</g:material>
+      <g:product_highlight>Розміри: 18 × 10 × 5 см</g:product_highlight>
+      <g:product_highlight>Регульований плечовий ремінь для носіння через плече або кросбоді</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
@@ -2670,12 +2943,16 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/cet55_mwnq6_a8.webp?v=e3748c46</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/cet55_mwnq6_a91.webp?v=6b2f7649</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>7400.00 UAH</g:price>
       <g:brand>Coach</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>CET55MWNQ6</g:mpn>
       <g:item_group_id>86</g:item_group_id>
       <g:color>Signature Canvas/Matte Black/Tan Black</g:color>
+      <g:material>Зерниста натуральна шкіра - Refined Pebble Leather</g:material>
+      <g:product_highlight>Розміри: 18 × 10 × 5 см</g:product_highlight>
+      <g:product_highlight>Регульований плечовий ремінь для носіння через плече або кросбоді</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
@@ -2694,12 +2971,16 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/cet55_mwoy2_a8.webp?v=9af9e7b6</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/cet55_mwoy2_a91.webp?v=9c2c4a59</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>7400.00 UAH</g:price>
       <g:brand>Coach</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>CET55MWNQ6</g:mpn>
       <g:item_group_id>86</g:item_group_id>
       <g:color>Signature canvas/Matte Black/Black Signature</g:color>
+      <g:material>Зерниста натуральна шкіра - Refined Pebble Leather</g:material>
+      <g:product_highlight>Розміри: 18 × 10 × 5 см</g:product_highlight>
+      <g:product_highlight>Регульований плечовий ремінь для носіння через плече або кросбоді</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
@@ -2718,12 +2999,16 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/cet66_svbk_a8.webp?v=aeafdac1</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/cet66_svbk_a91.webp?v=4a0a2302</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>7400.00 UAH</g:price>
       <g:brand>Coach</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>CET55SV/BK</g:mpn>
       <g:item_group_id>86</g:item_group_id>
       <g:color>Pebbled leather/Black</g:color>
+      <g:material>Зерниста натуральна шкіра - Refined Pebble Leather</g:material>
+      <g:product_highlight>Розміри: 18 × 10 × 5 см</g:product_highlight>
+      <g:product_highlight>Регульований плечовий ремінь для носіння через плече або кросбоді</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
@@ -2742,12 +3027,16 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/cet66_svmpl_a8.webp?v=5774d884</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/cet66_svmpl_a91.webp?v=2adbf71a</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>7400.00 UAH</g:price>
       <g:brand>Coach</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>SVMPL</g:mpn>
       <g:item_group_id>86</g:item_group_id>
       <g:color>Pebbled leather/Maple</g:color>
+      <g:material>Зерниста натуральна шкіра - Refined Pebble Leather</g:material>
+      <g:product_highlight>Розміри: 18 × 10 × 5 см</g:product_highlight>
+      <g:product_highlight>Регульований плечовий ремінь для носіння через плече або кросбоді</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Сумки &gt; Чоловічі сумки</g:product_type>
@@ -2766,11 +3055,16 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_3.webp?v=7b116d7b</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_5.webp?v=776d47c5</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>7000.00 UAH</g:price>
       <g:brand>Michael Kors</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>MK4944SET</g:mpn>
       <g:item_group_id>87</g:item_group_id>
+      <g:color>Золотистий</g:color>
+      <g:material>Нержавіюча сталь</g:material>
+      <g:product_highlight>Розміри: Корпус — 2,8 см у діаметрі</g:product_highlight>
+      <g:product_highlight>Браслет із нержавіючої сталі</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
@@ -2789,11 +3083,16 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/загрузка-2-.webp?v=f55a0f58</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/загрузка-1-1-.webp?v=c7db06fb</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>6600.00 UAH</g:price>
       <g:brand>Michael Kors</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>MK9254</g:mpn>
       <g:item_group_id>88</g:item_group_id>
+      <g:color>Чорний / золотистий</g:color>
+      <g:material>Нержавіюча сталь</g:material>
+      <g:product_highlight>Розміри: Корпус — 4,4 см у діаметрі</g:product_highlight>
+      <g:product_highlight>Браслет із нержавіючої сталі</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
@@ -2811,11 +3110,16 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-maritime-chronograph-quartz-blue-dial-mens-watch-mk9202_2.webp?v=27768112</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-maritime-chronograph-quartz-blue-dial-mens-watch-mk9202_3.webp?v=3ebf16bf</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>6000.00 UAH</g:price>
       <g:brand>Michael Kors</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>MK9202</g:mpn>
       <g:item_group_id>89</g:item_group_id>
+      <g:color>Сріблястий / синій</g:color>
+      <g:material>Нержавіюча сталь</g:material>
+      <g:product_highlight>Розміри: Корпус — 4,4 см у діаметрі</g:product_highlight>
+      <g:product_highlight>Браслет із нержавіючої сталі</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
@@ -2834,11 +3138,15 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasse-c873f7c8.webp?v=3dcc20af</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasse-dfb377a8.webp?v=0114f5da</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>6400.00 UAH</g:price>
       <g:brand>Ray-Ban</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>RB3183006/7163</g:mpn>
       <g:item_group_id>90</g:item_group_id>
+      <g:color>Чорний / зелений</g:color>
+      <g:product_highlight>Розміри: 13,9 × 3,3 см; ширина лінзи — 6,3 см; міст — 1,5 см; довжина дужки — 12,5 см.</g:product_highlight>
+      <g:product_highlight>Тонкі металеві дужки</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
@@ -2857,11 +3165,16 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/ray-ban-green-irregular-unisex-sunglasses-rb4451-630631-50_4.webp?v=cfd60fb6</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/ray-ban-green-irregular-unisex-sunglasses-rb4451-630631-50_10.webp?v=0114f5da</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>5900.00 UAH</g:price>
       <g:brand>Ray-Ban</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>RB445163063150</g:mpn>
       <g:item_group_id>91</g:item_group_id>
+      <g:color>Зелений / прозорий</g:color>
+      <g:material>Ацетат</g:material>
+      <g:product_highlight>Розміри: 13,7 × 4,7 см; ширина лінзи — 5 см; міст — 2,1 см; довжина дужки — 14 см</g:product_highlight>
+      <g:product_highlight>Пластикові дужки</g:product_highlight>
       <g:gender>unisex</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
@@ -2880,11 +3193,16 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-s-e881ab77.jpg?v=9a2823b9</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-s-f4bc13e6.jpg?v=a4470357</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>4900.00 UAH</g:price>
       <g:brand>Ray-Ban</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>RB2283901/3155</g:mpn>
       <g:item_group_id>92</g:item_group_id>
+      <g:color>Чорний / зелений</g:color>
+      <g:material>Ацетат</g:material>
+      <g:product_highlight>Розміри: 14,1 × 4,5 см; ширина лінзи — 5,5 см; міст — 1,8 см; довжина дужки — 14 см</g:product_highlight>
+      <g:product_highlight>Ацетатні дужки</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
@@ -2903,11 +3221,16 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-4b1f82a5.webp?v=3b38241c</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-960c6b7f.webp?v=0114f5da</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>7800.00 UAH</g:price>
       <g:brand>Ray-Ban</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>RB3498029/T561</g:mpn>
       <g:item_group_id>93</g:item_group_id>
+      <g:color>Коричневий / золотистий</g:color>
+      <g:material>Метал</g:material>
+      <g:product_highlight>Розміри: 14,0 × 4,8 см; ширина лінзи — 6 см; міст — 1,7 см; довжина дужки — 13,5 см</g:product_highlight>
+      <g:product_highlight>Металеві дужки</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Окуляри і оправи</g:product_type>
@@ -2925,11 +3248,16 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7557_2.jpg?v=791ac262</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7557_3.jpg?v=ab9ead93</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>7300.00 UAH</g:price>
       <g:brand>Michael Kors</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>MK7557</g:mpn>
       <g:item_group_id>94</g:item_group_id>
+      <g:color>Рожеве золото</g:color>
+      <g:material>Нержавіюча сталь</g:material>
+      <g:product_highlight>Діаметр корпусу: 40 мм Ширина браслета: 20 мм</g:product_highlight>
+      <g:product_highlight>Застібка: Розкладна з кнопковим фіксатором</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
@@ -2947,11 +3275,16 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-oversized-billie-frosted-ch-6d39ef48.webp?v=f8aa3bba</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-oversized-billie-frosted-ch-d3f8077e.webp?v=a858e17d</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>6300.00 UAH</g:price>
       <g:brand>Michael Kors</g:brand>
       <g:condition>new</g:condition>
       <g:identifier_exists>no</g:identifier_exists>
       <g:item_group_id>95</g:item_group_id>
+      <g:color>Сріблястий</g:color>
+      <g:material>Нержавіюча сталь</g:material>
+      <g:product_highlight>Діаметр корпусу: 40 мм Товщина корпусу: 10,5 мм Ширина браслета: 20 мм</g:product_highlight>
+      <g:product_highlight>Застібка: Розкладна з кнопковим фіксатором</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
@@ -2969,11 +3302,16 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-slim-runway-white-dial-ladies-watch-mk7545_2.webp?v=8f17acbc</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-slim-runway-white-dial-ladies-watch-mk7545_3.webp?v=72b8347d</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>5000.00 UAH</g:price>
       <g:brand>Michael Kors</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>MK7545</g:mpn>
       <g:item_group_id>96</g:item_group_id>
+      <g:color>Rose/Soft Pink/White</g:color>
+      <g:material>Матеріал корпусу: нержавіюча стал. Матеріал ремінця: натуральна шкіра</g:material>
+      <g:product_highlight>Діаметр корпусу: 38 мм.Товщина корпусу: 8 мм Ширина ремінця: 18 мм. Довжина ремінця: 17,5 см</g:product_highlight>
+      <g:product_highlight>Застібка: пряжка</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
@@ -2991,11 +3329,16 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-lexington-chronograph-quartz-black-dial-watch-mk9154_2.webp?v=41dee65d</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-lexington-chronograph-quartz-black-dial-watch-mk9154_3.webp?v=009e930e</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>8000.00 UAH</g:price>
       <g:brand>Michael Kors</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>MK9154</g:mpn>
       <g:item_group_id>97</g:item_group_id>
+      <g:color>Чорний</g:color>
+      <g:material>Нержавіюча сталь</g:material>
+      <g:product_highlight>Діаметр корпусу: 44 мм. Ширина браслета: 22 мм</g:product_highlight>
+      <g:product_highlight>Застібка: Розкладна з фіксатором</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
@@ -3013,11 +3356,16 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-slim-runway-black-dial-mens-watch-mk8621-_2.webp?v=72c91470</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-slim-runway-black-dial-mens-watch-mk8621-_3.webp?v=396c5675</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>6300.00 UAH</g:price>
       <g:brand>Michael Kors</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>MK8621</g:mpn>
       <g:item_group_id>98</g:item_group_id>
+      <g:color>Золотистий / чорний</g:color>
+      <g:material>Нержавіюча сталь; золотисте покриття корпусу та браслета. Скло — мінеральне, стійке до подряпин</g:material>
+      <g:product_highlight>Розміри: Діаметр корпусу — 4,4 см.Товщина корпусу — 1,0 см.Ширина браслета — 2,2 см</g:product_highlight>
+      <g:product_highlight>Металевий браслет із нержавіючої сталі золотистого кольору, застібка-метелик із кнопковим фіксатором</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
@@ -3035,11 +3383,16 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-slim-runway-quartz-green-dial-mens-watch-mk9149_2_1.webp?v=9c7e4cbd</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-slim-runway-quartz-green-dial-mens-watch-mk9149_3.webp?v=f7f0bf8d</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>5900.00 UAH</g:price>
       <g:brand>Michael Kors</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>MK9149</g:mpn>
       <g:item_group_id>99</g:item_group_id>
+      <g:color>Зелений</g:color>
+      <g:material>Нержавіюча сталь; мінеральне скло</g:material>
+      <g:product_highlight>Розміри: Діаметр корпусу — 4,4 см.Товщина корпусу — 0,8 см.Ширина браслета — 2,2 см</g:product_highlight>
+      <g:product_highlight>Металевий браслет із нержавіючої сталі у двоколірному виконанні — сріблястий + золотистий. Застібка-кліпса</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>
@@ -3057,11 +3410,16 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-oversized-sage-chronograph--52ba3cb7.webp?v=fa8f9e17</g:additional_image_link>
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-oversized-sage-chronograph--6cbadb1a.webp?v=7c03297c</g:additional_image_link>
       <g:availability>backorder</g:availability>
+      <g:availability_date>2026-09-28T07:35:20+00:00</g:availability_date>
       <g:price>7400.00 UAH</g:price>
       <g:brand>Michael Kors</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>MK9191</g:mpn>
       <g:item_group_id>100</g:item_group_id>
+      <g:color>Сріблястий / зелений циферблат</g:color>
+      <g:material>Нержавіюча сталь; скло — мінеральне, стійке до подряпин</g:material>
+      <g:product_highlight>Розмір (габарити), см: Діаметр корпусу — 4,4 см.Товщина корпусу — близько 1,1 см.Ширина браслета — 2,2 см</g:product_highlight>
+      <g:product_highlight>Браслет із нержавіючої сталі сріблястого кольору із застібкою-кліпсою</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:product_type>Аксесуари &gt; Годинники</g:product_type>

@@ -96,6 +96,7 @@ async function main() {
 
     const errors = rows.filter(r => r.kind === "js_error");
     const missing = rows.filter(r => r.kind === "not_found");
+    const searches = rows.filter(r => r.kind === "search_miss");
 
     console.log(`\nНових записів: ${rows.length}\n`);
 
@@ -125,6 +126,26 @@ async function main() {
 
     }
 
+    if (searches.length) {
+
+        console.log("ШУКАЛИ Й НЕ ЗНАЙШЛИ\n");
+
+        // Найчастіші — перші: hits показує, скільком людям цього
+        // бракувало.
+        [...searches]
+            .sort((a, b) => (b.hits || 0) - (a.hits || 0))
+            .forEach(row => {
+                console.log(`  «${row.message}» × ${row.hits}`);
+            });
+
+        console.log("");
+        console.log("  Причин рівно дві: або товару немає (варто завезти),");
+        console.log("  або він є, але зветься інакше — тоді досить дописати");
+        console.log("  написання в поле «Пошук» у картці товару.");
+        console.log("");
+
+    }
+
     if (DRY) {
         console.log("--dry-run: нічого не позначаю");
         process.exit(1);
@@ -142,6 +163,20 @@ async function main() {
 
     if (!mark.ok) {
         console.error(`Не вдалося позначити записи: HTTP ${mark.status}`);
+    }
+
+    // Пустий пошук — НЕ поломка.
+    //
+    // Це нормальна поведінка покупця, і якщо через неї щоденний звіт
+    // ставав би червоним, власник швидко привчився б його не читати —
+    // разом зі справжніми помилками. Тому червоним робимо лише те, що
+    // справді зламалось.
+    if (!errors.length && !missing.length) {
+
+        console.log("✅ Помилок немає (пусті пошуки вище — це не поломка)");
+
+        return;
+
     }
 
     console.log("❌ Є нові помилки сайту — подробиці вище");

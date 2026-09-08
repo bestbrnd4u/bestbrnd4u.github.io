@@ -244,14 +244,22 @@ console.log("\n[5] Ідентифікатори та групи");
     check("назва розрізняє кольори",
         new Set(group.map(i => i.title)).size === group.length);
 
-    // Товар одного кольору не потребує підпису кольору — і не має
-    // його отримувати, інакше назва подовжується без користі.
+    // Товар одного кольору не потребує підпису кольору В НАЗВІ — і не
+    // має його отримувати, інакше назва подовжується без користі.
+    //
+    // Саме в назві: поле color тепер є в кожної позиції, бо це фільтр
+    // у Shopping, а не частина заголовка. Раніше перевірка мішала
+    // одне з одним і падала на цьому.
     const single = products.find(p => (p.variants || []).length === 1);
     const singleItem = items.find(i => i.item_group_id === String(single.id));
 
     check("товар з одним кольором — назва без кольору",
-        singleItem && !singleItem.color && !/ — /.test(singleItem.title),
+        singleItem && !/ — /.test(singleItem.title),
         singleItem && singleItem.title);
+
+    check("але саме поле color у нього заповнене",
+        singleItem && !!singleItem.color,
+        singleItem && singleItem.color);
 }
 
 console.log("\n[6] Адреси");
@@ -274,7 +282,18 @@ console.log("\n[6] Адреси");
 
     // Колір в адресі — латиницею, як і на сайті: інакше посилання з
     // фіда відкриє товар, але не той колір, що на картинці.
-    const colored = items.filter(item => item.color);
+    //
+    // Ознака «кольорів кілька» — це група, а НЕ наявність поля color:
+    // воно тепер заповнене в кожної позиції. Одноколірному товару
+    // ?color= не потрібен — відкривати нічого не треба.
+    const byGroup = new Map();
+
+    items.forEach(item => {
+        if (!byGroup.has(item.item_group_id)) byGroup.set(item.item_group_id, new Set());
+        byGroup.get(item.item_group_id).add(item.color);
+    });
+
+    const colored = items.filter(item => byGroup.get(item.item_group_id).size > 1);
 
     check(`адреса веде на потрібний колір (${colored.length} позицій)`,
         colored.every(item => /\?color=[a-z0-9-]+/.test(item.link)),
@@ -367,6 +386,99 @@ console.log("\n[8] Фід збирається і доїжджає");
 
     check("адреси у зібраному фіді — одного середовища", isDev !== isProd,
         `dev: ${isDev}, prod: ${isProd}`);
+}
+
+console.log("\n[9] Дата очікуваної наявності для «під замовлення»");
+{
+    const back = items.filter(item => item.availability === "backorder");
+    const inStock = items.filter(item => item.availability === "in_stock");
+
+    // РЕГРЕСІЯ, ЯКУ ЦЕ ЛОВИТЬ. Для backorder Google ВИМАГАЄ дату
+    // очікуваної наявності. Заміряно у фіді на проді: 39 позицій
+    // backorder і жодного availability_date — Merchant Center
+    // позначає такі попередженням і може обмежувати показ.
+    check(`позицій під замовлення: ${back.length}`, back.length > 0);
+
+    check("у кожної є дата очікування",
+        back.every(item => item.availability_date),
+        back.filter(item => !item.availability_date).length + " без дати");
+
+    // У наявного товару дата безглузда — він уже є.
+    check("у наявних позицій дати немає",
+        inStock.every(item => !item.availability_date));
+
+    const sample = back[0] && back[0].availability_date;
+
+    // ISO 8601 із зоною — саме такий формат просить Google.
+    check(`формат ISO 8601 (${sample})`,
+        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+00:00$/.test(sample || ""));
+
+    const when = new Date(sample).getTime();
+
+    check("дата в майбутньому", when > Date.now());
+
+    check("і не через півроку", when < Date.now() + 200 * 24 * 3600 * 1000);
+
+    const feedSrc = read("scripts/build-feed.js");
+
+    // Строк беремо з товару, а не з константи: інакше фід обіцяв би
+    // те, чого магазин не казав.
+    check("строк — із поля товару", /preOrderDays/.test(feedSrc));
+
+    // «10-14 робочих днів» → 14. Обіцяти коротший строк, ніж буває,
+    // гірше, ніж не обіцяти нічого.
+    check("з діапазону береться довший строк", /Math\.max\(\.\.\.numbers/.test(feedSrc));
+
+    check("робочі дні перераховані в календарні", /work \* 7 \/ 5/.test(feedSrc));
+}
+
+console.log("\n[10] Колір, матеріал і характеристики");
+{
+    const feedSrc = read("scripts/build-feed.js");
+
+    // РЕГРЕСІЯ, ЯКУ ЦЕ ЛОВИТЬ. Колір писався лише коли у товару
+    // БІЛЬШЕ одного варіанта — це правило для НАЗВИ (щоб не
+    // дублювати колір у заголовку), і воно помилково діяло на g:color.
+    // Заміряно: колір мали 39 позицій зі 130, хоч відомий він у всіх.
+    const withColor = items.filter(item => item.color);
+
+    check(`колір у ${withColor.length} позиціях зі ${items.length}`,
+        withColor.length === items.length,
+        items.filter(item => !item.color).length + " без кольору");
+
+    check("колір не залежить від кількості варіантів",
+        !/variants\.length > 1 \? \(variant\.color/.test(feedSrc));
+
+    const withMaterial = items.filter(item => item.material);
+
+    check(`матеріал у ${withMaterial.length} позиціях`, withMaterial.length > 0);
+
+    const withHighlights = items.filter(item => item.product_highlight.length);
+
+    check(`характеристики у ${withHighlights.length} позиціях`, withHighlights.length > 0);
+
+    // Google просить короткі рядки — до 150 символів.
+    check("кожна характеристика коротка",
+        items.every(item => item.product_highlight.every(text => text.length <= 150)));
+
+    // Матеріал має власний тег: той самий текст двічі в одній картці
+    // нічого не додає.
+    check("матеріал не дублюється в характеристиках",
+        items.every(item => item.product_highlight.every(text => !/^Матеріал:/.test(text))));
+
+    // «Розміри: Ширина лінзи: 53 мм» — підпис двічі. Ставимо його
+    // лише там, де значення без нього незрозуміле.
+    check("підпис не дублює власний підпис значення",
+        items.every(item => item.product_highlight.every(
+            text => !/^(Розміри|Склад|Застібка): [^:]*:/.test(text))));
+
+    check("нічого не вигадуємо: немає поля — немає рядка",
+        items.every(item => item.product_highlight.every(text => text.trim().length > 0)));
+
+    // І все це доїжджає в розмітку.
+    check("у XML є availability_date", /<g:availability_date>/.test(xml));
+    check("у XML є material", /<g:material>/.test(xml));
+    check("у XML є product_highlight", /<g:product_highlight>/.test(xml));
 }
 
 if (skipped.length) {
