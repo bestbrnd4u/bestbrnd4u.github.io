@@ -160,8 +160,12 @@ console.log("\n[4] Каталог довантажується, а не трим
         && !/getAllProductsCached\(\)/.test(init),
         (init.match(/embedded[\s\S]{0,60}getAllProductsCached\(\)/) || [])[0]);
 
-    check("живий залишок лишився на критичному шляху (наявність — головне)",
-        /window\.LiveStock\.load\(\)/.test(init));
+    // Наявність питається, але БІЛЬШЕ НЕ ТРИМАЄ рендер: знімок
+    // читається з кеша синхронно, а свіжий доуточнює саме наявність
+    // (подробиці й заміри — tests/test-stock-timing.js).
+    check("живий залишок питається, але не тримає рендер",
+        /window\.LiveStock\.load\(\)/.test(init)
+        && !/Promise\.all\(\[[\s\S]{0,600}LiveStock\.load\(\)/.test(init));
 
     check("«схожі» й «переглянуті» — за появою в екрані",
         /whenNearViewport\(\s*\n?\s*document\.querySelector\("section\.similar"\)/.test(productSrc));
@@ -191,8 +195,10 @@ console.log("\n[4] Каталог довантажується, а не трим
     check("повний запис товару накриває полегшену картку з каталогу",
         /\{ \.\.\.item, \.\.\.product \}/.test(productSrc));
 
+    // Вікно ширше, ніж було: у showRelated з'явилось пояснення, чому
+    // знімок береться саме в момент показу, а не на початку init().
     check("залишок застосовується й до решти каталогу",
-        /showRelated[\s\S]{0,900}LiveStock\.apply\(products, live\)/.test(productSrc));
+        /showRelated[\s\S]{0,1600}LiveStock\.apply\(products, live\)/.test(productSrc));
 }
 
 console.log(failures ? `\n❌ Провалено: ${failures}` : "\n✅ Вага сторінки товару: зайвого не вантажимо");

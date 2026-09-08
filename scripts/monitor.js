@@ -535,10 +535,15 @@ async function main() {
                 // Місяць — з великим запасом «надовго». Адреса несе
                 // відбиток, тож змінений файл однаково приїде під
                 // новою адресою, і старий кеш нікому не зашкодить.
+                // Деталь — ЛИШЕ при провалі: record() друкує її завжди,
+                // коли вона не порожня, і на успішній перевірці вона
+                // казала власнику протилежне до правди.
                 record(`файли коду кешуються надовго (${age} с)`, age >= 2592000,
-                    age
-                        ? `зараз ${Math.round(age / 3600)} год — правило кешу в Cloudflare не налаштоване (див. docs/КЕШ.md)`
-                        : head["cache-control"] || "немає cache-control");
+                    age >= 2592000
+                        ? ""
+                        : (age
+                            ? `зараз ${Math.round(age / 3600)} год — правило кешу в Cloudflare не налаштоване (див. docs/КЕШ.md)`
+                            : head["cache-control"] || "немає cache-control"));
 
             }
 
@@ -557,6 +562,44 @@ async function main() {
                 status === "DYNAMIC"
                     ? "DYNAMIC — правило кешу для HTML не налаштоване (див. docs/КЕШ.md)"
                     : (status || "заголовка немає"));
+
+        }
+
+    }
+
+    // ---- 6в. заголовки безпеки ----
+    //
+    // Усі ці заголовки додаються в панелі Cloudflare (SSL/TLS для
+    // HSTS і одне Transform Rule для решти) — див. docs/МОНІТОРИНГ.md.
+    // GitHub Pages своїх заголовків задавати не дає, тож із коду це
+    // зробити неможливо; лишається перевіряти й нагадувати.
+    if (INDEXABLE) {
+
+        const head = await headers(`${SITE}/`);
+
+        if (head === null) {
+
+            record("заголовки безпеки перевірено", false, "сайт не відповів");
+
+        } else {
+
+            // Перелік навмисно короткий: рівно те, що вмикається двома
+            // діями в панелі й нічого не ламає.
+            const wanted = [
+                ["strict-transport-security", "HSTS: SSL/TLS → Edge Certificates"],
+                ["x-content-type-options", "nosniff"],
+                ["referrer-policy", "strict-origin-when-cross-origin"],
+                ["x-frame-options", "SAMEORIGIN"],
+                ["permissions-policy", "camera=(), microphone=(), geolocation=()"]
+            ];
+
+            const missing = wanted.filter(([name]) => !head[name]);
+
+            record(`заголовки безпеки: ${wanted.length - missing.length} з ${wanted.length}`,
+                missing.length === 0,
+                missing.length
+                    ? `немає: ${missing.map(([name]) => name).join(", ")} — див. docs/МОНІТОРИНГ.md`
+                    : "");
 
         }
 

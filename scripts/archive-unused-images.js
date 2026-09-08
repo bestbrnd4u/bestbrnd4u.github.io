@@ -197,9 +197,24 @@ function findUnused() {
 
         if (variant) {
 
-            const base = variant[1] + variant[3];
+            // Основа може бути в ІНШОМУ форматі, ніж копія.
+            //
+            // ЩО БУЛО НЕ ТАК. Тут перевірялась лише основа з тим самим
+            // розширенням: для «x-300.avif» шукався «x.avif», якого не
+            // існує — базове фото лежить у webp, а avif робиться з
+            // нього як зменшена копія (scripts/normalize-product-images.js).
+            //
+            // Основа не знаходилась, копія вважалась нікому не
+            // потрібною, і всі 900 файлів AVIF одним запуском поїхали
+            // в чергу на архівацію. Через 30 днів вони зникли б, а
+            // перелік data/image-variants.json і далі обіцяв би
+            // верстці, що копії є — картки просили б «-600.avif» і
+            // отримували 404.
+            const bases = [variant[1] + variant[3], variant[1] + ".webp"];
 
-            if (referenced.has(base) || isReferenced(base, haystack)) return false;
+            if (bases.some(base => referenced.has(base) || isReferenced(base, haystack))) {
+                return false;
+            }
 
         }
 

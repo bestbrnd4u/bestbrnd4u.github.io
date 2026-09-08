@@ -53,6 +53,23 @@ const CANVAS = { width: 1200, height: 1500 };
 const TARGET_RATIO = 0.8;
 const VARIANT_WIDTHS = [600, 300];
 
+// Формати зменшених копій. Порядок важливий лише для читабельності
+// логу; верстка обирає формат сама (див. applyImageVariants у ui.js).
+const VARIANT_FORMATS = ["webp", "avif"];
+
+// Якість AVIF.
+//
+// 55 у AVIF візуально відповідає 82 у WebP — формат стискає інакше, і
+// однакові числа означали б різну картинку. Заміряно на 24 файлах
+// каталогу: 399 КБ webp → 256 КБ avif, тобто на 36% менше при тій
+// самій деталізації.
+//
+// effort:4 — компроміс зі часом збірки: 300 мс на файл. Вище (6-9)
+// дає ще 3-5% розміру, але вчетверо довше, а конвертувати доводиться
+// лише нові фото.
+const AVIF_QUALITY = 55;
+const AVIF_EFFORT = 4;
+
 // поля добираються білим — під фон картки товару в каталозі
 const BACKGROUND = { r: 255, g: 255, b: 255, alpha: 1 };
 
@@ -165,26 +182,44 @@ async function buildMissingVariants(file) {
     // збірка перезаписує базу лише коли та справді змінилась.
     const baseTime = fs.statSync(full).mtimeMs;
 
-    const missing = VARIANT_WIDTHS.filter(width => {
+    function stale(name) {
 
-        const variant = path.join(DIR, `${stem}-${width}.webp`);
+        const variant = path.join(DIR, name);
 
         if (!fs.existsSync(variant)) return true;
 
         return fs.statSync(variant).mtimeMs < baseTime - 1000;
 
+    }
+
+    // Чого бракує — по кожному формату окремо: webp може бути свіжим, а
+    // avif ще не існувати (перший запуск після появи цього формату).
+    const missing = [];
+
+    VARIANT_FORMATS.forEach(format => {
+
+        VARIANT_WIDTHS.forEach(width => {
+
+            if (stale(`${stem}-${width}.${format}`)) missing.push({ width, format });
+
+        });
+
     });
 
     if (!missing.length) return false;
 
-    for (const width of missing) {
+    for (const { width, format } of missing) {
 
-        const variant = await sharp(source)
-            .resize({ width })
-            .webp({ quality: 82 })
-            .toBuffer();
+        // AVIF робимо з ОРИГІНАЛУ, а не з webp-копії: стискати вже
+        // стиснуте означало б зберегти артефакти першого стиснення й
+        // додати свої.
+        const pipeline = sharp(source).resize({ width });
 
-        fs.writeFileSync(path.join(DIR, `${stem}-${width}.webp`), variant);
+        const variant = format === "avif"
+            ? await pipeline.avif({ quality: AVIF_QUALITY, effort: AVIF_EFFORT }).toBuffer()
+            : await pipeline.webp({ quality: 82 }).toBuffer();
+
+        fs.writeFileSync(path.join(DIR, `${stem}-${width}.${format}`), variant);
 
     }
 
@@ -263,8 +298,12 @@ async function main() {
             // не реєструвалось узагалі — і верстка не знала, що для
             // нього є srcset. На нових товарах це давало шість
             // незареєстрованих знімків.
-            const hasCopies = VARIANT_WIDTHS.every(width =>
-                fs.existsSync(path.join(DIR, file.replace(/\.webp$/, `-${width}.webp`))));
+            // Копії вважаються повними, лише коли є ОБА формати:
+            // інакше фото зареєструвалось би в переліку, а верстка,
+            // побачивши його там, попросила б avif, якого немає.
+            const hasCopies = VARIANT_FORMATS.every(format =>
+                VARIANT_WIDTHS.every(width =>
+                    fs.existsSync(path.join(DIR, file.replace(/\.webp$/, `-${width}.${format}`)))));
 
             if (built || hasCopies) patched.push(file);
         }
@@ -273,7 +312,7 @@ async function main() {
 
             const addedNow = registerVariants(patched);
 
-            console.log(`Добудовано копії 600/300: ${patched.length} фото`
+            console.log(`Добудовано копії 600/300 (webp + avif): ${patched.length} фото`
                 + (addedNow ? `, у image-variants.json додано ${addedNow}` : ""));
 
         }
@@ -310,7 +349,10 @@ async function main() {
 
 }
 
-module.exports = { baseWebpFiles, findOffCanvas, TARGET_RATIO, CANVAS, VARIANT_WIDTHS };
+module.exports = {
+    baseWebpFiles, findOffCanvas, TARGET_RATIO, CANVAS, VARIANT_WIDTHS,
+    VARIANT_FORMATS, AVIF_QUALITY, AVIF_EFFORT
+};
 
 if (require.main === module) {
     main().catch(error => { console.error(error); process.exit(1); });
