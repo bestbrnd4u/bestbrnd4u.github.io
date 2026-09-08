@@ -72,6 +72,30 @@ const ImageFraming = require("../assets/js/image-framing.js");
 const Breadcrumbs = require("../assets/js/breadcrumbs.js");
 
 const CATEGORIES_FILE = path.join(ROOT, "data", "categories.json");
+const BRANDS_FILE = path.join(ROOT, "data", "brands.json");
+
+// Власні сторінки категорій, розділів і брендів: крихти мусять вести
+// туди, а не у фільтр каталогу, який сам заявляє canonical на
+// /catalog (пояснення — у scripts/taxonomy-links.js).
+const { taxonomyLinks, pageFor } = require("./taxonomy-links");
+
+function loadJsonList(file) {
+
+    if (!fs.existsSync(file)) return [];
+
+    try {
+
+        const raw = JSON.parse(fs.readFileSync(file, "utf8"));
+
+        return Array.isArray(raw) ? raw : [];
+
+    } catch (error) {
+
+        return [];
+
+    }
+
+}
 
 // назва категорії → відділ, і відділ → усі його категорії
 function loadCategoryIndex() {
@@ -107,8 +131,50 @@ function loadCategoryIndex() {
 
 const categoryIndex = loadCategoryIndex();
 
+// Читаємо ті самі файли, з яких scripts/build-taxonomy-pages.js робить
+// сторінки, — тож перелік адрес не залежить від того, у якому порядку
+// запускались скрипти збірки.
+const taxonomy = taxonomyLinks(
+    loadJsonList(PRODUCTS_FILE),
+    loadJsonList(CATEGORIES_FILE),
+    loadJsonList(BRANDS_FILE)
+);
+
 function trailFor(product) {
-    return Breadcrumbs.buildTrail(product, categoryIndex);
+    return Breadcrumbs.buildTrail(product, {
+        ...categoryIndex,
+        pageFor: pageFor(taxonomy)
+    });
+}
+
+// Ті самі адреси — у саму сторінку, для рантайму.
+//
+// НАВІЩО. product.js перемальовує доріжку після завантаження (вона
+// потрібна ще й для старої адреси /product?id=…). Без цих адрес
+// рантайм зібрав би крихти по-своєму — з посиланнями на фільтр — і
+// стер би те, що згенеровано тут. Кладемо в сторінку лише три записи,
+// які стосуються ЦЬОГО товару: це близько сотні байтів і жодного
+// зайвого запиту.
+function productTaxonomy(product) {
+
+    const links = pageFor(taxonomy);
+
+    const category = String(product.category || "").trim();
+    const department = categoryIndex.departmentOf(category);
+    const brand = String(product.brand || "").trim();
+
+    const out = {};
+
+    [["category", category], ["department", department], ["brand", brand]].forEach(([kind, name]) => {
+
+        const href = name ? links(kind, name) : "";
+
+        if (href) out[kind] = { [name]: href };
+
+    });
+
+    return JSON.stringify(out);
+
 }
 
 // Умови повернення й доставки для розмітки товару.
@@ -519,6 +585,9 @@ function buildHead(product) {
         `// малює картку одразу, а каталог довантажує лише заради`,
         `// «схожих» і «переглянутих» — і бере полегшений`,
         `window.PRODUCT_DATA = ${productData(product)};`,
+        `// адреси власних сторінок категорії, розділу й бренду — щоб`,
+        `// крихти після рендеру JS вели туди ж, куди в розмітці`,
+        `window.PRODUCT_TAXONOMY = ${productTaxonomy(product)};`,
         `</script>`
     ].join("\n");
 

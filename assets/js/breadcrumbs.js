@@ -75,9 +75,30 @@
     // options.departmentOf — функція «назва категорії → назва відділу».
     // Необовʼязкова: якщо перелік категорій ще не завантажений, ланка
     // відділу просто пропускається, а доріжка лишається коректною.
+    //
+    // options.pageFor — функція (вид, назва) → адреса власної сторінки
+    // цієї категорії / розділу / бренду або порожній рядок.
+    //
+    // НАВІЩО ВОНА. Крихта, що веде у фільтр каталогу, веде в нікуди:
+    // /catalog?category=… має canonical на /catalog, тобто сама
+    // заявляє, що окремою сторінкою не є. А /categories/zhinochi-sumky/
+    // — справжня сторінка з власним заголовком, яка саме й зроблена,
+    // щоб її знаходили. Тепер крихти ведуть туди, де така сторінка є.
+    //
+    // Для категорії це ще й нічого не звужує: назва категорії вже
+    // містить стать («Жіночі сумки»), тож сторінка показує рівно те
+    // саме, що показував фільтр gender + category.
+    //
+    // Необовʼязкова: без неї всі крихти лишаються посиланнями на
+    // фільтр — так працює стара адреса /product?id=… (вона однаково
+    // за мить іде на канонічну).
     function buildTrail(product, options) {
 
         var opts = options || {};
+
+        var pageFor = typeof opts.pageFor === "function"
+            ? opts.pageFor
+            : function () { return ""; };
         var trail = [{ label: "Головна", href: "/" }, { label: "Каталог", href: "catalog" }];
 
         if (!product) return trail;
@@ -106,7 +127,10 @@
             // в адмінці додавали категорію.
             if (department) {
                 so_far.department = department;
-                trail.push({ label: department, href: catalogHref(so_far) });
+                trail.push({
+                    label: department,
+                    href: pageFor("department", department) || catalogHref(so_far)
+                });
             }
 
             // Відділ прибираємо, щойно зʼявилась категорія.
@@ -118,13 +142,19 @@
             delete so_far.department;
 
             so_far.category = category;
-            trail.push({ label: category, href: catalogHref(so_far) });
+            trail.push({
+                label: category,
+                href: pageFor("category", category) || catalogHref(so_far)
+            });
 
         }
 
         if (product.brand) {
             so_far.brand = product.brand;
-            trail.push({ label: product.brand, href: catalogHref(so_far) });
+            trail.push({
+                label: product.brand,
+                href: pageFor("brand", product.brand) || catalogHref(so_far)
+            });
         }
 
         // остання ланка — сам товар, без посилання

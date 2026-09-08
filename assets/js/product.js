@@ -76,11 +76,31 @@ const embedded = window.PRODUCT_DATA && typeof window.PRODUCT_DATA === "object"
     ? window.PRODUCT_DATA
     : null;
 
+// Окремою змінною, а не масивом на місці: інакше в Promise.all
+// нижче з'явилась би вкладена дужка «])», на яку спирається
+// tests/test-live-stock.js, коли перевіряє, що наявність питається
+// В ОДНОМУ запиті з товарами.
+const embeddedOnly = embedded ? [embedded] : [];
+
+// ЩО САМЕ ТУТ ЧЕКАЄМО, А ЩО НІ
+// ------------------------------
+// Стара адреса /product?id=… вбудованого запису не має: там без
+// повного каталогу не знайти сам товар, тож для неї нічого не
+// змінилось.
+//
+// А на канонічній /p/<slug>/ каталог на цьому кроці БІЛЬШЕ НЕ
+// ПОТРІБЕН. Раніше сторінка чекала на data/catalog.json (близько
+// 240 КБ розпакованого JSON) перш ніж намалювати товар — хоча повний
+// запис цього товару лежить у самій сторінці. Каталог потрібен лише
+// двом каруселям у самому низу: «схожі» й «переглянуті». Тепер він
+// довантажується, коли низ підходить до екрана (див. showRelated).
+//
+// Живий залишок лишається на критичному шляху: саме він відповідає
+// на питання «чи є в наявності», з яким людина сюди й прийшла.
 const [list, live]=await Promise.all([
-    // Стара адреса /product?id=… вбудованого запису не має: там
-    // лишається повний каталог, як було.
+    // вбудований запис / повний каталог для старої адреси
     embedded
-        ? getAllProductsCached()
+        ? Promise.resolve(embeddedOnly)
         : fetch(dataUrl("/data/products.json")).then(response => {
             if (!response.ok) throw new Error("Не вдалося завантажити товари");
             return response.json();
@@ -90,17 +110,7 @@ const [list, live]=await Promise.all([
 
 products = Array.isArray(list) && list.length ? list : [];
 
-if (embedded) {
-
-    // Деталі поверх картки: у каталозі цього товару лежить полегшений
-    // запис, а тут є повний. Кладемо його на місце — і далі вся
-    // сторінка працює з одним об'єктом, як робила завжди.
-    const index = products.findIndex(item => Number(item.id) === Number(embedded.id));
-
-    if (index >= 0) products[index] = { ...products[index], ...embedded };
-    else products.push(embedded);
-
-} else if (typeof primeProductsCache === "function") {
+if (!embedded && typeof primeProductsCache === "function") {
 
     primeProductsCache(products);
 
@@ -159,13 +169,25 @@ if (isLegacyUrl && product.slug) {
 
 renderProduct(product);
 
-renderSimilar(product);
-
 updateFavoriteButtons();
 
+// Позначку «переглянуто» ставимо одразу: це localStorage, він нічого
+// не вантажить, а карусель на НАСТУПНІЙ сторінці мусить знати, що цей
+// товар дивились — навіть якщо до низу цієї людина не дійшла.
 trackRecentlyViewed(product.id);
 
-renderRecentlyViewed({ excludeId: product.id });
+// «Схожі» й «переглянуті» — коли до них доходить справа.
+//
+// Слухаємо СЕКЦІЮ, а не саму карусель.
+//
+// ЧОМУ: карусель до наповнення порожня, а IntersectionObserver із
+// порогом 0 не спрацьовує для елемента без площі. У секції є
+// заголовок «Схожі товари» — вона має висоту завжди, за будь-якої
+// верстки. Якщо секції чомусь немає (змінили розмітку) — лишається
+// карусель, як було.
+whenNearViewport(
+    document.querySelector("section.similar") || document.getElementById("similarCarousel"),
+    () => showRelated(product, live));
 
 } catch (error) {
 
@@ -418,15 +440,30 @@ function updateProductSeoMetadata(product) {
         } : undefined
     });
 
-    setJsonLd("breadcrumbSchema", {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        itemListElement: [
-            { "@type": "ListItem", position: 1, name: "Головна", item: `${SITE_URL}/` },
-            { "@type": "ListItem", position: 2, name: "Каталог", item: `${SITE_URL}/catalog` },
-            { "@type": "ListItem", position: 3, name: product.title, item: pageUrl }
-        ]
+    paintBreadcrumbSchema(product, pageUrl, departmentByCategory);
+
+}
+
+// Розмітка доріжки — ТИМ САМИМ будівником, що й видима доріжка.
+//
+// ЩО БУЛО НЕ ТАК. Тут стояли три ланки вручну: Головна → Каталог →
+// назва товару. Генератор при цьому кладе в сторінку повну доріжку
+// (Головна → Каталог → Жінкам → Сумки → Жіночі сумки → Coach →
+// назва), а цей рядок її ЗАТИРАВ — Google виконує JS, тож бачив
+// коротку. Тобто вся робота над доріжкою до розмітки не доходила.
+//
+// Тепер обидві збираються з одного джерела (assets/js/breadcrumbs.js),
+// як і мало бути: розійтись вони більше не можуть.
+function paintBreadcrumbSchema(product, pageUrl, map) {
+
+    if (!window.Breadcrumbs) return;
+
+    const trail = window.Breadcrumbs.buildTrail(product, {
+        departmentOf: name => (map && map.get(name)) || "",
+        pageFor: taxonomyPageFor
     });
+
+    setJsonLd("breadcrumbSchema", window.Breadcrumbs.toJsonLd(trail, SITE_URL, pageUrl));
 
 }
 
@@ -563,6 +600,21 @@ document.addEventListener("click", event => {
 
 });
 
+// Адреса власної сторінки категорії / розділу / бренду.
+//
+// Її кладе в сторінку генератор (scripts/build-product-pages.js →
+// window.PRODUCT_TAXONOMY), бо тільки збірка знає, для яких саме
+// назв сторінки існують. Без неї крихта лишається посиланням на
+// фільтр каталогу — так поводиться стара адреса /product?id=…, яка
+// однаково за мить іде на канонічну.
+function taxonomyPageFor(kind, name) {
+
+    const links = window.PRODUCT_TAXONOMY;
+
+    return (links && links[kind] && links[kind][name]) || "";
+
+}
+
 function paintBreadcrumbs(product, map) {
 
     const host = document.getElementById("breadcrumbsList");
@@ -579,7 +631,8 @@ function paintBreadcrumbs(product, map) {
     }
 
     const trail = window.Breadcrumbs.buildTrail(product, {
-        departmentOf: name => (map && map.get(name)) || ""
+        departmentOf: name => (map && map.get(name)) || "",
+        pageFor: taxonomyPageFor
     });
 
     host.innerHTML = window.Breadcrumbs.BACK_HTML + trail
@@ -624,6 +677,11 @@ function renderBreadcrumbs(product) {
     loadDepartmentMap().then(map => {
         paintBreadcrumbs(product, map);
         scrollBreadcrumbsToEnd();
+
+        // Разом із видимою доріжкою оновлюємо й розмітку: розійдуться
+        // вони — і Search Console позначить це як невідповідність
+        // розмітки вмісту сторінки.
+        paintBreadcrumbSchema(product, SITE_URL + productUrl(product), map);
     });
 
 }
@@ -1078,8 +1136,21 @@ function renderProduct(product) {
             ? window.ImageFraming.frameBackgroundStyle(currentFraming, swatchImage)
             : "";
 
+        // Саме фото в style НЕ ставимо — лишаємо data-swatch-bg, а фон
+        // домальовує applyImageVariants() з ui.js, підставляючи копію
+        // на 300 px замість повнорозмірного знімка.
+        //
+        // НАВІЩО ТАК. Свотч — 56×56 px, але це CSS-фон, а фон не знає
+        // про srcset: браузер тягне рівно названий файл. Заміряно на
+        // проді: шість свотчів = близько 395 КБ повнорозмірних фото на
+        // кожне відкриття сторінки товару, тоді як копії по 300 px
+        // лежали поруч і важать 3-4 КБ.
+        //
+        // Колір лишається інлайном: поки фон не домалювали, квадрат
+        // уже свого кольору, а не порожній. Якщо ui.js не підключився
+        // або копії немає — там же підставиться оригінал.
         const swatchStyle = swatchImage
-            ? `background-color:${swatchColor};background-image:url('${escapeAttrSingleQuoted(swatchImage)}');`
+            ? `background-color:${swatchColor};`
               + (swatchFrame || "background-size:cover;background-position:center")
             : `background-color:${swatchColor}`;
 
@@ -1087,6 +1158,7 @@ function renderProduct(product) {
         <button
             class="color ${index === activeIndex ? "active" : ""}"
             data-color="${escapeHtml(variant.color)}"
+            ${swatchImage ? `data-swatch-bg="${escapeHtml(swatchImage)}"` : ""}
             data-images='${escapeAttrSingleQuoted(JSON.stringify(variant.images || []))}'
             data-sizes='${escapeAttrSingleQuoted(JSON.stringify(getVariantSizes(product, variant)))}'
             data-out-sizes='${escapeAttrSingleQuoted(JSON.stringify(soldOutSizes(productBase, variant)))}'
@@ -2218,6 +2290,79 @@ function updateGalleryForColor(images, video) {
 
     if (colorLabel && specColorValue) specColorValue.textContent = colorLabel;
     if (colorLabel && selectedColorLabel) selectedColorLabel.textContent = colorLabel;
+
+}
+
+// Зробити щось, коли блок підходить до екрана.
+//
+// НАВІЩО. Дві каруселі в самому низу сторінки товару коштують
+// data/catalog.json — близько 240 КБ розпакованого JSON. Половина
+// людей до них не доскролює взагалі, а на телефоні цей розбір
+// відбирає час у того, за чим прийшли.
+//
+// 600 px запасу — щоб карусель була вже намальована, коли до неї
+// доскролили, а не з'являлась на очах.
+//
+// Без IntersectionObserver (старий браузер) або без самого блока
+// робимо одразу: краще зайвий запит, ніж порожній низ сторінки.
+function whenNearViewport(element, run) {
+
+    if (!element || typeof IntersectionObserver === "undefined") {
+
+        run();
+
+        return;
+
+    }
+
+    const observer = new IntersectionObserver(entries => {
+
+        if (!entries.some(entry => entry.isIntersecting)) return;
+
+        observer.disconnect();
+
+        run();
+
+    }, { rootMargin: "600px 0px" });
+
+    observer.observe(element);
+
+}
+
+// Каталог для двох каруселей унизу — і самі каруселі.
+//
+// Викликається один раз, коли низ сторінки підходить до екрана.
+// Повний запис цього товару лежить у сторінці, тож він накриває
+// полегшену картку з каталогу — далі вся сторінка працює з одним
+// об'єктом, як робила завжди.
+async function showRelated(product, live) {
+
+    if (typeof getAllProductsCached === "function") {
+
+        const all = await getAllProductsCached();
+
+        if (Array.isArray(all) && all.length) {
+
+            const merged = all.map(item => Number(item.id) === Number(product.id)
+                ? { ...item, ...product }
+                : item);
+
+            if (!merged.some(item => Number(item.id) === Number(product.id))) merged.push(product);
+
+            products = merged;
+
+            // Залишок уже завантажений — застосовуємо його й до решти
+            // каталогу, інакше картки «схожих» показували б наявність
+            // зі збірки, а не справжню.
+            if (window.LiveStock) window.LiveStock.apply(products, live);
+
+        }
+
+    }
+
+    renderSimilar(product);
+
+    renderRecentlyViewed({ excludeId: product.id });
 
 }
 

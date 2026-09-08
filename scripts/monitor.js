@@ -142,6 +142,45 @@ async function liveStock() {
 
 }
 
+// Чи знає розгорнута функція про маршрут.
+//
+// НАВІЩО. Нова можливість функції жива лише після ДВОХ дій власника:
+// міграція в базі й перерозгортання функції. Пропустити друге легко —
+// код у гілці є, тести зелені, а на сайті мовчок. Саме так уже було з
+// відгуками: маршрут відповідав «ignored», і виявилось це випадково.
+//
+// Питаємо НАВМИСНО НЕПРАВИЛЬНИМИ даними: свіжа функція відповість
+// зрозумілою відмовою (це й означає «маршрут є»), стара — не знатиме
+// такого site_action. У базу при цьому нічого не пишеться й лічильник
+// звернень не витрачається: перевірка вхідних даних стоїть першою.
+async function functionRoute(action, body) {
+
+    const client = publicKey();
+
+    if (!client) return null;
+
+    try {
+
+        const response = await fetch(`${client.url}/functions/v1/telegram-order-bot`, {
+            method: "POST",
+            headers: {
+                apikey: client.key,
+                Authorization: `Bearer ${client.key}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ site_action: action, ...body })
+        });
+
+        return { status: response.status, text: (await response.text()).slice(0, 200) };
+
+    } catch (error) {
+
+        return null;
+
+    }
+
+}
+
 // Запис DNS через HTTPS.
 //
 // Через HTTPS, а не системний резолвер: у CI його налаштування
@@ -392,6 +431,32 @@ async function main() {
 
             record("DMARC налаштований", Boolean(policy),
                 policy ? "" : `немає TXT-запису _dmarc.${host} — листи про замовлення ризикують піти в спам`);
+
+        }
+
+    }
+
+    // ---- 6а. функція знає про незавершене оформлення ----
+    //
+    // Перевіряємо лише на бойовому: на деві функція та сама, і другий
+    // однаковий запит нічого не додає.
+    if (INDEXABLE) {
+
+        // Порожня пошта — свідомо недійсна: функція мусить відмовити,
+        // і сама ця відмова означає, що маршрут у ній є.
+        const draft = await functionRoute("checkout-draft", { email: "", items: [] });
+
+        if (draft === null) {
+
+            record("незавершене оформлення перевірено", false, "функція не відповіла");
+
+        } else {
+
+            record("функція знає про незавершене оформлення",
+                draft.status === 200 && /"saved"\s*:\s*false/.test(draft.text),
+                draft.status === 200 && !/saved/.test(draft.text)
+                    ? "функцію не перерозгорнуто після міграції 020 — нагадування гостям не працюють"
+                    : `HTTP ${draft.status} ${draft.text}`);
 
         }
 

@@ -592,6 +592,30 @@ const DELIVERY_OPTIONS = [
   { id: "np_office",  label: "На відділення «Нова пошта»", price: 0, needsDetail: "Номер відділення" },
   { id: "np_box",     label: "Поштомат «Нова пошта»",      price: 0, needsDetail: "Номер поштомата" },
   { id: "np_courier", label: "Кур'єром «Нова пошта»",      price: 0, needsDetail: "Вулиця, будинок, квартира" },
+
+  // Інший перевізник — четвертим, як і на сайті.
+  //
+  // НАВІЩО. Сторінка «Оплата і доставка» обіцяє й Укрпошту, на сайті
+  // цей спосіб з'явився, а в боті лишались три кнопки — усі «Нова
+  // пошта». Тобто те саме замовлення через бот оформити було
+  // неможливо, і людину доводилось вести на сайт.
+  //
+  // Довідника Укрпошти чи Meest у нас немає (пошук по точках працює
+  // лише для НП), тому перевізника й адресу покупець пише сам одним
+  // рядком — так само, як у полі на checkout.html. Крок «місто»
+  // лишається: Укрпошті воно теж потрібне.
+  //
+  // button — текст ЛИШЕ на кнопці. label їде в orders.delivery_method
+  // і мусить збігатися з сайтом до символу, а на кнопці «Інша пошта»
+  // саме по собі нічого не пояснює: на сайті поруч написано, які це
+  // перевізники, і в боті це видно теж.
+  {
+    id: "other",
+    label: "Інша пошта",
+    button: "Інша пошта (Укрпошта, Meest)",
+    price: 0,
+    needsDetail: "Перевізник, відділення або адреса",
+  },
 ];
 
 const MAX_QTY = 10;
@@ -759,7 +783,7 @@ function qtyKeyboard() {
 function deliveryKeyboard() {
 
   const buttons = DELIVERY_OPTIONS.map((option) => ([{
-    text: `${option.label} — оплата при отриманні`,
+    text: `${option.button ?? option.label} — оплата при отриманні`,
     callback_data: `o:dlv:${option.id}`,
   }]));
 
@@ -2017,6 +2041,64 @@ function cartLetter(items, siteUrl) {
     return {
         subject: list.length === 1 ? "Ви залишили товар у кошику" : "Ви залишили товари у кошику",
         html: letterShell("Ваш кошик чекає 🛍", body, siteUrl)
+    };
+
+}
+
+// Незавершене ОФОРМЛЕННЯ — не те саме, що брошений кошик.
+//
+// ЧОМУ ОКРЕМИЙ ЛИСТ, А НЕ cartLetter
+// -----------------------------------
+// Людина не просто поклала товар у кошик — вона відкрила оформлення й
+// заповнила пошту. Тобто дійшла на крок далі, ніж «подивлюсь потім»,
+// і лист має говорити саме про це: не «ваш кошик чекає», а «ви не
+// завершили замовлення». Кнопка веде на оформлення, а не в кошик.
+//
+// ЧОМУ ТУТ ВЗАГАЛІ Є ПРО РОЗСИЛКУ
+// --------------------------------
+// Це єдиний лист магазину, який приходить людині, що НЕ реєструвалась
+// і НЕ підписувалась. Тому в ньому прямо сказано, чому він прийшов і
+// що адресу не додали в розсилку: людина має розуміти це з листа, а
+// не здогадуватись (умови — у міграції 020).
+function checkoutLetter(items, siteUrl) {
+
+    const list = Array.isArray(items) ? items : [];
+
+    if (!list.length) return null;
+
+    const site = String(siteUrl || "").replace(/\/+$/, "");
+
+    const total = list.reduce(function (sum, item) {
+        return sum + (Number(item.price) || 0) * (Number(item.qty) || 1);
+    }, 0);
+
+    const button = site
+        ? `<div style="margin-top:22px"><a href="${escapeHtml(site)}/checkout" `
+            + `style="display:inline-block;background:#111827;color:#fff;text-decoration:none;`
+            + `padding:12px 22px;border-radius:8px;font-size:14px">Завершити замовлення</a></div>`
+        : "";
+
+    const body = [
+        `<div style="font-size:15px;line-height:1.6">`,
+        "Ви почали оформлювати замовлення й не завершили — ",
+        list.length === 1 ? "товар ми зберегли." : "товари ми зберегли.",
+        " Якщо щось не вийшло, просто відповідайте на цей лист: допоможемо оформити.",
+        `</div>`,
+        itemsTable(list),
+        `<table style="width:100%;border-collapse:collapse">`,
+        row("Разом", escapeHtml(money(total)), true),
+        `</table>`,
+        button,
+        `<div style="margin-top:20px;font-size:13px;line-height:1.6;color:#6b7280">`,
+        "Ви отримали цей лист, бо залишили свою пошту на сторінці оформлення",
+        " замовлення. Це єдине нагадування, і до розсилки магазину ваша",
+        " адреса не додана. Якщо ви передумали — просто не звертайте уваги.",
+        `</div>`
+    ].join("");
+
+    return {
+        subject: "Ви не завершили замовлення",
+        html: letterShell("Завершити замовлення?", body, siteUrl)
     };
 
 }
@@ -3447,6 +3529,99 @@ function subscribeVerdict(status, data) {
 
 }
 
+
+// Незавершене оформлення: перевірка того, що прийшло з браузера.
+//
+// НАВІЩО ОКРЕМИЙ ФАЙЛ
+// --------------------
+// Тут немає ні мережі, ні бази — чисті функції, які можна прогнати
+// тестами в Node (той самий підхід, що в order-flow.js і subscribe.js).
+//
+// ЩО САМЕ ЗБЕРІГАЄМО
+// -------------------
+// Пошту й посилання на товари: [{product_id, color, size, qty}].
+// Ні імені, ні телефону, ні адреси доставки — для листа «ви не
+// завершили замовлення» вони не потрібні, а зберігати те, що не
+// потрібне, не варто.
+//
+// ЧОМУ МЕЖІ ТАКІ ЖОРСТКІ
+// -----------------------
+// Це відкритий маршрут: викликати його може будь-хто з публічним
+// ключем. Він мусить приймати рівно те, що надсилає наша сторінка
+// оформлення, і нічого крім.
+
+// Кошик із 40 позицій — це вже не кошик, а спроба щось зламати.
+const MAX_DRAFT_ITEMS = 40;
+
+// Стільки ж, скільки дозволяє сторінка товару (MAX_QTY у order-flow.js).
+const MAX_DRAFT_QTY = 10;
+
+const EMAIL_LIMIT = 160;
+const TEXT_LIMIT = 60;
+
+function draftEmail(value) {
+
+    const email = String(value ?? "").trim().toLowerCase();
+
+    if (!email || email.length > EMAIL_LIMIT) return "";
+
+    // Та сама перевірка, що на сторінці оформлення: щось@щось.щось.
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "";
+
+    return email;
+
+}
+
+function draftText(value) {
+
+    return String(value ?? "").trim().slice(0, TEXT_LIMIT);
+
+}
+
+// Позиція кошика → те, що ляже в базу.
+//
+// id приймаємо і як product_id, і як id: у кошику на сайті поле
+// зветься id, а в базі — product_id (так само в cart_items).
+function draftItem(row) {
+
+    if (!row || typeof row !== "object") return null;
+
+    const id = Number(row.product_id ?? row.id);
+
+    if (!Number.isFinite(id) || id <= 0) return null;
+
+    const qty = Math.min(Math.max(Math.round(Number(row.qty) || 1), 1), MAX_DRAFT_QTY);
+
+    return {
+        product_id: id,
+        color: draftText(row.color),
+        size: draftText(row.size),
+        qty,
+    };
+
+}
+
+// Уся посилка → { ok, draft } або { ok: false, reason }.
+function cleanDraft(body) {
+
+    const email = draftEmail(body && body.email);
+
+    if (!email) return { ok: false, reason: "пошта не схожа на пошту" };
+
+    const rows = Array.isArray(body && body.items) ? body.items : [];
+
+    if (!rows.length) return { ok: false, reason: "порожній кошик" };
+
+    if (rows.length > MAX_DRAFT_ITEMS) return { ok: false, reason: "надто багато позицій" };
+
+    const items = rows.map(draftItem).filter(Boolean);
+
+    if (!items.length) return { ok: false, reason: "жодної придатної позиції" };
+
+    return { ok: true, draft: { email, items } };
+
+}
+
 // ======================================
 // Telegram-бот для заявок BestBrnd4u
 //
@@ -3472,6 +3647,7 @@ function subscribeVerdict(status, data) {
 
 // Чиста логіка (форматування картки, кнопки) винесена окремо —
 // щоб її можна було запускати й тестувати в Node без Deno.
+
 
 
 
@@ -5880,6 +6056,89 @@ async function handleSubscribe(request: Request, body: Record<string, any>): Pro
 
 }
 
+// Незавершене оформлення замовлення.
+//
+// НАВІЩО ЦЕЙ МАРШРУТ
+// -------------------
+// Кошик гостя живе в localStorage — у базі його немає, і нагадування
+// про брошений кошик (scripts/remind-carts.js) до гостя не доходить
+// НІКОЛИ. А гості — більшість покупців.
+//
+// Пошта гостя вперше з'являється на сторінці оформлення. Якщо людина
+// її заповнила й не дійшла до кнопки — це найгарячіша втрата, яка в
+// магазині буває, і адреса при цьому вже в нас.
+//
+// ЩО САМЕ ТУТ ВІДБУВАЄТЬСЯ
+// -------------------------
+// Один рядок на адресу: пошта + посилання на товари. Ні імені, ні
+// телефону, ні адреси доставки — для листа «ви не завершили
+// замовлення» вони не потрібні.
+//
+// Це НЕ підписка. Адреса не потрапляє ні в MailerLite, ні в жоден
+// список; лист — один, і не частіше разу на 30 днів (умови в
+// міграції 020, функція abandoned_checkouts).
+//
+// ВІДПОВІДЬ ЗАВЖДИ 200 і ok:true — навіть коли нічого не збереглось.
+// Сторінка оформлення не має чого робити з цією помилкою: людина
+// зараз купує, і остання річ, яка їй потрібна, — червоне повідомлення
+// про допоміжну можливість магазину.
+async function handleCheckoutDraft(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  const clean = cleanDraft(body);
+
+  if (!clean.ok) {
+
+    console.warn("Чернетку оформлення відхилено:", clean.reason);
+
+    return adminJson({ ok: true, saved: false }, 200, origin);
+
+  }
+
+  // Межа звернень — та сама, що на сторінці «Де моє замовлення»
+  // (міграція 017). Без неї маршрут став би способом наповнити нам
+  // базу вигаданими адресами.
+  if (!(await lookupAllowed(clientIp(request)))) {
+    return adminJson({ ok: true, saved: false }, 200, origin);
+  }
+
+  try {
+
+    const response = await supabaseRest("rpc/save_checkout_draft", {
+      method: "POST",
+      body: JSON.stringify({
+        p_email: clean.draft.email,
+        p_items: clean.draft.items,
+      }),
+    });
+
+    if (!response.ok) {
+
+      const text = await response.text();
+
+      // Міграції ще немає — це «не налаштовано», а не збій. Кажемо в
+      // журнал і живемо далі: оформлення від цього не залежить.
+      console.warn("Чернетку не збережено:", response.status, text.slice(0, 160));
+
+      return adminJson({ ok: true, saved: false }, 200, origin);
+
+    }
+
+    await response.text();
+
+    return adminJson({ ok: true, saved: true }, 200, origin);
+
+  } catch (error) {
+
+    console.error("Чернетка оформлення недоступна:", error);
+
+    return adminJson({ ok: true, saved: false }, 200, origin);
+
+  }
+
+}
+
 async function handleAdmin(request: Request, body: Record<string, any>): Promise<Response> {
 
   const origin = request.headers.get("origin");
@@ -6101,6 +6360,13 @@ async function handleRequest(request: Request): Promise<Response> {
   if (body.site_action === "subscribe") {
 
     return await handleSubscribe(request, body);
+
+  }
+
+  // --- незавершене оформлення (щоб нагадати гостю) ---
+  if (body.site_action === "checkout-draft") {
+
+    return await handleCheckoutDraft(request, body);
 
   }
 

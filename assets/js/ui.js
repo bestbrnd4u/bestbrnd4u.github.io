@@ -639,6 +639,41 @@ function buildSrcSet(src) {
 
 }
 
+// Адреса ОДНІЄЇ зменшеної копії — для випадків, де srcset не працює.
+//
+// НАВІЩО. srcset розуміє лише <img>. Фон, заданий у CSS
+// (background-image), його ігнорує: браузер завантажить рівно той
+// файл, який названо, скільки б пікселів той квадрат не займав.
+//
+// Заміряно на сторінці товару: шість свотчів вибору кольору 56×56 px
+// тягнули повнорозмірні знімки — 60, 54, 125, 82, 53 і 21 КБ, разом
+// близько 395 КБ на кожне відкриття сторінки. Копії по 300 px при
+// цьому вже лежали поруч і важать 3-4 КБ.
+//
+// 300 px на квадрат 56 px — це запас навіть для retina, тож на око
+// різниці немає.
+function variantUrl(src, width) {
+
+    const [pathPart, query] = String(src || "").split("?");
+
+    if (!pathPart.endsWith(".webp")) return null;
+
+    const v = query ? `?${query}` : "";
+
+    return `${pathPart.slice(0, -".webp".length)}-${width}.webp${v}`;
+
+}
+
+// Значення для CSS background-image.
+//
+// Лапки й зворотні слеші в назві файлу екрануємо: назву дає адмінка
+// або масовий імпорт, і апостроф у ній інакше розірвав би url().
+function cssUrl(src) {
+
+    return `url("${String(src).replace(/["\\]/g, ch => `\\${ch}`)}")`;
+
+}
+
 // Рамка кадрування → інлайновий style для КАРТКИ каталогу.
 //
 // Ім'я з префіксом card- навмисно: на сторінці товару поруч
@@ -746,22 +781,47 @@ async function applyImageVariants(root) {
 
     const known = await loadImageVariants();
 
-    if (!known.size) return;
+    const scope = root || document;
 
-    (root || document).querySelectorAll("img[data-variant-src]").forEach(img => {
+    if (known.size) {
 
-        const src = img.dataset.variantSrc;
+        scope.querySelectorAll("img[data-variant-src]").forEach(img => {
 
-        if (!known.has(src.split("/").pop())) return;
+            const src = img.dataset.variantSrc;
 
-        const srcset = buildSrcSet(src);
+            if (!known.has(src.split("/").pop())) return;
 
-        if (!srcset) return;
+            const srcset = buildSrcSet(src);
 
-        img.srcset = srcset;
-        img.sizes = img.dataset.variantSizes || "(max-width: 768px) 50vw, 300px";
+            if (!srcset) return;
 
-        delete img.dataset.variantSrc;
+            img.srcset = srcset;
+            img.sizes = img.dataset.variantSizes || "(max-width: 768px) 50vw, 300px";
+
+            delete img.dataset.variantSrc;
+
+        });
+
+    }
+
+    // Фони, які чекають на зменшену копію (свотчі вибору кольору).
+    //
+    // Тут НЕ виходимо раніше через порожній перелік: фон малюємо
+    // завжди. Якщо зменшеної копії немає (фото додали через адмінку
+    // після збірки) або перелік не завантажився — ставимо оригінал.
+    // Свотч мусить показати фото за будь-яких обставин; зменшена
+    // копія — це прискорення, а не умова.
+    scope.querySelectorAll("[data-swatch-bg]").forEach(el => {
+
+        const src = el.dataset.swatchBg;
+
+        const name = src.split("/").pop().split("?")[0];
+
+        const small = known.has(name) ? variantUrl(src, 300) : null;
+
+        el.style.backgroundImage = cssUrl(small || src);
+
+        delete el.dataset.swatchBg;
 
     });
 

@@ -383,6 +383,64 @@ export function cartLetter(items, siteUrl) {
 
 }
 
+// Незавершене ОФОРМЛЕННЯ — не те саме, що брошений кошик.
+//
+// ЧОМУ ОКРЕМИЙ ЛИСТ, А НЕ cartLetter
+// -----------------------------------
+// Людина не просто поклала товар у кошик — вона відкрила оформлення й
+// заповнила пошту. Тобто дійшла на крок далі, ніж «подивлюсь потім»,
+// і лист має говорити саме про це: не «ваш кошик чекає», а «ви не
+// завершили замовлення». Кнопка веде на оформлення, а не в кошик.
+//
+// ЧОМУ ТУТ ВЗАГАЛІ Є ПРО РОЗСИЛКУ
+// --------------------------------
+// Це єдиний лист магазину, який приходить людині, що НЕ реєструвалась
+// і НЕ підписувалась. Тому в ньому прямо сказано, чому він прийшов і
+// що адресу не додали в розсилку: людина має розуміти це з листа, а
+// не здогадуватись (умови — у міграції 020).
+export function checkoutLetter(items, siteUrl) {
+
+    const list = Array.isArray(items) ? items : [];
+
+    if (!list.length) return null;
+
+    const site = String(siteUrl || "").replace(/\/+$/, "");
+
+    const total = list.reduce(function (sum, item) {
+        return sum + (Number(item.price) || 0) * (Number(item.qty) || 1);
+    }, 0);
+
+    const button = site
+        ? `<div style="margin-top:22px"><a href="${escapeHtml(site)}/checkout" `
+            + `style="display:inline-block;background:#111827;color:#fff;text-decoration:none;`
+            + `padding:12px 22px;border-radius:8px;font-size:14px">Завершити замовлення</a></div>`
+        : "";
+
+    const body = [
+        `<div style="font-size:15px;line-height:1.6">`,
+        "Ви почали оформлювати замовлення й не завершили — ",
+        list.length === 1 ? "товар ми зберегли." : "товари ми зберегли.",
+        " Якщо щось не вийшло, просто відповідайте на цей лист: допоможемо оформити.",
+        `</div>`,
+        itemsTable(list),
+        `<table style="width:100%;border-collapse:collapse">`,
+        row("Разом", escapeHtml(money(total)), true),
+        `</table>`,
+        button,
+        `<div style="margin-top:20px;font-size:13px;line-height:1.6;color:#6b7280">`,
+        "Ви отримали цей лист, бо залишили свою пошту на сторінці оформлення",
+        " замовлення. Це єдине нагадування, і до розсилки магазину ваша",
+        " адреса не додана. Якщо ви передумали — просто не звертайте уваги.",
+        `</div>`
+    ].join("");
+
+    return {
+        subject: "Ви не завершили замовлення",
+        html: letterShell("Завершити замовлення?", body, siteUrl)
+    };
+
+}
+
 // Запит до сервісу розсилки.
 //
 // Повертає null, якщо надсилати нічим або нікуди — тоді функція просто

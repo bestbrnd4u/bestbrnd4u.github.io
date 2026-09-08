@@ -133,19 +133,19 @@
       "@type": "ListItem",
       "position": 4,
       "name": "Сумки",
-      "item": "https://bestbrnd4u.com/catalog?gender=%D0%96%D1%96%D0%BD%D0%BA%D0%B0%D0%BC&department=%D0%A1%D1%83%D0%BC%D0%BA%D0%B8"
+      "item": "https://dev.bestbrnd4u.com/departments/sumky/"
     },
     {
       "@type": "ListItem",
       "position": 5,
       "name": "Жіночі сумки",
-      "item": "https://bestbrnd4u.com/catalog?gender=%D0%96%D1%96%D0%BD%D0%BA%D0%B0%D0%BC&category=%D0%96%D1%96%D0%BD%D0%BE%D1%87%D1%96%20%D1%81%D1%83%D0%BC%D0%BA%D0%B8"
+      "item": "https://dev.bestbrnd4u.com/categories/zhinochi-sumky/"
     },
     {
       "@type": "ListItem",
       "position": 6,
       "name": "Jacquemus",
-      "item": "https://bestbrnd4u.com/catalog?gender=%D0%96%D1%96%D0%BD%D0%BA%D0%B0%D0%BC&category=%D0%96%D1%96%D0%BD%D0%BE%D1%87%D1%96%20%D1%81%D1%83%D0%BC%D0%BA%D0%B8&brand=Jacquemus"
+      "item": "https://dev.bestbrnd4u.com/brands/jacquemus/"
     },
     {
       "@type": "ListItem",
@@ -166,6 +166,9 @@ window.PRODUCT_ID = 60;
 // малює картку одразу, а каталог довантажує лише заради
 // «схожих» і «переглянутих» — і бере полегшений
 window.PRODUCT_DATA = {"gender":["Жінкам"],"preOrderDays":"5–10 робочих днів","forcePublish":false,"material":"Натуральна шкіра","brand":"Jacquemus","price":25000,"preOrder":false,"dimensions":"24 × 14 × 7 см","variants":[{"color":"Бежевий","hex":"#d4cfcf","images":["/assets/images/products/uploads/rtlafd950301_33497199_1_v1_2x.webp?v=97ae59fa","/assets/images/products/uploads/rtlafd950301_33497201_2_v1_2x.webp?v=1495f53c","/assets/images/products/uploads/rtlafd950301_33497202_3_v1_2x.webp?v=b98abf60","/assets/images/products/uploads/rtlafd950301_33497204_4_v1_2x.webp?v=45e8e115","/assets/images/products/uploads/rtlafd950301_33526729_9_v1_2x.webp?v=f716ea50"],"sku":"213BA007-3063-510","article":"60-1","stock":{"ONESIZE":1},"inStock":1},{"color":"Темно-коричневий","hex":"#6f1d1d","sku":"213BA007-3128-890","images":["/assets/images/products/uploads/rtlafe837901_33595360_1_v1_2x.webp?v=b5328c67","/assets/images/products/uploads/rtlafe837901_33595361_2_v1_2x.webp?v=c834b78e","/assets/images/products/uploads/rtlafe837901_33595363_4_v1_2x.webp?v=cd6c1754","/assets/images/products/uploads/rtlafe837901_33634337_9_v1_2x.webp?v=8717973d"],"article":"60-2","stock":{"ONESIZE":1},"inStock":1}],"preOrderPrepayment":50,"strapInfo":"Знімний та регульований","sizes":["ONESIZE"],"splitByColor":true,"searchKeywords":["JACQUEMUS","Jacquemus Le Grand Bambino","Le Grand Bambino","Jacquemus Bambino","Jacquemus 213BA007","213BA007-3063-510","сумка Jacquemus","жіноча сумка Jacquemus","бежева сумка","бежева сумка Jacquemus","Le Grand Bambino Beige","Beige","шкіряна сумка","сумка з натуральної шкіри","сумка через плече","сумка на плече","кросбоді","брендова сумка","оригінальна Jacquemus","жакмюс","жакемус"],"isNew":false,"title":"Сумка JACQUEMUS Le Grand Bambino Beige","reviews":0,"instagramBlock":"general","description":"Елегантна сумка JACQUEMUS Le Grand Bambino. Впізнаваний мінімалістичний дизайн доповнений фірмовим логотипом JACQUEMUS та акуратною золотою фурнітурою.\nМодель виготовлена з натуральної шкіри та має структуровану прямокутну форму. Сумка оснащена верхньою ручкою, магнітною застібкою та знімним регульованим ремінцем, завдяки якому її можна носити на плечі або через плече. На задній стороні розташована кишеня для картки.","rating":5,"category":"Жіночі сумки","slug":"sumka-jacquemus-le-grand-bambino-beige","id":60,"color":"Бежевий","images":["/assets/images/products/uploads/rtlafd950301_33497199_1_v1_2x.webp","/assets/images/products/uploads/rtlafd950301_33497201_2_v1_2x.webp","/assets/images/products/uploads/rtlafd950301_33497202_3_v1_2x.webp","/assets/images/products/uploads/rtlafd950301_33497204_4_v1_2x.webp","/assets/images/products/uploads/rtlafd950301_33526729_9_v1_2x.webp"],"legacySlugs":["сумка-jacquemus-le-grand-bambino-beige"],"article":"60","inStock":2};
+// адреси власних сторінок категорії, розділу й бренду — щоб
+// крихти після рендеру JS вели туди ж, куди в розмітці
+window.PRODUCT_TAXONOMY = {"category":{"Жіночі сумки":"categories/zhinochi-sumky/"},"department":{"Сумки":"departments/sumky/"},"brand":{"Jacquemus":"brands/jacquemus/"}};
 </script>
 
 
@@ -264,11 +267,11 @@ BestBrnd4u
 <span class="crumb-sep">–</span>
 <a href="https://bestbrnd4u.com/catalog?gender=%D0%96%D1%96%D0%BD%D0%BA%D0%B0%D0%BC">Жінкам</a>
 <span class="crumb-sep">–</span>
-<a href="https://bestbrnd4u.com/catalog?gender=%D0%96%D1%96%D0%BD%D0%BA%D0%B0%D0%BC&amp;department=%D0%A1%D1%83%D0%BC%D0%BA%D0%B8">Сумки</a>
+<a href="https://dev.bestbrnd4u.com/departments/sumky/">Сумки</a>
 <span class="crumb-sep">–</span>
-<a href="https://bestbrnd4u.com/catalog?gender=%D0%96%D1%96%D0%BD%D0%BA%D0%B0%D0%BC&amp;category=%D0%96%D1%96%D0%BD%D0%BE%D1%87%D1%96%20%D1%81%D1%83%D0%BC%D0%BA%D0%B8">Жіночі сумки</a>
+<a href="https://dev.bestbrnd4u.com/categories/zhinochi-sumky/">Жіночі сумки</a>
 <span class="crumb-sep">–</span>
-<a href="https://bestbrnd4u.com/catalog?gender=%D0%96%D1%96%D0%BD%D0%BA%D0%B0%D0%BC&amp;category=%D0%96%D1%96%D0%BD%D0%BE%D1%87%D1%96%20%D1%81%D1%83%D0%BC%D0%BA%D0%B8&amp;brand=Jacquemus">Jacquemus</a>
+<a href="https://dev.bestbrnd4u.com/brands/jacquemus/">Jacquemus</a>
 <span class="crumb-sep">–</span>
 <span class="crumb-current">Сумка JACQUEMUS Le Grand Bambino Beige</span>
 </div>
@@ -678,7 +681,7 @@ BestBrnd4u
      тож прев'ю в ній і картка на сайті рахуються однаково. -->
 <script src="/assets/js/image-framing.js?v=80b29a57"></script>
 <!-- Хлібні крихти: спільний будівник для сторінки й розмітки BreadcrumbList -->
-<script src="/assets/js/breadcrumbs.js?v=f8e67fc2"></script>
+<script src="/assets/js/breadcrumbs.js?v=7fc6182d"></script>
 <!-- Оформлення текстових блоків з адмінки (кольори, шрифт, кнопка) -->
 <script src="/assets/js/text-styles.js?v=7dc05c7d"></script>
 <!-- Згода на використання даних (банер + блокування вбудованого відео) -->
@@ -697,16 +700,16 @@ BestBrnd4u
 <!-- Підписка на листи магазину -->
 <script src="/assets/js/subscribe.js?v=2a90922b"></script>
 <script src="/assets/js/sync.js?v=48ef002e"></script>
-<script src="/assets/js/mega-menu.js?v=803d52cc"></script>
+<script src="/assets/js/mega-menu.js?v=7381e85d"></script>
 
-<script src="/assets/js/ui.js?v=50565c32"></script>
+<script src="/assets/js/ui.js?v=7d0cc8b9"></script>
 
 <script src="/assets/js/app.js?v=dc04bec0"></script>
 
 <script src="/assets/js/lightbox.js?v=552b0982"></script>
 
 <script src="/assets/js/live-stock.js?v=288763d6"></script>
-<script src="/assets/js/product.js?v=0db83599"></script>
+<script src="/assets/js/product.js?v=0d4470fa"></script>
 
 <!-- Відгуки: показ, форма й перевірка покупки на сервері -->
 <script src="/assets/js/reviews.js?v=23932989"></script>

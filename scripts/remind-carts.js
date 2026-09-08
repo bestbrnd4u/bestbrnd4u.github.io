@@ -25,8 +25,21 @@
 // див. supabase/migrations/016-abandoned-carts.sql. Скрипт лише
 // збирає лист і надсилає.
 //
-// ЛИШЕ ДЛЯ АВТОРИЗОВАНИХ. У гостя ми не знаємо пошти, доки він не
-// оформить замовлення — а тоді нагадувати вже нічого.
+// ДВА ВИДИ ВТРАТ, ДВА ДЖЕРЕЛА
+// ----------------------------
+// 1. Кошик авторизованого — abandoned_carts (міграція 016). Кошик
+//    лежить у базі, пошта в auth.users.
+//
+// 2. Незавершене ОФОРМЛЕННЯ гостя — abandoned_checkouts (міграція
+//    020). Кошик гостя живе в localStorage і в базу не потрапляє
+//    ніколи, але пошту він залишає на сторінці оформлення. Це
+//    гарячіша втрата: людина дійшла на крок далі, ніж «подивлюсь
+//    потім».
+//
+// Обидва — тут, бо потрібне те саме: каталог для назв і цін, ключ до
+// бази й розсилка. Лист різний (cartLetter / checkoutLetter): у
+// другому випадку людина не реєструвалась і не підписувалась, і в
+// листі прямо сказано, чому він прийшов.
 //
 // ЗАПУСК
 //   node scripts/remind-carts.js              знайти й надіслати
@@ -42,7 +55,7 @@ const { notConfigured } = require("./site-env");
 
 const ROOT = path.join(__dirname, "..");
 
-const { cartLetter, mailRequest } = require("../supabase/functions/telegram-order-bot/mail.js");
+const { cartLetter, checkoutLetter, mailRequest } = require("../supabase/functions/telegram-order-bot/mail.js");
 
 const DRY = process.argv.includes("--dry-run");
 
@@ -210,35 +223,58 @@ async function main() {
     const url = supabaseUrl();
     const site = siteUrl();
 
-    let carts;
+    const products = catalog();
+
+    const sentCarts = await remindCarts(url, key, products, site);
+    const sentDrafts = await remindCheckouts(url, key, products, site);
+
+    console.log(DRY
+        ? "\n--dry-run: нічого не надіслано"
+        : `\nНадіслано листів: ${sentCarts + sentDrafts}`);
+
+}
+
+// Перелік для нагадування. Відсутня міграція — це «ще не
+// налаштовано», а не збій: крок не має червоніти через можливість,
+// якої власник ще не вмикав.
+async function fetchList(url, key, rpc, migration) {
 
     try {
 
-        const response = await rest(url, key, "rpc/abandoned_carts", {
+        const response = await rest(url, key, `rpc/${rpc}`, {
             method: "POST",
             body: JSON.stringify({ p_idle: IDLE, p_limit: LIMIT })
         });
 
-        carts = await response.json();
+        const rows = await response.json();
+
+        return Array.isArray(rows) ? rows : [];
 
     } catch (error) {
 
-        // Немає міграції — це не помилка, а «ще не налаштовано».
         if (/PGRST202|does not exist|Could not find/i.test(error.message)) {
-            console.log("Функції abandoned_carts ще немає — виконайте міграцію 016");
-            return;
+            notConfigured(`Функції ${rpc} ще немає — виконайте міграцію ${migration}`);
+            return [];
         }
 
         throw error;
 
     }
 
-    if (!carts.length) {
-        console.log("✅ Брошених кошиків немає");
-        return;
-    }
+}
 
-    const products = catalog();
+// 1. Кошики авторизованих покупців.
+async function remindCarts(url, key, products, site) {
+
+    const carts = await fetchList(url, key, "abandoned_carts", "016");
+
+    if (!carts.length) {
+
+        console.log("✅ Брошених кошиків немає");
+
+        return 0;
+
+    }
 
     console.log(`Брошених кошиків: ${carts.length}\n`);
 
@@ -283,7 +319,65 @@ async function main() {
 
     }
 
-    console.log(DRY ? "\n--dry-run: нічого не надіслано" : `\nНадіслано листів: ${sent}`);
+    return sent;
+
+}
+
+// 2. Незавершене оформлення гостя.
+//
+// Той самий каталог і та сама розсилка, але інший лист: людина не
+// реєструвалась і не підписувалась, тож checkoutLetter прямо каже,
+// чому лист прийшов і що адресу не додали в розсилку.
+//
+// Позначку ставимо ЛИШЕ після успішної відправки (як і для кошиків).
+// Зате ставимо її й тоді, коли товарів уже немає в каталозі: інакше
+// такий рядок перебирався б щогодини до самого видалення.
+async function remindCheckouts(url, key, products, site) {
+
+    const drafts = await fetchList(url, key, "abandoned_checkouts", "020");
+
+    if (!drafts.length) {
+
+        console.log("✅ Незавершених оформлень немає");
+
+        return 0;
+
+    }
+
+    console.log(`\nНезавершених оформлень: ${drafts.length}\n`);
+
+    let sent = 0;
+
+    for (const draft of drafts) {
+
+        const items = buildItems(draft.items, products, site);
+
+        const letter = checkoutLetter(items, site);
+
+        if (!letter) {
+            console.log(`   — ${draft.email}: товарів уже немає в каталозі`);
+        } else {
+            console.log(`   • ${draft.email}: ${items.length} поз. — ${letter.subject}`);
+        }
+
+        if (DRY) continue;
+
+        const ok = letter ? await send(letter, draft.email) : false;
+
+        if (ok) sent++;
+
+        if (ok || !letter) {
+
+            await rest(url, key, "rpc/mark_checkout_notified", {
+                method: "POST",
+                body: JSON.stringify({ p_email: draft.email })
+            });
+
+        }
+
+    }
+
+    return sent;
 
 }
 

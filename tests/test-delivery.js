@@ -172,6 +172,43 @@ console.log("\n[4] Можна вибрати іншу пошту");
         /delivery\.label === "Інша пошта"[\s\S]{0,200}otherCarrier/.test(checkout));
 
     check("у підказці показано приклад", /Укрпошта, відділення/.test(page));
+
+    // І В БОТІ ТЕЖ. Раніше на сайті цей спосіб був, а в боті лишались
+    // три кнопки — усі «Нова пошта». Тобто те саме замовлення через
+    // Telegram оформити було неможливо, і людину доводилось вести на
+    // сайт. Заміряно: 4 згадки в checkout.html проти 0 в order-flow.js.
+    const other = flow.DELIVERY_OPTIONS.find(option => option.id === "other");
+
+    check("спосіб є і в боті", !!other,
+        flow.DELIVERY_OPTIONS.map(o => o.id).join(", "));
+
+    if (other) {
+
+        // label їде в orders.delivery_method і мусить збігатися з
+        // сайтом до символу: розійдуться — і в картці замовлення буде
+        // одне формулювання, а в «Історії замовлень» інше.
+        check("назва в боті збігається з сайтом до символу", other.label === "Інша пошта",
+            other.label);
+
+        check("бот питає перевізника й адресу", /Перевізник/.test(other.needsDetail),
+            other.needsDetail);
+
+        check("на кнопці бота названо перевізників (сама «Інша пошта» нічого не каже)",
+            /Укрпошта/.test(other.button || ""), other.button);
+
+        check("доставку бот не додає в суму, як і сайт", other.price === 0);
+
+        // Кнопка Telegram: 64 байти на callback_data (перевіряє
+        // test-bot-order-flow.js), але й текст мусить бути осяжним.
+        const button = flow.deliveryKeyboard().inline_keyboard
+            .flat()
+            .find(b => b.callback_data === "o:dlv:other");
+
+        check("кнопка в боті існує", !!button, JSON.stringify(button));
+
+        check("текст кнопки не надто довгий", !!button && button.text.length <= 64,
+            button && `${button.text.length}: ${button.text}`);
+    }
 }
 
 console.log("\n[5] Сторінки умов кажуть те саме");

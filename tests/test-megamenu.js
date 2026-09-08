@@ -156,10 +156,71 @@ console.log("\n[6] XSS у назві категорії");
     [{ title:"X", brand:"B", gender:"Жінкам", price:1,
        category:`Сумки"><img src=x onerror="window.__pwned=true">` }]
   )});
+  // ЦЬОГО РЯДКА ТУТ БРАКУВАЛО, і перевірка була порожньою: без
+  // заглушок mega-menu.js падав на «dataUrl is not defined», меню не
+  // будувалось узагалі — тобто «жодного живого <img>» виконувалось
+  // просто тому, що не було жодного тега. Тепер меню справді
+  // будується, і перевіряється саме екранування.
+  installBrowserStubs(window);
   window.eval(fs.readFileSync(ROOT + "/assets/js/mega-menu.js", "utf8"));
   await new Promise(r => setTimeout(r, 60));
+  check("меню справді побудовано (інакше перевірка нижче нічого не варта)",
+        !!window.document.querySelector(".mega-menu-columns"));
   check("жодного живого <img> не створено", window.document.querySelector(".mega-menu-columns img") === null);
   check("код не виконався", window.__pwned === false);
+}
+
+console.log("\n[7] Каталог не змагається за мережу із самою сторінкою");
+{
+  // НАВІЩО ЦЕ ВАЖЛИВО. Шапка однакова на всіх сторінках, тож каталог
+  // (42 КБ по дроту, 242 КБ після розпакування) вантажився КРІЗЬ УСЬОГО
+  // САЙТУ — заради панелі, яку ще ніхто не відкривав. Заміряно на
+  // сторінці товару: запит стартував на 107-й мілісекунді, раніше за
+  // половину фото.
+  const html = fs.readFileSync(ROOT + "/catalog.html", "utf8");
+  const dom = new JSDOM(html, { runScripts:"outside-only", pretendToBeVisual:true, url:"https://x.test/catalog" });
+  const { window } = dom;
+
+  window.escapeHtml = v => String(v ?? "");
+  window.getProductGenders = p => Array.isArray(p?.gender) ? p.gender.filter(Boolean) : (p?.gender ? [p.gender] : []);
+
+  const fetched = [];
+
+  window.fetch = url => {
+    fetched.push(String(url));
+    return Promise.resolve({ ok:true, json: () => Promise.resolve(
+      String(url).includes("categories") ? CATEGORIES : PRODUCTS) });
+  };
+
+  // Браузер, який ще НЕ звільнився: вільної миті не буде.
+  // Заглушку ставимо до installBrowserStubs — вона не перезаписує вже
+  // наявну функцію.
+  window.requestIdleCallback = () => {};
+
+  installBrowserStubs(window);
+
+  window.eval(fs.readFileSync(ROOT + "/assets/js/mega-menu.js", "utf8"));
+
+  await new Promise(r => setTimeout(r, 60));
+
+  check("поки браузер зайнятий — жодного запиту", fetched.length === 0, fetched.join(", "));
+
+  // І меню при цьому НЕ порожнє: у розмітці лежить запасний варіант.
+  const menu = window.document.querySelector(".has-mega .mega-menu");
+
+  check("запасна розмітка працює як навігація",
+        menu.querySelectorAll(".mega-item").length > 0,
+        menu.querySelectorAll(".mega-item").length);
+
+  // Людина тягнеться до меню раніше, ніж браузер звільнився —
+  // будуємо негайно, а не змушуємо її дивитись на заглушку.
+  window.document.querySelector(".has-mega").dispatchEvent(new window.Event("pointerenter"));
+
+  await new Promise(r => setTimeout(r, 60));
+
+  check("наведення будує меню одразу",
+        !!window.document.querySelector(".mega-menu-columns"),
+        fetched.join(", "));
 }
 
 console.log(failures===0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);

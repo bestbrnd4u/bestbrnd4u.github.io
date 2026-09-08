@@ -58,6 +58,7 @@ import {
   cleanReview, orderHasProduct, reviewCard, reviewKeyboard,
   parseReviewAction, reviewVerdictLine, reviewPhoneMatches,
 } from "./reviews.js";
+import { cleanDraft } from "./checkout-draft.js";
 import {
   cleanSubscriber, subscribeRequest, subscribeVerdict,
 } from "./subscribe.js";
@@ -2460,6 +2461,89 @@ async function handleSubscribe(request: Request, body: Record<string, any>): Pro
 
 }
 
+// Незавершене оформлення замовлення.
+//
+// НАВІЩО ЦЕЙ МАРШРУТ
+// -------------------
+// Кошик гостя живе в localStorage — у базі його немає, і нагадування
+// про брошений кошик (scripts/remind-carts.js) до гостя не доходить
+// НІКОЛИ. А гості — більшість покупців.
+//
+// Пошта гостя вперше з'являється на сторінці оформлення. Якщо людина
+// її заповнила й не дійшла до кнопки — це найгарячіша втрата, яка в
+// магазині буває, і адреса при цьому вже в нас.
+//
+// ЩО САМЕ ТУТ ВІДБУВАЄТЬСЯ
+// -------------------------
+// Один рядок на адресу: пошта + посилання на товари. Ні імені, ні
+// телефону, ні адреси доставки — для листа «ви не завершили
+// замовлення» вони не потрібні.
+//
+// Це НЕ підписка. Адреса не потрапляє ні в MailerLite, ні в жоден
+// список; лист — один, і не частіше разу на 30 днів (умови в
+// міграції 020, функція abandoned_checkouts).
+//
+// ВІДПОВІДЬ ЗАВЖДИ 200 і ok:true — навіть коли нічого не збереглось.
+// Сторінка оформлення не має чого робити з цією помилкою: людина
+// зараз купує, і остання річ, яка їй потрібна, — червоне повідомлення
+// про допоміжну можливість магазину.
+async function handleCheckoutDraft(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  const clean = cleanDraft(body);
+
+  if (!clean.ok) {
+
+    console.warn("Чернетку оформлення відхилено:", clean.reason);
+
+    return adminJson({ ok: true, saved: false }, 200, origin);
+
+  }
+
+  // Межа звернень — та сама, що на сторінці «Де моє замовлення»
+  // (міграція 017). Без неї маршрут став би способом наповнити нам
+  // базу вигаданими адресами.
+  if (!(await lookupAllowed(clientIp(request)))) {
+    return adminJson({ ok: true, saved: false }, 200, origin);
+  }
+
+  try {
+
+    const response = await supabaseRest("rpc/save_checkout_draft", {
+      method: "POST",
+      body: JSON.stringify({
+        p_email: clean.draft.email,
+        p_items: clean.draft.items,
+      }),
+    });
+
+    if (!response.ok) {
+
+      const text = await response.text();
+
+      // Міграції ще немає — це «не налаштовано», а не збій. Кажемо в
+      // журнал і живемо далі: оформлення від цього не залежить.
+      console.warn("Чернетку не збережено:", response.status, text.slice(0, 160));
+
+      return adminJson({ ok: true, saved: false }, 200, origin);
+
+    }
+
+    await response.text();
+
+    return adminJson({ ok: true, saved: true }, 200, origin);
+
+  } catch (error) {
+
+    console.error("Чернетка оформлення недоступна:", error);
+
+    return adminJson({ ok: true, saved: false }, 200, origin);
+
+  }
+
+}
+
 async function handleAdmin(request: Request, body: Record<string, any>): Promise<Response> {
 
   const origin = request.headers.get("origin");
@@ -2681,6 +2765,13 @@ async function handleRequest(request: Request): Promise<Response> {
   if (body.site_action === "subscribe") {
 
     return await handleSubscribe(request, body);
+
+  }
+
+  // --- незавершене оформлення (щоб нагадати гостю) ---
+  if (body.site_action === "checkout-draft") {
+
+    return await handleCheckoutDraft(request, body);
 
   }
 
