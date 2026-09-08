@@ -1403,7 +1403,18 @@ function renderProduct(product) {
     <button type="button" class="size-guide-link" id="sizeGuideBtn">Таблиця розмірів</button>
 </div>
 
-<div class="sizes ${typeof sizeRowHidden === "function" && sizeRowHidden(sizes) ? "sizes-placeholder" : ""}">
+<!-- Рядок розмірів тут показується ЗАВЖДИ, зокрема з ONESIZE.
+
+     Раніше він ховався тим самим sizeRowHidden(), що в картці
+     каталогу, — а підпис «Розмір» над ним лишався. Виходив
+     заголовок без значення: заміряно на сумці Marc Jacobs, де
+     .size-row-head видно (698×38), а .sizes має display:none.
+     Виглядало як «розмір зник».
+
+     У компактних видах (картка, кошик, обране) рядок і далі
+     ховається: там підпису немає, тож і порожнечі не виникає, а
+     «ONESIZE» під кожною сумкою в сітці справді зайвий. -->
+<div class="sizes">
 
 ${sizeButtons}
 

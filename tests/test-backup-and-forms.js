@@ -595,7 +595,7 @@ console.log("\n[6] Доставка у фіді = доставці в розмі
         (feed.match(/<g:shipping>/g) || []).length === (feed.match(/<\/g:shipping>/g) || []).length);
 }
 
-console.log("\n[7] ONESIZE не видно, але кнопка лишається");
+console.log("\n[7] ONESIZE: у сітці ховається, на сторінці товару видно");
 {
     const common = read("assets/js/common.js");
 
@@ -606,15 +606,38 @@ console.log("\n[7] ONESIZE не видно, але кнопка лишаєтьс
     check("рядок ховається лише коли в ньому НІЧОГО, крім заглушки",
         /list\.length > 0 && list\.every\(isPlaceholderSize\)/.test(common));
 
-    // Клас на всіх чотирьох місцях, де малюються розміри.
+    // КОМПАКТНІ ВИДИ — ховають. Там немає підпису «Розмір», тож і
+    // порожнечі не виникає, а «ONESIZE» під кожною сумкою в сітці
+    // читається як помилка в даних.
     [
         ["assets/js/ui.js", "картка каталогу"],
         ["assets/js/cart.js", "кошик"],
         ["assets/js/favorites.js", "обране"],
-        ["assets/js/product.js", "сторінка товару"],
     ].forEach(([rel, where]) => {
-        check(`${where}`, /sizes-placeholder/.test(read(rel)));
+        check(`${where} — ховає`, /sizes-placeholder/.test(read(rel)));
     });
+
+    // ДЕТАЛЬНИЙ ВИД — показує.
+    //
+    // Тут теж стояло ховання, і виходила поломка: рядок кнопок
+    // зникав, а підпис «Розмір» над ним лишався. Заміряно на сумці
+    // Marc Jacobs: .size-row-head видно (698×38), .sizes має
+    // display:none. Тобто заголовок без значення — виглядає рівно
+    // як «розмір зник».
+    //
+    // Плюс саме на цій сторінці покупець підтверджує, що кладе в
+    // кошик, і бачити розмір там доречно навіть коли він один.
+    const productJs = read("assets/js/product.js");
+
+    check("сторінка товару — показує", !/sizes-placeholder/.test(productJs));
+
+    check("і причина записана в коді",
+        /показується ЗАВЖДИ, зокрема з ONESIZE/.test(productJs));
+
+    // Підпис «Розмір» лишається на місці — саме він і робив
+    // порожнечу помітною, і саме під ним тепер є значення.
+    check("підпис «Розмір» на сторінці товару лишився",
+        /<label>Розмір<\/label>/.test(productJs));
 
     check("стиль ховає рядок", /\.sizes-placeholder\{[\s\S]{0,60}display:none/.test(
         read("assets/css/style.css")));
