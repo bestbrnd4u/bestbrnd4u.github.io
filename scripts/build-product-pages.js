@@ -70,6 +70,7 @@ const ImageFraming = require("../assets/js/image-framing.js");
 // Google; збирати їх окремо означало б рано чи пізно показати роботу
 // шлях, якого на сторінці немає.
 const Breadcrumbs = require("../assets/js/breadcrumbs.js");
+const ProductOffer = require("../assets/js/product-offer.js");
 
 const CATEGORIES_FILE = path.join(ROOT, "data", "categories.json");
 const BRANDS_FILE = path.join(ROOT, "data", "brands.json");
@@ -177,37 +178,14 @@ function productTaxonomy(product) {
 
 }
 
-// Умови повернення й доставки для розмітки товару.
+// Умови продажу для розмітки — зі спільного модуля
+// assets/js/product-offer.js (він же працює в рантаймі й у
+// генераторі фіду). Пояснення до кожного значення — там же.
 //
-// Search Console просив додати hasMerchantReturnPolicy і shippingDetails
-// у offers (розділ Merchant listings). Значення нижче — НЕ вигадані:
-// узяті зі сторінок return-warranty і delivery-payment, тож розмітка
-// збігається з тим, що покупець реально прочитає на сайті.
-//
-// • 14 днів на повернення — строк із Закону України «Про захист прав
-//   споживачів», саме він зазначений в умовах;
-// • пересилку назад при «не підійшов розмір/колір» оплачує покупець —
-//   для цього в schema.org є значення ReturnFeesCustomerResponsibility,
-//   воно не вимагає вказувати суму (а сума й залежить від відправлення);
-// • 1–2 дні на збірку + 1–3 дні доставки Новою поштою по Україні;
-// • доставка безкоштовна від 3 500 грн. Найдешевший товар каталогу —
-//   4 000 грн, тобто для будь-якого окремого товару доставка справді
-//   нульова. Якщо колись з'явиться товар дешевше за поріг, ставка не
-//   вказується: краще неповна розмітка, ніж неправдива обіцянка.
-const RETURN_POLICY = {
-    "@type": "MerchantReturnPolicy",
-    applicableCountry: "UA",
-    returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
-    merchantReturnDays: 14,
-    returnMethod: "https://schema.org/ReturnByMail",
-    returnFees: "https://schema.org/ReturnFeesCustomerResponsibility"
-};
-
-// Типовий тариф перевізника (грн) — див. пояснення в
-// assets/js/product.js. Раніше тут був поріг безкоштовної доставки, і
-// товарам дорожче за нього в розмітку йшов нуль — обіцянка, якої
-// магазин не виконує: доставку оплачує покупець перевізнику.
-const SHIPPING_RATE_UAH = 60;
+// Досі тариф доставки був написаний тут, у assets/js/product.js і в
+// scripts/build-feed.js — три копії одного числа. А умови
+// повернення — дві копії, які вже й розійшлись полем category.
+const { offerFor } = ProductOffer;
 
 // Артикул для розмітки: перевірений і почищений.
 //
@@ -327,42 +305,6 @@ function firstSku(product) {
 
 }
 
-function shippingDetailsFor(price) {
-
-    const details = {
-        "@type": "OfferShippingDetails",
-        shippingDestination: {
-            "@type": "DefinedRegion",
-            addressCountry: "UA"
-        },
-        deliveryTime: {
-            "@type": "ShippingDeliveryTime",
-            handlingTime: {
-                "@type": "QuantitativeValue",
-                minValue: 1,
-                maxValue: 2,
-                unitCode: "DAY"
-            },
-            transitTime: {
-                "@type": "QuantitativeValue",
-                minValue: 1,
-                maxValue: 3,
-                unitCode: "DAY"
-            }
-        }
-    };
-
-    // Ставка однакова для всіх товарів: доставку оплачує покупець
-    // перевізнику, і від ціни товару вона не залежить.
-    details.shippingRate = {
-        "@type": "MonetaryAmount",
-        value: SHIPPING_RATE_UAH,
-        currency: "UAH",
-    };
-
-    return details;
-
-}
 
 
 // ---------------------------------------------------------------
@@ -504,10 +446,6 @@ function buildHead(product) {
 
     const images = (product.images || []).map(absoluteUrl).filter(Boolean);
 
-    const availability = product.preOrder
-        ? "https://schema.org/PreOrder"
-        : "https://schema.org/InStock";
-
     const productLd = {
         "@context": "https://schema.org",
         "@type": "Product",
@@ -525,16 +463,7 @@ function buildHead(product) {
         mpn: sanitizeSku(product.sku, product.sku ? (product.slug || product.title) : "") || undefined,
         brand: product.brand ? { "@type": "Brand", name: product.brand } : undefined,
         category: product.category || undefined,
-        offers: {
-            "@type": "Offer",
-            url,
-            priceCurrency: "UAH",
-            price: product.price,
-            itemCondition: "https://schema.org/NewCondition",
-            hasMerchantReturnPolicy: RETURN_POLICY,
-            shippingDetails: shippingDetailsFor(product.price),
-            availability
-        }
+        offers: offerFor(product, url)
     };
 
     // рейтинг додаємо ЛИШЕ якщо він реальний: вигадана розмітка

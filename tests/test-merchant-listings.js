@@ -245,24 +245,207 @@ console.log("\n[4] Рейтинг — тільки за справжніми в�
         /product\.rating && Number\(product\.reviews\) > 0/.test(productJs));
 }
 
+console.log("\n[4c] Розмітка не роняє сторінку товару");
+{
+    // Умови продажу лежать в окремому файлі, підключеному ДО
+    // product.js. Спершу виклик стояв без перевірки — і сторінка зі
+    // старою розміткою (без тега модуля) плюс новий product.js дали
+    //
+    //     TypeError: Cannot read properties of undefined
+    //     at updateProductSeoMetadata → renderProduct → init
+    //
+    // тобто товар не показувався зовсім. Версії в адресах від такої
+    // пари захищають, але залежність усе одно надто жорстка: досить
+    // блокувальника чи обірваного запиту, щоб сторінка зникла через
+    // РОЗМІТКУ, яка покупцеві не потрібна.
+    const productJs = fs.readFileSync(path.join(ROOT, "assets/js/product.js"), "utf8");
+
+    check("виклик розмітки під перевіркою на модуль",
+        /if \(window\.ProductOffer\) setJsonLd\("productSchema"/.test(productJs));
+
+    // Але саме на РОЗМІТЦІ, а не на всій функції: вона ж оновлює
+    // title, опис, canonical і OG — без них усі товари виглядали б у
+    // пошуку однаково, а це та проблема, з якої все й починалось.
+    const body = productJs.slice(
+        productJs.indexOf("function updateProductSeoMetadata(product) {"),
+        productJs.indexOf('setJsonLd("productSchema"'));
+
+    check("title і OG оновлюються до перевірки", /document\.title = title/.test(body)
+        && /setMetaByProperty\("og:title"/.test(body));
+
+    check("функція не виходить раніше часу", !/^\s{4}if \(!window\.ProductOffer\) return;/m.test(body));
+
+    // Тег модуля мусить стояти РАНІШЕ за product.js — інакше
+    // перевірка спрацює на кожному завантаженні й розмітка з JS
+    // ніколи не оновиться.
+    const page = fs.readFileSync(path.join(ROOT, "product.html"), "utf8");
+
+    const offerAt = page.indexOf("product-offer.js");
+    const productAt = page.indexOf("js/product.js");
+
+    check("product-offer.js підключено перед product.js",
+        offerAt > 0 && productAt > 0 && offerAt < productAt,
+        `модуль: ${offerAt}, product.js: ${productAt}`);
+
+    // І в готових сторінках — там теги розставляє генератор.
+    const sample = fs.readFileSync(path.join(ROOT, "p", schemas[0].p.slug, "index.html"), "utf8");
+
+    check("і в згенерованій сторінці теж",
+        sample.indexOf("product-offer.js") > 0
+        && sample.indexOf("product-offer.js") < sample.indexOf("js/product.js"));
+}
+
+console.log("\n[4b] Строк дії ціни");
+{
+    // Google просить priceValidUntil у offers. Прострочена дата гірша
+    // за відсутню: побачивши минулий строк, Google має право вважати
+    // ціну застарілою і зняти rich-результат товару.
+    const withDate = schemas.filter(x => x.ld.offers.priceValidUntil);
+
+    check(`строк дії ціни в усіх ${schemas.length} сторінках`,
+        withDate.length === schemas.length,
+        `без строку: ${schemas.length - withDate.length}`);
+
+    const dates = new Set(withDate.map(x => x.ld.offers.priceValidUntil));
+
+    check("формат РРРР-ММ-ДД", [...dates].every(d => /^\d{4}-\d{2}-\d{2}$/.test(d)),
+        [...dates].join(", "));
+
+    const today = new Date();
+
+    check("дата в майбутньому", [...dates].every(d => new Date(d) > today),
+        [...dates].join(", "));
+
+    // Запас мусить бути великий: інакше строк спливе між перезбірками
+    // (а фід і сторінки перезбираються не щодня).
+    const halfYear = new Date(today.getTime() + 183 * 24 * 3600 * 1000);
+
+    check("щонайменше пів року запасу", [...dates].every(d => new Date(d) > halfYear),
+        [...dates].join(", "));
+
+    // ГОЛОВНА ПАСТКА. Дата «рік від сьогодні» змінювала б усі сто
+    // сторінок при кожній перезбірці в новий день, і гілки dev та
+    // main, які збираються в різні моменти, конфліктували б на
+    // порожньому місці. Так уже сталося з availability_date у фіді,
+    // коли він рахувався з точністю до секунди.
+    const offer = require("../assets/js/product-offer.js");
+
+    const day = 24 * 3600 * 1000;
+
+    check("дата не залежить від дня збірки",
+        offer.priceValidUntil("2026-03-05") === offer.priceValidUntil("2026-09-08")
+        && offer.priceValidUntil(Date.now()) === offer.priceValidUntil(Date.now() + 30 * day),
+        `${offer.priceValidUntil("2026-03-05")} vs ${offer.priceValidUntil("2026-09-08")}`);
+
+    // Але на межі року вона таки мусить рухатись — інакше колись
+    // застигне в минулому.
+    check("на межі року дата зростає",
+        offer.priceValidUntil("2027-01-01") > offer.priceValidUntil("2026-12-31"));
+
+    check("сторінки зібрані тим самим правилом",
+        dates.size === 1 && dates.has(offer.priceValidUntil()),
+        `у сторінках: ${[...dates].join(", ")}, модуль: ${offer.priceValidUntil()}`);
+}
+
 console.log("\n[5] Обидва генератори розмітки узгоджені");
 {
     const productJs = fs.readFileSync(path.join(ROOT, "assets/js/product.js"), "utf8");
     const builder = fs.readFileSync(path.join(ROOT, "scripts/build-product-pages.js"), "utf8");
 
-    ["hasMerchantReturnPolicy", "shippingDetails", "MerchantReturnFiniteReturnWindow",
-     "ReturnFeesCustomerResponsibility", "SHIPPING_RATE_UAH"].forEach(token => {
-        check(`«${token}» є в обох`, productJs.includes(token) && builder.includes(token),
-            `product.js: ${productJs.includes(token)}, генератор: ${builder.includes(token)}`);
+    // Умови продажу написані РАЗ — у assets/js/product-offer.js.
+    // Обидва будівники мусять брати їх звідти, а не тримати копію.
+    const offer = require("../assets/js/product-offer.js");
+
+    check("рантайм бере пропозицію з модуля", /ProductOffer\.offerFor\(/.test(productJs));
+    check("генератор бере пропозицію з модуля", /offerFor\(product, url\)/.test(builder));
+
+    // Дивимось на КОД: у коментарях значення згадуються навмисно.
+    const bare = t => t.replace(/\/\/[^\n]*/g, "").replace(/\/\*[\s\S]*?\*\//g, "");
+
+    check("власних копій умов продажу не лишилось",
+        !/merchantReturnDays:/.test(bare(productJs))
+        && !/merchantReturnDays:/.test(bare(builder))
+        && !/SHIPPING_RATE_UAH = /.test(bare(productJs))
+        && !/SHIPPING_RATE_UAH = /.test(bare(builder)));
+
+    // Те, що лежить у готових сторінках, мусить збігатися з тим, що
+    // видає модуль, — інакше сторінки зібрані іншим кодом.
+    {
+        const sample = schemas[0];
+        const built = offer.offerFor(
+            { price: sample.ld.offers.price, preOrder: false },
+            sample.ld.offers.url);
+
+        const same = JSON.stringify(built.hasMerchantReturnPolicy)
+            === JSON.stringify(sample.ld.offers.hasMerchantReturnPolicy)
+            && JSON.stringify(built.shippingDetails)
+            === JSON.stringify(sample.ld.offers.shippingDetails);
+
+        check("умови в сторінках = умови в модулі", same);
+    }
+
+    // СКЛАД ПОЛІВ. Саме цього тут не було: перелік ключів у двох
+    // будівниках мусить бути однаковий. Розійдеться — JS затре те,
+    // що поклав генератор, і до Google дійде менше, ніж є у файлі.
+    const keysOf = (text, opener) => {
+
+        const start = text.indexOf(opener);
+
+        if (start < 0) return [];
+
+        let depth = 0;
+        const keys = [];
+
+        for (let i = start + opener.length - 1; i < text.length; i++) {
+
+            const ch = text[i];
+
+            if (ch === "{") depth++;
+            else if (ch === "}") { depth--; if (!depth) break; }
+
+            // ключ верхнього рівня — на початку рядка, глибина 1
+            if (depth === 1 && ch === "\n") {
+
+                const line = text.slice(i + 1, text.indexOf("\n", i + 1));
+                const found = line.match(/^\s{8}([a-zA-Z_$][\w$]*)\s*[:,]/);
+
+                if (found) keys.push(found[1]);
+
+            }
+
+        }
+
+        return keys;
+
+    };
+
+    const runtimeKeys = keysOf(productJs, 'setJsonLd("productSchema", {');
+    const builderKeys = keysOf(builder, "const productLd = {");
+
+    // Генератор дописує частину полів окремим присвоєнням після
+    // літерала — productLd.aggregateRating = … Для складу розмітки це
+    // те саме поле, тож зчитуємо і такі.
+    (builder.match(/\bproductLd\.([a-zA-Z_$][\w$]*)\s*=/g) || []).forEach(hit => {
+
+        const key = hit.replace(/^productLd\./, "").replace(/\s*=$/, "");
+
+        if (!builderKeys.includes(key)) builderKeys.push(key);
+
     });
 
-    // Ставка мусить бути та сама у двох генераторах: розійдуться —
-    // Google побачить різну доставку на одній адресі до і після
-    // виконання JS.
-    check("ставка доставки однакова",
-        /SHIPPING_RATE_UAH = 60/.test(productJs) && /SHIPPING_RATE_UAH = 60/.test(builder));
-    check("строк повернення однаковий",
-        /merchantReturnDays: 14/.test(productJs) && /merchantReturnDays: 14/.test(builder));
+    check("склад полів товару зчитано", runtimeKeys.length > 5 && builderKeys.length > 5,
+        `рантайм: ${runtimeKeys.length}, генератор: ${builderKeys.length}`);
+
+    const onlyRuntime = runtimeKeys.filter(k => !builderKeys.includes(k));
+    const onlyBuilder = builderKeys.filter(k => !runtimeKeys.includes(k));
+
+    check("однакові поля в обох будівниках",
+        !onlyRuntime.length && !onlyBuilder.length,
+        `лише в рантаймі: ${onlyRuntime.join(", ") || "—"};`
+        + ` лише в генераторі: ${onlyBuilder.join(", ") || "—"}`);
+
+    // І окремо — поле, яке вже одного разу відпало.
+    check("category є в обох", runtimeKeys.includes("category") && builderKeys.includes("category"));
 
     // Артикул чиститься у двох місцях — статичні сторінки і клієнтський
     // рендер. Розійдуться межі — Google побачить різний sku на одній
