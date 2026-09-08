@@ -227,6 +227,57 @@ console.log("\n[3] Підписка на листи");
     check("правило адресує саме прапорець",
         !/\.subscribe-consent input\{/.test(css));
 
+    // ТОЧКА В КІНЦІ ЗГОДИ — усередині посилання, а не після нього.
+    //
+    // Заміряно в Playwright (dev, вікно 1440): текст посилання
+    // заповнював рядок ДО ПІКСЕЛЯ — вільного місця після нього рівно
+    // нуль, — і точка падала на власний рядок. На скріншоті підвалу
+    // вона стояла окремо під посиланням і виглядала як смітинка.
+    //
+    // Доки точка стоїть після </a>, вона окремий елемент рядка й
+    // може відірватись на будь-якій ширині, де посилання
+    // закінчується близько до краю. Усередині посилання вона
+    // частина тексту, що переноситься лише по пробілах — у гіршому
+    // разі поїде разом зі словом «даними».
+    {
+        const pages = [];
+
+        (function walk(dir) {
+
+            fs.readdirSync(dir, { withFileTypes: true }).forEach(entry => {
+
+                if (entry.name === "node_modules" || entry.name === ".git"
+                    || entry.name === ".claude") return;
+
+                const full = path.join(dir, entry.name);
+
+                if (entry.isDirectory()) walk(full);
+                else if (entry.name.endsWith(".html")) pages.push(full);
+
+            });
+
+        })(ROOT);
+
+        const withConsent = pages.filter(file =>
+            fs.readFileSync(file, "utf8").includes("subscribeConsent"));
+
+        const orphan = withConsent.filter(file =>
+            /даними<\/a>\./.test(fs.readFileSync(file, "utf8")));
+
+        const fixed = withConsent.filter(file =>
+            /даними\.<\/a>/.test(fs.readFileSync(file, "utf8")));
+
+        check(`сторінок із формою підписки: ${withConsent.length}`, withConsent.length > 100);
+
+        check("точка всередині посилання на всіх",
+            fixed.length === withConsent.length,
+            `${withConsent.length - fixed.length} без цього`);
+
+        check("ніде не лишилась після посилання", orphan.length === 0,
+            orphan.slice(0, 3).map(f => path.relative(ROOT, f)).join(", "));
+    }
+
+
 
     // Пошта.
     check("пошта в нижньому регістрі без пробілів",
