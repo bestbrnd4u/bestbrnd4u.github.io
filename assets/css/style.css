@@ -5425,6 +5425,29 @@ body.mobile-filters-open .scroll-top{
 
 /* -- доставка / оплата / возврат -- */
 
+/* «Єдиний екземпляр. Якщо його купують, наступний веземо…»
+
+   Свідомо БЕЗ червоного, вогників і лічильників: 87 зі 91 позиції
+   в наявності — одна штука, тож будь-який натиск читався б як
+   накрутка терміновості й підривав би блок «тільки оригінал».
+
+   Це факт про товар, а не заклик. Тому спокійний темний текст на
+   світлій підкладці — тієї самої родини, що блок доставки поруч. */
+.only-one{
+    margin:14px 0 0;
+    padding:11px 14px;
+    border:1px solid var(--gray200);
+    border-radius:12px;
+    background:var(--gray50);
+    color:var(--gray700);
+    font-size:13.5px;
+    line-height:1.5;
+}
+
+.only-one b{
+    color:var(--gray900);
+}
+
 .delivery-box{
     padding:20px;
     background:var(--gray50);
@@ -5433,6 +5456,33 @@ body.mobile-filters-open .scroll-top{
     flex-direction:column;
     gap:12px;
     font-size:15px;
+}
+
+/* «Запитати про цей товар» — під кнопками купівлі.
+
+   Свідомо скромне посилання, а не друга кнопка: головна дія тут
+   одна — «Купити», і другий яскравий прямокутник поруч відбирав би
+   у неї увагу. Але й не сірий дрібний текст: питання про
+   оригінальність у діапазоні 3 000–15 000 ₴ виникає часто, і його
+   треба бачити без пошуку. */
+.ask-about{
+    margin:10px 0 0;
+    text-align:center;
+    font-size:13.5px;
+}
+
+.ask-about a{
+    color:var(--gray700);
+    text-decoration:underline;
+    text-decoration-color:var(--gray300);
+    text-underline-offset:3px;
+}
+
+@media (hover:hover) and (pointer:fine){
+.ask-about a:hover{
+    color:var(--gray900);
+    text-decoration-color:var(--gray900);
+}
 }
 
 .preorder-box{

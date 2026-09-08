@@ -1244,6 +1244,69 @@ function main() {
     console.log(`Готово: ${products.length} товарів → ${path.relative(ROOT, OUTPUT_FILE)}`
         + ` (${size(OUTPUT_FILE)} КБ) + ${path.relative(ROOT, CATALOG_FILE)} (${size(CATALOG_FILE)} КБ)`);
 
+    reportCardGaps(products);
+
+}
+
+// Чого бракує в карточках товарів.
+//
+// Обидва поля показуються покупцеві (розділ характеристик) і йдуть
+// у товарний фід — material це окремий атрибут Google Shopping.
+// Тобто незаповнене поле це не «поле без діла», а втрачений
+// аргумент у картці й гірший показ у Покупках.
+//
+// НЕ помилка й НЕ валить збірку: у частини товарів матеріалу
+// справді немає. Це список, щоб про нього знали.
+const CARD_FIELDS = [
+    { key: "dimensions", label: "габаритів" },
+    { key: "material", label: "матеріалу" }
+];
+
+// Скільки назв перелічувати. Повний список на сто товарів у логу
+// нечитабельний, а нуль назв не дає почати.
+const GAP_EXAMPLES = 5;
+
+function reportCardGaps(products) {
+
+    CARD_FIELDS.forEach(({ key, label }) => {
+
+        const missing = products.filter(product => !String(product[key] || "").trim());
+
+        if (!missing.length) return;
+
+        // За категоріями: «усі 10 кросівок» — це інша задача, ніж
+        // «4 годинники з 24», і робиться вона за один раз.
+        const byCategory = {};
+
+        missing.forEach(product => {
+            const category = product.category || "без категорії";
+            byCategory[category] = (byCategory[category] || 0) + 1;
+        });
+
+        const total = {};
+
+        products.forEach(product => {
+            const category = product.category || "без категорії";
+            total[category] = (total[category] || 0) + 1;
+        });
+
+        const parts = Object.keys(byCategory)
+            .sort((a, b) => byCategory[b] - byCategory[a])
+            .map(category => `${category} ${byCategory[category]}/${total[category]}`);
+
+        const examples = missing.slice(0, GAP_EXAMPLES)
+            // Назва, а не артикул: у логу «1, 2, 3» нічого не каже, а
+            // саме за назвою власник знайде товар в адмінці.
+            .map(product => String(product.title || product.slug || "").slice(0, 38))
+            .join(", ");
+
+        console.warn(`::warning::без ${label}: ${missing.length} товарів`
+            + ` (${parts.join("; ")}).`
+            + ` Наприклад: ${examples}${missing.length > GAP_EXAMPLES ? " …" : ""}.`
+            + " Поле видно на сторінці товару й воно йде у фід Google Shopping");
+
+    });
+
 }
 
 // Експортуємо для тестів: перейменування адрес перевіряється на
