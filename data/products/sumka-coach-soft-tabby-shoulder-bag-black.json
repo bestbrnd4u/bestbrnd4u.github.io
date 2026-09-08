@@ -8,6 +8,23 @@
   "material": "Гладка натуральна шкіра",
   "brand": "Coach",
   "price": 7100,
+  "framing": {
+    "91993377994530.webp": {
+      "zoom": 1.38,
+      "x": 48,
+      "y": 52
+    },
+    "26067173821878.webp": {
+      "zoom": 1.66,
+      "x": 48,
+      "y": 52
+    },
+    "49502081584862.webp": {
+      "zoom": 1.43,
+      "x": 48,
+      "y": 51
+    }
+  },
   "preOrder": false,
   "slug": "sumka-coach-soft-tabby-shoulder-bag-black",
   "dimensions": "26 × 16,5 × 8,3 см",
@@ -68,6 +85,14 @@
     "оригінальна Coach"
   ],
   "isNew": false,
+  "stock": {
+    "Black чорний": {
+      "ONESIZE": 4
+    },
+    "Brass/Ivory": {
+      "ONESIZE": 4
+    }
+  },
   "title": "Сумка Coach Soft Tabby Shoulder Bag Black",
   "images": [
     "/assets/images/products/uploads/1.1_5a5d6ea8-1bba-4803-951d-520a38d4aa66.webp",
@@ -85,30 +110,5 @@
   "category": "Жіночі сумки",
   "legacySlugs": [
     "сумка-coach-soft-tabby-shoulder-bag-black"
-  ],
-  "framing": {
-    "91993377994530.webp": {
-      "zoom": 1.38,
-      "x": 48,
-      "y": 52
-    },
-    "26067173821878.webp": {
-      "zoom": 1.66,
-      "x": 48,
-      "y": 52
-    },
-    "49502081584862.webp": {
-      "zoom": 1.43,
-      "x": 48,
-      "y": 51
-    }
-  },
-  "stock": {
-    "Black чорний": {
-      "ONESIZE": 0
-    },
-    "Brass/Ivory": {
-      "ONESIZE": 1
-    }
-  }
+  ]
 }
