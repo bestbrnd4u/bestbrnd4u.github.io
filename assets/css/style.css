@@ -13347,10 +13347,36 @@ body.refusal-open{
     cursor:pointer;
 }
 
-.subscribe-consent input{
-    flex-shrink:0;
-    margin-top:2px;
+/* ПРАПОРЕЦЬ ТУТ МУСИТЬ БУТИ ЯВНО ОБМЕЖЕНИЙ — той самий капкан, що
+   описаний у .refusal-item input[type="checkbox"] вище.
+
+   Угорі файлу є загальне правило для полів форми:
+
+       input, textarea, select{ width:100%; padding:14px 16px; … }
+
+   Воно писалось під текстові поля, але типу не розрізняє. Прапорець
+   згоди отримував width:100% від блока підписки (320px), а
+   flex-shrink:0 не давав йому стиснутись — текст згоди видавлювався
+   у смужку близько 70px і ламався по одному слову в рядок. На
+   скріншоті підвалу це виглядало так, ніби форма зламана: галочка
+   сама по собі, а поруч вузький стовпчик тексту й точка після
+   посилання на власному рядку.
+
+   width/height замість padding: прапорцю потрібен розмір самої
+   позначки, а не поле навколо неї. Рамку й тло теж прибираємо —
+   світлий прямокутник із загального правила на темному підвалі
+   виглядав чужим. */
+.subscribe-consent input[type="checkbox"]{
+    flex:0 0 auto;
+    width:16px;
+    height:16px;
+    margin:2px 0 0;
+    padding:0;
+    border:0;
+    border-radius:4px;
+    background:none;
     accent-color:#fff;
+    cursor:pointer;
 }
 
 .subscribe-consent a{
