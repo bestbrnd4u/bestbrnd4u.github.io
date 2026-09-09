@@ -1,0 +1,76 @@
+{
+  "gender": [
+    "Жінкам"
+  ],
+  "preOrderDays": "5–10 робочих днів",
+  "forcePublish": false,
+  "material": "Лакована натуральна шкіра",
+  "brand": "Coach",
+  "price": 6900,
+  "preOrder": false,
+  "dimensions": "20 × 11 × 6 см",
+  "variants": [
+    {
+      "hex": "#e1bb88",
+      "color": "Айворі",
+      "images": [
+        "/assets/images/products/uploads/ce761_b4bh5_a0.avif",
+        "/assets/images/products/uploads/ce761_b4bh5_a3.avif",
+        "/assets/images/products/uploads/ce761_b4bh5_a8.avif",
+        "/assets/images/products/uploads/ce761_b4bh5_a91.avif",
+        "/assets/images/products/uploads/ce761_b4bh5_a92.avif"
+      ],
+      "description": ""
+    },
+    {
+      "color": "Фіолетовий",
+      "hex": "#863cd4",
+      "images": [
+        "/assets/images/products/uploads/1117wx1400h-410344249-lhsf1-model.webp",
+        "/assets/images/products/uploads/1117wx1400h-410344249-lhsf1-model3.webp",
+        "/assets/images/products/uploads/1117wx1400h-410344249-lhsf1-model2.webp"
+      ]
+    }
+  ],
+  "preOrderPrepayment": 50,
+  "strapInfo": "Ручка: знімна. Ремінець: знімний та регульований",
+  "sizes": [
+    "Onesize"
+  ],
+  "splitByColor": true,
+  "searchKeywords": [
+    "COACH",
+    "Coach Studio Bag",
+    "Studio Bag 20",
+    "Coach CE761",
+    "CE761B4BH5",
+    "Coach сумка",
+    "сумка Coach",
+    "жіноча сумка Coach",
+    "Studio Bag",
+    "міні сумка",
+    "компактна сумка",
+    "айворі сумка",
+    "біла сумка",
+    "Chalk",
+    "сумка з лакованої шкіри",
+    "лакована сумка",
+    "шкіряна сумка",
+    "сумка на плече",
+    "сумка через плече",
+    "кросбоді",
+    "Pushlock",
+    "сумка з логотипом",
+    "брендова сумка",
+    "оригінальна Coach"
+  ],
+  "isNew": false,
+  "title": "Жіноча сумочка Coach Studio 20",
+  "soldOut": false,
+  "reviews": 0,
+  "instagramBlock": "general",
+  "description": "Елегантна компактна сумка Coach Studio Bag 20 у глянцевому виконанні. Модель створена на основі архівного дизайну Coach та доповнена фірмовою застібкою Pushlock із логотипом «C».\nСумка виготовлена з лакованої шкіри та має продуману організацію простору: 8 слотів для банківських карток, внутрішню багатофункціональну кишеню та зовнішню відкриту кишеню. Компактний формат дозволяє зручно носити телефон та найнеобхідніші речі.\nМодель комплектується знімною ручкою та знімним регульованим ремінцем, тому її можна носити в руці, під пахвою, на плечі або через плече",
+  "sku": "CE761B4BH5",
+  "rating": 5,
+  "category": "Жіночі сумки"
+}
