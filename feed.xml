@@ -3646,5 +3646,63 @@
       </g:shipping>
       <g:custom_label_0>новинка</g:custom_label_0>
     </item>
+    <item>
+      <g:id>103-1</g:id>
+      <title>Сумка крос-боді Marc Jacobs The Snapshot — Чорний</title>
+      <description>Сумка The Snapshot від Marc Jacobs — компактна модель у стильному чорно-білому виконанні з фірмовою подвійною літерою J та контрастною фурнітурою золотистого кольору. Сумка виготовлена зі шкіри Saffiano, добре тримає форму та чудово підходить для повсякденних образів</description>
+      <link>https://dev.bestbrnd4u.com/p/sumka-kros-bodi-marc-jacobs-the-snapshot/?color=chornyi</link>
+      <g:image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/marc-jacobs-the-snapshot-black-multi-00523-800x800.webp?v=39c12870</g:image_link>
+      <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/marc-jacobs-the-snapshot-black-multi-additional-image-6626-800x800.webp?v=0d94c7b9</g:additional_image_link>
+      <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/marc-jacobs-the-snapshot-black-multi-additional-image-6629-800x800.webp?v=693854d1</g:additional_image_link>
+      <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/marc-jacobs-the-snapshot-black-multi-additional-image-6627-800x800.webp?v=611fe1ca</g:additional_image_link>
+      <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/sumka-marc-jacobs-2s3hcr500h03-chornii-0196611092012.webp?v=a3e29ab0</g:additional_image_link>
+      <g:availability>in_stock</g:availability>
+      <g:price>8600.00 UAH</g:price>
+      <g:brand>Marc Jacobs</g:brand>
+      <g:condition>new</g:condition>
+      <g:mpn>2S3HCR500H03-964</g:mpn>
+      <g:item_group_id>103</g:item_group_id>
+      <g:color>Чорний</g:color>
+      <g:material>Шкіра Saffiano</g:material>
+      <g:product_highlight>Розміри: 18 × 11 × 6 см</g:product_highlight>
+      <g:product_highlight>Знімний регульований текстильний ремінь</g:product_highlight>
+      <g:gender>female</g:gender>
+      <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
+      <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
+    </item>
+    <item>
+      <g:id>103-2</g:id>
+      <title>Сумка крос-боді Marc Jacobs The Snapshot — Cement &amp; Multi</title>
+      <description>Сумка The Snapshot від Marc Jacobs у стильному відтінку Cement &amp; Multi. Компактна модель із характерним колор-блок дизайном, фірмовою подвійною літерою J на передній панелі та золотистою фурнітурою. Сумка виготовлена із міцної саф'янової шкіри та чудово підходить для повсякденних образів</description>
+      <link>https://dev.bestbrnd4u.com/p/sumka-kros-bodi-marc-jacobs-the-snapshot/?color=cement-multi</link>
+      <g:image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/marj-wy858_v2.webp?v=bcd2892d</g:image_link>
+      <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/marj-wy858_v1.webp?v=e2a7cc90</g:additional_image_link>
+      <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/marj-wy858_v3.webp?v=9d8afeb7</g:additional_image_link>
+      <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/marj-wy858_v5.webp?v=68972a28</g:additional_image_link>
+      <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/marj-wy858_v6.webp?v=433c5fb0</g:additional_image_link>
+      <g:availability>in_stock</g:availability>
+      <g:price>8600.00 UAH</g:price>
+      <g:brand>Marc Jacobs</g:brand>
+      <g:condition>new</g:condition>
+      <g:mpn>2S3HCR500H03-033</g:mpn>
+      <g:item_group_id>103</g:item_group_id>
+      <g:color>Cement &amp; Multi</g:color>
+      <g:material>Шкіра Saffiano</g:material>
+      <g:product_highlight>Розміри: 18 × 11 × 6 см</g:product_highlight>
+      <g:product_highlight>Знімний регульований текстильний ремінь</g:product_highlight>
+      <g:gender>female</g:gender>
+      <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
+      <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
+    </item>
   </channel>
 </rss>

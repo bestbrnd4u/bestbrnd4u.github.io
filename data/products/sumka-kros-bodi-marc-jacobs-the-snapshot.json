@@ -40,7 +40,7 @@
   "preOrderPrepayment": 50,
   "strapInfo": "Знімний регульований текстильний ремінь",
   "sizes": [
-    "Onesize"
+    "ONESIZE"
   ],
   "splitByColor": true,
   "searchKeywords": [
@@ -62,5 +62,25 @@
   "instagramBlock": "general",
   "description": "Сумка The Snapshot від Marc Jacobs — компактна модель із впізнаваним дизайном та фірмовим подвійним логотипом J Marc на передній панелі.\nСумка виготовлена з міцної саф'янової шкіри, добре тримає форму та має практичний формат для повсякденного використання. Два окремі відділення дозволяють зручно організувати необхідні речі, а знімний регульований ремінь дає можливість носити сумку через плече або кросбоді.",
   "rating": 5,
-  "category": "Жіночі сумки"
+  "category": "Жіночі сумки",
+  "framing": {
+    "marj-wy858_v5.webp": {
+      "zoom": 1.46,
+      "x": 49,
+      "y": 51
+    }
+  },
+  "legacySlugs": [
+    "сумка-крос-боді-marc-jacobs-the-snapshot"
+  ],
+  "slug": "sumka-kros-bodi-marc-jacobs-the-snapshot",
+  "id": 103,
+  "color": "Чорний",
+  "images": [
+    "/assets/images/products/uploads/marc-jacobs-the-snapshot-black-multi-00523-800x800.webp",
+    "/assets/images/products/uploads/marc-jacobs-the-snapshot-black-multi-additional-image-6626-800x800.webp",
+    "/assets/images/products/uploads/marc-jacobs-the-snapshot-black-multi-additional-image-6629-800x800.webp",
+    "/assets/images/products/uploads/marc-jacobs-the-snapshot-black-multi-additional-image-6627-800x800.webp",
+    "/assets/images/products/uploads/sumka-marc-jacobs-2s3hcr500h03-chornii-0196611092012.webp"
+  ]
 }
