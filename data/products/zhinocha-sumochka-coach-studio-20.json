@@ -35,7 +35,7 @@
   "preOrderPrepayment": 50,
   "strapInfo": "Ручка: знімна. Ремінець: знімний та регульований",
   "sizes": [
-    "Onesize"
+    "ONESIZE"
   ],
   "splitByColor": true,
   "searchKeywords": [
@@ -72,5 +72,18 @@
   "description": "Елегантна компактна сумка Coach Studio Bag 20 у глянцевому виконанні. Модель створена на основі архівного дизайну Coach та доповнена фірмовою застібкою Pushlock із логотипом «C».\nСумка виготовлена з лакованої шкіри та має продуману організацію простору: 8 слотів для банківських карток, внутрішню багатофункціональну кишеню та зовнішню відкриту кишеню. Компактний формат дозволяє зручно носити телефон та найнеобхідніші речі.\nМодель комплектується знімною ручкою та знімним регульованим ремінцем, тому її можна носити в руці, під пахвою, на плечі або через плече",
   "sku": "CE761B4BH5",
   "rating": 5,
-  "category": "Жіночі сумки"
+  "category": "Жіночі сумки",
+  "legacySlugs": [
+    "жіноча-сумочка-coach-studio-20"
+  ],
+  "slug": "zhinocha-sumochka-coach-studio-20",
+  "id": 101,
+  "color": "Айворі",
+  "images": [
+    "/assets/images/products/uploads/ce761_b4bh5_a0.avif",
+    "/assets/images/products/uploads/ce761_b4bh5_a3.avif",
+    "/assets/images/products/uploads/ce761_b4bh5_a8.avif",
+    "/assets/images/products/uploads/ce761_b4bh5_a91.avif",
+    "/assets/images/products/uploads/ce761_b4bh5_a92.avif"
+  ]
 }
