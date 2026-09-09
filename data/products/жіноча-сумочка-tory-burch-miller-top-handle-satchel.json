@@ -1,0 +1,56 @@
+{
+  "gender": [
+    "Жінкам"
+  ],
+  "preOrderDays": "5–10 робочих днів",
+  "forcePublish": false,
+  "material": "Натуральна зерниста шкіра",
+  "brand": "Tory Burch",
+  "price": 9000,
+  "preOrder": false,
+  "dimensions": "28 × 19,5 × 13,5 см",
+  "variants": [
+    {
+      "color": "Чорний",
+      "hex": "#000000",
+      "images": [
+        "/assets/images/products/uploads/00004.webp",
+        "/assets/images/products/uploads/00005.webp",
+        "/assets/images/products/uploads/00006.webp",
+        "/assets/images/products/uploads/00003.webp",
+        "/assets/images/products/uploads/rtlaal924401_14742030_9_v1_2x.webp",
+        "/assets/images/products/uploads/rtlaal924401_14742029_10_v1_2x.webp"
+      ]
+    }
+  ],
+  "preOrderPrepayment": 50,
+  "strapInfo": "Дві верхні ручки — для носіння сумки в руці. Знімний регульований ремінь — для носіння на плечі або кросбоді",
+  "sizes": [
+    "Onesize"
+  ],
+  "splitByColor": true,
+  "searchKeywords": [
+    "Tory Burch 79329",
+    "Tory Burch Miller",
+    "Miller Top Handle Satchel",
+    "Tory Burch Black 001",
+    "Tory Burch сумка",
+    "жіноча сумка Tory Burch",
+    "шкіряна сумка Tory Burch",
+    "чорна сумка Tory Burch",
+    "сумка через плече",
+    "сумка кросбоді",
+    "сумка з ручками",
+    "оригінал Tory Burch"
+  ],
+  "isNew": true,
+  "title": "Жіноча сумочка Tory Burch Miller Top Handle Satchel",
+  "soldOut": false,
+  "reviews": 0,
+  "closure": "Магнітна",
+  "instagramBlock": "general",
+  "description": "Стильна та містка сумка Tory Burch Miller у класичному чорному кольорі. Модель виконана з натуральної зернистої шкіри та доповнена фірмовим логотипом Double T, фурнітурою золотистого відтінку та акуратними декоративними швами",
+  "sku": "79329",
+  "rating": 5,
+  "category": "Жіночі сумки"
+}
