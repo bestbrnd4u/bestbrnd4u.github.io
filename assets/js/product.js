@@ -415,7 +415,11 @@ function updateProductSeoMetadata(product) {
         category: product.category || undefined,
         // Умови продажу — зі спільного модуля, того самого, що в
         // генератора сторінок і генератора фіду.
-        offers: window.ProductOffer.offerFor(product, pageUrl),
+        //
+        // Строки передаємо ті самі, з яких рахується видимий рядок
+        // «Орієнтовно у відділенні 11–13 вересня»: розмітка й текст на
+        // одній сторінці не мають права обіцяти різне.
+        offers: window.ProductOffer.offerFor(product, pageUrl, undefined, window.PRODUCT_TEXTS),
         // Рейтинг — ЛИШЕ якщо за ним стоять справжні відгуки.
         // Раніше умовою було саме product.rating, і в чотирьох товарів
         // із rating: 5, reviews: 0 у розмітку йшов reviewCount: 0 —
@@ -673,6 +677,111 @@ function renderBreadcrumbs(product) {
     });
 
 }
+
+// -------------------------
+// Артикул у буфер і «Поділитися»
+// -------------------------
+
+// Копіювання з запасним шляхом.
+//
+// navigator.clipboard існує лише в захищеному контексті й може
+// відмовити (дозволи, фокус на іншому вікні). Тоді лишається старий
+// execCommand — він некрасивий, але працює там, де новий не працює.
+// Той самий підхід уже вживає віджет посилання в адмінці.
+function copyText(value) {
+
+    const text = String(value || "");
+
+    if (!text) return Promise.resolve(false);
+
+    if (navigator.clipboard && window.isSecureContext) {
+
+        return navigator.clipboard.writeText(text)
+            .then(() => true, () => copyTextFallback(text));
+
+    }
+
+    return Promise.resolve(copyTextFallback(text));
+
+}
+
+function copyTextFallback(text) {
+
+    const area = document.createElement("textarea");
+
+    area.value = text;
+
+    // Поле мусить бути в документі й видимим для браузера, але не для
+    // людини: readOnly не дає клавіатурі вискочити на телефоні.
+    area.setAttribute("readonly", "");
+    area.style.position = "fixed";
+    area.style.top = "-1000px";
+    area.style.opacity = "0";
+
+    document.body.appendChild(area);
+
+    area.select();
+
+    let ok = false;
+
+    try { ok = document.execCommand("copy"); } catch (error) { ok = false; }
+
+    document.body.removeChild(area);
+
+    return ok;
+
+}
+
+// Галочка на 1,6 с. Без підтвердження копіювання виглядає так, ніби
+// нічого не сталося: буфер обміну людина не бачить.
+function flashDone(button) {
+
+    button.classList.add("done");
+
+    clearTimeout(button.doneTimer);
+
+    button.doneTimer = setTimeout(() => button.classList.remove("done"), 1600);
+
+}
+
+document.addEventListener("click", event => {
+
+    const skuBtn = event.target.closest(".sku-copy");
+
+    if (skuBtn) {
+
+        // Саме data-sku, а не текст кнопки: копіювати треба «28-1», а
+        // не «Артикул: 28-1» — вставлений у пошук підпис нічого не
+        // знайде.
+        copyText(skuBtn.dataset.sku).then(ok => { if (ok) flashDone(skuBtn); });
+
+        return;
+
+    }
+
+    const shareBtn = event.target.closest(".share-product");
+
+    if (!shareBtn) return;
+
+    // Адреса як є: після перемикання кольору в ній уже стоїть ?color=,
+    // тож посилання відкриє саме те, що людина зараз бачить.
+    const url = location.href;
+    const title = document.querySelector("#productPage h1")?.textContent.trim()
+        || document.title;
+
+    if (navigator.share) {
+
+        // Скасування діалогу — не помилка: людина передумала.
+        navigator.share({ title: title, url: url }).catch(() => {});
+
+        return;
+
+    }
+
+    // Системного вікна немає (десктоп) — кладемо посилання в буфер.
+    copyText(url).then(ok => { if (ok) flashDone(shareBtn); });
+
+});
 
 // Заглушка відео → плеєр.
 //
@@ -1158,6 +1267,42 @@ function onlyOneText(product) {
 
 }
 
+// Рядок «коли річ буде у відділенні».
+//
+// ЩО БУЛО НЕ ТАК. Тут стояло «🚚 Доставка по Україні 1–3 дні».
+// По-перше, неточно: днів на збірку в цьому числі немає, а в розмітці
+// Offer на цій же сторінці стояло handlingTime 1–2 + transitTime 1–3.
+// Дві різні обіцянки в одному файлі. По-друге, «1–3 дні» від чого — від
+// замовлення чи від відправки? — покупець мусив рахувати сам.
+//
+// Дата рахується в браузері, а не при збірці: інакше сторінки
+// p/<slug>/index.html змінювались би щодня й гілки dev і main
+// конфліктували б на порожньому місці (та сама пастка, що з
+// priceValidUntil і availability_date у фіді).
+const DELIVERY_FALLBACK = "Доставка Новою поштою по Україні";
+
+function deliveryDateLine() {
+
+    const offer = window.ProductOffer;
+
+    // Модуль не завантажився — краще старий загальний рядок, ніж
+    // порожнє місце там, де людина шукає строк.
+    if (!offer || !offer.deliveryWindow) return DELIVERY_FALLBACK;
+
+    const texts = window.PRODUCT_TEXTS || {};
+
+    const template = String(texts.deliveryDate || "Орієнтовно у відділенні {дата}").trim();
+
+    const range = offer.formatDeliveryRange(offer.deliveryWindow(texts));
+
+    // {дата} — місце для діапазону. Забули його в адмінці — дописуємо
+    // в кінці: без дати весь рядок втрачає сенс.
+    return template.includes("{дата}")
+        ? template.split("{дата}").join(range)
+        : `${template} ${range}`.trim();
+
+}
+
 // Скільки штук цього розміру лишилось: число або null.
 //
 // null означає «залишки не рахуємо» — тоді жодних слів про
@@ -1477,9 +1622,53 @@ function renderProduct(product) {
              на сторінці читався двічі підряд. Лишився артикул, і тепер
              з підписом: без нього «20-1» саме по собі нічого не казало.
              Значення оновлює обробник свотча (common.js) за
-             data-product-sku — підпис він теж пише. -->
+             data-product-sku — підпис він теж пише.
+
+             КОПІЮВАННЯ. На телефоні виділити «28-1» усередині рядка
+             майже неможливо, а саме цим номером покупець питає про
+             товар у Instagram чи Telegram — і саме за ним тепер працює
+             пошук по сайту. Тому рядок став кнопкою.
+
+             Текст лежить окремим вузлом (data-product-sku-text): у
+             кнопці поруч ще значок, і textContent на самій кнопці стер
+             би його. Сам код — у data-sku, бо копіювати треба «28-1», а
+             не «Артикул: 28-1».
+
+             ПОДІЛИТИСЯ. Магазин живе з Instagram, а віддати посилання
+             на товар можна було лише через адресний рядок. На телефоні
+             відкривається системне вікно, на десктопі (де його немає)
+             посилання лягає в буфер. -->
         <div class="product-meta-line">
-            <span data-product-sku>${activeSku ? `Артикул: ${escapeHtml(activeSku)}` : ""}</span>
+
+            <button type="button" class="meta-chip sku-copy"
+                    data-product-sku
+                    data-sku="${escapeHtml(activeSku || "")}"
+                    aria-label="Скопіювати артикул"
+                    ${activeSku ? "" : "hidden"}>
+                <span data-product-sku-text>${activeSku ? `Артикул: ${escapeHtml(activeSku)}` : ""}</span>
+                <svg class="meta-chip-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="9" y="9" width="11" height="11" rx="2"/>
+                    <path d="M5 15V5a2 2 0 0 1 2-2h10"/>
+                </svg>
+                <svg class="meta-chip-done" viewBox="0 0 24 24" aria-hidden="true">
+                    <polyline points="4 12 9 17 20 6"/>
+                </svg>
+            </button>
+
+            <button type="button" class="meta-chip share-product" aria-label="Поділитися товаром">
+                <span class="meta-chip-label">Поділитися</span>
+                <svg class="meta-chip-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="18" cy="5" r="3"/>
+                    <circle cx="6" cy="12" r="3"/>
+                    <circle cx="18" cy="19" r="3"/>
+                    <line x1="8.6" y1="10.5" x2="15.4" y2="6.5"/>
+                    <line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/>
+                </svg>
+                <svg class="meta-chip-done" viewBox="0 0 24 24" aria-hidden="true">
+                    <polyline points="4 12 9 17 20 6"/>
+                </svg>
+            </button>
+
         </div>
 
         <div class="price-box">
@@ -1623,7 +1812,7 @@ ${sizeButtons}
 
         <div class="delivery-box" ${product.preOrder ? "hidden" : ""}>
 
-            <div>🚚 Доставка по Україні 1–3 дні</div>
+            <div class="delivery-date">🚚 ${escapeHtml(deliveryDateLine())}</div>
 
             <div>💳 Оплата при отриманні або онлайн</div>
 

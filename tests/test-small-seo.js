@@ -294,8 +294,195 @@ console.log("\n[6] Правка живе у збірці, а не руками")
         && /length < 10/.test(legalSrc));
 }
 
+console.log("\n[7] Маніфест застосунку");
+{
+    // ЧОГО БРАКУВАЛО. theme-color, favicon і apple-touch-icon на
+    // сторінках були, а самого маніфесту — ні. Тобто «Додати на
+    // головний екран» давало ярлик без назви й без нормальної іконки,
+    // а Android не пропонував встановлення взагалі.
+    check("файл є", fs.existsSync(path.join(ROOT, "site.webmanifest")));
+
+    const manifest = JSON.parse(read("site.webmanifest"));
+
+    check("назва є", Boolean(manifest.name && manifest.short_name));
+
+    // Довга назва не влазить під іконкою — Android бере short_name.
+    check("коротка назва справді коротка",
+        manifest.short_name.length <= 12, manifest.short_name);
+
+    check("мова вказана", manifest.lang === "uk");
+
+    // Колір мусить збігатися з <meta name="theme-color"> на
+    // сторінках: інакше смуга браузера мигає при завантаженні.
+    const home = read("index.html");
+    const themeColor = (home.match(/name="theme-color" content="([^"]+)"/) || [])[1];
+
+    check("колір теми той самий, що в розмітці",
+        manifest.theme_color === themeColor,
+        `${manifest.theme_color} проти ${themeColor}`);
+
+    // Іконки мусять існувати й мати заявлений розмір: Android мовчки
+    // відкидає маніфест, у якому жодна іконка не завантажилась.
+    const iconProblems = manifest.icons.filter(icon => {
+
+        const file = path.join(ROOT, icon.src.replace(/^\//, ""));
+
+        if (!fs.existsSync(file)) return true;
+
+        // Ширина й висота PNG лежать у IHDR, байти 16..23.
+        const bytes = fs.readFileSync(file);
+
+        return `${bytes.readUInt32BE(16)}x${bytes.readUInt32BE(20)}` !== icon.sizes;
+
+    });
+
+    check("іконки на місці й потрібного розміру",
+        iconProblems.length === 0,
+        iconProblems.map(i => i.src).join(", "));
+
+    check("є 192 і 512 — обидва обов'язкові для встановлення",
+        manifest.icons.some(i => i.sizes === "192x192")
+        && manifest.icons.some(i => i.sizes === "512x512"));
+
+    // standalone ховає адресний рядок. Сервісного працівника в сайту
+    // немає, тож офлайн людина отримала б порожню помилку у вікні без
+    // жодної кнопки. minimal-ui лишає рядок і перезавантаження.
+    check("вікно з адресним рядком, бо офлайн-режиму немає",
+        manifest.display === "minimal-ui", manifest.display);
+
+    // Посилання — на КОЖНІЙ сторінці: встановлюють сайт не тільки з
+    // головної.
+    const pages = fs.readdirSync(ROOT).filter(f => f.endsWith(".html"));
+
+    const without = pages.filter(f => !/rel="manifest"/.test(read(f)));
+
+    check(`посилання на всіх ${pages.length} сторінках`,
+        without.length === 0, without.join(", "));
+
+    // Адреса АБСОЛЮТНА: сторінки в теках (p/, brands/) живуть із
+    // <base href="/">, і відносний шлях указував би не туди.
+    check("адреса абсолютна",
+        /rel="manifest" href="\/site\.webmanifest"/.test(home));
+
+    check("і в згенерованій сторінці товару теж",
+        /rel="manifest" href="\/site\.webmanifest"/.test(
+            read("p/michael-kors-rose-small-top-handle-quilted-crossbody-bag/index.html")));
+}
+
+console.log("\n[8] Картинка прев'ю посилань");
+{
+    // ЩО БУЛО НЕ ТАК. В og:image стояв банер головної (2400×1080), і в
+    // Telegram посилання на магазин виглядало як назва, опис і
+    // крихітний квадратик праворуч із випадковим світлим шматком того
+    // банера.
+    //
+    // Месенджери ріжуть картинку під СВІЙ формат: Telegram бере
+    // квадрат, Facebook — 1.91:1. Широкий банер після квадратного
+    // обрізання перетворюється на фрагмент.
+    const cover = "assets/images/og-cover.png";
+
+    check("обкладинка є", fs.existsSync(path.join(ROOT, cover)));
+
+    const bytes = fs.readFileSync(path.join(ROOT, cover));
+
+    // Ширина й висота PNG лежать у IHDR, байти 16..23.
+    const width = bytes.readUInt32BE(16);
+    const height = bytes.readUInt32BE(20);
+
+    check("розмір 1200×630 — той, що просять Facebook і Twitter",
+        width === 1200 && height === 630, `${width}×${height}`);
+
+    // ГОЛОВНА ВЛАСТИВІСТЬ: логотип мусить уміщатись у ЦЕНТРАЛЬНИЙ
+    // КВАДРАТ. Саме його бере Telegram, і саме через це попередня
+    // картинка й не працювала. Перевіряємо не константи скрипта, а
+    // сам файл: шукаємо межі всього, що не тло.
+    // Окремим процесом: sharp асинхронний, а тест — звичайний
+    // послідовний скрипт. Переписувати весь набір під async заради
+    // одного заміру не варто.
+    const probe = require("child_process").spawnSync(process.execPath, ["-e", `
+        const sharp = require(${JSON.stringify(require.resolve("sharp"))});
+        sharp(${JSON.stringify(path.join(ROOT, cover))})
+            .raw().toBuffer({ resolveWithObject: true })
+            .then(({ data, info }) => {
+                // Тло — колір лівого верхнього кута.
+                const bg = [data[0], data[1], data[2]];
+                let minX = info.width, minY = info.height, maxX = -1, maxY = -1;
+                for (let y = 0; y < info.height; y++) {
+                    for (let x = 0; x < info.width; x++) {
+                        const i = (y * info.width + x) * info.channels;
+                        // Поріг 12: у тла й краю логотипа є згладжування.
+                        if (Math.abs(data[i] - bg[0]) + Math.abs(data[i + 1] - bg[1])
+                            + Math.abs(data[i + 2] - bg[2]) <= 12) continue;
+                        if (x < minX) minX = x;
+                        if (y < minY) minY = y;
+                        if (x > maxX) maxX = x;
+                        if (y > maxY) maxY = y;
+                    }
+                }
+                console.log(JSON.stringify({ minX, minY, maxX, maxY }));
+            });
+    `], { encoding: "utf8" });
+
+    const box = JSON.parse((probe.stdout || "{}").trim() || "{}");
+
+    check("на картинці є що показати", box.maxX > 0, probe.stderr);
+
+    if (box.maxX > 0) {
+
+        const squareLeft = (width - height) / 2;
+        const squareRight = squareLeft + height;
+
+        check("логотип уміщається в центральний квадрат — той, що бере Telegram",
+            box.minX >= squareLeft && box.maxX <= squareRight,
+            `логотип ${box.minX}…${box.maxX}, квадрат ${squareLeft}…${squareRight}`);
+
+        // Впритул до краю ставити не можна: кожен месенджер ріже
+        // трохи по-своєму, і край першим і зникне.
+        check("є поля з усіх боків",
+            box.minY > 20 && box.maxY < height - 20,
+            `по вертикалі ${box.minY}…${box.maxY} з ${height}`);
+
+    }
+
+    // Це та сама «B», що у вкладці браузера й на іконці застосунку.
+    check("зібрана з тієї самої іконки",
+        /favicon-512\.png/.test(read("scripts/build-og-cover.js")));
+
+    // Головна мусить показувати саме її, а не банер.
+    const home = read("index.html");
+
+    check("головна показує обкладинку",
+        /og:image" content="[^"]*\/assets\/images\/og-cover\.png"/.test(home));
+
+    check("банер героя в прев'ю більше не їде",
+        !/og:image" content="[^"]*banners\//.test(home));
+
+    // Збірка головної раніше підставляла сюди фото з data/home.json —
+    // тобто повернула б банер на місце при наступному запуску.
+    check("збірка головної теж ставить обкладинку",
+        /og:image" content="\)([^)]*)\n?[\s\S]{0,120}og-cover\.png/
+            .test(read("scripts/build-home-static.js")));
+
+    // Розміри в тегах мусять збігатися зі справжніми: Facebook бере їх
+    // на віру й малює рамку ще до завантаження файлу.
+    check("розміри в тегах збігаються з файлом",
+        new RegExp(`og:image:width" content="${width}"`).test(home)
+        && new RegExp(`og:image:height" content="${height}"`).test(home));
+
+    // Сторінка з тегами прев'ю, але без картинки, показується самим
+    // текстом — а це рівно те, з чого все почалось.
+    const pagesWithOg = fs.readdirSync(ROOT)
+        .filter(f => f.endsWith(".html"))
+        .filter(f => /property="og:/.test(read(f)));
+
+    const withoutImage = pagesWithOg.filter(f => !/og:image/.test(read(f)));
+
+    check(`усі ${pagesWithOg.length} сторінок із тегами прев'ю мають картинку`,
+        withoutImage.length === 0, withoutImage.join(", "));
+}
+
 console.log(failures === 0
-    ? "\n✅ Фото заявлені, llms.txt свіжий, телефон у розмітці справжній\n"
+    ? "\n✅ Фото заявлені, llms.txt свіжий, телефон справжній, маніфест і прев'ю на місці\n"
     : `\n❌ Проблем: ${failures}\n`);
 
 process.exit(failures === 0 ? 0 : 1);

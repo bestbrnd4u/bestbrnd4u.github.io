@@ -81,6 +81,41 @@
 
     }
 
+    // Фото покупця під відгуком.
+    //
+    // НАВІЩО. Головне заперечення на полиці 3 000-15 000 ₴ із
+    // логотипами брендів — «чи це не підробка». Знімок покупця
+    // відповідає на це переконливіше за будь-який текст магазину, бо
+    // показує саме ту річ при звичайному світлі.
+    //
+    // Адреси приходять із бази й ведуть у власне сховище (за цим
+    // стежить і сама база — див. міграцію 024), але однаково
+    // екрануємо: у розмітку вони йдуть рядком.
+    //
+    // loading="lazy" тут обов'язковий: галерея стоїть унизу сторінки,
+    // і без нього три знімки вантажились би разом із фото товару,
+    // змагаючись із ними за канал.
+    function photosHtml(photos) {
+
+        var list = Array.isArray(photos) ? photos.filter(Boolean) : [];
+
+        if (!list.length) return "";
+
+        return "<div class=\"review-photos\">"
+            + list.map(function (url, index) {
+
+                return "<a class=\"review-photo\" href=\"" + escapeHtml(url) + "\""
+                    + " target=\"_blank\" rel=\"noopener nofollow\">"
+                    + "<img src=\"" + escapeHtml(url) + "\""
+                    + " alt=\"Фото покупця " + (index + 1) + "\""
+                    + " loading=\"lazy\" decoding=\"async\">"
+                    + "</a>";
+
+            }).join("")
+            + "</div>";
+
+    }
+
     // -------------------------
     // Показ
     // -------------------------
@@ -124,6 +159,7 @@
                 + "<span class=\"review-date\">" + escapeHtml(dateLabel(row.created_at)) + "</span>"
                 + "</div>"
                 + "<p class=\"review-body\">" + escapeHtml(row.body) + "</p>"
+                + photosHtml(row.photos)
                 // Відповідь магазину. Саме вона показує, що відгуки
                 // читають, — і робить це переконливіше за будь-який
                 // рекламний рядок.
@@ -229,6 +265,173 @@
 
     }
 
+    // -------------------------
+    // Фото до відгуку
+    // -------------------------
+    //
+    // ЧОМУ СТИСКАЄМО В БРАУЗЕРІ. Знімок сучасного телефона важить 3-5
+    // МБ. Три таких — це 15 МБ на мобільному інтернеті, тобто хвилина
+    // очікування й цілком імовірний обрив. Після зменшення до 1400 px
+    // і JPEG виходить 150-400 КБ — різниця в тридцять разів, а на
+    // екрані під відгуком її не видно.
+    //
+    // ЧОМУ САМЕ 1400. Галерея показує знімок у кілька сотень пікселів,
+    // а по кліку відкривається на весь екран. 1400 покриває і
+    // повноекранний показ на телефоні з подвійною щільністю, і
+    // збільшення пальцями.
+    var PHOTO_MAX_SIDE = 1400;
+    var PHOTO_MAX_COUNT = 3;
+    var PHOTO_QUALITY = 0.75;
+
+    // Межа ДО стиснення: захист від того, хто вибере 80-мегабайтний
+    // файл. Читати такий у пам'ять браузера, щоб потім його
+    // відкинути, — вірний спосіб покласти вкладку на слабкому
+    // телефоні.
+    var PHOTO_MAX_INPUT = 25 * 1024 * 1024;
+
+    var photos = [];
+
+    var photosInput = document.getElementById("reviewPhotos");
+    var photosAddBtn = document.getElementById("reviewPhotosAdd");
+    var photosPreview = document.getElementById("reviewPhotosPreview");
+
+    function renderPhotos() {
+
+        if (!photosPreview) return;
+
+        photosPreview.innerHTML = photos.map(function (photo, index) {
+
+            return "<div class=\"review-photo-item\">"
+                + "<img src=\"" + photo.dataUrl + "\" alt=\"\">"
+                + "<button type=\"button\" class=\"review-photo-remove\""
+                + " data-index=\"" + index + "\" aria-label=\"Прибрати фото\">✕</button>"
+                + "</div>";
+
+        }).join("");
+
+        // Кнопка зникає на третьому знімку: пояснювати «більше не
+        // можна» нічим не краще, ніж не пропонувати неможливого.
+        if (photosAddBtn) {
+            photosAddBtn.hidden = photos.length >= PHOTO_MAX_COUNT;
+        }
+
+    }
+
+    photosPreview && photosPreview.addEventListener("click", function (event) {
+
+        var btn = event.target.closest(".review-photo-remove");
+
+        if (!btn) return;
+
+        photos.splice(Number(btn.dataset.index), 1);
+
+        renderPhotos();
+
+    });
+
+    photosAddBtn && photosAddBtn.addEventListener("click", function () {
+        photosInput && photosInput.click();
+    });
+
+    // Зменшення через <canvas>.
+    //
+    // Повертає data-URL або null, якщо файл не картинка. Саме
+    // data-URL, а не Blob: відгук їде одним запитом JSON, і файл у
+    // ньому мусить бути рядком.
+    function shrinkPhoto(file) {
+
+        return new Promise(function (resolve) {
+
+            if (!file || file.size > PHOTO_MAX_INPUT) return resolve(null);
+
+            var url = URL.createObjectURL(file);
+            var image = new Image();
+
+            image.onload = function () {
+
+                URL.revokeObjectURL(url);
+
+                var scale = Math.min(1, PHOTO_MAX_SIDE / Math.max(image.width, image.height));
+
+                var canvas = document.createElement("canvas");
+
+                canvas.width = Math.max(1, Math.round(image.width * scale));
+                canvas.height = Math.max(1, Math.round(image.height * scale));
+
+                var context = canvas.getContext("2d");
+
+                // Біле тло: у PNG із прозорістю вона стала б чорною
+                // після переведення в JPEG.
+                context.fillStyle = "#ffffff";
+                context.fillRect(0, 0, canvas.width, canvas.height);
+                context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+                try {
+                    resolve(canvas.toDataURL("image/jpeg", PHOTO_QUALITY));
+                } catch (error) {
+                    resolve(null);
+                }
+
+            };
+
+            image.onerror = function () {
+
+                URL.revokeObjectURL(url);
+
+                resolve(null);
+
+            };
+
+            image.src = url;
+
+        });
+
+    }
+
+    photosInput && photosInput.addEventListener("change", async function () {
+
+        var files = Array.from(photosInput.files || []);
+
+        // Скидаємо одразу: інакше вибір того самого файлу вдруге не
+        // дасть події change.
+        photosInput.value = "";
+
+        if (!files.length) return;
+
+        var free = PHOTO_MAX_COUNT - photos.length;
+
+        if (free <= 0) return;
+
+        errorEl.hidden = true;
+
+        photosAddBtn.disabled = true;
+        photosAddBtn.textContent = "Готуємо фото...";
+
+        var skipped = 0;
+
+        for (var i = 0; i < files.length && photos.length < PHOTO_MAX_COUNT; i++) {
+
+            var dataUrl = await shrinkPhoto(files[i]);
+
+            if (dataUrl) photos.push({ dataUrl: dataUrl });
+            else skipped++;
+
+        }
+
+        photosAddBtn.disabled = false;
+        photosAddBtn.textContent = "Додати фото";
+
+        renderPhotos();
+
+        // Мовчки з'їдений файл виглядає як помилка сторінки.
+        if (skipped) {
+            showError(skipped === 1
+                ? "Один файл не вдалося додати: потрібне зображення до 25 МБ."
+                : skipped + " файли не вдалося додати: потрібні зображення до 25 МБ.");
+        }
+
+    });
+
     formEl && formEl.addEventListener("submit", async function (event) {
 
         event.preventDefault();
@@ -281,7 +484,11 @@
                     phone: phone,
                     author: author,
                     rating: Number(checked.value),
-                    body: body
+                    body: body,
+                    // Уже стиснуті: 150-400 КБ кожне замість 3-5 МБ
+                    // з телефона. Сервер однаково перевірить розмір і
+                    // тип — тут не захист, а економія каналу.
+                    photos: photos.map(function (photo) { return photo.dataUrl; })
                 })
             });
 

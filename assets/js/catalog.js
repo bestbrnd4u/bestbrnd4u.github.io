@@ -189,6 +189,14 @@ let priceRange = { min: null, max: null };
 let priceBounds = { min: 0, max: 0 };
 let selectedSizes = new Set(); // елементи виду "group:size", напр. "bags:S"
 
+// «Тільки в наявності» — один прапорець, а не множина: вибір тут
+// бінарний. Правда про наявність — це product.preOrder: у зібраному
+// каталозі там лежить уже ГОТОВА відповідь, а живий залишок
+// (assets/js/live-stock.js) її перераховує, щойно база відповість.
+// Тому фільтр і бейдж «Під замовлення» на картці не можуть
+// розійтися — вони читають одне поле.
+let onlyInStock = false;
+
 // колір товару (для фільтра) — беремо прямо з variants,
 // де hex вже заданий в адмінці; це й головне джерело правди
 // для свотчів у фільтрі "Колір"
@@ -522,6 +530,8 @@ const gridViewBtn = document.getElementById("gridViewBtn");
 const listViewBtn = document.getElementById("listViewBtn");
 
 const genderFilterEl = document.getElementById("genderFilter");
+const stockToggle = document.getElementById("stockToggle");
+const stockCountEl = document.getElementById("stockCount");
 const breadcrumbsList = document.getElementById("breadcrumbsList");
 const catalogTitle = document.getElementById("catalogTitle");
 const catalogSubtitle = document.getElementById("catalogSubtitle");
@@ -818,6 +828,8 @@ function readUrlState() {
     selectedColors = readSetParam(params, "color");
     selectedSizes = readSetParam(params, "size");
 
+    onlyInStock = params.get("stock") === "1";
+
     const sort = params.get("sort");
     currentSort = sort || "";
 
@@ -1066,6 +1078,19 @@ function clearBrands() {
 // уже обраний, колір.
 // -------------------------
 
+// Чи можна отримати товар зараз.
+//
+// Одне поле, те саме, що показує бейдж на картці й що враховує
+// порядок за замовчуванням (later() нижче). Свого визначення
+// «наявності» тут навмисно НЕ вводимо: друге визначення неминуче
+// розійшлося б із бейджем, і фільтр показував би картки з написом
+// «Під замовлення».
+function inStockNow(product) {
+
+    return !product.preOrder;
+
+}
+
 function availableFacets() {
 
     const forBrands = filterProducts("brands");
@@ -1104,7 +1129,13 @@ function availableFacets() {
         colors,
         sizes,
         genders: new Set(forGenders.flatMap(p => getProductGenders(p))),
-        categories: new Set(forCategories.map(p => p.category).filter(Boolean))
+        categories: new Set(forCategories.map(p => p.category).filter(Boolean)),
+        // Скільки товарів лишиться, якщо перемикач увімкнути. Рахуємо
+        // за тим самим правилом, що й решту фасетів: з усіма іншими
+        // фільтрами, але БЕЗ самого себе — інакше при ввімкненому
+        // перемикачі в написі стояла б довжина вже звуженого списку,
+        // тобто він завжди показував би «усі».
+        inStock: filterProducts("stock").filter(inStockNow).length
     };
 
 }
@@ -2680,6 +2711,81 @@ function setupGenderFilter() {
 }
 
 // -------------------------
+// Фільтр «Тільки в наявності»
+// -------------------------
+//
+// Два органи керування на один прапорець: кнопка в рядку фільтрів
+// (десктоп) і рядок у мобільній шторці. Рядок фільтрів на вузьких
+// екранах приховано (display:none у @media 768px), тож перенести
+// один вузол, як це зроблено з дропдаунами, тут не вийшло б —
+// шторка й рядок фільтрів існують одночасно. Тому стан один, а
+// малюються обидва з ОДНОГО місця: розійтися їм ніде.
+
+function updateStockUI() {
+
+    const available = availableFacets();
+
+    // Нема чого показувати — перемикач вимкнений, а не просто дає
+    // порожній список. Так само поводяться пили статі: недоступне
+    // значення блокуємо, але НІКОЛИ не блокуємо вже ввімкнене, бо
+    // тоді його неможливо було б зняти.
+    const nothingInStock = available.inStock === 0 && !onlyInStock;
+
+    if (stockToggle) {
+
+        stockToggle.classList.toggle("active", onlyInStock);
+        stockToggle.setAttribute("aria-pressed", onlyInStock ? "true" : "false");
+
+        stockToggle.classList.toggle("disabled", nothingInStock);
+        stockToggle.disabled = nothingInStock;
+
+    }
+
+    // Кількість показуємо, лише коли є що показати: «(0)» поруч із
+    // назвою фільтра читається як помилка сторінки, а не як «нічого
+    // з цим набором фільтрів немає».
+    if (stockCountEl) {
+
+        stockCountEl.textContent = available.inStock ? available.inStock : "";
+
+    }
+
+    const mobileRow = document.getElementById("mfStockRow");
+
+    if (mobileRow) {
+
+        mobileRow.classList.toggle("active", onlyInStock);
+        mobileRow.setAttribute("aria-pressed", onlyInStock ? "true" : "false");
+
+        mobileRow.classList.toggle("disabled", nothingInStock);
+        mobileRow.disabled = nothingInStock;
+
+    }
+
+    const mobileValue = document.getElementById("mfRowStock");
+
+    if (mobileValue) {
+
+        mobileValue.textContent = available.inStock ? String(available.inStock) : "";
+
+    }
+
+}
+
+function toggleOnlyInStock() {
+
+    onlyInStock = !onlyInStock;
+
+    updateStockUI();
+    applyFilterChange();
+
+}
+
+stockToggle?.addEventListener("click", toggleOnlyInStock);
+
+document.getElementById("mfStockRow")?.addEventListener("click", toggleOnlyInStock);
+
+// -------------------------
 // Значок «скільки фільтрів обрано» на кнопці «Фільтри»
 // -------------------------
 //
@@ -2708,7 +2814,8 @@ function activeFilterCount() {
         + selectedCategories.size
         + selectedDepartments.size
         + (priceFilterActive() ? 1 : 0)
-        + selectedSizes.size;
+        + selectedSizes.size
+        + (onlyInStock ? 1 : 0);
 
 }
 
@@ -3223,7 +3330,13 @@ function filterProducts(skip) {
         //
         // Він розбиває запит на слова й вимагає всі, тож «coach
         // гаманець» і «гаманець coach» тепер дають одне й те саме.
-        list = list.filter(product => matchesQuery(product, text));
+        //
+        // А ще він спершу пробує запит як АРТИКУЛ: підтримка відповідає
+        // покупцеві кодом («артикул 28-1»), а до правки свій товар не
+        // знаходив ні один із 231 артикулу каталогу — 198 давали нуль,
+        // 33 повертали лише товари, у чиїх габаритах трапилось те саме
+        // число.
+        list = searchProducts(list, text);
 
     }
 
@@ -3282,6 +3395,12 @@ function filterProducts(skip) {
         list = list.filter(product =>
             [...selectedSizes].some(key => matchesSizeKey(product, key))
         );
+
+    }
+
+    if (onlyInStock && skip !== "stock") {
+
+        list = list.filter(inStockNow);
 
     }
 
@@ -3439,6 +3558,7 @@ function refreshFacets() {
         updateSizeUI();
         updateCategoryUI();
         updateGenderUI();
+        updateStockUI();
 
         refreshSidebarCounts();
 
@@ -3627,6 +3747,7 @@ const URL_KEYS = {
     brand: "brand",
     color: "color",
     size: "size",
+    stock: "stock",
     priceMin: "priceMin",
     priceMax: "priceMax",
     sort: "sort",
@@ -3680,6 +3801,12 @@ function writeState(p, options) {
     setOrDelete(p, URL_KEYS.brand, skipBrand ? "" : joinSet(selectedBrands));
     setOrDelete(p, URL_KEYS.color, joinSet(selectedColors));
     setOrDelete(p, URL_KEYS.size, joinSet(selectedSizes));
+
+    // «1», а не «true»: коротше в посиланні й однозначно читається
+    // назад. Вимкнений прапорець в адресу не пишемо взагалі —
+    // «?stock=0» нічого не означає, крім зайвих символів у
+    // скопійованому посиланні.
+    setOrDelete(p, URL_KEYS.stock, onlyInStock ? "1" : "");
 
     // ціну пишемо, лише якщо людина її справді рухала: інакше
     // посилання тягло б за собою межі поточного асортименту, і
@@ -4018,6 +4145,12 @@ function renderActiveFilters() {
 
     });
 
+    if (onlyInStock) {
+
+        chips.push({ type: "stock", value: "", label: "Тільки в наявності" });
+
+    }
+
     if (chips.length === 0) {
 
         activeFiltersBar.hidden = true;
@@ -4184,6 +4317,12 @@ function clearOneFilter(type, value) {
 
         updateSizeUI();
 
+    } else if (type === "stock") {
+
+        onlyInStock = false;
+
+        updateStockUI();
+
     }
 
     applyFilterChange();
@@ -4212,6 +4351,9 @@ function resetAllFilters() {
 
     selectedSizes.clear();
     updateSizeUI();
+
+    onlyInStock = false;
+    updateStockUI();
 
     currentSort = "";
 

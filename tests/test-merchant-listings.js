@@ -357,7 +357,17 @@ console.log("\n[5] Обидва генератори розмітки узгод
     const offer = require("../assets/js/product-offer.js");
 
     check("рантайм бере пропозицію з модуля", /ProductOffer\.offerFor\(/.test(productJs));
-    check("генератор бере пропозицію з модуля", /offerFor\(product, url\)/.test(builder));
+    check("генератор бере пропозицію з модуля", /offerFor\(product, url/.test(builder));
+
+    // І обидва передають строки доставки з адмінки. Без цього в
+    // розмітці стояли б запасні числа модуля, а видимий рядок на
+    // сторінці показував би змінені — знову дві обіцянки на одній
+    // сторінці, тільки тепер уже між текстом і розміткою.
+    check("генератор передає строки з адмінки",
+        /offerFor\(product, url, undefined, productTexts\(\)\)/.test(builder));
+
+    check("рантайм передає ті самі строки",
+        /offerFor\(product, pageUrl, undefined, window\.PRODUCT_TEXTS\)/.test(productJs));
 
     // Дивимось на КОД: у коментарях значення згадуються навмисно.
     const bare = t => t.replace(/\/\/[^\n]*/g, "").replace(/\/\*[\s\S]*?\*\//g, "");

@@ -38,6 +38,115 @@ export const REVIEW_LIMITS = {
 // нічого ні наступному покупцеві, ні Google.
 export const MIN_BODY = 10;
 
+// Фото у відгуку.
+//
+// ТРИ — бо стільки поміщається в один рядок під відгуком і стільки
+// людина реально знімає: коробка, річ, деталь. Четверте вже ніхто не
+// роздивляється.
+//
+// ПІВТОРА МЕГАБАЙТА — стеля на файл ПІСЛЯ стиснення в браузері
+// (сторінка зменшує знімок до 1400 px і пише JPEG, звідки виходить
+// 150-400 КБ). Межа тут — не бажаний розмір, а захист від того, хто
+// надішле запит повз сторінку.
+//
+// ТИПИ — рівно ті, що вміє віддавати <canvas> і приймає відро
+// сховища. Формати без стиснення (bmp, tiff) і векторні (svg) тут
+// зайві, а svg ще й може містити скрипт.
+export const PHOTO_LIMITS = {
+    count: 3,
+    bytes: 1_500_000,
+    types: ["image/jpeg", "image/png", "image/webp"],
+};
+
+// Розширення файлу за типом. Сховище віддає файл із тим Content-Type,
+// який ми поставили, але правильне розширення потрібне Telegram і
+// збереженню «як є».
+export const PHOTO_EXTENSIONS = {
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/webp": "webp",
+};
+
+// Розбір одного знімка з data-URL.
+//
+// Сторінка надсилає фото рядком «data:image/jpeg;base64,…» — так воно
+// їде разом з рештою відгуку одним запитом, без окремого сховища
+// напівзавантажених файлів.
+//
+// Повертає { type, base64, bytes } або null. null означає «не годиться»
+// й не пояснює чому: пояснювати нема кому, це не інтерфейс, а межа.
+export function parseReviewPhoto(value) {
+
+    const match = String(value ?? "").match(/^data:([a-z/+-]+);base64,([A-Za-z0-9+/=]+)$/);
+
+    if (!match) return null;
+
+    const type = match[1];
+    const base64 = match[2];
+
+    if (!PHOTO_LIMITS.types.includes(type)) return null;
+
+    // Довжина base64 → довжина файлу. Рахуємо саме так, а не
+    // декодуванням: декодувати мегабайтний рядок лише для того, щоб
+    // дізнатись, що він завеликий, — марна робота.
+    const padding = base64.endsWith("==") ? 2 : (base64.endsWith("=") ? 1 : 0);
+    const bytes = Math.floor(base64.length / 4) * 3 - padding;
+
+    if (bytes <= 0 || bytes > PHOTO_LIMITS.bytes) return null;
+
+    return { type: type, base64: base64, bytes: bytes };
+
+}
+
+// Усі знімки відгуку. Зайві мовчки відрізаються, непридатні
+// пропускаються — відгук через фото не пропадає.
+export function cleanReviewPhotos(value) {
+
+    if (!Array.isArray(value)) return [];
+
+    return value
+        .map(parseReviewPhoto)
+        .filter(Boolean)
+        .slice(0, PHOTO_LIMITS.count);
+
+}
+
+// Ім'я файлу у сховищі.
+//
+// Випадкове, а не за номером відгуку: відро публічне на читання, і
+// передбачуване ім'я дало б змогу подивитись фото ще до модерації,
+// просто підставивши наступний номер.
+export function reviewPhotoName(type, random) {
+
+    const extension = PHOTO_EXTENSIONS[type] || "jpg";
+
+    const key = String(random ?? "").replace(/[^a-z0-9]/gi, "").slice(0, 32);
+
+    return `${key || "photo"}.${extension}`;
+
+}
+
+// Адреса, за якою фото віддається сайту.
+export function reviewPhotoUrl(supabaseUrl, name) {
+
+    return `${String(supabaseUrl ?? "").replace(/\/+$/, "")}`
+        + `/storage/v1/object/public/review-photos/${name}`;
+
+}
+
+// Ім'я файлу з адреси — щоб видалити його при відхиленні.
+//
+// Повертає null для будь-чого, що не веде у власне відро: команда на
+// видалення не має права ходити за чужими шляхами.
+export function reviewPhotoPath(url) {
+
+    const match = String(url ?? "")
+        .match(/\/storage\/v1\/object\/public\/review-photos\/([A-Za-z0-9._-]+)$/);
+
+    return match ? match[1] : null;
+
+}
+
 
 // -------------------------
 // Телефон
@@ -122,9 +231,13 @@ export function cleanReview(payload) {
         return { ok: false, reason: "текст коротший за мінімум" };
     }
 
+    // Фото не обов'язкові й не можуть завалити відгук: непридатний
+    // знімок мовчки пропускається, а текст усе одно доїде.
+    const photos = cleanReviewPhotos(payload.photos);
+
     return {
         ok: true,
-        review: { productId, orderNumber, phone, rating, author, body },
+        review: { productId, orderNumber, phone, rating, author, body, photos },
     };
 
 }
@@ -180,6 +293,8 @@ function escapeReview(text) {
 // виглядає дивно, номер дає змогу подивитись саму покупку.
 export function reviewCard(review, productTitle) {
 
+    const photos = Array.isArray(review.photos) ? review.photos.length : 0;
+
     const lines = [
         `💬 <b>Новий відгук</b> ${stars(review.rating)}`,
         "",
@@ -190,6 +305,14 @@ export function reviewCard(review, productTitle) {
         `👤 ${escapeReview(review.author)}`,
         `🧾 замовлення <code>${escapeReview(review.orderNumber)}</code>`,
     ];
+
+    // Знімки приходять окремими повідомленнями слідом. Рядок тут
+    // потрібен на випадок, коли вони не доїхали: інакше власник не
+    // знав би, що фото взагалі були, і опублікував би відгук із
+    // порожньою галереєю.
+    if (photos) {
+        lines.push(`📷 фото: ${photos}`);
+    }
 
     return lines.join("\n");
 

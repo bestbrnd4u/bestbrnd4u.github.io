@@ -1,5 +1,10 @@
 {
   "onlyOneTitle": "Єдиний екземпляр.",
   "onlyOneWithDays": "Якщо його купують, наступний веземо {строк}.",
-  "onlyOneWithoutDays": "Другого такого в наявності немає."
+  "onlyOneWithoutDays": "Другого такого в наявності немає.",
+  "deliveryDate": "Орієнтовно у відділенні {дата}",
+  "handlingMin": 1,
+  "handlingMax": 2,
+  "transitMin": 1,
+  "transitMax": 3
 }

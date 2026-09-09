@@ -95,6 +95,10 @@ export const REVIEW_COLUMNS = [
     "rating",
     "body",
     "reply",
+    // Фото у відгуку: панель показує їх поруч із текстом — модерувати
+    // знімок наосліп неможливо, а саме знімок і буває причиною
+    // відхилити.
+    "photos",
     "status",
     "created_at",
     "moderated_at",
@@ -267,6 +271,7 @@ export function reviewView(row) {
         rating: Number(row.rating) || 0,
         body: String(row.body ?? ""),
         reply: row.reply ? String(row.reply) : "",
+        photos: Array.isArray(row.photos) ? row.photos.map(String) : [],
         status,
         statusLabel: REVIEW_STATUSES[status].label,
         statusBadge: REVIEW_STATUSES[status].badge,

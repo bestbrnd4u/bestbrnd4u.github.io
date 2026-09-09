@@ -2,7 +2,7 @@
 
 > Інтернет-магазин оригінальних брендових сумок, взуття та аксесуарів в Україні. Доставка Новою поштою по всій країні, оплата при отриманні, повернення протягом 14 днів.
 
-Товар привозиться з офіційних магазинів США та Європи (байєр-сервіс), тому кожна річ має підтверджене походження. Зараз у каталозі 100 товарів.
+Товар привозиться з офіційних магазинів США та Європи (байєр-сервіс), тому кожна річ має підтверджене походження. Зараз у каталозі 103 товарів.
 
 ## Умови
 
@@ -37,26 +37,27 @@
 
 ### Бренди
 
-- [Adidas by Stella Mccartney](https://bestbrnd4u.com/brands/adidas-by-stella-mccartney/)
-- [Alain Mikli](https://bestbrnd4u.com/brands/alain-mikli/)
-- [Armani Exchange](https://bestbrnd4u.com/brands/armani-exchange/)
-- [Balenciaga](https://bestbrnd4u.com/brands/balenciaga/)
-- [Burberry](https://bestbrnd4u.com/brands/burberry/)
-- [Coach](https://bestbrnd4u.com/brands/coach/)
-- [Gucci](https://bestbrnd4u.com/brands/gucci/)
-- [Invicta](https://bestbrnd4u.com/brands/invicta/)
-- [Jacquemus](https://bestbrnd4u.com/brands/jacquemus/)
-- [Jimmy Choo](https://bestbrnd4u.com/brands/jimmy-choo/)
-- [JW PEI](https://bestbrnd4u.com/brands/jw-pei/)
-- [Lacoste](https://bestbrnd4u.com/brands/lacoste/)
-- [Love Moschino](https://bestbrnd4u.com/brands/love-moschino/)
-- [Marc Jacobs](https://bestbrnd4u.com/brands/marc-jacobs/)
-- [Mathey-Tissot](https://bestbrnd4u.com/brands/mathey-tissot/)
-- [Michael Kors](https://bestbrnd4u.com/brands/michael-kors/)
-- [Prada](https://bestbrnd4u.com/brands/prada/)
-- [Ray-Ban](https://bestbrnd4u.com/brands/ray-ban/)
-- [Saint Laurent](https://bestbrnd4u.com/brands/saint-laurent/)
-- [Tissot](https://bestbrnd4u.com/brands/tissot/)
+- [Adidas by Stella Mccartney](https://dev.bestbrnd4u.com/brands/adidas-by-stella-mccartney/)
+- [Alain Mikli](https://dev.bestbrnd4u.com/brands/alain-mikli/)
+- [Armani Exchange](https://dev.bestbrnd4u.com/brands/armani-exchange/)
+- [Balenciaga](https://dev.bestbrnd4u.com/brands/balenciaga/)
+- [Burberry](https://dev.bestbrnd4u.com/brands/burberry/)
+- [Coach](https://dev.bestbrnd4u.com/brands/coach/)
+- [Gucci](https://dev.bestbrnd4u.com/brands/gucci/)
+- [Invicta](https://dev.bestbrnd4u.com/brands/invicta/)
+- [Jacquemus](https://dev.bestbrnd4u.com/brands/jacquemus/)
+- [Jimmy Choo](https://dev.bestbrnd4u.com/brands/jimmy-choo/)
+- [JW PEI](https://dev.bestbrnd4u.com/brands/jw-pei/)
+- [Lacoste](https://dev.bestbrnd4u.com/brands/lacoste/)
+- [Love Moschino](https://dev.bestbrnd4u.com/brands/love-moschino/)
+- [Marc Jacobs](https://dev.bestbrnd4u.com/brands/marc-jacobs/)
+- [Mathey-Tissot](https://dev.bestbrnd4u.com/brands/mathey-tissot/)
+- [Michael Kors](https://dev.bestbrnd4u.com/brands/michael-kors/)
+- [Prada](https://dev.bestbrnd4u.com/brands/prada/)
+- [Ray-Ban](https://dev.bestbrnd4u.com/brands/ray-ban/)
+- [Saint Laurent](https://dev.bestbrnd4u.com/brands/saint-laurent/)
+- [Tissot](https://dev.bestbrnd4u.com/brands/tissot/)
+- [Tory Burch](https://dev.bestbrnd4u.com/brands/tory-burch/)
 
 ## Машинні дані
 

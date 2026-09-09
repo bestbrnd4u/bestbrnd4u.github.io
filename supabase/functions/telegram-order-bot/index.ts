@@ -3218,6 +3218,115 @@ const REVIEW_LIMITS = {
 // нічого ні наступному покупцеві, ні Google.
 const MIN_BODY = 10;
 
+// Фото у відгуку.
+//
+// ТРИ — бо стільки поміщається в один рядок під відгуком і стільки
+// людина реально знімає: коробка, річ, деталь. Четверте вже ніхто не
+// роздивляється.
+//
+// ПІВТОРА МЕГАБАЙТА — стеля на файл ПІСЛЯ стиснення в браузері
+// (сторінка зменшує знімок до 1400 px і пише JPEG, звідки виходить
+// 150-400 КБ). Межа тут — не бажаний розмір, а захист від того, хто
+// надішле запит повз сторінку.
+//
+// ТИПИ — рівно ті, що вміє віддавати <canvas> і приймає відро
+// сховища. Формати без стиснення (bmp, tiff) і векторні (svg) тут
+// зайві, а svg ще й може містити скрипт.
+const PHOTO_LIMITS = {
+    count: 3,
+    bytes: 1_500_000,
+    types: ["image/jpeg", "image/png", "image/webp"],
+};
+
+// Розширення файлу за типом. Сховище віддає файл із тим Content-Type,
+// який ми поставили, але правильне розширення потрібне Telegram і
+// збереженню «як є».
+const PHOTO_EXTENSIONS = {
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/webp": "webp",
+};
+
+// Розбір одного знімка з data-URL.
+//
+// Сторінка надсилає фото рядком «data:image/jpeg;base64,…» — так воно
+// їде разом з рештою відгуку одним запитом, без окремого сховища
+// напівзавантажених файлів.
+//
+// Повертає { type, base64, bytes } або null. null означає «не годиться»
+// й не пояснює чому: пояснювати нема кому, це не інтерфейс, а межа.
+function parseReviewPhoto(value) {
+
+    const match = String(value ?? "").match(/^data:([a-z/+-]+);base64,([A-Za-z0-9+/=]+)$/);
+
+    if (!match) return null;
+
+    const type = match[1];
+    const base64 = match[2];
+
+    if (!PHOTO_LIMITS.types.includes(type)) return null;
+
+    // Довжина base64 → довжина файлу. Рахуємо саме так, а не
+    // декодуванням: декодувати мегабайтний рядок лише для того, щоб
+    // дізнатись, що він завеликий, — марна робота.
+    const padding = base64.endsWith("==") ? 2 : (base64.endsWith("=") ? 1 : 0);
+    const bytes = Math.floor(base64.length / 4) * 3 - padding;
+
+    if (bytes <= 0 || bytes > PHOTO_LIMITS.bytes) return null;
+
+    return { type: type, base64: base64, bytes: bytes };
+
+}
+
+// Усі знімки відгуку. Зайві мовчки відрізаються, непридатні
+// пропускаються — відгук через фото не пропадає.
+function cleanReviewPhotos(value) {
+
+    if (!Array.isArray(value)) return [];
+
+    return value
+        .map(parseReviewPhoto)
+        .filter(Boolean)
+        .slice(0, PHOTO_LIMITS.count);
+
+}
+
+// Ім'я файлу у сховищі.
+//
+// Випадкове, а не за номером відгуку: відро публічне на читання, і
+// передбачуване ім'я дало б змогу подивитись фото ще до модерації,
+// просто підставивши наступний номер.
+function reviewPhotoName(type, random) {
+
+    const extension = PHOTO_EXTENSIONS[type] || "jpg";
+
+    const key = String(random ?? "").replace(/[^a-z0-9]/gi, "").slice(0, 32);
+
+    return `${key || "photo"}.${extension}`;
+
+}
+
+// Адреса, за якою фото віддається сайту.
+function reviewPhotoUrl(supabaseUrl, name) {
+
+    return `${String(supabaseUrl ?? "").replace(/\/+$/, "")}`
+        + `/storage/v1/object/public/review-photos/${name}`;
+
+}
+
+// Ім'я файлу з адреси — щоб видалити його при відхиленні.
+//
+// Повертає null для будь-чого, що не веде у власне відро: команда на
+// видалення не має права ходити за чужими шляхами.
+function reviewPhotoPath(url) {
+
+    const match = String(url ?? "")
+        .match(/\/storage\/v1\/object\/public\/review-photos\/([A-Za-z0-9._-]+)$/);
+
+    return match ? match[1] : null;
+
+}
+
 
 // -------------------------
 // Телефон
@@ -3302,9 +3411,13 @@ function cleanReview(payload) {
         return { ok: false, reason: "текст коротший за мінімум" };
     }
 
+    // Фото не обов'язкові й не можуть завалити відгук: непридатний
+    // знімок мовчки пропускається, а текст усе одно доїде.
+    const photos = cleanReviewPhotos(payload.photos);
+
     return {
         ok: true,
-        review: { productId, orderNumber, phone, rating, author, body },
+        review: { productId, orderNumber, phone, rating, author, body, photos },
     };
 
 }
@@ -3360,6 +3473,8 @@ function escapeReview(text) {
 // виглядає дивно, номер дає змогу подивитись саму покупку.
 function reviewCard(review, productTitle) {
 
+    const photos = Array.isArray(review.photos) ? review.photos.length : 0;
+
     const lines = [
         `💬 <b>Новий відгук</b> ${stars(review.rating)}`,
         "",
@@ -3370,6 +3485,14 @@ function reviewCard(review, productTitle) {
         `👤 ${escapeReview(review.author)}`,
         `🧾 замовлення <code>${escapeReview(review.orderNumber)}</code>`,
     ];
+
+    // Знімки приходять окремими повідомленнями слідом. Рядок тут
+    // потрібен на випадок, коли вони не доїхали: інакше власник не
+    // знав би, що фото взагалі були, і опублікував би відгук із
+    // порожньою галереєю.
+    if (photos) {
+        lines.push(`📷 фото: ${photos}`);
+    }
 
     return lines.join("\n");
 
@@ -3812,6 +3935,10 @@ const REVIEW_COLUMNS = [
     "rating",
     "body",
     "reply",
+    // Фото у відгуку: панель показує їх поруч із текстом — модерувати
+    // знімок наосліп неможливо, а саме знімок і буває причиною
+    // відхилити.
+    "photos",
     "status",
     "created_at",
     "moderated_at",
@@ -3984,6 +4111,7 @@ function reviewView(row) {
         rating: Number(row.rating) || 0,
         body: String(row.body ?? ""),
         reply: row.reply ? String(row.reply) : "",
+        photos: Array.isArray(row.photos) ? row.photos.map(String) : [],
         status,
         statusLabel: REVIEW_STATUSES[status].label,
         statusBadge: REVIEW_STATUSES[status].badge,
@@ -6236,6 +6364,101 @@ async function productTitle(productId: number): Promise<string> {
 
 }
 
+// -------------------------
+// Фото відгуку у сховищі
+// -------------------------
+//
+// Кладе файли СЛУЖБОВИМ ключем. Дати це право браузеру означало б
+// дати його всім: ключ anon лежить у коді сторінки (пояснення — у
+// міграції 024).
+
+async function uploadReviewPhotos(photos: Array<Record<string, any>>): Promise<string[]> {
+
+  if (!Array.isArray(photos) || !photos.length) return [];
+
+  const urls: string[] = [];
+
+  for (const photo of photos) {
+
+    // Ім'я випадкове: відро публічне на читання, і передбачуване ім'я
+    // дало б змогу подивитись фото ще до модерації.
+    const name = reviewPhotoName(photo.type, crypto.randomUUID().replace(/-/g, ""));
+
+    try {
+
+      const bytes = Uint8Array.from(atob(photo.base64), (char) => char.charCodeAt(0));
+
+      const response = await fetch(
+        `${SUPABASE_URL}/storage/v1/object/review-photos/${name}`,
+        {
+          method: "POST",
+          headers: {
+            apikey: SERVICE_ROLE_KEY,
+            Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+            "Content-Type": photo.type,
+            "Cache-Control": "public, max-age=31536000, immutable",
+          },
+          body: bytes,
+        },
+      );
+
+      if (!response.ok) {
+
+        console.error("Фото відгуку не збереглось:", await response.text());
+
+        continue;
+
+      }
+
+      urls.push(reviewPhotoUrl(SUPABASE_URL, name));
+
+    } catch (error) {
+
+      // Одне зіпсоване фото не має валити весь відгук: текст
+      // цінніший за знімок.
+      console.error("Фото відгуку не збереглось:", error);
+
+    }
+
+  }
+
+  return urls;
+
+}
+
+// Прибирання за відхиленим відгуком.
+//
+// Відро публічне на читання, тож відхилений знімок лишався б
+// доступним за прямим посиланням назавжди. Для випадкового фото це
+// дрібниця, а для того, заради чого відгук і відхилили, — ні.
+async function deleteReviewPhotos(urls: unknown): Promise<void> {
+
+  const names = (Array.isArray(urls) ? urls : [])
+    .map((url) => reviewPhotoPath(url))
+    .filter(Boolean);
+
+  if (!names.length) return;
+
+  try {
+
+    await fetch(`${SUPABASE_URL}/storage/v1/object/review-photos`, {
+      method: "DELETE",
+      headers: {
+        apikey: SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ prefixes: names }),
+    });
+
+  } catch (error) {
+
+    console.error("Не вдалося прибрати фото відгуку:", error);
+
+  }
+
+}
+
 async function handleAddReview(request: Request, body: Record<string, any>): Promise<Response> {
 
   const origin = request.headers.get("origin");
@@ -6272,6 +6495,14 @@ async function handleAddReview(request: Request, body: Record<string, any>): Pro
 
   }
 
+  // Фото — у сховище, ще до запису відгуку.
+  //
+  // Саме в такому порядку: якщо запис не вдасться, у відрі лишиться
+  // кілька нікому не потрібних файлів (це дрібниця), а якщо навпаки —
+  // відгук посилався б на адреси, за якими нічого немає, і власник
+  // побачив би биті картинки в модерації.
+  const photoUrls = await uploadReviewPhotos(review.photos);
+
   const response = await supabaseRest("rpc/add_review", {
     method: "POST",
     body: JSON.stringify({
@@ -6280,6 +6511,7 @@ async function handleAddReview(request: Request, body: Record<string, any>): Pro
       p_author: review.author,
       p_rating: review.rating,
       p_body: review.body,
+      p_photos: photoUrls,
     }),
   });
 
@@ -6333,6 +6565,25 @@ async function handleAddReview(request: Request, body: Record<string, any>): Pro
           owner_message_id: message.message_id,
         }),
       }).then(response => response.text()).catch(() => {});
+    }
+
+    // Знімки — окремим повідомленням слідом.
+    //
+    // НЕ каптіоном до картки: у Telegram підпис до фото обмежений 1024
+    // знаками, а відгук буває до 2000. Текст мовчки обрізався б рівно
+    // тоді, коли він найдовший, тобто найцінніший.
+    //
+    // Відповіддю на картку (reply_to_message_id), щоб у чаті було
+    // видно, до якого саме відгуку ці фото: карток за день буває
+    // кілька.
+    if (photoUrls.length) {
+
+      await telegram("sendMediaGroup", {
+        chat_id: TELEGRAM_CHAT_ID,
+        reply_to_message_id: message?.message_id,
+        media: photoUrls.map((url) => ({ type: "photo", media: url })),
+      });
+
     }
 
   })());
@@ -6408,6 +6659,13 @@ async function handleReviewCallback(callback: Record<string, any>, data: string)
 
     return;
 
+  }
+
+  // Відхилили — прибираємо й самі файли. Відро публічне на читання,
+  // тож інакше знімок лишався б доступним за прямим посиланням
+  // назавжди — саме той, заради якого відгук і відхилили.
+  if (action.status === "rejected") {
+    await deleteReviewPhotos(changed[0]?.photos);
   }
 
   await telegram("answerCallbackQuery", {
@@ -6775,6 +7033,13 @@ async function handleReviewAdmin(body: Record<string, any>, origin: string | nul
       error: "Рішення щойно ухвалили в Telegram — оновіть список.",
     }, 409, origin);
 
+  }
+
+  // Відхилили — прибираємо й самі файли. Те саме, що робить кнопка в
+  // чаті: відро публічне на читання, тож інакше знімок лишався б
+  // доступним за прямим посиланням назавжди.
+  if (params.status === "rejected") {
+    await background(deleteReviewPhotos(updated.photos));
   }
 
   // Картка в чаті мусить показати те саме рішення. Інакше під нею
