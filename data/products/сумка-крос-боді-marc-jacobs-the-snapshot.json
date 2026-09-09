@@ -1,0 +1,66 @@
+{
+  "gender": [
+    "Жінкам"
+  ],
+  "preOrderDays": "5–10 робочих днів",
+  "forcePublish": false,
+  "material": "Шкіра Saffiano",
+  "brand": "Marc Jacobs",
+  "price": 8600,
+  "preOrder": false,
+  "dimensions": "18 × 11 × 6 см",
+  "variants": [
+    {
+      "color": "Чорний",
+      "hex": "#000000",
+      "images": [
+        "/assets/images/products/uploads/marc-jacobs-the-snapshot-black-multi-00523-800x800.webp",
+        "/assets/images/products/uploads/marc-jacobs-the-snapshot-black-multi-additional-image-6626-800x800.webp",
+        "/assets/images/products/uploads/marc-jacobs-the-snapshot-black-multi-additional-image-6629-800x800.webp",
+        "/assets/images/products/uploads/marc-jacobs-the-snapshot-black-multi-additional-image-6627-800x800.webp",
+        "/assets/images/products/uploads/sumka-marc-jacobs-2s3hcr500h03-chornii-0196611092012.webp"
+      ],
+      "description": "Сумка The Snapshot від Marc Jacobs — компактна модель у стильному чорно-білому виконанні з фірмовою подвійною літерою J та контрастною фурнітурою золотистого кольору. Сумка виготовлена зі шкіри Saffiano, добре тримає форму та чудово підходить для повсякденних образів",
+      "sku": "2S3HCR500H03-964"
+    },
+    {
+      "color": "Cement & Multi",
+      "hex": "#cfcbb2",
+      "sku": "2S3HCR500H03-033",
+      "images": [
+        "/assets/images/products/uploads/marj-wy858_v2.webp",
+        "/assets/images/products/uploads/marj-wy858_v1.webp",
+        "/assets/images/products/uploads/marj-wy858_v3.webp",
+        "/assets/images/products/uploads/marj-wy858_v5.webp",
+        "/assets/images/products/uploads/marj-wy858_v6.webp"
+      ],
+      "description": "Сумка The Snapshot від Marc Jacobs у стильному відтінку Cement & Multi. Компактна модель із характерним колор-блок дизайном, фірмовою подвійною літерою J на передній панелі та золотистою фурнітурою. Сумка виготовлена із міцної саф'янової шкіри та чудово підходить для повсякденних образів"
+    }
+  ],
+  "preOrderPrepayment": 50,
+  "strapInfo": "Знімний регульований текстильний ремінь",
+  "sizes": [
+    "Onesize"
+  ],
+  "splitByColor": true,
+  "searchKeywords": [
+    "Marc Jacobs The Snapshot",
+    "Marc Jacobs Snapshot",
+    "2S3HCR500H03-964",
+    "Marc Jacobs Black Multi",
+    "Snapshot Black Multi",
+    "сумка Marc Jacobs",
+    "шкіряна сумка Marc Jacobs",
+    "кросбоді Marc Jacobs",
+    "чорна сумка Marc Jacobs",
+    "жіноча сумка Marc Jacobs."
+  ],
+  "isNew": false,
+  "title": "Сумка крос-боді Marc Jacobs The Snapshot",
+  "soldOut": false,
+  "reviews": 0,
+  "instagramBlock": "general",
+  "description": "Сумка The Snapshot від Marc Jacobs — компактна модель із впізнаваним дизайном та фірмовим подвійним логотипом J Marc на передній панелі.\nСумка виготовлена з міцної саф'янової шкіри, добре тримає форму та має практичний формат для повсякденного використання. Два окремі відділення дозволяють зручно організувати необхідні речі, а знімний регульований ремінь дає можливість носити сумку через плече або кросбоді.",
+  "rating": 5,
+  "category": "Жіночі сумки"
+}
