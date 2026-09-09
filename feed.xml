@@ -3614,5 +3614,37 @@
         <g:price>60.00 UAH</g:price>
       </g:shipping>
     </item>
+    <item>
+      <g:id>102-1</g:id>
+      <title>Жіноча сумочка Tory Burch Miller Top Handle Satchel</title>
+      <description>Стильна та містка сумка Tory Burch Miller у класичному чорному кольорі. Модель виконана з натуральної зернистої шкіри та доповнена фірмовим логотипом Double T, фурнітурою золотистого відтінку та акуратними декоративними швами</description>
+      <link>https://dev.bestbrnd4u.com/p/zhinocha-sumochka-tory-burch-miller-top-handle-satchel/</link>
+      <g:image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/00004.webp?v=d320e4f7</g:image_link>
+      <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/00005.webp?v=2653e835</g:additional_image_link>
+      <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/00006.webp?v=219e9115</g:additional_image_link>
+      <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/00003.webp?v=09a774af</g:additional_image_link>
+      <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/rtlaal924401_14742030_9_v1_2x.webp?v=4b3b5db1</g:additional_image_link>
+      <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/rtlaal924401_14742029_10_v1_2x.webp?v=1f00ac9a</g:additional_image_link>
+      <g:availability>in_stock</g:availability>
+      <g:price>9000.00 UAH</g:price>
+      <g:brand>Tory Burch</g:brand>
+      <g:condition>new</g:condition>
+      <g:mpn>79329</g:mpn>
+      <g:item_group_id>102</g:item_group_id>
+      <g:color>Чорний</g:color>
+      <g:material>Натуральна зерниста шкіра</g:material>
+      <g:product_highlight>Розміри: 28 × 19,5 × 13,5 см</g:product_highlight>
+      <g:product_highlight>Дві верхні ручки — для носіння сумки в руці. Знімний регульований ремінь — для носіння на плечі або кросбоді</g:product_highlight>
+      <g:product_highlight>Застібка: Магнітна</g:product_highlight>
+      <g:gender>female</g:gender>
+      <g:age_group>adult</g:age_group>
+      <g:google_product_category>3032</g:google_product_category>
+      <g:product_type>Сумки &gt; Жіночі сумки</g:product_type>
+      <g:shipping>
+        <g:country>UA</g:country>
+        <g:price>60.00 UAH</g:price>
+      </g:shipping>
+      <g:custom_label_0>новинка</g:custom_label_0>
+    </item>
   </channel>
 </rss>
