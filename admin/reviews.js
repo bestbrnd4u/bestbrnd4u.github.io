@@ -248,6 +248,29 @@
 
     }
 
+    // Фото покупця — прямо в картці модерації.
+    //
+    // Без них рішення довелось би ухвалювати наосліп, а знімок і буває
+    // причиною відхилити: чуже фото з інтернету, випадкове селфі,
+    // видно квартиру.
+    //
+    // Відкриваються в новій вкладці на повний розмір: у мініатюрі 96
+    // px не видно ні різкості, ні того, що саме там у кутку.
+    function reviewPhotos(review) {
+
+        const list = Array.isArray(review.photos) ? review.photos.filter(Boolean) : [];
+
+        if (!list.length) return "";
+
+        return '<div class="shots">'
+            + list.map((url, index) =>
+                `<a class="shot" href="${esc(url)}" target="_blank" rel="noopener">`
+                + `<img src="${esc(url)}" alt="Фото ${index + 1}" loading="lazy">`
+                + "</a>").join("")
+            + "</div>";
+
+    }
+
     function reviewCard(review) {
 
         const title = state.titles[String(review.productId)] || "";
@@ -274,6 +297,8 @@
                 : `<span class="what">Товар #${esc(review.productId)}</span>`)
 
             + `<p class="body">${esc(review.body)}</p>`
+
+            + reviewPhotos(review)
 
             + '<div class="meta">'
             // Номер замовлення не для краси: якщо відгук виглядає

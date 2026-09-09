@@ -194,7 +194,7 @@ window.PRODUCT_TEXTS = {"onlyOneTitle":"Єдиний екземпляр.","onlyO
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=2f1f9a04">
+<link rel="stylesheet" href="/assets/css/style.css?v=bf44aba4">
 
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"></script>
@@ -456,14 +456,21 @@ BestBrnd4u
 
                          Перелік тут мусить збігатися з тим, що справді
                          віддає база: функція product_reviews() повертає
-                         author, rating, body, reply, created_at — і
-                         більше нічого (див. supabase/migrations/
-                         019-reviews.sql). -->
+                         author, rating, body, reply, photos, created_at
+                         — і більше нічого (див. supabase/migrations/
+                         019-reviews.sql і 024-review-photos.sql).
+
+                         ФОТО В ЦЕЙ ПЕРЕЛІК ДОДАНО НАВМИСНО. Вони
+                         справді стають публічними, і сказати про це до
+                         того, як людина прикріпить знімок, — не
+                         формальність: на фото речі часто видно
+                         квартиру. -->
                     <p class="review-privacy">
-                        На сторінці буде видно <b>лише ім'я, оцінку й текст
-                        відгуку</b>. Номер замовлення й телефон потрібні,
-                        щоб переконатися, що ви справді купували цей товар —
-                        вони не показуються ні тут, ні будь-де на сайті.
+                        На сторінці буде видно <b>ім'я, оцінку, текст відгуку
+                        й фото</b>, якщо ви їх додасте. Номер замовлення й
+                        телефон потрібні, щоб переконатися, що ви справді
+                        купували цей товар — вони не показуються ні тут, ні
+                        будь-де на сайті.
                     </p>
 
                     <p class="review-group">Для перевірки покупки</p>
@@ -494,6 +501,35 @@ BestBrnd4u
                                   placeholder="Що сподобалось, що ні, чи збігся розмір і колір"
                                   required></textarea>
                     </label>
+
+                    <!-- ФОТО. Найсильніший доказ на цій полиці: знімок
+                         покупця показує ту саму річ при звичайному
+                         світлі, а не в студії — і відповідає на «чи це
+                         не підробка» переконливіше за будь-який текст
+                         магазину. Заодно закриває «а який він
+                         насправді на колір».
+
+                         capture НЕ ставимо: на телефоні це відкривало б
+                         одразу камеру, а знімок зазвичай уже в галереї.
+
+                         Стиснення — у браузері (assets/js/reviews.js):
+                         фото з телефона важить 3-5 МБ, і надсилати їх
+                         як є означало б довге очікування на мобільному
+                         інтернеті. -->
+                    <div class="review-field review-photos-field">
+                        <span>Фото (необов'язково)</span>
+                        <p class="review-photos-hint">
+                            До трьох знімків. Вони будуть видні всім —
+                            і саме вони найбільше допомагають наступному
+                            покупцеві.
+                        </p>
+                        <input type="file" id="reviewPhotos" accept="image/jpeg,image/png,image/webp"
+                               multiple hidden>
+                        <button type="button" class="btn btn-outline review-photos-add" id="reviewPhotosAdd">
+                            Додати фото
+                        </button>
+                        <div class="review-photos-preview" id="reviewPhotosPreview"></div>
+                    </div>
 
                     <button type="submit" class="btn" id="reviewSubmit">Надіслати відгук</button>
 
@@ -759,7 +795,7 @@ BestBrnd4u
 <script src="/assets/js/product.js?v=ec87f2dd"></script>
 
 <!-- Відгуки: показ, форма й перевірка покупки на сервері -->
-<script src="/assets/js/reviews.js?v=41a0316a"></script>
+<script src="/assets/js/reviews.js?v=5ae0d8c6"></script>
 
 </body>
 

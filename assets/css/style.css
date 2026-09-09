@@ -13397,6 +13397,63 @@ body.refusal-open{
     white-space:pre-line;
 }
 
+/* -- фото покупця під відгуком --
+
+   Квадратні мініатюри в ряд: різна висота знімків рвала б рядок
+   відгуків на нерівні шматки, а обрізання по центру для фото речі
+   майже завжди влучає в саму річ.
+
+   Ряд прокручується вбік, а не переноситься: трьох знімків досить,
+   щоб на вузькому екрані вони стали завширшки з ніготь. */
+.review-photos{
+    display:flex;
+    gap:8px;
+    margin-top:12px;
+    overflow-x:auto;
+    /* Смуга прокрутки з'їдала б нижній край знімка. */
+    padding-bottom:2px;
+    scrollbar-width:none;
+}
+
+.review-photos::-webkit-scrollbar{
+    display:none;
+}
+
+.review-photo{
+    flex:0 0 auto;
+    width:96px;
+    height:96px;
+    border-radius:12px;
+    overflow:hidden;
+    background:var(--gray100);
+    transition:transform 160ms ease;
+}
+
+.review-photo img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+}
+
+@media (hover:hover) and (pointer:fine){
+.review-photo:hover{
+    transform:scale(1.03);
+}
+
+/* З мишею :hover і :active мають однакову вагу, і вирішує порядок у
+   файлі. Без цього рядка натискання під курсором або не діяло б, або
+   діяло випадково — залежно від того, куди переїде блок при
+   редагуванні. */
+.review-photo:hover:active{
+    transform:scale(.97);
+}
+}
+
+.review-photo:active{
+    transform:scale(.97);
+}
+
 /* Відповідь магазину. Зсунута й на світлому тлі — щоб було
    видно, що це вже не покупець. */
 .review-reply{
@@ -13524,6 +13581,76 @@ body.refusal-open{
     font-size:13px;
     font-weight:600;
     color:var(--gray900);
+}
+
+/* -- прикріплення фото у формі -- */
+
+.review-photos-hint{
+    margin:0;
+    font-size:13px;
+    line-height:1.5;
+    color:var(--gray500);
+}
+
+/* Кнопка не на всю ширину: поруч із нею стають мініатюри, і
+   розтягнута вона виглядала б як головна дія форми — а головна тут
+   «Надіслати відгук». */
+.review-photos-add{
+    align-self:flex-start;
+    width:auto;
+    padding:9px 16px;
+    font-size:14px;
+}
+
+.review-photos-preview{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+}
+
+.review-photos-preview:empty{
+    display:none;
+}
+
+.review-photo-item{
+    position:relative;
+    width:76px;
+    height:76px;
+    border-radius:10px;
+    overflow:hidden;
+    background:var(--gray100);
+}
+
+.review-photo-item img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+}
+
+/* Хрестик поверх кута знімка. Завжди видимий, а не на ховері: на
+   телефоні ховера немає, і прибрати випадкове фото було б нічим. */
+.review-photo-remove{
+    position:absolute;
+    top:4px;
+    right:4px;
+    width:22px;
+    height:22px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:50%;
+    background:rgba(17,24,39,.72);
+    color:#fff;
+    font-size:12px;
+    line-height:1;
+    transition:background-color 160ms ease;
+}
+
+@media (hover:hover) and (pointer:fine){
+.review-photo-remove:hover{
+    background:rgba(17,24,39,.92);
+}
 }
 
 .review-field input,

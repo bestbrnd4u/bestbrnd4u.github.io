@@ -57,6 +57,7 @@ import {
 import {
   cleanReview, orderHasProduct, reviewCard, reviewKeyboard,
   parseReviewAction, reviewVerdictLine, reviewPhoneMatches,
+  reviewPhotoName, reviewPhotoUrl, reviewPhotoPath,
 } from "./reviews.js";
 
 // Панель «Відгуки» в адмінці — другий спосіб модерації поруч із
@@ -2259,6 +2260,101 @@ async function productTitle(productId: number): Promise<string> {
 
 }
 
+// -------------------------
+// Фото відгуку у сховищі
+// -------------------------
+//
+// Кладе файли СЛУЖБОВИМ ключем. Дати це право браузеру означало б
+// дати його всім: ключ anon лежить у коді сторінки (пояснення — у
+// міграції 024).
+
+async function uploadReviewPhotos(photos: Array<Record<string, any>>): Promise<string[]> {
+
+  if (!Array.isArray(photos) || !photos.length) return [];
+
+  const urls: string[] = [];
+
+  for (const photo of photos) {
+
+    // Ім'я випадкове: відро публічне на читання, і передбачуване ім'я
+    // дало б змогу подивитись фото ще до модерації.
+    const name = reviewPhotoName(photo.type, crypto.randomUUID().replace(/-/g, ""));
+
+    try {
+
+      const bytes = Uint8Array.from(atob(photo.base64), (char) => char.charCodeAt(0));
+
+      const response = await fetch(
+        `${SUPABASE_URL}/storage/v1/object/review-photos/${name}`,
+        {
+          method: "POST",
+          headers: {
+            apikey: SERVICE_ROLE_KEY,
+            Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+            "Content-Type": photo.type,
+            "Cache-Control": "public, max-age=31536000, immutable",
+          },
+          body: bytes,
+        },
+      );
+
+      if (!response.ok) {
+
+        console.error("Фото відгуку не збереглось:", await response.text());
+
+        continue;
+
+      }
+
+      urls.push(reviewPhotoUrl(SUPABASE_URL, name));
+
+    } catch (error) {
+
+      // Одне зіпсоване фото не має валити весь відгук: текст
+      // цінніший за знімок.
+      console.error("Фото відгуку не збереглось:", error);
+
+    }
+
+  }
+
+  return urls;
+
+}
+
+// Прибирання за відхиленим відгуком.
+//
+// Відро публічне на читання, тож відхилений знімок лишався б
+// доступним за прямим посиланням назавжди. Для випадкового фото це
+// дрібниця, а для того, заради чого відгук і відхилили, — ні.
+async function deleteReviewPhotos(urls: unknown): Promise<void> {
+
+  const names = (Array.isArray(urls) ? urls : [])
+    .map((url) => reviewPhotoPath(url))
+    .filter(Boolean);
+
+  if (!names.length) return;
+
+  try {
+
+    await fetch(`${SUPABASE_URL}/storage/v1/object/review-photos`, {
+      method: "DELETE",
+      headers: {
+        apikey: SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ prefixes: names }),
+    });
+
+  } catch (error) {
+
+    console.error("Не вдалося прибрати фото відгуку:", error);
+
+  }
+
+}
+
 async function handleAddReview(request: Request, body: Record<string, any>): Promise<Response> {
 
   const origin = request.headers.get("origin");
@@ -2295,6 +2391,14 @@ async function handleAddReview(request: Request, body: Record<string, any>): Pro
 
   }
 
+  // Фото — у сховище, ще до запису відгуку.
+  //
+  // Саме в такому порядку: якщо запис не вдасться, у відрі лишиться
+  // кілька нікому не потрібних файлів (це дрібниця), а якщо навпаки —
+  // відгук посилався б на адреси, за якими нічого немає, і власник
+  // побачив би биті картинки в модерації.
+  const photoUrls = await uploadReviewPhotos(review.photos);
+
   const response = await supabaseRest("rpc/add_review", {
     method: "POST",
     body: JSON.stringify({
@@ -2303,6 +2407,7 @@ async function handleAddReview(request: Request, body: Record<string, any>): Pro
       p_author: review.author,
       p_rating: review.rating,
       p_body: review.body,
+      p_photos: photoUrls,
     }),
   });
 
@@ -2356,6 +2461,25 @@ async function handleAddReview(request: Request, body: Record<string, any>): Pro
           owner_message_id: message.message_id,
         }),
       }).then(response => response.text()).catch(() => {});
+    }
+
+    // Знімки — окремим повідомленням слідом.
+    //
+    // НЕ каптіоном до картки: у Telegram підпис до фото обмежений 1024
+    // знаками, а відгук буває до 2000. Текст мовчки обрізався б рівно
+    // тоді, коли він найдовший, тобто найцінніший.
+    //
+    // Відповіддю на картку (reply_to_message_id), щоб у чаті було
+    // видно, до якого саме відгуку ці фото: карток за день буває
+    // кілька.
+    if (photoUrls.length) {
+
+      await telegram("sendMediaGroup", {
+        chat_id: TELEGRAM_CHAT_ID,
+        reply_to_message_id: message?.message_id,
+        media: photoUrls.map((url) => ({ type: "photo", media: url })),
+      });
+
     }
 
   })());
@@ -2431,6 +2555,13 @@ async function handleReviewCallback(callback: Record<string, any>, data: string)
 
     return;
 
+  }
+
+  // Відхилили — прибираємо й самі файли. Відро публічне на читання,
+  // тож інакше знімок лишався б доступним за прямим посиланням
+  // назавжди — саме той, заради якого відгук і відхилили.
+  if (action.status === "rejected") {
+    await deleteReviewPhotos(changed[0]?.photos);
   }
 
   await telegram("answerCallbackQuery", {
@@ -2798,6 +2929,13 @@ async function handleReviewAdmin(body: Record<string, any>, origin: string | nul
       error: "Рішення щойно ухвалили в Telegram — оновіть список.",
     }, 409, origin);
 
+  }
+
+  // Відхилили — прибираємо й самі файли. Те саме, що робить кнопка в
+  // чаті: відро публічне на читання, тож інакше знімок лишався б
+  // доступним за прямим посиланням назавжди.
+  if (params.status === "rejected") {
+    await background(deleteReviewPhotos(updated.photos));
   }
 
   // Картка в чаті мусить показати те саме рішення. Інакше під нею
