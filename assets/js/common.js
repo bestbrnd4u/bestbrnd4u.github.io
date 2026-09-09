@@ -1627,6 +1627,117 @@ function matchesQuery(product, q) {
 
 }
 
+// -------------------------
+// Пошук за артикулом
+// -------------------------
+//
+// ЩО БУЛО НЕ ТАК. Артикул каталогу («95», «28-1») бачить покупець: він
+// стоїть на сторінці товару, ним відповідає підтримка, і саме його
+// підставляє форма контактів — «Питання про товар: … (артикул 28-1)».
+// А пошук по ньому не працював: полів з кодом у searchHaystack немає.
+//
+// Заміряно на справжньому каталозі: із 231 артикулу (товари плюс
+// кольори) свій товар не знаходив НІ ОДИН. 198 давали нуль
+// результатів, а 33 — лише ЧУЖІ товари: запит «5» повертав 7
+// сторонніх (числа трапляються в габаритах і назвах моделей), і
+// потрібного годинника серед них не було. Тобто людина отримувала
+// або порожнечу, або впевнену неправильну відповідь.
+//
+// Коди виробника: із 157 сто не знаходились узагалі.
+//
+// ЯК ЦЕ ПРАЦЮЄ. Код — не слово, і в одну купу зі словами його
+// зсипати не можна: цифри збігаються всередині чужих описів, а
+// вкорочування закінчень на кодах узагалі позбавлене сенсу. Тому
+// збіг за кодом перевіряється ОКРЕМО й вимагає ТОЧНОЇ рівності.
+//
+// Якщо код збігся — показуємо лише його: людина, яка вводить
+// артикул, шукає одну конкретну річ, а не «щось схоже на неї».
+function normalizeCode(value) {
+
+    return String(value || "").trim().toLowerCase();
+
+}
+
+// Те саме без розділових знаків: код виробника переписують і як
+// «BB0096S-001-51», і як «BB0096S 001 51», і суцільним рядком.
+function squashCode(value) {
+
+    return normalizeCode(value).replace(/[^\p{L}\p{N}]+/gu, "");
+
+}
+
+// Коди одного товару.
+//
+// Два набори, а не один. exact — артикули каталогу («28», «28-1»): їх
+// порівнюємо символ у символ, бо викинути з «28-1» дефіс означало б
+// зрівняти його з артикулом «281». loose — коди виробника, де
+// розділові знаки якраз і плавають від джерела до джерела.
+function productCodes(product) {
+
+    const exact = new Set();
+    const loose = new Set();
+
+    const add = (value, alsoLoose) => {
+
+        const code = normalizeCode(value);
+
+        if (!code) return;
+
+        exact.add(code);
+
+        if (alsoLoose) loose.add(squashCode(value));
+
+    };
+
+    add(product.article, false);
+    add(product.sku, true);
+
+    (product.variants || []).forEach(variant => {
+
+        add(variant.article, false);
+        add(variant.sku, true);
+
+    });
+
+    return { exact: exact, loose: loose };
+
+}
+
+// Артикула без цифри не буває — а слів із цифрою скільки завгодно.
+// Ця перевірка не пускає в порівняння кодів звичайні запити.
+function looksLikeCode(q) {
+
+    return /\p{N}/u.test(String(q || ""));
+
+}
+
+function matchesCode(product, q) {
+
+    if (!looksLikeCode(q)) return false;
+
+    const codes = productCodes(product);
+
+    return codes.exact.has(normalizeCode(q))
+        || codes.loose.has(squashCode(q));
+
+}
+
+// Відбір за запитом — ОДИН на весь сайт: і пошукова панель, і
+// каталог кличуть саме його. Раніше кожен з них сам звав
+// matchesQuery(), і додати пошук за кодом в одному місці означало б
+// забути про друге.
+function searchProducts(list, q) {
+
+    const all = list || [];
+
+    const byCode = all.filter(product => matchesCode(product, q));
+
+    if (byCode.length) return byCode;
+
+    return all.filter(product => matchesQuery(product, q));
+
+}
+
 async function runGlobalSearch(query) {
 
     const idleState = document.getElementById("searchIdleState");
@@ -1651,7 +1762,7 @@ async function runGlobalSearch(query) {
 
     await getProductById(-1); // гарантовано підвантажує cachedProducts
 
-    const matches = (cachedProducts || []).filter(product => matchesQuery(product, q));
+    const matches = searchProducts(cachedProducts || [], q);
 
     // Статистика: що шукають і чи знаходять.
     //

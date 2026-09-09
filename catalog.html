@@ -27,7 +27,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
 
-<link rel="stylesheet" href="assets/css/style.css?v=83663c99">
+<link rel="stylesheet" href="assets/css/style.css?v=6ac42da3">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"></script>
 
@@ -128,6 +128,25 @@ placeholder="Пошук товару...">
 </div>
 </div>
 
+<!-- «Тільки в наявності».
+
+     Майже кожен четвертий товар магазин привозить під замовлення
+     (29 зі 102 на 09.09.2026), і в каталозі вони стоять поруч із
+     тим, що лежить на складі. Бейдж «Під замовлення» на картці є, а
+     звузити список до готового до відправки не було чим: людині,
+     якій річ потрібна на цих вихідних, доводилось перебирати всі
+     картки очима.
+
+     Кількість у написі рахується так само, як решта фасетів: з
+     урахуванням інших фільтрів, але БЕЗ самого себе. -->
+<div class="filter-group filter-stock">
+<button type="button" id="stockToggle" class="stock-toggle" aria-pressed="false">
+<span class="stock-toggle-box" aria-hidden="true"></span>
+<span class="stock-toggle-label">Тільки в наявності</span>
+<span class="stock-toggle-count" id="stockCount"></span>
+</button>
+</div>
+
 <div class="filter-group filter-dropdown" id="categoryDropdown">
 <button type="button" id="categoryToggle" class="filter-toggle">
 <span id="categoryLabel">Категорія</span>
@@ -218,6 +237,17 @@ placeholder="Пошук товару...">
 </div>
 
 <div class="mobile-filters-rows" id="mobileFiltersRows">
+<!-- Перемикач на місці, а не «провалювання» в підменю: для одного
+     «так/ні» окремий екран — це два дотики замість одного, та ще й з
+     поверненням назад. Решта рядків веде в підменю, бо там є що
+     обирати. -->
+<button type="button" class="mobile-filter-row mobile-filter-row-switch" id="mfStockRow" aria-pressed="false">
+<span>Тільки в наявності</span>
+<span class="mobile-filter-row-right">
+<span class="mobile-filter-row-value" id="mfRowStock"></span>
+<span class="mobile-filter-switch" aria-hidden="true"></span>
+</span>
+</button>
 <button type="button" class="mobile-filter-row" data-target="category">
 <span>Категорія</span>
 <span class="mobile-filter-row-right">
@@ -576,7 +606,7 @@ aria-label="Нагору">
 <!-- Транслітерація: каталог кладе латиницю в адресу фільтра.
      Той самий файл використовує збірка для адрес товарів. -->
 <script src="assets/js/translit.js?v=c0957cb7"></script>
-<script src="assets/js/common.js?v=47033522"></script>
+<script src="assets/js/common.js?v=27bb0648"></script>
 <!-- Підписка на листи магазину -->
 <script src="assets/js/subscribe.js?v=2367ff9d"></script>
 <script src="assets/js/promo-popup.js?v=2317f6f3"></script>
@@ -585,7 +615,7 @@ aria-label="Нагору">
 <script src="assets/js/ui.js?v=4dba4bc7"></script>
 <script src="assets/js/stock.js?v=85fa4aad"></script>
 <script src="assets/js/live-stock.js?v=ca9027dd"></script>
-<script src="assets/js/catalog.js?v=9b7769ca"></script>
+<script src="assets/js/catalog.js?v=d3f3852b"></script>
 </body>
 
 </html>
