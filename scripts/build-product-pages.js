@@ -486,7 +486,10 @@ function buildHead(product) {
         mpn: sanitizeSku(product.sku, product.sku ? (product.slug || product.title) : "") || undefined,
         brand: product.brand ? { "@type": "Brand", name: product.brand } : undefined,
         category: product.category || undefined,
-        offers: offerFor(product, url)
+        // Строки доставки з адмінки — і в розмітку теж. Без них тут
+        // стояли б запасні числа модуля, а видимий рядок на сторінці
+        // показував би змінені: дві різні обіцянки в одному файлі.
+        offers: offerFor(product, url, undefined, productTexts())
     };
 
     // рейтинг додаємо ЛИШЕ якщо він реальний: вигадана розмітка

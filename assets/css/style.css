@@ -5127,8 +5127,92 @@ body.mobile-filters-open .scroll-top{
 
 .product-meta-line{
     margin-top:-12px;
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:8px;
     font-size:13px;
     color:var(--gray500);
+}
+
+/* -- дві дії в рядку під назвою: скопіювати артикул і поділитися --
+
+   Виглядають як текст, а не як кнопки: це підпис, і повноцінні кнопки
+   поруч із назвою товару перетягували б увагу з ціни й «Купити».
+   Рамка з'являється на ховері — тобто рівно тоді, коли людина вже
+   зрозуміла, що сюди можна тиснути. */
+
+.meta-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:4px 8px;
+    margin-left:-8px;
+    border:1px solid transparent;
+    border-radius:9px;
+    font-size:13px;
+    color:var(--gray500);
+    transition:background-color 160ms ease,
+               border-color 160ms ease,
+               color 160ms ease;
+}
+
+/* Від'ємний відступ прибирає лише в першої: інакше друга кнопка
+   присувалась би до першої впритул. */
+.meta-chip + .meta-chip{
+    margin-left:0;
+}
+
+@media (hover:hover) and (pointer:fine){
+.meta-chip:hover{
+    border-color:var(--gray200);
+    background:var(--gray50);
+    color:var(--gray900);
+}
+}
+
+.meta-chip:active{
+    background:var(--gray100);
+}
+
+/* Спільна геометрія обох значків. Колір ліній сюди НЕ входить: він у
+   них різний, і другим правилом на той самий селектор його
+   перебивати не можна — за цим стежить test-accessibility-floor
+   (правило, яке перевизначає себе позицією, ламається від будь-якого
+   перенесення блоку). */
+.meta-chip-icon,
+.meta-chip-done{
+    width:14px;
+    height:14px;
+    flex-shrink:0;
+    fill:none;
+    stroke-width:2;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+}
+
+.meta-chip-icon{
+    stroke:currentColor;
+}
+
+/* Галочка підміняє значок на час підтвердження. Абсолютне
+   позиціювання тут зайве: обидва однакового розміру, тож досить
+   показати один і сховати другий — рядок не смикається. */
+.meta-chip-done{
+    display:none;
+    stroke:#15803d;
+}
+
+.meta-chip.done{
+    color:#15803d;
+}
+
+.meta-chip.done .meta-chip-icon{
+    display:none;
+}
+
+.meta-chip.done .meta-chip-done{
+    display:block;
 }
 
 .price-box{

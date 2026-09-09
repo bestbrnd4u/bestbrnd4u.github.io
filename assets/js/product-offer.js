@@ -64,12 +64,65 @@
     // самий, що на сторінці «Оплата і доставка».
     var SHIPPING_RATE_UAH = 60;
 
-    // 1–2 дні на збірку + 1–3 дні доставки Новою поштою по Україні —
-    // ті самі строки, що на сторінці «Оплата і доставка».
+    // Строки доставки — ОДИН набір чисел на весь сайт.
     //
+    // 1–2 дні на збірку (магазин пакує й передає перевізнику) + 1–3 дні
+    // самої Нової пошти по Україні. Ті самі строки, що на сторінці
+    // «Оплата і доставка».
+    //
+    // ЧОМУ ЦЕ ОДНЕ МІСЦЕ. Ці чотири числа читають одразу троє:
+    // розмітка Offer (тут же, нижче), видимий рядок на сторінці товару
+    // («у відділенні 11–13 вересня») і сторінка «Оплата і доставка».
+    // Поки вони жили лише в розмітці, видимий рядок казав своє —
+    // «Доставка по Україні 1–3 дні», тобто без днів на збірку. Дві
+    // різні обіцянки на одній сторінці.
+    //
+    // Змінюються з адмінки: «Тексти на сторінці товару» → блок
+    // «Строки доставки». Значення звідти приходять у deliveryTerms(),
+    // а тут лишається запас на випадок, коли файл не завантажився.
+    var DELIVERY = {
+        handlingMin: 1,
+        handlingMax: 2,
+        transitMin: 1,
+        transitMax: 3
+    };
+
+    // Числа з адмінки поверх запасних. Береться лише те, що справді
+    // число більше нуля: порожнє поле в адмінці не має обнуляти строк.
+    function deliveryTerms(overrides) {
+
+        var out = {
+            handlingMin: DELIVERY.handlingMin,
+            handlingMax: DELIVERY.handlingMax,
+            transitMin: DELIVERY.transitMin,
+            transitMax: DELIVERY.transitMax
+        };
+
+        if (!overrides) return out;
+
+        Object.keys(out).forEach(function (key) {
+
+            var value = Number(overrides[key]);
+
+            if (Number.isFinite(value) && value > 0) out[key] = Math.round(value);
+
+        });
+
+        // Переплутані місцями «від» і «до» дали б діапазон навпаки
+        // («у відділенні 13–11 вересня»). Тихо міняємо, а не падаємо:
+        // помилка в адмінці не має ламати сторінку товару.
+        if (out.handlingMin > out.handlingMax) out.handlingMax = out.handlingMin;
+        if (out.transitMin > out.transitMax) out.transitMax = out.transitMin;
+
+        return out;
+
+    }
+
     // Ставка стоїть беззастережно і від ціни товару не залежить: саме
     // умова «якщо ціна більша за поріг» і ставила колись нуль.
-    function shippingDetails() {
+    function shippingDetails(overrides) {
+
+        var terms = deliveryTerms(overrides);
 
         return {
             "@type": "OfferShippingDetails",
@@ -81,14 +134,14 @@
                 "@type": "ShippingDeliveryTime",
                 handlingTime: {
                     "@type": "QuantitativeValue",
-                    minValue: 1,
-                    maxValue: 2,
+                    minValue: terms.handlingMin,
+                    maxValue: terms.handlingMax,
                     unitCode: "DAY"
                 },
                 transitTime: {
                     "@type": "QuantitativeValue",
-                    minValue: 1,
-                    maxValue: 3,
+                    minValue: terms.transitMin,
+                    maxValue: terms.transitMax,
                     unitCode: "DAY"
                 }
             },
@@ -98,6 +151,106 @@
                 currency: "UAH"
             }
         };
+
+    }
+
+    // -------------------------
+    // Коли річ буде у відділенні
+    // -------------------------
+    //
+    // ЧОГО БРАКУВАЛО. На сторінці товару стояло «Доставка по Україні
+    // 1–3 дні». Це і неточно (днів на збірку там немає), і головне —
+    // покупець мусить рахувати сам, а «1–3 дні» від чого? Від
+    // замовлення? Від відправки? Конкретна дата знімає це питання й
+    // прибирає найпоширенішу причину написати в дірект «а коли
+    // прийде?».
+    //
+    // ЯК РАХУЄМО. Збірка — у РОБОЧІ дні: магазин пакує з понеділка по
+    // пʼятницю. Сама доставка — у КАЛЕНДАРНІ: відділення Нової пошти
+    // працюють і в суботу, тож викидати вихідні з дороги означало б
+    // називати дату пізнішу за справжню.
+    //
+    // Свят тут навмисно немає. Список державних свят треба
+    // підтримувати руками, а забутий список гірший за його
+    // відсутність: він тихо називає неправильні дати. Слово
+    // «орієнтовно» в тексті чесніше.
+    var UA_MONTHS_GENITIVE = [
+        "січня", "лютого", "березня", "квітня", "травня", "червня",
+        "липня", "серпня", "вересня", "жовтня", "листопада", "грудня"
+    ];
+
+    function addWorkdays(date, days) {
+
+        var out = new Date(date.getTime());
+
+        var left = days;
+
+        while (left > 0) {
+
+            out.setDate(out.getDate() + 1);
+
+            var weekday = out.getDay();
+
+            // 0 — неділя, 6 — субота.
+            if (weekday !== 0 && weekday !== 6) left--;
+
+        }
+
+        return out;
+
+    }
+
+    function addDays(date, days) {
+
+        var out = new Date(date.getTime());
+
+        out.setDate(out.getDate() + days);
+
+        return out;
+
+    }
+
+    // Найраніша й найпізніша дата отримання.
+    function deliveryWindow(overrides, from) {
+
+        var terms = deliveryTerms(overrides);
+
+        var start = from ? new Date(from) : new Date();
+
+        return {
+            from: addDays(addWorkdays(start, terms.handlingMin), terms.transitMin),
+            to: addDays(addWorkdays(start, terms.handlingMax), terms.transitMax)
+        };
+
+    }
+
+    // «11–13 вересня», «30 вересня – 2 жовтня», «11 вересня».
+    //
+    // Місяць пишемо словом і в родовому відмінку: «11.09–13.09»
+    // читається як телефонний номер, а «11–13 вересня» — як речення.
+    function formatDeliveryRange(window) {
+
+        var from = window.from;
+        var to = window.to;
+
+        var fromDay = from.getDate();
+        var toDay = to.getDate();
+
+        var fromMonth = UA_MONTHS_GENITIVE[from.getMonth()];
+        var toMonth = UA_MONTHS_GENITIVE[to.getMonth()];
+
+        if (fromDay === toDay && fromMonth === toMonth) {
+            return fromDay + " " + toMonth;
+        }
+
+        // Один місяць — назва один раз: «11–13 вересня».
+        if (fromMonth === toMonth) {
+            return fromDay + "–" + toDay + " " + toMonth;
+        }
+
+        // Через межу місяця — обидві назви, з пробілами навколо тире:
+        // «30 вересня – 2 жовтня» без них злипається в «вересня–2».
+        return fromDay + " " + fromMonth + " – " + toDay + " " + toMonth;
 
     }
 
@@ -140,7 +293,12 @@
 
     // Порядок полів тут — той самий, що був у статичних сторінках, щоб
     // перехід на спільний модуль не переписав усі сто файлів заново.
-    function offerFor(product, url, from) {
+    //
+    // terms — строки з адмінки (data/product-texts.json). Передають їх
+    // ОБИДВА виклики, і генератор, і рантайм: інакше в розмітці стояли
+    // б запасні числа, а покупець читав би змінені — тобто рівно та
+    // розбіжність, заради усунення якої цей модуль і зроблено.
+    function offerFor(product, url, from, terms) {
 
         return {
             "@type": "Offer",
@@ -150,7 +308,7 @@
             priceValidUntil: priceValidUntil(from),
             itemCondition: "https://schema.org/NewCondition",
             hasMerchantReturnPolicy: RETURN_POLICY,
-            shippingDetails: shippingDetails(),
+            shippingDetails: shippingDetails(terms),
             availability: availabilityOf(product)
         };
 
@@ -159,6 +317,10 @@
     root.ProductOffer = {
         RETURN_POLICY: RETURN_POLICY,
         SHIPPING_RATE_UAH: SHIPPING_RATE_UAH,
+        DELIVERY: DELIVERY,
+        deliveryTerms: deliveryTerms,
+        deliveryWindow: deliveryWindow,
+        formatDeliveryRange: formatDeliveryRange,
         shippingDetails: shippingDetails,
         priceValidUntil: priceValidUntil,
         availabilityOf: availabilityOf,

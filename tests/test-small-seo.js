@@ -294,8 +294,83 @@ console.log("\n[6] Правка живе у збірці, а не руками")
         && /length < 10/.test(legalSrc));
 }
 
+console.log("\n[7] Маніфест застосунку");
+{
+    // ЧОГО БРАКУВАЛО. theme-color, favicon і apple-touch-icon на
+    // сторінках були, а самого маніфесту — ні. Тобто «Додати на
+    // головний екран» давало ярлик без назви й без нормальної іконки,
+    // а Android не пропонував встановлення взагалі.
+    check("файл є", fs.existsSync(path.join(ROOT, "site.webmanifest")));
+
+    const manifest = JSON.parse(read("site.webmanifest"));
+
+    check("назва є", Boolean(manifest.name && manifest.short_name));
+
+    // Довга назва не влазить під іконкою — Android бере short_name.
+    check("коротка назва справді коротка",
+        manifest.short_name.length <= 12, manifest.short_name);
+
+    check("мова вказана", manifest.lang === "uk");
+
+    // Колір мусить збігатися з <meta name="theme-color"> на
+    // сторінках: інакше смуга браузера мигає при завантаженні.
+    const home = read("index.html");
+    const themeColor = (home.match(/name="theme-color" content="([^"]+)"/) || [])[1];
+
+    check("колір теми той самий, що в розмітці",
+        manifest.theme_color === themeColor,
+        `${manifest.theme_color} проти ${themeColor}`);
+
+    // Іконки мусять існувати й мати заявлений розмір: Android мовчки
+    // відкидає маніфест, у якому жодна іконка не завантажилась.
+    const iconProblems = manifest.icons.filter(icon => {
+
+        const file = path.join(ROOT, icon.src.replace(/^\//, ""));
+
+        if (!fs.existsSync(file)) return true;
+
+        // Ширина й висота PNG лежать у IHDR, байти 16..23.
+        const bytes = fs.readFileSync(file);
+
+        return `${bytes.readUInt32BE(16)}x${bytes.readUInt32BE(20)}` !== icon.sizes;
+
+    });
+
+    check("іконки на місці й потрібного розміру",
+        iconProblems.length === 0,
+        iconProblems.map(i => i.src).join(", "));
+
+    check("є 192 і 512 — обидва обов'язкові для встановлення",
+        manifest.icons.some(i => i.sizes === "192x192")
+        && manifest.icons.some(i => i.sizes === "512x512"));
+
+    // standalone ховає адресний рядок. Сервісного працівника в сайту
+    // немає, тож офлайн людина отримала б порожню помилку у вікні без
+    // жодної кнопки. minimal-ui лишає рядок і перезавантаження.
+    check("вікно з адресним рядком, бо офлайн-режиму немає",
+        manifest.display === "minimal-ui", manifest.display);
+
+    // Посилання — на КОЖНІЙ сторінці: встановлюють сайт не тільки з
+    // головної.
+    const pages = fs.readdirSync(ROOT).filter(f => f.endsWith(".html"));
+
+    const without = pages.filter(f => !/rel="manifest"/.test(read(f)));
+
+    check(`посилання на всіх ${pages.length} сторінках`,
+        without.length === 0, without.join(", "));
+
+    // Адреса АБСОЛЮТНА: сторінки в теках (p/, brands/) живуть із
+    // <base href="/">, і відносний шлях указував би не туди.
+    check("адреса абсолютна",
+        /rel="manifest" href="\/site\.webmanifest"/.test(home));
+
+    check("і в згенерованій сторінці товару теж",
+        /rel="manifest" href="\/site\.webmanifest"/.test(
+            read("p/michael-kors-rose-small-top-handle-quilted-crossbody-bag/index.html")));
+}
+
 console.log(failures === 0
-    ? "\n✅ Фото заявлені, llms.txt свіжий, телефон у розмітці справжній\n"
+    ? "\n✅ Фото заявлені, llms.txt свіжий, телефон справжній, маніфест на місці\n"
     : `\n❌ Проблем: ${failures}\n`);
 
 process.exit(failures === 0 ? 0 : 1);

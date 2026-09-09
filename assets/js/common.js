@@ -2670,7 +2670,27 @@ document.addEventListener("click", event => {
             // більше немає бренду, до якого точка приклеювалась (див.
             // product-meta-line в product.js), тож підпис пише сам
             // обробник — інакше при перемиканні кольору він зникав.
-            if (inlineSku) inlineSku.textContent = sku ? `Артикул: ${sku}` : "";
+            if (inlineSku) {
+
+                // Текст — у власному вузлі. Рядок став кнопкою «копіювати
+                // артикул», і поруч у ній лежать значки; textContent на
+                // самій кнопці стер би їх разом із розміткою.
+                //
+                // Запасний шлях (|| inlineSku) — для сторінок, зібраних
+                // до появи кнопки, і для тестових стендів, які кладуть
+                // порожній <span data-product-sku>.
+                const label = inlineSku.querySelector("[data-product-sku-text]") || inlineSku;
+
+                label.textContent = sku ? `Артикул: ${sku}` : "";
+
+                // Копіюється КОД, а не підпис — тримаємо його окремо.
+                if (inlineSku.dataset) inlineSku.dataset.sku = sku || "";
+
+                // Колір без артикула — ховаємо кнопку, а не лишаємо
+                // порожню рамку зі значком.
+                if (inlineSku.tagName === "BUTTON") inlineSku.hidden = !sku;
+
+            }
 
             const specSku = scope.querySelector("[data-spec-sku]");
 

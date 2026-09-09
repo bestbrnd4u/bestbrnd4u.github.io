@@ -2,7 +2,7 @@
 <html lang="uk">
 
 <head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"365edf3f","data/catalog.json":"1f6f7fa1","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"6a5c125f","data/legal.json":"f84751b2","data/notifications.json":"670aa3fa","data/product-texts.json":"4cb38a2b","data/products-updated.json":"a73eec4b","data/products.json":"4a262d9a","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/security.json":"34f399a1","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"365edf3f","data/catalog.json":"1f6f7fa1","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"6a5c125f","data/legal.json":"f84751b2","data/notifications.json":"670aa3fa","data/product-texts.json":"278df72d","data/products-updated.json":"a73eec4b","data/products.json":"4a262d9a","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/security.json":"34f399a1","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script>
 
 <!-- Сторінка лежить у /p/<slug>/, а скрипти будують шляхи як
      з кореня ("data/products.json", "assets/images/…").
@@ -174,7 +174,7 @@ window.PRODUCT_TAXONOMY = {"category":{"Окуляри і оправи":"categor
 // тексти на сторінці товару з адмінки (data/product-texts.json)
 // — вбудовані, а не довантажені: рядок «єдиний екземпляр»
 // стоїть високо, і запізнілий текст смикав би розмітку
-window.PRODUCT_TEXTS = {"onlyOneTitle":"Єдиний екземпляр.","onlyOneWithDays":"Якщо його купують, наступний веземо {строк}.","onlyOneWithoutDays":"Другого такого в наявності немає."};
+window.PRODUCT_TEXTS = {"onlyOneTitle":"Єдиний екземпляр.","onlyOneWithDays":"Якщо його купують, наступний веземо {строк}.","onlyOneWithoutDays":"Другого такого в наявності немає.","deliveryDate":"Орієнтовно у відділенні {дата}","handlingMin":1,"handlingMax":2,"transitMin":1,"transitMax":3};
 </script>
 
 
@@ -183,6 +183,7 @@ window.PRODUCT_TEXTS = {"onlyOneTitle":"Єдиний екземпляр.","onlyO
     <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="192x192" href="/assets/images/favicon-192.png">
+    <link rel="manifest" href="/site.webmanifest">
 
 <!-- Шрифт. Тут, а не @import у CSS: @import видно лише після
      завантаження таблиці стилів, і текст чекає на три запити
@@ -192,7 +193,7 @@ window.PRODUCT_TEXTS = {"onlyOneTitle":"Єдиний екземпляр.","onlyO
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=6ac42da3">
+<link rel="stylesheet" href="/assets/css/style.css?v=2f1f9a04">
 
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"></script>
@@ -718,7 +719,7 @@ BestBrnd4u
 <!-- Умови продажу для розмітки товару: доставка, повернення, строк
      дії ціни. Той самий файл читають генератор сторінок і генератор
      фіду, тож три місця не можуть пообіцяти різне. ДО product.js. -->
-<script src="/assets/js/product-offer.js?v=1a25c849"></script>
+<script src="/assets/js/product-offer.js?v=ef3e08ac"></script>
 <!-- Оформлення текстових блоків з адмінки (кольори, шрифт, кнопка) -->
 <script src="/assets/js/text-styles.js?v=7dc05c7d"></script>
 <!-- Згода на використання даних (банер + блокування вбудованого відео) -->
@@ -733,7 +734,7 @@ BestBrnd4u
 <script src="/assets/js/stock.js?v=85fa4aad"></script>
 
 <script src="/assets/js/translit.js?v=c0957cb7"></script>
-<script src="/assets/js/common.js?v=27bb0648"></script>
+<script src="/assets/js/common.js?v=044b86d6"></script>
 <!-- Підписка на листи магазину -->
 <script src="/assets/js/subscribe.js?v=2367ff9d"></script>
 <script src="/assets/js/sync.js?v=48ef002e"></script>
@@ -746,7 +747,7 @@ BestBrnd4u
 <script src="/assets/js/lightbox.js?v=552b0982"></script>
 
 <script src="/assets/js/live-stock.js?v=ca9027dd"></script>
-<script src="/assets/js/product.js?v=f07c8487"></script>
+<script src="/assets/js/product.js?v=ec87f2dd"></script>
 
 <!-- Відгуки: показ, форма й перевірка покупки на сервері -->
 <script src="/assets/js/reviews.js?v=41a0316a"></script>
