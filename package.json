@@ -14,7 +14,8 @@
     "images:fit:apply": "node scripts/normalize-product-images.js --apply",
     "build:dev": "node scripts/build-dev.js",
     "banners": "node scripts/build-banners.js",
-    "check:dev": "node scripts/check-dev.js"
+    "check:dev": "node scripts/check-dev.js",
+    "og-cover": "node scripts/build-og-cover.js"
   },
   "devDependencies": {
     "js-yaml": "^5.4.1",

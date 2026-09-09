@@ -369,8 +369,120 @@ console.log("\n[7] Маніфест застосунку");
             read("p/michael-kors-rose-small-top-handle-quilted-crossbody-bag/index.html")));
 }
 
+console.log("\n[8] Картинка прев'ю посилань");
+{
+    // ЩО БУЛО НЕ ТАК. В og:image стояв банер головної (2400×1080), і в
+    // Telegram посилання на магазин виглядало як назва, опис і
+    // крихітний квадратик праворуч із випадковим світлим шматком того
+    // банера.
+    //
+    // Месенджери ріжуть картинку під СВІЙ формат: Telegram бере
+    // квадрат, Facebook — 1.91:1. Широкий банер після квадратного
+    // обрізання перетворюється на фрагмент.
+    const cover = "assets/images/og-cover.png";
+
+    check("обкладинка є", fs.existsSync(path.join(ROOT, cover)));
+
+    const bytes = fs.readFileSync(path.join(ROOT, cover));
+
+    // Ширина й висота PNG лежать у IHDR, байти 16..23.
+    const width = bytes.readUInt32BE(16);
+    const height = bytes.readUInt32BE(20);
+
+    check("розмір 1200×630 — той, що просять Facebook і Twitter",
+        width === 1200 && height === 630, `${width}×${height}`);
+
+    // ГОЛОВНА ВЛАСТИВІСТЬ: логотип мусить уміщатись у ЦЕНТРАЛЬНИЙ
+    // КВАДРАТ. Саме його бере Telegram, і саме через це попередня
+    // картинка й не працювала. Перевіряємо не константи скрипта, а
+    // сам файл: шукаємо межі всього, що не тло.
+    // Окремим процесом: sharp асинхронний, а тест — звичайний
+    // послідовний скрипт. Переписувати весь набір під async заради
+    // одного заміру не варто.
+    const probe = require("child_process").spawnSync(process.execPath, ["-e", `
+        const sharp = require(${JSON.stringify(require.resolve("sharp"))});
+        sharp(${JSON.stringify(path.join(ROOT, cover))})
+            .raw().toBuffer({ resolveWithObject: true })
+            .then(({ data, info }) => {
+                // Тло — колір лівого верхнього кута.
+                const bg = [data[0], data[1], data[2]];
+                let minX = info.width, minY = info.height, maxX = -1, maxY = -1;
+                for (let y = 0; y < info.height; y++) {
+                    for (let x = 0; x < info.width; x++) {
+                        const i = (y * info.width + x) * info.channels;
+                        // Поріг 12: у тла й краю логотипа є згладжування.
+                        if (Math.abs(data[i] - bg[0]) + Math.abs(data[i + 1] - bg[1])
+                            + Math.abs(data[i + 2] - bg[2]) <= 12) continue;
+                        if (x < minX) minX = x;
+                        if (y < minY) minY = y;
+                        if (x > maxX) maxX = x;
+                        if (y > maxY) maxY = y;
+                    }
+                }
+                console.log(JSON.stringify({ minX, minY, maxX, maxY }));
+            });
+    `], { encoding: "utf8" });
+
+    const box = JSON.parse((probe.stdout || "{}").trim() || "{}");
+
+    check("на картинці є що показати", box.maxX > 0, probe.stderr);
+
+    if (box.maxX > 0) {
+
+        const squareLeft = (width - height) / 2;
+        const squareRight = squareLeft + height;
+
+        check("логотип уміщається в центральний квадрат — той, що бере Telegram",
+            box.minX >= squareLeft && box.maxX <= squareRight,
+            `логотип ${box.minX}…${box.maxX}, квадрат ${squareLeft}…${squareRight}`);
+
+        // Впритул до краю ставити не можна: кожен месенджер ріже
+        // трохи по-своєму, і край першим і зникне.
+        check("є поля з усіх боків",
+            box.minY > 20 && box.maxY < height - 20,
+            `по вертикалі ${box.minY}…${box.maxY} з ${height}`);
+
+    }
+
+    // Це та сама «B», що у вкладці браузера й на іконці застосунку.
+    check("зібрана з тієї самої іконки",
+        /favicon-512\.png/.test(read("scripts/build-og-cover.js")));
+
+    // Головна мусить показувати саме її, а не банер.
+    const home = read("index.html");
+
+    check("головна показує обкладинку",
+        /og:image" content="[^"]*\/assets\/images\/og-cover\.png"/.test(home));
+
+    check("банер героя в прев'ю більше не їде",
+        !/og:image" content="[^"]*banners\//.test(home));
+
+    // Збірка головної раніше підставляла сюди фото з data/home.json —
+    // тобто повернула б банер на місце при наступному запуску.
+    check("збірка головної теж ставить обкладинку",
+        /og:image" content="\)([^)]*)\n?[\s\S]{0,120}og-cover\.png/
+            .test(read("scripts/build-home-static.js")));
+
+    // Розміри в тегах мусять збігатися зі справжніми: Facebook бере їх
+    // на віру й малює рамку ще до завантаження файлу.
+    check("розміри в тегах збігаються з файлом",
+        new RegExp(`og:image:width" content="${width}"`).test(home)
+        && new RegExp(`og:image:height" content="${height}"`).test(home));
+
+    // Сторінка з тегами прев'ю, але без картинки, показується самим
+    // текстом — а це рівно те, з чого все почалось.
+    const pagesWithOg = fs.readdirSync(ROOT)
+        .filter(f => f.endsWith(".html"))
+        .filter(f => /property="og:/.test(read(f)));
+
+    const withoutImage = pagesWithOg.filter(f => !/og:image/.test(read(f)));
+
+    check(`усі ${pagesWithOg.length} сторінок із тегами прев'ю мають картинку`,
+        withoutImage.length === 0, withoutImage.join(", "));
+}
+
 console.log(failures === 0
-    ? "\n✅ Фото заявлені, llms.txt свіжий, телефон справжній, маніфест на місці\n"
+    ? "\n✅ Фото заявлені, llms.txt свіжий, телефон справжній, маніфест і прев'ю на місці\n"
     : `\n❌ Проблем: ${failures}\n`);
 
 process.exit(failures === 0 ? 0 : 1);

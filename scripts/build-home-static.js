@@ -167,13 +167,31 @@ function main() {
 
     }
 
-    // 6. Картинка для прев'ю посилань (og:image) — теж лишалась чужою
-    if (home.hero && home.hero.image) {
-        html = html.replace(
-            /(<meta property="og:image" content=")([^"]*)(")/,
-            (all, head, oldSrc, tail) => head + SITE_URL + escapeAttr(home.hero.image) + tail
-        );
-    }
+    // 6. Картинка для прев'ю посилань (og:image).
+    //
+    // ТУТ СТОЯВ БАНЕР ГОЛОВНОЇ — той, що в героя. Ідея була розумна:
+    // прев'ю показує поточну кампанію. На ділі вийшло навпаки.
+    //
+    // Месенджери ріжуть картинку під СВІЙ формат: Telegram бере
+    // квадрат, Facebook — 1.91:1. Банер героя широкий (2400×1080) і з
+    // композицією по центру, тож після квадратного обрізання від нього
+    // лишався випадковий фрагмент — у Telegram посилання на магазин
+    // виглядало як сіро-блакитна пляма поруч із назвою.
+    //
+    // Тепер тут постійна обкладинка з логотипом: її можна різати як
+    // завгодно, «B» лишається на місці. Збирає scripts/build-og-cover.js.
+    //
+    // Банер героя міняється з адмінки й далі — просто він більше не
+    // їде в прев'ю.
+    html = html.replace(
+        /(<meta property="og:image" content=")([^"]*)(")/,
+        (all, head, oldSrc, tail) => head + SITE_URL + "/assets/images/og-cover.png" + tail
+    );
+
+    html = html.replace(
+        /(<meta name="twitter:image" content=")([^"]*)(")/,
+        (all, head, oldSrc, tail) => head + SITE_URL + "/assets/images/og-cover.png" + tail
+    );
 
     if (html === before) {
         console.log("Готово: статична розмітка головної вже збігається з data/home.json");

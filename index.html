@@ -15,8 +15,28 @@
     <meta property="og:title" content="BestBrnd4u | Інтернет-магазин сумок">
     <meta property="og:type" content="website">
     <meta property="og:description" content="Інтернет-магазин сумок та аксесуарів">
-    <meta property="og:image" content="https://dev.bestbrnd4u.com/assets/images/banners/hero-bags.jpg">
+    <!-- Картинка прев'ю — логотип, а не банер головної.
+
+         Тут стояв hero-bags.jpg (2400×1080), і в Telegram посилання на
+         магазин виглядало так: назва, опис і крихітний квадратик
+         праворуч, у який потрапив випадковий світлий шматок банера.
+         Прев'ю ріжуть картинку під свій формат — Telegram бере
+         квадрат, — і широкий банер після цього перетворюється на
+         фрагмент.
+
+         В og-cover.png логотип точно по центру суцільного тла: його
+         можна різати як завгодно. Збирає scripts/build-og-cover.js із
+         тієї самої іконки, що у вкладці браузера. -->
+    <meta property="og:image" content="https://dev.bestbrnd4u.com/assets/images/og-cover.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="BestBrnd4u">
     <meta property="og:url" content="https://dev.bestbrnd4u.com/">
+    <!-- Twitter читає власні теги й ігнорує og:*, а за ними йдуть і
+         деякі месенджери. summary_large_image — прохання показати
+         картинку смугою, а не значком. -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://dev.bestbrnd4u.com/assets/images/og-cover.png">
     <link rel="canonical" href="https://dev.bestbrnd4u.com/">
 
 <link rel="icon" href="favicon.ico" sizes="any">
