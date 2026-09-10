@@ -126,8 +126,33 @@ console.log("\n[2] Перевірка «ви людина» вимкнена, п
     // віджета, Cloudflare лишив порожній блок 0×0 — і сторінка
     // вимагала токен, якого нізвідки взятись. Замовлення не можна
     // було оформити взагалі.
-    check("перевірка вважається ввімкненою, лише якщо віджет намалювався",
+    // УВАГА, ЩО ЦЕ ТЕПЕР ЗНАЧИТЬ. enabled() лишився ТІЛЬКИ підказкою
+    // покупцеві («зачекайте, перевірка ще не пройдена»). Рішення,
+    // слати замовлення через функцію чи ні, від нього більше не
+    // залежить — там питають токен (див. [5]).
+    //
+    // Так вийшло не від хорошого життя: 10.09.2026 на bestbrnd4u.com
+    // віджет був намальований і пройдений, а rendered() його не
+    // бачив — і п'ять справжніх замовлень пішли повз перевірку. Як
+    // Cloudflare розкладає свою розмітку, гарантувати не можна.
+    check("підказка покупцеві спирається на побачений віджет",
         /return Boolean\(siteKey\) && !failed && widgetId !== null && rendered\(\);/.test(widget));
+
+    // І помилка в цьому мірилі мусить коштувати підказки, а не
+    // замовлення: у гілці оформлення enabled() бути не повинно.
+    // Дивимось на КОД, а не на прозу про нього: у коментарях там
+    // enabled() згадується навмисно — саме там пояснено, чому його
+    // звідти прибрали. Перший варіант цієї перевірки на це й
+    // наступив (та сама пастка, що в test-ask-and-gaps).
+    const skrizFunkciyu = checkout
+        .slice(checkout.indexOf("async function placeOrderThroughFunction"),
+            checkout.indexOf("async function placeOrderThroughFunction") + 1600)
+        .replace(/\/\*[\s\S]*?\*\//g, "")
+        .replace(/^\s*\/\/.*$/gm, "");
+
+    check("рішення про замовлення від нього не залежить",
+        !/Turnstile\.enabled\(\)/.test(skrizFunkciyu),
+        (skrizFunkciyu.match(/.*Turnstile\.enabled\(\).*/) || [""])[0].trim());
 
     // І «намалювався» міряється ПО DOM, а не по події.
     //
@@ -373,6 +398,9 @@ console.log("\n[5] Замовлення повз перевірку видно �
         const doc = {
             getElementById: id => (id === "turnstileBox" && box)
                 ? { querySelector: () => (box.iframe ? {} : null) }
+                : null,
+            querySelector: sel => /turnstile\.js/.test(sel)
+                ? { getAttribute: () => "/assets/js/turnstile.js?v=" + ((page || {}).build || "abc12345") }
                 : null
         };
 
@@ -406,15 +434,39 @@ console.log("\n[5] Замовлення повз перевірку видно �
             === "turnstile_skip: модуль перевірки не завантажився · bestbrnd4u.com",
         first(run(undefined)));
 
-    check("віджет не намалювався — записано",
-        first(run({ enabled: () => false }))
-            === "turnstile_skip: віджет не зʼявився на сторінці · bestbrnd4u.com",
-        first(run({ enabled: () => false })));
+    const bezTokena = { enabled: () => true, token: () => "", reset() {} };
 
-    check("віджет є, а токена немає — записано",
-        first(run({ enabled: () => true, token: () => "", reset() {} }))
-            === "turnstile_skip: віджет є, але токена немає · bestbrnd4u.com",
-        first(run({ enabled: () => true, token: () => "", reset() {} })));
+    check("токена немає — записано",
+        first(run(bezTokena))
+            === "turnstile_skip: перевірка не дала токена · bestbrnd4u.com",
+        first(run(bezTokena)));
+
+    // НАЙВАЖЛИВІШЕ ПРАВИЛО В ЦЬОМУ ФАЙЛІ.
+    //
+    // Рішення «слати через функцію чи ні» мусить залежати ВІД ТОКЕНА,
+    // а не від того, що ми змогли розгледіти в розмітці Cloudflare.
+    //
+    // ЩО БУЛО. Тут стояло ще й !Turnstile.enabled(), а enabled() серед
+    // іншого шукав <iframe> усередині #turnstileBox. 10.09.2026 на
+    // bestbrnd4u.com віджет був намальований і ПРОЙДЕНИЙ — на екрані
+    // зелена галочка «Успіх!», — а querySelector("iframe") у тому
+    // самому блоці нічого не знаходив. Замовлення йшли повз перевірку.
+    // П'ять справжніх замовлень і три хибні пояснення підряд.
+    //
+    // Як Cloudflare розкладає свою розмітку — не наша гарантія.
+    const brekhlyvaRozmitka = {
+        enabled: () => false,          // мірило по DOM бреше
+        token: () => "справжній-токен",
+        reset() {}
+    };
+
+    const cherezFunkciyu = run(brekhlyvaRozmitka);
+
+    check("токен є — йдемо через функцію, хай там що каже розмітка",
+        (await cherezFunkciyu.promise) === true);
+
+    check("…і в журнал не пішло нічого",
+        cherezFunkciyu.said.length === 0, JSON.stringify(cherezFunkciyu.said));
 
     // ДОМЕН У ПРИЧИНІ — не окраса.
     //
@@ -423,7 +475,7 @@ console.log("\n[5] Замовлення повз перевірку видно �
     // базу, шлях /checkout у них однаковий — і зрозуміти, чи це
     // прод, чи перевірка на деві, було нізвідки. А різниця вирішальна:
     // на деві це буденність, на проді це причина не робити крок 6.
-    const naDevi = run({ enabled: () => false }, undefined, { host: "dev.bestbrnd4u.com" });
+    const naDevi = run(bezTokena, undefined, { host: "dev.bestbrnd4u.com" });
 
     check("дев і прод у журналі різні",
         first(naDevi).endsWith("· dev.bestbrnd4u.com"), first(naDevi));
@@ -433,11 +485,20 @@ console.log("\n[5] Замовлення повз перевірку видно �
     // в source домен першого запису застряг би назавжди.
     check("…бо склейка подій дивиться на причину",
         naDevi.said[0].message.includes("dev.bestbrnd4u.com")
-        && !first(run({ enabled: () => false })).includes("dev."));
+        && !first(run(bezTokena)).includes("dev."));
 
-    // ЧОМУ ВІДЖЕТА НЕМАЄ — три різні причини, і лікуються вони
-    // по-різному. Це йде в source: воно не бере участі в склейці.
-    const zablokovano = run({ enabled: () => false }, undefined, { box: { iframe: false }, seconds: 90 });
+    // ЧОМУ ВІДЖЕТА НЕМАЄ — і це не одна причина, а кілька, які
+    // лікуються по-різному. Деталь іде в source: воно не бере участі
+    // в склейці подій.
+    //
+    // ЧОГО ЦЕ КОШТУВАЛО. Причину «віджет не зʼявився» я пояснив
+    // неправильно двічі: спершу «домен не в списку хостів», потім
+    // «нульова ширина контейнера». Обидва рази виправлення виїжджало
+    // на прод, і обидва рази наступне справжнє замовлення знову йшло
+    // повз перевірку. Кожна помилка — тестове замовлення власника й
+    // пів дня. Тому сторінка тепер розповідає СВІЙ СТАН повністю, а
+    // не два прапорці.
+    const zablokovano = run(bezTokena, undefined, { box: { iframe: false }, seconds: 90 });
 
     check("сказано, чи є скрипт і кадр",
         /скрипта немає|скрипт є/.test(zablokovano.said[0].source)
@@ -449,6 +510,57 @@ console.log("\n[5] Замовлення повз перевірку видно �
     check("сказано, скільки сторінка була відкрита",
         /90 с від відкриття/.test(zablokovano.said[0].source),
         zablokovano.said[0].source);
+
+    // ПОВНИЙ СТАН, коли модуль уміє його розповісти. Ключове тут —
+    // відрізнити «render() ще не викликали» від «викликали, а кадру
+    // немає»: перше лікується в коді, друге — лише в кабінеті
+    // Cloudflare, і сплутати їх означає лагодити не те.
+    const rozgornuto = run({
+        enabled: () => false, token: () => "", reset() {},
+        state: () => ({
+            key: true, script: true, drawn: true, waiting: false,
+            failed: true, error: "110200", hidden: false, width: 321, iframe: false
+        })
+    }, undefined, { seconds: 12 });
+
+    const detail = rozgornuto.said[0].source;
+
+    check("видно, чи взагалі малювали", /малювали/.test(detail), detail);
+
+    check("видно ширину контейнера", /ширина 321/.test(detail), detail);
+
+    check("видно код помилки Cloudflare", /помилка: 110200/.test(detail), detail);
+
+    // Той самий модуль, але ще чекає на ширину — інша хвороба, інші
+    // ліки.
+    const chekaie = run({
+        enabled: () => false, token: () => "", reset() {},
+        state: () => ({
+            key: true, script: true, drawn: false, waiting: true,
+            failed: false, error: "", hidden: false, width: 0, iframe: false
+        })
+    }, undefined, { seconds: 3 });
+
+    check("очікування ширини не плутається з відмовою",
+        /не малювали/.test(chekaie.said[0].source)
+        && /чекаємо ширини/.test(chekaie.said[0].source)
+        && !/помилка/.test(chekaie.said[0].source),
+        chekaie.said[0].source);
+
+    // ЯКА ЗБІРКА ЦЕ НАПИСАЛА.
+    //
+    // Сторінки віддаються з Cache-Control: max-age=7200 — браузер
+    // тримає їх дві години. Виливка чистить край Cloudflare, але не
+    // чужий браузер. 10.09.2026 через це виправлення виглядало як
+    // таке, що не допомогло: воно вилилось за 98 секунд до
+    // замовлення, і чи воно взагалі виконувалось — невідомо.
+    //
+    // Тепер відомо: у ?v= лежить відбиток вмісту файлу, тобто точна
+    // назва коду, який працював.
+    const zbirka = run(bezTokena, undefined, { build: "91d5800f" });
+
+    check("видно, яка збірка це написала",
+        /збірка 91d5800f/.test(zbirka.said[0].source), zbirka.said[0].source);
 
     // НЕГАТИВНИЙ КОНТРОЛЬ. Найгірше, що тут може статись, — журнал,
     // який пише на КОЖНЕ замовлення: тоді в ньому не видно нічого.
