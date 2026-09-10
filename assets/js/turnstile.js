@@ -78,11 +78,109 @@
 
     }
 
+    // Як часто перепитувати ширину там, де немає ResizeObserver, і
+    // скільки взагалі чекати. Стеля потрібна, щоб на сторінці, де
+    // блок так і не з'явиться, таймер не жив вічно.
+    var POLL_MS = 150;
+    var WAIT_LIMIT_MS = 20000;
+
+    // Малюємо ЛИШЕ тоді, коли контейнер справді має ширину.
+    //
+    // НАЙДОРОЖЧА ПОМИЛКА В ЦІЙ ПЕРЕВІРЦІ — І НАЙТИХІША.
+    //
+    // Тут стояв просто render(), а target.hidden = false — після
+    // нього. Виявилось, що в момент малювання контейнер має нульову
+    // ширину, і то з двох незалежних причин:
+    //
+    //   1. сам блок оголошений у розмітці як hidden, а в стилях сайту
+    //      стоїть [hidden]{display:none !important};
+    //
+    //   2. і головне — увесь #checkoutLayout лишається hidden, доки
+    //      checkout.js не дочитає каталог (await loadCatalog()) і не
+    //      побудує підсумок замовлення.
+    //
+    // Тобто це ПЕРЕГОНИ ДВОХ СКРИПТІВ. Turnstile малює одразу, щойно
+    // завантажився скрипт Cloudflare; checkout.js показує layout
+    // помітно пізніше. Хто перший — той і вирішує, чи буде віджет.
+    //
+    // Розмір "flexible" — це «100% ширини контейнера, мінімум 300px»
+    // (developers.cloudflare.com/turnstile). Виміряти нема чого:
+    // віджет створює свою обгортку з прихованим полем
+    // cf-turnstile-response, а кадр — ні. Ні помилки, ні зворотного
+    // виклику — просто порожній блок 0×0, не відрізнити від
+    // «домен не дозволений». Саме так я його спершу й пояснив.
+    //
+    // ЗАМІРЯНО 10.09.2026 на bestbrnd4u.com: у власника віджет то
+    // з'являвся («Успіх!» на екрані), то ні — три справжніх
+    // замовлення в Chrome пішли повз перевірку, у журналі «скрипт є,
+    // кадру немає, 19 с від відкриття». Секунди тут ні до чого:
+    // шкода стається в першу секунду й лишається назавжди.
+    function whenWide(target, draw) {
+
+        if (target.getBoundingClientRect().width > 0) {
+            draw();
+            return;
+        }
+
+        var observer = null;
+        var timer = null;
+        var waited = 0;
+
+        function stop() {
+            if (observer) observer.disconnect();
+            if (timer) root.clearInterval(timer);
+        }
+
+        function ready() {
+
+            if (target.getBoundingClientRect().width <= 0) return;
+
+            stop();
+            draw();
+
+        }
+
+        if (typeof root.ResizeObserver === "function") {
+            observer = new root.ResizeObserver(ready);
+            observer.observe(target);
+        }
+
+        // Опитування — і запасний шлях там, де ResizeObserver немає,
+        // і стеля очікування. Читання розміру раз на 150 мс нічого не
+        // коштує; чекати вічно — коштувало б.
+        timer = root.setInterval(function () {
+
+            waited += POLL_MS;
+
+            if (waited > WAIT_LIMIT_MS) {
+                stop();
+                return;
+            }
+
+            ready();
+
+        }, POLL_MS);
+
+    }
+
     function render() {
 
         var target = box();
 
         if (!target || widgetId !== null || !root.turnstile) return;
+
+        // Спершу показуємо блок, потім чекаємо на ширину — інакше
+        // ResizeObserver ніколи не спрацює: у display:none немає
+        // навіть нульового боксу.
+        target.hidden = false;
+
+        whenWide(target, function () { draw(target); });
+
+    }
+
+    function draw(target) {
+
+        if (widgetId !== null) return;
 
         widgetId = root.turnstile.render(target, {
             sitekey: siteKey,
@@ -142,8 +240,6 @@
 
             }
         });
-
-        target.hidden = false;
 
     }
 

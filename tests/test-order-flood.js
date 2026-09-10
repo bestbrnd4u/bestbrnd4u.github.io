@@ -478,6 +478,120 @@ console.log("\n[5] Замовлення повз перевірку видно �
         JSON.stringify(leaky.said));
 }
 
+console.log("\n[6] Блок для віджета видно ДО того, як його малюють");
+{
+    // НАЙДОРОЖЧА ПОМИЛКА В ЦІЙ ПЕРЕВІРЦІ — і найтихіша.
+    //
+    // Блок оголошений у розмітці як hidden (щоб порожній ключ не
+    // лишав дірки), а в стилях сайту стоїть
+    // [hidden]{display:none !important}. У turnstile.js рядок
+    // target.hidden = false стояв ПІСЛЯ render() — тобто Cloudflare
+    // малював у контейнер нульової ширини.
+    //
+    // Розмір "flexible" — це «100% ширини контейнера, мінімум 300px».
+    // Виміряти нічого: віджет створює свою обгортку з прихованим
+    // полем cf-turnstile-response, а кадр — ні. Жодної помилки,
+    // жодного зворотного виклику — просто порожній блок 0×0.
+    //
+    // Назовні це не відрізнити від «домен не дозволений», і саме так
+    // я його спершу й пояснив. Заміряно 10.09.2026 на bestbrnd4u.com:
+    // три справжні замовлення в Chrome пішли повз перевірку, у
+    // журналі — «скрипт є, кадру немає, 19 с від відкриття».
+    //
+    // Перевіряємо ПОВЕДІНКУ: запускаємо справжній turnstile.js у
+    // jsdom і питаємо стан блока в момент виклику render().
+    const { JSDOM } = require("jsdom");
+
+    const dom = new JSDOM(
+        `<!doctype html><html><head></head><body>
+            <div id="turnstileBox" class="turnstile-box" hidden></div>
+         </body></html>`,
+        { url: "https://bestbrnd4u.com/checkout", runScripts: "dangerously" });
+
+    const win = dom.window;
+
+    const calls = [];
+
+    win.fetch = () => Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ turnstileSiteKey: "0xTESTTESTTEST" })
+    });
+
+    win.turnstile = {
+        render(target, options) {
+            calls.push({
+                hidden: target.hidden,
+                size: options && options.size,
+                action: options && options.action
+            });
+            return "widget-1";
+        },
+        getResponse: () => "",
+        reset() {}
+    };
+
+    // Скрипт Cloudflare «вже на сторінці»: loadScript() чекатиме на
+    // його подію load, яку ми надішлемо самі.
+    const cf = win.document.createElement("script");
+    cf.setAttribute("data-turnstile", "1");
+    win.document.head.appendChild(cf);
+
+    // У jsdom розмітки немає взагалі, тож ширину задаємо самі — і це
+    // тут не милиця, а суть перевірки: спершу нуль (як у справжньому
+    // #checkoutLayout, поки checkout.js не дочитав каталог), потім
+    // справжня ширина картки.
+    const target = win.document.getElementById("turnstileBox");
+
+    let width = 0;
+
+    target.getBoundingClientRect = () => ({ width, height: width ? 65 : 0 });
+
+    const script = win.document.createElement("script");
+    script.textContent = widget;
+    win.document.body.appendChild(script);
+
+    check("модуль ожив у сторінці", typeof win.Turnstile === "object");
+
+    await new Promise(resolve => setTimeout(resolve, 30));
+    cf.dispatchEvent(new win.Event("load"));
+    await new Promise(resolve => setTimeout(resolve, 60));
+
+    // ГОЛОВНЕ. Поки контейнер нульовий, малювати НЕ МОЖНА: Cloudflare
+    // мовчки зробить порожню обгортку без кадру, і другої спроби вже
+    // не буде.
+    check("у нульовий контейнер не малюємо", calls.length === 0,
+        JSON.stringify(calls));
+
+    // Блок при цьому вже показаний — інакше ResizeObserver не мав би
+    // за чим стежити: у display:none немає навіть нульового боксу.
+    check("але блок уже показаний", target.hidden === false);
+
+    // checkout.js дочитав каталог і показав layout.
+    width = 321;
+
+    await new Promise(resolve => setTimeout(resolve, 400));
+
+    check("щойно ширина зʼявилась — малюємо", calls.length === 1, calls.length);
+
+    check("і блок у цей момент видно",
+        calls[0] && calls[0].hidden === false,
+        calls[0] && String(calls[0].hidden));
+
+    // І параметри доїжджають саме ті, на які розраховує сервер.
+    check("розмір підлаштовується під картку",
+        calls[0] && calls[0].size === "flexible", calls[0] && calls[0].size);
+
+    check("токен позначено дією оформлення",
+        calls[0] && calls[0].action === "checkout", calls[0] && calls[0].action);
+
+    // Порожній блок не має лишати дірку над кнопкою: місце під віджет
+    // резервується, лише коли кадр справді зʼявився.
+    check("місце резервується лише під справжній кадр",
+        /\.turnstile-box:not\(\[hidden\]\):has\(iframe\)\{/.test(read("assets/css/style.css")));
+
+    dom.window.close();
+}
+
 console.log(failures === 0
     ? "\n✅ Замовлення: потік зупиняє база, людину підтверджує сервер\n"
     : `\n❌ Проблем: ${failures}\n`);
