@@ -108,6 +108,51 @@ collections:
               й накладну сервер пише завжди, незалежно від цієї
               галочки: раніше про це не повідомляв ніхто.
 
+          - label: "Лист «дякуємо за покупку» з персональним промокодом"
+            name: "thankYou"
+            widget: "boolean"
+            required: false
+            default: false
+            hint: >
+              Через місяць після «Виконано» покупець отримує лист із
+              власним одноразовим промокодом. Код створюється сам,
+              видно його в розділі «Промокоди». Потрібні міграції 025
+              і 026 та налаштована розсилка.
+
+          - label: "…через скільки днів після «Виконано»"
+            name: "thankYouDays"
+            widget: "number"
+            value_type: "int"
+            min: 7
+            max: 180
+            required: false
+            default: 30
+            hint: >
+              На сьомий день уже йде прохання про відгук — не ставте
+              менше, щоб два листи не прийшли поспіль.
+
+          - label: "…розмір знижки, %"
+            name: "thankYouPercent"
+            widget: "number"
+            value_type: "int"
+            min: 1
+            max: 50
+            required: false
+            default: 10
+
+          - label: "…скільки днів діє код"
+            name: "thankYouLife"
+            widget: "number"
+            value_type: "int"
+            min: 3
+            max: 365
+            required: false
+            default: 30
+            hint: >
+              Строк потрібен, щоб код не жив вічно: персональний код
+              без дати за тиждень опиняється в чаті «промокоди всіх
+              магазинів».
+
       - name: "security"
         label: "Захист замовлень"
         file: "data/security.json"

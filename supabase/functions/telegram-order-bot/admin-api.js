@@ -421,6 +421,9 @@ export function orderView(order) {
         deliveryDetail: order?.delivery_detail ?? "",
         paymentMethod: order?.payment_method ?? "",
         promoCode: order?.promo_code ?? "",
+        // Побажання покупця. Раніше такі прохання приходили в дірект
+        // окремим повідомленням і губились між замовленнями.
+        comment: order?.comment ?? "",
 
         trackingNumber: order?.tracking_number ?? "",
         trackingUrl: trackingUrl(order?.tracking_number),

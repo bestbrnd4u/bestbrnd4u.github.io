@@ -60,6 +60,18 @@ import {
   reviewPhotoName, reviewPhotoUrl, reviewPhotoPath,
 } from "./reviews.js";
 
+// Панель «Промокоди»: строки, обмеження, облік (пояснення — у
+// promo-admin.js).
+import {
+  isPromoAction, parsePromoRequest, promoListResponse, promoUsesResponse,
+} from "./promo-admin.js";
+
+// Панель «Покупці й підписники» (пояснення — у people-admin.js).
+import {
+  isPeopleAction, parsePeopleRequest, buyersResponse, subscribersResponse,
+  subscribersRequest, PEOPLE_PAGE,
+} from "./people-admin.js";
+
 // Панель «Відгуки» в адмінці — другий спосіб модерації поруч із
 // кнопками в Telegram (пояснення — у review-admin.js).
 import {
@@ -2975,6 +2987,231 @@ async function refreshReviewCard(review: Record<string, any>) {
 
 }
 
+// -------------------------
+// Панель промокодів
+// -------------------------
+//
+// Уся робота — через функції бази (міграція 025), а не прямими
+// запитами до таблиці. Причина та сама, що й у решті панелей: правила
+// «чи діє код» мусять жити в ОДНОМУ місці, і це місце — база, бо її
+// читає ще й тригер, який підтверджує суму замовлення.
+
+async function handlePromoAdmin(body: Record<string, any>, origin: string | null): Promise<Response> {
+
+  const parsed = parsePromoRequest(body);
+
+  if (!parsed.ok) return adminJson({ ok: false, error: parsed.error }, 400, origin);
+
+  const { action, params } = parsed;
+
+  // Помилку бази показуємо власнику як є лише тоді, коли її кинула
+  // сама функція (raise exception з людським текстом). Решту ховаємо:
+  // технічні подробиці PostgREST нічого йому не кажуть.
+  const failed = async (response: Response, fallback: string) => {
+
+    const detail = await response.text();
+
+    console.error("Панель промокодів:", detail);
+
+    let message = fallback;
+
+    try {
+      const parsedDetail = JSON.parse(detail);
+      if (typeof parsedDetail?.message === "string" && parsedDetail.message.length < 200) {
+        message = parsedDetail.message;
+      }
+    } catch (error) { /* лишаємо загальне */ }
+
+    return adminJson({ ok: false, error: message }, 502, origin);
+
+  };
+
+  if (action === "promo-list") {
+
+    const response = await supabaseRest("rpc/promo_admin_list", {
+      method: "POST",
+      body: JSON.stringify({}),
+    });
+
+    if (!response.ok) return await failed(response, "Не вдалося прочитати список кодів.");
+
+    return adminJson(promoListResponse(await response.json()), 200, origin);
+
+  }
+
+  if (action === "promo-uses") {
+
+    const response = await supabaseRest("rpc/promo_admin_uses", {
+      method: "POST",
+      body: JSON.stringify({ p_code: params.code }),
+    });
+
+    if (!response.ok) return await failed(response, "Не вдалося прочитати використання.");
+
+    return adminJson(promoUsesResponse(await response.json()), 200, origin);
+
+  }
+
+  if (action === "promo-delete") {
+
+    const response = await supabaseRest("rpc/promo_admin_delete", {
+      method: "POST",
+      body: JSON.stringify({ p_hash: params.hash }),
+    });
+
+    if (!response.ok) return await failed(response, "Не вдалося видалити код.");
+
+    return adminJson({ ok: true }, 200, origin);
+
+  }
+
+  // promo-save
+  const response = await supabaseRest("rpc/promo_admin_save", {
+    method: "POST",
+    body: JSON.stringify({
+      p_code: params.code,
+      p_percent: params.percent,
+      p_active: params.active,
+      p_starts_at: params.startsAt,
+      p_expires_at: params.expiresAt,
+      p_max_uses: params.maxUses,
+      p_product_ids: params.productIds,
+      p_min_total: params.minTotal,
+      p_note: params.note,
+    }),
+  });
+
+  if (!response.ok) return await failed(response, "Не вдалося зберегти код.");
+
+  return adminJson({ ok: true, code: params.code }, 200, origin);
+
+}
+
+// -------------------------
+// Панель «Покупці й підписники»
+// -------------------------
+//
+// Два різних джерела, і жодне з них не в нашій базі:
+//
+//   • покупці — auth.users, куди PostgREST не пускає взагалі; читаємо
+//     Admin API самого Supabase службовим ключем;
+//   • підписники — MailerLite, чужий сервіс із власним ключем.
+//
+// Обидва ключі лишаються на сервері. Панель отримує лише те, що видно
+// на екрані: пошта, ім'я, дати й числа.
+
+async function handlePeopleAdmin(body: Record<string, any>, origin: string | null): Promise<Response> {
+
+  const parsed = parsePeopleRequest(body);
+
+  if (!parsed.ok) return adminJson({ ok: false, error: parsed.error }, 400, origin);
+
+  const { action, params } = parsed;
+
+  if (action === "people-buyers") {
+
+    // Admin API віддає сторінками. Беремо з запасом: список покупців
+    // магазину — це сотні, а не сотні тисяч, і гортати його запитами
+    // тут дорожче, ніж прочитати цілком.
+    const users: any[] = [];
+
+    for (let page = 1; page <= 10; page++) {
+
+      const response = await fetch(
+        `${SUPABASE_URL}/auth/v1/admin/users?page=${page}&per_page=200`,
+        {
+          headers: {
+            apikey: SERVICE_ROLE_KEY,
+            Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+          },
+        },
+      );
+
+      if (!response.ok) {
+
+        console.error("Список покупців:", await response.text());
+
+        return adminJson({
+          ok: false,
+          error: "Не вдалося прочитати список покупців.",
+        }, 502, origin);
+
+      }
+
+      const payload = await response.json();
+
+      const batch = Array.isArray(payload?.users) ? payload.users : [];
+
+      users.push(...batch);
+
+      if (batch.length < 200) break;
+
+    }
+
+    // Замовлення — щоб поруч із поштою стояло, скільки людина купувала.
+    // Одним запитом на всіх: по запиту на покупця сторінка стала б
+    // повільною рівно тоді, коли покупців побільшає.
+    const orders = await supabaseRest(
+      "orders?select=email,total,status,created_at,first_name,last_name&order=created_at.desc&limit=5000",
+    );
+
+    const rows = orders.ok ? await orders.json() : [];
+
+    return adminJson(buyersResponse({
+      users,
+      orders: rows,
+      search: params.search,
+      page: params.page,
+    }), 200, origin);
+
+  }
+
+  // people-subscribers
+  const request = subscribersRequest(MAILERLITE_API_KEY, {
+    page: params.page,
+    groupId: MAILERLITE_GROUP_ID,
+  });
+
+  if (!request) {
+
+    // Ключа немає — це не помилка, а «розсилку ще не під'єднали».
+    // Панель мусить сказати саме це, а не «щось пішло не так».
+    return adminJson({
+      ok: true,
+      people: [],
+      total: 0,
+      page: 1,
+      perPage: PEOPLE_PAGE,
+      active: 0,
+      disabled: "Розсилку ще не під'єднано: у секретах функції немає MAILERLITE_API_KEY.",
+    }, 200, origin);
+
+  }
+
+  const response = await fetch(request.url, { headers: request.headers });
+
+  if (!response.ok) {
+
+    console.error("Список підписників:", await response.text());
+
+    return adminJson({
+      ok: false,
+      error: "MailerLite не відповів. Спробуйте пізніше.",
+    }, 502, origin);
+
+  }
+
+  const payload = await response.json();
+
+  return adminJson(subscribersResponse({
+    rows: payload?.data,
+    total: payload?.meta?.total,
+    page: params.page,
+    search: params.search,
+  }), 200, origin);
+
+}
+
 async function handleAdmin(request: Request, body: Record<string, any>): Promise<Response> {
 
   const origin = request.headers.get("origin");
@@ -3000,6 +3237,15 @@ async function handleAdmin(request: Request, body: Record<string, any>): Promise
   // репозиторій сайту), і дублювати її не треба.
   if (isReviewAction(body.admin_action)) {
     return await handleReviewAdmin(body, origin);
+  }
+
+  // Панель промокодів — так само окремою гілкою й з тим самим правом.
+  if (isPromoAction(body.admin_action)) {
+    return await handlePromoAdmin(body, origin);
+  }
+
+  if (isPeopleAction(body.admin_action)) {
+    return await handlePeopleAdmin(body, origin);
   }
 
   const parsed = parseAdminRequest(body);

@@ -127,6 +127,16 @@ export function formatOrder(order) {
     order.delivery_detail ? `   ${escapeHtml(order.delivery_detail)}` : "",
     order.payment_method ? `💳 ${escapeHtml(order.payment_method)}` : "",
     order.promo_code ? `🎟 Промокод: ${escapeHtml(order.promo_code)}` : "",
+    // Побажання покупця — ОКРЕМИМ абзацом і в лапках.
+    //
+    // Раніше таке прохання приходило в дірект окремим повідомленням і
+    // губилось між замовленнями. Тепер воно в картці — але серед
+    // однорядкових реквізитів його легко пропустити очима, тож
+    // відділяємо порожнім рядком.
+    //
+    // Перенос усередині самого рядка, а не окремим елементом: порожні
+    // елементи звідси викидає filter нижче.
+    order.comment ? `\n📝 <i>«${escapeHtml(order.comment)}»</i>` : "",
     order.user_id ? "" : "👥 <i>Гість (без реєстрації)</i>",
     order.refusal_requested_at ? "❗️ <b>Клієнт просив відмову</b>" : "",
     order.tracking_number ? `📦 ТТН: <code>${escapeHtml(order.tracking_number)}</code>` : "",

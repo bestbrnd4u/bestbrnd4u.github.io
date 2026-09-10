@@ -2,7 +2,7 @@
 <html lang="uk">
 
 <head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"365edf3f","data/catalog.json":"1f6f7fa1","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"6a5c125f","data/legal.json":"f84751b2","data/notifications.json":"670aa3fa","data/product-texts.json":"278df72d","data/products-updated.json":"a73eec4b","data/products.json":"4a262d9a","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/security.json":"34f399a1","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"365edf3f","data/catalog.json":"1f6f7fa1","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"6a5c125f","data/legal.json":"f84751b2","data/notifications.json":"29a7bfc8","data/product-texts.json":"278df72d","data/products-updated.json":"a73eec4b","data/products.json":"4a262d9a","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/security.json":"34f399a1","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script>
     <meta name="robots" content="noindex,nofollow">
     <meta charset="UTF-8">
     <meta name="author" content="BestBrnd4u">
@@ -320,6 +320,35 @@
                         </label>
 
                         <span class="field-error" data-error-for="paymentMethod"></span>
+
+                    </div>
+
+                </div>
+
+                <!-- КОМЕНТАР ДО ЗАМОВЛЕННЯ.
+
+                     Полів було десять, і жодного, куди покупець міг би
+                     написати те, що в них не влазить: «подзвоніть перед
+                     відправкою», «це подарунок — не кладіть чек у
+                     коробку», «мене не буде до п'ятниці». Усе це йшло в
+                     дірект окремим повідомленням, і магазин звіряв його
+                     із замовленням руками.
+
+                     Просто текст, а не перелік галочок: галочки
+                     вгадують лише те, про що вже здогадались, а таких
+                     прохань меншість. -->
+                <div class="checkout-block">
+
+                    <h2>Побажання до замовлення</h2>
+                    <p class="checkout-block-sub">Необов'язково — але ми прочитаємо</p>
+
+                    <div class="form-row">
+
+                        <div class="form-group form-group-full">
+                            <label for="orderComment">Коментар</label>
+                            <textarea id="orderComment" name="Коментар" rows="3" maxlength="500"
+                                      placeholder="Подзвоніть перед відправкою; це подарунок; зручніше отримати після 18:00"></textarea>
+                        </div>
 
                     </div>
 
@@ -658,7 +687,7 @@
 <script src="assets/js/turnstile.js?v=808a55ba" defer></script>
 <!-- Підказки міст і відділень Нової пошти (порожній ключ = поле як було) -->
 <script src="assets/js/nova-poshta.js?v=59960066" defer></script>
-<script src="assets/js/checkout.js?v=858fede4" defer></script>
+<script src="assets/js/checkout.js?v=0b14fdcc" defer></script>
 
 </body>
 

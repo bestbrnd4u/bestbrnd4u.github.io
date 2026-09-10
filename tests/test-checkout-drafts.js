@@ -176,10 +176,32 @@ console.log("\n[5] Межа: це нагадування, а не розсилк
         /forget_checkout_draft[\s\S]*?exception[\s\S]{0,500}return new;/.test(migration));
 
     // ГОЛОВНЕ. Адреса не потрапляє в список підписників.
+    //
+    // Беремо саме ТІЛО обробника, а не «все до handleAdmin».
+    //
+    // Раніше тут стояв другий варіант — і перевірка почервоніла в
+    // день, коли між цими двома функціями з'явилась третя (панель
+    // «Покупці й підписники», яка з MailerLite працює цілком законно).
+    // Тобто сторож ловив не витік, а сусідство.
+    const draftBody = (() => {
+
+        const from = handlers.indexOf("async function handleCheckoutDraft");
+
+        if (from < 0) return "";
+
+        // До наступного оголошення функції верхнього рівня.
+        const rest = handlers.slice(from + 1);
+
+        const next = rest.search(/\n(?:async )?function /);
+
+        return next < 0 ? rest : rest.slice(0, next);
+
+    })();
+
+    check("тіло обробника чернеток знайдено", draftBody.length > 100, draftBody.length);
+
     check("адреса не йде в MailerLite",
-        !/MAILERLITE|mailerlite|subscribeRequest/.test(
-            handlers.slice(handlers.indexOf("async function handleCheckoutDraft"),
-                handlers.indexOf("async function handleAdmin"))));
+        !/MAILERLITE|mailerlite|subscribeRequest/.test(draftBody));
 
     check("у листі сказано, чому він прийшов",
         /залишили свою пошту на сторінці оформлення/.test(

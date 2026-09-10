@@ -1,16 +1,20 @@
 // ⚠️ ЦЕЙ ФАЙЛ ЗГЕНЕРОВАНО АВТОМАТИЧНО — НЕ РЕДАГУЙТЕ ВРУЧНУ.
 //
 // Джерела:
-//   supabase/functions/telegram-order-bot/format.js      (картка замовлення)
-//   supabase/functions/telegram-order-bot/order-flow.js  (діалог оформлення)
-//   supabase/functions/telegram-order-bot/admin-api.js   (панель замовлень в адмінці)
-//   supabase/functions/telegram-order-bot/place-order.js (замовлення з сайту)
-//   supabase/functions/telegram-order-bot/mail.js         (листи покупцеві)
-//   supabase/functions/telegram-order-bot/nova-poshta.js  (довідник міст і відділень)
-//   supabase/functions/telegram-order-bot/meta-capi.js    (серверні конверсії Meta)
-//   supabase/functions/telegram-order-bot/order-lookup.js (перевірка замовлення гостем)
-//   supabase/functions/telegram-order-bot/reviews.js      (відгуки й модерація)
-//   supabase/functions/telegram-order-bot/subscribe.js    (підписка на листи)
+//   supabase/functions/telegram-order-bot/format.js
+//   supabase/functions/telegram-order-bot/order-flow.js
+//   supabase/functions/telegram-order-bot/admin-api.js
+//   supabase/functions/telegram-order-bot/place-order.js
+//   supabase/functions/telegram-order-bot/mail.js
+//   supabase/functions/telegram-order-bot/nova-poshta.js
+//   supabase/functions/telegram-order-bot/meta-capi.js
+//   supabase/functions/telegram-order-bot/order-lookup.js
+//   supabase/functions/telegram-order-bot/reviews.js
+//   supabase/functions/telegram-order-bot/subscribe.js
+//   supabase/functions/telegram-order-bot/checkout-draft.js
+//   supabase/functions/telegram-order-bot/review-admin.js
+//   supabase/functions/telegram-order-bot/promo-admin.js
+//   supabase/functions/telegram-order-bot/people-admin.js
 //   supabase/functions/telegram-order-bot/_index.src.ts  (мережа й база)
 //
 // Перезібрати:  node scripts/build-edge-function.js
@@ -147,6 +151,16 @@ function formatOrder(order) {
     order.delivery_detail ? `   ${escapeHtml(order.delivery_detail)}` : "",
     order.payment_method ? `💳 ${escapeHtml(order.payment_method)}` : "",
     order.promo_code ? `🎟 Промокод: ${escapeHtml(order.promo_code)}` : "",
+    // Побажання покупця — ОКРЕМИМ абзацом і в лапках.
+    //
+    // Раніше таке прохання приходило в дірект окремим повідомленням і
+    // губилось між замовленнями. Тепер воно в картці — але серед
+    // однорядкових реквізитів його легко пропустити очима, тож
+    // відділяємо порожнім рядком.
+    //
+    // Перенос усередині самого рядка, а не окремим елементом: порожні
+    // елементи звідси викидає filter нижче.
+    order.comment ? `\n📝 <i>«${escapeHtml(order.comment)}»</i>` : "",
     order.user_id ? "" : "👥 <i>Гість (без реєстрації)</i>",
     order.refusal_requested_at ? "❗️ <b>Клієнт просив відмову</b>" : "",
     order.tracking_number ? `📦 ТТН: <code>${escapeHtml(order.tracking_number)}</code>` : "",
@@ -1426,6 +1440,9 @@ function orderView(order) {
         deliveryDetail: order?.delivery_detail ?? "",
         paymentMethod: order?.payment_method ?? "",
         promoCode: order?.promo_code ?? "",
+        // Побажання покупця. Раніше такі прохання приходили в дірект
+        // окремим повідомленням і губились між замовленнями.
+        comment: order?.comment ?? "",
 
         trackingNumber: order?.tracking_number ?? "",
         trackingUrl: trackingUrl(order?.tracking_number),
@@ -1516,6 +1533,10 @@ const TEXT_LIMITS = {
     delivery_detail: 300,
     payment_method: 120,
     promo_code: 40,
+    // Коментар до замовлення: «подзвоніть перед відправкою», «це
+    // подарунок, без чека в коробці». Пів тисячі знаків — стеля
+    // здорового глузду: довше за це вже не побажання, а лист.
+    comment: 500,
     first_name: 80,
     last_name: 80,
     phone: 40,
@@ -1634,6 +1655,7 @@ function cleanOrder(payload) {
             delivery_detail: text(payload.delivery_detail, TEXT_LIMITS.delivery_detail),
             payment_method: text(payload.payment_method, TEXT_LIMITS.payment_method),
             promo_code: text(payload.promo_code, TEXT_LIMITS.promo_code),
+            comment: text(payload.comment, TEXT_LIMITS.comment),
 
             first_name: text(payload.first_name, TEXT_LIMITS.first_name),
             last_name: text(payload.last_name, TEXT_LIMITS.last_name),
@@ -2177,6 +2199,83 @@ function reviewLetter(order, siteUrl) {
     return {
         subject: `Як вам покупка? Замовлення ${number}`,
         html: letterShell("Дякуємо за покупку 💬", body, siteUrl)
+    };
+
+}
+
+// Лист «дякуємо за покупку» з персональним промокодом.
+//
+// НАВІЩО. Найдешевший покупець — той, що вже один раз заплатив. Після
+// «Виконано» магазин з ним більше не говорив ніколи.
+//
+// ЧОМУ ОКРЕМО ВІД ПРОХАННЯ ПРО ВІДГУК. Покласти знижку в той самий
+// лист означало б запропонувати гроші за відгук — і виглядало б саме
+// так, незалежно від того, що код дається безумовно.
+//
+// ЩО В ЛИСТІ Є І ЧОГО НЕМАЄ. Є код, розмір знижки й дата, до якої він
+// діє. Немає зворотного відліку, «залишилось 3 години» й іншого
+// тиску: строк тут потрібен, щоб код не жив вічно, а не щоб квапити.
+function thankYouLetter(order, promo, siteUrl) {
+
+    const name = String(order?.first_name ?? "").trim();
+
+    const code = String(promo?.code ?? "").trim();
+
+    const percent = Number(promo?.percent) || 0;
+
+    const base = String(siteUrl ?? "").replace(/\/$/, "");
+
+    // Дату пишемо словами: «до 12.10.2026» читається як реквізит, а
+    // «до 12 жовтня» — як речення.
+    const months = [
+        "січня", "лютого", "березня", "квітня", "травня", "червня",
+        "липня", "серпня", "вересня", "жовтня", "листопада", "грудня",
+    ];
+
+    const until = promo?.expiresAt ? new Date(promo.expiresAt) : null;
+
+    const untilText = until && !Number.isNaN(until.getTime())
+        ? `${until.getDate()} ${months[until.getMonth()]}`
+        : "";
+
+    const body = [
+        `<div style="font-size:15px;line-height:1.6">`,
+        name ? `${escapeHtml(name)}, дякуємо за покупку!` : "Дякуємо за покупку!",
+        ` Сподіваємось, річ вам служить.`,
+        `</div>`,
+
+        `<div style="margin-top:14px;font-size:15px;line-height:1.6">`,
+        `Ось персональна знижка на наступне замовлення — тільки ваша, `,
+        `для одного використання.`,
+        `</div>`,
+
+        // Код великим моноширинним: його переписують руками з листа в
+        // поле на сайті, і саме тут люди помиляються.
+        `<div style="margin:20px 0;padding:18px;border:2px dashed #d1d5db;border-radius:12px;text-align:center">`,
+        `<div style="font:800 26px/1.2 ui-monospace,Menlo,Consolas,monospace;letter-spacing:2px">`,
+        escapeHtml(code),
+        `</div>`,
+        `<div style="margin-top:8px;font-size:15px;color:#374151">`,
+        `знижка ${escapeHtml(String(percent))}%`,
+        untilText ? ` · діє до ${escapeHtml(untilText)}` : "",
+        `</div>`,
+        `</div>`,
+
+        `<div style="text-align:center;margin-top:18px">`,
+        `<a href="${escapeHtml(base)}/catalog" style="display:inline-block;background:#111827;`,
+        `color:#ffffff;text-decoration:none;padding:13px 26px;border-radius:10px;font-weight:600">`,
+        `Подивитись новинки`,
+        `</a>`,
+        `</div>`,
+
+        `<div style="margin-top:20px;font-size:13px;line-height:1.6;color:#6b7280">`,
+        `Код вводиться в полі «Маєте промокод?» на сторінці оформлення.`,
+        `</div>`,
+    ].join("");
+
+    return {
+        subject: `Ваша персональна знижка ${percent}% — код ${code}`,
+        html: letterShell("Дякуємо за покупку 🎁", body, siteUrl),
     };
 
 }
@@ -4137,6 +4236,575 @@ function reviewListResponse({ reviews, total, counts }) {
 
 }
 
+
+// Панель промокодів: чиста логіка.
+//
+// НАВІЩО ОКРЕМИЙ ФАЙЛ
+// --------------------
+// Тут немає ні мережі, ні бази — лише розбір запиту, перевірки й
+// проєкція рядка бази у те, що бачить панель. Завдяки цьому все нижче
+// перевіряється звичайними тестами в Node, без Supabase.
+//
+// ЧОМУ ПАНЕЛЬ, А НЕ ФАЙЛ В АДМІНЦІ
+// ---------------------------------
+// Промокоди не можна тримати у файлі репозиторію: репозиторій
+// публічний, і кожен код був би опублікований разом із ним. Тому вони
+// живуть у базі, а панель ходить до них через цю функцію — з тим
+// самим правом, що й панель замовлень (запис у репозиторій сайту).
+//
+// ІМЕНА
+// ------
+// Усі функції з префіксом promo: у зібраному index.ts усі модулі
+// лежать поруч, і дві функції з однією назвою тихо перекривають одна
+// одну (див. tests/test-no-function-collisions.js — та сама пастка
+// вже коштувала цін у каталозі).
+
+const PROMO_ADMIN_ACTIONS = [
+    "promo-list",
+    "promo-save",
+    "promo-delete",
+    "promo-uses",
+];
+
+function isPromoAction(action) {
+
+    return PROMO_ADMIN_ACTIONS.includes(String(action ?? ""));
+
+}
+
+// Стани коду. Ключ приходить із бази (promo_admin_list), тут — як їх
+// називати людині.
+//
+// «Вимкнений» і «вичерпаний» навмисно різні: у першому випадку код
+// вимкнув власник, у другому він скінчився сам, і це не помилка, а
+// нормальне життя одноразового коду.
+const PROMO_STATES = {
+    live:    { label: "Діє",          badge: "діє" },
+    early:   { label: "Ще не почався", badge: "чекає" },
+    expired: { label: "Скінчився",    badge: "минув" },
+    used_up: { label: "Вичерпаний",   badge: "вичерпано" },
+    off:     { label: "Вимкнений",    badge: "вимк." },
+};
+
+const PROMO_STATE_ORDER = ["live", "early", "expired", "used_up", "off"];
+
+// Межі коду. Латиниця й цифри — щоб код можна було продиктувати по
+// телефону й набрати без перемикання розкладки.
+const PROMO_CODE_RE = /^[A-Z0-9-]{3,32}$/;
+
+function normalizePromoCode(value) {
+
+    return String(value ?? "").trim().toUpperCase();
+
+}
+
+// Відсоток: панель показує 10, база тримає 0.1.
+//
+// Ділення на 100 робимо тут, в одному місці. Коли воно жило на двох
+// боках, рано чи пізно один із них починав слати 10 замість 0.1 — і
+// перевірка «менше одиниці» відхиляла збереження без пояснень.
+function promoPercentToFraction(value) {
+
+    const percent = Number(value);
+
+    if (!Number.isFinite(percent)) return null;
+
+    // Округлення до сотих відсотка: 12.345% — це вже не знижка, а
+    // помилка вводу.
+    const fraction = Math.round(percent * 100) / 10000;
+
+    if (fraction <= 0 || fraction >= 1) return null;
+
+    return fraction;
+
+}
+
+function promoFractionToPercent(value) {
+
+    const fraction = Number(value);
+
+    if (!Number.isFinite(fraction)) return 0;
+
+    return Math.round(fraction * 10000) / 100;
+
+}
+
+// Дата з панелі → мить для бази.
+//
+// Панель шле або порожньо (немає межі), або «2026-12-31» чи
+// «2026-12-31T23:59». Порожнє мусить стати саме null, а не «сьогодні»:
+// null означає «без межі», і сплутати ці два значення — значить
+// вимкнути всі безстрокові коди.
+function promoMoment(value) {
+
+    const text = String(value ?? "").trim();
+
+    if (!text) return null;
+
+    const date = new Date(text);
+
+    if (Number.isNaN(date.getTime())) return null;
+
+    return date.toISOString();
+
+}
+
+// Перелік товарів, на які діє код.
+//
+// Порожній перелік і відсутність переліку — це те саме «на всі
+// товари». Порожній масив у базі поводився б так само, але тримати
+// два способи сказати одне й те саме означає рано чи пізно перевірити
+// лише один із них.
+function promoProductIds(value) {
+
+    if (!Array.isArray(value)) return null;
+
+    const ids = [...new Set(value
+        .map(id => Number(id))
+        .filter(id => Number.isInteger(id) && id > 0))];
+
+    return ids.length ? ids : null;
+
+}
+
+// Ціле додатне або null. Спільне для «скільки разів» і «від якої суми».
+function promoPositive(value, { integer } = {}) {
+
+    if (value === null || value === undefined || String(value).trim() === "") return null;
+
+    const number = Number(value);
+
+    if (!Number.isFinite(number) || number <= 0) return null;
+
+    return integer ? Math.round(number) : number;
+
+}
+
+// Розбір запиту панелі. Повертає { ok, action, params } або { ok:false, error }.
+//
+// Повідомлення про помилку читає власник, а не програміст, — тож вони
+// написані як підказки, а не як коди.
+function parsePromoRequest(body) {
+
+    const action = String(body?.admin_action ?? "");
+
+    if (!isPromoAction(action)) {
+        return { ok: false, error: "Невідома дія панелі промокодів." };
+    }
+
+    if (action === "promo-list") {
+        return { ok: true, action, params: {} };
+    }
+
+    if (action === "promo-delete") {
+
+        const hash = String(body?.hash ?? "").trim().toLowerCase();
+
+        if (!/^[a-f0-9]{64}$/.test(hash)) {
+            return { ok: false, error: "Не зрозуміло, який код видаляти." };
+        }
+
+        return { ok: true, action, params: { hash } };
+
+    }
+
+    if (action === "promo-uses") {
+
+        const code = normalizePromoCode(body?.code);
+
+        if (!code) return { ok: false, error: "Не вказано код." };
+
+        return { ok: true, action, params: { code } };
+
+    }
+
+    // promo-save
+    const code = normalizePromoCode(body?.code);
+
+    if (!PROMO_CODE_RE.test(code)) {
+        return {
+            ok: false,
+            error: "Код: від 3 до 32 символів, лише латинські літери, цифри й дефіс.",
+        };
+    }
+
+    const percent = promoPercentToFraction(body?.percent);
+
+    if (percent === null) {
+        return { ok: false, error: "Відсоток знижки має бути більший за 0 і менший за 100." };
+    }
+
+    const startsAt = promoMoment(body?.starts_at);
+    const expiresAt = promoMoment(body?.expires_at);
+
+    if (startsAt && expiresAt && expiresAt <= startsAt) {
+        return { ok: false, error: "Кінець дії має бути пізніше за початок." };
+    }
+
+    // Код, який закінчився ще до створення, — майже завжди описка в
+    // даті. Мовчки зберегти його означає, що власник дізнається про
+    // помилку від покупця.
+    if (expiresAt && new Date(expiresAt).getTime() <= Date.now()) {
+        return { ok: false, error: "Дата закінчення вже минула — код не працюватиме." };
+    }
+
+    return {
+        ok: true,
+        action,
+        params: {
+            code,
+            percent,
+            active: body?.active !== false,
+            startsAt,
+            expiresAt,
+            maxUses: promoPositive(body?.max_uses, { integer: true }),
+            productIds: promoProductIds(body?.product_ids),
+            minTotal: promoPositive(body?.min_total),
+            note: String(body?.note ?? "").trim().slice(0, 200) || null,
+        },
+    };
+
+}
+
+// Рядок бази → те, що показує панель.
+function promoView(row) {
+
+    if (!row) return null;
+
+    const state = PROMO_STATES[row.state] ? row.state : "live";
+
+    return {
+        hash: String(row.code_hash ?? ""),
+        // Коди, перенесені зі старого списку, лежать лише хешем —
+        // плейнтексту в нас немає й узяти нізвідки. Кажемо це прямо,
+        // а не показуємо порожнє місце.
+        code: String(row.code ?? "").trim(),
+        legacy: !String(row.code ?? "").trim(),
+        percent: promoFractionToPercent(row.percent),
+        active: row.active !== false,
+        state,
+        stateLabel: PROMO_STATES[state].label,
+        stateBadge: PROMO_STATES[state].badge,
+        startsAt: row.starts_at ?? null,
+        expiresAt: row.expires_at ?? null,
+        maxUses: row.max_uses === null || row.max_uses === undefined
+            ? null
+            : Number(row.max_uses),
+        used: Number(row.used) || 0,
+        productIds: Array.isArray(row.product_ids) ? row.product_ids.map(Number) : [],
+        minTotal: row.min_total === null || row.min_total === undefined
+            ? null
+            : Number(row.min_total),
+        note: String(row.note ?? ""),
+        createdAt: row.created_at ?? null,
+    };
+
+}
+
+function promoListResponse(rows) {
+
+    const list = (Array.isArray(rows) ? rows : []).map(promoView).filter(Boolean);
+
+    return {
+        ok: true,
+        promos: list,
+        // Скільки в якому стані — щоб панель могла показати це поруч
+        // із фільтром, не рахуючи вдруге.
+        counts: PROMO_STATE_ORDER.reduce((acc, key) => {
+            acc[key] = list.filter(item => item.state === key).length;
+            return acc;
+        }, {}),
+        states: PROMO_STATE_ORDER.map(key => ({ key, label: PROMO_STATES[key].label })),
+    };
+
+}
+
+// Замовлення, у яких код спрацював.
+function promoUsesResponse(rows) {
+
+    return {
+        ok: true,
+        uses: (Array.isArray(rows) ? rows : []).map(row => ({
+            orderNumber: String(row.order_number ?? ""),
+            createdAt: row.created_at ?? null,
+            customer: String(row.customer ?? "").trim(),
+            email: String(row.email ?? ""),
+            total: Number(row.total) || 0,
+            discount: Number(row.discount) || 0,
+            status: String(row.status ?? ""),
+        })),
+    };
+
+}
+
+// Код для персонального листа.
+//
+// Читабельний набір: без 0/O та 1/I — саме на них люди помиляються,
+// переписуючи код із листа руками.
+const PROMO_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+function promoRandomCode(prefix, randomBytes) {
+
+    const clean = normalizePromoCode(prefix).replace(/[^A-Z0-9]/g, "").slice(0, 8);
+
+    const tail = Array.from(randomBytes || [])
+        .map(byte => PROMO_ALPHABET[byte % PROMO_ALPHABET.length])
+        .join("");
+
+    return `${clean || "BB"}-${tail}`;
+
+}
+
+
+// Панель «Покупці й підписники»: чиста логіка.
+//
+// ЧОГО БРАКУВАЛО
+// ---------------
+// Списку людей не було ніде. Хто зареєструвався в кабінеті — видно
+// лише в консолі Supabase; хто підписався на розсилку — лише в
+// кабінеті MailerLite. Тобто щоб відповісти на «скільки в нас
+// покупців», доводилось відкривати два чужих кабінети, а зіставити
+// одне з одним було нічим.
+//
+// ЧОМУ ДВА СПИСКИ, А НЕ ОДИН
+// ---------------------------
+// Це різні люди й різні згоди. Зареєстрований дав нам обліковий
+// запис — і не давав згоди на розсилку. Підписник дав саме згоду на
+// листи — і може взагалі не мати кабінету. Зліпити їх в один список
+// означало б рано чи пізно написати листа тому, хто на це не
+// погоджувався.
+//
+// ЩО ТУТ Є І ЧОГО НЕМАЄ
+// ----------------------
+// Тут немає мережі — лише розбір запиту й проєкція чужих відповідей у
+// те, що показує панель. Завдяки цьому все нижче перевіряється
+// звичайними тестами в Node.
+//
+// ІМЕНА з префіксом people: у зібраному index.ts усі модулі лежать
+// поруч, і дві функції з однією назвою тихо перекривають одна одну.
+
+const PEOPLE_ADMIN_ACTIONS = ["people-buyers", "people-subscribers"];
+
+function isPeopleAction(action) {
+
+    return PEOPLE_ADMIN_ACTIONS.includes(String(action ?? ""));
+
+}
+
+// Скільки віддавати за раз. Сто — стільки, скільки має сенс гортати
+// очима; більше однаково ніхто не читає, а відповідь важчає.
+const PEOPLE_PAGE = 100;
+
+function parsePeopleRequest(body) {
+
+    const action = String(body?.admin_action ?? "");
+
+    if (!isPeopleAction(action)) {
+        return { ok: false, error: "Невідома дія панелі людей." };
+    }
+
+    const page = Math.max(1, Math.trunc(Number(body?.page) || 1));
+
+    const search = String(body?.search ?? "").trim().slice(0, 120);
+
+    return { ok: true, action, params: { page, search } };
+
+}
+
+// Один рядок списку покупців із відповіді Supabase Auth.
+//
+// Беремо рівно те, що потрібно на екрані. Ні токенів, ні метаданих
+// провайдера, ні пароля (його там і немає) — усе це не має покидати
+// сервер навіть до адмінки.
+function buyerView(user, ordersByEmail) {
+
+    if (!user) return null;
+
+    const email = String(user.email ?? "").toLowerCase();
+
+    const stats = (ordersByEmail && ordersByEmail[email]) || null;
+
+    return {
+        id: String(user.id ?? ""),
+        email: email,
+        // Ім'я людина вказує при оформленні, а не при реєстрації, тож
+        // беремо його із замовлень: у метаданих облікового запису
+        // здебільшого порожньо.
+        name: (stats && stats.name) || String(user.user_metadata?.full_name ?? ""),
+        createdAt: user.created_at ?? null,
+        lastSignInAt: user.last_sign_in_at ?? null,
+        // Підтверджена пошта означає, що людина справді нею володіє.
+        confirmed: Boolean(user.email_confirmed_at || user.confirmed_at),
+        orders: stats ? stats.count : 0,
+        spent: stats ? stats.spent : 0,
+        lastOrderAt: stats ? stats.lastAt : null,
+    };
+
+}
+
+// Замовлення → зведення за поштою.
+//
+// Рахуємо ТУТ, а не окремим запитом на кожного покупця: сто запитів
+// замість одного зробили б сторінку повільною рівно тоді, коли
+// покупців стане багато.
+//
+// Скасовані не рахуємо в суму: «витратив 40 000» на трьох скасованих
+// замовленнях — це неправда, з якої власник зробить хибний висновок.
+function ordersByEmail(rows) {
+
+    const map = {};
+
+    (Array.isArray(rows) ? rows : []).forEach(row => {
+
+        const email = String(row?.email ?? "").trim().toLowerCase();
+
+        if (!email) return;
+
+        if (!map[email]) map[email] = { count: 0, spent: 0, lastAt: null, name: "" };
+
+        const entry = map[email];
+
+        const cancelled = String(row?.status ?? "") === "cancelled";
+
+        entry.count += 1;
+
+        if (!cancelled) entry.spent += Number(row?.total) || 0;
+
+        const at = row?.created_at ?? null;
+
+        if (at && (!entry.lastAt || at > entry.lastAt)) entry.lastAt = at;
+
+        if (!entry.name) {
+            entry.name = [row?.first_name, row?.last_name]
+                .map(part => String(part ?? "").trim())
+                .filter(Boolean)
+                .join(" ");
+        }
+
+    });
+
+    return map;
+
+}
+
+// Пошук по вже отриманому списку.
+//
+// Supabase Auth Admin API фільтрувати за підрядком не вміє, тож
+// відбираємо на своєму боці. Це чесно працює на списку, який ми
+// однаково цілком прочитали, і не вдає можливості, якої немає.
+function filterPeople(list, search) {
+
+    const query = String(search ?? "").trim().toLowerCase();
+
+    if (!query) return list;
+
+    return list.filter(item =>
+        String(item.email ?? "").toLowerCase().includes(query)
+        || String(item.name ?? "").toLowerCase().includes(query));
+
+}
+
+function buyersResponse({ users, orders, search, page }) {
+
+    const stats = ordersByEmail(orders);
+
+    const all = (Array.isArray(users) ? users : [])
+        .map(user => buyerView(user, stats))
+        .filter(Boolean)
+        // Найновіші першими: саме їх і хочеться бачити.
+        .sort((a, b) => String(b.createdAt ?? "").localeCompare(String(a.createdAt ?? "")));
+
+    const found = filterPeople(all, search);
+
+    const from = (Math.max(1, page || 1) - 1) * PEOPLE_PAGE;
+
+    return {
+        ok: true,
+        people: found.slice(from, from + PEOPLE_PAGE),
+        total: found.length,
+        page: Math.max(1, page || 1),
+        perPage: PEOPLE_PAGE,
+        // Скільки з них справді щось купували — найкорисніше число на
+        // цій сторінці.
+        withOrders: all.filter(person => person.orders > 0).length,
+    };
+
+}
+
+// Стан підписника в MailerLite. Ключі — їхні, назви — наші.
+const SUBSCRIBER_STATES = {
+    active:       "Підписаний",
+    unconfirmed:  "Не підтвердив",
+    unsubscribed: "Відписався",
+    bounced:      "Пошта не існує",
+    junk:         "Позначив спамом",
+};
+
+function subscriberView(row) {
+
+    if (!row) return null;
+
+    const status = String(row.status ?? "");
+
+    return {
+        id: String(row.id ?? ""),
+        email: String(row.email ?? "").toLowerCase(),
+        status: status,
+        statusLabel: SUBSCRIBER_STATES[status] || status || "—",
+        createdAt: row.created_at ?? null,
+        subscribedAt: row.subscribed_at ?? null,
+        // Скільки листів людина відкрила — єдине число, за яким видно,
+        // жива підписка чи ні.
+        opens: Number(row.opens_count) || 0,
+        clicks: Number(row.clicks_count) || 0,
+    };
+
+}
+
+function subscribersResponse({ rows, total, page, search }) {
+
+    const all = (Array.isArray(rows) ? rows : []).map(subscriberView).filter(Boolean);
+
+    const found = filterPeople(all, search);
+
+    return {
+        ok: true,
+        people: found,
+        total: typeof total === "number" ? total : found.length,
+        page: Math.max(1, page || 1),
+        perPage: PEOPLE_PAGE,
+        active: all.filter(person => person.status === "active").length,
+    };
+
+}
+
+// Запит до MailerLite: адреса й заголовки.
+//
+// Окремою функцією, щоб тест міг перевірити її, не ходячи в мережу, —
+// і щоб ключ не розповзався по коду.
+function subscribersRequest(apiKey, { page, groupId } = {}) {
+
+    if (!apiKey) return null;
+
+    const params = new URLSearchParams();
+
+    params.set("limit", String(PEOPLE_PAGE));
+    params.set("page", String(Math.max(1, page || 1)));
+
+    // Група та сама, у яку кладе підписки сама форма: інакше в списку
+    // з'явились би люди з інших розсилок цього ж акаунта.
+    if (groupId) params.set("filter[group]", String(groupId));
+
+    return {
+        url: `https://connect.mailerlite.com/api/subscribers?${params.toString()}`,
+        headers: {
+            Authorization: `Bearer ${apiKey}`,
+            Accept: "application/json",
+        },
+    };
+
+}
+
 // ======================================
 // Telegram-бот для заявок BestBrnd4u
 //
@@ -4170,6 +4838,11 @@ function reviewListResponse({ reviews, total, counts }) {
 
 
 
+
+// Панель «Промокоди»: строки, обмеження, облік (пояснення — у
+// promo-admin.js).
+
+// Панель «Покупці й підписники» (пояснення — у people-admin.js).
 
 // Панель «Відгуки» в адмінці — другий спосіб модерації поруч із
 // кнопками в Telegram (пояснення — у review-admin.js).
@@ -7079,6 +7752,231 @@ async function refreshReviewCard(review: Record<string, any>) {
 
 }
 
+// -------------------------
+// Панель промокодів
+// -------------------------
+//
+// Уся робота — через функції бази (міграція 025), а не прямими
+// запитами до таблиці. Причина та сама, що й у решті панелей: правила
+// «чи діє код» мусять жити в ОДНОМУ місці, і це місце — база, бо її
+// читає ще й тригер, який підтверджує суму замовлення.
+
+async function handlePromoAdmin(body: Record<string, any>, origin: string | null): Promise<Response> {
+
+  const parsed = parsePromoRequest(body);
+
+  if (!parsed.ok) return adminJson({ ok: false, error: parsed.error }, 400, origin);
+
+  const { action, params } = parsed;
+
+  // Помилку бази показуємо власнику як є лише тоді, коли її кинула
+  // сама функція (raise exception з людським текстом). Решту ховаємо:
+  // технічні подробиці PostgREST нічого йому не кажуть.
+  const failed = async (response: Response, fallback: string) => {
+
+    const detail = await response.text();
+
+    console.error("Панель промокодів:", detail);
+
+    let message = fallback;
+
+    try {
+      const parsedDetail = JSON.parse(detail);
+      if (typeof parsedDetail?.message === "string" && parsedDetail.message.length < 200) {
+        message = parsedDetail.message;
+      }
+    } catch (error) { /* лишаємо загальне */ }
+
+    return adminJson({ ok: false, error: message }, 502, origin);
+
+  };
+
+  if (action === "promo-list") {
+
+    const response = await supabaseRest("rpc/promo_admin_list", {
+      method: "POST",
+      body: JSON.stringify({}),
+    });
+
+    if (!response.ok) return await failed(response, "Не вдалося прочитати список кодів.");
+
+    return adminJson(promoListResponse(await response.json()), 200, origin);
+
+  }
+
+  if (action === "promo-uses") {
+
+    const response = await supabaseRest("rpc/promo_admin_uses", {
+      method: "POST",
+      body: JSON.stringify({ p_code: params.code }),
+    });
+
+    if (!response.ok) return await failed(response, "Не вдалося прочитати використання.");
+
+    return adminJson(promoUsesResponse(await response.json()), 200, origin);
+
+  }
+
+  if (action === "promo-delete") {
+
+    const response = await supabaseRest("rpc/promo_admin_delete", {
+      method: "POST",
+      body: JSON.stringify({ p_hash: params.hash }),
+    });
+
+    if (!response.ok) return await failed(response, "Не вдалося видалити код.");
+
+    return adminJson({ ok: true }, 200, origin);
+
+  }
+
+  // promo-save
+  const response = await supabaseRest("rpc/promo_admin_save", {
+    method: "POST",
+    body: JSON.stringify({
+      p_code: params.code,
+      p_percent: params.percent,
+      p_active: params.active,
+      p_starts_at: params.startsAt,
+      p_expires_at: params.expiresAt,
+      p_max_uses: params.maxUses,
+      p_product_ids: params.productIds,
+      p_min_total: params.minTotal,
+      p_note: params.note,
+    }),
+  });
+
+  if (!response.ok) return await failed(response, "Не вдалося зберегти код.");
+
+  return adminJson({ ok: true, code: params.code }, 200, origin);
+
+}
+
+// -------------------------
+// Панель «Покупці й підписники»
+// -------------------------
+//
+// Два різних джерела, і жодне з них не в нашій базі:
+//
+//   • покупці — auth.users, куди PostgREST не пускає взагалі; читаємо
+//     Admin API самого Supabase службовим ключем;
+//   • підписники — MailerLite, чужий сервіс із власним ключем.
+//
+// Обидва ключі лишаються на сервері. Панель отримує лише те, що видно
+// на екрані: пошта, ім'я, дати й числа.
+
+async function handlePeopleAdmin(body: Record<string, any>, origin: string | null): Promise<Response> {
+
+  const parsed = parsePeopleRequest(body);
+
+  if (!parsed.ok) return adminJson({ ok: false, error: parsed.error }, 400, origin);
+
+  const { action, params } = parsed;
+
+  if (action === "people-buyers") {
+
+    // Admin API віддає сторінками. Беремо з запасом: список покупців
+    // магазину — це сотні, а не сотні тисяч, і гортати його запитами
+    // тут дорожче, ніж прочитати цілком.
+    const users: any[] = [];
+
+    for (let page = 1; page <= 10; page++) {
+
+      const response = await fetch(
+        `${SUPABASE_URL}/auth/v1/admin/users?page=${page}&per_page=200`,
+        {
+          headers: {
+            apikey: SERVICE_ROLE_KEY,
+            Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+          },
+        },
+      );
+
+      if (!response.ok) {
+
+        console.error("Список покупців:", await response.text());
+
+        return adminJson({
+          ok: false,
+          error: "Не вдалося прочитати список покупців.",
+        }, 502, origin);
+
+      }
+
+      const payload = await response.json();
+
+      const batch = Array.isArray(payload?.users) ? payload.users : [];
+
+      users.push(...batch);
+
+      if (batch.length < 200) break;
+
+    }
+
+    // Замовлення — щоб поруч із поштою стояло, скільки людина купувала.
+    // Одним запитом на всіх: по запиту на покупця сторінка стала б
+    // повільною рівно тоді, коли покупців побільшає.
+    const orders = await supabaseRest(
+      "orders?select=email,total,status,created_at,first_name,last_name&order=created_at.desc&limit=5000",
+    );
+
+    const rows = orders.ok ? await orders.json() : [];
+
+    return adminJson(buyersResponse({
+      users,
+      orders: rows,
+      search: params.search,
+      page: params.page,
+    }), 200, origin);
+
+  }
+
+  // people-subscribers
+  const request = subscribersRequest(MAILERLITE_API_KEY, {
+    page: params.page,
+    groupId: MAILERLITE_GROUP_ID,
+  });
+
+  if (!request) {
+
+    // Ключа немає — це не помилка, а «розсилку ще не під'єднали».
+    // Панель мусить сказати саме це, а не «щось пішло не так».
+    return adminJson({
+      ok: true,
+      people: [],
+      total: 0,
+      page: 1,
+      perPage: PEOPLE_PAGE,
+      active: 0,
+      disabled: "Розсилку ще не під'єднано: у секретах функції немає MAILERLITE_API_KEY.",
+    }, 200, origin);
+
+  }
+
+  const response = await fetch(request.url, { headers: request.headers });
+
+  if (!response.ok) {
+
+    console.error("Список підписників:", await response.text());
+
+    return adminJson({
+      ok: false,
+      error: "MailerLite не відповів. Спробуйте пізніше.",
+    }, 502, origin);
+
+  }
+
+  const payload = await response.json();
+
+  return adminJson(subscribersResponse({
+    rows: payload?.data,
+    total: payload?.meta?.total,
+    page: params.page,
+    search: params.search,
+  }), 200, origin);
+
+}
+
 async function handleAdmin(request: Request, body: Record<string, any>): Promise<Response> {
 
   const origin = request.headers.get("origin");
@@ -7104,6 +8002,15 @@ async function handleAdmin(request: Request, body: Record<string, any>): Promise
   // репозиторій сайту), і дублювати її не треба.
   if (isReviewAction(body.admin_action)) {
     return await handleReviewAdmin(body, origin);
+  }
+
+  // Панель промокодів — так само окремою гілкою й з тим самим правом.
+  if (isPromoAction(body.admin_action)) {
+    return await handlePromoAdmin(body, origin);
+  }
+
+  if (isPeopleAction(body.admin_action)) {
+    return await handlePeopleAdmin(body, origin);
   }
 
   const parsed = parseAdminRequest(body);
