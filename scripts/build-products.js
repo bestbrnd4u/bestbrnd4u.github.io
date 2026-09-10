@@ -207,6 +207,27 @@ function stampImageVersions(products) {
 
     const cache = new Map();
 
+    // Версію рахуємо з базового фото ТА ЙОГО ЗМЕНШЕНИХ КОПІЙ.
+    //
+    // ЧОМУ НЕ ЛИШЕ З БАЗИ
+    // --------------------
+    // Верстка підставляє в srcset ту саму версію, що й у бази (див.
+    // buildSrcSet в assets/js/ui.js): `photo-600.avif?v=<версія бази>`.
+    // Поки копії змінювались разом із базою, цього вистачало.
+    //
+    // Але копію можна перезібрати й БЕЗ зміни бази — саме це й
+    // сталось, коли 32 avif-копії виявились зробленими з широкого
+    // оригіналу й були перебудовані. База не змінилась, версія не
+    // змінилась, адреса не змінилась — і Cloudflare далі віддавав з
+    // краю СТАРУ картинку за старою адресою. Заміряно: файл без
+    // версії вже новий (600×750), а з версією — ще старий (600×397).
+    //
+    // Тепер будь-яка зміна копії міняє версію, тобто адресу, тобто
+    // край змушений піти по нову. Читання чотирьох маленьких файлів
+    // на фото коштує секунди на всю збірку.
+    const VARIANTS = [300, 600];
+    const VARIANT_FORMATS = ["webp", "avif"];
+
     function version(src) {
 
         const clean = String(src).split("?")[0];
@@ -219,10 +240,23 @@ function stampImageVersions(products) {
 
         if (fs.existsSync(file)) {
 
-            stamp = crypto.createHash("sha1")
-                .update(fs.readFileSync(file))
-                .digest("hex")
-                .slice(0, 8);
+            const hash = crypto.createHash("sha1").update(fs.readFileSync(file));
+
+            const stem = file.replace(/\.[^.]+$/, "");
+
+            VARIANT_FORMATS.forEach(format => {
+
+                VARIANTS.forEach(width => {
+
+                    const variant = `${stem}-${width}.${format}`;
+
+                    if (fs.existsSync(variant)) hash.update(fs.readFileSync(variant));
+
+                });
+
+            });
+
+            stamp = hash.digest("hex").slice(0, 8);
 
         }
 

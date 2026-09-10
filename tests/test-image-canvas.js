@@ -303,6 +303,70 @@ console.log("\n[6] Зменшені копії зроблені з поточн�
     check("жодна копія не має форми, відмінної від оригіналу",
         wrongShape.length === 0, wrongShape.slice(0, 4).join("; "));
 
+    // ПЕРЕЗІБРАНА КОПІЯ МУСИТЬ ЗМІНИТИ АДРЕСУ.
+    //
+    // Верстка підставляє в srcset версію БАЗИ (buildSrcSet в ui.js):
+    // `photo-600.avif?v=<версія бази>`. Поки копії мінялись разом із
+    // базою, цього вистачало.
+    //
+    // Але копію можна перезібрати й без зміни бази — саме так і
+    // вийшло, коли 32 avif-копії виявились зробленими з широкого
+    // оригіналу. База не змінилась, версія не змінилась, адреса не
+    // змінилась — і Cloudflare далі віддавав з краю стару картинку.
+    // Заміряно на живому деві: та сама копія без версії вже нова
+    // (600×750), а з версією — ще стара (600×397).
+    //
+    // Тому версія рахується з бази ТА її копій.
+    const builder = fs.readFileSync(path.join(ROOT, "scripts/build-products.js"), "utf8");
+
+    const versionFn = builder.slice(
+        builder.indexOf("function version(src)"),
+        builder.indexOf("function stamp(src)"));
+
+    check("версія фото рахується разом із копіями",
+        /hash\.update\(fs\.readFileSync\(variant\)\)/.test(versionFn));
+
+    // Перевіряємо не текст, а наслідок: підміна копії мусить дати
+    // іншу версію тієї самої бази.
+    const crypto = require("crypto");
+
+    const sample = allBases.find(name =>
+        fs.existsSync(path.join(uploads, name.replace(/\.webp$/, "-600.avif"))));
+
+    if (sample) {
+
+        const baseBytes = fs.readFileSync(path.join(uploads, sample));
+
+        const only = crypto.createHash("sha1").update(baseBytes).digest("hex").slice(0, 8);
+
+        const withVariants = (() => {
+
+            const hash = crypto.createHash("sha1").update(baseBytes);
+
+            const stem = path.join(uploads, sample.replace(/\.webp$/, ""));
+
+            ["webp", "avif"].forEach(format => {
+                [300, 600].forEach(width => {
+                    const variant = `${stem}-${width}.${format}`;
+                    if (fs.existsSync(variant)) hash.update(fs.readFileSync(variant));
+                });
+            });
+
+            return hash.digest("hex").slice(0, 8);
+
+        })();
+
+        check("версія з копіями відрізняється від версії лише з бази",
+            only !== withVariants, `${only} проти ${withVariants}`);
+
+        // Що ця версія справді доїхала в дані, перевіряє окремо
+        // tests/test-cache-busting.js — на розмітці сторінок. Тут її
+        // не питаємо навмисно: читати згенерований data/products.json
+        // тестам заборонено (він буває застарілим у свіжому клоні —
+        // див. tests/test-migration-types.js).
+
+    }
+
     // І сам механізм: перевірка лише на існування файлу пропускала
     // застарілі копії.
     const normalizer = fs.readFileSync(

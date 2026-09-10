@@ -224,6 +224,23 @@ console.log("\n[5b] Версії у згенерованих даних відп
 
     // І вона мусить збігатися з реальним вмістом: розбіжність означала
     // б, що версія застаріла й заміну знову не побачать.
+    //
+    // У ВМІСТ ВХОДЯТЬ І ЗМЕНШЕНІ КОПІЇ.
+    //
+    // Верстка підставляє в srcset версію бази (buildSrcSet в ui.js):
+    // `photo-600.avif?v=<версія бази>`. Тобто копію можна перезібрати
+    // без зміни бази — і адреса лишиться тією самою.
+    //
+    // Саме так і вийшло, коли 32 avif-копії виявились зробленими з
+    // широкого оригіналу й були перебудовані: Cloudflare далі віддавав
+    // з краю стару картинку за старою адресою. Заміряно на живому
+    // деві — та сама копія без версії вже нова, а з версією ще стара.
+    //
+    // Тому версія рахується з бази ТА її копій (stampImageVersions у
+    // scripts/build-products.js), і тут перевіряємо так само.
+    const VARIANT_WIDTHS = [300, 600];
+    const VARIANT_FORMATS = ["webp", "avif"];
+
     const wrong = [...new Set(images)].filter(src => {
 
         const [clean, query] = src.split("?");
@@ -231,10 +248,23 @@ console.log("\n[5b] Версії у згенерованих даних відп
 
         if (!fs.existsSync(file)) return true;
 
-        const hash = crypto.createHash("sha1")
-            .update(fs.readFileSync(file)).digest("hex").slice(0, 8);
+        const hash = crypto.createHash("sha1").update(fs.readFileSync(file));
 
-        return query !== `v=${hash}`;
+        const stem = file.replace(/\.[^.]+$/, "");
+
+        VARIANT_FORMATS.forEach(format => {
+
+            VARIANT_WIDTHS.forEach(width => {
+
+                const variant = `${stem}-${width}.${format}`;
+
+                if (fs.existsSync(variant)) hash.update(fs.readFileSync(variant));
+
+            });
+
+        });
+
+        return query !== `v=${hash.digest("hex").slice(0, 8)}`;
 
     });
 
