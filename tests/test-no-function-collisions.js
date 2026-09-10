@@ -16,9 +16,22 @@ const ROOT = require("path").join(__dirname, "..");
 let failures=0;
 const check=(n,c,e)=>{if(c)console.log("  ✓",n);else{console.log("  ✗",n,e!==undefined?"→ "+e:"");failures++;}};
 
+// ЦЯ ФУНКЦІЯ ДОВГО ПОВЕРТАЛА ПОРОЖНЄ — і весь набір проходив, не
+// перевіривши нічого.
+//
+// Шаблон вимагав рівно `<script src="assets/js/ім'я.js"></script>`, а
+// збірка ще на кроці apply-cache-version дописує в адресу відбиток:
+// `...common.js?v=044b86d6`. Кореневі сторінки в репозиторії лежать
+// уже зібраними, тож збіг не траплявся ЖОДНОГО разу — заміряно, нуль
+// скриптів на кожній із трьох сторінок.
+//
+// Тому тепер: відбиток необов'язковий, атрибути (defer) теж, а
+// кількість знайдених перевіряється окремо — щоб наступна зміна
+// розмітки не перетворила сторожа на декорацію мовчки.
 function scriptsOn(page){
   const html=fs.readFileSync(path.join(ROOT,page),"utf8");
-  return [...html.matchAll(/<script src="assets\/js\/([\w-]+\.js)"><\/script>/g)].map(m=>m[1]);
+  return [...html.matchAll(/<script[^>]*\ssrc="assets\/js\/([\w-]+\.js)(?:\?v=[a-f0-9]+)?"/g)]
+    .map(m=>m[1]);
 }
 
 function topLevelFunctions(file){
@@ -28,7 +41,23 @@ function topLevelFunctions(file){
   return [...src.matchAll(/^function ([a-zA-Z_][a-zA-Z0-9_]*)/gm)].map(m=>m[1]);
 }
 
-const pages=["index.html","catalog.html","product.html"];
+// Усі сторінки сайту, а не три обрані: колізія на сторінці
+// оформлення коштує дорожче за колізію на головній.
+const pages=fs.readdirSync(ROOT)
+  .filter(f=>f.endsWith(".html"))
+  .filter(f=>scriptsOn(f).length>0);
+
+console.log("\n[0] Сторож справді щось бачить");
+{
+  // Саме через відсутність цієї перевірки набір і проходив вхолосту.
+  check(`сторінок зі скриптами знайдено: ${pages.length}`, pages.length>=10, pages.length);
+
+  const thin=pages.filter(p=>scriptsOn(p).length<5);
+
+  check("на кожній сторінці знайдено щонайменше пʼять скриптів",
+        thin.length===0,
+        thin.map(p=>`${p}: ${scriptsOn(p).length}`).join(", "));
+}
 
 console.log("\n[1] Немає колізій імен функцій серед скриптів, підключених РАЗОМ");
 pages.forEach(page=>{

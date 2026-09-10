@@ -550,6 +550,57 @@ if (skipped.length) {
     console.log(`\n  ⓘ  не потрапили у фід (${skipped.length}): ${skipped.slice(0, 3).join("; ")}`);
 }
 
+console.log("\n[12] Той самий фід приймає Meta");
+{
+    // Каталог в Instagram і Facebook живиться ТИМ САМИМ фідом, що
+    // Google Shopping (docs/КАТАЛОГ-В-INSTAGRAM.md). Тобто окремої
+    // роботи це не потребує — але й ламати його не можна: зникне
+    // одне поле, і разом із Google відвалиться позначка товарів у
+    // сторіс.
+    //
+    // Перелік — обов'язкові поля Meta Commerce Manager.
+    const REQUIRED = [
+        "id", "title", "description", "availability",
+        "condition", "price", "link", "image_link", "brand",
+    ];
+
+    // Розбираємо ГОТОВИЙ XML, а не проміжні об'єкти: Meta читає саме
+    // те, що ми віддаємо.
+    const blocks = xml.split("<item>").slice(1);
+
+    const missing = {};
+
+    blocks.forEach(block => {
+
+        REQUIRED.forEach(field => {
+
+            if (!new RegExp(`<(g:)?${field}>`).test(block)) {
+                missing[field] = (missing[field] || 0) + 1;
+            }
+
+        });
+
+    });
+
+    check(`усі ${REQUIRED.length} обов'язкових полів Meta на місці в ${blocks.length} позиціях`,
+        Object.keys(missing).length === 0,
+        JSON.stringify(missing));
+
+    // Duplicate id — найчастіша причина, з якої Meta відхиляє частину
+    // каталогу, і побачити її можна лише в їхньому кабінеті.
+    const ids = [...xml.matchAll(/<g:id>([^<]*)<\/g:id>/g)].map(m => m[1]);
+
+    check("жодного повторюваного id", new Set(ids).size === ids.length,
+        `${new Set(ids).size} унікальних із ${ids.length}`);
+
+    // Ціна без валюти — друга найчастіша причина.
+    const badPrice = [...xml.matchAll(/<g:price>([^<]*)<\/g:price>/g)]
+        .map(m => m[1])
+        .filter(price => !/^\d+\.\d{2} [A-Z]{3}$/.test(price));
+
+    check("ціна скрізь із валютою", badPrice.length === 0, badPrice.slice(0, 3).join(", "));
+}
+
 console.log(failures === 0
     ? `\n✅ Фід: ${items.length} позицій, усе на місці\n`
     : `\n❌ Проблем: ${failures}\n`);

@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex" />
+<title>BestBrnd4u — Промокоди</title>
+<link rel="icon" href="../assets/images/favicon.png">
+<style>
+
+    *{ box-sizing:border-box; }
+
+    body{
+        margin:0;
+        font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+        background:#f8fafc;
+        color:#111827;
+        line-height:1.55;
+    }
+
+    .wrap{
+        max-width:960px;
+        margin:0 auto;
+        padding:28px 20px 80px;
+    }
+
+    a.back{
+        display:inline-flex;
+        align-items:center;
+        gap:6px;
+        color:#2563eb;
+        text-decoration:none;
+        font-weight:600;
+        font-size:14px;
+        margin-bottom:16px;
+    }
+
+    h1{ font-size:26px; margin:0 0 4px; }
+
+    .lead{ color:#4b5563; margin:0 0 22px; font-size:14px; }
+
+    .muted{ color:#6b7280; }
+
+    .btn{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:7px;
+        background:#2563eb;
+        color:#fff;
+        border:none;
+        padding:10px 18px;
+        border-radius:10px;
+        font:600 14px/1.2 inherit;
+        cursor:pointer;
+        text-decoration:none;
+        transition:background 160ms ease;
+    }
+
+    .btn:disabled{ opacity:.6; cursor:not-allowed; }
+
+    .btn-ghost{ background:#fff; color:#111827; border:1px solid #e5e7eb; }
+    .btn-no{ background:#fff; color:#b91c1c; border:1px solid #fecaca; }
+    .btn-sm{ padding:8px 13px; font-size:13px; }
+
+    /* -------- вхід -------- */
+
+    .gate{
+        background:#fff;
+        border-radius:16px;
+        box-shadow:0 8px 24px rgba(0,0,0,.06);
+        padding:28px 26px;
+        max-width:560px;
+    }
+
+    .gate h2{ margin:0 0 8px; font-size:19px; }
+    .gate p{ margin:0 0 18px; color:#4b5563; font-size:14px; }
+
+    /* -------- панель інструментів -------- */
+
+    .toolbar{
+        display:flex;
+        gap:10px;
+        align-items:center;
+        margin-bottom:14px;
+        flex-wrap:wrap;
+    }
+
+    .toolbar .spacer{ margin-left:auto; }
+
+    .tabs{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+
+    .tab{
+        border:1px solid #e5e7eb;
+        background:#fff;
+        color:#374151;
+        border-radius:999px;
+        padding:7px 14px;
+        font:600 13px/1.2 inherit;
+        cursor:pointer;
+        display:inline-flex;
+        align-items:center;
+        gap:7px;
+        transition:background 160ms ease, border-color 160ms ease, color 160ms ease;
+    }
+
+    .tab.on{ background:#111827; border-color:#111827; color:#fff; }
+
+    .tab .count{
+        background:rgba(0,0,0,.08);
+        border-radius:999px;
+        padding:1px 7px;
+        font-size:11.5px;
+    }
+
+    .tab.on .count{ background:rgba(255,255,255,.18); }
+
+    /* -------- форма -------- */
+
+    .editor{
+        background:#fff;
+        border:1px solid #e5e7eb;
+        border-radius:14px;
+        padding:18px;
+        margin-bottom:18px;
+    }
+
+    .editor h2{ margin:0 0 14px; font-size:17px; }
+
+    .grid{
+        display:grid;
+        grid-template-columns:repeat(auto-fit, minmax(190px, 1fr));
+        gap:12px;
+    }
+
+    .field{ display:flex; flex-direction:column; gap:5px; }
+
+    .field label{
+        font-size:12px;
+        font-weight:700;
+        text-transform:uppercase;
+        letter-spacing:.5px;
+        color:#6b7280;
+    }
+
+    .field input, .field select, .field textarea{
+        padding:10px 12px;
+        border:1px solid #e5e7eb;
+        border-radius:10px;
+        font:inherit;
+        font-size:14px;
+        width:100%;
+    }
+
+    .field input:focus, .field textarea:focus{ outline:none; border-color:#2563eb; }
+
+    .field .hint{ font-size:12px; color:#6b7280; font-weight:400; text-transform:none; letter-spacing:0; }
+
+    #promoCode{ text-transform:uppercase; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
+
+    .checkline{ display:flex; align-items:center; gap:8px; font-size:14px; }
+
+    .editor-actions{ display:flex; gap:9px; margin-top:14px; flex-wrap:wrap; align-items:center; }
+
+    /* -------- вибір товарів -------- */
+
+    .picker{ margin-top:12px; }
+
+    .picker-found{
+        max-height:200px;
+        overflow:auto;
+        border:1px solid #e5e7eb;
+        border-radius:10px;
+        margin-top:8px;
+    }
+
+    .picker-found:empty{ display:none; }
+
+    .picker-row{
+        display:flex;
+        justify-content:space-between;
+        gap:10px;
+        padding:8px 12px;
+        border-bottom:1px solid #f3f4f6;
+        cursor:pointer;
+        font-size:13.5px;
+    }
+
+    .picker-row:last-child{ border-bottom:none; }
+    .picker-row:hover{ background:#f8fafc; }
+
+    .chips{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+
+    .chip{
+        display:inline-flex;
+        align-items:center;
+        gap:6px;
+        background:#eef2ff;
+        color:#3730a3;
+        border-radius:999px;
+        padding:4px 10px;
+        font-size:12.5px;
+    }
+
+    .chip button{
+        border:none;
+        background:none;
+        color:inherit;
+        cursor:pointer;
+        font-size:13px;
+        line-height:1;
+        padding:0;
+    }
+
+    /* -------- список -------- */
+
+    .list{ display:flex; flex-direction:column; gap:14px; }
+
+    .card{
+        background:#fff;
+        border:1px solid #e5e7eb;
+        border-radius:14px;
+        padding:16px 18px;
+    }
+
+    .card-head{
+        display:flex;
+        gap:12px;
+        align-items:center;
+        flex-wrap:wrap;
+        margin-bottom:8px;
+    }
+
+    .code{
+        font:800 18px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;
+        letter-spacing:1px;
+    }
+
+    .code.legacy{ font-weight:600; font-size:14px; color:#6b7280; letter-spacing:0; }
+
+    .off{
+        font-size:15px;
+        font-weight:800;
+        color:#059669;
+    }
+
+    .badge{
+        display:inline-block;
+        border-radius:999px;
+        padding:2px 9px;
+        font-size:11.5px;
+        font-weight:700;
+    }
+
+    .badge-live{ background:#d1fae5; color:#047857; }
+    .badge-early{ background:#dbeafe; color:#1d4ed8; }
+    .badge-expired{ background:#f3f4f6; color:#4b5563; }
+    .badge-used_up{ background:#fef3c7; color:#92400e; }
+    .badge-off{ background:#fee2e2; color:#b91c1c; }
+
+    .facts{
+        display:flex;
+        gap:14px;
+        flex-wrap:wrap;
+        font-size:12.5px;
+        color:#6b7280;
+        margin-bottom:12px;
+    }
+
+    .facts b{ color:#111827; font-weight:600; }
+
+    .actions{ display:flex; gap:9px; flex-wrap:wrap; align-items:center; }
+
+    .uses{
+        margin-top:12px;
+        border-top:1px solid #f3f4f6;
+        padding-top:10px;
+        font-size:13px;
+    }
+
+    .uses table{ width:100%; border-collapse:collapse; }
+    .uses th, .uses td{ text-align:left; padding:5px 8px 5px 0; border-bottom:1px solid #f8fafc; }
+    .uses th{ font-size:11.5px; text-transform:uppercase; letter-spacing:.4px; color:#6b7280; }
+
+    /* -------- повідомлення -------- */
+
+    .msg{ border-radius:10px; padding:11px 14px; font-size:13.5px; margin-bottom:14px; }
+    .msg-ok{ background:#d1fae5; color:#065f46; }
+    .msg-error{ background:#fee2e2; color:#991b1b; }
+
+    .empty{
+        background:#fff;
+        border:1px dashed #e5e7eb;
+        border-radius:14px;
+        padding:30px 20px;
+        text-align:center;
+        color:#6b7280;
+        font-size:14px;
+    }
+
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+    <a class="back" href="index.html">← В адмінку</a>
+
+    <h1>Промокоди</h1>
+    <p class="lead">
+        Код діє рівно доти, доки виконуються його умови: перемикач, дати
+        й кількість використань. Нічого вимикати руками не треба — коли
+        строк вийшов або код вичерпано, він перестає працювати сам, і
+        це видно тут у списку.
+    </p>
+
+    <p class="muted" id="boot">Завантажую промокоди…</p>
+
+    <!-- Вхід той самий, що в решті панелей: право визначається
+         токеном GitHub, під яким людина зайшла в адмінку. -->
+    <div class="gate" id="gate" hidden>
+        <h2 id="gateTitle">Потрібен вхід</h2>
+        <p id="gateText">Промокоди бачить лише той, хто має право запису в репозиторій сайту.</p>
+        <button class="btn" id="gateBtn">Увійти через GitHub</button>
+    </div>
+
+    <div id="panel" hidden>
+
+        <div id="listMsg"></div>
+
+        <div class="toolbar">
+            <button class="btn" id="newBtn">+ Новий код</button>
+            <span class="spacer"></span>
+            <button class="btn btn-ghost btn-sm" id="refreshBtn">Оновити</button>
+        </div>
+
+        <!-- Форма з'являється за кнопкою: більшість часу з панеллю
+             приходять дивитись, а не створювати. -->
+        <div class="editor" id="editor" hidden>
+
+            <h2 id="editorTitle">Новий промокод</h2>
+
+            <div class="grid">
+
+                <div class="field">
+                    <label for="promoCode">Код</label>
+                    <input type="text" id="promoCode" maxlength="32" autocomplete="off"
+                           placeholder="OSIN2026">
+                    <span class="hint">Латиниця, цифри й дефіс. Його диктують по телефону — хай буде простий.</span>
+                </div>
+
+                <div class="field">
+                    <label for="promoPercent">Знижка, %</label>
+                    <input type="number" id="promoPercent" min="1" max="99" step="0.5" placeholder="10">
+                </div>
+
+                <div class="field">
+                    <label for="promoStarts">Діє з</label>
+                    <input type="datetime-local" id="promoStarts">
+                    <span class="hint">Порожньо — одразу.</span>
+                </div>
+
+                <div class="field">
+                    <label for="promoExpires">Діє до</label>
+                    <input type="datetime-local" id="promoExpires">
+                    <span class="hint">Порожньо — безстроковий.</span>
+                </div>
+
+                <div class="field">
+                    <label for="promoMaxUses">Скільки разів</label>
+                    <input type="number" id="promoMaxUses" min="1" step="1" placeholder="без межі">
+                    <span class="hint">1 — одноразовий, для персонального листа.</span>
+                </div>
+
+                <div class="field">
+                    <label for="promoMinTotal">Від суми, ₴</label>
+                    <input type="number" id="promoMinTotal" min="1" step="50" placeholder="без порогу">
+                </div>
+
+            </div>
+
+            <div class="picker">
+
+                <div class="field">
+                    <label for="promoProductSearch">На які товари</label>
+                    <input type="text" id="promoProductSearch" autocomplete="off"
+                           placeholder="Почніть вводити назву або артикул — порожньо означає «на всі»">
+                </div>
+
+                <div class="picker-found" id="promoFound"></div>
+                <div class="chips" id="promoChosen"></div>
+
+            </div>
+
+            <div class="field" style="margin-top:12px">
+                <label for="promoNote">Для чого (лише для вас)</label>
+                <input type="text" id="promoNote" maxlength="200" placeholder="осіння розсилка">
+            </div>
+
+            <label class="checkline" style="margin-top:12px">
+                <input type="checkbox" id="promoActive" checked>
+                Увімкнений
+            </label>
+
+            <div class="editor-actions">
+                <button class="btn" id="saveBtn">Зберегти</button>
+                <button class="btn btn-ghost btn-sm" id="cancelBtn">Скасувати</button>
+                <span class="muted" id="editorHint"></span>
+            </div>
+
+            <div id="editorMsg" style="margin-top:12px"></div>
+
+        </div>
+
+        <div class="tabs" id="tabs" role="tablist"></div>
+
+        <div class="list" id="list"></div>
+
+    </div>
+
+</div>
+
+<script src="github-publish.js" defer></script>
+<script src="promo.js" defer></script>
+
+</body>
+</html>

@@ -519,6 +519,83 @@ export function reviewLetter(order, siteUrl) {
 
 }
 
+// Лист «дякуємо за покупку» з персональним промокодом.
+//
+// НАВІЩО. Найдешевший покупець — той, що вже один раз заплатив. Після
+// «Виконано» магазин з ним більше не говорив ніколи.
+//
+// ЧОМУ ОКРЕМО ВІД ПРОХАННЯ ПРО ВІДГУК. Покласти знижку в той самий
+// лист означало б запропонувати гроші за відгук — і виглядало б саме
+// так, незалежно від того, що код дається безумовно.
+//
+// ЩО В ЛИСТІ Є І ЧОГО НЕМАЄ. Є код, розмір знижки й дата, до якої він
+// діє. Немає зворотного відліку, «залишилось 3 години» й іншого
+// тиску: строк тут потрібен, щоб код не жив вічно, а не щоб квапити.
+export function thankYouLetter(order, promo, siteUrl) {
+
+    const name = String(order?.first_name ?? "").trim();
+
+    const code = String(promo?.code ?? "").trim();
+
+    const percent = Number(promo?.percent) || 0;
+
+    const base = String(siteUrl ?? "").replace(/\/$/, "");
+
+    // Дату пишемо словами: «до 12.10.2026» читається як реквізит, а
+    // «до 12 жовтня» — як речення.
+    const months = [
+        "січня", "лютого", "березня", "квітня", "травня", "червня",
+        "липня", "серпня", "вересня", "жовтня", "листопада", "грудня",
+    ];
+
+    const until = promo?.expiresAt ? new Date(promo.expiresAt) : null;
+
+    const untilText = until && !Number.isNaN(until.getTime())
+        ? `${until.getDate()} ${months[until.getMonth()]}`
+        : "";
+
+    const body = [
+        `<div style="font-size:15px;line-height:1.6">`,
+        name ? `${escapeHtml(name)}, дякуємо за покупку!` : "Дякуємо за покупку!",
+        ` Сподіваємось, річ вам служить.`,
+        `</div>`,
+
+        `<div style="margin-top:14px;font-size:15px;line-height:1.6">`,
+        `Ось персональна знижка на наступне замовлення — тільки ваша, `,
+        `для одного використання.`,
+        `</div>`,
+
+        // Код великим моноширинним: його переписують руками з листа в
+        // поле на сайті, і саме тут люди помиляються.
+        `<div style="margin:20px 0;padding:18px;border:2px dashed #d1d5db;border-radius:12px;text-align:center">`,
+        `<div style="font:800 26px/1.2 ui-monospace,Menlo,Consolas,monospace;letter-spacing:2px">`,
+        escapeHtml(code),
+        `</div>`,
+        `<div style="margin-top:8px;font-size:15px;color:#374151">`,
+        `знижка ${escapeHtml(String(percent))}%`,
+        untilText ? ` · діє до ${escapeHtml(untilText)}` : "",
+        `</div>`,
+        `</div>`,
+
+        `<div style="text-align:center;margin-top:18px">`,
+        `<a href="${escapeHtml(base)}/catalog" style="display:inline-block;background:#111827;`,
+        `color:#ffffff;text-decoration:none;padding:13px 26px;border-radius:10px;font-weight:600">`,
+        `Подивитись новинки`,
+        `</a>`,
+        `</div>`,
+
+        `<div style="margin-top:20px;font-size:13px;line-height:1.6;color:#6b7280">`,
+        `Код вводиться в полі «Маєте промокод?» на сторінці оформлення.`,
+        `</div>`,
+    ].join("");
+
+    return {
+        subject: `Ваша персональна знижка ${percent}% — код ${code}`,
+        html: letterShell("Дякуємо за покупку 🎁", body, siteUrl),
+    };
+
+}
+
 export function mailRequest(config, letter) {
 
     const to = String(config?.to || "").trim();

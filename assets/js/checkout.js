@@ -348,12 +348,20 @@ const PROMO_CODE_HASHES = {
     "184806b2107cb6a666a29ad6a4dad4477ab85342b1ea390345ae5cf3eaba78cb": 0.10
 };
 
-// Скільки дає промокод: питаємо базу, а список у коді лишається
-// запасним варіантом.
+// Умови промокоду: питаємо базу, а список у коді лишається запасним
+// варіантом.
 //
 // У базу йде ХЕШ, а не сам код: так код не з'являється ні в запиті, ні
 // в логах — рівно та причина, з якої він і був хешем.
-async function promoPercent(hash) {
+//
+// Повертає { percent, productIds, minTotal } або null, якщо код не діє.
+//
+// ЧОМУ НЕ ПРОСТО ВІДСОТОК. Код може діяти лише на певні товари й лише
+// від певної суми (міграція 025). Ті самі три значення читає тригер,
+// який підтверджує суму замовлення, — тож сторінка мусить рахувати
+// знижку рівно так само, інакше покупець побачить одну суму, а в
+// замовленні опиниться інша.
+async function promoTerms(hash) {
 
     if (typeof supabaseClient !== "undefined" && supabaseClient) {
 
@@ -361,11 +369,30 @@ async function promoPercent(hash) {
 
             const { data, error } = await supabaseClient.rpc("promo_check", { p_hash: hash });
 
-            // Немає функції (міграція ще не виконана) або база не
-            // відповіла — відкочуємось на список у коді. Мовчки
-            // відмовити в чинній знижці гірше, ніж дати її за старим
-            // списком: суму все одно перевірить сервер.
-            if (!error) return Number(data) || 0;
+            if (!error) {
+
+                // Функція повертає набір рядків: порожній — коду немає
+                // або він зараз не діє (вимкнений, не почався,
+                // скінчився, вичерпаний).
+                const row = Array.isArray(data) ? data[0] : data;
+
+                if (!row) return null;
+
+                // Стара міграція (014) віддавала просто число. Якщо 025
+                // ще не виконана, поводимось як раніше.
+                if (typeof row === "number") {
+                    return { percent: row, productIds: [], minTotal: 0 };
+                }
+
+                return {
+                    percent: Number(row.percent) || 0,
+                    productIds: Array.isArray(row.product_ids)
+                        ? row.product_ids.map(Number)
+                        : [],
+                    minTotal: Number(row.min_total) || 0,
+                };
+
+            }
 
             console.warn("Перевірка промокоду в базі недоступна:", error.message);
 
@@ -377,7 +404,13 @@ async function promoPercent(hash) {
 
     }
 
-    return PROMO_CODE_HASHES[hash] || 0;
+    // Немає функції (міграція ще не виконана) або база не відповіла —
+    // відкочуємось на список у коді. Мовчки відмовити в чинній знижці
+    // гірше, ніж дати її за старим списком: суму все одно перевірить
+    // сервер.
+    const percent = PROMO_CODE_HASHES[hash] || 0;
+
+    return percent ? { percent: percent, productIds: [], minTotal: 0 } : null;
 
 }
 
@@ -729,6 +762,36 @@ function renderOrderSummary() {
 
 }
 
+// Скільки дає промокод на ЦЕЙ кошик.
+//
+// Одна функція на всі місця, де знижка потрібна: підсумок праворуч,
+// прихована сума у формі й подія purchase у статистиці. Три копії
+// цього розрахунку розійшлися б неминуче — і покупець побачив би одну
+// суму, а в замовлення поїхала б інша.
+//
+// Правила ті самі, що в тригері бази (міграція 025), і саме тому вони
+// тут написані в тому ж порядку:
+//
+//   • поріг — по ВСЬОМУ кошику: «від 3 000 ₴» покупець читає саме як
+//     суму замовлення, а не як суму товарів зі знижкою;
+//   • знижка — лише на ті товари, на які код діє.
+function promoDiscountFor(lines, priceTotal) {
+
+    if (!appliedPromo || !appliedPromo.percent) return 0;
+
+    if (appliedPromo.minTotal && priceTotal < appliedPromo.minTotal) return 0;
+
+    const only = appliedPromo.productIds || [];
+
+    const eligible = only.length
+        ? lines.reduce((sum, { product, qty }) =>
+            sum + (only.includes(Number(product.id)) ? product.price * qty : 0), 0)
+        : priceTotal;
+
+    return Math.round(eligible * appliedPromo.percent);
+
+}
+
 function updateTotals() {
 
     const lines = getCartLines();
@@ -743,9 +806,7 @@ function updateTotals() {
 
     const productDiscount = subtotal - priceTotal;
 
-    const promoDiscount = appliedPromo
-        ? Math.round(priceTotal * appliedPromo.percent)
-        : 0;
+    const promoDiscount = promoDiscountFor(lines, priceTotal);
 
     const totalDiscount = productDiscount + promoDiscount;
 
@@ -843,25 +904,64 @@ applyPromoBtn?.addEventListener("click", async () => {
         return;
     }
 
-    const percent = await promoPercent(hash);
+    const terms = await promoTerms(hash);
 
     applyPromoBtn.disabled = false;
 
-    if (percent) {
-
-        appliedPromo = { code, percent };
-
-        promoMessageEl.textContent = `Промокод «${code}» застосовано (-${percent * 100}%)`;
-        promoMessageEl.className = "promo-message success";
-
-    } else {
+    if (!terms) {
 
         appliedPromo = null;
 
-        promoMessageEl.textContent = "Такого промокоду не існує";
+        // ОДНА відповідь на всі випадки «не спрацював»: коду немає,
+        // вимкнений, ще не почався, скінчився, вичерпаний.
+        //
+        // Розрізняти їх тут не можна: різні відповіді перетворюють
+        // форму на спосіб перебирати чужі коди — «цей скінчився»
+        // означає «цей існує».
+        promoMessageEl.textContent = "Такого промокоду не існує або він уже не діє";
         promoMessageEl.className = "promo-message error";
 
+        updateTotals();
+
+        return;
+
     }
+
+    appliedPromo = {
+        code: code,
+        percent: terms.percent,
+        productIds: terms.productIds,
+        minTotal: terms.minTotal,
+    };
+
+    const lines = getCartLines();
+
+    const priceTotal = lines.reduce((sum, { product, qty }) => sum + product.price * qty, 0);
+
+    const discount = promoDiscountFor(lines, priceTotal);
+
+    // Код чинний, але на ЦЕЙ кошик нічого не дає. Мовчазний нуль у
+    // підсумку — найгірше, що тут можна показати: людина бачить
+    // «застосовано» і не розуміє, чому сума не змінилась.
+    if (!discount) {
+
+        promoMessageEl.className = "promo-message error";
+
+        promoMessageEl.textContent = terms.minTotal && priceTotal < terms.minTotal
+            ? `Промокод «${code}» діє від ${formatPrice(terms.minTotal)}`
+            : `Промокод «${code}» діє лише на окремі товари — у кошику їх немає`;
+
+        updateTotals();
+
+        return;
+
+    }
+
+    promoMessageEl.className = "promo-message success";
+
+    promoMessageEl.textContent = terms.productIds.length
+        ? `Промокод «${code}» застосовано: −${formatPrice(discount)} на товари зі знижкою`
+        : `Промокод «${code}» застосовано (-${Math.round(terms.percent * 1000) / 10}%)`;
 
     updateTotals();
 
@@ -1103,7 +1203,7 @@ function computeOrderTotals() {
         return sum + (product.oldPrice || product.price) * qty;
     }, 0);
 
-    const promoDiscount = appliedPromo ? Math.round(priceTotal * appliedPromo.percent) : 0;
+    const promoDiscount = promoDiscountFor(lines, priceTotal);
 
     const productDiscount = subtotal - priceTotal;
     const totalDiscount = productDiscount + promoDiscount;
@@ -1358,6 +1458,10 @@ async function saveOrderToSupabase(orderId) {
         delivery_detail: getDeliveryDetailValue(),
         payment_method: getSelectedPayment(),
         promo_code: appliedPromo ? appliedPromo.code : null,
+        // Побажання покупця. Довжину ріже й сервер, але й тут не
+        // відправляємо зайвого: у полі стоїть maxlength, а вставка з
+        // буфера його обходить.
+        comment: (document.getElementById("orderComment")?.value.trim() || "").slice(0, 500) || null,
         first_name: document.getElementById("firstName")?.value.trim() || null,
         last_name: document.getElementById("lastName")?.value.trim() || null,
         phone: document.getElementById("phone")?.value.trim() || null,

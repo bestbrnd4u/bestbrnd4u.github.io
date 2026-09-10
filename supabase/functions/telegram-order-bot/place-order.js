@@ -42,6 +42,10 @@ const TEXT_LIMITS = {
     delivery_detail: 300,
     payment_method: 120,
     promo_code: 40,
+    // Коментар до замовлення: «подзвоніть перед відправкою», «це
+    // подарунок, без чека в коробці». Пів тисячі знаків — стеля
+    // здорового глузду: довше за це вже не побажання, а лист.
+    comment: 500,
     first_name: 80,
     last_name: 80,
     phone: 40,
@@ -160,6 +164,7 @@ export function cleanOrder(payload) {
             delivery_detail: text(payload.delivery_detail, TEXT_LIMITS.delivery_detail),
             payment_method: text(payload.payment_method, TEXT_LIMITS.payment_method),
             promo_code: text(payload.promo_code, TEXT_LIMITS.promo_code),
+            comment: text(payload.comment, TEXT_LIMITS.comment),
 
             first_name: text(payload.first_name, TEXT_LIMITS.first_name),
             last_name: text(payload.last_name, TEXT_LIMITS.last_name),

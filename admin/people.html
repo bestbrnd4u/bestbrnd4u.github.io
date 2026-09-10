@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex" />
+<title>BestBrnd4u — Покупці й підписники</title>
+<link rel="icon" href="../assets/images/favicon.png">
+<style>
+
+    *{ box-sizing:border-box; }
+
+    body{
+        margin:0;
+        font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+        background:#f8fafc;
+        color:#111827;
+        line-height:1.55;
+    }
+
+    .wrap{ max-width:1000px; margin:0 auto; padding:28px 20px 80px; }
+
+    a.back{
+        display:inline-flex;
+        align-items:center;
+        gap:6px;
+        color:#2563eb;
+        text-decoration:none;
+        font-weight:600;
+        font-size:14px;
+        margin-bottom:16px;
+    }
+
+    h1{ font-size:26px; margin:0 0 4px; }
+    .lead{ color:#4b5563; margin:0 0 22px; font-size:14px; }
+    .muted{ color:#6b7280; }
+
+    .btn{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:7px;
+        background:#2563eb;
+        color:#fff;
+        border:none;
+        padding:10px 18px;
+        border-radius:10px;
+        font:600 14px/1.2 inherit;
+        cursor:pointer;
+        text-decoration:none;
+    }
+
+    .btn:disabled{ opacity:.6; cursor:not-allowed; }
+    .btn-ghost{ background:#fff; color:#111827; border:1px solid #e5e7eb; }
+    .btn-sm{ padding:8px 13px; font-size:13px; }
+
+    .gate{
+        background:#fff;
+        border-radius:16px;
+        box-shadow:0 8px 24px rgba(0,0,0,.06);
+        padding:28px 26px;
+        max-width:560px;
+    }
+
+    .gate h2{ margin:0 0 8px; font-size:19px; }
+    .gate p{ margin:0 0 18px; color:#4b5563; font-size:14px; }
+
+    .tabs{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+
+    .tab{
+        border:1px solid #e5e7eb;
+        background:#fff;
+        color:#374151;
+        border-radius:999px;
+        padding:7px 14px;
+        font:600 13px/1.2 inherit;
+        cursor:pointer;
+        display:inline-flex;
+        align-items:center;
+        gap:7px;
+    }
+
+    .tab.on{ background:#111827; border-color:#111827; color:#fff; }
+
+    .tab .count{ background:rgba(0,0,0,.08); border-radius:999px; padding:1px 7px; font-size:11.5px; }
+    .tab.on .count{ background:rgba(255,255,255,.18); }
+
+    .toolbar{ display:flex; gap:10px; align-items:center; margin-bottom:14px; flex-wrap:wrap; }
+    .toolbar input{
+        flex:1 1 220px;
+        padding:10px 12px;
+        border:1px solid #e5e7eb;
+        border-radius:10px;
+        font:inherit;
+        font-size:14px;
+    }
+    .toolbar input:focus{ outline:none; border-color:#2563eb; }
+
+    /* -------- зведення -------- */
+
+    .stats{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
+
+    .stat{
+        background:#fff;
+        border:1px solid #e5e7eb;
+        border-radius:12px;
+        padding:12px 16px;
+        min-width:130px;
+    }
+
+    .stat .n{ font-size:22px; font-weight:800; line-height:1.2; }
+    .stat .t{ font-size:12px; color:#6b7280; }
+
+    /* -------- таблиця -------- */
+
+    .table-wrap{
+        background:#fff;
+        border:1px solid #e5e7eb;
+        border-radius:14px;
+        overflow-x:auto;
+    }
+
+    table{ width:100%; border-collapse:collapse; font-size:13.5px; }
+
+    th, td{ text-align:left; padding:11px 14px; border-bottom:1px solid #f3f4f6; white-space:nowrap; }
+
+    th{
+        font-size:11.5px;
+        text-transform:uppercase;
+        letter-spacing:.4px;
+        color:#6b7280;
+        background:#fbfcfe;
+        position:sticky;
+        top:0;
+    }
+
+    tr:last-child td{ border-bottom:none; }
+
+    td.email{ font-weight:600; white-space:normal; }
+
+    .pill{
+        display:inline-block;
+        border-radius:999px;
+        padding:2px 9px;
+        font-size:11.5px;
+        font-weight:700;
+        background:#f3f4f6;
+        color:#4b5563;
+    }
+
+    .pill-active{ background:#d1fae5; color:#047857; }
+    .pill-unconfirmed{ background:#fef3c7; color:#92400e; }
+    .pill-unsubscribed{ background:#fee2e2; color:#b91c1c; }
+
+    .msg{ border-radius:10px; padding:11px 14px; font-size:13.5px; margin-bottom:14px; }
+    .msg-ok{ background:#d1fae5; color:#065f46; }
+    .msg-error{ background:#fee2e2; color:#991b1b; }
+    .msg-info{ background:#e0f2fe; color:#075985; }
+
+    .empty{
+        background:#fff;
+        border:1px dashed #e5e7eb;
+        border-radius:14px;
+        padding:30px 20px;
+        text-align:center;
+        color:#6b7280;
+        font-size:14px;
+    }
+
+    .pager{
+        display:flex;
+        gap:10px;
+        align-items:center;
+        justify-content:center;
+        margin-top:16px;
+        font-size:13.5px;
+        color:#4b5563;
+    }
+
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+    <a class="back" href="index.html">← В адмінку</a>
+
+    <h1>Покупці й підписники</h1>
+    <p class="lead">
+        Два різних списки, і це навмисно. Покупець зареєстрував кабінет —
+        згоди на розсилку він не давав. Підписник дав саме згоду на листи —
+        і кабінету може не мати зовсім.
+    </p>
+
+    <p class="muted" id="boot">Завантажую…</p>
+
+    <div class="gate" id="gate" hidden>
+        <h2 id="gateTitle">Потрібен вхід</h2>
+        <p id="gateText">Список бачить лише той, хто має право запису в репозиторій сайту.</p>
+        <button class="btn" id="gateBtn">Увійти через GitHub</button>
+    </div>
+
+    <div id="panel" hidden>
+
+        <div class="tabs" id="tabs" role="tablist">
+            <button class="tab on" data-kind="buyers" role="tab">Покупці <span class="count" id="countBuyers">—</span></button>
+            <button class="tab" data-kind="subscribers" role="tab">Підписники <span class="count" id="countSubs">—</span></button>
+        </div>
+
+        <div id="listMsg"></div>
+
+        <div class="stats" id="stats"></div>
+
+        <div class="toolbar">
+            <input type="search" id="search" placeholder="Пошук за поштою або іменем" autocomplete="off">
+            <button class="btn btn-ghost btn-sm" id="refreshBtn">Оновити</button>
+        </div>
+
+        <div id="list"></div>
+
+        <div class="pager" id="pager"></div>
+
+    </div>
+
+</div>
+
+<script src="github-publish.js" defer></script>
+<script src="people.js" defer></script>
+
+</body>
+</html>

@@ -26,7 +26,7 @@ const SOURCE = path.join(DIR, "_index.src.ts");
 // Чисті модулі, які вклеюються у зібраний файл. Порядок — той, у
 // якому їх зручно читати; на роботу він не впливає, бо всередині
 // лише оголошення.
-const MODULES = ["format.js", "order-flow.js", "admin-api.js", "place-order.js", "mail.js", "nova-poshta.js", "meta-capi.js", "order-lookup.js", "reviews.js", "subscribe.js", "checkout-draft.js", "review-admin.js"];
+const MODULES = ["format.js", "order-flow.js", "admin-api.js", "place-order.js", "mail.js", "nova-poshta.js", "meta-capi.js", "order-lookup.js", "reviews.js", "subscribe.js", "checkout-draft.js", "review-admin.js", "promo-admin.js", "people-admin.js"];
 
 function build() {
 
@@ -52,20 +52,16 @@ function build() {
         "",
     );
 
+    // Перелік джерел будуємо з MODULES, а не пишемо руками.
+    //
+    // Рукописний список відстав одразу: у ньому не було
+    // checkout-draft.js і review-admin.js, тобто заголовок
+    // згенерованого файлу перелічував не те, з чого файл зібрано.
     const header = [
         "// ⚠️ ЦЕЙ ФАЙЛ ЗГЕНЕРОВАНО АВТОМАТИЧНО — НЕ РЕДАГУЙТЕ ВРУЧНУ.",
         "//",
         "// Джерела:",
-        "//   supabase/functions/telegram-order-bot/format.js      (картка замовлення)",
-        "//   supabase/functions/telegram-order-bot/order-flow.js  (діалог оформлення)",
-        "//   supabase/functions/telegram-order-bot/admin-api.js   (панель замовлень в адмінці)",
-        "//   supabase/functions/telegram-order-bot/place-order.js (замовлення з сайту)",
-        "//   supabase/functions/telegram-order-bot/mail.js         (листи покупцеві)",
-        "//   supabase/functions/telegram-order-bot/nova-poshta.js  (довідник міст і відділень)",
-        "//   supabase/functions/telegram-order-bot/meta-capi.js    (серверні конверсії Meta)",
-        "//   supabase/functions/telegram-order-bot/order-lookup.js (перевірка замовлення гостем)",
-        "//   supabase/functions/telegram-order-bot/reviews.js      (відгуки й модерація)",
-        "//   supabase/functions/telegram-order-bot/subscribe.js    (підписка на листи)",
+        ...MODULES.map(name => `//   supabase/functions/telegram-order-bot/${name}`),
         "//   supabase/functions/telegram-order-bot/_index.src.ts  (мережа й база)",
         "//",
         "// Перезібрати:  node scripts/build-edge-function.js",

@@ -137,6 +137,16 @@ console.log("\n[4] Поведінка на живому DOM");
 
     try { w.eval(code); } catch (error) { /* частина потребує common.js */ }
 
+    // Блок чекає на DOMContentLoaded — інакше він виконався б раніше
+    // за відкладені (defer) скрипти сторінки й не побачив би
+    // window.Translit (див. tests/test-script-loading.js).
+    //
+    // jsdom із runScripts:"outside-only" сам цю подію не надсилає:
+    // розмітку він розібрав ще до того, як ми виконали код. Тож
+    // надсилаємо руками — інакше нижче перевірявся б порожній DOM, і
+    // перевірки червоніли б не через сторінку, а через стенд.
+    w.document.dispatchEvent(new w.Event("DOMContentLoaded", { bubbles: true }));
+
     const d = w.document;
 
     check("кількість показана", d.getElementById("thanksItemsCount").textContent === "3",
