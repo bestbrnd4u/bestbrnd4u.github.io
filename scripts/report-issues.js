@@ -29,6 +29,57 @@ const DRY = process.argv.includes("--dry-run");
 
 const LIMIT = 50;
 
+// Що з журналу вважається ПОЛОМКОЮ, а що — новиною.
+//
+// Різниця тут не косметична: поломка виводить крок з помилкою, і
+// GitHub надсилає власнику лист. Новина просто друкується.
+//
+// ЧОМУ ЦЕ ОКРЕМІ СПИСКИ, А НЕ ТРИ if. Раніше зведення друкувало рівно
+// три різновиди — js_error, not_found і search_miss, — а забирало з
+// бази ВСІ непозначені рядки й помічало їх notified = true. Тобто
+// stock_out, meta_capi, mail_list і np_directory тихо зникали: у
+// таблиці вони лежали позначені як «повідомлено», а власник їх
+// ніколи не бачив. Саме тому їх доводилось діставати руками
+// запитом у Supabase.
+//
+// Тепер друкується КОЖЕН різновид: знайомі — своїм розділом, решта —
+// загальним. Забути новий різновид більше не можна.
+const BREAKAGE = new Set([
+    "js_error",     // сторінка впала в покупця
+    "not_found",    // відкрито адресу, якої немає
+    "meta_capi",    // Meta не прийняла серверну конверсію
+    "mail_list",    // MailerLite відмовився прийняти підписку
+    "np_directory"  // Нова пошта відмовила в пошуку адреси
+]);
+
+// Не поломка: нормальна поведінка або корисний факт. Червоним не
+// фарбуємо — інакше власник привчиться не читати звіт разом зі
+// справжніми помилками.
+const NEWS = {
+    search_miss: "ШУКАЛИ Й НЕ ЗНАЙШЛИ",
+    stock_out: "ТОВАР ЗАКІНЧИВСЯ",
+    turnstile_skip: "ЗАМОВЛЕННЯ ПОВЗ ПЕРЕВІРКУ «ВИ ЛЮДИНА»"
+};
+
+const TITLES = {
+    js_error: "ПОМИЛКИ JAVASCRIPT",
+    not_found: "АДРЕСИ, ЯКИХ НЕМАЄ",
+    meta_capi: "META НЕ ПРИЙНЯЛА КОНВЕРСІЮ",
+    mail_list: "ПІДПИСКА НЕ ПРОЙШЛА",
+    np_directory: "НОВА ПОШТА ВІДМОВИЛА",
+    ...NEWS
+};
+
+// Чи фарбує цей рядок звіт червоним.
+//
+// Окремою функцією, щоб тест питав ПОВЕДІНКУ, а не вигляд коду. Тут
+// уже була перевірка регуляркою на `if (!errors.length &&
+// !missing.length)` — і вона почервоніла, щойно перелік поломок став
+// списком. Поведінка при цьому не змінилась ні на крок.
+function isBreakage(row) {
+    return BREAKAGE.has(String(row && row.kind || ""));
+}
+
 // Адреса проєкту лежить у коді сайту — вона й так відкрита (той самий
 // підхід, що в scripts/push-stock.js).
 function supabaseUrl() {
@@ -146,6 +197,45 @@ async function main() {
 
     }
 
+    // ВСЕ РЕШТА. Три розділи вище мають власний вигляд, бо їх читають
+    // по-різному; але жоден рядок не має права зникнути тільки тому,
+    // що для нього не написали окремого розділу.
+    const shown = new Set(["js_error", "not_found", "search_miss"]);
+
+    const others = rows.filter(row => !shown.has(row.kind));
+
+    if (others.length) {
+
+        const byKind = {};
+
+        others.forEach(row => {
+            (byKind[row.kind] = byKind[row.kind] || []).push(row);
+        });
+
+        Object.keys(byKind).sort().forEach(kind => {
+
+            console.log(`${TITLES[kind] || kind.toUpperCase()}\n`);
+
+            byKind[kind].forEach(row => {
+
+                console.log(`  ${row.message} × ${row.hits}`);
+
+                if (row.page) console.log(`     ${row.page}`);
+
+                // Браузер тут не для краси: у turnstile_skip саме він
+                // відрізняє автоматику (Electron, HeadlessChrome) від
+                // живого покупця, у якого перевірка не намалювалась.
+                if (row.agent) console.log(`     ${row.agent.slice(0, 80)}`);
+
+                console.log(`     ${when(row.first_seen)} → ${when(row.last_seen)}`);
+                console.log("");
+
+            });
+
+        });
+
+    }
+
     if (DRY) {
         console.log("--dry-run: нічого не позначаю");
         process.exit(1);
@@ -171,9 +261,16 @@ async function main() {
     // ставав би червоним, власник швидко привчився б його не читати —
     // разом зі справжніми помилками. Тому червоним робимо лише те, що
     // справді зламалось.
-    if (!errors.length && !missing.length) {
+    //
+    // Так само не поломка stock_out (товар закінчився — це продаж) і
+    // turnstile_skip (найчастіше це робот, якого перевірка й мусила
+    // відсіяти). Їх видно в тексті звіту, але червоним вони не
+    // фарбують.
+    const broken = rows.filter(isBreakage);
 
-        console.log("✅ Помилок немає (пусті пошуки вище — це не поломка)");
+    if (!broken.length) {
+
+        console.log(`✅ Помилок немає (${rows.length} записів вище — це не поломки)`);
 
         return;
 
@@ -185,7 +282,16 @@ async function main() {
 
 }
 
-main().catch(error => {
-    console.error("Зведення помилок не відпрацювало:", error);
-    process.exit(1);
-});
+// Списки різновидів експортуються для тесту: він звіряє їх із
+// переліком, який приймає база. Розбіжність тут тиха — саме через неї
+// чотири різновиди роками нікуди не доходили.
+module.exports = { BREAKAGE, NEWS, TITLES, isBreakage };
+
+if (require.main === module) {
+
+    main().catch(error => {
+        console.error("Зведення помилок не відпрацювало:", error);
+        process.exit(1);
+    });
+
+}

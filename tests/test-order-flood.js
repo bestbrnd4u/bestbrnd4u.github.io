@@ -289,8 +289,107 @@ console.log("\n[4] Функція зібрана й обережна");
         /create policy "orders_insert_any"/.test(doc));
 }
 
+(async () => {
+
+console.log("\n[5] Замовлення повз перевірку видно в журналі подій");
+{
+    // НАВІЩО ЦЕ ВЗАГАЛІ ПОТРІБНО.
+    //
+    // Обхід перевірки тихий за задумом: віджет не з'явився —
+    // замовлення йде звичайним шляхом, покупець нічого не помічає.
+    // Але й власник не помічає теж.
+    //
+    // 10.09.2026 в кабінеті Cloudflare було «видано 40 перевірок,
+    // розв'язано 0, 100% схоже на робота» — і з цього не можна було
+    // зрозуміти головного: це роботи, яких віджет і мусив відсіяти,
+    // чи живі покупці, у яких він не намалювався. З'ясувалось лише
+    // вручну: усі 40 — один IP і Electron, тобто автоматичний
+    // браузер. Тепер таке видно з журналу сайту.
+    const src = read("assets/js/checkout.js");
+
+    const from = src.indexOf("function orderWithoutTurnstile(");
+    const to = src.indexOf("async function placeOrderThroughFunction");
+    const tail = src.indexOf("// -------------------------", to);
+
+    check("обидві функції на місці", from > 0 && to > from && tail > to);
+
+    // ЗАПУСКАЄМО СПРАВЖНІЙ КОД, а не звіряємо регулярки: тут уже
+    // траплялось, що перевірка по вигляду коду зеленіла на зламаній
+    // поведінці (див. [2] про enabled()).
+    const code = src.slice(from, tail);
+
+    function run(turnstile, invoke) {
+
+        const said = [];
+
+        const win = {
+            Turnstile: turnstile,
+            ErrorReport: { report: (kind, message) => said.push(`${kind}: ${message}`) }
+        };
+
+        const client = { functions: { invoke: invoke || (async () => ({ data: { ok: true } })) } };
+
+        const make = new Function("window", "supabaseClient", "console",
+            `${code}\nreturn placeOrderThroughFunction;`);
+
+        const promise = make(win, client, { warn() {} })({});
+
+        return { said, promise };
+
+    }
+
+    const working = {
+        enabled: () => true,
+        token: () => "справжній-токен",
+        reset() {}
+    };
+
+    // Гілки без токена спрацьовують ДО першого await, тому said
+    // заповнений уже після виклику — чекати нема чого.
+    check("модуль не завантажився — записано",
+        run(undefined).said[0] === "turnstile_skip: модуль перевірки не завантажився",
+        run(undefined).said[0]);
+
+    check("віджет не намалювався — записано",
+        run({ enabled: () => false }).said[0]
+            === "turnstile_skip: віджет не зʼявився на сторінці",
+        run({ enabled: () => false }).said[0]);
+
+    check("віджет є, а токена немає — записано",
+        run({ enabled: () => true, token: () => "", reset() {} }).said[0]
+            === "turnstile_skip: віджет є, але токена немає",
+        run({ enabled: () => true, token: () => "", reset() {} }).said[0]);
+
+    // НЕГАТИВНИЙ КОНТРОЛЬ. Найгірше, що тут може статись, — журнал,
+    // який пише на КОЖНЕ замовлення: тоді в ньому не видно нічого.
+    const ok = run(working);
+
+    check("перевірка пройшла — замовлення прийнято", (await ok.promise) === true);
+
+    check("…і в журнал не пішло нічого", ok.said.length === 0, ok.said.join("; "));
+
+    // Відмова функції теж мусить бути видно — але без вмісту
+    // замовлення: у ньому ім'я, телефон і пошта покупця.
+    const refused = run(working, async () => ({ data: { ok: false, error: "turnstile_failed" } }));
+
+    await refused.promise;
+
+    check("відмову функції записано з кодом",
+        refused.said[0] === "turnstile_skip: функція відмовила: turnstile_failed",
+        refused.said[0]);
+
+    const leaky = run(working, async () => ({ data: { ok: false, error: "turnstile_failed" } }));
+
+    await leaky.promise;
+
+    check("у журнал не потрапляє замовлення",
+        !/phone|email|order|\+380/i.test(leaky.said.join(" ")), leaky.said.join(" "));
+}
+
 console.log(failures === 0
     ? "\n✅ Замовлення: потік зупиняє база, людину підтверджує сервер\n"
     : `\n❌ Проблем: ${failures}\n`);
 
 process.exit(failures === 0 ? 0 : 1);
+
+})();

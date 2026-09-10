@@ -493,6 +493,131 @@ console.log("\n[10] Кеш: правила в Cloudflare не забуті");
         /Не кешувати `\/data\/\*\.json` надовго/.test(doc));
 }
 
+console.log("\n[N] Кожен різновид події з коду база справді приймає");
+{
+    // ПАСТКА, ЯКА ВЖЕ СПРАЦЮВАЛА ДВІЧІ.
+    //
+    // report_issue приймає лише перелічені різновиди — і це
+    // правильно: функцію може покликати будь-який відвідувач, без
+    // переліку таблиця стала б відкритим сховищем.
+    //
+    // Але перелік і код живуть у різних файлах, а розбіжність між
+    // ними ТИХА: невідомий різновид не помилка, функція просто
+    // виходить. Тобто запобіжник проти тихого збою сам працює тихо.
+    //
+    //   1. meta_capi — стояв у функції з першого дня й нікуди не
+    //      писався, поки міграція 018 його не додала. Реклама весь
+    //      цей час могла оптимізуватись за половиною покупок.
+    //
+    //   2. turnstile_skip — 10.09.2026 я додав запис у checkout.js і
+    //      мало не забув міграцію 028. Без неї журнал, заради якого
+    //      все це й робилось, мовчав би.
+    //
+    // Тому звіряємо СПИСКИ, а не наявність окремих слів.
+    const dir = path.join(ROOT, "supabase/migrations");
+
+    // Перелік беремо з НАЙНОВІШОЇ міграції, яка перевизначає функцію:
+    // саме вона зараз і стоїть у базі.
+    const latest = fs.readdirSync(dir)
+        .filter(file => file.endsWith(".sql"))
+        .sort()
+        .filter(file => /if v_kind not in \(/.test(read(`supabase/migrations/${file}`)))
+        .pop();
+
+    check("міграцію з переліком знайдено", Boolean(latest), latest);
+
+    const clause = (read(`supabase/migrations/${latest}`)
+        .match(/if v_kind not in \(([\s\S]*?)\) then/) || [])[1] || "";
+
+    const allowed = new Set((clause.match(/'([a-z_]+)'/g) || [])
+        .map(word => word.replace(/'/g, "")));
+
+    check(`перелік прочитано з ${latest}: ${allowed.size} різновидів`, allowed.size >= 7);
+
+    // Місця, які СПРАВДІ пишуть у журнал. Аналітику сюди не беремо:
+    // у неї своя функція send() і свої назви подій.
+    const used = new Map();
+
+    const note = (kind, where) => {
+        if (!used.has(kind)) used.set(kind, where);
+    };
+
+    const scan = (rel, pattern) => {
+        const text = read(rel);
+        let match;
+        while ((match = pattern.exec(text)) !== null) note(match[1], rel);
+    };
+
+    fs.readdirSync(path.join(ROOT, "assets/js"))
+        .filter(file => file.endsWith(".js"))
+        .forEach(file => scan(`assets/js/${file}`, /ErrorReport\.report\("([a-z_]+)"/g));
+
+    // У самому модулі журналу виклики без префікса.
+    scan("assets/js/error-report.js", /\b(?:send|report)\("([a-z_]+)"/g);
+
+    scan("supabase/functions/telegram-order-bot/_index.src.ts",
+        /reportServerIssue\("([a-z_]+)"/g);
+
+    fs.readdirSync(path.join(ROOT, "scripts"))
+        .filter(file => file.endsWith(".js"))
+        .forEach(file => scan(`scripts/${file}`, /p_kind:\s*"([a-z_]+)"/g));
+
+    check(`різновидів у коді: ${used.size}`, used.size >= 5,
+        [...used.keys()].join(", "));
+
+    const orphans = [...used].filter(([kind]) => !allowed.has(kind));
+
+    // РЕГРЕСІЯ, ЯКУ ЦЕ ЛОВИТЬ: додали запис у журнал і забули
+    // міграцію. Подія не запишеться, і про це ніхто не дізнається.
+    check("усі вони є в переліку бази",
+        orphans.length === 0,
+        orphans.map(([kind, where]) => `${kind} (${where})`).join("; "));
+
+    // ДРУГА ПОЛОВИНА ТІЄЇ Ж ДІРКИ. Запис може дійти до бази й однаково
+    // не дійти до власника.
+    //
+    // Заміряно 10.09.2026: щоденне зведення друкувало рівно три
+    // різновиди (js_error, not_found, search_miss), а забирало з бази
+    // ВСІ непозначені рядки й ставило їм notified = true. Тобто
+    // stock_out, meta_capi, mail_list і np_directory лежали в таблиці
+    // позначені як «повідомлено», а в листі їх не було жодного разу —
+    // хоча docs/ЗАЛИШКИ.md прямо обіцяє, що stock_out «приходить вам
+    // зі щоденним листом».
+    const { BREAKAGE, NEWS } = require("../scripts/report-issues.js");
+
+    const sorted = [...allowed].sort();
+
+    const unclassified = sorted.filter(kind => !BREAKAGE.has(kind) && !(kind in NEWS));
+
+    check("зведення знає кожен різновид — як поломку або як новину",
+        unclassified.length === 0, unclassified.join(", "));
+
+    // І навпаки: у списках зведення не має бути того, чого база не
+    // приймає, — це означало б розділ, який ніколи не заповниться.
+    const ghosts = [...BREAKAGE, ...Object.keys(NEWS)].filter(kind => !allowed.has(kind));
+
+    check("і нічого зайвого", ghosts.length === 0, ghosts.join(", "));
+
+    // Поломки фарбують звіт червоним, новини — ні. Найважливіше з
+    // цього: не поломка — не червоне, інакше власник привчиться не
+    // читати звіт.
+    check("новини не роблять звіт червоним",
+        !BREAKAGE.has("search_miss") && !BREAKAGE.has("stock_out")
+        && !BREAKAGE.has("turnstile_skip"));
+
+    check("справжні збої — роблять",
+        BREAKAGE.has("meta_capi") && BREAKAGE.has("mail_list")
+        && BREAKAGE.has("np_directory") && BREAKAGE.has("js_error"));
+
+    // Рядок, для якого немає власного розділу, мусить друкуватись
+    // загальним — інакше діра відкриється знову з наступним різновидом.
+    const digest = read("scripts/report-issues.js");
+
+    check("усе, крім трьох знайомих, друкується загальним розділом",
+        /const others = rows\.filter\(row => !shown\.has\(row\.kind\)\)/.test(digest)
+        && /TITLES\[kind\] \|\| kind\.toUpperCase\(\)/.test(digest));
+}
+
 console.log(failures === 0
     ? "\n✅ Моніторинг: про поломку дізнається власник, а не покупець\n"
     : `\n❌ Проблем: ${failures}\n`);

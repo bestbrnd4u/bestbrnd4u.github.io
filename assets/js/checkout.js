@@ -1323,13 +1323,41 @@ function buildOrderItemsSnapshot() {
 // Повертає true, якщо замовлення збережене. false означає «спробуй
 // звичайним шляхом» — і це нормальний, очікуваний варіант: перевірка
 // не налаштована, функція старої версії, Cloudflare мовчить.
+// Чому замовлення пішло повз перевірку — у журнал подій.
+//
+// НАВІЩО. Обхід тихий за задумом: покупець нічого не бачить, консоль
+// ніхто не читає. У кабінеті Cloudflare при цьому видно «видано 40,
+// розвʼязано 0» — і з цього не зрозуміти головного: це роботи, яких
+// віджет і мусив відсіяти, чи живі покупці, у яких він не зʼявився.
+//
+// Заміряно 10.09.2026: усі 40 перевірок — один IP, один рядок
+// браузера, Electron. Тобто автоматичний браузер, а не покупці. Але
+// дізнатись це вдалось лише вручну.
+//
+// Запис іде ЛИШЕ в момент справжнього оформлення, тож це кілька
+// рядків на день, а не потік. Причина — технічна: ні кошика, ні
+// імені, ні пошти в неї не потрапляє.
+function orderWithoutTurnstile(reason) {
+
+    try {
+        if (window.ErrorReport) window.ErrorReport.report("turnstile_skip", reason, "");
+    } catch (error) {
+        // Журнал не має права зламати оформлення.
+    }
+
+    return false;
+
+}
+
 async function placeOrderThroughFunction(order) {
 
-    if (!window.Turnstile || !window.Turnstile.enabled()) return false;
+    if (!window.Turnstile) return orderWithoutTurnstile("модуль перевірки не завантажився");
+
+    if (!window.Turnstile.enabled()) return orderWithoutTurnstile("віджет не зʼявився на сторінці");
 
     const token = window.Turnstile.token();
 
-    if (!token) return false;
+    if (!token) return orderWithoutTurnstile("віджет є, але токена немає");
 
     try {
 
@@ -1345,15 +1373,19 @@ async function placeOrderThroughFunction(order) {
 
         console.warn("Замовлення через функцію не пройшло:", error || data);
 
+        // Код відповіді, а не весь обʼєкт: у ньому лежить замовлення.
+        return orderWithoutTurnstile("функція відмовила: "
+            + String((data && data.error) || (error && error.message) || "невідомо"));
+
     } catch (failure) {
 
         console.warn("Функція замовлення недоступна:", failure && failure.message);
 
         window.Turnstile.reset();
 
-    }
+        return orderWithoutTurnstile("функція недоступна");
 
-    return false;
+    }
 
 }
 
