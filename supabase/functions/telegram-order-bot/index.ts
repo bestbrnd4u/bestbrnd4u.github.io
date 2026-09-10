@@ -1670,11 +1670,49 @@ function cleanOrder(payload) {
 //
 // Виносимо в чисту функцію, щоб розбір відповіді перевірявся тестом:
 // сам мережевий виклик у Deno не протестуєш.
+// Домени, з яких токен вважається нашим.
+//
+// НАВІЩО ЦЕ ОКРЕМО ВІД СПИСКУ В CLOUDFLARE
+//
+// У налаштуваннях віджета серед дозволених хостів стоять localhost і
+// 127.0.0.1 — вони потрібні, щоб перевірку можна було полагодити на
+// своїй машині. Але ключ сайту відкритий (він і має бути в коді
+// сторінки), тож будь-хто може підняти сторінку з нашим ключем у себе
+// на localhost, отримати ТАМ справжній токен — і надіслати його нашій
+// функції. Cloudflare підтвердить: токен чинний, видано на дозволеному
+// хості.
+//
+// Тому звіряємо ще й хост із відповіді siteverify: приймаємо лише
+// токени, видані на самому магазині.
+const TURNSTILE_HOSTS = ["bestbrnd4u.com", "dev.bestbrnd4u.com"];
+
+function turnstileHostAllowed(hostname) {
+
+    const host = String(hostname ?? "").trim().toLowerCase();
+
+    // Порожньо — це старий формат відповіді або тестовий ключ
+    // Cloudflare. Не привід відмовляти: головну перевірку (success)
+    // ми вже пройшли, а вигадувати хост нема з чого.
+    if (!host) return true;
+
+    return TURNSTILE_HOSTS.includes(host)
+        || TURNSTILE_HOSTS.some(allowed => host.endsWith(`.${allowed}`));
+
+}
+
 function turnstileVerdict(data) {
 
     if (!data || typeof data !== "object") return { ok: false, reason: "порожня відповідь" };
 
-    if (data.success === true) return { ok: true };
+    if (data.success === true) {
+
+        if (!turnstileHostAllowed(data.hostname)) {
+            return { ok: false, reason: `чужий хост: ${data.hostname}` };
+        }
+
+        return { ok: true };
+
+    }
 
     const codes = Array.isArray(data["error-codes"]) ? data["error-codes"].join(", ") : "";
 
