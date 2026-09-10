@@ -234,6 +234,139 @@ console.log("\n[6] Зменшені копії зроблені з поточн�
     check("усі копії зроблені з поточної бази", stale.length === 0,
         stale.slice(0, 3).join(", "));
 
+    // ЦЯ ПЕРЕВІРКА МАЛА ДВІ СЛІПІ ЗОНИ — і крізь них пройшла справжня
+    // поломка на живому сайті.
+    //
+    // По-перше, вище звіряється лише WEBP. А браузер бере AVIF: він
+    // перший у <picture>. Тобто найважливіший формат не перевірявся
+    // взагалі.
+    //
+    // По-друге, порівняння побайтове — воно вимагає перекодувати
+    // кожну копію, тому й обмежене двадцятьма п'ятьма файлами з 469.
+    //
+    // Заміряно 10 вересня: у 16 фото avif-копії лишились від широкого
+    // оригіналу (співвідношення 1.51), тоді як сам файл давно 4:5
+    // (0.80). На сторінці товару сумка виявлялась обрізаною — широку
+    // картинку вписували у вертикальну рамку через object-fit: cover,
+    // та ще й із наближенням від автокадру.
+    //
+    // Тому додаємо дешеву перевірку — ФОРМУ — і ганяємо її по ВСІХ
+    // копіях обох форматів. Читання заголовка замість перекодування:
+    // 1876 копій за 9 секунд.
+    const allBases = fs.readdirSync(uploads)
+        .filter(f => f.endsWith(".webp") && !/-(300|600|1200)\.webp$/.test(f));
+
+    const wrongShape = [];
+    let shapesChecked = 0;
+
+    for (const base of allBases) {
+
+        const meta = await sharp(path.join(uploads, base)).metadata();
+
+        const baseRatio = meta.width / meta.height;
+
+        const stem = base.slice(0, -".webp".length);
+
+        for (const format of ["webp", "avif"]) {
+
+            for (const width of [300, 600]) {
+
+                const variant = path.join(uploads, `${stem}-${width}.${format}`);
+
+                if (!fs.existsSync(variant)) continue;
+
+                const vm = await sharp(variant).metadata();
+
+                shapesChecked++;
+
+                if (vm.width !== width) {
+                    wrongShape.push(`${stem}-${width}.${format}: ширина ${vm.width}`);
+                    continue;
+                }
+
+                // Два відсотки допуску: масштабування округлює висоту
+                // до цілого пікселя.
+                if (Math.abs(vm.width / vm.height - baseRatio) / baseRatio > 0.02) {
+                    wrongShape.push(`${stem}-${width}.${format}: `
+                        + `${(vm.width / vm.height).toFixed(2)} проти ${baseRatio.toFixed(2)}`);
+                }
+
+            }
+
+        }
+
+    }
+
+    check(`форму перевірено в ${shapesChecked} копій обох форматів`, shapesChecked > 1000,
+        shapesChecked);
+
+    check("жодна копія не має форми, відмінної від оригіналу",
+        wrongShape.length === 0, wrongShape.slice(0, 4).join("; "));
+
+    // ПЕРЕЗІБРАНА КОПІЯ МУСИТЬ ЗМІНИТИ АДРЕСУ.
+    //
+    // Верстка підставляє в srcset версію БАЗИ (buildSrcSet в ui.js):
+    // `photo-600.avif?v=<версія бази>`. Поки копії мінялись разом із
+    // базою, цього вистачало.
+    //
+    // Але копію можна перезібрати й без зміни бази — саме так і
+    // вийшло, коли 32 avif-копії виявились зробленими з широкого
+    // оригіналу. База не змінилась, версія не змінилась, адреса не
+    // змінилась — і Cloudflare далі віддавав з краю стару картинку.
+    // Заміряно на живому деві: та сама копія без версії вже нова
+    // (600×750), а з версією — ще стара (600×397).
+    //
+    // Тому версія рахується з бази ТА її копій.
+    const builder = fs.readFileSync(path.join(ROOT, "scripts/build-products.js"), "utf8");
+
+    const versionFn = builder.slice(
+        builder.indexOf("function version(src)"),
+        builder.indexOf("function stamp(src)"));
+
+    check("версія фото рахується разом із копіями",
+        /hash\.update\(fs\.readFileSync\(variant\)\)/.test(versionFn));
+
+    // Перевіряємо не текст, а наслідок: підміна копії мусить дати
+    // іншу версію тієї самої бази.
+    const crypto = require("crypto");
+
+    const sample = allBases.find(name =>
+        fs.existsSync(path.join(uploads, name.replace(/\.webp$/, "-600.avif"))));
+
+    if (sample) {
+
+        const baseBytes = fs.readFileSync(path.join(uploads, sample));
+
+        const only = crypto.createHash("sha1").update(baseBytes).digest("hex").slice(0, 8);
+
+        const withVariants = (() => {
+
+            const hash = crypto.createHash("sha1").update(baseBytes);
+
+            const stem = path.join(uploads, sample.replace(/\.webp$/, ""));
+
+            ["webp", "avif"].forEach(format => {
+                [300, 600].forEach(width => {
+                    const variant = `${stem}-${width}.${format}`;
+                    if (fs.existsSync(variant)) hash.update(fs.readFileSync(variant));
+                });
+            });
+
+            return hash.digest("hex").slice(0, 8);
+
+        })();
+
+        check("версія з копіями відрізняється від версії лише з бази",
+            only !== withVariants, `${only} проти ${withVariants}`);
+
+        // Що ця версія справді доїхала в дані, перевіряє окремо
+        // tests/test-cache-busting.js — на розмітці сторінок. Тут її
+        // не питаємо навмисно: читати згенерований data/products.json
+        // тестам заборонено (він буває застарілим у свіжому клоні —
+        // див. tests/test-migration-types.js).
+
+    }
+
     // І сам механізм: перевірка лише на існування файлу пропускала
     // застарілі копії.
     const normalizer = fs.readFileSync(
@@ -241,6 +374,13 @@ console.log("\n[6] Зменшені копії зроблені з поточн�
 
     check("копія перезбирається, якщо старша за базу",
         /mtimeMs < baseTime/.test(normalizer));
+
+    // Час файлу — не властивість картинки: будь-який checkout ставить
+    // усім файлам однаковий час, і в CI перевірка за часом мовчить
+    // завжди. Саме тому поруч мусить стояти перевірка форми.
+    check("…і якщо не збігається формою",
+        /meta\.width !== width/.test(normalizer)
+        && /baseRatio\) \/ baseRatio > 0\.02/.test(normalizer));
 }
 
 console.log("\n[7] Реєстр копій не накопичує привидів");

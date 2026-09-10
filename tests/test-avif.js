@@ -162,11 +162,25 @@ console.log("\n[5] Збірка не переробляє те, що вже є")
 
     // 300 мс на файл × 900 копій — це чотири з половиною хвилини.
     // Робити це щоразу означало б платити їх на кожній збірці.
+    //
+    // Формулювання про РЕЗУЛЬТАТ, а не про форму коду: тут стояло
+    // «function stale(name)» і «VARIANT_FORMATS.forEach» — і обидві
+    // перевірки почервоніли, щойно перевірка застарілості стала
+    // асинхронною (вона тепер читає заголовок копії, щоб звірити
+    // форму). Логіка при цьому не змінилась, а сторож упав.
     check("копія перезбирається лише коли її немає або вона застаріла",
-        /function stale\(name\)/.test(script) && /mtimeMs < baseTime - 1000/.test(script));
+        /function stale\(/.test(script) && /mtimeMs < baseTime - 1000/.test(script));
+
+    // Час файлу — не властивість картинки: після checkout він однаковий
+    // в усіх, і в CI перевірка за часом мовчить. Тому поруч мусить
+    // стояти звірка форми (див. tests/test-image-canvas.js).
+    check("…і коли не збігається формою з оригіналом",
+        /meta\.width !== width/.test(script)
+        && /baseRatio\) \/ baseRatio > 0\.02/.test(script));
 
     check("формати перевіряються окремо",
-        /VARIANT_FORMATS\.forEach\(format/.test(script));
+        /for \(const format of VARIANT_FORMATS\)/.test(script)
+        || /VARIANT_FORMATS\.forEach\(format/.test(script));
 
     check("avif робиться з оригіналу, а не з webp-копії",
         /AVIF робимо з ОРИГІНАЛУ/.test(script));

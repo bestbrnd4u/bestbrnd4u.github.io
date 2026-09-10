@@ -207,6 +207,27 @@ function stampImageVersions(products) {
 
     const cache = new Map();
 
+    // Версію рахуємо з базового фото ТА ЙОГО ЗМЕНШЕНИХ КОПІЙ.
+    //
+    // ЧОМУ НЕ ЛИШЕ З БАЗИ
+    // --------------------
+    // Верстка підставляє в srcset ту саму версію, що й у бази (див.
+    // buildSrcSet в assets/js/ui.js): `photo-600.avif?v=<версія бази>`.
+    // Поки копії змінювались разом із базою, цього вистачало.
+    //
+    // Але копію можна перезібрати й БЕЗ зміни бази — саме це й
+    // сталось, коли 32 avif-копії виявились зробленими з широкого
+    // оригіналу й були перебудовані. База не змінилась, версія не
+    // змінилась, адреса не змінилась — і Cloudflare далі віддавав з
+    // краю СТАРУ картинку за старою адресою. Заміряно: файл без
+    // версії вже новий (600×750), а з версією — ще старий (600×397).
+    //
+    // Тепер будь-яка зміна копії міняє версію, тобто адресу, тобто
+    // край змушений піти по нову. Читання чотирьох маленьких файлів
+    // на фото коштує секунди на всю збірку.
+    const VARIANTS = [300, 600];
+    const VARIANT_FORMATS = ["webp", "avif"];
+
     function version(src) {
 
         const clean = String(src).split("?")[0];
@@ -219,10 +240,23 @@ function stampImageVersions(products) {
 
         if (fs.existsSync(file)) {
 
-            stamp = crypto.createHash("sha1")
-                .update(fs.readFileSync(file))
-                .digest("hex")
-                .slice(0, 8);
+            const hash = crypto.createHash("sha1").update(fs.readFileSync(file));
+
+            const stem = file.replace(/\.[^.]+$/, "");
+
+            VARIANT_FORMATS.forEach(format => {
+
+                VARIANTS.forEach(width => {
+
+                    const variant = `${stem}-${width}.${format}`;
+
+                    if (fs.existsSync(variant)) hash.update(fs.readFileSync(variant));
+
+                });
+
+            });
+
+            stamp = hash.digest("hex").slice(0, 8);
 
         }
 
@@ -1257,9 +1291,15 @@ function main() {
 //
 // НЕ помилка й НЕ валить збірку: у частини товарів матеріалу
 // справді немає. Це список, щоб про нього знали.
+//
+// skip — категорії, де поле не має сенсу й ніколи не заповниться.
+// У взуття габарити заміняє розмірна сітка: ні Lacoste, ні adidas
+// їх не публікують, бо покупцеві потрібен розмір ноги, а не довжина
+// кросівка. Без цього винятку десять кросівок вічно висіли б у
+// попередженні й привчали б його гортати.
 const CARD_FIELDS = [
-    { key: "dimensions", label: "габаритів" },
-    { key: "material", label: "матеріалу" }
+    { key: "dimensions", label: "габаритів", skip: ["Кросівки"] },
+    { key: "material", label: "матеріалу", skip: [] }
 ];
 
 // Скільки назв перелічувати. Повний список на сто товарів у логу
@@ -1268,9 +1308,12 @@ const GAP_EXAMPLES = 5;
 
 function reportCardGaps(products) {
 
-    CARD_FIELDS.forEach(({ key, label }) => {
+    CARD_FIELDS.forEach(({ key, label, skip }) => {
 
-        const missing = products.filter(product => !String(product[key] || "").trim());
+        const asked = products.filter(product =>
+            !(skip || []).includes(product.category));
+
+        const missing = asked.filter(product => !String(product[key] || "").trim());
 
         if (!missing.length) return;
 
@@ -1285,7 +1328,7 @@ function reportCardGaps(products) {
 
         const total = {};
 
-        products.forEach(product => {
+        asked.forEach(product => {
             const category = product.category || "без категорії";
             total[category] = (total[category] || 0) + 1;
         });
@@ -1311,6 +1354,12 @@ function reportCardGaps(products) {
 
 // Експортуємо для тестів: перейменування адрес перевіряється на
 // тимчасовій теці, а не на справжньому каталозі.
-module.exports = { renameToLatinSlugs, serialize, PRODUCT_PAGE_ONLY };
+module.exports = {
+    renameToLatinSlugs, serialize, PRODUCT_PAGE_ONLY,
+    // Звіт про порожні поля перевіряється за поведінкою, а не за
+    // виглядом коду: він уже раз мовчав про категорію, якій поле не
+    // потрібне, і про це не було звідки дізнатись.
+    reportCardGaps, CARD_FIELDS
+};
 
 if (require.main === module) main();
