@@ -19,6 +19,8 @@
       <g:mpn>A05042-0037354</g:mpn>
       <g:item_group_id>1</g:item_group_id>
       <g:color>Темно-сірий</g:color>
+      <g:material>Ацетат; полімерні лінзи</g:material>
+      <g:product_highlight>Ширина лінзи × місток × довжина завушника: 54 × 19 × 140 мм</g:product_highlight>
       <g:gender>unisex</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>178</g:google_product_category>
@@ -43,6 +45,7 @@
       <g:mpn>ARC54H01T-Q11</g:mpn>
       <g:item_group_id>2</g:item_group_id>
       <g:color>Чорний</g:color>
+      <g:material>Екошкіра</g:material>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>3032</g:google_product_category>
@@ -68,6 +71,7 @@
       <g:mpn>RTLADF952201</g:mpn>
       <g:item_group_id>3</g:item_group_id>
       <g:color>Чорний</g:color>
+      <g:material>Екошкіра</g:material>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>3032</g:google_product_category>
@@ -92,6 +96,8 @@
       <g:mpn>BB0096S-001-51</g:mpn>
       <g:item_group_id>4</g:item_group_id>
       <g:color>Темно-сірий</g:color>
+      <g:material>Ацетат</g:material>
+      <g:product_highlight>Ширина лінзи × місток × довжина завушника: 51 × 18 × 130 мм</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>178</g:google_product_category>
@@ -119,6 +125,8 @@
       <g:mpn>BB0041S-001-99</g:mpn>
       <g:item_group_id>5</g:item_group_id>
       <g:color>Темно-сірий</g:color>
+      <g:material>Нейлон — і оправа, і лінзи</g:material>
+      <g:product_highlight>Розміри: Суцільна лінза 99 мм; довжина завушника — 125 мм</g:product_highlight>
       <g:gender>unisex</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>178</g:google_product_category>
@@ -146,6 +154,8 @@
       <g:mpn>BE4361F-300187-51</g:mpn>
       <g:item_group_id>6</g:item_group_id>
       <g:color>Темно-сірий</g:color>
+      <g:material>Ацетат</g:material>
+      <g:product_highlight>Ширина лінзи × місток × довжина завушника: 51 × 20 × 135 мм</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>178</g:google_product_category>
@@ -174,6 +184,7 @@
       <g:item_group_id>7</g:item_group_id>
       <g:color>Коричневий</g:color>
       <g:material>Шкіра</g:material>
+      <g:product_highlight>Розміри: 21 × 32 × 9 см</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>3032</g:google_product_category>
@@ -201,6 +212,7 @@
       <g:item_group_id>8</g:item_group_id>
       <g:color>Чорний</g:color>
       <g:material>Шкіра</g:material>
+      <g:product_highlight>Розміри: 41 × 17 × 8 см</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>3032</g:google_product_category>
@@ -227,6 +239,7 @@
       <g:item_group_id>9</g:item_group_id>
       <g:color>Темно-сірий</g:color>
       <g:material>Шкіра</g:material>
+      <g:product_highlight>Розміри: 26 × 15 × 8 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>3032</g:google_product_category>
@@ -255,6 +268,7 @@
       <g:item_group_id>9</g:item_group_id>
       <g:color>Світло-сірий</g:color>
       <g:material>Шкіра</g:material>
+      <g:product_highlight>Розміри: 26 × 15 × 8 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>3032</g:google_product_category>
@@ -282,6 +296,7 @@
       <g:item_group_id>9</g:item_group_id>
       <g:color>Сіро-коричневий</g:color>
       <g:material>Шкіра</g:material>
+      <g:product_highlight>Розміри: 26 × 15 × 8 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>3032</g:google_product_category>
@@ -309,6 +324,7 @@
       <g:item_group_id>9</g:item_group_id>
       <g:color>Коричнево-чорний</g:color>
       <g:material>Шкіра</g:material>
+      <g:product_highlight>Розміри: 26 × 15 × 8 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>3032</g:google_product_category>
@@ -337,6 +353,7 @@
       <g:item_group_id>9</g:item_group_id>
       <g:color>Коричневий</g:color>
       <g:material>Шкіра</g:material>
+      <g:product_highlight>Розміри: 26 × 15 × 8 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>3032</g:google_product_category>
@@ -365,6 +382,7 @@
       <g:item_group_id>9</g:item_group_id>
       <g:color>Тауп</g:color>
       <g:material>Шкіра</g:material>
+      <g:product_highlight>Розміри: 26 × 15 × 8 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>3032</g:google_product_category>
@@ -392,6 +410,7 @@
       <g:mpn>coach-cp150-b4ha</g:mpn>
       <g:item_group_id>10</g:item_group_id>
       <g:color>Світло-сірий</g:color>
+      <g:material>Наппа — м'яка натуральна шкіра; текстильна підкладка</g:material>
       <g:product_highlight>Розміри: 26 × 14 × 10 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
@@ -419,6 +438,7 @@
       <g:mpn>cp150_b4bk_a0</g:mpn>
       <g:item_group_id>10</g:item_group_id>
       <g:color>Чорний</g:color>
+      <g:material>Наппа — м'яка натуральна шкіра; текстильна підкладка</g:material>
       <g:product_highlight>Розміри: 26 × 14 × 10 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
@@ -446,6 +466,7 @@
       <g:mpn>cp150_b4mpl</g:mpn>
       <g:item_group_id>10</g:item_group_id>
       <g:color>Темно-коричневий</g:color>
+      <g:material>Наппа — м'яка натуральна шкіра; текстильна підкладка</g:material>
       <g:product_highlight>Розміри: 26 × 14 × 10 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
@@ -473,6 +494,8 @@
       <g:mpn>GG0516S-001-52</g:mpn>
       <g:item_group_id>11</g:item_group_id>
       <g:color>Темно-сірий</g:color>
+      <g:material>Ацетат</g:material>
+      <g:product_highlight>Ширина лінзи × місток × довжина завушника: 52 × 20 × 145 мм</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>178</g:google_product_category>
@@ -496,6 +519,8 @@
       <g:mpn>invicta-pro-diver-blue-dial-22058</g:mpn>
       <g:item_group_id>12</g:item_group_id>
       <g:color>Темно-синій</g:color>
+      <g:material>Корпус і браслет — нержавіюча сталь; скло — Flame Fusion</g:material>
+      <g:product_highlight>Розміри: Корпус — 4,3 см у діаметрі, товщина 1,2 см</g:product_highlight>
       <g:gender>male</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>201</g:google_product_category>
@@ -520,6 +545,8 @@
       <g:mpn>JWPR-WY46</g:mpn>
       <g:item_group_id>13</g:item_group_id>
       <g:color>Чорний</g:color>
+      <g:material>Веганська шкіра; підкладка — поліестер</g:material>
+      <g:product_highlight>Розміри: 30 × 19 × 6 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>3032</g:google_product_category>
@@ -544,6 +571,8 @@
       <g:mpn>B094QT219C</g:mpn>
       <g:item_group_id>14</g:item_group_id>
       <g:color>Зелений</g:color>
+      <g:material>Веганська шкіра; підкладка — поліестер</g:material>
+      <g:product_highlight>Розміри: 24,5 × 13 × 6 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>3032</g:google_product_category>
@@ -568,6 +597,8 @@
       <g:mpn>JWP-MA123</g:mpn>
       <g:item_group_id>14</g:item_group_id>
       <g:color>Карамельний</g:color>
+      <g:material>Веганська шкіра; підкладка — поліестер</g:material>
+      <g:product_highlight>Розміри: 24,5 × 13 × 6 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>3032</g:google_product_category>
@@ -592,6 +623,8 @@
       <g:mpn>JWP-MA106</g:mpn>
       <g:item_group_id>15</g:item_group_id>
       <g:color>Коричневий</g:color>
+      <g:material>Веганська шкіра; підкладка — поліестер</g:material>
+      <g:product_highlight>Розміри: 23 × 15 × 10 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>3032</g:google_product_category>
@@ -617,6 +650,8 @@
       <g:mpn>JWP-MA080</g:mpn>
       <g:item_group_id>16</g:item_group_id>
       <g:color>Синій</g:color>
+      <g:material>Веганська шкіра; підкладка — бавовняний твіл</g:material>
+      <g:product_highlight>Розміри: 24 × 13,5 × 6 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>3032</g:google_product_category>
@@ -642,6 +677,8 @@
       <g:mpn>MJ-1028S-0807IR-54</g:mpn>
       <g:item_group_id>17</g:item_group_id>
       <g:color>Темно-сірий</g:color>
+      <g:material>Ацетат; полімерні лінзи</g:material>
+      <g:product_highlight>Ширина лінзи × місток × довжина завушника: 54 × 19 × 140 мм</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>178</g:google_product_category>
@@ -666,6 +703,8 @@
       <g:mpn>MJ-1061S-009QHA-59</g:mpn>
       <g:item_group_id>18</g:item_group_id>
       <g:color>Темно-коричневий</g:color>
+      <g:material>Ацетат; полімерні лінзи</g:material>
+      <g:product_highlight>Ширина лінзи × місток × довжина завушника: 59 × 9 × 145 мм</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>178</g:google_product_category>
@@ -690,6 +729,8 @@
       <g:mpn>MARC-409S-08079O-54</g:mpn>
       <g:item_group_id>19</g:item_group_id>
       <g:color>Темно-сірий</g:color>
+      <g:material>Металева оправа; полімерні лінзи</g:material>
+      <g:product_highlight>Ширина лінзи × місток × довжина завушника: 54 × 17 × 135 мм</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>178</g:google_product_category>
@@ -716,6 +757,7 @@
       <g:item_group_id>20</g:item_group_id>
       <g:color>Бежевий</g:color>
       <g:material>Шкіра</g:material>
+      <g:product_highlight>Розміри: 18 × 11 × 6 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>3032</g:google_product_category>
@@ -743,6 +785,7 @@
       <g:item_group_id>20</g:item_group_id>
       <g:color>Чорний</g:color>
       <g:material>Шкіра</g:material>
+      <g:product_highlight>Розміри: 18 × 11 × 6 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>3032</g:google_product_category>
@@ -769,6 +812,8 @@
       <g:mpn>2F3HSH042H02-230</g:mpn>
       <g:item_group_id>21</g:item_group_id>
       <g:color>Коричневий</g:color>
+      <g:material>Штучне хутро «тедді»; ремінець — натуральна шкіра, ланцюжок — метал</g:material>
+      <g:product_highlight>Розміри: 20 × 11 × 8 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>3032</g:google_product_category>
@@ -796,6 +841,7 @@
       <g:item_group_id>22</g:item_group_id>
       <g:color>Чорний</g:color>
       <g:material>Шкіра</g:material>
+      <g:product_highlight>Розміри: 16 × 21 × 16 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>3032</g:google_product_category>
@@ -821,6 +867,8 @@
       <g:mpn>D31186MABU</g:mpn>
       <g:item_group_id>23</g:item_group_id>
       <g:color>Світло-сірий</g:color>
+      <g:material>Корпус і браслет — нержавіюча сталь 316L; скло — із сапфіровим покриттям</g:material>
+      <g:product_highlight>Розміри: Корпус — 2,8 см у діаметрі, товщина 0,7 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>201</g:google_product_category>
@@ -847,6 +895,8 @@
       <g:mpn>D710BN</g:mpn>
       <g:item_group_id>24</g:item_group_id>
       <g:color>Темно-сірий</g:color>
+      <g:material>Корпус і браслет — нержавіюча сталь 316L; скло — сапфірове</g:material>
+      <g:product_highlight>Розміри: Корпус — 2,6 см у діаметрі, товщина 1 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>201</g:google_product_category>
@@ -873,6 +923,7 @@
       <g:item_group_id>25</g:item_group_id>
       <g:color>Синій</g:color>
       <g:material>Шкіра</g:material>
+      <g:product_highlight>Розміри: 25,5 × 14 × 9,5 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>3032</g:google_product_category>
@@ -898,6 +949,8 @@
       <g:mpn>MK4619</g:mpn>
       <g:item_group_id>26</g:item_group_id>
       <g:color>Бежевий</g:color>
+      <g:material>Корпус і сітчастий браслет — нержавіюча сталь; скло — мінеральне</g:material>
+      <g:product_highlight>Розміри: Корпус — 3,2 см у діаметрі</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>201</g:google_product_category>
@@ -923,6 +976,8 @@
       <g:mpn>PR-20WS-1AB5S0-49</g:mpn>
       <g:item_group_id>27</g:item_group_id>
       <g:color>Темно-сірий</g:color>
+      <g:material>Ацетат; полімерні лінзи</g:material>
+      <g:product_highlight>Ширина лінзи × місток × довжина завушника: 49 × 18 × 135 мм</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>178</g:google_product_category>
@@ -948,6 +1003,7 @@
       <g:mpn>35F1GX0C5U</g:mpn>
       <g:item_group_id>28</g:item_group_id>
       <g:color>Чорний</g:color>
+      <g:material>Стьобана натуральна шкіра</g:material>
       <g:product_highlight>Розміри: 18 см × 13 см × 7,5 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
@@ -972,6 +1028,7 @@
       <g:mpn>35F0SX0C5T</g:mpn>
       <g:item_group_id>28</g:item_group_id>
       <g:color>Світло-сірий</g:color>
+      <g:material>Стьобана натуральна шкіра</g:material>
       <g:product_highlight>Розміри: 18 см × 13 см × 7,5 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
@@ -998,6 +1055,7 @@
       <g:mpn>35F0GX0C5T</g:mpn>
       <g:item_group_id>28</g:item_group_id>
       <g:color>Зелений</g:color>
+      <g:material>Стьобана натуральна шкіра</g:material>
       <g:product_highlight>Розміри: 18 см × 13 см × 7,5 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
@@ -1025,6 +1083,7 @@
       <g:mpn>35F1GX0C5U</g:mpn>
       <g:item_group_id>28</g:item_group_id>
       <g:color>Темно-синій</g:color>
+      <g:material>Стьобана натуральна шкіра</g:material>
       <g:product_highlight>Розміри: 18 см × 13 см × 7,5 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
@@ -1081,6 +1140,7 @@
       <g:mpn>JC4116PP1FLT0000</g:mpn>
       <g:item_group_id>30</g:item_group_id>
       <g:color>Чорний</g:color>
+      <g:material>Екошкіра (100% поліуретан)</g:material>
       <g:product_highlight>Розміри: 25 × 15 × 7 см</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
@@ -1136,7 +1196,8 @@
       <g:item_group_id>32</g:item_group_id>
       <g:color>Чорний</g:color>
       <g:size>51</g:size>
-      <g:product_highlight>Розміри: 51</g:product_highlight>
+      <g:material>Ацетатна оправа з металевими дужками; полікарбонатні лінзи</g:material>
+      <g:product_highlight>Ширина лінзи × місток × довжина завушника: 51 × 21 × 145 мм</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>178</g:google_product_category>
@@ -1163,6 +1224,8 @@
       <g:item_group_id>33</g:item_group_id>
       <g:color>Чорний</g:color>
       <g:size>54</g:size>
+      <g:material>Ацетат; полімерні лінзи</g:material>
+      <g:product_highlight>Ширина лінзи × місток × довжина завушника: 54 × 20 × 140 мм</g:product_highlight>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>178</g:google_product_category>
@@ -1189,6 +1252,7 @@
       <g:item_group_id>34</g:item_group_id>
       <g:color>Білий</g:color>
       <g:size>38</g:size>
+      <g:material>Верх — 65% поліестер, 35% поліуретан; підкладка — поліестер; підошва — 61% гума, 39% EVA</g:material>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>187</g:google_product_category>
@@ -1215,6 +1279,7 @@
       <g:item_group_id>34</g:item_group_id>
       <g:color>Білий</g:color>
       <g:size>37</g:size>
+      <g:material>Верх — 65% поліестер, 35% поліуретан; підкладка — поліестер; підошва — 61% гума, 39% EVA</g:material>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>187</g:google_product_category>
@@ -1241,6 +1306,7 @@
       <g:item_group_id>34</g:item_group_id>
       <g:color>Білий</g:color>
       <g:size>39</g:size>
+      <g:material>Верх — 65% поліестер, 35% поліуретан; підкладка — поліестер; підошва — 61% гума, 39% EVA</g:material>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>187</g:google_product_category>
@@ -1267,6 +1333,7 @@
       <g:item_group_id>35</g:item_group_id>
       <g:color>Білий</g:color>
       <g:size>36</g:size>
+      <g:material>Верх — трикотаж PRIMEKNIT частково з перероблених матеріалів, накладки з біо-EVA; проміжна підошва — BOOST; підметка — гума</g:material>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>187</g:google_product_category>
@@ -1293,6 +1360,7 @@
       <g:item_group_id>36</g:item_group_id>
       <g:color>Мультиколір</g:color>
       <g:size>37</g:size>
+      <g:material>Верх — 65% нейлон, 35% поліуретан; підкладка — поліестер; підошва — 61% гума, 39% EVA</g:material>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>187</g:google_product_category>
@@ -1319,6 +1387,7 @@
       <g:item_group_id>36</g:item_group_id>
       <g:color>Мультиколір</g:color>
       <g:size>38</g:size>
+      <g:material>Верх — 65% нейлон, 35% поліуретан; підкладка — поліестер; підошва — 61% гума, 39% EVA</g:material>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>187</g:google_product_category>
@@ -1345,6 +1414,7 @@
       <g:item_group_id>36</g:item_group_id>
       <g:color>Мультиколір</g:color>
       <g:size>39</g:size>
+      <g:material>Верх — 65% нейлон, 35% поліуретан; підкладка — поліестер; підошва — 61% гума, 39% EVA</g:material>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>187</g:google_product_category>
@@ -1371,6 +1441,7 @@
       <g:item_group_id>37</g:item_group_id>
       <g:color>Зелений</g:color>
       <g:size>38</g:size>
+      <g:material>Верх — 50% поліестер, 42% шкіра, 8% поліуретан; підкладка — поліестер; підошва — 60% гума, 38% EVA, 2% ТПУ</g:material>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>187</g:google_product_category>
@@ -1396,6 +1467,7 @@
       <g:item_group_id>38</g:item_group_id>
       <g:color>Рожевий</g:color>
       <g:size>38</g:size>
+      <g:material>Верх — текстиль і замша із сітчастими вставками та синтетичними накладками; підкладка — текстиль; підошва — гума з EVA</g:material>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>187</g:google_product_category>
@@ -1421,6 +1493,7 @@
       <g:item_group_id>39</g:item_group_id>
       <g:color>Чорний</g:color>
       <g:size>37</g:size>
+      <g:material>Верх — 76% поліестер, 12% шкіра, 12% поліуретан; підкладка — 85% поліестер, 15% нейлон; підошва — 53% гума, 47% EVA</g:material>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>187</g:google_product_category>
@@ -1444,6 +1517,7 @@
       <g:mpn>NH4040NZ</g:mpn>
       <g:item_group_id>40</g:item_group_id>
       <g:color>Темно-синій</g:color>
+      <g:material>100% поліестер</g:material>
       <g:product_highlight>Розміри: 17 × 23 × 9 см</g:product_highlight>
       <g:product_highlight>Склад: 100% поліестр</g:product_highlight>
       <g:gender>male</g:gender>
@@ -1472,6 +1546,7 @@
       <g:item_group_id>41</g:item_group_id>
       <g:color>Білий із зеленим</g:color>
       <g:size>37</g:size>
+      <g:material>Верх — 43% поліестер, 32% шкіра, 25% поліуретан; підкладка — поліестер; підошва — 57% гума, 30% EVA, 13% ТПУ</g:material>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>187</g:google_product_category>
@@ -1498,6 +1573,7 @@
       <g:item_group_id>42</g:item_group_id>
       <g:color>Біло-помаранчевий</g:color>
       <g:size>37</g:size>
+      <g:material>Верх — шкіра, замша та синтетичні матеріали із сітчастими вставками; підкладка — текстиль; підошва — гума з EVA</g:material>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>187</g:google_product_category>
@@ -1524,6 +1600,7 @@
       <g:item_group_id>43</g:item_group_id>
       <g:color>Білий</g:color>
       <g:size>38</g:size>
+      <g:material>Верх — 92% шкіра, 8% поліестер; підкладка — поліестер; підошва — 100% гума</g:material>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>187</g:google_product_category>
@@ -1550,6 +1627,7 @@
       <g:item_group_id>44</g:item_group_id>
       <g:color>Бежевий</g:color>
       <g:size>38</g:size>
+      <g:material>Верх — 92% шкіра, 8% поліестер; підкладка — поліестер; підошва — 100% гума</g:material>
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
       <g:google_product_category>187</g:google_product_category>
@@ -2403,6 +2481,7 @@
       <g:mpn>952137-2F882-00020</g:mpn>
       <g:item_group_id>70</g:item_group_id>
       <g:color>Чорний</g:color>
+      <g:material>Екошкіра</g:material>
       <g:product_highlight>Розміри: 20 × 22 × 4 см</g:product_highlight>
       <g:product_highlight>Регульований плечовий ремінь довжиною 80–150 см, що дозволяє носити сумку через плече або кросбоді</g:product_highlight>
       <g:gender>male</g:gender>
@@ -3264,6 +3343,7 @@
       <g:mpn>RB3183006/7163</g:mpn>
       <g:item_group_id>90</g:item_group_id>
       <g:color>Чорний / зелений</g:color>
+      <g:material>Металева оправа; нейлонові лінзи</g:material>
       <g:product_highlight>Розміри: 13,9 × 3,3 см; ширина лінзи — 6,3 см; міст — 1,5 см; довжина дужки — 12,5 см.</g:product_highlight>
       <g:product_highlight>Тонкі металеві дужки</g:product_highlight>
       <g:gender>male</g:gender>

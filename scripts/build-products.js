@@ -1291,9 +1291,15 @@ function main() {
 //
 // НЕ помилка й НЕ валить збірку: у частини товарів матеріалу
 // справді немає. Це список, щоб про нього знали.
+//
+// skip — категорії, де поле не має сенсу й ніколи не заповниться.
+// У взуття габарити заміняє розмірна сітка: ні Lacoste, ні adidas
+// їх не публікують, бо покупцеві потрібен розмір ноги, а не довжина
+// кросівка. Без цього винятку десять кросівок вічно висіли б у
+// попередженні й привчали б його гортати.
 const CARD_FIELDS = [
-    { key: "dimensions", label: "габаритів" },
-    { key: "material", label: "матеріалу" }
+    { key: "dimensions", label: "габаритів", skip: ["Кросівки"] },
+    { key: "material", label: "матеріалу", skip: [] }
 ];
 
 // Скільки назв перелічувати. Повний список на сто товарів у логу
@@ -1302,9 +1308,12 @@ const GAP_EXAMPLES = 5;
 
 function reportCardGaps(products) {
 
-    CARD_FIELDS.forEach(({ key, label }) => {
+    CARD_FIELDS.forEach(({ key, label, skip }) => {
 
-        const missing = products.filter(product => !String(product[key] || "").trim());
+        const asked = products.filter(product =>
+            !(skip || []).includes(product.category));
+
+        const missing = asked.filter(product => !String(product[key] || "").trim());
 
         if (!missing.length) return;
 
@@ -1319,7 +1328,7 @@ function reportCardGaps(products) {
 
         const total = {};
 
-        products.forEach(product => {
+        asked.forEach(product => {
             const category = product.category || "без категорії";
             total[category] = (total[category] || 0) + 1;
         });
@@ -1345,6 +1354,12 @@ function reportCardGaps(products) {
 
 // Експортуємо для тестів: перейменування адрес перевіряється на
 // тимчасовій теці, а не на справжньому каталозі.
-module.exports = { renameToLatinSlugs, serialize, PRODUCT_PAGE_ONLY };
+module.exports = {
+    renameToLatinSlugs, serialize, PRODUCT_PAGE_ONLY,
+    // Звіт про порожні поля перевіряється за поведінкою, а не за
+    // виглядом коду: він уже раз мовчав про категорію, якій поле не
+    // потрібне, і про це не було звідки дізнатись.
+    reportCardGaps, CARD_FIELDS
+};
 
 if (require.main === module) main();
