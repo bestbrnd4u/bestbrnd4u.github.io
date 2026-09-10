@@ -209,6 +209,32 @@ export function turnstileHostAllowed(hostname) {
 
 }
 
+// Для чого саме видано токен.
+//
+// НАВІЩО ЦЕ, КОЛИ ХОСТ УЖЕ ЗВІРЕНО
+//
+// Хост відповідає на питання «з нашого сайту?», дія — на питання «з
+// нашого оформлення?». Зараз віджет на сайті один, і різниці немає.
+// Але щойно перевірка з'явиться ще десь — у формі відгуку, у підписці
+// на листи, — токен із дешевої форми можна буде надіслати сюди й
+// оформити замовлення. Хост при цьому збігається, бо форма теж наша.
+//
+// Три рядки зараз замість пошуку цієї дірки потім.
+export const TURNSTILE_ACTION = "checkout";
+
+export function turnstileActionAllowed(action) {
+
+    const value = String(action ?? "").trim();
+
+    // Порожньо — сторінка старої збірки з браузерного кеша: вона
+    // випустила токен ще без позначки дії. Відмовляти їй означало б
+    // зламати оформлення рівно тим, у кого сторінка не оновилась.
+    if (!value) return true;
+
+    return value === TURNSTILE_ACTION;
+
+}
+
 export function turnstileVerdict(data) {
 
     if (!data || typeof data !== "object") return { ok: false, reason: "порожня відповідь" };
@@ -217,6 +243,10 @@ export function turnstileVerdict(data) {
 
         if (!turnstileHostAllowed(data.hostname)) {
             return { ok: false, reason: `чужий хост: ${data.hostname}` };
+        }
+
+        if (!turnstileActionAllowed(data.action)) {
+            return { ok: false, reason: `чужа дія: ${data.action}` };
         }
 
         return { ok: true };
