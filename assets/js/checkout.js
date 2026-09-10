@@ -1387,14 +1387,81 @@ function orderWithoutTurnstile(reason, detail) {
 //                    відкрили щойно й віджет не встиг;
 //   секунд мало    — покупець надіслав форму швидше, ніж кадр
 //                    зʼявився. Тоді це не поломка, а перегони.
+// Яка саме збірка сторінки це написала.
+//
+// НАВІЩО. Сторінки віддаються з Cache-Control: max-age=7200 — тобто
+// БРАУЗЕР тримає їх дві години. Виливка чистить край Cloudflare
+// (scripts/purge-cache.js), але не чужий браузер: той, хто вже
+// відкривав оформлення, ще дві години працює зі старим кодом.
+//
+// 10.09.2026 це коштувало половини розслідування: виправлення
+// вилилось о 18:17:21, замовлення пішло о 18:18:59 — і виглядало,
+// ніби воно не допомогло. Насправді невідомо, чи воно взагалі
+// виконувалось.
+//
+// Версію беремо з адреси самого файлу: apply-cache-version.js
+// проставляє в ?v= відбиток його вмісту, тобто це точна назва того
+// коду, який зараз працює.
+function turnstileVersion() {
+
+    try {
+
+        var el = document.querySelector('script[src*="turnstile.js"]');
+
+        var match = el && /[?&]v=([a-z0-9]+)/i.exec(el.getAttribute("src") || "");
+
+        return match ? match[1] : "без версії";
+
+    } catch (error) {
+
+        return "без версії";
+
+    }
+
+}
+
 function turnstileDetail() {
 
-    var box = document.getElementById("turnstileBox");
+    var parts = ["збірка " + turnstileVersion()];
 
-    var parts = [
-        typeof window.turnstile === "undefined" ? "скрипта немає" : "скрипт є",
-        box ? (box.querySelector("iframe") ? "кадр є" : "кадру немає") : "блока немає"
-    ];
+    var state = null;
+
+    try {
+        state = window.Turnstile && window.Turnstile.state && window.Turnstile.state();
+    } catch (error) {
+        state = null;
+    }
+
+    if (state) {
+
+        // Порядок навмисний: від «нема з чого починати» до «усе було,
+        // а кадру немає». Останнє — єдиний випадок, коли дивитись
+        // треба не в код, а в кабінет Cloudflare.
+        if (!state.key) parts.push("ключа немає");
+
+        parts.push(state.script ? "скрипт є" : "скрипта немає");
+
+        if (state.failed) parts.push("помилка: " + (state.error || "без коду"));
+
+        parts.push(state.drawn ? "малювали" : "не малювали");
+
+        if (state.waiting) parts.push("чекаємо ширини");
+
+        parts.push("ширина " + state.width);
+
+        if (state.hidden) parts.push("блок схований");
+
+        parts.push(state.iframe ? "кадр є" : "кадру немає");
+
+    } else {
+
+        // Модуль не завантажився зовсім — тоді хоч так.
+        var target = document.getElementById("turnstileBox");
+
+        parts.push(typeof window.turnstile === "undefined" ? "скрипта немає" : "скрипт є");
+        parts.push(target ? (target.querySelector("iframe") ? "кадр є" : "кадру немає") : "блока немає");
+
+    }
 
     try {
         parts.push(Math.round(performance.now() / 1000) + " с від відкриття");
@@ -1412,14 +1479,25 @@ async function placeOrderThroughFunction(order) {
         return orderWithoutTurnstile("модуль перевірки не завантажився", turnstileDetail());
     }
 
-    if (!window.Turnstile.enabled()) {
-        return orderWithoutTurnstile("віджет не зʼявився на сторінці", turnstileDetail());
-    }
-
+    // ПИТАЄМО CLOUDFLARE, А НЕ РОЗМІТКУ.
+    //
+    // Тут стояло ще й !Turnstile.enabled() — а enabled() серед іншого
+    // шукав <iframe> усередині #turnstileBox. Це виявилось хибним
+    // мірилом: 10.09.2026 на bestbrnd4u.com віджет був намальований і
+    // ПРОЙДЕНИЙ (на екрані зелена галочка «Успіх!»), а
+    // querySelector("iframe") у тому самому блоці нічого не знаходив
+    // — і замовлення йшло повз перевірку. П'ять справжніх замовлень.
+    //
+    // Як саме Cloudflare розкладає свою розмітку — не наша справа й
+    // не наша гарантія: сьогодні кадр, завтра shadow DOM, післязавтра
+    // ще щось. Єдине надійне питання до нього одне: ТОКЕН Є?
+    //
+    // Токен є — шлемо його на звірку. Токена немає — йдемо старим
+    // шляхом і пишемо причину. Розмітка більше ні на що не впливає.
     const token = window.Turnstile.token();
 
     if (!token) {
-        return orderWithoutTurnstile("віджет є, але токена немає", turnstileDetail());
+        return orderWithoutTurnstile("перевірка не дала токена", turnstileDetail());
     }
 
     try {

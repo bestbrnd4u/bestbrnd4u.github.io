@@ -42,6 +42,21 @@
     // ніби перевірки немає зовсім (пояснення — у error-callback нижче).
     var failed = false;
 
+    // Код помилки від Cloudflare, якщо він її взагалі повідомив, і
+    // чи ми ще чекаємо на ширину контейнера. Обидва потрібні лише
+    // для журналу: коли замовлення йде повз перевірку, сторінка
+    // мусить сказати ЧОМУ, а не «не вийшло».
+    //
+    // НАВІЩО ЦЕ ОКРЕМО. Причину «віджет не зʼявився» я двічі пояснив
+    // неправильно — спершу «домен не в списку хостів», потім
+    // «нульова ширина контейнера». Обидва рази виправлення виїжджало
+    // на прод, і обидва рази наступне замовлення знову йшло повз
+    // перевірку. Кожна така помилка коштує власнику тестового
+    // замовлення й пів дня. Тому тепер сторінка розповідає свій стан
+    // повністю, і гадати більше не треба.
+    var lastError = "";
+    var waiting = false;
+
     function box() {
         return document.getElementById("turnstileBox");
     }
@@ -126,7 +141,10 @@
         var timer = null;
         var waited = 0;
 
+        waiting = true;
+
         function stop() {
+            waiting = false;
             if (observer) observer.disconnect();
             if (timer) root.clearInterval(timer);
         }
@@ -225,6 +243,7 @@
                 console.warn("Перевірка «ви людина» недоступна:", code);
 
                 failed = true;
+                lastError = String(code || "без коду");
 
                 if (target) target.hidden = true;
 
@@ -292,7 +311,30 @@
 
         var target = box();
 
-        return Boolean(target && target.querySelector("iframe"));
+        if (!target) return false;
+
+        if (target.querySelector("iframe")) return true;
+
+        // Кадр може лежати в shadow DOM — querySelector туди не
+        // заглядає. Заміряно 10.09.2026: віджет був на екрані й
+        // пройдений, а querySelector("iframe") нічого не знаходив.
+        //
+        // Це мірило лишилось ТІЛЬКИ для підказки покупцеві («зачекайте,
+        // перевірка ще не пройдена»). Рішення, чи слати замовлення
+        // через функцію, більше від нього не залежить: там питають
+        // токен (checkout.js). Тобто помилка тут коштує підказки, а
+        // не замовлення.
+        var inner = target.querySelectorAll("*");
+
+        for (var i = 0; i < inner.length; i++) {
+
+            var shadow = inner[i].shadowRoot;
+
+            if (shadow && shadow.querySelector("iframe")) return true;
+
+        }
+
+        return false;
 
     }
 
@@ -336,11 +378,52 @@
 
     }
 
+    // Повний стан перевірки — для журналу подій.
+    //
+    // Коли замовлення йде повз перевірку, сторінка мусить сказати
+    // ЧОМУ саме, а не «не вийшло». Кожне неправильне пояснення
+    // коштує власнику тестового замовлення й половини дня, і таких
+    // уже було два.
+    //
+    // Читається так:
+    //   ключ немає         — у data/security.json порожньо
+    //   скрипта немає      — Cloudflare не завантажився (блокувальник)
+    //   не малювали        — render() ще не викликали
+    //   чекаємо ширини     — контейнер нульовий, стежимо за ним
+    //   помилка: <код>     — Cloudflare сам повідомив про відмову
+    //   малювали, кадру немає — Cloudflare мовчки відмовив: оце і є
+    //                        випадок, коли дивитись треба в кабінет
+    function state() {
+
+        var target = box();
+        var width = -1;
+
+        try {
+            if (target) width = Math.round(target.getBoundingClientRect().width);
+        } catch (error) {
+            width = -1;
+        }
+
+        return {
+            key: Boolean(siteKey),
+            script: typeof root.turnstile !== "undefined",
+            drawn: widgetId !== null,
+            waiting: waiting,
+            failed: failed,
+            error: lastError,
+            hidden: target ? Boolean(target.hidden) : null,
+            width: width,
+            iframe: Boolean(target && target.querySelector("iframe"))
+        };
+
+    }
+
     root.Turnstile = {
         init: init,
         enabled: enabled,
         token: token,
-        reset: reset
+        reset: reset,
+        state: state
     };
 
     if (typeof document !== "undefined") {
