@@ -1337,10 +1337,37 @@ function buildOrderItemsSnapshot() {
 // Запис іде ЛИШЕ в момент справжнього оформлення, тож це кілька
 // рядків на день, а не потік. Причина — технічна: ні кошика, ні
 // імені, ні пошти в неї не потрапляє.
-function orderWithoutTurnstile(reason) {
+//
+// ЧОМУ В ПРИЧИНІ Є ДОМЕН
+//
+// Перший же справжній запис (10.09.2026, Chrome на Windows) показав
+// ваду цього журналу: у ньому написано «віджет не зʼявився», але не
+// написано ДЕ. Дев і прод пишуть в одну базу, у рядку лише шлях
+// /checkout — однаковий на обох, — і зрозуміти, чи це прод, чи
+// перевірка на деві, було нізвідки. Різниця вирішальна: на деві це
+// звичайна річ, на проді це причина не робити крок 6.
+//
+// Домен саме в ПРИЧИНІ, а не в source: журнал склеює однакові події
+// за kind|page|message, і source у повторів більше не оновлюється.
+// Тобто в source домен першого запису застряг би назавжди.
+function orderWithoutTurnstile(reason, detail) {
 
     try {
-        if (window.ErrorReport) window.ErrorReport.report("turnstile_skip", reason, "");
+
+        if (!window.ErrorReport) return false;
+
+        var host = "";
+
+        try {
+            host = String(location.hostname || "");
+        } catch (error) {
+            host = "";
+        }
+
+        window.ErrorReport.report("turnstile_skip",
+            host ? reason + " · " + host : reason,
+            String(detail || ""));
+
     } catch (error) {
         // Журнал не має права зламати оформлення.
     }
@@ -1349,15 +1376,51 @@ function orderWithoutTurnstile(reason) {
 
 }
 
+// Чому віджета не видно — окремим рядком у source.
+//
+// «Не зʼявився» має три різні причини, і лікуються вони по-різному:
+//
+//   скрипта немає  — Cloudflare заблокований (блокувальник реклами,
+//                    корпоративний DNS) або домену немає в списку
+//                    хостів віджета;
+//   скрипт є, кадру немає — або домен не дозволений, або сторінку
+//                    відкрили щойно й віджет не встиг;
+//   секунд мало    — покупець надіслав форму швидше, ніж кадр
+//                    зʼявився. Тоді це не поломка, а перегони.
+function turnstileDetail() {
+
+    var box = document.getElementById("turnstileBox");
+
+    var parts = [
+        typeof window.turnstile === "undefined" ? "скрипта немає" : "скрипт є",
+        box ? (box.querySelector("iframe") ? "кадр є" : "кадру немає") : "блока немає"
+    ];
+
+    try {
+        parts.push(Math.round(performance.now() / 1000) + " с від відкриття");
+    } catch (error) {
+        // performance може бути недоступний — не біда.
+    }
+
+    return parts.join(", ");
+
+}
+
 async function placeOrderThroughFunction(order) {
 
-    if (!window.Turnstile) return orderWithoutTurnstile("модуль перевірки не завантажився");
+    if (!window.Turnstile) {
+        return orderWithoutTurnstile("модуль перевірки не завантажився", turnstileDetail());
+    }
 
-    if (!window.Turnstile.enabled()) return orderWithoutTurnstile("віджет не зʼявився на сторінці");
+    if (!window.Turnstile.enabled()) {
+        return orderWithoutTurnstile("віджет не зʼявився на сторінці", turnstileDetail());
+    }
 
     const token = window.Turnstile.token();
 
-    if (!token) return orderWithoutTurnstile("віджет є, але токена немає");
+    if (!token) {
+        return orderWithoutTurnstile("віджет є, але токена немає", turnstileDetail());
+    }
 
     try {
 

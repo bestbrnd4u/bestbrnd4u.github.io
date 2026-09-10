@@ -318,25 +318,46 @@ console.log("\n[5] Замовлення повз перевірку видно �
     // поведінці (див. [2] про enabled()).
     const code = src.slice(from, tail);
 
-    function run(turnstile, invoke) {
+    function run(turnstile, invoke, page) {
 
         const said = [];
 
         const win = {
             Turnstile: turnstile,
-            ErrorReport: { report: (kind, message) => said.push(`${kind}: ${message}`) }
+            ErrorReport: {
+                report: (kind, message, source) => said.push({ kind, message, source })
+            }
         };
 
         const client = { functions: { invoke: invoke || (async () => ({ data: { ok: true } })) } };
 
+        // location, document і performance передаємо всередину: код
+        // звертається до них без префікса window, як і належить у
+        // браузері, а тесту треба ними керувати.
+        const box = (page || {}).box === undefined ? { iframe: false } : (page || {}).box;
+
+        const doc = {
+            getElementById: id => (id === "turnstileBox" && box)
+                ? { querySelector: () => (box.iframe ? {} : null) }
+                : null
+        };
+
         const make = new Function("window", "supabaseClient", "console",
+            "location", "document", "performance",
             `${code}\nreturn placeOrderThroughFunction;`);
 
-        const promise = make(win, client, { warn() {} })({});
+        const promise = make(
+            win, client, { warn() {} },
+            { hostname: (page || {}).host || "bestbrnd4u.com" },
+            doc,
+            { now: () => ((page || {}).seconds || 40) * 1000 }
+        )({});
 
         return { said, promise };
 
     }
+
+    const first = ran => (ran.said[0] ? `${ran.said[0].kind}: ${ran.said[0].message}` : "");
 
     const working = {
         enabled: () => true,
@@ -347,18 +368,53 @@ console.log("\n[5] Замовлення повз перевірку видно �
     // Гілки без токена спрацьовують ДО першого await, тому said
     // заповнений уже після виклику — чекати нема чого.
     check("модуль не завантажився — записано",
-        run(undefined).said[0] === "turnstile_skip: модуль перевірки не завантажився",
-        run(undefined).said[0]);
+        first(run(undefined))
+            === "turnstile_skip: модуль перевірки не завантажився · bestbrnd4u.com",
+        first(run(undefined)));
 
     check("віджет не намалювався — записано",
-        run({ enabled: () => false }).said[0]
-            === "turnstile_skip: віджет не зʼявився на сторінці",
-        run({ enabled: () => false }).said[0]);
+        first(run({ enabled: () => false }))
+            === "turnstile_skip: віджет не зʼявився на сторінці · bestbrnd4u.com",
+        first(run({ enabled: () => false })));
 
     check("віджет є, а токена немає — записано",
-        run({ enabled: () => true, token: () => "", reset() {} }).said[0]
-            === "turnstile_skip: віджет є, але токена немає",
-        run({ enabled: () => true, token: () => "", reset() {} }).said[0]);
+        first(run({ enabled: () => true, token: () => "", reset() {} }))
+            === "turnstile_skip: віджет є, але токена немає · bestbrnd4u.com",
+        first(run({ enabled: () => true, token: () => "", reset() {} })));
+
+    // ДОМЕН У ПРИЧИНІ — не окраса.
+    //
+    // Перший справжній запис (10.09.2026, Chrome на Windows) сказав
+    // «віджет не зʼявився» і не сказав ДЕ. Дев і прод пишуть в одну
+    // базу, шлях /checkout у них однаковий — і зрозуміти, чи це
+    // прод, чи перевірка на деві, було нізвідки. А різниця вирішальна:
+    // на деві це буденність, на проді це причина не робити крок 6.
+    const naDevi = run({ enabled: () => false }, undefined, { host: "dev.bestbrnd4u.com" });
+
+    check("дев і прод у журналі різні",
+        first(naDevi).endsWith("· dev.bestbrnd4u.com"), first(naDevi));
+
+    // Домен мусить бути саме в ПРИЧИНІ: журнал склеює однакові події
+    // за kind|page|message, а source у повторів не оновлюється — тобто
+    // в source домен першого запису застряг би назавжди.
+    check("…бо склейка подій дивиться на причину",
+        naDevi.said[0].message.includes("dev.bestbrnd4u.com")
+        && !first(run({ enabled: () => false })).includes("dev."));
+
+    // ЧОМУ ВІДЖЕТА НЕМАЄ — три різні причини, і лікуються вони
+    // по-різному. Це йде в source: воно не бере участі в склейці.
+    const zablokovano = run({ enabled: () => false }, undefined, { box: { iframe: false }, seconds: 90 });
+
+    check("сказано, чи є скрипт і кадр",
+        /скрипта немає|скрипт є/.test(zablokovano.said[0].source)
+        && /кадру немає|кадр є/.test(zablokovano.said[0].source),
+        zablokovano.said[0].source);
+
+    // Секунди відрізняють «Cloudflare заблокований» від «покупець
+    // натиснув швидше, ніж кадр зʼявився».
+    check("сказано, скільки сторінка була відкрита",
+        /90 с від відкриття/.test(zablokovano.said[0].source),
+        zablokovano.said[0].source);
 
     // НЕГАТИВНИЙ КОНТРОЛЬ. Найгірше, що тут може статись, — журнал,
     // який пише на КОЖНЕ замовлення: тоді в ньому не видно нічого.
@@ -366,7 +422,7 @@ console.log("\n[5] Замовлення повз перевірку видно �
 
     check("перевірка пройшла — замовлення прийнято", (await ok.promise) === true);
 
-    check("…і в журнал не пішло нічого", ok.said.length === 0, ok.said.join("; "));
+    check("…і в журнал не пішло нічого", ok.said.length === 0, JSON.stringify(ok.said));
 
     // Відмова функції теж мусить бути видно — але без вмісту
     // замовлення: у ньому ім'я, телефон і пошта покупця.
@@ -375,15 +431,17 @@ console.log("\n[5] Замовлення повз перевірку видно �
     await refused.promise;
 
     check("відмову функції записано з кодом",
-        refused.said[0] === "turnstile_skip: функція відмовила: turnstile_failed",
-        refused.said[0]);
+        first(refused)
+            === "turnstile_skip: функція відмовила: turnstile_failed · bestbrnd4u.com",
+        first(refused));
 
     const leaky = run(working, async () => ({ data: { ok: false, error: "turnstile_failed" } }));
 
     await leaky.promise;
 
     check("у журнал не потрапляє замовлення",
-        !/phone|email|order|\+380/i.test(leaky.said.join(" ")), leaky.said.join(" "));
+        !/phone|email|order|\+380/i.test(JSON.stringify(leaky.said)),
+        JSON.stringify(leaky.said));
 }
 
 console.log(failures === 0
