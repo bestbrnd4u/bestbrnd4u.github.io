@@ -180,31 +180,81 @@ async function buildMissingVariants(file) {
     // Порівнюємо за часом зміни: копія, старша за базу, зроблена не з
     // неї. Це дешевше за порівняння вмісту й для цієї задачі досить —
     // збірка перезаписує базу лише коли та справді змінилась.
+    //
+    // ЧОГО ЦЬОГО ВИЯВИЛОСЬ МАЛО
+    // --------------------------
+    // Час — не властивість картинки, а властивість файлу на диску.
+    // Будь-який checkout ставить УСІМ файлам той самий час, тож у CI
+    // ця перевірка мовчить завжди: копія ніколи не «старша за базу»,
+    // і перезбірка відбувається лише коли копії немає зовсім.
+    //
+    // Наслідок заміряний на живому сайті: у 16 фото avif-копії
+    // лишились від широкого оригіналу (1.51), тоді як сам файл давно
+    // приведений до 1200×1500 (0.80). Браузер бере саме avif — і
+    // сумка на сторінці товару виявлялась обрізаною, бо широку
+    // картинку вписували в вертикальну рамку через object-fit: cover.
+    // webp-копії при цьому були правильні, тобто помилка була ще й
+    // невидимою на око в частині браузерів.
+    //
+    // Тому додаємо перевірку, яку не збиває жоден checkout: ФОРМА.
+    // Копія, зроблена з цієї бази, мусить мати її співвідношення
+    // сторін і задану ширину. Не збігається — вона зроблена з іншого
+    // зображення, хоч би що казав час файлу.
     const baseTime = fs.statSync(full).mtimeMs;
 
-    function stale(name) {
+    const baseMeta = await sharp(source).metadata();
+
+    const baseRatio = baseMeta.width / baseMeta.height;
+
+    async function stale(name, width) {
 
         const variant = path.join(DIR, name);
 
         if (!fs.existsSync(variant)) return true;
 
+        // Форма — головне. Її перевіряємо першою й завжди.
+        try {
+
+            const meta = await sharp(variant).metadata();
+
+            if (meta.width !== width) return true;
+
+            // Два відсотки допуску: масштабування округлює висоту до
+            // цілого пікселя, і 300×375 проти 300×374 — це та сама
+            // картинка, а не інша.
+            if (Math.abs(meta.width / meta.height - baseRatio) / baseRatio > 0.02) return true;
+
+        } catch (error) {
+
+            // Не читається — точно треба перезібрати.
+            return true;
+
+        }
+
+        // Форма збіглась. Лишається випадок, коли базу підмінили
+        // зображенням тих самих пропорцій — його ловить лише час.
         return fs.statSync(variant).mtimeMs < baseTime - 1000;
 
     }
 
     // Чого бракує — по кожному формату окремо: webp може бути свіжим, а
     // avif ще не існувати (перший запуск після появи цього формату).
+    // Послідовно, а не forEach: перевірка форми читає заголовок
+    // файлу, тобто вона асинхронна. У forEach обіцянка нікого не
+    // чекала б, і перелік лишався б порожнім.
     const missing = [];
 
-    VARIANT_FORMATS.forEach(format => {
+    for (const format of VARIANT_FORMATS) {
 
-        VARIANT_WIDTHS.forEach(width => {
+        for (const width of VARIANT_WIDTHS) {
 
-            if (stale(`${stem}-${width}.${format}`)) missing.push({ width, format });
+            if (await stale(`${stem}-${width}.${format}`, width)) {
+                missing.push({ width, format });
+            }
 
-        });
+        }
 
-    });
+    }
 
     if (!missing.length) return false;
 
