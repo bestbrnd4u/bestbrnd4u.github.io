@@ -1700,6 +1700,32 @@ function turnstileHostAllowed(hostname) {
 
 }
 
+// Для чого саме видано токен.
+//
+// НАВІЩО ЦЕ, КОЛИ ХОСТ УЖЕ ЗВІРЕНО
+//
+// Хост відповідає на питання «з нашого сайту?», дія — на питання «з
+// нашого оформлення?». Зараз віджет на сайті один, і різниці немає.
+// Але щойно перевірка з'явиться ще десь — у формі відгуку, у підписці
+// на листи, — токен із дешевої форми можна буде надіслати сюди й
+// оформити замовлення. Хост при цьому збігається, бо форма теж наша.
+//
+// Три рядки зараз замість пошуку цієї дірки потім.
+const TURNSTILE_ACTION = "checkout";
+
+function turnstileActionAllowed(action) {
+
+    const value = String(action ?? "").trim();
+
+    // Порожньо — сторінка старої збірки з браузерного кеша: вона
+    // випустила токен ще без позначки дії. Відмовляти їй означало б
+    // зламати оформлення рівно тим, у кого сторінка не оновилась.
+    if (!value) return true;
+
+    return value === TURNSTILE_ACTION;
+
+}
+
 function turnstileVerdict(data) {
 
     if (!data || typeof data !== "object") return { ok: false, reason: "порожня відповідь" };
@@ -1708,6 +1734,10 @@ function turnstileVerdict(data) {
 
         if (!turnstileHostAllowed(data.hostname)) {
             return { ok: false, reason: `чужий хост: ${data.hostname}` };
+        }
+
+        if (!turnstileActionAllowed(data.action)) {
+            return { ok: false, reason: `чужа дія: ${data.action}` };
         }
 
         return { ok: true };
@@ -6671,6 +6701,14 @@ async function handlePlaceOrder(request: Request, body: Record<string, any>): Pr
 
   if (!token) {
     return adminJson({ ok: false, error: "no_token" }, 400, origin);
+  }
+
+  // Стеля довжини — з канонічного зразка Cloudflare. Справжній токен
+  // близько 600 символів; усе, що більше, siteverify однаково
+  // відхилить, тож немає сенсу гнати це через мережу. Заразом це
+  // межа на те, скільки чужого тексту можна змусити нас переслати.
+  if (token.length > 2048) {
+    return adminJson({ ok: false, error: "token_too_long" }, 400, origin);
   }
 
   let verdict;

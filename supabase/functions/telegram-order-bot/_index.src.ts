@@ -1870,6 +1870,14 @@ async function handlePlaceOrder(request: Request, body: Record<string, any>): Pr
     return adminJson({ ok: false, error: "no_token" }, 400, origin);
   }
 
+  // Стеля довжини — з канонічного зразка Cloudflare. Справжній токен
+  // близько 600 символів; усе, що більше, siteverify однаково
+  // відхилить, тож немає сенсу гнати це через мережу. Заразом це
+  // межа на те, скільки чужого тексту можна змусити нас переслати.
+  if (token.length > 2048) {
+    return adminJson({ ok: false, error: "token_too_long" }, 400, origin);
+  }
+
   let verdict;
 
   try {
