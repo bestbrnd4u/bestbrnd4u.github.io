@@ -55,7 +55,10 @@ function arg(name, fallback) {
 // усю базу покупців.
 const LIMIT = Number(arg("limit", "20")) || 20;
 
-const DAYS = Number(arg("days", "7")) || 7;
+// Строк береться з адмінки («Листи покупцеві»), а не з коду: міняти
+// його мусить власник, а не той, хто вміє правити JavaScript.
+// Аргумент --days лишається для разових запусків і перевірок.
+const DAYS = Number(arg("days", require("./letter-schedule").schedule().reviewDays)) || 7;
 
 function supabaseUrl() {
 
