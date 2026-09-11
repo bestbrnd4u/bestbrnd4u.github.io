@@ -39,6 +39,10 @@ const crypto = require("crypto");
 // сторінці запуску (див. пояснення в scripts/site-env.js).
 const { notConfigured } = require("./site-env");
 
+// Правило «листи не поспіль» живе в одному місці на обидва скрипти —
+// інакше воно розходиться (так уже було, див. letter-schedule.js).
+const { tooClose } = require("./letter-schedule");
+
 const ROOT = path.join(__dirname, "..");
 
 const { thankYouLetter, mailRequest } = require("../supabase/functions/telegram-order-bot/mail.js");
@@ -75,6 +79,7 @@ function settings() {
     return {
         enabled: saved.thankYou === true,
         days: number(arg("days", saved.thankYouDays), 30),
+        reviewDays: number(arg("review-days", saved.reviewDays), 7),
         percent: number(arg("percent", saved.thankYouPercent), 10),
         life: number(arg("life", saved.thankYouLife), 30),
         limit: number(arg("limit", null), 20),
@@ -157,6 +162,27 @@ async function main() {
     if (!config.enabled) {
 
         console.log("«Дякуємо за покупку» вимкнено в адмінці — пропускаю");
+
+        return;
+
+    }
+
+    // ЗАПОБІЖНИК ВІД ВИПАДКОВОЇ ПОМИЛКИ В АДМІНЦІ.
+    //
+    // Обидва строки тепер редагуються, і поле в CMS не вміє рахувати
+    // свій мінімум з іншого поля: можна поставити «відгук на 10-й,
+    // дякуємо на 14-й» і не помітити, що між листами лишилось
+    // чотири дні.
+    //
+    // Тому останнє слово — тут, де видно ОБИДВА числа. Краще не
+    // надіслати лист зі знижкою, ніж надіслати його так, що він
+    // читається як плата за відгук: перше помітно в логу, друге —
+    // лише по репутації, і то не одразу.
+    const problem = tooClose(config.reviewDays, config.days);
+
+    if (problem) {
+
+        console.log(problem);
 
         return;
 
