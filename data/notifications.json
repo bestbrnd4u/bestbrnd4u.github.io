@@ -1,7 +1,7 @@
 {
   "serverEmail": true,
   "thankYou": false,
-  "thankYouDays": 30,
-  "thankYouPercent": 10,
-  "thankYouLife": 30
+  "thankYouDays": 8,
+  "thankYouPercent": 5,
+  "thankYouLife": 7
 }
