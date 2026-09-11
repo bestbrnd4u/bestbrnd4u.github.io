@@ -13904,3 +13904,107 @@ body.refusal-open{
     .subscribe{ max-width:none; }
 
 }
+
+
+/* =========================================
+   Ціна дня (displayType: "deal_of_day")
+
+   Блок на головній: заголовок, великий відлік і ряд звичайних карток
+   товару — тих самих, що в каталозі, разом із кнопкою «Купити».
+
+   ЧОМУ ВІДЛІК ТУТ ВИГЛЯДАЄ ІНАКШЕ, НІЖ НА БАНЕРІ. На банері він лежить
+   на фотографії — світлий напівпрозорий на темному. Тут фон сторінки
+   світлий, і той самий стиль став би блідою плямою: головне число
+   блока читалося б гірше за ціну під ним.
+   ========================================= */
+
+.deal-promos:empty{
+    display:none;
+}
+
+.deal-block{
+    padding:48px 0;
+    background:var(--gray50);
+}
+
+.deal-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:24px;
+    margin-bottom:28px;
+}
+
+.deal-head-text h2{
+    margin:6px 0 0;
+    font-size:30px;
+    line-height:1.15;
+}
+
+.deal-head-text p{
+    margin:10px 0 0;
+    max-width:60ch;
+    color:var(--gray500);
+}
+
+.deal-eyebrow{
+    display:inline-block;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--danger);
+}
+
+/* Відлік блока: на світлому тлі — суцільна заливка, не прозорість. */
+.deal-head .promo-countdown{
+    flex:none;
+    margin-bottom:0;
+    padding:12px 22px;
+    background:var(--primary);
+    color:#fff;
+}
+
+.deal-head .promo-countdown[data-state="live"]{
+    background:var(--danger);
+}
+
+.deal-head .promo-countdown-value{
+    font-size:22px;
+}
+
+/* Ряд товарів. Сітка, а не карусель: товарів у ціні дня одиниці, і
+   стрілки гортання над трьома картками — механіка без потреби. */
+.deal-products{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(240px, 1fr));
+    gap:20px;
+}
+
+.deal-more{
+    display:inline-block;
+    margin-top:24px;
+    font-weight:600;
+    text-decoration:underline;
+}
+
+@media(max-width:768px){
+
+    .deal-block{ padding:32px 0; }
+
+    /* Відлік іде під заголовок: у рядок із ним він стискає обидва. */
+    .deal-head{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:16px;
+        margin-bottom:20px;
+    }
+
+    .deal-head-text h2{ font-size:24px; }
+
+    .deal-products{
+        grid-template-columns:repeat(2, minmax(0, 1fr));
+        gap:12px;
+    }
+
+}

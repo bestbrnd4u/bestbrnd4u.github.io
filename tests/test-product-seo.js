@@ -55,6 +55,11 @@ function seoSandbox() {
     };
 
     window.SITE_URL = SITE_URL;
+    // Ціна дня: у title й description іде ціна, за якою товар
+    // продається зараз, — інакше у видачі Google висіла б учорашня.
+    ["saleActive", "priceNow", "oldPriceNow"].forEach(name =>
+        window.eval(grab(new RegExp("function " + name + "[\\s\\S]*?\\n\\}\\n"))));
+
     window.eval(grab(/function productUrl\(product, params\) \{[\s\S]*?\n\}\n/));
     window.eval(grab(/function absoluteUrl\(url\) \{[\s\S]*?\n\}\n/));
     window.eval(grab(/function setMetaByName\(name, content\) \{[\s\S]*?\n\}\n/));

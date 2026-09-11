@@ -477,7 +477,7 @@ function pickCrossSell(products, cartLines, limit) {
 
     // Найдорожча річ у кошику — межа, до якої доповнення виглядає
     // доповненням.
-    const ceiling = Math.max(...cartProducts.map(product => Number(product.price) || 0));
+    const ceiling = Math.max(...cartProducts.map(product => priceNow(product)));
 
     const rest = (products || []).filter(product => !inCart.has(Number(product.id)));
 
@@ -516,12 +516,12 @@ function pickCrossSell(products, cartLines, limit) {
     // спадаючи, щоб перший екран не був завалений дрібницями.
     const order = (a, b) => {
 
-        const cheapA = (Number(a.price) || 0) <= ceiling ? 0 : 1;
-        const cheapB = (Number(b.price) || 0) <= ceiling ? 0 : 1;
+        const cheapA = priceNow(a) <= ceiling ? 0 : 1;
+        const cheapB = priceNow(b) <= ceiling ? 0 : 1;
 
         if (cheapA !== cheapB) return cheapA - cheapB;
 
-        return (Number(b.price) || 0) - (Number(a.price) || 0);
+        return priceNow(b) - priceNow(a);
 
     };
 
@@ -712,7 +712,9 @@ function getCartSummary() {
 
         if (product) {
 
-            subtotal += product.price;
+            // priceNow, а не product.price: лічильник у шапці мусить
+            // показувати ту саму суму, що й кошик із оформленням.
+            subtotal += priceNow(product);
 
         }
 
@@ -762,7 +764,7 @@ function showCartPopup(product, selection = {}) {
                 ${product.brand ? `<div class="cart-popup-item-brand">${escapeHtml(product.brand)}</div>` : ""}
                 <div class="cart-popup-item-title">${escapeHtml(product.title)}</div>
                 ${metaHtml}
-                <div class="cart-popup-item-price">${formatPrice(product.price)}</div>
+                <div class="cart-popup-item-price">${formatPrice(priceNow(product))}</div>
             </div>
         </div>
 
@@ -1907,7 +1909,7 @@ async function runGlobalSearch(query) {
                 </div>
                 <div class="search-result-brand">${escapeHtml(product.brand)}</div>
                 <div class="search-result-title">${escapeHtml(product.title)}</div>
-                <div class="search-result-price">${formatPrice(product.price)}</div>
+                <div class="search-result-price">${formatPrice(priceNow(product))}</div>
             </a>
         `;
 
@@ -4306,6 +4308,94 @@ function promoTickMs(untilMs, now) {
 
 }
 
+// -------------------------------------------------------------
+// Ціна дня: скільки товар коштує ПРЯМО ЗАРАЗ
+// -------------------------------------------------------------
+//
+// В акції можна задати ціну дня — і тоді товар справді стільки й
+// коштує, поки акція йде. Збірка кладе її поруч із ціною самого
+// товару (scripts/promo-deals.js):
+//
+//   product.sale = { price: 8600, from: "…", to: "…" }
+//
+// ЧОМУ ЦЕ ОКРЕМА ФУНКЦІЯ, А НЕ ПОЛЕ
+// ----------------------------------
+// Ціна залежить від годинника, а не від даних. Записати в товар уже
+// пораховану ціну збірка не може: вона знає лише час свого запуску, і
+// сейл почався б не опівночі, а під час наступної збірки.
+//
+// ЧОМУ ЦЕ МУСЯТЬ КЛИКАТИ ВСІ
+// ---------------------------
+// Суму замовлення перераховує база (тригер із міграції 014) за
+// власною копією цін. Якщо хоч одне місце на сайті порахує стару
+// ціну, покупець побачить одну суму, а в замовленні опиниться інша —
+// і замовлення отримає позначку «розбіжність», ту саму, якою ловлять
+// підміну ціни в консолі. Тобто чесна покупка виглядатиме як спроба
+// обману.
+//
+// Саме тому ціна читається ОДНІЄЮ функцією, а не кожним місцем
+// окремо.
+function saleActive(product, now) {
+
+    const sale = product && product.sale;
+
+    if (!sale || !(Number(sale.price) > 0)) return false;
+
+    const moment = Number.isFinite(now) ? now : Date.now();
+
+    if (sale.from) {
+        const starts = new Date(sale.from).getTime();
+        if (Number.isFinite(starts) && moment < starts) return false;
+    }
+
+    if (sale.to) {
+        const ends = new Date(sale.to).getTime();
+        if (Number.isFinite(ends) && moment >= ends) return false;
+    }
+
+    return true;
+
+}
+
+// Ціна, яку платить покупець.
+function priceNow(product, now) {
+
+    if (saleActive(product, now)) return Number(product.sale.price);
+
+    return Number(product && product.price) || 0;
+
+}
+
+// Перекреслена ціна поруч — або 0, якщо перекреслювати нема чого.
+//
+// Поки йде ціна дня, перекреслюємо ЗВИЧАЙНУ ціну товару, а не його
+// власну стару. Товар міг продаватись за 9000 при «старій» 12000 —
+// але вчора він коштував саме 9000, і саме це правда.
+function oldPriceNow(product, now) {
+
+    if (saleActive(product, now)) return Number(product.price) || 0;
+
+    return Number(product && product.oldPrice) || 0;
+
+}
+
+// Відсоток знижки — теж звідси, а не з власної формули в кожному місці.
+//
+// Раніше копій було дві: сортування «спочатку знижки» в каталозі і
+// позначка «-N%» на картці. Поки знижка була одна (oldPrice), копії
+// збігалися. З ціною дня вони б розійшлися першого ж вечора: сортування
+// побачило б знижку, а картка над тією самою ціною — ні.
+function discountPercent(product, now) {
+
+    const price = priceNow(product, now);
+    const old = oldPriceNow(product, now);
+
+    if (!old || old <= price) return 0;
+
+    return Math.round((1 - price / old) * 100);
+
+}
+
 // Картки акції: той самий набір товарів, розкладений по кольорах.
 //
 // НАВІЩО ОДИН ВИКЛИК, А НЕ ДВА КРОКИ НА КОЖНІЙ СТОРІНЦІ
@@ -4554,11 +4644,13 @@ function loadDepartmentOf() {
 
 }
 
+// Стара назва того самого. Лишилась, бо на рядок «function
+// getDiscountPercent» спирається півдесятка тестів: вони ріжуть
+// common.js по ньому як по межі. Формула тут більше не своя — інакше
+// сортування «за знижкою» не побачило б ціну дня, яку бачить картка.
 function getDiscountPercent(product) {
 
-    if (!product.oldPrice || product.oldPrice <= product.price) return 0;
-
-    return Math.round((1 - product.price / product.oldPrice) * 100);
+    return discountPercent(product);
 
 }
 

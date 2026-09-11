@@ -217,7 +217,11 @@ console.log("\n[5] Дати задаються в адмінці й доходя
         /\.\.\.\(promoDate\(data\.startsAt\) \? \{ startsAt/.test(build));
 
     // Крива дата не має валити збірку всього сайту.
-    const promoDate = new Function("value", read("scripts/build-promotions.js")
+    //
+    // promoDate живе в scripts/promo-deals.js: ті самі дати читає й
+    // збірка товарів (ціна дня), а вона йде РАНІШЕ за збірку акцій і
+    // готового data/promotions.json ще не бачить.
+    const promoDate = new Function("value", read("scripts/promo-deals.js")
         .match(/function promoDate[\s\S]*?\n}\n/)[0] + "\nreturn promoDate(value);");
 
     check("сміття відкидається мовчки",

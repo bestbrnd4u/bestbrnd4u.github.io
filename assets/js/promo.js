@@ -294,7 +294,10 @@ function setupPromoCatalog(promo, allProducts, categoryDepartments, departmentOf
         // АНОНСОВАНІЙ акції знижки ще немає, і перекреслена стара ціна
         // за тиждень до початку — це обіцянка, видана за факт.
         // Покупець, який прийде по ній сьогодні, заплатить повну.
-        if (product.oldPrice || !promoDiscountActive(promo)) return product;
+        // oldPriceNow, а не product.oldPrice: поки йде ціна дня,
+        // перекреслювати вже є що (звичайну ціну товару), і другий
+        // «старий» цінник поверх неї був би вигаданим.
+        if (oldPriceNow(product) || !promoDiscountActive(promo)) return product;
 
         const syntheticOldPrice = Math.round(product.price / (1 - promo.discountPercent / 100));
 

@@ -298,13 +298,22 @@
     // ОБИДВА виклики, і генератор, і рантайм: інакше в розмітці стояли
     // б запасні числа, а покупець читав би змінені — тобто рівно та
     // розбіжність, заради усунення якої цей модуль і зроблено.
-    function offerFor(product, url, from, terms) {
+    // ЦІНА ОКРЕМИМ ДОВОДОМ, а не product.price.
+    //
+    // Цей модуль спільний: його кличе і сторінка в браузері, і збірка
+    // в Node. Ціна дня залежить від годинника, тобто в браузері вона
+    // одна, а в момент збірки могла бути інша — і функції priceNow()
+    // тут просто немає.
+    //
+    // Тому хто кличе, той і каже ціну: сторінка передає поточну,
+    // збірка лишає звичайну.
+    function offerFor(product, url, from, terms, price) {
 
         return {
             "@type": "Offer",
             url: url,
             priceCurrency: "UAH",
-            price: product.price,
+            price: Number(price) > 0 ? Number(price) : product.price,
             priceValidUntil: priceValidUntil(from),
             itemCondition: "https://schema.org/NewCondition",
             hasMerchantReturnPolicy: RETURN_POLICY,

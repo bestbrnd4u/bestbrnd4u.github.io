@@ -55,10 +55,18 @@ function loadPicker() {
 
     const src = match[0].replace(/\nasync function renderCrossSell$/, "");
 
+    // Помічники ціни — зі СПРАВЖНЬОГО common.js, а не переписані тут:
+    // добір ставить наперед те, що дешевше за найдорожчу річ у кошику,
+    // і «дешевше» відтоді, як з'явилась ціна дня, рахує priceNow().
+    const priceApi = [
+        /function saleActive[\s\S]*?\n}\n/,
+        /function priceNow[\s\S]*?\n}\n/
+    ].map(pattern => common.match(pattern)[0]).join("\n");
+
     // getProductGenders живе в common.js нижче — підставляємо ту саму
     // логіку, щоб тест перевіряв добір, а не читання поля.
     return new Function("products", "cartLines", "limit", "getProductGenders",
-        src + "; return pickCrossSell(products, cartLines, limit);");
+        priceApi + "\n" + src + "; return pickCrossSell(products, cartLines, limit);");
 
 }
 

@@ -469,10 +469,81 @@ function renderAdvantages(advantages) {
 
 }
 
+// -------------------------------------------------------------
+// Відлік на банерах головної
+// -------------------------------------------------------------
+//
+// НА РІВНІ ФАЙЛУ, А НЕ ВСЕРЕДИНІ initPromotions. Спершу ці дві
+// функції жили в ній — і слайдер із великим банером, які
+// малюються окремими функціями, падали на ReferenceError: таймер
+// їм видно не було, а разом із ним зникав і весь банер.
+// Помилка мовчазна: блок просто не з'являвся на сторінці.
+// Відлік на банері головної — той самий елемент для всіх
+// чотирьох типів: картка, слайдер, банер із товарами,
+// компактний. Типів може стати більше, і згадувати про таймер
+// у кожному ніхто не буде.
+//
+// Порожньо, якщо в акції немає розкладу, — тобто в усіх, що
+// були до його появи.
+function promoTimerTag(promo) {
+
+    const timing = promoTiming(promo);
+
+    if (!timing.until) return "";
+
+    const label = timing.state === "announced" ? "Почнеться через" : "Лишилось";
+
+    return `<span class="promo-countdown" data-state="${timing.state}"`
+        + ` data-until="${timing.until}">`
+        + `<span class="promo-countdown-label">${label}</span>`
+        + `<span class="promo-countdown-value">${promoCountdown(timing.until)}</span>`
+        + `</span>`;
+
+}
+
+// Один хід годинника на всі банери одразу.
+//
+// ЧОМУ НЕ ТАЙМЕР НА КОЖЕН. Акцій на головній буває чотири-п'ять,
+// і п'ять окремих setTimeout — це п'ять пробуджень телефона
+// замість одного. Крок беремо найдрібніший із потрібних: поки
+// хоч одному банеру лишилась година, цокаємо щосекунди.
+function tickPromoTimers() {
+
+    const boxes = [...document.querySelectorAll(".promo-countdown[data-until]")];
+
+    if (!boxes.length) return;
+
+    let step = MINUTE_MS;
+
+    boxes.forEach(box => {
+
+        const until = Number(box.dataset.until);
+        const left = promoCountdown(until);
+
+        // Відлік добіг нуля — стан акції змінився, а разом із
+        // ним і ціни зі знижкою. Перемальовуємо сторінку, бо
+        // підмінити тут самі цифри означало б лишити головну в
+        // стані, якого вже немає.
+        if (!left) {
+            location.reload();
+            return;
+        }
+
+        box.querySelector(".promo-countdown-value").textContent = left;
+
+        step = Math.min(step, promoTickMs(until));
+
+    });
+
+    setTimeout(tickPromoTimers, step);
+
+}
+
 initHome();
 initHomeContent();
 initPromotions();
 initCollections();
+
 
 // -------------------------
 // Розділ "Акції" на головній (data/promotions.json —
@@ -494,66 +565,6 @@ async function initPromotions() {
             throw new Error("Не вдалося завантажити акції");
         }
 
-        // Відлік на банері головної — той самий елемент для всіх
-        // чотирьох типів: картка, слайдер, банер із товарами,
-        // компактний. Типів може стати більше, і згадувати про таймер
-        // у кожному ніхто не буде.
-        //
-        // Порожньо, якщо в акції немає розкладу, — тобто в усіх, що
-        // були до його появи.
-        function promoTimerTag(promo) {
-
-            const timing = promoTiming(promo);
-
-            if (!timing.until) return "";
-
-            const label = timing.state === "announced" ? "Почнеться через" : "Лишилось";
-
-            return `<span class="promo-countdown" data-state="${timing.state}"`
-                + ` data-until="${timing.until}">`
-                + `<span class="promo-countdown-label">${label}</span>`
-                + `<span class="promo-countdown-value">${promoCountdown(timing.until)}</span>`
-                + `</span>`;
-
-        }
-
-        // Один хід годинника на всі банери одразу.
-        //
-        // ЧОМУ НЕ ТАЙМЕР НА КОЖЕН. Акцій на головній буває чотири-п'ять,
-        // і п'ять окремих setTimeout — це п'ять пробуджень телефона
-        // замість одного. Крок беремо найдрібніший із потрібних: поки
-        // хоч одному банеру лишилась година, цокаємо щосекунди.
-        function tickPromoTimers() {
-
-            const boxes = [...document.querySelectorAll(".promo-countdown[data-until]")];
-
-            if (!boxes.length) return;
-
-            let step = MINUTE_MS;
-
-            boxes.forEach(box => {
-
-                const until = Number(box.dataset.until);
-                const left = promoCountdown(until);
-
-                // Відлік добіг нуля — стан акції змінився, а разом із
-                // ним і ціни зі знижкою. Перемальовуємо сторінку, бо
-                // підмінити тут самі цифри означало б лишити головну в
-                // стані, якого вже немає.
-                if (!left) {
-                    location.reload();
-                    return;
-                }
-
-                box.querySelector(".promo-countdown-value").textContent = left;
-
-                step = Math.min(step, promoTickMs(until));
-
-            });
-
-            setTimeout(tickPromoTimers, step);
-
-        }
 
         const all = await response.json();
 
@@ -605,6 +616,7 @@ async function initPromotions() {
         const heroSliderPromos = promotions.filter(promo => promo.displayType === "hero_slider");
         const bannersWithProducts = promotions.filter(promo => promo.displayType === "banner_products");
         const compactBanners = promotions.filter(promo => promo.displayType === "banner_compact");
+        const dealBlocks = promotions.filter(promo => promo.displayType === "deal_of_day");
 
         if (regular.length) {
 
@@ -640,6 +652,10 @@ async function initPromotions() {
 
         if (compactBanners.length) {
             renderCompactPromotions(compactBanners);
+        }
+
+        if (dealBlocks.length) {
+            await renderDealPromotions(dealBlocks);
         }
 
         // Після всіх чотирьох типів: банери намальовані, тепер їх
@@ -957,6 +973,118 @@ function renderCompactPromotions(compactPromotions) {
 }
 
 // -------------------------
+// Ціна дня (displayType: "deal_of_day") — блок на головній із
+// великим відліком і товарами, які купують просто звідси
+//
+// ЧОМУ ОКРЕМИЙ ТИП, А НЕ «БАНЕР ІЗ ТОВАРАМИ»
+// -------------------------------------------
+// Тому що тут головне — не банер, а годинник. «Тільки сьогодні,
+// сумка в одному екземплярі» живе доти, доки йде відлік, і читається
+// з першого погляду: скільки лишилось, скільки коштує зараз, скільки
+// коштувало вчора. Банер із товарами показує колекцію — це інша
+// розмова, і змішувати їх означало б зробити обидві тихішими.
+//
+// Товарів може бути один або кілька — розмітка та сама. Одна сумка
+// за 8 600 і ряд із пʼяти речей відрізняються лише кількістю карток.
+//
+// КНОПКА «КУПИТИ» — ЗВИЧАЙНА КАРТКА ТОВАРУ.
+// createProductCard() уже несе і кнопку, і вибір кольору з розміром,
+// і ціну через priceNow(). Власна картка тут означала б другий опис
+// того самого — і першу ж зміну, яку забудуть перенести.
+// -------------------------
+
+async function renderDealPromotions(dealPromotions) {
+
+    const section = document.getElementById("dealPromotionsSection");
+
+    if (!section) return;
+
+    let allProducts = [];
+    let departmentOf = new Map();
+
+    try {
+
+        const [products, deptMap] = await Promise.all([
+            loadCatalog(),
+            loadDepartmentOf()
+        ]);
+
+        allProducts = products;
+        departmentOf = deptMap;
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
+
+    section.innerHTML = dealPromotions.map(promo => {
+
+        // ЛИШЕ ТІ ТОВАРИ, У ЯКИХ ЦІНА ДНЯ СПРАВДІ Є.
+        //
+        // Акція може підхоплювати цілий бренд або розділ — так
+        // влаштовані всі інші способи показу. Але ціну дня збірка
+        // ставить рівно на обраний список (scripts/promo-deals.js), і
+        // блок «ціна дня» з двадцяти шести карток, де знижена одна,
+        // обіцяв би те, чого немає.
+        //
+        // Фільтруємо за списком, а не за saleActive(): в анонсованій
+        // акції ціна ще не діє, а показати, що саме подешевшає, треба
+        // вже — заради цього анонс і робиться.
+        const chosen = Array.isArray(promo.productIds) ? promo.productIds.map(Number) : [];
+
+        const curated = pickPromotionProducts(promo, allProducts, departmentOf)
+            .filter(product => !chosen.length || chosen.includes(Number(product.id)));
+
+        // Без товарів блок не має про що говорити: сам по собі відлік
+        // до ціни, якої ніде не видно, — це обіцянка без предмета.
+        if (!curated.length) return "";
+
+        const timing = promoTiming(promo);
+
+        // Анонс і сейл, що йде, — різні обіцянки, і слова різні.
+        const eyebrow = promo.badge
+            || (timing.state === "announced" ? "СКОРО" : "ЦІНА ДНЯ");
+
+        return `
+            <div class="deal-block${blockStyleClass(promo.style)}" style="${blockStyleAttr(promo.style)}">
+
+                <div class="container">
+
+                    <div class="deal-head">
+
+                        <div class="deal-head-text">
+                            <span class="deal-eyebrow">${eyebrow}</span>
+                            <h2>${promo.title}</h2>
+                            ${promo.text ? `<p>${promo.text}</p>` : ""}
+                        </div>
+
+                        ${promoTimerTag(promo)}
+
+                    </div>
+
+                    <div class="deal-products products-grid">
+                        ${curated.map(product => createProductCard(product)).join("")}
+                    </div>
+
+                    ${promo.buttonText ? `
+                    <a href="promo?id=${encodeURIComponent(promo.slug)}" class="deal-more">
+                        ${promo.buttonText} →
+                    </a>` : ""}
+
+                </div>
+
+            </div>
+        `;
+
+    }).join("");
+
+    if (typeof initProductCarousels === "function") initProductCarousels(section);
+    if (typeof updateFavoriteButtons === "function") updateFavoriteButtons();
+
+}
+
+// -------------------------
 // Блоки "Добірка" на головній (data/collections.json —
 // зібраний із data/collections/*.json через адмінку) — велике
 // фото зліва і кілька товарів справа з гортанням стрілками,
@@ -1098,8 +1226,8 @@ function createCollectionProductCard(product) {
         product.variants?.[0]?.images?.[0] ||
         "assets/images/no-image.png";
 
-    const oldPrice = product.oldPrice
-        ? `<span class="old-price">${formatPrice(product.oldPrice)}</span>`
+    const oldPrice = oldPriceNow(product)
+        ? `<span class="old-price">${formatPrice(oldPriceNow(product))}</span>`
         : "";
 
     return `
@@ -1130,7 +1258,7 @@ function createCollectionProductCard(product) {
                 </a>
 
                 <div class="collection-product-price">
-                    <span class="price">${formatPrice(product.price)}</span>
+                    <span class="price">${formatPrice(priceNow(product))}</span>
                     ${oldPrice}
                 </div>
 

@@ -63,7 +63,34 @@ const config = loadYaml("admin/config.yml");
 // Кожен новий помічник дописується в HELPERS. Незручність помітна, але
 // вона краща за тиху: забули — тест червоніє одразу, а не мовчки
 // перевіряє порожнечу.
+//
+// ШУКАЄМО НЕ ЛИШЕ У САМІЙ ЗБІРЦІ. promoDate() переїхав у
+// scripts/promo-deals.js (ті самі дати читає збірка ТОВАРІВ заради
+// ціни дня, а вона йде раніше за збірку акцій). Поки запускач дивився
+// тільки у власний файл збірки, він не знаходив помічника й тихо
+// підставляв заглушку — після чого «поле не доїжджає до сайту»
+// повідомлялось про цілком робочий код.
 const HELPERS = ["promoDate"];
+
+const HELPER_SOURCES = ["scripts/promo-deals.js", "scripts/letter-schedule.js"]
+    .filter(rel => fs.existsSync(path.join(ROOT, rel)))
+    .map(rel => fs.readFileSync(path.join(ROOT, rel), "utf8"));
+
+function helperSource(name, source) {
+
+    const pattern = new RegExp(`function ${name}\\([\\s\\S]*?\\n}\\n`);
+
+    const found = [source, ...HELPER_SOURCES]
+        .map(text => text.match(pattern))
+        .find(Boolean);
+
+    // Мовчазна заглушка тут — найгірше, що можна зробити: тест
+    // перевірятиме порожнечу й звинуватить у цьому збірку.
+    if (!found) throw new Error(`не знайшов ${name}() ні у збірці, ні в ${HELPER_SOURCES.length} сусідніх модулях`);
+
+    return found[0];
+
+}
 
 function literalRunner(source) {
 
@@ -71,13 +98,8 @@ function literalRunner(source) {
 
     if (!literal) return null;
 
-    const helpers = HELPERS.map(name => {
-
-        const found = source.match(new RegExp(`function ${name}\\([\\s\\S]*?\\n}\\n`));
-
-        return found ? new Function(`${found[0]}\nreturn ${name};`)() : () => "";
-
-    });
+    const helpers = HELPERS.map(name =>
+        new Function(`${helperSource(name, source)}\nreturn ${name};`)());
 
     return data => new Function("data", "slug", "genderButtons", ...HELPERS,
         `return (${literal});`)(data, "test-slug", [], ...helpers);

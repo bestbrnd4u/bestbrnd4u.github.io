@@ -119,8 +119,8 @@ function renderCart() {
         if (preOrder) hasPreOrder = true;
 
         const qty = line.qty;
-        const lineTotal = product.price * qty;
-        const lineTotalFull = (product.oldPrice || product.price) * qty;
+        const lineTotal = priceNow(product) * qty;
+        const lineTotalFull = (oldPriceNow(product) || priceNow(product)) * qty;
 
         subtotal += lineTotal;
         subtotalFull += lineTotalFull;
@@ -223,8 +223,8 @@ function renderCart() {
                         </div>
                     </div>
                     <div class="cart-item-price">
-                        ${product.oldPrice ? `<span class="old-price">${formatPrice(product.oldPrice)}</span>` : ""}
-                        <span class="price">${formatPrice(product.price)}</span>
+                        ${oldPriceNow(product) ? `<span class="old-price">${formatPrice(oldPriceNow(product))}</span>` : ""}
+                        <span class="price">${formatPrice(priceNow(product))}</span>
                     </div>
                 </div>
 
@@ -235,7 +235,7 @@ function renderCart() {
                 </div>
 
                 <div class="cart-item-total">
-                    ${product.oldPrice ? `<span class="old-price">${formatPrice(lineTotalFull)}</span>` : ""}
+                    ${oldPriceNow(product) ? `<span class="old-price">${formatPrice(lineTotalFull)}</span>` : ""}
                     <span class="price">${formatPrice(lineTotal)}</span>
                 </div>
 

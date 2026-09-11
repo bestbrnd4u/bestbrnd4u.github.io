@@ -259,7 +259,7 @@ function reportCheckout(event, detail) {
     if (!lines.length) return;
 
     const total = lines.reduce((sum, line) =>
-        sum + (Number(line.product.price) || 0) * line.qty, 0);
+        sum + priceNow(line.product) * line.qty, 0);
 
     if (event === "purchase") {
 
@@ -725,8 +725,8 @@ function renderOrderSummary() {
 
         const image = product.images?.[0] || "assets/images/no-image.png";
 
-        const oldPriceHtml = product.oldPrice
-            ? `<span class="order-item-oldprice">${formatPrice(product.oldPrice)}</span>`
+        const oldPriceHtml = oldPriceNow(product)
+            ? `<span class="order-item-oldprice">${formatPrice(oldPriceNow(product))}</span>`
             : "";
 
         const metaParts = [];
@@ -749,7 +749,7 @@ function renderOrderSummary() {
                         ${metaParts.join(" · ")}
                     </span>
                     <span class="order-item-price">
-                        ${oldPriceHtml}${formatPrice(product.price)}
+                        ${oldPriceHtml}${formatPrice(priceNow(product))}
                     </span>
                 </div>
 
@@ -785,7 +785,7 @@ function promoDiscountFor(lines, priceTotal) {
 
     const eligible = only.length
         ? lines.reduce((sum, { product, qty }) =>
-            sum + (only.includes(Number(product.id)) ? product.price * qty : 0), 0)
+            sum + (only.includes(Number(product.id)) ? priceNow(product) * qty : 0), 0)
         : priceTotal;
 
     return Math.round(eligible * appliedPromo.percent);
@@ -796,12 +796,17 @@ function updateTotals() {
 
     const lines = getCartLines();
 
+    // Ціна ДО знижок — та, що буде перекреслена. Поки йде ціна дня,
+    // це звичайна ціна товару (oldPriceNow), а не його власна стара.
     const subtotal = lines.reduce((sum, { product, qty }) => {
-        return sum + (product.oldPrice || product.price) * qty;
+        return sum + (oldPriceNow(product) || priceNow(product)) * qty;
     }, 0);
 
+    // Скільки покупець платить насправді. priceNow, а не product.price:
+    // інакше під час акції сторінка покаже одну суму, а тригер у базі
+    // порахує іншу — і чесне замовлення отримає позначку «розбіжність».
     const priceTotal = lines.reduce((sum, { product, qty }) => {
-        return sum + product.price * qty;
+        return sum + priceNow(product) * qty;
     }, 0);
 
     const productDiscount = subtotal - priceTotal;
@@ -936,7 +941,7 @@ applyPromoBtn?.addEventListener("click", async () => {
 
     const lines = getCartLines();
 
-    const priceTotal = lines.reduce((sum, { product, qty }) => sum + product.price * qty, 0);
+    const priceTotal = lines.reduce((sum, { product, qty }) => sum + priceNow(product) * qty, 0);
 
     const discount = promoDiscountFor(lines, priceTotal);
 
@@ -1180,13 +1185,13 @@ function buildOrderCompositionText() {
 
     return lines.map(({ product, qty, color, size }) => {
 
-        const lineTotal = product.price * qty;
+        const lineTotal = priceNow(product) * qty;
 
         return `${product.brand ? escapeHtml(product.brand) + " — " : ""}${escapeHtml(product.title)}`
             + `${color ? `, колір: ${color}` : ""}`
             + `${size ? `, розмір: ${size}` : ""}`
             + `, кількість: ${qty}`
-            + `, ціна за од.: ${formatPrice(product.price)}`
+            + `, ціна за од.: ${formatPrice(priceNow(product))}`
             + `, сума: ${formatPrice(lineTotal)}`;
 
     }).join("\n");
@@ -1197,10 +1202,10 @@ function computeOrderTotals() {
 
     const lines = getCartLines();
 
-    const priceTotal = lines.reduce((sum, { product, qty }) => sum + product.price * qty, 0);
+    const priceTotal = lines.reduce((sum, { product, qty }) => sum + priceNow(product) * qty, 0);
 
     const subtotal = lines.reduce((sum, { product, qty }) => {
-        return sum + (product.oldPrice || product.price) * qty;
+        return sum + (oldPriceNow(product) || priceNow(product)) * qty;
     }, 0);
 
     const promoDiscount = promoDiscountFor(lines, priceTotal);
@@ -1286,7 +1291,7 @@ function buildOrderItemsSnapshot() {
         id: product.id,
         title: product.title,
         brand: product.brand,
-        price: product.price,
+        price: priceNow(product),
         // АБСОЛЮТНА адреса, а не /assets/images/…
         //
         // ЧОМУ. Цей знімок замовлення йде і в базу, і в лист. Відносний

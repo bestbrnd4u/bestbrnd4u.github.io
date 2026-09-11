@@ -64,12 +64,26 @@ function rows(products) {
 
             const old = Number(product.oldPrice);
 
+            // Ціна дня їде ВІКНОМ, а не готовою ціною: знімок приїжджає
+            // раз на збірку, і вже порахована ціна почала б діяти не о
+            // 18:00, а під час наступної збірки. Момент рахує база — так
+            // само, як priceNow() у браузері.
+            const sale = product.sale || {};
+            const salePrice = Number(sale.price);
+            const hasSale = salePrice > 0;
+
             return {
                 product_id: id,
                 price: price,
                 // Стара ціна потрібна, щоб сервер міг порахувати ту
                 // саму «знижку», яку показує картка. Немає — null.
-                old_price: old > price ? old : null
+                old_price: old > price ? old : null,
+                // Усі три поля є ЗАВЖДИ, навіть порожні: PostgREST
+                // вимагає однакового набору ключів у пакеті, і рядок
+                // без них завалив би весь знімок.
+                sale_price: hasSale ? salePrice : null,
+                sale_from: hasSale && sale.from ? sale.from : null,
+                sale_to: hasSale && sale.to ? sale.to : null
             };
 
         })
@@ -119,6 +133,11 @@ async function main() {
         console.log(`Знімок цін: ${payload.length} товарів`);
         payload.slice(0, 10).forEach(row =>
             console.log(`   ${row.product_id} → ${row.price}${row.old_price ? ` (було ${row.old_price})` : ""}`));
+
+        const deals = payload.filter(row => row.sale_price);
+
+        deals.forEach(row =>
+            console.log(`   ціна дня: ${row.product_id} → ${row.sale_price} (${row.sale_from || "завжди"} … ${row.sale_to || "без кінця"})`));
 
         return;
 

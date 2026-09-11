@@ -57,8 +57,45 @@ function installBrowserStubs(window) {
         }), 0);
     }
 
+    // Ціна товару «прямо зараз» — ціна дня, якщо вона діє.
+    //
+    // НЕ ЗАГЛУШКА, А СПРАВЖНІЙ КОД. Решта цього файлу — заглушки: вони
+    // імітують те, чого в jsdom немає взагалі (requestIdleCallback,
+    // showToast). Тут інакше: функції існують, вони в common.js, і
+    // переписати їх тут спрощено означало б, що тест перевіряє одну
+    // ціну, а покупець бачить іншу. Тому беремо їх із джерела.
+    //
+    // Потрібні всім, хто виконує ОДИН файл сайту: mega-menu.js фільтрує
+    // розділ «Акції» за відсотком знижки, ui.js малює ціну на картці,
+    // catalog.js сортує за нею.
+    installPriceApi(window);
+
     return window;
 
 }
 
-module.exports = { installBrowserStubs };
+const PRICE_API = ["saleActive", "priceNow", "oldPriceNow", "discountPercent"];
+
+function installPriceApi(window) {
+
+    if (typeof window.priceNow === "function") return;
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const common = fs.readFileSync(
+        path.join(__dirname, "..", "..", "assets", "js", "common.js"), "utf8");
+
+    PRICE_API.forEach(name => {
+
+        const found = common.match(new RegExp("function " + name + "[\\s\\S]*?\\n}\\n"));
+
+        if (!found) throw new Error(`не знайшов ${name}() у common.js`);
+
+        window.eval(found[0]);
+
+    });
+
+}
+
+module.exports = { installBrowserStubs, installPriceApi, PRICE_API };

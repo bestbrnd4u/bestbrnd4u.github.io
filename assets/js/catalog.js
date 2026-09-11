@@ -248,16 +248,9 @@ function topRank(product) {
 
 }
 
-function discountPercent(product) {
-
-    var price = Number(product.price) || 0;
-    var old = Number(product.oldPrice) || 0;
-
-    if (!old || old <= price) return 0;
-
-    return Math.round((1 - price / old) * 100);
-
-}
+// discountPercent живе в common.js — поруч із priceNow/oldPriceNow,
+// бо картку з позначкою «-N%» малює ui.js і на головній, де catalog.js
+// не підключений.
 
 function compareSizes(a, b) {
 
@@ -1458,9 +1451,7 @@ function sectionProducts() {
 
         return products.filter(product => {
 
-            if (!product.oldPrice) return false;
-
-            return (1 - product.price / product.oldPrice) * 100 >= SALE_MIN_DISCOUNT;
+            return discountPercent(product) >= SALE_MIN_DISCOUNT;
 
         });
 
@@ -2294,7 +2285,7 @@ function setupPriceRange() {
     if (!priceMenu || !products.length) return;
 
     const prices = sectionProducts()
-        .map(product => Number(product.price))
+        .map(product => priceNow(product))
         .filter(value => Number.isFinite(value));
 
     if (!prices.length) return;
@@ -3385,7 +3376,7 @@ function filterProducts(skip) {
     if (priceFilterActive() && skip !== "price") {
 
         list = list.filter(product =>
-            product.price >= priceRange.min && product.price <= priceRange.max
+            priceNow(product) >= priceRange.min && priceNow(product) <= priceRange.max
         );
 
     }
@@ -3521,11 +3512,11 @@ function filterProducts(skip) {
             break;
 
         case "priceAsc":
-            list.sort((a, b) => a.price - b.price);
+            list.sort((a, b) => priceNow(a) - priceNow(b));
             break;
 
         case "priceDesc":
-            list.sort((a, b) => b.price - a.price);
+            list.sort((a, b) => priceNow(b) - priceNow(a));
             break;
 
         case "discount":

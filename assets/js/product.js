@@ -362,7 +362,7 @@ function updateProductSeoMetadata(product) {
 
     const pageUrl = SITE_URL + productUrl(product);
 
-    const priceText = `${new Intl.NumberFormat("uk-UA").format(product.price)} грн`;
+    const priceText = `${new Intl.NumberFormat("uk-UA").format(priceNow(product))} грн`;
 
     const title = `${product.title} — купити за ${priceText} | BestBrnd4u`;
 
@@ -419,7 +419,7 @@ function updateProductSeoMetadata(product) {
         // Строки передаємо ті самі, з яких рахується видимий рядок
         // «Орієнтовно у відділенні 11–13 вересня»: розмітка й текст на
         // одній сторінці не мають права обіцяти різне.
-        offers: window.ProductOffer.offerFor(product, pageUrl, undefined, window.PRODUCT_TEXTS),
+        offers: window.ProductOffer.offerFor(product, pageUrl, undefined, window.PRODUCT_TEXTS, priceNow(product)),
         // Рейтинг — ЛИШЕ якщо за ним стоять справжні відгуки.
         // Раніше умовою було саме product.rating, і в чотирьох товарів
         // із rating: 5, reviews: 0 у розмітку йшов reviewCount: 0 —
@@ -1056,14 +1056,17 @@ function pageColorView(base, variant) {
 
     const view = applyColorOverrides(base, variant);
 
-    const oldPrice = view.oldPrice
-        ? `<span class="old-price">${formatPrice(view.oldPrice)}</span>`
-        : "";
-
+    // Ціна дня. view — це товар із накладеними правками кольору, тож
+    // sale переходить у нього разом з рештою полів.
+    //
+    // ЧОМУ ТУТ ТЕЖ, А НЕ ЛИШЕ В КАТАЛОЗІ. Саме з цієї сторінки кладуть
+    // у кошик. Якби вона показувала 9000, коли каталог показує 8600,
+    // покупець побачив би дві різні ціни того самого товару за два
+    // кліки — і жодна з них не викликала б довіри.
     return {
         title: view.title || "",
         badge: view.badge || "",
-        priceBox: `${oldPrice}<span class="price">${formatPrice(view.price)}</span>`,
+        priceBox: priceBoxHtml(view),
         description: view.description || "",
         // Стан наявності саме цього кольору: чи він «під замовлення» і
         // яких розмірів немає. Перемикач кольору застосовує це до
@@ -1339,7 +1342,54 @@ function soldOutSizes(product, variant) {
 
 }
 
+// Ціна дня на вже готовій сторінці.
+//
+// ЧОМУ ЦЕ ОКРЕМИЙ КРОК, А НЕ ПОЛЕ В ЗБІРЦІ
+// -----------------------------------------
+// Сторінка товару приходить із сервера вже з ціною в розмітці — так
+// вона показує число, не чекаючи на жоден скрипт. Але ціна дня
+// залежить від годинника: збірка, яка відбулась учора, не могла знати,
+// що о 20:00 почнеться сейл.
+//
+// Тому в розмітці лишається звичайна ціна (правильна до початку й
+// після кінця), а тут вона виправляється, якщо акція саме зараз іде.
+//
+// ЗАМІРЯНО 11.09.2026: без цього кроку сторінка показувала 9 000, хоча
+// в каталозі, кошику й навіть у власній розмітці JSON-LD було вже
+// 8 600. Це знайшла перевірка на живій сторінці — жоден тест на
+// функціях цього не бачив, бо кожна з них працювала правильно.
+// Вміст цінника — ОДНА функція на дві точки показу.
+//
+// Точок справді дві, і це не дублювання: сторінку товару спершу
+// показує статичний HTML зі збірки, і лише потім renderProduct
+// перемальовує її даними з data/products.json. Поки йде завантаження,
+// у статичному цінику стоїть ціна, яку знала збірка, — без поправки
+// покупець встиг би побачити 9 000 замість 8 600.
+function priceBoxHtml(product) {
+
+    const old = oldPriceNow(product);
+
+    return (old ? `<span class="old-price">${formatPrice(old)}</span>` : "")
+        + `<span class="price">${formatPrice(priceNow(product))}</span>`;
+
+}
+
+// Поправка статичного цінника до першої перемальовки.
+function applySalePrice(product) {
+
+    if (!saleActive(product)) return;
+
+    const box = document.querySelector(".price-box");
+
+    if (!box) return;
+
+    box.innerHTML = priceBoxHtml(product);
+
+}
+
 function renderProduct(product) {
+
+    applySalePrice(product);
 
     // Статистика: перегляд товару. Колір і розмір беремо з адреси —
     // саме в них людина сюди прийшла (з каталогу, з кошика, з поста).
@@ -1673,13 +1723,7 @@ function renderProduct(product) {
 
         <div class="price-box">
 
-            ${product.oldPrice ? `<span class="old-price">${formatPrice(product.oldPrice)}</span>` : ""}
-
-            <span class="price">
-
-                ${formatPrice(product.price)}
-
-            </span>
+            ${priceBoxHtml(product)}
 
         </div>
         <div class="option-group">

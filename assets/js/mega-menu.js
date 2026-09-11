@@ -34,9 +34,7 @@
 
     function isSaleProduct(product) {
 
-        if (!product.oldPrice) return false;
-
-        return (1 - product.price / product.oldPrice) * 100 >= SALE_MIN_DISCOUNT;
+        return discountPercent(product) >= SALE_MIN_DISCOUNT;
 
     }
 

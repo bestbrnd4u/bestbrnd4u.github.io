@@ -45,24 +45,11 @@ const OUTPUT_FILE = path.join(ROOT, "data", "promotions.json");
 // в рядку браузера на канонічну.
 // Дата з адмінки — у придатний для браузера вигляд.
 //
-// Decap віддає datetime рядком; порожнє поле приходить порожнім
-// рядком або взагалі не приходить. Ми нормалізуємо в ISO з зоною —
-// саме його читає new Date() однаково в усіх браузерах.
-//
-// СМІТТЯ ВІДКИДАЄМО МОВЧКИ. Неправильна дата в акції не має валити
-// збірку всього сайту: акція просто лишиться без розкладу, тобто
-// поводитиметься як усі попередні.
-function promoDate(value) {
-
-    const text = String(value ?? "").trim();
-
-    if (!text) return "";
-
-    const time = new Date(text).getTime();
-
-    return Number.isFinite(time) ? new Date(time).toISOString() : "";
-
-}
+// Реалізація одна на дві збірки й лежить у scripts/promo-deals.js:
+// ту саму дату читає збірка товарів, коли проставляє ціну дня. Дві
+// копії однієї нормалізації розійшлись би на першому ж граничному
+// випадку — а тут межа це буквально секунда початку сейлу.
+const { promoDate } = require("./promo-deals");
 
 function renameToLatinSlugs(files, dirs) {
 
@@ -209,6 +196,11 @@ function main() {
             link: data.link,
             brand: data.brand || "",
             discountPercent: typeof data.discountPercent === "number" ? data.discountPercent : null,
+            // Ціна дня — щоб картка на головній могла показати саме її,
+            // не заглядаючи в товари. Сама ціна доїжджає до товарів
+            // окремо (scripts/promo-deals.js + build-products.js), бо
+            // читати її треба в каталозі й кошику, а не лише тут.
+            ...(Number(data.dealPrice) > 0 ? { dealPrice: Math.round(Number(data.dealPrice)) } : {}),
             // Розклад акції. Пишемо ЛИШЕ заповнене — щоб в акціях без
             // розкладу не з'явилось два порожніх рядки (та сама
             // причина, що в autoBrand нижче).
@@ -258,7 +250,7 @@ function main() {
                 && Object.keys(data.style).length
                 ? { style: data.style }
                 : {}),
-            displayType: ["card", "hero_slider", "banner_products", "banner_compact"].includes(data.displayType)
+            displayType: ["card", "hero_slider", "banner_products", "banner_compact", "deal_of_day"].includes(data.displayType)
                 ? data.displayType
                 : "card",
             order: typeof data.order === "number" ? data.order : 1

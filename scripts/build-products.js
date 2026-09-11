@@ -594,8 +594,18 @@ function contentHash(product) {
     // Службові поля в відбиток не беремо: version-штампи на фото
     // (?v=…) міняються від перезбірки картинок, а не від правки
     // товару — інакше кожна перезбірка виглядала б як зміна.
-    const clean = JSON.stringify(product, (key, value) =>
-        typeof value === "string" ? value.replace(/\?v=[0-9a-f]+/g, "") : value);
+    //
+    // sale — те саме з іншого боку. Ціну дня ставить АКЦІЯ, а не
+    // правка товару, і живе вона кілька годин. Якби вона входила у
+    // відбиток, товар ставав би «оновленим сьогодні» двічі за добу:
+    // коли сейл почався і коли скінчився.
+    const clean = JSON.stringify(product, (key, value) => {
+
+        if (key === "sale") return undefined;
+
+        return typeof value === "string" ? value.replace(/\?v=[0-9a-f]+/g, "") : value;
+
+    });
 
     return crypto.createHash("sha1").update(clean).digest("hex").slice(0, 16);
 
@@ -1255,6 +1265,8 @@ function main() {
 
     stampImageVersions(products);
 
+    stampDeals(products);
+
     // Журнал дат — ПІСЛЯ штампів на фото: contentHash їх однаково
     // не враховує, але порядок хай буде очевидним.
     stampUpdated(products);
@@ -1305,6 +1317,53 @@ const CARD_FIELDS = [
 // Скільки назв перелічувати. Повний список на сто товарів у логу
 // нечитабельний, а нуль назв не дає почати.
 const GAP_EXAMPLES = 5;
+
+// Ціна дня з акції — у сам товар.
+//
+// ЧОМУ В ТОВАР, А НЕ ЛИШЕ В АКЦІЮ
+// --------------------------------
+// Ціну задають в акції, а читають у товарі: каталог, картка, кошик,
+// оформлення, фід. Якби кожне з цих місць саме шукало свою акцію, їм
+// усім довелося б вантажити data/promotions.json і повторювати той
+// самий перебір — а розійтися вони змогли б на першій же дрібниці.
+//
+// Тому збірка кладе поруч із ціною готове поле sale:
+//
+//   sale: { price: 8600, from: "...", to: "..." }
+//
+// Далі всі читають одне й те саме, а хто саме її призначив — уже не
+// має значення.
+//
+// ПОРОЖНЄ ПОЛЕ НЕ ПИШЕМО: товарів сто, а в акції з ціною дня —
+// одиниці. Сто рядків "sale": null нікому нічого не кажуть.
+function stampDeals(products) {
+
+    const { readDeals } = require("./promo-deals");
+
+    const { deals, warnings } = readDeals();
+
+    // Попередження, а не помилка: збірка не має падати через те, що
+    // власник поставив ту саму сумку у дві акції. Але мовчати теж не
+    // можна — він побачить не ту ціну, яку задавав.
+    warnings.forEach(text => console.warn(`::warning::ціна дня — ${text}`));
+
+    let stamped = 0;
+
+    products.forEach(product => {
+
+        const deal = deals[Number(product.id)];
+
+        if (!deal) return;
+
+        product.sale = { price: deal.price, from: deal.from, to: deal.to };
+
+        stamped++;
+
+    });
+
+    if (stamped) console.log(`   ціна дня проставлена: ${stamped} товарів`);
+
+}
 
 function reportCardGaps(products) {
 
