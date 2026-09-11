@@ -487,6 +487,13 @@ function renderAdvantages(advantages) {
 // були до його появи.
 function promoTimerTag(promo) {
 
+    // Вимкнений в адмінці — не малюємо.
+    //
+    // ЯВНИЙ false, а не «немає поля»: акції, створені до появи
+    // перемикача, поля не мають і мусять показувати відлік, як
+    // показували.
+    if (promo && promo.showCountdown === false) return "";
+
     const timing = promoTiming(promo);
 
     if (!timing.until) return "";
@@ -1043,8 +1050,18 @@ async function renderDealPromotions(dealPromotions) {
         const timing = promoTiming(promo);
 
         // Анонс і сейл, що йде, — різні обіцянки, і слова різні.
+        //
+        // Порожній бейдж тут НЕ означає «нічого не писати»: у цьому
+        // блоці позначка — єдине, що пояснює, чому ціна інша. Тому
+        // порожнє поле дає слово за станом акції, а не порожнечу.
         const eyebrow = promo.badge
             || (timing.state === "announced" ? "СКОРО" : "ЦІНА ДНЯ");
+
+        // Заголовок і опис — навпаки: порожнє поле означає «не
+        // писати». Власник може лишити тільки позначку, таймер і
+        // картки, якщо все інше зайве.
+        const heading = String(promo.title || "").trim();
+        const lead = String(promo.text || "").trim();
 
         return `
             <div class="deal-block${blockStyleClass(promo.style)}" style="${blockStyleAttr(promo.style)}">
@@ -1055,8 +1072,8 @@ async function renderDealPromotions(dealPromotions) {
 
                         <div class="deal-head-text">
                             <span class="deal-eyebrow">${eyebrow}</span>
-                            <h2>${promo.title}</h2>
-                            ${promo.text ? `<p>${promo.text}</p>` : ""}
+                            ${heading ? `<h2>${heading}</h2>` : ""}
+                            ${lead ? `<p>${lead}</p>` : ""}
                         </div>
 
                         ${promoTimerTag(promo)}

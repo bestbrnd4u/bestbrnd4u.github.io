@@ -51,6 +51,15 @@ const OUTPUT_FILE = path.join(ROOT, "data", "promotions.json");
 // випадку — а тут межа це буквально секунда початку сейлу.
 const { promoDate } = require("./promo-deals");
 
+// Дозволені розкладки накладки на банері. Той самий перелік стоїть в
+// admin/config.yml і в CSS (.promo-hero-banner[data-layout]); тест
+// tests/test-promo-banner-layout.js звіряє всі три.
+const LAYOUTS = [
+    "left-top", "left-middle", "left-bottom",
+    "center-top", "center-middle", "center-bottom",
+    "right-top", "right-middle", "right-bottom"
+];
+
 function renameToLatinSlugs(files, dirs) {
 
     const promotionsDir = (dirs && dirs.promotions) || PROMOTIONS_DIR;
@@ -146,9 +155,32 @@ function main() {
         const data = JSON.parse(fs.readFileSync(filePath, "utf8"));
         const slug = file.replace(/\.json$/, "");
 
-        if (!data.title || !data.image || !data.link) {
+        // ЩО САМЕ РОБИТЬ АКЦІЮ ЗАПОВНЕНОЮ.
+        //
+        // Раніше тут вимагались заголовок, фото й посилання кнопки —
+        // і це заважало рівно тому випадку, заради якого банери й
+        // малюють: увесь напис уже на картинці, а сайт має лише
+        // показати її, нічого не дописуючи зверху.
+        //
+        // Тепер вимога одна: акції має бути що показати. Порожній
+        // запис (натиснули «створити» й пішли) далі пропускаємо —
+        // інакше на головній зʼявився б банер нізвідки.
+        const hasProducts = Array.isArray(data.products) && data.products.length > 0;
+
+        if (!data.title && !data.text && !data.image && !hasProducts) {
 
             console.log(`⏭  ПРОПУЩЕНО (не заповнено): ${file}`);
+
+            return;
+
+        }
+
+        // Банер без фото — окремий випадок: показувати нема чого, і
+        // порожня темна смуга на всю ширину гірша за відсутність
+        // блока. «Ціна дня» фото не використовує взагалі.
+        if (!data.image && data.displayType !== "deal_of_day") {
+
+            console.log(`⏭  ПРОПУЩЕНО (немає фото банера): ${file}`);
 
             return;
 
@@ -250,6 +282,14 @@ function main() {
                 && Object.keys(data.style).length
                 ? { style: data.style }
                 : {}),
+            // Розкладка накладки на банері. Порожнє — «як було»:
+            // ліворуч посередині, саме так малювались усі акції до
+            // появи цього поля.
+            ...(LAYOUTS.includes(data.bannerLayout) ? { bannerLayout: data.bannerLayout } : {}),
+            // Таймер вимикається ЯВНИМ false: відсутнє поле означає
+            // «показувати», інакше всі вже опубліковані акції разом
+            // втратили б відлік.
+            ...(data.showCountdown === false ? { showCountdown: false } : {}),
             displayType: ["card", "hero_slider", "banner_products", "banner_compact", "deal_of_day"].includes(data.displayType)
                 ? data.displayType
                 : "card",

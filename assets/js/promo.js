@@ -132,6 +132,16 @@ function startPromoCountdown(promo) {
 
     if (!box || !labelEl || !valueEl) return;
 
+    // Вимкнений в адмінці — блок не показуємо й годинник не заводимо.
+    //
+    // ЯВНИЙ false, а не «немає поля»: акції, створені до появи
+    // перемикача, поля не мають — і мусять показувати відлік, як
+    // показували.
+    if (promo.showCountdown === false) {
+        box.hidden = true;
+        return;
+    }
+
     let timer = null;
 
     // Стан, у якому сторінку намалювали. Усе інше на ній — ціни зі
@@ -192,9 +202,10 @@ function updatePromoSeoMetadata(promo) {
     // за якою реально відкрита сторінка
     const pageUrl = `${SITE_URL}/promo?id=${encodeURIComponent(promo.slug)}`;
 
-    const title = `${promo.title} | BestBrnd4u`;
+    const title = `${promoHeading(promo)} | BestBrnd4u`;
 
-    const description = truncateForMeta(promo.text || `Акція ${promo.title} в інтернет-магазині BestBrnd4u`);
+    const description = truncateForMeta(promo.text
+        || `${promoHeading(promo)} в інтернет-магазині BestBrnd4u`);
 
     setMetaByName("description", description);
 
@@ -210,10 +221,27 @@ function updatePromoSeoMetadata(promo) {
 
 }
 
+// НАЗВА АКЦІЇ СЛОВАМИ — НЕ ТЕ САМЕ, ЩО НАПИС НА БАНЕРІ.
+//
+// Напис на банері можна прибрати: він часто вже намальований на
+// самому фото. Але вкладка браузера, хлібні крихти й рядок у видачі
+// Google порожніми бути не можуть — там зʼявилось би « | BestBrnd4u»
+// і «Акція  в інтернет-магазині».
+//
+// Тому беремо перше, що є: заголовок, опис, бренд — і лише потім
+// безлике слово «Акція».
+function promoHeading(promo) {
+
+    return [promo && promo.title, promo && promo.text, promo && promo.brand]
+        .map(value => String(value || "").trim())
+        .find(Boolean) || "Акція";
+
+}
+
 function renderPromoHero(promo) {
 
-    document.getElementById("pageTitle").textContent = `${promo.title} | BestBrnd4u`;
-    document.getElementById("breadcrumbTitle").textContent = promo.title;
+    document.getElementById("pageTitle").textContent = `${promoHeading(promo)} | BestBrnd4u`;
+    document.getElementById("breadcrumbTitle").textContent = promoHeading(promo);
 
     updatePromoSeoMetadata(promo);
 
@@ -225,7 +253,26 @@ function renderPromoHero(promo) {
     const linkEl = document.getElementById("promoHeroLink");
     const linkTextEl = document.getElementById("promoHeroLinkText");
 
-    const overlay = "linear-gradient(rgba(17,24,39,.55), rgba(17,24,39,.55))";
+    // ЩО МИ ВЗАГАЛІ ПИШЕМО ПОВЕРХ ФОТО.
+    //
+    // Коли весь напис уже намальований на самій картинці, кожен
+    // елемент згори — завада: заголовок лягає на заголовок, кнопка
+    // закриває товар. Тому всі чотири прибираються порожнім полем, а
+    // таймер — перемикачем.
+    const hasBadge = Boolean(promo.badge);
+    const hasTitle = Boolean(promo.title);
+    const hasText = Boolean(promo.text);
+    const hasButton = Boolean(promo.buttonText);
+    const hasTimer = promo.showCountdown !== false && Boolean(promoTiming(promo).until);
+
+    const hasOverlay = hasBadge || hasTitle || hasText || hasButton || hasTimer;
+
+    // Темна заливка існує рівно заради читабельності білого тексту.
+    // Немає тексту — немає й причини приглушувати фото на 55%: воно
+    // для того й завантажене, щоб його було видно.
+    const overlay = hasOverlay
+        ? "linear-gradient(rgba(17,24,39,.55), rgba(17,24,39,.55))"
+        : "";
 
     // Банер цієї сторінки — окреме поле "Фото на сторінці акції", а
     // не те саме фото, що й тизер на головній. Причина: тизер і цей
@@ -238,8 +285,18 @@ function renderPromoHero(promo) {
     const desktopImage = promo.promoPageImage || promo.image;
     const mobileImage = promo.promoPageImageMobile || promo.promoPageImage || promo.imageMobile || promo.image;
 
-    banner.style.setProperty("--banner-img-desktop", `${overlay}, url('${desktopImage}')`);
-    banner.style.setProperty("--banner-img-mobile", `${overlay}, url('${mobileImage}')`);
+    const layered = src => (overlay ? `${overlay}, url('${src}')` : `url('${src}')`);
+
+    banner.style.setProperty("--banner-img-desktop", layered(desktopImage));
+    banner.style.setProperty("--banner-img-mobile", layered(mobileImage));
+
+    // Куди покласти напис. Порожнє поле — «ліворуч посередині», саме
+    // так малювались усі акції до появи вибору.
+    banner.dataset.layout = promo.bannerLayout || "left-middle";
+
+    // Порожній банер не тримає висоту сам: у ньому немає вмісту, а
+    // фото — фон. Без цього прапорця смуга схлопнулась би в нуль.
+    banner.classList.toggle("promo-hero-bare", !hasOverlay);
 
     if (promo.badge) {
         badgeEl.textContent = promo.badge;
@@ -248,15 +305,25 @@ function renderPromoHero(promo) {
 
     startPromoCountdown(promo);
 
-    titleEl.textContent = promo.title;
+    // Порожній заголовок — не пишемо нічого. Раніше сюди йшов
+    // undefined і на банері зʼявлявся порожній h1 заввишки в рядок.
+    titleEl.hidden = !hasTitle;
 
-    if (promo.text) {
+    if (hasTitle) titleEl.textContent = promo.title;
+
+    if (hasText) {
         textEl.textContent = promo.text;
         textEl.hidden = false;
     }
 
-    if (promo.link) linkEl.href = promo.link;
-    if (promo.buttonText) linkTextEl.textContent = promo.buttonText;
+    // Кнопки немає, поки немає напису на ній. Окремого перемикача не
+    // робимо: кнопка без тексту й так не кнопка.
+    linkEl.hidden = !hasButton;
+
+    if (hasButton) {
+        linkTextEl.textContent = promo.buttonText;
+        linkEl.href = promo.link || `catalog`;
+    }
 
     heroSection.hidden = false;
 

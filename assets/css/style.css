@@ -9248,6 +9248,67 @@ body.mobile-filters-open .scroll-top{
     }
 }
 
+/* =========================================
+   Куди лягає напис на банері акції
+
+   ЧОМУ ЦЕ ВЗАГАЛІ НАЛАШТУВАННЯ. Банер часто малюють уже з текстом —
+   назва акції, ціна, товар. Наш заголовок лягав поверх чужого, а
+   кнопка закривала сумку. Тепер напис можна посунути у вільний кут
+   або прибрати зовсім (порожні поля + вимкнений таймер), і тоді
+   лишається саме фото.
+
+   Перелік значень повторюється у трьох місцях — тут, в admin/config.yml
+   і в scripts/build-promotions.js (LAYOUTS). Звіряє їх
+   tests/test-promo-banner-layout.js.
+   ========================================= */
+
+.promo-hero-banner{
+    display:flex;
+}
+
+.promo-hero-banner[data-layout$="-top"]{ align-items:flex-start; }
+.promo-hero-banner[data-layout$="-middle"]{ align-items:center; }
+.promo-hero-banner[data-layout$="-bottom"]{ align-items:flex-end; }
+
+.promo-hero-banner[data-layout^="left-"]{ justify-content:flex-start; }
+.promo-hero-banner[data-layout^="center-"]{ justify-content:center; }
+.promo-hero-banner[data-layout^="right-"]{ justify-content:flex-end; }
+
+/* Текст усередині блока вирівнюємо туди ж, куди й сам блок: напис,
+   притиснутий праворуч, але з текстом ліворуч, читається як помилка. */
+.promo-hero-banner[data-layout^="center-"] .promo-hero-content{ text-align:center; }
+.promo-hero-banner[data-layout^="right-"] .promo-hero-content{ text-align:right; }
+
+.promo-hero-banner[data-layout^="center-"] .promo-hero-content p,
+.promo-hero-banner[data-layout^="right-"] .promo-hero-content p{
+    margin-left:auto;
+}
+
+.promo-hero-banner[data-layout^="center-"] .promo-hero-content p{
+    margin-right:auto;
+}
+
+/* Банер без напису: вмісту немає, висоту тримати нічому. Лишаємо ту
+   саму пропорцію, у якій власник готує фото (1920×600 ≈ 3.2:1). */
+.promo-hero-banner.promo-hero-bare{
+    padding:0;
+    aspect-ratio:3.2 / 1;
+}
+
+.promo-hero-banner.promo-hero-bare .promo-hero-content{
+    display:none;
+}
+
+@media(max-width:768px){
+
+    /* На телефоні фото завантажують вертикальніше — і пропорція інша. */
+    .promo-hero-banner.promo-hero-bare{
+        aspect-ratio:3 / 4;
+        min-height:0;
+    }
+
+}
+
 .promo-hero-content{
     max-width:650px;
 }

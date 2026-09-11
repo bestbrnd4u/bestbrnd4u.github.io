@@ -4206,6 +4206,7 @@ function collectionProducts(collection, allProducts, departmentOf) {
 
 // Хвилина в мілісекундах — щоб у розрахунках не було голих чисел.
 const MINUTE_MS = 60 * 1000;
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 function promoMoment(value) {
 
@@ -4266,12 +4267,28 @@ function promoDiscountActive(promo, now) {
     return promoState(promo, now) === "live" && Number(promo && promo.discountPercent) > 0;
 }
 
+// Чи видно в рядку відліку секунди.
+//
+// ОДНЕ ПРАВИЛО НА ДВОХ, І САМЕ ТОМУ ВОНО ОКРЕМО.
+//
+// Спершу їх було два: promoCountdown() показувала секунди, поки до
+// кінця менше доби, а promoTickMs() перемальовувала щосекунди, поки
+// менше години. Між годиною й добою вони розходились — на банері
+// стояв рядок «22:40:48», у якому секунди не рухались до наступної
+// хвилини. Виглядало як зламаний годинник, і власник саме так це й
+// прочитав.
+//
+// Тепер обидві питають тут.
+function promoShowsSeconds(leftMs) {
+
+    return Number(leftMs) < DAY_MS;
+
+}
+
 // «6 дн. 04:12» — скільки лишилось.
 //
 // ЧОМУ ДНІ ОКРЕМО, А НЕ 148 ГОДИН. Тиждень очікування читається
-// днями; останні години — годинником. Секунди показуємо лише на
-// останній годині: раніше вони лише смикають сторінку й тягнуть
-// перемальовку щосекунди без діла.
+// днями; останні години — годинником.
 function promoCountdown(untilMs, now) {
 
     const left = Number(untilMs) - (Number.isFinite(now) ? now : Date.now());
@@ -4287,7 +4304,7 @@ function promoCountdown(untilMs, now) {
 
     const two = value => String(value).padStart(2, "0");
 
-    if (days > 0) return `${days} дн. ${two(hours)}:${two(minutes)}`;
+    if (!promoShowsSeconds(left)) return `${days} дн. ${two(hours)}:${two(minutes)}`;
 
     if (total >= 3600) return `${two(hours)}:${two(minutes)}:${two(seconds)}`;
 
@@ -4297,14 +4314,15 @@ function promoCountdown(untilMs, now) {
 
 // Як часто перемальовувати таймер.
 //
-// Поки лишились дні — раз на хвилину: рядок «6 дн. 04:12» частіше не
-// міняється, а щосекундна перемальовка на телефоні коштує батареї.
-// На останній годині — щосекунди, бо там кожна видна.
+// Рівно так часто, як міняється сам рядок: поки на екрані секунди —
+// щосекунди, коли лишились дні — раз на хвилину («6 дн. 04:12»
+// частіше й не змінюється, а зайве пробудження на телефоні коштує
+// батареї).
 function promoTickMs(untilMs, now) {
 
     const left = Number(untilMs) - (Number.isFinite(now) ? now : Date.now());
 
-    return left > 3600 * 1000 ? MINUTE_MS : 1000;
+    return promoShowsSeconds(left) ? 1000 : MINUTE_MS;
 
 }
 

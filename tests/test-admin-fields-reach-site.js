@@ -92,6 +92,20 @@ function helperSource(name, source) {
 
 }
 
+// Перше значення зі списку варіантів самого поля. Варіанти в
+// Decap бувають рядками або {label, value}.
+function optionValue(field) {
+
+    const options = field.options || [];
+
+    const first = options.find(o => o !== undefined && o !== null);
+
+    if (first === undefined) return "card";
+
+    return typeof first === "object" ? first.value : first;
+
+}
+
 function literalRunner(source) {
 
     const literal = pushedLiteral(source);
@@ -101,8 +115,21 @@ function literalRunner(source) {
     const helpers = HELPERS.map(name =>
         new Function(`${helperSource(name, source)}\nreturn ${name};`)());
 
-    return data => new Function("data", "slug", "genderButtons", ...HELPERS,
-        `return (${literal});`)(data, "test-slug", [], ...helpers);
+    // Літерал спирається не лише на функції, а й на переліки поруч із
+    // ним: LAYOUTS — дозволені розкладки банера. Поки їх тут не було,
+    // запускач падав на ReferenceError, і набір червонів на цілком
+    // робочому коді — так уже сталося з promoDate().
+    //
+    // Беремо перелік із САМОГО джерела збірки: свій список тут означав
+    // би, що тест перевіряє не те, що працює.
+    const consts = [...source.matchAll(/^const ([A-Z_][A-Z0-9_]*) = (\[[\s\S]*?\n\]);$/gm)]
+        .map(hit => ({ name: hit[1], value: new Function(`return ${hit[2]};`)() }));
+
+    const names = HELPERS.concat(consts.map(c => c.name));
+    const values = helpers.concat(consts.map(c => c.value));
+
+    return data => new Function("data", "slug", "genderButtons", ...names,
+        `return (${literal});`)(data, "test-slug", [], ...values);
 
 }
 
@@ -158,9 +185,18 @@ function filledEntry(fields) {
 
             case "list":
             case "select":
+                // ЗНАЧЕННЯ БЕРЕМО З ВЛАСНИХ ВАРІАНТІВ ПОЛЯ, а не
+                // однакове на всі списки.
+                //
+                // Тут стояло "card" — чинний «спосіб показу», але для
+                // будь-якого іншого select чуже слово. Збірка такі
+                // значення відкидає (вона звіряє їх із переліком), і
+                // набір повідомляв «поле не доїжджає до сайту» про
+                // цілком робоче поле. Так уже сталося з розкладкою
+                // банера.
                 data[name] = field.multiple || field.widget === "list"
                     ? [{ gender: "Жінкам", color: "#111827" }]
-                    : "card";
+                    : optionValue(field);
                 break;
 
             case "productPicker":

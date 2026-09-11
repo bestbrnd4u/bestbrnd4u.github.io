@@ -115,6 +115,33 @@ console.log("\n[3] Пуш і коміт не сплутані");
     check("коміт лишився там, де злиття", /git commit -m "chore:/.test(merge));
 }
 
+console.log("\n[4] Перезбірка дева справді виїжджає");
+{
+    const dev = read(".github/workflows/build-dev.yml");
+
+    // Дев публікує Cloudflare Pages, стежачи за гілкою. Він читає ту
+    // саму позначку пропуску, що й GitHub Actions, — і з нею жодна
+    // перезбірка на дев не виїжджала: сайт показував стан
+    // ПОПЕРЕДНЬОГО коміту, тобто правка з адмінки з'являлась аж після
+    // наступної правки. Виглядало як «правка не зберігається».
+    const skips = dev.match(/git commit -m "[^"]*"/g) || [];
+
+    check("коміт перезбірки без позначки пропуску CI",
+        skips.every(line => !/\[\s*(skip|no)[\s-]*ci\s*\]|\[\s*ci[\s-]*(skip|no)\s*\]/i.test(line)),
+        skips.join(" | "));
+
+    // Позначка тут і не потрібна: пуш зроблено вбудованим
+    // GITHUB_TOKEN, а такий пуш не породжує події push. Якщо колись
+    // з'явиться свій токен — самозапуск повернеться, і позначку
+    // доведеться замінити чимось іншим, а не повертати.
+    check("пуш робиться вбудованим токеном",
+        !/persist-credentials:\s*false/.test(dev)
+        && !/token:\s*\$\{\{\s*secrets\./.test(dev));
+
+    check("сказано, чому позначки немає",
+        /Cloudflare Pages/.test(dev) && /GITHUB_TOKEN/.test(dev));
+}
+
 console.log(failures ? `\n✗ провалено перевірок: ${failures}\n` : "\n✓ усі перевірки пройдено\n");
 
 process.exit(failures ? 1 : 0);
