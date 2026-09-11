@@ -1,6 +1,6 @@
 {
   "serverEmail": true,
-  "thankYou": false,
+  "thankYou": true,
   "thankYouDays": 14,
   "thankYouPercent": 5,
   "thankYouLife": 7
