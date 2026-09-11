@@ -63,7 +63,14 @@ async function initPromoPage() {
 
         loader.hidden = true;
 
-        if (!promo) {
+        // Завершена акція поводиться як неіснуюча — і текст у блоці
+        // «не знайдено» це вже передбачає слово в слово: «Цю акцію не
+        // знайдено або її вже завершено».
+        //
+        // Окремий стан тут був би гіршим: на сторінці, де все одно
+        // нічого не купиш, різниця між «не було» і «скінчилось»
+        // покупцю нічого не дає, а посилання в каталог дає.
+        if (!promo || !promoVisible(promo)) {
             showPromoNotFound();
             return;
         }
@@ -100,6 +107,81 @@ async function initPromoPage() {
 function showPromoNotFound() {
 
     document.getElementById("promoNotFound").hidden = false;
+
+}
+
+// Відлік на сторінці акції.
+//
+// ЧОМУ ТАЙМЕР ПЕРЕРАХОВУЄ СТАН, А НЕ ПРОСТО ЦИФРУ
+// ------------------------------------------------
+// Сторінку можуть відкрити за хвилину до опівночі й дивитись, як
+// відлік добігає нуля. Якби ми лише зменшували число, о 00:00
+// покупець побачив би «почнеться через 00:00» і нічого більше.
+// Тому на кожному кроці питаємо стан заново: анонс сам стає
+// «лишилось», а кінець — ховає відлік і перезавантажує сторінку, щоб
+// зникли ціни зі знижкою.
+//
+// ПЕРЕЗАВАНТАЖЕННЯ ЛИШЕ В КІНЦІ І ЛИШЕ ОДИН РАЗ. Смикати сторінку під
+// читачем неввічливо, але показувати перекреслені ціни акції, яка вже
+// скінчилась, — гірше: це вже не оформлення, а неправдива ціна.
+function startPromoCountdown(promo) {
+
+    const box = document.getElementById("promoCountdown");
+    const labelEl = document.getElementById("promoCountdownLabel");
+    const valueEl = document.getElementById("promoCountdownValue");
+
+    if (!box || !labelEl || !valueEl) return;
+
+    let timer = null;
+
+    // Стан, у якому сторінку намалювали. Усе інше на ній — ціни зі
+    // знижкою, набір товарів — зібране саме під нього.
+    const drawnState = promoTiming(promo).state;
+
+    function draw() {
+
+        const timing = promoTiming(promo);
+
+        // СТАН ЗМІНИВСЯ ПРЯМО ПІД ЧИТАЧЕМ — перемальовуємо сторінку.
+        //
+        // Обидва переходи важать, і обидва міняють не лише напис:
+        //
+        //   анонс → іде   з'являються перекреслені старі ціни
+        //   іде → кінець  акції більше немає, ціни зі знижкою стають
+        //                 неправдою
+        //
+        // Підмінити тут самі лише цифри означало б лишити сторінку в
+        // стані, якого вже немає. Смикати читача неввічливо, але
+        // показувати неправдиву ціну — гірше. Трапляється це щонайбільше
+        // двічі за життя сторінки, рівно на межі.
+        if (timing.state !== drawnState) {
+
+            if (timer) clearTimeout(timer);
+
+            location.reload();
+
+            return;
+
+        }
+
+        // Немає до чого відлічувати — акція без дат або без кінця.
+        // Ховаємо блок і зупиняємось: мінятись нема чому.
+        if (!timing.until) {
+            box.hidden = true;
+            return;
+        }
+
+        labelEl.textContent = timing.state === "announced" ? "Почнеться через" : "Лишилось";
+        valueEl.textContent = promoCountdown(timing.until);
+
+        box.dataset.state = timing.state;
+        box.hidden = false;
+
+        timer = setTimeout(draw, promoTickMs(timing.until));
+
+    }
+
+    draw();
 
 }
 
@@ -164,6 +246,8 @@ function renderPromoHero(promo) {
         badgeEl.hidden = false;
     }
 
+    startPromoCountdown(promo);
+
     titleEl.textContent = promo.title;
 
     if (promo.text) {
@@ -206,7 +290,11 @@ function setupPromoCatalog(promo, allProducts, categoryDepartments, departmentOf
     // на цій сторінці, сам товар у каталозі це не змінює
     curated = curated.map(product => {
 
-        if (product.oldPrice || !promo.discountPercent) return product;
+        // promoDiscountActive, а не просто discountPercent: в
+        // АНОНСОВАНІЙ акції знижки ще немає, і перекреслена стара ціна
+        // за тиждень до початку — це обіцянка, видана за факт.
+        // Покупець, який прийде по ній сьогодні, заплатить повну.
+        if (product.oldPrice || !promoDiscountActive(promo)) return product;
 
         const syntheticOldPrice = Math.round(product.price / (1 - promo.discountPercent / 100));
 

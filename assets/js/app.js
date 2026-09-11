@@ -494,9 +494,80 @@ async function initPromotions() {
             throw new Error("Не вдалося завантажити акції");
         }
 
-        const promotions = await response.json();
+        // Відлік на банері головної — той самий елемент для всіх
+        // чотирьох типів: картка, слайдер, банер із товарами,
+        // компактний. Типів може стати більше, і згадувати про таймер
+        // у кожному ніхто не буде.
+        //
+        // Порожньо, якщо в акції немає розкладу, — тобто в усіх, що
+        // були до його появи.
+        function promoTimerTag(promo) {
 
-        if (!Array.isArray(promotions) || promotions.length === 0) {
+            const timing = promoTiming(promo);
+
+            if (!timing.until) return "";
+
+            const label = timing.state === "announced" ? "Почнеться через" : "Лишилось";
+
+            return `<span class="promo-countdown" data-state="${timing.state}"`
+                + ` data-until="${timing.until}">`
+                + `<span class="promo-countdown-label">${label}</span>`
+                + `<span class="promo-countdown-value">${promoCountdown(timing.until)}</span>`
+                + `</span>`;
+
+        }
+
+        // Один хід годинника на всі банери одразу.
+        //
+        // ЧОМУ НЕ ТАЙМЕР НА КОЖЕН. Акцій на головній буває чотири-п'ять,
+        // і п'ять окремих setTimeout — це п'ять пробуджень телефона
+        // замість одного. Крок беремо найдрібніший із потрібних: поки
+        // хоч одному банеру лишилась година, цокаємо щосекунди.
+        function tickPromoTimers() {
+
+            const boxes = [...document.querySelectorAll(".promo-countdown[data-until]")];
+
+            if (!boxes.length) return;
+
+            let step = MINUTE_MS;
+
+            boxes.forEach(box => {
+
+                const until = Number(box.dataset.until);
+                const left = promoCountdown(until);
+
+                // Відлік добіг нуля — стан акції змінився, а разом із
+                // ним і ціни зі знижкою. Перемальовуємо сторінку, бо
+                // підмінити тут самі цифри означало б лишити головну в
+                // стані, якого вже немає.
+                if (!left) {
+                    location.reload();
+                    return;
+                }
+
+                box.querySelector(".promo-countdown-value").textContent = left;
+
+                step = Math.min(step, promoTickMs(until));
+
+            });
+
+            setTimeout(tickPromoTimers, step);
+
+        }
+
+        const all = await response.json();
+
+        // Завершені акції зникають самі — у цьому й сенс дати кінця.
+        // Анонсовані лишаються: заради них розклад і робився.
+        //
+        // Фільтр стоїть ДО всього іншого, разом зі статистикою: інакше
+        // показ завершеної акції потрапляв би в аналітику, і «перегляди
+        // банера» рахували б те, чого ніхто не бачив.
+        const promotions = Array.isArray(all)
+            ? all.filter(promo => promoVisible(promo))
+            : [];
+
+        if (!promotions.length) {
             return;
         }
 
@@ -543,6 +614,7 @@ async function initPromotions() {
                     <div class="promo-card-image">
                         ${promoPicture(promo, 700)}
                         ${promo.badge ? `<span class="promo-card-badge">${promo.badge}</span>` : ""}
+                        ${promoTimerTag(promo)}
                     </div>
 
                     <div class="promo-card-info">
@@ -569,6 +641,10 @@ async function initPromotions() {
         if (compactBanners.length) {
             renderCompactPromotions(compactBanners);
         }
+
+        // Після всіх чотирьох типів: банери намальовані, тепер їх
+        // відліки можна вести одним ходом годинника.
+        tickPromoTimers();
 
     } catch (error) {
 
@@ -617,6 +693,7 @@ function renderHeroSliderPromotions(heroPromotions) {
             <div class="promo-hero-slide-content">
 
                 ${promo.badge ? `<span class="promo-hero-slide-badge">${promo.badge}</span>` : ""}
+                ${promoTimerTag(promo)}
 
                 <h2>${promo.title}</h2>
 
@@ -773,6 +850,7 @@ async function renderFeaturedPromotions(featuredPromotions) {
                         <div class="brand-campaign-content">
 
                             ${promo.badge ? `<span class="brand-campaign-eyebrow">${promo.badge}</span>` : ""}
+                            ${promoTimerTag(promo)}
 
                             <h2>${promo.title}</h2>
 

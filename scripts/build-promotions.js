@@ -43,6 +43,27 @@ const OUTPUT_FILE = path.join(ROOT, "data", "promotions.json");
 // Попереднє ім'я лишається в legacySlugs, і сторінка акції знаходить
 // акцію й за ним (див. assets/js/promo.js), після чого підміняє адресу
 // в рядку браузера на канонічну.
+// Дата з адмінки — у придатний для браузера вигляд.
+//
+// Decap віддає datetime рядком; порожнє поле приходить порожнім
+// рядком або взагалі не приходить. Ми нормалізуємо в ISO з зоною —
+// саме його читає new Date() однаково в усіх браузерах.
+//
+// СМІТТЯ ВІДКИДАЄМО МОВЧКИ. Неправильна дата в акції не має валити
+// збірку всього сайту: акція просто лишиться без розкладу, тобто
+// поводитиметься як усі попередні.
+function promoDate(value) {
+
+    const text = String(value ?? "").trim();
+
+    if (!text) return "";
+
+    const time = new Date(text).getTime();
+
+    return Number.isFinite(time) ? new Date(time).toISOString() : "";
+
+}
+
 function renameToLatinSlugs(files, dirs) {
 
     const promotionsDir = (dirs && dirs.promotions) || PROMOTIONS_DIR;
@@ -188,6 +209,16 @@ function main() {
             link: data.link,
             brand: data.brand || "",
             discountPercent: typeof data.discountPercent === "number" ? data.discountPercent : null,
+            // Розклад акції. Пишемо ЛИШЕ заповнене — щоб в акціях без
+            // розкладу не з'явилось два порожніх рядки (та сама
+            // причина, що в autoBrand нижче).
+            //
+            // Стан рахує браузер, а не збірка: збірка знає лише час
+            // свого запуску, і сейл почався б не опівночі, а під час
+            // наступної збірки. Пояснення — у promoTiming() в
+            // assets/js/common.js.
+            ...(promoDate(data.startsAt) ? { startsAt: promoDate(data.startsAt) } : {}),
+            ...(promoDate(data.endsAt) ? { endsAt: promoDate(data.endsAt) } : {}),
             productIds: Array.isArray(data.products) ? data.products.map(Number) : [],
             // ПРАВИЛА набору, на відміну від productIds вище — знімка.
             //

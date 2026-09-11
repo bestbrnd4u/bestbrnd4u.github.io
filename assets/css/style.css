@@ -9263,6 +9263,50 @@ body.mobile-filters-open .scroll-top{
     letter-spacing:.04em;
 }
 
+/* -- Відлік акції з розкладом (assets/js/promo.js).
+
+   ДВА СТАНИ, І ВОНИ НАВМИСНО РІЗНІ НА ВИГЛЯД:
+
+     announced  спокійний, напівпрозорий — до сейлу ще тиждень, і
+                кричати нема про що;
+     live       той самий червоний, що й позначка акції — бо тепер
+                час справді спливає.
+
+   Цифри моноширинні: інакше рядок «6 дн. 04:12» смикається на кожній
+   зміні хвилини, бо «1» вужча за «8». -- */
+.promo-countdown{
+    display:inline-flex;
+    align-items:baseline;
+    gap:8px;
+    padding:8px 18px;
+    margin-bottom:20px;
+    border-radius:50px;
+    background:rgba(255,255,255,.18);
+    font-size:14px;
+    line-height:1.2;
+}
+
+.promo-countdown[hidden]{
+    display:none;
+}
+
+.promo-countdown[data-state="live"]{
+    background:var(--danger);
+}
+
+.promo-countdown-label{
+    font-weight:600;
+    letter-spacing:.02em;
+    opacity:.9;
+}
+
+.promo-countdown-value{
+    font-weight:700;
+    font-size:16px;
+    font-variant-numeric:tabular-nums;
+    font-feature-settings:"tnum";
+}
+
 .promo-hero-badge[hidden]{
     display:none;
 }

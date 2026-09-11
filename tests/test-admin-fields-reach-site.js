@@ -52,6 +52,38 @@ const config = loadYaml("admin/config.yml");
 // Об'єкт із `<щось>.push({ ... })` — рівно той, який пише збірка.
 // Дужки шукаємо балансуванням, а не регуляркою: усередині є і вкладені
 // об'єкти, і тернарні оператори з фігурними дужками.
+// Запускач справжнього літерала збірки.
+//
+// ПОМІЧНИКИ, ЯКІ ЛІТЕРАЛ КЛИЧЕ ВСЕРЕДИНІ, подаємо сюди ж — і саме
+// їхньою справжньою реалізацією зі скрипта збірки, а не заглушкою.
+// Інакше перевірка або впаде на ReferenceError (так і сталось, коли в
+// акції з'явились дати початку й кінця), або — що гірше — перевірятиме
+// не той код, що працює.
+//
+// Кожен новий помічник дописується в HELPERS. Незручність помітна, але
+// вона краща за тиху: забули — тест червоніє одразу, а не мовчки
+// перевіряє порожнечу.
+const HELPERS = ["promoDate"];
+
+function literalRunner(source) {
+
+    const literal = pushedLiteral(source);
+
+    if (!literal) return null;
+
+    const helpers = HELPERS.map(name => {
+
+        const found = source.match(new RegExp(`function ${name}\\([\\s\\S]*?\\n}\\n`));
+
+        return found ? new Function(`${found[0]}\nreturn ${name};`)() : () => "";
+
+    });
+
+    return data => new Function("data", "slug", "genderButtons", ...HELPERS,
+        `return (${literal});`)(data, "test-slug", [], ...helpers);
+
+}
+
 function pushedLiteral(source) {
 
     const start = source.indexOf(".push({");
@@ -121,6 +153,18 @@ function filledEntry(fields) {
             case "imageFraming":
                 // Словник «ім'я файлу → кадр» (див. image-framing.js).
                 data[name] = { "banner.webp": { x: 30, y: 70, zoom: 1.4 } };
+                break;
+
+            case "datetime":
+                // СПРАВЖНЯ дата, а не рядок «startsAt-value».
+                //
+                // Збірка дати перевіряє (див. promoDate у
+                // build-promotions.js) і сміття відкидає мовчки — тож
+                // із загальною заглушкою поле «не доїжджало» до сайту,
+                // і перевірка звинувачувала збірку в тому, чого та не
+                // робила. Саме на цьому воно й спіймалось, коли в
+                // акцію додали розклад.
+                data[name] = "2026-12-31T23:00:00+02:00";
                 break;
 
             default:
@@ -203,8 +247,7 @@ GROUPS.forEach(group => {
 
     // Виконуємо СПРАВЖНІЙ літерал: так перевіряється код збірки, а не
     // його опис регуляркою.
-    const built = new Function("data", "slug", "genderButtons",
-        `return (${literal});`)(data, "test-slug", []);
+    const built = literalRunner(source)(data);
 
     const emitted = new Set(Object.keys(built));
 
@@ -256,10 +299,7 @@ console.log("\n[framing і style в акціях — те, на чому це з
 {
     const source = read("scripts/build-promotions.js");
 
-    const literal = pushedLiteral(source);
-
-    const build = data => new Function("data", "slug", "genderButtons",
-        `return (${literal});`)(data, "s", []);
+    const build = literalRunner(source);
 
     const заповнена = build({
         title: "t", image: "i", link: "l",
