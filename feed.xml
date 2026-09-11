@@ -2026,6 +2026,8 @@
       <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow1.webp?v=be67e115</g:additional_image_link>
       <g:availability>in_stock</g:availability>
       <g:price>9000.00 UAH</g:price>
+      <g:sale_price>8600.00 UAH</g:sale_price>
+      <g:sale_price_effective_date>2026-09-12T21:00:00+0000/2026-09-18T21:00:00+0000</g:sale_price_effective_date>
       <g:brand>Marc Jacobs</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>H956L01PF22-325</g:mpn>
@@ -2042,6 +2044,7 @@
         <g:country>UA</g:country>
         <g:price>60.00 UAH</g:price>
       </g:shipping>
+      <g:custom_label_0>акція</g:custom_label_0>
     </item>
     <item>
       <g:id>58-1</g:id>

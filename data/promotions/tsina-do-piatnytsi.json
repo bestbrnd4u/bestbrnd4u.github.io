@@ -1,0 +1,20 @@
+{
+  "active": true,
+  "title": "Ціна до пʼятниці",
+  "text": "Marc Jacobs The J Marc Shoulder Bag Green Glow — в одному екземплярі. Далі тільки під замовлення.",
+  "badge": "ДО ПʼЯТНИЦІ",
+  "displayType": "deal_of_day",
+  "products": [
+    57
+  ],
+  "dealPrice": 8600,
+  "startsAt": "2026-09-13T00:00:00+03:00",
+  "endsAt": "2026-09-19T00:00:00+03:00",
+  "order": 1,
+  "buttonText": "Детальніше про акцію",
+  "link": "p/sumka-marc-jacobs-the-j-marc-shoulder-bag-green-glow/",
+  "image": "/assets/images/banners/01marc-jacobs_hero_slider_1000x1160.jpg",
+  "imageMobile": "/assets/images/banners/02marc-jacobs_banner_products_1800x900.jpg",
+  "promoPageImage": "/assets/images/banners/marc-jacobs_promo_page_1920x600-1-.jpg",
+  "promoPageImageMobile": "/assets/images/banners/04marc-jacobs_мобильная_страница_акции_1080x1400.jpg"
+}

@@ -227,9 +227,33 @@ function main() {
         entries.push(urlEntry(page.url, "weekly", "0.9"));
     });
 
+    // Завершені акції в sitemap не потрапляють.
+    //
+    // Їхня сторінка показує «акцію не знайдено» й посилання в каталог —
+    // для Google це soft-404. Кликати робота на такий рядок означає
+    // самому наповнювати звіт «Сторінку не проіндексовано».
+    //
+    // АНОНСОВАНІ лишаються: їхня сторінка справжня, заради неї розклад
+    // і робився — про акцію мають дізнатись до початку.
+    //
+    // Момент тут — час ЗБІРКИ, і це все, що sitemap може знати. Акція,
+    // яка скінчилась між збірками, ще постоїть у файлі до наступної;
+    // прибрати її раніше нікому.
+    const now = Date.now();
+
+    const ended = promo => {
+
+        const endsAt = Date.parse(promo && promo.endsAt);
+
+        return Number.isFinite(endsAt) && now >= endsAt;
+
+    };
+
     promotions.forEach(promo => {
 
         if (!promo || !promo.slug) return;
+
+        if (ended(promo)) return;
 
         entries.push(
             urlEntry(`${SITE_URL}/promo?id=${encodeURIComponent(promo.slug)}`, "weekly", "0.6")

@@ -79,6 +79,29 @@
     "order": 1
   },
   {
+    "slug": "tsina-do-piatnytsi",
+    "title": "Ціна до пʼятниці",
+    "text": "Marc Jacobs The J Marc Shoulder Bag Green Glow — в одному екземплярі. Далі тільки під замовлення.",
+    "badge": "ДО ПʼЯТНИЦІ",
+    "image": "/assets/images/banners/01marc-jacobs_hero_slider_1000x1160.jpg",
+    "imageMobile": "/assets/images/banners/02marc-jacobs_banner_products_1800x900.jpg",
+    "promoPageImage": "/assets/images/banners/marc-jacobs_promo_page_1920x600-1-.jpg",
+    "promoPageImageMobile": "/assets/images/banners/04marc-jacobs_мобильная_страница_акции_1080x1400.jpg",
+    "buttonText": "Детальніше про акцію",
+    "link": "p/sumka-marc-jacobs-the-j-marc-shoulder-bag-green-glow/",
+    "brand": "",
+    "discountPercent": null,
+    "dealPrice": 8600,
+    "startsAt": "2026-09-12T21:00:00.000Z",
+    "endsAt": "2026-09-18T21:00:00.000Z",
+    "productIds": [
+      57
+    ],
+    "genderButtons": [],
+    "displayType": "deal_of_day",
+    "order": 1
+  },
+  {
     "slug": "summer-sale",
     "title": "SUMMER SALE",
     "text": "Сонцезахисні окуляри Balenciaga, Gucci, Prada, Burberry, Marc Jacobs, Alain Mikli",

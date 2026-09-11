@@ -254,6 +254,47 @@ console.log("\n[6] Головна не показує завершених");
         && (app.match(/setTimeout\(tickPromoTimers/g) || []).length === 1);
 }
 
+console.log("\n[7] Завершена акція не кличе до себе Google");
+{
+    const sitemap = read("scripts/build-sitemap.js");
+
+    // Сторінка завершеної акції показує «не знайдено» й посилання в
+    // каталог. Рядок на неї в sitemap — це запрошення роботу на
+    // soft-404, тобто власноруч зіпсований звіт індексації.
+    const ended = new Function("promo", "now",
+        sitemap.match(/const ended = promo => \{[\s\S]*?\n    \};/)[0]
+            .replace("const ended = promo =>", "const rule = promo =>")
+        + "\nreturn rule(promo);");
+
+    const past = { slug: "a", endsAt: "2026-01-01T00:00:00Z" };
+    const future = { slug: "b", endsAt: "2030-01-01T00:00:00Z" };
+
+    check("правило бачить завершену", ended(past, Date.now()) === true);
+
+    check("акція, що триває, лишається", ended(future, Date.now()) === false);
+
+    // Анонсована сторінка справжня: заради неї розклад і робився —
+    // про акцію мають дізнатись ДО початку.
+    check("акція без дат теж лишається", ended({ slug: "c" }, Date.now()) === false);
+
+    check("крива дата не викидає акцію",
+        ended({ slug: "d", endsAt: "не дата" }, Date.now()) === false);
+
+    check("і правило справді ввімкнене у збірці",
+        /if \(ended\(promo\)\) return;/.test(sitemap));
+
+    // Момент — час збірки, і це все, що sitemap може знати.
+    const live = JSON.parse(read("data/promotions.json"));
+    const xml = read("sitemap.xml");
+
+    const missing = live
+        .filter(promo => !ended(promo, Date.now()))
+        .filter(promo => !xml.includes(`promo?id=${promo.slug}`));
+
+    check("усі чинні акції в sitemap є", missing.length === 0,
+        missing.map(p => p.slug).join(", "));
+}
+
 console.log(failures
     ? `\n❌ Провалено: ${failures}\n`
     : "\n✅ Акція з розкладом: з'являється й зникає сама\n");
