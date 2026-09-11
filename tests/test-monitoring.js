@@ -493,6 +493,59 @@ console.log("\n[10] Кеш: правила в Cloudflare не забуті");
         /Не кешувати `\/data\/\*\.json` надовго/.test(doc));
 }
 
+console.log("\n[N0] Заблокований трекер — не поломка сайту");
+{
+    // ЩО ЗАМІРЯНО 10.09.2026. Власник відкрив журнал і побачив там
+    // двадцять записів поспіль — усі про те, що не завантажились
+    // fbevents.js, gtag/js і beacon.min.js. Майже всі з iPhone
+    // Safari та від пошукових роботів.
+    //
+    // Це не зламаний сайт, а блокувальники реклами й краулери, які
+    // аналітику не вантажать зроду. Ціна такого шуму не нульова:
+    // js_error вважається ПОЛОМКОЮ, тобто щоденний звіт від нього
+    // червонів і GitHub слав листа. Ще трохи — і власник привчився б
+    // не читати звіт разом зі справжніми помилками.
+    const { JSDOM } = require("jsdom");
+
+    const dom = new JSDOM("<!doctype html><body></body>",
+        { url: "https://bestbrnd4u.com/checkout", runScripts: "dangerously" });
+
+    const el = dom.window.document.createElement("script");
+    el.textContent = read("assets/js/error-report.js");
+    dom.window.document.body.appendChild(el);
+
+    const { optional } = dom.window.ErrorReport;
+
+    check("модуль віддає правило", typeof optional === "function");
+
+    [
+        "https://connect.facebook.net/en_US/fbevents.js",
+        "https://www.googletagmanager.com/gtag/js?id=G-K5XJTC3QJ9",
+        "https://static.cloudflareinsights.com/beacon.min.js/v31edd",
+        "https://assets.mailerlite.com/js/universal.js"
+    ].forEach(url => {
+        check(`мовчимо про ${url.split("/")[2]}`, optional(url) === true);
+    });
+
+    // ГОЛОВНЕ ОБМЕЖЕННЯ. Без cdn.jsdelivr.net не працює клієнт
+    // Supabase: ні замовлення, ні живі залишки, ні відгуки. Мовчати
+    // про це означало б проґавити зупинку магазину.
+    check("але про клієнт Supabase — кажемо",
+        optional("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm") === false);
+
+    // І про власні файли — тим паче: це вже зламана виливка.
+    check("і про власні файли теж",
+        optional("https://bestbrnd4u.com/assets/css/style.css?v=83663c99") === false
+        && optional("https://bestbrnd4u.com/assets/js/ui.js?v=7d0cc8b9") === false);
+
+    // Перелік звіряється по МЕЖІ хоста, інакше чужа адреса з нашою
+    // назвою всередині проскочила б як своя.
+    check("чужий домен із назвою всередині не проскочить",
+        optional("https://evil.example/www.googletagmanager.com/gtag/js") === false);
+
+    dom.window.close();
+}
+
 console.log("\n[N] Кожен різновид події з коду база справді приймає");
 {
     // ПАСТКА, ЯКА ВЖЕ СПРАЦЮВАЛА ДВІЧІ.
