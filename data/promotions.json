@@ -1,5 +1,28 @@
 [
   {
+    "slug": "tsina-do-piatnytsi",
+    "title": "ДО ПʼЯТНИЦІ",
+    "text": "Нова ціна товара 8600грн.",
+    "badge": "",
+    "image": "/assets/images/banners/12-2026-01_13_26-am.png",
+    "imageMobile": "/assets/images/banners/112-2026-01_15_22-am.png",
+    "promoPageImage": "/assets/images/banners/12-2026-01_13_26-am.png",
+    "promoPageImageMobile": "/assets/images/banners/112-2026-01_15_22-am.png",
+    "buttonText": "Детальніше про акцію",
+    "link": "p/sumka-marc-jacobs-the-j-marc-shoulder-bag-green-glow/",
+    "brand": "",
+    "discountPercent": null,
+    "dealPrice": 8600,
+    "startsAt": "2026-09-12T21:00:00.000Z",
+    "endsAt": "2026-09-18T21:00:00.000Z",
+    "productIds": [
+      57
+    ],
+    "genderButtons": [],
+    "displayType": "deal_of_day",
+    "order": 1
+  },
+  {
     "slug": "bilshe-styliu-dlia-yaskravoho-lita",
     "legacySlugs": [
       "більше-стилю-для-яскравого-літа"
@@ -76,29 +99,6 @@
       }
     ],
     "displayType": "hero_slider",
-    "order": 1
-  },
-  {
-    "slug": "tsina-do-piatnytsi",
-    "title": "Ціна до пʼятниці",
-    "text": "Marc Jacobs The J Marc Shoulder Bag Green Glow — в одному екземплярі. Далі тільки під замовлення.",
-    "badge": "ДО ПʼЯТНИЦІ",
-    "image": "/assets/images/banners/12-2026-01_13_26-am.png",
-    "imageMobile": "/assets/images/banners/112-2026-01_15_22-am.png",
-    "promoPageImage": "/assets/images/banners/12-2026-01_13_26-am.png",
-    "promoPageImageMobile": "/assets/images/banners/112-2026-01_15_22-am.png",
-    "buttonText": "Детальніше про акцію",
-    "link": "p/sumka-marc-jacobs-the-j-marc-shoulder-bag-green-glow/",
-    "brand": "",
-    "discountPercent": null,
-    "dealPrice": 8600,
-    "startsAt": "2026-09-12T21:00:00.000Z",
-    "endsAt": "2026-09-18T21:00:00.000Z",
-    "productIds": [
-      57
-    ],
-    "genderButtons": [],
-    "displayType": "deal_of_day",
     "order": 1
   },
   {
