@@ -196,6 +196,40 @@
         return !source && /^script error/i.test(String(message || ""));
     }
 
+    // Чужі скрипти, без яких магазин працює.
+    //
+    // Аналітика й телеметрія: їх ріже кожен другий блокувальник
+    // реклами, а пошукові роботи не вантажать зовсім. Ні замовлення,
+    // ні кошик, ні залишки від них не залежать.
+    //
+    // ТУТ НЕМАЄ cdn.jsdelivr.net — і це навмисно. Звідти йде клієнт
+    // Supabase: без нього не працюють ні замовлення, ні живі
+    // залишки, ні відгуки. Про його падіння знати треба обов'язково.
+    var OPTIONAL_HOSTS = [
+        "connect.facebook.net",
+        "www.googletagmanager.com",
+        "www.google-analytics.com",
+        "static.cloudflareinsights.com",
+        "assets.mailerlite.com",
+        "www.google.com"
+    ];
+
+    function optional(address) {
+
+        var text = String(address || "");
+
+        for (var i = 0; i < OPTIONAL_HOSTS.length; i++) {
+
+            // Саме «//хост/» — щоб «evil.com/www.googletagmanager.com»
+            // не проскочило як своє.
+            if (text.indexOf("//" + OPTIONAL_HOSTS[i] + "/") !== -1) return true;
+
+        }
+
+        return false;
+
+    }
+
     root.addEventListener("error", function (event) {
 
         // Подія «error» прилітає і від файлів, які не завантажились.
@@ -210,7 +244,32 @@
             // в консолі власника все гаразд, бо в нього кеш. Картинки
             // пропускаємо: одне зникле фото сторінку не ламає.
             if (tag === "script" || tag === "link") {
-                report("js_error", "Не завантажився файл: " + (el.src || el.href || tag), "");
+
+                var address = el.src || el.href || tag;
+
+                // ЧУЖИЙ ТРЕКЕР, ЯКОГО НЕ ПУСТИВ БРАУЗЕР, — НЕ НАША
+                // ПОЛОМКА.
+                //
+                // Заміряно 10.09.2026: усі 20 останніх записів у
+                // журналі були про це — fbevents.js, gtag/js і
+                // beacon.min.js, майже всі з iPhone Safari та від
+                // пошукових роботів. Тобто це блокувальники рекламних
+                // скриптів і краулери, а не зламаний сайт.
+                //
+                // Ціна такого шуму не нульова: js_error вважається
+                // поломкою, тобто щоденний звіт від нього червонів і
+                // GitHub надсилав листа. Власник швидко привчився б
+                // не читати звіт — разом зі справжніми помилками.
+                //
+                // ЧОМУ ПЕРЕЛІК, А НЕ «ВСЕ ЧУЖЕ». Без cdn.jsdelivr.net
+                // не працює клієнт Supabase, тобто ні замовлення, ні
+                // залишки, ні відгуки. Про його падіння знати треба
+                // обов'язково. Тому мовчимо лише про те, від чого
+                // магазин не залежить: аналітику й телеметрію.
+                if (!optional(address)) {
+                    report("js_error", "Не завантажився файл: " + address, "");
+                }
+
             }
 
             return;
@@ -244,6 +303,10 @@
         report: report,
         searchMiss: searchMiss,
         cleanQuery: cleanQuery,
+        // Для тесту: правило «про що мовчимо» перевіряється
+        // поведінкою, а не регуляркою по тексту цього файлу.
+        optional: optional,
+        OPTIONAL_HOSTS: OPTIONAL_HOSTS,
         PER_PAGE: PER_PAGE,
         SEARCH_PER_PAGE: SEARCH_PER_PAGE,
         SEARCH_SETTLE_MS: SEARCH_SETTLE_MS
