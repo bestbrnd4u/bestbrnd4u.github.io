@@ -65,6 +65,12 @@ const api = (() => {
         /function productCodes[\s\S]*?\n}\n/,
         /function looksLikeCode[\s\S]*?\n}\n/,
         /function matchesCode[\s\S]*?\n}\n/,
+        // Розкладка клавіатури: таблиця мусить іти перед LAYOUT_MAP —
+        // той будується одразу при оголошенні.
+        /const KEYBOARD_ROWS = \[[\s\S]*?\n\];\n/,
+        /const LAYOUT_MAP = \(\(\) => \{[\s\S]*?\n\}\)\(\);\n/,
+        /function swapLayout[\s\S]*?\n}\n/,
+        /function matchAll[\s\S]*?\n}\n/,
         /function searchProducts[\s\S]*?\n}\n/
     ].map(pattern => {
 
@@ -77,7 +83,7 @@ const api = (() => {
     });
 
     return new Function(parts.join("\n")
-        + "\nreturn { matchesQuery, searchProducts, searchHaystack, matchesCode };")();
+        + "\nreturn { matchesQuery, searchProducts, searchHaystack, matchesCode, swapLayout };")();
 
 })();
 
@@ -278,6 +284,77 @@ console.log("\n[6] Відбір один на весь сайт");
     // інакше код, знайдений у панелі, у каталозі знову нічого не дав би.
     check("«показати все» несе запит у каталог",
         /catalog\?search=\$\{encodeURIComponent/.test(common));
+}
+
+console.log("\n[7] Не та розкладка клавіатури");
+{
+    // ЦЕ НЕ ПРИПУЩЕННЯ ПРО ПОКУПЦЯ, А ЗАПИС ІЗ ЖУРНАЛУ.
+    //
+    // У site_issues (різновид search_miss) лежать справжні запити з
+    // 08.09.2026: «co» і «сщ» з однієї сторінки за три секунди. «сщ»
+    // — це рівно «co» на кириличній розкладці. Людина почала писати
+    // Coach, побачила абракадабру й перемкнулась, а магазин показав
+    // їй «нічого не знайдено» — на бренд, якого тут вісімнадцять
+    // моделей.
+    const { swapLayout } = api;
+
+    check("«сщ» це «co»", swapLayout("сщ") === "co", swapLayout("сщ"));
+
+    check("«сщфср» це «coach»", swapLayout("сщфср") === "coach", swapLayout("сщфср"));
+
+    // І в інший бік: український запит, набраний латиницею.
+    check("«rehnrf» це «куртка»", swapLayout("rehnrf") === "куртка", swapLayout("rehnrf"));
+
+    // Міняти нічого — порожньо. Інакше пошук робив би другий прохід
+    // на кожен цифровий артикул.
+    check("цифри й пробіли не чіпаємо", swapLayout("123 45") === "");
+
+    // Російська розкладка теж: ы/і та э/є ділять клавішу з
+    // українськими літерами, і в половини людей стоїть саме вона.
+    check("російська розкладка теж розуміється",
+        swapLayout("ы") === "s" && swapLayout("э") === "'", swapLayout("ы"));
+
+    // ПОВЕДІНКА ПОШУКУ, а не лише таблиця.
+    const catalog = [
+        { title: "Сумка Coach Tabby 26", brand: "Coach" },
+        { title: "Кросівки Lacoste L003", brand: "Lacoste" }
+    ];
+
+    const found = api.searchProducts(catalog, "сщфср");
+
+    check("пошук знаходить Coach, набраний кирилицею",
+        found.length === 1 && found[0].brand === "Coach",
+        found.map(x => x.title).join(", "));
+
+    const direct = api.searchProducts(catalog, "сумка");
+
+    check("чесний український запит працює як працював",
+        direct.length === 1 && direct[0].brand === "Coach",
+        direct.map(x => x.title).join(", "));
+
+    // ГОЛОВНЕ ОБМЕЖЕННЯ: перекладена розкладка — це ЗАПАСНИЙ шлях, а
+    // не другий одночасний пошук.
+    //
+    // «на» — звичайне українське слово («сумка НА плече»), а тими ж
+    // клавішами це «yf». Якби ми щоразу шукали обидва варіанти,
+    // чесний запит тягнув би за собою чуже.
+    //
+    // Перший варіант цієї перевірки цього не ловив: у наборі було
+    // всього два товари, і зіткнутись їм не було на чому.
+    const bothLayouts = [
+        { title: "Сумка на плече JW PEI", brand: "JW PEI" },
+        { title: "YF Sport Edition", brand: "YF" }
+    ];
+
+    const onlyDirect = api.searchProducts(bothLayouts, "на");
+
+    check("знайдене чесним запитом не змішується з перекладеним",
+        onlyDirect.length === 1 && onlyDirect[0].brand === "JW PEI",
+        onlyDirect.map(x => x.title).join(", "));
+
+    // І якщо нічого немає в обох розкладках — нічого й не вигадуємо.
+    check("неіснуючий товар лишається ненайденим",
+        api.searchProducts(catalog, "фотоапарат").length === 0);
 }
 
 console.log(failures ? `\n✗ провалено перевірок: ${failures}\n` : "\n✓ усі перевірки пройдено\n");
