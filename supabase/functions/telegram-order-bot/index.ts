@@ -1812,7 +1812,7 @@ function letterShell(title, bodyHtml, siteUrl) {
         '<div style="margin:0;padding:24px;background:#f3f4f6;',
         'font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#111827">',
         '<div style="max-width:560px;margin:0 auto;background:#fff;border-radius:12px;padding:28px">',
-        `<div style="font-size:20px;font-weight:700;letter-spacing:-.01em;margin-bottom:18px">${escapeHtml(title)}</div>`,
+        `<div style="font-size:20px;font-weight:700;letter-spacing:-.01em;margin-bottom:18px;text-align:center">${escapeHtml(title)}</div>`,
         bodyHtml,
         '<div style="margin-top:26px;padding-top:18px;border-top:1px solid #e5e7eb;',
         'font-size:13px;line-height:1.6;color:#6b7280">',
@@ -1834,21 +1834,49 @@ function letterShell(title, bodyHtml, siteUrl) {
 // воно збирається. Виділення підсумку — окремим прапорцем, а не
 // тегом у підписі: тег там перетворився б на видимий «<b>Разом</b>»
 // (саме так і вийшло з першого разу).
-function row(label, value, strong) {
+// ЧОМУ ТЕКСТОВІ ЗНАЧЕННЯ ВИРІВНЮЮТЬСЯ ІНАКШЕ, НІЖ ЧИСЛА
+//
+// Праворуч — правильно для сум: у стовпчику вони шикуються розряд під
+// розрядом, і «Разом» читається з одного погляду.
+//
+// Для тексту це ламається. Адреса відділення Нової пошти — це 80-120
+// символів («Поштомат "Нова Пошта" №2261: вул. Михайла Драгоманова,
+// 40є, під'їзд №1 (ТІЛЬКИ ДЛЯ МЕШКАНЦІВ)(77)»), вона переноситься на
+// два рядки, і при правому вирівнюванні в неї рваний лівий край
+// просто посеред листа. Заміряно на справжньому листі про замовлення
+// 8689484479 від 10.09.2026.
+//
+// Тому в блока «Доставка» власне вирівнювання: підпис вузьким
+// стовпчиком ліворуч, значення — теж ліворуч, і перенос лягає рівно
+// під початок рядка. valign="top" тримає підпис на першому рядку, а
+// не посередині двох.
+function row(label, value, strong, textual) {
 
     const labelStyle = strong
         ? "padding:8px 0 0;font-size:14px;font-weight:700"
-        : "padding:4px 0;color:#6b7280;font-size:14px";
+        : "padding:4px 0;color:#6b7280;font-size:14px"
+            + (textual ? ";width:96px;white-space:nowrap" : "");
 
     const valueStyle = strong
         ? "padding:8px 0 0;text-align:right;font-size:14px;font-weight:700"
-        : "padding:4px 0;text-align:right;font-size:14px";
+        : "padding:4px 0;font-size:14px"
+            + (textual
+                ? ";text-align:left;padding-left:12px;line-height:1.45"
+                : ";text-align:right");
+
+    // Ширина ще й атрибутом: Outlook читає саме його надійніше за style.
+    const labelWidth = textual && !strong ? ` width="96"` : "";
 
     return `<tr>`
-        + `<td style="${labelStyle}">${escapeHtml(label)}</td>`
-        + `<td style="${valueStyle}">${value}</td>`
+        + `<td valign="top"${labelWidth} style="${labelStyle}">${escapeHtml(label)}</td>`
+        + `<td valign="top" style="${valueStyle}">${value}</td>`
         + `</tr>`;
 
+}
+
+// Рядок блока «Доставка»: значення текстові, тож ліворуч (чому — вище).
+function deliveryRow(label, value) {
+    return row(label, value, false, true);
 }
 
 // Склад замовлення з фотографіями.
@@ -1976,10 +2004,10 @@ function orderLetter(order, siteUrl) {
     const delivery = [
         // Не «Доставка»: цей блок і так називається «Доставка», а
         // рядок «Доставка / Доставка: Нова пошта» читається як помилка.
-        order?.delivery_method ? row("Спосіб", escapeHtml(order.delivery_method)) : "",
-        order?.delivery_city ? row("Місто", escapeHtml(order.delivery_city)) : "",
-        order?.delivery_detail ? row("Відділення", escapeHtml(order.delivery_detail)) : "",
-        order?.payment_method ? row("Оплата", escapeHtml(order.payment_method)) : ""
+        order?.delivery_method ? deliveryRow("Спосіб", escapeHtml(order.delivery_method)) : "",
+        order?.delivery_city ? deliveryRow("Місто", escapeHtml(order.delivery_city)) : "",
+        order?.delivery_detail ? deliveryRow("Відділення", escapeHtml(order.delivery_detail)) : "",
+        order?.payment_method ? deliveryRow("Оплата", escapeHtml(order.payment_method)) : ""
     ].join("");
 
     const body = [

@@ -79,6 +79,69 @@ console.log("\n[1] Лист про замовлення");
         !/<img src=x/.test(evil.html) && /&lt;img/.test(evil.html));
 }
 
+console.log("\n[1b] Довга адреса відділення не ламає верстку");
+{
+    // ЩО ЗАМІРЯНО. У справжньому листі про замовлення 8689484479
+    // (10.09.2026) рядок «Відділення» виглядав так:
+    //
+    //   Поштомат "Нова Пошта" №2261: вул. Михайла Драгоманова, 40є,
+    //   під'їзд №1 (ТІЛЬКИ ДЛЯ МЕШКАНЦІВ)(77)
+    //
+    // Це 95 символів. При правому вирівнюванні вони переносяться на
+    // два рядки з рваним лівим краєм посеред листа.
+    //
+    // Праве вирівнювання правильне для СУМ: у стовпчику вони
+    // шикуються розряд під розрядом. Для тексту воно шкодить.
+    const long = mail.orderLetter({
+        ...ORDER,
+        delivery_detail: "Поштомат \"Нова Пошта\" №2261: вул. Михайла Драгоманова, 40є, під'їзд №1 (ТІЛЬКИ ДЛЯ МЕШКАНЦІВ)(77)",
+        payment_method: "Готівкою при отриманні на пошті"
+    }, "https://bestbrnd4u.com").html;
+
+    const deliveryBlock = long.slice(long.indexOf(">Доставка<"));
+
+    check("адреса потрапила в лист", /Драгоманова/.test(deliveryBlock));
+
+    // Дивимось на КОМІРКУ З АДРЕСОЮ, а не на «десь у блоці є
+    // text-align:left»: перший варіант цієї перевірки був саме таким
+    // і зеленів би, навіть якби ліворуч вирівнявся чужий рядок.
+    check("комірка з адресою вирівняна ліворуч",
+        /style="[^"]*text-align:left[^"]*">Поштомат/.test(deliveryBlock),
+        (deliveryBlock.match(/<td[^>]*>Поштомат/) || ["не знайшов комірку"])[0]);
+
+    check("підпис не розтягується й не переноситься",
+        /width="96"/.test(deliveryBlock) && /white-space:nowrap/.test(deliveryBlock));
+
+    check("підпис тримається першого рядка",
+        /<td valign="top"/.test(deliveryBlock));
+
+    // НЕГАТИВНИЙ КОНТРОЛЬ: суми мусили лишитись праворуч, інакше
+    // «Разом» перестане читатись із одного погляду.
+    const money = long.slice(0, long.indexOf(">Доставка<"));
+
+    check("а суми лишились праворуч",
+        /text-align:right[^<]*<\/td>|text-align:right/.test(money)
+        && !/text-align:left/.test(money.slice(money.indexOf("Сума товарів"))),
+        money.slice(money.indexOf("Сума товарів"), money.indexOf("Сума товарів") + 160));
+}
+
+console.log("\n[1c] Заголовок листа по центру");
+{
+    const letter = mail.orderLetter(ORDER, "https://bestbrnd4u.com").html;
+
+    const head = letter.slice(0, letter.indexOf("Замовлення прийнято") + 40);
+
+    check("заголовок вирівняний по центру", /text-align:center[^>]*>Замовлення прийнято/.test(head),
+        head.slice(-180));
+
+    // Той самий кістяк у листа про статус — центрування мусить бути
+    // спільним, а не дописаним в одному місці.
+    const status = mail.statusLetter({ ...ORDER, status: "shipped" }, "https://bestbrnd4u.com");
+
+    check("і в листі про статус так само",
+        !status || /text-align:center/.test(status.html), "лист про статус без центрування");
+}
+
 console.log("\n[1a] Фото товарів у листі");
 {
     const withPhoto = mail.orderLetter({
