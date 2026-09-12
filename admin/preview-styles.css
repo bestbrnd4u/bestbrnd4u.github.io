@@ -230,11 +230,37 @@
     display:inline-block;
     padding:6px 14px;
     border-radius:50px;
-    background:#ef4444;
-    color:#fff;
     font-size:13px;
     font-weight:700;
     font-variant-numeric:tabular-nums;
+}
+
+/* =====================================
+   КОЛЬОРИ В ПРЕВ'Ю — ЧЕРЕЗ ТІ САМІ ЗМІННІ, ЩО НА САЙТІ
+
+   ЩО БУЛО НЕ ТАК. Прев'ю мало власну розмітку (cms-preview-*), а
+   правила оформлення в style.css написані під класи сайту
+   (.promo-countdown, .deal-eyebrow, .badge, .btn). Тобто змінна
+   --blk-timer-text чесно доїжджала до прев'ю — я заміряв, 75 мс від
+   натискання, — і там її ніхто не читав: колір таймера в прев'ю був
+   зашитий як #fff.
+
+   Ззовні це виглядало саме так, як власник і сказав: колір міняєш,
+   а в прев'ю нічого не фарбується.
+
+   ДВІ НАЗВИ КЛАСУ В СЕЛЕКТОРІ, А НЕ ОДНА. Прев'ю живе в одному
+   iframe зі style.css сайту, а там .has-style span фарбує будь-який
+   span кольором ТЕКСТУ. Один клас (0,1,0) цьому програє (0,1,1);
+   два — виграють.
+
+   ЗАПАСНІ ЗНАЧЕННЯ — ТЕ, ЩО БУЛО ТУТ ДОСІ. Порожнє поле в адмінці
+   лишає прев'ю таким, яким воно й було.
+   ===================================== */
+
+.cms-preview-promo-banner .cms-preview-promo-timer,
+.cms-preview-home .cms-preview-promo-timer{
+    background:var(--blk-timer-bg, #ef4444);
+    color:var(--blk-timer-text, #fff);
 }
 
 /* Сам банер розкладаємо в рядок: колонка з написом всередині вже
@@ -255,20 +281,31 @@
     border-radius:16px;
     background:#374151 center/cover no-repeat;
     color:#fff;
+
+    /* Розмір заголовка задається МНОЖНИКОМ (--blk-title-scale), а
+       множити треба на щось. Сайт множить на власний розмір
+       заголовка блока, тож і прев'ю мусить назвати свій — інакше
+       «Розмір заголовка» рахувався б від 1em і банер стрибав би з
+       24px на 16px просто від того, що в блоці задали якийсь
+       колір. */
+    --blk-title-base:24px;
 }
 
 .cms-preview-promo-badge{
     padding:4px 10px;
     border-radius:20px;
-    background:#dc2626;
     font-size:12px;
     font-weight:700;
 }
 
+/* Розмір лишається тут, хоч --blk-title-base і дублює його числом.
+   Правило .has-style h1,h2 зі style.css діє ЛИШЕ коли в блоці щось
+   задано; поки не задано нічого, заголовок без цього рядка падав на
+   загальний h2 сайту — 42px замість 24px. Заміряно. */
 .cms-preview-promo-title{
     margin:0;
-    font-size:24px;
     line-height:1.2;
+    font-size:24px;
 }
 
 .cms-preview-promo-text{
@@ -280,6 +317,22 @@
 .cms-preview-promo-btn{
     margin-top:6px;
     pointer-events:none;
+}
+
+.cms-preview-promo-banner .cms-preview-promo-badge{
+    background:var(--blk-badge-bg, #dc2626);
+    color:var(--blk-badge-text, #fff);
+}
+
+.cms-preview-promo-banner .cms-preview-promo-title,
+.cms-preview-promo-banner .cms-preview-promo-text{
+    color:var(--blk-text, #fff);
+}
+
+.cms-preview-promo-banner .cms-preview-promo-btn{
+    background:var(--blk-btn-bg, var(--secondary, #2563eb));
+    color:var(--blk-btn-text, #fff);
+    border-color:var(--blk-btn-bg, currentColor);
 }
 
 .cms-preview-teaser{
@@ -552,6 +605,10 @@
     border-radius:12px;
     background:#f9fafb;
     border:1px solid #e5e7eb;
+
+    /* Від чого рахується «Розмір заголовка» — див. пояснення біля
+       .cms-preview-promo-banner вище. */
+    --blk-title-base:18px;
 }
 
 .cms-preview-home-head{
@@ -568,18 +625,33 @@
     font-weight:700;
     letter-spacing:.12em;
     text-transform:uppercase;
-    color:var(--blk-badge-bg, #ef4444);
 }
 
+/* Те саме, що в заголовка банера: без цього рядка блок без жодного
+   налаштування падав на загальний h2 сайту. */
 .cms-preview-home-title{
     margin:4px 0 0;
     font-size:18px;
-    color:var(--blk-text, #111827);
 }
 
 .cms-preview-home-text{
     margin:4px 0 0;
     font-size:13px;
+}
+
+/* Кольори блока на головній — той самий ланцюжок, що в .deal-eyebrow,
+   .deal-head-text і .deal-more на сайті. Два класи в селекторі
+   потрібні з тієї ж причини, що й у таймера вище. */
+.cms-preview-home .cms-preview-home-eyebrow{
+    background:transparent;
+    color:var(--blk-accent, var(--blk-badge-bg, #ef4444));
+}
+
+.cms-preview-home .cms-preview-home-title{
+    color:var(--blk-text, #111827);
+}
+
+.cms-preview-home .cms-preview-home-text{
     color:var(--blk-text, #6b7280);
 }
 
@@ -612,7 +684,13 @@
     font-size:12px;
     font-weight:600;
     text-decoration:underline;
-    color:var(--blk-text, #111827);
+}
+
+/* Напис-посилання під блоком читає КОЛІР КНОПКИ, а не тексту — так
+   само, як .deal-more на сайті. Досі прев'ю фарбувало його кольором
+   тексту, тобто показувало не те, що буде. */
+.cms-preview-home .cms-preview-home-more{
+    color:var(--blk-btn-bg, #111827);
 }
 
 /* Банер і товари в блоці — так само, як на сайті. */

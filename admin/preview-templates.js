@@ -830,12 +830,31 @@
 
             var hasOverlay = hasBadge || hasTitle || hasText || hasButton || hasTimer;
 
+            // КОЛЬОРИ БАНЕРА — СВІЙ НАБІР, НЕ ЗМІШАНИЙ З ГОЛОВНОЮ.
+            //
+            // Так само робить сайт: renderPromoHero() у
+            // assets/js/promo.js бере promo.style і НЕ домішує до
+            // нього homeStyle, бо на банері текст лежить на фото, а на
+            // головній — на світлій сторінці.
+            //
+            // Досі прев'ю банера не читало оформлення взагалі: змінні
+            // проставлялись лише на блок головної. Тому весь набір
+            // «Оформлення тексту і кнопки» був у прев'ю невидимий —
+            // колір міняли, а картинка не мінялась.
+            var bannerVars = window.TextStyles
+                ? window.TextStyles.styleVars(e.get("style"))
+                : {};
+
+            var hasBannerVars = Object.keys(bannerVars).length > 0;
+
             // Банер сторінки акції — той самий вигляд, що на promo.html.
             // Банер малюємо картинкою під текстом, а не фоном: фон не
             // вміє дочекатись щойно завантаженого файлу, а AssetImage вміє.
             var banner = h("div", {
                 className: "cms-preview-promo-banner"
-                    + (hasOverlay ? "" : " cms-preview-promo-bare"),
+                    + (hasOverlay ? "" : " cms-preview-promo-bare")
+                    + (hasBannerVars ? " has-style" : ""),
+                style: hasBannerVars ? bannerVars : undefined,
                 "data-layout": layout
             },
                 h("div", { className: "cms-preview-promo-bg" },
@@ -928,7 +947,12 @@
                 },
                     h("div", null,
                         homeBadge ? h("span", { className: "cms-preview-home-eyebrow" }, homeBadge) : null,
-                        homeTitle ? h("h3", { className: "cms-preview-home-title" }, esc(homeTitle)) : null,
+                        // h2, а не h3: на сайті заголовок блока — саме
+                        // h2, і правила «розмір заголовка», «великими
+                        // літерами», «розрядка» написані для h1/h2.
+                        // На h3 вони не діяли, тож у прев'ю ці три
+                        // поля мовчки нічого не робили.
+                        homeTitle ? h("h2", { className: "cms-preview-home-title" }, esc(homeTitle)) : null,
                         homeText ? h("p", { className: "cms-preview-home-text" }, esc(homeText)) : null),
                     (e.get("hideCountdown") !== true && (e.get("startsAt") || e.get("endsAt")))
                         ? h("span", { className: "cms-preview-promo-timer" }, "⏳ Лишилось 00:00:00")
@@ -1133,6 +1157,33 @@
     // Inter — і прев'ю перестало б показувати те саме, що покупець.
     CMS.registerPreviewStyle(
         "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
+
+    // РЕШТА ШРИФТІВ З ПОЛЯ «ШРИФТ» — ТЕЖ ТУТ, І ВІДРАЗУ ВСІ.
+    //
+    // На сайті їх підвантажує TextStyles.ensureFonts() — рівно ті, що
+    // справді обрані, бо кожен зайвий шрифт це сотні кілобайтів для
+    // покупця. В адмінці так не вийде: ensureFonts() дописує <link> у
+    // голову СТОРІНКИ, а прев'ю малюється в окремому iframe, і туди
+    // цей <link> не діє. Через це поле «Шрифт» мінялось, а напис у
+    // прев'ю лишався тим самим — та сама скарга, що й про кольори.
+    //
+    // Тому реєструємо весь список наперед. Ціна — кілька сотень
+    // кілобайтів, які вантажаться ЛИШЕ в адмінці й лише раз.
+    if (window.TextStyles && window.TextStyles.FONTS) {
+
+        window.TextStyles.FONTS.forEach(function (font) {
+
+            if (font.key === "inter") return;
+
+            CMS.registerPreviewStyle(
+                "https://fonts.googleapis.com/css2?family="
+                + font.family.replace(/ /g, "+")
+                + ":wght@" + font.weights
+                + "&display=swap");
+
+        });
+
+    }
 
     CMS.registerPreviewStyle("../assets/css/style.css" + noCache);
     CMS.registerPreviewStyle("preview-styles.css" + noCache);

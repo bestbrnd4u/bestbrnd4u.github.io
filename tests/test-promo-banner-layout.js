@@ -370,7 +370,11 @@ console.log("\n[2i] Обраний колір ніщо не перебиває")
         ["таймер, що йде", /\[data-state="live"\]\{\s*background:var\(--blk-timer-bg/],
         ["опис блока", /\.deal-head-text p\{[\s\S]*?color:var\(--blk-text/],
         ["посилання під блоком", /\.deal-more\{[\s\S]*?color:var\(--blk-btn-bg/],
-        ["бейдж блока", /\.deal-eyebrow\{[\s\S]*?color:var\(--blk-badge-bg/]
+        // Підпис зверху описують ДВА поля адмінки: «Колір
+        // бейджа-підпису зверху» (accentColor) і «Колір бейджа»
+        // (badgeBg). Порядок тут важить: поле з назвою «підпис
+        // зверху» має діяти першим, інакше воно не діє взагалі.
+        ["бейдж блока", /\.deal-eyebrow\{[\s\S]*?color:var\(--blk-accent, var\(--blk-badge-bg/]
     ].forEach(([label, re]) => check(label + " бере колір з адмінки", re.test(css)));
 }
 

@@ -11263,50 +11263,114 @@ body.mobile-filters-open .scroll-top{
 }
 
 /* Дрібний підпис над заголовком має власний колір: він і задуманий
-   як акцент, і зливати його з основним текстом було б втратою. */
+   як акцент, і зливати його з основним текстом було б втратою.
+
+   .hero-label і .promo-label власного кольору не мають — тут
+   успадкований і є їхнім звичайним виглядом, тож inherit у запасному
+   значенні правильний. */
 .has-style .hero-label,
-.has-style .promo-label,
-.has-style .collection-eyebrow,
-.has-style .promo-card-label{
+.has-style .promo-label{
     color:var(--blk-accent, inherit);
     letter-spacing:var(--blk-tracking, inherit);
 }
 
+/* А в підпису добірки колір свій (--secondary нижче по файлу), і
+   inherit його стирав — знову ж таки від першого-ліпшого заданого
+   кольору, хай навіть зовсім іншого поля. */
+.has-style .collection-eyebrow{
+    color:var(--blk-accent, var(--secondary));
+    letter-spacing:var(--blk-tracking, inherit);
+}
+
+/* ЗАПАСНЕ ЗНАЧЕННЯ — ВЛАСНИЙ КОЛІР КНОПКИ, А НЕ inherit.
+
+   inherit означає «узяти в батька», тобто прозору кнопку. Підступним
+   це було через те, КОЛИ спрацьовувало: поки в блоці не задано
+   ЖОДНОГО кольору, класу .has-style немає й правило не діє взагалі,
+   кнопка синя. Задали перший-ліпший колір — хай навіть цифр
+   таймера — і кнопка знебарвилась.
+
+   Значення ті самі, що в .btn на початку файлу.
+
+   Список скоротився на .hero-actions a, .promo-actions a і
+   .collection-cta: жодного з цих класів немає ні в CSS, ні в
+   розмітці — перевірено пошуком по всьому репозиторію. Запасне
+   значення для неіснуючого елемента — це пастка на майбутнє, бо
+   вгадати його власний колір наперед неможливо. */
 .has-style .btn,
-.has-style .btn-primary,
-.has-style .hero-actions a,
-.has-style .promo-actions a,
-.has-style .collection-cta{
-    background:var(--blk-btn-bg, inherit);
-    color:var(--blk-btn-text, inherit);
-    border-color:var(--blk-btn-bg, inherit);
+.has-style .btn-primary{
+    background:var(--blk-btn-bg, var(--secondary));
+    color:var(--blk-btn-text, #fff);
+    border-color:var(--blk-btn-bg, currentColor);
 }
 
 /* БЕЙДЖ І ТАЙМЕР — свої кольори, а не «колір кнопки».
 
    Обидва за замовчуванням червоні (--danger): вони мають кричати. Але
    акція буває й спокійною, і на пастельному банері червона пляма —
-   єдине, що видно. Порожнє поле в адмінці лишає червоний. */
-.has-style .badge,
+   єдине, що видно. Порожнє поле в адмінці лишає червоний.
+
+   ТУТ НЕМАЄ ПРОСТО .badge — І ЦЕ НАВМИСНО.
+
+   Було. Список починався з суцільного `.has-style .badge`, і воно
+   ловило не лише бейдж самого блока, а й бейджі КАРТОК ТОВАРІВ
+   усередині нього — «Ціна дня» і «Добірка» тримають картки в собі.
+
+   Ціна помилки: досить було задати один колір (у акції це був колір
+   цифр таймера), і плашка «-10%» у картці ставала прозорою з темним
+   текстом, тобто зникала. Заміряно на головній: усередині блока
+   rgba(0, 0, 0, 0) на білій картці, поруч — rgb(239, 68, 68).
+
+   Причина — у тому, що запасне значення var() це НЕ «як було». Коли
+   змінна не задана, background:var(--blk-badge-bg, inherit) дає
+   background:inherit, а не «правило не діє».
+
+   Тому перелічуємо ВЛАСНІ бейджі блоків поіменно. Жоден із них не
+   зветься просто .badge — перевірено по розмітці всіх п'яти блоків,
+   що отримують .has-style. */
 .has-style .promo-card-badge,
 .has-style .promo-hero-badge,
-.has-style .brand-campaign-eyebrow,
-.has-style .deal-eyebrow{
-    background:var(--blk-badge-bg, inherit);
-    color:var(--blk-badge-text, inherit);
+.has-style .promo-hero-slide-badge{
+    background:var(--blk-badge-bg, var(--danger));
+    color:var(--blk-badge-text, #fff);
 }
 
 /* Дрібний підпис над заголовком заливки не має — у нього фарбується
    сам текст. Інакше «ЦІНА ДНЯ» на головній перетворилась би на
-   кольорову плашку там, де її ніколи не було. */
-.has-style .deal-eyebrow,
+   кольорову плашку там, де її ніколи не було.
+
+   ЛАНЦЮЖОК З ТРЬОХ ЗНАЧЕНЬ. Два поля в адмінці описують цей самий
+   підпис: «Колір бейджа-підпису зверху» (accentColor) і «Колір
+   бейджа» (badgeBg). Досі підпис читав ЛИШЕ друге — тобто поле з
+   назвою «підпис зверху» мовчки не діяло саме на підписі зверху.
+   Тепер перше має перевагу, друге лишається запасним: усе, що вже
+   налаштоване через «Колір бейджа», виглядає як виглядало.
+
+   Третє, останнє — власний колір підпису. Саме воно й має стояти
+   там, де раніше був inherit: підпис не мусить сіріти від того, що
+   в блоці задали колір таймера. */
+.has-style .deal-eyebrow{
+    background:transparent;
+    color:var(--blk-accent, var(--blk-badge-bg, var(--danger)));
+}
+
+/* У кампанії підпис лежить на темному фото, тож і останнє значення
+   ланцюжка інше — білий, а не червоний. */
 .has-style .brand-campaign-eyebrow{
     background:transparent;
-    color:var(--blk-badge-bg, inherit);
+    color:var(--blk-accent, var(--blk-badge-bg, #fff));
 }
 
 .has-style .promo-countdown{
-    background:var(--blk-timer-bg, inherit);
+    background:var(--blk-timer-bg, rgba(255,255,255,.18));
+    color:var(--blk-timer-text, inherit);
+}
+
+/* Самі цифри лежать у вкладених <span>, а правило .has-style span
+   вище фарбує будь-який span кольором ТЕКСТУ й перемагає за вагою на
+   цих вкладених вузлах. Через це «Колір цифр на таймері» переставав
+   діяти рівно тоді, коли поруч задавали «Колір тексту». */
+.has-style .promo-countdown span{
     color:var(--blk-timer-text, inherit);
 }
 
@@ -11321,8 +11385,29 @@ body.mobile-filters-open .scroll-top{
    каталог» поруч із основною кнопкою перетворювалась би на її копію. */
 .has-style .btn-outline{
     background:transparent;
-    color:var(--blk-btn-bg, inherit);
-    border-color:var(--blk-btn-bg, inherit);
+    color:var(--blk-btn-bg, var(--primary));
+    border-color:var(--blk-btn-bg, var(--gray300));
+}
+
+/* КНОПКА «КУПИТИ» В КАРТЦІ ТОВАРУ — НЕ КНОПКА БЛОКА.
+
+   Те саме, що з бейджами вище, тільки помітніше. «Ціна дня» і
+   «Добірка» тримають картки товарів усередині оформленого блока, а
+   правило .has-style .btn не розрізняє, де чия кнопка.
+
+   Заміряно на головній із одним заданим кольором (цифри таймера):
+   у блоці кнопка «Купити» мала background rgba(0, 0, 0, 0), поруч —
+   rgb(37, 99, 235). Тобто ставала прозорою від налаштування, яке до
+   неї не має стосунку.
+
+   Тут не «скидання», а повернення власних значень картки — тих
+   самих, що в .product-card .buy-btn вище по файлу. Змінна одна й та
+   сама (--secondary), тож два місця не розійдуться; пару тримає
+   tests/test-block-styles-scope.js. */
+.has-style .product-card .btn{
+    background:var(--secondary);
+    color:#fff;
+    border-color:currentColor;
 }
 
 /* Наведення на фото акції: воно трохи наближується й тим показує, що
