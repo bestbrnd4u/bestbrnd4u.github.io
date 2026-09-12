@@ -1,8 +1,8 @@
 [
   {
     "slug": "tsina-do-piatnytsi",
-    "title": "До пʼятниці ",
-    "text": "Marc Jacobs The J Marc Shoulder Bag Green Glow — в одному екземплярі. Далі тільки під замовлення.",
+    "title": "",
+    "text": "",
     "badge": "Ціна тижня",
     "image": "/assets/images/banners/12-2026-01_13_26-am.png",
     "imageMobile": "/assets/images/banners/112-2026-01_15_22-am.png",
@@ -19,6 +19,10 @@
       57
     ],
     "genderButtons": [],
+    "homeTitle": "До пʼятниці",
+    "homeText": "Marc Jacobs The J Marc Shoulder Bag Green Glow — в одному екземплярі. Далі тільки під замовлення.",
+    "badgePlaces": "home",
+    "dealAlign": "center",
     "bannerLayout": "right-top",
     "displayType": "deal_of_day",
     "order": 1
