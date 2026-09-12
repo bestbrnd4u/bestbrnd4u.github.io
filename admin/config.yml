@@ -1673,10 +1673,27 @@ collections:
           акціях із ціною дня, збірка візьме першу й скаже про це в
           журналі.
 
+      # format ОБОВ'ЯЗКОВИЙ, і ось чому.
+      #
+      # Decap 3.15 вирішує, у якому вигляді ЗБЕРІГАТИ дату, так:
+      # якщо format не заданий, а date_format і time_format задані —
+      # він склеює їх через «T» і пише саме цим. Тобто
+      # «DD.MM.YYYY» + «HH:mm» дає у файлі «12.09.2026T17:10».
+      #
+      # Це не дата. new Date() на ній повертає Invalid Date, а
+      # promoDate() у scripts/promo-deals.js такі значення відкидає
+      # мовчки — «крива дата не має валити збірку». Виходило, що
+      # власник ставить початок акції, збірка його викидає, і акція
+      # стартує негайно. Так і сталося з «Ціна 8600грн»: у файлі
+      # лежало 12.09.2026T17:10, у products.json — sale.from: "".
+      #
+      # З format дата зберігається як 2026-09-12T17:10:00+03:00.
+      # date_format і time_format лишаються лише для вигляду.
       - label: "Початок акції"
         name: "startsAt"
         widget: "datetime"
         required: false
+        format: "YYYY-MM-DDTHH:mm:ssZ"
         date_format: "DD.MM.YYYY"
         time_format: "HH:mm"
         picker_utc: false
@@ -1686,10 +1703,12 @@ collections:
           малюються: знижки ж іще немає. Порожньо — акція діє одразу,
           як і всі попередні.
 
+      # format — з тієї самої причини, що й у «Початок акції» вище.
       - label: "Кінець акції"
         name: "endsAt"
         widget: "datetime"
         required: false
+        format: "YYYY-MM-DDTHH:mm:ssZ"
         date_format: "DD.MM.YYYY"
         time_format: "HH:mm"
         picker_utc: false
