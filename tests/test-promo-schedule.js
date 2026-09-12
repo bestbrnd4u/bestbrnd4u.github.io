@@ -55,11 +55,6 @@ const api = (() => {
     const parts = [
         /const MINUTE_MS[^\n]*\n/,
         /const DAY_MS[^\n]*\n/,
-        // promoShowsSeconds — спільне правило «чи видно секунди». Його
-        // питають і promoCountdown, і promoTickMs: раніше кожна мала
-        // власний поріг, і між годиною й добою вони розходились —
-        // секунди були на екрані, а оновлювались раз на хвилину.
-        /function promoShowsSeconds[\s\S]*?\n}\n/,
         /function promoMoment[\s\S]*?\n}\n/,
         /function promoState[\s\S]*?\n}\n/,
         /function promoTiming[\s\S]*?\n}\n/,
@@ -175,8 +170,8 @@ console.log("\n[3] Знижку показуємо лише коли вона с
 
 console.log("\n[4] Відлік читається людиною");
 {
-    check("дні окремо від годин",
-        api.promoCountdown(NOW + 6 * DAY + 4 * HOUR + 12 * 60000, NOW) === "6 дн. 04:12",
+    check("дні окремо від годин, але із секундами",
+        api.promoCountdown(NOW + 6 * DAY + 4 * HOUR + 12 * 60000, NOW) === "6 дн. 04:12:00",
         api.promoCountdown(NOW + 6 * DAY + 4 * HOUR + 12 * 60000, NOW));
 
     check("під добу — годинник із секундами",
@@ -197,17 +192,19 @@ console.log("\n[4] Відлік читається людиною");
     // хвилину. Власник побачив завмерлий годинник і саме так це й
     // описав: «таймер не идет, секунды не тикают».
     //
-    // Правильна межа — доба: рівно тоді promoCountdown() перестає
-    // показувати секунди й переходить на «6 дн. 04:12».
-    check("поки видно секунди — раз на секунду",
-        api.promoTickMs(NOW + 2 * HOUR, NOW) === 1000,
-        `${api.promoCountdown(NOW + 2 * HOUR, NOW)} / ${api.promoTickMs(NOW + 2 * HOUR, NOW)} мс`);
-
-    check("коли лишились дні — раз на хвилину",
-        api.promoTickMs(NOW + 3 * 24 * HOUR, NOW) === 60000,
-        `${api.promoCountdown(NOW + 3 * 24 * HOUR, NOW)} / ${api.promoTickMs(NOW + 3 * 24 * HOUR, NOW)} мс`);
-
-    check("близько — щосекунди", api.promoTickMs(NOW + 60000, NOW) === 1000);
+    // Тоді межу поставили на добу. Не допомогло: акція йшла шість діб,
+    // і власник побачив той самий нерухомий рядок — тепер уже «6 дн.
+    // 05:26». Написав удруге, окремо про головну й окремо про
+    // сторінку акції.
+    //
+    // Межі більше немає. Секунди в рядку завжди, крок завжди
+    // секунда, а батарею бережемо зупинкою годинника на прихованій
+    // вкладці — це перевіряє [4b] у test-promo-banner-layout.js.
+    [["дві години", 2 * HOUR], ["три доби", 3 * 24 * HOUR],
+     ["хвилина", 60000], ["тиждень", 7 * 24 * HOUR]].forEach(([name, shift]) =>
+        check(`${name} до кінця — крок одна секунда`,
+            api.promoTickMs(NOW + shift, NOW) === 1000,
+            `${api.promoCountdown(NOW + shift, NOW)} / ${api.promoTickMs(NOW + shift, NOW)} мс`));
 }
 
 console.log("\n[5] Дати задаються в адмінці й доходять до сайту");

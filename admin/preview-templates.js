@@ -888,10 +888,10 @@
             var homeTitle = String(e.get("homeTitle") || e.get("title") || "").trim();
             var homeText = String(e.get("homeText") || e.get("text") || "").trim();
 
-            // Кольори: спільний набір плюс власні «на головній».
-            var homeStyle = window.TextStyles
-                ? window.TextStyles.mergeStyles(e.get("style"), e.get("homeStyle"))
-                : null;
+            // Кольори головної — ТІЛЬКИ свій набір, без домішки
+            // «Оформлення тексту і кнопки». Чому саме так — у
+            // promoHomeStyle() в assets/js/app.js.
+            var homeStyle = e.get("homeStyle");
 
             var homeVars = window.TextStyles ? window.TextStyles.styleVars(homeStyle) : {};
 
@@ -1025,6 +1025,8 @@
                         (e.get("homeTitle") || e.get("homeText")) ? "так" : ""],
                     ["Таймер", e.get("hideCountdown") === true ? "приховано" : "показувати"],
                     ["Ціна дня, ₴", e.get("dealPrice")],
+                    ["Плашка «-%» на картці",
+                        e.get("hideDealBadge") === true ? "приховано" : "показувати"],
                     ["Початок", e.get("startsAt")],
                     ["Кінець", e.get("endsAt")],
                     ["Порядок показу", e.get("order")],

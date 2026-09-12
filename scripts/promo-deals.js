@@ -101,7 +101,12 @@ function readDeals(dir) {
                 price,
                 from: promoDate(data.startsAt),
                 to: promoDate(data.endsAt),
-                promo: String(data.title || name)
+                promo: String(data.title || name),
+                // Плашку «-4%» власник вимикає в самій акції. ЯВНИЙ
+                // true, а не «поле є»: акції, зроблені до появи
+                // перемикача, поля не мають і мусять показувати
+                // плашку, як показували.
+                noBadge: data.hideDealBadge === true
             };
 
             ids.forEach(id => {

@@ -397,6 +397,59 @@ console.log("\n[8] Картка показує ціну дня");
 
     check("позначка знижки теж рахується з ціни дня",
         /-4%/.test(card.cardBadgeStack(bag)), card.cardBadgeStack(bag));
+
+    // ПЛАШКУ «-4%» МОЖНА ВИМКНУТИ В САМІЙ АКЦІЇ.
+    //
+    // Відсоток рахується від звичайної ціни, і на сумці за 9000 знижка
+    // в 400 гривень дає «-4%». Таке число применшує акцію замість того,
+    // щоб її продати, — власник побачив це першого ж дня й попросив
+    // перемикач.
+    //
+    // Вимикається САМЕ ПЛАШКА: ціна дня, перекреслена стара ціна й
+    // сортування «спочатку знижки» лишаються, як були.
+    const quiet = JSON.parse(JSON.stringify(bag));
+
+    quiet.sale.noBadge = true;
+
+    check("вимкнена плашка не малюється",
+        !/-\d+%/.test(card.cardBadgeStack(quiet)), card.cardBadgeStack(quiet));
+
+    check("але ціна дня лишається",
+        /8600 грн/.test(card.cardPriceHtml(quiet)), card.cardPriceHtml(quiet));
+
+    check("і перекреслена стара теж",
+        /old-price[^>]*>9000 грн/.test(card.cardPriceHtml(quiet)));
+
+    // Перемикач належить АКЦІЇ, а не товару: коли вікно минуло, ціну
+    // дня скасовано, і власна знижка товару (oldPrice) має показувати
+    // плашку як завжди. Інакше один перемикач в акції мовчки
+    // знеболив би товар назавжди.
+    const later = JSON.parse(JSON.stringify(quiet));
+
+    later.sale.to = new Date(NOW - HOUR).toISOString();
+    later.oldPrice = 10000;
+
+    check("поза вікном акції плашка товару повертається",
+        /-10%/.test(card.cardBadgeStack(later)), card.cardBadgeStack(later));
+}
+
+console.log("\n[8a] Перемикач плашки доходить від адмінки до картки");
+{
+    // Ланцюжок із чотирьох ланок, і рветься він мовчки: поле є,
+    // плашка на місці, і ніде нічого не падає.
+    check("поле в адмінці є",
+        /name: "hideDealBadge"\n\s*widget: "boolean"/.test(read("admin/config.yml")));
+
+    // ЯВНИЙ true, а не «поле є»: акції, зроблені до появи перемикача,
+    // поля не мають і мусять показувати плашку, як показували.
+    check("збірка читає його явним true",
+        /noBadge: data\.hideDealBadge === true/.test(read("scripts/promo-deals.js")));
+
+    check("і кладе в товар лише коли вимкнено",
+        /if \(deal\.noBadge\) product\.sale\.noBadge = true;/.test(read("scripts/build-products.js")));
+
+    check("картка питає і прапорець, і чинність вікна",
+        /product\.sale\.noBadge === true[\s\S]{0,80}saleActive\(product\)/.test(read("assets/js/ui.js")));
 }
 
 

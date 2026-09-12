@@ -288,16 +288,26 @@ console.log("\n[2c] Кольори — у двох місцях і для всь
     check("таймер акції, що йде, теж фарбується",
         /\.promo-countdown\[data-state="live"\]\{\s*background:var\(--blk-timer-bg/.test(css));
 
-    // Злиття: що задано для головної, те й діє; решта — зі спільного.
-    const merge = new Function("base", "over",
-        textStyles.match(/function mergeStyles[\s\S]*?\n    }\n/)[0]
-        + "\nfunction toPlain(v){ return v || {}; }\nreturn mergeStyles(base, over);");
+    // НАБОРИ НЕЗАЛЕЖНІ, А НЕ ЗЛИВАЮТЬСЯ.
+    //
+    // Було навпаки: «Кольори на головній» перекривали спільний набір
+    // поле за полем. Задум — зручність, наслідок — протилежний.
+    // Кольори підбирають під ФОТО банера, і на світлу головну вони
+    // приїжджали цілком: червоний заголовок банера робив червоним і
+    // заголовок на головній. Щоб цього НЕ сталося, набір «на
+    // головній» доводилось заповнювати — тобто ним не міняли вигляд,
+    // а рятували звичайний.
+    check("mergeStyles прибрано з модуля",
+        !/function mergeStyles/.test(textStyles),
+        "злиття наборів повернулось");
 
-    check("свій колір головної перекриває спільний",
-        merge({ badgeBg: "#f00" }, { badgeBg: "#0f0" }).badgeBg === "#0f0");
+    check("модуль його більше не віддає",
+        !/mergeStyles:/.test(textStyles));
 
-    check("порожнє поле не скидає спільний",
-        merge({ badgeBg: "#f00" }, { badgeBg: "" }).badgeBg === "#f00");
+    check("головна бере ТІЛЬКИ свій набір",
+        /function promoHomeStyle[\s\S]{0,1200}?return \(promo && promo\.homeStyle\) \|\| null;/
+            .test(fs.readFileSync(path.join(ROOT, "assets/js/app.js"), "utf8")),
+        "promoHomeStyle знову домішує promo.style");
 
     check("блоки головної беруть злитий набір",
         /blockStyleAttr\(promoHomeStyle\(promo\)\)/.test(appJs)
@@ -612,8 +622,9 @@ console.log("\n[2e] Прев'ю в адмінці показує ОБИДВА м
         /e\.get\("homeTitle"\) \|\| e\.get\("title"\)/.test(preview)
         && /e\.get\("homeText"\) \|\| e\.get\("text"\)/.test(preview));
 
-    check("бере свої кольори",
-        /TextStyles\.mergeStyles\(e\.get\("style"\), e\.get\("homeStyle"\)\)/.test(preview));
+    check("бере ТІЛЬКИ свої кольори, без домішки спільного набору",
+        /var homeStyle = e\.get\("homeStyle"\);/.test(preview)
+        && !/mergeStyles/.test(preview));
 
     check("слухається вирівнювання",
         /"data-align": place\.products/.test(preview));
@@ -687,12 +698,24 @@ console.log("\n[3] Порожній заголовок не ламає вида�
 }
 
 
-console.log("\n[4] Таймер цокає так само часто, як міняється");
+console.log("\n[4] Секунди видно завжди, і вони цокають");
 {
+    // ЧОМУ ЗАВЖДИ.
+    //
+    // Раніше рядок був «6 дн. 04:12» і оновлювався раз на хвилину:
+    // хвилинний рядок частіше й не змінюється, а зайве пробудження на
+    // телефоні коштує батареї. Логіка бездоганна, наслідок жахливий —
+    // людина дивиться на відлік акції, а він стоїть.
+    //
+    // Власник написав про це двічі. Другого разу — окремо про головну
+    // й окремо про сторінку акції, вже коли акція йшла.
+    //
+    // Відлік існує рівно заради відчуття, що час спливає. Тому тепер
+    // секунди є в кожному рядку, а за батарею платимо зупинкою
+    // годинника на прихованій вкладці (перевірка [4b] нижче).
     const api = new Function([
         /const MINUTE_MS[^\n]*\n/,
         /const DAY_MS[^\n]*\n/,
-        /function promoShowsSeconds[\s\S]*?\n}\n/,
         /function promoCountdown[\s\S]*?\n}\n/,
         /function promoTickMs[\s\S]*?\n}\n/
     ].map(r => common.match(r)[0]).join("\n")
@@ -700,38 +723,76 @@ console.log("\n[4] Таймер цокає так само часто, як мі
 
     const now = Date.now();
 
-    // ГОЛОВНЕ: рядок із секундами мусить оновлюватись щосекунди.
-    // Саме тут і був розрив — між годиною й добою секунди стояли.
     const moments = [6 * 86400, 25 * 3600, 23 * 3600, 3 * 3600, 59 * 60, 30];
 
-    const mismatched = moments.filter(sec => {
+    const withoutSeconds = moments.filter(sec =>
+        !/:\d\d$/.test(api.promoCountdown(now + sec * 1000, now)));
 
-        const until = now + sec * 1000;
-        const shown = api.promoCountdown(until, now);
-        const step = api.promoTickMs(until, now);
+    check("секунди є в рядку на будь-якій відстані до кінця",
+        withoutSeconds.length === 0,
+        withoutSeconds.map(s => `${s} с: «${api.promoCountdown(now + s * 1000, now)}»`).join("; "));
 
-        const hasSeconds = /:\d\d:\d\d$|^\d\d:\d\d$/.test(shown) && !/дн\./.test(shown);
+    const slow = moments.filter(sec => api.promoTickMs(now + sec * 1000, now) !== 1000);
 
-        return hasSeconds !== (step === 1000);
+    check("крок усюди — одна секунда", slow.length === 0, slow.join(", "));
+
+    check("22 години — «22:00:00»",
+        api.promoCountdown(now + 22 * 3600 * 1000, now) === "22:00:00",
+        api.promoCountdown(now + 22 * 3600 * 1000, now));
+
+    // Дні лишились окремо: тиждень очікування читається днями, а не
+    // 148 годинами. Але секунди тепер є і в цьому рядку.
+    check("шість діб — «6 дн. 00:00:00», а не «6 дн. 00:00»",
+        api.promoCountdown(now + 6 * 86400 * 1000, now) === "6 дн. 00:00:00",
+        api.promoCountdown(now + 6 * 86400 * 1000, now));
+
+    check("правила «коли ховати секунди» більше немає",
+        !/promoShowsSeconds/.test(common),
+        "воно й розводило рядок із кроком");
+}
+
+console.log("\n[4b] Годинник не зупиняється сам і не роздвоюється");
+{
+    const appJs = fs.readFileSync(path.join(ROOT, "assets/js/app.js"), "utf8");
+    const promoPage = fs.readFileSync(path.join(ROOT, "assets/js/promo.js"), "utf8");
+
+    [["головна", appJs], ["сторінка акції", promoPage]].forEach(([name, src]) => {
+
+        // ВЛАСНОЇ ПАУЗИ БУТИ НЕ МАЄ.
+        //
+        // Спокуса очевидна: відлік іде щосекунди, тож нащо цокати в
+        // прихованій вкладці. Я так і зробив — і на перевірці побачив,
+        // що у вбудованому браузері document.hidden лишається true на
+        // цілком видимій сторінці. Пауза давала б рівно той симптом,
+        // заради якого все це й переписано.
+        //
+        // Батарею бережуть самі браузери: у фоні таймери душаться до
+        // одного ходу на хвилину.
+        //
+        // Дивимось саме на те, що стоїть ПЕРЕД заводом наступного
+        // ходу: рядок document.hidden у самому обробнику
+        // visibilitychange нижче — законний і потрібний.
+        const at = src.search(/setTimeout\((?:tickPromoTimers|draw),/);
+        const before = at === -1 ? "" : src.slice(Math.max(0, at - 400), at);
+
+        check(`${name}: наступний хід не скасовується через document.hidden`,
+            at !== -1 && !/document\.hidden\)\s*return/.test(before),
+            at === -1 ? "завод годинника не знайдено"
+                : "власна пауза повернулась — у вбудованих браузерах вона морозить відлік");
+
+        // А от домалювати рядок при поверненні варто: інакше перші
+        // секунди видно задушене браузером число.
+        check(`${name}: повернення вкладки перемальовує рядок`,
+            /visibilitychange/.test(src));
 
     });
 
-    check("скрізь, де видно секунди, крок — одна секунда",
-        mismatched.length === 0,
-        mismatched.map(s => `${s} с: «${api.promoCountdown(now + s * 1000, now)}» / ${api.promoTickMs(now + s * 1000, now)} мс`).join("; "));
+    // Другий годинник — це подвійна швидкість відліку. Спрацювало б
+    // не одразу, а після кількох перемикань вкладок.
+    check("головна не заводить другий ланцюжок",
+        /if \(promoTimerHandle\) \{\s*clearTimeout\(promoTimerHandle\)/.test(appJs));
 
-    check("22 години — секунди й крок в секунду",
-        api.promoCountdown(now + 22 * 3600 * 1000, now) === "22:00:00"
-        && api.promoTickMs(now + 22 * 3600 * 1000, now) === 1000);
-
-    // Поки лишились дні, секунд не видно — і будити телефон щосекунди
-    // немає причини.
-    check("шість діб — раз на хвилину",
-        api.promoTickMs(now + 6 * 86400 * 1000, now) === 60000);
-
-    check("обидві функції питають одне правило",
-        /promoShowsSeconds\(left\)/.test(common)
-        && (common.match(/promoShowsSeconds\(/g) || []).length >= 3);
+    check("сторінка акції теж", /if \(timer\) clearTimeout\(timer\);/.test(promoPage));
 }
 
 

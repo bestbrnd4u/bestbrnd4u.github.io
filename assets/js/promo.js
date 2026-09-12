@@ -191,6 +191,19 @@ function startPromoCountdown(promo) {
 
     }
 
+    // Повернулись із фонової вкладки — домальовуємо рядок одразу, не
+    // чекаючи задушеного браузером ходу. Сам годинник у фоні не
+    // спиняємо; чому саме так — у tickPromoTimers() в assets/js/app.js.
+    document.addEventListener("visibilitychange", () => {
+
+        if (document.hidden) return;
+
+        if (timer) clearTimeout(timer);
+
+        draw();
+
+    });
+
     draw();
 
 }

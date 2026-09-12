@@ -108,7 +108,19 @@ console.log("\n[4] Вантажаться лише обрані шрифти");
     check("один тег на шрифт, без дублів", /getElementById\(id\)\) return/.test(module_));
 
     check("шрифти головної довантажуються", /ensureFonts\(\[data\.hero\?\.style/.test(app));
-    check("шрифти акцій теж", /ensureFonts\(promotions\.map/.test(app));
+    // ОБИДВА НАБОРИ АКЦІЇ, а не лише style.
+    //
+    // Відколи «Кольори на головній» перестали домішуватись до
+    // спільного набору, шрифт для блока на головній береться саме з
+    // homeStyle. Тут стояло точне `promotions.map` — і воно б
+    // зеленіло далі, поки шрифт головної мовчки не вантажився.
+    const call = (app.match(/ensureFonts\([\s\S]{0,160}?\);/g) || [])
+        .find(text => /promotions/.test(text)) || "";
+
+    check("шрифти акцій теж", Boolean(call), "виклику для акцій немає");
+
+    check("  і з набору «на головній» теж",
+        /p\.style/.test(call) && /p\.homeStyle/.test(call), call);
     check("шрифти добірок теж", /ensureFonts\(collections\.map/.test(app));
 }
 

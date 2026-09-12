@@ -1357,6 +1357,11 @@ function stampDeals(products) {
 
         product.sale = { price: deal.price, from: deal.from, to: deal.to };
 
+        // Пишемо ЛИШЕ коли вимкнено — з тієї самої причини, що й
+        // порожнє sale вище: сто рядків "noBadge": false нікому
+        // нічого не кажуть.
+        if (deal.noBadge) product.sale.noBadge = true;
+
         stamped++;
 
     });

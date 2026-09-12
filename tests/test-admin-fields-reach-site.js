@@ -300,6 +300,10 @@ const GROUPS = [
         internal: {
             active: "фільтр самої збірки: вимкнена акція не потрапляє у файл",
             products: "перейменоване в productIds",
+            // Їде в ТОВАР, а не в акцію: збірка кладе його поруч із
+            // ціною дня як sale.noBadge, і картка питає саме товар.
+            // Ланцюжок цілком перевіряє [8a] у test-deal-price.js.
+            hideDealBadge: "стає product.sale.noBadge у scripts/build-products.js",
             style: null,      // читається — мусить передаватись
             framing: null
         }
