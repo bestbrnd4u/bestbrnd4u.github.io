@@ -530,3 +530,15 @@
     color:#991b1b;
     font-weight:600;
 }
+
+/* Напис, який зʼявиться в блоці акції на головній. */
+.cms-preview-home-words{
+    margin-top:10px;
+    font-size:13px;
+    line-height:1.5;
+}
+
+.cms-preview-home-words p{
+    margin:4px 0 0;
+    color:#6b7280;
+}

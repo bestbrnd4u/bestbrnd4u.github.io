@@ -858,14 +858,29 @@
 
                 h("div", { className: "cms-preview-stage" }, banner),
 
-                section("Прев'ю на головній", teaser
-                    ? h(AssetImage, { path: teaser, getAsset: getAsset, className: "cms-preview-teaser" })
-                    : null),
+                // НА ГОЛОВНІЙ — СВІЙ НАПИС.
+                //
+                // Тут показуємо саме те, що там буде: окремі поля,
+                // якщо заповнені, інакше загальні. Без цього рядка
+                // власник бачив би в прев'ю лише картинку й не знав,
+                // чим обернеться порожній банер.
+                section("Прев'ю на головній", h("div", null,
+                    teaser
+                        ? h(AssetImage, { path: teaser, getAsset: getAsset, className: "cms-preview-teaser" })
+                        : null,
+                    h("div", { className: "cms-preview-home-words" },
+                        h("b", null, esc(e.get("homeTitle") || e.get("title") || "—")),
+                        (e.get("homeText") || e.get("text"))
+                            ? h("p", null, esc(e.get("homeText") || e.get("text")))
+                            : null)
+                )),
 
                 section("Налаштування", detailsList([
                     ["Показувати на сайті", e.get("active") === false ? "ні" : "так"],
                     ["Спосіб показу", e.get("displayType")],
                     ["Напис на банері", bare ? "не показувати" : layout],
+                    ["Окремий напис на головній",
+                        (e.get("homeTitle") || e.get("homeText")) ? "так" : ""],
                     ["Таймер", e.get("hideCountdown") === true ? "приховано" : "показувати"],
                     ["Ціна дня, ₴", e.get("dealPrice")],
                     ["Початок", e.get("startsAt")],

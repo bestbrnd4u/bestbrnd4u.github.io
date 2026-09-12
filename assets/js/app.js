@@ -469,6 +469,31 @@ function renderAdvantages(advantages) {
 
 }
 
+// НАПИС АКЦІЇ НА ГОЛОВНІЙ.
+//
+// ЧОМУ ОКРЕМО ВІД promo.title. Два місця — дві різні задачі. На
+// банері сторінки акції текст часто вже намальований на самому фото,
+// і писати його зверху вдруге нема сенсу. А на головній свого фото
+// або немає зовсім (блок «Ціна дня»), або воно маленьке — і текст там
+// єдине, що пояснює акцію.
+//
+// Поки поле було одне, вибору не існувало: чистиш банер — гасне
+// головна.
+//
+// Порожньо — беремо загальні «Заголовок» і «Опис», тобто вже
+// опубліковані акції нічого не помічають.
+function promoHomeTitle(promo) {
+
+    return String((promo && promo.homeTitle) || (promo && promo.title) || "").trim();
+
+}
+
+function promoHomeText(promo) {
+
+    return String((promo && promo.homeText) || (promo && promo.text) || "").trim();
+
+}
+
 // -------------------------------------------------------------
 // Відлік на банерах головної
 // -------------------------------------------------------------
@@ -637,8 +662,8 @@ async function initPromotions() {
                     </div>
 
                     <div class="promo-card-info">
-                        <h3>${promo.title}</h3>
-                        ${promo.text ? `<p>${promo.text}</p>` : ""}
+                        <h3>${promoHomeTitle(promo)}</h3>
+                        ${promoHomeText(promo) ? `<p>${promoHomeText(promo)}</p>` : ""}
                         <span class="promo-card-link">${promo.buttonText || "Дивитись усі товари"} →</span>
                     </div>
 
@@ -718,9 +743,9 @@ function renderHeroSliderPromotions(heroPromotions) {
                 ${promo.badge ? `<span class="promo-hero-slide-badge">${promo.badge}</span>` : ""}
                 ${promoTimerTag(promo)}
 
-                <h2>${promo.title}</h2>
+                <h2>${promoHomeTitle(promo)}</h2>
 
-                ${promo.text ? `<p>${promo.text}</p>` : ""}
+                ${promoHomeText(promo) ? `<p>${promoHomeText(promo)}</p>` : ""}
 
                 ${genderButtons.length ? `<div class="promo-hero-quicklinks">${quicklinksHtml}</div>` : ""}
 
@@ -875,9 +900,9 @@ async function renderFeaturedPromotions(featuredPromotions) {
                             ${promo.badge ? `<span class="brand-campaign-eyebrow">${promo.badge}</span>` : ""}
                             ${promoTimerTag(promo)}
 
-                            <h2>${promo.title}</h2>
+                            <h2>${promoHomeTitle(promo)}</h2>
 
-                            ${promo.text ? `<p>${promo.text}</p>` : ""}
+                            ${promoHomeText(promo) ? `<p>${promoHomeText(promo)}</p>` : ""}
 
                             <a href="promo?id=${encodeURIComponent(promo.slug)}" class="btn">
                                 ${promo.buttonText || "Дивитись усі товари"}
@@ -955,13 +980,13 @@ function renderCompactPromotions(compactPromotions) {
                          кнопка збоку. -->
                     <a href="promo?id=${encodeURIComponent(promo.slug)}"
                        class="brand-teaser-image"
-                       aria-label="${promo.title}">
+                       aria-label="${promoHomeTitle(promo)}">
                         ${promoPicture(promo, 700)}
                     </a>
 
                     <div class="brand-teaser-content">
 
-                        <p class="brand-teaser-text">${promo.title}</p>
+                        <p class="brand-teaser-text">${promoHomeTitle(promo)}</p>
 
                         <a href="promo?id=${encodeURIComponent(promo.slug)}" class="brand-teaser-btn">
                             ${promo.buttonText || "Дивитись все"}
@@ -1060,8 +1085,8 @@ async function renderDealPromotions(dealPromotions) {
         // Заголовок і опис — навпаки: порожнє поле означає «не
         // писати». Власник може лишити тільки позначку, таймер і
         // картки, якщо все інше зайве.
-        const heading = String(promo.title || "").trim();
-        const lead = String(promo.text || "").trim();
+        const heading = promoHomeTitle(promo);
+        const lead = promoHomeText(promo);
 
         return `
             <div class="deal-block${blockStyleClass(promo.style)}" style="${blockStyleAttr(promo.style)}">

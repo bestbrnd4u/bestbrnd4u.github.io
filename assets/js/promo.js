@@ -232,7 +232,19 @@ function updatePromoSeoMetadata(promo) {
 // безлике слово «Акція».
 function promoHeading(promo) {
 
-    return [promo && promo.title, promo && promo.text, promo && promo.brand]
+    // Напис для ГОЛОВНОЇ теж у переліку, і стоїть одразу за банерним.
+    //
+    // Саме заради цього випадку: на банері напису немає (він уже на
+    // фото), а на головній є. Без цього рядка вкладка браузера й
+    // рядок у видачі Google діставали б безлике «Акція», хоча назва
+    // акції в записі є.
+    return [
+        promo && promo.title,
+        promo && promo.homeTitle,
+        promo && promo.text,
+        promo && promo.homeText,
+        promo && promo.brand
+    ]
         .map(value => String(value || "").trim())
         .find(Boolean) || "Акція";
 

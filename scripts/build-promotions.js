@@ -286,6 +286,11 @@ function main() {
                 && Object.keys(data.style).length
                 ? { style: data.style }
                 : {}),
+            // Окремий напис для головної. Порожнє поле не пишемо:
+            // інакше в кожній акції без нього зʼявилось би два
+            // порожніх рядки, а сайт і так падає назад на title/text.
+            ...(String(data.homeTitle || "").trim() ? { homeTitle: String(data.homeTitle).trim() } : {}),
+            ...(String(data.homeText || "").trim() ? { homeText: String(data.homeText).trim() } : {}),
             // Розкладка накладки на банері. Порожнє — «як було»:
             // ліворуч посередині, саме так малювались усі акції до
             // появи цього поля.
