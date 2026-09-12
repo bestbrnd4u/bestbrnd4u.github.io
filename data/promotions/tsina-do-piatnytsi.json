@@ -1,6 +1,6 @@
 {
   "badge": "Ціна тижня",
-  "startsAt": "2026-09-12T20:10:00+03:00",
+  "startsAt": "2026-09-12T20:18:00+03:00",
   "products": [
     57
   ],
@@ -32,6 +32,7 @@
     "timerText": "#60e109",
     "badgeText": ""
   },
+  "hideDealBadge": true,
   "bannerLayout": "right-top",
   "title": "Ціна 8600грн",
   "dealBanner": "left",
