@@ -54,6 +54,12 @@ const { promoDate } = require("./promo-deals");
 // Дозволені розкладки накладки на банері. Той самий перелік стоїть в
 // admin/config.yml і в CSS (.promo-hero-banner[data-layout]); тест
 // tests/test-promo-banner-layout.js звіряє всі три.
+// Де показувати бейдж і де стоять товари «Ціни дня». Ті самі переліки
+// стоять в admin/config.yml; звіряє їх tests/test-promo-banner-layout.js.
+const BADGE_PLACES = ["both", "home", "promo", "none"];
+
+const DEAL_ALIGNS = ["left", "center", "right"];
+
 const LAYOUTS = [
     "left-top", "left-middle", "left-bottom",
     "center-top", "center-middle", "center-bottom",
@@ -291,6 +297,17 @@ function main() {
             // порожніх рядки, а сайт і так падає назад на title/text.
             ...(String(data.homeTitle || "").trim() ? { homeTitle: String(data.homeTitle).trim() } : {}),
             ...(String(data.homeText || "").trim() ? { homeText: String(data.homeText).trim() } : {}),
+            // Де показувати бейдж. Порожнє поле — «і там, і там»,
+            // тобто як поводились усі акції до появи вибору.
+            ...(BADGE_PLACES.includes(data.badgePlaces) ? { badgePlaces: data.badgePlaces } : {}),
+            // Де стоять товари в блоці «Ціна дня».
+            ...(DEAL_ALIGNS.includes(data.dealAlign) ? { dealAlign: data.dealAlign } : {}),
+            // Свої кольори для головної. Порожній обʼєкт не пишемо:
+            // інакше в кожній акції зʼявився б рядок ні про що.
+            ...(data.homeStyle && typeof data.homeStyle === "object"
+                && Object.keys(data.homeStyle).length
+                ? { homeStyle: data.homeStyle }
+                : {}),
             // Розкладка накладки на банері. Порожнє — «як було»:
             // ліворуч посередині, саме так малювались усі акції до
             // появи цього поля.

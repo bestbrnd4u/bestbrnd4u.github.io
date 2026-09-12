@@ -122,7 +122,10 @@ function literalRunner(source) {
     //
     // Беремо перелік із САМОГО джерела збірки: свій список тут означав
     // би, що тест перевіряє не те, що працює.
-    const consts = [...source.matchAll(/^const ([A-Z_][A-Z0-9_]*) = (\[[\s\S]*?\n\]);$/gm)]
+    // Перелік буває і в кілька рядків, і в один — беремо обидві форми.
+    // Поки бралась лише багаторядкова, однорядковий DEAL_ALIGNS
+    // лишався невідомим, і запускач падав на ReferenceError.
+    const consts = [...source.matchAll(/^const ([A-Z_][A-Z0-9_]*) = (\[[\s\S]*?\]);$/gm)]
         .map(hit => ({ name: hit[1], value: new Function(`return ${hit[2]};`)() }));
 
     const names = HELPERS.concat(consts.map(c => c.name));

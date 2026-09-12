@@ -482,6 +482,34 @@ function renderAdvantages(advantages) {
 //
 // Порожньо — беремо загальні «Заголовок» і «Опис», тобто вже
 // опубліковані акції нічого не помічають.
+// Чи показувати бейдж у цьому місці.
+//
+// Банер часто вже має намальовану позначку на самому фото — тоді наша
+// друга поверх нього зайва. А на головній свого фото немає, і бейдж
+// там єдине, що пояснює, чому ціна інша. Порожнє поле — «і там, і
+// там», як поводились усі акції до появи вибору.
+function promoBadgeHere(promo, place) {
+
+    const where = (promo && promo.badgePlaces) || "both";
+
+    return where === "both" || where === place;
+
+}
+
+// Оформлення блока на ГОЛОВНІЙ: спільний набір плюс власні кольори.
+//
+// Порожній homeStyle нічого не перекриває — тобто вже опубліковані
+// акції виглядають як виглядали.
+function promoHomeStyle(promo) {
+
+    if (!promo) return null;
+
+    if (!window.TextStyles || !promo.homeStyle) return promo && promo.style;
+
+    return window.TextStyles.mergeStyles(promo.style, promo.homeStyle);
+
+}
+
 function promoHomeTitle(promo) {
 
     return String((promo && promo.homeTitle) || (promo && promo.title) || "").trim();
@@ -653,11 +681,11 @@ async function initPromotions() {
         if (regular.length) {
 
             grid.innerHTML = regular.map(promo => `
-                <a href="promo?id=${encodeURIComponent(promo.slug)}" class="promo-card${blockStyleClass(promo.style)}" style="${blockStyleAttr(promo.style)}">
+                <a href="promo?id=${encodeURIComponent(promo.slug)}" class="promo-card${blockStyleClass(promoHomeStyle(promo))}" style="${blockStyleAttr(promoHomeStyle(promo))}">
 
                     <div class="promo-card-image">
                         ${promoPicture(promo, 700)}
-                        ${promo.badge ? `<span class="promo-card-badge">${promo.badge}</span>` : ""}
+                        ${promo.badge && promoBadgeHere(promo, "home") ? `<span class="promo-card-badge">${promo.badge}</span>` : ""}
                         ${promoTimerTag(promo)}
                     </div>
 
@@ -736,7 +764,7 @@ function renderHeroSliderPromotions(heroPromotions) {
         `).join("");
 
         return `
-        <div class="promo-hero-slide${blockStyleClass(promo.style)}" style="${blockStyleAttr(promo.style)}">
+        <div class="promo-hero-slide${blockStyleClass(promoHomeStyle(promo))}" style="${blockStyleAttr(promoHomeStyle(promo))}">
 
             <div class="promo-hero-slide-content">
 
@@ -889,7 +917,7 @@ async function renderFeaturedPromotions(featuredPromotions) {
 
                 <div class="container">
 
-                    <div class="brand-campaign-banner${blockStyleClass(promo.style)}" style="${blockStyleAttr(promo.style)}">
+                    <div class="brand-campaign-banner${blockStyleClass(promoHomeStyle(promo))}" style="${blockStyleAttr(promoHomeStyle(promo))}">
 
                         <a href="promo?id=${encodeURIComponent(promo.slug)}" class="brand-campaign-image">
                             ${promoPicture(promo, 700)}
@@ -897,7 +925,7 @@ async function renderFeaturedPromotions(featuredPromotions) {
 
                         <div class="brand-campaign-content">
 
-                            ${promo.badge ? `<span class="brand-campaign-eyebrow">${promo.badge}</span>` : ""}
+                            ${promo.badge && promoBadgeHere(promo, "home") ? `<span class="brand-campaign-eyebrow">${promo.badge}</span>` : ""}
                             ${promoTimerTag(promo)}
 
                             <h2>${promoHomeTitle(promo)}</h2>
@@ -1079,8 +1107,11 @@ async function renderDealPromotions(dealPromotions) {
         // Порожній бейдж тут НЕ означає «нічого не писати»: у цьому
         // блоці позначка — єдине, що пояснює, чому ціна інша. Тому
         // порожнє поле дає слово за станом акції, а не порожнечу.
-        const eyebrow = promo.badge
-            || (timing.state === "announced" ? "СКОРО" : "ЦІНА ДНЯ");
+        //
+        // А от вибір «не показувати на головній» означає саме це.
+        const eyebrow = promoBadgeHere(promo, "home")
+            ? (promo.badge || (timing.state === "announced" ? "СКОРО" : "ЦІНА ДНЯ"))
+            : "";
 
         // Заголовок і опис — навпаки: порожнє поле означає «не
         // писати». Власник може лишити тільки позначку, таймер і
@@ -1089,14 +1120,14 @@ async function renderDealPromotions(dealPromotions) {
         const lead = promoHomeText(promo);
 
         return `
-            <div class="deal-block${blockStyleClass(promo.style)}" style="${blockStyleAttr(promo.style)}">
+            <div class="deal-block${blockStyleClass(promoHomeStyle(promo))}" style="${blockStyleAttr(promoHomeStyle(promo))}">
 
                 <div class="container">
 
                     <div class="deal-head">
 
                         <div class="deal-head-text">
-                            <span class="deal-eyebrow">${eyebrow}</span>
+                            ${eyebrow ? `<span class="deal-eyebrow">${eyebrow}</span>` : ""}
                             ${heading ? `<h2>${heading}</h2>` : ""}
                             ${lead ? `<p>${lead}</p>` : ""}
                         </div>
@@ -1105,7 +1136,7 @@ async function renderDealPromotions(dealPromotions) {
 
                     </div>
 
-                    <div class="deal-products products-grid">
+                    <div class="deal-products products-grid" data-align="${promo.dealAlign || "left"}">
                         ${curated.map(product => createProductCard(product)).join("")}
                     </div>
 

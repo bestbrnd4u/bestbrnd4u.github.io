@@ -280,7 +280,12 @@ function renderPromoHero(promo) {
     // пояснює акцію.
     const bare = promo.bannerLayout === "hidden";
 
-    const hasBadge = !bare && Boolean(promo.badge);
+    // Бейдж може бути вимкнений саме тут: на банері він часто вже
+    // намальований на самому фото, і другий поверх нього зайвий.
+    const badgeHere = (promo.badgePlaces || "both") !== "home"
+        && (promo.badgePlaces || "both") !== "none";
+
+    const hasBadge = !bare && badgeHere && Boolean(promo.badge);
     const hasTitle = !bare && Boolean(promo.title);
     const hasText = !bare && Boolean(promo.text);
     const hasButton = !bare && Boolean(promo.buttonText);
@@ -315,6 +320,23 @@ function renderPromoHero(promo) {
     // Куди покласти напис. Порожнє поле — «ліворуч посередині», саме
     // так малювались усі акції до появи вибору.
     banner.dataset.layout = promo.bannerLayout || "left-middle";
+
+    // Кольори з адмінки — ті самі, що на головній, але СВОЇМ набором:
+    // на банері текст лежить на фото, тож і кольори тут інші.
+    // Раніше сторінка акції оформлення не читала взагалі — вибраний в
+    // адмінці колір діяв на головній і мовчки не діяв тут.
+    if (window.TextStyles) {
+
+        const vars = window.TextStyles.styleVars(promo.style);
+        const names = Object.keys(vars);
+
+        banner.classList.toggle("has-style", names.length > 0);
+
+        names.forEach(name => banner.style.setProperty(name, vars[name]));
+
+        window.TextStyles.ensureFonts([promo.style]);
+
+    }
 
     // Порожній банер не тримає висоту сам: у ньому немає вмісту, а
     // фото — фон. Без цього прапорця смуга схлопнулась би в нуль.

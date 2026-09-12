@@ -147,6 +147,16 @@
         if (isColor(s.buttonBg)) out["--blk-btn-bg"] = s.buttonBg.trim();
         if (isColor(s.buttonText)) out["--blk-btn-text"] = s.buttonText.trim();
 
+        // Бейдж і таймер — окремі кольори, а не «колір кнопки».
+        //
+        // Обидва за замовчуванням червоні (--danger), бо мають кричати.
+        // Але акція буває й спокійною: на пастельному банері червона
+        // пляма — єдине, що видно. Тепер це вирішує власник.
+        if (isColor(s.badgeBg)) out["--blk-badge-bg"] = s.badgeBg.trim();
+        if (isColor(s.badgeText)) out["--blk-badge-text"] = s.badgeText.trim();
+        if (isColor(s.timerBg)) out["--blk-timer-bg"] = s.timerBg.trim();
+        if (isColor(s.timerText)) out["--blk-timer-text"] = s.timerText.trim();
+
         if (TITLE_SIZES[s.titleSize]) out["--blk-title-scale"] = TITLE_SIZES[s.titleSize];
         if (ALIGNS[s.align]) out["--blk-align"] = ALIGNS[s.align];
 
@@ -160,6 +170,42 @@
         if (isFinite(tracking) && tracking !== 0) {
             out["--blk-tracking"] = (Math.max(-5, Math.min(30, tracking)) / 100) + "em";
         }
+
+        return out;
+
+    }
+
+    // Два набори в один: що задано у ВЕРХНЬОМУ, те й діє.
+    //
+    // НАВІЩО. Банер акції й блок на головній стоять на різному тлі:
+    // на банері текст лежить на фото й мусить бути світлим, на
+    // головній — на світлій сторінці й мусить бути темним. Один набір
+    // на двох означав би, що в одному з місць напис зникає.
+    //
+    // Тому набір у акції — спільний, а «на головній» перекриває лише
+    // те, що в ньому справді заповнене. Порожній верхній набір = усе
+    // як було.
+    function mergeStyles(base, over) {
+
+        var a = toPlain(base);
+        var b = toPlain(over);
+
+        var out = {};
+
+        Object.keys(a).forEach(function (k) { out[k] = a[k]; });
+
+        Object.keys(b).forEach(function (k) {
+
+            var value = b[k];
+
+            // Порожнє поле в адмінці — «не задано», а не «скинути».
+            if (value === undefined || value === null) return;
+            if (typeof value === "string" && !value.trim()) return;
+            if (value === false) return;
+
+            out[k] = value;
+
+        });
 
         return out;
 
@@ -221,6 +267,7 @@
         fontByKey: fontByKey,
         fontStack: fontStack,
         styleVars: styleVars,
+        mergeStyles: mergeStyles,
         styleAttr: styleAttr,
         ensureFonts: ensureFonts
     };

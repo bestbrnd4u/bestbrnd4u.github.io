@@ -208,6 +208,134 @@ console.log("\n[2a] Напис на головній і напис на бане
 }
 
 
+console.log("\n[2b] Бейдж — окремо для кожного місця");
+{
+    const places = field("badgePlaces").options.map(o => o.value);
+
+    check("чотири варіанти", places.join("/") === "both/home/promo/none", places.join("/"));
+
+    check("збірка знає ті самі",
+        /const BADGE_PLACES = \["both", "home", "promo", "none"\]/.test(build));
+
+    // Порожнє поле — «і там, і там»: саме так поводились усі акції до
+    // появи вибору.
+    const here = new Function("promo", "place",
+        appJs.match(/function promoBadgeHere[\s\S]*?\n}\n/)[0]
+        + "\nreturn promoBadgeHere(promo, place);");
+
+    check("порожньо — показуємо скрізь",
+        here({}, "home") === true && here({}, "promo") === true);
+
+    check("тільки на головній",
+        here({ badgePlaces: "home" }, "home") === true
+        && here({ badgePlaces: "home" }, "promo") === false);
+
+    check("тільки на сторінці акції",
+        here({ badgePlaces: "promo" }, "promo") === true
+        && here({ badgePlaces: "promo" }, "home") === false);
+
+    check("ніде",
+        here({ badgePlaces: "none" }, "home") === false
+        && here({ badgePlaces: "none" }, "promo") === false);
+
+    // Три банери головної й банер акції мусять питати однаково —
+    // інакше вибір діяв би на одному й мовчки не діяв на іншому.
+    check("усі блоки головної питають правило",
+        (appJs.match(/promoBadgeHere\(promo, "home"\)/g) || []).length >= 3,
+        (appJs.match(/promoBadgeHere\(promo, "home"\)/g) || []).length);
+
+    // Перевіряємо, що правило ВЖИТЕ, а не просто оголошене. Перша
+    // версія цієї перевірки шукала слово badgeHere будь-де у файлі — і
+    // мовчала, коли його прибрали саме з рішення про бейдж, лишивши
+    // оголошення вище.
+    check("сторінка акції теж",
+        /badgePlaces \|\| "both"/.test(promoJs)
+        && /const hasBadge = !bare && badgeHere &&/.test(promoJs));
+}
+
+
+console.log("\n[2c] Кольори — у двох місцях і для всього, що заливається");
+{
+    const styleFields = field("style").fields.map(f => f.name);
+    const homeFields = field("homeStyle").fields.map(f => f.name);
+
+    // Бейдж і таймер за замовчуванням червоні: вони мають кричати. Але
+    // на пастельному банері червона пляма — єдине, що видно.
+    ["badgeBg", "badgeText", "timerBg", "timerText"].forEach(name =>
+        check(`колір «${name}» можна задати`, styleFields.includes(name)));
+
+    check("для головної є свій набір кольорів",
+        ["textColor", "badgeBg", "timerBg", "buttonBg"].every(n => homeFields.includes(n)),
+        homeFields.join(", "));
+
+    // Гарнітура й геометрія — спільні: різними в двох місцях мають
+    // бути кольори, а не шрифт.
+    check("шрифт і розмір у наборі для головної не дублюються",
+        !homeFields.includes("font") && !homeFields.includes("titleSize"));
+
+    const textStyles = read("assets/js/text-styles.js");
+
+    check("модуль віддає змінні бейджа й таймера",
+        ["--blk-badge-bg", "--blk-badge-text", "--blk-timer-bg", "--blk-timer-text"]
+            .every(v => textStyles.includes(v)));
+
+    check("CSS їх читає",
+        ["--blk-badge-bg", "--blk-timer-bg", "--blk-timer-text"].every(v => css.includes(v)));
+
+    // Червоний стан «іде» теж мусить підкорятись вибору: інакше колір
+    // діяв би лише до початку акції й зникав саме тоді, коли на банер
+    // дивляться.
+    check("таймер акції, що йде, теж фарбується",
+        /\.promo-countdown\[data-state="live"\]\{\s*background:var\(--blk-timer-bg/.test(css));
+
+    // Злиття: що задано для головної, те й діє; решта — зі спільного.
+    const merge = new Function("base", "over",
+        textStyles.match(/function mergeStyles[\s\S]*?\n    }\n/)[0]
+        + "\nfunction toPlain(v){ return v || {}; }\nreturn mergeStyles(base, over);");
+
+    check("свій колір головної перекриває спільний",
+        merge({ badgeBg: "#f00" }, { badgeBg: "#0f0" }).badgeBg === "#0f0");
+
+    check("порожнє поле не скидає спільний",
+        merge({ badgeBg: "#f00" }, { badgeBg: "" }).badgeBg === "#f00");
+
+    check("блоки головної беруть злитий набір",
+        /blockStyleAttr\(promoHomeStyle\(promo\)\)/.test(appJs)
+        && !/blockStyleAttr\(promo\.style\)/.test(appJs));
+
+    // Сторінка акції оформлення не читала ВЗАГАЛІ: обраний в адмінці
+    // колір діяв на головній і мовчки не діяв на банері.
+    check("банер акції нарешті читає оформлення",
+        /TextStyles\.styleVars\(promo\.style\)/.test(promoJs)
+        && /classList\.toggle\("has-style"/.test(promoJs));
+}
+
+
+console.log("\n[2d] Товари в блоці «Ціна дня» можна вирівняти");
+{
+    check("три варіанти в адмінці",
+        field("dealAlign").options.map(o => o.value).join("/") === "left/center/right");
+
+    check("збірка переносить", /const DEAL_ALIGNS = \["left", "center", "right"\]/.test(build));
+
+    check("ряд отримує ознаку", /data-align="\$\{promo\.dealAlign \|\| "left"\}"/.test(appJs));
+
+    // auto-FIT, а не auto-fill: fill лишає порожні колонки на всю
+    // ширину, і тоді вирівнювати нічого — один товар однаково
+    // притиснутий ліворуч.
+    const row = css.slice(css.indexOf(".deal-products{"), css.indexOf(".deal-more"));
+
+    check("порожні колонки згортаються", /auto-fit/.test(row), row.match(/auto-f\w+/));
+
+    check("колонка має верхню межу",
+        /minmax\(240px, 300px\)/.test(row));
+
+    check("обидва напрямки описані",
+        /\[data-align="center"\]\{ justify-content:center/.test(css)
+        && /\[data-align="right"\]\{ justify-content:end/.test(css));
+}
+
+
 console.log("\n[3] Порожній заголовок не ламає видачу Google");
 {
     check("назва акції словами — одна функція", /function promoHeading/.test(promoJs));

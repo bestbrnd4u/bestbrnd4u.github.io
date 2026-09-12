@@ -604,6 +604,32 @@ collections:
                     hint: >
                       Слідкуйте за контрастом: світлий текст на світлій кнопці
                       читатися не буде.
+                  - label: "Колір бейджа"
+                    name: "badgeBg"
+                    widget: "color"
+                    required: false
+                    allowInput: true
+                    hint: >
+                      Заливка позначки («-50%», «NEW», «ЦІНА ДНЯ»). Порожньо —
+                      червона, як зараз.
+                  - label: "Колір тексту на бейджі"
+                    name: "badgeText"
+                    widget: "color"
+                    required: false
+                    allowInput: true
+                  - label: "Колір таймера"
+                    name: "timerBg"
+                    widget: "color"
+                    required: false
+                    allowInput: true
+                    hint: >
+                      Заливка відліку в акції з розкладом. До початку він темний,
+                      поки йде — червоний; цей колір замінює обидва.
+                  - label: "Колір цифр на таймері"
+                    name: "timerText"
+                    widget: "color"
+                    required: false
+                    allowInput: true
                   - label: "Розмір заголовка"
                     name: "titleSize"
                     widget: "select"
@@ -822,6 +848,32 @@ collections:
                     hint: >
                       Слідкуйте за контрастом: світлий текст на світлій кнопці
                       читатися не буде.
+                  - label: "Колір бейджа"
+                    name: "badgeBg"
+                    widget: "color"
+                    required: false
+                    allowInput: true
+                    hint: >
+                      Заливка позначки («-50%», «NEW», «ЦІНА ДНЯ»). Порожньо —
+                      червона, як зараз.
+                  - label: "Колір тексту на бейджі"
+                    name: "badgeText"
+                    widget: "color"
+                    required: false
+                    allowInput: true
+                  - label: "Колір таймера"
+                    name: "timerBg"
+                    widget: "color"
+                    required: false
+                    allowInput: true
+                    hint: >
+                      Заливка відліку в акції з розкладом. До початку він темний,
+                      поки йде — червоний; цей колір замінює обидва.
+                  - label: "Колір цифр на таймері"
+                    name: "timerText"
+                    widget: "color"
+                    required: false
+                    allowInput: true
                   - label: "Розмір заголовка"
                     name: "titleSize"
                     widget: "select"
@@ -1098,6 +1150,32 @@ collections:
             hint: >
               Слідкуйте за контрастом: світлий текст на світлій кнопці
               читатися не буде.
+          - label: "Колір бейджа"
+            name: "badgeBg"
+            widget: "color"
+            required: false
+            allowInput: true
+            hint: >
+              Заливка позначки («-50%», «NEW», «ЦІНА ДНЯ»). Порожньо —
+              червона, як зараз.
+          - label: "Колір тексту на бейджі"
+            name: "badgeText"
+            widget: "color"
+            required: false
+            allowInput: true
+          - label: "Колір таймера"
+            name: "timerBg"
+            widget: "color"
+            required: false
+            allowInput: true
+            hint: >
+              Заливка відліку в акції з розкладом. До початку він темний,
+              поки йде — червоний; цей колір замінює обидва.
+          - label: "Колір цифр на таймері"
+            name: "timerText"
+            widget: "color"
+            required: false
+            allowInput: true
           - label: "Розмір заголовка"
             name: "titleSize"
             widget: "select"
@@ -1233,6 +1311,21 @@ collections:
       #
       # У цьому боці вимкнено = «не приховувати» = таймер на місці.
       # Стан перемикача збігається з тим, що на сайті, з першої секунди.
+      - label: "Де товари в блоці «Ціна дня»"
+        name: "dealAlign"
+        # default без required — та сама пастка, що в решті полів.
+        required: false
+        widget: "select"
+        default: "left"
+        options:
+          - { label: "Ліворуч (як зараз)", value: "left" }
+          - { label: "По центру", value: "center" }
+          - { label: "Праворуч", value: "right" }
+        hint: >
+          Коли товар в акції один, ряд карток притиснутий ліворуч, а
+          решта рядка порожня. Тут обирають, де йому стояти. На кілька
+          товарів теж діє: вони йдуть купкою в обраний бік.
+
       - label: "Приховати таймер"
         name: "hideCountdown"
         required: false
@@ -1260,7 +1353,30 @@ collections:
         name: "badge"
         widget: "string"
         required: false
-        hint: "Наприклад: -50% або NEW"
+        hint: >
+          Наприклад: -50% або NEW. Порожньо — бейджа немає ніде.
+          У блоці «Ціна дня» на головній порожній бейдж замінюється
+          словом за станом акції: «СКОРО» до початку, «ЦІНА ДНЯ» поки
+          йде. Там це єдине, що пояснює, чому ціна інша.
+
+      - label: "Де показувати бейдж"
+        name: "badgePlaces"
+        # default без required — пастка: Decap вважає поле
+        # обов'язковим, а default застосовує лише до НОВИХ записів,
+        # тож старі перестають зберігатись (див. tests/test-entries-savable.js)
+        required: false
+        widget: "select"
+        default: "both"
+        options:
+          - { label: "І на головній, і на сторінці акції (як зараз)", value: "both" }
+          - { label: "Тільки на головній", value: "home" }
+          - { label: "Тільки на сторінці акції", value: "promo" }
+          - { label: "Ніде", value: "none" }
+        hint: >
+          Банер часто вже має намальовану позначку на самому фото — тоді
+          наша друга поверх нього зайва, а на головній вона потрібна
+          (там свого фото немає). «Ніде» прибирає бейдж, не стираючи
+          сам текст: його можна буде повернути одним кліком.
 
       - label: "Заголовок"
         name: "title"
@@ -1626,6 +1742,62 @@ collections:
       # Усе необовʼязкове. Нічого не заповнили — блок виглядає як
       # зараз: правила в style.css мають значення за замовчуванням,
       # і змінна просто не зʼявляється.
+
+      # ── Свої кольори для ГОЛОВНОЇ ──
+      #
+      # Банер акції й блок на головній стоять на різному тлі: на банері
+      # текст лежить на фото й мусить бути світлим, на головній — на
+      # світлій сторінці й мусить бути темним. Один набір на двох
+      # означав би, що в одному з місць напис зникає.
+      #
+      # Порожньо — беруться кольори з набору вище, тобто все як було.
+      - label: "Кольори на головній (якщо мають відрізнятись)"
+        name: "homeStyle"
+        widget: "object"
+        collapsed: true
+        required: false
+        fields:
+          - label: "Колір тексту"
+            name: "textColor"
+            widget: "color"
+            required: false
+            allowInput: true
+          - label: "Колір бейджа-підпису зверху"
+            name: "accentColor"
+            widget: "color"
+            required: false
+            allowInput: true
+          - label: "Колір кнопки"
+            name: "buttonBg"
+            widget: "color"
+            required: false
+            allowInput: true
+          - label: "Колір тексту на кнопці"
+            name: "buttonText"
+            widget: "color"
+            required: false
+            allowInput: true
+          - label: "Колір бейджа"
+            name: "badgeBg"
+            widget: "color"
+            required: false
+            allowInput: true
+          - label: "Колір тексту на бейджі"
+            name: "badgeText"
+            widget: "color"
+            required: false
+            allowInput: true
+          - label: "Колір таймера"
+            name: "timerBg"
+            widget: "color"
+            required: false
+            allowInput: true
+          - label: "Колір цифр на таймері"
+            name: "timerText"
+            widget: "color"
+            required: false
+            allowInput: true
+
       - label: "Оформлення тексту і кнопки"
         name: "style"
         widget: "object"
@@ -1674,6 +1846,32 @@ collections:
             hint: >
               Слідкуйте за контрастом: світлий текст на світлій кнопці
               читатися не буде.
+          - label: "Колір бейджа"
+            name: "badgeBg"
+            widget: "color"
+            required: false
+            allowInput: true
+            hint: >
+              Заливка позначки («-50%», «NEW», «ЦІНА ДНЯ»). Порожньо —
+              червона, як зараз.
+          - label: "Колір тексту на бейджі"
+            name: "badgeText"
+            widget: "color"
+            required: false
+            allowInput: true
+          - label: "Колір таймера"
+            name: "timerBg"
+            widget: "color"
+            required: false
+            allowInput: true
+            hint: >
+              Заливка відліку в акції з розкладом. До початку він темний,
+              поки йде — червоний; цей колір замінює обидва.
+          - label: "Колір цифр на таймері"
+            name: "timerText"
+            widget: "color"
+            required: false
+            allowInput: true
           - label: "Розмір заголовка"
             name: "titleSize"
             widget: "select"
@@ -1889,6 +2087,32 @@ collections:
             hint: >
               Слідкуйте за контрастом: світлий текст на світлій кнопці
               читатися не буде.
+          - label: "Колір бейджа"
+            name: "badgeBg"
+            widget: "color"
+            required: false
+            allowInput: true
+            hint: >
+              Заливка позначки («-50%», «NEW», «ЦІНА ДНЯ»). Порожньо —
+              червона, як зараз.
+          - label: "Колір тексту на бейджі"
+            name: "badgeText"
+            widget: "color"
+            required: false
+            allowInput: true
+          - label: "Колір таймера"
+            name: "timerBg"
+            widget: "color"
+            required: false
+            allowInput: true
+            hint: >
+              Заливка відліку в акції з розкладом. До початку він темний,
+              поки йде — червоний; цей колір замінює обидва.
+          - label: "Колір цифр на таймері"
+            name: "timerText"
+            widget: "color"
+            required: false
+            allowInput: true
           - label: "Розмір заголовка"
             name: "titleSize"
             widget: "select"

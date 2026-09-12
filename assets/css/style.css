@@ -11282,6 +11282,40 @@ body.mobile-filters-open .scroll-top{
     border-color:var(--blk-btn-bg, inherit);
 }
 
+/* БЕЙДЖ І ТАЙМЕР — свої кольори, а не «колір кнопки».
+
+   Обидва за замовчуванням червоні (--danger): вони мають кричати. Але
+   акція буває й спокійною, і на пастельному банері червона пляма —
+   єдине, що видно. Порожнє поле в адмінці лишає червоний. */
+.has-style .badge,
+.has-style .promo-card-badge,
+.has-style .promo-hero-badge,
+.has-style .brand-campaign-eyebrow,
+.has-style .deal-eyebrow{
+    background:var(--blk-badge-bg, inherit);
+    color:var(--blk-badge-text, inherit);
+}
+
+/* Дрібний підпис над заголовком заливки не має — у нього фарбується
+   сам текст. Інакше «ЦІНА ДНЯ» на головній перетворилась би на
+   кольорову плашку там, де її ніколи не було. */
+.has-style .deal-eyebrow,
+.has-style .brand-campaign-eyebrow{
+    background:transparent;
+    color:var(--blk-badge-bg, inherit);
+}
+
+.has-style .promo-countdown{
+    background:var(--blk-timer-bg, inherit);
+    color:var(--blk-timer-text, inherit);
+}
+
+/* Червоний стан «іде» теж підкоряється вибору: інакше колір діяв би
+   лише до початку акції й зникав саме тоді, коли на банер дивляться. */
+.has-style .promo-countdown[data-state="live"]{
+    background:var(--blk-timer-bg, var(--danger));
+}
+
 /* Прозорі кнопки (btn-outline) мають лишатись прозорими — у них колір
    з адмінки задає рамку й текст, а не заливку. Інакше «Дивитись
    каталог» поруч із основною кнопкою перетворювалась би на її копію. */
@@ -14036,11 +14070,24 @@ body.refusal-open{
 
 /* Ряд товарів. Сітка, а не карусель: товарів у ціні дня одиниці, і
    стрілки гортання над трьома картками — механіка без потреби. */
+/* ДЕ СТОЯТЬ ТОВАРИ.
+
+   auto-FIT, а не auto-fill: fill лишає порожні колонки на всю ширину,
+   і тоді вирівнювати нічого — один товар однаково притиснутий ліворуч,
+   а праворуч від нього півекрана порожнечі. fit порожні колонки
+   згортає, тож ряд із однієї картки можна поставити куди треба.
+
+   Верхня межа колонки (300px) потрібна з тієї ж причини: без неї
+   єдина картка розтягнулась би на всю ширину блока. */
 .deal-products{
     display:grid;
-    grid-template-columns:repeat(auto-fill, minmax(240px, 1fr));
+    grid-template-columns:repeat(auto-fit, minmax(240px, 300px));
     gap:20px;
+    justify-content:start;
 }
+
+.deal-products[data-align="center"]{ justify-content:center; }
+.deal-products[data-align="right"]{ justify-content:end; }
 
 .deal-more{
     display:inline-block;

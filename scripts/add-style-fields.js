@@ -82,6 +82,32 @@ ${pad}      allowInput: true
 ${pad}      hint: >
 ${pad}        Слідкуйте за контрастом: світлий текст на світлій кнопці
 ${pad}        читатися не буде.
+${pad}    - label: "Колір бейджа"
+${pad}      name: "badgeBg"
+${pad}      widget: "color"
+${pad}      required: false
+${pad}      allowInput: true
+${pad}      hint: >
+${pad}        Заливка позначки («-50%», «NEW», «ЦІНА ДНЯ»). Порожньо —
+${pad}        червона, як зараз.
+${pad}    - label: "Колір тексту на бейджі"
+${pad}      name: "badgeText"
+${pad}      widget: "color"
+${pad}      required: false
+${pad}      allowInput: true
+${pad}    - label: "Колір таймера"
+${pad}      name: "timerBg"
+${pad}      widget: "color"
+${pad}      required: false
+${pad}      allowInput: true
+${pad}      hint: >
+${pad}        Заливка відліку в акції з розкладом. До початку він темний,
+${pad}        поки йде — червоний; цей колір замінює обидва.
+${pad}    - label: "Колір цифр на таймері"
+${pad}      name: "timerText"
+${pad}      widget: "color"
+${pad}      required: false
+${pad}      allowInput: true
 ${pad}    - label: "Розмір заголовка"
 ${pad}      name: "titleSize"
 ${pad}      widget: "select"

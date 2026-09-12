@@ -194,10 +194,21 @@ console.log("\n[7] Оформлення доходить до всіх блок�
         ["головний банер", /applyBlockStyle\(heroSection, hero\.style\)/],
         ["промо-банер", /applyBlockStyle\(bannerEl, promo\.style\)/],
         ["добірка", /collection-widget\$\{blockStyleClass\(collection\.style\)\}/],
-        ["картка акції", /promo-card\$\{blockStyleClass\(promo\.style\)\}/],
-        ["слайдер акцій", /promo-hero-slide\$\{blockStyleClass\(promo\.style\)\}/],
-        ["банер бренду", /brand-campaign-banner\$\{blockStyleClass\(promo\.style\)\}/]
-    ].forEach(([label, re]) => check(label, re.test(app)));
+        // Блоки АКЦІЙ беруть не promo.style напряму, а злитий набір:
+        // спільні кольори плюс власні «на головній». Причина — тло: на
+        // банері сторінки акції текст лежить на фото й мусить бути
+        // світлим, на головній він на білій сторінці й мусить бути
+        // темним. Один набір на двох означав би, що в одному з місць
+        // напис зникає.
+        ["картка акції", /promo-card\$\{blockStyleClass\(promoHomeStyle\(promo\)\)\}/],
+        ["слайдер акцій", /promo-hero-slide\$\{blockStyleClass\(promoHomeStyle\(promo\)\)\}/],
+        ["банер бренду", /brand-campaign-banner\$\{blockStyleClass\(promoHomeStyle\(promo\)\)\}/],
+        ["блок «Ціна дня»", /deal-block\$\{blockStyleClass\(promoHomeStyle\(promo\)\)\}/],
+        // Сторінка акції оформлення не читала ВЗАГАЛІ: обраний в
+        // адмінці колір діяв на головній і мовчки не діяв на банері.
+        ["банер сторінки акції", /TextStyles\.styleVars\(promo\.style\)/, "promo"]
+    ].forEach(([label, re, where]) =>
+        check(label, re.test(where === "promo" ? read("assets/js/promo.js") : app)));
 
     // один модуль на сайт і адмінку — інакше прев'ю почне брехати
     check("сайт підключає модуль", /assets\/js\/text-styles\.js/.test(read("index.html")));
