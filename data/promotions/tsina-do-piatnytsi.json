@@ -4,6 +4,7 @@
   "products": [
     57
   ],
+  "discountPercent": "",
   "active": true,
   "endsAt": "2026-09-19T00:00:00+03:00",
   "homeText": "Marc Jacobs The J Marc Shoulder Bag Green Glow — в одному екземплярі. Далі тільки під замовлення.",
@@ -14,14 +15,21 @@
   "hideCountdown": false,
   "style": {
     "buttonText": "",
-    "accentColor": "#60e109"
+    "accentColor": "#f50000",
+    "align": "left",
+    "timerText": "#60e109",
+    "timerBg": "#0d0101",
+    "textColor": "#ff0000",
+    "badgeBg": "",
+    "buttonBg": "#60e109"
   },
   "homeStyle": {
-    "textColor": "",
+    "textColor": "#060000",
     "accentColor": "",
     "badgeBg": "",
-    "timerBg": "",
-    "timerText": "#60e109"
+    "timerBg": "#000000",
+    "timerText": "#60e109",
+    "badgeText": ""
   },
   "bannerLayout": "right-top",
   "title": "Ціна 8600грн",
