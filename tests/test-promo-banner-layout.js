@@ -59,16 +59,25 @@ console.log("\n[1] Накладку на банері можна прибрат�
             String(field(name).required)));
 
     check("таймер має власний перемикач",
-        field("showCountdown") && field("showCountdown").widget === "boolean");
+        field("hideCountdown") && field("hideCountdown").widget === "boolean");
 
-    // ЯВНИЙ false, а не «немає поля»: акції, створені до появи
-    // перемикача, поля не мають і мусять показувати відлік, як
-    // показували.
-    check("вимкнення таймера — саме false, а не порожнє поле",
-        /showCountdown === false/.test(promoJs) && /showCountdown === false/.test(appJs));
+    // ПЕРЕМИКАЧ САМЕ «ПРИХОВАТИ», А НЕ «ПОКАЗУВАТИ».
+    //
+    // Decap малює булеве поле вимкненим, коли його в записі немає, — а
+    // немає його в усіх акціях, створених до появи перемикача.
+    // «Показувати таймер» у вимкненому стані читалось би як «таймера
+    // немає», хоча він показується: власник бачив би одне, покупець
+    // інше. Заміряно в живій адмінці на локальному backend.
+    check("вимкнений стан перемикача = таймер на місці",
+        field("hideCountdown").default === false);
 
-    check("збірка переносить вимкнений таймер",
-        /data\.showCountdown === false \? \{ showCountdown: false \}/.test(build));
+    // ЯВНИЙ true, а не «немає поля»: інакше всі вже опубліковані акції
+    // разом втратили б відлік.
+    check("приховання таймера — саме true, а не порожнє поле",
+        /hideCountdown === true/.test(promoJs) && /hideCountdown === true/.test(appJs));
+
+    check("збірка переносить прихований таймер",
+        /data\.hideCountdown === true \? \{ hideCountdown: true \}/.test(build));
 
     check("порожній заголовок ховає h1", /titleEl\.hidden = !hasTitle/.test(promoJs));
 
@@ -89,16 +98,29 @@ console.log("\n[2] Накладку можна посунути");
 {
     const options = field("bannerLayout").options.map(o => o.value);
 
-    check("девʼять позицій в адмінці", options.length === 9, options.length);
+    const places = options.filter(v => v !== "hidden");
+
+    check("девʼять позицій в адмінці", places.length === 9, places.length);
+
+    // «Лише картинка» — не позиція, а окремий режим: банер лишається
+    // самим фото, а заголовок з описом далі працюють на головній.
+    check("плюс режим «нічого не писати»", options.includes("hidden"));
 
     // Перелік живе в трьох місцях — адмінка, збірка, CSS. Розійдуться
     // — і вибір в адмінці мовчки нічого не змінить на сайті.
-    const inBuild = (build.match(/"(left|center|right)-(top|middle|bottom)"/g) || [])
+    const inBuild = (build.match(/"(left|center|right)-(top|middle|bottom)"|"hidden"/g) || [])
         .map(v => v.replace(/"/g, ""));
 
     check("збірка знає рівно ті самі",
         options.every(v => inBuild.includes(v)) && inBuild.length === options.length,
         inBuild.join(", "));
+
+    // Режим «лише картинка» мусить гасити ВСЮ накладку разом, а не
+    // покладатись на порожні поля: заголовок і опис лишаються
+    // заповненими заради головної.
+    check("«лише картинка» гасить накладку одним прапорцем",
+        /const bare = promo\.bannerLayout === "hidden"/.test(promoJs)
+        && /!bare && Boolean\(promo\.title\)/.test(promoJs));
 
     const axes = ["-top", "-middle", "-bottom", "left-", "center-", "right-"];
 

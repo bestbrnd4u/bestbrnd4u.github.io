@@ -70,8 +70,21 @@ const api = (() => {
 
 })();
 
-const FROM = "2026-09-11T18:00:00Z";
-const TO = "2026-09-12T03:00:00Z";
+// ВІКНО РАХУЄТЬСЯ ВІД «ЗАРАЗ», А НЕ ЗАПИСАНЕ ДАТАМИ.
+//
+// Спершу тут стояли дати вересня 2026-го. Поки їх писали, вони були
+// в майбутньому; за добу вони стали минулим — і перевірки, які
+// звіряють ціну БЕЗ явного моменту (як картка товару), почали бачити
+// сейл, що вже скінчився. Набір червонів на цілком робочому коді.
+//
+// Момент передається явно всюди, де він важить; там, де функція бере
+// його з годинника сама, вікно мусить бути живим у будь-який день.
+const NOW = Date.now();
+
+const HOUR = 3600 * 1000;
+
+const FROM = new Date(NOW - 6 * HOUR).toISOString();
+const TO = new Date(NOW + 3 * HOUR).toISOString();
 
 const deal = { price: 8600, from: FROM, to: TO };
 
@@ -79,24 +92,31 @@ const bag = { id: 57, price: 9000, sale: deal };
 
 const at = text => Date.parse(text);
 
+// Моменти навколо вікна — теж від «зараз». BEFORE і AFTER свідомо
+// далеко за межами: так перевірка лишається осмисленою, навіть якщо
+// вікно колись зроблять ширшим.
+const BEFORE = NOW - 12 * HOUR;
+const INSIDE = NOW - 1 * HOUR;
+const AFTER = NOW + 12 * HOUR;
+
 
 console.log("\n[1] Ціна залежить від годинника, а не від збірки");
 {
     check("до початку — звичайна",
-        api.priceNow(bag, at("2026-09-11T17:59:59Z")) === 9000);
+        api.priceNow(bag, BEFORE) === 9000);
 
     check("рівно на початку — вже акційна",
         api.priceNow(bag, at(FROM)) === 8600);
 
     check("посеред вікна — акційна",
-        api.priceNow(bag, at("2026-09-11T23:00:00Z")) === 8600);
+        api.priceNow(bag, INSIDE) === 8600);
 
     // Кінець НЕ включно: «до 03:00» читається як «о 03:00 вже ні».
     check("рівно в кінці — знову звичайна",
         api.priceNow(bag, at(TO)) === 9000);
 
     check("після кінця — звичайна",
-        api.priceNow(bag, at("2026-09-12T09:00:00Z")) === 9000);
+        api.priceNow(bag, AFTER) === 9000);
 
     check("товар без ціни дня не змінився",
         api.priceNow({ price: 5000 }) === 5000
@@ -119,17 +139,17 @@ console.log("\n[2] Перекреслюємо те, що було вчора");
     const both = { price: 9000, oldPrice: 12000, sale: deal };
 
     check("поки йде ціна дня — перекреслена звичайна",
-        api.oldPriceNow(both, at("2026-09-11T20:00:00Z")) === 9000);
+        api.oldPriceNow(both, INSIDE) === 9000);
 
     check("поза вікном — власна стара ціна товару",
-        api.oldPriceNow(both, at("2026-09-12T20:00:00Z")) === 12000);
+        api.oldPriceNow(both, AFTER) === 12000);
 
     check("відсоток знижки враховує ціну дня",
-        api.discountPercent(bag, at("2026-09-11T20:00:00Z")) === 4,
-        api.discountPercent(bag, at("2026-09-11T20:00:00Z")));
+        api.discountPercent(bag, INSIDE) === 4,
+        api.discountPercent(bag, INSIDE));
 
     check("поза вікном знижки немає",
-        api.discountPercent(bag, at("2026-09-12T20:00:00Z")) === 0);
+        api.discountPercent(bag, AFTER) === 0);
 }
 
 
@@ -137,19 +157,13 @@ console.log("\n[3] Браузер, збірка й бот рахують вік�
 {
     const { dealActive } = require("../scripts/promo-deals.js");
 
-    const moments = [
-        "2026-09-11T17:59:59Z",
-        FROM,
-        "2026-09-11T23:00:00Z",
-        TO,
-        "2026-09-12T09:00:00Z"
-    ];
+    const moments = [BEFORE, at(FROM), INSIDE, at(TO), AFTER];
 
     const same = moments.every(moment =>
-        api.saleActive(bag, at(moment)) === dealActive(deal, at(moment)));
+        api.saleActive(bag, moment) === dealActive(deal, moment));
 
     check("saleActive() і dealActive() згодні на всіх межах", same,
-        moments.map(m => `${m}: ${api.saleActive(bag, at(m))}/${dealActive(deal, at(m))}`).join(", "));
+        moments.map(m => `${new Date(m).toISOString()}: ${api.saleActive(bag, m)}/${dealActive(deal, m)}`).join(", "));
 
     // Бот — окремий рантайм зі своєю копією правила. Дані він бере з
     // того самого data/products.json, тобто ціна дня до нього

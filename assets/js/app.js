@@ -487,12 +487,12 @@ function renderAdvantages(advantages) {
 // були до його появи.
 function promoTimerTag(promo) {
 
-    // Вимкнений в адмінці — не малюємо.
+    // Прихований в адмінці — не малюємо.
     //
-    // ЯВНИЙ false, а не «немає поля»: акції, створені до появи
+    // ЯВНИЙ true, а не «немає поля»: акції, створені до появи
     // перемикача, поля не мають і мусять показувати відлік, як
     // показували.
-    if (promo && promo.showCountdown === false) return "";
+    if (promo && promo.hideCountdown === true) return "";
 
     const timing = promoTiming(promo);
 

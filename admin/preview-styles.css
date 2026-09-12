@@ -183,6 +183,66 @@
     z-index:1;
 }
 
+/* Куди лягає напис на банері — те саме, що на сайті
+   (.promo-hero-banner[data-layout] у assets/css/style.css).
+
+   ЧОМУ ТУТ ТЕЖ. Прев'ю існує рівно заради одного питання: «чи не
+   закриє напис товар на фото». Якщо воно завжди малює напис ліворуч
+   посередині, відповісти на це питання неможливо. */
+
+.cms-preview-promo-content{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:10px;
+    max-width:70%;
+}
+
+.cms-preview-promo-banner[data-layout$="-top"]{ align-items:flex-start; }
+.cms-preview-promo-banner[data-layout$="-middle"]{ align-items:center; }
+.cms-preview-promo-banner[data-layout$="-bottom"]{ align-items:flex-end; }
+
+.cms-preview-promo-banner[data-layout^="left-"]{ justify-content:flex-start; }
+.cms-preview-promo-banner[data-layout^="center-"]{ justify-content:center; }
+.cms-preview-promo-banner[data-layout^="right-"]{ justify-content:flex-end; }
+
+.cms-preview-promo-banner[data-layout^="center-"] .cms-preview-promo-content{
+    align-items:center;
+    text-align:center;
+}
+
+.cms-preview-promo-banner[data-layout^="right-"] .cms-preview-promo-content{
+    align-items:flex-end;
+    text-align:right;
+}
+
+/* «Лише картинка»: ні напису, ні темної заливки — рівно те, що
+   побачить покупець. */
+.cms-preview-promo-bare .cms-preview-promo-content{
+    display:none;
+}
+
+.cms-preview-promo-bare .cms-preview-promo-bg img{
+    filter:none;
+}
+
+.cms-preview-promo-timer{
+    display:inline-block;
+    padding:6px 14px;
+    border-radius:50px;
+    background:#ef4444;
+    color:#fff;
+    font-size:13px;
+    font-weight:700;
+    font-variant-numeric:tabular-nums;
+}
+
+/* Сам банер розкладаємо в рядок: колонка з написом всередині вже
+   своя (.cms-preview-promo-content). */
+.cms-preview-promo-banner{
+    flex-direction:row !important;
+}
+
 .cms-preview-promo-banner{
     position:relative;
     display:flex;

@@ -807,16 +807,46 @@
             var products = e.get("products");
             var productList = products && products.toJS ? products.toJS() : [];
 
-            // банер сторінки акції — той самий вигляд, що на promo.html
+            // ЩО САМЕ ЛЯЖЕ ПОВЕРХ ФОТО — за тими самими правилами, що
+            // на сайті (renderPromoHero у assets/js/promo.js).
+            //
+            // Прев'ю, яке показує не те, що покаже сайт, гірше за
+            // відсутність прев'ю: тут стояла кнопка з підставним
+            // написом «Дивитись усі товари», і власник бачив її навіть
+            // після того, як спорожнив поле. Виглядало як «кнопку не
+            // прибрати з адмінки» — хоча на сайті її вже не було.
+            var layout = e.get("bannerLayout") || "left-middle";
+            var bare = layout === "hidden";
+
+            var hasBadge = !bare && Boolean(e.get("badge"));
+            var hasTitle = !bare && Boolean(e.get("title"));
+            var hasText = !bare && Boolean(e.get("text"));
+            var hasButton = !bare && Boolean(e.get("buttonText"));
+            var hasTimer = !bare && e.get("hideCountdown") !== true
+                && Boolean(e.get("startsAt") || e.get("endsAt"));
+
+            var hasOverlay = hasBadge || hasTitle || hasText || hasButton || hasTimer;
+
+            // Банер сторінки акції — той самий вигляд, що на promo.html.
             // Банер малюємо картинкою під текстом, а не фоном: фон не
             // вміє дочекатись щойно завантаженого файлу, а AssetImage вміє.
-            var banner = h("div", { className: "cms-preview-promo-banner" },
+            var banner = h("div", {
+                className: "cms-preview-promo-banner"
+                    + (hasOverlay ? "" : " cms-preview-promo-bare"),
+                "data-layout": layout
+            },
                 h("div", { className: "cms-preview-promo-bg" },
                     h(AssetImage, { path: pageImg || teaser, getAsset: getAsset })),
-                e.get("badge") ? h("span", { className: "cms-preview-promo-badge" }, e.get("badge")) : null,
-                h("h2", { className: "cms-preview-promo-title" }, esc(e.get("title"))),
-                e.get("text") ? h("p", { className: "cms-preview-promo-text" }, e.get("text")) : null,
-                h("span", { className: "btn cms-preview-promo-btn" }, esc(e.get("buttonText") || "Дивитись усі товари"))
+                h("div", { className: "cms-preview-promo-content" },
+                    hasBadge ? h("span", { className: "cms-preview-promo-badge" }, e.get("badge")) : null,
+                    hasTitle ? h("h2", { className: "cms-preview-promo-title" }, esc(e.get("title"))) : null,
+                    hasText ? h("p", { className: "cms-preview-promo-text" }, e.get("text")) : null,
+                    // Точний відлік тут не потрібен і був би брехнею: в
+                    // адмінці немає моменту, з якого рахувати. Показуємо
+                    // МІСЦЕ, яке таймер займе на банері.
+                    hasTimer ? h("span", { className: "cms-preview-promo-timer" }, "⏳ Лишилось 00:00:00") : null,
+                    hasButton ? h("span", { className: "btn cms-preview-promo-btn" }, esc(e.get("buttonText"))) : null
+                )
             );
 
             return h("div", { className: "cms-preview" },
@@ -835,6 +865,11 @@
                 section("Налаштування", detailsList([
                     ["Показувати на сайті", e.get("active") === false ? "ні" : "так"],
                     ["Спосіб показу", e.get("displayType")],
+                    ["Напис на банері", bare ? "не показувати" : layout],
+                    ["Таймер", e.get("hideCountdown") === true ? "приховано" : "показувати"],
+                    ["Ціна дня, ₴", e.get("dealPrice")],
+                    ["Початок", e.get("startsAt")],
+                    ["Кінець", e.get("endsAt")],
                     ["Порядок показу", e.get("order")],
                     ["Бейдж", e.get("badge")],
                     ["Бренд акції", e.get("brand")],

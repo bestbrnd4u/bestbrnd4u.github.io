@@ -163,7 +163,17 @@ function pushedLiteral(source) {
 
 // Заповнюємо КОЖНЕ поле адмінки — інакше умовні `...(data.x ? ...)`
 // промовчали б, і перевірка нічого б не побачила.
-function filledEntry(fields) {
+// ПЕРЕМИКАЧІ ПЕРЕВІРЯЄМО В ОБОХ СТАНАХ.
+//
+// Умовні спреди в збірках написані під ОДИН зі станів, і під який
+// саме — залежить від поля: autoBrand і splitByColor доїжджають, коли
+// вимкнені, hideCountdown — коли увімкнений. Поки тут стояло глухе
+// false, набір повідомляв «поле не доїжджає до сайту» про цілком
+// робочий перемикач, який просто означає протилежне.
+//
+// Тому запис заповнюється двічі, і поле вважається доїхавшим, якщо
+// його переніс хоча б один зі станів.
+function filledEntry(fields, booleans) {
 
     const data = {};
 
@@ -174,9 +184,9 @@ function filledEntry(fields) {
         switch (field.widget) {
 
             case "boolean":
-                // false, а не true: умовні спреди в збірках написані
-                // саме під «вимкнено» (autoBrand, splitByColor).
-                data[name] = false;
+                // Значення підставляє filledEntry(fields, booleans) —
+                // перемикачі перевіряються В ОБОХ станах, див. нижче.
+                data[name] = booleans;
                 break;
 
             case "number":
@@ -301,13 +311,14 @@ GROUPS.forEach(group => {
 
     if (!literal) return;
 
-    const data = filledEntry(fields);
-
     // Виконуємо СПРАВЖНІЙ літерал: так перевіряється код збірки, а не
     // його опис регуляркою.
-    const built = literalRunner(source)(data);
+    const run = literalRunner(source);
 
-    const emitted = new Set(Object.keys(built));
+    const emitted = new Set([
+        ...Object.keys(run(filledEntry(fields, false))),
+        ...Object.keys(run(filledEntry(fields, true)))
+    ]);
 
     const consumerSource = group.consumers.map(read).join("\n");
 

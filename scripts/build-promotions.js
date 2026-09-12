@@ -57,7 +57,11 @@ const { promoDate } = require("./promo-deals");
 const LAYOUTS = [
     "left-top", "left-middle", "left-bottom",
     "center-top", "center-middle", "center-bottom",
-    "right-top", "right-middle", "right-bottom"
+    "right-top", "right-middle", "right-bottom",
+    // Окремий випадок: банер лишається самою картинкою. Заголовок і
+    // опис при цьому НЕ порожніють — вони далі потрібні блоку на
+    // головній і рядку у видачі Google.
+    "hidden"
 ];
 
 function renameToLatinSlugs(files, dirs) {
@@ -286,10 +290,10 @@ function main() {
             // ліворуч посередині, саме так малювались усі акції до
             // появи цього поля.
             ...(LAYOUTS.includes(data.bannerLayout) ? { bannerLayout: data.bannerLayout } : {}),
-            // Таймер вимикається ЯВНИМ false: відсутнє поле означає
-            // «показувати», інакше всі вже опубліковані акції разом
+            // Таймер прибирається ЯВНИМ true. Відсутнє поле означає
+            // «показувати» — інакше всі вже опубліковані акції разом
             // втратили б відлік.
-            ...(data.showCountdown === false ? { showCountdown: false } : {}),
+            ...(data.hideCountdown === true ? { hideCountdown: true } : {}),
             displayType: ["card", "hero_slider", "banner_products", "banner_compact", "deal_of_day"].includes(data.displayType)
                 ? data.displayType
                 : "card",

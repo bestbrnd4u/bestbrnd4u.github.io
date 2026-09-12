@@ -132,12 +132,12 @@ function startPromoCountdown(promo) {
 
     if (!box || !labelEl || !valueEl) return;
 
-    // Вимкнений в адмінці — блок не показуємо й годинник не заводимо.
+    // Прихований в адмінці — блок не показуємо й годинник не заводимо.
     //
-    // ЯВНИЙ false, а не «немає поля»: акції, створені до появи
+    // ЯВНИЙ true, а не «немає поля»: акції, створені до появи
     // перемикача, поля не мають — і мусять показувати відлік, як
     // показували.
-    if (promo.showCountdown === false) {
+    if (promo.hideCountdown === true || promo.bannerLayout === "hidden") {
         box.hidden = true;
         return;
     }
@@ -259,11 +259,21 @@ function renderPromoHero(promo) {
     // елемент згори — завада: заголовок лягає на заголовок, кнопка
     // закриває товар. Тому всі чотири прибираються порожнім полем, а
     // таймер — перемикачем.
-    const hasBadge = Boolean(promo.badge);
-    const hasTitle = Boolean(promo.title);
-    const hasText = Boolean(promo.text);
-    const hasButton = Boolean(promo.buttonText);
-    const hasTimer = promo.showCountdown !== false && Boolean(promoTiming(promo).until);
+    // «Лише картинка» — один вимикач на всю накладку.
+    //
+    // ЧОМУ ОКРЕМО ВІД ПОРОЖНІХ ПОЛІВ. Заголовок і опис потрібні ще й
+    // блоку на головній, вкладці браузера й рядку у видачі Google.
+    // Чистити банер, спорожнюючи їх, означало б заразом знімати напис
+    // із головної — а там картинки немає, і текст там єдине, що
+    // пояснює акцію.
+    const bare = promo.bannerLayout === "hidden";
+
+    const hasBadge = !bare && Boolean(promo.badge);
+    const hasTitle = !bare && Boolean(promo.title);
+    const hasText = !bare && Boolean(promo.text);
+    const hasButton = !bare && Boolean(promo.buttonText);
+    const hasTimer = !bare && promo.hideCountdown !== true
+        && Boolean(promoTiming(promo).until);
 
     const hasOverlay = hasBadge || hasTitle || hasText || hasButton || hasTimer;
 
@@ -298,10 +308,9 @@ function renderPromoHero(promo) {
     // фото — фон. Без цього прапорця смуга схлопнулась би в нуль.
     banner.classList.toggle("promo-hero-bare", !hasOverlay);
 
-    if (promo.badge) {
-        badgeEl.textContent = promo.badge;
-        badgeEl.hidden = false;
-    }
+    badgeEl.hidden = !hasBadge;
+
+    if (hasBadge) badgeEl.textContent = promo.badge;
 
     startPromoCountdown(promo);
 
