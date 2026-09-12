@@ -336,6 +336,50 @@ console.log("\n[2d] Товари в блоці «Ціна дня» можна в
 }
 
 
+console.log("\n[2e] Прев'ю в адмінці показує ОБИДВА місця");
+{
+    // Прев'ю існує заради одного питання: «що з цього вийде». Поки
+    // воно малювало лише банер, половину полів перевірити було нічим —
+    // окремий напис для головної, вирівнювання товарів, свої кольори.
+    // Власник бачив результат аж на сайті.
+    const preview = read("admin/preview-templates.js");
+
+    check("є блок «на головній»", /cms-preview-home/.test(preview));
+
+    check("бере окремий напис",
+        /e\.get\("homeTitle"\) \|\| e\.get\("title"\)/.test(preview)
+        && /e\.get\("homeText"\) \|\| e\.get\("text"\)/.test(preview));
+
+    check("бере свої кольори",
+        /TextStyles\.mergeStyles\(e\.get\("style"\), e\.get\("homeStyle"\)\)/.test(preview));
+
+    check("слухається вирівнювання",
+        /"data-align": e\.get\("dealAlign"\) \|\| "left"/.test(preview));
+
+    check("слухається перемикача таймера",
+        /e\.get\("hideCountdown"\) !== true/.test(preview));
+
+    // Бейдж — там, де його дозволили, і в кожному місці своє питання.
+    check("бейдж питає своє поле в обох місцях",
+        /badgePlaces !== "home" && badgePlaces !== "none"/.test(preview)
+        && /badgePlaces !== "promo" && badgePlaces !== "none"/.test(preview));
+
+    check("кнопка лише з написом",
+        /e\.get\("buttonText"\)\s*\?\s*h\("span", \{ className: "cms-preview-home-more"/.test(preview));
+
+    // Прев'ю мусить малювати ті самі правила, що сайт. Один модуль на
+    // двох — саме щоб вони не розійшлися.
+    check("оформлення рахує спільний модуль, а не своя копія",
+        /TextStyles\.styleVars\(homeStyle\)/.test(preview));
+
+    const previewCss = read("admin/preview-styles.css");
+
+    check("ряд товарів у прев'ю теж вирівнюється",
+        /cms-preview-home-row\[data-align="center"\]/.test(previewCss)
+        && /cms-preview-home-row\[data-align="right"\]/.test(previewCss));
+}
+
+
 console.log("\n[3] Порожній заголовок не ламає видачу Google");
 {
     check("назва акції словами — одна функція", /function promoHeading/.test(promoJs));

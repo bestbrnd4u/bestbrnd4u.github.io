@@ -818,7 +818,10 @@
             var layout = e.get("bannerLayout") || "left-middle";
             var bare = layout === "hidden";
 
-            var hasBadge = !bare && Boolean(e.get("badge"));
+            var badgePlaces = e.get("badgePlaces") || "both";
+
+            var hasBadge = !bare && badgePlaces !== "home" && badgePlaces !== "none"
+                && Boolean(e.get("badge"));
             var hasTitle = !bare && Boolean(e.get("title"));
             var hasText = !bare && Boolean(e.get("text"));
             var hasButton = !bare && Boolean(e.get("buttonText"));
@@ -849,6 +852,61 @@
                 )
             );
 
+            // ── БЛОК НА ГОЛОВНІЙ ──
+            //
+            // Друге місце, де живе акція, і воно геть інше: світле тло,
+            // свій напис, свої кольори, ряд карток товарів. Поки прев'ю
+            // показувало лише банер, половину полів перевірити було
+            // нічим — власник бачив результат аж на сайті.
+            //
+            // Малюємо ті самі правила, що renderDealPromotions():
+            // порожній напис не пишемо, бейдж слухається свого поля,
+            // таймер — перемикача, картки стають туди, куди сказано.
+            var homeBadge = badgePlaces !== "promo" && badgePlaces !== "none"
+                ? (e.get("badge") || (e.get("startsAt") ? "СКОРО" : "ЦІНА ДНЯ"))
+                : "";
+
+            var homeTitle = String(e.get("homeTitle") || e.get("title") || "").trim();
+            var homeText = String(e.get("homeText") || e.get("text") || "").trim();
+
+            // Кольори: спільний набір плюс власні «на головній».
+            var homeStyle = window.TextStyles
+                ? window.TextStyles.mergeStyles(e.get("style"), e.get("homeStyle"))
+                : null;
+
+            var homeVars = window.TextStyles ? window.TextStyles.styleVars(homeStyle) : {};
+
+            var homeAttr = Object.keys(homeVars)
+                .map(function (k) { return k + ":" + homeVars[k]; }).join(";");
+
+            var homeBlock = h("div", {
+                className: "cms-preview-home" + (homeAttr ? " has-style" : ""),
+                style: homeAttr || undefined
+            },
+                h("div", { className: "cms-preview-home-head" },
+                    h("div", null,
+                        homeBadge ? h("span", { className: "cms-preview-home-eyebrow" }, homeBadge) : null,
+                        homeTitle ? h("h3", { className: "cms-preview-home-title" }, esc(homeTitle)) : null,
+                        homeText ? h("p", { className: "cms-preview-home-text" }, esc(homeText)) : null),
+                    (e.get("hideCountdown") !== true && (e.get("startsAt") || e.get("endsAt")))
+                        ? h("span", { className: "cms-preview-promo-timer" }, "⏳ Лишилось 00:00:00")
+                        : null),
+                h("div", {
+                    className: "cms-preview-home-row",
+                    "data-align": e.get("dealAlign") || "left"
+                },
+                    // Справжніх карток тут не намалювати: у прев'ю немає
+                    // ні фото товарів, ні цін. Показуємо їхню кількість і
+                    // МІСЦЕ — саме це й налаштовують полем вирівнювання.
+                    (productList.length ? productList : [null]).slice(0, 4).map(function (id, i) {
+                        return h("div", { className: "cms-preview-home-card", key: i },
+                            productList.length ? "товар " + id : "товарів не обрано");
+                    })),
+                e.get("buttonText")
+                    ? h("span", { className: "cms-preview-home-more" }, esc(e.get("buttonText")) + " →")
+                    : null
+            );
+
             return h("div", { className: "cms-preview" },
 
                 h("div", { className: "cms-preview-hint" },
@@ -864,16 +922,18 @@
                 // якщо заповнені, інакше загальні. Без цього рядка
                 // власник бачив би в прев'ю лише картинку й не знав,
                 // чим обернеться порожній банер.
-                section("Прев'ю на головній", h("div", null,
-                    teaser
-                        ? h(AssetImage, { path: teaser, getAsset: getAsset, className: "cms-preview-teaser" })
-                        : null,
-                    h("div", { className: "cms-preview-home-words" },
-                        h("b", null, esc(e.get("homeTitle") || e.get("title") || "—")),
-                        (e.get("homeText") || e.get("text"))
-                            ? h("p", null, esc(e.get("homeText") || e.get("text")))
-                            : null)
-                )),
+                // «Ціна дня» — окремий блок без фото; решта способів
+                // показу — банер або картка, там головне саме прев'ю.
+                e.get("displayType") === "deal_of_day"
+                    ? section("Блок на головній", homeBlock)
+                    : section("Прев'ю на головній", h("div", null,
+                        teaser
+                            ? h(AssetImage, { path: teaser, getAsset: getAsset, className: "cms-preview-teaser" })
+                            : null,
+                        h("div", { className: "cms-preview-home-words" },
+                            h("b", null, esc(homeTitle || "—")),
+                            homeText ? h("p", null, esc(homeText)) : null)
+                    )),
 
                 section("Налаштування", detailsList([
                     ["Показувати на сайті", e.get("active") === false ? "ні" : "так"],

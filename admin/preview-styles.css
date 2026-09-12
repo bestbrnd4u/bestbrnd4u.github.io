@@ -542,3 +542,75 @@
     margin:4px 0 0;
     color:#6b7280;
 }
+
+/* ── Блок «Ціна дня», як він виглядатиме на головній ──
+
+   Тло світле, як на самій сторінці: саме через це для головної й
+   є окремий набір кольорів — світлий текст банера тут зникав би. */
+.cms-preview-home{
+    padding:16px;
+    border-radius:12px;
+    background:#f9fafb;
+    border:1px solid #e5e7eb;
+}
+
+.cms-preview-home-head{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:12px;
+}
+
+.cms-preview-home-eyebrow{
+    display:block;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--blk-badge-bg, #ef4444);
+}
+
+.cms-preview-home-title{
+    margin:4px 0 0;
+    font-size:18px;
+    color:var(--blk-text, #111827);
+}
+
+.cms-preview-home-text{
+    margin:4px 0 0;
+    font-size:13px;
+    color:var(--blk-text, #6b7280);
+}
+
+/* Ряд товарів. Справжніх карток у прев’ю не намалювати — немає ні
+   фото, ні цін. Показуємо їхню кількість і МІСЦЕ: саме місце й
+   налаштовують полем вирівнювання. */
+.cms-preview-home-row{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(90px, 110px));
+    gap:8px;
+    justify-content:start;
+}
+
+.cms-preview-home-row[data-align="center"]{ justify-content:center; }
+.cms-preview-home-row[data-align="right"]{ justify-content:end; }
+
+.cms-preview-home-card{
+    padding:18px 8px;
+    border-radius:8px;
+    border:1px dashed #d1d5db;
+    background:#fff;
+    font-size:11px;
+    color:#9ca3af;
+    text-align:center;
+}
+
+.cms-preview-home-more{
+    display:inline-block;
+    margin-top:12px;
+    font-size:12px;
+    font-weight:600;
+    text-decoration:underline;
+    color:var(--blk-text, #111827);
+}
