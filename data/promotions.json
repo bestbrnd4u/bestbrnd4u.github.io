@@ -91,12 +91,15 @@
     "brand": "",
     "discountPercent": null,
     "dealPrice": 8600,
-    "startsAt": "2026-09-12T21:00:00.000Z",
     "endsAt": "2026-09-18T21:00:00.000Z",
     "productIds": [
       57
     ],
     "genderButtons": [],
+    "style": {
+      "buttonText": "",
+      "accentColor": "#60e109"
+    },
     "homeTitle": "До пʼятниці",
     "homeText": "Marc Jacobs The J Marc Shoulder Bag Green Glow — в одному екземплярі. Далі тільки під замовлення.",
     "badgePlaces": "home",
