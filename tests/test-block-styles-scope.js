@@ -304,20 +304,82 @@ console.log("\n[6] Прев'ю ставить змінні на ОБИДВА б�
         /style: hasHomeVars \? homeVars : undefined/.test(templates));
 
     // Розмір заголовка — множник, і множити треба на розмір блока.
-    // Селектор може повторюватись у файлі кілька разів (у банера, до
-    // прикладу, є ще й окреме правило з flex-direction), тож дивимось
-    // на зведене тіло, а не на перше-ліпше.
-    ["cms-preview-promo-banner", "cms-preview-home"].forEach(cls => {
-        const body = bodyOf(previewRules, "." + cls);
-        check(`${cls} називає свій --blk-title-base`,
-            Boolean(body && body.includes("--blk-title-base")),
-            body === null ? "правила немає" : "");
+    // Розмір заголовка й опису — множник від ВЛАСНОГО розміру, як на
+    // сайті. Селектор може повторюватись у файлі, тож дивимось на
+    // зведене тіло, а не на перше-ліпше.
+    [[".cms-preview-promo-title", "title"],
+     [".cms-preview-promo-text", "text"],
+     [".cms-preview-home-title", "title"],
+     [".cms-preview-home-text", "text"]].forEach(([sel, kind]) => {
+
+        const props = propsOf(previewRules, sel);
+        const size = props && props.get("font-size");
+
+        check(`${sel}: розмір — множник від власної бази`,
+            Boolean(props && props.get("--blk-" + kind + "-base")
+                && size && size.includes("--blk-" + kind + "-scale")),
+            props ? `font-size:${size}` : "правила немає");
+
     });
 
     // На сайті заголовок блока — h2, і правила розміру/великих
     // літер/розрядки написані для h1,h2. На h3 вони не діяли.
     check("заголовок блока на головній — h2, як на сайті",
         /h\("h2", \{ className: "cms-preview-home-title" \}/.test(templates));
+}
+
+console.log("\n[6a] Розмір рахується від власного розміру блока");
+{
+    // ЩО БУЛО НЕ ТАК. Одне правило на всіх:
+    //
+    //     .has-style h1, .has-style h2{
+    //         font-size:calc(var(--blk-title-base, 1em) * var(--blk-title-scale, 1));
+    //     }
+    //
+    // Змінної --blk-title-base не було ніде, тож множили на 1em. А
+    // правило з .has-style важить більше за власне правило
+    // заголовка — і заголовок сторінки акції падав із 42px до 16px
+    // від самого лише факту, що в блоці щось налаштували. Виміряно в
+    // браузері: H1, fontSize 16px.
+    //
+    // Полагодити це одним числом тут було б помилкою вдруге: у
+    // кожного блока свій розмір ще й на телефоні (30px замість 42,
+    // 24 замість 30). Тому множник застосовує сам блок, поруч зі
+    // своїм розміром, а медіа-запит міняє лише базу.
+    const sizing = siteRules.filter(r => /--blk-(title|text)-base/.test(r.body));
+
+    check(`блоків із власним розміром — ${sizing.length}`, sizing.length >= 10,
+        "перелік звузився — якийсь блок лишився без розміру з адмінки");
+
+    // Правило, що ЗАДАЄ і базу, і font-size, мусить множити.
+    const wrong = sizing.filter(r => {
+
+        const size = (r.body.match(/font-size:([^;]+);/) || [])[1];
+
+        if (!size) return false;              // медіа-запит: лише база
+
+        return !/var\(--blk-(title|text)-scale/.test(size);
+
+    });
+
+    check("кожен такий блок множить базу на множник", wrong.length === 0,
+        wrong.map(r => r.sels.join(", ")).join(" | "));
+
+    // І найголовніше: спільне правило розміру НЕ ВЕРТАЄТЬСЯ.
+    const shared = propsOf(siteRules, ".has-style h2");
+
+    check(".has-style h1,h2 більше не задає font-size",
+        Boolean(shared) && !shared.has("font-size"),
+        shared ? "font-size:" + shared.get("font-size") : "правила немає");
+
+    // Пари «десктоп ↔ телефон». Медіа-запит має міняти саме базу:
+    // якби він лишився з font-size, множник на телефоні зникав би.
+    const mobileOnlyBase = siteRules.filter(r =>
+        /--blk-title-base/.test(r.body) && !/font-size/.test(r.body));
+
+    check(`медіа-запитів, що міняють лише базу — ${mobileOnlyBase.length}`,
+        mobileOnlyBase.length >= 4,
+        "мобільні розміри знову задаються через font-size");
 }
 
 console.log("\n[7] Шрифти доїжджають до iframe прев'ю");

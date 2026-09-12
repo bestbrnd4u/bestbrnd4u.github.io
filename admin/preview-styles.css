@@ -281,14 +281,6 @@
     border-radius:16px;
     background:#374151 center/cover no-repeat;
     color:#fff;
-
-    /* Розмір заголовка задається МНОЖНИКОМ (--blk-title-scale), а
-       множити треба на щось. Сайт множить на власний розмір
-       заголовка блока, тож і прев'ю мусить назвати свій — інакше
-       «Розмір заголовка» рахувався б від 1em і банер стрибав би з
-       24px на 16px просто від того, що в блоці задали якийсь
-       колір. */
-    --blk-title-base:24px;
 }
 
 .cms-preview-promo-badge{
@@ -298,19 +290,21 @@
     font-weight:700;
 }
 
-/* Розмір лишається тут, хоч --blk-title-base і дублює його числом.
-   Правило .has-style h1,h2 зі style.css діє ЛИШЕ коли в блоці щось
-   задано; поки не задано нічого, заголовок без цього рядка падав на
-   загальний h2 сайту — 42px замість 24px. Заміряно. */
+/* Розмір — множник від ВЛАСНОГО розміру, точно як на сайті: там
+   кожен заголовок сам називає свою базу й сам множить (див.
+   .deal-head-text h2 у assets/css/style.css). Прев'ю мусить рахувати
+   так само, інакше «Розмір заголовка» показуватиме не те. */
 .cms-preview-promo-title{
     margin:0;
     line-height:1.2;
-    font-size:24px;
+    --blk-title-base:24px;
+    font-size:calc(var(--blk-title-base) * var(--blk-title-scale, 1));
 }
 
 .cms-preview-promo-text{
     margin:0;
-    font-size:13.5px;
+    --blk-text-base:13.5px;
+    font-size:calc(var(--blk-text-base) * var(--blk-text-scale, 1));
     opacity:.9;
 }
 
@@ -605,10 +599,6 @@
     border-radius:12px;
     background:#f9fafb;
     border:1px solid #e5e7eb;
-
-    /* Від чого рахується «Розмір заголовка» — див. пояснення біля
-       .cms-preview-promo-banner вище. */
-    --blk-title-base:18px;
 }
 
 .cms-preview-home-head{
@@ -627,16 +617,16 @@
     text-transform:uppercase;
 }
 
-/* Те саме, що в заголовка банера: без цього рядка блок без жодного
-   налаштування падав на загальний h2 сайту. */
 .cms-preview-home-title{
     margin:4px 0 0;
-    font-size:18px;
+    --blk-title-base:18px;
+    font-size:calc(var(--blk-title-base) * var(--blk-title-scale, 1));
 }
 
 .cms-preview-home-text{
     margin:4px 0 0;
-    font-size:13px;
+    --blk-text-base:13px;
+    font-size:calc(var(--blk-text-base) * var(--blk-text-scale, 1));
 }
 
 /* Кольори блока на головній — той самий ланцюжок, що в .deal-eyebrow,

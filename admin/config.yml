@@ -639,6 +639,18 @@ collections:
                       - { label: "Звичайний", value: "m" }
                       - { label: "Більший", value: "l" }
                       - { label: "Найбільший", value: "xl" }
+                  - label: "Розмір опису"
+                    name: "textSize"
+                    widget: "select"
+                    required: false
+                    options:
+                      - { label: "Менший", value: "s" }
+                      - { label: "Звичайний", value: "m" }
+                      - { label: "Більший", value: "l" }
+                      - { label: "Найбільший", value: "xl" }
+                    hint: >
+                      Абзац під заголовком. Множник від звичайного розміру
+                      саме цього блока — на телефоні він теж лишиться доречним.
                   - label: "Вирівнювання"
                     name: "align"
                     widget: "select"
@@ -883,6 +895,18 @@ collections:
                       - { label: "Звичайний", value: "m" }
                       - { label: "Більший", value: "l" }
                       - { label: "Найбільший", value: "xl" }
+                  - label: "Розмір опису"
+                    name: "textSize"
+                    widget: "select"
+                    required: false
+                    options:
+                      - { label: "Менший", value: "s" }
+                      - { label: "Звичайний", value: "m" }
+                      - { label: "Більший", value: "l" }
+                      - { label: "Найбільший", value: "xl" }
+                    hint: >
+                      Абзац під заголовком. Множник від звичайного розміру
+                      саме цього блока — на телефоні він теж лишиться доречним.
                   - label: "Вирівнювання"
                     name: "align"
                     widget: "select"
@@ -1185,6 +1209,18 @@ collections:
               - { label: "Звичайний", value: "m" }
               - { label: "Більший", value: "l" }
               - { label: "Найбільший", value: "xl" }
+          - label: "Розмір опису"
+            name: "textSize"
+            widget: "select"
+            required: false
+            options:
+              - { label: "Менший", value: "s" }
+              - { label: "Звичайний", value: "m" }
+              - { label: "Більший", value: "l" }
+              - { label: "Найбільший", value: "xl" }
+            hint: >
+              Абзац під заголовком. Множник від звичайного розміру
+              саме цього блока — на телефоні він теж лишиться доречним.
           - label: "Вирівнювання"
             name: "align"
             widget: "select"
@@ -2016,6 +2052,18 @@ collections:
               - { label: "Звичайний", value: "m" }
               - { label: "Більший", value: "l" }
               - { label: "Найбільший", value: "xl" }
+          - label: "Розмір опису"
+            name: "textSize"
+            widget: "select"
+            required: false
+            options:
+              - { label: "Менший", value: "s" }
+              - { label: "Звичайний", value: "m" }
+              - { label: "Більший", value: "l" }
+              - { label: "Найбільший", value: "xl" }
+            hint: >
+              Абзац під заголовком. Множник від звичайного розміру
+              саме цього блока — на телефоні він теж лишиться доречним.
           - label: "Вирівнювання"
             name: "align"
             widget: "select"
@@ -2257,6 +2305,18 @@ collections:
               - { label: "Звичайний", value: "m" }
               - { label: "Більший", value: "l" }
               - { label: "Найбільший", value: "xl" }
+          - label: "Розмір опису"
+            name: "textSize"
+            widget: "select"
+            required: false
+            options:
+              - { label: "Менший", value: "s" }
+              - { label: "Звичайний", value: "m" }
+              - { label: "Більший", value: "l" }
+              - { label: "Найбільший", value: "xl" }
+            hint: >
+              Абзац під заголовком. Множник від звичайного розміру
+              саме цього блока — на телефоні він теж лишиться доречним.
           - label: "Вирівнювання"
             name: "align"
             widget: "select"

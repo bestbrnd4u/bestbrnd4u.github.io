@@ -117,6 +117,18 @@ ${pad}        - { label: "Менший", value: "s" }
 ${pad}        - { label: "Звичайний", value: "m" }
 ${pad}        - { label: "Більший", value: "l" }
 ${pad}        - { label: "Найбільший", value: "xl" }
+${pad}    - label: "Розмір опису"
+${pad}      name: "textSize"
+${pad}      widget: "select"
+${pad}      required: false
+${pad}      options:
+${pad}        - { label: "Менший", value: "s" }
+${pad}        - { label: "Звичайний", value: "m" }
+${pad}        - { label: "Більший", value: "l" }
+${pad}        - { label: "Найбільший", value: "xl" }
+${pad}      hint: >
+${pad}        Абзац під заголовком. Множник від звичайного розміру
+${pad}        саме цього блока — на телефоні він теж лишиться доречним.
 ${pad}    - label: "Вирівнювання"
 ${pad}      name: "align"
 ${pad}      widget: "select"

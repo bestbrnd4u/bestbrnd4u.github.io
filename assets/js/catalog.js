@@ -4038,6 +4038,13 @@ function render() {
 
     productsCount.textContent = list.length;
 
+    // Слово після числа — теж змінне. Досі в розмітці стояло «товарів»
+    // і не мінялось ніколи, тож єдиний знайдений товар підписувався
+    // «1 товарів». Правило відмінювання — plural() у common.js.
+    const countWord = document.getElementById("productsCountWord");
+
+    if (countWord) countWord.textContent = pluralProducts(list.length);
+
     if (productsCounter) {
 
         productsCounter.textContent = `(${list.length})`;
@@ -4170,15 +4177,13 @@ function renderActiveFilters() {
 // решту ховаємо за кнопкою "+N фільтрів"
 // -------------------------
 
+// Правило відмінювання тут не повторюємо: воно одне на весь сайт, у
+// plural() з common.js. Копія жила тут, поки лічильник був один; з
+// появою «1 товарів» у каталозі стало видно, що копій уже три й
+// одна з них відстала.
 function pluralizeFilters(n) {
 
-    const mod10 = n % 10;
-    const mod100 = n % 100;
-
-    if (mod10 === 1 && mod100 !== 11) return "фільтр";
-    if (mod10 >= 2 && mod10 <= 4 && !(mod100 >= 12 && mod100 <= 14)) return "фільтри";
-
-    return "фільтрів";
+    return plural(n, "фільтр", "фільтри", "фільтрів");
 
 }
 
@@ -4481,6 +4486,8 @@ if (!window.CATALOG_SKIP_AUTO_INIT) {
     const sortDropdownAnchor = document.getElementById("sortDropdownAnchor");
     const mfCount = document.getElementById("mfCount");
     const mfSubCount = document.getElementById("mfSubCount");
+    const mfCountWord = document.getElementById("mfCountWord");
+    const mfSubCountWord = document.getElementById("mfSubCountWord");
 
     if (!mobileFilterBar || !mobileFiltersModal) return;
 
@@ -4538,6 +4545,12 @@ if (!window.CATALOG_SKIP_AUTO_INIT) {
 
         if (mfCount) mfCount.textContent = n;
         if (mfSubCount) mfSubCount.textContent = n;
+
+        // «Показати 1 товар», а не «1 товарів».
+        const word = pluralProducts(Number(n) || 0);
+
+        if (mfCountWord) mfCountWord.textContent = word;
+        if (mfSubCountWord) mfSubCountWord.textContent = word;
 
     }
 
