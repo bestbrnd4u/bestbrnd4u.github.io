@@ -1163,7 +1163,7 @@ async function renderDealPromotions(dealPromotions) {
 
                         ${withBanner ? `
                         <a href="promo?id=${encodeURIComponent(promo.slug)}" class="deal-banner">
-                            <img src="${bannerImage}" alt="${escapeHtml(heading)}" loading="lazy">
+                            ${promoPicture(promo, 900)}
                         </a>` : ""}
 
                         <div class="deal-products products-grid" data-align="${place.products}">

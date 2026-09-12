@@ -339,6 +339,80 @@ console.log("\n[2d] Товари в блоці «Ціна дня» можна в
 }
 
 
+console.log("\n[2i] Обраний колір ніщо не перебиває");
+{
+    // ЩО ТУТ ЛОВИТЬСЯ.
+    //
+    // Колір із адмінки приходить CSS-змінною (--blk-*), а поруч у
+    // тому самому файлі лежать правила блока з ПРЯМИМИ кольорами. У
+    // них однакова вага, тож перемагає те, що нижче у файлі, — і
+    // обраний колір мовчки не застосовувався.
+    //
+    // Так сталося з «Колір цифр на таймері»: .deal-head .promo-countdown
+    // мав color:#fff і перебивав --blk-timer-text. Заміряно на живій
+    // сторінці: обрано #60e109, показувало білий.
+    //
+    // Правило просте: у блоці акції прямий колір має право бути ЛИШЕ
+    // запасним значенням змінної.
+    const dealCss = css.slice(css.indexOf("/* ── Розкладка блока «Ціна дня» ──"));
+
+    const hardcoded = [...dealCss.matchAll(/^\s*(color|background(?:-color)?):\s*(#[0-9a-f]{3,8}|var\(--(?!blk-)[a-z0-9-]+\))\s*;/gim)]
+        .map(m => m[0].trim());
+
+    check("у блоці акції немає прямих кольорів повз змінні",
+        hardcoded.length === 0, hardcoded.join(" | "));
+
+    // Кожен елемент, який власник може пофарбувати, мусить читати свою
+    // змінну — інакше поле в адмінці є, а дії немає.
+    [
+        ["таймер, тло", /\.deal-head \.promo-countdown\{[\s\S]*?background:var\(--blk-timer-bg/],
+        ["таймер, цифри", /\.deal-head \.promo-countdown\{[\s\S]*?color:var\(--blk-timer-text/],
+        ["таймер, що йде", /\[data-state="live"\]\{\s*background:var\(--blk-timer-bg/],
+        ["опис блока", /\.deal-head-text p\{[\s\S]*?color:var\(--blk-text/],
+        ["посилання під блоком", /\.deal-more\{[\s\S]*?color:var\(--blk-btn-bg/],
+        ["бейдж блока", /\.deal-eyebrow\{[\s\S]*?color:var\(--blk-badge-bg/]
+    ].forEach(([label, re]) => check(label + " бере колір з адмінки", re.test(css)));
+}
+
+
+console.log("\n[2j] Банер блока: мобільне фото й без порожнеч");
+{
+    // Мобільне фото працює лише через <picture>: просто <img src> його
+    // ігнорує, і на телефоні лишається десктопний кадр.
+    check("банер малюється через <picture>",
+        /class="deal-banner">\s*\$\{promoPicture\(promo, 900\)\}/.test(appJs));
+
+    // LAZY ТУТ ЛАМАВ САМ СЕБЕ.
+    //
+    // Незавантажене lazy-фото з height:auto має нульову висоту, а
+    // нульова висота не потрапляє у вікно перегляду — браузер його так
+    // і не починав вантажити. Заміряно: naturalWidth 0 після
+    // прокрутки просто до банера.
+    check("банер не відкладає завантаження",
+        !/promoPicture\(promo, 900, 'loading/.test(appJs));
+
+    // Ширину задає ВМІСТ, а не частки: з колонками 1fr/1.4fr одна
+    // картка лишала півекрана порожнечі.
+    const body = css.slice(css.indexOf(".deal-body{"), css.indexOf(".deal-more{"));
+
+    check("товари займають свою ширину, банер — решту",
+        /\.deal-banner\{\s*flex:1 1 320px/.test(body)
+        && /\.deal-products\{\s*flex:0 1 auto/.test(body));
+
+    check("немає колонок у частках", !/grid-template-columns:minmax\(0, 1\.4fr\)/.test(body));
+
+    // stretch давав банеру нульову висоту в мобільній колонці — там
+    // немає сусіда, від якого її брати.
+    check("висота банера не залежить від сусіда",
+        /\.deal-body\{[\s\S]*?align-items:flex-start/.test(body)
+        && !/\.deal-banner img\{[\s\S]*?height:100%/.test(css));
+
+    // Підпис поля більше не бреше: «Ціна дня» фото використовує.
+    check("підпис поля не каже «не для Ціни дня»",
+        !/не для «Ціни дня»/.test(read("admin/config.yml")));
+}
+
+
 console.log("\n[2h] Розкладка блока: одне правило на трьох");
 {
     const Layout = require("../assets/js/deal-layout.js");

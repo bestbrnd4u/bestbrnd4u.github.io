@@ -14036,10 +14036,12 @@ body.refusal-open{
     line-height:1.15;
 }
 
+/* Прямий колір — лише ЗАПАСНЕ значення змінної, інакше він
+   перебиває «Колір тексту» з адмінки. */
 .deal-head-text p{
     margin:10px 0 0;
     max-width:60ch;
-    color:var(--gray500);
+    color:var(--blk-text, var(--gray500));
 }
 
 .deal-eyebrow{
@@ -14052,16 +14054,23 @@ body.refusal-open{
 }
 
 /* Відлік блока: на світлому тлі — суцільна заливка, не прозорість. */
+/* ЧЕРЕЗ ЗМІННІ, А НЕ ПРЯМИМИ КОЛЬОРАМИ.
+
+   Тут стояло color:#fff — і воно перебивало «Колір цифр на таймері» з
+   адмінки: обидва правила однакової ваги, а це йде нижче у файлі, тож
+   перемагає воно. Обраний колір мовчки не застосовувався.
+
+   Тепер прямий колір лишається лише ЗАПАСНИМ значенням змінної. */
 .deal-head .promo-countdown{
     flex:none;
     margin-bottom:0;
     padding:12px 22px;
-    background:var(--primary);
-    color:#fff;
+    background:var(--blk-timer-bg, var(--primary));
+    color:var(--blk-timer-text, #fff);
 }
 
 .deal-head .promo-countdown[data-state="live"]{
-    background:var(--danger);
+    background:var(--blk-timer-bg, var(--danger));
 }
 
 .deal-head .promo-countdown-value{
@@ -14105,18 +14114,44 @@ body.refusal-open{
 
 /* Банер і товари ділять ширину. Без банера ряд товарів займає все —
    і поводиться рівно так, як поводився досі. */
+/* ШИРИНУ ЗАДАЄ ВМІСТ, А НЕ ЧАСТКИ.
+
+   Спершу тут були колонки 1fr / 1.4fr. З одним товаром це давало
+   півекрана порожнечі: колонка лишалась широкою, а картка в ній —
+   300 пікселів. Заміряно на живій сторінці.
+
+   Тепер товари займають рівно стільки, скільки займають, а всю решту
+   забирає банер — йому є чим її зайняти. */
+/* flex-start, а НЕ stretch.
+
+   Зі stretch висота банера бралась від сусіда, а в мобільній колонці
+   сусіда немає — фото отримувало нульову висоту й браузер його навіть
+   не завантажував (naturalWidth 0). Заміряно на 375px.
+
+   Тепер банер лишається у своїй пропорції, а порожнечу поруч знято
+   тим, що товари займають рівно свою ширину. */
 .deal-body{
-    display:grid;
+    display:flex;
+    flex-wrap:wrap;
     gap:24px;
-    align-items:start;
+    align-items:flex-start;
 }
 
-.deal-body[data-banner="left"]{
-    grid-template-columns:minmax(0, 1fr) minmax(0, 1.4fr);
+.deal-body[data-banner="none"] .deal-products{
+    flex:1 1 100%;
 }
 
-.deal-body[data-banner="right"]{
-    grid-template-columns:minmax(0, 1.4fr) minmax(0, 1fr);
+/* Банер росте, товари — за вмістом. 320px — та ширина, нижче за яку
+   банер перестає бути банером і краще перенести його на свій рядок. */
+.deal-banner{
+    flex:1 1 320px;
+    min-width:0;
+}
+
+.deal-body[data-banner="left"] .deal-products,
+.deal-body[data-banner="right"] .deal-products{
+    flex:0 1 auto;
+    min-width:0;
 }
 
 /* Банер завжди в тій половині, яку йому призначили, — порядок у
@@ -14132,11 +14167,14 @@ body.refusal-open{
     overflow:hidden;
 }
 
+.deal-banner picture{
+    display:block;
+}
+
 .deal-banner img{
     display:block;
     width:100%;
-    height:100%;
-    object-fit:cover;
+    height:auto;
     transition:transform .4s;
 }
 
@@ -14178,11 +14216,13 @@ body.refusal-open{
 .deal-products[data-align="center"]{ justify-content:center; }
 .deal-products[data-align="right"]{ justify-content:end; }
 
+/* Посилання під блоком — це call-to-action, тож бере колір кнопки. */
 .deal-more{
     display:inline-block;
     margin-top:24px;
     font-weight:600;
     text-decoration:underline;
+    color:var(--blk-btn-bg, inherit);
 }
 
 @media(max-width:768px){
