@@ -876,12 +876,25 @@
 
             var homeVars = window.TextStyles ? window.TextStyles.styleVars(homeStyle) : {};
 
-            var homeAttr = Object.keys(homeVars)
-                .map(function (k) { return k + ":" + homeVars[k]; }).join(";");
+            var hasHomeVars = Object.keys(homeVars).length > 0;
 
+            // STYLE — ОБ'ЄКТ, А НЕ РЯДОК.
+            //
+            // На сайті оформлення ставиться рядком у атрибут style, і
+            // тут я передав той самий рядок. React такого не приймає:
+            // він падає з помилкою #62 і замість прев'ю показує
+            // «There's been an error».
+            //
+            // Найгірше в цьому — коли саме воно падало: порожній набір
+            // давав undefined і все працювало, а перший же обраний
+            // колір ламав прев'ю. Тобто ламалось рівно тоді, коли
+            // прев'ю й потрібне.
+            //
+            // Власні CSS-змінні (--blk-*) React в обʼєкті розуміє й
+            // віддає як є.
             var homeBlock = h("div", {
-                className: "cms-preview-home" + (homeAttr ? " has-style" : ""),
-                style: homeAttr || undefined
+                className: "cms-preview-home" + (hasHomeVars ? " has-style" : ""),
+                style: hasHomeVars ? homeVars : undefined
             },
                 h("div", { className: "cms-preview-home-head" },
                     h("div", null,

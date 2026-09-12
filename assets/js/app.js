@@ -692,7 +692,7 @@ async function initPromotions() {
                     <div class="promo-card-info">
                         <h3>${promoHomeTitle(promo)}</h3>
                         ${promoHomeText(promo) ? `<p>${promoHomeText(promo)}</p>` : ""}
-                        <span class="promo-card-link">${promo.buttonText || "Дивитись усі товари"} →</span>
+                        ${promo.buttonText ? `<span class="promo-card-link">${promo.buttonText} →</span>` : ""}
                     </div>
 
                 </a>
@@ -777,9 +777,10 @@ function renderHeroSliderPromotions(heroPromotions) {
 
                 ${genderButtons.length ? `<div class="promo-hero-quicklinks">${quicklinksHtml}</div>` : ""}
 
+                ${promo.buttonText ? `
                 <a href="${promoLink}" class="btn promo-hero-cta">
-                    ${promo.buttonText || "Дивитись усі товари"} →
-                </a>
+                    ${promo.buttonText} →
+                </a>` : ""}
 
             </div>
 
@@ -932,9 +933,10 @@ async function renderFeaturedPromotions(featuredPromotions) {
 
                             ${promoHomeText(promo) ? `<p>${promoHomeText(promo)}</p>` : ""}
 
+                            ${promo.buttonText ? `
                             <a href="promo?id=${encodeURIComponent(promo.slug)}" class="btn">
-                                ${promo.buttonText || "Дивитись усі товари"}
-                            </a>
+                                ${promo.buttonText}
+                            </a>` : ""}
 
                         </div>
 
@@ -1016,10 +1018,11 @@ function renderCompactPromotions(compactPromotions) {
 
                         <p class="brand-teaser-text">${promoHomeTitle(promo)}</p>
 
+                        ${promo.buttonText ? `
                         <a href="promo?id=${encodeURIComponent(promo.slug)}" class="brand-teaser-btn">
-                            ${promo.buttonText || "Дивитись все"}
+                            ${promo.buttonText}
                             <span class="brand-teaser-arrow">→</span>
-                        </a>
+                        </a>` : ""}
 
                     </div>
 

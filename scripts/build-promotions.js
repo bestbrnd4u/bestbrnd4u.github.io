@@ -234,7 +234,28 @@ function main() {
             // без цього поля не ламаються.
             promoPageImage: data.promoPageImage || "",
             promoPageImageMobile: data.promoPageImageMobile || "",
-            buttonText: data.buttonText || "Дивитись усі товари",
+            // ПОРОЖНЄ ПОЛЕ — ЦЕ ВІДПОВІДЬ, А НЕ ПРОГАЛИНА.
+            //
+            // Тут стояло data.buttonText || "Дивитись усі товари", і
+            // через це кнопку не можна було прибрати ніяк: власник
+            // стирав напис, збірка вписувала його назад, сайт малював
+            // кнопку. Зовні виглядало як «поле не працює».
+            //
+            // Тепер порожнє поле не доїжджає до сайту зовсім, і кожен
+            // малювальник ховає кнопку, коли напису немає.
+            ...(String(data.buttonText || "").trim()
+                ? { buttonText: String(data.buttonText).trim() }
+                : {}),
+
+            // Затемнення фото банера, %.
+            //
+            // Темна заливка потрібна, щоб білий напис читався на
+            // світлому фото. Але коли напис уже намальований на самій
+            // картинці, вона лише гасить її. 55 — те, що було завжди.
+            ...(Number.isFinite(Number(data.bannerDim))
+                && String(data.bannerDim).trim() !== ""
+                ? { bannerDim: Math.max(0, Math.min(80, Math.round(Number(data.bannerDim)))) }
+                : {}),
             link: data.link,
             brand: data.brand || "",
             discountPercent: typeof data.discountPercent === "number" ? data.discountPercent : null,
