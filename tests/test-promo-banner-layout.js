@@ -303,19 +303,48 @@ console.log("\n[2c] Кольори — у двох місцях і для всь
     check("модуль його більше не віддає",
         !/mergeStyles:/.test(textStyles));
 
-    check("головна бере ТІЛЬКИ свій набір",
-        /function promoHomeStyle[\s\S]{0,1200}?return \(promo && promo\.homeStyle\) \|\| null;/
-            .test(fs.readFileSync(path.join(ROOT, "assets/js/app.js"), "utf8")),
-        "promoHomeStyle знову домішує promo.style");
+    const appSrc = fs.readFileSync(path.join(ROOT, "assets/js/app.js"), "utf8");
 
-    check("блоки головної беруть злитий набір",
+    check("головна бере свій набір, а не спільний",
+        /function promoHomeStyle[\s\S]{0,1200}?inheritTimer\(promo\.homeStyle, promo\.style\)/
+            .test(appSrc)
+        && !/mergeStyles/.test(appSrc),
+        "promoHomeStyle знову зливає набори");
+
+    // ЄДИНИЙ ВИНЯТОК — ПЛАШКА ТАЙМЕРА, І ВІН НАВМИСНИЙ.
+    //
+    // Колір ТЕКСТУ переносити не можна: на банері напис лежить на
+    // фото й мусить бути світлим, на головній — темним. А таймер це
+    // плашка з власним тлом, вона виглядає однаково будь-де. Власник
+    // поставив #0d0101 на банері й побачив на головній червону — не
+    // тому, що так хотів, а тому, що друге поле лишилось порожнім.
+    const inherit = new Function("style", "other",
+        textStyles.match(/function inheritTimer[\s\S]*?\n    }\n/)[0]
+        + "\nfunction toPlain(v){ return v || {}; }"
+        + "\nfunction isColor(v){ return typeof v === 'string' && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v.trim()); }"
+        + "\nreturn inheritTimer(style, other);");
+
+    check("порожня заливка таймера береться з сусіднього набору",
+        inherit({ timerBg: "" }, { timerBg: "#0d0101" }).timerBg === "#0d0101");
+
+    check("задана — лишається своєю",
+        inherit({ timerBg: "#123456" }, { timerBg: "#0d0101" }).timerBg === "#123456");
+
+    check("перенесення двостороннє",
+        inherit({}, { timerText: "#60e109" }).timerText === "#60e109");
+
+    check("колір тексту НЕ переноситься",
+        inherit({ textColor: "" }, { textColor: "#ff0000" }).textColor !== "#ff0000",
+        "разом із таймером поповз і текст — саме це й скасовували");
+
+    check("блоки головної беруть свій набір",
         /blockStyleAttr\(promoHomeStyle\(promo\)\)/.test(appJs)
         && !/blockStyleAttr\(promo\.style\)/.test(appJs));
 
     // Сторінка акції оформлення не читала ВЗАГАЛІ: обраний в адмінці
     // колір діяв на головній і мовчки не діяв на банері.
-    check("банер акції нарешті читає оформлення",
-        /TextStyles\.styleVars\(promo\.style\)/.test(promoJs)
+    check("банер акції читає оформлення",
+        /TextStyles\.inheritTimer\(promo\.style, promo\.homeStyle\)/.test(promoJs)
         && /classList\.toggle\("has-style"/.test(promoJs));
 }
 
@@ -635,9 +664,22 @@ console.log("\n[2e] Прев'ю в адмінці показує ОБИДВА м
         /e\.get\("homeTitle"\) \|\| e\.get\("title"\)/.test(preview)
         && /e\.get\("homeText"\) \|\| e\.get\("text"\)/.test(preview));
 
-    check("бере ТІЛЬКИ свої кольори, без домішки спільного набору",
-        /var homeStyle = e\.get\("homeStyle"\);/.test(preview)
+    check("бере свої кольори, без домішки спільного набору",
+        /inheritTimer\(e\.get\("homeStyle"\), e\.get\("style"\)\)/.test(preview)
         && !/mergeStyles/.test(preview));
+
+    // Прев'ю має показувати ТОЙ САМИЙ колір, що й сайт. Тут стояв
+    // просто червоний — і власник питав, звідки він, бо на сайті
+    // плашка була темна.
+    const timerCss = fs.readFileSync(path.join(ROOT, "admin/preview-styles.css"), "utf8");
+
+    check("запасна заливка таймера в прев'ю — як на головній (--primary)",
+        /\.cms-preview-home \.cms-preview-promo-timer\{[\s\S]{0,120}background:var\(--blk-timer-bg, #111827\)/
+            .test(timerCss));
+
+    check("а на банері — як на банері (напівпрозора)",
+        /\.cms-preview-promo-banner \.cms-preview-promo-timer\{[\s\S]{0,120}background:var\(--blk-timer-bg, rgba\(255,255,255,\.18\)\)/
+            .test(timerCss));
 
     check("слухається вирівнювання",
         /"data-align": place\.products/.test(preview));

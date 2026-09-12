@@ -352,7 +352,11 @@ function renderPromoHero(promo) {
     // адмінці колір діяв на головній і мовчки не діяв тут.
     if (window.TextStyles) {
 
-        const vars = window.TextStyles.styleVars(promo.style);
+        // Заливка й цифри таймера — виняток: порожнє поле бере колір
+        // із набору «на головній». Чому саме вони — в inheritTimer()
+        // у assets/js/text-styles.js.
+        const vars = window.TextStyles.styleVars(
+            window.TextStyles.inheritTimer(promo.style, promo.homeStyle));
         const names = Object.keys(vars);
 
         banner.classList.toggle("has-style", names.length > 0);

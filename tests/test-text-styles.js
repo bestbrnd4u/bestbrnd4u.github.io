@@ -243,7 +243,8 @@ console.log("\n[7] Оформлення доходить до всіх блок�
         ["блок «Ціна дня»", /deal-block\$\{blockStyleClass\(promoHomeStyle\(promo\)\)\}/],
         // Сторінка акції оформлення не читала ВЗАГАЛІ: обраний в
         // адмінці колір діяв на головній і мовчки не діяв на банері.
-        ["банер сторінки акції", /TextStyles\.styleVars\(promo\.style\)/, "promo"]
+        ["банер сторінки акції",
+            /TextStyles\.inheritTimer\(promo\.style, promo\.homeStyle\)/, "promo"]
     ].forEach(([label, re, where]) =>
         check(label, re.test(where === "promo" ? read("assets/js/promo.js") : app)));
 

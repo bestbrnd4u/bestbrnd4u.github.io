@@ -515,7 +515,14 @@ function promoBadgeHere(promo, place) {
 // звичайний вигляд сайту, а не чужі кольори.
 function promoHomeStyle(promo) {
 
-    return (promo && promo.homeStyle) || null;
+    if (!promo) return null;
+
+    if (!window.TextStyles) return promo.homeStyle || null;
+
+    // Виняток — заливка й цифри таймера: плашка виглядає однаково в
+    // обох місцях, тож порожнє поле бере колір із сусіднього набору.
+    // Пояснення цілком — в inheritTimer() у assets/js/text-styles.js.
+    return window.TextStyles.inheritTimer(promo.homeStyle, promo.style);
 
 }
 

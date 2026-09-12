@@ -291,8 +291,11 @@ console.log("\n[6] Прев'ю ставить змінні на ОБИДВА б�
 {
     // Досі змінні проставлялись лише на блок головної, і весь набір
     // «Оформлення тексту і кнопки» був у прев'ю невидимий.
-    check("банер бере власний набір style (без домішки homeStyle)",
-        /styleVars\(e\.get\("style"\)\)/.test(templates));
+    // Банер бере СВІЙ набір; єдине, що приходить із сусіднього, —
+    // заливка й цифри таймера (inheritTimer у text-styles.js).
+    check("банер бере власний набір style",
+        /inheritTimer\(e\.get\("style"\), e\.get\("homeStyle"\)\)/.test(templates)
+        && !/mergeStyles/.test(templates));
 
     check("банер отримує клас has-style",
         /hasBannerVars \? " has-style" : ""/.test(templates));

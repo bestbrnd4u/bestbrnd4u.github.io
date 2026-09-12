@@ -842,7 +842,8 @@
             // «Оформлення тексту і кнопки» був у прев'ю невидимий —
             // колір міняли, а картинка не мінялась.
             var bannerVars = window.TextStyles
-                ? window.TextStyles.styleVars(e.get("style"))
+                ? window.TextStyles.styleVars(
+                    window.TextStyles.inheritTimer(e.get("style"), e.get("homeStyle")))
                 : {};
 
             var hasBannerVars = Object.keys(bannerVars).length > 0;
@@ -890,8 +891,11 @@
 
             // Кольори головної — ТІЛЬКИ свій набір, без домішки
             // «Оформлення тексту і кнопки». Чому саме так — у
-            // promoHomeStyle() в assets/js/app.js.
-            var homeStyle = e.get("homeStyle");
+            // promoHomeStyle() в assets/js/app.js. Виняток — заливка
+            // й цифри таймера: див. inheritTimer() у text-styles.js.
+            var homeStyle = window.TextStyles
+                ? window.TextStyles.inheritTimer(e.get("homeStyle"), e.get("style"))
+                : e.get("homeStyle");
 
             var homeVars = window.TextStyles ? window.TextStyles.styleVars(homeStyle) : {};
 

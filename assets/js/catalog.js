@@ -2533,6 +2533,13 @@ function closeAllDropdowns() {
             // невидимим, і "оживало" лише після скролу вгору.
             menu.classList.remove("scroll-hidden");
 
+            // Зсув, який поставив keepMenuOnScreen(), знімаємо разом
+            // із закриттям: наступного разу кнопка може стояти в
+            // іншому місці рядка, і старий зсув був би невірним.
+            menu.style.left = "";
+            menu.style.right = "";
+            menu.style.width = "";
+
         }
 
         dropdown.classList.remove("open");
@@ -2545,6 +2552,49 @@ function closeAllDropdowns() {
 // показується одразу, незалежно від того, в якому місці каталогу
 // зараз користувач і що відбувалось зі скролом раніше. Панель
 // фільтрів sticky, тож список з'являється рівно під шапкою.
+// Меню, яке не вміщається, підсуваємо в екран.
+//
+// НАВІЩО. Меню фільтра «Ціна» ширше за свою кнопку (336px проти
+// ~135) і розкривається ВЛІВО: у стилях воно приколоте правим краєм
+// до кнопки. Так було зроблено свідомо — «Ціна» стоїть останньою в
+// рядку, і рости вправо їй нікуди.
+//
+// Але рядок фільтрів переноситься. Щойно «Ціна» опиняється ПЕРШОЮ в
+// новому рядку, той самий зсув вліво виносить меню за край екрана.
+// Заміряно на 1180px: кнопка left 56, меню left −145 — саме те, що
+// власник і побачив обрізаним.
+//
+// Прикріпити меню до іншого краю назавжди не вийде: тоді воно так
+// само вилізе праворуч, коли «Ціна» стоятиме останньою. Сторону
+// видно лише після того, як меню намальоване, тож вимірюємо й
+// зсуваємо. Зсув знімається при закритті.
+function keepMenuOnScreen(menu) {
+
+    if (!menu || !menu.parentElement) return;
+
+    const EDGE = 8;
+
+    const box = menu.getBoundingClientRect();
+
+    if (!box.width) return;
+
+    if (box.left >= EDGE && box.right <= window.innerWidth - EDGE) return;
+
+    const host = menu.parentElement.getBoundingClientRect();
+
+    const left = box.left < EDGE
+        ? EDGE
+        : Math.max(EDGE, window.innerWidth - EDGE - box.width);
+
+    // Ширину фіксуємо разом зі зсувом: у меню, розтягнутих на ширину
+    // кнопки (left:0;right:0), скасування right схлопнуло б їх до
+    // min-width.
+    menu.style.width = Math.round(box.width) + "px";
+    menu.style.left = Math.round(left - host.left) + "px";
+    menu.style.right = "auto";
+
+}
+
 function openDropdownMenu(dropdown, menu) {
 
     if (!dropdown || !menu) return;
@@ -2555,6 +2605,8 @@ function openDropdownMenu(dropdown, menu) {
     menu.classList.remove("scroll-hidden");
 
     dropdown.classList.add("open");
+
+    keepMenuOnScreen(menu);
 
     // якщо панель фільтрів у цей момент була відведена вгору після
     // скролу вниз — повертаємо її на місце, інакше меню відкрилось
