@@ -346,10 +346,39 @@ console.log("\n[6a] Розмір рахується від власного ро
     // кожного блока свій розмір ще й на телефоні (30px замість 42,
     // 24 замість 30). Тому множник застосовує сам блок, поруч зі
     // своїм розміром, а медіа-запит міняє лише базу.
-    const sizing = siteRules.filter(r => /--blk-(title|text)-base/.test(r.body));
+    // ПОІМЕННО, А НЕ ЧИСЛОМ.
+    //
+    // Спершу тут стояло «блоків із власним розміром щонайменше 10», і
+    // набір лишався зеленим, коли один блок повертали на фіксований
+    // font-size: решта п'ятнадцять перекривали втрату. Перевірено
+    // зломом — саме так і сталося.
+    const MUST_SCALE = [
+        [".promo-hero-content h1", "title"],
+        [".promo-hero-content p", "text"],
+        [".deal-head-text h2", "title"],
+        [".deal-head-text p", "text"],
+        [".promo-hero-slide-content h2", "title"],
+        [".promo-hero-slide-content p", "text"],
+        [".brand-campaign-content h2", "title"],
+        [".brand-campaign-content p", "text"],
+        [".collection-head h2", "title"],
+        [".promo-card-info h3", "title"],
+        [".promo-card-info p", "text"]
+    ];
 
-    check(`блоків із власним розміром — ${sizing.length}`, sizing.length >= 10,
-        "перелік звузився — якийсь блок лишився без розміру з адмінки");
+    MUST_SCALE.forEach(([selector, kind]) => {
+
+        const props = propsOf(siteRules, selector);
+        const size = props && props.get("font-size");
+
+        check(`${selector}: власна база × множник`,
+            Boolean(props && props.get("--blk-" + kind + "-base")
+                && size && size.includes("--blk-" + kind + "-scale")),
+            props ? `font-size:${size}` : "правила немає");
+
+    });
+
+    const sizing = siteRules.filter(r => /--blk-(title|text)-base/.test(r.body));
 
     // Правило, що ЗАДАЄ і базу, і font-size, мусить множити.
     const wrong = sizing.filter(r => {

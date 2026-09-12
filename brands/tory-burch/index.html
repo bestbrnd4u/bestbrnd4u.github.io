@@ -107,7 +107,7 @@ window.CATALOG_PRESET = {"brand":"Tory Burch"};
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=95307a34">
+<link rel="stylesheet" href="/assets/css/style.css?v=54b5c1b2">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3" defer></script>
 
@@ -373,7 +373,7 @@ placeholder="Пошук товару...">
 
 <div class="mobile-filters-footer">
 <button type="button" id="mobileFiltersResetBtn" class="btn btn-outline">Видалити все</button>
-<button type="button" id="mobileFiltersApplyBtn" class="btn">Показати <span id="mfCount">0</span> товарів</button>
+<button type="button" id="mobileFiltersApplyBtn" class="btn">Показати <span id="mfCount">0</span> <span id="mfCountWord">товарів</span></button>
 </div>
 </div>
 
@@ -387,7 +387,7 @@ placeholder="Пошук товару...">
 <div class="mobile-filters-sub-content" id="mobileFiltersSubContent"></div>
 
 <div class="mobile-filters-footer">
-<button type="button" id="mobileFiltersSubApplyBtn" class="btn">Показати <span id="mfSubCount">0</span> товарів</button>
+<button type="button" id="mobileFiltersSubApplyBtn" class="btn">Показати <span id="mfSubCount">0</span> <span id="mfSubCountWord">товарів</span></button>
 </div>
 </div>
 
@@ -419,7 +419,9 @@ placeholder="Пошук товару...">
 <span id="productsCount">
 0
 </span>
-товарів
+<!-- Слово окремим вузлом: його міняє catalog.js разом із числом,
+     інакше «1 товарів». Правило відмінювання — plural() у common.js. -->
+<span id="productsCountWord">товарів</span>
 </p>
 
 <div class="catalog-actions">
@@ -682,7 +684,7 @@ aria-label="Нагору">
 <!-- Хлібні крихти: спільний будівник для сторінки й розмітки BreadcrumbList -->
 <script src="/assets/js/breadcrumbs.js?v=7fc6182d" defer></script>
 <!-- Оформлення текстових блоків з адмінки (кольори, шрифт, кнопка) -->
-<script src="/assets/js/text-styles.js?v=cd74e489" defer></script>
+<script src="/assets/js/text-styles.js?v=845e04df" defer></script>
 <!-- Згода на використання даних (банер + блокування вбудованого відео) -->
 <script src="/assets/js/consent.js?v=b6cc5d45" defer></script>
 <!-- Статистика відвідувань. Не завантажує Google без згоди. -->
@@ -690,7 +692,7 @@ aria-label="Нагору">
 <!-- Транслітерація: каталог кладе латиницю в адресу фільтра.
      Той самий файл використовує збірка для адрес товарів. -->
 <script src="/assets/js/translit.js?v=c0957cb7" defer></script>
-<script src="/assets/js/common.js?v=e5e3e986" defer></script>
+<script src="/assets/js/common.js?v=a3b9d4d6" defer></script>
 <!-- Підписка на листи магазину -->
 <script src="/assets/js/subscribe.js?v=2367ff9d" defer></script>
 <script src="/assets/js/promo-popup.js?v=2317f6f3" defer></script>
@@ -699,7 +701,7 @@ aria-label="Нагору">
 <script src="/assets/js/ui.js?v=e015b069" defer></script>
 <script src="/assets/js/stock.js?v=85fa4aad" defer></script>
 <script src="/assets/js/live-stock.js?v=ca9027dd" defer></script>
-<script src="/assets/js/catalog.js?v=29e1a230" defer></script>
+<script src="/assets/js/catalog.js?v=324d06e1" defer></script>
 </body>
 
 </html>

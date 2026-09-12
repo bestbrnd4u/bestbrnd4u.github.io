@@ -21,6 +21,11 @@ let scrollCalls = [];
 window.scrollTo = opts => { scrollCalls.push(opts.top); };
 
 window.eval(fs.readFileSync(path.join(ROOT, "assets/js/common.js"), "utf8").match(/function escapeHtml[\s\S]*?\n}\n/)[0]);
+// plural()/pluralProducts() теж у common.js: на сайті файл
+// підключений повністю, у тесті додаємо явно — без них лічильник
+// товарів у catalog.js падає з ReferenceError.
+window.eval(fs.readFileSync(path.join(ROOT, "assets/js/common.js"), "utf8").match(/function plural\(count[\s\S]*?\n}\n/)[0]);
+window.eval(fs.readFileSync(path.join(ROOT, "assets/js/common.js"), "utf8").match(/function pluralProducts[\s\S]*?\n}\n/)[0]);
 // availableFacets() використовує getProductColors з common.js —
 // на сайті цей файл підключений повністю, у тесті підвантажуємо явно
 window.eval(fs.readFileSync(path.join(ROOT,"assets/js/common.js"),"utf8").match(/function getProductColors[\s\S]*?\n}\n/)[0]);
