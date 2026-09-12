@@ -1,14 +1,16 @@
 {
-  "badge": "",
+  "badge": "Ціна тижня",
   "startsAt": "2026-09-13T00:00:00+03:00",
   "products": [
     57
   ],
   "active": true,
   "endsAt": "2026-09-19T00:00:00+03:00",
-  "text": "",
+  "text": "Marc Jacobs The J Marc Shoulder Bag Green Glow — в одному екземплярі. Далі тільки під замовлення.",
   "order": 1,
-  "title": "",
+  "hideCountdown": false,
+  "bannerLayout": "right-top",
+  "title": "До пʼятниці ",
   "link": "",
   "image": "/assets/images/banners/12-2026-01_13_26-am.png",
   "displayType": "deal_of_day",
