@@ -318,7 +318,10 @@ console.log("\n[2d] Товари в блоці «Ціна дня» можна в
 
     check("збірка переносить", /const DEAL_ALIGNS = \["left", "center", "right"\]/.test(build));
 
-    check("ряд отримує ознаку", /data-align="\$\{promo\.dealAlign \|\| "left"\}"/.test(appJs));
+    // Ознака приходить із РОЗВʼЯЗАНОЇ розкладки, а не просто з поля:
+    // поруч із банером «по центру» неможливе, і сайт мусить малювати
+    // те, що справді вийшло, а не те, що обрали.
+    check("ряд отримує ознаку", /data-align="\$\{place\.products\}"/.test(appJs));
 
     // auto-FIT, а не auto-fill: fill лишає порожні колонки на всю
     // ширину, і тоді вирівнювати нічого — один товар однаково
@@ -333,6 +336,95 @@ console.log("\n[2d] Товари в блоці «Ціна дня» можна в
     check("обидва напрямки описані",
         /\[data-align="center"\]\{ justify-content:center/.test(css)
         && /\[data-align="right"\]\{ justify-content:end/.test(css));
+}
+
+
+console.log("\n[2h] Розкладка блока: одне правило на трьох");
+{
+    const Layout = require("../assets/js/deal-layout.js");
+
+    // ОДИН МОДУЛЬ НА САЙТ, ЗБІРКУ Й АДМІНКУ.
+    //
+    // Три копії розійшлися б, і прев'ю обіцяло б одне, а сайт малював
+    // інше. Той самий підхід, що в image-framing.js і text-styles.js.
+    check("сайт бере розкладку з модуля", /window\.DealLayout\s*\n?\s*\? window\.DealLayout\.resolve\(promo\)/.test(appJs));
+
+    check("прев'ю бере звідти ж", /window\.DealLayout\.resolve\(\{/.test(read("admin/preview-templates.js")));
+
+    check("збірка теж", /DealLayout = require\("\.\.\/assets\/js\/deal-layout\.js"\)/.test(build));
+
+    check("модуль підключено і на сайті, і в адмінці",
+        /deal-layout\.js/.test(read("index.html"))
+        && /deal-layout\.js/.test(read("admin/index.html")));
+
+    // ── Правила ──
+    const at = p => {
+        const r = Layout.resolve(p);
+        return `${r.banner}/${r.products}/${r.text}/${r.timer}`;
+    };
+
+    check("порожня акція — як було", at({}) === "none/left/left/right");
+
+    // Банер займає половину блока: «по центру» поруч із ним не існує.
+    check("банер ліворуч — товари праворуч",
+        at({ dealBanner: "left", dealAlign: "center" }) === "left/right/left/right");
+
+    check("банер праворуч — товари ліворуч",
+        at({ dealBanner: "right", dealAlign: "right" }) === "right/left/left/right");
+
+    check("без банера центр працює",
+        at({ dealAlign: "center" }) === "none/center/left/right");
+
+    // Напис і таймер стоять в одному рядку.
+    check("напис і таймер не стають на один бік",
+        at({ dealTextAlign: "right", dealTimer: "right" }) === "none/left/right/left");
+
+    check("напис по центру таймеру не заважає",
+        at({ dealTextAlign: "center", dealTimer: "right" }) === "none/left/center/right");
+
+    // ── Про суперечність кажуть вголос ──
+    const conflicts = p => Layout.resolve(p).conflicts;
+
+    check("суперечність описана словами",
+        conflicts({ dealBanner: "left", dealAlign: "center" }).length === 1
+        && /банер ліворуч/.test(conflicts({ dealBanner: "left", dealAlign: "center" })[0]));
+
+    check("несуперечлива розкладка мовчить",
+        conflicts({ dealBanner: "left", dealAlign: "right" }).length === 0);
+
+    // Decap не вміє перевіряти поля одне проти одного, тож єдиний
+    // спосіб попередити вчасно — сказати це в прев'ю й у журналі.
+    check("збірка попереджає в журналі",
+        /::warning::розкладка/.test(build));
+
+    check("прев'ю показує суперечність",
+        /cms-preview-home-warn/.test(read("admin/preview-templates.js"))
+        && /cms-preview-home-warn/.test(read("admin/preview-styles.css")));
+
+    // Кнопка на головній — своя: на банері акції її часто прибирають,
+    // а тут вона єдиний вхід в акцію.
+    check("є окрема кнопка для головної",
+        field("homeButtonText") && field("homeButtonText").required === false);
+
+    check("вона падає на загальну, коли порожня",
+        /promo\.homeButtonText \|\| promo\.buttonText/.test(appJs));
+
+    check("збірка її переносить", /homeButtonText: String\(data\.homeButtonText\)\.trim\(\)/.test(build));
+
+    // Банер у блоці бере те саме фото, що прев'ю на головній.
+    check("банер у блоці показує фото акції",
+        /const bannerImage = promo\.image \|\| promo\.imageMobile/.test(appJs));
+
+    check("без фото банера немає",
+        /place\.banner !== "none" && Boolean\(bannerImage\)/.test(appJs));
+
+    check("CSS ділить блок на дві половини",
+        /\.deal-body\[data-banner="left"\]/.test(css)
+        && /\.deal-body\[data-banner="right"\]/.test(css));
+
+    check("на телефоні банер і товари в один стовпчик",
+        /grid-template-columns:minmax\(0, 1fr\);/.test(
+            css.slice(css.indexOf("@media(max-width:900px)"))));
 }
 
 
@@ -367,9 +459,13 @@ console.log("\n[2f] Порожнє поле доходить до сайту п�
 
     // Кнопку ховає КОЖЕН малювальник — інакше вона зникала б на одному
     // банері й лишалась на іншому.
-    check("усі банери головної ховають кнопку без напису",
-        (appJs.match(/promo\.buttonText \?/g) || []).length >= 5,
-        (appJs.match(/promo\.buttonText \?/g) || []).length);
+    // Блок «Ціна дня» питає moreText (своя кнопка плюс запасна),
+    // решта чотири — promo.buttonText. Разом пʼять місць, і жодне не
+    // має малювати кнопку без напису.
+    const guards = (appJs.match(/promo\.buttonText \?/g) || []).length
+        + (appJs.match(/moreText\s*\?/g) || []).length;
+
+    check("усі банери головної ховають кнопку без напису", guards >= 5, guards);
 
     // Порожній <a class="btn"> намалював би порожню кольорову плашку —
     // гірше за кнопку з написом. Тому кожна згадка напису мусить
@@ -442,7 +538,7 @@ console.log("\n[2e] Прев'ю в адмінці показує ОБИДВА м
         /TextStyles\.mergeStyles\(e\.get\("style"\), e\.get\("homeStyle"\)\)/.test(preview));
 
     check("слухається вирівнювання",
-        /"data-align": e\.get\("dealAlign"\) \|\| "left"/.test(preview));
+        /"data-align": place\.products/.test(preview));
 
     check("слухається перемикача таймера",
         /e\.get\("hideCountdown"\) !== true/.test(preview));
@@ -453,7 +549,7 @@ console.log("\n[2e] Прев'ю в адмінці показує ОБИДВА м
         && /badgePlaces !== "promo" && badgePlaces !== "none"/.test(preview));
 
     check("кнопка лише з написом",
-        /e\.get\("buttonText"\)\s*\?\s*h\("span", \{ className: "cms-preview-home-more"/.test(preview));
+        /moreText\s*\?\s*h\("span", \{ className: "cms-preview-home-more"/.test(preview));
 
     // Прев'ю мусить малювати ті самі правила, що сайт. Один модуль на
     // двох — саме щоб вони не розійшлися.

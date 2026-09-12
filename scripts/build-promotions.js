@@ -60,6 +60,10 @@ const BADGE_PLACES = ["both", "home", "promo", "none"];
 
 const DEAL_ALIGNS = ["left", "center", "right"];
 
+// Розкладка блока «Ціна дня» — той самий модуль, що читає сайт і
+// адмінка. Він же каже, які поєднання неможливі.
+const DealLayout = require("../assets/js/deal-layout.js");
+
 const LAYOUTS = [
     "left-top", "left-middle", "left-bottom",
     "center-top", "center-middle", "center-bottom",
@@ -323,6 +327,16 @@ function main() {
             ...(BADGE_PLACES.includes(data.badgePlaces) ? { badgePlaces: data.badgePlaces } : {}),
             // Де стоять товари в блоці «Ціна дня».
             ...(DEAL_ALIGNS.includes(data.dealAlign) ? { dealAlign: data.dealAlign } : {}),
+            // Банер у блоці: ліворуч, праворуч або немає.
+            ...(DealLayout.SIDES.includes(data.dealBanner) ? { dealBanner: data.dealBanner } : {}),
+            // Напис і таймер у шапці блока.
+            ...(DEAL_ALIGNS.includes(data.dealTextAlign) ? { dealTextAlign: data.dealTextAlign } : {}),
+            ...(DealLayout.SIDES.includes(data.dealTimer) ? { dealTimer: data.dealTimer } : {}),
+            // Своя кнопка для головної: на банері акції її часто
+            // прибирають, а тут вона єдиний вхід в акцію.
+            ...(String(data.homeButtonText || "").trim()
+                ? { homeButtonText: String(data.homeButtonText).trim() }
+                : {}),
             // Свої кольори для головної. Порожній обʼєкт не пишемо:
             // інакше в кожній акції зʼявився б рядок ні про що.
             ...(data.homeStyle && typeof data.homeStyle === "object"
@@ -342,6 +356,21 @@ function main() {
                 : "card",
             order: typeof data.order === "number" ? data.order : 1
         });
+
+    });
+
+    // РОЗКЛАДКА: кажемо вголос, якщо два елементи просяться в одне
+    // місце. Не падаємо й не мовчимо — блок малюється осмислено, а
+    // власник бачить, що саме не застосувалось.
+    //
+    // Те саме правило показує прев'ю в адмінці, поки акцію правлять,
+    // бо рахує його той самий модуль.
+    promotions.forEach(promo => {
+
+        if (promo.displayType !== "deal_of_day") return;
+
+        DealLayout.resolve(promo).conflicts.forEach(text =>
+            console.warn(`::warning::розкладка «${promo.title || promo.slug}» — ${text}`));
 
     });
 

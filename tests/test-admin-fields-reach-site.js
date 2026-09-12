@@ -92,17 +92,37 @@ function helperSource(name, source) {
 
 }
 
-// Перше значення зі списку варіантів самого поля. Варіанти в
-// Decap бувають рядками або {label, value}.
-function optionValue(field) {
+// Варіант зі списку самого поля. Decap дозволяє і рядки, і
+// {label, value}.
+//
+// ПЕРЕБИРАЄМО ВСІ, А НЕ БЕРЕМО ПЕРШИЙ.
+//
+// Деякі варіанти означають «нічого не робити» — і збірка їх навмисно
+// не передає: «Банер у блоці: немає», «Ніде» для бейджа. Якщо
+// заповнювати поле лише першим варіантом, такий select виглядав би
+// полем, яке не доїжджає до сайту, хоча він доїжджає — просто іншим
+// значенням.
+//
+// Та сама логіка, що з перемикачами: поле вважається робочим, якщо
+// його переносить ХОЧА Б ОДИН зі станів.
+function optionValue(field, index) {
 
-    const options = field.options || [];
+    const options = (field.options || []).filter(o => o !== undefined && o !== null);
 
-    const first = options.find(o => o !== undefined && o !== null);
+    if (!options.length) return "card";
 
-    if (first === undefined) return "card";
+    const pick = options[(index || 0) % options.length];
 
-    return typeof first === "object" ? first.value : first;
+    return typeof pick === "object" ? pick.value : pick;
+
+}
+
+// Скільки різних заповнень треба, щоб перебрати всі варіанти всіх
+// списків: найдовший список і задає кількість.
+function optionRounds(fields) {
+
+    return fields.reduce((max, field) => Math.max(max,
+        (field.options || []).length || 1), 1);
 
 }
 
@@ -128,8 +148,22 @@ function literalRunner(source) {
     const consts = [...source.matchAll(/^const ([A-Z_][A-Z0-9_]*) = (\[[\s\S]*?\]);$/gm)]
         .map(hit => ({ name: hit[1], value: new Function(`return ${hit[2]};`)() }));
 
-    const names = HELPERS.concat(consts.map(c => c.name));
-    const values = helpers.concat(consts.map(c => c.value));
+    // МОДУЛІ, ЯКІ ЛІТЕРАЛ ВИМАГАЄ ЧЕРЕЗ require.
+    //
+    // Розкладку блока «Ціна дня» рахує спільний модуль — його читають
+    // сайт, збірка й адмінка. У пісочниці require не спрацює (літерал
+    // виконується у порожньому new Function), тож подаємо СПРАВЖНІЙ
+    // модуль аргументом. Своя заглушка означала б, що тест перевіряє
+    // не той код, який працює.
+    const modules = [...source.matchAll(/^const (\w+) = require\("([^"]+)"\);$/gm)]
+        .filter(hit => hit[2].startsWith("../assets/"))
+        .map(hit => ({
+            name: hit[1],
+            value: require(path.join(ROOT, hit[2].replace("../", "")))
+        }));
+
+    const names = HELPERS.concat(consts.map(c => c.name), modules.map(m => m.name));
+    const values = helpers.concat(consts.map(c => c.value), modules.map(m => m.value));
 
     return data => new Function("data", "slug", "genderButtons", ...names,
         `return (${literal});`)(data, "test-slug", [], ...values);
@@ -176,7 +210,7 @@ function pushedLiteral(source) {
 //
 // Тому запис заповнюється двічі, і поле вважається доїхавшим, якщо
 // його переніс хоча б один зі станів.
-function filledEntry(fields, booleans) {
+function filledEntry(fields, booleans, round) {
 
     const data = {};
 
@@ -209,7 +243,7 @@ function filledEntry(fields, booleans) {
                 // банера.
                 data[name] = field.multiple || field.widget === "list"
                     ? [{ gender: "Жінкам", color: "#111827" }]
-                    : optionValue(field);
+                    : optionValue(field, round);
                 break;
 
             case "productPicker":
@@ -256,8 +290,12 @@ const GROUPS = [
         aggregate: "data/promotions.json",
         // Як називається змінна запису у фронтенді — за нею й дивимось,
         // чи поле взагалі комусь потрібне.
-        accessor: "promo",
-        consumers: ["assets/js/app.js", "assets/js/promo.js", "assets/js/common.js"],
+        // Розкладку блока «Ціна дня» читає спільний модуль, а не сам
+        // app.js: у ньому поля звуться p.dealBanner. Без нього поля
+        // розкладки виглядали б нікому не потрібними — хоча саме вони й
+        // вирішують, що де стоїть.
+        accessor: ["promo", "p"],
+        consumers: ["assets/js/app.js", "assets/js/promo.js", "assets/js/common.js", "assets/js/deal-layout.js"],
         // Поле, якого сайт не читає, і чому це нормально.
         internal: {
             active: "фільтр самої збірки: вимкнена акція не потрапляє у файл",
@@ -318,10 +356,21 @@ GROUPS.forEach(group => {
     // його опис регуляркою.
     const run = literalRunner(source);
 
-    const emitted = new Set([
-        ...Object.keys(run(filledEntry(fields, false))),
-        ...Object.keys(run(filledEntry(fields, true)))
-    ]);
+    // Перебираємо ОБИДВА стани перемикачів і ВСІ варіанти списків:
+    // поле вважається робочим, якщо його переносить хоча б одне
+    // заповнення.
+    const emitted = new Set();
+
+    for (let round = 0; round < optionRounds(fields); round++) {
+
+        [false, true].forEach(booleans => {
+
+            Object.keys(run(filledEntry(fields, booleans, round)))
+                .forEach(key => emitted.add(key));
+
+        });
+
+    }
 
     const consumerSource = group.consumers.map(read).join("\n");
 

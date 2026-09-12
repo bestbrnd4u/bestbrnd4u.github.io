@@ -614,3 +614,39 @@
     text-decoration:underline;
     color:var(--blk-text, #111827);
 }
+
+/* Банер і товари в блоці — так само, як на сайті. */
+.cms-preview-home-body{
+    display:grid;
+    gap:10px;
+    align-items:start;
+}
+
+.cms-preview-home-body[data-banner="left"]{ grid-template-columns:minmax(0,1fr) minmax(0,1.4fr); }
+.cms-preview-home-body[data-banner="right"]{ grid-template-columns:minmax(0,1.4fr) minmax(0,1fr); }
+.cms-preview-home-body[data-banner="right"] .cms-preview-home-banner{ order:2; }
+
+.cms-preview-home-banner img{
+    display:block;
+    width:100%;
+    border-radius:8px;
+}
+
+.cms-preview-home-head[data-text="center"]{ justify-content:center; text-align:center; }
+.cms-preview-home-head[data-text="right"]{ flex-direction:row-reverse; text-align:right; }
+.cms-preview-home-head[data-timer="left"]{ flex-direction:row-reverse; }
+.cms-preview-home-head[data-text="right"][data-timer="left"]{ flex-direction:row; }
+
+/* Суперечність у розкладці. Decap перевіряти поля одне проти одного
+   не вміє, тож єдиний спосіб попередити вчасно — сказати це прямо в
+   прев’ю, поки акцію правлять. */
+.cms-preview-home-warn{
+    margin-bottom:10px;
+    padding:8px 10px;
+    border-radius:8px;
+    background:#fef2f2;
+    border:1px solid #fecaca;
+    color:#b91c1c;
+    font-size:12px;
+    line-height:1.5;
+}

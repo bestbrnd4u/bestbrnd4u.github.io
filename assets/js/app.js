@@ -1122,12 +1122,32 @@ async function renderDealPromotions(dealPromotions) {
         const heading = promoHomeTitle(promo);
         const lead = promoHomeText(promo);
 
+        // Куди що стає — вирішує спільний модуль, а не цей рядок
+        // розмітки. Він же знає, які поєднання неможливі: банер
+        // займає половину блока, а таймер не стане на той самий бік,
+        // що й напис. Те саме правило читають збірка й прев'ю.
+        const place = window.DealLayout
+            ? window.DealLayout.resolve(promo)
+            : { banner: "none", products: promo.dealAlign || "left", text: "left", timer: "right" };
+
+        // Банер у блоці — те саме фото, що прев'ю на головній.
+        // Без фото немає й банера: порожня половина гірша за її
+        // відсутність.
+        const bannerImage = promo.image || promo.imageMobile || "";
+
+        const withBanner = place.banner !== "none" && Boolean(bannerImage);
+
+        // Кнопка на головній — своя. На банері сторінки акції її часто
+        // прибирають, бо напис уже на фото, а тут вона єдиний вхід в
+        // акцію.
+        const moreText = String(promo.homeButtonText || promo.buttonText || "").trim();
+
         return `
             <div class="deal-block${blockStyleClass(promoHomeStyle(promo))}" style="${blockStyleAttr(promoHomeStyle(promo))}">
 
                 <div class="container">
 
-                    <div class="deal-head">
+                    <div class="deal-head" data-text="${place.text}" data-timer="${place.timer}">
 
                         <div class="deal-head-text">
                             ${eyebrow ? `<span class="deal-eyebrow">${eyebrow}</span>` : ""}
@@ -1139,13 +1159,22 @@ async function renderDealPromotions(dealPromotions) {
 
                     </div>
 
-                    <div class="deal-products products-grid" data-align="${promo.dealAlign || "left"}">
-                        ${curated.map(product => createProductCard(product)).join("")}
+                    <div class="deal-body" data-banner="${withBanner ? place.banner : "none"}">
+
+                        ${withBanner ? `
+                        <a href="promo?id=${encodeURIComponent(promo.slug)}" class="deal-banner">
+                            <img src="${bannerImage}" alt="${escapeHtml(heading)}" loading="lazy">
+                        </a>` : ""}
+
+                        <div class="deal-products products-grid" data-align="${place.products}">
+                            ${curated.map(product => createProductCard(product)).join("")}
+                        </div>
+
                     </div>
 
-                    ${promo.buttonText ? `
+                    ${moreText ? `
                     <a href="promo?id=${encodeURIComponent(promo.slug)}" class="deal-more">
-                        ${promo.buttonText} →
+                        ${moreText} →
                     </a>` : ""}
 
                 </div>

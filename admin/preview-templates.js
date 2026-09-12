@@ -892,11 +892,40 @@
             //
             // Власні CSS-змінні (--blk-*) React в обʼєкті розуміє й
             // віддає як є.
+            // РОЗКЛАДКА — ТИМ САМИМ МОДУЛЕМ, ЩО Й НА САЙТІ.
+            //
+            // Він же каже, які поєднання неможливі. Прев'ю показує цю
+            // суперечність червоним рядком: Decap перевіряти поля одне
+            // проти одного не вміє, тож єдиний спосіб попередити
+            // власника вчасно — сказати це прямо тут, поки він править.
+            var place = window.DealLayout
+                ? window.DealLayout.resolve({
+                    dealBanner: e.get("dealBanner"),
+                    dealAlign: e.get("dealAlign"),
+                    dealTextAlign: e.get("dealTextAlign"),
+                    dealTimer: e.get("dealTimer")
+                })
+                : { banner: "none", products: "left", text: "left", timer: "right", conflicts: [] };
+
+            var withBanner = place.banner !== "none" && Boolean(teaser);
+
+            var moreText = String(e.get("homeButtonText") || e.get("buttonText") || "").trim();
+
             var homeBlock = h("div", {
                 className: "cms-preview-home" + (hasHomeVars ? " has-style" : ""),
                 style: hasHomeVars ? homeVars : undefined
             },
-                h("div", { className: "cms-preview-home-head" },
+                place.conflicts.length
+                    ? h("div", { className: "cms-preview-home-warn" },
+                        place.conflicts.map(function (text, i) {
+                            return h("div", { key: i }, "⚠ " + text);
+                        }))
+                    : null,
+                h("div", {
+                    className: "cms-preview-home-head",
+                    "data-text": place.text,
+                    "data-timer": place.timer
+                },
                     h("div", null,
                         homeBadge ? h("span", { className: "cms-preview-home-eyebrow" }, homeBadge) : null,
                         homeTitle ? h("h3", { className: "cms-preview-home-title" }, esc(homeTitle)) : null,
@@ -905,18 +934,26 @@
                         ? h("span", { className: "cms-preview-promo-timer" }, "⏳ Лишилось 00:00:00")
                         : null),
                 h("div", {
-                    className: "cms-preview-home-row",
-                    "data-align": e.get("dealAlign") || "left"
+                    className: "cms-preview-home-body",
+                    "data-banner": withBanner ? place.banner : "none"
                 },
-                    // Справжніх карток тут не намалювати: у прев'ю немає
-                    // ні фото товарів, ні цін. Показуємо їхню кількість і
-                    // МІСЦЕ — саме це й налаштовують полем вирівнювання.
-                    (productList.length ? productList : [null]).slice(0, 4).map(function (id, i) {
-                        return h("div", { className: "cms-preview-home-card", key: i },
-                            productList.length ? "товар " + id : "товарів не обрано");
-                    })),
-                e.get("buttonText")
-                    ? h("span", { className: "cms-preview-home-more" }, esc(e.get("buttonText")) + " →")
+                    withBanner
+                        ? h("div", { className: "cms-preview-home-banner" },
+                            h(AssetImage, { path: teaser, getAsset: getAsset }))
+                        : null,
+                    h("div", {
+                        className: "cms-preview-home-row",
+                        "data-align": place.products
+                    },
+                        // Справжніх карток тут не намалювати: у прев'ю немає
+                        // ні фото товарів, ні цін. Показуємо їхню кількість і
+                        // МІСЦЕ — саме це й налаштовують полем вирівнювання.
+                        (productList.length ? productList : [null]).slice(0, 4).map(function (id, i) {
+                            return h("div", { className: "cms-preview-home-card", key: i },
+                                productList.length ? "товар " + id : "товарів не обрано");
+                        }))),
+                moreText
+                    ? h("span", { className: "cms-preview-home-more" }, esc(moreText) + " →")
                     : null
             );
 
@@ -953,7 +990,12 @@
                     ["Спосіб показу", e.get("displayType")],
                     ["Напис на банері", bare ? "не показувати" : layout],
                     ["Бейдж", {both:"і там, і там", home:"тільки на головній", promo:"тільки на сторінці акції", none:"ніде"}[e.get("badgePlaces") || "both"]],
-                    ["Товари в блоці", {left:"ліворуч", center:"по центру", right:"праворуч"}[e.get("dealAlign") || "left"]],
+                    ["Товари в блоці", window.DealLayout ? window.DealLayout.word(place.products) : ""],
+                    ["Банер у блоці", place.banner === "none"
+                        ? "немає"
+                        : (window.DealLayout ? window.DealLayout.word(place.banner) : place.banner)],
+                    ["Напис у блоці", window.DealLayout ? window.DealLayout.word(place.text) : ""],
+                    ["Таймер у блоці", window.DealLayout ? window.DealLayout.word(place.timer) : ""],
                     ["Свої кольори на головній", (e.get("homeStyle") && e.get("homeStyle").size) ? "так" : ""],
                     ["Окремий напис на головній",
                         (e.get("homeTitle") || e.get("homeText")) ? "так" : ""],

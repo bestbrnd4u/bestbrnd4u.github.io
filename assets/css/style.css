@@ -14070,6 +14070,95 @@ body.refusal-open{
 
 /* Ряд товарів. Сітка, а не карусель: товарів у ціні дня одиниці, і
    стрілки гортання над трьома картками — механіка без потреби. */
+/* ── Розкладка блока «Ціна дня» ──
+
+   Чотири рухомі частини, і кожну ставлять окремо: банер, ряд товарів,
+   напис, таймер. Які поєднання неможливі — вирішує
+   assets/js/deal-layout.js; сюди приходять уже готові позиції, тож
+   правил «а якщо і те, і те» тут немає. */
+
+/* Напис по центру — таймер лишається з краю, тому шапка ділиться на
+   три, а не на дві частини. */
+.deal-head[data-text="center"]{
+    justify-content:center;
+    text-align:center;
+}
+
+.deal-head[data-text="center"] .deal-head-text{
+    margin:0 auto;
+}
+
+.deal-head[data-text="right"]{
+    flex-direction:row-reverse;
+    text-align:right;
+}
+
+/* Таймер ліворуч — міняємо порядок, а не позицію: так він лишається в
+   тому самому рядку й не ламає вирівнювання напису. */
+.deal-head[data-timer="left"]{
+    flex-direction:row-reverse;
+}
+
+.deal-head[data-text="right"][data-timer="left"]{
+    flex-direction:row;
+}
+
+/* Банер і товари ділять ширину. Без банера ряд товарів займає все —
+   і поводиться рівно так, як поводився досі. */
+.deal-body{
+    display:grid;
+    gap:24px;
+    align-items:start;
+}
+
+.deal-body[data-banner="left"]{
+    grid-template-columns:minmax(0, 1fr) minmax(0, 1.4fr);
+}
+
+.deal-body[data-banner="right"]{
+    grid-template-columns:minmax(0, 1.4fr) minmax(0, 1fr);
+}
+
+/* Банер завжди в тій половині, яку йому призначили, — порядок у
+   розмітці один, а бік задає grid-column. Інакше довелося б малювати
+   дві різні розмітки заради дзеркального відображення. */
+.deal-body[data-banner="right"] .deal-banner{
+    order:2;
+}
+
+.deal-banner{
+    display:block;
+    border-radius:16px;
+    overflow:hidden;
+}
+
+.deal-banner img{
+    display:block;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    transition:transform .4s;
+}
+
+.deal-banner:hover img{
+    transform:scale(1.03);
+}
+
+@media(max-width:900px){
+
+    /* На телефоні банер і товари в один стовпчик: дві колонки по
+       півекрана перетворили б картку товару на марку. */
+    .deal-body[data-banner="left"],
+    .deal-body[data-banner="right"]{
+        grid-template-columns:minmax(0, 1fr);
+    }
+
+    .deal-body[data-banner="right"] .deal-banner{
+        order:0;
+    }
+
+}
+
 /* ДЕ СТОЯТЬ ТОВАРИ.
 
    auto-FIT, а не auto-fill: fill лишає порожні колонки на всю ширину,
