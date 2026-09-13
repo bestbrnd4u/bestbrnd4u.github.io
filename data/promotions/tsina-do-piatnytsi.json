@@ -1,6 +1,6 @@
 {
   "badge": "Ціна тижня",
-  "startsAt": "2026-09-12T20:18:00+03:00",
+  "startsAt": "2026-09-13T12:15:00+03:00",
   "products": [
     57
   ],
@@ -30,7 +30,9 @@
     "badgeBg": "",
     "timerBg": "",
     "timerText": "#60e109",
-    "badgeText": ""
+    "badgeText": "",
+    "buttonText": "",
+    "buttonBg": "#60e109"
   },
   "hideDealBadge": true,
   "bannerLayout": "right-top",
