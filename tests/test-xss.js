@@ -18,6 +18,11 @@ window.eval(fs.readFileSync(ROOT + "assets/js/common.js", "utf8").match(
 )[0]);
 // createProductCard тепер використовує ще й розмірні хелпери
 const commonSrc = fs.readFileSync(ROOT + "assets/js/common.js", "utf8");
+// Ціна дня: ціну рахує common.js, а малюють її ui.js і catalog.js.
+window.eval(commonSrc.match(/function saleActive[\s\S]*?\n}\n/)[0]);
+window.eval(commonSrc.match(/function priceNow[\s\S]*?\n}\n/)[0]);
+window.eval(commonSrc.match(/function oldPriceNow[\s\S]*?\n}\n/)[0]);
+window.eval(commonSrc.match(/function discountPercent[\s\S]*?\n}\n/)[0]);
 window.eval(commonSrc.match(/function getVariantSizes[\s\S]*?\n}\n/)[0]);
 window.eval(commonSrc.match(/function getAllProductSizes[\s\S]*?\n}\n/)[0]);
 window.eval(commonSrc.match(/function getProductColors[\s\S]*?\n}\n/)[0]);

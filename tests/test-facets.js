@@ -12,7 +12,17 @@ window.matchMedia=window.matchMedia||(()=>({matches:false,addEventListener(){},a
 window.fetch=()=>Promise.resolve({ok:false});
 window.requestAnimationFrame=cb=>cb();
 const common=fs.readFileSync(path.join(ROOT,"assets/js/common.js"),"utf8");
+// Ціна дня: ціну рахує common.js, а малюють її ui.js і catalog.js.
+window.eval(common.match(/function saleActive[\s\S]*?\n}\n/)[0]);
+window.eval(common.match(/function priceNow[\s\S]*?\n}\n/)[0]);
+window.eval(common.match(/function oldPriceNow[\s\S]*?\n}\n/)[0]);
+window.eval(common.match(/function discountPercent[\s\S]*?\n}\n/)[0]);
 window.eval(common.match(/function escapeHtml[\s\S]*?\n}\n/)[0]);
+// plural()/pluralProducts() теж у common.js: на сайті файл
+// підключений повністю, у тесті додаємо явно — без них лічильник
+// товарів у catalog.js падає з ReferenceError.
+window.eval(fs.readFileSync(path.join(ROOT, "assets/js/common.js"), "utf8").match(/function plural\(count[\s\S]*?\n}\n/)[0]);
+window.eval(fs.readFileSync(path.join(ROOT, "assets/js/common.js"), "utf8").match(/function pluralProducts[\s\S]*?\n}\n/)[0]);
 window.eval(common.match(/function getProductColors[\s\S]*?\n}\n/)[0]);
 // сім'ї кольорів — фільтр «Колір» працює ними (див. хелпер)
 require(require("path").join(__dirname,"helpers/color-families")).installColorFamilies(window);

@@ -2551,12 +2551,14 @@ footer{
 }
 
 .promo-card-info h3{
-    font-size:19px;
+    --blk-title-base:19px;
+    font-size:calc(var(--blk-title-base) * var(--blk-title-scale, 1));
     line-height:1.3;
 }
 
 .promo-card-info p{
-    font-size:14px;
+    --blk-text-base:14px;
+    font-size:calc(var(--blk-text-base) * var(--blk-text-scale, 1));
     color:var(--gray500);
 }
 
@@ -2628,7 +2630,8 @@ footer{
 }
 
 .promo-hero-slide-content h2{
-    font-size:32px;
+    --blk-title-base:32px;
+    font-size:calc(var(--blk-title-base) * var(--blk-title-scale, 1));
     line-height:1.15;
     text-align:left;
     margin:0;
@@ -2636,7 +2639,8 @@ footer{
 
 .promo-hero-slide-content p{
     color:var(--gray500);
-    font-size:16px;
+    --blk-text-base:16px;
+    font-size:calc(var(--blk-text-base) * var(--blk-text-scale, 1));
     margin:0;
 }
 
@@ -2779,7 +2783,7 @@ footer{
     }
 
     .promo-hero-slide-content h2{
-        font-size:22px;
+        --blk-title-base:22px;
     }
 
     .promo-hero-slide-image{
@@ -6018,7 +6022,8 @@ body.mobile-filters-open .scroll-top{
 }
 
 .brand-campaign-content h2{
-    font-size:32px;
+    --blk-title-base:32px;
+    font-size:calc(var(--blk-title-base) * var(--blk-title-scale, 1));
     line-height:1.25;
     /* глобальний h2{margin-bottom:50px} (для великих заголовків
        секцій типу "Популярні товари") тут зайвий — додається
@@ -6032,7 +6037,8 @@ body.mobile-filters-open .scroll-top{
 
 .brand-campaign-content p{
     color:var(--gray500);
-    font-size:16px;
+    --blk-text-base:16px;
+    font-size:calc(var(--blk-text-base) * var(--blk-text-scale, 1));
 }
 
 .brand-campaign-content .btn{
@@ -6074,7 +6080,7 @@ body.mobile-filters-open .scroll-top{
     }
 
     .brand-campaign-content h2{
-        font-size:24px;
+        --blk-title-base:24px;
     }
 
 }
@@ -9248,6 +9254,67 @@ body.mobile-filters-open .scroll-top{
     }
 }
 
+/* =========================================
+   Куди лягає напис на банері акції
+
+   ЧОМУ ЦЕ ВЗАГАЛІ НАЛАШТУВАННЯ. Банер часто малюють уже з текстом —
+   назва акції, ціна, товар. Наш заголовок лягав поверх чужого, а
+   кнопка закривала сумку. Тепер напис можна посунути у вільний кут
+   або прибрати зовсім (порожні поля + вимкнений таймер), і тоді
+   лишається саме фото.
+
+   Перелік значень повторюється у трьох місцях — тут, в admin/config.yml
+   і в scripts/build-promotions.js (LAYOUTS). Звіряє їх
+   tests/test-promo-banner-layout.js.
+   ========================================= */
+
+.promo-hero-banner{
+    display:flex;
+}
+
+.promo-hero-banner[data-layout$="-top"]{ align-items:flex-start; }
+.promo-hero-banner[data-layout$="-middle"]{ align-items:center; }
+.promo-hero-banner[data-layout$="-bottom"]{ align-items:flex-end; }
+
+.promo-hero-banner[data-layout^="left-"]{ justify-content:flex-start; }
+.promo-hero-banner[data-layout^="center-"]{ justify-content:center; }
+.promo-hero-banner[data-layout^="right-"]{ justify-content:flex-end; }
+
+/* Текст усередині блока вирівнюємо туди ж, куди й сам блок: напис,
+   притиснутий праворуч, але з текстом ліворуч, читається як помилка. */
+.promo-hero-banner[data-layout^="center-"] .promo-hero-content{ text-align:center; }
+.promo-hero-banner[data-layout^="right-"] .promo-hero-content{ text-align:right; }
+
+.promo-hero-banner[data-layout^="center-"] .promo-hero-content p,
+.promo-hero-banner[data-layout^="right-"] .promo-hero-content p{
+    margin-left:auto;
+}
+
+.promo-hero-banner[data-layout^="center-"] .promo-hero-content p{
+    margin-right:auto;
+}
+
+/* Банер без напису: вмісту немає, висоту тримати нічому. Лишаємо ту
+   саму пропорцію, у якій власник готує фото (1920×600 ≈ 3.2:1). */
+.promo-hero-banner.promo-hero-bare{
+    padding:0;
+    aspect-ratio:3.2 / 1;
+}
+
+.promo-hero-banner.promo-hero-bare .promo-hero-content{
+    display:none;
+}
+
+@media(max-width:768px){
+
+    /* На телефоні фото завантажують вертикальніше — і пропорція інша. */
+    .promo-hero-banner.promo-hero-bare{
+        aspect-ratio:3 / 4;
+        min-height:0;
+    }
+
+}
+
 .promo-hero-content{
     max-width:650px;
 }
@@ -9263,19 +9330,82 @@ body.mobile-filters-open .scroll-top{
     letter-spacing:.04em;
 }
 
+/* -- Відлік акції з розкладом (assets/js/promo.js).
+
+   ДВА СТАНИ, І ВОНИ НАВМИСНО РІЗНІ НА ВИГЛЯД:
+
+     announced  спокійний, напівпрозорий — до сейлу ще тиждень, і
+                кричати нема про що;
+     live       той самий червоний, що й позначка акції — бо тепер
+                час справді спливає.
+
+   Цифри моноширинні: інакше рядок «6 дн. 04:12» смикається на кожній
+   зміні хвилини, бо «1» вужча за «8». -- */
+.promo-countdown{
+    display:inline-flex;
+    align-items:baseline;
+    gap:8px;
+    padding:8px 18px;
+    margin-bottom:20px;
+    border-radius:50px;
+    background:rgba(255,255,255,.18);
+    font-size:14px;
+    line-height:1.2;
+}
+
+.promo-countdown[hidden]{
+    display:none;
+}
+
+/* ТАЙМЕР БІЛЬШЕ НЕ МІНЯЄ КОЛІР САМ ПО СОБІ.
+
+   Тут було правило .promo-countdown[data-state="live"] з
+   background:var(--danger): відлік стояв темним до початку акції й
+   ставав червоним, щойно вона починалась. Задум зрозумілий — «іде
+   просто зараз» має кричати.
+
+   На практиці власник прочитав це як поломку, і двічі. Він підібрав
+   темну заливку під свій банер, подивився на неї, а коли акція
+   стартувала, вона стала червоною — сама, без жодної його дії.
+   Колір, що міняється без причини, читається як баг, хай би яким
+   продуманим був задум.
+
+   Що акція вже йде, видно й без червоного: напис перемикається з
+   «Почнеться через» на «Лишилось», а ціна на картці стає акційною.
+
+   Кому потрібен червоний — ставить його в адмінці полем «Колір
+   таймера»: тоді він червоний ЗАВЖДИ, а не половину акції.
+
+   Сам атрибут data-state лишається — його читає розмітка й тести. */
+
+.promo-countdown-label{
+    font-weight:600;
+    letter-spacing:.02em;
+    opacity:.9;
+}
+
+.promo-countdown-value{
+    font-weight:700;
+    font-size:16px;
+    font-variant-numeric:tabular-nums;
+    font-feature-settings:"tnum";
+}
+
 .promo-hero-badge[hidden]{
     display:none;
 }
 
 .promo-hero-content h1{
     color:#fff;
-    font-size:42px;
+    --blk-title-base:42px;
+    font-size:calc(var(--blk-title-base) * var(--blk-title-scale, 1));
     margin-bottom:16px;
 }
 
 .promo-hero-content p{
     color:rgba(255,255,255,.88);
-    font-size:17px;
+    --blk-text-base:17px;
+    font-size:calc(var(--blk-text-base) * var(--blk-text-scale, 1));
     line-height:1.6;
     margin-bottom:32px;
     max-width:520px;
@@ -9292,8 +9422,9 @@ body.mobile-filters-open .scroll-top{
         min-height:320px;
     }
 
+    /* Міняємо ЛИШЕ базу — множник із адмінки застосує правило вище. */
     .promo-hero-content h1{
-        font-size:30px;
+        --blk-title-base:30px;
     }
 
 }
@@ -10588,7 +10719,8 @@ body.mobile-filters-open .scroll-top{
 
 .collection-head h2{
     margin:0;
-    font-size:26px;
+    --blk-title-base:26px;
+    font-size:calc(var(--blk-title-base) * var(--blk-title-scale, 1));
 }
 
 .collection-nav{
@@ -10784,7 +10916,7 @@ body.mobile-filters-open .scroll-top{
     }
 
     .collection-head h2{
-        font-size:19px;
+        --blk-title-base:19px;
     }
 
     .collection-product-title{
@@ -11148,42 +11280,180 @@ body.mobile-filters-open .scroll-top{
     color:var(--blk-text, inherit);
 }
 
-/* Заголовок масштабується множником, а не фіксованим розміром:
-   інакше на телефоні він ламав би верстку, бо там свій розмір. */
+/* РОЗМІР ТУТ НЕ ЗАДАЄМО — І ЦЕ ГОЛОВНЕ В ЦЬОМУ ФАЙЛІ ПРО РОЗМІРИ.
+
+   Було: font-size:calc(var(--blk-title-base, 1em) * var(--blk-title-scale, 1)).
+   Змінної --blk-title-base не існувало ніде, тож множили на 1em. А
+   правило з .has-style важить більше за власне правило заголовка —
+   і заголовок сторінки акції падав із 42px до 16px від самого лише
+   факту, що в блоці щось налаштували. Виміряно на живій сторінці:
+   H1, fontSize 16px. Поле «Розмір заголовка» при цьому працювало,
+   але множило ті самі 16px, тож «Найбільший» давав 24px замість 63.
+
+   Другий бік тієї ж помилки: у кожного блока свій розмір ще й НА
+   ТЕЛЕФОНІ (30px замість 42, 24 замість 30…). Одне число тут, хай
+   навіть правильне для десктопа, ламало б мобільну верстку.
+
+   Тому множник застосовує САМ блок, у своєму ж правилі, поруч зі
+   своїм розміром:
+
+       .deal-head-text h2{
+           --blk-title-base:30px;
+           font-size:calc(var(--blk-title-base) * var(--blk-title-scale, 1));
+       }
+
+   а медіа-запит міняє лише --blk-title-base. Пари «розмір ↔ множник»
+   тримає tests/test-block-styles-scope.js. */
 .has-style h1,
 .has-style h2{
-    font-size:calc(var(--blk-title-base, 1em) * var(--blk-title-scale, 1));
     text-transform:var(--blk-transform, none);
     letter-spacing:var(--blk-tracking, inherit);
 }
 
 /* Дрібний підпис над заголовком має власний колір: він і задуманий
-   як акцент, і зливати його з основним текстом було б втратою. */
+   як акцент, і зливати його з основним текстом було б втратою.
+
+   .hero-label і .promo-label власного кольору не мають — тут
+   успадкований і є їхнім звичайним виглядом, тож inherit у запасному
+   значенні правильний. */
 .has-style .hero-label,
-.has-style .promo-label,
-.has-style .collection-eyebrow,
-.has-style .promo-card-label{
+.has-style .promo-label{
     color:var(--blk-accent, inherit);
     letter-spacing:var(--blk-tracking, inherit);
 }
 
-.has-style .btn,
-.has-style .btn-primary,
-.has-style .hero-actions a,
-.has-style .promo-actions a,
-.has-style .collection-cta{
-    background:var(--blk-btn-bg, inherit);
-    color:var(--blk-btn-text, inherit);
-    border-color:var(--blk-btn-bg, inherit);
+/* А в підпису добірки колір свій (--secondary нижче по файлу), і
+   inherit його стирав — знову ж таки від першого-ліпшого заданого
+   кольору, хай навіть зовсім іншого поля. */
+.has-style .collection-eyebrow{
+    color:var(--blk-accent, var(--secondary));
+    letter-spacing:var(--blk-tracking, inherit);
 }
+
+/* ЗАПАСНЕ ЗНАЧЕННЯ — ВЛАСНИЙ КОЛІР КНОПКИ, А НЕ inherit.
+
+   inherit означає «узяти в батька», тобто прозору кнопку. Підступним
+   це було через те, КОЛИ спрацьовувало: поки в блоці не задано
+   ЖОДНОГО кольору, класу .has-style немає й правило не діє взагалі,
+   кнопка синя. Задали перший-ліпший колір — хай навіть цифр
+   таймера — і кнопка знебарвилась.
+
+   Значення ті самі, що в .btn на початку файлу.
+
+   Список скоротився на .hero-actions a, .promo-actions a і
+   .collection-cta: жодного з цих класів немає ні в CSS, ні в
+   розмітці — перевірено пошуком по всьому репозиторію. Запасне
+   значення для неіснуючого елемента — це пастка на майбутнє, бо
+   вгадати його власний колір наперед неможливо. */
+.has-style .btn,
+.has-style .btn-primary{
+    background:var(--blk-btn-bg, var(--secondary));
+    color:var(--blk-btn-text, #fff);
+    border-color:var(--blk-btn-bg, currentColor);
+}
+
+/* БЕЙДЖ І ТАЙМЕР — свої кольори, а не «колір кнопки».
+
+   Обидва за замовчуванням червоні (--danger): вони мають кричати. Але
+   акція буває й спокійною, і на пастельному банері червона пляма —
+   єдине, що видно. Порожнє поле в адмінці лишає червоний.
+
+   ТУТ НЕМАЄ ПРОСТО .badge — І ЦЕ НАВМИСНО.
+
+   Було. Список починався з суцільного `.has-style .badge`, і воно
+   ловило не лише бейдж самого блока, а й бейджі КАРТОК ТОВАРІВ
+   усередині нього — «Ціна дня» і «Добірка» тримають картки в собі.
+
+   Ціна помилки: досить було задати один колір (у акції це був колір
+   цифр таймера), і плашка «-10%» у картці ставала прозорою з темним
+   текстом, тобто зникала. Заміряно на головній: усередині блока
+   rgba(0, 0, 0, 0) на білій картці, поруч — rgb(239, 68, 68).
+
+   Причина — у тому, що запасне значення var() це НЕ «як було». Коли
+   змінна не задана, background:var(--blk-badge-bg, inherit) дає
+   background:inherit, а не «правило не діє».
+
+   Тому перелічуємо ВЛАСНІ бейджі блоків поіменно. Жоден із них не
+   зветься просто .badge — перевірено по розмітці всіх п'яти блоків,
+   що отримують .has-style. */
+.has-style .promo-card-badge,
+.has-style .promo-hero-badge,
+.has-style .promo-hero-slide-badge{
+    background:var(--blk-badge-bg, var(--danger));
+    color:var(--blk-badge-text, #fff);
+}
+
+/* Дрібний підпис над заголовком заливки не має — у нього фарбується
+   сам текст. Інакше «ЦІНА ДНЯ» на головній перетворилась би на
+   кольорову плашку там, де її ніколи не було.
+
+   ЛАНЦЮЖОК З ТРЬОХ ЗНАЧЕНЬ. Два поля в адмінці описують цей самий
+   підпис: «Колір бейджа-підпису зверху» (accentColor) і «Колір
+   бейджа» (badgeBg). Досі підпис читав ЛИШЕ друге — тобто поле з
+   назвою «підпис зверху» мовчки не діяло саме на підписі зверху.
+   Тепер перше має перевагу, друге лишається запасним: усе, що вже
+   налаштоване через «Колір бейджа», виглядає як виглядало.
+
+   Третє, останнє — власний колір підпису. Саме воно й має стояти
+   там, де раніше був inherit: підпис не мусить сіріти від того, що
+   в блоці задали колір таймера. */
+.has-style .deal-eyebrow{
+    background:transparent;
+    color:var(--blk-accent, var(--blk-badge-bg, var(--danger)));
+}
+
+/* У кампанії підпис лежить на темному фото, тож і останнє значення
+   ланцюжка інше — білий, а не червоний. */
+.has-style .brand-campaign-eyebrow{
+    background:transparent;
+    color:var(--blk-accent, var(--blk-badge-bg, #fff));
+}
+
+.has-style .promo-countdown{
+    background:var(--blk-timer-bg, rgba(255,255,255,.18));
+    color:var(--blk-timer-text, inherit);
+}
+
+/* Самі цифри лежать у вкладених <span>, а правило .has-style span
+   вище фарбує будь-який span кольором ТЕКСТУ й перемагає за вагою на
+   цих вкладених вузлах. Через це «Колір цифр на таймері» переставав
+   діяти рівно тоді, коли поруч задавали «Колір тексту». */
+.has-style .promo-countdown span{
+    color:var(--blk-timer-text, inherit);
+}
+
+/* Стан «іде» кольору більше не міняє — пояснення там, де раніше
+   стояло .promo-countdown[data-state="live"]. Обраний колір діє
+   однаково до початку акції й поки вона йде. */
 
 /* Прозорі кнопки (btn-outline) мають лишатись прозорими — у них колір
    з адмінки задає рамку й текст, а не заливку. Інакше «Дивитись
    каталог» поруч із основною кнопкою перетворювалась би на її копію. */
 .has-style .btn-outline{
     background:transparent;
-    color:var(--blk-btn-bg, inherit);
-    border-color:var(--blk-btn-bg, inherit);
+    color:var(--blk-btn-bg, var(--primary));
+    border-color:var(--blk-btn-bg, var(--gray300));
+}
+
+/* КНОПКА «КУПИТИ» В КАРТЦІ ТОВАРУ — НЕ КНОПКА БЛОКА.
+
+   Те саме, що з бейджами вище, тільки помітніше. «Ціна дня» і
+   «Добірка» тримають картки товарів усередині оформленого блока, а
+   правило .has-style .btn не розрізняє, де чия кнопка.
+
+   Заміряно на головній із одним заданим кольором (цифри таймера):
+   у блоці кнопка «Купити» мала background rgba(0, 0, 0, 0), поруч —
+   rgb(37, 99, 235). Тобто ставала прозорою від налаштування, яке до
+   неї не має стосунку.
+
+   Тут не «скидання», а повернення власних значень картки — тих
+   самих, що в .product-card .buy-btn вище по файлу. Змінна одна й та
+   сама (--secondary), тож два місця не розійдуться; пару тримає
+   tests/test-block-styles-scope.js. */
+.has-style .product-card .btn{
+    background:var(--secondary);
+    color:#fff;
+    border-color:currentColor;
 }
 
 /* Наведення на фото акції: воно трохи наближується й тим показує, що
@@ -13858,5 +14128,255 @@ body.refusal-open{
 @media(max-width:640px){
 
     .subscribe{ max-width:none; }
+
+}
+
+
+/* =========================================
+   Ціна дня (displayType: "deal_of_day")
+
+   Блок на головній: заголовок, великий відлік і ряд звичайних карток
+   товару — тих самих, що в каталозі, разом із кнопкою «Купити».
+
+   ЧОМУ ВІДЛІК ТУТ ВИГЛЯДАЄ ІНАКШЕ, НІЖ НА БАНЕРІ. На банері він лежить
+   на фотографії — світлий напівпрозорий на темному. Тут фон сторінки
+   світлий, і той самий стиль став би блідою плямою: головне число
+   блока читалося б гірше за ціну під ним.
+   ========================================= */
+
+.deal-promos:empty{
+    display:none;
+}
+
+.deal-block{
+    padding:48px 0;
+    background:var(--gray50);
+}
+
+.deal-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:24px;
+    margin-bottom:28px;
+}
+
+.deal-head-text h2{
+    margin:6px 0 0;
+    --blk-title-base:30px;
+    font-size:calc(var(--blk-title-base) * var(--blk-title-scale, 1));
+    line-height:1.15;
+}
+
+/* Прямий колір — лише ЗАПАСНЕ значення змінної, інакше він
+   перебиває «Колір тексту» з адмінки. */
+.deal-head-text p{
+    margin:10px 0 0;
+    max-width:60ch;
+    color:var(--blk-text, var(--gray500));
+    --blk-text-base:16px;
+    font-size:calc(var(--blk-text-base) * var(--blk-text-scale, 1));
+}
+
+.deal-eyebrow{
+    display:inline-block;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--danger);
+}
+
+/* Відлік блока: на світлому тлі — суцільна заливка, не прозорість. */
+/* ЧЕРЕЗ ЗМІННІ, А НЕ ПРЯМИМИ КОЛЬОРАМИ.
+
+   Тут стояло color:#fff — і воно перебивало «Колір цифр на таймері» з
+   адмінки: обидва правила однакової ваги, а це йде нижче у файлі, тож
+   перемагає воно. Обраний колір мовчки не застосовувався.
+
+   Тепер прямий колір лишається лише ЗАПАСНИМ значенням змінної. */
+.deal-head .promo-countdown{
+    flex:none;
+    margin-bottom:0;
+    padding:12px 22px;
+    background:var(--blk-timer-bg, var(--primary));
+    color:var(--blk-timer-text, #fff);
+}
+
+/* Стан «іде» кольору не міняє. Було var(--danger) — і заливка, яку
+   власник підібрав під банер, ставала червоною сама, щойно акція
+   починалась. */
+
+.deal-head .promo-countdown-value{
+    font-size:22px;
+}
+
+/* Ряд товарів. Сітка, а не карусель: товарів у ціні дня одиниці, і
+   стрілки гортання над трьома картками — механіка без потреби. */
+/* ── Розкладка блока «Ціна дня» ──
+
+   Чотири рухомі частини, і кожну ставлять окремо: банер, ряд товарів,
+   напис, таймер. Які поєднання неможливі — вирішує
+   assets/js/deal-layout.js; сюди приходять уже готові позиції, тож
+   правил «а якщо і те, і те» тут немає. */
+
+/* Напис по центру — таймер лишається з краю, тому шапка ділиться на
+   три, а не на дві частини. */
+.deal-head[data-text="center"]{
+    justify-content:center;
+    text-align:center;
+}
+
+.deal-head[data-text="center"] .deal-head-text{
+    margin:0 auto;
+}
+
+.deal-head[data-text="right"]{
+    flex-direction:row-reverse;
+    text-align:right;
+}
+
+/* Таймер ліворуч — міняємо порядок, а не позицію: так він лишається в
+   тому самому рядку й не ламає вирівнювання напису. */
+.deal-head[data-timer="left"]{
+    flex-direction:row-reverse;
+}
+
+.deal-head[data-text="right"][data-timer="left"]{
+    flex-direction:row;
+}
+
+/* Банер і товари ділять ширину. Без банера ряд товарів займає все —
+   і поводиться рівно так, як поводився досі. */
+/* ШИРИНУ ЗАДАЄ ВМІСТ, А НЕ ЧАСТКИ.
+
+   Спершу тут були колонки 1fr / 1.4fr. З одним товаром це давало
+   півекрана порожнечі: колонка лишалась широкою, а картка в ній —
+   300 пікселів. Заміряно на живій сторінці.
+
+   Тепер товари займають рівно стільки, скільки займають, а всю решту
+   забирає банер — йому є чим її зайняти. */
+/* flex-start, а НЕ stretch.
+
+   Зі stretch висота банера бралась від сусіда, а в мобільній колонці
+   сусіда немає — фото отримувало нульову висоту й браузер його навіть
+   не завантажував (naturalWidth 0). Заміряно на 375px.
+
+   Тепер банер лишається у своїй пропорції, а порожнечу поруч знято
+   тим, що товари займають рівно свою ширину. */
+.deal-body{
+    display:flex;
+    flex-wrap:wrap;
+    gap:24px;
+    align-items:flex-start;
+}
+
+.deal-body[data-banner="none"] .deal-products{
+    flex:1 1 100%;
+}
+
+/* Банер росте, товари — за вмістом. 320px — та ширина, нижче за яку
+   банер перестає бути банером і краще перенести його на свій рядок. */
+.deal-banner{
+    flex:1 1 320px;
+    min-width:0;
+}
+
+.deal-body[data-banner="left"] .deal-products,
+.deal-body[data-banner="right"] .deal-products{
+    flex:0 1 auto;
+    min-width:0;
+}
+
+/* Банер завжди в тій половині, яку йому призначили, — порядок у
+   розмітці один, а бік задає grid-column. Інакше довелося б малювати
+   дві різні розмітки заради дзеркального відображення. */
+.deal-body[data-banner="right"] .deal-banner{
+    order:2;
+}
+
+.deal-banner{
+    display:block;
+    border-radius:16px;
+    overflow:hidden;
+}
+
+.deal-banner picture{
+    display:block;
+}
+
+.deal-banner img{
+    display:block;
+    width:100%;
+    height:auto;
+    transition:transform .4s;
+}
+
+.deal-banner:hover img{
+    transform:scale(1.03);
+}
+
+@media(max-width:900px){
+
+    /* На телефоні банер і товари в один стовпчик: дві колонки по
+       півекрана перетворили б картку товару на марку. */
+    .deal-body[data-banner="left"],
+    .deal-body[data-banner="right"]{
+        grid-template-columns:minmax(0, 1fr);
+    }
+
+    .deal-body[data-banner="right"] .deal-banner{
+        order:0;
+    }
+
+}
+
+/* ДЕ СТОЯТЬ ТОВАРИ.
+
+   auto-FIT, а не auto-fill: fill лишає порожні колонки на всю ширину,
+   і тоді вирівнювати нічого — один товар однаково притиснутий ліворуч,
+   а праворуч від нього півекрана порожнечі. fit порожні колонки
+   згортає, тож ряд із однієї картки можна поставити куди треба.
+
+   Верхня межа колонки (300px) потрібна з тієї ж причини: без неї
+   єдина картка розтягнулась би на всю ширину блока. */
+.deal-products{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(240px, 300px));
+    gap:20px;
+    justify-content:start;
+}
+
+.deal-products[data-align="center"]{ justify-content:center; }
+.deal-products[data-align="right"]{ justify-content:end; }
+
+/* Посилання під блоком — це call-to-action, тож бере колір кнопки. */
+.deal-more{
+    display:inline-block;
+    margin-top:24px;
+    font-weight:600;
+    text-decoration:underline;
+    color:var(--blk-btn-bg, inherit);
+}
+
+@media(max-width:768px){
+
+    .deal-block{ padding:32px 0; }
+
+    /* Відлік іде під заголовок: у рядок із ним він стискає обидва. */
+    .deal-head{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:16px;
+        margin-bottom:20px;
+    }
+
+    /* Лише база — множник із адмінки застосує правило самого блока. */
+    .deal-head-text h2{ --blk-title-base:24px; }
+
+    .deal-products{
+        grid-template-columns:repeat(2, minmax(0, 1fr));
+        gap:12px;
+    }
 
 }

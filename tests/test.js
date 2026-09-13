@@ -34,7 +34,17 @@ window.requestAnimationFrame = cb => cb();
 // getProductColors з common.js — на сайті цей файл підключений
 // повністю, у тесті підвантажуємо потрібні функції явно
 const commonSrc = fs.readFileSync(path.join(ROOT, "assets/js/common.js"), "utf8");
+// Ціна дня: ціну рахує common.js, а малюють її ui.js і catalog.js.
+window.eval(commonSrc.match(/function saleActive[\s\S]*?\n}\n/)[0]);
+window.eval(commonSrc.match(/function priceNow[\s\S]*?\n}\n/)[0]);
+window.eval(commonSrc.match(/function oldPriceNow[\s\S]*?\n}\n/)[0]);
+window.eval(commonSrc.match(/function discountPercent[\s\S]*?\n}\n/)[0]);
 window.eval(commonSrc.match(/function escapeHtml[\s\S]*?\n}\n/)[0]);
+// plural()/pluralProducts() теж у common.js: на сайті файл
+// підключений повністю, у тесті додаємо явно — без них лічильник
+// товарів у catalog.js падає з ReferenceError.
+window.eval(fs.readFileSync(path.join(ROOT, "assets/js/common.js"), "utf8").match(/function plural\(count[\s\S]*?\n}\n/)[0]);
+window.eval(fs.readFileSync(path.join(ROOT, "assets/js/common.js"), "utf8").match(/function pluralProducts[\s\S]*?\n}\n/)[0]);
 window.eval(commonSrc.match(/function getProductColors[\s\S]*?\n}\n/)[0]);
 // сім'ї кольорів — фільтр «Колір» працює ними (див. хелпер)
 require(require("path").join(__dirname,"helpers/color-families")).installColorFamilies(window);

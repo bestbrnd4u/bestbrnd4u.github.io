@@ -807,16 +807,182 @@
             var products = e.get("products");
             var productList = products && products.toJS ? products.toJS() : [];
 
-            // банер сторінки акції — той самий вигляд, що на promo.html
+            // ЩО САМЕ ЛЯЖЕ ПОВЕРХ ФОТО — за тими самими правилами, що
+            // на сайті (renderPromoHero у assets/js/promo.js).
+            //
+            // Прев'ю, яке показує не те, що покаже сайт, гірше за
+            // відсутність прев'ю: тут стояла кнопка з підставним
+            // написом «Дивитись усі товари», і власник бачив її навіть
+            // після того, як спорожнив поле. Виглядало як «кнопку не
+            // прибрати з адмінки» — хоча на сайті її вже не було.
+            var layout = e.get("bannerLayout") || "left-middle";
+            var bare = layout === "hidden";
+
+            var badgePlaces = e.get("badgePlaces") || "both";
+
+            var hasBadge = !bare && badgePlaces !== "home" && badgePlaces !== "none"
+                && Boolean(e.get("badge"));
+            var hasTitle = !bare && Boolean(e.get("title"));
+            var hasText = !bare && Boolean(e.get("text"));
+            var hasButton = !bare && Boolean(e.get("buttonText"));
+            var hasTimer = !bare && e.get("hideCountdown") !== true
+                && Boolean(e.get("startsAt") || e.get("endsAt"));
+
+            var hasOverlay = hasBadge || hasTitle || hasText || hasButton || hasTimer;
+
+            // КОЛЬОРИ БАНЕРА — СВІЙ НАБІР, НЕ ЗМІШАНИЙ З ГОЛОВНОЮ.
+            //
+            // Так само робить сайт: renderPromoHero() у
+            // assets/js/promo.js бере promo.style і НЕ домішує до
+            // нього homeStyle, бо на банері текст лежить на фото, а на
+            // головній — на світлій сторінці.
+            //
+            // Досі прев'ю банера не читало оформлення взагалі: змінні
+            // проставлялись лише на блок головної. Тому весь набір
+            // «Оформлення тексту і кнопки» був у прев'ю невидимий —
+            // колір міняли, а картинка не мінялась.
+            var bannerVars = window.TextStyles
+                ? window.TextStyles.styleVars(
+                    window.TextStyles.inheritTimer(e.get("style"), e.get("homeStyle")))
+                : {};
+
+            var hasBannerVars = Object.keys(bannerVars).length > 0;
+
+            // Банер сторінки акції — той самий вигляд, що на promo.html.
             // Банер малюємо картинкою під текстом, а не фоном: фон не
             // вміє дочекатись щойно завантаженого файлу, а AssetImage вміє.
-            var banner = h("div", { className: "cms-preview-promo-banner" },
+            var banner = h("div", {
+                className: "cms-preview-promo-banner"
+                    + (hasOverlay ? "" : " cms-preview-promo-bare")
+                    + (hasBannerVars ? " has-style" : ""),
+                style: hasBannerVars ? bannerVars : undefined,
+                "data-layout": layout
+            },
                 h("div", { className: "cms-preview-promo-bg" },
                     h(AssetImage, { path: pageImg || teaser, getAsset: getAsset })),
-                e.get("badge") ? h("span", { className: "cms-preview-promo-badge" }, e.get("badge")) : null,
-                h("h2", { className: "cms-preview-promo-title" }, esc(e.get("title"))),
-                e.get("text") ? h("p", { className: "cms-preview-promo-text" }, e.get("text")) : null,
-                h("span", { className: "btn cms-preview-promo-btn" }, esc(e.get("buttonText") || "Дивитись усі товари"))
+                h("div", { className: "cms-preview-promo-content" },
+                    hasBadge ? h("span", { className: "cms-preview-promo-badge" }, e.get("badge")) : null,
+                    hasTitle ? h("h2", { className: "cms-preview-promo-title" }, esc(e.get("title"))) : null,
+                    hasText ? h("p", { className: "cms-preview-promo-text" }, e.get("text")) : null,
+                    // Точний відлік тут не потрібен і був би брехнею: в
+                    // адмінці немає моменту, з якого рахувати. Показуємо
+                    // МІСЦЕ, яке таймер займе на банері.
+                    hasTimer ? h("span", { className: "cms-preview-promo-timer" }, "⏳ Лишилось 00:00:00") : null,
+                    hasButton ? h("span", { className: "btn cms-preview-promo-btn" }, esc(e.get("buttonText"))) : null
+                )
+            );
+
+            // ── БЛОК НА ГОЛОВНІЙ ──
+            //
+            // Друге місце, де живе акція, і воно геть інше: світле тло,
+            // свій напис, свої кольори, ряд карток товарів. Поки прев'ю
+            // показувало лише банер, половину полів перевірити було
+            // нічим — власник бачив результат аж на сайті.
+            //
+            // Малюємо ті самі правила, що renderDealPromotions():
+            // порожній напис не пишемо, бейдж слухається свого поля,
+            // таймер — перемикача, картки стають туди, куди сказано.
+            var homeBadge = badgePlaces !== "promo" && badgePlaces !== "none"
+                ? (e.get("badge") || (e.get("startsAt") ? "СКОРО" : "ЦІНА ДНЯ"))
+                : "";
+
+            var homeTitle = String(e.get("homeTitle") || e.get("title") || "").trim();
+            var homeText = String(e.get("homeText") || e.get("text") || "").trim();
+
+            // Кольори головної — ТІЛЬКИ свій набір, без домішки
+            // «Оформлення тексту і кнопки». Чому саме так — у
+            // promoHomeStyle() в assets/js/app.js. Виняток — заливка
+            // й цифри таймера: див. inheritTimer() у text-styles.js.
+            var homeStyle = window.TextStyles
+                ? window.TextStyles.inheritTimer(e.get("homeStyle"), e.get("style"))
+                : e.get("homeStyle");
+
+            var homeVars = window.TextStyles ? window.TextStyles.styleVars(homeStyle) : {};
+
+            var hasHomeVars = Object.keys(homeVars).length > 0;
+
+            // STYLE — ОБ'ЄКТ, А НЕ РЯДОК.
+            //
+            // На сайті оформлення ставиться рядком у атрибут style, і
+            // тут я передав той самий рядок. React такого не приймає:
+            // він падає з помилкою #62 і замість прев'ю показує
+            // «There's been an error».
+            //
+            // Найгірше в цьому — коли саме воно падало: порожній набір
+            // давав undefined і все працювало, а перший же обраний
+            // колір ламав прев'ю. Тобто ламалось рівно тоді, коли
+            // прев'ю й потрібне.
+            //
+            // Власні CSS-змінні (--blk-*) React в обʼєкті розуміє й
+            // віддає як є.
+            // РОЗКЛАДКА — ТИМ САМИМ МОДУЛЕМ, ЩО Й НА САЙТІ.
+            //
+            // Він же каже, які поєднання неможливі. Прев'ю показує цю
+            // суперечність червоним рядком: Decap перевіряти поля одне
+            // проти одного не вміє, тож єдиний спосіб попередити
+            // власника вчасно — сказати це прямо тут, поки він править.
+            var place = window.DealLayout
+                ? window.DealLayout.resolve({
+                    dealBanner: e.get("dealBanner"),
+                    dealAlign: e.get("dealAlign"),
+                    dealTextAlign: e.get("dealTextAlign"),
+                    dealTimer: e.get("dealTimer")
+                })
+                : { banner: "none", products: "left", text: "left", timer: "right", conflicts: [] };
+
+            var withBanner = place.banner !== "none" && Boolean(teaser);
+
+            var moreText = String(e.get("homeButtonText") || e.get("buttonText") || "").trim();
+
+            var homeBlock = h("div", {
+                className: "cms-preview-home" + (hasHomeVars ? " has-style" : ""),
+                style: hasHomeVars ? homeVars : undefined
+            },
+                place.conflicts.length
+                    ? h("div", { className: "cms-preview-home-warn" },
+                        place.conflicts.map(function (text, i) {
+                            return h("div", { key: i }, "⚠ " + text);
+                        }))
+                    : null,
+                h("div", {
+                    className: "cms-preview-home-head",
+                    "data-text": place.text,
+                    "data-timer": place.timer
+                },
+                    h("div", null,
+                        homeBadge ? h("span", { className: "cms-preview-home-eyebrow" }, homeBadge) : null,
+                        // h2, а не h3: на сайті заголовок блока — саме
+                        // h2, і правила «розмір заголовка», «великими
+                        // літерами», «розрядка» написані для h1/h2.
+                        // На h3 вони не діяли, тож у прев'ю ці три
+                        // поля мовчки нічого не робили.
+                        homeTitle ? h("h2", { className: "cms-preview-home-title" }, esc(homeTitle)) : null,
+                        homeText ? h("p", { className: "cms-preview-home-text" }, esc(homeText)) : null),
+                    (e.get("hideCountdown") !== true && (e.get("startsAt") || e.get("endsAt")))
+                        ? h("span", { className: "cms-preview-promo-timer" }, "⏳ Лишилось 00:00:00")
+                        : null),
+                h("div", {
+                    className: "cms-preview-home-body",
+                    "data-banner": withBanner ? place.banner : "none"
+                },
+                    withBanner
+                        ? h("div", { className: "cms-preview-home-banner" },
+                            h(AssetImage, { path: teaser, getAsset: getAsset }))
+                        : null,
+                    h("div", {
+                        className: "cms-preview-home-row",
+                        "data-align": place.products
+                    },
+                        // Справжніх карток тут не намалювати: у прев'ю немає
+                        // ні фото товарів, ні цін. Показуємо їхню кількість і
+                        // МІСЦЕ — саме це й налаштовують полем вирівнювання.
+                        (productList.length ? productList : [null]).slice(0, 4).map(function (id, i) {
+                            return h("div", { className: "cms-preview-home-card", key: i },
+                                productList.length ? "товар " + id : "товарів не обрано");
+                        }))),
+                moreText
+                    ? h("span", { className: "cms-preview-home-more" }, esc(moreText) + " →")
+                    : null
             );
 
             return h("div", { className: "cms-preview" },
@@ -828,13 +994,45 @@
 
                 h("div", { className: "cms-preview-stage" }, banner),
 
-                section("Прев'ю на головній", teaser
-                    ? h(AssetImage, { path: teaser, getAsset: getAsset, className: "cms-preview-teaser" })
-                    : null),
+                // НА ГОЛОВНІЙ — СВІЙ НАПИС.
+                //
+                // Тут показуємо саме те, що там буде: окремі поля,
+                // якщо заповнені, інакше загальні. Без цього рядка
+                // власник бачив би в прев'ю лише картинку й не знав,
+                // чим обернеться порожній банер.
+                // «Ціна дня» — окремий блок без фото; решта способів
+                // показу — банер або картка, там головне саме прев'ю.
+                e.get("displayType") === "deal_of_day"
+                    ? section("Блок на головній", homeBlock)
+                    : section("Прев'ю на головній", h("div", null,
+                        teaser
+                            ? h(AssetImage, { path: teaser, getAsset: getAsset, className: "cms-preview-teaser" })
+                            : null,
+                        h("div", { className: "cms-preview-home-words" },
+                            h("b", null, esc(homeTitle || "—")),
+                            homeText ? h("p", null, esc(homeText)) : null)
+                    )),
 
                 section("Налаштування", detailsList([
                     ["Показувати на сайті", e.get("active") === false ? "ні" : "так"],
                     ["Спосіб показу", e.get("displayType")],
+                    ["Напис на банері", bare ? "не показувати" : layout],
+                    ["Бейдж", {both:"і там, і там", home:"тільки на головній", promo:"тільки на сторінці акції", none:"ніде"}[e.get("badgePlaces") || "both"]],
+                    ["Товари в блоці", window.DealLayout ? window.DealLayout.word(place.products) : ""],
+                    ["Банер у блоці", place.banner === "none"
+                        ? "немає"
+                        : (window.DealLayout ? window.DealLayout.word(place.banner) : place.banner)],
+                    ["Напис у блоці", window.DealLayout ? window.DealLayout.word(place.text) : ""],
+                    ["Таймер у блоці", window.DealLayout ? window.DealLayout.word(place.timer) : ""],
+                    ["Свої кольори на головній", (e.get("homeStyle") && e.get("homeStyle").size) ? "так" : ""],
+                    ["Окремий напис на головній",
+                        (e.get("homeTitle") || e.get("homeText")) ? "так" : ""],
+                    ["Таймер", e.get("hideCountdown") === true ? "приховано" : "показувати"],
+                    ["Ціна дня, ₴", e.get("dealPrice")],
+                    ["Плашка «-%» на картці",
+                        e.get("hideDealBadge") === true ? "приховано" : "показувати"],
+                    ["Початок", e.get("startsAt")],
+                    ["Кінець", e.get("endsAt")],
                     ["Порядок показу", e.get("order")],
                     ["Бейдж", e.get("badge")],
                     ["Бренд акції", e.get("brand")],
@@ -965,6 +1163,33 @@
     // Inter — і прев'ю перестало б показувати те саме, що покупець.
     CMS.registerPreviewStyle(
         "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
+
+    // РЕШТА ШРИФТІВ З ПОЛЯ «ШРИФТ» — ТЕЖ ТУТ, І ВІДРАЗУ ВСІ.
+    //
+    // На сайті їх підвантажує TextStyles.ensureFonts() — рівно ті, що
+    // справді обрані, бо кожен зайвий шрифт це сотні кілобайтів для
+    // покупця. В адмінці так не вийде: ensureFonts() дописує <link> у
+    // голову СТОРІНКИ, а прев'ю малюється в окремому iframe, і туди
+    // цей <link> не діє. Через це поле «Шрифт» мінялось, а напис у
+    // прев'ю лишався тим самим — та сама скарга, що й про кольори.
+    //
+    // Тому реєструємо весь список наперед. Ціна — кілька сотень
+    // кілобайтів, які вантажаться ЛИШЕ в адмінці й лише раз.
+    if (window.TextStyles && window.TextStyles.FONTS) {
+
+        window.TextStyles.FONTS.forEach(function (font) {
+
+            if (font.key === "inter") return;
+
+            CMS.registerPreviewStyle(
+                "https://fonts.googleapis.com/css2?family="
+                + font.family.replace(/ /g, "+")
+                + ":wght@" + font.weights
+                + "&display=swap");
+
+        });
+
+    }
 
     CMS.registerPreviewStyle("../assets/css/style.css" + noCache);
     CMS.registerPreviewStyle("preview-styles.css" + noCache);

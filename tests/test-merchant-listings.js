@@ -366,8 +366,13 @@ console.log("\n[5] Обидва генератори розмітки узгод
     check("генератор передає строки з адмінки",
         /offerFor\(product, url, undefined, productTexts\(\)\)/.test(builder));
 
+    // Сторожити ХВІСТ виклику, а не весь його текст: у offerFor()
+    // з'явився п'ятий аргумент (ціна дня), і перевірка, прибита до
+    // закритої дужки після PRODUCT_TEXTS, почервоніла на цілком
+    // правильному коді. Важливо тут одне — що строки з адмінки
+    // справді передані.
     check("рантайм передає ті самі строки",
-        /offerFor\(product, pageUrl, undefined, window\.PRODUCT_TEXTS\)/.test(productJs));
+        /offerFor\(product, pageUrl, undefined, window\.PRODUCT_TEXTS\b/.test(productJs));
 
     // Дивимось на КОД: у коментарях значення згадуються навмисно.
     const bare = t => t.replace(/\/\/[^\n]*/g, "").replace(/\/\*[\s\S]*?\*\//g, "");

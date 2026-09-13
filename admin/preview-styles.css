@@ -183,6 +183,106 @@
     z-index:1;
 }
 
+/* Куди лягає напис на банері — те саме, що на сайті
+   (.promo-hero-banner[data-layout] у assets/css/style.css).
+
+   ЧОМУ ТУТ ТЕЖ. Прев'ю існує рівно заради одного питання: «чи не
+   закриє напис товар на фото». Якщо воно завжди малює напис ліворуч
+   посередині, відповісти на це питання неможливо. */
+
+.cms-preview-promo-content{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:10px;
+    max-width:70%;
+}
+
+.cms-preview-promo-banner[data-layout$="-top"]{ align-items:flex-start; }
+.cms-preview-promo-banner[data-layout$="-middle"]{ align-items:center; }
+.cms-preview-promo-banner[data-layout$="-bottom"]{ align-items:flex-end; }
+
+.cms-preview-promo-banner[data-layout^="left-"]{ justify-content:flex-start; }
+.cms-preview-promo-banner[data-layout^="center-"]{ justify-content:center; }
+.cms-preview-promo-banner[data-layout^="right-"]{ justify-content:flex-end; }
+
+.cms-preview-promo-banner[data-layout^="center-"] .cms-preview-promo-content{
+    align-items:center;
+    text-align:center;
+}
+
+.cms-preview-promo-banner[data-layout^="right-"] .cms-preview-promo-content{
+    align-items:flex-end;
+    text-align:right;
+}
+
+/* «Лише картинка»: ні напису, ні темної заливки — рівно те, що
+   побачить покупець. */
+.cms-preview-promo-bare .cms-preview-promo-content{
+    display:none;
+}
+
+.cms-preview-promo-bare .cms-preview-promo-bg img{
+    filter:none;
+}
+
+.cms-preview-promo-timer{
+    display:inline-block;
+    padding:6px 14px;
+    border-radius:50px;
+    font-size:13px;
+    font-weight:700;
+    font-variant-numeric:tabular-nums;
+}
+
+/* =====================================
+   КОЛЬОРИ В ПРЕВ'Ю — ЧЕРЕЗ ТІ САМІ ЗМІННІ, ЩО НА САЙТІ
+
+   ЩО БУЛО НЕ ТАК. Прев'ю мало власну розмітку (cms-preview-*), а
+   правила оформлення в style.css написані під класи сайту
+   (.promo-countdown, .deal-eyebrow, .badge, .btn). Тобто змінна
+   --blk-timer-text чесно доїжджала до прев'ю — я заміряв, 75 мс від
+   натискання, — і там її ніхто не читав: колір таймера в прев'ю був
+   зашитий як #fff.
+
+   Ззовні це виглядало саме так, як власник і сказав: колір міняєш,
+   а в прев'ю нічого не фарбується.
+
+   ДВІ НАЗВИ КЛАСУ В СЕЛЕКТОРІ, А НЕ ОДНА. Прев'ю живе в одному
+   iframe зі style.css сайту, а там .has-style span фарбує будь-який
+   span кольором ТЕКСТУ. Один клас (0,1,0) цьому програє (0,1,1);
+   два — виграють.
+
+   ЗАПАСНІ ЗНАЧЕННЯ — ТЕ, ЩО БУЛО ТУТ ДОСІ. Порожнє поле в адмінці
+   лишає прев'ю таким, яким воно й було.
+   ===================================== */
+
+/* ЗАПАСНІ ЗНАЧЕННЯ — ТІ, ЩО НА САЙТІ, А НЕ «ЯКИЙСЬ ПОМІТНИЙ КОЛІР».
+
+   Тут стояло #ef4444 для обох місць — просто червоний, узятий зі
+   старого правила «акція, що йде». Сайт малює інше: на банері плашка
+   напівпрозоро-біла поверх фото, у блоці головної — темна (--primary,
+   rgb(17, 24, 39)).
+
+   Через це прев'ю показувало червону плашку там, де сайт показував
+   темну, і власник питав, звідки червоний. Прев'ю, яке бреше про
+   колір, гірше за відсутнє: саме за ним і підбирають кольори. */
+.cms-preview-promo-banner .cms-preview-promo-timer{
+    background:var(--blk-timer-bg, rgba(255,255,255,.18));
+    color:var(--blk-timer-text, #fff);
+}
+
+.cms-preview-home .cms-preview-promo-timer{
+    background:var(--blk-timer-bg, #111827);
+    color:var(--blk-timer-text, #fff);
+}
+
+/* Сам банер розкладаємо в рядок: колонка з написом всередині вже
+   своя (.cms-preview-promo-content). */
+.cms-preview-promo-banner{
+    flex-direction:row !important;
+}
+
 .cms-preview-promo-banner{
     position:relative;
     display:flex;
@@ -200,26 +300,47 @@
 .cms-preview-promo-badge{
     padding:4px 10px;
     border-radius:20px;
-    background:#dc2626;
     font-size:12px;
     font-weight:700;
 }
 
+/* Розмір — множник від ВЛАСНОГО розміру, точно як на сайті: там
+   кожен заголовок сам називає свою базу й сам множить (див.
+   .deal-head-text h2 у assets/css/style.css). Прев'ю мусить рахувати
+   так само, інакше «Розмір заголовка» показуватиме не те. */
 .cms-preview-promo-title{
     margin:0;
-    font-size:24px;
     line-height:1.2;
+    --blk-title-base:24px;
+    font-size:calc(var(--blk-title-base) * var(--blk-title-scale, 1));
 }
 
 .cms-preview-promo-text{
     margin:0;
-    font-size:13.5px;
+    --blk-text-base:13.5px;
+    font-size:calc(var(--blk-text-base) * var(--blk-text-scale, 1));
     opacity:.9;
 }
 
 .cms-preview-promo-btn{
     margin-top:6px;
     pointer-events:none;
+}
+
+.cms-preview-promo-banner .cms-preview-promo-badge{
+    background:var(--blk-badge-bg, #dc2626);
+    color:var(--blk-badge-text, #fff);
+}
+
+.cms-preview-promo-banner .cms-preview-promo-title,
+.cms-preview-promo-banner .cms-preview-promo-text{
+    color:var(--blk-text, #fff);
+}
+
+.cms-preview-promo-banner .cms-preview-promo-btn{
+    background:var(--blk-btn-bg, var(--secondary, #2563eb));
+    color:var(--blk-btn-text, #fff);
+    border-color:var(--blk-btn-bg, currentColor);
 }
 
 .cms-preview-teaser{
@@ -469,4 +590,145 @@
     background:#fee2e2;
     color:#991b1b;
     font-weight:600;
+}
+
+/* Напис, який зʼявиться в блоці акції на головній. */
+.cms-preview-home-words{
+    margin-top:10px;
+    font-size:13px;
+    line-height:1.5;
+}
+
+.cms-preview-home-words p{
+    margin:4px 0 0;
+    color:#6b7280;
+}
+
+/* ── Блок «Ціна дня», як він виглядатиме на головній ──
+
+   Тло світле, як на самій сторінці: саме через це для головної й
+   є окремий набір кольорів — світлий текст банера тут зникав би. */
+.cms-preview-home{
+    padding:16px;
+    border-radius:12px;
+    background:#f9fafb;
+    border:1px solid #e5e7eb;
+}
+
+.cms-preview-home-head{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:12px;
+}
+
+.cms-preview-home-eyebrow{
+    display:block;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+}
+
+.cms-preview-home-title{
+    margin:4px 0 0;
+    --blk-title-base:18px;
+    font-size:calc(var(--blk-title-base) * var(--blk-title-scale, 1));
+}
+
+.cms-preview-home-text{
+    margin:4px 0 0;
+    --blk-text-base:13px;
+    font-size:calc(var(--blk-text-base) * var(--blk-text-scale, 1));
+}
+
+/* Кольори блока на головній — той самий ланцюжок, що в .deal-eyebrow,
+   .deal-head-text і .deal-more на сайті. Два класи в селекторі
+   потрібні з тієї ж причини, що й у таймера вище. */
+.cms-preview-home .cms-preview-home-eyebrow{
+    background:transparent;
+    color:var(--blk-accent, var(--blk-badge-bg, #ef4444));
+}
+
+.cms-preview-home .cms-preview-home-title{
+    color:var(--blk-text, #111827);
+}
+
+.cms-preview-home .cms-preview-home-text{
+    color:var(--blk-text, #6b7280);
+}
+
+/* Ряд товарів. Справжніх карток у прев’ю не намалювати — немає ні
+   фото, ні цін. Показуємо їхню кількість і МІСЦЕ: саме місце й
+   налаштовують полем вирівнювання. */
+.cms-preview-home-row{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(90px, 110px));
+    gap:8px;
+    justify-content:start;
+}
+
+.cms-preview-home-row[data-align="center"]{ justify-content:center; }
+.cms-preview-home-row[data-align="right"]{ justify-content:end; }
+
+.cms-preview-home-card{
+    padding:18px 8px;
+    border-radius:8px;
+    border:1px dashed #d1d5db;
+    background:#fff;
+    font-size:11px;
+    color:#9ca3af;
+    text-align:center;
+}
+
+.cms-preview-home-more{
+    display:inline-block;
+    margin-top:12px;
+    font-size:12px;
+    font-weight:600;
+    text-decoration:underline;
+}
+
+/* Напис-посилання під блоком читає КОЛІР КНОПКИ, а не тексту — так
+   само, як .deal-more на сайті. Досі прев'ю фарбувало його кольором
+   тексту, тобто показувало не те, що буде. */
+.cms-preview-home .cms-preview-home-more{
+    color:var(--blk-btn-bg, #111827);
+}
+
+/* Банер і товари в блоці — так само, як на сайті. */
+.cms-preview-home-body{
+    display:grid;
+    gap:10px;
+    align-items:start;
+}
+
+.cms-preview-home-body[data-banner="left"]{ grid-template-columns:minmax(0,1fr) minmax(0,1.4fr); }
+.cms-preview-home-body[data-banner="right"]{ grid-template-columns:minmax(0,1.4fr) minmax(0,1fr); }
+.cms-preview-home-body[data-banner="right"] .cms-preview-home-banner{ order:2; }
+
+.cms-preview-home-banner img{
+    display:block;
+    width:100%;
+    border-radius:8px;
+}
+
+.cms-preview-home-head[data-text="center"]{ justify-content:center; text-align:center; }
+.cms-preview-home-head[data-text="right"]{ flex-direction:row-reverse; text-align:right; }
+.cms-preview-home-head[data-timer="left"]{ flex-direction:row-reverse; }
+.cms-preview-home-head[data-text="right"][data-timer="left"]{ flex-direction:row; }
+
+/* Суперечність у розкладці. Decap перевіряти поля одне проти одного
+   не вміє, тож єдиний спосіб попередити вчасно — сказати це прямо в
+   прев’ю, поки акцію правлять. */
+.cms-preview-home-warn{
+    margin-bottom:10px;
+    padding:8px 10px;
+    border-radius:8px;
+    background:#fef2f2;
+    border:1px solid #fecaca;
+    color:#b91c1c;
+    font-size:12px;
+    line-height:1.5;
 }

@@ -365,5 +365,76 @@ console.log("\n[6] Проставлені штампи доїжджають до
         && (stamper.match(/writeFileSync/g) || []).length === 1);
 }
 
+console.log("\n[N] Штамп на адресі = вміст самого файлу");
+{
+    // ГОЛОВНА ПЕРЕВІРКА ЦЬОГО НАБОРУ, і донедавна її не було.
+    //
+    // Решта стежить за тим, ЯК штампувач написаний. А важить одне: чи
+    // збігається ?v= в розмітці з відбитком файлу, на який він
+    // вказує. Якщо ні — браузер і Cloudflare віддають стару версію за
+    // тією самою адресою, і правка мовчки не доїжджає.
+    //
+    // Саме це й сталося: в admin/ і в assets/js/ є однойменні
+    // promo.js і reviews.js, а коротка форма імені шукалась із
+    // будь-яким префіксом теки. Відбиток АДМІНСЬКОГО файлу опинявся
+    // на адресі САЙТОВОГО, і сторінка акції 10 годин працювала на
+    // старому коді — виглядало так, ніби налаштування в адмінці не
+    // діють.
+    const crypto = require("crypto");
+
+    const hashOf = rel => {
+
+        const full = path.join(ROOT, rel);
+
+        if (!fs.existsSync(full)) return null;
+
+        return crypto.createHash("sha1").update(fs.readFileSync(full)).digest("hex").slice(0, 8);
+
+    };
+
+    const pages = fs.readdirSync(ROOT).filter(f => f.endsWith(".html"))
+        .concat(["admin/index.html"])
+        .filter(f => fs.existsSync(path.join(ROOT, f)));
+
+    const wrong = [];
+
+    pages.forEach(page => {
+
+        const html = read(page);
+
+        [...html.matchAll(/(["'])((?:[^"']*\/)?[a-z0-9-]+\.(?:js|css))\?v=([a-f0-9]+)\1/g)].forEach(m => {
+
+            const rel = m[2].replace(/^https?:\/\/[^/]+\//, "");
+
+            // Коротка форма в адмінці означає файл поруч із нею.
+            const real = [hashOf(rel), hashOf("admin/" + rel)].filter(Boolean);
+
+            if (real.length && !real.includes(m[3])) {
+                wrong.push(`${page} → ${rel}: ${m[3]} замість ${real.join(" / ")}`);
+            }
+
+        });
+
+    });
+
+    check(`усі ?v= збігаються з вмістом (перевірено сторінок: ${pages.length})`,
+        wrong.length === 0, wrong.slice(0, 5).join("; "));
+
+    // Однойменні файли в двох теках — не помилка, а наявний стан.
+    // Перевірка мусить лишатись осмисленою саме через них.
+    const twins = fs.existsSync(path.join(ROOT, "admin"))
+        ? fs.readdirSync(path.join(ROOT, "admin"))
+            .filter(f => /\.(js|css)$/.test(f))
+            .filter(f => fs.existsSync(path.join(ROOT, "assets", "js", f)))
+        : [];
+
+    check(`однойменні файли в admin/ і assets/js/ існують (${twins.length})`,
+        twins.length > 0, twins.join(", "));
+
+    // Коротка форма — лише одразу після лапки, без префікса теки.
+    check("коротка форма імені не ловить чужу теку",
+        /const prefix = anyDir \? "\(\?:\[\^\\"'\]\*\\\\\/\)\?" : "";/.test(read("scripts/apply-cache-version.js")));
+}
+
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
 process.exit(failures === 0 ? 0 : 1);

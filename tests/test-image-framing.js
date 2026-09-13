@@ -819,12 +819,30 @@ console.log("\n[10] Автоматичний кадр для фото з зав�
 
         Object.entries(p.framing).forEach(([key, frame]) => {
 
-            const okZoom = typeof frame.zoom === "number"
-                && frame.zoom >= 1 && frame.zoom <= 3;
-            const okXY = [frame.x, frame.y].every(v =>
-                typeof v === "number" && v >= 0 && v <= 100);
+            // ЗАПИС МОЖЕ НЕСТИ ЛИШЕ РІШЕННЯ ПРО ТЛО — без zoom/x/y.
+            //
+            // Так задумано: normalizeFrame() у assets/js/image-framing.js
+            // бере відсутні zoom/x/y за замовчуванням (1×, центр) і
+            // лишає запис живим саме заради bg. Перша версія цієї
+            // перевірки вимагала всі три поля завжди — і червоніла на
+            // фото, якому просто сказали «не чіпати тло».
+            //
+            // Перевіряємо те саме, що й сайт: поле, якщо воно є,
+            // мусить бути в межах; порожній запис не має сенсу.
+            const has = name => frame[name] !== undefined;
 
-            if (!okZoom || !okXY) bad.push(`${p.slug}/${key}`);
+            const okZoom = !has("zoom")
+                || (typeof frame.zoom === "number" && frame.zoom >= 1 && frame.zoom <= 3);
+
+            const okXY = ["x", "y"].every(name => !has(name)
+                || (typeof frame[name] === "number" && frame[name] >= 0 && frame[name] <= 100));
+
+            const okBg = !has("bg")
+                || ["white", "keep", "cutout"].includes(frame.bg);
+
+            const empty = !has("zoom") && !has("x") && !has("y") && !has("bg");
+
+            if (!okZoom || !okXY || !okBg || empty) bad.push(`${p.slug}/${key}`);
 
         });
 

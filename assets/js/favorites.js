@@ -38,8 +38,8 @@ function createFavoriteRow(product, favEntry) {
         ? product.variants
         : [{ color: product.color || "Основний", hex: "#999", images: product.images || [] }];
 
-    const oldPrice = product.oldPrice
-        ? `<span class="old-price">${formatPrice(product.oldPrice)}</span>`
+    const oldPrice = oldPriceNow(product)
+        ? `<span class="old-price">${formatPrice(oldPriceNow(product))}</span>`
         : "";
 
     const sizes = product.sizes?.length ? product.sizes : PRODUCT_SIZES;
@@ -131,7 +131,7 @@ function createFavoriteRow(product, favEntry) {
                 </div>
                 <div class="favorite-row-price">
                     ${oldPrice}
-                    <span class="price">${formatPrice(product.price)}</span>
+                    <span class="price">${formatPrice(priceNow(product))}</span>
                 </div>
             </div>
 

@@ -248,16 +248,9 @@ function topRank(product) {
 
 }
 
-function discountPercent(product) {
-
-    var price = Number(product.price) || 0;
-    var old = Number(product.oldPrice) || 0;
-
-    if (!old || old <= price) return 0;
-
-    return Math.round((1 - price / old) * 100);
-
-}
+// discountPercent живе в common.js — поруч із priceNow/oldPriceNow,
+// бо картку з позначкою «-N%» малює ui.js і на головній, де catalog.js
+// не підключений.
 
 function compareSizes(a, b) {
 
@@ -1458,9 +1451,7 @@ function sectionProducts() {
 
         return products.filter(product => {
 
-            if (!product.oldPrice) return false;
-
-            return (1 - product.price / product.oldPrice) * 100 >= SALE_MIN_DISCOUNT;
+            return discountPercent(product) >= SALE_MIN_DISCOUNT;
 
         });
 
@@ -2294,7 +2285,7 @@ function setupPriceRange() {
     if (!priceMenu || !products.length) return;
 
     const prices = sectionProducts()
-        .map(product => Number(product.price))
+        .map(product => priceNow(product))
         .filter(value => Number.isFinite(value));
 
     if (!prices.length) return;
@@ -2542,6 +2533,13 @@ function closeAllDropdowns() {
             // невидимим, і "оживало" лише після скролу вгору.
             menu.classList.remove("scroll-hidden");
 
+            // Зсув, який поставив keepMenuOnScreen(), знімаємо разом
+            // із закриттям: наступного разу кнопка може стояти в
+            // іншому місці рядка, і старий зсув був би невірним.
+            menu.style.left = "";
+            menu.style.right = "";
+            menu.style.width = "";
+
         }
 
         dropdown.classList.remove("open");
@@ -2554,6 +2552,49 @@ function closeAllDropdowns() {
 // показується одразу, незалежно від того, в якому місці каталогу
 // зараз користувач і що відбувалось зі скролом раніше. Панель
 // фільтрів sticky, тож список з'являється рівно під шапкою.
+// Меню, яке не вміщається, підсуваємо в екран.
+//
+// НАВІЩО. Меню фільтра «Ціна» ширше за свою кнопку (336px проти
+// ~135) і розкривається ВЛІВО: у стилях воно приколоте правим краєм
+// до кнопки. Так було зроблено свідомо — «Ціна» стоїть останньою в
+// рядку, і рости вправо їй нікуди.
+//
+// Але рядок фільтрів переноситься. Щойно «Ціна» опиняється ПЕРШОЮ в
+// новому рядку, той самий зсув вліво виносить меню за край екрана.
+// Заміряно на 1180px: кнопка left 56, меню left −145 — саме те, що
+// власник і побачив обрізаним.
+//
+// Прикріпити меню до іншого краю назавжди не вийде: тоді воно так
+// само вилізе праворуч, коли «Ціна» стоятиме останньою. Сторону
+// видно лише після того, як меню намальоване, тож вимірюємо й
+// зсуваємо. Зсув знімається при закритті.
+function keepMenuOnScreen(menu) {
+
+    if (!menu || !menu.parentElement) return;
+
+    const EDGE = 8;
+
+    const box = menu.getBoundingClientRect();
+
+    if (!box.width) return;
+
+    if (box.left >= EDGE && box.right <= window.innerWidth - EDGE) return;
+
+    const host = menu.parentElement.getBoundingClientRect();
+
+    const left = box.left < EDGE
+        ? EDGE
+        : Math.max(EDGE, window.innerWidth - EDGE - box.width);
+
+    // Ширину фіксуємо разом зі зсувом: у меню, розтягнутих на ширину
+    // кнопки (left:0;right:0), скасування right схлопнуло б їх до
+    // min-width.
+    menu.style.width = Math.round(box.width) + "px";
+    menu.style.left = Math.round(left - host.left) + "px";
+    menu.style.right = "auto";
+
+}
+
 function openDropdownMenu(dropdown, menu) {
 
     if (!dropdown || !menu) return;
@@ -2564,6 +2605,8 @@ function openDropdownMenu(dropdown, menu) {
     menu.classList.remove("scroll-hidden");
 
     dropdown.classList.add("open");
+
+    keepMenuOnScreen(menu);
 
     // якщо панель фільтрів у цей момент була відведена вгору після
     // скролу вниз — повертаємо її на місце, інакше меню відкрилось
@@ -3385,7 +3428,7 @@ function filterProducts(skip) {
     if (priceFilterActive() && skip !== "price") {
 
         list = list.filter(product =>
-            product.price >= priceRange.min && product.price <= priceRange.max
+            priceNow(product) >= priceRange.min && priceNow(product) <= priceRange.max
         );
 
     }
@@ -3521,11 +3564,11 @@ function filterProducts(skip) {
             break;
 
         case "priceAsc":
-            list.sort((a, b) => a.price - b.price);
+            list.sort((a, b) => priceNow(a) - priceNow(b));
             break;
 
         case "priceDesc":
-            list.sort((a, b) => b.price - a.price);
+            list.sort((a, b) => priceNow(b) - priceNow(a));
             break;
 
         case "discount":
@@ -4047,6 +4090,13 @@ function render() {
 
     productsCount.textContent = list.length;
 
+    // Слово після числа — теж змінне. Досі в розмітці стояло «товарів»
+    // і не мінялось ніколи, тож єдиний знайдений товар підписувався
+    // «1 товарів». Правило відмінювання — plural() у common.js.
+    const countWord = document.getElementById("productsCountWord");
+
+    if (countWord) countWord.textContent = pluralProducts(list.length);
+
     if (productsCounter) {
 
         productsCounter.textContent = `(${list.length})`;
@@ -4179,15 +4229,13 @@ function renderActiveFilters() {
 // решту ховаємо за кнопкою "+N фільтрів"
 // -------------------------
 
+// Правило відмінювання тут не повторюємо: воно одне на весь сайт, у
+// plural() з common.js. Копія жила тут, поки лічильник був один; з
+// появою «1 товарів» у каталозі стало видно, що копій уже три й
+// одна з них відстала.
 function pluralizeFilters(n) {
 
-    const mod10 = n % 10;
-    const mod100 = n % 100;
-
-    if (mod10 === 1 && mod100 !== 11) return "фільтр";
-    if (mod10 >= 2 && mod10 <= 4 && !(mod100 >= 12 && mod100 <= 14)) return "фільтри";
-
-    return "фільтрів";
+    return plural(n, "фільтр", "фільтри", "фільтрів");
 
 }
 
@@ -4490,6 +4538,8 @@ if (!window.CATALOG_SKIP_AUTO_INIT) {
     const sortDropdownAnchor = document.getElementById("sortDropdownAnchor");
     const mfCount = document.getElementById("mfCount");
     const mfSubCount = document.getElementById("mfSubCount");
+    const mfCountWord = document.getElementById("mfCountWord");
+    const mfSubCountWord = document.getElementById("mfSubCountWord");
 
     if (!mobileFilterBar || !mobileFiltersModal) return;
 
@@ -4547,6 +4597,12 @@ if (!window.CATALOG_SKIP_AUTO_INIT) {
 
         if (mfCount) mfCount.textContent = n;
         if (mfSubCount) mfSubCount.textContent = n;
+
+        // «Показати 1 товар», а не «1 товарів».
+        const word = pluralProducts(Number(n) || 0);
+
+        if (mfCountWord) mfCountWord.textContent = word;
+        if (mfSubCountWord) mfSubCountWord.textContent = word;
 
     }
 

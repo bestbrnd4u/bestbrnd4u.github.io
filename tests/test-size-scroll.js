@@ -4,6 +4,11 @@ const dom=new JSDOM("<!doctype html><body><div id='root'></div></body>",
   {runScripts:"outside-only",pretendToBeVisual:true});
 const {window}=dom;
 const common=fs.readFileSync(path.join(ROOT,"assets/js/common.js"),"utf8");
+// Ціна дня: ціну рахує common.js, а малюють її ui.js і catalog.js.
+window.eval(common.match(/function saleActive[\s\S]*?\n}\n/)[0]);
+window.eval(common.match(/function priceNow[\s\S]*?\n}\n/)[0]);
+window.eval(common.match(/function oldPriceNow[\s\S]*?\n}\n/)[0]);
+window.eval(common.match(/function discountPercent[\s\S]*?\n}\n/)[0]);
 window.eval(common.match(/function escapeHtml[\s\S]*?\n}\n/)[0]);
 window.eval(common.match(/function getProductColors[\s\S]*?\n}\n/)[0]);
 // сім'ї кольорів — фільтр «Колір» працює ними (див. хелпер)

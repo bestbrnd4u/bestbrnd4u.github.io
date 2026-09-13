@@ -365,14 +365,25 @@ function cardBadgeStack(product) {
         ? `<div class="badge">${product.badge}</div>`
         : "";
 
-    const discount = product.oldPrice
-        ? Math.round((1 - product.price / product.oldPrice) * 100)
-        : 0;
+    const discount = discountPercent(product);
+
+    // Акція може попросити не малювати плашку.
+    //
+    // НАВІЩО. Відсоток рахується від звичайної ціни, і на дорогій
+    // сумці знижка в кілька сотень гривень дає «-4%». Таке число
+    // применшує акцію замість того, щоб її продати. Перемикач — у
+    // самій акції, поле «Не показувати знижку у відсотках на картці».
+    //
+    // Тільки поки ціна дня СПРАВДІ ДІЄ: поза вікном знижки немає й
+    // ховати нічого.
+    const hidden = product.sale
+        && product.sale.noBadge === true
+        && saleActive(product);
 
     // Відсоток знижки — ЛИШЕ тут, у стовпчику позначок. Унизу картки
     // поруч із закресленою ціною його немає: рядок ціни не вміщався в
     // один рядок на вузьких картках каталогу.
-    const discountBadge = discount > 0
+    const discountBadge = discount > 0 && !hidden
         ? `<div class="badge badge-discount">-${discount}%</div>`
         : "";
 
@@ -386,11 +397,15 @@ function cardBadgeStack(product) {
 
 function cardPriceHtml(product) {
 
-    const oldPrice = product.oldPrice
-        ? `<span class="old-price">${formatPrice(product.oldPrice)}</span>`
+    // priceNow/oldPriceNow, а не поля товару: поки йде ціна дня,
+    // картка мусить показувати саме її — ту саму, яку порахує база.
+    const old = oldPriceNow(product);
+
+    const oldPrice = old
+        ? `<span class="old-price">${formatPrice(old)}</span>`
         : "";
 
-    return `<span class="price">${formatPrice(product.price)}</span>${oldPrice}`;
+    return `<span class="price">${formatPrice(priceNow(product))}</span>${oldPrice}`;
 
 }
 

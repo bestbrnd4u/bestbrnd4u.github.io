@@ -21,8 +21,9 @@ const common=fs.readFileSync(path.join(ROOT,"assets/js/common.js"),"utf8");
 ["escapeHtml","escapeAttrSingleQuoted","getProductColors","getVariantSizes","getAllProductSizes","getProductGenders","getProductGenderLabel","productUrl",
      // Перевизначення полів кольором: без них createProductCard падає з
      // ReferenceError, бо свотчі несуть готовий вигляд кожного кольору.
-     "colorOverrides","applyColorOverrides","baseProduct"]
-  .forEach(fn=>window.eval(common.match(new RegExp("function "+fn+"[\\s\\S]*?\\n}\\n"))[0]));
+     "colorOverrides","applyColorOverrides","baseProduct",
+     // Ціна дня: картку малює ui.js, а ціну рахує common.js.
+     "saleActive", "priceNow", "oldPriceNow", "discountPercent"].forEach(fn=>window.eval(common.match(new RegExp("function "+fn+"[\\s\\S]*?\\n}\\n"))[0]));
 window.eval(fs.readFileSync(path.join(ROOT,"assets/js/ui.js"),"utf8").replace(
   "function createProductCard(product) {",
   "window.PRODUCT_SIZES=['S','M','L'];window.formatPrice=v=>v+' грн';\nfunction createProductCard(product) {"));

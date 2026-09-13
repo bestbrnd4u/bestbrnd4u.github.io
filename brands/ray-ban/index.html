@@ -2,7 +2,7 @@
 <html lang="uk">
 
 <head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"365edf3f","data/catalog.json":"833e5408","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"6a5c125f","data/legal.json":"f84751b2","data/notifications.json":"a35b367f","data/product-texts.json":"278df72d","data/products-updated.json":"21324a1a","data/products.json":"549ae58a","data/promo-popups.json":"0940ece5","data/promotions.json":"dbe8723f","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/security.json":"0c05c691","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"365edf3f","data/catalog.json":"d4f83cb3","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"6a5c125f","data/legal.json":"f84751b2","data/notifications.json":"a35b367f","data/product-texts.json":"278df72d","data/products-updated.json":"d7e245ab","data/products.json":"1cd1cdb7","data/promo-popups.json":"0940ece5","data/promotions.json":"71677766","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/security.json":"0c05c691","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script>
 
 <!-- Сторінка лежить у /brands/<slug>/ або /categories/<slug>/,
      а скрипти будують шляхи як з кореня ("data/products.json").
@@ -124,7 +124,7 @@ window.CATALOG_PRESET = {"brand":"Ray-Ban"};
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=5857353f">
+<link rel="stylesheet" href="/assets/css/style.css?v=54b5c1b2">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3" defer></script>
 
@@ -390,7 +390,7 @@ placeholder="Пошук товару...">
 
 <div class="mobile-filters-footer">
 <button type="button" id="mobileFiltersResetBtn" class="btn btn-outline">Видалити все</button>
-<button type="button" id="mobileFiltersApplyBtn" class="btn">Показати <span id="mfCount">0</span> товарів</button>
+<button type="button" id="mobileFiltersApplyBtn" class="btn">Показати <span id="mfCount">0</span> <span id="mfCountWord">товарів</span></button>
 </div>
 </div>
 
@@ -404,7 +404,7 @@ placeholder="Пошук товару...">
 <div class="mobile-filters-sub-content" id="mobileFiltersSubContent"></div>
 
 <div class="mobile-filters-footer">
-<button type="button" id="mobileFiltersSubApplyBtn" class="btn">Показати <span id="mfSubCount">0</span> товарів</button>
+<button type="button" id="mobileFiltersSubApplyBtn" class="btn">Показати <span id="mfSubCount">0</span> <span id="mfSubCountWord">товарів</span></button>
 </div>
 </div>
 
@@ -436,7 +436,9 @@ placeholder="Пошук товару...">
 <span id="productsCount">
 0
 </span>
-товарів
+<!-- Слово окремим вузлом: його міняє catalog.js разом із числом,
+     інакше «1 товарів». Правило відмінювання — plural() у common.js. -->
+<span id="productsCountWord">товарів</span>
 </p>
 
 <div class="catalog-actions">
@@ -714,24 +716,24 @@ aria-label="Нагору">
 <!-- Хлібні крихти: спільний будівник для сторінки й розмітки BreadcrumbList -->
 <script src="/assets/js/breadcrumbs.js?v=7fc6182d" defer></script>
 <!-- Оформлення текстових блоків з адмінки (кольори, шрифт, кнопка) -->
-<script src="/assets/js/text-styles.js?v=7dc05c7d" defer></script>
+<script src="/assets/js/text-styles.js?v=4b9b6f00" defer></script>
 <!-- Згода на використання даних (банер + блокування вбудованого відео) -->
 <script src="/assets/js/consent.js?v=b6cc5d45" defer></script>
 <!-- Статистика відвідувань. Не завантажує Google без згоди. -->
-<script src="/assets/js/analytics.js?v=057602e5" defer></script>
+<script src="/assets/js/analytics.js?v=9d0002d2" defer></script>
 <!-- Транслітерація: каталог кладе латиницю в адресу фільтра.
      Той самий файл використовує збірка для адрес товарів. -->
 <script src="/assets/js/translit.js?v=c0957cb7" defer></script>
-<script src="/assets/js/common.js?v=4175ac20" defer></script>
+<script src="/assets/js/common.js?v=a3b9d4d6" defer></script>
 <!-- Підписка на листи магазину -->
 <script src="/assets/js/subscribe.js?v=2367ff9d" defer></script>
 <script src="/assets/js/promo-popup.js?v=2317f6f3" defer></script>
 <script src="/assets/js/sync.js?v=48ef002e" defer></script>
-<script src="/assets/js/mega-menu.js?v=7381e85d" defer></script>
-<script src="/assets/js/ui.js?v=4dba4bc7" defer></script>
+<script src="/assets/js/mega-menu.js?v=4649fe1e" defer></script>
+<script src="/assets/js/ui.js?v=e015b069" defer></script>
 <script src="/assets/js/stock.js?v=85fa4aad" defer></script>
 <script src="/assets/js/live-stock.js?v=ca9027dd" defer></script>
-<script src="/assets/js/catalog.js?v=d3f3852b" defer></script>
+<script src="/assets/js/catalog.js?v=129e5f9e" defer></script>
 </body>
 
 </html>

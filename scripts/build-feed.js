@@ -350,6 +350,39 @@ function priceTag(value) {
     return `${Number(value).toFixed(2)} UAH`;
 }
 
+// Вікно ціни дня у форматі Google: два моменти через похилу риску.
+//
+// НАВІЩО ВІДДАВАТИ ВІКНО, А НЕ ГОТОВУ ЦІНУ. Фід збирається раз на
+// збірку, а сейл починається о 18:00. Якби ми просто поклали в
+// sale_price акційну ціну, Google показував би її з моменту збірки —
+// тобто раніше за сайт, — а після кінця сейлу ще добу тримав би
+// ціну, якої вже немає. Обидва випадки це розбіжність між фідом і
+// сторінкою товару, і саме за неї Merchant Center знімає товари з
+// показу.
+//
+// Порожньо, якщо дат немає: «ціна дня без дат» діє, поки її не
+// приберуть, — і в Google так само.
+function saleWindow(sale) {
+
+    if (!sale || !sale.from || !sale.to) return "";
+
+    const from = new Date(sale.from);
+    const to = new Date(sale.to);
+
+    if (!Number.isFinite(from.getTime()) || !Number.isFinite(to.getTime())) return "";
+
+    return `${googleMoment(from)}/${googleMoment(to)}`;
+
+}
+
+// 2026-09-11T18:00:00+0000 — Google не приймає ні «Z», ні двокрапку
+// в зсуві, тож ISO-рядок доводиться трохи підрізати.
+function googleMoment(date) {
+
+    return date.toISOString().replace(/\.\d+Z$/, "+0000");
+
+}
+
 // Короткі характеристики для g:product_highlight.
 //
 // Google показує їх у картці товару списком і просить від двох до
@@ -460,7 +493,22 @@ function feedItems(products, departmentByCategory, siteUrl) {
                     + (params.length ? `?${params.join("&")}` : "");
 
                 const oldPrice = Number(view.oldPrice);
-                const onSale = Number.isFinite(oldPrice) && oldPrice > price;
+
+                // Ціна дня. У Google рівнів лише два — звичайна ціна й
+                // акційна, — тож коли в товару є і стара ціна, і ціна
+                // дня, перекресленою стає найбільша з них, а акційною —
+                // та, за якою справді продаємо.
+                const deal = product.sale && Number(product.sale.price) > 0
+                    ? Number(product.sale.price)
+                    : 0;
+
+                const listPrice = Number.isFinite(oldPrice) && oldPrice > price ? oldPrice : price;
+
+                const onSale = deal > 0
+                    ? deal < listPrice
+                    : Number.isFinite(oldPrice) && oldPrice > price;
+
+                const salePrice = deal > 0 ? deal : price;
 
                 items.push({
                     id: itemId(product, variant, index, size),
@@ -471,8 +519,14 @@ function feedItems(products, departmentByCategory, siteUrl) {
                     additional_image_link: images.slice(1, 11),
                     availability: availabilityOf(product, variant, size),
                     // Знижка парою: price — звичайна, sale_price — акційна.
-                    price: priceTag(onSale ? oldPrice : price),
-                    sale_price: onSale ? priceTag(price) : "",
+                    price: priceTag(onSale ? listPrice : price),
+                    sale_price: onSale ? priceTag(salePrice) : "",
+                    // Вікно ставимо лише для ціни дня: у звичайної
+                    // знижки (стара ціна в картці товару) кінця немає,
+                    // і вигадувати його Google не можна.
+                    sale_price_effective_date: deal > 0 && onSale
+                        ? saleWindow(product.sale)
+                        : "",
                     brand: product.brand || "",
                     condition: "new",
                     mpn: variant.sku || product.sku || "",
@@ -546,6 +600,7 @@ function itemXml(item) {
         tag("availability_date", item.availability_date),
         tag("price", item.price),
         tag("sale_price", item.sale_price),
+        tag("sale_price_effective_date", item.sale_price_effective_date),
         tag("brand", item.brand),
         tag("condition", item.condition),
         tag("mpn", item.mpn),

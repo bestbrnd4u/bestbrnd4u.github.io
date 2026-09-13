@@ -37,6 +37,45 @@ function escapeAttrSingleQuoted(value) {
 }
 
 // -------------------------
+// ВІДМІНЮВАННЯ ПІСЛЯ ЧИСЛА
+//
+// «У цій акції 1 товарів» — саме так це й виглядало, бо слово стояло
+// в розмітці окремим текстом і ніколи не мінялось. Число підставляв
+// JS, слово лишалось множинним назавжди.
+//
+// Українське правило — по ДВОХ останніх цифрах, і саме сотня тут
+// головна: 1 товар, 21 товар, але 11 товарІВ. Так само 2-4 товари,
+// проте 12-14 товарів. Тому перевіряємо mod 100 перед mod 10 —
+// найчастіша помилка в таких помічниках саме зворотна.
+//
+// Один помічник на весь сайт: лічильників кілька (каталог, акція,
+// кнопка мобільних фільтрів), і три копії правила розійшлись би на
+// першій же дрібниці.
+// -------------------------
+
+function plural(count, one, few, many) {
+
+    var n = Math.abs(Number(count)) || 0;
+
+    var mod10 = n % 10;
+    var mod100 = n % 100;
+
+    if (mod100 >= 11 && mod100 <= 14) return many;
+    if (mod10 === 1) return one;
+    if (mod10 >= 2 && mod10 <= 4) return few;
+
+    return many;
+
+}
+
+// «товар / товари / товарів» — найчастіший випадок, тож окремо.
+function pluralProducts(count) {
+
+    return plural(count, "товар", "товари", "товарів");
+
+}
+
+// -------------------------
 // Забороняємо нативне "підняття" картинки (drag) —
 // саме воно і показувало білу підкладку під фото при
 // протягуванні пальцем. На відміну від touch-action:pan-x
@@ -477,7 +516,7 @@ function pickCrossSell(products, cartLines, limit) {
 
     // Найдорожча річ у кошику — межа, до якої доповнення виглядає
     // доповненням.
-    const ceiling = Math.max(...cartProducts.map(product => Number(product.price) || 0));
+    const ceiling = Math.max(...cartProducts.map(product => priceNow(product)));
 
     const rest = (products || []).filter(product => !inCart.has(Number(product.id)));
 
@@ -516,12 +555,12 @@ function pickCrossSell(products, cartLines, limit) {
     // спадаючи, щоб перший екран не був завалений дрібницями.
     const order = (a, b) => {
 
-        const cheapA = (Number(a.price) || 0) <= ceiling ? 0 : 1;
-        const cheapB = (Number(b.price) || 0) <= ceiling ? 0 : 1;
+        const cheapA = priceNow(a) <= ceiling ? 0 : 1;
+        const cheapB = priceNow(b) <= ceiling ? 0 : 1;
 
         if (cheapA !== cheapB) return cheapA - cheapB;
 
-        return (Number(b.price) || 0) - (Number(a.price) || 0);
+        return priceNow(b) - priceNow(a);
 
     };
 
@@ -712,7 +751,9 @@ function getCartSummary() {
 
         if (product) {
 
-            subtotal += product.price;
+            // priceNow, а не product.price: лічильник у шапці мусить
+            // показувати ту саму суму, що й кошик із оформленням.
+            subtotal += priceNow(product);
 
         }
 
@@ -762,7 +803,7 @@ function showCartPopup(product, selection = {}) {
                 ${product.brand ? `<div class="cart-popup-item-brand">${escapeHtml(product.brand)}</div>` : ""}
                 <div class="cart-popup-item-title">${escapeHtml(product.title)}</div>
                 ${metaHtml}
-                <div class="cart-popup-item-price">${formatPrice(product.price)}</div>
+                <div class="cart-popup-item-price">${formatPrice(priceNow(product))}</div>
             </div>
         </div>
 
@@ -1907,7 +1948,7 @@ async function runGlobalSearch(query) {
                 </div>
                 <div class="search-result-brand">${escapeHtml(product.brand)}</div>
                 <div class="search-result-title">${escapeHtml(product.title)}</div>
-                <div class="search-result-price">${formatPrice(product.price)}</div>
+                <div class="search-result-price">${formatPrice(priceNow(product))}</div>
             </a>
         `;
 
@@ -4163,6 +4204,256 @@ function collectionProducts(collection, allProducts, departmentOf) {
 
 }
 
+// -------------------------------------------------------------
+// Акція з розкладом: анонс → іде → завершилась
+// -------------------------------------------------------------
+//
+// НАВІЩО
+// -------
+// Досі акція жила, поки її не приберуть руками. «Нічний сейл на 12
+// годин» так не зробити: треба прийти опівночі й увімкнути, а
+// вранці — вимкнути.
+//
+// Тепер в акції можуть бути дати початку й кінця. Обидві
+// необов'язкові: акція без дат поводиться точно як раніше, і жодна
+// з опублікованих нічого не помітить.
+//
+// ЧОМУ СТАН РАХУЄ БРАУЗЕР, А НЕ ЗБІРКА
+// -------------------------------------
+// Сайт статичний: збірка знає лише час, коли її запустили. Якщо стан
+// вирішувати там, сейл почався б не опівночі, а під час наступної
+// збірки — тобто будь-коли.
+//
+// Браузер же порівнює годинник із датами, які вже лежать у даних, —
+// і робить це правильно навіть на сторінці з кеша. Це важливо: наші
+// сторінки віддаються з max-age=7200, тобто дві години живуть у
+// браузері. Стан від цього не страждає, бо він не потребує нових
+// даних — лише годинника.
+//
+// ЧОГО ЦЕ НЕ ВМІЄ І НЕ МАЄ ВМІТИ
+// -------------------------------
+// Годинник у браузері можна перевести. Тому ТАЙМЕР ТУТ — ОФОРМЛЕННЯ,
+// А НЕ ЗАМОК. Справжня знижка дається промокодом, а в промокоду є
+// власне вікно (starts_at/expires_at у міграції 025), яке перевіряє
+// база. Перевів годинник — побачив сторінку раніше; скористатись
+// кодом однаково не вийде.
+//
+// І дані майбутньої акції лежать у збірці заздалегідь: хто загляне в
+// data/promotions.json, побачить її до початку. Для ОГОЛОШЕНОГО сейлу
+// це не проблема — його й так анонсують. Для таємного цей механізм не
+// годиться.
+
+// Хвилина в мілісекундах — щоб у розрахунках не було голих чисел.
+const MINUTE_MS = 60 * 1000;
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+function promoMoment(value) {
+
+    if (!value) return null;
+
+    const time = new Date(value).getTime();
+
+    return Number.isFinite(time) ? time : null;
+
+}
+
+// Стан акції на заданий момент: "announced" | "live" | "ended".
+//
+// Акція без дат — завжди "live": саме так поводились усі акції до
+// появи розкладу, і опубліковані не мають нічого помітити.
+function promoState(promo, now) {
+    return promoTiming(promo, now).state;
+}
+
+// Стан разом із моментом, до якого лишилось чекати.
+//
+// Одним викликом, а не двома: тому, хто малює таймер, потрібні
+// обидва, і рахувати дати двічі означало б колись розійтися в
+// граничному випадку (секунда між двома викликами).
+function promoTiming(promo, now) {
+
+    const moment = Number.isFinite(now) ? now : Date.now();
+
+    const startsAt = promoMoment(promo && promo.startsAt);
+    const endsAt = promoMoment(promo && promo.endsAt);
+
+    if (startsAt !== null && moment < startsAt) {
+        return { state: "announced", until: startsAt, startsAt, endsAt };
+    }
+
+    if (endsAt !== null && moment >= endsAt) {
+        return { state: "ended", until: null, startsAt, endsAt };
+    }
+
+    return { state: "live", until: endsAt, startsAt, endsAt };
+
+}
+
+// Чи показувати акцію взагалі.
+//
+// Завершені зникають самі — це і є сенс дати кінця. Анонсовані
+// показуються: заради них розклад і робився.
+function promoVisible(promo, now) {
+    return promoState(promo, now) !== "ended";
+}
+
+// Чи можна показувати перекреслену стару ціну.
+//
+// ОКРЕМО ВІД ВИДИМОСТІ, і це не дрібниця. Анонсована акція видима,
+// але знижки ще немає — намалювати перекреслену ціну означало б
+// збрехати покупцеві на тиждень раніше, ніж вона стане правдою.
+function promoDiscountActive(promo, now) {
+    return promoState(promo, now) === "live" && Number(promo && promo.discountPercent) > 0;
+}
+
+// «6 дн. 04:12:07» — скільки лишилось.
+//
+// ЧОМУ ДНІ ОКРЕМО, А НЕ 148 ГОДИН. Тиждень очікування читається
+// днями; останні години — годинником.
+//
+// СЕКУНДИ ВИДНО ЗАВЖДИ — І ЦЕ НЕ ДРІБНИЦЯ.
+//
+// Було інакше. Поки до кінця лишалось більше доби, рядок був «6 дн.
+// 04:12» і перемальовувався раз на хвилину: хвилинний рядок частіше
+// й не змінюється, а зайве пробудження на телефоні коштує батареї.
+// Логіка бездоганна, наслідок жахливий — людина дивиться на відлік
+// акції, а він стоїть. Власник написав про це двічі, другого разу
+// окремо про головну й окремо про сторінку акції.
+//
+// Відлік існує рівно заради відчуття, що час спливає. Відлік, який
+// не рухається, не виконує єдиної своєї роботи.
+//
+// Батарею бережуть самі браузери: у прихованій вкладці таймери
+// душаться до одного ходу на хвилину. Спинити годинник власноруч я
+// спробував — і побачив, що у вбудованому браузері document.hidden
+// лишається true на видимій сторінці. Подробиці в tickPromoTimers()
+// у assets/js/app.js.
+function promoCountdown(untilMs, now) {
+
+    const left = Number(untilMs) - (Number.isFinite(now) ? now : Date.now());
+
+    if (!Number.isFinite(left) || left <= 0) return "";
+
+    const total = Math.floor(left / 1000);
+
+    const days = Math.floor(total / 86400);
+    const hours = Math.floor((total % 86400) / 3600);
+    const minutes = Math.floor((total % 3600) / 60);
+    const seconds = total % 60;
+
+    const two = value => String(value).padStart(2, "0");
+
+    if (days > 0) return `${days} дн. ${two(hours)}:${two(minutes)}:${two(seconds)}`;
+
+    if (total >= 3600) return `${two(hours)}:${two(minutes)}:${two(seconds)}`;
+
+    return `${two(minutes)}:${two(seconds)}`;
+
+}
+
+// Як часто перемальовувати таймер.
+//
+// Рівно так часто, як міняється сам рядок, — а в ньому тепер завжди
+// є секунди, тож щосекунди й на головній, і на сторінці акції.
+//
+// Аргументи лишились у підписі навмисно: сюди й далі передають
+// момент кінця, і колись крок може знову від нього залежати. Але
+// розходитись із promoCountdown() йому більше нема як — саме на
+// цьому розходженні й стояв нерухомий рядок «22:40:48».
+function promoTickMs() {
+
+    return 1000;
+
+}
+
+// -------------------------------------------------------------
+// Ціна дня: скільки товар коштує ПРЯМО ЗАРАЗ
+// -------------------------------------------------------------
+//
+// В акції можна задати ціну дня — і тоді товар справді стільки й
+// коштує, поки акція йде. Збірка кладе її поруч із ціною самого
+// товару (scripts/promo-deals.js):
+//
+//   product.sale = { price: 8600, from: "…", to: "…" }
+//
+// ЧОМУ ЦЕ ОКРЕМА ФУНКЦІЯ, А НЕ ПОЛЕ
+// ----------------------------------
+// Ціна залежить від годинника, а не від даних. Записати в товар уже
+// пораховану ціну збірка не може: вона знає лише час свого запуску, і
+// сейл почався б не опівночі, а під час наступної збірки.
+//
+// ЧОМУ ЦЕ МУСЯТЬ КЛИКАТИ ВСІ
+// ---------------------------
+// Суму замовлення перераховує база (тригер із міграції 014) за
+// власною копією цін. Якщо хоч одне місце на сайті порахує стару
+// ціну, покупець побачить одну суму, а в замовленні опиниться інша —
+// і замовлення отримає позначку «розбіжність», ту саму, якою ловлять
+// підміну ціни в консолі. Тобто чесна покупка виглядатиме як спроба
+// обману.
+//
+// Саме тому ціна читається ОДНІЄЮ функцією, а не кожним місцем
+// окремо.
+function saleActive(product, now) {
+
+    const sale = product && product.sale;
+
+    if (!sale || !(Number(sale.price) > 0)) return false;
+
+    const moment = Number.isFinite(now) ? now : Date.now();
+
+    if (sale.from) {
+        const starts = new Date(sale.from).getTime();
+        if (Number.isFinite(starts) && moment < starts) return false;
+    }
+
+    if (sale.to) {
+        const ends = new Date(sale.to).getTime();
+        if (Number.isFinite(ends) && moment >= ends) return false;
+    }
+
+    return true;
+
+}
+
+// Ціна, яку платить покупець.
+function priceNow(product, now) {
+
+    if (saleActive(product, now)) return Number(product.sale.price);
+
+    return Number(product && product.price) || 0;
+
+}
+
+// Перекреслена ціна поруч — або 0, якщо перекреслювати нема чого.
+//
+// Поки йде ціна дня, перекреслюємо ЗВИЧАЙНУ ціну товару, а не його
+// власну стару. Товар міг продаватись за 9000 при «старій» 12000 —
+// але вчора він коштував саме 9000, і саме це правда.
+function oldPriceNow(product, now) {
+
+    if (saleActive(product, now)) return Number(product.price) || 0;
+
+    return Number(product && product.oldPrice) || 0;
+
+}
+
+// Відсоток знижки — теж звідси, а не з власної формули в кожному місці.
+//
+// Раніше копій було дві: сортування «спочатку знижки» в каталозі і
+// позначка «-N%» на картці. Поки знижка була одна (oldPrice), копії
+// збігалися. З ціною дня вони б розійшлися першого ж вечора: сортування
+// побачило б знижку, а картка над тією самою ціною — ні.
+function discountPercent(product, now) {
+
+    const price = priceNow(product, now);
+    const old = oldPriceNow(product, now);
+
+    if (!old || old <= price) return 0;
+
+    return Math.round((1 - price / old) * 100);
+
+}
+
 // Картки акції: той самий набір товарів, розкладений по кольорах.
 //
 // НАВІЩО ОДИН ВИКЛИК, А НЕ ДВА КРОКИ НА КОЖНІЙ СТОРІНЦІ
@@ -4411,11 +4702,13 @@ function loadDepartmentOf() {
 
 }
 
+// Стара назва того самого. Лишилась, бо на рядок «function
+// getDiscountPercent» спирається півдесятка тестів: вони ріжуть
+// common.js по ньому як по межі. Формула тут більше не своя — інакше
+// сортування «за знижкою» не побачило б ціну дня, яку бачить картка.
 function getDiscountPercent(product) {
 
-    if (!product.oldPrice || product.oldPrice <= product.price) return 0;
-
-    return Math.round((1 - product.price / product.oldPrice) * 100);
+    return discountPercent(product);
 
 }
 

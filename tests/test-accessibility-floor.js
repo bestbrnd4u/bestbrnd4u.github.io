@@ -275,16 +275,41 @@ console.log("\n[6] Усі змінні кольорів існують");
     // за них не варто. Небезпечний саме var(--x) без запасу: браузер
     // не знаходить значення й не малює НІЧОГО, без жодної помилки в
     // консолі. Саме так зникла кнопка «Показати ще».
-    const used = new Set();
+    // ЗМІННА, ОГОЛОШЕНА В ТОМУ САМОМУ ПРАВИЛІ, ЗНИКНУТИ НЕ МОЖЕ.
+    //
+    // Так написані розміри заголовків: правило поруч оголошує власну
+    // базу й тут-таки множить її на множник з адмінки —
+    //
+    //     .deal-head-text h2{
+    //         --blk-title-base:30px;
+    //         font-size:calc(var(--blk-title-base) * var(--blk-title-scale, 1));
+    //     }
+    //
+    // Запасне значення тут було б ГІРШЕ за його відсутність: саме
+    // запасне значення 1em і ховало помилку, через яку заголовок
+    // акції падав із 42px до 16px. Хай краще правило зламається
+    // помітно, ніж мовчки покаже не той розмір.
+    const broken = new Set();
 
-    [...css.matchAll(/var\((--[a-z0-9-]+)\s*([,)])/g)].forEach(m => {
-        if (m[2] === ")") used.add(m[1]);
+    [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].forEach(rule => {
+
+        const body = rule[2];
+
+        const own = new Set(
+            [...body.matchAll(/(--[a-z0-9-]+)\s*:/g)].map(m => m[1]));
+
+        [...body.matchAll(/var\((--[a-z0-9-]+)\s*([,)])/g)].forEach(m => {
+
+            if (m[2] !== ")") return;
+            if (own.has(m[1]) || declared.has(m[1]) || fromCode.has(m[1])) return;
+
+            broken.add(m[1]);
+
+        });
+
     });
 
-    const broken = [...used].filter(name =>
-        !declared.has(name) && !fromCode.has(name));
-
-    check("жодна змінна не втрачена", broken.length === 0, broken.join(", "));
+    check("жодна змінна не втрачена", broken.size === 0, [...broken].join(", "));
 
     // Окремо про --dark: саме на ній зламалась кнопка.
     check("--dark оголошено", declared.has("--dark"));

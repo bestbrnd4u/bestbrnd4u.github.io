@@ -25,6 +25,19 @@ const check = (n, c, e) => {
 };
 
 const read = rel => fs.readFileSync(path.join(ROOT, rel), "utf8");
+
+// Помічники ціни для пісочниць нижче.
+//
+// discountPercent живе в common.js поруч із priceNow: ціна дня мусить
+// враховуватись і в сортуванні каталогу, і на картці, а це два різні
+// файли. Тому в пісочницю, яка виконує шматок catalog.js, їх треба
+// покласти окремо — у браузері common.js підключений першим.
+const priceApi = () => [
+    /function saleActive[\s\S]*?\n}\n/,
+    /function priceNow[\s\S]*?\n}\n/,
+    /function oldPriceNow[\s\S]*?\n}\n/,
+    /function discountPercent[\s\S]*?\n}\n/
+].map(pattern => read("assets/js/common.js").match(pattern)[0]).join("\n");
 const catalog = read("assets/js/catalog.js");
 
 console.log("\n[1] Правило описане в коді");
@@ -265,7 +278,8 @@ console.log("\n[5] Сортування «новинки»");
     const src = catalog.match(/function markedNew[\s\S]*?\nfunction compareSizes/)[0]
         .replace(/\nfunction compareSizes$/, "");
 
-    const helpers = new Function(src + "; return { markedNew, topRank, discountPercent };")();
+    const helpers = new Function(priceApi() + "\n" + src
+        + "; return { markedNew, topRank, discountPercent };")();
 
     const items = JSON.parse(read("data/products.json"));
 
@@ -310,7 +324,8 @@ console.log("\n[6] Сортування «топ» більше не порож�
     const src = catalog.match(/function markedNew[\s\S]*?\nfunction compareSizes/)[0]
         .replace(/\nfunction compareSizes$/, "");
 
-    const helpers = new Function(src + "; return { markedNew, topRank, discountPercent };")();
+    const helpers = new Function(priceApi() + "\n" + src
+        + "; return { markedNew, topRank, discountPercent };")();
 
     const items = JSON.parse(read("data/products.json"));
 

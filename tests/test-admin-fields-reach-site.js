@@ -52,6 +52,124 @@ const config = loadYaml("admin/config.yml");
 // Об'єкт із `<щось>.push({ ... })` — рівно той, який пише збірка.
 // Дужки шукаємо балансуванням, а не регуляркою: усередині є і вкладені
 // об'єкти, і тернарні оператори з фігурними дужками.
+// Запускач справжнього літерала збірки.
+//
+// ПОМІЧНИКИ, ЯКІ ЛІТЕРАЛ КЛИЧЕ ВСЕРЕДИНІ, подаємо сюди ж — і саме
+// їхньою справжньою реалізацією зі скрипта збірки, а не заглушкою.
+// Інакше перевірка або впаде на ReferenceError (так і сталось, коли в
+// акції з'явились дати початку й кінця), або — що гірше — перевірятиме
+// не той код, що працює.
+//
+// Кожен новий помічник дописується в HELPERS. Незручність помітна, але
+// вона краща за тиху: забули — тест червоніє одразу, а не мовчки
+// перевіряє порожнечу.
+//
+// ШУКАЄМО НЕ ЛИШЕ У САМІЙ ЗБІРЦІ. promoDate() переїхав у
+// scripts/promo-deals.js (ті самі дати читає збірка ТОВАРІВ заради
+// ціни дня, а вона йде раніше за збірку акцій). Поки запускач дивився
+// тільки у власний файл збірки, він не знаходив помічника й тихо
+// підставляв заглушку — після чого «поле не доїжджає до сайту»
+// повідомлялось про цілком робочий код.
+const HELPERS = ["promoDate"];
+
+const HELPER_SOURCES = ["scripts/promo-deals.js", "scripts/letter-schedule.js"]
+    .filter(rel => fs.existsSync(path.join(ROOT, rel)))
+    .map(rel => fs.readFileSync(path.join(ROOT, rel), "utf8"));
+
+function helperSource(name, source) {
+
+    const pattern = new RegExp(`function ${name}\\([\\s\\S]*?\\n}\\n`);
+
+    const found = [source, ...HELPER_SOURCES]
+        .map(text => text.match(pattern))
+        .find(Boolean);
+
+    // Мовчазна заглушка тут — найгірше, що можна зробити: тест
+    // перевірятиме порожнечу й звинуватить у цьому збірку.
+    if (!found) throw new Error(`не знайшов ${name}() ні у збірці, ні в ${HELPER_SOURCES.length} сусідніх модулях`);
+
+    return found[0];
+
+}
+
+// Варіант зі списку самого поля. Decap дозволяє і рядки, і
+// {label, value}.
+//
+// ПЕРЕБИРАЄМО ВСІ, А НЕ БЕРЕМО ПЕРШИЙ.
+//
+// Деякі варіанти означають «нічого не робити» — і збірка їх навмисно
+// не передає: «Банер у блоці: немає», «Ніде» для бейджа. Якщо
+// заповнювати поле лише першим варіантом, такий select виглядав би
+// полем, яке не доїжджає до сайту, хоча він доїжджає — просто іншим
+// значенням.
+//
+// Та сама логіка, що з перемикачами: поле вважається робочим, якщо
+// його переносить ХОЧА Б ОДИН зі станів.
+function optionValue(field, index) {
+
+    const options = (field.options || []).filter(o => o !== undefined && o !== null);
+
+    if (!options.length) return "card";
+
+    const pick = options[(index || 0) % options.length];
+
+    return typeof pick === "object" ? pick.value : pick;
+
+}
+
+// Скільки різних заповнень треба, щоб перебрати всі варіанти всіх
+// списків: найдовший список і задає кількість.
+function optionRounds(fields) {
+
+    return fields.reduce((max, field) => Math.max(max,
+        (field.options || []).length || 1), 1);
+
+}
+
+function literalRunner(source) {
+
+    const literal = pushedLiteral(source);
+
+    if (!literal) return null;
+
+    const helpers = HELPERS.map(name =>
+        new Function(`${helperSource(name, source)}\nreturn ${name};`)());
+
+    // Літерал спирається не лише на функції, а й на переліки поруч із
+    // ним: LAYOUTS — дозволені розкладки банера. Поки їх тут не було,
+    // запускач падав на ReferenceError, і набір червонів на цілком
+    // робочому коді — так уже сталося з promoDate().
+    //
+    // Беремо перелік із САМОГО джерела збірки: свій список тут означав
+    // би, що тест перевіряє не те, що працює.
+    // Перелік буває і в кілька рядків, і в один — беремо обидві форми.
+    // Поки бралась лише багаторядкова, однорядковий DEAL_ALIGNS
+    // лишався невідомим, і запускач падав на ReferenceError.
+    const consts = [...source.matchAll(/^const ([A-Z_][A-Z0-9_]*) = (\[[\s\S]*?\]);$/gm)]
+        .map(hit => ({ name: hit[1], value: new Function(`return ${hit[2]};`)() }));
+
+    // МОДУЛІ, ЯКІ ЛІТЕРАЛ ВИМАГАЄ ЧЕРЕЗ require.
+    //
+    // Розкладку блока «Ціна дня» рахує спільний модуль — його читають
+    // сайт, збірка й адмінка. У пісочниці require не спрацює (літерал
+    // виконується у порожньому new Function), тож подаємо СПРАВЖНІЙ
+    // модуль аргументом. Своя заглушка означала б, що тест перевіряє
+    // не той код, який працює.
+    const modules = [...source.matchAll(/^const (\w+) = require\("([^"]+)"\);$/gm)]
+        .filter(hit => hit[2].startsWith("../assets/"))
+        .map(hit => ({
+            name: hit[1],
+            value: require(path.join(ROOT, hit[2].replace("../", "")))
+        }));
+
+    const names = HELPERS.concat(consts.map(c => c.name), modules.map(m => m.name));
+    const values = helpers.concat(consts.map(c => c.value), modules.map(m => m.value));
+
+    return data => new Function("data", "slug", "genderButtons", ...names,
+        `return (${literal});`)(data, "test-slug", [], ...values);
+
+}
+
 function pushedLiteral(source) {
 
     const start = source.indexOf(".push({");
@@ -82,7 +200,17 @@ function pushedLiteral(source) {
 
 // Заповнюємо КОЖНЕ поле адмінки — інакше умовні `...(data.x ? ...)`
 // промовчали б, і перевірка нічого б не побачила.
-function filledEntry(fields) {
+// ПЕРЕМИКАЧІ ПЕРЕВІРЯЄМО В ОБОХ СТАНАХ.
+//
+// Умовні спреди в збірках написані під ОДИН зі станів, і під який
+// саме — залежить від поля: autoBrand і splitByColor доїжджають, коли
+// вимкнені, hideCountdown — коли увімкнений. Поки тут стояло глухе
+// false, набір повідомляв «поле не доїжджає до сайту» про цілком
+// робочий перемикач, який просто означає протилежне.
+//
+// Тому запис заповнюється двічі, і поле вважається доїхавшим, якщо
+// його переніс хоча б один зі станів.
+function filledEntry(fields, booleans, round) {
 
     const data = {};
 
@@ -93,9 +221,9 @@ function filledEntry(fields) {
         switch (field.widget) {
 
             case "boolean":
-                // false, а не true: умовні спреди в збірках написані
-                // саме під «вимкнено» (autoBrand, splitByColor).
-                data[name] = false;
+                // Значення підставляє filledEntry(fields, booleans) —
+                // перемикачі перевіряються В ОБОХ станах, див. нижче.
+                data[name] = booleans;
                 break;
 
             case "number":
@@ -104,9 +232,18 @@ function filledEntry(fields) {
 
             case "list":
             case "select":
+                // ЗНАЧЕННЯ БЕРЕМО З ВЛАСНИХ ВАРІАНТІВ ПОЛЯ, а не
+                // однакове на всі списки.
+                //
+                // Тут стояло "card" — чинний «спосіб показу», але для
+                // будь-якого іншого select чуже слово. Збірка такі
+                // значення відкидає (вона звіряє їх із переліком), і
+                // набір повідомляв «поле не доїжджає до сайту» про
+                // цілком робоче поле. Так уже сталося з розкладкою
+                // банера.
                 data[name] = field.multiple || field.widget === "list"
                     ? [{ gender: "Жінкам", color: "#111827" }]
-                    : "card";
+                    : optionValue(field, round);
                 break;
 
             case "productPicker":
@@ -121,6 +258,18 @@ function filledEntry(fields) {
             case "imageFraming":
                 // Словник «ім'я файлу → кадр» (див. image-framing.js).
                 data[name] = { "banner.webp": { x: 30, y: 70, zoom: 1.4 } };
+                break;
+
+            case "datetime":
+                // СПРАВЖНЯ дата, а не рядок «startsAt-value».
+                //
+                // Збірка дати перевіряє (див. promoDate у
+                // build-promotions.js) і сміття відкидає мовчки — тож
+                // із загальною заглушкою поле «не доїжджало» до сайту,
+                // і перевірка звинувачувала збірку в тому, чого та не
+                // робила. Саме на цьому воно й спіймалось, коли в
+                // акцію додали розклад.
+                data[name] = "2026-12-31T23:00:00+02:00";
                 break;
 
             default:
@@ -141,12 +290,20 @@ const GROUPS = [
         aggregate: "data/promotions.json",
         // Як називається змінна запису у фронтенді — за нею й дивимось,
         // чи поле взагалі комусь потрібне.
-        accessor: "promo",
-        consumers: ["assets/js/app.js", "assets/js/promo.js", "assets/js/common.js"],
+        // Розкладку блока «Ціна дня» читає спільний модуль, а не сам
+        // app.js: у ньому поля звуться p.dealBanner. Без нього поля
+        // розкладки виглядали б нікому не потрібними — хоча саме вони й
+        // вирішують, що де стоїть.
+        accessor: ["promo", "p"],
+        consumers: ["assets/js/app.js", "assets/js/promo.js", "assets/js/common.js", "assets/js/deal-layout.js"],
         // Поле, якого сайт не читає, і чому це нормально.
         internal: {
             active: "фільтр самої збірки: вимкнена акція не потрапляє у файл",
             products: "перейменоване в productIds",
+            // Їде в ТОВАР, а не в акцію: збірка кладе його поруч із
+            // ціною дня як sale.noBadge, і картка питає саме товар.
+            // Ланцюжок цілком перевіряє [8a] у test-deal-price.js.
+            hideDealBadge: "стає product.sale.noBadge у scripts/build-products.js",
             style: null,      // читається — мусить передаватись
             framing: null
         }
@@ -199,14 +356,25 @@ GROUPS.forEach(group => {
 
     if (!literal) return;
 
-    const data = filledEntry(fields);
-
     // Виконуємо СПРАВЖНІЙ літерал: так перевіряється код збірки, а не
     // його опис регуляркою.
-    const built = new Function("data", "slug", "genderButtons",
-        `return (${literal});`)(data, "test-slug", []);
+    const run = literalRunner(source);
 
-    const emitted = new Set(Object.keys(built));
+    // Перебираємо ОБИДВА стани перемикачів і ВСІ варіанти списків:
+    // поле вважається робочим, якщо його переносить хоча б одне
+    // заповнення.
+    const emitted = new Set();
+
+    for (let round = 0; round < optionRounds(fields); round++) {
+
+        [false, true].forEach(booleans => {
+
+            Object.keys(run(filledEntry(fields, booleans, round)))
+                .forEach(key => emitted.add(key));
+
+        });
+
+    }
 
     const consumerSource = group.consumers.map(read).join("\n");
 
@@ -256,10 +424,7 @@ console.log("\n[framing і style в акціях — те, на чому це з
 {
     const source = read("scripts/build-promotions.js");
 
-    const literal = pushedLiteral(source);
-
-    const build = data => new Function("data", "slug", "genderButtons",
-        `return (${literal});`)(data, "s", []);
+    const build = literalRunner(source);
 
     const заповнена = build({
         title: "t", image: "i", link: "l",

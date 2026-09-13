@@ -210,8 +210,9 @@ console.log("\n[6] Картка каталогу: свотч несе готов
         const { window } = dom;
         ["escapeHtml", "escapeAttrSingleQuoted", "getProductColors", "getVariantSizes",
             "getAllProductSizes", "getProductGenders", "getProductGenderLabel", "productUrl",
-            "colorOverrides", "applyColorOverrides", "baseProduct"]
-            .forEach(fn => window.eval(commonSrc.match(new RegExp("function " + fn + "[\\s\\S]*?\\n}\\n"))[0]));
+            "colorOverrides", "applyColorOverrides", "baseProduct",
+     // Ціна дня: картку малює ui.js, а ціну рахує common.js.
+     "saleActive", "priceNow", "oldPriceNow", "discountPercent"].forEach(fn => window.eval(commonSrc.match(new RegExp("function " + fn + "[\\s\\S]*?\\n}\\n"))[0]));
         require(path.join(__dirname, "helpers/color-families")).installColorFamilies(window);
         window.eval(uiSrc.replace("function createProductCard(product) {",
             "window.PRODUCT_SIZES=['S','M'];window.formatPrice=v=>v+' грн';\nfunction createProductCard(product) {"));

@@ -307,7 +307,9 @@
             item_name: String(product.title || ""),
             item_brand: product.brand || undefined,
             item_category: product.category || undefined,
-            price: Number(product.price) || 0,
+            // Ціна дня: у звіти має йти те, що покупець справді платить,
+            // інакше виручка в GA розійдеться з виручкою в замовленнях.
+            price: typeof priceNow === "function" ? priceNow(product) : (Number(product.price) || 0),
             currency: "UAH",
             quantity: 1
         };
@@ -336,8 +338,16 @@
 
         // Знижка Google рахує окремим полем — інакше у звітах видно
         // тільки кінцеву ціну, і незрозуміло, скільки продано за акцією.
-        if (product.oldPrice && product.oldPrice > product.price) {
-            item.discount = Number(product.oldPrice) - Number(product.price);
+        // Стару ціну беремо тим самим обережним способом, що й ціну
+        // вище: analytics.js підключений ПЕРЕД common.js, і хоч на
+        // момент події помічники вже є, покладатись на це в цьому
+        // файлі не заведено.
+        var wasPrice = typeof oldPriceNow === "function"
+            ? oldPriceNow(product)
+            : (Number(product.oldPrice) || 0);
+
+        if (wasPrice > item.price) {
+            item.discount = wasPrice - item.price;
         }
 
         return item;

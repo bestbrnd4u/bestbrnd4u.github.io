@@ -82,6 +82,33 @@ ${pad}      allowInput: true
 ${pad}      hint: >
 ${pad}        Слідкуйте за контрастом: світлий текст на світлій кнопці
 ${pad}        читатися не буде.
+${pad}    - label: "Колір бейджа"
+${pad}      name: "badgeBg"
+${pad}      widget: "color"
+${pad}      required: false
+${pad}      allowInput: true
+${pad}      hint: >
+${pad}        Заливка позначки («-50%», «NEW», «ЦІНА ДНЯ»). Порожньо —
+${pad}        червона, як зараз.
+${pad}    - label: "Колір тексту на бейджі"
+${pad}      name: "badgeText"
+${pad}      widget: "color"
+${pad}      required: false
+${pad}      allowInput: true
+${pad}    - label: "Колір таймера"
+${pad}      name: "timerBg"
+${pad}      widget: "color"
+${pad}      required: false
+${pad}      allowInput: true
+${pad}      hint: >
+${pad}        Плашка відліку. Колір не міняється сам: від початку
+${pad}        й до кінця акції він один. Порожнє поле бере колір із
+${pad}        сусіднього набору — того, який задали першим.
+${pad}    - label: "Колір цифр на таймері"
+${pad}      name: "timerText"
+${pad}      widget: "color"
+${pad}      required: false
+${pad}      allowInput: true
 ${pad}    - label: "Розмір заголовка"
 ${pad}      name: "titleSize"
 ${pad}      widget: "select"
@@ -91,6 +118,18 @@ ${pad}        - { label: "Менший", value: "s" }
 ${pad}        - { label: "Звичайний", value: "m" }
 ${pad}        - { label: "Більший", value: "l" }
 ${pad}        - { label: "Найбільший", value: "xl" }
+${pad}    - label: "Розмір опису"
+${pad}      name: "textSize"
+${pad}      widget: "select"
+${pad}      required: false
+${pad}      options:
+${pad}        - { label: "Менший", value: "s" }
+${pad}        - { label: "Звичайний", value: "m" }
+${pad}        - { label: "Більший", value: "l" }
+${pad}        - { label: "Найбільший", value: "xl" }
+${pad}      hint: >
+${pad}        Абзац під заголовком. Множник від звичайного розміру
+${pad}        саме цього блока — на телефоні він теж лишиться доречним.
 ${pad}    - label: "Вирівнювання"
 ${pad}      name: "align"
 ${pad}      widget: "select"

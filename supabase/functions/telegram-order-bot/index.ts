@@ -72,6 +72,59 @@ function escapeHtml(value) {
     .replace(/>/g, "&gt;");
 }
 
+// Ціна дня — те саме правило, що saleActive() у assets/js/common.js.
+//
+// ЧОМУ ТУТ ЩЕ ОДНА КОПІЯ. Бот — окремий рантайм: він не бачить ні
+// коду сайту, ні збірки. Дані він бере з того самого
+// data/products.json, тобто ціна дня в нього ПРИЇЖДЖАЄ; бракувало
+// тільки правила, як її читати.
+//
+// ЧОМУ ЦЕ НЕ ДРІБНИЦЯ. Суму замовлення перераховує база (тригер із
+// 029) за вікном із public.prices. Поки бот продавав за 9 000, а база
+// рахувала 8 600, КОЖНЕ замовлення з бота під час сейлу отримувало б
+// позначку «сума не збігається» — ту саму, якою ловлять підміну ціни.
+//
+// Копії пов'язані тестом: tests/test-deal-price.js звіряє всі чотири
+// на тих самих межах вікна.
+function saleActive(product, now) {
+
+  const sale = product && product.sale;
+
+  if (!sale || !(Number(sale.price) > 0)) return false;
+
+  const moment = Number.isFinite(now) ? now : Date.now();
+
+  if (sale.from) {
+    const starts = new Date(sale.from).getTime();
+    if (Number.isFinite(starts) && moment < starts) return false;
+  }
+
+  if (sale.to) {
+    const ends = new Date(sale.to).getTime();
+    if (Number.isFinite(ends) && moment >= ends) return false;
+  }
+
+  return true;
+
+}
+
+function priceNow(product) {
+
+  if (saleActive(product)) return Number(product.sale.price);
+
+  return Number(product?.price) || 0;
+
+}
+
+// Перекреслена ціна: поки йде ціна дня — звичайна ціна товару.
+function oldPriceNow(product) {
+
+  if (saleActive(product)) return Number(product?.price) || 0;
+
+  return Number(product?.oldPrice) || 0;
+
+}
+
 function money(value) {
   const n = Number(value);
   return Number.isFinite(n) ? `${n.toLocaleString("uk-UA")} грн` : "—";
@@ -364,13 +417,18 @@ function formatProductCard(product, siteUrl) {
     ? first.sizes
     : (Array.isArray(product.sizes) ? product.sizes : []);
 
-  const discount = (product.oldPrice && product.price && Number(product.oldPrice) > Number(product.price))
-    ? Math.round((1 - Number(product.price) / Number(product.oldPrice)) * 100)
+  // Ціна дня: картка в боті мусить показувати те саме, що картка на
+  // сайті, — інакше людина бачить дві ціни того самого товару.
+  const shown = priceNow(product);
+  const wasPrice = oldPriceNow(product);
+
+  const discount = wasPrice > shown
+    ? Math.round((1 - shown / wasPrice) * 100)
     : 0;
 
   const priceLine = discount > 0
-    ? `<b>${money(product.price)}</b>  <s>${money(product.oldPrice)}</s>  −${discount}%`
-    : `<b>${money(product.price)}</b>`;
+    ? `<b>${money(shown)}</b>  <s>${money(wasPrice)}</s>  −${discount}%`
+    : `<b>${money(shown)}</b>`;
 
   const description = String(product.description ?? "").trim();
   const shortDescription = description.length > 320
@@ -677,8 +735,8 @@ function sizesOf(product, color) {
 
 function computeTotals(product, qty, deliveryPrice) {
 
-  const price = Number(product?.price) || 0;
-  const oldPrice = Number(product?.oldPrice) || 0;
+  const price = priceNow(product);
+  const oldPrice = oldPriceNow(product);
   const count = Math.max(1, Number(qty) || 1);
 
   const subtotal = (oldPrice > price ? oldPrice : price) * count;
@@ -994,8 +1052,8 @@ function buildOrderRow(product, session, orderNumber) {
       id: product.id,
       title: product.title,
       brand: product.brand ?? null,
-      price: Number(product.price) || 0,
-      oldPrice: Number(product.oldPrice) || null,
+      price: priceNow(product),
+      oldPrice: oldPriceNow(product) || null,
       qty: Math.max(1, Number(session.qty) || 1),
       color: session.color ?? null,
       size: session.size ?? null,

@@ -21,6 +21,11 @@ let scrollCalls = [];
 window.scrollTo = opts => { scrollCalls.push(opts.top); };
 
 window.eval(fs.readFileSync(path.join(ROOT, "assets/js/common.js"), "utf8").match(/function escapeHtml[\s\S]*?\n}\n/)[0]);
+// plural()/pluralProducts() теж у common.js: на сайті файл
+// підключений повністю, у тесті додаємо явно — без них лічильник
+// товарів у catalog.js падає з ReferenceError.
+window.eval(fs.readFileSync(path.join(ROOT, "assets/js/common.js"), "utf8").match(/function plural\(count[\s\S]*?\n}\n/)[0]);
+window.eval(fs.readFileSync(path.join(ROOT, "assets/js/common.js"), "utf8").match(/function pluralProducts[\s\S]*?\n}\n/)[0]);
 // availableFacets() використовує getProductColors з common.js —
 // на сайті цей файл підключений повністю, у тесті підвантажуємо явно
 window.eval(fs.readFileSync(path.join(ROOT,"assets/js/common.js"),"utf8").match(/function getProductColors[\s\S]*?\n}\n/)[0]);
@@ -37,6 +42,11 @@ const _cs = fs.readFileSync(path.join(ROOT,"assets/js/common.js"),"utf8");
 // (jsdom не ділить прив'язання) — привласнюємо прямо у window
 window.eval("window.FALLBACK_SIZE_GROUPS = " +
     _cs.match(/const FALLBACK_SIZE_GROUPS = (\[[\s\S]*?\n\]);\n/)[1] + ";");
+// Ціна дня: ціну рахує common.js, а малюють її ui.js і catalog.js.
+window.eval(_cs.match(/function saleActive[\s\S]*?\n}\n/)[0]);
+window.eval(_cs.match(/function priceNow[\s\S]*?\n}\n/)[0]);
+window.eval(_cs.match(/function oldPriceNow[\s\S]*?\n}\n/)[0]);
+window.eval(_cs.match(/function discountPercent[\s\S]*?\n}\n/)[0]);
 window.eval(_cs.match(/function resolveGroupCategories[\s\S]*?\n}\n/)[0]);
 window.eval(_cs.match(/function findSizeGroupForCategory[\s\S]*?\n}\n/)[0]);
 window.eval(_cs.match(/function getProductGenders[\s\S]*?\n}\n/)[0]);

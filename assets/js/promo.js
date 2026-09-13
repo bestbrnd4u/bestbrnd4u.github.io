@@ -63,7 +63,14 @@ async function initPromoPage() {
 
         loader.hidden = true;
 
-        if (!promo) {
+        // Завершена акція поводиться як неіснуюча — і текст у блоці
+        // «не знайдено» це вже передбачає слово в слово: «Цю акцію не
+        // знайдено або її вже завершено».
+        //
+        // Окремий стан тут був би гіршим: на сторінці, де все одно
+        // нічого не купиш, різниця між «не було» і «скінчилось»
+        // покупцю нічого не дає, а посилання в каталог дає.
+        if (!promo || !promoVisible(promo)) {
             showPromoNotFound();
             return;
         }
@@ -103,6 +110,104 @@ function showPromoNotFound() {
 
 }
 
+// Відлік на сторінці акції.
+//
+// ЧОМУ ТАЙМЕР ПЕРЕРАХОВУЄ СТАН, А НЕ ПРОСТО ЦИФРУ
+// ------------------------------------------------
+// Сторінку можуть відкрити за хвилину до опівночі й дивитись, як
+// відлік добігає нуля. Якби ми лише зменшували число, о 00:00
+// покупець побачив би «почнеться через 00:00» і нічого більше.
+// Тому на кожному кроці питаємо стан заново: анонс сам стає
+// «лишилось», а кінець — ховає відлік і перезавантажує сторінку, щоб
+// зникли ціни зі знижкою.
+//
+// ПЕРЕЗАВАНТАЖЕННЯ ЛИШЕ В КІНЦІ І ЛИШЕ ОДИН РАЗ. Смикати сторінку під
+// читачем неввічливо, але показувати перекреслені ціни акції, яка вже
+// скінчилась, — гірше: це вже не оформлення, а неправдива ціна.
+function startPromoCountdown(promo) {
+
+    const box = document.getElementById("promoCountdown");
+    const labelEl = document.getElementById("promoCountdownLabel");
+    const valueEl = document.getElementById("promoCountdownValue");
+
+    if (!box || !labelEl || !valueEl) return;
+
+    // Прихований в адмінці — блок не показуємо й годинник не заводимо.
+    //
+    // ЯВНИЙ true, а не «немає поля»: акції, створені до появи
+    // перемикача, поля не мають — і мусять показувати відлік, як
+    // показували.
+    if (promo.hideCountdown === true || promo.bannerLayout === "hidden") {
+        box.hidden = true;
+        return;
+    }
+
+    let timer = null;
+
+    // Стан, у якому сторінку намалювали. Усе інше на ній — ціни зі
+    // знижкою, набір товарів — зібране саме під нього.
+    const drawnState = promoTiming(promo).state;
+
+    function draw() {
+
+        const timing = promoTiming(promo);
+
+        // СТАН ЗМІНИВСЯ ПРЯМО ПІД ЧИТАЧЕМ — перемальовуємо сторінку.
+        //
+        // Обидва переходи важать, і обидва міняють не лише напис:
+        //
+        //   анонс → іде   з'являються перекреслені старі ціни
+        //   іде → кінець  акції більше немає, ціни зі знижкою стають
+        //                 неправдою
+        //
+        // Підмінити тут самі лише цифри означало б лишити сторінку в
+        // стані, якого вже немає. Смикати читача неввічливо, але
+        // показувати неправдиву ціну — гірше. Трапляється це щонайбільше
+        // двічі за життя сторінки, рівно на межі.
+        if (timing.state !== drawnState) {
+
+            if (timer) clearTimeout(timer);
+
+            location.reload();
+
+            return;
+
+        }
+
+        // Немає до чого відлічувати — акція без дат або без кінця.
+        // Ховаємо блок і зупиняємось: мінятись нема чому.
+        if (!timing.until) {
+            box.hidden = true;
+            return;
+        }
+
+        labelEl.textContent = timing.state === "announced" ? "Почнеться через" : "Лишилось";
+        valueEl.textContent = promoCountdown(timing.until);
+
+        box.dataset.state = timing.state;
+        box.hidden = false;
+
+        timer = setTimeout(draw, promoTickMs(timing.until));
+
+    }
+
+    // Повернулись із фонової вкладки — домальовуємо рядок одразу, не
+    // чекаючи задушеного браузером ходу. Сам годинник у фоні не
+    // спиняємо; чому саме так — у tickPromoTimers() в assets/js/app.js.
+    document.addEventListener("visibilitychange", () => {
+
+        if (document.hidden) return;
+
+        if (timer) clearTimeout(timer);
+
+        draw();
+
+    });
+
+    draw();
+
+}
+
 function updatePromoSeoMetadata(promo) {
 
     // slug може містити кирилицю — canonical/og:url мають бути
@@ -110,9 +215,10 @@ function updatePromoSeoMetadata(promo) {
     // за якою реально відкрита сторінка
     const pageUrl = `${SITE_URL}/promo?id=${encodeURIComponent(promo.slug)}`;
 
-    const title = `${promo.title} | BestBrnd4u`;
+    const title = `${promoHeading(promo)} | BestBrnd4u`;
 
-    const description = truncateForMeta(promo.text || `Акція ${promo.title} в інтернет-магазині BestBrnd4u`);
+    const description = truncateForMeta(promo.text
+        || `${promoHeading(promo)} в інтернет-магазині BestBrnd4u`);
 
     setMetaByName("description", description);
 
@@ -128,10 +234,39 @@ function updatePromoSeoMetadata(promo) {
 
 }
 
+// НАЗВА АКЦІЇ СЛОВАМИ — НЕ ТЕ САМЕ, ЩО НАПИС НА БАНЕРІ.
+//
+// Напис на банері можна прибрати: він часто вже намальований на
+// самому фото. Але вкладка браузера, хлібні крихти й рядок у видачі
+// Google порожніми бути не можуть — там зʼявилось би « | BestBrnd4u»
+// і «Акція  в інтернет-магазині».
+//
+// Тому беремо перше, що є: заголовок, опис, бренд — і лише потім
+// безлике слово «Акція».
+function promoHeading(promo) {
+
+    // Напис для ГОЛОВНОЇ теж у переліку, і стоїть одразу за банерним.
+    //
+    // Саме заради цього випадку: на банері напису немає (він уже на
+    // фото), а на головній є. Без цього рядка вкладка браузера й
+    // рядок у видачі Google діставали б безлике «Акція», хоча назва
+    // акції в записі є.
+    return [
+        promo && promo.title,
+        promo && promo.homeTitle,
+        promo && promo.text,
+        promo && promo.homeText,
+        promo && promo.brand
+    ]
+        .map(value => String(value || "").trim())
+        .find(Boolean) || "Акція";
+
+}
+
 function renderPromoHero(promo) {
 
-    document.getElementById("pageTitle").textContent = `${promo.title} | BestBrnd4u`;
-    document.getElementById("breadcrumbTitle").textContent = promo.title;
+    document.getElementById("pageTitle").textContent = `${promoHeading(promo)} | BestBrnd4u`;
+    document.getElementById("breadcrumbTitle").textContent = promoHeading(promo);
 
     updatePromoSeoMetadata(promo);
 
@@ -143,7 +278,53 @@ function renderPromoHero(promo) {
     const linkEl = document.getElementById("promoHeroLink");
     const linkTextEl = document.getElementById("promoHeroLinkText");
 
-    const overlay = "linear-gradient(rgba(17,24,39,.55), rgba(17,24,39,.55))";
+    // ЩО МИ ВЗАГАЛІ ПИШЕМО ПОВЕРХ ФОТО.
+    //
+    // Коли весь напис уже намальований на самій картинці, кожен
+    // елемент згори — завада: заголовок лягає на заголовок, кнопка
+    // закриває товар. Тому всі чотири прибираються порожнім полем, а
+    // таймер — перемикачем.
+    // «Лише картинка» — один вимикач на всю накладку.
+    //
+    // ЧОМУ ОКРЕМО ВІД ПОРОЖНІХ ПОЛІВ. Заголовок і опис потрібні ще й
+    // блоку на головній, вкладці браузера й рядку у видачі Google.
+    // Чистити банер, спорожнюючи їх, означало б заразом знімати напис
+    // із головної — а там картинки немає, і текст там єдине, що
+    // пояснює акцію.
+    const bare = promo.bannerLayout === "hidden";
+
+    // Бейдж може бути вимкнений саме тут: на банері він часто вже
+    // намальований на самому фото, і другий поверх нього зайвий.
+    const badgeHere = (promo.badgePlaces || "both") !== "home"
+        && (promo.badgePlaces || "both") !== "none";
+
+    const hasBadge = !bare && badgeHere && Boolean(promo.badge);
+    const hasTitle = !bare && Boolean(promo.title);
+    const hasText = !bare && Boolean(promo.text);
+    const hasButton = !bare && Boolean(promo.buttonText);
+    const hasTimer = !bare && promo.hideCountdown !== true
+        && Boolean(promoTiming(promo).until);
+
+    const hasOverlay = hasBadge || hasTitle || hasText || hasButton || hasTimer;
+
+    // Темна заливка існує рівно заради читабельності білого тексту.
+    // Немає тексту — немає й причини приглушувати фото на 55%: воно
+    // для того й завантажене, щоб його було видно.
+    // Затемнення фото — тепер із адмінки.
+    //
+    // Воно існує заради читабельності білого напису. Коли напису
+    // немає, гасити фото нема чого — тому нуль; а коли є, силу
+    // обирає власник: на темному знімку вистачає 20%, на світлому
+    // потрібні всі 55.
+    const dim = Number.isFinite(Number(promo.bannerDim))
+        ? Math.max(0, Math.min(80, Number(promo.bannerDim)))
+        : 55;
+
+    const wash = hasOverlay ? dim / 100 : 0;
+
+    const overlay = wash > 0
+        ? `linear-gradient(rgba(17,24,39,${wash}), rgba(17,24,39,${wash}))`
+        : "";
 
     // Банер цієї сторінки — окреме поле "Фото на сторінці акції", а
     // не те саме фото, що й тизер на головній. Причина: тизер і цей
@@ -156,23 +337,65 @@ function renderPromoHero(promo) {
     const desktopImage = promo.promoPageImage || promo.image;
     const mobileImage = promo.promoPageImageMobile || promo.promoPageImage || promo.imageMobile || promo.image;
 
-    banner.style.setProperty("--banner-img-desktop", `${overlay}, url('${desktopImage}')`);
-    banner.style.setProperty("--banner-img-mobile", `${overlay}, url('${mobileImage}')`);
+    const layered = src => (overlay ? `${overlay}, url('${src}')` : `url('${src}')`);
 
-    if (promo.badge) {
-        badgeEl.textContent = promo.badge;
-        badgeEl.hidden = false;
+    banner.style.setProperty("--banner-img-desktop", layered(desktopImage));
+    banner.style.setProperty("--banner-img-mobile", layered(mobileImage));
+
+    // Куди покласти напис. Порожнє поле — «ліворуч посередині», саме
+    // так малювались усі акції до появи вибору.
+    banner.dataset.layout = promo.bannerLayout || "left-middle";
+
+    // Кольори з адмінки — ті самі, що на головній, але СВОЇМ набором:
+    // на банері текст лежить на фото, тож і кольори тут інші.
+    // Раніше сторінка акції оформлення не читала взагалі — вибраний в
+    // адмінці колір діяв на головній і мовчки не діяв тут.
+    if (window.TextStyles) {
+
+        // Заливка й цифри таймера — виняток: порожнє поле бере колір
+        // із набору «на головній». Чому саме вони — в inheritTimer()
+        // у assets/js/text-styles.js.
+        const vars = window.TextStyles.styleVars(
+            window.TextStyles.inheritTimer(promo.style, promo.homeStyle));
+        const names = Object.keys(vars);
+
+        banner.classList.toggle("has-style", names.length > 0);
+
+        names.forEach(name => banner.style.setProperty(name, vars[name]));
+
+        window.TextStyles.ensureFonts([promo.style]);
+
     }
 
-    titleEl.textContent = promo.title;
+    // Порожній банер не тримає висоту сам: у ньому немає вмісту, а
+    // фото — фон. Без цього прапорця смуга схлопнулась би в нуль.
+    banner.classList.toggle("promo-hero-bare", !hasOverlay);
 
-    if (promo.text) {
+    badgeEl.hidden = !hasBadge;
+
+    if (hasBadge) badgeEl.textContent = promo.badge;
+
+    startPromoCountdown(promo);
+
+    // Порожній заголовок — не пишемо нічого. Раніше сюди йшов
+    // undefined і на банері зʼявлявся порожній h1 заввишки в рядок.
+    titleEl.hidden = !hasTitle;
+
+    if (hasTitle) titleEl.textContent = promo.title;
+
+    if (hasText) {
         textEl.textContent = promo.text;
         textEl.hidden = false;
     }
 
-    if (promo.link) linkEl.href = promo.link;
-    if (promo.buttonText) linkTextEl.textContent = promo.buttonText;
+    // Кнопки немає, поки немає напису на ній. Окремого перемикача не
+    // робимо: кнопка без тексту й так не кнопка.
+    linkEl.hidden = !hasButton;
+
+    if (hasButton) {
+        linkTextEl.textContent = promo.buttonText;
+        linkEl.href = promo.link || `catalog`;
+    }
 
     heroSection.hidden = false;
 
@@ -206,7 +429,14 @@ function setupPromoCatalog(promo, allProducts, categoryDepartments, departmentOf
     // на цій сторінці, сам товар у каталозі це не змінює
     curated = curated.map(product => {
 
-        if (product.oldPrice || !promo.discountPercent) return product;
+        // promoDiscountActive, а не просто discountPercent: в
+        // АНОНСОВАНІЙ акції знижки ще немає, і перекреслена стара ціна
+        // за тиждень до початку — це обіцянка, видана за факт.
+        // Покупець, який прийде по ній сьогодні, заплатить повну.
+        // oldPriceNow, а не product.oldPrice: поки йде ціна дня,
+        // перекреслювати вже є що (звичайну ціну товару), і другий
+        // «старий» цінник поверх неї був би вигаданим.
+        if (oldPriceNow(product) || !promoDiscountActive(promo)) return product;
 
         const syntheticOldPrice = Math.round(product.price / (1 - promo.discountPercent / 100));
 

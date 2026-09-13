@@ -469,10 +469,187 @@ function renderAdvantages(advantages) {
 
 }
 
+// НАПИС АКЦІЇ НА ГОЛОВНІЙ.
+//
+// ЧОМУ ОКРЕМО ВІД promo.title. Два місця — дві різні задачі. На
+// банері сторінки акції текст часто вже намальований на самому фото,
+// і писати його зверху вдруге нема сенсу. А на головній свого фото
+// або немає зовсім (блок «Ціна дня»), або воно маленьке — і текст там
+// єдине, що пояснює акцію.
+//
+// Поки поле було одне, вибору не існувало: чистиш банер — гасне
+// головна.
+//
+// Порожньо — беремо загальні «Заголовок» і «Опис», тобто вже
+// опубліковані акції нічого не помічають.
+// Чи показувати бейдж у цьому місці.
+//
+// Банер часто вже має намальовану позначку на самому фото — тоді наша
+// друга поверх нього зайва. А на головній свого фото немає, і бейдж
+// там єдине, що пояснює, чому ціна інша. Порожнє поле — «і там, і
+// там», як поводились усі акції до появи вибору.
+function promoBadgeHere(promo, place) {
+
+    const where = (promo && promo.badgePlaces) || "both";
+
+    return where === "both" || where === place;
+
+}
+
+// Оформлення блока на ГОЛОВНІЙ — ТІЛЬКИ свій набір.
+//
+// БУЛО: два набори зливались, homeStyle перекривав те, що задано в
+// style. Задумано було як зручність — «постав колір один раз, а на
+// головній підправ лише те, що має відрізнятись».
+//
+// На практиці виходило навпаки. Кольори для банера підбирають під
+// ФОТО: банер темний, напис світлий. Головна — світла сторінка, і той
+// самий напис на ній зникає. Червоний #ff0000, обраний для банера,
+// приїжджав на головну разом із заголовком і описом, і щоб його там
+// НЕ БУЛО, доводилось окремо задавати колір головної. Тобто набір «на
+// головній» доводилось заповнювати не тоді, коли хочеш щось змінити,
+// а тоді, коли хочеш, щоб нічого не змінилось.
+//
+// Тепер набори незалежні: «Оформлення тексту і кнопки» — банер
+// сторінки акції, «Кольори на головній» — головна. Порожній набір =
+// звичайний вигляд сайту, а не чужі кольори.
+function promoHomeStyle(promo) {
+
+    if (!promo) return null;
+
+    if (!window.TextStyles) return promo.homeStyle || null;
+
+    // Виняток — заливка й цифри таймера: плашка виглядає однаково в
+    // обох місцях, тож порожнє поле бере колір із сусіднього набору.
+    // Пояснення цілком — в inheritTimer() у assets/js/text-styles.js.
+    return window.TextStyles.inheritTimer(promo.homeStyle, promo.style);
+
+}
+
+function promoHomeTitle(promo) {
+
+    return String((promo && promo.homeTitle) || (promo && promo.title) || "").trim();
+
+}
+
+function promoHomeText(promo) {
+
+    return String((promo && promo.homeText) || (promo && promo.text) || "").trim();
+
+}
+
+// -------------------------------------------------------------
+// Відлік на банерах головної
+// -------------------------------------------------------------
+//
+// НА РІВНІ ФАЙЛУ, А НЕ ВСЕРЕДИНІ initPromotions. Спершу ці дві
+// функції жили в ній — і слайдер із великим банером, які
+// малюються окремими функціями, падали на ReferenceError: таймер
+// їм видно не було, а разом із ним зникав і весь банер.
+// Помилка мовчазна: блок просто не з'являвся на сторінці.
+// Відлік на банері головної — той самий елемент для всіх
+// чотирьох типів: картка, слайдер, банер із товарами,
+// компактний. Типів може стати більше, і згадувати про таймер
+// у кожному ніхто не буде.
+//
+// Порожньо, якщо в акції немає розкладу, — тобто в усіх, що
+// були до його появи.
+function promoTimerTag(promo) {
+
+    // Прихований в адмінці — не малюємо.
+    //
+    // ЯВНИЙ true, а не «немає поля»: акції, створені до появи
+    // перемикача, поля не мають і мусять показувати відлік, як
+    // показували.
+    if (promo && promo.hideCountdown === true) return "";
+
+    const timing = promoTiming(promo);
+
+    if (!timing.until) return "";
+
+    const label = timing.state === "announced" ? "Почнеться через" : "Лишилось";
+
+    return `<span class="promo-countdown" data-state="${timing.state}"`
+        + ` data-until="${timing.until}">`
+        + `<span class="promo-countdown-label">${label}</span>`
+        + `<span class="promo-countdown-value">${promoCountdown(timing.until)}</span>`
+        + `</span>`;
+
+}
+
+// Один хід годинника на всі банери одразу.
+//
+// ЧОМУ НЕ ТАЙМЕР НА КОЖЕН. Акцій на головній буває чотири-п'ять,
+// і п'ять окремих setTimeout — це п'ять пробуджень телефона
+// замість одного. Крок беремо найдрібніший із потрібних: поки
+// хоч одному банеру лишилась година, цокаємо щосекунди.
+let promoTimerHandle = null;
+
+function tickPromoTimers() {
+
+    // Другий виклик не має заводити другий годинник: initPromotions()
+    // кличе цю функцію після малювання, а visibilitychange нижче —
+    // щоразу, коли вкладку повертають. Без цього рядка після кількох
+    // перемикань вкладок тикало б кілька ланцюжків одночасно.
+    if (promoTimerHandle) {
+        clearTimeout(promoTimerHandle);
+        promoTimerHandle = null;
+    }
+
+    const boxes = [...document.querySelectorAll(".promo-countdown[data-until]")];
+
+    if (!boxes.length) return;
+
+    let step = MINUTE_MS;
+
+    boxes.forEach(box => {
+
+        const until = Number(box.dataset.until);
+        const left = promoCountdown(until);
+
+        // Відлік добіг нуля — стан акції змінився, а разом із
+        // ним і ціни зі знижкою. Перемальовуємо сторінку, бо
+        // підмінити тут самі цифри означало б лишити головну в
+        // стані, якого вже немає.
+        if (!left) {
+            location.reload();
+            return;
+        }
+
+        box.querySelector(".promo-countdown-value").textContent = left;
+
+        step = Math.min(step, promoTickMs(until));
+
+    });
+
+    // ГОДИННИК НЕ СПИНЯЄМО НАВІТЬ У ФОНІ — І ЦЕ НАВМИСНО.
+    //
+    // Спокуса була: відлік іде щосекунди, тож чому б не зупиняти його
+    // на прихованій вкладці. Я так і зробив — і на перевірці побачив,
+    // що у вбудованому браузері document.hidden лишається true на
+    // цілком видимій сторінці. Тобто пауза давала б рівно той симптом,
+    // заради якого все це й переписано: нерухомий відлік.
+    //
+    // Батарею й без нас бережуть самі браузери: у прихованій вкладці
+    // таймери душаться до одного ходу на хвилину, а через кілька
+    // хвилин — ще сильніше. Нам лишається інше й корисніше — щойно
+    // вкладку повертають, домалювати рядок тієї ж миті, не чекаючи
+    // задушеного ходу.
+    promoTimerHandle = setTimeout(tickPromoTimers, step);
+
+}
+
+document.addEventListener("visibilitychange", () => {
+
+    if (!document.hidden) tickPromoTimers();
+
+});
+
 initHome();
 initHomeContent();
 initPromotions();
 initCollections();
+
 
 // -------------------------
 // Розділ "Акції" на головній (data/promotions.json —
@@ -494,15 +671,32 @@ async function initPromotions() {
             throw new Error("Не вдалося завантажити акції");
         }
 
-        const promotions = await response.json();
 
-        if (!Array.isArray(promotions) || promotions.length === 0) {
+        const all = await response.json();
+
+        // Завершені акції зникають самі — у цьому й сенс дати кінця.
+        // Анонсовані лишаються: заради них розклад і робився.
+        //
+        // Фільтр стоїть ДО всього іншого, разом зі статистикою: інакше
+        // показ завершеної акції потрапляв би в аналітику, і «перегляди
+        // банера» рахували б те, чого ніхто не бачив.
+        const promotions = Array.isArray(all)
+            ? all.filter(promo => promoVisible(promo))
+            : [];
+
+        if (!promotions.length) {
             return;
         }
 
-        // шрифти, обрані в акціях (вантажаться лише ті, що справді є)
+        // Шрифти, обрані в акціях (вантажаться лише ті, що справді є).
+        //
+        // ОБИДВА НАБОРИ, не лише style: відколи «Кольори на головній»
+        // перестали домішуватись до спільного набору, шрифт для блока
+        // на головній береться саме звідти — і без цього рядка він
+        // мовчки не завантажився б.
         if (window.TextStyles) {
-            window.TextStyles.ensureFonts(promotions.map(p => p.style));
+            window.TextStyles.ensureFonts(
+                promotions.reduce((all, p) => all.concat([p.style, p.homeStyle]), []));
         }
 
         // Статистика: акції на головній.
@@ -534,21 +728,23 @@ async function initPromotions() {
         const heroSliderPromos = promotions.filter(promo => promo.displayType === "hero_slider");
         const bannersWithProducts = promotions.filter(promo => promo.displayType === "banner_products");
         const compactBanners = promotions.filter(promo => promo.displayType === "banner_compact");
+        const dealBlocks = promotions.filter(promo => promo.displayType === "deal_of_day");
 
         if (regular.length) {
 
             grid.innerHTML = regular.map(promo => `
-                <a href="promo?id=${encodeURIComponent(promo.slug)}" class="promo-card${blockStyleClass(promo.style)}" style="${blockStyleAttr(promo.style)}">
+                <a href="promo?id=${encodeURIComponent(promo.slug)}" class="promo-card${blockStyleClass(promoHomeStyle(promo))}" style="${blockStyleAttr(promoHomeStyle(promo))}">
 
                     <div class="promo-card-image">
                         ${promoPicture(promo, 700)}
-                        ${promo.badge ? `<span class="promo-card-badge">${promo.badge}</span>` : ""}
+                        ${promo.badge && promoBadgeHere(promo, "home") ? `<span class="promo-card-badge">${promo.badge}</span>` : ""}
+                        ${promoTimerTag(promo)}
                     </div>
 
                     <div class="promo-card-info">
-                        <h3>${promo.title}</h3>
-                        ${promo.text ? `<p>${promo.text}</p>` : ""}
-                        <span class="promo-card-link">${promo.buttonText || "Дивитись усі товари"} →</span>
+                        <h3>${promoHomeTitle(promo)}</h3>
+                        ${promoHomeText(promo) ? `<p>${promoHomeText(promo)}</p>` : ""}
+                        ${promo.buttonText ? `<span class="promo-card-link">${promo.buttonText} →</span>` : ""}
                     </div>
 
                 </a>
@@ -569,6 +765,14 @@ async function initPromotions() {
         if (compactBanners.length) {
             renderCompactPromotions(compactBanners);
         }
+
+        if (dealBlocks.length) {
+            await renderDealPromotions(dealBlocks);
+        }
+
+        // Після всіх чотирьох типів: банери намальовані, тепер їх
+        // відліки можна вести одним ходом годинника.
+        tickPromoTimers();
 
     } catch (error) {
 
@@ -612,21 +816,23 @@ function renderHeroSliderPromotions(heroPromotions) {
         `).join("");
 
         return `
-        <div class="promo-hero-slide${blockStyleClass(promo.style)}" style="${blockStyleAttr(promo.style)}">
+        <div class="promo-hero-slide${blockStyleClass(promoHomeStyle(promo))}" style="${blockStyleAttr(promoHomeStyle(promo))}">
 
             <div class="promo-hero-slide-content">
 
                 ${promo.badge ? `<span class="promo-hero-slide-badge">${promo.badge}</span>` : ""}
+                ${promoTimerTag(promo)}
 
-                <h2>${promo.title}</h2>
+                <h2>${promoHomeTitle(promo)}</h2>
 
-                ${promo.text ? `<p>${promo.text}</p>` : ""}
+                ${promoHomeText(promo) ? `<p>${promoHomeText(promo)}</p>` : ""}
 
                 ${genderButtons.length ? `<div class="promo-hero-quicklinks">${quicklinksHtml}</div>` : ""}
 
+                ${promo.buttonText ? `
                 <a href="${promoLink}" class="btn promo-hero-cta">
-                    ${promo.buttonText || "Дивитись усі товари"} →
-                </a>
+                    ${promo.buttonText} →
+                </a>` : ""}
 
             </div>
 
@@ -764,7 +970,7 @@ async function renderFeaturedPromotions(featuredPromotions) {
 
                 <div class="container">
 
-                    <div class="brand-campaign-banner${blockStyleClass(promo.style)}" style="${blockStyleAttr(promo.style)}">
+                    <div class="brand-campaign-banner${blockStyleClass(promoHomeStyle(promo))}" style="${blockStyleAttr(promoHomeStyle(promo))}">
 
                         <a href="promo?id=${encodeURIComponent(promo.slug)}" class="brand-campaign-image">
                             ${promoPicture(promo, 700)}
@@ -772,15 +978,17 @@ async function renderFeaturedPromotions(featuredPromotions) {
 
                         <div class="brand-campaign-content">
 
-                            ${promo.badge ? `<span class="brand-campaign-eyebrow">${promo.badge}</span>` : ""}
+                            ${promo.badge && promoBadgeHere(promo, "home") ? `<span class="brand-campaign-eyebrow">${promo.badge}</span>` : ""}
+                            ${promoTimerTag(promo)}
 
-                            <h2>${promo.title}</h2>
+                            <h2>${promoHomeTitle(promo)}</h2>
 
-                            ${promo.text ? `<p>${promo.text}</p>` : ""}
+                            ${promoHomeText(promo) ? `<p>${promoHomeText(promo)}</p>` : ""}
 
+                            ${promo.buttonText ? `
                             <a href="promo?id=${encodeURIComponent(promo.slug)}" class="btn">
-                                ${promo.buttonText || "Дивитись усі товари"}
-                            </a>
+                                ${promo.buttonText}
+                            </a>` : ""}
 
                         </div>
 
@@ -854,18 +1062,19 @@ function renderCompactPromotions(compactPromotions) {
                          кнопка збоку. -->
                     <a href="promo?id=${encodeURIComponent(promo.slug)}"
                        class="brand-teaser-image"
-                       aria-label="${promo.title}">
+                       aria-label="${promoHomeTitle(promo)}">
                         ${promoPicture(promo, 700)}
                     </a>
 
                     <div class="brand-teaser-content">
 
-                        <p class="brand-teaser-text">${promo.title}</p>
+                        <p class="brand-teaser-text">${promoHomeTitle(promo)}</p>
 
+                        ${promo.buttonText ? `
                         <a href="promo?id=${encodeURIComponent(promo.slug)}" class="brand-teaser-btn">
-                            ${promo.buttonText || "Дивитись все"}
+                            ${promo.buttonText}
                             <span class="brand-teaser-arrow">→</span>
-                        </a>
+                        </a>` : ""}
 
                     </div>
 
@@ -875,6 +1084,160 @@ function renderCompactPromotions(compactPromotions) {
 
         </div>
     `).join("");
+
+}
+
+// -------------------------
+// Ціна дня (displayType: "deal_of_day") — блок на головній із
+// великим відліком і товарами, які купують просто звідси
+//
+// ЧОМУ ОКРЕМИЙ ТИП, А НЕ «БАНЕР ІЗ ТОВАРАМИ»
+// -------------------------------------------
+// Тому що тут головне — не банер, а годинник. «Тільки сьогодні,
+// сумка в одному екземплярі» живе доти, доки йде відлік, і читається
+// з першого погляду: скільки лишилось, скільки коштує зараз, скільки
+// коштувало вчора. Банер із товарами показує колекцію — це інша
+// розмова, і змішувати їх означало б зробити обидві тихішими.
+//
+// Товарів може бути один або кілька — розмітка та сама. Одна сумка
+// за 8 600 і ряд із пʼяти речей відрізняються лише кількістю карток.
+//
+// КНОПКА «КУПИТИ» — ЗВИЧАЙНА КАРТКА ТОВАРУ.
+// createProductCard() уже несе і кнопку, і вибір кольору з розміром,
+// і ціну через priceNow(). Власна картка тут означала б другий опис
+// того самого — і першу ж зміну, яку забудуть перенести.
+// -------------------------
+
+async function renderDealPromotions(dealPromotions) {
+
+    const section = document.getElementById("dealPromotionsSection");
+
+    if (!section) return;
+
+    let allProducts = [];
+    let departmentOf = new Map();
+
+    try {
+
+        const [products, deptMap] = await Promise.all([
+            loadCatalog(),
+            loadDepartmentOf()
+        ]);
+
+        allProducts = products;
+        departmentOf = deptMap;
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
+
+    section.innerHTML = dealPromotions.map(promo => {
+
+        // ЛИШЕ ТІ ТОВАРИ, У ЯКИХ ЦІНА ДНЯ СПРАВДІ Є.
+        //
+        // Акція може підхоплювати цілий бренд або розділ — так
+        // влаштовані всі інші способи показу. Але ціну дня збірка
+        // ставить рівно на обраний список (scripts/promo-deals.js), і
+        // блок «ціна дня» з двадцяти шести карток, де знижена одна,
+        // обіцяв би те, чого немає.
+        //
+        // Фільтруємо за списком, а не за saleActive(): в анонсованій
+        // акції ціна ще не діє, а показати, що саме подешевшає, треба
+        // вже — заради цього анонс і робиться.
+        const chosen = Array.isArray(promo.productIds) ? promo.productIds.map(Number) : [];
+
+        const curated = pickPromotionProducts(promo, allProducts, departmentOf)
+            .filter(product => !chosen.length || chosen.includes(Number(product.id)));
+
+        // Без товарів блок не має про що говорити: сам по собі відлік
+        // до ціни, якої ніде не видно, — це обіцянка без предмета.
+        if (!curated.length) return "";
+
+        const timing = promoTiming(promo);
+
+        // Анонс і сейл, що йде, — різні обіцянки, і слова різні.
+        //
+        // Порожній бейдж тут НЕ означає «нічого не писати»: у цьому
+        // блоці позначка — єдине, що пояснює, чому ціна інша. Тому
+        // порожнє поле дає слово за станом акції, а не порожнечу.
+        //
+        // А от вибір «не показувати на головній» означає саме це.
+        const eyebrow = promoBadgeHere(promo, "home")
+            ? (promo.badge || (timing.state === "announced" ? "СКОРО" : "ЦІНА ДНЯ"))
+            : "";
+
+        // Заголовок і опис — навпаки: порожнє поле означає «не
+        // писати». Власник може лишити тільки позначку, таймер і
+        // картки, якщо все інше зайве.
+        const heading = promoHomeTitle(promo);
+        const lead = promoHomeText(promo);
+
+        // Куди що стає — вирішує спільний модуль, а не цей рядок
+        // розмітки. Він же знає, які поєднання неможливі: банер
+        // займає половину блока, а таймер не стане на той самий бік,
+        // що й напис. Те саме правило читають збірка й прев'ю.
+        const place = window.DealLayout
+            ? window.DealLayout.resolve(promo)
+            : { banner: "none", products: promo.dealAlign || "left", text: "left", timer: "right" };
+
+        // Банер у блоці — те саме фото, що прев'ю на головній.
+        // Без фото немає й банера: порожня половина гірша за її
+        // відсутність.
+        const bannerImage = promo.image || promo.imageMobile || "";
+
+        const withBanner = place.banner !== "none" && Boolean(bannerImage);
+
+        // Кнопка на головній — своя. На банері сторінки акції її часто
+        // прибирають, бо напис уже на фото, а тут вона єдиний вхід в
+        // акцію.
+        const moreText = String(promo.homeButtonText || promo.buttonText || "").trim();
+
+        return `
+            <div class="deal-block${blockStyleClass(promoHomeStyle(promo))}" style="${blockStyleAttr(promoHomeStyle(promo))}">
+
+                <div class="container">
+
+                    <div class="deal-head" data-text="${place.text}" data-timer="${place.timer}">
+
+                        <div class="deal-head-text">
+                            ${eyebrow ? `<span class="deal-eyebrow">${eyebrow}</span>` : ""}
+                            ${heading ? `<h2>${heading}</h2>` : ""}
+                            ${lead ? `<p>${lead}</p>` : ""}
+                        </div>
+
+                        ${promoTimerTag(promo)}
+
+                    </div>
+
+                    <div class="deal-body" data-banner="${withBanner ? place.banner : "none"}">
+
+                        ${withBanner ? `
+                        <a href="promo?id=${encodeURIComponent(promo.slug)}" class="deal-banner">
+                            ${promoPicture(promo, 900)}
+                        </a>` : ""}
+
+                        <div class="deal-products products-grid" data-align="${place.products}">
+                            ${curated.map(product => createProductCard(product)).join("")}
+                        </div>
+
+                    </div>
+
+                    ${moreText ? `
+                    <a href="promo?id=${encodeURIComponent(promo.slug)}" class="deal-more">
+                        ${moreText} →
+                    </a>` : ""}
+
+                </div>
+
+            </div>
+        `;
+
+    }).join("");
+
+    if (typeof initProductCarousels === "function") initProductCarousels(section);
+    if (typeof updateFavoriteButtons === "function") updateFavoriteButtons();
 
 }
 
@@ -1020,8 +1383,8 @@ function createCollectionProductCard(product) {
         product.variants?.[0]?.images?.[0] ||
         "assets/images/no-image.png";
 
-    const oldPrice = product.oldPrice
-        ? `<span class="old-price">${formatPrice(product.oldPrice)}</span>`
+    const oldPrice = oldPriceNow(product)
+        ? `<span class="old-price">${formatPrice(oldPriceNow(product))}</span>`
         : "";
 
     return `
@@ -1052,7 +1415,7 @@ function createCollectionProductCard(product) {
                 </a>
 
                 <div class="collection-product-price">
-                    <span class="price">${formatPrice(product.price)}</span>
+                    <span class="price">${formatPrice(priceNow(product))}</span>
                     ${oldPrice}
                 </div>
 

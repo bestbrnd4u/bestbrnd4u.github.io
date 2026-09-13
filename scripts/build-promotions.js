@@ -43,6 +43,37 @@ const OUTPUT_FILE = path.join(ROOT, "data", "promotions.json");
 // Попереднє ім'я лишається в legacySlugs, і сторінка акції знаходить
 // акцію й за ним (див. assets/js/promo.js), після чого підміняє адресу
 // в рядку браузера на канонічну.
+// Дата з адмінки — у придатний для браузера вигляд.
+//
+// Реалізація одна на дві збірки й лежить у scripts/promo-deals.js:
+// ту саму дату читає збірка товарів, коли проставляє ціну дня. Дві
+// копії однієї нормалізації розійшлись би на першому ж граничному
+// випадку — а тут межа це буквально секунда початку сейлу.
+const { promoDate } = require("./promo-deals");
+
+// Дозволені розкладки накладки на банері. Той самий перелік стоїть в
+// admin/config.yml і в CSS (.promo-hero-banner[data-layout]); тест
+// tests/test-promo-banner-layout.js звіряє всі три.
+// Де показувати бейдж і де стоять товари «Ціни дня». Ті самі переліки
+// стоять в admin/config.yml; звіряє їх tests/test-promo-banner-layout.js.
+const BADGE_PLACES = ["both", "home", "promo", "none"];
+
+const DEAL_ALIGNS = ["left", "center", "right"];
+
+// Розкладка блока «Ціна дня» — той самий модуль, що читає сайт і
+// адмінка. Він же каже, які поєднання неможливі.
+const DealLayout = require("../assets/js/deal-layout.js");
+
+const LAYOUTS = [
+    "left-top", "left-middle", "left-bottom",
+    "center-top", "center-middle", "center-bottom",
+    "right-top", "right-middle", "right-bottom",
+    // Окремий випадок: банер лишається самою картинкою. Заголовок і
+    // опис при цьому НЕ порожніють — вони далі потрібні блоку на
+    // головній і рядку у видачі Google.
+    "hidden"
+];
+
 function renameToLatinSlugs(files, dirs) {
 
     const promotionsDir = (dirs && dirs.promotions) || PROMOTIONS_DIR;
@@ -138,9 +169,32 @@ function main() {
         const data = JSON.parse(fs.readFileSync(filePath, "utf8"));
         const slug = file.replace(/\.json$/, "");
 
-        if (!data.title || !data.image || !data.link) {
+        // ЩО САМЕ РОБИТЬ АКЦІЮ ЗАПОВНЕНОЮ.
+        //
+        // Раніше тут вимагались заголовок, фото й посилання кнопки —
+        // і це заважало рівно тому випадку, заради якого банери й
+        // малюють: увесь напис уже на картинці, а сайт має лише
+        // показати її, нічого не дописуючи зверху.
+        //
+        // Тепер вимога одна: акції має бути що показати. Порожній
+        // запис (натиснули «створити» й пішли) далі пропускаємо —
+        // інакше на головній зʼявився б банер нізвідки.
+        const hasProducts = Array.isArray(data.products) && data.products.length > 0;
+
+        if (!data.title && !data.text && !data.image && !hasProducts) {
 
             console.log(`⏭  ПРОПУЩЕНО (не заповнено): ${file}`);
+
+            return;
+
+        }
+
+        // Банер без фото — окремий випадок: показувати нема чого, і
+        // порожня темна смуга на всю ширину гірша за відсутність
+        // блока. «Ціна дня» фото не використовує взагалі.
+        if (!data.image && data.displayType !== "deal_of_day") {
+
+            console.log(`⏭  ПРОПУЩЕНО (немає фото банера): ${file}`);
 
             return;
 
@@ -184,10 +238,46 @@ function main() {
             // без цього поля не ламаються.
             promoPageImage: data.promoPageImage || "",
             promoPageImageMobile: data.promoPageImageMobile || "",
-            buttonText: data.buttonText || "Дивитись усі товари",
+            // ПОРОЖНЄ ПОЛЕ — ЦЕ ВІДПОВІДЬ, А НЕ ПРОГАЛИНА.
+            //
+            // Тут стояло data.buttonText || "Дивитись усі товари", і
+            // через це кнопку не можна було прибрати ніяк: власник
+            // стирав напис, збірка вписувала його назад, сайт малював
+            // кнопку. Зовні виглядало як «поле не працює».
+            //
+            // Тепер порожнє поле не доїжджає до сайту зовсім, і кожен
+            // малювальник ховає кнопку, коли напису немає.
+            ...(String(data.buttonText || "").trim()
+                ? { buttonText: String(data.buttonText).trim() }
+                : {}),
+
+            // Затемнення фото банера, %.
+            //
+            // Темна заливка потрібна, щоб білий напис читався на
+            // світлому фото. Але коли напис уже намальований на самій
+            // картинці, вона лише гасить її. 55 — те, що було завжди.
+            ...(Number.isFinite(Number(data.bannerDim))
+                && String(data.bannerDim).trim() !== ""
+                ? { bannerDim: Math.max(0, Math.min(80, Math.round(Number(data.bannerDim)))) }
+                : {}),
             link: data.link,
             brand: data.brand || "",
             discountPercent: typeof data.discountPercent === "number" ? data.discountPercent : null,
+            // Ціна дня — щоб картка на головній могла показати саме її,
+            // не заглядаючи в товари. Сама ціна доїжджає до товарів
+            // окремо (scripts/promo-deals.js + build-products.js), бо
+            // читати її треба в каталозі й кошику, а не лише тут.
+            ...(Number(data.dealPrice) > 0 ? { dealPrice: Math.round(Number(data.dealPrice)) } : {}),
+            // Розклад акції. Пишемо ЛИШЕ заповнене — щоб в акціях без
+            // розкладу не з'явилось два порожніх рядки (та сама
+            // причина, що в autoBrand нижче).
+            //
+            // Стан рахує браузер, а не збірка: збірка знає лише час
+            // свого запуску, і сейл почався б не опівночі, а під час
+            // наступної збірки. Пояснення — у promoTiming() в
+            // assets/js/common.js.
+            ...(promoDate(data.startsAt) ? { startsAt: promoDate(data.startsAt) } : {}),
+            ...(promoDate(data.endsAt) ? { endsAt: promoDate(data.endsAt) } : {}),
             productIds: Array.isArray(data.products) ? data.products.map(Number) : [],
             // ПРАВИЛА набору, на відміну від productIds вище — знімка.
             //
@@ -227,11 +317,60 @@ function main() {
                 && Object.keys(data.style).length
                 ? { style: data.style }
                 : {}),
-            displayType: ["card", "hero_slider", "banner_products", "banner_compact"].includes(data.displayType)
+            // Окремий напис для головної. Порожнє поле не пишемо:
+            // інакше в кожній акції без нього зʼявилось би два
+            // порожніх рядки, а сайт і так падає назад на title/text.
+            ...(String(data.homeTitle || "").trim() ? { homeTitle: String(data.homeTitle).trim() } : {}),
+            ...(String(data.homeText || "").trim() ? { homeText: String(data.homeText).trim() } : {}),
+            // Де показувати бейдж. Порожнє поле — «і там, і там»,
+            // тобто як поводились усі акції до появи вибору.
+            ...(BADGE_PLACES.includes(data.badgePlaces) ? { badgePlaces: data.badgePlaces } : {}),
+            // Де стоять товари в блоці «Ціна дня».
+            ...(DEAL_ALIGNS.includes(data.dealAlign) ? { dealAlign: data.dealAlign } : {}),
+            // Банер у блоці: ліворуч, праворуч або немає.
+            ...(DealLayout.SIDES.includes(data.dealBanner) ? { dealBanner: data.dealBanner } : {}),
+            // Напис і таймер у шапці блока.
+            ...(DEAL_ALIGNS.includes(data.dealTextAlign) ? { dealTextAlign: data.dealTextAlign } : {}),
+            ...(DealLayout.SIDES.includes(data.dealTimer) ? { dealTimer: data.dealTimer } : {}),
+            // Своя кнопка для головної: на банері акції її часто
+            // прибирають, а тут вона єдиний вхід в акцію.
+            ...(String(data.homeButtonText || "").trim()
+                ? { homeButtonText: String(data.homeButtonText).trim() }
+                : {}),
+            // Свої кольори для головної. Порожній обʼєкт не пишемо:
+            // інакше в кожній акції зʼявився б рядок ні про що.
+            ...(data.homeStyle && typeof data.homeStyle === "object"
+                && Object.keys(data.homeStyle).length
+                ? { homeStyle: data.homeStyle }
+                : {}),
+            // Розкладка накладки на банері. Порожнє — «як було»:
+            // ліворуч посередині, саме так малювались усі акції до
+            // появи цього поля.
+            ...(LAYOUTS.includes(data.bannerLayout) ? { bannerLayout: data.bannerLayout } : {}),
+            // Таймер прибирається ЯВНИМ true. Відсутнє поле означає
+            // «показувати» — інакше всі вже опубліковані акції разом
+            // втратили б відлік.
+            ...(data.hideCountdown === true ? { hideCountdown: true } : {}),
+            displayType: ["card", "hero_slider", "banner_products", "banner_compact", "deal_of_day"].includes(data.displayType)
                 ? data.displayType
                 : "card",
             order: typeof data.order === "number" ? data.order : 1
         });
+
+    });
+
+    // РОЗКЛАДКА: кажемо вголос, якщо два елементи просяться в одне
+    // місце. Не падаємо й не мовчимо — блок малюється осмислено, а
+    // власник бачить, що саме не застосувалось.
+    //
+    // Те саме правило показує прев'ю в адмінці, поки акцію правлять,
+    // бо рахує його той самий модуль.
+    promotions.forEach(promo => {
+
+        if (promo.displayType !== "deal_of_day") return;
+
+        DealLayout.resolve(promo).conflicts.forEach(text =>
+            console.warn(`::warning::розкладка «${promo.title || promo.slug}» — ${text}`));
 
     });
 

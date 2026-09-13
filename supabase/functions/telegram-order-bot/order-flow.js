@@ -11,7 +11,7 @@
 // де альтернатив немає.
 // ======================================
 
-import { escapeHtml, money } from "./format.js";
+import { escapeHtml, money, priceNow, oldPriceNow } from "./format.js";
 
 // Способи доставки — ті самі назви й ціни, що в checkout.html.
 // ⚠️ Мусять збігатися з сайтом: назва їде в orders.delivery_method,
@@ -103,8 +103,8 @@ export function sizesOf(product, color) {
 
 export function computeTotals(product, qty, deliveryPrice) {
 
-  const price = Number(product?.price) || 0;
-  const oldPrice = Number(product?.oldPrice) || 0;
+  const price = priceNow(product);
+  const oldPrice = oldPriceNow(product);
   const count = Math.max(1, Number(qty) || 1);
 
   const subtotal = (oldPrice > price ? oldPrice : price) * count;
@@ -420,8 +420,8 @@ export function buildOrderRow(product, session, orderNumber) {
       id: product.id,
       title: product.title,
       brand: product.brand ?? null,
-      price: Number(product.price) || 0,
-      oldPrice: Number(product.oldPrice) || null,
+      price: priceNow(product),
+      oldPrice: oldPriceNow(product) || null,
       qty: Math.max(1, Number(session.qty) || 1),
       color: session.color ?? null,
       size: session.size ?? null,
