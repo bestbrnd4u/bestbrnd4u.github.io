@@ -321,5 +321,113 @@ console.log("\n[6] Усі змінні кольорів існують");
     check("і контрастний текст", /color:#fff/.test(button));
 }
 
+console.log("\n[7] Текст у полі видно на тому тлі, де поле стоїть");
+{
+    // ЩО БУЛО НЕ ТАК — І ЧОМУ ЦЕ РАХУЄТЬСЯ, А НЕ ВИЧИТУЄТЬСЯ.
+    //
+    // Поле підписки в темній смузі мало color:inherit. Решта його
+    // правил писались під темну поверхню: рамка напівпрозоро-біла,
+    // підказка rgba(255,255,255,.45). А колір тексту лишили
+    // успадкованим — тобто залежним від того, чи задасть його
+    // предок. Ні .newsletter, ні footer кольору не задають (обидва
+    // лише фарбують тло), тож inherit доходив до body й давав
+    // --dark: rgb(17,24,39) на тлі rgb(17,24,39).
+    //
+    // Контраст один до одного. Не «темнувато» — введеного не видно
+    // ВЗАГАЛІ. Підказку було видно, бо їй колір заданий, і поле
+    // виглядало робочим рівно доти, доки в нього не почнуть писати.
+    //
+    // Очима таке не ловиться: щоб побачити, треба саме ввести текст.
+    // Тому тут рахується справжній контраст за WCAG, а не шукається
+    // рядок у файлі.
+    const hex = name => {
+
+        const found = raw.match(new RegExp("\\" + name + ":\\s*(#[0-9a-f]{3,8})", "i"));
+
+        return found ? found[1] : null;
+
+    };
+
+    const rgb = value => {
+
+        let text = String(value || "").trim().replace("#", "");
+
+        if (text.length === 3) text = text.split("").map(c => c + c).join("");
+
+        return [0, 2, 4].map(i => parseInt(text.slice(i, i + 2), 16));
+
+    };
+
+    // Напівпрозоре тло поля лежить НА кольорі смуги — для контрасту
+    // важливий саме результат накладання, а не значення в файлі.
+    const over = (top, alpha, bottom) =>
+        top.map((c, i) => Math.round(c * alpha + bottom[i] * (1 - alpha)));
+
+    const relative = channel => {
+
+        const v = channel / 255;
+
+        return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+
+    };
+
+    const luminance = color =>
+        0.2126 * relative(color[0]) + 0.7152 * relative(color[1]) + 0.0722 * relative(color[2]);
+
+    const ratio = (a, b) => {
+
+        const light = Math.max(luminance(a), luminance(b));
+        const dark = Math.min(luminance(a), luminance(b));
+
+        return (light + 0.05) / (dark + 0.05);
+
+    };
+
+    const primary = hex("--primary");
+
+    check("колір темної смуги знайдено", Boolean(primary), primary);
+
+    const body = (raw.match(/\n\.subscribe-row input\{([^}]*)\}/) || [])[1] || "";
+
+    check("правило поля підписки знайдено", Boolean(body));
+
+    const declared = (body.match(/(?:^|;)\s*color:\s*([^;]+)/) || [])[1];
+
+    // inherit тут — не колір, а відмова від рішення: значення
+    // прийде звідкись, і звідки саме — залежить від сторінки.
+    check("колір тексту заданий, а не успадкований",
+        Boolean(declared) && declared.trim() !== "inherit",
+        declared);
+
+    if (primary && declared && declared.trim() !== "inherit") {
+
+        const band = rgb(primary);
+
+        const fillAlpha = Number((body.match(/background:rgba\(255,255,255,([\d.]+)\)/) || [])[1] || 0);
+
+        const field = over([255, 255, 255], fillAlpha, band);
+
+        const text = rgb(declared.trim());
+
+        const value = ratio(text, field);
+
+        // 4.5:1 — поріг WCAG AA для звичайного тексту. Введена
+        // пошта — саме звичайний текст, і перечитують її уважно:
+        // одна помилкова літера означає лист, який не прийде.
+        check(`контраст тексту в полі ${value.toFixed(1)}:1`, value >= 4.5,
+            `${declared.trim()} на ${field.join(",")}`);
+
+    }
+
+    // Те саме правило для всього файлу: колір поля форми не мусить
+    // залежати від того, що задасть предок.
+    const inheriting = [...raw.matchAll(/\n([^{}\n]*input[^{}\n]*)\{([^}]*)\}/g)]
+        .filter(m => /(?:^|;)\s*color:\s*inherit/.test(m[2]))
+        .map(m => m[1].trim());
+
+    check("жодне поле не успадковує колір тексту",
+        inheriting.length === 0, inheriting.join(" | "));
+}
+
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
 process.exit(failures === 0 ? 0 : 1);
