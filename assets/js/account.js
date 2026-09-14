@@ -2325,6 +2325,7 @@ const addressMethodSelect = document.getElementById("addressMethod");
 const addressBranchField = document.getElementById("addressBranchField");
 const addressPostomatField = document.getElementById("addressPostomatField");
 const addressCourierField = document.getElementById("addressCourierField");
+const addressOtherField = document.getElementById("addressOtherField");
 
 let addressesLoadedOnce = false;
 let cachedAddresses = [];
@@ -2336,6 +2337,11 @@ function toggleAddressMethodFields() {
     addressBranchField.hidden = value !== "На відділення «Нова пошта»";
     addressPostomatField.hidden = value !== "Поштомат «Нова пошта»";
     addressCourierField.hidden = value !== "Кур'єром «Нова пошта»";
+
+    // «Інша пошта» — Укрпошта чи Meest. Довідника ні для тієї, ні
+    // для тієї в нас немає, тож перевізника й відділення покупець
+    // пише одним рядком, як і на оформленні замовлення.
+    if (addressOtherField) addressOtherField.hidden = value !== "Інша пошта";
 
 }
 
@@ -2350,10 +2356,30 @@ function openAddressModal(address) {
     document.getElementById("addressLabel").value = address?.label || "";
     document.getElementById("addressCity").value = address?.city || "";
     addressMethodSelect.value = address?.delivery_method || "На відділення «Нова пошта»";
+
+    // Присвоєння value події change не надсилає — її надсилає лише
+    // людина. Але спосіб доставки тут щойно змінився насправді, і
+    // тим, хто на нього підписаний, про це треба сказати: власний
+    // випадний список (select-menu.js) інакше лишив би на кнопці
+    // напис від попередньої адреси.
+    addressMethodSelect.dispatchEvent(new Event("change", { bubbles: true }));
     document.getElementById("addressBranchNumber").value = address?.branch_number || "";
     document.getElementById("addressPostomatNumber").value = address?.postomat_number || "";
     document.getElementById("addressCourierAddress").value = address?.courier_address || "";
+    document.getElementById("addressOtherCarrier").value = address?.other_carrier || "";
     document.getElementById("addressIsDefault").checked = Boolean(address?.is_default);
+
+    // МІСТО, ПІДСТАВЛЕНЕ КОДОМ, ДОВІДНИК НЕ ВВАЖАЄ ОБРАНИМ.
+    //
+    // Ref міста ставиться тільки при виборі з підказки. Відкриваючи
+    // збережену адресу, ми заповнюємо поле самі — і воно виглядає
+    // заповненим, але пошук відділень мовчки не робить запиту
+    // взагалі: список порожній, пояснення немає. Ззовні це «не
+    // знаходить мій поштомат». Те саме колись виправляли на
+    // оформленні замовлення (applySavedAddress у checkout.js).
+    if (address?.city && window.NovaPoshta?.useCity) {
+        window.NovaPoshta.useCity(address.city, "address");
+    }
 
     toggleAddressMethodFields();
 
@@ -2383,14 +2409,18 @@ function renderAddressCard(address) {
     const methodIcon = {
         "На відділення «Нова пошта»": "📦",
         "Поштомат «Нова пошта»": "🏤",
-        "Кур'єром «Нова пошта»": "🚚"
+        "Кур'єром «Нова пошта»": "🚚",
+        "Інша пошта": "📮"
     }[address.delivery_method] || "📍";
 
-    const detail = address.delivery_method === "На відділення «Нова пошта»"
-        ? address.branch_number
-        : address.delivery_method === "Поштомат «Нова пошта»"
-            ? address.postomat_number
-            : address.courier_address;
+    // Кожен спосіб доставки має своє поле подробиць — показати треба
+    // саме те, що заповнили.
+    const detail = {
+        "На відділення «Нова пошта»": address.branch_number,
+        "Поштомат «Нова пошта»": address.postomat_number,
+        "Кур'єром «Нова пошта»": address.courier_address,
+        "Інша пошта": address.other_carrier
+    }[address.delivery_method] || "";
 
     return `
         <div class="address-card" data-id="${address.id}">
@@ -2588,15 +2618,39 @@ addressForm?.addEventListener("submit", async event => {
         branch_number: document.getElementById("addressBranchNumber").value.trim(),
         postomat_number: document.getElementById("addressPostomatNumber").value.trim(),
         courier_address: document.getElementById("addressCourierAddress").value.trim(),
+        other_carrier: document.getElementById("addressOtherCarrier").value.trim(),
         is_default: isDefault
     };
 
     // "id" — GENERATED ALWAYS AS IDENTITY, тому його не можна
     // передавати в тілі insert/update — для редагування існуючої
     // адреси використовуємо update() за id, для нової — insert()
-    const { error } = id
-        ? await supabaseClient.from("addresses").update(payload).eq("id", id)
-        : await supabaseClient.from("addresses").insert(payload);
+    const save = body => id
+        ? supabaseClient.from("addresses").update(body).eq("id", id)
+        : supabaseClient.from("addresses").insert(body);
+
+    let { error } = await save(payload);
+
+    // СТОВПЦЯ other_carrier МОЖЕ ЩЕ НЕ БУТИ.
+    //
+    // Міграції тут застосовують руками в панелі Supabase, і між
+    // викладкою коду та запуском 031-other-carrier.sql минає час.
+    // Без цієї гілки в той проміжок падало б збереження адреси
+    // ЦІЛКОМ — разом із містом і відділенням, які до нової колонки
+    // стосунку не мають. Тобто одна незапущена міграція ламала б
+    // роботу тим, хто «Іншою поштою» не користується взагалі.
+    //
+    // PGRST204 — саме «не знайшов такої колонки»; на інші помилки
+    // (мережа, права, RLS) повторювати запит нема сенсу.
+    if (error && (error.code === "PGRST204" || /other_carrier/.test(error.message || ""))) {
+
+        console.warn("Стовпця other_carrier ще немає — зберігаю без нього:", error.message);
+
+        delete payload.other_carrier;
+
+        ({ error } = await save(payload));
+
+    }
 
     submitBtn.disabled = false;
     submitBtn.textContent = "Зберегти адресу";

@@ -431,6 +431,102 @@ console.log("\n[6] Підказки придатні для клавіатури
         built.includes("api.novaposhta.ua/v2.0/json/") && built.includes("nova-poshta"));
 }
 
+console.log("\n[7] Довідник працює і в кабінеті, не лише на оформленні");
+{
+    // ЩО БУЛО НЕ ТАК. Підказки були прив'язані до трьох
+    // ідентифікаторів сторінки оформлення й більше нікуди. У
+    // кабінеті ту саму адресу зберігали руками: «Поштомат №1234» з
+    // підказки-прикладу так і лишався прикладом, а номер вписували
+    // на пам'ять. Далі ця адреса підставлялась у замовлення — тобто
+    // одрук доїжджав до накладної тим самим шляхом, від якого
+    // підказки й рятують.
+    const accountHtml = read("account.html");
+    const accountJs = read("assets/js/account.js");
+
+    check("поля приходять аргументом, а не з getElementById у коді",
+        /function bind\(fields\)/.test(page)
+        && /var city = fields && fields\.city/.test(page));
+
+    check("оформлення замовлення причеплене", /id: "city"|getElementById\("city"\)/.test(page));
+
+    check("вікно «Нова адреса» теж причеплене",
+        /getElementById\("addressCity"\)/.test(page)
+        && /getElementById\("addressBranchNumber"\)/.test(page)
+        && /getElementById\("addressPostomatNumber"\)/.test(page));
+
+    // РЕФ МІСТА В КОЖНОГО НАБОРУ СВІЙ.
+    // Спільний означав би, що місто, вибране в кабінеті, підставляє
+    // свої відділення в замовлення — і навпаки.
+    check("кожен набір полів тримає свій ref",
+        /var bound = \{\}/.test(page) && /bound\[which \|\| "checkout"\]/.test(page));
+
+    // Виклик без другого аргументу мусить лишитись тим самим: так
+    // його викликає checkout.js у двох місцях.
+    check("старий виклик useCity(name) не зламано",
+        /useCity: function \(name, which\)/.test(page)
+        && /which \|\| "checkout"/.test(page));
+
+    check("довідник підключено до сторінки кабінету",
+        /<script src="assets\/js\/nova-poshta\.js/.test(accountHtml));
+
+    // Місто збереженої адреси підставляє КОД, а не вибір із
+    // підказки, — ref при цьому порожній, і пошук відділень мовчки
+    // не робить запиту. Те саме колись лагодили в checkout.js.
+    check("адреса на редагуванні просить ref свого набору",
+        /NovaPoshta\.useCity\(address\.city, "address"\)/.test(accountJs));
+}
+
+console.log("\n[8] «Інша пошта» — і в замовленні, і в збережених адресах");
+{
+    const accountHtml = read("account.html");
+    const accountJs = read("assets/js/account.js");
+    const checkoutHtml = read("checkout.html");
+    const checkoutJs = read("assets/js/checkout.js");
+
+    // JUSTIN ПІШОВ З УКРАЇНИ. Перевізник, якого немає, у списку
+    // способів доставки — це замовлення, яке нікуди не поїде.
+    check("Justin прибрано з оформлення", !/Justin/i.test(checkoutHtml));
+
+    check("Укрпошта й Meest лишились",
+        /Інша пошта \(Укрпошта, Meest\)/.test(checkoutHtml));
+
+    // У кабінеті способу не було взагалі: покупець з Укрпоштою не
+    // міг зберегти свою адресу й вписував її щоразу заново.
+    check("спосіб є і в кабінеті",
+        /<option value="Інша пошта">/.test(accountHtml)
+        && /id="addressOtherCarrier"/.test(accountHtml));
+
+    check("поле показується саме для нього",
+        /addressOtherField\.hidden = value !== "Інша пошта"/.test(accountJs));
+
+    check("і зберігається окремим стовпцем",
+        /other_carrier: document\.getElementById\("addressOtherCarrier"\)/.test(accountJs));
+
+    // ОКРЕМИЙ СТОВПЕЦЬ, А НЕ courier_address: там вулиця для кур'єра
+    // НП, тут чужий перевізник. Злиті в одне поле, вони зробили б у
+    // картці адреси з «Укрпошти» «Кур'єра».
+    check("міграція на стовпець є",
+        fs.existsSync(path.join(ROOT, "supabase/migrations/031-other-carrier.sql")));
+
+    check("схема таблиці теж знає про нього",
+        /other_carrier/.test(read("supabase/addresses-schema.sql")));
+
+    // Міграції запускають руками, і між викладкою коду та запуском
+    // минає час. Без цієї гілки в той проміжок падало б збереження
+    // адреси ЦІЛКОМ — разом із полями, які до нової колонки
+    // стосунку не мають.
+    check("без стовпця адреса все одно зберігається",
+        /PGRST204/.test(accountJs) && /delete payload\.other_carrier/.test(accountJs));
+
+    check("картка адреси показує саме це поле",
+        /"Інша пошта": address\.other_carrier/.test(accountJs));
+
+    // Інакше збережена адреса підставлялась наполовину: спосіб
+    // обирався, а перевізник лишався порожнім.
+    check("замовлення підхоплює перевізника зі збереженої адреси",
+        /address\.other_carrier[\s\S]{0,200}otherCarrier/.test(checkoutJs));
+}
+
 console.log(failures === 0
     ? "\n✅ Нова пошта: адресу вибирають зі довідника, ключ лишається на сервері\n"
     : `\n❌ Проблем: ${failures}\n`);
