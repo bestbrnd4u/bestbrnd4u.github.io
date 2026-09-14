@@ -4737,7 +4737,25 @@ function promoRandomCode(prefix, randomBytes) {
 // ІМЕНА з префіксом people: у зібраному index.ts усі модулі лежать
 // поруч, і дві функції з однією назвою тихо перекривають одна одну.
 
-const PEOPLE_ADMIN_ACTIONS = ["people-buyers", "people-subscribers"];
+// Дві дії читають списки, дві — міняють людину.
+//
+// ЧОМУ ДІЇ НАД ЛЮДИНОЮ ТУТ, А НЕ В КАБІНЕТІ MAILERLITE Й SUPABASE
+//
+// Відписати й видалити можна було й там — власник має доступ до
+// обох. Але це два чужі кабінети з різними списками, і щоб відписати
+// одну людину, доводилось знайти її спершу в нашій панелі, потім
+// удруге — в чужій. Половина таких звернень так і лишалась
+// невиконаною.
+const PEOPLE_ADMIN_ACTIONS = [
+    "people-buyers",
+    "people-subscribers",
+    "people-unsubscribe",
+    "people-delete",
+];
+
+// Дії, які МІНЯЮТЬ дані. Виділені окремо, бо розбираються інакше:
+// їм потрібна не сторінка списку, а те, над ким саме діяти.
+const PEOPLE_WRITE_ACTIONS = ["people-unsubscribe", "people-delete"];
 
 function isPeopleAction(action) {
 
@@ -4755,6 +4773,42 @@ function parsePeopleRequest(body) {
 
     if (!isPeopleAction(action)) {
         return { ok: false, error: "Невідома дія панелі людей." };
+    }
+
+    // ДІЇ НАД ЛЮДИНОЮ — ЗА ІДЕНТИФІКАТОРОМ, А НЕ ЗА ПОШТОЮ.
+    //
+    // Пошта здається зручнішою, але вона змінна: людина може змінити
+    // її в кабінеті між тим, як панель намалювала список, і тим, як
+    // натиснули «видалити». Ідентифікатор незмінний, і саме він
+    // прийшов у тому ж рядку списку, який зараз перед очима.
+    //
+    // Пошту приймаємо теж — але лише щоб показати її у відповіді й у
+    // журналі: «відписали ivan@…» читається, «відписали 3f2a…» ні.
+    if (PEOPLE_WRITE_ACTIONS.includes(action)) {
+
+        const id = String(body?.id ?? "").trim();
+
+        const email = String(body?.email ?? "").trim().toLowerCase().slice(0, 200);
+
+        if (!id) return { ok: false, error: "Не вказано, над ким діяти." };
+
+        if (action === "people-delete") {
+
+            // Покупець і підписник живуть у РІЗНИХ системах, і
+            // видаляються по-різному. Вгадувати за виглядом
+            // ідентифікатора — найкоротший шлях видалити не того.
+            const kind = String(body?.kind ?? "");
+
+            if (kind !== "buyer" && kind !== "subscriber") {
+                return { ok: false, error: "Не вказано, кого видаляти: покупця чи підписника." };
+            }
+
+            return { ok: true, action, params: { id, email, kind } };
+
+        }
+
+        return { ok: true, action, params: { id, email } };
+
     }
 
     const page = Math.max(1, Math.trunc(Number(body?.page) || 1));
@@ -4956,6 +5010,88 @@ function subscribersRequest(apiKey, { page, groupId } = {}) {
             Accept: "application/json",
         },
     };
+
+}
+
+// ВІДПИСАТИ — це ЗМІНА СТАНУ, А НЕ ВИДАЛЕННЯ.
+//
+// Різниця не косметична. Відписаний лишається в списку зі станом
+// "unsubscribed", і MailerLite більше ніколи не надішле йому листа —
+// навіть якщо адресу потім знову внесуть імпортом. Видалений зникає
+// безслідно, і той самий імпорт спокійно підпише його вдруге.
+//
+// Тобто саме відписка, а не видалення, є виконанням прохання «не
+// пишіть мені більше».
+//
+// Міняємо за id, а не POST'ом по пошті: POST /api/subscribers
+// створює підписника, якщо такого немає, — і одруківка в адресі
+// додала б у список нову людину замість того, щоб відписати стару.
+function unsubscribeRequest(apiKey, id) {
+
+    if (!apiKey || !id) return null;
+
+    return {
+        method: "PUT",
+        url: `https://connect.mailerlite.com/api/subscribers/${encodeURIComponent(id)}`,
+        headers: {
+            Authorization: `Bearer ${apiKey}`,
+            Accept: "application/json",
+            "Content-Type": "application/json",
+        },
+        body: { status: "unsubscribed" },
+    };
+
+}
+
+// Видалення підписника зі списку MailerLite — назовсім.
+function deleteSubscriberRequest(apiKey, id) {
+
+    if (!apiKey || !id) return null;
+
+    return {
+        method: "DELETE",
+        url: `https://connect.mailerlite.com/api/subscribers/${encodeURIComponent(id)}`,
+        headers: {
+            Authorization: `Bearer ${apiKey}`,
+            Accept: "application/json",
+        },
+    };
+
+}
+
+// Видалення облікового запису покупця.
+//
+// ЦЕ ЄДИНЕ МІСЦЕ, ДЕ ВОНО ВЗАГАЛІ МОЖЛИВЕ. Admin API Supabase
+// вимагає service-role ключа, а він живе лише в секретах функції — у
+// коді сайту його немає й бути не може. Саме тому кнопка «видалити
+// акаунт» у кабінеті покупця свого часу й не видаляла акаунт: вона
+// стирала профіль і адреси, а сам запис лишався.
+function deleteBuyerRequest(baseUrl, serviceKey, id) {
+
+    if (!baseUrl || !serviceKey || !id) return null;
+
+    return {
+        method: "DELETE",
+        url: `${String(baseUrl).replace(/\/+$/, "")}/auth/v1/admin/users/${encodeURIComponent(id)}`,
+        headers: {
+            apikey: serviceKey,
+            Authorization: `Bearer ${serviceKey}`,
+        },
+    };
+
+}
+
+// Що сказати панелі після дії. Окремо, щоб формулювання не
+// розповзалось по обробниках і щоб його можна було перевірити тестом.
+function peopleActionResult(action, email) {
+
+    const who = email ? ` ${email}` : "";
+
+    if (action === "people-unsubscribe") {
+        return { ok: true, message: `Відписано${who}. Листи більше не надсилатимуться.` };
+    }
+
+    return { ok: true, message: `Видалено${who}.` };
 
 }
 
@@ -8034,6 +8170,99 @@ async function handlePeopleAdmin(body: Record<string, any>, origin: string | nul
   if (!parsed.ok) return adminJson({ ok: false, error: parsed.error }, 400, origin);
 
   const { action, params } = parsed;
+
+  // ---- Відписати ----
+  //
+  // Не видаляємо: відписаний лишається в списку зі станом
+  // "unsubscribed", і MailerLite більше не надішле йому листа навіть
+  // після повторного імпорту. Видалений — надішле.
+  if (action === "people-unsubscribe") {
+
+    const request = unsubscribeRequest(MAILERLITE_API_KEY, params.id);
+
+    if (!request) {
+      return adminJson({
+        ok: false,
+        error: "Розсилку не під'єднано: у секретах функції немає MAILERLITE_API_KEY.",
+      }, 400, origin);
+    }
+
+    const response = await fetch(request.url, {
+      method: request.method,
+      headers: request.headers,
+      body: JSON.stringify(request.body),
+    });
+
+    if (!response.ok) {
+
+      console.error("Відписка:", await response.text());
+
+      return adminJson({ ok: false, error: "MailerLite не відповів. Спробуйте пізніше." }, 502, origin);
+
+    }
+
+    return adminJson(peopleActionResult(action, params.email), 200, origin);
+
+  }
+
+  // ---- Видалити ----
+  if (action === "people-delete" && params.kind === "subscriber") {
+
+    const request = deleteSubscriberRequest(MAILERLITE_API_KEY, params.id);
+
+    if (!request) {
+      return adminJson({
+        ok: false,
+        error: "Розсилку не під'єднано: у секретах функції немає MAILERLITE_API_KEY.",
+      }, 400, origin);
+    }
+
+    const response = await fetch(request.url, { method: request.method, headers: request.headers });
+
+    // 404 означає, що підписника вже немає — мети досягнуто, і
+    // показувати помилку тут було б брехнею.
+    if (!response.ok && response.status !== 404) {
+
+      console.error("Видалення підписника:", await response.text());
+
+      return adminJson({ ok: false, error: "MailerLite не відповів. Спробуйте пізніше." }, 502, origin);
+
+    }
+
+    return adminJson(peopleActionResult(action, params.email), 200, origin);
+
+  }
+
+  if (action === "people-delete" && params.kind === "buyer") {
+
+    // ЗАМОВЛЕННЯ НЕ ЧІПАЄМО — і це навмисно.
+    //
+    // Вони потрібні для обліку й для самої людини теж: за номером
+    // замовлення її знайдуть, навіть коли кабінету вже немає. Тому
+    // видаляємо саме те, що прив'язане до облікового запису:
+    // профіль, адреси, обране — і сам запис.
+    await supabaseRest(`favorites?user_id=eq.${encodeURIComponent(params.id)}`, { method: "DELETE" });
+    await supabaseRest(`addresses?user_id=eq.${encodeURIComponent(params.id)}`, { method: "DELETE" });
+    await supabaseRest(`profiles?id=eq.${encodeURIComponent(params.id)}`, { method: "DELETE" });
+
+    const request = deleteBuyerRequest(SUPABASE_URL, SERVICE_ROLE_KEY, params.id);
+
+    const response = await fetch(request.url, { method: request.method, headers: request.headers });
+
+    if (!response.ok && response.status !== 404) {
+
+      console.error("Видалення покупця:", await response.text());
+
+      return adminJson({
+        ok: false,
+        error: "Не вдалося видалити обліковий запис. Профіль і адреси вже прибрано.",
+      }, 502, origin);
+
+    }
+
+    return adminJson(peopleActionResult(action, params.email), 200, origin);
+
+  }
 
   if (action === "people-buyers") {
 

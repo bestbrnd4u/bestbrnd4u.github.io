@@ -173,11 +173,23 @@
 
     }
 
+    // Кнопка дії над людиною.
+    //
+    // data-* замість onclick: обробник один на всю таблицю, і рядки
+    // можна перемальовувати скільки завгодно.
+    function actionButton(kind, person, action, label, danger) {
+
+        return `<button type="button" class="btn btn-sm${danger ? " btn-danger" : " btn-ghost"}"`
+            + ` data-act="${esc(action)}" data-kind="${esc(kind)}"`
+            + ` data-id="${esc(person.id)}" data-email="${esc(person.email)}">${esc(label)}</button>`;
+
+    }
+
     function buyersTable(people) {
 
         return "<div class=\"table-wrap\"><table>"
             + "<tr><th>Пошта</th><th>Ім'я</th><th>Замовлень</th><th>На суму</th>"
-            + "<th>Останнє</th><th>Зареєструвався</th><th>Останній вхід</th></tr>"
+            + "<th>Останнє</th><th>Зареєструвався</th><th>Останній вхід</th><th></th></tr>"
             + people.map(person =>
                 "<tr>"
                 + `<td class="email">${esc(person.email)}`
@@ -189,6 +201,7 @@
                 + `<td>${esc(dateLabel(person.lastOrderAt))}</td>`
                 + `<td>${esc(dateLabel(person.createdAt))}</td>`
                 + `<td>${esc(dateLabel(person.lastSignInAt))}</td>`
+                + `<td class="row-actions">${actionButton("buyer", person, "people-delete", "Видалити", true)}</td>`
                 + "</tr>").join("")
             + "</table></div>";
 
@@ -198,7 +211,7 @@
 
         return "<div class=\"table-wrap\"><table>"
             + "<tr><th>Пошта</th><th>Стан</th><th>Підписався</th>"
-            + "<th>Відкрив листів</th><th>Клацнув</th></tr>"
+            + "<th>Відкрив листів</th><th>Клацнув</th><th></th></tr>"
             + people.map(person =>
                 "<tr>"
                 + `<td class="email">${esc(person.email)}</td>`
@@ -206,10 +219,80 @@
                 + `<td>${esc(dateLabel(person.subscribedAt || person.createdAt))}</td>`
                 + `<td>${esc(person.opens)}</td>`
                 + `<td>${esc(person.clicks)}</td>`
+                // «Відписати» показуємо лише тому, хто ще підписаний:
+                // кнопка, яка нічого не змінить, лише збиває з пантелику.
+                + `<td class="row-actions">`
+                + (person.status === "unsubscribed"
+                    ? ""
+                    : actionButton("subscriber", person, "people-unsubscribe", "Відписати", false))
+                + actionButton("subscriber", person, "people-delete", "Видалити", true)
+                + "</td>"
                 + "</tr>").join("")
             + "</table></div>";
 
     }
+
+    // ЩО САМЕ ЗАРАЗ СТАНЕТЬСЯ — СЛОВАМИ, ПЕРЕД ТИМ ЯК СТАНЕТЬСЯ.
+    //
+    // Обидві дії незворотні, і плутати їх легко: «відписати» звучить
+    // м'якше, ніж є, а «видалити» — жорсткіше. Насправді навпаки:
+    // відписаний лишається в списку й захищений від повторного
+    // імпорту, а видаленого той самий імпорт підпише знову.
+    function confirmText(action, kind, email) {
+
+        if (action === "people-unsubscribe") {
+            return `Відписати ${email}?\n\n`
+                + "Листи більше не надсилатимуться. Адреса лишиться в списку зі"
+                + " станом «відписався» — це захищає її від повторного підписання.";
+        }
+
+        if (kind === "subscriber") {
+            return `Видалити ${email} зі списку розсилки?\n\n`
+                + "Адреса зникне безслідно. Якщо людина просила більше їй не"
+                + " писати — надійніше «Відписати»: видаленого повторний імпорт"
+                + " підпише знову.";
+        }
+
+        return `Видалити акаунт ${email}?\n\n`
+            + "Профіль, адреси доставки й обране буде стерто, вхід стане неможливим."
+            + "\n\nЗамовлення лишаться: вони потрібні для обліку, і за їхнім"
+            + " номером людину можна знайти й без кабінету.";
+
+    }
+
+    el("list").addEventListener("click", async event => {
+
+        const button = event.target.closest("button[data-act]");
+
+        if (!button) return;
+
+        const { act, kind, id, email } = button.dataset;
+
+        if (!window.confirm(confirmText(act, kind, email || "цю людину"))) return;
+
+        const label = button.textContent;
+
+        button.disabled = true;
+        button.textContent = "…";
+
+        try {
+
+            const payload = await call(act, { id, email, kind });
+
+            showMessage(payload.message || "Готово.", "ok");
+
+            load();
+
+        } catch (error) {
+
+            button.disabled = false;
+            button.textContent = label;
+
+            showMessage(error.message || "Не вдалося виконати дію.", "error");
+
+        }
+
+    });
 
     function renderList(payload) {
 

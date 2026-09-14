@@ -3116,6 +3116,99 @@ async function handlePeopleAdmin(body: Record<string, any>, origin: string | nul
 
   const { action, params } = parsed;
 
+  // ---- Відписати ----
+  //
+  // Не видаляємо: відписаний лишається в списку зі станом
+  // "unsubscribed", і MailerLite більше не надішле йому листа навіть
+  // після повторного імпорту. Видалений — надішле.
+  if (action === "people-unsubscribe") {
+
+    const request = unsubscribeRequest(MAILERLITE_API_KEY, params.id);
+
+    if (!request) {
+      return adminJson({
+        ok: false,
+        error: "Розсилку не під'єднано: у секретах функції немає MAILERLITE_API_KEY.",
+      }, 400, origin);
+    }
+
+    const response = await fetch(request.url, {
+      method: request.method,
+      headers: request.headers,
+      body: JSON.stringify(request.body),
+    });
+
+    if (!response.ok) {
+
+      console.error("Відписка:", await response.text());
+
+      return adminJson({ ok: false, error: "MailerLite не відповів. Спробуйте пізніше." }, 502, origin);
+
+    }
+
+    return adminJson(peopleActionResult(action, params.email), 200, origin);
+
+  }
+
+  // ---- Видалити ----
+  if (action === "people-delete" && params.kind === "subscriber") {
+
+    const request = deleteSubscriberRequest(MAILERLITE_API_KEY, params.id);
+
+    if (!request) {
+      return adminJson({
+        ok: false,
+        error: "Розсилку не під'єднано: у секретах функції немає MAILERLITE_API_KEY.",
+      }, 400, origin);
+    }
+
+    const response = await fetch(request.url, { method: request.method, headers: request.headers });
+
+    // 404 означає, що підписника вже немає — мети досягнуто, і
+    // показувати помилку тут було б брехнею.
+    if (!response.ok && response.status !== 404) {
+
+      console.error("Видалення підписника:", await response.text());
+
+      return adminJson({ ok: false, error: "MailerLite не відповів. Спробуйте пізніше." }, 502, origin);
+
+    }
+
+    return adminJson(peopleActionResult(action, params.email), 200, origin);
+
+  }
+
+  if (action === "people-delete" && params.kind === "buyer") {
+
+    // ЗАМОВЛЕННЯ НЕ ЧІПАЄМО — і це навмисно.
+    //
+    // Вони потрібні для обліку й для самої людини теж: за номером
+    // замовлення її знайдуть, навіть коли кабінету вже немає. Тому
+    // видаляємо саме те, що прив'язане до облікового запису:
+    // профіль, адреси, обране — і сам запис.
+    await supabaseRest(`favorites?user_id=eq.${encodeURIComponent(params.id)}`, { method: "DELETE" });
+    await supabaseRest(`addresses?user_id=eq.${encodeURIComponent(params.id)}`, { method: "DELETE" });
+    await supabaseRest(`profiles?id=eq.${encodeURIComponent(params.id)}`, { method: "DELETE" });
+
+    const request = deleteBuyerRequest(SUPABASE_URL, SERVICE_ROLE_KEY, params.id);
+
+    const response = await fetch(request.url, { method: request.method, headers: request.headers });
+
+    if (!response.ok && response.status !== 404) {
+
+      console.error("Видалення покупця:", await response.text());
+
+      return adminJson({
+        ok: false,
+        error: "Не вдалося видалити обліковий запис. Профіль і адреси вже прибрано.",
+      }, 502, origin);
+
+    }
+
+    return adminJson(peopleActionResult(action, params.email), 200, origin);
+
+  }
+
   if (action === "people-buyers") {
 
     // Admin API віддає сторінками. Беремо з запасом: список покупців

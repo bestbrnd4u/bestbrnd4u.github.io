@@ -25,7 +25,25 @@
 // ІМЕНА з префіксом people: у зібраному index.ts усі модулі лежать
 // поруч, і дві функції з однією назвою тихо перекривають одна одну.
 
-export const PEOPLE_ADMIN_ACTIONS = ["people-buyers", "people-subscribers"];
+// Дві дії читають списки, дві — міняють людину.
+//
+// ЧОМУ ДІЇ НАД ЛЮДИНОЮ ТУТ, А НЕ В КАБІНЕТІ MAILERLITE Й SUPABASE
+//
+// Відписати й видалити можна було й там — власник має доступ до
+// обох. Але це два чужі кабінети з різними списками, і щоб відписати
+// одну людину, доводилось знайти її спершу в нашій панелі, потім
+// удруге — в чужій. Половина таких звернень так і лишалась
+// невиконаною.
+export const PEOPLE_ADMIN_ACTIONS = [
+    "people-buyers",
+    "people-subscribers",
+    "people-unsubscribe",
+    "people-delete",
+];
+
+// Дії, які МІНЯЮТЬ дані. Виділені окремо, бо розбираються інакше:
+// їм потрібна не сторінка списку, а те, над ким саме діяти.
+export const PEOPLE_WRITE_ACTIONS = ["people-unsubscribe", "people-delete"];
 
 export function isPeopleAction(action) {
 
@@ -43,6 +61,42 @@ export function parsePeopleRequest(body) {
 
     if (!isPeopleAction(action)) {
         return { ok: false, error: "Невідома дія панелі людей." };
+    }
+
+    // ДІЇ НАД ЛЮДИНОЮ — ЗА ІДЕНТИФІКАТОРОМ, А НЕ ЗА ПОШТОЮ.
+    //
+    // Пошта здається зручнішою, але вона змінна: людина може змінити
+    // її в кабінеті між тим, як панель намалювала список, і тим, як
+    // натиснули «видалити». Ідентифікатор незмінний, і саме він
+    // прийшов у тому ж рядку списку, який зараз перед очима.
+    //
+    // Пошту приймаємо теж — але лише щоб показати її у відповіді й у
+    // журналі: «відписали ivan@…» читається, «відписали 3f2a…» ні.
+    if (PEOPLE_WRITE_ACTIONS.includes(action)) {
+
+        const id = String(body?.id ?? "").trim();
+
+        const email = String(body?.email ?? "").trim().toLowerCase().slice(0, 200);
+
+        if (!id) return { ok: false, error: "Не вказано, над ким діяти." };
+
+        if (action === "people-delete") {
+
+            // Покупець і підписник живуть у РІЗНИХ системах, і
+            // видаляються по-різному. Вгадувати за виглядом
+            // ідентифікатора — найкоротший шлях видалити не того.
+            const kind = String(body?.kind ?? "");
+
+            if (kind !== "buyer" && kind !== "subscriber") {
+                return { ok: false, error: "Не вказано, кого видаляти: покупця чи підписника." };
+            }
+
+            return { ok: true, action, params: { id, email, kind } };
+
+        }
+
+        return { ok: true, action, params: { id, email } };
+
     }
 
     const page = Math.max(1, Math.trunc(Number(body?.page) || 1));
@@ -244,5 +298,87 @@ export function subscribersRequest(apiKey, { page, groupId } = {}) {
             Accept: "application/json",
         },
     };
+
+}
+
+// ВІДПИСАТИ — це ЗМІНА СТАНУ, А НЕ ВИДАЛЕННЯ.
+//
+// Різниця не косметична. Відписаний лишається в списку зі станом
+// "unsubscribed", і MailerLite більше ніколи не надішле йому листа —
+// навіть якщо адресу потім знову внесуть імпортом. Видалений зникає
+// безслідно, і той самий імпорт спокійно підпише його вдруге.
+//
+// Тобто саме відписка, а не видалення, є виконанням прохання «не
+// пишіть мені більше».
+//
+// Міняємо за id, а не POST'ом по пошті: POST /api/subscribers
+// створює підписника, якщо такого немає, — і одруківка в адресі
+// додала б у список нову людину замість того, щоб відписати стару.
+export function unsubscribeRequest(apiKey, id) {
+
+    if (!apiKey || !id) return null;
+
+    return {
+        method: "PUT",
+        url: `https://connect.mailerlite.com/api/subscribers/${encodeURIComponent(id)}`,
+        headers: {
+            Authorization: `Bearer ${apiKey}`,
+            Accept: "application/json",
+            "Content-Type": "application/json",
+        },
+        body: { status: "unsubscribed" },
+    };
+
+}
+
+// Видалення підписника зі списку MailerLite — назовсім.
+export function deleteSubscriberRequest(apiKey, id) {
+
+    if (!apiKey || !id) return null;
+
+    return {
+        method: "DELETE",
+        url: `https://connect.mailerlite.com/api/subscribers/${encodeURIComponent(id)}`,
+        headers: {
+            Authorization: `Bearer ${apiKey}`,
+            Accept: "application/json",
+        },
+    };
+
+}
+
+// Видалення облікового запису покупця.
+//
+// ЦЕ ЄДИНЕ МІСЦЕ, ДЕ ВОНО ВЗАГАЛІ МОЖЛИВЕ. Admin API Supabase
+// вимагає service-role ключа, а він живе лише в секретах функції — у
+// коді сайту його немає й бути не може. Саме тому кнопка «видалити
+// акаунт» у кабінеті покупця свого часу й не видаляла акаунт: вона
+// стирала профіль і адреси, а сам запис лишався.
+export function deleteBuyerRequest(baseUrl, serviceKey, id) {
+
+    if (!baseUrl || !serviceKey || !id) return null;
+
+    return {
+        method: "DELETE",
+        url: `${String(baseUrl).replace(/\/+$/, "")}/auth/v1/admin/users/${encodeURIComponent(id)}`,
+        headers: {
+            apikey: serviceKey,
+            Authorization: `Bearer ${serviceKey}`,
+        },
+    };
+
+}
+
+// Що сказати панелі після дії. Окремо, щоб формулювання не
+// розповзалось по обробниках і щоб його можна було перевірити тестом.
+export function peopleActionResult(action, email) {
+
+    const who = email ? ` ${email}` : "";
+
+    if (action === "people-unsubscribe") {
+        return { ok: true, message: `Відписано${who}. Листи більше не надсилатимуться.` };
+    }
+
+    return { ok: true, message: `Видалено${who}.` };
 
 }
