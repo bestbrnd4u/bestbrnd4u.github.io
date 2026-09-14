@@ -29,7 +29,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
 
-    <link rel="stylesheet" href="assets/css/style.css?v=9bc6a91c">
+    <link rel="stylesheet" href="assets/css/style.css?v=6190b5af">
 
 
 
@@ -183,6 +183,22 @@
 
         <!-- ========== Відновлення пароля (перехід з листа) ========== -->
 
+        <!-- Повернення за посиланням із листа про зміну пошти.
+             Supabase підтверджує адресу сам і повертає сюди з
+             type=email_change в URL — лишається сказати, що все
+             вийшло, і куди тепер входити. -->
+        <div id="emailChangedCard" class="auth-card" hidden>
+
+            <h2 class="auth-card-title">Email змінено успішно</h2>
+            <p class="auth-card-sub">
+                Тепер входьте в кабінет із новою адресою.
+                Листи про замовлення теж ітимуть на неї.
+            </p>
+
+            <button type="button" class="btn" id="emailChangedLogin">Увійти</button>
+
+        </div>
+
         <div id="resetPasswordCard" class="auth-card" hidden>
 
             <h2 class="auth-card-title">Встановити новий пароль</h2>
@@ -226,6 +242,7 @@
                 <button type="button" class="account-tab" data-tab="addresses">Адреси доставки</button>
                 <button type="button" class="account-tab" data-tab="profile">Мої дані</button>
                 <button type="button" class="account-tab" data-tab="newsletter">Розсилки</button>
+                <button type="button" class="account-tab" data-tab="password">Змінити пароль</button>
             </div>
 
             <!-- ---- Історія замовлень ---- -->
@@ -326,29 +343,59 @@
                             <button type="button" class="auth-link" id="changeEmailBtn">Змінити email</button>
                         </div>
 
+                        <!-- ДВА КРОКИ, А НЕ ОДИН.
+
+                             Крок перший — ввести адресу двічі. Друге
+                             поле не формальність: пошта тут і логін, і
+                             адреса для листів, а помилки в ній не
+                             видно — вона виглядає як звичайна адреса,
+                             просто чужа. Помилившись один раз, людина
+                             втрачає і доступ, і листи про замовлення.
+
+                             Крок другий — сказати, що лист пішов, і на
+                             яку саме адресу. Без цього екрана людина
+                             закриває сторінку в упевненості, що пошту
+                             вже змінено. -->
                         <div class="profile-email-change" id="emailChangeBox" hidden>
 
-                            <label>
-                                Нова адреса
-                                <input type="email" id="newEmail" placeholder="you@example.com" autocomplete="email">
-                            </label>
+                            <div id="emailChangeStepForm">
 
-                            <div class="profile-email-change-actions">
-                                <button type="button" class="btn" id="newEmailSubmit">Надіслати лист</button>
-                                <button type="button" class="auth-link" id="newEmailCancel">Скасувати</button>
+                                <label>
+                                    Новий email
+                                    <input type="email" id="newEmail" placeholder="you@example.com" autocomplete="email">
+                                </label>
+
+                                <label>
+                                    Підтвердіть новий email
+                                    <input type="email" id="newEmailConfirm" placeholder="Ще раз ту саму адресу" autocomplete="email">
+                                </label>
+
+                                <span id="emailChangeMessage" class="field-error"></span>
+
+                                <div class="profile-email-change-actions">
+                                    <button type="button" class="btn" id="newEmailSubmit">Підтвердити</button>
+                                    <button type="button" class="auth-link" id="newEmailCancel">Скасувати</button>
+                                </div>
+
                             </div>
 
-                            <p class="profile-card-sub">
-                                Ми надішлемо лист на нову адресу. Пошта зміниться
-                                лише після переходу за посиланням із нього.
-                            </p>
+                            <div id="emailChangeStepSent" hidden>
 
-                            <span id="emailChangeMessage" class="field-error"></span>
+                                <p class="profile-email-sent">
+                                    На адресу <strong id="emailChangeSentTo"></strong> надіслано лист
+                                    для зміни email. Пошта зміниться лише після переходу
+                                    за посиланням із нього.
+                                </p>
 
-                        </div>
+                                <p class="profile-card-sub">
+                                    Листа немає? Перевірте теку «Спам». Посилання діє
+                                    обмежений час — якщо не встигнете, надішліть лист ще раз.
+                                </p>
 
-                        <div class="profile-links-row">
-                            <button type="button" class="auth-link" id="changePasswordBtn">Змінити пароль</button>
+                                <button type="button" class="btn" id="emailChangeClose">Закрити</button>
+
+                            </div>
+
                         </div>
 
                         <!-- ЗГОДА — ОКРЕМОЮ ГАЛОЧКОЮ Й НЕ ПРОСТАВЛЕНА
@@ -425,6 +472,85 @@
                         внизу кожного. Листи про замовлення приходитимуть у
                         будь-якому разі: це не розсилка, а підтвердження покупки.
                     </p>
+
+                </div>
+
+            </div>
+
+            <!-- ---- Змінити пароль ---- -->
+
+            <div id="passwordPanel" class="account-panel" hidden>
+
+                <div class="profile-card">
+
+                    <h2>Змінити пароль</h2>
+
+                    <!-- СТАРИЙ ПАРОЛЬ ПИТАЄМО НЕ ДЛЯ ПОРЯДКУ.
+
+                         Supabase дозволяє змінити пароль, маючи лише
+                         відкриту сесію, — старого не питає. Це означає,
+                         що будь-хто, хто сів за незаблокований
+                         комп'ютер, міняє пароль і забирає акаунт собі:
+                         власник більше не ввійде.
+
+                         Тому перед зміною перевіряємо старий пароль
+                         окремим входом. Не знаєш старого — тільки
+                         через лист, тобто через пошту, доступ до якої
+                         ще треба мати. -->
+                    <form id="passwordForm" class="profile-form" novalidate>
+
+                        <label>
+                            Старий пароль
+                            <input type="password" id="oldPassword" placeholder="Ваш поточний пароль" autocomplete="current-password">
+                        </label>
+
+                        <label>
+                            Новий пароль (від 6 до 30 символів)
+                            <input type="password" id="changedPassword" placeholder="Новий пароль" autocomplete="new-password">
+                        </label>
+
+                        <span id="passwordMessage" class="field-error"></span>
+
+                        <div class="profile-actions-row">
+                            <button type="submit" class="btn" id="passwordSubmit">Змінити пароль</button>
+                            <button type="button" class="auth-link" id="forgotPasswordInsideBtn">Забули пароль?</button>
+                        </div>
+
+                    </form>
+
+                    <!-- «Забули пароль?» — той самий лист, що й на вході,
+                         але адресу питати не треба: людина вже в кабінеті,
+                         і ми знаємо її пошту. -->
+                    <div class="profile-email-change" id="forgotBox" hidden>
+
+                        <div id="forgotStepForm">
+
+                            <p class="profile-card-sub">
+                                Надішлемо посилання для відновлення пароля на
+                                <strong id="forgotEmail"></strong>.
+                            </p>
+
+                            <span id="forgotMessage" class="field-error"></span>
+
+                            <div class="profile-email-change-actions">
+                                <button type="button" class="btn" id="forgotSubmit">Відновити</button>
+                                <button type="button" class="auth-link" id="forgotCancel">Скасувати</button>
+                            </div>
+
+                        </div>
+
+                        <div id="forgotStepSent" hidden>
+
+                            <p class="profile-email-sent">
+                                Посилання для відновлення пароля надіслано на
+                                <strong id="forgotSentTo"></strong>.
+                            </p>
+
+                            <button type="button" class="btn" id="forgotClose">Закрити</button>
+
+                        </div>
+
+                    </div>
 
                 </div>
 
@@ -686,7 +812,7 @@
 <script src="assets/js/ui.js?v=e015b069" defer></script>
 <!-- Вікно відмови: вибір товарів, причина, фото -->
 <script src="assets/js/refusal-dialog.js?v=308616b4" defer></script>
-<script src="assets/js/account.js?v=cf6d6b46" defer></script>
+<script src="assets/js/account.js?v=9271d2df" defer></script>
 
 </body>
 

@@ -8670,6 +8670,19 @@ body.mobile-filters-open .scroll-top{
     gap:12px;
 }
 
+/* Крок «лист надіслано». Адреса всередині речення виділена — саме її
+   й перечитують, щоб переконатись, що не помилились. */
+.profile-email-sent{
+    margin:0;
+    font-size:14px;
+    line-height:1.6;
+    color:var(--gray700);
+}
+
+.profile-email-sent strong{
+    color:var(--gray900);
+}
+
 /* Згода на обробку даних. Галочка й текст в один рядок, посилання
    всередині тексту — щоб його можна було прочитати, не шукаючи. */
 /* flex-direction обов'язковий: .profile-form label вище ставить

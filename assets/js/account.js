@@ -23,7 +23,8 @@ const ordersListEl = document.getElementById("ordersList");
 const profileForm = document.getElementById("profileForm");
 const profileEmailEl = document.getElementById("profileEmail");
 const profileMessageEl = document.getElementById("profileMessage");
-const changePasswordBtn = document.getElementById("changePasswordBtn");
+// changePasswordBtn прибрано: зміна пароля стала окремою вкладкою з
+// формою «старий → новий», а не однією кнопкою «надіслати лист».
 
 // -------------------------
 // Глазок "показати/приховати пароль"
@@ -300,6 +301,21 @@ const resetPasswordError = document.getElementById("resetPasswordError");
 let isPasswordRecovery =
     window.location.hash.includes("type=recovery") ||
     window.location.search.includes("type=recovery");
+
+// Те саме для повернення з листа про зміну пошти. Supabase ставить
+// type=email_change (а при увімкненій подвійній перевірці ще й
+// email_change_confirm_new — тому шукаємо за початком рядка).
+const emailChangedCard = document.getElementById("emailChangedCard");
+
+const isEmailChanged =
+    window.location.hash.includes("type=email_change") ||
+    window.location.search.includes("type=email_change");
+
+// «Увійти» — це просто кабінет без службової частини адреси: сесія
+// вже є, показувати екран успіху вдруге нема сенсу.
+document.getElementById("emailChangedLogin")?.addEventListener("click", () => {
+    window.location.href = `${window.location.origin}/account`;
+});
 
 supabaseClient?.auth.onAuthStateChange((event) => {
 
@@ -1802,7 +1818,7 @@ document.querySelectorAll(".account-tab").forEach(tab => {
 
         // Перелік, а не три рядки: вкладок стало чотири, і кожна
         // нова вимагала б четвертого рядка в трьох місцях.
-        ["orders", "addresses", "profile", "newsletter"].forEach(name => {
+        ["orders", "addresses", "profile", "newsletter", "password"].forEach(name => {
 
             const panel = document.getElementById(name + "Panel");
 
@@ -1963,6 +1979,11 @@ const newEmailInput = document.getElementById("newEmail");
 const newEmailSubmit = document.getElementById("newEmailSubmit");
 const newEmailCancel = document.getElementById("newEmailCancel");
 const emailChangeMessage = document.getElementById("emailChangeMessage");
+const newEmailConfirm = document.getElementById("newEmailConfirm");
+const emailChangeStepForm = document.getElementById("emailChangeStepForm");
+const emailChangeStepSent = document.getElementById("emailChangeStepSent");
+const emailChangeSentTo = document.getElementById("emailChangeSentTo");
+const emailChangeClose = document.getElementById("emailChangeClose");
 
 function toggleEmailChange(open) {
 
@@ -1972,12 +1993,20 @@ function toggleEmailChange(open) {
 
     if (emailChangeMessage) emailChangeMessage.textContent = "";
 
+    // Завжди повертаємось на перший крок: другий («лист надіслано»)
+    // стосується конкретної адреси й після закриття вже неправдивий.
+    if (emailChangeStepForm) emailChangeStepForm.hidden = false;
+    if (emailChangeStepSent) emailChangeStepSent.hidden = true;
+
     if (open && newEmailInput) {
         newEmailInput.value = "";
+        if (newEmailConfirm) newEmailConfirm.value = "";
         newEmailInput.focus();
     }
 
 }
+
+emailChangeClose?.addEventListener("click", () => toggleEmailChange(false));
 
 changeEmailBtn?.addEventListener("click", () => toggleEmailChange(emailChangeBox.hidden));
 
@@ -1994,6 +2023,17 @@ newEmailSubmit?.addEventListener("click", async () => {
     // лист — той самий, яким Supabase і підтверджує зміну.
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(email)) {
         emailChangeMessage.textContent = "Перевірте адресу пошти";
+        return;
+    }
+
+    // ДРУГЕ ПОЛЕ — НЕ ФОРМАЛЬНІСТЬ.
+    //
+    // Помилки в пошті не видно: чужа адреса виглядає як звичайна.
+    // Лист піде на неї, людина його не отримає, а вхід лишиться за
+    // старою поштою — і зрозуміти, що саме сталось, буде нізвідки.
+    if ((newEmailConfirm?.value || "").trim().toLowerCase() !== email.toLowerCase()) {
+        emailChangeMessage.textContent = "Адреси не збігаються";
+        newEmailConfirm?.focus();
         return;
     }
 
@@ -2028,32 +2068,183 @@ newEmailSubmit?.addEventListener("click", async () => {
 
     }
 
-    toggleEmailChange(false);
+    // Другий крок: сказати, що лист пішов, і на яку саме адресу.
+    // Без цього екрана людина закриває сторінку в упевненості, що
+    // пошту вже змінено.
+    if (emailChangeSentTo) emailChangeSentTo.textContent = email;
 
-    showToast("Лист надіслано на нову адресу — перейдіть за посиланням у ньому");
+    if (emailChangeStepForm) emailChangeStepForm.hidden = true;
+    if (emailChangeStepSent) emailChangeStepSent.hidden = false;
 
 });
 
-changePasswordBtn?.addEventListener("click", async () => {
+// -------------------------
+// Вкладка «Змінити пароль»
+//
+// БУЛО: одна кнопка, яка надсилала лист. Тобто «змінити пароль»
+// означало «вийти з кабінету, відкрити пошту, знайти лист» — і це
+// при тому, що людина вже ввійшла й пароль пам'ятає.
+//
+// СТАЛО: старий пароль + новий, як усюди. Лист лишається — але для
+// того випадку, для якого він і потрібен: коли старого пароля не
+// пам'ятають.
+//
+// ЧОМУ ПИТАЄМО СТАРИЙ. Supabase міняє пароль, маючи лише відкриту
+// сесію, — старого не питає взагалі. Це означає, що будь-хто, хто сів
+// за незаблокований комп'ютер, міняє пароль і забирає акаунт: власник
+// більше не ввійде. Перевіряємо окремим входом із тією ж поштою.
+// -------------------------
+
+const passwordForm = document.getElementById("passwordForm");
+const passwordMessage = document.getElementById("passwordMessage");
+
+passwordForm?.addEventListener("submit", async event => {
+
+    event.preventDefault();
+
+    passwordMessage.textContent = "";
+
+    const oldPassword = document.getElementById("oldPassword").value;
+    const newPassword = document.getElementById("changedPassword").value;
+
+    if (!oldPassword) {
+        passwordMessage.textContent = "Введіть поточний пароль";
+        return;
+    }
+
+    // Верхня межа не наша примха: Supabase відмовляє довшим за 72
+    // байти, і відмова приходить англійською вже після натискання.
+    // 30 — та сама межа, що написана в підписі поля.
+    if (newPassword.length < 6 || newPassword.length > 30) {
+        passwordMessage.textContent = "Пароль має бути від 6 до 30 символів";
+        return;
+    }
+
+    if (newPassword === oldPassword) {
+        passwordMessage.textContent = "Новий пароль збігається зі старим";
+        return;
+    }
 
     const user = await getCurrentUser();
 
     if (!user) return;
 
-    changePasswordBtn.disabled = true;
+    const submitBtn = document.getElementById("passwordSubmit");
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Змінюємо...";
+
+    // Перевірка старого пароля — входом. Вдалий вхід оновлює ту саму
+    // сесію, тож для людини нічого не змінюється; невдалий нічого не
+    // псує.
+    const check = await supabaseClient.auth.signInWithPassword({
+        email: user.email,
+        password: oldPassword
+    });
+
+    if (check.error) {
+
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Змінити пароль";
+
+        passwordMessage.textContent = "Старий пароль неправильний";
+
+        return;
+
+    }
+
+    const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Змінити пароль";
+
+    if (error) {
+
+        console.warn("Не вдалося змінити пароль:", error.message);
+
+        passwordMessage.textContent = "Не вдалося змінити пароль. Спробуйте ще раз";
+
+        return;
+
+    }
+
+    passwordForm.reset();
+
+    showToast("Пароль змінено");
+
+});
+
+// «Забули пароль?» у кабінеті — той самий лист, що й на вході, але
+// адресу питати не треба: людина вже ввійшла, і ми її знаємо.
+const forgotBox = document.getElementById("forgotBox");
+const forgotStepForm = document.getElementById("forgotStepForm");
+const forgotStepSent = document.getElementById("forgotStepSent");
+const forgotMessage = document.getElementById("forgotMessage");
+
+function toggleForgot(open) {
+
+    if (!forgotBox) return;
+
+    forgotBox.hidden = !open;
+
+    if (forgotMessage) forgotMessage.textContent = "";
+
+    if (forgotStepForm) forgotStepForm.hidden = false;
+    if (forgotStepSent) forgotStepSent.hidden = true;
+
+}
+
+document.getElementById("forgotPasswordInsideBtn")?.addEventListener("click", async () => {
+
+    const user = await getCurrentUser();
+
+    if (!user) return;
+
+    const where = document.getElementById("forgotEmail");
+
+    if (where) where.textContent = user.email;
+
+    toggleForgot(forgotBox.hidden);
+
+});
+
+document.getElementById("forgotCancel")?.addEventListener("click", () => toggleForgot(false));
+document.getElementById("forgotClose")?.addEventListener("click", () => toggleForgot(false));
+
+document.getElementById("forgotSubmit")?.addEventListener("click", async event => {
+
+    const user = await getCurrentUser();
+
+    if (!user) return;
+
+    const button = event.currentTarget;
+
+    button.disabled = true;
+    button.textContent = "Надсилаємо...";
 
     const { error } = await supabaseClient.auth.resetPasswordForEmail(user.email, {
         redirectTo: `${window.location.origin}/account`
     });
 
-    changePasswordBtn.disabled = false;
+    button.disabled = false;
+    button.textContent = "Відновити";
 
     if (error) {
-        showToast("Не вдалося надіслати лист. Спробуйте ще раз");
+
+        console.warn("Не вдалося надіслати лист:", error.message);
+
+        forgotMessage.textContent = "Не вдалося надіслати лист. Спробуйте ще раз";
+
         return;
+
     }
 
-    showToast("Лист для зміни пароля надіслано на " + user.email);
+    const sentTo = document.getElementById("forgotSentTo");
+
+    if (sentTo) sentTo.textContent = user.email;
+
+    if (forgotStepForm) forgotStepForm.hidden = true;
+    if (forgotStepSent) forgotStepSent.hidden = false;
 
 });
 
@@ -2377,6 +2568,28 @@ async function renderAuthState() {
     const user = await getCurrentUser();
 
     authLoader.hidden = true;
+
+    // ПОВЕРНЕННЯ З ЛИСТА ПРО ЗМІНУ ПОШТИ.
+    //
+    // Supabase підтверджує адресу сам і повертає сюди з
+    // type=email_change в адресі. Без цього екрана людина бачила б
+    // просто кабінет — і не знала б, чи спрацювало: пошта в шапці
+    // змінилась би мовчки.
+    //
+    // Перевірка стоїть ПЕРЕД відновленням пароля, бо ознаки різні й
+    // сплутати їх нема як, а порядок читається зверху вниз.
+    if (emailChangedCard && isEmailChanged) {
+
+        authCard.hidden = true;
+        accountDashboard.hidden = true;
+        resetPasswordCard.hidden = true;
+        emailChangedCard.hidden = false;
+
+        return;
+
+    }
+
+    if (emailChangedCard) emailChangedCard.hidden = true;
 
     if (isPasswordRecovery) {
 
