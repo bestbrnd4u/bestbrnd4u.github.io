@@ -166,7 +166,13 @@ console.log("\n[4] Куди сайт стукає з коду");
         "novaposhta.ua", "www.novaposhta.ua",
         "www.instagram.com", "instagram.com", "t.me",
         "www.google.com", "developers.google.com",
+        // bestbrnd4u.github.io — походження GitHub Pages, тобто той
+        // самий сайт до підміни домену. Коли сторінка віддається
+        // звідти, запити до нього свої ж і покриті 'self'; в інших
+        // випадках він трапляється лише текстом у поясненнях. Той
+        // самий клас, що й два домени поруч.
         "bestbrnd4u.com", "dev.bestbrnd4u.com", "www.bestbrnd4u.com",
+        "bestbrnd4u.github.io",
         "github.com", "www.w3.org", "creativecommons.org",
         "fonts.googleapis.com", "fonts.gstatic.com",
         "img.youtube.com", "i.ytimg.com",

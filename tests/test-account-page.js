@@ -456,6 +456,108 @@ console.log("\n[8] Листи входу лежать у репозиторії"
     });
 }
 
+console.log("\n[8a] Розкривні блоки кабінету дихають");
+{
+    // ЧОМУ ВСЕРЕДИНІ БУЛО РІВНО НУЛЬ.
+    //
+    // .profile-email-change — колонка з gap. Але gap діє між ПРЯМИМИ
+    // дітьми, а це два кроки-обгортки, з яких видно завжди лише один.
+    // Усередині обгортки лишався звичайний блок без жодного відступу:
+    // поле торкалось наступного підпису, кнопка — поля над нею.
+    // Виміряно 0px в обох місцях, і саме це власник показав стрілкою.
+    ["emailChangeStepForm", "emailChangeStepSent", "forgotStepForm", "forgotStepSent"]
+        .forEach(id => check(`${id} — крок із відступами`,
+            new RegExp(`id="${id}"[^>]*class="profile-email-step"`).test(html)
+            || new RegExp(`class="profile-email-step"[^>]*id="${id}"`).test(html)));
+
+    const step = ruleBody(".profile-email-step");
+
+    check("крок — колонка", Boolean(step && /flex-direction:\s*column/.test(step)));
+
+    check("з відступом між рядками",
+        Boolean(step && /gap:\s*(\d+)px/.test(step) && Number(RegExp.$1) >= 10),
+        step);
+
+    // Кнопка, що стоїть у кроці сама («Закрити»), інакше розтягнулась
+    // би на всю ширину: колонка за замовчуванням тягне дітей.
+    check("поодинока кнопка не розтягується",
+        /\.profile-email-step > \.btn\{[^}]*align-self:\s*flex-start/.test(css));
+
+    // #forgotBox — сусід форми, а не її поле: .profile-card звичайний
+    // блок без gap, тож між кнопкою й рамкою було 0px.
+    check("блок не липне до кнопки над ним",
+        /\.profile-form \+ \.profile-email-change\{[^}]*margin-top:\s*(\d+)px/.test(css)
+        && Number(RegExp.$1) >= 16);
+
+    // Картка без підзаголовка: там заголовок висів за 6px від поля.
+    check("заголовок без підзаголовка має повітря",
+        /\.profile-card h2 \+ \.profile-form\{[^}]*margin-top:\s*(\d+)px/.test(css)
+        && Number(RegExp.$1) >= 14);
+
+    // З'ЯВЛЕННЯ. Блок виростає на дві-три сотні пікселів по кліку —
+    // без переходу це читається як збій. Ключові кадри, бо елемент
+    // перемикається через hidden (display:none), а з нього переходи
+    // не стартують. Анімуються лише opacity й transform: усе інше
+    // перераховувало б розкладку щокадру.
+    const keyframes = css.replace(/\/\*[\s\S]*?\*\//g, "")
+        .match(/@keyframes profile-panel-in\{([\s\S]*?\}\s*)\}/);
+
+    check("блок з'являється переходом", Boolean(keyframes));
+
+    check("анімуються лише opacity й transform",
+        Boolean(keyframes) && !/(?:^|[\s;{])(height|width|margin|padding|top|left)\s*:/
+            .test(keyframes[1]),
+        keyframes ? keyframes[1].replace(/\s+/g, " ") : "");
+
+    check("тривалість у межах 300ms",
+        /animation:profile-panel-in (\d+)ms/.test(css) && Number(RegExp.$1) <= 300,
+        RegExp.$1);
+
+    // ease-in стартує повільно саме тоді, коли на нього дивляться, —
+    // і через це відчувається млявішим за ease-out тієї ж довжини.
+    check("крива — ease-out, а не ease-in",
+        /animation:profile-panel-in \d+ms var\(--ease-out\)/.test(css));
+}
+
+console.log("\n[8b] Токен із листа доїжджає до кабінету");
+{
+    // ЩО СТАЛОСЬ НАСПРАВДІ.
+    //
+    // У листі «Відновлення пароля» стояло
+    // redirect_to=https://bestbrnd4u.github.io — тобто головна, а не
+    // кабінет. Адресу повернення обирає Supabase: наш redirectTo діє
+    // лише якщо він є в списку дозволених у панелі, інакше мовчки
+    // береться Site URL.
+    //
+    // Токен при цьому живий і лежить у #-частині адреси. Клієнт
+    // Supabase підхоплює його на БУДЬ-ЯКІЙ сторінці, відкриває сесію
+    // й чистить адресу — екран «новий пароль» не показується вже
+    // ніколи, бо посилання одноразове.
+    const client = read("assets/js/supabase-client.js");
+
+    check("службовий токен переноситься в кабінет",
+        /type=\(recovery\|email_change\)/.test(client));
+
+    // Перевірка мусить стояти ДО створення клієнта — інакше той
+    // встигне забрати токен і почистити адресу.
+    check("перенесення стоїть до створення клієнта",
+        client.indexOf("carryAuthTokenToAccount") < client.indexOf("createClient"));
+
+    // Без перевірки «ми вже в кабінеті» це перенаправлення саме на
+    // себе, тобто нескінченне.
+    check("на самому кабінеті не спрацьовує",
+        /here\.endsWith\("\/account"\)/.test(client));
+
+    // href лишав би в історії адресу з уже використаним токеном:
+    // кнопка «назад» вела б у нікуди.
+    check("історію не засмічує", /location\.replace\(/.test(client));
+
+    // Код — лише страховка. Правильні Site URL і список дозволених
+    // адрес у панелі потрібні все одно, і про це має бути сказано.
+    check("сказано, що панель усе одно треба налаштувати",
+        /Site URL/.test(client) && /дозволених/.test(client));
+}
+
 console.log("\n[9] event.currentTarget не читається після await");
 {
     // ЧОМУ ЦЕ ОКРЕМА ПЕРЕВІРКА, А НЕ ДРІБНИЦЯ СТИЛЮ.
