@@ -42,9 +42,17 @@ const css = read("assets/css/style.css");
 const subscribe = read("assets/js/subscribe.js");
 
 // Тіло правила з style.css за точним селектором.
+//
+// ПРИВ'ЯЗКА ДО ПОЧАТКУ РЯДКА ОБОВ'ЯЗКОВА. Без неї пошук
+// «.subscribe-consent input[type="checkbox"]» знаходив
+// «.subscribe-account .subscribe-consent input[type="checkbox"]» —
+// той самий рядок є підрядком довшого селектора. Тест читав тіло
+// чужого правила й чесно повідомляв, що там немає ширини.
 const ruleBody = selector => {
 
-    const re = new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\s*\\{([^}]*)\\}");
+    const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+    const re = new RegExp("(?:^|\\n)" + escaped + "\\s*\\{([^}]*)\\}");
 
     const found = css.replace(/\/\*[\s\S]*?\*\//g, "").match(re);
 
@@ -199,6 +207,78 @@ console.log("\n[6] Згода на обробку даних");
         check("  зберігає час, а не булеве", /privacy_consent_at timestamptz/i.test(sql));
 
     }
+}
+
+console.log("\n[6a] Прапорці згоди не розсувають текст");
+{
+    // КАПКАН, У ЯКИЙ Я ВСТУПИВ УДВІЧІ.
+    //
+    // Угорі style.css є загальне правило форм:
+    //
+    //     input, textarea, select{ width:100%; padding:14px 16px; … }
+    //
+    // Типу воно не розрізняє. Прапорець у flex-рядку отримує
+    // width:100% від картки й видавлює текст згоди у вузький
+    // стовпчик — по одному-два слова в рядок. Перший раз це сталося
+    // з підпискою в підвалі, другий — зі згодою в кабінеті, і обидва
+    // рази це бачив власник, а не тест.
+    //
+    // Виміряно після правки: прапорець 16×16, текст 550px в один
+    // рядок замість стовпчика під правим краєм.
+    [".profile-consent", ".subscribe-consent"].forEach(base => {
+
+        const body = ruleBody(base + ' input[type="checkbox"]');
+
+        check(`${base}: прапорець має явну ширину`,
+            Boolean(body && /width:\s*\d+px/.test(body)),
+            body === null ? "правила немає" : body.replace(/\s+/g, " "));
+
+        check(`  і не тягнеться (flex:0 0 auto)`,
+            Boolean(body && /flex:\s*0 0 auto/.test(body)));
+
+        // padding із загального правила теж треба зняти: прапорцю
+        // потрібен розмір позначки, а не поле навколо неї.
+        check(`  і без поля навколо позначки`,
+            Boolean(body && /padding:\s*0/.test(body)));
+
+    });
+}
+
+console.log("\n[6b] Форма підписки читається на світлій картці");
+{
+    // Базові .subscribe-* написані під ТЕМНИЙ підвал: поле з
+    // напівпрозорим білим тлом, біла кнопка, текст
+    // rgba(255,255,255,.6). На білій картці кабінету поле зникало,
+    // кнопка читалась як звичайний рядок тексту, згода була невидима.
+    //
+    // Перефарбовуємо рівно кольори — розкладка лишається спільною:
+    // дві копії верстки тієї самої форми розійшлися б на першій
+    // правці.
+    [["поле", ".subscribe-account .subscribe-row input", /background:#fff/],
+     ["кнопка", ".subscribe-account .subscribe-row button", /background:var\(--secondary\)/],
+     ["текст згоди", ".subscribe-account .subscribe-consent", /color:var\(--gray500\)/]]
+        .forEach(([name, selector, re]) => {
+
+            const body = ruleBody(selector);
+
+            check(`${name} перефарбовано під світле тло`,
+                Boolean(body && re.test(body)),
+                body === null ? "правила немає" : body.replace(/\s+/g, " "));
+
+        });
+
+    // Світло-зелений і світло-рожевий читались на темному, на білому
+    // — ні.
+    check("відповідь про підписку теж читається",
+        /\.subscribe-account \.subscribe-note-ok\{ color:#047857; \}/.test(css)
+        && /\.subscribe-account \.subscribe-note-error\{ color:#b91c1c; \}/.test(css));
+
+    // Ширину задає базове .subscribe{max-width:320px} нижче по файлу
+    // — з однаковою вагою воно перемагало б порядком, і поле вводу
+    // стискалось до 196px.
+    check("ширина форми в кабінеті перебиває підвальну",
+        /\.subscribe\.subscribe-account\{/.test(css.replace(/\s+/g, "")),
+        "потрібні два класи в селекторі");
 }
 
 console.log("\n[7] Підписка працює на обох формах");

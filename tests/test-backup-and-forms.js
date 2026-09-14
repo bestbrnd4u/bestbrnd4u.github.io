@@ -212,7 +212,15 @@ console.log("\n[3] Підписка на листи");
     // 311px на телефоні, переповнення немає на жодній ширині.
     const css = read("assets/css/style.css");
 
-    const consentRule = (css.match(/\.subscribe-consent input\[type="checkbox"\]\{[^}]*\}/) || [])[0] || "";
+    // ПРИВ'ЯЗКА ДО ПОЧАТКУ РЯДКА ОБОВ'ЯЗКОВА.
+    //
+    // Без неї пошук знаходив перше-ліпше правило, чий селектор
+    // МІСТИТЬ цей рядок, — а таким стало
+    // «.subscribe-account .subscribe-consent input[type="checkbox"]»,
+    // яке перефарбовує галочку в кабінеті й розміру не задає. Тест
+    // читав тіло чужого правила й повідомляв про поломку, якої немає.
+    const consentRule = (css.match(
+        /(?:^|\n)\.subscribe-consent input\[type="checkbox"\]\{[^}]*\}/) || [])[0] || "";
 
     check("прапорець згоди має власний розмір", /width:16px/.test(consentRule)
         && /height:16px/.test(consentRule), consentRule.slice(0, 60));

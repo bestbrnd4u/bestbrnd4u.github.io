@@ -8687,17 +8687,101 @@ body.mobile-filters-open .scroll-top{
     color:var(--gray500);
 }
 
-.profile-consent input{
-    margin-top:2px;
-    flex-shrink:0;
+/* ПРАПОРЕЦЬ ТУТ МУСИТЬ БУТИ ЯВНО ОБМЕЖЕНИЙ — той самий капкан, що
+   описаний у .subscribe-consent input[type="checkbox"] нижче, і я в
+   нього вступив удруге.
+
+   Загальне правило форм угорі файлу:
+
+       input, textarea, select{ width:100%; padding:14px 16px; … }
+
+   Типу воно не розрізняє, тож прапорець отримував width:100% від
+   картки профілю. Разом із flex-shrink:0 це давало широкий
+   невидимий прямокутник, який видавлював текст згоди у вузький
+   стовпчик біля правого краю — по одному-два слова в рядок. Саме це
+   й показав власник на скріншоті.
+
+   width/height замість padding: прапорцю потрібен розмір самої
+   позначки, а не поле навколо неї. */
+.profile-consent input[type="checkbox"]{
+    flex:0 0 auto;
+    width:16px;
+    height:16px;
+    margin:2px 0 0;
+    padding:0;
+    border:0;
+    border-radius:4px;
+    background:none;
+    accent-color:var(--secondary);
+    cursor:pointer;
 }
 
-/* Форма підписки в кабінеті ширша за футерну: там вона в вузькій
-   колонці, тут — у картці на всю ширину. */
-.subscribe-account{
+/* Текст забирає решту рядка — інакше він тулиться до правого краю. */
+.profile-consent span{
+    flex:1 1 auto;
+}
+
+/* ФОРМА ПІДПИСКИ В КАБІНЕТІ — НА СВІТЛІЙ КАРТЦІ, А НЕ В ТЕМНОМУ
+   ПІДВАЛІ.
+
+   Базові .subscribe-* писались під підвал і тому світлі: поле має
+   напівпрозоре біле тло й білу рамку, кнопка — біла із темним
+   написом, текст згоди rgba(255,255,255,.6). На темному це виглядає
+   правильно, на білій картці кабінету — не виглядає ніяк: поле
+   зникає, кнопка читається як звичайний рядок тексту, згода
+   невидима. Саме це й було на скріншоті.
+
+   Тому тут перефарбовуємо — рівно кольори, нічого більше. Розкладка,
+   відступи й поведінка лишаються спільними: дві копії верстки тієї
+   самої форми розійшлися б на першій же правці. Той самий підхід, що
+   в .newsletter .subscribe вище. */
+/* Два класи в селекторі, бо базове .subscribe{max-width:320px} лежить
+   нижче по файлу й з однаковою вагою перемагало б порядком. 320px —
+   ширина колонки підвалу; у картці кабінету від цього поле вводу
+   стискалось до 196px. */
+.subscribe.subscribe-account{
     max-width:520px;
     margin:16px 0 20px;
 }
+
+.subscribe-account .subscribe-label{
+    color:var(--gray700);
+}
+
+.subscribe-account .subscribe-row input{
+    border:1px solid var(--gray200);
+    background:#fff;
+    color:var(--gray900);
+}
+
+/* --gray300, а не --gray400: четвертого відтінку в :root немає, і
+   var(--gray400) не намалював би нічого — підказка в полі просто
+   зникла б, без жодної помилки в консолі. */
+.subscribe-account .subscribe-row input::placeholder{
+    color:var(--gray300);
+}
+
+.subscribe-account .subscribe-row input:focus{
+    border-color:var(--secondary);
+}
+
+.subscribe-account .subscribe-row button{
+    background:var(--secondary);
+    color:#fff;
+}
+
+.subscribe-account .subscribe-consent{
+    color:var(--gray500);
+}
+
+.subscribe-account .subscribe-consent input[type="checkbox"]{
+    accent-color:var(--secondary);
+}
+
+/* Світло-зелений і світло-рожевий читались на темному підвалі, на
+   білому — ні. */
+.subscribe-account .subscribe-note-ok{ color:#047857; }
+.subscribe-account .subscribe-note-error{ color:#b91c1c; }
 
 .profile-form .auth-link{
     align-self:flex-start;
