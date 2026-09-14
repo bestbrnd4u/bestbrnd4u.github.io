@@ -2434,6 +2434,87 @@ function thankYouLetter(order, promo, siteUrl) {
 
 }
 
+// Лист підтвердження підписки на розсилку.
+//
+// ЧОМУ ВІН ТУТ, А НЕ В MAILERLITE
+// --------------------------------
+// MailerLite шле свій — англійською, «Confirm your email address», —
+// і відредагувати його на безкоштовному тарифі не можна: кнопка
+// «Редагувати» в панелі закрита підказкою «доступно лише в платних
+// тарифах». Людина щойно залишила пошту українському магазину й
+// отримує лист чужою мовою від назви, яку бачила вперше. Такі не
+// відкривають — а без відкриття підписка назавжди лишається
+// «unconfirmed»: у списку є, листів не отримує.
+//
+// ЧОМУ ПІДТВЕРДЖЕННЯ ВЗАГАЛІ ПОТРІБНЕ
+// ------------------------------------
+// Поштову адресу в форму може вписати будь-хто — свою чи чужу.
+// Єдине, що відрізняє згоду від чужого жарту, — перехід за
+// посиланням із самої скриньки. Це ж захищає й репутацію
+// відправника: листи, на які не підписувались, відмічають як спам, і
+// далі не доходять уже нічиї.
+//
+// ЩО В ЛИСТІ Є І ЧОГО НЕМАЄ
+// --------------------------
+// Є одна дія й пряма адреса під кнопкою — на випадок, якщо кнопка не
+// натиснеться (буває в поштових клієнтах, які ріжуть розмітку).
+// Немає знижки за підтвердження, зворотного відліку й «залишилось 3
+// години»: людина ще нічого нам не винна, і квапити її нема за що.
+//
+// Є рядок «якщо це були не ви». Без нього лист, що прийшов на чужу
+// адресу, виглядає як спам від магазину — і саме так його й
+// відмітять.
+function subscribeConfirmLetter(confirmUrl, siteUrl) {
+
+    const url = String(confirmUrl ?? "").trim();
+
+    if (!url) return null;
+
+    const safe = escapeHtml(url);
+
+    const body = [
+        `<div style="font-size:15px;line-height:1.6">`,
+        `Ви залишили цю адресу на bestbrnd4u.com, щоб отримувати листи `,
+        `про новинки та акції. Лишилось підтвердити, що скринька ваша.`,
+        `</div>`,
+
+        // Кнопка таблицею, а не <a> з padding: Outlook ігнорує
+        // відступи на посиланні й малює його звичайним рядком
+        // тексту. Той самий прийом, що в листах входу в кабінет.
+        `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:22px auto 0">`,
+        `<tr><td style="background:#111827;border-radius:10px">`,
+        `<a href="${safe}" style="display:inline-block;padding:14px 28px;`,
+        `font-size:15px;font-weight:700;color:#ffffff;text-decoration:none">`,
+        `Підтвердити підписку`,
+        `</a>`,
+        `</td></tr>`,
+        `</table>`,
+
+        // Адреса текстом — для клієнтів, які ріжуть кнопки, і для
+        // тих, хто перед переходом дивиться, куди саме веде.
+        `<div style="margin-top:18px;font-size:12px;line-height:1.5;color:#6b7280;`,
+        `text-align:center;word-break:break-all">`,
+        `Кнопка не працює? Скопіюйте адресу:<br>`,
+        `<a href="${safe}" style="color:#6b7280">${safe}</a>`,
+        `</div>`,
+
+        `<div style="margin-top:22px;padding-top:18px;border-top:1px solid #e5e7eb;`,
+        `font-size:13px;line-height:1.6;color:#6b7280">`,
+        `Посилання діє тиждень. Листи приходять не частіше ніж кілька разів `,
+        `на місяць, і відписатись можна з будь-якого — посилання внизу кожного.`,
+        `<br><br>`,
+        `Якщо це були не ви — просто видаліть лист. Без переходу за посиланням `,
+        `ми на цю адресу нічого не надсилатимемо.`,
+        `</div>`,
+    ].join("");
+
+    return {
+        subject: "Підтвердіть підписку на новинки BestBrnd4u",
+        html: letterShell("Залишився один крок ✉️", body, siteUrl),
+    };
+
+}
+
 function mailRequest(config, letter) {
 
     const to = String(config?.to || "").trim();
@@ -3994,6 +4075,132 @@ function subscribeVerdict(status, data) {
     if (status === 429) return { ok: false, reason: "забагато запитів до MailerLite" };
 
     return { ok: false, reason: `HTTP ${status}` };
+
+}
+
+
+// -------------------------
+// Підтвердження підписки НАШИМ листом
+//
+// ЧОМУ НЕ ЛИСТОМ MAILERLITE
+// --------------------------
+// Він приходив англійською — «Confirm your email address», — а
+// відредагувати його на безкоштовному тарифі не можна: у панелі
+// кнопка «Редагувати» закрита підказкою «доступно лише в платних
+// тарифах». Людина щойно залишила пошту українському магазину й
+// отримує лист чужою мовою від назви, яку бачила вперше. Такі не
+// відкривають, а без відкриття підписка назавжди лишається
+// «unconfirmed»: у списку є, листів не отримує.
+//
+// Решта листів магазину збирається в mail.js і йде через Resend або
+// Brevo. Цей був єдиним винятком.
+// -------------------------
+
+// Скільки живе посилання з листа.
+//
+// Тиждень, а не година: лист про підписку не терміновий, його
+// відкривають тоді, коли дійдуть руки. Година означала б, що людина,
+// яка прочитала пошту ввечері, отримує «посилання застаріло» — і
+// вдруге вже не підписується.
+const CONFIRM_TTL_HOURS = 168;
+
+// Скільки чекати між двома листами на ту саму адресу.
+//
+// Форма відкрита всім, і без цього її можна перетворити на спосіб
+// завалити чужу скриньку: вписуй чужу пошту й тисни кнопку. Межа за
+// IP уже є, але вона не рятує, коли натискають з різних мереж.
+//
+// П'ять хвилин — компроміс: людина, яка не отримала листа й тисне
+// ще раз, чекає недовго, а надіслати сотню листів поспіль не
+// вийде.
+const CONFIRM_COOLDOWN_MINUTES = 5;
+
+// Токен із посилання. uuid і нічого крім — усе інше навіть не
+// шукаємо в базі.
+function cleanToken(value) {
+
+    const clean = String(value ?? "").trim().toLowerCase();
+
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(clean)
+        ? clean
+        : "";
+
+}
+
+// Адреса, яку кладемо в лист.
+//
+// Веде на САЙТ, а не на функцію: у листі має стояти домен, який
+// людина впізнає. Чужий домен у посиланні — перше, на що дивляться
+// і поштові фільтри, і самі люди.
+function confirmUrl(siteUrl, token) {
+
+    const base = String(siteUrl ?? "").replace(/\/+$/, "");
+
+    if (!base || !token) return "";
+
+    return `${base}/newsletter-confirm?token=${encodeURIComponent(token)}`;
+
+}
+
+// Чи можна підтвердити за цим записом.
+//
+// Чиста функція: усе, що вирішується без мережі, вирішується тут —
+// і перевіряється тестами.
+//
+// state:
+//   ok       — підтверджуємо;
+//   used     — за посиланням уже переходили (лист відкрили двічі,
+//              або поштовий фільтр сам «клікнув» — таке буває);
+//   expired  — посилання старіше за CONFIRM_TTL_HOURS;
+//   unknown  — такого токена немає.
+function confirmVerdict(row, now) {
+
+    if (!row || !row.email) return { ok: false, state: "unknown" };
+
+    // Уже підтверджено — це не помилка. Людина мусить побачити «усе
+    // гаразд, ви підписані», а не «посилання недійсне»: вона зробила
+    // все правильно, просто двічі.
+    if (row.confirmed_at) return { ok: false, state: "used", email: row.email };
+
+    const created = Date.parse(row.created_at ?? "");
+
+    if (Number.isFinite(created)) {
+
+        const age = (Number(now) - created) / 36e5;
+
+        if (age > CONFIRM_TTL_HOURS) return { ok: false, state: "expired", email: row.email };
+
+    }
+
+    return { ok: true, state: "ok", email: row.email };
+
+}
+
+// Зробити підписку діючою.
+//
+// POST на той самий шлях, що й створення: MailerLite оновлює
+// існуючого підписника за поштою й віддає 200 (саме на цьому
+// побудований subscribeVerdict вище). Окремий ендпоінт із id тут не
+// потрібен — id ми не зберігаємо, а пошта є.
+function activateRequest(apiKey, email) {
+
+    const key = String(apiKey ?? "").trim();
+    const clean = cleanEmail(email);
+
+    if (!key || !clean) return null;
+
+    return {
+        url: "https://connect.mailerlite.com/api/subscribers",
+        headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${key}`,
+        },
+        body: {
+            email: clean,
+            status: "active",
+        },
+    };
 
 }
 
@@ -7727,6 +7934,19 @@ async function handleSubscribe(request: Request, body: Record<string, any>): Pro
 
     }
 
+    // ЛИСТ ПІДТВЕРДЖЕННЯ НАДСИЛАЄМО САМІ.
+    //
+    // MailerLite шле свій, але англійською, і на безкоштовному
+    // тарифі його не відредагувати — пояснення в subscribe.js.
+    // Тому: підписник лишається «unconfirmed» у списку, а лист іде
+    // наш, і активним він стане після переходу за посиланням.
+    //
+    // Тим, хто вже підтвердив, лист не потрібен: вони й так
+    // отримують розсилку.
+    if (verdict.state !== "active") {
+      await sendSubscribeConfirmation(clean.subscriber.email);
+    }
+
     // state каже, ЩО саме сталося: нову пошту додали, чи вона вже
     // була в списку, і чи підтверджена підписка. Без цього сторінка
     // обіцяла лист підтвердження навіть тому, хто підписався давно
@@ -7742,6 +7962,168 @@ async function handleSubscribe(request: Request, body: Record<string, any>): Pro
     console.error("MailerLite недоступний:", error);
 
     return adminJson({ ok: false, error: "unavailable" }, 200, origin);
+
+  }
+
+}
+
+// Наш лист підтвердження підписки.
+//
+// Ніколи не кидає винятків і ніколи не заважає відповіді: людина вже
+// натиснула кнопку, і форма мусить відповісти їй незалежно від того,
+// чи доступний зараз сервіс розсилки.
+async function sendSubscribeConfirmation(email: string): Promise<boolean> {
+
+  try {
+
+    // ЧУЖУ СКРИНЬКУ НЕ ЗАВАЛЮЄМО.
+    //
+    // Форма відкрита всім: вписуй чужу пошту й тисни кнопку. Межа за
+    // IP уже є, але вона не рятує, коли тиснуть із різних мереж.
+    // Тому дивимось, чи не надсилали ми цій адресі листа щойно.
+    const since = new Date(Date.now() - CONFIRM_COOLDOWN_MINUTES * 60000).toISOString();
+
+    const recent = await supabaseRest(
+      `newsletter_confirmations?email=eq.${encodeURIComponent(email)}`
+      + `&created_at=gte.${encodeURIComponent(since)}&confirmed_at=is.null&select=token&limit=1`
+    );
+
+    // Таблиці ще немає (міграцію 032 не застосували) — не мовчимо:
+    // без неї підтвердити підписку неможливо взагалі, і знати про це
+    // треба власнику, а не покупцю.
+    if (!recent.ok) {
+
+      const text = await recent.text();
+
+      console.error("Таблиця newsletter_confirmations недоступна:", text);
+
+      await reportServerIssue("mail_list", "Підтвердження підписки: немає таблиці (міграція 032)");
+
+      return false;
+
+    }
+
+    const rows = await recent.json().catch(() => []);
+
+    if (Array.isArray(rows) && rows.length) {
+
+      // Лист щойно пішов. Мовчки вважаємо, що все гаразд: людині
+      // треба перевірити пошту, а не отримати другий такий самий.
+      console.log("Лист підтвердження вже надсилали щойно:", email);
+
+      return true;
+
+    }
+
+    const created = await supabaseRest("newsletter_confirmations", {
+      method: "POST",
+      headers: { Prefer: "return=representation" },
+      body: JSON.stringify({ email }),
+    });
+
+    if (!created.ok) {
+
+      console.error("Не вдалося створити посилання підтвердження:", await created.text());
+
+      return false;
+
+    }
+
+    const row = (await created.json().catch(() => []))[0];
+
+    const link = confirmUrl(SITE_URL, row?.token);
+
+    if (!link) return false;
+
+    return await sendCustomerMail({ email }, subscribeConfirmLetter(link, SITE_URL));
+
+  } catch (error) {
+
+    console.error("Лист підтвердження підписки не пішов:", error);
+
+    return false;
+
+  }
+
+}
+
+// Перехід за посиланням із листа.
+//
+// ЩО ТУТ ВАЖЛИВО. Відповідь мусить розрізняти «підтверджено»,
+// «уже підтверджували», «посилання застаріло» й «такого посилання
+// немає»: для людини це чотири різні ситуації, і «недійсне
+// посилання» замість «ви вже підписані» — привід підписатись ще раз
+// або написати нам.
+async function handleSubscribeConfirm(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  const token = cleanToken(body?.token);
+
+  if (!token) {
+    return adminJson({ ok: false, state: "unknown" }, 400, origin);
+  }
+
+  try {
+
+    const found = await supabaseRest(
+      `newsletter_confirmations?token=eq.${encodeURIComponent(token)}&select=*&limit=1`
+    );
+
+    if (!found.ok) {
+
+      console.error("Підтвердження підписки: база не відповіла:", await found.text());
+
+      return adminJson({ ok: false, state: "error" }, 200, origin);
+
+    }
+
+    const row = (await found.json().catch(() => []))[0] ?? null;
+
+    const verdict = confirmVerdict(row, Date.now());
+
+    if (!verdict.ok) {
+      return adminJson({ ok: false, state: verdict.state }, 200, origin);
+    }
+
+    // СПОЧАТКУ MAILERLITE, ПОТІМ ПОЗНАЧКА.
+    //
+    // Якщо зробити навпаки й MailerLite відмовить, у нас лишиться
+    // підтверджена підписка, якої в списку розсилки немає, — і
+    // повторний перехід за посиланням уже нічого не виправить, бо
+    // воно вважатиметься використаним.
+    const plan = activateRequest(MAILERLITE_API_KEY, verdict.email);
+
+    if (!plan) {
+      return adminJson({ ok: false, state: "error" }, 200, origin);
+    }
+
+    const response = await fetch(plan.url, {
+      method: "POST",
+      headers: plan.headers,
+      body: JSON.stringify(plan.body),
+    });
+
+    if (!response.ok) {
+
+      console.error("MailerLite не активував підписку:", await response.text());
+
+      return adminJson({ ok: false, state: "error" }, 200, origin);
+
+    }
+
+    await supabaseRest(`newsletter_confirmations?token=eq.${encodeURIComponent(token)}`, {
+      method: "PATCH",
+      body: JSON.stringify({ confirmed_at: new Date().toISOString() }),
+    });
+
+    return adminJson({ ok: true, state: "confirmed" }, 200, origin);
+
+  } catch (error) {
+
+    console.error("Підтвердження підписки не вдалося:", error);
+
+    return adminJson({ ok: false, state: "error" }, 200, origin);
 
   }
 
@@ -8608,6 +8990,13 @@ async function handleRequest(request: Request): Promise<Response> {
   if (body.site_action === "subscribe") {
 
     return await handleSubscribe(request, body);
+
+  }
+
+  // --- перехід за посиланням із листа підтвердження підписки ---
+  if (body.site_action === "subscribe-confirm") {
+
+    return await handleSubscribeConfirm(request, body);
 
   }
 

@@ -147,6 +147,10 @@ rewrite("robots.txt", () => {
         "Disallow: /checkout",
         "Disallow: /favorites",
         "Disallow: /thanks",
+        // Сторінка одноразового посилання з листа про підписку:
+        // сама по собі вона порожня, а з чужим токеном в адресі їй
+        // в індексі тим більше нема чого робити.
+        "Disallow: /newsletter-confirm",
         "",
         `Sitemap: ${SITE_URL}/sitemap.xml`,
         ""

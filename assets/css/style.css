@@ -12002,6 +12002,18 @@ body.mobile-filters-open .scroll-top{
     color:var(--gray700);
 }
 
+/* Дві кнопки під підтвердженням підписки.
+   Окремий клас, а не .confirm-actions нижче: той живе у вікні
+   видалення адреси, де кнопки тягнуться на всю ширину вікна
+   (flex:1). На сторінці шириною в контейнер вони розтяглися б через
+   пів екрана кожна. */
+.confirm-page-actions{
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:12px;
+}
+
 .confirm-actions{
     display:flex;
     gap:10px;

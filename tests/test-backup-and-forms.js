@@ -392,6 +392,183 @@ console.log("\n[3] Підписка на листи");
         /лист із підтвердженням/.test(pageJs));
 }
 
+console.log("\n[3a] Лист підтвердження підписки — наш, а не MailerLite");
+{
+    // ЩО БУЛО НЕ ТАК.
+    //
+    // Лист надсилав MailerLite, і приходив він АНГЛІЙСЬКОЮ:
+    // «Confirm your email address». Відредагувати його на
+    // безкоштовному тарифі не можна — у панелі кнопка «Редагувати»
+    // закрита підказкою «доступно лише в платних тарифах».
+    //
+    // Людина щойно залишила пошту українському магазину й отримує
+    // лист чужою мовою від назви, яку бачила вперше. Такі не
+    // відкривають. А без відкриття підписка назавжди лишається
+    // «unconfirmed»: у списку є, листів не отримує — тобто форма
+    // працює, а розсилки немає.
+    //
+    // Решта листів магазину збирається в mail.js і йде через Resend
+    // або Brevo. Цей був єдиним винятком.
+    const sub = loadModule("supabase/functions/telegram-order-bot/subscribe.js", [
+        "cleanToken", "confirmUrl", "confirmVerdict", "activateRequest",
+        "CONFIRM_TTL_HOURS", "CONFIRM_COOLDOWN_MINUTES",
+    ]);
+
+    // require, а не loadModule: mail.js імпортує format.js, а
+    // loadModule збирає модуль через new Function — там import
+    // просто синтаксична помилка. Так само його бере
+    // test-customer-mail.js.
+    const mail = require("../supabase/functions/telegram-order-bot/mail.js");
+
+    const indexTs = read("supabase/functions/telegram-order-bot/index.ts");
+
+    const letter = mail.subscribeConfirmLetter(
+        "https://bestbrnd4u.com/newsletter-confirm?token=8f14e45f-ceea-467a-9f2c-6a1b3c4d5e6f",
+        "https://bestbrnd4u.com"
+    );
+
+    check("лист збирається в нас", Boolean(letter && letter.html));
+
+    // Головне, заради чого все й робилось.
+    check("лист українською",
+        /[Ѐ-ӿ]/.test(letter.subject)
+        && !/Confirm your email/i.test(letter.html),
+        letter.subject);
+
+    check("у листі є посилання підтвердження",
+        letter.html.includes("newsletter-confirm?token="));
+
+    // Поштові клієнти ріжуть розмітку кнопок — адреса мусить бути ще
+    // й текстом, інакше лист стає глухим кутом.
+    check("адреса продубльована текстом",
+        (letter.html.match(/newsletter-confirm\?token=/g) || []).length >= 2);
+
+    // Лист, що прийшов на чужу адресу, без цього рядка виглядає як
+    // спам від магазину — і саме так його й відмітять.
+    check("сказано, що робити, якщо це були не ви",
+        /не ви/.test(letter.html));
+
+    check("сказано, як відписатись", /відписатись/i.test(letter.html));
+
+    // ТОКЕН. Усе, що не uuid, до бази не доходить узагалі.
+    check("токен перевіряється за формою",
+        sub.cleanToken("8F14E45F-CEEA-467A-9F2C-6A1B3C4D5E6F")
+            === "8f14e45f-ceea-467a-9f2c-6a1b3c4d5e6f"
+        && sub.cleanToken("' or 1=1--") === ""
+        && sub.cleanToken("") === "");
+
+    // Посилання веде на САЙТ, а не на функцію: у листі має стояти
+    // домен, який людина впізнає.
+    check("посилання веде на сайт",
+        sub.confirmUrl("https://bestbrnd4u.com/", "abc")
+            === "https://bestbrnd4u.com/newsletter-confirm?token=abc");
+
+    // ЧОТИРИ СТАНИ, А НЕ ДВА. «Ви вже підписані» замість «недійсне
+    // посилання» — різниця між спокоєм і другою спробою підписатись.
+    const hour = 36e5;
+    const now = Date.parse("2026-09-14T12:00:00Z");
+
+    check("свіже посилання підтверджується",
+        sub.confirmVerdict(
+            { email: "a@b.co", created_at: "2026-09-14T11:00:00Z" }, now
+        ).state === "ok");
+
+    check("повторний перехід — «вже підписані», а не помилка",
+        sub.confirmVerdict(
+            { email: "a@b.co", created_at: "2026-09-14T11:00:00Z",
+                confirmed_at: "2026-09-14T11:30:00Z" }, now
+        ).state === "used");
+
+    check("протухле посилання розпізнається",
+        sub.confirmVerdict(
+            { email: "a@b.co", created_at: new Date(now - (sub.CONFIRM_TTL_HOURS + 1) * hour).toISOString() },
+            now
+        ).state === "expired");
+
+    check("невідомий токен не підтверджує нічого",
+        sub.confirmVerdict(null, now).state === "unknown"
+        && sub.confirmVerdict(null, now).ok === false);
+
+    // Строк такий, щоб лист устигли відкрити ввечері наступного дня.
+    check("посилання живе не менше доби", sub.CONFIRM_TTL_HOURS >= 24,
+        sub.CONFIRM_TTL_HOURS);
+
+    // АКТИВАЦІЯ. Ключ MailerLite — лише на сервері.
+    check("активація йде в MailerLite",
+        sub.activateRequest("key", "a@b.co").body.status === "active");
+
+    check("без ключа активації немає",
+        sub.activateRequest("", "a@b.co") === null);
+
+    check("ключ у заголовку, а не в адресі",
+        /Bearer key/.test(sub.activateRequest("key", "a@b.co").headers.Authorization));
+
+    // ПОРЯДОК ДІЙ. Спершу MailerLite, потім позначка: інакше при
+    // відмові MailerLite лишилась би підтверджена підписка, якої в
+    // списку немає, а посилання вже вважалося б використаним.
+    const handler = (indexTs.match(/async function handleSubscribeConfirm[\s\S]*?\n\}/) || [""])[0];
+
+    check("маршрут підтвердження є", Boolean(handler));
+
+    check("спершу MailerLite, потім позначка",
+        handler.indexOf("activateRequest") < handler.indexOf("confirmed_at"));
+
+    check("маршрут під'єднано", /site_action === "subscribe-confirm"/.test(indexTs));
+
+    // Підтвердженим лист не потрібен: вони й так отримують розсилку.
+    check("вже підтвердженим лист не шлемо",
+        /verdict\.state !== "active"[\s\S]{0,120}sendSubscribeConfirmation/.test(indexTs));
+
+    // Форма відкрита всім: без паузи її можна перетворити на спосіб
+    // завалити чужу скриньку листами.
+    check("на одну адресу лист не шлеться щоразу",
+        /CONFIRM_COOLDOWN_MINUTES/.test(indexTs) && sub.CONFIRM_COOLDOWN_MINUTES >= 1);
+
+    // Без таблиці підтвердити підписку неможливо взагалі — про це
+    // мусить знати власник, а не покупець.
+    check("про незастосовану міграцію повідомляємо власнику",
+        /reportServerIssue\("mail_list", "Підтвердження підписки/.test(indexTs));
+
+    check("міграція на таблицю є",
+        fs.existsSync(path.join(ROOT, "supabase/migrations/032-newsletter-confirm.sql")));
+
+    // RLS без політик = «нікому, крім service_role». Список чужих
+    // токенів — це список чужих підписок, які можна підтвердити за
+    // людину.
+    const migration = read("supabase/migrations/032-newsletter-confirm.sql");
+
+    check("таблиця закрита від браузера",
+        /enable row level security/.test(migration)
+        && !/create policy/.test(migration));
+
+    // СТОРІНКА, на яку веде лист.
+    const page = read("newsletter-confirm.html");
+    const pageScript = read("assets/js/newsletter-confirm.js");
+
+    check("сторінка підтвердження є", /id="confirmHeading"/.test(page));
+
+    check("вона не індексується", /name="robots" content="noindex/.test(page));
+
+    check("і закрита в robots",
+        /Disallow: \/newsletter-confirm/.test(read("scripts/apply-site-env.js")));
+
+    check("сторінка розрізняє всі чотири стани",
+        ["confirmed", "used", "expired", "unknown"]
+            .every(state => new RegExp(state + ":").test(pageScript)));
+
+    // Ключ MailerLite дає право правити ВЕСЬ список підписників — у
+    // коді сайту йому місця немає. Тому сторінка лише передає токен
+    // своїй функції, а до MailerLite не звертається взагалі.
+    //
+    // Перевіряємо звернення, а не згадку: слово «MailerLite» у
+    // поясненні нічого не розкриває, і забороняти його означало б
+    // забороняти писати коментарі.
+    check("сторінка лише передає токен своїй функції",
+        /site_action: "subscribe-confirm"/.test(pageScript)
+        && !/connect\.mailerlite\.com/.test(pageScript)
+        && !/Bearer\s+["'`]?ml_/i.test(pageScript));
+}
+
 console.log("\n[3b] Форма підписки — у смузі, а не в порожньому тримачі");
 {
     // ЩО БУЛО НЕ ТАК. У <section class="newsletter"> лежав
