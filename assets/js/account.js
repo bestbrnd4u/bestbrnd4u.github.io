@@ -400,6 +400,38 @@ function translateAuthError(error) {
 
 }
 
+// ЛИСТ НЕ ПІШОВ — НАЙЧАСТІШЕ ЦЕ НЕ ПОМИЛКА, А ЛІМІТ.
+//
+// Вбудована пошта Supabase призначена для перевірок, а не для
+// роботи: у неї жорсткий ліміт листів за годину й окрема пауза між
+// двома листами підряд. Під час налаштування в нього впираються
+// постійно — саме тоді листи й шлють один за одним.
+//
+// Формулювання при цьому різні, і слів «rate limit» у головному з
+// них НЕМАЄ: Supabase каже «For security purposes, you can only
+// request this after 54 seconds». Тому перевірка тільки на них
+// відправляла цей випадок у загальне «спробуйте ще раз» — після
+// якого йдуть шукати помилку в коді замість того, щоб зачекати
+// хвилину.
+function mailErrorText(error) {
+
+    const msg = error?.message || "";
+    const code = error?.code || "";
+
+    const throttled = error?.status === 429
+        || /rate.?limit/i.test(msg)
+        || /rate_limit/i.test(code)
+        || /you can only request this (after|once)/i.test(msg);
+
+    if (throttled) {
+        return "Забагато листів поспіль — це обмеження пошти, не помилка. "
+            + "Зачекайте хвилину й спробуйте ще раз";
+    }
+
+    return "Не вдалося надіслати лист. Спробуйте ще раз";
+
+}
+
 // -------------------------
 // Історія замовлень
 // -------------------------
@@ -2039,7 +2071,10 @@ newEmailSubmit?.addEventListener("click", async () => {
 
     const user = await getCurrentUser();
 
-    if (!user) return;
+    if (!user) {
+        emailChangeMessage.textContent = "Сесія завершилась. Увійдіть у кабінет ще раз";
+        return;
+    }
 
     if (email.toLowerCase() === String(user.email || "").toLowerCase()) {
         emailChangeMessage.textContent = "Це і є ваша поточна адреса";
@@ -2052,7 +2087,9 @@ newEmailSubmit?.addEventListener("click", async () => {
     const { error } = await supabaseClient.auth.updateUser({ email });
 
     newEmailSubmit.disabled = false;
-    newEmailSubmit.textContent = "Надіслати лист";
+    // Напис той самий, що в розмітці. Було «Надіслати лист» — і після
+    // першої ж невдалої спроби кнопка перейменовувалась сама собою.
+    newEmailSubmit.textContent = "Підтвердити";
 
     if (error) {
 
@@ -2062,7 +2099,7 @@ newEmailSubmit?.addEventListener("click", async () => {
         // Кажемо це прямо: «спробуйте ще раз» тут не допомагає.
         emailChangeMessage.textContent = /registered|exists|taken/i.test(error.message || "")
             ? "Ця пошта вже прив'язана до іншого акаунту"
-            : "Не вдалося змінити пошту. Спробуйте ще раз";
+            : mailErrorText(error);
 
         return;
 
@@ -2211,29 +2248,52 @@ document.getElementById("forgotPasswordInsideBtn")?.addEventListener("click", as
 document.getElementById("forgotCancel")?.addEventListener("click", () => toggleForgot(false));
 document.getElementById("forgotClose")?.addEventListener("click", () => toggleForgot(false));
 
-document.getElementById("forgotSubmit")?.addEventListener("click", async event => {
+// event.currentTarget ПІСЛЯ await — ЦЕ null, І САМЕ ЦЕ ЛАМАЛО
+// КНОПКУ «ВІДНОВИТИ».
+//
+// currentTarget живе рівно стільки, скільки триває розсилання події.
+// Перший же await віддає керування назад браузеру, розсилання
+// завершується — і властивість обнуляється. Тут вона читалась ПІСЛЯ
+// `await getCurrentUser()`, тож button був null, а наступний рядок
+// кидав TypeError.
+//
+// Далі не виконувалось нічого: ні запиту на лист, ні повідомлення про
+// помилку, ні екрана «лист надіслано». Тобто натискання не робило
+// взагалі нічого, і подивитись причину можна було тільки в консолі.
+// Саме це власник і побачив на деві.
+//
+// Тому елемент беремо за id, як сусідні обробники, — він не залежить
+// від того, на якому кроці ми зараз.
+const forgotSubmit = document.getElementById("forgotSubmit");
+
+forgotSubmit?.addEventListener("click", async () => {
+
+    forgotMessage.textContent = "";
 
     const user = await getCurrentUser();
 
-    if (!user) return;
+    // Мовчазний return тут означав би те саме, що й помилка вище:
+    // кнопка не робить нічого й не пояснює чому.
+    if (!user) {
+        forgotMessage.textContent = "Сесія завершилась. Увійдіть у кабінет ще раз";
+        return;
+    }
 
-    const button = event.currentTarget;
-
-    button.disabled = true;
-    button.textContent = "Надсилаємо...";
+    forgotSubmit.disabled = true;
+    forgotSubmit.textContent = "Надсилаємо...";
 
     const { error } = await supabaseClient.auth.resetPasswordForEmail(user.email, {
         redirectTo: `${window.location.origin}/account`
     });
 
-    button.disabled = false;
-    button.textContent = "Відновити";
+    forgotSubmit.disabled = false;
+    forgotSubmit.textContent = "Відновити";
 
     if (error) {
 
         console.warn("Не вдалося надіслати лист:", error.message);
 
-        forgotMessage.textContent = "Не вдалося надіслати лист. Спробуйте ще раз";
+        forgotMessage.textContent = mailErrorText(error);
 
         return;
 

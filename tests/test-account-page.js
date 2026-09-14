@@ -139,6 +139,39 @@ console.log("\n[4] «Вийти з акаунту» — поруч зі «Збе
     // Червоною лишається, щоб не натиснути замість збереження.
     check("вихід лишився червоним",
         /\.profile-actions-row \.btn-outline\{[\s\S]{0,120}color:#dc2626/.test(css));
+
+    // ОДНА ВЛАСТИВІСТЬ — ДВА РІЗНІ ЗНАЧЕННЯ, ЗАЛЕЖНО ВІД НАПРЯМКУ.
+    //
+    // .profile-form — колонка, і там align-self:flex-start означає
+    // «до лівого краю». .profile-actions-row усередині неї — РЯДОК, і
+    // там та сама властивість означає вже «до верхнього краю».
+    //
+    // Селектор без «>» діставав до обох, і посилання поруч із
+    // кнопками («Скасувати», «Забули пароль?») висіли на 18px вище за
+    // них. Дочірній комбінатор лишає правило полям самої форми.
+    check("align-self не тече з колонки форми в рядки дій",
+        /\.profile-form > \.auth-link\{/.test(css)
+        && !/(?:^|\n)\.profile-form \.auth-link\{/.test(css),
+        "селектор без «>» кладе посилання на верхній край рядка");
+
+    check("кнопка теж не тягне align-self у рядок",
+        /\.profile-form > \.btn\{/.test(css)
+        && !/(?:^|\n)\.profile-form \.btn\{[^}]*align-self/.test(css));
+
+    // Друга дія рядка — до правого краю картки: порожнеча між нею й
+    // головною кнопкою і є захистом від випадкового натискання.
+    check("друга дія стоїть біля правого краю",
+        /\.profile-actions-row \.btn-outline,\s*\n\s*\.profile-actions-row \.auth-link,\s*\n\s*\.profile-email-change-actions \.auth-link\{\s*\n\s*margin-left:auto/.test(css));
+
+    // На телефоні рядок не вміщається, і відсунута вправо кнопка
+    // виглядала б як помилка верстки — там стовпчик на всю ширину.
+    check("на вузькому екрані відступ знято",
+        /@media\(max-width:600px\)[\s\S]*?\.profile-email-change-actions \.auth-link\{\s*\n\s*margin-left:0/.test(css));
+
+    // Рамка додається до висоти навіть при border-box, бо висота
+    // auto: без поправки кнопка з рамкою на 3px вища за сусідню.
+    check("кнопки в рядку однакової висоти",
+        /\.profile-actions-row \.btn-outline\{[\s\S]{0,700}padding:16px 40px/.test(css));
 }
 
 console.log("\n[5] Зміну пошти видно й вона чесно пояснена");
@@ -421,6 +454,113 @@ console.log("\n[8] Листи входу лежать у репозиторії"
             "строк дії посилання змінюється в панелі, а лист — ні");
 
     });
+}
+
+console.log("\n[9] event.currentTarget не читається після await");
+{
+    // ЧОМУ ЦЕ ОКРЕМА ПЕРЕВІРКА, А НЕ ДРІБНИЦЯ СТИЛЮ.
+    //
+    // currentTarget живе рівно стільки, скільки триває розсилання
+    // події. Перший await віддає керування браузеру, розсилання
+    // завершується — і властивість стає null. Наступний рядок кидає
+    // TypeError, async-функція тихо відхиляється, і НЕ ВІДБУВАЄТЬСЯ
+    // НІЧОГО: ні запиту, ні повідомлення про помилку, ні наступного
+    // кроку. Кнопка просто не працює, а причина видна лише в консолі.
+    //
+    // Саме так зламалась кнопка «Відновити» у вкладці «Змінити
+    // пароль»: лист не йшов і жодного напису не з'являлось.
+    //
+    // Помилка непомітна на очі — рядок з currentTarget виглядає
+    // звичайно, а await стоїть на кілька рядків вище, — тож ловити її
+    // мусить перевірка, а не уважність.
+    const files = ["account.js", "app.js", "catalog.js", "checkout.js",
+        "product.js", "common.js", "subscribe.js"];
+
+    files.forEach(name => {
+
+        const rel = "assets/js/" + name;
+
+        if (!fs.existsSync(path.join(ROOT, rel))) return;
+
+        const code = read(rel);
+
+        // Обробники: async …=>{…} або async function(…){…}. Беремо
+        // тіло до кінця рядка з подвійним відступом закриття — грубо,
+        // але для «await раніше за currentTarget» цього досить.
+        const bad = [];
+
+        const re = /async\s*(?:\([^)]*\)|[A-Za-z_$][\w$]*)\s*=>\s*\{/g;
+
+        let match;
+
+        while ((match = re.exec(code))) {
+
+            const start = match.index;
+
+            // Кінець обробника — рядок «});» на нульовому відступі.
+            const rest = code.slice(start);
+            const end = rest.search(/\n\}\);/);
+            const body = end === -1 ? rest : rest.slice(0, end);
+
+            const awaitAt = body.indexOf("await ");
+            const targetAt = body.indexOf("currentTarget");
+
+            if (awaitAt !== -1 && targetAt !== -1 && targetAt > awaitAt) {
+                bad.push(rel + ": " + body.slice(0, 60).replace(/\s+/g, " "));
+            }
+
+        }
+
+        check(`${name}: currentTarget не після await`, bad.length === 0, bad[0]);
+
+    });
+
+    // Сама перевірка мусить ловити порушення — інакше зелений
+    // результат нічого не означає.
+    {
+        const probe = `
+async () => {
+    const user = await getCurrentUser();
+    const button = event.currentTarget;
+});
+`;
+        const re = /async\s*(?:\([^)]*\)|[A-Za-z_$][\w$]*)\s*=>\s*\{/g;
+        const match = re.exec(probe);
+        const rest = probe.slice(match.index);
+        const body = rest.slice(0, rest.search(/\n\}\);/));
+
+        check("перевірка бачить зразок із помилкою",
+            body.indexOf("currentTarget") > body.indexOf("await "));
+    }
+}
+
+console.log("\n[10] Кнопка «Відновити» доходить до листа");
+{
+    // Обробник бере кнопку за id, а не з події: id не залежить від
+    // того, скільки await-ів позаду.
+    check("forgotSubmit береться за id",
+        /const forgotSubmit = document\.getElementById\("forgotSubmit"\)/.test(js));
+
+    check("лист таки надсилається",
+        /forgotSubmit\?\.addEventListener[\s\S]{0,1200}resetPasswordForEmail/.test(js));
+
+    // Мовчазний return — те саме, що й зламана кнопка: натиснув,
+    // нічого не сталось, чому — невідомо.
+    check("без сесії кнопка каже, що сталось",
+        /forgotMessage\.textContent = "Сесія завершилась/.test(js));
+
+    // ЛІМІТ ПОШТИ SUPABASE НЕ МІСТИТЬ СЛІВ «rate limit».
+    // Він каже «you can only request this after 54 seconds», і без
+    // окремої гілки це падало в загальне «спробуйте ще раз» —
+    // після якого причину шукають у коді, а треба просто зачекати.
+    check("ліміт пошти має власне пояснення",
+        /you can only request this/.test(js)
+        && /Забагато листів поспіль/.test(js));
+
+    check("напис кнопки зміни пошти збігається з розміткою",
+        html.includes('id="newEmailSubmit">Підтвердити<')
+        && /newEmailSubmit\.textContent = "Підтвердити"/.test(js),
+        "після невдалої спроби кнопка перейменовувалась сама собою");
 }
 
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);

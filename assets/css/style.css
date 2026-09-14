@@ -8636,6 +8636,13 @@ body.mobile-filters-open .scroll-top{
 .profile-actions-row .btn-outline{
     color:#dc2626;
     border-color:#fecaca;
+    /* РАМКА ДОДАЄТЬСЯ ДО ВИСОТИ, І ЦЬОГО НЕ РЯТУЄ border-box.
+       box-sizing рахує рамку всередині коробки лише тоді, коли
+       висота задана; тут вона auto, тож виходить вміст + відступи +
+       рамка. Через це кнопка з рамкою була на 3px вища за сусідню
+       «Зберегти зміни», і нижні краї двох кнопок в одному рядку не
+       сходились. Віднімаємо рамку з відступів .btn (18px 42px). */
+    padding:16px 40px;
 }
 
 @media (hover:hover) and (pointer:fine){
@@ -8643,6 +8650,17 @@ body.mobile-filters-open .scroll-top{
         background:#fef2f2;
         border-color:#fecaca;
     }
+}
+
+/* ДРУГА ДІЯ В РЯДКУ — ДО ПРАВОГО КРАЮ КАРТКИ.
+   Ліворуч головна кнопка, праворуч — та, що відводить убік
+   («Вийти з акаунту», «Скасувати», «Забули пароль?»). Між ними
+   порожнеча на всю ширину картки: промахнутись по сусідній кнопці
+   важче, а око бачить, де рядок закінчується. */
+.profile-actions-row .btn-outline,
+.profile-actions-row .auth-link,
+.profile-email-change-actions .auth-link{
+    margin-left:auto;
 }
 
 /* Зміна пошти — прихований блок під посиланням. */
@@ -8796,22 +8814,40 @@ body.mobile-filters-open .scroll-top{
 .subscribe-account .subscribe-note-ok{ color:#047857; }
 .subscribe-account .subscribe-note-error{ color:#b91c1c; }
 
-.profile-form .auth-link{
+/* align-self ТУТ ЗНАЧИТЬ РІЗНЕ ЗАЛЕЖНО ВІД ТОГО, В ЧОМУ ЛЕЖИТЬ
+   ЕЛЕМЕНТ, — І САМЕ НА ЦЬОМУ ВЕРСТКА ЗЛАМАЛАСЬ.
+
+   .profile-form — це колонка. У колонці align-self керує
+   ГОРИЗОНТАЛЛЮ, і flex-start означає «до лівого краю»: саме для
+   цього правило й писалось.
+
+   Але селектор без «>» дістає і до кнопок усередині
+   .profile-actions-row та .profile-email-change-actions, а це
+   РЯДКИ. У рядку та сама властивість керує ВЕРТИКАЛЛЮ, і flex-start
+   означає вже «до верхнього краю». Через це «Скасувати», «Забули
+   пароль?» і «Змінити email» висіли на 18px вище за кнопку поруч —
+   рівно те, що видно на скріншотах власника.
+
+   Прямий нащадок лишає правило полям самої форми й не пускає його в
+   рядки дій, де вирівнюванням керує align-items:center. */
+.profile-form > .auth-link{
     align-self:flex-start;
 }
 
-.profile-links-row{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:16px;
+/* .auth-link-danger і .profile-links-row прибрані разом із кнопкою
+   «Видалити акаунт» — іншого небезпечного посилання в кабінеті
+   немає, а окремого рядка під посилання більше ніде немає. */
+
+.profile-form > .btn{
+    align-self:flex-start;
 }
 
-/* .auth-link-danger прибрано разом із кнопкою «Видалити акаунт» —
-   іншого небезпечного посилання в кабінеті немає. */
-
-.profile-form .btn{
-    align-self:flex-start;
+/* Ширина — і для кнопок у рядках дій теж, разом із тими, що лежать
+   поза формою (#forgotSubmit у блоці «Забули пароль?»): «Відновити»
+   було на 37px вужче за «Змінити пароль» просто тому, що стоїть на
+   абзац нижче. */
+.profile-form .btn,
+.profile-email-change-actions .btn{
     min-width:180px;
 }
 
@@ -9131,6 +9167,36 @@ body.mobile-filters-open .scroll-top{
 
     .profile-card{
         padding:24px 20px;
+    }
+
+    /* НА ВУЗЬКОМУ ЕКРАНІ РЯДОК ДІЙ СТАЄ СТОВПЧИКОМ.
+       «Зберегти зміни» + «Вийти з акаунту» — це 383px, а картка на
+       телефоні має всередині близько 295px. З flex-wrap друга кнопка
+       й так падала вниз, а margin-left:auto тулив би її до правого
+       краю окремим рядком — виглядало б як помилка. Тому явний
+       стовпчик на всю ширину: так кнопки й натискаються великим
+       пальцем. */
+    .profile-actions-row,
+    .profile-email-change-actions{
+        flex-direction:column;
+        align-items:stretch;
+    }
+
+    .profile-actions-row > *,
+    .profile-email-change-actions > *{
+        min-width:0;
+    }
+
+    /* Селектор мусить бути з двох класів — рівно такий, як у правилі
+       з margin-left:auto вище. Медіа-запит ваги не додає: із простим
+       «> *» відступ лишався б, і «Скасувати» тулилось би до правого
+       краю окремим рядком. Із нулем його ставить по центру base-
+       правило .auth-link{align-self:center} — у стовпчику воно
+       центрує по горизонталі. */
+    .profile-actions-row .btn-outline,
+    .profile-actions-row .auth-link,
+    .profile-email-change-actions .auth-link{
+        margin-left:0;
     }
 
     .account-tabs{
