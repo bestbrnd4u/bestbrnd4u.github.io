@@ -8622,22 +8622,81 @@ body.mobile-filters-open .scroll-top{
     font-weight:600;
 }
 
-.profile-logout-row{
-    margin-top:24px;
-    padding-top:24px;
-    border-top:1px solid var(--gray100);
+/* «Вийти з акаунту» стоїть поруч зі «Зберегти зміни», а не окремим
+   рядком під рискою: це дві дії над тією самою формою, і розносити
+   їх по різних кінцях картки нема причини. Червоним лишається — щоб
+   не натиснути замість збереження. */
+.profile-actions-row{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:12px;
 }
 
-.profile-logout-row .btn-outline{
+.profile-actions-row .btn-outline{
     color:#dc2626;
     border-color:#fecaca;
 }
 
 @media (hover:hover) and (pointer:fine){
-    .profile-logout-row .btn-outline:hover{
+    .profile-actions-row .btn-outline:hover{
         background:#fef2f2;
         border-color:#fecaca;
     }
+}
+
+/* Зміна пошти — прихований блок під посиланням. */
+.profile-email-change{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    padding:16px;
+    border:1px solid var(--gray200);
+    border-radius:12px;
+}
+
+.profile-email-change label{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    font-size:13px;
+    color:var(--gray500);
+}
+
+.profile-email-change-actions{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:12px;
+}
+
+/* Згода на обробку даних. Галочка й текст в один рядок, посилання
+   всередині тексту — щоб його можна було прочитати, не шукаючи. */
+/* flex-direction обов'язковий: .profile-form label вище ставить
+   column — так стоять усі поля форми, підпис над полем. Галочка ж
+   мусить бути ПОРУЧ із текстом, інакше вона висить окремим рядком і
+   не читається як частина фрази. */
+.profile-form label.profile-consent{
+    display:flex;
+    flex-direction:row;
+    align-items:flex-start;
+    gap:10px;
+    font-size:13px;
+    line-height:1.5;
+    font-weight:400;
+    color:var(--gray500);
+}
+
+.profile-consent input{
+    margin-top:2px;
+    flex-shrink:0;
+}
+
+/* Форма підписки в кабінеті ширша за футерну: там вона в вузькій
+   колонці, тут — у картці на всю ширину. */
+.subscribe-account{
+    max-width:520px;
+    margin:16px 0 20px;
 }
 
 .profile-form .auth-link{
@@ -8651,15 +8710,8 @@ body.mobile-filters-open .scroll-top{
     gap:16px;
 }
 
-.auth-link-danger{
-    color:#dc2626;
-}
-
-@media (hover:hover) and (pointer:fine){
-.auth-link-danger:hover{
-    color:#b91c1c;
-}
-}
+/* .auth-link-danger прибрано разом із кнопкою «Видалити акаунт» —
+   іншого небезпечного посилання в кабінеті немає. */
 
 .profile-form .btn{
     align-self:flex-start;
@@ -8897,6 +8949,17 @@ body.mobile-filters-open .scroll-top{
 
 }
 
+/* ПІДСУМОК — ВУЗЬКОЮ КОЛОНКОЮ ЛІВОРУЧ, А НЕ НА ВСЮ КАРТКУ.
+
+   Рядки розтягувались на всю ширину картки: підпис ліворуч, число
+   праворуч, між ними на широкому екрані півтори тисячі пікселів
+   порожнечі. Прочитати «Сума товарів 14 300 грн» одним поглядом було
+   неможливо — очі бігали від краю до краю, і це при тому, що рядків
+   чотири й вони читаються згори вниз.
+
+   width:fit-content, а не фіксоване число: блок звужується рівно до
+   найдовшого свого рядка. Будь-яке кругле число тут було б або
+   завузьким для «Безкоштовно», або залишало б порожнечу. */
 .order-card-summary{
     margin-top:14px;
     padding-top:14px;
@@ -8904,6 +8967,9 @@ body.mobile-filters-open .scroll-top{
     display:flex;
     flex-direction:column;
     gap:8px;
+    width:fit-content;
+    min-width:240px;
+    max-width:100%;
 }
 
 .order-card-summary-row{

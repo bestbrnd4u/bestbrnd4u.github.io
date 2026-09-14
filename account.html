@@ -29,7 +29,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
 
-    <link rel="stylesheet" href="assets/css/style.css?v=54b5c1b2">
+    <link rel="stylesheet" href="assets/css/style.css?v=cd6fb76f">
 
 
 
@@ -225,6 +225,7 @@
                 <button type="button" class="account-tab active" data-tab="orders">Історія замовлень</button>
                 <button type="button" class="account-tab" data-tab="addresses">Адреси доставки</button>
                 <button type="button" class="account-tab" data-tab="profile">Мої дані</button>
+                <button type="button" class="account-tab" data-tab="newsletter">Розсилки</button>
             </div>
 
             <!-- ---- Історія замовлень ---- -->
@@ -311,25 +312,119 @@
 
                         </div>
 
+                        <!-- EMAIL МОЖНА ЗМІНИТИ, АЛЕ НЕ ОДНИМ КЛІКОМ.
+
+                             Пошта — це і логін, і адреса, куди їде лист
+                             про замовлення. Помилка в ній відрізає
+                             людину від власного акаунту, тож Supabase
+                             міняє її лише після переходу за листом на
+                             НОВУ адресу. Тому поле сховане за
+                             посиланням: випадково його не зачепиш. -->
                         <div class="profile-email-row">
                             <span>Email</span>
                             <strong id="profileEmail"></strong>
+                            <button type="button" class="auth-link" id="changeEmailBtn">Змінити email</button>
+                        </div>
+
+                        <div class="profile-email-change" id="emailChangeBox" hidden>
+
+                            <label>
+                                Нова адреса
+                                <input type="email" id="newEmail" placeholder="you@example.com" autocomplete="email">
+                            </label>
+
+                            <div class="profile-email-change-actions">
+                                <button type="button" class="btn" id="newEmailSubmit">Надіслати лист</button>
+                                <button type="button" class="auth-link" id="newEmailCancel">Скасувати</button>
+                            </div>
+
+                            <p class="profile-card-sub">
+                                Ми надішлемо лист на нову адресу. Пошта зміниться
+                                лише після переходу за посиланням із нього.
+                            </p>
+
+                            <span id="emailChangeMessage" class="field-error"></span>
+
                         </div>
 
                         <div class="profile-links-row">
                             <button type="button" class="auth-link" id="changePasswordBtn">Змінити пароль</button>
-                            <button type="button" class="auth-link auth-link-danger" id="deleteAccountBtn">Видалити акаунт</button>
                         </div>
+
+                        <!-- ЗГОДА — ОКРЕМОЮ ГАЛОЧКОЮ Й НЕ ПРОСТАВЛЕНА
+                             ЗАЗДАЛЕГІДЬ. Згода, якої людина не ставила,
+                             згодою не є. Посилання — в самому тексті,
+                             щоб її можна було прочитати, не шукаючи. -->
+                        <label class="profile-consent">
+                            <input type="checkbox" id="profileConsent">
+                            <span>
+                                Я згоден на обробку персональних даних —
+                                <a href="privacy-policy" target="_blank" rel="noopener">політика конфіденційності.</a>
+                            </span>
+                        </label>
 
                         <span id="profileMessage" class="field-error"></span>
 
-                        <button type="submit" class="btn" id="profileSubmit">Зберегти зміни</button>
+                        <div class="profile-actions-row">
+                            <button type="submit" class="btn" id="profileSubmit">Зберегти зміни</button>
+                            <button type="button" class="btn btn-outline" id="logoutBtn">Вийти з акаунту</button>
+                        </div>
 
                     </form>
 
-                    <div class="profile-logout-row">
-                        <button type="button" class="btn btn-outline" id="logoutBtn">Вийти з акаунту</button>
-                    </div>
+                </div>
+
+            </div>
+
+            <!-- ---- Розсилки ---- -->
+
+            <div id="newsletterPanel" class="account-panel" hidden>
+
+                <div class="profile-card">
+
+                    <h2>Новини та знижки магазину</h2>
+                    <p class="profile-card-sub">
+                        Листи про нові надходження, акції та ціни дня. Не частіше
+                        ніж раз на тиждень.
+                    </p>
+
+                    <!-- Та сама форма, що у футері: той самий клас, ті самі
+                         правила, той самий обробник у assets/js/subscribe.js.
+                         Адреса підставляється з акаунту, але лишається
+                         редагованою — підписати можна й іншу скриньку. -->
+                    <form class="subscribe subscribe-account" novalidate>
+
+                        <label class="subscribe-label" for="newsletterEmail">
+                            Адреса для листів
+                        </label>
+
+                        <div class="subscribe-row">
+                            <input
+                                type="email"
+                                id="newsletterEmail"
+                                placeholder="you@example.com"
+                                autocomplete="email"
+                                required>
+                            <button type="submit">Підписатись</button>
+                        </div>
+
+                        <label class="subscribe-consent">
+                            <input type="checkbox">
+                            <span>
+                                Згоден отримувати листи про новинки й акції —
+                                <a href="privacy-policy" target="_blank" rel="noopener">як ми поводимось із даними.</a>
+                            </span>
+                        </label>
+
+                        <p class="subscribe-note" hidden></p>
+
+                    </form>
+
+                    <p class="profile-card-sub">
+                        Відписатись можна з будь-якого листа — посилання є
+                        внизу кожного. Листи про замовлення приходитимуть у
+                        будь-якому разі: це не розсилка, а підтвердження покупки.
+                    </p>
 
                 </div>
 
@@ -494,27 +589,14 @@
     </div>
 </div>
 
-<div id="deleteAccountModal" class="modal-overlay" hidden>
-    <div class="modal-card">
+<!-- ТУТ БУЛО ВІКНО «ВИДАЛИТИ АКАУНТ».
 
-        <div class="modal-header">
-            <h3>Видалити акаунт?</h3>
-            <button type="button" id="deleteAccountClose" class="modal-close" aria-label="Закрити">✕</button>
-        </div>
-
-        <p class="modal-text">
-            Ваш профіль, збережені адреси та список обраного буде
-            видалено назавжди. Історія замовлень збережеться згідно
-            з правилами обліку. Цю дію не можна скасувати.
-        </p>
-
-        <div class="modal-actions">
-            <button type="button" id="deleteAccountYes" class="btn-modal btn-modal-confirm">Так, видалити</button>
-            <button type="button" id="deleteAccountNo" class="btn-modal btn-modal-cancel">Скасувати</button>
-        </div>
-
-    </div>
-</div>
+     Кнопку прибрано на прохання власника: видалення робиться за
+     зверненням, руками. Причина в тому, що кнопка й не видаляла
+     акаунт — вона стирала профіль, адреси й обране, а сам обліковий
+     запис у Supabase Auth лишався (для нього потрібен service-role
+     ключ, тобто виклик на бекенді). Людина натискала «видалити
+     назавжди» й отримувала половину обіцяного. -->
 
 <div id="addressModal" class="modal-overlay" hidden>
     <div class="modal-card address-modal-card">
@@ -598,13 +680,13 @@
 <script src="assets/js/translit.js?v=c0957cb7" defer></script>
 <script src="assets/js/common.js?v=a3b9d4d6" defer></script>
 <!-- Підписка на листи магазину -->
-<script src="assets/js/subscribe.js?v=2367ff9d" defer></script>
+<script src="assets/js/subscribe.js?v=6a8dc105" defer></script>
 <script src="assets/js/sync.js?v=48ef002e" defer></script>
 <script src="assets/js/mega-menu.js?v=4649fe1e" defer></script>
 <script src="assets/js/ui.js?v=e015b069" defer></script>
 <!-- Вікно відмови: вибір товарів, причина, фото -->
 <script src="assets/js/refusal-dialog.js?v=308616b4" defer></script>
-<script src="assets/js/account.js?v=c6e33f2c" defer></script>
+<script src="assets/js/account.js?v=cf6d6b46" defer></script>
 
 </body>
 

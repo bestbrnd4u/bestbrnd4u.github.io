@@ -1800,9 +1800,15 @@ document.querySelectorAll(".account-tab").forEach(tab => {
 
         const target = tab.dataset.tab;
 
-        document.getElementById("ordersPanel").hidden = target !== "orders";
-        document.getElementById("addressesPanel").hidden = target !== "addresses";
-        document.getElementById("profilePanel").hidden = target !== "profile";
+        // Перелік, а не три рядки: вкладок стало чотири, і кожна
+        // нова вимагала б четвертого рядка в трьох місцях.
+        ["orders", "addresses", "profile", "newsletter"].forEach(name => {
+
+            const panel = document.getElementById(name + "Panel");
+
+            if (panel) panel.hidden = name !== target;
+
+        });
 
         if (target === "addresses" && !addressesLoadedOnce) {
             loadAddresses();
@@ -1837,9 +1843,32 @@ async function loadProfile(user) {
     document.getElementById("profilePhone").value = data?.phone || "";
     document.getElementById("profileCity").value = data?.city || "";
 
+    // ЗГОДА, ЯКУ ВЖЕ ДАЛИ, ПЕРЕПИТУВАТИ НЕ ТРЕБА.
+    //
+    // Стовпця може ще не бути: міграцію 030 власник застосовує
+    // руками. select("*") повертає рядок із тими стовпцями, які
+    // існують, тож наявність ключа і є перевіркою — без неї
+    // збереження падало б із «column does not exist» на всіх, хто
+    // міграцію не застосував.
+    profileHasConsentColumn = Boolean(data)
+        && Object.prototype.hasOwnProperty.call(data, "privacy_consent_at");
+
+    const consentEl = document.getElementById("profileConsent");
+
+    if (consentEl) consentEl.checked = Boolean(data?.privacy_consent_at);
+
+    // Адресу для розсилки підставляємо з акаунту — найчастіше саме
+    // її і хочуть підписати.
+    const newsletterEmail = document.getElementById("newsletterEmail");
+
+    if (newsletterEmail && !newsletterEmail.value) newsletterEmail.value = user.email || "";
+
     if (accountEmailEl) accountEmailEl.textContent = buildAccountGreeting(data?.first_name);
 
 }
+
+// Чи є в таблиці стовпець privacy_consent_at (міграція 030).
+let profileHasConsentColumn = false;
 
 // -------------------------
 // Пояснювальний текст під заголовком "Особистий кабінет"
@@ -1863,12 +1892,26 @@ profileForm?.addEventListener("submit", async event => {
 
     if (!user) return;
 
+    const consentEl = document.getElementById("profileConsent");
+
+    // Без згоди не зберігаємо: дані, які тут лежать, — персональні, і
+    // саме на них згода й потрібна.
+    if (consentEl && !consentEl.checked) {
+
+        profileMessageEl.textContent = "Потрібна згода на обробку персональних даних";
+
+        consentEl.focus();
+
+        return;
+
+    }
+
     const submitBtn = document.getElementById("profileSubmit");
 
     submitBtn.disabled = true;
     submitBtn.textContent = "Зберігаємо...";
 
-    const { error } = await supabaseClient.from("profiles").upsert({
+    const row = {
         id: user.id,
         first_name: document.getElementById("profileFirstName").value.trim(),
         last_name: document.getElementById("profileLastName").value.trim(),
@@ -1876,7 +1919,13 @@ profileForm?.addEventListener("submit", async event => {
         phone: document.getElementById("profilePhone").value.trim(),
         city: document.getElementById("profileCity").value.trim(),
         updated_at: new Date().toISOString()
-    });
+    };
+
+    // Момент згоди має значення сам по собі: «згоден» без дати нічого
+    // не доводить. Пишемо лише коли стовпець існує — див. loadProfile.
+    if (profileHasConsentColumn) row.privacy_consent_at = new Date().toISOString();
+
+    const { error } = await supabaseClient.from("profiles").upsert(row);
 
     submitBtn.disabled = false;
     submitBtn.textContent = "Зберегти зміни";
@@ -1892,6 +1941,96 @@ profileForm?.addEventListener("submit", async event => {
     }
 
     showToast("Дані збережено");
+
+});
+
+// -------------------------
+// Зміна пошти
+//
+// Пошта тут — це і логін, і адреса, куди їде лист про замовлення.
+// Помилка в ній відрізає людину від власного акаунту, тому Supabase
+// не міняє її одразу: він надсилає лист на НОВУ адресу, і зміна
+// відбувається лише після переходу за посиланням. Поки лист не
+// відкрито, вхід лишається за старою поштою.
+//
+// Саме тому кнопка каже «Надіслати лист», а не «Зберегти»: інакше
+// людина закриє сторінку в упевненості, що вже змінила адресу.
+// -------------------------
+
+const changeEmailBtn = document.getElementById("changeEmailBtn");
+const emailChangeBox = document.getElementById("emailChangeBox");
+const newEmailInput = document.getElementById("newEmail");
+const newEmailSubmit = document.getElementById("newEmailSubmit");
+const newEmailCancel = document.getElementById("newEmailCancel");
+const emailChangeMessage = document.getElementById("emailChangeMessage");
+
+function toggleEmailChange(open) {
+
+    if (!emailChangeBox) return;
+
+    emailChangeBox.hidden = !open;
+
+    if (emailChangeMessage) emailChangeMessage.textContent = "";
+
+    if (open && newEmailInput) {
+        newEmailInput.value = "";
+        newEmailInput.focus();
+    }
+
+}
+
+changeEmailBtn?.addEventListener("click", () => toggleEmailChange(emailChangeBox.hidden));
+
+newEmailCancel?.addEventListener("click", () => toggleEmailChange(false));
+
+newEmailSubmit?.addEventListener("click", async () => {
+
+    const email = (newEmailInput?.value || "").trim();
+
+    emailChangeMessage.textContent = "";
+
+    // Перевірка навмисно проста: складна регулярка відкидає справжні
+    // адреси й однаково не доводить, що скринька існує. Це доводить
+    // лист — той самий, яким Supabase і підтверджує зміну.
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(email)) {
+        emailChangeMessage.textContent = "Перевірте адресу пошти";
+        return;
+    }
+
+    const user = await getCurrentUser();
+
+    if (!user) return;
+
+    if (email.toLowerCase() === String(user.email || "").toLowerCase()) {
+        emailChangeMessage.textContent = "Це і є ваша поточна адреса";
+        return;
+    }
+
+    newEmailSubmit.disabled = true;
+    newEmailSubmit.textContent = "Надсилаємо...";
+
+    const { error } = await supabaseClient.auth.updateUser({ email });
+
+    newEmailSubmit.disabled = false;
+    newEmailSubmit.textContent = "Надіслати лист";
+
+    if (error) {
+
+        console.warn("Не вдалося змінити пошту:", error.message);
+
+        // Найчастіша причина — адреса вже зайнята іншим акаунтом.
+        // Кажемо це прямо: «спробуйте ще раз» тут не допомагає.
+        emailChangeMessage.textContent = /registered|exists|taken/i.test(error.message || "")
+            ? "Ця пошта вже прив'язана до іншого акаунту"
+            : "Не вдалося змінити пошту. Спробуйте ще раз";
+
+        return;
+
+    }
+
+    toggleEmailChange(false);
+
+    showToast("Лист надіслано на нову адресу — перейдіть за посиланням у ньому");
 
 });
 
@@ -2124,73 +2263,17 @@ confirmDeleteYes?.addEventListener("click", async () => {
 });
 
 // -------------------------
-// Видалення акаунту
+// ТУТ БУЛО ВИДАЛЕННЯ АКАУНТУ — ПРИБРАНО НА ПРОХАННЯ ВЛАСНИКА.
 //
-// Тут видаляємо власні дані користувача (профіль, адреси,
-// обране) і завершуємо сесію — на це вистачає прав звичайного
-// користувача (RLS дозволяє видаляти власні рядки). Сам обліковий
-// запис у Supabase Auth лишається — щоб видалити саме його,
-// потрібен виклик admin-API з service-role ключем, а це можна
-// робити тільки на бекенді (Edge Function), не з клієнтського
-// JS напряму. Якщо потрібна повна фізична видаленість акаунту —
-// сюди варто додати виклик такої функції.
+// Видалення тепер робиться за зверненням, руками. І це чесніше, ніж
+// було: кнопка обіцяла «видалити назавжди», а насправді стирала лише
+// профіль, адреси й обране. Сам обліковий запис у Supabase Auth
+// лишався — для нього потрібен service-role ключ, тобто виклик на
+// бекенді, якого тут не було й бути не могло.
+//
+// Якщо колись знадобиться повне видалення — це Edge Function, а не
+// кнопка в кабінеті.
 // -------------------------
-
-const deleteAccountModal = document.getElementById("deleteAccountModal");
-const deleteAccountBtn = document.getElementById("deleteAccountBtn");
-const deleteAccountYes = document.getElementById("deleteAccountYes");
-const deleteAccountNo = document.getElementById("deleteAccountNo");
-const deleteAccountClose = document.getElementById("deleteAccountClose");
-
-function openDeleteAccountModal() {
-    deleteAccountModal.hidden = false;
-}
-
-function closeDeleteAccountModal() {
-    deleteAccountModal.hidden = true;
-}
-
-deleteAccountBtn?.addEventListener("click", openDeleteAccountModal);
-deleteAccountNo?.addEventListener("click", closeDeleteAccountModal);
-deleteAccountClose?.addEventListener("click", closeDeleteAccountModal);
-
-deleteAccountModal?.addEventListener("click", event => {
-    if (event.target === deleteAccountModal) closeDeleteAccountModal();
-});
-
-deleteAccountYes?.addEventListener("click", async () => {
-
-    deleteAccountYes.disabled = true;
-    deleteAccountYes.textContent = "Видаляємо...";
-
-    const user = await getCurrentUser();
-
-    if (!user) {
-        closeDeleteAccountModal();
-        return;
-    }
-
-    await supabaseClient.from("favorites").delete().eq("user_id", user.id);
-    await supabaseClient.from("addresses").delete().eq("user_id", user.id);
-
-    const { error } = await supabaseClient.from("profiles").delete().eq("id", user.id);
-
-    deleteAccountYes.disabled = false;
-    deleteAccountYes.textContent = "Так, видалити";
-
-    if (error) {
-        closeDeleteAccountModal();
-        showToast("Не вдалося видалити акаунт");
-        return;
-    }
-
-    closeDeleteAccountModal();
-
-    await supabaseClient.auth.signOut();
-
-    window.location.href = "/";
-
-});
 
 addressesListEl?.addEventListener("click", async event => {
 

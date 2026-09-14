@@ -25,22 +25,19 @@
 
     "use strict";
 
-    var form = document.getElementById("subscribeForm");
+    // ФОРМ НА СТОРІНЦІ МОЖЕ БУТИ КІЛЬКА.
+    //
+    // Була одна — у футері, і шукали її за id. Потім та сама підписка
+    // знадобилась у кабінеті, вкладкою «Розсилки». Другий id означав
+    // би другу копію всієї логіки: перевірки адреси, згоди, і —
+    // найважливіше — п'яти різних відповідей про стан підписки.
+    //
+    // Тому шукаємо за класом і всередині кожної форми беремо поля
+    // відносно неї. Розмітка футера не змінилась: у неї той самий
+    // клас .subscribe, що був.
+    var forms = [].slice.call(document.querySelectorAll("form.subscribe"));
 
-    if (!form) return;
-
-    var emailEl = document.getElementById("subscribeEmail");
-    var consentEl = document.getElementById("subscribeConsent");
-    var buttonEl = document.getElementById("subscribeSubmit");
-    var noteEl = document.getElementById("subscribeNote");
-
-    function say(text, kind) {
-
-        noteEl.textContent = text;
-        noteEl.className = "subscribe-note subscribe-note-" + kind;
-        noteEl.hidden = false;
-
-    }
+    if (!forms.length) return;
 
     // Що сказати людині після натискання кнопки.
     //
@@ -70,6 +67,23 @@
         // "new" і "again": в обох випадках лист підтвердження щойно
         // пішов, тож і сказати треба те саме.
         return "Готово! Перевірте пошту: там лист із підтвердженням.";
+
+    }
+
+    forms.forEach(function (form) {
+
+    var emailEl = form.querySelector("input[type=email]");
+    var consentEl = form.querySelector(".subscribe-consent input[type=checkbox]");
+    var buttonEl = form.querySelector("button[type=submit], button:not([type])");
+    var noteEl = form.querySelector(".subscribe-note");
+
+    if (!emailEl || !consentEl || !buttonEl || !noteEl) return;
+
+    function say(text, kind) {
+
+        noteEl.textContent = text;
+        noteEl.className = "subscribe-note subscribe-note-" + kind;
+        noteEl.hidden = false;
 
     }
 
@@ -152,6 +166,8 @@
             buttonEl.textContent = label;
 
         }
+
+    });
 
     });
 
