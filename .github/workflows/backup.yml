@@ -111,7 +111,7 @@ jobs:
 
       - name: Зберегти артефакт
         if: steps.seal.outputs.sealed == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: backup-${{ github.run_number }}
           path: ${{ runner.temp }}/backup.tar.gz.gpg
