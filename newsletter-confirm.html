@@ -12,6 +12,22 @@
     <meta name="description" content="Підтвердження підписки на новинки BestBrnd4u">
     <meta name="theme-color" content="#111827">
 
+    <!-- ВЛАСНИЙ noindex, А НЕ ТОЙ, ЩО СТАВИТЬ ЗБІРКА.
+
+         Вище в <head> стоїть <meta robots="noindex,nofollow"> —
+         його додає scripts/apply-site-env.js усьому дев-середовищу
+         й ПРИБИРАЄ на проді. Тобто покладатись на нього не можна:
+         на бойовому сайті сторінка лишилась би відкритою для
+         індексації.
+
+         А їй там не місце. В адресі лежить одноразовий токен чужої
+         підписки; сама сторінка без нього порожня. Так само
+         позначені cart, checkout, favorites і account.
+
+         follow, а не nofollow: посилання звідси ведуть на головну
+         й у каталог, і ваги їм передати можна. -->
+    <meta name="robots" content="noindex,follow">
+
 <link rel="icon" href="favicon.ico" sizes="any">
     <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicon-16.png">

@@ -547,7 +547,20 @@ console.log("\n[3a] Лист підтвердження підписки — н�
 
     check("сторінка підтвердження є", /id="confirmHeading"/.test(page));
 
-    check("вона не індексується", /name="robots" content="noindex/.test(page));
+    // САМЕ ВЛАСНИЙ noindex, А НЕ ТОЙ, ЩО СТАВИТЬ ЗБІРКА.
+    //
+    // scripts/apply-site-env.js додає <meta robots="noindex,nofollow">
+    // усьому дев-середовищу — і ПРИБИРАЄ його на проді. Перевірка на
+    // «є слово noindex» тому проходила локально й падала в CI, де
+    // збирається бойова версія: саме на цьому й спіткнувся синк
+    // 14.09.2026.
+    //
+    // Сторінці в індексі не місце: в адресі лежить одноразовий токен
+    // чужої підписки, а без нього вона порожня. Тож перевіряємо
+    // постійний тег — той, що переживає обидві збірки.
+    check("вона не індексується на проді, а не лише на деві",
+        /name="robots" content="noindex,follow"/.test(page),
+        (page.match(/name="robots"[^>]*/g) || []).join(" | "));
 
     check("і закрита в robots",
         /Disallow: \/newsletter-confirm/.test(read("scripts/apply-site-env.js")));
