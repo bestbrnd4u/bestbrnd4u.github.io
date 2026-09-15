@@ -226,6 +226,189 @@ loginForm?.addEventListener("submit", async event => {
 });
 
 // -------------------------
+// Вхід через Google і Facebook
+//
+// ЧОМУ ЦЕ БЕЗПЕЧНІШЕ ЗА ПАРОЛЬ
+// -----------------------------
+// Пароля ми не бачимо взагалі: його перевіряє Google чи Facebook, а
+// до нас приходить лише підтверджена адреса. Нам нічого зберігати —
+// отже, нічого й втрачати.
+//
+// ОДНА КНОПКА НА ВХІД І РЕЄСТРАЦІЮ
+// ---------------------------------
+// Для цих двох це та сама дія: якщо людини в базі немає, Supabase
+// створює акаунт сам. Тому кнопки стоять над вкладками, а не в
+// одній із них.
+//
+// ЩО ТАКЕ redirectTo І ЧОМУ САМЕ /account
+// ----------------------------------------
+// Після згоди провайдер повертає людину на цю адресу з токеном у
+// #-частині; клієнт Supabase підхоплює його сам. Адреса мусить бути
+// в списку дозволених у налаштуваннях проєкту — інакше Supabase
+// підставить Site URL, і людина опиниться на головній (те саме, що
+// колись сталось із листом про відновлення пароля).
+// -------------------------
+
+const authSocialError = document.getElementById("authSocialError");
+
+async function signInWithProvider(provider, button) {
+
+    if (authSocialError) authSocialError.textContent = "";
+
+    const label = button ? button.textContent : "";
+
+    if (button) {
+        button.disabled = true;
+        button.textContent = "Відкриваємо...";
+    }
+
+    const { error } = await supabaseClient.auth.signInWithOAuth({
+        provider,
+        options: {
+            redirectTo: `${window.location.origin}/account`
+        }
+    });
+
+    // Помилка тут означає, що перехід НЕ відбувся: у звичайному разі
+    // сторінку вже замінив провайдер, і цей код не виконується.
+    if (button) {
+        button.disabled = false;
+        button.textContent = label;
+    }
+
+    if (!error) return;
+
+    console.warn(`Вхід через ${provider} не вдався:`, error.message);
+
+    // НАЙЧАСТІША ПРИЧИНА — ПРОВАЙДЕР НЕ УВІМКНЕНИЙ У ПАНЕЛІ.
+    //
+    // Кнопка при цьому просто нічого не робить, і зрозуміти чому
+    // можна лише в консолі. Кажемо прямо: це наша недоналаштованість,
+    // а не помилка людини, і в неї є чим увійти замість цього.
+    const notEnabled = /provider is not enabled|unsupported provider/i.test(error.message || "");
+
+    if (authSocialError) {
+        authSocialError.textContent = notEnabled
+            ? "Цей спосіб входу ще не під'єднано. Скористайтесь поштою й паролем нижче."
+            : "Не вдалося відкрити вікно входу. Спробуйте ще раз або увійдіть поштою.";
+    }
+
+}
+
+document.querySelectorAll(".auth-social-btn").forEach(button => {
+
+    button.addEventListener("click", () => {
+        signInWithProvider(button.dataset.provider, button);
+    });
+
+});
+
+// ПОКАЗУЄМО ЛИШЕ ТІ СПОСОБИ, ЯКІ СПРАВДІ УВІМКНЕНІ.
+//
+// ЩО СТАЄТЬСЯ БЕЗ ЦЬОГО. signInWithOAuth не повертає помилку в код —
+// він ОДРАЗУ переводить браузер на /auth/v1/authorize. Якщо провайдер
+// у проєкті не увімкнений, Supabase віддає туди голий JSON:
+//
+//     {"code":400,"error_code":"validation_failed",
+//      "msg":"Unsupported provider: provider is not enabled"}
+//
+// Тобто людина замість входу бачить білу сторінку з англійським
+// машинним текстом і кнопкою «назад». Перевірено в браузері — саме
+// так воно й виглядало, а мій обробник помилки не встигав виконатись
+// узагалі.
+//
+// Тому питаємо Supabase заздалегідь. /auth/v1/settings — відкритий
+// маршрут, він перелічує увімкнені провайдери й нічого не розкриває
+// (це той самий список, що видно в панелі).
+//
+// Наслідок, який важливіший за саму помилку: кнопка з'являється сама
+// в той момент, коли провайдера увімкнуть у панелі. Нічого не
+// перезбирати й не правити в коді.
+async function showEnabledProviders() {
+
+    const box = document.getElementById("authSocial");
+    const divider = document.getElementById("authDivider");
+
+    if (!box) return;
+
+    let enabled = {};
+
+    try {
+
+        const response = await fetch(`${SUPABASE_URL}/auth/v1/settings`, {
+            headers: { apikey: SUPABASE_PUBLISHABLE_KEY }
+        });
+
+        if (!response.ok) return;
+
+        enabled = (await response.json())?.external || {};
+
+    } catch (error) {
+
+        // Не дісталися — лишаємо як є: вхід поштою працює завжди, і
+        // недоступність цього запиту не привід ламати сторінку.
+        console.warn("Не вдалося дізнатись способи входу:", error && error.message);
+
+        return;
+
+    }
+
+    let shown = 0;
+
+    box.querySelectorAll(".auth-social-btn").forEach(button => {
+
+        const on = enabled[button.dataset.provider] === true;
+
+        button.hidden = !on;
+
+        if (on) shown += 1;
+
+    });
+
+    // Жодного не увімкнено — картка виглядає так само, як до всього
+    // цього: вкладки й форма. Порожня рамка з написом «або» була б
+    // гірша за її відсутність.
+    box.hidden = shown === 0;
+
+    if (divider) divider.hidden = shown === 0;
+
+}
+
+showEnabledProviders();
+
+// Ім'я з чужого акаунту — щоб профіль не був порожнім.
+//
+// Google і Facebook віддають ім'я в user_metadata. Профіль у нас
+// створюється лише при першому збереженні, тож людина, яка увійшла
+// через них, бачила б порожні поля й мусила вписувати те, що ми вже
+// знаємо.
+//
+// Ключі різні в різних провайдерів, тому перебираємо: given_name /
+// family_name (Google), name і full_name (обидва).
+function namesFromMetadata(user) {
+
+    const meta = user?.user_metadata || {};
+
+    const first = String(meta.given_name || meta.first_name || "").trim();
+    const last = String(meta.family_name || meta.last_name || "").trim();
+
+    if (first || last) return { first, last };
+
+    // Лишається одне поле на все ім'я — ділимо по першому пробілу.
+    // Складені прізвища при цьому лишаються цілими.
+    const full = String(meta.full_name || meta.name || "").trim();
+
+    if (!full) return { first: "", last: "" };
+
+    const space = full.indexOf(" ");
+
+    return space === -1
+        ? { first: full, last: "" }
+        : { first: full.slice(0, space), last: full.slice(space + 1).trim() };
+
+}
+
+// -------------------------
 // Забули пароль
 // -------------------------
 
@@ -1885,8 +2068,14 @@ async function loadProfile(user) {
         return;
     }
 
-    document.getElementById("profileFirstName").value = data?.first_name || "";
-    document.getElementById("profileLastName").value = data?.last_name || "";
+    // Профіль створюється лише при першому збереженні, тож у того,
+    // хто щойно увійшов через Google чи Facebook, рядка ще немає.
+    // Ім'я при цьому відоме — беремо його, щоб людина не вписувала
+    // те, що ми вже знаємо. Своє збережене ім'я завжди головніше.
+    const fromProvider = namesFromMetadata(user);
+
+    document.getElementById("profileFirstName").value = data?.first_name || fromProvider.first;
+    document.getElementById("profileLastName").value = data?.last_name || fromProvider.last;
     document.getElementById("profileMiddleName").value = data?.middle_name || "";
     document.getElementById("profilePhone").value = data?.phone || "";
     document.getElementById("profileCity").value = data?.city || "";
@@ -1911,7 +2100,7 @@ async function loadProfile(user) {
 
     if (newsletterEmail && !newsletterEmail.value) newsletterEmail.value = user.email || "";
 
-    if (accountEmailEl) accountEmailEl.textContent = buildAccountGreeting(data?.first_name);
+    if (accountEmailEl) accountEmailEl.textContent = buildAccountGreeting(data?.first_name || fromProvider.first);
 
 }
 

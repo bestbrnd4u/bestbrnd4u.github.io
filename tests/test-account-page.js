@@ -456,6 +456,100 @@ console.log("\n[8] Листи входу лежать у репозиторії"
     });
 }
 
+console.log("\n[7a] Вхід через Google і Facebook");
+{
+    // ГОЛОВНЕ, ЩО ТУТ ЗАКРІПЛЕНО: КНОПКИ, ЯКІ НЕ ПРАЦЮЮТЬ, НЕ
+    // ПОКАЗУЮТЬСЯ.
+    //
+    // signInWithOAuth не повертає помилку в код — він ОДРАЗУ
+    // переводить браузер на /auth/v1/authorize. Якщо провайдер у
+    // проєкті не увімкнений, Supabase віддає туди голий JSON:
+    //
+    //   {"code":400,"error_code":"validation_failed",
+    //    "msg":"Unsupported provider: provider is not enabled"}
+    //
+    // Тобто людина замість входу опиняється на білій сторінці з
+    // англійським машинним текстом. Перевірено в браузері — саме так
+    // воно й виглядало, і обробник помилки не встигав виконатись.
+    //
+    // Тому список увімкнених провайдерів питається заздалегідь, і
+    // кнопка з'являється сама, коли провайдера увімкнуть у панелі.
+    ["google", "facebook"].forEach(provider => {
+        check(`кнопка ${provider} є`,
+            new RegExp(`data-provider="${provider}"`).test(html));
+    });
+
+    // Сховані в розмітці: інакше вони встигли б блимнути до
+    // відповіді Supabase — і людина клікнула б саме в цей момент.
+    check("блок схований до відповіді Supabase",
+        /<div class="auth-social" id="authSocial" hidden>/.test(html));
+
+    check("розділювач «або» теж",
+        /<div class="auth-divider" id="authDivider" hidden>/.test(html));
+
+    check("список увімкнених питається у Supabase",
+        /\/auth\/v1\/settings/.test(js));
+
+    check("показуються лише увімкнені",
+        /button\.hidden = !on/.test(js));
+
+    check("жодного увімкненого — блока немає",
+        /box\.hidden = shown === 0/.test(js));
+
+    // Недоступність цього запиту не привід ламати вхід поштою.
+    check("без відповіді сторінка не ламається",
+        /Не вдалося дізнатись способи входу/.test(js));
+
+    check("вхід іде через Supabase, а не власними руками",
+        /auth\.signInWithOAuth\(\{/.test(js));
+
+    // Та сама пастка, що з листом про відновлення пароля: адреса
+    // повернення мусить бути в списку дозволених, інакше Supabase
+    // підставить Site URL.
+    check("повертає в кабінет",
+        /redirectTo: `\$\{window\.location\.origin\}\/account`/.test(js));
+
+    // Кнопки стоять НАД вкладками: для цих двох «увійти» й
+    // «зареєструватися» — та сама дія.
+    check("кнопки над обома вкладками",
+        html.indexOf('id="authSocial"') < html.indexOf('id="loginForm"')
+        && html.indexOf('id="authSocial"') < html.indexOf('id="signupForm"'));
+
+    // ІМ'Я З ЧУЖОГО АКАУНТУ. Профіль створюється лише при першому
+    // збереженні, тож той, хто увійшов через Google, бачив би порожні
+    // поля — і вписував те, що ми вже знаємо.
+    const source = js.match(/function namesFromMetadata\(user\)[\s\S]*?\n\}/);
+
+    check("ім'я береться з даних провайдера", Boolean(source));
+
+    if (source) {
+
+        const names = new Function(source[0] + "; return namesFromMetadata;")();
+
+        check("Google: окремі поля імені й прізвища",
+            JSON.stringify(names({ user_metadata: { given_name: "Ілля", family_name: "Півень" } }))
+                === JSON.stringify({ first: "Ілля", last: "Півень" }));
+
+        check("одне поле ділиться по першому пробілу",
+            JSON.stringify(names({ user_metadata: { full_name: "Ілля Півень" } }))
+                === JSON.stringify({ first: "Ілля", last: "Півень" }));
+
+        // Складене прізвище лишається цілим, а не обрізається.
+        check("складене прізвище не ріжеться",
+            names({ user_metadata: { name: "Анна Марія Коваль-Шевченко" } }).last
+                === "Марія Коваль-Шевченко");
+
+        check("без даних — порожньо, а не undefined",
+            JSON.stringify(names({})) === JSON.stringify({ first: "", last: "" })
+            && JSON.stringify(names(null)) === JSON.stringify({ first: "", last: "" }));
+
+    }
+
+    // Своє збережене ім'я головніше за те, що дав провайдер.
+    check("збережене ім'я не затирається",
+        /data\?\.first_name \|\| fromProvider\.first/.test(js));
+}
+
 console.log("\n[8a] Розкривні блоки кабінету дихають");
 {
     // ЧОМУ ВСЕРЕДИНІ БУЛО РІВНО НУЛЬ.
