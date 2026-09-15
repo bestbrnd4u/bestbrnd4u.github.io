@@ -8,5 +8,6 @@ Disallow: /cart
 Disallow: /checkout
 Disallow: /favorites
 Disallow: /thanks
+Disallow: /newsletter-confirm
 
 Sitemap: https://bestbrnd4u.com/sitemap.xml
