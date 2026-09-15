@@ -295,7 +295,14 @@ async function signInWithProvider(provider, button) {
 
 }
 
-document.querySelectorAll(".auth-social-btn").forEach(button => {
+// САМЕ [data-provider], А НЕ .auth-social-btn.
+//
+// Клас тут спільний — він про вигляд кнопки. Але Telegram провайдером
+// Supabase не є, і в нього свій обробник нижче. З широким селектором
+// натискання на Telegram теж ішло сюди, provider ставав undefined, і
+// браузер їхав на /auth/v1/authorize?provider=undefined — тобто на
+// сторінку з машинною помилкою. Перевірено кліком.
+document.querySelectorAll(".auth-social-btn[data-provider]").forEach(button => {
 
     button.addEventListener("click", () => {
         signInWithProvider(button.dataset.provider, button);
@@ -353,21 +360,33 @@ async function showEnabledProviders() {
 
     }
 
-    let shown = 0;
-
-    box.querySelectorAll(".auth-social-btn").forEach(button => {
-
-        const on = enabled[button.dataset.provider] === true;
-
-        button.hidden = !on;
-
-        if (on) shown += 1;
-
+    // Тільки [data-provider]: кнопка Telegram теж лежить у цьому
+    // блоці, але провайдером Supabase не є, і питати про неї
+    // /auth/v1/settings безглуздо — вона працює через нашу власну
+    // функцію й вмикається окремо.
+    box.querySelectorAll("[data-provider]").forEach(button => {
+        button.hidden = enabled[button.dataset.provider] !== true;
     });
 
-    // Жодного не увімкнено — картка виглядає так само, як до всього
-    // цього: вкладки й форма. Порожня рамка з написом «або» була б
-    // гірша за її відсутність.
+    showSocialBlock();
+
+}
+
+// Блок і розділювач з'являються, щойно є хоч одна робоча кнопка.
+//
+// Жодної — картка виглядає так само, як до всього цього: вкладки й
+// форма. Порожня рамка з написом «або» була б гірша за її
+// відсутність.
+function showSocialBlock() {
+
+    const box = document.getElementById("authSocial");
+    const divider = document.getElementById("authDivider");
+
+    if (!box) return;
+
+    const shown = [...box.querySelectorAll(".auth-social-btn")]
+        .filter(button => !button.hidden).length;
+
     box.hidden = shown === 0;
 
     if (divider) divider.hidden = shown === 0;
@@ -375,6 +394,217 @@ async function showEnabledProviders() {
 }
 
 showEnabledProviders();
+
+// -------------------------
+// Вхід через Telegram
+//
+// Supabase такого провайдера не має, тож вхід іде через нашого ж
+// бота. Чому саме так, а не через Login Widget, і навіщо код —
+// у supabase/functions/telegram-order-bot/telegram-login.js.
+//
+// ЩО РОБИТЬ ЦЯ СТОРІНКА, А ЧОГО НЕ РОБИТЬ
+// ----------------------------------------
+// Вона не перевіряє нічого й нічого не підписує: просить спробу
+// входу, відкриває бота, чекає, і в кінці передає Supabase
+// одноразовий токен, який видала наша функція. Сесію відкриває сам
+// Supabase — своїх ми не вигадуємо.
+// -------------------------
+
+const telegramLoginBtn = document.getElementById("telegramLoginBtn");
+const telegramWait = document.getElementById("telegramWait");
+
+// Показуємо одразу, не питаючи нікого.
+//
+// На відміну від Google і Facebook, тут нема чого питати: це наш
+// власний бот і наша власна функція, а не провайдер у чужій панелі.
+// І головне — відмова тут не страшна: людина побачить зрозумілий
+// рядок під кнопкою, а не білу сторінку з англійським JSON, як
+// вийшло б із невімкненим провайдером Supabase.
+if (telegramLoginBtn) {
+
+    telegramLoginBtn.hidden = false;
+
+    showSocialBlock();
+
+}
+
+// Опитування зупиняємо звідусіль: після успіху, після скасування,
+// після закриття вкладки. Незупинений таймер тут — це запит кожні
+// дві секунди до кінця життя сторінки.
+let telegramPoll = null;
+
+function stopTelegramLogin() {
+
+    clearInterval(telegramPoll);
+
+    telegramPoll = null;
+
+    if (telegramWait) telegramWait.hidden = true;
+    if (telegramLoginBtn) telegramLoginBtn.hidden = false;
+
+}
+
+// НІКОЛИ НЕ КИДАЄ ВИНЯТКІВ — І ЦЕ НЕ ОБЕРЕЖНІСТЬ, А ВИПРАВЛЕНА
+// ПОМИЛКА.
+//
+// Спершу тут стояв голий fetch. Коли функція недоступна (стара
+// версія без цього маршруту, відсутній CORS, обірвана мережа), fetch
+// відхиляється — і обробник кліку тихо вмирає посеред себе:
+//
+//     Uncaught (in promise) TypeError: Failed to fetch
+//
+// Зовні це «кнопка не працює»: ні екрана очікування, ні
+// повідомлення, ні сліду. Перевірено кліком — саме так воно й
+// поводилось.
+//
+// Тепер відмова мережі приходить як звичайна відповідь зі status 0,
+// і кожен, хто цим користується, однаково показує людині рядок.
+async function callFunction(body) {
+
+    try {
+
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/telegram-order-bot`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                apikey: SUPABASE_PUBLISHABLE_KEY,
+                Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`
+            },
+            body: JSON.stringify(body)
+        });
+
+        return { status: response.status, data: await response.json().catch(() => null) };
+
+    } catch (error) {
+
+        console.warn("Функція недоступна:", error && error.message);
+
+        return { status: 0, data: null };
+
+    }
+
+}
+
+telegramLoginBtn?.addEventListener("click", async () => {
+
+    if (authSocialError) authSocialError.textContent = "";
+
+    telegramLoginBtn.disabled = true;
+
+    const { status, data } = await callFunction({ site_action: "telegram-login-start" });
+
+    telegramLoginBtn.disabled = false;
+
+    if (status === 429) {
+        if (authSocialError) authSocialError.textContent = "Забагато спроб. Спробуйте за годину.";
+        return;
+    }
+
+    if (!data?.ok || !data.link) {
+        if (authSocialError) {
+            // Не «або Google»: його може бути не увімкнено, і тоді
+            // порада вказувала б на кнопку, якої на екрані немає.
+            // Пошта з паролем є завжди.
+            authSocialError.textContent = "Вхід через Telegram зараз недоступний."
+                + " Скористайтесь поштою й паролем нижче.";
+        }
+        return;
+    }
+
+    document.getElementById("telegramCode").textContent = data.code;
+
+    telegramLoginBtn.hidden = true;
+    telegramWait.hidden = false;
+
+    // НОВА ВКЛАДКА, А НЕ ПЕРЕХІД.
+    //
+    // Ця сторінка мусить лишитись живою: саме вона чекає на
+    // підтвердження й відкриває кабінет. Пішовши з неї, людина
+    // повернулась би на порожню форму входу, а підтверджена спроба
+    // згоріла б.
+    window.open(data.link, "_blank", "noopener");
+
+    waitForTelegram(data.token);
+
+});
+
+document.getElementById("telegramCancel")?.addEventListener("click", stopTelegramLogin);
+
+function waitForTelegram(token) {
+
+    clearInterval(telegramPoll);
+
+    // Дві секунди: людина підтверджує в іншій програмі, і секунда
+    // тут нічого б не пришвидшила, зате подвоїла б кількість
+    // запитів. Спроба живе п'ять хвилин — довше не чекаємо.
+    const started = Date.now();
+
+    telegramPoll = setInterval(async () => {
+
+        if (Date.now() - started > 5 * 60 * 1000) {
+
+            stopTelegramLogin();
+
+            if (authSocialError) {
+                authSocialError.textContent = "Час вийшов. Натисніть «Увійти через Telegram» ще раз.";
+            }
+
+            return;
+
+        }
+
+        const { data } = await callFunction({
+            site_action: "telegram-login-status",
+            token
+        });
+
+        if (!data || data.state === "waiting") return;
+
+        if (data.state !== "confirmed" || !data.tokenHash) {
+
+            stopTelegramLogin();
+
+            if (authSocialError) {
+                authSocialError.textContent = data.state === "expired"
+                    ? "Час вийшов. Спробуйте ще раз."
+                    : "Не вдалося завершити вхід. Спробуйте ще раз.";
+            }
+
+            return;
+
+        }
+
+        clearInterval(telegramPoll);
+        telegramPoll = null;
+
+        // Сесію відкриває Supabase за одноразовим токеном, який
+        // видала наша функція.
+        const { error } = await supabaseClient.auth.verifyOtp({
+            token_hash: data.tokenHash,
+            type: "email"
+        });
+
+        if (error) {
+
+            console.warn("Сесію не відкрито:", error.message);
+
+            stopTelegramLogin();
+
+            if (authSocialError) {
+                authSocialError.textContent = "Не вдалося завершити вхід. Спробуйте ще раз.";
+            }
+
+            return;
+
+        }
+
+        stopTelegramLogin();
+
+        await renderAuthState();
+
+    }, 2000);
+
+}
 
 // Ім'я з чужого акаунту — щоб профіль не був порожнім.
 //

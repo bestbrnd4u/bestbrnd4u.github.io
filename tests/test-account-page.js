@@ -491,7 +491,14 @@ console.log("\n[7a] Вхід через Google і Facebook");
         /\/auth\/v1\/settings/.test(js));
 
     check("показуються лише увімкнені",
-        /button\.hidden = !on/.test(js));
+        /button\.hidden = enabled\[button\.dataset\.provider\] !== true/.test(js));
+
+    // Питаємо тільки про справжніх провайдерів Supabase. Кнопка
+    // Telegram лежить у тому самому блоці, але працює через нашу
+    // власну функцію — у /auth/v1/settings її немає й бути не може,
+    // тож широкий селектор ховав би її назавжди.
+    check("Telegram не питається у Supabase",
+        /box\.querySelectorAll\("\[data-provider\]"\)/.test(js));
 
     check("жодного увімкненого — блока немає",
         /box\.hidden = shown === 0/.test(js));

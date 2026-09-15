@@ -8426,6 +8426,51 @@ body.mobile-filters-open .scroll-top{
     color:#1877f2;
 }
 
+.auth-social-telegram .auth-social-icon{
+    color:#29a0da;
+}
+
+/* Telegram — на всю ширину під двома іншими: підпис у нього довший,
+   і в половину рядка він переносився б у два. */
+.auth-social-telegram{
+    grid-column:1 / -1;
+}
+
+/* Крок очікування підтвердження в боті. */
+.auth-telegram-wait{
+    margin-top:14px;
+    padding:16px;
+    border:1px solid var(--gray200);
+    border-radius:12px;
+    text-align:center;
+    animation:profile-panel-in 180ms var(--ease-out);
+}
+
+.auth-telegram-step{
+    margin:0;
+    font-size:13px;
+    line-height:1.5;
+    color:var(--gray700);
+}
+
+/* КОД ВЕЛИКИЙ І МОНОШИРИННИЙ НАВМИСНЕ.
+   Його не вводять, а звіряють очима з тим, що написав бот, — і
+   робиться це в поспіху, переключаючись між програмами. Дрібний код
+   у такій ситуації просто не звірять. */
+.auth-telegram-code{
+    margin:10px 0;
+    font:800 32px/1.1 ui-monospace,Menlo,Consolas,monospace;
+    letter-spacing:4px;
+    color:var(--dark);
+}
+
+.auth-telegram-note{
+    margin:0 0 10px;
+    font-size:12px;
+    line-height:1.45;
+    color:var(--gray500);
+}
+
 .auth-social-error:empty{
     display:none;
 }

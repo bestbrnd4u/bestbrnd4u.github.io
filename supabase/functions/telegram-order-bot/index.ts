@@ -15,6 +15,7 @@
 //   supabase/functions/telegram-order-bot/review-admin.js
 //   supabase/functions/telegram-order-bot/promo-admin.js
 //   supabase/functions/telegram-order-bot/people-admin.js
+//   supabase/functions/telegram-order-bot/telegram-login.js
 //   supabase/functions/telegram-order-bot/_index.src.ts  (мережа й база)
 //
 // Перезібрати:  node scripts/build-edge-function.js
@@ -382,6 +383,16 @@ function parseStartPayload(text) {
   const payload = raw.replace(/^\/start(@\S+)?/, "").trim();
 
   if (!payload) return { type: "welcome" };
+
+  // Вхід на сайт: t.me/<bot>?start=login_<uuid>.
+  //
+  // З товарним посиланням не плутається: там самі цифри, тут
+  // обов'язковий префікс і дефіси uuid. Формат тут тільки
+  // впізнаємо — чи жива ця спроба входу, вирішує telegram-login.js
+  // за записом у базі.
+  const login = payload.match(/^login[_-]([0-9a-f-]{36})$/i);
+
+  if (login) return { type: "login", token: login[1].toLowerCase() };
 
   const match = payload.match(/^(?:product[_-]?|p)?(\d+)$/i);
 
@@ -5302,6 +5313,183 @@ function peopleActionResult(action, email) {
 
 }
 
+
+// Вхід на сайт через Telegram.
+//
+// НАВІЩО ВЗАГАЛІ
+// ---------------
+// Google і Facebook Supabase вміє сам, Telegram — ні. А саме він тут
+// найпоширеніший: бот магазину вже приймає замовлення, і людина в
+// ньому вже є.
+//
+// ЧОМУ ЧЕРЕЗ БОТА, А НЕ ЧЕРЕЗ LOGIN WIDGET
+// -----------------------------------------
+// Віджет вимагає зареєструвати домен у BotFather, і домен там один.
+// У нас їх три: прод, дев і localhost — тобто перевірити вхід можна
+// було б лише зламавши його на бойовому сайті. Діплінк у бота такого
+// обмеження не має: бот один, а прийшли на нього хоч звідки.
+//
+// ЯК ЦЕ ВИГЛЯДАЄ
+// ---------------
+//   1. Сайт просить нову спробу входу й отримує токен, код і адресу
+//      t.me/<bot>?start=login_<token>.
+//   2. Людина тисне «Старт» у боті. Бот НЕ входить мовчки: він пише,
+//      на який сайт іде вхід, і називає код.
+//   3. Код на сайті й у боті збігається — людина тисне «Підтвердити».
+//   4. Сайт, який весь цей час чекає, отримує сесію.
+//
+// НАВІЩО КРОК З КОДОМ
+// --------------------
+// Токен їде через Telegram, отже його може надіслати хтось інший.
+// Класична атака: зловмисник відкриває вхід у себе, надсилає жертві
+// СВОЄ посилання, жертва тисне «Старт» — і зловмисник заходить у
+// кабінет як жертва.
+//
+// Код це ламає: він видно тільки тому, хто вхід почав. Жертва бачить
+// у боті чужий код, свого на екрані не має — і не підтверджує.
+//
+// ЧОГО ТУТ НЕМА
+// --------------
+// Мережі й бази. Лише чисті функції — щоб перевірялись тестами в
+// Node, а не тільки на живому боті.
+
+// Скільки живе спроба входу.
+//
+// П'ять хвилин: людина переходить у Telegram і повертається — це
+// десятки секунд. Довше означало б, що забуте посилання лишається
+// дійсним, коли за комп'ютер сів хтось інший.
+const LOGIN_TTL_MINUTES = 5;
+
+// Префікс у діплінку. Telegram дозволяє в /start лише латиницю,
+// цифри, підкреслення й дефіс — uuid під це підходить.
+const LOGIN_PREFIX = "login_";
+
+// Токен спроби: uuid і нічого крім.
+function cleanLoginToken(value) {
+
+    const clean = String(value ?? "").trim().toLowerCase();
+
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(clean)
+        ? clean
+        : "";
+
+}
+
+// Код підтвердження — дві цифри.
+//
+// ЧОМУ ЛИШЕ ДВІ. Його не вводять, а ПОРІВНЮЮТЬ очима: на екрані й у
+// повідомленні бота. Довгий код тут нічого не додає — його просто
+// перестануть звіряти. Дві цифри дають 1 шанс зі 100, що підсунутий
+// чужий вхід випадково збіжиться, і при цьому читаються з одного
+// погляду.
+//
+// Це не пароль: угадувати його нема де. Спроба живе п'ять хвилин, і
+// підтвердити її можна лише з того Telegram-акаунта, якому прийшло
+// посилання.
+function loginCode(random) {
+
+    const value = Math.floor(Number(random) * 100);
+
+    return String(Math.min(Math.max(value, 0), 99)).padStart(2, "0");
+
+}
+
+// Адреса, яку відкриває кнопка.
+function loginDeepLink(botUsername, token) {
+
+    const bot = String(botUsername ?? "").trim().replace(/^@/, "");
+
+    if (!bot || !token) return "";
+
+    return `https://t.me/${bot}?start=${LOGIN_PREFIX}${token}`;
+
+}
+
+// Чи можна ще підтвердити цю спробу.
+//
+// state:
+//   ok       — можна;
+//   used     — за нею вже входили;
+//   expired  — минуло більше за LOGIN_TTL_MINUTES;
+//   unknown  — такої спроби немає.
+function loginVerdict(row, now) {
+
+    if (!row || !row.token) return { ok: false, state: "unknown" };
+
+    if (row.used_at) return { ok: false, state: "used" };
+
+    const created = Date.parse(row.created_at ?? "");
+
+    if (Number.isFinite(created)) {
+
+        const minutes = (Number(now) - created) / 60000;
+
+        if (minutes > LOGIN_TTL_MINUTES) return { ok: false, state: "expired" };
+
+    }
+
+    return { ok: true, state: "ok" };
+
+}
+
+// Що відповісти сайту, який чекає.
+//
+// state:
+//   waiting   — людина ще не підтвердила;
+//   confirmed — підтвердила, можна видавати сесію;
+//   expired / used / unknown — те саме, що вище.
+function loginStatus(row, now) {
+
+    const verdict = loginVerdict(row, now);
+
+    if (!verdict.ok) return verdict;
+
+    return row.confirmed_at
+        ? { ok: true, state: "confirmed" }
+        : { ok: true, state: "waiting" };
+
+}
+
+// ПОШТА, ЯКУ НЕМОЖЛИВО ЗАЙНЯТИ ЗАЗДАЛЕГІДЬ.
+//
+// Supabase тримає користувача за поштою, а Telegram її не дає. Тому
+// адресу доводиться вигадувати з id — і тут ховається дірка, якщо
+// зробити це прямо.
+//
+// Нехай адреса була б tg123456@telegram.bestbrnd4u.com. Тоді будь-хто
+// реєструється з ТАКОЮ поштою й паролем заздалегідь — і власник
+// Telegram-акаунта 123456, увійшовши через бота, потрапляє в чужий
+// акаунт. Id в Telegram не таємниця.
+//
+// Тому в адресу підмішується підпис, який можна порахувати лише з
+// секретом функції. Вгадати таку адресу, щоб зайняти її наперед,
+// неможливо — а порахувати повторно для того самого id ми можемо
+// завжди.
+//
+// Сам підпис рахується в index.ts (тут немає мережі й крипто), а ця
+// функція лише складає адресу з готових частин.
+function telegramEmail(telegramId, signature) {
+
+    const id = String(telegramId ?? "").replace(/\D/g, "");
+    const sign = String(signature ?? "").replace(/[^a-z0-9]/gi, "").toLowerCase();
+
+    if (!id || sign.length < 16) return "";
+
+    return `tg${id}.${sign.slice(0, 32)}@telegram.bestbrnd4u.com`;
+
+}
+
+// Ім'я для профілю. Telegram дає окремі поля, але прізвища може й не
+// бути — тоді лишається одне ім'я, і це нормально.
+function telegramName(row) {
+
+    const first = String(row?.first_name ?? "").trim();
+    const last = String(row?.last_name ?? "").trim();
+
+    return [first, last].filter(Boolean).join(" ");
+
+}
+
 // ======================================
 // Telegram-бот для заявок BestBrnd4u
 //
@@ -5343,6 +5531,7 @@ function peopleActionResult(action, email) {
 
 // Панель «Відгуки» в адмінці — другий спосіб модерації поруч із
 // кнопками в Telegram (пояснення — у review-admin.js).
+
 
 
 
@@ -5820,6 +6009,15 @@ async function handleCallback(callback: Record<string, any>) {
 
   }
 
+  // Підтвердження входу на сайт (префікс "tglogin:")
+  if (data.startsWith("tglogin:")) {
+
+    await handleLoginCallback(callback, data);
+
+    return;
+
+  }
+
   // Модерація відгуку (префікс "rev:")
   if (data.startsWith("rev:")) {
 
@@ -6026,6 +6224,15 @@ async function handleMessage(message: Record<string, any>) {
   if (await handleOrderText(message)) return;
 
   if (!command) return;
+
+  // --- вхід на сайт ---
+  if (command.type === "login") {
+
+    await offerSiteLogin(message, command.token);
+
+    return;
+
+  }
 
   // --- посилання на конкретний товар ---
   if (command.type === "product") {
@@ -7967,6 +8174,336 @@ async function handleSubscribe(request: Request, body: Record<string, any>): Pro
 
 }
 
+// -------------------------
+// Вхід на сайт через Telegram
+//
+// Чому через бота, а не через Login Widget, і навіщо код —
+// у telegram-login.js.
+// -------------------------
+
+// Ім'я бота питаємо в самого Telegram: зайвого секрету не заводимо, а
+// перейменування бота не ламає вхід. Відповідь не змінюється, тож
+// тримаємо її в пам'яті до наступного холодного старту.
+let botUsernameCache = "";
+
+async function botUsername(): Promise<string> {
+
+  if (botUsernameCache) return botUsernameCache;
+
+  const result = await telegram("getMe", {});
+
+  botUsernameCache = String(result?.result?.username ?? "");
+
+  return botUsernameCache;
+
+}
+
+// ПІДПИС ДЛЯ ВИГАДАНОЇ ПОШТИ.
+//
+// Навіщо він — у telegram-login.js, telegramEmail(). Коротко: без
+// підпису адресу tg<id>@… можна зайняти заздалегідь, знаючи лише id,
+// а id в Telegram не таємниця.
+//
+// Ключем беремо токен бота: він уже є, живе в секретах і ніколи не
+// залишає функцію. Окремий секрет тут нічого не додав би, а додав би
+// ще один спосіб усе зламати, забувши його виставити.
+async function telegramEmailSignature(telegramId: number | string): Promise<string> {
+
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(TELEGRAM_BOT_TOKEN),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+
+  const mac = await crypto.subtle.sign(
+    "HMAC",
+    key,
+    new TextEncoder().encode(`telegram-login:${telegramId}`),
+  );
+
+  return [...new Uint8Array(mac)]
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+
+}
+
+// Крок 2: людина натиснула «Старт» у боті.
+//
+// Мовчки не входимо. Пишемо, НА ЯКИЙ САЙТ іде вхід, і називаємо код —
+// той самий, що зараз на екрані в того, хто цей вхід почав. Не
+// збігається — значить, посилання підсунули, і людина це побачить.
+async function offerSiteLogin(message: Record<string, any>, token: string) {
+
+  const chatId = message.chat.id;
+
+  const clean = cleanLoginToken(token);
+
+  const row = clean ? await loginRow(clean) : null;
+
+  const verdict = loginVerdict(row, Date.now());
+
+  if (!verdict.ok) {
+
+    await telegram("sendMessage", {
+      chat_id: chatId,
+      text: verdict.state === "expired"
+        ? "Посилання для входу застаріло — воно діє кілька хвилин.\n\n"
+          + "Поверніться на сайт і натисніть «Увійти через Telegram» ще раз."
+        : "Це посилання для входу вже використали.\n\n"
+          + "Якщо вхід потрібен знову — почніть його на сайті.",
+    });
+
+    return;
+
+  }
+
+  await telegram("sendMessage", {
+    chat_id: chatId,
+    text:
+      `Вхід у <b>особистий кабінет</b> на bestbrnd4u.com\n\n`
+      + `Код на сайті: <b>${row.code}</b>\n\n`
+      + `Якщо на екрані той самий код — підтвердіть. `
+      + `Якщо ви нічого не починали або код інший — просто закрийте це повідомлення.`,
+    parse_mode: "HTML",
+    reply_markup: {
+      inline_keyboard: [[
+        { text: `✅ Підтвердити вхід (${row.code})`, callback_data: `tglogin:${clean}` },
+      ]],
+    },
+  });
+
+}
+
+// Крок 3: натиснули «Підтвердити».
+async function handleLoginCallback(callback: Record<string, any>, data: string) {
+
+  const chatId = callback.message?.chat?.id;
+  const from = callback.from ?? {};
+
+  const token = cleanLoginToken(data.slice("tglogin:".length));
+
+  const row = token ? await loginRow(token) : null;
+
+  const verdict = loginVerdict(row, Date.now());
+
+  if (!verdict.ok) {
+
+    await telegram("answerCallbackQuery", {
+      callback_query_id: callback.id,
+      text: verdict.state === "expired" ? "Посилання застаріло" : "Вхід уже виконано",
+      show_alert: true,
+    });
+
+    return;
+
+  }
+
+  await supabaseRest(`telegram_logins?token=eq.${encodeURIComponent(token)}`, {
+    method: "PATCH",
+    body: JSON.stringify({
+      confirmed_at: new Date().toISOString(),
+      telegram_id: from.id ?? null,
+      first_name: from.first_name ?? null,
+      last_name: from.last_name ?? null,
+      username: from.username ?? null,
+    }),
+  });
+
+  await telegram("answerCallbackQuery", {
+    callback_query_id: callback.id,
+    text: "Готово — поверніться на сайт",
+  });
+
+  await telegram("editMessageText", {
+    chat_id: chatId,
+    message_id: callback.message?.message_id,
+    text: "✅ Вхід підтверджено. Поверніться на вкладку з сайтом — кабінет уже відкритий.",
+  });
+
+}
+
+async function loginRow(token: string) {
+
+  const response = await supabaseRest(
+    `telegram_logins?token=eq.${encodeURIComponent(token)}&select=*&limit=1`,
+  );
+
+  if (!response.ok) {
+
+    console.error("Спроби входу недоступні:", await response.text());
+
+    return null;
+
+  }
+
+  return (await response.json().catch(() => []))[0] ?? null;
+
+}
+
+// Крок 1: сайт просить нову спробу входу.
+async function handleTelegramLoginStart(request: Request): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  if (!TELEGRAM_BOT_TOKEN) {
+    return adminJson({ ok: false, error: "not_configured" }, 501, origin);
+  }
+
+  // Та сама межа, що в інших відкритих маршрутів: без неї спроби
+  // входу можна створювати тисячами.
+  if (!(await lookupAllowed(clientIp(request)))) {
+    return adminJson({ ok: false, error: "too_many" }, 429, origin);
+  }
+
+  const code = loginCode(crypto.getRandomValues(new Uint32Array(1))[0] / 2 ** 32);
+
+  const created = await supabaseRest("telegram_logins", {
+    method: "POST",
+    headers: { Prefer: "return=representation" },
+    body: JSON.stringify({ code }),
+  });
+
+  if (!created.ok) {
+
+    // У журнал не пишемо: report_server_issue приймає рівно п'ять
+    // видів (міграція 018), і «auth» серед них немає — виклик просто
+    // відкинуло б. Заводити шостий вид заради одного повідомлення
+    // означало б переписувати спільну функцію бази.
+    //
+    // Мовчання тут і не виходить: сторінка скаже людині, що цей вхід
+    // недоступний, а причина лежить у журналі функції.
+    console.error("Не вдалося створити спробу входу (міграція 033?):", await created.text());
+
+    return adminJson({ ok: false, error: "unavailable" }, 200, origin);
+
+  }
+
+  const row = (await created.json().catch(() => []))[0];
+
+  const link = loginDeepLink(await botUsername(), row?.token);
+
+  if (!link) {
+    return adminJson({ ok: false, error: "not_configured" }, 501, origin);
+  }
+
+  return adminJson({
+    ok: true,
+    token: row.token,
+    code: row.code,
+    link,
+    ttlMinutes: LOGIN_TTL_MINUTES,
+  }, 200, origin);
+
+}
+
+// Крок 4: сайт питає, чи вже підтвердили, і забирає сесію.
+async function handleTelegramLoginStatus(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  const token = cleanLoginToken(body?.token);
+
+  if (!token) {
+    return adminJson({ ok: false, state: "unknown" }, 400, origin);
+  }
+
+  const row = await loginRow(token);
+
+  const status = loginStatus(row, Date.now());
+
+  if (!status.ok || status.state !== "confirmed") {
+    return adminJson({ ok: status.ok, state: status.state }, 200, origin);
+  }
+
+  // ПОЗНАЧАЄМО ВИКОРИСТАНОЮ ОДРАЗУ, ЩЕ ДО ВИДАЧІ СЕСІЇ.
+  //
+  // Інакше два запити, що прийшли одночасно, обидва побачили б
+  // «підтверджено» й обидва отримали б вхід. Умова в самому запиті
+  // (used_at is null) робить це атомарним: другий не змінить жодного
+  // рядка й отримає порожню відповідь.
+  const claimed = await supabaseRest(
+    `telegram_logins?token=eq.${encodeURIComponent(token)}&used_at=is.null`,
+    {
+      method: "PATCH",
+      headers: { Prefer: "return=representation" },
+      body: JSON.stringify({ used_at: new Date().toISOString() }),
+    },
+  );
+
+  const claimedRows = claimed.ok ? await claimed.json().catch(() => []) : [];
+
+  if (!Array.isArray(claimedRows) || !claimedRows.length) {
+    return adminJson({ ok: false, state: "used" }, 200, origin);
+  }
+
+  const signature = await telegramEmailSignature(row.telegram_id);
+
+  const email = telegramEmail(row.telegram_id, signature);
+
+  if (!email) {
+    return adminJson({ ok: false, state: "error" }, 200, origin);
+  }
+
+  // Користувача створюємо, якщо його ще немає. Помилку «вже існує»
+  // ігноруємо навмисно: це і є повторний вхід тієї самої людини.
+  await supabaseAuthAdmin("users", {
+    method: "POST",
+    body: JSON.stringify({
+      email,
+      email_confirm: true,
+      user_metadata: {
+        full_name: telegramName(row),
+        telegram_id: row.telegram_id,
+        telegram_username: row.username ?? null,
+      },
+    }),
+  });
+
+  // Сесію видає сам Supabase: ми лише просимо одноразовий токен і
+  // віддаємо його сторінці. Свої сесії не підписуємо й не вигадуємо.
+  const linkResponse = await supabaseAuthAdmin("admin/generate_link", {
+    method: "POST",
+    body: JSON.stringify({ type: "magiclink", email }),
+  });
+
+  if (!linkResponse.ok) {
+
+    console.error("Не вдалося видати сесію:", await linkResponse.text());
+
+    return adminJson({ ok: false, state: "error" }, 200, origin);
+
+  }
+
+  const data = await linkResponse.json().catch(() => null);
+
+  const hash = data?.hashed_token ?? data?.properties?.hashed_token ?? "";
+
+  if (!hash) {
+    return adminJson({ ok: false, state: "error" }, 200, origin);
+  }
+
+  return adminJson({ ok: true, state: "confirmed", tokenHash: hash }, 200, origin);
+
+}
+
+// Адмінські виклики до Auth. Окремо від supabaseRest, бо в Auth
+// інший корінь (/auth/v1/, не /rest/v1/).
+async function supabaseAuthAdmin(path: string, init: RequestInit = {}) {
+
+  return await fetch(`${SUPABASE_URL}/auth/v1/${path}`, {
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      apikey: SERVICE_ROLE_KEY,
+      Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+      ...(init.headers ?? {}),
+    },
+  });
+
+}
+
 // Наш лист підтвердження підписки.
 //
 // Ніколи не кидає винятків і ніколи не заважає відповіді: людина вже
@@ -8990,6 +9527,20 @@ async function handleRequest(request: Request): Promise<Response> {
   if (body.site_action === "subscribe") {
 
     return await handleSubscribe(request, body);
+
+  }
+
+  // --- вхід через Telegram: сайт просить нову спробу ---
+  if (body.site_action === "telegram-login-start") {
+
+    return await handleTelegramLoginStart(request);
+
+  }
+
+  // --- вхід через Telegram: сайт чекає підтвердження ---
+  if (body.site_action === "telegram-login-status") {
+
+    return await handleTelegramLoginStatus(request, body);
 
   }
 
