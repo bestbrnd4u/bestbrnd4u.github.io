@@ -5490,6 +5490,79 @@ function telegramName(row) {
 
 }
 
+
+// -------------------------
+// Телефон із Telegram
+//
+// НАВІЩО ЦЕ ВЗАГАЛІ ТУТ
+// ----------------------
+// Надіслати код на довільний номер безкоштовно не можна ні в кого:
+// платне саме телеком-плече — і SMS, і flash-дзвінок, і Viber через
+// партнера, і Telegram Gateway.
+//
+// Тому напрямок перевернуто. Не ми стукаємо на номер, а людина сама
+// віддає його кнопкою «Поділитися номером»: номер надсилає клієнт
+// Telegram, а не рука на клавіатурі.
+// -------------------------
+
+// ЧУЖИЙ КОНТАКТ — ОСЬ ЧОГО ТУТ ТРЕБА БОЯТИСЬ.
+//
+// Кнопка «Поділитися номером» надсилає власний номер. Але в той
+// самий чат можна ПЕРЕСЛАТИ картку будь-якого зі своїх контактів —
+// і боту прийде таке саме повідомлення з полем contact. Без
+// перевірки в базу ліг би номер друга й виглядав би підтвердженим.
+//
+// Відрізняє їх одне поле: у власному контакті user_id дорівнює id
+// того, хто надіслав. У чужому — або чужий id, або його немає
+// взагалі (у контакта без Telegram).
+function sharedPhone(message) {
+
+    const contact = message && message.contact;
+
+    if (!contact || !contact.phone_number) return { ok: false, reason: "немає контакту" };
+
+    const from = (message.from && message.from.id) ?? null;
+
+    if (!from || contact.user_id !== from) {
+        return { ok: false, reason: "контакт не свій" };
+    }
+
+    const phone = formatPhone(contact.phone_number);
+
+    if (!phone) return { ok: false, reason: "номер не схожий на номер" };
+
+    return { ok: true, phone: phone };
+
+}
+
+// Номер у тому вигляді, у якому його показує сайт.
+//
+// Telegram віддає самі цифри («380737288291»), а в кабінеті телефон
+// виглядає як «+380 73 728 82 91» — так його й пишуть руками. Два
+// різні написання того самого номера в одній таблиці означали б, що
+// за ним не знайти замовлення.
+//
+// Чужі коди країн не розбираємо: там своя розрядність, і вгадувати
+// її означало б псувати номер. Лишаємо «+» і цифри.
+function formatPhone(value) {
+
+    const digits = String(value ?? "").replace(/\D/g, "");
+
+    if (digits.length < 9) return "";
+
+    if (digits.length === 12 && digits.startsWith("380")) {
+
+        return "+380 " + digits.slice(3, 5)
+            + " " + digits.slice(5, 8)
+            + " " + digits.slice(8, 10)
+            + " " + digits.slice(10, 12);
+
+    }
+
+    return "+" + digits;
+
+}
+
 // ======================================
 // Telegram-бот для заявок BestBrnd4u
 //
@@ -6222,6 +6295,22 @@ async function handleMessage(message: Record<string, any>) {
   // спершу ТТН від власника, потім кроки оформлення клієнтом
   if (await handleTrackingInput(message)) return;
   if (await handleOrderText(message)) return;
+
+  // Кнопка «Поділитися номером» надсилає не текст, а контакт — жоден
+  // із текстових обробників його не впізнав би.
+  //
+  // ПІСЛЯ handleOrderText, А НЕ ДО НЬОГО. Оформлення замовлення теж
+  // питає телефон такою самою кнопкою (крок "phone"), і зі
+  // зворотним порядком контакт покупця забирав би цей обробник —
+  // замовлення зависало б на кроці телефону назавжди. Тут ми
+  // підбираємо лише те, чого не взяло оформлення.
+  if (message.contact) {
+
+    await handleSharedContact(message);
+
+    return;
+
+  }
 
   if (!command) return;
 
@@ -8322,6 +8411,109 @@ async function handleLoginCallback(callback: Record<string, any>, data: string) 
     text: "✅ Вхід підтверджено. Поверніться на вкладку з сайтом — кабінет уже відкритий.",
   });
 
+  // ТЕЛЕФОН — ОКРЕМОЮ ПРОПОЗИЦІЄЮ, І НЕ ОБОВ'ЯЗКОВОЮ.
+  //
+  // Надіслати код на номер безкоштовно не можна ні в кого. А ось
+  // навпаки — можна: людина сама віддає номер кнопкою, і надсилає
+  // його клієнт Telegram, а не рука на клавіатурі.
+  //
+  // Просимо ПІСЛЯ входу, а не замість нього: вхід уже відбувся, і
+  // відмова тут нічого не ламає. one_time_keyboard — щоб клавіатура
+  // не висіла в чаті назавжди.
+  await telegram("sendMessage", {
+    chat_id: chatId,
+    text:
+      "Хочете, щоб на оформленні замовлення телефон підставлявся сам?\n\n"
+      + "Натисніть кнопку нижче — ми збережемо його у вашому профілі. "
+      + "Це не обов'язково: без нього все працює як раніше.",
+    reply_markup: {
+      keyboard: [[{ text: "📱 Поділитися номером", request_contact: true }]],
+      resize_keyboard: true,
+      one_time_keyboard: true,
+    },
+  });
+
+}
+
+// Людина натиснула «Поділитися номером».
+async function handleSharedContact(message: Record<string, any>) {
+
+  const chatId = message.chat.id;
+
+  const shared = sharedPhone(message);
+
+  if (!shared.ok) {
+
+    // Найімовірніше переслали чужу картку контакту — а це вже не
+    // перевірка номера, а чужий номер у чужому профілі.
+    console.warn("Контакт не прийнято:", shared.reason);
+
+    await telegram("sendMessage", {
+      chat_id: chatId,
+      text: "Це не ваш власний номер — збережемо тільки той, що надсилає кнопка «Поділитися номером».",
+      reply_markup: { remove_keyboard: true },
+    });
+
+    return;
+
+  }
+
+  // Беремо останню підтверджену спробу входу цієї людини: саме в ній
+  // лежить user_id, якщо сайт уже відкрив сесію.
+  const response = await supabaseRest(
+    `telegram_logins?telegram_id=eq.${encodeURIComponent(message.from.id)}`
+    + `&confirmed_at=not.is.null&select=*&order=created_at.desc&limit=1`,
+  );
+
+  const row = response.ok ? (await response.json().catch(() => []))[0] : null;
+
+  if (!row) {
+
+    await telegram("sendMessage", {
+      chat_id: chatId,
+      text: "Спершу увійдіть на сайті через Telegram — тоді буде куди зберегти номер.",
+      reply_markup: { remove_keyboard: true },
+    });
+
+    return;
+
+  }
+
+  // Номер кладемо в рядок спроби завжди: якщо сесію ще не відкрито,
+  // саме звідси його забере handleTelegramLoginStatus.
+  await supabaseRest(`telegram_logins?token=eq.${encodeURIComponent(row.token)}`, {
+    method: "PATCH",
+    body: JSON.stringify({ phone: shared.phone }),
+  });
+
+  if (row.user_id) await saveProfilePhone(row.user_id, shared.phone);
+
+  await telegram("sendMessage", {
+    chat_id: chatId,
+    text: `Готово — ${shared.phone} збережено у профілі.`,
+    reply_markup: { remove_keyboard: true },
+  });
+
+}
+
+// Записати телефон у профіль.
+//
+// upsert, а не update: профіль створюється при першому збереженні, і
+// в того, хто щойно увійшов через Telegram, рядка може ще не бути.
+// on_conflict=id — інакше повторний вхід намагався б створити другий
+// профіль тій самій людині.
+async function saveProfilePhone(userId: string, phone: string) {
+
+  const response = await supabaseRest("profiles?on_conflict=id", {
+    method: "POST",
+    headers: { Prefer: "resolution=merge-duplicates" },
+    body: JSON.stringify({ id: userId, phone }),
+  });
+
+  if (!response.ok) {
+    console.error("Телефон не записався в профіль:", await response.text());
+  }
+
 }
 
 async function loginRow(token: string) {
@@ -8482,6 +8674,30 @@ async function handleTelegramLoginStatus(request: Request, body: Record<string, 
 
   if (!hash) {
     return adminJson({ ok: false, state: "error" }, 200, origin);
+  }
+
+  // ЗАПАМ'ЯТОВУЄМО, КОМУ НАЛЕЖИТЬ ЦЯ СПРОБА.
+  //
+  // Відповідь generate_link несе не лише одноразовий токен, а й
+  // самого користувача — окремий пошук за поштою не потрібен.
+  //
+  // Потрібно це для телефону: людина ділиться ним у боті вже після
+  // входу, і без user_id боту нема куди його записати.
+  const userId = data?.user?.id ?? data?.id ?? null;
+
+  if (userId) {
+
+    await supabaseRest(`telegram_logins?token=eq.${encodeURIComponent(token)}`, {
+      method: "PATCH",
+      body: JSON.stringify({ user_id: userId }),
+    });
+
+    // А якщо номером поділились РАНІШЕ, ніж сайт устиг відкрити
+    // сесію, він уже лежить у рядку — і записати його нікому, крім
+    // нас. Порядок дій людини непередбачуваний, тож обидва шляхи
+    // сходяться тут.
+    if (row.phone) await saveProfilePhone(userId, row.phone);
+
   }
 
   return adminJson({ ok: true, state: "confirmed", tokenHash: hash }, 200, origin);
