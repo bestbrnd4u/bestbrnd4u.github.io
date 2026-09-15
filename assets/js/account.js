@@ -226,6 +226,419 @@ loginForm?.addEventListener("submit", async event => {
 });
 
 // -------------------------
+// Вхід через Google і Facebook
+//
+// ЧОМУ ЦЕ БЕЗПЕЧНІШЕ ЗА ПАРОЛЬ
+// -----------------------------
+// Пароля ми не бачимо взагалі: його перевіряє Google чи Facebook, а
+// до нас приходить лише підтверджена адреса. Нам нічого зберігати —
+// отже, нічого й втрачати.
+//
+// ОДНА КНОПКА НА ВХІД І РЕЄСТРАЦІЮ
+// ---------------------------------
+// Для цих двох це та сама дія: якщо людини в базі немає, Supabase
+// створює акаунт сам. Тому кнопки стоять над вкладками, а не в
+// одній із них.
+//
+// ЩО ТАКЕ redirectTo І ЧОМУ САМЕ /account
+// ----------------------------------------
+// Після згоди провайдер повертає людину на цю адресу з токеном у
+// #-частині; клієнт Supabase підхоплює його сам. Адреса мусить бути
+// в списку дозволених у налаштуваннях проєкту — інакше Supabase
+// підставить Site URL, і людина опиниться на головній (те саме, що
+// колись сталось із листом про відновлення пароля).
+// -------------------------
+
+const authSocialError = document.getElementById("authSocialError");
+
+async function signInWithProvider(provider, button) {
+
+    if (authSocialError) authSocialError.textContent = "";
+
+    const label = button ? button.textContent : "";
+
+    if (button) {
+        button.disabled = true;
+        button.textContent = "Відкриваємо...";
+    }
+
+    const { error } = await supabaseClient.auth.signInWithOAuth({
+        provider,
+        options: {
+            redirectTo: `${window.location.origin}/account`
+        }
+    });
+
+    // Помилка тут означає, що перехід НЕ відбувся: у звичайному разі
+    // сторінку вже замінив провайдер, і цей код не виконується.
+    if (button) {
+        button.disabled = false;
+        button.textContent = label;
+    }
+
+    if (!error) return;
+
+    console.warn(`Вхід через ${provider} не вдався:`, error.message);
+
+    // НАЙЧАСТІША ПРИЧИНА — ПРОВАЙДЕР НЕ УВІМКНЕНИЙ У ПАНЕЛІ.
+    //
+    // Кнопка при цьому просто нічого не робить, і зрозуміти чому
+    // можна лише в консолі. Кажемо прямо: це наша недоналаштованість,
+    // а не помилка людини, і в неї є чим увійти замість цього.
+    const notEnabled = /provider is not enabled|unsupported provider/i.test(error.message || "");
+
+    if (authSocialError) {
+        authSocialError.textContent = notEnabled
+            ? "Цей спосіб входу ще не під'єднано. Скористайтесь поштою й паролем нижче."
+            : "Не вдалося відкрити вікно входу. Спробуйте ще раз або увійдіть поштою.";
+    }
+
+}
+
+// САМЕ [data-provider], А НЕ .auth-social-btn.
+//
+// Клас тут спільний — він про вигляд кнопки. Але Telegram провайдером
+// Supabase не є, і в нього свій обробник нижче. З широким селектором
+// натискання на Telegram теж ішло сюди, provider ставав undefined, і
+// браузер їхав на /auth/v1/authorize?provider=undefined — тобто на
+// сторінку з машинною помилкою. Перевірено кліком.
+document.querySelectorAll(".auth-social-btn[data-provider]").forEach(button => {
+
+    button.addEventListener("click", () => {
+        signInWithProvider(button.dataset.provider, button);
+    });
+
+});
+
+// ПОКАЗУЄМО ЛИШЕ ТІ СПОСОБИ, ЯКІ СПРАВДІ УВІМКНЕНІ.
+//
+// ЩО СТАЄТЬСЯ БЕЗ ЦЬОГО. signInWithOAuth не повертає помилку в код —
+// він ОДРАЗУ переводить браузер на /auth/v1/authorize. Якщо провайдер
+// у проєкті не увімкнений, Supabase віддає туди голий JSON:
+//
+//     {"code":400,"error_code":"validation_failed",
+//      "msg":"Unsupported provider: provider is not enabled"}
+//
+// Тобто людина замість входу бачить білу сторінку з англійським
+// машинним текстом і кнопкою «назад». Перевірено в браузері — саме
+// так воно й виглядало, а мій обробник помилки не встигав виконатись
+// узагалі.
+//
+// Тому питаємо Supabase заздалегідь. /auth/v1/settings — відкритий
+// маршрут, він перелічує увімкнені провайдери й нічого не розкриває
+// (це той самий список, що видно в панелі).
+//
+// Наслідок, який важливіший за саму помилку: кнопка з'являється сама
+// в той момент, коли провайдера увімкнуть у панелі. Нічого не
+// перезбирати й не правити в коді.
+async function showEnabledProviders() {
+
+    const box = document.getElementById("authSocial");
+    const divider = document.getElementById("authDivider");
+
+    if (!box) return;
+
+    let enabled = {};
+
+    try {
+
+        const response = await fetch(`${SUPABASE_URL}/auth/v1/settings`, {
+            headers: { apikey: SUPABASE_PUBLISHABLE_KEY }
+        });
+
+        if (!response.ok) return;
+
+        enabled = (await response.json())?.external || {};
+
+    } catch (error) {
+
+        // Не дісталися — лишаємо як є: вхід поштою працює завжди, і
+        // недоступність цього запиту не привід ламати сторінку.
+        console.warn("Не вдалося дізнатись способи входу:", error && error.message);
+
+        return;
+
+    }
+
+    // Тільки [data-provider]: кнопка Telegram теж лежить у цьому
+    // блоці, але провайдером Supabase не є, і питати про неї
+    // /auth/v1/settings безглуздо — вона працює через нашу власну
+    // функцію й вмикається окремо.
+    box.querySelectorAll("[data-provider]").forEach(button => {
+        button.hidden = enabled[button.dataset.provider] !== true;
+    });
+
+    showSocialBlock();
+
+}
+
+// Блок і розділювач з'являються, щойно є хоч одна робоча кнопка.
+//
+// Жодної — картка виглядає так само, як до всього цього: вкладки й
+// форма. Порожня рамка з написом «або» була б гірша за її
+// відсутність.
+function showSocialBlock() {
+
+    const box = document.getElementById("authSocial");
+    const divider = document.getElementById("authDivider");
+
+    if (!box) return;
+
+    const shown = [...box.querySelectorAll(".auth-social-btn")]
+        .filter(button => !button.hidden).length;
+
+    box.hidden = shown === 0;
+
+    if (divider) divider.hidden = shown === 0;
+
+}
+
+showEnabledProviders();
+
+// -------------------------
+// Вхід через Telegram
+//
+// Supabase такого провайдера не має, тож вхід іде через нашого ж
+// бота. Чому саме так, а не через Login Widget, і навіщо код —
+// у supabase/functions/telegram-order-bot/telegram-login.js.
+//
+// ЩО РОБИТЬ ЦЯ СТОРІНКА, А ЧОГО НЕ РОБИТЬ
+// ----------------------------------------
+// Вона не перевіряє нічого й нічого не підписує: просить спробу
+// входу, відкриває бота, чекає, і в кінці передає Supabase
+// одноразовий токен, який видала наша функція. Сесію відкриває сам
+// Supabase — своїх ми не вигадуємо.
+// -------------------------
+
+const telegramLoginBtn = document.getElementById("telegramLoginBtn");
+const telegramWait = document.getElementById("telegramWait");
+
+// Показуємо одразу, не питаючи нікого.
+//
+// На відміну від Google і Facebook, тут нема чого питати: це наш
+// власний бот і наша власна функція, а не провайдер у чужій панелі.
+// І головне — відмова тут не страшна: людина побачить зрозумілий
+// рядок під кнопкою, а не білу сторінку з англійським JSON, як
+// вийшло б із невімкненим провайдером Supabase.
+if (telegramLoginBtn) {
+
+    telegramLoginBtn.hidden = false;
+
+    showSocialBlock();
+
+}
+
+// Опитування зупиняємо звідусіль: після успіху, після скасування,
+// після закриття вкладки. Незупинений таймер тут — це запит кожні
+// дві секунди до кінця життя сторінки.
+let telegramPoll = null;
+
+function stopTelegramLogin() {
+
+    clearInterval(telegramPoll);
+
+    telegramPoll = null;
+
+    if (telegramWait) telegramWait.hidden = true;
+    if (telegramLoginBtn) telegramLoginBtn.hidden = false;
+
+}
+
+// НІКОЛИ НЕ КИДАЄ ВИНЯТКІВ — І ЦЕ НЕ ОБЕРЕЖНІСТЬ, А ВИПРАВЛЕНА
+// ПОМИЛКА.
+//
+// Спершу тут стояв голий fetch. Коли функція недоступна (стара
+// версія без цього маршруту, відсутній CORS, обірвана мережа), fetch
+// відхиляється — і обробник кліку тихо вмирає посеред себе:
+//
+//     Uncaught (in promise) TypeError: Failed to fetch
+//
+// Зовні це «кнопка не працює»: ні екрана очікування, ні
+// повідомлення, ні сліду. Перевірено кліком — саме так воно й
+// поводилось.
+//
+// Тепер відмова мережі приходить як звичайна відповідь зі status 0,
+// і кожен, хто цим користується, однаково показує людині рядок.
+async function callFunction(body) {
+
+    try {
+
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/telegram-order-bot`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                apikey: SUPABASE_PUBLISHABLE_KEY,
+                Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`
+            },
+            body: JSON.stringify(body)
+        });
+
+        return { status: response.status, data: await response.json().catch(() => null) };
+
+    } catch (error) {
+
+        console.warn("Функція недоступна:", error && error.message);
+
+        return { status: 0, data: null };
+
+    }
+
+}
+
+telegramLoginBtn?.addEventListener("click", async () => {
+
+    if (authSocialError) authSocialError.textContent = "";
+
+    telegramLoginBtn.disabled = true;
+
+    const { status, data } = await callFunction({ site_action: "telegram-login-start" });
+
+    telegramLoginBtn.disabled = false;
+
+    if (status === 429) {
+        if (authSocialError) authSocialError.textContent = "Забагато спроб. Спробуйте за годину.";
+        return;
+    }
+
+    if (!data?.ok || !data.link) {
+        if (authSocialError) {
+            // Не «або Google»: його може бути не увімкнено, і тоді
+            // порада вказувала б на кнопку, якої на екрані немає.
+            // Пошта з паролем є завжди.
+            authSocialError.textContent = "Вхід через Telegram зараз недоступний."
+                + " Скористайтесь поштою й паролем нижче.";
+        }
+        return;
+    }
+
+    document.getElementById("telegramCode").textContent = data.code;
+
+    telegramLoginBtn.hidden = true;
+    telegramWait.hidden = false;
+
+    // НОВА ВКЛАДКА, А НЕ ПЕРЕХІД.
+    //
+    // Ця сторінка мусить лишитись живою: саме вона чекає на
+    // підтвердження й відкриває кабінет. Пішовши з неї, людина
+    // повернулась би на порожню форму входу, а підтверджена спроба
+    // згоріла б.
+    window.open(data.link, "_blank", "noopener");
+
+    waitForTelegram(data.token);
+
+});
+
+document.getElementById("telegramCancel")?.addEventListener("click", stopTelegramLogin);
+
+function waitForTelegram(token) {
+
+    clearInterval(telegramPoll);
+
+    // Дві секунди: людина підтверджує в іншій програмі, і секунда
+    // тут нічого б не пришвидшила, зате подвоїла б кількість
+    // запитів. Спроба живе п'ять хвилин — довше не чекаємо.
+    const started = Date.now();
+
+    telegramPoll = setInterval(async () => {
+
+        if (Date.now() - started > 5 * 60 * 1000) {
+
+            stopTelegramLogin();
+
+            if (authSocialError) {
+                authSocialError.textContent = "Час вийшов. Натисніть «Увійти через Telegram» ще раз.";
+            }
+
+            return;
+
+        }
+
+        const { data } = await callFunction({
+            site_action: "telegram-login-status",
+            token
+        });
+
+        if (!data || data.state === "waiting") return;
+
+        if (data.state !== "confirmed" || !data.tokenHash) {
+
+            stopTelegramLogin();
+
+            if (authSocialError) {
+                authSocialError.textContent = data.state === "expired"
+                    ? "Час вийшов. Спробуйте ще раз."
+                    : "Не вдалося завершити вхід. Спробуйте ще раз.";
+            }
+
+            return;
+
+        }
+
+        clearInterval(telegramPoll);
+        telegramPoll = null;
+
+        // Сесію відкриває Supabase за одноразовим токеном, який
+        // видала наша функція.
+        const { error } = await supabaseClient.auth.verifyOtp({
+            token_hash: data.tokenHash,
+            type: "email"
+        });
+
+        if (error) {
+
+            console.warn("Сесію не відкрито:", error.message);
+
+            stopTelegramLogin();
+
+            if (authSocialError) {
+                authSocialError.textContent = "Не вдалося завершити вхід. Спробуйте ще раз.";
+            }
+
+            return;
+
+        }
+
+        stopTelegramLogin();
+
+        await renderAuthState();
+
+    }, 2000);
+
+}
+
+// Ім'я з чужого акаунту — щоб профіль не був порожнім.
+//
+// Google і Facebook віддають ім'я в user_metadata. Профіль у нас
+// створюється лише при першому збереженні, тож людина, яка увійшла
+// через них, бачила б порожні поля й мусила вписувати те, що ми вже
+// знаємо.
+//
+// Ключі різні в різних провайдерів, тому перебираємо: given_name /
+// family_name (Google), name і full_name (обидва).
+function namesFromMetadata(user) {
+
+    const meta = user?.user_metadata || {};
+
+    const first = String(meta.given_name || meta.first_name || "").trim();
+    const last = String(meta.family_name || meta.last_name || "").trim();
+
+    if (first || last) return { first, last };
+
+    // Лишається одне поле на все ім'я — ділимо по першому пробілу.
+    // Складені прізвища при цьому лишаються цілими.
+    const full = String(meta.full_name || meta.name || "").trim();
+
+    if (!full) return { first: "", last: "" };
+
+    const space = full.indexOf(" ");
+
+    return space === -1
+        ? { first: full, last: "" }
+        : { first: full.slice(0, space), last: full.slice(space + 1).trim() };
+
+}
+
+// -------------------------
 // Забули пароль
 // -------------------------
 
@@ -1885,8 +2298,14 @@ async function loadProfile(user) {
         return;
     }
 
-    document.getElementById("profileFirstName").value = data?.first_name || "";
-    document.getElementById("profileLastName").value = data?.last_name || "";
+    // Профіль створюється лише при першому збереженні, тож у того,
+    // хто щойно увійшов через Google чи Facebook, рядка ще немає.
+    // Ім'я при цьому відоме — беремо його, щоб людина не вписувала
+    // те, що ми вже знаємо. Своє збережене ім'я завжди головніше.
+    const fromProvider = namesFromMetadata(user);
+
+    document.getElementById("profileFirstName").value = data?.first_name || fromProvider.first;
+    document.getElementById("profileLastName").value = data?.last_name || fromProvider.last;
     document.getElementById("profileMiddleName").value = data?.middle_name || "";
     document.getElementById("profilePhone").value = data?.phone || "";
     document.getElementById("profileCity").value = data?.city || "";
@@ -1911,7 +2330,7 @@ async function loadProfile(user) {
 
     if (newsletterEmail && !newsletterEmail.value) newsletterEmail.value = user.email || "";
 
-    if (accountEmailEl) accountEmailEl.textContent = buildAccountGreeting(data?.first_name);
+    if (accountEmailEl) accountEmailEl.textContent = buildAccountGreeting(data?.first_name || fromProvider.first);
 
 }
 

@@ -359,6 +359,16 @@ export function parseStartPayload(text) {
 
   if (!payload) return { type: "welcome" };
 
+  // Вхід на сайт: t.me/<bot>?start=login_<uuid>.
+  //
+  // З товарним посиланням не плутається: там самі цифри, тут
+  // обов'язковий префікс і дефіси uuid. Формат тут тільки
+  // впізнаємо — чи жива ця спроба входу, вирішує telegram-login.js
+  // за записом у базі.
+  const login = payload.match(/^login[_-]([0-9a-f-]{36})$/i);
+
+  if (login) return { type: "login", token: login[1].toLowerCase() };
+
   const match = payload.match(/^(?:product[_-]?|p)?(\d+)$/i);
 
   if (match) return { type: "product", id: Number(match[1]) };

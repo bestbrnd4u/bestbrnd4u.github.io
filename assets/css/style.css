@@ -8352,6 +8352,165 @@ body.mobile-filters-open .scroll-top{
     padding:4px;
 }
 
+/* =========================================================
+   ВХІД ЧЕРЕЗ GOOGLE І FACEBOOK
+
+   Кнопки стоять НАД вкладками «Увійти / Реєстрація», бо для цих
+   двох це та сама дія: якщо людини в базі немає, акаунт створюється
+   сам. Сховати їх в одну з вкладок означало б сховати половину
+   способів входу.
+
+   ЧОМУ НЕ ФІРМОВІ СИНІ ПРЯМОКУТНИКИ. Два великі кольорові блоки
+   вгорі картки перетягують на себе всю увагу, і власна форма
+   магазину читається як другорядна. Тому форма наша — біла картка з
+   рамкою, — а від провайдера лишається тільки його знак. Він і є
+   тим, що впізнають.
+   ========================================================= */
+
+.auth-social{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+}
+
+.auth-social-btn{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    padding:13px 14px;
+    border:1px solid var(--gray200);
+    border-radius:12px;
+    background:#fff;
+    font-family:inherit;
+    font-size:14px;
+    font-weight:600;
+    color:var(--dark);
+    cursor:pointer;
+    /* opacity теж названо: її міняє :disabled нижче, і без неї
+       перехід був би неповним — кнопка гасне стрибком, тоді як
+       рамка й тінь пливуть. Це правило стереже
+       tests/test-transition-properties.js, і саме воно тут і
+       спрацювало. */
+    transition:border-color 200ms cubic-bezier(.23,1,.32,1),
+               box-shadow 200ms cubic-bezier(.23,1,.32,1),
+               opacity 200ms cubic-bezier(.23,1,.32,1),
+               transform 160ms cubic-bezier(.23,1,.32,1);
+}
+
+@media (hover:hover) and (pointer:fine){
+    .auth-social-btn:hover{
+        border-color:var(--gray300);
+        box-shadow:var(--shadow-sm);
+    }
+}
+
+/* Натискання мусить бути відчутним: інакше в момент, коли сторінка
+   вже пішла до провайдера, здається, що нічого не сталось. */
+.auth-social-btn:active{
+    transform:scale(.98);
+}
+
+.auth-social-btn:disabled{
+    opacity:.6;
+    cursor:default;
+}
+
+.auth-social-icon{
+    display:flex;
+    flex-shrink:0;
+}
+
+/* Синій — лише сам знак Facebook. Google свої кольори несе в SVG. */
+.auth-social-facebook .auth-social-icon{
+    color:#1877f2;
+}
+
+.auth-social-telegram .auth-social-icon{
+    color:#29a0da;
+}
+
+/* Telegram — на всю ширину під двома іншими: підпис у нього довший,
+   і в половину рядка він переносився б у два. */
+.auth-social-telegram{
+    grid-column:1 / -1;
+}
+
+/* Крок очікування підтвердження в боті. */
+.auth-telegram-wait{
+    margin-top:14px;
+    padding:16px;
+    border:1px solid var(--gray200);
+    border-radius:12px;
+    text-align:center;
+    animation:profile-panel-in 180ms var(--ease-out);
+}
+
+.auth-telegram-step{
+    margin:0;
+    font-size:13px;
+    line-height:1.5;
+    color:var(--gray700);
+}
+
+/* КОД ВЕЛИКИЙ І МОНОШИРИННИЙ НАВМИСНЕ.
+   Його не вводять, а звіряють очима з тим, що написав бот, — і
+   робиться це в поспіху, переключаючись між програмами. Дрібний код
+   у такій ситуації просто не звірять. */
+.auth-telegram-code{
+    margin:10px 0;
+    font:800 32px/1.1 ui-monospace,Menlo,Consolas,monospace;
+    letter-spacing:4px;
+    color:var(--dark);
+}
+
+.auth-telegram-note{
+    margin:0 0 10px;
+    font-size:12px;
+    line-height:1.45;
+    color:var(--gray500);
+}
+
+.auth-social-error:empty{
+    display:none;
+}
+
+.auth-social-error{
+    margin:10px 0 0;
+    line-height:1.45;
+}
+
+/* Розділювач «або»: риска, розірвана словом.
+   Псевдоелементи, а не три вкладені <div>, — розмітці нема чого
+   знати про те, як намальована лінія. */
+.auth-divider{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin:20px 0;
+    font-size:13px;
+    font-weight:600;
+    color:var(--gray500);
+}
+
+.auth-divider::before,
+.auth-divider::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:var(--gray200);
+}
+
+@media(max-width:400px){
+
+    /* На вузькому екрані дві кнопки поруч стискаються так, що напис
+       переноситься під знак. Стовпчик читається краще. */
+    .auth-social{
+        grid-template-columns:1fr;
+    }
+
+}
+
 .auth-card-title{
     font-size:22px;
     text-align:left;
