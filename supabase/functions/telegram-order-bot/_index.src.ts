@@ -36,7 +36,7 @@ import {
   ADMIN_ORIGINS,
 } from "./admin-api.js";
 import { cleanOrder, turnstileVerdict } from "./place-order.js";
-import { orderLetter, statusLetter, mailRequest } from "./mail.js";
+import { orderLetter, statusLetter, subscribeConfirmLetter, mailRequest } from "./mail.js";
 import {
   npRequest, parseSettlements, parseWarehouses, parseTypes, postomatTypeRef, npError,
 } from "./nova-poshta.js";
@@ -82,6 +82,8 @@ import {
 import { cleanDraft } from "./checkout-draft.js";
 import {
   cleanSubscriber, subscribeRequest, subscribeVerdict,
+  cleanToken, confirmUrl, confirmVerdict, activateRequest,
+  CONFIRM_COOLDOWN_MINUTES,
 } from "./subscribe.js";
 
 const TELEGRAM_BOT_TOKEN = Deno.env.get("TELEGRAM_BOT_TOKEN") ?? "";
@@ -2672,6 +2674,19 @@ async function handleSubscribe(request: Request, body: Record<string, any>): Pro
 
     }
 
+    // ЛИСТ ПІДТВЕРДЖЕННЯ НАДСИЛАЄМО САМІ.
+    //
+    // MailerLite шле свій, але англійською, і на безкоштовному
+    // тарифі його не відредагувати — пояснення в subscribe.js.
+    // Тому: підписник лишається «unconfirmed» у списку, а лист іде
+    // наш, і активним він стане після переходу за посиланням.
+    //
+    // Тим, хто вже підтвердив, лист не потрібен: вони й так
+    // отримують розсилку.
+    if (verdict.state !== "active") {
+      await sendSubscribeConfirmation(clean.subscriber.email);
+    }
+
     // state каже, ЩО саме сталося: нову пошту додали, чи вона вже
     // була в списку, і чи підтверджена підписка. Без цього сторінка
     // обіцяла лист підтвердження навіть тому, хто підписався давно
@@ -2687,6 +2702,168 @@ async function handleSubscribe(request: Request, body: Record<string, any>): Pro
     console.error("MailerLite недоступний:", error);
 
     return adminJson({ ok: false, error: "unavailable" }, 200, origin);
+
+  }
+
+}
+
+// Наш лист підтвердження підписки.
+//
+// Ніколи не кидає винятків і ніколи не заважає відповіді: людина вже
+// натиснула кнопку, і форма мусить відповісти їй незалежно від того,
+// чи доступний зараз сервіс розсилки.
+async function sendSubscribeConfirmation(email: string): Promise<boolean> {
+
+  try {
+
+    // ЧУЖУ СКРИНЬКУ НЕ ЗАВАЛЮЄМО.
+    //
+    // Форма відкрита всім: вписуй чужу пошту й тисни кнопку. Межа за
+    // IP уже є, але вона не рятує, коли тиснуть із різних мереж.
+    // Тому дивимось, чи не надсилали ми цій адресі листа щойно.
+    const since = new Date(Date.now() - CONFIRM_COOLDOWN_MINUTES * 60000).toISOString();
+
+    const recent = await supabaseRest(
+      `newsletter_confirmations?email=eq.${encodeURIComponent(email)}`
+      + `&created_at=gte.${encodeURIComponent(since)}&confirmed_at=is.null&select=token&limit=1`
+    );
+
+    // Таблиці ще немає (міграцію 032 не застосували) — не мовчимо:
+    // без неї підтвердити підписку неможливо взагалі, і знати про це
+    // треба власнику, а не покупцю.
+    if (!recent.ok) {
+
+      const text = await recent.text();
+
+      console.error("Таблиця newsletter_confirmations недоступна:", text);
+
+      await reportServerIssue("mail_list", "Підтвердження підписки: немає таблиці (міграція 032)");
+
+      return false;
+
+    }
+
+    const rows = await recent.json().catch(() => []);
+
+    if (Array.isArray(rows) && rows.length) {
+
+      // Лист щойно пішов. Мовчки вважаємо, що все гаразд: людині
+      // треба перевірити пошту, а не отримати другий такий самий.
+      console.log("Лист підтвердження вже надсилали щойно:", email);
+
+      return true;
+
+    }
+
+    const created = await supabaseRest("newsletter_confirmations", {
+      method: "POST",
+      headers: { Prefer: "return=representation" },
+      body: JSON.stringify({ email }),
+    });
+
+    if (!created.ok) {
+
+      console.error("Не вдалося створити посилання підтвердження:", await created.text());
+
+      return false;
+
+    }
+
+    const row = (await created.json().catch(() => []))[0];
+
+    const link = confirmUrl(SITE_URL, row?.token);
+
+    if (!link) return false;
+
+    return await sendCustomerMail({ email }, subscribeConfirmLetter(link, SITE_URL));
+
+  } catch (error) {
+
+    console.error("Лист підтвердження підписки не пішов:", error);
+
+    return false;
+
+  }
+
+}
+
+// Перехід за посиланням із листа.
+//
+// ЩО ТУТ ВАЖЛИВО. Відповідь мусить розрізняти «підтверджено»,
+// «уже підтверджували», «посилання застаріло» й «такого посилання
+// немає»: для людини це чотири різні ситуації, і «недійсне
+// посилання» замість «ви вже підписані» — привід підписатись ще раз
+// або написати нам.
+async function handleSubscribeConfirm(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  const token = cleanToken(body?.token);
+
+  if (!token) {
+    return adminJson({ ok: false, state: "unknown" }, 400, origin);
+  }
+
+  try {
+
+    const found = await supabaseRest(
+      `newsletter_confirmations?token=eq.${encodeURIComponent(token)}&select=*&limit=1`
+    );
+
+    if (!found.ok) {
+
+      console.error("Підтвердження підписки: база не відповіла:", await found.text());
+
+      return adminJson({ ok: false, state: "error" }, 200, origin);
+
+    }
+
+    const row = (await found.json().catch(() => []))[0] ?? null;
+
+    const verdict = confirmVerdict(row, Date.now());
+
+    if (!verdict.ok) {
+      return adminJson({ ok: false, state: verdict.state }, 200, origin);
+    }
+
+    // СПОЧАТКУ MAILERLITE, ПОТІМ ПОЗНАЧКА.
+    //
+    // Якщо зробити навпаки й MailerLite відмовить, у нас лишиться
+    // підтверджена підписка, якої в списку розсилки немає, — і
+    // повторний перехід за посиланням уже нічого не виправить, бо
+    // воно вважатиметься використаним.
+    const plan = activateRequest(MAILERLITE_API_KEY, verdict.email);
+
+    if (!plan) {
+      return adminJson({ ok: false, state: "error" }, 200, origin);
+    }
+
+    const response = await fetch(plan.url, {
+      method: "POST",
+      headers: plan.headers,
+      body: JSON.stringify(plan.body),
+    });
+
+    if (!response.ok) {
+
+      console.error("MailerLite не активував підписку:", await response.text());
+
+      return adminJson({ ok: false, state: "error" }, 200, origin);
+
+    }
+
+    await supabaseRest(`newsletter_confirmations?token=eq.${encodeURIComponent(token)}`, {
+      method: "PATCH",
+      body: JSON.stringify({ confirmed_at: new Date().toISOString() }),
+    });
+
+    return adminJson({ ok: true, state: "confirmed" }, 200, origin);
+
+  } catch (error) {
+
+    console.error("Підтвердження підписки не вдалося:", error);
+
+    return adminJson({ ok: false, state: "error" }, 200, origin);
 
   }
 
@@ -3116,6 +3293,99 @@ async function handlePeopleAdmin(body: Record<string, any>, origin: string | nul
 
   const { action, params } = parsed;
 
+  // ---- Відписати ----
+  //
+  // Не видаляємо: відписаний лишається в списку зі станом
+  // "unsubscribed", і MailerLite більше не надішле йому листа навіть
+  // після повторного імпорту. Видалений — надішле.
+  if (action === "people-unsubscribe") {
+
+    const request = unsubscribeRequest(MAILERLITE_API_KEY, params.id);
+
+    if (!request) {
+      return adminJson({
+        ok: false,
+        error: "Розсилку не під'єднано: у секретах функції немає MAILERLITE_API_KEY.",
+      }, 400, origin);
+    }
+
+    const response = await fetch(request.url, {
+      method: request.method,
+      headers: request.headers,
+      body: JSON.stringify(request.body),
+    });
+
+    if (!response.ok) {
+
+      console.error("Відписка:", await response.text());
+
+      return adminJson({ ok: false, error: "MailerLite не відповів. Спробуйте пізніше." }, 502, origin);
+
+    }
+
+    return adminJson(peopleActionResult(action, params.email), 200, origin);
+
+  }
+
+  // ---- Видалити ----
+  if (action === "people-delete" && params.kind === "subscriber") {
+
+    const request = deleteSubscriberRequest(MAILERLITE_API_KEY, params.id);
+
+    if (!request) {
+      return adminJson({
+        ok: false,
+        error: "Розсилку не під'єднано: у секретах функції немає MAILERLITE_API_KEY.",
+      }, 400, origin);
+    }
+
+    const response = await fetch(request.url, { method: request.method, headers: request.headers });
+
+    // 404 означає, що підписника вже немає — мети досягнуто, і
+    // показувати помилку тут було б брехнею.
+    if (!response.ok && response.status !== 404) {
+
+      console.error("Видалення підписника:", await response.text());
+
+      return adminJson({ ok: false, error: "MailerLite не відповів. Спробуйте пізніше." }, 502, origin);
+
+    }
+
+    return adminJson(peopleActionResult(action, params.email), 200, origin);
+
+  }
+
+  if (action === "people-delete" && params.kind === "buyer") {
+
+    // ЗАМОВЛЕННЯ НЕ ЧІПАЄМО — і це навмисно.
+    //
+    // Вони потрібні для обліку й для самої людини теж: за номером
+    // замовлення її знайдуть, навіть коли кабінету вже немає. Тому
+    // видаляємо саме те, що прив'язане до облікового запису:
+    // профіль, адреси, обране — і сам запис.
+    await supabaseRest(`favorites?user_id=eq.${encodeURIComponent(params.id)}`, { method: "DELETE" });
+    await supabaseRest(`addresses?user_id=eq.${encodeURIComponent(params.id)}`, { method: "DELETE" });
+    await supabaseRest(`profiles?id=eq.${encodeURIComponent(params.id)}`, { method: "DELETE" });
+
+    const request = deleteBuyerRequest(SUPABASE_URL, SERVICE_ROLE_KEY, params.id);
+
+    const response = await fetch(request.url, { method: request.method, headers: request.headers });
+
+    if (!response.ok && response.status !== 404) {
+
+      console.error("Видалення покупця:", await response.text());
+
+      return adminJson({
+        ok: false,
+        error: "Не вдалося видалити обліковий запис. Профіль і адреси вже прибрано.",
+      }, 502, origin);
+
+    }
+
+    return adminJson(peopleActionResult(action, params.email), 200, origin);
+
+  }
+
   if (action === "people-buyers") {
 
     // Admin API віддає сторінками. Беремо з запасом: список покупців
@@ -3460,6 +3730,13 @@ async function handleRequest(request: Request): Promise<Response> {
   if (body.site_action === "subscribe") {
 
     return await handleSubscribe(request, body);
+
+  }
+
+  // --- перехід за посиланням із листа підтвердження підписки ---
+  if (body.site_action === "subscribe-confirm") {
+
+    return await handleSubscribeConfirm(request, body);
 
   }
 

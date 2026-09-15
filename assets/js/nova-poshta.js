@@ -24,9 +24,14 @@
 
     "use strict";
 
-    // Заповнюється в init(): знайти ref міста за його назвою.
-    // Потрібне тоді, коли поле заповнили не вибором із підказки.
-    var useCity = function () { return Promise.resolve(""); };
+    // Набори полів, до яких довідник причеплений, за ключем.
+    //
+    // Їх два, і живуть вони на різних сторінках: "checkout" — поля
+    // оформлення замовлення, "address" — вікно «Нова адреса» в
+    // кабінеті. Кожен набір тримає СВІЙ ref обраного міста: спільний
+    // на двох означав би, що місто, вибране в кабінеті, підставляє
+    // свої відділення в замовлення.
+    var bound = {};
 
     // Скільки чекати після останньої натиснутої клавіші. Запит на
     // кожну літеру — це десяток запитів на слово «Хмельницький» і
@@ -338,17 +343,24 @@ function directoryDown() {
     }
 
     // ------------------------------------------------------------------
-    // Поля сторінки оформлення
+    // Причепити довідник до трійки полів «місто → відділення/поштомат»
+    //
+    // Раніше ці ідентифікатори стояли прямо в коді, бо поля були лише
+    // на оформленні замовлення. Тепер така сама трійка є й у вікні
+    // «Нова адреса» в кабінеті: покупець зберігає адресу заздалегідь,
+    // і номер відділення там мусить бути такий самий справжній, як на
+    // оформленні. Тому поля приходять аргументом, а все решта —
+    // спільне.
     // ------------------------------------------------------------------
 
-    function init() {
+    function bind(fields) {
 
-        var city = document.getElementById("city");
+        var city = fields && fields.city;
 
-        if (!city) return;
+        if (!city) return null;
 
-        var branch = document.getElementById("branchNumber");
-        var postomat = document.getElementById("postomatNumber");
+        var branch = fields.branch;
+        var postomat = fields.postomat;
 
         // Ref обраного міста. Без нього відділення не спитати — і це
         // навмисно: список відділень «усієї України» не має сенсу.
@@ -476,7 +488,7 @@ function directoryDown() {
         // цього ж довідника, тож збіг точний. Якщо НП не відповіла
         // або міста немає — лишаємо порожній ref, і поле поводиться
         // як звичайне текстове (замовлення однаково оформиться).
-        useCity = function (name) {
+        function resolveCity(name) {
 
             var query = String(name || "").trim();
 
@@ -498,19 +510,55 @@ function directoryDown() {
 
             });
 
-        };
+        }
 
         attach(branch, warehouses(false), null, 0);
         attach(postomat, warehouses(true), null, 0);
+
+        return { useCity: resolveCity };
+
+    }
+
+    // ------------------------------------------------------------------
+    // Де саме на сайті лежать такі трійки полів
+    // ------------------------------------------------------------------
+
+    function init() {
+
+        bound.checkout = bind({
+            city: document.getElementById("city"),
+            branch: document.getElementById("branchNumber"),
+            postomat: document.getElementById("postomatNumber")
+        });
+
+        // Вікно «Нова адреса» в кабінеті. Воно сховане, але в DOM
+        // лежить від завантаження сторінки, тож чіплятись можна
+        // одразу — перший показ нічого не мусить доналаштовувати.
+        bound.address = bind({
+            city: document.getElementById("addressCity"),
+            branch: document.getElementById("addressBranchNumber"),
+            postomat: document.getElementById("addressPostomatNumber")
+        });
 
     }
 
     root.NovaPoshta = {
         init: init,
         attach: attach,
-        // Сторінка оформлення викликає це, коли підставляє збережену
-        // адресу: без ref пошук відділень мовчки не працює.
-        useCity: function (name) { return useCity(name); },
+        bind: bind,
+        // Викликається, коли поле міста заповнили НЕ вибором із
+        // підказки: сторінка оформлення так підставляє збережену
+        // адресу, кабінет — так відкриває адресу на редагування. Без
+        // ref пошук відділень мовчки не працює.
+        //
+        // which: "checkout" (за замовчуванням) або "address".
+        useCity: function (name, which) {
+
+            var handle = bound[which || "checkout"];
+
+            return handle ? handle.useCity(name) : Promise.resolve("");
+
+        },
         MIN_QUERY: MIN_QUERY,
         DEBOUNCE: DEBOUNCE
     };

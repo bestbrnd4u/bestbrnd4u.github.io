@@ -202,3 +202,129 @@ export function subscribeVerdict(status, data) {
     return { ok: false, reason: `HTTP ${status}` };
 
 }
+
+
+// -------------------------
+// Підтвердження підписки НАШИМ листом
+//
+// ЧОМУ НЕ ЛИСТОМ MAILERLITE
+// --------------------------
+// Він приходив англійською — «Confirm your email address», — а
+// відредагувати його на безкоштовному тарифі не можна: у панелі
+// кнопка «Редагувати» закрита підказкою «доступно лише в платних
+// тарифах». Людина щойно залишила пошту українському магазину й
+// отримує лист чужою мовою від назви, яку бачила вперше. Такі не
+// відкривають, а без відкриття підписка назавжди лишається
+// «unconfirmed»: у списку є, листів не отримує.
+//
+// Решта листів магазину збирається в mail.js і йде через Resend або
+// Brevo. Цей був єдиним винятком.
+// -------------------------
+
+// Скільки живе посилання з листа.
+//
+// Тиждень, а не година: лист про підписку не терміновий, його
+// відкривають тоді, коли дійдуть руки. Година означала б, що людина,
+// яка прочитала пошту ввечері, отримує «посилання застаріло» — і
+// вдруге вже не підписується.
+export const CONFIRM_TTL_HOURS = 168;
+
+// Скільки чекати між двома листами на ту саму адресу.
+//
+// Форма відкрита всім, і без цього її можна перетворити на спосіб
+// завалити чужу скриньку: вписуй чужу пошту й тисни кнопку. Межа за
+// IP уже є, але вона не рятує, коли натискають з різних мереж.
+//
+// П'ять хвилин — компроміс: людина, яка не отримала листа й тисне
+// ще раз, чекає недовго, а надіслати сотню листів поспіль не
+// вийде.
+export const CONFIRM_COOLDOWN_MINUTES = 5;
+
+// Токен із посилання. uuid і нічого крім — усе інше навіть не
+// шукаємо в базі.
+export function cleanToken(value) {
+
+    const clean = String(value ?? "").trim().toLowerCase();
+
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(clean)
+        ? clean
+        : "";
+
+}
+
+// Адреса, яку кладемо в лист.
+//
+// Веде на САЙТ, а не на функцію: у листі має стояти домен, який
+// людина впізнає. Чужий домен у посиланні — перше, на що дивляться
+// і поштові фільтри, і самі люди.
+export function confirmUrl(siteUrl, token) {
+
+    const base = String(siteUrl ?? "").replace(/\/+$/, "");
+
+    if (!base || !token) return "";
+
+    return `${base}/newsletter-confirm?token=${encodeURIComponent(token)}`;
+
+}
+
+// Чи можна підтвердити за цим записом.
+//
+// Чиста функція: усе, що вирішується без мережі, вирішується тут —
+// і перевіряється тестами.
+//
+// state:
+//   ok       — підтверджуємо;
+//   used     — за посиланням уже переходили (лист відкрили двічі,
+//              або поштовий фільтр сам «клікнув» — таке буває);
+//   expired  — посилання старіше за CONFIRM_TTL_HOURS;
+//   unknown  — такого токена немає.
+export function confirmVerdict(row, now) {
+
+    if (!row || !row.email) return { ok: false, state: "unknown" };
+
+    // Уже підтверджено — це не помилка. Людина мусить побачити «усе
+    // гаразд, ви підписані», а не «посилання недійсне»: вона зробила
+    // все правильно, просто двічі.
+    if (row.confirmed_at) return { ok: false, state: "used", email: row.email };
+
+    const created = Date.parse(row.created_at ?? "");
+
+    if (Number.isFinite(created)) {
+
+        const age = (Number(now) - created) / 36e5;
+
+        if (age > CONFIRM_TTL_HOURS) return { ok: false, state: "expired", email: row.email };
+
+    }
+
+    return { ok: true, state: "ok", email: row.email };
+
+}
+
+// Зробити підписку діючою.
+//
+// POST на той самий шлях, що й створення: MailerLite оновлює
+// існуючого підписника за поштою й віддає 200 (саме на цьому
+// побудований subscribeVerdict вище). Окремий ендпоінт із id тут не
+// потрібен — id ми не зберігаємо, а пошта є.
+export function activateRequest(apiKey, email) {
+
+    const key = String(apiKey ?? "").trim();
+    const clean = cleanEmail(email);
+
+    if (!key || !clean) return null;
+
+    return {
+        url: "https://connect.mailerlite.com/api/subscribers",
+        headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${key}`,
+        },
+        body: {
+            email: clean,
+            status: "active",
+        },
+    };
+
+}

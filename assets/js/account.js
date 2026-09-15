@@ -23,7 +23,8 @@ const ordersListEl = document.getElementById("ordersList");
 const profileForm = document.getElementById("profileForm");
 const profileEmailEl = document.getElementById("profileEmail");
 const profileMessageEl = document.getElementById("profileMessage");
-const changePasswordBtn = document.getElementById("changePasswordBtn");
+// changePasswordBtn прибрано: зміна пароля стала окремою вкладкою з
+// формою «старий → новий», а не однією кнопкою «надіслати лист».
 
 // -------------------------
 // Глазок "показати/приховати пароль"
@@ -301,6 +302,21 @@ let isPasswordRecovery =
     window.location.hash.includes("type=recovery") ||
     window.location.search.includes("type=recovery");
 
+// Те саме для повернення з листа про зміну пошти. Supabase ставить
+// type=email_change (а при увімкненій подвійній перевірці ще й
+// email_change_confirm_new — тому шукаємо за початком рядка).
+const emailChangedCard = document.getElementById("emailChangedCard");
+
+const isEmailChanged =
+    window.location.hash.includes("type=email_change") ||
+    window.location.search.includes("type=email_change");
+
+// «Увійти» — це просто кабінет без службової частини адреси: сесія
+// вже є, показувати екран успіху вдруге нема сенсу.
+document.getElementById("emailChangedLogin")?.addEventListener("click", () => {
+    window.location.href = `${window.location.origin}/account`;
+});
+
 supabaseClient?.auth.onAuthStateChange((event) => {
 
     if (event === "PASSWORD_RECOVERY") {
@@ -381,6 +397,38 @@ function translateAuthError(error) {
     if (msg.includes("rate limit")) return "Забагато спроб. Спробуйте трохи пізніше";
 
     return "Сталася помилка. Спробуйте ще раз";
+
+}
+
+// ЛИСТ НЕ ПІШОВ — НАЙЧАСТІШЕ ЦЕ НЕ ПОМИЛКА, А ЛІМІТ.
+//
+// Вбудована пошта Supabase призначена для перевірок, а не для
+// роботи: у неї жорсткий ліміт листів за годину й окрема пауза між
+// двома листами підряд. Під час налаштування в нього впираються
+// постійно — саме тоді листи й шлють один за одним.
+//
+// Формулювання при цьому різні, і слів «rate limit» у головному з
+// них НЕМАЄ: Supabase каже «For security purposes, you can only
+// request this after 54 seconds». Тому перевірка тільки на них
+// відправляла цей випадок у загальне «спробуйте ще раз» — після
+// якого йдуть шукати помилку в коді замість того, щоб зачекати
+// хвилину.
+function mailErrorText(error) {
+
+    const msg = error?.message || "";
+    const code = error?.code || "";
+
+    const throttled = error?.status === 429
+        || /rate.?limit/i.test(msg)
+        || /rate_limit/i.test(code)
+        || /you can only request this (after|once)/i.test(msg);
+
+    if (throttled) {
+        return "Забагато листів поспіль — це обмеження пошти, не помилка. "
+            + "Зачекайте хвилину й спробуйте ще раз";
+    }
+
+    return "Не вдалося надіслати лист. Спробуйте ще раз";
 
 }
 
@@ -1800,9 +1848,15 @@ document.querySelectorAll(".account-tab").forEach(tab => {
 
         const target = tab.dataset.tab;
 
-        document.getElementById("ordersPanel").hidden = target !== "orders";
-        document.getElementById("addressesPanel").hidden = target !== "addresses";
-        document.getElementById("profilePanel").hidden = target !== "profile";
+        // Перелік, а не три рядки: вкладок стало чотири, і кожна
+        // нова вимагала б четвертого рядка в трьох місцях.
+        ["orders", "addresses", "profile", "newsletter", "password"].forEach(name => {
+
+            const panel = document.getElementById(name + "Panel");
+
+            if (panel) panel.hidden = name !== target;
+
+        });
 
         if (target === "addresses" && !addressesLoadedOnce) {
             loadAddresses();
@@ -1837,9 +1891,32 @@ async function loadProfile(user) {
     document.getElementById("profilePhone").value = data?.phone || "";
     document.getElementById("profileCity").value = data?.city || "";
 
+    // ЗГОДА, ЯКУ ВЖЕ ДАЛИ, ПЕРЕПИТУВАТИ НЕ ТРЕБА.
+    //
+    // Стовпця може ще не бути: міграцію 030 власник застосовує
+    // руками. select("*") повертає рядок із тими стовпцями, які
+    // існують, тож наявність ключа і є перевіркою — без неї
+    // збереження падало б із «column does not exist» на всіх, хто
+    // міграцію не застосував.
+    profileHasConsentColumn = Boolean(data)
+        && Object.prototype.hasOwnProperty.call(data, "privacy_consent_at");
+
+    const consentEl = document.getElementById("profileConsent");
+
+    if (consentEl) consentEl.checked = Boolean(data?.privacy_consent_at);
+
+    // Адресу для розсилки підставляємо з акаунту — найчастіше саме
+    // її і хочуть підписати.
+    const newsletterEmail = document.getElementById("newsletterEmail");
+
+    if (newsletterEmail && !newsletterEmail.value) newsletterEmail.value = user.email || "";
+
     if (accountEmailEl) accountEmailEl.textContent = buildAccountGreeting(data?.first_name);
 
 }
+
+// Чи є в таблиці стовпець privacy_consent_at (міграція 030).
+let profileHasConsentColumn = false;
 
 // -------------------------
 // Пояснювальний текст під заголовком "Особистий кабінет"
@@ -1863,12 +1940,26 @@ profileForm?.addEventListener("submit", async event => {
 
     if (!user) return;
 
+    const consentEl = document.getElementById("profileConsent");
+
+    // Без згоди не зберігаємо: дані, які тут лежать, — персональні, і
+    // саме на них згода й потрібна.
+    if (consentEl && !consentEl.checked) {
+
+        profileMessageEl.textContent = "Потрібна згода на обробку персональних даних";
+
+        consentEl.focus();
+
+        return;
+
+    }
+
     const submitBtn = document.getElementById("profileSubmit");
 
     submitBtn.disabled = true;
     submitBtn.textContent = "Зберігаємо...";
 
-    const { error } = await supabaseClient.from("profiles").upsert({
+    const row = {
         id: user.id,
         first_name: document.getElementById("profileFirstName").value.trim(),
         last_name: document.getElementById("profileLastName").value.trim(),
@@ -1876,7 +1967,13 @@ profileForm?.addEventListener("submit", async event => {
         phone: document.getElementById("profilePhone").value.trim(),
         city: document.getElementById("profileCity").value.trim(),
         updated_at: new Date().toISOString()
-    });
+    };
+
+    // Момент згоди має значення сам по собі: «згоден» без дати нічого
+    // не доводить. Пишемо лише коли стовпець існує — див. loadProfile.
+    if (profileHasConsentColumn) row.privacy_consent_at = new Date().toISOString();
+
+    const { error } = await supabaseClient.from("profiles").upsert(row);
 
     submitBtn.disabled = false;
     submitBtn.textContent = "Зберегти зміни";
@@ -1895,26 +1992,319 @@ profileForm?.addEventListener("submit", async event => {
 
 });
 
-changePasswordBtn?.addEventListener("click", async () => {
+// -------------------------
+// Зміна пошти
+//
+// Пошта тут — це і логін, і адреса, куди їде лист про замовлення.
+// Помилка в ній відрізає людину від власного акаунту, тому Supabase
+// не міняє її одразу: він надсилає лист на НОВУ адресу, і зміна
+// відбувається лише після переходу за посиланням. Поки лист не
+// відкрито, вхід лишається за старою поштою.
+//
+// Саме тому кнопка каже «Надіслати лист», а не «Зберегти»: інакше
+// людина закриє сторінку в упевненості, що вже змінила адресу.
+// -------------------------
+
+const changeEmailBtn = document.getElementById("changeEmailBtn");
+const emailChangeBox = document.getElementById("emailChangeBox");
+const newEmailInput = document.getElementById("newEmail");
+const newEmailSubmit = document.getElementById("newEmailSubmit");
+const newEmailCancel = document.getElementById("newEmailCancel");
+const emailChangeMessage = document.getElementById("emailChangeMessage");
+const newEmailConfirm = document.getElementById("newEmailConfirm");
+const emailChangeStepForm = document.getElementById("emailChangeStepForm");
+const emailChangeStepSent = document.getElementById("emailChangeStepSent");
+const emailChangeSentTo = document.getElementById("emailChangeSentTo");
+const emailChangeClose = document.getElementById("emailChangeClose");
+
+function toggleEmailChange(open) {
+
+    if (!emailChangeBox) return;
+
+    emailChangeBox.hidden = !open;
+
+    if (emailChangeMessage) emailChangeMessage.textContent = "";
+
+    // Завжди повертаємось на перший крок: другий («лист надіслано»)
+    // стосується конкретної адреси й після закриття вже неправдивий.
+    if (emailChangeStepForm) emailChangeStepForm.hidden = false;
+    if (emailChangeStepSent) emailChangeStepSent.hidden = true;
+
+    if (open && newEmailInput) {
+        newEmailInput.value = "";
+        if (newEmailConfirm) newEmailConfirm.value = "";
+        newEmailInput.focus();
+    }
+
+}
+
+emailChangeClose?.addEventListener("click", () => toggleEmailChange(false));
+
+changeEmailBtn?.addEventListener("click", () => toggleEmailChange(emailChangeBox.hidden));
+
+newEmailCancel?.addEventListener("click", () => toggleEmailChange(false));
+
+newEmailSubmit?.addEventListener("click", async () => {
+
+    const email = (newEmailInput?.value || "").trim();
+
+    emailChangeMessage.textContent = "";
+
+    // Перевірка навмисно проста: складна регулярка відкидає справжні
+    // адреси й однаково не доводить, що скринька існує. Це доводить
+    // лист — той самий, яким Supabase і підтверджує зміну.
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(email)) {
+        emailChangeMessage.textContent = "Перевірте адресу пошти";
+        return;
+    }
+
+    // ДРУГЕ ПОЛЕ — НЕ ФОРМАЛЬНІСТЬ.
+    //
+    // Помилки в пошті не видно: чужа адреса виглядає як звичайна.
+    // Лист піде на неї, людина його не отримає, а вхід лишиться за
+    // старою поштою — і зрозуміти, що саме сталось, буде нізвідки.
+    if ((newEmailConfirm?.value || "").trim().toLowerCase() !== email.toLowerCase()) {
+        emailChangeMessage.textContent = "Адреси не збігаються";
+        newEmailConfirm?.focus();
+        return;
+    }
+
+    const user = await getCurrentUser();
+
+    if (!user) {
+        emailChangeMessage.textContent = "Сесія завершилась. Увійдіть у кабінет ще раз";
+        return;
+    }
+
+    if (email.toLowerCase() === String(user.email || "").toLowerCase()) {
+        emailChangeMessage.textContent = "Це і є ваша поточна адреса";
+        return;
+    }
+
+    newEmailSubmit.disabled = true;
+    newEmailSubmit.textContent = "Надсилаємо...";
+
+    const { error } = await supabaseClient.auth.updateUser({ email });
+
+    newEmailSubmit.disabled = false;
+    // Напис той самий, що в розмітці. Було «Надіслати лист» — і після
+    // першої ж невдалої спроби кнопка перейменовувалась сама собою.
+    newEmailSubmit.textContent = "Підтвердити";
+
+    if (error) {
+
+        console.warn("Не вдалося змінити пошту:", error.message);
+
+        // Найчастіша причина — адреса вже зайнята іншим акаунтом.
+        // Кажемо це прямо: «спробуйте ще раз» тут не допомагає.
+        emailChangeMessage.textContent = /registered|exists|taken/i.test(error.message || "")
+            ? "Ця пошта вже прив'язана до іншого акаунту"
+            : mailErrorText(error);
+
+        return;
+
+    }
+
+    // Другий крок: сказати, що лист пішов, і на яку саме адресу.
+    // Без цього екрана людина закриває сторінку в упевненості, що
+    // пошту вже змінено.
+    if (emailChangeSentTo) emailChangeSentTo.textContent = email;
+
+    if (emailChangeStepForm) emailChangeStepForm.hidden = true;
+    if (emailChangeStepSent) emailChangeStepSent.hidden = false;
+
+});
+
+// -------------------------
+// Вкладка «Змінити пароль»
+//
+// БУЛО: одна кнопка, яка надсилала лист. Тобто «змінити пароль»
+// означало «вийти з кабінету, відкрити пошту, знайти лист» — і це
+// при тому, що людина вже ввійшла й пароль пам'ятає.
+//
+// СТАЛО: старий пароль + новий, як усюди. Лист лишається — але для
+// того випадку, для якого він і потрібен: коли старого пароля не
+// пам'ятають.
+//
+// ЧОМУ ПИТАЄМО СТАРИЙ. Supabase міняє пароль, маючи лише відкриту
+// сесію, — старого не питає взагалі. Це означає, що будь-хто, хто сів
+// за незаблокований комп'ютер, міняє пароль і забирає акаунт: власник
+// більше не ввійде. Перевіряємо окремим входом із тією ж поштою.
+// -------------------------
+
+const passwordForm = document.getElementById("passwordForm");
+const passwordMessage = document.getElementById("passwordMessage");
+
+passwordForm?.addEventListener("submit", async event => {
+
+    event.preventDefault();
+
+    passwordMessage.textContent = "";
+
+    const oldPassword = document.getElementById("oldPassword").value;
+    const newPassword = document.getElementById("changedPassword").value;
+
+    if (!oldPassword) {
+        passwordMessage.textContent = "Введіть поточний пароль";
+        return;
+    }
+
+    // Верхня межа не наша примха: Supabase відмовляє довшим за 72
+    // байти, і відмова приходить англійською вже після натискання.
+    // 30 — та сама межа, що написана в підписі поля.
+    if (newPassword.length < 6 || newPassword.length > 30) {
+        passwordMessage.textContent = "Пароль має бути від 6 до 30 символів";
+        return;
+    }
+
+    if (newPassword === oldPassword) {
+        passwordMessage.textContent = "Новий пароль збігається зі старим";
+        return;
+    }
 
     const user = await getCurrentUser();
 
     if (!user) return;
 
-    changePasswordBtn.disabled = true;
+    const submitBtn = document.getElementById("passwordSubmit");
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Змінюємо...";
+
+    // Перевірка старого пароля — входом. Вдалий вхід оновлює ту саму
+    // сесію, тож для людини нічого не змінюється; невдалий нічого не
+    // псує.
+    const check = await supabaseClient.auth.signInWithPassword({
+        email: user.email,
+        password: oldPassword
+    });
+
+    if (check.error) {
+
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Змінити пароль";
+
+        passwordMessage.textContent = "Старий пароль неправильний";
+
+        return;
+
+    }
+
+    const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Змінити пароль";
+
+    if (error) {
+
+        console.warn("Не вдалося змінити пароль:", error.message);
+
+        passwordMessage.textContent = "Не вдалося змінити пароль. Спробуйте ще раз";
+
+        return;
+
+    }
+
+    passwordForm.reset();
+
+    showToast("Пароль змінено");
+
+});
+
+// «Забули пароль?» у кабінеті — той самий лист, що й на вході, але
+// адресу питати не треба: людина вже ввійшла, і ми її знаємо.
+const forgotBox = document.getElementById("forgotBox");
+const forgotStepForm = document.getElementById("forgotStepForm");
+const forgotStepSent = document.getElementById("forgotStepSent");
+const forgotMessage = document.getElementById("forgotMessage");
+
+function toggleForgot(open) {
+
+    if (!forgotBox) return;
+
+    forgotBox.hidden = !open;
+
+    if (forgotMessage) forgotMessage.textContent = "";
+
+    if (forgotStepForm) forgotStepForm.hidden = false;
+    if (forgotStepSent) forgotStepSent.hidden = true;
+
+}
+
+document.getElementById("forgotPasswordInsideBtn")?.addEventListener("click", async () => {
+
+    const user = await getCurrentUser();
+
+    if (!user) return;
+
+    const where = document.getElementById("forgotEmail");
+
+    if (where) where.textContent = user.email;
+
+    toggleForgot(forgotBox.hidden);
+
+});
+
+document.getElementById("forgotCancel")?.addEventListener("click", () => toggleForgot(false));
+document.getElementById("forgotClose")?.addEventListener("click", () => toggleForgot(false));
+
+// event.currentTarget ПІСЛЯ await — ЦЕ null, І САМЕ ЦЕ ЛАМАЛО
+// КНОПКУ «ВІДНОВИТИ».
+//
+// currentTarget живе рівно стільки, скільки триває розсилання події.
+// Перший же await віддає керування назад браузеру, розсилання
+// завершується — і властивість обнуляється. Тут вона читалась ПІСЛЯ
+// `await getCurrentUser()`, тож button був null, а наступний рядок
+// кидав TypeError.
+//
+// Далі не виконувалось нічого: ні запиту на лист, ні повідомлення про
+// помилку, ні екрана «лист надіслано». Тобто натискання не робило
+// взагалі нічого, і подивитись причину можна було тільки в консолі.
+// Саме це власник і побачив на деві.
+//
+// Тому елемент беремо за id, як сусідні обробники, — він не залежить
+// від того, на якому кроці ми зараз.
+const forgotSubmit = document.getElementById("forgotSubmit");
+
+forgotSubmit?.addEventListener("click", async () => {
+
+    forgotMessage.textContent = "";
+
+    const user = await getCurrentUser();
+
+    // Мовчазний return тут означав би те саме, що й помилка вище:
+    // кнопка не робить нічого й не пояснює чому.
+    if (!user) {
+        forgotMessage.textContent = "Сесія завершилась. Увійдіть у кабінет ще раз";
+        return;
+    }
+
+    forgotSubmit.disabled = true;
+    forgotSubmit.textContent = "Надсилаємо...";
 
     const { error } = await supabaseClient.auth.resetPasswordForEmail(user.email, {
         redirectTo: `${window.location.origin}/account`
     });
 
-    changePasswordBtn.disabled = false;
+    forgotSubmit.disabled = false;
+    forgotSubmit.textContent = "Відновити";
 
     if (error) {
-        showToast("Не вдалося надіслати лист. Спробуйте ще раз");
+
+        console.warn("Не вдалося надіслати лист:", error.message);
+
+        forgotMessage.textContent = mailErrorText(error);
+
         return;
+
     }
 
-    showToast("Лист для зміни пароля надіслано на " + user.email);
+    const sentTo = document.getElementById("forgotSentTo");
+
+    if (sentTo) sentTo.textContent = user.email;
+
+    if (forgotStepForm) forgotStepForm.hidden = true;
+    if (forgotStepSent) forgotStepSent.hidden = false;
 
 });
 
@@ -1935,6 +2325,7 @@ const addressMethodSelect = document.getElementById("addressMethod");
 const addressBranchField = document.getElementById("addressBranchField");
 const addressPostomatField = document.getElementById("addressPostomatField");
 const addressCourierField = document.getElementById("addressCourierField");
+const addressOtherField = document.getElementById("addressOtherField");
 
 let addressesLoadedOnce = false;
 let cachedAddresses = [];
@@ -1946,6 +2337,11 @@ function toggleAddressMethodFields() {
     addressBranchField.hidden = value !== "На відділення «Нова пошта»";
     addressPostomatField.hidden = value !== "Поштомат «Нова пошта»";
     addressCourierField.hidden = value !== "Кур'єром «Нова пошта»";
+
+    // «Інша пошта» — Укрпошта чи Meest. Довідника ні для тієї, ні
+    // для тієї в нас немає, тож перевізника й відділення покупець
+    // пише одним рядком, як і на оформленні замовлення.
+    if (addressOtherField) addressOtherField.hidden = value !== "Інша пошта";
 
 }
 
@@ -1960,10 +2356,30 @@ function openAddressModal(address) {
     document.getElementById("addressLabel").value = address?.label || "";
     document.getElementById("addressCity").value = address?.city || "";
     addressMethodSelect.value = address?.delivery_method || "На відділення «Нова пошта»";
+
+    // Присвоєння value події change не надсилає — її надсилає лише
+    // людина. Але спосіб доставки тут щойно змінився насправді, і
+    // тим, хто на нього підписаний, про це треба сказати: власний
+    // випадний список (select-menu.js) інакше лишив би на кнопці
+    // напис від попередньої адреси.
+    addressMethodSelect.dispatchEvent(new Event("change", { bubbles: true }));
     document.getElementById("addressBranchNumber").value = address?.branch_number || "";
     document.getElementById("addressPostomatNumber").value = address?.postomat_number || "";
     document.getElementById("addressCourierAddress").value = address?.courier_address || "";
+    document.getElementById("addressOtherCarrier").value = address?.other_carrier || "";
     document.getElementById("addressIsDefault").checked = Boolean(address?.is_default);
+
+    // МІСТО, ПІДСТАВЛЕНЕ КОДОМ, ДОВІДНИК НЕ ВВАЖАЄ ОБРАНИМ.
+    //
+    // Ref міста ставиться тільки при виборі з підказки. Відкриваючи
+    // збережену адресу, ми заповнюємо поле самі — і воно виглядає
+    // заповненим, але пошук відділень мовчки не робить запиту
+    // взагалі: список порожній, пояснення немає. Ззовні це «не
+    // знаходить мій поштомат». Те саме колись виправляли на
+    // оформленні замовлення (applySavedAddress у checkout.js).
+    if (address?.city && window.NovaPoshta?.useCity) {
+        window.NovaPoshta.useCity(address.city, "address");
+    }
 
     toggleAddressMethodFields();
 
@@ -1993,14 +2409,18 @@ function renderAddressCard(address) {
     const methodIcon = {
         "На відділення «Нова пошта»": "📦",
         "Поштомат «Нова пошта»": "🏤",
-        "Кур'єром «Нова пошта»": "🚚"
+        "Кур'єром «Нова пошта»": "🚚",
+        "Інша пошта": "📮"
     }[address.delivery_method] || "📍";
 
-    const detail = address.delivery_method === "На відділення «Нова пошта»"
-        ? address.branch_number
-        : address.delivery_method === "Поштомат «Нова пошта»"
-            ? address.postomat_number
-            : address.courier_address;
+    // Кожен спосіб доставки має своє поле подробиць — показати треба
+    // саме те, що заповнили.
+    const detail = {
+        "На відділення «Нова пошта»": address.branch_number,
+        "Поштомат «Нова пошта»": address.postomat_number,
+        "Кур'єром «Нова пошта»": address.courier_address,
+        "Інша пошта": address.other_carrier
+    }[address.delivery_method] || "";
 
     return `
         <div class="address-card" data-id="${address.id}">
@@ -2124,73 +2544,17 @@ confirmDeleteYes?.addEventListener("click", async () => {
 });
 
 // -------------------------
-// Видалення акаунту
+// ТУТ БУЛО ВИДАЛЕННЯ АКАУНТУ — ПРИБРАНО НА ПРОХАННЯ ВЛАСНИКА.
 //
-// Тут видаляємо власні дані користувача (профіль, адреси,
-// обране) і завершуємо сесію — на це вистачає прав звичайного
-// користувача (RLS дозволяє видаляти власні рядки). Сам обліковий
-// запис у Supabase Auth лишається — щоб видалити саме його,
-// потрібен виклик admin-API з service-role ключем, а це можна
-// робити тільки на бекенді (Edge Function), не з клієнтського
-// JS напряму. Якщо потрібна повна фізична видаленість акаунту —
-// сюди варто додати виклик такої функції.
+// Видалення тепер робиться за зверненням, руками. І це чесніше, ніж
+// було: кнопка обіцяла «видалити назавжди», а насправді стирала лише
+// профіль, адреси й обране. Сам обліковий запис у Supabase Auth
+// лишався — для нього потрібен service-role ключ, тобто виклик на
+// бекенді, якого тут не було й бути не могло.
+//
+// Якщо колись знадобиться повне видалення — це Edge Function, а не
+// кнопка в кабінеті.
 // -------------------------
-
-const deleteAccountModal = document.getElementById("deleteAccountModal");
-const deleteAccountBtn = document.getElementById("deleteAccountBtn");
-const deleteAccountYes = document.getElementById("deleteAccountYes");
-const deleteAccountNo = document.getElementById("deleteAccountNo");
-const deleteAccountClose = document.getElementById("deleteAccountClose");
-
-function openDeleteAccountModal() {
-    deleteAccountModal.hidden = false;
-}
-
-function closeDeleteAccountModal() {
-    deleteAccountModal.hidden = true;
-}
-
-deleteAccountBtn?.addEventListener("click", openDeleteAccountModal);
-deleteAccountNo?.addEventListener("click", closeDeleteAccountModal);
-deleteAccountClose?.addEventListener("click", closeDeleteAccountModal);
-
-deleteAccountModal?.addEventListener("click", event => {
-    if (event.target === deleteAccountModal) closeDeleteAccountModal();
-});
-
-deleteAccountYes?.addEventListener("click", async () => {
-
-    deleteAccountYes.disabled = true;
-    deleteAccountYes.textContent = "Видаляємо...";
-
-    const user = await getCurrentUser();
-
-    if (!user) {
-        closeDeleteAccountModal();
-        return;
-    }
-
-    await supabaseClient.from("favorites").delete().eq("user_id", user.id);
-    await supabaseClient.from("addresses").delete().eq("user_id", user.id);
-
-    const { error } = await supabaseClient.from("profiles").delete().eq("id", user.id);
-
-    deleteAccountYes.disabled = false;
-    deleteAccountYes.textContent = "Так, видалити";
-
-    if (error) {
-        closeDeleteAccountModal();
-        showToast("Не вдалося видалити акаунт");
-        return;
-    }
-
-    closeDeleteAccountModal();
-
-    await supabaseClient.auth.signOut();
-
-    window.location.href = "/";
-
-});
 
 addressesListEl?.addEventListener("click", async event => {
 
@@ -2254,15 +2618,39 @@ addressForm?.addEventListener("submit", async event => {
         branch_number: document.getElementById("addressBranchNumber").value.trim(),
         postomat_number: document.getElementById("addressPostomatNumber").value.trim(),
         courier_address: document.getElementById("addressCourierAddress").value.trim(),
+        other_carrier: document.getElementById("addressOtherCarrier").value.trim(),
         is_default: isDefault
     };
 
     // "id" — GENERATED ALWAYS AS IDENTITY, тому його не можна
     // передавати в тілі insert/update — для редагування існуючої
     // адреси використовуємо update() за id, для нової — insert()
-    const { error } = id
-        ? await supabaseClient.from("addresses").update(payload).eq("id", id)
-        : await supabaseClient.from("addresses").insert(payload);
+    const save = body => id
+        ? supabaseClient.from("addresses").update(body).eq("id", id)
+        : supabaseClient.from("addresses").insert(body);
+
+    let { error } = await save(payload);
+
+    // СТОВПЦЯ other_carrier МОЖЕ ЩЕ НЕ БУТИ.
+    //
+    // Міграції тут застосовують руками в панелі Supabase, і між
+    // викладкою коду та запуском 031-other-carrier.sql минає час.
+    // Без цієї гілки в той проміжок падало б збереження адреси
+    // ЦІЛКОМ — разом із містом і відділенням, які до нової колонки
+    // стосунку не мають. Тобто одна незапущена міграція ламала б
+    // роботу тим, хто «Іншою поштою» не користується взагалі.
+    //
+    // PGRST204 — саме «не знайшов такої колонки»; на інші помилки
+    // (мережа, права, RLS) повторювати запит нема сенсу.
+    if (error && (error.code === "PGRST204" || /other_carrier/.test(error.message || ""))) {
+
+        console.warn("Стовпця other_carrier ще немає — зберігаю без нього:", error.message);
+
+        delete payload.other_carrier;
+
+        ({ error } = await save(payload));
+
+    }
 
     submitBtn.disabled = false;
     submitBtn.textContent = "Зберегти адресу";
@@ -2294,6 +2682,28 @@ async function renderAuthState() {
     const user = await getCurrentUser();
 
     authLoader.hidden = true;
+
+    // ПОВЕРНЕННЯ З ЛИСТА ПРО ЗМІНУ ПОШТИ.
+    //
+    // Supabase підтверджує адресу сам і повертає сюди з
+    // type=email_change в адресі. Без цього екрана людина бачила б
+    // просто кабінет — і не знала б, чи спрацювало: пошта в шапці
+    // змінилась би мовчки.
+    //
+    // Перевірка стоїть ПЕРЕД відновленням пароля, бо ознаки різні й
+    // сплутати їх нема як, а порядок читається зверху вниз.
+    if (emailChangedCard && isEmailChanged) {
+
+        authCard.hidden = true;
+        accountDashboard.hidden = true;
+        resetPasswordCard.hidden = true;
+        emailChangedCard.hidden = false;
+
+        return;
+
+    }
+
+    if (emailChangedCard) emailChangedCard.hidden = true;
 
     if (isPasswordRecovery) {
 

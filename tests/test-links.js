@@ -32,8 +32,16 @@ const path = require("path");
 
 const ROOT = path.join(__dirname, "..");
 
+// supabase — не сторінки сайту, а джерела для чужих панелей.
+//
+// У supabase/email-templates/ лежать листи входу в кабінет. Це теж
+// .html, але їх ніхто не відкриває браузером: вони вставляються в
+// Supabase, і замість посилання там стоїть {{ .ConfirmationURL }} —
+// підстановка, яку робить сам Supabase під час надсилання. Для цієї
+// перевірки вона виглядає як бите внутрішнє посилання, і так і
+// сталося.
 const SKIP_DIRS = new Set([
-    "node_modules", ".git", ".github", ".claude", "_archive", "tests"
+    "node_modules", ".git", ".github", ".claude", "_archive", "tests", "supabase"
 ]);
 
 let failures = 0;

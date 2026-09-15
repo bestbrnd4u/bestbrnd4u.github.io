@@ -536,6 +536,15 @@ function applySavedAddress(address) {
         document.getElementById("courierAddress").value = address.courier_address;
     }
 
+    // «Інша пошта» — Укрпошта чи Meest одним рядком. Без цього
+    // збережена адреса підставлялась наполовину: спосіб доставки
+    // обирався, а сам перевізник із відділенням лишався порожнім, і
+    // замовлення їхало «Іншою поштою» невідомо куди.
+    if (address.other_carrier) {
+        const other = document.getElementById("otherCarrier");
+        if (other) other.value = address.other_carrier;
+    }
+
     clearFieldError("city");
     clearFieldError("deliveryMethod");
 

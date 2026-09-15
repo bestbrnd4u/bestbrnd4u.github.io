@@ -3,6 +3,7 @@
 
 <head>
 <script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"365edf3f","data/catalog.json":"d4f83cb3","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"6a5c125f","data/legal.json":"f84751b2","data/notifications.json":"a35b367f","data/product-texts.json":"278df72d","data/products-updated.json":"d7e245ab","data/products.json":"1cd1cdb7","data/promo-popups.json":"0940ece5","data/promotions.json":"71677766","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/security.json":"0c05c691","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script>
+    <meta name="robots" content="noindex,nofollow">
     <meta charset="UTF-8">
     <meta name="author" content="BestBrnd4u">
     <meta name="copyright" content="© 2026 BestBrnd4u. Усі права захищено.">
@@ -10,6 +11,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Замовлення прийнято | BestBrnd4u">
     <meta name="theme-color" content="#111827">
+
+    <!-- ВЛАСНИЙ noindex, А НЕ ТОЙ, ЩО СТАВИТЬ ЗБІРКА.
+
+         Вище стоїть <meta robots="noindex,nofollow"> — його додає
+         scripts/apply-site-env.js усьому дев-середовищу й ПРИБИРАЄ
+         на проді. Тобто на бойовому сайті ця сторінка трималась
+         лише на «Disallow: /thanks» у robots.txt, а Disallow не
+         заважає показати адресу в результатах, якщо на неї
+         десь поставлять посилання.
+
+         Сторінці там не місце: на ній номер щойно оформленого
+         замовлення. Так само позначені cart, checkout, favorites,
+         account і newsletter-confirm.
+
+         follow, а не nofollow: посилання звідси ведуть у каталог, і
+         ваги їм передати можна. -->
+    <meta name="robots" content="noindex,follow">
 
 <link rel="icon" href="favicon.ico" sizes="any">
     <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32.png">
@@ -27,7 +45,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
 
-    <link rel="stylesheet" href="assets/css/style.css?v=54b5c1b2">
+    <link rel="stylesheet" href="assets/css/style.css?v=f6ba7bd5">
 
 
 
@@ -307,7 +325,7 @@
 
 <!-- Журнал помилок: сторінка сама розповідає, що в неї зламалось -->
 <script src="assets/js/error-report.js?v=21838fe8" defer></script>
-<script src="assets/js/supabase-client.js?v=42a4012d" defer></script>
+<script src="assets/js/supabase-client.js?v=5575258c" defer></script>
 <!-- Кадрування фото товару. Той самий файл підключає адмінка,
      тож прев'ю в ній і картка на сайті рахуються однаково. -->
 <script src="assets/js/image-framing.js?v=80b29a57" defer></script>
@@ -322,9 +340,9 @@
 <!-- Транслітерація: productUrl() кладе колір в адресу латиницею.
      Той самий файл використовує збірка для адрес товарів. -->
 <script src="assets/js/translit.js?v=c0957cb7" defer></script>
-<script src="assets/js/common.js?v=9d454a19" defer></script>
+<script src="assets/js/common.js?v=a3b9d4d6" defer></script>
 <!-- Підписка на листи магазину -->
-<script src="assets/js/subscribe.js?v=2367ff9d" defer></script>
+<script src="assets/js/subscribe.js?v=6a8dc105" defer></script>
 <script src="assets/js/sync.js?v=48ef002e" defer></script>
 <script src="assets/js/mega-menu.js?v=4649fe1e" defer></script>
 

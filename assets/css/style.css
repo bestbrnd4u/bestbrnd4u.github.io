@@ -8439,6 +8439,163 @@ body.mobile-filters-open .scroll-top{
     box-shadow:0 0 0 4px rgba(37,99,235,.1);
 }
 
+/* =========================================================
+   ВЛАСНИЙ ВИПАДНИЙ СПИСОК (select[data-menu])
+
+   Закритий <select> оформлений вище: своя рамка, свій шеврон, свій
+   фокус. Розкритий список оформити не можна взагалі — його малює
+   операційна система, і ні шрифт, ні кольори, ні скруглення їй не
+   передаються. Виходило так: поки на список не натиснули, він
+   частина сайту; щойно натиснули — сірий системний прямокутник
+   іншим шрифтом, рівно в той момент, коли на нього дивляться
+   найуважніше.
+
+   Тому поруч із <select> ставиться своя кнопка зі своїм списком
+   (assets/js/select-menu.js), а сам <select> лишається джерелом
+   істини й формою. Кнопка повторює оформлення поля один в один: це
+   та сама форма, і два різні на вигляд поля в ній читались би як
+   помилка.
+   ========================================================= */
+
+.select-menu{
+    position:relative;
+}
+
+/* НЕ display:none і не hidden.
+   Прихований select не отримує фокус, а на полі без фокуса браузер
+   не може показати підказку «заповніть це поле»: форма мовчки не
+   відправляється, і причини не видно. Тому елемент лишається в
+   потоці, але не займає місця й не ловить кліки. */
+.select-menu-native{
+    position:absolute;
+    width:1px;
+    height:1px;
+    padding:0;
+    border:0;
+    opacity:0;
+    pointer-events:none;
+}
+
+.select-menu-button{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    width:100%;
+    padding:14px 16px;
+    border:1px solid var(--gray200);
+    border-radius:12px;
+    background:var(--gray50);
+    font-family:inherit;
+    font-size:15px;
+    font-weight:400;
+    color:var(--dark);
+    text-align:left;
+    cursor:pointer;
+    transition:border-color 350ms cubic-bezier(.4,0,.2,1),
+               box-shadow 350ms cubic-bezier(.4,0,.2,1);
+}
+
+@media (hover:hover) and (pointer:fine){
+    .select-menu-button:hover{
+        border-color:var(--gray300);
+    }
+}
+
+.select-menu-button:focus-visible{
+    outline:none;
+    border-color:var(--secondary);
+    box-shadow:0 0 0 4px rgba(37,99,235,.1);
+}
+
+/* Поки список відкритий, поле лишається підсвіченим: інакше
+   зв'язок між списком і полем, з якого він виріс, видно лише за
+   відстанню. */
+.select-menu.open .select-menu-button{
+    border-color:var(--secondary);
+}
+
+.select-menu-value{
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+/* Шеврон той самий, що в полі вище, — але окремим елементом, бо
+   його треба повертати. */
+.select-menu-arrow{
+    flex:0 0 auto;
+    width:14px;
+    height:9px;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9' fill='none'%3E%3Cpath d='M1 1L7 7L13 1' stroke='%236b7280' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center / contain;
+    transition:transform 200ms cubic-bezier(.23,1,.32,1);
+}
+
+.select-menu.open .select-menu-arrow{
+    transform:rotate(180deg);
+}
+
+.select-menu-list{
+    position:absolute;
+    left:0;
+    right:0;
+    top:calc(100% + 6px);
+    z-index:60;
+    max-height:260px;
+    overflow-y:auto;
+    padding:6px;
+    background:#fff;
+    border:1px solid var(--gray200);
+    border-radius:12px;
+    box-shadow:0 12px 32px rgba(0,0,0,.12);
+    /* Список розкривається по кліку. Без переходу він просто
+       з'являється — те саме враження, що й від системного, від
+       якого ми й ішли. 160ms ease-out: рух видно з першого кадру.
+       Ключові кадри, а не transition: елемент перемикається через
+       hidden, тобто з display:none, а з нього переходи не
+       стартують. */
+    animation:select-menu-in 160ms var(--ease-out);
+}
+
+@keyframes select-menu-in{
+    from{
+        opacity:0;
+        transform:translateY(-4px);
+    }
+}
+
+.select-menu-item{
+    display:block;
+    width:100%;
+    padding:10px 12px;
+    border:0;
+    border-radius:8px;
+    background:none;
+    font-family:inherit;
+    font-size:14px;
+    line-height:1.45;
+    color:var(--dark);
+    text-align:left;
+    cursor:pointer;
+}
+
+/* .active — те, на чому зараз клавіатура або миша.
+   .current — те, що обрано насправді. Це різні речі: стрілкою вниз
+   ходять по списку, не змінюючи вибору, і без двох станів було б
+   не видно, звідки пішли. */
+.select-menu-item.active{
+    background:var(--gray100);
+}
+
+.select-menu-item.current{
+    color:var(--secondary);
+    font-weight:600;
+}
+
+.select-menu-item.current.active{
+    background:var(--gray100);
+}
+
 /* -- глазок "показати/приховати пароль" -- */
 
 .password-field{
@@ -8572,6 +8729,15 @@ body.mobile-filters-open .scroll-top{
     margin-bottom:24px;
 }
 
+/* Картка без пояснювального рядка під заголовком. У «Мої дані»
+   повітря перед формою дає сам підзаголовок (24px), а у «Змінити
+   пароль» його немає — і заголовок висів за 6px від першого підпису,
+   майже торкаючись його. Селектор спрацьовує лише там, де форма йде
+   одразу за заголовком. */
+.profile-card h2 + .profile-form{
+    margin-top:18px;
+}
+
 .profile-form{
     display:flex;
     flex-direction:column;
@@ -8622,47 +8788,289 @@ body.mobile-filters-open .scroll-top{
     font-weight:600;
 }
 
-.profile-logout-row{
-    margin-top:24px;
-    padding-top:24px;
-    border-top:1px solid var(--gray100);
+/* «Вийти з акаунту» стоїть поруч зі «Зберегти зміни», а не окремим
+   рядком під рискою: це дві дії над тією самою формою, і розносити
+   їх по різних кінцях картки нема причини. Червоним лишається — щоб
+   не натиснути замість збереження. */
+.profile-actions-row{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:12px;
 }
 
-.profile-logout-row .btn-outline{
+.profile-actions-row .btn-outline{
     color:#dc2626;
     border-color:#fecaca;
+    /* РАМКА ДОДАЄТЬСЯ ДО ВИСОТИ, І ЦЬОГО НЕ РЯТУЄ border-box.
+       box-sizing рахує рамку всередині коробки лише тоді, коли
+       висота задана; тут вона auto, тож виходить вміст + відступи +
+       рамка. Через це кнопка з рамкою була на 3px вища за сусідню
+       «Зберегти зміни», і нижні краї двох кнопок в одному рядку не
+       сходились. Віднімаємо рамку з відступів .btn (18px 42px). */
+    padding:16px 40px;
 }
 
 @media (hover:hover) and (pointer:fine){
-    .profile-logout-row .btn-outline:hover{
+    .profile-actions-row .btn-outline:hover{
         background:#fef2f2;
         border-color:#fecaca;
     }
 }
 
-.profile-form .auth-link{
+/* ДРУГА ДІЯ В РЯДКУ — ДО ПРАВОГО КРАЮ КАРТКИ.
+   Ліворуч головна кнопка, праворуч — та, що відводить убік
+   («Вийти з акаунту», «Скасувати», «Забули пароль?»). Між ними
+   порожнеча на всю ширину картки: промахнутись по сусідній кнопці
+   важче, а око бачить, де рядок закінчується. */
+.profile-actions-row .btn-outline,
+.profile-actions-row .auth-link,
+.profile-email-change-actions .auth-link{
+    margin-left:auto;
+}
+
+/* Зміна пошти — прихований блок під посиланням. */
+.profile-email-change{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    padding:20px;
+    border:1px solid var(--gray200);
+    border-radius:12px;
+    animation:profile-panel-in 180ms var(--ease-out);
+}
+
+/* З'ЯВЛЕННЯ БЛОКА.
+   По кліку сторінка миттєво підростала на дві-три сотні пікселів —
+   без переходу це читається як збій верстки, а не як «відкрилось».
+   180ms і ease-out: рух видно з першого кадру й він не встигає
+   набриднути; натискають тут зрідка, тож анімація доречна.
+
+   Ключові кадри, а не transition: блок перемикається атрибутом
+   hidden, тобто з display:none, — з нього переходи не стартують.
+   Anіmація зачіпає лише opacity й transform: вони не перераховують
+   розкладку. Системну настройку «менше руху» знімає спільне правило
+   в кінці файлу. */
+@keyframes profile-panel-in{
+    from{
+        opacity:0;
+        transform:translateY(-4px);
+    }
+}
+
+/* БЛОК, ЩО РОЗКРИВАЄТЬСЯ, НЕ МУСИТЬ ЛИПНУТИ ДО КНОПКИ НАД НИМ.
+   #forgotBox — сусід форми, а не її поле, і .profile-card звичайний
+   блок без gap. Тому між «Змінити пароль» і рамкою розкритого блока
+   не було ЖОДНОГО відступу: смужка вилазила просто з-під кнопки.
+   20px трохи більше за крок самої форми (16px) — так блок читається
+   як окрема поверхня, а не як ще одне поле. */
+.profile-form + .profile-email-change{
+    margin-top:20px;
+}
+
+/* КРОК — ТЕЖ КОЛОНКА З ВІДСТУПАМИ, І САМЕ ЦЬОГО НЕ БУЛО.
+   gap у .profile-email-change діє між його ПРЯМИМИ дітьми, а це два
+   кроки-обгортки, з яких видно завжди лише один. Усередині обгортки
+   був звичайний блок без жодного відступу: поле торкалось наступного
+   підпису, а кнопка — поля над нею. Виміряно 0px в обох місцях. */
+.profile-email-step{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+}
+
+/* Кнопка, що стоїть у кроці сама («Закрити»), тримається лівого краю
+   — інакше stretch розтягнув би її на всю ширину блока. Рядок дій це
+   не зачіпає: він мусить лишатись на всю ширину, щоб друга дія
+   відходила до правого краю. */
+.profile-email-step > .btn{
     align-self:flex-start;
 }
 
-.profile-links-row{
+.profile-email-change label{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    font-size:13px;
+    color:var(--gray500);
+}
+
+/* Свій нижній відступ підпису тут зайвий — крок уже дає ритм gap-ом,
+   а 24px під текстом ламали його. */
+.profile-email-change .profile-card-sub{
+    margin-bottom:0;
+}
+
+.profile-email-change-actions{
     display:flex;
     align-items:center;
-    justify-content:space-between;
-    gap:16px;
+    flex-wrap:wrap;
+    gap:12px;
+    /* Кнопка важча за поле над нею — їй потрібно трохи більше повітря,
+       ніж рівний крок між полями. */
+    margin-top:4px;
 }
 
-.auth-link-danger{
-    color:#dc2626;
+/* Крок «лист надіслано». Адреса всередині речення виділена — саме її
+   й перечитують, щоб переконатись, що не помилились. */
+.profile-email-sent{
+    margin:0;
+    font-size:14px;
+    line-height:1.6;
+    color:var(--gray700);
 }
 
-@media (hover:hover) and (pointer:fine){
-.auth-link-danger:hover{
-    color:#b91c1c;
-}
+.profile-email-sent strong{
+    color:var(--gray900);
 }
 
-.profile-form .btn{
+/* Згода на обробку даних. Галочка й текст в один рядок, посилання
+   всередині тексту — щоб його можна було прочитати, не шукаючи. */
+/* flex-direction обов'язковий: .profile-form label вище ставить
+   column — так стоять усі поля форми, підпис над полем. Галочка ж
+   мусить бути ПОРУЧ із текстом, інакше вона висить окремим рядком і
+   не читається як частина фрази. */
+.profile-form label.profile-consent{
+    display:flex;
+    flex-direction:row;
+    align-items:flex-start;
+    gap:10px;
+    font-size:13px;
+    line-height:1.5;
+    font-weight:400;
+    color:var(--gray500);
+}
+
+/* ПРАПОРЕЦЬ ТУТ МУСИТЬ БУТИ ЯВНО ОБМЕЖЕНИЙ — той самий капкан, що
+   описаний у .subscribe-consent input[type="checkbox"] нижче, і я в
+   нього вступив удруге.
+
+   Загальне правило форм угорі файлу:
+
+       input, textarea, select{ width:100%; padding:14px 16px; … }
+
+   Типу воно не розрізняє, тож прапорець отримував width:100% від
+   картки профілю. Разом із flex-shrink:0 це давало широкий
+   невидимий прямокутник, який видавлював текст згоди у вузький
+   стовпчик біля правого краю — по одному-два слова в рядок. Саме це
+   й показав власник на скріншоті.
+
+   width/height замість padding: прапорцю потрібен розмір самої
+   позначки, а не поле навколо неї. */
+.profile-consent input[type="checkbox"]{
+    flex:0 0 auto;
+    width:16px;
+    height:16px;
+    margin:2px 0 0;
+    padding:0;
+    border:0;
+    border-radius:4px;
+    background:none;
+    accent-color:var(--secondary);
+    cursor:pointer;
+}
+
+/* Текст забирає решту рядка — інакше він тулиться до правого краю. */
+.profile-consent span{
+    flex:1 1 auto;
+}
+
+/* ФОРМА ПІДПИСКИ В КАБІНЕТІ — НА СВІТЛІЙ КАРТЦІ, А НЕ В ТЕМНОМУ
+   ПІДВАЛІ.
+
+   Базові .subscribe-* писались під підвал і тому світлі: поле має
+   напівпрозоре біле тло й білу рамку, кнопка — біла із темним
+   написом, текст згоди rgba(255,255,255,.6). На темному це виглядає
+   правильно, на білій картці кабінету — не виглядає ніяк: поле
+   зникає, кнопка читається як звичайний рядок тексту, згода
+   невидима. Саме це й було на скріншоті.
+
+   Тому тут перефарбовуємо — рівно кольори, нічого більше. Розкладка,
+   відступи й поведінка лишаються спільними: дві копії верстки тієї
+   самої форми розійшлися б на першій же правці. Той самий підхід, що
+   в .newsletter .subscribe вище. */
+/* Два класи в селекторі, бо базове .subscribe{max-width:320px} лежить
+   нижче по файлу й з однаковою вагою перемагало б порядком. 320px —
+   ширина колонки підвалу; у картці кабінету від цього поле вводу
+   стискалось до 196px. */
+.subscribe.subscribe-account{
+    max-width:520px;
+    margin:16px 0 20px;
+}
+
+.subscribe-account .subscribe-label{
+    color:var(--gray700);
+}
+
+.subscribe-account .subscribe-row input{
+    border:1px solid var(--gray200);
+    background:#fff;
+    color:var(--gray900);
+}
+
+/* --gray300, а не --gray400: четвертого відтінку в :root немає, і
+   var(--gray400) не намалював би нічого — підказка в полі просто
+   зникла б, без жодної помилки в консолі. */
+.subscribe-account .subscribe-row input::placeholder{
+    color:var(--gray300);
+}
+
+.subscribe-account .subscribe-row input:focus{
+    border-color:var(--secondary);
+}
+
+.subscribe-account .subscribe-row button{
+    background:var(--secondary);
+    color:#fff;
+}
+
+.subscribe-account .subscribe-consent{
+    color:var(--gray500);
+}
+
+.subscribe-account .subscribe-consent input[type="checkbox"]{
+    accent-color:var(--secondary);
+}
+
+/* Світло-зелений і світло-рожевий читались на темному підвалі, на
+   білому — ні. */
+.subscribe-account .subscribe-note-ok{ color:#047857; }
+.subscribe-account .subscribe-note-error{ color:#b91c1c; }
+
+/* align-self ТУТ ЗНАЧИТЬ РІЗНЕ ЗАЛЕЖНО ВІД ТОГО, В ЧОМУ ЛЕЖИТЬ
+   ЕЛЕМЕНТ, — І САМЕ НА ЦЬОМУ ВЕРСТКА ЗЛАМАЛАСЬ.
+
+   .profile-form — це колонка. У колонці align-self керує
+   ГОРИЗОНТАЛЛЮ, і flex-start означає «до лівого краю»: саме для
+   цього правило й писалось.
+
+   Але селектор без «>» дістає і до кнопок усередині
+   .profile-actions-row та .profile-email-change-actions, а це
+   РЯДКИ. У рядку та сама властивість керує ВЕРТИКАЛЛЮ, і flex-start
+   означає вже «до верхнього краю». Через це «Скасувати», «Забули
+   пароль?» і «Змінити email» висіли на 18px вище за кнопку поруч —
+   рівно те, що видно на скріншотах власника.
+
+   Прямий нащадок лишає правило полям самої форми й не пускає його в
+   рядки дій, де вирівнюванням керує align-items:center. */
+.profile-form > .auth-link{
     align-self:flex-start;
+}
+
+/* .auth-link-danger і .profile-links-row прибрані разом із кнопкою
+   «Видалити акаунт» — іншого небезпечного посилання в кабінеті
+   немає, а окремого рядка під посилання більше ніде немає. */
+
+.profile-form > .btn{
+    align-self:flex-start;
+}
+
+/* Ширина — і для кнопок у рядках дій теж, разом із тими, що лежать
+   поза формою (#forgotSubmit у блоці «Забули пароль?»): «Відновити»
+   було на 37px вужче за «Змінити пароль» просто тому, що стоїть на
+   абзац нижче. */
+.profile-form .btn,
+.profile-email-change-actions .btn{
     min-width:180px;
 }
 
@@ -8897,6 +9305,17 @@ body.mobile-filters-open .scroll-top{
 
 }
 
+/* ПІДСУМОК — ВУЗЬКОЮ КОЛОНКОЮ ЛІВОРУЧ, А НЕ НА ВСЮ КАРТКУ.
+
+   Рядки розтягувались на всю ширину картки: підпис ліворуч, число
+   праворуч, між ними на широкому екрані півтори тисячі пікселів
+   порожнечі. Прочитати «Сума товарів 14 300 грн» одним поглядом було
+   неможливо — очі бігали від краю до краю, і це при тому, що рядків
+   чотири й вони читаються згори вниз.
+
+   width:fit-content, а не фіксоване число: блок звужується рівно до
+   найдовшого свого рядка. Будь-яке кругле число тут було б або
+   завузьким для «Безкоштовно», або залишало б порожнечу. */
 .order-card-summary{
     margin-top:14px;
     padding-top:14px;
@@ -8904,6 +9323,9 @@ body.mobile-filters-open .scroll-top{
     display:flex;
     flex-direction:column;
     gap:8px;
+    width:fit-content;
+    min-width:240px;
+    max-width:100%;
 }
 
 .order-card-summary-row{
@@ -8968,6 +9390,36 @@ body.mobile-filters-open .scroll-top{
 
     .profile-card{
         padding:24px 20px;
+    }
+
+    /* НА ВУЗЬКОМУ ЕКРАНІ РЯДОК ДІЙ СТАЄ СТОВПЧИКОМ.
+       «Зберегти зміни» + «Вийти з акаунту» — це 383px, а картка на
+       телефоні має всередині близько 295px. З flex-wrap друга кнопка
+       й так падала вниз, а margin-left:auto тулив би її до правого
+       краю окремим рядком — виглядало б як помилка. Тому явний
+       стовпчик на всю ширину: так кнопки й натискаються великим
+       пальцем. */
+    .profile-actions-row,
+    .profile-email-change-actions{
+        flex-direction:column;
+        align-items:stretch;
+    }
+
+    .profile-actions-row > *,
+    .profile-email-change-actions > *{
+        min-width:0;
+    }
+
+    /* Селектор мусить бути з двох класів — рівно такий, як у правилі
+       з margin-left:auto вище. Медіа-запит ваги не додає: із простим
+       «> *» відступ лишався б, і «Скасувати» тулилось би до правого
+       краю окремим рядком. Із нулем його ставить по центру base-
+       правило .auth-link{align-self:center} — у стовпчику воно
+       центрує по горизонталі. */
+    .profile-actions-row .btn-outline,
+    .profile-actions-row .auth-link,
+    .profile-email-change-actions .auth-link{
+        margin-left:0;
     }
 
     .account-tabs{
@@ -11550,6 +12002,18 @@ body.mobile-filters-open .scroll-top{
     color:var(--gray700);
 }
 
+/* Дві кнопки під підтвердженням підписки.
+   Окремий клас, а не .confirm-actions нижче: той живе у вікні
+   видалення адреси, де кнопки тягнуться на всю ширину вікна
+   (flex:1). На сторінці шириною в контейнер вони розтяглися б через
+   пів екрана кожна. */
+.confirm-page-actions{
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:12px;
+}
+
 .confirm-actions{
     display:flex;
     gap:10px;
@@ -14028,6 +14492,25 @@ body.refusal-open{
     gap:8px;
 }
 
+/* КОЛІР ТЕКСТУ ТУТ МУСИТЬ БУТИ ЯВНИЙ — БУЛО inherit, І ТЕКСТ БУВ
+   НЕВИДИМИЙ.
+
+   Решта правил цього блока писались під темну поверхню: рамка
+   напівпрозоро-біла, підказка в полі rgba(255,255,255,.45). А колір
+   самого тексту стояв inherit — тобто залежав від того, чи задасть
+   його предок. Ні .newsletter, ні footer кольору не задають: обидва
+   лише фарбують тло в --primary, а підписи всередині фарбують
+   поокремо. Тому inherit доходив аж до body й давав --dark.
+
+   Виміряно: колір тексту rgb(17,24,39) на тлі rgb(17,24,39).
+   Не «темнувато» — контраст один до одного, тобто введеного не
+   видно взагалі. Підказку було видно (їй колір заданий), і через це
+   поле виглядало робочим рівно доти, доки в нього не почнуть
+   писати.
+
+   #fff, а не inherit: ці правила описують поле НА ТЕМНОМУ, і колір
+   тексту — така сама їхня частина, як колір рамки. Світлу картку
+   кабінету перефарбовує .subscribe-account нижче. */
 .subscribe-row input{
     flex:1;
     min-width:0;
@@ -14037,7 +14520,7 @@ body.refusal-open{
     border:1px solid rgba(255,255,255,.25);
     border-radius:8px;
     background:rgba(255,255,255,.06);
-    color:inherit;
+    color:#fff;
 }
 
 .subscribe-row input::placeholder{

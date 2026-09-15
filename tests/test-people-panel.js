@@ -43,7 +43,8 @@ const people = (() => {
     return new Function(src + "; return {"
         + " PEOPLE_ADMIN_ACTIONS, isPeopleAction, PEOPLE_PAGE, parsePeopleRequest,"
         + " buyerView, ordersByEmail, filterPeople, buyersResponse,"
-        + " subscriberView, subscribersResponse, subscribersRequest, SUBSCRIBER_STATES };")();
+        + " subscriberView, subscribersResponse, subscribersRequest, SUBSCRIBER_STATES,"
+        + " unsubscribeRequest, deleteSubscriberRequest, deleteBuyerRequest, peopleActionResult };")();
 
 })();
 
@@ -234,6 +235,113 @@ console.log("\n[7] Дія доступна лише тому, хто має пр
             admin_action: "people-buyers",
             search: "я".repeat(500),
         }).params.search.length === 120);
+}
+
+console.log("\n[N] Відписати й видалити — з панелі, а не з чужих кабінетів");
+{
+    // ЧОМУ ЦЕ ТУТ. Відписати можна було й у MailerLite, видалити — у
+    // Supabase. Але це два чужі кабінети з різними списками: щоб
+    // виконати одне прохання, людину доводилось шукати двічі.
+
+    check("обидві дії оголошені",
+        people.PEOPLE_ADMIN_ACTIONS.includes("people-unsubscribe")
+        && people.PEOPLE_ADMIN_ACTIONS.includes("people-delete"));
+
+    // ЗА ІДЕНТИФІКАТОРОМ, А НЕ ЗА ПОШТОЮ. Пошта змінна: людина може
+    // змінити її між тим, як панель намалювала список, і натисканням
+    // кнопки. Ідентифікатор прийшов у тому ж рядку, що перед очима.
+    check("без id дія не проходить",
+        people.parsePeopleRequest({ admin_action: "people-unsubscribe" }).ok === false);
+
+    check("пошта нормалізується до нижнього регістру",
+        people.parsePeopleRequest({
+            admin_action: "people-unsubscribe", id: "7", email: "  A@B.COM ",
+        }).params.email === "a@b.com");
+
+    // Покупець і підписник живуть у різних системах. Вгадувати за
+    // виглядом ідентифікатора — найкоротший шлях видалити не того.
+    check("видалення без «кого саме» відхиляється",
+        people.parsePeopleRequest({ admin_action: "people-delete", id: "7" }).ok === false);
+
+    check("чужий kind теж відхиляється",
+        people.parsePeopleRequest({
+            admin_action: "people-delete", id: "7", kind: "все",
+        }).ok === false);
+
+    ["buyer", "subscriber"].forEach(kind =>
+        check(`kind ${kind} приймається`,
+            people.parsePeopleRequest({ admin_action: "people-delete", id: "7", kind }).ok === true));
+
+    // ВІДПИСКА — ЗМІНА СТАНУ, А НЕ ВИДАЛЕННЯ.
+    //
+    // Відписаний лишається в списку зі станом "unsubscribed", і
+    // MailerLite більше не надішле йому листа навіть після повторного
+    // імпорту. Видалений — надішле. Тобто саме відписка виконує
+    // прохання «не пишіть мені більше».
+    const off = people.unsubscribeRequest("secret", "42");
+
+    check("відписка — PUT, а не DELETE", off.method === "PUT");
+
+    check("  і саме зміна стану", off.body && off.body.status === "unsubscribed");
+
+    // POST /api/subscribers створив би підписника, якби id не знайшовся:
+    // одруківка додала б у список нову людину замість відписати стару.
+    check("  адресуємось за id, а не поштою",
+        off.url === "https://connect.mailerlite.com/api/subscribers/42");
+
+    check("без ключа запиту немає", people.unsubscribeRequest("", "42") === null);
+
+    check("без id теж", people.unsubscribeRequest("secret", "") === null);
+
+    const del = people.deleteSubscriberRequest("secret", "4 2");
+
+    check("видалення підписника — DELETE", del.method === "DELETE");
+
+    check("  id екранується", del.url.endsWith("/4%202"));
+
+    // Ключ service_role живе ЛИШЕ в секретах функції — саме тому
+    // видалення акаунту можливе тільки тут, а не в кабінеті покупця.
+    const buyer = people.deleteBuyerRequest("https://x.supabase.co/", "srv", "u1");
+
+    check("видалення акаунту йде в Admin API",
+        buyer.url === "https://x.supabase.co/auth/v1/admin/users/u1");
+
+    check("  зі службовим ключем", buyer.headers.apikey === "srv");
+
+    check("без ключа не будується", people.deleteBuyerRequest("https://x.co", "", "u1") === null);
+
+    // ЗАМОВЛЕННЯ НЕ ЧІПАЄМО: вони потрібні для обліку, і за їхнім
+    // номером людину знайдуть навіть без кабінету.
+    check("замовлення при видаленні акаунту лишаються",
+        !/orders\?[^`"']*method: "DELETE"/.test(source)
+        && /profiles\?id=eq\.\$\{encodeURIComponent\(params\.id\)\}`, \{ method: "DELETE" \}/.test(source));
+
+    check("профіль, адреси й обране прибираються",
+        /favorites\?user_id=eq/.test(source)
+        && /addresses\?user_id=eq/.test(source));
+
+    // Мети досягнуто — отже, не помилка.
+    check("вже видаленого не вважаємо помилкою",
+        /response\.status !== 404/.test(source));
+
+    // ПАНЕЛЬ: кнопки, підтвердження, чесний текст.
+    check("кнопки є в обох таблицях",
+        /actionButton\("buyer", person, "people-delete"/.test(panel)
+        && /actionButton\("subscriber", person, "people-unsubscribe"/.test(panel));
+
+    check("вже відписаному «Відписати» не показуємо",
+        /person\.status === "unsubscribed"/.test(panel));
+
+    check("перед дією питаємо", /window\.confirm\(confirmText\(/.test(panel));
+
+    // Найважливіше в тексті підтвердження: «відписати» звучить
+    // м'якше, ніж є, а «видалити» — жорсткіше, хоча насправді
+    // навпаки. Про це сказано прямо.
+    check("сказано, що видаленого імпорт підпише знову",
+        /видаленого повторний імпорт/.test(panel));
+
+    check("сказано, що замовлення лишаються",
+        /Замовлення лишаться/.test(panel));
 }
 
 console.log(failures ? `\n✗ провалено перевірок: ${failures}\n` : "\n✓ усі перевірки пройдено\n");

@@ -17,6 +17,12 @@ create table if not exists public.addresses (
     branch_number     text,
     postomat_number   text,
     courier_address   text,
+    -- Перевізник і відділення для способу «Інша пошта» (Укрпошта,
+    -- Meest) одним рядком. Окремо від courier_address навмисно:
+    -- там вулиця для кур'єра Нової пошти, тут чужий перевізник, і
+    -- злиті в одне поле вони зробили б з «Укрпошти» «Кур'єра».
+    -- Для вже створених таблиць — migrations/031-other-carrier.sql.
+    other_carrier     text,
     is_default        boolean not null default false,
     created_at        timestamptz not null default now()
 );
