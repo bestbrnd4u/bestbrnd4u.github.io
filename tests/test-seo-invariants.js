@@ -294,6 +294,58 @@ console.log("\n[6] robots.txt відповідає середовищу");
     }
 }
 
+console.log("\n[6a] Закрита сторінка закрита сама, а не лише в robots.txt");
+{
+    // ДВІ РІЗНІ ЗАБОРОНИ, І ОДНА З НИХ ЗНИКАЄ НА ПРОДІ.
+    //
+    // scripts/apply-site-env.js додає <meta robots="noindex,nofollow">
+    // УСЬОМУ дев-середовищу — і прибирає його під час продової
+    // збірки. Тому сторінка, у якої свого тега немає, на деві
+    // виглядає закритою, а на бойовому сайті відкрита.
+    //
+    // robots.txt це не рятує: Disallow забороняє ОБХІД, а не показ.
+    // Якщо на адресу десь поставлять посилання, Google має право
+    // показати її в результатах — без опису, самим рядком адреси.
+    // Для /thanks це номер замовлення, для /newsletter-confirm —
+    // токен чужої підписки.
+    //
+    // Саме на цьому впав синк 14.09.2026: сторінка підтвердження
+    // підписки пройшла тести локально (дев-збірка) і провалилась у
+    // CI (прод-збірка).
+    //
+    // СПИСОК БЕРЕМО ЗІ СКРИПТА, А НЕ ПИШЕМО РУКАМИ. Інакше наступна
+    // закрита сторінка додасться в robots.txt, а сюди — ні, і
+    // перевірка мовчки перестане її стерегти.
+    const envScript = read("scripts/apply-site-env.js");
+
+    const closed = [...envScript.matchAll(/"Disallow: (\/[^"]*)"/g)]
+        .map(m => m[1])
+        // /admin/ — тека, а не сторінка; її власні noindex стережуть
+        // окремі набори (test-admin-orders-panel, -reviews-panel).
+        .filter(p => !p.endsWith("/"))
+        .map(p => p.replace(/^\//, "") + ".html");
+
+    check(`закритих сторінок у списку: ${closed.length}`, closed.length >= 5, closed.join(" "));
+
+    closed.forEach(file => {
+
+        const full = path.join(ROOT, file);
+
+        if (!fs.existsSync(full)) {
+            check(`${file} існує`, false);
+            return;
+        }
+
+        // Саме «noindex,follow» — тег, який переживає обидві збірки.
+        // «noindex,nofollow» тут не рахується: його ставить і знімає
+        // сама збірка.
+        check(`${file} має власний noindex`,
+            /<meta name="robots" content="noindex,follow">/.test(read(file)),
+            (read(file).match(/<meta name="robots"[^>]*>/g) || ["немає жодного"]).join(" | "));
+
+    });
+}
+
 console.log("\n[6b] Пошуковики дізнаються про новину самі");
 {
     // sitemap відповідає на «що є на сайті», але не на «коли про це
