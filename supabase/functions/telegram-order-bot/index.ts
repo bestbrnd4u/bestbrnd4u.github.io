@@ -5559,6 +5559,24 @@ function isServiceEmail(email) {
 
 }
 
+// Telegram-id, захований у службовій адресі.
+//
+// Потрібен в одному місці й на один раз: перед тим як міняти пошту,
+// треба переконатись, що зв'язок «цей Telegram — цей акаунт» уже
+// записаний. Інакше після зміни адреси вхід через бота не знайде
+// акаунт і створить другий (див. userForTelegramId в index.ts).
+function telegramIdFromEmail(email) {
+
+    const clean = String(email ?? "").trim().toLowerCase();
+
+    if (!isServiceEmail(clean)) return "";
+
+    const found = clean.match(/^tg(\d+)\./);
+
+    return found ? found[1] : "";
+
+}
+
 // Ім'я для профілю. Telegram дає окремі поля, але прізвища може й не
 // бути — тоді лишається одне ім'я, і це нормально.
 function telegramName(row) {
@@ -9108,6 +9126,24 @@ async function handleEmailAddStart(request: Request, body: Record<string, any>):
     return adminJson({ ok: false, state: "taken" }, 200, origin);
   }
 
+  // НЕ ПОЧИНАЄМО, ПОКИ АКАУНТ НЕ ПРИВ'ЯЗАНИЙ ДО TELEGRAM.
+  //
+  // Після зміни пошти службової адреси в базі не лишиться, і вхід
+  // через бота шукатиме акаунт уже за telegram_id. Якщо зв'язку
+  // немає — не знайде й створить ДРУГИЙ, порожній кабінет, а
+  // замовлення й адреси лишаться в першому.
+  //
+  // Зв'язок пишеться при вході (стовпець user_id, міграція 034), тож
+  // «немає» означає рівно одне: міграцію ще не застосували. Краще
+  // чесно не почати, ніж роздвоїти людині акаунт.
+  if (!await linkedToTelegram(user)) {
+
+    console.error("Додавання пошти: немає зв'язку telegram_logins.user_id (міграція 034)");
+
+    return adminJson({ ok: false, state: "not_ready" }, 200, origin);
+
+  }
+
   const payload = emailAddPayload(user.id, email, Date.now());
 
   if (!payload) {
@@ -9176,6 +9212,50 @@ async function handleEmailAddConfirm(request: Request, body: Record<string, any>
   }
 
   return adminJson({ ok: true, state: "confirmed", email: data!.email }, 200, origin);
+
+}
+
+// Чи записано, що цей акаунт належить цьому Telegram.
+//
+// Якщо рядок спроби входу є, а user_id у ньому порожній (людина
+// входила ще до міграції 034) — дописуємо. Це той самий зв'язок, що
+// й при вході, просто дописаний пізніше.
+async function linkedToTelegram(user: Record<string, any>): Promise<boolean> {
+
+  const telegramId = telegramIdFromEmail(user?.email);
+
+  if (!telegramId) return false;
+
+  try {
+
+    const found = await supabaseRest(
+      `telegram_logins?telegram_id=eq.${telegramId}`
+      + `&select=token,user_id&order=created_at.desc&limit=1`
+    );
+
+    // Стовпця ще немає — тобто міграцію не застосували.
+    if (!found.ok) return false;
+
+    const row = (await found.json().catch(() => []))[0] ?? null;
+
+    if (!row?.token) return false;
+
+    if (row.user_id) return String(row.user_id) === String(user.id);
+
+    const written = await supabaseRest(
+      `telegram_logins?token=eq.${encodeURIComponent(row.token)}`,
+      { method: "PATCH", body: JSON.stringify({ user_id: user.id }) },
+    );
+
+    return written.ok;
+
+  } catch (error) {
+
+    console.error("Не вдалося перевірити зв'язок з Telegram:", error);
+
+    return false;
+
+  }
 
 }
 

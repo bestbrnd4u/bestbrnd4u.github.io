@@ -54,7 +54,7 @@ const tg = loadModule("supabase/functions/telegram-order-bot/telegram-login.js",
     "telegramEmail", "telegramName", "LOGIN_TTL_MINUTES", "LOGIN_PREFIX",
     "TELEGRAM_EMAIL_DOMAIN", "isServiceEmail", "EMAIL_ADD_TTL_MINUTES", "cleanNewEmail",
     "emailAddPayload", "readEmailAddPayload", "emailAddVerdict",
-    "packEmailAddToken", "unpackEmailAddToken", "emailAddUrl",
+    "packEmailAddToken", "unpackEmailAddToken", "emailAddUrl", "telegramIdFromEmail",
 ]);
 
 const fmt = loadModule("supabase/functions/telegram-order-bot/format.js", [
@@ -524,6 +524,26 @@ console.log("\n[11] Вхід через Telegram знаходить акаунт
     // і вхід має піти першим шляхом.
     check("видалений акаунт не рахується за знайдений",
         /if \(!response\.ok\) return null;[\s\S]{0,260}user\?\.id && user\?\.email \? user : null/.test(src));
+
+    // ПОРЯДОК ДІЙ ВЛАСНИКА МІГ БИ ВСЕ ЗІПСУВАТИ.
+    //
+    // Зв'язок пишеться при вході. Якби людина додала пошту РАНІШЕ, ніж
+    // відбувся перший вхід після міграції 034, службової адреси вже не
+    // було б, а зв'язку ще не було б — і наступний вхід створив би
+    // другий кабінет. Тому без зв'язку не починаємо взагалі.
+    check("без зв'язку з Telegram пошту додавати не починаємо",
+        /if \(!await linkedToTelegram\(user\)\) \{[\s\S]{0,320}not_ready/.test(src));
+
+    check("зв'язок дописується, якщо входили ще до міграції",
+        /if \(row\.user_id\) return String\(row\.user_id\) === String\(user\.id\)/.test(src)
+        && /method: "PATCH", body: JSON\.stringify\(\{ user_id: user\.id \}\)/.test(src));
+
+    check("telegram_id дістаємо зі службової адреси",
+        tg.telegramIdFromEmail("tg279041622." + "a".repeat(32) + "@telegram.bestbrnd4u.com") === "279041622"
+        && tg.telegramIdFromEmail("olena@gmail.com") === "");
+
+    check("сайт має що сказати, коли функція не почала",
+        /not_ready:/.test(read("assets/js/account.js")));
 }
 
 console.log(failures === 0

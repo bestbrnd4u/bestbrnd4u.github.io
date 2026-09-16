@@ -176,6 +176,24 @@ export function isServiceEmail(email) {
 
 }
 
+// Telegram-id, захований у службовій адресі.
+//
+// Потрібен в одному місці й на один раз: перед тим як міняти пошту,
+// треба переконатись, що зв'язок «цей Telegram — цей акаунт» уже
+// записаний. Інакше після зміни адреси вхід через бота не знайде
+// акаунт і створить другий (див. userForTelegramId в index.ts).
+export function telegramIdFromEmail(email) {
+
+    const clean = String(email ?? "").trim().toLowerCase();
+
+    if (!isServiceEmail(clean)) return "";
+
+    const found = clean.match(/^tg(\d+)\./);
+
+    return found ? found[1] : "";
+
+}
+
 // Ім'я для профілю. Telegram дає окремі поля, але прізвища може й не
 // бути — тоді лишається одне ім'я, і це нормально.
 export function telegramName(row) {
