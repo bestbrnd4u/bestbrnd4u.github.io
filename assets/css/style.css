@@ -3119,6 +3119,78 @@ body.mobile-filters-open .scroll-top{
     font-size:12px;
 }
 
+/* СМУГА БРЕНДІВ — ТІ САМІ ПЛАШКИ, ЩО НА ХАБІ, АЛЕ ФІЛЬТР.
+
+   Виглядають однаково навмисно: на /brands/ перелік лежить у розмітці
+   (там справжні посилання для пошукових роботів), у каталозі його
+   малює catalog.js. Поведінка в обох однакова — клік кладе бренд у
+   фільтр, — і виглядати по-різному вони не мають права.
+
+   Тому розміри й форма повторюють .taxonomy-hub-list li. Дві окремі
+   картинки того самого розійшлися б на першій же правці. */
+.brand-strip{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin:-8px 0 28px;
+}
+
+.brand-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:8px 14px;
+    border-radius:50px;
+    border:1.5px solid var(--gray200);
+    background:#fff;
+    font-size:14px;
+    font-weight:600;
+    color:var(--gray900);
+    text-decoration:none;
+    transition:border-color 160ms ease, color 160ms ease, background 160ms ease;
+}
+
+.brand-chip-count{
+    color:var(--gray500);
+    font-weight:700;
+    font-size:12px;
+}
+
+@media (hover:hover) and (pointer:fine){
+.brand-chip:hover{
+    border-color:var(--secondary);
+    color:var(--secondary);
+}
+}
+
+/* ОБРАНИЙ БРЕНД МУСИТЬ БУТИ ВИДНО З ОДНОГО ПОГЛЯДУ.
+
+   Смуга лишається на екрані після вибору — і якщо обране нічим не
+   відрізняється від необраного, людина не зрозуміє, чому список
+   товарів звузився. */
+.brand-chip.active,
+.taxonomy-hub-list li:has(> [data-brand-chip].active){
+    border-color:var(--secondary);
+    background:var(--secondary);
+    color:#fff;
+}
+
+.brand-chip.active .brand-chip-count,
+.taxonomy-hub-list li:has(> [data-brand-chip].active) .taxonomy-count{
+    color:rgba(255,255,255,.75);
+}
+
+.taxonomy-hub-list li:has(> [data-brand-chip].active) a{
+    color:#fff;
+}
+
+/* Бренда, якого за поточних фільтрів не лишилось, не ховаємо: зникла
+   плашка — це зниклий орієнтир. Гасимо, щоб видно було, що там нуль. */
+.brand-chip.unavailable,
+.taxonomy-hub-list li:has(> [data-brand-chip].unavailable){
+    opacity:.45;
+}
+
 /* Перелік товарів у розмітці до JS.
 
    Його бачить пошуковий робот і людина з вимкненим JS; щойно

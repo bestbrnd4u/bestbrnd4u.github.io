@@ -93,7 +93,7 @@ window.CATALOG_PRESET = {};
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=7996d1e3">
+<link rel="stylesheet" href="/assets/css/style.css?v=6afd3096">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3" defer></script>
 
@@ -175,91 +175,105 @@ window.CATALOG_PRESET = {};
 <nav class="taxonomy-hub" aria-label="Бренди">
     <ul class="taxonomy-hub-list">
         <li>
-            <a href="/brands/adidas-by-stella-mccartney/">Adidas by Stella Mccartney</a>
+            <a href="/brands/adidas-by-stella-mccartney/" data-brand-chip="Adidas by Stella Mccartney">Adidas by Stella Mccartney</a>
             <span class="taxonomy-count">1</span>
         </li>
         <li>
-            <a href="/brands/alain-mikli/">Alain Mikli</a>
+            <a href="/brands/alain-mikli/" data-brand-chip="Alain Mikli">Alain Mikli</a>
             <span class="taxonomy-count">1</span>
         </li>
         <li>
-            <a href="/brands/armani-exchange/">Armani Exchange</a>
+            <a href="/brands/armani-exchange/" data-brand-chip="Armani Exchange">Armani Exchange</a>
             <span class="taxonomy-count">3</span>
         </li>
         <li>
-            <a href="/brands/balenciaga/">Balenciaga</a>
+            <a href="/brands/balenciaga/" data-brand-chip="Balenciaga">Balenciaga</a>
             <span class="taxonomy-count">2</span>
         </li>
         <li>
-            <a href="/brands/burberry/">Burberry</a>
+            <a href="/brands/burberry/" data-brand-chip="Burberry">Burberry</a>
             <span class="taxonomy-count">1</span>
         </li>
         <li>
-            <a href="/brands/coach/">Coach</a>
+            <a href="/brands/coach/" data-brand-chip="Coach">Coach</a>
             <span class="taxonomy-count">18</span>
         </li>
         <li>
-            <a href="/brands/gucci/">Gucci</a>
+            <a href="/brands/gucci/" data-brand-chip="Gucci">Gucci</a>
             <span class="taxonomy-count">1</span>
         </li>
         <li>
-            <a href="/brands/invicta/">Invicta</a>
+            <a href="/brands/invicta/" data-brand-chip="Invicta">Invicta</a>
             <span class="taxonomy-count">1</span>
         </li>
         <li>
-            <a href="/brands/jacquemus/">Jacquemus</a>
+            <a href="/brands/jacquemus/" data-brand-chip="Jacquemus">Jacquemus</a>
             <span class="taxonomy-count">2</span>
         </li>
         <li>
-            <a href="/brands/jimmy-choo/">Jimmy Choo</a>
+            <a href="/brands/jimmy-choo/" data-brand-chip="Jimmy Choo">Jimmy Choo</a>
             <span class="taxonomy-count">1</span>
         </li>
         <li>
-            <a href="/brands/jw-pei/">JW PEI</a>
+            <a href="/brands/jw-pei/" data-brand-chip="JW PEI">JW PEI</a>
             <span class="taxonomy-count">4</span>
         </li>
         <li>
-            <a href="/brands/lacoste/">Lacoste</a>
+            <a href="/brands/lacoste/" data-brand-chip="Lacoste">Lacoste</a>
             <span class="taxonomy-count">10</span>
         </li>
         <li>
-            <a href="/brands/love-moschino/">Love Moschino</a>
+            <a href="/brands/love-moschino/" data-brand-chip="Love Moschino">Love Moschino</a>
             <span class="taxonomy-count">2</span>
         </li>
         <li>
-            <a href="/brands/marc-jacobs/">Marc Jacobs</a>
+            <a href="/brands/marc-jacobs/" data-brand-chip="Marc Jacobs">Marc Jacobs</a>
             <span class="taxonomy-count">23</span>
         </li>
         <li>
-            <a href="/brands/mathey-tissot/">Mathey-Tissot</a>
+            <a href="/brands/mathey-tissot/" data-brand-chip="Mathey-Tissot">Mathey-Tissot</a>
             <span class="taxonomy-count">3</span>
         </li>
         <li>
-            <a href="/brands/michael-kors/">Michael Kors</a>
+            <a href="/brands/michael-kors/" data-brand-chip="Michael Kors">Michael Kors</a>
             <span class="taxonomy-count">17</span>
         </li>
         <li>
-            <a href="/brands/prada/">Prada</a>
+            <a href="/brands/prada/" data-brand-chip="Prada">Prada</a>
             <span class="taxonomy-count">1</span>
         </li>
         <li>
-            <a href="/brands/ray-ban/">Ray-Ban</a>
+            <a href="/brands/ray-ban/" data-brand-chip="Ray-Ban">Ray-Ban</a>
             <span class="taxonomy-count">4</span>
         </li>
         <li>
-            <a href="/brands/saint-laurent/">Saint Laurent</a>
+            <a href="/brands/saint-laurent/" data-brand-chip="Saint Laurent">Saint Laurent</a>
             <span class="taxonomy-count">1</span>
         </li>
         <li>
-            <a href="/brands/tissot/">Tissot</a>
+            <a href="/brands/tissot/" data-brand-chip="Tissot">Tissot</a>
             <span class="taxonomy-count">6</span>
         </li>
         <li>
-            <a href="/brands/tory-burch/">Tory Burch</a>
+            <a href="/brands/tory-burch/" data-brand-chip="Tory Burch">Tory Burch</a>
             <span class="taxonomy-count">1</span>
         </li>
     </ul>
 </nav>
+
+<!-- СМУГА БРЕНДІВ — ФІЛЬТР, А НЕ ПЕРЕЛІК ПОСИЛАНЬ.
+
+     Була лише на /brands/, і кожна назва там вела на окрему сторінку
+     бренду. Тобто вибрати два бренди одразу було нічим, а в «Новинках»
+     і «Акціях» переліку не було взагалі.
+
+     Тепер плашки живуть у самому каталозі: натиснув — бренд пішов у
+     фільтр, смуга лишилась на місці, можна додати ще один або зняти.
+     І оскільки це частина каталогу, вона сама з'являється в розділах:
+     ?section=new і ?section=sale показують бренди СВОГО розділу.
+
+     Малює її catalog.js, fillBrandStrip(). -->
+<nav class="brand-strip" id="brandStrip" aria-label="Бренди" hidden></nav>
 
 <div class="catalog-filters-bar">
 
@@ -714,7 +728,7 @@ Telegram
 <a href="/catalog">Всі товари</a>
 <a href="/catalog?section=new">Новинки</a>
 <a href="/catalog?section=sale" class="sale-text">Акції</a>
-<a href="#">Бренди</a>
+<a href="/brands/">Бренди</a>
 </div>
 <div>
 <h3>Зв'яжіться з нами</h3>
@@ -769,7 +783,7 @@ aria-label="Нагору">
 <script src="/assets/js/ui.js?v=e015b069" defer></script>
 <script src="/assets/js/stock.js?v=85fa4aad" defer></script>
 <script src="/assets/js/live-stock.js?v=ca9027dd" defer></script>
-<script src="/assets/js/catalog.js?v=074fdfeb" defer></script>
+<script src="/assets/js/catalog.js?v=1f95290d" defer></script>
 </body>
 
 </html>

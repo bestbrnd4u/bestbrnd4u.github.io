@@ -47,7 +47,8 @@ let code=fs.readFileSync(path.join(ROOT,"assets/js/catalog.js"),"utf8");
 code+=`
 window.__t={ setProducts(l){products=l;}, fillCatalogSidebar:d=>fillCatalogSidebar(d),
   toggleCategory:n=>toggleCategory(n), get selectedCategories(){return selectedCategories;},
-  get selectedBrands(){return selectedBrands;}, refreshSidebarCounts:()=>refreshSidebarCounts() };`;
+  get selectedBrands(){return selectedBrands;}, refreshSidebarCounts:()=>refreshSidebarCounts(),
+  fillBrandStrip:()=>fillBrandStrip(), refreshBrandStrip:()=>refreshBrandStrip() };`;
 window.eval(code);
 
 let failures=0;
@@ -173,6 +174,154 @@ console.log("\n[6] Число відділу не розходиться з ре
         ["Сумки", "Взуття", "Аксесуари"].reduce((s, title) => s + departmentCount(title), 0) === allCount());
 
     window.__t.selectedBrands.delete("X");
+}
+
+console.log("\n[7] Смуга брендів — фільтр, а не перелік посилань");
+{
+    // ЩО БУЛО. Перелік брендів жив лише на /brands/, і кожна назва
+    // там вела на ОКРЕМУ сторінку бренду. Обрати два бренди одразу
+    // було нічим: перехід скидав усе, що обрано. А в «Новинках» і
+    // «Акціях» переліку не було взагалі.
+    const strip = document.getElementById("brandStrip");
+
+    const chips = () => [...document.querySelectorAll("[data-brand-chip]")];
+
+    const chip = name => chips().find(c => c.dataset.brandChip === name);
+
+    // Попередні розділи лишили обрану категорію — з нею база для
+    // перерахунку звузилась би, і числа в плашках були б не про те.
+    window.__t.selectedCategories.clear();
+
+    rebuild();
+    window.__t.fillBrandStrip();
+
+    check("смуга є в розмітці каталогу", Boolean(strip));
+
+    check("плашки намальовані з товарів", chips().length === 3,
+        chips().map(c => c.dataset.brandChip).join(", "));
+
+    // Без цієї перевірки наступні рядки падають СТЕКОМ замість чесного
+    // ✗, і з журналу не видно, що саме зламалось.
+    if (!chip("X")) {
+
+        check("плашки є, далі перевіряти нічого", false, "смуга порожня");
+
+    } else {
+
+    check("і видно, скільки чого",
+        chip("X").querySelector(".brand-chip-count").textContent === "2");
+
+    // ГОЛОВНЕ: клік фільтрує, а не веде на іншу сторінку.
+    window.__t.refreshBrandStrip();
+
+    chip("X").dispatchEvent(new window.MouseEvent("click", { bubbles: true, cancelable: true }));
+
+    check("клік поклав бренд у фільтр", window.__t.selectedBrands.has("X"));
+
+    check("смуга лишилась на місці", chips().length === 3);
+
+    check("обраний бренд видно", chip("X").classList.contains("active"));
+
+    // Другий бренд додається, а не замінює перший — заради цього все
+    // й робилось.
+    chip("Y").dispatchEvent(new window.MouseEvent("click", { bubbles: true, cancelable: true }));
+
+    check("другий бренд додається до першого",
+        window.__t.selectedBrands.has("X") && window.__t.selectedBrands.has("Y"),
+        [...window.__t.selectedBrands].join(", "));
+
+    // І знімається тим самим кліком.
+    chip("X").dispatchEvent(new window.MouseEvent("click", { bubbles: true, cancelable: true }));
+
+    check("повторний клік знімає бренд",
+        !window.__t.selectedBrands.has("X") && window.__t.selectedBrands.has("Y"),
+        [...window.__t.selectedBrands].join(", "));
+
+    check("і плашка гасне", !chip("X").classList.contains("active"));
+
+    // ПОСИЛАННЯ ЛИШАЄТЬСЯ СПРАВЖНІМ. Хаб брендів — головне джерело
+    // внутрішніх посилань на сторінки брендів; прибрати href означало
+    // б лишити їх досяжними хіба що з sitemap.
+    check("плашка лишається посиланням на сторінку бренду",
+        chip("Y").getAttribute("href").startsWith("/brands/"),
+        chip("Y").getAttribute("href"));
+
+    // Ctrl+клік — людина свідомо відкриває в новій вкладці.
+    const before = new Set(window.__t.selectedBrands);
+
+    const ctrl = new window.MouseEvent("click", { bubbles: true, cancelable: true, ctrlKey: true });
+
+    chip("X").dispatchEvent(ctrl);
+
+    check("Ctrl+клік не чіпає фільтр",
+        window.__t.selectedBrands.size === before.size && !ctrl.defaultPrevented);
+
+    }
+
+    window.__t.selectedBrands.clear();
+
+    // СМУГУ МУСИТЬ ХТОСЬ МАЛЮВАТИ Й ОНОВЛЮВАТИ.
+    //
+    // Перевірки вище кличуть обидві функції руками — прибери виклик зі
+    // сторінки, і вони й далі зелені, а смуги на сайті немає. Тому
+    // окремо звіряємо, що виклики стоять поруч із бічним меню й
+    // перерахунком фасетів.
+    const catalogJs = fs.readFileSync(path.join(ROOT, "assets/js/catalog.js"), "utf8");
+
+    check("смуга малюється разом із бічним меню",
+        catalogJs.includes("fillCatalogSidebar(categoryDepartments);\n        fillBrandStrip();"));
+
+    check("і оновлюється разом із рештою фасетів",
+        catalogJs.includes("refreshSidebarCounts();\n        refreshBrandStrip();"));
+}
+
+console.log("\n[8] Дві смуги поруч не малюємо");
+{
+    // На /brands/ перелік уже лежить у розмітці — його пише
+    // build-taxonomy-pages.js, і там справжні посилання для пошукових
+    // роботів. Друга така сама смуга поруч була б просто дублем.
+    // Контейнера може не бути — тоді далі перевіряти нема чого, але
+    // падати стеком теж не можна: з журналу не видно, що зламалось.
+    const box = document.getElementById("brandStrip");
+
+    check("контейнер смуги на місці", Boolean(box));
+
+    if (box) {
+
+    box.hidden = true;
+    box.innerHTML = "";
+
+    const hub = document.createElement("nav");
+
+    hub.className = "taxonomy-hub";
+    hub.innerHTML = '<ul class="taxonomy-hub-list"><li>'
+        + '<a href="/brands/x/" data-brand-chip="X">X</a>'
+        + '<span class="taxonomy-count">99</span></li></ul>';
+
+    document.body.appendChild(hub);
+
+    window.__t.fillBrandStrip();
+
+    check("свою смугу не малюємо, якщо хаб уже є",
+        document.getElementById("brandStrip").hidden === true
+        && document.getElementById("brandStrip").children.length === 0);
+
+    // Але число в хабі оновлюємо: воно згенероване без жодного
+    // фільтра й після вибору бренду обіцяло б неправду.
+    window.__t.refreshBrandStrip();
+
+    check("число в хабі оновлюється",
+        hub.querySelector(".taxonomy-count").textContent === "2",
+        hub.querySelector(".taxonomy-count").textContent);
+
+    // І клік по ньому теж фільтрує, а не веде на сторінку бренду.
+    hub.querySelector("[data-brand-chip]")
+        .dispatchEvent(new window.MouseEvent("click", { bubbles: true, cancelable: true }));
+
+    check("клік у хабі теж фільтрує", window.__t.selectedBrands.has("X"));
+
+    hub.remove();
+    window.__t.selectedBrands.clear();
 }
 
 console.log(failures===0?"\n✅ Усі перевірки пройдено":`\n❌ Провалено: ${failures}`);

@@ -954,6 +954,7 @@ async function initCatalog() {
         fillCategories(categoryDepartments);
 
         fillCatalogSidebar(categoryDepartments);
+        fillBrandStrip();
 
         applyCategoryFromUrl();
 
@@ -1026,6 +1027,137 @@ function fillBrands() {
     });
 
 }
+
+// -------------------------
+// Смуга брендів над фільтрами
+//
+// НАВІЩО ВОНА
+// ------------
+// Перелік брендів жив лише на /brands/, і кожна назва там вела на
+// ОКРЕМУ сторінку бренду. Тобто обрати два бренди одразу було нічим:
+// перехід скидав усе, що обрано. А в «Новинках» і «Акціях» переліку не
+// було взагалі — хоча саме там питання «а що є від Coach» виникає
+// найчастіше.
+//
+// Тепер це фільтр. Натиснув — бренд пішов у selectedBrands, смуга
+// лишилась на місці, можна додати другий або зняти обраний. Оскільки
+// вона частина каталогу, розділи отримують її задарма: ?section=new і
+// ?section=sale показують бренди СВОГО розділу.
+//
+// ДВА ДЖЕРЕЛА ПЛАШОК, ОДНА ПОВЕДІНКА
+// -----------------------------------
+// На каталозі смугу малює ця функція. На /brands/ перелік уже лежить у
+// розмітці (його пише build-taxonomy-pages.js) — там справжні
+// посилання на сторінки брендів, і вони потрібні пошуковим роботам.
+// Другу смугу поруч не малюємо, а кліки перехоплюємо однаково: обидва
+// джерела позначені data-brand-chip.
+// -------------------------
+
+const brandStrip = document.getElementById("brandStrip");
+
+// Перелік із розмітки хаба. Якщо він є — свій не малюємо.
+function hubBrandChips() {
+
+    return [...document.querySelectorAll(".taxonomy-hub [data-brand-chip]")];
+
+}
+
+function fillBrandStrip() {
+
+    if (!brandStrip || hubBrandChips().length) return;
+
+    const scoped = sectionProducts();
+
+    const counts = new Map();
+
+    scoped.forEach(product => {
+
+        if (!product.brand) return;
+
+        counts.set(product.brand, (counts.get(product.brand) || 0) + 1);
+
+    });
+
+    if (!counts.size) return;
+
+    const names = [...counts.keys()].sort((a, b) => a.localeCompare(b, "uk"));
+
+    brandStrip.innerHTML = names.map(name =>
+        `<a class="brand-chip" href="/brands/${encodeURIComponent(latinParam(name))}/"
+            data-brand-chip="${escapeHtml(name)}">${escapeHtml(name)}<span
+            class="brand-chip-count">${counts.get(name)}</span></a>`).join("");
+
+    brandStrip.hidden = false;
+
+}
+
+// Числа й підсвітку оновлюємо разом з рештою фільтрів.
+//
+// База — filterProducts("brands"), тобто ВСІ фільтри, крім вибору
+// самого бренду: інакше після кліку по «Coach» у смузі лишився б один
+// Coach і перемкнутись було б нікуди. Те саме правило, що в бічному
+// меню категорій.
+function refreshBrandStrip() {
+
+    const chips = [...document.querySelectorAll("[data-brand-chip]")];
+
+    if (!chips.length) return;
+
+    const base = filterProducts("brands");
+
+    const counts = new Map();
+
+    base.forEach(product => {
+
+        if (!product.brand) return;
+
+        counts.set(product.brand, (counts.get(product.brand) || 0) + 1);
+
+    });
+
+    chips.forEach(chip => {
+
+        const name = chip.dataset.brandChip;
+        const count = counts.get(name) || 0;
+        const selected = selectedBrands.has(name);
+
+        const countEl = chip.querySelector(".brand-chip-count, .taxonomy-count")
+            || chip.parentElement?.querySelector(".taxonomy-count");
+
+        if (countEl) countEl.textContent = count;
+
+        chip.classList.toggle("active", selected);
+        chip.setAttribute("aria-pressed", selected ? "true" : "false");
+
+        // Обраний бренд не гасимо навіть при нулі — інакше зняти його
+        // було б нічим.
+        chip.classList.toggle("unavailable", count === 0 && !selected);
+
+    });
+
+}
+
+// Клік по плашці — це фільтр, а не перехід.
+//
+// Слухаємо на документі: плашки з'являються і з розмітки хаба, і з
+// fillBrandStrip(), а перемальовування смуги не мусить кожного разу
+// перечіпляти обробники.
+document.addEventListener("click", event => {
+
+    const chip = event.target.closest("[data-brand-chip]");
+
+    if (!chip) return;
+
+    // Ctrl/Cmd/середня кнопка — людина свідомо відкриває посилання в
+    // новій вкладці. Не заважаємо: там на неї чекає сторінка бренду,
+    // як і написано в href.
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
+
+    event.preventDefault();
+
+    toggleBrand(chip.dataset.brandChip);
+
+});
 
 function toggleBrand(value) {
 
@@ -3631,6 +3763,7 @@ function refreshFacets() {
         updateStockUI();
 
         refreshSidebarCounts();
+        refreshBrandStrip();
 
     } finally {
 
