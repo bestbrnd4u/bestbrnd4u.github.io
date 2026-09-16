@@ -705,6 +705,73 @@ export function subscribeConfirmLetter(confirmUrl, siteUrl) {
 
 }
 
+// Лист «підтвердіть пошту», який надсилаємо МИ, а не Supabase.
+//
+// НАВІЩО СВІЙ, КОЛИ В SUPABASE Є СВІЙ
+// ------------------------------------
+// Бо його лист у цьому випадку не працює. Подробиці — у
+// telegram-login.js, розділ про додавання пошти. Коротко: Supabase
+// вимагає підтвердження ще й зі СТАРОЇ адреси, а в того, хто увійшов
+// через Telegram, стара адреса службова й не існує.
+//
+// І текст у нього не про те. Людина не міняє пошту — вона додає її
+// вперше, і лист про «зміну пошти» зі згадкою службової адреси
+// пояснює рівно нічого. Цей каже, що сталось насправді.
+export function addEmailLetter(confirmUrl, email, siteUrl) {
+
+    const url = String(confirmUrl ?? "").trim();
+    const mail = String(email ?? "").trim();
+
+    if (!url || !mail) return null;
+
+    const safe = escapeHtml(url);
+
+    const body = [
+        `<div style="font-size:15px;line-height:1.6">`,
+        `У кабінеті BestBrnd4u ви входите через Telegram — пошти в акаунті `,
+        `не було. Ви попросили додати цю адресу: <strong>${escapeHtml(mail)}</strong>.`,
+        `</div>`,
+
+        `<div style="margin-top:12px;font-size:15px;line-height:1.6">`,
+        `Лишилось підтвердити, що скринька ваша. Після цього листи про `,
+        `замовлення приходитимуть сюди, а входити можна буде і через `,
+        `Telegram, і за цією адресою.`,
+        `</div>`,
+
+        // Кнопка таблицею, а не <a> з padding: Outlook ігнорує
+        // відступи на посиланні й малює його звичайним рядком тексту.
+        `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:22px auto 0">`,
+        `<tr><td style="background:#111827;border-radius:10px">`,
+        `<a href="${safe}" style="display:inline-block;padding:14px 28px;`,
+        `font-size:15px;font-weight:700;color:#ffffff;text-decoration:none">`,
+        `Підтвердити адресу`,
+        `</a>`,
+        `</td></tr>`,
+        `</table>`,
+
+        `<div style="margin-top:18px;font-size:12px;line-height:1.5;color:#6b7280;`,
+        `text-align:center;word-break:break-all">`,
+        `Кнопка не працює? Скопіюйте адресу:<br>`,
+        `<a href="${safe}" style="color:#6b7280">${safe}</a>`,
+        `</div>`,
+
+        `<div style="margin-top:22px;padding-top:18px;border-top:1px solid #e5e7eb;`,
+        `font-size:13px;line-height:1.6;color:#6b7280">`,
+        `Посилання діє годину й спрацьовує з одного акаунту — того, з якого `,
+        `адресу вписали.`,
+        `<br><br>`,
+        `Якщо це були не ви — просто видаліть лист. Доки за посиланням не `,
+        `перейшли, у вашому акаунті нічого не змінюється.`,
+        `</div>`,
+    ].join("");
+
+    return {
+        subject: "Підтвердіть email для кабінету BestBrnd4u",
+        html: letterShell("Підтвердіть адресу ✉️", body, siteUrl),
+    };
+
+}
+
 export function mailRequest(config, letter) {
 
     const to = String(config?.to || "").trim();

@@ -2302,6 +2302,15 @@ document.querySelectorAll(".account-tab").forEach(tab => {
 // "Мої дані" — завантаження та збереження профілю
 // -------------------------
 
+// Текст елемента, якого може й не бути на сторінці.
+function setText(id, text) {
+
+    const el = document.getElementById(id);
+
+    if (el) el.textContent = text;
+
+}
+
 async function loadProfile(user) {
 
     // ПОШТИ МОЖЕ Й НЕ БУТИ — І ЦЕ НЕ ПОМИЛКА.
@@ -2322,6 +2331,15 @@ async function loadProfile(user) {
     const changeBtn = document.getElementById("changeEmailBtn");
 
     if (changeBtn) changeBtn.textContent = mail ? "Змінити email" : "Додати email";
+
+    // Форма поруч теж не про «зміну»: міняти нема чого. Власник
+    // побачив «зміна email» у кабінеті, у листі й на кнопці — і
+    // резонно спитав, до чого тут зміна, якщо він зайшов Telegram.
+    setText("newEmailLabel", mail ? "Новий email" : "Ваш email");
+    setText("newEmailConfirmLabel", mail ? "Підтвердіть новий email" : "Підтвердіть email");
+    setText("emailChangeSentWhat", mail
+        ? "Пошта зміниться лише після переходу за посиланням із нього."
+        : "Пошта з'явиться в кабінеті після переходу за посиланням із нього.");
 
     const { data, error } = await supabaseClient
         .from("profiles")
@@ -2541,7 +2559,26 @@ newEmailSubmit?.addEventListener("click", async () => {
     newEmailSubmit.disabled = true;
     newEmailSubmit.textContent = "Надсилаємо...";
 
-    const { error } = await supabaseClient.auth.updateUser({ email });
+    // ДВА РІЗНІ ШЛЯХИ, І ЦЕ НЕ ПРИМХА.
+    //
+    // У кого пошта вже є, тому її МІНЯЮТЬ: Supabase надсилає лист і на
+    // нову адресу, і на стару, і зміна відбувається лише після
+    // переходу за обома. Так власник старої адреси дізнається, що
+    // акаунт у нього забирають.
+    //
+    // У кого пошти немає (вхід через Telegram), тому її ДОДАЮТЬ — і
+    // той самий механізм для нього не працює взагалі: «стара» адреса
+    // службова, скриньки за нею не існує, другий лист іде в нікуди, і
+    // зміна не відбувається ніколи. Саме це власник і побачив: лист
+    // прийшов, посилання відкрилось, а в базі лишилась службова
+    // адреса.
+    //
+    // Тому для таких акаунтів підтверджує наша функція — їй треба
+    // довести лише одне: що нова адреса твоя. Старої, яку слід було б
+    // захищати, просто немає.
+    const error = realEmail(user)
+        ? (await supabaseClient.auth.updateUser({ email })).error
+        : await addEmailThroughFunction(email);
 
     newEmailSubmit.disabled = false;
     // Напис той самий, що в розмітці. Було «Надіслати лист» — і після
@@ -2571,6 +2608,98 @@ newEmailSubmit?.addEventListener("click", async () => {
     if (emailChangeStepSent) emailChangeStepSent.hidden = false;
 
 });
+
+// Прохання до функції надіслати лист на нову адресу.
+//
+// Повертає те саме, що й Supabase, — { message } або null: так місце
+// виклику не мусить знати, яким із двох шляхів пішов лист.
+async function addEmailThroughFunction(email) {
+
+    // Токен сесії доводить функції, ХТО просить. Полю з тіла запиту
+    // вірити не можна: його вписав би будь-хто й додав свою пошту до
+    // чужого акаунту.
+    const { data: session } = await supabaseClient.auth.getSession();
+
+    const accessToken = session?.session?.access_token || "";
+
+    if (!accessToken) return { message: "Сесія завершилась. Увійдіть у кабінет ще раз" };
+
+    const { data } = await callFunction({
+        site_action: "email-add-start",
+        accessToken: accessToken,
+        email: email,
+    });
+
+    if (data?.ok) return null;
+
+    // Кожен стан — окрема ситуація, і «спробуйте ще раз» у більшості з
+    // них не допомагає.
+    const says = {
+        taken: "Ця пошта вже прив'язана до іншого акаунту",
+        bad_email: "Перевірте адресу пошти",
+        unauthorized: "Сесія завершилась. Увійдіть у кабінет ще раз",
+        mail_failed: "Не вдалося надіслати лист. Спробуйте за хвилину",
+        // Функція навмисно не почала: без зв'язку з Telegram зміна
+        // пошти роздвоїла б кабінет. Подробиці — в її журналі, а
+        // людині досить знати, що це не її помилка.
+        not_ready: "Додавання пошти тимчасово недоступне. Ми вже знаємо про це",
+    };
+
+    return { message: says[data?.state] || "Не вдалося надіслати лист. Спробуйте за хвилину" };
+
+}
+
+// -------------------------
+// Повернення за посиланням із листа «підтвердіть адресу»
+//
+// Посилання веде сюди, а не в порожню сторінку «дякуємо»: людина
+// потрапляє одразу в кабінет і бачить свою пошту там, де щойно було
+// «Немає — ви увійшли через Telegram».
+// -------------------------
+
+async function confirmAddedEmail() {
+
+    const token = new URLSearchParams(window.location.search).get("email-token");
+
+    if (!token) return;
+
+    // Адресу чистимо одразу: посилання не має лишатись в історії
+    // браузера й у полі «поділитись».
+    const clean = window.location.pathname + window.location.hash;
+
+    window.history.replaceState({}, "", clean);
+
+    const { data } = await callFunction({ site_action: "email-add-confirm", token: token });
+
+    const says = {
+        expired: "Посилання застаріло. Додайте пошту ще раз — надішлемо нове",
+        taken: "Цю пошту вже прив'язано до іншого акаунту",
+        unknown: "Посилання недійсне. Додайте пошту ще раз",
+    };
+
+    if (!data?.ok) {
+
+        showTopNotice(says[data?.state] || "Не вдалося підтвердити адресу. Спробуйте ще раз");
+
+        return;
+
+    }
+
+    showTopNotice(`Пошту ${data.email} підтверджено`);
+
+    // СЕСІЯ ВСЕ ЩЕ ПАМ'ЯТАЄ СТАРУ АДРЕСУ.
+    //
+    // Пошту помінялa функція, а не браузер: у токені, який лежить тут,
+    // і далі стоїть службова адреса. Без оновлення кабінет показував
+    // би «Немає — ви увійшли через Telegram» відразу після успішного
+    // підтвердження — тобто рівно те, на що скаржився власник.
+    await supabaseClient.auth.refreshSession();
+
+    const user = await getCurrentUser();
+
+    if (user) await loadProfile(user);
+
+}
 
 // -------------------------
 // Вкладка «Змінити пароль»
@@ -3222,6 +3351,19 @@ async function renderAuthState() {
         accountDashboard.hidden = true;
 
     }
+
+    // ПІСЛЯ loadProfile, І В ОБОХ ГІЛКАХ.
+    //
+    // Після loadProfile — бо підтвердження саме перечитує профіль
+    // наприкінці: якби воно йшло першим, loadProfile перезаписав би
+    // оновлений рядок старим, службовою адресою з ще не оновленої
+    // сесії.
+    //
+    // В обох гілках — бо посилання з листа могли відкрити в іншому
+    // браузері, де сесії немає. Підтвердженню вона й не потрібна:
+    // доводить не сесія, а підпис у самому посиланні. Пропустити його
+    // тут означало б мовчки спалити посилання, яке щойно спрацювало б.
+    await confirmAddedEmail();
 
 }
 

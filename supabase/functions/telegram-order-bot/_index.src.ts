@@ -36,7 +36,7 @@ import {
   ADMIN_ORIGINS,
 } from "./admin-api.js";
 import { cleanOrder, turnstileVerdict } from "./place-order.js";
-import { orderLetter, statusLetter, subscribeConfirmLetter, mailRequest } from "./mail.js";
+import { orderLetter, statusLetter, subscribeConfirmLetter, addEmailLetter, mailRequest } from "./mail.js";
 import {
   npRequest, parseSettlements, parseWarehouses, parseTypes, postomatTypeRef, npError,
 } from "./nova-poshta.js";
@@ -88,6 +88,9 @@ import {
 import {
   cleanLoginToken, loginCode, loginDeepLink, loginVerdict, loginStatus,
   telegramEmail, telegramName, sharedPhone, LOGIN_TTL_MINUTES,
+  isServiceEmail, cleanNewEmail, emailAddPayload, readEmailAddPayload,
+  emailAddVerdict, packEmailAddToken, unpackEmailAddToken, emailAddUrl,
+  telegramIdFromEmail,
 } from "./telegram-login.js";
 
 const TELEGRAM_BOT_TOKEN = Deno.env.get("TELEGRAM_BOT_TOKEN") ?? "";
@@ -2780,6 +2783,18 @@ async function botUsername(): Promise<string> {
 // ще один спосіб усе зламати, забувши його виставити.
 async function telegramEmailSignature(telegramId: number | string): Promise<string> {
 
+  return await signWithBotToken(`telegram-login:${telegramId}`);
+
+}
+
+// Підпис чого завгодно тим самим ключем.
+//
+// Простір імен у самому повідомленні («telegram-login:», «email-add:»)
+// обов'язковий: без нього підпис, виданий для однієї мети, підійшов би
+// для іншої. Це класична помилка — один ключ, різні значення, один
+// підпис.
+async function signWithBotToken(message: string): Promise<string> {
+
   const key = await crypto.subtle.importKey(
     "raw",
     new TextEncoder().encode(TELEGRAM_BOT_TOKEN),
@@ -2791,12 +2806,29 @@ async function telegramEmailSignature(telegramId: number | string): Promise<stri
   const mac = await crypto.subtle.sign(
     "HMAC",
     key,
-    new TextEncoder().encode(`telegram-login:${telegramId}`),
+    new TextEncoder().encode(message),
   );
 
   return [...new Uint8Array(mac)]
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
+
+}
+
+// Порівняння підписів за сталий час.
+//
+// Звичайне === зупиняється на першій різниці, і час відповіді
+// підказує, скільки знаків уже вгадано. Тут перебираємо все до кінця
+// завжди.
+function sameSignature(a: string, b: string): boolean {
+
+  if (a.length !== b.length) return false;
+
+  let diff = 0;
+
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+
+  return diff === 0;
 
 }
 
@@ -3112,28 +3144,48 @@ async function handleTelegramLoginStatus(request: Request, body: Record<string, 
     return adminJson({ ok: false, state: "used" }, 200, origin);
   }
 
+  // КОГО ВПУСКАТИ — ВИРІШУЄ telegram_id, А НЕ ПОШТА.
+  //
+  // Раніше користувач шукався за службовою адресою tg<id>.<підпис>@…
+  // І доки пошта не мінялась, це працювало. А щойно людина додавала
+  // свою — адреса в базі ставала іншою, службової не знаходилось, і
+  // наступний вхід через Telegram створював ДРУГИЙ, порожній акаунт.
+  // Замовлення, адреси й обране лишались у першому, невидимі.
+  //
+  // Тому спершу дивимось, чи входила вже ця сама людина: у попередній
+  // спробі записаний user_id. Знайшли — беремо ЇЇ ПОТОЧНУ пошту, хоч
+  // яка вона тепер.
+  const known = await userForTelegramId(row.telegram_id);
+
   const signature = await telegramEmailSignature(row.telegram_id);
 
-  const email = telegramEmail(row.telegram_id, signature);
+  const email = known?.email || telegramEmail(row.telegram_id, signature);
 
   if (!email) {
     return adminJson({ ok: false, state: "error" }, 200, origin);
   }
 
-  // Користувача створюємо, якщо його ще немає. Помилку «вже існує»
-  // ігноруємо навмисно: це і є повторний вхід тієї самої людини.
-  await supabaseAuthAdmin("users", {
-    method: "POST",
-    body: JSON.stringify({
-      email,
-      email_confirm: true,
-      user_metadata: {
-        full_name: telegramName(row),
-        telegram_id: row.telegram_id,
-        telegram_username: row.username ?? null,
-      },
-    }),
-  });
+  // Створюємо, лише якщо це перший вхід. Для відомого користувача
+  // POST зі службовою адресою створив би саме той дублікат, від якого
+  // ми щойно пішли.
+  if (!known) {
+
+    // Помилку «вже існує» ігноруємо навмисно: це і є повторний вхід
+    // тієї самої людини, чия пошта ще службова.
+    await supabaseAuthAdmin("users", {
+      method: "POST",
+      body: JSON.stringify({
+        email,
+        email_confirm: true,
+        user_metadata: {
+          full_name: telegramName(row),
+          telegram_id: row.telegram_id,
+          telegram_username: row.username ?? null,
+        },
+      }),
+    });
+
+  }
 
   // Сесію видає сам Supabase: ми лише просимо одноразовий токен і
   // віддаємо його сторінці. Свої сесії не підписуємо й не вигадуємо.
@@ -3183,6 +3235,292 @@ async function handleTelegramLoginStatus(request: Request, body: Record<string, 
   }
 
   return adminJson({ ok: true, state: "confirmed", tokenHash: hash }, 200, origin);
+
+}
+
+// Той самий користувач, що входив цим Telegram раніше.
+//
+// ЧОМУ БЕЗ ОКРЕМОЇ ТАБЛИЦІ. Зв'язок уже є: у рядку спроби входу
+// лежить user_id, якому ту спробу зарахували (міграція 034). Беремо
+// найсвіжіший такий рядок для цього telegram_id.
+//
+// Порожньо буває у двох випадках, і обидва законні: перший вхід
+// узагалі, або вхід до того, як застосували міграцію 034. Тоді нижче
+// спрацює старий шлях зі службовою адресою — він і далі правильний
+// для тих, хто пошти не додавав.
+async function userForTelegramId(telegramId: unknown): Promise<Record<string, any> | null> {
+
+  const id = String(telegramId ?? "").replace(/\D/g, "");
+
+  if (!id) return null;
+
+  try {
+
+    const found = await supabaseRest(
+      `telegram_logins?telegram_id=eq.${id}&user_id=not.is.null`
+      + `&select=user_id&order=created_at.desc&limit=1`
+    );
+
+    if (!found.ok) return null;
+
+    const userId = (await found.json().catch(() => []))[0]?.user_id ?? "";
+
+    if (!userId) return null;
+
+    const response = await supabaseAuthAdmin(`admin/users/${encodeURIComponent(userId)}`);
+
+    // Акаунт могли видалити — тоді це вже не «той самий користувач»,
+    // і вхід має піти першим шляхом і створити новий.
+    if (!response.ok) return null;
+
+    const user = await response.json().catch(() => null);
+
+    return user?.id && user?.email ? user : null;
+
+  } catch (error) {
+
+    console.error("Не вдалося знайти акаунт за telegram_id:", error);
+
+    return null;
+
+  }
+
+}
+
+// -------------------------
+// Додати пошту до акаунту, який увійшов через Telegram
+//
+// Чому це робимо самі, а не через Supabase, — у telegram-login.js,
+// розділ «Додавання пошти». Коротко: Supabase вимагає підтвердження
+// ще й зі старої адреси, а вона в нас службова й не існує, тож зміна
+// не відбувається ніколи.
+// -------------------------
+
+// Крок 1: кабінет просить надіслати лист на нову адресу.
+async function handleEmailAddStart(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  const email = cleanNewEmail(body?.email);
+
+  if (!email) {
+    return adminJson({ ok: false, state: "bad_email" }, 200, origin);
+  }
+
+  // ХТО ПРОСИТЬ — ПИТАЄМО В SUPABASE, А НЕ В САЙТА.
+  //
+  // Сайт надсилає свій токен сесії, ми показуємо його Supabase і
+  // отримуємо користувача. Вірити полю «user_id» із тіла запиту не
+  // можна: його вписав би будь-хто й додав пошту до чужого акаунту.
+  const user = await userFromAccessToken(body?.accessToken);
+
+  if (!user?.id) {
+    return adminJson({ ok: false, state: "unauthorized" }, 200, origin);
+  }
+
+  // У кого пошта СПРАВЖНЯ, той іде звичайним шляхом Supabase: там
+  // лист на стару адресу доходить, і подвійне підтвердження працює
+  // так, як задумано. Підміняти його своїм — послаблювати захист.
+  if (!isServiceEmail(user.email)) {
+    return adminJson({ ok: false, state: "not_service" }, 200, origin);
+  }
+
+  if (await emailTaken(email)) {
+    return adminJson({ ok: false, state: "taken" }, 200, origin);
+  }
+
+  // НЕ ПОЧИНАЄМО, ПОКИ АКАУНТ НЕ ПРИВ'ЯЗАНИЙ ДО TELEGRAM.
+  //
+  // Після зміни пошти службової адреси в базі не лишиться, і вхід
+  // через бота шукатиме акаунт уже за telegram_id. Якщо зв'язку
+  // немає — не знайде й створить ДРУГИЙ, порожній кабінет, а
+  // замовлення й адреси лишаться в першому.
+  //
+  // Зв'язок пишеться при вході (стовпець user_id, міграція 034), тож
+  // «немає» означає рівно одне: міграцію ще не застосували. Краще
+  // чесно не почати, ніж роздвоїти людині акаунт.
+  if (!await linkedToTelegram(user)) {
+
+    console.error("Додавання пошти: немає зв'язку telegram_logins.user_id (міграція 034)");
+
+    return adminJson({ ok: false, state: "not_ready" }, 200, origin);
+
+  }
+
+  const payload = emailAddPayload(user.id, email, Date.now());
+
+  if (!payload) {
+    return adminJson({ ok: false, state: "error" }, 200, origin);
+  }
+
+  const token = packEmailAddToken(payload, await signWithBotToken(`email-add:${payload}`));
+
+  const link = emailAddUrl(SITE_URL, token);
+
+  if (!link) {
+    return adminJson({ ok: false, state: "error" }, 200, origin);
+  }
+
+  const sent = await sendCustomerMail({ email }, addEmailLetter(link, email, SITE_URL));
+
+  return adminJson({ ok: sent, state: sent ? "sent" : "mail_failed" }, 200, origin);
+
+}
+
+// Крок 2: перехід за посиланням із листа.
+async function handleEmailAddConfirm(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  const parts = unpackEmailAddToken(body?.token);
+
+  if (!parts) {
+    return adminJson({ ok: false, state: "unknown" }, 200, origin);
+  }
+
+  const expected = await signWithBotToken(`email-add:${parts.payload}`);
+
+  if (!sameSignature(expected, parts.signature)) {
+
+    console.warn("Підтвердження пошти: підпис не збігається");
+
+    return adminJson({ ok: false, state: "unknown" }, 200, origin);
+
+  }
+
+  const data = readEmailAddPayload(parts.payload);
+
+  const verdict = emailAddVerdict(data, Date.now());
+
+  if (!verdict.ok) {
+    return adminJson({ ok: false, state: verdict.state }, 200, origin);
+  }
+
+  // Адресу могли зайняти, доки лист лежав у скриньці.
+  if (await emailTaken(data!.email, data!.userId)) {
+    return adminJson({ ok: false, state: "taken" }, 200, origin);
+  }
+
+  const updated = await supabaseAuthAdmin(`admin/users/${encodeURIComponent(data!.userId)}`, {
+    method: "PUT",
+    body: JSON.stringify({ email: data!.email, email_confirm: true }),
+  });
+
+  if (!updated.ok) {
+
+    console.error("Не вдалося записати пошту:", await updated.text());
+
+    return adminJson({ ok: false, state: "error" }, 200, origin);
+
+  }
+
+  return adminJson({ ok: true, state: "confirmed", email: data!.email }, 200, origin);
+
+}
+
+// Чи записано, що цей акаунт належить цьому Telegram.
+//
+// Якщо рядок спроби входу є, а user_id у ньому порожній (людина
+// входила ще до міграції 034) — дописуємо. Це той самий зв'язок, що
+// й при вході, просто дописаний пізніше.
+async function linkedToTelegram(user: Record<string, any>): Promise<boolean> {
+
+  const telegramId = telegramIdFromEmail(user?.email);
+
+  if (!telegramId) return false;
+
+  try {
+
+    const found = await supabaseRest(
+      `telegram_logins?telegram_id=eq.${telegramId}`
+      + `&select=token,user_id&order=created_at.desc&limit=1`
+    );
+
+    // Стовпця ще немає — тобто міграцію не застосували.
+    if (!found.ok) return false;
+
+    const row = (await found.json().catch(() => []))[0] ?? null;
+
+    if (!row?.token) return false;
+
+    if (row.user_id) return String(row.user_id) === String(user.id);
+
+    const written = await supabaseRest(
+      `telegram_logins?token=eq.${encodeURIComponent(row.token)}`,
+      { method: "PATCH", body: JSON.stringify({ user_id: user.id }) },
+    );
+
+    return written.ok;
+
+  } catch (error) {
+
+    console.error("Не вдалося перевірити зв'язок з Telegram:", error);
+
+    return false;
+
+  }
+
+}
+
+// Користувач за токеном сесії, який надіслав сайт.
+async function userFromAccessToken(token: unknown): Promise<Record<string, any> | null> {
+
+  const clean = String(token ?? "").trim();
+
+  if (!clean || clean.length > 4096) return null;
+
+  try {
+
+    const response = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+      headers: {
+        apikey: SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${clean}`,
+      },
+    });
+
+    if (!response.ok) return null;
+
+    return await response.json().catch(() => null);
+
+  } catch (error) {
+
+    console.error("Не вдалося перевірити токен сесії:", error);
+
+    return null;
+
+  }
+
+}
+
+// Чи є вже акаунт із такою поштою.
+//
+// Питаємо ДО листа, а не після переходу за ним: інакше людина чекала
+// б листа, перейшла — і аж тоді дізналась, що адреса зайнята.
+async function emailTaken(email: string, exceptUserId = ""): Promise<boolean> {
+
+  try {
+
+    const response = await supabaseAuthAdmin(
+      `admin/users?filter=${encodeURIComponent(email)}&per_page=50`
+    );
+
+    if (!response.ok) return false;
+
+    const data = await response.json().catch(() => null);
+
+    const users = Array.isArray(data?.users) ? data.users : [];
+
+    return users.some((u: Record<string, any>) =>
+      String(u?.email ?? "").toLowerCase() === email
+      && String(u?.id ?? "") !== exceptUserId);
+
+  } catch (error) {
+
+    console.error("Не вдалося перевірити, чи зайнята пошта:", error);
+
+    return false;
+
+  }
 
 }
 
@@ -4246,6 +4584,20 @@ async function handleRequest(request: Request): Promise<Response> {
   if (body.site_action === "subscribe-confirm") {
 
     return await handleSubscribeConfirm(request, body);
+
+  }
+
+  // --- додавання пошти тому, хто увійшов через Telegram ---
+  if (body.site_action === "email-add-start") {
+
+    return await handleEmailAddStart(request, body);
+
+  }
+
+  // --- перехід за посиланням із того листа ---
+  if (body.site_action === "email-add-confirm") {
+
+    return await handleEmailAddConfirm(request, body);
 
   }
 
