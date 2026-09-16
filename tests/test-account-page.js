@@ -314,8 +314,12 @@ console.log("\n[5a] Зміна пароля — окрема вкладка, а 
     check("«Забули пароль?» поруч із кнопкою",
         /id="forgotPasswordInsideBtn"/.test(html));
 
+    // Адреса береться із сесії, а не з поля: mail — це realEmail(user)
+    // (див. [12]), тобто пошта того, хто вже увійшов. Поля вводу тут
+    // немає й бути не повинно.
     check("адресу не питаємо — людина вже в кабінеті",
-        /resetPasswordForEmail\(user\.email/.test(js));
+        /const mail = realEmail\(user\);[\s\S]{0,700}resetPasswordForEmail\(mail,/.test(js)
+        && !/id="forgotEmailInput"/.test(html));
 
     check("є крок «посилання надіслано»",
         /id="forgotStepSent"/.test(html) && /id="forgotSentTo"/.test(html));
@@ -764,6 +768,224 @@ console.log("\n[10] Кнопка «Відновити» доходить до л
         html.includes('id="newEmailSubmit">Підтвердити<')
         && /newEmailSubmit\.textContent = "Підтвердити"/.test(js),
         "після невдалої спроби кнопка перейменовувалась сама собою");
+}
+
+console.log("\n[11] П'ята вкладка досяжна на телефоні");
+{
+    // ЩО БУЛО. Заміряно на 375px: смузі вкладок треба 402px, а має
+    // вона 335. «Змінити пароль» обрізало краєм екрана — і дістатись
+    // до неї не можна було ніяк: смуга не прокручувалась, а зайве
+    // ховав overflow сторінки. Ціла вкладка кабінету була недоступна.
+    const tabs = ruleBody(".account-tabs");
+    const tab = ruleBody(".account-tab");
+
+    check("правила знайдено", Boolean(tabs && tab));
+
+    check("смуга вкладок прокручується",
+        Boolean(tabs && /overflow-x:\s*auto/.test(tabs)), tabs || "");
+
+    // Без цього вкладки стискаються замість того, щоб виїхати за
+    // край, — текст ламається на два рядки, а прокручувати нема чого.
+    check("вкладки не стискаються",
+        Boolean(tab && /flex:\s*0 0 auto/.test(tab)), tab || "");
+
+    check("назва вкладки лишається в один рядок",
+        Boolean(tab && /white-space:\s*nowrap/.test(tab)), tab || "");
+
+    // ПАСТКА, НА ЯКУ ЛЕГКО НАСТУПИТИ ДРУГИЙ РАЗ.
+    //
+    // overflow по одній осі робить другу теж прокручуваною. Активна
+    // вкладка накривала риску контейнера через margin-bottom:-1px — і
+    // в смузі з прокруткою цей піксель ставав ЗАЙВИМ ПІКСЕЛЕМ
+    // ВЕРТИКАЛЬНОЇ ПРОКРУТКИ (заміряно: scrollHeight 43 при
+    // clientHeight 42). Смужки не видно, а палець на вкладках
+    // прокручує вже не сторінку.
+    //
+    // Тому риска — inset-тінь: вона малюється всередині поля й на
+    // розкладку не впливає зовсім.
+    check("риска під вкладками не додає другої прокрутки",
+        Boolean(tabs && /box-shadow:\s*inset 0 -1px 0/.test(tabs))
+        && !/border-bottom/.test(tabs || ""), tabs || "");
+
+    check("вкладка більше не висить на від'ємному полі",
+        Boolean(tab) && !/margin-bottom:\s*-/.test(tab), tab || "");
+
+    // ПОЛЕ КОНТЕЙНЕРА Й ВИЇЗД СМУГИ МУСЯТЬ ЗБІГАТИСЬ.
+    //
+    // Смуга виходить за поля .container до самого краю екрана: саме
+    // розрізана краєм вкладка й каже, що далі є ще. Якщо виїзд
+    // більший за поле — сторінка поїде вбік, якщо менший — смуга
+    // обірветься з відступом і читатиметься як поломка.
+    //
+    // Заміряно на 700px: смуга обрізалась за 32px до краю екрана —
+    // тобто прокручувалась, але виглядала поламаною. Тому виїзд
+    // починається з 900px, а не з 600: влазити вкладки перестають
+    // приблизно з 780.
+    //
+    // Полів два: 32px до 500px завширшки і 20px нижче. ruleBody тут
+    // не годиться — у медіа-запиті селектор із відступом.
+    const clean = css.replace(/\/\*[\s\S]*?\*\//g, "");
+
+    // Однакових медіа-запитів у файлі кілька, і шукати від першого ж
+    // означає читати чуже правило: пошук «@media(max-width:500px)»
+    // знаходив блок із .container аж на початку файлу, а звідти
+    // дотягувався до .account-tabs із сусіднього запиту на 600px і
+    // рапортував 32 замість 20.
+    //
+    // Тому кожен знайдений запит обмежуємо до наступного @media — це
+    // рівно його блок — і шукаємо селектор лише всередині.
+    const inMedia = (query, selector) => {
+
+        // \s+ тут теж було б помилкою: \s ловить і перенос рядка, тож
+        // «\n\s+.account-tabs» знаходило БАЗОВЕ правило, перед яким
+        // стоїть порожній рядок. Відступ — це пробіли або табуляція.
+        const re = new RegExp("\\n[ \\t]+" + selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\s*\\{([^}]*)\\}");
+
+        let from = 0;
+
+        for (;;) {
+
+            const at = clean.indexOf(query, from);
+
+            if (at < 0) return null;
+
+            const next = clean.indexOf("@media", at + query.length);
+
+            const block = next < 0 ? clean.slice(at) : clean.slice(at, next);
+
+            const found = block.match(re);
+
+            if (found) return found[1];
+
+            from = at + query.length;
+
+        }
+
+    };
+
+    const wide = inMedia("@media(max-width:900px)", ".account-tabs");
+    const narrow = inMedia("@media(max-width:500px)", ".account-tabs");
+
+    const pad = body => {
+        const m = body && body.match(/padding-inline:\s*(\d+)px/);
+        return m ? Number(m[1]) : null;
+    };
+
+    const bleed = body => {
+        const m = body && body.match(/margin-inline:\s*-(\d+)px/);
+        return m ? Number(m[1]) : null;
+    };
+
+    check("смуга виїжджає за поле контейнера", bleed(wide) !== null, wide || "");
+
+    check("виїзд дорівнює полю контейнера (32px)",
+        bleed(wide) === 32 && pad(wide) === 32, `${bleed(wide)} / ${pad(wide)}`);
+
+    // Нижче 500px .container звужує поле до 20px. Якби смуга й далі
+    // виїжджала на 32, вона вилізла б за екран на 12px з кожного боку.
+    const containerNarrow = inMedia("@media(max-width:500px)", ".container");
+
+    check("нижче 500px поле контейнера — 20px",
+        Boolean(containerNarrow && /padding:\s*0 20px/.test(containerNarrow)),
+        containerNarrow || "");
+
+    check("нижче 500px виїзд теж 20px",
+        bleed(narrow) === 20 && pad(narrow) === 20, `${bleed(narrow)} / ${pad(narrow)}`);
+
+    // Правило для 500px мусить стояти ПІСЛЯ правила для 600px:
+    // обидва спрацьовують на вузькому екрані, і виграє останнє.
+    check("вузьке правило стоїть після широкого",
+        clean.lastIndexOf("margin-inline:-20px") > clean.indexOf("margin-inline:-32px"));
+
+    // Натиснута вкладка може лишитись наполовину за краєм — тобто
+    // активна, але не видно, яка саме.
+    check("натиснута вкладка під'їжджає у видиме",
+        /scrollIntoView\(\{[\s\S]{0,120}inline: "center"/.test(js));
+
+    // block:"nearest" означає «по вертикалі нічого не роби». Без
+    // нього сторінка стрибала б угору-вниз на кожному перемиканні.
+    check("без вертикального стрибка",
+        /scrollIntoView\(\{[\s\S]{0,160}block: "nearest"/.test(js));
+
+    // scrollIntoView з явним behavior перебиває навіть
+    // scroll-behavior:auto !important із блоку prefers-reduced-motion
+    // наприкінці style.css — тобто системну настройку треба спитати
+    // самим.
+    check("плавність питає систему, а не бере силою",
+        /matchMedia\("\(prefers-reduced-motion: reduce\)"\)/.test(js)
+        && /behavior: still \? "auto" : "smooth"/.test(js));
+}
+
+console.log("\n[12] Службова адреса входу через Telegram не видається за пошту");
+{
+    // ЗВІДКИ ВОНА. Supabase тримає користувача за поштою, а Telegram
+    // її не дає — тож адреса вигадується з id і підпису
+    // (telegram-login.js, telegramEmail). Скриньки за нею не існує.
+    //
+    // ЧОМУ ЦЕ НЕ КОСМЕТИКА. Вона підставлялась у форму замовлення й у
+    // підписку: покупець бачив заповнене поле «Email», вважав, що
+    // пошту вказав, — а лист про відправлення, подяка й прохання про
+    // відгук їхали в нікуди.
+    const client = read("assets/js/supabase-client.js");
+    const checkout = read("assets/js/checkout.js");
+    const login = read("supabase/functions/telegram-order-bot/telegram-login.js");
+
+    check("є одна спільна перевірка на службову адресу",
+        /function realEmail\(user\)/.test(client));
+
+    // ДВІ КОПІЇ ДОМЕНА — ДВА РІЗНІ ДОМЕНИ ПІСЛЯ ПЕРШОГО Ж
+    // ПЕРЕЙМЕНУВАННЯ. Один бік складає адресу, другий її впізнає; не
+    // збігнуться — службова пошта поїде в замовлення як справжня.
+    const inClient = (client.match(/TELEGRAM_EMAIL_DOMAIN = "([^"]+)"/) || [])[1];
+    const inFunction = (login.match(/@(telegram\.[a-z0-9.\-]+)`/) || [])[1];
+
+    check("домен у клієнті й у функції той самий",
+        Boolean(inClient) && inClient === "@" + inFunction,
+        `${inClient} проти @${inFunction}`);
+
+    // Кабінет: показувати рядок із id людині безглуздо, а
+    // пропонувати «змінити» — тим більше: міняти нема чого.
+    check("у кабінеті показано стан, а не службовий рядок",
+        /profileEmailEl\.textContent = mail \|\|/.test(js));
+
+    check("кнопка стає «Додати email», коли пошти немає",
+        /mail \? "Змінити email" : "Додати email"/.test(js));
+
+    check("у кабінеті більше не показують user.email напряму",
+        !/profileEmailEl\.textContent = user\.email/.test(js));
+
+    // Підписка: лист із підтвердженням пішов би в нікуди, а людина
+    // бачила б заповнене поле й чекала листа.
+    check("поле підписки не заповнюється службовою адресою",
+        /newsletterEmail\.value = mail;/.test(js)
+        && !/newsletterEmail\.value = user\.email/.test(js));
+
+    // Замовлення — найдорожчий випадок: туди їдуть усі листи.
+    check("оформлення замовлення не підставляє службову адресу",
+        /const mail = realEmail\(user\)/.test(checkout)
+        && /!emailField\.value && mail/.test(checkout)
+        && !/emailField\.value = user\.email/.test(checkout));
+
+    // Відновлення пароля: Supabase відповідає УСПІХОМ і на неіснуючу
+    // адресу — екран сказав би «лист надіслано», і людина чекала б
+    // його доти, доки не вирішила б, що зламався сайт.
+    check("відновлення пароля не вдає, що лист пішов",
+        /if \(!mail\) \{[\s\S]{0,300}надсилати посилання нема куди/.test(js)
+        && /resetPasswordForEmail\(mail,/.test(js));
+
+    // Пояснення мусить бути ДО натискання, а не після: інакше єдина
+    // дія на екрані веде в глухий кут.
+    check("без пошти блок відновлення пояснює це одразу",
+        /id="forgotNoMail"/.test(html)
+        && /Ви входите через Telegram — пароля в акаунті немає/.test(html)
+        && /if \(noMail\) noMail\.hidden = Boolean\(mail\)/.test(js));
+
+    check("і ховає кнопку, бо тиснути нема що",
+        /if \(submit\) submit\.hidden = !mail/.test(js));
+
+    // Підказка на іконці кабінету називає, ким саме ти увійшов.
+    check("підказка в шапці не показує службовий рядок",
+        /realEmail\(user\) \|\| "Особистий кабінет"/.test(client));
 }
 
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);

@@ -458,10 +458,21 @@ async function prefillFromProfile() {
 
     if (!user) return;
 
+    // ПІДСТАВЛЯЄМО ЛИШЕ СПРАВЖНЮ АДРЕСУ.
+    //
+    // У того, хто увійшов через Telegram, user.email — службовий
+    // рядок, скриньки за яким немає (realEmail у supabase-client.js).
+    // Підставлений, він виглядав би як заповнене поле: покупець його
+    // не чіпав би, а лист про замовлення, подяка й прохання про
+    // відгук поїхали б у нікуди.
+    //
+    // Порожнє поле тут безпечніше: воно обов'язкове, тож форма просто
+    // попросить вписати пошту.
     const emailField = document.getElementById("email");
+    const mail = realEmail(user);
 
-    if (emailField && !emailField.value) {
-        emailField.value = user.email;
+    if (emailField && !emailField.value && mail) {
+        emailField.value = mail;
     }
 
     const { data, error } = await supabaseClient

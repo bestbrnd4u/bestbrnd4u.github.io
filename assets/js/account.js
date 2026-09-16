@@ -2275,6 +2275,25 @@ document.querySelectorAll(".account-tab").forEach(tab => {
             loadAddresses();
         }
 
+        // Смуга вкладок на телефоні ширша за екран (див. .account-tabs
+        // у style.css). Натиснута скраю вкладка лишалась би наполовину
+        // за краєм — тобто активна, але не видно, яка саме.
+        //
+        // Горизонтально, без вертикального стрибка: block:"nearest"
+        // якраз і означає «по вертикалі нічого не роби».
+        //
+        // Плавність питаємо в системи, а не беремо за замовчуванням:
+        // scrollIntoView з явним behavior перебиває навіть
+        // scroll-behavior:auto !important, яким блок
+        // prefers-reduced-motion наприкінці style.css прибирає рух.
+        const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        tab.scrollIntoView({
+            inline: "center",
+            block: "nearest",
+            behavior: still ? "auto" : "smooth"
+        });
+
     });
 
 });
@@ -2285,7 +2304,24 @@ document.querySelectorAll(".account-tab").forEach(tab => {
 
 async function loadProfile(user) {
 
-    profileEmailEl.textContent = user.email;
+    // ПОШТИ МОЖЕ Й НЕ БУТИ — І ЦЕ НЕ ПОМИЛКА.
+    //
+    // Хто увійшов через Telegram, той пошти не давав: у user.email
+    // лежить службовий рядок, скриньки за яким не існує (realEmail у
+    // supabase-client.js). Показати його — те саме, що показати
+    // людині її id: вона бачить набір знаків, який до того ж не
+    // влазить у рядок, і не розуміє, звідки він узявся.
+    //
+    // Тому кажемо як є: пошти немає, ось звідки ви увійшли. І кнопка
+    // поруч стає «Додати email» — бо міняти нема чого.
+    const mail = realEmail(user);
+
+    profileEmailEl.textContent = mail || "Немає — ви увійшли через Telegram";
+    profileEmailEl.classList.toggle("profile-email-empty", !mail);
+
+    const changeBtn = document.getElementById("changeEmailBtn");
+
+    if (changeBtn) changeBtn.textContent = mail ? "Змінити email" : "Додати email";
 
     const { data, error } = await supabaseClient
         .from("profiles")
@@ -2325,10 +2361,12 @@ async function loadProfile(user) {
     if (consentEl) consentEl.checked = Boolean(data?.privacy_consent_at);
 
     // Адресу для розсилки підставляємо з акаунту — найчастіше саме
-    // її і хочуть підписати.
+    // її і хочуть підписати. Службову не підставляємо: лист із
+    // підтвердженням підписки пішов би в нікуди, а людина бачила б
+    // заповнене поле й чекала листа.
     const newsletterEmail = document.getElementById("newsletterEmail");
 
-    if (newsletterEmail && !newsletterEmail.value) newsletterEmail.value = user.email || "";
+    if (newsletterEmail && !newsletterEmail.value) newsletterEmail.value = mail;
 
     if (accountEmailEl) accountEmailEl.textContent = buildAccountGreeting(data?.first_name || fromProvider.first);
 
@@ -2656,9 +2694,21 @@ document.getElementById("forgotPasswordInsideBtn")?.addEventListener("click", as
 
     if (!user) return;
 
+    // Без пошти відновлювати нема що: показуємо пояснення замість
+    // «надішлемо лист на …» і ховаємо кнопку, бо тиснути нема що.
+    const mail = realEmail(user);
+
     const where = document.getElementById("forgotEmail");
 
-    if (where) where.textContent = user.email;
+    if (where) where.textContent = mail;
+
+    const intro = document.getElementById("forgotIntro");
+    const noMail = document.getElementById("forgotNoMail");
+    const submit = document.getElementById("forgotSubmit");
+
+    if (intro) intro.hidden = !mail;
+    if (noMail) noMail.hidden = Boolean(mail);
+    if (submit) submit.hidden = !mail;
 
     toggleForgot(forgotBox.hidden);
 
@@ -2698,10 +2748,27 @@ forgotSubmit?.addEventListener("click", async () => {
         return;
     }
 
+    // НАДСИЛАТИ НЕМА КУДИ — І ПРО ЦЕ ТРЕБА СКАЗАТИ, А НЕ ВДАВАТИ.
+    //
+    // У того, хто увійшов через Telegram, пошта службова: лист за нею
+    // не доходить нікуди. Supabase при цьому відповідає УСПІХОМ — тобто
+    // екран сказав би «лист надіслано», і людина чекала б його доти,
+    // доки не вирішила б, що зламався сайт.
+    //
+    // Кнопку в цьому випадку вже сховано при відкритті блока, тож сюди
+    // потрапити важко. Але «важко» — не «неможливо»: лишаємо перевірку
+    // й тут, бо ціна помилки саме така, як описано вище.
+    const mail = realEmail(user);
+
+    if (!mail) {
+        forgotMessage.textContent = "Пошти в акаунті немає — надсилати посилання нема куди";
+        return;
+    }
+
     forgotSubmit.disabled = true;
     forgotSubmit.textContent = "Надсилаємо...";
 
-    const { error } = await supabaseClient.auth.resetPasswordForEmail(user.email, {
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(mail, {
         redirectTo: `${window.location.origin}/account`
     });
 
@@ -2720,7 +2787,7 @@ forgotSubmit?.addEventListener("click", async () => {
 
     const sentTo = document.getElementById("forgotSentTo");
 
-    if (sentTo) sentTo.textContent = user.email;
+    if (sentTo) sentTo.textContent = mail;
 
     if (forgotStepForm) forgotStepForm.hidden = true;
     if (forgotStepSent) forgotStepSent.hidden = false;

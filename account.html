@@ -29,7 +29,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
 
-    <link rel="stylesheet" href="assets/css/style.css?v=44194855">
+    <link rel="stylesheet" href="assets/css/style.css?v=8d05ad52">
 
 
 
@@ -608,9 +608,24 @@
 
                         <div id="forgotStepForm" class="profile-email-step">
 
-                            <p class="profile-card-sub">
+                            <p class="profile-card-sub" id="forgotIntro">
                                 Надішлемо посилання для відновлення пароля на
                                 <strong id="forgotEmail"></strong>.
+                            </p>
+
+                            <!-- ПОШТИ МОЖЕ Й НЕ БУТИ.
+
+                                 Хто увійшов через Telegram, той пошти
+                                 не давав, і пароля в акаунті немає —
+                                 надсилати посилання нема куди. Кажемо
+                                 це одразу, а не після натискання
+                                 «Відновити»: інакше єдина дія на
+                                 екрані веде в глухий кут. Кнопку при
+                                 цьому ховаємо — тиснути нема що. -->
+                            <p class="profile-card-sub" id="forgotNoMail" hidden>
+                                Ви входите через Telegram — пароля в акаунті немає.
+                                Щоб мати ще й вхід за паролем, спершу додайте email
+                                у вкладці «Мої дані».
                             </p>
 
                             <span id="forgotMessage" class="field-error"></span>
@@ -886,7 +901,7 @@
 
 <!-- Журнал помилок: сторінка сама розповідає, що в неї зламалось -->
 <script src="assets/js/error-report.js?v=21838fe8" defer></script>
-<script src="assets/js/supabase-client.js?v=5575258c" defer></script>
+<script src="assets/js/supabase-client.js?v=6c5f5e88" defer></script>
 <!-- Кадрування фото товару. Той самий файл підключає адмінка,
      тож прев'ю в ній і картка на сайті рахуються однаково. -->
 <script src="assets/js/image-framing.js?v=80b29a57" defer></script>
@@ -915,7 +930,7 @@
      Той самий файл, що й на оформленні замовлення: збережена адреса
      мусить бути такою самою справжньою, як введена при замовленні. -->
 <script src="assets/js/nova-poshta.js?v=64b7a428" defer></script>
-<script src="assets/js/account.js?v=991c3958" defer></script>
+<script src="assets/js/account.js?v=b6b53768" defer></script>
 
 </body>
 
