@@ -79,6 +79,17 @@ function authShowSocialBlock() {
 
     if (divider) divider.hidden = shown === 0;
 
+    // Сітка розрахована на дві кнопки поруч — Facebook і Google. Поки
+    // увімкнений лише один із них, друга половина рядка лишалась
+    // порожньою, і кнопка виглядала недомальованою.
+    //
+    // Рахуємо саме [data-provider]: Telegram і так на всю ширину, і в
+    // цьому підрахунку він лише збивав би з пантелику.
+    const providers = [...box.querySelectorAll(".auth-social-btn[data-provider]")]
+        .filter(button => !button.hidden).length;
+
+    box.classList.toggle("auth-social-one", providers === 1);
+
 }
 
 // ПОКАЗУЄМО ЛИШЕ ТІ СПОСОБИ, ЯКІ СПРАВДІ УВІМКНЕНІ.
