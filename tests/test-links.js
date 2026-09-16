@@ -256,6 +256,68 @@ console.log(`\n[5] Сканер справді щось перевіряє`);
         && isExternal("#top"));
 }
 
+console.log("\n[6] У навігації підвалу немає заглушок");
+{
+    // ЩО БУЛО. Посилання «Бренди» у підвалі стояло як href="#" — на
+    // ВСІХ 154 сторінках із підвалом. Натиснув — нічого не сталось,
+    // сторінка смикнулась угору. Сторінка брендів при цьому існує й
+    // наповнена.
+    //
+    // Сканер вище такого не ловить і не має: "#" — законний якір, а не
+    // бита адреса. Заглушку видно лише за змістом: підпис обіцяє
+    // розділ, а посилання не веде нікуди.
+    //
+    // ЩО НЕ Є ЗАГЛУШКОЮ. Поруч у підвалі стоїть «Налаштування даних»
+    // з data-consent-reopen — це кнопка, яка відкриває вікно згоди, і
+    // href="#" у неї навмисний. Відрізняємо за наявністю data-гачка:
+    // без нього посилання нікуди не веде й нічого не робить.
+    const footers = pages
+        .map(file => ({ file, html: fs.readFileSync(file, "utf8") }))
+        .filter(page => page.html.includes("<footer"))
+        .map(page => ({ file: page.file, footer: page.html.slice(page.html.lastIndexOf("<footer")) }));
+
+    check("сторінки з підвалом знайшлись", footers.length > 100, footers.length);
+
+    const placeholders = [];
+
+    footers.forEach(({ file, footer }) => {
+
+        [...footer.matchAll(/<a href="#"([^>]*)>([^<]+)<\/a>/g)].forEach(match => {
+
+            const attrs = match[1];
+            const label = match[2].trim();
+
+            if (!label) return;
+
+            // data-гачок означає кнопку: нею керує JS, і адреса їй
+            // не потрібна.
+            if (/\sdata-[a-z-]+/.test(attrs)) return;
+
+            placeholders.push(path.relative(ROOT, file) + ": " + label);
+
+        });
+
+    });
+
+    check("жоден розділ підвалу не веде в нікуди",
+        placeholders.length === 0,
+        placeholders.slice(0, 3).join(" | ")
+            + (placeholders.length > 3 ? " (усього " + placeholders.length + ")" : ""));
+
+    // Сторінка, заради якої це й полагоджено, мусить існувати.
+    check("сторінка брендів на місці",
+        fs.existsSync(path.join(ROOT, "brands/index.html")));
+
+    // І на неї справді ведуть — інакше перевірка вище проходила б і
+    // на сайті, де посилання просто прибрали.
+    const withLink = footers
+        .filter(({ footer }) => /<a href="\/?brands\/"[^>]*>Бренди<\/a>/.test(footer)).length;
+
+    check("посилання на бренди є в підвалі кожної сторінки",
+        withLink === footers.length,
+        withLink + " з " + footers.length);
+}
+
 console.log(failures === 0
     ? `\n✅ Посилання: ${links} перевірено, битих немає\n`
     : `\n❌ Проблем: ${failures}\n`);

@@ -62,7 +62,17 @@ const fmt = loadModule("supabase/functions/telegram-order-bot/format.js", [
 ]);
 
 const built = read("supabase/functions/telegram-order-bot/index.ts");
-const accountJs = read("assets/js/account.js");
+
+// КАРТКА ВХОДУ ЖИВЕ У ДВОХ ФАЙЛАХ.
+//
+// Спільну поведінку (провайдери, Telegram, переклад помилок) винесено
+// в assets/js/auth-widget.js: та сама картка стоїть ще й на оформленні
+// замовлення, і двома копіями цей код прожив би до першої правки.
+//
+// Перевірки нижче — про те, що поведінка ІСНУЄ, а не про те, у якому
+// файлі вона лежить. Тому читаємо обидва разом.
+const accountJs = read("assets/js/account.js")
+    + read("assets/js/auth-widget.js");
 const accountHtml = read("account.html");
 
 console.log("\n[1] Діплінк замість віджета Telegram");
@@ -241,7 +251,7 @@ console.log("\n[7] Сторінка переживає недоступну фу
     // обробник кліку тихо вмирав: ні екрана очікування, ні
     // повідомлення. Зовні «кнопка не працює». Перевірено кліком.
     check("виклик функції не кидає винятків",
-        /async function callFunction[\s\S]{0,800}?catch \(error\)[\s\S]{0,200}?status: 0/.test(accountJs));
+        /async function authCallFunction[\s\S]{0,800}?catch \(error\)[\s\S]{0,200}?status: 0/.test(accountJs));
 
     check("і людина бачить, що сталось",
         /Вхід через Telegram зараз недоступний/.test(accountJs));
@@ -259,7 +269,7 @@ console.log("\n[7] Сторінка переживає недоступну фу
     check("OAuth-обробник не чіпає Telegram",
         /querySelectorAll\("\.auth-social-btn\[data-provider\]"\)/.test(accountJs));
 
-    check("опитування зупиняється", /clearInterval\(telegramPoll\)/.test(accountJs));
+    check("опитування зупиняється", /clearInterval\(authTelegramPoll\)/.test(accountJs));
 
     check("і не чекає вічно", /5 \* 60 \* 1000/.test(accountJs));
 
@@ -565,17 +575,86 @@ console.log("\n[11] Вхід через Telegram знаходить акаунт
     // разом із ним.
     check("протухла заявка перестає рахуватись",
         /email_change_sent_at/.test(src)
-        && /Date\.now\(\) - sentAt > EMAIL_ADD_TTL_MINUTES \* 60000/.test(src));
+        && /Date\.now\(\) - sentAt > EMAIL_CHANGE_CLAIM_MINUTES \* 60000/.test(src));
 
-    check("межа та сама, що й життя посилання",
+    // ЦЕ НЕ НАШЕ ЧИСЛО, І САМЕ ТОМУ ВОНО ОКРЕМЕ.
+    //
+    // Заявку створює Supabase, і живе вона стільки, скільки його
+    // посилання — Authentication → Emails → Email OTP Expiration.
+    // Плутати з нашим листом (EMAIL_ADD_TTL_MINUTES) не можна: то
+    // інший лист і інший строк.
+    check("строк чужої заявки — окрема стала",
+        /const EMAIL_CHANGE_CLAIM_MINUTES = 60;/.test(src)
+        && /Date\.now\(\) - sentAt > EMAIL_CHANGE_CLAIM_MINUTES \* 60000/.test(src));
+
+    check("наше посилання живе своїм строком",
         /EMAIL_ADD_TTL_MINUTES = 24 \* 60/.test(read("supabase/functions/telegram-order-bot/telegram-login.js")));
 
     // «Зайнята» остаточна, «щойно запросили» минає сама. Сказати одне
     // замість іншого означало б відправити людину шукати іншу пошту
     // там, де досить зачекати.
+    
+// КАРТКА ВХОДУ ЖИВЕ У ДВОХ ФАЙЛАХ.
+//
+// Спільну поведінку (провайдери, Telegram, переклад помилок) винесено
+// в assets/js/auth-widget.js: та сама картка стоїть ще й на оформленні
+// замовлення, і двома копіями цей код прожив би до першої правки.
+//
+// Перевірки нижче — про те, що поведінка ІСНУЄ, а не про те, у якому
+// файлі вона лежить. Тому читаємо обидва разом.
+const accountJs = read("assets/js/account.js")
+    + read("assets/js/auth-widget.js");
+
     check("дві різні відмови, а не одна",
         /busy\.taken \? "taken" : "pending"/.test(src)
-        && /Якщо там не підтвердять, вона звільниться за добу/.test(read("assets/js/account.js")));
+        && /Цю адресу щойно запросив інший кабінет/.test(accountJs));
+
+    // Строк у тексті береться з відповіді функції, а не написаний
+    // словами поруч: розійшовшись із кодом, він брехав би мовчки.
+    check("скільки чекати — з коду, а не з розмітки",
+        /freeInMinutes: EMAIL_CHANGE_CLAIM_MINUTES/.test(src)
+        && /waitWords\(busy\.freeInMinutes\)/.test(accountJs));
+
+    // «за 21 годин» — проста межа «менше п'яти» саме так і ламається.
+    //
+    // Функцію дістаємо з файлу цілком: від оголошення до першої «}» на
+    // початку рядка. Прив'язуватись до тексту всередині не можна — на
+    // ньому цей тест уже раз упав стеком замість чесного ✗, коли той
+    // текст змінився.
+    const waitWords = (() => {
+
+        try {
+
+            const from = accountJs.indexOf("function waitWords(minutes) {");
+
+            if (from < 0) return null;
+
+            const to = accountJs.indexOf("\n}\n", from);
+
+            if (to < 0) return null;
+
+            return new Function(accountJs.slice(from, to + 3) + "; return waitWords;")();
+
+        } catch (error) {
+
+            return null;
+
+        }
+
+    })();
+
+    check("функція строку знайшлась у файлі", typeof waitWords === "function");
+
+    check("години рахуються за останньою цифрою",
+        typeof waitWords === "function"
+        && waitWords(60) === "за годину"
+        && waitWords(180) === "за 3 години"
+        && waitWords(660) === "за 11 годин"
+        && waitWords(1260) === "за 21 годину"
+        && waitWords(1440) === "за добу",
+        typeof waitWords === "function"
+            ? [60, 180, 660, 1260, 1440].map(waitWords).join(" | ")
+            : "функції немає");
 
     // ЧОМУ ПЕРЕБІР, А НЕ ?filter=. filter у GoTrue шукає по полю
     // email — користувача із ЗАПИТАНОЮ адресою він просто не поверне,

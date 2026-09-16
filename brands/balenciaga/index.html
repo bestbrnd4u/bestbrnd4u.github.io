@@ -112,7 +112,7 @@ window.CATALOG_PRESET = {"brand":"Balenciaga"};
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=5910c934">
+<link rel="stylesheet" href="/assets/css/style.css?v=83af7af7">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3" defer></script>
 
@@ -192,6 +192,20 @@ window.CATALOG_PRESET = {"brand":"Balenciaga"};
 </div>
 
 <div class="brand-about" id="brandAbout" hidden></div>
+
+<!-- СМУГА БРЕНДІВ — ФІЛЬТР, А НЕ ПЕРЕЛІК ПОСИЛАНЬ.
+
+     Була лише на /brands/, і кожна назва там вела на окрему сторінку
+     бренду. Тобто вибрати два бренди одразу було нічим, а в «Новинках»
+     і «Акціях» переліку не було взагалі.
+
+     Тепер плашки живуть у самому каталозі: натиснув — бренд пішов у
+     фільтр, смуга лишилась на місці, можна додати ще один або зняти.
+     І оскільки це частина каталогу, вона сама з'являється в розділах:
+     ?section=new і ?section=sale показують бренди СВОГО розділу.
+
+     Малює її catalog.js, fillBrandStrip(). -->
+<nav class="brand-strip" id="brandStrip" aria-label="Бренди" hidden></nav>
 
 <div class="catalog-filters-bar">
 
@@ -656,7 +670,7 @@ Telegram
 <a href="/catalog">Всі товари</a>
 <a href="/catalog?section=new">Новинки</a>
 <a href="/catalog?section=sale" class="sale-text">Акції</a>
-<a href="#">Бренди</a>
+<a href="/brands/">Бренди</a>
 </div>
 <div>
 <h3>Зв'яжіться з нами</h3>
@@ -711,7 +725,7 @@ aria-label="Нагору">
 <script src="/assets/js/ui.js?v=e015b069" defer></script>
 <script src="/assets/js/stock.js?v=85fa4aad" defer></script>
 <script src="/assets/js/live-stock.js?v=ca9027dd" defer></script>
-<script src="/assets/js/catalog.js?v=129e5f9e" defer></script>
+<script src="/assets/js/catalog.js?v=840725fd" defer></script>
 </body>
 
 </html>

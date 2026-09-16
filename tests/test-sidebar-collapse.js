@@ -46,7 +46,10 @@ window.eval(_cs.match(/let sizeGroupsPromise[\s\S]*?\n}\n/)[0]);
 let code=fs.readFileSync(path.join(ROOT,"assets/js/catalog.js"),"utf8");
 code+=`
 window.__t={ setProducts(l){products=l;}, fillCatalogSidebar:d=>fillCatalogSidebar(d),
-  toggleCategory:n=>toggleCategory(n), get selectedCategories(){return selectedCategories;} };`;
+  toggleCategory:n=>toggleCategory(n), get selectedCategories(){return selectedCategories;},
+  get selectedBrands(){return selectedBrands;}, refreshSidebarCounts:()=>refreshSidebarCounts(),
+  fillBrandStrip:()=>fillBrandStrip(), refreshBrandStrip:()=>refreshBrandStrip(),
+  setupBrandCollapse:()=>setupBrandCollapse(), refreshBrandToggle:()=>refreshBrandToggle() };`;
 window.eval(code);
 
 let failures=0;
@@ -116,6 +119,320 @@ toggleOf("Сумки").dispatchEvent(new window.Event("click",{bubbles:true}));
 check("кількість товарів не змінилась", document.getElementById("productsCount").textContent===before,
       `${before} → ${document.getElementById("productsCount").textContent}`);
 check("фільтр категорії лишився", window.__t.selectedCategories.has("Кросівки"));
+
+console.log("\n[6] Число відділу не розходиться з рештою");
+{
+    // ЩО БУЛО. refreshSidebarCounts() оновлював «Всі товари» й кожну
+    // категорію, а число поруч із назвою відділу лишалось тим, яке
+    // намалювали ОДИН РАЗ при завантаженні — по всьому розділу, без
+    // жодного фільтра.
+    //
+    // Виглядало так (заміряно на живому деві,
+    // /catalog?section=sale&brand=coach&department=sumky):
+    //
+    //     Всі товари      10
+    //     Сумки           14      ← більше, ніж є в усьому каталозі
+    //       Жіночі сумки   9
+    //       Чоловічі сумки 1
+    //
+    // Тобто відділ обіцяв більше, ніж є, і більше, ніж сума власних
+    // категорій.
+    const departmentCount = title =>
+        Number(group(title).querySelector("[data-sidebar-department] .sidebar-count").textContent);
+
+    const childrenSum = title =>
+        [...group(title).querySelectorAll("[data-sidebar-category] .sidebar-count")]
+            .reduce((sum, el) => sum + Number(el.textContent), 0);
+
+    const allCount = () =>
+        Number(document.querySelector("[data-sidebar-all] .sidebar-count").textContent);
+
+    rebuild();
+
+    check("без фільтрів відділ дорівнює сумі своїх категорій",
+        departmentCount("Сумки") === childrenSum("Сумки"),
+        departmentCount("Сумки") + " проти " + childrenSum("Сумки"));
+
+    // Головне: фільтр, який справді звужує вибірку. Бренд X лишає
+    // тільки дві сумки з чотирьох товарів.
+    window.__t.selectedBrands.add("X");
+    window.__t.refreshSidebarCounts();
+
+    check("після фільтра «Всі товари» звузились", allCount() === 2, allCount());
+
+    check("і відділ звузився разом із категоріями",
+        departmentCount("Сумки") === 2 && departmentCount("Сумки") === childrenSum("Сумки"),
+        departmentCount("Сумки") + " проти " + childrenSum("Сумки"));
+
+    // Порожній відділ мусить показати нуль, а не старе число.
+    check("порожній відділ показує нуль",
+        departmentCount("Взуття") === 0 && departmentCount("Аксесуари") === 0,
+        departmentCount("Взуття") + " / " + departmentCount("Аксесуари"));
+
+    // Найпростіша перевірка на здоровий глузд: жоден відділ не може
+    // бути більшим за весь каталог.
+    check("сума відділів дорівнює «Всі товари»",
+        ["Сумки", "Взуття", "Аксесуари"].reduce((s, title) => s + departmentCount(title), 0) === allCount());
+
+    window.__t.selectedBrands.delete("X");
+}
+
+console.log("\n[7] Смуга брендів — фільтр, а не перелік посилань");
+{
+    // ЩО БУЛО. Перелік брендів жив лише на /brands/, і кожна назва
+    // там вела на ОКРЕМУ сторінку бренду. Обрати два бренди одразу
+    // було нічим: перехід скидав усе, що обрано. А в «Новинках» і
+    // «Акціях» переліку не було взагалі.
+    const strip = document.getElementById("brandStrip");
+
+    const chips = () => [...document.querySelectorAll("[data-brand-chip]")];
+
+    const chip = name => chips().find(c => c.dataset.brandChip === name);
+
+    // Попередні розділи лишили обрану категорію — з нею база для
+    // перерахунку звузилась би, і числа в плашках були б не про те.
+    window.__t.selectedCategories.clear();
+
+    rebuild();
+    window.__t.fillBrandStrip();
+
+    check("смуга є в розмітці каталогу", Boolean(strip));
+
+    check("плашки намальовані з товарів", chips().length === 3,
+        chips().map(c => c.dataset.brandChip).join(", "));
+
+    // Без цієї перевірки наступні рядки падають СТЕКОМ замість чесного
+    // ✗, і з журналу не видно, що саме зламалось.
+    if (!chip("X")) {
+
+        check("плашки є, далі перевіряти нічого", false, "смуга порожня");
+
+    } else {
+
+    check("і видно, скільки чого",
+        chip("X").querySelector(".brand-chip-count").textContent === "2");
+
+    // ГОЛОВНЕ: клік фільтрує, а не веде на іншу сторінку.
+    window.__t.refreshBrandStrip();
+
+    chip("X").dispatchEvent(new window.MouseEvent("click", { bubbles: true, cancelable: true }));
+
+    check("клік поклав бренд у фільтр", window.__t.selectedBrands.has("X"));
+
+    check("смуга лишилась на місці", chips().length === 3);
+
+    check("обраний бренд видно", chip("X").classList.contains("active"));
+
+    // Другий бренд додається, а не замінює перший — заради цього все
+    // й робилось.
+    chip("Y").dispatchEvent(new window.MouseEvent("click", { bubbles: true, cancelable: true }));
+
+    check("другий бренд додається до першого",
+        window.__t.selectedBrands.has("X") && window.__t.selectedBrands.has("Y"),
+        [...window.__t.selectedBrands].join(", "));
+
+    // І знімається тим самим кліком.
+    chip("X").dispatchEvent(new window.MouseEvent("click", { bubbles: true, cancelable: true }));
+
+    check("повторний клік знімає бренд",
+        !window.__t.selectedBrands.has("X") && window.__t.selectedBrands.has("Y"),
+        [...window.__t.selectedBrands].join(", "));
+
+    check("і плашка гасне", !chip("X").classList.contains("active"));
+
+    // ПОСИЛАННЯ ЛИШАЄТЬСЯ СПРАВЖНІМ. Хаб брендів — головне джерело
+    // внутрішніх посилань на сторінки брендів; прибрати href означало
+    // б лишити їх досяжними хіба що з sitemap.
+    check("плашка лишається посиланням на сторінку бренду",
+        chip("Y").getAttribute("href").startsWith("/brands/"),
+        chip("Y").getAttribute("href"));
+
+    // Ctrl+клік — людина свідомо відкриває в новій вкладці.
+    const before = new Set(window.__t.selectedBrands);
+
+    const ctrl = new window.MouseEvent("click", { bubbles: true, cancelable: true, ctrlKey: true });
+
+    chip("X").dispatchEvent(ctrl);
+
+    check("Ctrl+клік не чіпає фільтр",
+        window.__t.selectedBrands.size === before.size && !ctrl.defaultPrevented);
+
+    }
+
+    window.__t.selectedBrands.clear();
+
+    // СМУГУ МУСИТЬ ХТОСЬ МАЛЮВАТИ Й ОНОВЛЮВАТИ.
+    //
+    // Перевірки вище кличуть обидві функції руками — прибери виклик зі
+    // сторінки, і вони й далі зелені, а смуги на сайті немає. Тому
+    // окремо звіряємо, що виклики стоять поруч із бічним меню й
+    // перерахунком фасетів.
+    const catalogJs = fs.readFileSync(path.join(ROOT, "assets/js/catalog.js"), "utf8");
+
+    check("смуга малюється разом із бічним меню",
+        catalogJs.includes("fillCatalogSidebar(categoryDepartments);\n        fillBrandStrip();"));
+
+    check("і оновлюється разом із рештою фасетів",
+        catalogJs.includes("refreshSidebarCounts();\n        refreshBrandStrip();"));
+}
+
+console.log("\n[8] Дві смуги поруч не малюємо");
+{
+    // На /brands/ перелік уже лежить у розмітці — його пише
+    // build-taxonomy-pages.js, і там справжні посилання для пошукових
+    // роботів. Друга така сама смуга поруч була б просто дублем.
+    // Контейнера може не бути — тоді далі перевіряти нема чого, але
+    // падати стеком теж не можна: з журналу не видно, що зламалось.
+    const box = document.getElementById("brandStrip");
+
+    check("контейнер смуги на місці", Boolean(box));
+
+    if (box) {
+
+    box.hidden = true;
+    box.innerHTML = "";
+
+    const hub = document.createElement("nav");
+
+    hub.className = "taxonomy-hub";
+    hub.innerHTML = '<ul class="taxonomy-hub-list"><li>'
+        + '<a href="/brands/x/" data-brand-chip="X">X</a>'
+        + '<span class="taxonomy-count">99</span></li></ul>';
+
+    document.body.appendChild(hub);
+
+    window.__t.fillBrandStrip();
+
+    check("свою смугу не малюємо, якщо хаб уже є",
+        document.getElementById("brandStrip").hidden === true
+        && document.getElementById("brandStrip").children.length === 0);
+
+    // Але число в хабі оновлюємо: воно згенероване без жодного
+    // фільтра й після вибору бренду обіцяло б неправду.
+    window.__t.refreshBrandStrip();
+
+    check("число в хабі оновлюється",
+        hub.querySelector(".taxonomy-count").textContent === "2",
+        hub.querySelector(".taxonomy-count").textContent);
+
+    // І клік по ньому теж фільтрує, а не веде на сторінку бренду.
+    hub.querySelector("[data-brand-chip]")
+        .dispatchEvent(new window.MouseEvent("click", { bubbles: true, cancelable: true }));
+
+    check("клік у хабі теж фільтрує", window.__t.selectedBrands.has("X"));
+
+    hub.remove();
+
+    }
+
+    window.__t.selectedBrands.clear();
+}
+
+console.log("\n[9] На телефоні смуга згортається під кнопку");
+{
+    // НАВІЩО. Брендів два десятки, і на вузькому екрані вони займають
+    // п'ять-шість рядків — тобто відсувають сам каталог за межі
+    // екрана. Людина приходить дивитись товари, а бачить перелік назв.
+    document.getElementById("brandStripToggle")?.remove();
+
+    document.querySelectorAll(".brand-list-collapsible")
+        .forEach(node => node.classList.remove("brand-list-collapsible"));
+
+    window.__t.selectedBrands.clear();
+    window.__t.selectedCategories.clear();
+
+    rebuild();
+    window.__t.fillBrandStrip();
+    window.__t.setupBrandCollapse();
+
+    const toggle = document.getElementById("brandStripToggle");
+    const strip = document.getElementById("brandStrip");
+
+    check("кнопка з'явилась", Boolean(toggle));
+
+    // ІМ'Я НЕ МОЖНА БРАТИ ЗАЙНЯТЕ.
+    //
+    // Спершу кнопка звалась brandToggle — а так уже зветься кнопка
+    // випадайки «Бренд» у смузі фільтрів. Перевірка «чи вже є така
+    // кнопка» знаходила ЧУЖУ й мовчки не робила нічого: ні кнопки, ні
+    // згортання, і жодної помилки ніде.
+    const dropdownToggle = document.getElementById("brandToggle");
+
+    check("це не та сама кнопка, що у випадайці фільтра",
+        Boolean(dropdownToggle) && dropdownToggle !== toggle
+        && dropdownToggle.classList.contains("filter-toggle"),
+        dropdownToggle ? dropdownToggle.className : "випадайки немає");
+
+    if (toggle) {
+
+    check("смуга позначена як згортана",
+        strip.classList.contains("brand-list-collapsible"));
+
+    check("починаємо згорнутими", toggle.getAttribute("aria-expanded") === "false"
+        && !strip.classList.contains("open"));
+
+    toggle.dispatchEvent(new window.MouseEvent("click", { bubbles: true, cancelable: true }));
+
+    check("клік розгортає", strip.classList.contains("open")
+        && toggle.getAttribute("aria-expanded") === "true");
+
+    toggle.dispatchEvent(new window.MouseEvent("click", { bubbles: true, cancelable: true }));
+
+    check("повторний клік згортає", !strip.classList.contains("open"));
+
+    // ЗГОРНУТА КНОПКА МУСИТЬ ПОКАЗУВАТИ, ЩО ФІЛЬТР ПРАЦЮЄ.
+    //
+    // Інакше вона виглядає однаково з обраним брендом і без нього:
+    // товарів менше, а чому — не видно.
+    const badge = toggle.querySelector(".brand-strip-toggle-count");
+
+    check("без вибору лічильника немає", badge.hidden === true);
+
+    window.__t.selectedBrands.add("X");
+    window.__t.refreshBrandToggle();
+
+    check("з вибором лічильник показує, скільки брендів",
+        badge.hidden === false && badge.textContent === "1", badge.textContent);
+
+    window.__t.selectedBrands.add("Y");
+    window.__t.refreshBrandToggle();
+
+    check("і рахує обидва", badge.textContent === "2", badge.textContent);
+
+    window.__t.selectedBrands.clear();
+
+    }
+
+    // ШИРИНУ ЕКРАНА ВИРІШУЄ CSS, А НЕ КОД.
+    //
+    // Число в JS рано чи пізно розійшлося б із медіа-запитом, і кнопка
+    // з'являлась би не там, де ховається смуга.
+    const catalogJs = fs.readFileSync(path.join(ROOT, "assets/js/catalog.js"), "utf8");
+
+    const collapseCode = catalogJs.slice(
+        catalogJs.indexOf("function setupBrandCollapse"),
+        catalogJs.indexOf("function refreshBrandToggle"));
+
+    check("у коді згортання немає жодної ширини екрана",
+        !/matchMedia|innerWidth|768|600|max-width/.test(collapseCode));
+
+    const css = fs.readFileSync(path.join(ROOT, "assets/css/style.css"), "utf8");
+
+    // Перевірки вище кличуть setupBrandCollapse() руками — прибери
+    // виклик зі сторінки, і вони й далі зелені, а кнопки на сайті
+    // немає. Той самий недогляд уже був зі смугою.
+    check("кнопку ставить сама сторінка",
+        catalogJs.includes("fillBrandStrip();\n        setupBrandCollapse();"));
+
+    check("і лічильник оновлюється разом із рештою",
+        catalogJs.includes("refreshBrandStrip();\n        refreshBrandToggle();"));
+
+    check("на широкому екрані кнопки немає",
+        /\.brand-strip-toggle\{\s*\n\s*display:none;/.test(css));
+
+    check("а на вузькому вона з'являється",
+        /@media\(max-width:768px\)\{[\s\S]{0,400}\.brand-strip-toggle\{\s*\n\s*display:inline-flex/.test(css));
+}
 
 console.log(failures===0?"\n✅ Усі перевірки пройдено":`\n❌ Провалено: ${failures}`);
 process.exit(failures===0?0:1);

@@ -694,8 +694,22 @@ function hubMarkup(hub) {
 
         const href = `/${HUB_TITLES[page.kind].dir}/${page.slug}/`;
 
+        // ПОСИЛАННЯ ЛИШАЄТЬСЯ СПРАВЖНІМ, А КЛІК ПЕРЕХОПЛЮЄТЬСЯ.
+        //
+        // Хаб брендів — головне джерело внутрішніх посилань на
+        // сторінки брендів: прибрати href означало б лишити їх
+        // досяжними хіба що з sitemap. Тому href на місці, а
+        // catalog.js бачить data-brand-chip і замість переходу кладе
+        // бренд у фільтр — смуга лишається, і можна обрати другий.
+        //
+        // Хто відкриє в новій вкладці — потрапить на сторінку бренду,
+        // як і написано в посиланні.
+        const chip = page.kind === "brand"
+            ? ` data-brand-chip="${escapeHtml(page.name)}"`
+            : "";
+
         return `        <li>
-            <a href="${escapeHtml(href)}">${escapeHtml(page.name)}</a>
+            <a href="${escapeHtml(href)}"${chip}>${escapeHtml(page.name)}</a>
             <span class="taxonomy-count">${page.products.length}</span>
         </li>`;
 

@@ -954,6 +954,8 @@ async function initCatalog() {
         fillCategories(categoryDepartments);
 
         fillCatalogSidebar(categoryDepartments);
+        fillBrandStrip();
+        setupBrandCollapse();
 
         applyCategoryFromUrl();
 
@@ -1026,6 +1028,213 @@ function fillBrands() {
     });
 
 }
+
+// -------------------------
+// Смуга брендів над фільтрами
+//
+// НАВІЩО ВОНА
+// ------------
+// Перелік брендів жив лише на /brands/, і кожна назва там вела на
+// ОКРЕМУ сторінку бренду. Тобто обрати два бренди одразу було нічим:
+// перехід скидав усе, що обрано. А в «Новинках» і «Акціях» переліку не
+// було взагалі — хоча саме там питання «а що є від Coach» виникає
+// найчастіше.
+//
+// Тепер це фільтр. Натиснув — бренд пішов у selectedBrands, смуга
+// лишилась на місці, можна додати другий або зняти обраний. Оскільки
+// вона частина каталогу, розділи отримують її задарма: ?section=new і
+// ?section=sale показують бренди СВОГО розділу.
+//
+// ДВА ДЖЕРЕЛА ПЛАШОК, ОДНА ПОВЕДІНКА
+// -----------------------------------
+// На каталозі смугу малює ця функція. На /brands/ перелік уже лежить у
+// розмітці (його пише build-taxonomy-pages.js) — там справжні
+// посилання на сторінки брендів, і вони потрібні пошуковим роботам.
+// Другу смугу поруч не малюємо, а кліки перехоплюємо однаково: обидва
+// джерела позначені data-brand-chip.
+// -------------------------
+
+const brandStrip = document.getElementById("brandStrip");
+
+// Перелік із розмітки хаба. Якщо він є — свій не малюємо.
+function hubBrandChips() {
+
+    return [...document.querySelectorAll(".taxonomy-hub [data-brand-chip]")];
+
+}
+
+function fillBrandStrip() {
+
+    if (!brandStrip || hubBrandChips().length) return;
+
+    const scoped = sectionProducts();
+
+    const counts = new Map();
+
+    scoped.forEach(product => {
+
+        if (!product.brand) return;
+
+        counts.set(product.brand, (counts.get(product.brand) || 0) + 1);
+
+    });
+
+    if (!counts.size) return;
+
+    const names = [...counts.keys()].sort((a, b) => a.localeCompare(b, "uk"));
+
+    brandStrip.innerHTML = names.map(name =>
+        `<a class="brand-chip" href="/brands/${encodeURIComponent(latinParam(name))}/"
+            data-brand-chip="${escapeHtml(name)}">${escapeHtml(name)}<span
+            class="brand-chip-count">${counts.get(name)}</span></a>`).join("");
+
+    brandStrip.hidden = false;
+
+}
+
+// -------------------------
+// На телефоні смуга згортається під кнопку
+//
+// НАВІЩО. Брендів двадцять один, і на вузькому екрані вони займають
+// п'ять-шість рядків — тобто відсувають сам каталог за межі екрана.
+// Людина приходить дивитись товари, а бачить перелік назв.
+//
+// На широкому екрані кнопки немає: там смуга — один-два рядки, і
+// ховати її нема причини. Вирішує це CSS, а не JS: у коді немає
+// жодного числа про ширину екрана, щоб воно не розійшлося з
+// медіа-запитом.
+//
+// ОДНА КНОПКА НА ДВА ДЖЕРЕЛА. У каталозі смугу малює fillBrandStrip(),
+// на /brands/ перелік лежить у розмітці хаба. Кнопку ставимо перед
+// тим, що знайшли, — інакше довелося б писати її ще й у генераторі
+// сторінок, і дві копії розійшлися б.
+// -------------------------
+
+function brandListNode() {
+
+    const hub = document.querySelector(".taxonomy-hub:has([data-brand-chip])");
+
+    if (hub) return hub;
+
+    return brandStrip && !brandStrip.hidden ? brandStrip : null;
+
+}
+
+function setupBrandCollapse() {
+
+    const list = brandListNode();
+
+    if (!list || document.getElementById("brandStripToggle")) return;
+
+    const button = document.createElement("button");
+
+    button.type = "button";
+    button.id = "brandStripToggle";
+    button.className = "brand-strip-toggle";
+    button.setAttribute("aria-expanded", "false");
+    button.setAttribute("aria-controls", list.id || "");
+
+    button.innerHTML = `<span class="brand-strip-toggle-label">Бренди</span>`
+        + `<span class="brand-strip-toggle-count" hidden></span>`
+        + `<span class="brand-strip-toggle-icon" aria-hidden="true"></span>`;
+
+    list.classList.add("brand-list-collapsible");
+
+    list.parentNode.insertBefore(button, list);
+
+    button.addEventListener("click", () => {
+
+        const open = list.classList.toggle("open");
+
+        button.classList.toggle("open", open);
+        button.setAttribute("aria-expanded", open ? "true" : "false");
+
+    });
+
+}
+
+// Скільки брендів обрано — видно й тоді, коли смуга згорнута.
+//
+// Без цього числа згорнута кнопка виглядає однаково і з фільтром, і
+// без нього: товарів менше, а чому — не видно.
+function refreshBrandToggle() {
+
+    const count = document.querySelector("#brandStripToggle .brand-strip-toggle-count");
+
+    if (!count) return;
+
+    count.textContent = selectedBrands.size;
+    count.hidden = selectedBrands.size === 0;
+
+}
+
+// Числа й підсвітку оновлюємо разом з рештою фільтрів.
+//
+// База — filterProducts("brands"), тобто ВСІ фільтри, крім вибору
+// самого бренду: інакше після кліку по «Coach» у смузі лишився б один
+// Coach і перемкнутись було б нікуди. Те саме правило, що в бічному
+// меню категорій.
+function refreshBrandStrip() {
+
+    const chips = [...document.querySelectorAll("[data-brand-chip]")];
+
+    if (!chips.length) return;
+
+    const base = filterProducts("brands");
+
+    const counts = new Map();
+
+    base.forEach(product => {
+
+        if (!product.brand) return;
+
+        counts.set(product.brand, (counts.get(product.brand) || 0) + 1);
+
+    });
+
+    chips.forEach(chip => {
+
+        const name = chip.dataset.brandChip;
+        const count = counts.get(name) || 0;
+        const selected = selectedBrands.has(name);
+
+        const countEl = chip.querySelector(".brand-chip-count, .taxonomy-count")
+            || chip.parentElement?.querySelector(".taxonomy-count");
+
+        if (countEl) countEl.textContent = count;
+
+        chip.classList.toggle("active", selected);
+        chip.setAttribute("aria-pressed", selected ? "true" : "false");
+
+        // Обраний бренд не гасимо навіть при нулі — інакше зняти його
+        // було б нічим.
+        chip.classList.toggle("unavailable", count === 0 && !selected);
+
+    });
+
+}
+
+// Клік по плашці — це фільтр, а не перехід.
+//
+// Слухаємо на документі: плашки з'являються і з розмітки хаба, і з
+// fillBrandStrip(), а перемальовування смуги не мусить кожного разу
+// перечіпляти обробники.
+document.addEventListener("click", event => {
+
+    const chip = event.target.closest("[data-brand-chip]");
+
+    if (!chip) return;
+
+    // Ctrl/Cmd/середня кнопка — людина свідомо відкриває посилання в
+    // новій вкладці. Не заважаємо: там на неї чекає сторінка бренду,
+    // як і написано в href.
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
+
+    event.preventDefault();
+
+    toggleBrand(chip.dataset.brandChip);
+
+});
 
 function toggleBrand(value) {
 
@@ -1784,11 +1993,38 @@ function refreshSidebarCounts() {
 
     });
 
-    // група ховається цілком, якщо в ній не лишилось жодної категорії
+    // ЧИСЛО ВІДДІЛУ ТЕЖ ОНОВЛЮЄТЬСЯ — І САМЕ ЦЬОГО ТУТ НЕ БУЛО.
+    //
+    // Оновлювались «Всі товари» й кожна категорія, а число поруч із
+    // назвою відділу лишалось тим, яке намалювали один раз при
+    // завантаженні — по всьому розділу, без жодного фільтра.
+    //
+    // Виглядало це так: «Всі товари 10», «Сумки 14», а всередині
+    // «Жіночі сумки 9» і «Чоловічі сумки 1». Тобто відділ обіцяв
+    // більше, ніж є в усьому каталозі, і більше, ніж сума власних
+    // категорій. Заміряно на
+    // /catalog?section=sale&brand=coach&department=sumky.
+    //
+    // Рахуємо так само, як при побудові меню: сумою своїх категорій.
+    // Інакше два числа на одному екрані рахувались би по-різному й
+    // рано чи пізно розійшлися б знову.
     catalogSidebar.querySelectorAll(".sidebar-group").forEach(group => {
 
         const items = [...group.querySelectorAll("[data-sidebar-category]")];
 
+        const total = items.reduce((sum, item) => {
+
+            const value = Number(item.querySelector(".sidebar-count")?.textContent);
+
+            return sum + (Number.isFinite(value) ? value : 0);
+
+        }, 0);
+
+        const countEl = group.querySelector("[data-sidebar-department] .sidebar-count");
+
+        if (countEl) countEl.textContent = total;
+
+        // група ховається цілком, якщо в ній не лишилось жодної категорії
         group.classList.toggle(
             "unavailable",
             items.length > 0 && items.every(item => item.classList.contains("unavailable"))
@@ -3604,6 +3840,8 @@ function refreshFacets() {
         updateStockUI();
 
         refreshSidebarCounts();
+        refreshBrandStrip();
+        refreshBrandToggle();
 
     } finally {
 

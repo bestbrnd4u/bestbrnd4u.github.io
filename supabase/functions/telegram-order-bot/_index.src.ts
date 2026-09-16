@@ -3527,6 +3527,9 @@ async function handleEmailTaken(request: Request, body: Record<string, any>): Pr
     taken: verdict.taken,
     pending: verdict.pending,
     checked: verdict.checked,
+    // Скільки чекати — числом, а не словами в розмітці: інакше текст
+    // на сайті й строк у коді розійдуться на першій же правці.
+    freeInMinutes: EMAIL_CHANGE_CLAIM_MINUTES,
   }, 200, origin);
 
 }
@@ -3840,6 +3843,27 @@ async function emailTaken(email: string, exceptUserId = ""): Promise<{ checked: 
 // Назву поля різні версії GoTrue пишуть по-різному, тож перебираємо
 // відомі; зайвий ключ у переліку нічого не коштує, а відсутній
 // коштував би дірки.
+// Скільки живе чужа заявка на адресу.
+//
+// ЦЕ НЕ НАШЕ ЧИСЛО. Заявку створює Supabase, коли людина просить зміну
+// пошти, і живе вона рівно стільки, скільки живе його посилання:
+// Authentication → Emails → **Email OTP Expiration**. Зараз там година.
+//
+// ЩО СТАНЕТЬСЯ, ЯКЩО ЧИСЛА РОЗІЙДУТЬСЯ:
+//
+//   тут менше, ніж у панелі — ми звільнимо адресу, поки чуже посилання
+//   ще робоче, і повернеться мовчазне змагання за одну пошту;
+//
+//   тут більше — адреса потримається довше, ніж треба, але людина
+//   бачить, чому і скільки чекати.
+//
+// Тобто помилятись безпечніше вгору. Але тримати зайве теж погано, тож
+// правило просте: змінили строк у панелі — змініть і тут.
+//
+// Наше власне посилання (EMAIL_ADD_TTL_MINUTES) до цього числа
+// відношення не має: то інший лист і інший строк.
+const EMAIL_CHANGE_CLAIM_MINUTES = 60;
+
 function claims(user: Record<string, any>, email: string): "taken" | "pending" | "" {
 
   // Підтверджена адреса акаунту. Тут сумнівів немає: вона чиясь.
@@ -3857,11 +3881,10 @@ function claims(user: Record<string, any>, email: string): "taken" | "pending" |
   // ніхто інший більше цю пошту не займе, причому без жодного способу
   // дізнатись чому.
   //
-  // Посилання живе EMAIL_ADD_TTL_MINUTES. Минуло більше — воно мертве,
-  // і заявка разом із ним.
+  // Скільки та заявка ще щось означає — див. EMAIL_CHANGE_CLAIM_MINUTES.
   const sentAt = Date.parse(String(user?.email_change_sent_at ?? ""));
 
-  if (Number.isFinite(sentAt) && Date.now() - sentAt > EMAIL_ADD_TTL_MINUTES * 60000) {
+  if (Number.isFinite(sentAt) && Date.now() - sentAt > EMAIL_CHANGE_CLAIM_MINUTES * 60000) {
     return "";
   }
 
