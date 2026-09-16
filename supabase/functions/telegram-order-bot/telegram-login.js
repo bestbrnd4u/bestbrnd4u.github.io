@@ -152,6 +152,12 @@ export function loginStatus(row, now) {
 //
 // Сам підпис рахується в index.ts (тут немає мережі й крипто), а ця
 // функція лише складає адресу з готових частин.
+// Домен службових адрес. Живе окремою сталою, бо його звіряє ще й
+// сайт (realEmail у assets/js/supabase-client.js): одна сторона таку
+// адресу складає, друга мусить її впізнати. Розійдуться — і службова
+// пошта поїде в замовлення як справжня.
+export const TELEGRAM_EMAIL_DOMAIN = "@telegram.bestbrnd4u.com";
+
 export function telegramEmail(telegramId, signature) {
 
     const id = String(telegramId ?? "").replace(/\D/g, "");
@@ -159,7 +165,14 @@ export function telegramEmail(telegramId, signature) {
 
     if (!id || sign.length < 16) return "";
 
-    return `tg${id}.${sign.slice(0, 32)}@telegram.bestbrnd4u.com`;
+    return `tg${id}.${sign.slice(0, 32)}${TELEGRAM_EMAIL_DOMAIN}`;
+
+}
+
+// Чи це службова адреса, а не пошта людини.
+export function isServiceEmail(email) {
+
+    return String(email ?? "").trim().toLowerCase().endsWith(TELEGRAM_EMAIL_DOMAIN);
 
 }
 
@@ -244,5 +257,189 @@ export function formatPhone(value) {
     }
 
     return "+" + digits;
+
+}
+
+
+// -------------------------
+// Додавання пошти до акаунту, який увійшов через Telegram
+//
+// ЧОМУ ЦЕ НЕ РОБИТЬ САМ SUPABASE
+// -------------------------------
+// Робить, але не для нас. Supabase має увімкненим Secure email change:
+// лист іде і на НОВУ адресу, і на СТАРУ, і пошта міняється лише після
+// переходу за обома.
+//
+// Для звичайного акаунту це правильно: так власник старої адреси
+// дізнається, що акаунт у нього забирають. Для входу через Telegram
+// стара адреса — службова, скриньки за нею не існує. Тобто другий
+// лист іде в нікуди, і зміна НЕ ВІДБУВАЄТЬСЯ НІКОЛИ.
+//
+// Саме це й сталось: людина додала пошту, отримала лист, перейшла за
+// посиланням — і в базі лишилась службова адреса.
+//
+// ЧОМУ НЕ ВИМКНУТИ ПЕРЕМИКАЧ
+// ---------------------------
+// Бо він захищає й тих, хто входить паролем: без нього будь-хто, хто
+// дістався до відкритої сесії, переводить акаунт на свою пошту без
+// жодного підтвердження зі старої. Вимикати захист для всіх заради
+// тих, кому він не потрібен, — погана угода.
+//
+// ЩО РОБИМО НАТОМІСТЬ
+// --------------------
+// Для акаунтів БЕЗ справжньої пошти підтверджуємо самі. Захист тут
+// потрібен рівно один: довести, що нова адреса твоя. Старої, яку
+// треба було б захищати, просто немає.
+//
+// ЧОМУ БЕЗ ТАБЛИЦІ
+// -----------------
+// Посилання несе в собі і дані, і підпис. Підробити не можна — ключ
+// не залишає функції; підставити чужий акаунт теж, бо id у підписі.
+// Повторний перехід за тим самим посиланням лише вдруге запише ту
+// саму адресу, тобто не робить нічого.
+//
+// Підпис рахується в index.ts (тут немає крипто), а ці функції лише
+// складають і розбирають те, що підписують.
+// -------------------------
+
+// Скільки живе посилання з листа.
+//
+// Година, а не п'ять хвилин як у входу: лист може полежати в теці
+// «Спам», і людина знайде його не одразу. І не доба: посилання дає
+// право перевести акаунт на іншу пошту.
+export const EMAIL_ADD_TTL_MINUTES = 60;
+
+// Адреса, яку вписали в кабінеті.
+//
+// Перевірка навмисно проста — вона відсіює описки, а не доводить, що
+// скринька існує. Це доводить сам лист: не дійшов — не підтвердили.
+export function cleanNewEmail(value) {
+
+    const clean = String(value ?? "").trim().toLowerCase();
+
+    if (clean.length > 254) return "";
+
+    if (!/^[^\s@,;]+@[^\s@,;.]+(\.[^\s@,;.]+)+$/.test(clean)) return "";
+
+    // Службову адресу як «нову пошту» не приймаємо: це не пошта.
+    if (isServiceEmail(clean)) return "";
+
+    return clean;
+
+}
+
+// Те, що підписуємо: кому і яку адресу ставимо, і до якої миті.
+export function emailAddPayload(userId, email, now) {
+
+    const id = String(userId ?? "").trim();
+    const mail = cleanNewEmail(email);
+
+    if (!/^[0-9a-f-]{36}$/i.test(id) || !mail) return "";
+
+    const data = JSON.stringify({
+        u: id.toLowerCase(),
+        e: mail,
+        x: Number(now) + EMAIL_ADD_TTL_MINUTES * 60000,
+    });
+
+    return base64url(data);
+
+}
+
+// Розбір того самого. Зіпсований рядок — це null, а не виняток:
+// посилання з листа могло приїхати обрізаним поштовим клієнтом.
+export function readEmailAddPayload(payload) {
+
+    try {
+
+        const data = JSON.parse(fromBase64url(String(payload ?? "")));
+
+        const id = String(data?.u ?? "");
+        const mail = cleanNewEmail(data?.e);
+        const expires = Number(data?.x);
+
+        if (!/^[0-9a-f-]{36}$/i.test(id) || !mail || !Number.isFinite(expires)) return null;
+
+        return { userId: id, email: mail, expiresAt: expires };
+
+    } catch {
+
+        return null;
+
+    }
+
+}
+
+// Чи ще діє посилання.
+//
+// state:
+//   ok       — можна ставити пошту;
+//   expired  — минула година;
+//   unknown  — посилання зіпсоване або підроблене.
+export function emailAddVerdict(data, now) {
+
+    if (!data) return { ok: false, state: "unknown" };
+
+    if (Number(now) > data.expiresAt) return { ok: false, state: "expired" };
+
+    return { ok: true, state: "ok" };
+
+}
+
+// Токен = дані.підпис. Крапка тут безпечна: base64url її не містить.
+export function packEmailAddToken(payload, signature) {
+
+    const sign = String(signature ?? "").replace(/[^a-f0-9]/gi, "").toLowerCase();
+
+    if (!payload || sign.length < 32) return "";
+
+    return `${payload}.${sign}`;
+
+}
+
+export function unpackEmailAddToken(token) {
+
+    const parts = String(token ?? "").trim().split(".");
+
+    if (parts.length !== 2) return null;
+
+    const [payload, signature] = parts;
+
+    if (!/^[A-Za-z0-9_-]+$/.test(payload)) return null;
+    if (!/^[a-f0-9]{32,}$/i.test(signature)) return null;
+
+    return { payload: payload, signature: signature.toLowerCase() };
+
+}
+
+// Куди веде кнопка в листі. Підтверджує сам кабінет — туди ж людина
+// й потрапляє, уже зі своєю поштою на екрані.
+export function emailAddUrl(siteUrl, token) {
+
+    const base = String(siteUrl ?? "").trim().replace(/\/+$/, "");
+
+    if (!base || !token) return "";
+
+    return `${base}/account?email-token=${encodeURIComponent(token)}`;
+
+}
+
+// base64url без підкладок: такий рядок переживає і адресу, і поштовий
+// клієнт, який любить ламати «+» і «/».
+function base64url(text) {
+
+    return btoa(unescape(encodeURIComponent(text)))
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_")
+        .replace(/=+$/, "");
+
+}
+
+function fromBase64url(text) {
+
+    const padded = text.replace(/-/g, "+").replace(/_/g, "/")
+        + "=".repeat((4 - (text.length % 4)) % 4);
+
+    return decodeURIComponent(escape(atob(padded)));
 
 }

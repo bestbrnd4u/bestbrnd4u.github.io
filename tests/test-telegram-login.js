@@ -52,6 +52,9 @@ function loadModule(rel, names) {
 const tg = loadModule("supabase/functions/telegram-order-bot/telegram-login.js", [
     "cleanLoginToken", "loginCode", "loginDeepLink", "loginVerdict", "loginStatus",
     "telegramEmail", "telegramName", "LOGIN_TTL_MINUTES", "LOGIN_PREFIX",
+    "TELEGRAM_EMAIL_DOMAIN", "isServiceEmail", "EMAIL_ADD_TTL_MINUTES", "cleanNewEmail",
+    "emailAddPayload", "readEmailAddPayload", "emailAddVerdict",
+    "packEmailAddToken", "unpackEmailAddToken", "emailAddUrl",
 ]);
 
 const fmt = loadModule("supabase/functions/telegram-order-bot/format.js", [
@@ -379,6 +382,148 @@ console.log("\n[9] Телефон із Telegram — безкоштовно й с
 
     check("міграція на стовпці є",
         fs.existsSync(path.join(ROOT, "supabase/migrations/034-telegram-phone.sql")));
+}
+
+console.log("\n[10] Додавання пошти до акаунту без пошти");
+{
+    const src = read("supabase/functions/telegram-order-bot/_index.src.ts");
+    const mail = read("supabase/functions/telegram-order-bot/mail.js");
+
+    // ЩО БУЛО. Власник увійшов через Telegram, додав свою адресу,
+    // отримав лист, перейшов за посиланням — і в базі лишилась
+    // службова адреса. Причина: Supabase вимагає підтвердження ще й
+    // зі СТАРОЇ адреси, а вона службова й не існує. Тобто додати
+    // пошту було неможливо в принципі.
+    check("для акаунтів без пошти лист надсилає наша функція",
+        /site_action === "email-add-start"/.test(src)
+        && /site_action === "email-add-confirm"/.test(src));
+
+    check("лист має власний текст, а не «зміна email»",
+        /export function addEmailLetter/.test(mail)
+        && /Підтвердіть email для кабінету/.test(mail));
+
+    // ЗВИЧАЙНИХ АКАУНТІВ ЦЕ НЕ ТОРКАЄТЬСЯ.
+    //
+    // Там подвійне підтвердження працює як задумано й захищає власника
+    // старої адреси. Підміняти його своїм — послаблювати захист усім
+    // заради тих, кому він не потрібен.
+    check("акаунт зі справжньою поштою йде звичайним шляхом Supabase",
+        /if \(!isServiceEmail\(user\.email\)\) \{[\s\S]{0,160}not_service/.test(src));
+
+    const js = read("assets/js/account.js");
+
+    check("сайт теж розводить два шляхи",
+        /realEmail\(user\)\s*\n?\s*\? \(await supabaseClient\.auth\.updateUser\(\{ email \}\)\)\.error/.test(js)
+        && /: await addEmailThroughFunction\(email\)/.test(js));
+
+    // ХТО ПРОСИТЬ — ПИТАЄМО В SUPABASE. Полю з тіла запиту вірити не
+    // можна: його вписав би будь-хто й додав пошту до чужого акаунту.
+    check("функція не вірить сайту на слово, хто саме просить",
+        /userFromAccessToken\(body\?\.accessToken\)/.test(src)
+        && /auth\/v1\/user`, \{[\s\S]{0,200}Bearer \$\{clean\}/.test(src));
+
+    check("сайт надсилає саме токен сесії",
+        /auth\.getSession\(\)/.test(js) && /accessToken: accessToken/.test(js));
+
+    const id = "11111111-2222-3333-4444-555555555555";
+    const now = Date.now();
+
+    const payload = tg.emailAddPayload(id, "Olena@Gmail.COM", now);
+    const back = tg.readEmailAddPayload(payload);
+
+    check("посилання несе в собі кому й яку адресу ставити",
+        back && back.userId === id && back.email === "olena@gmail.com",
+        JSON.stringify(back));
+
+    check("адреса зводиться до нижнього регістру",
+        back && back.email === back.email.toLowerCase());
+
+    check("година — і посилання мертве",
+        tg.emailAddVerdict(back, now).state === "ok"
+        && tg.emailAddVerdict(back, now + tg.EMAIL_ADD_TTL_MINUTES * 60000 + 1).state === "expired");
+
+    check("зіпсоване посилання не кидає винятку, а стає unknown",
+        tg.readEmailAddPayload("це не base64") === null
+        && tg.emailAddVerdict(tg.readEmailAddPayload("+++"), now).state === "unknown");
+
+    // Службову адресу як «нову пошту» приймати нема сенсу: це не
+    // пошта, і людина опинилась би там само, звідки почала.
+    check("службову адресу за нову пошту не беремо",
+        tg.cleanNewEmail("tg1.aaaaaaaaaaaaaaaa@telegram.bestbrnd4u.com") === ""
+        && tg.isServiceEmail("tg1.aaaaaaaaaaaaaaaa@telegram.bestbrnd4u.com") === true);
+
+    check("описки в адресі відсіюються",
+        ["a@b", "a b@c.com", "@b.com", "a@.com", ""].every(v => tg.cleanNewEmail(v) === ""));
+
+    check("домен службових адрес — одна стала на обидві функції",
+        tg.telegramEmail(42, "a".repeat(32)).endsWith(tg.TELEGRAM_EMAIL_DOMAIN));
+
+    // ПІДПИС — ЄДИНЕ, ЩО ТУТ ЗАХИЩАЄ. Таблиці немає, тож підробка
+    // payload означала б право переписати пошту будь-кому.
+    check("токен розбирається лише разом із підписом",
+        tg.unpackEmailAddToken(payload) === null
+        && tg.unpackEmailAddToken(tg.packEmailAddToken(payload, "a".repeat(64))) !== null);
+
+    check("підпис звіряється за сталий час",
+        /function sameSignature/.test(src)
+        && /diff \|= a\.charCodeAt\(i\) \^ b\.charCodeAt\(i\)/.test(src)
+        && /sameSignature\(expected, parts\.signature\)/.test(src));
+
+    // ОДИН КЛЮЧ, РІЗНІ ЦІЛІ — КЛАСИЧНА ДІРКА. Без простору імен
+    // підпис, виданий для адреси входу, підійшов би для зміни пошти.
+    check("підписи різних цілей не взаємозамінні",
+        /signWithBotToken\(`telegram-login:/.test(src)
+        && /signWithBotToken\(`email-add:/.test(src));
+
+    check("посилання веде в кабінет, а не в порожню сторінку",
+        tg.emailAddUrl("https://bestbrnd4u.com/", "abc.def")
+        === "https://bestbrnd4u.com/account?email-token=abc.def");
+
+    check("кабінет підхоплює токен із адреси й чистить її",
+        /get\("email-token"\)/.test(js) && /history\.replaceState/.test(js));
+
+    // Пошту помінялa функція, а не браузер: у токені, що лежить у
+    // вкладці, і далі стоїть службова адреса.
+    check("після підтвердження сесія оновлюється",
+        /refreshSession\(\)/.test(js)
+        && /refreshSession\(\)[\s\S]{0,200}loadProfile\(user\)/.test(js));
+
+    // Посилання могли відкрити в іншому браузері, де сесії немає.
+    // Підтвердженню вона й не потрібна — доводить підпис. Пропустити
+    // його там означало б мовчки спалити робоче посилання.
+    check("посилання спрацьовує і без відкритої сесії",
+        /accountDashboard\.hidden = true;\s*\n\s*\}\n[\s\S]{0,900}await confirmAddedEmail\(\);/.test(js));
+}
+
+console.log("\n[11] Вхід через Telegram знаходить акаунт за telegram_id");
+{
+    const src = read("supabase/functions/telegram-order-bot/_index.src.ts");
+
+    // РАДИ ЧОГО ЦЕ ВЗАГАЛІ.
+    //
+    // Користувач шукався за службовою адресою tg<id>.<підпис>@… Доки
+    // пошта не мінялась, це працювало. А щойно людина додавала свою —
+    // службової адреси в базі не лишалось, і наступний вхід через
+    // Telegram створював ДРУГИЙ, порожній акаунт. Замовлення, адреси
+    // й обране лишались у першому, невидимі.
+    check("спершу шукаємо, чи входила ця людина раніше",
+        /const known = await userForTelegramId\(row\.telegram_id\)/.test(src));
+
+    check("беремо її ПОТОЧНУ пошту, а не службову",
+        /const email = known\?\.email \|\| telegramEmail\(row\.telegram_id, signature\)/.test(src));
+
+    // Саме тут і виникав дублікат: POST зі службовою адресою для
+    // людини, чия пошта вже інша.
+    check("відомому користувачеві акаунт не створюємо вдруге",
+        /if \(!known\) \{[\s\S]{0,600}supabaseAuthAdmin\("users", \{/.test(src));
+
+    check("зв'язок беремо з рядка спроби, без окремої таблиці",
+        /telegram_logins\?telegram_id=eq\.\$\{id\}&user_id=not\.is\.null/.test(src));
+
+    // Акаунт могли видалити — тоді це вже не «той самий користувач»,
+    // і вхід має піти першим шляхом.
+    check("видалений акаунт не рахується за знайдений",
+        /if \(!response\.ok\) return null;[\s\S]{0,260}user\?\.id && user\?\.email \? user : null/.test(src));
 }
 
 console.log(failures === 0

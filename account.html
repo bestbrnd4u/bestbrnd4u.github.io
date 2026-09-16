@@ -443,13 +443,21 @@
 
                             <div id="emailChangeStepForm" class="profile-email-step">
 
+                                <!-- ПІДПИСИ ЗАЛЕЖАТЬ ВІД ТОГО, ЧИ Є ПОШТА.
+
+                                     У кого вона є — той її МІНЯЄ, у кого
+                                     немає (вхід через Telegram) — ДОДАЄ.
+                                     «Новий email» для другого випадку
+                                     безглузде: старого не було. Тексти
+                                     проставляє account.js разом із
+                                     написом на кнопці. -->
                                 <label>
-                                    Новий email
+                                    <span id="newEmailLabel">Новий email</span>
                                     <input type="email" id="newEmail" placeholder="you@example.com" autocomplete="email">
                                 </label>
 
                                 <label>
-                                    Підтвердіть новий email
+                                    <span id="newEmailConfirmLabel">Підтвердіть новий email</span>
                                     <input type="email" id="newEmailConfirm" placeholder="Ще раз ту саму адресу" autocomplete="email">
                                 </label>
 
@@ -465,9 +473,9 @@
                             <div id="emailChangeStepSent" class="profile-email-step" hidden>
 
                                 <p class="profile-email-sent">
-                                    На адресу <strong id="emailChangeSentTo"></strong> надіслано лист
-                                    для зміни email. Пошта зміниться лише після переходу
-                                    за посиланням із нього.
+                                    На адресу <strong id="emailChangeSentTo"></strong> надіслано лист.
+                                    <span id="emailChangeSentWhat">Пошта зміниться лише після переходу
+                                    за посиланням із нього.</span>
                                 </p>
 
                                 <p class="profile-card-sub">
@@ -930,7 +938,7 @@
      Той самий файл, що й на оформленні замовлення: збережена адреса
      мусить бути такою самою справжньою, як введена при замовленні. -->
 <script src="assets/js/nova-poshta.js?v=64b7a428" defer></script>
-<script src="assets/js/account.js?v=b6b53768" defer></script>
+<script src="assets/js/account.js?v=e53f24f3" defer></script>
 
 </body>
 

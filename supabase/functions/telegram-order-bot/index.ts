@@ -2526,6 +2526,73 @@ function subscribeConfirmLetter(confirmUrl, siteUrl) {
 
 }
 
+// Лист «підтвердіть пошту», який надсилаємо МИ, а не Supabase.
+//
+// НАВІЩО СВІЙ, КОЛИ В SUPABASE Є СВІЙ
+// ------------------------------------
+// Бо його лист у цьому випадку не працює. Подробиці — у
+// telegram-login.js, розділ про додавання пошти. Коротко: Supabase
+// вимагає підтвердження ще й зі СТАРОЇ адреси, а в того, хто увійшов
+// через Telegram, стара адреса службова й не існує.
+//
+// І текст у нього не про те. Людина не міняє пошту — вона додає її
+// вперше, і лист про «зміну пошти» зі згадкою службової адреси
+// пояснює рівно нічого. Цей каже, що сталось насправді.
+function addEmailLetter(confirmUrl, email, siteUrl) {
+
+    const url = String(confirmUrl ?? "").trim();
+    const mail = String(email ?? "").trim();
+
+    if (!url || !mail) return null;
+
+    const safe = escapeHtml(url);
+
+    const body = [
+        `<div style="font-size:15px;line-height:1.6">`,
+        `У кабінеті BestBrnd4u ви входите через Telegram — пошти в акаунті `,
+        `не було. Ви попросили додати цю адресу: <strong>${escapeHtml(mail)}</strong>.`,
+        `</div>`,
+
+        `<div style="margin-top:12px;font-size:15px;line-height:1.6">`,
+        `Лишилось підтвердити, що скринька ваша. Після цього листи про `,
+        `замовлення приходитимуть сюди, а входити можна буде і через `,
+        `Telegram, і за цією адресою.`,
+        `</div>`,
+
+        // Кнопка таблицею, а не <a> з padding: Outlook ігнорує
+        // відступи на посиланні й малює його звичайним рядком тексту.
+        `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:22px auto 0">`,
+        `<tr><td style="background:#111827;border-radius:10px">`,
+        `<a href="${safe}" style="display:inline-block;padding:14px 28px;`,
+        `font-size:15px;font-weight:700;color:#ffffff;text-decoration:none">`,
+        `Підтвердити адресу`,
+        `</a>`,
+        `</td></tr>`,
+        `</table>`,
+
+        `<div style="margin-top:18px;font-size:12px;line-height:1.5;color:#6b7280;`,
+        `text-align:center;word-break:break-all">`,
+        `Кнопка не працює? Скопіюйте адресу:<br>`,
+        `<a href="${safe}" style="color:#6b7280">${safe}</a>`,
+        `</div>`,
+
+        `<div style="margin-top:22px;padding-top:18px;border-top:1px solid #e5e7eb;`,
+        `font-size:13px;line-height:1.6;color:#6b7280">`,
+        `Посилання діє годину й спрацьовує з одного акаунту — того, з якого `,
+        `адресу вписали.`,
+        `<br><br>`,
+        `Якщо це були не ви — просто видаліть лист. Доки за посиланням не `,
+        `перейшли, у вашому акаунті нічого не змінюється.`,
+        `</div>`,
+    ].join("");
+
+    return {
+        subject: "Підтвердіть email для кабінету BestBrnd4u",
+        html: letterShell("Підтвердіть адресу ✉️", body, siteUrl),
+    };
+
+}
+
 function mailRequest(config, letter) {
 
     const to = String(config?.to || "").trim();
@@ -5468,6 +5535,12 @@ function loginStatus(row, now) {
 //
 // Сам підпис рахується в index.ts (тут немає мережі й крипто), а ця
 // функція лише складає адресу з готових частин.
+// Домен службових адрес. Живе окремою сталою, бо його звіряє ще й
+// сайт (realEmail у assets/js/supabase-client.js): одна сторона таку
+// адресу складає, друга мусить її впізнати. Розійдуться — і службова
+// пошта поїде в замовлення як справжня.
+const TELEGRAM_EMAIL_DOMAIN = "@telegram.bestbrnd4u.com";
+
 function telegramEmail(telegramId, signature) {
 
     const id = String(telegramId ?? "").replace(/\D/g, "");
@@ -5475,7 +5548,14 @@ function telegramEmail(telegramId, signature) {
 
     if (!id || sign.length < 16) return "";
 
-    return `tg${id}.${sign.slice(0, 32)}@telegram.bestbrnd4u.com`;
+    return `tg${id}.${sign.slice(0, 32)}${TELEGRAM_EMAIL_DOMAIN}`;
+
+}
+
+// Чи це службова адреса, а не пошта людини.
+function isServiceEmail(email) {
+
+    return String(email ?? "").trim().toLowerCase().endsWith(TELEGRAM_EMAIL_DOMAIN);
 
 }
 
@@ -5560,6 +5640,190 @@ function formatPhone(value) {
     }
 
     return "+" + digits;
+
+}
+
+
+// -------------------------
+// Додавання пошти до акаунту, який увійшов через Telegram
+//
+// ЧОМУ ЦЕ НЕ РОБИТЬ САМ SUPABASE
+// -------------------------------
+// Робить, але не для нас. Supabase має увімкненим Secure email change:
+// лист іде і на НОВУ адресу, і на СТАРУ, і пошта міняється лише після
+// переходу за обома.
+//
+// Для звичайного акаунту це правильно: так власник старої адреси
+// дізнається, що акаунт у нього забирають. Для входу через Telegram
+// стара адреса — службова, скриньки за нею не існує. Тобто другий
+// лист іде в нікуди, і зміна НЕ ВІДБУВАЄТЬСЯ НІКОЛИ.
+//
+// Саме це й сталось: людина додала пошту, отримала лист, перейшла за
+// посиланням — і в базі лишилась службова адреса.
+//
+// ЧОМУ НЕ ВИМКНУТИ ПЕРЕМИКАЧ
+// ---------------------------
+// Бо він захищає й тих, хто входить паролем: без нього будь-хто, хто
+// дістався до відкритої сесії, переводить акаунт на свою пошту без
+// жодного підтвердження зі старої. Вимикати захист для всіх заради
+// тих, кому він не потрібен, — погана угода.
+//
+// ЩО РОБИМО НАТОМІСТЬ
+// --------------------
+// Для акаунтів БЕЗ справжньої пошти підтверджуємо самі. Захист тут
+// потрібен рівно один: довести, що нова адреса твоя. Старої, яку
+// треба було б захищати, просто немає.
+//
+// ЧОМУ БЕЗ ТАБЛИЦІ
+// -----------------
+// Посилання несе в собі і дані, і підпис. Підробити не можна — ключ
+// не залишає функції; підставити чужий акаунт теж, бо id у підписі.
+// Повторний перехід за тим самим посиланням лише вдруге запише ту
+// саму адресу, тобто не робить нічого.
+//
+// Підпис рахується в index.ts (тут немає крипто), а ці функції лише
+// складають і розбирають те, що підписують.
+// -------------------------
+
+// Скільки живе посилання з листа.
+//
+// Година, а не п'ять хвилин як у входу: лист може полежати в теці
+// «Спам», і людина знайде його не одразу. І не доба: посилання дає
+// право перевести акаунт на іншу пошту.
+const EMAIL_ADD_TTL_MINUTES = 60;
+
+// Адреса, яку вписали в кабінеті.
+//
+// Перевірка навмисно проста — вона відсіює описки, а не доводить, що
+// скринька існує. Це доводить сам лист: не дійшов — не підтвердили.
+function cleanNewEmail(value) {
+
+    const clean = String(value ?? "").trim().toLowerCase();
+
+    if (clean.length > 254) return "";
+
+    if (!/^[^\s@,;]+@[^\s@,;.]+(\.[^\s@,;.]+)+$/.test(clean)) return "";
+
+    // Службову адресу як «нову пошту» не приймаємо: це не пошта.
+    if (isServiceEmail(clean)) return "";
+
+    return clean;
+
+}
+
+// Те, що підписуємо: кому і яку адресу ставимо, і до якої миті.
+function emailAddPayload(userId, email, now) {
+
+    const id = String(userId ?? "").trim();
+    const mail = cleanNewEmail(email);
+
+    if (!/^[0-9a-f-]{36}$/i.test(id) || !mail) return "";
+
+    const data = JSON.stringify({
+        u: id.toLowerCase(),
+        e: mail,
+        x: Number(now) + EMAIL_ADD_TTL_MINUTES * 60000,
+    });
+
+    return base64url(data);
+
+}
+
+// Розбір того самого. Зіпсований рядок — це null, а не виняток:
+// посилання з листа могло приїхати обрізаним поштовим клієнтом.
+function readEmailAddPayload(payload) {
+
+    try {
+
+        const data = JSON.parse(fromBase64url(String(payload ?? "")));
+
+        const id = String(data?.u ?? "");
+        const mail = cleanNewEmail(data?.e);
+        const expires = Number(data?.x);
+
+        if (!/^[0-9a-f-]{36}$/i.test(id) || !mail || !Number.isFinite(expires)) return null;
+
+        return { userId: id, email: mail, expiresAt: expires };
+
+    } catch {
+
+        return null;
+
+    }
+
+}
+
+// Чи ще діє посилання.
+//
+// state:
+//   ok       — можна ставити пошту;
+//   expired  — минула година;
+//   unknown  — посилання зіпсоване або підроблене.
+function emailAddVerdict(data, now) {
+
+    if (!data) return { ok: false, state: "unknown" };
+
+    if (Number(now) > data.expiresAt) return { ok: false, state: "expired" };
+
+    return { ok: true, state: "ok" };
+
+}
+
+// Токен = дані.підпис. Крапка тут безпечна: base64url її не містить.
+function packEmailAddToken(payload, signature) {
+
+    const sign = String(signature ?? "").replace(/[^a-f0-9]/gi, "").toLowerCase();
+
+    if (!payload || sign.length < 32) return "";
+
+    return `${payload}.${sign}`;
+
+}
+
+function unpackEmailAddToken(token) {
+
+    const parts = String(token ?? "").trim().split(".");
+
+    if (parts.length !== 2) return null;
+
+    const [payload, signature] = parts;
+
+    if (!/^[A-Za-z0-9_-]+$/.test(payload)) return null;
+    if (!/^[a-f0-9]{32,}$/i.test(signature)) return null;
+
+    return { payload: payload, signature: signature.toLowerCase() };
+
+}
+
+// Куди веде кнопка в листі. Підтверджує сам кабінет — туди ж людина
+// й потрапляє, уже зі своєю поштою на екрані.
+function emailAddUrl(siteUrl, token) {
+
+    const base = String(siteUrl ?? "").trim().replace(/\/+$/, "");
+
+    if (!base || !token) return "";
+
+    return `${base}/account?email-token=${encodeURIComponent(token)}`;
+
+}
+
+// base64url без підкладок: такий рядок переживає і адресу, і поштовий
+// клієнт, який любить ламати «+» і «/».
+function base64url(text) {
+
+    return btoa(unescape(encodeURIComponent(text)))
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_")
+        .replace(/=+$/, "");
+
+}
+
+function fromBase64url(text) {
+
+    const padded = text.replace(/-/g, "+").replace(/_/g, "/")
+        + "=".repeat((4 - (text.length % 4)) % 4);
+
+    return decodeURIComponent(escape(atob(padded)));
 
 }
 
@@ -8298,6 +8562,18 @@ async function botUsername(): Promise<string> {
 // ще один спосіб усе зламати, забувши його виставити.
 async function telegramEmailSignature(telegramId: number | string): Promise<string> {
 
+  return await signWithBotToken(`telegram-login:${telegramId}`);
+
+}
+
+// Підпис чого завгодно тим самим ключем.
+//
+// Простір імен у самому повідомленні («telegram-login:», «email-add:»)
+// обов'язковий: без нього підпис, виданий для однієї мети, підійшов би
+// для іншої. Це класична помилка — один ключ, різні значення, один
+// підпис.
+async function signWithBotToken(message: string): Promise<string> {
+
   const key = await crypto.subtle.importKey(
     "raw",
     new TextEncoder().encode(TELEGRAM_BOT_TOKEN),
@@ -8309,12 +8585,29 @@ async function telegramEmailSignature(telegramId: number | string): Promise<stri
   const mac = await crypto.subtle.sign(
     "HMAC",
     key,
-    new TextEncoder().encode(`telegram-login:${telegramId}`),
+    new TextEncoder().encode(message),
   );
 
   return [...new Uint8Array(mac)]
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
+
+}
+
+// Порівняння підписів за сталий час.
+//
+// Звичайне === зупиняється на першій різниці, і час відповіді
+// підказує, скільки знаків уже вгадано. Тут перебираємо все до кінця
+// завжди.
+function sameSignature(a: string, b: string): boolean {
+
+  if (a.length !== b.length) return false;
+
+  let diff = 0;
+
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+
+  return diff === 0;
 
 }
 
@@ -8630,28 +8923,48 @@ async function handleTelegramLoginStatus(request: Request, body: Record<string, 
     return adminJson({ ok: false, state: "used" }, 200, origin);
   }
 
+  // КОГО ВПУСКАТИ — ВИРІШУЄ telegram_id, А НЕ ПОШТА.
+  //
+  // Раніше користувач шукався за службовою адресою tg<id>.<підпис>@…
+  // І доки пошта не мінялась, це працювало. А щойно людина додавала
+  // свою — адреса в базі ставала іншою, службової не знаходилось, і
+  // наступний вхід через Telegram створював ДРУГИЙ, порожній акаунт.
+  // Замовлення, адреси й обране лишались у першому, невидимі.
+  //
+  // Тому спершу дивимось, чи входила вже ця сама людина: у попередній
+  // спробі записаний user_id. Знайшли — беремо ЇЇ ПОТОЧНУ пошту, хоч
+  // яка вона тепер.
+  const known = await userForTelegramId(row.telegram_id);
+
   const signature = await telegramEmailSignature(row.telegram_id);
 
-  const email = telegramEmail(row.telegram_id, signature);
+  const email = known?.email || telegramEmail(row.telegram_id, signature);
 
   if (!email) {
     return adminJson({ ok: false, state: "error" }, 200, origin);
   }
 
-  // Користувача створюємо, якщо його ще немає. Помилку «вже існує»
-  // ігноруємо навмисно: це і є повторний вхід тієї самої людини.
-  await supabaseAuthAdmin("users", {
-    method: "POST",
-    body: JSON.stringify({
-      email,
-      email_confirm: true,
-      user_metadata: {
-        full_name: telegramName(row),
-        telegram_id: row.telegram_id,
-        telegram_username: row.username ?? null,
-      },
-    }),
-  });
+  // Створюємо, лише якщо це перший вхід. Для відомого користувача
+  // POST зі службовою адресою створив би саме той дублікат, від якого
+  // ми щойно пішли.
+  if (!known) {
+
+    // Помилку «вже існує» ігноруємо навмисно: це і є повторний вхід
+    // тієї самої людини, чия пошта ще службова.
+    await supabaseAuthAdmin("users", {
+      method: "POST",
+      body: JSON.stringify({
+        email,
+        email_confirm: true,
+        user_metadata: {
+          full_name: telegramName(row),
+          telegram_id: row.telegram_id,
+          telegram_username: row.username ?? null,
+        },
+      }),
+    });
+
+  }
 
   // Сесію видає сам Supabase: ми лише просимо одноразовий токен і
   // віддаємо його сторінці. Свої сесії не підписуємо й не вигадуємо.
@@ -8701,6 +9014,230 @@ async function handleTelegramLoginStatus(request: Request, body: Record<string, 
   }
 
   return adminJson({ ok: true, state: "confirmed", tokenHash: hash }, 200, origin);
+
+}
+
+// Той самий користувач, що входив цим Telegram раніше.
+//
+// ЧОМУ БЕЗ ОКРЕМОЇ ТАБЛИЦІ. Зв'язок уже є: у рядку спроби входу
+// лежить user_id, якому ту спробу зарахували (міграція 034). Беремо
+// найсвіжіший такий рядок для цього telegram_id.
+//
+// Порожньо буває у двох випадках, і обидва законні: перший вхід
+// узагалі, або вхід до того, як застосували міграцію 034. Тоді нижче
+// спрацює старий шлях зі службовою адресою — він і далі правильний
+// для тих, хто пошти не додавав.
+async function userForTelegramId(telegramId: unknown): Promise<Record<string, any> | null> {
+
+  const id = String(telegramId ?? "").replace(/\D/g, "");
+
+  if (!id) return null;
+
+  try {
+
+    const found = await supabaseRest(
+      `telegram_logins?telegram_id=eq.${id}&user_id=not.is.null`
+      + `&select=user_id&order=created_at.desc&limit=1`
+    );
+
+    if (!found.ok) return null;
+
+    const userId = (await found.json().catch(() => []))[0]?.user_id ?? "";
+
+    if (!userId) return null;
+
+    const response = await supabaseAuthAdmin(`admin/users/${encodeURIComponent(userId)}`);
+
+    // Акаунт могли видалити — тоді це вже не «той самий користувач»,
+    // і вхід має піти першим шляхом і створити новий.
+    if (!response.ok) return null;
+
+    const user = await response.json().catch(() => null);
+
+    return user?.id && user?.email ? user : null;
+
+  } catch (error) {
+
+    console.error("Не вдалося знайти акаунт за telegram_id:", error);
+
+    return null;
+
+  }
+
+}
+
+// -------------------------
+// Додати пошту до акаунту, який увійшов через Telegram
+//
+// Чому це робимо самі, а не через Supabase, — у telegram-login.js,
+// розділ «Додавання пошти». Коротко: Supabase вимагає підтвердження
+// ще й зі старої адреси, а вона в нас службова й не існує, тож зміна
+// не відбувається ніколи.
+// -------------------------
+
+// Крок 1: кабінет просить надіслати лист на нову адресу.
+async function handleEmailAddStart(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  const email = cleanNewEmail(body?.email);
+
+  if (!email) {
+    return adminJson({ ok: false, state: "bad_email" }, 200, origin);
+  }
+
+  // ХТО ПРОСИТЬ — ПИТАЄМО В SUPABASE, А НЕ В САЙТА.
+  //
+  // Сайт надсилає свій токен сесії, ми показуємо його Supabase і
+  // отримуємо користувача. Вірити полю «user_id» із тіла запиту не
+  // можна: його вписав би будь-хто й додав пошту до чужого акаунту.
+  const user = await userFromAccessToken(body?.accessToken);
+
+  if (!user?.id) {
+    return adminJson({ ok: false, state: "unauthorized" }, 200, origin);
+  }
+
+  // У кого пошта СПРАВЖНЯ, той іде звичайним шляхом Supabase: там
+  // лист на стару адресу доходить, і подвійне підтвердження працює
+  // так, як задумано. Підміняти його своїм — послаблювати захист.
+  if (!isServiceEmail(user.email)) {
+    return adminJson({ ok: false, state: "not_service" }, 200, origin);
+  }
+
+  if (await emailTaken(email)) {
+    return adminJson({ ok: false, state: "taken" }, 200, origin);
+  }
+
+  const payload = emailAddPayload(user.id, email, Date.now());
+
+  if (!payload) {
+    return adminJson({ ok: false, state: "error" }, 200, origin);
+  }
+
+  const token = packEmailAddToken(payload, await signWithBotToken(`email-add:${payload}`));
+
+  const link = emailAddUrl(SITE_URL, token);
+
+  if (!link) {
+    return adminJson({ ok: false, state: "error" }, 200, origin);
+  }
+
+  const sent = await sendCustomerMail({ email }, addEmailLetter(link, email, SITE_URL));
+
+  return adminJson({ ok: sent, state: sent ? "sent" : "mail_failed" }, 200, origin);
+
+}
+
+// Крок 2: перехід за посиланням із листа.
+async function handleEmailAddConfirm(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  const parts = unpackEmailAddToken(body?.token);
+
+  if (!parts) {
+    return adminJson({ ok: false, state: "unknown" }, 200, origin);
+  }
+
+  const expected = await signWithBotToken(`email-add:${parts.payload}`);
+
+  if (!sameSignature(expected, parts.signature)) {
+
+    console.warn("Підтвердження пошти: підпис не збігається");
+
+    return adminJson({ ok: false, state: "unknown" }, 200, origin);
+
+  }
+
+  const data = readEmailAddPayload(parts.payload);
+
+  const verdict = emailAddVerdict(data, Date.now());
+
+  if (!verdict.ok) {
+    return adminJson({ ok: false, state: verdict.state }, 200, origin);
+  }
+
+  // Адресу могли зайняти, доки лист лежав у скриньці.
+  if (await emailTaken(data!.email, data!.userId)) {
+    return adminJson({ ok: false, state: "taken" }, 200, origin);
+  }
+
+  const updated = await supabaseAuthAdmin(`admin/users/${encodeURIComponent(data!.userId)}`, {
+    method: "PUT",
+    body: JSON.stringify({ email: data!.email, email_confirm: true }),
+  });
+
+  if (!updated.ok) {
+
+    console.error("Не вдалося записати пошту:", await updated.text());
+
+    return adminJson({ ok: false, state: "error" }, 200, origin);
+
+  }
+
+  return adminJson({ ok: true, state: "confirmed", email: data!.email }, 200, origin);
+
+}
+
+// Користувач за токеном сесії, який надіслав сайт.
+async function userFromAccessToken(token: unknown): Promise<Record<string, any> | null> {
+
+  const clean = String(token ?? "").trim();
+
+  if (!clean || clean.length > 4096) return null;
+
+  try {
+
+    const response = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+      headers: {
+        apikey: SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${clean}`,
+      },
+    });
+
+    if (!response.ok) return null;
+
+    return await response.json().catch(() => null);
+
+  } catch (error) {
+
+    console.error("Не вдалося перевірити токен сесії:", error);
+
+    return null;
+
+  }
+
+}
+
+// Чи є вже акаунт із такою поштою.
+//
+// Питаємо ДО листа, а не після переходу за ним: інакше людина чекала
+// б листа, перейшла — і аж тоді дізналась, що адреса зайнята.
+async function emailTaken(email: string, exceptUserId = ""): Promise<boolean> {
+
+  try {
+
+    const response = await supabaseAuthAdmin(
+      `admin/users?filter=${encodeURIComponent(email)}&per_page=50`
+    );
+
+    if (!response.ok) return false;
+
+    const data = await response.json().catch(() => null);
+
+    const users = Array.isArray(data?.users) ? data.users : [];
+
+    return users.some((u: Record<string, any>) =>
+      String(u?.email ?? "").toLowerCase() === email
+      && String(u?.id ?? "") !== exceptUserId);
+
+  } catch (error) {
+
+    console.error("Не вдалося перевірити, чи зайнята пошта:", error);
+
+    return false;
+
+  }
 
 }
 
@@ -9764,6 +10301,20 @@ async function handleRequest(request: Request): Promise<Response> {
   if (body.site_action === "subscribe-confirm") {
 
     return await handleSubscribeConfirm(request, body);
+
+  }
+
+  // --- додавання пошти тому, хто увійшов через Telegram ---
+  if (body.site_action === "email-add-start") {
+
+    return await handleEmailAddStart(request, body);
+
+  }
+
+  // --- перехід за посиланням із того листа ---
+  if (body.site_action === "email-add-confirm") {
+
+    return await handleEmailAddConfirm(request, body);
 
   }
 

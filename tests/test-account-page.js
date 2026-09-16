@@ -937,11 +937,24 @@ console.log("\n[12] Службова адреса входу через Telegram
     // ПЕРЕЙМЕНУВАННЯ. Один бік складає адресу, другий її впізнає; не
     // збігнуться — службова пошта поїде в замовлення як справжня.
     const inClient = (client.match(/TELEGRAM_EMAIL_DOMAIN = "([^"]+)"/) || [])[1];
-    const inFunction = (login.match(/@(telegram\.[a-z0-9.\-]+)`/) || [])[1];
+    const inFunction = (login.match(/TELEGRAM_EMAIL_DOMAIN = "([^"]+)"/) || [])[1];
 
     check("домен у клієнті й у функції той самий",
-        Boolean(inClient) && inClient === "@" + inFunction,
-        `${inClient} проти @${inFunction}`);
+        Boolean(inClient) && inClient === inFunction,
+        `${inClient} проти ${inFunction}`);
+
+    // Адресу складає telegramEmail, а впізнає isServiceEmail. Обидві
+    // мусять брати домен зі сталої, а не писати його рядком: інакше
+    // «одна стала» лишається лише на папері.
+    // Коментарі не рахуємо: там домен наведений як приклад атаки, і
+    // це не друга його копія в коді.
+    const loginCode = login.replace(/^\s*\/\/.*$/gm, "");
+
+    check("обидві функції беруть домен зі сталої",
+        /\$\{TELEGRAM_EMAIL_DOMAIN\}`/.test(loginCode)
+        && /endsWith\(TELEGRAM_EMAIL_DOMAIN\)/.test(loginCode)
+        && (loginCode.match(/@telegram\.bestbrnd4u\.com/g) || []).length === 1,
+        "домен мусить зустрічатись у коді рівно один раз");
 
     // Кабінет: показувати рядок із id людині безглуздо, а
     // пропонувати «змінити» — тим більше: міняти нема чого.
