@@ -496,11 +496,39 @@ console.log("\n[N+2] Підписаному не пропонуємо підпи
         mod.lookupState(502, null) === "unknown"
         && /if \(data\.state !== "unknown"\) remember/.test(client));
 
-    // Форма в кабінеті — місце, де підпискою КЕРУЮТЬ. Сховати її
-    // означало б забрати єдиний спосіб підписатись у того, хто
-    // передумав.
-    check("форму в кабінеті не чіпаємо",
-        /!form\.classList\.contains\("subscribe-account"\)/.test(client));
+    // Вкладка «Розсилки» — місце, де підпискою КЕРУЮТЬ, і ховати її
+    // не можна: інакше відписатись стало б нічим. Тому вона й не
+    // форма підписки, а галочка зі станом.
+    check("у кабінеті показуємо стан, а не ховаємо",
+        /getElementById\("newsletterSettings"\)/.test(client)
+        && /function drawSettings/.test(client));
+
+    check("галочка показує саме стан підписки",
+        /wantedEl\.checked = subscribed\(state\)/.test(client));
+
+    // Зняв і зберіг — відписався. Раніше відписка жила лише в
+    // посиланні внизу листів, тобто в тих самих листах, від яких
+    // людина й хоче позбутись.
+    check("зняту галочку можна зберегти й відписатись",
+        /ask\("subscribe-off", who\.token\)/.test(client)
+        && /site_action === "subscribe-off"/.test(source));
+
+    check("і підписатись знову",
+        /ask\("subscribe", who\.token, \{ email: who\.email, consent: true \}\)/.test(client));
+
+    // Підписка завжди проходить через лист — навіть повторна. Інакше
+    // галочка обіцяла б листи, яких ще не буде.
+    check("повторна підписка чекає на підтвердження",
+        /data\.state === "active" \? "active" : "unconfirmed"/.test(client));
+
+    // Відписався — блоки в футері й на каталозі мусять повернутись.
+    check("після відписки пропозиція повертається",
+        /remember\(who\.email, "none"\);[\s\S]{0,160}showOffers\(\);/.test(client));
+
+    // Відписує СЕБЕ: адміністративна відписка бере id з панелі
+    // власника, тут же єдине, що треба довести, — що пошта твоя.
+    check("відписує лише власника сесії",
+        /async function handleSubscribeOff[\s\S]{0,400}realEmailOf\(user\)/.test(source));
 
     check("ховаємо весь блок, а не саме поле",
         /form\.closest\("section\.newsletter"\) \|\| form/.test(client));

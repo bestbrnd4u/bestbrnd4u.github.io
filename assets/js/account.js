@@ -2378,13 +2378,9 @@ async function loadProfile(user) {
 
     if (consentEl) consentEl.checked = Boolean(data?.privacy_consent_at);
 
-    // Адресу для розсилки підставляємо з акаунту — найчастіше саме
-    // її і хочуть підписати. Службову не підставляємо: лист із
-    // підтвердженням підписки пішов би в нікуди, а людина бачила б
-    // заповнене поле й чекала листа.
-    const newsletterEmail = document.getElementById("newsletterEmail");
-
-    if (newsletterEmail && !newsletterEmail.value) newsletterEmail.value = mail;
+    // Поля «адреса для листів» у вкладці «Розсилки» більше немає:
+    // там тепер галочка, і адресу вона бере з акаунту сама
+    // (assets/js/subscribe.js). Підставляти нема куди й не треба.
 
     if (accountEmailEl) accountEmailEl.textContent = buildAccountGreeting(data?.first_name || fromProvider.first);
 
@@ -2559,6 +2555,27 @@ newEmailSubmit?.addEventListener("click", async () => {
     newEmailSubmit.disabled = true;
     newEmailSubmit.textContent = "Надсилаємо...";
 
+    // ЗАЙНЯТУ АДРЕСУ ЛОВИМО ДО ЛИСТА, А НЕ ПІСЛЯ.
+    //
+    // Supabase на зміну пошти на чужу адресу відповідає УСПІХОМ і
+    // мовчки нічого не змінює — так він не видає, які адреси в нього
+    // зареєстровані. Для людини це виглядало так: «лист надіслано»,
+    // лист не приходить, пошта не міняється, причина невідома.
+    //
+    // Питаємо самі. Оракул на чужі адреси це не відкриває: маршрут
+    // вимагає токен сесії й має ту саму межу звернень за IP, що й
+    // «Де моє замовлення».
+    if (await emailAlreadyTaken(email)) {
+
+        newEmailSubmit.disabled = false;
+        newEmailSubmit.textContent = "Підтвердити";
+
+        emailChangeMessage.textContent = "Ця пошта вже прив'язана до іншого акаунту";
+
+        return;
+
+    }
+
     // ДВА РІЗНІ ШЛЯХИ, І ЦЕ НЕ ПРИМХА.
     //
     // У кого пошта вже є, тому її МІНЯЮТЬ: Supabase надсилає лист і на
@@ -2608,6 +2625,29 @@ newEmailSubmit?.addEventListener("click", async () => {
     if (emailChangeStepSent) emailChangeStepSent.hidden = false;
 
 });
+
+// Чи належить ця адреса вже комусь іншому.
+//
+// «Не знаю» повертаємо як false навмисно: збій мережі не привід
+// зупиняти зміну пошти. Якщо адреса таки зайнята, далі це
+// з'ясується — просто пізніше й гірше, як було досі.
+async function emailAlreadyTaken(email) {
+
+    const { data: session } = await supabaseClient.auth.getSession();
+
+    const accessToken = session?.session?.access_token || "";
+
+    if (!accessToken) return false;
+
+    const { data } = await callFunction({
+        site_action: "email-taken",
+        accessToken: accessToken,
+        email: email,
+    });
+
+    return Boolean(data?.ok && data.taken);
+
+}
 
 // Прохання до функції надіслати лист на нову адресу.
 //

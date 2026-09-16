@@ -37,7 +37,10 @@
     // клас .subscribe, що був.
     var forms = [].slice.call(document.querySelectorAll("form.subscribe"));
 
-    if (!forms.length) return;
+    // Форми може не бути зовсім, а налаштування в кабінеті — бути:
+    // це вже не форма підписки, а галочка. Виходити тут означало б
+    // лишити вкладку «Розсилки» мертвою, і помітили б це не одразу.
+    if (!forms.length && !document.getElementById("newsletterSettings")) return;
 
     // Що сказати людині після натискання кнопки.
     //
@@ -195,14 +198,17 @@
 
     var MEMORY_KEY = "bb4u:subscribed";
 
-    // Форму в кабінеті (вкладка «Розсилки») не чіпаємо: це місце, де
-    // підпискою КЕРУЮТЬ, і сховати її означало б забрати єдиний
-    // спосіб підписатись у того, хто передумав.
+    // Що саме ховати підписаному: смугу «Новинки й акції на пошту»
+    // цілком, а у футері — саму форму.
+    //
+    // Вкладки «Розсилки» тут немає навмисно: там не форма підписки, а
+    // налаштування з галочкою (див. нижче). Сховати її означало б
+    // забрати єдине місце, де підпискою можна керувати.
     function offers() {
 
-        return forms
-            .filter(function (form) { return !form.classList.contains("subscribe-account"); })
-            .map(function (form) { return form.closest("section.newsletter") || form; });
+        return forms.map(function (form) {
+            return form.closest("section.newsletter") || form;
+        });
 
     }
 
@@ -282,43 +288,33 @@
 
     }());
 
-    async function hideIfSubscribed() {
+    // Хто зараз на сайті. Порожньо — значить не ввійшов.
+    async function whoIsHere() {
 
-        // Сторінка без клієнта Supabase або без його адрес — тут
-        // просто нема кого й нема в кого питати.
-        if (typeof supabaseClient === "undefined" || !supabaseClient) return;
+        if (typeof supabaseClient === "undefined" || !supabaseClient) return null;
 
         if (typeof SUPABASE_URL === "undefined"
-            || typeof SUPABASE_PUBLISHABLE_KEY === "undefined") return;
+            || typeof SUPABASE_PUBLISHABLE_KEY === "undefined") return null;
 
         var session = await supabaseClient.auth.getSession().catch(function () { return null; });
 
-        var token = session && session.data && session.data.session
-            ? session.data.session.access_token
-            : "";
+        var live = session && session.data && session.data.session;
 
-        var email = session && session.data && session.data.session
-            ? String(session.data.session.user.email || "").toLowerCase()
-            : "";
+        if (!live) return null;
 
-        // Здогадка була, а людини немає або вона інша — повертаємо
-        // блок на місце, поки не з'ясуємо стан саме цієї людини.
-        if (!token || !email) {
-            if (guessed) showOffers();
-            return;
-        }
+        var email = String(live.user.email || "").toLowerCase();
 
-        var known = remembered(email);
+        return email && live.access_token ? { token: live.access_token, email: email } : null;
 
-        if (known === "active") {
-            hideOffers();
-            return;
-        }
+    }
 
-        if (known) {
-            if (guessed) showOffers();
-            return;
-        }
+    // Один запит до функції. Повертає стан або порожньо, якщо не
+    // вийшло: «не знаю» і «не підписаний» — різні речі.
+    async function ask(action, token, extra) {
+
+        var body = { site_action: action, accessToken: token };
+
+        for (var key in (extra || {})) body[key] = extra[key];
 
         var response = await fetch(SUPABASE_URL + "/functions/v1/telegram-order-bot", {
             method: "POST",
@@ -327,31 +323,189 @@
                 apikey: SUPABASE_PUBLISHABLE_KEY,
                 Authorization: "Bearer " + SUPABASE_PUBLISHABLE_KEY,
             },
-            body: JSON.stringify({ site_action: "subscribe-status", accessToken: token }),
+            body: JSON.stringify(body),
         }).catch(function () { return null; });
 
-        if (!response || !response.ok) {
-            if (guessed) showOffers();
+        if (!response || !response.ok) return null;
+
+        return await response.json().catch(function () { return null; });
+
+    }
+
+    // ==========================================
+    // ВКЛАДКА «РОЗСИЛКИ» В КАБІНЕТІ
+    //
+    // Тут було те саме поле «впишіть пошту» й кнопка «Підписатись»,
+    // що у футері. Підписаному це пропонувало підписатись ще раз, а
+    // відписатись не давало взагалі: відписка жила лише в посиланні
+    // внизу листів — тобто в тих самих листах, від яких людина й хоче
+    // позбутись.
+    //
+    // Тепер це налаштування. Галочка показує стан і міняє його: зняв
+    // і зберіг — відписався, поставив і зберіг — підписався знову.
+    // ==========================================
+
+    var settings = document.getElementById("newsletterSettings");
+    var noEmailBox = document.getElementById("newsletterNoEmail");
+    var wantedEl = document.getElementById("newsletterWanted");
+    var whereEl = document.getElementById("newsletterWhere");
+    var pendingEl = document.getElementById("newsletterPending");
+    var saveEl = document.getElementById("newsletterSave");
+    var messageEl = document.getElementById("newsletterMessage");
+
+    // Стан, який зараз намальовано. Потрібен при збереженні: без нього
+    // не відрізнити «зняв галочку» від «вона й так була знята».
+    var shownState = "";
+
+    function subscribed(state) {
+
+        return state === "active" || state === "unconfirmed";
+
+    }
+
+    function drawSettings(state, email) {
+
+        if (!settings) return;
+
+        shownState = state;
+
+        // Пошти в акаунті немає — вхід через Telegram. Підписувати
+        // нема кого, тож замість галочки кажемо, з чого почати.
+        if (!email) {
+            settings.hidden = true;
+            if (noEmailBox) noEmailBox.hidden = false;
             return;
         }
 
-        var data = await response.json().catch(function () { return null; });
+        if (noEmailBox) noEmailBox.hidden = true;
+
+        settings.hidden = false;
+
+        if (wantedEl) wantedEl.checked = subscribed(state);
+
+        if (whereEl) {
+            whereEl.textContent = subscribed(state)
+                ? "Листи приходять на " + email
+                : "Листи приходитимуть на " + email;
+        }
+
+        if (pendingEl) pendingEl.hidden = state !== "unconfirmed";
+
+    }
+
+    function saySettings(text, kind) {
+
+        if (!messageEl) return;
+
+        messageEl.textContent = text;
+        messageEl.className = kind === "ok" ? "field-error field-ok" : "field-error";
+
+    }
+
+    if (saveEl) saveEl.addEventListener("click", async function () {
+
+        saySettings("", "ok");
+
+        var who = await whoIsHere();
+
+        if (!who) return saySettings("Сесія завершилась. Увійдіть у кабінет ще раз");
+
+        var wants = Boolean(wantedEl && wantedEl.checked);
+
+        if (wants === subscribed(shownState)) {
+            return saySettings(wants ? "Ви вже підписані" : "Ви й так не підписані");
+        }
+
+        var label = saveEl.textContent;
+
+        saveEl.disabled = true;
+        saveEl.textContent = "Зберігаємо...";
+
+        var data = wants
+            ? await ask("subscribe", who.token, { email: who.email, consent: true })
+            : await ask("subscribe-off", who.token);
+
+        saveEl.disabled = false;
+        saveEl.textContent = label;
+
+        if (!data || !data.ok) {
+            return saySettings("Не вдалося зберегти. Спробуйте ще раз або напишіть нам у Telegram");
+        }
+
+        if (!wants) {
+
+            remember(who.email, "none");
+
+            drawSettings("none", who.email);
+
+            showOffers();
+
+            return saySettings("Відписано. Листи про замовлення приходитимуть як раніше", "ok");
+
+        }
+
+        // Підписка завжди проходить через лист підтвердження — навіть
+        // повторна. Тому стан тут «не підтверджено», а не «підписаний»:
+        // інакше галочка обіцяла б листи, яких ще не буде.
+        var state = data.state === "active" ? "active" : "unconfirmed";
+
+        remember(who.email, state);
+
+        drawSettings(state, who.email);
+
+        if (state === "active") hideOffers();
+
+        saySettings(state === "active"
+            ? "Ви підписані"
+            : "Готово! Перевірте пошту: там лист із підтвердженням", "ok");
+
+    });
+
+    async function applyState() {
+
+        var who = await whoIsHere();
+
+        // Здогадка була, а людини немає або вона інша — повертаємо
+        // блок на місце, поки не з'ясуємо стан саме цієї людини.
+        if (!who) {
+            if (guessed) showOffers();
+            drawSettings("none", "");
+            return;
+        }
+
+        var known = remembered(who.email);
+
+        if (known) {
+
+            if (known === "active") hideOffers();
+            else if (guessed) showOffers();
+
+            drawSettings(known, who.email);
+
+            return;
+
+        }
+
+        var data = await ask("subscribe-status", who.token);
 
         if (!data || !data.state) {
             if (guessed) showOffers();
+            drawSettings("none", who.email);
             return;
         }
 
         // «unknown» не запам'ятовуємо: це збій мережі чи MailerLite, а
-        // не стан людини. Запам'ятати його означало б на добу
-        // сховати форму (або не сховати) через випадкову невдачу.
-        if (data.state !== "unknown") remember(email, data.state);
+        // не стан людини. Запам'ятати його означало б на добу сховати
+        // форму (або не сховати) через випадкову невдачу.
+        if (data.state !== "unknown") remember(who.email, data.state);
 
         if (data.state === "active") hideOffers();
         else if (guessed) showOffers();
 
+        drawSettings(data.state === "unknown" ? "none" : data.state, who.email);
+
     }
 
-    hideIfSubscribed();
+    applyState();
 
 }());

@@ -9339,6 +9339,103 @@ async function handleSubscribeStatus(request: Request, body: Record<string, any>
 
 }
 
+// Відписати себе самого з кабінету.
+//
+// ЧОМУ ОКРЕМО ВІД АДМІНСЬКОЇ ВІДПИСКИ. Та бере id підписника з
+// панелі власника й вимагає його прав. Тут людина відписує СЕБЕ, і
+// єдине, що треба довести, — що ця пошта її. Доводить токен сесії.
+async function handleSubscribeOff(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  const user = await userFromAccessToken(body?.accessToken);
+
+  const email = realEmailOf(user);
+
+  if (!email) {
+    return adminJson({ ok: false, state: "unauthorized" }, 200, origin);
+  }
+
+  const plan = unsubscribeRequest(MAILERLITE_API_KEY, email);
+
+  if (!plan) {
+    return adminJson({ ok: false, state: "not_configured" }, 200, origin);
+  }
+
+  try {
+
+    const response = await fetch(plan.url, {
+      method: plan.method,
+      headers: plan.headers,
+      body: JSON.stringify(plan.body),
+    });
+
+    // 404 — адреси в списку немає, тобто мети вже досягнуто.
+    if (!response.ok && response.status !== 404) {
+
+      console.error("Відписка з кабінету:", await response.text());
+
+      return adminJson({ ok: false, state: "error" }, 200, origin);
+
+    }
+
+    return adminJson({ ok: true, state: "off" }, 200, origin);
+
+  } catch (error) {
+
+    console.error("MailerLite недоступний при відписці:", error);
+
+    return adminJson({ ok: false, state: "error" }, 200, origin);
+
+  }
+
+}
+
+// Чи зайнята адреса іншим акаунтом.
+//
+// НАВІЩО ПИТАТИ ЗАЗДАЛЕГІДЬ. Supabase на зміну пошти на зайняту
+// адресу відповідає УСПІХОМ і мовчки нічого не змінює — так він не
+// видає, які адреси в нього зареєстровані. Для нас це означає, що
+// людина бачила «лист надіслано», чекала його, не дочікувалась і
+// вважала, що зламався сайт.
+//
+// ЧОГО ЦЕ КОШТУЄ І ЧОМУ ВСЕ ОДНО ВАРТО. Маршрут, який каже «ця пошта
+// зайнята», — це спосіб перебирати адреси й дізнаватись, хто в нас
+// зареєстрований. Тому він:
+//   1. вимагає токен сесії — питати може лише той, хто вже ввійшов;
+//   2. має ту саму межу звернень за IP, що й «Де моє замовлення».
+//
+// Тобто перебір коштує акаунта й упирається в межу, а мовчазна
+// брехня в кабінеті зникає.
+async function handleEmailTaken(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  if (!(await lookupAllowed(clientIp(request)))) {
+    return adminJson({ ok: false, state: "too_many" }, 429, origin);
+  }
+
+  const user = await userFromAccessToken(body?.accessToken);
+
+  if (!user?.id) {
+    return adminJson({ ok: false, state: "unauthorized" }, 200, origin);
+  }
+
+  const email = cleanNewEmail(body?.email);
+
+  if (!email) {
+    return adminJson({ ok: false, state: "bad_email" }, 200, origin);
+  }
+
+  // Себе самого не рахуємо за «зайнято»: це відповідь на інше
+  // питання, і в кабінеті вона вже є окремим повідомленням.
+  return adminJson({
+    ok: true,
+    taken: await emailTaken(email, String(user.id)),
+  }, 200, origin);
+
+}
+
 // Пошта користувача, якщо вона справжня, а не службова адреса входу
 // через Telegram (telegram-login.js, isServiceEmail).
 function realEmailOf(user: Record<string, any> | null): string {
@@ -10731,6 +10828,20 @@ async function handleRequest(request: Request): Promise<Response> {
   if (body.site_action === "subscribe-status") {
 
     return await handleSubscribeStatus(request, body);
+
+  }
+
+  // --- відписка з кабінету, себе самого ---
+  if (body.site_action === "subscribe-off") {
+
+    return await handleSubscribeOff(request, body);
+
+  }
+
+  // --- чи зайнята адреса іншим акаунтом ---
+  if (body.site_action === "email-taken") {
+
+    return await handleEmailTaken(request, body);
 
   }
 
