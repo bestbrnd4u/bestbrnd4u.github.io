@@ -565,17 +565,76 @@ console.log("\n[11] Вхід через Telegram знаходить акаунт
     // разом із ним.
     check("протухла заявка перестає рахуватись",
         /email_change_sent_at/.test(src)
-        && /Date\.now\(\) - sentAt > EMAIL_ADD_TTL_MINUTES \* 60000/.test(src));
+        && /Date\.now\(\) - sentAt > EMAIL_CHANGE_CLAIM_MINUTES \* 60000/.test(src));
 
-    check("межа та сама, що й життя посилання",
+    // ЦЕ НЕ НАШЕ ЧИСЛО, І САМЕ ТОМУ ВОНО ОКРЕМЕ.
+    //
+    // Заявку створює Supabase, і живе вона стільки, скільки його
+    // посилання — Authentication → Emails → Email OTP Expiration.
+    // Плутати з нашим листом (EMAIL_ADD_TTL_MINUTES) не можна: то
+    // інший лист і інший строк.
+    check("строк чужої заявки — окрема стала",
+        /const EMAIL_CHANGE_CLAIM_MINUTES = 60;/.test(src)
+        && /Date\.now\(\) - sentAt > EMAIL_CHANGE_CLAIM_MINUTES \* 60000/.test(src));
+
+    check("наше посилання живе своїм строком",
         /EMAIL_ADD_TTL_MINUTES = 24 \* 60/.test(read("supabase/functions/telegram-order-bot/telegram-login.js")));
 
     // «Зайнята» остаточна, «щойно запросили» минає сама. Сказати одне
     // замість іншого означало б відправити людину шукати іншу пошту
     // там, де досить зачекати.
+    const accountJs = read("assets/js/account.js");
+
     check("дві різні відмови, а не одна",
         /busy\.taken \? "taken" : "pending"/.test(src)
-        && /Якщо там не підтвердять, вона звільниться за добу/.test(read("assets/js/account.js")));
+        && /Цю адресу щойно запросив інший кабінет/.test(accountJs));
+
+    // Строк у тексті береться з відповіді функції, а не написаний
+    // словами поруч: розійшовшись із кодом, він брехав би мовчки.
+    check("скільки чекати — з коду, а не з розмітки",
+        /freeInMinutes: EMAIL_CHANGE_CLAIM_MINUTES/.test(src)
+        && /waitWords\(busy\.freeInMinutes\)/.test(accountJs));
+
+    // «за 21 годин» — проста межа «менше п'яти» саме так і ламається.
+    //
+    // Функцію дістаємо з файлу цілком: від оголошення до першої «}» на
+    // початку рядка. Прив'язуватись до тексту всередині не можна — на
+    // ньому цей тест уже раз упав стеком замість чесного ✗, коли той
+    // текст змінився.
+    const waitWords = (() => {
+
+        try {
+
+            const from = accountJs.indexOf("function waitWords(minutes) {");
+
+            if (from < 0) return null;
+
+            const to = accountJs.indexOf("\n}\n", from);
+
+            if (to < 0) return null;
+
+            return new Function(accountJs.slice(from, to + 3) + "; return waitWords;")();
+
+        } catch (error) {
+
+            return null;
+
+        }
+
+    })();
+
+    check("функція строку знайшлась у файлі", typeof waitWords === "function");
+
+    check("години рахуються за останньою цифрою",
+        typeof waitWords === "function"
+        && waitWords(60) === "за годину"
+        && waitWords(180) === "за 3 години"
+        && waitWords(660) === "за 11 годин"
+        && waitWords(1260) === "за 21 годину"
+        && waitWords(1440) === "за добу",
+        typeof waitWords === "function"
+            ? [60, 180, 660, 1260, 1440].map(waitWords).join(" | ")
+            : "функції немає");
 
     // ЧОМУ ПЕРЕБІР, А НЕ ?filter=. filter у GoTrue шукає по полю
     // email — користувача із ЗАПИТАНОЮ адресою він просто не поверне,

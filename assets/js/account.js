@@ -2579,8 +2579,9 @@ newEmailSubmit?.addEventListener("click", async () => {
         // посиланням, і адреса звільниться. Сказати тут те саме, що й
         // у першому випадку, означало б відправити людину шукати іншу
         // пошту там, де досить зачекати.
-        emailChangeMessage.textContent = busy === "pending"
-            ? "Цю адресу щойно запросив інший кабінет. Якщо там не підтвердять, вона звільниться за добу"
+        emailChangeMessage.textContent = busy.state === "pending"
+            ? `Цю адресу щойно запросив інший кабінет. Якщо там не підтвердять,`
+                + ` вона звільниться ${waitWords(busy.freeInMinutes)}`
             : "Ця пошта вже прив'язана до іншого акаунту";
 
         return;
@@ -2669,11 +2670,43 @@ async function emailBusy(email) {
         console.warn("Не вдалося перевірити, чи пошта зайнята — подробиці в журналі функції");
     }
 
-    if (!data?.ok) return "";
+    if (!data?.ok) return null;
 
-    if (data.taken) return "taken";
+    if (data.taken) return { state: "taken" };
 
-    return data.pending ? "pending" : "";
+    return data.pending
+        ? { state: "pending", freeInMinutes: Number(data.freeInMinutes) || 60 }
+        : null;
+
+}
+
+// «за годину» / «за 3 години» / «за добу».
+//
+// Строк приходить числом від функції, а не написаний тут словами:
+// інакше текст на сайті й строк у коді розійшлися б на першій же
+// правці — а розійшовшись, він почав би брехати мовчки.
+function waitWords(minutes) {
+
+    const hours = Math.max(1, Math.round(Number(minutes) / 60));
+
+    if (hours >= 24) return "за добу";
+
+    if (hours === 1) return "за годину";
+
+    // УКРАЇНСЬКА РАХУЄ ГОДИНИ ЗА ОСТАННЬОЮ ЦИФРОЮ, А НЕ ЗА ВЕЛИЧИНОЮ.
+    //
+    // Проста межа «менше п'яти — години, далі — годин» ламається на
+    // 21: вийшло б «за 21 годин». Supabase такого строку й не
+    // пропонує, але правило дешевше зробити правильним, ніж потім
+    // згадувати, чому воно приблизне.
+    const last = hours % 10;
+    const teen = hours % 100 >= 11 && hours % 100 <= 14;
+
+    if (!teen && last === 1) return `за ${hours} годину`;
+
+    if (!teen && last >= 2 && last <= 4) return `за ${hours} години`;
+
+    return `за ${hours} годин`;
 
 }
 
