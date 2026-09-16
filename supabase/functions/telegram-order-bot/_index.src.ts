@@ -3520,9 +3520,13 @@ async function handleEmailTaken(request: Request, body: Record<string, any>): Pr
 
   // Себе самого не рахуємо за «зайнято»: це відповідь на інше
   // питання, і в кабінеті вона вже є окремим повідомленням.
+  const verdict = await emailTaken(email, String(user.id));
+
   return adminJson({
     ok: true,
-    taken: await emailTaken(email, String(user.id)),
+    taken: verdict.taken,
+    pending: verdict.pending,
+    checked: verdict.checked,
   }, 200, origin);
 
 }
@@ -3575,8 +3579,10 @@ async function handleEmailAddStart(request: Request, body: Record<string, any>):
     return adminJson({ ok: false, state: "not_service" }, 200, origin);
   }
 
-  if (await emailTaken(email)) {
-    return adminJson({ ok: false, state: "taken" }, 200, origin);
+  const busy = await emailTaken(email);
+
+  if (busy.taken || busy.pending) {
+    return adminJson({ ok: false, state: busy.taken ? "taken" : "pending" }, 200, origin);
   }
 
   // НЕ ПОЧИНАЄМО, ПОКИ АКАУНТ НЕ ПРИВ'ЯЗАНИЙ ДО TELEGRAM.
@@ -3647,7 +3653,7 @@ async function handleEmailAddConfirm(request: Request, body: Record<string, any>
   }
 
   // Адресу могли зайняти, доки лист лежав у скриньці.
-  if (await emailTaken(data!.email, data!.userId)) {
+  if ((await emailTaken(data!.email, data!.userId)).taken) {
     return adminJson({ ok: false, state: "taken" }, 200, origin);
   }
 
@@ -3746,31 +3752,120 @@ async function userFromAccessToken(token: unknown): Promise<Record<string, any> 
 //
 // Питаємо ДО листа, а не після переходу за ним: інакше людина чекала
 // б листа, перейшла — і аж тоді дізналась, що адреса зайнята.
-async function emailTaken(email: string, exceptUserId = ""): Promise<boolean> {
+// ТРИ ВІДПОВІДІ, А НЕ ДВІ.
+//
+// «Не зайнята» і «не змогли подивитись» — різні речі, а поверталось
+// на них однакове false. Через це зламана перевірка виглядала точнісінько
+// як вільна адреса: лист ішов, зміна мовчки не відбувалась, і зрозуміти,
+// що саме сталось, було нізвідки — ні власнику, ні мені.
+//
+// checked каже, чи ми взагалі дивились.
+async function emailTaken(email: string, exceptUserId = ""): Promise<{ checked: boolean; taken: boolean; pending: boolean }> {
 
   try {
 
-    const response = await supabaseAuthAdmin(
-      `admin/users?filter=${encodeURIComponent(email)}&per_page=50`
-    );
+    // ЧОМУ ПЕРЕБИРАЄМО, А НЕ ФІЛЬТРУЄМО ЗАПИТОМ.
+    //
+    // Тут стояв ?filter=<пошта>, і для підтвердженої адреси він
+    // працює. Але filter у GoTrue шукає по полю email — а нам треба
+    // впіймати ще й ЗАПИТАНУ, але не підтверджену адресу, яка лежить
+    // в іншому полі. Відфільтрований запит такого користувача просто
+    // не поверне, і дірка лишилась би непомітною.
+    //
+    // Тому читаємо сторінками. Список кабінетів магазину — це сотні,
+    // а перевірка трапляється лише коли хтось міняє пошту.
+    for (let page = 1; page <= 5; page++) {
 
-    if (!response.ok) return false;
+      const response = await supabaseAuthAdmin(`admin/users?page=${page}&per_page=200`);
 
-    const data = await response.json().catch(() => null);
+      if (!response.ok) {
 
-    const users = Array.isArray(data?.users) ? data.users : [];
+        console.error("Перевірка зайнятої пошти:", await response.text());
 
-    return users.some((u: Record<string, any>) =>
-      String(u?.email ?? "").toLowerCase() === email
-      && String(u?.id ?? "") !== exceptUserId);
+        return { checked: false, taken: false, pending: false };
+
+      }
+
+      const data = await response.json().catch(() => null);
+
+      const users = Array.isArray(data?.users) ? data.users : [];
+
+      for (const u of users) {
+
+        if (String(u?.id ?? "") === exceptUserId) continue;
+
+        const verdict = claims(u, email);
+
+        // «Зайнята» й «щойно запрошена» — різні відповіді людині:
+        // перша остаточна, друга минає сама.
+        if (verdict === "taken") return { checked: true, taken: true, pending: false };
+
+        if (verdict === "pending") return { checked: true, taken: false, pending: true };
+
+      }
+
+      if (users.length < 200) return { checked: true, taken: false, pending: false };
+
+    }
+
+    // Кабінетів більше за тисячу — далі не читаємо, бо це вже помітна
+    // затримка на кожній зміні пошти. Кажемо про це в журнал: мовчазне
+    // «вільна» тут було б неправдою.
+    console.warn("Перевірка зайнятої пошти: перебрано 1000 кабінетів, далі не дивились");
+
+    return { checked: false, taken: false, pending: false };
 
   } catch (error) {
 
     console.error("Не вдалося перевірити, чи зайнята пошта:", error);
 
-    return false;
+    return { checked: false, taken: false, pending: false };
 
   }
+
+}
+
+// ЗАЙНЯТА — ЦЕ НЕ ЛИШЕ «ВЖЕ Є ЧИЯЯСЬ ПОШТА».
+//
+// Дивитись тільки на підтверджену адресу мало. Хтось міг попросити
+// зміну на цю саму пошту годину тому й ще не перейти за посиланням:
+// у Supabase вона лежить окремим полем і стане адресою акаунту тієї
+// миті, коли лист відкриють.
+//
+// Без цієї гілки виходило б змагання: двоє просять одну адресу,
+// виграє той, хто швидше натисне, а другий бачить «лист надіслано» і
+// не отримує нічого — рівно та мовчазна невдача, від якої ми й
+// позбувались.
+//
+// Назву поля різні версії GoTrue пишуть по-різному, тож перебираємо
+// відомі; зайвий ключ у переліку нічого не коштує, а відсутній
+// коштував би дірки.
+function claims(user: Record<string, any>, email: string): "taken" | "pending" | "" {
+
+  // Підтверджена адреса акаунту. Тут сумнівів немає: вона чиясь.
+  if (String(user?.email ?? "").trim().toLowerCase() === email) return "taken";
+
+  const asked = ["new_email", "email_change"].some(
+    (key) => String(user?.[key] ?? "").trim().toLowerCase() === email);
+
+  if (!asked) return "";
+
+  // ЗАЯВКА, ЯКА ВЖЕ ПРОТУХЛА, НІКОГО НЕ ТРИМАЄ.
+  //
+  // Без цієї межі кинута на півдорозі заявка блокувала б адресу
+  // назавжди: людина попросила зміну, не перейшла за посиланням — і
+  // ніхто інший більше цю пошту не займе, причому без жодного способу
+  // дізнатись чому.
+  //
+  // Посилання живе EMAIL_ADD_TTL_MINUTES. Минуло більше — воно мертве,
+  // і заявка разом із ним.
+  const sentAt = Date.parse(String(user?.email_change_sent_at ?? ""));
+
+  if (Number.isFinite(sentAt) && Date.now() - sentAt > EMAIL_ADD_TTL_MINUTES * 60000) {
+    return "";
+  }
+
+  return "pending";
 
 }
 

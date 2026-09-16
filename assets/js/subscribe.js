@@ -145,6 +145,12 @@
 
                 say(subscribeMessage(data.state), "ok");
 
+                // Стан щойно змінився — записане про нього більше не
+                // правда. Форма приймає будь-яку адресу, тож навіть
+                // не завжди зрозуміло, чия саме підписка змінилась;
+                // надійніше перепитати, ніж пам'ятати неправильне.
+                forget();
+
                 form.reset();
 
                 return;
@@ -246,7 +252,19 @@
 
     }
 
+    // ДВА СТАНИ ЗАПАМ'ЯТОВУВАТИ НЕ МОЖНА.
+    //
+    // «unknown» — це збій мережі чи MailerLite, а не стан людини.
+    //
+    // «unconfirmed» — стан, який ІСНУЄ РІВНО ДО ТОГО, як людина
+    // натисне посилання в листі, тобто зазвичай кілька хвилин.
+    // Запам'ятати його на добу означає добу писати «підписку ще не
+    // підтверджено» тому, хто вже підтвердив. Саме це й сталось:
+    // в адмінці стояло «Підписаний», у кабінеті — «ще не
+    // підтверджено».
     function remember(email, state) {
+
+        if (state === "unknown" || state === "unconfirmed") return;
 
         try {
             window.localStorage.setItem(MEMORY_KEY, JSON.stringify({
@@ -254,6 +272,20 @@
                 state: state,
                 at: Date.now(),
             }));
+        } catch (error) { /* див. вище */ }
+
+    }
+
+    // Забути записане: стан щойно змінився, і яким він став — ми поки
+    // не знаємо напевно.
+    //
+    // Без цього виходить дзеркало того самого бага: людина підписалась
+    // у футері, підтвердила з листа — а в пам'яті лишилось «не
+    // підписаний», і пропозиція підписатись показувалась їй ще добу.
+    function forget() {
+
+        try {
+            window.localStorage.removeItem(MEMORY_KEY);
         } catch (error) { /* див. вище */ }
 
     }
@@ -413,7 +445,10 @@
         var wants = Boolean(wantedEl && wantedEl.checked);
 
         if (wants === subscribed(shownState)) {
-            return saySettings(wants ? "Ви вже підписані" : "Ви й так не підписані");
+            // Не помилка, а «нічого не змінилось»: галочка вже стоїть
+            // так, як її щойно зберегли. Червоним це виглядало б як
+            // збій — саме так воно й виглядало на скріншоті власника.
+            return saySettings(wants ? "Ви вже підписані" : "Ви й так не підписані", "ok");
         }
 
         var label = saveEl.textContent;
@@ -475,29 +510,32 @@
 
         var known = remembered(who.email);
 
-        if (known) {
+        // Вчорашня відповідь годиться лише на те, щоб блок не блимав.
+        if (known === "active") hideOffers();
+        else if (known && guessed) showOffers();
 
-            if (known === "active") hideOffers();
-            else if (guessed) showOffers();
-
-            drawSettings(known, who.email);
-
-            return;
-
-        }
+        // ПАНЕЛЬ НАЛАШТУВАНЬ ЗАВЖДИ ПИТАЄ НАЖИВО.
+        //
+        // Кеш тут показав своє: людина підписалась (стан «не
+        // підтверджено»), перейшла за посиланням із листа — і в
+        // MailerLite стала підписаною, а панель ще добу писала «підписку
+        // ще не підтверджено». В адмінці при цьому стояло «Підписаний».
+        //
+        // На решті сторінок кеш доречний: там від нього залежить лише
+        // те, показати пропозицію підписатись чи ні, і помилитись
+        // можна хіба зайвою пропозицією. А тут людина ПРИЙМАЄ РІШЕННЯ,
+        // і екран мусить показувати правду, а не вчорашній знімок.
+        if (known && !settings) return;
 
         var data = await ask("subscribe-status", who.token);
 
         if (!data || !data.state) {
-            if (guessed) showOffers();
-            drawSettings("none", who.email);
+            if (guessed && known !== "active") showOffers();
+            drawSettings(known || "none", who.email);
             return;
         }
 
-        // «unknown» не запам'ятовуємо: це збій мережі чи MailerLite, а
-        // не стан людини. Запам'ятати його означало б на добу сховати
-        // форму (або не сховати) через випадкову невдачу.
-        if (data.state !== "unknown") remember(who.email, data.state);
+        remember(who.email, data.state);
 
         if (data.state === "active") hideOffers();
         else if (guessed) showOffers();
