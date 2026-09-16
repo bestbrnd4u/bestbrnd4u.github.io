@@ -344,6 +344,189 @@ console.log("\n[N] Відписати й видалити — з панелі, �
         /Замовлення лишаться/.test(panel));
 }
 
+console.log("\n[N+1] Блокування адреси: ні замовлень, ні листів");
+{
+    const sql = read("supabase/migrations/035-blocked-emails.sql");
+
+    // ЩО САМЕ ЗУПИНЯЄ БЛОКУВАННЯ. Форма замовлення відкрита всім — і
+    // це правильно, покупцю не треба реєструватись. Але з тієї ж
+    // причини її бере й бот, і спинити конкретного відправника досі
+    // не було чим.
+    check("дія є в панелі",
+        people.PEOPLE_ADMIN_ACTIONS.includes("people-block")
+        && people.PEOPLE_ADMIN_ACTIONS.includes("people-unblock"));
+
+    // ЗА ПОШТОЮ, А НЕ ЗА АКАУНТОМ. Замовлення прив'язане до пошти:
+    // гість купує без реєстрації взагалі. Блокувати обліковий запис
+    // означало б спинити лише тих, хто входить, — тобто не тих.
+    const guest = people.parsePeopleRequest({
+        admin_action: "people-block", email: "bot@example.com",
+    });
+
+    check("блокує й того, у кого кабінету немає",
+        guest.ok && guest.params.email === "bot@example.com" && guest.params.id === "",
+        JSON.stringify(guest));
+
+    check("без адреси блокувати нема що",
+        people.parsePeopleRequest({ admin_action: "people-block", id: "3f2a" }).ok === false);
+
+    // ТРИГЕР, А НЕ ПЕРЕВІРКА У ФУНКЦІЇ. Шляхів запису замовлення два:
+    // через функцію і — коли не заданий ключ Turnstile — прямо в базу.
+    // Тригер стоїть під обома.
+    check("заборона живе в базі, під усіма шляхами",
+        /create trigger orders_reject_blocked/.test(sql)
+        && /before insert on public\.orders/.test(sql));
+
+    check("незавершене оформлення теж не збираємо",
+        /create trigger checkout_drafts_reject_blocked/.test(sql));
+
+    // Без SECURITY DEFINER тригер не побачив би жодного рядка:
+    // таблиця закрита RLS, а вставляє замовлення анонімна роль.
+    check("тригер бачить закриту таблицю",
+        /security definer/.test(sql) && /set search_path = public/.test(sql));
+
+    check("список заблокованих закритий від браузера",
+        /alter table public\.blocked_emails enable row level security/.test(sql)
+        && !/create policy[\s\S]*blocked_emails/.test(sql));
+
+    // Покупець мусить бачити зрозумілу відмову, а не «insert_failed».
+    check("функція відмовляє словами, а не збоєм бази",
+        /if \(await emailBlocked\(clean\.row\.email\)\)/.test(source)
+        && /error: "blocked"/.test(source));
+
+    check("заблокованого не підписуємо на листи",
+        /if \(await emailBlocked\(clean\.subscriber\.email\)\)/.test(source));
+
+    // Три дії, і жодної з них не досить окремо.
+    check("блокування закриває ще й вхід у кабінет",
+        /ban_duration: blocking \? "876000h" : "none"/.test(source));
+
+    check("і відписує від розсилки",
+        /if \(blocking\) await unsubscribeFromMailingList\(params\.email\)/.test(source));
+
+    // Згоду на листи людина дає сама — повертати її за неї не можна.
+    check("розблокування НЕ підписує назад",
+        /Підписку на листи не повернуто/.test(read("supabase/functions/telegram-order-bot/people-admin.js")));
+
+    // Панель мусить показувати, кого вже спинили: інакше блокування
+    // невидиме, і другий раз тиснути будуть навмання.
+    check("у списку видно, хто заблокований",
+        /pill-blocked/.test(panel) && /pill-blocked\{/.test(page));
+
+    check("кнопка міняється на зворотну",
+        /person\.blocked[\s\S]{0,200}"people-unblock", "Розблокувати"/.test(panel)
+        && /"people-block", "Заблокувати"/.test(panel));
+
+    check("панель попереджає, що саме станеться",
+        /не оформить замовлення, не отримає листів/.test(panel));
+
+    const blocked = people.buyerView(
+        { id: "1", email: "Bot@Example.com" }, {}, { "bot@example.com": true });
+
+    check("позначка рахується за поштою в нижньому регістрі", blocked.blocked === true);
+
+    check("решта лишається непозначеною",
+        people.buyerView({ id: "2", email: "ok@example.com" }, {}, {}).blocked === false);
+
+    // ЛИСТИ ЗА СТАРИМИ СЛІДАМИ. Тригер не дає заблокованому залишити
+    // НОВЕ замовлення, але старі нікуди не діваються — і саме за ними
+    // три розсильники й пишуть.
+    const helper = read("scripts/blocked.js");
+
+    check("є спільна перевірка для розсилок",
+        /function blockedEmails/.test(helper) && /function allowedToWrite/.test(helper));
+
+    check("немає таблиці — розсилка не падає, а йде без блокувань",
+        /if \(!response\.ok\) \{[\s\S]{0,200}return new Set\(\);/.test(helper));
+
+    for (const [file, name] of [
+        ["scripts/remind-carts.js", "нагадування про кошик"],
+        ["scripts/send-thankyou.js", "подяка за покупку"],
+        ["scripts/request-reviews.js", "прохання про відгук"],
+    ]) {
+
+        const text = read(file);
+
+        check(`${name} обходить заблокованих`,
+            /require\("\.\/blocked"\)/.test(text)
+            && /allowedToWrite\(blocked, row(?: && row\.email|\.email)\)|allowedToWrite\(blocked, row && row\.email\)/.test(text),
+            file);
+
+    }
+}
+
+console.log("\n[N+2] Підписаному не пропонуємо підписатись");
+{
+    const client = read("assets/js/subscribe.js");
+    const subscribeJs = read("supabase/functions/telegram-order-bot/subscribe.js");
+
+    // Блок «Новинки й акції на пошту» стоїть на шести сторінках, а
+    // форма у футері — на вісімнадцяти. Підписаний бачив пропозицію
+    // підписатись на кожній.
+    check("є маршрут, який каже стан підписки",
+        /site_action === "subscribe-status"/.test(source)
+        && /async function handleSubscribeStatus/.test(source));
+
+    // ГОЛОВНЕ ТУТ — ЧОГО МАРШРУТ НЕ РОБИТЬ. Якби він відповідав про
+    // довільну пошту, це був би спосіб перевірити, чи є конкретна
+    // людина в нашому списку.
+    check("питає лише про власника сесії, не про довільну адресу",
+        /const user = await userFromAccessToken\(body\?\.accessToken\)/.test(source)
+        && !/handleSubscribeStatus[\s\S]{0,900}cleanEmail\(body/.test(source));
+
+    check("службова адреса входу через Telegram за пошту не рахується",
+        /function realEmailOf/.test(source) && /!isServiceEmail\(email\)/.test(source));
+
+    check("стан читається з MailerLite",
+        /export function subscriberLookup/.test(subscribeJs)
+        && /export function lookupState/.test(subscribeJs));
+
+    // «Не підтвердив» — це стан, у якому людині ЩЕ ТРЕБА щось
+    // зробити, і форма для неї корисна.
+    const src = subscribeJs.replace(/^export /gm, "");
+
+    const mod = new Function(src + "; return { lookupState };")();
+
+    check("ховаємо лише підтвердженим",
+        mod.lookupState(200, { data: { status: "active" } }) === "active"
+        && mod.lookupState(200, { data: { status: "unconfirmed" } }) === "unconfirmed"
+        && mod.lookupState(404, null) === "none");
+
+    check("збій мережі не вважається станом людини",
+        mod.lookupState(502, null) === "unknown"
+        && /if \(data\.state !== "unknown"\) remember/.test(client));
+
+    // Форма в кабінеті — місце, де підпискою КЕРУЮТЬ. Сховати її
+    // означало б забрати єдиний спосіб підписатись у того, хто
+    // передумав.
+    check("форму в кабінеті не чіпаємо",
+        /!form\.classList\.contains\("subscribe-account"\)/.test(client));
+
+    check("ховаємо весь блок, а не саме поле",
+        /form\.closest\("section\.newsletter"\) \|\| form/.test(client));
+
+    check("відповідь не питаємо на кожній сторінці",
+        /localStorage/.test(client) && /REMEMBER_HOURS/.test(client));
+
+    // БЛОК НЕ МУСИТЬ БЛИМНУТИ. Відповідь іде мережею, сесію Supabase
+    // теж віддає не одразу — тобто підписаний побачив би
+    // «Підпишіться!» частку секунди на КОЖНІЙ сторінці. Рівно те, від
+    // чого ми його позбавляємо, тільки блимаюче.
+    check("ховаємо одразу, не чекаючи відповіді",
+        /var guessed = false;/.test(client)
+        && /guessed = true;\s*\n\s*hideOffers\(\);/.test(client));
+
+    // Здогадку треба вміти забрати назад: у цьому браузері могла
+    // ввійти інша людина.
+    check("хибну здогадку повертаємо назад",
+        /if \(guessed\) showOffers\(\);/.test(client)
+        && /else if \(guessed\) showOffers\(\);/.test(client));
+
+    check("сторінка без Supabase не ламається",
+        /typeof supabaseClient === "undefined"/.test(client)
+        && /typeof SUPABASE_URL === "undefined"/.test(client));
+}
+
 console.log(failures ? `\n✗ провалено перевірок: ${failures}\n` : "\n✓ усі перевірки пройдено\n");
 
 process.exit(failures ? 1 : 0);

@@ -52,6 +52,20 @@ const path = require("path");
 // Попередження «не налаштовано» так, щоб його було видно на
 // сторінці запуску (див. пояснення в scripts/site-env.js).
 const { notConfigured } = require("./site-env");
+const { blockedEmails, allowedToWrite } = require("./blocked");
+
+// Список заблокованих читаємо один раз за прогін: він однаковий для
+// кошиків і для оформлень, а запит на кожен перелік означав би два
+// однакові запити поспіль.
+let blockedCache = null;
+
+async function blockedList(url, key) {
+
+    if (!blockedCache) blockedCache = await blockedEmails(url, key);
+
+    return blockedCache;
+
+}
 
 const ROOT = path.join(__dirname, "..");
 
@@ -248,7 +262,20 @@ async function fetchList(url, key, rpc, migration) {
 
         const rows = await response.json();
 
-        return Array.isArray(rows) ? rows : [];
+        if (!Array.isArray(rows)) return [];
+
+        // ЗАБЛОКОВАНИМ НЕ ПИШЕМО.
+        //
+        // Тригер із міграції 035 не дає заблокованому залишити НОВИЙ
+        // кошик чи оформлення, але старі, залишені до блокування,
+        // нікуди не зникли — і саме за ними цей крок і пише листи.
+        //
+        // Відсіюємо тут, а не в кожному циклі: обидва переліки
+        // приходять через цю функцію, і третій, коли з'явиться,
+        // теж прийде сюди.
+        const blocked = await blockedList(url, key);
+
+        return rows.filter(row => allowedToWrite(blocked, row && row.email));
 
     } catch (error) {
 

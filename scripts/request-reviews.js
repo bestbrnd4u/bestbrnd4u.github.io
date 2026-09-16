@@ -35,6 +35,7 @@ const path = require("path");
 // Попередження «не налаштовано» так, щоб його було видно на
 // сторінці запуску (див. пояснення в scripts/site-env.js).
 const { notConfigured } = require("./site-env");
+const { blockedEmails, allowedToWrite } = require("./blocked");
 
 const ROOT = path.join(__dirname, "..");
 
@@ -215,9 +216,16 @@ async function main() {
 
     }
 
-    const rows = await response.json();
+    const all = await response.json();
 
-    if (!Array.isArray(rows) || !rows.length) {
+    // Заблокованим не пишемо. Замовлення, зроблені до блокування,
+    // нікуди не діваються — саме за ними цей крок і пише листи.
+    const blocked = await blockedEmails(url, key);
+
+    const rows = (Array.isArray(all) ? all : [])
+        .filter(row => allowedToWrite(blocked, row && row.email));
+
+    if (!rows.length) {
 
         console.log("Немає кому писати");
 

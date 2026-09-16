@@ -171,4 +171,187 @@
 
     });
 
+    // ==========================================
+    // ПІДПИСАНОМУ НЕ ПРОПОНУЄМО ПІДПИСАТИСЬ
+    //
+    // Блок «Новинки й акції на пошту» стоїть на шести сторінках, а
+    // форма у футері — на вісімнадцяти. Той, хто вже підписаний,
+    // бачив пропозицію підписатись на кожній із них. Це не просто
+    // зайве: воно змушує сумніватись, чи підписка взагалі спрацювала.
+    //
+    // ЧОМУ ПИТАЄМО ФУНКЦІЮ, А НЕ ДИВИМОСЬ САМІ. Список підписників
+    // живе в MailerLite, а ключ до нього — у секретах функції. У
+    // браузері знати про підписку нізвідки.
+    //
+    // ЧОМУ ЛИШЕ ДЛЯ ТИХ, ХТО ВВІЙШОВ. Функція відповідає про власника
+    // токена сесії й ні про кого іншого: маршрут, який каже «так/ні»
+    // про довільну адресу, був би способом перевіряти чужі пошти.
+    // ==========================================
+
+    // Скільки віримо відповіді. Доба: за цей час людина встигає
+    // підтвердити підписку з листа, а помилитись тут дорого лише в
+    // один бік — зайвий раз показати форму не страшно.
+    var REMEMBER_HOURS = 24;
+
+    var MEMORY_KEY = "bb4u:subscribed";
+
+    // Форму в кабінеті (вкладка «Розсилки») не чіпаємо: це місце, де
+    // підпискою КЕРУЮТЬ, і сховати її означало б забрати єдиний
+    // спосіб підписатись у того, хто передумав.
+    function offers() {
+
+        return forms
+            .filter(function (form) { return !form.classList.contains("subscribe-account"); })
+            .map(function (form) { return form.closest("section.newsletter") || form; });
+
+    }
+
+    function hideOffers() {
+
+        offers().forEach(function (node) { node.hidden = true; });
+
+    }
+
+    function showOffers() {
+
+        offers().forEach(function (node) { node.hidden = false; });
+
+    }
+
+    function remembered(email) {
+
+        try {
+
+            var saved = JSON.parse(window.localStorage.getItem(MEMORY_KEY) || "null");
+
+            if (!saved || saved.email !== email) return null;
+
+            if (Date.now() - Number(saved.at) > REMEMBER_HOURS * 3600000) return null;
+
+            return saved.state;
+
+        } catch (error) {
+
+            // Приватне вікно або заборонені дані сайту — просто
+            // спитаємо функцію ще раз.
+            return null;
+
+        }
+
+    }
+
+    function remember(email, state) {
+
+        try {
+            window.localStorage.setItem(MEMORY_KEY, JSON.stringify({
+                email: email,
+                state: state,
+                at: Date.now(),
+            }));
+        } catch (error) { /* див. вище */ }
+
+    }
+
+    // ЩОБ БЛОК НЕ БЛИМНУВ.
+    //
+    // Відповідь функції приходить через мережу, а сесію Supabase теж
+    // віддає не одразу. Якби ми чекали на це, підписаний бачив би
+    // «Підпишіться!» частку секунди на КОЖНІЙ сторінці — тобто рівно
+    // те, від чого ми його позбавляємо, тільки блимаюче.
+    //
+    // Тому ховаємо одразу, якщо вчорашня відповідь ще жива. Помилитись
+    // тут можна лише в одному разі: у цьому браузері ввійшла інша
+    // людина. Перевірка нижче це побачить і поверне блок на місце.
+    var guessed = false;
+
+    (function () {
+
+        try {
+
+            var saved = JSON.parse(window.localStorage.getItem(MEMORY_KEY) || "null");
+
+            if (!saved || saved.state !== "active") return;
+
+            if (Date.now() - Number(saved.at) > REMEMBER_HOURS * 3600000) return;
+
+            guessed = true;
+
+            hideOffers();
+
+        } catch (error) { /* приватне вікно — просто спитаємо функцію */ }
+
+    }());
+
+    async function hideIfSubscribed() {
+
+        // Сторінка без клієнта Supabase або без його адрес — тут
+        // просто нема кого й нема в кого питати.
+        if (typeof supabaseClient === "undefined" || !supabaseClient) return;
+
+        if (typeof SUPABASE_URL === "undefined"
+            || typeof SUPABASE_PUBLISHABLE_KEY === "undefined") return;
+
+        var session = await supabaseClient.auth.getSession().catch(function () { return null; });
+
+        var token = session && session.data && session.data.session
+            ? session.data.session.access_token
+            : "";
+
+        var email = session && session.data && session.data.session
+            ? String(session.data.session.user.email || "").toLowerCase()
+            : "";
+
+        // Здогадка була, а людини немає або вона інша — повертаємо
+        // блок на місце, поки не з'ясуємо стан саме цієї людини.
+        if (!token || !email) {
+            if (guessed) showOffers();
+            return;
+        }
+
+        var known = remembered(email);
+
+        if (known === "active") {
+            hideOffers();
+            return;
+        }
+
+        if (known) {
+            if (guessed) showOffers();
+            return;
+        }
+
+        var response = await fetch(SUPABASE_URL + "/functions/v1/telegram-order-bot", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                apikey: SUPABASE_PUBLISHABLE_KEY,
+                Authorization: "Bearer " + SUPABASE_PUBLISHABLE_KEY,
+            },
+            body: JSON.stringify({ site_action: "subscribe-status", accessToken: token }),
+        }).catch(function () { return null; });
+
+        if (!response || !response.ok) {
+            if (guessed) showOffers();
+            return;
+        }
+
+        var data = await response.json().catch(function () { return null; });
+
+        if (!data || !data.state) {
+            if (guessed) showOffers();
+            return;
+        }
+
+        // «unknown» не запам'ятовуємо: це збій мережі чи MailerLite, а
+        // не стан людини. Запам'ятати його означало б на добу
+        // сховати форму (або не сховати) через випадкову невдачу.
+        if (data.state !== "unknown") remember(email, data.state);
+
+        if (data.state === "active") hideOffers();
+        else if (guessed) showOffers();
+
+    }
+
+    hideIfSubscribed();
+
 }());

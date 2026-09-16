@@ -39,11 +39,28 @@ export const PEOPLE_ADMIN_ACTIONS = [
     "people-subscribers",
     "people-unsubscribe",
     "people-delete",
+    "people-block",
+    "people-unblock",
 ];
 
 // Дії, які МІНЯЮТЬ дані. Виділені окремо, бо розбираються інакше:
 // їм потрібна не сторінка списку, а те, над ким саме діяти.
-export const PEOPLE_WRITE_ACTIONS = ["people-unsubscribe", "people-delete"];
+export const PEOPLE_WRITE_ACTIONS = [
+    "people-unsubscribe",
+    "people-delete",
+    "people-block",
+    "people-unblock",
+];
+
+// Блокування — єдина дія, якій потрібна саме ПОШТА, а не id.
+//
+// Решта діє над обліковим записом, і там id надійніший: пошту людина
+// може змінити між тим, як панель намалювала список, і натисканням
+// кнопки. Але блокуємо ми не кабінет, а адресу: замовлення оформлює
+// й гість, у якого кабінету немає взагалі. Заблокувати обліковий
+// запис означало б зупинити лише тих, хто входить, — тобто саме не
+// тих.
+export const PEOPLE_EMAIL_ACTIONS = ["people-block", "people-unblock"];
 
 export function isPeopleAction(action) {
 
@@ -77,6 +94,20 @@ export function parsePeopleRequest(body) {
         const id = String(body?.id ?? "").trim();
 
         const email = String(body?.email ?? "").trim().toLowerCase().slice(0, 200);
+
+        // Блокуємо адресу, тож без адреси діяти нема над чим. Id при
+        // цьому теж беремо, якщо він є: ним закривається ще й вхід у
+        // кабінет. Але вимагати його не можна — блокувати доводиться
+        // й того, хто замовляв гостем.
+        if (PEOPLE_EMAIL_ACTIONS.includes(action)) {
+
+            if (!email.includes("@")) {
+                return { ok: false, error: "Не вказано, яку адресу блокувати." };
+            }
+
+            return { ok: true, action, params: { id, email } };
+
+        }
 
         if (!id) return { ok: false, error: "Не вказано, над ким діяти." };
 
@@ -112,7 +143,7 @@ export function parsePeopleRequest(body) {
 // Беремо рівно те, що потрібно на екрані. Ні токенів, ні метаданих
 // провайдера, ні пароля (його там і немає) — усе це не має покидати
 // сервер навіть до адмінки.
-export function buyerView(user, ordersByEmail) {
+export function buyerView(user, ordersByEmail, blocked) {
 
     if (!user) return null;
 
@@ -134,6 +165,8 @@ export function buyerView(user, ordersByEmail) {
         orders: stats ? stats.count : 0,
         spent: stats ? stats.spent : 0,
         lastOrderAt: stats ? stats.lastAt : null,
+        // Заблокованій адресі магазин не продасть і не напише.
+        blocked: Boolean(blocked && blocked[email]),
     };
 
 }
@@ -200,12 +233,12 @@ export function filterPeople(list, search) {
 
 }
 
-export function buyersResponse({ users, orders, search, page }) {
+export function buyersResponse({ users, orders, search, page, blocked }) {
 
     const stats = ordersByEmail(orders);
 
     const all = (Array.isArray(users) ? users : [])
-        .map(user => buyerView(user, stats))
+        .map(user => buyerView(user, stats, blocked))
         .filter(Boolean)
         // Найновіші першими: саме їх і хочеться бачити.
         .sort((a, b) => String(b.createdAt ?? "").localeCompare(String(a.createdAt ?? "")));
@@ -223,6 +256,7 @@ export function buyersResponse({ users, orders, search, page }) {
         // Скільки з них справді щось купували — найкорисніше число на
         // цій сторінці.
         withOrders: all.filter(person => person.orders > 0).length,
+        blockedCount: all.filter(person => person.blocked).length,
     };
 
 }
@@ -377,6 +411,23 @@ export function peopleActionResult(action, email) {
 
     if (action === "people-unsubscribe") {
         return { ok: true, message: `Відписано${who}. Листи більше не надсилатимуться.` };
+    }
+
+    if (action === "people-block") {
+        return {
+            ok: true,
+            message: `Заблоковано${who}. Замовлення не оформить, листів не отримає, у кабінет не ввійде.`,
+        };
+    }
+
+    // Розблокування НЕ підписує назад: згоду на листи людина дає
+    // сама, і повертати її за неї не можна. Кажемо це прямо, щоб
+    // власник не чекав, що розсилка відновиться самотужки.
+    if (action === "people-unblock") {
+        return {
+            ok: true,
+            message: `Розблоковано${who}. Підписку на листи не повернуто — її людина оформлює сама.`,
+        };
     }
 
     return { ok: true, message: `Видалено${who}.` };
