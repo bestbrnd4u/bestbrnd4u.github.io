@@ -37,7 +37,17 @@ const check = (n, c, e) => {
 };
 
 const html = read("account.html");
-const js = read("assets/js/account.js");
+
+// КАРТКА ВХОДУ ЖИВЕ У ДВОХ ФАЙЛАХ.
+//
+// Спільну поведінку (провайдери, Telegram, переклад помилок) винесено
+// в assets/js/auth-widget.js: та сама картка стоїть ще й на оформленні
+// замовлення, і двома копіями цей код прожив би до першої правки.
+//
+// Перевірки нижче — про те, що поведінка ІСНУЄ, а не про те, у якому
+// файлі вона лежить. Тому читаємо обидва разом.
+const js = read("assets/js/account.js")
+    + read("assets/js/auth-widget.js");
 const css = read("assets/css/style.css");
 const subscribe = read("assets/js/subscribe.js");
 
