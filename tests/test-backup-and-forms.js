@@ -379,7 +379,23 @@ console.log("\n[3] Підписка на листи");
     check("ключ читається з секретів",
         /Deno\.env\.get\("MAILERLITE_API_KEY"\)/.test(indexTs));
 
-    check("є межа звернень", /handleSubscribe[\s\S]{0,900}?lookupAllowed/.test(indexTs));
+    // ЧОМУ НЕ «У МЕЖАХ N СИМВОЛІВ». Так тут і було — і перевірка
+    // почервоніла від того, що в handleSubscribe додали ще одну
+    // перевірку перед межею звернень. Тобто тест ловив не відсутність
+    // межі, а довжину функції: рівно та поломка, якої не було.
+    //
+    // Дивимось у тіло функції: воно й є відповіддю на питання «чи
+    // застосовує підписка межу звернень».
+    const subscribeBody = (() => {
+
+        const at = indexTs.indexOf("async function handleSubscribe(");
+
+        return at < 0 ? "" : indexTs.slice(at, indexTs.indexOf("\n}\n", at));
+
+    })();
+
+    check("є межа звернень", subscribeBody.includes("lookupAllowed"),
+        subscribeBody ? "межі немає в тілі функції" : "функції не знайдено");
 
     // Недійсний ключ мусить бути видним: інакше форма мовчки не
     // працює, а список не росте.

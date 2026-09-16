@@ -83,6 +83,7 @@ import { cleanDraft } from "./checkout-draft.js";
 import {
   cleanSubscriber, subscribeRequest, subscribeVerdict,
   cleanToken, confirmUrl, confirmVerdict, activateRequest,
+  subscriberLookup, lookupState,
   CONFIRM_COOLDOWN_MINUTES,
 } from "./subscribe.js";
 import {
@@ -1970,6 +1971,18 @@ async function handlePlaceOrder(request: Request, body: Record<string, any>): Pr
 
   }
 
+  // Заблокована адреса. Відмовляє все одно тригер у базі — він стоїть
+  // під усіма шляхами запису, — але звідти прийшло б «insert_failed»,
+  // тобто «щось пішло не так». Кажемо прямо, щоб людина не тиснула
+  // кнопку вдесяте й не думала, що зламався сайт.
+  if (await emailBlocked(clean.row.email)) {
+
+    console.warn("Замовлення від заблокованої адреси:", clean.row.email);
+
+    return adminJson({ ok: false, error: "blocked" }, 403, origin);
+
+  }
+
   // Кабінет: замовлення прив'язується до людини лише за підтвердженим
   // токеном із заголовка Authorization — його кладе туди сам клієнт
   // Supabase. Те, що прислали в тілі запиту, тут не має ваги взагалі:
@@ -2671,6 +2684,17 @@ async function handleSubscribe(request: Request, body: Record<string, any>): Pro
 
   }
 
+  // Заблокованого не підписуємо. Відповідаємо йому так само, як
+  // підписаному: правда тут нічого не покращить, а скаже боту, що
+  // його помітили — і він просто змінить адресу.
+  if (await emailBlocked(clean.subscriber.email)) {
+
+    console.warn("Підписка від заблокованої адреси:", clean.subscriber.email);
+
+    return adminJson({ ok: true, state: "already" }, 200, origin);
+
+  }
+
   const plan = subscribeRequest(MAILERLITE_API_KEY, clean.subscriber, MAILERLITE_GROUP_ID);
 
   if (!plan) {
@@ -3238,6 +3262,75 @@ async function handleTelegramLoginStatus(request: Request, body: Record<string, 
 
 }
 
+// Відписати адресу від розсилки.
+//
+// MailerLite приймає в цьому маршруті і свій id, і саму пошту — а id
+// підписника ми на цьому боці не знаємо й знати не мусимо.
+//
+// Мовчить навмисно: 404 означає «такої адреси в списку немає», тобто
+// мети досягнуто. Відсутність ключа — теж не помилка блокування:
+// розсилку могли й не під'єднувати.
+async function unsubscribeFromMailingList(email: string): Promise<void> {
+
+  const request = unsubscribeRequest(MAILERLITE_API_KEY, email);
+
+  if (!request) return;
+
+  try {
+
+    const response = await fetch(request.url, {
+      method: request.method,
+      headers: request.headers,
+      body: JSON.stringify(request.body),
+    });
+
+    if (!response.ok && response.status !== 404) {
+      console.error("Відписка при блокуванні:", await response.text());
+    }
+
+  } catch (error) {
+
+    console.error("MailerLite недоступний при блокуванні:", error);
+
+  }
+
+}
+
+// Чи заблокована адреса.
+//
+// Головний сторож — тригер у базі (міграція 035): він стоїть під
+// УСІМА шляхами запису замовлення. Ця перевірка потрібна для іншого:
+// щоб покупець побачив зрозумілу відмову, а не «insert_failed».
+async function emailBlocked(email: unknown): Promise<boolean> {
+
+  const clean = String(email ?? "").trim().toLowerCase();
+
+  if (!clean) return false;
+
+  try {
+
+    const found = await supabaseRest(
+      `blocked_emails?email=eq.${encodeURIComponent(clean)}&select=email&limit=1`
+    );
+
+    // Таблиці ще немає (міграцію не застосували) — не вигадуємо
+    // блокувань там, де їх не завели.
+    if (!found.ok) return false;
+
+    const rows = await found.json().catch(() => []);
+
+    return Array.isArray(rows) && rows.length > 0;
+
+  } catch (error) {
+
+    console.error("Не вдалося перевірити блокування:", error);
+
+    return false;
+
+  }
+
+}
+
 // Той самий користувач, що входив цим Telegram раніше.
 //
 // ЧОМУ БЕЗ ОКРЕМОЇ ТАБЛИЦІ. Зв'язок уже є: у рядку спроби входу
@@ -3284,6 +3377,163 @@ async function userForTelegramId(telegramId: unknown): Promise<Record<string, an
     return null;
 
   }
+
+}
+
+// Чи підписаний той, хто зараз на сайті.
+//
+// ПИТАЄМО ПРО ТОГО, ХТО ВВІЙШОВ, І ТІЛЬКИ ПРО НЬОГО.
+//
+// Пошту з тіла запиту не беремо навмисно: маршрут, який відповідає
+// «так/ні» про довільну адресу, — це спосіб перевірити, чи є
+// конкретна людина в нашому списку. Беремо токен сесії й питаємо
+// лише про його власника.
+async function handleSubscribeStatus(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  const user = await userFromAccessToken(body?.accessToken);
+
+  const email = realEmailOf(user);
+
+  // Не ввійшов або пошти в акаунті немає (вхід через Telegram) —
+  // питати нема про кого. Це не помилка: форма просто лишається.
+  if (!email) {
+    return adminJson({ ok: true, state: "none" }, 200, origin);
+  }
+
+  const lookup = subscriberLookup(MAILERLITE_API_KEY, email);
+
+  if (!lookup) {
+    return adminJson({ ok: true, state: "none" }, 200, origin);
+  }
+
+  try {
+
+    const response = await fetch(lookup.url, { headers: lookup.headers });
+
+    const data = response.status === 200
+      ? await response.json().catch(() => null)
+      : null;
+
+    return adminJson({ ok: true, state: lookupState(response.status, data) }, 200, origin);
+
+  } catch (error) {
+
+    console.error("MailerLite не відповів на перевірку підписки:", error);
+
+    // Не знаємо — значить форму показуємо. Сховати її через збій
+    // мережі означало б відібрати в людини спосіб підписатись.
+    return adminJson({ ok: true, state: "unknown" }, 200, origin);
+
+  }
+
+}
+
+// Відписати себе самого з кабінету.
+//
+// ЧОМУ ОКРЕМО ВІД АДМІНСЬКОЇ ВІДПИСКИ. Та бере id підписника з
+// панелі власника й вимагає його прав. Тут людина відписує СЕБЕ, і
+// єдине, що треба довести, — що ця пошта її. Доводить токен сесії.
+async function handleSubscribeOff(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  const user = await userFromAccessToken(body?.accessToken);
+
+  const email = realEmailOf(user);
+
+  if (!email) {
+    return adminJson({ ok: false, state: "unauthorized" }, 200, origin);
+  }
+
+  const plan = unsubscribeRequest(MAILERLITE_API_KEY, email);
+
+  if (!plan) {
+    return adminJson({ ok: false, state: "not_configured" }, 200, origin);
+  }
+
+  try {
+
+    const response = await fetch(plan.url, {
+      method: plan.method,
+      headers: plan.headers,
+      body: JSON.stringify(plan.body),
+    });
+
+    // 404 — адреси в списку немає, тобто мети вже досягнуто.
+    if (!response.ok && response.status !== 404) {
+
+      console.error("Відписка з кабінету:", await response.text());
+
+      return adminJson({ ok: false, state: "error" }, 200, origin);
+
+    }
+
+    return adminJson({ ok: true, state: "off" }, 200, origin);
+
+  } catch (error) {
+
+    console.error("MailerLite недоступний при відписці:", error);
+
+    return adminJson({ ok: false, state: "error" }, 200, origin);
+
+  }
+
+}
+
+// Чи зайнята адреса іншим акаунтом.
+//
+// НАВІЩО ПИТАТИ ЗАЗДАЛЕГІДЬ. Supabase на зміну пошти на зайняту
+// адресу відповідає УСПІХОМ і мовчки нічого не змінює — так він не
+// видає, які адреси в нього зареєстровані. Для нас це означає, що
+// людина бачила «лист надіслано», чекала його, не дочікувалась і
+// вважала, що зламався сайт.
+//
+// ЧОГО ЦЕ КОШТУЄ І ЧОМУ ВСЕ ОДНО ВАРТО. Маршрут, який каже «ця пошта
+// зайнята», — це спосіб перебирати адреси й дізнаватись, хто в нас
+// зареєстрований. Тому він:
+//   1. вимагає токен сесії — питати може лише той, хто вже ввійшов;
+//   2. має ту саму межу звернень за IP, що й «Де моє замовлення».
+//
+// Тобто перебір коштує акаунта й упирається в межу, а мовчазна
+// брехня в кабінеті зникає.
+async function handleEmailTaken(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  if (!(await lookupAllowed(clientIp(request)))) {
+    return adminJson({ ok: false, state: "too_many" }, 429, origin);
+  }
+
+  const user = await userFromAccessToken(body?.accessToken);
+
+  if (!user?.id) {
+    return adminJson({ ok: false, state: "unauthorized" }, 200, origin);
+  }
+
+  const email = cleanNewEmail(body?.email);
+
+  if (!email) {
+    return adminJson({ ok: false, state: "bad_email" }, 200, origin);
+  }
+
+  // Себе самого не рахуємо за «зайнято»: це відповідь на інше
+  // питання, і в кабінеті вона вже є окремим повідомленням.
+  return adminJson({
+    ok: true,
+    taken: await emailTaken(email, String(user.id)),
+  }, 200, origin);
+
+}
+
+// Пошта користувача, якщо вона справжня, а не службова адреса входу
+// через Telegram (telegram-login.js, isServiceEmail).
+function realEmailOf(user: Record<string, any> | null): string {
+
+  const email = String(user?.email ?? "").trim().toLowerCase();
+
+  return email && !isServiceEmail(email) ? email : "";
 
 }
 
@@ -4219,6 +4469,65 @@ async function handlePeopleAdmin(body: Record<string, any>, origin: string | nul
 
   }
 
+  // ---- Заблокувати / розблокувати ----
+  //
+  // ЩО САМЕ РОБИТЬ БЛОКУВАННЯ. Три дії, і жодної з них не досить
+  // окремо:
+  //   1. адреса в blocked_emails — тригер бази не дасть оформити
+  //      замовлення ні через функцію, ні прямим записом (міграція 035);
+  //   2. обліковий запис забанений в Auth — закритий вхід у кабінет;
+  //   3. відписка в MailerLite — щоб не отримував розсилку.
+  //
+  // Порядок саме такий: головне — перше. Другого може не бути взагалі
+  // (гість без кабінету), третього — теж (не підписаний), і жодна з
+  // цих відсутностей не привід вважати блокування невдалим.
+  if (action === "people-block" || action === "people-unblock") {
+
+    const blocking = action === "people-block";
+
+    const written = blocking
+      ? await supabaseRest("blocked_emails", {
+          method: "POST",
+          headers: { Prefer: "resolution=merge-duplicates" },
+          body: JSON.stringify({ email: params.email, reason: "Заблоковано з адмінки" }),
+        })
+      : await supabaseRest(`blocked_emails?email=eq.${encodeURIComponent(params.email)}`, {
+          method: "DELETE",
+        });
+
+    if (!written.ok) {
+
+      console.error("Блокування адреси:", await written.text());
+
+      return adminJson({
+        ok: false,
+        error: "Не вдалося записати блокування. Чи застосована міграція 035?",
+      }, 502, origin);
+
+    }
+
+    // Вхід у кабінет. Лише якщо кабінет узагалі є.
+    if (params.id) {
+
+      const banned = await supabaseAuthAdmin(`admin/users/${encodeURIComponent(params.id)}`, {
+        method: "PUT",
+        // 100 років — це «назавжди» мовою Auth: безстрокового бана в
+        // ньому немає, а «none» знімає бан.
+        body: JSON.stringify({ ban_duration: blocking ? "876000h" : "none" }),
+      });
+
+      if (!banned.ok) console.error("Бан облікового запису:", await banned.text());
+
+    }
+
+    // Розсилка. Знімати блокування НЕ означає підписати назад: згоду
+    // на листи людина дає сама, і повертати її за неї не можна.
+    if (blocking) await unsubscribeFromMailingList(params.email);
+
+    return adminJson(peopleActionResult(action, params.email), 200, origin);
+
+  }
+
   if (action === "people-buyers") {
 
     // Admin API віддає сторінками. Беремо з запасом: список покупців
@@ -4268,11 +4577,30 @@ async function handlePeopleAdmin(body: Record<string, any>, origin: string | nul
 
     const rows = orders.ok ? await orders.json() : [];
 
+    // Заблоковані — одним запитом на всіх. Список короткий за
+    // природою: це не «всі покупці», а ті кілька, кого спинили.
+    //
+    // Не відповіла таблиця (міграції 035 ще немає) — малюємо список
+    // без позначок, а не порожню сторінку з помилкою: решта колонок
+    // від цього не залежить.
+    const blockedRows = await supabaseRest("blocked_emails?select=email&limit=5000");
+
+    const blocked: Record<string, boolean> = {};
+
+    if (blockedRows.ok) {
+
+      for (const row of await blockedRows.json().catch(() => [])) {
+        blocked[String(row?.email ?? "").toLowerCase()] = true;
+      }
+
+    }
+
     return adminJson(buyersResponse({
       users,
       orders: rows,
       search: params.search,
       page: params.page,
+      blocked,
     }), 200, origin);
 
   }
@@ -4584,6 +4912,27 @@ async function handleRequest(request: Request): Promise<Response> {
   if (body.site_action === "subscribe-confirm") {
 
     return await handleSubscribeConfirm(request, body);
+
+  }
+
+  // --- «я вже підписаний?» для того, хто ввійшов ---
+  if (body.site_action === "subscribe-status") {
+
+    return await handleSubscribeStatus(request, body);
+
+  }
+
+  // --- відписка з кабінету, себе самого ---
+  if (body.site_action === "subscribe-off") {
+
+    return await handleSubscribeOff(request, body);
+
+  }
+
+  // --- чи зайнята адреса іншим акаунтом ---
+  if (body.site_action === "email-taken") {
+
+    return await handleEmailTaken(request, body);
 
   }
 

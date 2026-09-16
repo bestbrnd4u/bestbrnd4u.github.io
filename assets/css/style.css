@@ -6706,6 +6706,16 @@ body.mobile-filters-open .scroll-top{
     min-height:14px;
 }
 
+/* ТЕ САМЕ МІСЦЕ, АЛЕ ГАРНА НОВИНА.
+
+   «Відписано» й «перевірте пошту» — не помилки, а червоний колір
+   каже саме про помилку. Клас додається поверх .field-error, щоб не
+   тримати другого елемента під те саме повідомлення: місце під
+   рядком уже зарезервоване (min-height вище), і текст не стрибає. */
+.field-ok{
+    color:#047857;
+}
+
 .checkout-form input.invalid{
     border-color:var(--danger);
     background:#fdf4f3;
@@ -9205,53 +9215,65 @@ body.mobile-filters-open .scroll-top{
    відступи й поведінка лишаються спільними: дві копії верстки тієї
    самої форми розійшлися б на першій же правці. Той самий підхід, що
    в .newsletter .subscribe вище. */
-/* Два класи в селекторі, бо базове .subscribe{max-width:320px} лежить
-   нижче по файлу й з однаковою вагою перемагало б порядком. 320px —
-   ширина колонки підвалу; у картці кабінету від цього поле вводу
-   стискалось до 196px. */
-.subscribe.subscribe-account{
-    max-width:520px;
-    margin:16px 0 20px;
+.newsletter-settings{
+    max-width:560px;
+    margin-top:18px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
 }
 
-.subscribe-account .subscribe-label{
-    color:var(--gray700);
-}
-
-.subscribe-account .subscribe-row input{
-    border:1px solid var(--gray200);
-    background:#fff;
+.newsletter-group{
+    font-size:16px;
+    font-weight:700;
     color:var(--gray900);
 }
 
-/* --gray300, а не --gray400: четвертого відтінку в :root немає, і
-   var(--gray400) не намалював би нічого — підказка в полі просто
-   зникла б, без жодної помилки в консолі. */
-.subscribe-account .subscribe-row input::placeholder{
-    color:var(--gray300);
+/* ТУТ І БУВ ТОЙ САМИЙ КАПКАН.
+
+   Базове .subscribe-consent писалось під ТЕМНИЙ підвал: колір тексту
+   rgba(255,255,255,.6). На білій картці кабінету це біле по білому —
+   тобто підпис галочки просто зник би, і жодної помилки ніде не
+   з'явилось би. Раніше на це вже наступили з формою підписки, і
+   перевірка [6b] у test-account-page.js стоїть саме через це.
+
+   Перефарбовуємо рівно колір: розкладка лишається спільною з
+   підвальною, щоб дві копії не розійшлись на першій же правці. */
+.newsletter-settings .subscribe-consent{
+    font-size:14px;
+    color:var(--gray900);
+    align-items:center;
 }
 
-.subscribe-account .subscribe-row input:focus{
-    border-color:var(--secondary);
-}
-
-.subscribe-account .subscribe-row button{
-    background:var(--secondary);
-    color:#fff;
-}
-
-.subscribe-account .subscribe-consent{
-    color:var(--gray500);
-}
-
-.subscribe-account .subscribe-consent input[type="checkbox"]{
+.newsletter-settings .subscribe-consent input[type="checkbox"]{
     accent-color:var(--secondary);
 }
 
-/* Світло-зелений і світло-рожевий читались на темному підвалі, на
-   білому — ні. */
-.subscribe-account .subscribe-note-ok{ color:#047857; }
-.subscribe-account .subscribe-note-error{ color:#b91c1c; }
+/* Підпис під галочкою — куди саме підуть листи. */
+.newsletter-settings .profile-card-sub{
+    margin:0;
+}
+
+/* Найчастіший страх при відписці — «а замовлення я тепер не побачу?».
+   Відбиваємо рискою, щоб це читалось як окрема обіцянка, а не як
+   продовження опису розсилки. */
+.newsletter-settings .newsletter-keep{
+    margin-top:6px;
+    padding-top:12px;
+    border-top:1px solid var(--gray200);
+}
+
+.newsletter-settings .field-note{
+    font-size:13px;
+    line-height:1.5;
+    color:#92400e;
+}
+
+.newsletter-settings .btn{
+    align-self:flex-start;
+    margin-top:6px;
+    min-width:180px;
+}
 
 /* align-self ТУТ ЗНАЧИТЬ РІЗНЕ ЗАЛЕЖНО ВІД ТОГО, В ЧОМУ ЛЕЖИТЬ
    ЕЛЕМЕНТ, — І САМЕ НА ЦЬОМУ ВЕРСТКА ЗЛАМАЛАСЬ.
@@ -14761,8 +14783,9 @@ body.refusal-open{
    писати.
 
    #fff, а не inherit: ці правила описують поле НА ТЕМНОМУ, і колір
-   тексту — така сама їхня частина, як колір рамки. Світлу картку
-   кабінету перефарбовує .subscribe-account нижче. */
+   тексту — така сама їхня частина, як колір рамки. Форма підписки
+   лишилась лише на темному (підвал і смуга «Новинки й акції»): у
+   кабінеті замість неї тепер галочка, .newsletter-settings. */
 .subscribe-row input{
     flex:1;
     min-width:0;

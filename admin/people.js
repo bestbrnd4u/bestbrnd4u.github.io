@@ -194,6 +194,7 @@
                 "<tr>"
                 + `<td class="email">${esc(person.email)}`
                 + (person.confirmed ? "" : ' <span class="pill pill-unconfirmed">не підтвердив</span>')
+                + (person.blocked ? ' <span class="pill pill-blocked">заблокований</span>' : "")
                 + "</td>"
                 + `<td>${esc(person.name || "—")}</td>`
                 + `<td>${esc(person.orders || "—")}</td>`
@@ -201,7 +202,15 @@
                 + `<td>${esc(dateLabel(person.lastOrderAt))}</td>`
                 + `<td>${esc(dateLabel(person.createdAt))}</td>`
                 + `<td>${esc(dateLabel(person.lastSignInAt))}</td>`
-                + `<td class="row-actions">${actionButton("buyer", person, "people-delete", "Видалити", true)}</td>`
+                // Блокування — перед видаленням, бо в більшості
+                // випадків потрібне саме воно: бота треба спинити, а
+                // не стерти сліди того, що він приходив.
+                + `<td class="row-actions">`
+                + (person.blocked
+                    ? actionButton("buyer", person, "people-unblock", "Розблокувати", false)
+                    : actionButton("buyer", person, "people-block", "Заблокувати", false))
+                + actionButton("buyer", person, "people-delete", "Видалити", true)
+                + "</td>"
                 + "</tr>").join("")
             + "</table></div>";
 
@@ -239,6 +248,21 @@
     // відписаний лишається в списку й захищений від повторного
     // імпорту, а видаленого той самий імпорт підпише знову.
     function confirmText(action, kind, email) {
+
+        if (action === "people-block") {
+            return `Заблокувати ${email}?\n\n`
+                + "Ця адреса більше не оформить замовлення, не отримає листів"
+                + " і не ввійде в кабінет. Заразом її буде відписано від розсилки."
+                + "\n\nЗамовлення й дані лишаються на місці — блокування знімається"
+                + " тією ж кнопкою.";
+        }
+
+        if (action === "people-unblock") {
+            return `Розблокувати ${email}?\n\n`
+                + "Замовлення й вхід у кабінет знову працюватимуть."
+                + "\n\nПідписку на листи це НЕ повертає: згоду на розсилку людина"
+                + " оформлює сама.";
+        }
 
         if (action === "people-unsubscribe") {
             return `Відписати ${email}?\n\n`
