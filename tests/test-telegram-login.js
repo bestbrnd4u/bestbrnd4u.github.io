@@ -580,7 +580,8 @@ console.log("\n[11] Вхід через Telegram знаходить акаунт
     // ЦЕ НЕ НАШЕ ЧИСЛО, І САМЕ ТОМУ ВОНО ОКРЕМЕ.
     //
     // Заявку створює Supabase, і живе вона стільки, скільки його
-    // посилання — Authentication → Emails → Email OTP Expiration.
+    // посилання — Authentication → Sign In / Providers → Email →
+    // Email OTP Expiration.
     // Плутати з нашим листом (EMAIL_ADD_TTL_MINUTES) не можна: то
     // інший лист і інший строк.
     check("строк чужої заявки — окрема стала",
