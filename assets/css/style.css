@@ -3184,11 +3184,85 @@ body.mobile-filters-open .scroll-top{
     color:#fff;
 }
 
+/* КНОПКА «БРЕНДИ» — ТІЛЬКИ НА ВУЗЬКОМУ ЕКРАНІ.
+
+   Брендів два десятки, і на телефоні вони займають п'ять-шість рядків,
+   тобто відсувають сам каталог за межі екрана. Людина приходить
+   дивитись товари, а бачить перелік назв.
+
+   На широкому екрані смуга — один-два рядки, і ховати її нема причини,
+   тому кнопки там немає зовсім. Вирішує це CSS: у JS немає жодного
+   числа про ширину екрана, щоб воно не розійшлося з медіа-запитом. */
+.brand-strip-toggle{
+    display:none;
+}
+
 /* Бренда, якого за поточних фільтрів не лишилось, не ховаємо: зникла
    плашка — це зниклий орієнтир. Гасимо, щоб видно було, що там нуль. */
 .brand-chip.unavailable,
 .taxonomy-hub-list li:has(> [data-brand-chip].unavailable){
     opacity:.45;
+}
+
+@media(max-width:768px){
+
+    .brand-strip-toggle{
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        margin:-8px 0 20px;
+        padding:10px 16px;
+        border-radius:50px;
+        border:1.5px solid var(--gray200);
+        background:#fff;
+        font-size:14px;
+        font-weight:700;
+        color:var(--gray900);
+    }
+
+    .brand-strip-toggle-count{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        min-width:20px;
+        height:20px;
+        padding:0 6px;
+        border-radius:50px;
+        background:var(--secondary);
+        color:#fff;
+        font-size:12px;
+    }
+
+    /* Значок — та сама «галочка», що в групах бічного меню: людина вже
+       знає, що вона означає. */
+    .brand-strip-toggle-icon{
+        width:8px;
+        height:8px;
+        border-right:2px solid var(--gray500);
+        border-bottom:2px solid var(--gray500);
+        transform:rotate(45deg) translate(-2px,-2px);
+        transition:transform 160ms ease;
+    }
+
+    .brand-strip-toggle.open .brand-strip-toggle-icon{
+        transform:rotate(225deg) translate(-2px,-2px);
+    }
+
+    /* Згорнуто — саме прибрано з потоку, а не звужено: інакше смуга
+       лишала б по собі порожнє місце. */
+    .brand-list-collapsible{
+        display:none;
+    }
+
+    .brand-list-collapsible.open{
+        display:flex;
+    }
+
+    /* Хаб малює список усередині <ul>, а не сам собою. */
+    nav.brand-list-collapsible.open{
+        display:block;
+    }
+
 }
 
 /* Перелік товарів у розмітці до JS.

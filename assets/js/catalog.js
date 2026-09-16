@@ -955,6 +955,7 @@ async function initCatalog() {
 
         fillCatalogSidebar(categoryDepartments);
         fillBrandStrip();
+        setupBrandCollapse();
 
         applyCategoryFromUrl();
 
@@ -1088,6 +1089,82 @@ function fillBrandStrip() {
             class="brand-chip-count">${counts.get(name)}</span></a>`).join("");
 
     brandStrip.hidden = false;
+
+}
+
+// -------------------------
+// На телефоні смуга згортається під кнопку
+//
+// НАВІЩО. Брендів двадцять один, і на вузькому екрані вони займають
+// п'ять-шість рядків — тобто відсувають сам каталог за межі екрана.
+// Людина приходить дивитись товари, а бачить перелік назв.
+//
+// На широкому екрані кнопки немає: там смуга — один-два рядки, і
+// ховати її нема причини. Вирішує це CSS, а не JS: у коді немає
+// жодного числа про ширину екрана, щоб воно не розійшлося з
+// медіа-запитом.
+//
+// ОДНА КНОПКА НА ДВА ДЖЕРЕЛА. У каталозі смугу малює fillBrandStrip(),
+// на /brands/ перелік лежить у розмітці хаба. Кнопку ставимо перед
+// тим, що знайшли, — інакше довелося б писати її ще й у генераторі
+// сторінок, і дві копії розійшлися б.
+// -------------------------
+
+function brandListNode() {
+
+    const hub = document.querySelector(".taxonomy-hub:has([data-brand-chip])");
+
+    if (hub) return hub;
+
+    return brandStrip && !brandStrip.hidden ? brandStrip : null;
+
+}
+
+function setupBrandCollapse() {
+
+    const list = brandListNode();
+
+    if (!list || document.getElementById("brandStripToggle")) return;
+
+    const button = document.createElement("button");
+
+    button.type = "button";
+    button.id = "brandStripToggle";
+    button.className = "brand-strip-toggle";
+    button.setAttribute("aria-expanded", "false");
+    button.setAttribute("aria-controls", list.id || "");
+
+    button.innerHTML = `<span class="brand-strip-toggle-label">Бренди</span>`
+        + `<span class="brand-strip-toggle-count" hidden></span>`
+        + `<span class="brand-strip-toggle-icon" aria-hidden="true"></span>`;
+
+    list.classList.add("brand-list-collapsible");
+
+    list.parentNode.insertBefore(button, list);
+
+    button.addEventListener("click", () => {
+
+        const open = list.classList.toggle("open");
+
+        button.classList.toggle("open", open);
+        button.setAttribute("aria-expanded", open ? "true" : "false");
+
+    });
+
+}
+
+// Скільки брендів обрано — видно й тоді, коли смуга згорнута.
+//
+// Без цього числа згорнута кнопка виглядає однаково і з фільтром, і
+// без нього: товарів менше, а чому — не видно.
+function refreshBrandToggle() {
+
+    const count = document.querySelector("#brandStripToggle .brand-strip-toggle-count");
+
+    if (!count) return;
+
+    count.textContent = selectedBrands.size;
+    count.hidden = selectedBrands.size === 0;
 
 }
 
@@ -3764,6 +3841,7 @@ function refreshFacets() {
 
         refreshSidebarCounts();
         refreshBrandStrip();
+        refreshBrandToggle();
 
     } finally {
 

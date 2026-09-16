@@ -48,7 +48,8 @@ code+=`
 window.__t={ setProducts(l){products=l;}, fillCatalogSidebar:d=>fillCatalogSidebar(d),
   toggleCategory:n=>toggleCategory(n), get selectedCategories(){return selectedCategories;},
   get selectedBrands(){return selectedBrands;}, refreshSidebarCounts:()=>refreshSidebarCounts(),
-  fillBrandStrip:()=>fillBrandStrip(), refreshBrandStrip:()=>refreshBrandStrip() };`;
+  fillBrandStrip:()=>fillBrandStrip(), refreshBrandStrip:()=>refreshBrandStrip(),
+  setupBrandCollapse:()=>setupBrandCollapse(), refreshBrandToggle:()=>refreshBrandToggle() };`;
 window.eval(code);
 
 let failures=0;
@@ -321,7 +322,116 @@ console.log("\n[8] Дві смуги поруч не малюємо");
     check("клік у хабі теж фільтрує", window.__t.selectedBrands.has("X"));
 
     hub.remove();
+
+    }
+
     window.__t.selectedBrands.clear();
+}
+
+console.log("\n[9] На телефоні смуга згортається під кнопку");
+{
+    // НАВІЩО. Брендів два десятки, і на вузькому екрані вони займають
+    // п'ять-шість рядків — тобто відсувають сам каталог за межі
+    // екрана. Людина приходить дивитись товари, а бачить перелік назв.
+    document.getElementById("brandStripToggle")?.remove();
+
+    document.querySelectorAll(".brand-list-collapsible")
+        .forEach(node => node.classList.remove("brand-list-collapsible"));
+
+    window.__t.selectedBrands.clear();
+    window.__t.selectedCategories.clear();
+
+    rebuild();
+    window.__t.fillBrandStrip();
+    window.__t.setupBrandCollapse();
+
+    const toggle = document.getElementById("brandStripToggle");
+    const strip = document.getElementById("brandStrip");
+
+    check("кнопка з'явилась", Boolean(toggle));
+
+    // ІМ'Я НЕ МОЖНА БРАТИ ЗАЙНЯТЕ.
+    //
+    // Спершу кнопка звалась brandToggle — а так уже зветься кнопка
+    // випадайки «Бренд» у смузі фільтрів. Перевірка «чи вже є така
+    // кнопка» знаходила ЧУЖУ й мовчки не робила нічого: ні кнопки, ні
+    // згортання, і жодної помилки ніде.
+    const dropdownToggle = document.getElementById("brandToggle");
+
+    check("це не та сама кнопка, що у випадайці фільтра",
+        Boolean(dropdownToggle) && dropdownToggle !== toggle
+        && dropdownToggle.classList.contains("filter-toggle"),
+        dropdownToggle ? dropdownToggle.className : "випадайки немає");
+
+    if (toggle) {
+
+    check("смуга позначена як згортана",
+        strip.classList.contains("brand-list-collapsible"));
+
+    check("починаємо згорнутими", toggle.getAttribute("aria-expanded") === "false"
+        && !strip.classList.contains("open"));
+
+    toggle.dispatchEvent(new window.MouseEvent("click", { bubbles: true, cancelable: true }));
+
+    check("клік розгортає", strip.classList.contains("open")
+        && toggle.getAttribute("aria-expanded") === "true");
+
+    toggle.dispatchEvent(new window.MouseEvent("click", { bubbles: true, cancelable: true }));
+
+    check("повторний клік згортає", !strip.classList.contains("open"));
+
+    // ЗГОРНУТА КНОПКА МУСИТЬ ПОКАЗУВАТИ, ЩО ФІЛЬТР ПРАЦЮЄ.
+    //
+    // Інакше вона виглядає однаково з обраним брендом і без нього:
+    // товарів менше, а чому — не видно.
+    const badge = toggle.querySelector(".brand-strip-toggle-count");
+
+    check("без вибору лічильника немає", badge.hidden === true);
+
+    window.__t.selectedBrands.add("X");
+    window.__t.refreshBrandToggle();
+
+    check("з вибором лічильник показує, скільки брендів",
+        badge.hidden === false && badge.textContent === "1", badge.textContent);
+
+    window.__t.selectedBrands.add("Y");
+    window.__t.refreshBrandToggle();
+
+    check("і рахує обидва", badge.textContent === "2", badge.textContent);
+
+    window.__t.selectedBrands.clear();
+
+    }
+
+    // ШИРИНУ ЕКРАНА ВИРІШУЄ CSS, А НЕ КОД.
+    //
+    // Число в JS рано чи пізно розійшлося б із медіа-запитом, і кнопка
+    // з'являлась би не там, де ховається смуга.
+    const catalogJs = fs.readFileSync(path.join(ROOT, "assets/js/catalog.js"), "utf8");
+
+    const collapseCode = catalogJs.slice(
+        catalogJs.indexOf("function setupBrandCollapse"),
+        catalogJs.indexOf("function refreshBrandToggle"));
+
+    check("у коді згортання немає жодної ширини екрана",
+        !/matchMedia|innerWidth|768|600|max-width/.test(collapseCode));
+
+    const css = fs.readFileSync(path.join(ROOT, "assets/css/style.css"), "utf8");
+
+    // Перевірки вище кличуть setupBrandCollapse() руками — прибери
+    // виклик зі сторінки, і вони й далі зелені, а кнопки на сайті
+    // немає. Той самий недогляд уже був зі смугою.
+    check("кнопку ставить сама сторінка",
+        catalogJs.includes("fillBrandStrip();\n        setupBrandCollapse();"));
+
+    check("і лічильник оновлюється разом із рештою",
+        catalogJs.includes("refreshBrandStrip();\n        refreshBrandToggle();"));
+
+    check("на широкому екрані кнопки немає",
+        /\.brand-strip-toggle\{\s*\n\s*display:none;/.test(css));
+
+    check("а на вузькому вона з'являється",
+        /@media\(max-width:768px\)\{[\s\S]{0,400}\.brand-strip-toggle\{\s*\n\s*display:inline-flex/.test(css));
 }
 
 console.log(failures===0?"\n✅ Усі перевірки пройдено":`\n❌ Провалено: ${failures}`);
