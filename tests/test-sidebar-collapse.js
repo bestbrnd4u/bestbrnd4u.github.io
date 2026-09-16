@@ -46,7 +46,8 @@ window.eval(_cs.match(/let sizeGroupsPromise[\s\S]*?\n}\n/)[0]);
 let code=fs.readFileSync(path.join(ROOT,"assets/js/catalog.js"),"utf8");
 code+=`
 window.__t={ setProducts(l){products=l;}, fillCatalogSidebar:d=>fillCatalogSidebar(d),
-  toggleCategory:n=>toggleCategory(n), get selectedCategories(){return selectedCategories;} };`;
+  toggleCategory:n=>toggleCategory(n), get selectedCategories(){return selectedCategories;},
+  get selectedBrands(){return selectedBrands;}, refreshSidebarCounts:()=>refreshSidebarCounts() };`;
 window.eval(code);
 
 let failures=0;
@@ -116,6 +117,63 @@ toggleOf("Сумки").dispatchEvent(new window.Event("click",{bubbles:true}));
 check("кількість товарів не змінилась", document.getElementById("productsCount").textContent===before,
       `${before} → ${document.getElementById("productsCount").textContent}`);
 check("фільтр категорії лишився", window.__t.selectedCategories.has("Кросівки"));
+
+console.log("\n[6] Число відділу не розходиться з рештою");
+{
+    // ЩО БУЛО. refreshSidebarCounts() оновлював «Всі товари» й кожну
+    // категорію, а число поруч із назвою відділу лишалось тим, яке
+    // намалювали ОДИН РАЗ при завантаженні — по всьому розділу, без
+    // жодного фільтра.
+    //
+    // Виглядало так (заміряно на живому деві,
+    // /catalog?section=sale&brand=coach&department=sumky):
+    //
+    //     Всі товари      10
+    //     Сумки           14      ← більше, ніж є в усьому каталозі
+    //       Жіночі сумки   9
+    //       Чоловічі сумки 1
+    //
+    // Тобто відділ обіцяв більше, ніж є, і більше, ніж сума власних
+    // категорій.
+    const departmentCount = title =>
+        Number(group(title).querySelector("[data-sidebar-department] .sidebar-count").textContent);
+
+    const childrenSum = title =>
+        [...group(title).querySelectorAll("[data-sidebar-category] .sidebar-count")]
+            .reduce((sum, el) => sum + Number(el.textContent), 0);
+
+    const allCount = () =>
+        Number(document.querySelector("[data-sidebar-all] .sidebar-count").textContent);
+
+    rebuild();
+
+    check("без фільтрів відділ дорівнює сумі своїх категорій",
+        departmentCount("Сумки") === childrenSum("Сумки"),
+        departmentCount("Сумки") + " проти " + childrenSum("Сумки"));
+
+    // Головне: фільтр, який справді звужує вибірку. Бренд X лишає
+    // тільки дві сумки з чотирьох товарів.
+    window.__t.selectedBrands.add("X");
+    window.__t.refreshSidebarCounts();
+
+    check("після фільтра «Всі товари» звузились", allCount() === 2, allCount());
+
+    check("і відділ звузився разом із категоріями",
+        departmentCount("Сумки") === 2 && departmentCount("Сумки") === childrenSum("Сумки"),
+        departmentCount("Сумки") + " проти " + childrenSum("Сумки"));
+
+    // Порожній відділ мусить показати нуль, а не старе число.
+    check("порожній відділ показує нуль",
+        departmentCount("Взуття") === 0 && departmentCount("Аксесуари") === 0,
+        departmentCount("Взуття") + " / " + departmentCount("Аксесуари"));
+
+    // Найпростіша перевірка на здоровий глузд: жоден відділ не може
+    // бути більшим за весь каталог.
+    check("сума відділів дорівнює «Всі товари»",
+        ["Сумки", "Взуття", "Аксесуари"].reduce((s, title) => s + departmentCount(title), 0) === allCount());
+
+    window.__t.selectedBrands.delete("X");
+}
 
 console.log(failures===0?"\n✅ Усі перевірки пройдено":`\n❌ Провалено: ${failures}`);
 process.exit(failures===0?0:1);

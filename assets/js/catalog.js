@@ -1784,11 +1784,38 @@ function refreshSidebarCounts() {
 
     });
 
-    // група ховається цілком, якщо в ній не лишилось жодної категорії
+    // ЧИСЛО ВІДДІЛУ ТЕЖ ОНОВЛЮЄТЬСЯ — І САМЕ ЦЬОГО ТУТ НЕ БУЛО.
+    //
+    // Оновлювались «Всі товари» й кожна категорія, а число поруч із
+    // назвою відділу лишалось тим, яке намалювали один раз при
+    // завантаженні — по всьому розділу, без жодного фільтра.
+    //
+    // Виглядало це так: «Всі товари 10», «Сумки 14», а всередині
+    // «Жіночі сумки 9» і «Чоловічі сумки 1». Тобто відділ обіцяв
+    // більше, ніж є в усьому каталозі, і більше, ніж сума власних
+    // категорій. Заміряно на
+    // /catalog?section=sale&brand=coach&department=sumky.
+    //
+    // Рахуємо так само, як при побудові меню: сумою своїх категорій.
+    // Інакше два числа на одному екрані рахувались би по-різному й
+    // рано чи пізно розійшлися б знову.
     catalogSidebar.querySelectorAll(".sidebar-group").forEach(group => {
 
         const items = [...group.querySelectorAll("[data-sidebar-category]")];
 
+        const total = items.reduce((sum, item) => {
+
+            const value = Number(item.querySelector(".sidebar-count")?.textContent);
+
+            return sum + (Number.isFinite(value) ? value : 0);
+
+        }, 0);
+
+        const countEl = group.querySelector("[data-sidebar-department] .sidebar-count");
+
+        if (countEl) countEl.textContent = total;
+
+        // група ховається цілком, якщо в ній не лишилось жодної категорії
         group.classList.toggle(
             "unavailable",
             items.length > 0 && items.every(item => item.classList.contains("unavailable"))
