@@ -2565,12 +2565,23 @@ newEmailSubmit?.addEventListener("click", async () => {
     // Питаємо самі. Оракул на чужі адреси це не відкриває: маршрут
     // вимагає токен сесії й має ту саму межу звернень за IP, що й
     // «Де моє замовлення».
-    if (await emailAlreadyTaken(email)) {
+    const busy = await emailBusy(email);
+
+    if (busy) {
 
         newEmailSubmit.disabled = false;
         newEmailSubmit.textContent = "Підтвердити";
 
-        emailChangeMessage.textContent = "Ця пошта вже прив'язана до іншого акаунту";
+        // ДВІ РІЗНІ ВІДМОВИ, І ПЛУТАТИ ЇХ НЕ МОЖНА.
+        //
+        // «Зайнята» остаточна: адреса чиясь, і чекати нема чого.
+        // «Щойно запросили» минає сама — заявка згорить разом із
+        // посиланням, і адреса звільниться. Сказати тут те саме, що й
+        // у першому випадку, означало б відправити людину шукати іншу
+        // пошту там, де досить зачекати.
+        emailChangeMessage.textContent = busy === "pending"
+            ? "Цю адресу щойно запросив інший кабінет. Якщо там не підтвердять, вона звільниться за добу"
+            : "Ця пошта вже прив'язана до іншого акаунту";
 
         return;
 
@@ -2628,16 +2639,19 @@ newEmailSubmit?.addEventListener("click", async () => {
 
 // Чи належить ця адреса вже комусь іншому.
 //
-// «Не знаю» повертаємо як false навмисно: збій мережі не привід
-// зупиняти зміну пошти. Якщо адреса таки зайнята, далі це
-// з'ясується — просто пізніше й гірше, як було досі.
-async function emailAlreadyTaken(email) {
+// Повертає "taken" (чиясь підтверджена пошта), "pending" (хтось
+// щойно попросив зміну на неї й ще не підтвердив) або порожньо.
+//
+// Порожньо повертаємо й тоді, коли перевірити не вдалося: збій мережі
+// не привід зупиняти зміну пошти. Якщо адреса таки зайнята, це
+// з'ясується далі — просто пізніше й гірше, як було досі.
+async function emailBusy(email) {
 
     const { data: session } = await supabaseClient.auth.getSession();
 
     const accessToken = session?.session?.access_token || "";
 
-    if (!accessToken) return false;
+    if (!accessToken) return "";
 
     const { data } = await callFunction({
         site_action: "email-taken",
@@ -2645,7 +2659,21 @@ async function emailAlreadyTaken(email) {
         email: email,
     });
 
-    return Boolean(data?.ok && data.taken);
+    // ПЕРЕВІРКА, ЯКА НЕ СПРАЦЮВАЛА, МУСИТЬ ЛИШИТИ СЛІД.
+    //
+    // Раніше «вільна» й «не змогли подивитись» поверталися однаково —
+    // і зламана перевірка виглядала точнісінько як вільна адреса.
+    // Зупиняти через це зміну пошти не можна (людина опинилась би в
+    // глухому куті через чужий збій), але мовчати теж не годиться.
+    if (data?.ok && data.checked === false) {
+        console.warn("Не вдалося перевірити, чи пошта зайнята — подробиці в журналі функції");
+    }
+
+    if (!data?.ok) return "";
+
+    if (data.taken) return "taken";
+
+    return data.pending ? "pending" : "";
 
 }
 
