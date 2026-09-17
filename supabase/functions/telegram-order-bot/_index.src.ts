@@ -3847,7 +3847,12 @@ async function emailTaken(email: string, exceptUserId = ""): Promise<{ checked: 
 //
 // ЦЕ НЕ НАШЕ ЧИСЛО. Заявку створює Supabase, коли людина просить зміну
 // пошти, і живе вона рівно стільки, скільки живе його посилання:
-// Authentication → Emails → **Email OTP Expiration**. Зараз там година.
+// Authentication → **Sign In / Providers** → Email → **Email OTP
+// Expiration**. Зараз там година.
+//
+// Розділ «Emails» у панелі — це ЛИШЕ шаблони листів: строк колись жив
+// там, і підказка, яка досі вела туди, змусила власника шукати
+// перемикач, якого там більше немає.
 //
 // ЩО СТАНЕТЬСЯ, ЯКЩО ЧИСЛА РОЗІЙДУТЬСЯ:
 //
