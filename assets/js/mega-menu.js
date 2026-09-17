@@ -297,12 +297,41 @@
 
             if (!genderColumns && !brandColumn) return;
 
+            // ПЕРЕХІД У КОЛОНКИ НЕ МАЄ БУТИ АНІМОВАНИМ.
+            //
+            // Закрите меню за замовчуванням стоїть по центру свого
+            // пункту: transform:translateX(-50%). Клас колонок цей зсув
+            // прибирає — панель займає всю ширину екрана й рахує своє
+            // місце сама.
+            //
+            // Але transform у .mega-menu входить у transition. Тобто в
+            // мить, коли клас додається, браузер не просто міняє
+            // значення, а ПЛАВНО ЇДЕ від −50% ширини до нуля. Заміряно
+            // на 1920px: панель 1910px завширшки, тобто виїзд на 955
+            // пікселів ліворуч — рівно те, що власник і побачив як
+            // «випадає збоку, а не згори».
+            //
+            // Помітно це лише на перших наведеннях: меню будуються по
+            // одному, і кожне їде окремо. Хто швидко проходить по
+            // «Каталог → Новинки → Акції», ловить усі три.
+            //
+            // Тому на час перебудови анімацію знімаємо. offsetWidth між
+            // цим — не забобон: без нього браузер склеїв би зняття й
+            // повернення в одну зміну, і transition не вимкнувся б.
+            const animation = menu.style.transition;
+
+            menu.style.transition = "none";
+
             menu.classList.add("mega-menu-columns");
             menu.innerHTML = `<div class="mega-inner">${genderColumns}${brandColumn}</div>`;
 
             builtMenus.push({ menu, item });
 
             stretchToViewport(menu, item);
+
+            void menu.offsetWidth;
+
+            menu.style.transition = animation;
 
         });
 

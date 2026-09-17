@@ -293,9 +293,55 @@ console.log("\n[4] Випадні списки фільтрів: без щіли
   // catalog.js — а не здогад у стилях, з якого боку буде тісно.
   const catalog = fs.readFileSync(path.join(ROOT, "assets/js/catalog.js"), "utf8");
 
+  // Щілину мали не лише фільтри. Перевіряємо КОЖЕН список, що
+  // чіпляється до свого поля чи кнопки: підказки міста на оформленні,
+  // меню сортування й самописний select. Виняток один - .cart-popup:
+  // це сповіщення «додано в кошик», яке саме зникає через 4,5 с, а не
+  // список під контролом.
+  [
+    ["підказки міста", /\.np-suggest\{[^}]*\}/],
+    ["меню сортування", /\.sort-menu\{[^}]*\}/],
+    ["самописний select", /\.select-menu-list\{[^}]*\}/],
+  ].forEach(([name, re]) => {
+
+    // Коментарі прибираємо: усередині правила написано, ЩО саме тут
+    // стояло раніше («margin-top:4px»), і перевірка чіплялась за цю
+    // згадку замість коду. Третій раз за сесію та сама пастка.
+    const rule = (re.exec(css) || [""])[0].replace(/\/\*[\s\S]*?\*\//g, "");
+
+    check(name + " - без щілини",
+      rule !== "" && !/top:\s*calc\(100% \+/.test(rule) && !/margin-top:\s*[1-9]/.test(rule),
+      rule.replace(/\s+/g, " ").slice(0, 100));
+
+  });
+
   check("а тісноту справа розв'язує замір, а не стилі",
     /function keepMenuOnScreen/.test(catalog)
     && /keepMenuOnScreen\(menu\)/.test(catalog));
+
+  // МЕГА-МЕНЮ ШАПКИ НЕ МАЄ ВИЇЖДЖАТИ ЗБОКУ.
+  //
+  // Закрите меню стоїть по центру свого пункту: transform:translateX(-50%).
+  // Клас колонок цей зсув прибирає — панель займає всю ширину екрана.
+  // Але transform входить у transition, тож у мить, коли клас додається,
+  // браузер ПЛАВНО ЇДЕ від −50% ширини до нуля. Заміряно на 1920px:
+  // панель 1910px, тобто виїзд на 955 пікселів ліворуч — рівно те, що
+  // власник бачив як «випадає збоку, а не згори».
+  //
+  // Тому на час перебудови анімація знімається. offsetWidth між зняттям
+  // і поверненням обов'язковий: без нього браузер склеїв би обидві зміни
+  // в одну, і transition не вимкнувся б.
+  const mega = fs.readFileSync(path.join(ROOT, "assets/js/mega-menu.js"), "utf8");
+
+  const build = mega.slice(mega.indexOf('menu.style.transition = "none"'));
+
+  check("перебудова меню шапки не анімується",
+    /menu\.style\.transition = "none"/.test(mega)
+    && /menu\.classList\.add\("mega-menu-columns"\)/.test(build));
+
+  check("і браузер змушений це застосувати",
+    /void menu\.offsetWidth/.test(build)
+    && build.indexOf("void menu.offsetWidth") < build.indexOf("menu.style.transition = animation"));
 }
 
 console.log(failures===0?"\n✅ Усі перевірки пройдено":`\n❌ Провалено: ${failures}`);

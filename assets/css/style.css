@@ -4749,7 +4749,7 @@ body.mobile-filters-open .scroll-top{
 
 .sort-menu{
     position:absolute;
-    top:calc(100% + 8px);
+    top:100%;
     right:0;
     background:#fff;
     border-radius:14px;
@@ -9030,7 +9030,7 @@ body.mobile-filters-open .scroll-top{
     position:absolute;
     left:0;
     right:0;
-    top:calc(100% + 6px);
+    top:100%;
     z-index:60;
     max-height:260px;
     overflow-y:auto;
@@ -14363,7 +14363,15 @@ body.refusal-open{
     right:0;
     top:100%;
     z-index:60;
-    margin-top:4px;
+    /* Притулом до поля, з перекриттям його нижньої межі.
+
+       Тут стояло margin-top:4px — чотири пікселі порожнечі між полем
+       «Місто доставки» і списком підказок. Виглядало як розрив, а
+       курсор, ідучи до підказки, проходив крізь неї.
+
+       −1px, а не 0: у поля й у списку свої рамки, і поставлені впритул
+       вони дали б подвійну лінію. */
+    margin-top:-1px;
     max-height:260px;
     overflow-y:auto;
     background:#fff;
