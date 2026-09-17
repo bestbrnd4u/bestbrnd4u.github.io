@@ -2,7 +2,7 @@
   {
     "name": "Adidas by Stella Mccartney",
     "slug": "adidas-by-stella-mccartney",
-    "logo": "",
+    "logo": "/assets/images/brands/adidas-by-stella-mccartney-logo.png?v=b65ea964",
     "banner": "/assets/images/brands/adidas-by-stella-mccartney-banner.webp?v=f007c273",
     "bannerMobile": "/assets/images/brands/adidas-by-stella-mccartney-banner-mobile.webp?v=cd9f5f37",
     "title": "Кросівки й спортивні речі Adidas by Stella Mccartney",
@@ -17,7 +17,7 @@
   {
     "name": "Alain Mikli",
     "slug": "alain-mikli",
-    "logo": "",
+    "logo": "/assets/images/brands/alain-mikli-logo.png?v=75e4633e",
     "banner": "/assets/images/brands/alain-mikli-banner.webp?v=868b4eb4",
     "bannerMobile": "/assets/images/brands/alain-mikli-banner-mobile.webp?v=10d06926",
     "title": "Окуляри Alain Mikli",
@@ -31,7 +31,7 @@
   {
     "name": "Armani Exchange",
     "slug": "armani-exchange",
-    "logo": "",
+    "logo": "/assets/images/brands/armani-exchange-logo.png?v=01feb908",
     "banner": "/assets/images/brands/armani-exchange-banner.webp?v=fb877dd3",
     "bannerMobile": "/assets/images/brands/armani-exchange-banner-mobile.webp?v=72f43de0",
     "title": "Armani Exchange",
@@ -106,7 +106,7 @@
   {
     "name": "Invicta",
     "slug": "invicta",
-    "logo": "",
+    "logo": "/assets/images/brands/invicta-logo.png?v=8aa9d2a6",
     "banner": "/assets/images/brands/invicta-banner.webp?v=b094b0a1",
     "bannerMobile": "/assets/images/brands/invicta-banner-mobile.webp?v=f611e8f4",
     "title": "Годинники Invicta",
@@ -207,7 +207,7 @@
   {
     "name": "Mathey-Tissot",
     "slug": "mathey-tissot",
-    "logo": "",
+    "logo": "/assets/images/brands/mathey-tissot-logo.png?v=495acc02",
     "banner": "/assets/images/brands/mathey-tissot-banner.webp?v=24e3d1c0",
     "bannerMobile": "/assets/images/brands/mathey-tissot-banner-mobile.webp?v=d1feba5b",
     "title": "Годинники Mathey-Tissot",
@@ -297,7 +297,7 @@
   {
     "name": "Tory Burch",
     "slug": "tory-burch",
-    "logo": "",
+    "logo": "/assets/images/brands/tory-burch-logo.png?v=6171ea3e",
     "banner": "/assets/images/brands/tory-burch-banner.webp?v=1ea51e6d",
     "bannerMobile": "/assets/images/brands/tory-burch-banner-mobile.webp?v=35b1b4cc",
     "title": "Tory Burch",
