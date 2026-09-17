@@ -429,6 +429,164 @@ console.log("\n[10] Свій текст для категорій і розді�
         && /aboutHydrated = false;\s*\n\s*hydrateAbout\(\);/.test(catalog));
 }
 
+console.log("\n[12] Картка бренду заповнена, і банер не ріжеться на телефоні");
+{
+    // ЩО ТУТ ЗАКРІПЛЕНО
+    //
+    // 1. У кожного бренду є заголовок і опис. Порожня картка — це
+    //    сторінка з машинним «Товари X» і без жодного авторського
+    //    рядка: для покупця порожньо, для пошуку нічого індексувати.
+    //
+    // 2. Банери однакові за розміром. Різнобій помітний одразу, щойно
+    //    людина перейде з бренду на бренд: смуга стрибає у висоті.
+    //
+    // 3. На телефоні банер НЕ ОБРІЗАНИЙ. Смуга 4:1 на екрані 375px
+    //    стискається до стрічки 94px заввишки — товарів у ній не
+    //    роздивитись. Тому для телефона окрема картинка 16:9, і
+    //    підставляє її <picture>, а не JS: робот і людина з вимкненим
+    //    JS мусять бачити те саме.
+    // Розмір WebP читаємо з заголовка самі. sharp тут був би зручніший,
+    // але його metadata() асинхронний, а весь цей набір — ні: заради
+    // двох чисел переписувати його на async не варто.
+    //
+    // Формат простий: RIFF, далі чанк. Для лоссі («VP8 ») ширина й
+    // висота лежать у 14 бітах на початку кадру, для «VP8L» — у 14
+    // бітах після сигнатури, для «VP8X» — трьома байтами кожна.
+    const webpSize = (file) => {
+
+        const buffer = fs.readFileSync(file);
+
+        if (buffer.toString("ascii", 0, 4) !== "RIFF") return null;
+
+        const kind = buffer.toString("ascii", 12, 16);
+
+        if (kind === "VP8 ") {
+            return [buffer.readUInt16LE(26) & 0x3fff, buffer.readUInt16LE(28) & 0x3fff];
+        }
+
+        if (kind === "VP8L") {
+            const bits = buffer.readUInt32LE(21);
+            return [(bits & 0x3fff) + 1, ((bits >> 14) & 0x3fff) + 1];
+        }
+
+        if (kind === "VP8X") {
+            const read24 = (at) => buffer[at] | (buffer[at + 1] << 8) | (buffer[at + 2] << 16);
+            return [read24(24) + 1, read24(27) + 1];
+        }
+
+        return null;
+
+    };
+
+    const records = fs.readdirSync(path.join(ROOT, "data/brands"))
+        .filter(file => file.endsWith(".json"))
+        .map(file => ({
+            slug: file.replace(/\.json$/, ""),
+            data: JSON.parse(read("data/brands/" + file)),
+        }));
+
+    check("записи брендів знайшлись", records.length >= 20, records.length);
+
+    const noText = records.filter(r => !r.data.title || !r.data.description);
+
+    check("у кожного бренду є заголовок і опис",
+        noText.length === 0,
+        noText.map(r => r.slug).join(", "));
+
+    // Заголовок мусить читатись разом зі статтю, яку дописує сайт:
+    // «Сумки й аксесуари Coach» + «для жінок» (brandPageTitle).
+    const shouty = records.filter(r => /[.!?]$/.test(String(r.data.title).trim()));
+
+    check("заголовок не закінчується крапкою — до нього дописують стать",
+        shouty.length === 0,
+        shouty.map(r => r.slug).join(", "));
+
+    const SIZES = { banner: [1600, 400], bannerMobile: [800, 450] };
+
+    const wrong = [];
+
+    records.forEach(({ slug, data }) => {
+
+        Object.entries(SIZES).forEach(([field, [width, height]]) => {
+
+            const src = String(data[field] || "").split("?")[0];
+
+            if (!src) { wrong.push(`${slug}: немає ${field}`); return; }
+
+            const file = path.join(ROOT, src.replace(/^\//, ""));
+
+            if (!fs.existsSync(file)) { wrong.push(`${slug}: файл ${field} не знайдено`); return; }
+
+            const size = webpSize(file);
+
+            if (!size) { wrong.push(`${slug}: ${field} — не WebP`); return; }
+
+            if (size[0] !== width || size[1] !== height) {
+                wrong.push(`${slug}: ${field} ${size[0]}×${size[1]}, а має бути ${width}×${height}`);
+            }
+
+        });
+
+    });
+
+    check("у кожного бренду є обидва банери, і всі одного розміру",
+        wrong.length === 0,
+        wrong.slice(0, 3).join(" | "));
+
+    // --- розмітка ---
+    const hero = read("scripts/build-taxonomy-pages.js")
+        .slice(read("scripts/build-taxonomy-pages.js").indexOf("function heroMarkup"));
+
+    // Коментарі прибираємо: у поясненні над функцією слово <picture>
+    // теж згадане, і перевірка проходила б навіть тоді, коли з
+    // розмітки його прибрали. Цю саму пастку вже ловили в цьому
+    // наборі — коментар виглядає як код доти, доки не зламаєш код.
+    const heroBody = hero.slice(0, hero.indexOf("\nfunction "))
+        .split("\n").filter(line => !/^\s*\/\//.test(line)).join("\n");
+
+    check("збірка малює <picture> з окремим джерелом для телефона",
+        /<picture>/.test(heroBody)
+        && /<source media="\(max-width:768px\)" srcset=/.test(heroBody));
+
+    check("мобільне джерело додається лише разом із банером",
+        /page\.banner && page\.bannerMobile/.test(heroBody));
+
+    // Згенерована сторінка вже містить розмітку для робота, і JS мусить
+    // перебудувати ТЕ САМЕ. Інакше той самий блок стоятиме двічі або
+    // на телефоні після рендеру підставиться широкий банер.
+    const catalogJs = read("assets/js/catalog.js");
+
+    check("каталог перебудовує таку саму розмітку",
+        /<picture>\$\{mobile\}<img class=/.test(catalogJs)
+        && /brand\.banner && brand\.bannerMobile/.test(catalogJs));
+
+    check("поле є в адмінці", /name: "bannerMobile"/.test(read("admin/config.yml"))
+        || /name: "bannerMobile"/.test(read("admin/config.yml").replace(/'/g, '"')));
+
+    check("і доїжджає в зібраний довідник",
+        /bannerMobile: stamp\(data\.bannerMobile\)/.test(read("scripts/build-brands.js")));
+
+    // --- стеля висоти ---
+    //
+    // Числа звірені заміром у браузері, а не взяті на око:
+    //   1440px → контейнер 1366 → смуга 4:1 виходить 341px;
+    //   390px  → банер 16:9 виходить 219px.
+    // Стеля нижча за ці числа означала б обрізання.
+    const css = read("assets/css/style.css");
+
+    const wide = /\.brand-hero \.brand-hero-banner\{[^}]*max-height:(\d+)px/.exec(css);
+
+    check("стеля широкого банера не ріже смугу 4:1",
+        wide && Number(wide[1]) >= 340, wide && wide[1]);
+
+    const narrow = css.slice(css.indexOf("@media(max-width:768px){", css.indexOf(".brand-hero .brand-hero-banner")));
+
+    const small = /\.brand-hero \.brand-hero-banner\{[^}]*max-height:(\d+)px/.exec(narrow);
+
+    check("а стеля на телефоні не ріже картинку 16:9",
+        small && Number(small[1]) >= 250, small && small[1]);
+}
+
 console.log("\n[11] Назва бренду в хабі й у товарі — той самий рядок");
 {
     // ЩО БУЛО. У двох товарів поле «Бренд» містило хвіст пробілу:

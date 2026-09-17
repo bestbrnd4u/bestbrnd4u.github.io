@@ -278,6 +278,7 @@ function brandPages(products, brands) {
             url: `${SITE_URL}/brands/${slug}/`,
             heading: record.title || `Товари ${name}`,
             banner: record.banner || "",
+            bannerMobile: record.bannerMobile || "",
             logo: record.logo || "",
             title: `${name} — купити в Україні | BestBrnd4u`,
             intro: [
@@ -505,8 +506,20 @@ function heroMarkup(page) {
 
     const cls = page.banner ? "brand-hero-banner" : "brand-hero-logo";
 
+    // ОКРЕМА КАРТИНКА ДЛЯ ТЕЛЕФОНА.
+    //
+    // Банер розрахований на смугу 4:1. На екрані 375px він стискається
+    // до стрічки 94px заввишки — товарів у ній не роздивитись. Тому,
+    // якщо для телефона завантажили свою картинку, <picture> підставляє
+    // саме її; немає — все лишається як було.
+    const mobile = page.banner && page.bannerMobile
+        ? `<source media="(max-width:768px)" srcset="${escapeHtml(page.bannerMobile)}">`
+        : "";
+
     return `<div class="brand-hero" id="brandHero">`
+        + `<picture>${mobile}`
         + `<img class="${cls}" src="${escapeHtml(image)}" alt="${escapeHtml(page.name)}" decoding="async">`
+        + `</picture>`
         + `</div>`;
 
 }

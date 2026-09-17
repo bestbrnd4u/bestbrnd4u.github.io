@@ -4,5 +4,10 @@
     "тіссо",
     "тісо",
     "тиссо"
-  ]
+  ],
+  "logo": "/assets/images/brands/tissot-logo.png",
+  "banner": "/assets/images/brands/tissot-banner.webp",
+  "bannerMobile": "/assets/images/brands/tissot-banner-mobile.webp",
+  "title": "Годинники Tissot",
+  "description": "Швейцарська марка, заснована 1853 року в Ле-Локлі. Її принцип від початку — справжня швейцарська механіка за розумні гроші, без надбавки за статус.\n\nTissot багато років лишається офіційним хронометристом великих спортивних змагань. Найвідоміші лінії — PRX, Seastar, Le Locle."
 }
