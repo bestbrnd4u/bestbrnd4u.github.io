@@ -177,7 +177,7 @@
   {
     "name": "Love Moschino",
     "slug": "love-moschino",
-    "logo": "",
+    "logo": "/assets/images/brands/love-moschino-logo.png?v=ed575875",
     "banner": "/assets/images/brands/love-moschino-banner.webp?v=b033c5dd",
     "bannerMobile": "/assets/images/brands/love-moschino-banner-mobile.webp?v=6a352e0c",
     "title": "Love Moschino",
@@ -251,7 +251,7 @@
   {
     "name": "Ray-Ban",
     "slug": "ray-ban",
-    "logo": "",
+    "logo": "/assets/images/brands/ray-ban-logo.png?v=e12aa389",
     "banner": "/assets/images/brands/ray-ban-banner.webp?v=d5afb6b0",
     "bannerMobile": "/assets/images/brands/ray-ban-banner-mobile.webp?v=a6ad715f",
     "title": "Окуляри Ray-Ban",
