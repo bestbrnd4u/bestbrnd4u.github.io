@@ -976,6 +976,25 @@ async function findOrderByNumber(orderNumber: string) {
 
 // Зберігає накладну і повідомляє клієнта. Повертає оновлене
 // замовлення або null.
+// Прибрати замовлення з панелі або повернути назад.
+//
+// Пишемо саме дату, а не прапорець: «прибрали 3 вересня» відповідає на
+// питання, яке справді виникає над архівом — чи це давнє сміття, чи
+// хтось помилився хвилину тому.
+async function setOrderArchived(orderId: string, archived: boolean) {
+
+  const response = await supabaseRest(`orders?id=eq.${encodeURIComponent(orderId)}`, {
+    method: "PATCH",
+    headers: { Prefer: "return=representation" },
+    body: JSON.stringify({ archived_at: archived ? new Date().toISOString() : null }),
+  });
+
+  const rows = response.ok ? await response.json() : [];
+
+  return Array.isArray(rows) ? rows[0] ?? null : null;
+
+}
+
 async function applyTracking(orderId: string, tracking: string | null) {
 
   const response = await supabaseRest(`orders?id=eq.${encodeURIComponent(orderId)}`, {
@@ -1723,11 +1742,14 @@ async function countOrders(params: Record<string, unknown>): Promise<number | nu
 
 async function adminCounts(): Promise<Record<string, number | null>> {
 
-  const keys = [...STATUS_ORDER, "refusal"];
+  const keys = [...STATUS_ORDER, "refusal", "archived"];
 
   const values = await Promise.all([
     ...STATUS_ORDER.map((status: string) => countOrders({ status })),
     countOrders({ refusal: true }),
+    // Архів рахуємо разом з усіма: інакше вкладка була б єдиною без
+    // числа, і незрозуміло, чи там узагалі щось лежить.
+    countOrders({ archived: true }),
   ]);
 
   const counts: Record<string, number | null> = {};
@@ -4893,6 +4915,70 @@ async function handleAdmin(request: Request, body: Record<string, any>): Promise
     await refreshOwnerCard(updated);
 
     return adminJson({ ok: true, order: orderView(updated) }, 200, origin);
+
+  }
+
+  if (action === "archive" || action === "restore") {
+
+    const moved = await setOrderArchived(params.id, action === "archive");
+
+    if (!moved) {
+
+      return adminJson({
+        ok: false,
+        error: action === "archive"
+          ? "Не вдалося прибрати замовлення."
+          : "Не вдалося повернути замовлення.",
+      }, 502, origin);
+
+    }
+
+    // Картку в Telegram не чіпаємо навмисно. Архів — це порядок у
+    // панелі власника, а не подія в житті замовлення: клієнту нічого
+    // не сталось, і чат про це знати не мусить.
+    return adminJson({ ok: true, order: orderView(moved) }, 200, origin);
+
+  }
+
+  if (action === "delete") {
+
+    const current = await findOrderById(params.id);
+
+    if (!current) return adminJson({ ok: false, error: "Замовлення не знайдено." }, 404, origin);
+
+    // ВИДАЛЯЄМО ЛИШЕ З АРХІВУ — І ПЕРЕВІРЯЄМО ЦЕ ТУТ, А НЕ В БРАУЗЕРІ.
+    //
+    // На сторінці кнопка «Видалити назавжди» є тільки в архівного
+    // замовлення, але сторінка — не охорона: той самий запит можна
+    // надіслати повз неї. А наслідок незворотний: разом із рядком
+    // cascade зносить заявки на відмову, і замовлення зникає ще й з
+    // кабінету клієнта.
+    if (!current.archived_at) {
+
+      return adminJson({
+        ok: false,
+        error: "Спершу приберіть замовлення в архів — назавжди видаляємо лише звідти.",
+        order: orderView(current),
+      }, 409, origin);
+
+    }
+
+    const response = await supabaseRest(`orders?id=eq.${encodeURIComponent(params.id)}`, {
+      method: "DELETE",
+    });
+
+    if (!response.ok) {
+
+      console.error("Не вдалося видалити замовлення:", await response.text());
+
+      return adminJson({ ok: false, error: "База не дала видалити замовлення." }, 502, origin);
+
+    }
+
+    // Тіло треба прочитати, інакше зʼєднання лишиться відкритим.
+    await response.text();
+
+    return adminJson({ ok: true, deleted: params.id }, 200, origin);
 
   }
 

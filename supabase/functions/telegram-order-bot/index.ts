@@ -1185,7 +1185,20 @@ function corsHeaders(origin) {
 // Дії
 // -------------------------
 
-const ADMIN_ACTIONS = ["list", "get", "status", "tracking"];
+// archive / restore / delete — прибирання в панелі, у два кроки.
+//
+// Тестові замовлення (кожна перевірка оплати на проді лишає одне),
+// дублі від подвійного натискання й ботівське сміття не зникають від
+// скасування: скасоване теж лишається у своїй вкладці. А видаляти
+// одразу не можна — рядок замовлення це запис про продаж, і разом із
+// ним cascade зносить заявки на відмову.
+//
+// Тому спершу «archive» (зникає з панелі, лишається в базі), і вже з
+// архіву — або «restore», або «delete» назавжди.
+const ADMIN_ACTIONS = [
+    "list", "get", "status", "tracking",
+    "archive", "restore", "delete",
+];
 
 const LIST_LIMIT_DEFAULT = 25;
 const LIST_LIMIT_MAX = 100;
@@ -1294,6 +1307,7 @@ const LIST_COLUMNS = [
     "delivery_city",
     "tracking_number",
     "refusal_requested_at",
+    "archived_at",
     "user_id",
     "telegram_chat_id",
     // Щоб позначку «сума не збігається» було видно вже в списку, а не
@@ -1304,6 +1318,14 @@ const LIST_COLUMNS = [
 function listFilters(params) {
 
     const parts = [];
+
+    // АРХІВ — НЕ ФІЛЬТР ПОВЕРХ ІНШИХ, А ОКРЕМА ПОЛИЦЯ.
+    //
+    // Умова стоїть у КОЖНОМУ запиті, включно з підрахунком вкладок.
+    // Без неї прибране замовлення й далі рахувалося б у «Нових», і
+    // число над вкладкою не сходилося б зі списком під нею — а це та
+    // помилка, яку помічають найпізніше.
+    parts.push(params.archived ? "archived_at=not.is.null" : "archived_at=is.null");
 
     if (params.status) parts.push(`status=eq.${params.status}`);
 
@@ -1416,6 +1438,7 @@ function parseAdminRequest(body) {
             params: {
                 status,
                 refusal: Boolean(body.refusal),
+                archived: Boolean(body.archived),
                 query: sanitizeSearch(body.query),
                 limit: clampLimit(body.limit),
                 offset: Math.max(0, Math.trunc(Number(body.offset) || 0)),
@@ -1429,6 +1452,16 @@ function parseAdminRequest(body) {
     if (!id) return { ok: false, error: "Не вказано замовлення" };
 
     if (action === "get") return { ok: true, action, params: { id } };
+
+    // Прибирання в архів і назад — самого номера досить.
+    if (action === "archive" || action === "restore") {
+        return { ok: true, action, params: { id } };
+    }
+
+    // Видалення назавжди. Жодних додаткових полів тут теж немає, а от
+    // умову «лише з архіву» перевіряє вже функція: тут ми бачимо
+    // тільки запит, а не стан замовлення в базі.
+    if (action === "delete") return { ok: true, action, params: { id } };
 
     if (action === "status") {
 
@@ -1515,6 +1548,11 @@ function orderView(order) {
 
         trackingNumber: order?.tracking_number ?? "",
         trackingUrl: trackingUrl(order?.tracking_number),
+
+        // Коли замовлення прибрали з панелі. Порожньо — воно в роботі.
+        // Панель дивиться саме сюди, щоб знати, які кнопки показати:
+        // «Прибрати» чи «Повернути» й «Видалити назавжди».
+        archivedAt: order?.archived_at ?? null,
 
         // Гість — це замовлення без реєстрації. Важливо для менеджера:
         // такому клієнту не видно історії в кабінеті, і всі уточнення
@@ -6895,6 +6933,25 @@ async function findOrderByNumber(orderNumber: string) {
 
 // Зберігає накладну і повідомляє клієнта. Повертає оновлене
 // замовлення або null.
+// Прибрати замовлення з панелі або повернути назад.
+//
+// Пишемо саме дату, а не прапорець: «прибрали 3 вересня» відповідає на
+// питання, яке справді виникає над архівом — чи це давнє сміття, чи
+// хтось помилився хвилину тому.
+async function setOrderArchived(orderId: string, archived: boolean) {
+
+  const response = await supabaseRest(`orders?id=eq.${encodeURIComponent(orderId)}`, {
+    method: "PATCH",
+    headers: { Prefer: "return=representation" },
+    body: JSON.stringify({ archived_at: archived ? new Date().toISOString() : null }),
+  });
+
+  const rows = response.ok ? await response.json() : [];
+
+  return Array.isArray(rows) ? rows[0] ?? null : null;
+
+}
+
 async function applyTracking(orderId: string, tracking: string | null) {
 
   const response = await supabaseRest(`orders?id=eq.${encodeURIComponent(orderId)}`, {
@@ -7642,11 +7699,14 @@ async function countOrders(params: Record<string, unknown>): Promise<number | nu
 
 async function adminCounts(): Promise<Record<string, number | null>> {
 
-  const keys = [...STATUS_ORDER, "refusal"];
+  const keys = [...STATUS_ORDER, "refusal", "archived"];
 
   const values = await Promise.all([
     ...STATUS_ORDER.map((status: string) => countOrders({ status })),
     countOrders({ refusal: true }),
+    // Архів рахуємо разом з усіма: інакше вкладка була б єдиною без
+    // числа, і незрозуміло, чи там узагалі щось лежить.
+    countOrders({ archived: true }),
   ]);
 
   const counts: Record<string, number | null> = {};
@@ -10812,6 +10872,70 @@ async function handleAdmin(request: Request, body: Record<string, any>): Promise
     await refreshOwnerCard(updated);
 
     return adminJson({ ok: true, order: orderView(updated) }, 200, origin);
+
+  }
+
+  if (action === "archive" || action === "restore") {
+
+    const moved = await setOrderArchived(params.id, action === "archive");
+
+    if (!moved) {
+
+      return adminJson({
+        ok: false,
+        error: action === "archive"
+          ? "Не вдалося прибрати замовлення."
+          : "Не вдалося повернути замовлення.",
+      }, 502, origin);
+
+    }
+
+    // Картку в Telegram не чіпаємо навмисно. Архів — це порядок у
+    // панелі власника, а не подія в житті замовлення: клієнту нічого
+    // не сталось, і чат про це знати не мусить.
+    return adminJson({ ok: true, order: orderView(moved) }, 200, origin);
+
+  }
+
+  if (action === "delete") {
+
+    const current = await findOrderById(params.id);
+
+    if (!current) return adminJson({ ok: false, error: "Замовлення не знайдено." }, 404, origin);
+
+    // ВИДАЛЯЄМО ЛИШЕ З АРХІВУ — І ПЕРЕВІРЯЄМО ЦЕ ТУТ, А НЕ В БРАУЗЕРІ.
+    //
+    // На сторінці кнопка «Видалити назавжди» є тільки в архівного
+    // замовлення, але сторінка — не охорона: той самий запит можна
+    // надіслати повз неї. А наслідок незворотний: разом із рядком
+    // cascade зносить заявки на відмову, і замовлення зникає ще й з
+    // кабінету клієнта.
+    if (!current.archived_at) {
+
+      return adminJson({
+        ok: false,
+        error: "Спершу приберіть замовлення в архів — назавжди видаляємо лише звідти.",
+        order: orderView(current),
+      }, 409, origin);
+
+    }
+
+    const response = await supabaseRest(`orders?id=eq.${encodeURIComponent(params.id)}`, {
+      method: "DELETE",
+    });
+
+    if (!response.ok) {
+
+      console.error("Не вдалося видалити замовлення:", await response.text());
+
+      return adminJson({ ok: false, error: "База не дала видалити замовлення." }, 502, origin);
+
+    }
+
+    // Тіло треба прочитати, інакше зʼєднання лишиться відкритим.
+    await response.text();
+
+    return adminJson({ ok: true, deleted: params.id }, 200, origin);
 
   }
 

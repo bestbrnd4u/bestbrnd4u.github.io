@@ -97,7 +97,20 @@ export function corsHeaders(origin) {
 // Дії
 // -------------------------
 
-export const ADMIN_ACTIONS = ["list", "get", "status", "tracking"];
+// archive / restore / delete — прибирання в панелі, у два кроки.
+//
+// Тестові замовлення (кожна перевірка оплати на проді лишає одне),
+// дублі від подвійного натискання й ботівське сміття не зникають від
+// скасування: скасоване теж лишається у своїй вкладці. А видаляти
+// одразу не можна — рядок замовлення це запис про продаж, і разом із
+// ним cascade зносить заявки на відмову.
+//
+// Тому спершу «archive» (зникає з панелі, лишається в базі), і вже з
+// архіву — або «restore», або «delete» назавжди.
+export const ADMIN_ACTIONS = [
+    "list", "get", "status", "tracking",
+    "archive", "restore", "delete",
+];
 
 export const LIST_LIMIT_DEFAULT = 25;
 export const LIST_LIMIT_MAX = 100;
@@ -206,6 +219,7 @@ export const LIST_COLUMNS = [
     "delivery_city",
     "tracking_number",
     "refusal_requested_at",
+    "archived_at",
     "user_id",
     "telegram_chat_id",
     // Щоб позначку «сума не збігається» було видно вже в списку, а не
@@ -216,6 +230,14 @@ export const LIST_COLUMNS = [
 function listFilters(params) {
 
     const parts = [];
+
+    // АРХІВ — НЕ ФІЛЬТР ПОВЕРХ ІНШИХ, А ОКРЕМА ПОЛИЦЯ.
+    //
+    // Умова стоїть у КОЖНОМУ запиті, включно з підрахунком вкладок.
+    // Без неї прибране замовлення й далі рахувалося б у «Нових», і
+    // число над вкладкою не сходилося б зі списком під нею — а це та
+    // помилка, яку помічають найпізніше.
+    parts.push(params.archived ? "archived_at=not.is.null" : "archived_at=is.null");
 
     if (params.status) parts.push(`status=eq.${params.status}`);
 
@@ -328,6 +350,7 @@ export function parseAdminRequest(body) {
             params: {
                 status,
                 refusal: Boolean(body.refusal),
+                archived: Boolean(body.archived),
                 query: sanitizeSearch(body.query),
                 limit: clampLimit(body.limit),
                 offset: Math.max(0, Math.trunc(Number(body.offset) || 0)),
@@ -341,6 +364,16 @@ export function parseAdminRequest(body) {
     if (!id) return { ok: false, error: "Не вказано замовлення" };
 
     if (action === "get") return { ok: true, action, params: { id } };
+
+    // Прибирання в архів і назад — самого номера досить.
+    if (action === "archive" || action === "restore") {
+        return { ok: true, action, params: { id } };
+    }
+
+    // Видалення назавжди. Жодних додаткових полів тут теж немає, а от
+    // умову «лише з архіву» перевіряє вже функція: тут ми бачимо
+    // тільки запит, а не стан замовлення в базі.
+    if (action === "delete") return { ok: true, action, params: { id } };
 
     if (action === "status") {
 
@@ -427,6 +460,11 @@ export function orderView(order) {
 
         trackingNumber: order?.tracking_number ?? "",
         trackingUrl: trackingUrl(order?.tracking_number),
+
+        // Коли замовлення прибрали з панелі. Порожньо — воно в роботі.
+        // Панель дивиться саме сюди, щоб знати, які кнопки показати:
+        // «Прибрати» чи «Повернути» й «Видалити назавжди».
+        archivedAt: order?.archived_at ?? null,
 
         // Гість — це замовлення без реєстрації. Важливо для менеджера:
         // такому клієнту не видно історії в кабінеті, і всі уточнення
