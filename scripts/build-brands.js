@@ -162,6 +162,11 @@ function main() {
                 slug: toSlug(name),
                 logo: stamp(data.logo),
                 banner: stamp(data.banner),
+                // Окрема картинка для телефона. Широка смуга 4:1 на
+                // екрані 375px стискається до стрічки 94px заввишки —
+                // товарів у ній не роздивитись. Порожньо — сайт покаже
+                // звичайний банер, як і раніше.
+                bannerMobile: stamp(data.bannerMobile),
                 title: data.title || "",
                 description: data.description || "",
 

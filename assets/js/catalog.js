@@ -3383,10 +3383,23 @@ function renderBrandHero() {
     // виглядав би як «картинка не завантажилась», тому ховаємо його.
     const banner = brand && (brand.banner || brand.logo);
 
+    // ОКРЕМА КАРТИНКА ДЛЯ ТЕЛЕФОНА.
+    //
+    // Смуга 4:1 на екрані 375px стискається до стрічки 94px заввишки —
+    // товарів у ній не роздивитись. Якщо в адмінці заклали банер для
+    // телефона, <picture> підставляє його; не заклали — усе як було.
+    //
+    // Та сама розмітка, що в build-taxonomy-pages.js (heroMarkup):
+    // згенерована сторінка вже містить її для робота, і JS мусить
+    // перебудувати те саме, а не щось схоже.
+    const mobile = brand && brand.banner && brand.bannerMobile
+        ? `<source media="(max-width:768px)" srcset="${escapeHtml(brand.bannerMobile)}">`
+        : "";
+
     brandHero.innerHTML = banner
-        ? `<img class="${brand.banner ? "brand-hero-banner" : "brand-hero-logo"}"
+        ? `<picture>${mobile}<img class="${brand.banner ? "brand-hero-banner" : "brand-hero-logo"}"
                 src="${escapeHtml(banner)}" alt="${escapeHtml(name)}"
-                decoding="async">`
+                decoding="async"></picture>`
         : "";
 
     brandHero.hidden = !banner;
