@@ -120,7 +120,7 @@
   {
     "name": "Jacquemus",
     "slug": "jacquemus",
-    "logo": "",
+    "logo": "/assets/images/brands/jacquemus-logo.png?v=b668c1a4",
     "banner": "/assets/images/brands/jacquemus-banner.webp?v=0da3457f",
     "bannerMobile": "/assets/images/brands/jacquemus-banner-mobile.webp?v=41b3746e",
     "title": "Jacquemus",
@@ -134,7 +134,7 @@
   {
     "name": "Jimmy Choo",
     "slug": "jimmy-choo",
-    "logo": "",
+    "logo": "/assets/images/brands/jimmy-choo-logo.png?v=bc2ee395",
     "banner": "/assets/images/brands/jimmy-choo-banner.webp?v=8dbd29e3",
     "bannerMobile": "/assets/images/brands/jimmy-choo-banner-mobile.webp?v=9917bc37",
     "title": "Jimmy Choo",
@@ -192,7 +192,7 @@
   {
     "name": "Marc Jacobs",
     "slug": "marc-jacobs",
-    "logo": "",
+    "logo": "/assets/images/brands/marc-jacobs-logo.png?v=edb5e3ca",
     "banner": "/assets/images/brands/marc-jacobs-banner.webp?v=902baf54",
     "bannerMobile": "/assets/images/brands/marc-jacobs-banner-mobile.webp?v=c7747f00",
     "title": "Сумки й аксесуари Marc Jacobs",
