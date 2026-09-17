@@ -8829,6 +8829,16 @@ body.mobile-filters-open .scroll-top{
     display:none;
 }
 
+/* Рядок про розсилку під кнопкою реєстрації. Дрібним — бо це
+   попередження, а не заклик; але саме дрібним і читаним, а не
+   ледь помітним: мовчазна підписка обертається скаргою на спам. */
+.signup-note{
+    margin:0;
+    font-size:13px;
+    line-height:1.5;
+    color:var(--gray500);
+}
+
 .auth-form label{
     display:flex;
     flex-direction:column;

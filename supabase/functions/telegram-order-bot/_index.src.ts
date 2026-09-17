@@ -83,7 +83,7 @@ import { cleanDraft } from "./checkout-draft.js";
 import {
   cleanSubscriber, subscribeRequest, subscribeVerdict,
   cleanToken, confirmUrl, confirmVerdict, activateRequest,
-  subscriberLookup, lookupState,
+  subscriberLookup, lookupState, subscriberStatus,
   CONFIRM_COOLDOWN_MINUTES,
 } from "./subscribe.js";
 import {
@@ -3452,6 +3452,132 @@ async function handleSubscribeStatus(request: Request, body: Record<string, any>
 
 }
 
+// Підписка при реєстрації.
+//
+// НАВІЩО ОКРЕМИЙ МАРШРУТ, А НЕ ЗВИЧАЙНИЙ «subscribe»
+// ---------------------------------------------------
+// Той бере пошту з тіла запиту — і правильно робить, що надсилає лист
+// підтвердження: введена в форму адреса не доводить нічого, її міг
+// вписати будь-хто. Тут навпаки: адресу ми беремо з ПІДТВЕРДЖЕНОГО
+// токена сесії, а не з тіла. Інакше цим маршрутом можна було б тихо
+// додати в список чужу пошту — без підтвердження, якого тут і немає.
+//
+// ЧОМУ БЕЗ ЛИСТА ПІДТВЕРДЖЕННЯ
+// -----------------------------
+// Якщо пошта в акаунті вже підтверджена (email_confirmed_at), людина
+// щойно перейшла за посиланням із листа Supabase. Просити те саме
+// вдруге — це просити двічі одне й те ж. Якщо ж не підтверджена
+// (підтвердження пошти в проєкті може бути вимкнене), йдемо
+// звичайним шляхом: статус unconfirmed і наш лист.
+//
+// ЧОГО ЦЕЙ МАРШРУТ НЕ РОБИТЬ НІКОЛИ
+// ----------------------------------
+// Не чіпає адресу, яку MailerLite уже знає — у БУДЬ-ЯКОМУ статусі.
+// Головне тут — той, хто колись відписався: POST у MailerLite не
+// додає, а перезаписує, і статус active воскресив би його підписку
+// мовчки. Людина відписалась один раз, а листи знову йдуть — гіршого
+// тут зробити не можна.
+//
+// Саме тому дивимось на СИРИЙ статус, а не на lookupState(): той
+// зводить «unsubscribed» до «none», бо його питання інше — чи
+// показувати форму підписки.
+async function handleSubscribeSignup(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  const user = await userFromAccessToken(body?.accessToken);
+
+  const email = realEmailOf(user);
+
+  // Вхід через Telegram: справжньої пошти ще немає. Не помилка —
+  // підпишемо, коли людина її додасть.
+  if (!email) return adminJson({ ok: true, state: "none" }, 200, origin);
+
+  if (await emailBlocked(email)) return adminJson({ ok: true, state: "none" }, 200, origin);
+
+  const lookup = subscriberLookup(MAILERLITE_API_KEY, email);
+
+  if (!lookup) return adminJson({ ok: true, state: "off" }, 200, origin);
+
+  try {
+
+    const found = await fetch(lookup.url, { headers: lookup.headers });
+
+    if (found.status === 200) {
+
+      const known = subscriberStatus(await found.json().catch(() => null));
+
+      // Уже в списку — у будь-якому статусі. Не чіпаємо.
+      return adminJson({ ok: true, state: "already", known }, 200, origin);
+
+    }
+
+    // 404 — адреси в списку немає. Будь-яка інша відповідь означає,
+    // що ми не знаємо; мовчки підписувати наосліп не будемо.
+    if (found.status !== 404) {
+
+      console.warn("MailerLite не сказав, чи є адреса в списку:", found.status);
+
+      return adminJson({ ok: true, state: "unknown" }, 200, origin);
+
+    }
+
+    const confirmed = Boolean((user as Record<string, any>)?.email_confirmed_at);
+
+    // Ім'я беремо те, яке людина вписала при реєстрації. Немає —
+    // нічого страшного: MailerLite обійдеться самою адресою.
+    const name = String(
+      (user as Record<string, any>)?.user_metadata?.full_name ?? "",
+    ).trim();
+
+    const plan = subscribeRequest(
+      MAILERLITE_API_KEY,
+      name ? { email, name } : { email },
+      MAILERLITE_GROUP_ID,
+      confirmed ? "active" : "unconfirmed",
+    );
+
+    if (!plan) return adminJson({ ok: true, state: "off" }, 200, origin);
+
+    const response = await fetch(plan.url, {
+      method: "POST",
+      headers: plan.headers,
+      body: JSON.stringify(plan.body),
+    });
+
+    const data = await response.json().catch(() => null);
+
+    const verdict = subscribeVerdict(response.status, data);
+
+    if (!verdict.ok) {
+
+      console.error("MailerLite відмовив у підписці при реєстрації:", verdict.reason);
+
+      return adminJson({ ok: false, error: "rejected" }, 200, origin);
+
+    }
+
+    // Пошта не підтверджена — далі звичайний шлях: наш лист, і
+    // активним підписник стане після переходу за посиланням.
+    if (!confirmed) await sendSubscribeConfirmation(email);
+
+    return adminJson({
+      ok: true,
+      state: confirmed ? "active" : "unconfirmed",
+    }, 200, origin);
+
+  } catch (error) {
+
+    console.error("MailerLite недоступний при реєстрації:", error);
+
+    // Підписка — не та річ, заради якої варто ламати реєстрацію.
+    // Сторінка цю відповідь і не показує.
+    return adminJson({ ok: true, state: "unavailable" }, 200, origin);
+
+  }
+
+}
+
 // Відписати себе самого з кабінету.
 //
 // ЧОМУ ОКРЕМО ВІД АДМІНСЬКОЇ ВІДПИСКИ. Та бере id підписника з
@@ -5121,6 +5247,13 @@ async function handleRequest(request: Request): Promise<Response> {
   if (body.site_action === "subscribe-confirm") {
 
     return await handleSubscribeConfirm(request, body);
+
+  }
+
+  // --- підписка одразу після реєстрації ---
+  if (body.site_action === "subscribe-signup") {
+
+    return await handleSubscribeSignup(request, body);
 
   }
 

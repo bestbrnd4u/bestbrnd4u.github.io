@@ -29,7 +29,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
 
-    <link rel="stylesheet" href="assets/css/style.css?v=912b7003">
+    <link rel="stylesheet" href="assets/css/style.css?v=3521314e">
 
 
 
@@ -259,6 +259,19 @@
                 <span id="signupError" class="field-error"></span>
 
                 <button type="submit" class="btn" id="signupSubmit">Зареєструватися</button>
+
+                <!-- ПРО РОЗСИЛКУ КАЖЕМО ДО РЕЄСТРАЦІЇ, А НЕ ПІСЛЯ.
+                     Зареєстрований потрапляє в розсилку автоматично —
+                     і це рівно та річ, про яку не можна мовчати:
+                     мовчазна підписка перетворюється на скаргу на
+                     спам, а скарги псують доставляння ВСІХ листів
+                     магазину, включно з листами про замовлення.
+                     Тому тут сказано, що буде, і де це вимкнути. -->
+                <p class="signup-note" id="signupNote">
+                    Реєструючись, ви підписуєтесь на листи про новинки й акції.
+                    Вимкнути можна будь-коли — у кабінеті, вкладка «Розсилка»,
+                    або одним кліком у самому листі.
+                </p>
 
             </form>
 
@@ -967,7 +980,7 @@
 <!-- Спільна поведінка картки входу: ті самі кнопки стоять ще й на
      оформленні замовлення. ПЕРЕД account.js — той нею користується. -->
 <script src="assets/js/auth-widget.js?v=6b02212c" defer></script>
-<script src="assets/js/account.js?v=0be00d49" defer></script>
+<script src="assets/js/account.js?v=f4e8cdfd" defer></script>
 
 </body>
 

@@ -185,9 +185,68 @@ signupForm?.addEventListener("submit", async event => {
 
     showToast("Реєстрація успішна! Перевірте пошту, якщо потрібне підтвердження.");
 
+    await subscribeAfterSignup();
+
     await renderAuthState();
 
 });
+
+// -------------------------
+// Розсилка при реєстрації
+//
+// Зареєструвавшись будь-яким способом, людина потрапляє в розсилку
+// новинок і акцій. Про це сказано під формою реєстрації, а вимкнути
+// можна у вкладці «Розсилка» або з будь-якого листа.
+//
+// ПОШТУ СЮДИ НЕ ПЕРЕДАЄМО. Функція бере її з токена сесії — інакше
+// цим маршрутом можна було б тихо додати в список чужу адресу.
+//
+// ПОМИЛКУ НЕ ПОКАЗУЄМО. Реєстрація вже відбулась, і зупиняти людину
+// повідомленням про розсилку було б гірше за саму невдачу: вона
+// вирішила б, що акаунт не створився.
+// -------------------------
+
+async function subscribeAfterSignup() {
+
+    const { data } = await supabaseClient.auth.getSession();
+
+    const token = data?.session?.access_token;
+
+    // Сесії ще немає — у проєкті ввімкнене підтвердження пошти.
+    // Тоді підпише перевірка нижче, коли людина ввійде за посиланням.
+    if (!token) return;
+
+    await authCallFunction({ site_action: "subscribe-signup", accessToken: token });
+
+}
+
+// Реєстрація через Google, Facebook чи підтвердження пошти листом
+// через нашу форму не проходить: сесія зʼявляється вже після
+// повернення, і «щойно зареєструвався» видно лише за віком акаунта.
+//
+// Вікно широке навмисно — між «Зареєструватися» і переходом за
+// посиланням із листа минає стільки, скільки людині треба відкрити
+// пошту. Помилитись тут дешево: адресу, яку MailerLite уже знає,
+// функція не чіпає в жодному статусі, тож того, хто колись
+// відписався, зайвий виклик не поверне.
+const FRESH_ACCOUNT_MINUTES = 30;
+
+let signupSubscribeTried = false;
+
+function subscribeIfFreshAccount(user) {
+
+    if (signupSubscribeTried || !user || !user.created_at) return;
+
+    const age = Date.now() - new Date(user.created_at).getTime();
+
+    if (!(age >= 0 && age < FRESH_ACCOUNT_MINUTES * 60 * 1000)) return;
+
+    signupSubscribeTried = true;
+
+    // Без await: підписка не мусить затримувати показ кабінету.
+    subscribeAfterSignup();
+
+}
 
 // -------------------------
 // Вхід
@@ -3098,6 +3157,10 @@ addressForm?.addEventListener("submit", async event => {
 async function renderAuthState() {
 
     const user = await getCurrentUser();
+
+    // Реєстрація не через нашу форму (Google, Facebook, підтвердження
+    // пошти листом) видно лише тут — за віком акаунта.
+    subscribeIfFreshAccount(user);
 
     authLoader.hidden = true;
 

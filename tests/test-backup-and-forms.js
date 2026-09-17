@@ -309,6 +309,24 @@ console.log("\n[3] Підписка на листи");
     // Подвійне підтвердження: людина мусить підтвердити пошту.
     check("статус unconfirmed", plan.body.status === "unconfirmed");
 
+    // ВИНЯТОК РІВНО ОДИН — І ВІН МУСИТЬ ЛИШИТИСЬ ЯВНИМ.
+    //
+    // «active» без підтвердження означає: адресу вже доведено іншим
+    // шляхом. Такий шлях у нас один — реєстрація з підтвердженою
+    // поштою (маршрут subscribe-signup): там людина щойно перейшла за
+    // посиланням із листа Supabase, і просити те саме вдруге — це
+    // просити двічі одне й те ж.
+    //
+    // Усе інше, що прийде в цей параметр, мусить лишитись
+    // unconfirmed: адреса з форми не доводить нічого.
+    check("активним робимо лише за прямою вказівкою",
+        sub.subscribeRequest("KEY", { email: "a@b.co" }, "", "active").body.status === "active");
+
+    check("будь-що інше в цьому параметрі — це unconfirmed",
+        sub.subscribeRequest("KEY", { email: "a@b.co" }, "", "ACTIVE").body.status === "unconfirmed"
+        && sub.subscribeRequest("KEY", { email: "a@b.co" }, "", true).body.status === "unconfirmed"
+        && sub.subscribeRequest("KEY", { email: "a@b.co" }, "", "confirmed").body.status === "unconfirmed");
+
     check("група додається, коли задана", plan.body.groups[0] === "42");
 
     check("без групи поля немає",
