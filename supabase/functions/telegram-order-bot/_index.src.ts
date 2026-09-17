@@ -52,7 +52,7 @@ import {
   capiRequest, capiVerdict, cleanBrowserIds, cleanSourceUrl,
 } from "./meta-capi.js";
 import {
-  cleanLookup, phoneMatches, publicOrderView,
+  cleanLookup, phoneMatches, phoneKey, publicOrderView,
 } from "./order-lookup.js";
 import {
   cleanReview, orderHasProduct, reviewCard, reviewKeyboard,
@@ -3578,6 +3578,175 @@ async function handleSubscribeSignup(request: Request, body: Record<string, any>
 
 }
 
+// -------------------------
+// Повернути людині її замовлення
+//
+// ЗВІДКИ БЕРУТЬСЯ ЗАМОВЛЕННЯ БЕЗ ВЛАСНИКА
+//
+//   • людина замовила гостем, без реєстрації, а потім завела кабінет;
+//   • її обліковий запис видалили в панелі «Люди», і замовлення
+//     лишились без власника (міграція 037 — до неї вони просто
+//     зникали разом з акаунтом).
+//
+// В обох випадках у рядку є пошта й телефон, які людина вписала при
+// оформленні. Саме за ними замовлення й повертається в кабінет.
+//
+// ПОШТА — ЛИШЕ ПІДТВЕРДЖЕНА
+//
+// Замовлення — це ім'я, телефон, адреса доставки й склад покупки.
+// Віддати його тому, хто просто ВПИСАВ чужу адресу при реєстрації,
+// означало б видати все це першому охочому. Тому email_confirmed_at
+// обов'язковий: людина мусить довести, що скринька її.
+//
+// ТЕЛЕФОН — ЗВІДКИ ВІН У АКАУНТІ
+//
+// З профілю або з входу через Telegram. Другий випадок доводить
+// номер по-справжньому — його повідомляє сам Telegram. Перший ні:
+// номер у профілі людина вписує сама.
+//
+// ⚠️ ТОБТО ЗБІГ ЗА ТЕЛЕФОНОМ — ЦЕ ДОВІРА ДО НОМЕРА, ЯКИЙ НІХТО НЕ
+// ПЕРЕВІРЯВ. Хто знає чужий номер і знає, що та людина тут замовляла,
+// може вписати його в профіль і побачити її замовлення. Так вирішив
+// власник, і для магазину, де по телефону й так уточнюють замовлення,
+// це прийнятно — але знати про це треба.
+// -------------------------
+
+// Скільки замовлень дивимось за раз. Більше двохсот гостьових
+// замовлень на одну пошту — це вже не людина, і тягнути їх усі в
+// пам'ять функції нема потреби.
+const CLAIM_SCAN_LIMIT = 200;
+
+async function profilePhone(userId: string): Promise<string> {
+
+  const response = await supabaseRest(
+    `profiles?id=eq.${encodeURIComponent(userId)}&select=phone&limit=1`,
+  );
+
+  if (!response.ok) return "";
+
+  const rows = await response.json().catch(() => []);
+
+  return Array.isArray(rows) && rows[0] ? String(rows[0].phone ?? "") : "";
+
+}
+
+async function claimGuestOrders(user: Record<string, any>): Promise<number> {
+
+  const id = String(user?.id ?? "");
+
+  if (!id) return 0;
+
+  const email = user.email_confirmed_at ? realEmailOf(user) : "";
+
+  // Пошта з токена — своя, але в адресу запиту вона все одно йде
+  // рядком. Пропускаємо лише те, що виглядає як пошта: кома й дужки в
+  // PostgREST — це синтаксис, а не текст.
+  const safeEmail = /^[^\s,()"']+@[^\s,()"']+\.[a-z]{2,}$/i.test(email) ? email : "";
+
+  const phone = phoneKey(await profilePhone(id) || user.phone || "");
+
+  if (!safeEmail && !phone) return 0;
+
+  // Два окремі запити, а не один or=(…): так у рядок запиту не
+  // потрапляє нічого, що довелося б екранувати.
+  const found = new Map<string, Record<string, any>>();
+
+  const collect = async (query: string) => {
+
+    const response = await supabaseRest(query);
+
+    if (!response.ok) {
+
+      console.error("Не вдалося пошукати замовлення без власника:", await response.text());
+
+      return;
+
+    }
+
+    const rows = await response.json().catch(() => []);
+
+    (Array.isArray(rows) ? rows : []).forEach((row: Record<string, any>) => {
+      found.set(String(row.id), row);
+    });
+
+  };
+
+  const select = `select=id,email,phone&limit=${CLAIM_SCAN_LIMIT}`;
+
+  if (safeEmail) {
+    await collect(`orders?user_id=is.null&email=ilike.${encodeURIComponent(safeEmail)}&${select}`);
+  }
+
+  // Телефон шукаємо за ГЕНЕРОВАНОЮ колонкою phone_key (міграція 037),
+  // а не за самим phone. У phone лежить те, що людина набрала:
+  // «+380 73 728 82 91» — і жоден ilike по цифрах його не знайде,
+  // бо між цифрами пробіли. phone_key рахує база: останні дев'ять
+  // цифр, те саме правило, що в phoneKey() тут.
+  if (phone) {
+    await collect(`orders?user_id=is.null&phone_key=eq.${phone}&${select}`);
+  }
+
+  if (!found.size) return 0;
+
+  // База шукала приблизно (ilike по шматку номера) — тут звіряємо
+  // точно. Телефон порівнюємо тим самим правилом, що й сторінка «Де
+  // моє замовлення»: останні дев'ять цифр.
+  const mine = [...found.values()].filter((row) => {
+
+    const rowEmail = String(row.email ?? "").trim().toLowerCase();
+
+    if (safeEmail && rowEmail === safeEmail) return true;
+
+    return Boolean(phone) && phoneMatches(row.phone, phone);
+
+  });
+
+  if (!mine.length) return 0;
+
+  const ids = mine.map((row) => String(row.id)).filter((value) => /^\d+$/.test(value));
+
+  if (!ids.length) return 0;
+
+  // user_id=is.null у САМОМУ запиті на запис — не для краси. Між
+  // пошуком і записом власник міг з'явитись (людина відкрила кабінет
+  // у двох вкладках), і без цієї умови ми забрали б чуже замовлення.
+  const response = await supabaseRest(
+    `orders?id=in.(${ids.join(",")})&user_id=is.null`,
+    {
+      method: "PATCH",
+      headers: { Prefer: "return=representation" },
+      body: JSON.stringify({ user_id: id }),
+    },
+  );
+
+  if (!response.ok) {
+
+    console.error("Не вдалося повернути замовлення власнику:", await response.text());
+
+    return 0;
+
+  }
+
+  const updated = await response.json().catch(() => []);
+
+  return Array.isArray(updated) ? updated.length : 0;
+
+}
+
+async function handleClaimOrders(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  const user = await userFromAccessToken(body?.accessToken);
+
+  if (!user?.id) return adminJson({ ok: false, error: "no_session" }, 401, origin);
+
+  const claimed = await claimGuestOrders(user);
+
+  return adminJson({ ok: true, claimed }, 200, origin);
+
+}
+
 // Відписати себе самого з кабінету.
 //
 // ЧОМУ ОКРЕМО ВІД АДМІНСЬКОЇ ВІДПИСКИ. Та бере id підписника з
@@ -4717,6 +4886,19 @@ async function handlePeopleAdmin(body: Record<string, any>, origin: string | nul
     // замовлення її знайдуть, навіть коли кабінету вже немає. Тому
     // видаляємо саме те, що прив'язане до облікового запису:
     // профіль, адреси, обране — і сам запис.
+    //
+    // ⚠️ ДОВГИЙ ЧАС ЦЕ БУЛО НЕПРАВДОЮ. Функція справді не чіпала
+    // замовлень — їх зносила БАЗА: user_id посилався на auth.users із
+    // ON DELETE CASCADE, тож видалення облікового запису тягло за
+    // собою всі замовлення людини, а з ними й заявки на відмову.
+    // Мовчки: тут відповідалось «готово», і в панелі все виглядало
+    // правильно.
+    //
+    // Полагоджено міграцією 037: тепер ON DELETE SET NULL, і
+    // замовлення лишаються без власника — як гостьові. Повертає їх
+    // назад маршрут claim-orders, коли людина реєструється знову.
+    //
+    // Без цієї міграції код нижче й далі знищує замовлення.
     await supabaseRest(`favorites?user_id=eq.${encodeURIComponent(params.id)}`, { method: "DELETE" });
     await supabaseRest(`addresses?user_id=eq.${encodeURIComponent(params.id)}`, { method: "DELETE" });
     await supabaseRest(`profiles?id=eq.${encodeURIComponent(params.id)}`, { method: "DELETE" });
@@ -5247,6 +5429,13 @@ async function handleRequest(request: Request): Promise<Response> {
   if (body.site_action === "subscribe-confirm") {
 
     return await handleSubscribeConfirm(request, body);
+
+  }
+
+  // --- повернути в кабінет замовлення без власника ---
+  if (body.site_action === "claim-orders") {
+
+    return await handleClaimOrders(request, body);
 
   }
 

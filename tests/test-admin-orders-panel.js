@@ -80,7 +80,7 @@ function sampleOrders() {
     ];
 }
 
-function startFunction(orders) {
+function startFunction(orders, people, afterOrdersRead) {
 
     const { stripTypeScriptTypes } = require("node:module");
 
@@ -132,6 +132,36 @@ function startFunction(orders) {
             return new Response(JSON.stringify({ ok: true, result: { message_id: 12345 } }), { status: 200 });
         }
 
+        // --- сесія покупця: токен → користувач ---
+        //
+        // Стенд роздає рівно тих, кого йому дали в people: токен
+        // «t-<id>» означає користувача з цим id. Невідомий токен —
+        // 401, як і в справжнього GoTrue.
+        if (address === "https://db.example/auth/v1/user") {
+
+            const token = String(init.headers?.Authorization || "").replace("Bearer ", "");
+
+            const person = (people || []).find((p) => `t-${p.id}` === token);
+
+            return person
+                ? new Response(JSON.stringify(person), { status: 200 })
+                : new Response("bad jwt", { status: 401 });
+
+        }
+
+        if (address.startsWith("https://db.example/rest/v1/profiles")) {
+
+            const userId = /id=eq\.([^&]+)/.exec(address)?.[1];
+
+            const person = (people || []).find((p) => p.id === decodeURIComponent(userId || ""));
+
+            return new Response(
+                JSON.stringify(person && person.profilePhone ? [{ phone: person.profilePhone }] : []),
+                { status: 200 },
+            );
+
+        }
+
         if (address.startsWith("https://db.example/rest/v1/order_refusals")) {
             return new Response(JSON.stringify([{
                 id: 3, created_at: "2026-09-03T08:00:00Z",
@@ -147,11 +177,28 @@ function startFunction(orders) {
 
             if (method === "PATCH") {
 
-                const order = orders.find((o) => String(o.id) === id);
+                // Правити можуть і одне замовлення (id=eq.41), і
+                // кілька одразу (id=in.(41,42)) — друге потрібне для
+                // повернення гостьових замовлень власнику.
+                const inList = /id=in\.\(([^)]*)\)/.exec(query)?.[1];
 
-                if (order) Object.assign(order, JSON.parse(init.body));
+                const targets = inList
+                    ? inList.split(",").map((value) => value.trim()).filter(Boolean)
+                    : (id ? [id] : []);
 
-                return new Response(JSON.stringify(order ? [order] : []), { status: 200 });
+                // Умова «лише без власника» в самому запиті. Стенд
+                // мусить її поважати — інакше перевірка «чуже не
+                // забираємо» проходила б і на коді, який забирає.
+                const onlyGuest = /user_id=is\.null/.test(query);
+
+                const patch = JSON.parse(init.body);
+
+                const touched = orders.filter((o) => targets.includes(String(o.id))
+                    && (!onlyGuest || !o.user_id));
+
+                touched.forEach((o) => Object.assign(o, patch));
+
+                return new Response(JSON.stringify(touched), { status: 200 });
 
             }
 
@@ -186,6 +233,53 @@ function startFunction(orders) {
             if (/archived_at=not\.is\.null/.test(query)) rows = rows.filter((o) => o.archived_at);
             else if (/archived_at=is\.null/.test(query)) rows = rows.filter((o) => !o.archived_at);
 
+            // --- пошук замовлень без власника ---
+            if (/user_id=is\.null/.test(query)) rows = rows.filter((o) => !o.user_id);
+
+            const emailLike = /email=ilike\.([^&]+)/.exec(query)?.[1];
+
+            if (emailLike) {
+
+                const want = decodeURIComponent(emailLike).replace(/\*/g, "").toLowerCase();
+
+                rows = rows.filter((o) => String(o.email || "").toLowerCase().includes(want));
+
+            }
+
+            // phone_key — генерована колонка (міграція 037): останні
+            // дев'ять цифр номера. Стенд рахує її так само, інакше
+            // перевірка «телефон збігається в будь-якому записі»
+            // проходила б лише на вигаданих даних.
+            // Стара, НЕПРАВИЛЬНА форма пошуку — лишена в стенді
+            // навмисно. Саме так і тягне зробити: «шукай номер, що
+            // містить ці цифри». Не працює, бо в базі лежить те, що
+            // людина набрала: «+380 73 728 82 91», з пробілами між
+            // цифрами. Якщо колись повернуться до неї — перевірка
+            // одразу почервоніє.
+            const phoneLike = /phone=ilike\.\*([^*&]+)\*/.exec(query)?.[1];
+
+            if (phoneLike) {
+                rows = rows.filter((o) => String(o.phone || "").includes(phoneLike));
+            }
+
+            const phoneKeyWanted = /phone_key=eq\.(\d+)/.exec(query)?.[1];
+
+            if (phoneKeyWanted) {
+
+                const key = (value) => {
+                    const digits = String(value ?? "").replace(/\D/g, "");
+                    return digits.length >= 9 ? digits.slice(-9) : "";
+                };
+
+                rows = rows.filter((o) => key(o.phone) === phoneKeyWanted);
+
+            }
+
+            // Гачок для перевірки гонки: стенд може змінити базу
+            // ПІСЛЯ того, як віддав рядки, — рівно як це буває, коли
+            // людина відкрила кабінет у двох вкладках.
+            if (typeof afterOrdersRead === "function") afterOrdersRead(query, rows);
+
             return new Response(JSON.stringify(rows), {
                 status: 200,
                 headers: { "content-range": `0-${Math.max(0, rows.length - 1)}/${rows.length}` },
@@ -217,6 +311,7 @@ function startFunction(orders) {
             headers: origin ? { origin } : {},
         })),
         post: (body, headers) => handler(request(body, headers)),
+        site: (body) => handler(request(body, { origin: "https://dev.bestbrnd4u.com" })),
         admin: (body, token = "owner") => handler(request(body, {
             origin: "https://dev.bestbrnd4u.com",
             "x-admin-token": token,
@@ -730,6 +825,139 @@ if (!canRunFunction) {
     check("і замовлення знову у звичайному списку",
         again.orders.some((o) => String(o.id) === "41"),
         again.orders.map((o) => o.id).join());
+}
+
+console.log("\n[6b] Замовлення без власника повертаються в кабінет");
+if (!canRunFunction) {
+    console.log("  — пропущено: у цій версії Node немає stripTypeScriptTypes");
+} else {
+
+    // ЗВІДКИ БЕРУТЬСЯ ЗАМОВЛЕННЯ БЕЗ ВЛАСНИКА
+    //
+    //   • людина замовила гостем, а кабінет завела пізніше;
+    //   • її обліковий запис видалили в панелі «Люди».
+    //
+    // Друге довго працювало інакше: user_id посилався на auth.users із
+    // ON DELETE CASCADE, і видалення акаунта зносило всі замовлення
+    // людини разом із заявками на відмову. Мовчки. Міграція 037
+    // міняє це на SET NULL — замовлення лишається, просто без власника.
+    const guestOrders = () => [
+        { id: 51, order_number: "A", created_at: "2026-09-01T10:00:00Z", status: "new",
+          items: [], total: 100, user_id: null,
+          // Інший регістр: та сама скринька.
+          email: "ILYAPIVEN4@gmail.com", phone: "+380631112233" },
+        { id: 52, order_number: "B", created_at: "2026-09-02T10:00:00Z", status: "new",
+          items: [], total: 200, user_id: null,
+          // Пошти в замовленні немає зовсім — лише телефон, і записаний
+          // інакше, ніж у профілі.
+          email: null, phone: "+380 73 728 82 91" },
+        { id: 53, order_number: "C", created_at: "2026-09-03T10:00:00Z", status: "new",
+          items: [], total: 300, user_id: null,
+          email: "someone@else.com", phone: "+380991234567" },
+        { id: 54, order_number: "D", created_at: "2026-09-04T10:00:00Z", status: "new",
+          items: [], total: 400, user_id: "u-other",
+          email: "ilyapiven4@gmail.com", phone: null },
+    ];
+
+    const confirmed = {
+        id: "u-9",
+        email: "ilyapiven4@gmail.com",
+        email_confirmed_at: "2026-09-01T09:00:00Z",
+        profilePhone: "0737288291",
+    };
+
+    const fn = startFunction(guestOrders(), [confirmed]);
+
+    const answer = await (await fn.site({
+        site_action: "claim-orders",
+        accessToken: "t-u-9",
+    })).json();
+
+    check("запит пройшов", answer.ok === true, answer.error);
+
+    check("повернулись рівно два замовлення", answer.claimed === 2, answer.claimed);
+
+    const byId = (id) => fn.orders.find((o) => o.id === id);
+
+    check("збіг за поштою — навіть в іншому регістрі", byId(51).user_id === "u-9");
+
+    // Телефон у базі «+380 73 728 82 91», у профілі «0737288291».
+    // Те саме правило, що на сторінці «Де моє замовлення»: останні
+    // дев'ять цифр.
+    check("збіг за телефоном — навіть у іншому записі", byId(52).user_id === "u-9");
+
+    check("чуже замовлення лишилось без власника", byId(53).user_id === null, byId(53).user_id);
+
+    // НАЙВАЖЛИВІШЕ. Замовлення, у якого власник уже є, не забираємо
+    // навіть при повному збігу пошти: умова user_id=is.null стоїть у
+    // самому запиті на запис, а не лише в пошуку.
+    check("замовлення з власником не забираємо", byId(54).user_id === "u-other", byId(54).user_id);
+
+    // --- пошта без підтвердження ---
+    //
+    // Замовлення — це ім'я, телефон і адреса доставки. Віддати його
+    // тому, хто просто ВПИСАВ чужу пошту при реєстрації, означало б
+    // видати все це першому охочому.
+    const pretender = { id: "u-8", email: "ilyapiven4@gmail.com" };
+
+    const second = startFunction(guestOrders(), [pretender]);
+
+    const refused = await (await second.site({
+        site_action: "claim-orders",
+        accessToken: "t-u-8",
+    })).json();
+
+    check("непідтвердженій пошті нічого не віддаємо", refused.claimed === 0, refused.claimed);
+
+    check("і замовлення лишились без власника",
+        second.orders.every((o) => o.user_id === null || o.user_id === "u-other"),
+        second.orders.map((o) => o.user_id).join());
+
+    check("запису в базу навіть не було",
+        !second.dbCalls().some((c) => c.method === "PATCH"));
+
+    // --- без сесії ---
+    const anon = await second.site({ site_action: "claim-orders", accessToken: "нема" });
+
+    check("без сесії — 401", anon.status === 401, anon.status);
+
+    // --- гонка: власник з'явився між пошуком і записом ---
+    //
+    // Людина відкрила кабінет у двох вкладках, або натиснула
+    // «Зберегти» двічі. Між тим, як ми знайшли замовлення без
+    // власника, і тим, як записуємо його на себе, власник уже може
+    // бути — і це може бути ІНША людина.
+    //
+    // Тому умова user_id=is.null стоїть у самому запиті на запис, а не
+    // лише в пошуку. Тут стенд імітує гонку буквально: віддає рядок і
+    // одразу проставляє йому чужого власника.
+    const raceOrders = guestOrders();
+
+    let raced = false;
+
+    const third = startFunction(raceOrders, [confirmed], (query) => {
+
+        if (raced || !/user_id=is\.null/.test(query)) return;
+
+        raced = true;
+
+        // Те саме замовлення, яке ми щойно віддали як «без власника».
+        raceOrders.find((o) => o.id === 51).user_id = "u-хтось-інший";
+
+    });
+
+    const afterRace = await (await third.site({
+        site_action: "claim-orders",
+        accessToken: "t-u-9",
+    })).json();
+
+    check("гонку відтворено", raced);
+
+    check("перехоплене замовлення не забираємо",
+        raceOrders.find((o) => o.id === 51).user_id === "u-хтось-інший",
+        raceOrders.find((o) => o.id === 51).user_id);
+
+    check("а решта повертається як звичайно", afterRace.claimed === 1, afterRace.claimed);
 }
 
 console.log("\n[7] У браузер не їде зайвого");
