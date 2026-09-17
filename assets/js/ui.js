@@ -855,7 +855,7 @@ function cardPhotoSlide(product, img) {
                 src="${img}"
                 style="${cardFrameStyle(product && product.framing, img)}"
                 data-variant-src="${img}"
-                data-variant-sizes="(max-width: 768px) 50vw, 300px"
+                data-variant-sizes="(max-width: 768px) 50vw, (max-width: 1300px) 300px, 400px"
                 alt="${escapeHtml((product && product.title) || "")}"
                 loading="lazy"
                 onerror="this.src='assets/images/no-image.png'">
@@ -889,7 +889,22 @@ async function applyImageVariants(root) {
             if (!srcset) return;
 
             img.srcset = srcset;
-            img.sizes = img.dataset.variantSizes || "(max-width: 768px) 50vw, 300px";
+            // SIZES МУСИТЬ НАЗИВАТИ СПРАВЖНЮ ШИРИНУ КАРТКИ.
+            //
+            // Довго тут стояло «300px» для всього, що ширше за телефон.
+            // Браузер вірить цьому числу на слово: бачить 300px —
+            // бере з srcset копію 300w. А картка на широкому екрані
+            // давно не 300px.
+            //
+            // Заміряно на живому каталозі: 1280 → 287px, 1600 → 394px,
+            // 1920 → 397px, 2560 → 397px (більше не росте, бо
+            // контейнер упирається в 1600px). Тобто на моніторі 2560
+            // копія 300w розтягувалась до 397px — на третину понад свій
+            // розмір. Саме це власник і побачив як «погану якість».
+            //
+            // Межа 1300px — там, де картка переходить через 300px.
+            img.sizes = img.dataset.variantSizes
+                || "(max-width: 768px) 50vw, (max-width: 1300px) 300px, 400px";
 
             delete img.dataset.variantSrc;
 
