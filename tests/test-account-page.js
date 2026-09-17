@@ -1064,5 +1064,130 @@ console.log("\n[12] Службова адреса входу через Telegram
         /realEmail\(user\) \|\| "Особистий кабінет"/.test(client));
 }
 
+console.log("\n[13] Після виходу з акаунту — на головну");
+{
+    // ЩО БУЛО. Кнопка «Вийти з акаунту» гасила сесію й перемальовувала
+    // ту саму сторінку. Людина лишалась на /account, та ще й на тому
+    // місці, де стояла — просто замість кабінету під нею з'являлась
+    // форма входу. Виглядало це як збій: щойно був кабінет, а тепер
+    // «Увійдіть», і незрозуміло, вийшов ти чи щось зламалось.
+    //
+    // Дивимось саме на ТІЛО обробника, а не на файл: location.replace
+    // у кабінеті трапляється ще й у переносі токена з листа, і
+    // перевірка «десь у файлі є replace» проходила б і без виходу.
+    const at = js.indexOf("logoutBtn?.addEventListener");
+
+    const body = at < 0 ? "" : js.slice(at, js.indexOf("\n});", at) + 4);
+
+    check("обробник виходу знайшовся", body.includes("signOut"), body.slice(0, 60));
+
+    check("після виходу ведемо на головну",
+        /window\.location\.replace\("\/"\)/.test(body),
+        body.replace(/\s+/g, " ").slice(0, 140));
+
+    // replace, а не href: «назад» повертало б у кабінет сесії, якої вже
+    // немає. Та сама причина, що й у carryAuthTokenToAccount().
+    check("кабінет не лишається в історії",
+        !/window\.location\.href\s*=/.test(body));
+
+    // І сторінку більше не перемальовуємо — ми з неї йдемо. Виклик, що
+    // лишився б тут, малював би форму входу за мить до переходу:
+    // блимало б саме те, від чого йшли.
+    check("замість перемальовування — перехід",
+        !/renderAuthState\(\)/.test(body));
+}
+
+console.log("\n[14] Реєстрація підписує на розсилку — і каже про це");
+{
+    // Зареєструвавшись будь-яким способом, людина потрапляє в розсилку.
+    // Це рішення власника, і тут закріплено не саме рішення, а те, що
+    // робить його безпечним.
+    const fn = read("supabase/functions/telegram-order-bot/_index.src.ts");
+
+    const at = fn.indexOf("async function handleSubscribeSignup");
+
+    const route = at < 0 ? "" : fn.slice(at, fn.indexOf("\n// Відписати себе самого", at));
+
+    check("маршрут для підписки при реєстрації є", route !== "");
+
+    // ПОШТА — З ТОКЕНА, А НЕ З ТІЛА ЗАПИТУ.
+    //
+    // Тут немає листа підтвердження, тож тіло запиту не доводить
+    // нічого: взявши адресу звідти, ми дали б спосіб тихо додати в
+    // список чужу пошту.
+    check("адресу беремо з підтвердженого токена",
+        /userFromAccessToken\(body\?\.accessToken\)/.test(route)
+        && /realEmailOf\(user\)/.test(route));
+
+    check("і не з тіла запиту", !/body\.email|body\?\.email/.test(route), route.slice(0, 120));
+
+    // НАЙВАЖЛИВІШЕ. Того, хто колись відписався, повертати не можна:
+    // POST у MailerLite не додає, а перезаписує, і статус active
+    // воскресив би підписку мовчки.
+    //
+    // Дивитись треба на СИРИЙ статус: lookupState() зводить
+    // «unsubscribed» до «none», бо його питання інше — чи показувати
+    // форму підписки.
+    check("відому адресу не чіпаємо в жодному статусі",
+        /subscriberStatus\(/.test(route)
+        && /found\.status === 200[\s\S]{0,320}state: "already"/.test(route));
+
+    check("і саме сирий статус, а не lookupState",
+        !/lookupState/.test(route),
+        "lookupState зводить unsubscribed до none — відписаного було б підписано знову");
+
+    check("підписуємо лише тоді, коли адреси в списку немає",
+        /found\.status !== 404[\s\S]{0,200}state: "unknown"/.test(route));
+
+    // «active» без листа — лише для вже підтвердженої пошти. Інакше
+    // звичайний шлях: unconfirmed і наш лист.
+    // Дивимось саме на виклик subscribeRequest, а не «десь у маршруті
+    // є така трійка»: та сама трійка стоїть нижче у відповіді, і
+    // перевірка проходила б навіть тоді, коли статус тут зашили
+    // намертво.
+    check("активним робимо тільки підтверджену пошту",
+        /email_confirmed_at/.test(route)
+        && /MAILERLITE_GROUP_ID,\s*\n\s*confirmed \? "active" : "unconfirmed",/.test(route),
+        (/subscribeRequest\([\s\S]{0,220}?\);/.exec(route) || [""])[0].replace(/\s+/g, " "));
+
+    check("непідтвердженій пошті лист усе одно йде",
+        /if \(!confirmed\) await sendSubscribeConfirmation\(email\)/.test(route));
+
+    check("заблоковану адресу не підписуємо", /emailBlocked\(email\)/.test(route));
+
+    check("маршрут під'єднано", /site_action === "subscribe-signup"/.test(fn));
+
+    // --- сторона браузера ---
+    check("після реєстрації підписка викликається",
+        /await subscribeAfterSignup\(\);/.test(js));
+
+    check("у запит іде токен, а не пошта",
+        /site_action: "subscribe-signup", accessToken: token/.test(js));
+
+    // Реєстрація через Google, Facebook чи підтвердження пошти листом
+    // через нашу форму не проходить — сесія зʼявляється вже після
+    // повернення. Єдина ознака там — вік акаунта.
+    check("свіжий акаунт ловимо й на інших способах входу",
+        /function subscribeIfFreshAccount\(user\)/.test(js)
+        && /subscribeIfFreshAccount\(user\);/.test(js));
+
+    check("і рівно один раз за показ сторінки",
+        /if \(signupSubscribeTried \|\| !user \|\| !user\.created_at\) return;/.test(js));
+
+    // ПРО ПІДПИСКУ КАЖЕМО ДО РЕЄСТРАЦІЇ, А НЕ ПІСЛЯ.
+    //
+    // Мовчазна підписка обертається скаргою на спам, а скарги псують
+    // доставляння ВСІХ листів магазину — включно з листами про
+    // замовлення. Рядок під кнопкою коштує нічого, а підставу під «я
+    // не погоджувався» знімає.
+    const note = (/<p class="signup-note"[\s\S]*?<\/p>/.exec(html) || [""])[0];
+
+    check("під формою сказано, що реєстрація підписує",
+        /підписуєтесь на листи/.test(note), note.replace(/\s+/g, " ").slice(0, 90));
+
+    check("і сказано, де вимкнути",
+        /Розсилка/.test(note) && /листі/.test(note));
+}
+
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
 process.exit(failures === 0 ? 0 : 1);

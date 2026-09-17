@@ -275,13 +275,23 @@
                 .slice(0, MAX_BRANDS)
                 .map(([brand]) => brand);
 
+            // «УСІ БРЕНДИ» — ЄДИНИЙ ВХІД ДО ПОВНОЇ СМУГИ.
+            //
+            // У «Каталозі» цей пункт веде на /brands/, де перелік уже
+            // лежить у розмітці. У розділах власної сторінки немає — там
+            // це той самий каталог, тож смугу просимо позначкою
+            // brands=1 (читає її fillBrandStrip() у catalog.js).
+            //
+            // Без позначки розділ відкривається без смуги, і це навмисно:
+            // людина прийшла дивитись новинки, а не перелік із двадцяти
+            // однієї назви над ними.
             const brandColumn = topBrands.length ? `
                 <div class="mega-col">
                     <div class="mega-col-title">Бренди</div>
                     ${topBrands.map(brand => `
                         <a href="${brandHref(section, brand)}">${escapeHtml(brand)}</a>
                     `).join("")}
-                    <a class="mega-col-all" href="${section ? buildQuery(section, []) : "/brands/"}">Усі бренди</a>
+                    <a class="mega-col-all" href="${section ? buildQuery(section, [["brands", "1"]]) : "/brands/"}">Усі бренди</a>
                 </div>
             ` : "";
 

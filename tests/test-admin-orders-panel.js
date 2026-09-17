@@ -155,6 +155,19 @@ function startFunction(orders) {
 
             }
 
+            if (method === "DELETE") {
+
+                const index = orders.findIndex((o) => String(o.id) === id);
+
+                if (index >= 0) orders.splice(index, 1);
+
+                // 204 — саме так відповідає PostgREST на DELETE. Тіла
+                // в нього немає, і підсунути порожній рядок замість
+                // null не можна: Response із тілом при 204 кидає.
+                return new Response(null, { status: 204 });
+
+            }
+
             if (id) {
                 const order = orders.find((o) => String(o.id) === id);
                 return new Response(JSON.stringify(order ? [order] : []), { status: 200 });
@@ -167,6 +180,11 @@ function startFunction(orders) {
             if (/refusal_requested_at=not\.is\.null/.test(query)) {
                 rows = rows.filter((o) => o.refusal_requested_at);
             }
+
+            // Архів у стенді теж фільтруємо — інакше перевірка «список
+            // не показує прибраних» проходила б на будь-якому коді.
+            if (/archived_at=not\.is\.null/.test(query)) rows = rows.filter((o) => o.archived_at);
+            else if (/archived_at=is\.null/.test(query)) rows = rows.filter((o) => !o.archived_at);
 
             return new Response(JSON.stringify(rows), {
                 status: 200,
@@ -480,6 +498,41 @@ console.log("\n[5] Список: пошук, вкладки, сторінки");
     check("вкладка відмов фільтрує за позначкою",
         A.buildListQuery({ refusal: true }).includes("refusal_requested_at=not.is.null"));
 
+    // АРХІВ — ОКРЕМА ПОЛИЦЯ, А НЕ ФІЛЬТР ПОВЕРХ ІНШИХ.
+    //
+    // Прибране замовлення не має показуватись НІДЕ, крім своєї
+    // вкладки: ні в «Усіх», ні в «Нових», ні в пошуку. Тому умова
+    // стоїть у кожному запиті списку — і, що важливіше, у запиті
+    // кількостей теж.
+    //
+    // Забути її в кількостях — найпідступніше: число над вкладкою
+    // рахувало б прибрані, а список під ним їх не показував би. Такі
+    // розходження помічають найпізніше, бо кожна половина окремо
+    // виглядає правильно.
+    check("звичайний список не показує прибраних",
+        A.buildListQuery({}).includes("archived_at=is.null"));
+
+    check("вкладка архіву показує лише прибраних",
+        A.buildListQuery({ archived: true }).includes("archived_at=not.is.null"));
+
+    check("кількість у вкладці рахується за тим самим правилом",
+        A.buildCountQuery({ status: "new" }).includes("archived_at=is.null")
+        && A.buildCountQuery({ archived: true }).includes("archived_at=not.is.null"));
+
+    check("прибирання й видалення — відомі дії",
+        A.parseAdminRequest({ admin_action: "archive", id: "7" }).ok
+        && A.parseAdminRequest({ admin_action: "restore", id: "7" }).ok
+        && A.parseAdminRequest({ admin_action: "delete", id: "7" }).ok);
+
+    check("без номера замовлення жодна з них не проходить",
+        !A.parseAdminRequest({ admin_action: "delete" }).ok
+        && !A.parseAdminRequest({ admin_action: "archive", id: "7; drop" }).ok);
+
+    check("дата прибирання доїжджає в браузер",
+        A.orderView({ id: 1, archived_at: "2026-09-17T10:00:00Z" }).archivedAt
+            === "2026-09-17T10:00:00Z"
+        && A.orderView({ id: 1 }).archivedAt === null);
+
     // Пошук їде в параметр or=(...), де кома, дужки й лапки — це
     // синтаксис. Тому все, що не схоже на текст запиту, прибирається,
     // і введене лишається ЗНАЧЕННЯМ: PostgREST ділить умову на
@@ -603,6 +656,80 @@ console.log("\n[6] Накладна");
 
         check("текст замість номера відхиляється з 400", response.status === 400, response.status);
     }
+}
+
+console.log("\n[6a] Архів: прибрати, повернути, видалити");
+if (!canRunFunction) {
+    console.log("  — пропущено: у цій версії Node немає stripTypeScriptTypes");
+} else {
+
+    const fn = startFunction(sampleOrders());
+
+    const archived = await (await fn.admin({ admin_action: "archive", id: 41 })).json();
+
+    check("прибирання пройшло", archived.ok === true, archived.error);
+    check("дата прибирання проставлена", Boolean(archived.order.archivedAt), archived.order.archivedAt);
+
+    // Прибране зникає з усіх вкладок, окрім своєї. Найважливіше тут —
+    // що те саме правило діє і на список, і на кількості: якби воно
+    // стояло лише в списку, число над вкладкою рахувало б прибрані, а
+    // список під ним їх не показував.
+    const plain = await (await fn.admin({ admin_action: "list" })).json();
+
+    check("зі звичайного списку зникло",
+        !plain.orders.some((o) => String(o.id) === "41"),
+        plain.orders.map((o) => o.id).join());
+
+    const shelf = await (await fn.admin({ admin_action: "list", archived: true })).json();
+
+    check("і знайшлось у вкладці «Архів»",
+        shelf.orders.length === 1 && String(shelf.orders[0].id) === "41",
+        shelf.orders.map((o) => o.id).join());
+
+    // ГОЛОВНЕ В УСЬОМУ РОЗДІЛІ.
+    //
+    // Видалити можна ЛИШЕ з архіву, і перевіряє це функція, а не
+    // сторінка. У живого замовлення кнопки немає — але той самий
+    // запит можна надіслати повз браузер, а наслідок незворотний:
+    // cascade забирає заявки на відмову, і замовлення зникає з
+    // кабінету клієнта.
+    const live = await fn.admin({ admin_action: "delete", id: 42 });
+    const liveBody = await live.json();
+
+    check("живе замовлення видалити не дають", liveBody.ok === false, liveBody.error);
+    check("і кажуть, що спершу треба в архів", /архів/i.test(liveBody.error || ""), liveBody.error);
+    check("рядок лишився на місці", fn.orders.some((o) => String(o.id) === "42"));
+    check("до бази запит на видалення навіть не пішов",
+        !fn.dbCalls().some((c) => c.method === "DELETE"));
+
+    const gone = await (await fn.admin({ admin_action: "delete", id: 41 })).json();
+
+    check("з архіву видаляється", gone.ok === true, gone.error);
+    check("рядка більше немає", !fn.orders.some((o) => String(o.id) === "41"));
+    check("і це справді DELETE по цьому замовленню",
+        fn.dbCalls().some((c) => c.method === "DELETE" && /orders\?id=eq\.41/.test(c.url)));
+
+    // Архів — це порядок у панелі власника, а не подія в житті
+    // замовлення. Клієнт нічого не робив і нічого отримувати не мусить.
+    check("клієнту про це нічого не написали",
+        fn.telegramCalls().filter((c) => c.method === "sendMessage").length === 0,
+        JSON.stringify(fn.telegramCalls()));
+
+    const back = startFunction(sampleOrders());
+
+    await back.admin({ admin_action: "archive", id: 41 });
+
+    const restored = await (await back.admin({ admin_action: "restore", id: 41 })).json();
+
+    check("повернення прибирає дату",
+        restored.ok === true && restored.order.archivedAt === null,
+        restored.order && restored.order.archivedAt);
+
+    const again = await (await back.admin({ admin_action: "list" })).json();
+
+    check("і замовлення знову у звичайному списку",
+        again.orders.some((o) => String(o.id) === "41"),
+        again.orders.map((o) => o.id).join());
 }
 
 console.log("\n[7] У браузер не їде зайвого");
@@ -735,11 +862,13 @@ console.log("\n[8] Сторінка панелі: піднімаємо в бра
 
     const tabs = doc.querySelectorAll(".tab");
 
-    check("вкладки за статусами намальовані", tabs.length === A.STATUS_ORDER.length + 2, tabs.length);
+    // «Усі» + статуси + «Відмови» + «Архів».
+    check("вкладки за статусами намальовані", tabs.length === A.STATUS_ORDER.length + 3, tabs.length);
     check("кількість показана на вкладці", /<span class="count">1<\/span>/.test(doc.getElementById("tabs").innerHTML));
     check("вкладка «Усі» вибрана за замовчуванням",
         tabs[0].getAttribute("aria-selected") === "true");
     check("є вкладка відмов", /Відмови/.test(doc.getElementById("tabs").textContent));
+    check("є вкладка архіву", /Архів/.test(doc.getElementById("tabs").textContent));
 
     // Позначки в рядку: без них у списку з тридцяти замовлень
     // неможливо побачити, де чекають на дію.
@@ -802,6 +931,74 @@ console.log("\n[8] Сторінка панелі: піднімаємо в бра
     const ttn = requests.find((r) => r.admin_action === "tracking");
 
     check("накладна надіслана", Boolean(ttn) && ttn.tracking === "20450912345678");
+
+    // --- прибирання в архів і видалення ---
+    //
+    // У панелі осідають замовлення, яких там бути не повинно: тестові
+    // (кожна перевірка оплати на проді лишає одне), дублі від
+    // подвійного натискання, ботівське сміття. Скасувати їх мало —
+    // скасоване теж лишається у своїй вкладці.
+    //
+    // Але видалити рядок означає знищити запис про продаж: cascade
+    // забирає ще й заявки на відмову, а з кабінету клієнта
+    // замовлення зникає. Тому кроків два, і перший — це те, що в
+    // ЖИВОГО замовлення кнопки «Видалити назавжди» просто немає.
+    check("у живому замовленні є «Прибрати в архів»",
+        Boolean(detail.querySelector('[data-archive="on"]')));
+
+    check("і немає «Видалити назавжди»",
+        !detail.querySelector("[data-delete]"));
+
+    detail.querySelector('[data-archive="on"]')
+        .dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+
+    await flush(); await flush(); await flush();
+
+    check("прибирання надіслано",
+        requests.some((r) => r.admin_action === "archive" && String(r.id) === "41"));
+
+    // Тепер відкриваємо вже прибране замовлення. Рядки перемальовані
+    // від часу першого запиту, тож шукаємо їх заново: стара колекція
+    // вказує на елементи, яких у документі вже немає, і клік по них
+    // не дійшов би до списку.
+    ORDERS[1].archivedAt = "2026-09-17T10:00:00Z";
+
+    doc.querySelectorAll(".row")[1]
+        .dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+
+    await flush(); await flush();
+
+    check("в архівному замовленні є «Повернути»",
+        Boolean(detail.querySelector('[data-archive="off"]')));
+
+    check("і аж тепер — «Видалити назавжди»",
+        Boolean(detail.querySelector("[data-delete]")));
+
+    check("у картці сказано, що видалення незворотне",
+        /незворотн/i.test(detail.textContent), detail.textContent.slice(-200));
+
+    // Питання мусить називати САМЕ ТЕ замовлення, яке зникне.
+    // «Видалити?» без номера — це підтвердження наосліп.
+    let confirmText = "";
+
+    window.confirm = (text) => { confirmText = String(text); return true; };
+
+    detail.querySelector("[data-delete]")
+        .dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+
+    await flush(); await flush(); await flush();
+
+    check("перед видаленням спитали, і в питанні — номер замовлення",
+        confirmText.includes(ORDERS[1].orderNumber), confirmText.slice(0, 80));
+
+    const removal = requests.find((r) => r.admin_action === "delete");
+
+    check("видалення надіслано", Boolean(removal));
+    check("із номером саме того замовлення",
+        removal && String(removal.id) === String(ORDERS[1].id),
+        removal && removal.id);
+
+    window.confirm = () => true;
 
     // --- пошук ---
     const search = doc.getElementById("search");

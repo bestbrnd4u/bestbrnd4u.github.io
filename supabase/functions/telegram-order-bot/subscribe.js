@@ -87,7 +87,15 @@ export function cleanSubscriber(payload) {
 // groupId необов'язковий: без нього людина йде в загальний список.
 // З ним — в окрему групу, і тоді можна відрізнити тих, хто підписався
 // на сайті, від тих, кого додали інакше.
-export function subscribeRequest(apiKey, subscriber, groupId) {
+// status — «unconfirmed» за замовчуванням, і міняти його можна рівно
+// в одному випадку: коли адресу вже доведено іншим шляхом. Такий шлях
+// у нас один — реєстрація з підтвердженою поштою (див. маршрут
+// subscribe-signup): там людина вже перейшла за посиланням із листа
+// Supabase, і просити те саме вдруге — це просити двічі одне й те ж.
+//
+// В усіх інших випадках лишається підтвердження: адреса, введена в
+// форму, не доводить нічого — її міг вписати будь-хто.
+export function subscribeRequest(apiKey, subscriber, groupId, status) {
 
     const key = String(apiKey ?? "").trim();
 
@@ -101,7 +109,7 @@ export function subscribeRequest(apiKey, subscriber, groupId) {
         // увімкнено double opt-in. Статус «unconfirmed» — саме те, що
         // потрібно: людина мусить підтвердити, і аж тоді потрапляє в
         // розсилку.
-        status: "unconfirmed",
+        status: status === "active" ? "active" : "unconfirmed",
     };
 
     if (subscriber.name) body.fields = { name: subscriber.name };

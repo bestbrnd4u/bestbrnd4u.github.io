@@ -69,6 +69,9 @@
     const state = {
         status: "",
         refusal: false,
+        // Вкладка «Архів». Не фільтр поверх статусів, а окрема полиця:
+        // прибране замовлення не показується більше ніде.
+        archived: false,
         query: "",
         offset: 0,
         statuses: {},
@@ -235,10 +238,13 @@
         });
 
         tabs.push({ key: "refusal", label: "❗ Відмови", count: state.counts.refusal });
+        tabs.push({ key: "archived", label: "🗄 Архів", count: state.counts.archived });
 
         tabsBox.innerHTML = tabs.map((tab) => {
 
-            const active = tab.key === "refusal" ? state.refusal : (!state.refusal && state.status === tab.key);
+            const active = tab.key === "refusal" ? state.refusal
+                : tab.key === "archived" ? state.archived
+                : (!state.refusal && !state.archived && state.status === tab.key);
 
             const count = Number(tab.count) > 0
                 ? `<span class="count">${esc(tab.count)}</span>`
@@ -486,6 +492,48 @@
                            ${order.fromBot ? " · клієнту вже надіслано номер" : ""}
                        </p>`
                     : ""}
+            </div>
+
+            ${archiveSection(order)}`;
+
+    }
+
+    // Прибирання — В КІНЦІ КАРТКИ, А НЕ ПОРУЧ ЗІ СТАТУСАМИ.
+    //
+    // Нагорі стоять кнопки щоденної роботи, і промахнутись по них
+    // нічого не варто: статус завжди можна перевести назад. «Видалити
+    // назавжди» — не з того ряду, тож і місце їй окремо, у самому
+    // низу, куди не тягнуться навмання.
+    function archiveSection(order) {
+
+        if (!order.archivedAt) {
+
+            return `
+            <div class="section">
+                <h3>Прибрати з панелі</h3>
+                <p class="muted" style="font-size:13px;margin:0 0 10px">
+                    Замовлення зникне зі списків, але лишиться в базі — і в кабінеті клієнта теж.
+                    Повернути можна з вкладки «Архів».
+                </p>
+                <button class="btn btn-ghost" type="button" data-archive="on">🗄 Прибрати в архів</button>
+            </div>`;
+
+        }
+
+        return `
+            <div class="section">
+                <h3>В архіві</h3>
+                <p class="muted" style="font-size:13px;margin:0 0 10px">
+                    Прибрано ${esc(dateLabel(order.archivedAt))}.
+                </p>
+                <div class="actions">
+                    <button class="btn" type="button" data-archive="off">↩ Повернути в роботу</button>
+                    <button class="btn btn-danger" type="button" data-delete="1">Видалити назавжди</button>
+                </div>
+                <p class="muted" style="font-size:13px;margin:10px 0 0">
+                    Видалення незворотне: рядок зникне з бази разом із заявками на відмову
+                    по цьому замовленню, а клієнт більше не побачить його в кабінеті.
+                </p>
             </div>`;
 
     }
@@ -507,8 +555,9 @@
         try {
 
             const payload = await call("list", {
-                status: state.refusal ? "" : state.status,
+                status: (state.refusal || state.archived) ? "" : state.status,
                 refusal: state.refusal,
+                archived: state.archived,
                 query: state.query,
                 limit: PAGE_SIZE,
                 offset: state.offset,
@@ -631,6 +680,48 @@
 
     }
 
+    // Видалення — окремо від act(), і не заради стилю: там після
+    // відповіді малюють оновлене замовлення, а тут малювати вже
+    // нічого. Картку закриваємо, а підтвердження показуємо НАД
+    // СПИСКОМ — у картці його б ніхто не побачив.
+    async function remove() {
+
+        const order = state.selected;
+
+        const buttons = detailBox.querySelectorAll("button");
+
+        buttons.forEach((button) => { button.disabled = true; });
+
+        try {
+
+            await call("delete", { id: order.id });
+
+            state.selected = null;
+            state.refusals = [];
+
+            renderDetail();
+
+            document.body.classList.remove("detail-open");
+
+            // Спершу список (він чистить власне повідомлення), і аж
+            // потім наше — інакше воно зникло б тієї ж миті.
+            await load();
+
+            showMessage(listMsg, `Замовлення ${order.orderNumber || order.id} видалено.`, "ok");
+
+        } catch (error) {
+
+            // 409: замовлення встигли повернути з архіву деінде.
+            // Показуємо фактичний стан, а не свій застарілий.
+            if (error.order) { state.selected = error.order; renderDetail(); }
+            else buttons.forEach((button) => { button.disabled = false; });
+
+            showMessage(el("detailMsg") || detailBox, error.message, "error");
+
+        }
+
+    }
+
     // -------------------------
     // Події
     // -------------------------
@@ -644,7 +735,8 @@
         const key = tab.dataset.tab;
 
         state.refusal = key === "refusal";
-        state.status = state.refusal ? "" : key;
+        state.archived = key === "archived";
+        state.status = (state.refusal || state.archived) ? "" : key;
         state.offset = 0;
         state.orders = [];
 
@@ -679,6 +771,46 @@
                 && !confirm(`Скасувати замовлення ${state.selected.orderNumber}?`)) return;
 
             act("status", { status: key }, `Статус: ${statusLabel(key)}.`);
+
+            return;
+
+        }
+
+        const archiveButton = event.target.closest("[data-archive]");
+
+        if (archiveButton) {
+
+            if (archiveButton.dataset.archive === "on") {
+
+                act("archive", {}, "Замовлення в архіві.");
+
+            } else {
+
+                act("restore", {}, "Замовлення повернуто в роботу.");
+
+            }
+
+            return;
+
+        }
+
+        if (event.target.closest("[data-delete]")) {
+
+            // ДРУГЕ ПІДТВЕРДЖЕННЯ — З НОМЕРОМ ЗАМОВЛЕННЯ В ТЕКСТІ.
+            //
+            // Перше вже відбулось: щоб дійти сюди, замовлення треба
+            // було прибрати в архів. Але тут дія незворотна, тож у
+            // питанні стоїть саме той номер, який зараз зникне, — це
+            // єдине, що рятує від «видалив не те».
+            const order = state.selected;
+
+            if (!confirm(
+                `Видалити замовлення ${order.orderNumber || order.id} назавжди?\n\n`
+                + "Рядок зникне з бази разом із заявками на відмову по ньому, "
+                + "і клієнт більше не побачить його в кабінеті. Повернути не можна."
+            )) return;
+
+            remove();
 
             return;
 
