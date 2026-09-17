@@ -232,8 +232,13 @@ console.log("\n[7] На сторінки ведуть внутрішні пос�
     check("мега-меню: бренд без розділу веде на сторінку",
         /return `\/brands\/\$\{window\.Translit\.toSlug\(brand\)\}\/`/.test(read("assets/js/mega-menu.js")));
 
-    check("мега-меню: «Усі бренди» веде на хаб",
-        /section \? buildQuery\(section, \[\]\) : "\/brands\/"/.test(read("assets/js/mega-menu.js")));
+    // Поза розділом «Усі бренди» ведуть на хаб — це головне внутрішнє
+    // посилання на нього. У розділі хаба немає (там той самий каталог),
+    // тож пункт просить смугу позначкою brands=1: без неї розділ
+    // відкривається без переліку брендів над товарами.
+    check("мега-меню: «Усі бренди» веде на хаб, а в розділі просить смугу",
+        /section \? buildQuery\(section, \[\["brands", "1"\]\]\) : "\/brands\/"/
+            .test(read("assets/js/mega-menu.js")));
 
     const home = JSON.parse(read("data/home.json"));
 

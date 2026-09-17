@@ -72,6 +72,11 @@ console.log("\n[1] Меню «Каталог» — колонки за стат�
   check("заголовок статі — посилання на всю стать",
         c[0].hrefs && menu.querySelector(".mega-col-title-link")?.getAttribute("href").includes("gender="));
   check("є «Усі бренди»", c[4].links.includes("Усі бренди"));
+  // «Усі бренди» — єдиний вхід до повного переліку. З «Каталогу» він
+  // веде на сторінку брендів, де перелік лежить у розмітці.
+  check("у «Каталозі» «Усі бренди» ведуть на сторінку брендів",
+        c[4].hrefs[c[4].hrefs.length - 1] === "/brands/",
+        c[4].hrefs[c[4].hrefs.length - 1]);
   check("бренди без section у посиланні", c[4].hrefs[0].startsWith("catalog?brand="), c[4].hrefs[0]);
 }
 
@@ -86,6 +91,12 @@ console.log("\n[2] Меню «Новинки» — лише новинки");
   check("посилання зберігає section=new", c[0].hrefs[0].startsWith("catalog?section=new&"), c[0].hrefs[0]);
   check("бренди звужені до новинок",
         c[2].links.filter(b=>b!=="Усі бренди").sort().join(",") === "Furla,Guess", c[2].links.join(","));
+  // У розділі власної сторінки брендів немає — це той самий каталог.
+  // Тому смугу просимо позначкою: без неї розділ відкривається без
+  // переліку, і саме цього від нього й хочуть.
+  check("«Усі бренди» просять смугу позначкою",
+        c[2].hrefs[c[2].hrefs.length - 1] === "catalog?section=new&brands=1",
+        c[2].hrefs[c[2].hrefs.length - 1]);
 }
 
 console.log("\n[3] Меню «Акції» — лише знижки від 30%");
@@ -96,6 +107,9 @@ console.log("\n[3] Меню «Акції» — лише знижки від 30%"
   check("товар зі знижкою 5% не потрапив", !c.some(x => x.links.includes("Жіночі сумки")));
   check("посилання зберігає section=sale", c[0].hrefs[0].startsWith("catalog?section=sale&"), c[0].hrefs[0]);
   check("бренд лише Nike", c[1].links.filter(b=>b!=="Усі бренди").join(",") === "Nike", c[1].links.join(","));
+  check("«Усі бренди» просять смугу позначкою",
+        c[1].hrefs[c[1].hrefs.length - 1] === "catalog?section=sale&brands=1",
+        c[1].hrefs[c[1].hrefs.length - 1]);
 }
 
 console.log("\n[4] Панель на всю ширину — меню не стрибає вбік");
