@@ -424,6 +424,70 @@ console.log("\n[10] Свій текст для категорій і розді�
         && /aboutHydrated = false;\s*\n\s*hydrateAbout\(\);/.test(catalog));
 }
 
+console.log("\n[11] Назва бренду в хабі й у товарі — той самий рядок");
+{
+    // ЩО БУЛО. У двох товарів поле «Бренд» містило хвіст пробілу:
+    // «Invicta » і «Adidas by Stella Mccartney ». Для JavaScript це
+    // ІНШІ рядки, ніж «Invicta» і «Adidas by Stella Mccartney».
+    //
+    // Видно було на /brands/: плашка показувала «Invicta 0», хоча в
+    // каталозі той самий бренд рахувався як 1. Причина — два джерела
+    // назви. Хаб бере її з ГРУПУВАННЯ товарів (а там .trim()), а
+    // catalog.js перераховує плашки за СИРИМ product.brand. Два
+    // написання не сходились, і рівно два товари зі 131 не потрапляли
+    // в жодну плашку: сума плашок давала 129.
+    //
+    // Не ловилось нічим: сторінка є, число є, виглядає буденно. Нуль
+    // помічають лише тоді, коли поруч те саме число не нульове.
+    //
+    // Пробіли тепер зрізає build-products.js — у ДЖЕРЕЛІ, а не в
+    // кожного споживача. Обхідні .trim().toLowerCase() по коду вже
+    // стояли (логотипи, аліаси), але кожен новий споживач мусив би про
+    // них згадати, і перший же не згадав.
+    const dirty = products.filter(product => {
+
+        const raw = String(product.brand || "");
+
+        return raw !== raw.replace(/\s+/g, " ").trim();
+
+    });
+
+    check("у товарах немає назв бренду із зайвими пробілами",
+        dirty.length === 0,
+        dirty.map(product => JSON.stringify(product.brand)).join(", "));
+
+    // ГОЛОВНЕ. Плашка рахує товари за ТОЧНИМ збігом рядка — отже кожна
+    // назва в розмітці мусить існувати в товарах саме так, як
+    // написана. Не існує — плашка показує нуль і гасне.
+    const names = new Set(products.map(product => String(product.brand || "")));
+
+    const hub = read("brands/index.html");
+
+    const chips = [...hub.matchAll(/data-brand-chip="([^"]*)"/g)]
+        .map(match => match[1]
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, "'")
+            .replace(/&amp;/g, "&"));
+
+    check("плашки в хабі знайшлись",
+        chips.length === brands.length,
+        chips.length + " з " + brands.length);
+
+    const orphans = chips.filter(name => !names.has(name));
+
+    check("кожна назва з хаба є в товарах рівно так, як написана",
+        orphans.length === 0,
+        orphans.map(name => JSON.stringify(name)).join(" | "));
+
+    // І назад: бренд без плашки означав би, що в хаб він не потрапив,
+    // — тобто перелік брендів неповний.
+    const missing = [...names].filter(name => name && !chips.includes(name));
+
+    check("і кожен бренд із товарів має плашку",
+        missing.length === 0,
+        missing.map(name => JSON.stringify(name)).join(" | "));
+}
+
 console.log(failures === 0
     ? `\n✅ Таксономія: ${brands.length} брендів + ${categories.length} категорій + розділи мають власні адреси\n`
     : `\n❌ Проблем: ${failures}\n`);
