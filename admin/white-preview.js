@@ -194,29 +194,73 @@
     // Предметне фото — це товар УСЕРЕДИНІ кадру, з фоном навколо. Якщо
     // кадр обрізає знімок (модель по пояс, макрозйомка нутрощів
     // сумки), заливка йде вздовж товару всередину й з'їдає його.
-    function runsOffFrame(px, w, h, colors, tol) {
+    //
+    // ДИВИМОСЬ НА МЕЖУ ЗНІМКА, А НЕ ПОЛОТНА. Пара до
+    // subjectRunsOffFrame() у scripts/whiten-backgrounds.js — там і
+    // замір: край полотна 1200×1500 це біла добивка до 4:5, «товару»
+    // на ній немає ніколи, і перевірка мовчала завжди.
+    function runsOffFrame(px, w, h, colors, tol, box) {
 
-        var band = Math.max(2, Math.round(Math.min(w, h) * 0.01));
+        var bw = box.x1 - box.x0 + 1;
+        var bh = box.y1 - box.y0 + 1;
+
+        var band = Math.max(2, Math.round(Math.min(bw, bh) * 0.01));
 
         var top = 0, bottom = 0, left = 0, right = 0;
         var x, y, d;
 
-        for (x = 0; x < w; x++) {
+        for (x = box.x0; x <= box.x1; x++) {
             for (d = 0; d < band; d++) {
-                if (!matchesBackground(px, (d * w + x) * 4, colors, tol)) top++;
-                if (!matchesBackground(px, ((h - 1 - d) * w + x) * 4, colors, tol)) bottom++;
+                if (!matchesBackground(px, ((box.y0 + d) * w + x) * 4, colors, tol)) top++;
+                if (!matchesBackground(px, ((box.y1 - d) * w + x) * 4, colors, tol)) bottom++;
             }
         }
 
-        for (y = 0; y < h; y++) {
+        for (y = box.y0; y <= box.y1; y++) {
             for (d = 0; d < band; d++) {
-                if (!matchesBackground(px, (y * w + d) * 4, colors, tol)) left++;
-                if (!matchesBackground(px, (y * w + (w - 1 - d)) * 4, colors, tol)) right++;
+                if (!matchesBackground(px, (y * w + box.x0 + d) * 4, colors, tol)) left++;
+                if (!matchesBackground(px, (y * w + box.x1 - d) * 4, colors, tol)) right++;
             }
         }
 
-        return Math.max(top / (w * band), bottom / (w * band),
-            left / (h * band), right / (h * band)) > EDGE_SHARE;
+        return Math.max(top / (bw * band), bottom / (bw * band),
+            left / (bh * band), right / (bh * band)) > EDGE_SHARE;
+
+    }
+
+    // Межі самого знімка всередині полотна 4:5: відкидаємо суцільно
+    // білі рядки й стовпці — це добивка, яку дописав
+    // normalize-product-images.js.
+    function contentBox(px, w, h) {
+
+        var x, y;
+
+        function whiteRow(row) {
+            var off = 0;
+            for (x = 0; x < w; x++) {
+                var i = (row * w + x) * 4;
+                if (px[i] < 253 || px[i + 1] < 253 || px[i + 2] < 253) off++;
+            }
+            return off / w < 0.005;
+        }
+
+        function whiteCol(col) {
+            var off = 0;
+            for (y = 0; y < h; y++) {
+                var i = (y * w + col) * 4;
+                if (px[i] < 253 || px[i + 1] < 253 || px[i + 2] < 253) off++;
+            }
+            return off / h < 0.005;
+        }
+
+        var x0 = 0, y0 = 0, x1 = w - 1, y1 = h - 1;
+
+        while (y0 < y1 && whiteRow(y0)) y0++;
+        while (y1 > y0 && whiteRow(y1)) y1--;
+        while (x0 < x1 && whiteCol(x0)) x0++;
+        while (x1 > x0 && whiteCol(x1)) x1--;
+
+        return { x0: x0, y0: y0, x1: x1, y1: y1 };
 
     }
 
@@ -396,7 +440,7 @@
 
             isWhite: found.colors.every(white),
 
-            cropped: runsOffFrame(px, w, h, found.colors, tol)
+            cropped: runsOffFrame(px, w, h, found.colors, tol, contentBox(px, w, h))
 
         };
 
@@ -623,6 +667,7 @@
         PREVIEW_MAX: PREVIEW_MAX,
 
         fillTolerance: fillTolerance,
+        contentBox: contentBox,
         borderColors: borderColors,
         matchesBackground: matchesBackground,
         whitenPixels: whitenPixels,

@@ -260,7 +260,9 @@ console.log("\n[3] Підписка на листи");
                 const full = path.join(dir, entry.name);
 
                 if (entry.isDirectory()) walk(full);
-                else if (entry.name.endsWith(".html")) pages.push(full);
+                // tmp-* — тимчасові файли сусіднього набору, не сторінки
+                // (пояснення нижче, там де читається корінь)
+                else if (entry.name.endsWith(".html") && !entry.name.startsWith("tmp-")) pages.push(full);
 
             });
 
@@ -628,7 +630,14 @@ console.log("\n[3b] Форма підписки — у смузі, а не в п
     //     годинами роботи, де її майже не видно.
     //
     // Тобто найпомітніше місце займав порожній div.
-    const pages = fs.readdirSync(ROOT).filter(f => f.endsWith(".html"));
+    // tmp-* відкидаємо: це не сторінки сайту, а тимчасові файли, які
+    // на секунду створює сусідній набір (tmp-archive-ref-check.html у
+    // test-image-archive.js). Набори йдуть паралельно, і коли обхід
+    // застає такий файл на диску, цей набір падає з «форма є на кожній
+    // сторінці → tmp-archive-ref-check.html» — червоне на порожньому
+    // місці, яке з другого разу вже не відтворюється.
+    const pages = fs.readdirSync(ROOT)
+        .filter(f => f.endsWith(".html") && !f.startsWith("tmp-"));
 
     const dead = pages.filter(f => /data-form=/.test(read(f)));
 
