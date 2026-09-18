@@ -210,6 +210,97 @@ console.log("\n[5] Вага");
         typeof serialize === "function" && serialize([{ a: 1 }]) === '[\n{"a":1}\n]\n');
 }
 
+console.log("\n[6] Що видно, поки ці кілобайти їдуть");
+{
+    // Вага каталогу — це не абстракція, а секунди на поганому звʼязку.
+    // Те, що людина бачить у ці секунди, — така сама частина сторінки,
+    // як і самі товари.
+    //
+    // ЩО БУЛО НЕ ТАК (зі скріна власника)
+    // ------------------------------------
+    //   «0 товарів»          зашитий нуль у розмітці, тобто сторінка
+    //                        каже «нічого немає» замість «ще несемо»;
+    //   порожнеча зі спінером під панеллю фільтрів;
+    //   вузька картка «Сортувати» з краю — бо приховане дерево
+    //                        категорій зникало із сітки, і <main>
+    //                        ставало в колонку завширшки 250px;
+    //   активні фільтри      «Бренд» відкривав порожній список.
+    const html = read("catalog.html");
+    const css = read("assets/css/style.css");
+    const js = read("assets/js/catalog.js");
+
+    // 1. Нуль із розмітки прибрано.
+    check("лічильник не показує «0 товарів» до завантаження",
+        /<span id="productsCount"><\/span>/.test(html),
+        (html.match(/<span id="productsCount">[\s\S]{0,12}/) || [""])[0]);
+
+    check("на його місці сіра плашка, а не порожнеча",
+        /\.catalog-count\.is-loading::before\{/.test(css)
+        && /\.catalog-count\.is-loading > span\{[^}]*visibility:hidden/.test(css));
+
+    // 2. Каркас карток замість самотнього спінера.
+    const cards = (html.match(/class="skeleton-card"/g) || []).length;
+
+    check(`каркас із карток, а не спінер — ${cards} плашок`, cards >= 6, cards);
+
+    check("каркас повторює геометрію справжньої картки",
+        /\.skeleton-photo\{\s*aspect-ratio:4\/5;/.test(css)
+        && /\.catalog-skeleton\{[^}]*minmax\(280px,1fr\)/.test(css));
+
+    check("і на телефоні теж: дві колонки, квадрат",
+        /\.catalog-skeleton\{\s*grid-template-columns:repeat\(2, 1fr\);/.test(css)
+        && /\.skeleton-photo\{\s*aspect-ratio:1\/1;/.test(css));
+
+    // Рух заглушок — не для всіх: у системі буває вимкнена анімація.
+    check("кому анімація заважає — плашки без хвилі",
+        /@media \(prefers-reduced-motion:reduce\)\{[\s\S]{0,200}?\.skeleton-line\{\s*animation:none/.test(css));
+
+    // 3. Колонки сітки названі явно — інакше каталог стрибає вбік.
+    check("сітка не переїжджає у вузьку колонку, поки немає дерева",
+        /\.catalog-layout > main\{\s*grid-column:2;/.test(css)
+        && /\.catalog-sidebar\{\s*grid-column:1;/.test(css));
+
+    // 4. Фільтри не вдають, що працюють.
+    check("фільтри погашені, поки нема з чого їх будувати",
+        /\.catalog-loading \.catalog-filters-bar/.test(css)
+        && /pointer-events:none/.test(css.slice(css.indexOf(".catalog-loading .catalog-filters-bar"),
+            css.indexOf(".catalog-loading .catalog-filters-bar") + 260)));
+
+    // Клас ставить JS, а не розмітка: якщо скрипт не доїхав зовсім,
+    // елементи мусять лишитись звичайними, а не погашеними назавжди.
+    check("клас вмикає скрипт, а не розмітка",
+        /classList\.add\("catalog-loading"\)/.test(js)
+        && !/catalog-loading/.test(html));
+
+    check("і знімається навіть після помилки",
+        /finally \{[\s\S]{0,400}?classList\.remove\("catalog-loading"\)/.test(js));
+
+    // 5. Помилка — з кнопкою, а не глухий кут.
+    check("каталог не доїхав — є кнопка «спробувати ще раз»",
+        /id="catalogRetry"/.test(js) && /location\.reload\(\)/.test(js));
+
+    check("і лічильник тоді ховається цілком, без самотнього «товарів»",
+        /productsCountLine\.hidden = true/.test(js));
+
+    // 6. На сторінках брендів і категорій каркас зайвий: там у сітці
+    //    вже лежить справжній перелік товарів.
+    const taxonomy = read("scripts/build-taxonomy-pages.js");
+
+    check("на сторінках брендів каркас прибирається збіркою",
+        /SKELETON_RE/.test(taxonomy) && /html\.replace\(SKELETON_RE, ""\)/.test(taxonomy));
+
+    const brandPages = fs.readdirSync(path.join(ROOT, "brands"), { withFileTypes: true })
+        .filter(e => e.isDirectory())
+        .map(e => path.join("brands", e.name, "index.html"))
+        .filter(f => fs.existsSync(path.join(ROOT, f)));
+
+    const withSkeleton = brandPages.filter(f => read(f).includes("skeleton-card"));
+
+    check(`і його там справді немає — перевірено ${brandPages.length} сторінок`,
+        brandPages.length > 0 && withSkeleton.length === 0,
+        withSkeleton.slice(0, 3).join(", "));
+}
+
 console.log(failures === 0
     ? "\n✅ Каталог: списки качають картки, подробиці лишаються сторінці товару\n"
     : `\n❌ Проблем: ${failures}\n`);

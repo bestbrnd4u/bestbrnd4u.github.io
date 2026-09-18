@@ -252,6 +252,27 @@ p{
     color:var(--gray500);
 }
 
+/* Каталог не доїхав — найчастіше це звʼязок, а не поламаний сайт.
+   Тому не сухий червоний рядок, а пояснення й кнопка. Займає всю
+   ширину сітки, інакше опиниться в одній колонці з краю. */
+.catalog-error{
+    grid-column:1/-1;
+    text-align:center;
+    padding:40px 20px 60px;
+}
+
+.catalog-error .error{
+    padding:0 0 8px;
+    font-size:18px;
+    font-weight:600;
+    color:var(--gray900);
+}
+
+.catalog-error-hint{
+    color:var(--gray500);
+    margin-bottom:24px;
+}
+
 /* =====================================
    BUTTONS
 ===================================== */
@@ -3009,6 +3030,158 @@ body.mobile-filters-open .scroll-top{
     animation:spin .8s linear infinite;
 }
 
+/* =====================================
+   КАРКАС КАТАЛОГУ
+
+   Поки їде data/catalog.json (44 КБ у стиснутому вигляді — на
+   поганому мобільному звʼязку кілька секунд), на місці товарів
+   стоять плашки тієї самої геометрії, що й картки.
+
+   Геометрію тримаємо однакову з .products-grid навмисно: інакше
+   каркас перестане бути каркасом і сітка стрибне, коли приїдуть
+   справжні картки.
+===================================== */
+.catalog-loader{
+    /* тут не спінер по центру, а сітка на всю ширину */
+    display:block;
+    padding:0;
+}
+
+.catalog-loader .loader-note{
+    /* Напис лишається для читалки екрана, очам його не треба:
+       рух плашок сам каже, що сторінка працює. Ховаємо через clip, а
+       не display:none — прихований display читалки не читають. */
+    position:absolute;
+    width:1px;
+    height:1px;
+    margin:-1px;
+    padding:0;
+    border:0;
+    overflow:hidden;
+    clip:rect(0 0 0 0);
+    clip-path:inset(50%);
+    white-space:nowrap;
+}
+
+.catalog-skeleton{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+    gap:30px;
+}
+
+.skeleton-card{
+    background:#fff;
+    border-radius:20px;
+    overflow:hidden;
+    box-shadow:0 8px 30px rgba(0,0,0,.06);
+}
+
+.skeleton-photo{
+    aspect-ratio:4/5;
+}
+
+.skeleton-body{
+    /* ті самі поля, що в .product-card .product-info */
+    padding:18px 20px 20px;
+}
+
+.skeleton-line{
+    height:12px;
+    border-radius:6px;
+    margin-bottom:10px;
+}
+
+.skeleton-line:last-child{
+    margin-bottom:0;
+}
+
+.skeleton-line-short{
+    width:45%;
+}
+
+.skeleton-line-half{
+    width:60%;
+}
+
+/* Одна анімація на всі плашки: біла хвиля зліва направо. Розмір
+   фону 400% — щоб хвиля йшла помітно довше за саму плашку й не
+   виглядала як миготіння. */
+.skeleton-photo,
+.skeleton-line{
+    /* gray200, а не gray100: сотий відрізняється від тла сторінки на
+       шість рівнів — на екрані це майже невидимо, і каркас читався б
+       як порожні білі прямокутники. */
+    background-color:var(--gray200);
+    background-image:linear-gradient(90deg,
+        rgba(255,255,255,0) 0%,
+        rgba(255,255,255,.55) 50%,
+        rgba(255,255,255,0) 100%);
+    background-size:400% 100%;
+    background-repeat:no-repeat;
+    animation:skeleton-wave 1.4s ease-in-out infinite;
+}
+
+@keyframes skeleton-wave{
+    from{ background-position:-150% 0; }
+    to{ background-position:250% 0; }
+}
+
+/* Людям, які просили менше руху в системі, показуємо плашки без
+   хвилі — форма й місце лишаються, миготіння немає. */
+@media (prefers-reduced-motion:reduce){
+    .skeleton-photo,
+    .skeleton-line{
+        animation:none;
+        background-image:none;
+    }
+}
+
+/* Лічильник поки без числа: сіра плашка замість «0 товарів». Ширину
+   задаємо фіксовану, щоб рядок не міняв висоту й не зсував
+   «Сортувати» вбік, коли приїде справжнє число. */
+.catalog-count.is-loading > span{
+    visibility:hidden;
+}
+
+.catalog-count.is-loading::before{
+    content:"";
+    display:inline-block;
+    width:92px;
+    height:12px;
+    border-radius:6px;
+    background-color:var(--gray200);
+    vertical-align:middle;
+}
+
+/* Поки товарів немає, фільтри нема з чого будувати: перелік брендів,
+   кольорів і розмірів збирається з того самого каталогу. Натиснута
+   «Бренд» відкривала порожній список — тобто виглядала зламаною.
+   Клас ставить і знімає catalog.js. */
+.catalog-loading .catalog-filters-bar,
+.catalog-loading .mobile-filter-bar,
+.catalog-loading .catalog-actions{
+    pointer-events:none;
+    opacity:.55;
+}
+
+@media(max-width:768px){
+
+    /* дзеркало до #catalogGrid.products-grid:not(.list-view) */
+    .catalog-skeleton{
+        grid-template-columns:repeat(2, 1fr);
+        gap:14px;
+    }
+
+    .skeleton-photo{
+        aspect-ratio:1/1;
+    }
+
+    .skeleton-body{
+        padding:12px 12px 14px;
+    }
+
+}
+
 .empty-state{
     text-align:center;
     padding:80px 20px;
@@ -3491,6 +3664,25 @@ body.mobile-filters-open .scroll-top{
         grid-template-columns:250px minmax(0,1fr);
         gap:34px;
         align-items:start;
+    }
+
+    /* КОЛОНКИ НАЗВАНІ ЯВНО — ІНАКШЕ КАТАЛОГ СТРИБАЄ ВБІК.
+       Дерево категорій приховане, поки не приїхав каталог: з нього ж
+       воно й будується. А прихований елемент сітки — це display:none,
+       тобто його в сітці немає зовсім, і <main> автоматично ставало в
+       ПЕРШУ колонку — ту, що завширшки 250px.
+       Виглядало це так: поки товари вантажаться, панель «Сортувати» —
+       вузька картка з краю, а коли дані приходять, вона розповзається
+       на всю ширину. Саме цей стрибок і видно на скріні з повільним
+       інтернетом.
+       Тепер місця закріплені: дерево завжди в першій колонці, сітка —
+       завжди в другій, є дерево чи ще немає. */
+    .catalog-sidebar{
+        grid-column:1;
+    }
+
+    .catalog-layout > main{
+        grid-column:2;
     }
 
     .catalog-sidebar{
