@@ -111,16 +111,12 @@
     "cr144_svha_a3.webp": {
       "zoom": 1.49,
       "x": 48,
-      "y": 52,
-      "bg": "keep"
+      "y": 52
     },
     "cr144_svha_a8.webp": {
       "zoom": 1.48,
       "x": 46,
       "y": 50
-    },
-    "cr144_svha_a91.webp": {
-      "bg": "keep"
     }
   },
   "stock": {

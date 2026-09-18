@@ -215,7 +215,23 @@ async function buildMissingVariants(file) {
         // Форма — головне. Її перевіряємо першою й завжди.
         try {
 
-            const meta = await sharp(variant).metadata();
+            // Читаємо байти В ПАМʼЯТЬ, а не даємо sharp шлях.
+            //
+            // sharp(шлях) тримає файл відкритим, поки живе конвеєр, а
+            // через кілька рядків ми пишемо writeFileSync РІВНО В ЦЕЙ
+            // САМИЙ файл. На Windows це падає:
+            //
+            //   Error: UNKNOWN: unknown error, open
+            //     '…/2s3hcr500h03-134-1-600.webp'
+            //
+            // і збірка зупиняється на першому ж фото, якому треба
+            // перезібрати копії. У CI (Linux) запис поверх відкритого
+            // файлу проходить, тож помилки там не видно взагалі — вона
+            // чекає на того, хто замінить фото в себе на машині.
+            //
+            // Той самий прийом і з тієї самої причини вже стоїть у
+            // whiten-backgrounds.js і в normalize() вище.
+            const meta = await sharp(fs.readFileSync(variant)).metadata();
 
             if (meta.width !== width) return true;
 
@@ -332,6 +348,43 @@ async function main() {
 
     const off = await findOffCanvas();
 
+    // СПОЧАТКУ ПРИВОДИМО ДО 4:5, АЖ ПОТІМ РОБИМО КОПІЇ
+    //
+    // Порядок був зворотний, і саме він давав ту поломку, що описана
+    // вище в stale() — «avif-копії лишились від широкого оригіналу».
+    //
+    // ЯК ЦЕ ВИГЛЯДАЛО. Нове фото 1900×1900 лягало в теку. За один
+    // прогін збірка робила так:
+    //
+    //   1. buildMissingVariants брав ЩЕ КВАДРАТНУ базу і робив із неї
+    //      600×600 та 300×300 — і webp, і avif;
+    //   2. normalize() після цього приводив базу до 1200×1500 і
+    //      перероблював webp-копії — але avif він не робить.
+    //
+    // У теці лишались квадратні avif при вертикальній базі, а браузер
+    // бере саме avif. У рамці 4:5 це object-fit: cover, тобто сумка на
+    // сторінці товару обрізана з боків.
+    //
+    // Перевірка форми в stale() лагодила це НАСТУПНИМ прогоном — але
+    // між двома збірками сайт стоїть із обрізаними фото. Дешевше не
+    // створювати хибні копії взагалі.
+    if (apply && off.length) {
+
+        console.log(`Не в пропорціях 4:5: ${off.length} фото\n`);
+
+        off.forEach(info => console.log(`  ${info.width}×${info.height} (${info.ratio})  ${info.file}`));
+
+        console.log("");
+
+        for (const info of off) {
+            await normalize(info.file);
+            console.log(`  → 1200×1500 + копії 600/300: ${info.file}`);
+        }
+
+        console.log("");
+
+    }
+
     // Копії добудовуємо ЗАВЖДИ, а не лише для перероблених знімків:
     // фото могло приїхати з адмінки вже в потрібній пропорції.
     const patched = [];
@@ -377,25 +430,21 @@ async function main() {
 
     }
 
-    console.log(`Не в пропорціях 4:5: ${off.length} фото\n`);
-
-    off.forEach(info => console.log(`  ${info.width}×${info.height} (${info.ratio})  ${info.file}`));
-
     if (!apply) {
+
+        console.log(`Не в пропорціях 4:5: ${off.length} фото\n`);
+
+        off.forEach(info => console.log(`  ${info.width}×${info.height} (${info.ratio})  ${info.file}`));
+
         console.log("\nЦе лише звіт. Щоб переробити — додайте --apply");
+
         return;
-    }
 
-    console.log("");
-
-    for (const info of off) {
-        await normalize(info.file);
-        console.log(`  → 1200×1500 + копії 600/300: ${info.file}`);
     }
 
     const added = registerVariants(off.map(info => info.file));
 
-    console.log(`\nГотово: нормалізовано ${off.length}, у image-variants.json додано ${added}`);
+    console.log(`Готово: нормалізовано ${off.length}, у image-variants.json додано ${added}`);
 
 }
 

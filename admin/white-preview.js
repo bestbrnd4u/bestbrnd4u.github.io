@@ -46,8 +46,14 @@
     // і показане перестане збігатися з опублікованим. Тест звіряє їх
     // між файлами, щоб таке не проїхало непоміченим.
 
-    // Допуск навколо кольору фону: тіні й компресія дають кілька одиниць.
+    // Допуск навколо кольору фону: тіні й компресія дають кілька
+    // одиниць. Це ВЕРХНЯ межа — скільки взяти насправді, вирішує сам
+    // знімок (див. fillTolerance).
     var TOLERANCE = 14;
+
+    // Нижня межа допуску: навіть у синтетичного фону webp лишає розкид
+    // в одиницю.
+    var MIN_TOLERANCE = 2;
 
     // Наскільки рівною має бути замкнена область, щоб вважатись фоном.
     var MAX_VARIANCE = 3;
@@ -75,6 +81,26 @@
 
     // ---------- чиста математика (працює і в Node) ----------
 
+    // ДОПУСК РАХУЄМО ВІД САМОГО ТЛА, А НЕ БЕРЕМО ОДИН НА ВСІ ФОТО
+    //
+    // Пара до fillTolerance() у scripts/whiten-backgrounds.js — там і
+    // замір, і історія (біла сумка Coach, у якої заливка з допуском 14
+    // перейшла з фону на шкіру й стерла візерунок Signature).
+    //
+    // Коротко: 3σ шуму тла, затиснуті в [2, 14]. Рівний синтетичний
+    // фон дає 2, зйомка з градієнтом — ті самі 14, що й раніше.
+    //
+    // ОДНЕ РОЗХОДЖЕННЯ ЗІ ЗБІРКОЮ. Тут σ міряється на зменшеній копії
+    // (PROBE_MAX), а зменшення усереднює шум — тобто в прев'ю допуск
+    // виходить не більший за той, що візьме збірка. Помилка в бік
+    // обережності: гірше було б показати чисте біле там, де збірка
+    // лишить сіре.
+    function fillTolerance(noise) {
+
+        return Math.min(TOLERANCE, Math.max(MIN_TOLERANCE, Math.ceil(noise * 3)));
+
+    }
+
     // Кольори фону — з УСЬОГО периметра, а не з чотирьох кутів.
     //
     // ЩО БУЛО НЕ ТАК. Перед публікацією фото проходить
@@ -92,17 +118,29 @@
 
             if (px[i + 3] < 16) return;
 
+            // Яскравість збираємо, щоб потім спитати, наскільки
+            // рівне тло саме в цьому кадрі (див. fillTolerance).
+            var lum = (px[i] + px[i + 1] + px[i + 2]) / 3;
+
             for (var k = 0; k < groups.length; k++) {
 
                 var g = groups[k];
 
+                // Групуємо з ПОВНИМ допуском: тут завдання —
+                // зібрати 240 і 241 в один колір тла, а не вирішити,
+                // докуди тектиме заливка.
                 if (Math.abs(g.c[0] - px[i]) <= TOLERANCE
                     && Math.abs(g.c[1] - px[i + 1]) <= TOLERANCE
-                    && Math.abs(g.c[2] - px[i + 2]) <= TOLERANCE) { g.n++; return; }
+                    && Math.abs(g.c[2] - px[i + 2]) <= TOLERANCE) {
+                    g.n++;
+                    g.sum += lum;
+                    g.sum2 += lum * lum;
+                    return;
+                }
 
             }
 
-            groups.push({ c: [px[i], px[i + 1], px[i + 2]], n: 1 });
+            groups.push({ c: [px[i], px[i + 1], px[i + 2]], n: 1, sum: lum, sum2: lum * lum });
 
         }
 
@@ -131,11 +169,22 @@
             return Math.min(g.c[0], g.c[1], g.c[2]) >= DARK_BACKGROUND;
         });
 
+        // Шум тла — найбільший розкид серед світлих кольорів: допуск
+        // має витримати найшумніший із тих, по яких піде заливка.
+        var noise = light.reduce(function (worst, g) {
+
+            var mean = g.sum / g.n;
+
+            return Math.max(worst, Math.sqrt(Math.max(0, g.sum2 / g.n - mean * mean)));
+
+        }, 0);
+
         // Покриття — по світлих: інакше темна пляма ще й підвищувала б
         // однорідність, тобто сама себе пропускала.
         return {
             colors: light.map(function (g) { return g.c; }),
-            coverage: light.reduce(function (s, g) { return s + g.n; }, 0) / total
+            coverage: light.reduce(function (s, g) { return s + g.n; }, 0) / total,
+            noise: noise
         };
 
     }
@@ -145,39 +194,87 @@
     // Предметне фото — це товар УСЕРЕДИНІ кадру, з фоном навколо. Якщо
     // кадр обрізає знімок (модель по пояс, макрозйомка нутрощів
     // сумки), заливка йде вздовж товару всередину й з'їдає його.
-    function runsOffFrame(px, w, h, colors) {
+    //
+    // ДИВИМОСЬ НА МЕЖУ ЗНІМКА, А НЕ ПОЛОТНА. Пара до
+    // subjectRunsOffFrame() у scripts/whiten-backgrounds.js — там і
+    // замір: край полотна 1200×1500 це біла добивка до 4:5, «товару»
+    // на ній немає ніколи, і перевірка мовчала завжди.
+    function runsOffFrame(px, w, h, colors, tol, box) {
 
-        var band = Math.max(2, Math.round(Math.min(w, h) * 0.01));
+        var bw = box.x1 - box.x0 + 1;
+        var bh = box.y1 - box.y0 + 1;
+
+        var band = Math.max(2, Math.round(Math.min(bw, bh) * 0.01));
 
         var top = 0, bottom = 0, left = 0, right = 0;
         var x, y, d;
 
-        for (x = 0; x < w; x++) {
+        for (x = box.x0; x <= box.x1; x++) {
             for (d = 0; d < band; d++) {
-                if (!matchesBackground(px, (d * w + x) * 4, colors)) top++;
-                if (!matchesBackground(px, ((h - 1 - d) * w + x) * 4, colors)) bottom++;
+                if (!matchesBackground(px, ((box.y0 + d) * w + x) * 4, colors, tol)) top++;
+                if (!matchesBackground(px, ((box.y1 - d) * w + x) * 4, colors, tol)) bottom++;
             }
         }
 
-        for (y = 0; y < h; y++) {
+        for (y = box.y0; y <= box.y1; y++) {
             for (d = 0; d < band; d++) {
-                if (!matchesBackground(px, (y * w + d) * 4, colors)) left++;
-                if (!matchesBackground(px, (y * w + (w - 1 - d)) * 4, colors)) right++;
+                if (!matchesBackground(px, (y * w + box.x0 + d) * 4, colors, tol)) left++;
+                if (!matchesBackground(px, (y * w + box.x1 - d) * 4, colors, tol)) right++;
             }
         }
 
-        return Math.max(top / (w * band), bottom / (w * band),
-            left / (h * band), right / (h * band)) > EDGE_SHARE;
+        return Math.max(top / (bw * band), bottom / (bw * band),
+            left / (bh * band), right / (bh * band)) > EDGE_SHARE;
 
     }
 
-    function matchesBackground(px, i, colors) {
+    // Межі самого знімка всередині полотна 4:5: відкидаємо суцільно
+    // білі рядки й стовпці — це добивка, яку дописав
+    // normalize-product-images.js.
+    function contentBox(px, w, h) {
+
+        var x, y;
+
+        function whiteRow(row) {
+            var off = 0;
+            for (x = 0; x < w; x++) {
+                var i = (row * w + x) * 4;
+                if (px[i] < 253 || px[i + 1] < 253 || px[i + 2] < 253) off++;
+            }
+            return off / w < 0.005;
+        }
+
+        function whiteCol(col) {
+            var off = 0;
+            for (y = 0; y < h; y++) {
+                var i = (y * w + col) * 4;
+                if (px[i] < 253 || px[i + 1] < 253 || px[i + 2] < 253) off++;
+            }
+            return off / h < 0.005;
+        }
+
+        var x0 = 0, y0 = 0, x1 = w - 1, y1 = h - 1;
+
+        while (y0 < y1 && whiteRow(y0)) y0++;
+        while (y1 > y0 && whiteRow(y1)) y1--;
+        while (x0 < x1 && whiteCol(x0)) x0++;
+        while (x1 > x0 && whiteCol(x1)) x1--;
+
+        return { x0: x0, y0: y0, x1: x1, y1: y1 };
+
+    }
+
+    function matchesBackground(px, i, colors, tol) {
+
+        // Без явного допуску — верхня межа: цю ж функцію викликає
+        // віджет кадрування зі своїми числами.
+        var limit = typeof tol === "number" ? tol : TOLERANCE;
 
         for (var k = 0; k < colors.length; k++) {
 
-            if (Math.abs(px[i] - colors[k][0]) <= TOLERANCE
-                && Math.abs(px[i + 1] - colors[k][1]) <= TOLERANCE
-                && Math.abs(px[i + 2] - colors[k][2]) <= TOLERANCE) return true;
+            if (Math.abs(px[i] - colors[k][0]) <= limit
+                && Math.abs(px[i + 1] - colors[k][1]) <= limit
+                && Math.abs(px[i + 2] - colors[k][2]) <= limit) return true;
 
         }
 
@@ -188,7 +285,7 @@
     // Заливка від країв + замкнені кишені. Міняє px НА МІСЦІ й повертає
     // кількість зафарбованих пікселів — саме за нею збірка вирішує, чи
     // не залилось часом усе фото.
-    function whitenPixels(px, w, h, colors) {
+    function whitenPixels(px, w, h, colors, tol) {
 
         var visited = new Uint8Array(w * h);
         var queue = [];
@@ -206,7 +303,7 @@
 
             if (px[i + 3] < 16) { visited[p] = 1; return; }
 
-            if (!matchesBackground(px, i, colors)) return;
+            if (!matchesBackground(px, i, colors, tol)) return;
 
             visited[p] = 1;
             queue.push(p);
@@ -247,7 +344,7 @@
         // сумки стала б білою дірою.
         for (var start = 0; start < w * h; start++) {
 
-            if (visited[start] || !matchesBackground(px, start * 4, colors)) continue;
+            if (visited[start] || !matchesBackground(px, start * 4, colors, tol)) continue;
 
             var cells = [];
             var pocket = [start];
@@ -282,7 +379,7 @@
 
                     var n = ay * w + ax;
 
-                    if (visited[n] || !matchesBackground(px, n * 4, colors)) continue;
+                    if (visited[n] || !matchesBackground(px, n * 4, colors, tol)) continue;
 
                     visited[n] = 1;
                     pocket.push(n);
@@ -321,9 +418,16 @@
 
         var white = function (c) { return Math.min(c[0], c[1], c[2]) >= ALREADY_WHITE; };
 
+        var tol = fillTolerance(found.noise);
+
         return {
 
             colors: found.colors,
+
+            // Допуск для заливки цього саме фото. Іде далі разом із
+            // кольорами: розірвати їх означало б залити одним правилом
+            // те, що знайшли за іншим.
+            tol: tol,
 
             // Колір для кружечка в підписі — НЕбілий, якщо він є. Біле
             // здебільшого виявляється добивкою до 4:5, і показувати її
@@ -336,7 +440,7 @@
 
             isWhite: found.colors.every(white),
 
-            cropped: runsOffFrame(px, w, h, found.colors)
+            cropped: runsOffFrame(px, w, h, found.colors, tol, contentBox(px, w, h))
 
         };
 
@@ -481,7 +585,7 @@
 
                     var px = new Uint8ClampedArray(shot.data);
 
-                    var painted = whitenPixels(px, shot.w, shot.h, found.colors);
+                    var painted = whitenPixels(px, shot.w, shot.h, found.colors, found.tol);
 
                     // Той самий запобіжник, що в збірці: залилось майже
                     // все — значить, фон визначено неправильно, і збірка
@@ -553,6 +657,7 @@
     root.WhitePreview = {
 
         TOLERANCE: TOLERANCE,
+        MIN_TOLERANCE: MIN_TOLERANCE,
         MAX_VARIANCE: MAX_VARIANCE,
         ALREADY_WHITE: ALREADY_WHITE,
         MAX_SHARE: MAX_SHARE,
@@ -561,6 +666,8 @@
         PROBE_MAX: PROBE_MAX,
         PREVIEW_MAX: PREVIEW_MAX,
 
+        fillTolerance: fillTolerance,
+        contentBox: contentBox,
         borderColors: borderColors,
         matchesBackground: matchesBackground,
         whitenPixels: whitenPixels,

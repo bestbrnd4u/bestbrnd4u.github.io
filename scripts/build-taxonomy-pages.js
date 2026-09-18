@@ -120,6 +120,11 @@ const TITLE_SLOT = '<span id="catalogTitle">Каталог товарів</span>
 const ABOUT_SLOT = '<div class="brand-about" id="brandAbout" hidden></div>';
 const HERO_SLOT = '<div class="brand-hero" id="brandHero" hidden></div>';
 const SUBTITLE_RE = /<p id="catalogSubtitle">[\s\S]*?<\/p>/;
+// Кожна плашка каркаса лежить одним рядком, тож блок читається без
+// підрахунку вкладених </div>: відкриття, кілька рядків-карток,
+// закриття. Зміниться форматування — regexp перестане збігатись, і
+// buildTemplate() скаже про це вголос замість тихо лишити каркас.
+const SKELETON_RE = /<div class="catalog-skeleton"[^>]*>\n(?:<div class="skeleton-card">.*<\/div>\n)+<\/div>\n/;
 
 function buildTemplate() {
 
@@ -154,6 +159,23 @@ function buildTemplate() {
     if (!html.includes(TITLE_SLOT)) {
         throw new Error("У catalog.html не знайдено заголовок #catalogTitle");
     }
+
+    // КАРКАС ТУТ ЗАЙВИЙ.
+    //
+    // У /catalog сітка порожня до приходу даних, і плашки каркаса
+    // тримають її форму. А на сторінці бренду чи категорії в сітку вже
+    // вкладено справжній перелік товарів — він доїжджає разом з HTML і
+    // працює навіть без JS.
+    //
+    // Каркас над ним означав би два екрани заглушок перед готовим
+    // вмістом: людина гортала б повз те, чого не існує, до того, що вже
+    // є. Тому на цих сторінках лишаємо тільки напис для читалки.
+    if (!SKELETON_RE.test(html)) {
+        throw new Error("У catalog.html не знайдено каркас .catalog-skeleton — "
+            + "шаблон змінився, перевірте scripts/build-taxonomy-pages.js");
+    }
+
+    html = html.replace(SKELETON_RE, "");
 
     return html;
 

@@ -514,6 +514,7 @@ const loader = document.getElementById("catalogLoader");
 const emptyState = document.getElementById("emptyCatalog");
 
 const productsCount = document.getElementById("productsCount");
+const productsCountLine = document.getElementById("productsCountLine");
 const productsCounter = document.getElementById("productsCounter");
 
 const resetBtn = document.getElementById("resetFilters");
@@ -852,6 +853,17 @@ async function initCatalog() {
 
         loader.hidden = false;
 
+        // Поки каталог їде, фільтри й сортування нема з чого будувати:
+        // і перелік брендів, і кольори, і розміри збираються з того
+        // самого файлу. Натиснута «Бренд» відкривала порожній список,
+        // тобто виглядала зламаною. Клас гасить їх до приходу даних;
+        // знімається у finally, тож і після помилки вони оживають.
+        //
+        // Ставимо саме тут, з JS, а не в розмітці: якщо скрипт зовсім
+        // не доїхав, елементи лишаються звичайними, а не назавжди
+        // погашеними.
+        document.body.classList.add("catalog-loading");
+
         // Каталог і живий залишок — одночасно, а не одне за одним.
         //
         // Запит до бази зазвичай швидший за 326 КБ каталогу, тож
@@ -987,17 +999,41 @@ async function initCatalog() {
 
     } catch (error) {
 
+        // ПОМИЛКА — ЦЕ НЕ КІНЕЦЬ РОЗМОВИ.
+        //
+        // Найчастіша причина тут — поганий звʼязок, а не поламаний
+        // сайт: 44 КБ каталогу не доїхали. Раніше людина бачила один
+        // червоний рядок і мусила сама здогадатись перезавантажити
+        // сторінку. Кнопка робить це за неї.
         grid.innerHTML = `
-            <p class="error">
-                Помилка завантаження каталогу.
-            </p>
+            <div class="catalog-error">
+                <p class="error">Не вдалося завантажити каталог.</p>
+                <p class="catalog-error-hint">Схоже на проблему зі звʼязком. Спробуйте ще раз.</p>
+                <button type="button" class="btn" id="catalogRetry">Спробувати ще раз</button>
+            </div>
         `;
+
+        const retry = document.getElementById("catalogRetry");
+
+        if (retry) retry.addEventListener("click", () => location.reload());
+
+        // Лічильник ховаємо цілком. Інакше у finally з нього знімається
+        // сіра плашка — і над помилкою лишається самотнє слово
+        // «товарів» без числа.
+        if (productsCountLine) productsCountLine.hidden = true;
 
         console.error(error);
 
     } finally {
 
         loader.hidden = true;
+
+        document.body.classList.remove("catalog-loading");
+
+        // Рядок лічильника більше не «вантажиться»: або в ньому число,
+        // або сторінка показує помилку — і в другому випадку сіра
+        // плашка замість числа висіла б вічно.
+        if (productsCountLine) productsCountLine.classList.remove("is-loading");
 
     }
 

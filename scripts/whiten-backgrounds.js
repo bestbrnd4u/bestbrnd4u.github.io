@@ -62,7 +62,58 @@ const ALREADY_WHITE = 250;
 
 // Допуск навколо кольору тла. Той самий, що у віджеті кадрування:
 // тіні й компресія дають відхилення на кілька одиниць.
+//
+// Це ВЕРХНЯ межа, а не постійна величина: скільки взяти насправді,
+// вирішує сам знімок — див. fillTolerance нижче.
 const TOLERANCE = 14;
+
+// Нижня межа допуску. Нуль означав би «тло мусить бути байт у байт»,
+// а такого не буває навіть у синтетичного фону: webp при quality 88
+// дає розкид в одиницю.
+const MIN_TOLERANCE = 2;
+
+// ДОПУСК РАХУЄМО ВІД САМОГО ТЛА, А НЕ БЕРЕМО ОДИН НА ВСІ ФОТО
+//
+// ЩО БУЛО НЕ ТАК (знайдено на сумці Coach Klare, ca148_imrfi_a0)
+// ---------------------------------------------------------------
+// Біла сумка на сірому тлі. Тло — рівно 240,240,240, добивка до 4:5 —
+// рівно 255,255,255. Клапан сумки — біла шкіра з ледь помітним
+// тоновим візерунком Signature, тобто 214–241.
+//
+// З допуском 14 «тлом» вважалось усе від 226 до 254. Це половина
+// клапана. Заливка спокійно перейшла з фону на шкіру, пройшла крізь
+// сумку й стерла візерунок: 18 880 пікселів товару стали білими.
+// Власник побачив це як «картинку сильно покраїло».
+//
+// Жоден із наявних запобіжників не спрацював: фон однорідний (так і
+// є), товар у межах кадру (так і є), а перевірка постфактум шукає
+// ТЕМНІ зафарбовані пікселі — на білій сумці темних немає.
+//
+// ЧОМУ САМЕ ТАК ЛАГОДИМО
+// -----------------------
+// Допуск 14 існує заради шуму компресії. Але шум у кожного знімка
+// свій, і його видно прямо на периметрі кадру. Замір по 161 фото,
+// які заливка колись обробляла:
+//
+//   σ тла 0.00–0.28   126 фото   синтетичний фон, шуму немає
+//   σ тла 2.4–7.4      35 фото   зйомка, jpeg, градієнт
+//
+// Тобто в 126 випадках із 161 допуск 14 був завеликий у півсотні
+// разів. Беремо 3σ — правило, яке покриває 99.7% шуму, — і
+// затискаємо в межі [2, 14]:
+//
+//   ca148_imrfi_a0   σ 0.28 → 2    (зʼїдено 0 пікселів замість 18 880)
+//   cz398_qbmi5_a91  σ 4.91 → 14
+//   p00545136_d1     σ 6.87 → 14
+//
+// Шумні фото лишаються з тим самим допуском, що й були, тобто нічого
+// з уже зробленого не змінюється. Вужчим стає тільки випадок рівного
+// фону — той самий, на якому й зламалось.
+function fillTolerance(noise) {
+
+    return Math.min(TOLERANCE, Math.max(MIN_TOLERANCE, Math.ceil(noise * 3)));
+
+}
 
 // Наскільки рівною має бути замкнена область, щоб вважатись фоном.
 // Фон однорідний; шкіра, тканина й підкладка мають фактуру.
@@ -80,13 +131,13 @@ const EDGE_SHARE = 0.05;
 // вийшла за межі фону: світлий фон не буває темним.
 const MAX_DARK_PAINTED = 0.005;
 
-function isBackground(data, i, colors) {
+function isBackground(data, i, colors, tol) {
 
     for (const bg of colors) {
 
-        if (Math.abs(data[i] - bg[0]) <= TOLERANCE
-            && Math.abs(data[i + 1] - bg[1]) <= TOLERANCE
-            && Math.abs(data[i + 2] - bg[2]) <= TOLERANCE) return true;
+        if (Math.abs(data[i] - bg[0]) <= tol
+            && Math.abs(data[i + 1] - bg[1]) <= tol
+            && Math.abs(data[i + 2] - bg[2]) <= tol) return true;
 
     }
 
@@ -128,15 +179,27 @@ function borderColors(data, w, h) {
 
         if (data[i + 3] < 16) return;   // прозорий — не колір
 
+        // Яскравість кожного зразка накопичуємо, щоб потім спитати,
+        // наскільки тло рівне САМЕ В ЦЬОМУ кадрі (див. fillTolerance).
+        const lum = (data[i] + data[i + 1] + data[i + 2]) / 3;
+
         for (const g of groups) {
 
+            // Групуємо з ПОВНИМ допуском, навіть якщо заливка потім
+            // піде з вужчим: тут завдання інше — зібрати 240 і 241 в
+            // один колір тла, а не вирішити, докуди тектиме заливка.
             if (Math.abs(g.c[0] - data[i]) <= TOLERANCE
                 && Math.abs(g.c[1] - data[i + 1]) <= TOLERANCE
-                && Math.abs(g.c[2] - data[i + 2]) <= TOLERANCE) { g.n++; return; }
+                && Math.abs(g.c[2] - data[i + 2]) <= TOLERANCE) {
+                g.n++;
+                g.sum += lum;
+                g.sum2 += lum * lum;
+                return;
+            }
 
         }
 
-        groups.push({ c: [data[i], data[i + 1], data[i + 2]], n: 1 });
+        groups.push({ c: [data[i], data[i + 1], data[i + 2]], n: 1, sum: lum, sum2: lum * lum });
 
     };
 
@@ -172,12 +235,67 @@ function borderColors(data, w, h) {
     // а стирати ми нічого не збирались.
     const light = kept.filter(g => Math.min(g.c[0], g.c[1], g.c[2]) >= DARK_BACKGROUND);
 
+    // Шум тла — найбільший розкид серед світлих кольорів периметра.
+    // Найбільший, а не середній: допуск має витримати найшумніший із
+    // тих кольорів, по яких піде заливка.
+    const noise = light.reduce((worst, g) => {
+
+        const mean = g.sum / g.n;
+
+        return Math.max(worst, Math.sqrt(Math.max(0, g.sum2 / g.n - mean * mean)));
+
+    }, 0);
+
     // Покриття рахуємо ПО СВІТЛИХ. Інакше темна пляма на периметрі ще
     // й підвищувала б однорідність — тобто сама себе пропускала.
     return {
         colors: light.map(g => g.c),
-        coverage: light.reduce((sum, g) => sum + g.n, 0) / total
+        coverage: light.reduce((sum, g) => sum + g.n, 0) / total,
+        noise
     };
+
+}
+
+// Межі САМОГО ЗНІМКА всередині полотна 4:5.
+//
+// НАВІЩО. normalize-product-images.js вписує фото в холст 1200×1500 і
+// добиває поля чисто білим. Тобто край полотна — це майже завжди
+// добивка, а не край знімка. Будь-яка перевірка, яка дивиться на
+// «рамку кадру», насправді дивиться на ці білі поля.
+//
+// Відкидаємо суцільно білі рядки й стовпці — лишається прямокутник
+// самого знімка. Півпроцента допуску на рядок: webp при quality 90
+// лишає в добивці поодинокі 254.
+function contentBox(data, w, h) {
+
+    const clean = (count, of) => count / of < 0.005;
+
+    const whiteRow = y => {
+        let off = 0;
+        for (let x = 0; x < w; x++) {
+            const i = (y * w + x) * 4;
+            if (data[i] < 253 || data[i + 1] < 253 || data[i + 2] < 253) off++;
+        }
+        return clean(off, w);
+    };
+
+    const whiteCol = x => {
+        let off = 0;
+        for (let y = 0; y < h; y++) {
+            const i = (y * w + x) * 4;
+            if (data[i] < 253 || data[i + 1] < 253 || data[i + 2] < 253) off++;
+        }
+        return clean(off, h);
+    };
+
+    let x0 = 0, y0 = 0, x1 = w - 1, y1 = h - 1;
+
+    while (y0 < y1 && whiteRow(y0)) y0++;
+    while (y1 > y0 && whiteRow(y1)) y1--;
+    while (x0 < x1 && whiteCol(x0)) x0++;
+    while (x1 > x0 && whiteCol(x1)) x1--;
+
+    return { x0, y0, x1, y1 };
 
 }
 
@@ -195,35 +313,58 @@ function borderColors(data, w, h) {
 //
 // Ціна помилки несиметрична: пропущене фото просто лишається з тим
 // фоном, який мало досі, а зіпсоване — це стерта модель.
-function subjectRunsOffFrame(data, w, h, colors) {
+//
+// ДИВИМОСЬ НА МЕЖУ ЗНІМКА, А НЕ ПОЛОТНА
+// --------------------------------------
+// Тут була дірка, через яку запобіжник мовчав узагалі. Він обходив
+// край полотна 1200×1500 — а це біла добивка до 4:5, однакова в усіх
+// фото. «Товару» на ній немає ніколи, тож частка виходила рівно 0.0%
+// і перевірка пропускала все.
+//
+// Заміряно на п'яти фото з моделями, які через це постраждали:
+//
+//   файл                  по полотну   по знімку
+//   73995_lhtau_a91          0.0%        75.9%   ← біла сукня
+//   51655546705003           0.0%        71.2%
+//   cr144_svbk_a91           0.0%        68.0%
+//   cet55_mwoy2_a91          0.0%        50.7%   ← білі штани
+//   ca148_imrfi_a92          0.0%        31.4%
+//
+// На предметних фото того ж каталогу (ca148_imrfi_a0, cr144_svha_a0,
+// cr144_svha_a3, ca148_imrfi_a3) по знімку так само 0.0% — тобто межа
+// в 5% розводить ці два випадки начисто.
+function subjectRunsOffFrame(data, w, h, colors, tol, box) {
 
     const isBg = i => colors.some(c =>
-        Math.abs(data[i] - c[0]) <= TOLERANCE
-        && Math.abs(data[i + 1] - c[1]) <= TOLERANCE
-        && Math.abs(data[i + 2] - c[2]) <= TOLERANCE);
+        Math.abs(data[i] - c[0]) <= tol
+        && Math.abs(data[i + 1] - c[1]) <= tol
+        && Math.abs(data[i + 2] - c[2]) <= tol);
+
+    const bw = box.x1 - box.x0 + 1;
+    const bh = box.y1 - box.y0 + 1;
 
     // Смуга в 1% від меншої сторони, а не один піксель: край знімка
     // майже завжди має шум компресії.
-    const band = Math.max(2, Math.round(Math.min(w, h) * 0.01));
+    const band = Math.max(2, Math.round(Math.min(bw, bh) * 0.01));
 
     let top = 0, bottom = 0, left = 0, right = 0;
 
-    for (let x = 0; x < w; x++) {
+    for (let x = box.x0; x <= box.x1; x++) {
         for (let d = 0; d < band; d++) {
-            if (!isBg((d * w + x) * 4)) top++;
-            if (!isBg(((h - 1 - d) * w + x) * 4)) bottom++;
+            if (!isBg(((box.y0 + d) * w + x) * 4)) top++;
+            if (!isBg(((box.y1 - d) * w + x) * 4)) bottom++;
         }
     }
 
-    for (let y = 0; y < h; y++) {
+    for (let y = box.y0; y <= box.y1; y++) {
         for (let d = 0; d < band; d++) {
-            if (!isBg((y * w + d) * 4)) left++;
-            if (!isBg((y * w + (w - 1 - d)) * 4)) right++;
+            if (!isBg((y * w + box.x0 + d) * 4)) left++;
+            if (!isBg((y * w + box.x1 - d) * 4)) right++;
         }
     }
 
-    return Math.max(top / (w * band), bottom / (w * band),
-        left / (h * band), right / (h * band)) > EDGE_SHARE;
+    return Math.max(top / (bw * band), bottom / (bw * band),
+        left / (bh * band), right / (bh * band)) > EDGE_SHARE;
 
 }
 
@@ -240,13 +381,13 @@ function subjectRunsOffFrame(data, w, h, colors) {
 // Однорідність — той самий запобіжник, що й скрізь у цьому файлі: без
 // нього світла підкладка всередині сумки, яка випадково збіглась із
 // фоном, стала б білою дірою. Фон рівний, підкладка має фактуру.
-function fillPockets(data, w, h, colors, visited) {
+function fillPockets(data, w, h, colors, visited, tol) {
 
     let painted = 0;
 
     for (let start = 0; start < w * h; start++) {
 
-        if (visited[start] || !isBackground(data, start * 4, colors)) continue;
+        if (visited[start] || !isBackground(data, start * 4, colors, tol)) continue;
 
         const cells = [];
         const queue = [start];
@@ -277,7 +418,7 @@ function fillPockets(data, w, h, colors, visited) {
 
                 const q = ny * w + nx;
 
-                if (visited[q] || !isBackground(data, q * 4, colors)) return;
+                if (visited[q] || !isBackground(data, q * 4, colors, tol)) return;
 
                 visited[q] = 1;
                 queue.push(q);
@@ -311,7 +452,7 @@ function fillPockets(data, w, h, colors, visited) {
 // Класичний обхід у ширину зі стартом на рамці кадру. Пікселі товару
 // не зачіпаються, навіть якщо їхній колір збігається з тлом: до них
 // просто не дійде черга, бо шлях перекритий самим товаром.
-function fillFromEdges(data, w, h, colors, visited) {
+function fillFromEdges(data, w, h, colors, visited, tol) {
 
     const queue = [];
 
@@ -327,7 +468,7 @@ function fillFromEdges(data, w, h, colors, visited) {
 
         if (data[i + 3] < 16) { visited[p] = 1; return; }   // прозорий — уже тло
 
-        if (!isBackground(data, i, colors)) return;
+        if (!isBackground(data, i, colors, tol)) return;
 
         visited[p] = 1;
         queue.push(p);
@@ -429,7 +570,9 @@ async function whiten(file, apply, choice) {
     const w = info.width;
     const h = info.height;
 
-    const { colors, coverage } = borderColors(data, w, h);
+    const { colors, coverage, noise } = borderColors(data, w, h);
+
+    const tol = fillTolerance(noise);
 
     const decided = choice ? choice[file] : null;
 
@@ -561,7 +704,7 @@ async function whiten(file, apply, choice) {
     // межу кадру, заливка йде вздовж нього всередину й з'їдає його.
     // Цей запобіжник теж не обходиться примусово — саме він рятує
     // фото на моделях.
-    if (subjectRunsOffFrame(data, w, h, colors)) {
+    if (subjectRunsOffFrame(data, w, h, colors, tol, contentBox(data, w, h))) {
         return { skip: "кадр обрізає товар — не предметне фото" };
     }
 
@@ -573,8 +716,8 @@ async function whiten(file, apply, choice) {
 
     const visited = new Uint8Array(w * h);
 
-    const painted = fillFromEdges(data, w, h, colors, visited)
-        + fillPockets(data, w, h, colors, visited);
+    const painted = fillFromEdges(data, w, h, colors, visited, tol)
+        + fillPockets(data, w, h, colors, visited, tol);
 
     const share = painted / (w * h);
 
@@ -609,7 +752,7 @@ async function whiten(file, apply, choice) {
         return { skip: `заливка зачепила товар (${(dark / painted * 100).toFixed(1)}% темного)` };
     }
 
-    if (!apply) return { would: Math.round(share * 100), bg: (colors.find(c => Math.min(c[0], c[1], c[2]) < ALREADY_WHITE) || colors[0])[0] };
+    if (!apply) return { would: Math.round(share * 100), tol, bg: (colors.find(c => Math.min(c[0], c[1], c[2]) < ALREADY_WHITE) || colors[0])[0] };
 
     fs.mkdirSync(BACKUP, { recursive: true });
 
@@ -625,7 +768,7 @@ async function whiten(file, apply, choice) {
 
     fs.renameSync(full + ".tmp", full);
 
-    return { done: Math.round(share * 100), bg: (colors.find(c => Math.min(c[0], c[1], c[2]) < ALREADY_WHITE) || colors[0])[0] };
+    return { done: Math.round(share * 100), tol, bg: (colors.find(c => Math.min(c[0], c[1], c[2]) < ALREADY_WHITE) || colors[0])[0] };
 
 }
 
@@ -673,7 +816,7 @@ async function main() {
 
         if (touched <= 10) {
             console.log(`   ${file}: тло ${result.bg} → біле`
-                + ` (${result.done || result.would}% кадру)`);
+                + ` (${result.done || result.would}% кадру, допуск ${result.tol})`);
         }
 
     }

@@ -2,7 +2,7 @@
 <html lang="uk">
 
 <head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"e9325f82","data/catalog.json":"bc30b200","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"6a5c125f","data/legal.json":"f84751b2","data/notifications.json":"a35b367f","data/product-texts.json":"278df72d","data/products-updated.json":"ff6ca27b","data/products.json":"af3309ad","data/promo-popups.json":"0940ece5","data/promotions.json":"71677766","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/security.json":"0c05c691","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"584f8595","data/catalog.json":"09f947e2","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"c1d6d1ac","data/image-variants.json":"6a5c125f","data/legal.json":"f84751b2","data/notifications.json":"a35b367f","data/product-texts.json":"278df72d","data/products-updated.json":"475aefa5","data/products.json":"4dfda810","data/promo-popups.json":"0940ece5","data/promotions.json":"71677766","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/security.json":"0c05c691","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script>
 
 <!-- Сторінка лежить у /brands/<slug>/ або /categories/<slug>/,
      а скрипти будують шляхи як з кореня ("data/products.json").
@@ -214,7 +214,7 @@ window.CATALOG_PRESET = {"department":"Аксесуари"};
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=9372349b">
+<link rel="stylesheet" href="/assets/css/style.css?v=fcdbb5f9">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3" defer></script>
 
@@ -548,10 +548,20 @@ placeholder="Пошук товару...">
 
 <main>
 <div class="catalog-top">
-<p>
-<span id="productsCount">
-0
-</span>
+<!-- «0 товарів» ДО ЗАВАНТАЖЕННЯ — ЦЕ НЕПРАВДА.
+
+     Тут стояв зашитий нуль, і на повільному звʼязку людина кілька
+     секунд читала «0 товарів» — рівно те саме, що каталог каже, коли
+     фільтри нічого не знайшли. Тобто сторінка повідомляла, що товарів
+     немає, замість «ще несемо».
+
+     Клас is-loading ховає число й слово і малює на їх місці сіру
+     плашку (див. .catalog-count.is-loading у style.css): рядок тримає
+     свою висоту, тож коли приїде справжнє число, нічого не стрибне.
+     Знімає клас catalog.js у finally — тобто й тоді, коли каталог не
+     завантажився взагалі. -->
+<p id="productsCountLine" class="catalog-count is-loading">
+<span id="productsCount"></span>
 <!-- Слово окремим вузлом: його міняє catalog.js разом із числом,
      інакше «1 товарів». Правило відмінювання — plural() у common.js. -->
 <span id="productsCountWord">товарів</span>
@@ -587,11 +597,33 @@ placeholder="Пошук товару...">
 </div>
 </div>
 
+<!-- КАРКАС ЗАМІСТЬ САМОТНЬОГО СПІНЕРА
+
+     Каталог важить 44 КБ у стиснутому вигляді. На поганому мобільному
+     звʼязку це кілька секунд, і весь цей час під панеллю фільтрів була
+     порожнеча зі спінером десь унизу: сторінка виглядала як магазин,
+     у якому нічого немає.
+
+     Тепер там стоять плашки карток тієї самої геометрії, що й
+     справжні — 4:5 на десктопі, 1:1 у дві колонки на телефоні. Дає
+     дві речі одразу:
+
+       • видно, ЩО саме зараз приїде і скільки його буде;
+       • коли товари приходять, сітка не стрибає — каркас уже займав
+         рівно те місце, яке займуть картки.
+
+     Сам напис лишається для читалки екрана (role="status"), а очам
+     вистачає руху плашок.
+
+     На сторінках брендів і категорій каркаса немає: там у сітці вже
+     лежить справжній перелік товарів, і показувати над ним
+     заглушки означало б відсунути готовий вміст (див.
+     scripts/build-taxonomy-pages.js). -->
 <div
 id="catalogLoader"
-class="loader">
-<div class="spinner"></div>
-<p>
+class="loader catalog-loader"
+role="status">
+<p class="loader-note">
 Завантаження товарів...
 </p>
 </div>
@@ -929,7 +961,7 @@ aria-label="Нагору">
 <script src="/assets/js/ui.js?v=0e98b39d" defer></script>
 <script src="/assets/js/stock.js?v=85fa4aad" defer></script>
 <script src="/assets/js/live-stock.js?v=ca9027dd" defer></script>
-<script src="/assets/js/catalog.js?v=f3d55615" defer></script>
+<script src="/assets/js/catalog.js?v=7a00de91" defer></script>
 </body>
 
 </html>

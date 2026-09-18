@@ -8,7 +8,14 @@ const ROOT = require("path").join(__dirname, "..");
 let failures=0;
 const check=(n,c,e)=>{if(c)console.log("  ✓",n);else{console.log("  ✗",n,e!==undefined?"→ "+e:"");failures++;}};
 
-const css=fs.readFileSync(path.join(ROOT,"assets/css/style.css"),"utf8");
+// Коментарі відкидаємо ОДРАЗУ, ще до всіх пошуків.
+//
+// Інакше перевірка читає їх як правила: варто комусь написати в
+// поясненні «дзеркало до #catalogGrid.products-grid:not(.list-view)»,
+// і набір падає на селекторі, якого в файлі немає. Саме так і сталось
+// — на коментарі до каркаса каталогу.
+const css=fs.readFileSync(path.join(ROOT,"assets/css/style.css"),"utf8")
+    .replace(/\/\*[\s\S]*?\*\//g,"");
 
 function rule(selector){
   // шукаємо ВІД ПОЧАТКУ РЯДКА (з опційним відступом) — інакше
