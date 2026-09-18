@@ -236,9 +236,28 @@ console.log("\n[2c] Обробка робиться РАЗ, а не на кож�
         /sharp\(input\)/.test(cutSrc) && !/sharp\(file\)/.test(cutSrc));
 }
 
-// Перевірка на СПРАВЖНІХ файлах: у кожного фото з рішенням адмінки
-// периметр мусить бути рівно білим — тоді наступна збірка його
-// пропустить.
+// Перевірка на СПРАВЖНІХ файлах: повторна збірка не має псувати фото,
+// для яких адміністратор щось вибрав.
+//
+// ЩО ТУТ СТОЯЛО РАНІШЕ Й ЧОМУ ЦЬОГО НЕ ВИСТАЧИЛО
+// -----------------------------------------------
+// Вимагалось, щоб периметр кадру був рівно білий: тоді наступна
+// збірка визнає роботу зробленою й пропустить фото.
+//
+// На крупному плані сумка ВПИРАЄТЬСЯ в край кадру — після вирізання
+// периметр там не може стати білим у принципі. Тобто для такого фото
+// умова не виконається ніколи, і збірка різала його знову й знову.
+// На сумці Jacquemus так і сталось: файл переписано в трьох комітах
+// «перезбірка» підряд, темна шкіра вицвіла, навколо лишились сірі
+// клапті, на фото з моделлю зникла частина сукні.
+//
+// Тепер вирізання завжди бере ОРИГІНАЛ із _originals, а не те, що вже
+// лежить у uploads. Мережа детермінована, отже повторний прогін дає
+// той самий файл — псуватись нічому.
+//
+// Тому й перевіряємо тепер саме це: опублікований файл мусить
+// збігатися з тим, що дає вирізання ОРИГІНАЛУ. Розійдуться — значить
+// його зробили з уже обробленого знімка.
 //
 // Перелік беремо з каталогу, а не вписуємо руками: рішень стане
 // більше, і жорсткий список тут швидко застаріє.
@@ -265,38 +284,91 @@ function decidedPhotosStayPut() {
 
     });
 
-    console.log("\n[2d] Фото з рішенням адмінки більше не переробляються");
+    console.log("\n[2d] Повторна збірка не псує фото з рішенням адмінки");
 
     check("рішення в каталозі є (інакше перевіряти нічого)", decided.length > 0, decided.length);
 
-    const border = async ({ name, bg }) => {
+    const originals = path.join(ROOT, "assets/images/_originals");
 
-        const full = path.join(uploads, name);
+    // Джерело вирізання — оригінал. Це головне, що тримає всю
+    // конструкцію: без нього кожна збірка різатиме вже вирізане.
+    const script = read("scripts/whiten-backgrounds.js")
+        .replace(/\/\*[\s\S]*?\*\//g, "")
+        .split("\n").filter(line => !/^\s*\/\//.test(line)).join("\n");
 
-        if (!fs.existsSync(full)) { check(name + " — файл на місці", false); return; }
+    check("вирізання бере оригінал, а не те, що вже лежить у uploads",
+        /const source = fs\.existsSync\(backup\) \? backup : full;/.test(script)
+        && /cutout\.cutoutToWhite\(source\)/.test(script));
 
-        const { data, info } = await sharp(full).ensureAlpha().raw()
-            .toBuffer({ resolveWithObject: true });
+    // Маска йде через поріг — інакше там, де мережа вагається, від
+    // товару лишається половина, змішана з білим.
+    const cut = read("scripts/cutout.js")
+        .replace(/\/\*[\s\S]*?\*\//g, "")
+        .split("\n").filter(line => !/^\s*\/\//.test(line)).join("\n");
 
-        const w = info.width;
-        const h = info.height;
+    check("маска береться з порогом, а не як є",
+        /const a = alpha\(mask\.data\[p \* mask\.stride\] \/ 255\)/.test(cut)
+        && /function alpha\(a\)/.test(cut));
 
-        let dirty = 0;
+    // І головне — наслідок, а не текст: беремо кілька вирізаних фото і
+    // ріжемо їхні оригінали заново. Збіглось — значить опубліковане
+    // зроблено з оригіналу.
+    const cutouts = decided.filter(d => d.bg === "cutout"
+        && fs.existsSync(path.join(originals, d.name))
+        && fs.existsSync(path.join(uploads, d.name)));
 
-        const look = (x, y) => {
-            const i = (y * w + x) * 4;
-            if (data[i] !== 255 || data[i + 1] !== 255 || data[i + 2] !== 255) dirty++;
-        };
+    check("вирізані фото з копією оригіналу є", cutouts.length > 0, cutouts.length);
 
-        for (let x = 0; x < w; x++) { look(x, 0); look(x, h - 1); }
-        for (let y = 0; y < h; y++) { look(0, y); look(w - 1, y); }
+    // Трьох досить: кожне — окремий прогін нейромережі, а перевіряємо
+    // спільний для всіх механізм.
+    const sample = cutouts.slice(0, 3);
 
-        check(name + " (" + bg + "): периметр рівно білий — збірка пропустить",
-            dirty === 0, "небілих пікселів по рамці: " + dirty);
+    const sameAsFreshCut = async ({ name }) => {
+
+        let fresh;
+
+        try {
+            const cutout = require("../scripts/cutout.js");
+            fresh = await cutout.cutoutToWhite(path.join(originals, name));
+        } catch (error) {
+            // Немає onnxruntime — перевіряти нічим, але й мовчати не
+            // варто: хай видно, що цей шматок не відпрацював.
+            check(name + ": вирізання доступне", false, error.message.slice(0, 60));
+            return;
+        }
+
+        const now = await sharp(fs.readFileSync(path.join(uploads, name)))
+            .removeAlpha().raw().toBuffer({ resolveWithObject: true });
+
+        if (now.info.width !== fresh.width || now.info.height !== fresh.height) {
+            check(name + ": розмір збігається", false,
+                `${now.info.width}x${now.info.height} проти ${fresh.width}x${fresh.height}`);
+            return;
+        }
+
+        // Рахуємо ЧАСТКУ помітно різних каналів, а не середнє по кадру.
+        //
+        // Середнє розмивається розміром: варто зіпсуватись самому
+        // товару в кутку кадру — і воно лишається біля нуля. Заміряно
+        // на цих же файлах: коли поріг маски зсунули так, що товар
+        // знову підмішується до білого, середнє трималось у межах
+        // допуску, а частка помітних розбіжностей злітала.
+        let big = 0;
+
+        for (let i = 0; i < fresh.data.length; i++) {
+            if (Math.abs(now.data[i] - fresh.data[i]) > 8) big++;
+        }
+
+        const share = big / fresh.data.length;
+
+        // Допуск на webp: файл проходить стиснення (quality 88), а
+        // fresh — ще сирі пікселі. На цілих файлах це 0.02–0.04%.
+        check(name + ": опубліковане = вирізане з оригіналу",
+            share < 0.01, "помітно різних каналів: " + (share * 100).toFixed(2) + "%");
 
     };
 
-    return decided.reduce((chain, item) => chain.then(() => border(item)), Promise.resolve());
+    return sample.reduce((chain, item) => chain.then(() => sameAsFreshCut(item)), Promise.resolve());
 
 }
 
