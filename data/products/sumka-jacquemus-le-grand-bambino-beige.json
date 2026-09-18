@@ -13,7 +13,7 @@
       "zoom": 1,
       "x": 50,
       "y": 50,
-      "bg": "white"
+      "bg": "cutout"
     },
     "rtlafd950301_33497204_4_v1_2x.webp": {
       "zoom": 1,
@@ -31,7 +31,7 @@
       "zoom": 1,
       "x": 50,
       "y": 50,
-      "bg": "white"
+      "bg": "cutout"
     }
   },
   "preOrder": false,
