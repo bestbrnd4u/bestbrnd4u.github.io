@@ -814,6 +814,29 @@ console.log("\n[10] Фокус заходить у вікно й поверта�
     check("і повертає його на бургер",
         /DialogFocus\?\.close\(mobileNavEl\)/.test(common));
 
+    // Панель фільтрів на телефоні — четверте таке вікно: накриває
+    // екран, замикає прокрутку, а класу .modal-overlay не має.
+    const catalogJs = fs.readFileSync(path.join(ROOT, "assets/js/catalog.js"), "utf8");
+
+    check("панель фільтрів забирає фокус",
+        /DialogFocus\?\.open\(mobileFiltersModal\)/.test(catalogJs));
+    check("і повертає його на кнопку «Фільтри»",
+        /DialogFocus\?\.close\(mobileFiltersModal\)/.test(catalogJs));
+
+    check("панель фільтрів повертає фокус до того, як сховатись",
+        catalogJs.indexOf("DialogFocus?.close(mobileFiltersModal)")
+        < catalogJs.indexOf("mobileFiltersModal.hidden = true"));
+
+    // Два рівні — два кроки назад. Зі списку брендів Escape має
+    // повертати до переліку фільтрів, а не закривати все: інакше
+    // губиться те, що людина щойно вибирала.
+    check("Escape у фільтрах спершу веде назад, потім закриває",
+        /if \(mobileFiltersSub && !mobileFiltersSub\.hidden\)[\s\S]{0,140}backToMobileFiltersMain\(\)[\s\S]{0,140}closeMobileFilters\(\)/.test(catalogJs));
+
+    check("у панелі фільтрів є назва для читача",
+        /id="mobileFiltersModal"[^>]*aria-label="Фільтри"/.test(
+            fs.readFileSync(path.join(ROOT, "catalog.html"), "utf8")));
+
     // role="dialog" без назви читач оголошує просто «діалог».
     check("у меню є назва для читача",
         /nav\.setAttribute\("aria-label", "Меню"\)/.test(common));

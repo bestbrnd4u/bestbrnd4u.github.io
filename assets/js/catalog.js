@@ -4949,11 +4949,21 @@ if (!window.CATALOG_SKIP_AUTO_INIT) {
         document.body.style.overflow = "hidden";
         document.body.classList.add("mobile-filters-open");
 
+        // Курсор — у панель, і Tab по колу всередині неї. Інакше він
+        // лишається на кнопці «Фільтри», а Tab веде по каталогу під
+        // панеллю — по картках, яких за нею не видно. Те саме, що
+        // роблять вікна .modal-overlay; спільний вхід — у common.js.
+        window.DialogFocus?.open(mobileFiltersModal);
+
     }
 
     function closeMobileFilters() {
 
         returnRelocatedTargets();
+
+        // Курсор назад на «Фільтри» — ДО того, як сховаємо панель: у
+        // схованій фокусувати вже нічого.
+        window.DialogFocus?.close(mobileFiltersModal);
 
         mobileFiltersModal.hidden = true;
 
@@ -5022,6 +5032,35 @@ if (!window.CATALOG_SKIP_AUTO_INIT) {
     });
 
     mobileFiltersBackBtn?.addEventListener("click", backToMobileFiltersMain);
+
+    // ESCAPE — СПОЧАТКУ НАЗАД, ПОТІМ ЗАКРИТИ.
+    //
+    // Панель фільтрів накриває екран цілком і замикає прокрутку,
+    // тобто це вікно в усьому, крім класу: .mobile-filters-modal, а
+    // не .modal-overlay, тож спільний обробник у common.js її не
+    // бачить. Вийти можна було лише хрестиком.
+    //
+    // Два кроки, бо в панелі два рівні: зі списку брендів Escape
+    // повертає до переліку фільтрів, а вже звідти закриває. Закривати
+    // все одразу означало б втратити те, що людина щойно вибирала, —
+    // рівно там, де вона й шукала вихід «на крок назад».
+    document.addEventListener("keydown", event => {
+
+        if (event.key !== "Escape") return;
+
+        if (!mobileFiltersModal || mobileFiltersModal.hidden) return;
+
+        if (mobileFiltersSub && !mobileFiltersSub.hidden) {
+
+            backToMobileFiltersMain();
+
+            return;
+
+        }
+
+        closeMobileFilters();
+
+    });
 
     mobileFiltersResetBtn?.addEventListener("click", () => {
 
