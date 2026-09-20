@@ -252,6 +252,106 @@ console.log("\n[5] Перший ряд каталогу не стоїть у ч�
         !/fetchpriority/.test(uiCode), "з'явився — чи є заміри?");
 }
 
+console.log("\n[6] Плитки мега-меню — 88×88, а не на пів екрана");
+{
+    // ЩО БУЛО ЗМІРЯНО (головна, performance.getEntriesByType):
+    //
+    //   4a5d4b88….png  2296 КБ   «Жінкам»
+    //   bea2c056….png  2257 КБ   «Чоловікам»
+    //   5cdd14ae….png  2012 КБ   «Унісекс»
+    //   4023d633….png  2314 КБ   «Дітям»
+    //   ─────────────────────────
+    //                  8879 КБ   на чотири плитки 88×88 px
+    //
+    // І качались вони намарно: мега-меню за мить перемальовує
+    // mega-menu.js, тобто ці мегабайти не встигали навіть
+    // показатись. Решта сторінок сайту тим часом брали готові
+    // mega-*.webp по 0,2–3,5 КБ.
+    //
+    // Причина — два кроки збірки, які тягли в різні боки.
+    // build-banners.js малює зменшені плитки, а build-home-static.js
+    // крок 5 підставляв у меню знімок категорії з home.json: там під
+    // тією ж статтю лежить фото для ВЕЛИКОЇ плитки на пів екрана.
+    // Головна була єдиною сторінкою, яку цей крок чіпає.
+    const { MEGA_MENU_FILES, MEGA_DIR } = require("../scripts/mega-tiles.js");
+
+    const pages = fs.readdirSync(ROOT).filter(f => f.endsWith(".html"));
+
+    const withMenu = pages.filter(f => read(f).includes('class="mega-item"'));
+
+    check(`сторінок із мега-меню — ${withMenu.length}`, withMenu.length >= 8);
+
+    // Межа не з голови: найбільша готова плитка важить 3,5 КБ, а
+    // найлегший «важкий» знімок категорії — два мегабайти. Двадцять
+    // кілобайтів лишають запас на кращу якість і все одно ловлять
+    // повернення повнорозмірного.
+    const LIMIT_KB = 20;
+
+    const heavy = [];
+
+    withMenu.forEach(page => {
+
+        const html = read(page);
+
+        [...html.matchAll(/class="mega-item"[^>]*><img src="([^"]+)"/g)].forEach(m => {
+
+            const src = m[1].replace(/^\//, "").split("?")[0];
+            const file = path.join(ROOT, src);
+
+            if (!fs.existsSync(file)) {
+                heavy.push(`${page}: ${src} — файлу немає`);
+                return;
+            }
+
+            const kb = Math.round(fs.statSync(file).size / 1024);
+
+            if (kb > LIMIT_KB) heavy.push(`${page}: ${src} — ${kb} КБ`);
+
+        });
+
+    });
+
+    check(`жодна плитка не важча за ${LIMIT_KB} КБ`, heavy.length === 0,
+        [...new Set(heavy)].slice(0, 6).join(" | "));
+
+    // Головна мусить брати ТІ САМІ файли, що й решта сторінок.
+    const home = read("index.html");
+
+    Object.values(MEGA_MENU_FILES).forEach(file => {
+        check(`головна бере ${file}`, home.includes(MEGA_DIR + "/" + file));
+    });
+
+    check("і жодного знімка з uploads у меню головної",
+        !/class="mega-item"[^>]*><img src="[^"]*products\/uploads/.test(home));
+
+    // Словник один на два скрипти: розійдись вони — головна тихо
+    // повернеться до мегабайтів.
+    const banners = read("scripts/build-banners.js");
+    const homeScript = read("scripts/build-home-static.js");
+
+    check("обидва скрипти беруть перелік зі спільного модуля",
+        /require\("\.\/mega-tiles"\)/.test(banners)
+        && /require\("\.\/mega-tiles"\)/.test(homeScript));
+
+    // Спільний модуль НЕ МУСИТЬ тягти sharp: основний ланцюжок
+    // збірки нативних модулів не потребує, і середовище без
+    // зібраного sharp валило б усю збірку замість однієї
+    // необов'язкової команди.
+    //
+    // Коментарі відкидаємо: у поясненні всередині самого модуля це
+    // слово стоїть навмисно — там сказано, чому sharp туди не
+    // тягнуть. Без очищення перевірка ловила б власний текст.
+    check("спільний модуль не тягне sharp",
+        !/require\("sharp"\)/.test(
+            read("scripts/mega-tiles.js")
+                .replace(/\/\*[\s\S]*?\*\//g, "")
+                .replace(/^\s*\/\/.*$/gm, "")));
+
+    check("головна підставляє зменшену плитку, а не знімок категорії",
+        /const small = megaTile\(name\);/.test(homeScript)
+        && /const img = small \|\| byGender\[name\];/.test(homeScript));
+}
+
 console.log(failures ? `\n❌ Провалено: ${failures}` : "\n✅ Вага сторінки товару: зайвого не вантажимо");
 
 process.exit(failures ? 1 : 0);

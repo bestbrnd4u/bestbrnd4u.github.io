@@ -106,15 +106,63 @@ console.log("\n[4] Бренди й випадаюче меню теж не за�
 
     check(`пунктів меню зі статтю — ${menu.length}`, menu.length > 0);
 
+    // ПРАВИЛО ЗМІНИЛОСЬ, ЗАДАЧА — НІ.
+    //
+    // Раніше тут вимагалось, щоб у меню стояв РІВНО той знімок, що й
+    // у плитці категорії. Сенс був у тому, щоб меню не застрягло на
+    // чужих фото з pexels, як воно роками й стояло.
+    //
+    // Але знімок категорії — це фото на пів екрана, а плитка меню —
+    // 88×88 px. Головна через це качала 8,7 МБ на чотири картинки й
+    // викидала їх: мега-меню за мить перемальовує mega-menu.js.
+    // Заміряно на живій сторінці, подробиці — у test-page-weight [6].
+    //
+    // Тепер правило таке: беремо зменшену плитку (build-banners.js),
+    // а знімок категорії лишається запасним варіантом на випадок,
+    // коли банерів ще не збирали. Застарілих і чужих фото це не
+    // пускає так само — джерело в обох випадках наше.
+    const { megaTile } = require("../scripts/mega-tiles.js");
+
     const stale = menu.filter(a => {
+
         const g = a.match(/gender=([^"&]+)/);
+
         if (!g) return false;
-        const want = byGender[decodeURIComponent(g[1])];
+
+        const gender = decodeURIComponent(g[1]);
+
+        const small = megaTile(gender);
+        const want = small || byGender[gender];
+
         return want && !a.includes(want);
+
     });
 
-    check("усі фото в меню взяті з даних категорій", stale.length === 0,
+    check("фото в меню — зменшена плитка або знімок категорії",
+        stale.length === 0,
         stale.slice(0, 2).map(a => a.slice(0, 80)).join(" | "));
+
+    // І окремо: зменшена плитка має ПЕРЕВАГУ. Без цієї перевірки
+    // попередня пройшла б і на важких знімках — вони теж «наші».
+    const genders = Object.keys(byGender).filter(g => megaTile(g));
+
+    check(`статей із готовою плиткою — ${genders.length}`, genders.length > 0);
+
+    genders.forEach(gender => {
+
+        // У розмітці стать стоїть кирилицею як є («gender=Жінкам»),
+        // а не у відсотковому кодуванні — тож звіряємо з обома
+        // написаннями, щоб перевірка не залежала від того, як саме
+        // адресу колись запишуть.
+        const own = menu.filter(a =>
+            a.includes("gender=" + gender)
+            || a.includes("gender=" + encodeURIComponent(gender)));
+
+        check(`«${gender}»: у меню саме зменшена плитка`,
+            own.length > 0 && own.every(a => a.includes(megaTile(gender))),
+            own.slice(0, 1).map(a => a.slice(0, 90)).join(""));
+
+    });
 }
 
 console.log("\n[5] Крок вбудований у збірку, а не разова правка");
