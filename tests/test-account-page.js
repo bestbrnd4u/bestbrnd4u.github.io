@@ -1022,7 +1022,7 @@ console.log("\n[12] Службова адреса входу через Telegram
     // Кабінет: показувати рядок із id людині безглуздо, а
     // пропонувати «змінити» — тим більше: міняти нема чого.
     check("у кабінеті показано стан, а не службовий рядок",
-        /profileEmailEl\.textContent = mail \|\|/.test(js));
+        /profileEmailEl\.textContent = mail\s*\|\|/.test(js));
 
     check("кнопка стає «Додати email», коли пошти немає",
         /mail \? "Змінити email" : "Додати email"/.test(js));
@@ -1053,8 +1053,46 @@ console.log("\n[12] Службова адреса входу через Telegram
     // дія на екрані веде в глухий кут.
     check("без пошти блок відновлення пояснює це одразу",
         /id="forgotNoMail"/.test(html)
-        && /Ви входите через Telegram — пароля в акаунті немає/.test(html)
+        && /Ви входите через <span id="forgotNoMailVia">/.test(html)
+        && /пароля в акаунті немає/.test(html)
         && /if \(noMail\) noMail\.hidden = Boolean\(mail\)/.test(js));
+
+    // СПОСІБ ВХОДУ НАЗИВАЄМО СПРАВЖНІЙ
+    //
+    // Тут було зашито «Telegram» — і в кабінеті замість пошти, і в
+    // поясненні про пароль. Тоді іншого входу без пошти не існувало.
+    //
+    // З Facebook їх стало два: акаунт, зареєстрований на телефон, або
+    // знята галочка з пошти у вікні входу дають користувача зовсім без
+    // адреси (це вмикає перемикач «Allow users without an email» у
+    // провайдері Supabase). Зашитий рядок казав такій людині, що вона
+    // зайшла звідки не заходила.
+    check("спосіб входу визначається, а не зашитий",
+        /function loginProviderName\(user\)/.test(client)
+        && /facebook: "Facebook"/.test(client)
+        && /google: "Google"/.test(client));
+
+    // Telegram упізнається ЗА ДОМЕНОМ і першим: акаунт створює наша ж
+    // функція через admin API, тож у app_metadata.provider там лежить
+    // «email», і провайдера звідти не видно.
+    const providerFn = client.slice(client.indexOf("function loginProviderName"));
+
+    check("Telegram упізнається за доменом, а не за провайдером",
+        /endsWith\(TELEGRAM_EMAIL_DOMAIN\)\) return "Telegram"/.test(providerFn)
+        && providerFn.indexOf("TELEGRAM_EMAIL_DOMAIN") < providerFn.indexOf("app_metadata"));
+
+    check("обидва місця беруть назву звідти",
+        /loginProviderName\(user\)/.test(js)
+        && (js.match(/loginProviderName\(user\)/g) || []).length >= 2);
+
+    check("у кабінеті немає зашитого «через Telegram»",
+        !/ви увійшли через Telegram"/.test(js)
+        && !/Ви входите через Telegram/.test(html));
+
+    // Невідомий спосіб не вигадуємо: краще коротко й правдиво.
+    check("на невідомий провайдер є запасний текст",
+        /Немає — пошту ви не вказували/.test(js)
+        && /\|\| "соцмережу"/.test(js));
 
     check("і ховає кнопку, бо тиснути нема що",
         /if \(submit\) submit\.hidden = !mail/.test(js));
