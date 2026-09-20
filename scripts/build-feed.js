@@ -66,7 +66,7 @@ const OUTPUT_FILE = path.join(ROOT, "feed.xml");
 // Google скаржиться на розходження й може притримати товари в
 // Покупках. Доти число було написане тут окремо від розмітки — тобто
 // розійтись вони могли будь-якої миті, і ловив це лише тест.
-const { SHIPPING_RATE_UAH } = require("../assets/js/product-offer.js");
+const { SHIPPING_RATE_UAH, preOrderWorkDays } = require("../assets/js/product-offer.js");
 
 // Магазин возить лише по Україні.
 const SHIPPING_COUNTRY = "UA";
@@ -145,22 +145,12 @@ function availabilityOf(product, variant, size) {
 
 }
 
-// Скільки робочих днів чекати. Беремо БІЛЬШЕ число з «10-14 робочих
-// днів»: обіцяти покупцеві коротший строк, ніж буває, — найгірший вид
-// точності.
+// Скільки робочих днів чекати — зі спільного модуля.
 //
-// Пробіли в полі стоять як завгодно («10- 14», «10 -14»), бо його
-// заповнюють руками в адмінці, тож числа виловлюємо регуляркою, а не
-// розбором за дефісом.
-function preOrderWorkDays(product) {
-
-    const numbers = String(product && product.preOrderDays || "").match(/\d+/g);
-
-    if (!numbers || !numbers.length) return 0;
-
-    return Math.max(...numbers.map(Number));
-
-}
+// Ця функція жила тут і працювала правильно: фід давно віддає Google
+// backorder із датою очікування. А розмітка сторінки про той самий
+// строк не знала й обіцяла 2–5 днів. Тепер помічник один на обох —
+// щоб фід і сторінка не розійшлись у тому, скільки чекати.
 
 // Дата, до якої товар очікується — для g:availability_date.
 //

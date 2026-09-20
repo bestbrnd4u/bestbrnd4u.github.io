@@ -570,5 +570,96 @@ console.log("\n[9] Артикул без пробілів — вимога Googl
             fs.readFileSync(path.join(ROOT, "scripts/build-product-pages.js"), "utf8")));
 }
 
+console.log("\n[10] Строк доставки в розмітці — той, що на сторінці");
+{
+    // ЩО БУЛО НЕ ТАК
+    //
+    // availability для товару під замовлення ставився правильно —
+    // PreOrder, а не InStock (див. availabilityOf). А ось строк у тій
+    // же пропозиції лишався загальним: збірка 1–2 дні плюс доставка
+    // 1–3, тобто Google читав «2–5 днів» там, де сторінка пише
+    // «10-14 робочих днів». Таких товарів 29 зі 103.
+    //
+    // Для Merchant listings це та сама невідповідність розмітки
+    // реальному стану, через яку знімають rich-результат, — просто в
+    // сусідньому полі. І покупець, який приходить із пошуку,
+    // дізнається про два тижні вже на сторінці.
+    const offer = require("../assets/js/product-offer.js");
+
+    const preOrder = { preOrder: true, preOrderDays: "10-14 робочих днів" };
+    const inStock = { preOrder: false };
+
+    const handling = product =>
+        offer.shippingDetails(null, product).deliveryTime.handlingTime;
+
+    const transit = product =>
+        offer.shippingDetails(null, product).deliveryTime.transitTime;
+
+    check("товар зі складу — звичайні строки",
+        handling(inStock).minValue === 1 && handling(inStock).maxValue === 2,
+        JSON.stringify(handling(inStock)));
+
+    check("товар під замовлення — строк із його поля",
+        handling(preOrder).minValue === 10 && handling(preOrder).maxValue === 14,
+        JSON.stringify(handling(preOrder)));
+
+    // Міняється саме handlingTime: це час ДО передачі перевізнику.
+    // Коли річ уже в дорозі, вона їде звичайні 1–3 дні.
+    check("час у дорозі не чіпаємо",
+        transit(preOrder).minValue === 1 && transit(preOrder).maxValue === 3,
+        JSON.stringify(transit(preOrder)));
+
+    // Поле заповнюють руками в адмінці, і в даних сьогодні три різні
+    // написання одного й того самого строку.
+    ["10-14 робочих днів", "10- 14 робочих днів", "10 -14 робочих днів"]
+        .forEach(text => {
+
+            const box = handling({ preOrder: true, preOrderDays: text });
+
+            check(`«${text}» → 10–14`,
+                box.minValue === 10 && box.maxValue === 14, JSON.stringify(box));
+
+        });
+
+    // Порожнє поле не має обнуляти строк: краще загальний, ніж нуль.
+    const empty = handling({ preOrder: true, preOrderDays: "" });
+
+    check("без строку в товарі лишаються загальні числа",
+        empty.minValue === 1 && empty.maxValue === 2, JSON.stringify(empty));
+
+    // І на живій сторінці — те, що реально віддається роботу до
+    // виконання JS.
+    const page = fs.readFileSync(
+        path.join(ROOT, "p/sontsezakhysni-okuliary-saint-laurent-sl-276-mica-001-53/index.html"),
+        "utf8");
+
+    // [^>]* обов'язково: у тегів є id (productSchema, breadcrumbSchema),
+    // і регулярка з одразу закритою дужкою не знаходить нічого.
+    const json = (page.match(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g) || [])
+        .map(block => {
+            try {
+                return JSON.parse(block.replace(/<\/?script[^>]*>/g, ""));
+            } catch (error) {
+                return null;
+            }
+        })
+        .find(item => item && item["@type"] === "Product");
+
+    check("розмітка товару на сторінці читається", Boolean(json));
+
+    if (json) {
+
+        const box = json.offers.shippingDetails.deliveryTime.handlingTime;
+
+        check("і в ній стоїть строк під замовлення, а не загальний",
+            box.minValue === 10 && box.maxValue === 14, JSON.stringify(box));
+
+        check("разом із PreOrder",
+            json.offers.availability === "https://schema.org/PreOrder",
+            json.offers.availability);
+
+    }
+}
+
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
 process.exit(failures === 0 ? 0 : 1);
