@@ -42,12 +42,12 @@
   "dealAlign": "right",
   "dealTimer": "right",
   "link": "",
-  "image": "/assets/images/banners/12-2026-01_13_26-am.png",
+  "image": "/assets/images/banners/12-2026-01_13_26-am.webp",
   "displayType": "deal_of_day",
   "dealPrice": 8600,
-  "imageMobile": "/assets/images/banners/112-2026-01_15_22-am.png",
-  "promoPageImage": "/assets/images/banners/12-2026-01_13_26-am.png",
+  "imageMobile": "/assets/images/banners/112-2026-01_15_22-am.webp",
+  "promoPageImage": "/assets/images/banners/12-2026-01_13_26-am.webp",
   "homeButtonText": "Детальніше",
-  "promoPageImageMobile": "/assets/images/banners/112-2026-01_15_22-am.png",
+  "promoPageImageMobile": "/assets/images/banners/112-2026-01_15_22-am.webp",
   "buttonText": ""
 }

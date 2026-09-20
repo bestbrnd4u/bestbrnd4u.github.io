@@ -352,6 +352,114 @@ console.log("\n[6] Плитки мега-меню — 88×88, а не на пі�
         && /const img = small \|\| byGender\[name\];/.test(homeScript));
 }
 
+console.log("\n[7] Фотографії не лежать у PNG");
+{
+    // ЩО БУЛО ЗМІРЯНО. Головна, 19 картинок разом на 13,7 МБ. Шість
+    // із них — PNG по 1,4–2,5 МБ: банер SUMMER SALE, плитки розділів,
+    // фони акцій. Поруч фотографії товарів важать 22–27 КБ.
+    //
+    // Різниця не в розмірі кадру (1100–2200 px — помірно), а у
+    // ФОРМАТІ. PNG стискає без утрат: для скриншота чи логотипа це
+    // правильно, для знімка з піском і градієнтами — ні. Той самий
+    // кадр у webp важить у 10–20 разів менше.
+    //
+    // Конвеєр товарних фото бере ЛИШЕ .webp, тож усе завантажене
+    // через адмінку як PNG лишалось нерозпакованим роками.
+    const shrink = read("scripts/shrink-heavy-images.js");
+
+    check("крок є в конвеєрі медіа",
+        JSON.parse(read("package.json")).scripts["build:media"]
+            .includes("shrink-heavy-images.js --apply"));
+
+    // Найголовніша обережність: products/uploads не чіпаємо.
+    // whiten-backgrounds.js вибілює тло КОЖНОМУ .webp у тій теці, і
+    // переупакований банер потрапив би йому під руку — небо на знімку
+    // з моделлю залилося б білим.
+    check("тека товарів залишена вибілювачу",
+        /SKIP_DIRS = \["_originals", "_archive", "uploads"\]/.test(shrink));
+
+    // Скрипт спіймав себе на першому ж показі: JPEG (уже стиснуті з
+    // утратами) у webp ставали БІЛЬШИМИ — до 3288 КБ із 1893.
+    check("замінюємо лише те, що справді полегшало",
+        /const MIN_GAIN = 0\.25;/.test(shrink)
+        && /result\.after > file\.size \* \(1 - MIN_GAIN\)/.test(shrink));
+
+    // Заміна по ІМЕНІ файлу зачепила б чуже: серед банерів лежить
+    // «2.png», і воно є підрядком у «photo2.png» чи «img-12.png».
+    check("посилання переписуються за шляхом, а не за іменем",
+        /path\.relative\(ROOT, file\.full\)/.test(shrink)
+        && /path\.relative\(ROOT, result\.target\)/.test(shrink));
+
+    // Сироти не чіпаємо: відвідувач їх не качає, а в репозиторії від
+    // переупаковки стало б удвічі більше файлів.
+    check("файли, на які ніхто не посилається, пропускаються",
+        /if \(!refs\.has\(name\)\)/.test(shrink));
+
+    // І власне результат.
+    const dataFiles = ["data/home.json", "data/promotions.json"]
+        .concat(fs.readdirSync(path.join(ROOT, "data/promotions"))
+            .filter(f => f.endsWith(".json"))
+            .map(f => "data/promotions/" + f));
+
+    const heavy = [];
+    const inUploads = [];
+
+    dataFiles.forEach(rel => {
+
+        const text = read(rel);
+
+        [...text.matchAll(/\/(assets\/images\/[^"']+\.(?:png|jpe?g))/gi)].forEach(m => {
+
+            const file = path.join(ROOT, m[1]);
+
+            if (!fs.existsSync(file)) return;
+
+            const kb = Math.round(fs.statSync(file).size / 1024);
+
+            if (kb <= 700) return;
+
+            const line = `${path.basename(m[1])} — ${kb} КБ`;
+
+            if (m[1].includes("products/uploads")) inUploads.push(line);
+            else heavy.push(`${rel}: ${line}`);
+
+        });
+
+    });
+
+    check("поза текою товарів важких PNG у даних немає",
+        heavy.length === 0, [...new Set(heavy)].slice(0, 5).join(" | "));
+
+    // ЩО ЛИШИЛОСЬ НЕЗРОБЛЕНИМ — І ЧОМУ ЦЕ ТУТ ВИДНО.
+    //
+    // Плитки розділів на головній лежать у products/uploads, тобто в
+    // теці, яку вибілювач фону обходить цілком. Переупакувати їх у
+    // webp означає віддати їх алгоритму, який заливає тло білим, —
+    // на знімку з моделлю це було б дуже помітно.
+    //
+    // Тому вони лишаються PNG, і це свідоме рішення, а не забуття.
+    // Правильний вихід — або перенести банери з теки товарів, або
+    // навчити вибілювач брати лише ті файли, на які посилається хоч
+    // один товар. Попередження нижче не дає про це забути й показує
+    // точну ціну питання.
+    const uploadsKb = [...new Set(inUploads)]
+        .reduce((sum, line) => sum + Number((line.match(/(\d+) КБ/) || [0, 0])[1]), 0);
+
+    if (inUploads.length) {
+
+        console.log(`::warning::важкі PNG у products/uploads: ${new Set(inUploads).size} файлів,`
+            + ` ${uploadsKb} КБ. Не переупаковані навмисно — див. SKIP_DIRS`
+            + ` у scripts/shrink-heavy-images.js`);
+
+    }
+
+    // Межа не на нуль, а на «не більше, ніж є»: набір мусить ловити
+    // ПОЯВУ нових важких файлів у цій теці, а не червоніти через ті,
+    // про які ми вже знаємо.
+    check(`важких PNG у теці товарів — ${new Set(inUploads).size}, не більше`,
+        new Set(inUploads).size <= 4, [...new Set(inUploads)].join(" | "));
+}
+
 console.log(failures ? `\n❌ Провалено: ${failures}` : "\n✅ Вага сторінки товару: зайвого не вантажимо");
 
 process.exit(failures ? 1 : 0);

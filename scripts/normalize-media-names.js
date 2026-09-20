@@ -265,6 +265,12 @@ function main() {
 
 }
 
-module.exports = { shortName, MAX_NAME };
+// collectTextFiles віддаємо назовні: перелік файлів, де можуть
+// лежати посилання на картинки, потрібен не лише перейменуванню.
+// shrink-heavy-images.js переводить важкі PNG у webp і мусить
+// правити ті самі посилання — друга копія цього переліку означала б,
+// що один зі скриптів колись забуде якусь теку, і частина фото
+// відвалиться мовчки.
+module.exports = { shortName, MAX_NAME, collectTextFiles };
 
 if (require.main === module) main();
