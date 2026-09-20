@@ -332,7 +332,12 @@ placeholder="Пошук товару...">
 </div>
 
 <!-- Мобільний повноекранний "Всі фільтри" -->
-<div id="mobileFiltersModal" class="mobile-filters-modal" hidden>
+<!-- aria-label, бо для читача це вікно: панель накриває екран,
+     замикає прокрутку й тримає фокус усередині (openModalFocus у
+     common.js ставить їй role="dialog"). Назву шукати нема де —
+     заголовок усередині це <span>, а не <h3>, і він міняється,
+     коли провалюєшся в підменю. -->
+<div id="mobileFiltersModal" class="mobile-filters-modal" aria-label="Фільтри" hidden>
 <div class="mobile-filters-sheet">
 
 <div class="mobile-filters-screen" id="mobileFiltersMain">
@@ -754,7 +759,7 @@ aria-label="Нагору">
 <script src="/assets/js/ui.js?v=96f510e0" defer></script>
 <script src="/assets/js/stock.js?v=85fa4aad" defer></script>
 <script src="/assets/js/live-stock.js?v=ca9027dd" defer></script>
-<script src="/assets/js/catalog.js?v=fef6132f" defer></script>
+<script src="/assets/js/catalog.js?v=51e579b3" defer></script>
 </body>
 
 </html>

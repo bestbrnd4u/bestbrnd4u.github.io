@@ -129,12 +129,60 @@ function directoryDown() {
     // Список підказок
     // ------------------------------------------------------------------
 
+    // ПІДКАЗКИ, ЯКИХ НЕ ЧУТИ
+    //
+    // Стрілки й Enter у списку працюють давно (див. keydown нижче) —
+    // тобто з клавіатури місто вибрати можна. Але екранний читач про
+    // список не знає нічого: між полем і <div> із підказками не було
+    // жодного звʼязку. Людина друкує «Льв», під полем беззвучно
+    // зʼявляються девʼять варіантів, вона тисне стрілку — і чує
+    // тишу. На сторінці оформлення, де кожне замовлення проходить
+    // саме через це поле.
+    //
+    // Тому поле стає справжнім combobox: воно каже, що список
+    // розкрито, скільки в ньому пунктів і який зараз обрано. Це
+    // стандартна зв'язка ARIA, а не вигадка: role=combobox на полі,
+    // role=listbox на контейнері, role=option на пунктах і
+    // aria-activedescendant, який вказує на поточний.
+    //
+    // ФОКУС ПРИ ЦЬОМУ ЛИШАЄТЬСЯ В ПОЛІ. Пункти — <button>, тобто
+    // самі собою вони потрапляли в таб-порядок: щоб дійти від міста
+    // до наступного поля, довелось би протиснути Tab девʼять разів.
+    // tabindex="-1" прибирає їх звідти, не чіпаючи ні вигляду, ні
+    // натискання мишею.
+    var listCount = 0;
+
     function buildList(input) {
 
         var box = document.createElement("div");
 
         box.className = "np-suggest";
         box.hidden = true;
+
+        listCount += 1;
+
+        box.id = "np-suggest-" + listCount;
+        box.setAttribute("role", "listbox");
+
+        // -1 НА САМОМУ СПИСКУ — НЕ ЗАЙВИЙ РЯДОК.
+        //
+        // Список має max-height і overflow-y:auto, тобто це смуга з
+        // прокруткою. Chrome від 127-ї версії сам робить такі смуги
+        // зупинкою таба, якщо всередині немає нічого фокусованого, —
+        // щоб їх можна було прокрутити з клавіатури. Доки пункти
+        // були звичайними <button>, умова не виконувалась. Щойно ми
+        // прибрали їх із таб-порядку (tabindex=-1 нижче), Tab почав
+        // потрапляти в порожній контейнер: зупинка є, озвучувати
+        // нічого. Явний -1 цю поведінку вимикає.
+        //
+        // Спіймано в браузері після першої ж правки: у розмітці все
+        // виглядало правильно.
+        box.setAttribute("tabindex", "-1");
+
+        input.setAttribute("role", "combobox");
+        input.setAttribute("aria-autocomplete", "list");
+        input.setAttribute("aria-expanded", "false");
+        input.setAttribute("aria-controls", box.id);
 
         // Поле лежить у <label>, тому список кладемо поруч із самим
         // полем — інакше він з'явився б під підписом.
@@ -156,6 +204,32 @@ function directoryDown() {
         state.items = [];
         state.active = -1;
 
+        if (state.input) {
+            state.input.setAttribute("aria-expanded", "false");
+            state.input.removeAttribute("aria-activedescendant");
+        }
+
+    }
+
+    // Який пункт зараз «під стрілкою». Читач озвучує його саме через
+    // aria-activedescendant: фокус лишається в полі, а «обраність»
+    // мандрує по пунктах.
+    function markActive(state) {
+
+        Array.prototype.forEach.call(state.box.children, function (node, index) {
+
+            var on = index === state.active;
+
+            node.classList.toggle("active", on);
+            node.setAttribute("aria-selected", on ? "true" : "false");
+
+        });
+
+        var current = state.box.children[state.active];
+
+        if (state.input && current) state.input.setAttribute("aria-activedescendant", current.id);
+        else if (state.input) state.input.removeAttribute("aria-activedescendant");
+
     }
 
     function render(state, items) {
@@ -170,13 +244,21 @@ function directoryDown() {
 
         state.box.innerHTML = items.map(function (item, index) {
 
-            return '<button type="button" class="np-suggest-item" data-index="' + index + '">'
+            return '<button type="button" class="np-suggest-item"'
+                + ' id="' + state.box.id + "-" + index + '"'
+                + ' role="option" aria-selected="false" tabindex="-1"'
+                + ' data-index="' + index + '">'
                 + escape(item.label)
                 + "</button>";
 
         }).join("");
 
         state.box.hidden = false;
+
+        if (state.input) {
+            state.input.setAttribute("aria-expanded", "true");
+            state.input.removeAttribute("aria-activedescendant");
+        }
 
     }
 
@@ -205,7 +287,7 @@ function directoryDown() {
 
         var limit = typeof min === "number" ? min : MIN_QUERY;
 
-        var state = { box: buildList(input), items: [], active: -1 };
+        var state = { input: input, box: buildList(input), items: [], active: -1 };
 
         // Рядок «довідник не відповідає». Створюється один раз і
         // лежить під полем прихованим: показати його треба саме тоді,
@@ -302,9 +384,7 @@ function directoryDown() {
 
                 state.active = (state.active + step + state.items.length) % state.items.length;
 
-                Array.prototype.forEach.call(state.box.children, function (node, index) {
-                    node.classList.toggle("active", index === state.active);
-                });
+                markActive(state);
 
                 return;
 
