@@ -264,6 +264,14 @@ console.log("\n[7] Сторінка товару: розмір, якого не�
     check("блок умов завжди в розмітці", /class="preorder-box" \$\{product\.preOrder \? "" : "hidden"\}/.test(src));
     check("блок доставки теж", /class="delivery-box" \$\{product\.preOrder \? "hidden" : ""\}/.test(src));
 
+    // Обидві кнопки «купити» мусять НАРОДИТИСЬ у правильному стані:
+    // refreshAvailability() після першого малювання не викликається
+    // (див. коментар біля «Єдиний екземпляр» у product.js).
+    check("основна кнопка народжується в правильному стані",
+        /\$\{product\.preOrder \? "📦 Замовити" : "🛒 Купити"\}/.test(src));
+    check("смуга знизу — теж",
+        /\$\{product\.preOrder \? "📦 Замовити" : "🛒 Додати в кошик"\}/.test(src));
+
     // Сама функція — на справжньому DOM.
     const dom = new JSDOM(`<!doctype html><body>
         <div id="productPage" data-color-preorder="0">
@@ -275,6 +283,9 @@ console.log("\n[7] Сторінка товару: розмір, якого не�
             <button class="buy-btn">🛒 Купити</button>
             <div class="preorder-box" hidden>умови</div>
             <div class="delivery-box">доставка</div>
+            <div class="mobile-sticky-cart">
+                <button class="buy-btn">🛒 Додати в кошик</button>
+            </div>
         </div></body>`, { runScripts: "outside-only" });
 
     const { window } = dom;
@@ -292,6 +303,18 @@ console.log("\n[7] Сторінка товару: розмір, якого не�
     check("умови замовлення показані", doc.querySelector(".preorder-box").hidden === false);
     check("блок доставки прибраний", doc.querySelector(".delivery-box").hidden === true);
 
+    // ЗАКРІПЛЕНА СМУГА ВНИЗУ — ТА САМА КНОПКА.
+    //
+    // На телефоні основна кнопка швидко йде за межі екрана, і далі
+    // покупець натискає смугу знизу. Доки refreshAvailability()
+    // питала querySelector (першу кнопку), смуга лишалась із написом
+    // із розмітки: сторінка каже «Замовити» й пояснює передоплату, а
+    // кнопка під пальцем обіцяє звичайне «додати в кошик».
+    const bar = () => doc.querySelector(".mobile-sticky-cart .buy-btn");
+
+    check("смуга знизу теж каже «Замовити»",
+        bar().textContent === "📦 Замовити", bar().textContent);
+
     // Обрали розмір, який є — сторінка повертається до звичайного стану.
     doc.querySelector('[data-size="39"]').classList.remove("active");
     doc.querySelector('[data-size="40"]').classList.add("active");
@@ -302,6 +325,11 @@ console.log("\n[7] Сторінка товару: розмір, якого не�
         doc.querySelector(".preorder-tag").hidden === true
         && doc.querySelector(".buy-btn").textContent === "🛒 Купити"
         && doc.querySelector(".delivery-box").hidden === false);
+
+    // …і кожна кнопка повертається до СВОГО слова: у смузі немає ні
+    // назви товару, ні ціни, тож дія там називається повністю.
+    check("смуга повертає власний напис, а не чужий",
+        bar().textContent === "🛒 Додати в кошик", bar().textContent);
 
     // Колір під замовлення перебиває розмір: якщо цього кольору немає
     // взагалі, немає й жодного його розміру.
