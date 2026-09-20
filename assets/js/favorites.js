@@ -20,11 +20,7 @@ async function initFavorites() {
 
     } catch (error) {
 
-        favoritesGrid.innerHTML = `
-            <p class="error">
-                Помилка завантаження обраного.
-            </p>
-        `;
+        favoritesGrid.innerHTML = loadErrorHtml("обране");
 
         console.error(error);
 

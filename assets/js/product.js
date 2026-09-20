@@ -226,9 +226,7 @@ whenNearViewport(
 
 console.error(error);
 
-document.getElementById("productPage").innerHTML = `
-    <p class="error">Помилка завантаження товару. Спробуйте оновити сторінку.</p>
-`;
+document.getElementById("productPage").innerHTML = loadErrorHtml("товар");
 
 }
 

@@ -26,11 +26,7 @@ async function initHome() {
 
     } catch (error) {
 
-        productsGrid.innerHTML = `
-            <p class="error">
-                Помилка завантаження товарів.
-            </p>
-        `;
+        productsGrid.innerHTML = loadErrorHtml("товари");
 
         console.error(error);
 

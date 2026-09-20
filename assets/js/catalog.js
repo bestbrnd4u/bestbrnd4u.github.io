@@ -1005,17 +1005,10 @@ async function initCatalog() {
         // сайт: 44 КБ каталогу не доїхали. Раніше людина бачила один
         // червоний рядок і мусила сама здогадатись перезавантажити
         // сторінку. Кнопка робить це за неї.
-        grid.innerHTML = `
-            <div class="catalog-error">
-                <p class="error">Не вдалося завантажити каталог.</p>
-                <p class="catalog-error-hint">Схоже на проблему зі звʼязком. Спробуйте ще раз.</p>
-                <button type="button" class="btn" id="catalogRetry">Спробувати ще раз</button>
-            </div>
-        `;
-
-        const retry = document.getElementById("catalogRetry");
-
-        if (retry) retry.addEventListener("click", () => location.reload());
+        // Розмітка й кнопка — зі спільного loadErrorHtml() у
+        // common.js: той самий екран тепер показують ще шість місць,
+        // де раніше був голий червоний рядок.
+        grid.innerHTML = loadErrorHtml("каталог");
 
         // Лічильник ховаємо цілком. Інакше у finally з нього знімається
         // сіра плашка — і над помилкою лишається самотнє слово

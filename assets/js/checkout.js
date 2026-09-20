@@ -639,7 +639,7 @@ async function initCheckout() {
 
     } catch (error) {
 
-        orderSummaryItemsEl.innerHTML = `<p class="error">Помилка завантаження замовлення.</p>`;
+        orderSummaryItemsEl.innerHTML = loadErrorHtml("замовлення");
 
         console.error(error);
 
