@@ -28,7 +28,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
 
-    <link rel="stylesheet" href="assets/css/style.css?v=fcdbb5f9">
+    <link rel="stylesheet" href="assets/css/style.css?v=08df8a11">
 
 
 
@@ -85,7 +85,7 @@
 
         <div class="header-icons">
 
-            <button id="searchBtn">🔍</button>
+            <button id="searchBtn" aria-label="Пошук по каталогу">🔍</button>
 <a href="account" id="accountLink">👤</a>
 
             <a href="favorites">
@@ -419,6 +419,26 @@
 
                     <h2>Оплата</h2>
                     <p class="checkout-block-sub">Оберіть зручний спосіб оплати</p>
+
+                    <!-- ПЕРЕДОПЛАТА ЗА ТОВАР ПІД ЗАМОВЛЕННЯ.
+
+                         Сторінка товару каже: «Потрібна передоплата
+                         N% вартості». Кошик попереджає, що термін
+                         довший за звичайну доставку. А тут, де
+                         покупець нарешті ОБИРАЄ, як платити, обидві
+                         умови зникали — і «Готівкою при отриманні»
+                         виглядало як рівноцінний варіант. Далі
+                         дзвонив менеджер і казав протилежне.
+
+                         Нічого не вимикаємо: замовлення приймаємо
+                         будь-яке, умови менеджер узгодить. Але
+                         прочитати їх покупець мусить ДО вибору, а не
+                         після нього.
+
+                         Текст збирає renderOrderSummary() у
+                         checkout.js — відсоток у кожного товару свій,
+                         і в кошику їх може бути кілька. -->
+                    <p class="preorder-banner" id="checkoutPreorderNote" hidden></p>
 
                     <div class="delivery-options">
 
@@ -802,17 +822,17 @@
 <!-- Транслітерація: productUrl() кладе колір в адресу латиницею.
      Той самий файл використовує збірка для адрес товарів. -->
 <script src="assets/js/translit.js?v=c0957cb7" defer></script>
-<script src="assets/js/common.js?v=9d454a19" defer></script>
+<script src="assets/js/common.js?v=553b80dd" defer></script>
 <!-- Підписка на листи магазину -->
 <script src="assets/js/subscribe.js?v=38994779" defer></script>
 <script src="assets/js/sync.js?v=48ef002e" defer></script>
-<script src="assets/js/mega-menu.js?v=399e38eb" defer></script>
-<script src="assets/js/ui.js?v=0e98b39d" defer></script>
+<script src="assets/js/mega-menu.js?v=689a9b61" defer></script>
+<script src="assets/js/ui.js?v=96f510e0" defer></script>
 <!-- Перевірка «ви людина» на оформленні (порожній ключ = вимкнено) -->
 <script src="assets/js/turnstile.js?v=29c5b96c" defer></script>
 <!-- Підказки міст і відділень Нової пошти (порожній ключ = поле як було) -->
 <script src="assets/js/nova-poshta.js?v=64b7a428" defer></script>
-<script src="assets/js/checkout.js?v=4d0b18fe" defer></script>
+<script src="assets/js/checkout.js?v=a819c209" defer></script>
 <!-- Картка входу над формою. ПІСЛЯ checkout.js — вона кличе його
      prefillFromProfile(), коли людина щойно ввійшла. auth-widget.js
      тримає саму поведінку кнопок, спільну з кабінетом. -->

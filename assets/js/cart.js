@@ -37,11 +37,7 @@ async function initCart() {
 
     } catch (error) {
 
-        cartItemsEl.innerHTML = `
-            <p class="error">
-                Помилка завантаження кошика.
-            </p>
-        `;
+        cartItemsEl.innerHTML = loadErrorHtml("кошик");
 
         console.error(error);
 

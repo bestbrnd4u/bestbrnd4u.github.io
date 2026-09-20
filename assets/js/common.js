@@ -76,6 +76,48 @@ function pluralProducts(count) {
 }
 
 // -------------------------
+// ДАНІ НЕ ДОЇХАЛИ — ЩО ЛЮДИНА БАЧИТЬ І ЩО МОЖЕ ЗРОБИТИ
+// -------------------------
+//
+// Збій завантаження був у семи місцях, і в шести з них показувався
+// один червоний рядок: «Помилка завантаження кошика.» І все —
+// жодної кнопки, жодного пояснення. Далі людина або здогадається
+// натиснути перезавантаження, або піде.
+//
+// Найдорожчі з цих шести — кошик і оформлення: там уже обрано
+// товар і майже ухвалено рішення.
+//
+// Причина майже завжди та сама й не в сайті: кількадесят кілобайт
+// даних не доїхали по поганому звʼязку. Тобто повторна спроба
+// справді допомагає — і саме її треба запропонувати, а не лишати
+// людину гадати.
+//
+// Один помічник на всі місця: шість копій цієї розмітки розійшлися б
+// на першій же правці тексту. Каталог, де кнопка з'явилась першою,
+// теж переведено сюди — інакше в нас було б «майже однаково».
+//
+// Кнопка не несе обробника: його ставить один делегований слухач
+// нижче. Розмітка тут — рядок, який вставляють через innerHTML, і
+// навішувати щось на елемент, якого ще немає, було б ніде.
+function loadErrorHtml(what) {
+
+    return `
+        <div class="load-error">
+            <p class="error">Не вдалося завантажити ${what}.</p>
+            <p class="load-error-hint">Схоже на проблему зі звʼязком. Спробуйте ще раз.</p>
+            <button type="button" class="btn" data-reload>Спробувати ще раз</button>
+        </div>
+    `;
+
+}
+
+document.addEventListener("click", event => {
+
+    if (event.target.closest("[data-reload]")) location.reload();
+
+});
+
+// -------------------------
 // Забороняємо нативне "підняття" картинки (drag) —
 // саме воно і показувало білу підкладку під фото при
 // протягуванні пальцем. На відміну від touch-action:pan-x
@@ -725,13 +767,45 @@ async function addToCart(id, options = {}) {
 
 }
 
+// ЩО ЧУЄ ЛЮДИНА, ЯКА НЕ БАЧИТЬ ШАПКИ
+//
+// Іконки в шапці — голі емодзі: 🔍 👤 ❤ 🛒. Для ока це зрозуміло
+// миттєво, а екранний читач озвучує їх ІМЕНЕМ СИМВОЛА і завжди
+// англійською: «shopping trolley», «black heart». На українській
+// сторінці це не назва розділу, а опис картинки — і поруч ще
+// самотнє число з лічильника: «black heart 0».
+//
+// Тому посилання дістає власний підпис. Ставимо його ТУТ, разом із
+// числом, а не в розмітці: у розмітці він був би без кількості, а
+// aria-label перебиває вміст — тобто число зникло б із озвучення
+// зовсім. Одне місце, одна правда.
+//
+// 🔍 підписаний прямо в розмітці (aria-label у самій кнопці): там
+// нема чого рахувати, а кнопка стоїть на всіх 154 сторінках.
+// 👤 не чіпаємо: updateAccountIcon() дає йому title, і той title
+// водночас показує, ким саме ти увійшов.
+//
+// Слово після числа — через pluralProducts() вище, як і всі інші
+// лічильники сайту. Своя копія правила дала б «Кошик, 1 товарів» —
+// рівно ту помилку, через яку той помічник і з'явився.
 function updateCartCounter() {
 
     const counter = document.getElementById("cartCount");
 
     if (!counter) return;
 
-    counter.textContent = getCart().length;
+    const count = getCart().length;
+
+    counter.textContent = count;
+
+    const link = document.getElementById("cartIconLink");
+
+    if (link) {
+        link.setAttribute("aria-label",
+            count === 0
+                ? "Кошик порожній"
+                : `Кошик, ${count} ${pluralProducts(count)}`);
+    }
 
 }
 
@@ -1058,7 +1132,21 @@ function updateFavoriteCounter() {
 
     if (!counter) return;
 
-    counter.textContent = getFavorites().length;
+    const count = getFavorites().length;
+
+    counter.textContent = count;
+
+    // Через closest, а не через id: у посилання на обране id немає,
+    // а додавати його довелось би в усі 154 сторінки заради одного
+    // атрибута. Лічильник усередині нього — нічим не гірша адреса.
+    const link = counter.closest("a");
+
+    if (link) {
+        link.setAttribute("aria-label",
+            count === 0
+                ? "Обране порожнє"
+                : `Обране, ${count} ${pluralProducts(count)}`);
+    }
 
 }
 
@@ -2262,6 +2350,13 @@ function buildMobileNav() {
     nav.id = "mobileNav";
     nav.className = "mobile-nav";
 
+    // Відкрите меню тримає фокус і закривається по Escape, тобто для
+    // читача це вікно — і openModalFocus() ставить йому
+    // role="dialog". Вікно без назви читач оголошує просто
+    // «діалог», тож назву даємо тут: шукати її нема де, заголовка в
+    // меню немає.
+    nav.setAttribute("aria-label", "Меню");
+
     nav.innerHTML = `
         <ul class="mobile-nav-list">
             <li><a href="/">Головна</a></li>
@@ -2308,11 +2403,23 @@ function openMobileNav() {
 
     lockPageScroll();
 
+    // Курсор — у меню, і Tab по колу всередині нього.
+    //
+    // Меню накриває сторінку й замикає прокрутку, тобто це вікно в
+    // усьому, крім класу. Але фокус лишався на кнопці-бургері, а Tab
+    // вів по сторінці ПІД меню — по посиланнях, яких за ним не
+    // видно. На закритті курсор повертається на бургер.
+    window.DialogFocus?.open(mobileNavEl);
+
 }
 
 function closeMobileNav() {
 
     if (!mobileNavEl || !mobileNavEl.classList.contains("open")) return;
+
+    // Курсор назад на бургер — ДО зняття класу: меню ховається через
+    // visibility, і у схованому фокусувати вже нічого.
+    window.DialogFocus?.close(mobileNavEl);
 
     mobileMenuBtn.classList.remove("open");
     mobileMenuBtn.setAttribute("aria-expanded", "false");
@@ -2343,6 +2450,289 @@ document.addEventListener("keydown", event => {
     if (event.key === "Escape") closeMobileNav();
 
 });
+
+// ESCAPE ЗАКРИВАЄ БУДЬ-ЯКЕ ВІКНО .modal-overlay
+//
+// ЩО БУЛО НЕ ТАК. На сайті все закривається Escape — пошук, мобільне
+// меню, кошик-попап, вибір відділення Нової пошти, причина відмови,
+// лайтбокс, випадні списки. Три вікна випадали з цього правила, і
+// всі три — на однаковій розмітці .modal-overlay:
+//
+//   таблиця розмірів (product.html),
+//   нова/редагована адреса доставки (account.html),
+//   «Видалити адресу?» (account.html).
+//
+// Вийти з них можна було тільки хрестиком у кутку або точним
+// натисканням по тлу — а на телефоні тло це вузька смужка з боків.
+// Для вікна-підтвердження це ще й неправильний бік: Escape мусить
+// СКАСОВУВАТИ, а не змушувати цілитись у хрестик.
+//
+// ЧОМУ ТУТ, А НЕ ТРИ ОБРОБНИКИ ПО МІСЦЯХ. Вікна однакові з розмітки:
+// .modal-overlay → .modal-card → .modal-header → .modal-close. Отже
+// й поведінка одна, і наступне таке вікно отримає її задарма — а
+// саме так ці три й з'явились без неї.
+//
+// ЧОМУ НАТИСКАЄМО ХРЕСТИК, А НЕ СТАВИМО hidden = true. У кожного
+// вікна своє закриття: checkout скидає ще й запам'ятоване
+// посилання. Виставити hidden повз нього означало б лишити вікно
+// закритим, а сторінку — у напіввідкритому стані. Хрестик кличе
+// рівно ту функцію, яку автор вікна для цього й написав.
+//
+// checkout.js має власний Escape для свого вікна — і хай має:
+// closeLeaveModal() ідемпотентний, а явний обробник поруч із вікном
+// читається краще за обіцянку десь у спільному файлі.
+//
+// Окремою функцією, бо тести цього репозиторію витягують поведінку
+// з common.js регуляркою «function NAME …» і виконують у jsdom;
+// обробник, написаний прямо в addEventListener, лишився б
+// неперевіреним. Тому функція самодостатня — крім document їй нічого
+// не треба.
+function closeTopModal() {
+
+    // Останнє відкрите — верхнє: вікна малюються в порядку розмітки,
+    // і якщо їх колись стане два одночасно, закрити треба те, що
+    // зверху.
+    const open = [...document.querySelectorAll(".modal-overlay:not([hidden])")].pop();
+
+    if (!open) return false;
+
+    const close = open.querySelector(".modal-close");
+
+    if (close) close.click();
+    else open.hidden = true;
+
+    return true;
+
+}
+
+document.addEventListener("keydown", event => {
+
+    if (event.key === "Escape") closeTopModal();
+
+});
+
+// ФОКУС МУСИТЬ ЗАЙТИ У ВІКНО — І ПОВЕРНУТИСЬ, КОЛИ ВОНО ЗАКРИЄТЬСЯ
+//
+// ЩО БУЛО НЕ ТАК. Вікно відкривається, а курсор лишається там, де
+// був: на кнопці «Таблиця розмірів», на «Додати адресу». Далі Tab
+// веде НЕ по вікну, а по сторінці ПІД ним — по посиланнях, які
+// затулені затемненням і яких людина не бачить. Для екранного читача
+// вікна взагалі ніби не з'явилось: він читає далі те, що було.
+//
+// А коли вікно закриється — курсор опиняється на початку сторінки,
+// бо елемент, на якому він стояв, міг зникнути разом із вікном.
+//
+// ЧОМУ ЧЕРЕЗ СПОСТЕРІГАЧА, А НЕ ПРАВКОЮ В ЧОТИРЬОХ МІСЦЯХ. Вікна
+// відкриває різний код: product.js (таблиця розмірів), account.js
+// (адреса, підтвердження видалення), checkout.js (вихід зі
+// сторінки). Спільного в них рівно одне — усі перемикають hidden на
+// .modal-overlay. Саме за цим і стежимо: тоді наступне таке вікно
+// отримає поведінку задарма, а не через півроку.
+//
+// ЩО СТАВИМО ЗАОДНО. role="dialog" і aria-modal — без них читач не
+// каже «діалог» і не обмежує читання його вмістом. aria-labelledby
+// на заголовок у шапці вікна — щоб діалог назвався, а не був
+// «діалог, порожньо».
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]),'
+    + ' select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+const modalFocusReturn = new WeakMap();
+
+// СТОС ВІДКРИТИХ ВІКОН, а не пошук по .modal-overlay.
+//
+// Спершу «верхнє вікно» шукалось запитом по класу — і цього виявилось
+// замало рівно тому, чому й мало: лайтбокс і мобільне меню теж
+// перекривають сторінку, теж мусять тримати фокус усередині, але
+// .modal-overlay не мають. Один клас у пошуку означав би або третє
+// ім'я в селекторі, або переписування чужої розмітки.
+//
+// Стос відповідає на те саме питання чесніше: верхнє — те, що
+// відкрили останнім, хоч би як воно називалось.
+const openDialogs = [];
+
+// ЧИ ВИДНО ЕЛЕМЕНТ — НЕ ЧЕРЕЗ offsetParent.
+//
+// Спершу тут стояло offsetParent !== null, і воно збрехало на
+// першому ж живому вікні. offsetParent порожній НЕ ЛИШЕ в
+// схованого: у position:fixed його немає ніколи. А хрестик
+// «Закрити» в лайтбоксі — саме fixed. Тому він випадав із переліку,
+// і фокус при відкритті ставав не на нього, а на першу-ліпшу
+// стрілку «Наступне фото».
+//
+// getClientRects() порожній у display:none (і в усього, що лежить
+// усередині схованого), але непорожній у fixed — тобто відповідає
+// саме на те питання, яке ми ставимо. visibility дивимось окремо:
+// схований нею елемент коробки має, просто не малюється, і фокус у
+// нього теж не стає.
+function isShown(el) {
+
+    if (!el.getClientRects().length) return false;
+
+    return getComputedStyle(el).visibility !== "hidden";
+
+}
+
+function focusablesIn(modal) {
+
+    return [...modal.querySelectorAll(FOCUSABLE)]
+        .filter(el => isShown(el) || el === document.activeElement);
+
+}
+
+function openModalFocus(modal) {
+
+    // Повторний виклик на вже відкритому — не привід забути, звідки
+    // прийшли: mutation-спостерігач нижче спрацьовує і тоді, коли
+    // hidden виставляють удруге тим самим значенням.
+    if (openDialogs.includes(modal)) return;
+
+    openDialogs.push(modal);
+
+    modalFocusReturn.set(modal, document.activeElement);
+
+    if (!modal.getAttribute("role")) modal.setAttribute("role", "dialog");
+
+    modal.setAttribute("aria-modal", "true");
+
+    const heading = modal.querySelector(".modal-header h3, .modal-header h2");
+
+    if (heading) {
+
+        if (!heading.id) heading.id = "modal-title-" + (modal.id || Math.random().toString(36).slice(2));
+
+        modal.setAttribute("aria-labelledby", heading.id);
+
+    }
+
+    // Перший у вікні — це хрестик «Закрити». Він і потрібен: почати
+    // з поля означало б для читача проминути назву вікна, а почати з
+    // кнопки «Видалити» — поставити палець на незворотну дію.
+    let target = focusablesIn(modal)[0];
+
+    if (!target) {
+
+        // Порожнє вікно теж мусить прийняти фокус, інакше Tab піде
+        // гуляти сторінкою під ним.
+        target = modal.querySelector(".modal-card") || modal;
+
+        target.setAttribute("tabindex", "-1");
+
+    }
+
+    target.focus();
+
+    // ДРУГА СПРОБА НА НАСТУПНОМУ КАДРІ — І ЦЕ НЕ ПЕРЕСТРАХОВКА.
+    //
+    // Вікна .modal-overlay зʼявляються миттєво (знімається hidden,
+    // тобто display:none), і фокус стає одразу. А мобільне меню
+    // виїжджає переходом: visibility йде в transition на 250 мс, і в
+    // ту мить, коли ми кличемо focus(), меню для браузера ще
+    // visibility:hidden. У схованому елементі фокус не ставиться
+    // МОВЧКИ — ні помилки, ні попередження, курсор просто лишається
+    // на кнопці-бургері, і Tab веде по сторінці під меню.
+    //
+    // Саме так це й було зловлено: у jsdom і на .modal-overlay усе
+    // працювало, а на живому меню — ні.
+    //
+    // Тому: якщо фокус не переїхав, пробуємо ще раз, коли браузер уже
+    // перерахував стилі. Перевірка modalFocusReturn.has() потрібна на
+    // випадок, коли вікно встигли закрити за цей кадр.
+    if (document.activeElement !== target) {
+
+        requestAnimationFrame(() => {
+
+            if (modalFocusReturn.has(modal)) target.focus();
+
+        });
+
+    }
+
+}
+
+function closeModalFocus(modal) {
+
+    const at = openDialogs.indexOf(modal);
+
+    // Не відкривали (або вже закрили) — повертати нікуди.
+    if (at < 0) return;
+
+    openDialogs.splice(at, 1);
+
+    const back = modalFocusReturn.get(modal);
+
+    modalFocusReturn.delete(modal);
+
+    // Елемент міг зникнути разом із перемальовкою — тоді просто
+    // нічого не робимо: гірше було б кинути фокус на початок.
+    //
+    // body відсіюємо окремо: коли вікно відкрили не з кнопки (а,
+    // скажімо, клацом по фото, яке фокус не приймає), у пам'яті
+    // лежить саме воно — і focus() на ньому нічого не дає.
+    if (back && back !== document.body && document.contains(back) && isShown(back)) {
+
+        back.focus();
+
+    }
+
+}
+
+// Tab по колу всередині відкритого вікна.
+function trapModalTab(event) {
+
+    if (event.key !== "Tab") return;
+
+    const modal = openDialogs[openDialogs.length - 1];
+
+    if (!modal || !modal.contains(event.target)) return;
+
+    const items = focusablesIn(modal);
+
+    if (!items.length) return;
+
+    const first = items[0];
+    const last = items[items.length - 1];
+
+    if (event.shiftKey && document.activeElement === first) {
+
+        event.preventDefault();
+        last.focus();
+
+    } else if (!event.shiftKey && document.activeElement === last) {
+
+        event.preventDefault();
+        first.focus();
+
+    }
+
+}
+
+document.addEventListener("keydown", trapModalTab);
+
+document.querySelectorAll(".modal-overlay").forEach(modal => {
+
+    new MutationObserver(() => {
+
+        if (modal.hidden) closeModalFocus(modal);
+        else openModalFocus(modal);
+
+    }).observe(modal, { attributes: true, attributeFilter: ["hidden"] });
+
+});
+
+// ТЕ САМЕ ДЛЯ ТИХ, ХТО НЕ .modal-overlay
+//
+// Лайтбокс і мобільне меню теж накривають сторінку собою, теж
+// замикають прокрутку й теж закриваються по Escape — тобто це вікна
+// в усьому, крім класу. Спостерігач вище їх не бачить: лайтбокс
+// створюється на льоту (у момент першого відкриття його ще немає в
+// сторінці), а меню перемикається класом .open, а не hidden.
+//
+// Тому вони кажуть про себе самі. Через window, бо lightbox.js —
+// окремий файл зі своєю областю видимості.
+window.DialogFocus = {
+    open: element => { if (element) openModalFocus(element); },
+    close: element => { if (element) closeModalFocus(element); }
+};
 
 // закриваємо мобільне меню, якщо екран розширили за брейкпоінт
 // (наприклад, повернули телефон/склали складачку) — інакше

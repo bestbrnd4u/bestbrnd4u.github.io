@@ -944,7 +944,7 @@ async function loadOrders(userId) {
 
         console.error("Не вдалося завантажити замовлення:", error);
 
-        ordersListEl.innerHTML = `<p class="error">Не вдалося завантажити історію замовлень.</p>`;
+        ordersListEl.innerHTML = loadErrorHtml("історію замовлень");
 
         return;
 
@@ -3031,7 +3031,7 @@ async function loadAddresses() {
 
         console.error("Не вдалося завантажити адреси:", error);
 
-        addressesListEl.innerHTML = `<p class="error">Не вдалося завантажити адреси доставки.</p>`;
+        addressesListEl.innerHTML = loadErrorHtml("адреси доставки");
 
         return;
 

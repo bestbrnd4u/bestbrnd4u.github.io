@@ -226,9 +226,7 @@ whenNearViewport(
 
 console.error(error);
 
-document.getElementById("productPage").innerHTML = `
-    <p class="error">Помилка завантаження товару. Спробуйте оновити сторінку.</p>
-`;
+document.getElementById("productPage").innerHTML = loadErrorHtml("товар");
 
 }
 
@@ -1102,9 +1100,34 @@ function refreshAvailability() {
 
     if (tag) tag.hidden = !preOrder;
 
-    const buy = page.querySelector(".buy-btn");
+    // КНОПОК «КУПИТИ» НА СТОРІНЦІ ДВІ, І ДРУГА — ТА САМА.
+    //
+    // Знизу на телефоні висить закріплена смуга: коли основна кнопка
+    // йде за межі екрана вгору, смуга її Й ЗАМІНЯЄ (див.
+    // setupMobileStickyCart). Тут же стояв querySelector — тобто
+    // ПЕРША кнопка, — і смуга лишалась із написом, зашитим у розмітку.
+    //
+    // Виходило так: сторінка каже «Замовити», поруч пояснює 10–14 днів
+    // і передоплату, а кнопка, яку на телефоні натискають найчастіше,
+    // обіцяє звичайне «додати в кошик». Саме її покупець і бачить у
+    // момент рішення — основної на екрані вже немає.
+    //
+    // Слова в двох кнопках лишаються РІЗНІ, і це навмисно: у смузі
+    // немає ні назви товару, ні ціни, тож дія там називається
+    // повністю. Спільним мусить бути СТАН, а не текст.
+    //
+    // Без окремої функції-помічника: test-stock.js витягує
+    // refreshAvailability регуляркою й виконує в jsdom саму, тож
+    // виклик сусіда впав би з ReferenceError.
+    page.querySelectorAll(".buy-btn").forEach(buy => {
 
-    if (buy) buy.textContent = preOrder ? "📦 Замовити" : "🛒 Купити";
+        const inBar = Boolean(buy.closest(".mobile-sticky-cart"));
+
+        buy.textContent = preOrder
+            ? "📦 Замовити"
+            : (inBar ? "🛒 Додати в кошик" : "🛒 Купити");
+
+    });
 
     const box = page.querySelector(".preorder-box");
 
@@ -2027,7 +2050,7 @@ ${sizeButtons}
         class="btn buy-btn"
         data-id="${product.id}">
 
-        🛒 Додати в кошик
+        ${product.preOrder ? "📦 Замовити" : "🛒 Додати в кошик"}
 
     </button>
 

@@ -1005,17 +1005,10 @@ async function initCatalog() {
         // сайт: 44 КБ каталогу не доїхали. Раніше людина бачила один
         // червоний рядок і мусила сама здогадатись перезавантажити
         // сторінку. Кнопка робить це за неї.
-        grid.innerHTML = `
-            <div class="catalog-error">
-                <p class="error">Не вдалося завантажити каталог.</p>
-                <p class="catalog-error-hint">Схоже на проблему зі звʼязком. Спробуйте ще раз.</p>
-                <button type="button" class="btn" id="catalogRetry">Спробувати ще раз</button>
-            </div>
-        `;
-
-        const retry = document.getElementById("catalogRetry");
-
-        if (retry) retry.addEventListener("click", () => location.reload());
+        // Розмітка й кнопка — зі спільного loadErrorHtml() у
+        // common.js: той самий екран тепер показують ще шість місць,
+        // де раніше був голий червоний рядок.
+        grid.innerHTML = loadErrorHtml("каталог");
 
         // Лічильник ховаємо цілком. Інакше у finally з нього знімається
         // сіра плашка — і над помилкою лишається самотнє слово
@@ -4380,8 +4373,15 @@ function render() {
     // (1 + extraPages) сторінок від поточної
     const shown = list.slice(from, from + PER_PAGE * (1 + extraPages));
 
+    // Перші картки — без lazy: саме вони й видно, щойно сторінка
+    // намалювалась (див. коментар біля createProductCard в ui.js).
+    //
+    // Чотири, а не «перший ряд»: рядів різна ширина — на телефоні в
+    // ряду дві картки, на широкому екрані чотири. Чотири покривають
+    // обидва випадки й не качають зайвого: на телефоні це два ряди,
+    // другий із яких уже наполовину видно.
     grid.innerHTML = shown
-        .map(product => createProductCard(product))
+        .map((product, index) => createProductCard(product, index < 4))
         .join("");
 
     // Статистика: які товари побачили в каталозі. Разом із select_item

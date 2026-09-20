@@ -639,7 +639,7 @@ async function initCheckout() {
 
     } catch (error) {
 
-        orderSummaryItemsEl.innerHTML = `<p class="error">Помилка завантаження замовлення.</p>`;
+        orderSummaryItemsEl.innerHTML = loadErrorHtml("замовлення");
 
         console.error(error);
 
@@ -778,7 +778,76 @@ function renderOrderSummary() {
 
     }).join("");
 
+    showPreorderNote(lines);
+
     updateTotals();
+
+}
+
+// УМОВА ПЕРЕДОПЛАТИ — ПОРУЧ ІЗ ВИБОРОМ СПОСОБУ ОПЛАТИ.
+//
+// ЩО БУЛО НЕ ТАК. Сторінка товару під замовлення пише: «Термін
+// виготовлення та доставки: 10-14 робочих днів. Потрібна передоплата
+// N% вартості». Кошик показує смугу про довший термін. А на
+// оформленні обидві умови зникали — і покупець спокійно обирав
+// «Готівкою при отриманні на пошті», бо ніщо не підказувало, що з цим
+// товаром так не вийде. Дізнавався вже від менеджера.
+//
+// ЧОГО ТУТ НАВМИСНО НЕМАЄ. Способи оплати не вимикаються й не
+// перемикаються. Замовлення приймаємо будь-яке — умови менеджер
+// узгодить; наша справа, щоб покупець прочитав їх ДО вибору.
+//
+// ЧОМУ БЕЗ ВІДСОТКА, ХОЧ ВІН І Є В ДАНИХ
+//
+// Відсоток лежить у полі preOrderPrepayment (у товарах зустрічаються
+// і 50, і 100). Але це поле — зі списку PRODUCT_PAGE_ONLY у
+// scripts/build-products.js: його навмисно НЕ кладуть у
+// data/catalog.json, який вантажать усі сторінки зі списками, це
+// оформлення в тому числі. Тобто тут його просто немає.
+//
+// Спокуса додати поле назад і назвати точну суму — саме те, від чого
+// стереже test-catalog-payload.js [2]: каталог важить 264 КБ, і
+// кожне поле дорожчає для КОЖНОГО відвідувача, а не лише для того,
+// хто дійшов до оплати. Заради одного речення воно того не варте.
+//
+// Тому речення каже те, що ми тут справді знаємо: передоплата буде,
+// суму назве менеджер. Точні умови покупець уже бачив на сторінці
+// товару — там поле є.
+//
+// ЧОМУ ТУТ product.preOrder, А В КОШИКУ ПРАВИЛО ШИРШЕ. Кошик рахує
+// «під замовлення» ще й по кольору та розміру (cart.js, linePreOrder):
+// бежевої сумки може не лишитись, коли чорна є. Але то про СТРОК, а
+// не про гроші: тимчасово відсутній колір не міняє умов оплати — їх
+// задають товару цілком. Тож і питаємо саме товар. Заразом це не
+// тягне на оформлення stock.js із live-stock.js, яких тут немає і які
+// ходили б у мережу заради одного рядка тексту.
+function showPreorderNote(lines) {
+
+    const note = document.getElementById("checkoutPreorderNote");
+
+    if (!note) return;
+
+    const preOrdered = lines.filter(line => line.product?.preOrder);
+
+    note.hidden = preOrdered.length === 0;
+
+    // Порожнимо навіть коли ховаємо: товар під замовлення можна
+    // прибрати просто тут, і текст не має лишатись від минулого разу —
+    // hidden колись знімуть, а рядок брехатиме.
+    if (note.hidden) {
+
+        note.textContent = "";
+
+        return;
+
+    }
+
+    const one = preOrdered.length === 1;
+
+    note.textContent =
+        `📦 У замовленні ${one ? "є товар" : "є товари"} під замовлення — `
+        + `${one ? "за нього" : "за них"} потрібна передоплата, оплата при отриманні не підійде. `
+        + `Після оформлення з вами зв'яжеться менеджер і узгодить суму та строк.`;
 
 }
 
@@ -1008,6 +1077,27 @@ toggleSummaryBtn?.addEventListener("click", () => {
 // Валідація форми
 // -------------------------
 
+// ЧЕРВОНА РАМКА — ЦЕ ВІДПОВІДЬ ТІЛЬКИ ДЛЯ ОКА
+//
+// Текст помилки з'являвся поруч із полем, поле бралось у клас
+// invalid — і на цьому все. Для екранного читача не змінювалось
+// НІЧОГО: поле не позначене як помилкове, а сам текст лежить
+// окремим вузлом, ніяк із полем не пов'язаним. Людина повертається
+// в «Email», чує «Email, поле вводу» — і жодного слова про те, що з
+// ним не так.
+//
+// Тому додаємо дві речі, які й мали тут бути:
+//   aria-invalid    — «з цим полем проблема»;
+//   aria-describedby — «а ось яка саме», посиланням на той самий
+//                      текст, що бачить око.
+//
+// id проставляємо ТУТ, а не в розмітці: прив'язка потрібна лише
+// поки помилка є, а тримати в checkout.html сім зайвих id, які ні
+// на що більше не впливають, — це сім місць, де вони розійдуться з
+// data-error-for.
+//
+// Порожнє повідомлення прибирає обидва атрибути: поле «з проблемою,
+// а якою — не скажу» гірше за поле без позначки.
 function setFieldError(fieldId, message) {
 
     const errorEl = document.querySelector(`[data-error-for="${fieldId}"]`);
@@ -1015,7 +1105,23 @@ function setFieldError(fieldId, message) {
 
     if (errorEl) errorEl.textContent = message;
 
-    if (fieldEl) fieldEl.classList.toggle("invalid", Boolean(message));
+    if (!fieldEl) return;
+
+    fieldEl.classList.toggle("invalid", Boolean(message));
+
+    if (message && errorEl) {
+
+        if (!errorEl.id) errorEl.id = `field-error-${fieldId}`;
+
+        fieldEl.setAttribute("aria-invalid", "true");
+        fieldEl.setAttribute("aria-describedby", errorEl.id);
+
+    } else {
+
+        fieldEl.removeAttribute("aria-invalid");
+        fieldEl.removeAttribute("aria-describedby");
+
+    }
 
 }
 
@@ -1709,6 +1815,28 @@ checkoutForm?.addEventListener("submit", event => {
         const firstError = checkoutForm.querySelector(".field-error:not(:empty)");
 
         firstError?.closest("label, .delivery-options")?.scrollIntoView({ behavior: "smooth", block: "center" });
+
+        // І КУРСОР ТУДИ Ж, А НЕ ЛИШЕ ЕКРАН.
+        //
+        // Сторінка прокручувалась до першої помилки, а фокус лишався
+        // на кнопці «Замовити». Хто веде формою з клавіатури, після
+        // натискання не отримував НІЧОГО: екран поїхав кудись угору
+        // (він його не бачить), кнопка під пальцем та сама, помилку
+        // ніхто не назвав. Виглядає як «кнопка не працює».
+        //
+        // Шукаємо поле за тим самим data-error-for, яким підписано
+        // помилку. Для способу доставки поля з таким id немає —
+        // помилка спільна на групу, — тому запасний варіант: перший
+        // перемикач у ній.
+        const fieldId = firstError?.dataset.errorFor;
+
+        const target = (fieldId && document.getElementById(fieldId))
+            || firstError?.closest("label, .delivery-options")
+                ?.querySelector("input, select, textarea");
+
+        // preventScroll — щоб не сперечатись із плавним прокручуванням
+        // вище: два стрибки поспіль виглядають як смикання.
+        target?.focus({ preventScroll: true });
 
         return;
 

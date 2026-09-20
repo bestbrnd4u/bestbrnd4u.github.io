@@ -305,6 +305,90 @@ console.log("\n[Форма] Помилки видно там, де курсор 
     check("вибраний спосіб доставки теж темний",
         /input:checked \+ \.delivery-option-card\{[^}]*border-color:var\(--gray900\)/.test(css));
 }
+
+console.log("\n[Форма-2] Помилку не тільки видно, а й чути — і курсор іде до неї");
+{
+    const { JSDOM } = require("jsdom");
+
+    const js = fs.readFileSync(path.join(ROOT, "assets/js/checkout.js"), "utf8");
+
+    // ЩО БУЛО НЕ ТАК. Помилка ставила текст поруч і клас invalid —
+    // тобто відповідала ТІЛЬКИ ОКУ. Для екранного читача не
+    // змінювалось нічого: поле не позначене, текст лежить окремим
+    // вузлом без жодного зв'язку з ним. А після невдалого
+    // надсилання сторінка прокручувалась до першої помилки, але
+    // фокус лишався на кнопці — хто веде формою з клавіатури,
+    // отримував рівно нуль зворотного зв'язку. Виглядає як
+    // «кнопка не працює».
+    const setter = (js.match(/function setFieldError[\s\S]*?\n}\n/) || [""])[0];
+
+    check("помилка знайдена", setter.length > 0);
+
+    const dom = new JSDOM(`<!doctype html><body>
+        <label>
+            <input id="email">
+            <span class="field-error" data-error-for="email"></span>
+        </label>
+        </body>`, { runScripts: "outside-only" });
+
+    const { window } = dom;
+    const doc = window.document;
+
+    window.eval(setter);
+    window.eval("window.__set = setFieldError;");
+
+    const field = () => doc.getElementById("email");
+    const errorEl = () => doc.querySelector('[data-error-for="email"]');
+
+    window.__set("email", "Вкажіть пошту");
+
+    check("текст помилки на місці", errorEl().textContent === "Вкажіть пошту");
+    check("поле позначене як помилкове",
+        field().getAttribute("aria-invalid") === "true");
+    check("і сказано, ЯКА саме помилка",
+        field().getAttribute("aria-describedby") === errorEl().id && Boolean(errorEl().id),
+        field().getAttribute("aria-describedby") + " / " + errorEl().id);
+
+    // Прив'язка живе рівно поки живе помилка. Поле «з проблемою, а
+    // якою — не скажу» гірше за поле без позначки зовсім.
+    window.__set("email", "");
+
+    check("виправили — позначка знята", field().hasAttribute("aria-invalid") === false);
+    check("і опис теж", field().hasAttribute("aria-describedby") === false);
+    check("клас теж знято", field().classList.contains("invalid") === false);
+
+    // Поля може не бути взагалі: помилка «Оберіть спосіб доставки»
+    // спільна на групу перемикачів, і елемента з таким id немає.
+    // Раніше на цьому не падало — хай не падає й тепер.
+    const groupDom = new JSDOM(
+        `<!doctype html><body><span class="field-error" data-error-for="deliveryMethod"></span></body>`,
+        { runScripts: "outside-only" });
+
+    groupDom.window.eval(setter);
+    groupDom.window.eval('setFieldError("deliveryMethod", "Оберіть спосіб доставки");');
+
+    check("помилка без власного поля не ламає нічого",
+        groupDom.window.document.querySelector('[data-error-for="deliveryMethod"]')
+            .textContent === "Оберіть спосіб доставки");
+
+    // І сам перехід курсора після невдалого надсилання.
+    check("після невдалого надсилання курсор іде в поле",
+        /target\?\.focus\(\{ preventScroll: true \}\)/.test(js));
+
+    check("поле шукається за тим самим data-error-for",
+        /firstError\?\.dataset\.errorFor/.test(js));
+
+    // Запасний варіант потрібен саме для способу доставки: там
+    // фокусувати треба перший перемикач групи.
+    check("для групи перемикачів є запасний шлях",
+        /querySelector\("input, select, textarea"\)/.test(js));
+
+    // Прокручування лишається: фокус із preventScroll сам нікуди не
+    // веде, а без плавного переходу сторінка просто стрибає.
+    check("плавне прокручування до помилки лишилось",
+        /scrollIntoView\(\{ behavior: "smooth", block: "center" \}\)/.test(js));
+}
+
 console.log(failures ? `\n❌ Провалено: ${failures}` : "\n✅ Незавершене оформлення: нагадуємо один раз і нікого не підписуємо");
 
 process.exit(failures ? 1 : 0);

@@ -276,8 +276,15 @@ console.log("\n[6] Що видно, поки ці кілобайти їдуть"
         /finally \{[\s\S]{0,400}?classList\.remove\("catalog-loading"\)/.test(js));
 
     // 5. Помилка — з кнопкою, а не глухий кут.
+    //
+    // Розмітка переїхала в loadErrorHtml() (common.js): той самий
+    // екран тепер показують ще шість місць, де раніше був голий
+    // червоний рядок. Перевірка йде за викликом, а не за id кнопки:
+    // id більше не потрібен, кнопку слухає делегований обробник.
     check("каталог не доїхав — є кнопка «спробувати ще раз»",
-        /id="catalogRetry"/.test(js) && /location\.reload\(\)/.test(js));
+        /loadErrorHtml\("каталог"\)/.test(js)
+        && /data-reload/.test(read("assets/js/common.js"))
+        && /location\.reload\(\)/.test(read("assets/js/common.js")));
 
     check("і лічильник тоді ховається цілком, без самотнього «товарів»",
         /productsCountLine\.hidden = true/.test(js));
