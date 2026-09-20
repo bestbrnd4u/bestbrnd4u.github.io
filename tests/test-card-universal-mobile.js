@@ -159,6 +159,80 @@ console.log("\n[6b] Кільце активного кольору не зріз
         active);
 }
 
+console.log("\n[6c] У кружечок кольору можна поцілити пальцем");
+{
+    // ЩО ЗМІРЯНО (375 px, каталог, elementFromPoint):
+    //
+    //   намальований кружечок: 16×16
+    //   зона натискання:       16×16 — рівно по малюнку
+    //   крок між сусідніми:    23 px
+    //   палець дорослого:      ~40 px
+    //
+    // Промах тут не прикрий виняток, а звичайна справа: цілишся в
+    // бежевий — відкривається картка, бо під кружечком суцільне
+    // посилання. Кружечок при цьому маленький не від невдалого
+    // смаку: у рядку їх буває шість-сім, і поруч іще розміри з
+    // ціною. Тому росте не малюнок, а невидима зона ::before.
+    //
+    // Числа нижче не константи, а ВИВЕДЕНІ з самих стилів — щоб
+    // перевірка ловила не «хтось стер рядок», а «хтось змінив
+    // кружечок або проміжок, і зона перестала сходитись».
+    const mini = rule(".product-card .mini-color");
+    const base = rule(".mini-color");
+    const zone = rule(".product-card .mini-color::before");
+    const colors = rule(".product-colors");
+
+    check("мобільне правило кружечка знайдено", !!mini);
+    check("зона натискання описана", !!zone);
+
+    const num = (body, prop) => {
+        const m = (body || "").match(new RegExp(prop + ":\\s*(-?[\\d.]+)px"));
+        return m ? Number(m[1]) : null;
+    };
+
+    const size = num(mini, "width");            // 16
+    const border = num(base, "border");         // 2
+    const gap = num(colors, "gap");             // 7
+    const inset = num(zone, "inset");           // -5
+
+    check("розміри прочитано зі стилів",
+        size && border && gap && inset !== null,
+        `size=${size} border=${border} gap=${gap} inset=${inset}`);
+
+    // inset у absolute рахується від PADDING-боксу, а box-sizing у
+    // проєкті border-box: видимі 16px це 12px padding-боксу плюс
+    // рамка. Саме на цьому легко помилитись на 4 пікселі — і зона
+    // майже не виросте, а на вигляд не відрізниш.
+    const touch = (size - 2 * border) + 2 * -inset;
+
+    check(`зона виходить ${touch}px замість ${size}px`, touch > size, touch);
+
+    // ВЕРХНЯ МЕЖА ПЕРША: крок між кружечками. Зона ширша за крок
+    // почала б перекривати сусідню — і промах просто переїхав би на
+    // сусідній колір замість картки.
+    check(`не ширша за крок між кружечками (${size + gap}px)`,
+        touch < size + gap, `${touch} проти ${size + gap}`);
+
+    // ВЕРХНЯ МЕЖА ДРУГА: .product-options ріже по вертикалі
+    // (overflow-y:hidden, див. [6b]). Вища за рядок зона просто не
+    // існуватиме знизу — і перевірка мовчала б про це.
+    const opts = rule(".product-card .product-options");
+    const padding = Number(((opts || "").match(/padding:\s*([\d.]+)px/) || [])[1]);
+    const rowHeight = size + 2 * padding;
+
+    check(`не вища за сам рядок (${rowHeight}px)`,
+        touch <= rowHeight, `${touch} проти ${rowHeight}`);
+
+    // Без position:relative зона поїхала б до найближчого
+    // позиціонованого предка — тобто кудись у кут картки.
+    check("зона тримається за свій кружечок", /position:relative/.test(mini));
+
+    // ::after тут зайнятий пунктирною рамкою «цей колір уже в
+    // кошику». Якщо зону колись перенесуть на нього, рамка зникне.
+    check("рамку «вже в кошику» не зайнято під зону",
+        /border:1px dashed/.test(rule(".mini-color.is-taken::after") || ""));
+}
+
 console.log("\n[7] Синтаксична цілісність файлу");
 {
   const opens = (css.match(/\{/g) || []).length;
