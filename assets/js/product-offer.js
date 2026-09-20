@@ -118,11 +118,75 @@
 
     }
 
+    // СКІЛЬКИ РОБОЧИХ ДНІВ ЧЕКАТИ ТОВАР ПІД ЗАМОВЛЕННЯ.
+    //
+    // Беремо БІЛЬШЕ число з «10-14 робочих днів»: обіцяти покупцеві
+    // коротший строк, ніж буває, — найгірший вид точності.
+    //
+    // Пробіли в полі стоять як завгодно («10- 14», «10 -14»), бо його
+    // заповнюють руками в адмінці — у даних сьогодні всі три
+    // написання. Тому числа виловлюємо регуляркою, а не розбором за
+    // дефісом.
+    //
+    // Жило це в scripts/build-feed.js і працювало там правильно:
+    // фід давно віддає Google backorder із датою очікування. А ось
+    // розмітка сторінки про той самий строк не знала — див.
+    // shippingDetails нижче. Тепер помічник один на обох.
+    function preOrderWorkRange(product) {
+
+        var numbers = String(product && product.preOrderDays || "").match(/\d+/g);
+
+        if (!numbers || !numbers.length) return null;
+
+        var days = numbers.map(Number);
+
+        return { min: Math.min.apply(null, days), max: Math.max.apply(null, days) };
+
+    }
+
+    // Одне число — коли потрібен саме строк «не пізніше»: фід рахує
+    // від нього дату очікування, і там діапазон недоречний.
+    function preOrderWorkDays(product) {
+
+        var range = preOrderWorkRange(product);
+
+        return range ? range.max : 0;
+
+    }
+
     // Ставка стоїть беззастережно і від ціни товару не залежить: саме
     // умова «якщо ціна більша за поріг» і ставила колись нуль.
-    function shippingDetails(overrides) {
+    //
+    // ДРУГИЙ АРГУМЕНТ — ПРО ТОВАР ПІД ЗАМОВЛЕННЯ.
+    //
+    // Раніше строки тут були одні на всіх: збірка 1–2 дні, доставка
+    // 1–3. Для товару зі складу це правда. Для товару під замовлення
+    // сторінка пише «10-14 робочих днів», а розмітка казала Google
+    // «2–5» — тобто рівно та невідповідність, через яку rich-результат
+    // і знімають. Таких товарів 29 зі 103.
+    //
+    // Міняється саме handlingTime: це час ДО передачі перевізнику, і
+    // очікування замовленої речі — воно і є. transitTime лишається,
+    // бо коли річ уже в дорозі, вона їде звичайні 1–3 дні.
+    function shippingDetails(overrides, product) {
 
         var terms = deliveryTerms(overrides);
+
+        // Діапазон, а не одне число: «10-14» на сторінці й «10-14» у
+        // розмітці — це те саме, що прочитає покупець. Одне число
+        // (14) було б теж чесно, але без потреби суворіше.
+        var wait = product && product.preOrder ? preOrderWorkRange(product) : null;
+
+        if (wait) {
+
+            terms = {
+                handlingMin: wait.min,
+                handlingMax: wait.max,
+                transitMin: terms.transitMin,
+                transitMax: terms.transitMax
+            };
+
+        }
 
         return {
             "@type": "OfferShippingDetails",
@@ -317,7 +381,7 @@
             priceValidUntil: priceValidUntil(from),
             itemCondition: "https://schema.org/NewCondition",
             hasMerchantReturnPolicy: RETURN_POLICY,
-            shippingDetails: shippingDetails(terms),
+            shippingDetails: shippingDetails(terms, product),
             availability: availabilityOf(product)
         };
 
@@ -331,6 +395,8 @@
         deliveryWindow: deliveryWindow,
         formatDeliveryRange: formatDeliveryRange,
         shippingDetails: shippingDetails,
+        preOrderWorkDays: preOrderWorkDays,
+        preOrderWorkRange: preOrderWorkRange,
         priceValidUntil: priceValidUntil,
         availabilityOf: availabilityOf,
         offerFor: offerFor

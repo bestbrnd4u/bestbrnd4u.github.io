@@ -252,6 +252,225 @@ console.log("\n[5] Перший ряд каталогу не стоїть у ч�
         !/fetchpriority/.test(uiCode), "з'явився — чи є заміри?");
 }
 
+console.log("\n[6] Плитки мега-меню — 88×88, а не на пів екрана");
+{
+    // ЩО БУЛО ЗМІРЯНО (головна, performance.getEntriesByType):
+    //
+    //   4a5d4b88….png  2296 КБ   «Жінкам»
+    //   bea2c056….png  2257 КБ   «Чоловікам»
+    //   5cdd14ae….png  2012 КБ   «Унісекс»
+    //   4023d633….png  2314 КБ   «Дітям»
+    //   ─────────────────────────
+    //                  8879 КБ   на чотири плитки 88×88 px
+    //
+    // І качались вони намарно: мега-меню за мить перемальовує
+    // mega-menu.js, тобто ці мегабайти не встигали навіть
+    // показатись. Решта сторінок сайту тим часом брали готові
+    // mega-*.webp по 0,2–3,5 КБ.
+    //
+    // Причина — два кроки збірки, які тягли в різні боки.
+    // build-banners.js малює зменшені плитки, а build-home-static.js
+    // крок 5 підставляв у меню знімок категорії з home.json: там під
+    // тією ж статтю лежить фото для ВЕЛИКОЇ плитки на пів екрана.
+    // Головна була єдиною сторінкою, яку цей крок чіпає.
+    const { MEGA_MENU_FILES, MEGA_DIR } = require("../scripts/mega-tiles.js");
+
+    const pages = fs.readdirSync(ROOT).filter(f => f.endsWith(".html"));
+
+    const withMenu = pages.filter(f => read(f).includes('class="mega-item"'));
+
+    check(`сторінок із мега-меню — ${withMenu.length}`, withMenu.length >= 8);
+
+    // Межа не з голови: найбільша готова плитка важить 3,5 КБ, а
+    // найлегший «важкий» знімок категорії — два мегабайти. Двадцять
+    // кілобайтів лишають запас на кращу якість і все одно ловлять
+    // повернення повнорозмірного.
+    const LIMIT_KB = 20;
+
+    const heavy = [];
+
+    withMenu.forEach(page => {
+
+        const html = read(page);
+
+        [...html.matchAll(/class="mega-item"[^>]*><img src="([^"]+)"/g)].forEach(m => {
+
+            const src = m[1].replace(/^\//, "").split("?")[0];
+            const file = path.join(ROOT, src);
+
+            if (!fs.existsSync(file)) {
+                heavy.push(`${page}: ${src} — файлу немає`);
+                return;
+            }
+
+            const kb = Math.round(fs.statSync(file).size / 1024);
+
+            if (kb > LIMIT_KB) heavy.push(`${page}: ${src} — ${kb} КБ`);
+
+        });
+
+    });
+
+    check(`жодна плитка не важча за ${LIMIT_KB} КБ`, heavy.length === 0,
+        [...new Set(heavy)].slice(0, 6).join(" | "));
+
+    // Головна мусить брати ТІ САМІ файли, що й решта сторінок.
+    const home = read("index.html");
+
+    Object.values(MEGA_MENU_FILES).forEach(file => {
+        check(`головна бере ${file}`, home.includes(MEGA_DIR + "/" + file));
+    });
+
+    check("і жодного знімка з uploads у меню головної",
+        !/class="mega-item"[^>]*><img src="[^"]*products\/uploads/.test(home));
+
+    // Словник один на два скрипти: розійдись вони — головна тихо
+    // повернеться до мегабайтів.
+    const banners = read("scripts/build-banners.js");
+    const homeScript = read("scripts/build-home-static.js");
+
+    check("обидва скрипти беруть перелік зі спільного модуля",
+        /require\("\.\/mega-tiles"\)/.test(banners)
+        && /require\("\.\/mega-tiles"\)/.test(homeScript));
+
+    // Спільний модуль НЕ МУСИТЬ тягти sharp: основний ланцюжок
+    // збірки нативних модулів не потребує, і середовище без
+    // зібраного sharp валило б усю збірку замість однієї
+    // необов'язкової команди.
+    //
+    // Коментарі відкидаємо: у поясненні всередині самого модуля це
+    // слово стоїть навмисно — там сказано, чому sharp туди не
+    // тягнуть. Без очищення перевірка ловила б власний текст.
+    check("спільний модуль не тягне sharp",
+        !/require\("sharp"\)/.test(
+            read("scripts/mega-tiles.js")
+                .replace(/\/\*[\s\S]*?\*\//g, "")
+                .replace(/^\s*\/\/.*$/gm, "")));
+
+    check("головна підставляє зменшену плитку, а не знімок категорії",
+        /const small = megaTile\(name\);/.test(homeScript)
+        && /const img = small \|\| byGender\[name\];/.test(homeScript));
+}
+
+console.log("\n[7] Фотографії не лежать у PNG");
+{
+    // ЩО БУЛО ЗМІРЯНО. Головна, 19 картинок разом на 13,7 МБ. Шість
+    // із них — PNG по 1,4–2,5 МБ: банер SUMMER SALE, плитки розділів,
+    // фони акцій. Поруч фотографії товарів важать 22–27 КБ.
+    //
+    // Різниця не в розмірі кадру (1100–2200 px — помірно), а у
+    // ФОРМАТІ. PNG стискає без утрат: для скриншота чи логотипа це
+    // правильно, для знімка з піском і градієнтами — ні. Той самий
+    // кадр у webp важить у 10–20 разів менше.
+    //
+    // Конвеєр товарних фото бере ЛИШЕ .webp, тож усе завантажене
+    // через адмінку як PNG лишалось нерозпакованим роками.
+    const shrink = read("scripts/shrink-heavy-images.js");
+
+    check("крок є в конвеєрі медіа",
+        JSON.parse(read("package.json")).scripts["build:media"]
+            .includes("shrink-heavy-images.js --apply"));
+
+    // НАЙГОЛОВНІША ОБЕРЕЖНІСТЬ — ПРО ВИБІЛЮВАЧ ТЛА.
+    //
+    // whiten-backgrounds.js бере з products/uploads КОЖЕН .webp і
+    // заливає йому тло білим. Для фотографії товару це його робота.
+    // Але в тій же теці лежать банери й плитки розділів — адмінка
+    // складає все завантажене в одне місце. Доки банер лишається
+    // PNG, вибілювач його не бачить; переупакуй його на місці — і
+    // наступна збірка заллє білим небо на знімку з моделлю.
+    //
+    // Тому фотографію товару не чіпаємо взагалі, а банер із тієї ж
+    // теки ПЕРЕНОСИМО до banners — там йому й місце, і вибілювач
+    // туди не заглядає. Відрізняємо за тим, чи посилається на файл
+    // хоч один товар.
+    check("фотографії товарів не чіпаємо",
+        /if \(inUploads && isProductPhoto\)/.test(shrink)
+        && /function productImages\(\)/.test(shrink));
+
+    check("банер із теки товарів переїздить до banners",
+        /const BANNERS_DIR = "assets\/images\/banners";/.test(shrink)
+        && /return path\.join\(ROOT, BANNERS_DIR, path\.basename\(asWebp\)\);/.test(shrink));
+
+    // Скрипт спіймав себе на першому ж показі: JPEG (уже стиснуті з
+    // утратами) у webp ставали БІЛЬШИМИ — до 3288 КБ із 1893.
+    check("замінюємо лише те, що справді полегшало",
+        /const MIN_GAIN = 0\.25;/.test(shrink)
+        && /result\.after > file\.size \* \(1 - MIN_GAIN\)/.test(shrink));
+
+    // ПРОЗОРІСТЬ МУСИТЬ БУТИ СПРАВЖНЬОЮ.
+    //
+    // Наявність четвертого каналу нічого не означає: редактори
+    // лишають його майже завжди, навіть коли жоден піксель не
+    // прозорий. Перша версія питала metadata().hasAlpha — і на
+    // банері 1am.png (альфа від краю до краю 255) увімкнула
+    // збереження без утрат: 846 КБ замість 91. Три чверті мегабайта
+    // на головній за канал, який нічого не робить.
+    check("прозорість перевіряється по самому каналу, а не по наявності",
+        /function usesAlpha\(/.test(shrink)
+        && /alpha\.min < 255/.test(shrink));
+
+    check("і саме вона вмикає збереження без утрат",
+        /const alpha = await usesAlpha\(file\.full\);/.test(shrink)
+        && /LOSSLESS_IF_ALPHA && alpha/.test(shrink));
+
+    // Заміна по ІМЕНІ файлу зачепила б чуже: серед банерів лежить
+    // «2.png», і воно є підрядком у «photo2.png» чи «img-12.png».
+    check("посилання переписуються за шляхом, а не за іменем",
+        /path\.relative\(ROOT, file\.full\)/.test(shrink)
+        && /path\.relative\(ROOT, result\.target\)/.test(shrink));
+
+    // Сироти не чіпаємо: відвідувач їх не качає, а в репозиторії від
+    // переупаковки стало б удвічі більше файлів.
+    check("файли, на які ніхто не посилається, пропускаються",
+        /if \(!refs\.has\(name\)\)/.test(shrink));
+
+    // І власне результат.
+    const dataFiles = ["data/home.json", "data/promotions.json"]
+        .concat(fs.readdirSync(path.join(ROOT, "data/promotions"))
+            .filter(f => f.endsWith(".json"))
+            .map(f => "data/promotions/" + f));
+
+    const heavy = [];
+    const inUploads = [];
+
+    dataFiles.forEach(rel => {
+
+        const text = read(rel);
+
+        [...text.matchAll(/\/(assets\/images\/[^"']+\.(?:png|jpe?g))/gi)].forEach(m => {
+
+            const file = path.join(ROOT, m[1]);
+
+            if (!fs.existsSync(file)) return;
+
+            const kb = Math.round(fs.statSync(file).size / 1024);
+
+            if (kb <= 700) return;
+
+            const line = `${path.basename(m[1])} — ${kb} КБ`;
+
+            if (m[1].includes("products/uploads")) inUploads.push(line);
+            else heavy.push(`${rel}: ${line}`);
+
+        });
+
+    });
+
+    check("поза текою товарів важких PNG у даних немає",
+        heavy.length === 0, [...new Set(heavy)].slice(0, 5).join(" | "));
+
+    // З теки товарів у дані сторінок теж більше нічого важкого не
+    // світить: плитки розділів переїхали до banners і стали webp.
+    //
+    // Якщо тут щось з'явиться — це або новий банер, покладений в
+    // теку товарів і ще не пропущений через build:media, або
+    // справжня фотографія товару, яку раптом вставили в банер. Обидва
+    // випадки варто побачити.
+    check("у даних сторінок немає важких файлів із теки товарів",
+        inUploads.length === 0, [...new Set(inUploads)].join(" | "));
+}
+
 console.log(failures ? `\n❌ Провалено: ${failures}` : "\n✅ Вага сторінки товару: зайвого не вантажимо");
 
 process.exit(failures ? 1 : 0);

@@ -8,8 +8,8 @@
   "link": "catalog?brand=Coach",
   "image": "/assets/images/banners/coach-teaser.jpg",
   "displayType": "banner_compact",
-  "imageMobile": "/assets/images/banners/4coachsmall_card_1200x1500.jpg",
+  "imageMobile": "/assets/images/banners/4coachsmall_card_1200x1500.webp",
   "promoPageImage": "/assets/images/banners/coach-promo-page.jpg",
-  "promoPageImageMobile": "/assets/images/banners/043_small_card_1200x1500.jpg",
+  "promoPageImageMobile": "/assets/images/banners/043_small_card_1200x1500.webp",
   "buttonText": "Дивитись колекцію"
 }

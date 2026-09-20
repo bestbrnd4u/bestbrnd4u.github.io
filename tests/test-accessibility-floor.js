@@ -837,6 +837,25 @@ console.log("\n[10] Фокус заходить у вікно й поверта�
         /id="mobileFiltersModal"[^>]*aria-label="Фільтри"/.test(
             fs.readFileSync(path.join(ROOT, "catalog.html"), "utf8")));
 
+    // П'яте таке вікно — накладка пошуку в шапці.
+    //
+    // Курсор у поле вона ставила й сама, і це головне. А от далі Tab
+    // вів по сторінці ПІД нею: заміряно на головній — дванадцятий Tab
+    // від поля, і фокус на кнопці «Меню», якої за накладкою не видно.
+    check("накладка пошуку забирає фокус",
+        /DialogFocus\?\.open\(searchOverlayEl\)/.test(common));
+    check("і повертає його на 🔍",
+        /DialogFocus\?\.close\(searchOverlayEl\)/.test(common));
+
+    // Порядок важливий: DialogFocus ставить курсор на перший елемент
+    // накладки, а потрібне саме поле, у яке одразу друкують.
+    check("поле лишається останнім словом",
+        common.indexOf("DialogFocus?.open(searchOverlayEl)")
+        < common.indexOf("setTimeout(() => input.focus(), 50)"));
+
+    check("у накладки пошуку є назва для читача",
+        /overlay\.setAttribute\("aria-label", "Пошук по каталогу"\)/.test(common));
+
     // role="dialog" без назви читач оголошує просто «діалог».
     check("у меню є назва для читача",
         /nav\.setAttribute\("aria-label", "Меню"\)/.test(common));

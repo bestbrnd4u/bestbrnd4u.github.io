@@ -30,6 +30,12 @@ const HOME = path.join(ROOT, "data", "home.json");
 // домен береться з site.config.json (див. scripts/site-env.js)
 const { SITE_URL } = require("./site-env");
 
+// Зменшені плитки мега-меню (88×88). Малює їх build-banners.js
+// окремою командою, а словник «стать → файл» живе в спільному
+// mega-tiles.js — там же пояснено, чому не прямо в build-banners.js
+// (той тягне sharp, якого в основній збірці немає).
+const { megaTile } = require("./mega-tiles");
+
 function escapeAttr(value) {
 
     return String(value === undefined || value === null ? "" : value)
@@ -148,6 +154,25 @@ function main() {
     // застаріли: там лишались зовнішні картинки з pexels. JS їх не
     // чіпає, тож у меню роками показувались чужі фото. Беремо картинку
     // за статтю з тих самих даних, що й плитки категорій.
+    //
+    // …АЛЕ НЕ ПОВНОРОЗМІРНУ. ЦЕ КОШТУВАЛО ГОЛОВНІЙ 8,7 МБ.
+    //
+    // Плитка в меню — 88×88 px. У home.json під тією ж статтю лежить
+    // знімок для ВЕЛИКОЇ плитки категорії на пів екрана: чотири таких
+    // файли важать 2296 + 2257 + 2012 + 2314 КБ. Заміряно на живій
+    // сторінці через performance.getEntriesByType("resource"):
+    // головна качала всі чотири. І викидала — мега-меню за мить
+    // перемальовує mega-menu.js, тобто ці мегабайти не встигали
+    // навіть показатись.
+    //
+    // Решта сторінок сайту тим часом брали готові mega-*.webp по
+    // 0,2–3,5 КБ. Тобто лишалась одна сторінка з чужої епохи — і саме
+    // та, яку відкривають першою.
+    //
+    // Зменшені плитки малює scripts/build-banners.js; словник «стать →
+    // файл» беремо в нього, а не переписуємо сюди. Немає файлу на
+    // диску (банери ще не збирали) — лишаємо знімок категорії:
+    // важкий, зате не порожнє місце.
     if (home.categories && Array.isArray(home.categories.items)) {
 
         const byGender = {};
@@ -160,8 +185,14 @@ function main() {
         html = html.replace(
             /(<a class="mega-item" href="[^"]*gender=([^"&]+)"><img src=")([^"]*)(")/g,
             (all, head, gender, oldSrc, tail) => {
-                const img = byGender[decodeURIComponent(gender)];
+
+                const name = decodeURIComponent(gender);
+                const small = megaTile(name);
+
+                const img = small || byGender[name];
+
                 return img ? head + escapeAttr(img) + tail : all;
+
             }
         );
 

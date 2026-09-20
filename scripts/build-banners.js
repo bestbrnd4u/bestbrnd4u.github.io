@@ -36,6 +36,8 @@ const fs = require("fs");
 const path = require("path");
 const sharp = require("sharp");
 
+const { MEGA_MENU_FILES } = require("./mega-tiles");
+
 const ROOT = path.join(__dirname, "..");
 const OUT_DIR = path.join(ROOT, "assets", "images", "banners");
 
@@ -63,12 +65,12 @@ const JOBS = [
     {
         key: "megaMenu",
         width: 200, height: 200, tiles: 1,
-        files: {
-            "Чоловікам": "mega-men.webp",
-            "Жінкам": "mega-women.webp",
-            "Унісекс": "mega-unisex.webp",
-            "Дітям": "mega-kids.webp"
-        }
+        // Імена файлів — зі спільного mega-tiles.js: ті самі плитки
+        // підставляє в головну build-home-static.js, і друга копія
+        // словника розійшлася б із цією. Чим це закінчується, видно
+        // там же: головна роками качала 8,7 МБ повнорозмірних
+        // знімків замість цих семи кілобайтів.
+        files: MEGA_MENU_FILES
     }
 ];
 

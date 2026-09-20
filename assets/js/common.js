@@ -1485,6 +1485,12 @@ function buildSearchOverlay() {
     overlay.className = "search-overlay";
     overlay.hidden = true;
 
+    // Накладка тримає фокус і закривається по Escape, тобто для
+    // читача це вікно — openModalFocus() ставить їй role="dialog".
+    // Вікно без назви читач оголошує просто «діалог», а шукати назву
+    // тут нема де: заголовка в накладці немає, є лише поле.
+    overlay.setAttribute("aria-label", "Пошук по каталогу");
+
     overlay.innerHTML = `
         <div class="search-overlay-panel">
 
@@ -2202,6 +2208,22 @@ function openSearchOverlay() {
 
     lockPageScroll();
 
+    // Tab не мусить виходити за межі пошуку.
+    //
+    // Курсор у поле ставився й раніше — це головне, і воно працювало.
+    // А от далі Tab вів по сторінці ПІД накладкою: заміряно на
+    // головній, дванадцятий Tab від поля пошуку — і фокус на кнопці
+    // «Меню», яку за накладкою не видно.
+    //
+    // Через той самий window.DialogFocus, що вже тримає вікна
+    // .modal-overlay, лайтбокс, мобільне меню й панель фільтрів:
+    // він замикає коло Tab і запам'ятовує, куди повернути курсор.
+    //
+    // Кличемо ДО фокуса в поле — щоб поле лишилось останнім словом:
+    // DialogFocus ставить курсор на перший елемент накладки, а нам
+    // потрібне саме поле, у яке одразу друкують.
+    window.DialogFocus?.open(searchOverlayEl);
+
     const input = document.getElementById("globalSearchInput");
 
     input.value = "";
@@ -2215,6 +2237,9 @@ function openSearchOverlay() {
 function closeSearchOverlay() {
 
     if (!searchOverlayEl) return;
+
+    // Курсор назад на 🔍 — ДО того, як накладка почне зникати.
+    window.DialogFocus?.close(searchOverlayEl);
 
     searchOverlayEl.classList.remove("open");
 

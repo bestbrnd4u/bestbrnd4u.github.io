@@ -63,13 +63,13 @@
   "order": 1,
   "title": "Обери сумочку для себе",
   "link": "catalog",
-  "image": "/assets/images/banners/1hero_c.png",
+  "image": "/assets/images/banners/1hero_c.webp",
   "displayType": "hero_slider",
   "autoSections": [
     "Сумки"
   ],
   "imageMobile": "/assets/images/banners/03_banner_compact_800x1000.jpg",
-  "promoPageImage": "/assets/images/banners/2.png",
+  "promoPageImage": "/assets/images/banners/2.webp",
   "legacySlugs": [
     "більше-стилю-для-яскравого-літа"
   ],
