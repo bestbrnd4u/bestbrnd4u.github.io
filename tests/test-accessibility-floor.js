@@ -660,8 +660,16 @@ console.log("\n[10] Фокус заходить у вікно й поверта�
     const grab = name =>
         (common.match(new RegExp("function " + name + "\\([\\s\\S]*?\\n}\\n")) || [""])[0];
 
-    ["openModalFocus", "closeModalFocus", "trapModalTab", "focusablesIn"]
+    ["openModalFocus", "closeModalFocus", "trapModalTab", "focusablesIn", "isShown"]
         .forEach(name => check(`${name} знайдено`, grab(name).length > 0));
+
+    // offsetParent порожній НЕ ЛИШЕ в схованого: у position:fixed
+    // його немає ніколи. Хрестик «Закрити» в лайтбоксі саме fixed —
+    // і випадав із переліку, а фокус ставав на стрілку «Наступне
+    // фото». Спіймано на живому лайтбоксі, не в jsdom.
+    check("видимість рахується не через offsetParent",
+        !/offsetParent/.test(grab("focusablesIn") + grab("isShown") + grab("closeModalFocus")),
+        "offsetParent повернувся");
 
     // Спостерігач за hidden — щоб не правити чотири місця, які
     // відкривають вікна (product.js, account.js ×2, checkout.js).
@@ -685,12 +693,13 @@ console.log("\n[10] Фокус заходить у вікно й поверта�
     const { window } = dom;
     const doc = window.document;
 
-    // jsdom не рахує розкладку: offsetParent там завжди null, тож
-    // видимість підміняємо чесним правилом «предок не hidden».
+    // jsdom не рахує розкладку: getClientRects() там завжди
+    // порожній. Підміняємо чесним правилом «предок не hidden» — саме
+    // те, що в браузері дає справжня розкладка.
     window.eval(`
-        Object.defineProperty(window.HTMLElement.prototype, "offsetParent", {
-            get() { return this.closest("[hidden]") ? null : (this.parentElement || null); }
-        });
+        window.HTMLElement.prototype.getClientRects = function () {
+            return this.closest("[hidden]") ? [] : [{ width: 10, height: 10 }];
+        };
     `);
 
     // Усе одним eval: функції спираються на FOCUSABLE і
@@ -703,6 +712,8 @@ console.log("\n[10] Фокус заходить у вікно й поверта�
     window.eval([
         decl(/const FOCUSABLE = [\s\S]*?;\n/),
         decl(/const modalFocusReturn = [^\n]*\n/),
+        decl(/const openDialogs = \[\];\n/),
+        grab("isShown"),
         grab("focusablesIn"),
         grab("openModalFocus"),
         grab("closeModalFocus"),
@@ -764,6 +775,63 @@ console.log("\n[10] Фокус заходить у вікно й поверта�
     // Найголовніше: сторінка під вікном лишається недосяжною.
     check("посилання під вікном у коло не потрапило",
         doc.activeElement.id !== "behind");
+
+    // ВІКНА БЕЗ КЛАСУ .modal-overlay — лайтбокс і мобільне меню.
+    //
+    // Вони так само накривають сторінку, замикають прокрутку й
+    // закриваються по Escape, але спостерігач за .modal-overlay їх
+    // не бачить: лайтбокс створюється на льоту, меню перемикається
+    // класом .open, а не hidden. Тому кажуть про себе самі.
+    check("є спільний вхід для вікон без класу",
+        /window\.DialogFocus = \{/.test(common));
+
+    // Верхнє вікно для Tab береться зі СТОСУ, а не пошуком по класу
+    // — інакше лайтбокс і меню в нього не потрапили б.
+    //
+    // Саме в trapModalTab: closeTopModal (обробник Escape) і далі
+    // питає .modal-overlay, і правильно робить — у лайтбокса й меню
+    // свої Escape, і закривати їх звідси означало б закрити двічі.
+    check("верхнє вікно для Tab береться зі стосу",
+        /const modal = openDialogs\[openDialogs\.length - 1\];/.test(grab("trapModalTab")));
+
+    check("а Escape і далі стосується лише .modal-overlay",
+        /\.modal-overlay:not\(\[hidden\]\)/.test(grab("closeTopModal")));
+
+    const lightbox = fs.readFileSync(path.join(ROOT, "assets/js/lightbox.js"), "utf8");
+
+    check("лайтбокс забирає фокус до себе",
+        /DialogFocus\?\.open\(root\)/.test(lightbox));
+    check("і повертає при закритті",
+        /DialogFocus\?\.close\(root\)/.test(lightbox));
+
+    // Повернути фокус треба ДО того, як вікно сховали: у схованому
+    // фокусувати вже нічого, і браузер кидає курсор на початок.
+    check("лайтбокс повертає фокус до того, як сховатись",
+        lightbox.indexOf("DialogFocus?.close(root)") < lightbox.indexOf("root.hidden = true"));
+
+    check("мобільне меню теж забирає фокус",
+        /DialogFocus\?\.open\(mobileNavEl\)/.test(common));
+    check("і повертає його на бургер",
+        /DialogFocus\?\.close\(mobileNavEl\)/.test(common));
+
+    // role="dialog" без назви читач оголошує просто «діалог».
+    check("у меню є назва для читача",
+        /nav\.setAttribute\("aria-label", "Меню"\)/.test(common));
+
+    // ДРУГА СПРОБА ФОКУСА — НЕ ПЕРЕСТРАХОВКА.
+    //
+    // .modal-overlay зʼявляється миттєво (знімається hidden), а
+    // мобільне меню виїжджає переходом: visibility транзиціює 250 мс,
+    // і в мить виклику focus() меню для браузера ще
+    // visibility:hidden. У схованому елементі фокус не ставиться
+    // МОВЧКИ — курсор лишався на бургері, Tab вів по сторінці під
+    // меню. На живому сайті це й спіймалось; у jsdom і на
+    // .modal-overlay усе «працювало».
+    check("фокус пробується ще раз наступним кадром",
+        /if \(document\.activeElement !== target\) \{[\s\S]{0,200}requestAnimationFrame/.test(common));
+
+    check("і не б'ється з вікном, яке встигли закрити",
+        /requestAnimationFrame\([\s\S]{0,160}modalFocusReturn\.has\(modal\)/.test(common));
 }
 
 console.log("\n[11] Меню в шапці розкривається з клавіатури");
