@@ -882,8 +882,34 @@ function buildThumbsMarkup(images, video, altText) {
 
 function buildTrackMarkup(images, video, altText) {
 
-    const imageSlides = images.map(img => `
-        <div class="gallery-slide gallery-slide-photo">
+    // СЛАЙД — КНОПКА, І САМЕ ОДИН СЛАЙД ЗА РАЗ.
+    //
+    // Повноекранний перегляд із зумом відкривався лише кліком по
+    // фото, а фото — звичайна картинка: ні tabindex, ні ролі. Тобто
+    // з клавіатури збільшити знімок було неможливо взагалі. Самі
+    // фото на сторінці видно, тож це втрата не смертельна, але
+    // «мишею можна, клавіатурою ні» — саме те, чого не має бути.
+    //
+    // TABINDEX МАНДРУЄ, а не стоїть на кожному слайді. Знімків у
+    // товару буває шість-сім, і сім зупинок таба поспіль на одній
+    // картинці — гірше, ніж жодної: людина довго тисне Tab і не
+    // розуміє, куди потрапляє. Тому фокус приймає тільки той слайд,
+    // який зараз показано; решта мають -1, а перемикає їх
+    // syncActiveState() у setupGallery() — там, де вже рахується
+    // активний слайд для крапок, мініатюр і відео.
+    //
+    // Нулем позначаємо перший: syncActiveState() викликається одразу
+    // після збирання, але якщо вона колись не дійде, одна зупинка
+    // має лишитись у самій розмітці.
+    //
+    // aria-label, а не alt картинки: читач має сказати не «що
+    // зображено», а «що станеться, якщо натиснути». Опис знімка
+    // лишається на <img> поруч.
+    const imageSlides = images.map((img, index) => `
+        <div class="gallery-slide gallery-slide-photo"
+             role="button"
+             tabindex="${index === 0 ? "0" : "-1"}"
+             aria-label="Фото ${index + 1} з ${images.length}. Натисніть, щоб відкрити на весь екран">
             <img class="gallery-photo" src="${img}" style="${galleryFrameStyle(img)}" data-variant-src="${img}" data-variant-sizes="(max-width: 900px) 100vw, 600px" alt="${altText}" draggable="false" onerror="this.onerror=null;this.src='assets/images/no-image.png'">
         </div>
     `).join("");
@@ -931,7 +957,7 @@ function buildTrackMarkup(images, video, altText) {
                 loop
                 preload="metadata"
                 disablepictureinpicture
-                tabindex="0"
+                tabindex="${images.length === 0 ? "0" : "-1"}"
                 role="button"
                 aria-label="Відео товару. Натисніть, щоб зупинити або продовжити"></video>
         `;
@@ -2423,6 +2449,29 @@ function setupGallery() {
             thumb.classList.toggle("active", i === index);
         });
 
+        // МАНДРІВНИЙ TABINDEX: фокус приймає лише показаний слайд.
+        //
+        // Слайди — кнопки (фото відкриває лайтбокс, відео ставить на
+        // паузу), але зупинка таба мусить бути ОДНА. Шість знімків
+        // це шість зупинок поспіль на одній і тій самій картинці —
+        // людина тисне Tab і не розуміє, куди потрапляє.
+        //
+        // Сховані слайди при цьому нікуди не діваються з розмітки:
+        // це scroll-snap-карусель, вони просто збоку. Тобто самі
+        // собою з таб-порядку вони НЕ випадуть, як випадають
+        // display:none, — прибрати їх звідти можна лише отак.
+        //
+        // Вбудоване відео (YouTube/Vimeo) не чіпаємо: усередині
+        // iframe свій таб-порядок, і -1 на обгортці його не
+        // стосується.
+        [...track.children].forEach((slide, i) => {
+
+            if (!slide.hasAttribute("tabindex")) return;
+
+            slide.tabIndex = i === index ? 0 : -1;
+
+        });
+
         // відео (файлове, не YouTube/Vimeo вбудовування) — програємо
         // лише той слайд, до якого долистали свайпом/скролом, і
         // одразу ставимо на паузу решту. slide.paused перевіряємо,
@@ -2647,11 +2696,32 @@ function setupGallery() {
 
             const video = event.target.closest?.("video.gallery-slide-video");
 
-            if (!video) return;
+            if (video) {
+
+                event.preventDefault();
+
+                toggleGalleryVideo(video);
+
+                return;
+
+            }
+
+            // ФОТО: те саме, що й тап по ньому — повноекранний
+            // перегляд із зумом.
+            //
+            // Досі його відкривав ЛИШЕ клік, а фото — звичайна
+            // картинка без ролі й без tabindex. Тобто з клавіатури
+            // збільшити знімок було неможливо взагалі.
+            //
+            // closest по слайду, а не по <img>: фокус тримає обгортка
+            // (саме вона кнопка), і event.target буде нею.
+            const photo = event.target.closest?.(".gallery-slide-photo");
+
+            if (!photo) return;
 
             event.preventDefault();
 
-            toggleGalleryVideo(video);
+            openGalleryLightbox();
 
         });
 
@@ -2665,31 +2735,18 @@ function setupGallery() {
 
         });
 
-        // клік/тап по фото — відкриваємо повноекранний перегляд
-        // з зумом (не спрацьовує, якщо це був свайп)
-        track.addEventListener("click", event => {
-
-            if (axis === "x") return;
-
-            // Тап по відео керує відтворенням, а не відкриває лайтбокс.
-            //
-            // Смуги керування в галереї немає навмисно (див.
-            // buildTrackMarkup), тож пауза тримається саме на цьому
-            // тапі — і тільки на ньому. Повторний тап продовжує з того
-            // ж місця: currentTime не чіпаємо взагалі.
-            const video = event.target.closest("video");
-
-            if (video) { toggleGalleryVideo(video); return; }
-
-            // iframe (YouTube/Vimeo) має власний плеєр усередині —
-            // клік туди наш, а не його.
-            if (event.target.closest("iframe")) return;
+        // ПОВНОЕКРАННИЙ ПЕРЕГЛЯД — ОДИН ШЛЯХ НА КЛІК І НА ENTER.
+        //
+        // Раніше все це лежало прямо в обробнику кліку. Відколи
+        // лайтбокс відкривається ще й з клавіатури, копія цього
+        // збирання була б другою — а вона тут довга, з розбором
+        // відео, вбудовувань і обгорток фото. Розійшлися б неминуче.
+        function openGalleryLightbox() {
 
             if (typeof window.openLightbox !== "function") return;
 
             const slides = [...track.children];
             const activeIndex = currentSlideIndex();
-            const activeSlide = slides[activeIndex];
 
             // Лайтбокс тепер показує і відео, тож передаємо ВСІ слайди
             // галереї, а не лише фото — інакше на відео зум просто
@@ -2729,13 +2786,36 @@ function setupGallery() {
 
             }).filter(slide => slide.src);
 
-            const currentImages = lightboxSlides;
             const startIndex = Math.max(0, Math.min(activeIndex, lightboxSlides.length - 1));
 
             const brand = document.querySelector(".product-info .brand")?.textContent.trim();
             const title = document.querySelector(".product-info h1")?.textContent.trim();
 
-            window.openLightbox(currentImages, startIndex, { brand, title });
+            window.openLightbox(lightboxSlides, startIndex, { brand, title });
+
+        }
+
+        // клік/тап по фото — відкриваємо повноекранний перегляд
+        // з зумом (не спрацьовує, якщо це був свайп)
+        track.addEventListener("click", event => {
+
+            if (axis === "x") return;
+
+            // Тап по відео керує відтворенням, а не відкриває лайтбокс.
+            //
+            // Смуги керування в галереї немає навмисно (див.
+            // buildTrackMarkup), тож пауза тримається саме на цьому
+            // тапі — і тільки на ньому. Повторний тап продовжує з того
+            // ж місця: currentTime не чіпаємо взагалі.
+            const video = event.target.closest("video");
+
+            if (video) { toggleGalleryVideo(video); return; }
+
+            // iframe (YouTube/Vimeo) має власний плеєр усередині —
+            // клік туди наш, а не його.
+            if (event.target.closest("iframe")) return;
+
+            openGalleryLightbox();
 
         });
 
