@@ -4380,8 +4380,15 @@ function render() {
     // (1 + extraPages) сторінок від поточної
     const shown = list.slice(from, from + PER_PAGE * (1 + extraPages));
 
+    // Перші картки — без lazy: саме вони й видно, щойно сторінка
+    // намалювалась (див. коментар біля createProductCard в ui.js).
+    //
+    // Чотири, а не «перший ряд»: рядів різна ширина — на телефоні в
+    // ряду дві картки, на широкому екрані чотири. Чотири покривають
+    // обидва випадки й не качають зайвого: на телефоні це два ряди,
+    // другий із яких уже наполовину видно.
     grid.innerHTML = shown
-        .map(product => createProductCard(product))
+        .map((product, index) => createProductCard(product, index < 4))
         .join("");
 
     // Статистика: які товари побачили в каталозі. Разом із select_item

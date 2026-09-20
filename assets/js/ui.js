@@ -436,7 +436,35 @@ function swatchColorView(product, variant) {
 
 }
 
-function createProductCard(product) {
+// ДРУГИЙ АРГУМЕНТ — ПРО ШВИДКІСТЬ, А НЕ ПРО ВИГЛЯД
+//
+// Усі фото карток стояли з loading="lazy". Для карток нижче екрана
+// це правильно й економить трафік. Але перший ряд каталогу видно
+// ОДРАЗУ — а lazy означає: дочекайся розкладки, подивись, чи воно в
+// полі зору, і лише тоді починай качати. Тобто найголовніше фото
+// сторінки навмисно стає в чергу останнім.
+//
+// Каталог малює картки з JS, уже після data/catalog.json, тож ці
+// знімки й без того стартують пізно — і lazy додає до затримки ще
+// один крок.
+//
+// ДЕ ЦЕ ВМИКАЄТЬСЯ. Тільки в catalog.js і тільки для перших карток.
+// На головній товарні ряди лежать нижче за банер, тобто там lazy
+// лишається правильним — вмикати eager «про всяк випадок» означало б
+// качати те, чого ніхто не побачить.
+//
+// catalog.js обслуговує ще й сторінку акції, де над картками стоїть
+// банер і перший ряд може бути нижче згину. Це чотири знімки, які
+// однаково знадобляться після першого ж прокручування, — не привід
+// заводити окрему гілку з перевіркою сторінки.
+//
+// ЧОГО ТУТ НЕМАЄ: fetchpriority="high". Він не просто прискорює
+// фото, а ПЕРЕСТАВЛЯЄ його попереду стилів і шрифтів — і коли з цим
+// помиляються, сторінка малюється пізніше, а не раніше. Перевірити
+// це можна лише польовими даними (PageSpeed по реальному домену), а
+// не здогадкою; eager же не міняє черги, а лише прибирає зайвий
+// крок очікування.
+function createProductCard(product, eager) {
 
     const variants = product.variants?.length
         ? product.variants
@@ -499,8 +527,8 @@ function createProductCard(product) {
                 </button>
                 <div class="product-carousel">
                     <div class="photo-track">
-                        ${images.map(img => `
-                            ${cardPhotoSlide(product, img)}
+                        ${images.map((img, index) => `
+                            ${cardPhotoSlide(product, img, eager && index === 0)}
                         `).join("")}
                         ${video ? `
                             <video
@@ -840,7 +868,7 @@ function cardFramingFrom(card) {
 
 }
 
-function cardPhotoSlide(product, img) {
+function cardPhotoSlide(product, img, eager) {
 
     // Слайд — обгортка, фото всередині.
     //
@@ -857,7 +885,7 @@ function cardPhotoSlide(product, img) {
                 data-variant-src="${img}"
                 data-variant-sizes="(max-width: 768px) 50vw, (max-width: 1300px) 300px, 400px"
                 alt="${escapeHtml((product && product.title) || "")}"
-                loading="lazy"
+                loading="${eager ? "eager" : "lazy"}"
                 onerror="this.src='assets/images/no-image.png'">
         </div>
     `;

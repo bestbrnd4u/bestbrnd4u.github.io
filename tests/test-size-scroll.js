@@ -27,8 +27,8 @@ window.eval(common.match(/function baseProduct[\s\S]*?\n}\n/)[0]);
 // назва в картці тепер посилання — createProductCard кличе productUrl
 window.eval(common.match(/function productUrl[\s\S]*?\n}\n/)[0]);
 window.eval(fs.readFileSync(path.join(ROOT,"assets/js/ui.js"),"utf8").replace(
-  "function createProductCard(product) {",
-  "window.PRODUCT_SIZES=window.PRODUCT_SIZES||['S','M','L'];\nwindow.formatPrice=window.formatPrice||(v=>v+' грн');\nfunction createProductCard(product) {"));
+  "function createProductCard(",
+  "window.PRODUCT_SIZES=window.PRODUCT_SIZES||['S','M','L'];\nwindow.formatPrice=window.formatPrice||(v=>v+' грн');\nfunction createProductCard("));
 
 let failures=0;
 const check=(n,c,e)=>{if(c)console.log("  ✓",n);else{console.log("  ✗",n,e!==undefined?"→ "+e:"");failures++;}};

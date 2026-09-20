@@ -51,8 +51,8 @@ console.log("\n[4] DOM: назва йде ПЕРЕД рядком ціни — �
      // Ціна дня: картку малює ui.js, а ціну рахує common.js.
      "saleActive", "priceNow", "oldPriceNow", "discountPercent"].forEach(fn=>window.eval(cs.match(new RegExp("function "+fn+"[\\s\\S]*?\\n}\\n"))[0]));
   window.eval(fs.readFileSync(path.join(ROOT,"assets/js/ui.js"),"utf8").replace(
-    "function createProductCard(product) {",
-    "window.PRODUCT_SIZES=['S','M'];\nfunction createProductCard(product) {"));
+    "function createProductCard(",
+    "window.PRODUCT_SIZES=['S','M'];\nfunction createProductCard("));
 
   const short={id:1,title:"Bag",brand:"X",price:100,variants:[{color:"Чорний",hex:"#000",images:["a.jpg"]}]};
   const long={id:2,title:"Guess Noelle Black Guess Noelle Black Guess Noelle Black Guess Noelle Black",

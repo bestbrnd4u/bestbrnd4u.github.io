@@ -37,10 +37,10 @@ window.eval(commonSrc.match(/function baseProduct[\s\S]*?\n}\n/)[0]);
 // назва в картці тепер посилання — createProductCard кличе productUrl
 window.eval(commonSrc.match(/function productUrl[\s\S]*?\n}\n/)[0]);
 window.eval(fs.readFileSync(ROOT + "assets/js/ui.js", "utf8").replace(
-    "function createProductCard(product) {",
+    "function createProductCard(",
     "window.PRODUCT_SIZES = window.PRODUCT_SIZES || ['S','M','L'];\n" +
     "window.formatPrice = window.formatPrice || (v => v + ' грн');\n" +
-    "function createProductCard(product) {"
+    "function createProductCard("
 ));
 
 console.log("\n[1] Зловмисне поле товару не виконується як HTML/JS");
