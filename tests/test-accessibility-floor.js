@@ -643,5 +643,174 @@ console.log("\n[9] Іконки в шапці називають себе сло
     });
 }
 
+console.log("\n[10] Фокус заходить у вікно й повертається з нього");
+{
+    // ЩО БУЛО НЕ ТАК. Вікно відкривається, а курсор лишається там,
+    // де був: на кнопці «Таблиця розмірів», на «Додати адресу». Далі
+    // Tab веде не по вікну, а по сторінці ПІД ним — по посиланнях,
+    // які затулені затемненням і яких людина не бачить. Для
+    // екранного читача вікна ніби й не з'явилось.
+    //
+    // А коли вікно закривається, курсор має повернутись туди, звідки
+    // його відкрили, — інакше обхід сторінки починається спочатку.
+    const { JSDOM } = require("jsdom");
+
+    const common = fs.readFileSync(path.join(ROOT, "assets/js/common.js"), "utf8");
+
+    const grab = name =>
+        (common.match(new RegExp("function " + name + "\\([\\s\\S]*?\\n}\\n")) || [""])[0];
+
+    ["openModalFocus", "closeModalFocus", "trapModalTab", "focusablesIn"]
+        .forEach(name => check(`${name} знайдено`, grab(name).length > 0));
+
+    // Спостерігач за hidden — щоб не правити чотири місця, які
+    // відкривають вікна (product.js, account.js ×2, checkout.js).
+    check("стан вікна ловиться спостерігачем, а не правками по місцях",
+        /attributeFilter: \["hidden"\]/.test(common));
+
+    const dom = new JSDOM(`<!doctype html><body>
+        <button id="opener">Таблиця розмірів</button>
+        <a href="/somewhere" id="behind">Посилання на сторінці під вікном</a>
+        <div id="m" class="modal-overlay" hidden>
+            <div class="modal-card">
+                <div class="modal-header">
+                    <h3>Таблиця розмірів</h3>
+                    <button class="modal-close" id="x">✕</button>
+                </div>
+                <a href="/inside" id="inner">Посилання у вікні</a>
+            </div>
+        </div>
+        </body>`, { runScripts: "outside-only" });
+
+    const { window } = dom;
+    const doc = window.document;
+
+    // jsdom не рахує розкладку: offsetParent там завжди null, тож
+    // видимість підміняємо чесним правилом «предок не hidden».
+    window.eval(`
+        Object.defineProperty(window.HTMLElement.prototype, "offsetParent", {
+            get() { return this.closest("[hidden]") ? null : (this.parentElement || null); }
+        });
+    `);
+
+    // Усе одним eval: функції спираються на FOCUSABLE і
+    // modalFocusReturn, а const із сусіднього eval їм не видно.
+    // Обидва оголошення беремо з ФАЙЛУ, а не переписуємо сюди —
+    // інакше перевірка жила б зі своєю копією переліку фокусованих
+    // елементів і не помітила б, якби в справжньому щось загубилось.
+    const decl = re => (common.match(re) || [""])[0].replace(/^const /, "var ");
+
+    window.eval([
+        decl(/const FOCUSABLE = [\s\S]*?;\n/),
+        decl(/const modalFocusReturn = [^\n]*\n/),
+        grab("focusablesIn"),
+        grab("openModalFocus"),
+        grab("closeModalFocus"),
+        grab("trapModalTab"),
+        "window.__trap = trapModalTab;",
+        "window.__openModal = function (m) { m.hidden = false; openModalFocus(m); };",
+        "window.__closeModal = function (m) { m.hidden = true; closeModalFocus(m); };"
+    ].join("\n"));
+
+    check("перелік фокусованих елементів узято з файла",
+        /const FOCUSABLE = /.test(common) && /a\[href\]/.test(decl(/const FOCUSABLE = [\s\S]*?;\n/)));
+
+    const modal = doc.getElementById("m");
+
+    doc.getElementById("opener").focus();
+
+    check("до відкриття курсор на кнопці, що відкриває",
+        doc.activeElement.id === "opener", doc.activeElement.id);
+
+    window.__openModal(modal);
+
+    check("вікно назвалось діалогом", modal.getAttribute("role") === "dialog");
+    check("і саме модальним", modal.getAttribute("aria-modal") === "true");
+    check("у діалога є назва",
+        modal.getAttribute("aria-labelledby") === modal.querySelector("h3").id
+        && Boolean(modal.querySelector("h3").id));
+
+    check("курсор зайшов усередину вікна",
+        modal.contains(doc.activeElement), doc.activeElement.id);
+    check("і став саме на «Закрити», а не на дію",
+        doc.activeElement.id === "x", doc.activeElement.id);
+
+    window.__closeModal(modal);
+
+    check("після закриття курсор повернувся туди, звідки прийшов",
+        doc.activeElement.id === "opener", doc.activeElement.id);
+
+    // Tab по колу: з останнього — на перший і навпаки.
+    window.__openModal(modal);
+
+    const inner = doc.getElementById("inner");
+
+    inner.focus();
+
+    const tab = shift => {
+        const event = new window.KeyboardEvent("keydown",
+            { key: "Tab", shiftKey: Boolean(shift), bubbles: true, cancelable: true });
+        Object.defineProperty(event, "target", { value: doc.activeElement });
+        window.__trap(event);
+        return event.defaultPrevented;
+    };
+
+    check("з останнього Tab повертає на перший",
+        tab(false) && doc.activeElement.id === "x", doc.activeElement.id);
+
+    check("і Shift+Tab із першого — на останній",
+        tab(true) && doc.activeElement.id === "inner", doc.activeElement.id);
+
+    // Найголовніше: сторінка під вікном лишається недосяжною.
+    check("посилання під вікном у коло не потрапило",
+        doc.activeElement.id !== "behind");
+}
+
+console.log("\n[11] Меню в шапці розкривається з клавіатури");
+{
+    // Панель відкривалась лише по :hover. Хто веде сторінку табом,
+    // доходив до «Каталог» і йшов далі: прихований вміст із
+    // таб-порядку випадає, тож категорій у шапці для нього не
+    // існувало.
+    const js = fs.readFileSync(path.join(ROOT, "assets/js/mega-menu.js"), "utf8");
+
+    check("стан меню тримає атрибут", /data-mega-open|megaOpen/.test(js));
+
+    // :focus-within тут не підходить принципово: Escape мусить
+    // закривати панель, а фокус при цьому лишається на «Каталог» —
+    // тобто в тому ж li, — і панель відкрилась би назад.
+    check("відкриття описане в стилях через атрибут",
+        /nav li\.has-mega\[data-mega-open\] \.mega-menu\{/.test(css));
+
+    check("варіант із колонками теж",
+        /nav li\.has-mega\[data-mega-open\] \.mega-menu\.mega-menu-columns\{/.test(css));
+
+    // Поза @media (hover:hover): та обгортка боронить від дотику
+    // пальцем, а клавіатура є й там, де миші немає.
+    const hoverBlocks = [...raw.matchAll(/@media \(hover:hover\) and \(pointer:fine\)\{([\s\S]*?)\n\}/g)]
+        .map(m => m[1]).join("\n");
+
+    check("правило не замкнене в медіазапиті про мишу",
+        !/\[data-mega-open\]/.test(hoverBlocks));
+
+    check("відкриваємо лише клавіатурний фокус",
+        /matches\(":focus-visible"\)/.test(js));
+
+    check("Escape закриває", /event\.key !== "Escape"/.test(js));
+
+    check("і повертає курсор на пункт меню",
+        /megaDismissed[\s\S]{0,400}link\.focus\(\)/.test(js));
+
+    // Без позначки Escape виглядав би зламаним: фокус повертається
+    // на посилання, це знову focusin на тому самому li — і панель
+    // відкрилась би тієї ж миті.
+    check("відмова запам'ятовується, поки фокус не піде з пункту",
+        /if \(item\.dataset\.megaDismissed\) return;/.test(js)
+        && /delete item\.dataset\.megaDismissed/.test(js));
+
+    check("клавіатуру вмикають одразу, а не після завантаження даних",
+        js.indexOf("setupMegaKeyboard(megaItems);") < js.indexOf("await new Promise"));
+}
+
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
 process.exit(failures === 0 ? 0 : 1);

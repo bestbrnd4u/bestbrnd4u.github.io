@@ -2450,6 +2450,135 @@ document.addEventListener("keydown", event => {
 
 });
 
+// ФОКУС МУСИТЬ ЗАЙТИ У ВІКНО — І ПОВЕРНУТИСЬ, КОЛИ ВОНО ЗАКРИЄТЬСЯ
+//
+// ЩО БУЛО НЕ ТАК. Вікно відкривається, а курсор лишається там, де
+// був: на кнопці «Таблиця розмірів», на «Додати адресу». Далі Tab
+// веде НЕ по вікну, а по сторінці ПІД ним — по посиланнях, які
+// затулені затемненням і яких людина не бачить. Для екранного читача
+// вікна взагалі ніби не з'явилось: він читає далі те, що було.
+//
+// А коли вікно закриється — курсор опиняється на початку сторінки,
+// бо елемент, на якому він стояв, міг зникнути разом із вікном.
+//
+// ЧОМУ ЧЕРЕЗ СПОСТЕРІГАЧА, А НЕ ПРАВКОЮ В ЧОТИРЬОХ МІСЦЯХ. Вікна
+// відкриває різний код: product.js (таблиця розмірів), account.js
+// (адреса, підтвердження видалення), checkout.js (вихід зі
+// сторінки). Спільного в них рівно одне — усі перемикають hidden на
+// .modal-overlay. Саме за цим і стежимо: тоді наступне таке вікно
+// отримає поведінку задарма, а не через півроку.
+//
+// ЩО СТАВИМО ЗАОДНО. role="dialog" і aria-modal — без них читач не
+// каже «діалог» і не обмежує читання його вмістом. aria-labelledby
+// на заголовок у шапці вікна — щоб діалог назвався, а не був
+// «діалог, порожньо».
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]),'
+    + ' select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+const modalFocusReturn = new WeakMap();
+
+function focusablesIn(modal) {
+
+    return [...modal.querySelectorAll(FOCUSABLE)]
+        .filter(el => el.offsetParent !== null || el === document.activeElement);
+
+}
+
+function openModalFocus(modal) {
+
+    modalFocusReturn.set(modal, document.activeElement);
+
+    if (!modal.getAttribute("role")) modal.setAttribute("role", "dialog");
+
+    modal.setAttribute("aria-modal", "true");
+
+    const heading = modal.querySelector(".modal-header h3, .modal-header h2");
+
+    if (heading) {
+
+        if (!heading.id) heading.id = "modal-title-" + (modal.id || Math.random().toString(36).slice(2));
+
+        modal.setAttribute("aria-labelledby", heading.id);
+
+    }
+
+    // Перший у вікні — це хрестик «Закрити». Він і потрібен: почати
+    // з поля означало б для читача проминути назву вікна, а почати з
+    // кнопки «Видалити» — поставити палець на незворотну дію.
+    const first = focusablesIn(modal)[0];
+
+    if (first) {
+
+        first.focus();
+
+    } else {
+
+        // Порожнє вікно теж мусить прийняти фокус, інакше Tab піде
+        // гуляти сторінкою під ним.
+        const card = modal.querySelector(".modal-card") || modal;
+
+        card.setAttribute("tabindex", "-1");
+        card.focus();
+
+    }
+
+}
+
+function closeModalFocus(modal) {
+
+    const back = modalFocusReturn.get(modal);
+
+    modalFocusReturn.delete(modal);
+
+    // Елемент міг зникнути разом із перемальовкою — тоді просто
+    // нічого не робимо: гірше було б кинути фокус на початок.
+    if (back && document.contains(back) && back.offsetParent !== null) back.focus();
+
+}
+
+// Tab по колу всередині відкритого вікна.
+function trapModalTab(event) {
+
+    if (event.key !== "Tab") return;
+
+    const modal = [...document.querySelectorAll(".modal-overlay:not([hidden])")].pop();
+
+    if (!modal || !modal.contains(event.target)) return;
+
+    const items = focusablesIn(modal);
+
+    if (!items.length) return;
+
+    const first = items[0];
+    const last = items[items.length - 1];
+
+    if (event.shiftKey && document.activeElement === first) {
+
+        event.preventDefault();
+        last.focus();
+
+    } else if (!event.shiftKey && document.activeElement === last) {
+
+        event.preventDefault();
+        first.focus();
+
+    }
+
+}
+
+document.addEventListener("keydown", trapModalTab);
+
+document.querySelectorAll(".modal-overlay").forEach(modal => {
+
+    new MutationObserver(() => {
+
+        if (modal.hidden) closeModalFocus(modal);
+        else openModalFocus(modal);
+
+    }).observe(modal, { attributes: true, attributeFilter: ["hidden"] });
+
+});
+
 // закриваємо мобільне меню, якщо екран розширили за брейкпоінт
 // (наприклад, повернули телефон/склали складачку) — інакше
 // панель могла лишитись відкритою поверх десктопного <nav>
