@@ -21,22 +21,22 @@
     "items": [
       {
         "label": "Жінкам",
-        "image": "/assets/images/products/uploads/4a5d4b88-66d7-4914-9b44-ac105205b511.png",
+        "image": "/assets/images/banners/4a5d4b88-66d7-4914-9b44-ac105205b511.webp",
         "link": "catalog?gender=Жінкам"
       },
       {
         "label": "Чоловікам",
-        "image": "/assets/images/products/uploads/bea2c056-4efb-4346-bed7-eee5964d562a.png",
+        "image": "/assets/images/banners/bea2c056-4efb-4346-bed7-eee5964d562a.webp",
         "link": "catalog?gender=Чоловікам"
       },
       {
         "label": "Аксесуари",
-        "image": "/assets/images/products/uploads/5cdd14ae-5b4e-43da-9407-a94306ff33e1.png",
+        "image": "/assets/images/banners/5cdd14ae-5b4e-43da-9407-a94306ff33e1.webp",
         "link": "/departments/aksesuary/"
       },
       {
         "label": "Взуття",
-        "image": "/assets/images/products/uploads/188c0bdd-51a4-482f-9e14-ec17c79e9b09.png",
+        "image": "/assets/images/banners/188c0bdd-51a4-482f-9e14-ec17c79e9b09.webp",
         "link": "/departments/vzuttia/"
       }
     ]

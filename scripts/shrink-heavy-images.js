@@ -69,11 +69,17 @@ const DIRS = ["assets/images"];
 // npm run build:media візьметься заливати білим небо чи пісок на
 // знімку з моделлю. Помилка була б дуже помітною і дуже дивною.
 //
-// Тому важкі PNG у products/uploads лишаються як є. Правильний вихід
-// для них інший: або перенести банери з теки товарів, або навчити
-// вибілювач брати тільки ті файли, на які посилається хоч один
-// товар. Обидва — окрема робота, і робити її мимохідь не варто.
-const SKIP_DIRS = ["_originals", "_archive", "uploads"];
+// Тому з products/uploads беремо не все підряд, а лише те, на що НЕ
+// посилається жоден товар (див. productImages нижче). Такий файл —
+// не фотографія товару, а банер чи плитка розділу, яку адмінка
+// поклала в спільну теку. Його й переносимо до банерів: там він і
+// має лежати, і вибілювач туди не заглядає.
+const SKIP_DIRS = ["_originals", "_archive"];
+
+// Куди переселяємо банери з теки товарів.
+const BANNERS_DIR = "assets/images/banners";
+
+const UPLOADS_DIR = path.join("assets", "images", "products", "uploads");
 
 // Поріг. Нижче цього переупаковка дає одиниці кілобайтів, а зайвий
 // файл у теці й зайвий рядок у git — щоразу.
@@ -132,13 +138,47 @@ function walk(dir, onFile) {
 
 }
 
+// Імена файлів, на які посилається хоч один ТОВАР.
+//
+// Саме за цим переліком відрізняємо фотографію товару від банера,
+// що випадково лежить поруч. Помилитись тут дорого в обидва боки:
+// прийняти банер за товар — лишити мегабайти; прийняти товар за
+// банер — витягти фото з-під вибілювача й перенести його кудись,
+// де його не шукатимуть.
+function productImages() {
+
+    const names = new Set();
+
+    const dir = path.join(ROOT, "data", "products");
+
+    const texts = [];
+
+    if (fs.existsSync(dir)) {
+        fs.readdirSync(dir)
+            .filter(f => f.endsWith(".json"))
+            .forEach(f => texts.push(fs.readFileSync(path.join(dir, f), "utf8")));
+    }
+
+    ["data/products.json", "data/catalog.json"].forEach(rel => {
+        const full = path.join(ROOT, rel);
+        if (fs.existsSync(full)) texts.push(fs.readFileSync(full, "utf8"));
+    });
+
+    const all = texts.join(" ");
+
+    (all.match(/[\w.#-]+\.(?:png|jpe?g|webp)/gi) || []).forEach(name => names.add(name));
+
+    return names;
+
+}
+
 // На що взагалі хтось посилається.
 //
 // НАВІЩО ЦЕ ТУТ. У теках лежить чимало осиротілих файлів — залишки
 // старих банерів і перезаливок. Переупаковувати їх немає сенсу:
-// відвідувач їх не качає, бо вони нікуди не підключені, а в репозиторії
-// від цього стало б удвічі більше файлів. Прибирати сиріт уміє
-// окремий npm run images:archive, і це його робота, не наша.
+// відвідувач їх не качає, бо вони нікуди не підключені, а в
+// репозиторії від цього стало б удвічі більше файлів. Прибирати
+// сиріт уміє окремий npm run images:archive — це його робота.
 function referencedNames() {
 
     const names = new Set();
@@ -174,9 +214,29 @@ function heavyImages() {
 
 }
 
-async function convert(file, apply) {
+// Куди лягає результат.
+//
+// Зазвичай — поруч із оригіналом, тим самим іменем на .webp. Але
+// якщо файл лежить у теці ТОВАРІВ, а жоден товар на нього не
+// посилається, це банер, який адмінка просто поклала в спільне
+// місце. Такий переселяємо до banners: інакше переупакований у webp
+// банер потрапив би під вибілювач тла, і на знімку з моделлю небо
+// залилося б білим.
+function targetFor(file, isProductPhoto) {
 
-    const target = file.full.replace(/\.(png|jpe?g)$/i, ".webp");
+    const asWebp = file.full.replace(/\.(png|jpe?g)$/i, ".webp");
+
+    const inUploads = path.relative(ROOT, file.full).startsWith(UPLOADS_DIR);
+
+    if (!inUploads || isProductPhoto) return asWebp;
+
+    return path.join(ROOT, BANNERS_DIR, path.basename(asWebp));
+
+}
+
+async function convert(file, apply, isProductPhoto) {
+
+    const target = targetFor(file, isProductPhoto);
 
     const meta = await sharp(file.full).metadata();
 
@@ -222,6 +282,7 @@ async function main() {
     }
 
     const refs = referencedNames();
+    const products = productImages();
 
     const nameMap = new Map();
 
@@ -229,6 +290,8 @@ async function main() {
     let after = 0;
     let orphans = 0;
     let noGain = 0;
+    let kept = 0;
+    let moved = 0;
 
     for (const file of files) {
 
@@ -242,7 +305,25 @@ async function main() {
 
         }
 
-        const result = await convert(file, apply);
+        const inUploads = path.relative(ROOT, file.full).startsWith(UPLOADS_DIR);
+        const isProductPhoto = products.has(name);
+
+        // Фотографію товару в теці товарів не чіпаємо взагалі.
+        //
+        // Її обслуговує власний конвеєр: вибілювання тла, зменшені
+        // копії, кадрування. Втрутитись туди збоку означає зламати
+        // домовленості, яких ми звідси не бачимо.
+        if (inUploads && isProductPhoto) {
+
+            kept++;
+
+            continue;
+
+        }
+
+        const result = await convert(file, apply, isProductPhoto);
+
+        if (inUploads) moved++;
 
         if (result.skipped) {
 
@@ -288,6 +369,8 @@ async function main() {
     }
 
     if (orphans) console.log(`  (пропущено ${orphans} — на них ніхто не посилається)`);
+    if (kept) console.log(`  (пропущено ${kept} — це фотографії товарів, у них свій конвеєр)`);
+    if (moved) console.log(`  (перенесено з теки товарів до банерів: ${moved})`);
     if (noGain) console.log(`  (пропущено ${noGain} — переупаковка не дає виграшу)`);
 
     if (!nameMap.size) {
