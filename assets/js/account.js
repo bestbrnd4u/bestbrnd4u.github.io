@@ -2093,9 +2093,21 @@ async function loadProfile(user) {
     //
     // Тому кажемо як є: пошти немає, ось звідки ви увійшли. І кнопка
     // поруч стає «Додати email» — бо міняти нема чого.
+    //
+    // СПОСІБ НАЗИВАЄМО СПРАВЖНІЙ. Тут стояв зашитий «Telegram» — бо
+    // іншого входу без пошти й не було. З появою Facebook (акаунт на
+    // телефон або знята галочка з пошти у вікні входу) цей рядок
+    // почав казати людині, що вона зайшла звідки не заходила.
     const mail = realEmail(user);
 
-    profileEmailEl.textContent = mail || "Немає — ви увійшли через Telegram";
+    const provider = loginProviderName(user);
+
+    profileEmailEl.textContent = mail
+        || (provider
+            ? `Немає — ви увійшли через ${provider}`
+            // Невідомий спосіб: краще сказати коротко й правдиво, ніж
+            // назвати навмання.
+            : "Немає — пошту ви не вказували");
     profileEmailEl.classList.toggle("profile-email-empty", !mail);
 
     const changeBtn = document.getElementById("changeEmailBtn");
@@ -2542,7 +2554,7 @@ async function addEmailThroughFunction(email) {
 //
 // Посилання веде сюди, а не в порожню сторінку «дякуємо»: людина
 // потрапляє одразу в кабінет і бачить свою пошту там, де щойно було
-// «Немає — ви увійшли через Telegram».
+// «Немає — ви увійшли через …».
 // -------------------------
 
 async function confirmAddedEmail() {
@@ -2579,7 +2591,7 @@ async function confirmAddedEmail() {
     //
     // Пошту помінялa функція, а не браузер: у токені, який лежить тут,
     // і далі стоїть службова адреса. Без оновлення кабінет показував
-    // би «Немає — ви увійшли через Telegram» відразу після успішного
+    // би «Немає — ви увійшли через …» відразу після успішного
     // підтвердження — тобто рівно те, на що скаржився власник.
     await supabaseClient.auth.refreshSession();
 
@@ -2756,6 +2768,13 @@ document.getElementById("forgotPasswordInsideBtn")?.addEventListener("click", as
     const intro = document.getElementById("forgotIntro");
     const noMail = document.getElementById("forgotNoMail");
     const submit = document.getElementById("forgotSubmit");
+
+    // Називаємо той спосіб, яким людина справді увійшла: у розмітці
+    // лежить запасне «соцмережу», бо до відповіді сесії ми цього не
+    // знаємо (пояснення — у loginProviderName, supabase-client.js).
+    const via = document.getElementById("forgotNoMailVia");
+
+    if (via) via.textContent = loginProviderName(user) || "соцмережу";
 
     if (intro) intro.hidden = !mail;
     if (noMail) noMail.hidden = Boolean(mail);

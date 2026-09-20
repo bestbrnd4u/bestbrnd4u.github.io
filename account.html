@@ -669,8 +669,12 @@
                                  «Відновити»: інакше єдина дія на
                                  екрані веде в глухий кут. Кнопку при
                                  цьому ховаємо — тиснути нема що. -->
+                            <!-- Спосіб входу підставляє account.js: без пошти
+                                 заходять і через Telegram, і через Facebook
+                                 (акаунт на телефон або знята галочка з пошти).
+                                 Зашитий «Telegram» казав другим неправду. -->
                             <p class="profile-card-sub" id="forgotNoMail" hidden>
-                                Ви входите через Telegram — пароля в акаунті немає.
+                                Ви входите через <span id="forgotNoMailVia">соцмережу</span> — пароля в акаунті немає.
                                 Щоб мати ще й вхід за паролем, спершу додайте email
                                 у вкладці «Мої дані».
                             </p>
@@ -948,7 +952,7 @@
 
 <!-- Журнал помилок: сторінка сама розповідає, що в неї зламалось -->
 <script src="assets/js/error-report.js?v=21838fe8" defer></script>
-<script src="assets/js/supabase-client.js?v=6c5f5e88" defer></script>
+<script src="assets/js/supabase-client.js?v=e116789a" defer></script>
 <!-- Кадрування фото товару. Той самий файл підключає адмінка,
      тож прев'ю в ній і картка на сайті рахуються однаково. -->
 <script src="assets/js/image-framing.js?v=80b29a57" defer></script>
@@ -980,7 +984,7 @@
 <!-- Спільна поведінка картки входу: ті самі кнопки стоять ще й на
      оформленні замовлення. ПЕРЕД account.js — той нею користується. -->
 <script src="assets/js/auth-widget.js?v=6b02212c" defer></script>
-<script src="assets/js/account.js?v=eef5cde5" defer></script>
+<script src="assets/js/account.js?v=58441b11" defer></script>
 
 </body>
 

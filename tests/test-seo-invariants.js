@@ -80,15 +80,45 @@ console.log("\n[1] Кожен товар у sitemap");
 
 console.log("\n[2] Кожна активна акція у sitemap");
 {
-    const promos = JSON.parse(read("data/promotions.json"));
+    const all = JSON.parse(read("data/promotions.json"));
+
+    // «АКТИВНА» — ЦЕ НЕ «БУДЬ-ЯКА З ФАЙЛУ».
+    //
+    // Заголовок набору казав «активна», а порівнювався весь файл
+    // підряд. Збірка ж викидає з sitemap ті, у яких минув endsAt
+    // (ended() у scripts/build-sitemap.js) — і це правильно: віддавати
+    // пошуку сторінку акції, якої вже немає, означає вести людей на
+    // «пропозиція завершилась».
+    //
+    // Тобто набір червонів не через поломку, а через календар: акція
+    // «Ціна до пʼятниці» закінчилась, збірка її прибрала, а перевірка
+    // й далі шукала. Умова тут мусить бути та сама, що у збірці.
+    const now = Date.now();
+
+    const ended = promo => {
+
+        const endsAt = Date.parse(promo && promo.endsAt);
+
+        return Number.isFinite(endsAt) && now >= endsAt;
+
+    };
+
+    const promos = all.filter(p => !ended(p));
 
     const inMap = new Set(locs.filter(l => l.includes("/promo?id="))
         .map(l => decodeURIComponent(l.replace(/.*\/promo\?id=/, ""))));
 
     const missing = promos.filter(p => !inMap.has(p.slug));
 
-    check(`усі ${promos.length} акцій на місці`,
+    check(`усі ${promos.length} активних акцій на місці`
+        + (all.length > promos.length ? ` (${all.length - promos.length} завершених пропущено)` : ""),
         missing.length === 0, missing.map(p => p.slug).join(", "));
+
+    // І навпаки: завершеної акції в sitemap бути не повинно.
+    const stale = all.filter(p => ended(p) && inMap.has(p.slug));
+
+    check("завершених акцій у sitemap немає",
+        stale.length === 0, stale.map(p => p.slug).join(", "));
 }
 
 console.log("\n[3] sitemap і noindex не перетинаються");
