@@ -725,13 +725,45 @@ async function addToCart(id, options = {}) {
 
 }
 
+// ЩО ЧУЄ ЛЮДИНА, ЯКА НЕ БАЧИТЬ ШАПКИ
+//
+// Іконки в шапці — голі емодзі: 🔍 👤 ❤ 🛒. Для ока це зрозуміло
+// миттєво, а екранний читач озвучує їх ІМЕНЕМ СИМВОЛА і завжди
+// англійською: «shopping trolley», «black heart». На українській
+// сторінці це не назва розділу, а опис картинки — і поруч ще
+// самотнє число з лічильника: «black heart 0».
+//
+// Тому посилання дістає власний підпис. Ставимо його ТУТ, разом із
+// числом, а не в розмітці: у розмітці він був би без кількості, а
+// aria-label перебиває вміст — тобто число зникло б із озвучення
+// зовсім. Одне місце, одна правда.
+//
+// 🔍 підписаний прямо в розмітці (aria-label у самій кнопці): там
+// нема чого рахувати, а кнопка стоїть на всіх 154 сторінках.
+// 👤 не чіпаємо: updateAccountIcon() дає йому title, і той title
+// водночас показує, ким саме ти увійшов.
+//
+// Слово після числа — через pluralProducts() вище, як і всі інші
+// лічильники сайту. Своя копія правила дала б «Кошик, 1 товарів» —
+// рівно ту помилку, через яку той помічник і з'явився.
 function updateCartCounter() {
 
     const counter = document.getElementById("cartCount");
 
     if (!counter) return;
 
-    counter.textContent = getCart().length;
+    const count = getCart().length;
+
+    counter.textContent = count;
+
+    const link = document.getElementById("cartIconLink");
+
+    if (link) {
+        link.setAttribute("aria-label",
+            count === 0
+                ? "Кошик порожній"
+                : `Кошик, ${count} ${pluralProducts(count)}`);
+    }
 
 }
 
@@ -1058,7 +1090,21 @@ function updateFavoriteCounter() {
 
     if (!counter) return;
 
-    counter.textContent = getFavorites().length;
+    const count = getFavorites().length;
+
+    counter.textContent = count;
+
+    // Через closest, а не через id: у посилання на обране id немає,
+    // а додавати його довелось би в усі 154 сторінки заради одного
+    // атрибута. Лічильник усередині нього — нічим не гірша адреса.
+    const link = counter.closest("a");
+
+    if (link) {
+        link.setAttribute("aria-label",
+            count === 0
+                ? "Обране порожнє"
+                : `Обране, ${count} ${pluralProducts(count)}`);
+    }
 
 }
 
@@ -2341,6 +2387,66 @@ mobileMenuBtn?.addEventListener("click", () => {
 document.addEventListener("keydown", event => {
 
     if (event.key === "Escape") closeMobileNav();
+
+});
+
+// ESCAPE ЗАКРИВАЄ БУДЬ-ЯКЕ ВІКНО .modal-overlay
+//
+// ЩО БУЛО НЕ ТАК. На сайті все закривається Escape — пошук, мобільне
+// меню, кошик-попап, вибір відділення Нової пошти, причина відмови,
+// лайтбокс, випадні списки. Три вікна випадали з цього правила, і
+// всі три — на однаковій розмітці .modal-overlay:
+//
+//   таблиця розмірів (product.html),
+//   нова/редагована адреса доставки (account.html),
+//   «Видалити адресу?» (account.html).
+//
+// Вийти з них можна було тільки хрестиком у кутку або точним
+// натисканням по тлу — а на телефоні тло це вузька смужка з боків.
+// Для вікна-підтвердження це ще й неправильний бік: Escape мусить
+// СКАСОВУВАТИ, а не змушувати цілитись у хрестик.
+//
+// ЧОМУ ТУТ, А НЕ ТРИ ОБРОБНИКИ ПО МІСЦЯХ. Вікна однакові з розмітки:
+// .modal-overlay → .modal-card → .modal-header → .modal-close. Отже
+// й поведінка одна, і наступне таке вікно отримає її задарма — а
+// саме так ці три й з'явились без неї.
+//
+// ЧОМУ НАТИСКАЄМО ХРЕСТИК, А НЕ СТАВИМО hidden = true. У кожного
+// вікна своє закриття: checkout скидає ще й запам'ятоване
+// посилання. Виставити hidden повз нього означало б лишити вікно
+// закритим, а сторінку — у напіввідкритому стані. Хрестик кличе
+// рівно ту функцію, яку автор вікна для цього й написав.
+//
+// checkout.js має власний Escape для свого вікна — і хай має:
+// closeLeaveModal() ідемпотентний, а явний обробник поруч із вікном
+// читається краще за обіцянку десь у спільному файлі.
+//
+// Окремою функцією, бо тести цього репозиторію витягують поведінку
+// з common.js регуляркою «function NAME …» і виконують у jsdom;
+// обробник, написаний прямо в addEventListener, лишився б
+// неперевіреним. Тому функція самодостатня — крім document їй нічого
+// не треба.
+function closeTopModal() {
+
+    // Останнє відкрите — верхнє: вікна малюються в порядку розмітки,
+    // і якщо їх колись стане два одночасно, закрити треба те, що
+    // зверху.
+    const open = [...document.querySelectorAll(".modal-overlay:not([hidden])")].pop();
+
+    if (!open) return false;
+
+    const close = open.querySelector(".modal-close");
+
+    if (close) close.click();
+    else open.hidden = true;
+
+    return true;
+
+}
+
+document.addEventListener("keydown", event => {
+
+    if (event.key === "Escape") closeTopModal();
 
 });
 
