@@ -29,7 +29,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
 
-    <link rel="stylesheet" href="assets/css/style.css?v=fcdbb5f9">
+    <link rel="stylesheet" href="assets/css/style.css?v=f0c5b7fd">
 
 
 
@@ -420,6 +420,26 @@
 
                     <h2>Оплата</h2>
                     <p class="checkout-block-sub">Оберіть зручний спосіб оплати</p>
+
+                    <!-- ПЕРЕДОПЛАТА ЗА ТОВАР ПІД ЗАМОВЛЕННЯ.
+
+                         Сторінка товару каже: «Потрібна передоплата
+                         N% вартості». Кошик попереджає, що термін
+                         довший за звичайну доставку. А тут, де
+                         покупець нарешті ОБИРАЄ, як платити, обидві
+                         умови зникали — і «Готівкою при отриманні»
+                         виглядало як рівноцінний варіант. Далі
+                         дзвонив менеджер і казав протилежне.
+
+                         Нічого не вимикаємо: замовлення приймаємо
+                         будь-яке, умови менеджер узгодить. Але
+                         прочитати їх покупець мусить ДО вибору, а не
+                         після нього.
+
+                         Текст збирає renderOrderSummary() у
+                         checkout.js — відсоток у кожного товару свій,
+                         і в кошику їх може бути кілька. -->
+                    <p class="preorder-banner" id="checkoutPreorderNote" hidden></p>
 
                     <div class="delivery-options">
 
@@ -813,7 +833,7 @@
 <script src="assets/js/turnstile.js?v=29c5b96c" defer></script>
 <!-- Підказки міст і відділень Нової пошти (порожній ключ = поле як було) -->
 <script src="assets/js/nova-poshta.js?v=64b7a428" defer></script>
-<script src="assets/js/checkout.js?v=4d0b18fe" defer></script>
+<script src="assets/js/checkout.js?v=b6185004" defer></script>
 <!-- Картка входу над формою. ПІСЛЯ checkout.js — вона кличе його
      prefillFromProfile(), коли людина щойно ввійшла. auth-widget.js
      тримає саму поведінку кнопок, спільну з кабінетом. -->
