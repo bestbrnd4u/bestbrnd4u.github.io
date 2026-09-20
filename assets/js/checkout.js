@@ -1077,6 +1077,27 @@ toggleSummaryBtn?.addEventListener("click", () => {
 // Валідація форми
 // -------------------------
 
+// ЧЕРВОНА РАМКА — ЦЕ ВІДПОВІДЬ ТІЛЬКИ ДЛЯ ОКА
+//
+// Текст помилки з'являвся поруч із полем, поле бралось у клас
+// invalid — і на цьому все. Для екранного читача не змінювалось
+// НІЧОГО: поле не позначене як помилкове, а сам текст лежить
+// окремим вузлом, ніяк із полем не пов'язаним. Людина повертається
+// в «Email», чує «Email, поле вводу» — і жодного слова про те, що з
+// ним не так.
+//
+// Тому додаємо дві речі, які й мали тут бути:
+//   aria-invalid    — «з цим полем проблема»;
+//   aria-describedby — «а ось яка саме», посиланням на той самий
+//                      текст, що бачить око.
+//
+// id проставляємо ТУТ, а не в розмітці: прив'язка потрібна лише
+// поки помилка є, а тримати в checkout.html сім зайвих id, які ні
+// на що більше не впливають, — це сім місць, де вони розійдуться з
+// data-error-for.
+//
+// Порожнє повідомлення прибирає обидва атрибути: поле «з проблемою,
+// а якою — не скажу» гірше за поле без позначки.
 function setFieldError(fieldId, message) {
 
     const errorEl = document.querySelector(`[data-error-for="${fieldId}"]`);
@@ -1084,7 +1105,23 @@ function setFieldError(fieldId, message) {
 
     if (errorEl) errorEl.textContent = message;
 
-    if (fieldEl) fieldEl.classList.toggle("invalid", Boolean(message));
+    if (!fieldEl) return;
+
+    fieldEl.classList.toggle("invalid", Boolean(message));
+
+    if (message && errorEl) {
+
+        if (!errorEl.id) errorEl.id = `field-error-${fieldId}`;
+
+        fieldEl.setAttribute("aria-invalid", "true");
+        fieldEl.setAttribute("aria-describedby", errorEl.id);
+
+    } else {
+
+        fieldEl.removeAttribute("aria-invalid");
+        fieldEl.removeAttribute("aria-describedby");
+
+    }
 
 }
 
@@ -1778,6 +1815,28 @@ checkoutForm?.addEventListener("submit", event => {
         const firstError = checkoutForm.querySelector(".field-error:not(:empty)");
 
         firstError?.closest("label, .delivery-options")?.scrollIntoView({ behavior: "smooth", block: "center" });
+
+        // І КУРСОР ТУДИ Ж, А НЕ ЛИШЕ ЕКРАН.
+        //
+        // Сторінка прокручувалась до першої помилки, а фокус лишався
+        // на кнопці «Замовити». Хто веде формою з клавіатури, після
+        // натискання не отримував НІЧОГО: екран поїхав кудись угору
+        // (він його не бачить), кнопка під пальцем та сама, помилку
+        // ніхто не назвав. Виглядає як «кнопка не працює».
+        //
+        // Шукаємо поле за тим самим data-error-for, яким підписано
+        // помилку. Для способу доставки поля з таким id немає —
+        // помилка спільна на групу, — тому запасний варіант: перший
+        // перемикач у ній.
+        const fieldId = firstError?.dataset.errorFor;
+
+        const target = (fieldId && document.getElementById(fieldId))
+            || firstError?.closest("label, .delivery-options")
+                ?.querySelector("input, select, textarea");
+
+        // preventScroll — щоб не сперечатись із плавним прокручуванням
+        // вище: два стрибки поспіль виглядають як смикання.
+        target?.focus({ preventScroll: true });
 
         return;
 
