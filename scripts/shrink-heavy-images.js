@@ -94,7 +94,36 @@ const QUALITY = 88;
 // PNG із прозорістю може бути логотипом чи іконкою, де «фотографічна»
 // логіка не діє. Webp прозорість тримає, тож переводимо і їх, але
 // без утрат — інакше на різкій межі логотипа з'явиться бахрома.
+//
+// ТІЛЬКИ ПРОЗОРІСТЬ МУСИТЬ БУТИ СПРАВЖНЬОЮ.
+//
+// Наявність четвертого каналу нічого не означає: редактори лишають
+// його майже завжди, навіть коли жоден піксель не прозорий. Перша
+// версія цієї перевірки питала metadata().hasAlpha — і на банері
+// 1am.png (1679×552, альфа від краю до краю 255) увімкнула
+// збереження без утрат:
+//
+//   без утрат   846 КБ
+//   з утратами   91 КБ
+//
+// Тобто 755 КБ на головній за канал, який нічого не робить. Тепер
+// дивимось у сам канал: якщо його мінімум — 255, прозорих пікселів
+// немає, і це звичайна фотографія.
 const LOSSLESS_IF_ALPHA = true;
+
+async function usesAlpha(file) {
+
+    const meta = await sharp(file).metadata();
+
+    if (!meta.hasAlpha) return false;
+
+    const stats = await sharp(file).stats();
+
+    const alpha = stats.channels[3];
+
+    return Boolean(alpha) && alpha.min < 255;
+
+}
 
 // НАСКІЛЬКИ МАЄ ПОЛЕГШАТИ, ЩОБ МІНЯТИ.
 //
@@ -249,7 +278,9 @@ async function convert(file, apply, isProductPhoto) {
 
     }
 
-    const options = (LOSSLESS_IF_ALPHA && meta.hasAlpha)
+    const alpha = await usesAlpha(file.full);
+
+    const options = (LOSSLESS_IF_ALPHA && alpha)
         ? { lossless: true }
         : { quality: QUALITY };
 
@@ -257,13 +288,13 @@ async function convert(file, apply, isProductPhoto) {
 
         const probe = await sharp(file.full).webp(options).toBuffer();
 
-        return { after: probe.length, target, alpha: Boolean(meta.hasAlpha) };
+        return { after: probe.length, target, alpha };
 
     }
 
     await sharp(file.full).webp(options).toFile(target);
 
-    return { after: fs.statSync(target).size, target, alpha: Boolean(meta.hasAlpha) };
+    return { after: fs.statSync(target).size, target, alpha };
 
 }
 
