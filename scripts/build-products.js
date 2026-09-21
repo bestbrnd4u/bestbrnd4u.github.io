@@ -1293,6 +1293,8 @@ function main() {
         if (withReviews) console.log(`   товарів із відгуками: ${withReviews}`);
     }
 
+    dropWrongVideos(products);
+
     stampImageVersions(products);
 
     stampDeals(products);
@@ -1322,6 +1324,65 @@ function main() {
 
     reportCardGaps(products);
     reportDuplicateTitles(products);
+
+}
+
+// КАРТИНКА В ПОЛІ «ВІДЕО».
+//
+// Поле «Відео цього кольору» в адмінці — це widget: "file", тобто
+// медіатека пропонує ВСІ файли, і вибрати там картинку так само
+// легко, як відео. А сайт довіряє полю: parseVideoEmbed
+// (assets/js/product.js) вважає файлом усе, що не YouTube і не
+// Vimeo, і віддає це тегу <video>.
+//
+// Браузер такий слайд не програє: error 4, MEDIA_ELEMENT_ERROR.
+// У галереї з'являється зайвий порожній кадр, на який покупець
+// неодмінно натрапляє — відео завжди останнє, і крапка під ним є.
+//
+// Знайдено 21.09.2026 через Search Console: Google звітував «відео
+// не на сторінці перегляду» для .webp на головній і на сторінці
+// акції. Тобто спершу це помітив пошуковик, а не ми.
+//
+// ЧОМУ СПИСОК ЗАБОРОНЕНОГО, А НЕ ДОЗВОЛЕНОГО. Дозволений перелік
+// розширень відкинув би посилання без розширення — а так виглядає
+// пряме посилання з відеосховища, і воно цілком робоче. Реальна ж
+// помилка тут одна: у медіатеці вибрали картинку. Її і ловимо.
+const NOT_VIDEO = /\.(webp|jpe?g|png|gif|avif|svg|bmp|tiff?|heic|pdf)(\?|#|$)/i;
+
+function dropWrongVideos(products) {
+
+    const spoiled = [];
+
+    products.forEach((product) => {
+
+        const check = (holder, where) => {
+
+            const value = String(holder.video || "").trim();
+
+            if (!value || !NOT_VIDEO.test(value)) return;
+
+            spoiled.push(`${product.title || product.slug}${where} → ${value.split("/").pop()}`);
+
+            // Прибираємо, а не лишаємо як є: покупець інакше далі
+            // бачить мертвий слайд, поки власник не прочитає журнал.
+            delete holder.video;
+
+        };
+
+        check(product, "");
+
+        (product.variants || []).forEach((variant) => {
+            if (variant) check(variant, ` (колір «${variant.color || "?"}»)`);
+        });
+
+    });
+
+    if (!spoiled.length) return;
+
+    console.warn(`::warning::у полі «Відео» лежить картинка, не відео —`
+        + ` ${spoiled.length}: ${spoiled.join("; ")}.`
+        + " Слайд прибрано зі сторінки, щоб не показувати порожній кадр."
+        + " Потрібне відео — завантажте .mp4 або вставте посилання на YouTube/Vimeo");
 
 }
 
@@ -1508,6 +1569,7 @@ function reportCardGaps(products) {
 // тимчасовій теці, а не на справжньому каталозі.
 module.exports = {
     renameToLatinSlugs, serialize, PRODUCT_PAGE_ONLY, reportDuplicateTitles,
+    dropWrongVideos, NOT_VIDEO,
     // Звіт про порожні поля перевіряється за поведінкою, а не за
     // виглядом коду: він уже раз мовчав про категорію, якій поле не
     // потрібне, і про це не було звідки дізнатись.
