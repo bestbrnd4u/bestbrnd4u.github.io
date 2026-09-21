@@ -16,6 +16,10 @@ async function initFavorites() {
 
         allProducts = await loadCatalog();
 
+        // Те саме, що в кошику: зниклий товар має піти зі сховища, а
+        // не лише зі списку (dropVanishedEntries у common.js).
+        dropVanishedEntries(allProducts);
+
         renderFavorites();
 
     } catch (error) {

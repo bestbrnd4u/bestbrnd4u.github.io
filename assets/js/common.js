@@ -979,6 +979,74 @@ function saveFavorites(list) {
 
 }
 
+// ЗНИКЛІ ТОВАРИ ПРИБИРАЄМО ЗІ СХОВИЩА, А НЕ ЛИШЕ З ЕКРАНА.
+//
+// Перемикач «🚫 Розпродано» в адмінці прибирає товар із products.json
+// ЦІЛКОМ (scripts/build-products.js): його немає ні в каталозі, ні в
+// пошуку, ні на власній сторінці. А от у кошику й в обраному він
+// лишався — сторінка мовчки не малювала такий рядок (`if (!product)
+// return ""` у cart.js, `.filter(Boolean)` у favorites.js), тоді як
+// лічильник у шапці рахує СХОВИЩЕ й далі показував «1».
+//
+// Виходила суперечність без виходу: на іконці «1», усередині
+// «Кошик порожній», і прибрати нема чого — рядка ж немає. І так до
+// кінця життя браузера.
+//
+// ЗАПОБІЖНИК, БЕЗ ЯКОГО ЦЕ НЕБЕЗПЕЧНО. Чистимо лише тоді, коли
+// каталог СПРАВДІ завантажився. Порожній products означає не «товарів
+// більше немає», а «мережа не відповіла» — і без цієї перевірки один
+// обрив зв'язку стирав би людині ввесь кошик.
+function dropVanishedEntries(products) {
+
+    if (!Array.isArray(products) || !products.length) return 0;
+
+    const alive = new Set(products.map(item => Number(item.id)));
+
+    let cartGone = 0;
+    let favGone = 0;
+
+    const cart = getCart();
+    const cartLeft = cart.filter(entry => alive.has(Number(entry.id)));
+
+    if (cartLeft.length !== cart.length) {
+        cartGone = cart.length - cartLeft.length;
+        saveCart(cartLeft);
+    }
+
+    const favorites = getFavorites();
+    const favLeft = favorites.filter(entry => alive.has(Number(entry.id)));
+
+    if (favLeft.length !== favorites.length) {
+        favGone = favorites.length - favLeft.length;
+        saveFavorites(favLeft);
+    }
+
+    // Мовчки викидати чуже з кошика негарно — кажемо, що сталось.
+    //
+    // Рахуємо РЯДКИ, а не місця: «прибрали 2 товари» після того, як
+    // людина клала одну сумку двічі, читалось би як помилка.
+    if (cartGone || favGone) {
+
+        const where = [cartGone ? "кошика" : "", favGone ? "обраного" : ""]
+            .filter(Boolean)
+            .join(" й ");
+
+        const total = cartGone + favGone;
+
+        // Дієслово узгоджується з числом: «2 товари не продається»
+        // читається як описка в магазині, а не як пояснення.
+        const what = total === 1
+            ? "Товар більше не продається"
+            : `${total} ${pluralProducts(total)} більше не продаються`;
+
+        showToast(`${what} — прибрали з ${where}`);
+
+    }
+
+    return cartGone + favGone;
+
+}
+
 function isFavorite(id, color = null, size = null) {
 
     return getFavorites().some(entry =>

@@ -33,6 +33,11 @@ async function initCart() {
 
         if (window.LiveStock) window.LiveStock.apply(allProducts, live);
 
+        // Товари, яких уже немає в каталозі, прибираємо зі сховища —
+        // інакше лічильник у шапці рахуватиме їх вічно (пояснення у
+        // dropVanishedEntries, common.js).
+        dropVanishedEntries(allProducts);
+
         renderCart();
 
     } catch (error) {
