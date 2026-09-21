@@ -460,6 +460,117 @@ console.log("\n[7] Однакові назви в різних товарів");
         !/reportDuplicateTitles[\s\S]{0,300}process\.exit\(1\)/.test(buildSrc));
 }
 
+console.log("\n[8] У полі «Відео» не може лежати картинка");
+{
+    // ЩО СТАЛОСЬ.
+    //
+    // Поле «Відео цього кольору» — widget: "file", тобто медіатека
+    // пропонує ВСІ файли, і вибрати там картинку так само легко, як
+    // відео. А сайт полю довіряє: parseVideoEmbed (product.js)
+    // вважає файлом усе, що не YouTube і не Vimeo, і віддає тегу
+    // <video>.
+    //
+    // Браузер такого не грає — error 4, MEDIA_ELEMENT_ERROR, — і в
+    // галереї з'являється порожній кадр. Натрапляють на нього всі:
+    // відео завжди останній слайд, і крапка під ним є.
+    //
+    // Заміряно на проді 21.09.2026, товар «Стильні жіночі
+    // сонцезахисні окуляри Marc Jacobs MJ 1010/S»: у полі відео
+    // лежав .webp, четвертий слайд з чотирьох був мертвий. Знайшов
+    // це не сайт і не ми, а Search Console — звітом «відео не на
+    // сторінці перегляду».
+    const { dropWrongVideos } = require("../scripts/build-products.js");
+
+    const say = products => {
+
+        const said = [];
+        const realWarn = console.warn;
+
+        console.warn = line => said.push(String(line));
+
+        try { dropWrongVideos(products); }
+        finally { console.warn = realWarn; }
+
+        return said.join(" ");
+
+    };
+
+    // 1. Картинка у відео — прибрати й сказати.
+    {
+        const list = [{
+            title: "Окуляри",
+            variants: [{ color: "Чорний", video: "/assets/images/products/uploads/photo.webp" }]
+        }];
+
+        const said = say(list);
+
+        check("картинку з поля відео прибрано",
+            list[0].variants[0].video === undefined, list[0].variants[0].video);
+
+        check("сказано, у якого товару й кольору",
+            /Окуляри/.test(said) && /Чорний/.test(said), said.slice(0, 90));
+
+        check("сказано, що робити далі",
+            /YouTube|\.mp4/.test(said), said.slice(-70));
+    }
+
+    // 2. Справжнє відео не чіпаємо — ні файл, ні YouTube, ні Vimeo.
+    {
+        const list = [
+            { title: "A", variants: [{ video: "/assets/video/review.mp4" }] },
+            { title: "B", variants: [{ video: "https://youtu.be/dQw4w9WgXcQ" }] },
+            { title: "C", variants: [{ video: "https://vimeo.com/123456" }] },
+            // Пряме посилання БЕЗ розширення — так виглядає віддача
+            // з відеосховища, і воно робоче.
+            { title: "D", variants: [{ video: "https://cdn.example.com/stream/abc" }] }
+        ];
+
+        const said = say(list);
+
+        check("справжнє відео лишилось недоторканим",
+            list.every(p => p.variants[0].video), list.map(p => p.variants[0].video).join(" | "));
+
+        check("і жодного зайвого попередження", said === "", said);
+    }
+
+    // 3. Відео на рівні товару, а не кольору, теж перевіряється.
+    {
+        const list = [{ title: "E", video: "/assets/images/x.png", variants: [] }];
+
+        say(list);
+
+        check("картинку прибрано й на рівні товару", list[0].video === undefined, list[0].video);
+    }
+
+    // 4. Прибирання мусить іти ДО запису файлів — інакше в
+    //    products.json поїде мертве посилання.
+    const buildSrc = read("scripts/build-products.js");
+
+    check("викликається у збірці", /dropWrongVideos\(products\);/.test(buildSrc));
+
+    check("і саме до запису products.json",
+        buildSrc.indexOf("dropWrongVideos(products);")
+            < buildSrc.indexOf("fs.writeFileSync(OUTPUT_FILE"));
+
+    // 5. І на живих даних зараз чисто.
+    {
+        const items = JSON.parse(read("data/products.json"));
+
+        const bad = [];
+
+        items.forEach(product => {
+            [product, ...(product.variants || [])].filter(Boolean).forEach(holder => {
+                const value = String(holder.video || "");
+                if (value && /\.(webp|jpe?g|png|gif|avif|svg)(\?|#|$)/i.test(value)) {
+                    bad.push(product.title + " → " + value.split("/").pop());
+                }
+            });
+        });
+
+        check("у зібраних даних картинок у полі відео немає", bad.length === 0, bad.join("; "));
+    }
+}
+
 console.log(failures ? `\n✗ провалено перевірок: ${failures}\n` : "\n✓ усі перевірки пройдено\n");
 
 process.exit(failures ? 1 : 0);
