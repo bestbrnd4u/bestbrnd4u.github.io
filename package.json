@@ -21,9 +21,9 @@
     "og-cover": "node scripts/build-og-cover.js"
   },
   "devDependencies": {
-    "js-yaml": "^5.4.1",
-    "jsdom": "^30.0.1",
-    "onnxruntime-node": "^1.29.0",
+    "js-yaml": "^5.4.2",
+    "jsdom": "^30.1.0",
+    "onnxruntime-node": "^1.30.0",
     "sharp": "^0.35.4"
   },
   "engines": {
