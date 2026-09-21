@@ -1321,6 +1321,7 @@ function main() {
         + ` (${size(OUTPUT_FILE)} КБ) + ${path.relative(ROOT, CATALOG_FILE)} (${size(CATALOG_FILE)} КБ)`);
 
     reportCardGaps(products);
+    reportDuplicateTitles(products);
 
 }
 
@@ -1400,6 +1401,63 @@ function stampDeals(products) {
 
 }
 
+// ОДНАКОВІ НАЗВИ В РІЗНИХ ТОВАРІВ.
+//
+// Заголовок сторінки будується з назви: «<назва> — купити за <ціна>
+// грн | BestBrnd4u». Коли назва в двох товарів та сама, для Google
+// це дві майже однакові сторінки: він лишає в видачі одну, а другу
+// вважає дублем — і другий товар просто не шукається.
+//
+// Заміряно 21.09.2026: три різні окуляри звуться однаково —
+// «Сонцезахисні окуляри Marc Jacobs», хоч артикули різні
+// (MJ-1028S, MJ-1061S, MARC-409S).
+//
+// ЧОМУ ПОПЕРЕДЖЕННЯ, А НЕ АВТОМАТИЧНЕ ПЕРЕЙМЕНУВАННЯ. Дописати
+// артикул у назву збірка змогла б, але назва — це те, що бачить
+// покупець у картці, у пошуку сайту й у фіді Google Shopping.
+// «Сонцезахисні окуляри Marc Jacobs MJ-1061S-009QHA-59» читається
+// гірше, ніж «Сонцезахисні окуляри Marc Jacobs Round Gold» — а яке
+// слово доречне, знає лише той, хто бачив саму річ.
+//
+// В адмінці цього не помітити: товари відкриваються поодинці, і
+// збіг видно лише коли покласти списки поряд. Тому — тут.
+function reportDuplicateTitles(products) {
+
+    const byTitle = new Map();
+
+    products.forEach((product) => {
+
+        const title = String(product.title || "").trim();
+
+        if (!title) return;
+
+        if (!byTitle.has(title)) byTitle.set(title, []);
+
+        byTitle.get(title).push(product);
+
+    });
+
+    const clashes = [...byTitle.entries()].filter(([, list]) => list.length > 1);
+
+    if (!clashes.length) return;
+
+    clashes.forEach(([title, list]) => {
+
+        // Артикул тут доречніший за назву (вона ж у всіх однакова) —
+        // саме за ним власник знайде потрібний товар в адмінці.
+        const which = list
+            .map((product) => String(product.sku || product.slug || product.id))
+            .join(", ");
+
+        console.warn(`::warning::однакова назва в ${list.length} товарів:`
+            + ` «${title}» (${which}).`
+            + " Заголовок сторінки будується з назви, тож для Google це дублі —"
+            + " додайте в назву те, чим вони різняться");
+
+    });
+
+}
+
 function reportCardGaps(products) {
 
     CARD_FIELDS.forEach(({ key, label, skip }) => {
@@ -1449,7 +1507,7 @@ function reportCardGaps(products) {
 // Експортуємо для тестів: перейменування адрес перевіряється на
 // тимчасовій теці, а не на справжньому каталозі.
 module.exports = {
-    renameToLatinSlugs, serialize, PRODUCT_PAGE_ONLY,
+    renameToLatinSlugs, serialize, PRODUCT_PAGE_ONLY, reportDuplicateTitles,
     // Звіт про порожні поля перевіряється за поведінкою, а не за
     // виглядом коду: він уже раз мовчав про категорію, якій поле не
     // потрібне, і про це не було звідки дізнатись.

@@ -373,6 +373,93 @@ console.log("\n[6] Текст рядка редагується з адмінк�
         /Показується у двох місцях/.test(admin));
 }
 
+console.log("\n[7] Однакові назви в різних товарів");
+{
+    // НАВІЩО. Заголовок сторінки будується з назви: «<назва> —
+    // купити за <ціна> грн | BestBrnd4u». Коли назва в двох товарів
+    // та сама, для Google це дві майже однакові сторінки: він лишає
+    // одну, а другу вважає дублем — і товар просто не шукається.
+    //
+    // Знайдено 21.09.2026 на живих даних: три різні окуляри звуться
+    // «Сонцезахисні окуляри Marc Jacobs» (MJ-1028S, MJ-1061S,
+    // MARC-409S). В адмінці цього не побачити — товари
+    // відкриваються поодинці.
+    //
+    // ЧОМУ ЛИШЕ ПОПЕРЕДЖЕННЯ. Дописати артикул збірка змогла б, але
+    // назву читає покупець — і в картці, і в пошуку, і у фіді
+    // Google Shopping. Яке саме слово доречне, знає той, хто бачив
+    // річ, а не скрипт.
+    const { reportDuplicateTitles } = require("../scripts/build-products.js");
+
+    const say = products => {
+
+        const said = [];
+        const realWarn = console.warn;
+
+        console.warn = line => said.push(String(line));
+
+        try { reportDuplicateTitles(products); }
+        finally { console.warn = realWarn; }
+
+        return said;
+
+    };
+
+    // 1. Збіг є — попереджаємо, і називаємо, ЯКІ саме товари.
+    {
+        const said = say([
+            { title: "Окуляри Marc Jacobs", sku: "MJ-1" },
+            { title: "Окуляри Marc Jacobs", sku: "MJ-2" },
+            { title: "Сумка Coach", sku: "C-1" }
+        ]).join(" ");
+
+        check("про збіг сказано", /однакова назва/.test(said), said);
+
+        check("названо обидва артикули",
+            said.includes("MJ-1") && said.includes("MJ-2"), said);
+
+        check("товар без збігу не згадано", !said.includes("C-1"), said);
+
+        // Саме ::warning::, як і решта звітів збірки — GitHub Actions
+        // піднімає такі рядки у зведення запуску.
+        check("це попередження збірки", /^::warning::/.test(said.trim()), said.slice(0, 40));
+    }
+
+    // 2. Збігів немає — мовчимо. Інакше звіт перетвориться на шум,
+    //    який перестануть читати.
+    {
+        const said = say([
+            { title: "Окуляри Marc Jacobs", sku: "MJ-1" },
+            { title: "Сумка Coach", sku: "C-1" }
+        ]);
+
+        check("без збігів — жодного рядка", said.length === 0, said.join(" | "));
+    }
+
+    // 3. Порожня назва не вважається збігом: про неї вже є свій звіт
+    //    (порожні поля картки, розділ вище).
+    {
+        const said = say([
+            { title: "", sku: "A" },
+            { title: "   ", sku: "B" },
+            { sku: "C" }
+        ]);
+
+        check("порожні назви не збігаються між собою", said.length === 0, said.join(" | "));
+    }
+
+    // 4. І звіт справді ввімкнений у збірці — інакше він мертвий.
+    const buildSrc = read("scripts/build-products.js");
+
+    check("викликається у збірці",
+        /reportDuplicateTitles\(products\);/.test(buildSrc));
+
+    // Попередження, а не падіння: збірка мусить дійти до кінця, бо
+    // однакова назва не ламає сайт — вона лише шкодить у видачі.
+    check("збірку не зупиняє",
+        !/reportDuplicateTitles[\s\S]{0,300}process\.exit\(1\)/.test(buildSrc));
+}
+
 console.log(failures ? `\n✗ провалено перевірок: ${failures}\n` : "\n✓ усі перевірки пройдено\n");
 
 process.exit(failures ? 1 : 0);
