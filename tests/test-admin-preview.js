@@ -88,6 +88,59 @@ function textOf(tree){
   return out.join(" ");
 }
 
+console.log("\n[2b] Прев'ю не питає полів, яких немає в конфізі");
+{
+    // ЩО ЦЕ ЛОВИТЬ.
+    //
+    // Прев'ю читає поля за іменем: e.get("material"), e.get("country")
+    // і так далі. Помилишся в імені — рядок просто лишиться порожнім.
+    // Нічого не впаде, у консолі нічого не буде: Decap чесно віддасть
+    // undefined за ключем, якого немає.
+    //
+    // Власник при цьому бачить, що заповнив поле, а в прев'ю його
+    // немає, — і робить єдиний доступний йому висновок: поле не
+    // працює.
+    //
+    // Знайдено 21.09.2026: рядок «Ремінь» читав strap, тоді як поле в
+    // конфізі зветься strapInfo (і саме strapInfo читають сторінка
+    // товару й фід Google Shopping). Тобто «Опис ручки/ременя» ніколи
+    // не з'являвся в прев'ю, скільки б його не заповнювали. Решта
+    // вісім рядків того ж переліку іменовані правильно — тобто це
+    // одрук, а не задум.
+    const preview = fs.readFileSync(path.join(ROOT, "admin/preview-templates.js"), "utf8");
+
+    const asked = [...new Set(
+        [...preview.matchAll(/\.get\("([a-zA-Z_]+)"\)/g)].map(m => m[1])
+    )];
+
+    check(`полів, які читає прев'ю: ${asked.length}`, asked.length > 30, asked.length);
+
+    // Імена полів із конфіга — усі, на будь-якій глибині вкладеності.
+    const configText = fs.readFileSync(path.join(ROOT, "admin/config.yml"), "utf8");
+
+    const declared = new Set(
+        [...configText.matchAll(/^\s*-?\s*name:\s*"?([a-zA-Z_]+)"?\s*$/gm)].map(m => m[1])
+    );
+
+    // Службові ключі самого Decap: їх у конфізі немає й не буде.
+    ["data", "slug", "path", "raw", "widgets"].forEach(key => declared.add(key));
+
+    check(`імен полів у конфізі: ${declared.size}`, declared.size > 100, declared.size);
+
+    const orphans = asked.filter(name => !declared.has(name));
+
+    check("кожне поле прев'ю існує в конфізі", orphans.length === 0, orphans.join(", "));
+
+    // І окремо той самий рядок, з якого все почалось: ім'я мусить
+    // збігатися з тим, що читає сама сторінка товару.
+    check("«Ремінь» читає те саме поле, що й сторінка товару",
+        /\["Ремінь", e\.get\("strapInfo"\)\]/.test(preview));
+
+    check("…і сторінка товару справді читає strapInfo",
+        /product\.strapInfo/.test(
+            fs.readFileSync(path.join(ROOT, "assets/js/product.js"), "utf8")));
+}
+
 console.log("\n[3] Товар рендериться СПРАВЖНЬОЮ карткою на реальних даних");
 {
   // Прев'ю перевіряємо на ВЛАСНОМУ наборі з усіма полями: сенс тесту —
