@@ -193,7 +193,10 @@
                 + '    <small>Якщо йдеться про стан товару — покажіть на фото.'
                 + ' До ' + MAX_FILES + ' знімків, разом до ' + bytesLabel(MAX_TOTAL_BYTES) + '.</small>'
                 + '  </div>'
-                + '  <p class="refusal-error" hidden></p>'
+                // role="alert": відповідь сервера з'являється
+                // рядком у вікні, фокус лишається на кнопці — без
+                // ролі про невдачу дізнається лише той, хто бачить.
+                + '  <p class="refusal-error" role="alert" hidden></p>'
                 + '  <div class="refusal-actions">'
                 + '    <button type="button" class="btn btn-outline" data-refusal="cancel">Скасувати</button>'
                 + '    <button type="button" class="btn" data-refusal="send">Надіслати</button>'
