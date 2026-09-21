@@ -318,6 +318,77 @@ console.log("\n[6] У навігації підвалу немає заглуш�
         withLink + " з " + footers.length);
 }
 
+console.log("\n[7] Коментарі не посилаються на неіснуючі набори");
+{
+    // ЧОМУ САМЕ НАБОРИ, А НЕ БУДЬ-ЯКІ ШЛЯХИ В КОМЕНТАРЯХ.
+    //
+    // Коментар МОЖЕ навмисно називати файл, якого вже немає: у
+    // scripts/normalize-media-names.js пояснюється, чому прибрали
+    // реєстр відбитків. Це не помилка, а історія, і вимагати від неї
+    // існуючого файлу безглуздо.
+    //
+    // А от «це звіряє тест (tests/…)» — обіцянка запобіжника. Якщо
+    // названого набору немає, читач або шукатиме його марно, або
+    // повірить, що перевірка існує, хоча її немає. Обидва варіанти
+    // гірші за відсутній коментар.
+    //
+    // Знайдено 21.09.2026: admin/orders.js посилався на набір
+    // test-admin-orders.js, тоді як файл давно зветься
+    // test-admin-orders-panel.js. Сама перевірка на місці — вона
+    // звіряє копію SUPABASE_URL у панелі й у клієнті сайту, — з'їхала
+    // лише назва.
+    //
+    // ЦЕЙ ФАЙЛ СКАНЕР ОБХОДИТЬ. Інакше набір червонів би на власному
+    // поясненні вище: приклад у ньому виглядає як справжня згадка.
+    const SELF = "tests/test-links.js";
+
+    const dirs = ["assets/js", "scripts", "admin", "tests",
+                  "supabase/functions/telegram-order-bot"];
+
+    const sources = [];
+
+    dirs.forEach(dir => {
+
+        const full = path.join(ROOT, dir);
+
+        if (!fs.existsSync(full)) return;
+
+        fs.readdirSync(full)
+            .filter(name => /\.(js|ts)$/.test(name))
+            .map(name => dir + "/" + name)
+            .filter(rel => rel !== SELF)
+            .forEach(rel => sources.push(rel));
+
+    });
+
+    const mentions = new Map();
+
+    sources.forEach(rel => {
+
+        const text = fs.readFileSync(path.join(ROOT, rel), "utf8");
+
+        // Дивимось ЛИШЕ в коментарі: у самих наборах шлях трапляється
+        // і в коді — require, readFileSync.
+        const comments = (text.match(/\/\/[^\n]*/g) || [])
+            .concat(text.match(/\/\*[\s\S]*?\*\//g) || [])
+            .join("\n");
+
+        (comments.match(/tests\/test-[A-Za-z0-9._-]+\.js/g) || []).forEach(hit => {
+            if (!mentions.has(hit)) mentions.set(hit, []);
+            mentions.get(hit).push(rel);
+        });
+
+    });
+
+    check(`згадок наборів у коментарях: ${mentions.size}`, mentions.size > 10, mentions.size);
+
+    const dead = [...mentions.entries()]
+        .filter(([target]) => !fs.existsSync(path.join(ROOT, target)))
+        .map(([target, from]) => `${target} ← ${from.join(", ")}`);
+
+    check("усі названі набори існують", dead.length === 0, dead.join("; "));
+}
+
 console.log(failures === 0
     ? `\n✅ Посилання: ${links} перевірено, битих немає\n`
     : `\n❌ Проблем: ${failures}\n`);

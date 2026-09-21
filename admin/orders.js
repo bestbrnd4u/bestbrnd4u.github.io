@@ -34,7 +34,7 @@
     // ⚠️ Та сама, що в assets/js/supabase-client.js. Копія тут навмисна:
     // адмінка не підключає скриптів сайту, а тягнути весь клієнт
     // Supabase заради одного рядка — зайве. Щоб копії не розійшлися,
-    // їх звіряє тест (tests/test-admin-orders.js).
+    // їх звіряє тест (tests/test-admin-orders-panel.js).
     const SUPABASE_URL = "https://hyfodsznpeeecgtgffub.supabase.co";
 
     const ENDPOINT = `${SUPABASE_URL}/functions/v1/telegram-order-bot`;
