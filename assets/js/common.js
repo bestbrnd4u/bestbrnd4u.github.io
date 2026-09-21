@@ -979,6 +979,74 @@ function saveFavorites(list) {
 
 }
 
+// ЗНИКЛІ ТОВАРИ ПРИБИРАЄМО ЗІ СХОВИЩА, А НЕ ЛИШЕ З ЕКРАНА.
+//
+// Перемикач «🚫 Розпродано» в адмінці прибирає товар із products.json
+// ЦІЛКОМ (scripts/build-products.js): його немає ні в каталозі, ні в
+// пошуку, ні на власній сторінці. А от у кошику й в обраному він
+// лишався — сторінка мовчки не малювала такий рядок (`if (!product)
+// return ""` у cart.js, `.filter(Boolean)` у favorites.js), тоді як
+// лічильник у шапці рахує СХОВИЩЕ й далі показував «1».
+//
+// Виходила суперечність без виходу: на іконці «1», усередині
+// «Кошик порожній», і прибрати нема чого — рядка ж немає. І так до
+// кінця життя браузера.
+//
+// ЗАПОБІЖНИК, БЕЗ ЯКОГО ЦЕ НЕБЕЗПЕЧНО. Чистимо лише тоді, коли
+// каталог СПРАВДІ завантажився. Порожній products означає не «товарів
+// більше немає», а «мережа не відповіла» — і без цієї перевірки один
+// обрив зв'язку стирав би людині ввесь кошик.
+function dropVanishedEntries(products) {
+
+    if (!Array.isArray(products) || !products.length) return 0;
+
+    const alive = new Set(products.map(item => Number(item.id)));
+
+    let cartGone = 0;
+    let favGone = 0;
+
+    const cart = getCart();
+    const cartLeft = cart.filter(entry => alive.has(Number(entry.id)));
+
+    if (cartLeft.length !== cart.length) {
+        cartGone = cart.length - cartLeft.length;
+        saveCart(cartLeft);
+    }
+
+    const favorites = getFavorites();
+    const favLeft = favorites.filter(entry => alive.has(Number(entry.id)));
+
+    if (favLeft.length !== favorites.length) {
+        favGone = favorites.length - favLeft.length;
+        saveFavorites(favLeft);
+    }
+
+    // Мовчки викидати чуже з кошика негарно — кажемо, що сталось.
+    //
+    // Рахуємо РЯДКИ, а не місця: «прибрали 2 товари» після того, як
+    // людина клала одну сумку двічі, читалось би як помилка.
+    if (cartGone || favGone) {
+
+        const where = [cartGone ? "кошика" : "", favGone ? "обраного" : ""]
+            .filter(Boolean)
+            .join(" й ");
+
+        const total = cartGone + favGone;
+
+        // Дієслово узгоджується з числом: «2 товари не продається»
+        // читається як описка в магазині, а не як пояснення.
+        const what = total === 1
+            ? "Товар більше не продається"
+            : `${total} ${pluralProducts(total)} більше не продаються`;
+
+        showToast(`${what} — прибрали з ${where}`);
+
+    }
+
+    return cartGone + favGone;
+
+}
+
 function isFavorite(id, color = null, size = null) {
 
     return getFavorites().some(entry =>
@@ -1358,6 +1426,20 @@ function showToast(text) {
         toast.id = "toast";
 
         toast.className = "toast";
+
+        // ТОСТ — ЦЕ ЄДИНА ВІДПОВІДЬ НА ДІЮ, І ЇЇ ТРЕБА СКАЗАТИ.
+        //
+        // «Товар додано в кошик», «Оберіть розмір», «Промокод
+        // застосовано» — тридцять різних повідомлень, і жодне з них
+        // ніде більше не дублюється. Хто не бачить екрана, після
+        // натискання не дізнавався нічого.
+        //
+        // Роль ставимо тут, при створенні вузла, а не при показі:
+        // елемент лишається в дереві (ховає його opacity, а не
+        // display), тож читалка бачить живу область одразу й далі
+        // оголошує кожну зміну тексту.
+        toast.setAttribute("role", "status");
+        toast.setAttribute("aria-live", "polite");
 
         document.body.appendChild(toast);
 
@@ -2916,6 +2998,28 @@ function flagSizeRequired(scope) {
         errorEl.hidden = false;
 
         sizeWraps[0].scrollIntoView({ behavior: "smooth", block: "center" });
+
+        // ФОКУС НА ПЕРШИЙ РОЗМІР.
+        //
+        // Тут, на відміну від решти повідомлень сайту, живою областю
+        // не обійтись: текст «Будь ласка, оберіть розмір» СТАЛИЙ — він
+        // лежить у розмітці й лише розховується. Для читалки екрана це
+        // не зміна змісту; а на другому натисканні «Купити» не
+        // змінюється взагалі нічого, і сказати їй буде нíчого.
+        //
+        // Фокус працює в обох випадках: людина опиняється рівно на
+        // тому, що треба вибрати, і читалка називає кнопку розміру.
+        // Заразом це виручає тих, хто працює з клавіатури: інакше до
+        // розмірів довелось би вертатись Shift+Tab через пів сторінки.
+        //
+        // isShown — бо в картці каталогу блоків розмірів два, і один
+        // із них схований (див. комент над функцією). Фокус на
+        // схованому не спрацьовує й не повідомляє про це.
+        const firstSize = [...scope.querySelectorAll(".size, .mini-size")].find(isShown);
+
+        // preventScroll — щоб не сперечатися з плавною прокруткою
+        // рядком вище.
+        if (firstSize) firstSize.focus({ preventScroll: true });
 
     } else {
 

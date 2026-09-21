@@ -1,10 +1,14 @@
 {
-  "title": "Сонцезахисні окуляри Marc Jacobs",
+  "gender": [
+    "Жінкам"
+  ],
+  "color": "Темно-сірий",
+  "material": "Металева оправа; полімерні лінзи",
   "brand": "Marc Jacobs",
-  "category": "Окуляри і оправи",
-  "gender": "Жінкам",
   "price": 6000,
-  "description": "Сонцезахисні окуляри Marc Jacobs у вузькій прямокутній оправі з темними лінзами. Лаконічна форма з логотипом бренду на дузі.",
+  "preOrder": false,
+  "slug": "marc-jacobs-sontsezakhysni-okuliary-marc-jacobs",
+  "dimensions": "Ширина лінзи × місток × довжина завушника: 54 × 17 × 135 мм",
   "variants": [
     {
       "color": "Темно-сірий",
@@ -20,11 +24,9 @@
       ]
     }
   ],
-  "isNew": false,
   "sizes": [
     "ONESIZE"
   ],
-  "sku": "MARC-409S-08079O-54",
   "searchKeywords": [
     "марк джейкобс",
     "marc jacobs",
@@ -36,21 +38,21 @@
     "marc",
     "jacobs"
   ],
-  "instagramBlock": "general",
-  "preOrder": false,
-  "images": [
-    "assets/images/products/uploads/marc-409s-08079o-54-1.webp",
-    "assets/images/products/uploads/marc-409s-08079o-54-2.webp",
-    "assets/images/products/uploads/marc-409s-08079o-54-3.webp"
-  ],
-  "slug": "marc-jacobs-sontsezakhysni-okuliary-marc-jacobs",
-  "id": 19,
-  "color": "Темно-сірий",
+  "isNew": false,
   "stock": {
     "Темно-сірий": {
       "ONESIZE": 1
     }
   },
-  "dimensions": "Ширина лінзи × місток × довжина завушника: 54 × 17 × 135 мм",
-  "material": "Металева оправа; полімерні лінзи"
+  "title": "Сонцезахисні окуляри Marc Jacobs  MARC-409S-08079O-54",
+  "images": [
+    "assets/images/products/uploads/marc-409s-08079o-54-1.webp",
+    "assets/images/products/uploads/marc-409s-08079o-54-2.webp",
+    "assets/images/products/uploads/marc-409s-08079o-54-3.webp"
+  ],
+  "id": 19,
+  "instagramBlock": "general",
+  "description": "Сонцезахисні окуляри Marc Jacobs у вузькій прямокутній оправі з темними лінзами. Лаконічна форма з логотипом бренду на дузі.",
+  "sku": "MARC-409S-08079O-54",
+  "category": "Окуляри і оправи"
 }

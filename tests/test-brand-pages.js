@@ -259,12 +259,23 @@ console.log("\n[6] promo.html не зачеплено");
 
 console.log("\n[7] Адмінка: колекція «Бренди»");
 {
-    const block = config.slice(config.indexOf('- name: "brands"\n    label: "Бренди"'));
+    // Блок ріжемо по НАСТУПНІЙ колекції, а не по кількості символів.
+    //
+    // Тут стояло block.slice(0, 3000) — груба межа, щоб не зачепити
+    // сусідні колекції. Вона й підвела: варто було дописати полям
+    // media_folder із поясненням, і поля title та description виїхали
+    // за три тисячі символів. Набір почервонів на полях, які нікуди
+    // не дівались.
+    const from = config.indexOf('- name: "brands"\n    label: "Бренди"');
+    const rest = config.slice(from + 1);
+    const next = rest.search(/\n {2}- name: "/);
+
+    const block = next > -1 ? rest.slice(0, next) : rest;
 
     check("колекція заведена", block.length > 0 && /folder: "data\/brands"/.test(block));
 
     ["name", "logo", "banner", "title", "description"].forEach(field => {
-        check(`поле ${field}`, new RegExp(`name: "${field}"`).test(block.slice(0, 3000)));
+        check(`поле ${field}`, new RegExp(`name: "${field}"`).test(block));
     });
 
     // Загальна тека — assets/images/products/uploads, а там працює

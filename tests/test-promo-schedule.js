@@ -311,6 +311,115 @@ console.log("\n[7] Завершена акція не кличе до себе G
         missing.map(p => p.slug).join(", "));
 }
 
+console.log("\n[8] Сторінка без акції сама просить її не індексувати");
+{
+    // ЩО ЦЕ ЗАКРИВАЄ.
+    //
+    // Sitemap завершені акції вже не пропонує ([7]). Але sitemap лише
+    // ПРОПОНУЄ адреси — він не прибирає ті, які Google уже знає. А
+    // знає він їх напевно: посилання на акцію для того й робиться,
+    // щоб піти в сторіс, у пост і в чужий репост, і живе воно там
+    // довше за саму акцію.
+    //
+    // Відкрита така адреса віддає код 200 і той самий шаблон:
+    // заголовок «Акція | BestBrnd4u», опис «Акції та знижки
+    // BestBrnd4u», тіло — «Цю акцію не знайдено». Для Google це не
+    // «сторінки немає», а ще один дубль; і таких адрес рівно стільки,
+    // скільки завершених акцій плюс одруків у посиланнях.
+    //
+    // Заміряно на проді 21.09.2026: /promo?id=tsina-do-piatnytsi
+    // (акція завершилась 18.09) і /promo?id=akciya-yakoyi-nemaye
+    // обидві віддавали robots: index,follow і заголовок «Акція».
+    //
+    // Сторінка товару це вміє давно — markProductPageNotFound
+    // у assets/js/product.js. Тут те саме.
+    const { JSDOM } = require("jsdom");
+
+    const promoJs = read("assets/js/promo.js");
+    const promoHtml = read("promo.html");
+
+    // Живі функції: showPromoNotFound із promo.js і setMetaByName,
+    // якою вона користується, із common.js.
+    const notFoundSrc = promoJs.match(/function showPromoNotFound[\s\S]*?\n}\n/);
+    const setMetaSrc = common.match(/function setMetaByName[\s\S]*?\n}\n/);
+
+    check("showPromoNotFound знайдено", Boolean(notFoundSrc));
+    check("setMetaByName знайдено", Boolean(setMetaSrc));
+
+    // ГОЛОВА ТАКА, ЯКОЮ ВОНА БУДЕ НА ПРОДІ.
+    //
+    // У робочому дереві лежить дев-збірка, а вона додає СВІЙ
+    // <meta name="robots" content="noindex,nofollow"> згори
+    // (scripts/apply-site-env.js, крок 6) — додає, а не переписує
+    // наявний, бо прод-збірка має прибрати його безслідно.
+    //
+    // Тобто на деві тегів два, а setMetaByName править лише перший
+    // (querySelector). Перевіряти на деві означало б перевіряти те,
+    // чого на проді немає, — тому знімаємо дев-тег так само, як його
+    // зніме збірка.
+    const DEV_TAG = /\s*<meta name="robots" content="noindex,nofollow">/g;
+
+    const head = promoHtml.slice(0, promoHtml.indexOf("</head>")).replace(DEV_TAG, "");
+
+    // А заразом стежимо, щоб на проді він лишався ОДИН. Два теги
+    // robots на сторінці — і setMetaByName мовчки поправить не той:
+    // так само тихо зламається й сторінка товару.
+    const inTemplate = head.match(/<meta name="robots"[^>]*>/g) || [];
+
+    check("у шаблоні рівно один robots", inTemplate.length === 1, inTemplate.join(" | "));
+
+    check("і поки що він дозволяє індексацію",
+        /content="index,follow"/.test(inTemplate[0] || ""), inTemplate[0]);
+
+    if (notFoundSrc && setMetaSrc) {
+
+        const dom = new JSDOM("<!doctype html><html><head>" + head + "</head>"
+            + '<body><div id="promoNotFound" hidden></div></body></html>');
+
+        const run = new Function("document",
+            setMetaSrc[0] + notFoundSrc[0] + "\nshowPromoNotFound();");
+
+        run(dom.window.document);
+
+        // ПОВЕДІНКА, а не текст файлу.
+        const robots = [...dom.window.document.querySelectorAll('meta[name="robots"]')]
+            .map(tag => tag.getAttribute("content"));
+
+        check("robots більше не каже index",
+            robots.length === 1 && /noindex/.test(robots[0]), robots.join(" | "));
+
+        check("але посиланням у каталог іти можна (follow)",
+            robots.every(value => !/nofollow/.test(value)), robots.join(" | "));
+
+        check("вкладка не каже «Акція» там, де акції немає",
+            dom.window.document.title === "Акцію не знайдено | BestBrnd4u",
+            dom.window.document.title);
+
+        const desc = dom.window.document.querySelector('meta[name="description"]');
+
+        check("опис теж не той, що в справжньої акції",
+            desc && !/Акції та знижки/.test(desc.content), desc && desc.content);
+
+        check("а сам блок «не знайдено» показано",
+            dom.window.document.getElementById("promoNotFound").hidden === false);
+
+    }
+
+    // Стан сторінки — заголовок, а не абзац: інакше читалка екрана,
+    // яка ходить по заголовках, знаходить у цьому блоці лише смайлик.
+    const block = promoHtml.slice(promoHtml.indexOf('id="promoNotFound"')).slice(0, 400);
+
+    check("«не знайдено» — заголовок, а не абзац",
+        /<h3>Цю акцію не знайдено[^<]*<\/h3>/.test(block),
+        block.replace(/\s+/g, " ").slice(0, 160));
+
+    // І та сама відповідь на сторінці товару — щоб два однакові стани
+    // не розійшлись на наступній правці.
+    check("сторінка товару робить те саме",
+        /function markProductPageNotFound[\s\S]*?noindex,follow/
+            .test(read("assets/js/product.js")));
+}
+
 console.log(failures
     ? `\n❌ Провалено: ${failures}\n`
     : "\n✅ Акція з розкладом: з'являється й зникає сама\n");

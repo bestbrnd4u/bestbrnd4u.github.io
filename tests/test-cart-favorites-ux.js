@@ -268,6 +268,131 @@ console.log("\n[7b] Поведінка обраного — на живих да
         store.map(x => x.color).join(","));
 }
 
+console.log("\n[7c] Зниклий товар іде зі сховища, а не лише з екрана");
+{
+    // ЩО БУЛО.
+    //
+    // Перемикач «🚫 Розпродано» прибирає товар із products.json ЦІЛКОМ
+    // (scripts/build-products.js) — саме так і задумано. Але в кошику
+    // й в обраному він лишався: сторінка мовчки не малювала рядок
+    // (`if (!product) return ""` у cart.js, `.filter(Boolean)` у
+    // favorites.js), а лічильник у шапці рахує СХОВИЩЕ.
+    //
+    // Заміряно на проді 21.09.2026: у сховищі один товар, якого немає
+    // в каталозі → на іконці «1» і aria-label «Кошик, 1 товар», а на
+    // сторінці «Кошик порожній». Прибрати нема чого — рядка ж немає.
+    // І так до кінця життя браузера.
+    const src = common.match(/function dropVanishedEntries[\s\S]*?\n\}/)[0];
+
+    const run = (products, cart, favorites) => {
+
+        const state = { cart: cart.slice(), favorites: favorites.slice(), toasts: [], saves: [] };
+
+        const fn = new Function(
+            "getCart", "saveCart", "getFavorites", "saveFavorites",
+            "showToast", "pluralProducts",
+            src + "; return dropVanishedEntries;"
+        )(
+            () => state.cart.map(x => ({ ...x })),
+            list => { state.cart = list; state.saves.push("cart"); },
+            () => state.favorites.map(x => ({ ...x })),
+            list => { state.favorites = list; state.saves.push("favorites"); },
+            text => state.toasts.push(text),
+            n => (n === 1 ? "товар" : "товари")
+        );
+
+        state.removed = fn(products);
+
+        return state;
+
+    };
+
+    const CATALOG = [{ id: 1 }, { id: 2 }];
+
+    // 1. Товару немає в каталозі — має зникнути з обох сховищ.
+    {
+        const s = run(CATALOG, [{ id: 1 }, { id: 99 }], [{ id: 99 }]);
+
+        check("зниклий пішов із кошика",
+            s.cart.length === 1 && Number(s.cart[0].id) === 1, JSON.stringify(s.cart));
+
+        check("зниклий пішов із обраного", s.favorites.length === 0, JSON.stringify(s.favorites));
+
+        check("повернуто кількість прибраного", s.removed === 2, s.removed);
+
+        // saveCart / saveFavorites самі оновлюють лічильники в шапці —
+        // саме через них розбіжність і зникає.
+        check("збереження пройшло через saveCart і saveFavorites",
+            s.saves.includes("cart") && s.saves.includes("favorites"), s.saves.join(","));
+    }
+
+    // 2. ГОЛОВНИЙ ЗАПОБІЖНИК: порожній каталог — це «мережа не
+    //    відповіла», а не «товарів більше немає». Без цієї перевірки
+    //    один обрив зв'язку стирав би людині ввесь кошик.
+    {
+        const s = run([], [{ id: 1 }, { id: 99 }], [{ id: 99 }]);
+
+        check("порожній каталог нічого не стирає",
+            s.cart.length === 2 && s.favorites.length === 1, JSON.stringify(s));
+
+        check("і нічого не зберігає", s.saves.length === 0, s.saves.join(","));
+
+        check("і мовчить", s.toasts.length === 0, s.toasts.join(" | "));
+    }
+
+    // 3. Те саме, якщо каталог узагалі не масив.
+    {
+        const s = run(null, [{ id: 99 }], []);
+
+        check("зіпсований каталог нічого не стирає", s.cart.length === 1, JSON.stringify(s.cart));
+    }
+
+    // 4. Усе на місці — жодних зайвих записів і повідомлень.
+    {
+        const s = run(CATALOG, [{ id: 1 }], [{ id: 2 }]);
+
+        check("цілий кошик не чіпаємо", s.saves.length === 0 && s.removed === 0,
+            s.saves.join(",") + " / " + s.removed);
+    }
+
+    // 5. Повідомлення називає САМЕ ТЕ місце, де прибрали.
+    {
+        const onlyCart = run(CATALOG, [{ id: 99 }], [{ id: 1 }]);
+
+        check("прибрали з кошика — так і сказано",
+            /кошика/.test(onlyCart.toasts[0] || "") && !/обраного/.test(onlyCart.toasts[0] || ""),
+            onlyCart.toasts[0]);
+
+        const onlyFav = run(CATALOG, [{ id: 1 }], [{ id: 99 }]);
+
+        check("прибрали з обраного — так і сказано",
+            /обраного/.test(onlyFav.toasts[0] || "") && !/кошика/.test(onlyFav.toasts[0] || ""),
+            onlyFav.toasts[0]);
+
+        const both = run(CATALOG, [{ id: 99 }], [{ id: 98 }]);
+
+        check("прибрали з обох — названі обидва",
+            /кошика/.test(both.toasts[0] || "") && /обраного/.test(both.toasts[0] || ""),
+            both.toasts[0]);
+
+        check("повідомлення одне, а не два", both.toasts.length === 1, both.toasts.length);
+    }
+
+    // 6. І сторінки справді кличуть прибиральника — інакше він мертвий.
+    check("кошик кличе прибиральника",
+        /dropVanishedEntries\(allProducts\);/.test(strip(read("assets/js/cart.js"))));
+
+    check("обране кличе прибиральника",
+        /dropVanishedEntries\(allProducts\);/.test(strip(read("assets/js/favorites.js"))));
+
+    // Порядок важливий: спершу прибрати, потім малювати. Інакше
+    // перший кадр покаже старий лічильник.
+    const cartJs = strip(read("assets/js/cart.js"));
+
+    check("прибирання йде ДО малювання кошика",
+        cartJs.indexOf("dropVanishedEntries(allProducts);") < cartJs.indexOf("renderCart();"));
+}
+
 console.log("\n[8] Мінус при останньому примірнику теж питає");
 {
     // Мінус при кількості 1 — це видалення рядка, просто інакше названа

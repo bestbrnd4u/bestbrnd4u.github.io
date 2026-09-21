@@ -772,7 +772,7 @@
                     ["Застібка", e.get("closure")],
                     ["Декор", e.get("decor")],
                     ["Габарити", e.get("dimensions")],
-                    ["Ремінь", e.get("strap")],
+                    ["Ремінь", e.get("strapInfo")],
                     ["Відділення", e.get("compartments")],
                     ["Склад", e.get("composition")]
                 ])),
