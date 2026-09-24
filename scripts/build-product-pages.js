@@ -48,6 +48,11 @@
 const fs = require("fs");
 const path = require("path");
 
+// Читання й запис із повтором: на Windows файл буває на мить
+// зайнятий антивірусом чи індексатором, і генератор падав посеред
+// дороги, лишаючи частину сторінок старими. Див. scripts/fs-retry.js.
+const safe = require("./fs-retry");
+
 const ROOT = path.join(__dirname, "..");
 const TEMPLATE_FILE = path.join(ROOT, "product.html");
 const PRODUCTS_FILE = path.join(ROOT, "data", "products.json");
@@ -86,7 +91,7 @@ function loadJsonList(file) {
 
     try {
 
-        const raw = JSON.parse(fs.readFileSync(file, "utf8"));
+        const raw = JSON.parse(safe.readFileSync(file, "utf8"));
 
         return Array.isArray(raw) ? raw : [];
 
@@ -103,7 +108,7 @@ function loadCategoryIndex() {
 
     if (!fs.existsSync(CATEGORIES_FILE)) return { departmentOf: () => "", categoriesOfDepartment: () => [] };
 
-    const list = JSON.parse(fs.readFileSync(CATEGORIES_FILE, "utf8"));
+    const list = JSON.parse(safe.readFileSync(CATEGORIES_FILE, "utf8"));
     const rows = Array.isArray(list) ? list : (list.categories || []);
 
     const byCategory = new Map();
@@ -144,7 +149,7 @@ function productTexts() {
     if (productTextsCache) return productTextsCache;
 
     try {
-        productTextsCache = JSON.parse(fs.readFileSync(PRODUCT_TEXTS_FILE, "utf8"));
+        productTextsCache = JSON.parse(safe.readFileSync(PRODUCT_TEXTS_FILE, "utf8"));
     } catch (error) {
         productTextsCache = {};
     }
@@ -416,7 +421,7 @@ function rootRelativeLinks(html) {
 
 function buildTemplate() {
 
-    let html = fs.readFileSync(TEMPLATE_FILE, "utf8");
+    let html = safe.readFileSync(TEMPLATE_FILE, "utf8");
 
     html = rootRelativeLinks(html);
 
@@ -724,7 +729,7 @@ function writeLegacyRedirects(product, written) {
         const dir = path.join(OUTPUT_DIR, old);
 
         fs.mkdirSync(dir, { recursive: true });
-        fs.writeFileSync(path.join(dir, "index.html"), html, "utf8");
+        safe.writeFileSync(path.join(dir, "index.html"), html, "utf8");
 
         written.add(old);
 
@@ -741,7 +746,7 @@ function main() {
         process.exit(1);
     }
 
-    const products = JSON.parse(fs.readFileSync(PRODUCTS_FILE, "utf8"));
+    const products = JSON.parse(safe.readFileSync(PRODUCTS_FILE, "utf8"));
 
     const template = buildTemplate();
 
@@ -794,7 +799,7 @@ function main() {
         const dir = path.join(OUTPUT_DIR, product.slug);
 
         fs.mkdirSync(dir, { recursive: true });
-        fs.writeFileSync(path.join(dir, "index.html"), html, "utf8");
+        safe.writeFileSync(path.join(dir, "index.html"), html, "utf8");
 
         written.add(product.slug);
 

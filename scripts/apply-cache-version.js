@@ -51,6 +51,11 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 
+// Читання й запис із повтором: на Windows файл буває на мить
+// зайнятий антивірусом чи індексатором, і збірка падала посеред
+// дороги, лишаючи дерево напівзібраним. Див. scripts/fs-retry.js.
+const safe = require("./fs-retry");
+
 const ROOT = path.join(__dirname, "..");
 
 // Файли, адреси яких переписуємо прямо в розмітці.
@@ -66,7 +71,7 @@ const MARKER = "window.ASSET_VERSIONS";
 
 function shortHash(file) {
 
-    const buffer = fs.readFileSync(file);
+    const buffer = safe.readFileSync(file);
 
     return crypto.createHash("sha1").update(buffer).digest("hex").slice(0, 8);
 
@@ -154,7 +159,7 @@ function main() {
 
     htmlFiles().forEach(file => {
 
-        let html = fs.readFileSync(file, "utf8");
+        let html = safe.readFileSync(file, "utf8");
 
         // СТОРІНКИ-ПЕРЕНАПРАВЛЕННЯ ПРОПУСКАЄМО.
         //
@@ -236,7 +241,7 @@ function main() {
 
         if (html !== before) {
 
-            fs.writeFileSync(file, html, "utf8");
+            safe.writeFileSync(file, html, "utf8");
 
             touched += 1;
 
