@@ -37,6 +37,12 @@ const fs = require("fs");
 const path = require("path");
 const sharp = require("sharp");
 
+// Спільний перелік файлів, де можуть стояти посилання на медіа.
+// Той самий, яким користуються shrink-heavy-images.js і
+// normalize-media-names.js: один перелік на всіх означає, що
+// нову теку не забуде ніхто з трьох.
+const { collectTextFiles } = require("./normalize-media-names");
+
 const ROOT = path.join(__dirname, "..");
 // ТІЛЬКИ фото товарів. Банери сюди навмисно не входять: у них своя,
 // широка геометрія, і приведення до 4:5 їх нищить. Так уже сталось —
@@ -74,6 +80,93 @@ const AVIF_EFFORT = 4;
 const BACKGROUND = { r: 255, g: 255, b: 255, alpha: 1 };
 
 const VARIANT_RE = /-(300|600|1200)\.webp$/;
+
+// ФОТО ТОВАРУ, ЗАЛИТЕ ЯК JPG АБО PNG, НЕ ОБСЛУГОВУЄ НІХТО.
+//
+// Дірка між двома скриптами, і кожен із них по-своєму має рацію:
+//
+//   • shrink-heavy-images.js бачить png і jpeg, але фото товарів у
+//     теці uploads навмисно НЕ чіпає — «у них свій конвеєр». До того
+//     ж у нього поріг 300 КБ, тож дрібніші він не розглядає взагалі;
+//   • цей скрипт — і є той «свій конвеєр», — досі брав лише .webp.
+//
+// Отже, знімок, залитий з адмінки як JPG, не отримував ні webp, ні
+// avif, ні зменшених копій, ні рядка в image-variants.json. Верстка
+// просить srcset лише для зареєстрованих фото, тож у мобільну сітку
+// їхав повнорозмірний оригінал.
+//
+// ЗАМІРЯНО 24.09.2026 на живому сайті: 21 знімок із 387 лишився в
+// JPG, разом 2929 КБ. Найгірший випадок — гаманець Marc Jacobs: три
+// фото на 1468 КБ, тобто сторінка товару коштувала покупцеві вчетверо
+// більше за типову. Для порівняння, медіана нормального webp — 60 КБ,
+// а зменшеної копії -300, яку й тягне телефон, — 5 КБ.
+//
+// Тому беремо такі файли на себе: переводимо в .webp тим самим
+// холстом, що й решту, прибираємо оригінал і правимо посилання. Далі
+// знімок іде звичайним шляхом — копії, avif, реєстрація, — бо стає
+// неотличним від будь-якого іншого.
+const RASTER_RE = /\.(jpe?g|png)$/i;
+
+// Тільки те, на що справді посилається товар.
+//
+// У теці uploads інколи опиняються банери, які адмінка поклала не
+// туди (їх переселяє shrink-heavy-images.js). Приводити банер до 4:5
+// не можна — це його нищить, і саме так уже сталось одного разу з
+// банером 1635×1104. Ознака та сама, що й у сусіднього скрипта:
+// фотографія товару — це та, яку згадує data/products.
+function referencedPhotos() {
+
+    const dir = path.join(ROOT, "data", "products");
+    const texts = [];
+
+    if (fs.existsSync(dir)) {
+        fs.readdirSync(dir)
+            .filter(f => f.endsWith(".json"))
+            .forEach(f => texts.push(fs.readFileSync(path.join(dir, f), "utf8")));
+    }
+
+    const names = new Set();
+
+    (texts.join(" ").match(/[\w.#-]+\.(?:png|jpe?g|webp)/gi) || [])
+        .forEach(name => names.add(name));
+
+    return names;
+
+}
+
+function rasterPhotos() {
+
+    const referenced = referencedPhotos();
+
+    return fs.readdirSync(DIR)
+        .filter(f => RASTER_RE.test(f) && referenced.has(f))
+        .sort();
+
+}
+
+async function toWebp(file) {
+
+    const full = path.join(DIR, file);
+
+    // Той самий холст і та сама якість, що в normalize(): інакше
+    // переведений знімок відрізнявся б від сусідніх на око.
+    const canvas = await sharp(fs.readFileSync(full))
+        .resize({ ...CANVAS, fit: "contain", background: BACKGROUND })
+        .webp({ quality: 90 })
+        .toBuffer();
+
+    const target = file.replace(RASTER_RE, ".webp");
+
+    fs.writeFileSync(path.join(DIR, target), canvas);
+
+    // Оригінал прибираємо: лишити його означало б тримати в репозиторії
+    // мегабайти, на які ніхто вже не посилається, і щоразу бачити їх у
+    // звіті про невикористані файли.
+    fs.unlinkSync(full);
+
+    return target;
+
+}
 
 function baseWebpFiles() {
 
@@ -344,6 +437,73 @@ async function main() {
     if (!fs.existsSync(DIR)) {
         console.error(`Не знайдено теку ${path.relative(ROOT, DIR)}`);
         process.exit(1);
+    }
+
+    // ПЕРЕВОДИМО JPG/PNG ДО ТОГО, ЯК ШУКАТИ ПРОПОРЦІЇ.
+    //
+    // findOffCanvas() дивиться лише на .webp, тож нещодавно переведений
+    // знімок мусить існувати вже на цей момент — інакше він дочекався б
+    // копій тільки наступного прогону, а між двома збірками сайт стояв
+    // би з фото без srcset.
+    const raster = rasterPhotos();
+
+    if (raster.length) {
+
+        console.log(`Фото товарів у JPG/PNG: ${raster.length}\n`);
+
+        raster.forEach(f => console.log(
+            `  ${Math.round(fs.statSync(path.join(DIR, f)).size / 1024)
+                .toString().padStart(5)} КБ  ${f}`));
+
+        console.log("");
+
+        if (apply) {
+
+            const renamed = new Map();
+
+            for (const file of raster) {
+
+                const to = await toWebp(file);
+
+                renamed.set(
+                    path.relative(ROOT, path.join(DIR, file)).split(path.sep).join("/"),
+                    path.relative(ROOT, path.join(DIR, to)).split(path.sep).join("/")
+                );
+
+                console.log(`  → ${to}`);
+
+            }
+
+            // Посилання правимо тим самим переліком файлів, що й сусідні
+            // скрипти, — щоб жоден із них колись не забув теку й частина
+            // фото не відвалилась мовчки.
+            //
+            // Ключ — ШЛЯХ, а не саме ім'я: у даних товару фото записані
+            // повними адресами, а серед коротких імен трапляються такі,
+            // як «2.png», і заміна по імені потрапила б куди завгодно.
+            let touched = 0;
+
+            collectTextFiles().forEach(file => {
+
+                const text = fs.readFileSync(file, "utf8");
+
+                let next = text;
+
+                renamed.forEach((to, from) => {
+                    if (next.includes(from)) next = next.split(from).join(to);
+                });
+
+                if (next !== text) {
+                    fs.writeFileSync(file, next, "utf8");
+                    touched++;
+                }
+
+            });
+
+            console.log(`\n  переведено ${renamed.size}, посилання оновлено у ${touched} файлах\n`);
+
+        }
+
     }
 
     const off = await findOffCanvas();

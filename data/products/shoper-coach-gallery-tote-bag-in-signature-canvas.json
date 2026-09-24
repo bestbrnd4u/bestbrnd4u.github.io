@@ -14,10 +14,10 @@
       "color": "Brown/Black коричневий",
       "hex": "#593131",
       "images": [
-        "/assets/images/products/uploads/00570556_d.jpg",
-        "/assets/images/products/uploads/00570556_s.jpg",
-        "/assets/images/products/uploads/00570556_i.jpg",
-        "/assets/images/products/uploads/00570556_m.jpg"
+        "/assets/images/products/uploads/00570556_d.webp",
+        "/assets/images/products/uploads/00570556_s.webp",
+        "/assets/images/products/uploads/00570556_i.webp",
+        "/assets/images/products/uploads/00570556_m.webp"
       ]
     }
   ],
@@ -63,10 +63,10 @@
   "id": 63,
   "color": "Brown/Black коричневий",
   "images": [
-    "/assets/images/products/uploads/00570556_d.jpg",
-    "/assets/images/products/uploads/00570556_s.jpg",
-    "/assets/images/products/uploads/00570556_i.jpg",
-    "/assets/images/products/uploads/00570556_m.jpg"
+    "/assets/images/products/uploads/00570556_d.webp",
+    "/assets/images/products/uploads/00570556_s.webp",
+    "/assets/images/products/uploads/00570556_i.webp",
+    "/assets/images/products/uploads/00570556_m.webp"
   ],
   "legacySlugs": [
     "шопер-coach-gallery-tote-bag-in-signature-canvas"
