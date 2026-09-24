@@ -266,6 +266,103 @@ console.log("\n[4] Canonical є там, куди кличе sitemap");
         /setCanonical\(/.test(read("assets/js/product.js")));
 }
 
+console.log("\n[4b] Картка посилання є в кожної сторінки з sitemap");
+{
+    // ЩО ЦЕ ЗАКРИВАЄ
+    // ---------------
+    // Коли покупець кидає посилання в Telegram, Viber чи Instagram,
+    // розгортається картка з og:title, og:description і og:image.
+    // Немає картинки — буде голий рядок тексту, і посилання виглядає
+    // як спам.
+    //
+    // Заміряно 24.09.2026: із 147 індексованих сторінок картки не мали
+    // сім. Серед них — каталог, контакти й три хаби, але найгірший
+    // випадок був зі СТОРІНКОЮ АКЦІЇ.
+    //
+    // Акція малюється з JS, і теги їй ставив promo.js. У браузері все
+    // виглядало правильно, тому й не помічалось. Але павуки
+    // месенджерів JS НЕ ВИКОНУЮТЬ — вони беруть те, що віддав сервер,
+    // а сервер віддавав нуль тегів. Тобто саме ті посилання, які
+    // магазин розсилає покупцям, розгортались порожніми.
+    //
+    // Тому перевірка дивиться на РОЗМІТКУ ФАЙЛУ, а не на те, що
+    // вийшло б у браузері.
+    const ogOf = (html, prop) => {
+        const hit = html.match(
+            new RegExp(`<meta[^>]*property=["']${prop}["'][^>]*content=["']([^"']*)["']`, "i"));
+        return hit ? hit[1] : "";
+    };
+
+    const rootPages = fs.readdirSync(ROOT).filter(f => f.endsWith(".html"));
+
+    // Адреса з sitemap → файл на диску.
+    const fileFor = loc => {
+        const url = loc.replace(SITE, "").split("?")[0];
+        if (url === "/") return "index.html";
+        if (url.endsWith("/")) return url.replace(/^\//, "") + "index.html";
+        const flat = url.replace(/^\//, "") + ".html";
+        return rootPages.includes(flat) ? flat : null;
+    };
+
+    const targets = [...new Set(locs.map(fileFor))]
+        .filter(Boolean)
+        .filter(f => fs.existsSync(path.join(ROOT, f)));
+
+    const noImage = [];
+    const noTitle = [];
+    const brokenImage = [];
+
+    targets.forEach(f => {
+
+        const html = read(f);
+
+        const image = ogOf(html, "og:image");
+        const title = ogOf(html, "og:title");
+
+        if (!title) noTitle.push(f);
+
+        if (!image) { noImage.push(f); return; }
+
+        // Картинка мусить існувати: месенджер по ній ходить сам, і
+        // 404 для нього те саме, що її відсутність.
+        const local = image.replace(/^https?:\/\/[^/]+/, "").split(/[?#]/)[0];
+        const onDisk = path.join(ROOT, decodeURIComponent(local).replace(/^\//, ""));
+
+        if (!fs.existsSync(onDisk)) brokenImage.push(`${f} → ${local}`);
+
+    });
+
+    check(`сторінок із sitemap знайдено — ${targets.length}`, targets.length > 10, targets.length);
+
+    check("у кожної є og:title", noTitle.length === 0, noTitle.slice(0, 4).join(", "));
+
+    check("у кожної є og:image", noImage.length === 0, noImage.slice(0, 4).join(", "));
+
+    check("і кожна картинка справді лежить на місці",
+        brokenImage.length === 0, brokenImage.slice(0, 3).join("; "));
+
+    // СТОРІНКА АКЦІЇ — ОКРЕМО.
+    //
+    // У sitemap вона стоїть як /promo?id=<slug>, тобто всі акції
+    // ведуть на ОДИН файл. Перевіряємо саме той файл: у ньому мусить
+    // лежати запасна картка на випадок, коли JS не виконали.
+    const promo = read("promo.html");
+
+    check("promo.html має запасну картку в самій розмітці",
+        Boolean(ogOf(promo, "og:image")) && Boolean(ogOf(promo, "og:title")),
+        "павук месенджера JS не виконує");
+
+    // …а og:url у ній навмисно немає: файл один на всі акції, і
+    // статична адреса «/promo» показала б у картці посилання не на ту
+    // акцію, яку надіслали. Правильну ставить promo.js.
+    check("і не називає адресу однієї акції за всі",
+        !ogOf(promo, "og:url"), ogOf(promo, "og:url"));
+
+    check("а конкретну акцію підписує вже promo.js",
+        /setMetaByProperty\("og:title"/.test(read("assets/js/promo.js"))
+        && /setMetaByProperty\("og:image"/.test(read("assets/js/promo.js")));
+}
+
 console.log("\n[5] Canonical вказує на себе, а не кудись");
 {
     const dir = path.join(ROOT, "p");
