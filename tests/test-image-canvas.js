@@ -12,6 +12,7 @@
 const fs = require("fs");
 const path = require("path");
 const { baseImageSizes, webpSize, UPLOADS } = require("./helpers/images");
+const { loadProducts } = require("./helpers/products");
 const {
     findOffCanvas, TARGET_RATIO, CANVAS, VARIANT_WIDTHS
 } = require("../scripts/normalize-product-images");
@@ -423,6 +424,102 @@ console.log("\n[6] Зменшені копії зроблені з поточн�
     // треба перезібрати копії. У CI (Linux) цього не видно взагалі.
     check("форма копії читається з памʼяті, а не по шляху",
         /sharp\(fs\.readFileSync\(variant\)\)\.metadata\(\)/.test(normalizer));
+}
+
+console.log("\n[6b] Фото товару не лишається в JPG чи PNG");
+{
+    // ЩО ЦЕ ЗАКРИВАЄ
+    // ---------------
+    // Знімок, залитий з адмінки як JPG, довго не діставався нікому:
+    //
+    //   • shrink-heavy-images.js бачить jpg і png, але фото товарів у
+    //     теці uploads навмисно не чіпає — «у них свій конвеєр», та й
+    //     поріг у нього 300 КБ;
+    //   • normalize-product-images.js — і є той конвеєр — брав лише
+    //     .webp.
+    //
+    // Наслідок тихий: ні avif, ні копій 600/300, ні рядка в
+    // image-variants.json. Верстка просить srcset тільки для
+    // зареєстрованих фото, тож у мобільну сітку каталогу їхав
+    // повнорозмірний оригінал.
+    //
+    // Заміряно 24.09.2026, до виправлення: 23 знімки з 387, разом
+    // 3066 КБ. Гаманець Marc Jacobs коштував 1468 КБ за три фото —
+    // ввосьмеро більше за типовий товар. Після переведення ті самі
+    // три фото важать у мобільній сітці 9,6 КБ.
+    //
+    // Помітив я це випадково, за одним числом у переліку ресурсів.
+    // Тому перевірка тут: дірка мовчала місяцями й мовчатиме знову.
+    // Джерела, а не згенерований агрегат — правило з
+    // tests/test-migration-types.js. Агрегат перезбирається, і тест,
+    // який на нього спирається, мовчав би доти, доки хтось не
+    // запустить збірку.
+    const products = loadProducts();
+
+    const referenced = new Set();
+
+    products.forEach(product => {
+        const dig = value => {
+            // Версію з адреси прибираємо ПЕРЕД перевіркою.
+            //
+            // У products.json те саме фото трапляється і як
+            // «…/foo.webp», і як «…/foo.webp?v=b174542e». Прив'язка
+            // до кінця рядка другого не бачить — і перевірка мовчки
+            // пропускала б рівно ті посилання, якими користується
+            // верстка. Спіймано на власному тесті: підкинутий jpg із
+            // версією не провалив його.
+            const clean = typeof value === "string" ? value.split(/[?#]/)[0] : value;
+
+            // Тільки тека завантажень — і це не дрібниця охоплення.
+            //
+            // У даних товару є ще логотип бренду з assets/images/brands/.
+            // Логотипи законно лежать у PNG: там прозорість і плаский
+            // колір, переводити їх у webp-холст 4:5 безглуздо. Без
+            // цього звуження перевірка падала б на 21 логотипі й
+            // ховала б справжню знахідку серед них.
+            const isUpload = typeof clean === "string"
+                && clean.includes("/products/uploads/");
+
+            if (isUpload && /\.(webp|avif|jpe?g|png)$/i.test(clean)) {
+                referenced.add(clean.split("/").pop());
+            } else if (Array.isArray(value)) {
+                value.forEach(dig);
+            } else if (value && typeof value === "object") {
+                Object.values(value).forEach(dig);
+            }
+        };
+        dig(product);
+    });
+
+    const raster = [...referenced].filter(f => /\.(jpe?g|png)$/i.test(f));
+
+    check(`фото товарів усі у webp (перевірено: ${referenced.size})`,
+        raster.length === 0,
+        raster.slice(0, 5).join(", "));
+
+    // Файл може лежати в теці й не бути згаданим у даних — тоді він
+    // нікому не шкодить, але й місця не вартий. Окремо не валимо,
+    // лише називаємо: прибирання таких — робота archive-unused-images.
+    const strays = fs.existsSync(UPLOADS)
+        ? fs.readdirSync(UPLOADS)
+            .filter(f => /\.(jpe?g|png)$/i.test(f))
+            .filter(f => !referenced.has(f))
+        : [];
+
+    check("а якщо jpg і лежить, то принаймні не в картках",
+        strays.every(f => !referenced.has(f)),
+        strays.slice(0, 3).join(", "));
+
+    // Сам пропуск у конвеєрі: без нього наступне завантаження з
+    // адмінки поверне дірку.
+    const normalizer = fs.readFileSync(
+        path.join(ROOT, "scripts/normalize-product-images.js"), "utf8");
+
+    check("конвеєр фото товарів уміє приймати jpg і png",
+        /RASTER_RE/.test(normalizer) && /jpe\?g\|png/.test(normalizer));
+
+    check("переведене прибирає за собою оригінал",
+        /fs\.unlinkSync\(full\)/.test(normalizer));
 }
 
 console.log("\n[7] Реєстр копій не накопичує привидів");
