@@ -65,7 +65,13 @@ console.log("\n[3] Telegram доданий і нікуди не веде пор�
 console.log("\n[4] Сторінка контактів");
 {
   const contacts = read("contacts.html");
-  check("картка Telegram додана", /<h3>Telegram<\/h3>/.test(contacts));
+  // Рівень заголовка тут навмисно не закріплюємо.
+  //
+  // Перевірка питає «чи є картка Telegram», а не «чи вона h3». Коли
+  // картки контактів підняли з h3 до h2 (щоб на сторінці не було
+  // перескоку h1 → h3, див. tests/test-accessibility-floor.js [13]),
+  // цей рядок упав — хоч картка нікуди не поділась.
+  check("картка Telegram додана", /<h[1-6]>Telegram<\/h[1-6]>/.test(contacts));
   check("пошта в картці клікабельна", contacts.includes(`href="mailto:${MAIL}"`));
   check("Telegram у картці клікабельний", contacts.includes(`href="https://t.me/${TG}"`));
 }

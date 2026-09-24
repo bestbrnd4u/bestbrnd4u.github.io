@@ -1069,5 +1069,101 @@ console.log("\n[12] Відповідь форми не лише видно, а �
         /querySelectorAll\("\.size, \.mini-size"\)\]\.find\(isShown\)/.test(flag ? flag[0] : ""));
 }
 
+console.log("\n[13] Заголовки складаються у зміст без дірок");
+{
+    // ЩО ЦЕ ЗАКРИВАЄ
+    // ---------------
+    // Диктор дає незрячому список заголовків як зміст сторінки, і
+    // рівні в ньому — це вкладеність. h3 одразу після h1 читається
+    // як «десь загубився цілий розділ».
+    //
+    // Заміряно 24.09.2026: перескок на 106 сторінках зі 154. Причина
+    // була не в одному місці, а в трьох — блок Instagram, картки
+    // контактів і колонки підвалу, — і кожне окремо виглядало
+    // невинно. Побачити це можна лише перевіркою по всьому сайту,
+    // тому вона тут.
+    //
+    // Дві сторінки при цьому не мали h1 зовсім: головним заголовком
+    // стояв h2, і зміст у диктора починався з підвалу.
+    const pages = [];
+
+    const walk = (dir, rel) => fs.readdirSync(path.join(ROOT, dir), { withFileTypes: true })
+        .forEach(entry => {
+            if (["node_modules", ".git", "supabase", "admin"].includes(entry.name)) return;
+            const next = rel ? `${rel}/${entry.name}` : entry.name;
+            if (entry.isDirectory()) walk(path.join(dir, entry.name), next);
+            else if (entry.name.endsWith(".html")) pages.push(next);
+        });
+
+    walk(".", "");
+
+    const noH1 = [];
+    const manyH1 = [];
+    const jumps = [];
+
+    let looked = 0;
+
+    pages.forEach(rel => {
+
+        const raw = fs.readFileSync(path.join(ROOT, rel), "utf8");
+
+        // Сторінки-перенаправлення заголовків не мають і не мусять.
+        if (/http-equiv=["']refresh["']/i.test(raw)) return;
+
+        // product.html — оболонка, яку заповнює генератор; заголовок
+        // у неї підставляється на збірці, тож порожня вона законно.
+        if (rel === "product.html") return;
+
+        // Без <script>: там лежать шаблони, яких на сторінці може й
+        // не бути, і рахувати їх як розмітку неправильно.
+        const html = raw
+            .replace(/<script[\s\S]*?<\/script>/gi, " ")
+            .replace(/<!--[\s\S]*?-->/g, " ");
+
+        looked += 1;
+
+        const levels = [...html.matchAll(/<h([1-6])\b[^>]*>/gi)].map(m => +m[1]);
+
+        const first = levels.filter(l => l === 1).length;
+
+        if (first === 0) noH1.push(rel);
+        if (first > 1) manyH1.push(`${rel} (${first})`);
+
+        for (let i = 1; i < levels.length; i += 1) {
+            if (levels[i] - levels[i - 1] > 1) {
+                jumps.push(`${rel}: h${levels[i - 1]} → h${levels[i]}`);
+                break;
+            }
+        }
+
+    });
+
+    check(`сторінок перевірено — ${looked}`, looked > 100, looked);
+
+    check("у кожної сторінки є h1", noH1.length === 0, noH1.slice(0, 4).join(", "));
+
+    check("і рівно один", manyH1.length === 0, manyH1.slice(0, 4).join(", "));
+
+    check("жодного перескоку через рівень",
+        jumps.length === 0, jumps.slice(0, 4).join("; "));
+
+    // ВИГЛЯД ЗАЛЕЖИТЬ ВІД ТЕГУ, А НЕ ВІД КЛАСУ — і це та пастка, у
+    // яку легко втрапити наступного разу. Загальні правила для h2 і
+    // h3 різні (24px/700 проти 42px/800 і center), тож там, де тег
+    // змінили заради структури, старий вигляд повернуто явно.
+    // css оголошено вище в цьому наборі — там уже вирізано коментарі.
+    [".footer h2", ".instagram-text h2", ".contact-card h2"].forEach(selector => {
+
+        const block = css.match(
+            new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\{([^}]*)\\}"));
+
+        check(`${selector}: вигляд задано явно, не успадковано від h2`,
+            Boolean(block) && /font-size/.test(block[1]) && /font-weight/.test(block[1])
+            && /text-align/.test(block[1]),
+            block ? block[1].replace(/\s+/g, " ").trim().slice(0, 60) : "правила немає");
+
+    });
+}
+
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
 process.exit(failures === 0 ? 0 : 1);

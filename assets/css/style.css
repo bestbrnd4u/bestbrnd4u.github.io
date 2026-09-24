@@ -1188,9 +1188,13 @@ nav li.has-mega[data-mega-open] .mega-menu.mega-menu-columns{
     min-width:220px;
 }
 
-.instagram-text h3{
+.instagram-text h2{
     color:#fff;
     font-size:24px;
+    /* Був h3: 700 і вирівнювання від батька. Загальне правило h2
+       дає 800 і center — повертаємо як було. */
+    font-weight:700;
+    text-align:inherit;
     margin-bottom:6px;
 }
 
@@ -2452,7 +2456,20 @@ footer{
     gap:60px;
 }
 
-.footer h3{
+/* Заголовки колонок підвалу.
+   Були h3 — і на тонких сторінках (thanks, newsletter-confirm,
+   order-status) виходив перескок h1 → h3: у них немає жодного
+   власного розділу, тож після заголовка сторінки диктор одразу
+   потрапляв у підвал. Колонки підвалу — самостійні розділи, тож h2
+   правильніший і за смислом. Вигляд не змінився: розмір і відступи
+   задає це саме правило. */
+.footer h2{
+    /* Розмір і жирність тут не випадкові: колонки підвалу були h3,
+       і без цих двох рядків вони стали б 42-піксельними по центру —
+       усе це приходить із загального правила h2. */
+    font-size:24px;
+    font-weight:700;
+    text-align:inherit;
     margin-bottom:20px;
     color:#fff;
 }
@@ -7097,8 +7114,12 @@ body.mobile-filters-open .scroll-top{
     font-size:26px;
 }
 
-.contact-card h3{
+.contact-card h2{
     font-size:15px;
+    /* Той самий випадок, що в .instagram-text: тег змінено на h2
+       заради структури заголовків, вигляд лишається від h3. */
+    font-weight:700;
+    text-align:inherit;
     margin-bottom:4px;
 }
 
@@ -7610,7 +7631,19 @@ body.mobile-filters-open .scroll-top{
     margin-bottom:16px;
 }
 
-.checkout-success h2{
+/* Головний заголовок сторінки-підтвердження.
+   Був h2, і сторінка лишалась без h1 узагалі — диктор не мав за що
+   зачепитись, а список заголовків починався з підвалу. Тег
+   виправлено, вигляд лишено той самий: сторінку бачать одразу після
+   покупки, і заголовок, який раптом виріс із 42 до 64 пікселів,
+   читався б як поломка. Тому розмір і центрування задані явно —
+   вони приходили із загального правила h2, а h1 їх не має. */
+.checkout-success h1{
+    font-size:42px;
+    text-align:center;
+    /* h1 задає line-height:1.1, h2 не задавав нічого — лишаємо
+       успадкований, щоб рядок не став щільнішим. */
+    line-height:inherit;
     margin-bottom:12px;
 }
 
