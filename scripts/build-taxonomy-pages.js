@@ -42,6 +42,11 @@
 const fs = require("fs");
 const path = require("path");
 
+// Відмінювання після числа. Копія правила з assets/js/common.js —
+// браузерний файл нічого не експортує; розійтись їм не дає
+// tests/test-plural.js, який проганяє обидві на тих самих числах.
+const { withCount } = require("./plural");
+
 const ROOT = path.join(__dirname, "..");
 const TEMPLATE_FILE = path.join(ROOT, "catalog.html");
 const PRODUCTS_FILE = path.join(ROOT, "data", "products.json");
@@ -675,9 +680,16 @@ function buildPage(template, page) {
 // ---------------------------------------------------------------
 
 const HUB_TITLES = {
-    brand: { heading: "Бренди", dir: "brands", word: "брендів" },
-    category: { heading: "Категорії", dir: "categories", word: "категорій" },
-    department: { heading: "Розділи каталогу", dir: "departments", word: "розділів" }
+    // Три форми слова, а не одна.
+    //
+    // Тут стояв лише родовий відмінок множини — «брендів», «розділів»,
+    // — і підпис хаба не залежав від числа взагалі. На 24.09.2026 два
+    // хаби з трьох читались неправильно: «21 брендів» і «3 розділів».
+    // Рядок іде і в видимий текст сторінки, і в опис для Google, тож
+    // помилку бачив кожен відвідувач /brands/.
+    brand: { heading: "Бренди", dir: "brands", word: ["бренд", "бренди", "брендів"] },
+    category: { heading: "Категорії", dir: "categories", word: ["категорія", "категорії", "категорій"] },
+    department: { heading: "Розділи каталогу", dir: "departments", word: ["розділ", "розділи", "розділів"] }
 };
 
 function hubPage(kind, pages) {
@@ -689,7 +701,7 @@ function hubPage(kind, pages) {
 
     const url = `${SITE_URL}/${slugDir}/`;
 
-    const intro = `${pages.length} ${meta.word} у каталозі BestBrnd4u.`;
+    const intro = `${withCount(pages.length, ...meta.word)} у каталозі BestBrnd4u.`;
 
     return {
         kind: `${kind}-hub`,
