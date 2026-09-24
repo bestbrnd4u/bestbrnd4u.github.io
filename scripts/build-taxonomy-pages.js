@@ -576,9 +576,25 @@ function headMarkup(page) {
 
     const image = (page.products[0] && page.products[0].images && page.products[0].images[0]) || "";
 
-    const absoluteImage = image
-        ? (/^https?:/i.test(image) ? image : `${SITE_URL}/${String(image).replace(/^\/+/, "")}`)
-        : "";
+    // Картинка для картки в месенджері.
+    //
+    // Хаби /brands/, /categories/ і /departments/ власного фото не
+    // мають — і до цього лишались без og:image зовсім. Посилання на
+    // них у Telegram чи Viber розгорталось голим текстом: назва, опис
+    // і порожнє місце там, де в решти сторінок магазин.
+    //
+    // Запасна — та сама обкладинка, що в статичних сторінок:
+    // логотип по центру суцільного тла, зроблений саме для прев'ю
+    // (див. scripts/build-og-cover.js). Її можна різати під будь-який
+    // формат — Telegram бере квадрат, Facebook смугу, — і логотип
+    // лишається на місці.
+    const FALLBACK_IMAGE = "assets/images/og-cover.png";
+
+    const pick = image || FALLBACK_IMAGE;
+
+    const absoluteImage = /^https?:/i.test(pick)
+        ? pick
+        : `${SITE_URL}/${String(pick).replace(/^\/+/, "")}`;
 
     const collectionLd = {
         "@context": "https://schema.org",
