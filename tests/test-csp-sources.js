@@ -127,7 +127,8 @@ console.log("\n[2] Джерела картинок");
     // Правило, а не два окремі випадки: усе, чим сайт вимірює
     // відвідування, мусить бути дозволене в ОБОХ режимах — і як
     // запит, і як картинка. Інакше частина даних тихо зникає.
-    ["www.googletagmanager.com", "www.google-analytics.com"].forEach(host => {
+    ["www.googletagmanager.com", "www.google-analytics.com",
+     "www.facebook.com"].forEach(host => {
 
         const asConnect = allows("connect-src", host) || allows("script-src", host);
 
