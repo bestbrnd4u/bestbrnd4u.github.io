@@ -490,6 +490,18 @@ function buildHead(product) {
         // необов'язковий і проходить ту саму перевірку довжини.
         mpn: sanitizeSku(product.sku, product.sku ? (product.slug || product.title) : "") || undefined,
         brand: product.brand ? { "@type": "Brand", name: product.brand } : undefined,
+        // КОЛІР І МАТЕРІАЛ — обидва Google приймає в Product.
+        //
+        // Дані для них у магазині вже є: колір заповнений у всіх 103
+        // товарів, матеріал — теж у всіх. Вони видно на сторінці, йдуть
+        // у фід Merchant Center підказками, а в розмітку не потрапляли.
+        //
+        // Колір беремо з ТОВАРУ, а не з активного варіанта. У цьому
+        // магазині товар із кількома кольорами розкладений на окремі
+        // записи (splitByColor), тож product.color і є колір саме цієї
+        // сторінки — той самий, що в canonical.
+        color: product.color || undefined,
+        material: product.material || undefined,
         category: product.category || undefined,
         // Строки доставки з адмінки — і в розмітку теж. Без них тут
         // стояли б запасні числа модуля, а видимий рядок на сторінці
