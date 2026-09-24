@@ -15,6 +15,7 @@
 // і в розмітку такий блок потрапляти не має.
 const fs = require("fs");
 const path = require("path");
+const { loadProducts } = require("./helpers/products");
 
 const ROOT = path.join(__dirname, "..");
 
@@ -459,8 +460,30 @@ console.log("\n[5] Обидва генератори розмітки узгод
         `лише в рантаймі: ${onlyRuntime.join(", ") || "—"};`
         + ` лише в генераторі: ${onlyBuilder.join(", ") || "—"}`);
 
-    // І окремо — поле, яке вже одного разу відпало.
-    check("category є в обох", runtimeKeys.includes("category") && builderKeys.includes("category"));
+    // І окремо — поля, які легко відпадають.
+    //
+    // category вже одного разу відпало: генератор клав його у статичну
+    // сторінку, а рантайм затирав, і оскільки Google виконує JS, до
+    // нього поле не доходило. color і material додані пізніше й
+    // ризикують тим самим — тому названі поіменно, а не лише в
+    // порівнянні складу вище.
+    ["category", "color", "material"].forEach(field => {
+        check(`${field} є в обох`,
+            runtimeKeys.includes(field) && builderKeys.includes(field),
+            `рантайм: ${runtimeKeys.includes(field)}, генератор: ${builderKeys.includes(field)}`);
+    });
+
+    // Дані для них справді є — інакше поле стояло б у розмітці як
+    // undefined і користі з нього не було б жодної.
+    const products = loadProducts();
+
+    ["color", "material"].forEach(field => {
+        const filled = products.filter(p => String(p[field] || "").trim()).length;
+        check(`${field} заповнений у товарах (${filled} з ${products.length})`,
+            filled === products.length,
+            products.filter(p => !String(p[field] || "").trim())
+                .slice(0, 3).map(p => p.slug || p.title).join(", "));
+    });
 
     // Артикул чиститься у двох місцях — статичні сторінки і клієнтський
     // рендер. Розійдуться межі — Google побачить різний sku на одній
