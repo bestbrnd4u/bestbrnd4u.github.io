@@ -2000,7 +2000,11 @@ ${sizeButtons}
                     <strong>${escapeHtml(product.dimensions)}</strong>
                 </div>` : ""}
 
-                ${product.strapInfo ? `<p class="spec-plain">${escapeHtml(product.strapInfo)}</p>` : ""}
+                ${product.strapInfo ? `
+                <div class="spec-row">
+                    <span>Ручка / ремінь</span>
+                    <strong>${escapeHtml(product.strapInfo)}</strong>
+                </div>` : ""}
 
                 ${product.compartments ? `
                 <div class="spec-row">

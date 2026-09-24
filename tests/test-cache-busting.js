@@ -365,6 +365,66 @@ console.log("\n[6] Проставлені штампи доїжджають до
         && (stamper.match(/writeFileSync/g) || []).length === 1);
 }
 
+console.log("\n[7] Заглушки-перенаправлення лишаються порожніми");
+{
+    // ЩО ЦЕ ЗАКРИВАЄ
+    // ---------------
+    // Коли товар змінює адресу, за старою лишається заглушка: canonical,
+    // meta refresh, location.replace() і рядок тексту. Вона нічого не
+    // вантажить — ні стилю, ні скрипта, ні даних.
+    //
+    // Штампувальник же вставляв рядок window.ASSET_VERSIONS у КОЖНУ
+    // сторінку, не питаючи, чи є там кому його читати. На заглушці це
+    // давало 668 байтів поверх 606 — сторінка важила вдвічі більше,
+    // і цю вагу качав кожен, хто прийшов за старим посиланням.
+    //
+    // Друга, гучніша біда — шум: усі 73 заглушки переписувались щоразу,
+    // коли мінявся будь-який файл даних. У кожній збірці вони висіли
+    // як змінені, хоч самі не мінялись ні на символ, і ховали в собі
+    // справжні зміни.
+    //
+    // Заміряно 24.09.2026: заглушка 1274 → 588 байтів, штампувальник
+    // чіпає 227 → 154 сторінки.
+    const isStub = html => /http-equiv=["']refresh["']/i.test(html);
+
+    const pages = fs.readdirSync(path.join(ROOT, "p"))
+        .map(d => `p/${d}/index.html`)
+        .filter(rel => fs.existsSync(path.join(ROOT, rel)))
+        .map(rel => ({ rel, html: read(rel) }));
+
+    const stubs = pages.filter(x => isStub(x.html));
+    const real = pages.filter(x => !isStub(x.html));
+
+    check(`заглушки знайдено (${stubs.length})`, stubs.length > 0);
+
+    const withBlock = stubs.filter(x => x.html.includes("window.ASSET_VERSIONS"));
+
+    check("у жодній немає рядка з версіями",
+        withBlock.length === 0,
+        withBlock.slice(0, 3).map(x => x.rel).join("; "));
+
+    // Перевірка лишається осмисленою, лише поки заглушка справді
+    // порожня. Якщо колись вона почне вантажити стиль — версія їй
+    // знадобиться, і пропуск доведеться знімати.
+    const withAssets = stubs.filter(x => /(?:src|href)=["'][^"']*assets/.test(x.html));
+
+    check("і жодна нічого не вантажить — тому версія їй не потрібна",
+        withAssets.length === 0,
+        withAssets.slice(0, 3).map(x => x.rel).join("; "));
+
+    // Сам пропуск у збірнику: без нього наступна збірка поверне блок.
+    check("штампувальник знає про перенаправлення",
+        read("scripts/apply-cache-version.js").includes("http-equiv="));
+
+    // А справжні сторінки товарів рядок мати ЗОБОВʼЯЗАНІ — інакше
+    // пропуск зачепив би не те.
+    const realMissing = real.filter(x => !x.html.includes("window.ASSET_VERSIONS"));
+
+    check(`справжні сторінки товарів рядок зберегли (${real.length})`,
+        real.length > 0 && realMissing.length === 0,
+        realMissing.slice(0, 3).map(x => x.rel).join("; "));
+}
+
 console.log("\n[N] Штамп на адресі = вміст самого файлу");
 {
     // ГОЛОВНА ПЕРЕВІРКА ЦЬОГО НАБОРУ, і донедавна її не було.
