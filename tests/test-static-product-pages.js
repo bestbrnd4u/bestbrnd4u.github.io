@@ -319,5 +319,102 @@ console.log("\n[8] Генератор переживає повторний за
         !fs.existsSync(ghost));
 }
 
+console.log("\n[9] Розмітка кожної сторінки згодна з тим, що на ній написано");
+{
+    // РОЗДІЛ [4] БЕРЕ ОДНУ СТОРІНКУ. Цього досить, щоб побачити
+    // поламаний шаблон, і замало, щоб побачити поламаний ТОВАР:
+    // сейл із минулим вікном, ціну кольору, «під замовлення» без
+    // PreOrder. Таке видно лише на всіх сторінках одразу.
+    //
+    // Ціна ж тут не дрібниця: розбіжність між розміткою й сторінкою —
+    // причина, з якої Merchant Center знімає товар із показу, а Google
+    // прибирає картку з видачі. Заміряно 25.09.2026: розбіжностей
+    // нуль, і саме це число тут і закріплюємо.
+    const dirs = fs.readdirSync(PAGES_DIR, { withFileTypes: true })
+        .filter(e => e.isDirectory())
+        .map(e => e.name);
+
+    const розбіжності = [];
+    let звірено = 0;
+
+    dirs.forEach(slug => {
+
+        const file = path.join(PAGES_DIR, slug, "index.html");
+
+        if (!fs.existsSync(file)) return;
+
+        const html = fs.readFileSync(file, "utf8");
+
+        // Перенаправлення зі старих адрес товару не несуть — і не мусять.
+        if (/http-equiv=["']refresh["']/i.test(html)) return;
+
+        const dataRaw = (html.match(/window\.PRODUCT_DATA = (\{[\s\S]*?\});\s*\n/) || [])[1];
+        const ldRaw = (html.match(/<script type="application\/ld\+json" id="productSchema">([\s\S]*?)<\/script>/) || [])[1];
+
+        if (!dataRaw || !ldRaw) { розбіжності.push(`${slug}: немає даних або розмітки`); return; }
+
+        let data, ld;
+        try { data = JSON.parse(dataRaw); } catch { розбіжності.push(`${slug}: PRODUCT_DATA не розбирається`); return; }
+        try { ld = JSON.parse(ldRaw); } catch { розбіжності.push(`${slug}: productSchema не розбирається`); return; }
+
+        звірено++;
+
+        const offers = ld.offers || {};
+
+        // Ціна, за якою справді продаємо — те саме правило, що
+        // priceNow() у common.js: сейл рахується лише у своєму вікні.
+        const sale = data.sale;
+        const saleOn = sale && Number(sale.price) > 0
+            && !(sale.from && Date.now() < new Date(sale.from).getTime())
+            && !(sale.to && Date.now() >= new Date(sale.to).getTime());
+
+        const треба = saleOn ? Number(sale.price) : Number(data.price);
+
+        if (Number.isFinite(треба) && Math.abs(Number(offers.price) - треба) > 0.01) {
+            розбіжності.push(`${slug}: у розмітці ${offers.price}, на сторінці ${треба}`);
+        }
+
+        if (offers.priceCurrency !== "UAH") розбіжності.push(`${slug}: валюта ${offers.priceCurrency}`);
+
+        const очікувана = data.preOrder ? "PreOrder" : "InStock";
+
+        if (!String(offers.availability || "").endsWith(очікувана)) {
+            розбіжності.push(`${slug}: наявність ${offers.availability}, preOrder=${Boolean(data.preOrder)}`);
+        }
+
+        if (data.brand && (ld.brand && ld.brand.name) !== data.brand) {
+            розбіжності.push(`${slug}: бренд «${ld.brand && ld.brand.name}» ≠ «${data.brand}»`);
+        }
+
+        // Прострочена дата гірша за відсутню: Google має право вважати
+        // ціну застарілою й прибрати картку.
+        if (offers.priceValidUntil) {
+            const until = new Date(offers.priceValidUntil).getTime();
+            if (Number.isFinite(until) && until < Date.now()) {
+                розбіжності.push(`${slug}: priceValidUntil у минулому — ${offers.priceValidUntil}`);
+            }
+        }
+
+        // І те, що покупець читає очима, — теж та сама ціна.
+        const видима = html.match(/class="product-static-price"[\s\S]{0,200}?class="price">([^<]+)</);
+
+        if (видима) {
+            const показано = Number(видима[1].replace(/[^\d]/g, ""));
+            if (Number.isFinite(показано) && показано !== треба) {
+                розбіжності.push(`${slug}: видима ціна ${показано} ≠ ${треба}`);
+            }
+        }
+
+    });
+
+    console.log(`  · звірено сторінок: ${звірено} (перенаправлення пропущено)`);
+
+    check("сторінок для звірки достатньо", звірено >= products.length,
+        `${звірено} проти ${products.length} товарів`);
+
+    check("розмітка й сторінка кажуть одне",
+        розбіжності.length === 0, розбіжності.slice(0, 5).join("; "));
+}
+
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
 process.exit(failures === 0 ? 0 : 1);
