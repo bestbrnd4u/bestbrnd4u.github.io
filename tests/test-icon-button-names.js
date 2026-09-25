@@ -158,5 +158,80 @@ console.log("\n[3] Кнопка «нагору» названа на ВСІХ с
         без.length === 0, без.join(", "));
 }
 
+console.log("\n[4] Кнопки, які малює JS, — теж названі");
+{
+    // СЛІПА ПЛЯМА ПЕРШОЇ ВЕРСІЇ ЦЬОГО НАБОРУ.
+    //
+    // Розділ [1] розбирає готові сторінки — і не бачить нічого, що
+    // з'являється вже в браузері. Саме там і сидів «✕» у накладці
+    // пошуку: кнопку малює common.js, у жодному .html її немає.
+    // Знайшов я його не тестом, а руками на проді.
+    //
+    // Тут інакше не можна: щоб побачити цю кнопку в DOM, треба
+    // відкрити накладку. Тому дивимось на шаблони в коді — і питаємо
+    // те саме, що й розділ [1]: чи є в імені літера або цифра.
+    const DIR = path.join(ROOT, "assets/js");
+
+    const BUTTON = /<button\b([^>]*)>([\s\S]{0,200}?)<\/button>/g;
+
+    let кнопок = 0;
+    const безімені = [];
+
+    fs.readdirSync(DIR).filter(f => f.endsWith(".js")).forEach(file => {
+
+        const src = fs.readFileSync(path.join(DIR, file), "utf8");
+
+        BUTTON.lastIndex = 0;
+
+        let m;
+
+        while ((m = BUTTON.exec(src)) !== null) {
+
+            кнопок++;
+
+            const attrs = m[1];
+
+            if (/aria-label\s*=|aria-labelledby\s*=|title\s*=/.test(attrs)) continue;
+
+            // Підпис підставляється — значить, там слова з даних.
+            if (m[2].includes("${")) continue;
+
+            const text = m[2].replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
+
+            if (!READABLE.test(text)) безімені.push(`${file}: «${text}» ${attrs.trim().slice(0, 50)}`);
+
+        }
+
+    });
+
+    console.log(`  · кнопок у шаблонах JS: ${кнопок}`);
+
+    check("є що перевіряти", кнопок > 20, String(кнопок));
+
+    check("жодна не лишилась без імені",
+        безімені.length === 0, безімені.slice(0, 5).join("; "));
+}
+
+console.log("\n[5] Підказка в полі — не назва поля");
+{
+    // Placeholder зникає, щойно людина почала друкувати, а частина
+    // читачів екрана не озвучує його взагалі. Для головного поля
+    // пошуку на сайті цього замало — воно мусить називатись саме.
+    const common = fs.readFileSync(path.join(ROOT, "assets/js/common.js"), "utf8");
+
+    const input = (common.match(/<input[^>]*id="globalSearchInput"[\s\S]{0,200}?>/) || [""])[0];
+
+    check("поле пошуку знайдено в накладці", Boolean(input));
+
+    check("поле пошуку має власну назву, а не лише підказку",
+        /aria-label\s*=\s*"[^"]*[\p{L}\p{N}]/u.test(input),
+        input.replace(/\s+/g, " ").slice(0, 100));
+
+    // Саму накладку теж мусить бути як назвати: вікно без назви читач
+    // оголошує просто «діалог».
+    check("накладка пошуку названа",
+        /overlay\.setAttribute\("aria-label"/.test(common));
+}
+
 console.log(failures ? `\n✗ Провалено: ${failures}` : "\n✓ Усе зелено");
 process.exit(failures ? 1 : 0);
