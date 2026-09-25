@@ -44,8 +44,26 @@
 
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3" defer></script>
-
-
+<script type="application/ld+json" id="breadcrumbSchema">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Головна",
+      "item": "https://dev.bestbrnd4u.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Контакти",
+      "item": "https://dev.bestbrnd4u.com/contacts"
+    }
+  ]
+}
+</script>
 </head>
 
 <body>
