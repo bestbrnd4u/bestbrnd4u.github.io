@@ -151,6 +151,22 @@ function buildTemplate() {
     html = html.replace(/<title>[\s\S]*?<\/title>/i, HEAD_SLOT);
     html = html.replace(/\n?<meta name="description"[^>]*>/i, "");
     html = html.replace(/\n?<link rel="canonical"[^>]*>/i, "");
+    // OG- І TWITTER-ТЕГИ ШАБЛОНУ — ТЕЖ ГЕТЬ.
+    //
+    // Відколи catalog.html дістав власну картку для месенджерів,
+    // кожна згенерована сторінка успадковувала її разом із розміткою
+    // й діставала ДВА og:title, og:url, og:image та og:description.
+    //
+    // І це гірше за їх відсутність: павуки беруть ПЕРШИЙ збіг, а
+    // першим іде успадкований. Заміряно 25.09.2026 на проді:
+    // посилання на /brands/coach/ розгорталось як «Каталог |
+    // BestBrnd4u» з адресою /catalog — тобто картка рекламувала не ту
+    // сторінку, на яку вела. 30 сторінок.
+    //
+    // Свої теги кожен генератор додає нижче сам.
+    html = html.replace(/\n?[ \t]*<meta property="og:[^>]*>/gi, "");
+    html = html.replace(/\n?[ \t]*<meta name="twitter:[^>]*>/gi, "");
+
     // РОЗМІТКУ ШАБЛОНУ ТЕЖ ВИРІЗАЄМО, І ЦЕ НЕ ДРІБНИЦЯ.
     //
     // catalog.html і product.html — водночас сторінки й шаблони. Відколи

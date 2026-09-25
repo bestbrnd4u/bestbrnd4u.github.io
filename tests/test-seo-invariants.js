@@ -497,6 +497,56 @@ console.log("\n[4c] Доріжку бачить не лише людина, а �
             /breadcrumbSchema\|productSchema\|collectionSchema/.test(read(rel)),
             "інакше згенерована сторінка успадкує чужий BreadcrumbList");
     });
+
+    // ТЕ САМЕ ПРО ВСІ ТЕГИ, ЯКИХ МАЄ БУТИ РІВНО ОДИН.
+    //
+    // Розмітка була лише першим випадком. Другий знайшовся того ж дня:
+    // відколи catalog.html дістав власну картку для месенджерів, усі
+    // 30 сторінок брендів і категорій успадкували її й отримали по два
+    // og:title, og:url, og:image та og:description.
+    //
+    // Це гірше за відсутність картки: павуки беруть ПЕРШИЙ збіг, а
+    // першим іде успадкований. Посилання на /brands/coach/
+    // розгорталось як «Каталог | BestBrnd4u» з адресою /catalog —
+    // картка рекламувала не ту сторінку, на яку вела.
+    //
+    // Тому перевірка тепер про КЛАС, а не про окремий тег: будь-який
+    // головний тег сторінки мусить бути один. Наступний крок, який
+    // щось допише в шаблон, спіткнеться об неї одразу.
+    const ОДИН = [
+        ["og:title", /<meta property="og:title"/g],
+        ["og:url", /<meta property="og:url"/g],
+        ["og:image", /<meta property="og:image"(?!:)/g],
+        ["og:description", /<meta property="og:description"/g],
+        ["twitter:card", /<meta name="twitter:card"/g],
+        ["canonical", /<link[^>]*rel="canonical"/g],
+        ["description", /<meta name="description"/g],
+        ["title", /<title[^>]*>/g]
+    ];
+
+    const багато = [];
+
+    усі.forEach(file => {
+
+        const html = fs.readFileSync(path.join(ROOT, file), "utf8");
+
+        // Сторінки-перенаправлення не мають ні картки, ні опису.
+        if (/http-equiv=["']refresh["']/i.test(html)) return;
+
+        ОДИН.forEach(([name, re]) => {
+            const n = (html.match(re) || []).length;
+            if (n > 1) багато.push(`${file}: ${name} × ${n}`);
+        });
+
+    });
+
+    check("кожен головний тег сторінки — рівно один",
+        багато.length === 0, багато.slice(0, 5).join("; "));
+
+    check("генератори вирізають і картку шаблону",
+        ["scripts/build-product-pages.js", "scripts/build-taxonomy-pages.js"]
+            .every(rel => /property="og:\[\^>\]\*>/.test(read(rel))),
+        "без цього згенерована сторінка успадкує чужий og:title");
 }
 
 console.log("\n[5] Canonical вказує на себе, а не кудись");
