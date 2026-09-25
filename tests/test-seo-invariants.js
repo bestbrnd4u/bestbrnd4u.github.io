@@ -445,6 +445,58 @@ console.log("\n[4c] Доріжку бачить не лише людина, а �
     // без розмітки.
     check("крок вбудований у npm run build",
         /build-breadcrumb-schema\.js/.test(read("package.json")));
+
+    // ЖОДНОГО ЗАДВОЄННЯ, І ЦЕ ОКРЕМА БІДА.
+    //
+    // catalog.html і product.html — водночас сторінки Й ШАБЛОНИ.
+    // Відколи розмітку доріжки будує окремий крок, шаблон приходить
+    // до генератора вже з нею — і кожна згенерована сторінка діставала
+    // ДВА блоки: чужий із шаблону й свій, правильний.
+    //
+    // Для Google два BreadcrumbList на сторінці — суперечність: він
+    // або ігнорує обидва, або бере не той. Заміряно 25.09.2026:
+    // задвоєння на всіх 103 сторінках товарів і 33 таксономії, і воно
+    // встигло потрапити в гілку. Лікує вирізання успадкованої розмітки
+    // в buildTemplate() обох генераторів.
+    const усі = [];
+
+    const обхід = dir => fs.readdirSync(path.join(ROOT, dir), { withFileTypes: true })
+        .forEach(entry => {
+            if (["node_modules", ".git", "supabase", "admin"].includes(entry.name)) return;
+            const next = dir === "." ? entry.name : `${dir}/${entry.name}`;
+            if (entry.isDirectory()) обхід(next);
+            else if (entry.name.endsWith(".html")) усі.push(next);
+        });
+
+    обхід(".");
+
+    const задвоєні = [];
+
+    усі.forEach(file => {
+
+        const html = fs.readFileSync(path.join(ROOT, file), "utf8");
+
+        const ids = [...html.matchAll(/<script[^>]*application\/ld\+json[^>]*id="([^"]+)"/g)]
+            .map(m => m[1]);
+
+        const повтори = ids.filter((id, i) => ids.indexOf(id) !== i);
+
+        if (повтори.length) задвоєні.push(`${file}: ${[...new Set(повтори)].join(", ")}`);
+
+    });
+
+    check(`сторінок перевірено на задвоєння — ${усі.length}`, усі.length > 100, усі.length);
+
+    check("жодна сторінка не має двох однакових блоків розмітки",
+        задвоєні.length === 0, задвоєні.slice(0, 4).join("; "));
+
+    // І причина, чому задвоєння взагалі можливе: шаблон несе розмітку.
+    // Обидва генератори мусять її вирізати.
+    ["scripts/build-product-pages.js", "scripts/build-taxonomy-pages.js"].forEach(rel => {
+        check(`${path.basename(rel)} вирізає розмітку шаблону`,
+            /breadcrumbSchema\|productSchema\|collectionSchema/.test(read(rel)),
+            "інакше згенерована сторінка успадкує чужий BreadcrumbList");
+    });
 }
 
 console.log("\n[5] Canonical вказує на себе, а не кудись");

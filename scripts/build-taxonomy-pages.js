@@ -151,6 +151,23 @@ function buildTemplate() {
     html = html.replace(/<title>[\s\S]*?<\/title>/i, HEAD_SLOT);
     html = html.replace(/\n?<meta name="description"[^>]*>/i, "");
     html = html.replace(/\n?<link rel="canonical"[^>]*>/i, "");
+    // РОЗМІТКУ ШАБЛОНУ ТЕЖ ВИРІЗАЄМО, І ЦЕ НЕ ДРІБНИЦЯ.
+    //
+    // catalog.html і product.html — водночас сторінки й шаблони. Відколи
+    // BreadcrumbList для них будує scripts/build-breadcrumb-schema.js,
+    // шаблон приходить сюди ВЖЕ З НЕЮ — і кожна згенерована сторінка
+    // отримувала два блоки: чужий із шаблону й свій, правильний.
+    //
+    // Для Google два BreadcrumbList на одній сторінці — суперечність:
+    // він або ігнорує обидва, або бере не той. Заміряно 25.09.2026:
+    // задвоєння на всіх 103 сторінках товарів і 33 сторінках таксономії.
+    //
+    // Тому прибираємо будь-яку розмітку, прив'язану до сторінки; свою
+    // кожен генератор додає нижче сам.
+    html = html.replace(
+        /\s*<script type="application\/ld\+json" id="(?:breadcrumbSchema|productSchema|collectionSchema)">[\s\S]*?<\/script>/g,
+        "");
+
 
     if (!html.includes(HEAD_SLOT)) {
         throw new Error("У catalog.html не знайдено <title> — шаблон змінився");
