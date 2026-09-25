@@ -6171,6 +6171,16 @@ body.mobile-filters-open .scroll-top{
 
    Це факт про товар, а не заклик. Тому спокійний темний текст на
    світлій підкладці — тієї самої родини, що блок доставки поруч. */
+/* Кнопка «+» у кошику, коли більше додати нема чого.
+   Тієї самої стриманої родини, що .only-one нижче: 92% позицій у
+   наявності — одна штука, тож червоне й вигуки читались би як
+   накрутка терміновості. Просто видно, що кнопка вже не працює.
+   Вона лишається натискною — клік пояснює причину. */
+.qty-btn.is-max{
+    opacity:.35;
+    cursor:not-allowed;
+}
+
 .only-one{
     margin:14px 0 0;
     padding:11px 14px;
@@ -6794,7 +6804,11 @@ body.mobile-filters-open .scroll-top{
     font-weight:700;
     box-shadow:var(--shadow-sm);
     transition:background-color 350ms cubic-bezier(.4,0,.2,1),
-               color 350ms cubic-bezier(.4,0,.2,1);
+               color 350ms cubic-bezier(.4,0,.2,1),
+               /* opacity — бо .qty-btn.is-max приглушує «+», коли
+                  більше додати нема чого. Без цього рядка приглушення
+                  стрибало б, а не проступало. */
+               opacity 350ms cubic-bezier(.4,0,.2,1);
 }
 
 @media (hover:hover) and (pointer:fine){
