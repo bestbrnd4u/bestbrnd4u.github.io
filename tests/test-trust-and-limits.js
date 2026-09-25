@@ -37,6 +37,9 @@ const read = rel => fs.readFileSync(path.join(ROOT, rel), "utf8");
 
 const productJs = read("assets/js/product.js");
 const cartJs = read("assets/js/cart.js");
+// Саме тут тепер живе правило межі: common.js є на кожній
+// сторінці, а cart.js — лише на кошику.
+const commonJs = read("assets/js/common.js");
 const css = read("assets/css/style.css");
 
 console.log("\n[1] Блок довіри є і стоїть там, де його читають");
@@ -102,52 +105,77 @@ console.log("\n[2] Блок не обіцяє більше, ніж сайт");
         !/100%/.test((productJs.match(/class="trust-box"[\s\S]{0,1600}/) || [""])[0]));
 }
 
-console.log("\n[3] Кошик не дає набрати більше, ніж є");
+console.log("\n[3] Набрати більше, ніж є, не дає ЖОДНА кнопка");
 {
-    check("межа рахується окремою функцією",
-        /function lineLimit\(id, color, size\)/.test(cartJs));
+    // ЩО ЦЕ ЗАКРИВАЄ
+    // ---------------
+    // Перевірка межі була лише в кошику, на кнопці «+». А кнопка
+    // «Купити» на сторінці товару просто робила cart.push().
+    //
+    // Заміряно на проді 25.09.2026: у кросівок Lacoste L003 розміру
+    // 37 залишок 1. Два кліки «Купити» клали в кошик ДВІ пари без
+    // єдиного слова, і лише потім кошик відмовлявся додати третю —
+    // тобто ловив уже перейдену межу.
+    //
+    // Магазин торгує переважно одиничними екземплярами, тож це
+    // замовлення, яке нічим виконати.
+    check("правило живе в common.js, який є на кожній сторінці",
+        /function cartLineLimit\(product, color, size\)/.test(commonJs));
 
-    check("плюс перевіряє межу",
+    check("кошик кличе те саме правило, а не свою копію",
+        /cartLineLimit\(findProductById\(id\), color, size\)/.test(cartJs)
+        && !/stock\.sizeQty\(/.test(cartJs));
+
+    // Обидві кнопки — та сама умова.
+    check("плюс у кошику перевіряє межу",
         /if \(limit !== null && already >= limit\)/.test(cartJs));
 
+    check("«Купити» на сторінці товару теж",
+        /limit !== null && cartLineCount\(cart, id, color, size\) >= limit/.test(commonJs));
+
+    // Товар мусить читатись ДО push — інакше межу нема з чого рахувати.
+    // Саме тому її там і не було.
+    check("товар дістається до того, як щось класти в кошик",
+        /const product = await getProductById\(id\);[\s\S]{0,200}?const cart = getCart\(\);/
+            .test(commonJs));
+
     check("і не додає рядок, коли межу досягнуто",
-        /already >= limit\) \{[\s\S]{0,400}?return;/.test(cartJs));
+        /already >= limit\) \{[\s\S]{0,400}?return;/.test(cartJs)
+        && />= limit\) \{[\s\S]{0,400}?return;/.test(commonJs));
 
     // Покупець мусить дізнатись причину на місці, а не від менеджера
-    // через день.
-    check("людині кажуть, чому не додалось", /showToast/.test(
-        (cartJs.match(/function changeQty[\s\S]{0,900}/) || [""])[0]));
-
-    check("для останньої одиниці текст свій",
-        /Це останній екземпляр/.test(cartJs));
-
-    check("інакше називають число", /у наявності \$\{limit\} шт/.test(cartJs));
+    // через день — і почути те саме, звідки б не натиснув.
+    ["останній екземпляр", "у наявності ${limit} шт"].forEach(text => {
+        check(`текст «${text}» однаковий в обох місцях`,
+            cartJs.includes(text) && commonJs.includes(text));
+    });
 
     // Кількість беремо тим самим модулем, що сайт і адмінка.
     check("залишок читається через Stock",
-        /stock\.sizeQty\(stock\.variantStock\(product, variant\)/.test(cartJs));
+        /stock\.sizeQty\(stock\.variantStock\(product, variant\)/.test(commonJs));
 }
 
 console.log("\n[4] Межа не чіпає того, чого не має чіпати");
 {
+    // Усі ці винятки перевіряємо там, де тепер правило, — у common.js.
+    // Доти вони стояли в cart.js, і сторінка товару про них не знала:
+    // вона не знала й самої межі.
+
     // Возити під замовлення можна будь-яку кількість.
     check("товар під замовлення без межі",
-        /if \(product\.preOrder\) return null;/.test(cartJs));
+        /if \(product\.preOrder\) return null;/.test(commonJs));
 
     // Порожня клітинка залишку — «не рахуємо», а не нуль
     // (див. docs/ЗАЛИШКИ.md).
     check("непорахований залишок — без межі",
-        /typeof have === "number" && have > 0 \? have : null/.test(cartJs));
+        /typeof have === "number" && have > 0 \? have : null/.test(commonJs));
 
     check("немає модуля залишків — без межі",
-        /if \(!stock\) return null;/.test(cartJs));
-
-    check("товар не знайдено — без межі",
-        /if \(!product\) return null;/.test(cartJs));
+        /if \(!stock \|\| !product\) return null;/.test(commonJs));
 
     // Правило записане в коді, а не лише в тесті.
     check("причина описана в коді",
-        /возять будь-яку кількість/.test(cartJs));
+        /возять будь-яку кількість/.test(commonJs));
 }
 
 console.log("\n[5] Підписи пошти під наглядом");
