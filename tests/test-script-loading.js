@@ -177,6 +177,65 @@ console.log("\n[3] Інлайнові скрипти не покладаютьс
         risky.length === 0, risky.join(" | "));
 }
 
+console.log("\n[4] Де є кнопка «Купити», там є і модуль залишків");
+{
+    // ЩО ЦЕ ЗАКРИВАЄ
+    // ---------------
+    // cartLineLimit() у common.js не дає покласти в кошик більше, ніж
+    // є. Але перше, що він робить, — читає window.Stock:
+    //
+    //     const stock = window.Stock;
+    //     if (!stock || !product) return null;
+    //
+    // null означає «межі немає». Тобто на сторінці без stock.js
+    // перевірка не падає й не свариться — вона МОВЧКИ вимикається, і
+    // кнопка знову дозволяє набрати більше, ніж є.
+    //
+    // Саме так і було: правило поклали в common.js, який є всюди, а
+    // stock.js — ні. Заміряно 25.09.2026 на головній і в обраному:
+    // три кліки «Купити» на товарі, якого одна штука, давали три
+    // позиції без жодного слова. На каталозі й сторінці товару та сама
+    // кнопка зупинялась після першої.
+    //
+    // Помилку такого роду не видно ні в коді сторінки, ні в коді
+    // перевірки — лише в тому, які файли підключені разом. Тому
+    // перевірка саме тут.
+    const pages = fs.readdirSync(ROOT).filter(file => file.endsWith(".html"));
+
+    const withBuy = [];
+    const missing = [];
+
+    pages.forEach(file => {
+
+        const html = read(file);
+
+        // Кнопку малює JS, у статичній розмітці її немає — шукати
+        // «buy-btn» у сторінці марно (перша версія цієї перевірки
+        // саме так і знайшла нуль сторінок). Ознака — контейнер, у
+        // який картки лягають: є сітка, отже будуть і кнопки.
+        const GRID = /products-grid|productsGrid|favorites-list|favoritesList|id="productPage"/;
+
+        if (!GRID.test(html)) return;
+
+        withBuy.push(file);
+
+        if (!/assets\/js\/stock\.js/.test(html)) missing.push(file);
+
+    });
+
+    check(`сторінок із кнопкою «Купити» — ${withBuy.length}`,
+        withBuy.length >= 4, withBuy.join(", "));
+
+    check("на кожній підключено stock.js",
+        missing.length === 0,
+        missing.join(", ") + " — там межа мовчки вимкнена");
+
+    // І сама причина, заради якої це перевіряється: без модуля
+    // функція чесно повертає null, а не падає.
+    check("cartLineLimit без модуля віддає «межі немає», а не помилку",
+        /if \(!stock \|\| !product\) return null;/.test(read("assets/js/common.js")));
+}
+
 console.log(failures ? `\n✗ провалено перевірок: ${failures}\n` : "\n✓ усі перевірки пройдено\n");
 
 process.exit(failures ? 1 : 0);
