@@ -115,6 +115,34 @@ function syncPhoneLinks(html, phone) {
 
 }
 
+// РІК У ЗНАКУ ОХОРОНИ ПРАВ — З ГОДИННИКА, А НЕ З ПАМ'ЯТІ.
+//
+// У розмітці 154 сторінок стояло «© 2026» — двічі на кожній, у
+// видимому підвалі й у <meta name="copyright">. Жоден крок збірки
+// його не чіпав, тобто 1 січня весь сайт почав би представлятись
+// минулим роком і робив би це, доки хтось не згадає.
+//
+// Це не помилка розмітки, а те саме, від чого страхує priceValidUntil
+// у assets/js/product-offer.js: дата, яку записали руками, рано чи
+// пізно стає неправдою мовчки. Різниця лише в тому, що ту помітить
+// Google, а цю — покупець, який вирішить, що магазин покинули.
+//
+// ЧОМУ В ЗБІРЦІ, А НЕ В JS НА СТОРІНЦІ. Підвал читають і без JS:
+// пошуковики, парсери, лист, у який його скопіювали. До того ж
+// збірка йде після кожної правки товару в адмінці, тож рік
+// виправиться сам за кілька днів січня.
+//
+// Міняється це рівно раз на рік, тож гілки dev і main, зібрані в
+// різні моменти, розійдуться на ньому не частіше, ніж на
+// priceValidUntil.
+function syncCopyrightYear(html, year) {
+
+    return html
+        .replace(/© \d{4} bestbrnd4u\./g, `© ${year} bestbrnd4u.`)
+        .replace(/(<meta name="copyright" content="© )\d{4}( BestBrnd4u)/g, `$1${year}$2`);
+
+}
+
 function buildRequisites(legal) {
 
     const lines = [];
@@ -299,33 +327,52 @@ function main() {
         console.log("Готово: реквізити в offer.html оновлено з data/legal.json");
     }
 
-    // 3. Телефон на всіх сторінках
+    // 3. Телефон і рік у знаку охорони прав — на всіх сторінках
     //
     // Крок стоїть у npm run build ПІСЛЯ генераторів сторінок товару
     // й таксономії, тож їхні 220 сторінок теж проходять через нього.
+    //
+    // Два правила в одному проході, і кожне зі своєю сторожею: колись
+    // тут стояло одне `if (!source.includes("phone-link")) return`, і
+    // друге правило мовчки не працювало б на сторінці без підвального
+    // телефону. Сьогодні таких немає, але покладатись на це — означає
+    // поставити пастку на того, хто додасть сторінку.
     const pages = htmlPages(ROOT);
 
+    const year = new Date().getUTCFullYear();
+
     let fixed = 0;
+    let dated = 0;
 
     pages.forEach(file => {
 
         const source = fs.readFileSync(file, "utf8");
 
-        if (!source.includes("phone-link")) return;
+        let next = source;
 
-        const next = syncPhoneLinks(source, legal.phone);
+        if (next.includes("phone-link")) {
+            const afterPhone = syncPhoneLinks(next, legal.phone);
+            if (afterPhone !== next) fixed++;
+            next = afterPhone;
+        }
+
+        const afterYear = syncCopyrightYear(next, year);
+        if (afterYear !== next) dated++;
+        next = afterYear;
 
         if (next === source) return;
 
         fs.writeFileSync(file, next, "utf8");
-
-        fixed++;
 
     });
 
     console.log(fixed
         ? `Готово: телефон оновлено на ${fixed} сторінках`
         : "Готово: телефон на сторінках уже збігається з data/legal.json");
+
+    console.log(dated
+        ? `Готово: рік у знаку охорони прав оновлено на ${dated} сторінках → ${year}`
+        : `Готово: рік у знаку охорони прав уже ${year}`);
 
     // 4. Розмітка «хто ми» на головній
     //
