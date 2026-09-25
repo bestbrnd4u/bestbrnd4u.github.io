@@ -214,9 +214,11 @@
 
     <div id="panel" hidden>
 
-        <div class="tabs" id="tabs" role="tablist">
-            <button class="tab on" data-kind="buyers" role="tab">Покупці <span class="count" id="countBuyers">—</span></button>
-            <button class="tab" data-kind="subscribers" role="tab">Підписники <span class="count" id="countSubs">—</span></button>
+        <!-- aria-selected, а не лише клас .on: обрану вкладку має
+             бути чути, а не лише видно. Так це вже робить orders.js. -->
+        <div class="tabs" id="tabs" role="tablist" aria-label="Кого показувати">
+            <button class="tab on" data-kind="buyers" role="tab" aria-selected="true">Покупці <span class="count" id="countBuyers">—</span></button>
+            <button class="tab" data-kind="subscribers" role="tab" aria-selected="false">Підписники <span class="count" id="countSubs">—</span></button>
         </div>
 
         <div id="listMsg"></div>

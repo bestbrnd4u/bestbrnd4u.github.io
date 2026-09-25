@@ -209,7 +209,8 @@
             const count = state.counts[tab.key];
 
             return `<button class="tab${tab.key === state.status ? " on" : ""}"`
-                + ` role="tab" data-status="${esc(tab.key)}">`
+                + ` role="tab" aria-selected="${tab.key === state.status}"`
+                + ` data-status="${esc(tab.key)}">`
                 + esc(tab.label)
                 + (typeof count === "number" ? `<span class="count">${count}</span>` : "")
                 + "</button>";

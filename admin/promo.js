@@ -396,6 +396,7 @@
 
         el("tabs").innerHTML = tabs.map(tab =>
             `<button class="tab${tab.key === state.filter ? " on" : ""}" role="tab"`
+            + ` aria-selected="${tab.key === state.filter}"`
             + ` data-filter="${esc(tab.key)}">${esc(tab.label)}`
             + `<span class="count">${tab.count}</span></button>`).join("");
 

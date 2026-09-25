@@ -130,9 +130,20 @@
 
         <div id="authCard" class="auth-card" hidden>
 
-            <div class="auth-tabs">
-                <button type="button" class="auth-tab active" data-tab="login">Увійти</button>
-                <button type="button" class="auth-tab" data-tab="signup">Реєстрація</button>
+            <!-- СТАН ВКЛАДКИ — НЕ ЛИШЕ КОЛІР.
+                 Раніше «яка вкладка зараз» несла сама тільки позначка
+                 active у класі. Хто не бачить екрана, чув дві однакові
+                 кнопки й не міг дізнатись, яка форма зараз відкрита.
+                 WCAG 4.1.2. Ролі тут, у розмітці, — щоб вони діяли ще
+                 до того, як виконається JS; aria-selected далі тримає
+                 в згоді assets/js/account.js. -->
+            <div class="auth-tabs" role="tablist" aria-label="Вхід або реєстрація">
+                <button type="button" class="auth-tab active" data-tab="login"
+                        id="authTabLogin" role="tab" aria-selected="true"
+                        aria-controls="loginForm">Увійти</button>
+                <button type="button" class="auth-tab" data-tab="signup"
+                        id="authTabSignup" role="tab" aria-selected="false"
+                        aria-controls="signupForm" tabindex="-1">Реєстрація</button>
             </div>
 
             <!-- ВХІД ЧЕРЕЗ ЧУЖИЙ АКАУНТ — НАД ФОРМАМИ, А НЕ В ОДНІЙ З НИХ.
@@ -218,7 +229,8 @@
 
             <div class="auth-divider" id="authDivider" hidden><span>або</span></div>
 
-            <form id="loginForm" class="auth-form" novalidate>
+            <form id="loginForm" class="auth-form" role="tabpanel"
+                  aria-labelledby="authTabLogin" novalidate>
 
                 <label>
                     Email
@@ -238,7 +250,8 @@
 
             </form>
 
-            <form id="signupForm" class="auth-form" hidden novalidate>
+            <form id="signupForm" class="auth-form" role="tabpanel"
+                  aria-labelledby="authTabSignup" hidden novalidate>
 
                 <label>
                     Ім'я
@@ -332,17 +345,27 @@
 
             </div>
 
-            <div class="account-tabs">
-                <button type="button" class="account-tab active" data-tab="orders">Історія замовлень</button>
-                <button type="button" class="account-tab" data-tab="addresses">Адреси доставки</button>
-                <button type="button" class="account-tab" data-tab="profile">Мої дані</button>
-                <button type="button" class="account-tab" data-tab="newsletter">Розсилки</button>
-                <button type="button" class="account-tab" data-tab="password">Змінити пароль</button>
+            <div class="account-tabs" role="tablist" aria-label="Розділи кабінету">
+                <button type="button" class="account-tab active" data-tab="orders"
+                        id="accountTabOrders" role="tab" aria-selected="true"
+                        aria-controls="ordersPanel">Історія замовлень</button>
+                <button type="button" class="account-tab" data-tab="addresses"
+                        id="accountTabAddresses" role="tab" aria-selected="false"
+                        aria-controls="addressesPanel" tabindex="-1">Адреси доставки</button>
+                <button type="button" class="account-tab" data-tab="profile"
+                        id="accountTabProfile" role="tab" aria-selected="false"
+                        aria-controls="profilePanel" tabindex="-1">Мої дані</button>
+                <button type="button" class="account-tab" data-tab="newsletter"
+                        id="accountTabNewsletter" role="tab" aria-selected="false"
+                        aria-controls="newsletterPanel" tabindex="-1">Розсилки</button>
+                <button type="button" class="account-tab" data-tab="password"
+                        id="accountTabPassword" role="tab" aria-selected="false"
+                        aria-controls="passwordPanel" tabindex="-1">Змінити пароль</button>
             </div>
 
             <!-- ---- Історія замовлень ---- -->
 
-            <div id="ordersPanel" class="account-panel">
+            <div id="ordersPanel" class="account-panel" role="tabpanel" aria-labelledby="accountTabOrders">
 
                 <div id="ordersLoader" class="loader">
                     <div class="spinner"></div>
@@ -360,7 +383,7 @@
 
             <!-- ---- Адреси доставки ---- -->
 
-            <div id="addressesPanel" class="account-panel" hidden>
+            <div id="addressesPanel" class="account-panel" role="tabpanel" aria-labelledby="accountTabAddresses" hidden>
 
                 <div class="addresses-header">
                     <div>
@@ -386,7 +409,7 @@
 
             <!-- ---- Мої дані ---- -->
 
-            <div id="profilePanel" class="account-panel" hidden>
+            <div id="profilePanel" class="account-panel" role="tabpanel" aria-labelledby="accountTabProfile" hidden>
 
                 <div class="profile-card">
 
@@ -528,7 +551,7 @@
 
             <!-- ---- Розсилки ---- -->
 
-            <div id="newsletterPanel" class="account-panel" hidden>
+            <div id="newsletterPanel" class="account-panel" role="tabpanel" aria-labelledby="accountTabNewsletter" hidden>
 
                 <div class="profile-card">
 
@@ -608,7 +631,7 @@
 
             <!-- ---- Змінити пароль ---- -->
 
-            <div id="passwordPanel" class="account-panel" hidden>
+            <div id="passwordPanel" class="account-panel" role="tabpanel" aria-labelledby="accountTabPassword" hidden>
 
                 <div class="profile-card">
 
@@ -983,7 +1006,7 @@
 <!-- Спільна поведінка картки входу: ті самі кнопки стоять ще й на
      оформленні замовлення. ПЕРЕД account.js — той нею користується. -->
 <script src="assets/js/auth-widget.js?v=6b02212c" defer></script>
-<script src="assets/js/account.js?v=82f2e710" defer></script>
+<script src="assets/js/account.js?v=3bf716e8" defer></script>
 
 </body>
 

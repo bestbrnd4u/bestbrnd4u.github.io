@@ -118,14 +118,93 @@ function localizeValidationMessages(form) {
 document.querySelectorAll(".auth-form").forEach(localizeValidationMessages);
 
 // -------------------------
+// ВКЛАДКА МУСИТЬ КАЗАТИ, ЩО ВОНА ОБРАНА
+//
+// Заміряно на проді 25.09.2026. «Яка вкладка зараз» несла сама тільки
+// позначка active у класі — тобто колір. Сім кнопок: дві в гостя
+// (Увійти / Реєстрація) і п'ять у кабінеті. Хто не бачить екрана, чув
+// сім однакових кнопок і після натискання не отримував жодного
+// підтвердження, що щось змінилось. WCAG 4.1.2 «Ім'я, роль,
+// значення», рівень A.
+//
+// Те саме, що було з сердечком у картці товару: стан жив у кольорі й
+// більше ніде.
+//
+// Причому взірець у проєкті вже був — вкладки в адмінці
+// (admin/people.html) мають role="tab" від початку. Сторінка, якою
+// користуються покупці, просто відстала.
+//
+// Ролі стоять у розмітці (щоб діяли ще до JS), а тут — те, що мусить
+// мінятись: aria-selected і роверний tabindex.
+// -------------------------
+
+function selectTab(tabs, active) {
+
+    tabs.forEach(tab => {
+
+        const on = tab === active;
+
+        tab.classList.toggle("active", on);
+        tab.setAttribute("aria-selected", on ? "true" : "false");
+
+        // Роверний tabindex: Tab заводить у смугу вкладок ОДИН раз, а
+        // між вкладками ходять стрілками. Без цього читач екрана
+        // оголошує смугу вкладок, а стрілки в ній не працюють — і це
+        // гірше, ніж не називати її смугою вкладок узагалі.
+        tab.tabIndex = on ? 0 : -1;
+
+    });
+
+}
+
+function wireTabKeys(tabs) {
+
+    const STEP = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: 1, ArrowUp: -1 };
+
+    tabs.forEach(tab => {
+
+        tab.addEventListener("keydown", event => {
+
+            let next = null;
+
+            if (STEP[event.key] !== undefined) {
+                const i = tabs.indexOf(tab) + STEP[event.key];
+                next = tabs[(i + tabs.length) % tabs.length];
+            } else if (event.key === "Home") {
+                next = tabs[0];
+            } else if (event.key === "End") {
+                next = tabs[tabs.length - 1];
+            }
+
+            if (!next || next === tab) return;
+
+            event.preventDefault();
+
+            // Спершу фокус, потім клац: обробник нижче вже вміє все
+            // інше — ховати панелі, чистити помилки, довантажувати
+            // адреси. Другої копії цієї логіки тут не треба.
+            next.focus();
+            next.click();
+
+        });
+
+    });
+
+}
+
+// -------------------------
 // Перемикання вкладок "Увійти" / "Реєстрація"
 // -------------------------
 
-document.querySelectorAll(".auth-tab").forEach(tab => {
+const authTabs = [...document.querySelectorAll(".auth-tab")];
+
+wireTabKeys(authTabs);
+
+authTabs.forEach(tab => {
 
     tab.addEventListener("click", () => {
 
-        document.querySelectorAll(".auth-tab").forEach(t => t.classList.toggle("active", t === tab));
+        selectTab(authTabs, tab);
 
         const isLogin = tab.dataset.tab === "login";
 
@@ -2023,11 +2102,15 @@ ordersListEl?.addEventListener("click", event => {
 // Перемикання вкладок "Історія замовлень" / "Мої дані"
 // -------------------------
 
-document.querySelectorAll(".account-tab").forEach(tab => {
+const accountTabs = [...document.querySelectorAll(".account-tab")];
+
+wireTabKeys(accountTabs);
+
+accountTabs.forEach(tab => {
 
     tab.addEventListener("click", () => {
 
-        document.querySelectorAll(".account-tab").forEach(t => t.classList.toggle("active", t === tab));
+        selectTab(accountTabs, tab);
 
         const target = tab.dataset.tab;
 
