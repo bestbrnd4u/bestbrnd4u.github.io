@@ -1165,5 +1165,73 @@ console.log("\n[13] Заголовки складаються у зміст бе
     });
 }
 
+console.log("\n[14] Кружечки кольору: зона натискання дорівнює кроку");
+{
+    // ЩО ЦЕ ЗАКРИВАЄ
+    // ---------------
+    // У картці каталогу на мобільному кружечків кольору буває шість-
+    // сім, тому намальовані вони маленькими — 16px. Мішень при цьому
+    // росте невидимою зоною ::before.
+    //
+    // Тут стикаються три числа, і жодне не можна рухати окремо:
+    //
+    //   крок  = ширина кружечка + проміжок рядка
+    //   зона  = padding-бокс кружечка + 2 × inset
+    //   норма = 24 (WCAG 2.2, 2.5.8 — виняток за відстанню: коло
+    //           діаметром 24 на кожній цілі не перетинає сусіднє)
+    //
+    // Зона БІЛЬША за крок — сусідні зони перекриваються, і натискання
+    // дістається чужому кольору. МЕНША — між ними мертвий проміжок,
+    // де не відбувається нічого. Правильно рівно одне: зона = крок.
+    //
+    // Заміряно 25.09.2026: було 16px, проміжок 7px → крок 23, зона 22.
+    // Тобто і норму не добирали на піксель, і між зонами лишалась
+    // щілина. Стало 8px → крок 24, зона 24.
+    const num = re => {
+        const hit = css.match(re);
+        return hit ? parseFloat(hit[1]) : null;
+    };
+
+    // .product-colors { gap: Npx }
+    const gap = num(/\.product-colors\{[^}]*gap:(\d+(?:\.\d+)?)px/);
+
+    // .product-card .mini-color { width: Npx }
+    const dot = num(/\.product-card \.mini-color\{[^}]*width:(\d+(?:\.\d+)?)px/);
+
+    // .mini-color { border: Npx ... } — базове правило
+    const border = num(/\.mini-color\{[^}]*border:(\d+(?:\.\d+)?)px/);
+
+    // .product-card .mini-color::before { inset: Vpx Hpx }
+    const inset = css.match(
+        /\.product-card \.mini-color::before\{[^}]*inset:-(\d+(?:\.\d+)?)px -(\d+(?:\.\d+)?)px/);
+
+    check("усі чотири числа знайдено в CSS",
+        gap !== null && dot !== null && border !== null && Boolean(inset),
+        `gap=${gap} dot=${dot} border=${border} inset=${inset ? inset[1] + "/" + inset[2] : "—"}`);
+
+    if (gap !== null && dot !== null && border !== null && inset) {
+
+        const step = dot + gap;
+        const padding = dot - border * 2;          // box-sizing:border-box
+        const zone = padding + parseFloat(inset[2]) * 2;
+
+        check(`крок між центрами ${step}px — не менший за 24`, step >= 24, step);
+
+        check(`зона натискання ${zone}px дорівнює кроку`, zone === step, `${zone} ≠ ${step}`);
+
+        // Вертикаль окремо: її ріже overflow-y:hidden батька, тож вона
+        // законно менша. Але не менша за намальований кружечок —
+        // інакше зона була б вужчою за те, що видно.
+        const zoneY = padding + parseFloat(inset[1]) * 2;
+
+        check(`по вертикалі ${zoneY}px — більша за сам кружечок`, zoneY > dot, `${zoneY} ≤ ${dot}`);
+
+    }
+
+    // Причина записана в коді, а не лише тут.
+    check("у CSS пояснено, чому саме ці числа",
+        /зони стикаються без щілин і без перекриття/.test(raw));
+}
+
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
 process.exit(failures === 0 ? 0 : 1);
