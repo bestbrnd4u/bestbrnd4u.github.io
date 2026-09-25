@@ -1679,8 +1679,20 @@ function buildSearchOverlay() {
             <div class="search-overlay-bar container">
                 <div class="search-overlay-input-wrap">
                     <span class="search-overlay-icon">🔍</span>
-                    <input type="text" id="globalSearchInput" placeholder="Пошук товарів..." autocomplete="off">
-                    <button type="button" id="globalSearchClear" class="search-overlay-clear" hidden>✕</button>
+                    <!-- Підказка в полі — не назва поля.
+                         Placeholder зникає, щойно людина почала
+                         друкувати, а частина читачів екрана його не
+                         озвучує взагалі. Поле пошуку на сайті одне й
+                         головне — воно мусить називатись саме.
+
+                         А «✕» читач озвучує ім'ям символа й
+                         англійською: «multiplication x». Поруч стоїть
+                         «Скасувати» словами, і різниця між «очистити
+                         поле» та «закрити пошук» на слух зникала. -->
+                    <input type="text" id="globalSearchInput" placeholder="Пошук товарів..."
+                           aria-label="Пошук товарів" autocomplete="off">
+                    <button type="button" id="globalSearchClear" class="search-overlay-clear"
+                            aria-label="Очистити пошук" hidden>✕</button>
                 </div>
                 <button type="button" id="globalSearchCancel" class="search-overlay-cancel">Скасувати</button>
             </div>
