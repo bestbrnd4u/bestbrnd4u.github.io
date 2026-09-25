@@ -2,7 +2,8 @@
 <html lang="uk">
 
 <head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"584f8595","data/catalog.json":"518a3f1b","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"00e8da26","data/image-variants.json":"7f73a794","data/legal.json":"f84751b2","data/notifications.json":"a35b367f","data/product-texts.json":"278df72d","data/products-updated.json":"1bd6ee8d","data/products.json":"3c1e6809","data/promo-popups.json":"0940ece5","data/promotions.json":"fd2ed22f","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/security.json":"0c05c691","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"584f8595","data/catalog.json":"506648c1","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"00e8da26","data/image-variants.json":"7f73a794","data/legal.json":"f84751b2","data/notifications.json":"a35b367f","data/product-texts.json":"278df72d","data/products-updated.json":"1bd6ee8d","data/products.json":"574243a4","data/promo-popups.json":"0940ece5","data/promotions.json":"fd2ed22f","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/security.json":"0c05c691","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script>
+    <meta name="robots" content="noindex,nofollow">
     <meta charset="UTF-8">
     <meta name="author" content="BestBrnd4u">
     <meta name="copyright" content="© 2026 BestBrnd4u. Усі права захищено.">
@@ -311,7 +312,7 @@
 
                 <div class="checkout-block">
 
-                    <h2>Доставка</h2>
+                    <h2 id="deliveryHeading">Доставка</h2>
                     <p class="checkout-block-sub">Оберіть місто та зручний спосіб отримання</p>
 
                     <div id="savedAddressesBlock" class="saved-addresses-block" hidden>
@@ -329,7 +330,16 @@
 
                     </div>
 
-                    <div class="delivery-options">
+
+                    <!-- ГРУПА ПЕРЕМИКАЧІВ МУСИТЬ МАТИ НАЗВУ.
+                         Без неї читач екрана чує «Telegram, перемикач,
+                         3 з 4» і не знає, на яке питання відповідає:
+                         спосіб доставки, оплати чи зв'язку. Їх тут
+                         три, десять перемикачів разом. WCAG 1.3.1.
+                         На сторінці товару оцінка відгуку це вже має
+                         (role="radiogroup" aria-label="Оцінка") —
+                         оформлення просто відстало. -->
+                    <div class="delivery-options" role="group" aria-labelledby="deliveryHeading">
 
                         <label class="delivery-option">
                             <input type="radio" name="deliveryMethod" value="На відділення «Нова пошта»" data-price="0">
@@ -417,7 +427,7 @@
 
                 <div class="checkout-block">
 
-                    <h2>Оплата</h2>
+                    <h2 id="paymentHeading">Оплата</h2>
                     <p class="checkout-block-sub">Оберіть зручний спосіб оплати</p>
 
                     <!-- ПЕРЕДОПЛАТА ЗА ТОВАР ПІД ЗАМОВЛЕННЯ.
@@ -440,7 +450,7 @@
                          і в кошику їх може бути кілька. -->
                     <p class="preorder-banner" id="checkoutPreorderNote" hidden></p>
 
-                    <div class="delivery-options">
+                    <div class="delivery-options" role="radiogroup" aria-labelledby="paymentHeading">
 
                         <label class="delivery-option">
                             <input type="radio" name="paymentMethod" value="Банківською карткою (Visa/Mastercard)" checked>
@@ -499,7 +509,7 @@
 
                 <div class="checkout-block">
 
-                    <h2>Зв'язатися зі мною</h2>
+                    <h2 id="contactHeading">Зв'язатися зі мною</h2>
                     <!-- Текст залежить від вибору.
                          Раніше тут завжди стояло «менеджер зателефонує вам» —
                          і людина, яка обрала Telegram, усе одно читала про
@@ -509,7 +519,7 @@
                         Оберіть зручний спосіб зв'язку — ми підтвердимо замовлення
                     </p>
 
-                    <div class="contact-channels">
+                    <div class="contact-channels" role="radiogroup" aria-labelledby="contactHeading">
 
                         <label class="contact-channel">
                             <input type="radio" name="contactChannel" value="Телефоном" checked>

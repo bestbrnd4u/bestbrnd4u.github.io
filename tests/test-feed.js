@@ -216,6 +216,62 @@ console.log("\n[4] Знижка — парою цін");
             return !item || num(item.price) === product.oldPrice;
         }),
         withOld.map(p => p.id).slice(0, 3).join(", "));
+
+    // ПРОТЕРМІНОВАНИЙ СЕЙЛ — НЕ СЕЙЛ.
+    //
+    // Заміряно у живому фіді 25.09.2026: товар 57 ніс sale_price
+    // 8600 з вікном, яке скінчилось 18 вересня — за тиждень до того.
+    // Сам сайт при цьому був правий усюди: сторінка показувала 9000,
+    // бейджа не було, розмітка Product казала 9000, а сторінка акції
+    // відповідала «її вже завершено». Фід лишався єдиним місцем, де
+    // жила ціна, якої вже немає.
+    //
+    // Покупець поганої ціни не бачив: за минулого вікна Google
+    // показує звичайну ціну. Але вище в цьому ж наборі написано,
+    // чого ми боїмось — розбіжність між фідом і сторінкою знімає
+    // товар із показу, і тримати в фіді те, що чекає лише на
+    // помилку, сенсу немає.
+    const expired = sale.filter(item => {
+
+        const window = item.sale_price_effective_date;
+
+        if (!window) return false;
+
+        const ends = new Date(String(window).split("/")[1]).getTime();
+
+        return Number.isFinite(ends) && ends <= Date.now();
+
+    });
+
+    check("жодна знижка у фіді вже не скінчилась",
+        expired.length === 0,
+        expired.slice(0, 3).map(i => `${i.id}: ${i.sale_price_effective_date}`).join("; "));
+
+    // Те саме навпростець, щоб перевірка не залежала від того, чи є
+    // зараз в каталозі протермінована акція.
+    const donor = products.find(p => Array.isArray(p.variants) && p.variants.length);
+    const index = feed.departmentIndex(categories);
+
+    const withSale = (from, to) => feed.feedItems(
+        [{ ...donor, sale: { price: Math.max(1, Number(donor.price) - 100), from, to } }],
+        index, SITE).items;
+
+    const минуле = withSale("2020-01-01T00:00:00.000Z", "2020-01-08T00:00:00.000Z");
+
+    check("сейл із вікном у минулому у фід не потрапляє",
+        минуле.length > 0 && минуле.every(i => !i.sale_price),
+        минуле.map(i => i.sale_price).filter(Boolean).slice(0, 2).join(", "));
+
+    // І навпаки: МАЙБУТНЄ вікно віддавати треба. Заради цього все й
+    // задумано — Google має дізнатись про сейл заздалегідь і почати
+    // його разом із сайтом, а не з моменту наступної збірки.
+    const рік = 365 * 24 * 3600 * 1000;
+    const майбутнє = withSale(new Date(Date.now() + рік).toISOString(),
+        new Date(Date.now() + рік * 2).toISOString());
+
+    check("сейл, який ще попереду, у фіді лишається",
+        майбутнє.some(i => i.sale_price),
+        "інакше Google дізнається про акцію лише з наступної збірки");
 }
 
 console.log("\n[5] Ідентифікатори та групи");

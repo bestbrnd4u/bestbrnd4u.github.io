@@ -2117,8 +2117,6 @@
       <g:additional_image_link>https://bestbrnd4u.com/assets/images/products/uploads/the-j-marc-shoulder-bag-green-glow1.webp?v=be67e115</g:additional_image_link>
       <g:availability>in_stock</g:availability>
       <g:price>9000.00 UAH</g:price>
-      <g:sale_price>8600.00 UAH</g:sale_price>
-      <g:sale_price_effective_date>2026-09-13T21:00:00+0000/2026-09-18T21:00:00+0000</g:sale_price_effective_date>
       <g:brand>Marc Jacobs</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>H956L01PF22-325</g:mpn>
@@ -2137,7 +2135,6 @@
         <g:country>UA</g:country>
         <g:price>60.00 UAH</g:price>
       </g:shipping>
-      <g:custom_label_0>акція</g:custom_label_0>
     </item>
     <item>
       <g:id>58-1</g:id>
@@ -2237,12 +2234,12 @@
       <g:id>60-1</g:id>
       <title>Сумка JACQUEMUS Le Grand Bambino Beige — Бежевий</title>
       <description>Елегантна сумка JACQUEMUS Le Grand Bambino. Впізнаваний мінімалістичний дизайн доповнений фірмовим логотипом JACQUEMUS та акуратною золотою фурнітурою. Модель виготовлена з натуральної шкіри та має структуровану прямокутну форму. Сумка оснащена верхньою ручкою, магнітною застібкою та знімним регульованим ремінцем, завдяки якому її можна носити на плечі або через плече. На задній стороні розташована кишеня для картки.</description>
-      <link>https://bestbrnd4u.com/p/sumka-jacquemus-le-grand-bambino-beige/?color=bezhevyi</link>
-      <g:image_link>https://bestbrnd4u.com/assets/images/products/uploads/rtlafd950301_33497199_1_v1_2x.webp?v=3b5f50c0</g:image_link>
-      <g:additional_image_link>https://bestbrnd4u.com/assets/images/products/uploads/rtlafd950301_33497201_2_v1_2x.webp?v=e1f4ba7d</g:additional_image_link>
-      <g:additional_image_link>https://bestbrnd4u.com/assets/images/products/uploads/rtlafd950301_33497202_3_v1_2x.webp?v=1c103cf3</g:additional_image_link>
-      <g:additional_image_link>https://bestbrnd4u.com/assets/images/products/uploads/rtlafd950301_33497204_4_v1_2x.webp?v=f68f35f7</g:additional_image_link>
-      <g:additional_image_link>https://bestbrnd4u.com/assets/images/products/uploads/rtlafd950301_33526729_9_v1_2x.webp?v=3c47194e</g:additional_image_link>
+      <link>https://dev.bestbrnd4u.com/p/sumka-jacquemus-le-grand-bambino-beige/?color=bezhevyi</link>
+      <g:image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/rtlafd950301_33497199_1_v1_2x.webp?v=3b5f50c0</g:image_link>
+      <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/rtlafd950301_33497201_2_v1_2x.webp?v=e1f4ba7d</g:additional_image_link>
+      <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/rtlafd950301_33497202_3_v1_2x.webp?v=1c103cf3</g:additional_image_link>
+      <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/rtlafd950301_33497204_4_v1_2x.webp?v=2af0291a</g:additional_image_link>
+      <g:additional_image_link>https://dev.bestbrnd4u.com/assets/images/products/uploads/rtlafd950301_33526729_9_v1_2x.webp?v=3c47194e</g:additional_image_link>
       <g:availability>in_stock</g:availability>
       <g:price>25000.00 UAH</g:price>
       <g:brand>Jacquemus</g:brand>
