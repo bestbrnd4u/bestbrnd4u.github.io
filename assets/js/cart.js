@@ -120,6 +120,30 @@ function renderCart() {
         if (preOrder) hasPreOrder = true;
 
         const qty = line.qty;
+
+        // МЕЖУ ВИДНО ДО НАТИСКАННЯ, А НЕ ПІСЛЯ.
+        //
+        // Кнопка «+» і так не дасть набрати більше, ніж є, — але доти
+        // вона виглядала звичайною, і людина дізнавалась про межу,
+        // лише тицьнувши. На товарі, якого одна штука, це трапляється
+        // з першого ж натискання.
+        //
+        // Сторінка товару про це вже каже заздалегідь (блок
+        // .only-one), кошик — ні. Тепер каже.
+        //
+        // ЧОМУ НЕ disabled. Вимкнена кнопка мовчить: людина бачить, що
+        // не можна, і не знає чому. Тут кнопка лишається натискною —
+        // клік показує ту саму підказку, що й раніше, — але вигляд і
+        // aria-disabled кажуть про межу заздалегідь.
+        const lineMax = lineLimit(line.id, line.color, line.size);
+        const atMax = lineMax !== null && qty >= lineMax;
+
+        // Текст один на всі місця: підказка в кошику, підказка на
+        // сторінці товару й ця підпис — звучать однаково.
+        const maxReason = lineMax === 1
+            ? "Це останній екземпляр"
+            : `Більше немає: у наявності ${lineMax} шт.`;
+
         const lineTotal = priceNow(product) * qty;
         const lineTotalFull = (oldPriceNow(product) || priceNow(product)) * qty;
 
@@ -232,7 +256,7 @@ function renderCart() {
                 <div class="cart-item-qty">
                     <button class="qty-btn qty-minus" data-id="${line.id}" data-color="${line.color || ""}" data-size="${line.size || ""}" aria-label="Зменшити кількість">−</button>
                     <span>${qty}</span>
-                    <button class="qty-btn qty-plus" data-id="${line.id}" data-color="${line.color || ""}" data-size="${line.size || ""}" aria-label="Збільшити кількість">+</button>
+                    <button class="qty-btn qty-plus${atMax ? " is-max" : ""}" data-id="${line.id}" data-color="${line.color || ""}" data-size="${line.size || ""}"${atMax ? ` aria-disabled="true" title="${escapeHtml(maxReason)}"` : ""} aria-label="${atMax ? escapeHtml(maxReason) : "Збільшити кількість"}">+</button>
                 </div>
 
                 <div class="cart-item-total">
