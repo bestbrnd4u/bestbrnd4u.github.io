@@ -1394,7 +1394,10 @@ function createCollectionProductCard(product) {
                     loading="lazy"
                     onerror="this.src='assets/images/no-image.png'">
 
-                <button class="favorite" data-id="${product.id}" title="Додати в обране">
+                <button class="favorite" data-id="${product.id}"
+                        aria-pressed="false"
+                        aria-label="В обране: ${escapeHtml(product.title)}"
+                        title="Додати в обране">
                     <svg viewBox="0 0 24 24">
                         <path d="M12 21s-6.7-4.4-9.3-8.3C.9 9.6 1.7 5.9 5.1 4.9c2-.6 4 .2 5.2 1.9l1.7 2.3 1.7-2.3c1.2-1.7 3.2-2.5 5.2-1.9 3.4 1 4.2 4.7 2.4 7.8C18.7 16.6 12 21 12 21z"/>
                     </svg>

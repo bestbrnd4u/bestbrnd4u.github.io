@@ -480,6 +480,21 @@ function createProductCard(product, eager) {
 
     const brand = product.brand || "Без бренду";
 
+    // ІМ'Я КАРТКИ ДЛЯ ТОГО, ХТО НЕ БАЧИТЬ ЕКРАНА.
+    //
+    // У каталозі один товар у кількох кольорах показується кількома
+    // картками (splitProductsByColor у catalog.js), і назва в них
+    // ОДНАКОВА. Очима їх розрізняє свотч; списком кнопок — нічим:
+    // заміряно на проді 25.09.2026, чотири картки «Жіноча сумочка
+    // Coach Tabby Shoulder Bag 26» поспіль, 28 карток на 22 назви.
+    //
+    // Тому в ім'я кнопки додаємо колір саме цієї картки. Видимий
+    // текст при цьому лишається початком імені — цього вимагає
+    // WCAG 2.5.3 «Підпис у назві» для голосового керування.
+    const cardName = product.cardColor
+        ? `${product.title}, колір ${product.cardColor}`
+        : product.title;
+
 
     // показуємо розміри ПЕРШОГО кольору (він активний за
     // замовчуванням); при перемиканні кольору список оновлює
@@ -520,6 +535,8 @@ function createProductCard(product, eager) {
                 <button
                     class="favorite"
                     data-id="${product.id}"
+                    aria-pressed="false"
+                    aria-label="В обране: ${escapeHtml(cardName)}"
                     title="Додати в обране">
                     <svg viewBox="0 0 24 24">
                         <path d="M12 21s-6.7-4.4-9.3-8.3C.9 9.6 1.7 5.9 5.1 4.9c2-.6 4 .2 5.2 1.9l1.7 2.3 1.7-2.3c1.2-1.7 3.2-2.5 5.2-1.9 3.4 1 4.2 4.7 2.4 7.8C18.7 16.6 12 21 12 21z"/>
@@ -574,7 +591,8 @@ function createProductCard(product, eager) {
                     </div>
                     <button
                         class="btn buy-btn"
-                        data-id="${product.id}">
+                        data-id="${product.id}"
+                        aria-label="${product.preOrder ? "Замовити" : "Купити"}: ${escapeHtml(cardName)}">
                         ${product.preOrder ? "Замовити" : "Купити"}
                     </button>
                 </div>
@@ -595,7 +613,7 @@ function createProductCard(product, eager) {
                          самій картці колір переносить уже давно — тут
                          вирівнюємо поведінку. -->
                     <a href="${productUrl(product, product.cardColor ? { color: product.cardColor } : null)}"
-                       class="product-title-link">${escapeHtml(product.title)}</a>
+                       class="product-title-link"${product.cardColor ? ` aria-label="${escapeHtml(cardName)}"` : ""}>${escapeHtml(product.title)}</a>
                 </div>
                 <div class="product-meta-row">
                     <div class="product-price">
@@ -622,7 +640,8 @@ function createProductCard(product, eager) {
                 ${product.preOrder ? `<div class="preorder-row">📦 Під замовлення</div>` : ""}
                 <button
                     class="btn buy-btn"
-                    data-id="${product.id}">
+                    data-id="${product.id}"
+                    aria-label="${product.preOrder ? "Замовити" : "Купити"}: ${escapeHtml(cardName)}">
                     ${product.preOrder ? "Замовити" : "Купити"}
                 </button>
             </div>
