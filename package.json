@@ -6,7 +6,7 @@
   "scripts": {
     "test": "node tests/run-all.js",
     "serve": "node scripts/serve.js",
-    "build": "node scripts/apply-site-env.js && node scripts/build-categories.js && node scripts/build-brands.js && node scripts/pull-reviews.js && node scripts/build-products.js && node scripts/build-product-pages.js && node scripts/build-taxonomy-pages.js && node scripts/build-promotions.js && node scripts/build-collections.js && node scripts/build-promo-popups.js && node scripts/build-home-static.js && node scripts/build-legal.js && node scripts/sync-fonts.js && node scripts/build-sitemap.js && node scripts/build-feed.js && node scripts/build-llms.js && node scripts/apply-cache-version.js",
+    "build": "node scripts/apply-site-env.js && node scripts/build-categories.js && node scripts/build-brands.js && node scripts/pull-reviews.js && node scripts/build-products.js && node scripts/build-product-pages.js && node scripts/build-taxonomy-pages.js && node scripts/build-promotions.js && node scripts/build-collections.js && node scripts/build-promo-popups.js && node scripts/build-home-static.js && node scripts/build-legal.js && node scripts/sync-fonts.js && node scripts/build-sitemap.js && node scripts/build-feed.js && node scripts/build-llms.js && node scripts/build-breadcrumb-schema.js && node scripts/apply-cache-version.js",
     "build:media": "node scripts/shrink-heavy-images.js --apply && node scripts/whiten-backgrounds.js --apply && node scripts/normalize-media-names.js && node scripts/normalize-product-images.js --apply && node scripts/auto-frame-products.js --apply",
     "images:shrink": "node scripts/shrink-heavy-images.js",
     "images:shrink:apply": "node scripts/shrink-heavy-images.js --apply",

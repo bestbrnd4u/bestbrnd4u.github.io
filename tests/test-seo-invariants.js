@@ -363,6 +363,90 @@ console.log("\n[4b] Картка посилання є в кожної стор�
         && /setMetaByProperty\("og:image"/.test(read("assets/js/promo.js")));
 }
 
+console.log("\n[4c] Доріжку бачить не лише людина, а й Google");
+{
+    // ЩО ЦЕ ЗАКРИВАЄ
+    // ---------------
+    // З розмітки BreadcrumbList Google малює шлях у результатах
+    // пошуку замість голої адреси. Заміряно 25.09.2026: 130+
+    // згенерованих сторінок її мали — товари, бренди, категорії,
+    // розділи, — а з десяти індексованих сторінок у корені не мала
+    // ЖОДНА. Доріжка на них була, але тільки для ока.
+    //
+    // Діра рівно там, де сторінку пише людина, а не скрипт: обидва
+    // генератори кличуть Breadcrumbs.toJsonLd(), а руками про це
+    // забували.
+    //
+    // ЧОМУ ЗВІРЯЄМО З ВИДИМОЮ ДОРІЖКОЮ, А НЕ ПРОСТО «ЧИ Є».
+    // Другий перелік ланок розійшовся б із тим, що на сторінці, і
+    // Google показував би шлях, якого немає. Тому джерело одне — та
+    // сама розмітка, і тест бере її тим самим кодом, що й збірка.
+    const { trailOf } = require("../scripts/build-breadcrumb-schema.js");
+
+    const pages = fs.readdirSync(ROOT).filter(file => file.endsWith(".html"));
+
+    const без = [];
+    const розбіжні = [];
+    let перевірено = 0;
+
+    pages.forEach(file => {
+
+        const html = read(file);
+
+        // Власний robots — ОСТАННІЙ: перший додає dev-збірка.
+        const robots = [...html.matchAll(/<meta name="robots" content="([^"]*)"/g)].map(m => m[1]);
+        const свій = robots.length ? robots[robots.length - 1] : "index,follow";
+
+        if (/noindex/.test(свій)) return;
+
+        const trail = trailOf(html);
+
+        if (!trail) return;          // доріжки немає — нічого й вимагати
+
+        перевірено += 1;
+
+        const hit = html.match(/id="breadcrumbSchema">([\s\S]*?)<\/script>/);
+
+        if (!hit) { без.push(file); return; }
+
+        let назви;
+        try {
+            назви = JSON.parse(hit[1]).itemListElement.map(item => item.name);
+        } catch (error) {
+            розбіжні.push(`${file}: розмітка не розбирається — ${error.message}`);
+            return;
+        }
+
+        const видимі = trail.map(crumb => crumb.label);
+
+        if (JSON.stringify(назви) !== JSON.stringify(видимі)) {
+            розбіжні.push(`${file}: розмітка «${назви.join(" / ")}» проти видимої «${видимі.join(" / ")}»`);
+        }
+
+    });
+
+    check(`сторінок із доріжкою — ${перевірено}`, перевірено >= 8, перевірено);
+
+    check("у кожної є BreadcrumbList", без.length === 0, без.join(", "));
+
+    check("і він слово в слово повторює видиму доріжку",
+        розбіжні.length === 0, розбіжні.slice(0, 3).join("; "));
+
+    // Кнопка «Назад» — навігація, а не ланка шляху. Її текст —
+    // «&lsaquo; Назад», і порівняння з голим «Назад» її не ловило:
+    // стрілка потрапляла в розмітку першою ланкою.
+    const builder = read("scripts/build-breadcrumb-schema.js");
+
+    check("кнопка «Назад» у доріжку не потрапляє",
+        /\/Назад\/i\.test\(label\)/.test(builder)
+        && /&\[a-z\]\+;/.test(builder));
+
+    // Крок мусить бути в збірці, інакше нова сторінка знову лишиться
+    // без розмітки.
+    check("крок вбудований у npm run build",
+        /build-breadcrumb-schema\.js/.test(read("package.json")));
+}
+
 console.log("\n[5] Canonical вказує на себе, а не кудись");
 {
     const dir = path.join(ROOT, "p");
