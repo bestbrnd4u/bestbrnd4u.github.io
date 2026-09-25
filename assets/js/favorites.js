@@ -89,6 +89,13 @@ function createFavoriteRow(product, favEntry) {
     // завжди відкривався перший колір товару.
     const rowUrl = productUrl(product, { color: activeColor, size: activeSize });
 
+    // Ім'я рядка для кнопок: у списку може лежати той самий товар у
+    // двох кольорах, і без кольору обидві кнопки «Видалити з
+    // обраного» звучали б однаково.
+    const rowName = activeColor
+        ? `${product.title}, колір ${activeColor}`
+        : product.title;
+
     // Кружечки кольорів не підписані, тож назву показуємо окремо.
     const colorLabel = activeColor
         ? `<div class="favorite-row-color">Колір: <b>${escapeHtml(activeColor)}</b></div>`
@@ -136,10 +143,12 @@ function createFavoriteRow(product, favEntry) {
             </div>
 
             <div class="favorite-row-actions">
-                <button class="btn buy-btn" data-id="${product.id}">
+                <button class="btn buy-btn" data-id="${product.id}"
+                        aria-label="Додати в кошик: ${escapeHtml(rowName)}">
                     Додати в кошик
                 </button>
-                <button class="favorite-row-remove favorite active" data-id="${product.id}">
+                <button class="favorite-row-remove favorite active" data-id="${product.id}"
+                        aria-label="Видалити з обраного: ${escapeHtml(rowName)}">
                     ✕ Видалити з обраного
                 </button>
             </div>
