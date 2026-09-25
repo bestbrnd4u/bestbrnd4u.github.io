@@ -739,17 +739,94 @@ function getGroupedCartLines() {
 
 }
 
+// Скільки одиниць цього кольору й розміру магазин узагалі може
+// продати. null — межі немає або вона невідома.
+//
+// ОДНА ФУНКЦІЯ НА ДВА МІСЦЯ, І ЦЕ ТУТ ГОЛОВНЕ.
+//
+// Перевірка залишку вже була — у кошику, на кнопці «+»
+// (changeQty у cart.js). А кнопка «Купити» на сторінці товару
+// просто робила cart.push() і не питала нічого.
+//
+// Заміряно на проді 25.09.2026: у кросівок Lacoste L003 розміру 37
+// залишок 1. Два кліки «Купити» клали в кошик ДВІ пари без єдиного
+// слова. Далі кошик показував «2 × 5 900 = 11 800» і чесно
+// відмовлявся додати третю — тобто перевірка спрацьовувала вже
+// після того, як межу перейшли.
+//
+// Магазин торгує переважно одиничними екземплярами, тож це не
+// дрібниця обліку: замовлення на дві пари з однієї — це або
+// повернення грошей, або розмова з покупцем.
+//
+// Тому правило живе тут, у common.js, який є на КОЖНІЙ сторінці, а
+// cart.js кличе саме його. Дві копії розійшлися б — і розбіжність
+// вилізла б знову там, де її найважче помітити.
+function cartLineLimit(product, color, size) {
+
+    const stock = typeof window !== "undefined" ? window.Stock : null;
+
+    if (!stock || !product) return null;
+
+    // Під замовлення возять будь-яку кількість — це спосіб роботи
+    // магазину, а не виняток.
+    if (product.preOrder) return null;
+
+    const variants = product.variants || [];
+
+    const variant = variants.find(item => item && item.color === color) || variants[0];
+
+    if (!variant) return null;
+
+    const have = stock.sizeQty(stock.variantStock(product, variant), size || "ONESIZE");
+
+    // null — залишок не порахований. Не вигадуємо межу там, де
+    // магазин її не ставив.
+    return typeof have === "number" && have > 0 ? have : null;
+
+}
+
+// Скільки таких самих одиниць уже лежить у кошику.
+//
+// Порівняння саме таке, як у cart.js: color і size зводимо до null,
+// бо в сховищі вони бувають і відсутні, і порожні.
+function cartLineCount(cart, id, color, size) {
+
+    return cart.filter(entry =>
+        Number(entry.id) === Number(id) &&
+        (entry.color || null) === (color || null) &&
+        (entry.size || null) === (size || null)
+    ).length;
+
+}
+
 async function addToCart(id, options = {}) {
 
     const { color = null, size = null } = options;
 
+    // Товар дістаємо ДО того, як щось класти: без нього не порахувати
+    // межу. Раніше він читався після push — саме тому перевірки там і
+    // не було.
+    const product = await getProductById(id);
+
     const cart = getCart();
+
+    const limit = cartLineLimit(product, color, size);
+
+    if (limit !== null && cartLineCount(cart, id, color, size) >= limit) {
+
+        // Той самий текст, що в кошику: людина має чути одне й те саме
+        // пояснення, незалежно від того, звідки натиснула.
+        showToast(limit === 1
+            ? "Це останній екземпляр"
+            : `Більше немає: у наявності ${limit} шт.`);
+
+        return;
+
+    }
 
     cart.push({ id: Number(id), color, size });
 
     saveCart(cart);
-
-    const product = await getProductById(id);
 
     if (product) {
 
