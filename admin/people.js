@@ -369,8 +369,11 @@
         state.kind = tab.dataset.kind;
         state.page = 1;
 
-        [...el("tabs").querySelectorAll(".tab")].forEach(item =>
-            item.classList.toggle("on", item.dataset.kind === state.kind));
+        [...el("tabs").querySelectorAll(".tab")].forEach(item => {
+            const on = item.dataset.kind === state.kind;
+            item.classList.toggle("on", on);
+            item.setAttribute("aria-selected", on ? "true" : "false");
+        });
 
         load();
 
