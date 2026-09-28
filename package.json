@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "js-yaml": "^5.4.2",
-    "jsdom": "^30.1.0",
+    "jsdom": "^30.1.1",
     "onnxruntime-node": "^1.30.0",
     "sharp": "^0.35.4"
   },
