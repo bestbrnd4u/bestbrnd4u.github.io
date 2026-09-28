@@ -97,15 +97,51 @@ function xmlEscape(value) {
 
 // Абсолютна адреса. У даних трапляються обидві форми — «/assets/…» і
 // «assets/…» (див. products.json), а фід приймає лише повні адреси.
+// АДРЕСА В МАШИННОМУ ФАЙЛІ МУСИТЬ БУТИ ASCII.
+//
+// Заміряно 25.09.2026. У фіді два g:image_link і в карті сайту чотири
+// image:loc виглядали так:
+//
+//     .../assets/images/products/uploads/загрузка.webp
+//
+// Кирилиця в імені файлу — байтами, як є. І Google, і sitemaps.org
+// вимагають адресу закодованою: «all URLs must be URL-encoded». Для
+// браузера це байдуже (він кодує сам), а от машинний читач має повне
+// право таку адресу не взяти — і тоді товар лишиться у Покупках без
+// фото.
+//
+// encodeURI, а не encodeURIComponent: перший лишає «/», «?», «&» і «=»
+// на місці, тож адреса не перестає бути адресою.
+//
+// АЛЕ encodeURI ЕКРАНУЄ Й САМ «%». Я на цьому спіткнувся: у доріжці
+// на сторінці товару вже стоїть закодоване
+//
+//     /catalog?gender=%D0%96%D1%96%D0%BD%D0%BA%D0%B0%D0%BC
+//
+// і після encodeURI воно стало %25D0%2596… — посилання «Жінкам» на
+// всіх 103 сторінках вело б у каталог, відфільтрований за буквальним
+// рядком «%D0%96…», тобто в порожнечу. Тести цього не побачили,
+// побачив діфф.
+//
+// Тому повертаємо назад ті «%25», за якими йдуть дві шістнадцяткові
+// цифри: це був справжній %XX, а не відсоток у тексті.
+function encodeOnce(url) {
+
+    return encodeURI(url).replace(/%25([0-9A-Fa-f]{2})/g, "%$1");
+
+}
+
 function absolute(url, siteUrl) {
 
     const clean = String(url || "").trim();
 
     if (!clean) return "";
 
-    if (/^https?:\/\//i.test(clean)) return clean;
+    const full = /^https?:\/\//i.test(clean)
+        ? clean
+        : `${siteUrl || SITE_URL}/${clean.replace(/^\/+/, "")}`;
 
-    return `${siteUrl || SITE_URL}/${clean.replace(/^\/+/, "")}`;
+    return encodeOnce(full);
 
 }
 

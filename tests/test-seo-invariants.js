@@ -732,5 +732,138 @@ console.log("\n[8] Збірка sitemap запускається сама");
         /build-sitemap\.js/.test(read("package.json")));
 }
 
+console.log("\n[9] Адреса для машини — тільки ASCII");
+{
+    // РОЗДІЛ [7] ВИЩЕ ЦЕ ВЖЕ ПЕРЕВІРЯВ — але лише для <loc>, тобто для
+    // адрес сторінок. Вони складаються зі слагів, які й так латинські,
+    // тож перевірка була зеленою завжди. Адреси ФОТО в <image:loc>,
+    // у фіді й у картці месенджера вона не бачила — а зламані були
+    // саме вони.
+    //
+    // ЗАМІРЯНО 25.09.2026.
+    //
+    //   sitemap.xml   4 × <image:loc> .../uploads/загрузка.webp
+    //   feed.xml      2 × <g:image_link> те саме
+    //   og:image      те саме на сторінці товару
+    //
+    // Кирилиця в імені файлу — байтами, як є. Браузерові байдуже: він
+    // кодує адресу сам, і покупець фото бачив. Але ці три файли
+    // читають не браузери, а sitemaps.org вимагає «all URLs must be
+    // URL-encoded», і Google те саме про фід. Машинний читач має повне
+    // право таку адресу не взяти — і тоді товар лишиться у Покупках
+    // без фото, а посилання в месенджері — без картинки.
+    //
+    // Тому питаємо не «чи є кирилиця в файлі» (у назвах фото вона
+    // доречна й потрібна), а саме «чи є вона в АДРЕСІ».
+    const NON_ASCII = /[^\x00-\x7F]/;
+
+    const адреси = [];
+
+    // 1. Карта сайту: <loc> і <image:loc>
+    const sitemap = fs.readFileSync(path.join(ROOT, "sitemap.xml"), "utf8");
+
+    (sitemap.match(/<(?:loc|image:loc)>[^<]*<\/(?:loc|image:loc)>/g) || [])
+        .forEach(tag => {
+            const value = tag.replace(/<[^>]*>/g, "");
+            if (NON_ASCII.test(value)) адреси.push(`sitemap.xml: ${value.slice(0, 80)}`);
+        });
+
+    // 2. Фід: посилання на товар і на фото.
+    //
+    // Посилання на товар лежить у ЗВИЧАЙНОМУ <link>, а не <g:link> —
+    // перша версія цієї перевірки шукала тільки теги з префіксом і
+    // мовчки проходила повз усі 135 посилань. Знайшлось це не тестом,
+    // а тим, що я пішов подивитись на фід очима.
+    const feedPath = path.join(ROOT, "feed.xml");
+
+    if (fs.existsSync(feedPath)) {
+
+        const feed = fs.readFileSync(feedPath, "utf8");
+
+        const теги = [
+            ...(feed.match(/<link>[^<]*<\/link>/g) || []),
+            ...(feed.match(/<g:(?:image_link|additional_image_link)>[^<]*<\/g:[a-z_]+>/g) || [])
+        ];
+
+        check("посилання у фіді взагалі знайшлись", теги.length > 0, String(теги.length));
+
+        теги.forEach(tag => {
+            const value = tag.replace(/<[^>]*>/g, "");
+            if (NON_ASCII.test(value)) адреси.push(`feed.xml: ${value.slice(0, 80)}`);
+        });
+
+    }
+
+    // 3. Сторінки: картка месенджера, canonical і адреси в розмітці
+    const сторінки = fs.readdirSync(ROOT).filter(f => f.endsWith(".html"))
+        .concat(["p", "brands", "categories", "departments"].flatMap(dir => {
+            const full = path.join(ROOT, dir);
+            if (!fs.existsSync(full)) return [];
+            return fs.readdirSync(full)
+                .filter(d => fs.existsSync(path.join(full, d, "index.html")))
+                .map(d => `${dir}/${d}/index.html`);
+        }));
+
+    сторінки.forEach(rel => {
+
+        const html = fs.readFileSync(path.join(ROOT, rel), "utf8");
+
+        const url = re => (html.match(re) || []).map(m => m.replace(/.*content="|.*href="|"$/g, ""));
+
+        [
+            ...url(/<meta property="og:image" content="[^"]*"/g),
+            ...url(/<meta property="og:url" content="[^"]*"/g),
+            ...url(/<link[^>]*rel="canonical"[^>]*href="[^"]*"/g)
+        ].forEach(value => {
+            if (NON_ASCII.test(value)) адреси.push(`${rel}: ${value.slice(0, 80)}`);
+        });
+
+    });
+
+    console.log(`  · перевірено ${сторінки.length} сторінок, карту сайту і фід`);
+
+    check("жодна адреса для машини не містить кирилиці",
+        адреси.length === 0, адреси.slice(0, 4).join("; "));
+
+    // І ДРУГИЙ БІК ТІЄЇ САМОЇ ПОМИЛКИ — ЗАКОДОВАНО ДВІЧІ.
+    //
+    // Коли я додавав кодування, encodeURI екранував і сам «%»: уже
+    // закодоване /catalog?gender=%D0%96… стало %25D0%2596…, і доріжка
+    // на 103 сторінках вела в каталог, відфільтрований за буквальним
+    // рядком. Усі 185 наборів лишились зеленими — бо кирилиці в
+    // адресі вже не було, а перевірки на зайве кодування не було
+    // взагалі. Побачив я це в діффі, а не в тестах.
+    //
+    // «%25» перед двома шістнадцятковими цифрами — це майже завжди
+    // помилка: справжній відсоток у тексті адреси трапляється, але за
+    // ним не стоїть саме %XX.
+    const подвійні = [];
+
+    const шукати = (де, текст) => {
+        (текст.match(/%25[0-9A-Fa-f]{2}/g) || []).forEach(m =>
+            подвійні.push(`${де}: ${m}`));
+    };
+
+    шукати("sitemap.xml", sitemap);
+
+    if (fs.existsSync(feedPath)) шукати("feed.xml", fs.readFileSync(feedPath, "utf8"));
+
+    сторінки.forEach(rel => {
+        const html = fs.readFileSync(path.join(ROOT, rel), "utf8");
+        (html.match(/(?:href|content)="[^"]*%25[0-9A-Fa-f]{2}[^"]*"/g) || [])
+            .forEach(m => подвійні.push(`${rel}: ${m.slice(0, 70)}`));
+    });
+
+    check("жодна адреса не закодована двічі",
+        подвійні.length === 0, подвійні.slice(0, 4).join("; "));
+
+    // І контроль здорового глузду: у карті сайту кирилиця Є — у назвах
+    // фото. Якби перевірка вище ловила «будь-яку кирилицю», вона
+    // червоніла б на цілком правильному файлі.
+    check("а в назвах фото кирилиця лишилась",
+        /<image:title>[^<]*[^\x00-\x7F]/.test(sitemap),
+        "перевірка [7] мусить дивитись на адреси, а не на весь файл");
+}
+
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
 process.exit(failures === 0 ? 0 : 1);
