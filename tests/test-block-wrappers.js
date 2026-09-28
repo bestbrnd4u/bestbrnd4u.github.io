@@ -168,5 +168,82 @@ console.log("\n[2] Пункти «Частих запитань» — у спи�
         /gap\s*:\s*[1-9]/.test(правило), правило.replace(/\s+/g, " ").slice(0, 80));
 }
 
+console.log("\n[3] Підписка — окремою секцією, а не в колонці футера");
+{
+    // ЧОМУ ЦЕ НЕ ПРО КРАСУ.
+    //
+    // subscribe.js ховає пропозицію підписатись тому, хто вже
+    // підписаний, і ховає він ось що:
+    //
+    //     form.closest("section.newsletter") || form
+    //
+    // Тобто форма в секції — ховається СЕКЦІЯ ЦІЛКОМ, а форма в
+    // футері — тільки форма, і в колонці лишається дірка. Перевірено
+    // на кошику: секція 727px зникає повністю, футер під'їжджає рівно
+    // на цю висоту.
+    //
+    // Плюс те, з чого все почалось: у вузькій колонці футера текст
+    // згоди наповзав на кнопку «нагору», а заголовка не було зовсім.
+    //
+    // ДВІ СТОРІНКИ БЕЗ ПІДПИСКИ — НАВМИСНО. На оформленні вона тягне
+    // увагу вбік від оплати, а на сторінці підтвердження людина
+    // щойно підписалась: пропонувати їй підписатись знову безглуздо.
+    const БЕЗ_ПІДПИСКИ = ["checkout.html", "newsletter-confirm.html"];
+
+    const уФутері = [];
+    const позаСекцією = [];
+    const зайві = [];
+    let зПідпискою = 0;
+
+    PAGES.forEach(rel => {
+
+        const html = fs.readFileSync(path.join(ROOT, rel), "utf8");
+
+        if (/http-equiv=["']refresh["']/i.test(html)) return;
+
+        const форм = (html.match(/<form class="subscribe"/g) || []).length;
+
+        if (БЕЗ_ПІДПИСКИ.includes(rel)) {
+            if (форм) зайві.push(`${rel}: форм ${форм}`);
+            return;
+        }
+
+        if (!форм) { позаСекцією.push(`${rel}: форми немає зовсім`); return; }
+
+        зПідпискою++;
+
+        if (/<footer>[\s\S]*?<form class="subscribe"[\s\S]*?<\/footer>/.test(html)) {
+            уФутері.push(rel);
+        }
+
+        const doc = new JSDOM(html).window.document;
+
+        doc.querySelectorAll("form.subscribe").forEach(form => {
+            if (!form.closest("section.newsletter")) позаСекцією.push(rel);
+        });
+
+    });
+
+    console.log(`  · сторінок із підпискою: ${зПідпискою}, без неї: ${БЕЗ_ПІДПИСКИ.length}`);
+
+    check("сторінок із підпискою достатньо", зПідпискою > 10, String(зПідпискою));
+
+    check("у футері форми немає ніде", уФутері.length === 0, уФутері.join(", "));
+
+    check("кожна форма — усередині section.newsletter",
+        позаСекцією.length === 0, позаСекцією.join(", "));
+
+    check("на оформленні й підтвердженні підписки немає",
+        зайві.length === 0, зайві.join(", "));
+
+    // І скрипт там теж зайвий: інших form.subscribe на цих сторінках
+    // немає, а назовні subscribe.js нічого не віддає.
+    const зіСкриптом = БЕЗ_ПІДПИСКИ.filter(rel =>
+        /<script src="assets\/js\/subscribe\.js/.test(fs.readFileSync(path.join(ROOT, rel), "utf8")));
+
+    check("і скрипт підписки звідти прибрано",
+        зіСкриптом.length === 0, зіСкриптом.join(", "));
+}
+
 console.log(failures ? `\n✗ Провалено: ${failures}` : "\n✓ Усе зелено");
 process.exit(failures ? 1 : 0);

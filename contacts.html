@@ -2,7 +2,8 @@
 <html lang="uk">
 
 <head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"584f8595","data/catalog.json":"518a3f1b","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"00e8da26","data/image-variants.json":"7f73a794","data/legal.json":"f84751b2","data/notifications.json":"a35b367f","data/product-texts.json":"278df72d","data/products-updated.json":"4fb62ea6","data/products.json":"3c1e6809","data/promo-popups.json":"0940ece5","data/promotions.json":"fd2ed22f","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/security.json":"0c05c691","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"584f8595","data/catalog.json":"506648c1","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"00e8da26","data/image-variants.json":"7f73a794","data/legal.json":"f84751b2","data/notifications.json":"a35b367f","data/product-texts.json":"278df72d","data/products-updated.json":"4fb62ea6","data/products.json":"574243a4","data/promo-popups.json":"0940ece5","data/promotions.json":"fd2ed22f","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/security.json":"0c05c691","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script>
+    <meta name="robots" content="noindex,nofollow">
     <meta charset="UTF-8">
     <meta name="author" content="BestBrnd4u">
     <meta name="copyright" content="© 2026 BestBrnd4u. Усі права захищено.">
@@ -231,6 +232,65 @@
 
 </section>
 
+
+<!-- Підписка на листи.
+
+     Форма стояла в колонці футера, під годинами роботи: у вузькій
+     колонці текст згоди наповзав на кнопку «нагору», а заголовка не
+     було зовсім. У каталозі її давно винесли в окрему секцію — решта
+     сторінок просто відстала.
+
+     Ключ MailerLite живе в секретах: адресу приймає наша функція, а
+     не браузер. Галочка згоди НЕ проставлена заздалегідь — згода,
+     якої людина не ставила, згодою не є.
+
+     Підпис поля лишається в розмітці для читалок екрана, а видимим
+     заголовком служить <h2> (див. .newsletter .subscribe-label у
+     style.css). -->
+<section class="newsletter">
+
+    <div class="container">
+
+        <h2>Новинки й акції на пошту</h2>
+
+        <form class="subscribe" id="subscribeForm" novalidate>
+
+            <label class="subscribe-label" for="subscribeEmail">
+                Новинки й акції на пошту
+            </label>
+
+            <div class="subscribe-row">
+                <input
+                    type="email"
+                    id="subscribeEmail"
+                    placeholder="you@example.com"
+                    autocomplete="email"
+                    required>
+                <button type="submit" id="subscribeSubmit">Підписатись</button>
+            </div>
+
+            <label class="subscribe-consent">
+                <input type="checkbox" id="subscribeConsent">
+                <span>
+                    Згоден отримувати листи про новинки й акції.
+                    Відписатись можна з будь-якого листа —
+                    <a href="privacy-policy">як ми поводимось із даними.</a>
+                </span>
+            </label>
+
+            <p class="subscribe-note" id="subscribeNote" hidden></p>
+
+        </form>
+
+        <small>
+        Жодного спаму.
+        Тільки акції та нові колекції.
+        </small>
+
+    </div>
+
+</section>
+
 <footer>
 
     <div class="container footer">
@@ -302,45 +362,6 @@
             <p>☎ <a class="phone-link" href="tel:+380737288291">+380 73 728 82 91</a></p>
 
             <p>🕘 Пн–Нд 09:00–20:00</p>
-
-            <!-- Підписка на листи.
-
-                 Раніше на кожній сторінці вантажився universal.js
-                 MailerLite (52 КБ) і не було жодної форми. Тепер
-                 навпаки: скрипта немає, а форма надсилає адресу
-                 через нашу функцію — ключ MailerLite живе в
-                 секретах, а не в коді сайту.
-
-                 Галочка НЕ проставлена заздалегідь: згода, якої
-                 людина не ставила, згодою не є. -->
-            <form class="subscribe" id="subscribeForm" novalidate>
-
-                <label class="subscribe-label" for="subscribeEmail">
-                    Новинки й акції на пошту
-                </label>
-
-                <div class="subscribe-row">
-                    <input
-                        type="email"
-                        id="subscribeEmail"
-                        placeholder="you@example.com"
-                        autocomplete="email"
-                        required>
-                    <button type="submit" id="subscribeSubmit">Підписатись</button>
-                </div>
-
-                <label class="subscribe-consent">
-                    <input type="checkbox" id="subscribeConsent">
-                    <span>
-                        Згоден отримувати листи про новинки й акції.
-                        Відписатись можна з будь-якого листа —
-                        <a href="privacy-policy">як ми поводимось із даними.</a>
-                    </span>
-                </label>
-
-                <p class="subscribe-note" id="subscribeNote" hidden></p>
-
-            </form>
 
         </div>
 
