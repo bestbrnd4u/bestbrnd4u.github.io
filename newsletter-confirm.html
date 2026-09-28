@@ -235,45 +235,6 @@
 
             <p>🕘 Пн–Нд 09:00–20:00</p>
 
-            <!-- Підписка на листи.
-
-                 Раніше на кожній сторінці вантажився universal.js
-                 MailerLite (52 КБ) і не було жодної форми. Тепер
-                 навпаки: скрипта немає, а форма надсилає адресу
-                 через нашу функцію — ключ MailerLite живе в
-                 секретах, а не в коді сайту.
-
-                 Галочка НЕ проставлена заздалегідь: згода, якої
-                 людина не ставила, згодою не є. -->
-            <form class="subscribe" id="subscribeForm" novalidate>
-
-                <label class="subscribe-label" for="subscribeEmail">
-                    Новинки й акції на пошту
-                </label>
-
-                <div class="subscribe-row">
-                    <input
-                        type="email"
-                        id="subscribeEmail"
-                        placeholder="you@example.com"
-                        autocomplete="email"
-                        required>
-                    <button type="submit" id="subscribeSubmit">Підписатись</button>
-                </div>
-
-                <label class="subscribe-consent">
-                    <input type="checkbox" id="subscribeConsent">
-                    <span>
-                        Згоден отримувати листи про новинки й акції.
-                        Відписатись можна з будь-якого листа —
-                        <a href="privacy-policy">як ми поводимось із даними.</a>
-                    </span>
-                </label>
-
-                <p class="subscribe-note" id="subscribeNote" hidden></p>
-
-            </form>
-
         </div>
 
     </div>
@@ -310,7 +271,6 @@
 <script src="assets/js/translit.js?v=c0957cb7" defer></script>
 <script src="assets/js/common.js?v=954cefaf" defer></script>
 <!-- Підписка на листи магазину -->
-<script src="assets/js/subscribe.js?v=eab64e3e" defer></script>
 <script src="assets/js/sync.js?v=48ef002e" defer></script>
 <script src="assets/js/mega-menu.js?v=689a9b61" defer></script>
 <!-- Підтвердження підписки: читає token з адреси й питає функцію -->
