@@ -15938,3 +15938,469 @@ body.refusal-open{
     }
 
 }
+
+
+/* =====================================
+   ДОК ЗВ'ЯЗКУ: ДЗВІНОК І ЧАТ
+
+   Лівий нижній кут. Правий зайнятий утрьох — стрілка «нагору»
+   (right:30 bottom:30), банер акції (right:24 bottom:24) і
+   сповіщення (right:20 bottom:20), — тож дві нові кнопки стали б
+   там четвертим шаром.
+
+   Розмір і тінь ті самі, що в стрілки «нагору»: це один клас
+   плаваючих кнопок, просто в різних кутах.
+===================================== */
+
+.contact-dock{
+    position:fixed;
+    left:30px;
+    bottom:30px;
+    z-index:999;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    /* Сам док нічого не ловить — лише кнопки в ньому. Інакше
+       невидима колонка між ними перехоплювала б кліки по товарах. */
+    pointer-events:none;
+    /* bottom змінюється: док підіймається над банером згоди й
+       мобільною кнопкою «Купити». Без переходу він стрибає в мить,
+       коли людина закриває банер. Те саме й з тієї ж причини робить
+       стрілка «нагору». */
+    transition:bottom 300ms ease;
+}
+
+.dock-slot{
+    display:flex;
+    pointer-events:auto;
+}
+
+.dock-btn{
+    position:relative;
+    width:48px;
+    height:48px;
+    border-radius:50%;
+    background:var(--primary);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:var(--shadow);
+    cursor:pointer;
+    border:none;
+    padding:0;
+    transition:transform 200ms var(--ease-out),
+               background-color 200ms ease;
+}
+
+.dock-btn:hover,
+.dock-btn:focus-visible{
+    transform:scale(1.06);
+    background:var(--secondary);
+}
+
+.dock-btn.is-active{
+    background:var(--secondary);
+}
+
+.dock-icon{
+    width:22px;
+    height:22px;
+    fill:none;
+    stroke:currentColor;
+    stroke-width:2;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+    flex-shrink:0;
+}
+
+/* Паперовий літачок Telegram пізнають залитим, контуром він читається
+   як випадкова пташка. Єдиний суцільний значок тут — тому окремий
+   клас, а не виняток усередині .dock-icon. */
+.dock-icon-solid{
+    fill:currentColor;
+    stroke:none;
+}
+
+/* ПІДКАЗКА БІЛЯ КНОПКИ
+
+   Виїжджає праворуч, бо кнопки стоять у лівому кутку. Текст у ній
+   слово в слово той самий, що в aria-label, — інакше голосове
+   керування не знайде кнопку за тим, що на ній написано. */
+.dock-hint{
+    position:absolute;
+    left:calc(100% + 12px);
+    top:50%;
+    transform:translateY(-50%) translateX(-6px);
+    white-space:nowrap;
+    background:var(--primary);
+    color:#fff;
+    font-size:13px;
+    font-weight:600;
+    padding:8px 14px;
+    border-radius:10px;
+    box-shadow:var(--shadow-sm);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity 200ms ease, transform 200ms var(--ease-out);
+}
+
+.dock-btn:hover .dock-hint,
+.dock-btn:focus-visible .dock-hint{
+    opacity:1;
+    transform:translateY(-50%) translateX(0);
+}
+
+/* =====================================
+   ПАНЕЛІ
+===================================== */
+
+.dock-panel{
+    position:fixed;
+    left:30px;
+    bottom:calc(30px + 48px + 12px + 48px + 12px);
+    z-index:1000;
+    width:320px;
+    max-width:calc(100vw - 60px);
+    background:#fff;
+    border-radius:var(--radius);
+    box-shadow:var(--shadow-lg);
+    padding:20px;
+    opacity:0;
+    transform:translateY(12px) scale(.97);
+    transform-origin:bottom left;
+    /* bottom у переліку не для краси: він теж міняється в станах
+       (банер згоди, кнопка «Купити»), а перехід без нього виглядає
+       як зникла анімація — шукати причину потім довго. */
+    transition:opacity 200ms ease,
+               transform 200ms var(--ease-out),
+               bottom 300ms ease;
+}
+
+.dock-panel.is-open{
+    opacity:1;
+    transform:translateY(0) scale(1);
+}
+
+/* hidden ЗАВЖДИ ховає: у цього блока власний display, і без явного
+   правила атрибут програв би йому — те саме вже ловили на .loader. */
+.dock-panel[hidden]{
+    display:none;
+}
+
+.dock-panel-head{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:16px;
+}
+
+.dock-panel-title{
+    font-size:16px;
+    font-weight:700;
+    color:var(--gray900);
+    margin:0;
+}
+
+.dock-panel-note{
+    font-size:13px;
+    color:var(--gray500);
+    margin:4px 0 0;
+    line-height:1.5;
+}
+
+/* 24×24 — найменша зона дотику, яку можна поцілити пальцем
+   (WCAG 2.5.8). Значок усередині менший, зона — ні. */
+.dock-panel-close{
+    flex-shrink:0;
+    width:28px;
+    height:28px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:none;
+    background:none;
+    color:var(--gray500);
+    cursor:pointer;
+    border-radius:8px;
+    transition:background-color 200ms ease, color 200ms ease;
+}
+
+.dock-panel-close:hover,
+.dock-panel-close:focus-visible{
+    background:var(--gray100);
+    color:var(--gray900);
+}
+
+.dock-panel-close .dock-icon{
+    width:16px;
+    height:16px;
+}
+
+.dock-sr{
+    position:absolute;
+    width:1px;
+    height:1px;
+    margin:-1px;
+    padding:0;
+    overflow:hidden;
+    clip:rect(0 0 0 0);
+    clip-path:inset(50%);
+    white-space:nowrap;
+    border:0;
+}
+
+/* =====================================
+   КАНАЛИ
+===================================== */
+
+.dock-channels{
+    list-style:none;
+    margin:0;
+    padding:0;
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+}
+
+.dock-channel{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:10px;
+    border-radius:12px;
+    color:var(--gray900);
+    text-decoration:none;
+    transition:background-color 200ms ease;
+}
+
+.dock-channel:hover,
+.dock-channel:focus-visible{
+    background:var(--gray50);
+}
+
+.dock-channel-icon{
+    flex-shrink:0;
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    background:var(--gray100);
+    color:var(--gray700);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.dock-channel-icon .dock-icon{
+    width:19px;
+    height:19px;
+}
+
+.dock-channel-text{
+    display:flex;
+    flex-direction:column;
+    min-width:0;
+}
+
+.dock-channel-name{
+    font-size:14px;
+    font-weight:600;
+}
+
+.dock-channel-sub{
+    font-size:12px;
+    color:var(--gray500);
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+/* =====================================
+   ФОРМА ЗВОРОТНОГО ДЗВІНКА
+===================================== */
+
+.dock-form{
+    display:flex;
+    flex-direction:column;
+}
+
+.dock-field{
+    font-size:13px;
+    font-weight:600;
+    color:var(--gray700);
+    margin-bottom:6px;
+}
+
+.dock-form input[type="tel"]{
+    width:100%;
+    padding:12px 14px;
+    border:1px solid var(--gray200);
+    border-radius:12px;
+    font-size:15px;
+    color:var(--gray900);
+    transition:border-color 200ms ease;
+}
+
+.dock-form input[type="tel"]:focus{
+    outline:none;
+    border-color:var(--secondary);
+}
+
+.dock-form input[aria-invalid="true"]{
+    border-color:var(--danger);
+}
+
+.dock-hint-text{
+    font-size:12px;
+    color:var(--gray500);
+    margin:6px 0 0;
+}
+
+/* Поки повідомлення немає, блок не займає місця — інакше панель
+   стрибає на висоту порожнього рядка при першій же помилці. */
+.dock-message{
+    margin:0;
+    font-size:13px;
+    line-height:1.5;
+}
+
+.dock-message:empty{
+    display:none;
+}
+
+.dock-message.is-error{
+    color:var(--danger);
+    margin-top:10px;
+}
+
+.dock-message.is-ok{
+    color:#15803d;
+    margin-top:10px;
+}
+
+.dock-submit{
+    margin-top:14px;
+    width:100%;
+    padding:14px 20px;
+    font-size:15px;
+}
+
+.dock-legal{
+    font-size:12px;
+    color:var(--gray500);
+    line-height:1.5;
+    margin:12px 0 0;
+}
+
+.dock-legal a{
+    color:var(--gray700);
+    text-decoration:underline;
+}
+
+/* =====================================
+   КОЛИ ВНИЗУ ВЖЕ ЩОСЬ Є
+
+   Банер згоди і мобільна кнопка «Купити» тримаються низу екрана на
+   всю ширину. Док у них під ногами — піднімаємо його так само, як
+   уже підіймається стрілка «нагору».
+===================================== */
+
+body:has(.consent-banner) .contact-dock{
+    bottom:calc(30px + 116px);
+}
+
+body:has(.consent-banner) .dock-panel{
+    bottom:calc(30px + 116px + 48px + 12px + 48px + 12px);
+}
+
+body:has(.mobile-sticky-cart.show) .contact-dock{
+    bottom:calc(100px + env(safe-area-inset-bottom, 0px));
+}
+
+body:has(.mobile-sticky-cart.show) .dock-panel{
+    bottom:calc(100px + env(safe-area-inset-bottom, 0px) + 48px + 12px + 48px + 12px);
+}
+
+/* БАНЕР ЗГОДИ І КНОПКА «КУПИТИ» СТОЯТЬ УНИЗУ ОДНОЧАСНО.
+
+   Перший перегляд сторінки товару з телефона — саме цей випадок, і
+   він був зламаний.
+
+   Два правила вище міряли один і той самий низ екрана, і вигравало
+   не те, що нижче в файлі, а те, у якого важчий селектор:
+   :has(.mobile-sticky-cart.show) — це ДВА класи проти одного в
+   :has(.consent-banner). Медіазапит ваги не додає, тож мобільне
+   правило на 166px програвало базовому на 100px — і кнопка
+   опинялась на 113 пікселів УСЕРЕДИНІ банера. Заміряно в браузері,
+   а не виведено з коду: з коду я був певен протилежного.
+
+   І це не «вищий із двох»: банер СТАВАТИМЕ НА кошик — вище вже є
+   правило «body:has(.mobile-sticky-cart.show) .consent-banner{
+   bottom:76px }». Тобто низ екрана займають обидва, один над одним,
+   і підніматись треба над сумою. 76 тут — та сама висота кошика, що
+   в тому правилі. */
+body:has(.consent-banner):has(.mobile-sticky-cart.show) .contact-dock{
+    bottom:calc(30px + 76px + 116px);
+}
+
+body:has(.consent-banner):has(.mobile-sticky-cart.show) .dock-panel{
+    bottom:calc(30px + 76px + 116px + 48px + 12px + 48px + 12px);
+}
+
+/* Шторка «Всі фільтри» має власний футер на всю ширину — док сховати
+   зовсім, як і стрілку «нагору». */
+body.mobile-filters-open .contact-dock{
+    opacity:0;
+    pointer-events:none;
+}
+
+@media(max-width:768px){
+
+    .contact-dock{
+        left:16px;
+        bottom:16px;
+    }
+
+    /* На вузькому екрані панель стає на всю ширину: 320px біля краю
+       лишали б 40px порожнечі справа, а текст усе одно тулився. */
+    .dock-panel{
+        left:16px;
+        right:16px;
+        width:auto;
+        max-width:none;
+        bottom:calc(16px + 48px + 12px + 48px + 12px);
+    }
+
+    body:has(.consent-banner) .contact-dock{
+        bottom:calc(16px + 150px);
+    }
+
+    body:has(.consent-banner) .dock-panel{
+        bottom:calc(16px + 150px + 48px + 12px + 48px + 12px);
+    }
+
+    /* Банер на вузькому екрані переносить рядки й виростає зі 77px до
+       150 (заміряно на 375×812), а стоїть він на кошику — тож
+       піднімаємось над сумою. Це найперший перегляд товару з
+       телефона, тобто випадок не рідкісний, а типовий. */
+    body:has(.consent-banner):has(.mobile-sticky-cart.show) .contact-dock{
+        bottom:calc(16px + 76px + 150px);
+    }
+
+    body:has(.consent-banner):has(.mobile-sticky-cart.show) .dock-panel{
+        bottom:calc(16px + 76px + 150px + 48px + 12px + 48px + 12px);
+    }
+
+    /* Підказка біля кнопки на дотику не спрацьовує — показувати її
+       нема кому, а місця вона просить. */
+    .dock-hint{
+        display:none;
+    }
+
+}
+
+/* Окремого @media(prefers-reduced-motion) тут немає навмисно: вище
+   вже стоїть глобальне правило з !important на *, ::before і ::after.
+   Друга копія нічого б не додала, зате розійшлася б із ним на першій
+   же правці. */

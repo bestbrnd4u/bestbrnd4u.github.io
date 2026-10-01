@@ -11,6 +11,7 @@
 //   supabase/functions/telegram-order-bot/order-lookup.js
 //   supabase/functions/telegram-order-bot/reviews.js
 //   supabase/functions/telegram-order-bot/subscribe.js
+//   supabase/functions/telegram-order-bot/call-back.js
 //   supabase/functions/telegram-order-bot/checkout-draft.js
 //   supabase/functions/telegram-order-bot/review-admin.js
 //   supabase/functions/telegram-order-bot/promo-admin.js
@@ -4391,6 +4392,91 @@ function lookupState(status, data) {
 }
 
 
+// Зворотний дзвінок: людина лишає номер, власнику прилітає Telegram.
+//
+// ЧОГО ТУТ НЕМА
+// --------------
+// Мережі. Лише чисті функції — щоб перевірялись тестами в Node.
+//
+// ЧОМУ НОМЕР ПЕРЕВІРЯЄМО ТУТ, ХОЧ САЙТ УЖЕ ПЕРЕВІРИВ
+// ---------------------------------------------------
+// Бо сайт — це те, що можна обійти. Запит до функції шлють і прямо,
+// без жодної сторінки; у полі phone приїде що завгодно. Перевірка в
+// браузері — зручність для людини, перевірка тут — єдина справжня.
+
+// Скільки знаків беремо зі шляху сторінки. Не обмеження, а стеля
+// здорового глузду: у повідомленні потрібен орієнтир, а не вся
+// адреса з трьома десятками параметрів фільтра.
+const CALL_BACK_PAGE_LIMIT = 200;
+
+// Приймаємо три написання, бо саме так люди й пишуть:
+//
+//   0XX XXX XX XX    як набирають в Україні
+//   380XX XXX XX XX  з кодом країни, зі знаком плюс чи без
+//   XX XXX XX XX     без нуля попереду
+//
+// Зводимо до одного вигляду +380XXXXXXXXX, щоб у Telegram прилітав
+// номер, на який можна натиснути й одразу подзвонити.
+function normalizeCallBackPhone(raw) {
+
+    const digits = String(raw ?? "").replace(/\D/g, "");
+
+    if (digits.length === 10 && digits.startsWith("0")) return "+38" + digits;
+
+    if (digits.length === 12 && digits.startsWith("380")) return "+" + digits;
+
+    if (digits.length === 9) return "+380" + digits;
+
+    return null;
+
+}
+
+// Сторінка, з якої натиснули кнопку. На картці товару це половина
+// розмови: одразу видно, про що питатимуть.
+//
+// Беремо ТІЛЬКИ відносний шлях. Інакше в повідомленні власнику
+// опинилось би посилання, яке туди підсунув хто завгодно — поле
+// приходить від клієнта, а повідомлення надсилається з parse_mode
+// HTML.
+function cleanCallBackPage(raw) {
+
+    const value = String(raw ?? "");
+
+    if (!value.startsWith("/")) return "";
+
+    // «//evil.example» теж починається зі скісної, і виглядає як шлях.
+    // Браузер прочитав би її як адресу чужого сайту, а Telegram
+    // підсвічує схоже на домен посиланням — тобто в повідомленні
+    // власнику зʼявилось би клікабельне чуже посилання.
+    if (value.startsWith("//")) return "";
+
+    if (value.length > CALL_BACK_PAGE_LIMIT) return "";
+
+    // Пробіли й лапки сюди потрапити не можуть: усе, що не схоже на
+    // адресу, відкидаємо цілком, а не вирізаємо по шматочку.
+    return /^\/[\w\-./?&=%+]*$/.test(value) ? value : "";
+
+}
+
+// Текст для власника. escape — функція екранування, яку передає
+// викликач: у зібраному файлі це escapeHtml, і тягнути її сюди
+// імпортом означало б другу копію.
+function formatCallBack(phone, page, escape) {
+
+    const esc = typeof escape === "function" ? escape : (v) => String(v ?? "");
+
+    return [
+        "📞 <b>Замовлено зворотний дзвінок</b>",
+        "",
+        `Номер: <a href="tel:${esc(phone)}">${esc(phone)}</a>`,
+        page ? `Сторінка: ${esc(page)}` : "",
+        "",
+        "Обіцяли передзвонити протягом робочого дня.",
+    ].filter(Boolean).join("\n");
+
+}
+
+
 // Незавершене оформлення: перевірка того, що прийшло з браузера.
 //
 // НАВІЩО ОКРЕМИЙ ФАЙЛ
@@ -6055,6 +6141,7 @@ function fromBase64url(text) {
 
 // Панель «Відгуки» в адмінці — другий спосіб модерації поруч із
 // кнопками в Telegram (пояснення — у review-admin.js).
+
 
 
 
@@ -8656,6 +8743,64 @@ async function handleReviewCallback(callback: Record<string, any>, data: string)
 //
 // Чому без скрипта MailerLite і чому через нас — у subscribe.js.
 // -------------------------
+
+// ЗАМОВЛЕННЯ ЗВОРОТНОГО ДЗВІНКА
+//
+// Плаваюча кнопка в лівому кутку сайту. Людина лишає номер — власнику
+// прилітає повідомлення в Telegram. Інших наслідків немає: нічого не
+// пишемо в базу, нікуди не підписуємо, листів не шлемо.
+//
+// Перевірка номера й текст повідомлення — у call-back.js, бо це чиста
+// логіка, і тести ганяють її в Node.
+async function handleCallBack(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  const phone = normalizeCallBackPhone(body.phone);
+
+  if (!phone) {
+
+    console.warn("Зворотний дзвінок відхилено: номер не схожий на номер");
+
+    return adminJson({ ok: false, error: "bad_phone" }, 400, origin);
+
+  }
+
+  // Та сама межа звернень, що в підписки й «Де моє замовлення».
+  // Без неї кнопка стає способом завалити власника дзвінками.
+  if (!(await lookupAllowed(clientIp(request)))) {
+    return adminJson({ ok: false, error: "too_many" }, 429, origin);
+  }
+
+  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
+
+    // Не «ок»: інакше людина чекала б дзвінка, якого ніхто не замовляв.
+    console.error("Зворотний дзвінок: бот не налаштований");
+
+    return adminJson({ ok: false, error: "not_configured" }, 501, origin);
+
+  }
+
+  const sent = await telegram("sendMessage", {
+    chat_id: TELEGRAM_CHAT_ID,
+    text: formatCallBack(phone, cleanCallBackPage(body.page), escapeHtml),
+    parse_mode: "HTML",
+    disable_web_page_preview: true,
+  });
+
+  if (!sent?.ok) {
+
+    // Telegram не прийняв — отже, власник НЕ дізнається. Сказати тут
+    // «готово» означало б пообіцяти дзвінок у порожнечу.
+    await reportServerIssue("call_back", "Telegram не прийняв замовлення дзвінка");
+
+    return adminJson({ ok: false, error: "unavailable" }, 200, origin);
+
+  }
+
+  return adminJson({ ok: true }, 200, origin);
+
+}
 
 async function handleSubscribe(request: Request, body: Record<string, any>): Promise<Response> {
 
@@ -11373,6 +11518,13 @@ async function handleRequest(request: Request): Promise<Response> {
   if (body.site_action === "subscribe") {
 
     return await handleSubscribe(request, body);
+
+  }
+
+  // --- «передзвоніть мені» з плаваючої кнопки ---
+  if (body.site_action === "call-back") {
+
+    return await handleCallBack(request, body);
 
   }
 
