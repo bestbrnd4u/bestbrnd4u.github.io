@@ -2728,6 +2728,101 @@ async function handleReviewCallback(callback: Record<string, any>, data: string)
 // Опитуємо лише поки панель відкрита — див. assets/js/site-chat.js.
 // ==================================================================
 
+// ==================================================================
+// МЕЖІ ЗВЕРНЕНЬ
+//
+// Чат і зворотний дзвінок МАЮТЬ ВЛАСНИЙ ЛІЧИЛЬНИК (міграція 040), а
+// не спільний із «Де моє замовлення». Інакше флуд у чаті гасив би
+// пошук замовлення й підписку для всіх покупців одразу.
+//
+// ЧОМУ САМЕ ТАКІ ЧИСЛА
+//
+// Людині, яка справді чекає дзвінка, треба ОДИН запит. Два — якщо
+// помилилась цифрою. Три на годину — це вже із запасом.
+//
+// Жива розмова в чаті — це десяток повідомлень. Тридцять на годину з
+// адреси вистачить і найбалакучішому.
+//
+// Глобальні межі тримаємо НАВМИСНО ТІСНИМИ. Telegram, у якому за
+// годину лягло триста повідомлень, — непридатний для роботи, тобто
+// напад досяг мети, навіть якщо формально нічого не зламалось.
+// Відхиленому ми при цьому не кажемо «йдіть геть»: у повідомленні є
+// посилання на Telegram магазину, тобто шлях лишається.
+//
+// Якщо магазин виросте — числа тут, в одному місці.
+const CONTACT_LIMITS = {
+  callback: { perIp: 3, global: 30 },
+  "chat-new": { perIp: 3, global: 30 },
+  "chat-msg": { perIp: 30, global: 150 },
+};
+
+// Повертає 'ok' | 'ip' | 'global' | 'global-first'.
+async function contactAllowed(request: Request, kind: keyof typeof CONTACT_LIMITS): Promise<string> {
+
+  const limits = CONTACT_LIMITS[kind];
+
+  try {
+
+    const response = await supabaseRest("rpc/contact_allowed", {
+      method: "POST",
+      body: JSON.stringify({
+        p_ip: clientIp(request),
+        p_kind: kind,
+        p_per_ip: limits.perIp,
+        p_global: limits.global,
+      }),
+    });
+
+    // Міграції ще немає — межі немає. Пропускаємо: та сама засада, що
+    // в решті лічильників проєкту. Мовчазний чат гірший за зайве
+    // повідомлення.
+    if (!response.ok) {
+      console.warn("contact_allowed недоступна:", await response.text());
+      return "ok";
+    }
+
+    const verdict = await response.json().catch(() => "ok");
+
+    return typeof verdict === "string" ? verdict : "ok";
+
+  } catch (error) {
+
+    console.warn("contact_allowed впала:", error);
+
+    return "ok";
+
+  }
+
+}
+
+// Один раз за годину кажемо власнику, що схоже на напад. Саме один
+// раз: сто повідомлень «вас флудять» — це той самий флуд, тільки від
+// нас.
+async function warnAboutFlood(kind: string) {
+
+  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) return;
+
+  const що = kind === "callback"
+    ? "замовлень дзвінка"
+    : "повідомлень у чаті";
+
+  await telegram("sendMessage", {
+    chat_id: TELEGRAM_CHAT_ID,
+    text: [
+      "🛡 <b>Схоже на флуд</b>",
+      "",
+      `За останню годину ${що} стало більше за межу, і нові ми тимчасово не приймаємо.`,
+      "",
+      "Нічого робити не треба: межа сама відпустить за годину. Це повідомлення приходить не частіше ніж раз на годину.",
+    ].join("\n"),
+    parse_mode: "HTML",
+    disable_web_page_preview: true,
+  });
+
+  await reportServerIssue("contact_flood", `${kind}: перевищено глобальну межу`);
+
+}
+
 // Нитка за токеном. Повертає null, якщо токена немає, він не схожий
 // на uuid або такої нитки вже не існує (власник видалив).
 async function loadThread(rawId: unknown) {
@@ -2801,13 +2896,24 @@ async function handleChatSend(request: Request, body: Record<string, any>): Prom
 
   const перше = !thread;
 
-  if (!thread) {
+  // МЕЖА СТОЇТЬ НА ОБОХ ШЛЯХАХ, А НЕ ЛИШЕ НА СТВОРЕННІ НИТКИ.
+  //
+  // Раніше було інакше: нову нитку рахували по IP, а далі — тільки
+  // по нитці, 30 на годину. Тобто створивши двадцять ниток, можна
+  // було надіслати 620 повідомлень у Telegram за годину з однієї
+  // адреси. Межа по нитці лишається (нижче), але вона тепер друга, а
+  // не єдина.
+  const вердикт = await contactAllowed(request, перше ? "chat-new" : "chat-msg");
 
-    // Нова нитка. Межу по IP перевіряємо САМЕ ТУТ: далі межа йде по
-    // нитці, а створення ниток — єдине, що можна робити без токена.
-    if (!(await lookupAllowed(clientIp(request)))) {
-      return adminJson({ ok: false, error: "too_many" }, 429, origin);
-    }
+  if (вердикт !== "ok") {
+
+    if (вердикт === "global-first") await warnAboutFlood("chat");
+
+    return adminJson({ ok: false, error: "too_many" }, 429, origin);
+
+  }
+
+  if (!thread) {
 
     const created = await supabaseRest("chat_threads", {
       method: "POST",
@@ -2836,8 +2942,11 @@ async function handleChatSend(request: Request, body: Record<string, any>): Prom
 
   } else {
 
-    // Нитка вже є — межа рахується по ній. Заблокована теж не
-    // проходить: chat_allowed() повертає false і для неї.
+    // Друга межа, по самій нитці: 30 на годину. Вона ж відсікає
+    // заблоковану розмову — chat_allowed() повертає false і для неї.
+    //
+    // Потрібні обидві. Межа по IP не знає про /chatblock, а межа по
+    // нитці обходиться новою ниткою.
     const allowed = await supabaseRest("rpc/chat_allowed", {
       method: "POST",
       body: JSON.stringify({ p_thread: thread.id }),
@@ -2905,6 +3014,25 @@ async function handleChatPoll(request: Request, body: Record<string, any>): Prom
     // Не 404 і не помилка: нитки могло просто ще не бути. Сайт у
     // такому разі показує порожній чат, а не поломку.
     return adminJson({ ok: true, messages: [], unseen: 0 }, 200, origin);
+  }
+
+  // МЕЖА НА САМЕ ОПИТУВАННЯ.
+  //
+  // Тут не було нічого: цикл у консолі — це виклики Edge Function без
+  // стелі, тобто рахунок і вичерпана квота. Сайт питає раз на пʼять
+  // секунд і лише поки панель відкрита; 900 на годину — стеля з
+  // запасом удвічі.
+  //
+  // Лічильник живе в самому рядку нитки (один UPDATE), бо опитування
+  // має лишатись дешевим — інакше захист від навантаження сам стає
+  // навантаженням.
+  const можна = await supabaseRest("rpc/chat_poll_allowed", {
+    method: "POST",
+    body: JSON.stringify({ p_thread: thread.id }),
+  });
+
+  if (можна.ok && (await можна.json().catch(() => true)) === false) {
+    return adminJson({ ok: false, error: "too_many" }, 429, origin);
   }
 
   const since = Number(body.since);
@@ -3055,10 +3183,42 @@ async function handleCallBack(request: Request, body: Record<string, any>): Prom
 
   }
 
-  // Та сама межа звернень, що в підписки й «Де моє замовлення».
-  // Без неї кнопка стає способом завалити власника дзвінками.
-  if (!(await lookupAllowed(clientIp(request)))) {
+  // ВЛАСНИЙ ЛІЧИЛЬНИК, НЕ СПІЛЬНИЙ ІЗ ПОШУКОМ ЗАМОВЛЕННЯ.
+  //
+  // Раніше тут стояла межа «Де моє замовлення» — 20 на годину. Для
+  // сторінки пошуку це правильне число, для дзвінка — ні: людині
+  // треба один. А спільний лічильник означав, що флуд дзвінками
+  // гасить пошук замовлення справжнім покупцям.
+  const вердикт = await contactAllowed(request, "callback");
+
+  if (вердикт !== "ok") {
+
+    if (вердикт === "global-first") await warnAboutFlood("callback");
+
     return adminJson({ ok: false, error: "too_many" }, 429, origin);
+
+  }
+
+  // МЕЖА НА САМ НОМЕР, І ВОНА НЕ ПРО НАВАНТАЖЕННЯ.
+  //
+  // Без неї магазином можна цькувати стороннього: вписати чужий номер
+  // двадцять разів — і власник двадцять разів дзвонить незнайомцю,
+  // причому знаряддям виглядає магазин.
+  //
+  // Адресу зловмисник змінить, а номер, який цькують, лишається той
+  // самий — тому межа саме по номеру.
+  const номерМожна = await supabaseRest("rpc/callback_phone_allowed", {
+    method: "POST",
+    body: JSON.stringify({ p_phone: phone }),
+  });
+
+  if (номерМожна.ok && (await номерМожна.json().catch(() => true)) === false) {
+
+    // Окремий код, щоб сайт сказав зрозуміле: людина, яка справді
+    // чекає дзвінка, має знати, що заявка вже є, а не що «забагато
+    // спроб».
+    return adminJson({ ok: false, error: "phone_repeat" }, 429, origin);
+
   }
 
   if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
