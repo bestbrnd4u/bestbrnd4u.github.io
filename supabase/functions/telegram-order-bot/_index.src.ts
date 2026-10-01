@@ -91,7 +91,7 @@ import {
 } from "./call-back.js";
 import {
   cleanChatBody, cleanThreadId, cleanChatPage, formatChatMessage,
-  CHAT_LIMITS, CHAT_DONE_TEXT, chatDoneReceipt,
+  CHAT_LIMITS, CHAT_DONE_TEXT, chatDoneReceipt, chatUserName, chatWho,
 } from "./chat.js";
 import {
   cleanLoginToken, loginCode, loginDeepLink, loginVerdict, loginStatus,
@@ -2823,6 +2823,53 @@ async function warnAboutFlood(kind: string) {
 
 }
 
+// ХТО ПИШЕ: ІМʼЯ Й ПОШТА З ПІДТВЕРДЖЕНОГО ТОКЕНА
+//
+// Саме з токена, а не з тіла запиту. Інакше будь-хто підписав би свою
+// розмову чужим імʼям — а власник відповідав би, вважаючи, що знає
+// співрозмовника.
+//
+// verifyUser() поруч повертає лише id; тут потрібні ще імʼя й пошта,
+// тож ходимо по те саме /auth/v1/user, але беремо більше.
+async function chatIdentity(request: Request) {
+
+  const token = (request.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "");
+
+  // Гість надсилає публічний ключ проєкту — на нього /auth/v1/user
+  // відповість відмовою, і розмова лишиться гостьовою. Це нормальний
+  // шлях, а не помилка.
+  if (!token) return null;
+
+  try {
+
+    const response = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+      headers: { apikey: SERVICE_ROLE_KEY, Authorization: `Bearer ${token}` },
+    });
+
+    if (!response.ok) return null;
+
+    const user = await response.json();
+
+    if (!user || typeof user.id !== "string") return null;
+
+    return {
+      user_id: user.id,
+      user_name: chatUserName(user).slice(0, 120),
+      user_email: String(user.email ?? "").slice(0, 160),
+    };
+
+  } catch (error) {
+
+    // Не впізнали — розмова просто лишається гостьовою. Падати через
+    // це не можна: питання людини важливіше за підпис під ним.
+    console.warn("Чат: не вдалося впізнати користувача:", error);
+
+    return null;
+
+  }
+
+}
+
 // Нитка за токеном. Повертає null, якщо токена немає, він не схожий
 // на uuid або такої нитки вже не існує (власник видалив).
 async function loadThread(rawId: unknown) {
@@ -2832,7 +2879,7 @@ async function loadThread(rawId: unknown) {
   if (!id) return null;
 
   const response = await supabaseRest(
-    `chat_threads?id=eq.${id}&select=id,page,blocked,closed_at&limit=1`);
+    `chat_threads?id=eq.${id}&select=id,page,blocked,closed_at,thread_no,user_id,user_name,user_email&limit=1`);
 
   if (!response.ok) return null;
 
@@ -2922,6 +2969,10 @@ async function handleChatSend(request: Request, body: Record<string, any>): Prom
 
   }
 
+  // Хто пише. Для гостя — null, і це нормальний шлях: більшість
+  // питань ставлять ДО реєстрації.
+  const хто = await chatIdentity(request);
+
   if (!thread) {
 
     const created = await supabaseRest("chat_threads", {
@@ -2930,6 +2981,7 @@ async function handleChatSend(request: Request, body: Record<string, any>): Prom
       body: JSON.stringify({
         page: cleanChatPage(body.page),
         agent: String(request.headers.get("user-agent") ?? "").slice(0, CHAT_LIMITS.agent),
+        ...(хто ?? {}),
       }),
     });
 
@@ -2979,7 +3031,18 @@ async function handleChatSend(request: Request, body: Record<string, any>): Prom
 
   const sent = await telegram("sendMessage", {
     chat_id: TELEGRAM_CHAT_ID,
-    text: formatChatMessage(text, { page: thread.page, first: перше }, escapeHtml),
+    // ЯКЩО ЛЮДИНА ВВІЙШЛА ПОСЕРЕД РОЗМОВИ — ПІДПИС ОНОВЛЮЄТЬСЯ.
+    //
+    // Почала гостем, потім зайшла в кабінет: наступні картки вже
+    // підписані імʼям. Беремо свіже «хто», а не те, що лежить у
+    // нитці з її створення.
+    text: formatChatMessage(text, {
+      page: thread.page,
+      first: перше,
+      thread_no: thread.thread_no,
+      user_name: (хто && хто.user_name) || thread.user_name,
+      user_email: (хто && хто.user_email) || thread.user_email,
+    }, escapeHtml),
     parse_mode: "HTML",
     disable_web_page_preview: true,
   });
@@ -3002,7 +3065,12 @@ async function handleChatSend(request: Request, body: Record<string, any>): Prom
 
   await supabaseRest(`chat_threads?id=eq.${thread.id}`, {
     method: "PATCH",
-    body: JSON.stringify({ last_message_at: new Date().toISOString() }),
+    body: JSON.stringify({
+      last_message_at: new Date().toISOString(),
+      // Впізнали серед розмови — дописуємо в нитку, щоб наступного
+      // разу (і в /chatdone) підпис уже був правильний.
+      ...(хто && !thread.user_id ? хто : {}),
+    }),
   });
 
   return adminJson({ ok: true, thread: thread.id, id: saved.id }, 200, origin);
@@ -3099,7 +3167,7 @@ async function handleChatReply(message: Record<string, any>): Promise<boolean> {
   if (!replyTo) return false;
 
   const found = await supabaseRest(
-    `chat_messages?tg_message_id=eq.${Number(replyTo)}&select=thread_id&limit=1`);
+    `chat_messages?tg_message_id=eq.${Number(replyTo)}&select=thread_id,chat_threads(thread_no,user_name,user_email)&limit=1`);
 
   if (!found.ok) return false;
 
@@ -3109,6 +3177,10 @@ async function handleChatReply(message: Record<string, any>): Promise<boolean> {
 
   // Реплай на щось інше (картку замовлення, відгук) — не наша справа.
   if (!threadId) return false;
+
+  // Кого саме завершуємо — щоб у підтвердженні було видно, а не
+  // просто «розмову завершено».
+  const ктоЦе = chatWho((Array.isArray(rows) && rows[0] && rows[0].chat_threads) || {});
 
   // --- /chatdone: питання вирішили, розмову завершено ---
   //
@@ -3139,7 +3211,7 @@ async function handleChatReply(message: Record<string, any>): Promise<boolean> {
 
     await telegram("sendMessage", {
       chat_id: message.chat.id,
-      text: chatDoneReceipt(CHAT_DONE_TEXT),
+      text: chatDoneReceipt(CHAT_DONE_TEXT, ктоЦе),
       reply_to_message_id: message.message_id,
     });
 
@@ -3160,7 +3232,8 @@ async function handleChatReply(message: Record<string, any>): Promise<boolean> {
 
     await telegram("sendMessage", {
       chat_id: message.chat.id,
-      text: "Цю розмову заблоковано — нових повідомлень із неї не буде.",
+      text: `🚫 Розмову заблоковано — нових повідомлень із неї не буде.
+👤 ${ктоЦе}`,
       reply_to_message_id: message.message_id,
     });
 

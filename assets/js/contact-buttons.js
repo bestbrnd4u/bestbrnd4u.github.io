@@ -823,17 +823,47 @@
         кнопкаЧату.classList.toggle("has-unread", !!є);
     }
 
+    // ТОКЕН ТОГО, ХТО ВВІЙШОВ — ЩОБ ВЛАСНИК БАЧИВ, ІЗ КИМ ГОВОРИТЬ.
+    //
+    // Надсилаємо САМ ТОКЕН, а не імʼя в тілі запиту: тіло підробить
+    // будь-хто, а токен перевіряє Supabase. Функція з нього дістає
+    // імʼя й пошту сама.
+    //
+    // Гість токена не має — і це нормальний шлях: більшість питань
+    // ставлять ДО реєстрації, і для них у картці буде «Гість #7».
+    async function токенСесії() {
+
+        try {
+
+            if (typeof supabaseClient === "undefined" || !supabaseClient) return null;
+
+            var сесія = await supabaseClient.auth.getSession();
+
+            var жива = сесія && сесія.data && сесія.data.session;
+
+            return (жива && жива.access_token) || null;
+
+        } catch (e) {
+
+            return null;
+
+        }
+
+    }
+
     async function запит(тіло) {
 
         if (typeof SUPABASE_URL === "undefined"
             || typeof SUPABASE_PUBLISHABLE_KEY === "undefined") return null;
+
+        var токен = await токенСесії();
 
         var відповідь = await fetch(SUPABASE_URL + "/functions/v1/telegram-order-bot", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 apikey: SUPABASE_PUBLISHABLE_KEY,
-                Authorization: "Bearer " + SUPABASE_PUBLISHABLE_KEY
+                Authorization: "Bearer " + (токен || SUPABASE_PUBLISHABLE_KEY)
             },
             body: JSON.stringify(тіло)
         }).catch(function () { return null; });
