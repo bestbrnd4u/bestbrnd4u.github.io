@@ -16746,3 +16746,22 @@ body.mobile-filters-open .contact-dock{
 .subscribe[hidden]{
     display:none;
 }
+
+/* Повідомлення, яке не дійшло.
+
+   Без цього відхилене повідомлення виглядало так само, як
+   доставлене: та сама синя бульбашка. Людина впевнена, що її почули,
+   і йде чекати відповіді, якої не буде. */
+.chat-msg-failed .chat-msg-body{
+    background:var(--gray200);
+    color:var(--gray700);
+    border:1px dashed var(--danger);
+}
+
+.chat-msg-failed .chat-msg-body::after{
+    content:"не надіслано";
+    display:block;
+    margin-top:4px;
+    font-size:11px;
+    color:var(--danger);
+}
