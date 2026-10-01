@@ -98,7 +98,10 @@ console.log("\n[2] Сховане справді ховається");
     // без явного правила програє йому — те саме вже ловили на .loader,
     // де спінер крутився вічно.
     const потребуютьПравила = [
-        ".dock-done", ".dock-form", ".subscribe-done", ".subscribe"
+        ".dock-done", ".dock-form", ".subscribe-done", ".subscribe",
+        // Чат теж міняє форму на підсумок — коли власник завершив
+        // розмову командою /chatdone.
+        ".chat-form", ".chat-again"
     ];
 
     потребуютьПравила.forEach(клас => {

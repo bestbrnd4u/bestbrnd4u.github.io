@@ -16765,3 +16765,61 @@ body.mobile-filters-open .contact-dock{
     font-size:11px;
     color:var(--danger);
 }
+
+/* =====================================
+   ЗАВЕРШЕНА РОЗМОВА
+
+   Підсумок — не бульбашка. Бульбашка читається як репліка в діалозі,
+   а це підпис під усім діалогом: розмову завершено, і писати далі
+   треба вже в новій.
+===================================== */
+
+.chat-msg-system{
+    align-self:stretch;
+    max-width:none;
+}
+
+.chat-msg-system .chat-msg-body{
+    background:#f1f8f3;
+    border:1px solid #cfe6d8;
+    color:#1f5c3a;
+    border-radius:12px;
+    font-size:13px;
+    text-align:center;
+}
+
+.chat-again{
+    display:flex;
+}
+
+.chat-again[hidden]{
+    display:none;
+}
+
+.chat-form[hidden]{
+    display:none;
+}
+
+.chat-again-btn{
+    flex:1 1 auto;
+    padding:12px 18px;
+    border:1px solid var(--gray200);
+    border-radius:12px;
+    background:#fff;
+    font-size:14px;
+    font-weight:600;
+    color:var(--gray900);
+    cursor:pointer;
+    /* color теж у переліку: при наведенні кнопка стає темною, і текст
+       на ній білішає. Без нього колір стрибав би, поки тло їде. */
+    transition:background-color 200ms ease,
+               border-color 200ms ease,
+               color 200ms ease;
+}
+
+.chat-again-btn:hover,
+.chat-again-btn:focus-visible{
+    background:var(--primary);
+    border-color:var(--primary);
+    color:#fff;
+}
