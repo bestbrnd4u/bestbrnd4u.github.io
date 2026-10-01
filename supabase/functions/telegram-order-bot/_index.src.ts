@@ -91,7 +91,7 @@ import {
 } from "./call-back.js";
 import {
   cleanChatBody, cleanThreadId, cleanChatPage, formatChatMessage,
-  CHAT_LIMITS,
+  CHAT_LIMITS, CHAT_DONE_TEXT, chatDoneReceipt,
 } from "./chat.js";
 import {
   cleanLoginToken, loginCode, loginDeepLink, loginVerdict, loginStatus,
@@ -2832,7 +2832,7 @@ async function loadThread(rawId: unknown) {
   if (!id) return null;
 
   const response = await supabaseRest(
-    `chat_threads?id=eq.${id}&select=id,page,blocked&limit=1`);
+    `chat_threads?id=eq.${id}&select=id,page,blocked,closed_at&limit=1`);
 
   if (!response.ok) return null;
 
@@ -2893,6 +2893,15 @@ async function handleChatSend(request: Request, body: Record<string, any>): Prom
   }
 
   let thread = await loadThread(body.thread);
+
+  // ЗАВЕРШЕНА РОЗМОВА — ЦЕ ПОЧАТОК НОВОЇ, А НЕ ВІДМОВА.
+  //
+  // Людина могла лишити вкладку відкритою з учора, а розмову тим
+  // часом завершили. Відповісти «ця розмова закрита» означало б
+  // загубити її питання й змусити шукати, де тут кнопка. Просто
+  // починаємо нову нитку — для неї це виглядає як «написала й
+  // надіслалось».
+  if (thread && thread.closed_at) thread = null;
 
   const перше = !thread;
 
@@ -3065,7 +3074,14 @@ async function handleChatPoll(request: Request, body: Record<string, any>): Prom
   return adminJson({
     ok: true,
     messages: rows,
-    unseen: rows.filter((r: Record<string, any>) => r.seen === false && r.author === "owner").length,
+    // Крапку малюємо і на підсумок завершення: людина має побачити,
+    // що розмову закрили, навіть якщо панель була згорнута.
+    unseen: rows.filter((r: Record<string, any>) =>
+      r.seen === false && (r.author === "owner" || r.author === "system")).length,
+    // Сайт по цьому прибирає поле вводу й пропонує почати нову
+    // розмову. Без ознаки він показував би відкрите поле під
+    // підсумком «раді, що допомогли» — тобто сам собі суперечив.
+    closed: Boolean(thread.closed_at),
   }, 200, origin);
 
 }
@@ -3093,6 +3109,43 @@ async function handleChatReply(message: Record<string, any>): Promise<boolean> {
 
   // Реплай на щось інше (картку замовлення, відгук) — не наша справа.
   if (!threadId) return false;
+
+  // --- /chatdone: питання вирішили, розмову завершено ---
+  //
+  // ЧОМУ ЦЕ ПОТРІБНО. Без команди розмова просто обривається: останнє
+  // повідомлення висить, поле вводу відкрите, і людині незрозуміло,
+  // чекати ще чи ні. Виглядає як «мене перестали читати».
+  //
+  // ЧОМУ ЦЕ НЕ /chatblock. Блокування — проти настирливих, воно тихе
+  // й людина про нього не дізнається. Завершення — подія, яку ВИДНО,
+  // і після неї писати можна далі, просто в новій розмові.
+  if (/^\/chatdone(@\S+)?$/i.test(String(message.text ?? "").trim())) {
+
+    // Підсумок кладемо В ПЕРЕПИСКУ, а не лише ставимо позначку: він
+    // має зʼявитись у людини так само, як зʼявляється відповідь, —
+    // тим самим опитуванням, без окремого механізму.
+    //
+    // seen:false — щоб на кнопці зʼявилась крапка: людина мала б
+    // побачити, що розмову завершили, навіть якщо панель закрита.
+    await insertChatMessage(threadId, "system", CHAT_DONE_TEXT, message.message_id, false);
+
+    await supabaseRest(`chat_threads?id=eq.${threadId}`, {
+      method: "PATCH",
+      body: JSON.stringify({
+        closed_at: new Date().toISOString(),
+        last_message_at: new Date().toISOString(),
+      }),
+    });
+
+    await telegram("sendMessage", {
+      chat_id: message.chat.id,
+      text: chatDoneReceipt(CHAT_DONE_TEXT),
+      reply_to_message_id: message.message_id,
+    });
+
+    return true;
+
+  }
 
   // --- /chatblock у відповідь на повідомлення з чату ---
   //

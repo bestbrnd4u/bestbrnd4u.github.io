@@ -343,6 +343,51 @@ console.log("\n[9] Сервер: відповідь власника знахо�
 
     check("є спосіб заблокувати настирливого", /chatblock/.test(reply));
 
+    // --- завершення розмови ---
+    //
+    // Без нього розмова просто обривається: останнє повідомлення
+    // висить, поле вводу відкрите, і людині незрозуміло, чекати ще
+    // чи ні.
+    check("є спосіб завершити розмову", /\/chatdone/.test(reply));
+
+    // Підсумок кладемо В ПЕРЕПИСКУ, а не лише ставимо позначку: він
+    // має приїхати тим самим опитуванням, що й відповіді, без
+    // окремого механізму.
+    check("підсумок потрапляє в переписку",
+        /insertChatMessage\(threadId, "system", CHAT_DONE_TEXT/.test(reply));
+
+    check("нитка позначається завершеною", /closed_at: new Date\(\)/.test(reply));
+
+    // seen:false — щоб на кнопці зʼявилась крапка: людина має
+    // побачити, що розмову завершили, навіть якщо панель закрита.
+    check("підсумок приходить непрочитаним",
+        /CHAT_DONE_TEXT, message\.message_id, false\)/.test(reply));
+
+    // Завершення й блокування — різні речі. Перше видно людині й
+    // після нього можна писати далі; друге тихе й не можна.
+    //
+    // Беремо САМЕ блок /chatdone, а не «400 знаків після згадки»:
+    // з вікном перевірка лишалась зеленою, коли я навмисно дописав
+    // туди blocked — рядок просто не влазив у вікно.
+    const блокЗавершення = (reply.match(
+        /if \(\/\^\\\/chatdone[\s\S]*?\n    return true;\n\n  \}/) || [""])[0];
+
+    check("блок /chatdone знайдено", блокЗавершення.length > 0);
+
+    check("завершення не блокує розмову",
+        !/blocked/.test(блокЗавершення),
+        блокЗавершення.replace(/\s+/g, " ").slice(0, 120));
+
+    // Людина могла лишити вкладку відкритою з учора. Відмовити їй
+    // означало б загубити питання.
+    const send = (ФУНКЦІЯ.match(/async function handleChatSend[\s\S]*?\n}\n\n\/\/ САЙТ ПИТАЄ/) || [""])[0];
+
+    check("у завершену розмову не пишемо — починаємо нову",
+        /if \(thread && thread\.closed_at\) thread = null;/.test(send));
+
+    check("опитування каже сайту, що розмову завершено",
+        /closed: Boolean\(thread\.closed_at\)/.test(ФУНКЦІЯ));
+
     // Порядок у handleMessage: найточніший обробник перший.
     const порядок = ФУНКЦІЯ.indexOf("handleChatReply(message)");
     const замовлення = ФУНКЦІЯ.indexOf("handleOrderText(message)");
@@ -529,10 +574,16 @@ console.log("\n[12] Крапка «є відповідь»");
 
     check("відкрили панель — крапка гасне", /крапку\(false\)/.test(МОДУЛЬ));
 
-    // unseen рахує ЛИШЕ відповіді власника: своє ж повідомлення
-    // крапки викликати не має.
-    check("рахуються лише відповіді власника",
-        /seen === false && r\.author === "owner"/.test(ФУНКЦІЯ));
+    // Крапку викликає те, що написали НАМ: відповідь власника й
+    // підсумок завершеної розмови. Своє ж повідомлення — ні.
+    check("крапку викликає відповідь власника",
+        /seen === false && \(r\.author === "owner"/.test(ФУНКЦІЯ));
+
+    check("і підсумок завершення теж",
+        /r\.author === "system"\)\)\.length/.test(ФУНКЦІЯ));
+
+    check("а власне повідомлення — ні",
+        !/r\.author === "visitor"[\s\S]{0,40}unseen/.test(ФУНКЦІЯ));
 }
 
 
@@ -597,6 +648,20 @@ console.log("\n[14] Повернувся на сайт — побачив, що 
 
     const запити = [];
 
+    // Ловимо таймери, щоб [15] могла спитати, чи спинилось опитування
+    // після завершення розмови. Справжній setInterval тут не потрібен:
+    // модуль і так опитує на кожному відкритті панелі.
+    const живі = new Set();
+    let наступнийТаймер = 1;
+
+    window.setInterval = function () {
+        const id = наступнийТаймер++;
+        живі.add(id);
+        return id;
+    };
+
+    window.clearInterval = function (id) { живі.delete(id); };
+
     window.fetch = function (url, opt) {
 
         запити.push(JSON.parse((opt && opt.body) || "{}"));
@@ -657,6 +722,86 @@ console.log("\n[14] Повернувся на сайт — побачив, що 
     check("повідомлення не продублювалось",
         d.getElementById("chatLog").querySelectorAll(".chat-msg").length === 1,
         String(d.getElementById("chatLog").querySelectorAll(".chat-msg").length));
+
+
+    console.log("\n[15] Розмову завершили — що бачить людина");
+
+    // Власник написав /chatdone. Відповідь опитування приносить
+    // підсумок і ознаку closed.
+    window.fetch = function (url, opt) {
+
+        запити.push(JSON.parse((opt && opt.body) || "{}"));
+
+        return Promise.resolve({
+            json: () => Promise.resolve({
+                ok: true,
+                closed: true,
+                messages: [{
+                    id: 9, author: "system", seen: false,
+                    body: "Раді, що змогли допомогти. Якщо виникне нове питання — почніть нову розмову, ми на звʼязку."
+                }],
+                unseen: 1
+            })
+        });
+
+    };
+
+    // Прискорюємо: кличемо те саме опитування, що робить таймер.
+    d.getElementById("dockChat").dispatchEvent(new window.Event("click", { bubbles: true })); // закрили
+    d.getElementById("dockChat").dispatchEvent(new window.Event("click", { bubbles: true })); // відкрили → опитування
+
+    await new Promise(r => window.setTimeout(r, 80));
+
+    const форма = d.getElementById("chatForm");
+    const кнопкаНова = d.getElementById("chatAgain");
+
+    // ПІДСУМОК — НЕ БУЛЬБАШКА. Бульбашка читається як репліка в
+    // діалозі, а це підпис під усім діалогом.
+    check("підсумок намальовано окремим виглядом",
+        !!d.querySelector(".chat-msg-system"),
+        [...d.querySelectorAll(".chat-msg")].map(x => x.className).join(" | "));
+
+    // Клас без правила — це той самий вигляд, що й у бульбашки
+    // покупця: синій, праворуч, тобто ніби це написала вона сама.
+    check("для підсумку є власне правило у стилях",
+        /\.chat-msg-system \.chat-msg-body\{/.test(CSS));
+
+    check("підсумок не синя бульбашка покупця",
+        /\.chat-msg-system\{[^}]*align-self\s*:\s*stretch/.test(CSS));
+
+    check("текст підсумку видно",
+        /Раді, що змогли допомогти/.test(d.getElementById("chatLog").textContent));
+
+    // Відкрите поле під «раді, що допомогли» суперечить саме собі.
+    check("поле вводу сховано", форма.hidden === true);
+
+    check("натомість кнопка «почати нову розмову»",
+        кнопкаНова.hidden === false);
+
+    // У завершеній розмові нового не зʼявиться — питати нема про що.
+    check("опитування спинено", !живі.size || [...живі].length === 0,
+        `живих таймерів: ${живі.size}`);
+
+    // --- натискаємо «почати нову розмову» ---
+    const бувТокен = window.localStorage.getItem("bb4u_chat_thread");
+
+    check("до натискання токен ще лежить", !!бувТокен);
+
+    кнопкаНова.querySelector(".chat-again-btn")
+        .dispatchEvent(new window.Event("click", { bubbles: true }));
+
+    check("токен забуто — наступне питання почне нову нитку",
+        window.localStorage.getItem("bb4u_chat_thread") === null,
+        String(window.localStorage.getItem("bb4u_chat_thread")));
+
+    check("стрічка очищена", !!d.querySelector(".chat-empty"),
+        d.getElementById("chatLog").textContent.slice(0, 60));
+
+    check("поле вводу повернулось", форма.hidden === false);
+    check("кнопка сховалась", кнопкаНова.hidden === true);
+
+    check("фокус у полі", d.activeElement === d.getElementById("chatInput"),
+        d.activeElement ? (d.activeElement.id || d.activeElement.className) : "нічого");
 
     console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
     process.exit(failures === 0 ? 0 : 1);

@@ -250,6 +250,23 @@ console.log("\n[4] Відкриття, закриття і взаємне вик
 
     check("Esc повертає фокус на кнопку", d.activeElement === дзвінок,
         d.activeElement ? d.activeElement.id || d.activeElement.tagName : "нічого");
+
+    // ДВА ШВИДКІ НАТИСКАННЯ ПІДРЯД.
+    //
+    // hidden знімається з панелі через 200мс, щоб вона доїхала
+    // анімацію. Поки обробник дивився на hidden, друге натискання
+    // бачило «відкрита» і закривало вже закрите — тобто подвійний
+    // клік не відкривав панель, а лишав її закритою.
+    //
+    // Та сама пастка, що вже була в обробнику чату. Там я її
+    // поправив, а тут лишив — і вона вилізла знову, тільки тихіше.
+    чат.dispatchEvent(new window.Event("click", { bubbles: true }));   // відкрили
+    чат.dispatchEvent(new window.Event("click", { bubbles: true }));   // закрили
+    чат.dispatchEvent(new window.Event("click", { bubbles: true }));   // знову відкрили
+
+    check("три натискання підряд лишають панель відкритою",
+        чат.getAttribute("aria-expanded") === "true",
+        `aria-expanded=${чат.getAttribute("aria-expanded")}, hidden=${пЧат.hidden}`);
 }
 
 
