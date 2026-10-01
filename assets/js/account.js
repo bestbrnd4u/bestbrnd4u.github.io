@@ -1249,7 +1249,7 @@ function renderOrderCard(order) {
 
                     <div class="order-card-header-right">
                         <span class="order-card-date">Дата замовлення: ${date}</span>
-                        <span class="order-card-chevron">⌄</span>
+                        <svg class="order-card-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
                     </div>
 
                 </div>

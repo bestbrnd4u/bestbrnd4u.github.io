@@ -10147,10 +10147,24 @@ body.mobile-filters-open .scroll-top{
     color:var(--gray500);
 }
 
+/* Намальований шеврон, а не знак ⌄ із шрифту.
+
+   Знак виглядав іншим: товщина й форма залежали від шрифту, колір
+   брався з тексту, а сидів він на базовій лінії — тобто нижче за
+   середину рядка, хоч сусіди вирівняні по центру.
+
+   Форма та сама полілінія, що в акордеонів (.accordion-chevron):
+   один шеврон на весь сайт. Розмір менший, 16 проти 18, бо поруч
+   дата 13px, а не питання 15px. */
 .order-card-chevron{
     flex-shrink:0;
-    font-size:16px;
-    color:var(--gray500);
+    width:16px;
+    height:16px;
+    fill:none;
+    stroke:var(--gray500);
+    stroke-width:2;
+    stroke-linecap:round;
+    stroke-linejoin:round;
     transition:transform .2s;
 }
 
