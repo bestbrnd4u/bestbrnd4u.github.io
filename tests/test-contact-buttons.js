@@ -154,12 +154,12 @@ function підняти() {
         d.querySelectorAll(".contact-dock .dock-btn").length === 2,
         String(d.querySelectorAll(".contact-dock .dock-btn").length));
 
-    check("панель каналів створена", !!d.getElementById("dockChannels"));
+    check("панель каналів створена", !!d.getElementById("dockChatPanel"));
     check("панель дзвінка створена", !!d.getElementById("dockCallback"));
 
     // Поки не натиснули — панелей у дереві доступності немає.
     check("обидві панелі спочатку сховані",
-        d.getElementById("dockChannels").hidden && d.getElementById("dockCallback").hidden);
+        d.getElementById("dockChatPanel").hidden && d.getElementById("dockCallback").hidden);
 
     // Кнопка мусить САМА казати, що вона розкриває і в якому стані.
     ["dockChat", "dockCall"].forEach(id => {
@@ -183,7 +183,7 @@ console.log("\n[3] Канали ті самі, що на сторінці кон
     const window = підняти();
     const d = window.document;
 
-    const посилання = [...d.querySelectorAll(".dock-channel")].map(a => a.getAttribute("href"));
+    const посилання = [...d.querySelectorAll(".dock-channel-mini")].map(a => a.getAttribute("href"));
 
     check("каналів чотири", посилання.length === 4, посилання.join(", "));
 
@@ -199,7 +199,7 @@ console.log("\n[3] Канали ті самі, що на сторінці кон
     });
 
     // Зовнішні — у нову вкладку й без передачі реферера вікну.
-    [...d.querySelectorAll(".dock-channel")].forEach(a => {
+    [...d.querySelectorAll(".dock-channel-mini")].forEach(a => {
 
         const href = a.getAttribute("href");
 
@@ -219,7 +219,7 @@ console.log("\n[4] Відкриття, закриття і взаємне вик
 
     const чат = d.getElementById("dockChat");
     const дзвінок = d.getElementById("dockCall");
-    const пЧат = d.getElementById("dockChannels");
+    const пЧат = d.getElementById("dockChatPanel");
     const пДзв = d.getElementById("dockCallback");
 
     чат.dispatchEvent(new window.Event("click", { bubbles: true }));
@@ -269,9 +269,11 @@ console.log("\n[4a] Фокус потрапляє туди, де є що роб�
 
     d.getElementById("dockChat").dispatchEvent(new window.Event("click", { bubbles: true }));
 
-    check("у панелі каналів фокус на першому каналі",
-        d.activeElement && d.activeElement.classList.contains("dock-channel"),
-        d.activeElement ? (d.activeElement.className || d.activeElement.tagName) : "нічого");
+    // У чаті це поле повідомлення, а не перший значок каналу внизу:
+    // панель відкривають, щоб написати.
+    check("у чаті фокус на полі повідомлення",
+        d.activeElement && d.activeElement.id === "chatInput",
+        d.activeElement ? (d.activeElement.id || d.activeElement.className) : "нічого");
 }
 
 

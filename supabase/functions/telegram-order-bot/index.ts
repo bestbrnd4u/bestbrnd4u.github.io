@@ -12,6 +12,7 @@
 //   supabase/functions/telegram-order-bot/reviews.js
 //   supabase/functions/telegram-order-bot/subscribe.js
 //   supabase/functions/telegram-order-bot/call-back.js
+//   supabase/functions/telegram-order-bot/chat.js
 //   supabase/functions/telegram-order-bot/checkout-draft.js
 //   supabase/functions/telegram-order-bot/review-admin.js
 //   supabase/functions/telegram-order-bot/promo-admin.js
@@ -4477,6 +4478,132 @@ function formatCallBack(phone, page, escape) {
 }
 
 
+// Чат на сайті: покупець пише в панелі, власник відповідає з Telegram.
+//
+// ЧОГО ТУТ НЕМА
+// --------------
+// Мережі й бази. Лише чисті функції — щоб перевірялись тестами в Node.
+
+// Скільки знаків беремо. Не обмеження для людини, а стеля здорового
+// глузду: Telegram усе одно ріже повідомлення на 4096, а все, що
+// довше за тисячу, — це не питання до магазину.
+const CHAT_LIMITS = {
+    body: 1000,
+    page: 200,
+    agent: 300,
+    // Скільки повідомлень віддаємо сайту за раз. Довша розмова
+    // догортається запитом зі since.
+    batch: 50
+};
+
+// Хто написав. Третього учасника тут не планується, але перевіряти
+// треба: значення приходить із тіла запиту.
+const CHAT_AUTHORS = ["visitor", "owner"];
+
+// Текст повідомлення від відвідувача.
+//
+// Порожнє (і «самі пробіли») відкидаємо: такі надсилає не людина, а
+// випадковий Enter, і в Telegram вони виглядають як збій бота.
+function cleanChatBody(raw) {
+
+    const value = String(raw ?? "")
+        // Невидимі керівні символи прибираємо всі, крім переносу
+        // рядка: вставлене з месенджера часто тягне їх за собою, а в
+        // Telegram вони ламають розмітку.
+        .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "")
+        .replace(/\r\n?/g, "\n")
+        .trim();
+
+    if (!value) return null;
+
+    return value.slice(0, CHAT_LIMITS.body);
+
+}
+
+// Токен нитки. Приймаємо тільки те, що справді схоже на uuid: усе
+// інше пішло б у запит до бази як є.
+function cleanThreadId(raw) {
+
+    const value = String(raw ?? "").trim().toLowerCase();
+
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(value)
+        ? value
+        : null;
+
+}
+
+// Сторінка, з якої написали. Те саме правило, що в зворотному
+// дзвінку: тільки свій відносний шлях, бо це поле приходить від
+// клієнта, а потрапляє в повідомлення власнику.
+function cleanChatPage(raw) {
+
+    const value = String(raw ?? "");
+
+    if (!value.startsWith("/")) return "";
+
+    if (value.startsWith("//")) return "";
+
+    if (value.length > CHAT_LIMITS.page) return "";
+
+    return /^\/[\w\-./?&=%+]*$/.test(value) ? value : "";
+
+}
+
+// Картка для власника в Telegram.
+//
+// escape — функція екранування, яку передає викликач (у зібраному
+// файлі це escapeHtml). Тягнути її сюди імпортом означало б другу
+// копію того самого.
+function formatChatMessage(message, thread, escape) {
+
+    const esc = typeof escape === "function" ? escape : (v) => String(v ?? "");
+
+    const перше = thread && thread.first === true;
+
+    return [
+        перше ? "💬 <b>Нове питання з сайту</b>" : "💬 <b>Питання з сайту</b>",
+        "",
+        esc(message),
+        "",
+        thread && thread.page ? `Сторінка: ${esc(thread.page)}` : "",
+        "↩️ Відповідайте <b>реплаєм на це повідомлення</b> — відповідь зʼявиться в людини на сайті."
+    ].filter(Boolean).join("\n");
+
+}
+
+// ЧИ ЗАРАЗ РОБОЧИЙ ЧАС.
+//
+// Потрібно не боту, а сайту: панель має сказати правду одразу.
+// «Відповімо за хвилину» о другій ночі — це обіцянка, якої ніхто не
+// виконає, і людина піде ображеною замість того, щоб спокійно
+// дочекатись ранку.
+//
+// Години ті самі, що на сторінці контактів: Пн–Нд 09:00–20:00.
+const CHAT_HOURS = { from: 9, to: 20 };
+
+// kyivHour — година за Києвом (0..23). Передається ззовні, бо
+// рахується вона по-різному: у браузері через Intl, на сервері
+// через timestamptz. Тут — лише саме правило.
+function withinWorkingHours(kyivHour) {
+
+    const h = Number(kyivHour);
+
+    if (!Number.isFinite(h)) return true;
+
+    return h >= CHAT_HOURS.from && h < CHAT_HOURS.to;
+
+}
+
+// Що сайт показує під полем вводу.
+function chatGreeting(kyivHour) {
+
+    return withinWorkingHours(kyivHour)
+        ? "Зазвичай відповідаємо за кілька хвилин."
+        : "Зараз неробочий час — відповімо зранку, з 9:00.";
+
+}
+
+
 // Незавершене оформлення: перевірка того, що прийшло з браузера.
 //
 // НАВІЩО ОКРЕМИЙ ФАЙЛ
@@ -6146,6 +6273,7 @@ function fromBase64url(text) {
 
 
 
+
 const TELEGRAM_BOT_TOKEN = Deno.env.get("TELEGRAM_BOT_TOKEN") ?? "";
 const TELEGRAM_CHAT_ID = Deno.env.get("TELEGRAM_CHAT_ID") ?? "";
 
@@ -6826,6 +6954,18 @@ async function handleMessage(message: Record<string, any>) {
     return;
 
   }
+
+  // --- відповідь власника в чаті сайту ---
+  //
+  // ПЕРШИМ, бо це найточніший обробник: він спрацьовує лише тоді,
+  // коли повідомлення — реплай САМЕ на картку з чату (її message_id
+  // лежить у chat_messages). Реплай на будь-що інше він пропускає
+  // далі, тож нічого в себе не забирає.
+  //
+  // Якби він стояв після handleOrderText, той міг би прийняти
+  // відповідь власника за крок оформлення — обидва читають просто
+  // текст.
+  if (await handleChatReply(message)) return;
 
   // --- відповіді на кроках, де клієнт пише текстом ---
   // Робимо це ДО перевірки команд: людина відповідає на питання
@@ -8743,6 +8883,328 @@ async function handleReviewCallback(callback: Record<string, any>, data: string)
 //
 // Чому без скрипта MailerLite і чому через нас — у subscribe.js.
 // -------------------------
+
+// ==================================================================
+// ЧАТ НА САЙТІ
+//
+// Покупець пише в панелі — повідомлення прилітає власнику в Telegram.
+// Власник відповідає РЕПЛАЄМ — відповідь зʼявляється на сайті.
+//
+// ЧОМУ ОПИТУВАННЯ, А НЕ REALTIME
+//
+// Supabase вміє realtime, але для нього браузер мусить мати доступ
+// до таблиці. Переписка містить те, що людина написала про себе, і
+// відкривати її анонімному ключу не можна навіть за політиками: ключ
+// лежить у коді сайту. Тут весь обмін іде через функцію, як і решта
+// в цьому проєкті, і таблиці лишаються закритими геть для всіх.
+//
+// Опитуємо лише поки панель відкрита — див. assets/js/site-chat.js.
+// ==================================================================
+
+// Нитка за токеном. Повертає null, якщо токена немає, він не схожий
+// на uuid або такої нитки вже не існує (власник видалив).
+async function loadThread(rawId: unknown) {
+
+  const id = cleanThreadId(rawId);
+
+  if (!id) return null;
+
+  const response = await supabaseRest(
+    `chat_threads?id=eq.${id}&select=id,page,blocked&limit=1`);
+
+  if (!response.ok) return null;
+
+  const rows = await response.json().catch(() => null);
+
+  return Array.isArray(rows) ? rows[0] ?? null : null;
+
+}
+
+async function insertChatMessage(
+  threadId: string, author: string, body: string, tgMessageId: number | null, seen: boolean) {
+
+  const response = await supabaseRest("chat_messages", {
+    method: "POST",
+    headers: { Prefer: "return=representation" },
+    body: JSON.stringify({
+      thread_id: threadId,
+      author,
+      body,
+      tg_message_id: tgMessageId,
+      seen,
+    }),
+  });
+
+  if (!response.ok) {
+    console.error("Чат: не вдалося записати повідомлення:", await response.text());
+    return null;
+  }
+
+  const rows = await response.json().catch(() => null);
+
+  return Array.isArray(rows) ? rows[0] ?? null : null;
+
+}
+
+// ПОКУПЕЦЬ НАДІСЛАВ ПОВІДОМЛЕННЯ
+//
+// Першим повідомленням нитка і створюється: окремого «почати чат» у
+// сайту немає, бо порожня нитка нікому не потрібна — ні власнику в
+// Telegram, ні в базі.
+async function handleChatSend(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  const text = cleanChatBody(body.body);
+
+  if (!text) {
+    return adminJson({ ok: false, error: "empty" }, 400, origin);
+  }
+
+  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
+
+    // Не «ок»: людина чекала б відповіді, про яку ніхто не дізнався.
+    console.error("Чат: бот не налаштований");
+
+    return adminJson({ ok: false, error: "not_configured" }, 501, origin);
+
+  }
+
+  let thread = await loadThread(body.thread);
+
+  const перше = !thread;
+
+  if (!thread) {
+
+    // Нова нитка. Межу по IP перевіряємо САМЕ ТУТ: далі межа йде по
+    // нитці, а створення ниток — єдине, що можна робити без токена.
+    if (!(await lookupAllowed(clientIp(request)))) {
+      return adminJson({ ok: false, error: "too_many" }, 429, origin);
+    }
+
+    const created = await supabaseRest("chat_threads", {
+      method: "POST",
+      headers: { Prefer: "return=representation" },
+      body: JSON.stringify({
+        page: cleanChatPage(body.page),
+        agent: String(request.headers.get("user-agent") ?? "").slice(0, CHAT_LIMITS.agent),
+      }),
+    });
+
+    if (!created.ok) {
+
+      console.error("Чат: не вдалося створити нитку:", await created.text());
+
+      return adminJson({ ok: false, error: "unavailable" }, 200, origin);
+
+    }
+
+    const rows = await created.json().catch(() => null);
+
+    thread = Array.isArray(rows) ? rows[0] ?? null : null;
+
+    if (!thread) {
+      return adminJson({ ok: false, error: "unavailable" }, 200, origin);
+    }
+
+  } else {
+
+    // Нитка вже є — межа рахується по ній. Заблокована теж не
+    // проходить: chat_allowed() повертає false і для неї.
+    const allowed = await supabaseRest("rpc/chat_allowed", {
+      method: "POST",
+      body: JSON.stringify({ p_thread: thread.id }),
+    });
+
+    const verdict = allowed.ok ? await allowed.json().catch(() => true) : true;
+
+    if (verdict === false) {
+      return adminJson({ ok: false, error: "too_many" }, 429, origin);
+    }
+
+  }
+
+  // Своє ж повідомлення людина вже бачить на екрані — пишемо його
+  // одразу прочитаним, інакше воно саме себе підсвітить як нове.
+  const saved = await insertChatMessage(thread.id, "visitor", text, null, true);
+
+  if (!saved) {
+    return adminJson({ ok: false, error: "unavailable" }, 200, origin);
+  }
+
+  const sent = await telegram("sendMessage", {
+    chat_id: TELEGRAM_CHAT_ID,
+    text: formatChatMessage(text, { page: thread.page, first: перше }, escapeHtml),
+    parse_mode: "HTML",
+    disable_web_page_preview: true,
+  });
+
+  if (sent?.ok && sent.result?.message_id) {
+
+    // Саме цей звʼязок і дозволяє реплаю знайти нитку.
+    await supabaseRest(`chat_messages?id=eq.${saved.id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ tg_message_id: sent.result.message_id }),
+    });
+
+  } else {
+
+    // Повідомлення в базі є, а власник його не побачив. Для людини
+    // це виглядає як «написала й тиша».
+    await reportServerIssue("site_chat", "Telegram не прийняв повідомлення з чату");
+
+  }
+
+  await supabaseRest(`chat_threads?id=eq.${thread.id}`, {
+    method: "PATCH",
+    body: JSON.stringify({ last_message_at: new Date().toISOString() }),
+  });
+
+  return adminJson({ ok: true, thread: thread.id, id: saved.id }, 200, origin);
+
+}
+
+// САЙТ ПИТАЄ, ЧИ Є НОВЕ
+//
+// Без токена нитки не віддаємо нічого: токен і є єдиним доказом, що
+// переписка ваша.
+async function handleChatPoll(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  const thread = await loadThread(body.thread);
+
+  if (!thread) {
+    // Не 404 і не помилка: нитки могло просто ще не бути. Сайт у
+    // такому разі показує порожній чат, а не поломку.
+    return adminJson({ ok: true, messages: [], unseen: 0 }, 200, origin);
+  }
+
+  const since = Number(body.since);
+
+  const filter = Number.isFinite(since) && since > 0 ? `&id=gt.${Math.floor(since)}` : "";
+
+  const response = await supabaseRest(
+    `chat_messages?thread_id=eq.${thread.id}${filter}` +
+    `&select=id,author,body,created_at,seen&order=id.asc&limit=${CHAT_LIMITS.batch}`);
+
+  if (!response.ok) {
+    return adminJson({ ok: false, error: "unavailable" }, 200, origin);
+  }
+
+  const rows = (await response.json().catch(() => [])) ?? [];
+
+  // Позначати прочитаним має сайт, а не цей запит: опитування йде і
+  // тоді, коли панель закрита (одна перевірка на завантаженні
+  // сторінки — чи не відповіли, поки людини не було).
+  if (body.seen === true && rows.length) {
+
+    await supabaseRest(
+      `chat_messages?thread_id=eq.${thread.id}&seen=eq.false`, {
+        method: "PATCH",
+        body: JSON.stringify({ seen: true }),
+      });
+
+  }
+
+  return adminJson({
+    ok: true,
+    messages: rows,
+    unseen: rows.filter((r: Record<string, any>) => r.seen === false && r.author === "owner").length,
+  }, 200, origin);
+
+}
+
+// ВЛАСНИК ВІДПОВІВ РЕПЛАЄМ У TELEGRAM
+//
+// Повертає true, якщо повідомлення було відповіддю в чаті, — тоді
+// решта обробників його не чіпає.
+async function handleChatReply(message: Record<string, any>): Promise<boolean> {
+
+  if (!isOwner(message?.chat?.id)) return false;
+
+  const replyTo = message?.reply_to_message?.message_id;
+
+  if (!replyTo) return false;
+
+  const found = await supabaseRest(
+    `chat_messages?tg_message_id=eq.${Number(replyTo)}&select=thread_id&limit=1`);
+
+  if (!found.ok) return false;
+
+  const rows = await found.json().catch(() => null);
+
+  const threadId = Array.isArray(rows) && rows[0] ? rows[0].thread_id : null;
+
+  // Реплай на щось інше (картку замовлення, відгук) — не наша справа.
+  if (!threadId) return false;
+
+  // --- /chatblock у відповідь на повідомлення з чату ---
+  //
+  // Єдиний спосіб заблокувати настирливого відвідувача, не відкриваючи
+  // базу. Стоїть тут, бо тільки тут уже відома нитка.
+  if (/^\/chatblock(@\S+)?$/i.test(String(message.text ?? "").trim())) {
+
+    await supabaseRest(`chat_threads?id=eq.${threadId}`, {
+      method: "PATCH",
+      body: JSON.stringify({ blocked: true }),
+    });
+
+    await telegram("sendMessage", {
+      chat_id: message.chat.id,
+      text: "Цю розмову заблоковано — нових повідомлень із неї не буде.",
+      reply_to_message_id: message.message_id,
+    });
+
+    return true;
+
+  }
+
+  const text = cleanChatBody(message.text);
+
+  if (!text) {
+
+    await telegram("sendMessage", {
+      chat_id: message.chat.id,
+      text: "Порожню відповідь не надсилаю. Напишіть текст реплаєм ще раз.",
+      reply_to_message_id: message.message_id,
+    });
+
+    return true;
+
+  }
+
+  const saved = await insertChatMessage(threadId, "owner", text, message.message_id, false);
+
+  if (!saved) {
+
+    // Мовчати тут не можна: власник вважатиме, що відповів.
+    await telegram("sendMessage", {
+      chat_id: message.chat.id,
+      text: "Не вдалося зберегти відповідь. Спробуйте ще раз.",
+      reply_to_message_id: message.message_id,
+    });
+
+    return true;
+
+  }
+
+  await supabaseRest(`chat_threads?id=eq.${threadId}`, {
+    method: "PATCH",
+    body: JSON.stringify({ last_message_at: new Date().toISOString() }),
+  });
+
+  // Підтверджуємо галочкою, а не словами: у переписці з десятком
+  // розмов зайвий рядок на кожну відповідь тільки заважає.
+  await telegram("setMessageReaction", {
+    chat_id: message.chat.id,
+    message_id: message.message_id,
+    reaction: [{ type: "emoji", emoji: "👍" }],
+  });
+
+  return true;
+
+}
 
 // ЗАМОВЛЕННЯ ЗВОРОТНОГО ДЗВІНКА
 //
@@ -11525,6 +11987,20 @@ async function handleRequest(request: Request): Promise<Response> {
   if (body.site_action === "call-back") {
 
     return await handleCallBack(request, body);
+
+  }
+
+  // --- чат на сайті: покупець надіслав повідомлення ---
+  if (body.site_action === "chat-send") {
+
+    return await handleChatSend(request, body);
+
+  }
+
+  // --- чат на сайті: сайт питає, чи є нове ---
+  if (body.site_action === "chat-poll") {
+
+    return await handleChatPoll(request, body);
 
   }
 

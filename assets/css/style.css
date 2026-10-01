@@ -16404,3 +16404,234 @@ body.mobile-filters-open .contact-dock{
    вже стоїть глобальне правило з !important на *, ::before і ::after.
    Друга копія нічого б не додала, зате розійшлася б із ним на першій
    же правці. */
+
+/* =====================================
+   ЧАТ У ПАНЕЛІ
+
+   Панель чату вища за панель дзвінка: у ній стрічка листування,
+   якій потрібне місце. Висоту тримаємо в межах екрана — інакше на
+   ноутбуці верх панелі заїжджає під шапку.
+===================================== */
+
+.dock-panel-chat{
+    width:340px;
+    display:flex;
+    flex-direction:column;
+    /* 82px — висота закріпленої шапки, 40 — повітря під нею. Нижче
+       панель спирається на власний bottom, тож тут лише стеля. */
+    max-height:calc(100vh - 82px - 40px - 150px);
+    padding-bottom:14px;
+}
+
+.chat-log{
+    flex:1 1 auto;
+    min-height:140px;
+    overflow-y:auto;
+    overscroll-behavior:contain;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    padding:4px 2px 12px;
+    margin-bottom:10px;
+    border-bottom:1px solid var(--gray100);
+}
+
+.chat-empty{
+    color:var(--gray500);
+    font-size:13px;
+    line-height:1.6;
+}
+
+.chat-empty p{
+    margin:0 0 8px;
+}
+
+.chat-msg{
+    display:flex;
+    max-width:85%;
+}
+
+.chat-msg-visitor{
+    align-self:flex-end;
+}
+
+.chat-msg-owner{
+    align-self:flex-start;
+}
+
+.chat-msg-body{
+    margin:0;
+    padding:9px 13px;
+    border-radius:14px;
+    font-size:14px;
+    line-height:1.5;
+    /* Переноси, які написала людина, лишаються переносами; довге
+       слово без пробілів не розсуває панель. */
+    white-space:pre-wrap;
+    overflow-wrap:anywhere;
+}
+
+.chat-msg-visitor .chat-msg-body{
+    background:var(--secondary);
+    color:#fff;
+    border-bottom-right-radius:4px;
+}
+
+.chat-msg-owner .chat-msg-body{
+    background:var(--gray100);
+    color:var(--gray900);
+    border-bottom-left-radius:4px;
+}
+
+/* -- поле вводу -- */
+
+.chat-form{
+    display:flex;
+    align-items:flex-end;
+    gap:8px;
+}
+
+.chat-input{
+    flex:1 1 auto;
+    min-width:0;
+    padding:10px 12px;
+    border:1px solid var(--gray200);
+    border-radius:12px;
+    font-size:14px;
+    line-height:1.4;
+    color:var(--gray900);
+    resize:none;
+    max-height:120px;
+    transition:border-color 200ms ease;
+}
+
+.chat-input:focus{
+    outline:none;
+    border-color:var(--secondary);
+}
+
+/* 40px, а не 24: кнопку надсилання тиснуть пальцем, часто поспіхом
+   і часто однією рукою (WCAG 2.5.8 вимагає 24, тут із запасом). */
+.chat-send{
+    flex-shrink:0;
+    width:40px;
+    height:40px;
+    border:none;
+    border-radius:50%;
+    background:var(--primary);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition:background-color 200ms ease;
+}
+
+.chat-send:hover,
+.chat-send:focus-visible{
+    background:var(--secondary);
+}
+
+.chat-send .dock-icon{
+    width:17px;
+    height:17px;
+}
+
+.chat-note{
+    margin:8px 0 0;
+    font-size:12px;
+    line-height:1.5;
+    color:var(--gray500);
+}
+
+.chat-note:empty{
+    display:none;
+}
+
+.chat-note.is-error{
+    color:var(--danger);
+}
+
+/* -- канали смугою внизу --
+
+   Були списком на всю панель і були тут головними. Тепер головне —
+   саме листування, а канали лишились запасним шляхом для тих, кому
+   звичніше в месенджері. */
+
+.chat-channels{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-top:12px;
+    padding-top:12px;
+    border-top:1px solid var(--gray100);
+}
+
+.chat-channels-label{
+    font-size:12px;
+    color:var(--gray500);
+    flex-shrink:0;
+}
+
+.chat-channels-list{
+    display:flex;
+    gap:6px;
+}
+
+.dock-channel-mini{
+    width:32px;
+    height:32px;
+    border-radius:50%;
+    background:var(--gray100);
+    color:var(--gray700);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:background-color 200ms ease, color 200ms ease;
+}
+
+.dock-channel-mini:hover,
+.dock-channel-mini:focus-visible{
+    background:var(--primary);
+    color:#fff;
+}
+
+.dock-channel-mini .dock-icon{
+    width:16px;
+    height:16px;
+}
+
+/* -- крапка «є відповідь» --
+
+   Людина написала, закрила панель і пішла читати каталог. Відповідь
+   прийшла — і без цієї крапки вона дізнається про неї, лише
+   здогадавшись відкрити панель знову. */
+
+.dock-btn.has-unread::after{
+    content:"";
+    position:absolute;
+    top:2px;
+    right:2px;
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    background:var(--danger);
+    /* Обводка кольором сторінки — щоб крапка читалась і на темній
+       кнопці, і коли та підсвічена синім. */
+    border:2px solid var(--gray50);
+}
+
+@media(max-width:768px){
+
+    .dock-panel-chat{
+        width:auto;
+        /* На телефоні панель і так на всю ширину, а от висоту треба
+           тримати окремо: клавіатура зʼїдає половину екрана. */
+        max-height:calc(100vh - 82px - 24px - 180px);
+    }
+
+    .chat-log{
+        min-height:120px;
+    }
+
+}
