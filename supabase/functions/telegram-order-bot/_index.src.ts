@@ -87,6 +87,9 @@ import {
   CONFIRM_COOLDOWN_MINUTES,
 } from "./subscribe.js";
 import {
+  normalizeCallBackPhone, cleanCallBackPage, formatCallBack,
+} from "./call-back.js";
+import {
   cleanLoginToken, loginCode, loginDeepLink, loginVerdict, loginStatus,
   telegramEmail, telegramName, sharedPhone, LOGIN_TTL_MINUTES,
   isServiceEmail, cleanNewEmail, emailAddPayload, readEmailAddPayload,
@@ -2691,6 +2694,64 @@ async function handleReviewCallback(callback: Record<string, any>, data: string)
 //
 // Чому без скрипта MailerLite і чому через нас — у subscribe.js.
 // -------------------------
+
+// ЗАМОВЛЕННЯ ЗВОРОТНОГО ДЗВІНКА
+//
+// Плаваюча кнопка в лівому кутку сайту. Людина лишає номер — власнику
+// прилітає повідомлення в Telegram. Інших наслідків немає: нічого не
+// пишемо в базу, нікуди не підписуємо, листів не шлемо.
+//
+// Перевірка номера й текст повідомлення — у call-back.js, бо це чиста
+// логіка, і тести ганяють її в Node.
+async function handleCallBack(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  const phone = normalizeCallBackPhone(body.phone);
+
+  if (!phone) {
+
+    console.warn("Зворотний дзвінок відхилено: номер не схожий на номер");
+
+    return adminJson({ ok: false, error: "bad_phone" }, 400, origin);
+
+  }
+
+  // Та сама межа звернень, що в підписки й «Де моє замовлення».
+  // Без неї кнопка стає способом завалити власника дзвінками.
+  if (!(await lookupAllowed(clientIp(request)))) {
+    return adminJson({ ok: false, error: "too_many" }, 429, origin);
+  }
+
+  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
+
+    // Не «ок»: інакше людина чекала б дзвінка, якого ніхто не замовляв.
+    console.error("Зворотний дзвінок: бот не налаштований");
+
+    return adminJson({ ok: false, error: "not_configured" }, 501, origin);
+
+  }
+
+  const sent = await telegram("sendMessage", {
+    chat_id: TELEGRAM_CHAT_ID,
+    text: formatCallBack(phone, cleanCallBackPage(body.page), escapeHtml),
+    parse_mode: "HTML",
+    disable_web_page_preview: true,
+  });
+
+  if (!sent?.ok) {
+
+    // Telegram не прийняв — отже, власник НЕ дізнається. Сказати тут
+    // «готово» означало б пообіцяти дзвінок у порожнечу.
+    await reportServerIssue("call_back", "Telegram не прийняв замовлення дзвінка");
+
+    return adminJson({ ok: false, error: "unavailable" }, 200, origin);
+
+  }
+
+  return adminJson({ ok: true }, 200, origin);
+
+}
 
 async function handleSubscribe(request: Request, body: Record<string, any>): Promise<Response> {
 
@@ -5408,6 +5469,13 @@ async function handleRequest(request: Request): Promise<Response> {
   if (body.site_action === "subscribe") {
 
     return await handleSubscribe(request, body);
+
+  }
+
+  // --- «передзвоніть мені» з плаваючої кнопки ---
+  if (body.site_action === "call-back") {
+
+    return await handleCallBack(request, body);
 
   }
 
