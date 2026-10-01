@@ -104,6 +104,60 @@
 
     }
 
+    // ПІСЛЯ УСПІХУ ФОРМИ БІЛЬШЕ НЕМАЄ.
+    //
+    // ЩО БУЛО НЕ ТАК. Підписався — поле й кнопка «Підписатись»
+    // лишались на місці, а про успіх казав лише рядок під ними. Поки
+    // на екрані стоїть кнопка, яку щойно натиснув, людина не певна,
+    // чи спрацювало, і тисне ще раз.
+    //
+    // У формі відгуку це вже зроблено правильно: вона ховається, а на
+    // її місце стає підтвердження. Правило в проєкті було — просто
+    // застосоване в одному місці з трьох.
+    //
+    // ЧОМУ БЛОК НАРОДЖУЄТЬСЯ ТУТ, А НЕ В РОЗМІТЦІ. Форма підписки
+    // стоїть на шістнадцяти сторінках, а catalog.html і product.html —
+    // ще й шаблони для 136 згенерованих. Те, що лежить у шістнадцяти
+    // файлах, розходиться.
+    var doneEl = document.createElement("div");
+
+    doneEl.className = "subscribe-done";
+    doneEl.hidden = true;
+
+    doneEl.innerHTML = '<p class="subscribe-done-text"></p>'
+        + '<button type="button" class="subscribe-done-again">Підписати іншу пошту</button>';
+
+    form.insertAdjacentElement("afterend", doneEl);
+
+    var doneText = doneEl.querySelector(".subscribe-done-text");
+    var doneAgain = doneEl.querySelector(".subscribe-done-again");
+
+    function showDone(text) {
+
+        doneText.textContent = text;
+
+        form.hidden = true;
+        doneEl.hidden = false;
+
+        // Фокус туди, куди веде шлях далі: інакше той, хто ходить
+        // клавіатурою, лишається на кнопці, якої вже немає.
+        doneAgain.focus({ preventScroll: true });
+
+    }
+
+    doneAgain.addEventListener("click", function () {
+
+        noteEl.hidden = true;
+        emailEl.value = "";
+        consentEl.checked = false;
+
+        doneEl.hidden = true;
+        form.hidden = false;
+
+        emailEl.focus({ preventScroll: true });
+
+    });
+
     form.addEventListener("submit", async function (event) {
 
         event.preventDefault();
@@ -157,8 +211,6 @@
 
             if (data && data.ok) {
 
-                say(subscribeMessage(data.state), "ok");
-
                 // Стан щойно змінився — записане про нього більше не
                 // правда. Форма приймає будь-яку адресу, тож навіть
                 // не завжди зрозуміло, чия саме підписка змінилась;
@@ -166,6 +218,13 @@
                 forget();
 
                 form.reset();
+
+                // Форму ховаємо, на її місце стає підтвердження. Текст
+                // той самий, що був у рядку, — він і так казав різне
+                // для «нова», «вже в списку» й «не підтверджена».
+                noteEl.hidden = true;
+
+                showDone(subscribeMessage(data.state));
 
                 return;
 
