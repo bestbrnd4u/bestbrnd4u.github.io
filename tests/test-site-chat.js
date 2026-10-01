@@ -44,7 +44,8 @@ function loadModule(rel, names) {
 
 const CHAT = loadModule("supabase/functions/telegram-order-bot/chat.js", [
     "cleanChatBody", "cleanThreadId", "cleanChatPage", "formatChatMessage",
-    "withinWorkingHours", "chatGreeting", "CHAT_LIMITS", "CHAT_HOURS"
+    "withinWorkingHours", "chatGreeting", "CHAT_LIMITS", "CHAT_HOURS",
+    "chatUserName", "chatWho", "chatDoneReceipt"
 ]);
 
 const МОДУЛЬ = read("assets/js/contact-buttons.js");
@@ -146,6 +147,147 @@ console.log("\n[4] Те, що написала людина, не стає ро�
     check("картка каже, що відповідати треба реплаєм", /реплаєм/.test(текст));
 
     check("сторінка в картці є", /\/catalog/.test(текст));
+}
+
+
+console.log("\n[4a] У картці видно, ХТО пише");
+{
+    const { chatWho, chatUserName, formatChatMessage } = CHAT;
+
+    const esc = v => String(v ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+    // ЩО БУЛО НЕ ТАК. Усі картки виглядали однаково: «Питання з
+    // сайту» й текст. Коли пишуть двоє одночасно, власник не бачить,
+    // де чия репліка, — і відповідає не тому.
+
+    // --- гість ---
+    check("гість підписаний номером", chatWho({ thread_no: 7 }) === "Гість #7");
+
+    // Номер, а не шматок uuid: його можна вимовити («відповідаю гостю
+    // сім») і видно, хто прийшов раніше.
+    check("номер читається, а не є набором знаків",
+        /^Гість #\d+$/.test(chatWho({ thread_no: 42 })), chatWho({ thread_no: 42 }));
+
+    check("без номера не падає", chatWho({}) === "Гість");
+    check("без нитки взагалі не падає", chatWho(null) === "Гість");
+
+    // --- той, хто ввійшов ---
+    check("впізнаний підписаний імʼям і поштою",
+        chatWho({ thread_no: 7, user_name: "Олена Коваль", user_email: "o@example.com" })
+            === "Олена Коваль · o@example.com");
+
+    // Імені в профілі може не бути — пошта є завжди й розрізняє людей
+    // не гірше.
+    check("без імені лишається пошта",
+        chatWho({ thread_no: 7, user_email: "o@example.com" }) === "o@example.com");
+
+    check("імʼя без пошти теж годиться",
+        chatWho({ thread_no: 7, user_name: "Олена" }) === "Олена");
+
+    // Впізнаного НЕ підписуємо номером: номер тут був би гірший за
+    // імʼя, а не доповненням до нього.
+    check("впізнаного не звемо гостем",
+        !/Гість/.test(chatWho({ thread_no: 7, user_name: "Олена", user_email: "o@e.com" })));
+
+    // --- імʼя з метаданих ---
+    //
+    // Ключі різні в різних провайдерів.
+    check("Google: given_name / family_name",
+        chatUserName({ user_metadata: { given_name: "Олена", family_name: "Коваль" } }) === "Олена Коваль");
+
+    check("Telegram: first_name / last_name",
+        chatUserName({ user_metadata: { first_name: "Олена", last_name: "Коваль" } }) === "Олена Коваль");
+
+    check("одне поле на все імʼя: full_name",
+        chatUserName({ user_metadata: { full_name: "Олена Коваль" } }) === "Олена Коваль");
+
+    check("і name теж", chatUserName({ user_metadata: { name: "Олена" } }) === "Олена");
+
+    check("порожні метадані не ламають", chatUserName({}) === "");
+    check("відсутній користувач не ламає", chatUserName(null) === "");
+
+    // ТА САМА ЛОГІКА ЖИВЕ В БРАУЗЕРІ.
+    //
+    // assets/js/account.js робить те саме для кабінету. Спільного
+    // модуля між ботом і сайтом немає, тож це копія — і переліки
+    // ключів мусять збігатись, інакше в картці буде одне імʼя, а в
+    // кабінеті інше.
+    const account = read("assets/js/account.js");
+
+    ["given_name", "family_name", "first_name", "last_name", "full_name", "name"]
+        .forEach(ключ => {
+
+            check(`ключ ${ключ} знають обидва боки`,
+                account.includes(ключ) && read("supabase/functions/telegram-order-bot/chat.js").includes(ключ));
+
+        });
+
+    // --- підпис у самій картці ---
+    const картка = formatChatMessage("хай", { thread_no: 3, page: "/catalog", first: true }, esc);
+
+    check("підпис стоїть у картці", /Гість #3/.test(картка), картка.split("\n")[1]);
+
+    check("підпис другим рядком, одразу під заголовком",
+        /^💬 <b>[^<]*<\/b>\n👤 <b>Гість #3<\/b>/.test(картка),
+        картка.split("\n").slice(0, 2).join(" | "));
+
+    // КАРТКА НЕ МАЄ ЗЛИПАТИСЬ У СТОВПЧИК.
+    //
+    // Порожні рядки тут були, але їх зʼїдав .filter(Boolean) — він
+    // потрібен, щоб прибрати «Сторінка», коли сторінки немає, а
+    // заразом викидав і роздільники. Заголовок, підпис, саме питання
+    // й службова примітка читались однаково щільно.
+    check("питання відділене порожніми рядками",
+        /<\/b>\n\nхай\n\n/.test(картка),
+        JSON.stringify(картка.slice(0, 90)));
+
+    // А ось рядка «Сторінка» бути не повинно, коли сторінки немає.
+    const безСторінки = formatChatMessage("хай", { thread_no: 3, first: true }, esc);
+
+    check("без сторінки зайвого рядка немає",
+        !/Сторінка:/.test(безСторінки) && !/\n\n\n/.test(безСторінки),
+        JSON.stringify(безСторінки));
+
+    // Підпис на КОЖНІЙ картці, не лише на першій: власник гортає
+    // переписку й має бачити біля кожної репліки, чия вона.
+    const друга = formatChatMessage("ще", { thread_no: 3, first: false }, esc);
+
+    check("підпис є й на наступних картках", /Гість #3/.test(друга));
+
+    // Імʼя приходить від людини — екранувати обовʼязково.
+    const злий = formatChatMessage("хай",
+        { thread_no: 1, user_name: "<b>хакер</b>", user_email: "a@b.c" }, esc);
+
+    check("імʼя в підписі екрановано", !/<b>хакер<\/b>/.test(злий), злий.split("\n")[1]);
+}
+
+
+console.log("\n[4b] Підтвердження власнику теж називають, кого саме");
+{
+    const { chatDoneReceipt } = CHAT;
+
+    // «Розмову завершено» у переписці з десятком розмов не каже нічого.
+    check("у підтвердженні видно, кого завершили",
+        /Гість #7/.test(chatDoneReceipt("текст", "Гість #7")),
+        chatDoneReceipt("текст", "Гість #7").split("\n").slice(0, 2).join(" | "));
+
+    // ПІДПИС ОКРЕМИМ РЯДКОМ, А НЕ ВСЕРЕДИНІ РЕЧЕННЯ.
+    //
+    // «Розмову з Гість #7 завершено» — не українською: потрібен
+    // орудний відмінок. А для імені з профілю це нерозвʼязно:
+    // відміняти чуже імʼя програмно не можна.
+    check("підпис не всередині речення",
+        !/Розмову з /.test(chatDoneReceipt("текст", "Гість #7")),
+        chatDoneReceipt("текст", "Гість #7").split("\n")[0]);
+
+    check("підпис другим рядком",
+        chatDoneReceipt("текст", "Гість #7").split("\n")[1] === "👤 Гість #7");
+
+    check("без імені зайвого рядка немає",
+        chatDoneReceipt("текст", "").split("\n")[1] === "");
+
+    check("блокування теж називає, кого, і теж окремим рядком",
+        /Розмову заблоковано[\s\S]{0,80}👤 \$\{ктоЦе\}/.test(ФУНКЦІЯ));
 }
 
 
@@ -443,6 +585,29 @@ console.log("\n[10] Сервер: чат не стає діркою в базі"
 
     check("межу не можна покликати з браузера",
         /revoke execute on function public\.chat_allowed\(uuid\) from anon/.test(МІГРАЦІЯ));
+
+    // ПІДПИС РОЗМОВИ БЕРЕТЬСЯ З ТОКЕНА, А НЕ З ТІЛА ЗАПИТУ.
+    //
+    // Інакше будь-хто підписав би свою розмову чужим імʼям — а
+    // власник відповідав би, вважаючи, що знає співрозмовника. Це не
+    // косметика: на підпис він спиратиметься, вирішуючи, що казати.
+    const хто = (ФУНКЦІЯ.match(/async function chatIdentity[\s\S]*?\n}\n/) || [""])[0];
+
+    check("обробник впізнавання знайдено", хто.length > 0);
+
+    check("імʼя береться з /auth/v1/user", /auth\/v1\/user/.test(хто));
+
+    check("токен — із заголовка Authorization",
+        /headers\.get\("authorization"\)/.test(хто));
+
+    // Жодного читання body: саме це й була б дірка.
+    check("з тіла запиту імʼя не беремо", !/body\./.test(хто), хто.slice(0, 120));
+
+    check("у нитку пишемо лише перевірене",
+        /\.\.\.\(хто \?\? \{\}\)/.test(send));
+
+    // Не впізнали — розмова лишається гостьовою, а не падає.
+    check("невпізнаний не ламає чат", /return null;/.test(хто));
 }
 
 
@@ -603,6 +768,22 @@ console.log("\n[13] Токен розмови не світиться в адр�
     check("звернення до сховища в try/catch",
         /try \{ return window\.localStorage\.getItem/.test(МОДУЛЬ)
         && /try \{ window\.localStorage\.setItem/.test(МОДУЛЬ));
+
+    // Сайт надсилає ТОКЕН, а не імʼя: тіло запиту підробить будь-хто,
+    // токен перевіряє Supabase.
+    check("сайт шле токен сесії, якщо людина ввійшла",
+        /supabaseClient\.auth\.getSession\(\)/.test(МОДУЛЬ));
+
+    check("токен іде в Authorization",
+        /Authorization: "Bearer " \+ \(токен \|\| SUPABASE_PUBLISHABLE_KEY\)/.test(МОДУЛЬ));
+
+    check("імʼя в тілі запиту не надсилаємо",
+        !/user_name|user_email|userName/.test(МОДУЛЬ),
+        (МОДУЛЬ.match(/user_name|user_email|userName/) || [""])[0]);
+
+    // Гість токена не має — і це нормальний шлях, не помилка.
+    check("без сесії лишається публічний ключ",
+        /return \(жива && жива\.access_token\) \|\| null;/.test(МОДУЛЬ));
 }
 
 
