@@ -68,13 +68,31 @@ function readMediaFolder() {
 
 }
 
-const MEDIA_DIR_REL = readMediaFolder();
-const MEDIA_DIR = path.join(ROOT, MEDIA_DIR_REL);
+// ПІСОЧНИЦЯ ДЛЯ ТЕСТІВ — І ЧОМУ ВОНА ТУТ ПОТРІБНА.
+//
+// Скрипт ПЕРЕНОСИТЬ файли. Поки тест ганяв його по справжніх теках
+// проєкту, кожен `npm test` робив справжню архівацію: будь-яке
+// невживане фото, що відлежало свої 30 днів, їхало в архів НАСПРАВДІ.
+//
+// Далі ставало гірше. Прибираючи за прогоном, я відкочував
+// manifest.json і pending.json — а перенесений файл лишався в архіві
+// вже без запису про себе. Повернути його скриптом (--restore) після
+// цього неможливо: restore шукає саме в маніфесті. Наступний прогін
+// переносив копію з медіатеки знову, тепер уже з суфіксом «-2».
+//
+// Так у репозиторії й опинилось ШІСТЬ ПАР однакових файлів (4,26 МБ)
+// і один запис в архіві, якого немає в маніфесті.
+//
+// Тому теки задаються ззовні: тест працює у своїй тимчасовій, і
+// справжньої медіатеки прогін не торкається взагалі. Шлях може бути
+// і абсолютним, тому resolve, а не join.
+const MEDIA_DIR_REL = process.env.ARCHIVE_MEDIA_DIR || readMediaFolder();
+const MEDIA_DIR = path.resolve(ROOT, MEDIA_DIR_REL);
 
 // Архів навмисно ЗА МЕЖАМИ media_folder — інакше Decap показував би
 // його вміст у тому самому діалозі, і сенс прибирання зникає.
-const ARCHIVE_DIR_REL = "assets/images/_archive";
-const ARCHIVE_DIR = path.join(ROOT, ARCHIVE_DIR_REL);
+const ARCHIVE_DIR_REL = process.env.ARCHIVE_TARGET_DIR || "assets/images/_archive";
+const ARCHIVE_DIR = path.resolve(ROOT, ARCHIVE_DIR_REL);
 const MANIFEST_FILE = path.join(ARCHIVE_DIR, "manifest.json");
 const PENDING_FILE = path.join(ARCHIVE_DIR, "pending.json");
 
@@ -383,7 +401,11 @@ function restore(target) {
             return;
         }
 
-        const to = path.join(ROOT, item.from);
+        // resolve, а не join: у маніфесті шлях зазвичай відносний, але
+        // коли теку задано ззовні (ARCHIVE_MEDIA_DIR), він абсолютний —
+        // join тоді склеїв би корінь проєкту з «C:\…» і файл нікуди
+        // не повернувся б.
+        const to = path.resolve(ROOT, item.from);
 
         if (fs.existsSync(to)) {
             console.error(`  пропущено (у медіатеці вже є): ${item.from}`);
