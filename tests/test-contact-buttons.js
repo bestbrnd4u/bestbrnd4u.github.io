@@ -384,15 +384,20 @@ console.log("\n[7] Док не накриває того, що вже стоїт
     // й тоді, коли базове зникло, а лишилось тільки те, що в
     // @media(max-width:768px). Тобто на ноутбуці кнопки знову під
     // банером, а тест мовчить. Сам на це й натрапив.
-    check("піднімається над банером згоди (базове правило)",
-        /body:has\(\.consent-banner\)\s*\.contact-dock\{/.test(безМедіа(CSS)));
+    // ПІДЙОМ ЗАДАЄТЬСЯ ЗМІННОЮ, А НЕ ВЛАСНИМ bottom У КОЖНОГО СТАНУ.
+    //
+    // Раніше кожен стан мав свій bottom, і це вийшло боком: правило
+    // для клавіатури на айфоні програвало їм вагою :has() і док не
+    // рухався. Тепер bottom один, а стани міняють --dock-lift на body.
+    check("підйом над банером згоди задано (базове правило)",
+        /body:has\(\.consent-banner\)\{[^}]*--dock-lift/.test(безМедіа(CSS)));
 
-    check("піднімається над банером згоди і на вузькому екрані",
-        (CSS.match(/body:has\(\.consent-banner\)\s*\.contact-dock\{/g) || []).length >= 2,
-        String((CSS.match(/body:has\(\.consent-banner\)\s*\.contact-dock\{/g) || []).length));
+    check("підйом над банером згоди є й на вузькому екрані",
+        (CSS.match(/body:has\(\.consent-banner\)\{[^}]*--dock-lift/g) || []).length >= 2,
+        String((CSS.match(/body:has\(\.consent-banner\)\{[^}]*--dock-lift/g) || []).length));
 
-    check("піднімається над мобільною кнопкою «Купити»",
-        /body:has\(\.mobile-sticky-cart\.show\)\s*\.contact-dock\{/.test(CSS));
+    check("підйом над мобільною кнопкою «Купити»",
+        /body:has\(\.mobile-sticky-cart\.show\)\{[^}]*--dock-lift/.test(CSS));
 
     // Шторка фільтрів має власний футер на всю ширину.
     check("ховається під шторкою фільтрів",
@@ -413,14 +418,14 @@ console.log("\n[7] Док не накриває того, що вже стоїт
     // Тому перевіряємо не «чи є правило», а ВАГУ: спільний випадок
     // мусить перемагати обидва поодинокі.
     check("спільний випадок «банер + кошик» описаний окремо",
-        /body:has\(\.consent-banner\):has\(\.mobile-sticky-cart\.show\)\s*\.contact-dock\{/.test(CSS));
+        /body:has\(\.consent-banner\):has\(\.mobile-sticky-cart\.show\)\{[^}]*--dock-lift/.test(CSS));
 
     // Рахуємо класи в селекторі — для таких простих це і є вага.
     const вага = сел => (сел.match(/\.[\w-]+/g) || []).length;
 
-    const спільний = вага("body:has(.consent-banner):has(.mobile-sticky-cart.show) .contact-dock");
-    const кошикОдин = вага("body:has(.mobile-sticky-cart.show) .contact-dock");
-    const банерОдин = вага("body:has(.consent-banner) .contact-dock");
+    const спільний = вага("body:has(.consent-banner):has(.mobile-sticky-cart.show)");
+    const кошикОдин = вага("body:has(.mobile-sticky-cart.show)");
+    const банерОдин = вага("body:has(.consent-banner)");
 
     check("спільне правило важче за «тільки кошик»", спільний > кошикОдин,
         `${спільний} проти ${кошикОдин}`);
@@ -437,7 +442,7 @@ console.log("\n[7] Док не накриває того, що вже стоїт
         /body:has\(\.mobile-sticky-cart\.show\)\s*\.consent-banner\{[^}]*bottom\s*:\s*76px/.test(CSS));
 
     const спільніПравила = CSS.match(
-        /body:has\(\.consent-banner\):has\(\.mobile-sticky-cart\.show\)\s*\.contact-dock\{([^}]*)\}/g) || [];
+        /body:has\(\.consent-banner\):has\(\.mobile-sticky-cart\.show\)\{([^}]*)\}/g) || [];
 
     check("підйом рахує й кошик, і банер",
         спільніПравила.length >= 2 && спільніПравила.every(r => /76px/.test(r)),

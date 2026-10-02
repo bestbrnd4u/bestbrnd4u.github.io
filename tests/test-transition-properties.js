@@ -212,7 +212,8 @@ console.log("\n[3] Немає переходів, які не анімують �
         ".gallery-slide": "масштаб іде через --frame-zoom, який ставить app.js:263",
         ".gallery-photo": "те саме: --frame-zoom з app.js:263",
         ".favorite-row-undo-bar span": "width ставить favorites.js:298 інлайном — смужка відліку",
-        ".btn-modal": "стани на сусідніх класах .btn-modal-confirm:hover / .btn-modal-cancel:hover"
+        ".btn-modal": "стани на сусідніх класах .btn-modal-confirm:hover / .btn-modal-cancel:hover",
+        ".contact-dock": "bottom рахується з --dock-lift, а її міняють стани на body (банер згоди, кнопка «Купити», вузький екран)"
     };
 
     const пусті = переходи

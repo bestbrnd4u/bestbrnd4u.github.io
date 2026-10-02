@@ -13965,9 +13965,19 @@ summary:focus-visible,
 [role="button"]:focus-visible{
     outline:3px solid var(--secondary);
     outline-offset:2px;
-    /* Скруглення успадковується від елемента, тож рамка обіймає
-       кнопку по формі, а не прямокутником поверх неї. */
-    border-radius:inherit;
+    /* ТУТ БУЛО border-radius:inherit — І ЦЕ РОБИЛО ПРОТИЛЕЖНЕ.
+
+       Коментар обіцяв «скруглення успадковується ВІД ЕЛЕМЕНТА».
+       Насправді inherit бере значення в БАТЬКА. У круглої кнопки
+       (border-radius:50%) батько зазвичай без скруглення — і на час
+       фокуса кнопка ставала КВАДРАТНОЮ разом із рамкою.
+
+       Власник прислав це з айфона: закрив чат, а на круглій кнопці
+       лишився синій квадрат.
+
+       Нічого замість не потрібно: outline і так обіймає елемент по
+       його власному border-radius — так малюють усі браузери, яким
+       цей сайт ще цікавий. */
 }
 
 /* На темних смугах синя рамка тоне — там світла. */
@@ -15971,7 +15981,17 @@ body.refusal-open{
 .contact-dock{
     position:fixed;
     left:30px;
-    bottom:30px;
+    /* ЄДИНИЙ bottom на весь док.
+       
+       Стани (банер згоди, мобільна кнопка «Купити», вузький
+       екран) міняють ТІЛЬКИ --dock-lift на body — див. нижче.
+       Тут лише складання, і клавіатура додається беззастережно.
+       
+       Було інакше: кожен стан мав власний bottom, і правило
+       клавіатури програвало їм вагою селектора :has(), хоч і
+       стояло останнім у файлі. На айфоні панель лишалась під
+       клавіатурою. */
+    bottom:calc(var(--dock-lift, 30px) + var(--keyboard-h, 0px));
     z-index:999;
     display:flex;
     flex-direction:column;
@@ -16074,7 +16094,9 @@ body.refusal-open{
 .dock-panel{
     position:fixed;
     left:30px;
-    bottom:calc(30px + 48px + 12px + 48px + 12px);
+    /* Панель стоїть над доком: його підйом плюс висота самого
+       дока (48 + 12 + 48) і проміжок 12. */
+    bottom:calc(var(--dock-lift, 30px) + 120px + var(--keyboard-h, 0px));
     z-index:1000;
     width:320px;
     max-width:calc(100vw - 60px);
@@ -16253,7 +16275,15 @@ body.refusal-open{
     padding:12px 14px;
     border:1px solid var(--gray200);
     border-radius:12px;
-    font-size:15px;
+    /* 16px НЕ ДЛЯ КРАСИ.
+
+       Safari на iPhone САМ наближає сторінку, щойно фокус потрапляє
+       в поле зі шрифтом меншим за 16px. Було 15 — і екран стрибав
+       на кожне торкання поля; повернути масштаб назад людина мусить
+       сама, двома пальцями.
+
+       Власник прислав це з айфона. Те саме правило й у полі чату. */
+    font-size:16px;
     color:var(--gray900);
     transition:border-color 200ms ease;
 }
@@ -16322,20 +16352,12 @@ body.refusal-open{
    уже підіймається стрілка «нагору».
 ===================================== */
 
-body:has(.consent-banner) .contact-dock{
-    bottom:calc(30px + 116px);
+body:has(.consent-banner){
+    --dock-lift:calc(30px + 116px);
 }
 
-body:has(.consent-banner) .dock-panel{
-    bottom:calc(30px + 116px + 48px + 12px + 48px + 12px);
-}
-
-body:has(.mobile-sticky-cart.show) .contact-dock{
-    bottom:calc(100px + env(safe-area-inset-bottom, 0px));
-}
-
-body:has(.mobile-sticky-cart.show) .dock-panel{
-    bottom:calc(100px + env(safe-area-inset-bottom, 0px) + 48px + 12px + 48px + 12px);
+body:has(.mobile-sticky-cart.show){
+    --dock-lift:calc(100px + env(safe-area-inset-bottom, 0px));
 }
 
 /* БАНЕР ЗГОДИ І КНОПКА «КУПИТИ» СТОЯТЬ УНИЗУ ОДНОЧАСНО.
@@ -16356,12 +16378,8 @@ body:has(.mobile-sticky-cart.show) .dock-panel{
    bottom:76px }». Тобто низ екрана займають обидва, один над одним,
    і підніматись треба над сумою. 76 тут — та сама висота кошика, що
    в тому правилі. */
-body:has(.consent-banner):has(.mobile-sticky-cart.show) .contact-dock{
-    bottom:calc(30px + 76px + 116px);
-}
-
-body:has(.consent-banner):has(.mobile-sticky-cart.show) .dock-panel{
-    bottom:calc(30px + 76px + 116px + 48px + 12px + 48px + 12px);
+body:has(.consent-banner):has(.mobile-sticky-cart.show){
+    --dock-lift:calc(30px + 76px + 116px);
 }
 
 /* Шторка «Всі фільтри» має власний футер на всю ширину — док сховати
@@ -16373,9 +16391,12 @@ body.mobile-filters-open .contact-dock{
 
 @media(max-width:768px){
 
+    body{
+        --dock-lift:16px;
+    }
+
     .contact-dock{
         left:16px;
-        bottom:16px;
     }
 
     /* На вузькому екрані панель стає на всю ширину: 320px біля краю
@@ -16385,27 +16406,18 @@ body.mobile-filters-open .contact-dock{
         right:16px;
         width:auto;
         max-width:none;
-        bottom:calc(16px + 48px + 12px + 48px + 12px);
     }
 
-    body:has(.consent-banner) .contact-dock{
-        bottom:calc(16px + 150px);
-    }
-
-    body:has(.consent-banner) .dock-panel{
-        bottom:calc(16px + 150px + 48px + 12px + 48px + 12px);
+    body:has(.consent-banner){
+        --dock-lift:calc(16px + 150px);
     }
 
     /* Банер на вузькому екрані переносить рядки й виростає зі 77px до
        150 (заміряно на 375×812), а стоїть він на кошику — тож
        піднімаємось над сумою. Це найперший перегляд товару з
        телефона, тобто випадок не рідкісний, а типовий. */
-    body:has(.consent-banner):has(.mobile-sticky-cart.show) .contact-dock{
-        bottom:calc(16px + 76px + 150px);
-    }
-
-    body:has(.consent-banner):has(.mobile-sticky-cart.show) .dock-panel{
-        bottom:calc(16px + 76px + 150px + 48px + 12px + 48px + 12px);
+    body:has(.consent-banner):has(.mobile-sticky-cart.show){
+        --dock-lift:calc(16px + 76px + 150px);
     }
 
     /* Підказка біля кнопки на дотику не спрацьовує — показувати її
@@ -16513,7 +16525,9 @@ body.mobile-filters-open .contact-dock{
     padding:10px 12px;
     border:1px solid var(--gray200);
     border-radius:12px;
-    font-size:14px;
+    /* 16px, інакше Safari на iPhone наближає сторінку при фокусі —
+       див. пояснення в .dock-form input[type=tel]. */
+    font-size:16px;
     line-height:1.4;
     color:var(--gray900);
     resize:none;
@@ -16641,9 +16655,14 @@ body.mobile-filters-open .contact-dock{
 
     .dock-panel-chat{
         width:auto;
-        /* На телефоні панель і так на всю ширину, а от висоту треба
-           тримати окремо: клавіатура зʼїдає половину екрана. */
-        max-height:calc(100vh - 82px - 24px - 180px);
+        /* На телефоні панель і так на всю ширину, а висоту треба
+           тримати окремо: клавіатура зʼїдає половину екрана, і без
+           цього доданку стрічка лізла б за верх екрана — зникав би
+           вже заголовок із хрестиком.
+
+           --keyboard-h вимірює contact-buttons.js через
+           visualViewport; поки клавіатури немає — нуль. */
+        max-height:calc(100vh - 82px - 24px - 180px - var(--keyboard-h, 0px));
     }
 
     .chat-log{
@@ -16839,3 +16858,4 @@ body.mobile-filters-open .contact-dock{
     border-color:var(--primary);
     color:#fff;
 }
+
