@@ -213,7 +213,8 @@ console.log("\n[3] Немає переходів, які не анімують �
         ".gallery-photo": "те саме: --frame-zoom з app.js:263",
         ".favorite-row-undo-bar span": "width ставить favorites.js:298 інлайном — смужка відліку",
         ".btn-modal": "стани на сусідніх класах .btn-modal-confirm:hover / .btn-modal-cancel:hover",
-        ".contact-dock": "bottom рахується з --dock-lift, а її міняють стани на body (банер згоди, кнопка «Купити», вузький екран)"
+        ".contact-dock": "bottom рахується з --dock-lift, а її міняють стани на body (банер згоди, кнопка «Купити», вузький екран)",
+        ".catalog-sidebar": "top і max-height рахуються з --catalog-filters-lift, а її обнуляє body:has(.catalog-filters-bar.is-hidden) — колонка їде за панеллю фільтрів"
     };
 
     const пусті = переходи
