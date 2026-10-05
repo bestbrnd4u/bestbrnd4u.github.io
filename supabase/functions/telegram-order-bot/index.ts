@@ -9182,6 +9182,19 @@ async function chatIdentity(request: Request) {
 
 // Нитка за токеном. Повертає null, якщо токена немає, він не схожий
 // на uuid або такої нитки вже не існує (власник видалив).
+// ДВА РІЗНІ «НЕМАЄ», І ПЛУТАТИ ЇХ НЕБЕЗПЕЧНО.
+//
+//   null      — нитки справді немає: її стерли або токен чужий;
+//   undefined — перевірити не вдалось: база не відповіла.
+//
+// Доки різниці не було, обидва випадки поверталися як null — і це
+// стало загрозою втратити переписку. Опитування по відсутній нитці
+// віддає сайту missing, а сайт по ньому стирає СВОЮ копію розмови й
+// забуває токен. Тобто однієї секунди недоступності бази вистачило б,
+// щоб у людини безповоротно зникла вся переписка.
+//
+// Обидва значення хибні, тож решта коду («if (!thread)») працює як
+// працювала. Різницю питає лише опитування.
 async function loadThread(rawId: unknown) {
 
   const id = cleanThreadId(rawId);
@@ -9191,11 +9204,13 @@ async function loadThread(rawId: unknown) {
   const response = await supabaseRest(
     `chat_threads?id=eq.${id}&select=id,page,blocked,closed_at,thread_no,user_id,user_name,user_email&limit=1`);
 
-  if (!response.ok) return null;
+  if (!response.ok) return undefined;
 
-  const rows = await response.json().catch(() => null);
+  const rows = await response.json().catch(() => undefined);
 
-  return Array.isArray(rows) ? rows[0] ?? null : null;
+  if (!Array.isArray(rows)) return undefined;
+
+  return rows[0] ?? null;
 
 }
 
@@ -9406,7 +9421,18 @@ async function handleChatPoll(request: Request, body: Record<string, any>): Prom
     // нічого немає, у другому там лежить копія розмови, якої на
     // сервері вже не існує, — і її треба прибрати, інакше очищення
     // видно лише власнику.
-    return adminJson({ ok: true, messages: [], unseen: 0, missing: true }, 200, origin);
+    //
+    // І РІВНО ТУТ ПОТРІБНА ОБЕРЕЖНІСТЬ. Сайт по цій ознаці стирає
+    // свою копію розмови безповоротно. Тому ставимо її лише коли
+    // база ВІДПОВІЛА, що нитки немає (null), а не коли вона просто
+    // не відповіла (undefined) — інакше секунда недоступності бази
+    // коштувала б людині всієї переписки.
+    return adminJson({
+      ok: true,
+      messages: [],
+      unseen: 0,
+      missing: thread === null,
+    }, 200, origin);
   }
 
   // МЕЖА НА САМЕ ОПИТУВАННЯ.
@@ -9483,7 +9509,9 @@ async function handleChatReply(message: Record<string, any>): Promise<boolean> {
   if (!replyTo) return false;
 
   const found = await supabaseRest(
-    `chat_messages?tg_message_id=eq.${Number(replyTo)}&select=thread_id,chat_threads(thread_no,user_name,user_email)&limit=1`);
+    // closed_at потрібен нижче: відповідь на завершену розмову знову
+    // її відкриває, інакше людина цього повідомлення не побачить.
+    `chat_messages?tg_message_id=eq.${Number(replyTo)}&select=thread_id,chat_threads(thread_no,user_name,user_email,closed_at)&limit=1`);
 
   if (!found.ok) return false;
 
@@ -9628,9 +9656,29 @@ async function handleChatReply(message: Record<string, any>): Promise<boolean> {
 
   }
 
+  // ВІДПОВІДЬ ЗНОВУ ВІДКРИВАЄ ЗАВЕРШЕНУ РОЗМОВУ.
+  //
+  // ЩО БУЛО НЕ ТАК, І ЧОМУ ЦЕ БУЛО ТИХО. Після /chatdone сайт
+  // перестає опитувати: у завершеній розмові нового не зʼявиться.
+  // Але власник міг завершити, а за хвилину згадати ще щось і
+  // відповісти знову — реплаєм на ту саму картку.
+  //
+  // Повідомлення зберігалось, власник бачив галочку «доставлено», а
+  // людина не бачила його НІКОЛИ. Найгірший вид помилки: обидві
+  // сторони впевнені, що все гаразд.
+  //
+  // Якщо власник пише — розмова, очевидно, не завершена. Знімаємо
+  // позначку: сайт побачить closed:false і поверне поле вводу.
+  const булаЗавершена = Boolean(
+    (Array.isArray(rows) && rows[0] && rows[0].chat_threads
+      && (rows[0].chat_threads as Record<string, any>).closed_at) || false);
+
   await supabaseRest(`chat_threads?id=eq.${threadId}`, {
     method: "PATCH",
-    body: JSON.stringify({ last_message_at: new Date().toISOString() }),
+    body: JSON.stringify({
+      last_message_at: new Date().toISOString(),
+      ...(булаЗавершена ? { closed_at: null } : {}),
+    }),
   });
 
   // Підтверджуємо галочкою, а не словами: у переписці з десятком
@@ -9640,6 +9688,22 @@ async function handleChatReply(message: Record<string, any>): Promise<boolean> {
     message_id: message.message_id,
     reaction: [{ type: "emoji", emoji: "👍" }],
   });
+
+  // А ось про зняте завершення сказати треба словами: власник щойно
+  // натискав /chatdone і має знати, що розмова знову відкрита.
+  if (булаЗавершена) {
+
+    await telegram("sendMessage", {
+      chat_id: message.chat.id,
+      text: `↩️ Розмову знову відкрито — ви написали після /chatdone.
+👤 ${ктоЦе}
+
+Людина побачить це повідомлення й зможе відповісти.
+Завершити ще раз: /chatdone`,
+      reply_to_message_id: message.message_id,
+    });
+
+  }
 
   return true;
 
