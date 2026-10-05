@@ -84,6 +84,25 @@ http.createServer((req, res) => {
     const file = resolve(url);
 
     if (!file) {
+
+        // GitHub Pages на невідому адресу віддає 404.html — із шапкою,
+        // пошуком і підбіркою товарів. Локально тут довго стояв голий
+        // рядок тексту, і через це сама сторінка 404 ніколи не
+        // потрапляла на очі: щоб її побачити, треба було відкрити
+        // /404.html вручну, а так ніхто не робить.
+        //
+        // Тепер клік по битому посиланню показує те саме, що покаже
+        // прод. Для файлів (.js, .png) лишаємо рядок: там HTML замість
+        // скрипта лише заплутує, а код відповіді однаково 404.
+        const сторінка = !path.extname(url) || /\.html?$/i.test(url);
+        const макет = path.join(ROOT, "404.html");
+
+        if (сторінка && fs.existsSync(макет)) {
+            res.writeHead(404, { "Content-Type": TYPES[".html"], "Cache-Control": "no-store" });
+            fs.createReadStream(макет).pipe(res);
+            return;
+        }
+
         res.writeHead(404, { "Content-Type": TYPES[".txt"] });
         res.end("404: " + url);
         return;
