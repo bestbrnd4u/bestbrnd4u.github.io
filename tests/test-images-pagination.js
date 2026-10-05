@@ -241,8 +241,21 @@ console.log("\n[3] Пагінація");
   check("сторінка читається з адреси при відкритті",
         /readNumberParam\(new URLSearchParams\(location\.search\), "page"\)/.test(cat));
   check("replaceState, щоб «Назад» не гортав сторінки", /history\.replaceState/.test(cat));
+  // ПИТАЄМО ПРО НАМІР, А НЕ ПРО РЕАЛІЗАЦІЮ.
+  //
+  // Тут стояло /grid\.getBoundingClientRect/ — тобто перевірялось, що
+  // обробник САМ рахує позицію сітки. І коли власну арифметику
+  // прибрали на користь спільної scrollToFirstProduct(), перевірка
+  // впала, хоч поведінка стала кращою: та функція враховує ще й липкі
+  // панелі й цілиться в рядок із кількістю товарів.
+  //
+  // Сама арифметика й була причиною: перехід на другу сторінку ставив
+  // перший ряд карток під панель фільтрів, а рядок «131 товар» лишався
+  // за екраном. Заміряно в jsdom — 1488 замість 624.
   check("після переходу підіймає до товарів, а не до шапки",
-        /grid\.getBoundingClientRect/.test(cat));
+        /scrollToFirstProduct\(\);/.test(
+            cat.slice(cat.indexOf('paginationEl?.addEventListener("click"'),
+                      cat.indexOf("\n});", cat.indexOf('paginationEl?.addEventListener("click"')))));
   check("є стилі", css.includes(".pagination-page") && css.includes(".pagination-arrow"));
 
   const mk = n => new Function(cat.match(new RegExp("function "+n+"[\\s\\S]*?\\n}"))[0] + "; return "+n+";")();
