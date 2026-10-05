@@ -576,6 +576,90 @@ console.log("\n[10] На оформленні плаваючі кнопки че
 }
 
 
+const РОЗДІЛ_11 = async () => {
+
+console.log("\n[11] Док слухає ознаку, а не клік");
+
+// ЧОМУ ЦЕЙ РОЗДІЛ ПОВЕДІНКОВИЙ, А НЕ ТЕКСТОВИЙ
+// ---------------------------------------------
+// Перша версія [10] питала в коду, чи слухає він клік. Код слухав —
+// і розділ був зелений. Але панель відкривається й закривається не
+// лише кліком, і саме ці шляхи ламались:
+//
+//   • власник пише з Telegram людині, яка стоїть посеред форми. Чат
+//     відкривається сам, кліку немає — на екрані висить картка
+//     розмови, а кнопки під нею немає, бо док лишився схованим;
+//   • людина закриває чат клавішею Escape. Кліку знов немає — док
+//     лишається стояти над формою, саме чого тут не має бути.
+//
+// Тому тут не шукається рядок, а перемикається ознака й питається
+// сторінка. Було виміряно у справжньому браузері на /checkout.
+
+    const common = read("assets/js/common.js");
+
+    const блок = common.slice(
+        common.indexOf("(function плаваючіНаОформленні"),
+        common.indexOf("const scrollTopBtn"));
+
+    const dom = new JSDOM(
+        '<!doctype html><body>'
+        + '<div class="contact-dock">'
+        + '<button class="dock-btn" id="dockChat" aria-expanded="false"></button>'
+        + "</div>"
+        + '<div class="dock-panel" id="dockChatPanel" hidden></div>'
+        + "<footer>підвал</footer></body>",
+        { url: "https://bestbrnd4u.com/checkout", runScripts: "outside-only" });
+
+    const { window } = dom;
+
+    // jsdom не має IntersectionObserver. Підставляємо рівно такий,
+    // яким він тут і вживається: одна ціль, один виклик — і ручка,
+    // якою набір сам каже «підвал видно / не видно».
+    let сказатиПроПідвал = () => {};
+
+    window.IntersectionObserver = function (callback) {
+        this.observe = () => {
+            сказатиПроПідвал = видно => callback([{ isIntersecting: видно }]);
+        };
+        this.disconnect = () => {};
+    };
+
+    window.eval(блок);
+
+    const кнопка = window.document.getElementById("dockChat");
+    const сховано = () => window.document.body.classList.contains("hide-floating");
+
+    // MutationObserver у jsdom будить обробник мікрозадачею.
+    const дати = () => new Promise(r => window.setTimeout(r, 0));
+
+    check("блок підняв себе сам", typeof сховано() === "boolean");
+
+    check("на старті, доки підвал не видно, кнопки сховані", сховано() === true);
+
+    сказатиПроПідвал(true);
+    check("підвал у полі зору — кнопки повертаються", сховано() === false);
+
+    сказатиПроПідвал(false);
+    check("пішов від підвалу — кнопки знов сховані", сховано() === true);
+
+    // ОСЬ ТУТ ЛАМАЛОСЬ. Ознаку перемикає чат, що відкрив себе сам:
+    // ніякого кліку немає.
+    кнопка.setAttribute("aria-expanded", "true");
+    await дати();
+
+    check("чат відкрився сам, без кліку — док виходить до панелі",
+        сховано() === false, "hide-floating лишився на body");
+
+    // І назад: Escape закриває панель, кліку знову немає.
+    кнопка.setAttribute("aria-expanded", "false");
+    await дати();
+
+    check("панель закрили Escape, без кліку — док ховається",
+        сховано() === true, "док лишився стояти над формою");
+
+};
+
+
 console.log("\n[8] Обіцянка на кнопці збігається з графіком на сайті");
 {
     // «Передзвонимо протягом робочого дня» має сенс лише разом із
@@ -630,5 +714,9 @@ console.log("\n[9] Підпис кнопки читається однаково
 }
 
 
-console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
-process.exit(failures === 0 ? 0 : 1);
+// Розділ [11] чекає на мікрозадачу MutationObserver, тож підсумок —
+// після нього, а не раніше.
+РОЗДІЛ_11().then(() => {
+    console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
+    process.exit(failures === 0 ? 0 : 1);
+});
