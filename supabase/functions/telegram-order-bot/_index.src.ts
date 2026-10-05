@@ -91,7 +91,7 @@ import {
 } from "./call-back.js";
 import {
   cleanChatBody, cleanThreadId, cleanChatPage, formatChatMessage,
-  CHAT_LIMITS, CHAT_DONE_TEXT, chatDoneReceipt, chatUserName, chatWho,
+  CHAT_LIMITS, CHAT_DONE_TEXT, chatDoneReceipt, chatClearReceipt, chatUserName, chatWho,
 } from "./chat.js";
 import {
   cleanLoginToken, loginCode, loginDeepLink, loginVerdict, loginStatus,
@@ -3090,7 +3090,13 @@ async function handleChatPoll(request: Request, body: Record<string, any>): Prom
   if (!thread) {
     // Не 404 і не помилка: нитки могло просто ще не бути. Сайт у
     // такому разі показує порожній чат, а не поломку.
-    return adminJson({ ok: true, messages: [], unseen: 0 }, 200, origin);
+    //
+    // missing — щоб сайт відрізнив «ще не писали» від «переписку
+    // стерли командою /chatclear». У першому випадку в браузері й так
+    // нічого немає, у другому там лежить копія розмови, якої на
+    // сервері вже не існує, — і її треба прибрати, інакше очищення
+    // видно лише власнику.
+    return adminJson({ ok: true, messages: [], unseen: 0, missing: true }, 200, origin);
   }
 
   // МЕЖА НА САМЕ ОПИТУВАННЯ.
@@ -3212,6 +3218,48 @@ async function handleChatReply(message: Record<string, any>): Promise<boolean> {
     await telegram("sendMessage", {
       chat_id: message.chat.id,
       text: chatDoneReceipt(CHAT_DONE_TEXT, ктоЦе),
+      reply_to_message_id: message.message_id,
+    });
+
+    return true;
+
+  }
+
+  // --- /chatclear: переписки більше немає ніде ---
+  //
+  // НАВІЩО. Розмова лишається в базі назавжди, а в ній те, що людина
+  // написала про себе: розмір, бюджет, інколи телефон. Тримати це
+  // після того, як питання вирішили, немає потреби — і тримати не
+  // треба.
+  //
+  // Видаляємо саму НИТКУ, а не лише повідомлення: on delete cascade
+  // прибирає переписку, а разом із ниткою зникає й токен, за яким до
+  // неї був доступ. Лишити порожню нитку означало б лишити ключ від
+  // порожньої кімнати.
+  //
+  // Сайт дізнається про це сам: опитування по невідомій нитці
+  // повертає missing, і браузер прибирає свою копію.
+  if (/^\/chatclear(@\S+)?$/i.test(String(message.text ?? "").trim())) {
+
+    // Рахуємо ДО видалення — після рахувати вже нічого.
+    //
+    // Кількість беремо із заголовка Content-Range («0-0/42»), а не
+    // довжиною масиву: інакше довелось би тягнути всю переписку лише
+    // заради того, щоб дізнатись її довжину.
+    const скільки = await supabaseRest(
+      `chat_messages?thread_id=eq.${threadId}&select=id&limit=1`, {
+        headers: { Prefer: "count=exact" },
+      });
+
+    const діапазон = скільки.ok ? (скільки.headers.get("content-range") ?? "") : "";
+
+    const стерто = Number(діапазон.split("/")[1]) || 0;
+
+    await supabaseRest(`chat_threads?id=eq.${threadId}`, { method: "DELETE" });
+
+    await telegram("sendMessage", {
+      chat_id: message.chat.id,
+      text: chatClearReceipt(ктоЦе, стерто),
       reply_to_message_id: message.message_id,
     });
 

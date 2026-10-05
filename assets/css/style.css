@@ -16785,18 +16785,41 @@ body.mobile-filters-open .contact-dock{
    прийшла — і без цієї крапки вона дізнається про неї, лише
    здогадавшись відкрити панель знову. */
 
-.dock-btn.has-unread::after{
-    content:"";
+/* ЧИСЛО НЕПРОЧИТАНИХ, А НЕ ПРОСТО КРАПКА.
+
+   Тут був порожній кружечок на ::after. Він казав «щось є» — і цього
+   мало: власник написав двічі, людина обидва рази згорнула панель, і
+   з крапки не видно, що пропущено саме два повідомлення.
+
+   Тепер це справжній елемент із текстом. Розмір заданий через
+   min-width і padding, а не width: «9+» ширше за «2», і фіксована
+   ширина обрізала б його. */
+.dock-badge{
     position:absolute;
-    top:2px;
-    right:2px;
-    width:12px;
-    height:12px;
-    border-radius:50%;
+    top:0;
+    right:0;
+    min-width:20px;
+    height:20px;
+    padding:0 5px;
+    box-sizing:border-box;
+    border-radius:10px;
     background:var(--danger);
-    /* Обводка кольором сторінки — щоб крапка читалась і на темній
+    /* Обводка кольором сторінки — щоб число читалось і на темній
        кнопці, і коли та підсвічена синім. */
     border:2px solid var(--gray50);
+    color:#fff;
+    font-size:11px;
+    font-weight:700;
+    line-height:16px;
+    text-align:center;
+    /* Щоб кружечок не ловив клік замість кнопки під ним. */
+    pointer-events:none;
+}
+
+/* hidden на span із display з каскаду не спрацював би сам —
+   те саме вже ловили на .dock-panel і на .loader. */
+.dock-badge[hidden]{
+    display:none;
 }
 
 @media(max-width:768px){
