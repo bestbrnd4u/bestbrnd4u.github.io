@@ -2971,6 +2971,58 @@ window.matchMedia("(min-width:769px)").addEventListener("change", event => {
 // Scroll Top
 // -------------------------
 
+// -------------------------
+// НА ОФОРМЛЕННІ ПЛАВАЮЧІ КНОПКИ ЧЕКАЮТЬ ДО ПІДВАЛУ
+//
+// Форма замовлення — найвужче місце сайту: імʼя, телефон, адреса,
+// доставка, оплата. Три кола, що висять над полями, тут не
+// допомагають, а відвертають і перекривають.
+//
+// Прибрати зовсім теж не можна: саме тут питання виникають
+// найчастіше. Тому повертаємо їх, коли людина догортала до підвалу —
+// форму вже пройдено.
+//
+// IntersectionObserver, а не підрахунок на кожен scroll: браузер сам
+// скаже, коли підвал у полі зору, і не смикатиме обробник сотні разів
+// за прокрутку.
+// -------------------------
+(function плаваючіНаОформленні() {
+
+    if (!/\/checkout(\.html)?(\/|$|\?)/.test(location.pathname)) return;
+
+    const підвал = document.querySelector("footer");
+
+    if (!підвал || !("IntersectionObserver" in window)) return;
+
+    let біляПідвалу = false;
+
+    function оновити() {
+
+        // Поки відкрита панель чату чи дзвінка — не ховаємо нічого.
+        // Інакше людина, яка догорнула, відкрила чат і трохи піднялась
+        // назад, побачила б, як розмова зникає разом із доком.
+        const панельВідкрита = Boolean(
+            document.querySelector('.dock-btn[aria-expanded="true"]'));
+
+        document.body.classList.toggle("hide-floating", !біляПідвалу && !панельВідкрита);
+
+    }
+
+    new IntersectionObserver(entries => {
+
+        біляПідвалу = entries.some(e => e.isIntersecting);
+
+        оновити();
+
+    }, { rootMargin: "0px 0px -10% 0px" }).observe(підвал);
+
+    // Панель могли відкрити або закрити без прокрутки.
+    document.addEventListener("click", () => window.setTimeout(оновити, 250));
+
+    оновити();
+
+})();
+
 const scrollTopBtn = document.getElementById("scrollTop");
 
 if (scrollTopBtn) {
