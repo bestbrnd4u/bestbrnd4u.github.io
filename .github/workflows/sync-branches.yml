@@ -124,18 +124,33 @@ jobs:
           #
           # Тому питаємо прямо: чи є цей шлях у джерелі. Немає —
           # прибираємо.
-          if git ls-files -u | grep -q .; then
+          # СПИСОК КОНФЛІКТІВ — У ФАЙЛ, А НЕ ЧЕРЕЗ КОНВЕЄР.
+          #
+          # `git diff` оновлює кеш індексу й бере .git/index.lock. У
+          # конвеєрі він працює ОДНОЧАСНО з тілом циклу, де git rm
+          # бере той самий замок, — і крок падає з «Unable to create
+          # index.lock». Локально це гонка, яку щастить пройти на
+          # короткому списку; на раннері вона впала з першого разу.
+          #
+          # Файл кладемо поза робочою текою: у ній його підхопив би
+          # git add -A нижче.
+          #
+          # імена змінних латиницею навмисно: bash не приймає
+          # кириличні ідентифікатори
+          conflicts="${RUNNER_TEMP:-/tmp}/sync-conflicts.z"
 
-            # імена змінних тут латиницею навмисно: bash не приймає
-            # кириличні ідентифікатори
-            git diff --name-only --diff-filter=U -z | while IFS= read -r -d '' file; do
+          git diff --name-only --diff-filter=U -z > "$conflicts" || true
+
+          if [ -s "$conflicts" ]; then
+
+            while IFS= read -r -d '' file; do
               if git cat-file -e "origin/${{ steps.pick.outputs.from }}:$file" 2>/dev/null; then
                 git checkout --theirs -- "$file" || true
                 git add -- "$file"
               else
                 git rm -f -q -- "$file"
               fi
-            done
+            done < "$conflicts"
 
             git add -A
             git commit --no-edit
