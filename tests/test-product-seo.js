@@ -228,7 +228,7 @@ console.log("\n[4] availability відповідає реальному стан
 
     w.updateProductSeoMetadata({ ...base, preOrder: true });
     ld = JSON.parse(w.document.getElementById("productSchema").textContent);
-    check("товар під замовлення → PreOrder", /PreOrder$/.test(ld.offers.availability), ld.offers.availability);
+    check("товар під замовлення → BackOrder", /BackOrder$/.test(ld.offers.availability), ld.offers.availability);
 }
 
 console.log("\n[5] Сторінка без товару не йде в індекс (м'який 404)");

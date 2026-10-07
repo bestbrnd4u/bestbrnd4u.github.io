@@ -361,13 +361,30 @@
 
     }
 
-    // Товар «під замовлення» — це PreOrder, а не InStock:
+    // Товар «під замовлення» — це BackOrder, а не InStock:
     // невідповідність розмітки реальному стану — привід для Google
     // зняти rich-результат товару.
+    //
+    // BACKORDER, А НЕ PREORDER — І ЦЕ НЕ ПРИДИРКА ДО СЛОВА.
+    //
+    // Тут стояв PreOrder. А в scripts/build-feed.js, у функції з тим
+    // самим іменем, давно написано зворотне, і написано правильно:
+    // «preorder у Google означає інше — товар ще не вийшов і має дату
+    // появи; для нас це неправда». Наш товар існує, його просто треба
+    // привезти — це BackOrder.
+    //
+    // Тобто про ОДИН товар Google отримував два різні статуси:
+    // backorder у фіді й PreOrder у розмітці сторінки. Заміряно
+    // 07.10.2026 на /p/sontsezakhysni-okuliary-saint-laurent-sl-276-
+    // mica-001-53/ — у фіді backorder, у Product.offers PreOrder.
+    //
+    // Строки між цими двома місцями вже звели докупи (див. коментар
+    // про preOrderWorkDays у build-feed.js). Слово лишилось
+    // незведеним — половина правки прожила довше за другу половину.
     function availabilityOf(product) {
 
         return (product && product.preOrder)
-            ? "https://schema.org/PreOrder"
+            ? "https://schema.org/BackOrder"
             : "https://schema.org/InStock";
 
     }
