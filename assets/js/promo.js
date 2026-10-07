@@ -20,13 +20,23 @@
 
 async function initPromoPage() {
 
+    // ЗВІДКИ СТОРІНКА ЗНАЄ, ЯКА ЦЕ АКЦІЯ — ДВА ШЛЯХИ, І ОБИДВА ЖИВІ.
+    //
+    // Нові адреси — /promo/<slug>/: їх збирає
+    // scripts/build-promo-pages.js, і в кожній сторінці стоїть
+    // window.PROMO_SLUG. Саме такі адреси тепер усюди на сайті, і
+    // саме вони несуть у статичній розмітці свою назву, опис і
+    // картинку для прев'ю в месенджері.
+    //
+    // Старе /promo?id=<slug> лишається робочим: ці посилання вже
+    // розійшлись по сторіс і в листуванні, і ламати їх не можна.
     const params = new URLSearchParams(location.search);
-    const slug = params.get("id");
+    const slug = window.PROMO_SLUG || params.get("id");
 
     const loader = document.getElementById("promoLoader");
 
     if (!slug) {
-        location.href = "catalog";
+        location.href = "/catalog";
         return;
     }
 
@@ -81,11 +91,23 @@ async function initPromoPage() {
         // перезавантажувати її заради адреси означало б зайве
         // мигання. У історії лишається один запис, тож «назад»
         // повертає туди, звідки прийшли, а не по колу.
-        if (promo.slug !== slug) {
+        // Адреса в рядку — завжди власна адреса акції.
+        //
+        // Раніше це робилось лише тоді, коли slug не збігся (стара
+        // назва акції). Тепер ще й тому, що сторінку могли відкрити
+        // старим /promo?id=<slug>: ці посилання вже розійшлись, і
+        // ламати їх не можна, але лишати людину на адресі, якої немає
+        // в sitemap, теж не варто — скопіює саме її.
+        //
+        // replaceState, а не редирект: сторінка вже намальована, і
+        // перезавантажувати її заради адреси означало б зайве мигання.
+        // У історії лишається один запис, тож «назад» повертає туди,
+        // звідки прийшли, а не по колу.
+        const власна = PromoMeta.promoPath(promo.slug);
 
-            const canonical = `${location.pathname}?id=${encodeURIComponent(promo.slug)}`;
+        if (location.pathname !== власна) {
 
-            history.replaceState(null, "", canonical + location.hash);
+            history.replaceState(null, "", власна + location.hash);
 
         }
 
@@ -240,13 +262,16 @@ function updatePromoSeoMetadata(promo) {
 
     // slug може містити кирилицю — canonical/og:url мають бути
     // закодованими, інакше адреса в мета-тегах не збігається з тією,
-    // за якою реально відкрита сторінка
-    const pageUrl = `${SITE_URL}/promo?id=${encodeURIComponent(promo.slug)}`;
+    // за якою реально відкрита сторінка. Кодує promoPath().
+    //
+    // Веде на ВЛАСНУ адресу акції, навіть якщо сторінку відкрили
+    // старою /promo?id=…: дві адреси на один вміст мають указувати
+    // на одну.
+    const pageUrl = `${SITE_URL}${PromoMeta.promoPath(promo.slug)}`;
 
-    const title = `${promoHeading(promo)} | BestBrnd4u`;
+    const title = PromoMeta.promoTitle(promo);
 
-    const description = truncateForMeta(promo.text
-        || `${promoHeading(promo)} в інтернет-магазині BestBrnd4u`);
+    const description = PromoMeta.promoDescription(promo);
 
     setMetaByName("description", description);
 
@@ -269,25 +294,13 @@ function updatePromoSeoMetadata(promo) {
 // Google порожніми бути не можуть — там зʼявилось би « | BestBrnd4u»
 // і «Акція  в інтернет-магазині».
 //
-// Тому беремо перше, що є: заголовок, опис, бренд — і лише потім
-// безлике слово «Акція».
+// Саме правило переїхало в assets/js/promo-meta.js: той самий текст
+// потрібен ще й збірці, яка пише promo/<slug>/index.html ДО викладки.
+// Павук месенджера JavaScript не виконує, тож назву й опис він може
+// взяти лише зі статичної розмітки.
 function promoHeading(promo) {
 
-    // Напис для ГОЛОВНОЇ теж у переліку, і стоїть одразу за банерним.
-    //
-    // Саме заради цього випадку: на банері напису немає (він уже на
-    // фото), а на головній є. Без цього рядка вкладка браузера й
-    // рядок у видачі Google діставали б безлике «Акція», хоча назва
-    // акції в записі є.
-    return [
-        promo && promo.title,
-        promo && promo.homeTitle,
-        promo && promo.text,
-        promo && promo.homeText,
-        promo && promo.brand
-    ]
-        .map(value => String(value || "").trim())
-        .find(Boolean) || "Акція";
+    return PromoMeta.promoHeading(promo);
 
 }
 

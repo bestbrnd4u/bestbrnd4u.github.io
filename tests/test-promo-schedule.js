@@ -303,9 +303,14 @@ console.log("\n[7] Завершена акція не кличе до себе G
     const live = JSON.parse(read("data/promotions.json"));
     const xml = read("sitemap.xml");
 
+    // Адреса акції — /promo/<slug>/: відколи в кожної є своя
+    // сторінка, саме вона стоїть у sitemap. Стара /promo?id=
+    // лишається робочою, але в sitemap їй не місце.
+    const PromoMeta = require("../assets/js/promo-meta.js");
+
     const missing = live
         .filter(promo => !ended(promo, Date.now()))
-        .filter(promo => !xml.includes(`promo?id=${promo.slug}`));
+        .filter(promo => !xml.includes(PromoMeta.promoPath(promo.slug)));
 
     check("усі чинні акції в sitemap є", missing.length === 0,
         missing.map(p => p.slug).join(", "));

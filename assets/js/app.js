@@ -709,11 +709,21 @@ async function initPromotions() {
 
         document.addEventListener("click", event => {
 
-            const link = event.target.closest('a[href^="promo?id="]');
+            // Адреса акції тепер /promo/<slug>/ — свою сторінку має
+            // кожна, і саме вона несе назву та картинку для прев'ю в
+            // месенджері. Стару /promo?id= теж ловимо: вона лишається
+            // робочою, і посилання з давніх сторіс мають так само
+            // потрапляти в статистику.
+            const link = event.target.closest('a[href^="/promo/"], a[href^="promo?id="]');
 
             if (!link) return;
 
-            const slug = decodeURIComponent(link.getAttribute("href").split("id=")[1] || "");
+            const href = link.getAttribute("href");
+
+            const slug = decodeURIComponent(
+                href.startsWith("/promo/")
+                    ? href.slice("/promo/".length).replace(/\/.*$/, "")
+                    : (href.split("id=")[1] || ""));
             const promo = promotions.find(p => p.slug === slug);
 
             if (promo) window.Analytics?.selectPromotion(promo, promo.displayType);
@@ -729,7 +739,7 @@ async function initPromotions() {
         if (regular.length) {
 
             grid.innerHTML = regular.map(promo => `
-                <a href="promo?id=${encodeURIComponent(promo.slug)}" class="promo-card${blockStyleClass(promoHomeStyle(promo))}" style="${blockStyleAttr(promoHomeStyle(promo))}">
+                <a href="${PromoMeta.promoPath(promo.slug)}" class="promo-card${blockStyleClass(promoHomeStyle(promo))}" style="${blockStyleAttr(promoHomeStyle(promo))}">
 
                     <div class="promo-card-image">
                         ${promoPicture(promo, 700)}
@@ -797,7 +807,7 @@ function renderHeroSliderPromotions(heroPromotions) {
 
     track.innerHTML = heroPromotions.map(promo => {
 
-        const promoLink = `promo?id=${encodeURIComponent(promo.slug)}`;
+        const promoLink = `${PromoMeta.promoPath(promo.slug)}`;
 
         const genderButtons = Array.isArray(promo.genderButtons) && promo.genderButtons.length
             ? promo.genderButtons
@@ -808,7 +818,7 @@ function renderHeroSliderPromotions(heroPromotions) {
             ];
 
         const quicklinksHtml = genderButtons.map(btn => `
-            <a href="${promoLink}&gender=${encodeURIComponent(btn.gender)}" style="background:${btn.color || "#111827"}">${btn.gender}</a>
+            <a href="${promoLink}?gender=${encodeURIComponent(btn.gender)}" style="background:${btn.color || "#111827"}">${btn.gender}</a>
         `).join("");
 
         return `
@@ -968,7 +978,7 @@ async function renderFeaturedPromotions(featuredPromotions) {
 
                     <div class="brand-campaign-banner${blockStyleClass(promoHomeStyle(promo))}" style="${blockStyleAttr(promoHomeStyle(promo))}">
 
-                        <a href="promo?id=${encodeURIComponent(promo.slug)}" class="brand-campaign-image">
+                        <a href="${PromoMeta.promoPath(promo.slug)}" class="brand-campaign-image">
                             ${promoPicture(promo, 700)}
                         </a>
 
@@ -982,7 +992,7 @@ async function renderFeaturedPromotions(featuredPromotions) {
                             ${promoHomeText(promo) ? `<p>${promoHomeText(promo)}</p>` : ""}
 
                             ${promo.buttonText ? `
-                            <a href="promo?id=${encodeURIComponent(promo.slug)}" class="btn">
+                            <a href="${PromoMeta.promoPath(promo.slug)}" class="btn">
                                 ${promo.buttonText}
                             </a>` : ""}
 
@@ -1056,7 +1066,7 @@ function renderCompactPromotions(compactPromotions) {
                          звичайний <div>: курсор над ним лишався стрілкою,
                          клац нічого не робив, і єдиним входом у акцію була
                          кнопка збоку. -->
-                    <a href="promo?id=${encodeURIComponent(promo.slug)}"
+                    <a href="${PromoMeta.promoPath(promo.slug)}"
                        class="brand-teaser-image"
                        aria-label="${promoHomeTitle(promo)}">
                         ${promoPicture(promo, 700)}
@@ -1067,7 +1077,7 @@ function renderCompactPromotions(compactPromotions) {
                         <p class="brand-teaser-text">${promoHomeTitle(promo)}</p>
 
                         ${promo.buttonText ? `
-                        <a href="promo?id=${encodeURIComponent(promo.slug)}" class="brand-teaser-btn">
+                        <a href="${PromoMeta.promoPath(promo.slug)}" class="brand-teaser-btn">
                             ${promo.buttonText}
                             <span class="brand-teaser-arrow">→</span>
                         </a>` : ""}
@@ -1210,7 +1220,7 @@ async function renderDealPromotions(dealPromotions) {
                     <div class="deal-body" data-banner="${withBanner ? place.banner : "none"}">
 
                         ${withBanner ? `
-                        <a href="promo?id=${encodeURIComponent(promo.slug)}" class="deal-banner">
+                        <a href="${PromoMeta.promoPath(promo.slug)}" class="deal-banner">
                             ${promoPicture(promo, 900)}
                         </a>` : ""}
 
@@ -1221,7 +1231,7 @@ async function renderDealPromotions(dealPromotions) {
                     </div>
 
                     ${moreText ? `
-                    <a href="promo?id=${encodeURIComponent(promo.slug)}" class="deal-more">
+                    <a href="${PromoMeta.promoPath(promo.slug)}" class="deal-more">
                         ${moreText} →
                     </a>` : ""}
 

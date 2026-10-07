@@ -2,19 +2,19 @@
 <html lang="uk">
 
 <head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"584f8595","data/catalog.json":"518a3f1b","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"00e8da26","data/image-variants.json":"7f73a794","data/legal.json":"f84751b2","data/notifications.json":"a35b367f","data/product-texts.json":"278df72d","data/products-updated.json":"4fb62ea6","data/products.json":"3c1e6809","data/promo-popups.json":"0940ece5","data/promotions.json":"fd2ed22f","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/security.json":"0c05c691","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script>
+
+<!-- Сторінка лежить у /promo/<slug>/, а скрипти будують шляхи
+     як з кореня ("data/promotions.json"). Без <base> вони
+     перетворились би на /promo/<slug>/data/…
+     Файл згенеровано: scripts/build-promo-pages.js -->
+<base href="/">
     <meta name="robots" content="noindex,nofollow">
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"584f8595","data/catalog.json":"518a3f1b","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"00e8da26","data/image-variants.json":"7f73a794","data/legal.json":"f84751b2","data/notifications.json":"a35b367f","data/product-texts.json":"278df72d","data/products-updated.json":"4fb62ea6","data/products.json":"3c1e6809","data/promo-popups.json":"0940ece5","data/promotions.json":"fd2ed22f","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/security.json":"0c05c691","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script>
 <meta charset="UTF-8">
 <meta name="author" content="BestBrnd4u">
 <meta name="copyright" content="© 2026 BestBrnd4u. Усі права захищено.">
 <link rel="license" href="/LICENSE">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Акції та знижки BestBrnd4u">
-
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="Акції | BestBrnd4u">
-    <meta property="og:description" content="Акції та знижки BestBrnd4u">
-    <meta property="og:image" content="https://dev.bestbrnd4u.com/assets/images/og-cover.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 <meta name="theme-color" content="#111827">
@@ -25,7 +25,18 @@
     <link rel="apple-touch-icon" sizes="180x180" href="assets/images/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="192x192" href="assets/images/favicon-192.png">
     <link rel="manifest" href="/site.webmanifest">
-<title id="pageTitle">Акція | BestBrnd4u</title>
+<script>window.PROMO_SLUG="20260817124647";</script>
+<title id="pageTitle">Колекція Coach | BestBrnd4u</title>
+<meta name="description" content="Найширша добірка бренду в каталозі — сумки">
+<link rel="canonical" href="https://dev.bestbrnd4u.com/promo/20260817124647/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Колекція Coach | BestBrnd4u">
+<meta property="og:description" content="Найширша добірка бренду в каталозі — сумки">
+<meta property="og:image" content="https://dev.bestbrnd4u.com/assets/images/banners/coach-promo-page.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://dev.bestbrnd4u.com/promo/20260817124647/">
+<meta name="twitter:card" content="summary_large_image">
 <!-- Шрифт. Тут, а не @import у CSS: @import видно лише після
      завантаження таблиці стилів, і текст чекає на три запити
      поспіль. Розкладає scripts/sync-fonts.js — правити руками
@@ -138,7 +149,7 @@
 
                 <span class="promo-hero-badge" id="promoHeroBadge" hidden></span>
 
-                <h1 id="promoHeroTitle"></h1>
+                <h1 id="promoHeroTitle">Колекція Coach</h1>
 
                 <p id="promoHeroText" hidden></p>
 
