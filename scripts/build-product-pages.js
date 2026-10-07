@@ -513,7 +513,9 @@ function buildHead(product) {
 
     const priceText = formatPrice(product.price);
 
-    const title = `${product.title} — купити за ${priceText} | BestBrnd4u`;
+    // Шаблон спільний із product.js — див. pageTitle() у
+    // assets/js/product-offer.js, там і пояснено, чому без «купити за».
+    const title = ProductOffer.pageTitle(product, priceText);
 
     const description = truncateForMeta(
         product.description

@@ -362,7 +362,9 @@ function updateProductSeoMetadata(product) {
 
     const priceText = `${new Intl.NumberFormat("uk-UA").format(priceNow(product))} грн`;
 
-    const title = `${product.title} — купити за ${priceText} | BestBrnd4u`;
+    // Шаблон спільний зі збіркою — див. pageTitle() у
+    // assets/js/product-offer.js, там і пояснено, чому без «купити за».
+    const title = window.ProductOffer.pageTitle(product, priceText);
 
     const description = truncateForMeta(
         product.description ||
