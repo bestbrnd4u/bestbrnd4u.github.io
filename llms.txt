@@ -61,17 +61,17 @@
 
 ### Бренд і тип товару
 
-- [Аксесуари Marc Jacobs](https://dev.bestbrnd4u.com/brands/marc-jacobs/aksesuary/)
-- [Гаманці Coach](https://dev.bestbrnd4u.com/brands/coach/hamantsi/)
-- [Гаманці Marc Jacobs](https://dev.bestbrnd4u.com/brands/marc-jacobs/hamantsi/)
-- [Годинники Michael Kors](https://dev.bestbrnd4u.com/brands/michael-kors/hodynnyky/)
-- [Жіночі сумки Coach](https://dev.bestbrnd4u.com/brands/coach/zhinochi-sumky/)
-- [Жіночі сумки Marc Jacobs](https://dev.bestbrnd4u.com/brands/marc-jacobs/zhinochi-sumky/)
-- [Жіночі сумки Michael Kors](https://dev.bestbrnd4u.com/brands/michael-kors/zhinochi-sumky/)
-- [Кросівки Lacoste](https://dev.bestbrnd4u.com/brands/lacoste/krosivky/)
-- [Окуляри і оправи Marc Jacobs](https://dev.bestbrnd4u.com/brands/marc-jacobs/okuliary-i-opravy/)
-- [Сумки Coach](https://dev.bestbrnd4u.com/brands/coach/sumky/)
-- [Чоловічі сумки Coach](https://dev.bestbrnd4u.com/brands/coach/cholovichi-sumky/)
+- [Аксесуари Marc Jacobs](https://bestbrnd4u.com/brands/marc-jacobs/aksesuary/)
+- [Гаманці Coach](https://bestbrnd4u.com/brands/coach/hamantsi/)
+- [Гаманці Marc Jacobs](https://bestbrnd4u.com/brands/marc-jacobs/hamantsi/)
+- [Годинники Michael Kors](https://bestbrnd4u.com/brands/michael-kors/hodynnyky/)
+- [Жіночі сумки Coach](https://bestbrnd4u.com/brands/coach/zhinochi-sumky/)
+- [Жіночі сумки Marc Jacobs](https://bestbrnd4u.com/brands/marc-jacobs/zhinochi-sumky/)
+- [Жіночі сумки Michael Kors](https://bestbrnd4u.com/brands/michael-kors/zhinochi-sumky/)
+- [Кросівки Lacoste](https://bestbrnd4u.com/brands/lacoste/krosivky/)
+- [Окуляри і оправи Marc Jacobs](https://bestbrnd4u.com/brands/marc-jacobs/okuliary-i-opravy/)
+- [Сумки Coach](https://bestbrnd4u.com/brands/coach/sumky/)
+- [Чоловічі сумки Coach](https://bestbrnd4u.com/brands/coach/cholovichi-sumky/)
 
 ## Машинні дані
 
