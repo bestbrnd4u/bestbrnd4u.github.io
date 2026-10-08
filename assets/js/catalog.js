@@ -3183,7 +3183,8 @@ const PRESET = (window.CATALOG_PRESET && typeof window.CATALOG_PRESET === "objec
     : null;
 
 function presetActive() {
-    return Boolean(PRESET && (PRESET.brand || PRESET.category || PRESET.department));
+    return Boolean(PRESET && (PRESET.brand || PRESET.category
+        || PRESET.department || PRESET.section));
 }
 
 function applyPreset() {
@@ -3193,6 +3194,12 @@ function applyPreset() {
     if (PRESET.brand) selectedBrands.add(PRESET.brand);
     if (PRESET.category) selectedCategories.add(PRESET.category);
     if (PRESET.department) selectedDepartments.add(PRESET.department);
+
+    // Розділ — не фільтр у наборі, а стан сторінки: від нього
+    // залежить і сітка, і бокове меню, і межі повзунка ціни
+    // (sectionProducts нижче). На /aktsii/ його задає сама сторінка,
+    // а не ?section= в адресі.
+    if (PRESET.section) currentSection = PRESET.section;
 
 }
 
@@ -3217,9 +3224,13 @@ function presetHolds() {
     const тримає = (value, selected) =>
         !value || (selected.size === 1 && selected.has(value));
 
+    // Розділ лежить не в наборі, а в одному значенні — тож і
+    // перевіряється інакше: пішов зі свого розділу, значить пішов зі
+    // сторінки.
     return тримає(PRESET.brand, selectedBrands)
         && тримає(PRESET.department, selectedDepartments)
-        && тримає(PRESET.category, selectedCategories);
+        && тримає(PRESET.category, selectedCategories)
+        && (!PRESET.section || currentSection === PRESET.section);
 
 }
 
@@ -4146,7 +4157,10 @@ function writeState(p, options) {
     const skipCategory = !keepPreset && presetActive() && Boolean(PRESET.category);
     const skipDepartment = !keepPreset && presetActive() && Boolean(PRESET.department);
 
-    setOrDelete(p, URL_KEYS.section, currentSection);
+    // На /aktsii/ розділ уже в шляху — у запиті він був би вдруге.
+    const skipSection = !keepPreset && presetActive() && Boolean(PRESET.section);
+
+    setOrDelete(p, URL_KEYS.section, skipSection ? "" : currentSection);
     setOrDelete(p, URL_KEYS.gender, joinSet(selectedGenders));
     setOrDelete(p, URL_KEYS.department, skipDepartment ? "" : joinSet(selectedDepartments));
     setOrDelete(p, URL_KEYS.category, skipCategory ? "" : joinSet(selectedCategories));

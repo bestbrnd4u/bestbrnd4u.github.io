@@ -40,6 +40,7 @@ const BRANDS_FILE = path.join(ROOT, "data", "brands.json");
 const CATEGORIES_FILE = path.join(ROOT, "data", "categories.json");
 const LEGAL_FILE = path.join(ROOT, "data", "legal.json");
 
+const Sections = require("./sections");
 const { brandPages, categoryPages, departmentPages, pairPages, readRecords, DEPARTMENTS_SRC }
     = require("./build-taxonomy-pages");
 
@@ -129,8 +130,8 @@ function build() {
     lines.push("");
     lines.push(link("Усі товари", `${SITE_URL}/catalog`,
         "фільтри за брендом, категорією, кольором, розміром і ціною"));
-    lines.push(link("Новинки", `${SITE_URL}/catalog?section=new`));
-    lines.push(link("Акції", `${SITE_URL}/catalog?section=sale`,
+    lines.push(link("Новинки", `${SITE_URL}${Sections.sectionPath("new")}`));
+    lines.push(link("Акції", `${SITE_URL}${Sections.sectionPath("sale")}`,
         "товари зі знижкою"));
     lines.push("");
 

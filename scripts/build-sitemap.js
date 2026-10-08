@@ -31,8 +31,8 @@ const CATEGORIES_FILE = path.join(ROOT, "data", "categories.json");
 // Перелік сторінок брендів і категорій беремо в того ж модуля, що їх
 // і будує. Свій список тут означав би, що sitemap колись почне
 // обіцяти сторінки, яких немає, — або мовчки не показувати наявні.
-const { brandPages, categoryPages, departmentPages, pairPages, readRecords, DEPARTMENTS_SRC }
-    = require("./build-taxonomy-pages");
+const { brandPages, categoryPages, departmentPages, pairPages, sectionPages,
+    readRecords, DEPARTMENTS_SRC } = require("./build-taxonomy-pages");
 // Адресу акції будує той самий модуль, що й сторінки акцій і promo.js
 // у браузері: три списки розійшлись би на першій же зміні схеми.
 const PromoMeta = require("../assets/js/promo-meta.js");
@@ -238,6 +238,17 @@ function main() {
     // бренду: вужча за нього, але й конкуренція на ній вужча.
     pairs.forEach(page => entries.push(urlEntry(page.url, "weekly", "0.9")));
 
+    // Розділи каталогу. ПОРОЖНІЙ НЕ КЛИЧЕМО: «Акції» без жодної
+    // знижки — це сторінка зі словами й без товарів, тобто м'який
+    // 404. Сама адреса при цьому лишається робочою: вона є в меню на
+    // кожній сторінці, і прибирати її не можна.
+    //
+    // Міняються вони частіше за решту: новинка перестає бути новинкою,
+    // знижка закінчується — звідси daily.
+    sectionPages(products)
+        .filter(page => page.products.length)
+        .forEach(page => entries.push(urlEntry(page.url, "daily", "0.9")));
+
     // Завершені акції в sitemap не потрапляють.
     //
     // Їхня сторінка показує «акцію не знайдено» й посилання в каталог —
@@ -296,6 +307,7 @@ function main() {
         `Готово: ${STATIC_PAGES.length} статичних + ${products.length} товарів + ` +
         `${brands.length} брендів + ${categories.length} категорій + ` +
         `${departments.length} розділів + ${pairs.length} пар «бренд × тип» + ` +
+        `${sectionPages(products).filter(p => p.products.length).length} розділів каталогу + ` +
         `${promotions.length} акцій + ${photos} фото → ${path.relative(ROOT, OUTPUT_FILE)}`
     );
 

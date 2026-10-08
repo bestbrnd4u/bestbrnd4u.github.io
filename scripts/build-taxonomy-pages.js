@@ -62,6 +62,8 @@ const DEPARTMENTS_DIR = path.join(ROOT, "departments");
 const { SITE_URL } = require("./site-env");
 const { toSlug } = require("./translit");
 const { slugProblem } = require("./slug-safety");
+// Назви, адреси й набір товарів розділів «Новинки» та «Акції».
+const Sections = require("./sections");
 const Breadcrumbs = require("../assets/js/breadcrumbs.js");
 
 // Скільки товарів перелічувати в розмітці до JS.
@@ -820,6 +822,52 @@ function pairPages(products, categories, brands) {
 
 }
 
+// Розділи каталогу: /novynky/ і /aktsii/
+//
+// Те саме, що сталося з брендами й категоріями, тільки на рік пізніше:
+// пункт меню вів на catalog?section=sale, а та адреса сама заявляла
+// canonical на /catalog. Правило, назви й набір товарів — у
+// scripts/sections.js, тут лише сторінка.
+//
+// ЧОМУ БЕЗ ПОРОГУ. Сторінка бренду існує, лише якщо в бренда є
+// товари, — а розділ є завжди, навіть порожній: він пункт меню на
+// кожній сторінці, і прибрана адреса дала б 404 замість порожнього
+// переліку. Натомість порожній розділ не потрапляє в sitemap (див.
+// scripts/build-sitemap.js): кликати робота на порожню сторінку
+// означає самому наповнювати звіт «не проіндексовано».
+function sectionPages(products) {
+
+    return Object.keys(Sections.SECTIONS).map(key => {
+
+        const meta = Sections.SECTIONS[key];
+
+        const items = Sections.sectionProducts(key, products);
+
+        return {
+            kind: "section",
+            section: key,
+            name: meta.heading,
+            slug: meta.slug,
+            dir: path.join(ROOT, meta.slug),
+            url: `${SITE_URL}/${meta.slug}/`,
+            href: `/${meta.slug}/`,
+            heading: meta.heading,
+            title: meta.title,
+            intro: [meta.intro, factsLine(items)].filter(Boolean).join(" "),
+            description: "",
+            preset: { section: key },
+            crumbs: [
+                { label: "Головна", href: "/" },
+                { label: "Каталог", href: "catalog" },
+                { label: meta.heading, href: null, current: true }
+            ],
+            products: items
+        };
+
+    });
+
+}
+
 // Посилання на пари — у їхнього бренду й у їхнього типу.
 //
 // Пари живуть усередині /brands/<slug>/, тож сторінка бренду їм
@@ -1344,6 +1392,7 @@ function main() {
     const categories = categoryPages(products, categoryData);
     const departments = departmentPages(products, categoryData, readRecords(DEPARTMENTS_SRC));
     const pairs = pairPages(products, categoryData, brandData);
+    const sections = sectionPages(products);
 
     // Посилання на пари — ДО того, як сторінки підуть у розмітку:
     // саме тут бренд дізнається про свої типи, а тип про свої бренди.
@@ -1352,7 +1401,7 @@ function main() {
     let written = 0;
     const skipped = [];
 
-    [...brands, ...categories, ...departments, ...pairs].forEach(page => {
+    [...brands, ...categories, ...departments, ...pairs, ...sections].forEach(page => {
 
         const problem = slugProblem(page.slug);
 
@@ -1405,6 +1454,7 @@ function main() {
     console.log(`Готово: ${brands.length} брендів + ${categories.length} категорій`
         + ` + ${departments.length} розділів (+3 хаби)`
         + `, пар «бренд × тип»: ${pairs.length}`
+        + `, розділів каталогу: ${sections.map(s => `${s.name} ${s.products.length}`).join(", ")}`
         + (уКаталозі ? `, у каталозі ${уКаталозі} товарів без JS` : "")
         + (removed ? `, прибрано зайвих: ${removed}` : ""));
 
@@ -1417,6 +1467,7 @@ module.exports = {
     categoryPages,
     departmentPages,
     pairPages,
+    sectionPages,
     linkPairs,
     readRecords,
     factsLine,

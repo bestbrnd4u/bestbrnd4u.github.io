@@ -3,6 +3,11 @@ const { installBrowserStubs } = require("./helpers/browser-stubs");
 const { JSDOM } = require("jsdom");
 const ROOT = require("path").join(__dirname, "..");
 
+// Адреси розділів беремо там, де вони визначені, а не переписуємо
+// рядком: інакше перевірка закріпила б за собою саме ту форму
+// посилання, від якої ми й пішли.
+const Sections = require("../scripts/sections.js");
+
 let failures = 0;
 const check = (n,c,e) => { if(c) console.log("  ✓",n); else { console.log("  ✗",n,e!==undefined?"→ "+e:""); failures++; } };
 
@@ -88,14 +93,20 @@ console.log("\n[2] Меню «Новинки» — лише новинки");
   check("тільки статі, що мають новинки", titles.join(",") === "Жінкам,Чоловікам,Бренди", titles.join(","));
   check("у «Жінкам» лише категорія новинки", c[0].links.join(",") === "Жіночі сумки", c[0].links.join(","));
   check("«Рюкзаки» (не новинка) відсутні", !c[0].links.includes("Рюкзаки"));
-  check("посилання зберігає section=new", c[0].hrefs[0].startsWith("catalog?section=new&"), c[0].hrefs[0]);
+  // РОЗДІЛ У ШЛЯХУ, А НЕ В ЗАПИТІ.
+  //
+  // Було catalog?section=new&… — адреса, canonical якої веде на
+  // /catalog, тобто посилання в нікуди. Тепер /novynky/?… — та сама
+  // сітка, але на сторінці, яка для пошуку існує.
+  check("посилання веде на сторінку розділу",
+        c[0].hrefs[0].startsWith(Sections.sectionPath("new") + "?"), c[0].hrefs[0]);
   check("бренди звужені до новинок",
         c[2].links.filter(b=>b!=="Усі бренди").sort().join(",") === "Furla,Guess", c[2].links.join(","));
   // У розділі власної сторінки брендів немає — це той самий каталог.
   // Тому смугу просимо позначкою: без неї розділ відкривається без
   // переліку, і саме цього від нього й хочуть.
   check("«Усі бренди» просять смугу позначкою",
-        c[2].hrefs[c[2].hrefs.length - 1] === "catalog?section=new&brands=1",
+        c[2].hrefs[c[2].hrefs.length - 1] === Sections.sectionPath("new") + "?brands=1",
         c[2].hrefs[c[2].hrefs.length - 1]);
 }
 
@@ -105,10 +116,11 @@ console.log("\n[3] Меню «Акції» — лише знижки від 30%"
   const c = cols(menu);
   check("лише «Дітям» + Бренди", c.map(x=>x.title).join(",") === "Дітям,Бренди", c.map(x=>x.title).join(","));
   check("товар зі знижкою 5% не потрапив", !c.some(x => x.links.includes("Жіночі сумки")));
-  check("посилання зберігає section=sale", c[0].hrefs[0].startsWith("catalog?section=sale&"), c[0].hrefs[0]);
+  check("посилання веде на сторінку розділу",
+        c[0].hrefs[0].startsWith(Sections.sectionPath("sale") + "?"), c[0].hrefs[0]);
   check("бренд лише Nike", c[1].links.filter(b=>b!=="Усі бренди").join(",") === "Nike", c[1].links.join(","));
   check("«Усі бренди» просять смугу позначкою",
-        c[1].hrefs[c[1].hrefs.length - 1] === "catalog?section=sale&brands=1",
+        c[1].hrefs[c[1].hrefs.length - 1] === Sections.sectionPath("sale") + "?brands=1",
         c[1].hrefs[c[1].hrefs.length - 1]);
 }
 
