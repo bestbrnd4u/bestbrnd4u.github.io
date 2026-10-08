@@ -625,9 +625,10 @@ console.log("\n[10] Строк доставки в розмітці — той, 
 {
     // ЩО БУЛО НЕ ТАК
     //
-    // availability для товару під замовлення ставився правильно —
-    // PreOrder, а не InStock (див. availabilityOf). А ось строк у тій
-    // же пропозиції лишався загальним: збірка 1–2 дні плюс доставка
+    // availability для товару під замовлення ставився не InStock —
+    // і на тому я тоді й заспокоївся (слово було PreOrder, і воно теж
+    // виявилось хибним, див. розділ [11]). А ось строк у тій же
+    // пропозиції лишався загальним: збірка 1–2 дні плюс доставка
     // 1–3, тобто Google читав «2–5 днів» там, де сторінка пише
     // «10-14 робочих днів». Таких товарів 29 зі 103.
     //
@@ -705,12 +706,68 @@ console.log("\n[10] Строк доставки в розмітці — той, 
         check("і в ній стоїть строк під замовлення, а не загальний",
             box.minValue === 10 && box.maxValue === 14, JSON.stringify(box));
 
-        check("разом із PreOrder",
-            json.offers.availability === "https://schema.org/PreOrder",
+        // BackOrder, а не PreOrder: тут теж було зашите хибне слово —
+        // перевірка сумлінно стерегла його на сторінках. Чому саме
+        // BackOrder — у розділі [11].
+        check("разом із BackOrder",
+            json.offers.availability === "https://schema.org/BackOrder",
             json.offers.availability);
 
     }
 }
+
+console.log("\n[11] Про один товар Google отримує ОДИН статус наявності");
+{
+    // ЩО БУЛО НЕ ТАК. Про ту саму річ Google чув два різні слова:
+    //
+    //   feed.xml                backorder
+    //   Product.offers у HTML   PreOrder
+    //
+    // Це не синоніми. BackOrder — річ існує, її треба привезти.
+    // PreOrder — річ ще не вийшла й має дату появи. Для байєр-сервісу
+    // правдиве перше, і build-feed.js це знав: там так і написано —
+    // «preorder у Google означає інше… для нас це неправда». А
+    // product-offer.js писав PreOrder.
+    //
+    // Заміряно 07.10.2026 на проді, товар
+    // /p/sontsezakhysni-okuliary-saint-laurent-sl-276-mica-001-53/:
+    // у фіді backorder, у розмітці сторінки PreOrder. Таких у фіді 39.
+    //
+    // Строки між цими двома місцями звели докупи ще раніше (розділ
+    // [10]). Слово лишилось незведеним — половина правки прожила
+    // довше за другу половину.
+    const offer = require("../assets/js/product-offer.js");
+    const feedSrc = fs.readFileSync(path.join(ROOT, "scripts/build-feed.js"), "utf8");
+
+    const підЗамовлення = offer.availabilityOf({ preOrder: true });
+    const зіСкладу = offer.availabilityOf({ preOrder: false });
+
+    check("під замовлення — BackOrder, а не PreOrder",
+        підЗамовлення === "https://schema.org/BackOrder", підЗамовлення);
+
+    check("зі складу — InStock",
+        зіСкладу === "https://schema.org/InStock", зіСкладу);
+
+    check("слова PreOrder у модулі більше немає",
+        !/schema\.org\/PreOrder/.test(
+            fs.readFileSync(path.join(ROOT, "assets/js/product-offer.js"), "utf8")));
+
+    // І ТЕ САМЕ ЗНАЧЕННЯ У ФІДІ — звіряємо два файли між собою, бо
+    // саме їхня розбіжність і була помилкою. Словники різні (Google
+    // пише backorder, schema.org — BackOrder), тож порівнюємо не
+    // рядки, а те, що вони означають.
+    const уФіді = (feedSrc.match(/return preOrder \? "([a-z_]+)" : "([a-z_]+)"/) || []);
+
+    check("у фіді знайдено пару значень", уФіді.length === 3, уФіді.join(" / "));
+
+    check("фід і розмітка кажуть про один стан одне й те саме",
+        уФіді[1] === "backorder"
+        && підЗамовлення.toLowerCase().endsWith(уФіді[1])
+        && уФіді[2] === "in_stock"
+        && зіСкладу === "https://schema.org/InStock",
+        "фід: " + уФіді[1] + " / " + уФіді[2] + "   розмітка: " + підЗамовлення + " / " + зіСкладу);
+}
+
 
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
 process.exit(failures === 0 ? 0 : 1);

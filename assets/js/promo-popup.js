@@ -60,7 +60,7 @@
         wrapper.className = "promo-popup";
         wrapper.innerHTML = `
             <button type="button" class="promo-popup-close" aria-label="Закрити">✕</button>
-            <a href="promo?id=${encodeURIComponent(popup.promoSlug)}" class="promo-popup-link">
+            <a href="${PromoMeta.promoPath(popup.promoSlug)}" class="promo-popup-link">
                 <img src="${popup.image}" alt="" loading="lazy">
             </a>
         `;

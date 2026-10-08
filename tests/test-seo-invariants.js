@@ -105,8 +105,12 @@ console.log("\n[2] Кожна активна акція у sitemap");
 
     const promos = all.filter(p => !ended(p));
 
-    const inMap = new Set(locs.filter(l => l.includes("/promo?id="))
-        .map(l => decodeURIComponent(l.replace(/.*\/promo\?id=/, ""))));
+    // Адреса акції — /promo/<slug>/, тека з index.html, як у товарів
+    // і брендів. Відколи в кожної акції є своя сторінка, саме вона
+    // несе власні title, опис і картинку для прев'ю в месенджері;
+    // стара /promo?id= лишається робочою, але в sitemap її немає.
+    const inMap = new Set(locs.filter(l => /\/promo\/[^/]+\/?$/.test(l))
+        .map(l => decodeURIComponent(l.replace(/.*\/promo\//, "").replace(/\/$/, ""))));
 
     const missing = promos.filter(p => !inMap.has(p.slug));
 

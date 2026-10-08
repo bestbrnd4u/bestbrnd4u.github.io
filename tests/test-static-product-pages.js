@@ -324,7 +324,7 @@ console.log("\n[9] Розмітка кожної сторінки згодна �
     // РОЗДІЛ [4] БЕРЕ ОДНУ СТОРІНКУ. Цього досить, щоб побачити
     // поламаний шаблон, і замало, щоб побачити поламаний ТОВАР:
     // сейл із минулим вікном, ціну кольору, «під замовлення» без
-    // PreOrder. Таке видно лише на всіх сторінках одразу.
+    // BackOrder. Таке видно лише на всіх сторінках одразу.
     //
     // Ціна ж тут не дрібниця: розбіжність між розміткою й сторінкою —
     // причина, з якої Merchant Center знімає товар із показу, а Google
@@ -376,7 +376,7 @@ console.log("\n[9] Розмітка кожної сторінки згодна �
 
         if (offers.priceCurrency !== "UAH") розбіжності.push(`${slug}: валюта ${offers.priceCurrency}`);
 
-        const очікувана = data.preOrder ? "PreOrder" : "InStock";
+        const очікувана = data.preOrder ? "BackOrder" : "InStock";
 
         if (!String(offers.availability || "").endsWith(очікувана)) {
             розбіжності.push(`${slug}: наявність ${offers.availability}, preOrder=${Boolean(data.preOrder)}`);

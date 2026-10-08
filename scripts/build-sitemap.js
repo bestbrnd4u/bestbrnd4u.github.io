@@ -33,6 +33,9 @@ const CATEGORIES_FILE = path.join(ROOT, "data", "categories.json");
 // обіцяти сторінки, яких немає, — або мовчки не показувати наявні.
 const { brandPages, categoryPages, departmentPages, readRecords, DEPARTMENTS_SRC }
     = require("./build-taxonomy-pages");
+// Адресу акції будує той самий модуль, що й сторінки акцій і promo.js
+// у браузері: три списки розійшлись би на першій же зміні схеми.
+const PromoMeta = require("../assets/js/promo-meta.js");
 // Абсолютні адреси картинок будує той самий помічник, що й фід:
 // у даних трапляються обидві форми («/assets/…» і «assets/…»), і
 // друга реалізація цього правила колись розійшлася б із першою.
@@ -249,6 +252,15 @@ function main() {
 
     };
 
+    // АДРЕСА АКЦІЇ — /promo/<slug>/, а не /promo?id=<slug>.
+    //
+    // Відколи в кожної акції є своя сторінка (scripts/build-promo-pages.js),
+    // саме вона несе власні title, опис і картинку для прев'ю. Стара
+    // адреса лишається робочою, але в sitemap їй не місце: дві адреси
+    // на один вміст, і canonical указує на нову.
+    //
+    // Шлях будує той самий помічник, що й сторінки, — щоб sitemap не
+    // почав колись обіцяти адреси, яких немає.
     promotions.forEach(promo => {
 
         if (!promo || !promo.slug) return;
@@ -256,7 +268,7 @@ function main() {
         if (ended(promo)) return;
 
         entries.push(
-            urlEntry(`${SITE_URL}/promo?id=${encodeURIComponent(promo.slug)}`, "weekly", "0.6")
+            urlEntry(`${SITE_URL}${PromoMeta.promoPath(promo.slug)}`, "weekly", "0.6")
         );
 
     });

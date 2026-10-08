@@ -65,7 +65,7 @@ console.log("\n[1] Фото акції показує, що на нього мо
 
     // у тизера фото було <div> — курсор стрілкою, клац у нікуди
     check("фото тизера — посилання, а не div",
-        /<a href="promo\?id=\$\{encodeURIComponent\(promo\.slug\)\}"\s*\n\s*class="brand-teaser-image"/
+        /<a href="\$\{PromoMeta\.promoPath\(promo\.slug\)\}"\s*\n\s*class="brand-teaser-image"/
             .test(app));
     check("посилання підписане для зчитувача",
         /class="brand-teaser-image"[\s\S]{0,90}aria-label=/.test(app));

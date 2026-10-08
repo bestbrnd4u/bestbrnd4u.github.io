@@ -743,10 +743,23 @@ console.log("\n[2e] Прев'ю в адмінці показує ОБИДВА м
 
 console.log("\n[3] Порожній заголовок не ламає видачу Google");
 {
-    check("назва акції словами — одна функція", /function promoHeading/.test(promoJs));
+    // ПРАВИЛО ПЕРЕЇХАЛО, І ПЕРЕВІРКА ПІШЛА ЗА НИМ.
+    //
+    // Тіло функції тут колись виймалось із promo.js регуляркою й
+    // виконувалось окремо. Відколи те саме потрібно ще й збірці, яка
+    // пише promo/<slug>/index.html, правило живе в
+    // assets/js/promo-meta.js — і піднімати його треба цілим модулем,
+    // а не шматком тексту: вирваний шматок падав із «PromoMeta is not
+    // defined», бо всередині лишився виклик сусіда.
+    const PromoMeta = require("../assets/js/promo-meta.js");
 
-    const heading = new Function("promo",
-        promoJs.match(/function promoHeading[\s\S]*?\n}\n/)[0] + "\nreturn promoHeading(promo);");
+    check("назва акції словами — одна функція",
+        typeof PromoMeta.promoHeading === "function");
+
+    check("promo.js бере її звідти, а не має свою",
+        /PromoMeta\.promoHeading/.test(promoJs));
+
+    const heading = promo => PromoMeta.promoHeading(promo);
 
     check("бере заголовок, коли він є", heading({ title: "SUMMER SALE" }) === "SUMMER SALE");
 

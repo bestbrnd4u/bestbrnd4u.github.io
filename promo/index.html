@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+
+<!-- Сторінка лежить у /promo/<slug>/, а скрипти будують шляхи
+     як з кореня ("data/promotions.json"). Без <base> вони
+     перетворились би на /promo/<slug>/data/…
+     Файл згенеровано: scripts/build-promo-pages.js -->
+<base href="/">
+    <meta name="robots" content="noindex,nofollow">
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"584f8595","data/catalog.json":"518a3f1b","data/categories.json":"c3f4c8fa","data/collections.json":"dc20073e","data/home.json":"00e8da26","data/image-variants.json":"7f73a794","data/legal.json":"f84751b2","data/notifications.json":"a35b367f","data/product-texts.json":"278df72d","data/products-updated.json":"4fb62ea6","data/products.json":"3c1e6809","data/promo-popups.json":"0940ece5","data/promotions.json":"fd2ed22f","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/security.json":"0c05c691","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script>
+<meta charset="UTF-8">
+<meta name="author" content="BestBrnd4u">
+<meta name="copyright" content="© 2026 BestBrnd4u. Усі права захищено.">
+<link rel="license" href="/LICENSE">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+<meta name="theme-color" content="#111827">
+<meta name="robots" content="index,follow">
+<link rel="icon" href="favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicon-16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/images/favicon-192.png">
+    <link rel="manifest" href="/site.webmanifest">
+<!-- Стара адреса /promo?id=<slug>. Своїх тегів не має:
+     яка саме акція — відомо лише з ?id=, тобто вже в
+     браузері. Нові посилання ведуть на /promo/<slug>/,
+     де все це стоїть статично. -->
+<title id="pageTitle">Акція | BestBrnd4u</title>
+<meta name="description" content="Акції та знижки BestBrnd4u">
+<meta name="robots" content="noindex,follow">
+<!-- Шрифт. Тут, а не @import у CSS: @import видно лише після
+     завантаження таблиці стилів, і текст чекає на три запити
+     поспіль. Розкладає scripts/sync-fonts.js — правити руками
+     не треба. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+
+<link rel="stylesheet" href="assets/css/style.css?v=1aedfe72">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3" defer></script>
+<script type="application/ld+json" id="breadcrumbSchema">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Головна",
+      "item": "https://dev.bestbrnd4u.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Акції",
+      "item": "https://dev.bestbrnd4u.com/catalog?section=sale"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Акція",
+      "item": "https://dev.bestbrnd4u.com/promo"
+    }
+  ]
+}
+</script>
+</head>
+
+<body data-popup-page="promo">
+
+<header>
+<div class="container header">
+<a href="/" class="logo">BestBrnd4u</a>
+<nav>
+<ul>
+<li><a href="/">Головна</a></li>
+<li class="has-mega"><a href="catalog" id="navCatalogLink">Каталог</a><div class="mega-menu" id="catalogMegaMenu">
+<a class="mega-item" href="catalog?gender=Жінкам"><img src="assets/images/banners/mega-women.webp" alt="Жінкам"><span>Жінкам</span></a>
+<a class="mega-item" href="catalog?gender=Чоловікам"><img src="assets/images/banners/mega-men.webp" alt="Чоловікам"><span>Чоловікам</span></a>
+<a class="mega-item" href="catalog?gender=Унісекс"><img src="assets/images/banners/mega-unisex.webp" alt="Унісекс"><span>Унісекс</span></a>
+<a class="mega-item" href="catalog?gender=Дітям"><img src="assets/images/banners/mega-kids.webp" alt="Дітям"><span>Дітям</span></a>
+</div></li>
+<li class="has-mega"><a href="catalog?section=new" id="navNewLink">Новинки</a><div class="mega-menu">
+<a class="mega-item" href="catalog?section=new&gender=Жінкам"><img src="assets/images/banners/mega-women.webp" alt="Жінкам"><span>Жінкам</span></a>
+<a class="mega-item" href="catalog?section=new&gender=Чоловікам"><img src="assets/images/banners/mega-men.webp" alt="Чоловікам"><span>Чоловікам</span></a>
+<a class="mega-item" href="catalog?section=new&gender=Унісекс"><img src="assets/images/banners/mega-unisex.webp" alt="Унісекс"><span>Унісекс</span></a>
+<a class="mega-item" href="catalog?section=new&gender=Дітям"><img src="assets/images/banners/mega-kids.webp" alt="Дітям"><span>Дітям</span></a>
+</div></li>
+<li class="has-mega"><a href="catalog?section=sale" id="navSaleLink" class="sale-text active">Акції</a><div class="mega-menu">
+<a class="mega-item" href="catalog?section=sale&gender=Жінкам"><img src="assets/images/banners/mega-women.webp" alt="Жінкам"><span>Жінкам</span></a>
+<a class="mega-item" href="catalog?section=sale&gender=Чоловікам"><img src="assets/images/banners/mega-men.webp" alt="Чоловікам"><span>Чоловікам</span></a>
+<a class="mega-item" href="catalog?section=sale&gender=Унісекс"><img src="assets/images/banners/mega-unisex.webp" alt="Унісекс"><span>Унісекс</span></a>
+<a class="mega-item" href="catalog?section=sale&gender=Дітям"><img src="assets/images/banners/mega-kids.webp" alt="Дітям"><span>Дітям</span></a>
+</div></li>
+                <li><a href="bayer-service">Байєр-сервіс</a></li>
+
+<li><a href="contacts">Контакти</a></li>
+</ul>
+</nav>
+<div class="header-icons">
+<button id="searchBtn" aria-label="Пошук по каталогу">🔍</button>
+<a href="account" id="accountLink" aria-label="Увійти або зареєструватися">👤</a>
+<a href="favorites">
+❤
+<span id="favCount">0</span>
+</a>
+<div class="cart-icon-wrap">
+    <a href="cart" id="cartIconLink">
+        🛒
+        <span id="cartCount">0</span>
+    </a>
+    <div id="cartPopup" class="cart-popup" hidden></div>
+</div>
+</div>
+</div>
+</header>
+
+<section class="breadcrumbs">
+<div class="container" id="breadcrumbsList">
+<a href="/">Головна</a>
+<span class="crumb-sep">→</span>
+<a href="catalog?section=sale">Акції</a>
+<span class="crumb-sep">→</span>
+<span id="breadcrumbTitle">Акція</span>
+</div>
+</section>
+
+<div id="promoLoader" class="loader">
+    <div class="spinner"></div>
+</div>
+
+<section class="promo-hero" id="promoHero" hidden>
+
+    <div class="container">
+
+        <div class="promo-hero-banner" id="promoHeroBanner">
+
+            <div class="promo-hero-content">
+
+                <span class="promo-hero-badge" id="promoHeroBadge" hidden></span>
+
+                <h1 id="promoHeroTitle"></h1>
+
+                <p id="promoHeroText" hidden></p>
+
+                <!-- Відлік акції з розкладом: «почнеться через…» до
+                     початку, «лишилось…» поки йде. Порожній і схований,
+                     якщо в акції немає дат — тобто в усіх, що були до
+                     появи розкладу. Малює assets/js/promo.js. -->
+                <div class="promo-countdown" id="promoCountdown" hidden>
+                    <span class="promo-countdown-label" id="promoCountdownLabel"></span>
+                    <span class="promo-countdown-value" id="promoCountdownValue"></span>
+                </div>
+
+                <a href="catalog" id="promoHeroLink" class="btn">
+                    <span id="promoHeroLinkText">Дивитись усі товари</span>
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="promo-products" id="promoProductsSection" hidden>
+
+    <div class="container">
+
+        <div class="catalog-filters-bar">
+
+            <div class="filter-group filter-search">
+                <input type="text" id="searchInput" placeholder="Пошук товару...">
+            </div>
+
+            <div class="filter-group filter-gender">
+                <div id="genderFilter" class="gender-filter">
+                    <button type="button" class="gender-pill" data-gender="">Всі</button>
+                    <button type="button" class="gender-pill" data-gender="Чоловікам">Чоловікам</button>
+                    <button type="button" class="gender-pill" data-gender="Жінкам">Жінкам</button>
+                    <button type="button" class="gender-pill" data-gender="Унісекс">Унісекс</button>
+                    <button type="button" class="gender-pill" data-gender="Дітям">Дітям</button>
+                </div>
+            </div>
+
+            <div class="filter-group filter-dropdown" id="categoryDropdown">
+                <button type="button" id="categoryToggle" class="filter-toggle">
+                    <span id="categoryLabel">Категорія</span>
+                    <span class="filter-arrow">▾</span>
+                </button>
+                <div id="categoryMenu" class="filter-menu filter-menu-search" hidden>
+                    <div class="filter-menu-search-box">
+                        <span class="filter-menu-search-icon">🔍</span>
+                        <input type="text" id="categorySearchInput" placeholder="Пошук категорії...">
+                    </div>
+                    <button type="button" class="filter-option-clear" data-clear-category>✕ Скинути вибір категорії</button>
+                    <div id="categoryOptionsList" class="filter-menu-options"></div>
+                    <p id="categoryNoResults" class="filter-menu-empty" hidden>Категорію не знайдено</p>
+                </div>
+            </div>
+
+            <div class="filter-group filter-dropdown" id="brandDropdown">
+                <button type="button" id="brandToggle" class="filter-toggle">
+                    <span id="brandLabel">Бренд</span>
+                    <span class="filter-arrow">▾</span>
+                </button>
+                <div id="brandMenu" class="filter-menu filter-menu-search" hidden>
+                    <div class="filter-menu-search-box">
+                        <span class="filter-menu-search-icon">🔍</span>
+                        <input type="text" id="brandSearchInput" placeholder="Пошук бренду...">
+                    </div>
+                    <button type="button" class="filter-option-clear" data-clear-brand>✕ Скинути вибір бренду</button>
+                    <div id="brandOptionsList" class="filter-menu-options"></div>
+                    <p id="brandNoResults" class="filter-menu-empty" hidden>Бренд не знайдено</p>
+                </div>
+            </div>
+
+            <div class="filter-group filter-dropdown" id="colorDropdown">
+                <button type="button" id="colorToggle" class="filter-toggle">
+                    <span id="colorLabel">Колір</span>
+                    <span class="filter-arrow">▾</span>
+                </button>
+                <div id="colorMenu" class="filter-menu filter-menu-colors" hidden>
+                    <button type="button" class="filter-option-clear" data-clear-color>✕ Скинути вибір кольору</button>
+                    <div id="colorOptionsList" class="filter-menu-options"></div>
+                </div>
+            </div>
+
+            <div class="filter-group filter-dropdown" id="sizeDropdown">
+                <button type="button" id="sizeToggle" class="filter-toggle">
+                    <span id="sizeLabel">Розмір</span>
+                    <span class="filter-arrow">▾</span>
+                </button>
+                <div id="sizeMenu" class="filter-menu filter-menu-sizes" hidden>
+                    <button type="button" class="filter-option-clear" data-clear-size>✕ Скинути вибір розміру</button>
+                    <div id="sizeGroupsList"></div>
+                </div>
+            </div>
+
+            <div class="filter-group filter-dropdown" id="priceDropdown">
+                <button type="button" id="priceToggle" class="filter-toggle">
+                    <span id="priceLabel">Ціна</span>
+                    <span class="filter-arrow">▾</span>
+                </button>
+                <div id="priceMenu" class="filter-menu" hidden>
+                    <button type="button" class="filter-option-clear" data-clear-price>✕ Скинути вибір ціни</button>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Мобільна закріплена панель "Фільтри / Сортування" -->
+        <div id="mobileFilterBar" class="mobile-filter-bar">
+            <button type="button" id="mobileFiltersBtn" class="mobile-filter-btn">
+                <span class="mobile-filter-btn-icon">☰</span>
+                Фільтри
+                <span id="mobileFiltersCount" class="mobile-filter-count" hidden>0</span>
+            </button>
+        </div>
+
+        <!-- Мобільний повноекранний "Всі фільтри" -->
+        <div id="mobileFiltersModal" class="mobile-filters-modal" hidden>
+            <div class="mobile-filters-sheet">
+
+                <div class="mobile-filters-screen" id="mobileFiltersMain">
+                    <div class="mobile-filters-head">
+                        <span class="mobile-filters-head-title">Всі фільтри</span>
+                        <button type="button" id="mobileFiltersCloseBtn" class="mobile-filters-close" aria-label="Закрити">✕</button>
+                    </div>
+
+                    <div class="mobile-filters-rows" id="mobileFiltersRows">
+                        <button type="button" class="mobile-filter-row" data-target="category">
+                            <span>Категорія</span>
+                            <span class="mobile-filter-row-right">
+                                <span class="mobile-filter-row-value" id="mfRowCategory"></span>
+                                <span class="mobile-filter-row-arrow">→</span>
+                            </span>
+                        </button>
+                        <button type="button" class="mobile-filter-row" data-target="brand">
+                            <span>Бренд</span>
+                            <span class="mobile-filter-row-right">
+                                <span class="mobile-filter-row-value" id="mfRowBrand"></span>
+                                <span class="mobile-filter-row-arrow">→</span>
+                            </span>
+                        </button>
+                        <button type="button" class="mobile-filter-row" data-target="color">
+                            <span>Колір</span>
+                            <span class="mobile-filter-row-right">
+                                <span class="mobile-filter-row-value" id="mfRowColor"></span>
+                                <span class="mobile-filter-row-arrow">→</span>
+                            </span>
+                        </button>
+                        <button type="button" class="mobile-filter-row" data-target="size">
+                            <span>Розмір</span>
+                            <span class="mobile-filter-row-right">
+                                <span class="mobile-filter-row-value" id="mfRowSize"></span>
+                                <span class="mobile-filter-row-arrow">→</span>
+                            </span>
+                        </button>
+                        <button type="button" class="mobile-filter-row" data-target="gender">
+                            <span>Стать</span>
+                            <span class="mobile-filter-row-right">
+                                <span class="mobile-filter-row-value" id="mfRowGender"></span>
+                                <span class="mobile-filter-row-arrow">→</span>
+                            </span>
+                        </button>
+                        <button type="button" class="mobile-filter-row" data-target="price">
+                            <span>Ціна</span>
+                            <span class="mobile-filter-row-right">
+                                <span class="mobile-filter-row-value" id="mfRowPrice"></span>
+                                <span class="mobile-filter-row-arrow">→</span>
+                            </span>
+                        </button>
+                    </div>
+
+                    <div class="mobile-filters-footer">
+                        <button type="button" id="mobileFiltersResetBtn" class="btn btn-outline">Видалити все</button>
+                        <button type="button" id="mobileFiltersApplyBtn" class="btn">Показати <span id="mfCount">0</span> <span id="mfCountWord">товарів</span></button>
+                    </div>
+                </div>
+
+                <div class="mobile-filters-screen mobile-filters-sub" id="mobileFiltersSub" hidden>
+                    <div class="mobile-filters-head">
+                        <button type="button" id="mobileFiltersBackBtn" class="mobile-filters-back" aria-label="Назад">←</button>
+                        <span class="mobile-filters-head-title" id="mobileFiltersSubTitle"></span>
+                        <button type="button" id="mobileFiltersCloseBtn2" class="mobile-filters-close" aria-label="Закрити">✕</button>
+                    </div>
+
+                    <div class="mobile-filters-sub-content" id="mobileFiltersSubContent"></div>
+
+                    <div class="mobile-filters-footer">
+                        <button type="button" id="mobileFiltersSubApplyBtn" class="btn">Показати <span id="mfSubCount">0</span> <span id="mfSubCountWord">товарів</span></button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="activeFiltersBar" class="active-filters-bar" hidden>
+            <div id="activeFiltersList" class="active-filters-list">
+                <span class="active-filters-label">Активні фільтри:</span>
+                <div id="activeFiltersChips" class="active-filters-chips"></div>
+                <button type="button" id="resetFilters" class="filter-reset-chip">Скинути фільтри</button>
+            </div>
+        </div>
+
+        <div class="catalog-top">
+            <p>
+                У цій акції
+                <span id="productsCount">0</span>
+                <!-- Слово окремим вузлом: його міняє catalog.js разом
+                     із числом, інакше «1 товарів». Правило —
+                     plural() у common.js. -->
+                <span id="productsCountWord">товарів</span>
+            </p>
+
+            <div class="catalog-actions">
+
+                <span id="sortDropdownAnchor" hidden></span>
+                <div class="sort-dropdown" id="sortDropdown">
+                    <button type="button" id="sortToggle" class="sort-toggle">
+                        <span class="sort-toggle-label">Сортувати:</span> <span id="sortLabel">за замовчуванням</span>
+                        <span class="sort-arrow">▾</span>
+                    </button>
+                    <div id="sortMenu" class="sort-menu" hidden>
+                        <button type="button" class="sort-option active" data-sort="" data-label="за замовчуванням">за замовчуванням</button>
+                        <button type="button" class="sort-option" data-sort="new" data-label="новинки">новинки</button>
+                        <button type="button" class="sort-option" data-sort="top" data-label="топ">топ</button>
+                        <button type="button" class="sort-option" data-sort="priceAsc" data-label="за збільшенням ціни">за збільшенням ціни</button>
+                        <button type="button" class="sort-option" data-sort="priceDesc" data-label="за зменшенням ціни">за зменшенням ціни</button>
+                        <button type="button" class="sort-option" data-sort="discount" data-label="за знижкою">за знижкою</button>
+                    </div>
+                </div>
+
+                <div class="catalog-view-switch">
+                    <span class="catalog-view-label">Показати:</span>
+                    <button id="gridViewBtn" aria-label="Сітка товарів" class="active">▦</button>
+                    <button id="listViewBtn" aria-label="Список товарів">☰</button>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="catalogGrid" class="products-grid"></div>
+
+        <div id="emptyCatalog" class="empty-state" hidden>
+            <h2>😔</h2>
+            <p>За вашим запитом нічого не знайдено</p>
+            <button class="btn" id="clearSearch">Показати все</button>
+            <a href="catalog" class="btn btn-outline">На головну</a>
+        </div>
+
+    </div>
+
+</section>
+
+<div id="promoNotFound" class="empty-state" hidden>
+    <h2>😔</h2>
+    <h3>Цю акцію не знайдено або її вже завершено</h3>
+    <a href="catalog" class="btn">Перейти до каталогу</a>
+</div>
+
+<!-- Підписка на листи — у найпомітнішому місці сторінки.
+
+     Раніше тут стояв порожній <div class="ml-embedded"> —
+     тримач вбудованої форми MailerLite, чий скрипт із сайту
+     прибрали (52 КБ на кожній сторінці). Смуга виходила
+     порожня, а справжня форма тулилась у футері під
+     годинами роботи. Тепер навпаки.
+
+     Ключ MailerLite живе в секретах: адресу приймає наша
+     функція, а не браузер. Галочка згоди НЕ проставлена
+     заздалегідь — згода, якої людина не ставила, згодою
+     не є.
+
+     Підпис поля лишається в розмітці для читалок екрана, а
+     видимим заголовком служить <h2> (див. .newsletter
+     .subscribe-label у style.css). -->
+<section class="newsletter">
+
+    <div class="container">
+
+        <h2>Новинки й акції на пошту</h2>
+
+        <form class="subscribe" id="subscribeForm" novalidate>
+
+            <label class="subscribe-label" for="subscribeEmail">
+                Новинки й акції на пошту
+            </label>
+
+            <div class="subscribe-row">
+                <input
+                    type="email"
+                    id="subscribeEmail"
+                    placeholder="you@example.com"
+                    autocomplete="email"
+                    required>
+                <button type="submit" id="subscribeSubmit">Підписатись</button>
+            </div>
+
+            <label class="subscribe-consent">
+                <input type="checkbox" id="subscribeConsent">
+                <span>
+                    Згоден отримувати листи про новинки й акції.
+                    Відписатись можна з будь-якого листа —
+                    <a href="privacy-policy">як ми поводимось із даними.</a>
+                </span>
+            </label>
+
+            <p class="subscribe-note" id="subscribeNote" hidden></p>
+
+        </form>
+
+        <small>
+        Жодного спаму.
+        Тільки акції та нові колекції.
+        </small>
+
+    </div>
+
+</section>
+
+<section class="instagram-promo" data-section="instagram">
+<div class="container">
+<div class="instagram-card">
+<div class="instagram-icon">📸</div>
+<div class="instagram-text">
+<h2>Стежте за нами в Instagram</h2>
+<p>Нові колекції, образи та акції — щодня у нашому акаунті.</p>
+</div>
+<a href="https://www.instagram.com/bestbrnd4u" target="_blank" rel="noopener" class="btn">
+Підписатися · @bestbrnd4u
+</a>
+</div>
+</div>
+</section>
+
+<footer>
+<div class="container footer">
+<div>
+<h2>BestBrnd4u</h2>
+<p>
+Інтернет-магазин сумок
+та аксесуарів.
+</p>
+<div class="footer-social">
+<a href="https://www.instagram.com/bestbrnd4u" target="_blank" rel="noopener" aria-label="Instagram">
+Instagram
+</a>
+<a href="https://t.me/bestbrnd4u" target="_blank" rel="noopener" aria-label="Telegram">
+Telegram
+</a>
+</div>
+</div>
+<div>
+<h2>Покупцям</h2>
+<!-- Гість не бачить замовлення в кабінеті: воно без user_id -->
+<a href="order-status">Де моє замовлення</a>
+<a href="delivery-payment#delivery">Доставка</a>
+<a href="delivery-payment#payment">Оплата</a>
+<a href="return-warranty">Повернення та гарантія</a>
+<a href="bayer-service">Байєр-сервіс</a>
+<a href="privacy-policy">Політика конфіденційності</a>
+<a href="offer">Публічна оферта</a>
+            <!-- Згоду треба вміти відкликати так само легко, як дати -->
+            <a href="#" data-consent-reopen>Налаштування даних</a>
+</div>
+<div>
+<h2>Каталог</h2>
+<a href="catalog">Всі товари</a>
+<a href="catalog?section=new">Новинки</a>
+<a href="catalog?section=sale" class="sale-text">Акції</a>
+<a href="brands/">Бренди</a>
+</div>
+<div>
+<h2>Зв'яжіться з нами</h2>
+<p>📍 Україна</p>
+<p>✉ <a class="mail-link" href="mailto:bestbrnd4u@proton.me">bestbrnd4u@proton.me</a></p>
+
+            <p><svg class="tg-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21.9 4.3 18.6 20c-.2 1-.9 1.3-1.8.8l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.3-5 9.1-8.2c.4-.4-.1-.6-.6-.2L6.1 13.7 1.2 12.2c-1-.3-1.1-1 .2-1.5l19.3-7.4c.9-.3 1.6.2 1.2 1z"/></svg> <a class="tg-link" href="https://t.me/bestbrnd4u" target="_blank" rel="noopener">@bestbrnd4u</a></p>
+<p>☎ <a class="phone-link" href="tel:+380737288291">+380 73 728 82 91</a></p>
+<p>🕘 Пн–Нд 09:00–20:00</p>
+
+</div>
+</div>
+</footer>
+
+<div class="copyright">
+<div class="container">
+© 2026 bestbrnd4u.
+Всі права захищені.
+</div>
+</div>
+
+<button
+id="scrollTop"
+class="scroll-top"
+aria-label="Нагору">
+↑
+</button>
+
+<!-- Журнал помилок: сторінка сама розповідає, що в неї зламалось -->
+<script src="assets/js/error-report.js?v=21838fe8" defer></script>
+<script src="assets/js/supabase-client.js?v=d0555d06" defer></script>
+<!-- Кадрування фото товару. Той самий файл підключає адмінка,
+     тож прев'ю в ній і картка на сайті рахуються однаково. -->
+<script src="assets/js/image-framing.js?v=80b29a57" defer></script>
+<!-- Хлібні крихти: спільний будівник для сторінки й розмітки BreadcrumbList -->
+<script src="assets/js/breadcrumbs.js?v=7fc6182d" defer></script>
+<!-- Оформлення текстових блоків з адмінки (кольори, шрифт, кнопка) -->
+<script src="assets/js/text-styles.js?v=4b9b6f00" defer></script>
+<!-- Згода на використання даних (банер + блокування вбудованого відео) -->
+<script src="assets/js/consent.js?v=b6cc5d45" defer></script>
+<!-- Статистика відвідувань. Не завантажує Google без згоди. -->
+<script src="assets/js/analytics.js?v=9d0002d2" defer></script>
+<!-- Транслітерація: productUrl() кладе колір в адресу латиницею.
+     Той самий файл використовує збірка для адрес товарів. -->
+<script src="assets/js/translit.js?v=c0957cb7" defer></script>
+<script src="assets/js/common.js?v=f9d37b6a" defer></script>
+<!-- Дзвінок і зв'язок: дві плаваючі кнопки в лівому кутку -->
+<script src="assets/js/contact-buttons.js?v=53c2ccd7" defer></script>
+<!-- Підписка на листи магазину -->
+<script src="assets/js/subscribe.js?v=971151a0" defer></script>
+<!-- Адресу акції будує один модуль на всіх: і тут у браузері,
+     і в scripts/build-promo-pages.js, який пише promo/<slug>/index.html.
+     ПЕРЕД усіма, хто ним користується: скрипти з defer виконуються
+     у порядку тегів. -->
+<script src="assets/js/promo-meta.js?v=49d78016" defer></script>
+<script src="assets/js/promo-popup.js?v=daca6b7c" defer></script>
+<script src="assets/js/sync.js?v=48ef002e" defer></script>
+<script src="assets/js/mega-menu.js?v=689a9b61" defer></script>
+<script src="assets/js/ui.js?v=963cf6af" defer></script>
+<script>window.CATALOG_SKIP_AUTO_INIT = true;</script>
+<script src="assets/js/stock.js?v=85fa4aad" defer></script>
+<script src="assets/js/live-stock.js?v=ca9027dd" defer></script>
+<script src="assets/js/catalog.js?v=fb229842" defer></script>
+<script src="assets/js/promo.js?v=72dc79b4" defer></script>
+</body>
+
+</html>

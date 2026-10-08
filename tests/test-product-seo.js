@@ -228,7 +228,7 @@ console.log("\n[4] availability відповідає реальному стан
 
     w.updateProductSeoMetadata({ ...base, preOrder: true });
     ld = JSON.parse(w.document.getElementById("productSchema").textContent);
-    check("товар під замовлення → PreOrder", /PreOrder$/.test(ld.offers.availability), ld.offers.availability);
+    check("товар під замовлення → BackOrder", /BackOrder$/.test(ld.offers.availability), ld.offers.availability);
 }
 
 console.log("\n[5] Сторінка без товару не йде в індекс (м'який 404)");
@@ -279,6 +279,73 @@ console.log("\n[7] Кожен товар із каталогу є в sitemap.xml
     check("сторінки з robots.txt Disallow у sitemap не потрапили",
         !/\/(cart|checkout|account|favorites|thanks)</.test(sitemap));
 }
+
+console.log("\n[N] Заголовок товару не витрачає видимі символи даремно");
+{
+    // ЩО БУЛО НЕ ТАК. Шаблон був «<назва> — купити за N грн |
+    // BestBrnd4u», і будувався він ДВІЧІ: у збірці статичних сторінок
+    // і в product.js для рантайму.
+    //
+    // Заміряно на 103 товарах 07.10.2026. Google показує близько 60
+    // символів; при медіані заголовка 84 хвіст обрізався майже
+    // завжди. Ціну було видно у 17 заголовках зі 103, назву магазину —
+    // в ОДНОМУ. Тобто тридцять символів хвоста майже нічого не
+    // показували, зате виштовхували за край те, що варто показати.
+    //
+    // Два слова «купити за» коштували десять символів і не давали
+    // нічого: для пошуку вони однаково в описі, у H1 і в тексті, а
+    // індексується заголовок цілком — обрізка стосується лише показу.
+    //
+    // Після правки: медіана 74, довших за 80 — 25 замість 65, ціну
+    // видно в 49, магазин — в 11.
+    const ProductOffer = require("../assets/js/product-offer.js");
+
+    check("шаблон заголовка — один на обидва генератори",
+        typeof ProductOffer.pageTitle === "function");
+
+    const зразок = ProductOffer.pageTitle({ title: "Сумка Coach Tabby" }, "11 000 грн");
+
+    check("у заголовку є назва, ціна й магазин",
+        зразок === "Сумка Coach Tabby — 11 000 грн | BestBrnd4u", зразок);
+
+    check("двох слів «купити за» в ньому більше немає",
+        !/купити за/.test(зразок), зразок);
+
+    // Без ціни (а таке буває, поки дані не доїхали) заголовок не має
+    // перетворюватись на «Назва —  | BestBrnd4u».
+    const безЦіни = ProductOffer.pageTitle({ title: "Сумка Coach Tabby" }, "");
+
+    check("без ціни тире не висить саме по собі",
+        безЦіни === "Сумка Coach Tabby | BestBrnd4u", безЦіни);
+
+    // І ОБИДВА ГЕНЕРАТОРИ БЕРУТЬ ЙОГО ЗВІДТИ, а не мають свою копію.
+    const збірка = fs.readFileSync(path.join(ROOT, "scripts/build-product-pages.js"), "utf8");
+    const рантайм = productJs;
+
+    check("збірка статичних сторінок бере шаблон звідти",
+        /ProductOffer\.pageTitle\(/.test(збірка));
+
+    check("рантайм теж", /ProductOffer\.pageTitle\(/.test(рантайм));
+
+    const свої = [збірка, рантайм].filter(src => /— купити за \$\{/.test(src));
+
+    check("власних копій шаблону не лишилось", свої.length === 0,
+        String(свої.length) + " файл(и) все ще будують заголовок самі");
+
+    // І на готових сторінках теж — інакше правка лишилась би в коді,
+    // а на сайті стояв би старий заголовок.
+    const товари = fs.readdirSync(path.join(ROOT, "p"))
+        .map(d => path.join(ROOT, "p", d, "index.html"))
+        .filter(f => fs.existsSync(f))
+        .map(f => fs.readFileSync(f, "utf8"))
+        .filter(html => !/http-equiv="refresh"/.test(html));
+
+    const старі = товари.filter(html => /<title>[^<]*купити за/.test(html));
+
+    check(`на всіх ${товари.length} сторінках заголовок новий`,
+        старі.length === 0, String(старі.length) + " зі старим");
+}
+
 
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
 process.exit(failures === 0 ? 0 : 1);
