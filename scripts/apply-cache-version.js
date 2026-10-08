@@ -101,38 +101,51 @@ function htmlFiles() {
 
     if (fs.existsSync(admin)) out.push(admin);
 
-    // Згенеровані сторінки: товари, бренди, категорії.
+    // Згенеровані сторінки — УСІ, скільки б їх не було й де б вони не
+    // лежали.
     //
-    // Тека «p» тут стояла сама. Коли з'явились /brands/ і
-    // /categories/, вони лишились без версій: сторінка будується з
-    // catalog.html, тобто несе версії ПОПЕРЕДНЬОЇ збірки — і після
-    // виливки браузер тягнув би з кеша старий catalog.js рівно там,
-    // де він найпотрібніший.
-    ["p", "brands", "categories", "departments"].forEach(dir => {
+    // ТУТ БУВ ПЕРЕЛІК ТЕК, І ВІН ВІДСТАВАВ ВІД САЙТУ.
+    //
+    // Спершу стояла сама «p». Коли зʼявились /brands/ і /categories/,
+    // вони лишились без версій — про це нижній коментар і написано.
+    // Потім те саме повторилось тричі поспіль і вже мовчки:
+    //
+    //   promo/<slug>/            сторінки акцій          5
+    //   brands/<бренд>/<тип>/    «бренд × тип»          11
+    //   aktsii/, novynky/        розділи каталогу        2
+    //
+    // Заміряно 08.10.2026: 18 сторінок несли версії ПОПЕРЕДНЬОЇ
+    // збірки, бо будуються з catalog.html чи promo.html і копіюють їх
+    // штамп. Після виливки браузер віддавав би на них старий
+    // catalog.js і старий data/products.json — рівно там, де вони
+    // найпотрібніші.
+    //
+    // Перелік тут нічим не кращий за попередній: наступний тип
+    // сторінки забудуть так само. Тому обходимо дерево — тоді
+    // «забути» нема чого.
+    const пропустити = new Set(["node_modules", ".git", ".claude", "archive",
+        ".playwright-mcp", "supabase", "assets", "data", "tests", "scripts"]);
 
-        const base = path.join(ROOT, dir);
+    const обійти = dir => {
 
-        if (!fs.existsSync(base)) return;
+        fs.readdirSync(dir, { withFileTypes: true }).forEach(entry => {
 
-        // Хаб (/brands/index.html) лежить у самій теці, сторінки — у
-        // підтеках. Треба обидва.
-        const hub = path.join(base, "index.html");
+            if (пропустити.has(entry.name) || entry.name.startsWith(".")) return;
 
-        if (fs.existsSync(hub)) out.push(hub);
+            const full = path.join(dir, entry.name);
 
-        fs.readdirSync(base, { withFileTypes: true })
-            .filter(entry => entry.isDirectory())
-            .forEach(entry => {
+            if (entry.isDirectory()) { обійти(full); return; }
 
-                const file = path.join(base, entry.name, "index.html");
+            // Сторінки в корені та адмінку вже додано вище.
+            if (entry.name.endsWith(".html") && path.dirname(full) !== ROOT) out.push(full);
 
-                if (fs.existsSync(file)) out.push(file);
+        });
 
-            });
+    };
 
-    });
+    обійти(ROOT);
 
-    return out;
+    return [...new Set(out)];
 
 }
 

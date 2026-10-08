@@ -506,8 +506,20 @@ console.log("\n[10] Сторінка панелі: піднімаємо в бр�
     check("сторінка не йде в індекс",
         /name="robots" content="noindex"/.test(PAGE));
 
+    // Шукаємо САМ ТЕГ, а не підрядок імені.
+    //
+    // Було PAGE.indexOf("reviews.js") — і воно почало знаходити
+    // «data/reviews.json» у рядку версій (перші десять його літер —
+    // це рівно «reviews.js»). Той рядок стоїть у <head>, тобто
+    // РАНІШЕ за будь-який скрипт, тож порівняння позицій ламалось,
+    // хоч порядок підключення лишався правильним.
+    const місце = ім => PAGE.search(new RegExp(`<script src="${ім}(\\?v=[a-f0-9]+)?"`));
+
     check("підключено github-publish.js ДО reviews.js",
-        PAGE.indexOf("github-publish.js") < PAGE.indexOf("reviews.js"));
+        місце("github-publish\\.js") >= 0
+        && місце("reviews\\.js") >= 0
+        && місце("github-publish\\.js") < місце("reviews\\.js"),
+        `${місце("github-publish\\.js")} проти ${місце("reviews\\.js")}`);
 }
 
 console.log("\n[11] Сторінка на місці й до неї можна дійти");
