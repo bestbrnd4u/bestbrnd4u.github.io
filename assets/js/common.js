@@ -1725,11 +1725,11 @@ function buildSearchOverlay() {
                             <span>Жінкам</span>
                         </a>
 
-                        <a href="catalog?section=new" class="search-promo-banner search-promo-new" data-banner="new">
+                        <a href="/novynky/" class="search-promo-banner search-promo-new" data-banner="new">
                             <span>Новинки</span>
                         </a>
 
-                        <a href="catalog?section=sale" class="search-promo-banner search-promo-sale" data-banner="sale">
+                        <a href="/aktsii/" class="search-promo-banner search-promo-sale" data-banner="sale">
                             <span>Акції</span>
                         </a>
 
@@ -2595,8 +2595,8 @@ function buildMobileNav() {
         <ul class="mobile-nav-list">
             <li><a href="/">Головна</a></li>
             <li><a href="catalog">Каталог</a></li>
-            <li><a href="catalog?section=new">Новинки</a></li>
-            <li><a href="catalog?section=sale" class="sale-text">Акції</a></li>
+            <li><a href="/novynky/">Новинки</a></li>
+            <li><a href="/aktsii/" class="sale-text">Акції</a></li>
             <li><a href="bayer-service">Байєр-сервіс</a></li>
             <li><a href="contacts">Контакти</a></li>
             <li><a href="account">Особистий кабінет</a></li>

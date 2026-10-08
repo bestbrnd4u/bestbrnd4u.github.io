@@ -16,9 +16,9 @@
 
 ## Каталог
 
-- [Усі товари](https://bestbrnd4u.com/catalog): фільтри за брендом, категорією, кольором, розміром і ціною
-- [Новинки](https://bestbrnd4u.com/catalog?section=new)
-- [Акції](https://bestbrnd4u.com/catalog?section=sale): товари зі знижкою
+- [Усі товари](https://dev.bestbrnd4u.com/catalog): фільтри за брендом, категорією, кольором, розміром і ціною
+- [Новинки](https://dev.bestbrnd4u.com/novynky/)
+- [Акції](https://dev.bestbrnd4u.com/aktsii/): товари зі знижкою
 
 ### Розділи
 

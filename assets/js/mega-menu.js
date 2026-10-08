@@ -157,9 +157,26 @@ function setupMegaKeyboard(items) {
 
     }
 
-    // розділ визначаємо з посилання самого пункту меню:
-    // "catalog?section=new" → "new", "catalog" → ""
+    // Адреси розділів каталогу. Та сама пара, що в
+    // scripts/sections.js, — звіряє їх tests/test-sections.js.
+    //
+    // Копія тут, бо меню працює в браузері: файли підключаються
+    // тегами в заданому порядку, модулів у них немає.
+    const SECTION_PATH = { "new": "/novynky/", "sale": "/aktsii/" };
+
+    // Розділ визначаємо з посилання самого пункту меню:
+    // "/aktsii/" → "sale", "catalog" → ""
+    //
+    // Стару форму ?section= теж лишаємо зрозумілою: такі посилання вже
+    // розіслані, та й сам каталог приймає їх як фільтр і далі.
     function sectionFromHref(href) {
+
+        const path = String(href || "").replace(/^https?:\/\/[^/]+/, "").split("?")[0];
+
+        const known = Object.keys(SECTION_PATH)
+            .find(key => path === SECTION_PATH[key] || path === SECTION_PATH[key].slice(1));
+
+        if (known) return known;
 
         const match = /[?&]section=(new|sale)\b/.exec(href || "");
 
@@ -201,15 +218,20 @@ function setupMegaKeyboard(items) {
 
     }
 
+    // Адреса всередині меню.
+    //
+    // РОЗДІЛ ІДЕ В ШЛЯХ, А НЕ В ЗАПИТ. Відколи в «Новинок» і «Акцій» є
+    // власні сторінки, catalog?section=sale&gender=Жінкам — це адреса,
+    // canonical якої веде на /catalog, тобто посилання в нікуди.
+    // /aktsii/?gender=Жінкам — та сама сітка, але на сторінці, яка для
+    // пошуку існує.
     function buildQuery(section, extra) {
 
-        const parts = [];
+        const parts = extra.map(([key, value]) => `${key}=${encodeURIComponent(value)}`);
 
-        if (section) parts.push(`section=${section}`);
+        const base = SECTION_PATH[section] || "catalog";
 
-        extra.forEach(([key, value]) => parts.push(`${key}=${encodeURIComponent(value)}`));
-
-        return parts.length ? `catalog?${parts.join("&")}` : "catalog";
+        return parts.length ? `${base}?${parts.join("&")}` : base;
 
     }
 
