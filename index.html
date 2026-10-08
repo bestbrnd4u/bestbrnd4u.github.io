@@ -82,6 +82,29 @@
 }
 </script>
 
+<!-- ЯК ЗВЕТЬСЯ САЙТ — ОКРЕМО ВІД ТОГО, ХТО ЙОГО ВЕДЕ.
+
+     Organization вище каже, хто продавець. А назву САЙТУ Google бере
+     з WebSite.name — і показує її окремим рядком над заголовком у
+     видачі. Без цього блоку він здогадується сам: за доменом, за
+     хвостом «| BestBrnd4u» у заголовках, за чим доведеться.
+
+     Саме тому блок з'явився разом зі скороченням заголовків товару:
+     хвіст із назвою магазину звідти прибрано, і назва мусить мати
+     власне джерело, а не триматись на ньому.
+
+     Збирає scripts/build-legal.js із data/legal.json — руками тут
+     правити нічого. -->
+<script type="application/ld+json" id="websiteSchema">
+{
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "BestBrnd4u",
+    "url": "https://dev.bestbrnd4u.com/",
+    "inLanguage": "uk-UA"
+}
+</script>
+
 </head>
 
 <body data-popup-page="home">

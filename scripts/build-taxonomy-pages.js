@@ -120,7 +120,15 @@ function rootRelativeLinks(html) {
 
 const HEAD_SLOT = "<!--SEO_HEAD-->";
 const BREADCRUMB_SLOT_RE = /<div class="container" id="breadcrumbsList">[\s\S]*?<\/div>/;
-const GRID_SLOT_RE = /<div\s*\n?\s*id="catalogGrid"\s*\n?\s*class="products-grid">\s*<\/div>/;
+// Сітка може бути і порожня, і вже наповнена: відколи /catalog теж
+// дістав статичний перелік (див. writeCatalogStatic нижче), той самий
+// catalog.html буває у двох станах, і збірка мусить працювати в
+// обох — інакше другий прогін підряд падав би.
+//
+// Лінива крапка безпечна: усередині переліку самих <div> немає, лише
+// <ul>/<li>/<a>/<span>. Перший же </div> після вмісту — це справді
+// закриття сітки.
+const GRID_SLOT_RE = /<div\s*\n?\s*id="catalogGrid"\s*\n?\s*class="products-grid">[\s\S]*?<\/div>/;
 const TITLE_SLOT = '<span id="catalogTitle">Каталог товарів</span>';
 const ABOUT_SLOT = '<div class="brand-about" id="brandAbout" hidden></div>';
 const HERO_SLOT = '<div class="brand-hero" id="brandHero" hidden></div>';
@@ -208,11 +216,10 @@ function buildTemplate() {
     // Каркас над ним означав би два екрани заглушок перед готовим
     // вмістом: людина гортала б повз те, чого не існує, до того, що вже
     // є. Тому на цих сторінках лишаємо тільки напис для читалки.
-    if (!SKELETON_RE.test(html)) {
-        throw new Error("У catalog.html не знайдено каркас .catalog-skeleton — "
-            + "шаблон змінився, перевірте scripts/build-taxonomy-pages.js");
-    }
-
+    // Каркаса може вже й не бути: writeCatalogStatic нижче прибирає
+    // його з catalog.html разом із наповненням сітки, і на другому
+    // прогоні підряд шукати його марно. Тому не вимога, а прибирання,
+    // якщо він ще на місці.
     html = html.replace(SKELETON_RE, "");
 
     return html;
@@ -701,6 +708,51 @@ ${items}
 
 }
 
+// САМ КАТАЛОГ ТЕЖ МУСИТЬ БУТИ НЕ ПОРОЖНІЙ БЕЗ JS.
+//
+// ЩО БУЛО НЕ ТАК. Сторінки брендів і категорій давно носять у
+// розмітці перелік товарів — рівно заради робота, який не виконує
+// JavaScript. А /catalog, головна сторінка каталогу, лишалась
+// порожньою: заміряно 07.10.2026 на проді, нуль посилань на /p/ у
+// сирому HTML. Усе, що бачив такий робот, — підписи фільтрів.
+//
+// Для Google це не біда: він рендерить. Але ШІ-краулери (GPTBot,
+// PerplexityBot, ClaudeBot) переважно ні — і для них каталог
+// магазину не містив жодного товару.
+//
+// ЧОМУ ПЕРЕЛІК ПИШЕТЬСЯ В САМ catalog.html. Це не окрема згенерована
+// сторінка: /catalog і є catalog.html. Тож файл після збірки має два
+// стани — чистий шаблон у гілці й наповнений на сайті, — і обидва
+// мусять годитись для збірки сторінок таксономії, які з нього ж і
+// родяться. Звідси ліниві регулярки вище.
+//
+// Каркас при цьому йде геть: він тримав форму сітки, поки немає
+// даних, а тепер там одразу справжній перелік. Два екрани заглушок
+// перед готовим вмістом — те саме, чого уникають сторінки брендів.
+function writeCatalogStatic(products) {
+
+    const html = fs.readFileSync(TEMPLATE_FILE, "utf8");
+
+    if (!GRID_SLOT_RE.test(html)) {
+        throw new Error('У catalog.html не знайдено <div id="catalogGrid"> — '
+            + "переліку товарів нема куди вставити");
+    }
+
+    const next = html
+        .replace(SKELETON_RE, "")
+        .replace(GRID_SLOT_RE, () => productsMarkup(products));
+
+    if (next === html) {
+        console.log("Готово: перелік у каталозі вже на місці");
+        return 0;
+    }
+
+    fs.writeFileSync(TEMPLATE_FILE, next, "utf8");
+
+    return Math.min(products.length, STATIC_LIMIT);
+
+}
+
 function buildPage(template, page) {
 
     let html = template
@@ -919,6 +971,11 @@ function main() {
         fs.writeFileSync(path.join(hub.dir, "index.html"), buildHub(template, hub), "utf8");
     });
 
+    // Перелік у самому каталозі — ОСТАННІМ. Шаблон для сторінок вище
+    // уже знято (buildTemplate на початку), тож переписати catalog.html
+    // тепер безпечно.
+    const уКаталозі = writeCatalogStatic(products);
+
     const removed = pruneStale(BRANDS_DIR, new Set(brands.map(p => p.slug)))
         + pruneStale(CATEGORIES_DIR, new Set(categories.map(p => p.slug)))
         + pruneStale(DEPARTMENTS_DIR, new Set(departments.map(p => p.slug)));
@@ -927,6 +984,7 @@ function main() {
 
     console.log(`Готово: ${brands.length} брендів + ${categories.length} категорій`
         + ` + ${departments.length} розділів (+3 хаби)`
+        + (уКаталозі ? `, у каталозі ${уКаталозі} товарів без JS` : "")
         + (removed ? `, прибрано зайвих: ${removed}` : ""));
 
 }
