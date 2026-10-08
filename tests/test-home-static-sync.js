@@ -201,5 +201,86 @@ console.log("\n[6] Усі згадані в розмітці локальні ф
     check("жодного биті посилання", missing.length === 0, missing.join(", "));
 }
 
+console.log("\n[7] Головна не порожня без JavaScript");
+{
+    // ЩО БУЛО НЕ ТАК. Смугу «Популярні товари» малює app.js, а до
+    // нього #productsGrid порожній. Заміряно 08.10.2026: у сирому HTML
+    // головної НУЛЬ посилань на /p/.
+    //
+    // Для Google це не біда — він рендерить. А ШІ-краулери (GPTBot,
+    // PerplexityBot, ClaudeBot) переважно ні, і найголовніша сторінка
+    // магазину не містила для них жодного товару.
+    const читати = rel => fs.readFileSync(path.join(ROOT, rel), "utf8");
+
+    const блок = (html.match(/id="productsGrid"[^>]*>([\s\S]*?)<\/div>/) || [])[1] || "";
+
+    const посилань = (блок.match(/<a href="\/p\//g) || []).length;
+
+    const { topRated, HOME_FEATURED, featuredMarkup }
+        = require("../scripts/build-home-static.js");
+
+    check(`товарів у розмітці смуги: ${посилань}`, посилань === HOME_FEATURED,
+        `${посилань}, а треба ${HOME_FEATURED}`);
+
+    // ВІДБІР ТОЙ САМИЙ, ЩО В БРАУЗЕРІ.
+    //
+    // Правило живе у двох місцях: scripts/build-home-static.js (для
+    // розмітки) і assets/js/app.js (для рантайму). app.js у node не
+    // завантажується — він одразу шукає DOM, — тож витягаємо функцію з
+    // вихідника й ЗАПУСКАЄМО. Регуляркою тут не обійтись: вона
+    // закріпила б форму запису, а не поведінку.
+    const appSrc = читати("assets/js/app.js");
+
+    const тіло = (appSrc.match(/function topRated\(products\)[\s\S]*?\n}/) || [])[0];
+
+    check("правило відбору знайшлось у app.js", Boolean(тіло));
+
+    const зБраузера = new Function("HOME_FEATURED", тіло + "\nreturn topRated;")(HOME_FEATURED);
+
+    const каталог = JSON.parse(читати("data/catalog.json"));
+
+    const наш = topRated(каталог).map(p => p.slug);
+    const їхній = зБраузера(каталог).map(p => p.slug);
+
+    check(`обидва відбирають ті самі ${наш.length} товарів`,
+        наш.join("|") === їхній.join("|"),
+        `збірка [${наш.slice(0, 2)}…], браузер [${їхній.slice(0, 2)}…]`);
+
+    // І саме з рейтингом. Порожній рейтинг стоїть у 27 товарах зі 103,
+    // а null у відніманні дає NaN — через це головна показувала РІВНО
+    // ТІ ВІСІМ, у яких рейтингу немає.
+    const безРейтингу = topRated(каталог).filter(p => !(Number(p.rating) > 0));
+
+    check("серед обраних немає жодного без рейтингу", безРейтингу.length === 0,
+        `${безРейтингу.length} із ${HOME_FEATURED}`);
+
+    // І ці самі товари справді стоять у розмітці.
+    const уРозмітці = [...блок.matchAll(/<a href="\/p\/([^"]+?)\/"/g)]
+        .map(m => decodeURIComponent(m[1]));
+
+    check("у розмітці саме вони", уРозмітці.join("|") === наш.join("|"),
+        уРозмітці.slice(0, 2).join(", "));
+
+    // Ціну форматує той самий модуль, що й переліки таксономії: своя
+    // копія вже встигла розійтись невидимим нерозривним пробілом.
+    check("ціну форматує спільний модуль",
+        /const \{ formatPrice \} = require\("\.\/build-taxonomy-pages"\)/
+            .test(читати("scripts/build-home-static.js")));
+
+    const ціна = (блок.match(/taxonomy-price">([^<]*)</) || [])[1] || "";
+
+    const зТаксономії = (читати("brands/coach/zhinochi-sumky/index.html")
+        .match(/taxonomy-price">([^<]*)</) || [])[1] || "";
+
+    const роздільник = s => (s.match(/\d(\D)\d\d\d/) || [])[1];
+
+    check("і роздільник розрядів однаковий",
+        роздільник(ціна) === роздільник(зТаксономії),
+        `${JSON.stringify(ціна)} проти ${JSON.stringify(зТаксономії)}`);
+
+    check("розмітку будує функція, а не руками вписаний список",
+        typeof featuredMarkup === "function");
+}
+
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
 process.exit(failures === 0 ? 0 : 1);

@@ -1472,6 +1472,7 @@ module.exports = {
     readRecords,
     factsLine,
     listLine,
+    formatPrice,
     STATIC_LIMIT,
     PAIR_MIN,
     DEPARTMENTS_SRC
