@@ -3206,15 +3206,20 @@ function presetHolds() {
 
     if (!presetActive()) return true;
 
-    if (PRESET.brand) {
-        return selectedBrands.size === 1 && selectedBrands.has(PRESET.brand);
-    }
+    // КОЖЕН фільтр, який заявила сторінка, а не перший-ліпший.
+    //
+    // Раніше тут стояли ранні return: є бренд — перевіряємо бренд і
+    // виходимо. Поки preset був з одного ключа, різниці не було. А
+    // /brands/coach/zhinochi-sumky/ заявляє ДВА, і зняття категорії
+    // лишало сторінку на місці: адреса обіцяє жіночі сумки Coach, а
+    // в сітці всі товари Coach. Рівно те, чого цей механізм і мав не
+    // допустити.
+    const тримає = (value, selected) =>
+        !value || (selected.size === 1 && selected.has(value));
 
-    if (PRESET.department) {
-        return selectedDepartments.size === 1 && selectedDepartments.has(PRESET.department);
-    }
-
-    return selectedCategories.size === 1 && selectedCategories.has(PRESET.category);
+    return тримає(PRESET.brand, selectedBrands)
+        && тримає(PRESET.department, selectedDepartments)
+        && тримає(PRESET.category, selectedCategories);
 
 }
 

@@ -30,6 +30,12 @@
 
 const { toSlug } = require("./translit");
 
+// Правило існування пари «бренд × тип» складніше за решту: три умови,
+// і всі три живуть у генераторі сторінок. Друга копія тут розійшлася б
+// із першою на першій же зміні асортименту — а розійшовшись, дала б
+// крихту на сторінку, якої немає.
+const { pairPages } = require("./build-taxonomy-pages");
+
 function clean(value) {
 
     return String(value ?? "").trim();
@@ -61,7 +67,19 @@ function taxonomyLinks(products, categories, brands) {
 
     });
 
-    const links = { category: {}, department: {}, brand: {} };
+    const links = { category: {}, department: {}, brand: {}, pair: {} };
+
+    // Ключ — видима назва пари, «Жіночі сумки Marc Jacobs»: той самий
+    // рядок, що в її заголовку й <h1>, і той самий, що складає
+    // assets/js/breadcrumbs.js.
+    //
+    // Лише КАТЕГОРІЙНІ пари. Крихта бренду стоїть одразу після крихти
+    // категорії, тож означає саме категорію цього бренду; пара з
+    // розділом («Сумки Coach») була б ширшою за ту ланку, повз яку
+    // людина щойно пройшла.
+    pairPages(products || [], categories || [], brands || [])
+        .filter(page => page.level === "category")
+        .forEach(page => { links.pair[page.name] = page.href.replace(/^\//, ""); });
 
     (products || []).forEach(product => {
 

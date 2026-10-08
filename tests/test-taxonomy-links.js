@@ -90,6 +90,107 @@ console.log("\n[1] Будівник доріжки віддає власні с�
     check("накопичення фільтрів у запасному шляху не зламалось",
         /gender=/.test(plainHref("Coach")) && /category=/.test(plainHref("Coach")),
         plainHref("Coach"));
+
+    // КРИХТА БРЕНДУ МУСИТЬ ПАМʼЯТАТИ КАТЕГОРІЮ.
+    //
+    // Доріжка накопичувальна: «Coach» усередині «Жіночих сумок»
+    // означає жіночі сумки Coach, і запасне посилання на фільтр це й
+    // давало — catalog?gender=…&category=…&brand=…
+    //
+    // А власна сторінка бренду, яку ланка дістала разом із /brands/,
+    // категорію мовчки загубила: клац по «Coach» усередині жіночих
+    // сумок відкривав усі 18 товарів бренду разом із гаманцями. Тобто
+    // перехід на справжню адресу покращив SEO й зіпсував саме те,
+    // заради чого доріжка накопичувальна.
+    const зПарою = Breadcrumbs.buildTrail(product, {
+        departmentOf: () => "Сумки",
+        pageFor: pageFor({
+            ...links,
+            pair: { "Жіночі сумки Coach": "brands/coach/zhinochi-sumky/" }
+        })
+    });
+
+    const парнийHref = label => (зПарою.find(c => c.label === label) || {}).href;
+
+    check("є пара «бренд × тип» — крихта бренду веде на неї",
+        парнийHref("Coach") === "brands/coach/zhinochi-sumky/", парнийHref("Coach"));
+
+    check("підпис крихти лишається назвою бренду",
+        зПарою.filter(c => c.label === "Coach").length === 1,
+        зПарою.map(c => c.label).join(" → "));
+
+    check("рівнів у доріжці не побільшало", зПарою.length === trail.length,
+        `${зПарою.length} проти ${trail.length}`);
+
+    // Пари немає — лишається сторінка бренду. У брендів з одним типом
+    // товару вона й ПОКАЗУЄ рівно цей тип, тож нічого не губиться.
+    check("немає пари — лишається сторінка бренду",
+        href("Coach") === "brands/coach/", href("Coach"));
+
+    // Поза категорією пара не має сенсу: немає тієї ланки, повз яку
+    // людина щойно пройшла.
+    const безКатегорії = Breadcrumbs.buildTrail(
+        { title: "Щось", brand: "Coach" },
+        { pageFor: pageFor({ ...links, pair: { " Coach": "brands/coach/zhinochi-sumky/" } }) });
+
+    check("без категорії пара не підставляється",
+        (безКатегорії.find(c => c.label === "Coach") || {}).href === "brands/coach/",
+        (безКатегорії.find(c => c.label === "Coach") || {}).href);
+}
+
+console.log("\n[1a] Ключ пари складається однаково в усіх трьох місцях");
+{
+    // «Жіночі сумки Marc Jacobs» будують троє: сам генератор сторінок
+    // (як назву), довідник адрес (як ключ) і будівник доріжки (щоб у
+    // довіднику знайти). Розійдуться — крихта мовчки впаде назад на
+    // сторінку бренду, і ніхто цього не помітить.
+    const products = JSON.parse(read("data/products.json"));
+    const categories = JSON.parse(read("data/categories.json"));
+    const brands = JSON.parse(read("data/brands.json"));
+
+    const taxonomy = require("../scripts/build-taxonomy-pages.js");
+
+    const pairs = taxonomy.pairPages(products, categories, brands)
+        .filter(page => page.level === "category");
+
+    const links = taxonomyLinks(products, categories, brands);
+
+    check(`категорійних пар: ${pairs.length}`, pairs.length > 0);
+
+    const загублені = pairs.filter(page => links.pair[page.name] !== page.href.replace(/^\//, ""));
+
+    check("довідник знає кожну під її власною назвою", загублені.length === 0,
+        загублені.map(p => p.name).join(", "));
+
+    // І лише категорійні. Крихта бренду стоїть одразу після крихти
+    // категорії, тож означає саме категорію цього бренду; пара з
+    // розділом («Сумки Coach») була б ширшою за ту ланку, повз яку
+    // людина щойно пройшла.
+    const зайві = taxonomy.pairPages(products, categories, brands)
+        .filter(page => page.level === "department" && links.pair[page.name]);
+
+    check("пар із розділом у довіднику немає", зайві.length === 0,
+        зайві.map(p => p.name).join(", "));
+
+    // А тепер те саме, але очима будівника: він складає ключ сам, з
+    // полів товару.
+    const знайдені = products.filter(product => {
+
+        const trail = Breadcrumbs.buildTrail(product, { pageFor: pageFor(links) });
+
+        const crumb = trail.find(c => c.label === product.brand);
+
+        return crumb && /^brands\/[^/]+\/[^/]+\//.test(crumb.href);
+
+    });
+
+    const очікувані = products.filter(product => pairs.some(page =>
+        page.brand === String(product.brand || "").trim()
+        && page.type === String(product.category || "").trim()));
+
+    check(`товарів із парою: ${очікувані.length} — стільки ж дістали посилання`,
+        знайдені.length === очікувані.length,
+        `${знайдені.length} проти ${очікувані.length}`);
 }
 
 console.log("\n[2] Правило «кому належить сторінка» — те саме, що в генератора");
@@ -126,7 +227,7 @@ console.log("\n[3] КОЖНЕ посилання з крихт веде на і�
     } else {
 
         const broken = new Set();
-        let pages = 0, links = 0;
+        let pages = 0, links = 0, pairLinks = 0;
 
         fs.readdirSync(dir).forEach(slug => {
 
@@ -154,6 +255,10 @@ console.log("\n[3] КОЖНЕ посилання з крихт веде на і�
 
                 links++;
 
+                // /brands/coach/zhinochi-sumky/ — два рівні, тобто
+                // пара «бренд × тип».
+                if (/^\/brands\/[^/]+\/[^/]+\/$/.test(href)) pairLinks++;
+
                 if (!fs.existsSync(path.join(ROOT, href, "index.html"))) broken.add(href);
 
             });
@@ -165,6 +270,35 @@ console.log("\n[3] КОЖНЕ посилання з крихт веде на і�
         check(`посилань на власні сторінки: ${links} (було 0)`, links > 0);
 
         check("жодного битого посилання", broken.size === 0, [...broken].join(", "));
+
+        // І саме на пари — на ГОТОВИХ сторінках, а не лише в памʼяті
+        // будівника. Між ними стоїть ще й window.PRODUCT_TAXONOMY, яку
+        // кладе генератор; забуде він туди покласти пару — крихта
+        // мовчки відкотиться на сторінку бренду.
+        const продукти = JSON.parse(read("data/products.json"));
+
+        const пари = require("../scripts/build-taxonomy-pages.js")
+            .pairPages(продукти, JSON.parse(read("data/categories.json")),
+                JSON.parse(read("data/brands.json")))
+            .filter(page => page.level === "category");
+
+        const зПарою = продукти.filter(product => пари.some(page =>
+            page.brand === String(product.brand || "").trim()
+            && page.type === String(product.category || "").trim())).length;
+
+        check(`на сторінки «бренд × тип» — ${pairLinks} крихт із ${зПарою} можливих`,
+            pairLinks === зПарою, `${pairLinks} проти ${зПарою}`);
+
+        // Рантайм перемальовує доріжку після завантаження. Без мапи в
+        // самій сторінці він зібрав би її по-своєму й стер би пару.
+        const зразок = fs.readdirSync(dir)
+            .map(slug => path.join(dir, slug, "index.html"))
+            .filter(file => fs.existsSync(file))
+            .map(file => fs.readFileSync(file, "utf8"))
+            .filter(html => /window\.PRODUCT_TAXONOMY = \{[^\n]*"pair"/.test(html));
+
+        check(`мапа з парою доїхала в рантайм ${зразок.length} сторінок`,
+            зразок.length === зПарою, `${зразок.length} проти ${зПарою}`);
     }
 }
 

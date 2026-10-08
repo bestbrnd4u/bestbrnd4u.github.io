@@ -258,6 +258,58 @@ function syncOrganization(legal, home) {
 
 }
 
+// ЯК ЗВЕТЬСЯ САЙТ — ОКРЕМА РОЗМІТКА.
+//
+// Organization вище каже, ХТО продавець. А назву САЙТУ Google бере з
+// WebSite.name і показує її окремим рядком над заголовком у видачі.
+//
+// НАВІЩО ЦЕ З'ЯВИЛОСЬ. 08.10.2026 із заголовків товару прибрано
+// хвіст « | BestBrnd4u»: при межі показу в 60 символів він був видний
+// в одному заголовку зі 103 і лише виштовхував ціну за край. Але
+// доти саме цей хвіст і підказував Google назву магазину. Прибрати
+// його, не давши назві власного джерела, означало б прибрати назву
+// взагалі.
+//
+// Назва — та сама sellerName, що в Organization: два написання
+// одного магазину розійшлись би на першій же правці в адмінці.
+function websiteSchema(legal) {
+
+    return JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        name: (legal && legal.sellerName) || "BestBrnd4u",
+        url: `${SITE_URL}/`,
+        inLanguage: "uk-UA"
+    }, null, 4);
+
+}
+
+const SITE_SLOT_RE = /(<script type="application\/ld\+json" id="websiteSchema">)([\s\S]*?)(<\/script>)/;
+
+function syncWebsite(legal) {
+
+    if (!fs.existsSync(HOME_PAGE)) return;
+
+    const html = fs.readFileSync(HOME_PAGE, "utf8");
+
+    if (!SITE_SLOT_RE.test(html)) {
+        throw new Error('У index.html немає <script id="websiteSchema"> — назву сайту нема куди вставити');
+    }
+
+    const next = html.replace(SITE_SLOT_RE, (all, open, body, close) =>
+        `${open}\n${websiteSchema(legal)}\n${close}`);
+
+    if (next === html) {
+        console.log("Готово: назва сайту в розмітці вже збігається з даними");
+        return;
+    }
+
+    fs.writeFileSync(HOME_PAGE, next, "utf8");
+
+    console.log("Готово: назву сайту в розмітці оновлено");
+
+}
+
 function htmlPages(dir, found) {
 
     const list = found || [];
@@ -392,6 +444,7 @@ function main() {
     }
 
     syncOrganization(legal, home);
+    syncWebsite(legal);
 
 }
 

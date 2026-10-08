@@ -296,8 +296,12 @@ console.log("\n[N] Заголовок товару не витрачає вид�
     // нічого: для пошуку вони однаково в описі, у H1 і в тексті, а
     // індексується заголовок цілком — обрізка стосується лише показу.
     //
-    // Після правки: медіана 74, довших за 80 — 25 замість 65, ціну
-    // видно в 49, магазин — в 11.
+    // Другим кроком, 08.10.2026, пішов і хвіст « | BestBrnd4u»:
+    // тринадцять символів, які коштували те саме на всіх 103
+    // заголовках, а видно їх було в одинадцяти.
+    //
+    // Разом: медіана 84 → 61, довших за 80 — 65 → 3, найдовший
+    // 127 → 104. Ціну тепер видно в 49 заголовках замість 17.
     const ProductOffer = require("../assets/js/product-offer.js");
 
     check("шаблон заголовка — один на обидва генератори",
@@ -305,18 +309,21 @@ console.log("\n[N] Заголовок товару не витрачає вид�
 
     const зразок = ProductOffer.pageTitle({ title: "Сумка Coach Tabby" }, "11 000 грн");
 
-    check("у заголовку є назва, ціна й магазин",
-        зразок === "Сумка Coach Tabby — 11 000 грн | BestBrnd4u", зразок);
+    check("у заголовку лишились назва й ціна",
+        зразок === "Сумка Coach Tabby — 11 000 грн", зразок);
 
     check("двох слів «купити за» в ньому більше немає",
         !/купити за/.test(зразок), зразок);
 
+    check("і хвоста з назвою магазину теж",
+        !/BestBrnd4u/.test(зразок), зразок);
+
     // Без ціни (а таке буває, поки дані не доїхали) заголовок не має
-    // перетворюватись на «Назва —  | BestBrnd4u».
+    // перетворюватись на «Назва — ».
     const безЦіни = ProductOffer.pageTitle({ title: "Сумка Coach Tabby" }, "");
 
     check("без ціни тире не висить саме по собі",
-        безЦіни === "Сумка Coach Tabby | BestBrnd4u", безЦіни);
+        безЦіни === "Сумка Coach Tabby", безЦіни);
 
     // І ОБИДВА ГЕНЕРАТОРИ БЕРУТЬ ЙОГО ЗВІДТИ, а не мають свою копію.
     const збірка = fs.readFileSync(path.join(ROOT, "scripts/build-product-pages.js"), "utf8");
@@ -340,10 +347,52 @@ console.log("\n[N] Заголовок товару не витрачає вид�
         .map(f => fs.readFileSync(f, "utf8"))
         .filter(html => !/http-equiv="refresh"/.test(html));
 
-    const старі = товари.filter(html => /<title>[^<]*купити за/.test(html));
+    const старі = товари.filter(html => /<title>[^<]*(купити за|\| BestBrnd4u)/.test(html));
 
     check(`на всіх ${товари.length} сторінках заголовок новий`,
         старі.length === 0, String(старі.length) + " зі старим");
+
+    // НАЗВА МАГАЗИНУ МУСИТЬ МАТИ ВЛАСНЕ ДЖЕРЕЛО.
+    //
+    // Доти вона трималась саме на хвості заголовка. Прибрати хвіст, не
+    // давши їй іншого джерела, означало б прибрати назву з видачі
+    // взагалі: Google показує її окремим рядком, беручи з WebSite.name.
+    //
+    // Тому WebSite-розмітка на головній — не окрема приємність, а
+    // умова цієї правки. Перевіряємо разом, щоб одне не поїхало без
+    // другого.
+    const головна = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
+
+    const блок = (головна.match(
+        /<script type="application\/ld\+json" id="websiteSchema">([\s\S]*?)<\/script>/) || [])[1];
+
+    check("на головній є розмітка WebSite", Boolean(блок));
+
+    if (блок) {
+
+        let ld = null;
+
+        try { ld = JSON.parse(блок); } catch (error) { ld = null; }
+
+        check("вона парситься", Boolean(ld));
+
+        check("тип саме WebSite", ld && ld["@type"] === "WebSite", ld && ld["@type"]);
+
+        check("назва сайту в ній є", Boolean(ld && ld.name), ld && ld.name);
+
+        // Та сама назва, що в Organization: два написання одного
+        // магазину розійшлись би на першій правці в адмінці.
+        const org = (головна.match(
+            /<script type="application\/ld\+json" id="organizationSchema">([\s\S]*?)<\/script>/) || [])[1];
+
+        let orgLd = null;
+
+        try { orgLd = JSON.parse(org); } catch (error) { orgLd = null; }
+
+        check("назва збігається з тією, що в Organization",
+            Boolean(ld && orgLd && ld.name === orgLd.name),
+            (ld && ld.name) + " / " + (orgLd && orgLd.name));
+    }
 }
 
 
