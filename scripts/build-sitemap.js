@@ -31,7 +31,7 @@ const CATEGORIES_FILE = path.join(ROOT, "data", "categories.json");
 // Перелік сторінок брендів і категорій беремо в того ж модуля, що їх
 // і будує. Свій список тут означав би, що sitemap колись почне
 // обіцяти сторінки, яких немає, — або мовчки не показувати наявні.
-const { brandPages, categoryPages, departmentPages, readRecords, DEPARTMENTS_SRC }
+const { brandPages, categoryPages, departmentPages, pairPages, readRecords, DEPARTMENTS_SRC }
     = require("./build-taxonomy-pages");
 // Адресу акції будує той самий модуль, що й сторінки акцій і promo.js
 // у браузері: три списки розійшлись би на першій же зміні схеми.
@@ -213,9 +213,12 @@ function main() {
     // робот знаходить решту.
     const categoryData = readJsonSafe(CATEGORIES_FILE);
 
-    const brands = brandPages(products, readJsonSafe(BRANDS_FILE));
+    const brandData = readJsonSafe(BRANDS_FILE);
+
+    const brands = brandPages(products, brandData);
     const categories = categoryPages(products, categoryData);
     const departments = departmentPages(products, categoryData, readRecords(DEPARTMENTS_SRC));
+    const pairs = pairPages(products, categoryData, brandData);
 
     if (brands.length) entries.push(urlEntry(`${SITE_URL}/brands/`, "weekly", "0.7"));
     if (categories.length) entries.push(urlEntry(`${SITE_URL}/categories/`, "weekly", "0.7"));
@@ -229,6 +232,11 @@ function main() {
     [...brands, ...categories].forEach(page => {
         entries.push(urlEntry(page.url, "weekly", "0.9"));
     });
+
+    // «Бренд × тип» — найточніша відповідь на запит із двох слів
+    // («годинники Michael Kors»), і пріоритет у неї такий самий, як у
+    // бренду: вужча за нього, але й конкуренція на ній вужча.
+    pairs.forEach(page => entries.push(urlEntry(page.url, "weekly", "0.9")));
 
     // Завершені акції в sitemap не потрапляють.
     //
@@ -287,7 +295,7 @@ function main() {
     console.log(
         `Готово: ${STATIC_PAGES.length} статичних + ${products.length} товарів + ` +
         `${brands.length} брендів + ${categories.length} категорій + ` +
-        `${departments.length} розділів + ` +
+        `${departments.length} розділів + ${pairs.length} пар «бренд × тип» + ` +
         `${promotions.length} акцій + ${photos} фото → ${path.relative(ROOT, OUTPUT_FILE)}`
     );
 

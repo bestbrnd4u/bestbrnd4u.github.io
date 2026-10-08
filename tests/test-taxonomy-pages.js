@@ -351,8 +351,62 @@ console.log("\n[9] Розділи — рівень над категорією")
     check("розділ не дублюється в запиті",
         /const skipDepartment = !keepPreset && presetActive\(\) && Boolean\(PRESET\.department\)/.test(catalog));
 
+    // ПОВЕДІНКУ, А НЕ ТЕКСТ ФУНКЦІЇ.
+    //
+    // Тут стояла регулярка на тіло presetHolds — «if (PRESET.department)
+    // { return selectedDepartments.size === 1…». Вона трималась за
+    // ранні return, а саме ранні return і були помилкою: сторінка
+    // /brands/coach/zhinochi-sumky/ заявляє ДВА фільтри, і перевірка
+    // першого-ліпшого лишала її на місці, коли знімали другий.
+    //
+    // Тобто перевірка закріплювала за собою ту форму запису, через яку
+    // баг і став можливим. Тепер вона ЗАПУСКАЄ обидві функції з
+    // підставленим станом — і ламається від зміни поведінки, а не від
+    // переписаного рядка.
+    const вихідник = назва =>
+        catalog.match(new RegExp("function " + назва + "\\(\\)[\\s\\S]*?\\n}"))[0];
+
+    const тримається = (preset, стан) => new Function(
+        "PRESET", "selectedBrands", "selectedDepartments", "selectedCategories",
+        вихідник("presetActive") + "\n" + вихідник("presetHolds") + "\nreturn presetHolds();"
+    )(
+        preset,
+        new Set(стан.brands || []),
+        new Set(стан.departments || []),
+        new Set(стан.categories || [])
+    );
+
+    check("без фільтра сторінки нічого не перевіряємо",
+        тримається(null, {}) === true);
+
+    check("бренд на місці — лишаємось",
+        тримається({ brand: "Coach" }, { brands: ["Coach"] }) === true);
+
+    check("додали другий бренд — виходимо",
+        тримається({ brand: "Coach" }, { brands: ["Coach", "Prada"] }) === false);
+
     check("зняли розділ — виходимо зі сторінки",
-        /if \(PRESET\.department\) \{\s*\n\s*return selectedDepartments\.size === 1/.test(catalog));
+        тримається({ department: "Сумки" }, { departments: [] }) === false);
+
+    check("зняли категорію — виходимо зі сторінки",
+        тримається({ category: "Гаманці" }, { categories: [] }) === false);
+
+    // Сторінка «бренд × тип» заявляє два фільтри, і доти, доки тут
+    // стояли ранні return, зняття другого лишалось непоміченим:
+    // адреса обіцяла жіночі сумки Coach, а в сітці був увесь Coach.
+    const пара = { brand: "Coach", category: "Жіночі сумки" };
+
+    check("пара ціла — лишаємось",
+        тримається(пара, { brands: ["Coach"], categories: ["Жіночі сумки"] }) === true);
+
+    check("у парі зняли тип — виходимо",
+        тримається(пара, { brands: ["Coach"], categories: [] }) === false);
+
+    check("у парі зняли бренд — виходимо",
+        тримається(пара, { brands: [], categories: ["Жіночі сумки"] }) === false);
+
+    check("у парі додали другий тип — виходимо",
+        тримається(пара, { brands: ["Coach"], categories: ["Жіночі сумки", "Гаманці"] }) === false);
 
     check("один розділ → canonical на його сторінку",
         /link\.href = `\$\{base\}\/departments\/\$\{latinParam\(\[\.\.\.selectedDepartments\]\[0\]\)\}\/`/.test(catalog));

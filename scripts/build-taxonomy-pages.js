@@ -97,6 +97,37 @@ function truncateForMeta(text, maxLength = 155) {
 
 }
 
+// ЗАГОЛОВОК ВКЛАДКИ БЕРЕ НАЗВУ, ЯКУ ДАВ ВЛАСНИК.
+//
+// В адмінці у бренду, категорії й розділу є поле заголовка, і власник
+// ним уже користується рівно так, як треба пошуку: «Годинники
+// Tissot», «Окуляри Ray-Ban», «Сумки JW PEI», «Сумки й аксесуари
+// Coach».
+//
+// Цей текст стояв у <h1> — і більше ніде. У <title>, тобто в рядку,
+// який Google і показує, і важить найбільше, йшла гола назва бренду.
+// Тобто сторінка, яку власник назвав «Годинники Tissot»,
+// зголошувалась на запит «Tissot», а на «годинники Tissot» — ні.
+//
+// ЧОМУ З МЕЖЕЮ. Google показує близько шістдесяти символів. Заміряно
+// 08.10.2026: з 49 заголовків таксономії за 60 вилазив один. Шість
+// десятків із хвостиком — межа, за якою авторський заголовок
+// виштовхує за край саму назву, заради якої його й писали; тоді
+// коротша форма виграє.
+const TITLE_MAX = 65;
+
+const TITLE_TAIL = " — купити в Україні | BestBrnd4u";
+
+function pageTitle(custom, name) {
+
+    const own = String(custom || "").trim();
+
+    const full = own + TITLE_TAIL;
+
+    return own && own !== name && full.length <= TITLE_MAX ? full : name + TITLE_TAIL;
+
+}
+
 function jsonLdScript(id, data) {
 
     return `<script type="application/ld+json" id="${id}">\n`
@@ -347,7 +378,7 @@ function brandPages(products, brands) {
             banner: record.banner || "",
             bannerMobile: record.bannerMobile || "",
             logo: record.logo || "",
-            title: `${name} — купити в Україні | BestBrnd4u`,
+            title: pageTitle(record.title, name),
             intro: [
                 factsLine(items),
                 listLine("Категорії", items.map(p => p.category))
@@ -421,7 +452,7 @@ function categoryPages(products, categories) {
             dir: path.join(CATEGORIES_DIR, slug),
             url: `${SITE_URL}/categories/${slug}/`,
             heading: record.title || name,
-            title: `${name} — купити в Україні | BestBrnd4u`,
+            title: pageTitle(record.title, name),
             intro: [
                 factsLine(items),
                 listLine("Бренди", items.map(p => p.brand))
@@ -483,7 +514,7 @@ function departmentPages(products, categories, records) {
             dir: path.join(DEPARTMENTS_DIR, slug),
             url: `${SITE_URL}/departments/${slug}/`,
             heading: record.title || name,
-            title: `${name} — купити в Україні | BestBrnd4u`,
+            title: pageTitle(record.title, name),
             intro: [
                 factsLine(items),
                 listLine("Категорії", inside),
@@ -497,10 +528,367 @@ function departmentPages(products, categories, records) {
                 { label: name, href: null, current: true }
             ],
             products: items,
-            inside
+            // Посиланнями, а не назвами: той самий блок нижче носить
+            // і категорії розділу, і сторінки «бренд × тип», а в них
+            // адреса будується інакше.
+            insideGroups: [{
+                label: `Категорії розділу ${name}`,
+                links: inside.map(category => ({
+                    name: category,
+                    href: `/categories/${toSlug(category)}/`
+                }))
+            }]
         };
 
     }).sort((a, b) => a.name.localeCompare(b.name, "uk"));
+
+}
+
+// Бренд × тип: /brands/coach/zhinochi-sumky/
+//
+// НАВІЩО
+// -------
+// Запит про річ майже завжди з ДВОХ слів — тип і бренд: «годинники
+// Michael Kors», «кросівки Lacoste», «гаманці Coach». А сторінки в
+// нас були рівно по одному слову: /brands/coach/ про всі товари
+// Coach і /categories/hamantsi/ про гаманці всіх брендів. Сторінки
+// саме під такий запит не існувало — її місце займав каталог із
+// фільтром, canonical якого веде на /catalog, тобто сам каже Google
+// «це не окрема сторінка».
+//
+// ЧОМУ ВСЕРЕДИНІ /brands/
+// ------------------------
+// Сторінка бренду — найкраще зв'язаний хаб магазину (заміряно
+// 08.10.2026: 130 внутрішніх посилань проти 12 у категорій), і
+// вкладена адреса читається як шлях: бренд → його тип. Зворотний
+// порядок (/categories/<тип>/<бренд>/) дав би те саме, але від
+// слабшого батька.
+//
+// ПРАВИЛО ІСНУВАННЯ
+// ------------------
+// 1. Не менше PAIR_MIN товарів. З одним товаром сторінка — це
+//    картка товару, переказана своїми словами, тобто дубль.
+//
+// 2. Пара з РОЗДІЛОМ («Сумки Coach») існує, лише якщо бренд має в
+//    цьому розділі хоча б дві категорії. Інакше її перелік товарів
+//    збігається з переліком категорійної пари слово в слово, а дві
+//    сторінки з однаковим вмістом Google зводить до однієї, сам
+//    обираючи яку.
+//
+//    У спірному випадку лишається ВУЖЧА, категорійна. Коштує це
+//    менше, ніж здається: назва категорії здебільшого МІСТИТЬ назву
+//    розділу («Жіночі сумки» ⊃ «Сумки»), тож ширший запит стоїть у
+//    заголовку вужчої сторінки слово в слово. А там, де не містить
+//    («Годинники» проти «Аксесуари», «Окуляри і оправи» проти
+//    «Аксесуари»), ширше слово — внутрішнє слово магазину, якого в
+//    пошуку ніхто не набирає.
+//
+//    Один випадок із 13 таки програє: «Взуття Lacoste» лишається без
+//    власного заголовка на користь «Кросівок Lacoste» — усі дев'ять
+//    товарів там кросівки.
+const PAIR_MIN = 2;
+
+function pairPages(products, categories, brands) {
+
+    const departmentOf = new Map();
+
+    (categories || []).forEach(category => {
+        if (category && category.name) departmentOf.set(category.name, category.department || "");
+    });
+
+    // Теку бренду беремо в того ж модуля, що її й створює: в адмінці
+    // slug можна перевизначити, і друга транслітерація тут поклала б
+    // сторінку в теку, якої немає.
+    const brandDir = new Map();
+    const brandTotal = new Map();
+    const brandLook = new Map();
+
+    brandPages(products, brands).forEach(page => {
+        brandDir.set(page.name, page.slug);
+        brandTotal.set(page.name, page.products.length);
+        brandLook.set(page.name, page);
+    });
+
+    const groups = new Map();
+
+    const add = (level, brand, type, product) => {
+
+        if (!brand || !type) return;
+
+        const key = `${level}\u0000${brand}\u0000${type}`;
+
+        if (!groups.has(key)) {
+            groups.set(key, { level, brand, type, products: [], inside: new Set() });
+        }
+
+        const group = groups.get(key);
+
+        group.products.push(product);
+        group.inside.add(String(product.category || "").trim());
+
+    };
+
+    products.forEach(product => {
+
+        const brand = String(product.brand || "").trim();
+        const category = String(product.category || "").trim();
+
+        add("category", brand, category, product);
+        add("department", brand, departmentOf.get(category) || "", product);
+
+    });
+
+    const taken = new Set();
+
+    const pages = [...groups.values()]
+        // Категорійні першими: якщо slug розділу й категорії колись
+        // збігся б у межах одного бренду, тека лишається за вужчою.
+        .sort((a, b) => (a.level === b.level ? 0 : a.level === "category" ? -1 : 1))
+        .map(group => {
+
+            if (group.products.length < PAIR_MIN) return null;
+
+            if (group.level === "department" && group.inside.size < 2) return null;
+
+            // 3. Пара не може охопити ВЕСЬ асортимент бренду.
+            //
+            // Tissot возить самі годинники, Ray-Ban — самі окуляри:
+            // «Годинники Tissot» виявилось би тими самими шістьма
+            // товарами, що й /brands/tissot/. Заміряно 08.10.2026:
+            // таких пар було 8 із 19, тобто майже половина нових
+            // сторінок не додавала жодного нового рядка.
+            //
+            // Запит при цьому не губиться: заголовок сторінки бренду
+            // тепер бере назву з адмінки, а там у власника вже
+            // написано «Годинники Tissot» (див. pageTitle вище).
+            if (group.products.length >= (brandTotal.get(group.brand) || 0)) return null;
+
+            const brandSlug = brandDir.get(group.brand);
+
+            if (!brandSlug) return null;
+
+            const slug = toSlug(group.type);
+
+            if (taken.has(`${brandSlug}/${slug}`)) return null;
+
+            taken.add(`${brandSlug}/${slug}`);
+
+            const inside = [...group.inside].filter(Boolean);
+
+            return {
+                kind: "pair",
+                level: group.level,
+                brand: group.brand,
+                type: group.type,
+                // «Жіночі сумки Coach», а не «Coach Жіночі сумки»:
+                // українською тип іде перший, і саме в такому порядку
+                // це питають у пошуку.
+                name: `${group.type} ${group.brand}`,
+                slug,
+                brandSlug,
+                dir: path.join(BRANDS_DIR, brandSlug, slug),
+                href: `/brands/${brandSlug}/${slug}/`,
+                url: `${SITE_URL}/brands/${brandSlug}/${slug}/`,
+                heading: `${group.type} ${group.brand}`,
+                title: pageTitle("", `${group.type} ${group.brand}`),
+                intro: [
+                    factsLine(group.products),
+                    group.level === "department" ? listLine("Категорії", inside) : ""
+                ].filter(Boolean).join(" "),
+                // БАНЕР БРЕНДУ — ТАК, ОПИС — НІ.
+                //
+                // Банер малює генератор (catalog.js на сторінках із
+                // фільтром його не чіпає), і без цих полів перехід
+                // «Coach → Жіночі сумки» губив би смугу Coach на
+                // півдорозі.
+                //
+                // А опис бренду лишається самій сторінці бренду: це
+                // єдиний неавтоматичний абзац, яким вона відрізняється
+                // для пошуку, і розмножений по чотирьох підсторінках
+                // він перестав би таким бути.
+                banner: (brandLook.get(group.brand) || {}).banner || "",
+                bannerMobile: (brandLook.get(group.brand) || {}).bannerMobile || "",
+                logo: (brandLook.get(group.brand) || {}).logo || "",
+                description: "",
+                preset: group.level === "category"
+                    ? { brand: group.brand, category: group.type }
+                    : { brand: group.brand, department: group.type },
+                crumbs: [
+                    { label: "Головна", href: "/" },
+                    { label: "Каталог", href: "catalog" },
+                    { label: "Бренди", href: "brands/" },
+                    { label: group.brand, href: `brands/${brandSlug}/` },
+                    { label: group.type, href: null, current: true }
+                ],
+                products: group.products
+            };
+
+        })
+        .filter(Boolean)
+        .sort((a, b) => a.name.localeCompare(b.name, "uk"));
+
+    // СТОРІНКА, НА ЯКУ НІХТО НЕ ПОСИЛАЄТЬСЯ, НЕ ІСНУЄ.
+    //
+    // Рівно цим закінчились сторінки розділів: вони були, у sitemap
+    // були, а посилань на них по всьому сайту знайшлось 11. Тому
+    // кожна пара одразу дістає три шляхи до себе — зі сторінки свого
+    // бренду, зі сторінки свого типу й від сусідів того ж типу.
+    //
+    // СУСІД — НЕ ОБОВʼЯЗКОВО ПАРА.
+    //
+    // Tissot возить самі годинники, тож власної пари в нього немає
+    // (правило 3 вище). Але /brands/tissot/ показує самі годинники й
+    // навіть зветься «Годинники Tissot» — для читача це сторінка того
+    // самого типу. Якби сусідами лічились тільки пари, «Годинники
+    // Michael Kors» виявились би глухим кутом, хоч годинників у
+    // магазині чотири бренди.
+    const types = new Map();
+
+    const додати = (level, type, link) => {
+
+        const key = `${level}\u0000${type}`;
+
+        if (!types.has(key)) types.set(key, []);
+
+        types.get(key).push(link);
+
+    };
+
+    pages.forEach(page => додати(page.level, page.type,
+        { brand: page.brand, name: page.brand, href: page.href }));
+
+    // Бренд, увесь асортимент якого — один тип.
+    const brandTypes = new Map();
+
+    products.forEach(product => {
+
+        const brand = String(product.brand || "").trim();
+        const category = String(product.category || "").trim();
+
+        if (!brand || !category) return;
+
+        if (!brandTypes.has(brand)) {
+            brandTypes.set(brand, { category: new Set(), department: new Set() });
+        }
+
+        brandTypes.get(brand).category.add(category);
+        brandTypes.get(brand).department.add(departmentOf.get(category) || "");
+
+    });
+
+    brandTypes.forEach((levels, brand) => {
+
+        const slug = brandDir.get(brand);
+
+        if (!slug) return;
+
+        ["category", "department"].forEach(level => {
+
+            if (levels[level].size !== 1) return;
+
+            const type = [...levels[level]][0];
+
+            if (type) додати(level, type, { brand, name: brand, href: `/brands/${slug}/` });
+
+        });
+
+    });
+
+    // Сусіди — за абеткою бренду: тут вони рівні між собою, і
+    // впорядкування за кількістю читалось би як рейтинг.
+    types.forEach(list => list.sort((a, b) => a.brand.localeCompare(b.brand, "uk")));
+
+    pages.forEach(page => {
+
+        const siblings = (types.get(`${page.level}\u0000${page.type}`) || [])
+            .filter(other => other.brand !== page.brand);
+
+        if (!siblings.length) return;
+
+        page.insideGroups = [{
+            label: `${page.type} інших брендів`,
+            links: siblings.map(({ name, href }) => ({ name, href }))
+        }];
+
+    });
+
+    // Той самий довідник потрібен і сторінкам типів (див. linkPairs):
+    // інакше /categories/hodynnyky/ знало б лише про Michael Kors.
+    pages.byType = types;
+
+    return pages;
+
+}
+
+// Посилання на пари — у їхнього бренду й у їхнього типу.
+//
+// Пари живуть усередині /brands/<slug>/, тож сторінка бренду їм
+// батько й за адресою, і за посиланням. Сторінка типу (категорії чи
+// розділу) — другий шлях: з неї видно, у яких брендів цей тип узагалі
+// є.
+function linkPairs(brands, categories, departments, pairs) {
+
+    const byBrand = new Map();
+
+    pairs.forEach(pair => {
+
+        if (!byBrand.has(pair.brand)) byBrand.set(pair.brand, []);
+        byBrand.get(pair.brand).push(pair);
+
+    });
+
+    brands.forEach(page => {
+
+        const list = byBrand.get(page.name) || [];
+
+        if (!list.length) return;
+
+        // Тут назва коротка — «Жіночі сумки», а не «Жіночі сумки
+        // Coach»: бренд уже в заголовку сторінки, і повторювати його
+        // в кожному рядку означає читати його шість разів поспіль.
+        // ЗА КІЛЬКІСТЮ, А НЕ ЗА АБЕТКОЮ.
+        //
+        // Серед типів одного бренду трапляється і ширший, і вужчі:
+        // «Сумки» в Coach — це його ж «Жіночі сумки» плюс «Чоловічі».
+        // За абеткою надмножина ставала між своїми частинами
+        // («Гаманці, Жіночі сумки, Сумки, Чоловічі сумки») і читалась
+        // як помилка. За кількістю ширше завжди попереду вужчого —
+        // воно просто більше.
+        page.insideGroups = [{
+            label: `${page.name} за типом товару`,
+            links: [...list]
+                .sort((a, b) => b.products.length - a.products.length
+                    || a.type.localeCompare(b.type, "uk"))
+                .map(pair => ({ name: pair.type, href: pair.href }))
+        }];
+
+    });
+
+    [...categories, ...departments].forEach(page => {
+
+        // Довідник «тип → сторінки цього типу» будує pairPages і
+        // кладе його полем byType на повернений список: там же, де
+        // живе правило, яким брендам пара не належить. Своя копія
+        // тут означала б, що /categories/hodynnyky/ знає лише про
+        // Michael Kors, а про Tissot і Mathey-Tissot — ні.
+        const level = page.kind === "department" ? "department" : "category";
+
+        const list = (pairs.byType && pairs.byType.get(`${level}\u0000${page.name}`)) || [];
+
+        if (!list.length) return;
+
+        // ОКРЕМОЮ ГРУПОЮ, А НЕ В КІНЕЦЬ НАЯВНОЇ.
+        //
+        // У розділу в блоці вже лежать його категорії, і дописані до
+        // них бренди читались би як ще одна категорія: «Жіночі сумки,
+        // Чоловічі сумки, Coach». Дві групи — два рядки, і в кожному
+        // однорідне.
+        page.insideGroups = [...(page.insideGroups || []), {
+            label: `${page.name} за брендами`,
+            links: list.map(({ name, href }) => ({ name, href }))
+        }];
+
+    });
 
 }
 
@@ -583,9 +971,14 @@ function heroMarkup(page) {
         ? `<source media="(max-width:768px)" srcset="${escapeHtml(page.bannerMobile)}">`
         : "";
 
+    // Підпис описує КАРТИНКУ, а не сторінку: на /brands/coach/
+    // zhinochi-sumky/ це смуга Coach, і «Жіночі сумки Coach» читалка
+    // оголосила б як назву зображення жіночих сумок.
+    const alt = page.brand || page.name;
+
     return `<div class="brand-hero" id="brandHero">`
         + `<picture>${mobile}`
-        + `<img class="${cls}" src="${escapeHtml(image)}" alt="${escapeHtml(page.name)}" decoding="async">`
+        + `<img class="${cls}" src="${escapeHtml(image)}" alt="${escapeHtml(alt)}" decoding="async">`
         + `</picture>`
         + `</div>`;
 
@@ -687,24 +1080,32 @@ function headMarkup(page) {
 
 }
 
-// Перелік категорій усередині розділу.
+// Куди ця сторінка веде далі.
 //
 // Це не прикраса: без нього від «Сумок» немає жодного посилання до
 // «Жіночих сумок», і вужчі сторінки лишаються досяжними хіба що з
-// sitemap — тобто найгіршим із можливих способів.
+// sitemap — тобто найгіршим із можливих способів. Відтоді той самий
+// блок носить і сторінки «бренд × тип»: у розділу це його категорії,
+// у бренду — його типи, у типу — його бренди.
 function insideMarkup(page) {
 
-    if (!page.inside || !page.inside.length) return "";
+    const groups = (page.insideGroups || []).filter(group => group.links && group.links.length);
 
-    const items = page.inside.map(name => `        <li>
-            <a href="/categories/${toSlug(name)}/">${escapeHtml(name)}</a>
+    if (!groups.length) return "";
+
+    return groups.map(group => {
+
+        const items = group.links.map(link => `        <li>
+            <a href="${escapeHtml(link.href)}">${escapeHtml(link.name)}</a>
         </li>`).join("\n");
 
-    return `<nav class="taxonomy-hub" aria-label="Категорії розділу">
+        return `<nav class="taxonomy-hub" aria-label="${escapeHtml(group.label)}">
     <ul class="taxonomy-hub-list">
 ${items}
     </ul>
 </nav>`;
+
+    }).join("\n\n");
 
 }
 
@@ -937,14 +1338,21 @@ function main() {
 
     const categoryData = readJsonSafe(CATEGORIES_FILE, []);
 
-    const brands = brandPages(products, readJsonSafe(BRANDS_FILE, []));
+    const brandData = readJsonSafe(BRANDS_FILE, []);
+
+    const brands = brandPages(products, brandData);
     const categories = categoryPages(products, categoryData);
     const departments = departmentPages(products, categoryData, readRecords(DEPARTMENTS_SRC));
+    const pairs = pairPages(products, categoryData, brandData);
+
+    // Посилання на пари — ДО того, як сторінки підуть у розмітку:
+    // саме тут бренд дізнається про свої типи, а тип про свої бренди.
+    linkPairs(brands, categories, departments, pairs);
 
     let written = 0;
     const skipped = [];
 
-    [...brands, ...categories, ...departments].forEach(page => {
+    [...brands, ...categories, ...departments, ...pairs].forEach(page => {
 
         const problem = slugProblem(page.slug);
 
@@ -976,14 +1384,27 @@ function main() {
     // тепер безпечно.
     const уКаталозі = writeCatalogStatic(products);
 
-    const removed = pruneStale(BRANDS_DIR, new Set(brands.map(p => p.slug)))
+    let removed = pruneStale(BRANDS_DIR, new Set(brands.map(p => p.slug)))
         + pruneStale(CATEGORIES_DIR, new Set(categories.map(p => p.slug)))
         + pruneStale(DEPARTMENTS_DIR, new Set(departments.map(p => p.slug)));
+
+    // Пари — всередині теки свого бренду, тож прибирання вище їх не
+    // бачить: воно дивиться лише на прямих дітей brands/. А застаріти
+    // вони вміють швидше за решту — досить продати передостанній
+    // годинник, і пара падає нижче PAIR_MIN.
+    brands.forEach(brand => {
+
+        const keep = new Set(pairs.filter(p => p.brandSlug === brand.slug).map(p => p.slug));
+
+        removed += pruneStale(path.join(BRANDS_DIR, brand.slug), keep);
+
+    });
 
     skipped.forEach(line => console.warn(`⚠  ${line}`));
 
     console.log(`Готово: ${brands.length} брендів + ${categories.length} категорій`
         + ` + ${departments.length} розділів (+3 хаби)`
+        + `, пар «бренд × тип»: ${pairs.length}`
         + (уКаталозі ? `, у каталозі ${уКаталозі} товарів без JS` : "")
         + (removed ? `, прибрано зайвих: ${removed}` : ""));
 
@@ -995,9 +1416,12 @@ module.exports = {
     brandPages,
     categoryPages,
     departmentPages,
+    pairPages,
+    linkPairs,
     readRecords,
     factsLine,
     listLine,
     STATIC_LIMIT,
+    PAIR_MIN,
     DEPARTMENTS_SRC
 };

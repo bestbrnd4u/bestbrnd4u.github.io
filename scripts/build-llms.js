@@ -40,7 +40,7 @@ const BRANDS_FILE = path.join(ROOT, "data", "brands.json");
 const CATEGORIES_FILE = path.join(ROOT, "data", "categories.json");
 const LEGAL_FILE = path.join(ROOT, "data", "legal.json");
 
-const { brandPages, categoryPages, departmentPages, readRecords, DEPARTMENTS_SRC }
+const { brandPages, categoryPages, departmentPages, pairPages, readRecords, DEPARTMENTS_SRC }
     = require("./build-taxonomy-pages");
 
 const OUTPUT_FILE = path.join(ROOT, "llms.txt");
@@ -79,9 +79,12 @@ function build() {
     const categoryData = readJsonSafe(CATEGORIES_FILE) || [];
     const legal = readJsonSafe(LEGAL_FILE) || {};
 
-    const brands = brandPages(products, readJsonSafe(BRANDS_FILE) || []);
+    const brandData = readJsonSafe(BRANDS_FILE) || [];
+
+    const brands = brandPages(products, brandData);
     const categories = categoryPages(products, categoryData);
     const departments = departmentPages(products, categoryData, readRecords(DEPARTMENTS_SRC));
+    const pairs = pairPages(products, categoryData, brandData);
 
     const lines = [];
 
@@ -163,6 +166,22 @@ function build() {
         lines.push("");
 
         brands.slice(0, MAX_LINKS).forEach(page => {
+            lines.push(link(page.name, page.url));
+        });
+
+        lines.push("");
+
+    }
+
+    // Бренд і тип разом — рівно те, чим питання до моделі й буває:
+    // не «що є в Coach», а «які в Coach чоловічі сумки». Окремі
+    // переліки брендів і типів вище на таке не відповідають.
+    if (pairs.length) {
+
+        lines.push("### Бренд і тип товару");
+        lines.push("");
+
+        pairs.slice(0, MAX_LINKS).forEach(page => {
             lines.push(link(page.name, page.url));
         });
 
