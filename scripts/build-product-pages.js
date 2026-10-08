@@ -181,7 +181,7 @@ function trailFor(product) {
 // НАВІЩО. product.js перемальовує доріжку після завантаження (вона
 // потрібна ще й для старої адреси /product?id=…). Без цих адрес
 // рантайм зібрав би крихти по-своєму — з посиланнями на фільтр — і
-// стер би те, що згенеровано тут. Кладемо в сторінку лише три записи,
+// стер би те, що згенеровано тут. Кладемо в сторінку лише ті записи,
 // які стосуються ЦЬОГО товару: це близько сотні байтів і жодного
 // зайвого запиту.
 function productTaxonomy(product) {
@@ -192,9 +192,15 @@ function productTaxonomy(product) {
     const department = categoryIndex.departmentOf(category);
     const brand = String(product.brand || "").trim();
 
+    // Ключ пари складається тут так само, як в assets/js/breadcrumbs.js
+    // і в scripts/taxonomy-links.js: це видима назва сторінки, «Жіночі
+    // сумки Marc Jacobs».
+    const pair = category && brand ? `${category} ${brand}` : "";
+
     const out = {};
 
-    [["category", category], ["department", department], ["brand", brand]].forEach(([kind, name]) => {
+    [["category", category], ["department", department], ["brand", brand],
+        ["pair", pair]].forEach(([kind, name]) => {
 
         const href = name ? links(kind, name) : "";
 
