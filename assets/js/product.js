@@ -684,110 +684,9 @@ function renderBreadcrumbs(product) {
 
 }
 
-// -------------------------
-// Артикул у буфер і «Поділитися»
-// -------------------------
-
-// Копіювання з запасним шляхом.
-//
-// navigator.clipboard існує лише в захищеному контексті й може
-// відмовити (дозволи, фокус на іншому вікні). Тоді лишається старий
-// execCommand — він некрасивий, але працює там, де новий не працює.
-// Той самий підхід уже вживає віджет посилання в адмінці.
-function copyText(value) {
-
-    const text = String(value || "");
-
-    if (!text) return Promise.resolve(false);
-
-    if (navigator.clipboard && window.isSecureContext) {
-
-        return navigator.clipboard.writeText(text)
-            .then(() => true, () => copyTextFallback(text));
-
-    }
-
-    return Promise.resolve(copyTextFallback(text));
-
-}
-
-function copyTextFallback(text) {
-
-    const area = document.createElement("textarea");
-
-    area.value = text;
-
-    // Поле мусить бути в документі й видимим для браузера, але не для
-    // людини: readOnly не дає клавіатурі вискочити на телефоні.
-    area.setAttribute("readonly", "");
-    area.style.position = "fixed";
-    area.style.top = "-1000px";
-    area.style.opacity = "0";
-
-    document.body.appendChild(area);
-
-    area.select();
-
-    let ok = false;
-
-    try { ok = document.execCommand("copy"); } catch (error) { ok = false; }
-
-    document.body.removeChild(area);
-
-    return ok;
-
-}
-
-// Галочка на 1,6 с. Без підтвердження копіювання виглядає так, ніби
-// нічого не сталося: буфер обміну людина не бачить.
-function flashDone(button) {
-
-    button.classList.add("done");
-
-    clearTimeout(button.doneTimer);
-
-    button.doneTimer = setTimeout(() => button.classList.remove("done"), 1600);
-
-}
-
-document.addEventListener("click", event => {
-
-    const skuBtn = event.target.closest(".sku-copy");
-
-    if (skuBtn) {
-
-        // Саме data-sku, а не текст кнопки: копіювати треба «28-1», а
-        // не «Артикул: 28-1» — вставлений у пошук підпис нічого не
-        // знайде.
-        copyText(skuBtn.dataset.sku).then(ok => { if (ok) flashDone(skuBtn); });
-
-        return;
-
-    }
-
-    const shareBtn = event.target.closest(".share-product");
-
-    if (!shareBtn) return;
-
-    // Адреса як є: після перемикання кольору в ній уже стоїть ?color=,
-    // тож посилання відкриє саме те, що людина зараз бачить.
-    const url = location.href;
-    const title = document.querySelector("#productPage h1")?.textContent.trim()
-        || document.title;
-
-    if (navigator.share) {
-
-        // Скасування діалогу — не помилка: людина передумала.
-        navigator.share({ title: title, url: url }).catch(() => {});
-
-        return;
-
-    }
-
-    // Системного вікна немає (десктоп) — кладемо посилання в буфер.
-    copyText(url).then(ok => { if (ok) flashDone(shareBtn); });
-
-});
+// Копіювання артикула й кнопку «Поділитися» переселено в
+// assets/js/common.js: та сама кнопка потрібна ще й на сторінці акції,
+// а common.js підключений до кожної сторінки сайту.
 
 // Заглушка відео → плеєр.
 //
@@ -1762,7 +1661,7 @@ function renderProduct(product) {
                 </svg>
             </button>
 
-            <button type="button" class="meta-chip share-product" aria-label="Поділитися товаром">
+            <button type="button" class="meta-chip share-page" aria-label="Поділитися товаром">
                 <span class="meta-chip-label">Поділитися</span>
                 <svg class="meta-chip-icon" viewBox="0 0 24 24" aria-hidden="true">
                     <circle cx="18" cy="5" r="3"/>

@@ -10943,6 +10943,22 @@ body.mobile-filters-open .scroll-top{
 .promo-hero-banner[data-layout^="center-"]{ justify-content:center; }
 .promo-hero-banner[data-layout^="right-"]{ justify-content:flex-end; }
 
+/* Дві кнопки в банері акції: «дивитись товари» й «поділитися».
+
+   Рядок, що переноситься: на вузькому екрані друга кнопка стає під
+   першою, а не вилазить за край банера. Вирівнювання бере те саме, що
+   й текст поруч, — інакше кнопки стояли б ліворуч під написом,
+   притиснутим праворуч. */
+.promo-hero-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    margin-top:18px;
+}
+
+.promo-hero-banner[data-layout^="center-"] .promo-hero-actions{ justify-content:center; }
+.promo-hero-banner[data-layout^="right-"] .promo-hero-actions{ justify-content:flex-end; }
+
 /* Текст усередині блока вирівнюємо туди ж, куди й сам блок: напис,
    притиснутий праворуч, але з текстом ліворуч, читається як помилка. */
 .promo-hero-banner[data-layout^="center-"] .promo-hero-content{ text-align:center; }
