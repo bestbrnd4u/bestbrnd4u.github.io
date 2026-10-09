@@ -580,6 +580,111 @@ console.log("\n[10a] Текст категорій і розділів не бр
     }
 }
 
+console.log("\n[10b] Тексти сторінок без власного запису в адмінці");
+{
+    // ЩО ЦЕ ЗАКРИВАЄ. У бренда, категорії й розділу опис лежить у
+    // їхньому записі. А сторінки «бренд × тип» і розділи каталогу
+    // («Новинки», «Акції») генеруються — запису в них немає, і текст
+    // їм узяти було нізвідки: 13 сторінок із самим лише автоматичним
+    // рядком про кількість і ціни.
+    //
+    // Заводити колекцію під кожну пару означало б просити власника
+    // створювати запис для сторінки, яка зʼявилась сама й так само
+    // зникне, коли закінчиться товар. Тому один файл на всі такі
+    // сторінки, ключ — видима назва.
+    const products = JSON.parse(read("data/products.json"));
+    const categoryData = JSON.parse(read("data/categories.json"));
+    const brandData = JSON.parse(read("data/brands.json"));
+
+    const pairs = taxonomy.pairPages(products, categoryData, brandData);
+    const sections = taxonomy.sectionPages(products);
+
+    const файл = JSON.parse(read("data/page-texts.json"));
+
+    check("файл текстів читається й має список",
+        Array.isArray(файл.texts) && файл.texts.length > 0,
+        String((файл.texts || []).length));
+
+    const безТексту = [...pairs, ...sections].filter(p => !(p.description || "").trim());
+
+    check(`сторінок без власного запису: ${pairs.length + sections.length}, із них без тексту: ${безТексту.length}`,
+        безТексту.length === 0, безТексту.map(p => p.name).join(", "));
+
+    // Ключ — ВИДИМА назва сторінки. Розійдеться з тим, що в заголовку,
+    // — і текст мовчки не зʼявиться: ні помилки, ні порожньої сторінки.
+    const назви = new Set([...pairs, ...sections].map(p => p.name));
+
+    const зайві = файл.texts.map(r => String(r.page || "").trim())
+        .filter(name => name && !назви.has(name));
+
+    check("кожен запис знаходить свою сторінку", зайві.length === 0, зайві.join(", "));
+
+    // Числа в тексті застаріють мовчки — кількість і ціни вже є в
+    // автоматичному рядку поруч.
+    const зЧислами = файл.texts.filter(r =>
+        /\d+\s*(модел|товар|позиці|бренд|відсот|%)/iu.test(r.description || ""));
+
+    check("у текстах немає зашитих кількостей і порогів", зЧислами.length === 0,
+        зЧислами.map(r => r.page).join(", "));
+
+    // Два однакові описи — та сама «порожня сторінка-дубль».
+    const тексти = файл.texts.map(r => String(r.description || "").replace(/\s+/g, " ").trim());
+
+    const повтори = тексти.filter((t, i) => t && тексти.indexOf(t) !== i);
+
+    check("усі тексти різні", повтори.length === 0,
+        [...new Set(повтори)].map(t => t.slice(0, 40)).join(" | "));
+
+    // Названий бренд мусить справді бути на цій сторінці.
+    const усіБренди = taxonomy.brandPages(products, brandData).map(b => b.name);
+
+    const брехня = [];
+
+    pairs.filter(p => p.description).forEach(page => {
+
+        усіБренди.forEach(brand => {
+
+            if (brand === page.brand) return;
+
+            const re = new RegExp("(^|[^\\p{L}])" + brand.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+                + "($|[^\\p{L}])", "iu");
+
+            if (re.test(page.description)) {
+                брехня.push(`${page.name}: згадано чужий бренд «${brand}»`);
+            }
+
+        });
+
+    });
+
+    check("у тексті пари не згадано чужих брендів", брехня.length === 0,
+        брехня.slice(0, 3).join(" | "));
+
+    // І текст доїжджає на сторінку абзацами.
+    const зразок = pairs.find(p => /\n\s*\n/.test(p.description || ""));
+
+    check("є текст із кількох абзаців", Boolean(зразок));
+
+    if (зразок) {
+
+        const блок = (read(`brands/${зразок.brandSlug}/${зразок.slug}/index.html`)
+            .match(/id="brandAbout">([\s\S]*?)<button/) || [])[1] || "";
+
+        const абзаців = (блок.match(/<p>/g) || []).length;
+
+        check(`на сторінці «${зразок.name}» абзаців: ${абзаців}`,
+            абзаців === зразок.description.split(/\n\s*\n/).length,
+            `${абзаців} проти ${зразок.description.split(/\n\s*\n/).length}`);
+
+    }
+
+    // Поле заведене в адмінці — інакше правити текст зміг би лише той,
+    // хто вміє редагувати JSON у репозиторії.
+    const admin = read("admin/config.yml");
+
+    check("файл заведено в адмінці", /file: "data\/page-texts\.json"/.test(admin));
+}
+
 console.log("\n[12] Картка бренду заповнена, і банер не ріжеться на телефоні");
 {
     // ЩО ТУТ ЗАКРІПЛЕНО
