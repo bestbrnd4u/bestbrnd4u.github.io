@@ -55,6 +55,45 @@ const CATEGORIES_FILE = path.join(ROOT, "data", "categories.json");
 
 const DEPARTMENTS_SRC = path.join(ROOT, "data", "departments");
 
+// Тексти для сторінок, у яких немає власного запису в адмінці.
+//
+// У бренда, категорії й розділу запис є — там і лежить опис. А
+// сторінки «бренд × тип» і розділи каталогу («Новинки», «Акції»)
+// генеруються: заводити під кожну окрему колекцію означало б
+// просити власника створювати запис для сторінки, яка зʼявилась сама
+// й так само сама зникне, коли товар закінчиться.
+//
+// Тому один файл на всі такі сторінки, ключ — видима назва сторінки.
+const PAGE_TEXTS_FILE = path.join(ROOT, "data", "page-texts.json");
+
+function pageTexts() {
+
+    const out = new Map();
+
+    try {
+
+        const data = JSON.parse(fs.readFileSync(PAGE_TEXTS_FILE, "utf8"));
+
+        (data.texts || []).forEach(row => {
+
+            const name = String((row && row.page) || "").trim();
+            const text = String((row && row.description) || "").trim();
+
+            if (name && text) out.set(name, text);
+
+        });
+
+    } catch (error) {
+
+        // Файла немає або він битий — сторінки лишаються без тексту,
+        // як були. Падати через це збірка не має.
+
+    }
+
+    return out;
+
+}
+
 const BRANDS_DIR = path.join(ROOT, "brands");
 const CATEGORIES_DIR = path.join(ROOT, "categories");
 const DEPARTMENTS_DIR = path.join(ROOT, "departments");
@@ -665,6 +704,8 @@ function pairPages(products, categories, brands) {
 
     const taken = new Set();
 
+    const тексти = pageTexts();
+
     const pages = [...groups.values()]
         // Категорійні першими: якщо slug розділу й категорії колись
         // збігся б у межах одного бренду, тека лишається за вужчою.
@@ -734,7 +775,7 @@ function pairPages(products, categories, brands) {
                 banner: (brandLook.get(group.brand) || {}).banner || "",
                 bannerMobile: (brandLook.get(group.brand) || {}).bannerMobile || "",
                 logo: (brandLook.get(group.brand) || {}).logo || "",
-                description: "",
+                description: тексти.get(`${group.type} ${group.brand}`) || "",
                 preset: group.level === "category"
                     ? { brand: group.brand, category: group.type }
                     : { brand: group.brand, department: group.type },
@@ -860,6 +901,8 @@ function pairPages(products, categories, brands) {
 // означає самому наповнювати звіт «не проіндексовано».
 function sectionPages(products) {
 
+    const тексти = pageTexts();
+
     return Object.keys(Sections.SECTIONS).map(key => {
 
         const meta = Sections.SECTIONS[key];
@@ -877,7 +920,7 @@ function sectionPages(products) {
             heading: meta.heading,
             title: meta.title,
             intro: [meta.intro, factsLine(items)].filter(Boolean).join(" "),
-            description: "",
+            description: тексти.get(meta.heading) || "",
             preset: { section: key },
             crumbs: [
                 { label: "Головна", href: "/" },
@@ -1551,12 +1594,25 @@ function main() {
 
     });
 
+    // Запис у data/page-texts.json, якому не знайшлося сторінки, —
+    // не помилка: пара могла зникнути разом з останнім товаром і
+    // повернутись завтра. Але мовчати про нього не можна: власник
+    // написав текст, якого ніхто не бачить.
+    {
+        const назви = new Set([...pairs, ...sections].map(p => p.name));
+
+        [...pageTexts().keys()].filter(name => !назви.has(name)).forEach(name =>
+            console.warn(`⚠  текст для «${name}» написано, а сторінки такої немає`));
+    }
+
     skipped.forEach(line => console.warn(`⚠  ${line}`));
 
     console.log(`Готово: ${brands.length} брендів + ${categories.length} категорій`
         + ` + ${departments.length} розділів (+3 хаби)`
         + `, пар «бренд × тип»: ${pairs.length}`
         + `, розділів каталогу: ${sections.map(s => `${s.name} ${s.products.length}`).join(", ")}`
+        + `, власний текст у ${[...brands, ...categories, ...departments, ...pairs, ...sections]
+            .filter(p => (p.description || "").trim()).length} сторінок`
         + (уКаталозі ? `, у каталозі ${уКаталозі} із ${products.length} товарів без JS` : "")
         + (removed ? `, прибрано зайвих: ${removed}` : ""));
 

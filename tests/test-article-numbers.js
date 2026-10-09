@@ -221,8 +221,10 @@ console.log("\n[6] На сайті видно номер, а не порожнє
 
     // Копіюється КОД. Вставлений у пошук «Артикул: 28-1» нічого не
     // знайде — там точний збіг (див. tests/test-search-by-code.js).
+    // Обробник живе в common.js: та сама логіка потрібна й кнопці
+    // «Поділитися», яка тепер стоїть ще й на сторінці акції.
     check("копіюється код, а не підпис",
-        /copyText\(skuBtn\.dataset\.sku\)/.test(product));
+        /copyText\(skuBtn\.dataset\.sku\)/.test(read("assets/js/common.js")));
 
     check("бренду в цьому рядку більше немає",
         !/product-meta-line">\s*\$\{escapeHtml\(product\.brand\)\}/.test(product));
