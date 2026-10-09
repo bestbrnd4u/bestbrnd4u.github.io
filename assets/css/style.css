@@ -1377,7 +1377,11 @@ nav li.has-mega[data-mega-open] .mega-menu.mega-menu-columns{
     display:none;
 }
 
-.carousel-track.products-grid .product-card{
+/* Плашка-каркас займає рівно те саме місце, що й справжня картка:
+   інакше, коли приїдуть товари, карусель стрибне. Тому ширина
+   описана одним правилом на обидві. */
+.carousel-track.products-grid .product-card,
+.carousel-track.products-grid .skeleton-card{
     scroll-snap-align:start;
     flex:0 0 calc(25% - 18px);
     min-width:260px;
@@ -1436,7 +1440,8 @@ nav li.has-mega[data-mega-open] .mega-menu.mega-menu-columns{
 
 @media(max-width:900px){
 
-    .carousel-track.products-grid .product-card{
+    .carousel-track.products-grid .product-card,
+    .carousel-track.products-grid .skeleton-card{
         flex:0 0 calc(80% - 12px);
         min-width:220px;
     }
@@ -1557,7 +1562,37 @@ nav li.has-mega[data-mega-open] .mega-menu.mega-menu-columns{
     /* обрізає масштабоване кадруванням фото — інакше воно вилазить
        за межі картки й накриває сусідні */
     overflow:hidden;
+
+    /* ПОКИ ФОТО НЕ ПРИЇХАЛО — ТА САМА ХВИЛЯ, ЩО В ПЛАШОК.
+       На поганому звʼязку картка малювалась миттєво, а фото йшло ще
+       секунди: у сітці стояли білі прямокутники, і це читалось як
+       «фото немає», а не «фото вантажиться».
+       Клас is-ready ставить common.js, коли картинка справді
+       завантажилась (або не змогла). */
+    background-color:var(--gray200);
+    background-image:linear-gradient(90deg,
+        rgba(255,255,255,0) 0%,
+        rgba(255,255,255,.55) 50%,
+        rgba(255,255,255,0) 100%);
+    background-size:400% 100%;
+    background-repeat:no-repeat;
+    animation:skeleton-wave 1.4s ease-in-out infinite;
 }
+
+/* Фото приїхало — хвилю гасимо: нескінченна анімація під непрозорою
+   картинкою нікому не потрібна, а батарею їсть. */
+.product-image.is-ready{
+    background-image:none;
+    animation:none;
+}
+
+@media (prefers-reduced-motion:reduce){
+    .product-image{
+        animation:none;
+        background-image:none;
+    }
+}
+
 
 .product-video-slide{
     width:100%;
@@ -3224,26 +3259,52 @@ body.mobile-filters-open .scroll-top{
    каркас перестане бути каркасом і сітка стрибне, коли приїдуть
    справжні картки.
 ===================================== */
+/* СМУГА ЗАВАНТАЖЕННЯ НАД СІТКОЮ.
+   -----------------------------------------------------------------
+   Раніше видимим вмістом цього блока були плашки-каркаси, і напис
+   ховався від очей: рух плашок сам казав, що сторінка працює.
+   Потім у сітку поклали справжній перелік товарів для роботів, а
+   каркас прибрали — і завантажувач лишився порожнім div'ом. На
+   повільному інтернеті людина бачила голий текстовий перелік без
+   жодної ознаки, що сторінка ще вантажиться.
+   Тепер напис видимий, а поруч із ним — вузька смуга з тією самою
+   хвилею, що й у плашок. Вона невисока навмисно: готовий вміст під
+   нею не можна відсувати на екран. */
 .catalog-loader{
-    /* тут не спінер по центру, а сітка на всю ширину */
-    display:block;
-    padding:0;
+    display:flex;
+    flex-direction:column;
+    /* stretch, а не успадкований від .loader center: смуга порожня
+       всередині, і по центру вона стискалась до нульової ширини —
+       тобто її не було видно взагалі. */
+    align-items:stretch;
+    gap:10px;
+    padding:0 0 18px;
+}
+
+.catalog-loader-bar{
+    height:6px;
+    border-radius:999px;
+    background-color:var(--gray200);
+    background-image:linear-gradient(90deg,
+        rgba(255,255,255,0) 0%,
+        rgba(255,255,255,.55) 50%,
+        rgba(255,255,255,0) 100%);
+    background-size:400% 100%;
+    background-repeat:no-repeat;
+    animation:skeleton-wave 1.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion:reduce){
+    .catalog-loader-bar{
+        animation:none;
+        background-image:none;
+    }
 }
 
 .catalog-loader .loader-note{
-    /* Напис лишається для читалки екрана, очам його не треба:
-       рух плашок сам каже, що сторінка працює. Ховаємо через clip, а
-       не display:none — прихований display читалки не читають. */
-    position:absolute;
-    width:1px;
-    height:1px;
-    margin:-1px;
-    padding:0;
-    border:0;
-    overflow:hidden;
-    clip:rect(0 0 0 0);
-    clip-path:inset(50%);
-    white-space:nowrap;
+    margin:0;
+    font-size:14px;
+    color:var(--gray500);
 }
 
 .catalog-skeleton{
@@ -3278,12 +3339,35 @@ body.mobile-filters-open .scroll-top{
     margin-bottom:0;
 }
 
-.skeleton-line-short{
+/* РЯДКИ ПЛАШКИ ПОВТОРЮЮТЬ РЯДКИ СПРАВЖНЬОЇ КАРТКИ.
+   -----------------------------------------------------------------
+   Не «схожі на око», а ті самі висоти. Інакше карусель підстрибує
+   рівно в ту мить, коли приїжджають товари, — тобто каркас робить те,
+   чому мав запобігти. Перші три смужки давали 484px проти 504px у
+   картки, і стрибок на 20px було видно.
+
+   У .product-info поля 18px 20px 20px і рівно три рядки:
+       .product-category-row   19px + 6px знизу
+       .product-title          2.6em при 17px = 44px + 10px знизу
+       .product-meta-row       32px (ціна)
+   Разом 149px — стільки ж, скільки займає .product-info. */
+.skeleton-line-category{
+    height:19px;
     width:45%;
+    margin-bottom:6px;
 }
 
-.skeleton-line-half{
-    width:60%;
+.skeleton-line-title{
+    /* та сама 2.6em при 17px, що й min-height у .product-title */
+    height:44px;
+    width:90%;
+    margin-bottom:10px;
+}
+
+.skeleton-line-meta{
+    height:32px;
+    width:50%;
+    margin-bottom:0;
 }
 
 /* Одна анімація на всі плашки: біла хвиля зліва направо. Розмір
@@ -5431,6 +5515,15 @@ body.mobile-filters-open .scroll-top{
     cursor:pointer;
     border-radius:14px;
     border:2px solid transparent;
+
+    /* Сіра підкладка, поки фото не приїхало. Порожній квадрат із
+       рамкою читався як помилка, а не як очікування. Хвилі тут
+       немає: мініатюра маленька, і чотири смужки, що біжать поруч,
+       відбирали б увагу в головного фото.
+       Колір стоїть у базовому правилі, а не в окремому — інакше він
+       став би «станом», і перехід мусив би його анімувати (див.
+       tests/test-transition-properties.js). */
+    background-color:var(--gray200);
     transition:border-color 250ms ease,
                transform 250ms ease;
     overflow:hidden;
@@ -12779,6 +12872,24 @@ body.mobile-filters-open .scroll-top{
    Ховати його через display:none не можна: прихований текст
    Google може розцінити як спробу підсунути контент лише
    роботу. Тож просто робимо його охайним. */
+/* Смуга завантаження першим рядком блока.
+   Поки даних немає, людина бачить сторінку без каруселі, без
+   розмірів і без кнопки «Купити» — і читає це як поломку. Смуга з
+   написом каже, що сторінка ще вантажиться. Та сама хвиля, що в
+   каталозі: один візуальний словник на весь сайт. */
+.product-static-loader{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin:0 0 18px;
+}
+
+.product-static-loader .loader-note{
+    margin:0;
+    font-size:14px;
+    color:var(--gray500);
+}
+
 .product-static-seo h1{
     font-size:26px;
     line-height:1.25;
@@ -12813,6 +12924,30 @@ body.mobile-filters-open .scroll-top{
     height:140px;
     object-fit:cover;
     border-radius:8px;
+
+    /* Поки фото не приїхало — та сама хвиля, що й у плашок. Порожні
+       квадрати з рамкою читались як «фото немає». Клас is-ready
+       ставить common.js, коли картинка завантажилась або не змогла. */
+    background-color:var(--gray200);
+    background-image:linear-gradient(90deg,
+        rgba(255,255,255,0) 0%,
+        rgba(255,255,255,.55) 50%,
+        rgba(255,255,255,0) 100%);
+    background-size:400% 100%;
+    background-repeat:no-repeat;
+    animation:skeleton-wave 1.4s ease-in-out infinite;
+}
+
+.product-static-gallery img.is-ready{
+    background-image:none;
+    animation:none;
+}
+
+@media (prefers-reduced-motion:reduce){
+    .product-static-gallery img{
+        animation:none;
+        background-image:none;
+    }
 }
 
 .product-static-desc{
