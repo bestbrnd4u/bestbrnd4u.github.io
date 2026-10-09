@@ -20,6 +20,40 @@ const path = require("path");
 
 const ROOT = path.join(__dirname, "..");
 
+// Куди збірка кладе готовий перелік. Його читає сторінка адмінки
+// admin/instagram.html — там у кожного товару кнопка «Копіювати».
+const OUT_FILE = path.join(ROOT, "data", "instagram-links.json");
+
+// Логін бота живе в адмінці (data/telegram.json), а не в аргументі:
+// збірка запускається без рук, і спитати в неї нікого.
+function botFromData() {
+
+    try {
+
+        const data = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "telegram.json"), "utf8"));
+
+        return String(data.botUsername || "").replace(/^@/, "").trim();
+
+    } catch (error) {
+
+        return "";
+
+    }
+
+}
+
+// САМЕ ТУТ ЖИВЕ ФОРМАТ ПОСИЛАННЯ.
+//
+// Бот приймає кілька написань (product_15, p15, просто 15 — див.
+// supabase/functions/telegram-order-bot/format.js), бо посилання
+// вставляють руками. Але СКЛАДАЄ їх одне місце — це, — інакше
+// сторінка адмінки й цей скрипт колись почали б давати різні.
+function linkFor(username, id) {
+
+    return `https://t.me/${username}?start=product_${id}`;
+
+}
+
 // Джерело — окремі файли товарів, а не згенерований data/products.json:
 // у свіжому клоні агрегат може бути ще не перезібраний.
 function loadProducts() {
@@ -45,10 +79,70 @@ function discountOf(product) {
 
 }
 
+// Перелік для сторінки адмінки.
+//
+// Пишемо файл, а не будуємо посилання в самій сторінці: формат
+// посилання тоді опинився б іще й у браузерному коді, третьою копією
+// поруч із цим скриптом і ботом.
+function writeList() {
+
+    const username = botFromData();
+
+    if (!username) {
+        console.warn("Логін бота не заданий у data/telegram.json — перелік для Instagram пропускаю");
+        return;
+    }
+
+    const products = loadProducts();
+
+    // Спершу новинки, далі — від найновіших до найстаріших. Постять
+    // те, що щойно приїхало, і шукати його в кінці списку незручно.
+    const rows = [...products]
+        .sort((a, b) => (Number(Boolean(b.isNew)) - Number(Boolean(a.isNew))) || (b.id - a.id))
+        .map((p) => ({
+            id: p.id,
+            brand: p.brand || "",
+            title: p.title || "",
+            price: Number(p.price) || 0,
+            image: (Array.isArray(p.images) && p.images[0]) || "",
+            isNew: Boolean(p.isNew),
+            discount: discountOf(p),
+            preOrder: Boolean(p.preOrder),
+            link: linkFor(username, p.id)
+        }));
+
+    const out = { bot: username, updated: new Date().toISOString(), products: rows };
+
+    const текст = JSON.stringify(out, null, 2) + "\n";
+
+    // Дата оновлення міняється щоразу, тож порівнюємо без неї:
+    // інакше кожна збірка давала б коміт на порожньому місці.
+    const безДати = (s) => s.replace(/"updated": "[^"]*",?\n?/, "");
+
+    const було = fs.existsSync(OUT_FILE) ? fs.readFileSync(OUT_FILE, "utf8") : "";
+
+    if (безДати(було) === безДати(текст)) {
+        console.log(`Готово: перелік для Instagram уже збігається (${rows.length} товарів)`);
+        return;
+    }
+
+    fs.writeFileSync(OUT_FILE, текст, "utf8");
+
+    console.log(`Готово: ${rows.length} посилань для Instagram → data/instagram-links.json`);
+
+}
+
 function main() {
 
     const args = process.argv.slice(2);
-    const bot = args.find((a) => !a.startsWith("--"));
+
+    // Без аргументів — режим збірки: пишемо файл для адмінки.
+    if (args.includes("--write") || !args.length) {
+        writeList();
+        return;
+    }
+
+    const bot = args.find((a) => !a.startsWith("--")) || botFromData();
 
     if (!bot) {
 
@@ -82,7 +176,7 @@ function main() {
 
         products.forEach((p) => {
             const title = String(p.title ?? "").replace(/"/g, '""');
-            console.log(`${p.id},"${p.brand ?? ""}","${title}",${p.price ?? ""},https://t.me/${username}?start=product_${p.id}`);
+            console.log(`${p.id},"${p.brand ?? ""}","${title}",${p.price ?? ""},${linkFor(username, p.id)}`);
         });
 
         return;
@@ -117,4 +211,4 @@ function main() {
 
 if (require.main === module) main();
 
-module.exports = { loadProducts, discountOf };
+module.exports = { loadProducts, discountOf, linkFor, writeList, OUT_FILE };
