@@ -349,13 +349,24 @@ console.log("\n[6] Проставлені штампи доїжджають до
     // сторінок, а не свій список.
     const stamper = read("scripts/apply-cache-version.js");
 
-    check("штампувач дивиться в корінь, admin/index.html і згенеровані теки",
+    // ТУТ БУЛА ПЕРЕВІРКА НА ПЕРЕЛІК ТЕК — І ВОНА ЙОГО ЗАКРІПЛЮВАЛА.
+    //
+    // Рядок вимагав, щоб у штампувачі стояло
+    // ["p", "brands", "categories", "departments"], і навіть
+    // попереджав у коментарі: «нову забудуть додати сюди». Так і
+    // сталося, тричі поспіль — promo/, brands/<бренд>/<тип>/,
+    // aktsii/ і novynky/. Перевірка при цьому лишалась зеленою, бо
+    // стежила за наявністю переліку, а не за повнотою охоплення.
+    //
+    // Тепер вимога зворотна: переліку бути НЕ МАЄ, бо штампувач
+    // ходить деревом.
+    check("штампувач дивиться в корінь і admin/index.html",
         /readdirSync\(ROOT\)\.filter\(f => f\.endsWith\("\.html"\)\)/.test(stamper)
-        && /"admin", "index\.html"/.test(stamper)
-        // Теки згенерованих сторінок: товари, бренди, категорії. Нову
-        // забудуть додати сюди — і після виливки саме там браузер
-        // тягтиме старий catalog.js із кеша.
-        && /\["p", "brands", "categories", "departments"\]\.forEach/.test(stamper));
+        && /"admin", "index\.html"/.test(stamper));
+
+    check("а решту сторінок знаходить обходом дерева, а не переліком тек",
+        /const обійти = dir => \{/.test(stamper)
+        && !/\["p", "brands", "categories", "departments"\]/.test(stamper));
 
     // Переписує він РІВНО те, що дає htmlFiles() — тобто лише
     // сторінки. Якби він почав правити щось інше, маски "*.html" уже
@@ -452,9 +463,38 @@ console.log("\n[N] Штамп на адресі = вміст самого фай
 
     };
 
-    const pages = fs.readdirSync(ROOT).filter(f => f.endsWith(".html"))
-        .concat(["admin/index.html"])
-        .filter(f => fs.existsSync(path.join(ROOT, f)));
+    // УСІ сторінки, а не корінь плюс admin/index.html.
+    //
+    // Старого переліку вистачало, доки сторінки лежали в корені.
+    // Далі він відстав від сайту й мовчав: promo/<slug>/,
+    // brands/<бренд>/<тип>/, aktsii/ і novynky/ несли штамп
+    // ПОПЕРЕДНЬОЇ збірки — вони будуються з catalog.html чи promo.html
+    // і копіюють його разом із розміткою, — а ще шість сторінок
+    // адмінки не мали його взагалі.
+    //
+    // Заміряно 08.10.2026: 24 сторінки зі 179. Перевірка цього не
+    // бачила, бо дивилась туди ж, куди й штампувач.
+    const пропустити = new Set(["node_modules", ".git", ".claude", "archive",
+        ".playwright-mcp", "supabase", "assets", "data", "tests", "scripts"]);
+
+    const обійти = (dir, out) => {
+
+        fs.readdirSync(dir, { withFileTypes: true }).forEach(entry => {
+
+            if (пропустити.has(entry.name) || entry.name.startsWith(".")) return;
+
+            const full = path.join(dir, entry.name);
+
+            if (entry.isDirectory()) обійти(full, out);
+            else if (entry.name.endsWith(".html")) out.push(path.relative(ROOT, full));
+
+        });
+
+        return out;
+
+    };
+
+    const pages = обійти(ROOT, []);
 
     const wrong = [];
 
@@ -490,6 +530,83 @@ console.log("\n[N] Штамп на адресі = вміст самого фай
 
     check(`однойменні файли в admin/ і assets/js/ існують (${twins.length})`,
         twins.length > 0, twins.join(", "));
+
+    // Жодна сторінка не лишилась без списку версій.
+    const безСписку = pages.filter(page =>
+        !/http-equiv="refresh"/.test(read(page))
+        && !/window\.ASSET_VERSIONS = \{/.test(read(page)));
+
+    check(`список версій є на всіх ${pages.length} сторінках`, безСписку.length === 0,
+        безСписку.slice(0, 4).join(", "));
+
+    // І він усюди ОДИН І ТОЙ САМИЙ. Різні значення означають, що
+    // частина сторінок відстала на збірку — рівно той стан, у якому
+    // жили promo/ і сторінки «бренд × тип».
+    const штампи = new Map();
+
+    pages.forEach(page => {
+
+        const html = read(page);
+
+        if (/http-equiv="refresh"/.test(html)) return;
+
+        const m = html.match(/"data\/products\.json":"([^"]+)"/);
+
+        if (m) штампи.set(m[1], (штампи.get(m[1]) || 0) + 1);
+
+    });
+
+    check("штамп даних однаковий на всіх сторінках", штампи.size === 1,
+        [...штампи].map(([h, n]) => `${h}×${n}`).join(", "));
+
+    // А ТЕПЕР — ЧИ ВІН ОНОВЛЮЄТЬСЯ.
+    //
+    // Два рядки вище дивляться на стан дерева, і цього замало:
+    // сторінка, яку штампувач ніколи не бачить, виглядає правильною
+    // доти, доки дані не змінились. Саме так promo/ і сторінки
+    // «бренд × тип» і прожили — зі штампом, вірним на день їхнього
+    // народження.
+    //
+    // Тож міняємо дані на один байт і дивимось, чи нову позначку
+    // отримали ВСІ. Знімок data/ повертає helpers/workspace на виході,
+    // але повертаємо й самі одразу — щоб решта набору працювала з
+    // цілим деревом.
+    const файлДаних = path.join(ROOT, "data/notifications.json");
+
+    const стамп = page => {
+
+        const m = read(page).match(/"data\/notifications\.json":"([a-f0-9]+)"/);
+
+        return m ? m[1] : "";
+
+    };
+
+    const живі = pages.filter(page => !/http-equiv="refresh"/.test(read(page)));
+
+    const доЗміни = стамп(живі[0]);
+
+    const вмістДаних = fs.readFileSync(файлДаних, "utf8");
+
+    // Пробіл у кінці: JSON лишається коректним, а відбиток інший.
+    fs.writeFileSync(файлДаних, вмістДаних + " ", "utf8");
+
+    execFileSync("node", [path.join(ROOT, "scripts/apply-cache-version.js")],
+        { cwd: ROOT, encoding: "utf8" });
+
+    const новий = стамп(живі[0]);
+
+    const відсталі = живі.filter(page => стамп(page) !== новий);
+
+    fs.writeFileSync(файлДаних, вмістДаних, "utf8");
+
+    execFileSync("node", [path.join(ROOT, "scripts/apply-cache-version.js")],
+        { cwd: ROOT, encoding: "utf8" });
+
+    check("зміна даних справді міняє штамп", новий !== доЗміни && новий !== "",
+        `${доЗміни} → ${новий}`);
+
+    check(`новий штамп доїхав у всі ${живі.length} сторінок`, відсталі.length === 0,
+        відсталі.slice(0, 4).join(", "));
 
     // Коротка форма — лише одразу після лапки, без префікса теки.
     check("коротка форма імені не ловить чужу теку",

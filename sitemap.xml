@@ -17,7 +17,12 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://bestbrnd4u.com/delivery-payment</loc>
+    <loc>https://dev.bestbrnd4u.com/authenticity</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dev.bestbrnd4u.com/delivery-payment</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>

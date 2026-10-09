@@ -75,6 +75,25 @@ const Breadcrumbs = require("../assets/js/breadcrumbs.js");
 // пагінацією каталогу.
 const STATIC_LIMIT = 20;
 
+// А В САМОМУ КАТАЛОЗІ — ВЕСЬ АСОРТИМЕНТ.
+//
+// Двадцяти досить сторінці бренду: решту його товарів робот дійде з
+// того ж /catalog. Але сам /catalog так само показував 20 зі 103 —
+// і для робота, що не виконує JavaScript, магазин складався з двадцяти
+// позицій. Заміряно 08.10.2026.
+//
+// Google рендерить, тож його це не стосується. А ШІ-краулери (GPTBot,
+// PerplexityBot, ClaudeBot) переважно ні, і саме вони відповідають на
+// «де купити сумку Coach в Україні».
+//
+// Ціна рішення — 275 байтів на товар: сторінка з 38 КБ стає 60 КБ, і
+// це 8% від того, що вона й так тягне в data/catalog.json (258 КБ).
+//
+// Стеля все одно потрібна: на тисячі товарів перелік важив би 275 КБ.
+// Якщо магазин до неї доросте, це буде видно в журналі збірки —
+// там пишеться «N із M».
+const CATALOG_STATIC_LIMIT = 300;
+
 function escapeHtml(value) {
 
     return String(value === undefined || value === null ? "" : value)
@@ -967,9 +986,9 @@ function crumbsMarkup(crumbs) {
 // перелік із посиланням, назвою й ціною — рівно те, задля чого він і
 // потрібен: щоб сторінка не була порожньою і щоб від неї був шлях до
 // кожного товару.
-function productsMarkup(products) {
+function productsMarkup(products, limit) {
 
-    const items = products.slice(0, STATIC_LIMIT).map(product => {
+    const items = products.slice(0, limit || STATIC_LIMIT).map(product => {
 
         const href = `/p/${encodeURIComponent(product.slug)}/`;
 
@@ -1189,7 +1208,7 @@ function writeCatalogStatic(products) {
 
     const next = html
         .replace(SKELETON_RE, "")
-        .replace(GRID_SLOT_RE, () => productsMarkup(products));
+        .replace(GRID_SLOT_RE, () => productsMarkup(products, CATALOG_STATIC_LIMIT));
 
     if (next === html) {
         console.log("Готово: перелік у каталозі вже на місці");
@@ -1198,7 +1217,7 @@ function writeCatalogStatic(products) {
 
     fs.writeFileSync(TEMPLATE_FILE, next, "utf8");
 
-    return Math.min(products.length, STATIC_LIMIT);
+    return Math.min(products.length, CATALOG_STATIC_LIMIT);
 
 }
 
@@ -1455,7 +1474,7 @@ function main() {
         + ` + ${departments.length} розділів (+3 хаби)`
         + `, пар «бренд × тип»: ${pairs.length}`
         + `, розділів каталогу: ${sections.map(s => `${s.name} ${s.products.length}`).join(", ")}`
-        + (уКаталозі ? `, у каталозі ${уКаталозі} товарів без JS` : "")
+        + (уКаталозі ? `, у каталозі ${уКаталозі} із ${products.length} товарів без JS` : "")
         + (removed ? `, прибрано зайвих: ${removed}` : ""));
 
 }
@@ -1472,7 +1491,9 @@ module.exports = {
     readRecords,
     factsLine,
     listLine,
+    formatPrice,
     STATIC_LIMIT,
+    CATALOG_STATIC_LIMIT,
     PAIR_MIN,
     DEPARTMENTS_SRC
 };

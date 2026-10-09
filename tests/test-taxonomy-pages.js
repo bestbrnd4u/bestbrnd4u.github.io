@@ -722,8 +722,27 @@ console.log("\n[N] Сам каталог теж не порожній без JS"
 
     const links = (html.match(/href="\/p\/[^"]+"/g) || []).length;
 
-    check(`перелік товарів у розмітці каталогу (${links})`,
-        links > 0 && links <= taxonomy.STATIC_LIMIT, String(links));
+    // У САМОМУ КАТАЛОЗІ — ВЕСЬ АСОРТИМЕНТ, А НЕ ДВАДЦЯТЬ.
+    //
+    // Стеля в 20 має сенс на сторінці бренду: решту його товарів робот
+    // дійде з /catalog. Але сам /catalog так само показував 20 зі 103,
+    // і для робота без JavaScript магазин складався з двадцяти позицій.
+    const products = JSON.parse(read("data/products.json"));
+
+    check(`перелік товарів у розмітці каталогу (${links} із ${products.length})`,
+        links === Math.min(products.length, taxonomy.CATALOG_STATIC_LIMIT),
+        `${links}, а треба ${Math.min(products.length, taxonomy.CATALOG_STATIC_LIMIT)}`);
+
+    // Дві стелі існують із різних причин і не мусять зрівнятись:
+    // мала — щоб сторінка бренду не везла два екрани тексту, якого
+    // людина не побачить; велика — щоб каталог показав увесь
+    // асортимент роботові без JavaScript.
+    check(`стеля таксономії (${taxonomy.STATIC_LIMIT}) менша за каталожну (${taxonomy.CATALOG_STATIC_LIMIT})`,
+        taxonomy.STATIC_LIMIT < taxonomy.CATALOG_STATIC_LIMIT);
+
+    check("а на сторінках таксономії стеля лишилась",
+        (read("departments/sumky/index.html").match(/href="\/p\/[^"]+"/g) || []).length
+            <= taxonomy.STATIC_LIMIT);
 
     check("той самий перелік, що й на сторінках таксономії",
         /class="taxonomy-static-list"/.test(html));

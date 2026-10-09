@@ -36,6 +36,67 @@ const { SITE_URL } = require("./site-env");
 // (той тягне sharp, якого в основній збірці немає).
 const { megaTile } = require("./mega-tiles");
 
+const CATALOG = path.join(ROOT, "data", "catalog.json");
+
+// Ціну форматує той самий модуль, що й переліки на сторінках
+// таксономії. Своя копія тут уже встигла розійтись: toLocaleString
+// віддає нерозривний пробіл, а там його замінюють на звичайний — і
+// «8 000 ₴» на головній відрізнялось від «8 000 ₴» у каталозі
+// невидимим символом.
+const { formatPrice } = require("./build-taxonomy-pages");
+
+// Скільки товарів пишемо в розмітку смуги «Популярні товари».
+//
+// Те саме число, що в assets/js/app.js (HOME_FEATURED): смуга там і
+// там одна. Звіряє їх tests/test-home-static-sync.js.
+const HOME_FEATURED = 8;
+
+// ГОЛОВНА БЕЗ JS БУЛА БЕЗ ЖОДНОГО ТОВАРУ.
+//
+// Заміряно 08.10.2026: у сирому HTML головної нуль посилань на /p/.
+// Смугу «Популярні товари» малює app.js, а до нього в #productsGrid
+// порожньо. Для Google це не біда — він рендерить. А ШІ-краулери
+// (GPTBot, PerplexityBot, ClaudeBot) переважно ні, і найголовніша
+// сторінка магазину не містила для них жодного товару.
+//
+// Той самий прийом уже застосовано до /catalog і сторінок таксономії
+// (scripts/build-taxonomy-pages.js → productsMarkup): простий перелік
+// із посиланням, назвою й ціною, який JS потім замінює картками.
+function featuredMarkup(products) {
+
+    const items = products.map(product => {
+
+        const href = `/p/${encodeURIComponent(product.slug)}/`;
+
+        const price = Number(product.price) > 0 ? formatPrice(product.price) : "";
+
+        return `        <li>
+            <a href="${escapeAttr(href)}">${escapeAttr(product.title)}</a>
+            ${product.brand ? `<span class="taxonomy-brand">${escapeAttr(product.brand)}</span>` : ""}
+            ${price ? `<span class="taxonomy-price">${escapeAttr(price)}</span>` : ""}
+        </li>`;
+
+    }).join("\n");
+
+    return `\n    <ul class="taxonomy-static-list">\n${items}\n    </ul>\n`;
+
+}
+
+// Відбір — той самий, що в app.js (topRated). Копія тут тому, що
+// app.js у node не завантажується (він одразу шукає DOM), а правило
+// з трьох рядків не варте окремого модуля в браузері: порядок
+// підключення скриптів довелось би правити на 18 сторінках.
+//
+// Розійтись копіям не дає tests/test-home-static-sync.js: він ВИТЯГАЄ
+// topRated із app.js і проганяє обидві на тих самих товарах.
+function topRated(products) {
+
+    return [...(Array.isArray(products) ? products : [])]
+        .sort((a, b) => (Number(b && b.rating) || 0) - (Number(a && a.rating) || 0))
+        .slice(0, HOME_FEATURED);
+
+}
+
 function escapeAttr(value) {
 
     return String(value === undefined || value === null ? "" : value)
@@ -224,6 +285,28 @@ function main() {
         (all, head, oldSrc, tail) => head + SITE_URL + "/assets/images/og-cover.png" + tail
     );
 
+    // Товари — в розмітку, щоб головна не була порожньою без JS.
+    let товарів = 0;
+
+    try {
+
+        const каталог = JSON.parse(fs.readFileSync(CATALOG, "utf8"));
+
+        const обрані = topRated(каталог);
+
+        if (обрані.length) {
+            html = replaceInner(html, "productsGrid", featuredMarkup(обрані));
+            товарів = обрані.length;
+        }
+
+    } catch (error) {
+
+        // Каталогу ще немає (перша збірка) — смуга лишається порожньою,
+        // як була. Падати через це головна не має.
+        console.warn("Не читається data/catalog.json — перелік товарів на головній пропускаю");
+
+    }
+
     if (html === before) {
         console.log("Готово: статична розмітка головної вже збігається з data/home.json");
         return;
@@ -231,10 +314,11 @@ function main() {
 
     fs.writeFileSync(INDEX, html, "utf8");
 
-    console.log("Готово: статичну розмітку index.html оновлено з data/home.json");
+    console.log("Готово: статичну розмітку index.html оновлено з data/home.json"
+        + (товарів ? `, товарів без JS: ${товарів}` : ""));
 
 }
 
-module.exports = { replaceInner, setStyleVar };
+module.exports = { replaceInner, setStyleVar, topRated, featuredMarkup, HOME_FEATURED };
 
 if (require.main === module) main();

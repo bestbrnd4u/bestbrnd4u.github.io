@@ -5,6 +5,18 @@
 
 const productsGrid = document.getElementById("productsGrid");
 
+// Скільки товарів у смузі «Популярні товари» на головній.
+const HOME_FEATURED = 8;
+
+// Відбір для цієї смуги — одним правилом на браузер і на збірку.
+function topRated(products) {
+
+    return [...(Array.isArray(products) ? products : [])]
+        .sort((a, b) => (Number(b && b.rating) || 0) - (Number(a && a.rating) || 0))
+        .slice(0, HOME_FEATURED);
+
+}
+
 async function initHome() {
 
     if (!productsGrid) return;
@@ -13,10 +25,21 @@ async function initHome() {
 
         const products = await loadCatalog();
 
-        // Показуємо товари з найвищим рейтингом
-        const featured = [...products]
-            .sort((a, b) => b.rating - a.rating)
-            .slice(0, 8);
+        // Показуємо товари з найвищим рейтингом.
+        //
+        // ЧОМУ ТУТ Number(...) || 0, А НЕ ПРОСТО b.rating - a.rating.
+        //
+        // Рейтинг стоїть не в усіх: у 27 товарах зі 103 там null. А
+        // null (чи undefined) у відніманні дає NaN, і для сортування
+        // це «порівняти не можу» — пара лишається як була. Через це
+        // головна показувала РІВНО ТІ ВІСІМ, у яких рейтингу немає:
+        // заміряно 08.10.2026, 8 із 8 показаних були без рейтингу,
+        // тобто правило працювало навпаки.
+        //
+        // Той самий перелік пише в розмітку scripts/build-home-static.js
+        // — щоб його бачив робот, який не виконує JavaScript. Розійтись
+        // їм не дає tests/test-home-static-sync.js.
+        const featured = topRated(products);
 
         renderProducts(featured);
 
