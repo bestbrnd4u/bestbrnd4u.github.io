@@ -483,6 +483,103 @@ console.log("\n[10] Свій текст для категорій і розді�
         && /aboutHydrated = false;\s*\n\s*hydrateAbout\(\);/.test(catalog));
 }
 
+console.log("\n[10a] Текст категорій і розділів не бреше про каталог");
+{
+    // ЩО БУЛО НЕ ТАК. Поля для тексту існували, але в категорій і
+    // розділів лишались порожні: 0 із 22 проти 21 із 21 у брендів.
+    // Сторінка з найбільшим попитом (/departments/sumky/, 48 товарів)
+    // мала лише автоматичний рядок про кількість і ціни — за формою
+    // однаковий з усіма іншими.
+    //
+    // ЩО ТУТ СТЕРЕЖЕМО. Не наявність тексту — його пише людина, і
+    // вимагати його від кожної нової категорії означало б ламати
+    // збірку через ненаписаний абзац.
+    //
+    // Стережемо ПРАВДИВІСТЬ: текст живе в даних і не оновлюється сам,
+    // а каталог змінюється щодня. Названий у ньому бренд, який
+    // поїхав із категорії, перетворює опис на неправду — тихо й
+    // надовго.
+    const products = JSON.parse(read("data/products.json"));
+    const categoryData = JSON.parse(read("data/categories.json"));
+
+    const cats = taxonomy.categoryPages(products, categoryData);
+    const deps = taxonomy.departmentPages(products, categoryData,
+        taxonomy.readRecords(taxonomy.DEPARTMENTS_SRC));
+    const brs = taxonomy.brandPages(products, JSON.parse(read("data/brands.json")));
+
+    const зТекстом = [...cats, ...deps].filter(p => (p.description || "").trim());
+
+    check(`категорій і розділів із власним текстом: ${зТекстом.length} із ${cats.length + deps.length}`,
+        зТекстом.length > 0);
+
+    // Усі бренди, які взагалі є в магазині, — щоб відрізнити згадку
+    // бренду від звичайного слова.
+    const усіБренди = brs.map(b => b.name);
+
+    const брехня = [];
+
+    зТекстом.forEach(page => {
+
+        const свої = new Set(page.products.map(p => String(p.brand || "").trim()));
+
+        усіБренди.forEach(brand => {
+
+            // Згадка саме назви, а не частини іншого слова.
+            const re = new RegExp("(^|[^\\p{L}])" + brand.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+                + "($|[^\\p{L}])", "iu");
+
+            if (re.test(page.description) && !свої.has(brand)) {
+                брехня.push(`${page.name}: згадано «${brand}», а в категорії його немає`);
+            }
+
+        });
+
+    });
+
+    check("жоден названий бренд не поїхав із категорії", брехня.length === 0,
+        брехня.slice(0, 3).join(" | "));
+
+    // Числа в тексті застаріють мовчки: кількість і ціни вже є в
+    // автоматичному рядку поруч, і саме він оновлюється зі складом.
+    const зЧислами = зТекстом.filter(page =>
+        /\d+\s*(модел|товар|позиці|бренд)/iu.test(page.description));
+
+    check("у тексті немає зашитих кількостей", зЧислами.length === 0,
+        зЧислами.map(p => p.name).join(", "));
+
+    // Два однакові описи — ознака копіпасти, і для пошуку це та сама
+    // «порожня сторінка-дубль», якої ми уникали автоматичним рядком.
+    const тексти = зТекстом.map(p => p.description.replace(/\s+/g, " ").trim());
+
+    const повтори = тексти.filter((t, i) => тексти.indexOf(t) !== i);
+
+    check("усі тексти різні", повтори.length === 0,
+        [...new Set(повтори)].map(t => t.slice(0, 40)).join(" | "));
+
+    // І текст мусить доїхати на сторінку абзацами, а не одним рядком:
+    // aboutMarkup ділить його по порожньому рядку.
+    const зразок = зТекстом.find(p => /\n\s*\n/.test(p.description));
+
+    check("є текст із кількох абзаців", Boolean(зразок),
+        зТекстом.map(p => p.name).join(", "));
+
+    if (зразок) {
+
+        const rel = зразок.kind === "department"
+            ? `departments/${зразок.slug}/index.html`
+            : `categories/${зразок.slug}/index.html`;
+
+        const блок = (read(rel).match(/id="brandAbout">([\s\S]*?)<button/) || [])[1] || "";
+
+        const абзаців = (блок.match(/<p>/g) || []).length;
+
+        check(`на сторінці /${зразок.slug}/ абзаців: ${абзаців}`,
+            абзаців === зразок.description.split(/\n\s*\n/).length,
+            `${абзаців} проти ${зразок.description.split(/\n\s*\n/).length}`);
+
+    }
+}
+
 console.log("\n[12] Картка бренду заповнена, і банер не ріжеться на телефоні");
 {
     // ЩО ТУТ ЗАКРІПЛЕНО
