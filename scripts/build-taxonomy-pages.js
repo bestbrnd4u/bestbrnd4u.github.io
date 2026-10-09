@@ -65,6 +65,10 @@ const { slugProblem } = require("./slug-safety");
 // Назви, адреси й набір товарів розділів «Новинки» та «Акції».
 const Sections = require("./sections");
 const Breadcrumbs = require("../assets/js/breadcrumbs.js");
+// Наявність бере той самий модуль, що й сторінка товару та фід:
+// «під замовлення» вже одного разу розійшлося між ними (BackOrder
+// проти PreOrder), і другої копії цього правила тут не буде.
+const ProductOffer = require("../assets/js/product-offer.js");
 
 // Скільки товарів перелічувати в розмітці до JS.
 //
@@ -1068,6 +1072,55 @@ function aboutMarkup(page) {
 
 }
 
+// Рядок переліку для розмітки — з ціною й наявністю.
+//
+// ЩО БУЛО НЕ ТАК. У ListItem стояли тільки url і name. Для Google
+// цього досить, щоб показати карусель, — а от ШІ-пошук, який читає
+// сторінку категорії, щоб відповісти «скільки коштують жіночі сумки
+// Coach», не бачив із неї ЖОДНОЇ ціни. Довелось би заходити в кожен
+// товар, чого жоден із них не робить.
+//
+// Заміряно 08.10.2026: 46 сторінок таксономії, 20 позицій на кожній,
+// нуль цін у розмітці.
+//
+// Повний Offer (з умовами повернення й доставки, як на сторінці
+// товару) тут був би зайвий: двадцять таких роздули б сторінку на
+// 25 КБ і нічого не додали. Перелік описує, ЩО є і почім; подробиці —
+// на самій сторінці товару, і посилання на неї поруч.
+function listItem(product, index) {
+
+    const url = `${SITE_URL}/p/${encodeURIComponent(product.slug)}/`;
+
+    const image = (product.images && product.images[0]) || "";
+
+    const item = {
+        "@type": "Product",
+        name: product.title,
+        url
+    };
+
+    if (product.brand) item.brand = { "@type": "Brand", name: product.brand };
+
+    if (image) {
+        item.image = /^https?:/i.test(image)
+            ? image
+            : `${SITE_URL}/${String(image).replace(/^\/+/, "")}`;
+    }
+
+    if (Number(product.price) > 0) {
+        item.offers = {
+            "@type": "Offer",
+            price: Number(product.price),
+            priceCurrency: "UAH",
+            availability: ProductOffer.availabilityOf(product),
+            url
+        };
+    }
+
+    return { "@type": "ListItem", position: index + 1, item };
+
+}
+
 function headMarkup(page) {
 
     const description = truncateForMeta(
@@ -1106,12 +1159,8 @@ function headMarkup(page) {
         mainEntity: {
             "@type": "ItemList",
             numberOfItems: page.products.length,
-            itemListElement: page.products.slice(0, STATIC_LIMIT).map((product, index) => ({
-                "@type": "ListItem",
-                position: index + 1,
-                url: `${SITE_URL}/p/${encodeURIComponent(product.slug)}/`,
-                name: product.title
-            }))
+            itemListElement: page.products.slice(0, STATIC_LIMIT)
+                .map((product, index) => listItem(product, index))
         }
     };
 
@@ -1206,8 +1255,42 @@ function writeCatalogStatic(products) {
             + "переліку товарів нема куди вставити");
     }
 
+    // І РОЗМІТКУ ПЕРЕЛІКУ — ТЕЖ.
+    //
+    // У сторінок бренду й категорії CollectionPage є (її додає
+    // headMarkup нижче), а в самого /catalog не було: він не
+    // генерується, а живе як звичайна сторінка. Виходило, що
+    // найбільший перелік магазину — єдиний, із якого машина не може
+    // взяти ні назв, ні цін.
+    //
+    // Позицій у розмітці стільки ж, скільки в решти переліків:
+    // завдання розмітки — описати сторінку, а не перелічити весь
+    // асортимент. Для переліку є sitemap і feed.xml.
+    const collection = {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        name: "Каталог товарів",
+        description: truncateForMeta("Сумки, одяг, взуття та аксесуари від світових "
+            + "брендів. " + factsLine(products)),
+        url: `${SITE_URL}/catalog`,
+        isPartOf: { "@type": "WebSite", name: "BestBrnd4u", url: `${SITE_URL}/` },
+        mainEntity: {
+            "@type": "ItemList",
+            numberOfItems: products.length,
+            itemListElement: products.slice(0, STATIC_LIMIT).map((product, index) =>
+                listItem(product, index))
+        }
+    };
+
+    const CATALOG_LD_RE = /\s*<script type="application\/ld\+json" id="collectionSchema">[\s\S]*?<\/script>/;
+
     const next = html
         .replace(SKELETON_RE, "")
+        .replace(CATALOG_LD_RE, "")
+        // Функція, а не рядок із $1: у рядку-заміннику $ має
+        // спеціальне значення, і JSON із цінами його б зачепив.
+        .replace(/<script type="application\/ld\+json" id="breadcrumbSchema">/,
+            match => jsonLdScript("collectionSchema", collection) + "\n" + match)
         .replace(GRID_SLOT_RE, () => productsMarkup(products, CATALOG_STATIC_LIMIT));
 
     if (next === html) {

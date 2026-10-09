@@ -641,6 +641,98 @@ console.log("\n[12] Картка бренду заповнена, і банер 
         small && Number(small[1]) >= 250, small && small[1]);
 }
 
+console.log("\n[N] У переліку видно ціну, а не лише назву");
+{
+    // ЩО БУЛО НЕ ТАК. У ListItem стояли тільки url і name. Для Google
+    // цього досить на карусель — а ШІ-пошук, який читає сторінку
+    // категорії, щоб відповісти «скільки коштують жіночі сумки
+    // Coach», не бачив із неї ЖОДНОЇ ціни. Довелось би заходити в
+    // кожен товар, чого жоден із них не робить.
+    //
+    // Заміряно 08.10.2026: 46 сторінок таксономії, 20 позицій на
+    // кожній, нуль цін у розмітці.
+    const сторінки = [
+        "categories/zhinochi-sumky/index.html",
+        "brands/coach/index.html",
+        "departments/sumky/index.html",
+        "aktsii/index.html"
+    ].filter(exists);
+
+    check(`сторінок із переліком: ${сторінки.length}`, сторінки.length >= 3);
+
+    const проблеми = [];
+
+    сторінки.forEach(rel => {
+
+        const блок = (read(rel).match(/id="collectionSchema">([\s\S]*?)<\/script>/) || [])[1];
+
+        let d = null;
+
+        try { d = JSON.parse(блок); } catch (error) { проблеми.push(`${rel}: не читається`); return; }
+
+        const список = (d.mainEntity && d.mainEntity.itemListElement) || [];
+
+        if (!список.length) { проблеми.push(`${rel}: перелік порожній`); return; }
+
+        const безЦіни = список.filter(x => !(x.item && x.item.offers && x.item.offers.price > 0));
+
+        if (безЦіни.length) проблеми.push(`${rel}: без ціни ${безЦіни.length} із ${список.length}`);
+
+        const безВалюти = список.filter(x => x.item && x.item.offers
+            && x.item.offers.priceCurrency !== "UAH");
+
+        if (безВалюти.length) проблеми.push(`${rel}: валюта не UAH у ${безВалюти.length}`);
+
+        const безНаявності = список.filter(x => x.item && x.item.offers
+            && !/schema\.org\/(InStock|BackOrder)/.test(x.item.offers.availability || ""));
+
+        if (безНаявності.length) проблеми.push(`${rel}: наявність не вказана у ${безНаявності.length}`);
+
+    });
+
+    check("у кожної позиції є ціна, валюта й наявність", проблеми.length === 0,
+        проблеми.slice(0, 3).join(" | "));
+
+    // Наявність бере той самий модуль, що й сторінка товару та фід:
+    // «під замовлення» вже одного разу розійшлося між ними (BackOrder
+    // проти PreOrder).
+    const джерело = read("scripts/build-taxonomy-pages.js");
+
+    check("наявність — зі спільного модуля, а не своя копія",
+        /ProductOffer\.availabilityOf\(product\)/.test(джерело));
+
+    // Ціна в розмітці мусить збігатися з видимою на сторінці:
+    // розбіжність Search Console називає невідповідністю розмітки
+    // вмісту.
+    const html = read("categories/zhinochi-sumky/index.html");
+
+    // Через try: зіпсована розмітка має давати червону перевірку, а не
+    // виняток посеред набору — інакше решта перевірок просто не
+    // виконається, і причину доведеться шукати в стеку.
+    let d = null;
+
+    try { d = JSON.parse(html.match(/id="collectionSchema">([\s\S]*?)<\/script>/)[1]); }
+    catch (error) { /* нижче */ }
+
+    const перший = (d && d.mainEntity && d.mainEntity.itemListElement[0]
+        && d.mainEntity.itemListElement[0].item) || null;
+
+    check("розмітку переліку вдалося прочитати, і ціна в ній є",
+        Boolean(перший && перший.offers && перший.offers.price > 0));
+
+    const екран = перший ? перший.url.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") : "";
+
+    const видима = екран
+        ? (html.match(new RegExp(екран + '"[\\s\\S]*?taxonomy-price">([^<]*)<')) || [])[1] || ""
+        : "";
+
+    const число = Number(видима.replace(/[^0-9]/g, ""));
+
+    check("ціна в розмітці збігається з видимою",
+        Boolean(перший && перший.offers) && число === перший.offers.price,
+        `${число} проти ${перший && перший.offers ? перший.offers.price : "—"}`);
+}
+
 console.log("\n[11] Назва бренду в хабі й у товарі — той самий рядок");
 {
     // ЩО БУЛО. У двох товарів поле «Бренд» містило хвіст пробілу:
@@ -746,6 +838,28 @@ console.log("\n[N] Сам каталог теж не порожній без JS"
 
     check("той самий перелік, що й на сторінках таксономії",
         /class="taxonomy-static-list"/.test(html));
+
+    // І РОЗМІТКА ПЕРЕЛІКУ — ТЕЖ.
+    //
+    // У сторінок бренду й категорії CollectionPage була, а в самого
+    // /catalog ні: він не генерується, а живе як звичайна сторінка.
+    // Найбільший перелік магазину лишався єдиним, із якого машина не
+    // могла взяти ні назв, ні цін.
+    const ld = (html.match(/id="collectionSchema">([\s\S]*?)<\/script>/) || [])[1];
+
+    let колекція = null;
+
+    try { колекція = JSON.parse(ld); } catch (error) { /* нижче */ }
+
+    check("у каталозі є CollectionPage",
+        Boolean(колекція && колекція["@type"] === "CollectionPage"));
+
+    check("вона заявляє весь асортимент",
+        колекція && колекція.mainEntity.numberOfItems === products.length,
+        колекція && String(колекція.mainEntity.numberOfItems));
+
+    check("і не задвоюється на другому прогоні",
+        (html.match(/id="collectionSchema"/g) || []).length === 1);
 
     // Каркас прибрано: він тримав форму сітки, поки немає даних, а
     // тепер там одразу справжній перелік. Два екрани заглушок перед
