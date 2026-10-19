@@ -44,7 +44,7 @@ const FILE = path.join(ROOT, "data", "season.json");
 // рівно їх. Розійдуться — власник обере в адмінці сезон, якого збірка
 // не знає, і сайт лишиться у звичайному вигляді без жодної скарги.
 // За збігом стежить tests/test-season.js.
-const SEASONS = ["standard", "winter"];
+const SEASONS = ["standard", "winter", "spring", "summer", "autumn"];
 
 function readSeason() {
 

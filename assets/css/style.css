@@ -72,6 +72,22 @@
     --header-bg:rgba(255,255,255,.88);
     --header-border:rgba(255,255,255,.3);
 
+    /* Смуга між білими секціями. Сторінка чергує «біла секція / тиха
+       смуга», і саме це чергування задає ритм довгої головної.
+
+       ДО 19.10.2026 ЦЕЙ КОЛІР БУВ ЗАШИТИЙ, І ТРЬОМА РІЗНИМИ:
+       .products, .brands, .promo-hero-slide мали #f8fafc,
+       .brand-teaser і .similar — #fafafa, .breadcrumbs — #f7f7f7.
+       Між собою вони відрізняються на 3-6 одиниць, тобто на око
+       однакові — три назви для одного наміру.
+
+       Через це сезонне оформлення діставало сторінку, але не смуги:
+       на dev із зимою тло стало #e8eff8, а смуги лишились майже
+       білими — і ритм перевернувся. Заміряно на живому сайті.
+
+       Тепер намір названий, і сезон міняє його разом з усім іншим. */
+    --surface-muted:#f8fafc;
+
     --radius:18px;
 
     /* Відстань між пунктами шапки. Названа тому, що на неї спирається
@@ -152,6 +168,7 @@
     --gray200:#c7d5e7;
     --gray100:#dce6f2;
     --gray50:#e8eff8;
+    --surface-muted:#eef4fb;
 
     /* Акцент глибшає: той самий синій, але зимовий. */
     --secondary:#1746c8;
@@ -172,6 +189,100 @@
        би єдиним теплим плямом на холодній сторінці. */
     --header-bg:rgba(247,251,255,.9);
     --header-border:rgba(195,208,224,.45);
+
+}
+
+/* Весна: світло крізь молоде листя: зелень світла, але не салатова —
+   для люксу важливо лишитись стриманим. */
+:root[data-season="spring"]{
+
+    --primary:#142a1c;
+    --dark:#142a1c;
+    --gray900:#142a1c;
+    --gray700:#2f4a38;
+    --gray500:#586e5e;
+
+    --gray300:#a8c6a4;
+    --gray200:#cadfc7;
+    --gray100:#e0eede;
+    --gray50:#eef6ee;
+    --surface-muted:#f5faf4;
+
+    /* глибокий смарагд: лишається очевидно «натискальним» */
+    --secondary:#067f5b;
+
+    --hero-tint-rgb:18,40,26;
+
+    --shadow-sm:0 2px 8px rgba(20,42,28,.07);
+    --shadow:0 12px 30px rgba(20,42,28,.10);
+    --shadow-lg:0 25px 60px rgba(20,42,28,.14);
+
+    --season-wash:linear-gradient(180deg, #dff0dd 0%, transparent 420px);
+
+    --header-bg:rgba(248,253,247,.9);
+    --header-border:rgba(168,198,164,.4);
+
+}
+
+/* Літо: пісок і полуденне небо: тепле світло, високий ключ. */
+:root[data-season="summer"]{
+
+    --primary:#2a1f12;
+    --dark:#2a1f12;
+    --gray900:#2a1f12;
+    --gray700:#4d3a24;
+    --gray500:#7a664c;
+
+    --gray300:#d9c09b;
+    --gray200:#eedcc2;
+    --gray100:#f8ebd9;
+    --gray50:#fdf6ec;
+    --surface-muted:#fffbf4;
+
+    /* чиста лазур — єдиний холодний акцент на теплому */
+    --secondary:#0c74be;
+
+    --hero-tint-rgb:42,31,18;
+
+    --shadow-sm:0 2px 8px rgba(42,31,18,.07);
+    --shadow:0 12px 30px rgba(42,31,18,.10);
+    --shadow-lg:0 25px 60px rgba(42,31,18,.14);
+
+    --season-wash:linear-gradient(180deg, #fdeed6 0%, transparent 420px);
+
+    --header-bg:rgba(255,252,246,.9);
+    --header-border:rgba(217,192,155,.4);
+
+}
+
+/* Осінь: вохра й суха листва: тепло глибше за літнє, ніж темніше. */
+:root[data-season="autumn"]{
+
+    --primary:#2b1d12;
+    --dark:#2b1d12;
+    --gray900:#2b1d12;
+    --gray700:#4f3824;
+    --gray500:#7a624a;
+
+    --gray300:#c8ab8b;
+    --gray200:#e2cdb5;
+    --gray100:#f1e2d2;
+    --gray50:#f9f0e6;
+    --surface-muted:#fdf7f0;
+
+    /* приглушена синь: не свариться з бурштином знижок */
+    --secondary:#1c5f8e;
+
+    --hero-tint-rgb:43,29,18;
+
+    --shadow-sm:0 2px 8px rgba(43,29,18,.07);
+    --shadow:0 12px 30px rgba(43,29,18,.10);
+    --shadow-lg:0 25px 60px rgba(43,29,18,.14);
+
+    --season-wash:linear-gradient(180deg, #f6e3cd 0%, transparent 420px);
+
+    --header-bg:rgba(254,249,243,.9);
+    --header-border:rgba(200,171,139,.4);
 
 }
 
@@ -1450,7 +1561,7 @@ nav li.has-mega[data-mega-open] .mega-menu.mega-menu-columns{
 ===================================== */
 
 .products{
-    background:#f8fafc;
+    background:var(--surface-muted);
     padding-top:40px;
 }
 
@@ -2943,7 +3054,7 @@ footer{
     display:grid;
     grid-template-columns:1fr 1fr;
     min-height:360px;
-    background:#f8fafc;
+    background:var(--surface-muted);
 }
 
 .promo-hero-slide-content{
@@ -3144,7 +3255,7 @@ footer{
 }
 
 .brands{
-    background:#f8fafc;
+    background:var(--surface-muted);
 }
 
 .brands-grid{
@@ -3615,7 +3726,7 @@ body.mobile-filters-open .scroll-top{
 .breadcrumbs{
     margin-top:82px;
     padding:14px 0;
-    background:#f7f7f7;
+    background:var(--surface-muted);
     font-size:15px;
 }
 
@@ -6801,7 +6912,7 @@ body.mobile-filters-open .scroll-top{
 }
 
 .brand-teaser:nth-child(even){
-    background:#fafafa;
+    background:var(--surface-muted);
 }
 
 .brand-teaser-banner{
@@ -6910,7 +7021,7 @@ body.mobile-filters-open .scroll-top{
 }
 
 .brand-campaign:nth-child(even){
-    background:#fafafa;
+    background:var(--surface-muted);
 }
 
 .brand-campaign-banner{
@@ -7033,7 +7144,7 @@ body.mobile-filters-open .scroll-top{
 
 .similar{
     padding:64px 0;
-    background:#fafafa;
+    background:var(--surface-muted);
 }
 
 /* =====================================
@@ -13804,7 +13915,7 @@ body.confirm-open{
     z-index:2;
     /* тло те саме, що в смуги крихт: інакше під кнопкою просвічували б
        пункти, які проїжджають повз неї при прокрутці */
-    background:#f7f7f7;
+    background:var(--surface-muted);
     padding-right:14px;
 }
 
@@ -13827,7 +13938,7 @@ body.confirm-open{
     bottom:0;
     right:100%;
     width:40px;
-    background:#f7f7f7;
+    background:var(--surface-muted);
 }
 
 /* Розділювач після кнопки — щоб вона читалась як окремий елемент, а не

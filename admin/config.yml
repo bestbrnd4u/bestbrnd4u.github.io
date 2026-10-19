@@ -136,6 +136,9 @@ collections:
             options:
               - { label: "Звичайне (як зараз)", value: "standard" }
               - { label: "Зима", value: "winter" }
+              - { label: "Весна", value: "spring" }
+              - { label: "Літо", value: "summer" }
+              - { label: "Осінь", value: "autumn" }
             hint: >
               Після збереження сайт перезбереться сам — це займає
               кілька хвилин. Повернути попередній вигляд можна тим
