@@ -212,6 +212,43 @@ function main() {
 
     });
 
+    // ДАТА ЗМІНИ ДЛЯ СТОРІНКИ-СПИСКУ.
+    //
+    // 19.10.2026 заміряно на проді: lastmod мали рівно 103 адреси зі
+    // 163 — тобто лише товари. Сторінки брендів, категорій, розділів і
+    // пар «бренд × тип» ішли без дати взагалі, зокрема одинадцять
+    // найновіших. Для сторінки, яку Google ще жодного разу не бачив,
+    // це втрачений сигнал саме там, де він потрібен найбільше.
+    //
+    // Вигадувати дату не можна — Google ігнорує lastmod, якому не
+    // довіряє, а «сьогодні на кожній збірці» це рівно той випадок.
+    // Але тут її й не треба вигадувати: сторінка-список показує товари,
+    // і міняється вона тоді, коли міняється найсвіжіший із них. Беремо
+    // максимум із журналу оновлень — тієї самої таблиці, з якої дати
+    // беруть самі товари.
+    //
+    // Немає жодної дати (журнал порожній, свіжий клон) — лишаємо
+    // порожньо, як і раніше.
+    const listLastmod = page => {
+
+        const dates = (page.products || [])
+            .map(product => (updated[product && product.slug] || {}).date)
+            .filter(Boolean)
+            .sort();
+
+        return dates.length ? dates[dates.length - 1] : "";
+
+    };
+
+    // Для хаба — найсвіжіша дата серед сторінок, які він збирає.
+    const hubLastmod = pages => {
+
+        const dates = pages.map(listLastmod).filter(Boolean).sort();
+
+        return dates.length ? dates[dates.length - 1] : "";
+
+    };
+
     // Хаби й сторінки таксономії. Пріоритет вищий за товар: саме вони
     // виграють запити на кшталт «сумки Coach купити», і саме через них
     // робот знаходить решту.
@@ -224,23 +261,36 @@ function main() {
     const departments = departmentPages(products, categoryData, readRecords(DEPARTMENTS_SRC));
     const pairs = pairPages(products, categoryData, brandData);
 
-    if (brands.length) entries.push(urlEntry(`${SITE_URL}/brands/`, "weekly", "0.7"));
-    if (categories.length) entries.push(urlEntry(`${SITE_URL}/categories/`, "weekly", "0.7"));
-    if (departments.length) entries.push(urlEntry(`${SITE_URL}/departments/`, "weekly", "0.7"));
+    if (brands.length) {
+        entries.push(urlEntry(`${SITE_URL}/brands/`, "weekly", "0.7",
+            undefined, hubLastmod(brands)));
+    }
+
+    if (categories.length) {
+        entries.push(urlEntry(`${SITE_URL}/categories/`, "weekly", "0.7",
+            undefined, hubLastmod(categories)));
+    }
+
+    if (departments.length) {
+        entries.push(urlEntry(`${SITE_URL}/departments/`, "weekly", "0.7",
+            undefined, hubLastmod(departments)));
+    }
 
     // Розділ ширший за категорію й за бренд — і пріоритет у нього
     // найвищий після головної: саме на такі запити («сумки купити»)
     // припадає найбільший попит.
-    departments.forEach(page => entries.push(urlEntry(page.url, "weekly", "0.95")));
+    departments.forEach(page => entries.push(
+        urlEntry(page.url, "weekly", "0.95", undefined, listLastmod(page))));
 
     [...brands, ...categories].forEach(page => {
-        entries.push(urlEntry(page.url, "weekly", "0.9"));
+        entries.push(urlEntry(page.url, "weekly", "0.9", undefined, listLastmod(page)));
     });
 
     // «Бренд × тип» — найточніша відповідь на запит із двох слів
     // («годинники Michael Kors»), і пріоритет у неї такий самий, як у
     // бренду: вужча за нього, але й конкуренція на ній вужча.
-    pairs.forEach(page => entries.push(urlEntry(page.url, "weekly", "0.9")));
+    pairs.forEach(page => entries.push(
+        urlEntry(page.url, "weekly", "0.9", undefined, listLastmod(page))));
 
     // Розділи каталогу. ПОРОЖНІЙ НЕ КЛИЧЕМО: «Акції» без жодної
     // знижки — це сторінка зі словами й без товарів, тобто м'який
@@ -251,7 +301,8 @@ function main() {
     // знижка закінчується — звідси daily.
     sectionPages(products)
         .filter(page => page.products.length)
-        .forEach(page => entries.push(urlEntry(page.url, "daily", "0.9")));
+        .forEach(page => entries.push(
+            urlEntry(page.url, "daily", "0.9", undefined, listLastmod(page))));
 
     // Завершені акції в sitemap не потрапляють.
     //
