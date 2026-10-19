@@ -69,10 +69,37 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v6
 
+      # ЩО САМЕ ЇДЕ НА PAGES.
+      #
+      # Було `path: .` — тобто весь репозиторій. Заміряно 19.10.2026:
+      # зі 155 МБ опублікованого сайту 44 МБ не потрібні відвідувачу
+      # взагалі — 16 МБ копій фото в assets/images/_originals, 17 МБ
+      # знятих банерів у _archive, tests/, scripts/, supabase/. Усе це
+      # віддавалось публічно: /tests/test-oversell.js і
+      # /supabase/migrations/011-stock-reservation.sql повертали 200.
+      #
+      # Чому це не дрібниця: у GitHub Pages ліміт опублікованого сайту
+      # 1 ГБ, а кожен товар додає ~0,75 МБ фотографій. Третина бюджету,
+      # витрачена на службові файли, — це сотні товарів, яких магазин
+      # не зможе виставити.
+      #
+      # ЗБИРАЄМО ОКРЕМУ ТЕКУ, А НЕ ЧИСТИМО РОБОЧУ: останній крок
+      # «Purge Cloudflare cache» запускає scripts/purge-cache.js, і
+      # видалення scripts/ до виливки зламало б його.
+      #
+      # Перелік винятків живе у scripts/collect-site.js, а не тут —
+      # щоб тести могли ВИКОНАТИ збирання й подивитись на результат, а
+      # не звіряти рядок YAML регуляркою. Скрипт сам падає, якщо в
+      # зібраному сайті забракло .nojekyll, CNAME чи ключа IndexNow;
+      # а tests/test-published-tree.js перевіряє, що на місці кожен
+      # файл, на який посилається розмітка.
+      - name: Collect site files
+        run: node scripts/collect-site.js _site
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5
         with:
-          path: .
+          path: _site
 
       - name: Deploy to GitHub Pages
         id: deployment

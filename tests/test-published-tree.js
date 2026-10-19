@@ -1,0 +1,232 @@
+// Що саме їде на GitHub Pages.
+//
+// ЗВІДКИ ВЗЯЛОСЬ
+// ---------------
+// Виливка робилась із `path: .` — тобто на Pages їхав увесь
+// репозиторій. Заміряно 19.10.2026: зі 155 МБ опублікованого сайту
+// 44 МБ не потрібні відвідувачу ніяк —
+//
+//     assets/images/_originals   16 МБ   копії фото до обробки
+//     assets/images/_archive     17 МБ   зняті з сайту банери
+//     scripts/                  5,4 МБ   код збірки
+//     tests/                    4,0 МБ   самі тести
+//     supabase/                 1,6 МБ   міграції й код функції
+//
+// і все це віддавалось публічно: /tests/test-oversell.js та
+// /supabase/migrations/011-stock-reservation.sql повертали 200.
+//
+// ЧОМУ ЦЕ ВАЖЛИВО, А НЕ ПРОСТО НЕОХАЙНО
+// --------------------------------------
+// У GitHub Pages ліміт опублікованого сайту — 1 ГБ, а кожен товар
+// додає близько 0,75 МБ фотографій. Третина бюджету, витрачена на
+// службові файли, — це сотні товарів, яких магазин не зможе
+// виставити, поки хтось не розбереться, куди поділось місце.
+//
+// ЧОМУ ПЕРЕВІРКА ВИКОНУЄ ЗБИРАННЯ, А НЕ ЧИТАЄ ПЕРЕЛІК
+// ----------------------------------------------------
+// Перелік винятків — класичний спосіб тихо зламати сайт: досить
+// додати рядок, і потрібний файл перестає їхати. У репозиторії він на
+// місці, git чистий, сторінка відкривається — просто без картинки або
+// без скрипта. Звірка двох переліків такого не ловить: обидва ж
+// «правильні».
+//
+// Тому тут збирається СПРАВЖНІЙ сайт у тимчасову теку, і до нього
+// прикладається кожне посилання з розмітки.
+const fs = require("fs");
+const os = require("os");
+const path = require("path");
+
+const ROOT = path.join(__dirname, "..");
+
+let failures = 0;
+const check = (n, c, e) => {
+    if (c) console.log("  ✓", n);
+    else { console.log("  ✗", n, e !== undefined ? "→ " + e : ""); failures++; }
+};
+
+const read = rel => fs.readFileSync(path.join(ROOT, rel), "utf8");
+
+const { collect, ВИНЯТКИ, ОБОВЯЗКОВІ } = require("../scripts/collect-site.js");
+
+const workflow = read(".github/workflows/deploy-pages.yml").replace(/\r\n/g, "\n");
+
+
+console.log("\n[1] Виливка бере зібрану теку, а не весь репозиторій");
+{
+    check("крок збирання є", /run: node scripts\/collect-site\.js _site/.test(workflow));
+
+    // БЕЗ ЦЬОГО РЯДКА КРОК НІЧОГО НЕ ЗМІНЮЄ.
+    // Зібрати _site і при цьому вилити «.» — найприродніша помилка:
+    // усе виглядає зробленим, а на сайт і далі їде весь репозиторій.
+    check("виливається саме вона",
+        /uses: actions\/upload-pages-artifact@v\d+\s*\n\s*with:\s*\n\s*path: _site/.test(workflow),
+        (workflow.match(/path: [^\n]*/g) || []).join(" | "));
+
+    // Чистити робочу теку замість окремої не можна: останній крок
+    // запускає scripts/purge-cache.js. Порівнюємо місця самих кроків,
+    // а не будь-яку згадку — пояснення цього стоїть у коментарі вище.
+    check("scripts/ лишається в робочій теці для скидання кеша",
+        /run: node scripts\/purge-cache\.js/.test(workflow)
+        && workflow.indexOf("- name: Collect site files")
+            < workflow.indexOf("run: node scripts/purge-cache.js"));
+}
+
+
+// Збираємо справжній сайт — далі всі питання до нього.
+const куди = fs.mkdtempSync(path.join(os.tmpdir(), "site-"));
+
+let зібрано = null;
+
+try {
+    зібрано = collect(куди, { тихо: true });
+} catch (error) {
+    check("збирання не впало", false, error.message);
+}
+
+
+console.log("\n[2] Зібраний сайт схожий на сайт");
+{
+    check("збирання відпрацювало", Boolean(зібрано));
+
+    if (зібрано) {
+
+        check(`файлів у сайті: ${зібрано.файлів}`, зібрано.файлів > 500, String(зібрано.файлів));
+
+        check(`розмір: ${(зібрано.байтів / 1048576).toFixed(0)} МБ`,
+            зібрано.байтів > 10 * 1048576);
+
+        // Ліміт GitHub Pages — 1 ГБ. Попереджаємо завчасно: за 800 МБ
+        // уже час думати, куди переносити фотографії, а не дізнаватись
+        // про це з відмови виливки.
+        check("до межі Pages в 1 ГБ ще далеко",
+            зібрано.байтів < 800 * 1048576,
+            `${(зібрано.байтів / 1048576).toFixed(0)} МБ з 1024`);
+
+        check("головна на місці", fs.existsSync(path.join(куди, "index.html")));
+
+        check("каталог на місці", fs.existsSync(path.join(куди, "catalog.html")));
+
+        check("дані каталогу на місці", fs.existsSync(path.join(куди, "data", "catalog.json")));
+    }
+}
+
+
+console.log("\n[3] Службового в сайті немає");
+{
+    // Саме ті теки, через які все й почалось.
+    for (const тека of ["assets/images/_originals", "assets/images/_archive",
+        "tests", "scripts", "supabase", "node_modules", ".github"]) {
+
+        const було = fs.existsSync(path.join(ROOT, тека));
+
+        check(`${тека}${було ? "" : " (немає в цій гілці)"}`,
+            !fs.existsSync(path.join(куди, тека)));
+
+    }
+
+    check("перелік винятків не спорожнів", ВИНЯТКИ.length >= 10, String(ВИНЯТКИ.length));
+}
+
+
+console.log("\n[4] Жодного потрібного файлу не загубилось");
+{
+    // ГОЛОВНА ПЕРЕВІРКА НАБОРУ. Беремо всі локальні посилання з
+    // розмітки сайту й шукаємо кожне в зібраній теці.
+    const SKIP = new Set(["node_modules", ".git", ".claude", "archive", ".playwright-mcp",
+        "supabase", "scripts", "tests", "docs"]);
+
+    const сторінки = [];
+
+    (function обійти(dir) {
+        for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+            if (e.isDirectory()) {
+                if (!SKIP.has(e.name)) обійти(path.join(dir, e.name));
+            } else if (e.name.endsWith(".html")) {
+                сторінки.push(path.join(dir, e.name));
+            }
+        }
+    })(ROOT);
+
+    check(`сторінок переглянуто: ${сторінки.length}`, сторінки.length > 100, String(сторінки.length));
+
+    const посилання = new Set();
+
+    for (const файл of сторінки) {
+
+        const html = fs.readFileSync(файл, "utf8");
+
+        for (const m of html.matchAll(/(?:src|href)="([^"]+)"/g)) {
+
+            const url = m[1];
+
+            // Чуже, якорі, пошта, телефон — не наша справа.
+            if (/^(https?:|\/\/|#|mailto:|tel:|data:|javascript:)/.test(url)) continue;
+
+            // Відрізаємо версію й якір: ?v=… додає крок збірки.
+            const чистий = url.split("?")[0].split("#")[0];
+
+            // Порожнє й «красиві» адреси тек пропускаємо: за ними
+            // лежить index.html, і перевіряти їх мусить test-links.
+            if (!чистий || чистий.endsWith("/")) continue;
+
+            посилання.add(чистий.replace(/^\//, ""));
+
+        }
+
+    }
+
+    // Дані тягне вже сам скрипт — у розмітці їх немає.
+    for (const m of read("assets/js/common.js").matchAll(/dataUrl\("(data\/[^"]+)"\)/g)) {
+        посилання.add(m[1]);
+    }
+
+    check(`посилань зібрано: ${посилання.size}`, посилання.size > 20, String(посилання.size));
+
+    // Цікавлять лише ті, що справді існують у репозиторії: биті
+    // посилання — турбота test-links.js, а не ця.
+    const мали = [...посилання].filter(p => fs.existsSync(path.join(ROOT, p)));
+
+    const зниклі = мали.filter(p => !fs.existsSync(path.join(куди, p)));
+
+    check(`перевірено наявних файлів: ${мали.length}`, мали.length > 20);
+
+    check("усі вони доїхали в зібраний сайт", зниклі.length === 0,
+        зниклі.slice(0, 5).join(", "));
+}
+
+
+console.log("\n[5] Службові файли в корені доїхали теж");
+{
+    // На них ніхто не посилається, тому їх найлегше випадково
+    // виключити — і найважче помітити.
+    const наявні = ОБОВЯЗКОВІ.filter(f => fs.existsSync(path.join(ROOT, f)));
+
+    const зниклі = наявні.filter(f => !fs.existsSync(path.join(куди, f)));
+
+    check(`обовʼязкових файлів у цій гілці: ${наявні.length}`, наявні.length >= 4,
+        наявні.join(", "));
+
+    check("усі доїхали", зниклі.length === 0, зниклі.join(", "));
+
+    check(".nojekyll серед них", ОБОВЯЗКОВІ.includes(".nojekyll"));
+
+    // CNAME лежить лише в main — у dev його немає, і це нормально.
+    // Але в переліку обовʼязкових він мусить бути завжди, інакше
+    // виливка прода тихо втратить домен.
+    check("CNAME теж (хоч у dev його й немає)", ОБОВЯЗКОВІ.includes("CNAME"));
+
+    const ключ = fs.readdirSync(ROOT).find(f => /^[0-9a-f]{32}\.txt$/.test(f));
+
+    check("ключ IndexNow знайдено", Boolean(ключ), ключ);
+
+    check("і він у сайті", !ключ || fs.existsSync(path.join(куди, ключ)));
+}
+
+fs.rmSync(куди, { recursive: true, force: true });
+
+
+console.log(failures === 0
+    ? "\n✅ На Pages їде сайт, а не репозиторій — і нічого потрібного не загубилось\n"
+    : `\n❌ Проблем: ${failures}\n`);
+
+process.exit(failures === 0 ? 0 : 1);
