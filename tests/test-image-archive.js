@@ -286,7 +286,16 @@ console.log("\n[5] Відстрочка: свіже сміття не їде в 
         fs.existsSync(path.join(BOX_MEDIA, name)));
 
     const pending = JSON.parse(fs.readFileSync(path.join(BOX_ARCHIVE, "pending.json"), "utf8"));
-    check("файл узятий на облік у списку очікування", !!pending[name], Object.keys(pending).length);
+
+    // КЛЮЧ У ЧЕРЗІ — ШЛЯХ, А НЕ НАЗВА.
+    //
+    // Поки тека була одна, назви вистачало. Медіатек стало дві
+    // (products/uploads і banners), а однойменні файли в них справді
+    // є — 043_small_card_1200x1500.jpg лежить в обох. За голою назвою
+    // черга склеїла б різні файли, і архівація одного обнуляла б
+    // відлік другого.
+    check("файл узятий на облік у списку очікування",
+        !!pending[`${BOX_MEDIA}/${name}`], Object.keys(pending).join(", "));
 }
 
 console.log("\n[6] Перенесення і повернення");
@@ -394,6 +403,211 @@ console.log("\n[7] Запуск за розкладом налаштований
         сталоАрхів === БУЛО_АРХІВ, різниця(БУЛО_АРХІВ, сталоАрхів));
 
 }
+
+
+console.log("\n[9] Прибираємо ВСІ медіатеки адмінки, а не одну");
+{
+    // ЩО БУЛО НЕ ТАК І СКІЛЬКИ ЦЕ КОШТУВАЛО.
+    //
+    // Скрипт читав один-єдиний media_folder із кореня admin/config.yml
+    // — assets/images/products/uploads. Але в Decap медіатека задається
+    // ще й ПОЛЯМ: банери акцій, добірок і плиток пошуку лежать в
+    // assets/images/banners, і туди скрипт не заглядав жодного разу.
+    //
+    // Заміряно 19.10.2026: із 76 файлів у banners на 35 (18,9 МБ) не
+    // посилається нічого. З них 11 (13,7 МБ) — важкі PNG і JPEG, які
+    // shrink-heavy-images.js уже замінив на webp тієї самої назви. У
+    // коментарі того скрипта написано «прибрати такі осиротілі файли
+    // вміє npm run images:archive» — а прибрати їх було нічим.
+    const { readMediaFolders, MEDIA_DIRS } = require("../scripts/archive-unused-images");
+
+    const теки = readMediaFolders();
+
+    check(`медіатек знайдено: ${теки.length}`, теки.length >= 2, теки.join(", "));
+
+    check("серед них головна", теки.includes(MEDIA_DIR_REL), теки.join(", "));
+
+    check("і тека банерів", теки.includes("assets/images/banners"), теки.join(", "));
+
+    // ПЕРЕЛІК БЕРЕТЬСЯ З КОНФІГУ, А НЕ ЗІ СПИСКУ В КОДІ.
+    // Список у коді застаріває мовчки: нове поле з власною медіатекою
+    // просто не потрапляє в прибирання, і сміття копичиться роками —
+    // рівно так і сталось із банерами.
+    const config = fs.readFileSync(path.join(ROOT, "admin/config.yml"), "utf8");
+
+    const зКонфігу = [...config.matchAll(/^\s*media_folder:\s*"([^"]+)"/gm)]
+        .map(m => m[1].replace(/^\/+/, "").replace(/\/+$/, ""));
+
+    check("кожна тека з конфігу врахована",
+        [...new Set(зКонфігу)]
+            .filter(rel => fs.existsSync(path.join(ROOT, rel)))
+            .every(rel => теки.includes(rel)),
+        [...new Set(зКонфігу)].join(", "));
+
+    // Шлях у полі пишеться від кореня САЙТУ («/assets/images/banners»),
+    // у корені конфігу — від кореня репозиторію. Без зведення та сама
+    // тека потрапляла б у перелік двічі й оброблялась би двічі.
+    check("провідна скісна в шляху поля зведена",
+        теки.every(rel => !rel.startsWith("/")), теки.join(", "));
+
+    check("повторів у переліку немає", new Set(теки).size === теки.length, теки.join(", "));
+
+    check("у звичайному запуску працюємо саме цим переліком",
+        MEDIA_DIRS.length === теки.length);
+
+    // --- І найголовніше: однойменні файли з різних тек не склеюються.
+    const ДВІ = fs.mkdtempSync(path.join(os.tmpdir(), "archive-two-"));
+
+    const А = path.join(ДВІ, "a");
+    const Б = path.join(ДВІ, "b");
+    const АРХ = path.join(ДВІ, "arch");
+
+    [А, Б, АРХ].forEach(d => fs.mkdirSync(d, { recursive: true }));
+
+    const спільне = "однакова-назва.png";
+
+    fs.writeFileSync(path.join(А, спільне), "а");
+    fs.writeFileSync(path.join(Б, спільне), "б");
+
+    const прогін = args => execFileSync("node", [SCRIPT, ...args], {
+        cwd: ROOT,
+        encoding: "utf8",
+        env: {
+            ...process.env,
+            ARCHIVE_MEDIA_DIRS: `${А},${Б}`,
+            ARCHIVE_TARGET_DIR: АРХ
+        }
+    });
+
+    const звіт = прогін([]);
+
+    check("звіт бачить обидва файли",
+        звіт.includes(`${А}/${спільне}`) && звіт.includes(`${Б}/${спільне}`),
+        звіт.split("\n").filter(l => l.includes(спільне)).join(" | "));
+
+    прогін(["--apply", "--now"]);
+
+    check("обидва перенесено, жоден не лишився",
+        !fs.existsSync(path.join(А, спільне)) && !fs.existsSync(path.join(Б, спільне)));
+
+    const вАрхіві = fs.readdirSync(АРХ).filter(f => f.includes("однакова-назва"));
+
+    check(`в архіві два різні файли, а не один: ${вАрхіві.length}`,
+        вАрхіві.length === 2, вАрхіві.join(", "));
+
+    const manifest = JSON.parse(fs.readFileSync(path.join(АРХ, "manifest.json"), "utf8"));
+
+    const звідки = manifest.map(i => i.from).sort();
+
+    // Саме звідки взяли — за цим шляхом --restore кладе файл назад.
+    // Один шлях на обидва означав би, що банер повернеться в теку
+    // фотографій товарів, а другий файл не повернеться нікуди.
+    check("маніфест памʼятає РІЗНІ теки походження",
+        звідки.length === 2 && звідки[0] !== звідки[1],
+        звідки.join(" | "));
+
+    check("і це справді ті теки",
+        звідки.includes(`${А}/${спільне}`) && звідки.includes(`${Б}/${спільне}`),
+        звідки.join(" | "));
+
+    fs.rmSync(ДВІ, { recursive: true, force: true });
+}
+
+
+console.log("\n[10] Та сама картинка не лягає в архів двічі");
+{
+    // ЗВІДКИ ВЗЯЛОСЬ. Коли прибирання дійшло до другої медіатеки,
+    // перевірка [1b] почервоніла: в архіві опинились пари байт у байт.
+    //
+    // Два різні випадки, і обидва справжні:
+    //   • ОДНА НАЗВА, дві теки — власник завантажив те саме фото і в
+    //     товари, і в банери (043_small_card_1200x1500.jpg);
+    //   • РІЗНІ НАЗВИ, один вміст — кирилиця в іменах пройшла крізь
+    //     конвеєр по-різному, і той самий банер лежав як
+    //     «…мобильная_страница…», «…моби#U-…», «…#U043c#U043e…» і
+    //     «…mobile-…»: чотири файли по 498 КБ.
+    //
+    // Архів лежить у git, тож зайва копія — це вага назавжди.
+    const ТРИ = fs.mkdtempSync(path.join(os.tmpdir(), "archive-dup-"));
+
+    const П = path.join(ТРИ, "p");
+    const Р = path.join(ТРИ, "r");
+    const АРХ = path.join(ТРИ, "arch");
+
+    [П, Р, АРХ].forEach(d => fs.mkdirSync(d, { recursive: true }));
+
+    // Той самий вміст під трьома різними назвами у двох теках.
+    fs.writeFileSync(path.join(П, "однакова.png"), "той самий вміст");
+    fs.writeFileSync(path.join(Р, "однакова.png"), "той самий вміст");
+    fs.writeFileSync(path.join(Р, "інша-назва.png"), "той самий вміст");
+
+    // І один справді інший файл — щоб було видно, що склеюємо не все.
+    fs.writeFileSync(path.join(Р, "окремий.png"), "інший вміст");
+
+    const прогін2 = args => execFileSync("node", [SCRIPT, ...args], {
+        cwd: ROOT,
+        encoding: "utf8",
+        env: { ...process.env, ARCHIVE_MEDIA_DIRS: `${П},${Р}`, ARCHIVE_TARGET_DIR: АРХ }
+    });
+
+    прогін2(["--apply", "--now"]);
+
+    const вАрхіві = fs.readdirSync(АРХ).filter(f => !f.endsWith(".json"));
+
+    check(`в архіві два файли, а не чотири: ${вАрхіві.length}`,
+        вАрхіві.length === 2, вАрхіві.join(", "));
+
+    const manifest2 = JSON.parse(fs.readFileSync(path.join(АРХ, "manifest.json"), "utf8"));
+
+    // Записів стільки ж, скільки файлів прибрали: кожен мусить знати
+    // СВОЄ походження, інакше повернути його нікуди.
+    check(`записів у маніфесті чотири: ${manifest2.length}`, manifest2.length === 4,
+        manifest2.map(i => i.from).join(" | "));
+
+    check("усі чотири походження різні",
+        new Set(manifest2.map(i => i.from)).size === 4);
+
+    const спільний = manifest2.filter(i => i.file === manifest2[0].file);
+
+    check("три однакові посилаються на ОДИН файл в архіві",
+        спільний.length === 3, String(спільний.length));
+
+    check("а відмінний — на власний",
+        new Set(manifest2.map(i => i.file)).size === 2,
+        [...new Set(manifest2.map(i => i.file))].join(", "));
+
+    // ПОВЕРНЕННЯ МУСИТЬ ВІДДАТИ ВСІ ТРИ.
+    //
+    // Файл в архіві один, а origin-ів три. Якби restore просто
+    // переносив його, перший же виклик забрав би файл, і два інші
+    // місця лишились би ні з чим — мовчки.
+    прогін2(["--restore", "all"]);
+
+    const повернулись = [
+        path.join(П, "однакова.png"),
+        path.join(Р, "однакова.png"),
+        path.join(Р, "інша-назва.png"),
+        path.join(Р, "окремий.png")
+    ].filter(p => fs.existsSync(p));
+
+    check(`повернулись усі чотири: ${повернулись.length}`, повернулись.length === 4,
+        повернулись.map(p => path.basename(p)).join(", "));
+
+    check("і архів спорожнів",
+        fs.readdirSync(АРХ).filter(f => !f.endsWith(".json")).length === 0,
+        fs.readdirSync(АРХ).join(", "));
+
+    const післяПовернення = JSON.parse(fs.readFileSync(path.join(АРХ, "manifest.json"), "utf8"));
+
+    // Записи прибираються ПООДИНЦІ. Фільтр за іменем файлу стер би
+    // разом із своїм і чужі записи — файл лишився б в архіві без
+    // жодної згадки про те, звідки він.
+    check("маніфест спорожнів теж", післяПовернення.length === 0,
+        JSON.stringify(післяПовернення));
+
+    fs.rmSync(ТРИ, { recursive: true, force: true });
+}
+
 
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
 process.exit(failures === 0 ? 0 : 1);
