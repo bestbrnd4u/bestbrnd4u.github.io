@@ -22,6 +22,17 @@
     --primary:#111827;
     --secondary:#2563eb;
     --accent:#f59e0b;
+
+    /* БУРШТИН ЯК ТЕКСТ — ОКРЕМИЙ, ТЕМНІШИЙ.
+       --accent (#f59e0b) годиться для плашки, де на ньому білий
+       напис. Як КОЛІР ТЕКСТУ на світлому він дає 2.06 — удвічі нижче
+       норми 4.5, тобто напис нечитабельний. Заміряно 20.10.2026.
+       У коді це вже обходили руками: шість місць писали #b45309. Але
+       й той на холодних і теплих поверхнях сезонів просідає до 4.34.
+       Тут один відтінок, який проходить на тлі КОЖНОГО сезону з
+       запасом (мінімум 5.04, на сторінках 5.5-6.1), — і лишається
+       однаковим у всіх, бо це знак, а не прикраса. */
+    --accent-ink:#8d500b;
     --danger:#ef4444;
 
     --white:#ffffff;
@@ -255,20 +266,27 @@
 
 }
 
-/* Осінь: вохра й суха листва: тепло глибше за літнє, ніж темніше. */
+/* Осінь: вохра й суха листва.
+   ГЛИБША ЗА ЛІТО НАВМИСНО. Перша версія відрізнялась від літа на 9
+   одиниць — тобто майже ніяк: два сезони з чотирьох виглядали
+   однаково. Заміряно 20.10.2026. Тепер 28, і кожен сезон відрізняється
+   від решти щонайменше на 14. Чорнило при цьому довелось поглибити
+   (#2b1d12 → #241709): на темнішому тлі перше давало 13.37 проти
+   16.98 у звичайного оформлення, тобто просідало більш ніж на пʼяту
+   частину — за цим стежить tests/test-season.js. */
 :root[data-season="autumn"]{
 
-    --primary:#2b1d12;
-    --dark:#2b1d12;
-    --gray900:#2b1d12;
-    --gray700:#4f3824;
-    --gray500:#7a624a;
+    --primary:#241709;
+    --dark:#241709;
+    --gray900:#241709;
+    --gray700:#46301c;
+    --gray500:#745c44;
 
-    --gray300:#c8ab8b;
-    --gray200:#e2cdb5;
-    --gray100:#f1e2d2;
-    --gray50:#f9f0e6;
-    --surface-muted:#fdf7f0;
+    --gray300:#c0a37f;
+    --gray200:#dcc5a6;
+    --gray100:#ead9c3;
+    --gray50:#f3e7d6;
+    --surface-muted:#f7ede0;
 
     /* приглушена синь: не свариться з бурштином знижок */
     --secondary:#1c5f8e;
@@ -279,10 +297,10 @@
     --shadow:0 12px 30px rgba(43,29,18,.10);
     --shadow-lg:0 25px 60px rgba(43,29,18,.14);
 
-    --season-wash:linear-gradient(180deg, #f6e3cd 0%, transparent 420px);
+    --season-wash:linear-gradient(180deg, #efdcc2 0%, transparent 420px);
 
-    --header-bg:rgba(254,249,243,.9);
-    --header-border:rgba(200,171,139,.4);
+    --header-bg:rgba(252,246,238,.9);
+    --header-border:rgba(192,163,127,.45);
 
 }
 
@@ -2261,7 +2279,7 @@ nav li.has-mega[data-mega-open] .mega-menu.mega-menu-columns{
         padding:3px 10px;
         border-radius:50px;
         background:rgba(180,83,9,.12);
-        color:#b45309;
+        color:var(--accent-ink);
         font-size:11px;
         font-weight:700;
         letter-spacing:.3px;
@@ -2291,7 +2309,7 @@ nav li.has-mega[data-mega-open] .mega-menu.mega-menu-columns{
     margin-bottom:8px;
     border-radius:6px;
     background:rgba(245,158,11,.12);
-    color:#b45309;
+    color:var(--accent-ink);
     font-size:12px;
     font-weight:700;
 }
@@ -6732,7 +6750,7 @@ body.mobile-filters-open .scroll-top{
 
 .preorder-box-title{
     font-weight:700;
-    color:#b45309;
+    color:var(--accent-ink);
     margin-bottom:8px;
 }
 
@@ -6950,7 +6968,7 @@ body.mobile-filters-open .scroll-top{
 }
 
 .brand-teaser-text{
-    color:var(--accent);
+    color:var(--accent-ink);
     font-weight:600;
     font-size:15px;
     line-height:1.5;
@@ -10696,7 +10714,7 @@ body.mobile-filters-open .scroll-top{
 
 .order-status-processing{
     background:rgba(245,158,11,.12);
-    color:#b45309;
+    color:var(--accent-ink);
 }
 
 .order-status-shipped{
@@ -10723,7 +10741,7 @@ body.mobile-filters-open .scroll-top{
    повернення це не збій, а нормальний хід подій. */
 .order-status-returned{
     background:rgba(245,158,11,.14);
-    color:#b45309;
+    color:var(--accent-ink);
 }
 
 .order-card-items{
@@ -14577,7 +14595,7 @@ summary:focus-visible,
 .order-item-refuse-left{
     margin-left:8px;
     font-size:12.5px;
-    color:#b45309;
+    color:var(--accent-ink);
 }
 
 /* «Відмову надіслано» і «замовлення скасовано» — два різні факти, але
