@@ -28,6 +28,39 @@ const check = (name, condition, extra) => {
 
 const read = file => fs.readFileSync(path.join(ROOT, file), "utf8");
 
+// ЧЕКАТИ НА ОЗНАКУ, А НЕ НА ГОДИННИК.
+//
+// Нижче набір ганяє справжній contact-buttons.js у JSDOM із підміненим
+// fetch і після кожної дії чекав фіксовані 60–80 мс, поки модуль
+// відреагує. На вільній машині цього вистачало, під навантаженням —
+// ні: 19.10.2026 набір провалився в повному прогоні («❌ Провалено: 1»)
+// і пройшов, коли його запустили окремо. Галочок при цьому було на
+// одну менше — тобто перевірка не знайшла поломки, а просто спитала
+// раніше, ніж модуль устиг відповісти.
+//
+// Найгірший різновид червоного: воно нічого не каже про код і
+// привчає перезапускати тести замість того, щоб їм вірити.
+//
+// Тепер чекаємо на саму ознаку, яку наступна перевірка й питає.
+// Межа лишається — якщо ознака не настала, перевірка впаде так само,
+// як падала б, тільки після справжнього очікування, а не після
+// вгаданих 80 мс.
+async function доки(window, умова, межа = 3000, крок = 10) {
+
+    const кінець = Date.now() + межа;
+
+    while (Date.now() < кінець) {
+
+        if (умова()) return true;
+
+        await new Promise(r => window.setTimeout(r, крок));
+
+    }
+
+    return умова();
+
+}
+
 function loadModule(rel, names) {
 
     const src = read(rel)
@@ -1123,8 +1156,9 @@ console.log("\n[14] Повернувся на сайт — побачив, що 
 
     window.eval(МОДУЛЬ);
 
-    // Даємо обіцянці доїхати.
-    await new Promise(r => window.setTimeout(r, 60));
+    // Чекаємо, поки модуль зробить своє перше опитування, — саме про
+    // нього питає наступна перевірка.
+    await доки(window, () => запити.length >= 1);
 
     const d = window.document;
     const кнопка = d.getElementById("dockChat");
@@ -1174,7 +1208,7 @@ console.log("\n[14] Повернувся на сайт — побачив, що 
 
     // Друге опитування вже з seen:true — тепер побачене справді
     // побачене.
-    await new Promise(r => window.setTimeout(r, 60));
+    await доки(window, () => запити.length >= 2);
 
     const останнє = запити[запити.length - 1];
 
@@ -1208,7 +1242,7 @@ console.log("\n[14] Повернувся на сайт — побачив, що 
     кнопка.dispatchEvent(new window.Event("click", { bubbles: true }));   // згорнули
     кнопка.dispatchEvent(new window.Event("click", { bubbles: true }));   // відкрили → опитування
 
-    await new Promise(r => window.setTimeout(r, 80));
+    await доки(window, () => нот > 0);
 
     check("на нову відповідь власника звук є", нот > 0, `нот: ${нот}`);
 
@@ -1221,7 +1255,7 @@ console.log("\n[14] Повернувся на сайт — побачив, що 
     кнопка.dispatchEvent(new window.Event("click", { bubbles: true }));
     кнопка.dispatchEvent(new window.Event("click", { bubbles: true }));
 
-    await new Promise(r => window.setTimeout(r, 80));
+    await new Promise(r => window.setTimeout(r, 250));
 
     check("на вже показане повідомлення звуку немає",
         нот === булоНот, `${булоНот} → ${нот}`);
@@ -1272,7 +1306,7 @@ console.log("\n[14] Повернувся на сайт — побачив, що 
 
     d.dispatchEvent(new window.Event("visibilitychange"));
 
-    await new Promise(r => window.setTimeout(r, 80));
+    await доки(window, () => кнопка.getAttribute("aria-expanded") === "true");
 
     check("панель відкрилась сама",
         кнопка.getAttribute("aria-expanded") === "true",
@@ -1308,7 +1342,7 @@ console.log("\n[14] Повернувся на сайт — побачив, що 
     d.getElementById("chatForm").dispatchEvent(
         new window.Event("submit", { bubbles: true, cancelable: true }));
 
-    await new Promise(r => window.setTimeout(r, 80));
+    await доки(window, () => кружечок.hidden === true);
 
     check("відповіла — кружечок зник",
         кружечок.hidden === true,
@@ -1339,7 +1373,7 @@ console.log("\n[14] Повернувся на сайт — побачив, що 
 
     d.dispatchEvent(new window.Event("visibilitychange"));
 
-    await new Promise(r => window.setTimeout(r, 80));
+    await доки(window, () => d.getElementById("chatLog").querySelectorAll(".chat-msg").length === 0);
 
     check("стрічка спорожніла",
         d.getElementById("chatLog").querySelectorAll(".chat-msg").length === 0,
@@ -1376,7 +1410,7 @@ console.log("\n[14] Повернувся на сайт — побачив, що 
     d.getElementById("chatForm").dispatchEvent(
         new window.Event("submit", { bubbles: true, cancelable: true }));
 
-    await new Promise(r => window.setTimeout(r, 80));
+    await доки(window, () => window.localStorage.getItem("bb4u_chat_thread") === ТОКЕН);
 
     check("після очищення нове повідомлення починає нову розмову",
         window.localStorage.getItem("bb4u_chat_thread") === ТОКЕН,
@@ -1409,7 +1443,7 @@ console.log("\n[14] Повернувся на сайт — побачив, що 
     d.getElementById("dockChat").dispatchEvent(new window.Event("click", { bubbles: true })); // закрили
     d.getElementById("dockChat").dispatchEvent(new window.Event("click", { bubbles: true })); // відкрили → опитування
 
-    await new Promise(r => window.setTimeout(r, 80));
+    await доки(window, () => Boolean(d.querySelector(".chat-msg-system")));
 
     const форма = d.getElementById("chatForm");
     const кнопкаНова = d.getElementById("chatAgain");
@@ -1449,7 +1483,7 @@ console.log("\n[14] Повернувся на сайт — побачив, що 
     // не те, що ми колись викликали зупинку.
     кнопка.dispatchEvent(new window.Event("click", { bubbles: true }));
 
-    await new Promise(r => window.setTimeout(r, 60));
+    await new Promise(r => window.setTimeout(r, 250));
 
     check("відкриття завершеної розмови не заводить опитування знову",
         живі.size === 0, `живих таймерів: ${живі.size}`);
@@ -1493,12 +1527,12 @@ console.log("\n[14] Повернувся на сайт — побачив, що 
         // Це і перевіряємо — саме так воно відбувається в житті.
         if (кнопка.getAttribute("aria-expanded") === "true") {
             кнопка.dispatchEvent(new window.Event("click", { bubbles: true }));
-            await new Promise(r => window.setTimeout(r, 40));
+            await доки(window, () => кнопка.getAttribute("aria-expanded") !== "true");
         }
 
         кнопка.dispatchEvent(new window.Event("click", { bubbles: true }));
 
-        await new Promise(r => window.setTimeout(r, 120));
+        await доки(window, () => форма.hidden === false);
 
         check("поле вводу повернулось", форма.hidden === false,
             `hidden=${форма.hidden}`);
