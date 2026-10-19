@@ -404,5 +404,19 @@
     "from": "assets/images/banners/search-women.webp",
     "archivedAt": "2026-10-19",
     "unusedSince": "2026-10-19"
+  },
+  {
+    "file": "1am.png",
+    "originalName": "1am.png",
+    "from": "assets/images/banners/1am.png",
+    "archivedAt": "2026-10-19",
+    "unusedSince": "2026-10-19"
+  },
+  {
+    "file": "mob009.png",
+    "originalName": "mob009.png",
+    "from": "assets/images/banners/mob009.png",
+    "archivedAt": "2026-10-19",
+    "unusedSince": "2026-10-19"
   }
 ]
