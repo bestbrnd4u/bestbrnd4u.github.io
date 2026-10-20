@@ -370,6 +370,44 @@ function escapeHtml(value) {
 // Тому «%25» перед двома шістнадцятковими цифрами повертаємо назад:
 // це був справжній %XX, а не відсоток у тексті. Те саме правило й
 // тією самою причиною — в absolute() у build-feed.js.
+// Чи має це фото зменшені копії — і як вони звуться.
+//
+// Перелік той самий, що читає браузер (data/image-variants.json):
+// другий його примірник рано чи пізно розійшовся б із першим, і
+// статична галерея просила б копії, яких немає. Повертаємо null, коли
+// копій немає — таке буває у фото, доданого через адмінку вже після
+// останнього прогону normalize-product-images.js.
+const VARIANTS_FILE = path.join(ROOT, "data", "image-variants.json");
+
+let variantNames = null;
+
+function variantBase(src) {
+
+    if (!variantNames) {
+        try {
+            variantNames = new Set(JSON.parse(safe.readFileSync(VARIANTS_FILE, "utf8")));
+        } catch (e) {
+            variantNames = new Set();
+            console.log("   ::warning::переліку зменшених копій немає — галерея піде повнорозмірними фото");
+        }
+    }
+
+    const [pathPart, query] = String(src || "").split("?");
+
+    // Копії роблять лише з .webp (див. VARIANT_FORMATS у
+    // normalize-product-images.js). Для іншого розширення
+    // «відрізання .webp» дало б безглузду адресу.
+    if (!pathPart.endsWith(".webp")) return null;
+
+    if (!variantNames.has(pathPart.split("/").pop())) return null;
+
+    return {
+        base: pathPart.slice(0, -".webp".length),
+        v: query ? `?${query}` : ""
+    };
+
+}
+
 function absoluteUrl(url) {
 
     if (!url) return "";
@@ -670,18 +708,76 @@ function buildBody(product) {
         ? `<span class="old-price">${escapeHtml(formatPrice(product.oldPrice))}</span>`
         : "";
 
+    // Адреси З ВЕРСІЄЮ беремо з варіантів товару.
+    //
+    // У даних те саме фото лежить двічі: product.images — без версії,
+    // product.variants[].images — із ?v=<хеш> (його проставляє
+    // build-products.js, і лише варіантам). Галерея, яку малює
+    // product.js, бере саме варіанти. Поки тут стояла адреса без
+    // версії, браузер вважав це ДРУГИМ файлом і качав ті самі
+    // байти вдруге.
+    const версіяФото = new Map();
+
+    (product.variants || []).forEach(variant => {
+        ((variant && variant.images) || []).forEach(src => {
+            версіяФото.set(String(src).split("?")[0], String(src));
+        });
+    });
+
     const gallery = (product.images || []).slice(0, 5).map((img, i) => {
 
         const frame = ImageFraming.frameStyleAttr(product.framing, img);
+        const стиль = frame ? `\n                    style="${escapeHtml(frame)}"` : "";
+        const alt = `${escapeHtml(product.title)}${i ? ` — фото ${i + 1}` : ""}`;
+        // Перше фото — LCP-картинка статичної сторінки, воно не lazy.
+        const loading = i ? "lazy" : "eager";
 
-        return `
+        const повне = версіяФото.get(String(img).split("?")[0]) || img;
+        const копії = variantBase(повне);
+
+        if (!копії) {
+
+            return `
                 <img
-                    src="${escapeHtml(absoluteUrl(img))}"${frame ? `
-                    style="${escapeHtml(frame)}"` : ""}
-                    alt="${escapeHtml(product.title)}${i ? ` — фото ${i + 1}` : ""}"
+                    src="${escapeHtml(absoluteUrl(повне))}"${стиль}
+                    alt="${alt}"
                     width="600"
                     height="600"
-                    loading="${i ? "lazy" : "eager"}">`;
+                    loading="${loading}">`;
+
+        }
+
+        // ЦЕЙ БЛОК ПОКАЗУЄ КВАДРАТИ 140×140 — А ТЯГНУВ ПОВНОРОЗМІРНІ.
+        //
+        // Заміряно на проді 20.10.2026, сторінка товару Armani
+        // Exchange, перший візит: чотири знімки по 74-167 КБ, разом
+        // 418 КБ — і рівно стільки ж іще раз, бо JS-галерея просила
+        // ті самі файли з версією. Показувались при цьому копії по
+        // 600px на 2-20 КБ.
+        //
+        // Копії -300/-600 лежать поруч іще з нормалізації
+        // (scripts/normalize-product-images.js), їх перелік — у
+        // data/image-variants.json, і саме їх підставляє
+        // applyImageVariants у ui.js. Тобто тут вони й потрібні:
+        // браузер візьме ту саму копію, яку за мить попросить JS, і
+        // другого завантаження не буде взагалі.
+        //
+        // sizes називає справжній розмір квадрата (140px у
+        // .product-static-gallery img), тож навіть на retina
+        // вистачає копії 300w.
+        const u = s => escapeHtml(absoluteUrl(s));
+
+        return `
+                <picture>
+                    <source type="image/avif" srcset="${u(копії.base + "-300.avif" + копії.v)} 300w, ${u(копії.base + "-600.avif" + копії.v)} 600w" sizes="140px">
+                    <source type="image/webp" srcset="${u(копії.base + "-300.webp" + копії.v)} 300w, ${u(копії.base + "-600.webp" + копії.v)} 600w" sizes="140px">
+                    <img
+                        src="${u(копії.base + "-300.webp" + копії.v)}"${стиль}
+                        alt="${alt}"
+                        width="600"
+                        height="600"
+                        loading="${loading}">
+                </picture>`;
 
     }).join("");
 
