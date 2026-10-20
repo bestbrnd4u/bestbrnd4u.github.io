@@ -727,7 +727,8 @@ function buildBody(product) {
     const gallery = (product.images || []).slice(0, 5).map((img, i) => {
 
         const frame = ImageFraming.frameStyleAttr(product.framing, img);
-        const стиль = frame ? `\n                    style="${escapeHtml(frame)}"` : "";
+        // Відступ різний: у <picture> теги на рівень глибші.
+        const стиль = відступ => frame ? `\n${відступ}style="${escapeHtml(frame)}"` : "";
         const alt = `${escapeHtml(product.title)}${i ? ` — фото ${i + 1}` : ""}`;
         // Перше фото — LCP-картинка статичної сторінки, воно не lazy.
         const loading = i ? "lazy" : "eager";
@@ -739,7 +740,7 @@ function buildBody(product) {
 
             return `
                 <img
-                    src="${escapeHtml(absoluteUrl(повне))}"${стиль}
+                    src="${escapeHtml(absoluteUrl(повне))}"${стиль("                    ")}
                     alt="${alt}"
                     width="600"
                     height="600"
@@ -772,7 +773,7 @@ function buildBody(product) {
                     <source type="image/avif" srcset="${u(копії.base + "-300.avif" + копії.v)} 300w, ${u(копії.base + "-600.avif" + копії.v)} 600w" sizes="140px">
                     <source type="image/webp" srcset="${u(копії.base + "-300.webp" + копії.v)} 300w, ${u(копії.base + "-600.webp" + копії.v)} 600w" sizes="140px">
                     <img
-                        src="${u(копії.base + "-300.webp" + копії.v)}"${стиль}
+                        src="${u(копії.base + "-300.webp" + копії.v)}"${стиль("                        ")}
                         alt="${alt}"
                         width="600"
                         height="600"
