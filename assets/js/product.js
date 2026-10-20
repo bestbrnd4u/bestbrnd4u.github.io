@@ -766,12 +766,53 @@ function galleryFrameStyle(src) {
 // framing поточного товару; проставляється при рендері сторінки
 let currentFraming = null;
 
+// ЗМЕНШЕНІ КОПІЇ — ЩОБ СЛАЙД НЕ ТЯГНУВ ПОВНОРОЗМІРНИЙ ЗНІМОК.
+//
+// У <img> спершу спрацьовує src, і лише потім ui.js дописує srcset із
+// копіями. На теплому кеші він устигає раніше за браузер, на холодному
+// — ні, і тоді з мережі їде повний знімок, якого ніхто не побачить.
+// Заміряно на dev 20.10.2026, сторінка Armani Crossbody, перший візит:
+// 245 КБ повнорозмірних при 18 КБ показаних копій.
+//
+// ЧОМУ НЕ ЧЕКАЄМО НА ПЕРЕЛІК. buildTrackMarkup і buildThumbsMarkup
+// синхронні й кличуться з двох місць; робити їх асинхронними — це
+// переписувати обидва шляхи рендера заради дрібниці. Тому читаємо
+// перелік одразу при завантаженні скрипта, а в розмітку підставляємо
+// копію ЛИШЕ якщо він уже приїхав. Не приїхав — ставимо оригінал,
+// тобто рівно те, що було досі; srcset від ui.js усе одно допрацює.
+// Тож новий спосіб зламатись тут не зʼявляється: найгірше, що буде, —
+// сьогоднішня поведінка.
+let знаніКопії = new Set();
+
+fetch(dataUrl("data/image-variants.json"))
+    .then(response => (response.ok ? response.json() : []))
+    .then(list => { знаніКопії = new Set(Array.isArray(list) ? list : []); })
+    .catch(() => { /* лишаємось з оригіналами — так само, як було */ });
+
+// Адреса копії потрібної ширини, якщо вона існує.
+//
+// Копії роблять лише з .webp (VARIANT_FORMATS у
+// scripts/normalize-product-images.js), тому для решти розширень
+// повертаємо адресу як є — інакше «відрізання .webp» дало б
+// посилання в нікуди.
+function копіяФото(src, ширина) {
+
+    const [шлях, запит] = String(src || "").split("?");
+
+    if (!шлях.endsWith(".webp")) return src;
+
+    if (!знаніКопії.has(шлях.split("/").pop())) return src;
+
+    return `${шлях.slice(0, -".webp".length)}-${ширина}.webp${запит ? `?${запит}` : ""}`;
+
+}
+
 function buildThumbsMarkup(images, video, altText) {
 
     const imageThumbs = images.map((img, index) => `
         <div class="thumb ${index === 0 ? "active" : ""}">
             <img
-                src="${img}"
+                src="${копіяФото(img, 300)}"
                 style="${galleryFrameStyle(img)}"
                 data-variant-src="${img}"
                 data-variant-sizes="100px"
@@ -845,7 +886,7 @@ function buildTrackMarkup(images, video, altText) {
              role="button"
              tabindex="${index === 0 ? "0" : "-1"}"
              aria-label="Фото ${index + 1} з ${images.length}. Натисніть, щоб відкрити на весь екран">
-            <img class="gallery-photo" src="${img}" style="${galleryFrameStyle(img)}" data-variant-src="${img}" data-variant-sizes="(max-width: 900px) 100vw, 600px" alt="${altText}" draggable="false" onerror="this.onerror=null;this.src='assets/images/no-image.png'">
+            <img class="gallery-photo" src="${копіяФото(img, 600)}" style="${galleryFrameStyle(img)}" data-variant-src="${img}" data-variant-sizes="(max-width: 900px) 100vw, 600px" alt="${altText}" draggable="false" onerror="this.onerror=null;this.src='assets/images/no-image.png'">
         </div>
     `).join("");
 
