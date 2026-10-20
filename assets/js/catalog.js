@@ -409,43 +409,22 @@ function addMissingSizeGroups(categoryDepartments) {
 
 }
 
-// завантажує дерево категорій з адмінки (data/categories.json,
-// зібраного зі списку окремих файлів data/categories/*.json)
-// і групує його за розділами — у форматі, який очікують
-// fillCategories() та applyCategoryDataToSizeGroups()
-async function loadCategoryDepartments() {
-
-    try {
-
-        const response = await fetch(dataUrl("data/categories.json"));
-
-        if (!response.ok) return [];
-
-        const categories = await response.json();
-
-        const byDepartment = new Map();
-
-        categories.forEach(category => {
-
-            if (!byDepartment.has(category.department)) {
-                byDepartment.set(category.department, { title: category.department, categories: [] });
-            }
-
-            byDepartment.get(category.department).categories.push(category.name);
-
-        });
-
-        return [...byDepartment.values()];
-
-    } catch (error) {
-
-        console.warn("Не вдалося завантажити категорії:", error);
-
-        return [];
-
-    }
-
-}
+// Дерево категорій тут більше НЕ ЗАВАНТАЖУЄТЬСЯ ОКРЕМО.
+//
+// Тут лежала власна копія loadCategoryTree() з common.js — та сама
+// вибірка з data/categories.json і те саме групування за розділами,
+// слово в слово, тільки без кешу. Дві однакові реалізації одного
+// правила розходяться рано чи пізно, а помітити це важко: обидві
+// повертають масив, просто з часом різний.
+//
+// Заміряно на проді 20.10.2026: сторінка каталогу просила
+// categories.json ДВІЧІ (о 1175 і о 1258 мс) — ось цією копією і
+// кешованою версією з common.js. Байтів це майже не коштувало
+// (другий запит ішов із кеша), але робота дублювалась.
+//
+// loadCategoryTree() живе в common.js, бо потрібна ще й сторінці
+// товару для таблиці розмірів, куди catalog.js не підключений. Вона
+// кешує обіцянку, тож повторний виклик безкоштовний.
 
 function matchesSizeKey(product, key) {
 
@@ -864,15 +843,42 @@ async function initCatalog() {
         // погашеними.
         document.body.classList.add("catalog-loading");
 
-        // Каталог і живий залишок — одночасно, а не одне за одним.
+        // УСЕ, ЩО ПОТРІБНО ДЛЯ ПЕРШОГО ПОКАЗУ, — ОДНОЧАСНО.
         //
-        // Запит до бази зазвичай швидший за 326 КБ каталогу, тож
-        // очікування на нього нічого не додає. Якщо ж база не
-        // відповість за 1,2 с, модуль сам повернеться ні з чим і
-        // каталог покажеться з наявністю зі збірки — як було досі.
-        const [catalogData, live] = await Promise.all([
+        // Каталог і живий залишок їхали паралельно вже давно, а от три
+        // довідники — категорії, бренди й групи розмірів — лишались
+        // трьома `await` поспіль нижче. Вони ні від каталогу, ні від
+        // складу не залежать, але стояли в черзі за ними.
+        //
+        // ЗАМІРЯНО НА ПРОДІ 20.10.2026, телефон 375px, перший візит:
+        //
+        //     catalog.json + image-variants   паралельно, кінець  793 мс
+        //     запит до Supabase (наявність)                      1167 мс
+        //     categories.json   старт 1175 — через 8 мс після Supabase
+        //     brands.json       старт 1359 — через 3 мс після categories
+        //     size-groups.json  старт 1536 — через 2 мс після brands
+        //
+        // Тобто три файли по 2-6 КБ додавали ~500 мс чистого чекання, і
+        // товари зʼявлялись не раніше 1,7 с. Розриви в 2-8 мс — підпис
+        // послідовного коду: кожен наступний запит стартував рівно
+        // тоді, коли завершився попередній.
+        //
+        // Тепер вони завантажуються ПІД ЧАС очікування бази й із
+        // критичного шляху зникають.
+        //
+        // Додавати їх сюди безпечно, бо жоден не відхиляється:
+        // loadCategoryTree і loadBrands мають try/catch,
+        // loadSizeGroups — .catch(() => FALLBACK_SIZE_GROUPS). Інакше
+        // збій мережі на довіднику ронив би весь каталог.
+        //
+        // Якщо база не відповість за 1,2 с, модуль сам повернеться ні з
+        // чим і каталог покажеться з наявністю зі збірки — як було.
+        const [catalogData, live, categoryDepartments, , sizeGroupsRaw] = await Promise.all([
             loadCatalog(),
-            window.LiveStock ? window.LiveStock.load() : Promise.resolve(null)
+            window.LiveStock ? window.LiveStock.load() : Promise.resolve(null),
+            loadCategoryTree(),
+            loadBrands(),
+            loadSizeGroups()
         ]);
 
         // Кожен колір — окрема картка. Сама функція живе в common.js:
@@ -895,14 +901,12 @@ async function initCatalog() {
         // будь-якого фільтрування чи розкладки фільтрів.
         resolveUrlTokens();
 
-        const categoryDepartments = await loadCategoryDepartments();
-
-        // Логотипи, банери й описи брендів. Потрібні заголовку
-        // сторінки, тож мають бути тут — до renderBreadcrumbsAndTitle().
-        await loadBrands();
-
-        // групи розмірів з адмінки — до побудови фільтра «Розмір»
-        SIZE_GROUPS = (await loadSizeGroups()).map(group => ({ ...group }));
+        // Категорії, бренди й групи розмірів уже приїхали — вони в
+        // Promise.all вище. Логотипи й описи брендів потрібні
+        // заголовку сторінки, тобто до renderBreadcrumbsAndTitle();
+        // групи розмірів — до побудови фільтра «Розмір». Обидва
+        // моменти нижче за цей рядок, тож порядок збережено.
+        SIZE_GROUPS = sizeGroupsRaw.map(group => ({ ...group }));
 
         applyCategoryDataToSizeGroups(categoryDepartments);
 

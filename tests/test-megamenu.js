@@ -40,6 +40,11 @@ async function build() {
     ok:true,
     json: () => Promise.resolve(String(url).includes("categories") ? CATEGORIES : PRODUCTS)
   });
+  // Категорії mega-menu.js бере спільною функцією з common.js — як і
+  // escapeHtml та getProductGenders вище. Тест виконує сам модуль,
+  // без common.js, тож залежність треба підставити; інакше він падає
+  // на «loadCategoriesRaw is not defined» і меню не будується зовсім.
+  window.loadCategoriesRaw = () => Promise.resolve(CATEGORIES);
   installBrowserStubs(window);
   window.eval(fs.readFileSync(ROOT + "/assets/js/mega-menu.js", "utf8"));
   await new Promise(r => setTimeout(r, 60));
@@ -161,6 +166,10 @@ console.log("\n[5] Стійкість: помилка мережі не лама
   window.escapeHtml = v => String(v);
   window.getProductGenders = p => Array.isArray(p?.gender) ? p.gender.filter(Boolean) : (p?.gender ? [p.gender] : []);
   window.fetch = () => Promise.reject(new Error("offline"));
+  // Справжній loadCategoriesRaw має .catch(() => []), тобто при
+  // збої мережі повертає порожній список, а не відхиляється. Саме це
+  // й відтворюємо — інакше перевірялась би неможлива ситуація.
+  window.loadCategoriesRaw = () => Promise.resolve([]);
   window.eval(fs.readFileSync(ROOT + "/assets/js/mega-menu.js", "utf8"));
   await new Promise(r => setTimeout(r, 60));
   const menu = window.document.querySelector(".has-mega .mega-menu");
@@ -182,6 +191,7 @@ console.log("\n[6] XSS у назві категорії");
     [{ title:"X", brand:"B", gender:"Жінкам", price:1,
        category:`Сумки"><img src=x onerror="window.__pwned=true">` }]
   )});
+  window.loadCategoriesRaw = () => Promise.resolve([]);
   // ЦЬОГО РЯДКА ТУТ БРАКУВАЛО, і перевірка була порожньою: без
   // заглушок mega-menu.js падав на «dataUrl is not defined», меню не
   // будувалось узагалі — тобто «жодного живого <img>» виконувалось
@@ -216,6 +226,14 @@ console.log("\n[7] Каталог не змагається за мережу і
     fetched.push(String(url));
     return Promise.resolve({ ok:true, json: () => Promise.resolve(
       String(url).includes("categories") ? CATEGORIES : PRODUCTS) });
+  };
+
+  // Виклик спільного завантажувача рахуємо так само, як запит: інакше
+  // перевірка «жодного запиту» проходила б просто тому, що категорії
+  // тепер беруться не через window.fetch.
+  window.loadCategoriesRaw = () => {
+    fetched.push("data/categories.json");
+    return Promise.resolve(CATEGORIES);
   };
 
   // Браузер, який ще НЕ звільнився: вільної миті не буде.

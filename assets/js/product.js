@@ -532,22 +532,23 @@ async function loadDepartmentMap() {
 
     if (departmentByCategory) return departmentByCategory;
 
-    departmentByCategory = new Map();
-
+    // Той самий довідник, що й loadDepartmentOf() у common.js — тому
+    // беремо його, а не читаємо файл удруге.
+    //
+    // Тут був власний fetch того самого data/categories.json, і на
+    // сторінці товару виходило два запити одного файлу: цей і той, що
+    // робить дерево розділів для таблиці розмірів. Прибрано
+    // 20.10.2026 разом із такою ж копією в catalog.js.
+    //
+    // Обидві версії будували ту саму пару «категорія → розділ» і
+    // мовчки відкидали рядки без назви чи відділу — ця поведінка
+    // збережена: дерево в common.js групує лише за department, а
+    // категорії без назви в нього не потрапляють.
     try {
-
-        const response = await fetch(dataUrl("data/categories.json"));
-
-        if (response.ok) {
-            (await response.json()).forEach(row => {
-                if (row && row.name && row.department) departmentByCategory.set(row.name, row.department);
-            });
-        }
-
+        departmentByCategory = await loadDepartmentOf();
     } catch (error) {
-
         // без переліку категорій ланка відділу просто не зʼявиться
-
+        departmentByCategory = new Map();
     }
 
     return departmentByCategory;

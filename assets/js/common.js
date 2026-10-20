@@ -4123,14 +4123,42 @@ const FALLBACK_SIZE_GROUPS = [
 // розмірів, задана через «Розділ каталогу», знала свої категорії.
 // Живе саме тут (а не в catalog.js), бо потрібно ще й на сторінці
 // товару для таблиці розмірів — catalog.js там не підключений.
+// ОДИН ЗАПИТ НА data/categories.json ДЛЯ ВСЬОГО САЙТУ.
+//
+// Цей файл читали пʼятьма різними способами: дерево розділів тут,
+// його дослівна копія в catalog.js, довідник «категорія → розділ»
+// нижче, порядок пунктів у mega-menu.js і ще один довідник у
+// product.js. Кожен — своїм fetch.
+//
+// Заміряно на проді 20.10.2026: сторінка каталогу просила файл ДВІЧІ
+// (о 1175 і о 1258 мс), сторінка товару — теж двічі. Байтів це майже
+// не коштувало (повторні запити йшли з кеша), але однакове правило,
+// розписане в кількох місцях, рано чи пізно розходиться — а помітити
+// це важко, бо всі повертають щось схоже на правду.
+//
+// Тому сире читання тепер одне, а всі проєкції будуються з нього.
+let categoriesRawPromise = null;
+
+function loadCategoriesRaw() {
+
+    if (categoriesRawPromise) return categoriesRawPromise;
+
+    categoriesRawPromise = fetch(dataUrl("data/categories.json"))
+        .then(response => response.ok ? response.json() : [])
+        .then(list => Array.isArray(list) ? list : [])
+        .catch(() => []);
+
+    return categoriesRawPromise;
+
+}
+
 let categoryTreePromise = null;
 
 function loadCategoryTree() {
 
     if (categoryTreePromise) return categoryTreePromise;
 
-    categoryTreePromise = fetch(dataUrl("data/categories.json"))
-        .then(response => response.ok ? response.json() : [])
+    categoryTreePromise = loadCategoriesRaw()
         .then(categories => {
 
             const byDepartment = new Map();
@@ -5415,11 +5443,29 @@ function loadDepartmentOf() {
 
     if (departmentOfCache) return departmentOfCache;
 
-    departmentOfCache = fetch(dataUrl("data/categories.json"))
-        .then(response => response.ok ? response.json() : [])
-        .then(list => new Map((Array.isArray(list) ? list : [])
-            .filter(item => item && item.name)
-            .map(item => [item.name, item.department])))
+    // БУДУЄТЬСЯ З ДЕРЕВА, А НЕ З ВЛАСНОГО ЗАПИТУ.
+    //
+    // Тут був третій за ліком fetch того самого
+    // data/categories.json — після loadCategoryTree() нижче й копії в
+    // catalog.js (прибрана 20.10.2026). Три запити одного файлу за
+    // показ сторінки.
+    //
+    // Дерево дає рівно те, що потрібно: у кожної групи є title
+    // (розділ) і categories (імена). Порядок обходу той самий, що й у
+    // вихідному списку, тож за збігу імен виграє останній — як і
+    // раніше, коли Map будувалась просто з масиву.
+    departmentOfCache = loadCategoryTree()
+        .then(tree => {
+
+            const map = new Map();
+
+            (Array.isArray(tree) ? tree : []).forEach(group => {
+                (group.categories || []).forEach(name => map.set(name, group.title));
+            });
+
+            return map;
+
+        })
         .catch(() => new Map());
 
     return departmentOfCache;

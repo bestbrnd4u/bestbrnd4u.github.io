@@ -178,9 +178,25 @@ console.log("\n[3] Каталог бренду");
         /<div class="brand-hero" id="brandHero" hidden><\/div>/.test(catalogHtml)
         && /<div class="brand-about" id="brandAbout" hidden><\/div>/.test(catalogHtml));
 
-    check("бренди вантажаться до побудови заголовка",
-        catalogJs.indexOf("await loadBrands();") > 0
-        && catalogJs.indexOf("await loadBrands();") < catalogJs.indexOf("renderBreadcrumbsAndTitle();"));
+    // БРЕНДИ МУСЯТЬ БУТИ ЗАВАНТАЖЕНІ ДО ЗАГОЛОВКА.
+    //
+    // Тут стояло дослівне «await loadBrands();» — і перевірка впала
+    // 20.10.2026, коли виклик переїхав у спільний Promise.all разом із
+    // каталогом і складом (окремим рядком він стояв у черзі й додавав
+    // ~175 мс до появи товарів). Вимога при цьому не змінилась, тому
+    // питаємо саме її, та ще й строгіше: виклик мусить бути ВСЕРЕДИНІ
+    // дочеканого Promise.all, а сам той блок — вище за заголовок.
+    const блок = catalogJs.match(/await Promise\.all\(\[([\s\S]*?)\]\);/);
+
+    check("є дочеканий Promise.all", Boolean(блок));
+
+    check("бренди вантажаться в ньому",
+        Boolean(блок) && /loadBrands\(\)/.test(блок[1]),
+        блок ? блок[1].replace(/\s+/g, " ").slice(0, 90) : "");
+
+    check("і цей блок стоїть до побудови заголовка",
+        Boolean(блок)
+        && catalogJs.indexOf(блок[0]) < catalogJs.indexOf("renderBreadcrumbsAndTitle();"));
 
     check("сторінка бренду — це РІВНО один обраний бренд",
         /selectedBrands\.size === 1 \? \[\.\.\.selectedBrands\]\[0\] : ""/.test(catalogJs));

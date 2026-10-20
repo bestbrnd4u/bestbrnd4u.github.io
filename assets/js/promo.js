@@ -45,9 +45,13 @@ async function initPromoPage() {
         const [promoRes, products, categoryDepartments, departmentOf] = await Promise.all([
             fetch(dataUrl("data/promotions.json")),
             loadCatalog(),
-            loadCategoryDepartments(),
+            // Дерево розділів: було loadCategoryDepartments() із
+            // catalog.js — власна копія цієї ж функції без кешу.
+            // Копію прибрано 20.10.2026, лишилась одна, у common.js.
+            loadCategoryTree(),
             // «категорія → розділ»: щоб розгорнути розділ, указаний в
-            // автопідхопленні акції, у перелік його категорій
+            // автопідхопленні акції, у перелік його категорій.
+            // Будується з того самого дерева, без окремого запиту.
             loadDepartmentOf()
         ]);
 

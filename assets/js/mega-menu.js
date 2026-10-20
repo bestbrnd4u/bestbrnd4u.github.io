@@ -324,14 +324,15 @@ function setupMegaKeyboard(items) {
         // Товари беремо зі спільного кешу, а не своїм fetch: на
         // сторінці товару той самий список уже вантажать «схожі» та
         // «переглянуті». Два запити на один файл нічого не додавали.
-        const [categoriesRes, products] = await Promise.all([
-            fetch(dataUrl("data/categories.json")),
+        // Категорії — теж зі спільного кешу (loadCategoriesRaw у
+        // common.js), а не своїм fetch: той самий файл на сторінці
+        // просять іще дерево розділів і довідник «категорія →
+        // розділ». Потрібен саме СИРИЙ список — мегаменю бере з нього
+        // порядковий номер пункту, а дерево його втрачає.
+        const [categories, products] = await Promise.all([
+            loadCategoriesRaw(),
             getAllProductsCached()
         ]);
-
-        if (!categoriesRes.ok) return;
-
-        const categories = await categoriesRes.json();
 
         if (!Array.isArray(products) || products.length === 0) return;
 

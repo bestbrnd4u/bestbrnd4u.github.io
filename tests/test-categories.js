@@ -176,5 +176,64 @@ console.log("\n[4] XSS: зловмисна назва категорії не в
     check("код не виконався", window.__pwned === false);
 }
 
+console.log("\n[5] data/categories.json читається з одного місця");
+{
+    // ЩО ЦЕ ЗАКРИВАЄ
+    // ---------------
+    // Той самий файл читали пʼятьма окремими fetch: дерево розділів у
+    // common.js, його ДОСЛІВНА КОПІЯ в catalog.js, довідник
+    // «категорія → розділ» там же, порядок пунктів у mega-menu.js і
+    // ще один довідник у product.js.
+    //
+    // Заміряно на проді 20.10.2026: сторінка каталогу просила файл
+    // двічі (о 1175 і о 1258 мс), сторінка товару — теж двічі.
+    // Байтів це майже не коштувало (повторні йшли з кеша), але
+    // однакове правило в кількох місцях розходиться рано чи пізно, і
+    // помітити це важко: усі копії повертають щось схоже на правду.
+    //
+    // Тому перевіряємо не кількість запитів у мережі, а причину:
+    // скільки місць у коді взагалі вміють читати цей файл.
+    const JS = path.join(ROOT, "assets/js");
+
+    const читають = fs.readdirSync(JS)
+        .filter(f => f.endsWith(".js"))
+        .filter(f => /dataUrl\("data\/categories\.json"\)/
+            .test(fs.readFileSync(path.join(JS, f), "utf8")
+                .replace(/\/\*[\s\S]*?\*\//g, "")));
+
+    check(`файл читає рівно один модуль (${читають.join(", ") || "жоден"})`,
+        читають.length === 1, читають.join(", "));
+
+    check("і це common.js — він підключений до кожної сторінки",
+        читають[0] === "common.js", читають[0]);
+
+    // Проєкції будуються з того самого читання, а не кожна своїм.
+    const common = fs.readFileSync(path.join(JS, "common.js"), "utf8");
+
+    check("дерево розділів будується з нього",
+        /categoryTreePromise = loadCategoriesRaw\(\)/.test(common));
+
+    check("довідник «категорія → розділ» — теж",
+        /departmentOfCache = loadCategoryTree\(\)/.test(common));
+
+    // Споживачі в інших файлах беруть готове.
+    const споживачі = {
+        "catalog.js": /loadCategoryTree\(\)/,
+        "promo.js": /loadCategoryTree\(\)/,
+        "mega-menu.js": /loadCategoriesRaw\(\)/,
+        "product.js": /loadDepartmentOf\(\)/
+    };
+
+    const безСпільного = Object.entries(споживачі)
+        .filter(([файл, вираз]) => {
+            const повний = path.join(JS, файл);
+            return fs.existsSync(повний) && !вираз.test(fs.readFileSync(повний, "utf8"));
+        })
+        .map(([файл]) => файл);
+
+    check("усі споживачі беруть готове зі спільного модуля",
+        безСпільного.length === 0, безСпільного.join(", "));
+}
+
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
 process.exit(failures === 0 ? 0 : 1);
