@@ -667,6 +667,64 @@ function createProductCard(product, eager) {
 
 let imageVariants = null;
 
+// ПЕРЕЛІК, ЯКИЙ МОЖНА ПРОЧИТАТИ СИНХРОННО.
+//
+// loadImageVariants() повертає обіцянку, а розмітку карток будують
+// синхронно — тож питати в обіцянки нічого. Тримаємо дзеркало.
+//
+// Наповнюється з двох боків: сторінка товару несе свій перелік у
+// window.PHOTO_VARIANTS (вона малює галерею миттєво, не чекаючи на
+// мережу), решта сторінок дочитує data/image-variants.json. Обидва
+// ДОПОВНЮЮТЬ один набір — присвоєння стирало б те, що вже відомо.
+// Дозаповнює його loadImageVariants() — усередині себе, а не тут.
+//
+// Виклик на рівні модуля запускав би fetch щойно файл виконано, а
+// кілька наборів виконують ui.js у Node, де fetch немає: девʼять із
+// них одразу впали з ReferenceError. Лінивість тут нічого не
+// коштує — loadImageVariants() кличе applyImageVariants() на
+// DOMContentLoaded, тобто задовго до того, як намалюються картки
+// (заміряно: перелік о 713 мс, картки о 1687 мс).
+const знаніКопії = new Set(
+    Array.isArray(window.PHOTO_VARIANTS) ? window.PHOTO_VARIANTS : []);
+
+// Адреса зменшеної копії — або вихідна, якщо копій немає.
+//
+// НАВІЩО ЦЕ ПОТРІБНО В РОЗМІТЦІ, А НЕ ЛИШЕ В srcset. Картка з
+// loading="eager" починає тягнути src ТОЇ Ж МИТІ, коли потрапляє в
+// DOM, — раніше, ніж applyImageVariants() встигне дописати srcset
+// (вона асинхронна). Заміряно на dev 20.10.2026, каталог: перелік
+// копій приїхав на 713 мс, картки намалювались на 1687 мс, і все
+// одно чотири верхні картки забрали 413 КБ повнорозмірних — рівно
+// ті чотири, що eager. Решта 28 — lazy, і вони встигали.
+//
+// Копії роблять лише з .webp (VARIANT_FORMATS у
+// scripts/normalize-product-images.js), тож для іншого розширення
+// повертаємо адресу як є — «відрізання .webp» дало б посилання
+// в нікуди.
+function копіяФото(src, ширина) {
+
+    const [шлях, запит] = String(src || "").split("?");
+
+    if (!шлях.endsWith(".webp")) return src;
+
+    if (!знаніКопії.has(шлях.split("/").pop())) return src;
+
+    return `${шлях.slice(0, -".webp".length)}-${ширина}.webp${запит ? `?${запит}` : ""}`;
+
+}
+
+// Назовні — щоб common.js (зміна кольору в картці) і product.js
+// (галерея товару) не заводили другий такий самий перелік і другий
+// такий самий спосіб його читати. Два переліки рано чи пізно
+// розійшлися б, і розбіжність була б видима лише як зайві байти.
+window.ImageCopies = {
+    копія: копіяФото,
+    має: src => {
+        const шлях = String(src || "").split("?")[0];
+        return шлях.endsWith(".webp") && знаніКопії.has(шлях.split("/").pop());
+    }
+};
+
 function loadImageVariants() {
 
     if (imageVariants) return imageVariants;
@@ -674,6 +732,13 @@ function loadImageVariants() {
     imageVariants = fetch(dataUrl("data/image-variants.json"))
         .then(r => r.ok ? r.json() : [])
         .then(list => new Set(Array.isArray(list) ? list : []))
+        .then(набір => {
+            // Дозаповнюємо синхронне дзеркало — ДОДАЄМО, а не
+            // присвоюємо: сторінка товару вже поклала туди свій
+            // перелік, і присвоєння стерло б його.
+            набір.forEach(ім => знаніКопії.add(ім));
+            return набір;
+        })
         .catch(() => new Set());
 
     return imageVariants;
@@ -899,7 +964,7 @@ function cardPhotoSlide(product, img, eager) {
         <div class="photo-slide photo-slide-photo">
             <img
                 class="product-main-image"
-                src="${img}"
+                src="${копіяФото(img, 600)}"
                 style="${cardFrameStyle(product && product.framing, img)}"
                 data-variant-src="${img}"
                 data-variant-sizes="(max-width: 768px) 50vw, (max-width: 1300px) 300px, 400px"
