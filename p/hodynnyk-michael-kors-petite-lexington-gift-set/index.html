@@ -176,6 +176,15 @@ window.PRODUCT_TAXONOMY = {"category":{"Годинники":"categories/hodynnyk
 // — вбудовані, а не довантажені: рядок «єдиний екземпляр»
 // стоїть високо, і запізнілий текст смикав би розмітку
 window.PRODUCT_TEXTS = {"onlyOneTitle":"Єдиний екземпляр.","onlyOneWithDays":"Якщо його купують, наступний веземо {строк}.","onlyOneWithoutDays":"Другого такого в наявності немає.","deliveryDate":"Орієнтовно у відділенні {дата}","handlingMin":1,"handlingMax":2,"transitMin":1,"transitMax":3};
+// у яких фото цього товару є зменшені копії.
+//
+// ЧОМУ ТУТ, А НЕ ЗАПИТОМ. Галерею product.js малює МИТТЄВО з
+// PRODUCT_DATA вище — не чекаючи на жодну мережу. Поки перелік
+// копій тягнувся окремим файлом, він не встигав, і в src
+// ставився повнорозмірний знімок: заміряно на dev 20.10.2026,
+// 764 КБ повнорозмірних при 31 КБ показаних копій. Тут це
+// кілька рядків і жодного запиту.
+window.PHOTO_VARIANTS = ["michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set.webp","michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_2.webp","michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_3.webp","michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_5.webp"];
 </script>
 
 
@@ -194,7 +203,7 @@ window.PRODUCT_TEXTS = {"onlyOneTitle":"Єдиний екземпляр.","onlyO
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=e0ee4b4c">
+<link rel="stylesheet" href="/assets/css/style.css?v=4bfd0f01">
 
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3" defer></script>
@@ -314,30 +323,46 @@ BestBrnd4u
     </p>
 
     <div class="product-static-gallery">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set.webp"
-                    alt="Годинник Michael Kors Petite Lexington Gift Set"
-                    width="600"
-                    height="600"
-                    loading="eager">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_2.webp"
-                    alt="Годинник Michael Kors Petite Lexington Gift Set — фото 2"
-                    width="600"
-                    height="600"
-                    loading="lazy">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_3.webp"
-                    alt="Годинник Michael Kors Petite Lexington Gift Set — фото 3"
-                    width="600"
-                    height="600"
-                    loading="lazy">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_5.webp"
-                    alt="Годинник Michael Kors Petite Lexington Gift Set — фото 4"
-                    width="600"
-                    height="600"
-                    loading="lazy">
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set-300.avif?v=f1753b73 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set-600.avif?v=f1753b73 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set-300.webp?v=f1753b73 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set-600.webp?v=f1753b73 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set-300.webp?v=f1753b73"
+                        alt="Годинник Michael Kors Petite Lexington Gift Set"
+                        width="600"
+                        height="600"
+                        loading="eager">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_2-300.avif?v=6336850b 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_2-600.avif?v=6336850b 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_2-300.webp?v=6336850b 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_2-600.webp?v=6336850b 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_2-300.webp?v=6336850b"
+                        alt="Годинник Michael Kors Petite Lexington Gift Set — фото 2"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_3-300.avif?v=5b54a7fa 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_3-600.avif?v=5b54a7fa 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_3-300.webp?v=5b54a7fa 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_3-600.webp?v=5b54a7fa 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_3-300.webp?v=5b54a7fa"
+                        alt="Годинник Michael Kors Petite Lexington Gift Set — фото 3"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_5-300.avif?v=92e15cad 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_5-600.avif?v=92e15cad 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_5-300.webp?v=92e15cad 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_5-600.webp?v=92e15cad 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_5-300.webp?v=92e15cad"
+                        alt="Годинник Michael Kors Petite Lexington Gift Set — фото 4"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
     </div>
 
     <p class="product-static-desc">Елегантний подарунковий набір Michael Kors Petite Lexington — стильний аксесуар для повсякденних та особливих образів. Вишуканий дизайн годинника поєднує класичний циферблат, тонкий корпус та фірмову естетику Michael Kors.
@@ -838,7 +863,7 @@ BestBrnd4u
 <script src="/assets/js/lightbox.js?v=a8cfdeb0" defer></script>
 
 <script src="/assets/js/live-stock.js?v=ca9027dd" defer></script>
-<script src="/assets/js/product.js?v=68c3f32d" defer></script>
+<script src="/assets/js/product.js?v=0ea54bfa" defer></script>
 
 <!-- Відгуки: показ, форма й перевірка покупки на сервері -->
 <script src="/assets/js/reviews.js?v=905c3ee8" defer></script>

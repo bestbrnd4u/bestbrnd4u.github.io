@@ -179,6 +179,15 @@ window.PRODUCT_TAXONOMY = {"category":{"Жіночі сумки":"categories/zhi
 // — вбудовані, а не довантажені: рядок «єдиний екземпляр»
 // стоїть високо, і запізнілий текст смикав би розмітку
 window.PRODUCT_TEXTS = {"onlyOneTitle":"Єдиний екземпляр.","onlyOneWithDays":"Якщо його купують, наступний веземо {строк}.","onlyOneWithoutDays":"Другого такого в наявності немає.","deliveryDate":"Орієнтовно у відділенні {дата}","handlingMin":1,"handlingMax":2,"transitMin":1,"transitMax":3};
+// у яких фото цього товару є зменшені копії.
+//
+// ЧОМУ ТУТ, А НЕ ЗАПИТОМ. Галерею product.js малює МИТТЄВО з
+// PRODUCT_DATA вище — не чекаючи на жодну мережу. Поки перелік
+// копій тягнувся окремим файлом, він не встигав, і в src
+// ставився повнорозмірний знімок: заміряно на dev 20.10.2026,
+// 764 КБ повнорозмірних при 31 КБ показаних копій. Тут це
+// кілька рядків і жодного запиту.
+window.PHOTO_VARIANTS = ["ch857_b4ha_a0.webp","ch857_b4ha_a3.webp","ch857_b4ha_a8.webp","ch857_b4ha_a21.webp","ch857_b4ha_a99.webp","ch857_b4ha_a61.webp","ch857_b4ha_a92.webp","ch857_b4bk_a0.webp","ch857_b4bk_a3.webp","ch857_b4bk_a8.webp","ch857_b4bk_a61.webp","ch857_b4bk_a92.webp","ch857_b4yu1_a0.webp","ch857_b4yu1_a3.webp","ch857_b4yu1_a8.webp","ch857_b4mpl_a0.webp","ch857_b4mpl_a5.webp","ch857_b4mpl_a6.webp","ch857_b4mpl_a62.webp","ch857_b4mpl_a92.webp"];
 </script>
 
 
@@ -197,7 +206,7 @@ window.PRODUCT_TEXTS = {"onlyOneTitle":"Єдиний екземпляр.","onlyO
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=e0ee4b4c">
+<link rel="stylesheet" href="/assets/css/style.css?v=4bfd0f01">
 
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3" defer></script>
@@ -317,38 +326,58 @@ BestBrnd4u
     </p>
 
     <div class="product-static-gallery">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/ch857_b4ha_a0.webp"
-                    alt="Жіноча сумочка Coach Tabby Shoulder Bag 26"
-                    width="600"
-                    height="600"
-                    loading="eager">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/ch857_b4ha_a3.webp"
-                    style="--frame-zoom:1.93;--frame-x:48%;--frame-y:56%"
-                    alt="Жіноча сумочка Coach Tabby Shoulder Bag 26 — фото 2"
-                    width="600"
-                    height="600"
-                    loading="lazy">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/ch857_b4ha_a8.webp"
-                    style="--frame-zoom:1.43;--frame-x:48%;--frame-y:51%"
-                    alt="Жіноча сумочка Coach Tabby Shoulder Bag 26 — фото 3"
-                    width="600"
-                    height="600"
-                    loading="lazy">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/ch857_b4ha_a21.webp"
-                    alt="Жіноча сумочка Coach Tabby Shoulder Bag 26 — фото 4"
-                    width="600"
-                    height="600"
-                    loading="lazy">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/ch857_b4ha_a99.webp"
-                    alt="Жіноча сумочка Coach Tabby Shoulder Bag 26 — фото 5"
-                    width="600"
-                    height="600"
-                    loading="lazy">
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/ch857_b4ha_a0-300.avif?v=324626b3 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/ch857_b4ha_a0-600.avif?v=324626b3 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/ch857_b4ha_a0-300.webp?v=324626b3 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/ch857_b4ha_a0-600.webp?v=324626b3 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/ch857_b4ha_a0-300.webp?v=324626b3"
+                        alt="Жіноча сумочка Coach Tabby Shoulder Bag 26"
+                        width="600"
+                        height="600"
+                        loading="eager">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/ch857_b4ha_a3-300.avif?v=fb102755 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/ch857_b4ha_a3-600.avif?v=fb102755 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/ch857_b4ha_a3-300.webp?v=fb102755 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/ch857_b4ha_a3-600.webp?v=fb102755 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/ch857_b4ha_a3-300.webp?v=fb102755"
+                        style="--frame-zoom:1.93;--frame-x:48%;--frame-y:56%"
+                        alt="Жіноча сумочка Coach Tabby Shoulder Bag 26 — фото 2"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/ch857_b4ha_a8-300.avif?v=cb1e130b 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/ch857_b4ha_a8-600.avif?v=cb1e130b 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/ch857_b4ha_a8-300.webp?v=cb1e130b 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/ch857_b4ha_a8-600.webp?v=cb1e130b 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/ch857_b4ha_a8-300.webp?v=cb1e130b"
+                        style="--frame-zoom:1.43;--frame-x:48%;--frame-y:51%"
+                        alt="Жіноча сумочка Coach Tabby Shoulder Bag 26 — фото 3"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/ch857_b4ha_a21-300.avif?v=f173d1bb 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/ch857_b4ha_a21-600.avif?v=f173d1bb 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/ch857_b4ha_a21-300.webp?v=f173d1bb 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/ch857_b4ha_a21-600.webp?v=f173d1bb 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/ch857_b4ha_a21-300.webp?v=f173d1bb"
+                        alt="Жіноча сумочка Coach Tabby Shoulder Bag 26 — фото 4"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/ch857_b4ha_a99-300.avif?v=547773ef 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/ch857_b4ha_a99-600.avif?v=547773ef 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/ch857_b4ha_a99-300.webp?v=547773ef 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/ch857_b4ha_a99-600.webp?v=547773ef 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/ch857_b4ha_a99-300.webp?v=547773ef"
+                        alt="Жіноча сумочка Coach Tabby Shoulder Bag 26 — фото 5"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
     </div>
 
     <p class="product-static-desc">Структурована сумка Coach Tabby 26 — культова модель бренду з впізнаваною фірмовою застібкою Signature. Компактна, але містка, доповнена двома знімними ремінцями: коротким для носіння на плечі та довгим для носіння через плече.
@@ -848,7 +877,7 @@ BestBrnd4u
 <script src="/assets/js/lightbox.js?v=a8cfdeb0" defer></script>
 
 <script src="/assets/js/live-stock.js?v=ca9027dd" defer></script>
-<script src="/assets/js/product.js?v=68c3f32d" defer></script>
+<script src="/assets/js/product.js?v=0ea54bfa" defer></script>
 
 <!-- Відгуки: показ, форма й перевірка покупки на сервері -->
 <script src="/assets/js/reviews.js?v=905c3ee8" defer></script>

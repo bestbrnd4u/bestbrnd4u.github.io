@@ -178,6 +178,15 @@ window.PRODUCT_TAXONOMY = {"category":{"Жіночі сумки":"categories/zhi
 // — вбудовані, а не довантажені: рядок «єдиний екземпляр»
 // стоїть високо, і запізнілий текст смикав би розмітку
 window.PRODUCT_TEXTS = {"onlyOneTitle":"Єдиний екземпляр.","onlyOneWithDays":"Якщо його купують, наступний веземо {строк}.","onlyOneWithoutDays":"Другого такого в наявності немає.","deliveryDate":"Орієнтовно у відділенні {дата}","handlingMin":1,"handlingMax":2,"transitMin":1,"transitMax":3};
+// у яких фото цього товару є зменшені копії.
+//
+// ЧОМУ ТУТ, А НЕ ЗАПИТОМ. Галерею product.js малює МИТТЄВО з
+// PRODUCT_DATA вище — не чекаючи на жодну мережу. Поки перелік
+// копій тягнувся окремим файлом, він не встигав, і в src
+// ставився повнорозмірний знімок: заміряно на dev 20.10.2026,
+// 764 КБ повнорозмірних при 31 КБ показаних копій. Тут це
+// кілька рядків і жодного запиту.
+window.PHOTO_VARIANTS = ["marc-jacobs-the-leather-cargo-bag-black--2013c7eb.webp","marc-jacobs-the-leather-cargo-bag-black--3eeb5b5d.webp","marc-jacobs-the-leather-cargo-bag-black--e6d79062.webp","marc-jacobs-the-leather-cargo-bag-black--8fc5eccc.webp","marc-jacobs-the-leather-cargo-bag-black--20634337.webp","marc-jacobs-the-leather-cargo-bag-black--3bae4de6.webp"];
 </script>
 
 
@@ -196,7 +205,7 @@ window.PRODUCT_TEXTS = {"onlyOneTitle":"Єдиний екземпляр.","onlyO
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=e0ee4b4c">
+<link rel="stylesheet" href="/assets/css/style.css?v=4bfd0f01">
 
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3" defer></script>
@@ -316,36 +325,56 @@ BestBrnd4u
     </p>
 
     <div class="product-static-gallery">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--2013c7eb.webp"
-                    alt="Сумка Marc Jacobs The Leather Cargo Bag Black"
-                    width="600"
-                    height="600"
-                    loading="eager">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--3eeb5b5d.webp"
-                    alt="Сумка Marc Jacobs The Leather Cargo Bag Black — фото 2"
-                    width="600"
-                    height="600"
-                    loading="lazy">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--e6d79062.webp"
-                    alt="Сумка Marc Jacobs The Leather Cargo Bag Black — фото 3"
-                    width="600"
-                    height="600"
-                    loading="lazy">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--8fc5eccc.webp"
-                    alt="Сумка Marc Jacobs The Leather Cargo Bag Black — фото 4"
-                    width="600"
-                    height="600"
-                    loading="lazy">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--20634337.webp"
-                    alt="Сумка Marc Jacobs The Leather Cargo Bag Black — фото 5"
-                    width="600"
-                    height="600"
-                    loading="lazy">
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--2013c7eb-300.avif?v=4203793d 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--2013c7eb-600.avif?v=4203793d 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--2013c7eb-300.webp?v=4203793d 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--2013c7eb-600.webp?v=4203793d 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--2013c7eb-300.webp?v=4203793d"
+                        alt="Сумка Marc Jacobs The Leather Cargo Bag Black"
+                        width="600"
+                        height="600"
+                        loading="eager">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--3eeb5b5d-300.avif?v=c2e397cc 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--3eeb5b5d-600.avif?v=c2e397cc 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--3eeb5b5d-300.webp?v=c2e397cc 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--3eeb5b5d-600.webp?v=c2e397cc 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--3eeb5b5d-300.webp?v=c2e397cc"
+                        alt="Сумка Marc Jacobs The Leather Cargo Bag Black — фото 2"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--e6d79062-300.avif?v=c525bf4a 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--e6d79062-600.avif?v=c525bf4a 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--e6d79062-300.webp?v=c525bf4a 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--e6d79062-600.webp?v=c525bf4a 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--e6d79062-300.webp?v=c525bf4a"
+                        alt="Сумка Marc Jacobs The Leather Cargo Bag Black — фото 3"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--8fc5eccc-300.avif?v=dedf561c 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--8fc5eccc-600.avif?v=dedf561c 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--8fc5eccc-300.webp?v=dedf561c 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--8fc5eccc-600.webp?v=dedf561c 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--8fc5eccc-300.webp?v=dedf561c"
+                        alt="Сумка Marc Jacobs The Leather Cargo Bag Black — фото 4"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--20634337-300.avif?v=8955f01f 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--20634337-600.avif?v=8955f01f 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--20634337-300.webp?v=8955f01f 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--20634337-600.webp?v=8955f01f 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/marc-jacobs-the-leather-cargo-bag-black--20634337-300.webp?v=8955f01f"
+                        alt="Сумка Marc Jacobs The Leather Cargo Bag Black — фото 5"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
     </div>
 
     <p class="product-static-desc">Стильна та функціональна сумка Marc Jacobs The Leather Cargo Bag у класичному чорному кольорі. Модель поєднує лаконічний дизайн із практичною конструкцією cargo та великою кількістю функціональних кишень.
@@ -846,7 +875,7 @@ BestBrnd4u
 <script src="/assets/js/lightbox.js?v=a8cfdeb0" defer></script>
 
 <script src="/assets/js/live-stock.js?v=ca9027dd" defer></script>
-<script src="/assets/js/product.js?v=68c3f32d" defer></script>
+<script src="/assets/js/product.js?v=0ea54bfa" defer></script>
 
 <!-- Відгуки: показ, форма й перевірка покупки на сервері -->
 <script src="/assets/js/reviews.js?v=905c3ee8" defer></script>

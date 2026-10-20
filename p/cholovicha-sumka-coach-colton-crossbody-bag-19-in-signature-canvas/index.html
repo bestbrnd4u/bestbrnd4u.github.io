@@ -175,6 +175,15 @@ window.PRODUCT_TAXONOMY = {"category":{"Чоловічі сумки":"categories
 // — вбудовані, а не довантажені: рядок «єдиний екземпляр»
 // стоїть високо, і запізнілий текст смикав би розмітку
 window.PRODUCT_TEXTS = {"onlyOneTitle":"Єдиний екземпляр.","onlyOneWithDays":"Якщо його купують, наступний веземо {строк}.","onlyOneWithoutDays":"Другого такого в наявності немає.","deliveryDate":"Орієнтовно у відділенні {дата}","handlingMin":1,"handlingMax":2,"transitMin":1,"transitMax":3};
+// у яких фото цього товару є зменшені копії.
+//
+// ЧОМУ ТУТ, А НЕ ЗАПИТОМ. Галерею product.js малює МИТТЄВО з
+// PRODUCT_DATA вище — не чекаючи на жодну мережу. Поки перелік
+// копій тягнувся окремим файлом, він не встигав, і в src
+// ставився повнорозмірний знімок: заміряно на dev 20.10.2026,
+// 764 КБ повнорозмірних при 31 КБ показаних копій. Тут це
+// кілька рядків і жодного запиту.
+window.PHOTO_VARIANTS = ["cet66_svsmu_a0.webp","cet66_svsmu_a3.webp","cet66_svsmu_a8.webp","cet66_svsmu_a91.webp","cet55_mwnq6_a0.webp","cet55_mwnq6_a3.webp","cet55_mwnq6_a8.webp","cet55_mwnq6_a91.webp","cet55_mwoy2_a0.webp","cet55_mwoy2_a3.webp","cet55_mwoy2_a8.webp","cet55_mwoy2_a91.webp","cet66_svbk_a0.webp","cet66_svbk_a3.webp","cet66_svbk_a8.webp","cet66_svbk_a91.webp","cet66_svmpl_a0.webp","cet66_svmpl_a3.webp","cet66_svmpl_a8.webp","cet66_svmpl_a91.webp"];
 </script>
 
 
@@ -193,7 +202,7 @@ window.PRODUCT_TEXTS = {"onlyOneTitle":"Єдиний екземпляр.","onlyO
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=e0ee4b4c">
+<link rel="stylesheet" href="/assets/css/style.css?v=4bfd0f01">
 
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3" defer></script>
@@ -313,33 +322,49 @@ BestBrnd4u
     </p>
 
     <div class="product-static-gallery">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/cet66_svsmu_a0.webp"
-                    style="--frame-zoom:1.4;--frame-x:48%;--frame-y:68%"
-                    alt="Чоловіча сумка COACH Colton Crossbody Bag 19 In Signature Canvas"
-                    width="600"
-                    height="600"
-                    loading="eager">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/cet66_svsmu_a3.webp"
-                    style="--frame-zoom:1.51;--frame-x:48%;--frame-y:68%"
-                    alt="Чоловіча сумка COACH Colton Crossbody Bag 19 In Signature Canvas — фото 2"
-                    width="600"
-                    height="600"
-                    loading="lazy">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/cet66_svsmu_a8.webp"
-                    style="--frame-zoom:1.49;--frame-x:48%;--frame-y:50%"
-                    alt="Чоловіча сумка COACH Colton Crossbody Bag 19 In Signature Canvas — фото 3"
-                    width="600"
-                    height="600"
-                    loading="lazy">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/cet66_svsmu_a91.webp"
-                    alt="Чоловіча сумка COACH Colton Crossbody Bag 19 In Signature Canvas — фото 4"
-                    width="600"
-                    height="600"
-                    loading="lazy">
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/cet66_svsmu_a0-300.avif?v=29b17eac 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/cet66_svsmu_a0-600.avif?v=29b17eac 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/cet66_svsmu_a0-300.webp?v=29b17eac 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/cet66_svsmu_a0-600.webp?v=29b17eac 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/cet66_svsmu_a0-300.webp?v=29b17eac"
+                        style="--frame-zoom:1.4;--frame-x:48%;--frame-y:68%"
+                        alt="Чоловіча сумка COACH Colton Crossbody Bag 19 In Signature Canvas"
+                        width="600"
+                        height="600"
+                        loading="eager">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/cet66_svsmu_a3-300.avif?v=cd4aea44 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/cet66_svsmu_a3-600.avif?v=cd4aea44 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/cet66_svsmu_a3-300.webp?v=cd4aea44 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/cet66_svsmu_a3-600.webp?v=cd4aea44 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/cet66_svsmu_a3-300.webp?v=cd4aea44"
+                        style="--frame-zoom:1.51;--frame-x:48%;--frame-y:68%"
+                        alt="Чоловіча сумка COACH Colton Crossbody Bag 19 In Signature Canvas — фото 2"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/cet66_svsmu_a8-300.avif?v=a0e36c15 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/cet66_svsmu_a8-600.avif?v=a0e36c15 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/cet66_svsmu_a8-300.webp?v=a0e36c15 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/cet66_svsmu_a8-600.webp?v=a0e36c15 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/cet66_svsmu_a8-300.webp?v=a0e36c15"
+                        style="--frame-zoom:1.49;--frame-x:48%;--frame-y:50%"
+                        alt="Чоловіча сумка COACH Colton Crossbody Bag 19 In Signature Canvas — фото 3"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/cet66_svsmu_a91-300.avif?v=92b0296e 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/cet66_svsmu_a91-600.avif?v=92b0296e 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/cet66_svsmu_a91-300.webp?v=92b0296e 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/cet66_svsmu_a91-600.webp?v=92b0296e 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/cet66_svsmu_a91-300.webp?v=92b0296e"
+                        alt="Чоловіча сумка COACH Colton Crossbody Bag 19 In Signature Canvas — фото 4"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
     </div>
 
     <p class="product-static-desc">Компактна та практична сумка COACH Colton Crossbody Bag 19 — чудовий варіант для повсякденного використання. Модель виготовлена з високоякісної зернистої шкіри та має лаконічний дизайн із металевою фурнітурою сріблястого кольору.
@@ -839,7 +864,7 @@ BestBrnd4u
 <script src="/assets/js/lightbox.js?v=a8cfdeb0" defer></script>
 
 <script src="/assets/js/live-stock.js?v=ca9027dd" defer></script>
-<script src="/assets/js/product.js?v=68c3f32d" defer></script>
+<script src="/assets/js/product.js?v=0ea54bfa" defer></script>
 
 <!-- Відгуки: показ, форма й перевірка покупки на сервері -->
 <script src="/assets/js/reviews.js?v=905c3ee8" defer></script>

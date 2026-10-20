@@ -175,6 +175,15 @@ window.PRODUCT_TAXONOMY = {"category":{"Гаманці":"categories/hamantsi/"},
 // — вбудовані, а не довантажені: рядок «єдиний екземпляр»
 // стоїть високо, і запізнілий текст смикав би розмітку
 window.PRODUCT_TEXTS = {"onlyOneTitle":"Єдиний екземпляр.","onlyOneWithDays":"Якщо його купують, наступний веземо {строк}.","onlyOneWithoutDays":"Другого такого в наявності немає.","deliveryDate":"Орієнтовно у відділенні {дата}","handlingMin":1,"handlingMax":2,"transitMin":1,"transitMax":3};
+// у яких фото цього товару є зменшені копії.
+//
+// ЧОМУ ТУТ, А НЕ ЗАПИТОМ. Галерею product.js малює МИТТЄВО з
+// PRODUCT_DATA вище — не чекаючи на жодну мережу. Поки перелік
+// копій тягнувся окремим файлом, він не встигав, і в src
+// ставився повнорозмірний знімок: заміряно на dev 20.10.2026,
+// 764 КБ повнорозмірних при 31 КБ показаних копій. Тут це
+// кілька рядків і жодного запиту.
+window.PHOTO_VARIANTS = ["s150l03fa22-223_1.webp","f540b0f9-f29c-31d6-8bdf-03912d1cc134.webp","s150l03fa22-223_3.webp"];
 </script>
 
 
@@ -193,7 +202,7 @@ window.PRODUCT_TEXTS = {"onlyOneTitle":"Єдиний екземпляр.","onlyO
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=e0ee4b4c">
+<link rel="stylesheet" href="/assets/css/style.css?v=4bfd0f01">
 
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3" defer></script>
@@ -313,25 +322,37 @@ BestBrnd4u
     </p>
 
     <div class="product-static-gallery">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/s150l03fa22-223_1.webp"
-                    style="--frame-zoom:1.53;--frame-x:51%;--frame-y:52%"
-                    alt="Гаманець Marc Jacobs The Zip Around Wallet"
-                    width="600"
-                    height="600"
-                    loading="eager">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/f540b0f9-f29c-31d6-8bdf-03912d1cc134.webp"
-                    alt="Гаманець Marc Jacobs The Zip Around Wallet — фото 2"
-                    width="600"
-                    height="600"
-                    loading="lazy">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/s150l03fa22-223_3.webp"
-                    alt="Гаманець Marc Jacobs The Zip Around Wallet — фото 3"
-                    width="600"
-                    height="600"
-                    loading="lazy">
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/s150l03fa22-223_1-300.avif?v=6d037762 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/s150l03fa22-223_1-600.avif?v=6d037762 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/s150l03fa22-223_1-300.webp?v=6d037762 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/s150l03fa22-223_1-600.webp?v=6d037762 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/s150l03fa22-223_1-300.webp?v=6d037762"
+                        style="--frame-zoom:1.53;--frame-x:51%;--frame-y:52%"
+                        alt="Гаманець Marc Jacobs The Zip Around Wallet"
+                        width="600"
+                        height="600"
+                        loading="eager">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/f540b0f9-f29c-31d6-8bdf-03912d1cc134-300.avif?v=2da01531 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/f540b0f9-f29c-31d6-8bdf-03912d1cc134-600.avif?v=2da01531 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/f540b0f9-f29c-31d6-8bdf-03912d1cc134-300.webp?v=2da01531 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/f540b0f9-f29c-31d6-8bdf-03912d1cc134-600.webp?v=2da01531 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/f540b0f9-f29c-31d6-8bdf-03912d1cc134-300.webp?v=2da01531"
+                        alt="Гаманець Marc Jacobs The Zip Around Wallet — фото 2"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/s150l03fa22-223_3-300.avif?v=7068c0a9 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/s150l03fa22-223_3-600.avif?v=7068c0a9 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/s150l03fa22-223_3-300.webp?v=7068c0a9 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/s150l03fa22-223_3-600.webp?v=7068c0a9 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/s150l03fa22-223_3-300.webp?v=7068c0a9"
+                        alt="Гаманець Marc Jacobs The Zip Around Wallet — фото 3"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
     </div>
 
     <p class="product-static-desc">Компактний та стильний жіночий гаманець Marc Jacobs The Zip Around Wallet у трендовому кольорі хакі. Практична модель із застібкою на блискавку по периметру забезпечує надійне зберігання карток, купюр та інших необхідних дрібниць.
@@ -831,7 +852,7 @@ BestBrnd4u
 <script src="/assets/js/lightbox.js?v=a8cfdeb0" defer></script>
 
 <script src="/assets/js/live-stock.js?v=ca9027dd" defer></script>
-<script src="/assets/js/product.js?v=68c3f32d" defer></script>
+<script src="/assets/js/product.js?v=0ea54bfa" defer></script>
 
 <!-- Відгуки: показ, форма й перевірка покупки на сервері -->
 <script src="/assets/js/reviews.js?v=905c3ee8" defer></script>

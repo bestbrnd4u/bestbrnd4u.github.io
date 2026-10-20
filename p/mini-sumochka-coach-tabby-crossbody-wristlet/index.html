@@ -178,6 +178,15 @@ window.PRODUCT_TAXONOMY = {"category":{"Жіночі сумки":"categories/zhi
 // — вбудовані, а не довантажені: рядок «єдиний екземпляр»
 // стоїть високо, і запізнілий текст смикав би розмітку
 window.PRODUCT_TEXTS = {"onlyOneTitle":"Єдиний екземпляр.","onlyOneWithDays":"Якщо його купують, наступний веземо {строк}.","onlyOneWithoutDays":"Другого такого в наявності немає.","deliveryDate":"Орієнтовно у відділенні {дата}","handlingMin":1,"handlingMax":2,"transitMin":1,"transitMax":3};
+// у яких фото цього товару є зменшені копії.
+//
+// ЧОМУ ТУТ, А НЕ ЗАПИТОМ. Галерею product.js малює МИТТЄВО з
+// PRODUCT_DATA вище — не чекаючи на жодну мережу. Поки перелік
+// копій тягнувся окремим файлом, він не встигав, і в src
+// ставився повнорозмірний знімок: заміряно на dev 20.10.2026,
+// 764 КБ повнорозмірних при 31 КБ показаних копій. Тут це
+// кілька рядків і жодного запиту.
+window.PHOTO_VARIANTS = ["1117wx1400h-410385199-b4ha-model.webp","1117wx1400h-410385199-b4ha-model3.webp","11a5edba3e0242ac110004.webp","71-zo1liwrl._ac_sy625_.webp","1117wx1400h-410385199-b4ha-model2.webp","1117wx1400h-410385199-b4ha-model4.webp"];
 </script>
 
 
@@ -196,7 +205,7 @@ window.PRODUCT_TEXTS = {"onlyOneTitle":"Єдиний екземпляр.","onlyO
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=e0ee4b4c">
+<link rel="stylesheet" href="/assets/css/style.css?v=4bfd0f01">
 
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3" defer></script>
@@ -316,36 +325,56 @@ BestBrnd4u
     </p>
 
     <div class="product-static-gallery">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model.webp"
-                    alt="Міні сумочка Coach Tabby Crossbody Wristlet"
-                    width="600"
-                    height="600"
-                    loading="eager">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model3.webp"
-                    alt="Міні сумочка Coach Tabby Crossbody Wristlet — фото 2"
-                    width="600"
-                    height="600"
-                    loading="lazy">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/11a5edba3e0242ac110004.webp"
-                    alt="Міні сумочка Coach Tabby Crossbody Wristlet — фото 3"
-                    width="600"
-                    height="600"
-                    loading="lazy">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/71-zo1liwrl._ac_sy625_.webp"
-                    alt="Міні сумочка Coach Tabby Crossbody Wristlet — фото 4"
-                    width="600"
-                    height="600"
-                    loading="lazy">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model2.webp"
-                    alt="Міні сумочка Coach Tabby Crossbody Wristlet — фото 5"
-                    width="600"
-                    height="600"
-                    loading="lazy">
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model-300.avif?v=dacdf3af 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model-600.avif?v=dacdf3af 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model-300.webp?v=dacdf3af 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model-600.webp?v=dacdf3af 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model-300.webp?v=dacdf3af"
+                        alt="Міні сумочка Coach Tabby Crossbody Wristlet"
+                        width="600"
+                        height="600"
+                        loading="eager">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model3-300.avif?v=8ed5eef5 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model3-600.avif?v=8ed5eef5 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model3-300.webp?v=8ed5eef5 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model3-600.webp?v=8ed5eef5 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model3-300.webp?v=8ed5eef5"
+                        alt="Міні сумочка Coach Tabby Crossbody Wristlet — фото 2"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/11a5edba3e0242ac110004-300.avif?v=5444f6b6 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/11a5edba3e0242ac110004-600.avif?v=5444f6b6 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/11a5edba3e0242ac110004-300.webp?v=5444f6b6 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/11a5edba3e0242ac110004-600.webp?v=5444f6b6 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/11a5edba3e0242ac110004-300.webp?v=5444f6b6"
+                        alt="Міні сумочка Coach Tabby Crossbody Wristlet — фото 3"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/71-zo1liwrl._ac_sy625_-300.avif?v=5c1c45c1 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/71-zo1liwrl._ac_sy625_-600.avif?v=5c1c45c1 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/71-zo1liwrl._ac_sy625_-300.webp?v=5c1c45c1 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/71-zo1liwrl._ac_sy625_-600.webp?v=5c1c45c1 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/71-zo1liwrl._ac_sy625_-300.webp?v=5c1c45c1"
+                        alt="Міні сумочка Coach Tabby Crossbody Wristlet — фото 4"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model2-300.avif?v=905065ad 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model2-600.avif?v=905065ad 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model2-300.webp?v=905065ad 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model2-600.webp?v=905065ad 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/1117wx1400h-410385199-b4ha-model2-300.webp?v=905065ad"
+                        alt="Міні сумочка Coach Tabby Crossbody Wristlet — фото 5"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
     </div>
 
     <p class="product-static-desc">Стильна та компактна сумка COACH Tabby Crossbody Wristlet у ніжному відтінку Chalk із золотистою фурнітурою. Модель натхненна архівним дизайном COACH 1970-х років та доповнена фірмовою застібкою Signature.
@@ -846,7 +875,7 @@ BestBrnd4u
 <script src="/assets/js/lightbox.js?v=a8cfdeb0" defer></script>
 
 <script src="/assets/js/live-stock.js?v=ca9027dd" defer></script>
-<script src="/assets/js/product.js?v=68c3f32d" defer></script>
+<script src="/assets/js/product.js?v=0ea54bfa" defer></script>
 
 <!-- Відгуки: показ, форма й перевірка покупки на сервері -->
 <script src="/assets/js/reviews.js?v=905c3ee8" defer></script>

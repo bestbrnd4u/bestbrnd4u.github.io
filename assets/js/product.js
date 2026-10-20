@@ -766,17 +766,117 @@ function galleryFrameStyle(src) {
 // framing поточного товару; проставляється при рендері сторінки
 let currentFraming = null;
 
+// ЗМЕНШЕНІ КОПІЇ — ЩОБ СЛАЙД НЕ ТЯГНУВ ПОВНОРОЗМІРНИЙ ЗНІМОК.
+//
+// У <img> спершу спрацьовує src, і лише потім ui.js дописує srcset із
+// копіями. На теплому кеші він устигає раніше за браузер, на холодному
+// — ні, і тоді з мережі їде повний знімок, якого ніхто не побачить.
+// Заміряно на dev 20.10.2026, сторінка Armani Crossbody, перший візит:
+// 245 КБ повнорозмірних при 18 КБ показаних копій.
+//
+// ЧОМУ НЕ ЧЕКАЄМО НА ПЕРЕЛІК. buildTrackMarkup і buildThumbsMarkup
+// синхронні й кличуться з двох місць; робити їх асинхронними — це
+// переписувати обидва шляхи рендера заради дрібниці. Тому читаємо
+// перелік одразу при завантаженні скрипта, а в розмітку підставляємо
+// копію ЛИШЕ якщо він уже приїхав. Не приїхав — ставимо оригінал,
+// тобто рівно те, що було досі; srcset від ui.js усе одно допрацює.
+// Тож новий спосіб зламатись тут не зʼявляється: найгірше, що буде, —
+// сьогоднішня поведінка.
+// ЗВІДКИ ПЕРЕЛІК. Сторінка товару несе свій, на кілька рядків:
+// window.PHOTO_VARIANTS проставляє build-product-pages.js. Це
+// принципово — галерея малюється МИТТЄВО з window.PRODUCT_DATA, не
+// чекаючи на мережу, тож перелік, який треба спершу завантажити, до
+// першого малювання просто не встигає (заміряно на dev 20.10.2026:
+// 764 КБ повнорозмірних при 31 КБ показаних копій).
+//
+// Запит лишається для сторінок без вбудованого переліку — наприклад
+// старої /product?id=… Він ДОПОВНЮЄ, а не заміщає: інакше відповідь
+// мережі стирала б те, що сторінка вже знала.
+let знаніКопії = new Set(
+    Array.isArray(window.PHOTO_VARIANTS) ? window.PHOTO_VARIANTS : []);
+
+fetch(dataUrl("data/image-variants.json"))
+    .then(response => (response.ok ? response.json() : []))
+    .then(list => {
+        if (Array.isArray(list)) list.forEach(name => знаніКопії.add(name));
+    })
+    .catch(() => { /* лишаємось з тим, що є — так само, як було */ });
+
+// Адреса копії потрібної ширини, якщо вона існує.
+//
+// Копії роблять лише з .webp (VARIANT_FORMATS у
+// scripts/normalize-product-images.js), тому для решти розширень
+// повертаємо адресу як є — інакше «відрізання .webp» дало б
+// посилання в нікуди.
+function копіяФото(src, ширина) {
+
+    const [шлях, запит] = String(src || "").split("?");
+
+    if (!шлях.endsWith(".webp")) return src;
+
+    if (!знаніКопії.has(шлях.split("/").pop())) return src;
+
+    return `${шлях.slice(0, -".webp".length)}-${ширина}.webp${запит ? `?${запит}` : ""}`;
+
+}
+
+// Чи є в цього фото зменшені копії — тим самим правилом, що вище.
+function маєКопії(src) {
+
+    const шлях = String(src || "").split("?")[0];
+
+    return шлях.endsWith(".webp") && знаніКопії.has(шлях.split("/").pop());
+
+}
+
+// <picture> ЗАМІСТЬ ГОЛОГО <img> — ЩОБ ФОРМАТ ОБИРАВ БРАУЗЕР.
+//
+// Поки формат підставляв JS (ui.js дописував srcset після рендеру),
+// браузер устигав узяти webp із src, а потім ще й avif зі srcset —
+// тобто кожне фото їхало двічі. Заміряно на dev 20.10.2026, сторінка
+// Marc Jacobs Leather Tote: webp 59 КБ + avif 55 КБ, хоч показувався
+// лише avif.
+//
+// <source type="image/avif"> вирішує це в розмітці: браузер бере
+// рівно один файл і робить це ДО будь-якого JS.
+//
+// data-full тримає ОРИГІНАЛ — його відкриває лайтбокс. Без нього
+// повноекранний перегляд показував би копію 600px: він бере img.src,
+// а там тепер копія (саме так і сталось після попередньої правки).
+function фотоРозмітка(img, ширина, sizes, клас, решта) {
+
+    const спільне = `${клас ? `class="${клас}" ` : ""}`
+        + `src="${копіяФото(img, ширина)}" `
+        + `data-full="${img}" `
+        + `style="${galleryFrameStyle(img)}" `
+        + `${решта}`;
+
+    if (!маєКопії(img)) {
+
+        // Копій немає — лишаємо шлях, яким ui.js зможе доробити
+        // srcset пізніше, якщо фото нормалізують уже після збірки.
+        return `<img ${спільне} data-variant-src="${img}" data-variant-sizes="${sizes}">`;
+
+    }
+
+    const [шлях, запит] = String(img).split("?");
+    const база = шлях.slice(0, -".webp".length);
+    const v = запит ? `?${запит}` : "";
+
+    return `<picture>`
+        + `<source type="image/avif" srcset="${база}-300.avif${v} 300w, ${база}-600.avif${v} 600w" sizes="${sizes}">`
+        + `<source type="image/webp" srcset="${база}-300.webp${v} 300w, ${база}-600.webp${v} 600w" sizes="${sizes}">`
+        + `<img ${спільне}>`
+        + `</picture>`;
+
+}
+
 function buildThumbsMarkup(images, video, altText) {
 
     const imageThumbs = images.map((img, index) => `
         <div class="thumb ${index === 0 ? "active" : ""}">
-            <img
-                src="${img}"
-                style="${galleryFrameStyle(img)}"
-                data-variant-src="${img}"
-                data-variant-sizes="100px"
-                alt="${altText}"
-                onerror="this.onerror=null;this.src='assets/images/no-image.png'">
+            ${фотоРозмітка(img, 300, "100px", "",
+                `alt="${altText}" onerror="this.onerror=null;this.src='assets/images/no-image.png'"`)}
         </div>
     `).join("");
 
@@ -845,7 +945,8 @@ function buildTrackMarkup(images, video, altText) {
              role="button"
              tabindex="${index === 0 ? "0" : "-1"}"
              aria-label="Фото ${index + 1} з ${images.length}. Натисніть, щоб відкрити на весь екран">
-            <img class="gallery-photo" src="${img}" style="${galleryFrameStyle(img)}" data-variant-src="${img}" data-variant-sizes="(max-width: 900px) 100vw, 600px" alt="${altText}" draggable="false" onerror="this.onerror=null;this.src='assets/images/no-image.png'">
+            ${фотоРозмітка(img, 600, "(max-width: 900px) 100vw, 600px", "gallery-photo",
+                `alt="${altText}" draggable="false" onerror="this.onerror=null;this.src='assets/images/no-image.png'"`)}
         </div>
     `).join("");
 
@@ -2776,7 +2877,19 @@ function setupGallery() {
                     ? slide
                     : slide.querySelector("img");
 
-                return { type: "image", src: photo && photo.src };
+                // ПОВНОЕКРАННИЙ ПЕРЕГЛЯД — ЦЕ ПРО «РОЗДИВИТИСЬ».
+                //
+                // У src тепер копія 600px: саме вона показується на
+                // слайді, і тягнути туди оригінал було б марно. Але
+                // лайтбокс відкривають, щоб роздивитись фактуру й
+                // шви, — там потрібен оригінал, і його тримає
+                // data-full. Без цього рядка зум показував би
+                // розмиту копію (так і сталось після правки, яка
+                // перевела src на копії).
+                return {
+                    type: "image",
+                    src: (photo && (photo.dataset.full || photo.src)) || ""
+                };
 
             }).filter(slide => slide.src);
 

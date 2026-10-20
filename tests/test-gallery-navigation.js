@@ -231,8 +231,34 @@ console.log("\n[N] Масштаб не виходить за межі свого
         /<div class="gallery-slide gallery-slide-photo">/.test(product));
     check("фото всередині має власний клас",
         /<img class="gallery-photo"/.test(product));
+    // КАДР — НА ФОТО, А НЕ НА ОБГОРТЦІ.
+    //
+    // Тут стояв вираз по готовій розмітці
+    // (class="gallery-photo"…style="${galleryFrameStyle"), і він
+    // розсипався, щойно розмітку винесли у функцію фотоРозмітка():
+    // клас став аргументом, а не літералом поруч зі стилем.
+    //
+    // Питання те саме, тому дивимось туди, де тепер живе відповідь:
+    // у тілі будівника стиль мусить стояти в <img> і не мусить — на
+    // <picture>, інакше масштаб кадрування обрізало б не те.
+    const будівник = (product.match(/function фотоРозмітка\([\s\S]*?\n\}/) || [])[0] || "";
+
+    check("будівник розмітки фото знайдено", Boolean(будівник));
+
+    // Стиль мусить бути в наборі атрибутів, який іде ТІЛЬКИ в <img>,
+    // а відкривний <picture> — лишатись без атрибутів.
+    //
+    // Перша версія цієї перевірки питала «чи немає galleryFrameStyle
+    // одразу після <picture>» — і мовчала, коли стиль переносили на
+    // саму обгортку: там зʼявлявся «<picture style=…», тобто вже не
+    // «<picture>», і вираз просто не збігався. Пастка та сама, що й
+    // скрізь: шукати відсутність легко не там.
+    const спільне = (будівник.match(/const спільне = [\s\S]*?;\n/) || [])[0] || "";
+
     check("кадр застосовується до фото, не до обгортки",
-        /class="gallery-photo"[^>]*style="\$\{galleryFrameStyle/.test(product));
+        /style="\$\{galleryFrameStyle\(img\)\}"/.test(спільне)
+        && /`<picture>`/.test(будівник),
+        спільне ? "обгортка з атрибутами або стиль не в <img>" : "набір атрибутів не знайдено");
 
     // Головне: обгортка мусить ОБРІЗАТИ вміст.
     check("обгортка обрізає масштабоване фото",
@@ -265,14 +291,18 @@ console.log("\n[N2] Смуга слайдів — на живому DOM");
 {
     const { JSDOM } = require("jsdom");
 
+    // Розмітка тут така сама, як її будує фотоРозмітка(): фото
+    // обгорнуте в <picture>, у src копія, оригінал — у data-full.
     const dom = new JSDOM(`
         <div class="main-photo"><div class="gallery-track" id="t">
+          <div class="gallery-slide gallery-slide-photo"><picture>
+            <source type="image/avif" srcset="/a/one-600.avif 600w">
+            <img class="gallery-photo" src="/a/one-600.webp" data-full="/a/one.webp" style="--frame-zoom:2.98"></picture></div>
+          <div class="gallery-slide gallery-slide-photo"><picture>
+            <source type="image/avif" srcset="/a/two-600.avif 600w">
+            <img class="gallery-photo" src="/a/two-600.webp" data-full="/a/two.webp" style="--frame-zoom:3"></picture></div>
           <div class="gallery-slide gallery-slide-photo">
-            <img class="gallery-photo" src="/a/one.webp" style="--frame-zoom:2.98"></div>
-          <div class="gallery-slide gallery-slide-photo">
-            <img class="gallery-photo" src="/a/two.webp" style="--frame-zoom:3"></div>
-          <div class="gallery-slide gallery-slide-photo">
-            <img class="gallery-photo" src="/a/three.webp"></div>
+            <img class="gallery-photo" src="/a/three.webp" data-full="/a/three.webp"></div>
         </div></div>`, { pretendToBeVisual: true });
 
     const slides = [...dom.window.document.getElementById("t").children];
@@ -285,16 +315,22 @@ console.log("\n[N2] Смуга слайдів — на живому DOM");
 
         const photo = slide.tagName === "IMG" ? slide : slide.querySelector("img");
 
-        return { type: "image", src: photo && photo.src };
+        return { type: "image", src: (photo && (photo.dataset.full || photo.src)) || "" };
 
     }).filter(x => x.src);
 
     check("усі фото доходять до лайтбокса", lightbox.length === slides.length,
         `${lightbox.length} з ${slides.length}`);
 
-    check("порядок збережено",
+    // ОРИГІНАЛИ, А НЕ КОПІЇ. Якби лайтбокс і далі брав img.src, тут
+    // були б one-600.webp — тобто зум показував би копію 600px.
+    check("порядок збережено, і це оригінали",
         lightbox.map(x => x.src.split("/").pop()).join(",") === "one.webp,two.webp,three.webp",
         lightbox.map(x => x.src.split("/").pop()).join(","));
+
+    // Обгортка не повинна заважати дістатись фото.
+    check("фото знаходиться і крізь <picture>",
+        slides[0].querySelector("img") !== null);
 
     // Кадр живе на зображенні, а не на слайді
     check("масштаб на зображенні",
@@ -363,6 +399,127 @@ console.log("\n[Зум двома пальцями не гортає фото]")
     // не гортання.
     check("лайтбокс: при наближеному фото це перетягування",
         /mode = scale > 1\.02 \? "pan" : null;[\s\S]{0,60}return;/.test(кінець));
+}
+
+console.log("\n[Слайд просить копію, а не повнорозмірний знімок]");
+{
+    // ЩО ЦЕ ЗАКРИВАЄ
+    // ---------------
+    // У <img> спершу спрацьовує src, і лише потім ui.js дописує srcset
+    // із копіями. На теплому кеші він устигає раніше за браузер, на
+    // холодному — ні. Тому поки в src стояв повнорозмірний знімок,
+    // перший візит тягнув його з мережі, хоч показувалась копія.
+    //
+    // Заміряно на dev 20.10.2026, сторінка Armani Crossbody, перший
+    // візит: 245 КБ повнорозмірних проти 18 КБ показаних копій.
+    //
+    // Перевіряємо не слово «600», а зв'язок: у src стоїть копія, у
+    // data-variant-src — оригінал (з нього ui.js будує srcset, і
+    // підміна зламала б і його), і ширина копії не менша за ту, в
+    // якій слайд показують.
+    const js = read("assets/js/product.js");
+
+    // Розмітку обох галерей будує одна функція — тож і питаємо її, а
+    // не два схожих літерали в різних місцях файлу.
+    const будівник = (js.match(/function фотоРозмітка\([\s\S]*?\n\}/) || [])[0] || "";
+
+    check("будівник розмітки фото знайдено", Boolean(будівник));
+
+    // Виклики: слайд просить 600, мініатюра — 300.
+    const виклики = [...js.matchAll(/фотоРозмітка\(img,\s*(\d+),\s*"([^"]*)"/g)]
+        .map(m => ({ ширина: Number(m[1]), sizes: m[2] }));
+
+    check("обидві галереї кличуть будівника", виклики.length >= 2,
+        виклики.map(v => v.ширина).join(", "));
+
+    check("слайд бере копію, а не оригінал",
+        /src="\$\{копіяФото\(img, ширина\)\}"/.test(будівник), будівник.slice(0, 120));
+
+    // Копія не має бути вужчою за те, в чому її показують.
+    //
+    // Дужки з sizes прибираємо: «(max-width: 900px) 100vw, 600px» —
+    // 900px тут УМОВА екрана, а не ширина показу. Без цього перевірка
+    // вимагала копію 900 там, де слайд ніколи не ширший за 600.
+    виклики.forEach(({ ширина, sizes }) => {
+
+        const безУмов = sizes.replace(/\([^)]*\)/g, "");
+        const найширше = Math.max(...(безУмов.match(/(\d+)px/g) || ["0px"]).map(s => parseInt(s, 10)));
+
+        check(`копія ${ширина} не вужча за показ (${найширше}px)`,
+            ширина >= найширше, `${ширина} < ${найширше}`);
+
+    });
+
+    // ФОРМАТ ОБИРАЄ БРАУЗЕР, А НЕ JS.
+    //
+    // Поки формат підставляв ui.js після рендеру, браузер устигав
+    // узяти webp зі src, а потім ще й avif зі srcset: заміряно на dev
+    // 20.10.2026 — webp 59 КБ плюс avif 55 КБ, хоч показувався лише
+    // avif. <source type="image/avif"> вирішує це в розмітці.
+    check("avif пропонується першим", /<source type="image\/avif"/.test(будівник));
+    check("webp — запасним", /<source type="image\/webp"/.test(будівник));
+
+    check("avif стоїть ПЕРЕД webp",
+        будівник.indexOf('image/avif') < будівник.indexOf('image/webp'));
+
+    // Коли копій немає, обгортки бути не повинно — лише <img>, і з
+    // data-variant-src, щоб ui.js міг доробити srcset, якщо фото
+    // нормалізують уже після збірки сторінки.
+    check("без копій — звичайний img із шляхом для ui.js",
+        /if \(!маєКопії\(img\)\)/.test(будівник)
+        && /data-variant-src="\$\{img\}"/.test(будівник));
+
+    // ЛАЙТБОКС МУСИТЬ ВІДКРИВАТИ ОРИГІНАЛ.
+    //
+    // У src тепер копія 600px. Повноекранний перегляд відкривають,
+    // щоб роздивитись, — там потрібен оригінал, і його тримає
+    // data-full. Перевірка народилась червоною: після переведення src
+    // на копії зум показував саме копію.
+    check("оригінал залишено в data-full", /data-full="\$\{img\}"/.test(будівник));
+
+    check("лайтбокс бере data-full, а не src",
+        /photo\.dataset\.full \|\| photo\.src/.test(js));
+
+    // Обгортка не має стати коробкою: .gallery-photo має height:100%,
+    // і відсоток рахувався б від <picture>, у якої висота авто.
+    const css = read("assets/css/style.css").replace(/\/\*[\s\S]*?\*\//g, "");
+
+    check("picture прибрано з розкладки (display:contents)",
+        /\.gallery-slide picture,\s*\.thumb picture\{[^}]*display:contents/.test(css));
+
+    // ПЕРЕЛІК МУСИТЬ БУТИ ВІДОМИЙ ОДРАЗУ, А НЕ ПІСЛЯ ЗАПИТУ.
+    //
+    // Галерея малюється миттєво з window.PRODUCT_DATA. Поки перелік
+    // копій тягнули лише запитом, він до першого малювання не
+    // встигав — і це не теорія: після першої спроби цієї правки на
+    // dev лишалось 764 КБ повнорозмірних при 31 КБ показаних копій.
+    // Тому сторінка несе свій перелік у window.PHOTO_VARIANTS.
+    check("перелік береться зі сторінки, синхронно",
+        /знаніКопії = new Set\(\s*Array\.isArray\(window\.PHOTO_VARIANTS\)/.test(js));
+
+    // Запит лишається для сторінок без вбудованого переліку, але мусить
+    // ДОПОВНЮВАТИ: присвоєння новим Set стерло б те, що сторінка вже
+    // знала, і повернуло б повнорозмірні при перемиканні кольору.
+    check("запит доповнює перелік, а не заміщає",
+        /знаніКопії\.add\(/.test(js) && !/знаніКопії = new Set\(Array\.isArray\(list\)/.test(js));
+
+    check("перелік копій береться з data/image-variants.json",
+        /fetch\(dataUrl\("data\/image-variants\.json"\)\)/.test(js));
+
+    // І найголовніше: не приїхав перелік — лишається оригінал.
+    // Інакше порожній Set перетворив би галерею на биті посилання.
+    //
+    // Дивимось у тіло самої функції: шукати по всьому файлу означало б
+    // спіткнутись об дужки всередині виклику (шлях.split("/").pop()).
+    const тіло = (js.match(/function копіяФото\([\s\S]*?\n\}/) || [])[0] || "";
+
+    check("тіло копіяФото знайдено", Boolean(тіло));
+
+    check("без переліку підставляється оригінал",
+        /знаніКопії\.has\([\s\S]*?\)\s*\)\s*return src;/.test(тіло), тіло.slice(0, 80));
+
+    check("і для не-webp теж оригінал",
+        /endsWith\("\.webp"\)\)\s*return src;/.test(тіло));
 }
 
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);

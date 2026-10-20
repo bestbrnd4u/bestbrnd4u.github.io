@@ -177,6 +177,15 @@ window.PRODUCT_TAXONOMY = {"category":{"Жіночі сумки":"categories/zhi
 // — вбудовані, а не довантажені: рядок «єдиний екземпляр»
 // стоїть високо, і запізнілий текст смикав би розмітку
 window.PRODUCT_TEXTS = {"onlyOneTitle":"Єдиний екземпляр.","onlyOneWithDays":"Якщо його купують, наступний веземо {строк}.","onlyOneWithoutDays":"Другого такого в наявності немає.","deliveryDate":"Орієнтовно у відділенні {дата}","handlingMin":1,"handlingMax":2,"transitMin":1,"transitMax":3};
+// у яких фото цього товару є зменшені копії.
+//
+// ЧОМУ ТУТ, А НЕ ЗАПИТОМ. Галерею product.js малює МИТТЄВО з
+// PRODUCT_DATA вище — не чекаючи на жодну мережу. Поки перелік
+// копій тягнувся окремим файлом, він не встигав, і в src
+// ставився повнорозмірний знімок: заміряно на dev 20.10.2026,
+// 764 КБ повнорозмірних при 31 КБ показаних копій. Тут це
+// кілька рядків і жодного запиту.
+window.PHOTO_VARIANTS = ["215896950_beige_in.webp","215896950_beige_bk.webp","215896950_beige_cu.webp","215896950_beige_e1.webp","215896950_beige_fr.webp"];
 </script>
 
 
@@ -195,7 +204,7 @@ window.PRODUCT_TEXTS = {"onlyOneTitle":"Єдиний екземпляр.","onlyO
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=e0ee4b4c">
+<link rel="stylesheet" href="/assets/css/style.css?v=4bfd0f01">
 
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3" defer></script>
@@ -315,36 +324,56 @@ BestBrnd4u
     </p>
 
     <div class="product-static-gallery">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/215896950_beige_in.webp"
-                    alt="Сумка The Medium Tote Bag in Monogram Jacquard"
-                    width="600"
-                    height="600"
-                    loading="eager">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/215896950_beige_bk.webp"
-                    alt="Сумка The Medium Tote Bag in Monogram Jacquard — фото 2"
-                    width="600"
-                    height="600"
-                    loading="lazy">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/215896950_beige_cu.webp"
-                    alt="Сумка The Medium Tote Bag in Monogram Jacquard — фото 3"
-                    width="600"
-                    height="600"
-                    loading="lazy">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/215896950_beige_e1.webp"
-                    alt="Сумка The Medium Tote Bag in Monogram Jacquard — фото 4"
-                    width="600"
-                    height="600"
-                    loading="lazy">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/215896950_beige_fr.webp"
-                    alt="Сумка The Medium Tote Bag in Monogram Jacquard — фото 5"
-                    width="600"
-                    height="600"
-                    loading="lazy">
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/215896950_beige_in-300.avif?v=9306e91d 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/215896950_beige_in-600.avif?v=9306e91d 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/215896950_beige_in-300.webp?v=9306e91d 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/215896950_beige_in-600.webp?v=9306e91d 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/215896950_beige_in-300.webp?v=9306e91d"
+                        alt="Сумка The Medium Tote Bag in Monogram Jacquard"
+                        width="600"
+                        height="600"
+                        loading="eager">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/215896950_beige_bk-300.avif?v=520f3d66 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/215896950_beige_bk-600.avif?v=520f3d66 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/215896950_beige_bk-300.webp?v=520f3d66 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/215896950_beige_bk-600.webp?v=520f3d66 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/215896950_beige_bk-300.webp?v=520f3d66"
+                        alt="Сумка The Medium Tote Bag in Monogram Jacquard — фото 2"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/215896950_beige_cu-300.avif?v=366b0c98 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/215896950_beige_cu-600.avif?v=366b0c98 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/215896950_beige_cu-300.webp?v=366b0c98 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/215896950_beige_cu-600.webp?v=366b0c98 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/215896950_beige_cu-300.webp?v=366b0c98"
+                        alt="Сумка The Medium Tote Bag in Monogram Jacquard — фото 3"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/215896950_beige_e1-300.avif?v=cdb4913b 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/215896950_beige_e1-600.avif?v=cdb4913b 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/215896950_beige_e1-300.webp?v=cdb4913b 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/215896950_beige_e1-600.webp?v=cdb4913b 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/215896950_beige_e1-300.webp?v=cdb4913b"
+                        alt="Сумка The Medium Tote Bag in Monogram Jacquard — фото 4"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/215896950_beige_fr-300.avif?v=ac025dae 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/215896950_beige_fr-600.avif?v=ac025dae 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/215896950_beige_fr-300.webp?v=ac025dae 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/215896950_beige_fr-600.webp?v=ac025dae 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/215896950_beige_fr-300.webp?v=ac025dae"
+                        alt="Сумка The Medium Tote Bag in Monogram Jacquard — фото 5"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
     </div>
 
     <p class="product-static-desc">Стильна та містка сумка Marc Jacobs The Medium Tote Bag in Monogram Jacquard — культова модель The Tote Bag у вишуканому виконанні з фірмовим монограмним жакардом.
@@ -845,7 +874,7 @@ BestBrnd4u
 <script src="/assets/js/lightbox.js?v=a8cfdeb0" defer></script>
 
 <script src="/assets/js/live-stock.js?v=ca9027dd" defer></script>
-<script src="/assets/js/product.js?v=68c3f32d" defer></script>
+<script src="/assets/js/product.js?v=0ea54bfa" defer></script>
 
 <!-- Відгуки: показ, форма й перевірка покупки на сервері -->
 <script src="/assets/js/reviews.js?v=905c3ee8" defer></script>

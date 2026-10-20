@@ -175,6 +175,15 @@ window.PRODUCT_TAXONOMY = {"category":{"Жіночі сумки":"categories/zhi
 // — вбудовані, а не довантажені: рядок «єдиний екземпляр»
 // стоїть високо, і запізнілий текст смикав би розмітку
 window.PRODUCT_TEXTS = {"onlyOneTitle":"Єдиний екземпляр.","onlyOneWithDays":"Якщо його купують, наступний веземо {строк}.","onlyOneWithoutDays":"Другого такого в наявності немає.","deliveryDate":"Орієнтовно у відділенні {дата}","handlingMin":1,"handlingMax":2,"transitMin":1,"transitMax":3};
+// у яких фото цього товару є зменшені копії.
+//
+// ЧОМУ ТУТ, А НЕ ЗАПИТОМ. Галерею product.js малює МИТТЄВО з
+// PRODUCT_DATA вище — не чекаючи на жодну мережу. Поки перелік
+// копій тягнувся окремим файлом, він не встигав, і в src
+// ставився повнорозмірний знімок: заміряно на dev 20.10.2026,
+// 764 КБ повнорозмірних при 31 КБ показаних копій. Тут це
+// кілька рядків і жодного запиту.
+window.PHOTO_VARIANTS = ["coach73995black-1.webp","coach73995black-2.webp","coach73995black-3.webp","coach73995chalk-1.webp","coach73995chalk-2.webp","coach73995chalk-3.webp","coach73995chalk-4.webp","coach73995-dark-stone-1.webp","coach73995-dark-stone-2.webp","coach73995-dark-stone-3.webp","91215-b4ooh_7d995c2e069841c5ad45599ee803592d.webp","91215-b4ooh-1_b3aea35bcebe4922a51b66ad7b2bb0a1_master.webp","91215-b4ooh-2_ea0908385fb449c5a786a9c58e2e20cb_master.webp","4.1_cd948ddf-55be-4b35-9a4c-3437a5ac5842.webp","4.2_a5d008bc-5f9d-4f34-8908-6df68e0bb528.webp","4.3_3c1ef4e9-0d2f-4d62-a413-703f855d833b.webp","4.6_b585e107-3532-4dd2-ad9c-2d2383b92dd0.webp","73995_lhtau_a0.webp","73995_lhtau_a5.webp","73995_lhtau_a8.webp","73995_lhtau_a91.webp"];
 </script>
 
 
@@ -193,7 +202,7 @@ window.PRODUCT_TEXTS = {"onlyOneTitle":"Єдиний екземпляр.","onlyO
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=e0ee4b4c">
+<link rel="stylesheet" href="/assets/css/style.css?v=4bfd0f01">
 
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3" defer></script>
@@ -313,26 +322,38 @@ BestBrnd4u
     </p>
 
     <div class="product-static-gallery">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/coach73995black-1.webp"
-                    alt="Шкіряна сумочка Coach Tabby 26"
-                    width="600"
-                    height="600"
-                    loading="eager">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/coach73995black-2.webp"
-                    style="--frame-zoom:2.05;--frame-x:50%;--frame-y:50%"
-                    alt="Шкіряна сумочка Coach Tabby 26 — фото 2"
-                    width="600"
-                    height="600"
-                    loading="lazy">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/coach73995black-3.webp"
-                    style="--frame-zoom:1.46;--frame-x:50%;--frame-y:50%"
-                    alt="Шкіряна сумочка Coach Tabby 26 — фото 3"
-                    width="600"
-                    height="600"
-                    loading="lazy">
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/coach73995black-1-300.avif?v=f2ab3826 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/coach73995black-1-600.avif?v=f2ab3826 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/coach73995black-1-300.webp?v=f2ab3826 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/coach73995black-1-600.webp?v=f2ab3826 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/coach73995black-1-300.webp?v=f2ab3826"
+                        alt="Шкіряна сумочка Coach Tabby 26"
+                        width="600"
+                        height="600"
+                        loading="eager">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/coach73995black-2-300.avif?v=1f6c57d5 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/coach73995black-2-600.avif?v=1f6c57d5 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/coach73995black-2-300.webp?v=1f6c57d5 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/coach73995black-2-600.webp?v=1f6c57d5 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/coach73995black-2-300.webp?v=1f6c57d5"
+                        style="--frame-zoom:2.05;--frame-x:50%;--frame-y:50%"
+                        alt="Шкіряна сумочка Coach Tabby 26 — фото 2"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/coach73995black-3-300.avif?v=9d04cc4d 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/coach73995black-3-600.avif?v=9d04cc4d 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/coach73995black-3-300.webp?v=9d04cc4d 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/coach73995black-3-600.webp?v=9d04cc4d 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/coach73995black-3-300.webp?v=9d04cc4d"
+                        style="--frame-zoom:1.46;--frame-x:50%;--frame-y:50%"
+                        alt="Шкіряна сумочка Coach Tabby 26 — фото 3"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
     </div>
 
     <p class="product-static-desc">Coach Tabby 26 — одна з найвпізнаваніших моделей бренду.
@@ -834,7 +855,7 @@ BestBrnd4u
 <script src="/assets/js/lightbox.js?v=a8cfdeb0" defer></script>
 
 <script src="/assets/js/live-stock.js?v=ca9027dd" defer></script>
-<script src="/assets/js/product.js?v=68c3f32d" defer></script>
+<script src="/assets/js/product.js?v=0ea54bfa" defer></script>
 
 <!-- Відгуки: показ, форма й перевірка покупки на сервері -->
 <script src="/assets/js/reviews.js?v=905c3ee8" defer></script>

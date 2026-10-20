@@ -178,6 +178,15 @@ window.PRODUCT_TAXONOMY = {"category":{"Жіночі сумки":"categories/zhi
 // — вбудовані, а не довантажені: рядок «єдиний екземпляр»
 // стоїть високо, і запізнілий текст смикав би розмітку
 window.PRODUCT_TEXTS = {"onlyOneTitle":"Єдиний екземпляр.","onlyOneWithDays":"Якщо його купують, наступний веземо {строк}.","onlyOneWithoutDays":"Другого такого в наявності немає.","deliveryDate":"Орієнтовно у відділенні {дата}","handlingMin":1,"handlingMax":2,"transitMin":1,"transitMax":3};
+// у яких фото цього товару є зменшені копії.
+//
+// ЧОМУ ТУТ, А НЕ ЗАПИТОМ. Галерею product.js малює МИТТЄВО з
+// PRODUCT_DATA вище — не чекаючи на жодну мережу. Поки перелік
+// копій тягнувся окремим файлом, він не встигав, і в src
+// ставився повнорозмірний знімок: заміряно на dev 20.10.2026,
+// 764 КБ повнорозмірних при 31 КБ показаних копій. Тут це
+// кілька рядків і жодного запиту.
+window.PHOTO_VARIANTS = ["00004.webp","00005.webp","00006.webp","00003.webp","rtlaal924401_14742030_9_v1_2x.webp","rtlaal924401_14742029_10_v1_2x.webp"];
 </script>
 
 
@@ -196,7 +205,7 @@ window.PRODUCT_TEXTS = {"onlyOneTitle":"Єдиний екземпляр.","onlyO
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=e0ee4b4c">
+<link rel="stylesheet" href="/assets/css/style.css?v=4bfd0f01">
 
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3" defer></script>
@@ -316,40 +325,60 @@ BestBrnd4u
     </p>
 
     <div class="product-static-gallery">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/00004.webp"
-                    style="--frame-zoom:1.81;--frame-x:48%;--frame-y:51%"
-                    alt="Жіноча сумочка Tory Burch Miller Top Handle Satchel"
-                    width="600"
-                    height="600"
-                    loading="eager">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/00005.webp"
-                    style="--frame-zoom:1.83;--frame-x:50%;--frame-y:50%"
-                    alt="Жіноча сумочка Tory Burch Miller Top Handle Satchel — фото 2"
-                    width="600"
-                    height="600"
-                    loading="lazy">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/00006.webp"
-                    style="--frame-zoom:1.74;--frame-x:49%;--frame-y:51%"
-                    alt="Жіноча сумочка Tory Burch Miller Top Handle Satchel — фото 3"
-                    width="600"
-                    height="600"
-                    loading="lazy">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/00003.webp"
-                    style="--frame-zoom:1.81;--frame-x:48%;--frame-y:51%"
-                    alt="Жіноча сумочка Tory Burch Miller Top Handle Satchel — фото 4"
-                    width="600"
-                    height="600"
-                    loading="lazy">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/rtlaal924401_14742030_9_v1_2x.webp"
-                    alt="Жіноча сумочка Tory Burch Miller Top Handle Satchel — фото 5"
-                    width="600"
-                    height="600"
-                    loading="lazy">
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/00004-300.avif?v=9a2792e5 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/00004-600.avif?v=9a2792e5 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/00004-300.webp?v=9a2792e5 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/00004-600.webp?v=9a2792e5 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/00004-300.webp?v=9a2792e5"
+                        style="--frame-zoom:1.81;--frame-x:48%;--frame-y:51%"
+                        alt="Жіноча сумочка Tory Burch Miller Top Handle Satchel"
+                        width="600"
+                        height="600"
+                        loading="eager">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/00005-300.avif?v=634af9db 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/00005-600.avif?v=634af9db 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/00005-300.webp?v=634af9db 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/00005-600.webp?v=634af9db 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/00005-300.webp?v=634af9db"
+                        style="--frame-zoom:1.83;--frame-x:50%;--frame-y:50%"
+                        alt="Жіноча сумочка Tory Burch Miller Top Handle Satchel — фото 2"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/00006-300.avif?v=7dd1e363 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/00006-600.avif?v=7dd1e363 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/00006-300.webp?v=7dd1e363 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/00006-600.webp?v=7dd1e363 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/00006-300.webp?v=7dd1e363"
+                        style="--frame-zoom:1.74;--frame-x:49%;--frame-y:51%"
+                        alt="Жіноча сумочка Tory Burch Miller Top Handle Satchel — фото 3"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/00003-300.avif?v=7ce03fa3 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/00003-600.avif?v=7ce03fa3 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/00003-300.webp?v=7ce03fa3 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/00003-600.webp?v=7ce03fa3 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/00003-300.webp?v=7ce03fa3"
+                        style="--frame-zoom:1.81;--frame-x:48%;--frame-y:51%"
+                        alt="Жіноча сумочка Tory Burch Miller Top Handle Satchel — фото 4"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/rtlaal924401_14742030_9_v1_2x-300.avif?v=b9abf74d 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/rtlaal924401_14742030_9_v1_2x-600.avif?v=b9abf74d 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/rtlaal924401_14742030_9_v1_2x-300.webp?v=b9abf74d 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/rtlaal924401_14742030_9_v1_2x-600.webp?v=b9abf74d 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/rtlaal924401_14742030_9_v1_2x-300.webp?v=b9abf74d"
+                        alt="Жіноча сумочка Tory Burch Miller Top Handle Satchel — фото 5"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
     </div>
 
     <p class="product-static-desc">Стильна та містка сумка Tory Burch Miller у класичному чорному кольорі. Модель виконана з натуральної зернистої шкіри та доповнена фірмовим логотипом Double T, фурнітурою золотистого відтінку та акуратними декоративними швами</p>
@@ -848,7 +877,7 @@ BestBrnd4u
 <script src="/assets/js/lightbox.js?v=a8cfdeb0" defer></script>
 
 <script src="/assets/js/live-stock.js?v=ca9027dd" defer></script>
-<script src="/assets/js/product.js?v=68c3f32d" defer></script>
+<script src="/assets/js/product.js?v=0ea54bfa" defer></script>
 
 <!-- Відгуки: показ, форма й перевірка покупки на сервері -->
 <script src="/assets/js/reviews.js?v=905c3ee8" defer></script>

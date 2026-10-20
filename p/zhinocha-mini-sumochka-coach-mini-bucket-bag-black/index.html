@@ -177,6 +177,15 @@ window.PRODUCT_TAXONOMY = {"category":{"Жіночі сумки":"categories/zhi
 // — вбудовані, а не довантажені: рядок «єдиний екземпляр»
 // стоїть високо, і запізнілий текст смикав би розмітку
 window.PRODUCT_TEXTS = {"onlyOneTitle":"Єдиний екземпляр.","onlyOneWithDays":"Якщо його купують, наступний веземо {строк}.","onlyOneWithoutDays":"Другого такого в наявності немає.","deliveryDate":"Орієнтовно у відділенні {дата}","handlingMin":1,"handlingMax":2,"transitMin":1,"transitMax":3};
+// у яких фото цього товару є зменшені копії.
+//
+// ЧОМУ ТУТ, А НЕ ЗАПИТОМ. Галерею product.js малює МИТТЄВО з
+// PRODUCT_DATA вище — не чекаючи на жодну мережу. Поки перелік
+// копій тягнувся окремим файлом, він не встигав, і в src
+// ставився повнорозмірний знімок: заміряно на dev 20.10.2026,
+// 764 КБ повнорозмірних при 31 КБ показаних копій. Тут це
+// кілька рядків і жодного запиту.
+window.PHOTO_VARIANTS = ["cr144_svbk_a0.webp","cr144_svbk_a3.webp","cr144_svbk_a8.webp","cr144_svbk_a91.webp","cr144_svbk_a92.webp","cr144_svha_a0.webp","cr144_svha_a3.webp","cr144_svha_a8.webp","cr144_svha_a91.webp"];
 </script>
 
 
@@ -195,7 +204,7 @@ window.PRODUCT_TEXTS = {"onlyOneTitle":"Єдиний екземпляр.","onlyO
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=e0ee4b4c">
+<link rel="stylesheet" href="/assets/css/style.css?v=4bfd0f01">
 
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3" defer></script>
@@ -315,39 +324,59 @@ BestBrnd4u
     </p>
 
     <div class="product-static-gallery">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/cr144_svbk_a0.webp"
-                    style="--frame-zoom:1.55;--frame-x:46%;--frame-y:52%"
-                    alt="Жіноча міні сумочка Coach Mini Bucket Bag Black"
-                    width="600"
-                    height="600"
-                    loading="eager">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/cr144_svbk_a3.webp"
-                    style="--frame-zoom:1.52;--frame-x:46%;--frame-y:52%"
-                    alt="Жіноча міні сумочка Coach Mini Bucket Bag Black — фото 2"
-                    width="600"
-                    height="600"
-                    loading="lazy">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/cr144_svbk_a8.webp"
-                    style="--frame-zoom:1.48;--frame-x:46%;--frame-y:50%"
-                    alt="Жіноча міні сумочка Coach Mini Bucket Bag Black — фото 3"
-                    width="600"
-                    height="600"
-                    loading="lazy">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/cr144_svbk_a91.webp"
-                    alt="Жіноча міні сумочка Coach Mini Bucket Bag Black — фото 4"
-                    width="600"
-                    height="600"
-                    loading="lazy">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/cr144_svbk_a92.webp"
-                    alt="Жіноча міні сумочка Coach Mini Bucket Bag Black — фото 5"
-                    width="600"
-                    height="600"
-                    loading="lazy">
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/cr144_svbk_a0-300.avif?v=655d438d 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/cr144_svbk_a0-600.avif?v=655d438d 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/cr144_svbk_a0-300.webp?v=655d438d 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/cr144_svbk_a0-600.webp?v=655d438d 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/cr144_svbk_a0-300.webp?v=655d438d"
+                        style="--frame-zoom:1.55;--frame-x:46%;--frame-y:52%"
+                        alt="Жіноча міні сумочка Coach Mini Bucket Bag Black"
+                        width="600"
+                        height="600"
+                        loading="eager">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/cr144_svbk_a3-300.avif?v=bfb1b8ea 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/cr144_svbk_a3-600.avif?v=bfb1b8ea 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/cr144_svbk_a3-300.webp?v=bfb1b8ea 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/cr144_svbk_a3-600.webp?v=bfb1b8ea 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/cr144_svbk_a3-300.webp?v=bfb1b8ea"
+                        style="--frame-zoom:1.52;--frame-x:46%;--frame-y:52%"
+                        alt="Жіноча міні сумочка Coach Mini Bucket Bag Black — фото 2"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/cr144_svbk_a8-300.avif?v=733ad090 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/cr144_svbk_a8-600.avif?v=733ad090 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/cr144_svbk_a8-300.webp?v=733ad090 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/cr144_svbk_a8-600.webp?v=733ad090 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/cr144_svbk_a8-300.webp?v=733ad090"
+                        style="--frame-zoom:1.48;--frame-x:46%;--frame-y:50%"
+                        alt="Жіноча міні сумочка Coach Mini Bucket Bag Black — фото 3"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/cr144_svbk_a91-300.avif?v=1f6b24b1 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/cr144_svbk_a91-600.avif?v=1f6b24b1 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/cr144_svbk_a91-300.webp?v=1f6b24b1 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/cr144_svbk_a91-600.webp?v=1f6b24b1 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/cr144_svbk_a91-300.webp?v=1f6b24b1"
+                        alt="Жіноча міні сумочка Coach Mini Bucket Bag Black — фото 4"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/cr144_svbk_a92-300.avif?v=4d6899b5 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/cr144_svbk_a92-600.avif?v=4d6899b5 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/cr144_svbk_a92-300.webp?v=4d6899b5 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/cr144_svbk_a92-600.webp?v=4d6899b5 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/cr144_svbk_a92-300.webp?v=4d6899b5"
+                        alt="Жіноча міні сумочка Coach Mini Bucket Bag Black — фото 5"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
     </div>
 
     <p class="product-static-desc">Стильна міні-сумка COACH Mini Bucket Bag у поєднанні чорного кольору зі сріблястою фурнітурою. Лаконічний силует bucket та фірмовий логотип COACH роблять модель універсальним аксесуаром для повсякденних і вечірніх образів.
@@ -847,7 +876,7 @@ BestBrnd4u
 <script src="/assets/js/lightbox.js?v=a8cfdeb0" defer></script>
 
 <script src="/assets/js/live-stock.js?v=ca9027dd" defer></script>
-<script src="/assets/js/product.js?v=68c3f32d" defer></script>
+<script src="/assets/js/product.js?v=0ea54bfa" defer></script>
 
 <!-- Відгуки: показ, форма й перевірка покупки на сервері -->
 <script src="/assets/js/reviews.js?v=905c3ee8" defer></script>

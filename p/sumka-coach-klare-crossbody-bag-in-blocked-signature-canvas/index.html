@@ -177,6 +177,15 @@ window.PRODUCT_TAXONOMY = {"category":{"Жіночі сумки":"categories/zhi
 // — вбудовані, а не довантажені: рядок «єдиний екземпляр»
 // стоїть високо, і запізнілий текст смикав би розмітку
 window.PRODUCT_TEXTS = {"onlyOneTitle":"Єдиний екземпляр.","onlyOneWithDays":"Якщо його купують, наступний веземо {строк}.","onlyOneWithoutDays":"Другого такого в наявності немає.","deliveryDate":"Орієнтовно у відділенні {дата}","handlingMin":1,"handlingMax":2,"transitMin":1,"transitMax":3};
+// у яких фото цього товару є зменшені копії.
+//
+// ЧОМУ ТУТ, А НЕ ЗАПИТОМ. Галерею product.js малює МИТТЄВО з
+// PRODUCT_DATA вище — не чекаючи на жодну мережу. Поки перелік
+// копій тягнувся окремим файлом, він не встигав, і в src
+// ставився повнорозмірний знімок: заміряно на dev 20.10.2026,
+// 764 КБ повнорозмірних при 31 КБ показаних копій. Тут це
+// кілька рядків і жодного запиту.
+window.PHOTO_VARIANTS = ["ca148_imrfi_a0.webp","ca148_imrfi_a3.webp","ca148_imrfi_a8.webp","ca148_imrfi_a92.webp","ca148_imrfi_a91.webp"];
 </script>
 
 
@@ -195,7 +204,7 @@ window.PRODUCT_TEXTS = {"onlyOneTitle":"Єдиний екземпляр.","onlyO
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
 
-<link rel="stylesheet" href="/assets/css/style.css?v=e0ee4b4c">
+<link rel="stylesheet" href="/assets/css/style.css?v=4bfd0f01">
 
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3" defer></script>
@@ -315,39 +324,59 @@ BestBrnd4u
     </p>
 
     <div class="product-static-gallery">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/ca148_imrfi_a0.webp"
-                    style="--frame-zoom:1.58;--frame-x:47%;--frame-y:64%"
-                    alt="Сумка Coach Klare Crossbody Bag In Blocked Signature Canvas"
-                    width="600"
-                    height="600"
-                    loading="eager">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/ca148_imrfi_a3.webp"
-                    style="--frame-zoom:1.93;--frame-x:49%;--frame-y:64%"
-                    alt="Сумка Coach Klare Crossbody Bag In Blocked Signature Canvas — фото 2"
-                    width="600"
-                    height="600"
-                    loading="lazy">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/ca148_imrfi_a8.webp"
-                    style="--frame-zoom:1.38;--frame-x:48%;--frame-y:52%"
-                    alt="Сумка Coach Klare Crossbody Bag In Blocked Signature Canvas — фото 3"
-                    width="600"
-                    height="600"
-                    loading="lazy">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/ca148_imrfi_a92.webp"
-                    alt="Сумка Coach Klare Crossbody Bag In Blocked Signature Canvas — фото 4"
-                    width="600"
-                    height="600"
-                    loading="lazy">
-                <img
-                    src="https://bestbrnd4u.com/assets/images/products/uploads/ca148_imrfi_a91.webp"
-                    alt="Сумка Coach Klare Crossbody Bag In Blocked Signature Canvas — фото 5"
-                    width="600"
-                    height="600"
-                    loading="lazy">
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/ca148_imrfi_a0-300.avif?v=d3c6ce6b 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/ca148_imrfi_a0-600.avif?v=d3c6ce6b 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/ca148_imrfi_a0-300.webp?v=d3c6ce6b 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/ca148_imrfi_a0-600.webp?v=d3c6ce6b 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/ca148_imrfi_a0-300.webp?v=d3c6ce6b"
+                        style="--frame-zoom:1.58;--frame-x:47%;--frame-y:64%"
+                        alt="Сумка Coach Klare Crossbody Bag In Blocked Signature Canvas"
+                        width="600"
+                        height="600"
+                        loading="eager">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/ca148_imrfi_a3-300.avif?v=8575a0e3 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/ca148_imrfi_a3-600.avif?v=8575a0e3 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/ca148_imrfi_a3-300.webp?v=8575a0e3 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/ca148_imrfi_a3-600.webp?v=8575a0e3 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/ca148_imrfi_a3-300.webp?v=8575a0e3"
+                        style="--frame-zoom:1.93;--frame-x:49%;--frame-y:64%"
+                        alt="Сумка Coach Klare Crossbody Bag In Blocked Signature Canvas — фото 2"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/ca148_imrfi_a8-300.avif?v=cee6f174 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/ca148_imrfi_a8-600.avif?v=cee6f174 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/ca148_imrfi_a8-300.webp?v=cee6f174 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/ca148_imrfi_a8-600.webp?v=cee6f174 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/ca148_imrfi_a8-300.webp?v=cee6f174"
+                        style="--frame-zoom:1.38;--frame-x:48%;--frame-y:52%"
+                        alt="Сумка Coach Klare Crossbody Bag In Blocked Signature Canvas — фото 3"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/ca148_imrfi_a92-300.avif?v=c8943c16 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/ca148_imrfi_a92-600.avif?v=c8943c16 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/ca148_imrfi_a92-300.webp?v=c8943c16 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/ca148_imrfi_a92-600.webp?v=c8943c16 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/ca148_imrfi_a92-300.webp?v=c8943c16"
+                        alt="Сумка Coach Klare Crossbody Bag In Blocked Signature Canvas — фото 4"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
+                <picture>
+                    <source type="image/avif" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/ca148_imrfi_a91-300.avif?v=6d49d237 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/ca148_imrfi_a91-600.avif?v=6d49d237 600w" sizes="140px">
+                    <source type="image/webp" srcset="https://dev.bestbrnd4u.com/assets/images/products/uploads/ca148_imrfi_a91-300.webp?v=6d49d237 300w, https://dev.bestbrnd4u.com/assets/images/products/uploads/ca148_imrfi_a91-600.webp?v=6d49d237 600w" sizes="140px">
+                    <img
+                        src="https://dev.bestbrnd4u.com/assets/images/products/uploads/ca148_imrfi_a91-300.webp?v=6d49d237"
+                        alt="Сумка Coach Klare Crossbody Bag In Blocked Signature Canvas — фото 5"
+                        width="600"
+                        height="600"
+                        loading="lazy">
+                </picture>
     </div>
 
     <p class="product-static-desc">Стильна сумка COACH Klare Crossbody Bag у фірмовому принті Signature Canvas з контрастними відтінками Gold, Chalk та Glacier White. Елегантний структурований дизайн, золотиста фурнітура та впізнаваний логотип COACH роблять модель універсальним доповненням до повсякденних і більш святкових образів.
@@ -848,7 +877,7 @@ BestBrnd4u
 <script src="/assets/js/lightbox.js?v=a8cfdeb0" defer></script>
 
 <script src="/assets/js/live-stock.js?v=ca9027dd" defer></script>
-<script src="/assets/js/product.js?v=68c3f32d" defer></script>
+<script src="/assets/js/product.js?v=0ea54bfa" defer></script>
 
 <!-- Відгуки: показ, форма й перевірка покупки на сервері -->
 <script src="/assets/js/reviews.js?v=905c3ee8" defer></script>
