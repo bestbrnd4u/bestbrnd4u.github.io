@@ -3713,7 +3713,16 @@ document.addEventListener("click", event => {
 
                     const images = JSON.parse(colorBtn.dataset.images || "[]");
 
-                    if (images[0]) targetImg.src = images[0];
+                    // Копія, а не повнорозмірний знімок: квадрат
+                    // картки — 270-450px, а оригінал важить у 10-20
+                    // разів більше. Помічник живе в ui.js (там же
+                    // перелік копій); якщо його немає — ставимо
+                    // вихідну адресу, тобто як було.
+                    if (images[0]) {
+                        targetImg.src = window.ImageCopies
+                            ? window.ImageCopies.копія(images[0], 600)
+                            : images[0];
+                    }
 
                 } catch (error) {
 
