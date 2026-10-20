@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="uk" data-season="standard">
+<head>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"a8e18699","data/catalog.json":"518a3f1b","data/categories.json":"2c24d857","data/collections.json":"dc20073e","data/home.json":"1e892e17","data/image-variants.json":"7f73a794","data/instagram-links.json":"f9e272c7","data/legal.json":"f84751b2","data/notifications.json":"a35b367f","data/page-texts.json":"6dd1be71","data/product-texts.json":"278df72d","data/products-updated.json":"4fb62ea6","data/products.json":"3c1e6809","data/promo-popups.json":"0940ece5","data/promotions.json":"fd2ed22f","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/season.json":"17f1306b","data/security.json":"0c05c691","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Оформлення сайту — перегляд | BestBrnd4u</title>
+
+<!-- Inter — той самий шрифт, що на сайті: сторінка просить його в
+     своєму font-stack, тож нехай і завантажує. Порядок той самий, що
+     на сторінках сайту (preconnect до стилів), за цим стежить
+     tests/test-fonts.js. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+
+<style>
+    *{ box-sizing:border-box; }
+
+    body{
+        margin:0;
+        padding:20px 16px 60px;
+        background:#f9fafb;
+        color:#111827;
+        font:15px/1.6 Inter, -apple-system, "Segoe UI", sans-serif;
+    }
+
+    .wrap{ max-width:1180px; margin:0 auto; }
+
+    h1{ font-size:24px; margin:0 0 4px; }
+
+    .lead{ color:#6b7280; margin:0 0 18px; }
+
+    .note{
+        background:#eff6ff;
+        border:1px solid #bfdbfe;
+        border-radius:12px;
+        padding:12px 14px;
+        margin:0 0 18px;
+        font-size:14px;
+    }
+
+    .bar{
+        display:flex;
+        flex-wrap:wrap;
+        gap:8px;
+        align-items:center;
+        margin-bottom:14px;
+    }
+
+    .bar + .bar{ margin-top:-6px; }
+
+    .bar b{ font-size:13px; color:#6b7280; font-weight:600; margin-right:4px; }
+
+    button{
+        padding:8px 14px;
+        border:1px solid #d1d5db;
+        border-radius:10px;
+        background:#fff;
+        font:inherit;
+        font-size:14px;
+        cursor:pointer;
+    }
+
+    button[aria-pressed="true"]{
+        background:#111827;
+        border-color:#111827;
+        color:#fff;
+    }
+
+    .stage{
+        border:1px solid #e5e7eb;
+        border-radius:14px;
+        overflow:hidden;
+        background:#fff;
+        /* Рамка «екрана»: саме в ній і живе справжній сайт. */
+        margin:0 auto 18px;
+        transition:max-width 200ms ease;
+    }
+
+    iframe{
+        display:block;
+        width:100%;
+        height:620px;
+        border:0;
+    }
+
+    table{ border-collapse:collapse; width:100%; font-size:14px; }
+
+    th, td{ text-align:left; padding:7px 10px; border-bottom:1px solid #eef0f3; }
+
+    th{ color:#6b7280; font-weight:600; font-size:13px; }
+
+    td.n{ font-variant-numeric:tabular-nums; text-align:right; width:92px; }
+
+    .ok{ color:#15803d; }
+    .bad{ color:#b91c1c; font-weight:600; }
+
+    .swatches{ display:flex; flex-wrap:wrap; gap:10px; margin:10px 0 22px; }
+
+    .sw{
+        width:104px;
+        border:1px solid #e5e7eb;
+        border-radius:10px;
+        overflow:hidden;
+        font-size:11px;
+    }
+
+    .sw i{ display:block; height:44px; }
+
+    .sw span{ display:block; padding:5px 7px; color:#6b7280; font-style:normal; }
+
+    .sw span b{ display:block; color:#111827; font-weight:600; }
+
+    h2{ font-size:17px; margin:26px 0 6px; }
+
+    .hint{ color:#6b7280; font-size:13px; margin:0 0 10px; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+    <h1>Оформлення сайту — перегляд</h1>
+
+    <p class="lead">
+        Як виглядатиме магазин у кожному сезоні. Це не макет і не
+        картинки: нижче відкрито справжній сайт, і перемикач міняє
+        оформлення просто в ньому.
+    </p>
+
+    <div class="note">
+        Тут нічого не зберігається — дивитись можна скільки завгодно.
+        Щоб увімкнути сезон на сайті, оберіть його в
+        <b>Налаштування&nbsp;→&nbsp;Оформлення сайту</b> і збережіть.
+    </div>
+
+    <div class="bar" id="seasons"><b>Сезон:</b></div>
+    <div class="bar" id="pages"><b>Сторінка:</b></div>
+    <div class="bar" id="widths"><b>Екран:</b></div>
+
+    <div class="stage" id="stage">
+        <iframe id="frame" title="Перегляд сайту" src="/"></iframe>
+    </div>
+
+    <h2>Палітра сезону</h2>
+    <p class="hint">
+        Значення зчитані з того самого файлу стилів, яким малюється
+        сайт, — не переписані сюди руками.
+    </p>
+    <div class="swatches" id="swatches"></div>
+
+    <h2>Контраст тексту</h2>
+    <p class="hint">
+        Норма для звичайного тексту — 4,5. Нижче за неї текст важко
+        читати людям зі слабким зором і на сонці.
+    </p>
+    <table id="contrast"><tbody></tbody></table>
+
+</div>
+
+<script>
+// Перегляд сезонів в адмінці.
+//
+// ЧОМУ СПРАВЖНІЙ САЙТ В IFRAME, А НЕ МАКЕТ
+// -----------------------------------------
+// Макет — це друга копія верстки, і вона розходиться з сайтом на
+// першій же правці. Тоді перегляд починає показувати не те, що
+// побачить покупець, і довіряти йому не можна взагалі.
+//
+// Тут у рамці відкрито сам сайт із тими самими стилями, а перемикач
+// лише ставить його кореню атрибут data-season — рівно те, що робить
+// збірка. Тобто показане і є те, що вийде.
+//
+// ПАЛІТРА Й КОНТРАСТ ТЕЖ ЗЧИТУЮТЬСЯ З НЬОГО. getComputedStyle на
+// документі всередині рамки віддає значення, які браузер справді
+// застосував. Переписувати кольори в цю сторінку означало б завести
+// третю копію палітри — після CSS і скрипта збірки.
+(function () {
+
+    "use strict";
+
+    // СЕЗОНИ НЕ ПЕРЕЛІЧЕНІ ТУТ — ВОНИ ЧИТАЮТЬСЯ З CSS.
+    //
+    // Перелік уже живе у трьох місцях: блоки в style.css, SEASONS у
+    // scripts/apply-season.js і варіанти в admin/config.yml. Четверта
+    // копія тут розійшлася б першою: додали сезон — а перегляд його
+    // не показує, і саме перегляд мав би це спіймати.
+    //
+    // Тому беремо звідти, де сезон визначається насправді: кожен
+    // сезон — це блок :root[data-season="…"] у стилях. Назви лишаються
+    // окремо, бо в CSS їх нема; невідомий ключ покажеться як є — краще
+    // англійською, ніж ніяк.
+    var НАЗВИ = {
+        standard: "Звичайне",
+        winter: "Зима",
+        spring: "Весна",
+        summer: "Літо",
+        autumn: "Осінь"
+    };
+
+    function сезониЗCss(css) {
+
+        var знайдені = [];
+        var re = /:root\[data-season="([a-z-]+)"\]/g;
+        var m;
+
+        while ((m = re.exec(css)) !== null) {
+            if (знайдені.indexOf(m[1]) === -1) знайдені.push(m[1]);
+        }
+
+        // «Звичайне» власного блока не має й не повинно мати: базові
+        // значення на :root і є звичайне оформлення.
+        return [{ ключ: "standard", назва: НАЗВИ.standard }].concat(
+            знайдені.map(function (к) {
+                return { ключ: к, назва: НАЗВИ[к] || к };
+            }));
+
+    }
+
+    // Сторінки, які є ЗАВЖДИ, і кожна показує своє:
+    //   головна  — банер із затемненням і чергування секцій;
+    //   каталог   — сітка карток, значки знижок, фільтри;
+    //   бренди    — плитки й заголовки;
+    //   контакти  — ФОРМА. Саме на полях вводу палітра ламається
+    //               найчастіше: рамка, підказка в полі, стан помилки.
+    //
+    // Кошика тут немає навмисно: порожній кошик — це майже порожня
+    // сторінка, дивитись на ній нема чого.
+    var СТОРІНКИ = [
+        { шлях: "/", назва: "Головна" },
+        { шлях: "/catalog", назва: "Каталог" },
+        { шлях: "/brands/", назва: "Бренди" },
+        { шлях: "/contacts", назва: "Форма" }
+    ];
+
+    var ЕКРАНИ = [
+        { ширина: "100%", назва: "Десктоп" },
+        { ширина: "420px", назва: "Телефон" }
+    ];
+
+    // Токени, які справді визначають вигляд. Назви ті самі, що в CSS.
+    var ТОКЕНИ = [
+        ["--gray50", "тло сторінки"],
+        ["--surface-muted", "смуга секції"],
+        ["--gray100", "плашка"],
+        ["--gray200", "рамка"],
+        ["--gray500", "другорядний текст"],
+        ["--gray900", "основний текст"],
+        ["--secondary", "посилання й кнопки"],
+        ["--accent", "знижки"],
+        ["--danger", "помилки"]
+    ];
+
+    // Пари «текст на тлі», які зустрічаються на сайті.
+    var ПАРИ = [
+        ["основний текст на сторінці", "--gray900", "--gray50"],
+        ["основний текст на картці", "--gray900", null],
+        ["другорядний на сторінці", "--gray500", "--gray50"],
+        ["другорядний на картці", "--gray500", null],
+        ["другорядний на плашці", "--gray500", "--gray100"],
+        ["другорядний на смузі", "--gray500", "--surface-muted"],
+        ["посилання на сторінці", "--secondary", "--gray50"],
+        ["посилання на картці", "--secondary", null],
+        /* Посилання на плашці й на смузі — найтісніші пари на сайті, і
+           саме їх тут бракувало. Напис «за замовчуванням» на кнопці
+           сортування (каталог і акції) давав 4.16 на весні та 4.20 на
+           літі, тобто провал, а ця сторінка показувала самі «норма»:
+           перевіряла посилання лише на сторінці й на картці, де тло
+           світліше. Заміряно 20.10.2026. Перелік пар тут мусить
+           збігатися з тим, що в tests/test-season.js — інакше звірка
+           очима й набір бачать різні сайти. */
+        ["посилання на плашці", "--secondary", "--gray100"],
+        ["посилання на смузі", "--secondary", "--surface-muted"],
+        ["білий текст на кнопці", null, "--secondary"],
+        ["білий текст на темній кнопці", null, "--primary"]
+    ];
+
+    var frame = document.getElementById("frame");
+    var stage = document.getElementById("stage");
+
+    var сезон = "winter";
+    var сторінка = "/";
+    var екран = "100%";
+
+    function кнопки(куди, список, ключ, назва, поточне, обрати) {
+
+        var box = document.getElementById(куди);
+
+        список.forEach(function (item) {
+
+            var b = document.createElement("button");
+
+            b.type = "button";
+            b.textContent = item[назва];
+            b.dataset.value = item[ключ];
+            b.setAttribute("aria-pressed", String(item[ключ] === поточне));
+
+            b.addEventListener("click", function () {
+
+                [].forEach.call(box.querySelectorAll("button"), function (x) {
+                    x.setAttribute("aria-pressed", String(x === b));
+                });
+
+                обрати(item[ключ]);
+
+            });
+
+            box.appendChild(b);
+
+        });
+
+    }
+
+    // Атрибут ставимо на документ усередині рамки — те саме, що робить
+    // збірка. Сторінка в рамці може ще вантажитись, тому чекаємо на
+    // load і повторюємо після кожного переходу.
+    function застосувати() {
+
+        var doc = frame.contentDocument;
+
+        if (!doc || !doc.documentElement) return;
+
+        doc.documentElement.setAttribute("data-season", сезон);
+
+        показати(doc);
+
+    }
+
+    function значення(doc, ім) {
+        return getComputedStyle(doc.documentElement).getPropertyValue(ім).trim();
+    }
+
+    function числа(колір) {
+
+        var s = String(колір).trim();
+
+        if (s.charAt(0) === "#") {
+            var h = s.length === 4
+                ? s.slice(1).split("").map(function (c) { return c + c; }).join("")
+                : s.slice(1, 7);
+            return [0, 2, 4].map(function (i) { return parseInt(h.substr(i, 2), 16); });
+        }
+
+        var m = s.match(/\d+(\.\d+)?/g);
+
+        return m ? m.slice(0, 3).map(Number) : null;
+
+    }
+
+    function яскравість(колір) {
+
+        var c = числа(колір);
+
+        if (!c) return null;
+
+        var л = c.map(function (v) {
+            var x = v / 255;
+            return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4);
+        });
+
+        return 0.2126 * л[0] + 0.7152 * л[1] + 0.0722 * л[2];
+
+    }
+
+    function контраст(a, b) {
+
+        var la = яскравість(a);
+        var lb = яскравість(b);
+
+        if (la === null || lb === null) return null;
+
+        var hi = Math.max(la, lb);
+        var lo = Math.min(la, lb);
+
+        return (hi + 0.05) / (lo + 0.05);
+
+    }
+
+    function показати(doc) {
+
+        // Палітра.
+        var sw = document.getElementById("swatches");
+
+        sw.innerHTML = "";
+
+        ТОКЕНИ.forEach(function (пара) {
+
+            var колір = значення(doc, пара[0]);
+
+            if (!колір) return;
+
+            var d = document.createElement("div");
+
+            d.className = "sw";
+            d.innerHTML = '<i style="background:' + колір + '"></i>'
+                + "<span><b>" + пара[1] + "</b>" + колір + "</span>";
+
+            sw.appendChild(d);
+
+        });
+
+        // Контраст. Білий підставляємо там, де в парі стоїть null:
+        // це картка, вона біла в будь-якому сезоні.
+        var tb = document.querySelector("#contrast tbody");
+
+        tb.innerHTML = "";
+
+        ПАРИ.forEach(function (п) {
+
+            var текст = п[1] ? значення(doc, п[1]) : "#ffffff";
+            var тло = п[2] ? значення(doc, п[2]) : "#ffffff";
+
+            var r = контраст(текст, тло);
+
+            if (r === null) return;
+
+            var tr = document.createElement("tr");
+
+            tr.innerHTML = "<td>" + п[0] + "</td>"
+                + '<td class="n">' + r.toFixed(2) + "</td>"
+                + '<td class="' + (r >= 4.5 ? "ok" : "bad") + '">'
+                + (r >= 4.5 ? "норма" : "нижче норми") + "</td>";
+
+            tb.appendChild(tr);
+
+        });
+
+    }
+
+    frame.addEventListener("load", застосувати);
+
+    кнопки("pages", СТОРІНКИ, "шлях", "назва", сторінка, function (v) {
+        сторінка = v;
+        frame.src = v;
+    });
+
+    кнопки("widths", ЕКРАНИ, "ширина", "назва", екран, function (v) {
+        екран = v;
+        stage.style.maxWidth = v;
+    });
+
+    // Кнопки сезонів зʼявляються після того, як прочитали стилі.
+    fetch("/assets/css/style.css?v=e0ee4b4c", { cache: "no-store" })
+        .then(function (r) { return r.ok ? r.text() : ""; })
+        .then(function (css) {
+
+            var список = сезониЗCss(css);
+
+            if (список.length < 2) throw new Error("у стилях немає жодного сезону");
+
+            кнопки("seasons", список, "ключ", "назва", сезон, function (v) {
+                сезон = v;
+                застосувати();
+            });
+
+            застосувати();
+
+        })
+        .catch(function (error) {
+
+            document.getElementById("seasons").insertAdjacentHTML("beforeend",
+                '<span style="color:#b91c1c">не вдалося прочитати стилі — '
+                + "перелік сезонів недоступний</span>");
+
+            console.warn("Сезони з CSS:", error && error.message);
+
+        });
+
+}());
+</script>
+
+</body>
+</html>

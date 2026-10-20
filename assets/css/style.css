@@ -22,7 +22,36 @@
     --primary:#111827;
     --secondary:#2563eb;
     --accent:#f59e0b;
-    --danger:#ef4444;
+
+    /* БУРШТИН ЯК ТЕКСТ — ОКРЕМИЙ, ТЕМНІШИЙ.
+       --accent (#f59e0b) годиться для плашки, де на ньому білий
+       напис. Як КОЛІР ТЕКСТУ на світлому він дає 2.06 — удвічі нижче
+       норми 4.5, тобто напис нечитабельний. Заміряно 20.10.2026.
+       У коді це вже обходили руками: шість місць писали #b45309. Але
+       й той на холодних і теплих поверхнях сезонів просідає до 4.34.
+       Тут один відтінок, який проходить на тлі КОЖНОГО сезону з
+       запасом (мінімум 5.04, на сторінках 5.5-6.1), — і лишається
+       однаковим у всіх, бо це знак, а не прикраса. */
+    --accent-ink:#8d500b;
+    /* Червоний для ЗАЛИВКИ: на ньому білий напис — значок «-30%»,
+       кнопки видалення. З #ef4444 той напис давав 3.76 при нормі 4.5
+       (заміряно на живому каталозі: 10px, жирний). #dc2626 дає 4.83,
+       і цей відтінок у файлі вже вживався. */
+    --danger:#dc2626;
+
+    /* Червоний для ТЕКСТУ — окремий, як і бурштиновий.
+       Заливка й напис це різні пари: те, на чому білий текст читається,
+       саме текстом на світлому вже не читається. #dc2626 як напис дає
+       3.96 на тлі осені й 3.50 на її плашці. Цей проходить скрізь із
+       запасом: мінімум 5.04. */
+    --danger-ink:#b01b1b;
+
+    /* Той самий знак, але НА ТЕМНОМУ тлі.
+       Мобільне меню темно-синє, і темне чорнило там дає 2.48 — напис
+       «Акції» зникає. Світліший варіант проходить на темних тлах усіх
+       сезонів (мінімум 5.51). Два відтінки одного знаку — не
+       надмірність: контраст залежить від пари, а не від кольору. */
+    --danger-on-dark:#f87171;
 
     --white:#ffffff;
 
@@ -49,6 +78,45 @@
     --shadow:0 12px 30px rgba(0,0,0,.08);
     --shadow-lg:0 25px 60px rgba(0,0,0,.12);
 
+    /* Відтінок, яким затемнено банер головної. Трьома складовими, а не
+       шестизначним кодом: у .hero він домішується в градієнти через
+       rgba(), і там потрібні саме числа. Сезонне оформлення міняє
+       це одне значення. */
+    --hero-tint-rgb:17,24,39;
+
+    /* Смуга інею вгорі сторінки. У звичайному оформленні її немає
+       ЗОВСІМ — none, а не прозорий градієнт: прозорий усе одно
+       лишається шаром, який браузер малює. Названа тут, щоб правило
+       для body було одне на всі сезони, а не по правилу на кожен. */
+    --season-wash:none;
+
+    /* Шапка напівпрозора, тож її колір — окремі змінні, а не друге
+       правило для header у сезонному блоці.
+       ЧОМУ САМЕ ТАК: друге правило на той самий селектор CSS читає як
+       ДВА СТАНИ одного елемента, і перехід на шапці мусив би їх
+       анімувати (за цим стежить tests/test-transition-properties.js).
+       Анімувати тут нема чого: сезон не міняється в браузері, його
+       проставляє збірка раз і назавжди. Через змінну станів не
+       виникає взагалі. */
+    --header-bg:rgba(255,255,255,.88);
+    --header-border:rgba(255,255,255,.3);
+
+    /* Смуга між білими секціями. Сторінка чергує «біла секція / тиха
+       смуга», і саме це чергування задає ритм довгої головної.
+
+       ДО 19.10.2026 ЦЕЙ КОЛІР БУВ ЗАШИТИЙ, І ТРЬОМА РІЗНИМИ:
+       .products, .brands, .promo-hero-slide мали #f8fafc,
+       .brand-teaser і .similar — #fafafa, .breadcrumbs — #f7f7f7.
+       Між собою вони відрізняються на 3-6 одиниць, тобто на око
+       однакові — три назви для одного наміру.
+
+       Через це сезонне оформлення діставало сторінку, але не смуги:
+       на dev із зимою тло стало #e8eff8, а смуги лишились майже
+       білими — і ритм перевернувся. Заміряно на живому сайті.
+
+       Тепер намір названий, і сезон міняє його разом з усім іншим. */
+    --surface-muted:#f8fafc;
+
     --radius:18px;
 
     /* Відстань між пунктами шапки. Названа тому, що на неї спирається
@@ -64,6 +132,193 @@
        там, куди людина дивиться найпильніше. Ця крива стартує різко
        й гальмує в кінці, тобто «чує» дію відразу. */
     --ease-out:cubic-bezier(.23,1,.32,1);
+
+}
+
+
+/* =====================================
+   СЕЗОННЕ ОФОРМЛЕННЯ
+   =====================================
+   Один перемикач в адмінці («Оформлення сайту») → data/season.json →
+   збірка ставить <html data-season="winter"> кожній сторінці
+   (scripts/apply-season.js) → оживає блок нижче.
+
+   ЧОМУ САМЕ ПЕРЕВИЗНАЧЕННЯ ЗМІННИХ, А НЕ ОКРЕМИЙ ФАЙЛ СТИЛІВ
+   -----------------------------------------------------------
+   Бо стилі тут уже наскрізь на змінних: --secondary ужито 141 раз,
+   --gray500 — 136, --gray900 — 109. Сезон, який міняє десяток
+   значень, доходить до всього сайту сам. Окремий файл-тема означав би
+   другу копію верстки, яка розійдеться з першою на першій же правці,
+   і зайвий запит на кожен показ сторінки.
+
+   ЧОГО СЕЗОН НЕ ЧІПАЄ, І ЦЕ НАВМИСНО
+   -----------------------------------
+   --danger (червоний) і --accent (бурштиновий) лишаються як є. Це не
+   прикраса, а знаки: червоним помічені помилки й «немає в наявності»,
+   бурштиновим — знижки й новинки. Покупець упізнає їх із півпогляду,
+   і міняти їх щосезону означало б щоразу переучувати його заново.
+
+   ЧОГО ТУТ НЕМАЄ: СНІГУ, ЩО ПАДАЄ
+   --------------------------------
+   Сніжинки анімацією — перше, що проситься, і перше, від чого стає
+   гірше: це постійне перемальовування на кожному кадрі, на телефоні
+   з поганим звʼязком воно відчутне. Власник уже писав про повільний
+   інтернет, тож рух у фоні тут був би рухом у зворотний бік.
+   Зимовість тримається на кольорі й на смузі інею вгорі.
+
+   ЯК ДОДАТИ НАСТУПНИЙ СЕЗОН
+   --------------------------
+   1. Новий блок :root[data-season="…"] нижче.
+   2. Назва сезону в SEASONS у scripts/apply-season.js.
+   3. Той самий варіант у списку адмінки (admin/config.yml).
+   Усі три місця звіряє tests/test-season.js — розійдуться, і набір
+   почервоніє; без нього власник обрав би сезон, якого збірка не знає,
+   і сайт мовчки лишився б звичайним.
+===================================== */
+
+/* Зима. Палітра холодніша й ТЕМНІША за звичайну, а не блідіша:
+   контраст заміряно, і він вищий за нинішній на кожній парі
+   «текст на тлі» (див. tests/test-season.js). Найпомітніше там, де
+   нинішній ледве дотягує: другорядний текст на сірій плашці був 4,39
+   при нормі 4,5 — став 4,74. */
+:root[data-season="winter"]{
+
+    /* Чорнило з синявою замість майже-чорного. */
+    --primary:#0f1b2d;
+    --dark:#0f1b2d;
+    --gray900:#0f1b2d;
+    --gray700:#334155;
+
+    /* Другорядний текст: холодніший і темніший — звідси +0,4 контрасту. */
+    --gray500:#57677c;
+
+    /* Поверхні й рамки: сніг у тіні, а не сірий папір. */
+    --gray300:#a9bcd3;
+    --gray200:#c7d5e7;
+    --gray100:#dce6f2;
+    --gray50:#e8eff8;
+    --surface-muted:#eef4fb;
+
+    /* Акцент глибшає: той самий синій, але зимовий. */
+    --secondary:#1746c8;
+
+    /* Банер головної затемнюється холодним, а не нейтральним. */
+    --hero-tint-rgb:12,26,48;
+
+    /* Тіні з синявою: нейтрально-чорні на холодних поверхнях читаються
+       як бруд. */
+    --shadow-sm:0 2px 8px rgba(15,27,45,.07);
+    --shadow:0 12px 30px rgba(15,27,45,.10);
+    --shadow-lg:0 25px 60px rgba(15,27,45,.14);
+
+    /* Смуга інею під шапкою: від краю до 420 px і далі в ніщо. */
+    --season-wash:linear-gradient(180deg, #d8e6f6 0%, transparent 420px);
+
+    /* Шапка теж холоднішає — вона напівпрозора, тож інакше лишилась
+       би єдиним теплим плямом на холодній сторінці. */
+    --header-bg:rgba(247,251,255,.9);
+    --header-border:rgba(195,208,224,.45);
+
+}
+
+/* Весна: світло крізь молоде листя: зелень світла, але не салатова —
+   для люксу важливо лишитись стриманим. */
+:root[data-season="spring"]{
+
+    --primary:#142a1c;
+    --dark:#142a1c;
+    --gray900:#142a1c;
+    --gray700:#2f4a38;
+    --gray500:#586e5e;
+
+    --gray300:#a8c6a4;
+    --gray200:#cadfc7;
+    --gray100:#e0eede;
+    --gray50:#eef6ee;
+    --surface-muted:#f5faf4;
+
+    /* глибокий смарагд: лишається очевидно «натискальним» */
+    --secondary:#00734f;
+
+    --hero-tint-rgb:18,40,26;
+
+    --shadow-sm:0 2px 8px rgba(20,42,28,.07);
+    --shadow:0 12px 30px rgba(20,42,28,.10);
+    --shadow-lg:0 25px 60px rgba(20,42,28,.14);
+
+    --season-wash:linear-gradient(180deg, #dff0dd 0%, transparent 420px);
+
+    --header-bg:rgba(248,253,247,.9);
+    --header-border:rgba(168,198,164,.4);
+
+}
+
+/* Літо: пісок і полуденне небо: тепле світло, високий ключ. */
+:root[data-season="summer"]{
+
+    --primary:#2a1f12;
+    --dark:#2a1f12;
+    --gray900:#2a1f12;
+    --gray700:#4d3a24;
+    --gray500:#7a664c;
+
+    --gray300:#d9c09b;
+    --gray200:#eedcc2;
+    --gray100:#f8ebd9;
+    --gray50:#fdf6ec;
+    --surface-muted:#fffbf4;
+
+    /* чиста лазур — єдиний холодний акцент на теплому */
+    --secondary:#0468b2;
+
+    --hero-tint-rgb:42,31,18;
+
+    --shadow-sm:0 2px 8px rgba(42,31,18,.07);
+    --shadow:0 12px 30px rgba(42,31,18,.10);
+    --shadow-lg:0 25px 60px rgba(42,31,18,.14);
+
+    --season-wash:linear-gradient(180deg, #fdeed6 0%, transparent 420px);
+
+    --header-bg:rgba(255,252,246,.9);
+    --header-border:rgba(217,192,155,.4);
+
+}
+
+/* Осінь: вохра й суха листва.
+   ГЛИБША ЗА ЛІТО НАВМИСНО. Перша версія відрізнялась від літа на 9
+   одиниць — тобто майже ніяк: два сезони з чотирьох виглядали
+   однаково. Заміряно 20.10.2026. Тепер 28, і кожен сезон відрізняється
+   від решти щонайменше на 14. Чорнило при цьому довелось поглибити
+   (#2b1d12 → #241709): на темнішому тлі перше давало 13.37 проти
+   16.98 у звичайного оформлення, тобто просідало більш ніж на пʼяту
+   частину — за цим стежить tests/test-season.js. */
+:root[data-season="autumn"]{
+
+    --primary:#241709;
+    --dark:#241709;
+    --gray900:#241709;
+    --gray700:#46301c;
+    --gray500:#745c44;
+
+    --gray300:#c0a37f;
+    --gray200:#dcc5a6;
+    --gray100:#ead9c3;
+    --gray50:#f3e7d6;
+    --surface-muted:#f7ede0;
+
+    /* приглушена синь: не свариться з бурштином знижок */
+    --secondary:#1c5f8e;
+
+    --hero-tint-rgb:43,29,18;
+
+    --shadow-sm:0 2px 8px rgba(43,29,18,.07);
+    --shadow:0 12px 30px rgba(43,29,18,.10);
+    --shadow-lg:0 25px 60px rgba(43,29,18,.14);
+
+    --season-wash:linear-gradient(180deg, #efdcc2 0%, transparent 420px);
+
+    --header-bg:rgba(252,246,238,.9);
+    --header-border:rgba(192,163,127,.45);
 
 }
 
@@ -147,7 +402,16 @@ html{
 
 body{
     font-family:'Inter',sans-serif;
-    background:var(--gray50);
+
+    /* Тло + смуга сезону одним записом.
+       У звичайному оформленні --season-wash дорівнює none — тобто
+       зайвого шару немає взагалі, і сторінка виглядає рівно як
+       раніше. Правило одне на всі сезони: окреме правило на кожен
+       означало б, що про body треба не забути щоразу. */
+    background-color:var(--gray50);
+    background-image:var(--season-wash);
+    background-repeat:no-repeat;
+
     color:var(--gray900);
     line-height:1.6;
     overflow-x:hidden;
@@ -363,9 +627,9 @@ header{
     display:flex;
     align-items:center;
     z-index:9999;
-    background:rgba(255,255,255,.88);
+    background:var(--header-bg);
     backdrop-filter:blur(22px);
-    border-bottom:1px solid rgba(255,255,255,.3);
+    border-bottom:1px solid var(--header-border);
     box-shadow:0 8px 30px rgba(0,0,0,.05);
 
     /* Їде вгору, коли на телефоні відкрита панель чату чи дзвінка —
@@ -441,14 +705,14 @@ nav a.active{
 
 .sale-text,
 .sale-text.active{
-    color:var(--danger) !important;
+    color:var(--danger-ink) !important;
 }
 
 
 
 @media (hover:hover) and (pointer:fine){
 .sale-text:hover{
-    color:var(--danger) !important;
+    color:var(--danger-ink) !important;
 }
 }
 
@@ -1043,8 +1307,15 @@ nav li.has-mega[data-mega-open] .mega-menu.mega-menu-columns{
     overflow:hidden;
 
     /* захисний колір-підклад: якщо з якоїсь причини
-       фото не завантажиться, кут не буде "світлою дірою" */
-    background-color:#111827;
+       фото не завантажиться, кут не буде "світлою дірою"
+
+       Колір узято змінною, бо той самий відтінок далі домішується в
+       три шари градієнта. Сезонне оформлення міняє одне число —
+       --hero-tint-rgb, — і банер холоднішає разом із рештою сторінки.
+       Переоголошувати тут увесь background-image задля зими не можна:
+       це крихкий багатошаровий запис (чому саме такий — нижче), і
+       друга його копія розійшлася б із цією на першій же правці. */
+    background-color:rgb(var(--hero-tint-rgb));
 
     /* усе одним background-image — навмисно без окремого
        ::before для градієнта: два різних composite-шари
@@ -1054,11 +1325,11 @@ nav li.has-mega[data-mega-open] .mega-menu.mega-menu-columns{
     background-image:
         linear-gradient(
             90deg,
-            rgba(17,24,39,.65) 0%,
-            rgba(17,24,39,.30) 55%,
-            rgba(17,24,39,0) 100%
+            rgba(var(--hero-tint-rgb),.65) 0%,
+            rgba(var(--hero-tint-rgb),.30) 55%,
+            rgba(var(--hero-tint-rgb),0) 100%
         ),
-        linear-gradient(rgba(17,24,39,.45), rgba(17,24,39,.45)),
+        linear-gradient(rgba(var(--hero-tint-rgb),.45), rgba(var(--hero-tint-rgb),.45)),
         var(--hero-bg, url("/assets/images/banners/hero-bags.jpg"));
     background-size:cover;
     /* Точка кадрування з адмінки (assets/js/image-framing.js).
@@ -1101,35 +1372,61 @@ nav li.has-mega[data-mega-open] .mega-menu.mega-menu-columns{
     font-size:18px;
 }
 
-/* FIX: тёмный .btn-outline на тёмном фото hero
-   был почти нечитаем — делаем светлый вариант
-   только в контексте hero */
-.hero .btn-outline{
+/* ТЕМНІ БАНЕРИ САЙТУ — ОДИН ПЕРЕЛІК, А НЕ КОПІЯ НА КОЖЕН.
+   ------------------------------------------------------
+   Темний банер оголошує для свого вмісту color:#fff, і весь текст у
+   ньому цю білизну успадковує. Усе, крім .btn-outline: у нього колір
+   заданий СВОЇМ правилом (--primary, темне чорнило), тож успадкування
+   до нього не доходить. Виходить єдиний елемент банера, який не
+   дотримується його ж контракту.
+
+   Фікс існував двічі — для .hero і для банерів байєр-сервісу — двома
+   однаковими копіями. Банер акції просто забули, і вийшло рівно те,
+   що й мало: на /promo/… кнопка «Поділитися» писалась чорнилом
+   #111827 поверх притемненого фото. Заміряно 20.10.2026 на справжніх
+   пікселях фото з накладкою rgba(17,24,39,.55): найгірша точка під
+   написом — 1.81 при нормі 4.5. З білим — 6.32.
+
+   Тому тепер перелік один. Додаєте темний банер — дописуєте сюди, і
+   те саме в перелік білого кільця фокуса нижче по файлу; що вони не
+   розійдуться, стежить tests/test-dark-banners.js. */
+.hero .btn-outline,
+.bayer-hero-banner .btn-outline,
+.promo-hero-banner .btn-outline{
     color:#fff;
     border-color:rgba(255,255,255,.55);
     background:rgba(255,255,255,.06);
     backdrop-filter:blur(6px);
 }
 
-@media (hover:hover) and (pointer:fine){
-.hero .btn-outline:hover{
-    background:#fff;
-    color:var(--primary);
-    border-color:#fff;
-}
+/* ТОЙ САМИЙ БАНЕР, АЛЕ З ОФОРМЛЕННЯМ З АДМІНКИ — ЗАПАСНИЙ КОЛІР ІНШИЙ.
+   -------------------------------------------------------------------
+   promo.js вішає has-style на САМ банер акції, щойно в акції задано хоч
+   один колір. А .has-style .btn-outline (далеко нижче по файлу) має ту
+   саму вагу, що й правило вище, і стоїть пізніше — тобто вигравало б
+   воно, і напис «Поділитися» повертався б у темне чорнило, щойно акція
+   отримає оформлення. Виглядало б як «фікс відвалився сам собою», хоч
+   насправді це порядок у файлі.
+
+   У власника нічого не відбирається: заданий ним колір діє далі.
+   Міняється лише ЗАПАСНИЙ — той, що бере гору, коли колір кнопок не
+   заданий. На темному банері запасним мусить бути білий, а не --primary.
+
+   ЧОМУ САМЕ ТУТ, А НЕ ПОРЯД ІЗ .has-style. Вага цього правила — (0,3,0),
+   рівно стільки ж, скільки в правила наведення нижче
+   (.promo-hero-banner .btn-outline:hover). При рівній вазі виграє те,
+   що нижче. Поставиш це правило після наведення — і на наведенні напис
+   лишиться білим на білому тлі, тобто зникне. Тому воно стоїть ПЕРЕД
+   наведенням; порядок стереже tests/test-dark-banners.js. */
+.promo-hero-banner.has-style .btn-outline{
+    color:var(--blk-btn-bg, #fff);
+    border-color:var(--blk-btn-bg, rgba(255,255,255,.55));
 }
 
-/* той самий фікс, що і для .hero, але для банерів
-   сторінок bayer-service / delivery-payment / return-warranty */
-.bayer-hero-banner .btn-outline{
-    color:#fff;
-    border-color:rgba(255,255,255,.55);
-    background:rgba(255,255,255,.06);
-    backdrop-filter:blur(6px);
-}
-
 @media (hover:hover) and (pointer:fine){
-.bayer-hero-banner .btn-outline:hover{
+.hero .btn-outline:hover,
+.bayer-hero-banner .btn-outline:hover,
+.promo-hero-banner .btn-outline:hover{
     background:#fff;
     color:var(--primary);
     border-color:#fff;
@@ -1326,7 +1623,7 @@ nav li.has-mega[data-mega-open] .mega-menu.mega-menu-columns{
 ===================================== */
 
 .products{
-    background:#f8fafc;
+    background:var(--surface-muted);
     padding-top:40px;
 }
 
@@ -1787,7 +2084,7 @@ nav li.has-mega[data-mega-open] .mega-menu.mega-menu-columns{
     display:none;
     align-items:center;
     gap:5px;
-    background:#b45309;
+    background:var(--accent-ink);
 }
 
 @media(max-width:768px){
@@ -2026,7 +2323,7 @@ nav li.has-mega[data-mega-open] .mega-menu.mega-menu-columns{
         padding:3px 10px;
         border-radius:50px;
         background:rgba(180,83,9,.12);
-        color:#b45309;
+        color:var(--accent-ink);
         font-size:11px;
         font-weight:700;
         letter-spacing:.3px;
@@ -2056,7 +2353,7 @@ nav li.has-mega[data-mega-open] .mega-menu.mega-menu-columns{
     margin-bottom:8px;
     border-radius:6px;
     background:rgba(245,158,11,.12);
-    color:#b45309;
+    color:var(--accent-ink);
     font-size:12px;
     font-weight:700;
 }
@@ -2349,7 +2646,13 @@ nav li.has-mega[data-mega-open] .mega-menu.mega-menu-columns{
 
 .product-card .old-price{
     text-decoration:line-through;
-    color:var(--gray300);
+    /* НЕ --gray300: ТО КОЛІР РАМОК.
+       Як текст він дає 1.47 на білій картці — закреслена стара ціна
+       була практично невидима. А це доказ знижки: без неї «-30%»
+       нічим не підтверджене. Заміряно на живому каталозі 20.10.2026,
+       разом із трьома такими самими місцями (кошик, обране, сторінка
+       товару). «Старість» показує закреслення, а не блідість. */
+    color:var(--gray500);
     font-size:13px;
     white-space:nowrap;
 }
@@ -2469,7 +2772,11 @@ nav li.has-mega[data-mega-open] .mega-menu.mega-menu-columns{
 .newsletter small{
     display:block;
     margin-top:28px;
-    color:rgba(255,255,255,.4);
+    /* Було .4 — на темному підвалі це 3.77 при нормі 4.5, і «жодного
+       спаму» читалось гірше за решту дрібного тексту саме там, де
+       людина вирішує, лишати пошту чи ні. .55 дає 5.96 і все одно
+       явно тихіше за основний напис. Заміряно 20.10.2026. */
+    color:rgba(255,255,255,.55);
     font-size:13px;
     letter-spacing:.3px;
 }
@@ -2534,6 +2841,18 @@ footer{
     text-align:inherit;
     margin-bottom:20px;
     color:#fff;
+}
+
+.footer .sale-text{
+    /* Підвал темно-синій (background:var(--primary)), і темне чорнило
+       знаку давало тут 2.48 — напис «Акції» зливався з тлом.
+       Заміряно на живому каталозі 20.10.2026.
+       Мобільне меню при цьому БІЛЕ, тож там лишається темний
+       відтінок: контраст залежить від пари, а не від кольору.
+
+       !important тут не примха: базове .sale-text оголошене з ним, і
+       без нього це правило програє попри вищу вагу селектора. */
+    color:var(--danger-on-dark) !important;
 }
 
 .footer a{
@@ -2819,7 +3138,7 @@ footer{
     display:grid;
     grid-template-columns:1fr 1fr;
     min-height:360px;
-    background:#f8fafc;
+    background:var(--surface-muted);
 }
 
 .promo-hero-slide-content{
@@ -3020,7 +3339,7 @@ footer{
 }
 
 .brands{
-    background:#f8fafc;
+    background:var(--surface-muted);
 }
 
 .brands-grid{
@@ -3491,7 +3810,7 @@ body.mobile-filters-open .scroll-top{
 .breadcrumbs{
     margin-top:82px;
     padding:14px 0;
-    background:#f7f7f7;
+    background:var(--surface-muted);
     font-size:15px;
 }
 
@@ -3912,8 +4231,16 @@ body.mobile-filters-open .scroll-top{
 }
 
 .brand-about-toggle{
-    margin-top:8px;
-    padding:0;
+    /* ВІДСТУП ПЕРЕЇХАВ У ПІДБИВКУ — МІШЕНЬ РОСТЕ, ВИГЛЯД НІ.
+       Напис «Детальніше» має 14px і висоту рядка 16.8 — під палець
+       тонко. 4px підбивки згори й знизу піднімають зону натискання до
+       24.8px, а відступ згори, зменшений на ті самі 4px, лишає напис
+       рівно там, де він був. Виняток WCAG 2.2 за відстанню ця кнопка
+       проходила й без того (нічого клікабельного ближче за 24px від
+       неї немає) — але то про норму, а не про те, чи влучає палець.
+       Заміряно 20.10.2026 на ширині 375px. */
+    margin-top:4px;
+    padding:4px 0;
     border:0;
     background:none;
     color:var(--secondary);
@@ -4781,7 +5108,7 @@ body.mobile-filters-open .scroll-top{
     font-weight:700;
     text-transform:uppercase;
     letter-spacing:.04em;
-    color:var(--gray300);
+    color:var(--gray500);
 }
 
 .filter-option-group-title:first-child{
@@ -4847,7 +5174,7 @@ body.mobile-filters-open .scroll-top{
 @media (hover:hover) and (pointer:fine){
 .filter-option-clear:hover{
     background:var(--gray100);
-    color:var(--danger);
+    color:var(--danger-ink);
 }
 }
 
@@ -5086,8 +5413,8 @@ body.mobile-filters-open .scroll-top{
 
 @media (hover:hover) and (pointer:fine){
 .filter-chip:hover{
-    border-color:var(--danger);
-    color:var(--danger);
+    border-color:var(--danger-ink);
+    color:var(--danger-ink);
 }
 }
 
@@ -6044,7 +6371,7 @@ body.mobile-filters-open .scroll-top{
 .price-box .old-price{
     font-size:18px;
     text-decoration:line-through;
-    color:var(--gray300);
+    color:var(--gray500);
 }
 
 .product-short{
@@ -6089,7 +6416,7 @@ body.mobile-filters-open .scroll-top{
 
 .size-error{
     margin-top:10px;
-    color:#dc2626;
+    color:var(--danger-ink);
     font-size:13px;
     font-weight:600;
 }
@@ -6107,7 +6434,7 @@ body.mobile-filters-open .scroll-top{
 
 .size-shake .size,
 .size-shake .mini-size{
-    border-color:#dc2626 !important;
+    border-color:var(--danger-ink) !important;
 }
 
 /* -- модалка "Таблиця розмірів" -- */
@@ -6412,7 +6739,7 @@ body.mobile-filters-open .scroll-top{
 .favorite-btn.active .favorite-indicator{
     opacity:1;
     transform:scale(1);
-    border-color:var(--danger);
+    border-color:var(--danger-ink);
     box-shadow:0 4px 10px rgba(0,0,0,.12);
 }
 
@@ -6497,7 +6824,7 @@ body.mobile-filters-open .scroll-top{
 
 .preorder-box-title{
     font-weight:700;
-    color:#b45309;
+    color:var(--accent-ink);
     margin-bottom:8px;
 }
 
@@ -6677,7 +7004,7 @@ body.mobile-filters-open .scroll-top{
 }
 
 .brand-teaser:nth-child(even){
-    background:#fafafa;
+    background:var(--surface-muted);
 }
 
 .brand-teaser-banner{
@@ -6715,7 +7042,7 @@ body.mobile-filters-open .scroll-top{
 }
 
 .brand-teaser-text{
-    color:var(--accent);
+    color:var(--accent-ink);
     font-weight:600;
     font-size:15px;
     line-height:1.5;
@@ -6786,7 +7113,7 @@ body.mobile-filters-open .scroll-top{
 }
 
 .brand-campaign:nth-child(even){
-    background:#fafafa;
+    background:var(--surface-muted);
 }
 
 .brand-campaign-banner{
@@ -6909,7 +7236,7 @@ body.mobile-filters-open .scroll-top{
 
 .similar{
     padding:64px 0;
-    background:#fafafa;
+    background:var(--surface-muted);
 }
 
 /* =====================================
@@ -7032,7 +7359,7 @@ body.mobile-filters-open .scroll-top{
 .cart-item-price .old-price,
 .cart-item-total .old-price{
     text-decoration:line-through;
-    color:var(--gray300);
+    color:var(--gray500);
     font-size:.85em;
 }
 
@@ -7095,7 +7422,7 @@ body.mobile-filters-open .scroll-top{
 @media (hover:hover) and (pointer:fine){
 .cart-item-remove:hover{
     background:#fee2e2;
-    color:#dc2626;
+    color:var(--danger-ink);
 }
 }
 
@@ -7269,7 +7596,7 @@ body.mobile-filters-open .scroll-top{
 
 .favorite-row-price .old-price{
     font-size:14px;
-    color:var(--gray300);
+    color:var(--gray500);
     text-decoration:line-through;
 }
 
@@ -7310,7 +7637,7 @@ body.mobile-filters-open .scroll-top{
 @media (hover:hover) and (pointer:fine){
 .favorite-row-remove:hover{
     background:#fee2e2;
-    color:var(--danger);
+    color:var(--danger-ink);
     transform:none;
 }
 }
@@ -7594,7 +7921,7 @@ body.mobile-filters-open .scroll-top{
 .field-error{
     font-size:12px;
     font-weight:500;
-    color:var(--danger);
+    color:var(--danger-ink);
     min-height:14px;
 }
 
@@ -7609,7 +7936,7 @@ body.mobile-filters-open .scroll-top{
 }
 
 .checkout-form input.invalid{
-    border-color:var(--danger);
+    border-color:var(--danger-ink);
     background:#fdf4f3;
     padding-right:44px;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ef4444' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cline x1='12' y1='8' x2='12' y2='13'/%3E%3Cline x1='12' y1='16' x2='12.01' y2='16'/%3E%3C/svg%3E");
@@ -7619,7 +7946,7 @@ body.mobile-filters-open .scroll-top{
 }
 
 .checkout-form input.invalid:focus{
-    border-color:var(--danger);
+    border-color:var(--danger-ink);
     box-shadow:0 0 0 4px rgba(239,68,68,.12);
 }
 
@@ -7884,7 +8211,7 @@ body.mobile-filters-open .scroll-top{
 }
 
 .promo-message.error{
-    color:var(--danger);
+    color:var(--danger-ink);
 }
 
 .order-summary .btn{
@@ -8782,7 +9109,7 @@ body.mobile-filters-open .scroll-top{
 
 .mobile-nav-list a.sale-text,
 .mobile-nav-list a.sale-text:active{
-    color:var(--danger) !important;
+    color:var(--danger-ink) !important;
 }
 
 /* =====================================
@@ -9160,7 +9487,7 @@ body.mobile-filters-open .scroll-top{
 }
 
 .search-no-suggestions{
-    color:var(--gray300);
+    color:var(--gray500);
     font-size:13px;
 }
 
@@ -10042,7 +10369,7 @@ body.mobile-filters-open .scroll-top{
 }
 
 .profile-actions-row .btn-outline{
-    color:#dc2626;
+    color:var(--danger-ink);
     border-color:#fecaca;
     /* РАМКА ДОДАЄТЬСЯ ДО ВИСОТИ, І ЦЬОГО НЕ РЯТУЄ border-box.
        box-sizing рахує рамку всередині коробки лише тоді, коли
@@ -10428,7 +10755,7 @@ body.mobile-filters-open .scroll-top{
 }
 
 .order-card-brief-discount{
-    color:var(--danger);
+    color:var(--danger-ink);
 }
 
 .order-card-brief-total{
@@ -10461,7 +10788,7 @@ body.mobile-filters-open .scroll-top{
 
 .order-status-processing{
     background:rgba(245,158,11,.12);
-    color:#b45309;
+    color:var(--accent-ink);
 }
 
 .order-status-shipped{
@@ -10476,7 +10803,7 @@ body.mobile-filters-open .scroll-top{
 
 .order-status-cancelled{
     background:rgba(239,68,68,.1);
-    color:var(--danger);
+    color:var(--danger-ink);
 }
 
 /* Повернення — не скасування.
@@ -10488,7 +10815,7 @@ body.mobile-filters-open .scroll-top{
    повернення це не збій, а нормальний хід подій. */
 .order-status-returned{
     background:rgba(245,158,11,.14);
-    color:#b45309;
+    color:var(--accent-ink);
 }
 
 .order-card-items{
@@ -10516,7 +10843,7 @@ body.mobile-filters-open .scroll-top{
 
 @media (hover:hover) and (pointer:fine){
 .order-item-refuse:hover{
-    color:var(--danger);
+    color:var(--danger-ink);
 }
 }
 
@@ -10606,7 +10933,7 @@ body.mobile-filters-open .scroll-top{
 }
 
 .order-card-summary-discount span:last-child{
-    color:var(--danger);
+    color:var(--danger-ink);
     font-weight:600;
 }
 
@@ -10855,7 +11182,7 @@ body.mobile-filters-open .scroll-top{
 @media (hover:hover) and (pointer:fine){
 .address-remove-btn:hover{
     background:#fee2e2;
-    color:var(--danger);
+    color:var(--danger-ink);
 }
 }
 
@@ -11451,7 +11778,7 @@ body.mobile-filters-open .scroll-top{
 
 .mobile-filter-row-arrow{
     flex-shrink:0;
-    color:var(--gray300);
+    color:var(--gray500);
 }
 
 /* Рядок-перемикач у шторці фільтрів.
@@ -12251,7 +12578,7 @@ body.mobile-filters-open .scroll-top{
 
 .bayer-why-check.is-negative{
     background:rgba(239,68,68,.1);
-    color:var(--danger);
+    color:var(--danger-ink);
 }
 
 .bayer-why-item strong{
@@ -12845,7 +13172,7 @@ body.mobile-filters-open .scroll-top{
 
 .pagination-gap{
     padding:0 4px;
-    color:var(--gray300);
+    color:var(--gray500);
     user-select:none;
 }
 
@@ -13249,6 +13576,12 @@ body.mobile-filters-open .scroll-top{
     border-color:var(--blk-btn-bg, var(--gray300));
 }
 
+/* Запасний колір для цієї кнопки на темному банері акції живе не тут,
+   а поряд зі світлим варіантом (.promo-hero-banner.has-style
+   .btn-outline, шукайте «ЗАПАСНИЙ КОЛІР ІНШИЙ»). Там він мусить стояти
+   через порядок відносно правила наведення — причина розписана на
+   місці. */
+
 /* КНОПКА «КУПИТИ» В КАРТЦІ ТОВАРУ — НЕ КНОПКА БЛОКА.
 
    Те саме, що з бейджами вище, тільки помітніше. «Ціна дня» і
@@ -13391,14 +13724,14 @@ body.mobile-filters-open .scroll-top{
    собі попереджає ще до читання тексту. */
 .confirm-danger{
     background:#dc2626;
-    border-color:#dc2626;
+    border-color:var(--danger-ink);
     color:#fff;
 }
 
 @media (hover:hover) and (pointer:fine){
 .confirm-danger:hover{
     background:#b91c1c;
-    border-color:#b91c1c;
+    border-color:var(--danger-ink);
 }
 }
 
@@ -13680,7 +14013,7 @@ body.confirm-open{
     z-index:2;
     /* тло те саме, що в смуги крихт: інакше під кнопкою просвічували б
        пункти, які проїжджають повз неї при прокрутці */
-    background:#f7f7f7;
+    background:var(--surface-muted);
     padding-right:14px;
 }
 
@@ -13703,7 +14036,7 @@ body.confirm-open{
     bottom:0;
     right:100%;
     width:40px;
-    background:#f7f7f7;
+    background:var(--surface-muted);
 }
 
 /* Розділювач після кнопки — щоб вона читалась як окремий елемент, а не
@@ -13714,6 +14047,28 @@ body.confirm-open{
     height:16px;
     margin-left:14px;
     background:var(--gray300);
+}
+
+/* М'який край ПРАВОРУЧ — і лише коли під кнопку справді щось заїхало.
+
+   Ліворуч заслінка (::before вище) ховає пункти, що проїжджають повз
+   кнопку. Праворуч такої не було, і пункт виринав з-під неї обрізаним
+   посеред слова: у доріжці товару поряд із «Назад» стирчало «мки» від
+   «Чоловічі сумки». Заміряно 20.10.2026 на 375px — 83px пункту під
+   кнопкою, 28px назовні.
+
+   ЧОМУ НЕ ЗАВЖДИ. На 1280px шлях уміщається цілком (scrollWidth
+   дорівнює clientWidth, заміряно там же), і постійне розмиття гасило
+   б перший пункт задарма. Клас ставить product.js — там, де він уже
+   рахує, чи доріжка влазить, і де знає позицію прокрутки: поки шлях
+   не зсунуто, ховати нічого.
+
+   ТІНЬ, А НЕ ТРЕТІЙ ПСЕВДОЕЛЕМЕНТ: ::before і ::after тут зайняті
+   заслінкою й розділовою рискою. Колір — тло самої смуги, тому це
+   читається не як тінь, а як розчинення пункту. Сезонне оформлення
+   міняє --surface-muted, і край їде за ним без окремої правки. */
+.breadcrumbs-shifted .crumb-back{
+    box-shadow:22px 0 16px -2px var(--surface-muted);
 }
 
 .breadcrumbs .crumb-back{
@@ -14260,11 +14615,22 @@ summary:focus-visible,
        цей сайт ще цікавий. */
 }
 
-/* На темних смугах синя рамка тоне — там світла. */
+/* На темних смугах синя рамка тоне — там світла.
+
+   Перелік мусить покривати ті самі банери, що й світлий .btn-outline
+   вище по файлу. Банерів акції й байєр-сервісу тут не було: кільце
+   лишалось синім (--secondary) і давало 1.27 на притемненому фото
+   акції при нормі 3 — тобто людина з клавіатурою не бачила, де вона.
+   Заміряно 20.10.2026 на пікселях фото; з білим — 6.58. Що два
+   переліки не розійдуться, стежить tests/test-dark-banners.js. */
 .footer a:focus-visible,
 .hero a:focus-visible,
 .hero button:focus-visible,
-.promo-hero-slide a:focus-visible{
+.promo-hero-slide a:focus-visible,
+.bayer-hero-banner a:focus-visible,
+.bayer-hero-banner button:focus-visible,
+.promo-hero-banner a:focus-visible,
+.promo-hero-banner button:focus-visible{
     outline-color:#fff;
 }
 
@@ -14342,7 +14708,7 @@ summary:focus-visible,
 .order-item-refuse-left{
     margin-left:8px;
     font-size:12.5px;
-    color:#b45309;
+    color:var(--accent-ink);
 }
 
 /* «Відмову надіслано» і «замовлення скасовано» — два різні факти, але
@@ -14720,7 +15086,7 @@ body.refusal-open{
 }
 
 .refusal-file-state.is-over{
-    color:#dc2626;
+    color:var(--danger-ink);
     font-weight:600;
 }
 
@@ -14737,7 +15103,7 @@ body.refusal-open{
 .refusal-error{
     margin:0 0 12px;
     font-size:13px;
-    color:#dc2626;
+    color:var(--danger-ink);
 }
 
 .refusal-actions{
@@ -14838,7 +15204,7 @@ body.refusal-open{
     height:22px;
     flex:0 0 auto;
     border:2.5px solid var(--gray200);
-    border-top-color:var(--danger);
+    border-top-color:var(--danger-ink);
     border-radius:50%;
     animation:spin .8s linear infinite;
 }
@@ -14856,7 +15222,7 @@ body.refusal-open{
     display:inline-block;
     min-width:1ch;
     text-align:center;
-    color:var(--danger);
+    color:var(--danger-ink);
 }
 
 .favorite-row-undo-cancel{
@@ -15079,7 +15445,7 @@ body.refusal-open{
 .empty-state-note{
     margin-bottom:24px;
     font-size:13px;
-    color:var(--gray300);
+    color:var(--gray500);
     word-break:break-word;
 }
 
@@ -16048,7 +16414,7 @@ body.refusal-open{
     font-weight:700;
     letter-spacing:.12em;
     text-transform:uppercase;
-    color:var(--danger);
+    color:var(--danger-ink);
 }
 
 /* Відлік блока: на світлому тлі — суцільна заливка, не прозорість. */
@@ -16672,7 +17038,7 @@ body{
 }
 
 .dock-form input[aria-invalid="true"]{
-    border-color:var(--danger);
+    border-color:var(--danger-ink);
 }
 
 .dock-hint-text{
@@ -16694,7 +17060,7 @@ body{
 }
 
 .dock-message.is-error{
-    color:var(--danger);
+    color:var(--danger-ink);
     margin-top:10px;
 }
 
@@ -17145,7 +17511,7 @@ body.keyboard-up:has(#dockChat[aria-expanded="true"]){
 }
 
 .chat-note.is-error{
-    color:var(--danger);
+    color:var(--danger-ink);
 }
 
 /* -- канали смугою внизу --
@@ -17379,7 +17745,7 @@ body.keyboard-up:has(#dockChat[aria-expanded="true"]){
     display:block;
     margin-top:4px;
     font-size:11px;
-    color:var(--danger);
+    color:var(--danger-ink);
 }
 
 /* =====================================
