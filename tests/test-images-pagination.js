@@ -169,8 +169,22 @@ console.log("\n[2] Кілька розмірів одного фото");
     (ui.match(new RegExp(cardSizes.replace(/[()]/g, "\\$&"), "g")) || []).length >= 2,
     cardSizes);
   const prod = fs.readFileSync(path.join(ROOT,"assets/js/product.js"),"utf8");
-  check("галерея товару підключена", prod.includes('data-variant-sizes="(max-width: 900px) 100vw, 600px"'));
-  check("мініатюри беруть найдрібніший розмір", prod.includes('data-variant-sizes="100px"'));
+  // SIZES БІЛЬШЕ НЕ СТОЇТЬ В АТРИБУТІ ДОСЛІВНО.
+  //
+  // Розмітку обох галерей будує одна функція фотоРозмітка(), і sizes
+  // приходить їй аргументом — а далі потрапляє і в <source sizes>, і
+  // в data-variant-sizes запасної гілки. Перевірки, що шукали
+  // атрибут, почервоніли від самого винесення в функцію, хоч значення
+  // не змінились. Тому питаємо ЗНАЧЕННЯ, а не місце, де воно лежить.
+  const sizesГалереї = [...prod.matchAll(/фотоРозмітка\(img,\s*\d+,\s*"([^"]*)"/g)]
+    .map(m => m[1]);
+
+  check("галерея товару підключена",
+    sizesГалереї.includes("(max-width: 900px) 100vw, 600px"),
+    sizesГалереї.join(" | ") || "жодного виклику не знайдено");
+
+  check("мініатюри беруть найдрібніший розмір",
+    sizesГалереї.includes("100px"), sizesГалереї.join(" | "));
 
   // Вага каталожної версії ВІДНОСНО повнорозмірної.
   //

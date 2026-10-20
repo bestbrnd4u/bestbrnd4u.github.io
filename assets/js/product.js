@@ -820,17 +820,63 @@ function копіяФото(src, ширина) {
 
 }
 
+// Чи є в цього фото зменшені копії — тим самим правилом, що вище.
+function маєКопії(src) {
+
+    const шлях = String(src || "").split("?")[0];
+
+    return шлях.endsWith(".webp") && знаніКопії.has(шлях.split("/").pop());
+
+}
+
+// <picture> ЗАМІСТЬ ГОЛОГО <img> — ЩОБ ФОРМАТ ОБИРАВ БРАУЗЕР.
+//
+// Поки формат підставляв JS (ui.js дописував srcset після рендеру),
+// браузер устигав узяти webp із src, а потім ще й avif зі srcset —
+// тобто кожне фото їхало двічі. Заміряно на dev 20.10.2026, сторінка
+// Marc Jacobs Leather Tote: webp 59 КБ + avif 55 КБ, хоч показувався
+// лише avif.
+//
+// <source type="image/avif"> вирішує це в розмітці: браузер бере
+// рівно один файл і робить це ДО будь-якого JS.
+//
+// data-full тримає ОРИГІНАЛ — його відкриває лайтбокс. Без нього
+// повноекранний перегляд показував би копію 600px: він бере img.src,
+// а там тепер копія (саме так і сталось після попередньої правки).
+function фотоРозмітка(img, ширина, sizes, клас, решта) {
+
+    const спільне = `${клас ? `class="${клас}" ` : ""}`
+        + `src="${копіяФото(img, ширина)}" `
+        + `data-full="${img}" `
+        + `style="${galleryFrameStyle(img)}" `
+        + `${решта}`;
+
+    if (!маєКопії(img)) {
+
+        // Копій немає — лишаємо шлях, яким ui.js зможе доробити
+        // srcset пізніше, якщо фото нормалізують уже після збірки.
+        return `<img ${спільне} data-variant-src="${img}" data-variant-sizes="${sizes}">`;
+
+    }
+
+    const [шлях, запит] = String(img).split("?");
+    const база = шлях.slice(0, -".webp".length);
+    const v = запит ? `?${запит}` : "";
+
+    return `<picture>`
+        + `<source type="image/avif" srcset="${база}-300.avif${v} 300w, ${база}-600.avif${v} 600w" sizes="${sizes}">`
+        + `<source type="image/webp" srcset="${база}-300.webp${v} 300w, ${база}-600.webp${v} 600w" sizes="${sizes}">`
+        + `<img ${спільне}>`
+        + `</picture>`;
+
+}
+
 function buildThumbsMarkup(images, video, altText) {
 
     const imageThumbs = images.map((img, index) => `
         <div class="thumb ${index === 0 ? "active" : ""}">
-            <img
-                src="${копіяФото(img, 300)}"
-                style="${galleryFrameStyle(img)}"
-                data-variant-src="${img}"
-                data-variant-sizes="100px"
-                alt="${altText}"
-                onerror="this.onerror=null;this.src='assets/images/no-image.png'">
+            ${фотоРозмітка(img, 300, "100px", "",
+                `alt="${altText}" onerror="this.onerror=null;this.src='assets/images/no-image.png'"`)}
         </div>
     `).join("");
 
@@ -899,7 +945,8 @@ function buildTrackMarkup(images, video, altText) {
              role="button"
              tabindex="${index === 0 ? "0" : "-1"}"
              aria-label="Фото ${index + 1} з ${images.length}. Натисніть, щоб відкрити на весь екран">
-            <img class="gallery-photo" src="${копіяФото(img, 600)}" style="${galleryFrameStyle(img)}" data-variant-src="${img}" data-variant-sizes="(max-width: 900px) 100vw, 600px" alt="${altText}" draggable="false" onerror="this.onerror=null;this.src='assets/images/no-image.png'">
+            ${фотоРозмітка(img, 600, "(max-width: 900px) 100vw, 600px", "gallery-photo",
+                `alt="${altText}" draggable="false" onerror="this.onerror=null;this.src='assets/images/no-image.png'"`)}
         </div>
     `).join("");
 
@@ -2830,7 +2877,19 @@ function setupGallery() {
                     ? slide
                     : slide.querySelector("img");
 
-                return { type: "image", src: photo && photo.src };
+                // ПОВНОЕКРАННИЙ ПЕРЕГЛЯД — ЦЕ ПРО «РОЗДИВИТИСЬ».
+                //
+                // У src тепер копія 600px: саме вона показується на
+                // слайді, і тягнути туди оригінал було б марно. Але
+                // лайтбокс відкривають, щоб роздивитись фактуру й
+                // шви, — там потрібен оригінал, і його тримає
+                // data-full. Без цього рядка зум показував би
+                // розмиту копію (так і сталось після правки, яка
+                // перевела src на копії).
+                return {
+                    type: "image",
+                    src: (photo && (photo.dataset.full || photo.src)) || ""
+                };
 
             }).filter(slide => slide.src);
 
