@@ -69,6 +69,30 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v6
 
+      # ЗАЛЕЖНОСТІ ЛИШЕ ДЛЯ ВИЛИВКИ — І ЇХ РІВНО ОДНА.
+      #
+      # Довго цей крок узагалі не мав залежностей, і це була перевага:
+      # виливка не могла впасти через npm. Але зняття коментарів зі
+      # скриптів потребує справжнього розбирача JS (виразом там не
+      # обійтись — «//» буває в адресі, «/*» у регулярці), а це 166 КБ
+      # на кожен перший показ каталогу. Заміряно 20.10.2026.
+      #
+      # Тому terser лежить у dependencies, а не в devDependencies, і
+      # ставиться з --omit=dev: sharp, jsdom і onnxruntime-node
+      # (сотні мегабайтів) виливці не потрібні.
+      #
+      # Якщо npm усе-таки не впорається — scripts/strip-comments.js
+      # виходить із ::warning::, і сайт поїде з коментарями, а не
+      # зламається.
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install deploy dependencies
+        run: npm ci --omit=dev
+
       # ЩО САМЕ ЇДЕ НА PAGES.
       #
       # Було `path: .` — тобто весь репозиторій. Заміряно 19.10.2026:

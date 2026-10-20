@@ -72,11 +72,42 @@ console.log("\n[4] Конфіг відповідає реальному репо
         JSON.stringify(cfg.npmGroups));
   check("ліміт PR для npm заданий", typeof cfg.npmLimit === "number", cfg.npmLimit);
 
-  // залежності справді devDependencies — на сайт не потрапляють
+  // ЖОДЕН ПАКЕТ НЕ ДОЇЖДЖАЄ ДО ВІДВІДУВАЧА.
+  //
+  // Тут стояло `!pkg.dependencies` — «секції dependencies не мусить
+  // бути взагалі». Намір був правильний: нічого з node_modules не має
+  // потрапляти в браузер. Але форма виявилась завузькою, щойно
+  // зʼявилась залежність, потрібна САМІЙ ВИЛИВЦІ: terser знімає
+  // коментарі зі скриптів у scripts/strip-comments.js, тобто працює
+  // на збірці й на сайт не їде (20.10.2026).
+  //
+  // Тому питаємо не «чи є секція», а те, що справді важливо:
+  //   • node_modules у переліку винятків збирача — не публікується;
+  //   • жоден скрипт фронтенду не тягне пакет.
   const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, "package.json"), "utf8"));
-  check("залежності лише в devDependencies (сайт від них не залежить)",
-        !pkg.dependencies && Object.keys(pkg.devDependencies || {}).length > 0,
-        JSON.stringify(Object.keys(pkg.devDependencies || {})));
+
+  check("залежності взагалі є (інакше нема про що говорити)",
+        Object.keys(pkg.dependencies || {}).length
+        + Object.keys(pkg.devDependencies || {}).length > 0);
+
+  const збирач = fs.readFileSync(path.join(ROOT, "scripts/collect-site.js"), "utf8");
+
+  check("node_modules не публікується", /"node_modules"/.test(збирач));
+
+  const фронт = fs.readdirSync(path.join(ROOT, "assets/js"))
+    .filter(f => f.endsWith(".js"));
+
+  const зПакетом = фронт.filter(f => {
+    const код = fs.readFileSync(path.join(ROOT, "assets/js", f), "utf8")
+      .replace(/\/\*[\s\S]*?\*\//g, "");
+    // require("щось") і import … from "щось", де «щось» не починається
+    // з крапки чи слеша — тобто саме пакет, а не сусідній файл.
+    return /require\(\s*["'][a-z@]/.test(код)
+      || /from\s+["'][a-z@]/.test(код);
+  });
+
+  check(`жоден скрипт фронтенду не тягне пакет (${фронт.length} файлів)`,
+        зПакетом.length === 0, зПакетом.slice(0, 3).join(", "));
 
   // усі actions, що реально використовуються, підпадають під patterns:*
   const wfDir = path.join(ROOT, ".github/workflows");

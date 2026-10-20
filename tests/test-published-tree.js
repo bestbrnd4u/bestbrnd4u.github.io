@@ -34,6 +34,7 @@
 // прикладається кожне посилання з розмітки.
 const fs = require("fs");
 const os = require("os");
+const vm = require("vm");
 const path = require("path");
 
 const ROOT = path.join(__dirname, "..");
@@ -329,6 +330,130 @@ console.log("\n[6] Коментарі зі стилів на сайт не їд�
 
         check(`стиль схуд на ${Math.round(зменшення * 100)}%`,
             зменшення > 0.3, `${Math.round(зменшення * 100)}%`);
+
+    }
+}
+
+console.log("\n[7] Коментарі зі скриптів теж не їдуть — і код від цього не змінився");
+{
+    // ЩО ЦЕ ЗАКРИВАЄ
+    // ---------------
+    // Те саме, що [6], але для JS: заміряно 20.10.2026 на 41 файлі
+    // assets/js — gzip 455 → 161 КБ. На самій сторінці каталогу разом
+    // зі стилем виходить 396 → 120 КБ, тобто мінус 276 КБ на кожен
+    // перший показ.
+    //
+    // Виразом тут не обійтись: «//» буває всередині адреси, «/*» — у
+    // регулярці й шаблонному літералі. Тому scripts/strip-comments.js
+    // бере terser із ВИМКНЕНИМИ compress і mangle — той лише перевидає
+    // розібране дерево.
+    //
+    // ЧОМУ ЗВІРЯЄМО ПОВЕДІНКУ, А НЕ ТЕКСТ. terser попутно екранує «<»
+    // як «\x3c» у рядках і переписує нутро шаблонних літералів —
+    // семантично те саме, але текстом не порівняти: перша спроба
+    // такого порівняння дала 34 хибні зауваження. Тому питаємо
+    // ФУНКЦІЇ: ті самі входи мусять дати ті самі висновки.
+    const JS_ДЖЕРЕЛО = path.join(ROOT, "assets/js");
+    const JS_ЗІБРАНЕ = path.join(куди, "assets/js");
+
+    check("скрипти доїхали", fs.existsSync(JS_ЗІБРАНЕ));
+
+    if (зібрано && fs.existsSync(JS_ЗІБРАНЕ)) {
+
+        const файли = fs.readdirSync(JS_ДЖЕРЕЛО).filter(f => f.endsWith(".js"));
+
+        // ДЕТЕКТОР МУСИТЬ ВІДРІЗНЯТИ КОМЕНТАР ВІД ДВОХ СИМВОЛІВ.
+        //
+        // Перша версія шукала просто «/*» — і знайшла його в
+        // accept="image/*" у refusal-dialog.js. Тобто завалила
+        // перевірку на файлі, де коментарів давно немає.
+        //
+        // Тому «/*» рахуємо коментарем лише тоді, коли перед ним не
+        // стоїть літера, лапка чи двокрапка: у «image/*» перед слешем
+        // буква, у «https://» — двокрапка.
+        const зКоментарями = файли.filter(f => {
+            const текст = fs.readFileSync(path.join(JS_ЗІБРАНЕ, f), "utf8");
+            return /(^|[^:"'`\\\w*])\/\*/.test(текст) || /(^|\n)\s*\/\//.test(текст);
+        });
+
+        check(`у зібраних скриптах коментарів немає (${файли.length} файлів)`,
+            зКоментарями.length === 0, зКоментарями.slice(0, 3).join(", "));
+
+        const неПарсяться = файли.filter(f => {
+            try { new vm.Script(fs.readFileSync(path.join(JS_ЗІБРАНЕ, f), "utf8")); return false; }
+            catch (error) { return true; }
+        });
+
+        check("кожен зібраний скрипт лишився робочим кодом",
+            неПарсяться.length === 0, неПарсяться.slice(0, 3).join(", "));
+
+        // ПОВЕДІНКА. Беремо ті модулі, які виконуються і в Node (їх
+        // вимагають збірочні скрипти), і звіряємо висновки функцій.
+        const ВИПРОБИ = {
+            "translit.js": m => [m.toSlug && m.toSlug("Сумка Marc Jacobs"),
+                m.toSlug && m.toSlug("Окуляри / оправи")],
+            "breadcrumbs.js": m => [m.BACK_HTML,
+                m.firstGender && m.firstGender({ gender: "Жінкам" }),
+                JSON.stringify(m.buildTrail && m.buildTrail(
+                    { title: "Сумка", brand: "Coach", category: "Жіночі сумки", gender: "Жінкам" }, {}))],
+            "image-framing.js": m => [
+                m.frameStyleAttr && m.frameStyleAttr({ "a.webp": { zoom: 3, x: 20, y: 80 } }, "a.webp"),
+                m.frameStyleAttr && m.frameStyleAttr(null, "a.webp")],
+            "product-offer.js": m => [JSON.stringify(m.buildOffer && m.buildOffer(
+                { price: 6000, sku: "AX-1", preOrder: false }, "https://x/p/a/"))],
+            "stock.js": m => Object.keys(m).sort(),
+            "promo-meta.js": m => Object.keys(m).sort(),
+            "deal-layout.js": m => Object.keys(m).sort(),
+            "text-styles.js": m => Object.keys(m).sort()
+        };
+
+        const завантажити = (файл, код) => {
+            const Module = require("module");
+            const m = new Module(файл, null);
+            m.filename = path.join(JS_ДЖЕРЕЛО, файл);
+            m.paths = Module._nodeModulePaths(JS_ДЖЕРЕЛО);
+            m._compile(код, m.filename);
+            return m.exports;
+        };
+
+        let збіглось = 0;
+        const розійшлось = [];
+
+        for (const [файл, проба] of Object.entries(ВИПРОБИ)) {
+
+            const джерело = path.join(JS_ДЖЕРЕЛО, файл);
+            const зібране = path.join(JS_ЗІБРАНЕ, файл);
+
+            if (!fs.existsSync(джерело) || !fs.existsSync(зібране)) {
+                розійшлось.push(файл + ": немає файлу");
+                continue;
+            }
+
+            try {
+
+                const a = проба(завантажити(файл, fs.readFileSync(джерело, "utf8")));
+                const b = проба(завантажити(файл, fs.readFileSync(зібране, "utf8")));
+
+                if (JSON.stringify(a) === JSON.stringify(b)) збіглось++;
+                else розійшлось.push(`${файл}: ${JSON.stringify(a).slice(0, 60)} → ${JSON.stringify(b).slice(0, 60)}`);
+
+            } catch (error) {
+                розійшлось.push(`${файл}: ${error.message.slice(0, 60)}`);
+            }
+
+        }
+
+        check(`поведінка збіглась у ${збіглось} з ${Object.keys(ВИПРОБИ).length} модулів`,
+            розійшлось.length === 0, розійшлось.slice(0, 3).join("; "));
+
+        // І власне економія.
+        const вага = тека => fs.readdirSync(тека).filter(f => f.endsWith(".js"))
+            .reduce((s, f) => s + fs.statSync(path.join(тека, f)).size, 0);
+
+        const до = вага(JS_ДЖЕРЕЛО), після = вага(JS_ЗІБРАНЕ);
+
+        check(`скрипти схудли на ${Math.round((1 - після / до) * 100)}%`,
+            після < до * 0.75, `${Math.round(до / 1024)} → ${Math.round(після / 1024)} КБ`);
 
     }
 }
