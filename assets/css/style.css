@@ -33,7 +33,25 @@
        запасом (мінімум 5.04, на сторінках 5.5-6.1), — і лишається
        однаковим у всіх, бо це знак, а не прикраса. */
     --accent-ink:#8d500b;
-    --danger:#ef4444;
+    /* Червоний для ЗАЛИВКИ: на ньому білий напис — значок «-30%»,
+       кнопки видалення. З #ef4444 той напис давав 3.76 при нормі 4.5
+       (заміряно на живому каталозі: 10px, жирний). #dc2626 дає 4.83,
+       і цей відтінок у файлі вже вживався. */
+    --danger:#dc2626;
+
+    /* Червоний для ТЕКСТУ — окремий, як і бурштиновий.
+       Заливка й напис це різні пари: те, на чому білий текст читається,
+       саме текстом на світлому вже не читається. #dc2626 як напис дає
+       3.96 на тлі осені й 3.50 на її плашці. Цей проходить скрізь із
+       запасом: мінімум 5.04. */
+    --danger-ink:#b01b1b;
+
+    /* Той самий знак, але НА ТЕМНОМУ тлі.
+       Мобільне меню темно-синє, і темне чорнило там дає 2.48 — напис
+       «Акції» зникає. Світліший варіант проходить на темних тлах усіх
+       сезонів (мінімум 5.51). Два відтінки одного знаку — не
+       надмірність: контраст залежить від пари, а не від кольору. */
+    --danger-on-dark:#f87171;
 
     --white:#ffffff;
 
@@ -687,14 +705,14 @@ nav a.active{
 
 .sale-text,
 .sale-text.active{
-    color:var(--danger) !important;
+    color:var(--danger-ink) !important;
 }
 
 
 
 @media (hover:hover) and (pointer:fine){
 .sale-text:hover{
-    color:var(--danger) !important;
+    color:var(--danger-ink) !important;
 }
 }
 
@@ -2040,7 +2058,7 @@ nav li.has-mega[data-mega-open] .mega-menu.mega-menu-columns{
     display:none;
     align-items:center;
     gap:5px;
-    background:#b45309;
+    background:var(--accent-ink);
 }
 
 @media(max-width:768px){
@@ -2602,7 +2620,13 @@ nav li.has-mega[data-mega-open] .mega-menu.mega-menu-columns{
 
 .product-card .old-price{
     text-decoration:line-through;
-    color:var(--gray300);
+    /* НЕ --gray300: ТО КОЛІР РАМОК.
+       Як текст він дає 1.47 на білій картці — закреслена стара ціна
+       була практично невидима. А це доказ знижки: без неї «-30%»
+       нічим не підтверджене. Заміряно на живому каталозі 20.10.2026,
+       разом із трьома такими самими місцями (кошик, обране, сторінка
+       товару). «Старість» показує закреслення, а не блідість. */
+    color:var(--gray500);
     font-size:13px;
     white-space:nowrap;
 }
@@ -2722,7 +2746,11 @@ nav li.has-mega[data-mega-open] .mega-menu.mega-menu-columns{
 .newsletter small{
     display:block;
     margin-top:28px;
-    color:rgba(255,255,255,.4);
+    /* Було .4 — на темному підвалі це 3.77 при нормі 4.5, і «жодного
+       спаму» читалось гірше за решту дрібного тексту саме там, де
+       людина вирішує, лишати пошту чи ні. .55 дає 5.96 і все одно
+       явно тихіше за основний напис. Заміряно 20.10.2026. */
+    color:rgba(255,255,255,.55);
     font-size:13px;
     letter-spacing:.3px;
 }
@@ -2787,6 +2815,18 @@ footer{
     text-align:inherit;
     margin-bottom:20px;
     color:#fff;
+}
+
+.footer .sale-text{
+    /* Підвал темно-синій (background:var(--primary)), і темне чорнило
+       знаку давало тут 2.48 — напис «Акції» зливався з тлом.
+       Заміряно на живому каталозі 20.10.2026.
+       Мобільне меню при цьому БІЛЕ, тож там лишається темний
+       відтінок: контраст залежить від пари, а не від кольору.
+
+       !important тут не примха: базове .sale-text оголошене з ним, і
+       без нього це правило програє попри вищу вагу селектора. */
+    color:var(--danger-on-dark) !important;
 }
 
 .footer a{
@@ -5034,7 +5074,7 @@ body.mobile-filters-open .scroll-top{
     font-weight:700;
     text-transform:uppercase;
     letter-spacing:.04em;
-    color:var(--gray300);
+    color:var(--gray500);
 }
 
 .filter-option-group-title:first-child{
@@ -5100,7 +5140,7 @@ body.mobile-filters-open .scroll-top{
 @media (hover:hover) and (pointer:fine){
 .filter-option-clear:hover{
     background:var(--gray100);
-    color:var(--danger);
+    color:var(--danger-ink);
 }
 }
 
@@ -5339,8 +5379,8 @@ body.mobile-filters-open .scroll-top{
 
 @media (hover:hover) and (pointer:fine){
 .filter-chip:hover{
-    border-color:var(--danger);
-    color:var(--danger);
+    border-color:var(--danger-ink);
+    color:var(--danger-ink);
 }
 }
 
@@ -6297,7 +6337,7 @@ body.mobile-filters-open .scroll-top{
 .price-box .old-price{
     font-size:18px;
     text-decoration:line-through;
-    color:var(--gray300);
+    color:var(--gray500);
 }
 
 .product-short{
@@ -6342,7 +6382,7 @@ body.mobile-filters-open .scroll-top{
 
 .size-error{
     margin-top:10px;
-    color:#dc2626;
+    color:var(--danger-ink);
     font-size:13px;
     font-weight:600;
 }
@@ -6360,7 +6400,7 @@ body.mobile-filters-open .scroll-top{
 
 .size-shake .size,
 .size-shake .mini-size{
-    border-color:#dc2626 !important;
+    border-color:var(--danger-ink) !important;
 }
 
 /* -- модалка "Таблиця розмірів" -- */
@@ -6665,7 +6705,7 @@ body.mobile-filters-open .scroll-top{
 .favorite-btn.active .favorite-indicator{
     opacity:1;
     transform:scale(1);
-    border-color:var(--danger);
+    border-color:var(--danger-ink);
     box-shadow:0 4px 10px rgba(0,0,0,.12);
 }
 
@@ -7285,7 +7325,7 @@ body.mobile-filters-open .scroll-top{
 .cart-item-price .old-price,
 .cart-item-total .old-price{
     text-decoration:line-through;
-    color:var(--gray300);
+    color:var(--gray500);
     font-size:.85em;
 }
 
@@ -7348,7 +7388,7 @@ body.mobile-filters-open .scroll-top{
 @media (hover:hover) and (pointer:fine){
 .cart-item-remove:hover{
     background:#fee2e2;
-    color:#dc2626;
+    color:var(--danger-ink);
 }
 }
 
@@ -7522,7 +7562,7 @@ body.mobile-filters-open .scroll-top{
 
 .favorite-row-price .old-price{
     font-size:14px;
-    color:var(--gray300);
+    color:var(--gray500);
     text-decoration:line-through;
 }
 
@@ -7563,7 +7603,7 @@ body.mobile-filters-open .scroll-top{
 @media (hover:hover) and (pointer:fine){
 .favorite-row-remove:hover{
     background:#fee2e2;
-    color:var(--danger);
+    color:var(--danger-ink);
     transform:none;
 }
 }
@@ -7847,7 +7887,7 @@ body.mobile-filters-open .scroll-top{
 .field-error{
     font-size:12px;
     font-weight:500;
-    color:var(--danger);
+    color:var(--danger-ink);
     min-height:14px;
 }
 
@@ -7862,7 +7902,7 @@ body.mobile-filters-open .scroll-top{
 }
 
 .checkout-form input.invalid{
-    border-color:var(--danger);
+    border-color:var(--danger-ink);
     background:#fdf4f3;
     padding-right:44px;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ef4444' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cline x1='12' y1='8' x2='12' y2='13'/%3E%3Cline x1='12' y1='16' x2='12.01' y2='16'/%3E%3C/svg%3E");
@@ -7872,7 +7912,7 @@ body.mobile-filters-open .scroll-top{
 }
 
 .checkout-form input.invalid:focus{
-    border-color:var(--danger);
+    border-color:var(--danger-ink);
     box-shadow:0 0 0 4px rgba(239,68,68,.12);
 }
 
@@ -8137,7 +8177,7 @@ body.mobile-filters-open .scroll-top{
 }
 
 .promo-message.error{
-    color:var(--danger);
+    color:var(--danger-ink);
 }
 
 .order-summary .btn{
@@ -9035,7 +9075,7 @@ body.mobile-filters-open .scroll-top{
 
 .mobile-nav-list a.sale-text,
 .mobile-nav-list a.sale-text:active{
-    color:var(--danger) !important;
+    color:var(--danger-ink) !important;
 }
 
 /* =====================================
@@ -9413,7 +9453,7 @@ body.mobile-filters-open .scroll-top{
 }
 
 .search-no-suggestions{
-    color:var(--gray300);
+    color:var(--gray500);
     font-size:13px;
 }
 
@@ -10295,7 +10335,7 @@ body.mobile-filters-open .scroll-top{
 }
 
 .profile-actions-row .btn-outline{
-    color:#dc2626;
+    color:var(--danger-ink);
     border-color:#fecaca;
     /* РАМКА ДОДАЄТЬСЯ ДО ВИСОТИ, І ЦЬОГО НЕ РЯТУЄ border-box.
        box-sizing рахує рамку всередині коробки лише тоді, коли
@@ -10681,7 +10721,7 @@ body.mobile-filters-open .scroll-top{
 }
 
 .order-card-brief-discount{
-    color:var(--danger);
+    color:var(--danger-ink);
 }
 
 .order-card-brief-total{
@@ -10729,7 +10769,7 @@ body.mobile-filters-open .scroll-top{
 
 .order-status-cancelled{
     background:rgba(239,68,68,.1);
-    color:var(--danger);
+    color:var(--danger-ink);
 }
 
 /* Повернення — не скасування.
@@ -10769,7 +10809,7 @@ body.mobile-filters-open .scroll-top{
 
 @media (hover:hover) and (pointer:fine){
 .order-item-refuse:hover{
-    color:var(--danger);
+    color:var(--danger-ink);
 }
 }
 
@@ -10859,7 +10899,7 @@ body.mobile-filters-open .scroll-top{
 }
 
 .order-card-summary-discount span:last-child{
-    color:var(--danger);
+    color:var(--danger-ink);
     font-weight:600;
 }
 
@@ -11108,7 +11148,7 @@ body.mobile-filters-open .scroll-top{
 @media (hover:hover) and (pointer:fine){
 .address-remove-btn:hover{
     background:#fee2e2;
-    color:var(--danger);
+    color:var(--danger-ink);
 }
 }
 
@@ -11704,7 +11744,7 @@ body.mobile-filters-open .scroll-top{
 
 .mobile-filter-row-arrow{
     flex-shrink:0;
-    color:var(--gray300);
+    color:var(--gray500);
 }
 
 /* Рядок-перемикач у шторці фільтрів.
@@ -12504,7 +12544,7 @@ body.mobile-filters-open .scroll-top{
 
 .bayer-why-check.is-negative{
     background:rgba(239,68,68,.1);
-    color:var(--danger);
+    color:var(--danger-ink);
 }
 
 .bayer-why-item strong{
@@ -13098,7 +13138,7 @@ body.mobile-filters-open .scroll-top{
 
 .pagination-gap{
     padding:0 4px;
-    color:var(--gray300);
+    color:var(--gray500);
     user-select:none;
 }
 
@@ -13644,14 +13684,14 @@ body.mobile-filters-open .scroll-top{
    собі попереджає ще до читання тексту. */
 .confirm-danger{
     background:#dc2626;
-    border-color:#dc2626;
+    border-color:var(--danger-ink);
     color:#fff;
 }
 
 @media (hover:hover) and (pointer:fine){
 .confirm-danger:hover{
     background:#b91c1c;
-    border-color:#b91c1c;
+    border-color:var(--danger-ink);
 }
 }
 
@@ -14973,7 +15013,7 @@ body.refusal-open{
 }
 
 .refusal-file-state.is-over{
-    color:#dc2626;
+    color:var(--danger-ink);
     font-weight:600;
 }
 
@@ -14990,7 +15030,7 @@ body.refusal-open{
 .refusal-error{
     margin:0 0 12px;
     font-size:13px;
-    color:#dc2626;
+    color:var(--danger-ink);
 }
 
 .refusal-actions{
@@ -15091,7 +15131,7 @@ body.refusal-open{
     height:22px;
     flex:0 0 auto;
     border:2.5px solid var(--gray200);
-    border-top-color:var(--danger);
+    border-top-color:var(--danger-ink);
     border-radius:50%;
     animation:spin .8s linear infinite;
 }
@@ -15109,7 +15149,7 @@ body.refusal-open{
     display:inline-block;
     min-width:1ch;
     text-align:center;
-    color:var(--danger);
+    color:var(--danger-ink);
 }
 
 .favorite-row-undo-cancel{
@@ -15332,7 +15372,7 @@ body.refusal-open{
 .empty-state-note{
     margin-bottom:24px;
     font-size:13px;
-    color:var(--gray300);
+    color:var(--gray500);
     word-break:break-word;
 }
 
@@ -16301,7 +16341,7 @@ body.refusal-open{
     font-weight:700;
     letter-spacing:.12em;
     text-transform:uppercase;
-    color:var(--danger);
+    color:var(--danger-ink);
 }
 
 /* Відлік блока: на світлому тлі — суцільна заливка, не прозорість. */
@@ -16925,7 +16965,7 @@ body{
 }
 
 .dock-form input[aria-invalid="true"]{
-    border-color:var(--danger);
+    border-color:var(--danger-ink);
 }
 
 .dock-hint-text{
@@ -16947,7 +16987,7 @@ body{
 }
 
 .dock-message.is-error{
-    color:var(--danger);
+    color:var(--danger-ink);
     margin-top:10px;
 }
 
@@ -17398,7 +17438,7 @@ body.keyboard-up:has(#dockChat[aria-expanded="true"]){
 }
 
 .chat-note.is-error{
-    color:var(--danger);
+    color:var(--danger-ink);
 }
 
 /* -- канали смугою внизу --
@@ -17632,7 +17672,7 @@ body.keyboard-up:has(#dockChat[aria-expanded="true"]){
     display:block;
     margin-top:4px;
     font-size:11px;
-    color:var(--danger);
+    color:var(--danger-ink);
 }
 
 /* =====================================
