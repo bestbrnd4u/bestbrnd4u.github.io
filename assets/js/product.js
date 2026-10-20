@@ -652,16 +652,44 @@ function paintBreadcrumbs(product, map) {
 // Кнопка «Назад» при цьому лишається на місці: вона прилипла до лівого
 // краю (.crumb-back у style.css), інакше прокрутка вправо ховала б
 // саме те, чим найчастіше користуються.
+// Край під кнопкою «Назад»: вмикається лише тоді, коли шлях зсунуто.
+//
+// Поки доріжка не прокручена, одразу за кнопкою стоїть перший пункт —
+// цілий, і гасити його нема за що. Щойно шлях поїхав, під кнопку
+// заїжджають пункти й виринають обрізаними посеред слова; ось тоді
+// край і потрібен. Саме правило — .breadcrumbs-shifted у style.css.
+function markBreadcrumbsShift(host) {
+
+    host.classList.toggle("breadcrumbs-shifted", host.scrollLeft > 0);
+
+}
+
 function scrollBreadcrumbsToEnd() {
 
     const host = document.getElementById("breadcrumbsList");
 
     if (!host) return;
 
+    // Слухача вішаємо один раз: доріжку перемальовують двічі (одразу
+    // й коли приїде перелік категорій), а сам вузол при цьому той
+    // самий — без позначки підписка дублювалась би.
+    if (!host.dataset.shiftWatched) {
+        host.dataset.shiftWatched = "1";
+        host.addEventListener("scroll", () => markBreadcrumbsShift(host), { passive: true });
+    }
+
     // тільки якщо доріжка справді не влазить
-    if (host.scrollWidth <= host.clientWidth) return;
+    if (host.scrollWidth <= host.clientWidth) {
+        markBreadcrumbsShift(host);
+        return;
+    }
 
     host.scrollLeft = host.scrollWidth;
+
+    // scrollLeft присвоюється синхронно, тож позначку ставимо одразу:
+    // подія scroll прилетить лише наступним кадром, і до неї доріжка
+    // встигла б блимнути без краю.
+    markBreadcrumbsShift(host);
 
 }
 
