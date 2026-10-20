@@ -178,6 +178,15 @@ window.PRODUCT_TAXONOMY = {"category":{"Жіночі сумки":"categories/zhi
 // — вбудовані, а не довантажені: рядок «єдиний екземпляр»
 // стоїть високо, і запізнілий текст смикав би розмітку
 window.PRODUCT_TEXTS = {"onlyOneTitle":"Єдиний екземпляр.","onlyOneWithDays":"Якщо його купують, наступний веземо {строк}.","onlyOneWithoutDays":"Другого такого в наявності немає.","deliveryDate":"Орієнтовно у відділенні {дата}","handlingMin":1,"handlingMax":2,"transitMin":1,"transitMax":3};
+// у яких фото цього товару є зменшені копії.
+//
+// ЧОМУ ТУТ, А НЕ ЗАПИТОМ. Галерею product.js малює МИТТЄВО з
+// PRODUCT_DATA вище — не чекаючи на жодну мережу. Поки перелік
+// копій тягнувся окремим файлом, він не встигав, і в src
+// ставився повнорозмірний знімок: заміряно на dev 20.10.2026,
+// 764 КБ повнорозмірних при 31 КБ показаних копій. Тут це
+// кілька рядків і жодного запиту.
+window.PHOTO_VARIANTS = ["1.1_5a5d6ea8-1bba-4803-951d-520a38d4aa66.webp","1.3_ce9bb568-0aad-4321-a7e0-b14d24c39654.webp","1.4_25460987-0b5f-4461-8974-b1763e92ae4a.webp","1.6_e50f3e2f-9bc0-46c8-90db-1fbc061785eb.webp","1.7_f4726ced-2357-4efe-8aac-fe254f85c889.webp","91993377994530.webp","26067173821878.webp","49502081584862.webp","51655546705003.webp","56611343404440.webp"];
 </script>
 
 
@@ -866,7 +875,7 @@ BestBrnd4u
 <script src="/assets/js/lightbox.js?v=a8cfdeb0" defer></script>
 
 <script src="/assets/js/live-stock.js?v=ca9027dd" defer></script>
-<script src="/assets/js/product.js?v=c19bf061" defer></script>
+<script src="/assets/js/product.js?v=de90270f" defer></script>
 
 <!-- Відгуки: показ, форма й перевірка покупки на сервері -->
 <script src="/assets/js/reviews.js?v=905c3ee8" defer></script>

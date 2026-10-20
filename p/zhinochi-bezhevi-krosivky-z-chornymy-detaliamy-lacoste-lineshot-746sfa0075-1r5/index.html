@@ -177,6 +177,15 @@ window.PRODUCT_TAXONOMY = {"category":{"Кросівки":"categories/krosivky/"
 // — вбудовані, а не довантажені: рядок «єдиний екземпляр»
 // стоїть високо, і запізнілий текст смикав би розмітку
 window.PRODUCT_TEXTS = {"onlyOneTitle":"Єдиний екземпляр.","onlyOneWithDays":"Якщо його купують, наступний веземо {строк}.","onlyOneWithoutDays":"Другого такого в наявності немає.","deliveryDate":"Орієнтовно у відділенні {дата}","handlingMin":1,"handlingMax":2,"transitMin":1,"transitMax":3};
+// у яких фото цього товару є зменшені копії.
+//
+// ЧОМУ ТУТ, А НЕ ЗАПИТОМ. Галерею product.js малює МИТТЄВО з
+// PRODUCT_DATA вище — не чекаючи на жодну мережу. Поки перелік
+// копій тягнувся окремим файлом, він не встигав, і в src
+// ставився повнорозмірний знімок: заміряно на dev 20.10.2026,
+// 764 КБ повнорозмірних при 31 КБ показаних копій. Тут це
+// кілька рядків і жодного запиту.
+window.PHOTO_VARIANTS = ["bc4302e5-037f-4a05-b3b7-d6f959c4c00c_size2000x2000_cropcenter.webp","894a2223-e123-468a-9c5e-6949a9f72643_size2000x2000_cropcenter.webp","02e9fde1-b8ec-4df3-812c-6869dbcfb37c_size2000x2000_cropcenter.webp","1e18c52b-9cf3-411f-8897-4c0830babd56_size2000x2000_cropcenter.webp"];
 </script>
 
 
@@ -854,7 +863,7 @@ BestBrnd4u
 <script src="/assets/js/lightbox.js?v=a8cfdeb0" defer></script>
 
 <script src="/assets/js/live-stock.js?v=ca9027dd" defer></script>
-<script src="/assets/js/product.js?v=c19bf061" defer></script>
+<script src="/assets/js/product.js?v=de90270f" defer></script>
 
 <!-- Відгуки: показ, форма й перевірка покупки на сервері -->
 <script src="/assets/js/reviews.js?v=905c3ee8" defer></script>
