@@ -59,6 +59,12 @@ const api = (() => {
         /function searchTokens[\s\S]*?\n}\n/,
         /function hasSearchWord[\s\S]*?\n}\n/,
         /function searchHaystack[\s\S]*?\n}\n/,
+        // Містки російських слів і розміри в запиті: matchesQuery
+        // кличе обидва, і без них стенд падає з ReferenceError —
+        // тобто не червоніє, а ОБРИВАЄТЬСЯ, ховаючи решту перевірок.
+        /const SEARCH_SYNONYMS = \{[\s\S]*?\n\};\n/,
+        /function searchVariants[\s\S]*?\n}\n/,
+        /function matchesSize[\s\S]*?\n}\n/,
         /function matchesQuery[\s\S]*?\n}\n/,
         /function normalizeCode[\s\S]*?\n}\n/,
         /function squashCode[\s\S]*?\n}\n/,
