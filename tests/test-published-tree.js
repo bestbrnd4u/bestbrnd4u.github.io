@@ -458,6 +458,97 @@ console.log("\n[7] Коментарі зі скриптів теж не їдут
     }
 }
 
+console.log("\n[8] Жоден скрипт не проїде повз чистку");
+{
+    // ЩО ЦЕ ЗАКРИВАЄ
+    // ---------------
+    // Блок [7] дивиться в assets/js — тобто рівно туди, куди
+    // strip-comments.js і так заглядав за зашитим переліком
+    // ["assets/js", "admin"]. Скрипт, покладений завтра деінде,
+    // обидва б і пропустили, причому мовчки: перелік фільтрувався
+    // через existsSync, тож тека, якої немає, просто не трапляється.
+    //
+    // А «не трапилось жодної» означало «знято 0 КБ» у журналі
+    // збирання і НУЛЬОВИЙ код виходу — тобто collect-site.js вважав
+    // це успіхом і спокійно вез коментарі на Pages.
+    //
+    // Заміряно 02.11.2026: у зібраному сайті 60 файлів .js — 41 в
+    // assets/js і 19 в admin, тобто промаху тоді ще не було. Ці
+    // перевірки стоять, щоб його не стало й потім.
+    const { execFileSync } = require("child_process");
+
+    const СКРИПТ = path.join(ROOT, "scripts/strip-comments.js");
+
+    // Той самий детектор, що в [7]: «/*» рахується коментарем лише
+    // тоді, коли перед ним не літера, лапка чи двокрапка — інакше
+    // accept="image/*" і «https://» дають хибну тривогу.
+    const коментар = текст =>
+        /(^|[^:"'`\\\w*])\/\*/.test(текст) || /(^|\n)\s*\/\//.test(текст);
+
+    const усіСкрипти = корінь => {
+        const знайдені = [];
+        (function обійти(тека) {
+            for (const e of fs.readdirSync(тека, { withFileTypes: true })) {
+                const повний = path.join(тека, e.name);
+                if (e.isDirectory()) обійти(повний);
+                else if (e.name.endsWith(".js")) знайдені.push(повний);
+            }
+        })(корінь);
+        return знайдені;
+    };
+
+    if (зібрано) {
+
+        // Головне: питаємо не «чи чиста відома тека», а «чи чистий
+        // КОЖЕН скрипт, який їде на сайт».
+        const усі = усіСкрипти(куди);
+
+        const брудні = усі.filter(f => коментар(fs.readFileSync(f, "utf8")));
+
+        check(`коментарів немає в УСІХ ${усі.length} скриптах сайту`,
+            усі.length > 0 && брудні.length === 0,
+            брудні.slice(0, 3).map(f => path.relative(куди, f)).join(", "));
+
+    }
+
+    // Скрипт у несподіваному місці мусить почиститись…
+    const пісочниця = fs.mkdtempSync(path.join(os.tmpdir(), "strip-"));
+
+    fs.mkdirSync(path.join(пісочниця, "service"), { recursive: true });
+    fs.writeFileSync(path.join(пісочниця, "service/sw.js"),
+        "// пояснення, якого в браузері бути не повинно\nfunction a() { return 1; }\n",
+        "utf8");
+
+    let почистило = false;
+    try {
+        execFileSync(process.execPath, [СКРИПТ, пісочниця], { stdio: "pipe" });
+        почистило = !коментар(fs.readFileSync(path.join(пісочниця, "service/sw.js"), "utf8"));
+    } catch (error) {
+        почистило = false;
+    }
+
+    check("скрипт поза assets/js теж чиститься", почистило);
+
+    fs.rmSync(пісочниця, { recursive: true, force: true });
+
+    // …а тека зовсім без скриптів — падати, бо сайту без JS не буває:
+    // каталог, сторінка товару й кошик без нього не працюють узагалі.
+    const порожня = fs.mkdtempSync(path.join(os.tmpdir(), "strip-"));
+
+    fs.mkdirSync(path.join(порожня, "assets"), { recursive: true });
+
+    let впало = false;
+    try {
+        execFileSync(process.execPath, [СКРИПТ, порожня], { stdio: "pipe" });
+    } catch (error) {
+        впало = true;
+    }
+
+    check("тека без жодного .js валить збирання, а не мовчить", впало);
+
+    fs.rmSync(порожня, { recursive: true, force: true });
+}
+
 fs.rmSync(куди, { recursive: true, force: true });
 
 
