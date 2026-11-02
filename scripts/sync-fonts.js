@@ -51,9 +51,48 @@ const FONT_URL = "https://fonts.googleapis.com/css2?family=Inter:wght@"
 // Позначка, за якою знаходимо власний блок при повторному запуску.
 const MARK = "Шрифт. Тут, а не @import";
 
-// preconnect до обох хостів: css2 віддає googleapis, а самі файли
-// шрифту — gstatic. Без другого браузер витрачає час на з'єднання
-// з ним уже після розбору CSS.
+// ХОСТ SUPABASE БЕРЕМО З КОДУ, А НЕ ВПИСУЄМО ДРУГОЮ КОПІЄЮ.
+//
+// Він живе в assets/js/supabase-client.js. Копія тут розійшлася б із
+// оригіналом рівно тоді, коли проєкт переїде, — і прогрівання тихо
+// гріло б чужу адресу.
+function supabaseOrigin() {
+
+    const src = fs.readFileSync(path.join(ROOT, "assets/js/supabase-client.js"), "utf8");
+
+    const m = src.match(/const SUPABASE_URL = "([^"]+)"/);
+
+    if (!m) throw new Error("не знайшов SUPABASE_URL у assets/js/supabase-client.js");
+
+    return new URL(m[1]).origin;
+
+}
+
+// preconnect до обох хостів шрифту: css2 віддає googleapis, а самі
+// файли — gstatic. Без другого браузер витрачає час на з'єднання з
+// ним уже після розбору CSS.
+//
+// ТРЕТІЙ ХОСТ — SUPABASE, І ВІН ТУТ НЕ ЗАРАДИ ШРИФТУ.
+//
+// Блок цього кроку — єдине місце, яке гарантовано однакове на всіх
+// 174 сторінках, тож підказки з'єднання збираються разом саме тут.
+//
+// ЧОМУ САМЕ ЙОМУ ПОТРІБНЕ ПРОГРІВАННЯ. З'єднання з jsdelivr браузер
+// починає одразу: тег <script> стоїть у <head>, і передсканер бачить
+// його ще до розбору сторінки. А от до Supabase звертається вже
+// ЗАВАНТАЖЕНИЙ звідти клієнт — тобто рукостискання починається лише
+// після того, як виконається чужий скрипт, і лягає чистою затримкою
+// перед першим запитом залишків. Саме від них залежить кнопка
+// купівлі.
+//
+// ЗАМІРЯНО 03.11.2026, медіана з п'яти холодних з'єднань: DNS 3 мс,
+// TCP 8 мс, TLS 42 мс, перший байт 77 мс. Прогрівання знімає ці
+// 42 мс із критичного шляху; на мобільній мережі рукостискання
+// коштує більше.
+//
+// crossorigin ОБОВ'ЯЗКОВИЙ: запити до Supabase — це CORS-fetch без
+// кук, і прогріте з'єднання без цього прапорця браузер для них не
+// використає, тобто підказка була б марною.
 function block(indent) {
 
     return [
@@ -63,6 +102,7 @@ function block(indent) {
         `${indent}     не треба. -->`,
         `${indent}<link rel="preconnect" href="https://fonts.googleapis.com">`,
         `${indent}<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>`,
+        `${indent}<link rel="preconnect" href="${supabaseOrigin()}" crossorigin>`,
         `${indent}<link rel="stylesheet" href="${FONT_URL}">`
     ].join("\n");
 

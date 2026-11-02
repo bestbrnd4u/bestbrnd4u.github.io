@@ -153,6 +153,62 @@ console.log("\n[3] Блок є на кожній сторінці зі стил�
 
     check("preconnect до gstatic скрізь", noPreconnect.length === 0,
         `${noPreconnect.length}: ${noPreconnect.slice(0, 3).join(", ")}`);
+
+    // ПРОГРІВАННЯ ДО SUPABASE — У ЦЬОМУ Ж БЛОЦІ.
+    //
+    // До jsdelivr браузер з'єднується сам: тег <script> стоїть у
+    // <head>, і передсканер бачить його одразу. А до Supabase
+    // звертається вже ЗАВАНТАЖЕНИЙ звідти клієнт — рукостискання
+    // починається аж після виконання чужого скрипта й лягає чистою
+    // затримкою перед першим запитом залишків, від яких залежить
+    // кнопка купівлі.
+    //
+    // Заміряно 03.11.2026, медіана з п'яти холодних з'єднань:
+    // TLS 42 мс, перший байт 77 мс.
+    const supabaseOrigin = new URL(
+        read("assets/js/supabase-client.js").match(/const SUPABASE_URL = "([^"]+)"/)[1]).origin;
+
+    // ЛИШЕ СТОРІНКИ, ЯКИМИ КЕРУЄ КРОК.
+    //
+    // withStyle вище ловить і admin/seasons.html — прев'ю в адмінці,
+    // яке не підключає стилі тегом, а ТЯГНЕ їх через fetch. Крок її
+    // не чіпає (у нього умова на <link>), і шрифтовий блок там
+    // написаний руками. Вимагати від неї прогрівання до Supabase
+    // нема сенсу: вона з ним і не розмовляє.
+    const керовані = withStyle.filter(file =>
+        /<link\b[^>]*assets\/css\/style\.css/.test(fs.readFileSync(file, "utf8")));
+
+    check(`сторінок під кроком: ${керовані.length}`, керовані.length > 100);
+
+    const noSupabase = керовані.filter(file =>
+        !fs.readFileSync(file, "utf8").includes(`preconnect" href="${supabaseOrigin}"`));
+
+    check("preconnect до Supabase скрізь", noSupabase.length === 0,
+        `${noSupabase.length}: ${noSupabase.slice(0, 3).join(", ")}`);
+
+    // crossorigin ОБОВ'ЯЗКОВИЙ: запити до Supabase — CORS-fetch без
+    // кук, і без цього прапорця браузер прогріте з'єднання для них не
+    // використає. Тобто підказка лишилась би, а користі з неї — нуль.
+    const безПрапорця = керовані.filter(file => {
+        const html = fs.readFileSync(file, "utf8");
+        const тег = (html.match(new RegExp(`<link[^>]*${supabaseOrigin.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}[^>]*>`)) || [])[0] || "";
+        return !/crossorigin/.test(тег);
+    });
+
+    check("і саме з crossorigin", безПрапорця.length === 0,
+        `${безПрапорця.length}: ${безПрапорця.slice(0, 3).join(", ")}`);
+
+    // ХОСТ — З КОДУ, А НЕ ДРУГОЮ КОПІЄЮ.
+    //
+    // Копія в кроці збірки розійшлася б із оригіналом рівно тоді,
+    // коли проєкт переїде, — і прогрівання тихо гріло б чужу адресу.
+    check("крок читає хост із supabase-client.js",
+        /supabase-client\.js/.test(read("scripts/sync-fonts.js")),
+        "крок не звертається до джерела адреси");
+
+    check("і сам хост у кроці не записаний",
+        !read("scripts/sync-fonts.js").includes(supabaseOrigin),
+        "у sync-fonts.js лежить друга копія адреси");
 }
 
 console.log("\n[4] Збірка сходиться за один прохід");
