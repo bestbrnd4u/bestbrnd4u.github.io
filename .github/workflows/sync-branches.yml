@@ -65,9 +65,22 @@ jobs:
           node-version: "22"
           cache: "npm"
 
-      - name: Install dependencies
-        run: npm ci
-
+      # ЗАЛЕЖНОСТЕЙ ТУТ НЕМАЄ — І ЦЕ НАВМИСНО.
+      #
+      # Раніше `npm ci` стояв саме тут, перед злиттям. А checkout бере
+      # гілку-ПРИЙМАЧА, тобто залежності ставились із package.json
+      # гілки main — тієї, куди ще нічого не перенесли.
+      #
+      # 02.11.2026 на цьому впало перенесення. На dev до dependencies
+      # додали terser (ним знімаються коментарі зі скриптів дорогою на
+      # Pages). Під час Sync його не було: чистка мовчки вийшла нулем
+      # — вона так і задумана, щоб відсутній terser не валив виливку,
+      # — і скрипти лишились по 1541 КБ із коментарями. Ворота нижче
+      # це побачили й зупинили перенесення.
+      #
+      # Тобто БУДЬ-ЯКА нова залежність, додана на dev, ламала перше ж
+      # перенесення. Тому `npm ci` переїхав ПІСЛЯ злиття: ставимо те,
+      # що просить уже злите дерево.
       - name: Визначити гілки
         id: pick
         run: |
@@ -81,9 +94,7 @@ jobs:
             echo "env=development" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Перенести і перезібрати
-        env:
-          SITE_ENV: ${{ steps.pick.outputs.env }}
+      - name: Перенести
         run: |
           set -e
           git config user.name "bestbrnd4u-bot"
@@ -156,7 +167,20 @@ jobs:
             git commit --no-edit
           fi
 
-          # перезбірка під середовище гілки-приймача
+      # САМЕ ТУТ, А НЕ ДО ЗЛИТТЯ — див. коментар біля «Визначити
+      # гілки». Дерево вже злите, тож package.json і package-lock.json
+      # тут ті, що з гілки-джерела, і нова залежність на місці.
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Перезібрати під середовище гілки-приймача
+        env:
+          SITE_ENV: ${{ steps.pick.outputs.env }}
+        run: |
+          set -e
+          git config user.name "bestbrnd4u-bot"
+          git config user.email "actions@users.noreply.github.com"
+
           npm run build
 
           git add -A
