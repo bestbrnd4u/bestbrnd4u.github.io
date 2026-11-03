@@ -201,6 +201,27 @@ function promoPicture(promo, breakpoint, extraAttrs) {
         ? `<source media="(max-width: ${breakpoint}px)" srcset="${promo.imageMobile}">`
         : "";
 
+    // ВІДКЛАДЕННЯ — ТИПОВЕ, НЕГАЙНІСТЬ — ВИНЯТОК.
+    //
+    // Цю розмітку просять п'ять місць, і лише ОДНЕ з них вище згину:
+    // перший слайд героя. Решта — promo-card, brand-campaign,
+    // brand-teaser і deal-banner — лежать за три-пʼять тисяч пікселів
+    // від верху, тобто чотири-шість екранів униз.
+    //
+    // ЗАМІРЯНО 03.11.2026 на проді, телефон 390×844: головна тягнула
+    // 1388 КБ картинок, а на екрані була ОДНА. Найважчі —
+    // mob009.webp 247 КБ (brand-campaigns, 3258 px униз),
+    // 02marc-jacobs_banner 192 КБ і 4coachsmall_card 173 КБ
+    // (brand-teasers, 4555 і 5175 px униз). Усі негайні.
+    //
+    // Тому мовчазний виклик означає «відкласти»: новий рекламний блок
+    // у майбутньому так само не потягне кадр наперед, і про це не
+    // треба памʼятати. А той, кому потрібна негайність, просить її
+    // вголос — як герой нижче.
+    const вантаження = /loading=/.test(extraAttrs || "")
+        ? ""
+        : ` loading="lazy" decoding="async"`;
+
     return `
         <picture>
             ${mobile}
@@ -208,8 +229,8 @@ function promoPicture(promo, breakpoint, extraAttrs) {
                 src="${promo.image}"
                 style="${frameFor(promo.image)}"
                 alt="${promo.title}"
-                ${extraAttrs || ""}
-                onerror="this.src='assets/images/no-image.png'">
+                ${extraAttrs || ""}${вантаження}
+                onerror="this.src='assets/images/no-image.webp'">
         </picture>`;
 
 }
@@ -409,9 +430,10 @@ function renderCategories(categories) {
         gridEl.innerHTML = categories.items.map(item => `
             <a href="${item.link || "catalog"}" class="category">
                 <img
-                    src="${item.image || "assets/images/no-image.png"}"
+                    src="${item.image || "assets/images/no-image.webp"}"
                     alt="${item.label || ""}"
-                    onerror="this.src='assets/images/no-image.png'">
+                    loading="lazy" decoding="async"
+                    onerror="this.src='assets/images/no-image.webp'">
                 <h3>${item.label || ""}</h3>
             </a>
         `).join("");
@@ -828,9 +850,30 @@ function renderHeroSliderPromotions(heroPromotions) {
 
     if (!section || !track) return;
 
-    track.innerHTML = heroPromotions.map(promo => {
+    // ВИДНО ЛИШЕ ПЕРШИЙ СЛАЙД — решта чекають свайпу.
+    //
+    // Смуга героя влаштована так само, як галерея товару: горизонтальний
+    // скролер зі scroll-snap, де слайд займає всю ширину. Але всі кадри
+    // були негайними.
+    //
+    // ЗАМІРЯНО 03.11.2026 на проді, телефон 390×844: головна тягнула
+    // 1388 КБ картинок, із яких на екрані була ОДНА. Найважчі —
+    // mob009.webp 247 КБ і 4coachsmall_card 173 КБ — це другий і третій
+    // кадри героя.
+    //
+    // Перший лишається негайним: він і є головне зображення сторінки,
+    // кандидат на LCP.
+    track.innerHTML = heroPromotions.map((promo, index) => {
 
         const promoLink = `${PromoMeta.promoPath(promo.slug)}`;
+
+        // Перший слайд просить негайність ВГОЛОС: у promoPicture()
+        // типове — відкладення, і мовчазний виклик відклав би головне
+        // зображення сторінки. fetchpriority додає йому ваги серед
+        // усього, що браузер тягне на старті.
+        const колиВантажити = index === 0
+            ? `loading="eager" fetchpriority="high"`
+            : "";
 
         const genderButtons = Array.isArray(promo.genderButtons) && promo.genderButtons.length
             ? promo.genderButtons
@@ -866,7 +909,7 @@ function renderHeroSliderPromotions(heroPromotions) {
             </div>
 
             <a href="${promoLink}" class="promo-hero-slide-image">
-                ${promoPicture(promo, 768)}
+                ${promoPicture(promo, 768, колиВантажити)}
             </a>
 
         </div>
@@ -1368,7 +1411,7 @@ function renderCollectionWidget(collection, items) {
                             src="${collection.image}"
                             alt="${collection.imageAlt || collection.title}"
                             loading="lazy"
-                            onerror="this.src='assets/images/no-image.png'">
+                            onerror="this.src='assets/images/no-image.webp'">
                     </picture>
                 </div>
 
@@ -1410,7 +1453,7 @@ function createCollectionProductCard(product) {
     const image =
         product.images?.[0] ||
         product.variants?.[0]?.images?.[0] ||
-        "assets/images/no-image.png";
+        "assets/images/no-image.webp";
 
     const oldPrice = oldPriceNow(product)
         ? `<span class="old-price">${formatPrice(oldPriceNow(product))}</span>`
@@ -1425,7 +1468,7 @@ function createCollectionProductCard(product) {
                     src="${image}"
                     alt="${escapeHtml(product.title)}"
                     loading="lazy"
-                    onerror="this.src='assets/images/no-image.png'">
+                    onerror="this.src='assets/images/no-image.webp'">
 
                 <button class="favorite" data-id="${product.id}"
                         aria-pressed="false"

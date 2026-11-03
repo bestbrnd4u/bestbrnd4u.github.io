@@ -280,12 +280,24 @@ function collectHaystack() {
 
 }
 
+// ІМ'Я МУСИТЬ ПОЧИНАТИСЬ САМЕ ТАМ, ДЕ ЗБІГЛОСЬ.
+//
+// Доти перевірка була простим includes() — і коротке ім'я вважалось
+// ужитим, щойно воно траплялось ХВОСТОМ довшого. Через це
+// banners/2.png (1,9 МБ) роками їхав на Pages: «2.png» є всередині
+// «favicon-512.png».
+//
+// Саме правило лежить у normalize-media-names.js — те саме питання
+// ставить і shrink-heavy-images.js, а друга копія означала б, що
+// межу колись полагодять в одному місці, а друге й далі мовчатиме.
+const { згадано } = require("./normalize-media-names");
+
 function isReferenced(name, haystack) {
 
-    if (haystack.includes(name)) return true;
+    if (згадано(haystack, name)) return true;
 
     // кирилиця в даних може лежати закодованою
-    if (haystack.includes(encodeURIComponent(name))) return true;
+    if (згадано(haystack, encodeURIComponent(name))) return true;
 
     return false;
 

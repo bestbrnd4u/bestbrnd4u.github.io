@@ -30,9 +30,9 @@
   "imageAlt": "Годинники для твого стилю",
   "order": 1,
   "title": "Годинники для твого стилю",
-  "image": "/assets/images/banners/collection-watches.jpg",
+  "image": "/assets/images/banners/collection-watches.webp",
   "autoSections": [
     "Годинники"
   ],
-  "imageMobile": "/assets/images/banners/collection-watches-mobile.jpg"
+  "imageMobile": "/assets/images/banners/collection-watches-mobile.webp"
 }

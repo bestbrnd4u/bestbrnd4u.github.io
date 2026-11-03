@@ -857,7 +857,7 @@ function buildThumbsMarkup(images, video, altText) {
     const imageThumbs = images.map((img, index) => `
         <div class="thumb ${index === 0 ? "active" : ""}">
             ${фотоРозмітка(img, 300, "100px", "",
-                `alt="${altText}" onerror="this.onerror=null;this.src='assets/images/no-image.png'"`)}
+                `alt="${altText}" onerror="this.onerror=null;this.src='assets/images/no-image.webp'"`)}
         </div>
     `).join("");
 
@@ -870,7 +870,7 @@ function buildThumbsMarkup(images, video, altText) {
         // мініатюра — це фото (poster), а не сам відеотег: так
         // завжди видно нормальну картинку зверху, а не порожній/
         // чорний кадр, поки браузер ще не підвантажив відео
-        const poster = images[0] || "assets/images/no-image.png";
+        const poster = images[0] || "assets/images/no-image.webp";
 
         videoThumb = `
         <div class="thumb thumb-video ${images.length === 0 ? "active" : ""}" style="background-image:url('${poster}');background-size:cover;background-position:center">
@@ -973,7 +973,7 @@ function buildTrackMarkup(images, video, altText) {
              aria-label="Фото ${index + 1} з ${images.length}. Натисніть, щоб відкрити на весь екран">
             ${фотоРозмітка(img, 600, "(max-width: 900px) 100vw, 600px", "gallery-photo",
                 `alt="${altText}" draggable="false" ${колиВантажити(index)}`
-                + ` onerror="this.onerror=null;this.src='assets/images/no-image.png'"`)}
+                + ` onerror="this.onerror=null;this.src='assets/images/no-image.webp'"`)}
         </div>
     `).join("");
 
@@ -1014,7 +1014,7 @@ function buildTrackMarkup(images, video, altText) {
             <video
                 class="gallery-slide gallery-slide-video"
                 src="${media.videoUrl}"
-                poster="${images[0] || "assets/images/no-image.png"}"
+                poster="${images[0] || "assets/images/no-image.webp"}"
                 muted
                 playsinline
                 loop
@@ -1070,7 +1070,7 @@ function buildTrackMarkup(images, video, altText) {
 
     return imageSlides + videoSlide
         || `<div class="gallery-slide gallery-slide-photo">
-                <img class="gallery-photo" src="assets/images/no-image.png" alt="${altText}">
+                <img class="gallery-photo" src="assets/images/no-image.webp" alt="${altText}">
             </div>`;
 
 }

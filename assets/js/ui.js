@@ -472,7 +472,7 @@ function createProductCard(product, eager) {
 
     const images = variants[0].images?.length
         ? variants[0].images
-        : (product.images?.length ? product.images : ["assets/images/no-image.png"]);
+        : (product.images?.length ? product.images : ["assets/images/no-image.webp"]);
 
     // відео беремо з активного (першого) варіанту кольору —
     // саме його фото/колір показані на картці за замовчуванням
@@ -970,7 +970,7 @@ function cardPhotoSlide(product, img, eager) {
                 data-variant-sizes="(max-width: 768px) 50vw, (max-width: 1300px) 300px, 400px"
                 alt="${escapeHtml((product && product.title) || "")}"
                 loading="${eager ? "eager" : "lazy"}"
-                onerror="this.src='assets/images/no-image.png'">
+                onerror="this.src='assets/images/no-image.webp'">
         </div>
     `;
 

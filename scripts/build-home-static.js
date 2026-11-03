@@ -184,9 +184,10 @@ function main() {
         const cards = home.categories.items.map(item => `
             <a href="${escapeAttr(item.link || "catalog")}" class="category">
                 <img
-                    src="${escapeAttr(item.image || "assets/images/no-image.png")}"
+                    src="${escapeAttr(item.image || "assets/images/no-image.webp")}"
                     alt="${escapeAttr(item.label || "")}"
-                    onerror="this.src='assets/images/no-image.png'">
+                    loading="lazy" decoding="async"
+                    onerror="this.src='assets/images/no-image.webp'">
                 <h3>${escapeAttr(item.label || "")}</h3>
             </a>`).join("\n");
 

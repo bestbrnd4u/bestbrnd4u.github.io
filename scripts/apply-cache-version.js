@@ -62,7 +62,15 @@ const ROOT = path.join(__dirname, "..");
 // admin — теж свій: у ньому стилі панелі редактора
 // (admin/editor-styles.css). Без версії браузер після виливки
 // віддавав би старий файл, і виправлення верстки не доїхало б.
-const ASSET_DIRS = ["assets/js", "assets/css", "admin"];
+// assets/js/vendor — чужі бібліотеки, які лежать у нас
+// (scripts/vendor-libs.js). Версія стоїть уже в імені файлу, але
+// правило кешу Cloudflare вмикає річний строк за УМОВОЮ «в адресі є
+// v=» (див. docs/КЕШ.md). Заміряно 03.11.2026: /assets/css/style.css
+// без запиту віддається з max-age=14400, а з «?v=» — з 31536000.
+//
+// Без цього рядка повторний відвідувач перезавантажував би клієнт
+// Supabase (53 КБ gzip) кожні чотири години.
+const ASSET_DIRS = ["assets/js", "assets/js/vendor", "assets/css", "admin"];
 
 // Дані, які тягне JS. Версії для них ідуть у window.ASSET_VERSIONS.
 const DATA_DIR = "data";
