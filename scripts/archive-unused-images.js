@@ -126,6 +126,44 @@ function readMediaFolders() {
 const MEDIA_DIR_REL = process.env.ARCHIVE_MEDIA_DIR || readMediaFolder();
 const MEDIA_DIR = path.resolve(ROOT, MEDIA_DIR_REL);
 
+// ТЕКИ, ЯКІ НЕ Є МЕДІАТЕКОЮ АДМІНКИ, АЛЕ ЇДУТЬ НА САЙТ.
+//
+// readMediaFolders() бере теки з admin/config.yml — тобто рівно ті,
+// куди кладе файли адмінка. Усе, що потрапило в репозиторій іншим
+// шляхом (руками, зі старого шаблону, з попереднього власника),
+// прибиранню невидиме НАЗАВЖДИ. Не «поки не дійдуть руки», а зовсім:
+// жоден звіт його не назве.
+//
+// ЗАМІРЯНО 03.11.2026.
+//
+//   assets/images/products         8 файлів, 8,35 МБ — МЕРТВІ ВСІ
+//     Dolomiti-…-lands-d423bdc1.jpg          2257 КБ
+//     pexels-christian-heitz-842711.jpg      1893 КБ
+//     pexels-pixabay-33045.jpg               1278 КБ
+//     pexels-lalesh-aldarwish-168938.jpg     1202 КБ
+//     …ще три pexels і guess-noelle-1.jpg на ОДИН байт
+//
+//   assets/images                  3 файли, 230 КБ
+//     no-image.png, promo.jpg, hero.jpg
+//
+// Це стокові знімки з часів шаблону. Відвідувач їх не качає — вони
+// нікуди не підключені, — зате вони лежать у кожній викладці.
+//
+// Окремо: no-image.png осиротів щойно, і це нормальний хід подій.
+// shrink-heavy-images.js навмисно лишає оригінал на диску, а
+// підбирати його має саме прибирач — доти цей ланцюжок обривався на
+// теці, якої він не бачив.
+//
+// ЧОМУ ЦЕ БЕЗПЕЧНО. findUnused() не рекурсивна: вона читає лише
+// файли ПРОСТО в теці. Тож assets/images, assets/images/products і
+// assets/images/products/uploads не перетинаються, хоч і вкладені.
+// А з обходу за текстом ці теки випадають без наслідків: єдині
+// текстові файли під ними лежать у _archive, який і так пропускаємо.
+//
+// І ніщо не зникає сьогодні: нові знахідки стають у чергу на 30 днів,
+// а перенесене повертає npm run images:restore.
+const EXTRA_DIRS = ["assets/images", "assets/images/products"];
+
 // Повний перелік тек, які прибираємо.
 //
 // ARCHIVE_MEDIA_DIRS (через кому) — пісочниця для перевірки саме
@@ -133,12 +171,15 @@ const MEDIA_DIR = path.resolve(ROOT, MEDIA_DIR_REL);
 // дивиться, що вони не склеїлись. ARCHIVE_MEDIA_DIR лишається для
 // старих перевірок однієї теки.
 //
-// У обох випадках справжніх медіатек прогін не торкається взагалі.
+// У обох випадках справжніх медіатек прогін не торкається взагалі —
+// і EXTRA_DIRS там теж не додаємо, інакше пісочниця перестала б бути
+// пісочницею.
 const MEDIA_DIRS = process.env.ARCHIVE_MEDIA_DIRS
     ? process.env.ARCHIVE_MEDIA_DIRS.split(",").map(s => s.trim()).filter(Boolean)
     : process.env.ARCHIVE_MEDIA_DIR
         ? [MEDIA_DIR_REL]
-        : readMediaFolders();
+        : [...new Set([...readMediaFolders(), ...EXTRA_DIRS])]
+            .filter(rel => fs.existsSync(path.resolve(ROOT, rel)));
 
 // Архів навмисно ЗА МЕЖАМИ media_folder — інакше Decap показував би
 // його вміст у тому самому діалозі, і сенс прибирання зникає.
@@ -671,7 +712,7 @@ function main() {
 
 module.exports = {
     findUnused, readMediaFolders,
-    MEDIA_DIR_REL, MEDIA_DIRS, ARCHIVE_DIR_REL, ARCHIVE_AFTER_DAYS
+    MEDIA_DIR_REL, MEDIA_DIRS, EXTRA_DIRS, ARCHIVE_DIR_REL, ARCHIVE_AFTER_DAYS
 };
 
 if (require.main === module) main();
