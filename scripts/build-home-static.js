@@ -186,6 +186,7 @@ function main() {
                 <img
                     src="${escapeAttr(item.image || "assets/images/no-image.png")}"
                     alt="${escapeAttr(item.label || "")}"
+                    loading="lazy" decoding="async"
                     onerror="this.src='assets/images/no-image.png'">
                 <h3>${escapeAttr(item.label || "")}</h3>
             </a>`).join("\n");
