@@ -65,18 +65,47 @@ console.log("\n[2] Sync branches сам перевіряє те, що поїде
 
     const steps = Object.values(sync.jobs)[0].steps;
 
-    const names = steps.map(s => s.name || "");
+    // ШУКАЄМО КРОКИ ЗА ВМІСТОМ, А НЕ ЗА НАЗВОЮ.
+    //
+    // Тут стояло findIndex по назві «Перенести і перезібрати». Коли
+    // цей крок довелось розділити надвоє, назва зникла — і перевірка
+    // почала шукати те, чого немає. Назва крока в YAML не несе
+    // жодного змісту для CI, тож і спиратись на неї не варто: команда
+    // в `run` і є те, що справді відбувається.
+    const бігає = re => steps.findIndex(s => re.test(String(s.run || "")));
 
-    const at = needle => names.findIndex(n => n.includes(needle));
-
-    const build = at("Перенести і перезібрати");
+    const merge = бігає(/git merge\b/);
+    const install = бігає(/^\s*npm ci\s*$/m);
+    const build = бігає(/npm run build/);
     const test = steps.findIndex(s => String(s.run || "").trim() === "npm test");
-    const push = steps.findIndex(s => /git push origin/.test(String(s.run || "")));
-    const deploy = at("Trigger deploy");
+    const push = бігає(/git push origin/);
+    const deploy = бігає(/gh workflow run deploy-pages\.yml/);
 
-    check("крок перенесення є", build >= 0);
+    check("крок злиття є", merge >= 0);
+    check("крок збірки є", build >= 0);
     check("набір ганяється", test >= 0);
     check("пуш винесений окремим кроком", push >= 0);
+
+    // ЗАЛЕЖНОСТІ СТАВЛЯТЬСЯ ПІСЛЯ ЗЛИТТЯ.
+    //
+    // РЕГРЕСІЯ, ЯКУ ЦЕ ЛОВИТЬ. `npm ci` стояв ПЕРЕД злиттям, а
+    // checkout бере гілку-приймача — тобто залежності ставились із
+    // package.json тієї гілки, куди ще нічого не перенесли.
+    //
+    // 02.11.2026 на цьому впало перенесення dev→main. На dev до
+    // dependencies додали terser (ним знімаються коментарі зі
+    // скриптів дорогою на Pages). Під час Sync його не було: чистка
+    // мовчки вийшла нулем — вона так і задумана, щоб відсутній terser
+    // не валив виливку, — і скрипти лишились по 1541 КБ. Ворота нижче
+    // це побачили й зупинили перенесення.
+    //
+    // Тобто будь-яка НОВА залежність, додана на гілці-джерелі, ламала
+    // перше ж перенесення.
+    check("залежності ставляться ПІСЛЯ злиття, а не з гілки-приймача",
+        install > merge, `злиття ${merge}, npm ci ${install}`);
+
+    check("і ДО збірки — інакше збирати нічим",
+        install >= 0 && install < build, `npm ci ${install}, збірка ${build}`);
 
     // ПОРЯДОК — це і є суть воріт.
     check("тести ПІСЛЯ перезбірки: перевіряємо те, що поїде, а не те, що було",
@@ -100,19 +129,29 @@ console.log("\n[2] Sync branches сам перевіряє те, що поїде
 
 console.log("\n[3] Пуш і коміт не сплутані");
 {
-    const sync = read(".github/workflows/sync-branches.yml");
+    const steps = Object.values(load(".github/workflows/sync-branches.yml").jobs)[0].steps;
+
+    // ЗНОВУ ЗА ВМІСТОМ, А НЕ ЗА НАЗВОЮ.
+    //
+    // Тут текст різався від назви крока «Перенести і перезібрати» до
+    // коментаря «ВОРОТА ПЕРЕД ПРОДОМ». Коли 02.11.2026 цей крок
+    // довелось розділити надвоє (залежності мусять ставитись уже
+    // після злиття), indexOf повернув -1 — а slice(-1, …) мовчки
+    // віддав хвіст файлу. Перевірка почервоніла не тому, що щось
+    // зламалось, і тим сховала б справжню причину.
+    const збірка = steps.find(s => /npm run build/.test(String(s.run || "")));
+
+    check("крок збірки знайдено", Boolean(збірка));
+
+    const код = String(збірка && збірка.run || "");
 
     // Коміт мусить лишатись у кроці перезбірки, а пуш — окремо.
     // Якщо їх знову зліпити, тести опиняться після пуша й ворота
     // перестануть бути воротами.
-    const merge = sync.slice(
-        sync.indexOf("Перенести і перезібрати"),
-        sync.indexOf("ВОРОТА ПЕРЕД ПРОДОМ"));
-
     check("у кроці перезбірки пуша немає",
-        !/git push/.test(merge), "git push лишився в кроці злиття");
+        !/git push/.test(код), "git push лишився в кроці збірки");
 
-    check("коміт лишився там, де злиття", /git commit -m "chore:/.test(merge));
+    check("коміт лишився там, де збірка", /git commit -m "chore:/.test(код));
 }
 
 console.log("\n[4] Перезбірка дева справді виїжджає");

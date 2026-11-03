@@ -2,7 +2,7 @@
 <html lang="uk" data-season="standard">
 
 <head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"a8e18699","data/catalog.json":"3f24f2a1","data/categories.json":"2c24d857","data/collections.json":"dc20073e","data/home.json":"1e892e17","data/image-variants.json":"8d6e1e7e","data/instagram-links.json":"610ebd7b","data/legal.json":"f84751b2","data/notifications.json":"a35b367f","data/page-texts.json":"6dd1be71","data/product-texts.json":"278df72d","data/products-updated.json":"e9c71ff7","data/products.json":"f126cdf1","data/promo-popups.json":"0940ece5","data/promotions.json":"fd2ed22f","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/season.json":"17f1306b","data/security.json":"0c05c691","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"a8e18699","data/catalog.json":"0b64d6c3","data/categories.json":"2c24d857","data/collections.json":"dc20073e","data/home.json":"1e892e17","data/image-variants.json":"8d6e1e7e","data/instagram-links.json":"610ebd7b","data/legal.json":"f84751b2","data/notifications.json":"a35b367f","data/page-texts.json":"6dd1be71","data/product-texts.json":"278df72d","data/products-updated.json":"e9c71ff7","data/products.json":"68fff0f5","data/promo-popups.json":"0940ece5","data/promotions.json":"fd2ed22f","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/season.json":"17f1306b","data/security.json":"0c05c691","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script>
 
 <!-- Сторінка лежить у /p/<slug>/, а скрипти будують шляхи як
      з кореня ("data/products.json", "assets/images/…").
@@ -193,18 +193,20 @@ window.PHOTO_VARIANTS = ["d31186mabu-1.webp","d31186mabu-2.webp"];
     <link rel="icon" type="image/png" sizes="192x192" href="/assets/images/favicon-192.png">
     <link rel="manifest" href="/site.webmanifest">
 
+<link rel="preconnect" href="https://hyfodsznpeeecgtgffub.supabase.co" crossorigin>
+
 <!-- Шрифт. Тут, а не @import у CSS: @import видно лише після
      завантаження таблиці стилів, і текст чекає на три запити
      поспіль. Розкладає scripts/sync-fonts.js — правити руками
      не треба. -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+<link rel="preconnect" href="https://hyfodsznpeeecgtgffub.supabase.co" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-v20-latin.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-v20-cyrillic.woff2" crossorigin>
 
-<link rel="stylesheet" href="/assets/css/style.css?v=4bfd0f01">
+<link rel="stylesheet" href="/assets/css/style.css?v=55702f75">
 
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3" defer></script>
+<script src="/assets/js/vendor/supabase-js-2.112.3.js" defer></script>
 </head>
 
 <body>
@@ -822,13 +824,13 @@ BestBrnd4u
 <script src="/assets/js/stock.js?v=85fa4aad" defer></script>
 
 <script src="/assets/js/translit.js?v=c0957cb7" defer></script>
-<script src="/assets/js/common.js?v=e9287427" defer></script>
+<script src="/assets/js/common.js?v=95b0aa57" defer></script>
 <!-- Дзвінок і зв'язок: дві плаваючі кнопки в лівому кутку -->
 <script src="/assets/js/contact-buttons.js?v=53c2ccd7" defer></script>
 <!-- Підписка на листи магазину -->
 <script src="/assets/js/subscribe.js?v=971151a0" defer></script>
 <script src="/assets/js/sync.js?v=48ef002e" defer></script>
-<script src="/assets/js/mega-menu.js?v=76dcd66e" defer></script>
+<script src="/assets/js/mega-menu.js?v=ff0d32d0" defer></script>
 
 <script src="/assets/js/ui.js?v=763c5ff1" defer></script>
 
@@ -840,10 +842,10 @@ BestBrnd4u
 <script src="/assets/js/lightbox.js?v=a8cfdeb0" defer></script>
 
 <script src="/assets/js/live-stock.js?v=ca9027dd" defer></script>
-<script src="/assets/js/product.js?v=ecaed422" defer></script>
+<script src="/assets/js/product.js?v=daa2afc6" defer></script>
 
 <!-- Відгуки: показ, форма й перевірка покупки на сервері -->
-<script src="/assets/js/reviews.js?v=905c3ee8" defer></script>
+<script src="/assets/js/reviews.js?v=311a8806" defer></script>
 
 </body>
 

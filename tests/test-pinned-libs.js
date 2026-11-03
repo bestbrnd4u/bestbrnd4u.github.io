@@ -46,15 +46,32 @@ console.log("\n[1] Жодної незакріпленої версії");
 
 console.log("\n[2] Одна й та сама версія на всіх сторінках");
 {
+  // ВЕРСІЮ ШУКАЄМО В ОБОХ ВИГЛЯДАХ.
+  //
+  // Доти бралася лише адреса CDN («@supabase/supabase-js@2.112.3»).
+  // 03.11.2026 бібліотеки переїхали до себе, і версія тепер в імені
+  // файлу: /assets/js/vendor/supabase-js-2.112.3.js.
+  //
+  // Перевірка лишається про те саме — «одна й та сама версія на всіх
+  // сторінках», — просто вигляд посилання більше не визначає, чи
+  // вона її побачить.
   const versions = new Map();
 
   files.forEach(f => {
-    [...read(f).matchAll(/(@[\w@/.-]+?)@(\d+\.\d+\.\d+)/g)].forEach(m => {
-      const lib = m[1], v = m[2];
+
+    const src = read(f);
+
+    [...src.matchAll(/(@[\w@/.-]+?)@(\d+\.\d+\.\d+)/g)].forEach(m => додати(m[1], m[2]));
+
+    [...src.matchAll(/\/assets\/js\/vendor\/([\w.-]+?)-(\d+\.\d+\.\d+)\.js/g)]
+      .forEach(m => додати(m[1], m[2]));
+
+    function додати(lib, v) {
       if (!versions.has(lib)) versions.set(lib, new Map());
       const byV = versions.get(lib);
       byV.set(v, (byV.get(v) || 0) + 1);
-    });
+    }
+
   });
 
   check("бібліотеки знайдені", versions.size > 0, [...versions.keys()].join(", "));
@@ -85,9 +102,22 @@ console.log("\n[3] supabase-js — найважливіший випадок");
   const unpinned = pages.filter(f => /supabase-js@2["'/]/.test(read(f)));
   check("немає жодного @2 без уточнення", unpinned.length === 0, unpinned.join(", "));
 
-  const pinned = pages.filter(f => /supabase-js@\d+\.\d+\.\d+/.test(read(f)));
+  // Точна версія — в адресі CDN або в імені свого файлу.
+  const pinned = pages.filter(f => /supabase-js[@-]\d+\.\d+\.\d+/.test(read(f)));
   check("закріплений на всіх сторінках", pinned.length === pages.length,
         `${pinned.length} з ${pages.length}`);
+
+  // І ГОЛОВНЕ, ЗАРАДИ ЧОГО ПЕРЕЇЗД.
+  //
+  // Точна версія в адресі CDN — це обіцянка CDN, а не факт. Заміряно
+  // 03.11.2026: те, що jsdelivr віддає за @2.112.3, не збігається
+  // байт-у-байт із пакетом тієї ж версії (207,2 проти 206,9 КБ).
+  // Тобто артефакт там свій, і ніщо не заважає йому змінитись — а
+  // одне таке мовчазне оновлення вже коштувало подвоєння кошика.
+  const зCdn = pages.filter(f => /jsdelivr|unpkg/.test(read(f)));
+
+  check("бібліотека своя, а не з чужого CDN", зCdn.length === 0,
+        зCdn.join(", "));
 }
 
 console.log("\n[4] Рішення задокументоване");
@@ -103,14 +133,83 @@ console.log("\n[4] Рішення задокументоване");
           /не приходять самі/i.test(doc));
     check("є інструкція, що перевіряти після оновлення",
           /Що перевірити руками/i.test(doc));
-    check("попереджено, що Dependabot цих бібліотек не бачить",
-          /Dependabot/i.test(doc) && /не бачить/i.test(doc));
+    // ЩО ПРО DEPENDABOT СКАЗАНО — ЗМІНИЛОСЬ ПО СУТІ.
+    //
+    // Доти перевірялось, що в документі написано «Dependabot їх не
+    // бачить»: бібліотеки були прямими посиланнями в HTML.
+    //
+    // 03.11.2026 supabase-js і @emailjs/browser переїхали до себе й
+    // стали залежностями npm — тепер він їх БАЧИТЬ, і це була окрема
+    // вигода переїзду. А три адмінські лишились на CDN, тож документ
+    // мусить розрізняти ці два випадки.
+    check("у документі сказано, що свої бібліотеки Dependabot бачить",
+          /Dependabot/i.test(doc) && /бачить/i.test(doc));
+
+    check("і що адмінські він і далі не бачить",
+          /адмінськ[^\n]*не бачить|не бачить[^\n]*адмінськ/i.test(doc));
+
+    check("сказано, що після оновлення потрібен npm run vendor",
+          /npm run vendor/.test(doc));
 
     // версії в документі мусять збігатися з реальними
-    const supabaseInCode = read("index.html").match(/supabase-js@(\d+\.\d+\.\d+)/)[1];
+    const supabaseInCode = read("index.html").match(/supabase-js[@-](\d+\.\d+\.\d+)/)[1];
     check(`версія supabase-js у документі збігається з кодом (${supabaseInCode})`,
           doc.includes(supabaseInCode), supabaseInCode);
   }
+}
+
+console.log("\n[5] Свої копії не розходяться з пакетами");
+{
+  // ЩО ЦЕ ЗАКРИВАЄ
+  // ---------------
+  // Версія стоїть у трьох місцях: package.json (що ставить npm),
+  // ім'я файлу в assets/js/vendor і адреса в тегу на 173 сторінках.
+  // Розійдуться — сторінка попросить файл, якого немає, і магазин
+  // лишиться без клієнта Supabase.
+  //
+  // Найімовірніший шлях до цього: Dependabot оновив package.json, PR
+  // злили, а `npm run vendor` не виконали.
+  const vendor = require("../scripts/vendor-libs.js");
+
+  const ТЕКА = path.join(ROOT, "assets", "js", "vendor");
+
+  check("тека своїх бібліотек є", fs.existsSync(ТЕКА));
+
+  const наДиску = fs.existsSync(ТЕКА)
+    ? fs.readdirSync(ТЕКА).filter(f => f.endsWith(".js")) : [];
+
+  check(`файлів у vendor: ${наДиску.length}`, наДиску.length === vendor.БІБЛІОТЕКИ.length,
+        наДиску.join(", "));
+
+  vendor.БІБЛІОТЕКИ.forEach(({ пакет, звідки, імʼя }) => {
+
+    const версія = vendor.версіяПакета(пакет);
+    const файл = імʼя(версія);
+
+    check(`${пакет}@${версія} лежить у vendor`,
+          fs.existsSync(path.join(ТЕКА, файл)), файл);
+
+    // Байт-у-байт із пакетом: саме цим своя копія й відрізняється
+    // від обіцянки CDN.
+    const джерело = path.join(ROOT, "node_modules", пакет, звідки);
+
+    if (fs.existsSync(джерело) && fs.existsSync(path.join(ТЕКА, файл))) {
+      check(`${пакет}: копія збігається з пакетом байт-у-байт`,
+            fs.readFileSync(джерело).equals(fs.readFileSync(path.join(ТЕКА, файл))));
+    }
+
+    // І сторінки просять саме цей файл.
+    const просять = files.filter(f => read(f).includes(`/assets/js/vendor/${файл}`));
+
+    check(`${пакет}: сторінки просять саме цю версію (${просять.length})`,
+          просять.length > 0);
+
+  });
+
+  // КРОК НЕ В npm run build — збірка не сміє залежати від того, чи
+  // поставлені devDependencies.
+  check("vendor-libs не стоїть у npm run build",
+        !/vendor-libs\.js/.test(JSON.parse(read("package.json")).scripts.build || ""));
 }
 
 console.log(failures===0?"\n✅ Усі перевірки пройдено":`\n❌ Провалено: ${failures}`);

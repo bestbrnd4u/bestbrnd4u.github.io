@@ -146,6 +146,7 @@ console.log("\n[3] Джерела, які сайт справді підключ
 
     const scriptHosts = new Set();
     const styleHosts = new Set();
+    const preconnectHosts = new Set();
     const frameHosts = new Set();
 
     pages.forEach(page => {
@@ -155,14 +156,33 @@ console.log("\n[3] Джерела, які сайт справді підключ
         [...html.matchAll(/<script[^>]+src="https:\/\/([^/"]+)/g)]
             .forEach(m => scriptHosts.add(m[1]));
 
-        // Саме стилі й preconnect. <link rel="canonical"> теж має
-        // href із https, але це не завантаження, а вказівка для
-        // пошуку — під CSP вона не потрапляє взагалі.
-        [...html.matchAll(/<link[^>]*rel="(stylesheet|preconnect)"[^>]*href="https:\/\/([^/"]+)/g)]
-            .forEach(m => styleHosts.add(m[2]));
-
-        [...html.matchAll(/<link[^>]*href="https:\/\/([^/"]+)"[^>]*rel="(stylesheet|preconnect)"/g)]
+        // Саме стилі. <link rel="canonical"> теж має href із https,
+        // але це не завантаження, а вказівка для пошуку — під CSP
+        // вона не потрапляє взагалі.
+        [...html.matchAll(/<link[^>]*rel="stylesheet"[^>]*href="https:\/\/([^/"]+)/g)]
             .forEach(m => styleHosts.add(m[1]));
+
+        [...html.matchAll(/<link[^>]*href="https:\/\/([^/"]+)"[^>]*rel="stylesheet"/g)]
+            .forEach(m => styleHosts.add(m[1]));
+
+        // PRECONNECT — ОКРЕМО, І ЦЕ НЕ ДРІБНИЦЯ.
+        //
+        // Доти прогрівання рахувалось разом зі стилями й вимагало
+        // style-src. Це працювало, поки прогрівали лише шрифти.
+        //
+        // Але preconnect не підпадає під style-src узагалі: директиви
+        // preconnect-src не існує, і саме з'єднання CSP не блокує.
+        // Значення має те, ЩО ним потім скористається: для шрифту це
+        // style-src/font-src, для запиту з коду — connect-src.
+        //
+        // 03.11.2026 додали прогрівання до Supabase — і перевірка
+        // почервоніла на правильній правці, вимагаючи style-src для
+        // хоста, з якого стилів не буває.
+        [...html.matchAll(/<link[^>]*rel="preconnect"[^>]*href="https:\/\/([^/"]+)/g)]
+            .forEach(m => preconnectHosts.add(m[1]));
+
+        [...html.matchAll(/<link[^>]*href="https:\/\/([^/"]+)"[^>]*rel="preconnect"/g)]
+            .forEach(m => preconnectHosts.add(m[1]));
 
         [...html.matchAll(/<iframe[^>]+src="https:\/\/([^/"]+)/g)]
             .forEach(m => frameHosts.add(m[1]));
@@ -181,6 +201,17 @@ console.log("\n[3] Джерела, які сайт справді підключ
 
     check(`усі ${styleHosts.size} хостів стилів і шрифтів дозволені`,
         missingStyles.length === 0, missingStyles.join(", "));
+
+    // Прогріте з'єднання має сенс лише тоді, коли ним є кому
+    // скористатись: шрифт (style-src/font-src) або запит із коду
+    // (connect-src). Хост, заборонений усюди, — це марна підказка,
+    // і про неї варто знати.
+    const marnі = [...preconnectHosts].filter(host =>
+        !allows("style-src", host) && !allows("font-src", host)
+        && !allows("connect-src", host));
+
+    check(`усі ${preconnectHosts.size} прогрітих хостів комусь потрібні`,
+        marnі.length === 0, "нікому не дозволені: " + marnі.join(", "));
 
     check("файли шрифту дозволені окремо",
         allows("font-src", "fonts.gstatic.com"));

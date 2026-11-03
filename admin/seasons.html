@@ -1,19 +1,26 @@
 <!DOCTYPE html>
 <html lang="uk" data-season="standard">
 <head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"a8e18699","data/catalog.json":"3f24f2a1","data/categories.json":"2c24d857","data/collections.json":"dc20073e","data/home.json":"1e892e17","data/image-variants.json":"8d6e1e7e","data/instagram-links.json":"610ebd7b","data/legal.json":"f84751b2","data/notifications.json":"a35b367f","data/page-texts.json":"6dd1be71","data/product-texts.json":"278df72d","data/products-updated.json":"e9c71ff7","data/products.json":"f126cdf1","data/promo-popups.json":"0940ece5","data/promotions.json":"fd2ed22f","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/season.json":"17f1306b","data/security.json":"0c05c691","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"a8e18699","data/catalog.json":"0b64d6c3","data/categories.json":"2c24d857","data/collections.json":"dc20073e","data/home.json":"1e892e17","data/image-variants.json":"8d6e1e7e","data/instagram-links.json":"610ebd7b","data/legal.json":"f84751b2","data/notifications.json":"a35b367f","data/page-texts.json":"6dd1be71","data/product-texts.json":"278df72d","data/products-updated.json":"e9c71ff7","data/products.json":"68fff0f5","data/promo-popups.json":"0940ece5","data/promotions.json":"fd2ed22f","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/season.json":"17f1306b","data/security.json":"0c05c691","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
 <title>Оформлення сайту — перегляд | BestBrnd4u</title>
 
 <!-- Inter — той самий шрифт, що на сайті: сторінка просить його в
-     своєму font-stack, тож нехай і завантажує. Порядок той самий, що
-     на сторінках сайту (preconnect до стилів), за цим стежить
-     tests/test-fonts.js. -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+     своєму font-stack, тож нехай і завантажує.
+
+     ПРАВИЛА ТУТ СВОЇ, А НЕ З style.css. Сторінки сайту беруть
+     @font-face зі style.css, але ця його НЕ підключає: вона лише
+     читає його текстом, щоб дістати перелік сезонів (див. fetch
+     нижче). Тому дві потрібні підмножини оголошені прямо тут.
+
+     Шлях абсолютний: сторінка лежить у /admin/, а файли — у
+     /assets/fonts/. За складом стежить tests/test-fonts.js. -->
+<style>
+@font-face{font-family:'Inter';font-style:normal;font-weight:100 900;font-display:swap;src:url(/assets/fonts/inter-v20-latin.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Inter';font-style:normal;font-weight:100 900;font-display:swap;src:url(/assets/fonts/inter-v20-cyrillic.woff2) format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
+</style>
 
 <style>
     *{ box-sizing:border-box; }
@@ -442,7 +449,7 @@
     });
 
     // Кнопки сезонів зʼявляються після того, як прочитали стилі.
-    fetch("/assets/css/style.css?v=4bfd0f01", { cache: "no-store" })
+    fetch("/assets/css/style.css?v=55702f75", { cache: "no-store" })
         .then(function (r) { return r.ok ? r.text() : ""; })
         .then(function (css) {
 

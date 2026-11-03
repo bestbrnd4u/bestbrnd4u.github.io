@@ -136,13 +136,15 @@ function renderCart() {
         // клік показує ту саму підказку, що й раніше, — але вигляд і
         // aria-disabled кажуть про межу заздалегідь.
         const lineMax = lineLimit(line.id, line.color, line.size);
-        const atMax = lineMax !== null && qty >= lineMax;
+        const atMax = Boolean(lineMax) && qty >= lineMax.max;
 
-        // Текст один на всі місця: підказка в кошику, підказка на
-        // сторінці товару й ця підпис — звучать однаково.
-        const maxReason = lineMax === 1
-            ? "Це останній екземпляр"
-            : `Більше немає: у наявності ${lineMax} шт.`;
+        // Текст один на всі місця — і тепер буквально один: він
+        // приходить разом із межею з cartLineLimit() у common.js.
+        // Доти тут стояла своя копія, ще одна в changeQty нижче й
+        // третя в addToCart; зі стелею для «під замовлення» вони
+        // розійшлись би, бо «у наявності 5 шт.» для товару зі складу
+        // й для того, що везуть, означає різне.
+        const maxReason = lineMax ? lineMax.reason : "";
 
         const lineTotal = priceNow(product) * qty;
         const lineTotalFull = (oldPriceNow(product) || priceNow(product)) * qty;
@@ -338,10 +340,12 @@ function renderCart() {
 
 }
 
-// Скільки цього кольору й розміру можна взяти.
+// Скільки цього кольору й розміру можна взяти — і чому саме стільки.
 //
-// null означає «межі немає»: товар під замовлення або залишок не
-// рахується (порожня клітинка — це не нуль, а «не рахуємо»).
+// Повертає { max, reason } або null. null означає не «бери скільки
+// хочеш», а «вирішити не можемо»: немає модуля залишків або самого
+// товару. Для товару під замовлення межа тепер є — стеля з
+// PREORDER_MAX у common.js.
 function lineLimit(id, color, size) {
 
     // Саме правило живе в common.js — там, де addToCart, бо той файл
@@ -370,13 +374,9 @@ function changeQty(id, color, size, delta) {
 
         // Дійшли до межі — не додаємо і кажемо чому. Раніше кнопка
         // просто працювала, а розбіжність вилазила вже в замовленні.
-        if (limit !== null && already >= limit) {
+        if (limit && already >= limit.max) {
 
-            if (typeof showToast === "function") {
-                showToast(limit === 1
-                    ? "Це останній екземпляр"
-                    : `Більше немає: у наявності ${limit} шт.`);
-            }
+            if (typeof showToast === "function") showToast(limit.reason);
 
             return;
 

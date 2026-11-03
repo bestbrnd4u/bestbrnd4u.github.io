@@ -246,6 +246,36 @@ function collect(dest, { тихо = false } = {}) {
         throw new Error("У зібраному сайті немає обовʼязкових файлів: " + зниклі.join(", "));
     }
 
+    // КОМЕНТАРІ ЗІ СКРИПТІВ — ОКРЕМИМ ПРОЦЕСОМ.
+    //
+    // У стилях їх знімає вираз (вище): синтаксис коментарів у CSS без
+    // винятків. У JS так не можна — «//» трапляється в адресах, «/*» у
+    // регулярках і шаблонних літералах, — тому там працює terser із
+    // вимкненими compress і mangle, тобто просто перевидає розібране
+    // дерево. terser.minify() асинхронний, а ця функція синхронна й
+    // такою потрібна тестам, тож кличемо скрипт, а не бібліотеку.
+    //
+    // Якщо terser не встановлено, scripts/strip-comments.js виходить
+    // із ::warning:: і кодом 0 — сайт поїде з коментарями, але поїде.
+    try {
+
+        const вивід = require("child_process").execFileSync(
+            process.execPath,
+            [path.join(__dirname, "strip-comments.js"), ціль],
+            { encoding: "utf8", stdio: "pipe", timeout: 600000 }
+        );
+
+        if (!тихо && вивід.trim()) process.stdout.write(вивід);
+
+    } catch (error) {
+
+        throw new Error(
+            "Зняття коментарів зі скриптів не вдалось: "
+            + ((error.stdout || "") + (error.stderr || "") || error.message).trim()
+        );
+
+    }
+
     if (!тихо) {
         console.log(`Готово: ${файлів} файлів, ${(байтів / 1048576).toFixed(1)} МБ → ${dest}`);
         if (знятоКоментарів > 0) {

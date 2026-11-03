@@ -45,26 +45,109 @@ const CHECK = process.argv.includes("--check");
 // Ваги, які справді вживаються в assets/css/style.css.
 const WEIGHTS = [400, 500, 600, 700, 800, 900];
 
-const FONT_URL = "https://fonts.googleapis.com/css2?family=Inter:wght@"
-    + WEIGHTS.join(";") + "&display=swap";
+// ШРИФТ ТЕПЕР СВІЙ.
+//
+// Доти тут стояло посилання на fonts.googleapis.com/css2. Воно
+// блокувало показ, і лише після нього починалися самі файли з
+// fonts.gstatic.com — тобто два чужі домени й два послідовні запити
+// перед тим, як текст намалюється потрібним накресленням.
+//
+// Файли забирає scripts/fetch-fonts.js, правила @font-face лежать у
+// assets/css/style.css. Тут лишається тільки підказка браузеру
+// почати їх вантажити одразу, не чекаючи на розбір стилів.
+const FONTS_DIR = path.join(ROOT, "assets", "fonts");
+
+// ЯКІ САМЕ ПІДМНОЖИНИ ПІДКАЗУЄМО.
+//
+// Їх сім, але браузер бере лише ті, чиї символи є на сторінці. Дві з
+// них є на КОЖНІЙ сторінці магазину: кирилиця — бо сайт український,
+// латиниця — бо назви брендів латинські. Решту (грецьку, вʼєтнамську,
+// розширені) підказувати не можна: підказка змусила б качати файл,
+// якого сторінці не треба.
+const PRELOAD_SUBSETS = ["latin", "cyrillic"];
+
+// Імена файлів беремо з теки, а не вписуємо: у них версія шрифту
+// (inter-v20-latin.woff2), і після оновлення вона зміниться.
+function fontFiles() {
+
+    if (!fs.existsSync(FONTS_DIR)) return [];
+
+    const усі = fs.readdirSync(FONTS_DIR).filter(f => f.endsWith(".woff2"));
+
+    return PRELOAD_SUBSETS
+        .map(subset => усі.find(f => new RegExp(`-${subset}\\.woff2$`).test(f)))
+        .filter(Boolean);
+
+}
 
 // Позначка, за якою знаходимо власний блок при повторному запуску.
 const MARK = "Шрифт. Тут, а не @import";
 
-// preconnect до обох хостів: css2 віддає googleapis, а самі файли
-// шрифту — gstatic. Без другого браузер витрачає час на з'єднання
-// з ним уже після розбору CSS.
+// ХОСТ SUPABASE БЕРЕМО З КОДУ, А НЕ ВПИСУЄМО ДРУГОЮ КОПІЄЮ.
+//
+// Він живе в assets/js/supabase-client.js. Копія тут розійшлася б із
+// оригіналом рівно тоді, коли проєкт переїде, — і прогрівання тихо
+// гріло б чужу адресу.
+function supabaseOrigin() {
+
+    const src = fs.readFileSync(path.join(ROOT, "assets/js/supabase-client.js"), "utf8");
+
+    const m = src.match(/const SUPABASE_URL = "([^"]+)"/);
+
+    if (!m) throw new Error("не знайшов SUPABASE_URL у assets/js/supabase-client.js");
+
+    return new URL(m[1]).origin;
+
+}
+
+// preconnect до обох хостів шрифту: css2 віддає googleapis, а самі
+// файли — gstatic. Без другого браузер витрачає час на з'єднання з
+// ним уже після розбору CSS.
+//
+// ТРЕТІЙ ХОСТ — SUPABASE, І ВІН ТУТ НЕ ЗАРАДИ ШРИФТУ.
+//
+// Блок цього кроку — єдине місце, яке гарантовано однакове на всіх
+// 174 сторінках, тож підказки з'єднання збираються разом саме тут.
+//
+// ЧОМУ САМЕ ЙОМУ ПОТРІБНЕ ПРОГРІВАННЯ. З'єднання з jsdelivr браузер
+// починає одразу: тег <script> стоїть у <head>, і передсканер бачить
+// його ще до розбору сторінки. А от до Supabase звертається вже
+// ЗАВАНТАЖЕНИЙ звідти клієнт — тобто рукостискання починається лише
+// після того, як виконається чужий скрипт, і лягає чистою затримкою
+// перед першим запитом залишків. Саме від них залежить кнопка
+// купівлі.
+//
+// ЗАМІРЯНО 03.11.2026, медіана з п'яти холодних з'єднань: DNS 3 мс,
+// TCP 8 мс, TLS 42 мс, перший байт 77 мс. Прогрівання знімає ці
+// 42 мс із критичного шляху; на мобільній мережі рукостискання
+// коштує більше.
+//
+// crossorigin ОБОВ'ЯЗКОВИЙ: запити до Supabase — це CORS-fetch без
+// кук, і прогріте з'єднання без цього прапорця браузер для них не
+// використає, тобто підказка була б марною.
 function block(indent) {
 
-    return [
+    const рядки = [
         `${indent}<!-- ${MARK} у CSS: @import видно лише після`,
         `${indent}     завантаження таблиці стилів, і текст чекає на три запити`,
         `${indent}     поспіль. Розкладає scripts/sync-fonts.js — правити руками`,
         `${indent}     не треба. -->`,
-        `${indent}<link rel="preconnect" href="https://fonts.googleapis.com">`,
-        `${indent}<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>`,
-        `${indent}<link rel="stylesheet" href="${FONT_URL}">`
-    ].join("\n");
+        `${indent}<link rel="preconnect" href="${supabaseOrigin()}" crossorigin>`
+    ];
+
+    // ШЛЯХ АБСОЛЮТНИЙ. Сторінки лежать на різній глибині
+    // (/p/slug/index.html), і відносний «assets/fonts/…» працював би
+    // лише там, де є <base href="/">.
+    //
+    // crossorigin ОБОВ'ЯЗКОВИЙ навіть для свого домену: шрифти
+    // браузер завжди бере в режимі CORS, і preload без цього прапорця
+    // дав би ДРУГЕ завантаження того самого файлу замість одного.
+    fontFiles().forEach(файл => {
+        рядки.push(`${indent}<link rel="preload" as="font" type="font/woff2"`
+            + ` href="/assets/fonts/${файл}" crossorigin>`);
+    });
+
+    return рядки.join("\n");
 
 }
 
@@ -107,8 +190,22 @@ const STYLE_RE = /([ \t]*)<link\b[^>]*assets\/css\/style\.css[^>]*>/;
 //
 // Переносів прибираємо стільки ж, скільки ставимо при вставці (два):
 // інакше кожен прохід додавав би перед блоком ще один порожній рядок.
+// Беремо коментар і ВСІ теги блоку, які йдуть за ним поспіль.
+//
+// Доти регулярка закінчувалась на посиланні googleapis — тобто знала
+// склад блоку напам'ять. Коли шрифт переїхав до себе, склад змінився,
+// а старі блоки на 173 сторінках лишились би недоторканими: крок не
+// знайшов би їх і просто дописав новий поруч.
+//
+// Тому перелічуємо ВИДИ тегів, які блок може містити, а не їхній
+// порядок: preconnect, preload і старе посилання на googleapis.
+// Тег стилів сайту (rel="stylesheet" без googleapis) під це не
+// підпадає — саме перед ним блок і стоїть, і з'їсти його не можна.
 const OWN_BLOCK_RE = new RegExp(
-    `[ \\t]*<!-- ${MARK}[\\s\\S]*?fonts\\.googleapis\\.com\\/css2[^>]*>[ \\t]*(?:\\r?\\n){0,2}`,
+    `[ \\t]*<!-- ${MARK}[\\s\\S]*?-->[ \\t]*\\r?\\n`
+    + `(?:[ \\t]*<link\\b[^>]*(?:rel="preconnect"|rel="preload"|fonts\\.googleapis\\.com)[^>]*>`
+    + `[ \\t]*\\r?\\n)*`
+    + `(?:\\r?\\n){0,1}`,
     "g"
 );
 
@@ -211,4 +308,4 @@ function main() {
 
 if (require.main === module) main();
 
-module.exports = { FONT_URL, WEIGHTS, MARK, block, syncPage };
+module.exports = { WEIGHTS, MARK, PRELOAD_SUBSETS, fontFiles, block, syncPage };

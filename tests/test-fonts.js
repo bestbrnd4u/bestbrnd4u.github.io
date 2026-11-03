@@ -41,6 +41,7 @@ const check = (n, c, e) => {
 const read = rel => fs.readFileSync(path.join(ROOT, rel), "utf8");
 
 const fonts = require("../scripts/sync-fonts.js");
+const fetch = require("../scripts/fetch-fonts.js");
 
 const css = read("assets/css/style.css");
 
@@ -64,27 +65,43 @@ console.log("\n[1] У CSS немає @import на шрифт");
     check("натомість у файлі написано, де шрифт", /Шрифт підключається в <head>/.test(css));
 }
 
-console.log("\n[2] Ваги в посиланні = ваги, які вживає CSS");
+console.log("\n[2] Варіативний шрифт покриває всі ваги, які вживає CSS");
 {
-    // Кожна зайва вага — це окремий файл на кожен потрібний набір
-    // символів (латиниця + кирилиця). Ваги 300 у стилях немає ніде,
-    // а замовлялась вона обома способами.
-    const used = new Set((css.match(/font-weight:\s*(\d+)/g) || [])
+    // ЧОМУ ВАРІАТИВНИЙ.
+    //
+    // Доти шрифт замовлявся шістьма окремими накресленнями, і кожне
+    // було окремим файлом на кожну абетку. Заміряно 03.11.2026:
+    // «wght@400;500;600;700;800;900» — це 42 файли й 1280 КБ, а
+    // «wght@100..900» — 7 файлів і 213 КБ. Один файл на абетку
+    // покриває всі ваги одразу.
+    //
+    // Тому перевіряємо не «список ваг збігається», а «кожна вжита
+    // вага потрапляє в діапазон, який оголошує @font-face».
+    const блок = (css.match(fetch.БЛОК_RE) || [])[0] || "";
+
+    check("блок @font-face знайдено в style.css", Boolean(блок));
+
+    // Ваги сайту беремо з ПРАВИЛ САЙТУ, а не з самого блоку: у ньому
+    // стоїть «font-weight:100 900», і воно потрапило б у вибірку.
+    const свої = new Set((css.replace(блок, "").match(/font-weight:\s*(\d+)/g) || [])
         .map(row => Number(row.replace(/\D/g, ""))));
 
-    const asked = new Set(fonts.WEIGHTS);
+    check(`CSS вживає ваги: ${[...свої].sort((a, b) => a - b).join(", ")}`, свої.size > 0);
 
-    const missing = [...used].filter(w => !asked.has(w));
-    const extra = [...asked].filter(w => !used.has(w));
+    const діапазон = (блок.match(/font-weight:(\d+)\s+(\d+)/) || []).slice(1).map(Number);
 
-    check(`CSS вживає ваги: ${[...used].sort((a, b) => a - b).join(", ")}`, used.size > 0);
+    check(`шрифт оголошує діапазон ${діапазон.join("–") || "?"}`, діапазон.length === 2);
 
-    check("усі вживані ваги замовлені", missing.length === 0, missing.join(", "));
+    const поза = [...свої].filter(w => w < діапазон[0] || w > діапазон[1]);
 
-    check("зайвих ваг не замовляємо", extra.length === 0, extra.join(", "));
+    check("усі вживані ваги в діапазоні шрифту", поза.length === 0, поза.join(", "));
 
-    check("посилання просить swap (текст видно одразу)",
-        /display=swap/.test(fonts.FONT_URL));
+    // swap — щоб текст було видно одразу, ще до приходу шрифту.
+    const правил = (блок.match(/@font-face\{/g) || []).length;
+    const зSwap = (блок.match(/font-display:swap/g) || []).length;
+
+    check(`swap у всіх ${правил} правилах`, правил > 0 && зSwap === правил,
+        `${зSwap} із ${правил}`);
 }
 
 console.log("\n[3] Блок є на кожній сторінці зі стилями");
@@ -115,21 +132,24 @@ console.log("\n[3] Блок є на кожній сторінці зі стил�
     const late = [];
     const twice = [];
 
-    withStyle.forEach(file => {
+    const керовані = withStyle.filter(file =>
+        /<link\b[^>]*assets\/css\/style\.css/.test(fs.readFileSync(file, "utf8")));
+
+    керовані.forEach(file => {
 
         const html = fs.readFileSync(file, "utf8");
 
-        const font = html.indexOf("fonts.googleapis.com/css2");
+        const font = html.indexOf("rel=\"preload\" as=\"font\"");
         const style = html.indexOf("assets/css/style.css");
 
         if (font < 0) { missing.push(path.relative(ROOT, file)); return; }
 
-        // Блок мусить стояти ПЕРЕД стилями: інакше браузер бачить
-        // шрифт пізніше, ніж міг би.
+        // Блок мусить стояти ПЕРЕД стилями: інакше браузер дізнається
+        // про шрифт аж із розібраного CSS, тобто на цілий запит пізніше.
         if (font > style) late.push(path.relative(ROOT, file));
 
         // Двічі — це два запити за тим самим.
-        if ((html.match(/fonts\.googleapis\.com\/css2/g) || []).length > 1) {
+        if ((html.match(/rel="preload" as="font"[^>]*inter-[^>]*latin\.woff2/g) || []).length > 1) {
             twice.push(path.relative(ROOT, file));
         }
 
@@ -146,13 +166,61 @@ console.log("\n[3] Блок є на кожній сторінці зі стил�
     check("і жодного разу не замовлений двічі", twice.length === 0,
         `${twice.length}: ${twice.slice(0, 3).join(", ")}`);
 
-    // preconnect до gstatic: самі файли шрифту лежать там, і без
-    // нього з'єднання з ним починається вже після розбору CSS.
-    const noPreconnect = withStyle.filter(file =>
-        !/preconnect[^>]*fonts\.gstatic\.com/.test(fs.readFileSync(file, "utf8")));
+    // ЖОДНОЇ ЗГАДКИ GOOGLE FONTS НА САЙТІ.
+    //
+    // Це і є суть переїзду: шрифт більше не вимагає двох чужих
+    // доменів і render-blocking запиту перед показом тексту.
+    const зGoogle = pages.filter(file =>
+        /fonts\.(googleapis|gstatic)\.com/.test(fs.readFileSync(file, "utf8")));
 
-    check("preconnect до gstatic скрізь", noPreconnect.length === 0,
-        `${noPreconnect.length}: ${noPreconnect.slice(0, 3).join(", ")}`);
+    check("жодна сторінка не ходить по шрифт до Google", зGoogle.length === 0,
+        `${зGoogle.length}: ${зGoogle.slice(0, 3).map(f => path.relative(ROOT, f)).join(", ")}`);
+
+    // ПРОГРІВАННЯ ДО SUPABASE — У ЦЬОМУ Ж БЛОЦІ.
+    //
+    // До jsdelivr браузер з'єднується сам: тег <script> стоїть у
+    // <head>, і передсканер бачить його одразу. А до Supabase
+    // звертається вже ЗАВАНТАЖЕНИЙ звідти клієнт — рукостискання
+    // починається аж після виконання чужого скрипта й лягає чистою
+    // затримкою перед першим запитом залишків, від яких залежить
+    // кнопка купівлі.
+    //
+    // Заміряно 03.11.2026, медіана з п'яти холодних з'єднань:
+    // TLS 42 мс, перший байт 77 мс.
+    const supabaseOrigin = new URL(
+        read("assets/js/supabase-client.js").match(/const SUPABASE_URL = "([^"]+)"/)[1]).origin;
+
+    check(`сторінок під кроком: ${керовані.length}`, керовані.length > 100);
+
+    const noSupabase = керовані.filter(file =>
+        !fs.readFileSync(file, "utf8").includes(`preconnect" href="${supabaseOrigin}"`));
+
+    check("preconnect до Supabase скрізь", noSupabase.length === 0,
+        `${noSupabase.length}: ${noSupabase.slice(0, 3).join(", ")}`);
+
+    // crossorigin ОБОВ'ЯЗКОВИЙ: запити до Supabase — CORS-fetch без
+    // кук, і без цього прапорця браузер прогріте з'єднання для них не
+    // використає. Тобто підказка лишилась би, а користі з неї — нуль.
+    const безПрапорця = керовані.filter(file => {
+        const html = fs.readFileSync(file, "utf8");
+        const тег = (html.match(new RegExp(`<link[^>]*${supabaseOrigin.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}[^>]*>`)) || [])[0] || "";
+        return !/crossorigin/.test(тег);
+    });
+
+    check("і саме з crossorigin", безПрапорця.length === 0,
+        `${безПрапорця.length}: ${безПрапорця.slice(0, 3).join(", ")}`);
+
+    // ХОСТ — З КОДУ, А НЕ ДРУГОЮ КОПІЄЮ.
+    //
+    // Копія в кроці збірки розійшлася б із оригіналом рівно тоді,
+    // коли проєкт переїде, — і прогрівання тихо гріло б чужу адресу.
+    check("крок читає хост із supabase-client.js",
+        /supabase-client\.js/.test(read("scripts/sync-fonts.js")),
+        "крок не звертається до джерела адреси");
+
+    check("і сам хост у кроці не записаний",
+        !read("scripts/sync-fonts.js").includes(supabaseOrigin),
+        "у sync-fonts.js лежить друга копія адреси");
 }
 
 console.log("\n[4] Збірка сходиться за один прохід");
@@ -177,6 +245,70 @@ console.log("\n[4] Збірка сходиться за один прохід");
 
     check("крок є в npm run build",
         /sync-fonts\.js/.test(read("package.json")));
+}
+
+console.log("\n[4b] Файли шрифту свої, на місці й без зайвих");
+{
+    const блок = (css.match(fetch.БЛОК_RE) || [])[0] || "";
+
+    const згадані = [...блок.matchAll(/url\(\.\.\/fonts\/([^)]+)\)/g)].map(m => m[1]);
+
+    check(`у правилах згадано ${згадані.length} файлів`, згадані.length > 0);
+
+    // ШЛЯХ ВІДНОСНО CSS, А НЕ СТОРІНКИ.
+    //
+    // «../fonts/…» рахується від самого style.css, тож однаково
+    // працює і на /index.html, і на /p/slug/index.html. Абсолютний
+    // шлях тут теж спрацював би, але відносний переживе переїзд
+    // сайту в підтеку.
+    check("шляхи відносні до таблиці стилів",
+        згадані.length === (блок.match(/url\(\.\.\/fonts\//g) || []).length);
+
+    const тека = path.join(ROOT, "assets", "fonts");
+
+    const немає = згадані.filter(f => !fs.existsSync(path.join(тека, f)));
+
+    check("кожен згаданий файл лежить у assets/fonts", немає.length === 0, немає.join(", "));
+
+    const наДиску = fs.existsSync(тека)
+        ? fs.readdirSync(тека).filter(f => f.endsWith(".woff2")) : [];
+
+    const зайві = наДиску.filter(f => !згадані.includes(f));
+
+    check("зайвих файлів у теці немає", зайві.length === 0, зайві.join(", "));
+
+    // Те, що підказуємо в <head>, теж мусить існувати.
+    const підказані = fonts.fontFiles();
+
+    check(`підказуємо ${підказані.length} підмножини`, підказані.length === 2,
+        підказані.join(", "));
+
+    check("підказані файли існують",
+        підказані.every(f => fs.existsSync(path.join(тека, f))), підказані.join(", "));
+
+    // CYRILLIC-EXT МУСИТЬ СТОЯТИ ПІСЛЯ LATIN-EXT.
+    //
+    // Символ гривні U+20B4 лежить у ДВОХ підмножинах: явно в
+    // cyrillic-ext і всередині U+20AD-20C4 в latin-ext. Коли
+    // діапазони перекриваються, браузер бере правило, що НИЖЧЕ.
+    //
+    // ЗАМІРЯНО 03.11.2026 на /aktsii/: у порядку Google нижче стоїть
+    // latin-ext, і сторінка тягнула 83 КБ замість 26 — заради одного
+    // гліфа в підзаголовку «Ціни від 6 500 ₴ до 13 000 ₴». Таких
+    // сторінок 48. Після перестановки: 91,6 КБ замість 149,4.
+    const порядок = згадані.map(f => (f.match(/inter-v\d+-(.+)\.woff2/) || [])[1]);
+
+    check("cyrillic-ext оголошений після latin-ext",
+        порядок.indexOf("cyrillic-ext") > порядок.indexOf("latin-ext"),
+        порядок.join(" → "));
+
+    // ЗБІРКА НЕ ЗАЛЕЖИТЬ ВІД GOOGLE.
+    //
+    // fetch-fonts.js ходить у мережу, тож у npm run build йому не
+    // місце: їхній збій або зміна умов зупиняли б виливку. Файли
+    // лежать у репозиторії, скрипт потрібен лише для оновлення.
+    check("fetch-fonts не стоїть у npm run build",
+        !/fetch-fonts\.js/.test(JSON.parse(read("package.json")).scripts.build || ""));
 }
 
 console.log("\n[5] Прев'ю в адмінці теж має шрифт");

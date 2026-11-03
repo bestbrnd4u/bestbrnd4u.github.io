@@ -121,7 +121,18 @@ console.log("\n[5] Каталог більше не має зашитих гру
 {
   const js=fs.readFileSync(path.join(ROOT,"assets/js/catalog.js"),"utf8");
   check("SIZE_GROUPS не константа з даними", !js.includes('const SIZE_GROUPS = ['));
-  check("групи вантажаться з адмінки", js.includes("await loadSizeGroups()"));
+  // ПИТАННЯ — ЧИ ВАНТАЖАТЬСЯ, А НЕ ЯК САМЕ НАПИСАНО.
+  //
+  // Тут стояло дослівне «await loadSizeGroups()» — і перевірка впала
+  // 20.10.2026, коли три довідники переїхали в спільний Promise.all
+  // (вони стояли в черзі за запитом до бази й додавали ~500 мс до
+  // появи товарів). Групи як вантажились з адмінки, так і вантажаться.
+  check("групи вантажаться з адмінки", /loadSizeGroups\(\)/.test(js));
+
+  // І саме з очікуванням: без await у SIZE_GROUPS лягла б обіцянка.
+  check("і результат дочікують",
+    /await Promise\.all\(\[[\s\S]*?loadSizeGroups\(\)[\s\S]*?\]\)/.test(js)
+    || /await loadSizeGroups\(\)/.test(js));
   check("є запасний набір на випадок недоступності файлу",
         fs.readFileSync(path.join(ROOT,"assets/js/common.js"),"utf8").includes("FALLBACK_SIZE_GROUPS"));
 }
