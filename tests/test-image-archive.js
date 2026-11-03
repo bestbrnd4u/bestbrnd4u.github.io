@@ -429,7 +429,8 @@ console.log("\n[9] Прибираємо ВСІ медіатеки адмінки
     // shrink-heavy-images.js уже замінив на webp тієї самої назви. У
     // коментарі того скрипта написано «прибрати такі осиротілі файли
     // вміє npm run images:archive» — а прибрати їх було нічим.
-    const { readMediaFolders, MEDIA_DIRS } = require("../scripts/archive-unused-images");
+    const { readMediaFolders, MEDIA_DIRS, EXTRA_DIRS }
+        = require("../scripts/archive-unused-images");
 
     const теки = readMediaFolders();
 
@@ -462,8 +463,50 @@ console.log("\n[9] Прибираємо ВСІ медіатеки адмінки
 
     check("повторів у переліку немає", new Set(теки).size === теки.length, теки.join(", "));
 
-    check("у звичайному запуску працюємо саме цим переліком",
-        MEDIA_DIRS.length === теки.length);
+    // ПЕРЕЛІК = ТЕКИ З КОНФІГУ ПЛЮС НАЗВАНІ РУКАМИ.
+    //
+    // Тут стояло «MEDIA_DIRS.length === теки.length», тобто «нічого,
+    // крім конфігу». Воно правильно охороняло від списку в коді, який
+    // застаріває мовчки — і водночас робило НЕВИДИМИМИ теки, яких у
+    // конфігу не буде ніколи, бо адмінка туди не пише.
+    //
+    // ЗАМІРЯНО 03.11.2026: у assets/images/products лежало 8 мертвих
+    // файлів на 8,35 МБ (стокові pexels, краєвид Доломітів на 2,2 МБ,
+    // guess-noelle-1.jpg на один байт), у корені assets/images — ще
+    // три на 230 КБ. Жоден звіт за всю історію їх не назвав.
+    //
+    // Тому перелік тепер із двох джерел, і кожне перевіряється окремо.
+    check("усі теки з конфігу в роботі",
+        теки.every(rel => MEDIA_DIRS.includes(rel)), MEDIA_DIRS.join(", "));
+
+    check("додані руками — теж",
+        EXTRA_DIRS.filter(rel => fs.existsSync(path.join(ROOT, rel)))
+            .every(rel => MEDIA_DIRS.includes(rel)),
+        MEDIA_DIRS.join(", "));
+
+    // Щоб попередня перевірка не була зеленою задарма: якщо названа
+    // руками тека колись з'явиться і в конфігу, вона перестане бути
+    // додатковою, і сенс охороняти її тут зникне.
+    check("названі руками теки справді поза конфігом",
+        EXTRA_DIRS.length > 0 && EXTRA_DIRS.every(rel => !теки.includes(rel)),
+        EXTRA_DIRS.join(", "));
+
+    check("нічого стороннього в переліку немає",
+        MEDIA_DIRS.every(rel => теки.includes(rel) || EXTRA_DIRS.includes(rel)),
+        MEDIA_DIRS.filter(rel => !теки.includes(rel) && !EXTRA_DIRS.includes(rel)).join(", "));
+
+    // САМЕ ЦЯ ТЕКА — ПРИЧИНА ВСЬОГО ВИЩЕ.
+    //
+    // Перевірки про «додані руками» лишаються зеленими й тоді, коли
+    // перелік скоротили: «кожна названа врахована» — правда й для
+    // коротшого переліку. Так і показав ламач.
+    //
+    // А 8,35 МБ лежали саме в assets/images/products: сім стокових
+    // pexels, краєвид Доломітів на 2,2 МБ і guess-noelle-1.jpg на
+    // один байт. Тека нікуди не подінеться, поки в ній лежить
+    // uploads, тож назвати її прямо тут безпечно.
+    check("тека з часів шаблону прибирається",
+        MEDIA_DIRS.includes("assets/images/products"), MEDIA_DIRS.join(", "));
 
     // --- І найголовніше: однойменні файли з різних тек не склеюються.
     const ДВІ = fs.mkdtempSync(path.join(os.tmpdir(), "archive-two-"));
