@@ -45,8 +45,40 @@ const CHECK = process.argv.includes("--check");
 // Ваги, які справді вживаються в assets/css/style.css.
 const WEIGHTS = [400, 500, 600, 700, 800, 900];
 
-const FONT_URL = "https://fonts.googleapis.com/css2?family=Inter:wght@"
-    + WEIGHTS.join(";") + "&display=swap";
+// ШРИФТ ТЕПЕР СВІЙ.
+//
+// Доти тут стояло посилання на fonts.googleapis.com/css2. Воно
+// блокувало показ, і лише після нього починалися самі файли з
+// fonts.gstatic.com — тобто два чужі домени й два послідовні запити
+// перед тим, як текст намалюється потрібним накресленням.
+//
+// Файли забирає scripts/fetch-fonts.js, правила @font-face лежать у
+// assets/css/style.css. Тут лишається тільки підказка браузеру
+// почати їх вантажити одразу, не чекаючи на розбір стилів.
+const FONTS_DIR = path.join(ROOT, "assets", "fonts");
+
+// ЯКІ САМЕ ПІДМНОЖИНИ ПІДКАЗУЄМО.
+//
+// Їх сім, але браузер бере лише ті, чиї символи є на сторінці. Дві з
+// них є на КОЖНІЙ сторінці магазину: кирилиця — бо сайт український,
+// латиниця — бо назви брендів латинські. Решту (грецьку, вʼєтнамську,
+// розширені) підказувати не можна: підказка змусила б качати файл,
+// якого сторінці не треба.
+const PRELOAD_SUBSETS = ["latin", "cyrillic"];
+
+// Імена файлів беремо з теки, а не вписуємо: у них версія шрифту
+// (inter-v20-latin.woff2), і після оновлення вона зміниться.
+function fontFiles() {
+
+    if (!fs.existsSync(FONTS_DIR)) return [];
+
+    const усі = fs.readdirSync(FONTS_DIR).filter(f => f.endsWith(".woff2"));
+
+    return PRELOAD_SUBSETS
+        .map(subset => усі.find(f => new RegExp(`-${subset}\\.woff2$`).test(f)))
+        .filter(Boolean);
+
+}
 
 // Позначка, за якою знаходимо власний блок при повторному запуску.
 const MARK = "Шрифт. Тут, а не @import";
@@ -95,16 +127,27 @@ function supabaseOrigin() {
 // використає, тобто підказка була б марною.
 function block(indent) {
 
-    return [
+    const рядки = [
         `${indent}<!-- ${MARK} у CSS: @import видно лише після`,
         `${indent}     завантаження таблиці стилів, і текст чекає на три запити`,
         `${indent}     поспіль. Розкладає scripts/sync-fonts.js — правити руками`,
         `${indent}     не треба. -->`,
-        `${indent}<link rel="preconnect" href="https://fonts.googleapis.com">`,
-        `${indent}<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>`,
-        `${indent}<link rel="preconnect" href="${supabaseOrigin()}" crossorigin>`,
-        `${indent}<link rel="stylesheet" href="${FONT_URL}">`
-    ].join("\n");
+        `${indent}<link rel="preconnect" href="${supabaseOrigin()}" crossorigin>`
+    ];
+
+    // ШЛЯХ АБСОЛЮТНИЙ. Сторінки лежать на різній глибині
+    // (/p/slug/index.html), і відносний «assets/fonts/…» працював би
+    // лише там, де є <base href="/">.
+    //
+    // crossorigin ОБОВ'ЯЗКОВИЙ навіть для свого домену: шрифти
+    // браузер завжди бере в режимі CORS, і preload без цього прапорця
+    // дав би ДРУГЕ завантаження того самого файлу замість одного.
+    fontFiles().forEach(файл => {
+        рядки.push(`${indent}<link rel="preload" as="font" type="font/woff2"`
+            + ` href="/assets/fonts/${файл}" crossorigin>`);
+    });
+
+    return рядки.join("\n");
 
 }
 
@@ -147,8 +190,22 @@ const STYLE_RE = /([ \t]*)<link\b[^>]*assets\/css\/style\.css[^>]*>/;
 //
 // Переносів прибираємо стільки ж, скільки ставимо при вставці (два):
 // інакше кожен прохід додавав би перед блоком ще один порожній рядок.
+// Беремо коментар і ВСІ теги блоку, які йдуть за ним поспіль.
+//
+// Доти регулярка закінчувалась на посиланні googleapis — тобто знала
+// склад блоку напам'ять. Коли шрифт переїхав до себе, склад змінився,
+// а старі блоки на 173 сторінках лишились би недоторканими: крок не
+// знайшов би їх і просто дописав новий поруч.
+//
+// Тому перелічуємо ВИДИ тегів, які блок може містити, а не їхній
+// порядок: preconnect, preload і старе посилання на googleapis.
+// Тег стилів сайту (rel="stylesheet" без googleapis) під це не
+// підпадає — саме перед ним блок і стоїть, і з'їсти його не можна.
 const OWN_BLOCK_RE = new RegExp(
-    `[ \\t]*<!-- ${MARK}[\\s\\S]*?fonts\\.googleapis\\.com\\/css2[^>]*>[ \\t]*(?:\\r?\\n){0,2}`,
+    `[ \\t]*<!-- ${MARK}[\\s\\S]*?-->[ \\t]*\\r?\\n`
+    + `(?:[ \\t]*<link\\b[^>]*(?:rel="preconnect"|rel="preload"|fonts\\.googleapis\\.com)[^>]*>`
+    + `[ \\t]*\\r?\\n)*`
+    + `(?:\\r?\\n){0,1}`,
     "g"
 );
 
@@ -251,4 +308,4 @@ function main() {
 
 if (require.main === module) main();
 
-module.exports = { FONT_URL, WEIGHTS, MARK, block, syncPage };
+module.exports = { WEIGHTS, MARK, PRELOAD_SUBSETS, fontFiles, block, syncPage };
