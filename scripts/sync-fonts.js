@@ -142,9 +142,13 @@ function block(indent) {
     // crossorigin ОБОВ'ЯЗКОВИЙ навіть для свого домену: шрифти
     // браузер завжди бере в режимі CORS, і preload без цього прапорця
     // дав би ДРУГЕ завантаження того самого файлу замість одного.
+    // Адресу будує scripts/fetch-fonts.js — той самий помічник, яким
+    // вона підставляється в @font-face у style.css. Дві копії
+    // розійшлися б на запиті ?v=, і браузер завантажив би шрифт
+    // ДВІЧІ: preload окремо, правило стилів окремо.
     fontFiles().forEach(файл => {
         рядки.push(`${indent}<link rel="preload" as="font" type="font/woff2"`
-            + ` href="/assets/fonts/${файл}" crossorigin>`);
+            + ` href="${require("./fetch-fonts.js").адресаШрифту(файл)}" crossorigin>`);
     });
 
     return рядки.join("\n");
