@@ -60,9 +60,22 @@ console.log("\n[1] Платіжного шлюзу на сайті немає");
 
     const код = [];
 
+    // ЧУЖІ БІБЛІОТЕКИ НЕ РАХУЮТЬСЯ: питання до НАШОГО коду.
+    //
+    // 03.11.2026 бібліотеки переїхали з CDN у assets/js/vendor — і
+    // перевірка одразу почервоніла на supabase-js. Збіглося слово
+    // «Acquiring» у рядку «Acquiring an exclusive Navigator Lock»,
+    // тобто повідомлення про захоплення замка, а не про еквайринг.
+    //
+    // Шлюз на сайті з'являється тоді, коли ЙОГО ПІДКЛЮЧАЮТЬ у своєму
+    // коді чи розмітці. Те, що чужа бібліотека вживає англійське
+    // слово у своєму значенні, обіцянок покупцеві не змінює.
+    const ЧУЖЕ = path.join(ROOT, "assets", "js", "vendor");
+
     const walk = dir => fs.readdirSync(dir, { withFileTypes: true }).forEach(entry => {
         if (["node_modules", ".git", "tests", "docs"].includes(entry.name)) return;
         const full = path.join(dir, entry.name);
+        if (full === ЧУЖЕ) return;
         if (entry.isDirectory()) walk(full);
         else if (/\.(js|ts|html)$/.test(entry.name) && !full.includes(path.join(ROOT, "p"))) код.push(full);
     });

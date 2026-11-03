@@ -90,7 +90,11 @@ console.log("\n[2] Порядок виконання збережено");
     // потім те, що її вживає.
     const home = read("index.html");
 
-    const lib = home.indexOf("supabase-js@");
+    // «supabase-js» без прив'язки до того, звідки він: доти шукалось
+    // «supabase-js@» — вигляд адреси на CDN. 03.11.2026 бібліотека
+    // переїхала до себе й зветься vendor/supabase-js-2.112.3.js, і
+    // перевірка почервоніла не тому, що порядок зламався.
+    const lib = home.search(/supabase-js[@-]/);
     const client = home.indexOf("assets/js/supabase-client.js");
     const common = home.indexOf("assets/js/common.js");
     const app = home.indexOf("assets/js/app.js");
