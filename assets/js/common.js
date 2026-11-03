@@ -975,7 +975,7 @@ function showCartPopup(product, selection = {}) {
 
     const { itemsCount, subtotal } = getCartSummary();
 
-    const image = product.images?.[0] || "assets/images/no-image.png";
+    const image = product.images?.[0] || "assets/images/no-image.webp";
 
     const metaParts = [];
 
@@ -996,7 +996,7 @@ function showCartPopup(product, selection = {}) {
             <img
                 src="${image}"
                 alt="${escapeHtml(product.title)}"
-                onerror="this.src='assets/images/no-image.png'">
+                onerror="this.src='assets/images/no-image.webp'">
             <div class="cart-popup-item-info">
                 ${product.brand ? `<div class="cart-popup-item-brand">${escapeHtml(product.brand)}</div>` : ""}
                 <div class="cart-popup-item-title">${escapeHtml(product.title)}</div>
@@ -2376,12 +2376,12 @@ async function runGlobalSearch(query) {
 
     gridEl.innerHTML = matches.slice(0, MAX_SEARCH_RESULTS).map(product => {
 
-        const image = product.images?.[0] || "assets/images/no-image.png";
+        const image = product.images?.[0] || "assets/images/no-image.webp";
 
         return `
             <a href="${productUrl(product)}" class="search-result-card">
                 <div class="search-result-image">
-                    <img src="${image}" alt="${escapeHtml(product.title)}" onerror="this.src='assets/images/no-image.png'">
+                    <img src="${image}" alt="${escapeHtml(product.title)}" onerror="this.src='assets/images/no-image.webp'">
                 </div>
                 <div class="search-result-brand">${escapeHtml(product.brand)}</div>
                 <div class="search-result-title">${escapeHtml(product.title)}</div>

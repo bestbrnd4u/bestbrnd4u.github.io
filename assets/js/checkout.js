@@ -743,7 +743,7 @@ function renderOrderSummary() {
 
     orderSummaryItemsEl.innerHTML = lines.map(({ product, qty, color, size }) => {
 
-        const image = product.images?.[0] || "assets/images/no-image.png";
+        const image = product.images?.[0] || "assets/images/no-image.webp";
 
         const oldPriceHtml = oldPriceNow(product)
             ? `<span class="order-item-oldprice">${formatPrice(oldPriceNow(product))}</span>`
@@ -760,7 +760,7 @@ function renderOrderSummary() {
             <div class="order-item">
 
                 <a href="${productUrl(product)}" class="order-item-image">
-                    <img src="${image}" alt="${escapeHtml(product.title)}" onerror="this.src='assets/images/no-image.png'">
+                    <img src="${image}" alt="${escapeHtml(product.title)}" onerror="this.src='assets/images/no-image.webp'">
                 </a>
 
                 <div class="order-item-info">

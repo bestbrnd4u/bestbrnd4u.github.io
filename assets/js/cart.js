@@ -164,7 +164,7 @@ function renderCart() {
 
         const activeVariant = variants.find(v => v.color === activeColor) || variants[0];
 
-        const image = activeVariant.images?.[0] || product.images?.[0] || "assets/images/no-image.png";
+        const image = activeVariant.images?.[0] || product.images?.[0] || "assets/images/no-image.webp";
 
         // Кольори, які вже лежать у кошику окремими рядками, позначаємо
         // одразу — щоб людина не тицяла в них і не отримувала відмову.
@@ -223,7 +223,7 @@ function renderCart() {
                     <img
                         src="${image}"
                         alt="${escapeHtml(product.title)}"
-                        onerror="this.src='assets/images/no-image.png'">
+                        onerror="this.src='assets/images/no-image.webp'">
                 </a>
 
                 <div class="cart-item-info">

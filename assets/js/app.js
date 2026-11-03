@@ -230,7 +230,7 @@ function promoPicture(promo, breakpoint, extraAttrs) {
                 style="${frameFor(promo.image)}"
                 alt="${promo.title}"
                 ${extraAttrs || ""}${вантаження}
-                onerror="this.src='assets/images/no-image.png'">
+                onerror="this.src='assets/images/no-image.webp'">
         </picture>`;
 
 }
@@ -430,10 +430,10 @@ function renderCategories(categories) {
         gridEl.innerHTML = categories.items.map(item => `
             <a href="${item.link || "catalog"}" class="category">
                 <img
-                    src="${item.image || "assets/images/no-image.png"}"
+                    src="${item.image || "assets/images/no-image.webp"}"
                     alt="${item.label || ""}"
                     loading="lazy" decoding="async"
-                    onerror="this.src='assets/images/no-image.png'">
+                    onerror="this.src='assets/images/no-image.webp'">
                 <h3>${item.label || ""}</h3>
             </a>
         `).join("");
@@ -1411,7 +1411,7 @@ function renderCollectionWidget(collection, items) {
                             src="${collection.image}"
                             alt="${collection.imageAlt || collection.title}"
                             loading="lazy"
-                            onerror="this.src='assets/images/no-image.png'">
+                            onerror="this.src='assets/images/no-image.webp'">
                     </picture>
                 </div>
 
@@ -1453,7 +1453,7 @@ function createCollectionProductCard(product) {
     const image =
         product.images?.[0] ||
         product.variants?.[0]?.images?.[0] ||
-        "assets/images/no-image.png";
+        "assets/images/no-image.webp";
 
     const oldPrice = oldPriceNow(product)
         ? `<span class="old-price">${formatPrice(oldPriceNow(product))}</span>`
@@ -1468,7 +1468,7 @@ function createCollectionProductCard(product) {
                     src="${image}"
                     alt="${escapeHtml(product.title)}"
                     loading="lazy"
-                    onerror="this.src='assets/images/no-image.png'">
+                    onerror="this.src='assets/images/no-image.webp'">
 
                 <button class="favorite" data-id="${product.id}"
                         aria-pressed="false"

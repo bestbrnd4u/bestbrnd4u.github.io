@@ -1353,7 +1353,7 @@ nav li.has-mega[data-mega-open] .mega-menu.mega-menu-columns{
             rgba(var(--hero-tint-rgb),0) 100%
         ),
         linear-gradient(rgba(var(--hero-tint-rgb),.45), rgba(var(--hero-tint-rgb),.45)),
-        var(--hero-bg, url("/assets/images/banners/hero-bags.jpg"));
+        var(--hero-bg, url("/assets/images/banners/hero-bags.webp"));
     background-size:cover;
     /* Точка кадрування з адмінки (assets/js/image-framing.js).
        Банер — смуга 1600×720 на десктопі й 750×1000 на телефоні, а
@@ -2989,7 +2989,7 @@ footer{
     background-color:#111827;
     background-image:
         linear-gradient(rgba(17,24,39,.55), rgba(17,24,39,.55)),
-        var(--promo-bg, url("/assets/images/banners/home-new-arrivals.jpg"));
+        var(--promo-bg, url("/assets/images/banners/home-new-arrivals.webp"));
     background-size:cover;
     /* те саме, що для головного банера */
     background-position:var(--frame-x,50%) var(--frame-y,50%);

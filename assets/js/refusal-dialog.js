@@ -144,8 +144,8 @@
                     + '<label class="refusal-item' + (alreadySent ? ' refusal-item-sent' : '') + '">'
                     + '  <input type="checkbox" value="' + index + '"' + checked
                     + (alreadySent ? ' disabled' : '') + '>'
-                    + '  <img src="' + (item.image || "assets/images/no-image.png") + '"'
-                    + '       alt="" onerror="this.onerror=null;this.src=\'assets/images/no-image.png\'">'
+                    + '  <img src="' + (item.image || "assets/images/no-image.webp") + '"'
+                    + '       alt="" onerror="this.onerror=null;this.src=\'assets/images/no-image.webp\'">'
                     + '  <span class="refusal-item-info">'
                     + '    <b>' + (item.title || "Товар") + '</b>'
                     + (meta ? '<span class="refusal-item-meta">' + meta + '</span>' : "")

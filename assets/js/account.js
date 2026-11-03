@@ -1185,7 +1185,7 @@ function renderOrderCard(order) {
             <div class="order-item">
 
                 <a class="order-item-image" href="${productHref}">
-                    <img src="${item.image || "assets/images/no-image.png"}" alt="${escapeHtml(item.title || "")}" onerror="this.src='assets/images/no-image.png'">
+                    <img src="${item.image || "assets/images/no-image.webp"}" alt="${escapeHtml(item.title || "")}" onerror="this.src='assets/images/no-image.webp'">
                 </a>
 
                 <div class="order-item-info">

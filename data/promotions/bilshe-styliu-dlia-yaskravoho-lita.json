@@ -68,11 +68,11 @@
   "autoSections": [
     "Сумки"
   ],
-  "imageMobile": "/assets/images/banners/03_banner_compact_800x1000.jpg",
+  "imageMobile": "/assets/images/banners/03_banner_compact_800x1000.webp",
   "promoPageImage": "/assets/images/banners/2.webp",
   "legacySlugs": [
     "більше-стилю-для-яскравого-літа"
   ],
-  "promoPageImageMobile": "/assets/images/banners/coach-teaser-mobile.jpg",
+  "promoPageImageMobile": "/assets/images/banners/coach-teaser-mobile.webp",
   "buttonText": "Дивитись усі товари"
 }
