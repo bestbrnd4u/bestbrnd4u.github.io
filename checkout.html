@@ -390,10 +390,18 @@
                             </span>
                         </label>
 
+                        <!-- autocomplete тут ПОТРІБЕН, на відміну від сусідів.
+                             Місту, відділенню й поштомату nova-poshta.js сам
+                             ставить autocomplete="off" — його список підказок
+                             б'ється з рідним автозаповненням браузера. А це
+                             поле покупець пише сам, довідника під ним немає,
+                             і воно просто лишилось без атрибута зовсім.
+                             address-line1, а не street-address: місто вже
+                             окремим полем вище. -->
                         <div class="delivery-detail" data-detail-for="Кур'єром «Нова пошта»">
                             <label>
                                 Адреса доставки (вулиця, будинок, квартира)
-                                <input type="text" id="courierAddress" name="Адреса доставки" placeholder="Вулиця, будинок, квартира">
+                                <input type="text" id="courierAddress" name="Адреса доставки" placeholder="Вулиця, будинок, квартира" autocomplete="address-line1">
                             </label>
                         </div>
 
