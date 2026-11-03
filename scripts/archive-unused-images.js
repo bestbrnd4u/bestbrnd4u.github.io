@@ -280,12 +280,49 @@ function collectHaystack() {
 
 }
 
+// ІМ'Я МУСИТЬ ПОЧИНАТИСЬ САМЕ ТАМ, ДЕ ЗБІГЛОСЬ.
+//
+// Доти перевірка була простим includes() — і коротке ім'я вважалось
+// ужитим, щойно воно траплялось ХВОСТОМ довшого.
+//
+// ЗАМІРЯНО 03.11.2026: assets/images/banners/2.png важить 1,9 МБ і не
+// згаданий ніде. Але «2.png» є всередині «favicon-512.png»,
+// «favicon-192.png» і «favicon-32.png» — тож прибирач рік поспіль
+// звітував «медіатека чиста», а файл їхав на Pages.
+//
+// Помилка тут однобічна й тиха: чим коротше ім'я, тим надійніше воно
+// захищене від прибирання. Саме короткі імена й дає ручне
+// завантаження («2.png», «1.jpg»).
+//
+// Тому дивимось символ ПЕРЕД збігом: якщо він може бути частиною
+// імені файлу, то це не наше ім'я, а чужий хвіст. Шлях («/2.png»),
+// лапка («"2.png») чи початок рядка — підходять.
+function згадано(haystack, needle) {
+
+    if (!needle) return false;
+
+    let i = haystack.indexOf(needle);
+
+    while (i !== -1) {
+
+        const перед = i === 0 ? "" : haystack[i - 1];
+
+        if (!/[A-Za-z0-9._\-Ѐ-ӿ]/.test(перед)) return true;
+
+        i = haystack.indexOf(needle, i + 1);
+
+    }
+
+    return false;
+
+}
+
 function isReferenced(name, haystack) {
 
-    if (haystack.includes(name)) return true;
+    if (згадано(haystack, name)) return true;
 
     // кирилиця в даних може лежати закодованою
-    if (haystack.includes(encodeURIComponent(name))) return true;
+    if (згадано(haystack, encodeURIComponent(name))) return true;
 
     return false;
 
