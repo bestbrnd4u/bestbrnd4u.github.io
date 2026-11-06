@@ -319,6 +319,11 @@
 
             <form id="resetPasswordForm" class="auth-form" novalidate>
 
+                <!-- Для менеджера паролів: без поля імені він не знає,
+                     до якого облікового запису прив'язати новий пароль.
+                     Значення ставить account.js — лише справжньою поштою. -->
+                <input type="email" class="pm-username" name="username" autocomplete="username" hidden>
+
                 <label>
                     Новий пароль
                     <input type="password" id="newPassword" required minlength="6" placeholder="Мінімум 6 символів" autocomplete="new-password">
@@ -655,6 +660,9 @@
                          через лист, тобто через пошту, доступ до якої
                          ще треба мати. -->
                     <form id="passwordForm" class="profile-form" novalidate>
+
+                        <!-- Див. те саме поле в resetPasswordForm вище. -->
+                        <input type="email" class="pm-username" name="username" autocomplete="username" hidden>
 
                         <label>
                             Старий пароль
@@ -1040,7 +1048,7 @@
 <!-- Спільна поведінка картки входу: ті самі кнопки стоять ще й на
      оформленні замовлення. ПЕРЕД account.js — той нею користується. -->
 <script src="assets/js/auth-widget.js?v=6b02212c" defer></script>
-<script src="assets/js/account.js?v=ca47459b" defer></script>
+<script src="assets/js/account.js?v=dff1b898" defer></script>
 
 </body>
 
