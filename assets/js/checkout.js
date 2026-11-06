@@ -2031,7 +2031,7 @@ checkoutForm?.addEventListener("submit", event => {
 
             saveCart([]);
 
-            window.location.href = "thanks";
+            window.location.href = (window.I18N ? window.I18N.href("thanks") : "thanks");
 
         } else {
 

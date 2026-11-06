@@ -551,7 +551,7 @@ logoutBtn?.addEventListener("click", async () => {
     // Нова навігація відкриває сторінку згори сама — окремо гортати не
     // треба: відновлення прокрутки є лише в каталозі, і головної воно
     // не стосується.
-    window.location.replace("/");
+    window.location.replace((window.I18N ? window.I18N.href("/") : "/"));
 
 });
 
@@ -585,7 +585,7 @@ const isEmailChanged =
 // «Увійти» — це просто кабінет без службової частини адреси: сесія
 // вже є, показувати екран успіху вдруге нема сенсу.
 document.getElementById("emailChangedLogin")?.addEventListener("click", () => {
-    window.location.href = `${window.location.origin}/account`;
+    window.location.href = `${window.location.origin}${(window.I18N ? window.I18N.href("/account") : "/account")}`;
 });
 
 // МЕНЕДЖЕРУ ПАРОЛІВ ТРЕБА ЗНАТИ, ЧИЙ ЦЕ ПАРОЛЬ.

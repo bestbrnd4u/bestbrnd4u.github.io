@@ -52,7 +52,7 @@ const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_imbIdZ0a4I14x1rftMKRLQ_nn9FJmy6
     // replace, а не href: інакше «назад» повертало б на адресу з уже
     // використаним токеном.
     window.location.replace(
-        window.location.origin + "/account" + window.location.search + window.location.hash
+        window.location.origin + (window.I18N ? window.I18N.href("/account") : "/account") + window.location.search + window.location.hash
     );
 
 })();

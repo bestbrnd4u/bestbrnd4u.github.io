@@ -170,10 +170,12 @@ if (isLegacyUrl && product.slug) {
     // відбувається тим самим рядком нижче.
     updateProductSeoMetadata(product);
 
-    location.replace(productUrl(product, {
+    const target = productUrl(product, {
         color: params.get("color"),
         size: params.get("size")
-    }));
+    });
+
+    location.replace((window.I18N ? window.I18N.href(target) : target));
 
     return;
 

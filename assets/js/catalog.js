@@ -3298,7 +3298,7 @@ function leavePreset() {
 
     const query = params.toString().replace(/%2C/gi, ",");
 
-    window.location.assign(query ? `/catalog?${query}` : "/catalog");
+    window.location.assign((window.I18N ? window.I18N.href((query ? `/catalog?${query}` : "/catalog")) : (query ? `/catalog?${query}` : "/catalog")));
 
 }
 

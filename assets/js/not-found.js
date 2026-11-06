@@ -132,7 +132,7 @@
                     return;
                 }
 
-                window.location.href = "/catalog";
+                window.location.href = (window.I18N ? window.I18N.href("/catalog") : "/catalog");
 
             });
 
