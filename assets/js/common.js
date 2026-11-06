@@ -4615,6 +4615,63 @@ function sizeRowHidden(sizes) {
 
 }
 
+// ОБРАНИЙ КОЛІР І РОЗМІР — НЕ ЛИШЕ ДЛЯ ОКА.
+//
+// Кружечки кольору й кнопки розміру показують вибір обводкою (клас
+// active) — і більше нічим. Читалка на кружечку казала «Чорний,
+// кнопка», не кажучи, чи він обраний. Сторінка товару для великих
+// кнопок розміру вже ставить aria-pressed сама, а кружечки й маленькі
+// розміри малюють ЧОТИРИ різні шаблони (картка каталогу, сторінка
+// товару, кошик, обране), і перемикає їх інший обробник.
+//
+// Тому не в кожен шаблон окремо, а одне правило за самою ознакою: є
+// active — aria-pressed="true", немає — "false". Так нова п'ята
+// картка отримає це задарма, а не через півроку (див. «Клік — це
+// здогад, слухай ознаку»).
+const PRESSABLE = "button.mini-color, button.color, button.mini-size, button.size";
+
+function syncPressed(el) {
+
+    const value = el.classList.contains("active") ? "true" : "false";
+
+    if (el.getAttribute("aria-pressed") !== value) el.setAttribute("aria-pressed", value);
+
+}
+
+function syncPressedIn(root) {
+
+    if (root.matches?.(PRESSABLE)) syncPressed(root);
+
+    root.querySelectorAll?.(PRESSABLE).forEach(syncPressed);
+
+}
+
+if (typeof MutationObserver !== "undefined" && typeof document !== "undefined") {
+
+    const pressedObserver = new MutationObserver(records => {
+
+        for (const record of records) {
+
+            if (record.type === "attributes") {
+                if (record.target.matches?.(PRESSABLE)) syncPressed(record.target);
+            } else {
+                record.addedNodes.forEach(node => { if (node.nodeType === 1) syncPressedIn(node); });
+            }
+
+        }
+
+    });
+
+    const startPressed = () => {
+        syncPressedIn(document.body);
+        pressedObserver.observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ["class"] });
+    };
+
+    if (document.body) startPressed();
+    else document.addEventListener("DOMContentLoaded", startPressed);
+
+}
+
 function getVariantSizes(product, variant) {
 
     const list = variant && Array.isArray(variant.sizes) && variant.sizes.length
