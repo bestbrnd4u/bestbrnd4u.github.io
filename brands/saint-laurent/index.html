@@ -2,7 +2,7 @@
 <html lang="uk" data-season="standard">
 
 <head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"7a6c2900","data/catalog.json":"7af5999c","data/categories.json":"2c24d857","data/collections.json":"858469e9","data/home.json":"3b07783a","data/image-variants.json":"8d6e1e7e","data/instagram-links.json":"610ebd7b","data/legal.json":"f84751b2","data/notifications.json":"a35b367f","data/page-texts.json":"6dd1be71","data/product-texts.json":"278df72d","data/products-updated.json":"79b3052e","data/products.json":"ae78eb0a","data/promo-popups.json":"0940ece5","data/promotions.json":"92880867","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/season.json":"17f1306b","data/security.json":"0c05c691","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"7a6c2900","data/catalog.json":"7af5999c","data/categories.json":"2c24d857","data/collections.json":"858469e9","data/home.json":"3b07783a","data/i18n-en.json":"22ec2d2e","data/i18n-ru.json":"b3ab7a6d","data/image-variants.json":"8d6e1e7e","data/instagram-links.json":"610ebd7b","data/legal.json":"f84751b2","data/notifications.json":"a35b367f","data/page-texts.json":"6dd1be71","data/product-texts.json":"278df72d","data/products-updated.json":"79b3052e","data/products.json":"ae78eb0a","data/promo-popups.json":"0940ece5","data/promotions.json":"92880867","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/season.json":"17f1306b","data/security.json":"0c05c691","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script>
 
 <!-- Сторінка лежить у /brands/<slug>/ або /categories/<slug>/,
      а скрипти будують шляхи як з кореня ("data/products.json").
@@ -125,9 +125,17 @@ window.CATALOG_PRESET = {"brand":"Saint Laurent"};
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-v20-latin.woff2?v=v20" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-v20-cyrillic.woff2?v=v20" crossorigin>
 
-<link rel="stylesheet" href="/assets/css/style.css?v=2437e714">
+<link rel="stylesheet" href="/assets/css/style.css?v=42359bef">
 
 <script src="/assets/js/vendor/supabase-js-2.112.3.js?v=a38f4664" defer></script>
+<!-- i18n:begin -->
+<link rel="alternate" hreflang="uk" href="https://dev.bestbrnd4u.com/brands/saint-laurent/">
+<link rel="alternate" hreflang="en" href="https://dev.bestbrnd4u.com/en/brands/saint-laurent/">
+<link rel="alternate" hreflang="ru" href="https://dev.bestbrnd4u.com/ru/brands/saint-laurent/">
+<link rel="alternate" hreflang="x-default" href="https://dev.bestbrnd4u.com/brands/saint-laurent/">
+<script src="/assets/js/i18n-core.js?v=60e9bbb5" defer></script>
+<script src="/assets/js/i18n.js?v=7bd17491" defer></script>
+<!-- i18n:end -->
 </head>
 
 <body data-popup-page="catalog">
@@ -163,6 +171,7 @@ window.CATALOG_PRESET = {"brand":"Saint Laurent"};
 </ul>
 </nav>
 <div class="header-icons">
+            <nav class="lang-switch" aria-label="Мова сайту" translate="no"><details class="lang-switch-menu"><summary class="lang-switch-current" aria-label="Мова сайту: Українська"><span>УКР</span></summary><ul class="lang-switch-list"><li><span class="lang-switch-option" aria-current="true" lang="uk">Українська</span></li><li><a class="lang-switch-option" href="/en/brands/saint-laurent/" hreflang="en" lang="en">English</a></li><li><a class="lang-switch-option" href="/ru/brands/saint-laurent/" hreflang="ru" lang="ru">Русский</a></li></ul></details></nav>
 <button id="searchBtn" aria-label="Пошук по каталогу">🔍</button>
 <a href="/account" id="accountLink" aria-label="Увійти або зареєструватися">👤</a>
 <a href="/favorites">
@@ -749,7 +758,7 @@ aria-label="Нагору">
 
 <!-- Журнал помилок: сторінка сама розповідає, що в неї зламалось -->
 <script src="/assets/js/error-report.js?v=21838fe8" defer></script>
-<script src="/assets/js/supabase-client.js?v=d0555d06" defer></script>
+<script src="/assets/js/supabase-client.js?v=e8358d93" defer></script>
 <!-- Кадрування фото товару. Той самий файл підключає адмінка,
      тож прев'ю в ній і картка на сайті рахуються однаково. -->
 <script src="/assets/js/image-framing.js?v=80b29a57" defer></script>
@@ -764,7 +773,7 @@ aria-label="Нагору">
 <!-- Транслітерація: каталог кладе латиницю в адресу фільтра.
      Той самий файл використовує збірка для адрес товарів. -->
 <script src="/assets/js/translit.js?v=c0957cb7" defer></script>
-<script src="/assets/js/common.js?v=856e1d9d" defer></script>
+<script src="/assets/js/common.js?v=98dcdbcc" defer></script>
 <!-- Дзвінок і зв'язок: дві плаваючі кнопки в лівому кутку -->
 <script src="/assets/js/contact-buttons.js?v=53c2ccd7" defer></script>
 <!-- Підписка на листи магазину -->
@@ -778,7 +787,7 @@ aria-label="Нагору">
 <script src="/assets/js/ui.js?v=fa1e1236" defer></script>
 <script src="/assets/js/stock.js?v=85fa4aad" defer></script>
 <script src="/assets/js/live-stock.js?v=ca9027dd" defer></script>
-<script src="/assets/js/catalog.js?v=53d3e5bb" defer></script>
+<script src="/assets/js/catalog.js?v=d2baf64c" defer></script>
 </body>
 
 </html>

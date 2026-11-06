@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ru" data-season="standard"><head>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"7a6c2900","data/catalog.json":"7af5999c","data/categories.json":"2c24d857","data/collections.json":"858469e9","data/home.json":"3b07783a","data/i18n-en.json":"22ec2d2e","data/i18n-ru.json":"b3ab7a6d","data/image-variants.json":"8d6e1e7e","data/instagram-links.json":"610ebd7b","data/legal.json":"f84751b2","data/notifications.json":"a35b367f","data/page-texts.json":"6dd1be71","data/product-texts.json":"278df72d","data/products-updated.json":"79b3052e","data/products.json":"ae78eb0a","data/promo-popups.json":"0940ece5","data/promotions.json":"92880867","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/season.json":"17f1306b","data/security.json":"0c05c691","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script><base href="/">
+    <meta name="robots" content="noindex,nofollow">
+    <meta charset="UTF-8">
+    <meta name="author" content="BestBrnd4u">
+    <meta name="copyright" content="© 2026 BestBrnd4u. Усі права захищено.">
+    <link rel="license" href="/LICENSE">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Підтвердження підписки на новинки BestBrnd4u">
+    <meta name="theme-color" content="#111827">
+
+    <!-- ВЛАСНИЙ noindex, А НЕ ТОЙ, ЩО СТАВИТЬ ЗБІРКА.
+
+         Вище в <head> стоїть <meta robots="noindex,nofollow"> —
+         його додає scripts/apply-site-env.js усьому дев-середовищу
+         й ПРИБИРАЄ на проді. Тобто покладатись на нього не можна:
+         на бойовому сайті сторінка лишилась би відкритою для
+         індексації.
+
+         А їй там не місце. В адресі лежить одноразовий токен чужої
+         підписки; сама сторінка без нього порожня. Так само
+         позначені cart, checkout, favorites і account.
+
+         follow, а не nofollow: посилання звідси ведуть на головну
+         й у каталог, і ваги їм передати можна. -->
+    <meta name="robots" content="noindex,follow">
+
+<link rel="icon" href="favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicon-16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/images/favicon-192.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <title>Підтвердження підписки | BestBrnd4u</title>
+
+    <link rel="preconnect" href="https://hyfodsznpeeecgtgffub.supabase.co" crossorigin="">
+
+    <!-- Шрифт. Тут, а не @import у CSS: @import видно лише після
+         завантаження таблиці стилів, і текст чекає на три запити
+         поспіль. Розкладає scripts/sync-fonts.js — правити руками
+         не треба. -->
+    <link rel="preconnect" href="https://hyfodsznpeeecgtgffub.supabase.co" crossorigin="">
+    <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-v20-latin.woff2?v=v20" crossorigin="">
+    <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-v20-cyrillic.woff2?v=v20" crossorigin="">
+
+    <link rel="stylesheet" href="assets/css/style.css?v=42359bef">
+
+
+
+
+<script src="/assets/js/vendor/supabase-js-2.112.3.js?v=a38f4664" defer=""></script>
+
+
+<!-- i18n:begin -->
+<link rel="alternate" hreflang="uk" href="https://dev.bestbrnd4u.com/newsletter-confirm">
+<link rel="alternate" hreflang="en" href="https://dev.bestbrnd4u.com/en/newsletter-confirm">
+<link rel="alternate" hreflang="ru" href="https://dev.bestbrnd4u.com/ru/newsletter-confirm">
+<link rel="alternate" hreflang="x-default" href="https://dev.bestbrnd4u.com/newsletter-confirm">
+<link rel="preload" href="/data/i18n-ru.json" as="fetch" crossorigin>
+<script src="/assets/js/i18n-core.js?v=60e9bbb5" defer></script>
+<script src="/assets/js/i18n.js?v=7bd17491" defer></script>
+<!-- i18n:end -->
+</head>
+
+<body>
+<a class="skip-link" href="#content">Перейти к содержимому</a>
+
+<header>
+
+    <div class="container header">
+
+        <a href="/ru/" class="logo">
+            BestBrnd4u
+        </a>
+
+        <nav>
+
+            <ul>
+
+                <li><a href="/ru/">Главная</a></li>
+
+                <li class="has-mega"><a href="/ru/catalog" id="navCatalogLink">Каталог</a><div class="mega-menu" id="catalogMegaMenu">
+<a class="mega-item" href="/ru/catalog?gender=Жінкам"><img src="assets/images/banners/mega-women.webp" alt="Женщинам"><span>Женщинам</span></a>
+<a class="mega-item" href="/ru/catalog?gender=Чоловікам"><img src="assets/images/banners/mega-men.webp" alt="Мужчинам"><span>Мужчинам</span></a>
+<a class="mega-item" href="/ru/catalog?gender=Унісекс"><img src="assets/images/banners/mega-unisex.webp" alt="Унисекс"><span>Унисекс</span></a>
+<a class="mega-item" href="/ru/catalog?gender=Дітям"><img src="assets/images/banners/mega-kids.webp" alt="Детям"><span>Детям</span></a>
+</div></li>
+
+                <li class="has-mega"><a href="/ru/novynky/" id="navNewLink">Новинки</a><div class="mega-menu">
+<a class="mega-item" href="/ru/novynky/?gender=Жінкам"><img src="assets/images/banners/mega-women.webp" alt="Женщинам"><span>Женщинам</span></a>
+<a class="mega-item" href="/ru/novynky/?gender=Чоловікам"><img src="assets/images/banners/mega-men.webp" alt="Мужчинам"><span>Мужчинам</span></a>
+<a class="mega-item" href="/ru/novynky/?gender=Унісекс"><img src="assets/images/banners/mega-unisex.webp" alt="Унисекс"><span>Унисекс</span></a>
+<a class="mega-item" href="/ru/novynky/?gender=Дітям"><img src="assets/images/banners/mega-kids.webp" alt="Детям"><span>Детям</span></a>
+</div></li>
+
+                <li class="has-mega"><a href="/ru/aktsii/" id="navSaleLink" class="sale-text">Акции</a><div class="mega-menu">
+<a class="mega-item" href="/ru/aktsii/?gender=Жінкам"><img src="assets/images/banners/mega-women.webp" alt="Женщинам"><span>Женщинам</span></a>
+<a class="mega-item" href="/ru/aktsii/?gender=Чоловікам"><img src="assets/images/banners/mega-men.webp" alt="Мужчинам"><span>Мужчинам</span></a>
+<a class="mega-item" href="/ru/aktsii/?gender=Унісекс"><img src="assets/images/banners/mega-unisex.webp" alt="Унисекс"><span>Унисекс</span></a>
+<a class="mega-item" href="/ru/aktsii/?gender=Дітям"><img src="assets/images/banners/mega-kids.webp" alt="Детям"><span>Детям</span></a>
+</div></li>
+                <li><a href="/ru/bayer-service">Байер-сервис</a></li>
+
+
+                <li><a href="/ru/contacts">Контакты</a></li>
+
+            </ul>
+
+        </nav>
+
+        <div class="header-icons">
+            <nav class="lang-switch" aria-label="Язык сайта" translate="no"><details class="lang-switch-menu"><summary class="lang-switch-current" aria-label="Язык сайта: Русский"><span>RU</span></summary><ul class="lang-switch-list"><li><a class="lang-switch-option" href="/newsletter-confirm" hreflang="uk" lang="uk">Українська</a></li><li><a class="lang-switch-option" href="/en/newsletter-confirm" hreflang="en" lang="en">English</a></li><li><span class="lang-switch-option" aria-current="true" lang="ru">Русский</span></li></ul></details></nav>
+
+            <button id="searchBtn" aria-label="Поиск по каталогу">🔍</button>
+<a href="/ru/account" id="accountLink" aria-label="Войти или зарегистрироваться">👤</a>
+
+            <a href="/ru/favorites">
+                ❤
+                <span id="favCount">0</span>
+            </a>
+
+            <div class="cart-icon-wrap">
+    <a href="/ru/cart" id="cartIconLink">
+        🛒
+        <span id="cartCount">0</span>
+    </a>
+    <div id="cartPopup" class="cart-popup" hidden=""></div>
+</div>
+
+        </div>
+
+    </div>
+
+</header>
+<span id="content" class="skip-target" tabindex="-1"></span>
+
+<section class="checkout-page">
+
+    <div class="container">
+
+        <!-- ПІДТВЕРДЖЕННЯ ПІДПИСКИ НА РОЗСИЛКУ.
+
+             Сторінка, на яку веде посилання з нашого листа. Раніше
+             лист надсилав MailerLite, і вів він на їхню сторінку
+             англійською — відредагувати її на безкоштовному тарифі
+             не можна.
+
+             Чотири різні стани, а не два. «Підтверджено» і «щось
+             пішло не так» замало: людина, яка перейшла за
+             посиланням удруге, мусить побачити «ви вже підписані», а
+             не «недійсне посилання» — інакше вона підписується
+             заново або пише нам. -->
+
+        <div class="checkout-success confirm-page">
+
+            <!-- aria-hidden: смайлик усередині живої області, і читалка
+                 оголошувала б його разом із відповіддю. Те саме, що в
+                 заголовку, він не додає — лише слово «конверт». -->
+            <div class="success-icon" id="confirmIcon" aria-hidden="true">✉️</div>
+
+            <h1 id="confirmHeading">Підтверджуємо підписку…</h1>
+
+            <p id="confirmText">Секунду.</p>
+
+            <div class="confirm-page-actions" id="confirmActions" hidden="">
+                <a href="/ru/" class="btn">На головну</a>
+                <a href="/ru/catalog" class="btn btn-outline">До каталогу</a>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<footer>
+
+    <div class="container footer">
+
+        <div>
+
+            <h2>BestBrnd4u</h2>
+
+            <p>
+                Інтернет-магазин сумок
+та аксесуарів.
+            </p>
+
+            <div class="footer-social">
+                <a href="https://www.instagram.com/bestbrnd4u" target="_blank" rel="noopener" aria-label="Instagram">
+                    Instagram
+                </a>
+                <a href="https://t.me/bestbrnd4u" target="_blank" rel="noopener" aria-label="Telegram">
+                    Telegram
+                </a>
+            </div>
+
+        </div>
+
+        <div>
+
+            <h2>Покупцям</h2>
+
+            <!-- Гість не бачить замовлення в кабінеті: воно без user_id.
+                 Тому посилання стоїть ПЕРШИМ у розділі — це не політика,
+                 а дія, і саме її шукають найчастіше -->
+            <a href="/ru/order-status">Де моє замовлення</a>
+
+            <a href="/ru/delivery-payment#delivery">Доставка</a>
+            <a href="/ru/delivery-payment#payment">Оплата</a>
+            <a href="/ru/authenticity">Оригінальність</a>
+            <a href="/ru/return-warranty">Повернення та гарантія</a>
+            <a href="/ru/bayer-service">Байер-сервис</a>
+            <a href="/ru/privacy-policy">Політика конфіденційності</a>
+            <a href="/ru/offer">Публічна оферта</a>
+            <!-- Згоду треба вміти відкликати так само легко, як дати -->
+            <a href="#" data-consent-reopen="">Налаштування даних</a>
+
+        </div>
+
+        <div>
+
+            <h2>Каталог</h2>
+
+            <a href="/ru/catalog">Всі товари</a>
+
+            <!--SECTIONS_START-->
+            <a href="/ru/departments/aksesuary/">Аксесуари</a>
+            <a href="/ru/departments/vzuttia/">Взуття</a>
+            <a href="/ru/departments/sumky/">Сумки</a>
+            <!--SECTIONS_END-->
+
+            <a href="/ru/novynky/">Новинки</a>
+
+            <a href="/ru/aktsii/" class="sale-text">Акции</a>
+
+            <a href="/ru/brands/">Бренди</a>
+
+        </div>
+
+        <div>
+
+            <h2>Зв'яжіться з нами</h2>
+
+            <p>📍 Україна</p>
+
+            <p>✉ <a class="mail-link" href="mailto:bestbrnd4u@proton.me">bestbrnd4u@proton.me</a></p>
+
+            <p><svg class="tg-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21.9 4.3 18.6 20c-.2 1-.9 1.3-1.8.8l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.3-5 9.1-8.2c.4-.4-.1-.6-.6-.2L6.1 13.7 1.2 12.2c-1-.3-1.1-1 .2-1.5l19.3-7.4c.9-.3 1.6.2 1.2 1z"></path></svg> <a class="tg-link" href="https://t.me/bestbrnd4u" target="_blank" rel="noopener">@bestbrnd4u</a></p>
+
+            <p>☎ <a class="phone-link" href="tel:+380737288291">+380 73 728 82 91</a></p>
+
+            <p>🕘 Пн–Нд 09:00–20:00</p>
+
+        </div>
+
+    </div>
+
+</footer>
+
+<div class="copyright">
+
+    <div class="container">
+
+    © 2026 bestbrnd4u.
+    Всі права захищені.
+
+    </div>
+
+</div>
+
+<!-- Журнал помилок: сторінка сама розповідає, що в неї зламалось -->
+<script src="assets/js/error-report.js?v=21838fe8" defer=""></script>
+<script src="assets/js/supabase-client.js?v=e8358d93" defer=""></script>
+<!-- Кадрування фото товару. Той самий файл підключає адмінка,
+     тож прев'ю в ній і картка на сайті рахуються однаково. -->
+<script src="assets/js/image-framing.js?v=80b29a57" defer=""></script>
+<!-- Хлібні крихти: спільний будівник для сторінки й розмітки BreadcrumbList -->
+<script src="assets/js/breadcrumbs.js?v=8e4f5363" defer=""></script>
+<!-- Оформлення текстових блоків з адмінки (кольори, шрифт, кнопка) -->
+<script src="assets/js/text-styles.js?v=4b9b6f00" defer=""></script>
+<!-- Згода на використання даних (банер + блокування вбудованого відео) -->
+<script src="assets/js/consent.js?v=b6cc5d45" defer=""></script>
+<!-- Статистика відвідувань. Не завантажує Google без згоди. -->
+<script src="assets/js/analytics.js?v=9d0002d2" defer=""></script>
+<!-- Транслітерація: productUrl() кладе колір в адресу латиницею.
+     Той самий файл використовує збірка для адрес товарів. -->
+<script src="assets/js/translit.js?v=c0957cb7" defer=""></script>
+<script src="assets/js/common.js?v=98dcdbcc" defer=""></script>
+<!-- Дзвінок і зв'язок: дві плаваючі кнопки в лівому кутку -->
+<script src="assets/js/contact-buttons.js?v=53c2ccd7" defer=""></script>
+<!-- Підписка на листи магазину -->
+<script src="assets/js/sync.js?v=48ef002e" defer=""></script>
+<script src="assets/js/mega-menu.js?v=ff0d32d0" defer=""></script>
+<!-- Підтвердження підписки: читає token з адреси й питає функцію -->
+<script src="assets/js/newsletter-confirm.js?v=3163dd9d" defer=""></script>
+
+
+
+
+
+
+</body></html>

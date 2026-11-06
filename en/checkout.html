@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en" data-season="standard"><head>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"7a6c2900","data/catalog.json":"7af5999c","data/categories.json":"2c24d857","data/collections.json":"858469e9","data/home.json":"3b07783a","data/i18n-en.json":"22ec2d2e","data/i18n-ru.json":"b3ab7a6d","data/image-variants.json":"8d6e1e7e","data/instagram-links.json":"610ebd7b","data/legal.json":"f84751b2","data/notifications.json":"a35b367f","data/page-texts.json":"6dd1be71","data/product-texts.json":"278df72d","data/products-updated.json":"79b3052e","data/products.json":"ae78eb0a","data/promo-popups.json":"0940ece5","data/promotions.json":"92880867","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/season.json":"17f1306b","data/security.json":"0c05c691","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script><base href="/">
+    <meta name="robots" content="noindex,nofollow">
+    <meta charset="UTF-8">
+    <meta name="author" content="BestBrnd4u">
+    <meta name="copyright" content="© 2026 BestBrnd4u. Усі права захищено.">
+    <link rel="license" href="/LICENSE">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Оформлення замовлення BestBrnd4u">
+    <meta name="theme-color" content="#111827">
+    <meta name="robots" content="noindex,follow">
+
+<link rel="icon" href="favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicon-16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/images/favicon-192.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <title>Оформлення замовлення | BestBrnd4u</title>
+
+    <link rel="preconnect" href="https://hyfodsznpeeecgtgffub.supabase.co" crossorigin="">
+
+    <!-- Шрифт. Тут, а не @import у CSS: @import видно лише після
+         завантаження таблиці стилів, і текст чекає на три запити
+         поспіль. Розкладає scripts/sync-fonts.js — правити руками
+         не треба. -->
+    <link rel="preconnect" href="https://hyfodsznpeeecgtgffub.supabase.co" crossorigin="">
+    <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-v20-latin.woff2?v=v20" crossorigin="">
+    <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-v20-cyrillic.woff2?v=v20" crossorigin="">
+
+    <link rel="stylesheet" href="assets/css/style.css?v=42359bef">
+
+
+
+
+<script src="/assets/js/vendor/supabase-js-2.112.3.js?v=a38f4664" defer=""></script>
+
+
+<!-- i18n:begin -->
+<link rel="alternate" hreflang="uk" href="https://dev.bestbrnd4u.com/checkout">
+<link rel="alternate" hreflang="en" href="https://dev.bestbrnd4u.com/en/checkout">
+<link rel="alternate" hreflang="ru" href="https://dev.bestbrnd4u.com/ru/checkout">
+<link rel="alternate" hreflang="x-default" href="https://dev.bestbrnd4u.com/checkout">
+<link rel="preload" href="/data/i18n-en.json" as="fetch" crossorigin>
+<script src="/assets/js/i18n-core.js?v=60e9bbb5" defer></script>
+<script src="/assets/js/i18n.js?v=7bd17491" defer></script>
+<!-- i18n:end -->
+</head>
+
+<body>
+<a class="skip-link" href="#content">Skip to content</a>
+
+<header>
+
+    <div class="container header">
+
+        <a href="/en/" class="logo">
+            BestBrnd4u
+        </a>
+
+        <nav>
+
+            <ul>
+
+                <li><a href="/en/">Home</a></li>
+
+                <li class="has-mega"><a href="/en/catalog" id="navCatalogLink">Catalog</a><div class="mega-menu" id="catalogMegaMenu">
+<a class="mega-item" href="/en/catalog?gender=Жінкам"><img src="assets/images/banners/mega-women.webp" alt="Women"><span>Women</span></a>
+<a class="mega-item" href="/en/catalog?gender=Чоловікам"><img src="assets/images/banners/mega-men.webp" alt="Men"><span>Men</span></a>
+<a class="mega-item" href="/en/catalog?gender=Унісекс"><img src="assets/images/banners/mega-unisex.webp" alt="Unisex"><span>Unisex</span></a>
+<a class="mega-item" href="/en/catalog?gender=Дітям"><img src="assets/images/banners/mega-kids.webp" alt="Kids"><span>Kids</span></a>
+</div></li>
+
+                <li class="has-mega"><a href="/en/novynky/" id="navNewLink">New arrivals</a><div class="mega-menu">
+<a class="mega-item" href="/en/novynky/?gender=Жінкам"><img src="assets/images/banners/mega-women.webp" alt="Women"><span>Women</span></a>
+<a class="mega-item" href="/en/novynky/?gender=Чоловікам"><img src="assets/images/banners/mega-men.webp" alt="Men"><span>Men</span></a>
+<a class="mega-item" href="/en/novynky/?gender=Унісекс"><img src="assets/images/banners/mega-unisex.webp" alt="Unisex"><span>Unisex</span></a>
+<a class="mega-item" href="/en/novynky/?gender=Дітям"><img src="assets/images/banners/mega-kids.webp" alt="Kids"><span>Kids</span></a>
+</div></li>
+
+                <li class="has-mega"><a href="/en/aktsii/" id="navSaleLink" class="sale-text">Sale</a><div class="mega-menu">
+<a class="mega-item" href="/en/aktsii/?gender=Жінкам"><img src="assets/images/banners/mega-women.webp" alt="Women"><span>Women</span></a>
+<a class="mega-item" href="/en/aktsii/?gender=Чоловікам"><img src="assets/images/banners/mega-men.webp" alt="Men"><span>Men</span></a>
+<a class="mega-item" href="/en/aktsii/?gender=Унісекс"><img src="assets/images/banners/mega-unisex.webp" alt="Unisex"><span>Unisex</span></a>
+<a class="mega-item" href="/en/aktsii/?gender=Дітям"><img src="assets/images/banners/mega-kids.webp" alt="Kids"><span>Kids</span></a>
+</div></li>
+                <li><a href="/en/bayer-service">Personal shopper</a></li>
+
+
+                <li><a href="/en/contacts">Contacts</a></li>
+
+            </ul>
+
+        </nav>
+
+        <div class="header-icons">
+            <nav class="lang-switch" aria-label="Site language" translate="no"><details class="lang-switch-menu"><summary class="lang-switch-current" aria-label="Site language: English"><span>EN</span></summary><ul class="lang-switch-list"><li><a class="lang-switch-option" href="/checkout" hreflang="uk" lang="uk">Українська</a></li><li><span class="lang-switch-option" aria-current="true" lang="en">English</span></li><li><a class="lang-switch-option" href="/ru/checkout" hreflang="ru" lang="ru">Русский</a></li></ul></details></nav>
+
+            <button id="searchBtn" aria-label="Search the catalog">🔍</button>
+<a href="/en/account" id="accountLink" aria-label="Sign in or register">👤</a>
+
+            <a href="/en/favorites">
+                ❤
+                <span id="favCount">0</span>
+            </a>
+
+            <div class="cart-icon-wrap">
+    <a href="/en/cart" class="active" id="cartIconLink">
+        🛒
+        <span id="cartCount">0</span>
+    </a>
+    <div id="cartPopup" class="cart-popup" hidden=""></div>
+</div>
+
+        </div>
+
+    </div>
+
+</header>
+<span id="content" class="skip-target" tabindex="-1"></span>
+
+<section class="breadcrumbs">
+
+    <div class="container">
+
+        <a href="/en/">Home</a>
+
+        <span class="crumb-sep">→</span>
+
+        <a href="/en/cart">Cart</a>
+
+        <span class="crumb-sep">→</span>
+
+        <span class="crumb-current">Оформлення замовлення</span>
+
+    </div>
+
+</section>
+
+<section class="checkout-page">
+
+    <div class="container">
+
+        <h1>Оформлення замовлення</h1>
+
+        <div id="checkoutEmpty" class="empty-state" hidden="">
+
+            <div class="empty-state-icon" aria-hidden="true">🛒</div>
+
+            <h2 class="empty-state-title">Ваш кошик порожній — немає що оформлювати</h2>
+
+            <a href="/en/catalog" class="btn">Перейти в каталог</a>
+
+        </div>
+
+        <div id="checkoutLayout" class="checkout-layout" hidden="">
+
+            <div class="checkout-main">
+
+                <!-- ВХІД ПЕРЕД ОФОРМЛЕННЯМ — ПРОПОЗИЦІЯ, А НЕ ВОРОТА.
+
+                     Магазин навмисно продає без реєстрації: змусити
+                     завести кабінет заради однієї покупки — найпростіший
+                     спосіб втратити покупця. Але й мовчати не варто: у
+                     того, хто ввійшов, адреса й контакти підставляться
+                     самі, а замовлення потім знайдеться в кабінеті.
+
+                     Тому тут три однаково відкриті виходи, і всі ведуть
+                     до тієї самої форми нижче: увійти, увійти чужим
+                     акаунтом, або просто продовжити.
+
+                     Картки не видно тому, хто вже увійшов, і тому, хто
+                     вже відмовився: питати вдруге про те саме — те саме,
+                     що не почути відповіді.
+
+                     Поведінка кнопок — у assets/js/auth-widget.js, та
+                     сама, що в кабінеті. -->
+                <div id="checkoutAuth" class="checkout-auth" hidden="">
+
+                    <h2>Маєте кабінет?</h2>
+                    <p class="checkout-block-sub">
+                        Увійдіть — контактні дані й адреса підставляться самі,
+                        а замовлення збережеться в історії.
+                    </p>
+
+                    <div class="auth-social" id="authSocial" hidden="">
+
+                        <button type="button" class="auth-social-btn auth-social-facebook" data-provider="facebook">
+                            <span class="auth-social-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                                    <path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.09 10.13 24v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.96.93-1.96 1.89v2.25h3.33l-.53 3.49h-2.8V24C19.61 23.09 24 18.1 24 12.07z"></path>
+                                </svg>
+                            </span>
+                            Facebook
+                        </button>
+
+                        <button type="button" class="auth-social-btn auth-social-google" data-provider="google">
+                            <span class="auth-social-icon" aria-hidden="true">
+                                <svg viewBox="0 0 48 48" width="18" height="18">
+                                    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
+                                    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
+                                    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24s.92 7.54 2.56 10.78l7.97-6.19z"></path>
+                                    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
+                                </svg>
+                            </span>
+                            Google
+                        </button>
+
+                        <button type="button" class="auth-social-btn auth-social-telegram" id="telegramLoginBtn" hidden="">
+                            <span class="auth-social-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                                    <path d="M11.94 24C5.34 24 0 18.63 0 12S5.34 0 11.94 0C18.55 0 24 5.37 24 12s-5.45 12-12.06 12zm5.5-17.3c-.15-.13-.38-.15-.7-.03L5.9 10.98c-.6.24-.6.58-.11.73l2.7.84 6.24-3.94c.3-.18.57-.08.35.11l-5.06 4.57-.19 2.86c.24 0 .34-.1.47-.23l1.13-1.09 2.35 1.73c.43.24.74.12.85-.4l1.54-7.25c.15-.64-.1-.94-.33-1.11z"></path>
+                                </svg>
+                            </span>
+                            Увійти через Telegram
+                        </button>
+
+                    </div>
+
+                    <p class="field-error auth-social-error" id="authSocialError"></p>
+
+                    <!-- Крок очікування: кнопка вже відкрила бота, і тепер
+                         головне — показати код, який людина мусить звірити
+                         з тим, що назве бот. Саме це й ламає підсунуте чуже
+                         посилання. -->
+                    <div class="auth-telegram-wait" id="telegramWait" hidden="">
+
+                        <p class="auth-telegram-step">
+                            Відкрили Telegram? Підтвердіть вхід у боті —
+                            там має бути цей самий код:
+                        </p>
+
+                        <div class="auth-telegram-code" id="telegramCode">--</div>
+
+                        <p class="auth-telegram-note">
+                            Якщо код у боті інший — не підтверджуйте:
+                            це не ваш вхід.
+                        </p>
+
+                        <button type="button" class="auth-link" id="telegramCancel">Скасувати</button>
+
+                    </div>
+
+                    <div class="auth-divider" id="authDivider" hidden=""><span>або</span></div>
+
+                    <form id="loginForm" class="auth-form" novalidate="">
+
+                        <label>
+                            Email
+                            <input type="email" id="loginEmail" required="" placeholder="you@example.com" autocomplete="email">
+                        </label>
+
+                        <label>
+                            Пароль
+                            <input type="password" id="loginPassword" required="" placeholder="Ваш пароль" autocomplete="current-password">
+                        </label>
+
+                        <span id="loginError" class="field-error"></span>
+
+                        <button type="submit" class="btn" id="loginSubmit">Увійти</button>
+
+                        <!-- Відновлення живе в кабінеті: воно однаково
+                             вимагає піти читати пошту, тож другої копії
+                             того екрана тут не треба. -->
+                        <a class="auth-link" href="/en/account">Забули пароль?</a>
+
+                    </form>
+
+                    <!-- ГОЛОВНИЙ ВИХІД, І ВІН НЕ СХОВАНИЙ.
+
+                         Саме заради нього тут риска: «продовжити» не
+                         мусить виглядати як дрібний текст під формою,
+                         інакше картка читається як обов'язковий крок. -->
+                    <div class="checkout-auth-skip">
+                        <button type="button" class="btn btn-outline" id="checkoutGuest">
+                            Продовжити без реєстрації
+                        </button>
+                    </div>
+
+                </div>
+
+            <form id="checkoutForm" class="checkout-form" novalidate="" action="https://formsubmit.co/b8e2e26d0dab4962153e7c42bfab1499" method="POST">
+
+                <div class="checkout-block">
+
+                    <h2>Контактні дані</h2>
+                    <p class="checkout-block-sub">Вкажіть, як з вами зв'язатися</p>
+
+                    <div class="checkout-fields">
+
+                        <label>
+                            Ім'я
+                            <input type="text" id="firstName" name="Ім'я" required="" placeholder="Ваше ім'я" autocomplete="given-name">
+                            <span class="field-error" data-error-for="firstName"></span>
+                        </label>
+
+                        <label>
+                            Прізвище
+                            <input type="text" id="lastName" name="Прізвище" required="" placeholder="Ваше прізвище" autocomplete="family-name">
+                            <span class="field-error" data-error-for="lastName"></span>
+                        </label>
+
+                        <label>
+                            По батькові
+                            <input type="text" id="middleName" name="По батькові" placeholder="По батькові (необов'язково)" autocomplete="additional-name">
+                        </label>
+
+                        <label>
+                            Email
+                            <input type="email" id="email" name="Email" required="" placeholder="you@example.com" autocomplete="email">
+                            <span class="field-error" data-error-for="email"></span>
+                        </label>
+
+                        <label class="field-full">
+                            Телефон
+                            <input type="tel" id="phone" name="Телефон" required="" placeholder="+380 73 728 82 91" autocomplete="tel">
+                            <span class="field-error" data-error-for="phone"></span>
+                        </label>
+
+                    </div>
+
+                </div>
+
+                <div class="checkout-block">
+
+                    <h2 id="deliveryHeading">Доставка</h2>
+                    <p class="checkout-block-sub">Оберіть місто та зручний спосіб отримання</p>
+
+                    <div id="savedAddressesBlock" class="saved-addresses-block" hidden="">
+                        <p class="saved-addresses-title">Ваші збережені адреси</p>
+                        <div id="savedAddressesList" class="saved-addresses-list"></div>
+                    </div>
+
+                    <div class="checkout-fields" style="margin-bottom:20px;">
+
+                        <label class="field-full">
+                            Місто доставки
+                            <input type="text" id="city" name="Місто доставки" required="" placeholder="Наприклад: Київ">
+                            <span class="field-error" data-error-for="city"></span>
+                        </label>
+
+                    </div>
+
+
+                    <!-- ГРУПА ПЕРЕМИКАЧІВ МУСИТЬ МАТИ НАЗВУ.
+                         Без неї читач екрана чує «Telegram, перемикач,
+                         3 з 4» і не знає, на яке питання відповідає:
+                         спосіб доставки, оплати чи зв'язку. Їх тут
+                         три, десять перемикачів разом. WCAG 1.3.1.
+                         На сторінці товару оцінка відгуку це вже має
+                         (role="radiogroup" aria-label="Оцінка") —
+                         оформлення просто відстало. -->
+                    <div class="delivery-options" role="group" aria-labelledby="deliveryHeading">
+
+                        <label class="delivery-option">
+                            <input type="radio" name="deliveryMethod" value="На відділення «Нова пошта»" data-price="0">
+                            <span class="delivery-option-card">
+                                <span class="delivery-option-title">
+                                    <span class="delivery-option-icon">📦</span>
+                                    На відділення «Нова пошта»
+                                </span>
+                                <span class="delivery-option-price">оплата при отриманні</span>
+                            </span>
+                        </label>
+
+                        <div class="delivery-detail" data-detail-for="На відділення «Нова пошта»">
+                            <label>
+                                Оберіть номер відділення
+                                <input type="text" id="branchNumber" name="Номер відділення" placeholder="Наприклад: Відділення №45">
+                            </label>
+                        </div>
+
+                        <label class="delivery-option">
+                            <input type="radio" name="deliveryMethod" value="Поштомат «Нова пошта»" data-price="0">
+                            <span class="delivery-option-card">
+                                <span class="delivery-option-title">
+                                    <span class="delivery-option-icon">🏤</span>
+                                    Поштомат «Нова пошта»
+                                </span>
+                                <span class="delivery-option-price">оплата при отриманні</span>
+                            </span>
+                        </label>
+
+                        <div class="delivery-detail" data-detail-for="Поштомат «Нова пошта»">
+                            <label>
+                                Оберіть номер поштомату
+                                <input type="text" id="postomatNumber" name="Номер поштомату" placeholder="Наприклад: Поштомат №1234">
+                            </label>
+                        </div>
+
+                        <label class="delivery-option">
+                            <input type="radio" name="deliveryMethod" value="Кур'єром «Нова пошта»" data-price="0">
+                            <span class="delivery-option-card">
+                                <span class="delivery-option-title">
+                                    <span class="delivery-option-icon">🚚</span>
+                                    Кур'єром «Нова пошта»
+                                </span>
+                                <span class="delivery-option-price">оплата при отриманні</span>
+                            </span>
+                        </label>
+
+                        <!-- autocomplete тут ПОТРІБЕН, на відміну від сусідів.
+                             Місту, відділенню й поштомату nova-poshta.js сам
+                             ставить autocomplete="off" — його список підказок
+                             б'ється з рідним автозаповненням браузера. А це
+                             поле покупець пише сам, довідника під ним немає,
+                             і воно просто лишилось без атрибута зовсім.
+                             address-line1, а не street-address: місто вже
+                             окремим полем вище. -->
+                        <div class="delivery-detail" data-detail-for="Кур'єром «Нова пошта»">
+                            <label>
+                                Адреса доставки (вулиця, будинок, квартира)
+                                <input type="text" id="courierAddress" name="Адреса доставки" placeholder="Вулиця, будинок, квартира" autocomplete="address-line1">
+                            </label>
+                        </div>
+
+                        <!-- Інший перевізник.
+                             Сторінка «Оплата і доставка» обіцяє й Укрпошту, а
+                             обрати її тут було неможливо: усі три способи —
+                             Нова пошта. Довідника Укрпошти чи Meest у нас
+                             немає, тому перевізника й адресу покупець пише
+                             сам одним рядком. -->
+                        <label class="delivery-option">
+                            <input type="radio" name="deliveryMethod" value="Інша пошта" data-price="0">
+                            <span class="delivery-option-card">
+                                <span class="delivery-option-title">
+                                    <span class="delivery-option-icon">📮</span>
+                                    Інша пошта (Укрпошта, Meest)
+                                </span>
+                                <span class="delivery-option-price">оплата при отриманні</span>
+                            </span>
+                        </label>
+
+                        <div class="delivery-detail" data-detail-for="Інша пошта">
+                            <label>
+                                Перевізник, відділення або адреса
+                                <input type="text" id="otherCarrier" name="Інша пошта" placeholder="Наприклад: Укрпошта, відділення 03150, вул. Велика Васильківська, 100">
+                            </label>
+                        </div>
+
+                        <span class="field-error" data-error-for="deliveryMethod"></span>
+
+                    </div>
+
+                </div>
+
+                <div class="checkout-block">
+
+                    <h2 id="paymentHeading">Оплата</h2>
+                    <p class="checkout-block-sub">Оберіть зручний спосіб оплати</p>
+
+                    <!-- ПЕРЕДОПЛАТА ЗА ТОВАР ПІД ЗАМОВЛЕННЯ.
+
+                         Сторінка товару каже: «Потрібна передоплата
+                         N% вартості». Кошик попереджає, що термін
+                         довший за звичайну доставку. А тут, де
+                         покупець нарешті ОБИРАЄ, як платити, обидві
+                         умови зникали — і «Готівкою при отриманні»
+                         виглядало як рівноцінний варіант. Далі
+                         дзвонив менеджер і казав протилежне.
+
+                         Нічого не вимикаємо: замовлення приймаємо
+                         будь-яке, умови менеджер узгодить. Але
+                         прочитати їх покупець мусить ДО вибору, а не
+                         після нього.
+
+                         Текст збирає renderOrderSummary() у
+                         checkout.js — відсоток у кожного товару свій,
+                         і в кошику їх може бути кілька. -->
+                    <p class="preorder-banner" id="checkoutPreorderNote" hidden=""></p>
+
+                    <div class="delivery-options" role="radiogroup" aria-labelledby="paymentHeading">
+
+                        <label class="delivery-option">
+                            <input type="radio" name="paymentMethod" value="Банківською карткою (Visa/Mastercard)" checked="">
+                            <span class="delivery-option-card">
+                                <span class="delivery-option-title">
+                                    <span class="delivery-option-icon">💳</span>
+                                    Банківською карткою (Visa/Mastercard)
+                                </span>
+                            </span>
+                        </label>
+
+                        <label class="delivery-option">
+                            <input type="radio" name="paymentMethod" value="Готівкою при отриманні на пошті">
+                            <span class="delivery-option-card">
+                                <span class="delivery-option-title">
+                                    <span class="delivery-option-icon">💵</span>
+                                    Готівкою при отриманні на пошті
+                                </span>
+                            </span>
+                        </label>
+
+                        <span class="field-error" data-error-for="paymentMethod"></span>
+
+                    </div>
+
+                </div>
+
+                <!-- КОМЕНТАР ДО ЗАМОВЛЕННЯ.
+
+                     Полів було десять, і жодного, куди покупець міг би
+                     написати те, що в них не влазить: «подзвоніть перед
+                     відправкою», «це подарунок — не кладіть чек у
+                     коробку», «мене не буде до п'ятниці». Усе це йшло в
+                     дірект окремим повідомленням, і магазин звіряв його
+                     із замовленням руками.
+
+                     Просто текст, а не перелік галочок: галочки
+                     вгадують лише те, про що вже здогадались, а таких
+                     прохань меншість. -->
+                <div class="checkout-block">
+
+                    <h2>Побажання до замовлення</h2>
+                    <p class="checkout-block-sub">Необов'язково — але ми прочитаємо</p>
+
+                    <div class="form-row">
+
+                        <div class="form-group form-group-full">
+                            <label for="orderComment">Коментар</label>
+                            <textarea id="orderComment" name="Коментар" rows="3" maxlength="500" placeholder="Подзвоніть перед відправкою; це подарунок; зручніше отримати після 18:00"></textarea>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="checkout-block">
+
+                    <h2 id="contactHeading">Зв'язатися зі мною</h2>
+                    <!-- Текст залежить від вибору.
+                         Раніше тут завжди стояло «менеджер зателефонує вам» —
+                         і людина, яка обрала Telegram, усе одно читала про
+                         дзвінок. Тепер підпис оновлюється разом із вибором
+                         і називає, КУДИ саме ми напишемо. -->
+                    <p class="checkout-block-sub" id="contactChannelNote">
+                        Оберіть зручний спосіб зв'язку — ми підтвердимо замовлення
+                    </p>
+
+                    <div class="contact-channels" role="radiogroup" aria-labelledby="contactHeading">
+
+                        <label class="contact-channel">
+                            <input type="radio" name="contactChannel" value="Телефоном" checked="">
+                            <span class="contact-channel-chip">📞 Телефоном</span>
+                        </label>
+
+                        <label class="contact-channel">
+                            <input type="radio" name="contactChannel" value="Viber">
+                            <span class="contact-channel-chip">💬 Viber</span>
+                        </label>
+
+                        <label class="contact-channel">
+                            <input type="radio" name="contactChannel" value="Telegram">
+                            <span class="contact-channel-chip"><svg class="tg-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21.9 4.3 18.6 20c-.2 1-.9 1.3-1.8.8l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.3-5 9.1-8.2c.4-.4-.1-.6-.6-.2L6.1 13.7 1.2 12.2c-1-.3-1.1-1 .2-1.5l19.3-7.4c.9-.3 1.6.2 1.2 1z"></path></svg>Telegram</span>
+                        </label>
+
+                        <label class="contact-channel">
+                            <input type="radio" name="contactChannel" value="Email">
+                            <span class="contact-channel-chip">✉ Email</span>
+                        </label>
+
+                    </div>
+
+                    <!-- Поле лише для Telegram.
+                         Телефон і email уже зібрані вище, і Viber працює за
+                         номером — для них додаткове поле було б зайвим
+                         клопотом. А от у Telegram номер часто прихований
+                         налаштуваннями приватності, і без ніка написати
+                         нікуди. Поле необов'язкове: не вкажете — спробуємо
+                         за номером. -->
+                    <div class="contact-channel-extra" id="telegramField" hidden="">
+                        <label>
+                            Ваш нік у Telegram (необов'язково)
+                            <input type="text" name="Telegram" id="telegramHandle" placeholder="@username" autocomplete="off">
+                        </label>
+                        <p class="contact-channel-hint">
+                            Якщо не вкажете — напишемо на номер, який ви ввели вище.
+                            Але якщо у ваших налаштуваннях Telegram номер прихований,
+                            ми вас не знайдемо.
+                        </p>
+                    </div>
+
+                </div>
+
+                <!-- службові поля для листа -->
+                <input type="hidden" name="Склад замовлення" id="orderComposition">
+                <input type="hidden" name="Сума замовлення" id="orderSubtotalField">
+                <input type="hidden" name="Знижка" id="orderDiscountField">
+                <input type="hidden" name="Промокод" id="orderPromoField">
+                <input type="hidden" name="Спосіб оплати" id="orderPaymentField">
+                <input type="hidden" name="Вартість доставки" id="orderDeliveryField">
+                <input type="hidden" name="Всього до сплати" id="orderTotalField">
+                <input type="hidden" name="_subject" value="Нове замовлення на dev.bestbrnd4u.com">
+                <input type="hidden" name="_template" value="table">
+                <input type="hidden" name="_captcha" value="false">
+                <input type="hidden" name="_replyto" id="orderReplyTo">
+                <input type="hidden" name="_url" value="https://dev.bestbrnd4u.com/checkout">
+
+            </form>
+
+            </div>
+
+            <aside class="order-summary">
+
+                <div class="order-summary-header">
+                    <h2>Ваше замовлення</h2>
+                    <button type="button" id="toggleSummary" class="order-summary-toggle">Приховати</button>
+                </div>
+
+                <div id="orderSummaryItems" class="order-summary-items">
+                </div>
+
+                <div>
+                    <div class="promo-row">
+                        <input type="text" id="promoInput" placeholder="Маєте промокод?" aria-label="Промокод" autocomplete="off">
+                        <button type="button" id="applyPromo">Застосувати</button>
+                    </div>
+                    <div id="promoMessage" class="promo-message"></div>
+                </div>
+
+                <div class="summary-row">
+                    <span>Сума замовлення</span>
+                    <span id="orderSubtotal">0 грн</span>
+                </div>
+
+                <div class="summary-row" id="orderDiscountRow" hidden="">
+                    <span>Загальна знижка</span>
+                    <span class="discount-value" id="orderDiscount">-0 грн</span>
+                </div>
+
+                <div class="summary-row">
+                    <span>Доставка</span>
+                    <span id="orderDeliveryPrice">Оберіть спосіб</span>
+                </div>
+
+                <div class="summary-row summary-total">
+                    <span>Всього</span>
+                    <span id="orderTotal">0 грн</span>
+                </div>
+
+                <!-- Перевірка «ви людина». З'являється, лише якщо в
+                     адмінці заданий ключ Turnstile; порожній ключ —
+                     блок лишається схованим, і сторінка поводиться
+                     точно як раніше. Див. docs/ЗАХИСТ-ЗАМОВЛЕНЬ.md -->
+                <div id="turnstileBox" class="turnstile-box" hidden=""></div>
+
+                <button type="submit" form="checkoutForm" id="submitOrderBtn" class="btn">Checkout</button>
+
+                <!-- Прямо тут, а не лише в політиці.
+                     Питання «які дані ви збираєте» виникає саме в цю
+                     мить — коли людина вже ввела телефон і адресу й
+                     тримає палець над кнопкою. Посилання на окрему
+                     сторінку тут не відповідь: щоб його прочитати,
+                     треба піти зі сторінки оформлення. -->
+                <!-- Одна стрічка замість розкривного блока.
+                     
+                     Тут стояли чотири абзаци про збір даних — під самою
+                     кнопкою «Оформити замовлення». Людина хотіла купити
+                     сумку, а читала про передачу даних службі доставки:
+                     радше пугало, ніж інформувало.
+                     
+                     Текст переїхав у політику конфіденційності, у розділ
+                     із якорем. Кому цікаво — прочитає; решті не заважає. -->
+                <!-- Оферта згадана саме тут, а не десь у підвалі: договір
+                     укладається натисканням цієї кнопки, тож людина має
+                     бачити, з чим погоджується, у момент погодження. -->
+                <p class="order-data-link">
+                    Оформлюючи замовлення, ви погоджуєтесь з
+                    <a href="/en/offer">умовами продажу</a> та
+                    <a href="/en/privacy-policy#order-data">обробкою даних</a>.
+                </p>
+
+            </aside>
+
+        </div>
+
+    </div>
+
+</section>
+
+<footer>
+
+    <div class="container footer">
+
+        <div>
+
+            <h2>BestBrnd4u</h2>
+
+            <p>
+                Інтернет-магазин сумок
+та аксесуарів.
+            </p>
+
+            <div class="footer-social">
+                <a href="https://www.instagram.com/bestbrnd4u" target="_blank" rel="noopener" aria-label="Instagram">
+                    Instagram
+                </a>
+                <a href="https://t.me/bestbrnd4u" target="_blank" rel="noopener" aria-label="Telegram">
+                    Telegram
+                </a>
+            </div>
+
+        </div>
+
+        <div>
+
+            <h2>Покупцям</h2>
+
+            <!-- Гість не бачить замовлення в кабінеті: воно без user_id.
+                 Тому посилання стоїть ПЕРШИМ у розділі — це не політика,
+                 а дія, і саме її шукають найчастіше -->
+            <a href="/en/order-status">Де моє замовлення</a>
+
+            <a href="/en/delivery-payment#delivery">Доставка</a>
+            <a href="/en/delivery-payment#payment">Оплата</a>
+            <a href="/en/authenticity">Оригінальність</a>
+            <a href="/en/return-warranty">Повернення та гарантія</a>
+            <a href="/en/bayer-service">Personal shopper</a>
+            <a href="/en/privacy-policy">Політика конфіденційності</a>
+            <a href="/en/offer">Публічна оферта</a>
+            <!-- Згоду треба вміти відкликати так само легко, як дати -->
+            <a href="#" data-consent-reopen="">Налаштування даних</a>
+
+        </div>
+
+        <div>
+
+            <h2>Catalog</h2>
+
+            <a href="/en/catalog">Всі товари</a>
+
+            <!--SECTIONS_START-->
+            <a href="/en/departments/aksesuary/">Аксесуари</a>
+            <a href="/en/departments/vzuttia/">Взуття</a>
+            <a href="/en/departments/sumky/">Сумки</a>
+            <!--SECTIONS_END-->
+
+            <a href="/en/novynky/">New arrivals</a>
+
+            <a href="/en/aktsii/" class="sale-text">Sale</a>
+
+            <a href="/en/brands/">Бренди</a>
+
+        </div>
+
+        <div>
+
+            <h2>Зв'яжіться з нами</h2>
+
+            <p>📍 Україна</p>
+
+            <p>✉ <a class="mail-link" href="mailto:bestbrnd4u@proton.me">bestbrnd4u@proton.me</a></p>
+
+            <p><svg class="tg-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21.9 4.3 18.6 20c-.2 1-.9 1.3-1.8.8l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.3-5 9.1-8.2c.4-.4-.1-.6-.6-.2L6.1 13.7 1.2 12.2c-1-.3-1.1-1 .2-1.5l19.3-7.4c.9-.3 1.6.2 1.2 1z"></path></svg> <a class="tg-link" href="https://t.me/bestbrnd4u" target="_blank" rel="noopener">@bestbrnd4u</a></p>
+
+            <p>☎ <a class="phone-link" href="tel:+380737288291">+380 73 728 82 91</a></p>
+
+            <p>🕘 Пн–Нд 09:00–20:00</p>
+
+        </div>
+
+    </div>
+
+</footer>
+
+<div class="copyright">
+
+    <div class="container">
+
+    © 2026 bestbrnd4u.
+    Всі права захищені.
+
+    </div>
+
+</div>
+
+<button id="scrollTop" class="scroll-top" aria-label="Нагору">
+    ↑
+</button>
+
+<div id="leaveConfirmModal" class="modal-overlay" hidden="">
+    <div class="modal-card">
+
+        <div class="modal-header">
+            <h3>Ви залишаєте сторінку замовлення</h3>
+            <button type="button" id="leaveModalClose" class="modal-close" aria-label="Закрити">✕</button>
+        </div>
+
+        <p class="modal-text">
+            Ви дійсно бажаєте залишити сторінку замовлення?
+            Вся інформація про замовлення буде втрачена.
+        </p>
+
+        <div class="modal-actions">
+            <button type="button" id="leaveModalConfirm" class="btn-modal btn-modal-confirm">Так</button>
+            <button type="button" id="leaveModalCancel" class="btn-modal btn-modal-cancel">Ні</button>
+        </div>
+
+    </div>
+</div>
+
+<script src="/assets/js/vendor/emailjs-browser-4.4.1.js?v=4204eb12" defer=""></script>
+<!-- Журнал помилок: сторінка сама розповідає, що в неї зламалось -->
+<script src="assets/js/error-report.js?v=21838fe8" defer=""></script>
+<script src="assets/js/supabase-client.js?v=e8358d93" defer=""></script>
+<!-- Кадрування фото товару. Той самий файл підключає адмінка,
+     тож прев'ю в ній і картка на сайті рахуються однаково. -->
+<script src="assets/js/image-framing.js?v=80b29a57" defer=""></script>
+<!-- Хлібні крихти: спільний будівник для сторінки й розмітки BreadcrumbList -->
+<script src="assets/js/breadcrumbs.js?v=8e4f5363" defer=""></script>
+<!-- Оформлення текстових блоків з адмінки (кольори, шрифт, кнопка) -->
+<script src="assets/js/text-styles.js?v=4b9b6f00" defer=""></script>
+<!-- Згода на використання даних (банер + блокування вбудованого відео) -->
+<script src="assets/js/consent.js?v=b6cc5d45" defer=""></script>
+<!-- Статистика відвідувань. Не завантажує Google без згоди. -->
+<script src="assets/js/analytics.js?v=9d0002d2" defer=""></script>
+<!-- Транслітерація: productUrl() кладе колір в адресу латиницею.
+     Той самий файл використовує збірка для адрес товарів. -->
+<script src="assets/js/translit.js?v=c0957cb7" defer=""></script>
+<script src="assets/js/common.js?v=98dcdbcc" defer=""></script>
+<!-- Дзвінок і зв'язок: дві плаваючі кнопки в лівому кутку -->
+<script src="assets/js/contact-buttons.js?v=53c2ccd7" defer=""></script>
+<!-- Підписка на листи магазину -->
+<script src="assets/js/sync.js?v=48ef002e" defer=""></script>
+<script src="assets/js/mega-menu.js?v=ff0d32d0" defer=""></script>
+<script src="assets/js/ui.js?v=fa1e1236" defer=""></script>
+<!-- Перевірка «ви людина» на оформленні (порожній ключ = вимкнено) -->
+<script src="assets/js/turnstile.js?v=29c5b96c" defer=""></script>
+<!-- Підказки міст і відділень Нової пошти (порожній ключ = поле як було) -->
+<script src="assets/js/nova-poshta.js?v=3bf11f84" defer=""></script>
+<script src="assets/js/checkout.js?v=9f142de1" defer=""></script>
+<!-- Картка входу над формою. ПІСЛЯ checkout.js — вона кличе його
+     prefillFromProfile(), коли людина щойно ввійшла. auth-widget.js
+     тримає саму поведінку кнопок, спільну з кабінетом. -->
+<script src="assets/js/auth-widget.js?v=6b02212c" defer=""></script>
+<script src="assets/js/checkout-auth.js?v=3187f55c" defer=""></script>
+
+
+
+
+</body></html>
