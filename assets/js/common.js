@@ -3844,6 +3844,7 @@ document.addEventListener("click", event => {
                         list.innerHTML = variantSizes.map((size, index) => `
                             <button type="button"
                                 class="${isMini ? "mini-size" : "size"} ${variantSizes.length === 1 && index === 0 ? "active" : ""}"
+                                ${isMini ? "" : `aria-pressed="${variantSizes.length === 1 && index === 0}"`}
                                 data-size="${escapeHtml(size)}">${escapeHtml(size)}</button>
                         `).join("");
 
@@ -4618,11 +4619,35 @@ function getVariantSizes(product, variant) {
 
     if (variant && Array.isArray(variant.sizes) && variant.sizes.length) {
 
-        return variant.sizes;
+        return inSizeOrder(variant.sizes);
 
     }
 
-    return product?.sizes || [];
+    return inSizeOrder(product?.sizes || []);
+
+}
+
+// Числові розміри — за зростанням, решта — як ввели в адмінці.
+//
+// Розміри йдуть у тому порядку, у якому їх набрали: у кросівок Lacoste
+// L003 це «38, 37, 39». Покупець шукає свій розмір поглядом зліва
+// направо й на такому рядку спотикається. Сортуємо тут, бо звідси
+// читають усі: сторінка товару, перемикач кольору (data-sizes) і
+// картки каталогу.
+//
+// Літерні (S, M, L) і змішані не чіпаємо: їхній порядок не виводиться
+// зі значень, і власник ставить його сам. Копія, а не sort() на місці —
+// масив належить товару в кеші.
+function inSizeOrder(list) {
+
+    const value = size => {
+        const text = String(size).trim().replace(",", ".");
+        return /^\d+(\.\d+)?$/.test(text) ? Number(text) : NaN;
+    };
+
+    if (list.length < 2 || list.some(size => Number.isNaN(value(size)))) return list;
+
+    return [...list].sort((a, b) => value(a) - value(b));
 
 }
 

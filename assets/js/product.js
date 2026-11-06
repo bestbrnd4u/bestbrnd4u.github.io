@@ -1680,6 +1680,7 @@ function renderProduct(product) {
         return `
         <button type="button"
                 class="size ${isActive ? "active" : ""} ${isOut ? "size-out" : ""}"
+                aria-pressed="${isActive}"
                 data-size="${escapeHtml(size)}"
                 ${left === null ? "" : `data-qty="${left}"`}
                 ${isOut ? 'data-out="1" title="Немає в наявності — можна замовити"' : ""}>
@@ -1852,7 +1853,7 @@ function renderProduct(product) {
 <div class="option-group">
 
 <div class="size-row-head">
-    <label>Розмір</label>
+    <label id="sizeGroupLabel">Розмір</label>
     <button type="button" class="size-guide-link" id="sizeGuideBtn">Таблиця розмірів</button>
 </div>
 
@@ -1867,7 +1868,10 @@ function renderProduct(product) {
      У компактних видах (картка, кошик, обране) рядок і далі
      ховається: там підпису немає, тож і порожнечі не виникає, а
      «ONESIZE» під кожною сумкою в сітці справді зайвий. -->
-<div class="sizes">
+<!-- Група з назвою: читалка на кнопці «38» каже «Розмір, група», і
+     aria-pressed на кожній кнопці каже, яку обрано. Досі обраний
+     розмір було видно лише кольором. -->
+<div class="sizes" role="group" aria-labelledby="sizeGroupLabel">
 
 ${sizeButtons}
 
@@ -2182,10 +2186,13 @@ ${sizeButtons}
 
             if (!button || !button.closest("#productPage")) return;
 
-            document.querySelectorAll("#productPage .size")
-                .forEach(item => item.classList.remove("active"));
+            document.querySelectorAll("#productPage .size").forEach(item => {
+                item.classList.remove("active");
+                item.setAttribute("aria-pressed", "false");
+            });
 
             button.classList.add("active");
+            button.setAttribute("aria-pressed", "true");
 
             updateFavoriteButtons();
 
