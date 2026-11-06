@@ -27,7 +27,9 @@ const fn = name => (common.match(new RegExp(`function ${name}\\([^)]*\\) \\{[\\s
 
 const ctx = {};
 vm.createContext(ctx);
-vm.runInContext(fn("inSizeOrder") + fn("getVariantSizes") + "this.order = inSizeOrder; this.sizes = getVariantSizes;", ctx);
+// Лише getVariantSizes, без сусідів — саме так її беруть інші тести,
+// і саме так CI зловив окрему допоміжну функцію поруч.
+vm.runInContext(fn("getVariantSizes") + "this.sizes = getVariantSizes; this.order = list => getVariantSizes({ sizes: list }, null);", ctx);
 
 console.log("\n[1] Числові розміри — за зростанням");
 {
