@@ -518,7 +518,7 @@ window.CATALOG_PRESET = {"department":"Сумки"};
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-v20-latin.woff2?v=v20" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-v20-cyrillic.woff2?v=v20" crossorigin>
 
-<link rel="stylesheet" href="/assets/css/style.css?v=471eddae">
+<link rel="stylesheet" href="/assets/css/style.css?v=2437e714">
 
 <script src="/assets/js/vendor/supabase-js-2.112.3.js?v=a38f4664" defer></script>
 </head>
@@ -1072,13 +1072,8 @@ role="status">
 id="emptyCatalog"
 class="empty-state"
 hidden>
-<h2>
-😔
-</h2>
-<p>
-За вашим запитом
-нічого не знайдено
-</p>
+<div class="empty-state-icon" aria-hidden="true">😔</div>
+<h2 class="empty-state-title">За вашим запитом нічого не знайдено</h2>
 <button
 class="btn"
 id="clearSearch">
