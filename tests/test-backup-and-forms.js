@@ -901,7 +901,7 @@ console.log("\n[7] ONESIZE: у сітці ховається, на сторін�
     // Підпис «Розмір» лишається на місці — саме він і робив
     // порожнечу помітною, і саме під ним тепер є значення.
     check("підпис «Розмір» на сторінці товару лишився",
-        /<label>Розмір<\/label>/.test(productJs));
+        /<label[^>]*>Розмір<\/label>/.test(productJs));
 
     check("стиль ховає рядок", /\.sizes-placeholder\{[\s\S]{0,60}display:none/.test(
         read("assets/css/style.css")));

@@ -206,6 +206,27 @@ document.addEventListener("click", event => {
 
     heading.scrollIntoView({ behavior: "smooth", block: "start" });
 
+    // ФОКУС ЙДЕ ТУДИ Ж, КУДИ Й ПОГЛЯД.
+    //
+    // preventDefault вище скасовує рідну навігацію за якорем — а разом
+    // із нею й те, що браузер робить для клавіатури: переносить фокус
+    // на ціль. Перевірено 04.11.2026 у двох браузерах: після Enter на
+    // «Популярні товари» фокус лишався на кнопці героя, і наступний Tab
+    // ішов на її сусіда («Жінкам»), смикаючи сторінку назад угору.
+    // Стосувалось усіх дев'яти якорів сайту, а тепер і посилання
+    // «Перейти до вмісту» — воно теж якірне.
+    //
+    // tabindex=-1 робить ціль фокусованою з коду, але не додає її в
+    // порядок Tab — інакше кожна секція з якорем стала б зайвою
+    // порожньою зупинкою. Наявний tabindex не чіпаємо.
+    //
+    // preventScroll — щоб фокус не перебив плавну прокрутку власним
+    // миттєвим стрибком. Рамки фокусу після кліку мишею не буде:
+    // стилі фокусу тут на :focus-visible.
+    if (!target.hasAttribute("tabindex")) target.setAttribute("tabindex", "-1");
+
+    target.focus({ preventScroll: true });
+
     // ДОГАНЯЄМО ЦІЛЬ ПІСЛЯ АНІМАЦІЇ.
     //
     // На головній вище за «Популярні товари» лежать секції, які
@@ -1018,9 +1039,79 @@ function showCartPopup(product, selection = {}) {
 
     requestAnimationFrame(() => popup.classList.add("show"));
 
+    // Читалці — коротко й без кнопок. Поп-ап є на товарі, головній і в
+    // каталозі, тобто майже скрізь, де купують, — а тост із живою
+    // областю тут не показується. Хто не бачить екрана, після «Додати
+    // в кошик» досі не чув нічого.
+    announce(`Товар додано в кошик: ${product.title}. Сума замовлення ${formatPrice(subtotal)}.`);
+
+    watchCartPopup(popup);
+
+    scheduleCartPopupHide(popup);
+
+}
+
+// 4,5 секунди — щоб не заважав, якщо людина купує далі. Але поки курсор
+// або фокус усередині, він не зникає: інакше «Оформити замовлення»
+// зникала з-під миші на півдорозі, а з клавіатури до неї взагалі не
+// встигнути дотабати.
+function scheduleCartPopupHide(popup) {
+
     clearTimeout(window.cartPopupTimer);
 
+    if (popup.matches(":hover") || popup.contains(document.activeElement)) return;
+
     window.cartPopupTimer = setTimeout(hideCartPopup, 4500);
+
+}
+
+function watchCartPopup(popup) {
+
+    // Вузол той самий, міняється лише вміст — слухачі вішаємо раз.
+    if (popup.dataset.watched) return;
+
+    popup.dataset.watched = "1";
+
+    popup.addEventListener("mouseenter", () => clearTimeout(window.cartPopupTimer));
+    popup.addEventListener("focusin", () => clearTimeout(window.cartPopupTimer));
+
+    popup.addEventListener("mouseleave", () => { if (!popup.hidden) scheduleCartPopupHide(popup); });
+
+    // Tab між двома кнопками поп-апу тут теж запускає таймер — але
+    // одразу за focusout іде focusin на сусідній кнопці й гасить його.
+    popup.addEventListener("focusout", () => { if (!popup.hidden) scheduleCartPopupHide(popup); });
+
+    document.addEventListener("keydown", event => {
+        if (event.key === "Escape" && !popup.hidden) hideCartPopup();
+    });
+
+}
+
+// Оголошення для читалки без нічого видимого.
+//
+// Область створюємо порожньою й текст кладемо наступним кроком: живу
+// область, що з'явилась одразу з текстом, частина читалок пропускає, а
+// однакову фразу двічі поспіль не оголошує взагалі — тому спершу
+// очищаємо.
+function announce(text) {
+
+    let region = document.getElementById("srAnnounce");
+
+    if (!region) {
+
+        region = document.createElement("div");
+        region.id = "srAnnounce";
+        region.className = "sr-announce";
+        region.setAttribute("role", "status");
+        region.setAttribute("aria-live", "polite");
+
+        document.body.appendChild(region);
+
+    }
+
+    region.textContent = "";
+
+    setTimeout(() => { region.textContent = text; }, 100);
 
 }
 
@@ -1737,7 +1828,7 @@ function buildSearchOverlay() {
                          «Скасувати» словами, і різниця між «очистити
                          поле» та «закрити пошук» на слух зникала. -->
                     <input type="text" id="globalSearchInput" placeholder="Пошук товарів..."
-                           aria-label="Пошук товарів" autocomplete="off">
+                           aria-label="Пошук товарів" autocomplete="off" enterkeyhint="search">
                     <button type="button" id="globalSearchClear" class="search-overlay-clear"
                             aria-label="Очистити пошук" hidden>✕</button>
                 </div>
@@ -2321,6 +2412,9 @@ async function runGlobalSearch(query) {
 
     if (!q) {
 
+        // Поле очистили — недоказане «знайдено N» уже ні до чого.
+        clearTimeout(runGlobalSearch.announceTimer);
+
         idleState.hidden = false;
         resultsState.hidden = true;
 
@@ -2357,7 +2451,7 @@ async function runGlobalSearch(query) {
     const suggestions = [...new Set(matches.map(p => p.title))].slice(0, 6);
 
     suggestionsEl.innerHTML = suggestions.length
-        ? suggestions.map(title => `<button type="button" class="search-suggestion-item">${title}</button>`).join("")
+        ? suggestions.map(title => `<button type="button" class="search-suggestion-item">${escapeHtml(title)}</button>`).join("")
         : `<p class="search-no-suggestions">Немає підказок</p>`;
 
     suggestionsEl.querySelectorAll(".search-suggestion-item").forEach(btn => {
@@ -2401,6 +2495,18 @@ async function runGlobalSearch(query) {
 
     seeAllEl.hidden = matches.length === 0;
     seeAllEl.href = `catalog?search=${encodeURIComponent(query.trim())}`;
+
+    // Скільки знайдено — читалці. Видно це лише очима: результати
+    // мовчки з'являються під полем, і хто не бачить екрана, не знає, чи
+    // є що гортати. Чекаємо паузи в наборі — інакше на «сумка коач»
+    // прозвучало б десять оголошень, по одному на літеру.
+    clearTimeout(runGlobalSearch.announceTimer);
+
+    runGlobalSearch.announceTimer = setTimeout(() => {
+        announce(matches.length
+            ? `Знайдено ${matches.length} ${pluralProducts(matches.length)}`
+            : "Нічого не знайдено");
+    }, 800);
 
 }
 
@@ -2580,6 +2686,9 @@ function openSearchOverlay() {
 function closeSearchOverlay() {
 
     if (!searchOverlayEl) return;
+
+    // Пошук закрили — «знайдено N» уже ні про що.
+    clearTimeout(runGlobalSearch.announceTimer);
 
     // Курсор назад на 🔍 — ДО того, як накладка почне зникати.
     window.DialogFocus?.close(searchOverlayEl);
@@ -3735,6 +3844,7 @@ document.addEventListener("click", event => {
                         list.innerHTML = variantSizes.map((size, index) => `
                             <button type="button"
                                 class="${isMini ? "mini-size" : "size"} ${variantSizes.length === 1 && index === 0 ? "active" : ""}"
+                                ${isMini ? "" : `aria-pressed="${variantSizes.length === 1 && index === 0}"`}
                                 data-size="${escapeHtml(size)}">${escapeHtml(size)}</button>
                         `).join("");
 
@@ -4507,13 +4617,33 @@ function sizeRowHidden(sizes) {
 
 function getVariantSizes(product, variant) {
 
-    if (variant && Array.isArray(variant.sizes) && variant.sizes.length) {
+    const list = variant && Array.isArray(variant.sizes) && variant.sizes.length
+        ? variant.sizes
+        : (product?.sizes || []);
 
-        return variant.sizes;
+    // Числові розміри — за зростанням, решта — як ввели в адмінці.
+    //
+    // Розміри йдуть у тому порядку, у якому їх набрали: у кросівок
+    // Lacoste L003 це «38, 37, 39». Покупець шукає свій поглядом зліва
+    // направо й на такому рядку спотикається. Сортуємо тут, бо звідси
+    // читають усі: сторінка товару, перемикач кольору (data-sizes) і
+    // картки каталогу.
+    //
+    // Літерні (S, M, L) і змішані не чіпаємо: їхній порядок не
+    // виводиться зі значень, і власник ставить його сам. Копія, а не
+    // sort() на місці — масив належить товару в кеші.
+    //
+    // УСЕРЕДИНІ функції, а не окремою поруч: близько десяти тестів
+    // беруть getVariantSizes із common.js саму по собі, і сусідня
+    // функція дала б у них ReferenceError (CI це й показав).
+    const value = size => {
+        const text = String(size).trim().replace(",", ".");
+        return /^\d+(\.\d+)?$/.test(text) ? Number(text) : NaN;
+    };
 
-    }
+    if (list.length < 2 || list.some(size => Number.isNaN(value(size)))) return list;
 
-    return product?.sizes || [];
+    return [...list].sort((a, b) => value(a) - value(b));
 
 }
 

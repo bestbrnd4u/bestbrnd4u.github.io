@@ -588,11 +588,41 @@ document.getElementById("emailChangedLogin")?.addEventListener("click", () => {
     window.location.href = `${window.location.origin}/account`;
 });
 
-supabaseClient?.auth.onAuthStateChange((event) => {
+// МЕНЕДЖЕРУ ПАРОЛІВ ТРЕБА ЗНАТИ, ЧИЙ ЦЕ ПАРОЛЬ.
+//
+// У формі нового пароля після листа й у зміні пароля в профілі є лише
+// поля пароля. Chrome так і писав у консоль: «Password forms should
+// have (optionally hidden) username fields». Без поля імені менеджер
+// паролів (вбудований у браузер, Keychain на iPhone) не знає, до якого
+// облікового запису прив'язати новий пароль: зберігає окремий запис
+// без імені або не пропонує оновити старий. Наступного входу він
+// підставляє СТАРИЙ пароль — і людина не може увійти.
+//
+// Тому в обох формах лежить приховане поле autocomplete="username", а
+// значення ставимо тут.
+//
+// ЛИШЕ СПРАВЖНЬОЮ ПОШТОЮ. У тих, хто ввійшов через Telegram, у
+// user.email лежить службовий рядок, скриньки за яким немає. Підстав
+// його — і менеджер збереже пароль під вигаданою адресою. realEmail
+// такий рядок відкидає й повертає порожнечу: тоді поле лишається
+// порожнім, і менеджер принаймні нічого не прив'яже неправильно.
+function підставитиІмʼяДляМенеджераПаролів(user) {
+
+    const пошта = realEmail(user);
+
+    document.querySelectorAll(".pm-username").forEach(поле => {
+        поле.value = пошта;
+    });
+
+}
+
+supabaseClient?.auth.onAuthStateChange((event, session) => {
 
     if (event === "PASSWORD_RECOVERY") {
 
         isPasswordRecovery = true;
+
+        підставитиІмʼяДляМенеджераПаролів(session && session.user);
 
         renderAuthState();
 
@@ -2182,6 +2212,8 @@ async function loadProfile(user) {
     // телефон або знята галочка з пошти у вікні входу) цей рядок
     // почав казати людині, що вона зайшла звідки не заходила.
     const mail = realEmail(user);
+
+    підставитиІмʼяДляМенеджераПаролів(user);
 
     const provider = loginProviderName(user);
 
