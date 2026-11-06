@@ -1828,7 +1828,7 @@ function buildSearchOverlay() {
                          «Скасувати» словами, і різниця між «очистити
                          поле» та «закрити пошук» на слух зникала. -->
                     <input type="text" id="globalSearchInput" placeholder="Пошук товарів..."
-                           aria-label="Пошук товарів" autocomplete="off">
+                           aria-label="Пошук товарів" autocomplete="off" enterkeyhint="search">
                     <button type="button" id="globalSearchClear" class="search-overlay-clear"
                             aria-label="Очистити пошук" hidden>✕</button>
                 </div>
@@ -2412,6 +2412,9 @@ async function runGlobalSearch(query) {
 
     if (!q) {
 
+        // Поле очистили — недоказане «знайдено N» уже ні до чого.
+        clearTimeout(runGlobalSearch.announceTimer);
+
         idleState.hidden = false;
         resultsState.hidden = true;
 
@@ -2448,7 +2451,7 @@ async function runGlobalSearch(query) {
     const suggestions = [...new Set(matches.map(p => p.title))].slice(0, 6);
 
     suggestionsEl.innerHTML = suggestions.length
-        ? suggestions.map(title => `<button type="button" class="search-suggestion-item">${title}</button>`).join("")
+        ? suggestions.map(title => `<button type="button" class="search-suggestion-item">${escapeHtml(title)}</button>`).join("")
         : `<p class="search-no-suggestions">Немає підказок</p>`;
 
     suggestionsEl.querySelectorAll(".search-suggestion-item").forEach(btn => {
@@ -2492,6 +2495,18 @@ async function runGlobalSearch(query) {
 
     seeAllEl.hidden = matches.length === 0;
     seeAllEl.href = `catalog?search=${encodeURIComponent(query.trim())}`;
+
+    // Скільки знайдено — читалці. Видно це лише очима: результати
+    // мовчки з'являються під полем, і хто не бачить екрана, не знає, чи
+    // є що гортати. Чекаємо паузи в наборі — інакше на «сумка коач»
+    // прозвучало б десять оголошень, по одному на літеру.
+    clearTimeout(runGlobalSearch.announceTimer);
+
+    runGlobalSearch.announceTimer = setTimeout(() => {
+        announce(matches.length
+            ? `Знайдено ${matches.length} ${pluralProducts(matches.length)}`
+            : "Нічого не знайдено");
+    }, 800);
 
 }
 
@@ -2671,6 +2686,9 @@ function openSearchOverlay() {
 function closeSearchOverlay() {
 
     if (!searchOverlayEl) return;
+
+    // Пошук закрили — «знайдено N» уже ні про що.
+    clearTimeout(runGlobalSearch.announceTimer);
 
     // Курсор назад на 🔍 — ДО того, як накладка почне зникати.
     window.DialogFocus?.close(searchOverlayEl);
