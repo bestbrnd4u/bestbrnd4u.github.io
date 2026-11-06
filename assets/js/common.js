@@ -1039,9 +1039,79 @@ function showCartPopup(product, selection = {}) {
 
     requestAnimationFrame(() => popup.classList.add("show"));
 
+    // Читалці — коротко й без кнопок. Поп-ап є на товарі, головній і в
+    // каталозі, тобто майже скрізь, де купують, — а тост із живою
+    // областю тут не показується. Хто не бачить екрана, після «Додати
+    // в кошик» досі не чув нічого.
+    announce(`Товар додано в кошик: ${product.title}. Сума замовлення ${formatPrice(subtotal)}.`);
+
+    watchCartPopup(popup);
+
+    scheduleCartPopupHide(popup);
+
+}
+
+// 4,5 секунди — щоб не заважав, якщо людина купує далі. Але поки курсор
+// або фокус усередині, він не зникає: інакше «Оформити замовлення»
+// зникала з-під миші на півдорозі, а з клавіатури до неї взагалі не
+// встигнути дотабати.
+function scheduleCartPopupHide(popup) {
+
     clearTimeout(window.cartPopupTimer);
 
+    if (popup.matches(":hover") || popup.contains(document.activeElement)) return;
+
     window.cartPopupTimer = setTimeout(hideCartPopup, 4500);
+
+}
+
+function watchCartPopup(popup) {
+
+    // Вузол той самий, міняється лише вміст — слухачі вішаємо раз.
+    if (popup.dataset.watched) return;
+
+    popup.dataset.watched = "1";
+
+    popup.addEventListener("mouseenter", () => clearTimeout(window.cartPopupTimer));
+    popup.addEventListener("focusin", () => clearTimeout(window.cartPopupTimer));
+
+    popup.addEventListener("mouseleave", () => { if (!popup.hidden) scheduleCartPopupHide(popup); });
+
+    // Tab між двома кнопками поп-апу тут теж запускає таймер — але
+    // одразу за focusout іде focusin на сусідній кнопці й гасить його.
+    popup.addEventListener("focusout", () => { if (!popup.hidden) scheduleCartPopupHide(popup); });
+
+    document.addEventListener("keydown", event => {
+        if (event.key === "Escape" && !popup.hidden) hideCartPopup();
+    });
+
+}
+
+// Оголошення для читалки без нічого видимого.
+//
+// Область створюємо порожньою й текст кладемо наступним кроком: живу
+// область, що з'явилась одразу з текстом, частина читалок пропускає, а
+// однакову фразу двічі поспіль не оголошує взагалі — тому спершу
+// очищаємо.
+function announce(text) {
+
+    let region = document.getElementById("srAnnounce");
+
+    if (!region) {
+
+        region = document.createElement("div");
+        region.id = "srAnnounce";
+        region.className = "sr-announce";
+        region.setAttribute("role", "status");
+        region.setAttribute("aria-live", "polite");
+
+        document.body.appendChild(region);
+
+    }
+
+    region.textContent = "";
+
+    setTimeout(() => { region.textContent = text; }, 100);
 
 }
 

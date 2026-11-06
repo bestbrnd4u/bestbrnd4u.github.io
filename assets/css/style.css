@@ -1184,6 +1184,22 @@ nav li.has-mega[data-mega-open] .mega-menu.mega-menu-columns{
     transform:translateY(0);
 }
 
+/* Жива область для читалки (announce() у common.js): у дереві є, на
+   екрані — ні. Не display:none і не visibility:hidden — такий вузол
+   читалка не оголошує. */
+.sr-announce{
+    position:absolute;
+    width:1px;
+    height:1px;
+    margin:-1px;
+    padding:0;
+    overflow:hidden;
+    clip:rect(0 0 0 0);
+    clip-path:inset(50%);
+    white-space:nowrap;
+    border:0;
+}
+
 .cart-popup-header{
     display:flex;
     justify-content:space-between;
