@@ -68,7 +68,11 @@
                 <button type="button" class="lightbox-arrow lightbox-prev-mobile" aria-label="Попереднє фото">
                     <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>
                 </button>
-                <div class="lightbox-counter">
+                <!-- «01/04» — для ока. Читалка вимовила б «нуль один,
+                     скісна, нуль чотири», та й то лише якби до нього
+                     дійшли; тому лічильник їй сховано, а сказане —
+                     у #lightboxLive нижче. -->
+                <div class="lightbox-counter" aria-hidden="true">
                     <span id="lightboxCurrent">1</span><span class="lightbox-counter-total">/<span id="lightboxTotal">1</span></span>
                 </div>
                 <button type="button" class="lightbox-arrow lightbox-next-mobile" aria-label="Наступне фото">
@@ -76,6 +80,9 @@
                 </button>
             </div>
             <div class="lightbox-hint">Масштабуйте фотографію жестом зведення і розведення пальців</div>
+            <!-- Жива область УСЕРЕДИНІ вікна: воно aria-modal, і частина
+                 читалок не озвучує те, що поза ним. -->
+            <span class="sr-announce" id="lightboxLive" aria-live="polite"></span>
         `;
 
         document.body.appendChild(el);
@@ -210,6 +217,14 @@
 
         currentEl.textContent = String(index + 1).padStart(2, "0");
 
+        // Що зараз на екрані — словами. Стрілками гортали мовчки: без
+        // цього людина не знала, чи перейшла, і скільки лишилось.
+        const live = root.querySelector("#lightboxLive");
+
+        if (live) {
+            live.textContent = `${images[index].type === "video" ? "Відео" : "Фото"} ${index + 1} з ${images.length}`;
+        }
+
         [...track.children].forEach((slide, i) => {
             slide.classList.toggle("active", i === index);
         });
@@ -252,6 +267,10 @@
         infoBrandEl.textContent = brand;
         infoTitleEl.textContent = title;
         infoEl.hidden = !brand && !title;
+
+        // Назва вікна. DialogFocus бере її з заголовка .modal-header, а
+        // тут його немає — і читалка казала просто «діалог».
+        root.setAttribute("aria-label", title ? `Фото: ${title}` : "Фото товару");
 
         root.hidden = false;
 
