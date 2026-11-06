@@ -326,8 +326,8 @@ function renderProductNotFound() {
 
     page.innerHTML = `
         <div class="empty-state product-not-found">
-            <h2>🔍</h2>
-            <h3>Товар не знайдено</h3>
+            <div class="empty-state-icon" aria-hidden="true">🔍</div>
+            <h1 class="empty-state-heading">Товар не знайдено</h1>
             <p>
                 Можливо, його вже розпродано або знято з продажу,
                 а посилання застаріло. Схожі моделі майже завжди є —

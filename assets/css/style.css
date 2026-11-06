@@ -3905,9 +3905,43 @@ body.mobile-filters-open .scroll-top{
     grid-column:1/-1;
 }
 
-.empty-state h2{
+/* ЗНАЧОК — ПРИКРАСА, А НЕ ЗАГОЛОВОК.
+
+   Тут був h2 зі смайликом (🛒, ❤, 😔…), а сам текст стану — <p>. Хто
+   ходить сторінкою за заголовками, чув «заголовок 2, візок для
+   покупок», а «Ваш кошик поки порожній» заголовком не був зовсім. Так
+   було в усіх семи порожніх станах сайту, і в «Товар не знайдено» —
+   теж, хоч коментар нижче вже обіцяв протилежне.
+
+   Тепер значок — aria-hidden div з тим самим виглядом, а заголовок —
+   сам текст. Розміри зняті з браузера ДО правки й повторені точно. */
+.empty-state-icon{
     font-size:52px;
+    font-weight:800;
+    line-height:1.6;
     margin-bottom:10px;
+    color:var(--dark);
+}
+
+/* Текст стану як заголовок — але вигляд того самого абзацу, що був:
+   17px/400, сірий. Загальне правило h2 інакше дало б 42px/800. */
+.empty-state .empty-state-title{
+    margin:0 0 24px;
+    font-size:17px;
+    font-weight:400;
+    line-height:1.6;
+    color:var(--gray500);
+    text-align:center;
+}
+
+/* Там, де текст був h3 (акцію не знайдено), — вигляд того h3. */
+.empty-state .empty-state-heading{
+    margin:0 0 24px;
+    font-size:24px;
+    font-weight:700;
+    line-height:1.6;
+    color:var(--dark);
+    text-align:center;
 }
 
 .empty-state p{
@@ -15856,7 +15890,7 @@ body.refusal-open{
     margin:0 auto;
 }
 
-.product-not-found h3{
+.product-not-found .empty-state-heading{
     margin-bottom:12px;
     font-size:26px;
 }
@@ -15878,7 +15912,7 @@ body.refusal-open{
 
 @media(max-width:520px){
 
-    .product-not-found h3{
+    .product-not-found .empty-state-heading{
         font-size:21px;
     }
 
