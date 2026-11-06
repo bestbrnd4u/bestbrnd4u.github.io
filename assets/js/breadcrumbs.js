@@ -235,6 +235,52 @@
         + '<span aria-hidden="true">\u2039</span> Назад'
         + '</a>';
 
+    // Доріжка, що не влазить, показується з КІНЦЯ — з поточної сторінки.
+    //
+    // На товарі це давно робить product.js (scrollBreadcrumbsToEnd).
+    // А сторінки категорій, брендів і розділів малює генератор, і
+    // доріжку там ніхто не прокручував: на 375px «Головна – Каталог –
+    // Сумки – Чоловічі сумки» не влазила на 49px, і назва сторінки, на
+    // якій людина стоїть, була ЦІЛКОМ за правим краєм — видно лише
+    // шлях, яким вона прийшла. Заміряно в браузері: права межа поточної
+    // ланки 394px при ширині смуги 365px.
+    //
+    // Тут, а не в catalog.js: цей файл підключений до всіх сторінок із
+    // доріжкою, а catalog.js на згенерованих сторінках крихти не
+    // чіпає взагалі (там PRESET).
+    function showTrailEnd() {
+
+        var hosts = document.querySelectorAll(".breadcrumbs .container");
+
+        for (var i = 0; i < hosts.length; i++) {
+            var host = hosts[i];
+            // Людина вже прокрутила сама — не відбираємо в неї доріжку.
+            if (host.dataset.trailTouched) continue;
+            if (host.scrollWidth > host.clientWidth) host.scrollLeft = host.scrollWidth;
+        }
+
+    }
+
+    if (typeof document !== "undefined" && document.addEventListener) {
+
+        document.addEventListener("touchstart", function (event) {
+            var host = event.target.closest && event.target.closest(".breadcrumbs .container");
+            if (host) host.dataset.trailTouched = "1";
+        }, { passive: true });
+
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", showTrailEnd);
+        } else {
+            showTrailEnd();
+        }
+
+        // Шрифт сайту приїжджає пізніше за розмітку й ширший за
+        // запасний: без другого заходу край назви лишався б обрізаним
+        // на ті кілька пікселів, на які розсунулась доріжка.
+        if (document.fonts && document.fonts.ready) document.fonts.ready.then(showTrailEnd);
+
+    }
+
     root.Breadcrumbs = {
         BACK_HTML: BACK_HTML,
         firstGender: firstGender,
