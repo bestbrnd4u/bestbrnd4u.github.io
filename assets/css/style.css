@@ -10203,6 +10203,17 @@ body.mobile-filters-open .scroll-top{
     color:var(--gray500);
 }
 
+/* Вимога під полем («Мінімум 6 символів»). Стоїть після <label>, тож
+   між ними — 16px відступу форми; -10 лишає 6px, рядок читається як
+   частина свого поля, а не наступного. Наїзду немає: від'ємне тут
+   менше за сам проміжок. */
+.auth-form .field-hint{
+    margin-top:-10px;
+    font-size:12px;
+    line-height:1.4;
+    color:var(--gray500);
+}
+
 .auth-form label{
     display:flex;
     flex-direction:column;
