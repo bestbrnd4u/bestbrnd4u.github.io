@@ -4329,6 +4329,38 @@ body.mobile-filters-open .scroll-top{
     object-fit:contain;
 }
 
+/* «Бренду … зараз немає» — для старих посилань catalog?brand=…
+   (showMissingBrands у catalog.js). Спокійна плашка, а не червона
+   помилка: людина нічого не зробила не так, просто бренд пішов. */
+.catalog-notice{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:baseline;
+    gap:6px 16px;
+    /* Без від'ємного відступу: під заголовком на телефоні лише 14px,
+       і -16 знову дало б наїзд, як було з описом бренду. */
+    margin:0 0 24px;
+    padding:14px 18px;
+    border-radius:14px;
+    /* Біле з рамкою, а не --surface-muted: тло каталогу саме таке, і
+       плашка на ньому зливалась (видно на знімку 375px). */
+    background:#fff;
+    border:1px solid var(--gray200);
+    color:var(--gray700);
+    line-height:1.5;
+}
+
+.catalog-notice p{
+    margin:0;
+}
+
+/* Синє, як «Детальніше» під описом бренду на тій самій сторінці. */
+.catalog-notice a{
+    color:var(--secondary);
+    font-weight:600;
+    white-space:nowrap;
+}
+
 /* Від'ємний відступ підтягує опис до заголовка: 36px під ним
    призначені для смуги фільтрів, а не для тексту. */
 .brand-about{

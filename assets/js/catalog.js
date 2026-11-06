@@ -1459,15 +1459,67 @@ function applyBrandFromUrl() {
 
     let added = false;
 
+    const missing = [];
+
     wanted.forEach(token => {
 
         const brand = bySlug.get(token) || bySlug.get(latinParam(token));
 
         if (brand) { selectedBrands.add(brand); added = true; }
+        else missing.push(token);
 
     });
 
     if (added) updateBrandUI();
+
+    showMissingBrands(missing, added);
+
+}
+
+// Старе посилання на бренд, якого вже немає.
+//
+// Невідомий бренд з адреси відкидається (див. вище), і досі — мовчки:
+// за посиланням з Instagram чи закладок людина бачила «Каталог товарів»
+// і всі 131 позицію, без жодного слова про те, куди подівся бренд, по
+// який вона прийшла. Тепер над товарами — пояснення й шлях до всіх
+// брендів.
+//
+// Назва береться з адреси, тобто від будь-кого, хто склав посилання:
+// лише textContent, жодного innerHTML.
+function showMissingBrands(missing, othersShown) {
+
+    document.getElementById("missingBrandNotice")?.remove();
+
+    if (!missing.length) return;
+
+    // «marc-jacobs» → «Marc Jacobs»: в адресі slug, а людині — назва.
+    const pretty = token => String(token)
+        .replace(/[-_+]+/g, " ")
+        .trim()
+        .replace(/(^|\s)(\S)/g, (m, space, ch) => space + ch.toUpperCase())
+        .slice(0, 60);
+
+    const names = missing.map(token => `«${pretty(token)}»`).join(", ");
+
+    const notice = document.createElement("div");
+    notice.id = "missingBrandNotice";
+    notice.className = "catalog-notice";
+    notice.setAttribute("role", "status");
+
+    const text = document.createElement("p");
+    text.textContent = (missing.length === 1 ? `Бренду ${names}` : `Брендів ${names}`)
+        + " зараз немає в магазині. "
+        + (othersShown ? "Показуємо решту вибраних." : "Нижче — увесь каталог.");
+
+    const link = document.createElement("a");
+    link.href = "/brands/";
+    link.textContent = "Усі бренди →";
+
+    notice.append(text, link);
+
+    const anchor = document.getElementById("brandAbout") || document.querySelector(".catalog-header");
+
+    anchor?.after(notice);
 
 }
 
