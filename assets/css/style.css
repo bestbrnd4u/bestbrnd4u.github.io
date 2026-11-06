@@ -7796,10 +7796,21 @@ body.mobile-filters-open .scroll-top{
         grid-area:info;
     }
 
+    /* Дві кнопки поруч, обидві nowrap: «Додати в кошик» ~190px і
+       «✕ Видалити з обраного» ~178px. Картка на 320–414px дає їм
+       230–295px, тож друга виїжджала за край і обрізалась на «з обр»
+       (заміряно в браузері). Не влазять — друга переходить у свій
+       рядок на всю ширину; на ширшому екрані стоять поруч, як і
+       були. */
     .favorite-row-actions{
         grid-area:actions;
         flex-direction:row;
+        flex-wrap:wrap;
         min-width:0;
+    }
+
+    .favorite-row-actions > *{
+        flex:1 1 auto;
     }
 
 }

@@ -443,5 +443,29 @@ console.log("\n[9] Спосіб звʼязку в оформленні");
         check(`названо спосіб «${channel}»`, new RegExp(`"${channel}":`).test(checkoutJs)));
 }
 
+console.log("\n[Обране] Кнопки рядка вміщаються на телефоні");
+{
+    // «Додати в кошик» ~190px і «✕ Видалити з обраного» ~178px, обидві
+    // nowrap, а картка на 320–414px дає 230–295px: друга обрізалась на
+    // «з обр». У мобільному блоці кнопкам дозволено переноситись.
+    // Блоків max-width:700px у файлі кілька — беремо той, де живе обране.
+    const mobile = [...css.matchAll(/@media\s*\(max-width:\s*700px\)\s*\{([\s\S]*?)\n\}/g)]
+        .find(m => /\.favorite-row-actions\{/.test(m[1]));
+    const block = mobile ? mobile[1] : "";
+
+    const actions = (block.match(/\.favorite-row-actions\{([^}]*)\}/) || [])[1] || "";
+    check("мобільний блок обраного знайдено", Boolean(mobile));
+    check("кнопки в рядок", /flex-direction:\s*row/.test(actions));
+    check("і переносяться, коли не влазять", /flex-wrap:\s*wrap/.test(actions), actions.trim());
+
+    const kids = (block.match(/\.favorite-row-actions\s*>\s*\*\{([^}]*)\}/) || [])[1] || "";
+    check("перенесена кнопка — на всю ширину", /flex:\s*1 1 auto/.test(kids), kids.trim());
+
+    // Текст кнопок лишається в один рядок — переноситься кнопка, а не
+    // слово посередині.
+    check("«Видалити з обраного» не ламається на два рядки",
+        /\.favorite-row-remove\{[^}]*white-space:\s*nowrap/.test(css));
+}
+
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
 process.exit(failures === 0 ? 0 : 1);
