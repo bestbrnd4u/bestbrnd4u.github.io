@@ -412,7 +412,56 @@
         return /^\d[\d   ]*$/.test(text) ? text : null;
     }
 
+    // Абсолютна адреса сторінки сайту → та сама мовою lang, теж абсолютна.
+    //
+    // Для canonical і og:url. product.js і catalog.js ставлять їх уже в
+    // браузері — від SITE_URL або location.origin, без мови. На /en/p/…
+    // canonical після завантаження вказував на українську сторінку: тобто
+    // англійська сама оголошувала себе копією, і Google мав би її
+    // викинути з видачі. extraOrigin — location.origin у браузері
+    // (localhost, превʼю), бо isPageHref знає лише бойові домени.
+    function localizeAbsolute(url, lang, extraOrigin) {
+        var m = String(url || "").match(/^(https?:\/\/[^\/?#]+)(.*)$/i);
+        if (!m || lang === DEFAULT_LANG) return url;
+        var own = /^https?:\/\/(dev\.)?bestbrnd4u\.com$/i.test(m[1]) || (extraOrigin && m[1] === extraOrigin);
+        var rest = m[2] || "/";
+        if (!own || !isPageHref(rest)) return url;
+        return m[1] + localizeHref(rest, lang);
+    }
+
+    // Розмітка schema.org (JSON-LD) мовою lang.
+    //
+    // Текст — тим самим перекладачем, що й сторінка: назва товару в
+    // розмітці мусить збігатися з видимою, інакше Google бачить дві
+    // різні речі на одній адресі. Адреси сторінок — з мовним префіксом.
+    //
+    // НЕ ЧІПАЄМО: @id (це імʼя сутності — організація одна на всі мови),
+    // ідентифікатори (sku, mpn, gtin), картинки й лого (isPageHref і так
+    // їх пропускає), sameAs (зовнішні профілі).
+    var LD_KEEP = /^(@id|@context|@type|sku|mpn|gtin\d*|sameAs|email|telephone|priceCurrency|postalCode)$/;
+    var LD_LANG = { uk: "uk-UA", en: "en", ru: "ru" };
+
+    function localizeJsonLd(data, translate, lang, extraOrigin) {
+        if (lang === DEFAULT_LANG) return data;
+        var visit = function (value, key) {
+            if (Array.isArray(value)) return value.map(function (v) { return visit(v, key); });
+            if (value && typeof value === "object") {
+                var out = {};
+                Object.keys(value).forEach(function (k) { out[k] = visit(value[k], k); });
+                return out;
+            }
+            if (typeof value !== "string" || (key && LD_KEEP.test(key))) return value;
+            if (key === "inLanguage") return LD_LANG[lang] || lang;
+            if (/^https?:\/\//i.test(value)) return localizeAbsolute(value, lang, extraOrigin);
+            if (/[а-яіїєґ]/i.test(value)) return translate(value);
+            return value;
+        };
+        return visit(data, null);
+    }
+
     var api = {
+        localizeAbsolute: localizeAbsolute,
+        localizeJsonLd: localizeJsonLd,
         numberBefore: numberBefore,
         LANGS: LANGS,
         DEFAULT_LANG: DEFAULT_LANG,

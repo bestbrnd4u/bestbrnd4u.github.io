@@ -109,7 +109,12 @@ function urlPath(rel) {
     return "/" + rel.replace(/\.html$/, "");
 }
 
+// Юридичні сторінки hreflang НЕ мають. Їхній основний текст на /en/ і
+// /ru/ лишається українським, тож перекладом у сенсі hreflang вони не є:
+// мовна копія вказує canonical на український оригінал (див. buildCopy),
+// а hreflang поруч із canonical на іншу адресу Google вважає суперечністю.
 function hreflangBlock(rel) {
+    if (LEGAL.has(rel)) return "";
     const p = urlPath(rel);
     const lines = ["uk", ...LOCALES].map(lang =>
         `<link rel="alternate" hreflang="${lang}" href="${SITE_URL}${Core.localizePath(p, lang)}">`);
@@ -165,7 +170,8 @@ function decorateUk(rel, html, on) {
     if (!on) return out;
 
     // hreflang і скрипти — у <head>.
-    out = out.replace(/<\/head>/i, `${MARK_START}\n${hreflangBlock(rel)}\n${SCRIPTS}\n${MARK_END}\n</head>`);
+    const links = hreflangBlock(rel);
+    out = out.replace(/<\/head>/i, `${MARK_START}\n${links ? links + "\n" : ""}${SCRIPTS}\n${MARK_END}\n</head>`);
 
     // Перемикач — першим у групі значків шапки: окремим елементом
     // шапки він ділив би з лого й меню вільне місце, якого на межі
@@ -280,6 +286,22 @@ function buildCopy(rel, html, lang, t) {
 
     const stats = translateDocument(document, t, lang);
 
+    // Розмітка schema.org — тим самим ядром, що й у браузері (i18n.js
+    // перекладає блоки, які скрипти перемальовують уже після
+    // завантаження). Відступ зберігаємо той, що був, — щоб діфф копії
+    // показував зміни слів, а не переформатування.
+    document.querySelectorAll('script[type="application/ld+json"]').forEach(script => {
+        const text = script.textContent;
+        let data;
+        try { data = JSON.parse(text); } catch (error) { return; }
+        const indent = (text.match(/\n( +)"/) || [, ""])[1].length;
+        const local = Core.localizeJsonLd(data, t, lang);
+        if (JSON.stringify(local) === JSON.stringify(data)) return;
+        const lead = text.match(/^\s*/)[0];
+        const tail = text.match(/\s*$/)[0];
+        script.textContent = lead + JSON.stringify(local, null, indent || undefined) + tail;
+    });
+
     // Посилання на сторінки — з префіксом мови.
     document.querySelectorAll("a[href]").forEach(a => {
         if (a.closest(".lang-switch")) return;
@@ -291,7 +313,9 @@ function buildCopy(rel, html, lang, t) {
     });
 
     // canonical, og:url — на свою мовну адресу.
-    const own = SITE_URL + Core.localizePath(urlPath(rel), lang);
+    // Юридична копія — той самий український документ, тож canonical
+    // на оригінал: інакше в пошуку було б три копії договору.
+    const own = SITE_URL + (LEGAL.has(rel) ? urlPath(rel) : Core.localizePath(urlPath(rel), lang));
     const canonical = document.querySelector('link[rel="canonical"]');
     if (canonical) canonical.setAttribute("href", own);
     const ogUrl = document.querySelector('meta[property="og:url"]');
@@ -303,7 +327,8 @@ function buildCopy(rel, html, lang, t) {
     // переносимо як є — ставимо свої.
     let out = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
     out = stripInserts(out);
-    out = out.replace(/<\/head>/i, `${MARK_START}\n${hreflangBlock(rel)}\n` +
+    const links = hreflangBlock(rel);
+    out = out.replace(/<\/head>/i, `${MARK_START}\n${links ? links + "\n" : ""}` +
         `<link rel="preload" href="/data/i18n-${lang}.json" as="fetch" crossorigin>\n${SCRIPTS}\n${MARK_END}\n</head>`);
     out = out.replace(/<div class="header-icons">/, m => `${m}\n            ${switcher(rel, lang)}`);
 
@@ -504,4 +529,4 @@ function main() {
 
 if (require.main === module) main();
 
-module.exports = { urlPath, hreflangBlock, switcher, decorateUk, stripInserts, buildCopy, pages, legalParts, collectDataTranslations, dataDictionary, pairDictionary, LEGAL, MARK_START, MARK_END };
+module.exports = { enabled, LOCALES, urlPath, hreflangBlock, switcher, decorateUk, stripInserts, buildCopy, pages, legalParts, collectDataTranslations, dataDictionary, pairDictionary, LEGAL, MARK_START, MARK_END };

@@ -166,7 +166,12 @@ console.log("\n[3] Українські сторінки");
             const hasHeader = /<div class="header-icons">/.test(html);
             const ownUk = new RegExp(`hreflang="uk" href="[^"]*${own.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"`).test(html);
             const ownEn = html.includes(`hreflang="en" href="`) && html.includes(Core.localizePath(own, "en") + '"');
-            if (!ownUk || !ownEn) bad.push(rel + ": hreflang не на себе");
+            // Юридичні hreflang не мають навмисно: текст договору не
+            // перекладається, і копія вказує canonical на оригінал.
+            const legal = Locales.LEGAL.has(rel);
+            const linkTags = /<link rel="alternate" hreflang=/.test(html);
+            if (legal && linkTags) bad.push(rel + ": юридична з hreflang");
+            else if (!legal && (!ownUk || !ownEn)) bad.push(rel + ": hreflang не на себе");
             else if (hasHeader && switches !== 1) bad.push(rel + ": перемикачів " + switches);
             else if (!/\/assets\/js\/i18n\.js/.test(html)) bad.push(rel + ": без i18n.js");
         });

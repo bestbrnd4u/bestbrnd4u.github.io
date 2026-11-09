@@ -74,8 +74,43 @@
     // соцмереж українською — збірка їх уже переклала, а скрипт затирав.
     var META = /^(description|og:title|og:description|twitter:title|twitter:description)$/;
 
+    // canonical, og:url і розмітку schema.org скрипти теж ставлять уже в
+    // браузері — від адреси без мови й українськими рядками. canonical
+    // на українську сторінку оголошував англійську її копією.
+    function fixCanonical(link) {
+        var href = link.getAttribute("href");
+        var next = Core.localizeAbsolute(href, lang, location.origin);
+        if (next !== href) link.setAttribute("href", next);
+    }
+
+    // Що ми самі записали в кожен блок — щоб не перекладати власну заміну.
+    var ldDone = typeof WeakMap === "function" ? new WeakMap() : null;
+
+    function translateLd(script) {
+        var text = script.textContent;
+        if (!text || (ldDone && ldDone.get(script) === text)) return;
+        try {
+            var data = JSON.parse(text);
+            var local = Core.localizeJsonLd(data, translate, lang, location.origin);
+            if (JSON.stringify(local) !== JSON.stringify(data)) script.textContent = JSON.stringify(local);
+            if (ldDone) ldDone.set(script, script.textContent);
+        } catch (error) { /* зіпсований JSON — лишаємо як є */ }
+    }
+
+    function special(el) {
+        if (el.tagName === "LINK" && el.getAttribute("rel") === "canonical") { fixCanonical(el); return true; }
+        if (el.tagName === "SCRIPT" && el.type === "application/ld+json") { translateLd(el); return true; }
+        return false;
+    }
+
     function translateMeta(el) {
         var key = el.getAttribute("name") || el.getAttribute("property") || "";
+        if (key === "og:url") {
+            var url = el.getAttribute("content");
+            var local = Core.localizeAbsolute(url, lang, location.origin);
+            if (local !== url) el.setAttribute("content", local);
+            return;
+        }
         if (!META.test(key)) return;
         var v = el.getAttribute("content");
         if (v && /[а-яіїєґ]/i.test(v)) {
@@ -106,6 +141,7 @@
     function walk(root) {
         if (root.nodeType === 3) { translateText(root); return; }
         if (root.nodeType !== 1) return;
+        if (special(root)) return;
         if (root.tagName === "A" && root.hasAttribute("href")) fixLink(root);
         translateAttrs(root);
         if (skipped(root)) return;
@@ -117,16 +153,24 @@
                 translateAttrs(n);
             }
         }
+        // Обхід вище в <script> не заходить (skipped) — розмітку окремо.
+        var lds = root.querySelectorAll ? root.querySelectorAll('script[type="application/ld+json"], link[rel="canonical"]') : [];
+        for (var k = 0; k < lds.length; k++) special(lds[k]);
     }
 
     function handle(records) {
         for (var i = 0; i < records.length; i++) {
             var r = records[i];
             if (r.type === "childList") {
+                // setJsonLd міняє textContent наявного <script>: це запис
+                // про сам скрипт, а не про доданий елемент.
+                if (r.target.nodeType === 1 && special(r.target)) continue;
                 for (var j = 0; j < r.addedNodes.length; j++) walk(r.addedNodes[j]);
             } else if (r.type === "characterData") {
+                if (r.target.parentElement && special(r.target.parentElement)) continue;
                 translateText(r.target);
             } else if (r.type === "attributes") {
+                if (special(r.target)) continue;
                 if (r.attributeName === "href" && r.target.tagName === "A") fixLink(r.target);
                 else translateAttrs(r.target);
             }
