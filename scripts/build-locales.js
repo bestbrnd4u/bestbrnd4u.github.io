@@ -318,8 +318,11 @@ function buildCopy(rel, html, lang, t) {
     const own = SITE_URL + (LEGAL.has(rel) ? urlPath(rel) : Core.localizePath(urlPath(rel), lang));
     const canonical = document.querySelector('link[rel="canonical"]');
     if (canonical) canonical.setAttribute("href", own);
+    // Позначка для i18n.js: цей canonical на іншу мову — навмисно.
+    if (canonical && LEGAL.has(rel)) canonical.setAttribute("data-no-i18n", "");
     const ogUrl = document.querySelector('meta[property="og:url"]');
     if (ogUrl) ogUrl.setAttribute("content", own);
+    if (ogUrl && LEGAL.has(rel)) ogUrl.setAttribute("data-no-i18n", "");
     const ogLocale = document.querySelector('meta[property="og:locale"]');
     if (ogLocale) ogLocale.setAttribute("content", lang === "en" ? "en_US" : "ru_UA");
 
