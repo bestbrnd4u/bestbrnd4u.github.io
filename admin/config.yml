@@ -286,7 +286,7 @@ collections:
                 name: "link"
                 widget: "string"
                 required: false
-                hint: "Наприклад https://dev.bestbrnd4u.com/delivery-payment — додасться окремим рядком під відповіддю."
+                hint: "Наприклад https://bestbrnd4u.com/delivery-payment — додасться окремим рядком під відповіддю."
 
       - name: "security"
         label: "Захист замовлень"
