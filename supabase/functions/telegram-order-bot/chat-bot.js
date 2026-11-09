@@ -583,6 +583,59 @@ const T11 = {
     ru: { compare: "Оба бренда — оригинал, так что выбор по вкусу 🙂 Вот по две модели {a} и {b}, чтобы сравнить 👇", noStyle: "{What} сейчас нет 😔 Вот другие сумки, которые могут подойти 👇" }
 };
 
+// ── Стан замовлення в чаті ─────────────────────────────────────────
+
+const PHONE_RE = /(?:\+?38\s?)?\(?0\d{2}\)?[\s-]?\d{3}[\s-]?\d{2}[\s-]?\d{2}(?!\d)/;
+
+// Номер замовлення й телефон з одного повідомлення. Номер — 6–12 цифр,
+// що НЕ є частиною телефону й не починаються з нуля (телефон — з нуля).
+export function extractLookup(text) {
+    const raw = String(text || "");
+    const phoneMatch = raw.match(PHONE_RE);
+    if (!phoneMatch) return null;
+    const rest = raw.replace(phoneMatch[0], " ");
+    const order = (rest.match(/(?:^|\D)([1-9]\d{5,11})(?!\d)/) || [])[1];
+    if (!order) return null;
+    return { orderNumber: order, phone: phoneMatch[0].replace(/[^\d+]/g, "") };
+}
+
+// Стан — тими самими словами, що на сторінці «Де моє замовлення»
+// (order-lookup.js, LOOKUP_STATUS); англійською й російською — переклад.
+const STATUS_TEXT = {
+    en: {
+        new: ["Awaiting processing", "We've received the order and will contact you to confirm the details."],
+        processing: ["Being prepared for shipping", "The order has been accepted and is being packed."],
+        shipped: ["Handed over for delivery", "The order is on its way. You can track it by the waybill number."],
+        completed: ["Delivered", "The order is completed. Thank you for your purchase!"],
+        cancelled: ["Cancelled", "The order has been cancelled. If this is a mistake, write to us and we'll fix it."]
+    },
+    ru: {
+        new: ["Ожидает обработки", "Заказ получен. Мы свяжемся с вами, чтобы подтвердить детали."],
+        processing: ["Готовится к отправке", "Заказ принят в работу и упаковывается."],
+        shipped: ["Передан в доставку", "Заказ в пути. Отследить его можно по номеру накладной."],
+        completed: ["Доставлен", "Заказ выполнен. Спасибо за покупку!"],
+        cancelled: ["Отменен", "Заказ отменен. Если это ошибка — напишите нам, мы все исправим."]
+    }
+};
+
+const T12 = {
+    uk: { head: "Замовлення {number}: {label}.", ttn: "Номер накладної: {ttn}", notFound: "Не знайшов замовлення з таким номером і телефоном 🤔 Перевірте цифри (номер — у листі чи SMS про замовлення, телефон — той, що вказували при оформленні) або напишіть, і менеджер подивиться." },
+    en: { head: "Order {number}: {label}.", ttn: "Waybill number: {ttn}", notFound: "I couldn't find an order with that number and phone 🤔 Please check the digits (the number is in the order email or SMS, the phone is the one you entered at checkout) or write here and a manager will look into it." },
+    ru: { head: "Заказ {number}: {label}.", ttn: "Номер накладной: {ttn}", notFound: "Не нашел заказ с таким номером и телефоном 🤔 Проверьте цифры (номер — в письме или SMS о заказе, телефон — тот, что указывали при оформлении) или напишите, и менеджер посмотрит." }
+};
+
+// view — publicOrderView (order-lookup.js) або null, якщо не знайдено.
+export function lookupReplyText(view, lang) {
+    const l = botLang(lang);
+    if (!view) return T12[l].notFound;
+    const tr = l !== "uk" && STATUS_TEXT[l][view.status];
+    const label = tr ? tr[0] : view.status_label;
+    const note = tr ? tr[1] : view.status_note;
+    const lines = [fill(T12[l].head, { number: view.order_number, label }), note];
+    if (view.tracking_number) lines.push(fill(T12[l].ttn, { ttn: view.tracking_number }));
+    return lines.join("\n");
+}
+
 // Назви типів для фрази «Сумок Prada зараз немає».
 const TYPE_WORDS = {
     uk: { bags: "Сумок", watches: "Годинників", glasses: "Окулярів", sneakers: "Кросівок", wallets: "Гаманців" },
@@ -1377,7 +1430,9 @@ export function botReply(message, history, data, options) {
     // «Привіт, хочу чорну сумку» — спершу «Привіт!», потім сумки.
     const greet = greetingOf(text, lang);
     const reply = (body, extra) => {
-        const out = Object.assign({ text: body, products: [], chips: [], handoff: false }, extra);
+        // lang — мова ВІДПОВІДІ (мова повідомлення), а не сторінки: її
+        // бере функція, записуючи відповідь і перевіряючи замовлення.
+        const out = Object.assign({ text: body, products: [], chips: [], handoff: false, lang }, extra);
         if (out.handoff && late && !out.text.includes(late.trim())) out.text += late;
         if (greet && out.intent !== "hello" && !out.text.startsWith(greet)) out.text = `${greet}! ${out.text}`;
         return out;
@@ -1387,6 +1442,15 @@ export function botReply(message, history, data, options) {
     // «покличте людину»: слово «людина» є в обох.
     if (!((parseWish(text, data) || {}).criteria) && hasStem(list, ABOUT_FIRST)) {
         return reply(T4[lang].aboutBot, { chips: L.chips.menu, intent: "about-bot" });
+    }
+
+    // 1б'. Номер замовлення І телефон — бот сам перевірить стан (функція
+    // звертається до бази, як сторінка «Де моє замовлення», з тим самим
+    // лімітом). Тут — лише позначка й запасний текст на випадок, коли
+    // перевірити не вийшло.
+    const lookup = extractLookup(text);
+    if (lookup) {
+        return reply(fill(L.status, { url: pageUrl(site, "/order-status", lang) }), { intent: "lookup", lookup, chips: [L.chips.human] });
     }
 
     // 1в. Номер телефону в повідомленні («мій номер 067…», «передзвоніть

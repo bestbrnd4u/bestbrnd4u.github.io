@@ -230,9 +230,9 @@ console.log("\n[7] Підключення");
 {
     const src = read("supabase/functions/telegram-order-bot/_index.src.ts");
     check("функція відповідає ботом після збереження й пересилання",
-        /const saved = await insertChatMessage\(thread\.id, "visitor"[\s\S]*telegram\("sendMessage"[\s\S]*answerWithBot\(thread, saved, text, body\.lang, cleanChatPage\(body\.page\)\)/.test(src));
+        /const saved = await insertChatMessage\(thread\.id, "visitor"[\s\S]*telegram\("sendMessage"[\s\S]*answerWithBot\(thread, saved, text, body\.lang, cleanChatPage\(body\.page\), clientIp\(request\)\)/.test(src));
     check("бот знає сторінку, з якої написали (а не лише першу в нитці)", /botReply\(text, history, data, \{[^}]*page \}/.test(src));
-    check("помилка бота не ламає відповідь сайту", /answerWithBot\(thread, saved, text, body\.lang, cleanChatPage\(body\.page\)\)\.catch\(/.test(src));
+    check("помилка бота не ламає відповідь сайту", /answerWithBot\(thread, saved, text, body\.lang, cleanChatPage\(body\.page\), clientIp\(request\)\)\.catch\(/.test(src));
     check("відповідь бота повертається сайту в тому ж запиті", /\.\.\.\(bot \? \{ bot \} : \{\}\)/.test(src));
     check("власнику — тихо, гучно лише при передачі", /disable_notification: !reply\.handoff/.test(src));
     check("зібрана функція містить бота", /function botReply/.test(read("supabase/functions/telegram-order-bot/index.ts"))
@@ -627,6 +627,49 @@ console.log("\n[16] Матеріал, фасон, порівняння, «є х�
     check("ru «можно примерить?»", talk("ru", ["можно примерить?"]).intent === "faq");
     check("«де ви знаходитесь?» — без «Ні,» на початку", (r => r.intent === "faq" && !/^Ні/.test(r.text))(talk("uk", ["де ви знаходитесь?"])));
     check("«як підібрати розмір?» — про «Таблицю розмірів»", /Таблиця розмірів/.test(talk("uk", ["як підібрати розмір?"]).text));
+}
+
+console.log("\n[17] Стан замовлення в чаті; кнопки під сторінку товару; «бот друкує»");
+{
+    // Номер І телефон — бот перевіряє сам.
+    const both = bot.extractLookup("замовлення 8689484479, телефон 067 123 45 67");
+    check("номер і телефон з одного повідомлення", both && both.orderNumber === "8689484479" && both.phone === "0671234567", JSON.stringify(both));
+    check("+380 теж телефон", (bot.extractLookup("8689484479 +380671234567") || {}).phone === "+380671234567");
+    check("лише телефон — не перевірка, а дзвінок", bot.extractLookup("мій номер 067 123 45 67") === null && talk("uk", ["мій номер 067 123 45 67"]).intent === "handoff");
+    check("лише номер — посилання на сторінку перевірки", bot.extractLookup("де моє замовлення 8689484479") === null && talk("uk", ["де моє замовлення 8689484479"]).intent === "status");
+    check("номер і телефон — позначка для функції", talk("uk", ["замовлення 8689484479, телефон 0671234567"]).intent === "lookup");
+
+    const OL = require("../supabase/functions/telegram-order-bot/order-lookup.js");
+    const view = OL.publicOrderView({ order_number: "8689484479", status: "shipped", tracking_number: "20450000000000", phone: "+380671234567", items: [] });
+    const uk = bot.lookupReplyText(view, "uk");
+    check("стан — тими самими словами, що на сторінці «Де моє замовлення»", uk.includes(OL.LOOKUP_STATUS.shipped.label) && uk.includes(OL.LOOKUP_STATUS.shipped.note), uk);
+    check("номер накладної — у відповіді", uk.includes("20450000000000"));
+    check("en і ru — перекладено", /Handed over for delivery/.test(bot.lookupReplyText(view, "en")) && /Передан в доставку/.test(bot.lookupReplyText(view, "ru")));
+    check("для кожного стану є переклад", Object.keys(OL.LOOKUP_STATUS).every(k => !/[іїєґ]/i.test(bot.lookupReplyText(OL.publicOrderView({ order_number: "1", status: k, items: [] }), "ru"))));
+    check("не знайдено — підказка, де взяти номер і телефон", /Не знайшов/.test(bot.lookupReplyText(null, "uk")));
+
+    const src = read("supabase/functions/telegram-order-bot/_index.src.ts");
+    check("функція перевіряє ТІЄЮ САМОЮ дорогою: ліміт, номер + телефон",
+        /reply\.lookup[\s\S]{0,400}cleanLookup\([\s\S]{0,200}lookupAllowed\(ip\)[\s\S]{0,200}findOrderByNumber\([\s\S]{0,200}phoneMatches\(order\.phone, clean\.phone\)/.test(src));
+    check("IP для ліміту передається з запиту", /answerWithBot\(thread, saved, text, body\.lang, cleanChatPage\(body\.page\), clientIp\(request\)\)/.test(src));
+    check("відповідь записується мовою відповіді, а не сторінки", /serializeBotReply\(reply, reply\.lang \|\| botLang\(lang\)\)/.test(src));
+    check("мова відповіді — у самій відповіді", bot.botReply("хочу черную сумку", [], data, { lang: "uk" }).lang === "ru");
+
+    // Кнопки під сторінку товару й «бот друкує».
+    const client = read("assets/js/contact-buttons.js");
+    check("на сторінці товару — кнопки про цей товар", /\/p\\\/\[\^\/\]\+\\\/\?\$\/\.test\(location\.pathname\)[\s\S]{0,200}Є в наявності\?[\s\S]{0,200}Які кольори\?[\s\S]{0,200}Покажи схожі/.test(client));
+    check("«бот друкує» — показ до запиту й прибирання після", /chat-typing[\s\S]{0,900}site_action: "chat-send"[\s\S]{0,600}друкує\.remove\(\)/.test(client));
+    const strings = JSON.parse(read("data/i18n/strings.json"));
+    check("кнопки сторінки товару перекладені (інакше бот відповів би українською)",
+        ["Є в наявності?", "Які кольори?", "Покажи схожі", "Бот друкує…"].every(k => strings[k] && strings[k].en && strings[k].ru));
+    const p = data.products.find(x => x.department === "Сумки" && x.details.variants.length > 1);
+    [["uk", ["Є в наявності?", "Які кольори?"]], ["en", [strings["Є в наявності?"].en, strings["Які кольори?"].en]], ["ru", [strings["Є в наявності?"].ru, strings["Які кольори?"].ru]]]
+        .forEach(([lang, qs]) => qs.forEach(q => {
+            const r = bot.botReply(q, [], data, { lang, now: NOW, page: (lang === "uk" ? "" : "/" + lang) + "/p/" + p.slug + "/" });
+            check(`${lang}: кнопка «${q}» — відповідь про товар його мовою`, r.intent === "product" && r.lang === lang, r.text.slice(0, 50));
+        }));
+    const sim = bot.botReply(strings["Покажи схожі"].en, [], data, { lang: "en", now: NOW, page: "/en/p/" + p.slug + "/" });
+    check("en: «Show similar» — схожі товари англійською", sim.products.length > 0 && sim.lang === "en");
 }
 
 console.log(failures ? `\n✗ Провалено: ${failures}` : "\n✓ Усе зелено");
