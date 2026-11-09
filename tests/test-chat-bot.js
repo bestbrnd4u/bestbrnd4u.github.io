@@ -672,5 +672,51 @@ console.log("\n[17] Стан замовлення в чаті; кнопки пі
     check("en: «Show similar» — схожі товари англійською", sim.products.length > 0 && sim.lang === "en");
 }
 
+console.log("\n[18] Оригінальність без «Ні», кілька питань, розмова про одну річ");
+{
+    // ЗНАЙДЕНО 09.11.2026. Відповідь із сайту — на «Чи продаєте ви
+    // репліки?» — починається з «Ні.». На «це оригінал?» вона читалась
+    // як «ні, не оригінал». Бот так відповідав від першого дня.
+    [["uk", "це оригінал?"], ["uk", "це оригінал чи репліка?"], ["uk", "у вас оригінальні речі?"], ["en", "is it original?"], ["ru", "это оригинал?"], ["en", "are they authentic?"]]
+        .forEach(([lang, q]) => {
+            const r = talk(lang, [q]);
+            // Не \b: у JavaScript він бачить межу слова лише для латиниці.
+            check(`«${q}» — «так», а не «ні»`, !/^(Ні|No|Нет)[,.\s]/.test(r.text) && /^(Так|Yes|Да)[,.\s]/.test(r.text), r.text.slice(0, 50));
+        });
+    check("«ви продаєте підробки?» — «Ні»", /^Ні\./.test(talk("uk", ["ви продаєте підробки?"]).text));
+    check("en «do you sell replicas?» — «No»", /^No\./.test(talk("en", ["do you sell replicas?"]).text));
+
+    // Кілька питань в одному повідомленні.
+    const two = talk("uk", ["скільки коштує доставка і чи можна оплатити при отриманні?"]);
+    const dCost = data.faq.uk.find(f => /Скільки коштує доставка/.test(f.q)).a;
+    const pay = data.faq.uk.find(f => /оплатити карткою/.test(f.q)).a;
+    check("два питання — дві відповіді з сайту", two.text.includes(dCost) && two.text.includes(pay), two.text.slice(0, 80));
+    check("посилання на ту саму сторінку — один раз", (two.text.match(/delivery-payment/g) || []).length === 1);
+    const order = talk("uk", ["це оригінал? і як швидко відправите?"]);
+    check("відповіді — у порядку питань", order.text.indexOf("оригінальні") < order.text.indexOf("1–2 робочих днів") && order.text.indexOf("оригінальні") >= 0, order.text.slice(0, 60));
+    check("одне питання — як і раніше, одна відповідь", talk("uk", ["скільки коштує доставка?"]).text.split("\n\n").length === 1);
+
+    // Розмова про одну річ.
+    const chain = ["кросівки", "розкажіть про другу", "а розміри?", "з чого вони?"];
+    const shoes = talk("uk", ["кросівки"]);
+    const second = bySlug.get(shoes.products[1].slug);
+    const sizes = talk("uk", chain.slice(0, 3));
+    const mat2 = talk("uk", chain);
+    check("«розкажіть про другу» → «а розміри?» — розміри саме її", sizes.intent === "product" && sizes.text.includes(second.title.uk), sizes.text.slice(0, 70));
+    check("→ «з чого вони?» — матеріал тієї ж речі", mat2.text.includes(second.details.material.uk.slice(0, 20)), mat2.text.slice(0, 70));
+    const reset = talk("uk", ["кросівки", "розкажіть про другу", "годинник", "а розміри?"]);
+    check("після нової підбірки «а розміри?» вже не про ту річ — «про яку з них?»", reset.intent === "ask" && /Про яку з них/.test(reset.text), reset.text.slice(0, 50));
+    const which = talk("uk", ["сумка Coach", "а розміри?"]);
+    check("«про яку з них?» — кнопки «Розкажіть про першу…»", which.chips.length === 4 && /першу/.test(which.chips[0]));
+    const picked = talk("uk", ["сумка Coach", "а розміри?", which.chips[1]]);
+    check("кнопка «Розкажіть про другу» — друга картка", picked.intent === "product" && picked.text.includes(talk("uk", ["сумка Coach"]).products[1].url));
+    check("«а чорна є?» після підбірки — уточнення підбірки, а не «про яку»", talk("uk", ["сумка Coach", "а чорна є?"]).intent === "products");
+
+    // Підказка власнику.
+    const unknownBody = bot.serializeBotReply(talk("uk", ["яка погода"]), "uk");
+    check("не зрозумів — власнику підказка «навчіть бота»", /Автовідповіді бота в чаті/.test(bot.botTelegramText(unknownBody, 1, s => s)));
+    check("звичайна відповідь — без підказки", !/Автовідповіді/.test(bot.botTelegramText(bot.serializeBotReply(talk("uk", ["сумка"]), "uk"), 1, s => s)));
+}
+
 console.log(failures ? `\n✗ Провалено: ${failures}` : "\n✓ Усе зелено");
 process.exit(failures ? 1 : 0);

@@ -5534,6 +5534,14 @@ function ordinalOf(text) {
     return null;
 }
 
+// Річ, про яку бот відповідав ОСТАННІМ повідомленням. Лише останнім:
+// після нової підбірки «а розміри?» вже не про ту річ.
+function lastFocus(history) {
+    const last = (history || []).slice().reverse().find(m => m && m.author === BOT_AUTHOR);
+    const m = last && String(last.body || "").match(/\[\[focus: ([^\]]+)\]\]/);
+    return m ? m[1].trim() : null;
+}
+
 // Товари з останньої відповіді бота, де вони були, — у тому ж порядку.
 function lastShownSlugs(history) {
     const last = (history || []).slice().reverse().find(m => m && m.author === BOT_AUTHOR && /\/p\//.test(String(m.body || "")));
@@ -5645,6 +5653,12 @@ function lookupReplyText(view, lang) {
     if (view.tracking_number) lines.push(fill(T12[l].ttn, { ttn: view.tracking_number }));
     return lines.join("\n");
 }
+
+const T13 = {
+    uk: { which: "Про яку з них? Напишіть номер — «перша», «друга»… — або натисніть нижче.", ordinals: ["Розкажіть про першу", "Розкажіть про другу", "Розкажіть про третю", "Розкажіть про четверту"] },
+    en: { which: "Which one? Write its number — “first”, “second”… — or tap below.", ordinals: ["Tell me about the first", "Tell me about the second", "Tell me about the third", "Tell me about the fourth"] },
+    ru: { which: "Про какую из них? Напишите номер — «первая», «вторая»… — или нажмите ниже.", ordinals: ["Расскажите о первой", "Расскажите о второй", "Расскажите о третьей", "Расскажите о четвертой"] }
+};
 
 // Назви типів для фрази «Сумок Prada зараз немає».
 const TYPE_WORDS = {
@@ -6136,6 +6150,41 @@ function findTopic(text) {
     return TOPICS.find(t => hasStem(list, t.stems)) || null;
 }
 
+// Усі теми повідомлення, по одній на питання з сайту. «Доставка» й
+// «вартість доставки» ведуть до того самого питання — двічі не беремо.
+function findTopics(text, faq) {
+    const list = words(text);
+    const out = [];
+    const seen = new Set();
+    TOPICS.forEach(t => {
+        if (!hasStem(list, t.stems)) return;
+        const item = (faq || []).find(fq => t.faq.test(fq.q));
+        const key = item ? item.q : "legal:" + t.key;
+        if (seen.has(key)) return;
+        seen.add(key);
+        // Де в повідомленні тема вперше згадана — щоб відповідати по черзі.
+        const joined = " " + list.join(" ");
+        const at = Math.min(...t.stems.map(st => { const i = joined.indexOf(" " + st.replace(/\$/, "")); return i < 0 ? Infinity : i; }));
+        out.push({ topic: t, item, at });
+    });
+    return out.sort((a, b) => a.at - b.at);
+}
+
+// Відповідь на тему «оригінальність». На сайті це відповідь на «Чи
+// продаєте ви репліки?» і починається з «Ні.» — на питання «це
+// оригінал?» вона читалась би як «ні, не оригінал». Тож «Ні» лишаємо
+// лише тоді, коли людина й питала про репліки чи підробки.
+function topicAnswer(topic, item, list, lang) {
+    // «Це оригінал чи репліка?» — теж «так, оригінал»: «Ні» на питання,
+    // де першим стоїть «оригінал», читається як відмова.
+    const positive = hasStem(list, ["оригінал", "оригинал", "справжн", "настоящ", "original", "authentic", "genuine", "real$"]);
+    const replica = hasStem(list, ["реплік", "реплик", "підробк", "подделк", "копі", "копи", "фейк", "fake", "replica", "copy", "copies", "knock"]);
+    if (topic.key === "fake" && (positive || !replica)) {
+        return T4[lang].authYes;
+    }
+    return item.a;
+}
+
 // ── Відповідь ──────────────────────────────────────────────────────
 
 function botMoney(n) {
@@ -6537,10 +6586,10 @@ function botReply(message, history, data, options) {
         if (picked) {
             const q = productAnswer(text, picked, data, lang, now, site);
             const link = `\n${pageUrl(site, `/p/${picked.slug}/`, lang)}`;
-            if (q && !q.handoff) return reply(q.text + link, { chips: [L.chips.human], intent: "product" });
+            if (q && !q.handoff) return reply(q.text + link, { chips: [L.chips.human], intent: "product", focus: picked.slug });
             // Без конкретного питання («розкажіть про другу») — коротко все.
             const all = productAnswer("ціна наявність кольори розмір матеріал", picked, data, lang, now, site);
-            if (all) return reply(all.text.replace(/\n[^\n]*(не вказано|isn't listed|не указано)[^\n]*$/, "") + link, { chips: [L.chips.human], intent: "product" });
+            if (all) return reply(all.text.replace(/\n[^\n]*(не вказано|isn't listed|не указано)[^\n]*$/, "") + link, { chips: [L.chips.human], intent: "product", focus: picked.slug });
         }
     }
 
@@ -6550,6 +6599,26 @@ function botReply(message, history, data, options) {
     }
     if (hasStem(list, ["відкладіть", "відклади", "забронюй", "забронюйте", "залиште для мене", "притримайте", "отложите", "отложи", "забронируйте", "оставьте для меня", "reserve", "hold it for me", "put it aside"])) {
         return reply(T8[lang].reserve, { handoff: true, intent: "handoff" });
+    }
+
+    // 2а'''. Розмова про одну річ: щойно відповідали про «другу сумку» —
+    // «а розміри?», «з чого вона?» стосуються її.
+    if (!productFromPage(opts.page, data)) {
+        const focusSlug = lastFocus(history);
+        const focused = focusSlug && (data.products || []).find(p => p.slug === focusSlug);
+        const q = focused && productAnswer(text, focused, data, lang, now, site);
+        if (q && !q.handoff) {
+            return reply(q.text + `\n${pageUrl(site, `/p/${focused.slug}/`, lang)}`, { chips: [L.chips.human], intent: "product", focus: focused.slug });
+        }
+    }
+
+    // 2а''''. Після підбірки «а розміри?», «з чого?» без номера — про яку
+    // з них? Перепитати краще, ніж «не зрозумів» і будити власника.
+    if (!productFromPage(opts.page, data) && lastShownSlugs(history).length > 1
+        && Object.keys(ASK).some(k => k !== "authentic" && hasStem(list, ASK[k]))
+        && !((parseWish(text, data) || {}).criteria)) {
+        const n = lastShownSlugs(history).length;
+        return reply(fill(T13[lang].which, { n }), { chips: T13[lang].ordinals.slice(0, Math.min(n, 4)), intent: "ask" });
     }
 
     // 2б. Людина пише зі сторінки товару й питає про НЬОГО.
@@ -6658,12 +6727,22 @@ function botReply(message, history, data, options) {
     let authPrefix = "";
     if (strictFake && (parseWish(text, data) || {}).criteria) authPrefix = T4[lang].authYes + "\n";
     else if (topic && (strictFake || !(parseWish(text, data) || {}).criteria)) {
+        // «Скільки доставка і чи можна оплатити при отриманні?» — на ВСІ
+        // питання, до трьох, кожне окремим абзацом; посилання — один раз.
+        const many = findTopics(text, faq).filter(x => x.item || (x.topic.legal && lang !== "uk"));
+        if (many.length > 1) {
+            const parts = many.slice(0, 3).map(x => x.item ? topicAnswer(x.topic, x.item, list, lang)
+                : fill(L.returnsLegal, { url: pageUrl(site, "/return-warranty", lang) }));
+            const pages = [...new Set(many.slice(0, 3).filter(x => x.item).map(x => x.item.page))];
+            const links = pages.map(p => pageUrl(site, p, lang)).join(" · ");
+            return reply(parts.join("\n\n") + (links ? `\n${L.faqMore} ${links}` : ""), { chips: L.chips.menu.slice(0, 5), intent: "faq" });
+        }
         if (topic.legal && lang !== "uk") {
             return reply(fill(L.returnsLegal, { url: pageUrl(site, "/return-warranty", lang) }), { chips: L.chips.menu.filter(c => c !== L.chips.menu[4]), intent: "faq" });
         }
         const item = faq.find(f => topic.faq.test(f.q)) || faqByWords(text, faq);
         if (item) {
-            let answer = item.a;
+            let answer = topicAnswer(topic, item, list, lang);
             // На сайті питання «Чи є фізичний магазин?» і відповідь
             // починається з «Ні,». На «де ви знаходитесь?» таке «Ні»
             // звучить як відмова відповідати — прибираємо його.
@@ -6915,6 +6994,10 @@ function serializeBotReply(reply, lang) {
     });
     if (reply.chips && reply.chips.length) lines.push(`[[chips: ${reply.chips.join(" | ")}]]`);
     if (reply.handoff) lines.push("[[handoff]]");
+    // Про яку річ щойно говорили — щоб «а розміри?» далі стосувалось її.
+    if (reply.focus) lines.push(`[[focus: ${reply.focus}]]`);
+    // Бот не зрозумів — власнику підказка «навчіть бота».
+    if (reply.intent === "unknown") lines.push("[[unknown]]");
     return lines.join("\n");
 }
 
@@ -6924,7 +7007,10 @@ function botTelegramText(body, threadNo, escape) {
     const clean = String(body || "").split("\n").filter(l => !/^\[\[.*\]\]$/.test(l.trim())).join("\n");
     const handoff = /\[\[handoff\]\]/.test(String(body || ""));
     return `🤖 <b>Бот відповів</b>${threadNo ? ` · розмова #${threadNo}` : ""}\n\n${esc(clean)}`
-        + (handoff ? "\n\n⚠️ <b>Бот передав розмову вам</b> — відповідайте реплаєм на повідомлення покупця." : "");
+        + (handoff ? "\n\n⚠️ <b>Бот передав розмову вам</b> — відповідайте реплаєм на повідомлення покупця." : "")
+        // Питання, якого бот не знає, — найкращий матеріал, щоб його
+        // навчити: власник бачить його саме тут.
+        + (/\[\[unknown\]\]/.test(String(body || "")) ? "\n💡 Щоб бот відповідав на таке сам — адмінка → «Автовідповіді бота в чаті»." : "");
 }
 
 
