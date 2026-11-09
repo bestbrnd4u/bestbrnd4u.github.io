@@ -1728,7 +1728,11 @@ function orderLang(value) {
 // відмовою.
 function orderLangColumnMissing(detail) {
     const text = String(detail ?? "");
-    return /'lang' column/i.test(text) || /column "lang"[^]*does not exist/i.test(text);
+    // Третя форма — «column orders.lang does not exist»: так база
+    // відповіла на справжній запит 09.11.2026, поки міграції не було.
+    return /'lang' column/i.test(text)
+        || /column "lang"[^]*does not exist/i.test(text)
+        || /column (?:"?orders"?\.)"?lang"? does not exist/i.test(text);
 }
 
 function cleanOrder(payload) {

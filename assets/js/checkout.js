@@ -1817,7 +1817,7 @@ async function saveOrderToSupabase(orderId) {
 
     // Колонки lang ще немає (міграцію 044 не застосовано): повторюємо
     // без мови. Втратити замовлення через мову листа — неприпустимо.
-    if (error && order.lang && /'lang' column|column "lang"/i.test(String(error.message || ""))) {
+    if (error && order.lang && /'lang' column|column "lang"|column "?orders"?\."?lang"? does not exist/i.test(String(error.message || ""))) {
         const { lang, ...withoutLang } = order;
         ({ error } = await supabaseClient.from("orders").insert({
             user_id: user ? user.id : null,

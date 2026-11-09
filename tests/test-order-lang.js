@@ -49,6 +49,15 @@ console.log("\n[2] Без міграції 044 замовлення не губ�
     const M = place.orderLangColumnMissing;
     check("PostgREST: немає колонки lang", M(`{"code":"PGRST204","message":"Could not find the 'lang' column of 'orders' in the schema cache"}`));
     check("Postgres: немає колонки lang", M(`column "lang" of relation "orders" does not exist`));
+    // Дослівна відповідь бази 09.11.2026, коли міграції ще не було.
+    check("Postgres: column orders.lang does not exist",
+        M(`{"code":"42703","details":null,"hint":null,"message":"column orders.lang does not exist"}`));
+    check("інша колонка — не повтор", !M(`column orders.lang_x does not exist`) && !M(`column orders.slang does not exist`));
+    const pageRe = read("assets/js/checkout.js").match(/order\.lang && (\/[^\n]*?\/i)\.test/);
+    const pageMatch = pageRe && new Function(`return ${pageRe[1]}`)();
+    check("сторінка впізнає ті самі три форми",
+        pageMatch && pageMatch.test("Could not find the 'lang' column of 'orders'")
+        && pageMatch.test("column orders.lang does not exist") && pageMatch.test(`column "lang" of relation "orders" does not exist`));
     check("інша відмова (заблокована пошта) — не повтор", !M(`{"message":"blocked email"}`));
     check("відмова через іншу колонку — не повтор", !M(`Could not find the 'phone_key' column`));
 
@@ -57,7 +66,7 @@ console.log("\n[2] Без міграції 044 замовлення не губ�
         /orderLangColumnMissing\(detail\)[\s\S]{0,300}withoutLang[\s\S]{0,80}save\(withoutLang\)/.test(src));
     const checkout = read("assets/js/checkout.js");
     check("сторінка (прямий запис) так само",
-        /error && order\.lang && \/'lang' column\|column "lang"\/i[\s\S]{0,200}withoutLang/.test(checkout));
+        /error && order\.lang && \/'lang' column[^\n]*\/i\.test[\s\S]{0,200}withoutLang/.test(checkout));
     check("сторінка шле мову лише не для української",
         /if \(orderLang\(\)\) order\.lang = orderLang\(\);/.test(checkout)
         && /lang === "en" \|\| lang === "ru" \? lang : null/.test(checkout));

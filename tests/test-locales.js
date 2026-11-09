@@ -291,7 +291,12 @@ console.log("\n[7] Збірка знає про мовні версії");
     check("перед apply-cache-version", at("build-locales") < at("apply-cache-version"));
 
     const config = JSON.parse(read("data/i18n/config.json"));
-    check("публікація на прод поки вимкнена (переклад не готовий)", config.publish === false, JSON.stringify(config));
+    // До 09.11.2026 тут стояло «publish === false»: переклад не був
+    // готовий. Власник того дня вирішив публікувати. Тепер стережемо
+    // лише форму: рядок «true» чи друкарська помилка в імені поля мовчки
+    // вимкнули б або ввімкнули мови на проді.
+    check("перемикач публікації — булеве publish", typeof config.publish === "boolean"
+        && Object.keys(config).every(k => k === "publish"), JSON.stringify(config));
 }
 
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
