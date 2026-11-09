@@ -149,5 +149,21 @@ console.log("\n[5] Міграція 044");
     check("зібрана функція (index.ts) містить зміни", /orderLangColumnMissing/.test(bundle) && /mailLang/.test(bundle));
 }
 
+console.log("\n[6] Перевірка «ви людина» — мовою сторінки");
+{
+    // Знайдено на /en/checkout 09.11.2026: віджет Cloudflare відкривався
+    // з lang=uk, бо мова була зашита.
+    const ts = read("assets/js/turnstile.js");
+    check("мова віджета — з I18N, а не завжди uk",
+        /language: \(root\.I18N && \/\^\(en\|ru\)\$\/\.test\(root\.I18N\.lang\)\) \? root\.I18N\.lang : "uk"/.test(ts));
+    // Прод-збірка без publish мовних скриптів не має зовсім — тоді
+    // I18N немає, і віджет лишається українським, як і сторінка.
+    const page = read("checkout.html");
+    if (page.includes("/assets/js/i18n.js")) {
+        check("i18n.js підключено раніше за turnstile.js",
+            page.indexOf("/assets/js/i18n.js") < page.indexOf("assets/js/turnstile.js"));
+    }
+}
+
 console.log(failures ? `\n✗ Провалено: ${failures}` : "\n✓ Усе зелено");
 process.exit(failures ? 1 : 0);
