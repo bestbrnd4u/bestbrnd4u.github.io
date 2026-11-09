@@ -313,14 +313,17 @@ console.log("\n[7] Сторінка каже покупцеві, що лист �
         /REQUIRED_FIELDS = \[[^\]]*"email"/.test(checkout));
 
     // І лист справді існує — не обіцяємо того, чого немає.
-    const mail = read("supabase/functions/telegram-order-bot/mail.js");
+    // Збираємо самі листи: тексти лежать у таблиці перекладів (mail.js,
+    // TEXT), тож шукати шаблон у коді вже нема сенсу.
+    const Mail = require("../supabase/functions/telegram-order-bot/mail.js");
+    const demo = { order_number: "77", items: [], total: 1 };
 
     check("лист «прийнято» справді надсилається",
-        /subject: `Замовлення \$\{number\} прийнято`/.test(mail));
+        Mail.orderLetter(demo, "https://bestbrnd4u.com").subject === "Замовлення 77 прийнято");
 
     check("і листи про статуси теж",
-        /Замовлення \$\{number\} відправлено/.test(mail)
-        && /Замовлення \$\{number\} виконано/.test(mail));
+        Mail.statusLetter(demo, "shipped", "https://bestbrnd4u.com").subject === "Замовлення 77 відправлено"
+        && Mail.statusLetter(demo, "completed", "https://bestbrnd4u.com").subject === "Замовлення 77 виконано");
 
     // Менеджер дзвонить — про це теж лишилось сказано, бо для
     // частини покупців це головна обіцянка.

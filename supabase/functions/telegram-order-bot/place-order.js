@@ -97,6 +97,12 @@ function item(raw) {
         qty: Math.min(Math.max(Math.trunc(Number(raw.qty) || 1), 1), 100),
         color: text(raw.color, 100),
         size: text(raw.size, 50),
+        // Назва й колір мовою покупця — лише для листа. Менеджер у
+        // Telegram і в адмінці бачить українські title і color, як і
+        // раніше. Порожні не зберігаємо: в українських замовленнях їх
+        // немає взагалі.
+        ...(text(raw.title_local, 200) ? { title_local: text(raw.title_local, 200) } : {}),
+        ...(text(raw.color_local, 100) ? { color_local: text(raw.color_local, 100) } : {}),
     };
 
 }
@@ -105,6 +111,26 @@ function item(raw) {
 //
 // Повертає { ok: true, row } або { ok: false, reason } — reason іде в
 // логи функції, а не покупцеві: йому досить «не вдалося оформити».
+// Мова замовлення: лише мови сайту. Українська — порожньо (так у базі
+// всі старі замовлення й замовлення з бота).
+export const ORDER_LANGS = ["en", "ru"];
+
+export function orderLang(value) {
+    const lang = String(value ?? "").trim().toLowerCase();
+    return ORDER_LANGS.includes(lang) ? lang : null;
+}
+
+// Чи відмова бази — саме через відсутню колонку lang (міграцію 044 ще
+// не застосовано). PostgREST: «Could not find the 'lang' column of
+// 'orders' in the schema cache» (PGRST204), Postgres: «column "lang" of
+// relation "orders" does not exist» (42703). Будь-яку ІНШУ відмову не
+// повторюємо: заблокована пошта чи межа замовлень мусять лишитись
+// відмовою.
+export function orderLangColumnMissing(detail) {
+    const text = String(detail ?? "");
+    return /'lang' column/i.test(text) || /column "lang"[^]*does not exist/i.test(text);
+}
+
 export function cleanOrder(payload) {
 
     if (!payload || typeof payload !== "object") {
@@ -170,6 +196,10 @@ export function cleanOrder(payload) {
             last_name: text(payload.last_name, TEXT_LIMITS.last_name),
             phone,
             email,
+
+            // Лише коли не українська: тоді рядок без мови збігається з
+            // тим, що функція писала досі, і не залежить від міграції 044.
+            ...(orderLang(payload.lang) ? { lang: orderLang(payload.lang) } : {}),
         },
     };
 

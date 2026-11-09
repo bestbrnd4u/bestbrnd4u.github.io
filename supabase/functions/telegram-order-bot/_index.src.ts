@@ -35,7 +35,7 @@ import {
   parseTotal, orderView, refusalView, listResponse, STATUS_ORDER,
   ADMIN_ORIGINS,
 } from "./admin-api.js";
-import { cleanOrder, turnstileVerdict } from "./place-order.js";
+import { cleanOrder, turnstileVerdict, orderLangColumnMissing } from "./place-order.js";
 import { orderLetter, statusLetter, subscribeConfirmLetter, addEmailLetter, mailRequest } from "./mail.js";
 import {
   npRequest, parseSettlements, parseWarehouses, parseTypes, postomatTypeRef, npError,
@@ -2043,11 +2043,31 @@ async function handlePlaceOrder(request: Request, body: Record<string, any>): Pr
 
   const userId = await verifyUser(bearer);
 
-  const response = await supabaseRest("orders", {
+  const save = (row: Record<string, unknown>) => supabaseRest("orders", {
     method: "POST",
     headers: { Prefer: "return=minimal" },
-    body: JSON.stringify({ ...clean.row, user_id: userId }),
+    body: JSON.stringify({ ...row, user_id: userId }),
   });
+
+  let response = await save(clean.row);
+
+  // Колонки lang ще немає (міграцію 044 не застосовано) — повторюємо
+  // без мови. Замовлення важливіше за мову листа: той піде українською.
+  if (!response.ok && "lang" in clean.row) {
+
+    const detail = await response.clone().text();
+
+    if (orderLangColumnMissing(detail)) {
+
+      console.warn("Колонки orders.lang немає — застосуйте міграцію 044-order-lang.sql");
+
+      const { lang: _lang, ...withoutLang } = clean.row;
+
+      response = await save(withoutLang);
+
+    }
+
+  }
 
   if (!response.ok) {
 
@@ -3568,7 +3588,7 @@ async function handleSubscribe(request: Request, body: Record<string, any>): Pro
     // Тим, хто вже підтвердив, лист не потрібен: вони й так
     // отримують розсилку.
     if (verdict.state !== "active") {
-      await sendSubscribeConfirmation(clean.subscriber.email);
+      await sendSubscribeConfirmation(clean.subscriber.email, clean.lang);
     }
 
     // state каже, ЩО саме сталося: нову пошту додали, чи вона вже
@@ -5032,7 +5052,7 @@ async function supabaseAuthAdmin(path: string, init: RequestInit = {}) {
 // Ніколи не кидає винятків і ніколи не заважає відповіді: людина вже
 // натиснула кнопку, і форма мусить відповісти їй незалежно від того,
 // чи доступний зараз сервіс розсилки.
-async function sendSubscribeConfirmation(email: string): Promise<boolean> {
+async function sendSubscribeConfirmation(email: string, lang = "uk"): Promise<boolean> {
 
   try {
 
@@ -5091,11 +5111,11 @@ async function sendSubscribeConfirmation(email: string): Promise<boolean> {
 
     const row = (await created.json().catch(() => []))[0];
 
-    const link = confirmUrl(SITE_URL, row?.token);
+    const link = confirmUrl(SITE_URL, row?.token, lang);
 
     if (!link) return false;
 
-    return await sendCustomerMail({ email }, subscribeConfirmLetter(link, SITE_URL));
+    return await sendCustomerMail({ email }, subscribeConfirmLetter(link, SITE_URL, lang));
 
   } catch (error) {
 

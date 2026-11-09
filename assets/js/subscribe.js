@@ -199,7 +199,9 @@
                 body: JSON.stringify({
                     site_action: "subscribe",
                     email: email,
-                    consent: true
+                    consent: true,
+                    // Мова листа-підтвердження — мова сторінки.
+                    lang: (window.I18N && window.I18N.lang) || "uk"
                 })
             });
 

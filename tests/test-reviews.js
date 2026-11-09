@@ -344,8 +344,14 @@ console.log("\n[7] Прохання написати відгук");
     check("у листі є фото з alt",
         /reviewLetter[\s\S]{0,2000}?alt="\$\{title\}"/.test(mail));
 
-    check("сказано, що знадобиться номер і телефон",
-        /reviewLetter[\s\S]{0,2600}?номер замовлення/.test(mail));
+    // У самому листі, а не в тексті файлу: фрази тепер лежать у таблиці
+    // перекладів (mail.js, TEXT) — мова листа залежить від замовлення.
+    {
+        const letter = require("../supabase/functions/telegram-order-bot/mail.js")
+            .reviewLetter({ order_number: "123", items: [] }, "https://bestbrnd4u.com").html;
+        check("сказано, що знадобиться номер і телефон",
+            /номер замовлення <b>123<\/b> і ваш телефон/.test(letter));
+    }
 
     const script = read("scripts/request-reviews.js");
 

@@ -73,7 +73,12 @@ export function cleanSubscriber(payload) {
 
     const name = String(payload.name ?? "").trim().slice(0, SUBSCRIBE_LIMITS.name);
 
-    return { ok: true, subscriber: { email, name } };
+    // Мова сторінки, з якої підписались, — для листа підтвердження.
+    // Окремо від subscriber: той іде в MailerLite як є.
+    const lang = ["en", "ru"].includes(String(payload.lang ?? "").toLowerCase())
+        ? String(payload.lang).toLowerCase() : "uk";
+
+    return { ok: true, subscriber: { email, name }, lang };
 
 }
 
@@ -265,13 +270,16 @@ export function cleanToken(value) {
 // Веде на САЙТ, а не на функцію: у листі має стояти домен, який
 // людина впізнає. Чужий домен у посиланні — перше, на що дивляться
 // і поштові фільтри, і самі люди.
-export function confirmUrl(siteUrl, token) {
+// lang — щоб людина з /en/ після підтвердження опинилась на /en/.
+export function confirmUrl(siteUrl, token, lang) {
 
     const base = String(siteUrl ?? "").replace(/\/+$/, "");
 
     if (!base || !token) return "";
 
-    return `${base}/newsletter-confirm?token=${encodeURIComponent(token)}`;
+    const prefix = lang === "en" || lang === "ru" ? `/${lang}` : "";
+
+    return `${base}${prefix}/newsletter-confirm?token=${encodeURIComponent(token)}`;
 
 }
 
