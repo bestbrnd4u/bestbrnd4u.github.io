@@ -18086,6 +18086,119 @@ body.keyboard-up:has(#dockChat[aria-expanded="true"]){
     border-bottom-left-radius:4px;
 }
 
+/* -- бот-помічник (contact-buttons.js, намалюватиБота) --
+   Ліворуч, як відповідь магазину, але з підписом: людина має знати,
+   що це бот, а не менеджер. Колонкою: текст, картки, кнопки. */
+.chat-msg-bot{
+    align-self:flex-start;
+    flex-direction:column;
+    gap:8px;
+    max-width:92%;
+}
+
+.chat-msg-bot .chat-bot-body{
+    background:var(--gray100);
+    color:var(--gray900);
+    border-bottom-left-radius:4px;
+}
+
+.chat-bot-label{
+    display:block;
+    margin-bottom:4px;
+    font-size:11px;
+    font-weight:600;
+    color:var(--gray500);
+    letter-spacing:.02em;
+}
+
+.chat-bot-text{
+    margin:0;
+    white-space:pre-wrap;
+}
+
+.chat-products{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    margin-top:8px;
+}
+
+.chat-product{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:6px;
+    border-radius:10px;
+    background:#fff;
+    color:var(--gray900);
+    text-decoration:none;
+    border:1px solid var(--gray200, #e5e7eb);
+}
+
+.chat-product:hover,
+.chat-product:focus-visible{
+    border-color:var(--secondary);
+}
+
+.chat-product-img{
+    flex:0 0 56px;
+    width:56px;
+    height:56px;
+    object-fit:cover;
+    border-radius:8px;
+    background:var(--gray100);
+}
+
+.chat-product-info{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    min-width:0;
+}
+
+.chat-product-title{
+    font-size:13px;
+    line-height:1.35;
+    /* Дві строки, не більше: назви бувають на 80 знаків. */
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+}
+
+.chat-product-price{
+    font-size:13px;
+    font-weight:700;
+}
+
+.chat-chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+}
+
+.chat-chips-start{
+    margin-top:10px;
+}
+
+.chat-chip{
+    padding:6px 12px;
+    border:1px solid var(--secondary);
+    border-radius:999px;
+    background:#fff;
+    color:var(--secondary);
+    font:inherit;
+    font-size:13px;
+    line-height:1.3;
+    cursor:pointer;
+}
+
+.chat-chip:hover,
+.chat-chip:focus-visible{
+    background:var(--secondary);
+    color:#fff;
+}
+
 /* -- поле вводу -- */
 
 .chat-form{

@@ -93,6 +93,7 @@ import {
   cleanChatBody, cleanThreadId, cleanChatPage, formatChatMessage,
   CHAT_LIMITS, CHAT_DONE_TEXT, chatDoneReceipt, chatClearReceipt, chatUserName, chatWho,
 } from "./chat.js";
+import { botReply, botLang, serializeBotReply, botTelegramText, BOT_AUTHOR } from "./chat-bot.js";
 import {
   cleanLoginToken, loginCode, loginDeepLink, loginVerdict, loginStatus,
   telegramEmail, telegramName, sharedPhone, LOGIN_TTL_MINUTES,
@@ -3108,7 +3109,80 @@ async function handleChatSend(request: Request, body: Record<string, any>): Prom
     }),
   });
 
-  return adminJson({ ok: true, thread: thread.id, id: saved.id }, 200, origin);
+  // БОТ-ПОМІЧНИК (chat-bot.js). Відповідає одразу; мовчить, щойно в
+  // розмові відповів власник або бот сам передав її людині. Будь-яка
+  // його помилка не має зачепити саме повідомлення — воно вже
+  // збережене й переслане власнику.
+  const bot = await answerWithBot(thread, saved, text, body.lang).catch((error) => {
+    console.error("Чат: бот не відповів:", error);
+    return null;
+  });
+
+  return adminJson({ ok: true, thread: thread.id, id: saved.id, ...(bot ? { bot } : {}) }, 200, origin);
+
+}
+
+// Довідка бота (data/chat-bot.json): питання з сайту й стислий каталог.
+// Тримаємо в памʼяті функції на 10 хвилин — товари міняються не
+// частіше, а кожне повідомлення без цього качало б 115 КБ.
+let chatBotData: { at: number; data: any } | null = null;
+
+// Адреса для бота: github.io (запасне значення SITE_URL) перекидає на
+// основний домен, а посилання в чаті мають вести одразу туди.
+const BOT_SITE = /github\.io/.test(SITE_URL) ? "https://bestbrnd4u.com" : SITE_URL;
+
+async function loadChatBotData(): Promise<any> {
+  if (chatBotData && Date.now() - chatBotData.at < 10 * 60 * 1000) return chatBotData.data;
+  const response = await fetch(`${BOT_SITE}/data/chat-bot.json`);
+  if (!response.ok) throw new Error(`chat-bot.json: ${response.status}`);
+  const data = await response.json();
+  chatBotData = { at: Date.now(), data };
+  return data;
+}
+
+async function answerWithBot(
+  thread: Record<string, any>, saved: Record<string, any>, text: string, lang: unknown,
+): Promise<Record<string, any> | null> {
+
+  const data = await loadChatBotData();
+
+  if (!data || data.enabled === false) return null;
+
+  // Попередні повідомлення розмови — без щойно записаного.
+  const prior = await supabaseRest(
+    `chat_messages?thread_id=eq.${thread.id}&id=lt.${saved.id}` +
+    `&select=author,body&order=id.desc&limit=20`);
+  const history = prior.ok ? ((await prior.json().catch(() => [])) ?? []).reverse() : [];
+
+  const reply = botReply(text, history, data, { lang: botLang(lang), siteUrl: BOT_SITE });
+
+  if (!reply) return null;
+
+  const bodyText = serializeBotReply(reply, botLang(lang)).slice(0, 4000);
+
+  const row = await insertChatMessage(thread.id, BOT_AUTHOR, bodyText, null, true);
+
+  if (!row) return null;
+
+  // Власнику — тихо (без звуку): про саме повідомлення покупця він уже
+  // отримав сповіщення. Гучно — лише коли бот передав розмову йому.
+  const sent = await telegram("sendMessage", {
+    chat_id: TELEGRAM_CHAT_ID,
+    text: botTelegramText(bodyText, thread.thread_no, escapeHtml),
+    parse_mode: "HTML",
+    disable_web_page_preview: true,
+    disable_notification: !reply.handoff,
+  });
+
+  // Реплай власника на відповідь бота теж має знайти цю розмову.
+  if (sent?.ok && sent.result?.message_id) {
+    await supabaseRest(`chat_messages?id=eq.${row.id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ tg_message_id: sent.result.message_id }),
+    });
+  }
+
+  return { id: row.id, author: row.author, body: row.body, created_at: row.created_at };
 
 }
 
