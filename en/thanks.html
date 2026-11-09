@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en" data-season="standard"><head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"7a6c2900","data/catalog.json":"7af5999c","data/categories.json":"2c24d857","data/collections.json":"858469e9","data/home.json":"3b07783a","data/i18n-en.json":"22ec2d2e","data/i18n-ru.json":"b3ab7a6d","data/image-variants.json":"8d6e1e7e","data/instagram-links.json":"610ebd7b","data/legal.json":"f84751b2","data/notifications.json":"a35b367f","data/page-texts.json":"6dd1be71","data/product-texts.json":"278df72d","data/products-updated.json":"79b3052e","data/products.json":"ae78eb0a","data/promo-popups.json":"0940ece5","data/promotions.json":"92880867","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/season.json":"17f1306b","data/security.json":"0c05c691","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script><base href="/">
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"7a6c2900","data/catalog.json":"7af5999c","data/categories.json":"2c24d857","data/collections.json":"858469e9","data/home.json":"3b07783a","data/i18n-en.json":"3dd95ec2","data/i18n-ru.json":"dd3e42b7","data/image-variants.json":"8d6e1e7e","data/instagram-links.json":"610ebd7b","data/legal.json":"f84751b2","data/notifications.json":"a35b367f","data/page-texts.json":"6dd1be71","data/product-texts.json":"278df72d","data/products-updated.json":"79b3052e","data/products.json":"ae78eb0a","data/promo-popups.json":"0940ece5","data/promotions.json":"92880867","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/season.json":"17f1306b","data/security.json":"0c05c691","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script><base href="/">
     <meta name="robots" content="noindex,nofollow">
     <meta charset="UTF-8">
     <meta name="author" content="BestBrnd4u">
     <meta name="copyright" content="© 2026 BestBrnd4u. Усі права захищено.">
     <link rel="license" href="/LICENSE">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Замовлення прийнято | BestBrnd4u">
+    <meta name="description" content="Order received | BestBrnd4u">
     <meta name="theme-color" content="#111827">
 
     <!-- ВЛАСНИЙ noindex, А НЕ ТОЙ, ЩО СТАВИТЬ ЗБІРКА.
@@ -33,7 +33,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="assets/images/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="192x192" href="assets/images/favicon-192.png">
     <link rel="manifest" href="/site.webmanifest">
-    <title>Замовлення прийнято | BestBrnd4u</title>
+    <title>Order received | BestBrnd4u</title>
 
     <link rel="preconnect" href="https://hyfodsznpeeecgtgffub.supabase.co" crossorigin="">
 
@@ -45,7 +45,7 @@
     <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-v20-latin.woff2?v=v20" crossorigin="">
     <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-v20-cyrillic.woff2?v=v20" crossorigin="">
 
-    <link rel="stylesheet" href="assets/css/style.css?v=42359bef">
+    <link rel="stylesheet" href="assets/css/style.css?v=e0b0d1a8">
 
 
 
@@ -59,8 +59,8 @@
 <link rel="alternate" hreflang="ru" href="https://dev.bestbrnd4u.com/ru/thanks">
 <link rel="alternate" hreflang="x-default" href="https://dev.bestbrnd4u.com/thanks">
 <link rel="preload" href="/data/i18n-en.json" as="fetch" crossorigin>
-<script src="/assets/js/i18n-core.js?v=60e9bbb5" defer></script>
-<script src="/assets/js/i18n.js?v=7bd17491" defer></script>
+<script src="/assets/js/i18n-core.js?v=4401c5c0" defer></script>
+<script src="/assets/js/i18n.js?v=43968499" defer></script>
 <!-- i18n:end -->
 </head>
 
@@ -144,24 +144,24 @@
 
             <div class="success-icon">🎉</div>
 
-            <h1 id="thanksHeading">Дякуємо! Замовлення прийнято</h1>
+            <h1 id="thanksHeading">Thank you! Your order has been received</h1>
 
             <p id="thanksGreeting" hidden=""></p>
 
             <div class="order-confirm-card" id="orderConfirmCard" hidden="">
 
                 <div class="order-confirm-row">
-                    <span>Номер замовлення</span>
+                    <span>Order number</span>
                     <strong id="thanksOrderId">—</strong>
                 </div>
 
                 <div class="order-confirm-row">
-                    <span>Дата</span>
+                    <span>Date</span>
                     <strong id="thanksOrderDate">—</strong>
                 </div>
 
                 <div class="order-confirm-row">
-                    <span>Товарів</span>
+                    <span>Items</span>
                     <strong id="thanksItemsCount">—</strong>
                 </div>
 
@@ -173,7 +173,7 @@
                 <div id="thanksItems" class="order-confirm-items" hidden=""></div>
 
                 <div class="order-confirm-row order-confirm-total">
-                    <span>До сплати</span>
+                    <span>Amount due</span>
                     <strong id="thanksTotal">—</strong>
                 </div>
 
@@ -200,14 +200,11 @@
                  Пошта на оформленні обов'язкова (REQUIRED_FIELDS у
                  checkout.js), тож обіцянка виконується завжди. -->
             <p>
-                Підтвердження вже надіслано на вашу пошту — перевірте
-                вхідні, інколи лист потрапляє у «Спам». Про кожну зміну
-                статусу теж напишемо.
+                A confirmation has been sent to your email — check your inbox; sometimes it lands in Spam. We'll also email you about every status change.
             </p>
 
             <p>
-                Найближчим часом наш менеджер зв'яжеться з вами,
-                щоб підтвердити замовлення.
+                Our manager will contact you shortly to confirm the order.
             </p>
 
             <!-- Стан замовлення пізніше.
@@ -216,14 +213,14 @@
                  підставленим номером: переписувати десять цифр із
                  листа нікому не хочеться. -->
             <p class="thanks-lookup">
-                Стан замовлення можна перевірити будь-коли на сторінці
-                <a href="/en/order-status" id="thanksLookupLink">Де моє замовлення</a>
-                — потрібні номер замовлення й ваш телефон.
+                You can check your order status anytime on the page
+                <a href="/en/order-status" id="thanksLookupLink">Where's my order</a>
+                — you'll need your order number and phone number.
             </p>
 
             <div class="thanks-actions">
-                <a href="/en/catalog" class="btn">Продовжити покупки</a>
-                <a href="/en/" class="btn btn-outline">На головну</a>
+                <a href="/en/catalog" class="btn">Continue shopping</a>
+                <a href="/en/" class="btn btn-outline">Back to home</a>
             </div>
 
         </div>
@@ -251,25 +248,24 @@
 
     <div class="container">
 
-        <h2>Новинки й акції на пошту</h2>
+        <h2>New arrivals and sales to your inbox</h2>
 
         <form class="subscribe" id="subscribeForm" novalidate="">
 
             <label class="subscribe-label" for="subscribeEmail">
-                Новинки й акції на пошту
+                New arrivals and sales to your inbox
             </label>
 
             <div class="subscribe-row">
                 <input type="email" id="subscribeEmail" placeholder="you@example.com" autocomplete="email" required="">
-                <button type="submit" id="subscribeSubmit">Підписатись</button>
+                <button type="submit" id="subscribeSubmit">Subscribe</button>
             </div>
 
             <label class="subscribe-consent">
                 <input type="checkbox" id="subscribeConsent">
                 <span>
-                    Згоден отримувати листи про новинки й акції.
-                    Відписатись можна з будь-якого листа —
-                    <a href="/en/privacy-policy">як ми поводимось із даними.</a>
+                    I agree to receive emails about new arrivals and sales. You can unsubscribe from any email —
+                    <a href="/en/privacy-policy">how we handle your data.</a>
                 </span>
             </label>
 
@@ -278,8 +274,7 @@
         </form>
 
         <small>
-        Жодного спаму.
-        Тільки акції та нові колекції.
+        No spam. Only sales and new collections.
         </small>
 
     </div>
@@ -295,8 +290,7 @@
             <h2>BestBrnd4u</h2>
 
             <p>
-                Інтернет-магазин сумок
-та аксесуарів.
+                Online store of bags and accessories.
             </p>
 
             <div class="footer-social">
@@ -312,22 +306,22 @@
 
         <div>
 
-            <h2>Покупцям</h2>
+            <h2>Customer info</h2>
 
             <!-- Гість не бачить замовлення в кабінеті: воно без user_id.
                  Тому посилання стоїть ПЕРШИМ у розділі — це не політика,
                  а дія, і саме її шукають найчастіше -->
-            <a href="/en/order-status">Де моє замовлення</a>
+            <a href="/en/order-status">Where's my order</a>
 
-            <a href="/en/delivery-payment#delivery">Доставка</a>
-            <a href="/en/delivery-payment#payment">Оплата</a>
-            <a href="/en/authenticity">Оригінальність</a>
-            <a href="/en/return-warranty">Повернення та гарантія</a>
+            <a href="/en/delivery-payment#delivery">Delivery</a>
+            <a href="/en/delivery-payment#payment">Payment</a>
+            <a href="/en/authenticity">Authenticity</a>
+            <a href="/en/return-warranty">Returns &amp; warranty</a>
             <a href="/en/bayer-service">Personal shopper</a>
-            <a href="/en/privacy-policy">Політика конфіденційності</a>
-            <a href="/en/offer">Публічна оферта</a>
+            <a href="/en/privacy-policy">Privacy policy</a>
+            <a href="/en/offer">Public offer</a>
             <!-- Згоду треба вміти відкликати так само легко, як дати -->
-            <a href="#" data-consent-reopen="">Налаштування даних</a>
+            <a href="#" data-consent-reopen="">Data settings</a>
 
         </div>
 
@@ -335,27 +329,27 @@
 
             <h2>Catalog</h2>
 
-            <a href="/en/catalog">Всі товари</a>
+            <a href="/en/catalog">All products</a>
 
             <!--SECTIONS_START-->
-            <a href="/en/departments/aksesuary/">Аксесуари</a>
-            <a href="/en/departments/vzuttia/">Взуття</a>
-            <a href="/en/departments/sumky/">Сумки</a>
+            <a href="/en/departments/aksesuary/">Accessories</a>
+            <a href="/en/departments/vzuttia/">Shoes</a>
+            <a href="/en/departments/sumky/">Bags</a>
             <!--SECTIONS_END-->
 
             <a href="/en/novynky/">New arrivals</a>
 
             <a href="/en/aktsii/" class="sale-text">Sale</a>
 
-            <a href="/en/brands/">Бренди</a>
+            <a href="/en/brands/">Brands</a>
 
         </div>
 
         <div>
 
-            <h2>Зв'яжіться з нами</h2>
+            <h2>Contact us</h2>
 
-            <p>📍 Україна</p>
+            <p>📍 Ukraine</p>
 
             <p>✉ <a class="mail-link" href="mailto:bestbrnd4u@proton.me">bestbrnd4u@proton.me</a></p>
 
@@ -363,7 +357,7 @@
 
             <p>☎ <a class="phone-link" href="tel:+380737288291">+380 73 728 82 91</a></p>
 
-            <p>🕘 Пн–Нд 09:00–20:00</p>
+            <p>🕘 Mon–Sun 09:00–20:00</p>
 
         </div>
 
@@ -375,8 +369,7 @@
 
     <div class="container">
 
-    © 2026 bestbrnd4u.
-    Всі права захищені.
+    © 2026 bestbrnd4u. All rights reserved.
 
     </div>
 

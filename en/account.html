@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en" data-season="standard"><head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"7a6c2900","data/catalog.json":"7af5999c","data/categories.json":"2c24d857","data/collections.json":"858469e9","data/home.json":"3b07783a","data/i18n-en.json":"22ec2d2e","data/i18n-ru.json":"b3ab7a6d","data/image-variants.json":"8d6e1e7e","data/instagram-links.json":"610ebd7b","data/legal.json":"f84751b2","data/notifications.json":"a35b367f","data/page-texts.json":"6dd1be71","data/product-texts.json":"278df72d","data/products-updated.json":"79b3052e","data/products.json":"ae78eb0a","data/promo-popups.json":"0940ece5","data/promotions.json":"92880867","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/season.json":"17f1306b","data/security.json":"0c05c691","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script><base href="/">
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"7a6c2900","data/catalog.json":"7af5999c","data/categories.json":"2c24d857","data/collections.json":"858469e9","data/home.json":"3b07783a","data/i18n-en.json":"3dd95ec2","data/i18n-ru.json":"dd3e42b7","data/image-variants.json":"8d6e1e7e","data/instagram-links.json":"610ebd7b","data/legal.json":"f84751b2","data/notifications.json":"a35b367f","data/page-texts.json":"6dd1be71","data/product-texts.json":"278df72d","data/products-updated.json":"79b3052e","data/products.json":"ae78eb0a","data/promo-popups.json":"0940ece5","data/promotions.json":"92880867","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/season.json":"17f1306b","data/security.json":"0c05c691","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script><base href="/">
     <meta name="robots" content="noindex,nofollow">
     <meta charset="UTF-8">
     <meta name="author" content="BestBrnd4u">
     <meta name="copyright" content="© 2026 BestBrnd4u. Усі права захищено.">
     <link rel="license" href="/LICENSE">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Особистий кабінет BestBrnd4u — вхід, реєстрація та історія замовлень">
+    <meta name="description" content="BestBrnd4u account — sign in, sign up and order history">
     <meta name="theme-color" content="#111827">
     <meta name="robots" content="noindex,follow">
 
@@ -29,7 +29,7 @@
     <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-v20-latin.woff2?v=v20" crossorigin="">
     <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-v20-cyrillic.woff2?v=v20" crossorigin="">
 
-    <link rel="stylesheet" href="assets/css/style.css?v=42359bef">
+    <link rel="stylesheet" href="assets/css/style.css?v=e0b0d1a8">
 
 
 
@@ -42,8 +42,8 @@
 <link rel="alternate" hreflang="ru" href="https://dev.bestbrnd4u.com/ru/account">
 <link rel="alternate" hreflang="x-default" href="https://dev.bestbrnd4u.com/account">
 <link rel="preload" href="/data/i18n-en.json" as="fetch" crossorigin>
-<script src="/assets/js/i18n-core.js?v=60e9bbb5" defer></script>
-<script src="/assets/js/i18n.js?v=7bd17491" defer></script>
+<script src="/assets/js/i18n-core.js?v=4401c5c0" defer></script>
+<script src="/assets/js/i18n.js?v=43968499" defer></script>
 <!-- i18n:end -->
 </head>
 
@@ -125,7 +125,7 @@
 
         <span class="crumb-sep">→</span>
 
-        <span class="crumb-current">Кабінет</span>
+        <span class="crumb-current">My account</span>
 
     </div>
 
@@ -150,9 +150,9 @@
                  WCAG 4.1.2. Ролі тут, у розмітці, — щоб вони діяли ще
                  до того, як виконається JS; aria-selected далі тримає
                  в згоді assets/js/account.js. -->
-            <div class="auth-tabs" role="tablist" aria-label="Вхід або реєстрація">
-                <button type="button" class="auth-tab active" data-tab="login" id="authTabLogin" role="tab" aria-selected="true" aria-controls="loginForm">Увійти</button>
-                <button type="button" class="auth-tab" data-tab="signup" id="authTabSignup" role="tab" aria-selected="false" aria-controls="signupForm" tabindex="-1">Реєстрація</button>
+            <div class="auth-tabs" role="tablist" aria-label="Sign in or register">
+                <button type="button" class="auth-tab active" data-tab="login" id="authTabLogin" role="tab" aria-selected="true" aria-controls="loginForm">Sign in</button>
+                <button type="button" class="auth-tab" data-tab="signup" id="authTabSignup" role="tab" aria-selected="false" aria-controls="signupForm" tabindex="-1">Sign up</button>
             </div>
 
             <!-- ВХІД ЧЕРЕЗ ЧУЖИЙ АКАУНТ — НАД ФОРМАМИ, А НЕ В ОДНІЙ З НИХ.
@@ -190,7 +190,7 @@
                             <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
                         </svg>
                     </span>
-                    Увійти через Google
+                    Sign in with Google
                 </button>
 
                 <!-- TELEGRAM — ОКРЕМОЮ КНОПКОЮ НА ВСЮ ШИРИНУ.
@@ -207,7 +207,7 @@
                             <path d="M11.94 24C5.34 24 0 18.63 0 12S5.34 0 11.94 0C18.55 0 24 5.37 24 12s-5.45 12-12.06 12zm5.5-17.3c-.15-.13-.38-.15-.7-.03L5.9 10.98c-.6.24-.6.58-.11.73l2.7.84 6.24-3.94c.3-.18.57-.08.35.11l-5.06 4.57-.19 2.86c.24 0 .34-.1.47-.23l1.13-1.09 2.35 1.73c.43.24.74.12.85-.4l1.54-7.25c.15-.64-.1-.94-.33-1.11z"></path>
                         </svg>
                     </span>
-                    Увійти через Telegram
+                    Sign in with Telegram
                 </button>
 
             </div>
@@ -221,22 +221,20 @@
             <div class="auth-telegram-wait" id="telegramWait" hidden="">
 
                 <p class="auth-telegram-step">
-                    Відкрили Telegram? Підтвердіть вхід у боті —
-                    там має бути цей самий код:
+                    Opened Telegram? Confirm sign-in in the bot — it should show this same code:
                 </p>
 
                 <div class="auth-telegram-code" id="telegramCode">--</div>
 
                 <p class="auth-telegram-note">
-                    Якщо код у боті інший — не підтверджуйте:
-                    це не ваш вхід.
+                    If the code in the bot is different, don't confirm: this isn't your sign-in.
                 </p>
 
-                <button type="button" class="auth-link" id="telegramCancel">Скасувати</button>
+                <button type="button" class="auth-link" id="telegramCancel">Cancel</button>
 
             </div>
 
-            <div class="auth-divider" id="authDivider" hidden=""><span>або</span></div>
+            <div class="auth-divider" id="authDivider" hidden=""><span>or</span></div>
 
             <form id="loginForm" class="auth-form" role="tabpanel" aria-labelledby="authTabLogin" novalidate="">
 
@@ -246,23 +244,23 @@
                 </label>
 
                 <label>
-                    Пароль
-                    <input type="password" id="loginPassword" required="" placeholder="Ваш пароль" autocomplete="current-password">
+                    Password
+                    <input type="password" id="loginPassword" required="" placeholder="Your password" autocomplete="current-password">
                 </label>
 
                 <span id="loginError" class="field-error"></span>
 
-                <button type="submit" class="btn" id="loginSubmit">Увійти</button>
+                <button type="submit" class="btn" id="loginSubmit">Sign in</button>
 
-                <button type="button" class="auth-link" id="forgotPasswordBtn">Забули пароль?</button>
+                <button type="button" class="auth-link" id="forgotPasswordBtn">Forgot your password?</button>
 
             </form>
 
             <form id="signupForm" class="auth-form" role="tabpanel" aria-labelledby="authTabSignup" hidden="" novalidate="">
 
                 <label>
-                    Ім'я
-                    <input type="text" id="signupName" required="" placeholder="Ваше ім'я" autocomplete="given-name">
+                    Name
+                    <input type="text" id="signupName" required="" placeholder="Your first name" autocomplete="given-name">
                 </label>
 
                 <label>
@@ -271,19 +269,19 @@
                 </label>
 
                 <label>
-                    Пароль
-                    <input type="password" id="signupPassword" required="" minlength="6" placeholder="Мінімум 6 символів" autocomplete="new-password" aria-describedby="signupPasswordHint">
+                    Password
+                    <input type="password" id="signupPassword" required="" minlength="6" placeholder="Minimum 6 characters" autocomplete="new-password" aria-describedby="signupPasswordHint">
                 </label>
 
                 <!-- Вимога — видимим рядком, а не лише в placeholder: той
                      зникає з першою літерою, тобто саме тоді, коли про
                      вимогу треба пам'ятати. Поза <label>, бо інакше рядок
                      став би частиною назви поля. -->
-                <span class="field-hint" id="signupPasswordHint">Мінімум 6 символів</span>
+                <span class="field-hint" id="signupPasswordHint">Minimum 6 characters</span>
 
                 <span id="signupError" class="field-error"></span>
 
-                <button type="submit" class="btn" id="signupSubmit">Зареєструватися</button>
+                <button type="submit" class="btn" id="signupSubmit">Sign up</button>
 
                 <!-- ПРО РОЗСИЛКУ КАЖЕМО ДО РЕЄСТРАЦІЇ, А НЕ ПІСЛЯ.
                      Зареєстрований потрапляє в розсилку автоматично —
@@ -293,9 +291,7 @@
                      магазину, включно з листами про замовлення.
                      Тому тут сказано, що буде, і де це вимкнути. -->
                 <p class="signup-note" id="signupNote">
-                    Реєструючись, ви підписуєтесь на листи про новинки й акції.
-                    Вимкнути можна будь-коли — у кабінеті, вкладка «Розсилка»,
-                    або одним кліком у самому листі.
+                    By signing up, you subscribe to emails about new arrivals and sales. You can unsubscribe anytime — in your account under the “Newsletter” tab, or in one click from the email itself.
                 </p>
 
             </form>
@@ -310,20 +306,19 @@
              вийшло, і куди тепер входити. -->
         <div id="emailChangedCard" class="auth-card" hidden="">
 
-            <h2 class="auth-card-title">Email змінено успішно</h2>
+            <h2 class="auth-card-title">Email changed successfully</h2>
             <p class="auth-card-sub">
-                Тепер входьте в кабінет із новою адресою.
-                Листи про замовлення теж ітимуть на неї.
+                From now on, sign in to your account with the new address. Order emails will go to it too.
             </p>
 
-            <button type="button" class="btn" id="emailChangedLogin">Увійти</button>
+            <button type="button" class="btn" id="emailChangedLogin">Sign in</button>
 
         </div>
 
         <div id="resetPasswordCard" class="auth-card" hidden="">
 
-            <h2 class="auth-card-title">Встановити новий пароль</h2>
-            <p class="auth-card-sub">Введіть новий пароль для входу в акаунт</p>
+            <h2 class="auth-card-title">Set new password</h2>
+            <p class="auth-card-sub">Enter a new password to sign in to your account</p>
 
             <form id="resetPasswordForm" class="auth-form" novalidate="">
 
@@ -333,20 +328,20 @@
                 <input type="email" class="pm-username" name="username" autocomplete="username" hidden="">
 
                 <label>
-                    Новий пароль
-                    <input type="password" id="newPassword" required="" minlength="6" placeholder="Мінімум 6 символів" autocomplete="new-password" aria-describedby="newPasswordHint">
+                    New password
+                    <input type="password" id="newPassword" required="" minlength="6" placeholder="Minimum 6 characters" autocomplete="new-password" aria-describedby="newPasswordHint">
                 </label>
 
-                <span class="field-hint" id="newPasswordHint">Мінімум 6 символів</span>
+                <span class="field-hint" id="newPasswordHint">Minimum 6 characters</span>
 
                 <label>
-                    Підтвердіть пароль
-                    <input type="password" id="newPasswordConfirm" required="" minlength="6" placeholder="Повторіть пароль" autocomplete="new-password">
+                    Confirm password
+                    <input type="password" id="newPasswordConfirm" required="" minlength="6" placeholder="Repeat password" autocomplete="new-password">
                 </label>
 
                 <span id="resetPasswordError" class="field-error"></span>
 
-                <button type="submit" class="btn" id="resetPasswordSubmit">Зберегти новий пароль</button>
+                <button type="submit" class="btn" id="resetPasswordSubmit">Save new password</button>
 
             </form>
 
@@ -365,12 +360,12 @@
 
             </div>
 
-            <div class="account-tabs" role="tablist" aria-label="Розділи кабінету">
-                <button type="button" class="account-tab active" data-tab="orders" id="accountTabOrders" role="tab" aria-selected="true" aria-controls="ordersPanel">Історія замовлень</button>
-                <button type="button" class="account-tab" data-tab="addresses" id="accountTabAddresses" role="tab" aria-selected="false" aria-controls="addressesPanel" tabindex="-1">Адреси доставки</button>
-                <button type="button" class="account-tab" data-tab="profile" id="accountTabProfile" role="tab" aria-selected="false" aria-controls="profilePanel" tabindex="-1">Мої дані</button>
-                <button type="button" class="account-tab" data-tab="newsletter" id="accountTabNewsletter" role="tab" aria-selected="false" aria-controls="newsletterPanel" tabindex="-1">Розсилки</button>
-                <button type="button" class="account-tab" data-tab="password" id="accountTabPassword" role="tab" aria-selected="false" aria-controls="passwordPanel" tabindex="-1">Змінити пароль</button>
+            <div class="account-tabs" role="tablist" aria-label="Account sections">
+                <button type="button" class="account-tab active" data-tab="orders" id="accountTabOrders" role="tab" aria-selected="true" aria-controls="ordersPanel">Order history</button>
+                <button type="button" class="account-tab" data-tab="addresses" id="accountTabAddresses" role="tab" aria-selected="false" aria-controls="addressesPanel" tabindex="-1">Delivery addresses</button>
+                <button type="button" class="account-tab" data-tab="profile" id="accountTabProfile" role="tab" aria-selected="false" aria-controls="profilePanel" tabindex="-1">My details</button>
+                <button type="button" class="account-tab" data-tab="newsletter" id="accountTabNewsletter" role="tab" aria-selected="false" aria-controls="newsletterPanel" tabindex="-1">Newsletters</button>
+                <button type="button" class="account-tab" data-tab="password" id="accountTabPassword" role="tab" aria-selected="false" aria-controls="passwordPanel" tabindex="-1">Change password</button>
             </div>
 
             <!-- ---- Історія замовлень ---- -->
@@ -383,7 +378,7 @@
 
                 <div id="emptyOrders" class="empty-state" hidden="">
                     <div class="empty-state-icon" aria-hidden="true">🛍️</div>
-                    <h2 class="empty-state-title">У вас поки немає замовлень</h2>
+                    <h2 class="empty-state-title">You don't have any orders yet</h2>
                     <a href="/en/catalog" class="btn">Go to catalog</a>
                 </div>
 
@@ -397,10 +392,10 @@
 
                 <div class="addresses-header">
                     <div>
-                        <h2>Адреси доставки</h2>
-                        <p class="profile-card-sub">Збережіть адресу — і на оформленні замовлення її можна буде обрати в один клік</p>
+                        <h2>Delivery addresses</h2>
+                        <p class="profile-card-sub">Save your address — and you'll be able to select it in one click at checkout</p>
                     </div>
-                    <button type="button" class="btn" id="addAddressBtn">+ Додати адресу</button>
+                    <button type="button" class="btn" id="addAddressBtn">+ Add address</button>
                 </div>
 
                 <div id="addressesLoader" class="loader">
@@ -409,8 +404,8 @@
 
                 <div id="emptyAddresses" class="empty-state" hidden="">
                     <div class="empty-state-icon" aria-hidden="true">📍</div>
-                    <h2 class="empty-state-title">У вас поки немає збережених адрес</h2>
-                    <button type="button" class="btn" id="emptyAddAddressBtn">Додати першу адресу</button>
+                    <h2 class="empty-state-title">You don't have any saved addresses yet</h2>
+                    <button type="button" class="btn" id="emptyAddAddressBtn">Add your first address</button>
                 </div>
 
                 <div id="addressesList" class="addresses-list"></div>
@@ -423,36 +418,36 @@
 
                 <div class="profile-card">
 
-                    <h2>Персональна інформація</h2>
-                    <p class="profile-card-sub">Ці дані автоматично підставляться при оформленні замовлення</p>
+                    <h2>Personal information</h2>
+                    <p class="profile-card-sub">This information will be filled in automatically at checkout</p>
 
                     <form id="profileForm" class="profile-form" novalidate="">
 
                         <div class="profile-fields">
 
                             <label>
-                                Ім'я
-                                <input type="text" id="profileFirstName" placeholder="Ваше ім'я">
+                                Name
+                                <input type="text" id="profileFirstName" placeholder="Your first name">
                             </label>
 
                             <label>
-                                Прізвище
-                                <input type="text" id="profileLastName" placeholder="Ваше прізвище">
+                                Last name
+                                <input type="text" id="profileLastName" placeholder="Your last name">
                             </label>
 
                             <label>
-                                По батькові
-                                <input type="text" id="profileMiddleName" placeholder="Необов'язково">
+                                Patronymic
+                                <input type="text" id="profileMiddleName" placeholder="Optional">
                             </label>
 
                             <label>
-                                Телефон
+                                Phone
                                 <input type="tel" id="profilePhone" placeholder="+380 73 728 82 91">
                             </label>
 
                             <label class="field-full">
-                                Місто
-                                <input type="text" id="profileCity" placeholder="Наприклад: Київ">
+                                City
+                                <input type="text" id="profileCity" placeholder="For example: Kyiv">
                             </label>
 
                         </div>
@@ -468,7 +463,7 @@
                         <div class="profile-email-row">
                             <span>Email</span>
                             <strong id="profileEmail"></strong>
-                            <button type="button" class="auth-link" id="changeEmailBtn">Змінити email</button>
+                            <button type="button" class="auth-link" id="changeEmailBtn">Change email</button>
                         </div>
 
                         <!-- ДВА КРОКИ, А НЕ ОДИН.
@@ -497,20 +492,20 @@
                                      проставляє account.js разом із
                                      написом на кнопці. -->
                                 <label>
-                                    <span id="newEmailLabel">Новий email</span>
+                                    <span id="newEmailLabel">New email</span>
                                     <input type="email" id="newEmail" placeholder="you@example.com" autocomplete="email">
                                 </label>
 
                                 <label>
-                                    <span id="newEmailConfirmLabel">Підтвердіть новий email</span>
-                                    <input type="email" id="newEmailConfirm" placeholder="Ще раз ту саму адресу" autocomplete="email">
+                                    <span id="newEmailConfirmLabel">Confirm your new email</span>
+                                    <input type="email" id="newEmailConfirm" placeholder="The same address again" autocomplete="email">
                                 </label>
 
                                 <span id="emailChangeMessage" class="field-error"></span>
 
                                 <div class="profile-email-change-actions">
-                                    <button type="button" class="btn" id="newEmailSubmit">Підтвердити</button>
-                                    <button type="button" class="auth-link" id="newEmailCancel">Скасувати</button>
+                                    <button type="button" class="btn" id="newEmailSubmit">Confirm</button>
+                                    <button type="button" class="auth-link" id="newEmailCancel">Cancel</button>
                                 </div>
 
                             </div>
@@ -518,17 +513,15 @@
                             <div id="emailChangeStepSent" class="profile-email-step" hidden="">
 
                                 <p class="profile-email-sent">
-                                    На адресу <strong id="emailChangeSentTo"></strong> надіслано лист.
-                                    <span id="emailChangeSentWhat">Пошта зміниться лише після переходу
-                                    за посиланням із нього.</span>
+                                    To address <strong id="emailChangeSentTo"></strong> an email has been sent.
+                                    <span id="emailChangeSentWhat">Your email will change only after you follow the link in it.</span>
                                 </p>
 
                                 <p class="profile-card-sub">
-                                    Листа немає? Перевірте теку «Спам». Посилання діє
-                                    обмежений час — якщо не встигнете, надішліть лист ще раз.
+                                    No email? Check your Spam folder. The link is valid for a limited time — if it expires, send the email again.
                                 </p>
 
-                                <button type="button" class="btn" id="emailChangeClose">Закрити</button>
+                                <button type="button" class="btn" id="emailChangeClose">Close</button>
 
                             </div>
 
@@ -541,16 +534,16 @@
                         <label class="profile-consent">
                             <input type="checkbox" id="profileConsent">
                             <span>
-                                Я згоден на обробку персональних даних —
-                                <a href="/en/privacy-policy" target="_blank" rel="noopener">політика конфіденційності.</a>
+                                I agree to the processing of my personal data —
+                                <a href="/en/privacy-policy" target="_blank" rel="noopener">privacy policy.</a>
                             </span>
                         </label>
 
                         <span id="profileMessage" class="field-error"></span>
 
                         <div class="profile-actions-row">
-                            <button type="submit" class="btn" id="profileSubmit">Зберегти зміни</button>
-                            <button type="button" class="btn btn-outline" id="logoutBtn">Вийти з акаунту</button>
+                            <button type="submit" class="btn" id="profileSubmit">Save changes</button>
+                            <button type="button" class="btn btn-outline" id="logoutBtn">Sign out</button>
                         </div>
 
                     </form>
@@ -565,7 +558,7 @@
 
                 <div class="profile-card">
 
-                    <h2>Розсилки</h2>
+                    <h2>Newsletters</h2>
 
                     <!-- ГАЛОЧКА, А НЕ ФОРМА ПІДПИСКИ.
 
@@ -587,23 +580,21 @@
                          про нього нізвідки. -->
                     <div class="newsletter-settings" id="newsletterSettings" hidden="">
 
-                        <h3 class="newsletter-group">Новини та знижки магазину</h3>
+                        <h3 class="newsletter-group">Store news and discounts</h3>
 
                         <p class="profile-card-sub">
-                            Листи про нові надходження, акції та ціни дня.
-                            Не частіше ніж раз на тиждень.
+                            Emails about new arrivals, sales and deals of the day. No more than once a week.
                         </p>
 
                         <label class="subscribe-consent">
                             <input type="checkbox" id="newsletterWanted">
-                            <span>Повідомляйте мені про новини та знижки магазину</span>
+                            <span>Send me store news and discounts</span>
                         </label>
 
                         <p class="profile-card-sub" id="newsletterWhere"></p>
 
                         <p class="field-note" id="newsletterPending" hidden="">
-                            Підписку ще не підтверджено. Перевірте пошту (і теку
-                            «Спам») — там лист із посиланням.
+                            Your subscription isn't confirmed yet. Check your inbox (and the Spam folder) — there's an email with a link.
                         </p>
 
                         <!-- ЩО ЛИШАЄТЬСЯ ПРИ БУДЬ-ЯКОМУ ВИБОРІ.
@@ -612,13 +603,12 @@
                              я тепер теж не побачу?». Кажемо це поруч із
                              галочкою, а не десь унизу сторінки. -->
                         <p class="profile-card-sub newsletter-keep">
-                            Листи про замовлення приходитимуть у будь-якому разі:
-                            це не розсилка, а підтвердження покупки.
+                            Order emails will be sent regardless: they're not a newsletter but purchase confirmations.
                         </p>
 
                         <span id="newsletterMessage" class="field-error"></span>
 
-                        <button type="button" class="btn" id="newsletterSave">Зберегти</button>
+                        <button type="button" class="btn" id="newsletterSave">Save</button>
 
                     </div>
 
@@ -628,9 +618,7 @@
                     <div class="newsletter-settings" id="newsletterNoEmail" hidden="">
 
                         <p class="profile-card-sub">
-                            Щоб отримувати листи, спершу додайте email у вкладці
-                            «Мої дані» — зараз ви входите через Telegram, і адреси
-                            для листів у акаунті немає.
+                            To receive emails, first add your email in the "My details" tab — you're signing in via Telegram, so there's no email address on your account.
                         </p>
 
                     </div>
@@ -645,7 +633,7 @@
 
                 <div class="profile-card">
 
-                    <h2>Змінити пароль</h2>
+                    <h2>Change password</h2>
 
                     <!-- СТАРИЙ ПАРОЛЬ ПИТАЄМО НЕ ДЛЯ ПОРЯДКУ.
 
@@ -665,20 +653,20 @@
                         <input type="email" class="pm-username" name="username" autocomplete="username" hidden="">
 
                         <label>
-                            Старий пароль
-                            <input type="password" id="oldPassword" placeholder="Ваш поточний пароль" autocomplete="current-password">
+                            Current password
+                            <input type="password" id="oldPassword" placeholder="Your current password" autocomplete="current-password">
                         </label>
 
                         <label>
-                            Новий пароль (від 6 до 30 символів)
-                            <input type="password" id="changedPassword" placeholder="Новий пароль" autocomplete="new-password">
+                            New password (6 to 30 characters)
+                            <input type="password" id="changedPassword" placeholder="New password" autocomplete="new-password">
                         </label>
 
                         <span id="passwordMessage" class="field-error"></span>
 
                         <div class="profile-actions-row">
-                            <button type="submit" class="btn" id="passwordSubmit">Змінити пароль</button>
-                            <button type="button" class="auth-link" id="forgotPasswordInsideBtn">Забули пароль?</button>
+                            <button type="submit" class="btn" id="passwordSubmit">Change password</button>
+                            <button type="button" class="auth-link" id="forgotPasswordInsideBtn">Forgot your password?</button>
                         </div>
 
                     </form>
@@ -691,7 +679,7 @@
                         <div id="forgotStepForm" class="profile-email-step">
 
                             <p class="profile-card-sub" id="forgotIntro">
-                                Надішлемо посилання для відновлення пароля на
+                                We'll send a password reset link to
                                 <strong id="forgotEmail"></strong>.
                             </p>
 
@@ -709,16 +697,14 @@
                                  (акаунт на телефон або знята галочка з пошти).
                                  Зашитий «Telegram» казав другим неправду. -->
                             <p class="profile-card-sub" id="forgotNoMail" hidden="">
-                                Ви входите через <span id="forgotNoMailVia">соцмережу</span> — пароля в акаунті немає.
-                                Щоб мати ще й вхід за паролем, спершу додайте email
-                                у вкладці «Мої дані».
+                                You're signing in with <span id="forgotNoMailVia">social network</span> — your account has no password. To also sign in with a password, first add an email in the “My details” tab.
                             </p>
 
                             <span id="forgotMessage" class="field-error"></span>
 
                             <div class="profile-email-change-actions">
-                                <button type="button" class="btn" id="forgotSubmit">Відновити</button>
-                                <button type="button" class="auth-link" id="forgotCancel">Скасувати</button>
+                                <button type="button" class="btn" id="forgotSubmit">Restore</button>
+                                <button type="button" class="auth-link" id="forgotCancel">Cancel</button>
                             </div>
 
                         </div>
@@ -726,11 +712,11 @@
                         <div id="forgotStepSent" class="profile-email-step" hidden="">
 
                             <p class="profile-email-sent">
-                                Посилання для відновлення пароля надіслано на
+                                A password reset link has been sent to
                                 <strong id="forgotSentTo"></strong>.
                             </p>
 
-                            <button type="button" class="btn" id="forgotClose">Закрити</button>
+                            <button type="button" class="btn" id="forgotClose">Close</button>
 
                         </div>
 
@@ -765,25 +751,24 @@
 
     <div class="container">
 
-        <h2>Новинки й акції на пошту</h2>
+        <h2>New arrivals and sales to your inbox</h2>
 
         <form class="subscribe" id="subscribeForm" novalidate="">
 
             <label class="subscribe-label" for="subscribeEmail">
-                Новинки й акції на пошту
+                New arrivals and sales to your inbox
             </label>
 
             <div class="subscribe-row">
                 <input type="email" id="subscribeEmail" placeholder="you@example.com" autocomplete="email" required="">
-                <button type="submit" id="subscribeSubmit">Підписатись</button>
+                <button type="submit" id="subscribeSubmit">Subscribe</button>
             </div>
 
             <label class="subscribe-consent">
                 <input type="checkbox" id="subscribeConsent">
                 <span>
-                    Згоден отримувати листи про новинки й акції.
-                    Відписатись можна з будь-якого листа —
-                    <a href="/en/privacy-policy">як ми поводимось із даними.</a>
+                    I agree to receive emails about new arrivals and sales. You can unsubscribe from any email —
+                    <a href="/en/privacy-policy">how we handle your data.</a>
                 </span>
             </label>
 
@@ -792,8 +777,7 @@
         </form>
 
         <small>
-        Жодного спаму.
-        Тільки акції та нові колекції.
+        No spam. Only sales and new collections.
         </small>
 
     </div>
@@ -809,8 +793,7 @@
             <h2>BestBrnd4u</h2>
 
             <p>
-                Інтернет-магазин сумок
-та аксесуарів.
+                Online store of bags and accessories.
             </p>
 
             <div class="footer-social">
@@ -826,22 +809,22 @@
 
         <div>
 
-            <h2>Покупцям</h2>
+            <h2>Customer info</h2>
 
             <!-- Гість не бачить замовлення в кабінеті: воно без user_id.
                  Тому посилання стоїть ПЕРШИМ у розділі — це не політика,
                  а дія, і саме її шукають найчастіше -->
-            <a href="/en/order-status">Де моє замовлення</a>
+            <a href="/en/order-status">Where's my order</a>
 
-            <a href="/en/delivery-payment#delivery">Доставка</a>
-            <a href="/en/delivery-payment#payment">Оплата</a>
-            <a href="/en/authenticity">Оригінальність</a>
-            <a href="/en/return-warranty">Повернення та гарантія</a>
+            <a href="/en/delivery-payment#delivery">Delivery</a>
+            <a href="/en/delivery-payment#payment">Payment</a>
+            <a href="/en/authenticity">Authenticity</a>
+            <a href="/en/return-warranty">Returns &amp; warranty</a>
             <a href="/en/bayer-service">Personal shopper</a>
-            <a href="/en/privacy-policy">Політика конфіденційності</a>
-            <a href="/en/offer">Публічна оферта</a>
+            <a href="/en/privacy-policy">Privacy policy</a>
+            <a href="/en/offer">Public offer</a>
             <!-- Згоду треба вміти відкликати так само легко, як дати -->
-            <a href="#" data-consent-reopen="">Налаштування даних</a>
+            <a href="#" data-consent-reopen="">Data settings</a>
 
         </div>
 
@@ -849,27 +832,27 @@
 
             <h2>Catalog</h2>
 
-            <a href="/en/catalog">Всі товари</a>
+            <a href="/en/catalog">All products</a>
 
             <!--SECTIONS_START-->
-            <a href="/en/departments/aksesuary/">Аксесуари</a>
-            <a href="/en/departments/vzuttia/">Взуття</a>
-            <a href="/en/departments/sumky/">Сумки</a>
+            <a href="/en/departments/aksesuary/">Accessories</a>
+            <a href="/en/departments/vzuttia/">Shoes</a>
+            <a href="/en/departments/sumky/">Bags</a>
             <!--SECTIONS_END-->
 
             <a href="/en/novynky/">New arrivals</a>
 
             <a href="/en/aktsii/" class="sale-text">Sale</a>
 
-            <a href="/en/brands/">Бренди</a>
+            <a href="/en/brands/">Brands</a>
 
         </div>
 
         <div>
 
-            <h2>Зв'яжіться з нами</h2>
+            <h2>Contact us</h2>
 
-            <p>📍 Україна</p>
+            <p>📍 Ukraine</p>
 
             <p>✉ <a class="mail-link" href="mailto:bestbrnd4u@proton.me">bestbrnd4u@proton.me</a></p>
 
@@ -877,7 +860,7 @@
 
             <p>☎ <a class="phone-link" href="tel:+380737288291">+380 73 728 82 91</a></p>
 
-            <p>🕘 Пн–Нд 09:00–20:00</p>
+            <p>🕘 Mon–Sun 09:00–20:00</p>
 
         </div>
 
@@ -889,14 +872,13 @@
 
     <div class="container">
 
-    © 2026 bestbrnd4u.
-    Всі права захищені.
+    © 2026 bestbrnd4u. All rights reserved.
 
     </div>
 
 </div>
 
-<button id="scrollTop" class="scroll-top" aria-label="Нагору">
+<button id="scrollTop" class="scroll-top" aria-label="Back to top">
     ↑
 </button>
 
@@ -904,18 +886,17 @@
     <div class="modal-card">
 
         <div class="modal-header">
-            <h3>Видалити адресу?</h3>
-            <button type="button" id="confirmDeleteClose" class="modal-close" aria-label="Закрити">✕</button>
+            <h3>Delete address?</h3>
+            <button type="button" id="confirmDeleteClose" class="modal-close" aria-label="Close">✕</button>
         </div>
 
         <p class="modal-text">
-            Цю адресу доставки буде видалено назавжди.
-            Цю дію не можна скасувати.
+            This delivery address will be permanently deleted. This action can't be undone.
         </p>
 
         <div class="modal-actions">
-            <button type="button" id="confirmDeleteYes" class="btn-modal btn-modal-confirm">Так, видалити</button>
-            <button type="button" id="confirmDeleteNo" class="btn-modal btn-modal-cancel">Скасувати</button>
+            <button type="button" id="confirmDeleteYes" class="btn-modal btn-modal-confirm">Yes, delete</button>
+            <button type="button" id="confirmDeleteNo" class="btn-modal btn-modal-cancel">Cancel</button>
         </div>
 
     </div>
@@ -934,8 +915,8 @@
     <div class="modal-card address-modal-card">
 
         <div class="modal-header">
-            <h3 id="addressModalTitle">Нова адреса</h3>
-            <button type="button" id="addressModalClose" class="modal-close" aria-label="Закрити">✕</button>
+            <h3 id="addressModalTitle">New address</h3>
+            <button type="button" id="addressModalClose" class="modal-close" aria-label="Close">✕</button>
         </div>
 
         <form id="addressForm" class="auth-form" novalidate="">
@@ -943,13 +924,13 @@
             <input type="hidden" id="addressId">
 
             <label>
-                Назва адреси (необов'язково)
-                <input type="text" id="addressLabel" placeholder="Наприклад: Дім, Робота">
+                Address name (optional)
+                <input type="text" id="addressLabel" placeholder="For example: Home, Work">
             </label>
 
             <label>
-                Місто
-                <input type="text" id="addressCity" required="" placeholder="Наприклад: Київ">
+                City
+                <input type="text" id="addressCity" required="" placeholder="For example: Kyiv">
             </label>
 
             <!-- data-menu вмикає власний випадний список замість
@@ -958,48 +939,48 @@
                  що читає addressMethod.value, працює як працювало, а
                  без JS список поводиться як звичайний. -->
             <label>
-                Спосіб отримання
+                Pickup method
                 <select id="addressMethod" data-menu="" required="">
-                    <option value="На відділення «Нова пошта»">На відділення «Нова пошта»</option>
-                    <option value="Поштомат «Нова пошта»">Поштомат «Нова пошта»</option>
-                    <option value="Кур'єром «Нова пошта»">Кур'єром «Нова пошта»</option>
-                    <option value="Інша пошта">Інша пошта (Укрпошта, Meest)</option>
+                    <option value="На відділення «Нова пошта»">To a Nova Poshta branch</option>
+                    <option value="Поштомат «Нова пошта»">Nova Poshta parcel locker</option>
+                    <option value="Кур'єром «Нова пошта»">Nova Poshta courier</option>
+                    <option value="Інша пошта">Other carrier (Ukrposhta, Meest)</option>
                 </select>
             </label>
 
             <label id="addressBranchField">
-                Номер відділення
-                <input type="text" id="addressBranchNumber" placeholder="Наприклад: Відділення №45">
+                Branch number
+                <input type="text" id="addressBranchNumber" placeholder="For example: Branch No. 45">
             </label>
 
             <label id="addressPostomatField" hidden="">
-                Номер поштомату
-                <input type="text" id="addressPostomatNumber" placeholder="Наприклад: Поштомат №1234">
+                Parcel locker number
+                <input type="text" id="addressPostomatNumber" placeholder="For example: Parcel locker No. 1234">
             </label>
 
             <label id="addressCourierField" hidden="">
-                Адреса (вулиця, будинок, квартира)
-                <input type="text" id="addressCourierAddress" placeholder="Вулиця, будинок, квартира">
+                Address (street, building, apartment)
+                <input type="text" id="addressCourierAddress" placeholder="Street, building, apartment">
             </label>
 
             <!-- Довідника Укрпошти чи Meest у нас немає, тому
                  перевізника й відділення покупець пише сам одним
                  рядком — так само, як на оформленні замовлення. -->
             <label id="addressOtherField" hidden="">
-                Перевізник, відділення або адреса
-                <input type="text" id="addressOtherCarrier" placeholder="Наприклад: Укрпошта, відділення 03150">
+                Carrier, branch or address
+                <input type="text" id="addressOtherCarrier" placeholder="For example: Ukrposhta, branch 03150">
             </label>
 
             <label class="address-default-check">
                 <input type="checkbox" id="addressIsDefault">
-                Використовувати за замовчуванням
+                Use as default
             </label>
 
             <span id="addressFormError" class="field-error"></span>
 
             <div class="modal-actions">
-                <button type="submit" class="btn" id="addressSubmitBtn">Зберегти адресу</button>
-                <button type="button" class="btn btn-outline" id="addressCancelBtn">Скасувати</button>
+                <button type="submit" class="btn" id="addressSubmitBtn">Save address</button>
+                <button type="button" class="btn btn-outline" id="addressCancelBtn">Cancel</button>
             </div>
 
         </form>
