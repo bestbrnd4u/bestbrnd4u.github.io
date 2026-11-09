@@ -488,5 +488,86 @@ console.log("\n[14] Живі відповіді (побажання власни
     check("en «how long is the strap?» — лише про ремінь, без «коли отримаю»", /Strap/.test(strapEn.text) && !/We ship/.test(strapEn.text), strapEn.text);
 }
 
+console.log("\n[15] Моделі, розміри, сортування, «друга», мова повідомлення");
+{
+    // Назва моделі.
+    const tabby = talk("uk", ["Tabby є?"]);
+    check("«Tabby є?» — моделі Tabby", tabby.products.length > 0 && tabby.products.every(p => /tabby/i.test(p.title)) && /^Ось моделі Tabby/.test(tabby.text), tabby.text);
+    const snap = talk("en", ["do you have the Marc Jacobs Snapshot"]);
+    check("en «Marc Jacobs Snapshot» — саме Snapshot", snap.products.length > 0 && snap.products.every(p => /snapshot/i.test(p.title)));
+    check("код моделі «gg0516s»", talk("uk", ["gg0516s"]).products.some(p => /GG0516S/i.test(p.title)));
+    const generic = ["gift", "soft", "heart", "lady", "strap", "camera", "denim", "set"].filter(w => bot.findModels(w, data));
+    check("звичайні слова з назв — не моделі", generic.length === 0, generic.join(", "));
+    check("«a gift» — не модель, а уточнення «для кого»", talk("en", ["a gift"]).intent === "ask");
+
+    // Розмір взуття.
+    const s38 = talk("uk", ["кросівки 38 розміру"]);
+    const has = (p, size) => p.details.variants.some(v => v.sizes.some(x => x.size === size));
+    check("«кросівки 38 розміру» — лише моделі з 38-м", s38.products.length > 0 && items(s38).every(p => has(p, "38")) && /38 розміру/.test(s38.text), s38.text);
+    check("«сумка до 38 000» — бюджет, а не розмір", !talk("uk", ["сумка до 38 000"]).text.includes("розміру"));
+    const absent = ["46", "45", "44", "43", "42", "41", "40"].find(sz => !data.products.some(p => p.category === "Кросівки" && has(p, sz)));
+    if (absent) {
+        const no = talk("uk", ["кросівки", `а ${absent}-й є?`]);
+        check(`«кросівки» → «а ${absent}-й є?» — немає, і які розміри є (кнопками)`,
+            new RegExp(`^${absent}-го розміру зараз немає`).test(no.text) && no.chips.some(c => /розмір/.test(c)), no.text);
+    }
+
+    // Помилки в назвах типів.
+    [["uk", "кросовки білі", "Кросівки"], ["uk", "годиники чоловічі", "Годинники"], ["uk", "окулари", "Окуляри і оправи"], ["uk", "гаманец", "Гаманці"]]
+        .forEach(([lang, q, cat]) => check(`помилка в назві: «${q}»`, (r => r.products.length > 0 && items(r).every(p => p.category === cat)
+            // Тип має бути саме ВПІЗНАНИЙ (видно в заголовку), а не
+            // випадково збігтися: перші чотири білі речі — і так кросівки.
+            && /кросівки|годинники|окуляри|гаманці/.test(r.text))(talk(lang, [q]))));
+
+    // Сортування.
+    const cheap = talk("uk", ["найдешевші сумки"]);
+    const bagPrices = data.products.filter(p => p.department === "Сумки").map(p => bot.botPriceNow(p, NOW)).sort((a, b) => a - b);
+    check("«найдешевші сумки» — від найдешевшої, заголовок «найдоступніші»",
+        cheap.products[0].price === bagPrices[0] && /найдоступніші сумки/.test(cheap.text));
+    const pricey = talk("uk", ["найдорожчі годинники"]);
+    const watchMax = Math.max(...data.products.filter(p => p.category === "Годинники").map(p => bot.botPriceNow(p, NOW)));
+    check("«найдорожчі годинники» — від найдорожчого", pricey.products[0].price === watchMax);
+
+    // Діапазон цін і кількість.
+    const range = talk("uk", ["скільки коштують годинники?"]);
+    const wp = data.products.filter(p => p.category === "Годинники").map(p => bot.botPriceNow(p, NOW)).sort((a, b) => a - b);
+    check("«скільки коштують годинники?» — від найдешевшого до найдорожчого",
+        range.text.includes(bot.botPriceNow({ price: wp[0] }).toLocaleString("uk-UA").replace(/ | /g, " ")) && /до .*₴/.test(range.text) && range.products.length > 0, range.text);
+    const count = talk("uk", ["скільки у вас сумок?"]);
+    check("«скільки у вас сумок?» — число", count.text.includes(String(data.products.filter(p => p.department === "Сумки").length)), count.text);
+    check("«скільки коштує доставка?» — як і раніше, доставка", talk("uk", ["скільки коштує доставка?"]).intent === "faq");
+
+    // Широкий запит — уточнення «для кого».
+    check("«сумка» (48 варіантів) — кнопки «Жіночі / Чоловічі сумки»", (r => r.chips.includes("Жіночі сумки") && r.chips.includes("Чоловічі сумки"))(talk("uk", ["сумка"])));
+
+    // Схожі на сторінці товару.
+    const bag = data.products.find(p => p.department === "Сумки");
+    const sim = bot.botReply("покажи схожі", [], data, { lang: "uk", now: NOW, page: `/p/${bag.slug}/` });
+    check("«покажи схожі» — той самий розділ, без самого товару, ціна ±35 %",
+        sim.products.length > 0 && items(sim).every(p => p.category === bag.category && p.slug !== bag.slug
+            && Math.abs(bot.botPriceNow(p, NOW) - bot.botPriceNow(bag, NOW)) <= bot.botPriceNow(bag, NOW) * 0.35));
+
+    // «Друга», «перша» — товар з останньої підбірки.
+    const list0 = talk("uk", ["жіноча сумка до 9000"]);
+    const second = talk("uk", ["жіноча сумка до 9000", "скільки коштує друга?"]);
+    check("«скільки коштує друга?» — ціна саме другої картки й посилання на неї",
+        second.intent === "product" && second.text.includes(list0.products[1].url) && second.text.includes(list0.products[1].price.toLocaleString("uk-UA").replace(/ | /g, " ")), second.text);
+    check("«подарунок другу» — це не «другий товар», а подарунок чоловікові", talk("uk", ["жіноча сумка", "подарунок другу"]).intent === "products"
+        && bot.parseWish("подарунок другу", data).gender === "Чоловікам");
+    check("ru «есть другой цвет?» — не «другий товар»", bot.ordinalOf("есть другой цвет?") === null);
+    check("«додайте в кошик» — як це зробити самому", /«Купити»/.test(talk("uk", ["додайте в кошик"]).text));
+    check("«відкладіть для мене» — передає менеджеру", talk("uk", ["відкладіть для мене"]).handoff === true);
+    check("«подарунок» без деталей — уточнення, а не 103 речі", (r => r.intent === "ask" && r.products.length === 0 && r.chips.length >= 4)(talk("uk", ["подарунок"])));
+
+    // Мова повідомлення важливіша за мову сторінки.
+    const ruOnUk = bot.botReply("хочу черную сумку", [], data, { lang: "uk", now: NOW });
+    check("російською на українській сторінці — відповідь російською, посилання на /ru/",
+        /^Вот черные сумки/.test(ruOnUk.text) && ruOnUk.products.every(p => /\/ru\/p\//.test(p.url)), ruOnUk.text);
+    const enOnUk = bot.botReply("do you have black bags?", [], data, { lang: "uk", now: NOW });
+    check("англійською на українській — англійською", /^Here are the black bags/.test(enOnUk.text));
+    check("назва бренду латиницею — не англійська мова", bot.detectLang("Coach", "uk") === "uk" && bot.detectLang("Michael Kors", "ru") === "ru");
+    check("«привіт» на /ru/ — українською", bot.detectLang("привіт, є чорні сумки?", "ru") === "uk");
+}
+
 console.log(failures ? `\n✗ Провалено: ${failures}` : "\n✓ Усе зелено");
 process.exit(failures ? 1 : 0);
