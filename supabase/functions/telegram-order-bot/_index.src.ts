@@ -3113,7 +3113,7 @@ async function handleChatSend(request: Request, body: Record<string, any>): Prom
   // розмові відповів власник або бот сам передав її людині. Будь-яка
   // його помилка не має зачепити саме повідомлення — воно вже
   // збережене й переслане власнику.
-  const bot = await answerWithBot(thread, saved, text, body.lang).catch((error) => {
+  const bot = await answerWithBot(thread, saved, text, body.lang, cleanChatPage(body.page)).catch((error) => {
     console.error("Чат: бот не відповів:", error);
     return null;
   });
@@ -3141,7 +3141,7 @@ async function loadChatBotData(): Promise<any> {
 }
 
 async function answerWithBot(
-  thread: Record<string, any>, saved: Record<string, any>, text: string, lang: unknown,
+  thread: Record<string, any>, saved: Record<string, any>, text: string, lang: unknown, page = "",
 ): Promise<Record<string, any> | null> {
 
   const data = await loadChatBotData();
@@ -3154,7 +3154,7 @@ async function answerWithBot(
     `&select=author,body&order=id.desc&limit=20`);
   const history = prior.ok ? ((await prior.json().catch(() => [])) ?? []).reverse() : [];
 
-  const reply = botReply(text, history, data, { lang: botLang(lang), siteUrl: BOT_SITE });
+  const reply = botReply(text, history, data, { lang: botLang(lang), siteUrl: BOT_SITE, page });
 
   if (!reply) return null;
 

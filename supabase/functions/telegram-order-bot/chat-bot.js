@@ -115,6 +115,105 @@ const T = {
     }
 };
 
+// Друга частина текстів: про товар, на сторінці якого пише людина,
+// контакти, промокоди, неробочий час.
+const T2 = {
+    uk: {
+        offHours: " Зараз неробочий час — менеджер відповість після 09:00.",
+        contacts: "Звʼязатися з нами можна так:",
+        phone: "Телефон", telegram: "Telegram", instagram: "Instagram", email: "Пошта",
+        contactsHours: "Працюємо {hours}.",
+        promo: "Промокод вводиться в полі «Маєте промокод?» на сторінці оформлення замовлення — знижка порахується одразу. Діючі акції — на сторінці «Акції»: {url}",
+        about: "Про «{title}»:",
+        price: "Ціна — {price}.",
+        priceSale: "Ціна зараз — {price} (було {old}).",
+        colors: "Кольори: {list}.",
+        colorOne: "Колір: {list}.",
+        sizesIn: "Розміри в наявності: {list}.",
+        sizesPre: "Під замовлення: {list}.",
+        sizesNone: "Зараз усі розміри — під замовлення.",
+        inStock: "Є в наявності. Відправляємо за {h} робочі дні, доставка Новою поштою — ще {t} дні.",
+        preOrder: "Цей товар — під замовлення: {days}.",
+        preOrderNoDays: "Цей товар — під замовлення; строк уточнить менеджер.",
+        colorPre: "Колір «{color}» — під замовлення.",
+        material: "Матеріал: {value}.",
+        dimensions: "Розміри: {value}.",
+        noInfo: "Цього в картці товару не вказано — передаю питання менеджеру.",
+        authentic: "Так, це оригінал — у каталозі немає реплік і копій. Докладніше: {url}"
+    },
+    en: {
+        offHours: " It's outside working hours now — a manager will reply after 09:00 (Kyiv time).",
+        contacts: "You can reach us:",
+        phone: "Phone", telegram: "Telegram", instagram: "Instagram", email: "Email",
+        contactsHours: "We work {hours}.",
+        promo: "Enter a promo code in the “Have a promo code?” field at checkout — the discount is applied right away. Current sales: {url}",
+        about: "About “{title}”:",
+        price: "Price — {price}.",
+        priceSale: "Price now — {price} (was {old}).",
+        colors: "Colors: {list}.",
+        colorOne: "Color: {list}.",
+        sizesIn: "Sizes in stock: {list}.",
+        sizesPre: "Made to order: {list}.",
+        sizesNone: "All sizes are made to order right now.",
+        inStock: "In stock. We ship within {h} business days, Nova Poshta delivery takes {t} more days.",
+        preOrder: "This item is made to order: {days}.",
+        preOrderNoDays: "This item is made to order; a manager will confirm the timing.",
+        colorPre: "The “{color}” color is made to order.",
+        material: "Material: {value}.",
+        dimensions: "Dimensions: {value}.",
+        noInfo: "That isn't listed on the product page — I'm passing your question to a manager.",
+        authentic: "Yes, it's authentic — there are no replicas or copies in our catalog. More: {url}"
+    },
+    ru: {
+        offHours: " Сейчас нерабочее время — менеджер ответит после 09:00.",
+        contacts: "Связаться с нами можно так:",
+        phone: "Телефон", telegram: "Telegram", instagram: "Instagram", email: "Почта",
+        contactsHours: "Работаем {hours}.",
+        promo: "Промокод вводится в поле «Есть промокод?» на странице оформления заказа — скидка посчитается сразу. Действующие акции — на странице «Акции»: {url}",
+        about: "О «{title}»:",
+        price: "Цена — {price}.",
+        priceSale: "Цена сейчас — {price} (было {old}).",
+        colors: "Цвета: {list}.",
+        colorOne: "Цвет: {list}.",
+        sizesIn: "Размеры в наличии: {list}.",
+        sizesPre: "Под заказ: {list}.",
+        sizesNone: "Сейчас все размеры — под заказ.",
+        inStock: "Есть в наличии. Отправляем за {h} рабочих дня, доставка Новой почтой — еще {t} дня.",
+        preOrder: "Этот товар — под заказ: {days}.",
+        preOrderNoDays: "Этот товар — под заказ; срок уточнит менеджер.",
+        colorPre: "Цвет «{color}» — под заказ.",
+        material: "Материал: {value}.",
+        dimensions: "Размеры: {value}.",
+        noInfo: "Этого в карточке товара не указано — передаю вопрос менеджеру.",
+        authentic: "Да, это оригинал — в каталоге нет реплик и копий. Подробнее: {url}"
+    }
+};
+
+const T3 = {
+    uk: {
+        colorYes: "Так, є: {list}.",
+        colorNo: "Такого кольору в цієї моделі немає. Є: {list}.",
+        brandOther: "{what} {brand} зараз немає, але є інші речі {brand}:"
+    },
+    en: {
+        colorYes: "Yes, available: {list}.",
+        colorNo: "This model doesn't come in that color. Available: {list}.",
+        brandOther: "No {what} from {brand} right now, but here are other {brand} items:"
+    },
+    ru: {
+        colorYes: "Да, есть: {list}.",
+        colorNo: "Такого цвета у этой модели нет. Есть: {list}.",
+        brandOther: "{what} {brand} сейчас нет, но есть другие вещи {brand}:"
+    }
+};
+
+// Назви типів для фрази «Сумок Prada зараз немає».
+const TYPE_WORDS = {
+    uk: { bags: "Сумок", watches: "Годинників", glasses: "Окулярів", sneakers: "Кросівок", wallets: "Гаманців" },
+    en: { bags: "bags", watches: "watches", glasses: "sunglasses", sneakers: "sneakers", wallets: "wallets" },
+    ru: { bags: "Сумок", watches: "Часов", glasses: "Очков", sneakers: "Кроссовок", wallets: "Кошельков" }
+};
+
 function fill(text, vars) {
     return String(text).replace(/\{(\w+)\}/g, (m, k) => (vars && k in vars ? String(vars[k]) : m));
 }
@@ -265,6 +364,10 @@ export function parseWish(text, data) {
     const brand = brands.find(b => raw.includes(" " + normalizeText(b) + " ") || raw.includes(" " + normalizeText(b).split(" ")[0] + " ") && normalizeText(b).split(" ")[0].length > 4)
         || Object.keys(BRAND_ALIASES).find(b => brands.includes(b) && BRAND_ALIASES[b].some(a => raw.includes(" " + a)));
     if (brand) wish.brand = brand;
+    else {
+        const fuzzy = fuzzyBrand(text, data);
+        if (fuzzy) wish.brand = fuzzy;
+    }
 
     const budget = parseBudget(text);
     if (budget) wish.budget = budget;
@@ -444,6 +547,233 @@ function pageUrl(site, path, lang) {
     return base + (lang === "uk" ? path : `/${lang}${path}`);
 }
 
+// ── Неробочий час ──────────────────────────────────────────────────
+
+// Година в Києві. Функція Supabase живе в UTC, а графік магазину —
+// київський; зсув літо/зима бере на себе Intl.
+export function kyivHour(now) {
+    try {
+        return Number(new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Kyiv", hour: "numeric", hourCycle: "h23" })
+            .format(new Date(Number.isFinite(now) ? now : Date.now())));
+    } catch (error) {
+        return 12;
+    }
+}
+
+export function offHours(now) {
+    const h = kyivHour(now);
+    return h < 9 || h >= 20;
+}
+
+// ── Автовідповіді власника (адмінка) ───────────────────────────────
+
+// Ключове слово — як у hasStem: початок слова або фраза. Власник
+// пише «розстрочк», «частинами» — і так само ловляться «розстрочка»,
+// «розстрочку».
+export function ownerAnswer(text, data, lang) {
+    const list = words(text);
+    const answers = (data && data.answers) || [];
+    for (const a of answers) {
+        const keys = (a.keywords || []).map(k => normalizeText(k)).filter(Boolean);
+        if (!keys.length || !hasStem(list, keys)) continue;
+        const body = a.answer && a.answer[lang];
+        // Немає відповіді цією мовою — не відповідаємо українською
+        // людині з /en/: краще передати менеджеру.
+        if (!body) return lang === "uk" ? null : { missing: true };
+        return { text: body + (a.link ? "\n" + a.link : "") };
+    }
+    return null;
+}
+
+// ── Товар, на сторінці якого пише людина ───────────────────────────
+
+export function productFromPage(page, data) {
+    const m = String(page || "").match(/\/p\/([^/?#]+)/);
+    if (!m) return null;
+    let slug = m[1];
+    try { slug = decodeURIComponent(slug); } catch (error) { /* як є */ }
+    return ((data && data.products) || []).find(p => p.slug === slug) || null;
+}
+
+const ASK = {
+    colors: ["кольор", "колір", "колор", "цвет", "цвета", "color", "colour", "чорн", "черн", "біл", "бел", "black", "white", "інш колір", "другой цвет", "other color"],
+    sizes: ["розмір", "розмер", "размер", "size", "сітк", "сетк", "маломір", "маломер", "великомір", "большемер"],
+    stock: ["наявн", "наличи", "in stock", "available", "availability", "є в ", "є?", "есть в ", "залиш", "остал", "коли отрима", "когда получ", "when will i get", "скільки чека", "сколько жда", "how long"],
+    price: ["ціна", "ціну", "ціни", "скільки кошту", "вартість", "цена", "цену", "сколько стоит", "стоимость", "price", "cost", "how much"],
+    material: ["матеріал", "материал", "шкір", "кожа", "кожан", "material", "leather", "з чого", "из чего", "made of", "склад", "состав"],
+    dimensions: ["габарит", "розміри сумк", "размеры сумк", "dimension", "заввишки", "завширшки", "высот", "ширин", "how big", "влізе", "влезет", "fit"],
+    authentic: ["оригінал", "оригинал", "справжн", "настоящ", "authentic", "original", "genuine", "fake", "реплік", "реплик", "підробк", "подделк"]
+};
+
+function colorName(v, lang) {
+    return (v.color && (v.color[lang] || v.color.uk)) || v.colorUk || "";
+}
+
+// Відповідь про конкретний товар. null — питання не про нього (або
+// людина питає про щось інше: «а сумки Coach є?» — це вже підбір).
+export function productAnswer(text, product, data, lang, now, site) {
+
+    if (!product || !product.details) return null;
+
+    const list = words(text);
+    const L = T2[lang];
+    const asked = Object.keys(ASK).filter(k => hasStem(list, ASK[k]));
+    // Будь-який колір зі словника («а червоний є?») — теж питання про
+    // колір, не лише ті кілька, що в ASK.colors.
+    if (!asked.includes("colors") && COLORS.some(c => hasStem(list, c.stems))) asked.push("colors");
+
+    // «Є чорний?» на сторінці годинника — це питання про ЦЕЙ годинник,
+    // а «чорна сумка Coach» на тій самій сторінці — підбір. Ознака
+    // підбору — ІНШИЙ тип чи бренд або бюджет. Той самий тип («які
+    // розміри сумки?» на сторінці сумки) — це все ще про неї.
+    const wish = parseWish(text, data);
+    const sameType = wish && wish.type && (() => {
+        const t = TYPES.find(x => x.key === wish.type);
+        return t && ((t.department && t.department === product.department) || (t.category && t.category === product.category));
+    })();
+    if (wish && ((wish.type && !sameType) || (wish.brand && wish.brand !== product.brand) || wish.budget)) return null;
+
+    if (!asked.length) return null;
+
+    const d = product.details;
+    const title = (product.title && (product.title[lang] || product.title.uk)) || "";
+    const lines = [fill(L.about, { title })];
+    const variants = d.variants || [];
+    const realSizes = variants.some(v => (v.sizes || []).some(s => String(s.size).toUpperCase() !== "ONESIZE"));
+    let missing = false;
+
+    if (asked.includes("price")) {
+        const now_ = botPriceNow(product, now);
+        const old = product.sale && now_ < product.price ? product.price : (product.oldPrice && product.oldPrice > now_ ? product.oldPrice : 0);
+        lines.push(old ? fill(L.priceSale, { price: botMoney(now_), old: botMoney(old) }) : fill(L.price, { price: botMoney(now_) }));
+    }
+
+    // Конкретний колір («а чорний є?») — відповідь прямо: так чи ні.
+    const wanted = COLORS.find(c => hasStem(list, c.stems));
+    if (wanted) {
+        const hit = variants.filter(v => String(v.colorUk || "").toLowerCase().includes(wanted.key.toLowerCase()));
+        const L3 = T3[lang];
+        if (hit.length) {
+            lines.push(fill(L3.colorYes, { list: hit.map(v => colorName(v, lang) + (v.preOrder ? ` (${T[lang].preorder})` : "")).join(", ") }));
+        } else {
+            lines.push(fill(L3.colorNo, { list: variants.map(v => colorName(v, lang)).filter(Boolean).join(", ") }));
+        }
+    } else if (asked.includes("colors") || (asked.includes("stock") && variants.length > 1)) {
+        const names = variants.map(v => colorName(v, lang) + (v.preOrder ? ` (${T[lang].preorder})` : "")).filter(Boolean);
+        if (names.length) lines.push(fill(names.length > 1 ? L.colors : L.colorOne, { list: names.join(", ") }));
+    }
+
+    if (asked.includes("sizes")) {
+        if (realSizes) {
+            variants.forEach(v => {
+                const inStock = (v.sizes || []).filter(s => !s.preOrder).map(s => s.size);
+                const pre = (v.sizes || []).filter(s => s.preOrder).map(s => s.size);
+                const prefix = variants.length > 1 ? colorName(v, lang) + ": " : "";
+                if (inStock.length) lines.push(prefix + fill(L.sizesIn, { list: inStock.join(", ") }));
+                if (pre.length) lines.push(prefix + (inStock.length ? fill(L.sizesPre, { list: pre.join(", ") }) : L.sizesNone));
+            });
+        } else if (d.dimensions && d.dimensions[lang]) {
+            lines.push(fill(L.dimensions, { value: d.dimensions[lang] }));
+        } else {
+            missing = true;
+        }
+    }
+
+    if (asked.includes("stock")) {
+        const all = variants.length && variants.every(v => v.preOrder);
+        if (product.preOrder || all) {
+            const days = d.preOrderDays && d.preOrderDays[lang];
+            lines.push(days ? fill(L.preOrder, { days }) : L.preOrderNoDays);
+        } else {
+            const del = data.delivery || { handlingMin: 1, handlingMax: 2, transitMin: 1, transitMax: 3 };
+            lines.push(fill(L.inStock, { h: `${del.handlingMin}–${del.handlingMax}`, t: `${del.transitMin}–${del.transitMax}` }));
+            variants.filter(v => v.preOrder).forEach(v => lines.push(fill(L.colorPre, { color: colorName(v, lang) })));
+        }
+    }
+
+    if (asked.includes("material")) {
+        if (d.material && d.material[lang]) lines.push(fill(L.material, { value: d.material[lang] }));
+        else missing = true;
+    }
+
+    if (asked.includes("dimensions") && !asked.includes("sizes")) {
+        if (d.dimensions && d.dimensions[lang]) lines.push(fill(L.dimensions, { value: d.dimensions[lang] }));
+        else missing = true;
+    }
+
+    if (asked.includes("authentic")) {
+        lines.push(fill(L.authentic, { url: pageUrl(site, "/authenticity", lang) }));
+    }
+
+    // Нічого з питаного в картці немає — чесно, і людині.
+    if (lines.length === 1) {
+        return { text: L.noInfo, handoff: true };
+    }
+
+    if (missing) lines.push(L.noInfo);
+
+    return { text: lines.join("\n"), handoff: missing };
+
+}
+
+// ── Контакти ───────────────────────────────────────────────────────
+
+const CONTACT_STEMS = ["контакт", "телефон", "зателефонувати", "подзвонит", "позвонит", "номер телефон", "інстаграм", "инстаграм", "instagram", "телеграм", "telegram", "вайбер", "viber", "пошт", "почт", "email", "e-mail", "мейл", "як з вами зв", "как с вами связ", "how to contact", "contact", "графік", "график", "години роботи", "часы работы", "коли працюєте", "когда работаете", "working hours", "opening hours"];
+
+function contactsReply(data, lang) {
+    const c = (data && data.contacts) || {};
+    const L = T2[lang];
+    const lines = [L.contacts];
+    if (c.phone) lines.push(`${L.phone}: ${c.phone}`);
+    if (c.telegram) lines.push(`${L.telegram}: ${c.telegram}`);
+    if (c.instagram) lines.push(`${L.instagram}: ${c.instagram}`);
+    if (c.email) lines.push(`${L.email}: ${c.email}`);
+    lines.push(fill(L.contactsHours, { hours: HOURS[lang] }));
+    return lines.join("\n");
+}
+
+// ── Опечатки в брендах ─────────────────────────────────────────────
+
+function editDistance(a, b) {
+    if (Math.abs(a.length - b.length) > 2) return 3;
+    const row = Array.from({ length: b.length + 1 }, (_, i) => i);
+    for (let i = 1; i <= a.length; i++) {
+        let prev = row[0];
+        row[0] = i;
+        for (let j = 1; j <= b.length; j++) {
+            const tmp = row[j];
+            row[j] = Math.min(row[j] + 1, row[j - 1] + 1, prev + (a[i - 1] === b[j - 1] ? 0 : 1));
+            prev = tmp;
+        }
+    }
+    return row[b.length];
+}
+
+// «Prda» → Prada, «гучи» → Gucci, «лакосте» → Lacoste. Лише для слів від
+// чотирьох літер і з однією помилкою (дві — для довгих): «coat» не має
+// ставати Coach.
+export function fuzzyBrand(text, data) {
+    const brands = [...new Set(((data && data.products) || []).map(p => p.brand).filter(Boolean))];
+    const candidates = [];
+    brands.forEach(b => {
+        // Найдовше слово назви, а не перше: «love» (Love Moschino) і
+        // «marc» (Marc Jacobs) — звичайні слова, і «I love it» ставало б
+        // запитом на бренд.
+        const longest = normalizeText(b).split(" ").sort((x, y) => y.length - x.length)[0];
+        candidates.push([longest, b]);
+        (BRAND_ALIASES[b] || []).forEach(a => { if (!a.includes(" ")) candidates.push([a.trim(), b]); });
+    });
+    for (const w of words(text)) {
+        if (w.length < 4) continue;
+        for (const [name, brand] of candidates) {
+            if (name.length < 4) continue;
+            const limit = name.length >= 7 ? 2 : 1;
+            if (editDistance(w, name) <= limit && w[0] === name[0]) return brand;
+        }
+    }
+    return null;
+}
+
 // Розмова вже в людини: власник відповів або бот передав її сам.
 export function botShouldStay(history) {
     return !(history || []).some(m => m && (m.author === "owner"
@@ -467,16 +797,46 @@ export function botReply(message, history, data, options) {
     const text = String(message ?? "");
     const list = words(text);
     const hours = HOURS[lang];
-    const reply = (body, extra) => Object.assign({ text: body, products: [], chips: [], handoff: false }, extra);
+    // Передаючи розмову вночі, кажемо, коли чекати відповіді: «відповімо
+    // найближчим часом» о другій ночі — неправда.
+    const late = offHours(now) ? T2[lang].offHours : "";
+    const reply = (body, extra) => {
+        const out = Object.assign({ text: body, products: [], chips: [], handoff: false }, extra);
+        if (out.handoff && late && !out.text.includes(late.trim())) out.text += late;
+        return out;
+    };
 
     // 1. Людина просить людину.
-    if (hasStem(list, ["менеджер", "оператор", "людин", "человек", "живий", "живой", "покликат", "позват", "manager", "human", "operator", "real person", "агент", "agent", "передзвон", "перезвон", "call me", "зателефон", "позвон"])) {
+    if (hasStem(list, ["менеджер", "оператор", "людин", "человек", "живий", "живой", "покликат", "позват", "manager", "human", "operator", "real person", "агент", "agent", "передзвон", "перезвон", "call me", "call back"])) {
         return reply(fill(L.handoff, { hours }), { handoff: true });
     }
 
     // 2. Де моє замовлення.
     if (hasStem(list, ["де моє замовлен", "где мой заказ", "статус замовлен", "статус заказ", "стан замовлен", "where is my order", "order status", "трек", "track", "накладн", "ттн"]) || /\b\d{8,12}\b/.test(text)) {
         return reply(fill(L.status, { url: pageUrl(site, "/order-status", lang) }), { chips: [L.chips.human] });
+    }
+
+    // 2а. Автовідповіді власника — понад усе вбудоване: власник знає
+    // свій магазин краще за ключові слова в коді.
+    const own = ownerAnswer(text, data, lang);
+    if (own && own.missing) return reply(fill(L.handoff, { hours }), { handoff: true });
+    if (own) return reply(own.text, { chips: [L.chips.human] });
+
+    // 2б. Людина пише зі сторінки товару й питає про НЬОГО.
+    const here = productFromPage(opts.page, data);
+    const about = productAnswer(text, here, data, lang, now, site);
+    if (about) {
+        return reply(about.text, { handoff: Boolean(about.handoff), chips: about.handoff ? [] : [L.chips.human] });
+    }
+
+    // 2в. Контакти й графік.
+    if (hasStem(list, CONTACT_STEMS) && !(parseWish(text, data) || {}).criteria) {
+        return reply(contactsReply(data, lang), { chips: L.chips.menu.slice(0, 3) });
+    }
+
+    // 2г. Промокод.
+    if (hasStem(list, ["промокод", "промо-код", "промо код", "promo code", "promocode", "coupon", "купон", "код знижки", "код скидки", "discount code"])) {
+        return reply(fill(T2[lang].promo, { url: pageUrl(site, "/aktsii/", lang) }), { chips: [L.chips.human] });
     }
 
     // 3. Тема з частих питань.
@@ -525,6 +885,26 @@ export function botReply(message, history, data, options) {
         const picked = pickProducts(wish, data, now, offset);
 
         if (!picked.items.length) {
+            // «Сумка Prada», а сумок Prada немає — показуємо, що в Prada
+            // Є. Тип тут не підмінюється мовчки: фраза прямо каже, що
+            // сумок немає, а це інші речі того самого бренду.
+            if (wish.brand && wish.type) {
+                const other = pickProducts(Object.assign({}, wish, { type: undefined, budget: undefined, color: undefined }), data, now, 0);
+                if (other.items.length) {
+                    const what = TYPE_WORDS[lang][wish.type] || "";
+                    const text0 = fill(T3[lang].brandOther, { what, brand: wish.brand });
+                    return reply(text0.charAt(0).toUpperCase() + text0.slice(1), {
+                        products: other.items.map(p => ({
+                            slug: p.slug,
+                            title: (p.title && (p.title[lang] || p.title.uk)) || p.slug,
+                            price: botPriceNow(p, now),
+                            url: pageUrl(site, `/p/${p.slug}/`, lang),
+                            preOrder: Boolean(p.preOrder || !p.inStock)
+                        })),
+                        chips: [L.chips.more[1]]
+                    });
+                }
+            }
             return reply(L.nothing, { handoff: true });
         }
 

@@ -108,6 +108,46 @@ function translators() {
     return out;
 }
 
+// Те, що людина бачить на сторінці товару, — для питань «є чорний?»,
+// «який розмір є?», «з чого зроблена?», коли вона пише саме звідти.
+// Наявність — тим самим правилом, що й сторінка (assets/js/stock.js):
+// друга копія правила розійшлася б із першою.
+const Stock = require("../assets/js/stock.js");
+
+function local(t, value) {
+    const out = {};
+    LANGS.forEach(lang => {
+        const v = String(value || "");
+        const tr = v ? t[lang](v) : "";
+        out[lang] = stillUkrainian(tr, lang) ? "" : tr;
+    });
+    return out;
+}
+
+function details(p, t) {
+
+    const list = (Array.isArray(p.variants) && p.variants.length ? p.variants : [null]);
+
+    const variants = list.map(variant => {
+        const sizes = Stock.sizesOf(p, variant).map(String);
+        const color = String((variant && variant.color) || p.color || "");
+        return {
+            color: local(t, color),
+            colorUk: color,
+            preOrder: Boolean(Stock.colorPreOrder(p, variant)),
+            sizes: sizes.map(size => ({ size, preOrder: Boolean(Stock.sizePreOrder(p, variant, size)) }))
+        };
+    });
+
+    return {
+        variants,
+        material: local(t, p.material || p.composition),
+        dimensions: local(t, p.dimensions),
+        preOrderDays: local(t, p.preOrderDays)
+    };
+
+}
+
 function buildProducts() {
 
     const products = readJson(path.join(ROOT, "data", "products.json"), []);
@@ -146,22 +186,70 @@ function buildProducts() {
             preOrder: Boolean(p.preOrder),
             isNew: Boolean(p.isNew),
             keywords: String(p.searchKeywords || "").slice(0, 300),
-            image: image === "/" ? "" : image
+            image: image === "/" ? "" : image,
+            details: details(p, t)
         };
 
     });
 
 }
 
+// Контакти — зі сторінки «Контакти», а не з памʼяті: поміняли номер
+// там — бот назве новий. Немає на сторінці — бот цей пункт не називає.
+function readContacts() {
+    const file = path.join(ROOT, "contacts.html");
+    const html = fs.existsSync(file) ? fs.readFileSync(file, "utf8") : "";
+    const first = re => (html.match(re) || [])[1] || "";
+    return {
+        phone: first(/href="tel:([+\d]+)"/),
+        telegram: first(/href="(https:\/\/t\.me\/[A-Za-z0-9_]+)"/),
+        instagram: first(/href="(https:\/\/(?:www\.)?instagram\.com\/[A-Za-z0-9_.]+)\/?"/),
+        email: first(/href="mailto:([^"?]+)"/)
+    };
+}
+
+const CONTACTS = readContacts();
+
+// Автовідповіді власника: data/chat-answers.json (адмінка →
+// «Автовідповіді бота»). Ключові слова — через кому, будь-якою мовою.
+// Відповідь англійською й російською необовʼязкова: якщо її немає,
+// бот цією мовою автовідповідь не дає (українська відповідь людині з
+// /en/ гірша за передачу менеджеру).
+function buildAnswers() {
+    const raw = readJson(path.join(ROOT, "data", "chat-answers.json"), {});
+    return (Array.isArray(raw.answers) ? raw.answers : []).map(a => ({
+        keywords: String(a && a.keywords || "").split(/[,;\n]/).map(s => s.trim().toLowerCase()).filter(s => s.length >= 2),
+        answer: {
+            uk: String(a && a.answer || "").trim(),
+            en: String(a && a.answer_en || "").trim(),
+            ru: String(a && a.answer_ru || "").trim()
+        },
+        link: String(a && a.link || "").trim()
+    })).filter(a => a.keywords.length && a.answer.uk);
+}
+
 function main() {
 
     const notifications = readJson(path.join(ROOT, "data", "notifications.json"), {});
+
+    const texts = readJson(path.join(ROOT, "data", "product-texts.json"), {});
 
     const data = {
         // Вимикач в адмінці («Бот у чаті»). Немає поля — увімкнено.
         enabled: notifications.chatBot !== false,
         faq: buildFaq(),
-        products: buildProducts()
+        products: buildProducts(),
+        // Автовідповіді власника з адмінки («Автовідповіді бота»).
+        answers: buildAnswers(),
+        // Строки доставки товару в наявності — ті самі числа, з яких
+        // сторінка товару пише «Орієнтовно у відділенні …».
+        delivery: {
+            handlingMin: Number(texts.handlingMin) || 1,
+            handlingMax: Number(texts.handlingMax) || 2,
+            transitMin: Number(texts.transitMin) || 1,
+            transitMax: Number(texts.transitMax) || 3
+        },
+        contacts: CONTACTS
     };
 
     fs.writeFileSync(OUT, JSON.stringify(data) + "\n", "utf8");
@@ -176,4 +264,4 @@ function main() {
 
 if (require.main === module) main();
 
-module.exports = { buildFaq, buildProducts, faqOf, FAQ_PAGES };
+module.exports = { buildFaq, buildProducts, buildAnswers, readContacts, faqOf, FAQ_PAGES };
