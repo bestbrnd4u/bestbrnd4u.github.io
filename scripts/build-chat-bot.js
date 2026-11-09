@@ -143,6 +143,7 @@ function details(p, t) {
         variants,
         material: local(t, p.material || p.composition),
         dimensions: local(t, p.dimensions),
+        strap: local(t, p.strapInfo),
         preOrderDays: local(t, p.preOrderDays)
     };
 

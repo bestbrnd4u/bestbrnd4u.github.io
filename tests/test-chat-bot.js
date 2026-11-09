@@ -421,5 +421,60 @@ console.log("\n[13] «Дешевше» в розмові");
     check("дешевшого немає — чесно каже, а не показує дорожче", floor.products.length === 0 && /нічого немає/.test(floor.text), floor.text.slice(0, 60));
 }
 
+console.log("\n[14] Живі відповіді (побажання власника 09.11.2026)");
+{
+    // «Привіт» — у відповідь «Привіт», а не абзац про бота.
+    check("«привіт» → «Привіт! 👋 Чим можу допомогти?»", /^Привіт! 👋 Чим можу допомогти/.test(talk("uk", ["привіт"]).text), talk("uk", ["привіт"]).text.slice(0, 40));
+    check("«Добрий день» → «Добрий день!»", talk("uk", ["Добрий день"]).text.startsWith("Добрий день!"));
+    check("«Доброго ранку» → «Доброго ранку!»", talk("uk", ["Доброго ранку"]).text.startsWith("Доброго ранку!"));
+    check("ru «Привет» → «Привет!»", talk("ru", ["Привет"]).text.startsWith("Привет!"));
+    check("en «hi» → «Hi!»", talk("en", ["hi"]).text.startsWith("Hi!"));
+    check("привітання коротке — без абзацу про бота", talk("uk", ["привіт"]).text.length < 220);
+    const greetAsk = talk("uk", ["Привіт, хочу чорну сумку"]);
+    check("«Привіт, хочу чорну сумку» — «Привіт!» і самі сумки", greetAsk.text.startsWith("Привіт! ") && greetAsk.products.length > 0);
+
+    // «Хочу чорну сумку» — список чорних сумок, заголовок словами людини.
+    const black = talk("uk", ["хочу чорну сумку купити, які є"]);
+    check("«хочу чорну сумку, які є» — чорні сумки з картками",
+        black.products.length > 0 && items(black).every(p => p.department === "Сумки" && p.colors.some(c => /чорн/i.test(c))));
+    check("заголовок — «Ось чорні сумки … 👇», а не «Ось що підходить»", /^Ось чорні сумки/.test(black.text) && /👇/.test(black.text), black.text);
+    check("правильна форма числа: «22 варіанти», «5 варіантів», «1 варіант»",
+        bot.plural(22, ["варіант", "варіанти", "варіантів"], "uk") === "варіанти" && bot.plural(5, ["варіант", "варіанти", "варіантів"], "uk") === "варіантів"
+        && bot.plural(11, ["варіант", "варіанти", "варіантів"], "uk") === "варіантів" && bot.plural(21, ["варіант", "варіанти", "варіантів"], "uk") === "варіант");
+    check("опис запиту трьома мовами", bot.describeWish({ color: "Чорн", gender: "Жінкам", type: "bags", brand: "Coach", budget: { max: 8000 } }, "uk") === "чорні жіночі сумки Coach до 8 000 ₴"
+        && bot.describeWish({ color: "Чорн", gender: "Жінкам", type: "bags", brand: "Coach" }, "en") === "black women's Coach bags"
+        && bot.describeWish({ color: "Чорн", type: "bags" }, "ru") === "черные сумки");
+    const page2 = talk("uk", ["Жіночі сумки", "Інші варіанти"]);
+    check("«Інші варіанти» — «Ще жіночі сумки — 5–8 з …»", /^Ще жіночі сумки — 5–8 з \d+/.test(page2.text), page2.text);
+
+    // Чого в магазині немає — чесно, і що є натомість.
+    [["uk", "хочу штани", /^На жаль, штанів у нас зараз немає/], ["ru", "есть брюки?", /^К сожалению, брюк/], ["uk", "шукаю сукню", /суконь/],
+        ["en", "do you have jeans?", /^Sorry, we don't have jeans/], ["uk", "парфуми є?", /парфумів/], ["uk", "хочу куртку", /верхнього одягу/], ["uk", "сережки", /прикрас/]]
+        .forEach(([lang, q, re]) => {
+            const r = talk(lang, [q]);
+            check(`«${q}» — немає, і пропонує, що є`, r.intent === "missing" && re.test(r.text) && r.chips.length >= 4 && !r.handoff, r.text.slice(0, 60));
+        });
+    const heels = talk("uk", ["туфлі на підборах"]);
+    check("«туфлі» — «такого взуття немає, але є кросівки» з картками",
+        /^Такого взуття у нас зараз немає, але є кросівки/.test(heels.text) && heels.products.length > 0 && items(heels).every(p => p.category === "Кросівки"));
+    check("«сумка на довгому ремені» — сумка, а не «ременів немає»", talk("uk", ["сумка на довгому ремені"]).intent === "products");
+    check("«поясна сумка» — сумка, а не «поясів немає»", talk("uk", ["поясна сумка"]).intent === "products");
+    check("«майкл корс» — бренд, а не «майок немає»", talk("uk", ["годинник майкл корс"]).products.every(p => bySlug.get(p.slug).brand === "Michael Kors") && talk("uk", ["годинник майкл корс"]).products.length > 0);
+
+    // Без типу в запиті словник «чого немає» вже діє — «майкл» не «майка».
+    const mk = talk("uk", ["майкл корс"]);
+    check("«майкл корс» без типу — товари бренду, а не «майок немає»", mk.intent === "products" && items(mk).every(p => p.brand === "Michael Kors"), mk.text.slice(0, 50));
+    const few = talk("uk", ["окуляри Ray-Ban"]);
+    const fewTotal = data.products.filter(p => p.brand === "Ray-Ban" && p.category === "Окуляри і оправи").length;
+    if (fewTotal <= 4) check("невелика підбірка — «Ось окуляри Ray-Ban, які є зараз 👇»", few.text === "Ось окуляри Ray-Ban, які є зараз 👇", few.text);
+
+    // Ремінь на сторінці сумки.
+    const withStrap = data.products.find(p => p.details.strap && p.details.strap.uk);
+    const strap = bot.botReply("яка довжина ременя?", [], data, { lang: "uk", now: NOW, page: `/p/${withStrap.slug}/` });
+    check("«яка довжина ременя?» на сторінці сумки — з картки", strap.text.includes(withStrap.details.strap.uk), strap.text);
+    const strapEn = bot.botReply("how long is the strap?", [], data, { lang: "en", now: NOW, page: `/en/p/${withStrap.slug}/` });
+    check("en «how long is the strap?» — лише про ремінь, без «коли отримаю»", /Strap/.test(strapEn.text) && !/We ship/.test(strapEn.text), strapEn.text);
+}
+
 console.log(failures ? `\n✗ Провалено: ${failures}` : "\n✓ Усе зелено");
 process.exit(failures ? 1 : 0);

@@ -5148,6 +5148,7 @@ const T2 = {
         colorPre: "Колір «{color}» — під замовлення.",
         material: "Матеріал: {value}.",
         dimensions: "Розміри: {value}.",
+        strap: "Ремінь / ручки: {value}.",
         noInfo: "Цього в картці товару не вказано — передаю питання менеджеру.",
         authentic: "Так, це оригінал — у каталозі немає реплік і копій. Докладніше: {url}"
     },
@@ -5171,6 +5172,7 @@ const T2 = {
         colorPre: "The “{color}” color is made to order.",
         material: "Material: {value}.",
         dimensions: "Dimensions: {value}.",
+        strap: "Strap / handles: {value}.",
         noInfo: "That isn't listed on the product page — I'm passing your question to a manager.",
         authentic: "Yes, it's authentic — there are no replicas or copies in our catalog. More: {url}"
     },
@@ -5194,6 +5196,7 @@ const T2 = {
         colorPre: "Цвет «{color}» — под заказ.",
         material: "Материал: {value}.",
         dimensions: "Размеры: {value}.",
+        strap: "Ремень / ручки: {value}.",
         noInfo: "Этого в карточке товара не указано — передаю вопрос менеджеру.",
         authentic: "Да, это оригинал — в каталоге нет реплик и копий. Подробнее: {url}"
     }
@@ -5327,6 +5330,139 @@ const HOW_TO_ORDER = ["як оформ", "як замов", "як купи", "я
 const CHEAPER = ["дешевш", "дешевле", "дорого", "дорогувато", "дороговато", "не по кишені", "бюджетніш", "бюджетнее", "cheaper", "less expensive", "too expensive", "expensive", "more affordable"];
 
 const WARRANTY = ["гаранті", "гарант", "warranty", "guarantee", "брак", "дефект", "зламал", "сломал", "defect", "broke$"];
+
+// ── Живіші відповіді ───────────────────────────────────────────────
+//
+// Побажання власника (09.11.2026): «привіт» — у відповідь «привіт», а не
+// абзац про бота; «хочу штани» — «штанів немає, зате є сумки…»; підбірка
+// — словами людини: «ось чорні сумки, які є», а не «ось що підходить».
+
+// Привітання у відповідь — тим самим словом, яким привітались.
+const GREET_BACK = {
+    uk: [[["доброго ранку", "добрий ранок", "добрий ранку"], "Доброго ранку"], [["добрий вечір", "доброго вечора", "добрий вечер"], "Добрий вечір"],
+        [["добрий день", "доброго дня", "добридень"], "Добрий день"], [["привіт", "привітик", "хай$", "салют"], "Привіт"], [["вітаю", "здрастуйте", "здравствуйте"], "Вітаю"]],
+    en: [[["good morning"], "Good morning"], [["good evening"], "Good evening"], [["good afternoon"], "Good afternoon"],
+        [["hello", "hiya"], "Hello"], [["hey$"], "Hey"], [["hi$"], "Hi"]],
+    ru: [[["доброе утро", "доброго утра"], "Доброе утро"], [["добрый вечер", "доброго вечера"], "Добрый вечер"], [["добрый день", "доброго дня"], "Добрый день"],
+        [["привет", "приветик", "салют"], "Привет"], [["здравствуй", "здрасте", "здрасьте"], "Здравствуйте"]]
+};
+
+function greetingOf(text, lang) {
+    const list = words(text);
+    // Привітання — на початку повідомлення: «скажіть, привіт від кого» — ні.
+    const head = list.slice(0, 3);
+    const table = GREET_BACK[lang] || GREET_BACK.uk;
+    for (const [stems, back] of table) if (hasStem(head, stems)) return back;
+    // Привіталися іншою мовою, ніж сторінка («привет» на /uk/) — відповідаємо мовою сторінки.
+    for (const l of ["uk", "ru", "en"]) for (const [stems] of GREET_BACK[l]) if (hasStem(head, stems)) return table[table.length - 1][1];
+    return "";
+}
+
+const T5 = {
+    uk: {
+        hello: "{greet}! 👋 Чим можу допомогти? Можу підібрати сумку, годинник чи окуляри — просто напишіть, що шукаєте, — або підказати щодо доставки й оплати.",
+        here: "Ось {desc}, які є зараз 👇",
+        hereMany: "Ось {desc} — усього {total} {variants}, показую {k} 👇",
+        hereMore: "Ще {desc} — {from}–{to} з {total} 👇",
+        things: "речі",
+        missing: "На жаль, {what} у нас зараз немає 😔 Ми спеціалізуємося на сумках, годинниках, окулярах, кросівках і гаманцях — подивитесь, що є? Якщо потрібна конкретна річ, менеджер підкаже, чи можна привезти її під замовлення.",
+        missingSimilar: "{What} у нас зараз немає, але є {similar} 👇",
+        variants: ["варіант", "варіанти", "варіантів"]
+    },
+    en: {
+        hello: "{greet}! 👋 How can I help? I can pick a bag, a watch or sunglasses for you — just tell me what you're looking for — or help with delivery and payment.",
+        here: "Here are the {desc} we have right now 👇",
+        hereMany: "Here are the {desc} — {total} {variants} in total, showing {k} 👇",
+        hereMore: "More {desc} — {from}–{to} of {total} 👇",
+        things: "items",
+        missing: "Sorry, we don't have {what} right now 😔 We specialize in bags, watches, sunglasses, sneakers and wallets — want to take a look? If you need a specific item, a manager can tell you whether we can bring it to order.",
+        missingSimilar: "We don't have {what} right now, but we do have {similar} 👇",
+        variants: ["option", "options", "options"]
+    },
+    ru: {
+        hello: "{greet}! 👋 Чем могу помочь? Могу подобрать сумку, часы или очки — просто напишите, что ищете, — или подсказать по доставке и оплате.",
+        here: "Вот {desc}, которые есть сейчас 👇",
+        hereMany: "Вот {desc} — всего {total} {variants}, показываю {k} 👇",
+        hereMore: "Еще {desc} — {from}–{to} из {total} 👇",
+        things: "вещи",
+        missing: "К сожалению, {what} у нас сейчас нет 😔 Мы специализируемся на сумках, часах, очках, кроссовках и кошельках — посмотрите, что есть? Если нужна конкретная вещь, менеджер подскажет, можно ли привезти ее под заказ.",
+        missingSimilar: "{What} у нас сейчас нет, но есть {similar} 👇",
+        variants: ["вариант", "варианта", "вариантов"]
+    }
+};
+
+// 1 варіант, 2 варіанти, 5 варіантів (так само російською).
+function plural(n, forms, lang) {
+    if (lang === "en") return n === 1 ? forms[0] : forms[1];
+    const a = Math.abs(n) % 100, b = a % 10;
+    if (a > 10 && a < 20) return forms[2];
+    if (b === 1) return forms[0];
+    if (b >= 2 && b <= 4) return forms[1];
+    return forms[2];
+}
+
+// Опис запиту словами: «чорні жіночі сумки Coach до 8 000 ₴».
+const DESC = {
+    uk: {
+        color: { "Чорн": "чорні", "Біл": "білі", "Коричн": "коричневі", "Беж": "бежеві", "Сір": "сірі", "Рожев": "рожеві", "Син": "сині", "Зелен": "зелені", "Золот": "золотисті", "Срібл": "сріблясті", "Червон": "червоні" },
+        gender: { "Жінкам": "жіночі", "Чоловікам": "чоловічі" },
+        type: { bags: "сумки", watches: "годинники", glasses: "окуляри", sneakers: "кросівки", wallets: "гаманці" },
+        upTo: "до", from: "від", sale: "зі знижкою", fresh: "новинки"
+    },
+    en: {
+        color: { "Чорн": "black", "Біл": "white", "Коричн": "brown", "Беж": "beige", "Сір": "grey", "Рожев": "pink", "Син": "blue", "Зелен": "green", "Золот": "gold", "Срібл": "silver", "Червон": "red" },
+        gender: { "Жінкам": "women's", "Чоловікам": "men's" },
+        type: { bags: "bags", watches: "watches", glasses: "sunglasses", sneakers: "sneakers", wallets: "wallets" },
+        upTo: "under", from: "from", sale: "on sale", fresh: "new arrivals"
+    },
+    ru: {
+        color: { "Чорн": "черные", "Біл": "белые", "Коричн": "коричневые", "Беж": "бежевые", "Сір": "серые", "Рожев": "розовые", "Син": "синие", "Зелен": "зеленые", "Золот": "золотистые", "Срібл": "серебристые", "Червон": "красные" },
+        gender: { "Жінкам": "женские", "Чоловікам": "мужские" },
+        type: { bags: "сумки", watches: "часы", glasses: "очки", sneakers: "кроссовки", wallets: "кошельки" },
+        upTo: "до", from: "от", sale: "со скидкой", fresh: "новинки"
+    }
+};
+
+function describeWish(wish, lang) {
+    const D = DESC[lang] || DESC.uk;
+    const parts = [];
+    if (wish.color && D.color[wish.color]) parts.push(D.color[wish.color]);
+    if (wish.gender && D.gender[wish.gender]) parts.push(D.gender[wish.gender]);
+    // Бренд англійською — перед типом («Coach bags»), українською й
+    // російською — після («сумки Coach»).
+    if (lang === "en" && wish.brand) parts.push(wish.brand);
+    parts.push(wish.type ? D.type[wish.type] : (wish.fresh ? D.fresh : T5[lang].things));
+    if (lang !== "en" && wish.brand) parts.push(wish.brand);
+    if (wish.sale && !wish.fresh) parts.push(D.sale);
+    if (wish.budget && wish.budget.max) parts.push(`${D.upTo} ${botMoney(wish.budget.max)}`);
+    else if (wish.budget && wish.budget.min) parts.push(`${D.from} ${botMoney(wish.budget.min)}`);
+    return parts.join(" ");
+}
+
+// Чого в магазині немає. Відповідь — «на жаль, штанів немає», і що є
+// натомість; для взуття — одразу кросівки (єдине взуття в каталозі).
+const MISSING = [
+    { key: "jeans", stems: ["джинс", "jeans", "denim"], what: { uk: "джинсів", en: "jeans", ru: "джинсов" } },
+    { key: "pants", stems: ["штан", "брюк", "легінс", "легинс", "лосин", "pants", "trousers", "leggings"], what: { uk: "штанів", en: "pants", ru: "брюк" } },
+    { key: "dress", stems: ["сукн", "сукен", "суконь", "плаття", "платт", "плать", "dress"], what: { uk: "суконь", en: "dresses", ru: "платьев" } },
+    { key: "skirt", stems: ["спідниц", "юбк", "юбок", "skirt"], what: { uk: "спідниць", en: "skirts", ru: "юбок" } },
+    { key: "shorts", stems: ["шорт", "shorts"], what: { uk: "шортів", en: "shorts", ru: "шорт" } },
+    { key: "outer", stems: ["куртк", "курток", "пальт", "пуховик", "плащ", "тренч", "парк$", "jacket", "coat$", "coats$", "parka", "trench"], what: { uk: "верхнього одягу", en: "outerwear", ru: "верхней одежды" } },
+    { key: "suit", stems: ["костюм", "піджак", "пиджак", "жакет", "suit$", "suits$", "blazer"], what: { uk: "костюмів і піджаків", en: "suits or blazers", ru: "костюмов и пиджаков" } },
+    { key: "tops", stems: ["футболк", "сорочк", "рубашк", "рубах", "блуз", "топ$", "майка", "майки", "майку", "майок", "світшот", "свитшот", "худі", "худи", "толстовк", "светр", "свитер", "кофт", "лонгслів", "лонгслив", "одяг", "одежд", "t-shirt", "tshirt", "shirt", "blouse", "hoodie", "sweater", "sweatshirt", "clothes", "clothing"], what: { uk: "одягу", en: "clothing", ru: "одежды" } },
+    { key: "underwear", stems: ["білизн", "белье", "белья", "купальн", "бікіні", "бикини", "lingerie", "underwear", "swimsuit", "bikini"], what: { uk: "білизни й купальників", en: "underwear or swimwear", ru: "белья и купальников" } },
+    { key: "shoes", similar: "sneakers", stems: ["туфл", "туфел", "чобіт", "чоботи", "черевик", "ботин", "сапог", "сапож", "босоніж", "босонож", "сандал", "шльопан", "шлепан", "тапк", "тапоч", "лофер", "мокасин", "балетк", "мюл", "heels", "boots", "sandals", "loafers", "slippers", "flats", "pumps"], what: { uk: "такого взуття", en: "that kind of shoes", ru: "такой обуви" } },
+    { key: "jewelry", stems: ["прикрас", "ювелір", "ювелир", "кільц", "каблучк", "сережк", "намист", "підвіск", "кулон", "кольц", "серьг", "ожерел", "цепочк", "ланцюжк", "украшен", "jewel", "ring$", "rings$", "earring", "necklace", "pendant"], what: { uk: "прикрас", en: "jewelry", ru: "украшений" } },
+    { key: "beauty", stems: ["парфум", "парфюм", "духи$", "духів", "аромат", "туалетн", "косметик", "помад", "тональн", "perfume", "fragrance", "cologne", "makeup", "make-up", "cosmetic", "lipstick"], what: { uk: "парфумів і косметики", en: "perfume or cosmetics", ru: "парфюмерии и косметики" } },
+    { key: "hats", stems: ["шапк", "шапок", "кепк", "кепок", "капелюх", "панам", "шарф", "хустк", "рукавиц", "рукавичк", "шляп", "перчат", "платок", "платк", "beanie", "hat$", "hats$", "cap$", "caps$", "scarf", "scarves", "gloves"], what: { uk: "шапок, шарфів і рукавичок", en: "hats, scarves or gloves", ru: "шапок, шарфов и перчаток" } },
+    { key: "belts", stems: ["ремені", "ременів", "ремінь для", "ремень для", "ремни", "ремней", "пояс", "belt"], what: { uk: "ременів", en: "belts", ru: "ремней" } },
+    { key: "kids", stems: ["дитяч", "детск", "для дитини", "для ребенка", "kids", "children", "baby"], what: { uk: "дитячих речей", en: "kids' items", ru: "детских вещей" } }
+];
+
+function findMissing(text) {
+    const list = words(text);
+    return MISSING.find(m => hasStem(list, m.stems)) || null;
+}
 
 // Назви типів для фрази «Сумок Prada зараз немає».
 const TYPE_WORDS = {
@@ -5732,10 +5868,11 @@ function productFromPage(page, data) {
 const ASK = {
     colors: ["кольор", "колір", "колор", "цвет", "цвета", "color", "colour", "чорн", "черн", "біл", "бел", "black", "white", "інш колір", "другой цвет", "other color"],
     sizes: ["розмір", "розмер", "размер", "size", "сітк", "сетк", "маломір", "маломер", "великомір", "большемер"],
-    stock: ["наявн", "наличи", "in stock", "available", "availability", "є в ", "є?", "есть в ", "залиш", "остал", "коли отрима", "когда получ", "when will i get", "скільки чека", "сколько жда", "how long"],
+    stock: ["наявн", "наличи", "in stock", "available", "availability", "є в ", "є?", "есть в ", "залиш", "остал", "коли отрима", "когда получ", "when will i get", "скільки чека", "сколько жда", "how long will", "how long until", "how long does it take", "how long to get"],
     price: ["ціна", "ціну", "ціни", "скільки кошту", "вартість", "цена", "цену", "сколько стоит", "стоимость", "price", "cost", "how much"],
     material: ["матеріал", "материал", "шкір", "кожа", "кожан", "material", "leather", "з чого", "из чего", "made of", "склад", "состав"],
     dimensions: ["габарит", "розміри сумк", "размеры сумк", "dimension", "заввишки", "завширшки", "высот", "ширин", "how big", "влізе", "влезет", "fit"],
+    strap: ["ремін", "ремен", "ременя", "ручк", "ручка", "довжин", "длин", "strap", "handle", "length"],
     authentic: ["оригінал", "оригинал", "справжн", "настоящ", "authentic", "original", "genuine", "fake", "реплік", "реплик", "підробк", "подделк"]
 };
 
@@ -5832,6 +5969,11 @@ function productAnswer(text, product, data, lang, now, site) {
 
     if (asked.includes("dimensions") && !asked.includes("sizes")) {
         if (d.dimensions && d.dimensions[lang]) lines.push(fill(L.dimensions, { value: d.dimensions[lang] }));
+        else missing = true;
+    }
+
+    if (asked.includes("strap")) {
+        if (d.strap && d.strap[lang]) lines.push(fill(L.strap, { value: d.strap[lang] }));
         else missing = true;
     }
 
@@ -5934,9 +6076,12 @@ function botReply(message, history, data, options) {
     // Передаючи розмову вночі, кажемо, коли чекати відповіді: «відповімо
     // найближчим часом» о другій ночі — неправда.
     const late = offHours(now) ? T2[lang].offHours : "";
+    // «Привіт, хочу чорну сумку» — спершу «Привіт!», потім сумки.
+    const greet = greetingOf(text, lang);
     const reply = (body, extra) => {
         const out = Object.assign({ text: body, products: [], chips: [], handoff: false }, extra);
         if (out.handoff && late && !out.text.includes(late.trim())) out.text += late;
+        if (greet && out.intent !== "hello" && !out.text.startsWith(greet)) out.text = `${greet}! ${out.text}`;
         return out;
     };
 
@@ -6011,7 +6156,8 @@ function botReply(message, history, data, options) {
     if (small === "about-bot") return reply(T4L.aboutBot, { chips: L.chips.menu, intent: "about-bot" });
 
     if (!criteria && list.length <= 4 && hasStem(list, GREETINGS)) {
-        return reply(L.hello, { chips: L.chips.menu, intent: "hello" });
+        return reply(fill(T5[lang].hello, { greet: greet || T5[lang].hello.split("!")[0] || "Вітаю" }).replace(/^\{greet\}/, ""),
+            { chips: L.chips.menu, intent: "hello" });
     }
 
     // 2д. Як оформити замовлення.
@@ -6086,6 +6232,42 @@ function botReply(message, history, data, options) {
         }
     }
 
+    // 3а. «Хочу штани», а штанів у магазині немає: чесно, і що є натомість.
+    // Лише коли в запиті немає типу, який у нас Є: «сумка з довгим ременем»
+    // — це сумка, а не ремінь.
+    const missing = findMissing(text);
+    const missingWish = parseWish(text, data) || {};
+    const kidsInCatalog = missing && missing.key === "kids" && (data.products || []).some(p => /Дитяч/.test(p.category));
+    if (missing && !missingWish.type && !kidsInCatalog) {
+        const T5L = T5[lang];
+        const what = missing.what[lang] || missing.what.uk;
+        if (missing.similar) {
+            const sim = pickProducts(Object.assign({}, missingWish, { type: missing.similar, criteria: 1 }), data, now, 0);
+            if (sim.items.length) {
+                const simWord = DESC[lang].type[missing.similar];
+                return reply(fill(T5L.missingSimilar, { What: what.charAt(0).toUpperCase() + what.slice(1), similar: simWord }), {
+                    products: sim.items.map(p => ({
+                        slug: p.slug,
+                        title: (p.title && (p.title[lang] || p.title.uk)) || p.slug,
+                        price: botPriceNow(p, now),
+                        url: pageUrl(site, `/p/${p.slug}/`, lang),
+                        preOrder: Boolean(p.preOrder || !p.inStock)
+                    })),
+                    chips: [L.chips.more[1]],
+                    intent: "missing"
+                });
+            }
+        }
+        // Пропонуємо те, що є в каталозі, — кнопками типів.
+        const present = new Set((data.products || []).map(p => p.category).concat((data.products || []).map(p => p.department)));
+        const typeChips = L.chips.types.filter((c, i) => {
+            const key = ["bags", "bags", "watches", "glasses", "sneakers", "wallets"][i];
+            const t = TYPES.find(x => x.key === key);
+            return t && (present.has(t.category) || present.has(t.department));
+        });
+        return reply(fill(T5L.missing, { what }), { chips: typeChips.concat(L.chips.human).slice(0, 7), intent: "missing" });
+    }
+
     // 4. Підбір товару.
     let wish = parseWish(text, data);
 
@@ -6142,9 +6324,13 @@ function botReply(message, history, data, options) {
             return reply(L.nothing, { handoff: true, intent: "handoff" });
         }
 
+        // Заголовок словами людини: «Ось чорні сумки, які є зараз 👇».
+        const T5L = T5[lang];
+        const desc = describeWish(wish, lang);
         const head = picked.relaxed ? L.relaxed
-            : picked.total > MAX_PRODUCTS ? fill(L.foundMore, { n: picked.start + picked.items.length, total: picked.total })
-                : L.found;
+            : picked.start > 0 ? fill(T5L.hereMore, { desc, from: picked.start + 1, to: picked.start + picked.items.length, total: picked.total })
+                : picked.total > MAX_PRODUCTS ? fill(T5L.hereMany, { desc, total: picked.total, k: picked.items.length, variants: plural(picked.total, T5L.variants, lang) })
+                    : fill(T5L.here, { desc });
 
         const chips = [];
         if (!wish.budget) chips.push(...L.chips.budget);
