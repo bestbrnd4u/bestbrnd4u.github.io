@@ -63,5 +63,23 @@
     "/assets/images/products/uploads/michael-kors-lexington-chronograph-quartz-black-dial-watch-mk9154.webp",
     "/assets/images/products/uploads/michael-kors-lexington-chronograph-quartz-black-dial-watch-mk9154_2.webp",
     "/assets/images/products/uploads/michael-kors-lexington-chronograph-quartz-black-dial-watch-mk9154_3.webp"
-  ]
+  ],
+  "i18n": {
+    "en": {
+      "title": "Michael Kors Oversized Lexington Chronograph MK9154 Watch",
+      "description": "A stylish men's Michael Kors Lexington watch in an all-black finish. The bold case, black dial and steel bracelet create a striking monochrome design that pairs well with both casual and business looks.\nThe model features a quartz movement with a chronograph function and date display. The dial is complemented by Roman numerals and three subdials. The case and bracelet are made of stainless steel, and mineral crystal protects the dial",
+      "material": "Stainless steel",
+      "dimensions": "Case diameter: 44 mm. Bracelet width: 22 mm",
+      "preOrderDays": "10-14 business days",
+      "closure": "Folding clasp with lock"
+    },
+    "ru": {
+      "title": "Часы Michael Kors Oversized Lexington Chronograph MK9154",
+      "description": "Стильные мужские часы Michael Kors Lexington в полностью черном исполнении. Массивный корпус, черный циферблат и стальной браслет создают выразительный монохромный дизайн, который отлично дополнит как повседневный, так и деловой образ.\nМодель оснащена кварцевым механизмом с функцией хронографа и отображением даты. Циферблат дополнен римскими цифрами и тремя субциферблатами. Корпус и браслет изготовлены из нержавеющей стали, а минеральное стекло защищает циферблат",
+      "material": "Нержавеющая сталь",
+      "dimensions": "Диаметр корпуса: 44 мм. Ширина браслета: 22 мм",
+      "preOrderDays": "10-14 рабочих дней",
+      "closure": "Раскладная с фиксатором"
+    }
+  }
 }

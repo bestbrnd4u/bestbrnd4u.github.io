@@ -81,5 +81,29 @@
   },
   "closure": "Клапан на магнітній кнопці з фурнітурою J Marc",
   "compartments": "Зовнішня відкрита кишеня; усередині — кишеня на блискавці та відкрита кишеня",
-  "decor": "Фірмова фурнітура J Marc"
+  "decor": "Фірмова фурнітура J Marc",
+  "i18n": {
+    "en": {
+      "title": "Marc Jacobs The J Marc Shoulder Bag Green Glow",
+      "description": "A bright and stylish Marc Jacobs The J Marc Shoulder Bag in a rich Green Glow shade. Crafted from smooth genuine leather and finished with the signature J Marc closure that makes the design recognizable and expressive.\nThe bag has a compact rectangular shape and a convenient main compartment, an interior zip pocket, an open pocket, and an exterior back pocket.\nIt comes with two detachable straps: an elegant chain strap and an adjustable textile strap. Wear it on the shoulder, crossbody, or without straps as a clutch",
+      "material": "Genuine leather",
+      "dimensions": "25 × 16 × 5 cm",
+      "strapInfo": "Two detachable: chain and adjustable textile",
+      "preOrderDays": "5–10 business days",
+      "closure": "Flap with magnetic snap and J Marc hardware",
+      "compartments": "Exterior open pocket; inside: zip pocket and open pocket",
+      "decor": "Signature J Marc hardware"
+    },
+    "ru": {
+      "title": "Сумка Marc Jacobs The J Marc Shoulder Bag Green Glow",
+      "description": "Яркая и стильная сумка Marc Jacobs The J Marc Shoulder Bag в насыщенном оттенке Green Glow. Модель выполнена из гладкой натуральной кожи и дополнена фирменной застежкой J Marc, которая делает дизайн узнаваемым и выразительным.\nСумка имеет компактную прямоугольную форму и удобное основное отделение, внутренний карман на молнии, открытый карман и наружный карман на задней стороне.\nМодель комплектуется двумя съемными ремнями: элегантным ремнем-цепочкой и регулируемым текстильным ремнем. Ее можно носить на плече, через плечо или без ремней как клатч",
+      "material": "Натуральная кожа",
+      "dimensions": "25 × 16 × 5 см",
+      "strapInfo": "Два съемных — цепочка и регулируемый текстильный",
+      "preOrderDays": "5–10 рабочих дней",
+      "closure": "Клапан на магнитной кнопке с фурнитурой J Marc",
+      "compartments": "Наружный открытый карман; внутри — карман на молнии и открытый карман",
+      "decor": "Фирменная фурнитура J Marc"
+    }
+  }
 }

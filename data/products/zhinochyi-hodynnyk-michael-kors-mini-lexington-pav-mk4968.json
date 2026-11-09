@@ -64,5 +64,25 @@
     "/assets/images/products/uploads/michael-kors-mini-lexington-quartz-red-dial-ladies-watch-mk4968_2.webp",
     "/assets/images/products/uploads/michael-kors-mini-lexington-quartz-red-dial-ladies-watch-mk4968_3.webp"
   ],
-  "closure": "Розкладна застібка"
+  "closure": "Розкладна застібка",
+  "i18n": {
+    "en": {
+      "title": "Michael Kors Mini Lexington Pavé MK4968 Women's Watch",
+      "description": "An elegant women's Michael Kors Mini Lexington Pavé watch in silver tone with a striking red dial. The miniature round case is complemented by a decorative bezel and pavé indexes that add refined sparkle.\nThe watch features a precise three-hand quartz movement. The red dial has an eye-catching sunray finish, and the case and bracelet are made of stainless steel. Mineral glass protects the dial; water resistance up to 50 m (5 ATM)",
+      "material": "Case and bracelet: stainless steel; glass: mineral",
+      "dimensions": "2.6 × 2.6 × 0.8 cm",
+      "strapInfo": "Silver-tone steel bracelet, 1.4 cm wide, with a folding clasp",
+      "preOrderDays": "10-14 business days",
+      "closure": "Folding clasp"
+    },
+    "ru": {
+      "title": "Женские часы Michael Kors Mini Lexington Pavé MK4968",
+      "description": "Элегантные женские часы Michael Kors Mini Lexington Pavé в серебристом исполнении с выразительным красным циферблатом. Миниатюрный круглый корпус дополнен декоративным безелем и pavé-индексами, которые придают модели утонченный блеск.\nЧасы оснащены точным кварцевым механизмом с тремя стрелками. Красный циферблат имеет эффектную лучистую отделку, а корпус и браслет выполнены из нержавеющей стали. Минеральное стекло защищает циферблат, водонепроницаемость — до 50 м (5 ATM)",
+      "material": "Корпус и браслет — нержавеющая сталь; стекло — минеральное",
+      "dimensions": "2,6 × 2,6 × 0,8 см",
+      "strapInfo": "Стальной браслет серебристого цвета шириной 1,4 см с раскладной застежкой",
+      "preOrderDays": "10-14 рабочих дней",
+      "closure": "Раскладная застежка"
+    }
+  }
 }

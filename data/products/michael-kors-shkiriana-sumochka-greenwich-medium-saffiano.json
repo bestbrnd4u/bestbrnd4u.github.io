@@ -69,5 +69,27 @@
   "closure": "Поворотний замок (turn-lock)",
   "compartments": "Зовні — передня та задня відкриті кишені; усередині — задня відкрита кишеня, центральна кишеня на блискавці та три відділення для карток",
   "strapInfo": "Ручка з перепадом 16,5 см; регульований плечовий ремінь 51–58 см, ремені взаємозамінні",
-  "decor": "Фурнітура золотистого тону"
+  "decor": "Фурнітура золотистого тону",
+  "i18n": {
+    "en": {
+      "title": "Greenwich Medium Saffiano Leather Bag",
+      "description": "The medium-size Michael Kors Greenwich in fine-grain Saffiano leather. Flap with the signature round MK emblem, detachable strap. A practical bag that keeps its shape with everyday wear.",
+      "material": "Leather",
+      "dimensions": "25.5 × 14 × 9.5 cm",
+      "strapInfo": "Handle with a 16.5 cm drop; adjustable shoulder strap 51–58 cm, straps are interchangeable",
+      "closure": "Turn-lock",
+      "compartments": "Outside — front and back slip pockets; inside — back slip pocket, center zip pocket and three card slots",
+      "decor": "Gold-tone hardware"
+    },
+    "ru": {
+      "title": "Кожаная сумочка Greenwich Medium Saffiano",
+      "description": "Michael Kors Greenwich в среднем размере из сафьяновой кожи с мелкозернистой текстурой. Клапан с фирменной круглой эмблемой MK, съемный ремешок. Практичная модель, которая не теряет вид при ежедневной носке.",
+      "material": "Кожа",
+      "dimensions": "25,5 × 14 × 9,5 см",
+      "strapInfo": "Ручка с высотой 16,5 см; регулируемый плечевой ремень 51–58 см, ремни взаимозаменяемые",
+      "closure": "Поворотный замок (turn-lock)",
+      "compartments": "Снаружи — передний и задний открытые карманы; внутри — задний открытый карман, центральный карман на молнии и три отделения для карт",
+      "decor": "Фурнитура золотистого тона"
+    }
+  }
 }

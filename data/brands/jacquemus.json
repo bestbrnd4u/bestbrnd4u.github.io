@@ -8,5 +8,15 @@
   "banner": "/assets/images/brands/jacquemus-banner.webp",
   "bannerMobile": "/assets/images/brands/jacquemus-banner-mobile.webp",
   "title": "Жіночі сумки Jacquemus",
-  "description": "Французька марка Сімона Порта Жакмюса, заснована 2009 року, коли засновнику було дев'ятнадцять. Її впізнають за середземноморським настроєм: світлі відтінки, прості лінії, відчуття півдня Франції.\n\nОкремо прославили бренд мініатюрні сумки Le Chiquito та Le Bambino — речі на межі аксесуара й прикраси."
+  "description": "Французька марка Сімона Порта Жакмюса, заснована 2009 року, коли засновнику було дев'ятнадцять. Її впізнають за середземноморським настроєм: світлі відтінки, прості лінії, відчуття півдня Франції.\n\nОкремо прославили бренд мініатюрні сумки Le Chiquito та Le Bambino — речі на межі аксесуара й прикраси.",
+  "i18n": {
+    "en": {
+      "title": "Jacquemus women's bags",
+      "description": "The French label of Simon Porte Jacquemus, founded in 2009, when its founder was nineteen. It is recognized by its Mediterranean mood: light tones, simple lines, a feeling of the South of France.\n\nThe brand owes much of its fame to the miniature Le Chiquito and Le Bambino bags — pieces on the line between accessory and jewelry."
+    },
+    "ru": {
+      "title": "Женские сумки Jacquemus",
+      "description": "Французская марка Симона Порта Жакмюса, основанная в 2009 году, когда основателю было девятнадцать. Ее узнают по средиземноморскому настроению: светлые оттенки, простые линии, ощущение юга Франции.\n\nОтдельно прославили бренд миниатюрные сумки Le Chiquito и Le Bambino — вещи на грани аксессуара и украшения."
+    }
+  }
 }

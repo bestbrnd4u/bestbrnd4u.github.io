@@ -66,5 +66,23 @@
     "/assets/images/products/uploads/ray-ban-green-irregular-unisex-sunglasses-rb4451-630631-50_2.webp",
     "/assets/images/products/uploads/ray-ban-green-irregular-unisex-sunglasses-rb4451-630631-50_4.webp",
     "/assets/images/products/uploads/ray-ban-green-irregular-unisex-sunglasses-rb4451-630631-50_10.webp"
-  ]
+  ],
+  "i18n": {
+    "en": {
+      "title": "Ray-Ban RB4451 Sunglasses",
+      "description": "Stylish Ray-Ban RB4451 sunglasses with a distinctive irregular frame shape. A versatile model with a modern design that easily complements both women's and men's looks.\nGreen lenses and a bold frame create a striking accent, while the lightweight construction keeps them comfortable for everyday wear. A great choice for city looks, vacations and travel",
+      "material": "Acetate",
+      "dimensions": "13.7 × 4.7 cm; lens width — 5 cm; bridge — 2.1 cm; temple length — 14 cm",
+      "strapInfo": "Plastic temples",
+      "preOrderDays": "10-14 business days"
+    },
+    "ru": {
+      "title": "Солнцезащитные очки Ray-Ban RB4451",
+      "description": "Стильные солнцезащитные очки Ray-Ban RB4451 с оригинальной неправильной формой оправы. Универсальная модель с современным дизайном, которая легко дополнит как женские, так и мужские образы.\nЗеленые линзы и выразительная оправа создают эффектный акцент в образе, а легкая конструкция обеспечивает комфорт во время ежедневной носки. Модель отлично подойдет для городских образов, отдыха и путешествий",
+      "material": "Ацетат",
+      "dimensions": "13,7 × 4,7 см; ширина линзы — 5 см; переносица — 2,1 см; длина дужки — 14 см",
+      "strapInfo": "Пластиковые дужки",
+      "preOrderDays": "10-14 рабочих дней"
+    }
+  }
 }

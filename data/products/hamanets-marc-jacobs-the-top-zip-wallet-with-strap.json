@@ -78,5 +78,25 @@
       "ONESIZE": 1
     }
   },
-  "closure": "Блискавка зверху"
+  "closure": "Блискавка зверху",
+  "i18n": {
+    "en": {
+      "title": "Marc Jacobs The Top Zip Wallet with Strap",
+      "description": "A compact and practical Marc Jacobs The Top Zip Wallet with Strap for women. The clean design is complemented by the signature Marc Jacobs logo and a convenient top zip closure.\nIt combines the function of a wallet and an accessory that can be carried on its own thanks to the strap. Inside there are compartments for cards and small essentials. An ideal choice for those who value compactness but don't want to give up signature style",
+      "material": "Genuine leather",
+      "dimensions": "13 × 7.5 cm",
+      "strapInfo": "Detachable strap that lets you wear the wallet on the wrist or use it as a compact standalone accessory",
+      "preOrderDays": "5–10 business days",
+      "closure": "Top zipper"
+    },
+    "ru": {
+      "title": "Кошелек Marc Jacobs The Top Zip Wallet with Strap",
+      "description": "Компактный и практичный женский кошелек Marc Jacobs The Top Zip Wallet with Strap. Лаконичный дизайн дополнен фирменным логотипом Marc Jacobs и удобной верхней застежкой на молнию.\nМодель сочетает функциональность кошелька и аксессуара, который можно носить отдельно благодаря ремешку. Внутри предусмотрены отделения для карт и необходимых мелочей. Идеальный вариант для тех, кто ценит компактность, но не хочет отказываться от фирменного стиля",
+      "material": "Натуральная кожа",
+      "dimensions": "13 × 7,5 см",
+      "strapInfo": "Съемный ремешок, который позволяет носить кошелек на запястье или использовать его как компактный самостоятельный аксессуар",
+      "preOrderDays": "5–10 рабочих дней",
+      "closure": "Молния сверху"
+    }
+  }
 }

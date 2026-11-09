@@ -52,5 +52,21 @@
     "Blush Beige": {
       "ONESIZE": 1
     }
+  },
+  "i18n": {
+    "en": {
+      "title": "Love Moschino quilted Leather Crossbody Bag",
+      "description": "Love Moschino Logo-plaque Quilted Cross-body Bag\nAn elegant quilted Love Moschino bag in a soft beige shade. It is adorned with the signature metal logo plaque, adding a recognizable accent to your look. Material: 100% genuine calf leather\nThe bag has a compact yet practical size, a main compartment for the essentials and a long strap for shoulder or crossbody wear.",
+      "material": "100% genuine calf leather",
+      "dimensions": "23 × 15 × 7 cm",
+      "preOrderDays": "5–10 business days"
+    },
+    "ru": {
+      "title": "Кожаная сумочка кросс-боди Love Moschino quilted",
+      "description": "Love Moschino Logo-plaque Quilted Cross-body Bag\nЭлегантная стеганая сумка Love Moschino в нежном бежевом оттенке. Модель украшена фирменной металлической пластиной с логотипом бренда, которая добавляет образу узнаваемый акцент. Материал — 100% натуральная телячья кожа (calf leather)\nСумка имеет компактный, но практичный формат, основное отделение для необходимых вещей и длинный ремешок для ношения на плече или кросс-боди.",
+      "material": "100% натуральная телячья кожа",
+      "dimensions": "23 × 15 × 7 см",
+      "preOrderDays": "5–10 рабочих дней"
+    }
   }
 }

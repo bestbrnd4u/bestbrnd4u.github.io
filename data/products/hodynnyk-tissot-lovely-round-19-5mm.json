@@ -64,5 +64,25 @@
   "legacySlugs": [
     "годинник-tissot-lovely-round-19-5mm"
   ],
-  "closure": "Застібка-метелик із кнопками-фіксаторами"
+  "closure": "Застібка-метелик із кнопками-фіксаторами",
+  "i18n": {
+    "en": {
+      "title": "Tissot Lovely Round 19.5mm Watch",
+      "description": "An exquisite women's Tissot Lovely Round 19.5mm watch — a petite model with a round case that combines elegance, femininity and Swiss quality.\nThe watch has a silver-tone dial with clean indices, a 316L stainless steel case with yellow gold-colored PVD coating and scratch-resistant sapphire crystal. The Swiss quartz movement ensures precise timekeeping. The model is completed by a gold-tone steel bracelet with a folding clasp and safety lock. Water resistance — up to 30 m (3 ATM)",
+      "material": "Case — 316L stainless steel with PVD coating; bracelet — stainless steel with PVD coating; crystal — sapphire",
+      "dimensions": "1.95 × 1.95 × 0.5 cm",
+      "strapInfo": "Gold-tone PVD-coated steel bracelet, clasp — folding with safety lock. Lug width — 0.6 cm",
+      "preOrderDays": "10-14 business days",
+      "closure": "Butterfly clasp with push-button locks"
+    },
+    "ru": {
+      "title": "Часы Tissot Lovely Round 19.5mm",
+      "description": "Изысканные женские часы Tissot Lovely Round 19.5mm — миниатюрная модель с круглым корпусом, сочетающая элегантность, женственность и швейцарское качество.\nЧасы имеют серебристый циферблат с лаконичными индексами, корпус из нержавеющей стали 316L с PVD-покрытием цвета желтого золота и устойчивое к царапинам сапфировое стекло. Швейцарский кварцевый механизм обеспечивает точный ход. Модель дополнена золотистым стальным браслетом с раскладной застежкой и защитным замком. Водонепроницаемость — до 30 м (3 ATM)",
+      "material": "Корпус — нержавеющая сталь 316L с PVD-покрытием; браслет — нержавеющая сталь с PVD-покрытием; стекло — сапфировое",
+      "dimensions": "1,95 × 1,95 × 0,5 см",
+      "strapInfo": "Золотистый стальной браслет с PVD-покрытием, застежка — раскладная с защитным замком. Ширина крепления — 0,6 см",
+      "preOrderDays": "10-14 рабочих дней",
+      "closure": "Застежка-бабочка с кнопками-фиксаторами"
+    }
+  }
 }

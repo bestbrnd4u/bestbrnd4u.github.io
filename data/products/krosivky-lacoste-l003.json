@@ -66,5 +66,19 @@
       "39": 1
     }
   },
-  "material": "Верх — 65% поліестер, 35% поліуретан; підкладка — поліестер; підошва — 61% гума, 39% EVA"
+  "material": "Верх — 65% поліестер, 35% поліуретан; підкладка — поліестер; підошва — 61% гума, 39% EVA",
+  "i18n": {
+    "en": {
+      "title": "Lacoste L003 Textile Sneakers",
+      "description": "Lacoste L003 0722 1 SMA\nStylish everyday Lacoste L003 0722 1 SMA sneakers — a modern model with a bold athletic design inspired by tennis aesthetics. The upper combines textile and synthetic materials for a comfortable fit and lightness in everyday wear.",
+      "material": "Upper — 65% polyester, 35% polyurethane; lining — polyester; sole — 61% rubber, 39% EVA",
+      "preOrderDays": "5–10 business days"
+    },
+    "ru": {
+      "title": "Кроссовки Lacoste L003 Textile Sneakers",
+      "description": "Lacoste L003 0722 1 SMA\nСтильные повседневные кроссовки Lacoste L003 0722 1 SMA — современная модель с выразительным спортивным дизайном, вдохновленным теннисной эстетикой. Верх сочетает текстильные и синтетические материалы, обеспечивая комфортную посадку и легкость в повседневной носке.",
+      "material": "Верх — 65% полиэстер, 35% полиуретан; подкладка — полиэстер; подошва — 61% резина, 39% EVA",
+      "preOrderDays": "5–10 рабочих дней"
+    }
+  }
 }

@@ -9,5 +9,15 @@
   "banner": "/assets/images/brands/love-moschino-banner.webp",
   "bannerMobile": "/assets/images/brands/love-moschino-banner-mobile.webp",
   "title": "Жіночі сумки Love Moschino",
-  "description": "Молодша лінія італійського дому Moschino, який 1983 року заснував Франко Москіно. Головна марка від початку жартувала з моди й цитувала її з іронією; ця лінія зберігає той самий настрій, але у простіших і легших речах.\n\nЗвідси серця, яскраві принти й стьобані сумки з помітною фурнітурою."
+  "description": "Молодша лінія італійського дому Moschino, який 1983 року заснував Франко Москіно. Головна марка від початку жартувала з моди й цитувала її з іронією; ця лінія зберігає той самий настрій, але у простіших і легших речах.\n\nЗвідси серця, яскраві принти й стьобані сумки з помітною фурнітурою.",
+  "i18n": {
+    "en": {
+      "title": "Love Moschino women's bags",
+      "description": "The younger line of the Italian house Moschino, founded by Franco Moschino in 1983. From the start, the main label poked fun at fashion and quoted it with irony; this line keeps the same mood in simpler, lighter pieces.\n\nHence the hearts, bright prints and quilted bags with bold hardware."
+    },
+    "ru": {
+      "title": "Женские сумки Love Moschino",
+      "description": "Младшая линия итальянского дома Moschino, который в 1983 году основал Франко Москино. Главная марка с самого начала шутила над модой и цитировала ее с иронией; эта линия сохраняет то же настроение, но в более простых и легких вещах.\n\nОтсюда сердца, яркие принты и стеганые сумки с заметной фурнитурой."
+    }
+  }
 }

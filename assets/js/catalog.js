@@ -3298,7 +3298,7 @@ function leavePreset() {
 
     const query = params.toString().replace(/%2C/gi, ",");
 
-    window.location.assign(query ? `/catalog?${query}` : "/catalog");
+    window.location.assign((window.I18N ? window.I18N.href((query ? `/catalog?${query}` : "/catalog")) : (query ? `/catalog?${query}` : "/catalog")));
 
 }
 
@@ -5006,6 +5006,51 @@ if (!window.CATALOG_SKIP_AUTO_INIT) {
 
     }
 
+    // ЩО ЧУЄ ЧИТАЛКА В ШТОРЦІ.
+    //
+    // Тап по фільтру міняв «Показати 131 товар» на «Показати 92 товари»
+    // лише для ока: хто не бачить екрана, не знав, чи щось
+    // відфільтрувалось. Тепер після паузи звучить «Знайдено 92 товари».
+    //
+    // Жива область — УСЕРЕДИНІ шторки: вона aria-modal, і частина
+    // читалок не озвучує те, що поза нею (див. те саме в lightbox.js).
+    // Створюємо з JS: catalog.html — шаблон для 136 згенерованих
+    // сторінок, і розмітку в ньому зайвий раз не чіпаємо.
+    const mfLive = document.createElement("span");
+    mfLive.className = "sr-announce";
+    mfLive.id = "mfLive";
+    mfLive.setAttribute("aria-live", "polite");
+    mobileFiltersModal.appendChild(mfLive);
+
+    let spokenCount = null;
+    let countTimer = 0;
+
+    function sayCount() {
+
+        const n = productsCount ? productsCount.textContent.trim() : "";
+
+        clearTimeout(countTimer);
+
+        // Чекаємо паузи: три тапи поспіль — одне оголошення, а не три.
+        countTimer = setTimeout(() => {
+
+            if (n === spokenCount) return;
+
+            spokenCount = n;
+
+            mfLive.textContent = "";
+
+            setTimeout(() => {
+                mfLive.textContent = `Знайдено ${n} ${pluralProducts(Number(n) || 0)}`;
+            }, 100);
+
+        }, 600);
+
+    }
+
+    // Звідки зайшли в розділ — щоб «Назад» повернув курсор саме туди.
+    let lastSection = null;
+
     function returnRelocatedTargets() {
 
         Object.values(targets).forEach(target => {
@@ -5031,6 +5076,11 @@ if (!window.CATALOG_SKIP_AUTO_INIT) {
         refreshRowLabels();
         refreshCounts();
 
+        // Те, що вже на кнопці, при відкритті не повторюємо.
+        clearTimeout(countTimer);
+        spokenCount = productsCount ? productsCount.textContent.trim() : null;
+        mfLive.textContent = "";
+
         mobileFiltersSub.hidden = true;
         mobileFiltersMain.hidden = false;
         mobileFiltersModal.hidden = false;
@@ -5049,6 +5099,8 @@ if (!window.CATALOG_SKIP_AUTO_INIT) {
     function closeMobileFilters() {
 
         returnRelocatedTargets();
+
+        clearTimeout(countTimer);
 
         // Курсор назад на «Фільтри» — ДО того, як сховаємо панель: у
         // схованій фокусувати вже нічого.
@@ -5094,6 +5146,19 @@ if (!window.CATALOG_SKIP_AUTO_INIT) {
 
         refreshCounts();
 
+        // КУРСОР — НА НАЗВУ РОЗДІЛУ.
+        //
+        // Натиснута кнопка «Бренд» щойно сховалась разом із переліком
+        // фільтрів, і фокус падав на <body> — на початок сторінки під
+        // шторкою. З клавіатури й читалкою людина опинялась «ніде».
+        // Назва — а не перший бренд у списку: читалка спершу каже, куди
+        // людина потрапила («Бренд»), а Tab далі веде до пошуку й
+        // варіантів.
+        lastSection = key;
+
+        mobileFiltersSubTitle.setAttribute("tabindex", "-1");
+        mobileFiltersSubTitle.focus({ preventScroll: true });
+
     }
 
     function backToMobileFiltersMain() {
@@ -5103,6 +5168,13 @@ if (!window.CATALOG_SKIP_AUTO_INIT) {
 
         refreshRowLabels();
         refreshCounts();
+
+        // Назад — на той самий рядок, з якого зайшли («Бренд →»), а не
+        // на <body>: кнопка «Назад» щойно сховалась разом із розділом.
+        const row = lastSection
+            && mobileFiltersRows?.querySelector(`.mobile-filter-row[data-target="${lastSection}"]`);
+
+        row?.focus();
 
     }
 
@@ -5183,6 +5255,8 @@ if (!window.CATALOG_SKIP_AUTO_INIT) {
             refreshCounts();
 
             if (!mobileFiltersMain.hidden) refreshRowLabels();
+
+            sayCount();
 
         }
 

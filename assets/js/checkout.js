@@ -1411,9 +1411,35 @@ function buildEmailTemplateParams(orderId, orderDate) {
 
 }
 
+// Мова, якою оформлено замовлення: від неї залежить мова листів
+// (міграція 044). Українська — null, як у всіх замовлень досі.
+function orderLang() {
+    const lang = window.I18N && window.I18N.lang;
+    return lang === "en" || lang === "ru" ? lang : null;
+}
+
+// Назва й колір мовою покупця — для листа. Тим самим перекладачем, що
+// й сторінка, тож у листі те саме, що людина бачила в кошику. У
+// замовленні лишаються й українські: їх читає менеджер.
+function localFields(product, color) {
+
+    if (!orderLang() || !window.I18N || typeof window.I18N.t !== "function") return {};
+
+    const out = {};
+    const title = window.I18N.t(product.title || "");
+    const colorLocal = color ? window.I18N.t(color) : "";
+
+    if (title && title !== product.title) out.title_local = title;
+    if (colorLocal && colorLocal !== color) out.color_local = colorLocal;
+
+    return out;
+
+}
+
 function buildOrderItemsSnapshot() {
 
     return getCartLines().map(({ product, qty, color, size }) => ({
+        ...localFields(product, color),
         id: product.id,
         title: product.title,
         brand: product.brand,
@@ -1772,6 +1798,9 @@ async function saveOrderToSupabase(orderId) {
         email: document.getElementById("email")?.value.trim() || null
     };
 
+    // Лише не для української: тоді запис той самий, що й досі.
+    if (orderLang()) order.lang = orderLang();
+
     // Якщо на сторінці стоїть перевірка «ви людина» — замовлення йде
     // через функцію, бо підтвердити токен можна тільки на сервері.
     //
@@ -1781,10 +1810,20 @@ async function saveOrderToSupabase(orderId) {
     // потоку в базі лишається власна межа (міграція 015).
     if (await placeOrderThroughFunction(order)) return;
 
-    const { error } = await supabaseClient.from("orders").insert({
+    let { error } = await supabaseClient.from("orders").insert({
         user_id: user ? user.id : null,
         ...order
     });
+
+    // Колонки lang ще немає (міграцію 044 не застосовано): повторюємо
+    // без мови. Втратити замовлення через мову листа — неприпустимо.
+    if (error && order.lang && /'lang' column|column "lang"|column "?orders"?\."?lang"? does not exist/i.test(String(error.message || ""))) {
+        const { lang, ...withoutLang } = order;
+        ({ error } = await supabaseClient.from("orders").insert({
+            user_id: user ? user.id : null,
+            ...withoutLang
+        }));
+    }
 
     if (!error) return true;
 
@@ -2031,7 +2070,7 @@ checkoutForm?.addEventListener("submit", event => {
 
             saveCart([]);
 
-            window.location.href = "thanks";
+            window.location.href = (window.I18N ? window.I18N.href("thanks") : "thanks");
 
         } else {
 

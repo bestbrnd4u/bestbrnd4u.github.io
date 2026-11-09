@@ -65,5 +65,21 @@
   "category": "Окуляри і оправи",
   "legacySlugs": [
     "стильні-жіночі-сонцезахисні-окуляри-marc-jacobs-mj-1010-s"
-  ]
+  ],
+  "i18n": {
+    "en": {
+      "title": "Marc Jacobs MJ 1010/S Women's Sunglasses",
+      "description": "Stylish women's Marc Jacobs MJ 1010/S sunglasses with an elegant rectangular frame. The model combines a modern design with the brand's recognizable aesthetic, easily complementing both everyday and more refined looks",
+      "material": "Acetate; polymer lenses",
+      "dimensions": "Lens width × bridge × temple length: 54 × 20 × 140 mm",
+      "preOrderDays": "5–10 business days"
+    },
+    "ru": {
+      "title": "Стильные женские солнцезащитные очки Marc Jacobs MJ 1010/S",
+      "description": "Стильные женские солнцезащитные очки Marc Jacobs MJ 1010/S с элегантной прямоугольной формой оправы. Модель сочетает современный дизайн и узнаваемую эстетику бренда, легко дополняя как повседневные, так и более изысканные образы",
+      "material": "Ацетат; полимерные линзы",
+      "dimensions": "Ширина линзы × переносица × длина заушника: 54 × 20 × 140 мм",
+      "preOrderDays": "5–10 рабочих дней"
+    }
+  }
 }

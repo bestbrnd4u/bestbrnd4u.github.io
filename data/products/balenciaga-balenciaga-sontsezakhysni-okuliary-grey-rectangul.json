@@ -61,5 +61,19 @@
     }
   },
   "dimensions": "Суцільна лінза 99 мм; довжина завушника — 125 мм",
-  "material": "Нейлон — і оправа, і лінзи"
+  "material": "Нейлон — і оправа, і лінзи",
+  "i18n": {
+    "en": {
+      "title": "Balenciaga Grey Rectangular Unisex Sunglasses",
+      "description": "Balenciaga sunglasses with a bold frame and dark lenses. Striking geometry, brand logo on the temple. A style that works as a statement piece on its own.",
+      "material": "Nylon — both frame and lenses",
+      "dimensions": "Single-piece lens 99 mm; temple length — 125 mm"
+    },
+    "ru": {
+      "title": "Солнцезащитные очки Balenciaga Grey Rectangular Unisex Sunglasses",
+      "description": "Солнцезащитные очки Balenciaga с массивной оправой и темными линзами. Выразительная геометрия, логотип бренда на заушнике. Модель, которая работает как самостоятельный акцент образа.",
+      "material": "Нейлон — и оправа, и линзы",
+      "dimensions": "Цельная линза 99 мм; длина заушника — 125 мм"
+    }
+  }
 }

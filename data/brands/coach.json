@@ -8,5 +8,15 @@
   "banner": "/assets/images/brands/coach-banner.webp",
   "bannerMobile": "/assets/images/brands/coach-banner-mobile.webp",
   "title": "Сумки й аксесуари Coach",
-  "description": "Нью-йоркська марка, що веде історію з 1941 року, коли невелика майстерня почала шити сумки зі щільної бейсбольної шкіри. Звідси й характер речей: міцна фурнітура, проста форма, розрахунок на щоденне носіння.\n\nНайвпізнаваніше в марці — тиснене полотно Signature й лінія Tabby. У каталозі переважно жіночі та чоловічі сумки, гаманці й дрібні аксесуари."
+  "description": "Нью-йоркська марка, що веде історію з 1941 року, коли невелика майстерня почала шити сумки зі щільної бейсбольної шкіри. Звідси й характер речей: міцна фурнітура, проста форма, розрахунок на щоденне носіння.\n\nНайвпізнаваніше в марці — тиснене полотно Signature й лінія Tabby. У каталозі переважно жіночі та чоловічі сумки, гаманці й дрібні аксесуари.",
+  "i18n": {
+    "en": {
+      "title": "Coach bags and accessories",
+      "description": "A New York brand that traces its history back to 1941, when a small workshop began making bags from sturdy baseball-glove leather. Hence the character of its pieces: solid hardware, simple shapes, made for everyday wear.\n\nThe brand's most recognizable signatures are the embossed Signature canvas and the Tabby line. The catalog mainly features women's and men's bags, wallets and small accessories."
+    },
+    "ru": {
+      "title": "Сумки и аксессуары Coach",
+      "description": "Нью-йоркская марка, которая ведет историю с 1941 года, когда небольшая мастерская начала шить сумки из плотной бейсбольной кожи. Отсюда и характер вещей: прочная фурнитура, простая форма, расчет на ежедневную носку.\n\nСамое узнаваемое в марке — тисненое полотно Signature и линия Tabby. В каталоге преимущественно женские и мужские сумки, кошельки и мелкие аксессуары."
+    }
+  }
 }

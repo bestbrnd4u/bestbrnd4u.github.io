@@ -76,5 +76,29 @@
   },
   "closure": "Клапан на магнітній кнопці з фурнітурою J Marc",
   "compartments": "Зовнішня відкрита кишеня; усередині — кишеня на блискавці та відкрита кишеня",
-  "decor": "Фірмова фурнітура J Marc"
+  "decor": "Фірмова фурнітура J Marc",
+  "i18n": {
+    "en": {
+      "title": "Women's Marc Jacobs The J Marc Shoulder Bag",
+      "description": "An elegant Marc Jacobs The J Marc Shoulder Bag in Bronze Green, a stylish model in smooth genuine leather finished with the signature double “J” closure and gold hardware.\nThe model has one main compartment, an interior zip pocket, and a patch pocket on the back. It comes with two detachable straps: an adjustable leather strap and a chain strap. Wear it on the shoulder, crossbody, or without straps as a clutch",
+      "material": "Genuine leather",
+      "dimensions": "25 × 16 × 5 cm",
+      "strapInfo": "2 detachable: adjustable and chain",
+      "preOrderDays": "5–10 business days",
+      "closure": "Flap with magnetic snap and J Marc hardware",
+      "compartments": "Exterior open pocket; inside: zip pocket and open pocket",
+      "decor": "Signature J Marc hardware"
+    },
+    "ru": {
+      "title": "Женская сумочка Marc Jacobs The J Marc Shoulder Bag",
+      "description": "Элегантная сумка Marc Jacobs The J Marc Shoulder Bag в оттенке Bronze Green — стильная модель из гладкой натуральной кожи, дополненная фирменной застежкой в виде двойной буквы «J» и золотой фурнитурой.\nМодель имеет одно основное отделение, внутренний карман на молнии и накладной карман на обратной стороне. Сумка комплектуется двумя съемными ремнями: регулируемым кожаным ремнем и ремнем-цепочкой. Ее можно носить на плече, через плечо или без ремней как клатч",
+      "material": "Натуральная кожа",
+      "dimensions": "25 × 16 × 5 см",
+      "strapInfo": "2 съемных: регулируемый и цепочка",
+      "preOrderDays": "5–10 рабочих дней",
+      "closure": "Клапан на магнитной кнопке с фурнитурой J Marc",
+      "compartments": "Наружный открытый карман; внутри — карман на молнии и открытый карман",
+      "decor": "Фирменная фурнитура J Marc"
+    }
+  }
 }

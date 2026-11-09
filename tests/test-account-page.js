@@ -1128,7 +1128,8 @@ console.log("\n[13] Після виходу з акаунту — на голо�
     check("обробник виходу знайшовся", body.includes("signOut"), body.slice(0, 60));
 
     check("після виходу ведемо на головну",
-        /window\.location\.replace\("\/"\)/.test(body),
+        // На /en/ і /ru/ — та сама головна своєю мовою (I18N.href).
+        /window\.location\.replace\((\(window\.I18N \? window\.I18N\.href\("\/"\) : "\/"\)|"\/")\)/.test(body),
         body.replace(/\s+/g, " ").slice(0, 140));
 
     // replace, а не href: «назад» повертало б у кабінет сесії, якої вже

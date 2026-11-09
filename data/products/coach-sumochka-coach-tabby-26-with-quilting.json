@@ -101,5 +101,27 @@
   "closure": "Замок-засувка (pushlock)",
   "compartments": "Зовнішня відкрита кишеня; усередині — кишеня на блискавці та кишеня на магнітній кнопці",
   "strapInfo": "Ланцюговий ремінь із перепадом 55 см: носиться на плечі або через плече, можна скласти вдвічі для коротшого варіанта",
-  "decor": "Фірмова фурнітура Coach, стьобання «подушка»"
+  "decor": "Фірмова фурнітура Coach, стьобання «подушка»",
+  "i18n": {
+    "en": {
+      "title": "Coach Tabby 26 With Quilting Bag",
+      "description": "The Coach Tabby Pillow is a stylish bag that will become the statement piece of any look \nIts soft silhouette and iconic Coach design make this style an ideal choice both for every day and for special occasions ",
+      "material": "Nappa — soft genuine leather; fabric lining",
+      "dimensions": "26 × 14 × 10 cm",
+      "strapInfo": "Chain strap with a 55 cm drop: wear it on the shoulder or crossbody, or double it for a shorter length",
+      "closure": "Pushlock",
+      "compartments": "Exterior open pocket; inside — a zip pocket and a magnetic snap pocket",
+      "decor": "Signature Coach hardware, pillow quilting"
+    },
+    "ru": {
+      "title": "Сумочка Coach Tabby 26 With Quilting",
+      "description": "Coach Tabby Pillow — стильная сумочка, которая станет акцентом любого образа \nМягкий силуэт и культовый дизайн Coach делают эту модель идеальным выбором как на каждый день, так и для особых случаев ",
+      "material": "Наппа — мягкая натуральная кожа; текстильная подкладка",
+      "dimensions": "26 × 14 × 10 см",
+      "strapInfo": "Цепочный ремень с высотой спуска 55 см: носится на плече или через плечо, можно сложить вдвое для более короткого варианта",
+      "closure": "Замок-защелка (pushlock)",
+      "compartments": "Внешний открытый карман; внутри — карман на молнии и карман на магнитной кнопке",
+      "decor": "Фирменная фурнитура Coach, стежка «подушка»"
+    }
+  }
 }

@@ -1,5 +1,13 @@
 {
   "name": "Жіночі сумки",
   "department": "Сумки",
-  "description": "Переважають моделі на довгому ремені — крос-боді й сумки на плече: вони лишають руки вільними й однаково доречні в офісі та на прогулянці. Поруч шопери на кожен день, клатчі та невеликі сумочки на ланцюжку.\n\nЯдро асортименту — Marc Jacobs і Coach: перший упізнають за монограмою та формою The Tote, другий — за тисненим полотном Signature й лінією Tabby. Є також JW PEI з веганськими матеріалами, Michael Kors, Love Moschino, Jacquemus і Tory Burch."
+  "description": "Переважають моделі на довгому ремені — крос-боді й сумки на плече: вони лишають руки вільними й однаково доречні в офісі та на прогулянці. Поруч шопери на кожен день, клатчі та невеликі сумочки на ланцюжку.\n\nЯдро асортименту — Marc Jacobs і Coach: перший упізнають за монограмою та формою The Tote, другий — за тисненим полотном Signature й лінією Tabby. Є також JW PEI з веганськими матеріалами, Michael Kors, Love Moschino, Jacquemus і Tory Burch.",
+  "i18n": {
+    "en": {
+      "description": "Long-strap styles dominate — crossbody and shoulder bags: they keep your hands free and work equally well at the office and on a stroll. Alongside them are everyday totes, clutches and small chain bags.\n\nThe core of the range is Marc Jacobs and Coach: the first is recognized by its monogram and The Tote shape, the second by its embossed Signature canvas and the Tabby line. There is also JW PEI with vegan materials, Michael Kors, Love Moschino, Jacquemus and Tory Burch."
+    },
+    "ru": {
+      "description": "Преобладают модели на длинном ремне — кросс-боди и сумки на плечо: они оставляют руки свободными и одинаково уместны в офисе и на прогулке. Рядом шоперы на каждый день, клатчи и небольшие сумочки на цепочке.\n\nЯдро ассортимента — Marc Jacobs и Coach: первый узнают по монограмме и форме The Tote, второй — по тисненому полотну Signature и линии Tabby. Есть также JW PEI с веганскими материалами, Michael Kors, Love Moschino, Jacquemus и Tory Burch."
+    }
+  }
 }

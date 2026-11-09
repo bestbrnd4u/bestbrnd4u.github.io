@@ -60,5 +60,23 @@
     "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7558.webp",
     "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-ch-6d39ef48.webp",
     "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-ch-d3f8077e.webp"
-  ]
+  ],
+  "i18n": {
+    "en": {
+      "title": "Michael Kors Oversized Billie Frosted Chronograph MK7558 Watch",
+      "description": "An elegant Michael Kors Billie women's watch in a silver tone with a Frosted effect. The stylish stainless steel bracelet and sparkling dial create a striking accent and beautifully complement both everyday and festive looks.\nThe watch is powered by a quartz movement with a chronograph function and date display. Mineral crystal protects the dial from scratches, and 5 ATM water resistance ensures comfort in everyday use",
+      "material": "Stainless steel",
+      "dimensions": "Case diameter: 40 mm Case thickness: 10.5 mm Bracelet width: 20 mm",
+      "preOrderDays": "10-14 business days",
+      "closure": "Folding with push-button lock"
+    },
+    "ru": {
+      "title": "Часы Michael Kors Oversized Billie Frosted Chronograph MK7558",
+      "description": "Элегантные женские часы Michael Kors Billie в серебристом оттенке с эффектом Frosted. Стильный браслет из нержавеющей стали и блестящий циферблат создают выразительный акцент и отлично дополняют как повседневные, так и праздничные образы.\nМодель оснащена кварцевым механизмом с функцией хронографа и отображением даты. Минеральное стекло защищает циферблат от царапин, а водозащита 5 ATM обеспечивает комфорт в повседневном использовании",
+      "material": "Нержавеющая сталь",
+      "dimensions": "Диаметр корпуса: 40 мм Толщина корпуса: 10,5 мм Ширина браслета: 20 мм",
+      "preOrderDays": "10-14 рабочих дней",
+      "closure": "Раскладная с кнопочным фиксатором"
+    }
+  }
 }

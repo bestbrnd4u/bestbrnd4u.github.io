@@ -6,5 +6,19 @@
   "handlingMin": 1,
   "handlingMax": 2,
   "transitMin": 1,
-  "transitMax": 3
+  "transitMax": 3,
+  "i18n": {
+    "en": {
+      "onlyOneTitle": "Only one in stock.",
+      "onlyOneWithDays": "If it sells, we bring the next one in {строк}.",
+      "onlyOneWithoutDays": "There is no second one like it in stock.",
+      "deliveryDate": "Estimated at the branch {дата}"
+    },
+    "ru": {
+      "onlyOneTitle": "Единственный экземпляр.",
+      "onlyOneWithDays": "Если его купят, следующий привезем за {строк}.",
+      "onlyOneWithoutDays": "Второго такого в наличии нет.",
+      "deliveryDate": "Ориентировочно в отделении {дата}"
+    }
+  }
 }

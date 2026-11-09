@@ -572,7 +572,7 @@ checkoutBtn?.addEventListener("click", () => {
 
     if (getCart().length === 0) return;
 
-    window.location.href = "checkout";
+    window.location.href = (window.I18N ? window.I18N.href("checkout") : "checkout");
 
 });
 

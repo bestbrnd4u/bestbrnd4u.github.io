@@ -89,5 +89,29 @@
   },
   "closure": "Блискавка",
   "compartments": "Дві передні кишені з клапанами та дві бічні кишені на блискавці",
-  "decor": "Фурнітура сріблястого тону з гравіюванням логотипа, тиснене брендування"
+  "decor": "Фурнітура сріблястого тону з гравіюванням логотипа, тиснене брендування",
+  "i18n": {
+    "en": {
+      "title": "Marc Jacobs The Leather Cargo Bag Camel",
+      "description": "A stylish and functional Marc Jacobs The Leather Cargo Bag in a warm Camel shade. The model combines a minimalist design with a practical construction and plenty of convenient exterior pockets.\nThe bag is made of genuine pebbled leather and finished with the signature Marc Jacobs logo. It features a zippered main compartment, two exterior zip pockets, and two patch pockets with magnetic closures.\nIt comes with two detachable straps: a leather strap for shoulder wear and an adjustable textile strap for crossbody wear",
+      "material": "Genuine leather",
+      "dimensions": "22 × 12 × 7 cm",
+      "strapInfo": "Two detachable straps",
+      "preOrderDays": "5–10 business days",
+      "closure": "Zipper",
+      "compartments": "Two front flap pockets and two side zip pockets",
+      "decor": "Silver-tone hardware with engraved logo, embossed branding"
+    },
+    "ru": {
+      "title": "Сумка Marc Jacobs The Leather Cargo Bag Camel",
+      "description": "Стильная и функциональная сумка Marc Jacobs The Leather Cargo Bag в теплом оттенке Camel. Модель сочетает лаконичный дизайн с практичной конструкцией и большим количеством удобных наружных карманов.\nСумка изготовлена из натуральной зернистой кожи и дополнена фирменным логотипом Marc Jacobs. Имеет основное отделение на молнии, два наружных кармана на молнии и два накладных кармана с магнитными застежками.\nМодель комплектуется двумя съемными ремнями: кожаным ремнем для ношения на плече и регулируемым текстильным ремнем для ношения через плечо",
+      "material": "Натуральная кожа",
+      "dimensions": "22 × 12 × 7 см",
+      "strapInfo": "Два съемных ремня",
+      "preOrderDays": "5–10 рабочих дней",
+      "closure": "Молния",
+      "compartments": "Два передних кармана с клапанами и два боковых кармана на молнии",
+      "decor": "Фурнитура серебристого тона с гравировкой логотипа, тисненый брендинг"
+    }
+  }
 }

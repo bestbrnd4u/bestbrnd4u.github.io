@@ -70,5 +70,27 @@
     }
   },
   "closure": "Кнопка",
-  "compartments": "Зовнішня відкрита кишеня; усередині — кишеня на блискавці та багатофункціональна кишеня"
+  "compartments": "Зовнішня відкрита кишеня; усередині — кишеня на блискавці та багатофункціональна кишеня",
+  "i18n": {
+    "en": {
+      "title": "Coach Klare Crossbody 25 In Signature Canvas",
+      "description": "A stylish women's Coach Klare Crossbody 25 in the signature Signature print, an elegant everyday bag. The combination of signature coated Signature canvas and textured refined pebble leather gives the bag a premium look.\nIt has a convenient main compartment with a snap closure, an interior zip pocket and a multifunction pocket, plus an exterior pocket for things you want close at hand.\nThe minimalist design and versatile dark brown shade pair easily with both casual and more elegant looks",
+      "material": "Signature coated canvas and textured refined pebble leather; fabric lining",
+      "dimensions": "26 × 17 × 8 cm",
+      "strapInfo": "Adjustable strap. The strap lets you wear the bag three ways: short or long on the shoulder, or crossbody",
+      "preOrderDays": "5–10 business days",
+      "closure": "Snap",
+      "compartments": "Exterior open pocket; inside: zip pocket and multifunction pocket"
+    },
+    "ru": {
+      "title": "Сумочка Coach Klare Crossbody 25 In Signature Canvas",
+      "description": "Стильная женская сумка Coach Klare Crossbody 25 в фирменном принте Signature — элегантная модель на каждый день. Сочетание фирменного покрытого полотна Signature и фактурной кожи refined pebble leather придает сумке премиальный вид.\nМодель имеет удобное основное отделение с застежкой-кнопкой, внутренний карман на молнии и многофункциональный карман, а также наружный карман для вещей, которые должны быть под рукой.\nЛаконичный дизайн и универсальный темно-коричневый оттенок легко сочетаются как с повседневными, так и с более элегантными образами",
+      "material": "Фирменное покрытое полотно Signature и фактурная кожа refined pebble leather; текстильная подкладка",
+      "dimensions": "26 × 17 × 8 см",
+      "strapInfo": "Регулируемый ремень. Ремень позволяет носить сумку тремя способами: коротко или длинно на плече, а также кроссбоди",
+      "preOrderDays": "5–10 рабочих дней",
+      "closure": "Кнопка",
+      "compartments": "Наружный открытый карман; внутри — карман на молнии и многофункциональный карман"
+    }
+  }
 }

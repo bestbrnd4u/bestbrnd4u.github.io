@@ -9,5 +9,13 @@
   "banner": "/assets/images/brands/gucci-banner.webp",
   "bannerMobile": "/assets/images/brands/gucci-banner-mobile.webp",
   "title": "Gucci",
-  "description": "Флорентійський дім, заснований Гуччо Гуччі 1921 року. Починав він із дорожніх валіз і кінської збруї — звідси й досі пряжка Horsebit на взутті та сумках, і зелено-червона стрічка, що повторює попругу.\n\nМонограма GG з'явилась пізніше, у 1960-х, і стала одним із найвпізнаваніших знаків у моді. Марка входить до групи Kering."
+  "description": "Флорентійський дім, заснований Гуччо Гуччі 1921 року. Починав він із дорожніх валіз і кінської збруї — звідси й досі пряжка Horsebit на взутті та сумках, і зелено-червона стрічка, що повторює попругу.\n\nМонограма GG з'явилась пізніше, у 1960-х, і стала одним із найвпізнаваніших знаків у моді. Марка входить до групи Kering.",
+  "i18n": {
+    "en": {
+      "description": "A Florentine house founded by Guccio Gucci in 1921. It started out with travel luggage and equestrian tack — which is why the Horsebit buckle still appears on shoes and bags, along with the green-and-red web stripe that echoes a saddle girth.\n\nThe GG monogram came later, in the 1960s, and became one of the most recognizable symbols in fashion. The brand is part of the Kering group."
+    },
+    "ru": {
+      "description": "Флорентийский дом, основанный Гуччо Гуччи в 1921 году. Начинал он с дорожных чемоданов и конской сбруи — отсюда до сих пор пряжка Horsebit на обуви и сумках и зелено-красная лента, повторяющая подпругу.\n\nМонограмма GG появилась позже, в 1960-х, и стала одним из самых узнаваемых знаков в моде. Марка входит в группу Kering."
+    }
+  }
 }

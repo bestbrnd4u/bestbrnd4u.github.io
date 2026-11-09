@@ -1049,6 +1049,159 @@ nav li.has-mega[data-mega-open] .mega-menu.mega-menu-columns{
     align-items:center;
 }
 
+/* ПЕРЕМИКАЧ МОВИ (scripts/build-locales.js).
+
+   Це <nav>, а на вузькому екрані правило «nav{display:none}» ховає
+   все меню шапки — разом із ним і перемикач. Там йому однаково немає
+   місця (меню, пошук, логотип, обране, кошик на 375px), тож у шапці
+   він лише на широкому екрані, а на телефоні — копія в мобільному
+   меню (buildMobileNav у common.js). Правила тут — за класом: «nav a»
+   важить менше й не перебиває. */
+/* Усередині .header-icons — проміжок до сусідів дає сама група. */
+.header .lang-switch{
+    display:flex;
+    align-items:center;
+}
+
+/* Випадний список (<details>, побажання власника): закритим — коротка
+   назва поточної мови, у списку — повні назви. */
+.lang-switch-menu{
+    position:relative;
+}
+
+.lang-switch-current{
+    display:flex;
+    align-items:center;
+    gap:4px;
+    padding:8px 10px;
+    border-radius:10px;
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:.02em;
+    color:var(--dark);
+    cursor:pointer;
+    list-style:none;
+    user-select:none;
+}
+
+/* Свій трикутник замість стандартного маркера <summary>. */
+.lang-switch-current::-webkit-details-marker{
+    display:none;
+}
+
+.lang-switch-current::after{
+    content:"";
+    width:7px;
+    height:7px;
+    margin-left:2px;
+    border-right:2px solid currentColor;
+    border-bottom:2px solid currentColor;
+    transform:translateY(-2px) rotate(45deg);
+    transition:transform 200ms ease;
+}
+
+.lang-switch-menu[open] > .lang-switch-current::after{
+    transform:translateY(2px) rotate(-135deg);
+}
+
+@media (hover:hover) and (pointer:fine){
+.lang-switch-current:hover{
+    background:var(--surface-muted);
+}
+}
+
+.lang-switch-current:focus-visible{
+    outline:2px solid var(--secondary);
+    outline-offset:2px;
+}
+
+/* display:block — бо «nav ul{display:flex}» (правило меню шапки, за
+   тегом) інакше ставить мови в рядок. */
+.lang-switch-list{
+    display:block;
+    position:absolute;
+    top:calc(100% + 6px);
+    right:0;
+    z-index:700;
+    min-width:160px;
+    margin:0;
+    padding:6px;
+    list-style:none;
+    background:#fff;
+    border-radius:12px;
+    box-shadow:var(--shadow-lg);
+}
+
+.lang-switch .lang-switch-option{
+    display:block;
+    padding:10px 12px;
+    border-radius:8px;
+    font-size:15px;
+    font-weight:600;
+    color:var(--gray700);
+    text-decoration:none;
+    white-space:nowrap;
+}
+
+@media (hover:hover) and (pointer:fine){
+.lang-switch a.lang-switch-option:hover{
+    background:var(--surface-muted);
+    color:var(--secondary);
+}
+}
+
+.lang-switch a.lang-switch-option:focus-visible{
+    outline:2px solid var(--secondary);
+    outline-offset:-2px;
+}
+
+.lang-switch .lang-switch-option[aria-current]{
+    color:var(--dark);
+    background:var(--surface-muted);
+}
+
+/* На вузькому екрані в шапці перемикача немає: «nav{display:none}»
+   за тегом важить менше за «.header .lang-switch» і його не ховав —
+   перемикач виштовхував обране й кошик у другий рядок (заміряно на
+   375px). Брейкпоінт той самий, що в шапки (див. 1239 нижче). */
+@media(max-width:1239px){
+    .header .lang-switch{
+        display:none;
+    }
+}
+
+/* У мобільному меню список розкривається на місці, а не випливає
+   над сторінкою: меню саме по собі вже накладка. */
+.mobile-nav .lang-switch{
+    display:block;
+    padding:8px 24px 20px;
+}
+
+.mobile-nav .lang-switch-current{
+    padding:14px 0;
+    font-size:16px;
+}
+
+.mobile-nav .lang-switch-list{
+    position:static;
+    box-shadow:none;
+    padding:0;
+    background:none;
+}
+
+/* Юридична сторінка іншою мовою: текст — український, чинний саме він. */
+.legal-lang-note{
+    max-width:820px;
+    margin:16px auto;
+    padding:12px 16px;
+    border-radius:12px;
+    background:#fff;
+    border:1px solid var(--gray200);
+    color:var(--gray700);
+    font-size:14px;
+    line-height:1.5;
+}
+
 .header-icons a,
 .header-icons button{
     position:relative;
@@ -2729,7 +2882,14 @@ nav li.has-mega[data-mega-open] .mega-menu.mega-menu-columns{
 
    min-height не чіпаємо: коли переносити нічого (знижки немає),
    рядок лишається один і його висота та сама, що й була. */
-@media(max-width:374px){
+/* МЕЖА 374 → 389 (09.11.2026). Заміряно на /catalog: на 375–380px від
+   «грн» старої ціни зрізано 1–3px на 1–3 картках зі знижкою (рядок
+   145px при 131px місця, поля картки ховають лише 12). Тіснити
+   проміжок між цінами пробували — 8 → 4 → 2px — і на 375 одна картка
+   все одно вилазила: запас у частки пікселя залежить від того, як
+   пристрій малює шрифт. Тож перенос — до 389px; на 390 він, як і
+   було, не потрібен (див. заміри вище). */
+@media(max-width:389px){
 
     .product-price{
         flex-wrap:wrap;
@@ -3905,9 +4065,43 @@ body.mobile-filters-open .scroll-top{
     grid-column:1/-1;
 }
 
-.empty-state h2{
+/* ЗНАЧОК — ПРИКРАСА, А НЕ ЗАГОЛОВОК.
+
+   Тут був h2 зі смайликом (🛒, ❤, 😔…), а сам текст стану — <p>. Хто
+   ходить сторінкою за заголовками, чув «заголовок 2, візок для
+   покупок», а «Ваш кошик поки порожній» заголовком не був зовсім. Так
+   було в усіх семи порожніх станах сайту, і в «Товар не знайдено» —
+   теж, хоч коментар нижче вже обіцяв протилежне.
+
+   Тепер значок — aria-hidden div з тим самим виглядом, а заголовок —
+   сам текст. Розміри зняті з браузера ДО правки й повторені точно. */
+.empty-state-icon{
     font-size:52px;
+    font-weight:800;
+    line-height:1.6;
     margin-bottom:10px;
+    color:var(--dark);
+}
+
+/* Текст стану як заголовок — але вигляд того самого абзацу, що був:
+   17px/400, сірий. Загальне правило h2 інакше дало б 42px/800. */
+.empty-state .empty-state-title{
+    margin:0 0 24px;
+    font-size:17px;
+    font-weight:400;
+    line-height:1.6;
+    color:var(--gray500);
+    text-align:center;
+}
+
+/* Там, де текст був h3 (акцію не знайдено), — вигляд того h3. */
+.empty-state .empty-state-heading{
+    margin:0 0 24px;
+    font-size:24px;
+    font-weight:700;
+    line-height:1.6;
+    color:var(--dark);
+    text-align:center;
 }
 
 .empty-state p{
@@ -9156,6 +9350,13 @@ body.mobile-filters-open .scroll-top{
 
    Звідси 1140: нижче — мобільна шапка, яка влазить і в 390px.
 
+   ДАЛІ 1239 (06.11.2026). У шапці з'явився перемикач мови (≈65px з
+   проміжком). Заміряно на /cart: на 1141px вільно було лише 42px (по 21
+   з боків меню), і з перемикачем лого впритул стало до «Головна» —
+   зазор 0. На 1200px без перемикача вільно 100px, з ним заміряно лише
+   8–13px — тісно. На 1240px — 28–33px. Тож повна шапка тепер від
+   1240px, нижче — мобільна.
+
    ЧОМУ ОКРЕМИЙ БЛОК, А НЕ ПЕРЕНЕСЕНИЙ 768. У тому блоці ще 45
    правил про зовсім інше — сітки, кошик, заголовки секцій. Їм 768
    правильний, і тягти їх за шапкою не можна.
@@ -9164,7 +9365,7 @@ body.mobile-filters-open .scroll-top{
    переносить гамбургер і пошук у .header-left. Якщо розійдуться,
    шапка зламається навпіл: CSS уже мобільний, а кнопки ще ні.
    Тримає їх разом перевірка в tests/test-header-breakpoint.js. */
-@media(max-width:1140px){
+@media(max-width:1239px){
 
     nav{
         display:none;
@@ -10200,6 +10401,17 @@ body.mobile-filters-open .scroll-top{
     margin:0;
     font-size:13px;
     line-height:1.5;
+    color:var(--gray500);
+}
+
+/* Вимога під полем («Мінімум 6 символів»). Стоїть після <label>, тож
+   між ними — 16px відступу форми; -10 лишає 6px, рядок читається як
+   частина свого поля, а не наступного. Наїзду немає: від'ємне тут
+   менше за сам проміжок. */
+.auth-form .field-hint{
+    margin-top:-10px;
+    font-size:12px;
+    line-height:1.4;
     color:var(--gray500);
 }
 
@@ -15845,7 +16057,7 @@ body.refusal-open{
     margin:0 auto;
 }
 
-.product-not-found h3{
+.product-not-found .empty-state-heading{
     margin-bottom:12px;
     font-size:26px;
 }
@@ -15867,7 +16079,7 @@ body.refusal-open{
 
 @media(max-width:520px){
 
-    .product-not-found h3{
+    .product-not-found .empty-state-heading{
         font-size:21px;
     }
 

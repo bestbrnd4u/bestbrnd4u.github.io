@@ -36,7 +36,7 @@ async function initPromoPage() {
     const loader = document.getElementById("promoLoader");
 
     if (!slug) {
-        location.href = "/catalog";
+        location.href = (window.I18N ? window.I18N.href("/catalog") : "/catalog");
         return;
     }
 

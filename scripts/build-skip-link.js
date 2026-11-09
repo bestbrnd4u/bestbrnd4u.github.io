@@ -64,7 +64,9 @@ const ВСТАВКА_ЦІЛІ = "\n" + ЦІЛЬ;
 // Ті самі теки, що й у build-footer-sections.js: supabase — шаблони
 // листів, admin — Decap зі своєю розміткою, archive — старе.
 const ПРОПУСК = ["node_modules", ".git", ".claude", "archive", "admin",
-    ".playwright-mcp", "supabase", "_site"];
+    ".playwright-mcp", "supabase", "_site",
+    // мовні копії будує build-locales.js пізніше й щоразу наново
+    "en", "ru"];
 
 function сторінки(dir, список) {
 

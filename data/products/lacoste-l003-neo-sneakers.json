@@ -56,5 +56,17 @@
       "37": 1
     }
   },
-  "material": "Верх — 76% поліестер, 12% шкіра, 12% поліуретан; підкладка — 85% поліестер, 15% нейлон; підошва — 53% гума, 47% EVA"
+  "material": "Верх — 76% поліестер, 12% шкіра, 12% поліуретан; підкладка — 85% поліестер, 15% нейлон; підошва — 53% гума, 47% EVA",
+  "i18n": {
+    "en": {
+      "description": "Stylish Lacoste L003 Neo sneakers with a modern chunky design and the brand's signature logo. A comfortable fit and versatile silhouette make them a great choice for everyday looks",
+      "material": "Upper — 76% polyester, 12% leather, 12% polyurethane; lining — 85% polyester, 15% nylon; sole — 53% rubber, 47% EVA",
+      "preOrderDays": "5–10 business days"
+    },
+    "ru": {
+      "description": "Стильные кроссовки Lacoste L003 Neo с современным массивным дизайном и фирменным логотипом бренда. Комфортная посадка и универсальный силуэт делают их отличным выбором для повседневных образов",
+      "material": "Верх — 76% полиэстер, 12% кожа, 12% полиуретан; подкладка — 85% полиэстер, 15% нейлон; подошва — 53% резина, 47% EVA",
+      "preOrderDays": "5–10 рабочих дней"
+    }
+  }
 }

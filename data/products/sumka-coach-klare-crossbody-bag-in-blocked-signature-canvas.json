@@ -94,5 +94,27 @@
     }
   },
   "closure": "Кнопка",
-  "compartments": "Зовнішня відкрита кишеня; усередині — кишеня на блискавці та багатофункціональна кишеня"
+  "compartments": "Зовнішня відкрита кишеня; усередині — кишеня на блискавці та багатофункціональна кишеня",
+  "i18n": {
+    "en": {
+      "title": "Coach Klare Crossbody Bag In Blocked Signature Canvas",
+      "description": "A stylish COACH Klare Crossbody Bag in the signature Signature Canvas print with contrasting Gold, Chalk and Glacier White tones. The elegant structured design, gold-tone hardware and recognizable COACH logo make it a versatile addition to both everyday and more festive looks.\nMade of signature coated canvas and smooth leather. It has a main compartment, an interior zip pocket, multifunction pockets and an exterior pocket. Fastens with a convenient closure.\nThe adjustable strap can be worn short or longer on the shoulder, or crossbody.",
+      "material": "Signature coated canvas and smooth leather",
+      "dimensions": "22 × 16 × 7 cm",
+      "strapInfo": "Adjustable, detachable",
+      "preOrderDays": "5–10 business days",
+      "closure": "Snap",
+      "compartments": "Exterior slip pocket; inside — zip pocket and multifunction pocket"
+    },
+    "ru": {
+      "title": "Сумка Coach Klare Crossbody Bag In Blocked Signature Canvas",
+      "description": "Стильная сумка COACH Klare Crossbody Bag в фирменном принте Signature Canvas с контрастными оттенками Gold, Chalk и Glacier White. Элегантный структурированный дизайн, золотистая фурнитура и узнаваемый логотип COACH делают модель универсальным дополнением к повседневным и более праздничным образам.\nСумка изготовлена из фирменного покрытого канваса и гладкой кожи. Имеет основное отделение, внутренний карман на молнии, многофункциональные карманы и внешний карман. Закрывается на удобную застежку.\nРегулируемый ремешок можно носить коротко или длиннее на плече, а также через плечо.",
+      "material": "Фирменный покрытый канвас и гладкая кожа",
+      "dimensions": "22 × 16 × 7 см",
+      "strapInfo": "Регулируемый, съемный",
+      "preOrderDays": "5–10 рабочих дней",
+      "closure": "Кнопка",
+      "compartments": "Внешний открытый карман; внутри — карман на молнии и многофункциональный карман"
+    }
+  }
 }

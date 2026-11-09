@@ -60,5 +60,19 @@
     }
   },
   "dimensions": "Ширина лінзи × місток × довжина завушника: 51 × 18 × 130 мм",
-  "material": "Ацетат"
+  "material": "Ацетат",
+  "i18n": {
+    "en": {
+      "title": "Balenciaga Grey Rectangular Ladies Sunglasses",
+      "description": "Balenciaga sunglasses with a rectangular frame and dark lenses. An understated shape with the signature logo on the temple — right for every day.",
+      "material": "Acetate",
+      "dimensions": "Lens width × bridge × temple length: 51 × 18 × 130 mm"
+    },
+    "ru": {
+      "title": "Солнцезащитные очки Balenciaga Grey Rectangular Ladies Sunglasses",
+      "description": "Солнцезащитные очки Balenciaga в прямоугольной оправе с темными линзами. Сдержанная форма с фирменным логотипом на дужке — уместны каждый день.",
+      "material": "Ацетат",
+      "dimensions": "Ширина линзы × мост × длина заушника: 51 × 18 × 130 мм"
+    }
+  }
 }

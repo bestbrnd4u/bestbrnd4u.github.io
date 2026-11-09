@@ -93,5 +93,27 @@
     }
   },
   "closure": "Масивна блискавка зверху",
-  "compartments": "Усередині — кишеня на блискавці, відкрита кишеня та відділення для картки"
+  "compartments": "Усередині — кишеня на блискавці, відкрита кишеня та відділення для картки",
+  "i18n": {
+    "en": {
+      "title": "Marc Jacobs The Denim Small Tote Bag Blue",
+      "description": "A stylish, distinctive Marc Jacobs The Denim Small Tote Bag in light-and-dark blue denim. It features the signature The Tote Bag silhouette, contrasting leather details and The Tote Bag lettering on the front.\nThe denim fabric and the mix of blue shades give the bag a modern, relaxed look. It has two top handles and a detachable strap for shoulder or crossbody wear",
+      "material": "Denim",
+      "dimensions": "26 × 21 × 13 cm",
+      "strapInfo": "Detachable, adjustable strap",
+      "preOrderDays": "5–10 business days",
+      "closure": "Chunky zip top",
+      "compartments": "Inside — zip pocket, slip pocket and card slot"
+    },
+    "ru": {
+      "title": "Шопер Marc Jacobs The Denim Small Tote Bag Blue",
+      "description": "Стильная и оригинальная сумка Marc Jacobs The Denim Small Tote Bag в голубо-синем дениме. Модель выполнена в фирменном силуэте The Tote Bag и дополнена контрастными кожаными деталями и надписью The Tote Bag на передней панели.\nДжинсовый материал и сочетание разных оттенков синего придают сумке современный и непринужденный вид. Модель имеет две верхние ручки и съемный ремешок для ношения на плече или через плечо",
+      "material": "Деним",
+      "dimensions": "26 × 21 × 13 см",
+      "strapInfo": "Ремешок съемный и регулируемый",
+      "preOrderDays": "5–10 рабочих дней",
+      "closure": "Массивная молния сверху",
+      "compartments": "Внутри — карман на молнии, открытый карман и отделение для карты"
+    }
+  }
 }

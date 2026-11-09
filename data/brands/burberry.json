@@ -9,5 +9,13 @@
   "banner": "/assets/images/brands/burberry-banner.webp",
   "bannerMobile": "/assets/images/brands/burberry-banner-mobile.webp",
   "title": "Burberry",
-  "description": "Британський дім, який 1856 року заснував Томас Берберрі. Саме він винайшов габардин — щільну тканину, що дихає й не промокає, — а з неї згодом народився тренч, спершу як форма для військових.\n\nКлітка Burberry з'явилась як підкладка того ж тренча й поступово стала самостійним знаком марки. Її й досі впізнають без жодного логотипа."
+  "description": "Британський дім, який 1856 року заснував Томас Берберрі. Саме він винайшов габардин — щільну тканину, що дихає й не промокає, — а з неї згодом народився тренч, спершу як форма для військових.\n\nКлітка Burberry з'явилась як підкладка того ж тренча й поступово стала самостійним знаком марки. Її й досі впізнають без жодного логотипа.",
+  "i18n": {
+    "en": {
+      "description": "A British house founded in 1856 by Thomas Burberry. It was he who invented gabardine — a dense, breathable, waterproof fabric — which later gave rise to the trench coat, originally as a military uniform.\n\nThe Burberry check first appeared as the lining of that same trench and gradually became a hallmark of the brand in its own right. It is still recognized without any logo."
+    },
+    "ru": {
+      "description": "Британский дом, который в 1856 году основал Томас Берберри. Именно он изобрел габардин — плотную ткань, которая дышит и не промокает, — а из нее впоследствии родился тренч, сначала как форма для военных.\n\nКлетка Burberry появилась как подкладка того же тренча и постепенно стала самостоятельным знаком марки. Ее и сейчас узнают без всякого логотипа."
+    }
+  }
 }

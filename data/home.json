@@ -8,13 +8,41 @@
     "secondaryButtonText": "Популярні товари",
     "label": "Нова колекція",
     "image": "/assets/images/banners/hero-bags.webp",
-    "imageMobile": "/assets/images/banners/home-hero-sm.webp"
+    "imageMobile": "/assets/images/banners/home-hero-sm.webp",
+    "i18n": {
+      "en": {
+        "primaryButtonText": "Go to catalog",
+        "heading": "Find the bag\nthat brings out\nyour style",
+        "text": "Over 100 original styles from world-famous brands. Fast delivery, convenient payment and guaranteed quality.",
+        "secondaryButtonText": "Popular products",
+        "label": "New collection"
+      },
+      "ru": {
+        "primaryButtonText": "Перейти в каталог",
+        "heading": "Найдите сумку,\nкоторая подчеркнет\nваш стиль",
+        "text": "Более 100 оригинальных моделей от мировых брендов. Быстрая доставка, удобная оплата и гарантия качества.",
+        "secondaryButtonText": "Популярные товары",
+        "label": "Новая коллекция"
+      }
+    }
   },
   "instagram": {
     "title": "Стежте за нами в Instagram",
     "text": "Нові колекції, образи та акції — щодня у нашому акаунті.",
     "buttonText": "Підписатися · @bestbrnd4u",
-    "link": "https://www.instagram.com/bestbrnd4u"
+    "link": "https://www.instagram.com/bestbrnd4u",
+    "i18n": {
+      "en": {
+        "title": "Follow us on Instagram",
+        "text": "New collections, looks and deals — every day on our account.",
+        "buttonText": "Follow · @bestbrnd4u"
+      },
+      "ru": {
+        "title": "Следите за нами в Instagram",
+        "text": "Новые коллекции, образы и акции — каждый день в нашем аккаунте.",
+        "buttonText": "Подписаться · @bestbrnd4u"
+      }
+    }
   },
   "categories": {
     "title": "Популярні категорії",
@@ -22,24 +50,64 @@
       {
         "label": "Жінкам",
         "image": "/assets/images/banners/4a5d4b88-66d7-4914-9b44-ac105205b511.webp",
-        "link": "catalog?gender=Жінкам"
+        "link": "catalog?gender=Жінкам",
+        "i18n": {
+          "en": {
+            "label": "Women"
+          },
+          "ru": {
+            "label": "Женщинам"
+          }
+        }
       },
       {
         "label": "Чоловікам",
         "image": "/assets/images/banners/bea2c056-4efb-4346-bed7-eee5964d562a.webp",
-        "link": "catalog?gender=Чоловікам"
+        "link": "catalog?gender=Чоловікам",
+        "i18n": {
+          "en": {
+            "label": "Men"
+          },
+          "ru": {
+            "label": "Мужчинам"
+          }
+        }
       },
       {
         "label": "Аксесуари",
         "image": "/assets/images/banners/5cdd14ae-5b4e-43da-9407-a94306ff33e1.webp",
-        "link": "/departments/aksesuary/"
+        "link": "/departments/aksesuary/",
+        "i18n": {
+          "en": {
+            "label": "Accessories"
+          },
+          "ru": {
+            "label": "Аксессуары"
+          }
+        }
       },
       {
         "label": "Взуття",
         "image": "/assets/images/banners/188c0bdd-51a4-482f-9e14-ec17c79e9b09.webp",
-        "link": "/departments/vzuttia/"
+        "link": "/departments/vzuttia/",
+        "i18n": {
+          "en": {
+            "label": "Shoes"
+          },
+          "ru": {
+            "label": "Обувь"
+          }
+        }
       }
-    ]
+    ],
+    "i18n": {
+      "en": {
+        "title": "Popular categories"
+      },
+      "ru": {
+        "title": "Популярные категории"
+      }
+    }
   },
   "promo": {
     "label": "НОВА КОЛЕКЦІЯ",
@@ -48,7 +116,21 @@
     "image": "/assets/images/banners/1am.webp",
     "buttonText": "Дивитися новинки",
     "buttonLink": "/novynky/",
-    "imageMobile": "/assets/images/banners/home-promo-sm.webp"
+    "imageMobile": "/assets/images/banners/home-promo-sm.webp",
+    "i18n": {
+      "en": {
+        "label": "NEW COLLECTION",
+        "heading": "Fresh arrivals are already in the catalog",
+        "text": "Marc Jacobs, Michael Kors, Coach, JW PEI, Love Moschino — this season's fresh arrivals.",
+        "buttonText": "Shop new arrivals"
+      },
+      "ru": {
+        "label": "НОВАЯ КОЛЛЕКЦИЯ",
+        "heading": "Свежие поступления уже в каталоге",
+        "text": "Marc Jacobs, Michael Kors, Coach, JW PEI, Love Moschino — свежие поступления сезона.",
+        "buttonText": "Смотреть новинки"
+      }
+    }
   },
   "brands": {
     "title": "Популярні бренди",
@@ -77,28 +159,76 @@
         "name": "BALENCIAGA",
         "link": "/brands/balenciaga/"
       }
-    ]
+    ],
+    "i18n": {
+      "en": {
+        "title": "Popular brands"
+      },
+      "ru": {
+        "title": "Популярные бренды"
+      }
+    }
   },
   "advantages": [
     {
       "icon": "🚚",
       "title": "Швидка доставка",
-      "text": "По всій Україні"
+      "text": "По всій Україні",
+      "i18n": {
+        "en": {
+          "title": "Fast delivery",
+          "text": "Across Ukraine"
+        },
+        "ru": {
+          "title": "Быстрая доставка",
+          "text": "По всей Украине"
+        }
+      }
     },
     {
       "icon": "💳",
       "title": "Зручна оплата",
-      "text": "Карткою або готівкою"
+      "text": "Карткою або готівкою",
+      "i18n": {
+        "en": {
+          "title": "Convenient payment",
+          "text": "By card or cash"
+        },
+        "ru": {
+          "title": "Удобная оплата",
+          "text": "Картой или наличными"
+        }
+      }
     },
     {
       "icon": "⭐",
       "title": "Гарантія якості",
-      "text": "Тільки оригінальні товари"
+      "text": "Тільки оригінальні товари",
+      "i18n": {
+        "en": {
+          "title": "Guaranteed quality",
+          "text": "Only original products"
+        },
+        "ru": {
+          "title": "Гарантия качества",
+          "text": "Только оригинальные товары"
+        }
+      }
     },
     {
       "icon": "🔄",
       "title": "Повернення 14 днів",
-      "text": "Без зайвих запитань"
+      "text": "Без зайвих запитань",
+      "i18n": {
+        "en": {
+          "title": "14-day returns",
+          "text": "No questions asked"
+        },
+        "ru": {
+          "title": "Возврат 14 дней",
+          "text": "Без лишних вопросов"
+        }
+      }
     }
   ],
   "sectionsOrder": [

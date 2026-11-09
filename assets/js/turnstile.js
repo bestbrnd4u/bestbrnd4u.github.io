@@ -202,8 +202,10 @@
 
         widgetId = root.turnstile.render(target, {
             sitekey: siteKey,
-            // Мова інтерфейсу — та сама, що на сайті.
-            language: "uk",
+            // Мова інтерфейсу — та сама, що на сторінці (/en/, /ru/ або
+            // українська). Раніше стояло "uk" для всіх: на /en/checkout
+            // віджет говорив українською.
+            language: (root.I18N && /^(en|ru)$/.test(root.I18N.lang)) ? root.I18N.lang : "uk",
             // Компактний вигляд: на кроці оформлення й так тісно.
             size: "flexible",
 

@@ -2624,7 +2624,7 @@ function openSearchOverlay() {
 
                 saveRecentSearch(input.value);
 
-                window.location.href = `catalog?search=${encodeURIComponent(input.value.trim())}`;
+                window.location.href = (window.I18N ? window.I18N.href(`catalog?search=${encodeURIComponent(input.value.trim())}`) : `catalog?search=${encodeURIComponent(input.value.trim())}`);
 
             } else if (event.key === "Escape") {
 
@@ -2760,7 +2760,7 @@ const mobileMenuBtn = (() => {
 // мобільному ховається через CSS, див. style.css). На десктопі
 // лишаємо все як було раніше — переносимо елементи лише в межах
 // того самого брейкпоінту, на якому й так ховається <nav>
-// (@media(max-width:1140px) у style.css).
+// (@media(max-width:1239px) у style.css).
 // -------------------------
 
 (() => {
@@ -2774,13 +2774,14 @@ const mobileMenuBtn = (() => {
         return;
     }
 
-    // 1140, А НЕ 768 — І ЦЕ ТЕ САМЕ ЧИСЛО, ЩО В CSS.
+    // 1239, А НЕ 768 — І ЦЕ ТЕ САМЕ ЧИСЛО, ЩО В CSS (було 1140; підняли,
+    // коли в шапці з'явився перемикач мови — заміри в style.css).
     //
     // Шапка переходить у мобільний вигляд раніше за решту сайту:
     // десктопне меню з лого й іконками потребує ~1177px, а нижче
     // .header-icons вилазить за контейнер і зникає під
     // overflow-x:hidden — на iPad у портреті кошик був недосяжний.
-    // Повний замір — у коментарі над @media(max-width:1140px) у
+    // Повний замір — у коментарі над @media(max-width:1239px) у
     // style.css.
     //
     // Тут це число мусить збігатися з тамтешнім. Розійдуться —
@@ -2788,7 +2789,7 @@ const mobileMenuBtn = (() => {
     // гамбургер, а JS ще не переніс його в .header-left, тож
     // гамбургер лишиться праворуч разом із кошиком. Тримає їх
     // разом tests/test-header-breakpoint.js.
-    const mobileQuery = window.matchMedia("(max-width:1140px)");
+    const mobileQuery = window.matchMedia("(max-width:1239px)");
 
     function applyLayout(isMobile) {
 
@@ -2860,6 +2861,10 @@ function buildMobileNav() {
             <li><a href="account">Особистий кабінет</a></li>
         </ul>
     `;
+
+    const langSwitch = document.querySelector("header .lang-switch");
+
+    if (langSwitch) nav.appendChild(langSwitch.cloneNode(true));
 
     document.body.appendChild(backdrop);
     document.body.appendChild(nav);
@@ -4172,10 +4177,12 @@ document.addEventListener("click", function (e) {
 
         // картка знає лише id; slug дістаємо з кешу каталогу, щоб піти
         // одразу на канонічну адресу, а не через редірект
-        window.location.href = productUrl(
+        const target = productUrl(
             findCachedProduct(Number(id)) || Number(id),
             { color, size }
         );
+
+        window.location.href = (window.I18N ? window.I18N.href(target) : target);
 
     }
 
@@ -4612,6 +4619,63 @@ function sizeRowHidden(sizes) {
     const list = Array.isArray(sizes) ? sizes : [];
 
     return list.length > 0 && list.every(isPlaceholderSize);
+
+}
+
+// ОБРАНИЙ КОЛІР І РОЗМІР — НЕ ЛИШЕ ДЛЯ ОКА.
+//
+// Кружечки кольору й кнопки розміру показують вибір обводкою (клас
+// active) — і більше нічим. Читалка на кружечку казала «Чорний,
+// кнопка», не кажучи, чи він обраний. Сторінка товару для великих
+// кнопок розміру вже ставить aria-pressed сама, а кружечки й маленькі
+// розміри малюють ЧОТИРИ різні шаблони (картка каталогу, сторінка
+// товару, кошик, обране), і перемикає їх інший обробник.
+//
+// Тому не в кожен шаблон окремо, а одне правило за самою ознакою: є
+// active — aria-pressed="true", немає — "false". Так нова п'ята
+// картка отримає це задарма, а не через півроку (див. «Клік — це
+// здогад, слухай ознаку»).
+const PRESSABLE = "button.mini-color, button.color, button.mini-size, button.size";
+
+function syncPressed(el) {
+
+    const value = el.classList.contains("active") ? "true" : "false";
+
+    if (el.getAttribute("aria-pressed") !== value) el.setAttribute("aria-pressed", value);
+
+}
+
+function syncPressedIn(root) {
+
+    if (root.matches?.(PRESSABLE)) syncPressed(root);
+
+    root.querySelectorAll?.(PRESSABLE).forEach(syncPressed);
+
+}
+
+if (typeof MutationObserver !== "undefined" && typeof document !== "undefined") {
+
+    const pressedObserver = new MutationObserver(records => {
+
+        for (const record of records) {
+
+            if (record.type === "attributes") {
+                if (record.target.matches?.(PRESSABLE)) syncPressed(record.target);
+            } else {
+                record.addedNodes.forEach(node => { if (node.nodeType === 1) syncPressedIn(node); });
+            }
+
+        }
+
+    });
+
+    const startPressed = () => {
+        syncPressedIn(document.body);
+        pressedObserver.observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ["class"] });
+    };
+
+    if (document.body) startPressed();
+    else document.addEventListener("DOMContentLoaded", startPressed);
 
 }
 

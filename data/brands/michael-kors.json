@@ -10,5 +10,13 @@
   "banner": "/assets/images/brands/michael-kors-banner.webp",
   "bannerMobile": "/assets/images/brands/michael-kors-banner-mobile.webp",
   "title": "Michael Kors",
-  "description": "Нью-йоркська марка, заснована 1981 року. Її ідея — доступна розкіш: американський крій і впізнавані аксесуари без цін високої моди.\n\nНайбільше марку знають за годинниками й сумками — лінії Lexington, Billie, Runway. У каталозі переважно вони."
+  "description": "Нью-йоркська марка, заснована 1981 року. Її ідея — доступна розкіш: американський крій і впізнавані аксесуари без цін високої моди.\n\nНайбільше марку знають за годинниками й сумками — лінії Lexington, Billie, Runway. У каталозі переважно вони.",
+  "i18n": {
+    "en": {
+      "description": "A New York brand founded in 1981. Its idea is accessible luxury: American tailoring and recognizable accessories without high-fashion prices.\n\nThe brand is best known for its watches and bags — the Lexington, Billie and Runway lines. They make up most of the catalog."
+    },
+    "ru": {
+      "description": "Нью-йоркская марка, основанная в 1981 году. Ее идея — доступная роскошь: американский крой и узнаваемые аксессуары без цен высокой моды.\n\nБольше всего марку знают по часам и сумкам — линии Lexington, Billie, Runway. В каталоге в основном они."
+    }
+  }
 }

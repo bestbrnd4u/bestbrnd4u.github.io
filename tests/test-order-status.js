@@ -351,11 +351,15 @@ console.log("\n[8] Номер підставляється сам");
     check("сторінка подяки веде сюди з номером",
         /order-status\?order=/.test(read("thanks.html")));
 
+    // Сам рядок листа, а не текст файлу: адреса тепер будується з
+    // мовою замовлення (/en/order-status для англійського).
+    const lookup = require("../supabase/functions/telegram-order-bot/mail.js").lookupLine;
     check("лист покупцеві теж",
-        /order-status\?order=/.test(read("supabase/functions/telegram-order-bot/mail.js")));
+        lookup("123", "https://bestbrnd4u.com").includes('href="https://bestbrnd4u.com/order-status?order=123"')
+        && lookup("123", "https://bestbrnd4u.com", "en").includes('href="https://bestbrnd4u.com/en/order-status?order=123"'));
 
     check("посилання в листі є в зібраній функції",
-        indexTs.includes("function lookupLine") && indexTs.includes("order-status?order="));
+        indexTs.includes("function lookupLine") && indexTs.includes('localPath("/order-status", l)}?order='));
 }
 
 console.log("\n[9] Замовлення з акаунтом не стають гостьовими");

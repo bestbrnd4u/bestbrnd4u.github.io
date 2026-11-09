@@ -311,7 +311,8 @@ console.log("\n[6] У навігації підвалу немає заглуш�
     // І на неї справді ведуть — інакше перевірка вище проходила б і
     // на сайті, де посилання просто прибрали.
     const withLink = footers
-        .filter(({ footer }) => /<a href="\/?brands\/"[^>]*>Бренди<\/a>/.test(footer)).length;
+        // На /en/ і /ru/ — з мовним префіксом і перекладеним підписом.
+        .filter(({ footer }) => /<a href="(\/(en|ru))?\/?brands\/"[^>]*>(Бренди|Brands|Бренды)<\/a>/.test(footer)).length;
 
     check("посилання на бренди є в підвалі кожної сторінки",
         withLink === footers.length,

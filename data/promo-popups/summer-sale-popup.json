@@ -7,5 +7,13 @@
     "catalog",
     "promo"
   ],
-  "delaySeconds": 60
+  "delaySeconds": 60,
+  "i18n": {
+    "en": {
+      "title": "Pop-up banner — SUMMER SALE"
+    },
+    "ru": {
+      "title": "Всплывающий баннер — SUMMER SALE"
+    }
+  }
 }

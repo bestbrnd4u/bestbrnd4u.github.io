@@ -415,7 +415,7 @@ console.log("\n[8] Сторінка без акції сама просить ї
     const block = promoHtml.slice(promoHtml.indexOf('id="promoNotFound"')).slice(0, 400);
 
     check("«не знайдено» — заголовок, а не абзац",
-        /<h3>Цю акцію не знайдено[^<]*<\/h3>/.test(block),
+        /<h([1-6])[^>]*>Цю акцію не знайдено[^<]*<\/h\1>/.test(block),
         block.replace(/\s+/g, " ").slice(0, 160));
 
     // І та сама відповідь на сторінці товару — щоб два однакові стани

@@ -55,5 +55,23 @@
   "dimensions": "Корпус — 4,3 см у діаметрі, товщина 1,2 см",
   "material": "Корпус і браслет — нержавіюча сталь; скло — Flame Fusion",
   "closure": "Розкладна із запобіжним фіксатором",
-  "decor": "Односпрямований поворотний безель із золотистими акцентами, рифлена загвинчувана заводна головка"
+  "decor": "Односпрямований поворотний безель із золотистими акцентами, рифлена загвинчувана заводна головка",
+  "i18n": {
+    "en": {
+      "title": "Invicta Pro Diver Men's Watch",
+      "description": "The Invicta Pro Diver men's watch is a model in the style of classic dive watches. Rotating bezel, two-tone bracelet, dark blue dial with date display.",
+      "material": "Case and bracelet — stainless steel; crystal — Flame Fusion",
+      "dimensions": "Case — 4.3 cm in diameter, 1.2 cm thick",
+      "closure": "Folding clasp with safety lock",
+      "decor": "Unidirectional rotating bezel with gold-tone accents, fluted screw-down crown"
+    },
+    "ru": {
+      "title": "Мужские часы Invicta Pro Diver",
+      "description": "Мужские часы Invicta Pro Diver — модель в стиле классических дайверских часов. Вращающийся безель, комбинированный браслет, темно-синий циферблат с указателем даты.",
+      "material": "Корпус и браслет — нержавеющая сталь; стекло — Flame Fusion",
+      "dimensions": "Корпус — 4,3 см в диаметре, толщина 1,2 см",
+      "closure": "Раскладная с предохранительным фиксатором",
+      "decor": "Односторонний вращающийся безель с золотистыми акцентами, рифленая завинчивающаяся заводная головка"
+    }
+  }
 }

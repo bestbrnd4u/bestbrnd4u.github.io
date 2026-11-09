@@ -47,14 +47,230 @@ import { escapeHtml, money, trackingUrl } from "./format.js";
 // адреса, що в підвалі листа, — одна на файл, щоб вони не розійшлися.
 export const SHOP_EMAIL = "bestbrnd4u@proton.me";
 
+// МОВА ЛИСТА
+// -----------
+// Мова — та, якою покупець оформлював замовлення (orders.lang, міграція
+// 044). Порожньо або щось інше — українська: так у всіх старих
+// замовленнях і в замовленнях із бота.
+//
+// Переклад тут, а не через словник сайту: лист збирає функція в Deno і
+// скрипти в GitHub Actions, і тягнути їм 400 КБ словника заради сорока
+// фраз було б дорого й крихко. Назви товарів і кольорів приходять уже
+// перекладеними в самому замовленні (title_local, color_local — їх
+// кладе сторінка оформлення тим самим перекладачем, що й сайт).
+export const MAIL_LANGS = ["uk", "en", "ru"];
+
+export function mailLang(value) {
+    const lang = String(value ?? "").trim().toLowerCase();
+    return MAIL_LANGS.includes(lang) ? lang : "uk";
+}
+
+// Спосіб доставки й оплати в замовленні — українські значення зі
+// сторінки оформлення (на них тримається логіка й їх читає менеджер).
+// У листі — мовою покупця. Невідоме значення лишається як є.
+const VALUE_TEXT = {
+    "На відділення «Нова пошта»": { en: "Nova Poshta branch", ru: "В отделение «Нова пошта»" },
+    "Поштомат «Нова пошта»": { en: "Nova Poshta parcel locker", ru: "Почтомат «Нова пошта»" },
+    "Кур'єром «Нова пошта»": { en: "Nova Poshta courier", ru: "Курьером «Нова пошта»" },
+    "Інша пошта": { en: "Another carrier", ru: "Другая почта" },
+    "Банківською карткою (Visa/Mastercard)": { en: "Bank card (Visa/Mastercard)", ru: "Банковской картой (Visa/Mastercard)" },
+    "Готівкою при отриманні на пошті": { en: "Cash on delivery at the post office", ru: "Наличными при получении на почте" }
+};
+
+function valueText(value, lang) {
+    const v = String(value ?? "");
+    return (lang !== "uk" && VALUE_TEXT[v] && VALUE_TEXT[v][lang]) || v;
+}
+
+// Тексти листів. {name} — підстановки; значення в них уже екрановані
+// там, де збираються (номер замовлення, сума, адреса).
+const TEXT = {
+    uk: {
+        hours: "Пн–Нд 09:00–20:00",
+        subtotal: "Сума товарів", discount: "Знижка", delivery: "Доставка", total: "Разом",
+        method: "Спосіб", city: "Місто", branch: "Відділення", payment: "Оплата",
+        yourOrder: "Ваше замовлення",
+        lookup: "Стан замовлення можна перевірити будь-коли: {link} — потрібні номер {number} і ваш телефон.",
+        lookupLink: "Де моє замовлення",
+        orderTitle: "Замовлення прийнято 🎉",
+        orderSubject: "Замовлення {number} прийнято",
+        orderIntro: "Дякуємо за замовлення <b>{number}</b>! Ми вже його бачимо й найближчим часом зв'яжемось, щоб підтвердити деталі.",
+        track: "Відстежити посилку",
+        processingSubject: "Замовлення {number} прийнято в роботу",
+        processingTitle: "Замовлення в роботі 👌",
+        processingText: "Ваше замовлення <b>{number}</b> прийнято в роботу. Ми зв'яжемось із вами найближчим часом, щоб підтвердити деталі.",
+        shippedSubject: "Замовлення {number} відправлено",
+        shippedTitle: "Замовлення відправлено 📦",
+        shippedText: "Замовлення <b>{number}</b> вже в дорозі.",
+        ttn: "Номер накладної: <b>{ttn}</b>",
+        ttnLater: "Номер накладної надішлемо окремо.",
+        completedSubject: "Замовлення {number} виконано",
+        completedTitle: "Замовлення виконано 🎉",
+        completedText: "Замовлення <b>{number}</b> виконано. Дякуємо за покупку — будемо раді бачити вас знову!",
+        cancelledSubject: "Замовлення {number} скасовано",
+        cancelledTitle: "Замовлення скасовано",
+        cancelledText: "Замовлення <b>{number}</b> скасовано. Якщо це помилка — просто напишіть нам, ми все виправимо.",
+        reviewSubject: "Як вам покупка? Замовлення {number}",
+        reviewTitle: "Дякуємо за покупку 💬",
+        reviewWrite: "Написати відгук →",
+        reviewIntro: "Дякуємо за замовлення <b>{number}</b>! Сподіваємось, усе підійшло.",
+        reviewAsk: "Якщо у вас є хвилина — напишіть кілька слів про покупку. Це найкорисніше, що можна зробити для наступного покупця: він бачить ту саму річ, але не може її потримати.",
+        reviewNote: "Знадобиться номер замовлення <b>{number}</b> і ваш телефон — так ми відрізняємо відгуки покупців від чужих. Відгук з'явиться на сайті після того, як ми його прочитаємо.",
+        thanksSubject: "Ваша персональна знижка {percent}% — код {code}",
+        thanksTitle: "Дякуємо за покупку 🎁",
+        thanksHello: "{name}, дякуємо за покупку!",
+        thanksHelloAnon: "Дякуємо за покупку!",
+        thanksWish: " Сподіваємось, річ вам служить.",
+        thanksOffer: "Ось персональна знижка на наступне замовлення — тільки ваша, для одного використання.",
+        thanksPercent: "знижка {percent}%",
+        thanksUntil: " · діє до {date}",
+        thanksButton: "Подивитись новинки",
+        thanksHow: "Код вводиться в полі «Маєте промокод?» на сторінці оформлення.",
+        months: ["січня", "лютого", "березня", "квітня", "травня", "червня",
+            "липня", "серпня", "вересня", "жовтня", "листопада", "грудня"],
+        subscribeSubject: "Підтвердіть підписку на новинки BestBrnd4u",
+        subscribeTitle: "Залишився один крок ✉️",
+        subscribeIntro: "Ви залишили цю адресу на bestbrnd4u.com, щоб отримувати листи про новинки та акції. Лишилось підтвердити, що скринька ваша.",
+        subscribeButton: "Підтвердити підписку",
+        copyLink: "Кнопка не працює? Скопіюйте адресу:",
+        subscribeNote: "Посилання діє тиждень. Листи приходять не частіше ніж кілька разів на місяць, і відписатись можна з будь-якого — посилання внизу кожного.",
+        subscribeIgnore: "Якщо це були не ви — просто видаліть лист. Без переходу за посиланням ми на цю адресу нічого не надсилатимемо."
+    },
+    en: {
+        hours: "Mon–Sun 09:00–20:00 (Kyiv time)",
+        subtotal: "Items", discount: "Discount", delivery: "Delivery", total: "Total",
+        method: "Method", city: "City", branch: "Branch", payment: "Payment",
+        yourOrder: "Your order",
+        lookup: "You can check your order status any time: {link} — you will need the number {number} and your phone.",
+        lookupLink: "Where is my order",
+        orderTitle: "Order received 🎉",
+        orderSubject: "Order {number} received",
+        orderIntro: "Thank you for your order <b>{number}</b>! We have already got it and will contact you shortly to confirm the details.",
+        track: "Track parcel",
+        processingSubject: "Order {number} is being processed",
+        processingTitle: "Order in progress 👌",
+        processingText: "Your order <b>{number}</b> is being processed. We will contact you shortly to confirm the details.",
+        shippedSubject: "Order {number} has been shipped",
+        shippedTitle: "Order shipped 📦",
+        shippedText: "Order <b>{number}</b> is on its way.",
+        ttn: "Tracking number: <b>{ttn}</b>",
+        ttnLater: "We will send the tracking number separately.",
+        completedSubject: "Order {number} completed",
+        completedTitle: "Order completed 🎉",
+        completedText: "Order <b>{number}</b> is completed. Thank you for shopping with us — we will be glad to see you again!",
+        cancelledSubject: "Order {number} cancelled",
+        cancelledTitle: "Order cancelled",
+        cancelledText: "Order <b>{number}</b> has been cancelled. If this is a mistake, just write to us and we will fix it.",
+        reviewSubject: "How do you like your purchase? Order {number}",
+        reviewTitle: "Thank you for your purchase 💬",
+        reviewWrite: "Write a review →",
+        reviewIntro: "Thank you for your order <b>{number}</b>! We hope everything fits.",
+        reviewAsk: "If you have a minute, write a few words about your purchase. It is the most useful thing you can do for the next buyer: they see the same item but cannot hold it.",
+        reviewNote: "You will need the order number <b>{number}</b> and your phone — this is how we tell buyers' reviews from others. The review will appear on the site after we read it.",
+        thanksSubject: "Your personal {percent}% discount — code {code}",
+        thanksTitle: "Thank you for your purchase 🎁",
+        thanksHello: "{name}, thank you for your purchase!",
+        thanksHelloAnon: "Thank you for your purchase!",
+        thanksWish: " We hope you enjoy it.",
+        thanksOffer: "Here is a personal discount on your next order — just for you, single use.",
+        thanksPercent: "{percent}% off",
+        thanksUntil: " · valid until {date}",
+        thanksButton: "See new arrivals",
+        thanksHow: "Enter the code in the “Have a promo code?” field at checkout.",
+        months: ["January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"],
+        subscribeSubject: "Confirm your BestBrnd4u newsletter subscription",
+        subscribeTitle: "One step left ✉️",
+        subscribeIntro: "You left this address on bestbrnd4u.com to get emails about new arrivals and sales. Please confirm that the mailbox is yours.",
+        subscribeButton: "Confirm subscription",
+        copyLink: "Button not working? Copy the link:",
+        subscribeNote: "The link is valid for a week. We write no more than a few times a month, and you can unsubscribe from any email — the link is at the bottom of each one.",
+        subscribeIgnore: "If this wasn't you, just delete this email. Unless the link is opened, we will send nothing to this address."
+    },
+    ru: {
+        hours: "Пн–Вс 09:00–20:00",
+        subtotal: "Сумма товаров", discount: "Скидка", delivery: "Доставка", total: "Итого",
+        method: "Способ", city: "Город", branch: "Отделение", payment: "Оплата",
+        yourOrder: "Ваш заказ",
+        lookup: "Состояние заказа можно проверить в любой момент: {link} — понадобятся номер {number} и ваш телефон.",
+        lookupLink: "Где мой заказ",
+        orderTitle: "Заказ принят 🎉",
+        orderSubject: "Заказ {number} принят",
+        orderIntro: "Спасибо за заказ <b>{number}</b>! Мы уже его видим и в ближайшее время свяжемся, чтобы подтвердить детали.",
+        track: "Отследить посылку",
+        processingSubject: "Заказ {number} принят в работу",
+        processingTitle: "Заказ в работе 👌",
+        processingText: "Ваш заказ <b>{number}</b> принят в работу. Мы свяжемся с вами в ближайшее время, чтобы подтвердить детали.",
+        shippedSubject: "Заказ {number} отправлен",
+        shippedTitle: "Заказ отправлен 📦",
+        shippedText: "Заказ <b>{number}</b> уже в пути.",
+        ttn: "Номер накладной: <b>{ttn}</b>",
+        ttnLater: "Номер накладной пришлем отдельно.",
+        completedSubject: "Заказ {number} выполнен",
+        completedTitle: "Заказ выполнен 🎉",
+        completedText: "Заказ <b>{number}</b> выполнен. Спасибо за покупку — будем рады видеть вас снова!",
+        cancelledSubject: "Заказ {number} отменен",
+        cancelledTitle: "Заказ отменен",
+        cancelledText: "Заказ <b>{number}</b> отменен. Если это ошибка — просто напишите нам, мы все исправим.",
+        reviewSubject: "Как вам покупка? Заказ {number}",
+        reviewTitle: "Спасибо за покупку 💬",
+        reviewWrite: "Написать отзыв →",
+        reviewIntro: "Спасибо за заказ <b>{number}</b>! Надеемся, все подошло.",
+        reviewAsk: "Если у вас есть минута — напишите несколько слов о покупке. Это самое полезное, что можно сделать для следующего покупателя: он видит ту же вещь, но не может ее подержать.",
+        reviewNote: "Понадобится номер заказа <b>{number}</b> и ваш телефон — так мы отличаем отзывы покупателей от чужих. Отзыв появится на сайте после того, как мы его прочитаем.",
+        thanksSubject: "Ваша персональная скидка {percent}% — код {code}",
+        thanksTitle: "Спасибо за покупку 🎁",
+        thanksHello: "{name}, спасибо за покупку!",
+        thanksHelloAnon: "Спасибо за покупку!",
+        thanksWish: " Надеемся, вещь вам служит.",
+        thanksOffer: "Вот персональная скидка на следующий заказ — только ваша, для одного использования.",
+        thanksPercent: "скидка {percent}%",
+        thanksUntil: " · действует до {date}",
+        thanksButton: "Посмотреть новинки",
+        thanksHow: "Код вводится в поле «Есть промокод?» на странице оформления.",
+        months: ["января", "февраля", "марта", "апреля", "мая", "июня",
+            "июля", "августа", "сентября", "октября", "ноября", "декабря"],
+        subscribeSubject: "Подтвердите подписку на новинки BestBrnd4u",
+        subscribeTitle: "Остался один шаг ✉️",
+        subscribeIntro: "Вы оставили этот адрес на bestbrnd4u.com, чтобы получать письма о новинках и акциях. Осталось подтвердить, что ящик ваш.",
+        subscribeButton: "Подтвердить подписку",
+        copyLink: "Кнопка не работает? Скопируйте адрес:",
+        subscribeNote: "Ссылка действует неделю. Письма приходят не чаще нескольких раз в месяц, и отписаться можно из любого — ссылка внизу каждого.",
+        subscribeIgnore: "Если это были не вы — просто удалите письмо. Без перехода по ссылке мы на этот адрес ничего не будем отправлять."
+    }
+};
+
+export function mailText(lang, key, vars) {
+    const table = TEXT[mailLang(lang)];
+    const raw = key in table ? table[key] : TEXT.uk[key];
+    if (typeof raw !== "string") return raw;
+    return raw.replace(/\{(\w+)\}/g, (m, name) => (vars && name in vars ? String(vars[name]) : m));
+}
+
+// Адреса сторінки сайту мовою листа: /order-status → /en/order-status.
+function localPath(path, lang) {
+    const p = String(path || "/");
+    return lang === "uk" ? p : `/${lang}${p.startsWith("/") ? p : "/" + p}`;
+}
+
+// Сума: українською «6 500 грн», як і досі; англійською й російською —
+// «6 500 ₴», як на мовних версіях сайту.
+function localMoney(value, lang) {
+    const text = money(value);
+    return lang === "uk" ? text : text.replace(/ грн$/, " ₴");
+}
+
 // Загальний вигляд листа.
 //
 // Верстка навмисно проста й inline: клієнти пошти вирізають <style>,
 // не знають flex і по-різному розуміють майже все інше. Лист, який
 // зламався в Outlook, гірший за лист без оформлення.
-function letterShell(title, bodyHtml, siteUrl) {
+function letterShell(title, bodyHtml, siteUrl, lang) {
 
-    const site = String(siteUrl || "").replace(/\/+$/, "");
+    const l = mailLang(lang);
+
+    const root = String(siteUrl || "").replace(/\/+$/, "");
+    const site = root && l !== "uk" ? root + localPath("/", l) : root;
 
     return [
         '<div style="margin:0;padding:24px;background:#f3f4f6;',
@@ -67,7 +283,7 @@ function letterShell(title, bodyHtml, siteUrl) {
         site ? `<a href="${escapeHtml(site)}" style="color:#111827">BestBrnd4u</a> · ` : "BestBrnd4u · ",
         '<a href="https://t.me/bestbrnd4u" style="color:#111827">Telegram</a> · ',
         `<a href="mailto:${SHOP_EMAIL}" style="color:#111827">${SHOP_EMAIL}</a>`,
-        '<br>Пн–Нд 09:00–20:00',
+        `<br>${escapeHtml(mailText(l, "hours"))}`,
         "</div>",
         "</div>",
         "</div>"
@@ -142,7 +358,9 @@ function deliveryRow(label, value) {
 // ВИСОТУ НЕ ЗАДАЄМО. Outlook не знає object-fit, тож фіксована висота
 // перетворила б фото на розтягнуте. Ширина 64 + height:auto виглядає
 // однаково всюди.
-function itemsTable(items) {
+function itemsTable(items, lang) {
+
+    const l = mailLang(lang);
 
     const list = Array.isArray(items) ? items : [];
 
@@ -157,10 +375,14 @@ function itemsTable(items) {
         // так само ховає (фід, ідентифікатор для Meta).
         const size = String(item.size ?? "").trim();
 
-        const variant = [item.color, size.toUpperCase() === "ONESIZE" ? "" : size]
+        // Мовою покупця, якщо сторінка поклала переклад (title_local,
+        // color_local); інакше — як у замовленні.
+        const color = (l !== "uk" && item.color_local) || item.color;
+
+        const variant = [color, size.toUpperCase() === "ONESIZE" ? "" : size]
             .filter(Boolean).join(" / ");
 
-        const title = escapeHtml(item.title || "");
+        const title = escapeHtml((l !== "uk" && item.title_local) || item.title || "");
 
         // alt на випадок, коли фото не показали: Gmail за
         // замовчуванням не вантажить картинки, а Outlook не розуміє
@@ -178,7 +400,7 @@ function itemsTable(items) {
             + (variant ? `<br><span style="color:#6b7280">${escapeHtml(variant)}</span>` : "")
             + `</td>`
             + `<td valign="top" style="${cell};text-align:right;font-size:14px;white-space:nowrap">`
-            + `${item.qty ?? 1} × ${escapeHtml(money(item.price))}`
+            + `${item.qty ?? 1} × ${escapeHtml(localMoney(item.price, l))}`
             + `</td></tr>`;
 
     }).join("");
@@ -198,15 +420,17 @@ function itemsTable(items) {
 // повторити рахунок, а нагадати товар.
 function summaryBlock(order) {
 
-    const items = itemsTable(order?.items);
+    const l = mailLang(order?.lang);
+
+    const items = itemsTable(order?.items, l);
 
     if (!items) return "";
 
     return `<div style="margin-top:24px;padding-top:6px;border-top:1px solid #e5e7eb">`
-        + `<div style="font-weight:600;font-size:14px;margin-top:14px">Ваше замовлення</div>`
+        + `<div style="font-weight:600;font-size:14px;margin-top:14px">${escapeHtml(mailText(l, "yourOrder"))}</div>`
         + items
         + `<table style="width:100%;border-collapse:collapse">`
-        + row("Разом", escapeHtml(money(order?.total)), true)
+        + row(mailText(l, "total"), escapeHtml(localMoney(order?.total, l)), true)
         + `</table></div>`;
 
 }
@@ -220,7 +444,9 @@ function summaryBlock(order) {
 //
 // Стилі вбудовані в атрибути: пошта не читає <style>, і будь-який
 // клас тут просто нічого не робив би.
-export function lookupLine(orderNumber, siteUrl) {
+export function lookupLine(orderNumber, siteUrl, lang) {
+
+    const l = mailLang(lang);
 
     const number = String(orderNumber ?? "").trim();
 
@@ -228,53 +454,55 @@ export function lookupLine(orderNumber, siteUrl) {
 
     const base = String(siteUrl ?? "").replace(/\/$/, "");
 
-    const url = `${base}/order-status?order=${encodeURIComponent(number)}`;
+    const url = `${base}${localPath("/order-status", l)}?order=${encodeURIComponent(number)}`;
 
     return `<div style="margin-top:18px;font-size:13px;line-height:1.6;color:#6b7280">`
-        + `Стан замовлення можна перевірити будь-коли: `
-        + `<a href="${escapeHtml(url)}" style="color:#111827;font-weight:600">Де моє замовлення</a>`
-        + ` — потрібні номер ${escapeHtml(number)} і ваш телефон.`
+        + mailText(l, "lookup", {
+            link: `<a href="${escapeHtml(url)}" style="color:#111827;font-weight:600">${escapeHtml(mailText(l, "lookupLink"))}</a>`,
+            number: escapeHtml(number)
+        })
         + `</div>`;
 
 }
 
 export function orderLetter(order, siteUrl) {
 
+    const l = mailLang(order?.lang);
+
     const number = String(order?.order_number ?? "");
 
     const totals = [
-        Number(order?.subtotal) > 0 ? row("Сума товарів", escapeHtml(money(order.subtotal))) : "",
-        Number(order?.discount) > 0 ? row("Знижка", "−" + escapeHtml(money(order.discount))) : "",
-        Number(order?.delivery_price) > 0 ? row("Доставка", escapeHtml(money(order.delivery_price))) : "",
-        row("Разом", escapeHtml(money(order?.total)), true)
+        Number(order?.subtotal) > 0 ? row(mailText(l, "subtotal"), escapeHtml(localMoney(order.subtotal, l))) : "",
+        Number(order?.discount) > 0 ? row(mailText(l, "discount"), "−" + escapeHtml(localMoney(order.discount, l))) : "",
+        Number(order?.delivery_price) > 0 ? row(mailText(l, "delivery"), escapeHtml(localMoney(order.delivery_price, l))) : "",
+        row(mailText(l, "total"), escapeHtml(localMoney(order?.total, l)), true)
     ].join("");
 
     const delivery = [
         // Не «Доставка»: цей блок і так називається «Доставка», а
         // рядок «Доставка / Доставка: Нова пошта» читається як помилка.
-        order?.delivery_method ? deliveryRow("Спосіб", escapeHtml(order.delivery_method)) : "",
-        order?.delivery_city ? deliveryRow("Місто", escapeHtml(order.delivery_city)) : "",
-        order?.delivery_detail ? deliveryRow("Відділення", escapeHtml(order.delivery_detail)) : "",
-        order?.payment_method ? deliveryRow("Оплата", escapeHtml(order.payment_method)) : ""
+        order?.delivery_method ? deliveryRow(mailText(l, "method"), escapeHtml(valueText(order.delivery_method, l))) : "",
+        order?.delivery_city ? deliveryRow(mailText(l, "city"), escapeHtml(order.delivery_city)) : "",
+        order?.delivery_detail ? deliveryRow(mailText(l, "branch"), escapeHtml(order.delivery_detail)) : "",
+        order?.payment_method ? deliveryRow(mailText(l, "payment"), escapeHtml(valueText(order.payment_method, l))) : ""
     ].join("");
 
     const body = [
         `<div style="font-size:15px;line-height:1.6">`,
-        `Дякуємо за замовлення <b>${escapeHtml(number)}</b>! Ми вже його бачимо `,
-        `й найближчим часом зв'яжемось, щоб підтвердити деталі.`,
+        mailText(l, "orderIntro", { number: escapeHtml(number) }),
         `</div>`,
-        itemsTable(order?.items),
+        itemsTable(order?.items, l),
         `<table style="width:100%;border-collapse:collapse">${totals}</table>`,
         delivery
-            ? `<div style="margin-top:18px;font-weight:600;font-size:14px">Доставка</div>`
+            ? `<div style="margin-top:18px;font-weight:600;font-size:14px">${escapeHtml(mailText(l, "delivery"))}</div>`
                 + `<table style="width:100%;border-collapse:collapse">${delivery}</table>`
             : "",
-        lookupLine(number, siteUrl)
+        lookupLine(number, siteUrl, l)
     ].join("");
 
     return {
-        subject: `Замовлення ${number} прийнято`,
-        html: letterShell("Замовлення прийнято 🎉", body, siteUrl)
+        subject: mailText(l, "orderSubject", { number }),
+        html: letterShell(mailText(l, "orderTitle"), body, siteUrl, l)
     };
 
 }
@@ -284,7 +512,11 @@ export function orderLetter(order, siteUrl) {
 // б різне.
 export function statusLetter(order, status, siteUrl) {
 
+    const l = mailLang(order?.lang);
+
     const number = String(order?.order_number ?? "");
+
+    const n = { number: escapeHtml(number) };
     const ttn = order?.tracking_number;
 
     const url = trackingUrl(ttn);
@@ -292,29 +524,28 @@ export function statusLetter(order, status, siteUrl) {
     const button = url
         ? `<div style="margin-top:20px"><a href="${escapeHtml(url)}" `
             + `style="display:inline-block;background:#111827;color:#fff;text-decoration:none;`
-            + `padding:12px 20px;border-radius:8px;font-size:14px">Відстежити посилку</a></div>`
+            + `padding:12px 20px;border-radius:8px;font-size:14px">${escapeHtml(mailText(l, "track"))}</a></div>`
         : "";
 
     switch (String(status || "").toLowerCase()) {
 
         case "processing":
             return {
-                subject: `Замовлення ${number} прийнято в роботу`,
-                html: letterShell("Замовлення в роботі 👌",
-                    `<div style="font-size:15px;line-height:1.6">Ваше замовлення <b>${escapeHtml(number)}</b> `
-                    + `прийнято в роботу. Ми зв'яжемось із вами найближчим часом, щоб підтвердити деталі.</div>`
+                subject: mailText(l, "processingSubject", { number }),
+                html: letterShell(mailText(l, "processingTitle"),
+                    `<div style="font-size:15px;line-height:1.6">${mailText(l, "processingText", n)}</div>`
                     + summaryBlock(order),
-                    siteUrl)
+                    siteUrl, l)
             };
 
         case "shipped":
             return {
-                subject: `Замовлення ${number} відправлено`,
-                html: letterShell("Замовлення відправлено 📦",
-                    `<div style="font-size:15px;line-height:1.6">Замовлення <b>${escapeHtml(number)}</b> вже в дорозі.`
+                subject: mailText(l, "shippedSubject", { number }),
+                html: letterShell(mailText(l, "shippedTitle"),
+                    `<div style="font-size:15px;line-height:1.6">${mailText(l, "shippedText", n)}`
                     + (ttn
-                        ? `<br><br>Номер накладної: <b>${escapeHtml(ttn)}</b>`
-                        : `<br><br>Номер накладної надішлемо окремо.`)
+                        ? `<br><br>${mailText(l, "ttn", { ttn: escapeHtml(ttn) })}`
+                        : `<br><br>${mailText(l, "ttnLater")}`)
                     // Порядок тут не косметика.
                     //
                     // Gmail ховає «обрізаний вміст» — те, що повторює
@@ -324,27 +555,25 @@ export function statusLetter(order, status, siteUrl) {
                     // накладної, потім склад, і лише потім кнопка з
                     // підвалом — те, що можна втратити без шкоди.
                     + `</div>` + summaryBlock(order) + button,
-                    siteUrl)
+                    siteUrl, l)
             };
 
         case "completed":
             return {
-                subject: `Замовлення ${number} виконано`,
-                html: letterShell("Замовлення виконано 🎉",
-                    `<div style="font-size:15px;line-height:1.6">Замовлення <b>${escapeHtml(number)}</b> виконано. `
-                    + `Дякуємо за покупку — будемо раді бачити вас знову!</div>`
+                subject: mailText(l, "completedSubject", { number }),
+                html: letterShell(mailText(l, "completedTitle"),
+                    `<div style="font-size:15px;line-height:1.6">${mailText(l, "completedText", n)}</div>`
                     + summaryBlock(order),
-                    siteUrl)
+                    siteUrl, l)
             };
 
         case "cancelled":
             return {
-                subject: `Замовлення ${number} скасовано`,
-                html: letterShell("Замовлення скасовано",
-                    `<div style="font-size:15px;line-height:1.6">Замовлення <b>${escapeHtml(number)}</b> скасовано. `
-                    + `Якщо це помилка — просто напишіть нам, ми все виправимо.</div>`
+                subject: mailText(l, "cancelledSubject", { number }),
+                html: letterShell(mailText(l, "cancelledTitle"),
+                    `<div style="font-size:15px;line-height:1.6">${mailText(l, "cancelledText", n)}</div>`
                     + summaryBlock(order),
-                    siteUrl)
+                    siteUrl, l)
             };
 
         default:
@@ -485,6 +714,8 @@ export function checkoutLetter(items, siteUrl) {
 // його в адресу, щоб людині лишилось ввести телефон.
 export function reviewLetter(order, siteUrl) {
 
+    const l = mailLang(order?.lang);
+
     const number = String(order?.order_number ?? "");
 
     const base = String(siteUrl ?? "").replace(/\/$/, "");
@@ -493,13 +724,13 @@ export function reviewLetter(order, siteUrl) {
 
     const rows = items.map((item) => {
 
-        const title = escapeHtml(item?.title ?? "");
+        const title = escapeHtml((l !== "uk" && item?.title_local) || item?.title || "");
 
         // Посилання на конкретний товар: у нього ж і треба написати
         // відгук. Без slug лишається просто рядок — це нормально,
         // знімок замовлення міг бути зроблений до появи slug.
         const url = item?.slug
-            ? `${base}/p/${encodeURIComponent(item.slug)}/?order=${encodeURIComponent(number)}#productReviews`
+            ? `${base}${localPath("/p/", l)}${encodeURIComponent(item.slug)}/?order=${encodeURIComponent(number)}#productReviews`
             : "";
 
         const photo = item?.image
@@ -516,7 +747,7 @@ export function reviewLetter(order, siteUrl) {
                 ? `<a href="${escapeHtml(url)}" style="color:#111827;font-weight:600;text-decoration:none">${title}</a>`
                 : `<b>${title}</b>`)
             + (url
-                ? `<div style="margin-top:6px"><a href="${escapeHtml(url)}" style="color:#2f6fb3">Написати відгук →</a></div>`
+                ? `<div style="margin-top:6px"><a href="${escapeHtml(url)}" style="color:#2f6fb3">${escapeHtml(mailText(l, "reviewWrite"))}</a></div>`
                 : "")
             + `</td>`
             + `</tr>`;
@@ -525,24 +756,20 @@ export function reviewLetter(order, siteUrl) {
 
     const body = [
         `<div style="font-size:15px;line-height:1.6">`,
-        `Дякуємо за замовлення <b>${escapeHtml(number)}</b>! Сподіваємось, усе підійшло.`,
+        mailText(l, "reviewIntro", { number: escapeHtml(number) }),
         `</div>`,
         `<div style="margin-top:14px;font-size:15px;line-height:1.6">`,
-        `Якщо у вас є хвилина — напишіть кілька слів про покупку. `,
-        `Це найкорисніше, що можна зробити для наступного покупця: він `,
-        `бачить ту саму річ, але не може її потримати.`,
+        mailText(l, "reviewAsk"),
         `</div>`,
         rows ? `<table style="width:100%;border-collapse:collapse;margin-top:18px">${rows}</table>` : "",
         `<div style="margin-top:18px;font-size:13px;line-height:1.6;color:#6b7280">`,
-        `Знадобиться номер замовлення <b>${escapeHtml(number)}</b> і ваш телефон — `,
-        `так ми відрізняємо відгуки покупців від чужих. Відгук з'явиться `,
-        `на сайті після того, як ми його прочитаємо.`,
+        mailText(l, "reviewNote", { number: escapeHtml(number) }),
         `</div>`,
     ].join("");
 
     return {
-        subject: `Як вам покупка? Замовлення ${number}`,
-        html: letterShell("Дякуємо за покупку 💬", body, siteUrl)
+        subject: mailText(l, "reviewSubject", { number }),
+        html: letterShell(mailText(l, "reviewTitle"), body, siteUrl, l)
     };
 
 }
@@ -561,6 +788,8 @@ export function reviewLetter(order, siteUrl) {
 // тиску: строк тут потрібен, щоб код не жив вічно, а не щоб квапити.
 export function thankYouLetter(order, promo, siteUrl) {
 
+    const l = mailLang(order?.lang);
+
     const name = String(order?.first_name ?? "").trim();
 
     const code = String(promo?.code ?? "").trim();
@@ -571,26 +800,22 @@ export function thankYouLetter(order, promo, siteUrl) {
 
     // Дату пишемо словами: «до 12.10.2026» читається як реквізит, а
     // «до 12 жовтня» — як речення.
-    const months = [
-        "січня", "лютого", "березня", "квітня", "травня", "червня",
-        "липня", "серпня", "вересня", "жовтня", "листопада", "грудня",
-    ];
+    const months = mailText(l, "months");
 
     const until = promo?.expiresAt ? new Date(promo.expiresAt) : null;
 
     const untilText = until && !Number.isNaN(until.getTime())
-        ? `${until.getDate()} ${months[until.getMonth()]}`
+        ? (l === "en" ? `${months[until.getMonth()]} ${until.getDate()}` : `${until.getDate()} ${months[until.getMonth()]}`)
         : "";
 
     const body = [
         `<div style="font-size:15px;line-height:1.6">`,
-        name ? `${escapeHtml(name)}, дякуємо за покупку!` : "Дякуємо за покупку!",
-        ` Сподіваємось, річ вам служить.`,
+        name ? mailText(l, "thanksHello", { name: escapeHtml(name) }) : mailText(l, "thanksHelloAnon"),
+        mailText(l, "thanksWish"),
         `</div>`,
 
         `<div style="margin-top:14px;font-size:15px;line-height:1.6">`,
-        `Ось персональна знижка на наступне замовлення — тільки ваша, `,
-        `для одного використання.`,
+        mailText(l, "thanksOffer"),
         `</div>`,
 
         // Код великим моноширинним: його переписують руками з листа в
@@ -600,26 +825,26 @@ export function thankYouLetter(order, promo, siteUrl) {
         escapeHtml(code),
         `</div>`,
         `<div style="margin-top:8px;font-size:15px;color:#374151">`,
-        `знижка ${escapeHtml(String(percent))}%`,
-        untilText ? ` · діє до ${escapeHtml(untilText)}` : "",
+        mailText(l, "thanksPercent", { percent: escapeHtml(String(percent)) }),
+        untilText ? mailText(l, "thanksUntil", { date: escapeHtml(untilText) }) : "",
         `</div>`,
         `</div>`,
 
         `<div style="text-align:center;margin-top:18px">`,
-        `<a href="${escapeHtml(base)}/catalog" style="display:inline-block;background:#111827;`,
+        `<a href="${escapeHtml(base)}${localPath("/catalog", l)}" style="display:inline-block;background:#111827;`,
         `color:#ffffff;text-decoration:none;padding:13px 26px;border-radius:10px;font-weight:600">`,
-        `Подивитись новинки`,
+        escapeHtml(mailText(l, "thanksButton")),
         `</a>`,
         `</div>`,
 
         `<div style="margin-top:20px;font-size:13px;line-height:1.6;color:#6b7280">`,
-        `Код вводиться в полі «Маєте промокод?» на сторінці оформлення.`,
+        escapeHtml(mailText(l, "thanksHow")),
         `</div>`,
     ].join("");
 
     return {
-        subject: `Ваша персональна знижка ${percent}% — код ${code}`,
-        html: letterShell("Дякуємо за покупку 🎁", body, siteUrl),
+        subject: mailText(l, "thanksSubject", { percent, code }),
+        html: letterShell(mailText(l, "thanksTitle"), body, siteUrl, l),
     };
 
 }
@@ -654,7 +879,9 @@ export function thankYouLetter(order, promo, siteUrl) {
 // Є рядок «якщо це були не ви». Без нього лист, що прийшов на чужу
 // адресу, виглядає як спам від магазину — і саме так його й
 // відмітять.
-export function subscribeConfirmLetter(confirmUrl, siteUrl) {
+export function subscribeConfirmLetter(confirmUrl, siteUrl, lang) {
+
+    const l = mailLang(lang);
 
     const url = String(confirmUrl ?? "").trim();
 
@@ -664,8 +891,7 @@ export function subscribeConfirmLetter(confirmUrl, siteUrl) {
 
     const body = [
         `<div style="font-size:15px;line-height:1.6">`,
-        `Ви залишили цю адресу на bestbrnd4u.com, щоб отримувати листи `,
-        `про новинки та акції. Лишилось підтвердити, що скринька ваша.`,
+        mailText(l, "subscribeIntro"),
         `</div>`,
 
         // Кнопка таблицею, а не <a> з padding: Outlook ігнорує
@@ -675,7 +901,7 @@ export function subscribeConfirmLetter(confirmUrl, siteUrl) {
         `<tr><td style="background:#111827;border-radius:10px">`,
         `<a href="${safe}" style="display:inline-block;padding:14px 28px;`,
         `font-size:15px;font-weight:700;color:#ffffff;text-decoration:none">`,
-        `Підтвердити підписку`,
+        escapeHtml(mailText(l, "subscribeButton")),
         `</a>`,
         `</td></tr>`,
         `</table>`,
@@ -684,23 +910,21 @@ export function subscribeConfirmLetter(confirmUrl, siteUrl) {
         // тих, хто перед переходом дивиться, куди саме веде.
         `<div style="margin-top:18px;font-size:12px;line-height:1.5;color:#6b7280;`,
         `text-align:center;word-break:break-all">`,
-        `Кнопка не працює? Скопіюйте адресу:<br>`,
+        `${escapeHtml(mailText(l, "copyLink"))}<br>`,
         `<a href="${safe}" style="color:#6b7280">${safe}</a>`,
         `</div>`,
 
         `<div style="margin-top:22px;padding-top:18px;border-top:1px solid #e5e7eb;`,
         `font-size:13px;line-height:1.6;color:#6b7280">`,
-        `Посилання діє тиждень. Листи приходять не частіше ніж кілька разів `,
-        `на місяць, і відписатись можна з будь-якого — посилання внизу кожного.`,
+        mailText(l, "subscribeNote"),
         `<br><br>`,
-        `Якщо це були не ви — просто видаліть лист. Без переходу за посиланням `,
-        `ми на цю адресу нічого не надсилатимемо.`,
+        mailText(l, "subscribeIgnore"),
         `</div>`,
     ].join("");
 
     return {
-        subject: "Підтвердіть підписку на новинки BestBrnd4u",
-        html: letterShell("Залишився один крок ✉️", body, siteUrl),
+        subject: mailText(l, "subscribeSubject"),
+        html: letterShell(mailText(l, "subscribeTitle"), body, siteUrl, l),
     };
 
 }

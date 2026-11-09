@@ -62,5 +62,19 @@
       "37": 1
     }
   },
-  "material": "Верх — 43% поліестер, 32% шкіра, 25% поліуретан; підкладка — поліестер; підошва — 57% гума, 30% EVA, 13% ТПУ"
+  "material": "Верх — 43% поліестер, 32% шкіра, 25% поліуретан; підкладка — поліестер; підошва — 57% гума, 30% EVA, 13% ТПУ",
+  "i18n": {
+    "en": {
+      "title": "Lacoste Women's Elite Active Sneakers",
+      "description": "Stylish women's Lacoste Elite Active sneakers in white with contrasting green and red accents. The combination of textile, suede, and nubuck creates a modern sporty look, and the comfortable construction is perfect for everyday wear",
+      "material": "Upper: 43% polyester, 32% leather, 25% polyurethane; lining: polyester; sole: 57% rubber, 30% EVA, 13% TPU",
+      "preOrderDays": "5–10 business days"
+    },
+    "ru": {
+      "title": "Женские кроссовки Lacoste Women's Elite Active Sneakers",
+      "description": "Стильные женские кроссовки Lacoste Elite Active в белом цвете с контрастными зелеными и красными акцентами. Сочетание текстиля, замши и нубука создает современный спортивный образ, а удобная конструкция отлично подходит для повседневной носки",
+      "material": "Верх — 43% полиэстер, 32% кожа, 25% полиуретан; подкладка — полиэстер; подошва — 57% резина, 30% EVA, 13% ТПУ",
+      "preOrderDays": "5–10 рабочих дней"
+    }
+  }
 }

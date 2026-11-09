@@ -1,5 +1,13 @@
 {
   "name": "Чоловічі сумки",
   "department": "Сумки",
-  "description": "Чоловіча лінійка зібрана навколо двох форм. Крос-боді через плече бере документи, телефон і павербанк, лишаючи руки вільними. Поясна сумка менша й носиться двома способами — на поясі або навскіс через груди.\n\nОснова — Coach зі щільної шкіри й тисненого полотна Signature, поруч Armani Exchange і Lacoste."
+  "description": "Чоловіча лінійка зібрана навколо двох форм. Крос-боді через плече бере документи, телефон і павербанк, лишаючи руки вільними. Поясна сумка менша й носиться двома способами — на поясі або навскіс через груди.\n\nОснова — Coach зі щільної шкіри й тисненого полотна Signature, поруч Armani Exchange і Lacoste.",
+  "i18n": {
+    "en": {
+      "description": "The men's range is built around two shapes. A crossbody worn over the shoulder holds documents, a phone and a power bank while keeping your hands free. A belt bag is smaller and can be worn two ways — on the waist or slung across the chest.\n\nThe core is Coach in sturdy leather and embossed Signature canvas, alongside Armani Exchange and Lacoste."
+    },
+    "ru": {
+      "description": "Мужская линейка собрана вокруг двух форм. Кросс-боди через плечо вмещает документы, телефон и пауэрбанк, оставляя руки свободными. Поясная сумка меньше и носится двумя способами — на поясе или наискосок через грудь.\n\nОснова — Coach из плотной кожи и тисненого полотна Signature, рядом Armani Exchange и Lacoste."
+    }
+  }
 }

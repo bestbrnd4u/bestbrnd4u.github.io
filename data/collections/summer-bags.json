@@ -34,5 +34,17 @@
   "autoSections": [
     "Годинники"
   ],
-  "imageMobile": "/assets/images/banners/collection-watches-mobile.webp"
+  "imageMobile": "/assets/images/banners/collection-watches-mobile.webp",
+  "i18n": {
+    "en": {
+      "eyebrow": "SELECTION",
+      "imageAlt": "Watches for your style",
+      "title": "Watches for your style"
+    },
+    "ru": {
+      "eyebrow": "ПОДБОРКА",
+      "imageAlt": "Часы для твоего стиля",
+      "title": "Часы для твоего стиля"
+    }
+  }
 }

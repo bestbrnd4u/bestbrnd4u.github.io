@@ -77,5 +77,27 @@
     }
   },
   "closure": "Блискавка зверху",
-  "compartments": "Зовнішня кишеня на блискавці; усередині — кишеня на блискавці, кишеня для телефона та багатофункціональна кишеня"
+  "compartments": "Зовнішня кишеня на блискавці; усередині — кишеня на блискавці, кишеня для телефона та багатофункціональна кишеня",
+  "i18n": {
+    "en": {
+      "title": "Coach Gallery Tote Bag In Signature Canvas",
+      "description": "A stylish, roomy COACH Gallery Tote Bag In Signature Canvas in the signature brown and black combination. Made of signature Signature Canvas with leather details and finished with gold-tone hardware.\nThe bag has a spacious zip-top main compartment, interior pockets for a phone and small items, a zip pocket and an exterior zip pocket. Its roomy size makes it suitable for work and everyday use, and it easily fits a laptop up to 13\"",
+      "material": "Signature coated canvas and smooth leather",
+      "dimensions": "32 × 27 × 14 cm",
+      "strapInfo": "Double handles, non-detachable",
+      "preOrderDays": "5–10 business days",
+      "closure": "Zip top",
+      "compartments": "Exterior zip pocket; inside — zip pocket, phone pocket and multifunction pocket"
+    },
+    "ru": {
+      "title": "Шопер Coach Gallery Tote Bag In Signature Canvas",
+      "description": "Стильная и вместительная сумка COACH Gallery Tote Bag In Signature Canvas в фирменном сочетании коричневого и черного цветов. Модель выполнена из фирменного Signature Canvas с кожаными деталями и дополнена золотой фурнитурой.\nСумка имеет просторное основное отделение на молнии, внутренние карманы для телефона и мелочей, карман на молнии и внешний карман на молнии. Благодаря вместительному формату модель подходит для работы, повседневного использования и легко вмещает ноутбук до 13\"",
+      "material": "Фирменный покрытый Signature Canvas и гладкая кожа",
+      "dimensions": "32 × 27 × 14 см",
+      "strapInfo": "Ручки двойные, несъемные",
+      "preOrderDays": "5–10 рабочих дней",
+      "closure": "Молния сверху",
+      "compartments": "Внешний карман на молнии; внутри — карман на молнии, карман для телефона и многофункциональный карман"
+    }
+  }
 }

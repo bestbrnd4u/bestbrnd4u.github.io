@@ -74,5 +74,27 @@
   },
   "material": "100% поліестер",
   "compartments": "Дві зовнішні кишені на блискавці; усередині — кишеня на блискавці та окрема кишеня для телефона",
-  "decor": "Тиснений крокодил збоку, ремінь із графічним принтом у шахову клітинку"
+  "decor": "Тиснений крокодил збоку, ремінь із графічним принтом у шахову клітинку",
+  "i18n": {
+    "en": {
+      "title": "Lacoste Neocroc Checkboard Strap Camera Bag for Men",
+      "description": "Lacoste Neocroc Checkboard Strap Camera Bag\nA compact men's shoulder bag, the Lacoste Neocroc features a contrasting check strap and the signature logo. A practical everyday style: two exterior zip pockets and interior compartments help you keep your essentials neatly organized. Made of durable, lightweight polyester",
+      "material": "100% polyester",
+      "dimensions": "17 × 23 × 9 cm",
+      "preOrderDays": "5–10 business days",
+      "compartments": "Two exterior zip pockets; inside — a zip pocket and a separate phone pocket",
+      "decor": "Embossed crocodile on the side, strap with a graphic checkerboard print",
+      "composition": "100% polyester"
+    },
+    "ru": {
+      "title": "Мужская сумка Lacoste Neocroc Checkboard Strap Camera Bag",
+      "description": "Lacoste Neocroc Checkboard Strap Camera Bag\nКомпактная мужская сумка через плечо Lacoste Neocroc с контрастным клетчатым ремнем и фирменным логотипом. Практичная модель для ежедневного использования: два внешних кармана на молнии и внутренние отделения помогают удобно разместить необходимые вещи. Изготовлена из износостойкого легкого полиэстера",
+      "material": "100% полиэстер",
+      "dimensions": "17 × 23 × 9 см",
+      "preOrderDays": "5–10 рабочих дней",
+      "compartments": "Два внешних кармана на молнии; внутри — карман на молнии и отдельный карман для телефона",
+      "decor": "Тисненый крокодил сбоку, ремень с графическим принтом в шахматную клетку",
+      "composition": "100% полиэстер"
+    }
+  }
 }

@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en" data-season="standard"><head>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"7a6c2900","data/catalog.json":"7af5999c","data/categories.json":"2c24d857","data/collections.json":"858469e9","data/home.json":"179e2c76","data/i18n-en.json":"5e2e6aac","data/i18n-ru.json":"10ef1f66","data/image-variants.json":"8d6e1e7e","data/instagram-links.json":"610ebd7b","data/legal.json":"f84751b2","data/notifications.json":"a35b367f","data/page-texts.json":"9666f432","data/product-texts.json":"e9b88208","data/products-updated.json":"3da58ea6","data/products.json":"ae78eb0a","data/promo-popups.json":"0940ece5","data/promotions.json":"92880867","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/season.json":"17f1306b","data/security.json":"0c05c691","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script><base href="/">
+    <meta name="robots" content="noindex,nofollow">
+    <meta charset="UTF-8">
+    <meta name="author" content="BestBrnd4u">
+    <meta name="copyright" content="© 2026 BestBrnd4u. Усі права захищено.">
+    <link rel="license" href="/LICENSE">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="BestBrnd4u personal shopper service: order authentic designer bags, shoes and accessories from official US and European websites. Purchasing, delivery to Ukraine, and support at every step.">
+    <meta name="theme-color" content="#111827">
+    <meta name="robots" content="index,follow">
+    <link rel="canonical" href="https://dev.bestbrnd4u.com/en/bayer-service">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Personal shopper | BestBrnd4u">
+    <meta property="og:description" content="Order authentic designer goods from the US and Europe through the BestBrnd4u personal shopper service — great prices, purchase and delivery handled end to end.">
+    <meta property="og:image" content="https://dev.bestbrnd4u.com/assets/images/banners/02_banner_products_1800x900-1-.webp">
+    <meta property="og:url" content="https://dev.bestbrnd4u.com/en/bayer-service">
+
+<link rel="icon" href="favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicon-16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/images/favicon-192.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <title>Personal shopper: order designer goods from the US and Europe | BestBrnd4u</title>
+
+    <link rel="preconnect" href="https://hyfodsznpeeecgtgffub.supabase.co" crossorigin="">
+
+    <!-- Шрифт. Тут, а не @import у CSS: @import видно лише після
+         завантаження таблиці стилів, і текст чекає на три запити
+         поспіль. Розкладає scripts/sync-fonts.js — правити руками
+         не треба. -->
+    <link rel="preconnect" href="https://hyfodsznpeeecgtgffub.supabase.co" crossorigin="">
+    <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-v20-latin.woff2?v=v20" crossorigin="">
+    <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-v20-cyrillic.woff2?v=v20" crossorigin="">
+
+    <link rel="stylesheet" href="assets/css/style.css?v=e0b0d1a8">
+
+
+
+
+<script src="/assets/js/vendor/supabase-js-2.112.3.js?v=a38f4664" defer=""></script>
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+        {
+            "@type": "Question",
+            "name": "Is the packaging weight included in the shipping calculation?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, shipping is calculated by the weight of the packed parcel, not just the item itself."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "Do delivery times include order processing by the store?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "No, the table shows transit time only. Some overseas stores take up to 7 business days to process an order themselves — that's counted separately, and we'll let you know in advance."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "Are there extra fees on electronics and accessories from the US?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Some product categories in the US are indeed subject to local sales tax. We always include it in the cost estimate before you make the prepayment."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "How are bulky or heavy items delivered?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "For bulky or heavy shipments, sea freight is better value — slower, but noticeably cheaper than air."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "Can I order an item that's currently out of stock?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, we can watch for the item to come back in stock and purchase it as soon as it reappears on the seller's website."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "How long does the purchase take after prepayment?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "We usually place the purchase within 24–48 hours after receiving the prepayment. If the seller has a processing delay, we'll let you know right away."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "Can I track my parcel after it ships?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, we provide a tracking number for delivery within Ukraine and keep you updated on the key stages of your order's journey."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "What's the minimum order amount for the personal shopper service?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "There's no minimum order — you can order even a single item."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "Can items from different stores be combined into one parcel?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, we can combine several purchases into one shipment to reduce the total shipping cost."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "What if the item arrives defective?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "We'll help you check whether a return or exchange is possible — terms depend on the specific store. Be sure to let us know right after you receive the item."
+            }
+        }
+    ]
+}
+</script>
+<script type="application/ld+json" id="breadcrumbSchema">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://dev.bestbrnd4u.com/en/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Personal shopper",
+      "item": "https://dev.bestbrnd4u.com/en/bayer-service"
+    }
+  ]
+}
+</script>
+<!-- i18n:begin -->
+<link rel="alternate" hreflang="uk" href="https://dev.bestbrnd4u.com/bayer-service">
+<link rel="alternate" hreflang="en" href="https://dev.bestbrnd4u.com/en/bayer-service">
+<link rel="alternate" hreflang="ru" href="https://dev.bestbrnd4u.com/ru/bayer-service">
+<link rel="alternate" hreflang="x-default" href="https://dev.bestbrnd4u.com/bayer-service">
+<link rel="preload" href="/data/i18n-en.json" as="fetch" crossorigin>
+<script src="/assets/js/i18n-core.js?v=742167b2" defer></script>
+<script src="/assets/js/i18n.js?v=34fdf130" defer></script>
+<!-- i18n:end -->
+</head>
+
+<body>
+<a class="skip-link" href="#content">Skip to content</a>
+
+<header>
+
+    <div class="container header">
+
+        <a href="/en/" class="logo">
+            BestBrnd4u
+        </a>
+
+        <nav>
+
+            <ul>
+
+                <li><a href="/en/">Home</a></li>
+
+                <li class="has-mega"><a href="/en/catalog" id="navCatalogLink">Catalog</a><div class="mega-menu" id="catalogMegaMenu">
+<a class="mega-item" href="/en/catalog?gender=Жінкам"><img src="assets/images/banners/mega-women.webp" alt="Women"><span>Women</span></a>
+<a class="mega-item" href="/en/catalog?gender=Чоловікам"><img src="assets/images/banners/mega-men.webp" alt="Men"><span>Men</span></a>
+<a class="mega-item" href="/en/catalog?gender=Унісекс"><img src="assets/images/banners/mega-unisex.webp" alt="Unisex"><span>Unisex</span></a>
+<a class="mega-item" href="/en/catalog?gender=Дітям"><img src="assets/images/banners/mega-kids.webp" alt="Kids"><span>Kids</span></a>
+</div></li>
+
+                <li class="has-mega"><a href="/en/novynky/" id="navNewLink">New arrivals</a><div class="mega-menu">
+<a class="mega-item" href="/en/novynky/?gender=Жінкам"><img src="assets/images/banners/mega-women.webp" alt="Women"><span>Women</span></a>
+<a class="mega-item" href="/en/novynky/?gender=Чоловікам"><img src="assets/images/banners/mega-men.webp" alt="Men"><span>Men</span></a>
+<a class="mega-item" href="/en/novynky/?gender=Унісекс"><img src="assets/images/banners/mega-unisex.webp" alt="Unisex"><span>Unisex</span></a>
+<a class="mega-item" href="/en/novynky/?gender=Дітям"><img src="assets/images/banners/mega-kids.webp" alt="Kids"><span>Kids</span></a>
+</div></li>
+
+                <li class="has-mega"><a href="/en/aktsii/" id="navSaleLink" class="sale-text">Sale</a><div class="mega-menu">
+<a class="mega-item" href="/en/aktsii/?gender=Жінкам"><img src="assets/images/banners/mega-women.webp" alt="Women"><span>Women</span></a>
+<a class="mega-item" href="/en/aktsii/?gender=Чоловікам"><img src="assets/images/banners/mega-men.webp" alt="Men"><span>Men</span></a>
+<a class="mega-item" href="/en/aktsii/?gender=Унісекс"><img src="assets/images/banners/mega-unisex.webp" alt="Unisex"><span>Unisex</span></a>
+<a class="mega-item" href="/en/aktsii/?gender=Дітям"><img src="assets/images/banners/mega-kids.webp" alt="Kids"><span>Kids</span></a>
+</div></li>
+
+                <li><a href="/en/bayer-service" class="active">Personal shopper</a></li>
+
+                <li><a href="/en/contacts">Contacts</a></li>
+
+            </ul>
+
+        </nav>
+
+        <div class="header-icons">
+            <nav class="lang-switch" aria-label="Site language" translate="no"><details class="lang-switch-menu"><summary class="lang-switch-current" aria-label="Site language: English"><span>EN</span></summary><ul class="lang-switch-list"><li><a class="lang-switch-option" href="/bayer-service" hreflang="uk" lang="uk">Українська</a></li><li><span class="lang-switch-option" aria-current="true" lang="en">English</span></li><li><a class="lang-switch-option" href="/ru/bayer-service" hreflang="ru" lang="ru">Русский</a></li></ul></details></nav>
+
+            <button id="searchBtn" aria-label="Search the catalog">🔍</button>
+<a href="/en/account" id="accountLink" aria-label="Sign in or register">👤</a>
+
+            <a href="/en/favorites">         ❤         <span id="favCount">0</span>     </a>
+
+            <div class="cart-icon-wrap">
+    <a href="/en/cart" id="cartIconLink">
+        🛒
+        <span id="cartCount">0</span>
+    </a>
+    <div id="cartPopup" class="cart-popup" hidden=""></div>
+</div>
+
+        </div>
+
+    </div>
+
+</header>
+<span id="content" class="skip-target" tabindex="-1"></span>
+
+<section class="breadcrumbs">
+
+    <div class="container">
+
+        <a href="/en/">Home</a>
+
+        <span class="crumb-sep">→</span>
+
+        <span class="crumb-current">Personal shopper</span>
+
+    </div>
+
+</section>
+
+<section class="bayer-section" style="padding-top:36px;">
+
+    <div class="container">
+
+        <div class="bayer-hero-banner">
+
+            <div class="bayer-hero-content">
+
+                <span class="bayer-hero-badge">🛍️ Personal shopper</span>
+
+                <h1>Can't find the bag you want in our catalog? We'll bring it from the US or Europe</h1>
+
+                <p>
+                    If an authentic item isn't available in Ukraine or costs significantly less abroad, order it through BestBrnd4u. You find the item on the brand's official website or a marketplace, and we purchase it and deliver it to you, taking care of all the payment and logistics hassle.
+                </p>
+
+                <div class="bayer-hero-actions">
+                    <a href="#bayerContact" class="btn">Submit request</a>
+                    <a href="#bayerFaq" class="btn btn-outline">FAQ</a>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="bayer-section">
+
+    <div class="container">
+
+        <div class="bayer-section-head">
+            <span class="bayer-section-eyebrow">🤝</span>
+            <h2>What is the personal shopper service</h2>
+            <p>
+                It's a service that purchases items from foreign stores for customers in Ukraine. You choose any designer item on an official Western website — we buy it in our name, arrange international shipping and hand it over to you in Ukraine. It's not just bags and shoes: you can order clothing, accessories, cosmetics and other goods allowed for import this way.
+            </p>
+        </div>
+
+        <div class="bayer-benefits-grid">
+
+            <div class="bayer-benefit-card">
+                <div class="bayer-benefit-icon">💸</div>
+                <h3>Better prices</h3>
+                <p>Sales and seasonal discounts on brands' official sites in the US and Europe often make buying cheaper even with shipping.</p>
+            </div>
+
+            <div class="bayer-benefit-card">
+                <div class="bayer-benefit-icon">✅</div>
+                <h3>Authenticity guaranteed</h3>
+                <p>We buy only from official brand websites and trusted marketplaces — no fakes or gray-market imports.</p>
+            </div>
+
+            <div class="bayer-benefit-card">
+                <div class="bayer-benefit-icon">🌍</div>
+                <h3>Wider selection</h3>
+                <p>Models, colors and sizes that aren't on the Ukrainian market yet or have already sold out.</p>
+            </div>
+
+            <div class="bayer-benefit-card">
+                <div class="bayer-benefit-icon">📦</div>
+                <h3>No logistics hassle</h3>
+                <p>Just send us a link to the item — we'll handle payment to the overseas seller, shipping, and customs.</p>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="bayer-section">
+
+    <div class="container">
+
+        <div class="bayer-section-head">
+            <span class="bayer-section-eyebrow">🥇</span>
+            <h2>How it works</h2>
+            <p>Six simple steps from a product link to the parcel in your hands.</p>
+        </div>
+
+        <div class="bayer-steps">
+
+            <div class="bayer-step">
+                <div class="bayer-step-number">1</div>
+                <div>
+                    <h3>You send a link to the item</h3>
+                    <p>
+                        Found the item you want on the brand's official website or a marketplace? Send us the link. Not sure where to look for a specific model? We'll recommend trusted stores ourselves.
+                    </p>
+                </div>
+            </div>
+
+            <div class="bayer-step">
+                <div class="bayer-step-number">2</div>
+                <div>
+                    <h3>Calculating the full cost</h3>
+                    <p>We tell you the final order total up front, with no hidden fees later:</p>
+                    <ul>
+                        <li>🏷️ the item price on the seller's website;</li>
+                        <li>📦 shipping cost to Ukraine;</li>
+                        <li>💰 service fee — 10–15% of the item price, depending on how complex the purchase is.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="bayer-step">
+                <div class="bayer-step-number">3</div>
+                <div>
+                    <h3>Make a prepayment</h3>
+                    <p>Once the price is agreed, you make a prepayment and we immediately purchase the item from the seller.</p>
+                </div>
+            </div>
+
+            <div class="bayer-step">
+                <div class="bayer-step-number">4</div>
+                <div>
+                    <h3>Choose a delivery method within Ukraine</h3>
+                    <p>Three options for different budgets and timelines:</p>
+
+                    <table class="bayer-delivery-table">
+                        <thead>
+                            <tr>
+                                <th>Delivery option</th>
+                                <th>Price</th>
+                                <th>Time frame, days</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>🚚 From Europe</td>
+                                <td>from 280 UAH/kg</td>
+                                <td>5–14</td>
+                            </tr>
+                            <tr>
+                                <td>⛵ By sea from the US</td>
+                                <td>from 390 UAH/kg</td>
+                                <td>20–45</td>
+                            </tr>
+                            <tr>
+                                <td>✈ By air from the US</td>
+                                <td>from 560 UAH/kg</td>
+                                <td>10–21</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bayer-step">
+                <div class="bayer-step-number">5</div>
+                <div>
+                    <h3>Track the status</h3>
+                    <p>
+                        You can check your order status at any time — message us on Instagram Direct or Telegram and we'll tell you where your parcel is.
+                    </p>
+                </div>
+            </div>
+
+            <div class="bayer-step">
+                <div class="bayer-step-number">6</div>
+                <div>
+                    <h3>Final payment and pickup</h3>
+                    <p>
+                        When the item arrives in Ukraine, you pay the balance and choose how to receive it — via Nova Poshta to any city in the country: to a branch, a parcel locker or by courier.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="bayer-section">
+
+    <div class="container">
+
+        <div class="bayer-section-head">
+            <span class="bayer-section-eyebrow">😻</span>
+            <h2>Why choose BestBrnd4u</h2>
+        </div>
+
+        <div class="bayer-why-list">
+
+            <div class="bayer-why-item">
+                <span class="bayer-why-check">✓</span>
+                <p><strong>Authenticity guarantee</strong> — we buy only from official brand websites and trusted marketplaces.</p>
+            </div>
+
+            <div class="bayer-why-item">
+                <span class="bayer-why-check">✓</span>
+                <p><strong>Savings on sales</strong> — overseas stores run sales regularly, and we catch the best price for you.</p>
+            </div>
+
+            <div class="bayer-why-item">
+                <span class="bayer-why-check">✓</span>
+                <p><strong>Transparent terms</strong> — no hidden fees, just the actual price of the item plus the service fee.</p>
+            </div>
+
+            <div class="bayer-why-item">
+                <span class="bayer-why-check">✓</span>
+                <p><strong>Convenient delivery</strong> — you choose the best shipping option for price and speed.</p>
+            </div>
+
+            <div class="bayer-why-item">
+                <span class="bayer-why-check">✓</span>
+                <p><strong>Support at every step</strong> — from placing the purchase request to the moment the parcel is in your hands.</p>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="bayer-section" id="bayerContact">
+
+    <div class="container">
+
+        <div class="bayer-cta">
+
+            <h2>Ready to place your order?</h2>
+
+            <p>
+                Send us a link to the item — we'll calculate the purchase cost and find the best delivery option.
+            </p>
+
+            <div class="bayer-cta-actions">
+                <a href="mailto:bestbrnd4u@proton.me" class="btn">✉ Email bestbrnd4u@proton.me</a>
+                <a href="https://www.instagram.com/bestbrnd4u" target="_blank" rel="noopener" class="btn btn-outline">Instagram Direct</a>
+                <a href="/en/contacts" class="btn btn-outline">All ways to contact us</a>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="bayer-section" id="bayerFaq">
+
+    <div class="container">
+
+        <div class="bayer-section-head">
+            <span class="bayer-section-eyebrow">🤔</span>
+            <h2>FAQ</h2>
+        </div>
+
+        <div class="bayer-faq-list" id="bayerFaqList">
+
+            <div class="bayer-faq-item">
+                <button type="button" class="bayer-faq-question" aria-expanded="false">
+                    Is the packaging weight included in the shipping calculation?
+                    <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <div class="bayer-faq-answer">
+                    <div class="bayer-faq-answer-inner">
+                        <p>Yes, shipping is calculated by the weight of the packed parcel, not just the item itself.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bayer-faq-item">
+                <button type="button" class="bayer-faq-question" aria-expanded="false">
+                    Do delivery times include order processing by the store?
+                    <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <div class="bayer-faq-answer">
+                    <div class="bayer-faq-answer-inner">
+                        <p>No, the table shows transit time only. Some overseas stores take up to 7 business days to process an order themselves — that's counted separately, and we'll let you know in advance.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bayer-faq-item">
+                <button type="button" class="bayer-faq-question" aria-expanded="false">
+                    Are there extra fees on electronics and accessories from the US?
+                    <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <div class="bayer-faq-answer">
+                    <div class="bayer-faq-answer-inner">
+                        <p>Some product categories in the US are indeed subject to local sales tax. We always include it in the cost estimate before you make the prepayment.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bayer-faq-item">
+                <button type="button" class="bayer-faq-question" aria-expanded="false">
+                    How are bulky or heavy items delivered?
+                    <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <div class="bayer-faq-answer">
+                    <div class="bayer-faq-answer-inner">
+                        <p>For bulky or heavy shipments, sea freight is better value — slower, but noticeably cheaper than air.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bayer-faq-item">
+                <button type="button" class="bayer-faq-question" aria-expanded="false">
+                    Can I order an item that's currently out of stock?
+                    <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <div class="bayer-faq-answer">
+                    <div class="bayer-faq-answer-inner">
+                        <p>Yes, we can watch for the item to come back in stock and purchase it as soon as it reappears on the seller's website.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bayer-faq-item">
+                <button type="button" class="bayer-faq-question" aria-expanded="false">
+                    How long does the purchase take after prepayment?
+                    <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <div class="bayer-faq-answer">
+                    <div class="bayer-faq-answer-inner">
+                        <p>We usually place the purchase within 24–48 hours after receiving the prepayment. If the seller has a processing delay, we'll let you know right away.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bayer-faq-item">
+                <button type="button" class="bayer-faq-question" aria-expanded="false">
+                    Can I track my parcel after it ships?
+                    <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <div class="bayer-faq-answer">
+                    <div class="bayer-faq-answer-inner">
+                        <p>Yes, we provide a tracking number for delivery within Ukraine and keep you updated on the key stages of your order's journey.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bayer-faq-item">
+                <button type="button" class="bayer-faq-question" aria-expanded="false">
+                    What's the minimum order amount for the personal shopper service?
+                    <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <div class="bayer-faq-answer">
+                    <div class="bayer-faq-answer-inner">
+                        <p>There's no minimum order — you can order even a single item.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bayer-faq-item">
+                <button type="button" class="bayer-faq-question" aria-expanded="false">
+                    Can items from different stores be combined into one parcel?
+                    <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <div class="bayer-faq-answer">
+                    <div class="bayer-faq-answer-inner">
+                        <p>Yes, we can combine several purchases into one shipment to reduce the total shipping cost.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bayer-faq-item">
+                <button type="button" class="bayer-faq-question" aria-expanded="false">
+                    What if the item arrives defective?
+                    <svg class="accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <div class="bayer-faq-answer">
+                    <div class="bayer-faq-answer-inner">
+                        <p>We'll help you check whether a return or exchange is possible — terms depend on the specific store. Be sure to let us know right after you receive the item.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- Підписка на листи — у найпомітнішому місці сторінки.
+
+     Раніше тут стояв порожній <div class="ml-embedded"> —
+     тримач вбудованої форми MailerLite, чий скрипт із сайту
+     прибрали (52 КБ на кожній сторінці). Смуга виходила
+     порожня, а справжня форма тулилась у футері під
+     годинами роботи. Тепер навпаки.
+
+     Ключ MailerLite живе в секретах: адресу приймає наша
+     функція, а не браузер. Галочка згоди НЕ проставлена
+     заздалегідь — згода, якої людина не ставила, згодою
+     не є.
+
+     Підпис поля лишається в розмітці для читалок екрана, а
+     видимим заголовком служить <h2> (див. .newsletter
+     .subscribe-label у style.css). -->
+<section class="newsletter">
+
+    <div class="container">
+
+        <h2>New arrivals and sales to your inbox</h2>
+
+        <form class="subscribe" id="subscribeForm" novalidate="">
+
+            <label class="subscribe-label" for="subscribeEmail">
+                New arrivals and sales to your inbox
+            </label>
+
+            <div class="subscribe-row">
+                <input type="email" id="subscribeEmail" placeholder="you@example.com" autocomplete="email" required="">
+                <button type="submit" id="subscribeSubmit">Subscribe</button>
+            </div>
+
+            <label class="subscribe-consent">
+                <input type="checkbox" id="subscribeConsent">
+                <span>
+                    I agree to receive emails about new arrivals and sales. You can unsubscribe from any email —
+                    <a href="/en/privacy-policy">how we handle your data.</a>
+                </span>
+            </label>
+
+            <p class="subscribe-note" id="subscribeNote" hidden=""></p>
+
+        </form>
+
+        <small>
+        No spam. Only sales and new collections.
+        </small>
+
+    </div>
+
+</section>
+
+<footer>
+
+    <div class="container footer">
+
+        <div>
+
+            <h2>BestBrnd4u</h2>
+
+            <p>
+                Online store of bags and accessories.
+            </p>
+
+            <div class="footer-social">
+                <a href="https://www.instagram.com/bestbrnd4u" target="_blank" rel="noopener" aria-label="Instagram">
+                    Instagram
+                </a>
+                <a href="https://t.me/bestbrnd4u" target="_blank" rel="noopener" aria-label="Telegram">
+                    Telegram
+                </a>
+            </div>
+
+        </div>
+
+        <div>
+
+            <h2>Customer info</h2>
+
+            <!-- Гість не бачить замовлення в кабінеті: воно без user_id.
+                 Тому посилання стоїть ПЕРШИМ у розділі — це не політика,
+                 а дія, і саме її шукають найчастіше -->
+            <a href="/en/order-status">Where's my order</a>
+
+            <a href="/en/delivery-payment#delivery">Delivery</a>
+            <a href="/en/delivery-payment#payment">Payment</a>
+            <a href="/en/authenticity">Authenticity</a>
+            <a href="/en/return-warranty">Returns &amp; warranty</a>
+            <a href="/en/bayer-service">Personal shopper</a>
+            <a href="/en/privacy-policy">Privacy policy</a>
+            <a href="/en/offer">Public offer</a>
+            <!-- Згоду треба вміти відкликати так само легко, як дати -->
+            <a href="#" data-consent-reopen="">Data settings</a>
+
+        </div>
+
+        <div>
+
+            <h2>Catalog</h2>
+
+            <a href="/en/catalog">All products</a>
+
+            <!--SECTIONS_START-->
+            <a href="/en/departments/aksesuary/">Accessories</a>
+            <a href="/en/departments/vzuttia/">Shoes</a>
+            <a href="/en/departments/sumky/">Bags</a>
+            <!--SECTIONS_END-->
+
+            <a href="/en/novynky/">New arrivals</a>
+
+            <a href="/en/aktsii/" class="sale-text">Sale</a>
+
+            <a href="/en/brands/">Brands</a>
+
+        </div>
+
+        <div>
+
+            <h2>Contact us</h2>
+
+            <p>📍 Ukraine</p>
+
+            <p>✉ <a class="mail-link" href="mailto:bestbrnd4u@proton.me">bestbrnd4u@proton.me</a></p>
+
+            <p><svg class="tg-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21.9 4.3 18.6 20c-.2 1-.9 1.3-1.8.8l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.3-5 9.1-8.2c.4-.4-.1-.6-.6-.2L6.1 13.7 1.2 12.2c-1-.3-1.1-1 .2-1.5l19.3-7.4c.9-.3 1.6.2 1.2 1z"></path></svg> <a class="tg-link" href="https://t.me/bestbrnd4u" target="_blank" rel="noopener">@bestbrnd4u</a></p>
+
+            <p>☎ <a class="phone-link" href="tel:+380737288291">+380 73 728 82 91</a></p>
+
+            <p>🕘 Mon–Sun 09:00–20:00</p>
+
+
+        </div>
+
+    </div>
+
+</footer>
+
+<div class="copyright">
+
+    <div class="container">
+
+    © 2026 bestbrnd4u. All rights reserved.
+
+    </div>
+
+</div>
+
+<button id="scrollTop" class="scroll-top" aria-label="Back to top">
+    ↑
+</button>
+
+<!-- Журнал помилок: сторінка сама розповідає, що в неї зламалось -->
+<script src="assets/js/error-report.js?v=21838fe8" defer=""></script>
+<script src="assets/js/supabase-client.js?v=e8358d93" defer=""></script>
+<!-- Кадрування фото товару. Той самий файл підключає адмінка,
+     тож прев'ю в ній і картка на сайті рахуються однаково. -->
+<script src="assets/js/image-framing.js?v=80b29a57" defer=""></script>
+<!-- Хлібні крихти: спільний будівник для сторінки й розмітки BreadcrumbList -->
+<script src="assets/js/breadcrumbs.js?v=8e4f5363" defer=""></script>
+<!-- Оформлення текстових блоків з адмінки (кольори, шрифт, кнопка) -->
+<script src="assets/js/text-styles.js?v=4b9b6f00" defer=""></script>
+<!-- Згода на використання даних (банер + блокування вбудованого відео) -->
+<script src="assets/js/consent.js?v=b6cc5d45" defer=""></script>
+<!-- Статистика відвідувань. Не завантажує Google без згоди. -->
+<script src="assets/js/analytics.js?v=9d0002d2" defer=""></script>
+<!-- Транслітерація: productUrl() кладе колір в адресу латиницею.
+     Той самий файл використовує збірка для адрес товарів. -->
+<script src="assets/js/translit.js?v=c0957cb7" defer=""></script>
+<script src="assets/js/common.js?v=98dcdbcc" defer=""></script>
+<!-- Дзвінок і зв'язок: дві плаваючі кнопки в лівому кутку -->
+<script src="assets/js/contact-buttons.js?v=53c2ccd7" defer=""></script>
+<!-- Підписка на листи магазину -->
+<script src="assets/js/subscribe.js?v=79349742" defer=""></script>
+<script src="assets/js/sync.js?v=48ef002e" defer=""></script>
+<script src="assets/js/mega-menu.js?v=ff0d32d0" defer=""></script>
+<script src="assets/js/ui.js?v=fa1e1236" defer=""></script>
+
+<script>
+
+    document.querySelectorAll(".bayer-faq-question").forEach(question => {
+
+        question.addEventListener("click", () => {
+
+            const item = question.closest(".bayer-faq-item");
+
+            if (!item) return;
+
+            const open = item.classList.toggle("open");
+
+            // Стрілка розвертається через CSS і видна оком. Зчитувачу
+            // екрана вона не каже нічого — стан читається саме звідси.
+            question.setAttribute("aria-expanded", String(open));
+
+        });
+
+    });
+
+</script>
+
+
+
+
+</body></html>

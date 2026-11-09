@@ -8,5 +8,15 @@
   "banner": "/assets/images/brands/invicta-banner.webp",
   "bannerMobile": "/assets/images/brands/invicta-banner-mobile.webp",
   "title": "Годинники Invicta",
-  "description": "Марку заснували 1837 року в швейцарському Ла-Шо-де-Фоні, а сучасне життя вона отримала 1991-го, коли її відродили в США з іншою ідеєю: механіка й дайверські корпуси за ціною, доступною не лише колекціонерам.\n\nНайвідоміша лінія — Pro Diver: масивний сталевий корпус, обертовий безель, добра читабельність циферблата."
+  "description": "Марку заснували 1837 року в швейцарському Ла-Шо-де-Фоні, а сучасне життя вона отримала 1991-го, коли її відродили в США з іншою ідеєю: механіка й дайверські корпуси за ціною, доступною не лише колекціонерам.\n\nНайвідоміша лінія — Pro Diver: масивний сталевий корпус, обертовий безель, добра читабельність циферблата.",
+  "i18n": {
+    "en": {
+      "title": "Invicta watches",
+      "description": "The brand was founded in 1837 in La Chaux-de-Fonds, Switzerland, and got its modern life in 1991, when it was revived in the US with a different idea: mechanical movements and dive cases at a price within reach of more than just collectors.\n\nThe best-known line is the Pro Diver: a massive steel case, a rotating bezel and a highly legible dial."
+    },
+    "ru": {
+      "title": "Часы Invicta",
+      "description": "Марку основали в 1837 году в швейцарском Ла-Шо-де-Фоне, а современную жизнь она получила в 1991-м, когда ее возродили в США с другой идеей: механика и дайверские корпуса по цене, доступной не только коллекционерам.\n\nСамая известная линия — Pro Diver: массивный стальной корпус, вращающийся безель, хорошая читаемость циферблата."
+    }
+  }
 }

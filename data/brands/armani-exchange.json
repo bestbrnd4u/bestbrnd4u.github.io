@@ -10,5 +10,15 @@
   "banner": "/assets/images/brands/armani-exchange-banner.webp",
   "bannerMobile": "/assets/images/brands/armani-exchange-banner-mobile.webp",
   "title": "Чоловічі сумки Armani Exchange",
-  "description": "Молодша й демократичніша лінія Джорджо Армані, запущена 1991 року в Нью-Йорку. Задум був простий: взяти впізнаваний мінімалізм головної марки й перекласти його на щоденний одяг та аксесуари.\n\nЗвідси й характер речей — чисті форми, стриманий колір, помітний, але не крикливий логотип. У каталозі здебільшого сумки, годинники й аксесуари."
+  "description": "Молодша й демократичніша лінія Джорджо Армані, запущена 1991 року в Нью-Йорку. Задум був простий: взяти впізнаваний мінімалізм головної марки й перекласти його на щоденний одяг та аксесуари.\n\nЗвідси й характер речей — чисті форми, стриманий колір, помітний, але не крикливий логотип. У каталозі здебільшого сумки, годинники й аксесуари.",
+  "i18n": {
+    "en": {
+      "title": "Armani Exchange men's bags",
+      "description": "Giorgio Armani's younger, more accessible line, launched in New York in 1991. The idea was simple: take the recognizable minimalism of the main label and translate it into everyday clothing and accessories.\n\nHence the character of the pieces — clean shapes, restrained color, a logo that stands out without shouting. The catalog mostly features bags, watches and accessories."
+    },
+    "ru": {
+      "title": "Мужские сумки Armani Exchange",
+      "description": "Младшая и более демократичная линия Джорджо Армани, запущенная в 1991 году в Нью-Йорке. Замысел был простым: взять узнаваемый минимализм главной марки и перенести его на повседневную одежду и аксессуары.\n\nОтсюда и характер вещей — чистые формы, сдержанный цвет, заметный, но не кричащий логотип. В каталоге в основном сумки, часы и аксессуары."
+    }
+  }
 }

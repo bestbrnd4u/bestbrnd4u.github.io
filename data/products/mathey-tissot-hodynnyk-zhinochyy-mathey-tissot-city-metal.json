@@ -60,5 +60,21 @@
   },
   "dimensions": "Корпус — 2,8 см у діаметрі, товщина 0,7 см",
   "material": "Корпус і браслет — нержавіюча сталь 316L; скло — із сапфіровим покриттям",
-  "closure": "Розкладна"
+  "closure": "Розкладна",
+  "i18n": {
+    "en": {
+      "title": "Mathey Tissot City Metal Women's Watch",
+      "description": "A women's Mathey Tissot watch from the City collection, with a compact case on a metal bracelet. A clean dial with a date display. A Swiss brand with more than 130 years of history.",
+      "material": "Case and bracelet — 316L stainless steel; glass — sapphire-coated",
+      "dimensions": "Case — 2.8 cm in diameter, 0.7 cm thick",
+      "closure": "Deployant clasp"
+    },
+    "ru": {
+      "title": "Часы женские Mathey Tissot City Metal",
+      "description": "Женские часы Mathey Tissot из коллекции City — компактный корпус на металлическом браслете. Лаконичный циферблат с указателем даты. Швейцарский бренд с более чем 130-летней историей.",
+      "material": "Корпус и браслет — нержавеющая сталь 316L; стекло — с сапфировым покрытием",
+      "dimensions": "Корпус — 2,8 см в диаметре, толщина 0,7 см",
+      "closure": "Раскладная застежка"
+    }
+  }
 }

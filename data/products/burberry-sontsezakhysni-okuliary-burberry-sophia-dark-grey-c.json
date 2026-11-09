@@ -57,5 +57,19 @@
     }
   },
   "dimensions": "Ширина лінзи × місток × довжина завушника: 51 × 20 × 135 мм",
-  "material": "Ацетат"
+  "material": "Ацетат",
+  "i18n": {
+    "en": {
+      "title": "Burberry Sophia Dark Grey Cat Eye Sunglasses",
+      "description": "Burberry Sophia sunglasses. Rectangular frame, dark lenses, brand logo on the temple. A classic shape that flatters most face types.",
+      "material": "Acetate",
+      "dimensions": "Lens width × bridge × temple length: 51 × 20 × 135 mm"
+    },
+    "ru": {
+      "title": "Солнцезащитные очки Burberry Sophia Dark Grey Cat Eye",
+      "description": "Солнцезащитные очки Burberry Sophia. Прямоугольная оправа, темные линзы, логотип бренда на заушнике. Классическая форма, которая подходит большинству типов лица.",
+      "material": "Ацетат",
+      "dimensions": "Ширина линзы × мост × длина заушника: 51 × 20 × 135 мм"
+    }
+  }
 }

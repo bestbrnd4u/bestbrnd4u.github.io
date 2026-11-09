@@ -1316,6 +1316,18 @@ function main() {
     // не враховує, але порядок хай буде очевидним.
     stampUpdated(products);
 
+    // Переклади товару (поле i18n, з адмінки) у зібрані файли не
+    // кладемо: до сторінок вони доходять словником
+    // (scripts/build-locales.js → data/i18n-en.json), а тут кожен
+    // відвідувач каталогу тягнув би ще дві мови до кожного товару.
+    //
+    // Не лише в самому товарі: опис може мати й варіант (колір), і тоді
+    // переклад лежить поруч із ним.
+    products.forEach(product => {
+        delete product.i18n;
+        (product.variants || []).forEach(variant => { if (variant) delete variant.i18n; });
+    });
+
     fs.writeFileSync(OUTPUT_FILE, serialize(products), "utf8");
 
     const catalog = products.map(product => {

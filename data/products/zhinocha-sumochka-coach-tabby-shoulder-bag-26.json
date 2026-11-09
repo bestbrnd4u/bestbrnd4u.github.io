@@ -139,5 +139,27 @@
     "жіноча-сумочка-coach-tabby-shoulder-bag-26"
   ],
   "closure": "Кнопка",
-  "compartments": "Зовнішня відкрита кишеня; усередині — кишеня на блискавці та багатофункціональна кишеня"
+  "compartments": "Зовнішня відкрита кишеня; усередині — кишеня на блискавці та багатофункціональна кишеня",
+  "i18n": {
+    "en": {
+      "title": "Women's Coach Tabby Shoulder Bag 26",
+      "description": "The structured Coach Tabby 26, the brand's iconic model with the recognizable signature Signature closure. Compact yet roomy, it comes with two detachable straps: a short one for shoulder wear and a long one for crossbody wear.\nIt pairs perfectly with both casual and more elegant looks.",
+      "material": "Genuine Polished Pebble Leather",
+      "dimensions": "26 × 15 × 8 cm",
+      "strapInfo": "Short detachable handle + long detachable crossbody strap",
+      "preOrderDays": "10-14 business days",
+      "closure": "Snap",
+      "compartments": "Exterior open pocket; inside: zip pocket and multifunction pocket"
+    },
+    "ru": {
+      "title": "Женская сумочка Coach Tabby Shoulder Bag 26",
+      "description": "Структурированная сумка Coach Tabby 26 — культовая модель бренда с узнаваемой фирменной застежкой Signature. Компактная, но вместительная, дополнена двумя съемными ремешками: коротким для ношения на плече и длинным для ношения через плечо.\nИдеально сочетается как с повседневными образами, так и с более элегантными.",
+      "material": "Натуральная кожа Polished Pebble Leather",
+      "dimensions": "26 × 15 × 8 см",
+      "strapInfo": "Короткая съемная ручка + длинный съемный ремень для ношения через плечо",
+      "preOrderDays": "10-14 рабочих дней",
+      "closure": "Кнопка",
+      "compartments": "Наружный открытый карман; внутри — карман на молнии и многофункциональный карман"
+    }
+  }
 }

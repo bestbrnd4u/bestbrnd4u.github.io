@@ -62,5 +62,27 @@
   "closure": "Магнітна",
   "compartments": "Одне велике відділення; усередині — кишеня на блискавці та відкрита кишеня",
   "strapInfo": "Знімний регульований ремінь, перепад 45–56 см",
-  "decor": "Фурнітура сріблястого тону"
+  "decor": "Фурнітура сріблястого тону",
+  "i18n": {
+    "en": {
+      "title": "JW PEI Maze Crossbody Women's Bag",
+      "description": "JW PEI Maze is a crossbody bag with a two-tone woven top. A long strap and a compact body. A richly textured model that works as an accessory in its own right.",
+      "material": "Vegan leather; lining — polyester",
+      "dimensions": "23 × 15 × 10 cm",
+      "strapInfo": "Removable adjustable strap, drop 45–56 cm",
+      "closure": "Magnetic",
+      "compartments": "One large compartment; inside — zip pocket and open pocket",
+      "decor": "Silver-tone hardware"
+    },
+    "ru": {
+      "title": "Женская сумочка JW PEI Maze Crossbody",
+      "description": "JW PEI Maze — кросс-боди с плетеным верхом в два тона. Длинный ремешок, компактный корпус. Модель с выраженной фактурой, которая сама по себе служит аксессуаром.",
+      "material": "Веганская кожа; подкладка — полиэстер",
+      "dimensions": "23 × 15 × 10 см",
+      "strapInfo": "Съемный регулируемый ремень, высота 45–56 см",
+      "closure": "Магнитная",
+      "compartments": "Одно большое отделение; внутри — карман на молнии и открытый карман",
+      "decor": "Фурнитура серебристого тона"
+    }
+  }
 }

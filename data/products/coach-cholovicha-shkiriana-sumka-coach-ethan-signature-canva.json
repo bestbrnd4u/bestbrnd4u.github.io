@@ -58,5 +58,25 @@
   "dimensions": "21 × 32 × 9 см",
   "closure": "Блискавка",
   "compartments": "Зовнішні кишені на блискавці; усередині — кишеня на блискавці та багатофункціональна кишеня",
-  "strapInfo": "Регульований плечовий ремінь довжиною 115 см; кріпиться ліворуч або праворуч"
+  "strapInfo": "Регульований плечовий ремінь довжиною 115 см; кріпиться ліворуч або праворуч",
+  "i18n": {
+    "en": {
+      "title": "Coach Ethan Signature Canvas Men's Leather Bag",
+      "description": "The Coach Ethan in the signature Signature print — a crossbody with leather trim. Compact body, shoulder strap. For everyday small essentials.",
+      "material": "Leather",
+      "dimensions": "21 × 32 × 9 cm",
+      "strapInfo": "Adjustable 115 cm shoulder strap; attaches on the left or right",
+      "closure": "Zipper",
+      "compartments": "Exterior zip pockets; inside — a zip pocket and a multifunction pocket"
+    },
+    "ru": {
+      "title": "Мужская кожаная сумка Coach Ethan Signature Canvas",
+      "description": "Coach Ethan в фирменном принте Signature — кросс-боди с кожаными вставками. Компактный корпус, ремешок через плечо. Для ежедневных мелочей.",
+      "material": "Кожа",
+      "dimensions": "21 × 32 × 9 см",
+      "strapInfo": "Регулируемый плечевой ремень длиной 115 см; крепится слева или справа",
+      "closure": "Молния",
+      "compartments": "Внешние карманы на молнии; внутри — карман на молнии и многофункциональный карман"
+    }
+  }
 }

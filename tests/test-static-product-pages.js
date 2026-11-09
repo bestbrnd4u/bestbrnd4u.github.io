@@ -277,8 +277,11 @@ console.log("\n[7] Стара адреса ?id= не ламається, а ве
            < legacyBlock.indexOf("location.replace("),
         "updateProductSeoMetadata має стояти перед location.replace");
 
+    // Адреса з кольором і розміром — та сама, але на /en/ і /ru/ ще й з
+    // мовним префіксом (I18N.href), тож між productUrl і replace —
+    // проміжна змінна.
     check("колір і розмір переносяться на нову адресу",
-        /location\.replace\(productUrl\(product, \{[\s\S]{0,120}color[\s\S]{0,120}size/.test(productJs));
+        /productUrl\(product, \{[\s\S]{0,120}color[\s\S]{0,120}size[\s\S]{0,200}location\.replace\(/.test(productJs));
     // Через dataUrl(), щоб адреса несла версію файлу — інакше після
     // викладки сторінка товару тягла б старий каталог із кеша.
     check("product.js тягне каталог з кореня, а не відносно теки",
@@ -300,9 +303,16 @@ console.log("\n[8] Генератор переживає повторний за
     // крок збірки (scripts/apply-cache-version.js), який іде після.
     // Тому «до» тут версіоноване, а «після» — ні, і пряме порівняння
     // перевіряло б порядок кроків, а не ідемпотентність генератора.
+    //
+    // З мовними вставками (hreflang, перемикач — build-locales.js) те
+    // саме: їх ставить пізніший крок, а генератор копіює шаблонні.
+    // Кінцевий стан сторінки після повної збірки перевіряє
+    // tests/test-locales.js.
     const stripVersions = html => html
         .replace(/\?v=[a-f0-9]+/g, "")
-        .replace(/\s*<script>window\.ASSET_VERSIONS[\s\S]*?<\/script>/, "");
+        .replace(/\s*<script>window\.ASSET_VERSIONS[\s\S]*?<\/script>/, "")
+        .replace(/\n?<!-- i18n:begin -->[\s\S]*?<!-- i18n:end -->/g, "")
+        .replace(/<nav class="lang-switch"[\s\S]*?<\/nav>/g, "");
 
     check("повторний запуск не змінює сторінку (ідемпотентність)",
         stripVersions(before) === stripVersions(after));

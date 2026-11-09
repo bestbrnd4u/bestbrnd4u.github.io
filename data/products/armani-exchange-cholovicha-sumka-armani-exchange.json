@@ -51,5 +51,17 @@
       "ONESIZE": 1
     }
   },
-  "material": "Екошкіра"
+  "material": "Екошкіра",
+  "i18n": {
+    "en": {
+      "title": "Armani Exchange Men's Bag",
+      "description": "An Armani Exchange belt bag with an allover monogram print. Wear it around the waist or over the shoulder. A compact style for walks and travel.",
+      "material": "Faux leather"
+    },
+    "ru": {
+      "title": "Мужская сумка Armani Exchange",
+      "description": "Поясная сумка Armani Exchange с монограммным принтом по всему корпусу. Носится на поясе или через плечо. Компактная модель для прогулок и путешествий.",
+      "material": "Экокожа"
+    }
+  }
 }

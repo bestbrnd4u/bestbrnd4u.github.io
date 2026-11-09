@@ -80,5 +80,29 @@
   },
   "closure": "Клапан на магніті",
   "compartments": "Задня кишеня з відділенням для картки",
-  "decor": "Золотистий логотип JACQUEMUS, помітна відстрочка"
+  "decor": "Золотистий логотип JACQUEMUS, помітна відстрочка",
+  "i18n": {
+    "en": {
+      "title": "Jacquemus Le Bambino White Bag",
+      "description": "A miniature and elegant Jacquemus Le Bambino bag in classic white. Crafted from smooth genuine leather and finished with the signature gold-tone Jacquemus logo on the flap.\nThe bag has a compact main compartment, a back card pocket, and a magnetic closure. It features a top handle and a detachable adjustable strap, so it can be carried by hand or worn on the shoulder or crossbody. Made in Italy.",
+      "material": "Smooth genuine leather",
+      "dimensions": "17.5 × 8.5 × 6.5 cm",
+      "strapInfo": "Detachable and adjustable strap; fixed handle",
+      "preOrderDays": "5–10 business days",
+      "closure": "Magnetic flap",
+      "compartments": "Back pocket with card slot",
+      "decor": "Gold-tone JACQUEMUS logo, visible topstitching"
+    },
+    "ru": {
+      "title": "Сумочка Jacquemus Le Bambino White",
+      "description": "Миниатюрная и элегантная сумка Jacquemus Le Bambino в классическом белом цвете. Модель выполнена из гладкой натуральной кожи и дополнена фирменным золотистым логотипом Jacquemus на клапане.\nСумка имеет компактное основное отделение, задний карман для карты и магнитную застежку. Оснащена верхней ручкой и съемным регулируемым ремешком, поэтому ее можно носить в руке, на плече или через плечо. Изготовлена в Италии.",
+      "material": "Натуральная гладкая кожа",
+      "dimensions": "17,5 × 8,5 × 6,5 см",
+      "strapInfo": "Ремешок съемный и регулируемый, ручка несъемная",
+      "preOrderDays": "5–10 рабочих дней",
+      "closure": "Клапан на магните",
+      "compartments": "Задний карман с отделением для карты",
+      "decor": "Золотистый логотип JACQUEMUS, заметная отстрочка"
+    }
+  }
 }

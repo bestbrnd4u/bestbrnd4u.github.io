@@ -71,5 +71,23 @@
       "ONESIZE": 1
     }
   },
-  "closure": "Блискавка по периметру"
+  "closure": "Блискавка по периметру",
+  "i18n": {
+    "en": {
+      "title": "Marc Jacobs The Zip Around Wallet",
+      "description": "A compact and stylish Marc Jacobs The Zip Around Wallet for women in a trendy khaki color. The practical zip-around closure keeps your cards, bills and other small essentials secure.\nThe clean design with the signature Marc Jacobs logo makes this wallet a versatile accessory for everyday use. Its compact format fits easily into a small bag as well as a larger one",
+      "material": "Genuine leather",
+      "dimensions": "12 × 9 × 3 cm",
+      "preOrderDays": "5–10 business days",
+      "closure": "Zip-around"
+    },
+    "ru": {
+      "title": "Кошелек Marc Jacobs The Zip Around Wallet",
+      "description": "Компактный и стильный женский кошелек Marc Jacobs The Zip Around Wallet в трендовом цвете хаки. Практичная модель с застежкой на молнию по периметру обеспечивает надежное хранение карт, купюр и других необходимых мелочей.\nЛаконичный дизайн с фирменным логотипом Marc Jacobs делает кошелек универсальным аксессуаром для повседневного использования. Компактный формат легко помещается как в небольшую сумку, так и в более крупную модель",
+      "material": "Натуральная кожа",
+      "dimensions": "12 × 9 × 3 см",
+      "preOrderDays": "5–10 рабочих дней",
+      "closure": "Молния по периметру"
+    }
+  }
 }

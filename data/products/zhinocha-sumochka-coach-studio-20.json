@@ -87,5 +87,27 @@
     "/assets/images/products/uploads/ce761_b4bh5_a92.webp"
   ],
   "closure": "Замок-засувка (pushlock)",
-  "compartments": "Зовнішня відкрита кишеня; усередині — багатофункціональна кишеня та вісім відділень для карток"
+  "compartments": "Зовнішня відкрита кишеня; усередині — багатофункціональна кишеня та вісім відділень для карток",
+  "i18n": {
+    "en": {
+      "title": "Coach Studio 20 Women's Bag",
+      "description": "An elegant, compact Coach Studio Bag 20 in a glossy finish. Inspired by an archival Coach design and finished with the signature Pushlock closure with the “C” logo.\nMade of patent leather with a well-thought-out interior: 8 credit card slots, an interior multifunction pocket, and an exterior open pocket. The compact format comfortably fits a phone and the essentials.\nIt comes with a detachable handle and a detachable adjustable strap, so it can be carried by hand, under the arm, on the shoulder, or crossbody",
+      "material": "Genuine patent leather",
+      "dimensions": "20 × 11 × 6 cm",
+      "strapInfo": "Handle: detachable. Strap: detachable and adjustable",
+      "preOrderDays": "5–10 business days",
+      "closure": "Pushlock closure",
+      "compartments": "Exterior open pocket; inside: multifunction pocket and eight card slots"
+    },
+    "ru": {
+      "title": "Женская сумочка Coach Studio 20",
+      "description": "Элегантная компактная сумка Coach Studio Bag 20 в глянцевом исполнении. Модель создана на основе архивного дизайна Coach и дополнена фирменной застежкой Pushlock с логотипом «C».\nСумка изготовлена из лакированной кожи и имеет продуманную организацию пространства: 8 слотов для банковских карт, внутренний многофункциональный карман и наружный открытый карман. Компактный формат позволяет удобно носить телефон и самые необходимые вещи.\nМодель комплектуется съемной ручкой и съемным регулируемым ремешком, поэтому ее можно носить в руке, под мышкой, на плече или через плечо",
+      "material": "Лакированная натуральная кожа",
+      "dimensions": "20 × 11 × 6 см",
+      "strapInfo": "Ручка: съемная. Ремешок: съемный и регулируемый",
+      "preOrderDays": "5–10 рабочих дней",
+      "closure": "Замок-защелка (pushlock)",
+      "compartments": "Наружный открытый карман; внутри — многофункциональный карман и восемь отделений для карт"
+    }
+  }
 }

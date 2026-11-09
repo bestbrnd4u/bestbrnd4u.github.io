@@ -72,5 +72,23 @@
     "Чорний": {
       "ONESIZE": 1
     }
+  },
+  "i18n": {
+    "en": {
+      "title": "Women's Marc Jacobs The Creature Tote Bag Black",
+      "description": "A stylish Marc Jacobs The Creature Tote Bag in black, a striking model from the brand's collection that combines a recognizable design with an original texture. The bag is made of soft faux fur and finished with leather handles and a detachable adjustable strap, so it can be carried by hand or worn on the shoulder or crossbody.\nThe model has a roomy main compartment and a practical construction, making it suitable for both everyday looks and stylish outings. The black color pairs easily with a basic wardrobe, while the textured material adds a statement accent to any look",
+      "material": "Faux fur",
+      "dimensions": "32 × 26 × 17 cm",
+      "strapInfo": "Detachable, adjustable strap",
+      "preOrderDays": "5–10 business days"
+    },
+    "ru": {
+      "title": "Женская сумочка Marc Jacobs The Creature Tote Bag Black",
+      "description": "Стильная сумка Marc Jacobs The Creature Tote Bag в черном цвете — эффектная модель из коллекции бренда, которая сочетает узнаваемый дизайн и оригинальную фактуру. Сумка выполнена из мягкого искусственного меха, дополнена кожаными ручками и съемным регулируемым ремнем, что позволяет носить ее в руке, на плече или через плечо.\nМодель имеет вместительное основное отделение и практичную конструкцию, благодаря чему подходит как для повседневных образов, так и для стильных выходов. Черный цвет легко сочетается с базовым гардеробом, а фактурный материал добавляет образу акцентности",
+      "material": "Искусственный мех",
+      "dimensions": "32 × 26 × 17 см",
+      "strapInfo": "Ремень съемный, регулируемый",
+      "preOrderDays": "5–10 рабочих дней"
+    }
   }
 }

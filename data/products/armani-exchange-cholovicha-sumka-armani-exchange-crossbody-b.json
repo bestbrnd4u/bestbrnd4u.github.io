@@ -51,5 +51,17 @@
       "ONESIZE": 1
     }
   },
-  "material": "Екошкіра"
+  "material": "Екошкіра",
+  "i18n": {
+    "en": {
+      "title": "Armani Exchange Crossbody Bag Black Men's Bag",
+      "description": "An Armani Exchange crossbody with a flat body that adds no bulk under outerwear. AX logo on the front, shoulder strap. For documents, a phone and small essentials.",
+      "material": "Faux leather"
+    },
+    "ru": {
+      "title": "Мужская сумка Armani Exchange Crossbody Bag Black",
+      "description": "Кросс-боди Armani Exchange — плоский корпус, который не добавляет объема под верхней одеждой. Логотип AX на лицевой стороне, ремешок через плечо. Для документов, телефона и мелочей.",
+      "material": "Экокожа"
+    }
+  }
 }

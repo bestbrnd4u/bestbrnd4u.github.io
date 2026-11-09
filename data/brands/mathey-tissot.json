@@ -9,5 +9,15 @@
   "banner": "/assets/images/brands/mathey-tissot-banner.webp",
   "bannerMobile": "/assets/images/brands/mathey-tissot-banner-mobile.webp",
   "title": "Годинники Mathey-Tissot",
-  "description": "Швейцарська годинникова марка, заснована 1886 року в Ле-Пон-де-Мартель родиною Матеї. Тримається класики: круглий корпус, стримані циферблати, механіка — без спроб наздогнати моду.\n\nНезважаючи на схожість у назві, з маркою Tissot вона не пов'язана: це різні компанії з різною історією."
+  "description": "Швейцарська годинникова марка, заснована 1886 року в Ле-Пон-де-Мартель родиною Матеї. Тримається класики: круглий корпус, стримані циферблати, механіка — без спроб наздогнати моду.\n\nНезважаючи на схожість у назві, з маркою Tissot вона не пов'язана: це різні компанії з різною історією.",
+  "i18n": {
+    "en": {
+      "title": "Mathey-Tissot watches",
+      "description": "A Swiss watch brand founded in 1886 in Les Ponts-de-Martel by the Mathey family. It sticks to the classics: round cases, understated dials, mechanical movements — with no attempt to chase trends.\n\nDespite the similar name, it is not related to Tissot: these are different companies with different histories."
+    },
+    "ru": {
+      "title": "Часы Mathey-Tissot",
+      "description": "Швейцарская часовая марка, основанная в 1886 году в Ле-Пон-де-Мартеле семьей Матеи. Держится классики: круглый корпус, сдержанные циферблаты, механика — без попыток угнаться за модой.\n\nНесмотря на сходство в названии, с маркой Tissot она не связана: это разные компании с разной историей."
+    }
+  }
 }

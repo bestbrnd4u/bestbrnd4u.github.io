@@ -79,5 +79,27 @@
     "/assets/images/products/uploads/ces89_svbk_a91.webp"
   ],
   "closure": "Блискавка",
-  "compartments": "Зовнішні кишені — на блискавці та на магнітній кнопці; усередині — кишеня на кнопці"
+  "compartments": "Зовнішні кишені — на блискавці та на магнітній кнопці; усередині — кишеня на кнопці",
+  "i18n": {
+    "en": {
+      "title": "COACH Tristan Crossbody Bag In Signature Leather Men's Bag",
+      "description": "The stylish and functional COACH Tristan Crossbody Bag 22, made of signature Signature pebbled leather. It has a convenient vertical format and a well-planned interior for everyday essentials.\nThe bag features a main zip compartment, an interior snap pocket, and exterior zip and magnetic snap pockets. The adjustable strap lets you wear it over the shoulder or crossbody.\nThe clean design, signature COACH craftsmanship and practical format make Tristan a great everyday choice",
+      "material": "Signature pebbled leather and pebbled leather; lining — recycled polyester",
+      "dimensions": "22 × 26 × 5 cm",
+      "strapInfo": "Adjustable shoulder strap. Can be worn over the shoulder or crossbody. Strap drop — approximately",
+      "preOrderDays": "10-14 business days",
+      "closure": "Zipper",
+      "compartments": "Exterior pockets — zip and magnetic snap; inside — snap pocket"
+    },
+    "ru": {
+      "title": "Мужская сумка COACH Tristan Crossbody Bag In Signature Leather",
+      "description": "Стильная и функциональная сумка COACH Tristan Crossbody Bag 22, выполненная из фирменной зернистой кожи Signature. Модель имеет удобный вертикальный формат и продуманное внутреннее пространство для повседневных вещей.\nСумка оснащена основным отделением на молнии, внутренним карманом на кнопке, а также внешними карманами на молнии и магнитной кнопке. Регулируемый ремень позволяет носить модель на плече или кросс-боди.\nЛаконичный дизайн, фирменное исполнение COACH и практичный формат делают Tristan отличным выбором на каждый день",
+      "material": "Фирменная зернистая кожа Signature и зернистая кожа; внутренняя подкладка — переработанный полиэстер",
+      "dimensions": "22 × 26 × 5 см",
+      "strapInfo": "Регулируемый плечевой ремень. Можно носить на плече или кросс-боди. Высота спуска ремня — примерно",
+      "preOrderDays": "10-14 рабочих дней",
+      "closure": "Молния",
+      "compartments": "Внешние карманы — на молнии и на магнитной кнопке; внутри — карман на кнопке"
+    }
+  }
 }

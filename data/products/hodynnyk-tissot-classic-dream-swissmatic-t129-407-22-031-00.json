@@ -66,5 +66,25 @@
   "legacySlugs": [
     "годинник-tissot-classic-dream-swissmatic-t129-407-22-031-00"
   ],
-  "closure": "Розкладна застібка з кнопкою-фіксатором"
+  "closure": "Розкладна застібка з кнопкою-фіксатором",
+  "i18n": {
+    "en": {
+      "title": "Tissot Classic Dream Swissmatic T129.407.22.031.00 Watch",
+      "description": "The watch features a Swiss Swissmatic automatic movement with a power reserve of up to 72 hours, a date display and scratch-resistant sapphire crystal. The transparent case back lets you watch the movement at work. The case and bracelet are made of stainless steel with rose gold-colored PVD coating. Water resistance — up to 50 m (5 bar)",
+      "material": "Case and bracelet — 316L stainless steel; rose gold-tone elements — PVD coating; crystal — sapphire, scratch-resistant",
+      "dimensions": "4.2 × 4.2 × 1.15 cm",
+      "strapInfo": "Two-tone stainless steel bracelet in silver and rose gold tones, lug width — 2.2 cm. Butterfly clasp with push buttons",
+      "preOrderDays": "10-14 business days",
+      "closure": "Folding clasp with push-button lock"
+    },
+    "ru": {
+      "title": "Часы Tissot Classic Dream Swissmatic T129.407.22.031.00",
+      "description": "Часы оснащены швейцарским автоматическим механизмом Swissmatic с запасом хода до 72 часов, функцией отображения даты и сапфировым стеклом с защитой от царапин. Прозрачная задняя крышка позволяет наблюдать за работой механизма. Корпус и браслет выполнены из нержавеющей стали с PVD-покрытием цвета розового золота. Водонепроницаемость — до 50 м (5 bar)",
+      "material": "Корпус и браслет — нержавеющая сталь 316L; розово-золотистые элементы — PVD-покрытие; стекло — сапфировое, устойчивое к царапинам",
+      "dimensions": "4,2 × 4,2 × 1,15 см",
+      "strapInfo": "Двухцветный браслет из нержавеющей стали серебристого и розово-золотистого цветов, ширина крепления — 2,2 см. Застежка-бабочка с кнопками",
+      "preOrderDays": "10-14 рабочих дней",
+      "closure": "Раскладная застежка с кнопкой-фиксатором"
+    }
+  }
 }

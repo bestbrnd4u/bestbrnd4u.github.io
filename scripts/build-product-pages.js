@@ -150,6 +150,10 @@ function productTexts() {
 
     try {
         productTextsCache = JSON.parse(safe.readFileSync(PRODUCT_TEXTS_FILE, "utf8"));
+        // Переклади цих текстів доходять до /en/ і /ru/ словником
+        // (scripts/build-locales.js) — у кожну сторінку товару їх не
+        // вшиваємо.
+        delete productTextsCache.i18n;
     } catch (error) {
         productTextsCache = {};
     }
@@ -821,7 +825,9 @@ function buildBody(product) {
     const specs = [
         ["Бренд", product.brand],
         ["Категорія", product.category],
-        ["Стать", product.gender],
+        // Стать у даних — масив («Унісекс», «Жінкам», «Чоловікам»);
+        // у шаблоні рядка він склеювався комами без пробілу.
+        ["Стать", [].concat(product.gender || []).join(", ")],
         // Артикул каталогу — той, що ставить система: він є завжди.
         // Заводський код лишається окремим рядком і лише коли він є.
         ["Артикул", product.article || product.sku],

@@ -8,5 +8,15 @@
   "banner": "/assets/images/brands/jw-pei-banner.webp",
   "bannerMobile": "/assets/images/brands/jw-pei-banner-mobile.webp",
   "title": "Сумки JW PEI",
-  "description": "Молода марка з Лос-Анджелеса, заснована 2018 року. Від початку вона працює без натуральної шкіри: матеріали веганські, частина — з переробленого пластику.\n\nНайвідоміша модель — Gabbi: напівкругла форма з короткою ручкою, яку носять у руці або на плечі."
+  "description": "Молода марка з Лос-Анджелеса, заснована 2018 року. Від початку вона працює без натуральної шкіри: матеріали веганські, частина — з переробленого пластику.\n\nНайвідоміша модель — Gabbi: напівкругла форма з короткою ручкою, яку носять у руці або на плечі.",
+  "i18n": {
+    "en": {
+      "title": "JW PEI bags",
+      "description": "A young Los Angeles brand founded in 2018. From the start it has worked without genuine leather: the materials are vegan, some of them made from recycled plastic.\n\nThe best-known model is the Gabbi: a half-moon shape with a short handle, carried in the hand or on the shoulder."
+    },
+    "ru": {
+      "title": "Сумки JW PEI",
+      "description": "Молодая марка из Лос-Анджелеса, основанная в 2018 году. С самого начала она работает без натуральной кожи: материалы веганские, часть — из переработанного пластика.\n\nСамая известная модель — Gabbi: полукруглая форма с короткой ручкой, которую носят в руке или на плече."
+    }
+  }
 }

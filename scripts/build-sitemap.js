@@ -49,6 +49,16 @@ const UPDATED_FILE = path.join(ROOT, "data", "products-updated.json");
 
 const OUTPUT_FILE = path.join(ROOT, "sitemap.xml");
 
+// Мовні версії (/en/, /ru/) — той самий перемикач, що й у їхнього
+// генератора: поки переклад не опубліковано, прод-збірка їх не має, і
+// sitemap не мусить обіцяти адрес, яких немає.
+const Locales = require("./build-locales");
+const Core = require("../assets/js/i18n-core.js");
+
+// Юридичні сторінки мовних копій мають canonical на український
+// оригінал (текст договору не перекладається) — у sitemap їх немає.
+const LEGAL_PATHS = new Set([...Locales.LEGAL].map(Locales.urlPath));
+
 const STATIC_PAGES = [
     { loc: "/", changefreq: "daily", priority: "1.0" },
     { loc: "/catalog", changefreq: "daily", priority: "0.9" },
@@ -130,7 +140,10 @@ function productImages(product, siteUrl) {
 
 // Один запис sitemap. images — необов'язкові: їх мають лише
 // сторінки товару.
-function urlEntry(loc, changefreq, priority, images, lastmod) {
+//
+// alternates — мовні версії тієї самої сторінки, разом із нею самою
+// (так вимагає Google: кожна адреса перелічує всі, і себе теж).
+function urlEntry(loc, changefreq, priority, images, lastmod, alternates) {
 
     const photos = (images || []).map(image => [
         "    <image:image>",
@@ -144,6 +157,8 @@ function urlEntry(loc, changefreq, priority, images, lastmod) {
     return [
         "  <url>",
         `    <loc>${xmlEscape(loc)}</loc>`,
+        ...(alternates || []).map(alt =>
+            `    <xhtml:link rel="alternate" hreflang="${alt.lang}" href="${xmlEscape(alt.href)}"/>`),
         // Порожньої дати не буває: Google сам пише, що
         // ігнорує lastmod, якому не довіряє, — а неточна дата
         // гірша за відсутню.
@@ -153,6 +168,34 @@ function urlEntry(loc, changefreq, priority, images, lastmod) {
         ...photos,
         "  </url>"
     ].filter(Boolean).join("\n");
+
+}
+
+// Записи збираються як аргументи urlEntry, а мовні копії додаються вже
+// в кінці — одним правилом для всіх груп адрес.
+const record = (...args) => args;
+
+// Одна українська адреса → вона сама плюс /en/ і /ru/, усі з hreflang.
+//
+// Фото лишаються тільки в українського запису: це ті самі файли, і
+// тричі заявлена картинка нічого не додає, крім ваги sitemap.
+function withLanguages(args, on) {
+
+    const [loc, changefreq, priority, images, lastmod] = args;
+
+    const pathname = loc.startsWith(SITE_URL) ? loc.slice(SITE_URL.length) || "/" : null;
+
+    if (!on || pathname === null || LEGAL_PATHS.has(pathname)) return [urlEntry(...args)];
+
+    const href = lang => SITE_URL + Core.localizePath(pathname, lang);
+
+    const alternates = ["uk", ...Locales.LOCALES].map(lang => ({ lang, href: href(lang) }))
+        .concat({ lang: "x-default", href: href("uk") });
+
+    return [
+        urlEntry(loc, changefreq, priority, images, lastmod, alternates),
+        ...Locales.LOCALES.map(lang => urlEntry(href(lang), changefreq, priority, undefined, lastmod, alternates))
+    ];
 
 }
 
@@ -177,10 +220,12 @@ function main() {
 
     const entries = [];
 
+    const on = Locales.enabled();
+
     let photos = 0;
 
     STATIC_PAGES.forEach(page => {
-        entries.push(urlEntry(`${SITE_URL}${page.loc}`, page.changefreq, page.priority));
+        entries.push(record(`${SITE_URL}${page.loc}`, page.changefreq, page.priority));
     });
 
     products.forEach(product => {
@@ -206,7 +251,7 @@ function main() {
         photos += images.length;
 
         entries.push(
-            urlEntry(`${SITE_URL}/p/${encodeURIComponent(product.slug)}/`, "weekly", "0.8",
+            record(`${SITE_URL}/p/${encodeURIComponent(product.slug)}/`, "weekly", "0.8",
                 images, (updated[product.slug] || {}).date)
         );
 
@@ -262,17 +307,17 @@ function main() {
     const pairs = pairPages(products, categoryData, brandData);
 
     if (brands.length) {
-        entries.push(urlEntry(`${SITE_URL}/brands/`, "weekly", "0.7",
+        entries.push(record(`${SITE_URL}/brands/`, "weekly", "0.7",
             undefined, hubLastmod(brands)));
     }
 
     if (categories.length) {
-        entries.push(urlEntry(`${SITE_URL}/categories/`, "weekly", "0.7",
+        entries.push(record(`${SITE_URL}/categories/`, "weekly", "0.7",
             undefined, hubLastmod(categories)));
     }
 
     if (departments.length) {
-        entries.push(urlEntry(`${SITE_URL}/departments/`, "weekly", "0.7",
+        entries.push(record(`${SITE_URL}/departments/`, "weekly", "0.7",
             undefined, hubLastmod(departments)));
     }
 
@@ -280,17 +325,17 @@ function main() {
     // найвищий після головної: саме на такі запити («сумки купити»)
     // припадає найбільший попит.
     departments.forEach(page => entries.push(
-        urlEntry(page.url, "weekly", "0.95", undefined, listLastmod(page))));
+        record(page.url, "weekly", "0.95", undefined, listLastmod(page))));
 
     [...brands, ...categories].forEach(page => {
-        entries.push(urlEntry(page.url, "weekly", "0.9", undefined, listLastmod(page)));
+        entries.push(record(page.url, "weekly", "0.9", undefined, listLastmod(page)));
     });
 
     // «Бренд × тип» — найточніша відповідь на запит із двох слів
     // («годинники Michael Kors»), і пріоритет у неї такий самий, як у
     // бренду: вужча за нього, але й конкуренція на ній вужча.
     pairs.forEach(page => entries.push(
-        urlEntry(page.url, "weekly", "0.9", undefined, listLastmod(page))));
+        record(page.url, "weekly", "0.9", undefined, listLastmod(page))));
 
     // Розділи каталогу. ПОРОЖНІЙ НЕ КЛИЧЕМО: «Акції» без жодної
     // знижки — це сторінка зі словами й без товарів, тобто м'який
@@ -302,7 +347,7 @@ function main() {
     sectionPages(products)
         .filter(page => page.products.length)
         .forEach(page => entries.push(
-            urlEntry(page.url, "daily", "0.9", undefined, listLastmod(page))));
+            record(page.url, "daily", "0.9", undefined, listLastmod(page))));
 
     // Завершені акції в sitemap не потрапляють.
     //
@@ -342,7 +387,7 @@ function main() {
         if (ended(promo)) return;
 
         entries.push(
-            urlEntry(`${SITE_URL}${PromoMeta.promoPath(promo.slug)}`, "weekly", "0.6")
+            record(`${SITE_URL}${PromoMeta.promoPath(promo.slug)}`, "weekly", "0.6")
         );
 
     });
@@ -352,8 +397,10 @@ function main() {
         // Без цього простору імен теги image:* — просто невідома
         // розмітка, і Google мовчки пропустить усі фото.
         `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n` +
-        `        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n` +
-        `${entries.join("\n")}\n` +
+        `        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"\n` +
+        // Простір імен для hreflang-посилань мовних версій.
+        `        xmlns:xhtml="http://www.w3.org/1999/xhtml">\n` +
+        `${entries.flatMap(args => withLanguages(args, on)).join("\n")}\n` +
         `</urlset>\n`;
 
     fs.writeFileSync(OUTPUT_FILE, xml, "utf8");
@@ -375,4 +422,4 @@ if (require.main === module) main();
 // Експортуємо, щоб тест перевіряв складання записів, а не
 // готовий файл: файл перезбирає CI, і в свіжому клоні він
 // відстає від джерел.
-module.exports = { urlEntry, productImages, MAX_IMAGES };
+module.exports = { urlEntry, productImages, withLanguages, LEGAL_PATHS, MAX_IMAGES };

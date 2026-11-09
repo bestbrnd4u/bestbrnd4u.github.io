@@ -80,5 +80,29 @@
   },
   "closure": "Блискавка зверху",
   "compartments": "Усередині — кишеня на блискавці, відділення для картки та дві відкриті кишені",
-  "decor": "Вишите фірмове брендування на жакарді"
+  "decor": "Вишите фірмове брендування на жакарді",
+  "i18n": {
+    "en": {
+      "title": "The Medium Tote Bag in Monogram Jacquard",
+      "description": "A stylish and roomy Marc Jacobs The Medium Tote Bag in Monogram Jacquard: the iconic The Tote Bag in a refined version with the signature monogram jacquard.\nThe bag features the recognizable Marc Jacobs design with an embroidered logo, leather trim, and top handles. The spacious main compartment closes with a zipper and has an interior pocket.\nIt comes with a detachable and adjustable textile strap, so it can be carried by hand or worn on the shoulder or crossbody",
+      "material": "Monogram jacquard, leather trim",
+      "dimensions": "34 × 27 × 15 cm",
+      "strapInfo": "Detachable and adjustable strap",
+      "preOrderDays": "5–10 business days",
+      "closure": "Top zipper",
+      "compartments": "Inside: zip pocket, card slot, and two open pockets",
+      "decor": "Embroidered signature branding on the jacquard"
+    },
+    "ru": {
+      "title": "Сумка The Medium Tote Bag in Monogram Jacquard",
+      "description": "Стильная и вместительная сумка Marc Jacobs The Medium Tote Bag in Monogram Jacquard — культовая модель The Tote Bag в изысканном исполнении с фирменным монограммным жаккардом.\nСумка имеет узнаваемый дизайн Marc Jacobs с вышитым логотипом, кожаной окантовкой и верхними ручками. Просторное основное отделение закрывается на молнию и дополнено внутренним карманом.\nМодель оснащена съемным и регулируемым текстильным ремешком, поэтому ее можно носить в руке, на плече или через плечо",
+      "material": "Монограммный жаккард, кожаная отделка",
+      "dimensions": "34 × 27 × 15 см",
+      "strapInfo": "Ремешок съемный и регулируемый",
+      "preOrderDays": "5–10 рабочих дней",
+      "closure": "Молния сверху",
+      "compartments": "Внутри — карман на молнии, отделение для карты и два открытых кармана",
+      "decor": "Вышитый фирменный брендинг на жаккарде"
+    }
+  }
 }

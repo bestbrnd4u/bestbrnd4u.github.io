@@ -64,5 +64,23 @@
     "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-chronograph-ladies-watch-mk7557.webp",
     "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-ch-d2d545df.webp",
     "/assets/images/products/uploads/michael-kors-oversized-billie-frosted-ch-a94ef7c8.webp"
-  ]
+  ],
+  "i18n": {
+    "en": {
+      "title": "Michael Kors Oversized Billie Frosted Chronograph MK7557 Watch",
+      "description": "A stylish Michael Kors Billie women's watch in a luxurious rose gold tone with a Frosted effect. The stainless steel bracelet with a mixed finish beautifully reflects the light, and the sparkling dial adds elegance and a touch of glamour.\nThe watch is powered by a quartz movement with a chronograph function and date display. Mineral crystal protects the dial, and the folding clasp with push-button lock ensures a comfortable fit on the wrist",
+      "material": "Stainless steel",
+      "dimensions": "Case diameter: 40 mm Bracelet width: 20 mm",
+      "preOrderDays": "10-14 business days",
+      "closure": "Folding with push-button lock"
+    },
+    "ru": {
+      "title": "Часы Michael Kors Oversized Billie Frosted Chronograph MK7557",
+      "description": "Стильные женские часы Michael Kors Billie в роскошном оттенке розового золота с эффектом Frosted. Браслет из нержавеющей стали с комбинированной отделкой красиво отражает свет, а блестящий циферблат добавляет модели элегантности и glamour-акцента.\nЧасы оснащены кварцевым механизмом с функцией хронографа и отображением даты. Минеральное стекло защищает циферблат, а раскладная застежка с кнопочным фиксатором обеспечивает комфортную посадку на запястье",
+      "material": "Нержавеющая сталь",
+      "dimensions": "Диаметр корпуса: 40 мм Ширина браслета: 20 мм",
+      "preOrderDays": "10-14 рабочих дней",
+      "closure": "Раскладная с кнопочным фиксатором"
+    }
+  }
 }

@@ -63,5 +63,23 @@
     "/assets/images/products/uploads/michael-kors-maritime-chronograph-quartz-blue-dial-mens-watch-mk9202_1.webp",
     "/assets/images/products/uploads/michael-kors-maritime-chronograph-quartz-blue-dial-mens-watch-mk9202_2.webp",
     "/assets/images/products/uploads/michael-kors-maritime-chronograph-quartz-blue-dial-mens-watch-mk9202_3.webp"
-  ]
+  ],
+  "i18n": {
+    "en": {
+      "title": "Michael Kors Maritime Chronograph Men's Watch",
+      "description": "A stylish Michael Kors Maritime men's watch with a chronograph function and a striking blue dial. It combines a sporty design with classic details, so it easily complements both everyday and business looks.\nThe watch features a quartz movement, an analog dial and a chronograph function. The sturdy steel case and bracelet provide practicality and comfort for daily wear",
+      "material": "Stainless steel",
+      "dimensions": "Case — 4.4 cm in diameter",
+      "strapInfo": "Stainless steel bracelet",
+      "preOrderDays": "10-14 business days"
+    },
+    "ru": {
+      "title": "Мужские часы Michael Kors Maritime Chronograph",
+      "description": "Стильные мужские часы Michael Kors Maritime с функцией хронографа и выразительным синим циферблатом. Модель сочетает спортивный дизайн с классическими деталями, благодаря чему легко дополняет повседневные и деловые образы.\nЧасы оснащены кварцевым механизмом, аналоговым циферблатом и функцией хронографа. Прочный стальной корпус и браслет обеспечивают практичность и комфорт в ежедневном использовании",
+      "material": "Нержавеющая сталь",
+      "dimensions": "Корпус — 4,4 см в диаметре",
+      "strapInfo": "Браслет из нержавеющей стали",
+      "preOrderDays": "10-14 рабочих дней"
+    }
+  }
 }

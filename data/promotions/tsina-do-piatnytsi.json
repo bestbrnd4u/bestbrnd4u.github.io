@@ -49,5 +49,19 @@
   "promoPageImage": "/assets/images/banners/12-2026-01_13_26-am.webp",
   "homeButtonText": "Детальніше",
   "promoPageImageMobile": "/assets/images/banners/112-2026-01_15_22-am.webp",
-  "buttonText": ""
+  "buttonText": "",
+  "i18n": {
+    "en": {
+      "badge": "Price of the week",
+      "title": "Price: 8600 ₴",
+      "homeTitle": "Until Friday",
+      "homeText": "Marc Jacobs The J Marc Shoulder Bag Green Glow — a single piece. After that, pre-order only."
+    },
+    "ru": {
+      "badge": "Цена недели",
+      "title": "Цена 8600 грн",
+      "homeTitle": "До пятницы",
+      "homeText": "Marc Jacobs The J Marc Shoulder Bag Green Glow — в одном экземпляре. Дальше только под заказ."
+    }
+  }
 }

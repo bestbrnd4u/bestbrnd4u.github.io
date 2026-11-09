@@ -66,5 +66,21 @@
       "51": 1
     }
   },
-  "material": "Ацетатна оправа з металевими дужками; полікарбонатні лінзи"
+  "material": "Ацетатна оправа з металевими дужками; полікарбонатні лінзи",
+  "i18n": {
+    "en": {
+      "title": "Jimmy Choo NENA/S 807 51 Sunglasses",
+      "description": "Stylish women's Jimmy Choo NENA/S sunglasses with a bold rectangular frame. Made of black acetate and fitted with dark gray gradient lenses. The chunky temples feature a raised JC logo, giving the accessory a recognizable Jimmy Choo accent",
+      "material": "Acetate frame with metal temples; polycarbonate lenses",
+      "dimensions": "Lens width × bridge × temple length: 51 × 21 × 145 mm",
+      "preOrderDays": "5–10 business days"
+    },
+    "ru": {
+      "title": "Солнцезащитные очки Jimmy Choo NENA/S 807 51",
+      "description": "Стильные женские солнцезащитные очки Jimmy Choo NENA/S с выразительной прямоугольной оправой. Модель выполнена из ацетата черного цвета и дополнена темно-серыми градиентными линзами. Массивные заушники украшены объемным логотипом JC, который добавляет аксессуару узнаваемый акцент Jimmy Choo",
+      "material": "Ацетатная оправа с металлическими дужками; поликарбонатные линзы",
+      "dimensions": "Ширина линзы × переносица × длина заушника: 51 × 21 × 145 мм",
+      "preOrderDays": "5–10 рабочих дней"
+    }
+  }
 }

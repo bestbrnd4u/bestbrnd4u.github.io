@@ -65,5 +65,21 @@
     "Коричневий / черепаховий (WR953HA)": {
       "53": 1
     }
+  },
+  "i18n": {
+    "en": {
+      "title": "Marc Jacobs 1011/S WR953HA Sunglasses",
+      "description": "Stylish women's Marc Jacobs MJ 1011/S sunglasses with a round frame, an elegant pair that adds character and a modern accent to your look.\nThe sunglasses have a lightweight plastic frame and polycarbonate lenses. The classic shape pairs easily with both everyday and dressier outfits. The signature Marc Jacobs design makes them a versatile accessory for sunny days",
+      "material": "Plastic frame, polymer lenses",
+      "dimensions": "Lens width × bridge × temple length: 53 × 21 × 140 mm",
+      "preOrderDays": "5–10 business days"
+    },
+    "ru": {
+      "title": "Солнцезащитные очки Marc Jacobs 1011/S WR953HA",
+      "description": "Стильные женские солнцезащитные очки Marc Jacobs MJ 1011/S с круглой оправой — элегантная модель, которая добавляет образу выразительности и современного акцента.\nОчки имеют легкую пластиковую оправу и поликарбонатные линзы. Классическая форма легко сочетается как с повседневными, так и с более элегантными образами. Фирменный дизайн Marc Jacobs делает модель универсальным аксессуаром для солнечных дней",
+      "material": "Пластиковая оправа, полимерные линзы",
+      "dimensions": "Ширина линзы × переносица × длина заушника: 53 × 21 × 140 мм",
+      "preOrderDays": "5–10 рабочих дней"
+    }
   }
 }

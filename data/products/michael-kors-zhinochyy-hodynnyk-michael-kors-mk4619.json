@@ -64,5 +64,19 @@
     }
   },
   "dimensions": "Корпус — 3,2 см у діаметрі",
-  "material": "Корпус і сітчастий браслет — нержавіюча сталь; скло — мінеральне"
+  "material": "Корпус і сітчастий браслет — нержавіюча сталь; скло — мінеральне",
+  "i18n": {
+    "en": {
+      "title": "MICHAEL KORS MK4619 Women's Watch",
+      "description": "A women's Michael Kors MK4619 watch on a gold-tone mesh bracelet. Light dial, decorated bezel. An accessory that completes the look.",
+      "material": "Case and mesh bracelet — stainless steel; crystal — mineral",
+      "dimensions": "Case — 3.2 cm in diameter"
+    },
+    "ru": {
+      "title": "Женские часы MICHAEL KORS MK4619",
+      "description": "Женские часы Michael Kors MK4619 на сетчатом браслете золотистого оттенка. Светлый циферблат, отделка по безелю. Аксессуар, который завершает образ.",
+      "material": "Корпус и сетчатый браслет — нержавеющая сталь; стекло — минеральное",
+      "dimensions": "Корпус — 3,2 см в диаметре"
+    }
+  }
 }

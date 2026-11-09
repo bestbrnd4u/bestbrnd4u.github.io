@@ -147,5 +147,29 @@
   ],
   "closure": "Клапан на магніті",
   "compartments": "Задня кишеня з відділенням для картки",
-  "decor": "Золотистий логотип JACQUEMUS, помітна відстрочка"
+  "decor": "Золотистий логотип JACQUEMUS, помітна відстрочка",
+  "i18n": {
+    "en": {
+      "title": "JACQUEMUS Le Grand Bambino Beige Bag",
+      "description": "An elegant JACQUEMUS Le Grand Bambino bag. The recognizable minimalist design is complemented by the signature JACQUEMUS logo and neat gold-tone hardware.\nMade of genuine leather with a structured rectangular shape. The bag features a top handle, a magnetic closure and a detachable, adjustable strap for shoulder or crossbody wear. A card pocket is located on the back.",
+      "material": "Genuine leather",
+      "dimensions": "24 × 14 × 7 cm",
+      "strapInfo": "Detachable and adjustable",
+      "preOrderDays": "5–10 business days",
+      "closure": "Magnetic flap",
+      "compartments": "Back pocket with card slot",
+      "decor": "Gold-tone JACQUEMUS logo, visible topstitching"
+    },
+    "ru": {
+      "title": "Сумка JACQUEMUS Le Grand Bambino Beige",
+      "description": "Элегантная сумка JACQUEMUS Le Grand Bambino. Узнаваемый минималистичный дизайн дополнен фирменным логотипом JACQUEMUS и аккуратной золотой фурнитурой.\nМодель изготовлена из натуральной кожи и имеет структурированную прямоугольную форму. Сумка оснащена верхней ручкой, магнитной застежкой и съемным регулируемым ремешком, благодаря которому ее можно носить на плече или через плечо. На задней стороне расположен карман для карты.",
+      "material": "Натуральная кожа",
+      "dimensions": "24 × 14 × 7 см",
+      "strapInfo": "Съемный и регулируемый",
+      "preOrderDays": "5–10 рабочих дней",
+      "closure": "Клапан на магните",
+      "compartments": "Задний карман с отделением для карты",
+      "decor": "Золотистый логотип JACQUEMUS, заметная отстрочка"
+    }
+  }
 }

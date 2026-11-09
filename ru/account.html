@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="ru" data-season="standard"><head>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"7a6c2900","data/catalog.json":"7af5999c","data/categories.json":"2c24d857","data/collections.json":"858469e9","data/home.json":"179e2c76","data/i18n-en.json":"5e2e6aac","data/i18n-ru.json":"10ef1f66","data/image-variants.json":"8d6e1e7e","data/instagram-links.json":"610ebd7b","data/legal.json":"f84751b2","data/notifications.json":"a35b367f","data/page-texts.json":"9666f432","data/product-texts.json":"e9b88208","data/products-updated.json":"3da58ea6","data/products.json":"ae78eb0a","data/promo-popups.json":"0940ece5","data/promotions.json":"92880867","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/season.json":"17f1306b","data/security.json":"0c05c691","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script><base href="/">
+    <meta name="robots" content="noindex,nofollow">
+    <meta charset="UTF-8">
+    <meta name="author" content="BestBrnd4u">
+    <meta name="copyright" content="© 2026 BestBrnd4u. Усі права захищено.">
+    <link rel="license" href="/LICENSE">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Личный кабинет BestBrnd4u — вход, регистрация и история заказов">
+    <meta name="theme-color" content="#111827">
+    <meta name="robots" content="noindex,follow">
+
+<link rel="icon" href="favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicon-16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/images/favicon-192.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <title>Личный кабинет | BestBrnd4u</title>
+
+    <link rel="preconnect" href="https://hyfodsznpeeecgtgffub.supabase.co" crossorigin="">
+
+    <!-- Шрифт. Тут, а не @import у CSS: @import видно лише після
+         завантаження таблиці стилів, і текст чекає на три запити
+         поспіль. Розкладає scripts/sync-fonts.js — правити руками
+         не треба. -->
+    <link rel="preconnect" href="https://hyfodsznpeeecgtgffub.supabase.co" crossorigin="">
+    <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-v20-latin.woff2?v=v20" crossorigin="">
+    <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-v20-cyrillic.woff2?v=v20" crossorigin="">
+
+    <link rel="stylesheet" href="assets/css/style.css?v=e0b0d1a8">
+
+
+
+
+<script src="/assets/js/vendor/supabase-js-2.112.3.js?v=a38f4664" defer=""></script>
+
+<!-- i18n:begin -->
+<link rel="alternate" hreflang="uk" href="https://dev.bestbrnd4u.com/account">
+<link rel="alternate" hreflang="en" href="https://dev.bestbrnd4u.com/en/account">
+<link rel="alternate" hreflang="ru" href="https://dev.bestbrnd4u.com/ru/account">
+<link rel="alternate" hreflang="x-default" href="https://dev.bestbrnd4u.com/account">
+<link rel="preload" href="/data/i18n-ru.json" as="fetch" crossorigin>
+<script src="/assets/js/i18n-core.js?v=742167b2" defer></script>
+<script src="/assets/js/i18n.js?v=34fdf130" defer></script>
+<!-- i18n:end -->
+</head>
+
+<body>
+<a class="skip-link" href="#content">Перейти к содержимому</a>
+
+<header>
+
+    <div class="container header">
+
+        <a href="/ru/" class="logo">
+            BestBrnd4u
+        </a>
+
+        <nav>
+
+            <ul>
+
+                <li><a href="/ru/">Главная</a></li>
+
+                <li class="has-mega"><a href="/ru/catalog" id="navCatalogLink">Каталог</a><div class="mega-menu" id="catalogMegaMenu">
+<a class="mega-item" href="/ru/catalog?gender=Жінкам"><img src="assets/images/banners/mega-women.webp" alt="Женщинам"><span>Женщинам</span></a>
+<a class="mega-item" href="/ru/catalog?gender=Чоловікам"><img src="assets/images/banners/mega-men.webp" alt="Мужчинам"><span>Мужчинам</span></a>
+<a class="mega-item" href="/ru/catalog?gender=Унісекс"><img src="assets/images/banners/mega-unisex.webp" alt="Унисекс"><span>Унисекс</span></a>
+<a class="mega-item" href="/ru/catalog?gender=Дітям"><img src="assets/images/banners/mega-kids.webp" alt="Детям"><span>Детям</span></a>
+</div></li>
+
+                <li class="has-mega"><a href="/ru/novynky/" id="navNewLink">Новинки</a><div class="mega-menu">
+<a class="mega-item" href="/ru/novynky/?gender=Жінкам"><img src="assets/images/banners/mega-women.webp" alt="Женщинам"><span>Женщинам</span></a>
+<a class="mega-item" href="/ru/novynky/?gender=Чоловікам"><img src="assets/images/banners/mega-men.webp" alt="Мужчинам"><span>Мужчинам</span></a>
+<a class="mega-item" href="/ru/novynky/?gender=Унісекс"><img src="assets/images/banners/mega-unisex.webp" alt="Унисекс"><span>Унисекс</span></a>
+<a class="mega-item" href="/ru/novynky/?gender=Дітям"><img src="assets/images/banners/mega-kids.webp" alt="Детям"><span>Детям</span></a>
+</div></li>
+
+                <li class="has-mega"><a href="/ru/aktsii/" id="navSaleLink" class="sale-text">Акции</a><div class="mega-menu">
+<a class="mega-item" href="/ru/aktsii/?gender=Жінкам"><img src="assets/images/banners/mega-women.webp" alt="Женщинам"><span>Женщинам</span></a>
+<a class="mega-item" href="/ru/aktsii/?gender=Чоловікам"><img src="assets/images/banners/mega-men.webp" alt="Мужчинам"><span>Мужчинам</span></a>
+<a class="mega-item" href="/ru/aktsii/?gender=Унісекс"><img src="assets/images/banners/mega-unisex.webp" alt="Унисекс"><span>Унисекс</span></a>
+<a class="mega-item" href="/ru/aktsii/?gender=Дітям"><img src="assets/images/banners/mega-kids.webp" alt="Детям"><span>Детям</span></a>
+</div></li>
+                <li><a href="/ru/bayer-service">Байер-сервис</a></li>
+
+
+                <li><a href="/ru/contacts">Контакты</a></li>
+
+            </ul>
+
+        </nav>
+
+        <div class="header-icons">
+            <nav class="lang-switch" aria-label="Язык сайта" translate="no"><details class="lang-switch-menu"><summary class="lang-switch-current" aria-label="Язык сайта: Русский"><span>RU</span></summary><ul class="lang-switch-list"><li><a class="lang-switch-option" href="/account" hreflang="uk" lang="uk">Українська</a></li><li><a class="lang-switch-option" href="/en/account" hreflang="en" lang="en">English</a></li><li><span class="lang-switch-option" aria-current="true" lang="ru">Русский</span></li></ul></details></nav>
+
+            <button id="searchBtn" aria-label="Поиск по каталогу">🔍</button>
+
+            <a href="/ru/account" id="accountLink" aria-label="Войти или зарегистрироваться" class="active">👤</a>
+
+            <a href="/ru/favorites">         ❤         <span id="favCount">0</span>     </a>
+
+            <div class="cart-icon-wrap">
+    <a href="/ru/cart" id="cartIconLink">
+        🛒
+        <span id="cartCount">0</span>
+    </a>
+    <div id="cartPopup" class="cart-popup" hidden=""></div>
+</div>
+
+        </div>
+
+    </div>
+
+</header>
+<span id="content" class="skip-target" tabindex="-1"></span>
+
+<section class="breadcrumbs">
+
+    <div class="container">
+
+        <a href="/ru/">Главная</a>
+
+        <span class="crumb-sep">→</span>
+
+        <span class="crumb-current">Кабинет</span>
+
+    </div>
+
+</section>
+
+<section class="account-page">
+
+    <div class="container">
+
+        <div id="authLoader" class="loader">
+            <div class="spinner"></div>
+        </div>
+
+        <!-- ========== Гість: вхід / реєстрація ========== -->
+
+        <div id="authCard" class="auth-card" hidden="">
+
+            <!-- СТАН ВКЛАДКИ — НЕ ЛИШЕ КОЛІР.
+                 Раніше «яка вкладка зараз» несла сама тільки позначка
+                 active у класі. Хто не бачить екрана, чув дві однакові
+                 кнопки й не міг дізнатись, яка форма зараз відкрита.
+                 WCAG 4.1.2. Ролі тут, у розмітці, — щоб вони діяли ще
+                 до того, як виконається JS; aria-selected далі тримає
+                 в згоді assets/js/account.js. -->
+            <div class="auth-tabs" role="tablist" aria-label="Вход или регистрация">
+                <button type="button" class="auth-tab active" data-tab="login" id="authTabLogin" role="tab" aria-selected="true" aria-controls="loginForm">Войти</button>
+                <button type="button" class="auth-tab" data-tab="signup" id="authTabSignup" role="tab" aria-selected="false" aria-controls="signupForm" tabindex="-1">Регистрация</button>
+            </div>
+
+            <!-- ВХІД ЧЕРЕЗ ЧУЖИЙ АКАУНТ — НАД ФОРМАМИ, А НЕ В ОДНІЙ З НИХ.
+
+                 Для Google і Facebook «увійти» й «зареєструватися» — та
+                 сама дія: якщо людини в базі немає, акаунт створюється
+                 сам. Класти такі кнопки в одну з вкладок означало б
+                 сховати половину способів входу за вкладкою, яку
+                 половина відвідувачів не відкриє.
+
+                 Пароля тут немає взагалі: його перевіряє Google чи
+                 Facebook, а до нас приходить лише підтверджена
+                 адреса. Це найбезпечніший вхід із наявних — нам нічого
+                 зберігати й нічого втрачати. -->
+            <!-- Приховані до відповіді Supabase: показуємо лише ті
+                 способи, які справді увімкнені в проєкті. Чому саме
+                 так — у assets/js/account.js, showEnabledProviders(). -->
+            <div class="auth-social" id="authSocial" hidden="">
+
+                <button type="button" class="auth-social-btn auth-social-facebook" data-provider="facebook">
+                    <span class="auth-social-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                            <path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.09 10.13 24v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.96.93-1.96 1.89v2.25h3.33l-.53 3.49h-2.8V24C19.61 23.09 24 18.1 24 12.07z"></path>
+                        </svg>
+                    </span>
+                    Facebook
+                </button>
+
+                <button type="button" class="auth-social-btn auth-social-google" data-provider="google">
+                    <span class="auth-social-icon" aria-hidden="true">
+                        <svg viewBox="0 0 48 48" width="18" height="18">
+                            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
+                            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
+                            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24s.92 7.54 2.56 10.78l7.97-6.19z"></path>
+                            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
+                        </svg>
+                    </span>
+                    Войти через Google
+                </button>
+
+                <!-- TELEGRAM — ОКРЕМОЮ КНОПКОЮ НА ВСЮ ШИРИНУ.
+
+                     Supabase такого провайдера не має, тож вхід іде
+                     через нашого ж бота: кнопка відкриває його, бот
+                     питає підтвердження, сайт дочікується сесії.
+                     Чому саме через бота, а не через Login Widget —
+                     у supabase/functions/telegram-order-bot/
+                     telegram-login.js. -->
+                <button type="button" class="auth-social-btn auth-social-telegram" id="telegramLoginBtn" hidden="">
+                    <span class="auth-social-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                            <path d="M11.94 24C5.34 24 0 18.63 0 12S5.34 0 11.94 0C18.55 0 24 5.37 24 12s-5.45 12-12.06 12zm5.5-17.3c-.15-.13-.38-.15-.7-.03L5.9 10.98c-.6.24-.6.58-.11.73l2.7.84 6.24-3.94c.3-.18.57-.08.35.11l-5.06 4.57-.19 2.86c.24 0 .34-.1.47-.23l1.13-1.09 2.35 1.73c.43.24.74.12.85-.4l1.54-7.25c.15-.64-.1-.94-.33-1.11z"></path>
+                        </svg>
+                    </span>
+                    Войти через Telegram
+                </button>
+
+            </div>
+
+            <p class="field-error auth-social-error" id="authSocialError"></p>
+
+            <!-- Крок очікування: кнопка вже відкрила бота, і тепер
+                 головне — показати код, який людина мусить звірити з
+                 тим, що назве бот. Саме це й ламає підсунуте чуже
+                 посилання. -->
+            <div class="auth-telegram-wait" id="telegramWait" hidden="">
+
+                <p class="auth-telegram-step">
+                    Открыли Telegram? Подтвердите вход в боте — там должен быть этот же код:
+                </p>
+
+                <div class="auth-telegram-code" id="telegramCode">--</div>
+
+                <p class="auth-telegram-note">
+                    Если код в боте другой — не подтверждайте: это не ваш вход.
+                </p>
+
+                <button type="button" class="auth-link" id="telegramCancel">Отменить</button>
+
+            </div>
+
+            <div class="auth-divider" id="authDivider" hidden=""><span>или</span></div>
+
+            <form id="loginForm" class="auth-form" role="tabpanel" aria-labelledby="authTabLogin" novalidate="">
+
+                <label>
+                    Email
+                    <input type="email" id="loginEmail" required="" placeholder="you@example.com" autocomplete="email">
+                </label>
+
+                <label>
+                    Пароль
+                    <input type="password" id="loginPassword" required="" placeholder="Ваш пароль" autocomplete="current-password">
+                </label>
+
+                <span id="loginError" class="field-error"></span>
+
+                <button type="submit" class="btn" id="loginSubmit">Войти</button>
+
+                <button type="button" class="auth-link" id="forgotPasswordBtn">Забыли пароль?</button>
+
+            </form>
+
+            <form id="signupForm" class="auth-form" role="tabpanel" aria-labelledby="authTabSignup" hidden="" novalidate="">
+
+                <label>
+                    Имя
+                    <input type="text" id="signupName" required="" placeholder="Ваше имя" autocomplete="given-name">
+                </label>
+
+                <label>
+                    Email
+                    <input type="email" id="signupEmail" required="" placeholder="you@example.com" autocomplete="email">
+                </label>
+
+                <label>
+                    Пароль
+                    <input type="password" id="signupPassword" required="" minlength="6" placeholder="Минимум 6 символов" autocomplete="new-password" aria-describedby="signupPasswordHint">
+                </label>
+
+                <!-- Вимога — видимим рядком, а не лише в placeholder: той
+                     зникає з першою літерою, тобто саме тоді, коли про
+                     вимогу треба пам'ятати. Поза <label>, бо інакше рядок
+                     став би частиною назви поля. -->
+                <span class="field-hint" id="signupPasswordHint">Минимум 6 символов</span>
+
+                <span id="signupError" class="field-error"></span>
+
+                <button type="submit" class="btn" id="signupSubmit">Зарегистрироваться</button>
+
+                <!-- ПРО РОЗСИЛКУ КАЖЕМО ДО РЕЄСТРАЦІЇ, А НЕ ПІСЛЯ.
+                     Зареєстрований потрапляє в розсилку автоматично —
+                     і це рівно та річ, про яку не можна мовчати:
+                     мовчазна підписка перетворюється на скаргу на
+                     спам, а скарги псують доставляння ВСІХ листів
+                     магазину, включно з листами про замовлення.
+                     Тому тут сказано, що буде, і де це вимкнути. -->
+                <p class="signup-note" id="signupNote">
+                    Регистрируясь, вы подписываетесь на письма о новинках и акциях. Отключить можно в любой момент — в кабинете, вкладка «Рассылка», или одним кликом в самом письме.
+                </p>
+
+            </form>
+
+        </div>
+
+        <!-- ========== Відновлення пароля (перехід з листа) ========== -->
+
+        <!-- Повернення за посиланням із листа про зміну пошти.
+             Supabase підтверджує адресу сам і повертає сюди з
+             type=email_change в URL — лишається сказати, що все
+             вийшло, і куди тепер входити. -->
+        <div id="emailChangedCard" class="auth-card" hidden="">
+
+            <h2 class="auth-card-title">Email успешно изменен</h2>
+            <p class="auth-card-sub">
+                Теперь входите в кабинет с новым адресом. Письма о заказах тоже будут приходить на него.
+            </p>
+
+            <button type="button" class="btn" id="emailChangedLogin">Войти</button>
+
+        </div>
+
+        <div id="resetPasswordCard" class="auth-card" hidden="">
+
+            <h2 class="auth-card-title">Установить новый пароль</h2>
+            <p class="auth-card-sub">Введите новый пароль для входа в аккаунт</p>
+
+            <form id="resetPasswordForm" class="auth-form" novalidate="">
+
+                <!-- Для менеджера паролів: без поля імені він не знає,
+                     до якого облікового запису прив'язати новий пароль.
+                     Значення ставить account.js — лише справжньою поштою. -->
+                <input type="email" class="pm-username" name="username" autocomplete="username" hidden="">
+
+                <label>
+                    Новый пароль
+                    <input type="password" id="newPassword" required="" minlength="6" placeholder="Минимум 6 символов" autocomplete="new-password" aria-describedby="newPasswordHint">
+                </label>
+
+                <span class="field-hint" id="newPasswordHint">Минимум 6 символов</span>
+
+                <label>
+                    Подтвердите пароль
+                    <input type="password" id="newPasswordConfirm" required="" minlength="6" placeholder="Повторите пароль" autocomplete="new-password">
+                </label>
+
+                <span id="resetPasswordError" class="field-error"></span>
+
+                <button type="submit" class="btn" id="resetPasswordSubmit">Сохранить новый пароль</button>
+
+            </form>
+
+        </div>
+
+        <!-- ========== Авторизований користувач ========== -->
+
+        <div id="accountDashboard" hidden="">
+
+            <div class="account-header">
+
+                <div>
+                    <h1>Личный кабинет</h1>
+                    <p id="accountEmail" class="account-email"></p>
+                </div>
+
+            </div>
+
+            <div class="account-tabs" role="tablist" aria-label="Разделы кабинета">
+                <button type="button" class="account-tab active" data-tab="orders" id="accountTabOrders" role="tab" aria-selected="true" aria-controls="ordersPanel">История заказов</button>
+                <button type="button" class="account-tab" data-tab="addresses" id="accountTabAddresses" role="tab" aria-selected="false" aria-controls="addressesPanel" tabindex="-1">Адреса доставки</button>
+                <button type="button" class="account-tab" data-tab="profile" id="accountTabProfile" role="tab" aria-selected="false" aria-controls="profilePanel" tabindex="-1">Мои данные</button>
+                <button type="button" class="account-tab" data-tab="newsletter" id="accountTabNewsletter" role="tab" aria-selected="false" aria-controls="newsletterPanel" tabindex="-1">Рассылки</button>
+                <button type="button" class="account-tab" data-tab="password" id="accountTabPassword" role="tab" aria-selected="false" aria-controls="passwordPanel" tabindex="-1">Изменить пароль</button>
+            </div>
+
+            <!-- ---- Історія замовлень ---- -->
+
+            <div id="ordersPanel" class="account-panel" role="tabpanel" aria-labelledby="accountTabOrders">
+
+                <div id="ordersLoader" class="loader">
+                    <div class="spinner"></div>
+                </div>
+
+                <div id="emptyOrders" class="empty-state" hidden="">
+                    <div class="empty-state-icon" aria-hidden="true">🛍️</div>
+                    <h2 class="empty-state-title">У вас пока нет заказов</h2>
+                    <a href="/ru/catalog" class="btn">Перейти в каталог</a>
+                </div>
+
+                <div id="ordersList" class="orders-list"></div>
+
+            </div>
+
+            <!-- ---- Адреси доставки ---- -->
+
+            <div id="addressesPanel" class="account-panel" role="tabpanel" aria-labelledby="accountTabAddresses" hidden="">
+
+                <div class="addresses-header">
+                    <div>
+                        <h2>Адреса доставки</h2>
+                        <p class="profile-card-sub">Сохраните адрес — и при оформлении заказа его можно будет выбрать в один клик</p>
+                    </div>
+                    <button type="button" class="btn" id="addAddressBtn">+ Добавить адрес</button>
+                </div>
+
+                <div id="addressesLoader" class="loader">
+                    <div class="spinner"></div>
+                </div>
+
+                <div id="emptyAddresses" class="empty-state" hidden="">
+                    <div class="empty-state-icon" aria-hidden="true">📍</div>
+                    <h2 class="empty-state-title">У вас пока нет сохраненных адресов</h2>
+                    <button type="button" class="btn" id="emptyAddAddressBtn">Добавить первый адрес</button>
+                </div>
+
+                <div id="addressesList" class="addresses-list"></div>
+
+            </div>
+
+            <!-- ---- Мої дані ---- -->
+
+            <div id="profilePanel" class="account-panel" role="tabpanel" aria-labelledby="accountTabProfile" hidden="">
+
+                <div class="profile-card">
+
+                    <h2>Персональная информация</h2>
+                    <p class="profile-card-sub">Эти данные автоматически подставятся при оформлении заказа</p>
+
+                    <form id="profileForm" class="profile-form" novalidate="">
+
+                        <div class="profile-fields">
+
+                            <label>
+                                Имя
+                                <input type="text" id="profileFirstName" placeholder="Ваше имя">
+                            </label>
+
+                            <label>
+                                Фамилия
+                                <input type="text" id="profileLastName" placeholder="Ваша фамилия">
+                            </label>
+
+                            <label>
+                                Отчество
+                                <input type="text" id="profileMiddleName" placeholder="Необязательно">
+                            </label>
+
+                            <label>
+                                Телефон
+                                <input type="tel" id="profilePhone" placeholder="+380 73 728 82 91">
+                            </label>
+
+                            <label class="field-full">
+                                Город
+                                <input type="text" id="profileCity" placeholder="Например: Киев">
+                            </label>
+
+                        </div>
+
+                        <!-- EMAIL МОЖНА ЗМІНИТИ, АЛЕ НЕ ОДНИМ КЛІКОМ.
+
+                             Пошта — це і логін, і адреса, куди їде лист
+                             про замовлення. Помилка в ній відрізає
+                             людину від власного акаунту, тож Supabase
+                             міняє її лише після переходу за листом на
+                             НОВУ адресу. Тому поле сховане за
+                             посиланням: випадково його не зачепиш. -->
+                        <div class="profile-email-row">
+                            <span>Email</span>
+                            <strong id="profileEmail"></strong>
+                            <button type="button" class="auth-link" id="changeEmailBtn">Изменить email</button>
+                        </div>
+
+                        <!-- ДВА КРОКИ, А НЕ ОДИН.
+
+                             Крок перший — ввести адресу двічі. Друге
+                             поле не формальність: пошта тут і логін, і
+                             адреса для листів, а помилки в ній не
+                             видно — вона виглядає як звичайна адреса,
+                             просто чужа. Помилившись один раз, людина
+                             втрачає і доступ, і листи про замовлення.
+
+                             Крок другий — сказати, що лист пішов, і на
+                             яку саме адресу. Без цього екрана людина
+                             закриває сторінку в упевненості, що пошту
+                             вже змінено. -->
+                        <div class="profile-email-change" id="emailChangeBox" hidden="">
+
+                            <div id="emailChangeStepForm" class="profile-email-step">
+
+                                <!-- ПІДПИСИ ЗАЛЕЖАТЬ ВІД ТОГО, ЧИ Є ПОШТА.
+
+                                     У кого вона є — той її МІНЯЄ, у кого
+                                     немає (вхід через Telegram) — ДОДАЄ.
+                                     «Новий email» для другого випадку
+                                     безглузде: старого не було. Тексти
+                                     проставляє account.js разом із
+                                     написом на кнопці. -->
+                                <label>
+                                    <span id="newEmailLabel">Новый email</span>
+                                    <input type="email" id="newEmail" placeholder="you@example.com" autocomplete="email">
+                                </label>
+
+                                <label>
+                                    <span id="newEmailConfirmLabel">Подтвердите новый email</span>
+                                    <input type="email" id="newEmailConfirm" placeholder="Еще раз тот же адрес" autocomplete="email">
+                                </label>
+
+                                <span id="emailChangeMessage" class="field-error"></span>
+
+                                <div class="profile-email-change-actions">
+                                    <button type="button" class="btn" id="newEmailSubmit">Подтвердить</button>
+                                    <button type="button" class="auth-link" id="newEmailCancel">Отменить</button>
+                                </div>
+
+                            </div>
+
+                            <div id="emailChangeStepSent" class="profile-email-step" hidden="">
+
+                                <p class="profile-email-sent">
+                                    На адрес <strong id="emailChangeSentTo"></strong> отправлено письмо.
+                                    <span id="emailChangeSentWhat">Почта изменится только после перехода по ссылке из него.</span>
+                                </p>
+
+                                <p class="profile-card-sub">
+                                    Письма нет? Проверьте папку «Спам». Ссылка действует ограниченное время — если не успеете, отправьте письмо еще раз.
+                                </p>
+
+                                <button type="button" class="btn" id="emailChangeClose">Закрыть</button>
+
+                            </div>
+
+                        </div>
+
+                        <!-- ЗГОДА — ОКРЕМОЮ ГАЛОЧКОЮ Й НЕ ПРОСТАВЛЕНА
+                             ЗАЗДАЛЕГІДЬ. Згода, якої людина не ставила,
+                             згодою не є. Посилання — в самому тексті,
+                             щоб її можна було прочитати, не шукаючи. -->
+                        <label class="profile-consent">
+                            <input type="checkbox" id="profileConsent">
+                            <span>
+                                Я согласен на обработку персональных данных —
+                                <a href="/ru/privacy-policy" target="_blank" rel="noopener">политика конфиденциальности.</a>
+                            </span>
+                        </label>
+
+                        <span id="profileMessage" class="field-error"></span>
+
+                        <div class="profile-actions-row">
+                            <button type="submit" class="btn" id="profileSubmit">Сохранить изменения</button>
+                            <button type="button" class="btn btn-outline" id="logoutBtn">Выйти из аккаунта</button>
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+            <!-- ---- Розсилки ---- -->
+
+            <div id="newsletterPanel" class="account-panel" role="tabpanel" aria-labelledby="accountTabNewsletter" hidden="">
+
+                <div class="profile-card">
+
+                    <h2>Рассылки</h2>
+
+                    <!-- ГАЛОЧКА, А НЕ ФОРМА ПІДПИСКИ.
+
+                         Тут було те саме поле «впишіть пошту» й кнопка
+                         «Підписатись», що у футері. Підписаному це
+                         пропонувало підписатись ще раз, а відписатись не
+                         давало взагалі — відписка жила лише в посиланні
+                         внизу листів, тобто в тих самих листах, від яких
+                         людина хоче позбутись.
+
+                         Тепер це налаштування: галочка показує стан і
+                         міняє його. Зняв і зберіг — відписався; поставив
+                         і зберіг — підписався знову. Галочка тут і є
+                         згодою: людина ставить її сама, і це дія, а не
+                         проставлена заздалегідь позначка.
+
+                         Стан питає assets/js/subscribe.js: список
+                         підписників живе в MailerLite, і в браузері знати
+                         про нього нізвідки. -->
+                    <div class="newsletter-settings" id="newsletterSettings" hidden="">
+
+                        <h3 class="newsletter-group">Новости и скидки магазина</h3>
+
+                        <p class="profile-card-sub">
+                            Письма о новых поступлениях, акциях и ценах дня. Не чаще раза в неделю.
+                        </p>
+
+                        <label class="subscribe-consent">
+                            <input type="checkbox" id="newsletterWanted">
+                            <span>Сообщайте мне о новостях и скидках магазина</span>
+                        </label>
+
+                        <p class="profile-card-sub" id="newsletterWhere"></p>
+
+                        <p class="field-note" id="newsletterPending" hidden="">
+                            Подписка еще не подтверждена. Проверьте почту (и папку «Спам») — там письмо со ссылкой.
+                        </p>
+
+                        <!-- ЩО ЛИШАЄТЬСЯ ПРИ БУДЬ-ЯКОМУ ВИБОРІ.
+
+                             Найчастіший страх при відписці — «а замовлення
+                             я тепер теж не побачу?». Кажемо це поруч із
+                             галочкою, а не десь унизу сторінки. -->
+                        <p class="profile-card-sub newsletter-keep">
+                            Письма о заказах будут приходить в любом случае: это не рассылка, а подтверждение покупки.
+                        </p>
+
+                        <span id="newsletterMessage" class="field-error"></span>
+
+                        <button type="button" class="btn" id="newsletterSave">Сохранить</button>
+
+                    </div>
+
+                    <!-- Пошти в акаунті може й не бути: вхід через Telegram
+                         її не дає. Підписувати нема кого — кажемо, з чого
+                         почати. -->
+                    <div class="newsletter-settings" id="newsletterNoEmail" hidden="">
+
+                        <p class="profile-card-sub">
+                            Чтобы получать письма, сначала добавьте email во вкладке «Мои данные» — сейчас вы входите через Telegram, и адреса для писем в аккаунте нет.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ---- Змінити пароль ---- -->
+
+            <div id="passwordPanel" class="account-panel" role="tabpanel" aria-labelledby="accountTabPassword" hidden="">
+
+                <div class="profile-card">
+
+                    <h2>Изменить пароль</h2>
+
+                    <!-- СТАРИЙ ПАРОЛЬ ПИТАЄМО НЕ ДЛЯ ПОРЯДКУ.
+
+                         Supabase дозволяє змінити пароль, маючи лише
+                         відкриту сесію, — старого не питає. Це означає,
+                         що будь-хто, хто сів за незаблокований
+                         комп'ютер, міняє пароль і забирає акаунт собі:
+                         власник більше не ввійде.
+
+                         Тому перед зміною перевіряємо старий пароль
+                         окремим входом. Не знаєш старого — тільки
+                         через лист, тобто через пошту, доступ до якої
+                         ще треба мати. -->
+                    <form id="passwordForm" class="profile-form" novalidate="">
+
+                        <!-- Див. те саме поле в resetPasswordForm вище. -->
+                        <input type="email" class="pm-username" name="username" autocomplete="username" hidden="">
+
+                        <label>
+                            Старый пароль
+                            <input type="password" id="oldPassword" placeholder="Ваш текущий пароль" autocomplete="current-password">
+                        </label>
+
+                        <label>
+                            Новый пароль (от 6 до 30 символов)
+                            <input type="password" id="changedPassword" placeholder="Новый пароль" autocomplete="new-password">
+                        </label>
+
+                        <span id="passwordMessage" class="field-error"></span>
+
+                        <div class="profile-actions-row">
+                            <button type="submit" class="btn" id="passwordSubmit">Изменить пароль</button>
+                            <button type="button" class="auth-link" id="forgotPasswordInsideBtn">Забыли пароль?</button>
+                        </div>
+
+                    </form>
+
+                    <!-- «Забули пароль?» — той самий лист, що й на вході,
+                         але адресу питати не треба: людина вже в кабінеті,
+                         і ми знаємо її пошту. -->
+                    <div class="profile-email-change" id="forgotBox" hidden="">
+
+                        <div id="forgotStepForm" class="profile-email-step">
+
+                            <p class="profile-card-sub" id="forgotIntro">
+                                Отправим ссылку для восстановления пароля на
+                                <strong id="forgotEmail"></strong>.
+                            </p>
+
+                            <!-- ПОШТИ МОЖЕ Й НЕ БУТИ.
+
+                                 Хто увійшов через Telegram, той пошти
+                                 не давав, і пароля в акаунті немає —
+                                 надсилати посилання нема куди. Кажемо
+                                 це одразу, а не після натискання
+                                 «Відновити»: інакше єдина дія на
+                                 екрані веде в глухий кут. Кнопку при
+                                 цьому ховаємо — тиснути нема що. -->
+                            <!-- Спосіб входу підставляє account.js: без пошти
+                                 заходять і через Telegram, і через Facebook
+                                 (акаунт на телефон або знята галочка з пошти).
+                                 Зашитий «Telegram» казав другим неправду. -->
+                            <p class="profile-card-sub" id="forgotNoMail" hidden="">
+                                Вы входите через <span id="forgotNoMailVia">соцсеть</span> — пароля в аккаунте нет. Чтобы входить еще и по паролю, сначала добавьте email во вкладке «Мои данные».
+                            </p>
+
+                            <span id="forgotMessage" class="field-error"></span>
+
+                            <div class="profile-email-change-actions">
+                                <button type="button" class="btn" id="forgotSubmit">Восстановить</button>
+                                <button type="button" class="auth-link" id="forgotCancel">Отменить</button>
+                            </div>
+
+                        </div>
+
+                        <div id="forgotStepSent" class="profile-email-step" hidden="">
+
+                            <p class="profile-email-sent">
+                                Ссылка для восстановления пароля отправлена на
+                                <strong id="forgotSentTo"></strong>.
+                            </p>
+
+                            <button type="button" class="btn" id="forgotClose">Закрыть</button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- Підписка на листи.
+
+     Форма стояла в колонці футера, під годинами роботи: у вузькій
+     колонці текст згоди наповзав на кнопку «нагору», а заголовка не
+     було зовсім. У каталозі її давно винесли в окрему секцію — решта
+     сторінок просто відстала.
+
+     Ключ MailerLite живе в секретах: адресу приймає наша функція, а
+     не браузер. Галочка згоди НЕ проставлена заздалегідь — згода,
+     якої людина не ставила, згодою не є.
+
+     Підпис поля лишається в розмітці для читалок екрана, а видимим
+     заголовком служить <h2> (див. .newsletter .subscribe-label у
+     style.css). -->
+<section class="newsletter">
+
+    <div class="container">
+
+        <h2>Новинки и акции на почту</h2>
+
+        <form class="subscribe" id="subscribeForm" novalidate="">
+
+            <label class="subscribe-label" for="subscribeEmail">
+                Новинки и акции на почту
+            </label>
+
+            <div class="subscribe-row">
+                <input type="email" id="subscribeEmail" placeholder="you@example.com" autocomplete="email" required="">
+                <button type="submit" id="subscribeSubmit">Подписаться</button>
+            </div>
+
+            <label class="subscribe-consent">
+                <input type="checkbox" id="subscribeConsent">
+                <span>
+                    Согласен получать письма о новинках и акциях. Отписаться можно из любого письма —
+                    <a href="/ru/privacy-policy">как мы обращаемся с данными.</a>
+                </span>
+            </label>
+
+            <p class="subscribe-note" id="subscribeNote" hidden=""></p>
+
+        </form>
+
+        <small>
+        Никакого спама. Только акции и новые коллекции.
+        </small>
+
+    </div>
+
+</section>
+
+<footer>
+
+    <div class="container footer">
+
+        <div>
+
+            <h2>BestBrnd4u</h2>
+
+            <p>
+                Интернет-магазин сумок и аксессуаров.
+            </p>
+
+            <div class="footer-social">
+                <a href="https://www.instagram.com/bestbrnd4u" target="_blank" rel="noopener" aria-label="Instagram">
+                    Instagram
+                </a>
+                <a href="https://t.me/bestbrnd4u" target="_blank" rel="noopener" aria-label="Telegram">
+                    Telegram
+                </a>
+            </div>
+
+        </div>
+
+        <div>
+
+            <h2>Покупателям</h2>
+
+            <!-- Гість не бачить замовлення в кабінеті: воно без user_id.
+                 Тому посилання стоїть ПЕРШИМ у розділі — це не політика,
+                 а дія, і саме її шукають найчастіше -->
+            <a href="/ru/order-status">Где мой заказ</a>
+
+            <a href="/ru/delivery-payment#delivery">Доставка</a>
+            <a href="/ru/delivery-payment#payment">Оплата</a>
+            <a href="/ru/authenticity">Оригинальность</a>
+            <a href="/ru/return-warranty">Возврат и гарантия</a>
+            <a href="/ru/bayer-service">Байер-сервис</a>
+            <a href="/ru/privacy-policy">Политика конфиденциальности</a>
+            <a href="/ru/offer">Публичная оферта</a>
+            <!-- Згоду треба вміти відкликати так само легко, як дати -->
+            <a href="#" data-consent-reopen="">Настройки данных</a>
+
+        </div>
+
+        <div>
+
+            <h2>Каталог</h2>
+
+            <a href="/ru/catalog">Все товары</a>
+
+            <!--SECTIONS_START-->
+            <a href="/ru/departments/aksesuary/">Аксессуары</a>
+            <a href="/ru/departments/vzuttia/">Обувь</a>
+            <a href="/ru/departments/sumky/">Сумки</a>
+            <!--SECTIONS_END-->
+
+            <a href="/ru/novynky/">Новинки</a>
+
+            <a href="/ru/aktsii/" class="sale-text">Акции</a>
+
+            <a href="/ru/brands/">Бренды</a>
+
+        </div>
+
+        <div>
+
+            <h2>Свяжитесь с нами</h2>
+
+            <p>📍 Украина</p>
+
+            <p>✉ <a class="mail-link" href="mailto:bestbrnd4u@proton.me">bestbrnd4u@proton.me</a></p>
+
+            <p><svg class="tg-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21.9 4.3 18.6 20c-.2 1-.9 1.3-1.8.8l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.3-5 9.1-8.2c.4-.4-.1-.6-.6-.2L6.1 13.7 1.2 12.2c-1-.3-1.1-1 .2-1.5l19.3-7.4c.9-.3 1.6.2 1.2 1z"></path></svg> <a class="tg-link" href="https://t.me/bestbrnd4u" target="_blank" rel="noopener">@bestbrnd4u</a></p>
+
+            <p>☎ <a class="phone-link" href="tel:+380737288291">+380 73 728 82 91</a></p>
+
+            <p>🕘 Пн–Вс 09:00–20:00</p>
+
+        </div>
+
+    </div>
+
+</footer>
+
+<div class="copyright">
+
+    <div class="container">
+
+    © 2026 bestbrnd4u. Все права защищены.
+
+    </div>
+
+</div>
+
+<button id="scrollTop" class="scroll-top" aria-label="Наверх">
+    ↑
+</button>
+
+<div id="confirmDeleteModal" class="modal-overlay" hidden="">
+    <div class="modal-card">
+
+        <div class="modal-header">
+            <h3>Удалить адрес?</h3>
+            <button type="button" id="confirmDeleteClose" class="modal-close" aria-label="Закрыть">✕</button>
+        </div>
+
+        <p class="modal-text">
+            Этот адрес доставки будет удален навсегда. Это действие нельзя отменить.
+        </p>
+
+        <div class="modal-actions">
+            <button type="button" id="confirmDeleteYes" class="btn-modal btn-modal-confirm">Да, удалить</button>
+            <button type="button" id="confirmDeleteNo" class="btn-modal btn-modal-cancel">Отменить</button>
+        </div>
+
+    </div>
+</div>
+
+<!-- ТУТ БУЛО ВІКНО «ВИДАЛИТИ АКАУНТ».
+
+     Кнопку прибрано на прохання власника: видалення робиться за
+     зверненням, руками. Причина в тому, що кнопка й не видаляла
+     акаунт — вона стирала профіль, адреси й обране, а сам обліковий
+     запис у Supabase Auth лишався (для нього потрібен service-role
+     ключ, тобто виклик на бекенді). Людина натискала «видалити
+     назавжди» й отримувала половину обіцяного. -->
+
+<div id="addressModal" class="modal-overlay" hidden="">
+    <div class="modal-card address-modal-card">
+
+        <div class="modal-header">
+            <h3 id="addressModalTitle">Новый адрес</h3>
+            <button type="button" id="addressModalClose" class="modal-close" aria-label="Закрыть">✕</button>
+        </div>
+
+        <form id="addressForm" class="auth-form" novalidate="">
+
+            <input type="hidden" id="addressId">
+
+            <label>
+                Название адреса (необязательно)
+                <input type="text" id="addressLabel" placeholder="Например: Дом, Работа">
+            </label>
+
+            <label>
+                Город
+                <input type="text" id="addressCity" required="" placeholder="Например: Киев">
+            </label>
+
+            <!-- data-menu вмикає власний випадний список замість
+                 системного: див. assets/js/select-menu.js. Сам <select>
+                 лишається на місці й лишається джерелом істини — усе,
+                 що читає addressMethod.value, працює як працювало, а
+                 без JS список поводиться як звичайний. -->
+            <label>
+                Способ получения
+                <select id="addressMethod" data-menu="" required="">
+                    <option value="На відділення «Нова пошта»">В отделение «Новая почта»</option>
+                    <option value="Поштомат «Нова пошта»">Почтомат «Новая почта»</option>
+                    <option value="Кур'єром «Нова пошта»">Курьером «Новая почта»</option>
+                    <option value="Інша пошта">Другая почта (Укрпочта, Meest)</option>
+                </select>
+            </label>
+
+            <label id="addressBranchField">
+                Номер отделения
+                <input type="text" id="addressBranchNumber" placeholder="Например: Отделение №45">
+            </label>
+
+            <label id="addressPostomatField" hidden="">
+                Номер почтомата
+                <input type="text" id="addressPostomatNumber" placeholder="Например: Почтомат №1234">
+            </label>
+
+            <label id="addressCourierField" hidden="">
+                Адрес (улица, дом, квартира)
+                <input type="text" id="addressCourierAddress" placeholder="Улица, дом, квартира">
+            </label>
+
+            <!-- Довідника Укрпошти чи Meest у нас немає, тому
+                 перевізника й відділення покупець пише сам одним
+                 рядком — так само, як на оформленні замовлення. -->
+            <label id="addressOtherField" hidden="">
+                Перевозчик, отделение или адрес
+                <input type="text" id="addressOtherCarrier" placeholder="Например: Укрпочта, отделение 03150">
+            </label>
+
+            <label class="address-default-check">
+                <input type="checkbox" id="addressIsDefault">
+                Использовать по умолчанию
+            </label>
+
+            <span id="addressFormError" class="field-error"></span>
+
+            <div class="modal-actions">
+                <button type="submit" class="btn" id="addressSubmitBtn">Сохранить адрес</button>
+                <button type="button" class="btn btn-outline" id="addressCancelBtn">Отменить</button>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<!-- Журнал помилок: сторінка сама розповідає, що в неї зламалось -->
+<script src="assets/js/error-report.js?v=21838fe8" defer=""></script>
+<script src="assets/js/supabase-client.js?v=e8358d93" defer=""></script>
+<!-- Кадрування фото товару. Той самий файл підключає адмінка,
+     тож прев'ю в ній і картка на сайті рахуються однаково. -->
+<script src="assets/js/image-framing.js?v=80b29a57" defer=""></script>
+<!-- Хлібні крихти: спільний будівник для сторінки й розмітки BreadcrumbList -->
+<script src="assets/js/breadcrumbs.js?v=8e4f5363" defer=""></script>
+<!-- Оформлення текстових блоків з адмінки (кольори, шрифт, кнопка) -->
+<script src="assets/js/text-styles.js?v=4b9b6f00" defer=""></script>
+<!-- Згода на використання даних (банер + блокування вбудованого відео) -->
+<script src="assets/js/consent.js?v=b6cc5d45" defer=""></script>
+<!-- Статистика відвідувань. Не завантажує Google без згоди. -->
+<script src="assets/js/analytics.js?v=9d0002d2" defer=""></script>
+<!-- Транслітерація: productUrl() кладе колір в адресу латиницею.
+     Той самий файл використовує збірка для адрес товарів. -->
+<script src="assets/js/translit.js?v=c0957cb7" defer=""></script>
+<script src="assets/js/common.js?v=98dcdbcc" defer=""></script>
+<!-- Дзвінок і зв'язок: дві плаваючі кнопки в лівому кутку -->
+<script src="assets/js/contact-buttons.js?v=53c2ccd7" defer=""></script>
+<!-- Підписка на листи магазину -->
+<script src="assets/js/subscribe.js?v=79349742" defer=""></script>
+<script src="assets/js/sync.js?v=48ef002e" defer=""></script>
+<script src="assets/js/mega-menu.js?v=ff0d32d0" defer=""></script>
+<script src="assets/js/ui.js?v=fa1e1236" defer=""></script>
+<!-- Вікно відмови: вибір товарів, причина, фото -->
+<script src="assets/js/refusal-dialog.js?v=b52d17bd" defer=""></script>
+<!-- Власний випадний список замість системного (select[data-menu]) -->
+<script src="assets/js/select-menu.js?v=a456067c" defer=""></script>
+<!-- Підказки міст і відділень Нової пошти у вікні «Нова адреса».
+     Той самий файл, що й на оформленні замовлення: збережена адреса
+     мусить бути такою самою справжньою, як введена при замовленні. -->
+<script src="assets/js/nova-poshta.js?v=3bf11f84" defer=""></script>
+<!-- Спільна поведінка картки входу: ті самі кнопки стоять ще й на
+     оформленні замовлення. ПЕРЕД account.js — той нею користується. -->
+<script src="assets/js/auth-widget.js?v=6b02212c" defer=""></script>
+<script src="assets/js/account.js?v=b4d2e802" defer=""></script>
+
+
+
+
+</body></html>

@@ -1,5 +1,13 @@
 {
   "name": "Годинники",
   "department": "Аксесуари",
-  "description": "Годинник обирають за трьома речами: розміром корпусу, браслетом і тим, що вміє циферблат. Металевий браслет виглядає суворіше за шкіряний ремінець, а хронограф додає лічильники, які справді працюють, — але й робить корпус помітно більшим.\n\nУ каталозі переважно Michael Kors на металевому браслеті, а також швейцарські Tissot і Mathey-Tissot. Частину моделей привозимо під замовлення: розмір тут ролі не грає, тож ризик «не підійшло» мінімальний."
+  "description": "Годинник обирають за трьома речами: розміром корпусу, браслетом і тим, що вміє циферблат. Металевий браслет виглядає суворіше за шкіряний ремінець, а хронограф додає лічильники, які справді працюють, — але й робить корпус помітно більшим.\n\nУ каталозі переважно Michael Kors на металевому браслеті, а також швейцарські Tissot і Mathey-Tissot. Частину моделей привозимо під замовлення: розмір тут ролі не грає, тож ризик «не підійшло» мінімальний.",
+  "i18n": {
+    "en": {
+      "description": "A watch comes down to three things: case size, bracelet and what the dial can do. A metal bracelet looks more austere than a leather strap, and a chronograph adds subdials that actually work — but also makes the case noticeably larger.\n\nThe catalog mainly features Michael Kors on metal bracelets, along with Swiss Tissot and Mathey-Tissot. Some models are available for pre-order: size doesn't matter here, so the risk of “it didn't fit” is minimal."
+    },
+    "ru": {
+      "description": "Часы выбирают по трем вещам: размеру корпуса, браслету и тому, что умеет циферблат. Металлический браслет выглядит строже кожаного ремешка, а хронограф добавляет счетчики, которые действительно работают, — но и делает корпус заметно больше.\n\nВ каталоге преимущественно Michael Kors на металлическом браслете, а также швейцарские Tissot и Mathey-Tissot. Часть моделей привозим под заказ: размер здесь роли не играет, поэтому риск «не подошло» минимален."
+    }
+  }
 }

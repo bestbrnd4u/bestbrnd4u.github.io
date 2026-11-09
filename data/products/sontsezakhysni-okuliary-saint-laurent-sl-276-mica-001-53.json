@@ -87,5 +87,21 @@
   "category": "Окуляри і оправи",
   "legacySlugs": [
     "сонцезахисні-окуляри-saint-laurent-sl-276-mica-001-53"
-  ]
+  ],
+  "i18n": {
+    "en": {
+      "title": "Saint Laurent SL 276 MICA 001 53 Sunglasses",
+      "description": "Elegant women's Saint Laurent SL 276 MICA sunglasses with a bold cat-eye frame. The frame creates a look that is clean yet striking.\nThe model has a full-rim acetate frame and gray lenses with 100% UVA/UVB protection. The temples bear the signature SAINT LAURENT PARIS lettering. Made in Italy",
+      "material": "Acetate frame, polymer nylon lenses",
+      "dimensions": "Lens width: 53 mm Bridge: 16 mm Temple length: 145 mm",
+      "preOrderDays": "10- 14 business days"
+    },
+    "ru": {
+      "title": "Солнцезащитные очки Saint Laurent SL 276 MICA 001 53",
+      "description": "Элегантные женские солнцезащитные очки Saint Laurent SL 276 MICA с выразительной оправой формы Cat Eye. Оправа создает лаконичный и в то же время эффектный образ.\nМодель имеет ацетатную оправу с полным ободком и серые линзы со 100% защитой от UVA/UVB-лучей. На заушниках нанесена фирменная надпись SAINT LAURENT PARIS. Очки изготовлены в Италии",
+      "material": "Ацетатная оправа, полимерные нейлоновые линзы",
+      "dimensions": "Ширина линзы: 53 мм Переносица: 16 мм Длина заушника: 145 мм",
+      "preOrderDays": "10- 14 рабочих дней"
+    }
+  }
 }

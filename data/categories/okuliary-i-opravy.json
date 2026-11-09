@@ -1,5 +1,13 @@
 {
   "name": "Окуляри і оправи",
   "department": "Аксесуари",
-  "description": "Оправу добирають до форми обличчя: прямокутна додає чітких ліній м'яким рисам, «котяче око» витягує, авіатор лишається найуніверсальнішим. Другий орієнтир — ширина оправи: дужки не мають тиснути на скроні.\n\nБренди тут переважно модні доми, а не оптика: Marc Jacobs, Ray-Ban, Balenciaga, Gucci, Prada, Saint Laurent, Burberry, Jimmy Choo, Alain Mikli."
+  "description": "Оправу добирають до форми обличчя: прямокутна додає чітких ліній м'яким рисам, «котяче око» витягує, авіатор лишається найуніверсальнішим. Другий орієнтир — ширина оправи: дужки не мають тиснути на скроні.\n\nБренди тут переважно модні доми, а не оптика: Marc Jacobs, Ray-Ban, Balenciaga, Gucci, Prada, Saint Laurent, Burberry, Jimmy Choo, Alain Mikli.",
+  "i18n": {
+    "en": {
+      "description": "A frame is chosen to suit the shape of the face: a rectangular one adds crisp lines to soft features, a “cat-eye” elongates, and an aviator remains the most versatile. The second guide is frame width: the arms shouldn't press against your temples.\n\nThe brands here are mostly fashion houses rather than optical companies: Marc Jacobs, Ray-Ban, Balenciaga, Gucci, Prada, Saint Laurent, Burberry, Jimmy Choo, Alain Mikli."
+    },
+    "ru": {
+      "description": "Оправу подбирают под форму лица: прямоугольная добавляет четких линий мягким чертам, «кошачий глаз» вытягивает, авиатор остается самым универсальным. Второй ориентир — ширина оправы: дужки не должны давить на виски.\n\nБренды здесь в основном модные дома, а не оптика: Marc Jacobs, Ray-Ban, Balenciaga, Gucci, Prada, Saint Laurent, Burberry, Jimmy Choo, Alain Mikli."
+    }
+  }
 }

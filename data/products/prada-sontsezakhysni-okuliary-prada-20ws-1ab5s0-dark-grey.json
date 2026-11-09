@@ -60,5 +60,19 @@
     }
   },
   "dimensions": "Ширина лінзи × місток × довжина завушника: 49 × 18 × 135 мм",
-  "material": "Ацетат; полімерні лінзи"
+  "material": "Ацетат; полімерні лінзи",
+  "i18n": {
+    "en": {
+      "title": "PRADA 20WS 1AB5S0 DARK GREY Sunglasses",
+      "description": "Prada 20WS sunglasses. A slim frame with dark lenses and the brand logo on the temple. An understated pair for everyday wear.",
+      "material": "Acetate; polymer lenses",
+      "dimensions": "Lens width × bridge × temple length: 49 × 18 × 135 mm"
+    },
+    "ru": {
+      "title": "Солнцезащитные очки PRADA 20WS 1AB5S0 DARK GREY",
+      "description": "Солнцезащитные очки Prada 20WS. Узкая оправа с темными линзами и логотипом бренда на заушнике. Сдержанная модель для повседневной носки.",
+      "material": "Ацетат; полимерные линзы",
+      "dimensions": "Ширина линзы × переносица × длина заушника: 49 × 18 × 135 мм"
+    }
+  }
 }

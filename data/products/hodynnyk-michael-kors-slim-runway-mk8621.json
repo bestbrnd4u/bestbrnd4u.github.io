@@ -62,5 +62,25 @@
     "/assets/images/products/uploads/michael-kors-slim-runway-black-dial-mens-watch-mk8621-_2.webp",
     "/assets/images/products/uploads/michael-kors-slim-runway-black-dial-mens-watch-mk8621-_3.webp"
   ],
-  "closure": "Застібка-метелик із кнопковим фіксатором"
+  "closure": "Застібка-метелик із кнопковим фіксатором",
+  "i18n": {
+    "en": {
+      "title": "Michael Kors Slim Runway MK8621 Watch",
+      "description": "A stylish men's Michael Kors Slim Runway MK8621 watch with a contrasting black dial and a gold-tone case. The clean design with minimalist indices pairs easily with both business and casual looks.\nThe model features a quartz movement, scratch-resistant mineral crystal and an analog three-hand dial. The case and bracelet are made of gold-tone plated stainless steel.\nThe watch is water resistant up to 50 meters (5 ATM), making it practical for everyday wear. The bold 44 mm case gives the model a distinctly masculine character",
+      "material": "Stainless steel; gold-tone plating on case and bracelet. Mineral crystal, scratch-resistant",
+      "dimensions": "Case diameter — 4.4 cm. Case thickness — 1.0 cm. Bracelet width — 2.2 cm",
+      "strapInfo": "Gold-tone stainless steel metal bracelet, butterfly clasp with push-button lock",
+      "preOrderDays": "10-14 business days",
+      "closure": "Butterfly clasp with push-button lock"
+    },
+    "ru": {
+      "title": "Часы Michael Kors Slim Runway MK8621",
+      "description": "Стильные мужские часы Michael Kors Slim Runway MK8621 с контрастным черным циферблатом и золотистым корпусом. Лаконичный дизайн с минималистичными индексами легко сочетается как с деловым, так и с повседневным образом.\nМодель оснащена кварцевым механизмом, минеральным стеклом с защитой от царапин и аналоговым циферблатом с тремя стрелками. Корпус и браслет выполнены из нержавеющей стали с золотистым покрытием.\nЧасы имеют водозащиту до 50 метров (5 ATM), что делает их практичными для ежедневной носки. Массивный корпус диаметром 44 мм придает модели выразительный мужской характер",
+      "material": "Нержавеющая сталь; золотистое покрытие корпуса и браслета. Стекло — минеральное, устойчивое к царапинам",
+      "dimensions": "Диаметр корпуса — 4,4 см. Толщина корпуса — 1,0 см. Ширина браслета — 2,2 см",
+      "strapInfo": "Металлический браслет из нержавеющей стали золотистого цвета, застежка-бабочка с кнопочным фиксатором",
+      "preOrderDays": "10-14 рабочих дней",
+      "closure": "Застежка-бабочка с кнопочным фиксатором"
+    }
+  }
 }

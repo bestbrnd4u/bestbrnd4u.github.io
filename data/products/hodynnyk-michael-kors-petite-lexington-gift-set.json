@@ -65,5 +65,23 @@
     "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_2.webp",
     "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_3.webp",
     "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-watch-gift-set-mk4944set_5.webp"
-  ]
+  ],
+  "i18n": {
+    "en": {
+      "title": "Michael Kors Petite Lexington Gift Set Watch",
+      "description": "An elegant Michael Kors Petite Lexington gift set — a stylish accessory for everyday and special-occasion looks. The refined watch design combines a classic dial, a slim case and the signature Michael Kors aesthetic.\nThe watch runs on a quartz movement and has an analog dial. The compact case size makes the model delicate and comfortable for everyday wear.\nWith its presentable packaging and versatile design, the set makes a great gift",
+      "material": "Stainless steel",
+      "dimensions": "Case — 2.8 cm in diameter",
+      "strapInfo": "Stainless steel bracelet",
+      "preOrderDays": "10-14 business days"
+    },
+    "ru": {
+      "title": "Часы Michael Kors Petite Lexington Gift Set",
+      "description": "Элегантный подарочный набор Michael Kors Petite Lexington — стильный аксессуар для повседневных и особых образов. Изысканный дизайн часов сочетает классический циферблат, тонкий корпус и фирменную эстетику Michael Kors.\nЧасы работают на кварцевом механизме и имеют аналоговый циферблат. Компактный размер корпуса делает модель изящной и комфортной для ежедневной носки.\nНабор станет отличным вариантом для подарка благодаря презентабельному оформлению и универсальному дизайну",
+      "material": "Нержавеющая сталь",
+      "dimensions": "Корпус — 2,8 см в диаметре",
+      "strapInfo": "Браслет из нержавеющей стали",
+      "preOrderDays": "10-14 рабочих дней"
+    }
+  }
 }

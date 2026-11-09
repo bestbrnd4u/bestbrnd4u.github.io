@@ -69,5 +69,21 @@
       "ONESIZE": 1
     }
   },
-  "material": "Екошкіра (100% поліуретан)"
+  "material": "Екошкіра (100% поліуретан)",
+  "i18n": {
+    "en": {
+      "title": "Love Moschino Logo Plaque Quilted Shoulder Bag",
+      "description": "A stylish quilted Love Moschino bag in classic black. The model features the signature Love Moschino logo and an elegant compact design.\nThe bag has a comfortable shoulder strap that lets you wear it over the shoulder or crossbody. Its compact size makes it a great option for everyday looks when you want all the essentials close at hand.",
+      "material": "Faux leather (100% polyurethane)",
+      "dimensions": "25 × 15 × 7 cm",
+      "preOrderDays": "5–10 business days"
+    },
+    "ru": {
+      "title": "Сумочка Love Moschino Logo Plaque Quilted Shoulder Bag",
+      "description": "Стильная стеганая сумка Love Moschino в классическом черном цвете. Модель дополнена фирменным логотипом Love Moschino и имеет элегантный компактный дизайн.\nСумка оснащена удобным плечевым ремешком, который позволяет носить ее через плечо или кроссбоди. Компактный размер делает модель отличным вариантом для повседневных образов, когда все необходимое должно быть под рукой.",
+      "material": "Экокожа (100% полиуретан)",
+      "dimensions": "25 × 15 × 7 см",
+      "preOrderDays": "5–10 рабочих дней"
+    }
+  }
 }
