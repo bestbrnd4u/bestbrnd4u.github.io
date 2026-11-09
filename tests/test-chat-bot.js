@@ -343,5 +343,83 @@ console.log("\n[10] Контакти, промокод, неробочий ча�
     }
 }
 
+console.log("\n[11] Базові діалоги: живі фрази");
+{
+    // Корпус живих фраз. До цих правок бот влучав у 17 із 76: «ок»,
+    // «👍», «до побачення», «ти бот?» він передавав менеджеру — кожне
+    // «дякую» будило власника. Друга половина (з позначкою fresh) —
+    // фрази, на яких бот НЕ налаштовувався: перевірка, що він розуміє, а
+    // не завчив.
+    const intentOf = r => !r ? "silent" : r.intent === "cheaper" ? "cheaper"
+        : (r.products && r.products.length) ? "products" : (r.intent || "other");
+    const CORPUS = [
+        ["uk", "ок", "ack"], ["uk", "добре", "ack"], ["uk", "зрозуміло, дякую", "ack"], ["uk", "👍", "ack"], ["uk", "ясно", "ack"],
+        ["ru", "понятно", "ack"], ["ru", "хорошо", "ack"], ["en", "ok thanks", "ack"], ["en", "got it", "ack"],
+        ["uk", "дякую за допомогу", "ack"], ["ru", "спасибо большое", "ack"], ["en", "thank you!", "ack"],
+        ["uk", "так", "ack"], ["uk", "ні", "ack"], ["en", "no thanks", "ack"], ["uk", "сервіс у вас класний", "ack"],
+        ["uk", "до побачення", "bye"], ["uk", "бувайте", "bye"], ["ru", "до свидания", "bye"], ["en", "bye", "bye"], ["uk", "Гарного дня!", "bye"],
+        ["uk", "як справи?", "smalltalk"], ["ru", "как дела", "smalltalk"], ["en", "how are you", "smalltalk"],
+        ["uk", "ти бот?", "about-bot"], ["uk", "з ким я говорю", "about-bot"], ["ru", "ты робот?", "about-bot"], ["en", "are you a bot?", "about-bot"],
+        ["uk", "що ти вмієш?", "about-bot"], ["en", "what can you do", "about-bot"], ["ru", "чем можешь помочь", "about-bot"],
+        ["uk", "допоможіть", "about-bot"], ["en", "help", "about-bot"], ["uk", "ти справжня людина?", "about-bot"], ["uk", "з чим ти можеш допомогти?", "about-bot"],
+        ["uk", "добрий вечір", "hello"], ["ru", "добрый день", "hello"], ["en", "good morning", "hello"], ["uk", "Вітаю", "hello"],
+        ["uk", "як оформити замовлення?", "how-to-order"], ["uk", "як купити?", "how-to-order"], ["ru", "как сделать заказ", "how-to-order"],
+        ["en", "how do I order", "how-to-order"], ["uk", "можна без реєстрації?", "how-to-order"], ["uk", "чи треба реєструватись щоб купити", "how-to-order"],
+        ["uk", "дорого", "cheaper"], ["uk", "а дешевше є?", "cheaper"], ["ru", "есть дешевле?", "cheaper"], ["en", "anything cheaper?", "cheaper"],
+        ["uk", "сайт не працює", "handoff"], ["uk", "не можу оформити замовлення", "handoff"], ["en", "checkout doesn't work", "handoff"],
+        ["uk", "я хочу скасувати замовлення", "handoff"], ["en", "I want to cancel my order", "handoff"], ["uk", "передзвоніть мені будь ласка", "handoff"],
+        ["uk", "доставляєте за кордон?", "handoff"], ["en", "do you ship to Poland?", "handoff"],
+        ["uk", "мені не прийшло замовлення", "status"], ["ru", "где моя посылка", "status"], ["en", "my order hasn't arrived yet", "status"],
+        ["uk", "жахливий сервіс", "sorry"], ["uk", "ви мене обманули", "sorry"], ["en", "this is terrible", "sorry"],
+        ["uk", "у вас є сумки?", "products"], ["ru", "что есть из сумок", "products"], ["uk", "щось на подарунок дівчині", "products"],
+        ["uk", "Доброго ранку! Підкажіть, будь ласка, чи є у вас рюкзаки?", "products"], ["uk", "мені потрібен годинник до 7 тисяч", "products"],
+        ["ru", "Привет, есть мужские кошельки?", "products"], ["en", "hello, I'm looking for sunglasses", "products"], ["en", "are your bags real?", "products"],
+        ["uk", "Ви є в інстаграмі?", "contacts"], ["uk", "Номер телефону підкажіть", "contacts"]
+    ];
+    const FAQ_LIKE = [
+        ["uk", "скільки днів доставка?"], ["uk", "оплата при отриманні можлива?"], ["uk", "у вас оригінальні речі?"], ["uk", "а можна обміняти?"],
+        ["uk", "а що з гарантією?"], ["uk", "дякую, а скільки коштує доставка?"], ["ru", "а это не подделка?"], ["en", "can I pay cash on delivery?"]
+    ];
+    const missed = CORPUS.filter(([lang, q, want]) => intentOf(bot.botReply(q, [], data, { lang, now: NOW })) !== want)
+        .map(([lang, q, want]) => `[${lang}] «${q}» → ${intentOf(bot.botReply(q, [], data, { lang, now: NOW }))} (чекали ${want})`);
+    check(`${CORPUS.length} фраз — кожна дає свій намір`, missed.length === 0, missed.slice(0, 4).join(" | "));
+    const faqMissed = FAQ_LIKE.filter(([lang, q]) => !/Докладніше|More details|Подробнее/.test((bot.botReply(q, [], data, { lang, now: NOW }) || {}).text || ""));
+    check(`${FAQ_LIKE.length} питань — відповідь із сайту з посиланням`, faqMissed.length === 0, faqMissed.map(x => x[1]).join(" | "));
+
+    const pinged = ["ок", "👍", "дякую", "до побачення", "як справи?", "ти бот?", "сервіс у вас класний"].filter(q => bot.botReply(q, [], data, { lang: "uk", now: NOW }).handoff);
+    check("«ок», «👍», «дякую»… — не будять власника", pinged.length === 0, pinged.join(", "));
+}
+
+console.log("\n[12] Хибні збіги слів");
+{
+    const w = q => bot.parseWish(q, data) || {};
+    check("«жахливий сервіс» — не сірий колір", !w("жахливий сервіс").color);
+    check("«більше» — не білий колір", !w("покажіть більше сумок").color);
+    check("«синя сумка» — колір, а не «для сина»", w("синя сумка").color === "Син" && !w("синя сумка").gender);
+    check("«сумка для сина» — чоловікам", w("сумка для сина").gender === "Чоловікам");
+    check("«I'm ready» — не червоний", !w("I'm ready to buy a bag").color);
+    check("«manager», «mention» — не «чоловікам»", !w("bag for the manager").gender && !w("bag, as I mention").gender);
+    check("«men's watch» — чоловікам", w("men's watch").gender === "Чоловікам");
+    check("«high quality bag» — не привітання", talk("en", ["high quality bag"]).intent === "products");
+    check("«сумка зі справжньої шкіри» — пошук, а не «оригінальність»", talk("uk", ["сумка зі справжньої шкіри"]).products.length > 0);
+    check("«сумка з оригінальної шкіри» — теж пошук, без «так, оригінал»",
+        (r => r.products.length > 0 && !/оригінальні — без реплік/.test(r.text))(talk("uk", ["сумка з оригінальної шкіри"])));
+    check("«а оригінальні сумки Coach є?» — «так, оригінал» і самі сумки",
+        (r => /оригінальні/.test(r.text) && !/^Ні/.test(r.text) && items(r).every(p => p.brand === "Coach"))(talk("uk", ["а оригінальні сумки Coach є?"])));
+    check("«дякую, а чорна є?» — питання, а не лише «будь ласка»", talk("uk", ["хочу сумку", "дякую, а чорна є?"]).intent === "products");
+}
+
+console.log("\n[13] «Дешевше» в розмові");
+{
+    const first = talk("uk", ["хочу жіночу сумку"]);
+    const cheap = talk("uk", ["хочу жіночу сумку", "дорого"]);
+    const minShown = Math.min(...first.products.map(p => p.price));
+    check("«дорого» — той самий тип, дешевше за найдешевше показане",
+        cheap.intent === "cheaper" && cheap.products.length > 0 && items(cheap).every(p => p.department === "Сумки")
+        && cheap.products.every(p => p.price < minShown), cheap.products.map(p => p.price).join(","));
+    const floor = talk("uk", ["годинник чоловічий", "а дешевше?", "ще дешевше", "ще дешевше"]);
+    check("дешевшого немає — чесно каже, а не показує дорожче", floor.products.length === 0 && /нічого немає/.test(floor.text), floor.text.slice(0, 60));
+}
+
 console.log(failures ? `\n✗ Провалено: ${failures}` : "\n✓ Усе зелено");
 process.exit(failures ? 1 : 0);

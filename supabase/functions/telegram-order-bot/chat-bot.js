@@ -207,6 +207,117 @@ const T3 = {
     }
 };
 
+// ── Базові діалоги ─────────────────────────────────────────────────
+//
+// Раніше «ок», «👍», «до побачення», «як справи», «ти бот?» бот не
+// розумів і ПЕРЕДАВАВ МЕНЕДЖЕРУ — тобто кожне «дякую» будило власника.
+// Заміряно корпусом із 76 живих фраз: 17 влучань до цих правок.
+
+const GREETINGS = ["привіт", "вітаю", "добрий", "доброго", "доброї", "добрий день", "здрав", "привет", "добрый", "доброе", "доброй", "hello", "hi$", "hey$", "hiya", "good morning", "good afternoon", "good evening", "салют", "хай$"];
+
+// Порядок має значення: перевіряється згори вниз, і перший збіг перемагає.
+const SMALL = [
+    { key: "bye", stems: ["до побачення", "бувай", "до зустрічі", "на все добре", "гарного дня", "гарного вечора", "до свидания", "пока$", "всего доброго", "хорошего дня", "bye", "goodbye", "see you", "have a nice day"] },
+    { key: "about-bot", stems: ["ти бот", "ви бот", "це бот", "ты бот", "вы бот", "это бот", "робот", "з ким я", "с кем я", "хто ти", "хто ви", "кто ты", "кто вы", "що ти вмієш", "що ви вмієте", "що можеш", "чем можешь", "что умеешь", "что ты умеешь", "чим можеш", "чим допоможеш", "are you a bot", "are you human", "are you real", "is this a bot", "who are you", "what can you do", "how can you help", "можеш допомогти", "можете допомогти", "чим можете", "з чим ти", "з чим ви", "чем можете", "с чем ты", "с чем вы", "допоможіть", "допоможи", "допомога", "потрібна допомога", "помогите", "помощь", "нужна помощь", "help$", "need help", "help me"] },
+    { key: "compliment", stems: ["класн", "клас$", "круто", "крут$", "молодц", "дуже гарн", "гарний магазин", "гарний сайт", "подобаєт", "сподобал", "нравит", "понравил", "люблю ваш", "відмінн", "отличн", "супер магазин", "nice shop", "great shop", "love your", "love this", "awesome", "amazing", "well done", "good job"] },
+    { key: "smalltalk", stems: ["як справи", "як ти", "як ви", "як життя", "как дела", "как ты", "как вы", "how are you", "how's it going", "what's up"] },
+    { key: "ack", stems: ["ок$", "окей", "ok$", "okay", "оке$", "добре$", "гаразд", "зрозуміл", "ясно", "чудово", "супер", "клас$", "понятно", "хорошо", "ладно", "отлично", "got it", "fine$", "great$", "cool$", "perfect", "alright", "sounds good", "так$", "ні$", "да$", "нет$", "yes$", "no$", "ага$", "угу$", "дяку", "спасиб", "благодар", "thank", "thx", "ty$", "ні дякую", "нет спасибо", "no thanks"] }
+];
+
+// Повідомлення без жодної літери чи цифри: «👍», «🙂», «!!!».
+function onlyEmoji(text) {
+    return !/[\p{L}\p{N}]/u.test(String(text || "")) && /\S/.test(String(text || ""));
+}
+
+export function smallTalk(text) {
+    const list = words(text);
+    if (onlyEmoji(text)) return "ack";
+    // Довге повідомлення — це вже питання, навіть якщо в ньому є «дякую»:
+    // «дякую, а доставка скільки?» — про доставку.
+    if (list.length > 6) return null;
+    const hit = SMALL.find(s => hasStem(list, s.stems));
+    return hit ? hit.key : null;
+}
+
+const T4 = {
+    uk: {
+        ack: "Добре! Якщо щось знадобиться — пишіть, я тут.",
+        compliment: "Дякуємо, дуже приємно! Якщо щось знадобиться — пишіть.",
+        authYes: "Так, усі речі в каталозі оригінальні — без реплік і копій.",
+        thanks: "Будь ласка! Якщо буде ще питання — пишіть.",
+        bye: "Гарного дня! Будемо раді бачити вас знову 🙂",
+        smalltalk: "Дякую, все добре! Чим можу допомогти — підібрати річ чи розповісти про доставку й оплату?",
+        aboutBot: "Я бот-помічник BestBrnd4u. Можу підібрати річ за вашим побажанням (тип, для кого, бренд, колір, бюджет), розповісти про доставку, оплату, оригінальність і повернення, підказати стан замовлення. Менеджер бачить цю розмову й підключиться, якщо треба, — або напишіть «покличте менеджера».",
+        howToOrder: "Оформити замовлення просто, реєстрація не потрібна:\n1. Відкрийте товар і натисніть «Купити» — він потрапить у кошик.\n2. У кошику натисніть «Оформити замовлення».\n3. Вкажіть імʼя, телефон, місто й відділення Нової пошти (або поштомат чи курʼєра).\n4. Оберіть оплату: карткою або при отриманні.\nПісля цього менеджер звʼяжеться з вами, щоб підтвердити замовлення.",
+        cheaper: "Ось варіанти дешевше:",
+        cheapest: "Ось найдоступніші варіанти:",
+        noCheaper: "Дешевше в цьому розділі зараз нічого немає — це найдоступніші варіанти. Можу підібрати щось з іншого розділу або покликати менеджера.",
+        broken: "Вибачте за незручність! Передаю менеджеру — він допоможе оформити замовлення або розбереться, що пішло не так.",
+        cancel: "Скасувати чи змінити замовлення може менеджер — передаю йому вашу розмову. Вкажіть, будь ласка, номер замовлення, щоб було швидше.",
+        sorry: "Нам дуже шкода, що так вийшло. Передаю розмову менеджеру — він розбереться й відповість тут.",
+        abroad: "Про доставку за кордон краще уточнити в менеджера — передаю питання.",
+        lost: "Перевірити, де замовлення, можна тут: {url} — потрібні номер і телефон. Я також передав ваше питання менеджеру: він подивиться й відповість тут.",
+        warranty: "Умови гарантії й повернення — на сторінці: {url}. Якщо з річчю щось не так — опишіть тут, менеджер допоможе."
+    },
+    en: {
+        ack: "Great! If you need anything, just write — I'm here.",
+        compliment: "Thank you, that's really nice to hear! Write if you need anything.",
+        authYes: "Yes, everything in our catalog is authentic — no replicas or copies.",
+        thanks: "You're welcome! Write if you have more questions.",
+        bye: "Have a nice day! We'll be glad to see you again 🙂",
+        smalltalk: "I'm fine, thanks! How can I help — pick an item or tell you about delivery and payment?",
+        aboutBot: "I'm the BestBrnd4u assistant bot. I can pick an item for you (type, who it's for, brand, color, budget), tell you about delivery, payment, authenticity and returns, and help you check your order status. A manager sees this chat and will join if needed — or just write “call a manager”.",
+        howToOrder: "Ordering is easy, no registration needed:\n1. Open the item and press “Buy” — it goes to the cart.\n2. In the cart press “Checkout”.\n3. Enter your name, phone, city and Nova Poshta branch (or parcel locker or courier).\n4. Choose payment: by card or on delivery.\nA manager will then contact you to confirm the order.",
+        cheaper: "Here are cheaper options:",
+        cheapest: "Here are the most affordable options:",
+        noCheaper: "There's nothing cheaper in this category right now — those are the most affordable options. I can look in another category or call a manager.",
+        broken: "Sorry for the trouble! I'm passing this to a manager — they will help you place the order or figure out what went wrong.",
+        cancel: "A manager can cancel or change an order — I'm passing the chat to them. Please add your order number to make it faster.",
+        sorry: "We're really sorry about that. I'm passing the chat to a manager — they will look into it and reply here.",
+        abroad: "It's best to check international delivery with a manager — I'm passing your question on.",
+        lost: "You can check where your order is here: {url} — you'll need the number and phone. I've also passed your question to a manager: they will look and reply here.",
+        warranty: "Warranty and return terms are on this page (in Ukrainian — that version is legally binding): {url}. If something is wrong with the item, describe it here and a manager will help."
+    },
+    ru: {
+        ack: "Хорошо! Если что-то понадобится — пишите, я здесь.",
+        compliment: "Спасибо, очень приятно! Если что-то понадобится — пишите.",
+        authYes: "Да, все вещи в каталоге оригинальные — без реплик и копий.",
+        thanks: "Пожалуйста! Если будут еще вопросы — пишите.",
+        bye: "Хорошего дня! Будем рады видеть вас снова 🙂",
+        smalltalk: "Спасибо, все хорошо! Чем могу помочь — подобрать вещь или рассказать о доставке и оплате?",
+        aboutBot: "Я бот-помощник BestBrnd4u. Могу подобрать вещь по вашему пожеланию (тип, для кого, бренд, цвет, бюджет), рассказать о доставке, оплате, оригинальности и возврате, подсказать состояние заказа. Менеджер видит этот чат и подключится, если нужно, — или напишите «позовите менеджера».",
+        howToOrder: "Оформить заказ просто, регистрация не нужна:\n1. Откройте товар и нажмите «Купить» — он попадет в корзину.\n2. В корзине нажмите «Оформить заказ».\n3. Укажите имя, телефон, город и отделение Новой почты (или почтомат либо курьера).\n4. Выберите оплату: картой или при получении.\nПосле этого менеджер свяжется с вами, чтобы подтвердить заказ.",
+        cheaper: "Вот варианты дешевле:",
+        cheapest: "Вот самые доступные варианты:",
+        noCheaper: "Дешевле в этом разделе сейчас ничего нет — это самые доступные варианты. Могу подобрать что-то из другого раздела или позвать менеджера.",
+        broken: "Извините за неудобство! Передаю менеджеру — он поможет оформить заказ или разберется, что пошло не так.",
+        cancel: "Отменить или изменить заказ может менеджер — передаю ему ваш разговор. Укажите, пожалуйста, номер заказа, чтобы было быстрее.",
+        sorry: "Нам очень жаль, что так вышло. Передаю разговор менеджеру — он разберется и ответит здесь.",
+        abroad: "О доставке за границу лучше уточнить у менеджера — передаю вопрос.",
+        lost: "Проверить, где заказ, можно здесь: {url} — понадобятся номер и телефон. Я также передал ваш вопрос менеджеру: он посмотрит и ответит здесь.",
+        warranty: "Условия гарантии и возврата — на странице (на украинском, юридически действующей является эта версия): {url}. Если с вещью что-то не так — опишите здесь, менеджер поможет."
+    }
+};
+
+// Намір → основи слів. Ці питання бот не закриває сам — лише чесно
+// каже, що далі людина, і будить власника.
+const ESCALATE = [
+    { key: "cancel", stems: ["скасув", "відмін", "відмов", "змінити замовлен", "змінити адрес", "отмен", "изменить заказ", "изменить адрес", "cancel", "change my order", "change the order", "change address"] },
+    { key: "broken", stems: ["не працює", "не працюють", "не відкрива", "не можу оформ", "не виходить оформ", "не вдається", "помилк", "глюч", "зависа", "не работает", "не открывается", "не могу оформ", "не получается", "ошибк", "глючит", "doesn't work", "does not work", "not working", "can't checkout", "cannot checkout", "can't order", "error", "bug$", "broken"] },
+    { key: "sorry", stems: ["жахлив", "огидн", "незадовол", "розчарован", "погано", "обман", "шахра", "кидал", "скарг", "ужасн", "отвратит", "недовол", "разочаров", "плохо", "мошенн", "жалоб", "terrible", "awful", "horrible", "disappointed", "unhappy", "scam", "fraud", "complaint", "worst"] },
+    { key: "abroad", stems: ["за кордон", "закордон", "за межі україни", "в європ", "в польщ", "в німеччин", "за границ", "в европ", "в польш", "в германи", "abroad", "international", "outside ukraine", "ship to poland", "ship to germany", "ship to europe", "worldwide", "to poland", "to germany", "to usa", "to the us"] }
+];
+
+const ABOUT_FIRST = ["ти людина", "ти справжн", "ти жива", "ти живий", "ви людина", "ви справжн", "ви жива", "ви живий", "ти бот", "ви бот", "ты человек", "ты настоящ", "ты живой", "ты живая", "вы человек", "вы настоящ", "вы живой", "ты бот", "вы бот", "are you human", "are you a human", "are you real", "are you a real", "are you a bot", "is this a bot", "am i talking to", "real person?"];
+
+const LOST = ["не прийш", "не отрима", "не получ", "загуби", "потерял", "де посилк", "де моя посилк", "где посылк", "где моя посылк", "коли приїде", "коли прийде", "когда приедет", "когда придет", "where is my parcel", "where is my package", "my package", "my parcel", "hasn't arrived", "not arrived", "didn't arrive", "didn't receive", "посилк", "посылк"];
+
+const HOW_TO_ORDER = ["як оформ", "як замов", "як купи", "як зробити замовлен", "як придбат", "як офор", "как оформ", "как заказ", "как купи", "как сделать заказ", "как приобрест", "how do i order", "how to order", "how can i order", "how to buy", "how do i buy", "how can i buy", "place an order", "без реєстрац", "без регистрац", "реєстр", "зареєстр", "регистр", "зарегистр", "without registration", "need an account", "create an account", "sign up"];
+
+const CHEAPER = ["дешевш", "дешевле", "дорого", "дорогувато", "дороговато", "не по кишені", "бюджетніш", "бюджетнее", "cheaper", "less expensive", "too expensive", "expensive", "more affordable"];
+
+const WARRANTY = ["гаранті", "гарант", "warranty", "guarantee", "брак", "дефект", "зламал", "сломал", "defect", "broke$"];
+
 // Назви типів для фрази «Сумок Prada зараз немає».
 const TYPE_WORDS = {
     uk: { bags: "Сумок", watches: "Годинників", glasses: "Окулярів", sneakers: "Кросівок", wallets: "Гаманців" },
@@ -242,17 +353,26 @@ function words(text) {
 // Чи є в тексті слово, що ПОЧИНАЄТЬСЯ з одного зі стемів. Початок
 // слова, а не будь-де: інакше «жін» знайшлося б у «піджінсах», а «чол»
 // — у «чолці». Стеми з пробілом шукаються як фраза.
+//
+// «$» у кінці — ЦІЛЕ слово. Для коротких основ, які інакше ловлять
+// чуже: «red» — «ready», «man» — «manager», «her» — «here».
 function hasStem(list, stems) {
-    return stems.some(stem => stem.includes(" ")
-        ? (" " + list.join(" ") + " ").includes(" " + stem)
-        : list.some(w => w.startsWith(stem)));
+    return stems.some(stem => {
+        if (stem.endsWith("$")) {
+            const exact = stem.slice(0, -1);
+            return exact.includes(" ") ? (" " + list.join(" ") + " ").includes(" " + exact + " ") : list.includes(exact);
+        }
+        return stem.includes(" ")
+            ? (" " + list.join(" ") + " ").includes(" " + stem)
+            : list.some(w => w.startsWith(stem));
+    });
 }
 
 // Типи речей: стеми трьома мовами → категорія чи розділ каталогу.
 // Розділ (department) ширший за категорію: «сумка» — це і жіночі, і
 // чоловічі, а стать тоді вирішує окреме слово.
 const TYPES = [
-    { key: "bags", department: "Сумки", stems: ["сумк", "сумоч", "клатч", "шопер", "тоут", "кросбоді", "крос-боді", "bag", "handbag", "purse", "tote", "clutch", "crossbody", "backpack", "рюкзак"] },
+    { key: "bags", department: "Сумки", stems: ["сумк", "сумоч", "сумок", "сумці", "сумочк", "клатч", "шопер", "тоут", "кросбоді", "крос-боді", "bag", "handbag", "purse", "tote", "clutch", "crossbody", "backpack", "рюкзак"] },
     { key: "watches", category: "Годинники", stems: ["годинник", "часы", "часов", "часик", "watch"] },
     { key: "glasses", category: "Окуляри і оправи", stems: ["окуляр", "оправ", "очки", "очков", "glasses", "sunglass", "eyewear", "frames"] },
     { key: "sneakers", category: "Кросівки", stems: ["кросівк", "кроссовк", "кеди", "кеды", "взутт", "обув", "sneaker", "trainer", "shoes"] },
@@ -260,23 +380,23 @@ const TYPES = [
 ];
 
 const GENDERS = [
-    { key: "Жінкам", stems: ["жін", "жен", "дівч", "девуш", "мам", "дружин", "жена", "жене", "сестр", "доньк", "дочк", "подруг", "для неї", "для нее", "woman", "women", "female", "lady", "ladies", "her ", "wife", "girl", "mom", "mother"] },
-    { key: "Чоловікам", stems: ["чолов", "мужч", "мужск", "хлопц", "парн", "тат", "пап", "муж", "син", "сын", "брат", "для нього", "для него", "man", "men", "male", "him ", "husband", "boyfriend", "dad", "father", "guy"] }
+    { key: "Жінкам", stems: ["жін", "жен", "дівч", "девуш", "мам", "дружин", "жена", "жене", "сестр", "доньк", "дочк", "подруг", "для неї", "для нее", "woman", "women", "female", "lady", "ladies", "her$", "wife", "girl", "mom$", "mother"] },
+    { key: "Чоловікам", stems: ["чолов", "мужч", "мужск", "хлопц", "парн", "тато", "тата", "татові", "татов", "папа", "папе", "папы", "папі", "муж", "сина", "сину", "синові", "синов", "сын", "брат", "для нього", "для него", "man$", "men$", "men's", "mens$", "male", "him$", "husband", "boyfriend", "dad$", "father", "guy$", "guys$"] }
 ];
 
 // Кольори: стеми → початок української назви кольору у варіантах.
 const COLORS = [
     { key: "Чорн", stems: ["чорн", "черн", "black"] },
-    { key: "Біл", stems: ["біл", "бел", "white", "молочн", "айвор", "ivory"] },
+    { key: "Біл", stems: ["білий", "біла", "біле", "білі", "білого", "білу", "білій", "белый", "белая", "белое", "белые", "белого", "белую", "white", "молочн", "айвор", "ivory"] },
     { key: "Коричн", stems: ["коричн", "brown", "кемел", "camel", "карамел"] },
     { key: "Беж", stems: ["беж", "beige", "nude"] },
-    { key: "Сір", stems: ["сір", "сер", "grey", "gray", "графіт"] },
+    { key: "Сір", stems: ["сірий", "сіра", "сіре", "сірі", "сірого", "сіру", "серый", "серая", "серое", "серые", "серого", "серую", "grey", "gray", "графіт"] },
     { key: "Рожев", stems: ["рожев", "розов", "pink", "пудров"] },
     { key: "Син", stems: ["синій", "синя", "синь", "синий", "синяя", "blue", "navy"] },
     { key: "Зелен", stems: ["зелен", "green", "хакі", "хаки", "khaki"] },
     { key: "Золот", stems: ["золот", "gold"] },
     { key: "Срібл", stems: ["срібл", "серебр", "silver"] },
-    { key: "Червон", stems: ["червон", "красн", "red"] }
+    { key: "Червон", stems: ["червон", "красн", "red$"] }
 ];
 
 // Бренди, які пишуть кирилицею. Латинську назву шукаємо як є.
@@ -374,10 +494,10 @@ export function parseWish(text, data) {
 
     if (hasStem(list, ["подар", "gift", "present"])) wish.gift = true;
     if (hasStem(list, ["новинк", "нове", "новое", "новые", "new arrival", "latest"])) wish.fresh = true;
-    if (hasStem(list, ["знижк", "скидк", "акці", "акци", "sale", "discount", "дешев", "cheap"])) wish.sale = true;
+    if (hasStem(list, ["знижк", "скидк", "акці", "акци", "sale", "discount"])) wish.sale = true;
 
     // «Інші варіанти» — показати наступні.
-    if (hasStem(list, ["інші варіант", "ще варіант", "другие вариант", "еще вариант", "other option", "more option", "show more", "ще "])) wish.more = true;
+    if (hasStem(list, ["інші варіант", "ще варіант", "другие вариант", "еще вариант", "other option", "more option", "show more", "покажи ще", "покажіть ще", "більше варіант", "больше вариант", "more options", "more variants", "покажи еще", "покажите еще"]) || (list.length <= 2 && (list.includes("ще") || list.includes("еще") || list.includes("more")))) wish.more = true;
 
     const wants = hasStem(list, ["шука", "ищу", "хочу", "хоті", "хотел", "підбер", "подбер", "підібр", "подобр", "порад", "посовет", "покаж", "что есть", "що є", "є ", "есть ", "looking", "want", "need", "recommend", "suggest", "show", "pick", "any "]);
 
@@ -447,12 +567,16 @@ export function pickProducts(wish, data, now, offset) {
 
     const products = (data && data.products) || [];
 
-    const steps = [{}, { color: true }, { color: true, gender: true }, { color: true, gender: true, budget: true }];
+    // «Дешевше» бюджет не послаблює: показати дорожче у відповідь на
+    // «а дешевше є?» — гірше, ніж чесно сказати, що дешевшого немає.
+    const steps = wish.cheap
+        ? [{}, { color: true }, { color: true, gender: true }]
+        : [{}, { color: true }, { color: true, gender: true }, { color: true, gender: true, budget: true }];
 
     for (let i = 0; i < steps.length; i++) {
         const found = products.filter(p => matches(p, wish, now, steps[i]));
         if (!found.length) continue;
-        found.sort((a, b) =>
+        found.sort((a, b) => wish.cheap ? botPriceNow(a, now) - botPriceNow(b, now) :
             (Number(b.inStock && !b.preOrder) - Number(a.inStock && !a.preOrder))
             || (wish.budget && wish.budget.max ? botPriceNow(b, now) - botPriceNow(a, now) : 0)
             || (Number(b.isNew) - Number(a.isNew))
@@ -497,7 +621,7 @@ const TOPICS = [
     { key: "delivery", stems: ["доставк", "нова пошт", "новой почт", "новая почт", "відправк", "отправк", "delivery", "shipping", "nova poshta", "courier", "кур'єр", "курьер", "поштомат", "почтомат"], faq: /Скільки коштує доставка|How much does delivery|Сколько стоит доставка/i },
     { key: "payment", stems: ["оплат", "оплач", "карт", "готівк", "наличн", "накладен", "післяплат", "наложен", "payment", "pay ", "card", "cash", "cod"], faq: /оплатити карткою|pay by card|pay online|оплатить картой/i },
     { key: "inspect", stems: ["оглян", "огляд", "осмотр", "посмотреть перед", "inspect", "check before"], faq: /оглянути|inspect|осмотреть/i },
-    { key: "fake", stems: ["оригінал", "оригинал", "підробк", "подделк", "реплік", "реплик", "фейк", "fake", "replica", "original", "authentic", "genuine", "справжн", "настоящ"], faq: /репліки|replicas|реплики/i },
+    { key: "fake", always: true, stems: ["оригінал", "оригинал", "підробк", "подделк", "реплік", "реплик", "фейк", "fake", "replica", "original", "authentic", "genuine", "справжн", "настоящ", "real$"], faq: /репліки|replicas|реплики/i },
     { key: "source", stems: ["звідки", "откуда", "where do you", "where from", "де купу", "где покупа"], faq: /Звідки ви привозите|Where do you|Откуда вы привозите/i },
     { key: "doubt", stems: ["сумнів", "сомнева", "doubt", "перевір оригін", "проверить оригин"], faq: /сумніваюся|doubt|сомневаюсь/i },
     { key: "returns", stems: ["поверн", "возврат", "вернут", "обмін", "обмен", "не підійш", "не подош", "не підходит", "return", "refund", "exchange", "doesn't fit", "didn't fit"], faq: /Що робити, якщо товар не підійшов|What if the item|What to do if the item|Что делать, если товар не подош/i, legal: true },
@@ -806,50 +930,149 @@ export function botReply(message, history, data, options) {
         return out;
     };
 
+    // 0. «Ти людина?», «ви бот?» — питання ПРО бота. Перевіряємо раніше за
+    // «покличте людину»: слово «людина» є в обох.
+    if (!((parseWish(text, data) || {}).criteria) && hasStem(list, ABOUT_FIRST)) {
+        return reply(T4[lang].aboutBot, { chips: L.chips.menu, intent: "about-bot" });
+    }
+
     // 1. Людина просить людину.
     if (hasStem(list, ["менеджер", "оператор", "людин", "человек", "живий", "живой", "покликат", "позват", "manager", "human", "operator", "real person", "агент", "agent", "передзвон", "перезвон", "call me", "call back"])) {
-        return reply(fill(L.handoff, { hours }), { handoff: true });
+        return reply(fill(L.handoff, { hours }), { handoff: true, intent: "handoff" });
+    }
+
+    const T4L = T4[lang];
+    const criteria = (parseWish(text, data) || {}).criteria;
+
+    // 1а. Те, що бот сам не закриває: скасувати замовлення, сайт не
+    // працює, скарга, доставка за кордон. Чесно кажемо, що далі людина.
+    const esc = ESCALATE.find(e => hasStem(list, e.stems));
+    if (esc && !(esc.key === "abroad" && criteria)) {
+        return reply(T4L[esc.key], { handoff: true, intent: esc.key === "sorry" ? "sorry" : "handoff" });
+    }
+
+    // 1б. «Не прийшло», «де посилка» — посилання на перевірку і людина:
+    // це вже не довідка, а можлива проблема.
+    if (hasStem(list, LOST) && !criteria) {
+        return reply(fill(T4L.lost, { url: pageUrl(site, "/order-status", lang) }), { handoff: true, intent: "status" });
     }
 
     // 2. Де моє замовлення.
     if (hasStem(list, ["де моє замовлен", "где мой заказ", "статус замовлен", "статус заказ", "стан замовлен", "where is my order", "order status", "трек", "track", "накладн", "ттн"]) || /\b\d{8,12}\b/.test(text)) {
-        return reply(fill(L.status, { url: pageUrl(site, "/order-status", lang) }), { chips: [L.chips.human] });
+        return reply(fill(L.status, { url: pageUrl(site, "/order-status", lang) }), { chips: [L.chips.human], intent: "status" });
     }
 
     // 2а. Автовідповіді власника — понад усе вбудоване: власник знає
     // свій магазин краще за ключові слова в коді.
     const own = ownerAnswer(text, data, lang);
-    if (own && own.missing) return reply(fill(L.handoff, { hours }), { handoff: true });
-    if (own) return reply(own.text, { chips: [L.chips.human] });
+    if (own && own.missing) return reply(fill(L.handoff, { hours }), { handoff: true, intent: "handoff" });
+    if (own) return reply(own.text, { chips: [L.chips.human], intent: "owner" });
 
     // 2б. Людина пише зі сторінки товару й питає про НЬОГО.
     const here = productFromPage(opts.page, data);
     const about = productAnswer(text, here, data, lang, now, site);
     if (about) {
-        return reply(about.text, { handoff: Boolean(about.handoff), chips: about.handoff ? [] : [L.chips.human] });
+        return reply(about.text, { handoff: Boolean(about.handoff), chips: about.handoff ? [] : [L.chips.human], intent: "product" });
     }
 
     // 2в. Контакти й графік.
     if (hasStem(list, CONTACT_STEMS) && !(parseWish(text, data) || {}).criteria) {
-        return reply(contactsReply(data, lang), { chips: L.chips.menu.slice(0, 3) });
+        return reply(contactsReply(data, lang), { chips: L.chips.menu.slice(0, 3), intent: "contacts" });
     }
 
     // 2г. Промокод.
     if (hasStem(list, ["промокод", "промо-код", "промо код", "promo code", "promocode", "coupon", "купон", "код знижки", "код скидки", "discount code"])) {
-        return reply(fill(T2[lang].promo, { url: pageUrl(site, "/aktsii/", lang) }), { chips: [L.chips.human] });
+        return reply(fill(T2[lang].promo, { url: pageUrl(site, "/aktsii/", lang) }), { chips: [L.chips.human], intent: "promo" });
+    }
+
+    // 2ґ. Базові діалоги: «ок», «дякую», «бувайте», «як справи», «ти бот?».
+    // Лише коли в повідомленні немає запиту на товар: «дякую, а чорна є?»
+    // — це вже питання.
+    // Питання важливіше за ввічливість: «дякую, а доставка скільки?» —
+    // про доставку.
+    const small = (criteria || findTopic(text) || hasStem(list, HOW_TO_ORDER) || hasStem(list, CHEAPER)) ? null : smallTalk(text);
+    if (small === "ack") {
+        const thanks = hasStem(list, ["дяку", "спасиб", "благодар", "thank", "thx", "ty$"]);
+        return reply(thanks ? T4L.thanks : T4L.ack, { intent: "ack" });
+    }
+    if (small === "bye") return reply(T4L.bye, { intent: "bye" });
+    if (small === "compliment") return reply(T4L.compliment, { intent: "ack" });
+    if (small === "smalltalk") return reply(T4L.smalltalk, { chips: L.chips.menu.slice(0, 3), intent: "smalltalk" });
+    if (small === "about-bot") return reply(T4L.aboutBot, { chips: L.chips.menu, intent: "about-bot" });
+
+    if (!criteria && list.length <= 4 && hasStem(list, GREETINGS)) {
+        return reply(L.hello, { chips: L.chips.menu, intent: "hello" });
+    }
+
+    // 2д. Як оформити замовлення.
+    if (hasStem(list, HOW_TO_ORDER)) {
+        return reply(T4L.howToOrder, { chips: [L.chips.menu[0], L.chips.menu[1], L.chips.menu[2]], intent: "how-to-order" });
+    }
+
+    // 2е. Гарантія.
+    if (hasStem(list, WARRANTY) && !criteria) {
+        return reply(fill(T4L.warranty, { url: pageUrl(site, "/return-warranty", lang) }) + `\n${L.faqMore} ${pageUrl(site, "/return-warranty", lang)}`,
+            { chips: [L.chips.human], intent: "faq" });
+    }
+
+    // 2є. «Дорого», «а дешевше є?» — той самий запит, але дешевше за
+    // найдешевше, що вже показали. Без попереднього запиту — найдоступніше.
+    if (hasStem(list, CHEAPER)) {
+        const previous = (history || []).filter(m => m && m.author === "visitor").slice(-CONTEXT_MESSAGES).reverse()
+            .map(m => parseWish(m.body, data)).filter(Boolean);
+        const base = mergeWishes(parseWish(text, data) || { criteria: 0 }, previous);
+        const shownPrices = [];
+        // Остання відповідь бота З ТОВАРАМИ: після «дешевшого немає»
+        // наступне «ще дешевше» інакше починало з найдешевшого заново.
+        const lastBot = (history || []).slice().reverse().find(m => m && m.author === BOT_AUTHOR && /₴/.test(String(m.body || "")));
+        String(lastBot && lastBot.body || "").split("\n").forEach(l => {
+            const m = l.match(/—\s+([\d\s  ]+)₴/);
+            if (m) shownPrices.push(Number(m[1].replace(/\D/g, "")));
+        });
+        const ceiling = shownPrices.length ? Math.min(...shownPrices) - 1 : 0;
+        const cheapWish = Object.assign({}, base, { cheap: true, more: false },
+            ceiling > 0 ? { budget: Object.assign({}, base.budget || {}, { max: ceiling }) } : {});
+        const picked = pickProducts(cheapWish, data, now, 0);
+        if (picked.items.length) {
+            return reply(ceiling > 0 ? T4L.cheaper : T4L.cheapest, {
+                products: picked.items.map(p => ({
+                    slug: p.slug,
+                    title: (p.title && (p.title[lang] || p.title.uk)) || p.slug,
+                    price: botPriceNow(p, now),
+                    url: pageUrl(site, `/p/${p.slug}/`, lang),
+                    preOrder: Boolean(p.preOrder || !p.inStock)
+                })),
+                chips: [L.chips.more[1]],
+                intent: "cheaper"
+            });
+        }
+        return reply(T4L.noCheaper, { chips: [L.chips.more[1]], intent: "cheaper" });
     }
 
     // 3. Тема з частих питань.
     const topic = findTopic(text);
     const faq = (data.faq && data.faq[lang]) || [];
 
-    if (topic && !(parseWish(text, data) || {}).criteria) {
+    // «Ваші сумки оригінальні?» — питання про оригінальність, хоч у ньому
+    // й названо тип: такі теми (always) відповідаються завжди.
+    // «Справжня шкіра», «genuine leather» — про матеріал, а не про
+    // оригінальність: тоді й тип у запиті важить.
+    const strictFake = topic && topic.always
+        && hasStem(list, ["оригінал", "оригинал", "підробк", "подделк", "реплік", "реплик", "фейк", "fake", "replica", "original", "authentic", "real$"])
+        && !hasStem(list, ["шкір", "кож", "leather", "замш", "suede"]);
+    // «А оригінальні сумки Coach є?» — і про оригінальність, і запит на
+    // товар. Відповідь із сайту починається словом «Ні» (реплік немає) —
+    // поруч із запитом на сумки воно читалося б як «сумок немає». Тож
+    // коротко «так, оригінал» і далі — самі сумки.
+    let authPrefix = "";
+    if (strictFake && (parseWish(text, data) || {}).criteria) authPrefix = T4[lang].authYes + "\n";
+    else if (topic && (strictFake || !(parseWish(text, data) || {}).criteria)) {
         if (topic.legal && lang !== "uk") {
-            return reply(fill(L.returnsLegal, { url: pageUrl(site, "/return-warranty", lang) }), { chips: L.chips.menu.filter(c => c !== L.chips.menu[4]) });
+            return reply(fill(L.returnsLegal, { url: pageUrl(site, "/return-warranty", lang) }), { chips: L.chips.menu.filter(c => c !== L.chips.menu[4]), intent: "faq" });
         }
         const item = faq.find(f => topic.faq.test(f.q)) || faqByWords(text, faq);
         if (item) {
-            return reply(`${item.a}\n${L.faqMore} ${pageUrl(site, item.page, lang)}`, { chips: L.chips.menu.slice(0, 5) });
+            return reply(`${item.a}\n${L.faqMore} ${pageUrl(site, item.page, lang)}`, { chips: L.chips.menu.slice(0, 5), intent: "faq" });
         }
     }
 
@@ -858,7 +1081,7 @@ export function botReply(message, history, data, options) {
 
     // Кнопки меню без критеріїв: «Підібрати річ» — питаємо, що саме.
     if (wish && !wish.criteria && !wish.more && !wish.gift && !wish.fresh && !wish.sale) {
-        return reply(L.askWhat, { chips: L.chips.types });
+        return reply(L.askWhat, { chips: L.chips.types, intent: "ask" });
     }
 
     if (wish) {
@@ -879,7 +1102,7 @@ export function botReply(message, history, data, options) {
         const offset = wish.more ? (pages + 1) * MAX_PRODUCTS : 0;
 
         if (!wish.criteria && !wish.fresh && !wish.sale && !wish.gift) {
-            return reply(L.askWhat, { chips: L.chips.types });
+            return reply(L.askWhat, { chips: L.chips.types, intent: "ask" });
         }
 
         const picked = pickProducts(wish, data, now, offset);
@@ -901,11 +1124,12 @@ export function botReply(message, history, data, options) {
                             url: pageUrl(site, `/p/${p.slug}/`, lang),
                             preOrder: Boolean(p.preOrder || !p.inStock)
                         })),
-                        chips: [L.chips.more[1]]
+                        chips: [L.chips.more[1]],
+                        intent: "products"
                     });
                 }
             }
-            return reply(L.nothing, { handoff: true });
+            return reply(L.nothing, { handoff: true, intent: "handoff" });
         }
 
         const head = picked.relaxed ? L.relaxed
@@ -926,27 +1150,18 @@ export function botReply(message, history, data, options) {
             preOrder: Boolean(p.preOrder || !p.inStock)
         }));
 
-        return reply(head, { products, chips: chips.slice(0, 5) });
+        return reply(authPrefix + head, { products, chips: chips.slice(0, 5), intent: "products" });
 
-    }
-
-    // 5. Привітання й подяка.
-    if (list.length <= 4 && hasStem(list, ["привіт", "вітаю", "добр", "здрав", "привет", "hello", "hi", "hey", "good morning", "good afternoon", "good evening"])) {
-        return reply(L.hello, { chips: L.chips.menu });
-    }
-
-    if (list.length <= 5 && hasStem(list, ["дяку", "спасиб", "благодар", "thank", "thx"])) {
-        return reply(L.thanks);
     }
 
     // 6. Слова збіглися з частим питанням, хоч тему не впізнали.
     const loose = faqByWords(text, faq);
     if (loose) {
-        return reply(`${loose.a}\n${L.faqMore} ${pageUrl(site, loose.page, lang)}`, { chips: L.chips.menu.slice(0, 5) });
+        return reply(`${loose.a}\n${L.faqMore} ${pageUrl(site, loose.page, lang)}`, { chips: L.chips.menu.slice(0, 5), intent: "faq" });
     }
 
     // 7. Не зрозумів — чесно кажемо й передаємо людині.
-    return reply(fill(L.unknown, { hours }), { handoff: true, chips: L.chips.menu.slice(0, 3) });
+    return reply(fill(L.unknown, { hours }), { handoff: true, chips: L.chips.menu.slice(0, 3), intent: "unknown" });
 
 }
 
