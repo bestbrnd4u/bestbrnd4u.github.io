@@ -143,10 +143,13 @@ function details(p, t) {
         variants,
         material: local(t, p.material || p.composition),
         dimensions: local(t, p.dimensions),
+        strap: local(t, p.strapInfo),
         preOrderDays: local(t, p.preOrderDays)
     };
 
 }
+
+const THUMBS = new Set(readJson(path.join(ROOT, "data", "image-variants.json"), []));
 
 function buildProducts() {
 
@@ -168,8 +171,15 @@ function buildProducts() {
         const colors = [...new Set([p.color, ...(p.variants || []).map(v => v && v.color)]
             .filter(Boolean).map(String))];
 
-        const image = String((p.images || [])[0] || ((p.variants || [])[0] || {}).images?.[0] || "")
+        const original = String((p.images || [])[0] || ((p.variants || [])[0] || {}).images?.[0] || "")
             .split("?")[0].replace(/^\/?/, "/");
+
+        // Мініатюра в чаті — 56 px. Оригінал важить 55–145 КБ, копія на
+        // 300 px — 3–5 КБ (заміряно на проді 09.11.2026). Правило те саме,
+        // що в каталозі (assets/js/ui.js, buildSrcSet): копія є лише для
+        // фото з data/image-variants.json, інакше — оригінал.
+        const name = original.split("/").pop();
+        const image = name.endsWith(".webp") && THUMBS.has(name) ? original.replace(/\.webp$/, "-300.webp") : original;
 
         return {
             slug: p.slug,

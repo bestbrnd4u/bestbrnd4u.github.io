@@ -93,7 +93,7 @@ import {
   cleanChatBody, cleanThreadId, cleanChatPage, formatChatMessage,
   CHAT_LIMITS, CHAT_DONE_TEXT, chatDoneReceipt, chatClearReceipt, chatUserName, chatWho,
 } from "./chat.js";
-import { botReply, botLang, serializeBotReply, botTelegramText, BOT_AUTHOR } from "./chat-bot.js";
+import { botReply, botLang, serializeBotReply, botTelegramText, BOT_AUTHOR, lookupReplyText } from "./chat-bot.js";
 import {
   cleanLoginToken, loginCode, loginDeepLink, loginVerdict, loginStatus,
   telegramEmail, telegramName, sharedPhone, LOGIN_TTL_MINUTES,
@@ -3113,7 +3113,7 @@ async function handleChatSend(request: Request, body: Record<string, any>): Prom
   // розмові відповів власник або бот сам передав її людині. Будь-яка
   // його помилка не має зачепити саме повідомлення — воно вже
   // збережене й переслане власнику.
-  const bot = await answerWithBot(thread, saved, text, body.lang, cleanChatPage(body.page)).catch((error) => {
+  const bot = await answerWithBot(thread, saved, text, body.lang, cleanChatPage(body.page), clientIp(request)).catch((error) => {
     console.error("Чат: бот не відповів:", error);
     return null;
   });
@@ -3141,7 +3141,7 @@ async function loadChatBotData(): Promise<any> {
 }
 
 async function answerWithBot(
-  thread: Record<string, any>, saved: Record<string, any>, text: string, lang: unknown, page = "",
+  thread: Record<string, any>, saved: Record<string, any>, text: string, lang: unknown, page = "", ip = "",
 ): Promise<Record<string, any> | null> {
 
   const data = await loadChatBotData();
@@ -3158,7 +3158,24 @@ async function answerWithBot(
 
   if (!reply) return null;
 
-  const bodyText = serializeBotReply(reply, botLang(lang)).slice(0, 4000);
+  // Номер замовлення й телефон в одному повідомленні — перевіряємо
+  // стан самі, ТІЄЮ САМОЮ дорогою, що сторінка «Де моє замовлення»:
+  // спільний ліміт звернень, номер + телефон мусять збігтися. Не вийшло
+  // (ліміт, база) — лишається запасний текст із посиланням на сторінку.
+  if (reply.lookup) {
+    try {
+      const clean = cleanLookup({ order_number: reply.lookup.orderNumber, phone: reply.lookup.phone });
+      if (clean.ok && (await lookupAllowed(ip))) {
+        const order = await findOrderByNumber(clean.orderNumber);
+        const found = order && phoneMatches(order.phone, clean.phone) ? publicOrderView(order) : null;
+        reply.text = lookupReplyText(found, reply.lang || botLang(lang));
+      }
+    } catch (error) {
+      console.error("Чат: перевірка замовлення не вдалася:", error);
+    }
+  }
+
+  const bodyText = serializeBotReply(reply, reply.lang || botLang(lang)).slice(0, 4000);
 
   const row = await insertChatMessage(thread.id, BOT_AUTHOR, bodyText, null, true);
 

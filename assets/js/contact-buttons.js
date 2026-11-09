@@ -966,10 +966,17 @@
             '  <p>Напишіть, що вас цікавить — розмір, наявність, доставка.</p>',
             '  <p>Бот-помічник відповість одразу, менеджер — щодня 09:00–20:00. Відповідь прийде сюди ж, цю сторінку можна не тримати відкритою.</p>',
             '  <div class="chat-chips chat-chips-start">',
-            '    <button type="button" class="chat-chip">Підібрати річ</button>',
-            '    <button type="button" class="chat-chip">Доставка</button>',
-            '    <button type="button" class="chat-chip">Оплата</button>',
-            '    <button type="button" class="chat-chip">Оригінальність</button>',
+            // На сторінці товару — питання саме про нього: бот відповідає
+            // з картки цього товару (chat-bot.js, productAnswer).
+            /\/p\/[^/]+\/?$/.test(location.pathname)
+                ? '    <button type="button" class="chat-chip">Є в наявності?</button>' +
+                  '    <button type="button" class="chat-chip">Які кольори?</button>' +
+                  '    <button type="button" class="chat-chip">Покажи схожі</button>' +
+                  '    <button type="button" class="chat-chip">Доставка</button>'
+                : '    <button type="button" class="chat-chip">Підібрати річ</button>' +
+                  '    <button type="button" class="chat-chip">Доставка</button>' +
+                  '    <button type="button" class="chat-chip">Оплата</button>' +
+                  '    <button type="button" class="chat-chip">Оригінальність</button>',
             '  </div>',
             '</div>'
         ].join("");
@@ -1026,7 +1033,9 @@
         img.alt = "";
         img.width = 56;
         img.height = 56;
-        img.loading = "lazy";
+        // Без lazy: усередині прокручуваної панелі він спрацьовував
+        // ненадійно (на проді дві з чотирьох мініатюр лишались порожніми),
+        // а мініатюр щонайбільше чотири по 3–5 КБ.
 
         var slug = (шляхТовару(адреса).match(/\/p\/([^/?#]+)/) || [])[1];
         if (slug) фото(decodeURIComponent(slug)).then(function (src) { if (src) img.src = src; else img.remove(); });
@@ -1627,6 +1636,22 @@
         підпис.textContent = "";
         підпис.className = "chat-note";
 
+        // Три крапки, поки сервер думає: відповідь бота приходить за
+        // секунду-дві, і без знаку здається, що нічого не відбувається.
+        var друкує = document.createElement("div");
+        друкує.className = "chat-msg chat-msg-bot chat-typing";
+        друкує.setAttribute("role", "status");
+        var крапки = document.createElement("div");
+        крапки.className = "chat-msg-body chat-bot-body";
+        крапки.innerHTML = '<span class="chat-typing-dots" aria-hidden="true"><i></i><i></i><i></i></span>';
+        var підписДрук = document.createElement("span");
+        підписДрук.className = "dock-sr";
+        підписДрук.textContent = "Бот друкує…";
+        крапки.appendChild(підписДрук);
+        друкує.appendChild(крапки);
+        стрічка.appendChild(друкує);
+        донизу();
+
         var дані = await запит({
             site_action: "chat-send",
             thread: нитка,
@@ -1635,6 +1660,8 @@
             // Мовою сторінки відповідає бот-помічник.
             lang: (window.I18N && window.I18N.lang) || "uk"
         });
+
+        друкує.remove();
 
         if (дані && дані.ok) {
 
