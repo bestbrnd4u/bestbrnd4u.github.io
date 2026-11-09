@@ -1026,7 +1026,9 @@
         img.alt = "";
         img.width = 56;
         img.height = 56;
-        img.loading = "lazy";
+        // Без lazy: усередині прокручуваної панелі він спрацьовував
+        // ненадійно (на проді дві з чотирьох мініатюр лишались порожніми),
+        // а мініатюр щонайбільше чотири по 3–5 КБ.
 
         var slug = (шляхТовару(адреса).match(/\/p\/([^/?#]+)/) || [])[1];
         if (slug) фото(decodeURIComponent(slug)).then(function (src) { if (src) img.src = src; else img.remove(); });

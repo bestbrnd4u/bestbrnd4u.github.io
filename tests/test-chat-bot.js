@@ -63,6 +63,18 @@ console.log("\n[1] Довідка для бота");
         (fromPage.find(f => !page.includes(f.a.replace(/\s+/g, " ").slice(0, 60))) || {}).q);
     check("юридичні відповіді лише українською (переклад не чинний)",
         data.faq.uk.some(f => f.page === "/return-warranty") && !data.faq.en.some(f => f.page === "/return-warranty"));
+    // Мініатюра в чаті — 56 px: копія на 300 px (3–5 КБ), а не оригінал
+    // (55–145 КБ). На проді 09.11.2026 дві з чотирьох оригінальних
+    // мініатюр не встигали зʼявитись. І кожна мусить існувати.
+    const missingImg = data.products.filter(p => p.image && !fs.existsSync(path.join(ROOT, decodeURI(p.image))));
+    check("кожна мініатюра — справжній файл", missingImg.length === 0, missingImg.slice(0, 2).map(p => p.image).join(", "));
+    const variants = new Set(JSON.parse(read("data/image-variants.json")));
+    const heavy = data.products.filter(p => {
+        const orig = p.image.replace(/-300\.webp$/, ".webp").split("/").pop();
+        return variants.has(orig) && !/-300\.webp$/.test(p.image);
+    });
+    check("де є копія на 300 px — бот бере її", heavy.length === 0, heavy.slice(0, 2).map(p => p.image).join(", "));
+    check("мініатюри в чаті без lazy (у прокручуваній панелі він підводив)", !/chat-product-img[\s\S]{0,400}loading = "lazy"/.test(read("assets/js/contact-buttons.js")));
     const notif = JSON.parse(read("data/notifications.json"));
     check("вимикач з адмінки доходить до довідки", data.enabled === (notif.chatBot !== false));
 }
