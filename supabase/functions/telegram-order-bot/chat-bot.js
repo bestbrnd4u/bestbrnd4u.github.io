@@ -223,6 +223,7 @@ const SMALL = [
     { key: "bye", stems: ["до побачення", "бувай", "до зустрічі", "на все добре", "гарного дня", "гарного вечора", "до свидания", "пока$", "всего доброго", "хорошего дня", "bye", "goodbye", "see you", "have a nice day"] },
     { key: "about-bot", stems: ["ти бот", "ви бот", "це бот", "ты бот", "вы бот", "это бот", "робот", "з ким я", "с кем я", "хто ти", "хто ви", "кто ты", "кто вы", "що ти вмієш", "що ви вмієте", "що можеш", "чем можешь", "что умеешь", "что ты умеешь", "чим можеш", "чим допоможеш", "are you a bot", "are you human", "are you real", "is this a bot", "who are you", "what can you do", "how can you help", "можеш допомогти", "можете допомогти", "чим можете", "з чим ти", "з чим ви", "чем можете", "с чем ты", "с чем вы", "допоможіть", "допоможи", "допомога", "потрібна допомога", "помогите", "помощь", "нужна помощь", "help$", "need help", "help me"] },
     { key: "compliment", stems: ["класн", "клас$", "круто", "крут$", "молодц", "дуже гарн", "гарний магазин", "гарний сайт", "подобаєт", "сподобал", "нравит", "понравил", "люблю ваш", "відмінн", "отличн", "супер магазин", "nice shop", "great shop", "love your", "love this", "awesome", "amazing", "well done", "good job"] },
+    { key: "anyone", stems: ["є хтось", "хтось є", "хтось тут", "ви тут", "ви на зв", "на звʼязку?", "алло", "ау$", "есть кто", "кто-нибудь", "вы тут", "вы здесь", "anyone there", "is anyone", "are you there", "hello?"] },
     { key: "smalltalk", stems: ["як справи", "як ти", "як ви", "як життя", "как дела", "как ты", "как вы", "how are you", "how's it going", "what's up"] },
     { key: "ack", stems: ["ок$", "окей", "ok$", "okay", "оке$", "добре$", "гаразд", "зрозуміл", "ясно", "чудово", "супер", "клас$", "понятно", "хорошо", "ладно", "отлично", "got it", "fine$", "great$", "cool$", "perfect", "alright", "sounds good", "так$", "ні$", "да$", "нет$", "yes$", "no$", "ага$", "угу$", "дяку", "спасиб", "благодар", "thank", "thx", "ty$", "ні дякую", "нет спасибо", "no thanks"] }
 ];
@@ -426,9 +427,11 @@ export function describeWish(wish, lang) {
     if (lang === "en" && wish.brand) parts.push(wish.brand);
     const modelName = wish.models && wish.models.names && wish.models.names.join(" ");
     if (!wish.type && modelName) parts.push(lang === "en" ? `${modelName} models` : `${lang === "ru" ? "модели" : "моделі"} ${modelName}`);
+    else if (wish.style && STYLES.find(x => x.key === wish.style)) parts.push(STYLES.find(x => x.key === wish.style).name[lang]);
     else parts.push(wish.type ? D.type[wish.type] : (wish.fresh ? D.fresh : T5[lang].things));
     if (wish.type && modelName) parts.push(modelName);
     if (lang !== "en" && wish.brand) parts.push(wish.brand);
+    if (wish.material) parts.push({ leather: { uk: "зі шкіри", en: "leather", ru: "из кожи" }, vegan: { uk: "з екошкіри", en: "vegan leather", ru: "из экокожи" } }[wish.material][lang]);
     if (wish.size) parts.push(lang === "en" ? `size ${wish.size}` : `${wish.size} ${lang === "ru" ? "размера" : "розміру"}`);
     if (wish.sale && !wish.fresh) parts.push(D.sale);
     if (wish.budget && wish.budget.max) parts.push(`${D.upTo} ${botMoney(wish.budget.max)}`);
@@ -528,6 +531,57 @@ export function lastShownSlugs(history) {
     return String(last.body).split("\n").map(l => (l.match(/\/p\/([^/\s?#]+)\//) || [])[1]).filter(Boolean)
         .map(x => { try { return decodeURIComponent(x); } catch (e) { return x; } });
 }
+
+const T9 = {
+    uk: {
+        phone: "Дякую! Передаю ваш номер менеджеру — він передзвонить вам найближчим часом (щодня 09:00–20:00).",
+        sorryBot: "Вибачте, що не вийшло зрозуміти 🙏 Передаю розмову менеджеру — він відповість тут. А поки можете написати коротко, що шукаєте: «чорна сумка до 8000».",
+        anyone: "Так, я тут! 🙂 Я бот-помічник, а менеджер бачить цю розмову й підключиться, якщо треба. Чим допомогти?",
+        sizeGuide: "На сторінці кожного товару з розмірами є кнопка «Таблиця розмірів» — там мірки. Якщо сумніваєтесь між двома розмірами, напишіть сюди довжину стопи чи звичний розмір — менеджер підкаже."
+    },
+    en: {
+        phone: "Thank you! I'm passing your number to a manager — they will call you back shortly (daily 09:00–20:00, Kyiv time).",
+        sorryBot: "Sorry I couldn't get that 🙏 I'm passing the chat to a manager — they will reply here. Meanwhile you can write briefly what you're looking for: “black bag under 8000”.",
+        anyone: "Yes, I'm here! 🙂 I'm the assistant bot, and a manager sees this chat and will join if needed. How can I help?",
+        sizeGuide: "Every product page with sizes has a “Size chart” button with the measurements. If you're between two sizes, write your foot length or usual size here — a manager will advise."
+    },
+    ru: {
+        phone: "Спасибо! Передаю ваш номер менеджеру — он перезвонит вам в ближайшее время (ежедневно 09:00–20:00).",
+        sorryBot: "Извините, что не получилось понять 🙏 Передаю разговор менеджеру — он ответит здесь. А пока можете написать коротко, что ищете: «черная сумка до 8000».",
+        anyone: "Да, я здесь! 🙂 Я бот-помощник, а менеджер видит этот чат и подключится, если нужно. Чем помочь?",
+        sizeGuide: "На странице каждого товара с размерами есть кнопка «Таблица размеров» — там мерки. Если сомневаетесь между двумя размерами, напишите сюда длину стопы или привычный размер — менеджер подскажет."
+    }
+};
+
+const T10 = {
+    uk: {
+        bargain: "Персональну знижку може погодити лише менеджер — передаю йому ваше питання. Діючі акції й знижки вже зараз — тут: {url}",
+        photos: "Додаткові фото чи відео надішле менеджер — передаю йому ваше прохання. Він відповість тут же.",
+        wholesale: "Щодо опту краще домовитись із менеджером — передаю йому вашу розмову.",
+        restock: "Коли буде поповнення, точно скаже менеджер — передаю питання. Якщо річ потрібна вже, можемо привезти її під замовлення.",
+        weekend: "Так, працюємо {hours} — без вихідних. Бот відповідає цілодобово 🙂"
+    },
+    en: {
+        bargain: "Only a manager can approve a personal discount — I'm passing your question on. Current sales and discounts are here: {url}",
+        photos: "A manager will send more photos or a video — I'm passing your request on. They will reply right here.",
+        wholesale: "For wholesale it's best to talk to a manager — I'm passing the chat to them.",
+        restock: "A manager will tell you exactly when it's restocked — I'm passing your question on. If you need it now, we can bring it to order.",
+        weekend: "Yes, we work {hours} — no days off. The bot answers around the clock 🙂"
+    },
+    ru: {
+        bargain: "Персональную скидку может согласовать только менеджер — передаю ему ваш вопрос. Действующие акции и скидки уже сейчас — здесь: {url}",
+        photos: "Дополнительные фото или видео пришлет менеджер — передаю ему вашу просьбу. Он ответит здесь же.",
+        wholesale: "По опту лучше договориться с менеджером — передаю ему ваш разговор.",
+        restock: "Когда будет пополнение, точно скажет менеджер — передаю вопрос. Если вещь нужна уже, можем привезти ее под заказ.",
+        weekend: "Да, работаем {hours} — без выходных. Бот отвечает круглосуточно 🙂"
+    }
+};
+
+const T11 = {
+    uk: { compare: "Обидва бренди — оригінал, тож вибір за смаком 🙂 Ось по дві моделі {a} і {b}, щоб порівняти 👇", noStyle: "{What} зараз немає 😔 Ось інші сумки, які можуть підійти 👇" },
+    en: { compare: "Both brands are authentic, so it's a matter of taste 🙂 Here are two {a} and two {b} models to compare 👇", noStyle: "{What} aren't available right now 😔 Here are other bags that might suit you 👇" },
+    ru: { compare: "Оба бренда — оригинал, так что выбор по вкусу 🙂 Вот по две модели {a} и {b}, чтобы сравнить 👇", noStyle: "{What} сейчас нет 😔 Вот другие сумки, которые могут подойти 👇" }
+};
 
 // Назви типів для фрази «Сумок Prada зараз немає».
 const TYPE_WORDS = {
@@ -672,6 +726,32 @@ export function parseBudget(text) {
 
 }
 
+// ── Фасон сумки ───────────────────────────────────────────────────
+
+const STYLES = [
+    { key: "crossbody", stems: ["крос-боді", "кросбоді", "кросс-боди", "кроссбоди", "через плече", "через плечо", "crossbody", "cross-body"], re: /crossbody|cross-body|крос-боді|кросбоді/i, name: { uk: "сумки крос-боді", en: "crossbody bags", ru: "сумки кросс-боди" }, none: { uk: "сумок крос-боді", ru: "сумок кросс-боди" } },
+    { key: "tote", stems: ["шопер", "тоут", "tote", "shopper", "велика сумка", "большая сумка"], re: /tote|shopper|шопер/i, name: { uk: "шопери", en: "totes", ru: "шоперы" }, none: { uk: "шоперів", ru: "шоперов" } },
+    { key: "clutch", stems: ["клатч", "clutch"], re: /clutch|клатч/i, name: { uk: "клатчі", en: "clutches", ru: "клатчи" }, none: { uk: "клатчів", ru: "клатчей" } },
+    { key: "mini", stems: ["міні", "маленьк", "мини", "маленьк", "mini$", "small bag", "tiny"], re: /mini|міні|small|маленьк/i, name: { uk: "маленькі сумки", en: "small bags", ru: "маленькие сумки" }, none: { uk: "маленьких сумок", ru: "маленьких сумок" } },
+    { key: "shoulder", stems: ["на плече", "на плечо", "shoulder bag"], re: /shoulder|на плече/i, name: { uk: "сумки на плече", en: "shoulder bags", ru: "сумки на плечо" }, none: { uk: "сумок на плече", ru: "сумок на плечо" } },
+    { key: "chain", stems: ["на ланцюж", "ланцюжк", "на цепоч", "цепочк", "chain"], re: /chain|ланцюж/i, name: { uk: "сумки на ланцюжку", en: "chain bags", ru: "сумки на цепочке" }, none: { uk: "сумок на ланцюжку", ru: "сумок на цепочке" } },
+    { key: "belt", stems: ["бананк", "поясн сумк", "поясна", "поясная", "belt bag", "fanny", "waist bag"], re: /belt bag|поясн|бананк|racer/i, name: { uk: "поясні сумки", en: "belt bags", ru: "поясные сумки" }, none: { uk: "поясних сумок", ru: "поясных сумок" } },
+    { key: "bucket", stems: ["сумка-мішок", "мішок", "мешок", "bucket"], re: /bucket|мішок/i, name: { uk: "сумки-мішки", en: "bucket bags", ru: "сумки-мешки" }, none: { uk: "сумок-мішків", ru: "сумок-мешков" } },
+    { key: "backpack", stems: ["рюкзак", "backpack"], re: /backpack|рюкзак/i, name: { uk: "рюкзаки", en: "backpacks", ru: "рюкзаки" }, none: { uk: "рюкзаків", ru: "рюкзаков" } }
+];
+
+// Бренди в повідомленні — усі (для «Coach чи Michael Kors?»).
+export function findBrands(text, data) {
+    const raw = " " + normalizeText(text) + " ";
+    const brands = [...new Set(((data && data.products) || []).map(p => p.brand).filter(Boolean))];
+    return brands.filter(b => {
+        const n = normalizeText(b);
+        const longest = n.split(" ").sort((x, y) => y.length - x.length)[0];
+        return raw.includes(" " + n + " ") || (longest.length > 4 && raw.includes(" " + longest))
+            || (BRAND_ALIASES[b] || []).some(a => raw.includes(" " + a));
+    });
+}
+
 // ── Назва моделі ──────────────────────────────────────────────────
 
 // Слова з назв, що НЕ є назвою моделі: тип, стать, колір, загальне.
@@ -775,6 +855,16 @@ export function parseWish(text, data) {
     if (hasStem(list, ["найдешевш", "найбюджетн", "самые дешев", "самый дешев", "cheapest"])) wish.cheap = true;
     if (hasStem(list, ["найдорожч", "найдорожчий", "самые дорог", "самый дорог", "most expensive", "преміум", "премиум", "premium", "найкращ", "лучш", "best$"])) wish.pricey = true;
 
+    // Матеріал: «шкіряна», «з натуральної шкіри» — справжня шкіра;
+    // «веганська», «екошкіра» — штучна. Порядок важливий: «екошкіра»
+    // містить «шкір».
+    if (hasStem(list, ["веган", "екошкір", "еко-шкір", "екошкіра", "штучн", "экокож", "эко-кож", "искусствен", "vegan", "faux", "pu$"])) wish.material = "vegan";
+    else if (hasStem(list, ["шкір", "натуральн шкір", "кожан", "кожа$", "кожи$", "из кожи", "leather"])) wish.material = "leather";
+
+    // Фасон сумки — зі слів людини, у назвах і ключових словах товарів.
+    const style = STYLES.find(st => hasStem(list, st.stems));
+    if (style) wish.style = style.key;
+
     // «Tabby є?», «а Snapshot?», «GG0516S» — назва моделі.
     const models = findModels(text, data);
     if (models) wish.models = models;
@@ -794,7 +884,10 @@ export function parseWish(text, data) {
 
     const wants = hasStem(list, ["шука", "ищу", "хочу", "хоті", "хотел", "підбер", "подбер", "підібр", "подобр", "порад", "посовет", "покаж", "что есть", "що є", "є ", "есть ", "looking", "want", "need", "recommend", "suggest", "show", "pick", "any "]);
 
-    const criteria = ["type", "gender", "color", "brand", "budget", "models", "size"].filter(k => wish[k]).length;
+    const criteria = ["type", "gender", "color", "brand", "budget", "models", "size", "material", "style"].filter(k => wish[k]).length;
+    // Фасон чи матеріал без типу — це про сумки (інших шкіряних
+    // крос-боді в каталозі немає).
+    if ((wish.style || wish.material === "vegan") && !wish.type) wish.type = "bags";
 
     if (!criteria && !wish.gift && !wish.fresh && !wish.sale && !wish.more && !wish.cheap && !wish.pricey && !wants) return null;
 
@@ -830,6 +923,23 @@ function matches(product, wish, now, relax) {
     if (wish.brand && product.brand !== wish.brand) return false;
 
     if (wish.models && !wish.models.has(product.slug)) return false;
+
+    if (wish.material) {
+        const m = String((product.details && product.details.material && product.details.material.uk) || "");
+        const vegan = /веган|еко|поліуретан|штучн/i.test(m);
+        if (wish.material === "vegan" && !vegan) return false;
+        // «Фірмовий покритий канвас та шкіра», «жакард, шкіряне
+        // оздоблення» — шкіра тут лише в деталях. На «з натуральної шкіри»
+        // людина чекає шкіряну сумку.
+        const notMain = /^(фірмов|монограмн|денім|штучне хутро|100% поліестер)/i.test(m.trim());
+        if (wish.material === "leather" && (vegan || notMain || !/шкір/i.test(m))) return false;
+    }
+
+    if (wish.style) {
+        const st = STYLES.find(x => x.key === wish.style);
+        const hay = [product.title && product.title.uk, product.title && product.title.en, product.keywords].join(" ");
+        if (st && !st.re.test(hay)) return false;
+    }
 
     // Розмір — лише в моделях, де він узагалі є (у наявності чи під
     // замовлення: «під замовлення» видно в картці).
@@ -903,12 +1013,12 @@ export function mergeWishes(current, previous) {
     for (const prev of previous) {
         if (!prev) continue;
         if (current.type && prev.type && prev.type !== current.type) break;
-        ["type", "gender", "brand", "color", "budget", "size"].forEach(k => {
+        ["type", "gender", "brand", "color", "budget", "size", "material", "style"].forEach(k => {
             if (out[k] === undefined && prev[k] !== undefined) out[k] = prev[k];
         });
     }
 
-    out.criteria = ["type", "gender", "color", "brand", "budget", "models", "size"].filter(k => out[k]).length;
+    out.criteria = ["type", "gender", "color", "brand", "budget", "models", "size", "material", "style"].filter(k => out[k]).length;
 
     return out;
 
@@ -923,12 +1033,12 @@ const TOPICS = [
     { key: "delivery-time", stems: ["як швидко", "коли відправ", "скільки йде", "скільки їде", "термін доставк", "строк доставк", "как быстро", "когда отправ", "сколько идет", "срок доставк", "how fast", "how quickly", "when will", "how long", "ship"], faq: /Як швидко|How quickly|How fast|Как быстро/i },
     { key: "delivery", stems: ["доставк", "нова пошт", "новой почт", "новая почт", "відправк", "отправк", "delivery", "shipping", "nova poshta", "courier", "кур'єр", "курьер", "поштомат", "почтомат"], faq: /Скільки коштує доставка|How much does delivery|Сколько стоит доставка/i },
     { key: "payment", stems: ["оплат", "оплач", "карт", "готівк", "наличн", "накладен", "післяплат", "наложен", "payment", "pay ", "card", "cash", "cod"], faq: /оплатити карткою|pay by card|pay online|оплатить картой/i },
-    { key: "inspect", stems: ["оглян", "огляд", "осмотр", "посмотреть перед", "inspect", "check before"], faq: /оглянути|inspect|осмотреть/i },
+    { key: "inspect", stems: ["оглян", "огляд", "осмотр", "посмотреть перед", "inspect", "check before", "приміря", "примiря", "примеря", "примерит", "примерять", "примерк", "примірк", "try on", "try it on"], faq: /оглянути|inspect|осмотреть/i },
     { key: "fake", always: true, stems: ["оригінал", "оригинал", "підробк", "подделк", "реплік", "реплик", "фейк", "fake", "replica", "original", "authentic", "genuine", "справжн", "настоящ", "real$"], faq: /репліки|replicas|реплики/i },
     { key: "source", stems: ["звідки", "откуда", "where do you", "where from", "де купу", "где покупа"], faq: /Звідки ви привозите|Where do you|Откуда вы привозите/i },
     { key: "doubt", stems: ["сумнів", "сомнева", "doubt", "перевір оригін", "проверить оригин"], faq: /сумніваюся|doubt|сомневаюсь/i },
     { key: "returns", stems: ["поверн", "возврат", "вернут", "обмін", "обмен", "не підійш", "не подош", "не підходит", "return", "refund", "exchange", "doesn't fit", "didn't fit"], faq: /Що робити, якщо товар не підійшов|What if the item|What to do if the item|Что делать, если товар не подош/i, legal: true },
-    { key: "store", stems: ["магазин", "шоурум", "showroom", "офлайн", "offline", "адрес", "address", "самовивіз", "самовывоз", "забрат", "pickup", "pick up", "приїхат", "приехать"], faq: /фізичний магазин|physical store|физический магазин/i },
+    { key: "store", stems: ["знаходит", "находит", "де ви$", "где вы$", "в якому місті", "в каком городе", "where are you", "where is your store", "located", "магазин", "шоурум", "showroom", "офлайн", "offline", "адрес", "address", "самовивіз", "самовывоз", "забрат", "pickup", "pick up", "приїхат", "приехать"], faq: /фізичний магазин|physical store|физический магазин/i },
     { key: "buyer", stems: ["байєр", "байер", "під замовлен", "под заказ", "привез", "немає в каталоз", "нет в каталог", "buyer", "to order", "not in the catalog", "з сша", "из сша", "from the us", "from usa"], faq: /Чи можна замовити річ, якої немає|order an item that|заказать вещь, которой нет/i }
 ];
 
@@ -1279,6 +1389,13 @@ export function botReply(message, history, data, options) {
         return reply(T4[lang].aboutBot, { chips: L.chips.menu, intent: "about-bot" });
     }
 
+    // 1в. Номер телефону в повідомленні («мій номер 067…», «передзвоніть
+    // 0501234567»): людина чекає дзвінка. Номер замовлення (теж 10 цифр)
+    // з нуля не починається, тож їх не сплутати.
+    if (/(?:^|[^\d])(?:\+?38)?0\d{2}[\s-]?\d{3}[\s-]?\d{2}[\s-]?\d{2}(?!\d)/.test(text)) {
+        return reply(T9[lang].phone, { handoff: true, intent: "handoff" });
+    }
+
     // 1. Людина просить людину.
     if (hasStem(list, ["менеджер", "оператор", "людин", "человек", "живий", "живой", "покликат", "позват", "manager", "human", "operator", "real person", "агент", "agent", "передзвон", "перезвон", "call me", "call back"])) {
         return reply(fill(L.handoff, { hours }), { handoff: true, intent: "handoff" });
@@ -1298,6 +1415,31 @@ export function botReply(message, history, data, options) {
     // це вже не довідка, а можлива проблема.
     if (hasStem(list, LOST) && !criteria) {
         return reply(fill(T4L.lost, { url: pageUrl(site, "/order-status", lang) }), { handoff: true, intent: "status" });
+    }
+
+    // 1г. Невдоволення самим ботом — вибачитись і покликати людину.
+    if (hasStem(list, ["тупий", "тупой", "дурний", "дурной", "не розумієш", "не розумієте", "не понимаешь", "не понимаете", "марний", "бесполезн", "безглузд", "stupid", "useless", "dumb", "you don't understand", "you do not understand", "не той", "не то$", "не те$"])) {
+        return reply(T9[lang].sorryBot, { handoff: true, intent: "sorry" });
+    }
+
+    // 1д. Питання, які вирішує лише людина: персональна знижка, більше
+    // фото, опт, поповнення. Бот каже, що далі менеджер, і що може
+    // показати сам (акції).
+    const PERSONAL = [
+        { key: "bargain", stems: ["дайте знижк", "зробіть знижк", "зробите знижк", "можна знижк", "можна зі знижк", "а знижку", "скинете", "скиньте", "скинути ціну", "торг", "поторгу", "дадите скидк", "сделаете скидк", "можно скидк", "скинете цену", "уступите", "give me a discount", "can you give a discount", "any discount for me", "negotiable", "best price"] },
+        { key: "photos", stems: ["більше фото", "ще фото", "живі фото", "реальні фото", "відео", "больше фото", "еще фото", "живые фото", "реальные фото", "видео", "more photos", "more pictures", "real photos", "video"] },
+        { key: "wholesale", stems: ["опт$", "оптом", "оптов", "дропшип", "дроп$", "wholesale", "bulk", "dropship"] },
+        { key: "restock", stems: ["поповнен", "коли привезете", "коли буде в наявн", "коли зʼявиться", "коли з'явиться", "коли появиться", "пополнен", "когда привезете", "когда будет в налич", "когда появится", "restock", "back in stock", "when will it be available"] }
+    ];
+    const personal = PERSONAL.find(p => hasStem(list, p.stems));
+    if (personal) {
+        return reply(fill(T10[lang][personal.key], { url: pageUrl(site, "/aktsii/", lang) }), { handoff: true, intent: "handoff" });
+    }
+
+    // 1е. «Працюєте у вихідні / в неділю?» — графік зі сторінки «Контакти».
+    if (hasStem(list, ["вихідн", "неділ", "субот", "свят", "выходн", "воскресен", "суббот", "праздник", "weekend", "sunday", "saturday", "holiday"])
+        && hasStem(list, ["працює", "працюєте", "відповіда", "работает", "работаете", "отвечает", "open", "work", "are you"])) {
+        return reply(fill(T10[lang].weekend, { hours: HOURS[lang] }), { chips: L.chips.menu.slice(0, 3), intent: "contacts" });
     }
 
     // 2. Де моє замовлення.
@@ -1364,6 +1506,7 @@ export function botReply(message, history, data, options) {
         return reply(thanks ? T4L.thanks : T4L.ack, { intent: "ack" });
     }
     if (small === "bye") return reply(T4L.bye, { intent: "bye" });
+    if (small === "anyone") return reply(T9[lang].anyone, { chips: L.chips.menu.slice(0, 3), intent: "smalltalk" });
     if (small === "compliment") return reply(T4L.compliment, { intent: "ack" });
     if (small === "smalltalk") return reply(T4L.smalltalk, { chips: L.chips.menu.slice(0, 3), intent: "smalltalk" });
     if (small === "about-bot") return reply(T4L.aboutBot, { chips: L.chips.menu, intent: "about-bot" });
@@ -1371,6 +1514,11 @@ export function botReply(message, history, data, options) {
     if (!criteria && list.length <= 4 && hasStem(list, GREETINGS)) {
         return reply(fill(T5[lang].hello, { greet: greet || T5[lang].hello.split("!")[0] || "Вітаю" }).replace(/^\{greet\}/, ""),
             { chips: L.chips.menu, intent: "hello" });
+    }
+
+    // 2д'. Як підібрати розмір: таблиця є на сторінці товару.
+    if (hasStem(list, ["розмірна сітк", "розмірну сітк", "таблиц розмір", "таблиця розмір", "як підібрати розмір", "як обрати розмір", "маломір", "великомір", "размерная сетк", "размерную сетк", "таблиц размер", "как подобрать размер", "как выбрать размер", "маломер", "большемер", "size chart", "size guide", "what size", "which size", "fit true to size", "true to size"])) {
+        return reply(T9[lang].sizeGuide, { chips: [L.chips.human], intent: "faq" });
     }
 
     // 2д. Як оформити замовлення.
@@ -1441,7 +1589,15 @@ export function botReply(message, history, data, options) {
         }
         const item = faq.find(f => topic.faq.test(f.q)) || faqByWords(text, faq);
         if (item) {
-            return reply(`${item.a}\n${L.faqMore} ${pageUrl(site, item.page, lang)}`, { chips: L.chips.menu.slice(0, 5), intent: "faq" });
+            let answer = item.a;
+            // На сайті питання «Чи є фізичний магазин?» і відповідь
+            // починається з «Ні,». На «де ви знаходитесь?» таке «Ні»
+            // звучить як відмова відповідати — прибираємо його.
+            if (topic.key === "store" && hasStem(list, ["знаходит", "находит", "де ви$", "где вы$", "в якому місті", "в каком городе", "where are you", "located"])) {
+                answer = answer.replace(/^(Ні|Нет|No)[,.]\s*/i, "");
+                answer = answer.charAt(0).toUpperCase() + answer.slice(1);
+            }
+            return reply(`${answer}\n${L.faqMore} ${pageUrl(site, item.page, lang)}`, { chips: L.chips.menu.slice(0, 5), intent: "faq" });
         }
     }
 
@@ -1518,6 +1674,23 @@ export function botReply(message, history, data, options) {
         }
     }
 
+    // 3г. «Що краще, Coach чи Michael Kors?» — по дві моделі кожного.
+    // Сказати «кращий» бот не може й не має: обидва оригінальні, вибір —
+    // за смаком, тож показуємо поруч.
+    const both = findBrands(text, data);
+    if (both.length === 2 && hasStem(list, ["чи$", "або$", "или$", "or$", "vs$", "versus", "порівня", "сравн", "compare", "краще", "лучше", "better"])) {
+        const cw = parseWish(text, data) || {};
+        if (!cw.type && both.every(b => (data.products || []).some(p => p.brand === b && p.department === "Сумки"))) cw.type = "bags";
+        const pick2 = b => pickProducts(Object.assign({}, cw, { brand: b, models: undefined }), data, now, 0).items.slice(0, 2);
+        const pair = both.flatMap(pick2);
+        if (pair.length) {
+            return reply(fill(T11[lang].compare, { a: both[0], b: both[1] }), { products: pair.map(p => ({
+                slug: p.slug, title: (p.title && (p.title[lang] || p.title.uk)) || p.slug, price: botPriceNow(p, now),
+                url: pageUrl(site, `/p/${p.slug}/`, lang), preOrder: Boolean(p.preOrder || !p.inStock)
+            })), chips: [both[0], both[1], L.chips.more[1]], intent: "products" });
+        }
+    }
+
     // 4. Підбір товару.
     let wish = parseWish(text, data);
 
@@ -1563,6 +1736,21 @@ export function botReply(message, history, data, options) {
         }
 
         const picked = pickProducts(wish, data, now, offset);
+
+        if (!picked.items.length && wish.style) {
+            const st = STYLES.find(x => x.key === wish.style);
+            const other = pickProducts(Object.assign({}, wish, { style: undefined }), data, now, 0);
+            if (st && other.items.length) {
+                // Після «немає» — родовий відмінок: «рюкзаків», а не «рюкзаки».
+                const what = (st.none && st.none[lang]) || st.name[lang];
+                return reply(fill(T11[lang].noStyle, { What: what.charAt(0).toUpperCase() + what.slice(1) }), {
+                    products: other.items.map(p => ({
+                        slug: p.slug, title: (p.title && (p.title[lang] || p.title.uk)) || p.slug, price: botPriceNow(p, now),
+                        url: pageUrl(site, `/p/${p.slug}/`, lang), preOrder: Boolean(p.preOrder || !p.inStock)
+                    })), chips: [L.chips.more[1]], intent: "missing"
+                });
+            }
+        }
 
         if (!picked.items.length && wish.size) {
             // «40-й є?», а сорокового немає: які розміри Є — одразу.

@@ -569,5 +569,65 @@ console.log("\n[15] Моделі, розміри, сортування, «дру
     check("«привіт» на /ru/ — українською", bot.detectLang("привіт, є чорні сумки?", "ru") === "uk");
 }
 
+console.log("\n[16] Матеріал, фасон, порівняння, «є хтось», телефон, торг");
+{
+    // Матеріал: шкіра — основний матеріал, а не оздоблення канвасу.
+    const leather = talk("uk", ["сумка з натуральної шкіри"]);
+    const mat = p => p.details.material.uk;
+    check("«з натуральної шкіри» — лише шкіряні, без канвасу й екошкіри",
+        leather.products.length > 0 && items(leather).every(p => /шкір/i.test(mat(p)) && !/веган|еко|поліуретан|штучн/i.test(mat(p)) && !/^(фірмов|монограмн)/i.test(mat(p))),
+        items(leather).map(mat).join(" | "));
+    // Уся підбірка, а не перші чотири: вони й так шкіряні за сортуванням,
+    // і канвас із шкіряним оздобленням ховався б далі.
+    const lw = bot.parseWish("сумка з натуральної шкіри", data);
+    const allLeather = [];
+    for (let o = 0; o < 200; o += 4) {
+        const page = bot.pickProducts(lw, data, NOW, o);
+        if (page.start !== o) break;
+        allLeather.push(...page.items);
+    }
+    const fake = allLeather.filter(p => /^(фірмов|монограмн)/i.test(mat(p)) || /веган|еко|поліуретан/i.test(mat(p)));
+    check(`уся підбірка «з натуральної шкіри» (${allLeather.length}) — без канвасу й екошкіри`, allLeather.length > 4 && fake.length === 0, fake.map(mat).join(" | "));
+    const vegan = talk("uk", ["веганська сумка"]);
+    check("«веганська сумка» — екошкіра", vegan.products.length > 0 && items(vegan).every(p => /веган|еко|поліуретан/i.test(mat(p))));
+
+    // Фасон.
+    const cross = talk("uk", ["крос-боді чорна"]);
+    check("«крос-боді чорна» — «Ось чорні сумки крос-боді», лише крос-боді",
+        /^Ось чорні сумки крос-боді/.test(cross.text) && items(cross).every(p => /crossbody|cross-body|крос-боді|кросбоді/i.test([p.title.uk, p.title.en, p.keywords].join(" "))), cross.text);
+    check("«шопер» — «Ось шопери»", /^Ось шопери/.test(talk("uk", ["шопер"]).text));
+    const noBackpack = !data.products.some(p => /backpack|рюкзак/i.test(p.title.uk + p.title.en + p.keywords));
+    if (noBackpack) check("«рюкзак» — «Рюкзаків зараз немає» і інші сумки", (r => /^Рюкзаків зараз немає/.test(r.text) && r.products.length > 0)(talk("uk", ["рюкзак"])));
+
+    // Порівняння двох брендів.
+    const cmp = talk("uk", ["що краще Coach чи Michael Kors?"]);
+    check("«Coach чи Michael Kors?» — обидва бренди, сумки, без «кращий»",
+        cmp.products.length === 4 && items(cmp).filter(p => p.brand === "Coach").length === 2 && items(cmp).filter(p => p.brand === "Michael Kors").length === 2
+        && items(cmp).every(p => p.department === "Сумки") && /вибір за смаком/.test(cmp.text));
+
+    // Короткі репліки.
+    check("«є хтось?» — «Так, я тут!»", /^Так, я тут/.test(talk("uk", ["є хтось?"]).text));
+    check("«ти мене не розумієш» — вибачитись і передати людині", (r => r.handoff && /Вибачте/.test(r.text))(talk("uk", ["ти мене не розумієш"])));
+
+    // Телефон — дзвінок, а не номер замовлення.
+    const phone = talk("uk", ["мій номер 067 123 45 67, передзвоніть"]);
+    check("телефон у повідомленні — «менеджер передзвонить»", phone.handoff && /передзвонить/.test(phone.text), phone.text);
+    check("«+380501234567» — теж телефон", /передзвонить/.test(talk("uk", ["+380501234567"]).text));
+    check("номер замовлення (з 8, а не 0) — як і раніше, стан замовлення", talk("uk", ["де моє замовлення 8689484479"]).intent === "status");
+
+    // Що вирішує лише людина.
+    [["uk", "дайте знижку", /Персональну знижку/], ["uk", "можна більше фото цієї сумки?", /фото/], ["uk", "оптом можна?", /опт/], ["uk", "коли буде поповнення?", /поповнення/]]
+        .forEach(([lang, q, re]) => check(`«${q}» — менеджеру з поясненням`, (r => r.handoff && re.test(r.text))(talk(lang, [q]))));
+    check("«а знижки є?» — як і раніше, товари зі знижкою (не торг)", talk("uk", ["а знижки є?"]).intent === "products");
+    check("«фото з відгуків» — не прохання надіслати фото", !/Додаткові фото/.test(talk("uk", ["фото з відгуків"]).text));
+    check("«працюєте в неділю?» — так, щодня", /без вихідних/.test(talk("uk", ["ви працюєте у неділю?"]).text));
+
+    // Примірка, «де ви», таблиця розмірів.
+    check("«можна приміряти?» — з розділу про огляд", talk("uk", ["можна приміряти?"]).intent === "faq");
+    check("ru «можно примерить?»", talk("ru", ["можно примерить?"]).intent === "faq");
+    check("«де ви знаходитесь?» — без «Ні,» на початку", (r => r.intent === "faq" && !/^Ні/.test(r.text))(talk("uk", ["де ви знаходитесь?"])));
+    check("«як підібрати розмір?» — про «Таблицю розмірів»", /Таблиця розмірів/.test(talk("uk", ["як підібрати розмір?"]).text));
+}
+
 console.log(failures ? `\n✗ Провалено: ${failures}` : "\n✓ Усе зелено");
 process.exit(failures ? 1 : 0);
