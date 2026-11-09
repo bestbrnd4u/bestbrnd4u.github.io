@@ -78,6 +78,10 @@
     // браузері — від адреси без мови й українськими рядками. canonical
     // на українську сторінку оголошував англійську її копією.
     function fixCanonical(link) {
+        // Юридична копія навмисно вказує на український оригінал (текст
+        // договору не перекладається) — збірка ставить тут позначку.
+        // Без неї цей рядок переписував /offer на /en/offer.
+        if (link.hasAttribute("data-no-i18n")) return;
         var href = link.getAttribute("href");
         var next = Core.localizeAbsolute(href, lang, location.origin);
         if (next !== href) link.setAttribute("href", next);
@@ -106,6 +110,7 @@
     function translateMeta(el) {
         var key = el.getAttribute("name") || el.getAttribute("property") || "";
         if (key === "og:url") {
+            if (el.hasAttribute("data-no-i18n")) return;
             var url = el.getAttribute("content");
             var local = Core.localizeAbsolute(url, lang, location.origin);
             if (local !== url) el.setAttribute("content", local);

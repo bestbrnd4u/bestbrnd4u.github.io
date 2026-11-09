@@ -128,6 +128,25 @@ console.log("\n[3] Браузер: те, що скрипти ставлять п
     check("новостворений canonical теж", link.getAttribute("href") === "https://dev.bestbrnd4u.com/en/catalog", link.getAttribute("href"));
     w.close();
 
+    // Юридична копія: canonical і og:url навмисно на український
+    // оригінал. ЗНАЙДЕНО НА ПРОДІ 09.11.2026: зібраний файл був
+    // правильний, а i18n.js після завантаження переписував /offer на
+    // /en/offer. Тому — справжня зібрана сторінка, справжній скрипт.
+    if (fs.existsSync(path.join(ROOT, "en/offer.html"))) {
+        const legal = new JSDOM(read("en/offer.html").replace(/<script\b[^>]*\bsrc=[^>]*><\/script>/gi, ""),
+            { url: "https://bestbrnd4u.com/en/offer", runScripts: "outside-only" });
+        const lw = legal.window;
+        lw.fetch = () => Promise.resolve({ ok: true, json: () => Promise.resolve({}) });
+        lw.eval(read("assets/js/i18n-core.js"));
+        lw.eval(read("assets/js/i18n.js"));
+        await tick();
+        const canon = lw.document.querySelector('link[rel="canonical"]').getAttribute("href");
+        const og = (lw.document.querySelector('meta[property="og:url"]') || { getAttribute: () => "https://bestbrnd4u.com/offer" }).getAttribute("content");
+        check("en/offer після скрипта: canonical і og:url — на український оригінал",
+            /\/offer$/.test(canon) && !/\/en\//.test(canon) && /\/offer$/.test(og) && !/\/en\//.test(og), `${canon} | ${og}`);
+        lw.close();
+    }
+
     builtCopies();
 })();
 
