@@ -128,6 +128,19 @@ console.log("\n[3] Браузер: те, що скрипти ставлять п
     check("новостворений canonical теж", link.getAttribute("href") === "https://dev.bestbrnd4u.com/en/catalog", link.getAttribute("href"));
     w.close();
 
+    // Сервер на будь-яку неіснуючу адресу віддає одну українську 404
+    // (lang="uk"). На /en/… мова документа мусить стати англійською.
+    {
+        const nf = new JSDOM(`<!DOCTYPE html><html lang="uk"><head></head><body><h1>Такої сторінки немає</h1></body></html>`,
+            { url: "https://bestbrnd4u.com/en/nope", runScripts: "outside-only" });
+        nf.window.fetch = () => Promise.resolve({ ok: true, json: () => Promise.resolve({}) });
+        nf.window.eval(read("assets/js/i18n-core.js"));
+        nf.window.eval(read("assets/js/i18n.js"));
+        await tick();
+        check("404 на /en/: lang документа — en", nf.window.document.documentElement.lang === "en", nf.window.document.documentElement.lang);
+        nf.window.close();
+    }
+
     // Юридична копія: canonical і og:url навмисно на український
     // оригінал. ЗНАЙДЕНО НА ПРОДІ 09.11.2026: зібраний файл був
     // правильний, а i18n.js після завантаження переписував /offer на

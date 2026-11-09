@@ -12866,10 +12866,14 @@ body.mobile-filters-open .scroll-top{
     overflow:hidden;
     padding:80px 60px;
     color:#fff;
+    /* Тут стояло фото з images.pexels.com. CSP (img-src) чужих
+       стокових адрес не пускає, тож фото не показувалось ніколи, а
+       кожне відкриття сторінки писало помилку в консоль (знайдено на
+       проді 09.11.2026). Видимий вигляд не змінюється: банер і так
+       малювався самим затемненням — тим самим напівпрозорим кольором
+       поверх фону сторінки, що й лишається тут. */
     background:
-        linear-gradient(rgba(17,24,39,.72), rgba(17,24,39,.72)),
-        url('https://images.pexels.com/photos/5745781/pexels-photo-5745781.jpeg?auto=compress&cs=tinysrgb&w=1600')
-        center/cover no-repeat;
+        linear-gradient(rgba(17,24,39,.72), rgba(17,24,39,.72));
 }
 
 /* варіант без фотографії байєр-сервісу — для інших

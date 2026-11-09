@@ -190,5 +190,41 @@ if (!built) {
     check("en: опис бренду Coach — англійською, по абзацах", about.length > 0 && about.every(p => !/[а-яіїєґ]/i.test(p)), about.find(p => /[а-яіїєґ]/i.test(p)));
 }
 
+console.log("\n[9] Речення, складені в коді з кількох рядків, перекладені цілими");
+{
+    // ЗНАЙДЕНО НА ПРОДІ 09.11.2026: банер cookie на /en/ і /ru/ показував
+    // перше речення українською. У consent.js воно записане як
+    //     "Ми використовуємо cookie … статистики" + " відвідувань, …"
+    // На сторінку потрапляє ціле речення, а в словнику лежали шматки.
+    // Так само ще 7 речень (підтвердження підписки, стан замовлення,
+    // відгуки). Обхід сторінок їх не бачив: банер лише для нових
+    // відвідувачів, решта — повідомлення про помилки.
+    const dictFile = path.join(ROOT, "data/i18n-en.json");
+    if (fs.existsSync(dictFile)) {
+        const en = Core.createTranslator(JSON.parse(fs.readFileSync(dictFile, "utf8")), "en");
+        const ru = Core.createTranslator(JSON.parse(fs.readFileSync(path.join(ROOT, "data/i18n-ru.json"), "utf8")), "ru");
+        const LIT = String.raw`(?:"(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*')`;
+        const CHAIN = new RegExp(`${LIT}(?:\\s*\\+\\s*${LIT})+`, "g");
+        const missing = [];
+        let total = 0;
+        fs.readdirSync(path.join(ROOT, "assets/js")).filter(f => f.endsWith(".js") && !/^i18n/.test(f)).forEach(f => {
+            const src = read("assets/js/" + f).replace(/^\s*\/\/.*$/gm, "");
+            for (const m of src.matchAll(CHAIN)) {
+                let parts;
+                try { parts = [...m[0].matchAll(new RegExp(LIT, "g"))].map(x => new Function("return " + x[0])()); }
+                catch (error) { continue; }
+                const text = Core.normalize(parts.join(""));
+                // Шматки розмітки («" alt="…») — не речення, їх перекладає
+                // обхід атрибутів уже на сторінці.
+                if (!/[а-яіїєґ]/i.test(text) || /[<>{}"=]/.test(text)) continue;
+                total += 1;
+                const e = en(text), r = ru(text);
+                if (e === text || /[а-яіїєґ]/i.test(e) || /[іїєґ]/i.test(r)) missing.push(`${f}: «${text.slice(0, 60)}»`);
+            }
+        });
+        check(`усі ${total} складених речень є в словнику цілими (en і ru)`, total > 5 && missing.length === 0, missing.slice(0, 4).join(" | "));
+    }
+}
+
 console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
 process.exit(failures === 0 ? 0 : 1);
