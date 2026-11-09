@@ -46,6 +46,11 @@ function fromHtml(rel, out) {
 
     const { document } = new JSDOM(html).window;
 
+    // Юридична сторінка: сам документ лишається українським — беремо
+    // лише те, що довкола (запитання, підписка, шапка). Межа — та сама,
+    // що в build-locales.js.
+    if (LEGAL.has(rel)) require("./build-locales.js").legalParts(document).forEach(el => el.remove());
+
     const walker = document.createTreeWalker(document.documentElement, 4 /* TEXT */);
 
     for (let node = walker.nextNode(); node; node = walker.nextNode()) {
@@ -83,6 +88,15 @@ function fromJs(rel, out) {
         parts.forEach(text => add(out, text, rel));
     }
 
+    // Рядки в лапках УСЕРЕДИНІ шаблонів: `${preOrder ? "Під замовлення"
+    // : "В наявності"}`. Прохід вище бере шаблон цілком і вираз у ${…}
+    // стає {*} — а самі рядки губились. Тут — лише лапки, по всьому коду.
+    for (const m of src.matchAll(/"((?:[^"\\\n]|\\.)*)"|'((?:[^'\\\n]|\\.)*)'/g)) {
+        const raw = m[1] ?? m[2] ?? "";
+        if (!CYR.test(raw) || raw.includes("<")) continue;
+        add(out, normalize(raw), rel);
+    }
+
 }
 
 function add(out, text, where) {
@@ -94,7 +108,7 @@ function collect() {
 
     const out = new Map();
 
-    fs.readdirSync(ROOT).filter(f => f.endsWith(".html") && !LEGAL.has(f)).forEach(f => fromHtml(f, out));
+    fs.readdirSync(ROOT).filter(f => f.endsWith(".html")).forEach(f => fromHtml(f, out));
 
     // Шаблони згенерованих сторінок — їхні власні тексти теж інтерфейс.
     ["product.html", "catalog.html", "promo.html"].forEach(f => fromHtml(f, out));
@@ -102,6 +116,13 @@ function collect() {
     fs.readdirSync(path.join(ROOT, "assets/js"))
         .filter(f => f.endsWith(".js") && !/^(vendor|translit)/.test(f))
         .forEach(f => fromJs("assets/js/" + f, out));
+
+    // Генератори сторінок пишуть власні підписи («Бренд:», «Артикул:»,
+    // «Завантажуємо фото…») у сторінки /p/, /brands/, /categories/ —
+    // у шаблонах їх немає, тож і з розмітки вони сюди не потрапили б.
+    fs.readdirSync(path.join(ROOT, "scripts"))
+        .filter(f => /^build-.*\.js$/.test(f) && f !== "build-locales.js")
+        .forEach(f => fromJs("scripts/" + f, out));
 
     return out;
 

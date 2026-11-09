@@ -63,7 +63,10 @@
         if (!node.parentElement || skipped(node.parentElement)) return;
         var before = node.nodeValue;
         if (!/[а-яіїєґ]/i.test(before)) return;
-        var after = translate(before);
+        // «131» + «товар» окремими вузлами — форму слова вирішує число.
+        var number = /^\s*\S+\s*$/.test(before) ? Core.numberBefore(node) : null;
+        var counted = number ? translate.counted(number, before) : null;
+        var after = counted ? before.match(/^\s*/)[0] + counted + before.match(/\s*$/)[0] : translate(before);
         if (after !== before) node.nodeValue = after;
     }
 

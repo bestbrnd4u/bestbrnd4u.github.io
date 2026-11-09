@@ -176,6 +176,20 @@ function decorateUk(rel, html, on) {
 
 }
 
+// Що на юридичній сторінці — сам документ (лишається українським).
+//
+// Оферта й політика конфіденційності тримають текст у .legal-content, а
+// поруч — часті запитання й підписка, які перекладаємо. Сторінка
+// повернення побудована розділами без такої обгортки, але умови
+// повернення — теж юридичний текст: там українським лишається весь
+// основний вміст (розділи .bayer-section), а шапка, крихти, підписка й
+// підвал перекладаються.
+function legalParts(document) {
+    const doc = document.querySelector(".legal-content");
+    if (doc) return [doc];
+    return [...document.querySelectorAll("section.bayer-section")];
+}
+
 // ── Мовні копії: повний розбір ─────────────────────────────────────
 
 function translateDocument(document, t, lang) {
@@ -194,7 +208,11 @@ function translateDocument(document, t, lang) {
         const before = node.textContent;
         if (!/[а-яіїєґ]/i.test(before)) return;
         total += 1;
-        const after = t(before);
+        // «131» + «товар» окремими вузлами — форму слова вирішує число
+        // (те саме правило, що в i18n.js).
+        const number = /^\s*\S+\s*$/.test(before) ? Core.numberBefore(node) : null;
+        const counted = number ? t.counted(number, before) : null;
+        const after = counted ? before.match(/^\s*/)[0] + counted + before.match(/\s*$/)[0] : t(before);
         if (after !== before) { node.textContent = after; done += 1; }
         else missing.set(Core.normalize(before), (missing.get(Core.normalize(before)) || 0) + 1);
     });
@@ -243,26 +261,24 @@ function buildCopy(rel, html, lang, t) {
         document.head.insertBefore(base, document.head.firstChild);
     }
 
-    const stats = LEGAL.has(rel) ? { total: 0, done: 0, missing: new Map() } : translateDocument(document, t, lang);
-
+    // Юридична сторінка: сам документ (.legal-content) лишається
+    // українським — чинна саме ця редакція. Усе довкола (шапка, підвал,
+    // часті запитання, підписка) — перекладаємо, як і на решті сайту.
+    // data-no-i18n пропускає й збірка, й переклад у браузері. Не
+    // translate="no": той заборонив би й вбудованому перекладачу браузера
+    // перекласти договір людині, якій треба його зрозуміти.
     if (LEGAL.has(rel)) {
-        // Помітка зверху основного вмісту; заголовок і текст — українські.
+        const parts = legalParts(document);
+        parts.forEach(part => part.setAttribute("data-no-i18n", ""));
         const note = document.createElement("p");
         note.className = "legal-lang-note";
         note.setAttribute("role", "note");
         note.textContent = LEGAL_NOTE[lang];
-        const host = document.querySelector("main") || document.querySelector(".breadcrumbs") || document.body;
-        if (host.tagName === "MAIN") host.insertBefore(note, host.firstChild);
-        else host.parentNode.insertBefore(note, host.nextSibling);
-        // Назви меню й шапки все одно перекладаємо — документ лишається
-        // українським, а навігація сайту — ні.
-        const walker = document.createTreeWalker(document.body, 4);
-        for (let n = walker.nextNode(); n; n = walker.nextNode()) {
-            if (!n.parentElement || !n.parentElement.closest("header, footer, .breadcrumbs")) continue;
-            const after = t(n.textContent);
-            if (after !== n.textContent) n.textContent = after;
-        }
+        const before = parts[0] || document.querySelector("main") || document.body.firstElementChild;
+        before.parentNode.insertBefore(note, before);
     }
+
+    const stats = translateDocument(document, t, lang);
 
     // Посилання на сторінки — з префіксом мови.
     document.querySelectorAll("a[href]").forEach(a => {
@@ -358,4 +374,4 @@ function main() {
 
 if (require.main === module) main();
 
-module.exports = { urlPath, hreflangBlock, switcher, decorateUk, stripInserts, buildCopy, pages, LEGAL, MARK_START, MARK_END };
+module.exports = { urlPath, hreflangBlock, switcher, decorateUk, stripInserts, buildCopy, pages, legalParts, LEGAL, MARK_START, MARK_END };

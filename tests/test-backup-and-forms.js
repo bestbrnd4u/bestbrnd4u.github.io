@@ -271,11 +271,13 @@ console.log("\n[3] Підписка на листи");
         const withConsent = pages.filter(file =>
             fs.readFileSync(file, "utf8").includes("subscribeConsent"));
 
+        // На /en/ і /ru/ — те саме посилання своєю мовою
+        // (scripts/build-locales.js): «your data.</a>», «с данными.</a>».
         const orphan = withConsent.filter(file =>
-            /даними<\/a>\./.test(fs.readFileSync(file, "utf8")));
+            /(даними|your data|данными)<\/a>\./.test(fs.readFileSync(file, "utf8")));
 
         const fixed = withConsent.filter(file =>
-            /даними\.<\/a>/.test(fs.readFileSync(file, "utf8")));
+            /(даними|your data|данными)\.<\/a>/.test(fs.readFileSync(file, "utf8")));
 
         check(`сторінок із формою підписки: ${withConsent.length}`, withConsent.length > 100);
 

@@ -64,11 +64,38 @@ console.log("\n[1] Коди живуть у базі, а не в репозит�
     const dataFiles = fs.readdirSync(path.join(ROOT, "data"))
         .filter(name => name.endsWith(".json"));
 
-    const leaked = dataFiles.filter(name =>
-        /promo_?code|промокод/i.test(read(`data/${name}`))
-        && !/promoPopup|promotions/i.test(name));
+    // Словники перекладу (data/i18n-*.json) законно містять слово
+    // «промокод» — це тексти інтерфейсу: «Введіть промокод», «Промокод
+    // «{*}» застосовано». Заміряно 09.11.2026: 12 таких рядків, у всіх
+    // код — підстановка {*}, жодного значення. Тож для словників не
+    // вимикаємо перевірку, а уточнюємо: код у лапках після «промокод»
+    // має бути саме підстановкою, а не «SALE10».
+    const isDictionary = name => /^i18n-[a-z]{2}\.json$/.test(name);
+    // Сам код — ВЕЛИКИМИ літерами й цифрами, тож без /i у цій частині:
+    // інакше [A-Z0-9]{4,} ловив звичайні слова («promo code. Please»).
+    const codeInDictionary = text =>
+        /промокод[а-яіїєґ]*\s*«(?!\{(?:\*|\d+)\})[^»]+»/i.test(text)
+        || /[Pp]romo[ _-]?[Cc]ode\W{1,3}[A-Z0-9]{4,}\b/.test(text)
+        || /[Пп]ромокод[а-яіїєґ]*:?\s+(?!\{)[A-Z0-9]{4,}\b/.test(text);
+
+    const leaked = dataFiles.filter(name => {
+        const text = read(`data/${name}`);
+        if (isDictionary(name)) return codeInDictionary(text);
+        return /promo_?code|промокод/i.test(text) && !/promoPopup|promotions/i.test(name);
+    });
 
     check("у даних сайту кодів немає", leaked.length === 0, leaked.join(", "));
+
+    // Те саме для джерела словників (data/i18n/strings.json) — воно не в
+    // корені data/, тож переліком вище не покрите.
+    const source = path.join(ROOT, "data/i18n/strings.json");
+    check("у джерелі словника кодів немає",
+        !fs.existsSync(source) || !codeInDictionary(fs.readFileSync(source, "utf8")));
+
+    // Уточнене правило мусить ловити справжній код, а не мовчати завжди.
+    check("уточнене правило ловить код у лапках", codeInDictionary('"Промокод «SALE10» застосовано"'));
+    check("і код після двокрапки", codeInDictionary('"промокод: SPRING2026"'));
+    check("а підстановку не чіпає", !codeInDictionary('"Промокод «{*}» застосовано", "Promo code «{1}» applied"'));
 
     check("таблиця закрита від браузера",
         /alter table public\.promo_codes enable row level security/.test(
