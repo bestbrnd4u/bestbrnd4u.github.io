@@ -50,53 +50,83 @@
     "mainEntity": [
         {
             "@type": "Question",
-            "name": "Чи входить вага упаковки у розрахунок доставки?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Так, вартість перевезення рахується за вагою вже упакованого відправлення, а не лише самого товару." }
+            "name": "Is the packaging weight included in the shipping calculation?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, shipping is calculated by the weight of the packed parcel, not just the item itself."
+            }
         },
         {
             "@type": "Question",
-            "name": "Строки доставки включають обробку замовлення магазином?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Ні, у таблиці вказано лише час перевезення. Деякі закордонні магазини самі обробляють замовлення до 7 робочих днів — це рахується окремо і ми попереджаємо про це заздалегідь." }
+            "name": "Do delivery times include order processing by the store?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "No, the table shows transit time only. Some overseas stores take up to 7 business days to process an order themselves — that's counted separately, and we'll let you know in advance."
+            }
         },
         {
             "@type": "Question",
-            "name": "Чи є додаткові збори на техніку й аксесуари з США?",
-            "acceptedAnswer": { "@type": "Answer", "text": "На окремі категорії товарів у США справді діє місцевий податок. Ми завжди озвучуємо його в розрахунку вартості ще до того, як ви вносите передоплату." }
+            "name": "Are there extra fees on electronics and accessories from the US?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Some product categories in the US are indeed subject to local sales tax. We always include it in the cost estimate before you make the prepayment."
+            }
         },
         {
             "@type": "Question",
-            "name": "Як доставляють великогабаритні або важкі речі?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Для габаритних чи важких відправлень вигідніше морське перевезення — довше за термінами, зате помітно дешевше за авіадоставку." }
+            "name": "How are bulky or heavy items delivered?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "For bulky or heavy shipments, sea freight is better value — slower, but noticeably cheaper than air."
+            }
         },
         {
             "@type": "Question",
-            "name": "Можна замовити товар, якого зараз немає в наявності?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Так, ми можемо відстежувати появу товару в продажу й оформити викуп, щойно він знову з'явиться на сайті продавця." }
+            "name": "Can I order an item that's currently out of stock?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, we can watch for the item to come back in stock and purchase it as soon as it reappears on the seller's website."
+            }
         },
         {
             "@type": "Question",
-            "name": "Скільки часу займає викуп після передоплати?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Зазвичай оформлюємо покупку протягом 24–48 годин після отримання передоплати. Якщо у продавця затримка з обробкою — повідомимо вам одразу." }
+            "name": "How long does the purchase take after prepayment?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "We usually place the purchase within 24–48 hours after receiving the prepayment. If the seller has a processing delay, we'll let you know right away."
+            }
         },
         {
             "@type": "Question",
-            "name": "Чи можна відстежити посилку після відправлення?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Так, ми надаємо трек-номер для відстеження доставки по Україні і повідомляємо про основні етапи руху замовлення." }
+            "name": "Can I track my parcel after it ships?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, we provide a tracking number for delivery within Ukraine and keep you updated on the key stages of your order's journey."
+            }
         },
         {
             "@type": "Question",
-            "name": "Яка мінімальна сума замовлення через байєр-сервіс?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Мінімальної суми немає — можна замовити навіть одну річ." }
+            "name": "What's the minimum order amount for the personal shopper service?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "There's no minimum order — you can order even a single item."
+            }
         },
         {
             "@type": "Question",
-            "name": "Можна об'єднати товари з різних магазинів в одну посилку?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Так, ми можемо об'єднати кілька викупів в одне відправлення, щоб зменшити загальні витрати на пересилку." }
+            "name": "Can items from different stores be combined into one parcel?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, we can combine several purchases into one shipment to reduce the total shipping cost."
+            }
         },
         {
             "@type": "Question",
-            "name": "Що робити, якщо товар прийшов з дефектом?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Допоможемо уточнити можливість повернення чи обміну — умови залежать від конкретного магазину. Обов'язково повідомте нас одразу після отримання товару." }
+            "name": "What if the item arrives defective?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "We'll help you check whether a return or exchange is possible — terms depend on the specific store. Be sure to let us know right after you receive the item."
+            }
         }
     ]
 }
@@ -109,14 +139,14 @@
     {
       "@type": "ListItem",
       "position": 1,
-      "name": "Головна",
-      "item": "https://dev.bestbrnd4u.com/"
+      "name": "Home",
+      "item": "https://dev.bestbrnd4u.com/en/"
     },
     {
       "@type": "ListItem",
       "position": 2,
-      "name": "Байєр-сервіс",
-      "item": "https://dev.bestbrnd4u.com/bayer-service"
+      "name": "Personal shopper",
+      "item": "https://dev.bestbrnd4u.com/en/bayer-service"
     }
   ]
 }
@@ -127,8 +157,8 @@
 <link rel="alternate" hreflang="ru" href="https://dev.bestbrnd4u.com/ru/bayer-service">
 <link rel="alternate" hreflang="x-default" href="https://dev.bestbrnd4u.com/bayer-service">
 <link rel="preload" href="/data/i18n-en.json" as="fetch" crossorigin>
-<script src="/assets/js/i18n-core.js?v=49daa365" defer></script>
-<script src="/assets/js/i18n.js?v=728432a5" defer></script>
+<script src="/assets/js/i18n-core.js?v=742167b2" defer></script>
+<script src="/assets/js/i18n.js?v=34fdf130" defer></script>
 <!-- i18n:end -->
 </head>
 
