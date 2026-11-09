@@ -73,5 +73,19 @@
       "38": 1
     }
   },
-  "material": "Верх — 50% поліестер, 42% шкіра, 8% поліуретан; підкладка — поліестер; підошва — 60% гума, 38% EVA, 2% ТПУ"
+  "material": "Верх — 50% поліестер, 42% шкіра, 8% поліуретан; підкладка — поліестер; підошва — 60% гума, 38% EVA, 2% ТПУ",
+  "i18n": {
+    "en": {
+      "title": "Lacoste L-Guard Breaker Sneakers",
+      "description": "Stylish women's Lacoste L-Guard Breaker sneakers in a modern outdoor style. The model is made of durable Ripstop textile with leather and synthetic overlays and finished with reflective details. The rubber and EVA sole provides comfort, cushioning and reliable grip. A great choice for city looks, walks and active everyday wear.",
+      "material": "Upper — 50% polyester, 42% leather, 8% polyurethane; lining — polyester; sole — 60% rubber, 38% EVA, 2% TPU",
+      "preOrderDays": "5–10 business days"
+    },
+    "ru": {
+      "title": "Кроссовки Lacoste L-Guard Breaker",
+      "description": "Стильные женские кроссовки Lacoste L-Guard Breaker в современном outdoor-стиле. Модель выполнена из прочного текстиля Ripstop с кожаными и синтетическими вставками и дополнена светоотражающими деталями. Подошва из резины и EVA обеспечивает комфорт, амортизацию и надежное сцепление с поверхностью. Отличный вариант для городских образов, прогулок и активной повседневной носки.",
+      "material": "Верх — 50% полиэстер, 42% кожа, 8% полиуретан; подкладка — полиэстер; подошва — 60% резина, 38% EVA, 2% ТПУ",
+      "preOrderDays": "5–10 рабочих дней"
+    }
+  }
 }

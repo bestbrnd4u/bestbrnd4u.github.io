@@ -106,5 +106,27 @@
     }
   },
   "closure": "Блискавка зверху",
-  "compartments": "Усередині — багатофункціональна кишеня та два відділення для карток"
+  "compartments": "Усередині — багатофункціональна кишеня та два відділення для карток",
+  "i18n": {
+    "en": {
+      "title": "Coach Teri Shoulder Bag In Colorblock",
+      "description": "A stylish Coach Teri Shoulder Bag In Colorblock in a harmonious combination of beige, white, and gold tones. The model is finished with the signature Signature print and elegant gold hardware.\nThe bag has a compact structured silhouette, a spacious main compartment, and interior pockets for convenient storage of essentials. The combination of signature canvas and smooth leather makes the model practical and stylish.\nIt comes with a detachable handle and a detachable adjustable strap, so it can be carried by hand or worn on the shoulder or crossbody",
+      "material": "Signature coated canvas and genuine leather",
+      "dimensions": "26 × 15.5 × 7 cm",
+      "strapInfo": "Two detachable and adjustable straps",
+      "preOrderDays": "5–10 business days",
+      "closure": "Top zipper",
+      "compartments": "Inside: multifunction pocket and two card slots"
+    },
+    "ru": {
+      "title": "Сумочка Coach Teri Shoulder Bag In Colorblock",
+      "description": "Стильная сумка Coach Teri Shoulder Bag In Colorblock в гармоничном сочетании бежевого, белого и золотистого оттенков. Модель дополнена фирменным принтом Signature и элегантной золотой фурнитурой.\nСумка имеет компактный структурированный силуэт, просторное основное отделение и внутренние карманы для удобного хранения необходимых вещей. Сочетание фирменного канваса и гладкой кожи делает модель практичной и стильной.\nМодель оснащена съемной ручкой и съемным регулируемым ремешком, поэтому ее можно носить в руке, на плече или через плечо",
+      "material": "Фирменный покрытый канвас и натуральная кожа",
+      "dimensions": "26 × 15,5 × 7 см",
+      "strapInfo": "Два ремешка, съемные и регулируемые",
+      "preOrderDays": "5–10 рабочих дней",
+      "closure": "Молния сверху",
+      "compartments": "Внутри — многофункциональный карман и два отделения для карт"
+    }
+  }
 }

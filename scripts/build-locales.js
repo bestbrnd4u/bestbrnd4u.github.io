@@ -322,10 +322,140 @@ function writeRuntimeDictionaries(dict) {
     });
 }
 
+// ПЕРЕКЛАДИ З ДАНИХ (товари, бренди, категорії, банери…).
+//
+// Тексти, які пише власник в адмінці, перекладаються поруч із собою:
+// у будь-якому об'єкті даних може бути поле
+//     "i18n": { "en": { "title": "…", "description": "…" }, "ru": { … } }
+// і тоді значення сусідніх полів (українською) стають ключами словника:
+//     "Кросівки Lacoste L003…" → { en: "Lacoste L003…", ru: "Кроссовки…" }.
+//
+// Чому словником, а не підміною даних. Назва товару стоїть у картці,
+// заголовку, крихтах, alt фото, заголовку вкладки — і все це малює
+// різний код. Словник перекладає їх там, де вони вже є, тим самим
+// механізмом, що й інтерфейс, — без правок у каталозі й кошику.
+//
+// Поля без перекладу просто не потрапляють сюди: новий товар без
+// заповнених полів показується українською, доки їх не заповнять.
+const DATA_DIRS = ["data/products", "data/brands", "data/categories", "data/departments",
+    "data/promotions", "data/collections", "data/promo-popups"];
+const DATA_FILES = ["data/home.json", "data/page-texts.json", "data/product-texts.json",
+    "data/search-banners.json", "data/notifications.json", "data/season.json"];
+
+// «Якщо його купують, наступний веземо {строк}.» — шаблон з адмінки:
+// product.js ставить на місце {строк} термін, {дата} — дату. На сторінці
+// заглушки вже немає, тож ключ — із {*}, а в перекладі — {1}, {2} за
+// порядком у українському тексті (англійська може переставити місцями).
+const PLACEHOLDER = /\{[а-яіїєґʼ'a-z_]+\}/gi;
+
+function placeholders(source, value) {
+    const names = source.match(PLACEHOLDER) || [];
+    if (!names.length) return { key: source, text: value };
+    const key = source.replace(PLACEHOLDER, "{*}");
+    const text = value.replace(PLACEHOLDER, name => {
+        const i = names.indexOf(name);
+        return i === -1 ? name : `{${i + 1}}`;
+    });
+    return { key, text };
+}
+
+function collectDataTranslations(node, out, options) {
+    const lines = !options || options.lines !== false;
+    if (Array.isArray(node)) { node.forEach(item => collectDataTranslations(item, out, options)); return; }
+    if (!node || typeof node !== "object") return;
+    const tr = node.i18n;
+    if (tr && typeof tr === "object") {
+        LOCALES.forEach(lang => {
+            const fields = tr[lang] || {};
+            Object.keys(fields).forEach(field => {
+                const source = node[field];
+                const value = fields[field];
+                if (typeof source !== "string" || typeof value !== "string" || !value.trim()) return;
+                const { key, text } = placeholders(Core.normalize(source), value);
+                if (!/[а-яіїєґ]/i.test(key.replace(/\{\*\}/g, ""))) return;
+                if (!out[key]) out[key] = {};
+                out[key][lang] = text;
+                // Опис бренду чи розділу сторінка ділить на абзаци за
+                // переносом рядка — кожен абзац окремим вузлом. Ключ на
+                // весь текст там не збігся б ніколи; рядки перекладу
+                // йдуть у тому ж порядку (це перевіряється при записі).
+                //
+                // Товарам — ні: опис товару і збірка, і product.js ставлять
+                // одним вузлом, а словник для браузера качає кожна сторінка
+                // /en/ — абзаци 103 описів важили б у ньому ще стільки ж.
+                const ukLines = source.split(/\n+/).map(s => s.trim()).filter(Boolean);
+                const trLines = value.split(/\n+/).map(s => s.trim()).filter(Boolean);
+                if (lines && ukLines.length > 1 && ukLines.length === trLines.length) {
+                    ukLines.forEach((line, i) => {
+                        const lineKey = Core.normalize(line);
+                        if (!/[а-яіїєґ]/i.test(lineKey)) return;
+                        if (!out[lineKey]) out[lineKey] = {};
+                        if (!out[lineKey][lang]) out[lineKey][lang] = trLines[i];
+                    });
+                }
+            });
+        });
+    }
+    Object.keys(node).forEach(k => { if (k !== "i18n") collectDataTranslations(node[k], out, options); });
+}
+
+function dataDictionary() {
+    const out = {};
+    const files = [];
+    DATA_DIRS.forEach(dir => {
+        const full = path.join(ROOT, dir);
+        if (!fs.existsSync(full)) return;
+        const options = { lines: dir !== "data/products" };
+        fs.readdirSync(full).filter(f => f.endsWith(".json")).forEach(f => files.push({ file: path.join(full, f), options }));
+    });
+    DATA_FILES.forEach(f => { const full = path.join(ROOT, f); if (fs.existsSync(full)) files.push({ file: full }); });
+    files.forEach(({ file, options }) => collectDataTranslations(readJson(file, null), out, options));
+    return out;
+}
+
+// «Чоловічі сумки Coach» — назва сторінки пари «тип × бренд»
+// (build-taxonomy-pages.js складає її як `${тип} ${бренд}`). Шаблон
+// «Чоловічі сумки {*}» тут не годиться: він ловив би й «Чоловічі сумки
+// для подорожей», і для російської така мішанина пройшла б перевірку.
+// Тож лише точні ключі — для пар, які справді є серед товарів.
+function pairDictionary(dict) {
+    const out = {};
+    const products = readJson(path.join(ROOT, "data", "products.json"), []);
+    // Розділу в товарі немає — він береться з категорії, як і в
+    // build-taxonomy-pages.js («Сумки Coach»).
+    const departmentOf = new Map();
+    const categories = readJson(path.join(ROOT, "data", "categories.json"), []);
+    (Array.isArray(categories) ? categories : []).forEach(c => {
+        if (c && c.name) departmentOf.set(c.name, c.department || "");
+    });
+    const lcFirst = s => s.charAt(0).toLowerCase() + s.slice(1);
+    (Array.isArray(products) ? products : []).forEach(p => {
+        if (!p || typeof p.brand !== "string" || !p.brand.trim()) return;
+        const brand = p.brand.trim();
+        const category = String(p.category || "").trim();
+        [category, departmentOf.get(category)].forEach(type => {
+            if (typeof type !== "string" || !type.trim()) return;
+            const entry = dict[Core.normalize(type)];
+            if (!entry) return;
+            const key = Core.normalize(`${type} ${brand}`);
+            if (dict[key] || out[key]) return;
+            const value = {};
+            // Англійською бренд іде першим: «Coach men's bags».
+            if (entry.en) value.en = `${brand} ${lcFirst(entry.en)}`;
+            if (entry.ru) value.ru = `${entry.ru} ${brand}`;
+            if (Object.keys(value).length) out[key] = value;
+        });
+    });
+    return out;
+}
+
 function main() {
 
     const on = enabled();
-    const dict = readJson(STRINGS_FILE, {});
+    // Інтерфейс поверх даних: короткий рядок інтерфейсу («Кросівки» як
+    // назва категорії) важливіший за випадковий збіг із полем товару.
+    const base = Object.assign(dataDictionary(), readJson(STRINGS_FILE, {}));
+    const dict = Object.assign(pairDictionary(base), base);
 
     // Українські сторінки — вставки (або їх прибирання).
     const list = pages();
@@ -374,4 +504,4 @@ function main() {
 
 if (require.main === module) main();
 
-module.exports = { urlPath, hreflangBlock, switcher, decorateUk, stripInserts, buildCopy, pages, legalParts, LEGAL, MARK_START, MARK_END };
+module.exports = { urlPath, hreflangBlock, switcher, decorateUk, stripInserts, buildCopy, pages, legalParts, collectDataTranslations, dataDictionary, pairDictionary, LEGAL, MARK_START, MARK_END };

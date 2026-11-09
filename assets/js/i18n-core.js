@@ -102,6 +102,19 @@
         return lang === "ru" ? /[іїєґ]/i.test(text) : /[а-яіїєґ]/i.test(text);
     }
 
+    // Чи лишилась частина неперекладеною. Однієї перевірки літер для
+    // російської мало: «що нещодавно зʼявились» не має жодної з і ї є ґ,
+    // і шаблон підставляв його в російське речення як є. Тож ще й так:
+    // повернулось без змін і в словнику такого немає — не перекладено.
+    // («Сумки» → «Сумки» законно однакові: вони в словнику є.)
+    function leftUntranslated(text, next, translate, lang) {
+        if (!/[а-яіїєґ]/i.test(text)) return false;
+        if (stillUkrainian(next, lang)) return true;
+        if (next !== text) return false;
+        var bare = String(text).replace(/[\s:.,;!?…]+$/, "");
+        return !(translate.has && translate.has(bare));
+    }
+
     // Повертає null, якщо хоч одна підстановка лишилась українською.
     //
     // Шаблон «Знижка {*}» інакше спрацьовував на довгому реченні:
@@ -117,7 +130,7 @@
         var used = template.match(/\{(\d+)\}/g) || [];
         for (var u = 0; u < used.length; u++) {
             var cap = captures[Number(used[u].slice(1, -1)) - 1];
-            if (cap !== undefined && stillUkrainian(translate(cap), lang)) return null;
+            if (cap !== undefined && leftUntranslated(cap, translate(cap), translate, lang)) return null;
         }
         return template
             .replace(/\{#:([^}]*)\}/g, function (m, forms) {
@@ -197,6 +210,13 @@
 
             if (punct && exact[punct[1]] !== undefined) return lead + exact[punct[1]] + punct[2] + tail;
 
+            // Те саме для шаблонів і чисел: «Ціни від 4 000 ₴ до 8 600 ₴.»
+            // наприкінці речення. Коротший рядок — рекурсія скінченна.
+            if (punct) {
+                var bare = translate(punct[1]);
+                if (bare !== punct[1] && !stillUkrainian(bare, lang)) return lead + bare + punct[2] + tail;
+            }
+
             // «🚚 Орієнтовно у відділенні…», «↩ Відмова»: значок чи стрілка
             // перед текстом. Шаблони прив'язані до початку рядка й на ньому
             // не збігались — перекладаємо без значка й повертаємо його.
@@ -205,6 +225,14 @@
             if (icon) {
                 var rest = translate(icon[2]);
                 if (rest !== icon[2]) return lead + icon[1] + rest + tail;
+            }
+
+            // «Дивитись усі товари →» — те саме, коли стрілка в кінці.
+            var trailing = norm.match(/^(.*[\p{L}\p{N}»")])(\s*[^\p{L}\p{N}\s«»"()]+)$/u);
+
+            if (trailing) {
+                var head = translate(trailing[1]);
+                if (head !== trailing[1] && !stillUkrainian(head, lang)) return lead + head + trailing[2] + tail;
             }
 
             // «Кошик | BestBrnd4u», «Сумки Coach — купити в Україні»:
@@ -218,15 +246,89 @@
                 var mixed = false;
                 for (var i = 0; i < parts.length; i += 2) {
                     var next = translate(parts[i]);
+                    if (leftUntranslated(parts[i], next, translate, lang)) mixed = true;
                     if (next !== parts[i]) { parts[i] = next; changed = true; }
-                    if (stillUkrainian(parts[i], lang)) mixed = true;
                 }
                 // Як і з підстановками: частина лишилась українською —
                 // цілий рядок, а не «Чоловіча сумка … — 6 000 UAH».
                 if (changed && !mixed) return lead + parts.join(" ") + tail;
             }
 
+            // «Чоловічі сумки, Жіночі сумки, Гаманці», «Унісекс, Жінкам»:
+            // перелік значень через кому. Перекладаємо, лише якщо
+            // перекладено кожне — інакше це звичайне речення з комою.
+            var list = eachPart(norm.split(/(,\s*)/));
+            if (list !== null) return lead + list + tail;
+
+            // «Чорний / жовтий» — складений колір.
+            var slashed = eachPart(norm.split(/(\s\/\s)/));
+            if (slashed !== null) return lead + slashed + tail;
+
+            // «Чорний: Чорний, Чорний / жовтий, Хакі» — підказка групи
+            // кольорів: підпис і перелік, кожне перекладаємо окремо.
+            var labelled = norm.match(/^([^:]+)(:\s+)(.+)$/);
+            if (labelled) {
+                var both = eachPart([labelled[1], labelled[2], labelled[3]]);
+                if (both !== null) return lead + both + tail;
+            }
+
+            // «9 моделей у наявності… Ціни від… Бренди: Coach, JW PEI.» —
+            // підсумок сторінки складено з речень у різних поєднаннях.
+            // Так само: лише якщо перекладено кожне речення.
+            // «Стильні кросівки Lacoste L003 … натхненним тенісною…» —
+            // опис товару, обрізаний для meta description (і збіркою, і
+            // product.js, кожен по-своєму). Цілим рядком такого ключа
+            // немає, але є повний опис, що з нього починається: беремо
+            // його переклад і ріжемо до тієї ж довжини. Початок довгий —
+            // випадковий збіг з іншим текстом неможливий.
+            var cut = truncated(norm);
+            if (cut !== null) return lead + cut + tail;
+
+            // Без lookbehind: старий Safari на ньому не розбирає весь файл.
+            var found = norm.match(/[^.!?…]+(?:[.!?…]+|$)/g) || [];
+            if (found.length > 1) {
+                var joined = [];
+                found.forEach(function (s) { joined.push(s.trim(), " "); });
+                joined.pop();
+                var sentences = eachPart(joined);
+                if (sentences !== null) return lead + sentences + tail;
+            }
+
             return raw;
+
+        }
+
+        var MIN_TRUNCATED_PREFIX = 60;
+        var exactKeys = null;
+
+        function truncated(norm) {
+            if (norm.slice(-1) !== "…") return null;
+            var prefix = norm.slice(0, -1).trim();
+            if (prefix.length < MIN_TRUNCATED_PREFIX) return null;
+            if (!exactKeys) exactKeys = Object.keys(exact);
+            for (var k = 0; k < exactKeys.length; k++) {
+                var key = exactKeys[k];
+                if (key.length <= prefix.length || key.indexOf(prefix) !== 0) continue;
+                var full = normalize(exact[key]);
+                if (full.length <= norm.length) return full;
+                var piece = full.slice(0, norm.length);
+                var space = piece.lastIndexOf(" ");
+                return (space > 0 ? piece.slice(0, space) : piece).replace(/[\s,;:—–-]+$/, "") + "…";
+            }
+            return null;
+        }
+
+        // Частини через роздільник (парні — текст, непарні — роздільник).
+        // null, якщо частина одна або хоч одна лишилась неперекладеною.
+        function eachPart(pieces) {
+            if (pieces.length < 3) return null;
+            for (var j = 0; j < pieces.length; j += 2) {
+                if (!/[а-яіїєґ]/i.test(pieces[j])) continue;
+                var next = translate(pieces[j]);
+                if (leftUntranslated(pieces[j], next, translate, lang)) return null;
+                pieces[j] = next;
+            }
+            return pieces.join("");
 
         }
 

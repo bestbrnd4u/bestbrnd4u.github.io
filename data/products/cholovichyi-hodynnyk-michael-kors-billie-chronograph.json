@@ -64,5 +64,23 @@
     "/assets/images/products/uploads/загрузка-1-.webp",
     "/assets/images/products/uploads/загрузка-2-.webp",
     "/assets/images/products/uploads/загрузка-1-1-.webp"
-  ]
+  ],
+  "i18n": {
+    "en": {
+      "title": "Michael Kors Billie Chronograph Men's Watch",
+      "description": "A stylish Michael Kors Billie men's watch with a chronograph function — a blend of sporty character and classic elegance. It features a quartz movement, a multifunction dial and a sturdy metal bracelet.\nThe bold case and dial details create a modern, confident look. Thanks to its versatile design, the watch suits both everyday wear and more business-oriented outfits",
+      "material": "Stainless steel",
+      "dimensions": "Case — 4.4 cm in diameter",
+      "strapInfo": "Stainless steel bracelet",
+      "preOrderDays": "10-14 business days"
+    },
+    "ru": {
+      "title": "Мужские часы Michael Kors Billie Chronograph",
+      "description": "Стильные мужские часы Michael Kors Billie с функцией хронографа — сочетание спортивного характера и классической элегантности. Модель оснащена кварцевым механизмом, многофункциональным циферблатом и прочным металлическим браслетом.\nЧасы имеют выразительный корпус и детали циферблата, которые создают современный и уверенный образ. Благодаря универсальному дизайну модель подходит как для повседневной носки, так и для более деловых образов",
+      "material": "Нержавеющая сталь",
+      "dimensions": "Корпус — 4,4 см в диаметре",
+      "strapInfo": "Браслет из нержавеющей стали",
+      "preOrderDays": "10-14 рабочих дней"
+    }
+  }
 }

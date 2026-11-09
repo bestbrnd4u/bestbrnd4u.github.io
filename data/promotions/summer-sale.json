@@ -26,5 +26,15 @@
   "imageMobile": "/assets/images/banners/mob009.webp",
   "promoPageImage": "/assets/images/banners/02_banner_products_1800x900-1-.webp",
   "promoPageImageMobile": "/assets/images/banners/01_hero_slider_1000x1160.webp",
-  "buttonText": "Дивитись усі товари"
+  "buttonText": "Дивитись усі товари",
+  "i18n": {
+    "en": {
+      "text": "Sunglasses by Balenciaga, Gucci, Prada, Burberry, Marc Jacobs, Alain Mikli",
+      "buttonText": "View all products"
+    },
+    "ru": {
+      "text": "Солнцезащитные очки Balenciaga, Gucci, Prada, Burberry, Marc Jacobs, Alain Mikli",
+      "buttonText": "Смотреть все товары"
+    }
+  }
 }

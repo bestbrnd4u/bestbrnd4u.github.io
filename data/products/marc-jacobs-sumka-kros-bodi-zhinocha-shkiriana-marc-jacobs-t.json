@@ -83,5 +83,25 @@
   "dimensions": "18 × 11 × 6 см",
   "closure": "Подвійна блискавка зверху",
   "compartments": "Задня відкрита кишеня; усередині — відкрита кишеня",
-  "strapInfo": "Знімний регульований текстильний ремінь, перепад 69 см"
+  "strapInfo": "Знімний регульований текстильний ремінь, перепад 69 см",
+  "i18n": {
+    "en": {
+      "title": "Marc Jacobs The Snapshot Women's Leather Crossbody Bag",
+      "description": "A Marc Jacobs leather crossbody — a neat rectangular body and the double J monogram. The strap is adjustable, so the bag can be worn over the shoulder or across the body. Two colors to choose from.",
+      "material": "Leather",
+      "dimensions": "18 × 11 × 6 cm",
+      "strapInfo": "Removable adjustable textile strap, drop 69 cm",
+      "closure": "Double zipper on top",
+      "compartments": "Open back pocket; inside — open pocket"
+    },
+    "ru": {
+      "title": "Женская кожаная сумка кросс-боди Marc Jacobs The Snapshot",
+      "description": "Кросс-боди Marc Jacobs из кожи — аккуратный прямоугольный корпус и двойная монограмма J. Ремешок регулируется, поэтому сумку можно носить на плече или через плечо. Два цвета на выбор.",
+      "material": "Кожа",
+      "dimensions": "18 × 11 × 6 см",
+      "strapInfo": "Съемный регулируемый текстильный ремень, высота 69 см",
+      "closure": "Двойная молния сверху",
+      "compartments": "Задний открытый карман; внутри — открытый карман"
+    }
+  }
 }

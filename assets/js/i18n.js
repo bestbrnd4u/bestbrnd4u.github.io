@@ -70,7 +70,22 @@
         if (after !== before) node.nodeValue = after;
     }
 
+    // product.js після завантаження переписує опис і заголовок для
+    // соцмереж українською — збірка їх уже переклала, а скрипт затирав.
+    var META = /^(description|og:title|og:description|twitter:title|twitter:description)$/;
+
+    function translateMeta(el) {
+        var key = el.getAttribute("name") || el.getAttribute("property") || "";
+        if (!META.test(key)) return;
+        var v = el.getAttribute("content");
+        if (v && /[а-яіїєґ]/i.test(v)) {
+            var after = translate(v);
+            if (after !== v) el.setAttribute("content", after);
+        }
+    }
+
     function translateAttrs(el) {
+        if (el.tagName === "META") { translateMeta(el); return; }
         if (skipped(el)) return;
         for (var i = 0; i < ATTRS.length; i++) {
             var v = el.getAttribute(ATTRS[i]);
@@ -130,7 +145,7 @@
     function observe() {
         observer.observe(document.documentElement, {
             subtree: true, childList: true, characterData: true,
-            attributes: true, attributeFilter: ATTRS.concat(["href"])
+            attributes: true, attributeFilter: ATTRS.concat(["href", "content"])
         });
     }
 

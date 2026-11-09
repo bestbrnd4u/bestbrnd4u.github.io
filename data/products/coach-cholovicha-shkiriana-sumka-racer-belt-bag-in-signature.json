@@ -57,5 +57,25 @@
   "dimensions": "41 × 17 × 8 см",
   "closure": "Блискавка",
   "compartments": "Зовнішні кишені на блискавці; усередині — багатофункціональна кишеня",
-  "strapInfo": "Регульований ремінь довжиною 106 см для носіння на поясі"
+  "strapInfo": "Регульований ремінь довжиною 106 см для носіння на поясі",
+  "i18n": {
+    "en": {
+      "title": "Racer Belt Bag In Signature Canvas Men's Leather Bag",
+      "description": "The Coach Racer Belt Bag in leather — a belt bag with an embossed monogram. Adjustable strap; wear it around the waist, over the shoulder or crossbody. A unisex style.",
+      "material": "Leather",
+      "dimensions": "41 × 17 × 8 cm",
+      "strapInfo": "Adjustable 106 cm strap for wearing around the waist",
+      "closure": "Zipper",
+      "compartments": "Exterior zip pockets; inside — a multifunction pocket"
+    },
+    "ru": {
+      "title": "Мужская кожаная сумка Racer Belt Bag In Signature Canvas",
+      "description": "Coach Racer Belt Bag из кожи — поясная сумка с монограммным рельефом. Регулируемый ремень, носится на поясе, через плечо или наискосок. Модель унисекс.",
+      "material": "Кожа",
+      "dimensions": "41 × 17 × 8 см",
+      "strapInfo": "Регулируемый ремень длиной 106 см для ношения на поясе",
+      "closure": "Молния",
+      "compartments": "Внешние карманы на молнии; внутри — многофункциональный карман"
+    }
+  }
 }

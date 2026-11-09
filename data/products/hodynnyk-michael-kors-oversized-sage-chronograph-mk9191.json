@@ -64,5 +64,25 @@
     "/assets/images/products/uploads/michael-kors-oversized-sage-chronograph--52ba3cb7.webp",
     "/assets/images/products/uploads/michael-kors-oversized-sage-chronograph--6cbadb1a.webp"
   ],
-  "closure": "Застібка-кліпса"
+  "closure": "Застібка-кліпса",
+  "i18n": {
+    "en": {
+      "title": "Michael Kors Oversized Sage Chronograph MK9191 Watch",
+      "description": "A stylish men's Michael Kors Oversized Sage Chronograph MK9191 watch with a striking green dial and a silver-tone case and bracelet. The large case gives the model a modern, confident look, and the contrast between the green dial and the steel details makes the watch a statement piece of any outfit.\nThe model features a quartz movement with a chronograph function and date display. The dial is complemented by silver-tone indices and hands, and mineral crystal protects it from scratches.\nThe watch is made of stainless steel and has a comfortable metal bracelet with a clasp. Water resistance up to 30 meters makes the model suitable for everyday wear",
+      "material": "Stainless steel; mineral crystal, scratch-resistant",
+      "dimensions": "Size (dimensions), cm: Case diameter — 4.4 cm. Case thickness — approx. 1.1 cm. Bracelet width — 2.2 cm",
+      "strapInfo": "Silver-tone stainless steel bracelet with a clip clasp",
+      "preOrderDays": "10-14 business days",
+      "closure": "Clip clasp"
+    },
+    "ru": {
+      "title": "Часы Michael Kors Oversized Sage Chronograph MK9191",
+      "description": "Стильные мужские часы Michael Kors Oversized Sage Chronograph MK9191 с выразительным зеленым циферблатом, серебристым корпусом и браслетом. Крупный корпус придает модели современный и уверенный вид, а контраст зеленого циферблата со стальными деталями делает часы акцентным элементом образа.\nМодель оснащена кварцевым механизмом с функцией хронографа и отображением даты. Циферблат дополнен серебристыми индексами и стрелками, а минеральное стекло защищает его от царапин.\nЧасы выполнены из нержавеющей стали и имеют удобный металлический браслет с застежкой. Водозащита до 30 метров позволяет использовать модель в повседневной жизни",
+      "material": "Нержавеющая сталь; стекло — минеральное, устойчивое к царапинам",
+      "dimensions": "Размер (габариты), см: Диаметр корпуса — 4,4 см. Толщина корпуса — около 1,1 см. Ширина браслета — 2,2 см",
+      "strapInfo": "Браслет из нержавеющей стали серебристого цвета с застежкой-клипсой",
+      "preOrderDays": "10-14 рабочих дней",
+      "closure": "Застежка-клипса"
+    }
+  }
 }

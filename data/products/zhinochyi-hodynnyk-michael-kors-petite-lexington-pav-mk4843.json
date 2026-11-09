@@ -63,5 +63,23 @@
     "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-silver-dial-ladies-watch-mk4843.webp",
     "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-silver-dial-ladies-watch-mk4843_2.webp",
     "/assets/images/products/uploads/michael-kors-petite-lexington-quartz-silver-dial-ladies-watch-mk4843_3.webp"
-  ]
+  ],
+  "i18n": {
+    "en": {
+      "title": "Michael Kors Petite Lexington Pavé MK4843 Women's Watch",
+      "description": "An elegant women's Michael Kors Petite Lexington Pavé watch in silver tone. The miniature 26 mm round case is complemented by a cream mother-of-pearl dial with delicate pavé accents and Roman numeral indexes.\nThe model features a reliable three-hand quartz movement. The case, bezel, and bracelet are made entirely of stainless steel. Mineral glass protects the dial, and water resistance up to 50 m (5 ATM) makes the watch practical for daily wear",
+      "material": "Case and bracelet: stainless steel; glass: mineral",
+      "dimensions": "2.6 × 2.6 × 0.7 cm",
+      "preOrderDays": "10-14 business days",
+      "closure": "Silver-tone steel bracelet, 1.4 cm wide, with a folding clip clasp"
+    },
+    "ru": {
+      "title": "Женские часы Michael Kors Petite Lexington Pavé MK4843",
+      "description": "Элегантные женские часы Michael Kors Petite Lexington Pavé в серебристом исполнении. Миниатюрный круглый корпус диаметром 26 мм дополнен кремовым перламутровым циферблатом с деликатными pavé-акцентами и римскими индексами.\nМодель оснащена надежным кварцевым механизмом с тремя стрелками. Корпус, безель и браслет полностью выполнены из нержавеющей стали. Минеральное стекло защищает циферблат, а водонепроницаемость до 50 м (5 ATM) делает часы практичными для ежедневной носки",
+      "material": "Корпус и браслет — нержавеющая сталь; стекло — минеральное",
+      "dimensions": "2,6 × 2,6 × 0,7 см",
+      "preOrderDays": "10-14 рабочих дней",
+      "closure": "Стальной браслет серебристого цвета шириной 1,4 см с раскладной застежкой-клипсой"
+    }
+  }
 }

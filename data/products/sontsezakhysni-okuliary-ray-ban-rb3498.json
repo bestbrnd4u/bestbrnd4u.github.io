@@ -66,5 +66,23 @@
     "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-d6f54bf0.webp",
     "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-4b1f82a5.webp",
     "/assets/images/products/uploads/ray-ban-polarized-brown-gradient-rectang-960c6b7f.webp"
-  ]
+  ],
+  "i18n": {
+    "en": {
+      "title": "Ray-Ban RB3498 Sunglasses",
+      "description": "Stylish men's Ray-Ban RB3498 sunglasses with a rectangular frame. The model combines a modern sporty design with the signature Ray-Ban aesthetic.\nThe sunglasses feature polarized brown gradient lenses that help reduce glare and make bright light comfortable on the eyes. The clean shape and versatile design are ideal for everyday use, travel and vacations",
+      "material": "Metal",
+      "dimensions": "14.0 × 4.8 cm; lens width — 6 cm; bridge — 1.7 cm; temple length — 13.5 cm",
+      "strapInfo": "Metal temples",
+      "preOrderDays": "10-14 business days"
+    },
+    "ru": {
+      "title": "Солнцезащитные очки Ray-Ban RB3498",
+      "description": "Стильные мужские солнцезащитные очки Ray-Ban RB3498 с прямоугольной формой оправы. Модель сочетает современный спортивный дизайн с фирменной эстетикой Ray-Ban.\nОчки оснащены поляризационными линзами с коричневым градиентом, которые помогают уменьшить блики и обеспечивают комфортное восприятие яркого света. Лаконичная форма и универсальный дизайн отлично подходят для повседневного использования, путешествий и отдыха",
+      "material": "Металл",
+      "dimensions": "14,0 × 4,8 см; ширина линзы — 6 см; переносица — 1,7 см; длина дужки — 13,5 см",
+      "strapInfo": "Металлические дужки",
+      "preOrderDays": "10-14 рабочих дней"
+    }
+  }
 }

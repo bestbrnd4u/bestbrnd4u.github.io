@@ -63,5 +63,25 @@
   "legacySlugs": [
     "жіночий-годинник-tissot-lovely-round-19-5mm"
   ],
-  "closure": "Застібка-метелик із кнопками-фіксаторами"
+  "closure": "Застібка-метелик із кнопками-фіксаторами",
+  "i18n": {
+    "en": {
+      "title": "Tissot Lovely Round 19.5mm Women's Watch",
+      "description": "An exquisite women's Tissot Lovely Round 19.5mm watch, a miniature model with a round case, designed for those who value elegance and understated design.\nThe watch has a silver dial with minimalist indexes, a 316L stainless steel case, and scratch-resistant sapphire crystal. Inside is a reliable Swiss ETA 901.001 quartz movement. The metal bracelet is fitted with a butterfly clasp with push buttons. Water resistance up to 30 meters (3 ATM)",
+      "material": "Case and bracelet: 316L stainless steel; crystal: scratch-resistant sapphire",
+      "dimensions": "19.5 × 19.5 × 5 mm",
+      "strapInfo": "Silver-tone stainless steel bracelet, 11 mm wide, butterfly clasp with push buttons",
+      "preOrderDays": "10-14 business days",
+      "closure": "Butterfly clasp with push-button locks"
+    },
+    "ru": {
+      "title": "Женские часы Tissot Lovely Round 19.5mm",
+      "description": "Изысканные женские часы Tissot Lovely Round 19.5mm — миниатюрная модель с круглым корпусом, созданная для тех, кто ценит элегантность и сдержанный дизайн.\nЧасы имеют серебристый циферблат с лаконичными индексами, корпус из нержавеющей стали 316L и устойчивое к царапинам сапфировое стекло. Внутри установлен надежный швейцарский кварцевый механизм ETA 901.001. Металлический браслет дополнен застежкой-бабочкой с кнопками. Водостойкость — до 30 метров (3 ATM)",
+      "material": "Корпус и браслет — нержавеющая сталь 316L; стекло — устойчивое к царапинам сапфировое",
+      "dimensions": "19,5 × 19,5 × 5 мм",
+      "strapInfo": "Браслет из нержавеющей стали серебристого цвета, ширина 11 мм, застежка-бабочка с кнопками",
+      "preOrderDays": "10-14 рабочих дней",
+      "closure": "Застежка-бабочка с кнопками-фиксаторами"
+    }
+  }
 }

@@ -11,5 +11,17 @@
   "imageMobile": "/assets/images/banners/4coachsmall_card_1200x1500.webp",
   "promoPageImage": "/assets/images/banners/coach-promo-page.webp",
   "promoPageImageMobile": "/assets/images/banners/043_small_card_1200x1500.webp",
-  "buttonText": "Дивитись колекцію"
+  "buttonText": "Дивитись колекцію",
+  "i18n": {
+    "en": {
+      "text": "The brand's widest selection in the catalog — bags",
+      "title": "Coach collection",
+      "buttonText": "View collection"
+    },
+    "ru": {
+      "text": "Самая широкая подборка бренда в каталоге — сумки",
+      "title": "Коллекция Coach",
+      "buttonText": "Смотреть коллекцию"
+    }
+  }
 }

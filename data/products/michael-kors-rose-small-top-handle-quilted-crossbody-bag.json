@@ -114,5 +114,27 @@
   "closure": "Клапан на поворотному замку; верх на блискавці",
   "compartments": "Передня кишеня з клапаном; задня відкрита кишеня; усередині — центральна кишеня на блискавці та три відділення для карток",
   "strapInfo": "Ланцюговий ремінь зі шкіряною вставкою, перепад 28 або 53 см",
-  "decor": "Фурнітура золотистого тону, логотип Michael Kors на клапані"
+  "decor": "Фурнітура золотистого тону, логотип Michael Kors на клапані",
+  "i18n": {
+    "en": {
+      "description": "Michael Kors Rose Small Top Handle Crossbody — a quilted bag in a rich Racing Green shade\nThe elegant, compact Michael Kors Rose bag combines a feminine design with a practical size. The quilted texture gives the bag character, while the deep Racing Green shade makes it a stylish accent to any look.\nA compact bag that easily complements both everyday and dressier outfits.\n",
+      "material": "Quilted genuine leather",
+      "dimensions": "18 cm × 13 cm × 7.5 cm",
+      "strapInfo": "Chain strap with a leather insert, 28 or 53 cm drop",
+      "preOrderDays": "5–10 business days",
+      "closure": "Flap with turn-lock; zippered top",
+      "compartments": "Front flap pocket; back slip pocket; inside — center zip pocket and three card slots",
+      "decor": "Gold-tone hardware, Michael Kors logo on the flap"
+    },
+    "ru": {
+      "description": "Michael Kors Rose Small Top Handle Crossbody — стеганая сумка в насыщенном оттенке Racing Green\nЭлегантная компактная сумка Michael Kors Rose сочетает женственный дизайн и практичный формат. Стеганая фактура добавляет модели выразительности, а глубокий зеленый оттенок Racing Green делает ее стильным акцентом образа.\nКомпактная модель, которая легко дополнит как повседневный, так и более элегантный образ.\n",
+      "material": "Стеганая натуральная кожа",
+      "dimensions": "18 см × 13 см × 7,5 см",
+      "strapInfo": "Цепочный ремень с кожаной вставкой, высота 28 или 53 см",
+      "preOrderDays": "5–10 рабочих дней",
+      "closure": "Клапан на поворотном замке; верх на молнии",
+      "compartments": "Передний карман с клапаном; задний открытый карман; внутри — центральный карман на молнии и три отделения для карт",
+      "decor": "Фурнитура золотистого тона, логотип Michael Kors на клапане"
+    }
+  }
 }

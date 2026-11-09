@@ -54,5 +54,19 @@
   "instagramBlock": "general",
   "description": "Сонцезахисні окуляри Marc Jacobs — велика оправа з градієнтними лінзами теплого відтінку. Модель, що закриває значну частину обличчя й працює як акцент.",
   "sku": "MJ-1061S-009QHA-59",
-  "category": "Окуляри і оправи"
+  "category": "Окуляри і оправи",
+  "i18n": {
+    "en": {
+      "title": "Marc Jacobs MJ-1061S-009QHA-59 Sunglasses",
+      "description": "Marc Jacobs sunglasses — an oversized frame with warm-toned gradient lenses. A model that covers much of the face and serves as a statement piece.",
+      "material": "Acetate; polymer lenses",
+      "dimensions": "Lens width × bridge × temple length: 59 × 9 × 145 mm"
+    },
+    "ru": {
+      "title": "Солнцезащитные очки Marc Jacobs MJ-1061S-009QHA-59",
+      "description": "Солнцезащитные очки Marc Jacobs — крупная оправа с градиентными линзами теплого оттенка. Модель, которая закрывает значительную часть лица и работает как акцент.",
+      "material": "Ацетат; полимерные линзы",
+      "dimensions": "Ширина линзы × переносица × длина заушника: 59 × 9 × 145 мм"
+    }
+  }
 }

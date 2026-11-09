@@ -74,5 +74,17 @@
     "більше-стилю-для-яскравого-літа"
   ],
   "promoPageImageMobile": "/assets/images/banners/coach-teaser-mobile.webp",
-  "buttonText": "Дивитись усі товари"
+  "buttonText": "Дивитись усі товари",
+  "i18n": {
+    "en": {
+      "text": "Women's, men's and unisex — every bag in the catalog in one place",
+      "title": "Pick a bag for yourself",
+      "buttonText": "View all products"
+    },
+    "ru": {
+      "text": "Женские, мужские и унисекс — все сумки каталога в одном месте",
+      "title": "Выбери сумочку для себя",
+      "buttonText": "Смотреть все товары"
+    }
+  }
 }

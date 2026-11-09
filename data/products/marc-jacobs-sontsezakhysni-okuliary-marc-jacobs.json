@@ -54,5 +54,19 @@
   "instagramBlock": "general",
   "description": "Сонцезахисні окуляри Marc Jacobs у вузькій прямокутній оправі з темними лінзами. Лаконічна форма з логотипом бренду на дузі.",
   "sku": "MARC-409S-08079O-54",
-  "category": "Окуляри і оправи"
+  "category": "Окуляри і оправи",
+  "i18n": {
+    "en": {
+      "title": "Marc Jacobs MARC-409S-08079O-54 Sunglasses",
+      "description": "Marc Jacobs sunglasses with a narrow rectangular frame and dark lenses. A clean shape with the brand logo on the temple.",
+      "material": "Metal frame; polymer lenses",
+      "dimensions": "Lens width × bridge × temple length: 54 × 17 × 135 mm"
+    },
+    "ru": {
+      "title": "Солнцезащитные очки Marc Jacobs MARC-409S-08079O-54",
+      "description": "Солнцезащитные очки Marc Jacobs в узкой прямоугольной оправе с темными линзами. Лаконичная форма с логотипом бренда на заушнике.",
+      "material": "Металлическая оправа; полимерные линзы",
+      "dimensions": "Ширина линзы × переносица × длина заушника: 54 × 17 × 135 мм"
+    }
+  }
 }

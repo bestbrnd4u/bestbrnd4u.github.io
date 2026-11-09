@@ -18,5 +18,17 @@
   "imageMobile": "/assets/images/banners/02marc-jacobs_banner_products_1800x900.webp",
   "promoPageImage": "/assets/images/banners/marc-jacobs_promo_page_1920x600-1-.webp",
   "promoPageImageMobile": "/assets/images/banners/04marc-jacobs_мобильная_страница_акции_1080x1400.webp",
-  "buttonText": "Дивитись колекцію"
+  "buttonText": "Дивитись колекцію",
+  "i18n": {
+    "en": {
+      "text": "The brand's widest selection in the catalog — bags and sunglasses",
+      "title": "Marc Jacobs collection",
+      "buttonText": "View collection"
+    },
+    "ru": {
+      "text": "Самая широкая подборка бренда в каталоге — сумки и солнцезащитные очки",
+      "title": "Коллекция Marc Jacobs",
+      "buttonText": "Смотреть коллекцию"
+    }
+  }
 }

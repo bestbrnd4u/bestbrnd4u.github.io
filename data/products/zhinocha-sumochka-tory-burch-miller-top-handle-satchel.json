@@ -88,5 +88,25 @@
   "category": "Жіночі сумки",
   "legacySlugs": [
     "жіноча-сумочка-tory-burch-miller-top-handle-satchel"
-  ]
+  ],
+  "i18n": {
+    "en": {
+      "title": "Women's Tory Burch Miller Top Handle Satchel",
+      "description": "A stylish and roomy Tory Burch Miller bag in classic black. Made of genuine pebbled leather and finished with the signature Double T logo, gold-tone hardware, and neat decorative stitching",
+      "material": "Genuine pebbled leather",
+      "dimensions": "28 × 19.5 × 13.5 cm",
+      "strapInfo": "Two top handles for carrying by hand. Detachable adjustable strap for shoulder or crossbody wear",
+      "preOrderDays": "5–10 business days",
+      "closure": "Magnetic"
+    },
+    "ru": {
+      "title": "Женская сумочка Tory Burch Miller Top Handle Satchel",
+      "description": "Стильная и вместительная сумка Tory Burch Miller в классическом черном цвете. Модель выполнена из натуральной зернистой кожи и дополнена фирменным логотипом Double T, фурнитурой золотистого оттенка и аккуратными декоративными швами",
+      "material": "Натуральная зернистая кожа",
+      "dimensions": "28 × 19,5 × 13,5 см",
+      "strapInfo": "Две верхние ручки — для ношения сумки в руке. Съемный регулируемый ремень — для ношения на плече или кроссбоди",
+      "preOrderDays": "5–10 рабочих дней",
+      "closure": "Магнитная"
+    }
+  }
 }

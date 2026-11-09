@@ -63,5 +63,23 @@
       "ONESIZE": 1
     }
   },
-  "compartments": "Вісім відділень для карток; знімний вкладиш із віконцем для документа та ще двома відділеннями для карток; повнорозмірне відділення для купюр"
+  "compartments": "Вісім відділень для карток; знімний вкладиш із віконцем для документа та ще двома відділеннями для карток; повнорозмірне відділення для купюр",
+  "i18n": {
+    "en": {
+      "title": "Coach 3-In-1 Wallet In Signature Leather",
+      "description": "A practical Coach 3-In-1 Wallet In Signature Leather for men in classic black. It combines a roomy wallet with a removable inner insert that can be used on its own.\nThe main section has 8 card slots and full-length bill compartments. The removable insert has an ID window and two additional card slots. The clean design with the signature Coach logo makes it a versatile choice for everyday use",
+      "material": "Genuine calf leather",
+      "dimensions": "11 × 9.5 × 2 cm",
+      "preOrderDays": "5–10 business days",
+      "compartments": "Eight card slots; removable insert with an ID window and two more card slots; full-length bill compartment"
+    },
+    "ru": {
+      "title": "Кошелек Coach 3-In-1 Wallet In Signature Leather",
+      "description": "Практичный мужской кошелек Coach 3-In-1 Wallet In Signature Leather в классическом черном цвете. Модель сочетает вместительный кошелек и съемную внутреннюю вставку, которую можно использовать отдельно.\nОсновное отделение имеет 8 слотов для банковских карт и полноразмерные отделения для купюр. Съемная вставка оснащена окошком для ID и двумя дополнительными слотами для карт. Лаконичный дизайн с фирменным логотипом Coach делает модель универсальным вариантом для повседневного использования",
+      "material": "Натуральная телячья кожа",
+      "dimensions": "11 × 9,5 × 2 см",
+      "preOrderDays": "5–10 рабочих дней",
+      "compartments": "Восемь отделений для карт; съемный вкладыш с окошком для документа и еще двумя отделениями для карт; полноразмерное отделение для купюр"
+    }
+  }
 }

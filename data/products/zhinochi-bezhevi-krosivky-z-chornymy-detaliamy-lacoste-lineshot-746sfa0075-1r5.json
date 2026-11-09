@@ -69,5 +69,19 @@
       "38": 1
     }
   },
-  "material": "Верх — 92% шкіра, 8% поліестер; підкладка — поліестер; підошва — 100% гума"
+  "material": "Верх — 92% шкіра, 8% поліестер; підкладка — поліестер; підошва — 100% гума",
+  "i18n": {
+    "en": {
+      "title": "Lacoste Lineshot 746SFA0075.1R5 Women's Beige Sneakers with Black Details",
+      "description": "Stylish women's Lacoste Lineshot sneakers in beige. The classic '90s tennis silhouette is combined with modern details, a breathable upper, and a comfortable Ortholite sole. A versatile model for everyday looks and an active city pace",
+      "material": "Upper: 92% leather, 8% polyester; lining: polyester; sole: 100% rubber",
+      "preOrderDays": "5–10 business days"
+    },
+    "ru": {
+      "title": "Женские бежевые кроссовки с черными деталями Lacoste Lineshot 746SFA0075.1R5",
+      "description": "Стильные женские кроссовки Lacoste Lineshot в бежевом цвете. Классический теннисный силуэт 90-х сочетается с современными деталями, дышащим верхом и комфортной подошвой Ortholite. Универсальная модель для повседневных образов и активного городского ритма",
+      "material": "Верх — 92% кожа, 8% полиэстер; подкладка — полиэстер; подошва — 100% резина",
+      "preOrderDays": "5–10 рабочих дней"
+    }
+  }
 }

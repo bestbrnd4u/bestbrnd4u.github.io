@@ -78,5 +78,29 @@
   },
   "closure": "Масивна блискавка зверху",
   "compartments": "Усередині — кишеня на блискавці, відкрита кишеня та відділення для картки",
-  "decor": "Тиснене фірмове брендування"
+  "decor": "Тиснене фірмове брендування",
+  "i18n": {
+    "en": {
+      "title": "Marc Jacobs The Leather Small Tote Bag Aspen Green Cement",
+      "description": "A stylish, roomy Marc Jacobs The Leather Small Tote Bag in a refined Aspen Green shade, a versatile bag for everyday looks, work, travel and city walks.\nMade of genuine pebbled leather and finished with the signature embossed Marc Jacobs logo on the front. It has a spacious zip-top main compartment, an interior zip pocket, two patch pockets and a card slot.\nCarry it by the top handles or over the shoulder with the detachable, adjustable leather strap",
+      "material": "Genuine pebbled leather",
+      "dimensions": "26 × 21 × 13 cm",
+      "strapInfo": "Detachable, adjustable strap",
+      "preOrderDays": "5–10 business days",
+      "closure": "Chunky zip top",
+      "compartments": "Inside — zip pocket, slip pocket and card slot",
+      "decor": "Embossed signature branding"
+    },
+    "ru": {
+      "title": "Шопер Marc Jacobs The Leather Small Tote Bag Aspen Green Cement",
+      "description": "Стильная и вместительная сумка Marc Jacobs The Leather Small Tote Bag в благородном оттенке Aspen Green — универсальная модель для повседневных образов, работы, путешествий и прогулок по городу.\nСумка изготовлена из натуральной зернистой кожи и дополнена фирменным тисненым логотипом Marc Jacobs на передней панели. Модель имеет просторное основное отделение на молнии, внутренний карман на молнии, два накладных кармана и слот для карты.\nНосить сумку можно за верхние ручки или с помощью съемного регулируемого кожаного ремешка через плечо",
+      "material": "Натуральная зернистая кожа",
+      "dimensions": "26 × 21 × 13 см",
+      "strapInfo": "Ремень съемный и регулируемый",
+      "preOrderDays": "5–10 рабочих дней",
+      "closure": "Массивная молния сверху",
+      "compartments": "Внутри — карман на молнии, открытый карман и отделение для карты",
+      "decor": "Тисненый фирменный брендинг"
+    }
+  }
 }

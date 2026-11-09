@@ -57,5 +57,19 @@
       "ONESIZE": 1
     }
   },
-  "dimensions": "16 × 21 × 16 см"
+  "dimensions": "16 × 21 × 16 см",
+  "i18n": {
+    "en": {
+      "title": "Marc Jacobs the leather bucket bag Women's Leather Crossbody",
+      "description": "A Marc Jacobs leather crossbody bag. Compact body, signature monogram, shoulder strap. A bag that fits everything you need without looking bulky.",
+      "material": "Leather",
+      "dimensions": "16 × 21 × 16 cm"
+    },
+    "ru": {
+      "title": "Женская кожаная сумочка кросс-боди Marc Jacobs the leather bucket bag",
+      "description": "Кросс-боди Marc Jacobs из кожи. Компактный корпус, фирменная монограмма, ремешок через плечо. Модель, в которую помещается все нужное, но которая не выглядит громоздкой.",
+      "material": "Кожа",
+      "dimensions": "16 × 21 × 16 см"
+    }
+  }
 }

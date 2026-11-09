@@ -74,5 +74,19 @@
   "sku": "2F3HSH042H02-230",
   "category": "Жіночі сумки",
   "dimensions": "20 × 11 × 8 см",
-  "material": "Штучне хутро «тедді»; ремінець — натуральна шкіра, ланцюжок — метал"
+  "material": "Штучне хутро «тедді»; ремінець — натуральна шкіра, ланцюжок — метал",
+  "i18n": {
+    "en": {
+      "title": "Marc Jacobs The Teddy J Marc Mini Bag Brown",
+      "description": "A compact Marc Jacobs bag from The Teddy collection, with a soft, plush exterior and the signature J monogram on the flap. Carry it on the chain over the shoulder or in hand. An everyday piece for when you only need to bring the essentials.",
+      "material": "Faux teddy fur; strap — genuine leather, chain — metal",
+      "dimensions": "20 × 11 × 8 cm"
+    },
+    "ru": {
+      "title": "Сумочка Marc Jacobs The Teddy J Marc Mini Bag Brown",
+      "description": "Компактная сумочка Marc Jacobs из коллекции The Teddy — мягкий ворсистый верх и фирменная монограмма J на клапане. Носится на цепочке через плечо или в руке. Модель на каждый день, когда нужно взять только самое необходимое.",
+      "material": "Искусственный мех «тедди»; ремешок — натуральная кожа, цепочка — металл",
+      "dimensions": "20 × 11 × 8 см"
+    }
+  }
 }

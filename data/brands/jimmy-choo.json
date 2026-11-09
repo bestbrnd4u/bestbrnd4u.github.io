@@ -9,5 +9,13 @@
   "banner": "/assets/images/brands/jimmy-choo-banner.webp",
   "bannerMobile": "/assets/images/brands/jimmy-choo-banner-mobile.webp",
   "title": "Jimmy Choo",
-  "description": "Лондонський дім, заснований 1996 року шевцем Джиммі Чу та редакторкою Тамарою Меллон. Марка швидко стала синонімом вечірнього взуття — тонка шпилька, блиск, святковий характер.\n\nЗгодом до взуття додались сумки та окуляри, витримані в тому самому настрої."
+  "description": "Лондонський дім, заснований 1996 року шевцем Джиммі Чу та редакторкою Тамарою Меллон. Марка швидко стала синонімом вечірнього взуття — тонка шпилька, блиск, святковий характер.\n\nЗгодом до взуття додались сумки та окуляри, витримані в тому самому настрої.",
+  "i18n": {
+    "en": {
+      "description": "A London house founded in 1996 by shoemaker Jimmy Choo and editor Tamara Mellon. The brand quickly became synonymous with evening shoes — slender stilettos, shine, a festive character.\n\nOver time, bags and eyewear in the same spirit joined the shoes."
+    },
+    "ru": {
+      "description": "Лондонский дом, основанный в 1996 году сапожником Джимми Чу и редактором Тамарой Меллон. Марка быстро стала синонимом вечерней обуви — тонкая шпилька, блеск, праздничный характер.\n\nСо временем к обуви добавились сумки и очки, выдержанные в том же настроении."
+    }
+  }
 }

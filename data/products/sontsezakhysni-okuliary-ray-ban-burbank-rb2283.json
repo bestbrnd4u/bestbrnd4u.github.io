@@ -64,5 +64,23 @@
     "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-s-0f4f3c17.webp",
     "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-s-e881ab77.webp",
     "/assets/images/products/uploads/ray-ban-burbank-green-rectangular-mens-s-f4bc13e6.webp"
-  ]
+  ],
+  "i18n": {
+    "en": {
+      "title": "Ray-Ban Burbank RB2283 Sunglasses",
+      "description": "Stylish men's Ray-Ban Burbank RB2283 sunglasses with a rectangular frame. The model combines a classic silhouette with modern details and the signature Ray-Ban aesthetic.\nGreen lenses complement the frame and make bright light comfortable on the eyes. The versatile shape is ideal for everyday looks and pairs easily with different styles of clothing",
+      "material": "Acetate",
+      "dimensions": "14.1 × 4.5 cm; lens width — 5.5 cm; bridge — 1.8 cm; temple length — 14 cm",
+      "strapInfo": "Acetate temples",
+      "preOrderDays": "10-14 business days"
+    },
+    "ru": {
+      "title": "Солнцезащитные очки Ray-Ban Burbank RB2283",
+      "description": "Стильные мужские солнцезащитные очки Ray-Ban Burbank RB2283 с прямоугольной формой оправы. Модель сочетает классический силуэт с современными деталями и фирменной эстетикой Ray-Ban.\nЗеленые линзы гармонично дополняют оправу и обеспечивают комфортное восприятие яркого света. Универсальная форма отлично подходит для повседневных образов и легко сочетается с разным стилем одежды",
+      "material": "Ацетат",
+      "dimensions": "14,1 × 4,5 см; ширина линзы — 5,5 см; переносица — 1,8 см; длина дужки — 14 см",
+      "strapInfo": "Ацетатные дужки",
+      "preOrderDays": "10-14 рабочих дней"
+    }
+  }
 }

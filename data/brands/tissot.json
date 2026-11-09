@@ -9,5 +9,15 @@
   "banner": "/assets/images/brands/tissot-banner.webp",
   "bannerMobile": "/assets/images/brands/tissot-banner-mobile.webp",
   "title": "Годинники Tissot",
-  "description": "Швейцарська марка, заснована 1853 року в Ле-Локлі. Її принцип від початку — справжня швейцарська механіка за розумні гроші, без надбавки за статус.\n\nTissot багато років лишається офіційним хронометристом великих спортивних змагань. Найвідоміші лінії — PRX, Seastar, Le Locle."
+  "description": "Швейцарська марка, заснована 1853 року в Ле-Локлі. Її принцип від початку — справжня швейцарська механіка за розумні гроші, без надбавки за статус.\n\nTissot багато років лишається офіційним хронометристом великих спортивних змагань. Найвідоміші лінії — PRX, Seastar, Le Locle.",
+  "i18n": {
+    "en": {
+      "title": "Tissot watches",
+      "description": "A Swiss brand founded in 1853 in Le Locle. Its principle from the start: genuine Swiss mechanics for reasonable money, with no premium for status.\n\nFor many years, Tissot has been the official timekeeper of major sporting events. The best-known lines are PRX, Seastar and Le Locle."
+    },
+    "ru": {
+      "title": "Часы Tissot",
+      "description": "Швейцарская марка, основанная в 1853 году в Ле-Локле. Ее принцип с самого начала — настоящая швейцарская механика за разумные деньги, без наценки за статус.\n\nTissot много лет остается официальным хронометристом крупных спортивных соревнований. Самые известные линии — PRX, Seastar, Le Locle."
+    }
+  }
 }

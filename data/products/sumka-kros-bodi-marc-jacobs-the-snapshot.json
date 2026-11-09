@@ -21,7 +21,15 @@
         "/assets/images/products/uploads/sumka-marc-jacobs-2s3hcr500h03-chornii-0196611092012.webp"
       ],
       "description": "Сумка The Snapshot від Marc Jacobs — компактна модель у стильному чорно-білому виконанні з фірмовою подвійною літерою J та контрастною фурнітурою золотистого кольору. Сумка виготовлена зі шкіри Saffiano, добре тримає форму та чудово підходить для повсякденних образів",
-      "sku": "2S3HCR500H03-964"
+      "sku": "2S3HCR500H03-964",
+      "i18n": {
+        "en": {
+          "description": "Marc Jacobs The Snapshot bag — a compact model in a stylish black-and-white finish with the signature double J and contrasting gold-tone hardware. The bag is made of Saffiano leather, holds its shape well and is ideal for everyday looks"
+        },
+        "ru": {
+          "description": "Сумка The Snapshot от Marc Jacobs — компактная модель в стильном черно-белом исполнении с фирменной двойной буквой J и контрастной фурнитурой золотистого цвета. Сумка изготовлена из кожи Saffiano, хорошо держит форму и отлично подходит для повседневных образов"
+        }
+      }
     },
     {
       "color": "Cement & Multi",
@@ -34,7 +42,15 @@
         "/assets/images/products/uploads/marj-wy858_v5.webp",
         "/assets/images/products/uploads/marj-wy858_v6.webp"
       ],
-      "description": "Сумка The Snapshot від Marc Jacobs у стильному відтінку Cement & Multi. Компактна модель із характерним колор-блок дизайном, фірмовою подвійною літерою J на передній панелі та золотистою фурнітурою. Сумка виготовлена із міцної саф'янової шкіри та чудово підходить для повсякденних образів"
+      "description": "Сумка The Snapshot від Marc Jacobs у стильному відтінку Cement & Multi. Компактна модель із характерним колор-блок дизайном, фірмовою подвійною літерою J на передній панелі та золотистою фурнітурою. Сумка виготовлена із міцної саф'янової шкіри та чудово підходить для повсякденних образів",
+      "i18n": {
+        "en": {
+          "description": "Marc Jacobs The Snapshot bag in a stylish Cement & Multi shade. A compact model with a distinctive color-block design, the signature double J on the front panel and gold-tone hardware. The bag is made of durable Saffiano leather and is ideal for everyday looks"
+        },
+        "ru": {
+          "description": "Сумка The Snapshot от Marc Jacobs в стильном оттенке Cement & Multi. Компактная модель с характерным колор-блок дизайном, фирменной двойной буквой J на передней панели и золотистой фурнитурой. Сумка изготовлена из прочной сафьяновой кожи и отлично подходит для повседневных образов"
+        }
+      }
     }
   ],
   "preOrderPrepayment": 50,
@@ -84,5 +100,27 @@
     "/assets/images/products/uploads/sumka-marc-jacobs-2s3hcr500h03-chornii-0196611092012.webp"
   ],
   "closure": "Подвійна блискавка зверху",
-  "compartments": "Задня відкрита кишеня; усередині — відкрита кишеня"
+  "compartments": "Задня відкрита кишеня; усередині — відкрита кишеня",
+  "i18n": {
+    "en": {
+      "title": "Marc Jacobs The Snapshot Crossbody Bag",
+      "description": "The Snapshot by Marc Jacobs is a compact bag with a recognizable design and the signature double J Marc logo on the front.\nMade of durable Saffiano leather, it holds its shape well and has a practical size for everyday use. Two separate compartments make it easy to organize your essentials, and the detachable adjustable strap lets you wear the bag over the shoulder or crossbody.",
+      "material": "Saffiano leather",
+      "dimensions": "18 × 11 × 6 cm",
+      "strapInfo": "Detachable adjustable fabric strap",
+      "preOrderDays": "5–10 business days",
+      "closure": "Double zip top",
+      "compartments": "Back slip pocket; inside — slip pocket"
+    },
+    "ru": {
+      "title": "Сумка кросс-боди Marc Jacobs The Snapshot",
+      "description": "Сумка The Snapshot от Marc Jacobs — компактная модель с узнаваемым дизайном и фирменным двойным логотипом J Marc на передней панели.\nСумка изготовлена из прочной сафьяновой кожи, хорошо держит форму и имеет практичный формат для повседневного использования. Два отдельных отделения позволяют удобно организовать необходимые вещи, а съемный регулируемый ремень дает возможность носить сумку через плечо или кросс-боди.",
+      "material": "Кожа Saffiano",
+      "dimensions": "18 × 11 × 6 см",
+      "strapInfo": "Съемный регулируемый текстильный ремень",
+      "preOrderDays": "5–10 рабочих дней",
+      "closure": "Двойная молния сверху",
+      "compartments": "Задний открытый карман; внутри — открытый карман"
+    }
+  }
 }

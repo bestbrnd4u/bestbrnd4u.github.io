@@ -3435,6 +3435,52 @@ collections:
         required: false
         hint: "Наприклад: 100% поліестер"
 
+      # ПЕРЕКЛАДИ ТОВАРУ (сайт /en/ і /ru/ — scripts/build-locales.js).
+      # Порожнє поле = на тій мові показується український текст. Нічого
+      # не ламається: переклад можна дописати будь-коли пізніше.
+      - label: "🌍 Переклади (English / Русский)"
+        name: "i18n"
+        widget: "object"
+        collapsed: true
+        required: false
+        hint: >
+          Тексти цього товару англійською й російською для сайту /en/ і /ru/.
+          Заповнюйте ті самі поля, що й українською вище. Порожнє поле —
+          на тій мові покупець побачить український текст.
+        fields:
+          - label: "English"
+            name: "en"
+            widget: "object"
+            collapsed: true
+            required: false
+            fields:
+              - { label: "Назва", name: "title", widget: "string", required: false }
+              - { label: "Опис", name: "description", widget: "text", required: false }
+              - { label: "Матеріал", name: "material", widget: "string", required: false }
+              - { label: "Розмір (габарити)", name: "dimensions", widget: "string", required: false }
+              - { label: "Ручка / ремінь", name: "strapInfo", widget: "string", required: false }
+              - { label: "Застібка", name: "closure", widget: "string", required: false }
+              - { label: "Відділення / кишені", name: "compartments", widget: "string", required: false }
+              - { label: "Декор", name: "decor", widget: "string", required: false }
+              - { label: "Склад матеріалу", name: "composition", widget: "string", required: false }
+              - { label: "Термін під замовлення", name: "preOrderDays", widget: "string", required: false }
+          - label: "Русский"
+            name: "ru"
+            widget: "object"
+            collapsed: true
+            required: false
+            fields:
+              - { label: "Назва", name: "title", widget: "string", required: false }
+              - { label: "Опис", name: "description", widget: "text", required: false }
+              - { label: "Матеріал", name: "material", widget: "string", required: false }
+              - { label: "Розмір (габарити)", name: "dimensions", widget: "string", required: false }
+              - { label: "Ручка / ремінь", name: "strapInfo", widget: "string", required: false }
+              - { label: "Застібка", name: "closure", widget: "string", required: false }
+              - { label: "Відділення / кишені", name: "compartments", widget: "string", required: false }
+              - { label: "Декор", name: "decor", widget: "string", required: false }
+              - { label: "Склад матеріалу", name: "composition", widget: "string", required: false }
+              - { label: "Термін під замовлення", name: "preOrderDays", widget: "string", required: false }
+
       - label: "Рейтинг"
         name: "rating"
         widget: "number"

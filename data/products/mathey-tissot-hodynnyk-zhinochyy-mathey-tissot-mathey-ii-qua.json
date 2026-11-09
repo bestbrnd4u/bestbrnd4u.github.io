@@ -61,5 +61,21 @@
   },
   "dimensions": "Корпус — 2,6 см у діаметрі, товщина 1 см",
   "material": "Корпус і браслет — нержавіюча сталь 316L; скло — сапфірове",
-  "closure": "Розкладна"
+  "closure": "Розкладна",
+  "i18n": {
+    "en": {
+      "title": "Mathey Tissot Mathey II Quartz Crystal Black Dial Ladies Watch",
+      "description": "A women's Mathey Tissot watch on a two-tone bracelet. Dark dial with decorative accents around the edge and a date window. A watch for everyday wear and special occasions.",
+      "material": "Case and bracelet — 316L stainless steel; crystal — sapphire",
+      "dimensions": "Case — 2.6 cm in diameter, 1 cm thick",
+      "closure": "Deployant clasp"
+    },
+    "ru": {
+      "title": "Часы женские Mathey Tissot Mathey II Quartz Crystal Black Dial Ladies Watch",
+      "description": "Женские часы Mathey Tissot на комбинированном браслете. Темный циферблат с декоративными вставками по кругу и окошком даты. Модель для повседневной носки и особых случаев.",
+      "material": "Корпус и браслет — нержавеющая сталь 316L; стекло — сапфировое",
+      "dimensions": "Корпус — 2,6 см в диаметре, толщина 1 см",
+      "closure": "Раскладная застежка"
+    }
+  }
 }

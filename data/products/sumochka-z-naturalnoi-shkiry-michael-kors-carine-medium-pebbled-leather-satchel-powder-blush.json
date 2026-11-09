@@ -83,5 +83,29 @@
   "closure": "Блискавка",
   "compartments": "Зовні — задня відкрита кишеня та передня кишеня на блискавці; усередині — задня кишеня на блискавці та передня відкрита кишеня",
   "strapInfo": "Знімний регульований ремінь через плече, 47–56 см",
-  "decor": "Фурнітура золотистого тону"
+  "decor": "Фурнітура золотистого тону",
+  "i18n": {
+    "en": {
+      "title": "Michael Kors Carine Medium Pebbled Leather Satchel Powder Blush",
+      "description": "Michael Kors Carine Medium Pebbled Leather Satchel — Powder Blush\n\nAn elegant Michael Kors Carine Medium bag in a soft Powder Blush shade, a refined everyday option that easily complements both casual and more elegant looks.\n\nMade of 100% genuine leather with a pebbled texture that gives the bag an expressive look and makes it practical for daily use. The structured silhouette, neat top handles, and signature gold hardware create a stylish, upscale look.\n\nCarry it by hand or wear it on the shoulder thanks to the detachable adjustable strap. The spacious interior compartment is complemented by pockets for convenient storage of essentials, and the exterior zip pocket gives you quick access to things you need close at hand.",
+      "material": "100% genuine leather",
+      "dimensions": "28.5 × 12 × 21 cm",
+      "strapInfo": "Detachable adjustable shoulder strap, 47–56 cm",
+      "preOrderDays": "5–10 business days",
+      "closure": "Zipper",
+      "compartments": "Exterior: back open pocket and front zip pocket; interior: back zip pocket and front open pocket",
+      "decor": "Gold-tone hardware"
+    },
+    "ru": {
+      "title": "Сумочка из натуральной кожи Michael Kors Carine Medium Pebbled Leather Satchel Powder Blush",
+      "description": "Michael Kors Carine Medium Pebbled Leather Satchel — Powder Blush\n\nЭлегантная сумка Michael Kors Carine Medium в нежном оттенке Powder Blush — изысканный вариант на каждый день, который легко дополнит как повседневный, так и более элегантный образ.\n\nМодель изготовлена из 100% натуральной кожи с зернистой фактурой, которая придает сумке выразительный вид и делает ее практичной для ежедневного использования. Структурированный силуэт, аккуратные верхние ручки и фирменная золотая фурнитура создают стильный и дорогой вид.\n\nСумку можно носить в руках или на плече благодаря съемному регулируемому ремню. Просторное внутреннее отделение дополнено карманами для удобного хранения необходимых вещей, а наружный карман на молнии позволяет быстро достать то, что должно быть под рукой.",
+      "material": "100% натуральная кожа",
+      "dimensions": "28,5 × 12 × 21 см",
+      "strapInfo": "Съемный регулируемый ремень через плечо, 47–56 см",
+      "preOrderDays": "5–10 рабочих дней",
+      "closure": "Молния",
+      "compartments": "Снаружи — задний открытый карман и передний карман на молнии; внутри — задний карман на молнии и передний открытый карман",
+      "decor": "Фурнитура золотистого тона"
+    }
+  }
 }

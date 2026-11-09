@@ -53,5 +53,23 @@
       "ONESIZE": 1
     }
   },
-  "closure": "Кнопка"
+  "closure": "Кнопка",
+  "i18n": {
+    "en": {
+      "title": "Coach Snap Wallet With Heart Bolt Print",
+      "description": "A compact Coach Snap Wallet With Heart Bolt Print for women with a playful lightning bolt and heart print. It combines Coach's signature style with a practical format for everyday use.\nInside there are bill compartments, 3 card slots and a clear ID window. The exterior zip pocket is handy for coins and small items. The wallet closes with a snap",
+      "material": "Genuine leather",
+      "dimensions": "11 × 9 × 2.5 cm",
+      "preOrderDays": "5–10 business days",
+      "closure": "Snap"
+    },
+    "ru": {
+      "title": "Кошелек Coach Snap Wallet With Heart Bolt Print",
+      "description": "Компактный женский кошелек Coach Snap Wallet With Heart Bolt Print с игривым принтом в виде молний и сердечек. Модель сочетает фирменный стиль Coach с практичным форматом для повседневного использования.\nВнутри предусмотрены отделения для купюр, 3 слота для банковских карт и прозрачное окошко для ID. Внешний карман на молнии удобно подходит для монет и мелочей. Кошелек закрывается на кнопку",
+      "material": "Натуральная кожа",
+      "dimensions": "11 × 9 × 2,5 см",
+      "preOrderDays": "5–10 рабочих дней",
+      "closure": "Кнопка"
+    }
+  }
 }

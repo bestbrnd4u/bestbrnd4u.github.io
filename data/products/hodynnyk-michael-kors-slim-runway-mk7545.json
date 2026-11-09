@@ -63,5 +63,23 @@
     "/assets/images/products/uploads/michael-kors-slim-runway-white-dial-ladies-watch-mk7545.webp",
     "/assets/images/products/uploads/michael-kors-slim-runway-white-dial-ladies-watch-mk7545_2.webp",
     "/assets/images/products/uploads/michael-kors-slim-runway-white-dial-ladies-watch-mk7545_3.webp"
-  ]
+  ],
+  "i18n": {
+    "en": {
+      "title": "Michael Kors Slim Runway MK7545 Watch",
+      "description": "An elegant women's Michael Kors Slim Runway watch in a delicate combination of rose gold, a white dial and a light pink leather strap. The minimalist design makes the model versatile — it easily complements both casual and business looks.\nThe watch features a precise three-hand quartz movement. The case is made of stainless steel, the dial is protected by scratch-resistant mineral crystal, and the leather strap is finished with a classic buckle",
+      "material": "Case material: stainless steel. Strap material: genuine leather",
+      "dimensions": "Case diameter: 38 mm. Case thickness: 8 mm. Strap width: 18 mm. Strap length: 17.5 cm",
+      "preOrderDays": "10-14 business days",
+      "closure": "Closure: buckle"
+    },
+    "ru": {
+      "title": "Часы Michael Kors Slim Runway MK7545",
+      "description": "Элегантные женские часы Michael Kors Slim Runway в нежном сочетании розового золота, белого циферблата и светло-розового кожаного ремешка. Минималистичный дизайн делает модель универсальной — она легко дополнит как повседневный, так и деловой образ.\nЧасы оснащены точным кварцевым механизмом с тремя стрелками. Корпус изготовлен из нержавеющей стали, циферблат защищен устойчивым к царапинам минеральным стеклом, а кожаный ремешок дополнен классической застежкой-пряжкой",
+      "material": "Материал корпуса: нержавеющая сталь. Материал ремешка: натуральная кожа",
+      "dimensions": "Диаметр корпуса: 38 мм. Толщина корпуса: 8 мм. Ширина ремешка: 18 мм. Длина ремешка: 17,5 см",
+      "preOrderDays": "10-14 рабочих дней",
+      "closure": "Застежка: пряжка"
+    }
+  }
 }

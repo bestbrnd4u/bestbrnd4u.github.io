@@ -63,5 +63,25 @@
   "legacySlugs": [
     "годинник-tissot-pr-100-40mm-t150-410-11-041-00"
   ],
-  "closure": "Розкладна застібка-метелик із двома кнопками-фіксаторами та емблемою Tissot"
+  "closure": "Розкладна застібка-метелик із двома кнопками-фіксаторами та емблемою Tissot",
+  "i18n": {
+    "en": {
+      "title": "Tissot PR 100 40mm T150.410.11.041.00 Watch",
+      "description": "A classic men's Tissot PR 100 40mm watch with a rich blue dial and an elegant steel case. The clean design makes the model versatile — it complements a business suit and a casual outfit equally well.\nThe watch features a precise Swiss quartz movement, a date display and scratch-resistant sapphire crystal. The silver-tone case and steel bracelet emphasize the model's understated premium style. Water resistance up to 100 m (10 bar) allows comfortable everyday wear",
+      "material": "Case and bracelet — 316L stainless steel; crystal — sapphire, scratch-resistant",
+      "dimensions": "4 × 4 × 0.825 cm",
+      "strapInfo": "Silver-tone steel bracelet with a quick-release system and butterfly clasp with push buttons. Lug width — 2 cm",
+      "preOrderDays": "10-14 business days",
+      "closure": "Folding butterfly clasp with two push-button locks and Tissot emblem"
+    },
+    "ru": {
+      "title": "Часы Tissot PR 100 40mm T150.410.11.041.00",
+      "description": "Классические мужские часы Tissot PR 100 40mm с насыщенным синим циферблатом и элегантным стальным корпусом. Лаконичный дизайн делает модель универсальной — она гармонично дополнит как деловой костюм, так и повседневный образ.\nЧасы оснащены точным швейцарским кварцевым механизмом, индикацией даты и сапфировым стеклом, устойчивым к царапинам. Серебристый корпус и стальной браслет подчеркивают сдержанный премиальный стиль модели. Водонепроницаемость до 100 м (10 bar) позволяет комфортно использовать часы в повседневной жизни",
+      "material": "Корпус и браслет — нержавеющая сталь 316L; стекло — сапфировое, устойчивое к царапинам",
+      "dimensions": "4 × 4 × 0,825 см",
+      "strapInfo": "Стальной браслет серебристого цвета с системой быстрой замены и застежкой-бабочкой с кнопками. Ширина крепления — 2 см",
+      "preOrderDays": "10-14 рабочих дней",
+      "closure": "Раскладная застежка-бабочка с двумя кнопками-фиксаторами и эмблемой Tissot"
+    }
+  }
 }

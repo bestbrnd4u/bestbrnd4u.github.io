@@ -101,5 +101,27 @@
     "/assets/images/products/uploads/cz398_qbmi5_a91.webp"
   ],
   "closure": "Блискавка",
-  "compartments": "Зовнішні кишені — на блискавці та відкрита; усередині — багатофункціональна кишеня"
+  "compartments": "Зовнішні кишені — на блискавці та відкрита; усередині — багатофункціональна кишеня",
+  "i18n": {
+    "en": {
+      "title": "Coach Houston Flight Bag In Signature Canvas Men's Bag",
+      "description": "A stylish and practical Coach Houston Flight Bag for men in the signature Signature print. It combines the brand's signature coated canvas with smooth leather, finished with metal details and a clean design.\nThe bag has a main zip compartment, exterior zip and open pockets, and an interior multifunction pocket to keep your things organized. The compact yet roomy format fits a wallet, headphones, a smartphone and other essentials. The adjustable strap lets you wear the bag on the shoulder or crossbody",
+      "material": "Signature coated canvas and smooth calf leather; fabric lining",
+      "dimensions": "22 × 26 × 5 cm",
+      "strapInfo": "Adjustable shoulder strap with a 63.5 cm drop, so the bag can be worn on the shoulder or crossbody",
+      "preOrderDays": "10-14 business days",
+      "closure": "Zipper",
+      "compartments": "Exterior pockets — zip and open; inside — multifunction pocket"
+    },
+    "ru": {
+      "title": "Мужская сумка Coach Houston Flight Bag In Signature Canvas",
+      "description": "Стильная и практичная мужская сумка Coach Houston Flight Bag в фирменном принте Signature. Модель выполнена в сочетании фирменного покрытого холста и гладкой кожи, дополнена металлическими деталями и лаконичным дизайном.\nСумка имеет основное отделение на молнии, внешние карманы на молнии и без застежки, а также внутренний многофункциональный карман для удобной организации вещей. Компактный, но вместительный формат позволяет разместить кошелек, наушники, смартфон и другие необходимые вещи. Регулируемый ремень позволяет носить сумку на плече или кросс-боди",
+      "material": "Фирменный покрытый холст Signature и гладкая телячья кожа; текстильная подкладка",
+      "dimensions": "22 × 26 × 5 см",
+      "strapInfo": "Регулируемый плечевой ремень с высотой спуска 63,5 см, который позволяет носить сумку на плече или кросс-боди",
+      "preOrderDays": "10-14 рабочих дней",
+      "closure": "Молния",
+      "compartments": "Внешние карманы — на молнии и открытый; внутри — многофункциональный карман"
+    }
+  }
 }

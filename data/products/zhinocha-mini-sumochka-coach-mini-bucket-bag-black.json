@@ -127,5 +127,25 @@
       "ONESIZE": 1
     }
   },
-  "closure": "Затяжний шнурок"
+  "closure": "Затяжний шнурок",
+  "i18n": {
+    "en": {
+      "title": "Women's Coach Mini Bucket Bag Black",
+      "description": "A stylish COACH Mini Bucket Bag in black with silver-tone hardware. The minimalist bucket silhouette and signature COACH logo make it a versatile accessory for everyday and evening looks.\nThe bag is made of quality genuine leather and has a convenient drawstring closure. It comes with a detachable handle and a detachable strap, so it can be carried by hand or worn on the shoulder or crossbody. The compact size is ideal for just the essentials",
+      "material": "Genuine leather",
+      "dimensions": "14 × 16.5 × 9 cm",
+      "strapInfo": "Detachable",
+      "preOrderDays": "5–10 business days",
+      "closure": "Drawstring"
+    },
+    "ru": {
+      "title": "Женская мини-сумочка Coach Mini Bucket Bag Black",
+      "description": "Стильная мини-сумка COACH Mini Bucket Bag в сочетании черного цвета с серебристой фурнитурой. Лаконичный силуэт bucket и фирменный логотип COACH делают модель универсальным аксессуаром для повседневных и вечерних образов.\nСумка изготовлена из качественной натуральной кожи и имеет удобное закрытие на шнурок. Модель дополнена съемной ручкой и съемным ремнем, поэтому ее можно носить в руке, на плече или через плечо. Компактный размер идеально подходит для самых необходимых вещей",
+      "material": "Натуральная кожа",
+      "dimensions": "14 × 16,5 × 9 см",
+      "strapInfo": "Съемные",
+      "preOrderDays": "5–10 рабочих дней",
+      "closure": "Затягивающийся шнурок"
+    }
+  }
 }

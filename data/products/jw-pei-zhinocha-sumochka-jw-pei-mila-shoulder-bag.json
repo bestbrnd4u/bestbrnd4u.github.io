@@ -57,5 +57,25 @@
   "material": "Веганська шкіра; підкладка — бавовняний твіл",
   "compartments": "Одна внутрішня кишеня",
   "strapInfo": "Знімний нерегульований плечовий ремінь, перепад 25 см",
-  "decor": "Фурнітура золотистого тону"
+  "decor": "Фурнітура золотистого тону",
+  "i18n": {
+    "en": {
+      "title": "JW PEI Mila Shoulder Bag Women's Bag",
+      "description": "JW PEI Mila is a shoulder bag with soft lines and a short handle. A minimalist design without excess decoration that fits easily into any look.",
+      "material": "Vegan leather; lining — cotton twill",
+      "dimensions": "24 × 13.5 × 6 cm",
+      "strapInfo": "Removable non-adjustable shoulder strap, drop 25 cm",
+      "compartments": "One interior pocket",
+      "decor": "Gold-tone hardware"
+    },
+    "ru": {
+      "title": "Женская сумочка JW PEI Mila Shoulder Bag",
+      "description": "JW PEI Mila — сумка на плечо с мягкими линиями и короткой ручкой. Минималистичный дизайн без лишнего декора, который легко вписывается в любой образ.",
+      "material": "Веганская кожа; подкладка — хлопковый твил",
+      "dimensions": "24 × 13,5 × 6 см",
+      "strapInfo": "Съемный нерегулируемый плечевой ремень, высота 25 см",
+      "compartments": "Один внутренний карман",
+      "decor": "Фурнитура золотистого тона"
+    }
+  }
 }

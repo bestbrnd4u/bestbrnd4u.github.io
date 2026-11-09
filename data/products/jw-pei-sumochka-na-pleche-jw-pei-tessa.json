@@ -61,5 +61,25 @@
   "material": "Веганська шкіра; підкладка — поліестер",
   "closure": "Передня пряжка",
   "compartments": "Усередині — кишеня на блискавці та відкрита кишеня",
-  "strapInfo": "Знімний регульований плечовий ремінь, перепад 26–57 см"
+  "strapInfo": "Знімний регульований плечовий ремінь, перепад 26–57 см",
+  "i18n": {
+    "en": {
+      "title": "JW PEI TESSA Shoulder Bag",
+      "description": "JW PEI Tessa is a shoulder bag with hardware and decorative details across the body. A crescent shape that sits snugly on the shoulder.",
+      "material": "Vegan leather; lining — polyester",
+      "dimensions": "30 × 19 × 6 cm",
+      "strapInfo": "Removable adjustable shoulder strap, drop 26–57 cm",
+      "closure": "Front buckle",
+      "compartments": "Inside — zip pocket and open pocket"
+    },
+    "ru": {
+      "title": "Сумочка на плечо JW PEI TESSA",
+      "description": "JW PEI Tessa — сумка на плечо с фурнитурой и декоративными деталями по корпусу. Форма полумесяца, плотно прилегающая к плечу.",
+      "material": "Веганская кожа; подкладка — полиэстер",
+      "dimensions": "30 × 19 × 6 см",
+      "strapInfo": "Съемный регулируемый плечевой ремень, высота 26–57 см",
+      "closure": "Передняя пряжка",
+      "compartments": "Внутри — карман на молнии и открытый карман"
+    }
+  }
 }

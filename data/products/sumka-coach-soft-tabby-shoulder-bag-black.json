@@ -113,5 +113,29 @@
   ],
   "closure": "Кнопка",
   "compartments": "Зовнішня кишеня на блискавці; усередині — кишеня на блискавці",
-  "decor": "Фірмова фурнітура Coach"
+  "decor": "Фірмова фурнітура Coach",
+  "i18n": {
+    "en": {
+      "title": "Coach Soft Tabby Shoulder Bag Black",
+      "description": "An elegant COACH Soft Tabby Shoulder Bag in classic black. It reimagines the iconic 1970s Tabby silhouette in a softer, more relaxed form.\nMade of smooth genuine leather and finished with the signature Signature hardware closure. There is a zip pocket inside and an additional exterior zip pocket for convenient storage of small items.\nThe detachable strap lets you carry the bag in hand, on the shoulder or crossbody",
+      "material": "Smooth genuine leather",
+      "dimensions": "26 × 16.5 × 8.3 cm",
+      "strapInfo": "Detachable, adjustable strap",
+      "preOrderDays": "5–10 business days",
+      "closure": "Snap",
+      "compartments": "Exterior zip pocket; inside — zip pocket",
+      "decor": "Signature Coach hardware"
+    },
+    "ru": {
+      "title": "Сумка Coach Soft Tabby Shoulder Bag Black",
+      "description": "Элегантная сумка COACH Soft Tabby Shoulder Bag в классическом черном цвете. Модель переосмысливает культовый силуэт Tabby 1970-х годов в более мягком и расслабленном исполнении.\nСумка изготовлена из гладкой натуральной кожи и дополнена фирменной застежкой Signature. Внутри расположен карман на молнии, снаружи — дополнительный карман на молнии для удобного хранения мелочей.\nМодель имеет съемный ремешок, благодаря которому сумку можно носить в руке, на плече или через плечо",
+      "material": "Гладкая натуральная кожа",
+      "dimensions": "26 × 16,5 × 8,3 см",
+      "strapInfo": "Ремешок съемный и регулируемый",
+      "preOrderDays": "5–10 рабочих дней",
+      "closure": "Кнопка",
+      "compartments": "Внешний карман на молнии; внутри — карман на молнии",
+      "decor": "Фирменная фурнитура Coach"
+    }
+  }
 }

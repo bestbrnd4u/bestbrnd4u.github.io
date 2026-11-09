@@ -79,5 +79,29 @@
   },
   "closure": "Масивна блискавка зверху",
   "compartments": "Усередині — кишеня на блискавці, відкрита кишеня та відділення для картки",
-  "decor": "Тиснене фірмове брендування"
+  "decor": "Тиснене фірмове брендування",
+  "i18n": {
+    "en": {
+      "title": "Marc Jacobs The Leather Small Tote Bag",
+      "description": "A stylish, versatile Marc Jacobs The Leather Small Tote Bag in a neutral Twine shade. The clean design, genuine pebbled leather and signature Marc Jacobs logo make it a great complement to everyday looks.\nThe bag has a spacious main compartment, an interior slip pocket and a signature leather logo patch on the back. It comes with two top handles and a detachable, adjustable strap, so you can carry it in hand, on the shoulder or crossbody",
+      "material": "Genuine leather",
+      "dimensions": "25.5 × 20 × 13 cm",
+      "strapInfo": "Detachable, adjustable strap",
+      "preOrderDays": "5–10 business days",
+      "closure": "Chunky zip top",
+      "compartments": "Inside — zip pocket, slip pocket and card slot",
+      "decor": "Embossed signature branding"
+    },
+    "ru": {
+      "title": "Шопер Marc Jacobs The Leather Small Tote Bag",
+      "description": "Стильная и универсальная сумка Marc Jacobs The Leather Small Tote Bag в нейтральном оттенке Twine. Лаконичный дизайн, натуральная зернистая кожа и фирменный логотип Marc Jacobs делают модель отличным дополнением к повседневным образам.\nСумка имеет просторное основное отделение, внутренний открытый карман и фирменную кожаную нашивку с логотипом на задней панели. Модель дополнена двумя верхними ручками и съемным регулируемым ремешком, поэтому ее можно носить в руке, на плече или через плечо",
+      "material": "Натуральная кожа",
+      "dimensions": "25,5 × 20 × 13 см",
+      "strapInfo": "Ремешок съемный и регулируемый",
+      "preOrderDays": "5–10 рабочих дней",
+      "closure": "Массивная молния сверху",
+      "compartments": "Внутри — карман на молнии, открытый карман и отделение для карты",
+      "decor": "Тисненый фирменный брендинг"
+    }
+  }
 }

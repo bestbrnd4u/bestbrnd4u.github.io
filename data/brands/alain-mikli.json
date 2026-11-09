@@ -8,5 +8,15 @@
   "banner": "/assets/images/brands/alain-mikli-banner.webp",
   "bannerMobile": "/assets/images/brands/alain-mikli-banner-mobile.webp",
   "title": "Окуляри Alain Mikli",
-  "description": "Паризький оптичний дім, заснований Аленом Міклі 1978 року. Він одним із перших почав ставитись до оправи як до самостійного об'єкта дизайну, а не до медичного виробу: кольорові ацетати, скульптурні форми, помітні лінії.\n\nОправи збирають вручну з ацетату, тож навіть в одній моделі малюнок матеріалу не повторюється. Сьогодні бренд входить до групи EssilorLuxottica."
+  "description": "Паризький оптичний дім, заснований Аленом Міклі 1978 року. Він одним із перших почав ставитись до оправи як до самостійного об'єкта дизайну, а не до медичного виробу: кольорові ацетати, скульптурні форми, помітні лінії.\n\nОправи збирають вручну з ацетату, тож навіть в одній моделі малюнок матеріалу не повторюється. Сьогодні бренд входить до групи EssilorLuxottica.",
+  "i18n": {
+    "en": {
+      "title": "Alain Mikli eyewear",
+      "description": "A Parisian optical house founded by Alain Mikli in 1978. He was one of the first to treat a frame as a design object in its own right rather than a medical device: colored acetates, sculptural shapes, bold lines.\n\nThe frames are assembled by hand from acetate, so the pattern of the material never repeats, even within a single model. Today the brand is part of the EssilorLuxottica group."
+    },
+    "ru": {
+      "title": "Очки Alain Mikli",
+      "description": "Парижский оптический дом, основанный Аленом Микли в 1978 году. Он одним из первых стал относиться к оправе как к самостоятельному объекту дизайна, а не к медицинскому изделию: цветные ацетаты, скульптурные формы, заметные линии.\n\nОправы собирают вручную из ацетата, поэтому даже в одной модели рисунок материала не повторяется. Сегодня бренд входит в группу EssilorLuxottica."
+    }
+  }
 }

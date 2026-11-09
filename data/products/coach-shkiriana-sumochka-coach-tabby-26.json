@@ -187,5 +187,23 @@
   },
   "dimensions": "26 × 15 × 8 см",
   "closure": "Кнопка",
-  "compartments": "Зовнішня відкрита кишеня; усередині — кишеня на блискавці та багатофункціональна кишеня"
+  "compartments": "Зовнішня відкрита кишеня; усередині — кишеня на блискавці та багатофункціональна кишеня",
+  "i18n": {
+    "en": {
+      "title": "Coach Tabby 26 Leather Bag",
+      "description": "The Coach Tabby 26 is one of the brand's most recognizable styles.\nIt is inspired by an archival 1970s COACH design and finished with the signature closure with Signature hardware.\nThe bag is made of genuine Polished Pebble Leather — a textured leather with a subtle glossy finish. It has an exterior open pocket, an interior zip pocket and a multifunction pocket.\nIt comes with two detachable straps: a short one for carrying by hand or on the shoulder, and a long adjustable one for wearing crossbody",
+      "material": "Leather",
+      "dimensions": "26 × 15 × 8 cm",
+      "closure": "Snap",
+      "compartments": "Exterior open pocket; inside — a zip pocket and a multifunction pocket"
+    },
+    "ru": {
+      "title": "Кожаная сумочка Coach Tabby 26",
+      "description": "Coach Tabby 26 — одна из самых узнаваемых моделей бренда.\nМодель вдохновлена архивным дизайном COACH 1970-х годов и дополнена фирменной застежкой с Signature-фурнитурой.\nСумка изготовлена из натуральной кожи Polished Pebble Leather — фактурной кожи с легкой глянцевой поверхностью. Имеет внешний открытый карман, внутренний карман на молнии и многофункциональный карман.\nМодель комплектуется двумя съемными ремнями: коротким для ношения в руке или на плече и длинным регулируемым для ношения через плечо",
+      "material": "Кожа",
+      "dimensions": "26 × 15 × 8 см",
+      "closure": "Кнопка",
+      "compartments": "Внешний открытый карман; внутри — карман на молнии и многофункциональный карман"
+    }
+  }
 }

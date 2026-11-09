@@ -7,5 +7,13 @@
   "banner": "/assets/images/brands/prada-banner.webp",
   "bannerMobile": "/assets/images/brands/prada-banner-mobile.webp",
   "title": "Prada",
-  "description": "Міланський дім, заснований Маріо Прадою 1913 року як крамниця шкіряних виробів і дорожніх речей. Упізнаваним у світі його зробила Міучча Прада, онука засновника.\n\nЇї головний прийом — нейлон замість шкіри: технічна тканина в люксовій речі спершу здавалась провокацією, а стала знаком марки. Сьогодні це перероблений Re-Nylon."
+  "description": "Міланський дім, заснований Маріо Прадою 1913 року як крамниця шкіряних виробів і дорожніх речей. Упізнаваним у світі його зробила Міучча Прада, онука засновника.\n\nЇї головний прийом — нейлон замість шкіри: технічна тканина в люксовій речі спершу здавалась провокацією, а стала знаком марки. Сьогодні це перероблений Re-Nylon.",
+  "i18n": {
+    "en": {
+      "description": "A Milanese house founded by Mario Prada in 1913 as a shop selling leather goods and travel items. It was Miuccia Prada, the founder's granddaughter, who made it recognizable worldwide.\n\nHer signature move was nylon instead of leather: a technical fabric in a luxury piece first seemed like a provocation but became the brand's hallmark. Today it is the recycled Re-Nylon."
+    },
+    "ru": {
+      "description": "Миланский дом, основанный Марио Прадой в 1913 году как лавка кожаных изделий и дорожных вещей. Узнаваемым во всем мире его сделала Миучча Прада, внучка основателя.\n\nЕе главный прием — нейлон вместо кожи: техническая ткань в люксовой вещи сначала казалась провокацией, а стала знаком марки. Сегодня это переработанный Re-Nylon."
+    }
+  }
 }

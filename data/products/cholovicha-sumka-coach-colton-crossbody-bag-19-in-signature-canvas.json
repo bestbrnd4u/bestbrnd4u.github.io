@@ -191,5 +191,27 @@
     "/assets/images/products/uploads/cet66_svsmu_a91.webp"
   ],
   "closure": "Блискавка",
-  "compartments": "Зовнішня кишеня на блискавці з двома відділеннями для карток"
+  "compartments": "Зовнішня кишеня на блискавці з двома відділеннями для карток",
+  "i18n": {
+    "en": {
+      "title": "COACH Colton Crossbody Bag 19 In Signature Canvas Men's Bag",
+      "description": "The compact and practical COACH Colton Crossbody Bag 19 is a great choice for everyday use. It is made of high-quality pebbled leather and has a clean design with silver-tone metal hardware.\nThe bag closes with a zipper and has an exterior zip pocket with two card slots. The compact format comfortably fits your essentials, and the bag holds even an iPhone 14 Pro Max.\nThe adjustable strap lets you wear it over the shoulder or crossbody for everyday comfort",
+      "material": "Pebbled genuine leather - Refined Pebble Leather",
+      "dimensions": "18 × 10 × 5 cm",
+      "strapInfo": "Adjustable shoulder strap for wearing over the shoulder or crossbody",
+      "preOrderDays": "10-14 business days",
+      "closure": "Zipper",
+      "compartments": "Exterior zip pocket with two card slots"
+    },
+    "ru": {
+      "title": "Мужская сумка COACH Colton Crossbody Bag 19 In Signature Canvas",
+      "description": "Компактная и практичная сумка COACH Colton Crossbody Bag 19 — отличный вариант для повседневного использования. Модель изготовлена из высококачественной зернистой кожи и имеет лаконичный дизайн с металлической фурнитурой серебристого цвета.\nСумка закрывается на молнию и имеет внешний карман на молнии с двумя слотами для банковских карт. Компактный формат позволяет удобно разместить необходимые вещи, а сумка вмещает даже iPhone 14 Pro Max.\nРегулируемый ремень позволяет носить модель на плече или кросс-боди, обеспечивая комфорт в повседневном использовании",
+      "material": "Зернистая натуральная кожа - Refined Pebble Leather",
+      "dimensions": "18 × 10 × 5 см",
+      "strapInfo": "Регулируемый плечевой ремень для ношения на плече или кросс-боди",
+      "preOrderDays": "10-14 рабочих дней",
+      "closure": "Молния",
+      "compartments": "Внешний карман на молнии с двумя отделениями для карт"
+    }
+  }
 }

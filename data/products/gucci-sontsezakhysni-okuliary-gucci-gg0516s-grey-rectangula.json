@@ -55,5 +55,19 @@
     }
   },
   "dimensions": "Ширина лінзи × місток × довжина завушника: 52 × 20 × 145 мм",
-  "material": "Ацетат"
+  "material": "Ацетат",
+  "i18n": {
+    "en": {
+      "title": "GUCCI GG0516S Grey Rectangula Sunglasses",
+      "description": "Gucci GG0516S sunglasses. A cat-eye frame with metal detailing on the temples and dark lenses. A shape that visually elongates facial features.",
+      "material": "Acetate",
+      "dimensions": "Lens width × bridge × temple length: 52 × 20 × 145 mm"
+    },
+    "ru": {
+      "title": "Солнцезащитные очки GUCCI GG0516S Grey Rectangula",
+      "description": "Солнцезащитные очки Gucci GG0516S. Оправа «кошачий глаз» с металлическим декором на заушниках и темными линзами. Форма, которая визуально вытягивает черты лица.",
+      "material": "Ацетат",
+      "dimensions": "Ширина линзы × мост × длина заушника: 52 × 20 × 145 мм"
+    }
+  }
 }

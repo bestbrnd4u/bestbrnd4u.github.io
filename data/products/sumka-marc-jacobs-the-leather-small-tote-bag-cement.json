@@ -78,5 +78,29 @@
   },
   "closure": "Масивна блискавка зверху",
   "compartments": "Усередині — кишеня на блискавці, відкрита кишеня та відділення для картки",
-  "decor": "Тиснене фірмове брендування"
+  "decor": "Тиснене фірмове брендування",
+  "i18n": {
+    "en": {
+      "title": "Marc Jacobs The Leather Small Tote Bag Cement",
+      "description": "A stylish and versatile Marc Jacobs The Leather Small Tote Bag in a refined Cement shade. The minimalist design, genuine pebbled leather, and signature Marc Jacobs logo make it a great choice for everyday looks.\nThe bag is made of genuine pebbled leather with a subtle glossy finish. It has one zippered main compartment, an interior pocket, and a pocket for small items. The front panel features the signature The Tote Bag logo, and the back has a leather logo patch.\nIt comes with two top handles and a detachable adjustable leather strap, so it can be carried by hand or worn on the shoulder or crossbody",
+      "material": "Genuine leather",
+      "dimensions": "26 × 21 × 13 cm",
+      "strapInfo": "Detachable and adjustable strap",
+      "preOrderDays": "5–10 business days",
+      "closure": "Chunky top zipper",
+      "compartments": "Inside: zip pocket, open pocket, and card slot",
+      "decor": "Embossed signature branding"
+    },
+    "ru": {
+      "title": "Сумка Marc Jacobs The Leather Small Tote Bag Cement",
+      "description": "Стильная и универсальная сумка Marc Jacobs The Leather Small Tote Bag в утонченном оттенке Cement. Лаконичный дизайн, натуральная зернистая кожа и фирменный логотип Marc Jacobs делают модель отличным выбором для повседневных образов.\nСумка изготовлена из натуральной зернистой кожи с легкой глянцевой поверхностью. Имеет одно основное отделение на молнии, внутренний карман и карман для мелочей. На передней панели расположен фирменный логотип The Tote Bag, а на задней — кожаный патч с логотипом.\nМодель дополнена двумя верхними ручками и съемным регулируемым кожаным ремешком, поэтому ее можно носить в руке, на плече или через плечо",
+      "material": "Натуральная кожа",
+      "dimensions": "26 × 21 × 13 см",
+      "strapInfo": "Ремешок съемный и регулируемый",
+      "preOrderDays": "5–10 рабочих дней",
+      "closure": "Массивная молния сверху",
+      "compartments": "Внутри — карман на молнии, открытый карман и отделение для карты",
+      "decor": "Тисненый фирменный брендинг"
+    }
+  }
 }

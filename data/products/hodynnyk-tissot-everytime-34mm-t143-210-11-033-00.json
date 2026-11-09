@@ -62,5 +62,25 @@
   "legacySlugs": [
     "годинник-tissot-everytime-34mm-t143-210-11-033-00"
   ],
-  "closure": "Застібка-метелик із кнопками-фіксаторами"
+  "closure": "Застібка-метелик із кнопками-фіксаторами",
+  "i18n": {
+    "en": {
+      "title": "Tissot Everytime 34mm T143.210.11.033.00 Watch",
+      "description": "An elegant women's Tissot Everytime 34mm watch with a minimalist design and a round steel case. The model pairs easily with casual, business and more formal looks.\nThe watch features a Swiss ETA F05.412 quartz movement, scratch-resistant sapphire crystal and a steel bracelet with a quick-release system. The silver-tone case is complemented by a light dial with clean indices. Water resistance — up to 50 m (5 bar)",
+      "material": "Case and bracelet — 316L stainless steel; crystal — sapphire, scratch-resistant",
+      "dimensions": "3.4 × 3.4 × 0.69 cm",
+      "strapInfo": "Silver-tone steel bracelet, 1.6 cm wide, with a quick-release system and butterfly clasp",
+      "preOrderDays": "10-14 business days",
+      "closure": "Butterfly clasp with push-button locks"
+    },
+    "ru": {
+      "title": "Часы Tissot Everytime 34mm T143.210.11.033.00",
+      "description": "Элегантные женские часы Tissot Everytime 34mm с минималистичным дизайном и круглым стальным корпусом. Модель легко сочетается как с повседневными, так и с деловыми и более элегантными образами.\nЧасы оснащены швейцарским кварцевым механизмом ETA F05.412, сапфировым стеклом, устойчивым к царапинам, и стальным браслетом с системой быстрой замены. Серебристый корпус дополнен светлым циферблатом с лаконичными индексами. Водонепроницаемость — до 50 м (5 bar)",
+      "material": "Корпус и браслет — нержавеющая сталь 316L; стекло — сапфировое, устойчивое к царапинам",
+      "dimensions": "3,4 × 3,4 × 0,69 см",
+      "strapInfo": "Стальной браслет серебристого цвета шириной 1,6 см с системой быстрой замены и застежкой-бабочкой",
+      "preOrderDays": "10-14 рабочих дней",
+      "closure": "Застежка-бабочка с кнопками-фиксаторами"
+    }
+  }
 }

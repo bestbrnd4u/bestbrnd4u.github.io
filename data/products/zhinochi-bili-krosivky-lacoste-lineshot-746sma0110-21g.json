@@ -69,5 +69,19 @@
       "38": 1
     }
   },
-  "material": "Верх — 92% шкіра, 8% поліестер; підкладка — поліестер; підошва — 100% гума"
+  "material": "Верх — 92% шкіра, 8% поліестер; підкладка — поліестер; підошва — 100% гума",
+  "i18n": {
+    "en": {
+      "title": "Lacoste Lineshot 746SMA0110.21G Women's White Sneakers",
+      "description": "Stylish women's Lacoste Lineshot sneakers in classic white. The minimalist tennis design pairs easily with everyday looks, and the well-designed construction provides all-day comfort. A versatile model for urban style and active leisure",
+      "material": "Upper: 92% leather, 8% polyester; lining: polyester; sole: 100% rubber",
+      "preOrderDays": "5–10 business days"
+    },
+    "ru": {
+      "title": "Женские белые кроссовки Lacoste Lineshot 746SMA0110.21G",
+      "description": "Стильные женские кроссовки Lacoste Lineshot в классическом белом цвете. Лаконичный теннисный дизайн легко сочетается с повседневными образами, а удобная конструкция обеспечивает комфорт в течение дня. Универсальная модель для городского стиля и активного отдыха",
+      "material": "Верх — 92% кожа, 8% полиэстер; подкладка — полиэстер; подошва — 100% резина",
+      "preOrderDays": "5–10 рабочих дней"
+    }
+  }
 }

@@ -1,5 +1,13 @@
 {
   "name": "Гаманці",
   "department": "Аксесуари",
-  "description": "Гаманець обирають за тим, що в ньому носять. Довгий формат тримає купюри без згину й має більше відділень для карток; компактний на кнопці чи блискавці легко лягає в кишеню або маленьку сумку.\n\nУ каталозі моделі Marc Jacobs і Coach — ті самі матеріали й фурнітура, що в їхніх сумках, тож пара збирається без зусиль."
+  "description": "Гаманець обирають за тим, що в ньому носять. Довгий формат тримає купюри без згину й має більше відділень для карток; компактний на кнопці чи блискавці легко лягає в кишеню або маленьку сумку.\n\nУ каталозі моделі Marc Jacobs і Coach — ті самі матеріали й фурнітура, що в їхніх сумках, тож пара збирається без зусиль.",
+  "i18n": {
+    "en": {
+      "description": "Choose a wallet by what you carry in it. A long format holds bills without folding and has more card slots; a compact one with a snap or zip slips easily into a pocket or a small bag.\n\nThe catalog features Marc Jacobs and Coach models — the same materials and hardware as their bags, so putting together a matching pair takes no effort."
+    },
+    "ru": {
+      "description": "Кошелек выбирают по тому, что в нем носят. Длинный формат держит купюры без сгиба и имеет больше отделений для карт; компактный на кнопке или молнии легко помещается в карман или маленькую сумку.\n\nВ каталоге модели Marc Jacobs и Coach — те же материалы и фурнитура, что в их сумках, так что пара собирается без усилий."
+    }
+  }
 }

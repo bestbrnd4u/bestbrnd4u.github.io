@@ -2,55 +2,159 @@
   "texts": [
     {
       "page": "Новинки",
-      "description": "Сюди потрапляють речі, які нещодавно приїхали в каталог. Позначку ставить магазин вручну — тобто це справді свіжі надходження, а не просто останні додані картки.\n\nЯкщо потрібної моделі тут немає, її можна замовити через байєр-сервіс: річ викуповується на офіційному сайті бренду й приїжджає так само, як товари з каталогу."
+      "description": "Сюди потрапляють речі, які нещодавно приїхали в каталог. Позначку ставить магазин вручну — тобто це справді свіжі надходження, а не просто останні додані картки.\n\nЯкщо потрібної моделі тут немає, її можна замовити через байєр-сервіс: річ викуповується на офіційному сайті бренду й приїжджає так само, як товари з каталогу.",
+      "i18n": {
+        "en": {
+          "description": "This is where you'll find items that have recently arrived in the catalog. The store adds the tag by hand — so these really are fresh arrivals, not just the most recently added listings.\n\nIf the model you want isn't here, you can order it through our personal shopper service: the item is purchased on the brand's official website and arrives just like products from the catalog."
+        },
+        "ru": {
+          "description": "Сюда попадают вещи, которые недавно приехали в каталог. Отметку магазин ставит вручную — то есть это действительно свежие поступления, а не просто последние добавленные карточки.\n\nЕсли нужной модели здесь нет, ее можно заказать через байер-сервис: вещь выкупается на официальном сайте бренда и приезжает так же, как товары из каталога."
+        }
+      }
     },
     {
       "page": "Акції",
-      "description": "Тут зібрані речі, які продаються дешевше за звичайну ціну. Поріг знижки для розділу вказано в підзаголовку — нижчі знижки сюди не потрапляють, щоб розділ не перетворився на половину каталогу.\n\nЗнижка стосується самої речі. Доставку оплачує покупець перевізнику при отриманні, і на неї акція не поширюється."
+      "description": "Тут зібрані речі, які продаються дешевше за звичайну ціну. Поріг знижки для розділу вказано в підзаголовку — нижчі знижки сюди не потрапляють, щоб розділ не перетворився на половину каталогу.\n\nЗнижка стосується самої речі. Доставку оплачує покупець перевізнику при отриманні, і на неї акція не поширюється.",
+      "i18n": {
+        "en": {
+          "description": "Here you'll find items selling below their regular price. The minimum discount for this section is shown in the subheading — smaller discounts don't make it in, so the section doesn't turn into half the catalog.\n\nThe discount applies to the item itself. Shipping is paid by the buyer to the carrier on delivery, and the sale does not apply to it."
+        },
+        "ru": {
+          "description": "Здесь собраны вещи, которые продаются дешевле обычной цены. Порог скидки для раздела указан в подзаголовке — меньшие скидки сюда не попадают, чтобы раздел не превратился в половину каталога.\n\nСкидка касается самой вещи. Доставку оплачивает покупатель перевозчику при получении, и на нее акция не распространяется."
+        }
+      }
     },
     {
       "page": "Жіночі сумки Marc Jacobs",
-      "description": "Марка тримається кількох упізнаваних форм. The Tote Bag — м'який шопер із написом на боці, який носять у руці й на плечі. Snapshot — компактна крос-боді на довгому ремені з фірмовою подвійною літерою J. Поруч моделі з гладкої шкіри без зайвого декору.\n\nБільшість сумок тут — на знімному ремені, тобто одна річ працює і як крос-боді, і як клатч."
+      "description": "Марка тримається кількох упізнаваних форм. The Tote Bag — м'який шопер із написом на боці, який носять у руці й на плечі. Snapshot — компактна крос-боді на довгому ремені з фірмовою подвійною літерою J. Поруч моделі з гладкої шкіри без зайвого декору.\n\nБільшість сумок тут — на знімному ремені, тобто одна річ працює і як крос-боді, і як клатч.",
+      "i18n": {
+        "en": {
+          "description": "The brand sticks to a few recognizable shapes. The Tote Bag is a soft tote with lettering on the side, carried in the hand or on the shoulder. Snapshot is a compact crossbody on a long strap with the signature double J. Alongside them are smooth leather styles without unnecessary embellishment.\n\nMost bags here come with a detachable strap, so one piece works as both a crossbody and a clutch."
+        },
+        "ru": {
+          "description": "Марка держится нескольких узнаваемых форм. The Tote Bag — мягкий шопер с надписью на боку, который носят в руке и на плече. Snapshot — компактная кросс-боди на длинном ремне с фирменной двойной буквой J. Рядом модели из гладкой кожи без лишнего декора.\n\nБольшинство сумок здесь — на съемном ремне, то есть одна вещь работает и как кросс-боди, и как клатч."
+        }
+      }
     },
     {
       "page": "Жіночі сумки Coach",
-      "description": "Основа добірки — лінія Tabby: структурована форма з фірмовою застібкою-засувкою й знімним ременем. Поруч Klare, Studio і міні-формати на кожен день.\n\nМатеріали в марки два: гладка шкіра та тиснене полотно Signature з повторюваною монограмою. Друге практичніше в дощ і менше бере подряпини."
+      "description": "Основа добірки — лінія Tabby: структурована форма з фірмовою застібкою-засувкою й знімним ременем. Поруч Klare, Studio і міні-формати на кожен день.\n\nМатеріали в марки два: гладка шкіра та тиснене полотно Signature з повторюваною монограмою. Друге практичніше в дощ і менше бере подряпини.",
+      "i18n": {
+        "en": {
+          "description": "The core of the selection is the Tabby line: a structured shape with the signature latch closure and a detachable strap. Alongside it are Klare, Studio and mini formats for every day.\n\nThe brand works with two materials: smooth leather and embossed Signature canvas with a repeating monogram. The latter is more practical in the rain and less prone to scratches."
+        },
+        "ru": {
+          "description": "Основа подборки — линия Tabby: структурированная форма с фирменной застежкой-задвижкой и съемным ремнем. Рядом Klare, Studio и мини-форматы на каждый день.\n\nМатериалов у марки два: гладкая кожа и тисненое полотно Signature с повторяющейся монограммой. Второе практичнее в дождь и меньше подвержено царапинам."
+        }
+      }
     },
     {
       "page": "Жіночі сумки Michael Kors",
-      "description": "Сумки марки впізнають за фактурною шкірою Saffiano зі щільним зерном і стьобаними поверхнями. Лінії строгі, фурнітура акуратна — такі моделі легше поєднати з офісним одягом.\n\nУ каталозі переважно невеликі крос-боді й сумки з верхньою ручкою."
+      "description": "Сумки марки впізнають за фактурною шкірою Saffiano зі щільним зерном і стьобаними поверхнями. Лінії строгі, фурнітура акуратна — такі моделі легше поєднати з офісним одягом.\n\nУ каталозі переважно невеликі крос-боді й сумки з верхньою ручкою.",
+      "i18n": {
+        "en": {
+          "description": "The brand's bags are recognized by textured Saffiano leather with its dense grain and by quilted surfaces. The lines are clean and the hardware neat — styles like these are easier to pair with office wear.\n\nThe catalog mainly features small crossbodies and top-handle bags."
+        },
+        "ru": {
+          "description": "Сумки марки узнают по фактурной коже Saffiano с плотным зерном и стеганым поверхностям. Линии строгие, фурнитура аккуратная — такие модели легче сочетать с офисной одеждой.\n\nВ каталоге в основном небольшие кросс-боди и сумки с верхней ручкой."
+        }
+      }
     },
     {
       "page": "Чоловічі сумки Coach",
-      "description": "Чоловіча лінійка марки зібрана навколо двох форм: крос-боді через плече під документи, телефон і павербанк, і поясна сумка, яку носять на поясі або навскіс через груди.\n\nМатеріал майже завжди один — тиснене полотно Signature зі шкіряними деталями на кутах і ремені. Воно легше за суцільну шкіру й менше боїться вологи."
+      "description": "Чоловіча лінійка марки зібрана навколо двох форм: крос-боді через плече під документи, телефон і павербанк, і поясна сумка, яку носять на поясі або навскіс через груди.\n\nМатеріал майже завжди один — тиснене полотно Signature зі шкіряними деталями на кутах і ремені. Воно легше за суцільну шкіру й менше боїться вологи.",
+      "i18n": {
+        "en": {
+          "description": "The brand's men's range is built around two shapes: a crossbody worn over the shoulder for documents, a phone and a power bank, and a belt bag worn on the waist or slung across the chest.\n\nThe material is almost always the same — embossed Signature canvas with leather trim on the corners and strap. It is lighter than all-leather and less sensitive to moisture."
+        },
+        "ru": {
+          "description": "Мужская линейка марки собрана вокруг двух форм: кросс-боди через плечо под документы, телефон и пауэрбанк, и поясная сумка, которую носят на поясе или наискосок через грудь.\n\nМатериал почти всегда один — тисненое полотно Signature с кожаными деталями на углах и ремне. Оно легче цельной кожи и меньше боится влаги."
+        }
+      }
     },
     {
       "page": "Сумки Coach",
-      "description": "Тут зібрано весь бік марки, що стосується сумок: жіночі моделі лінії Tabby, міні-формати на щодня, чоловічі крос-боді та поясні сумки.\n\nСпільне в них — розрахунок на щоденне носіння: щільна шкіра або тиснене полотно Signature, міцна фурнітура, проста форма без зайвого декору. Саме з цього марка й починала 1941 року, коли шила сумки з бейсбольної шкіри."
+      "description": "Тут зібрано весь бік марки, що стосується сумок: жіночі моделі лінії Tabby, міні-формати на щодня, чоловічі крос-боді та поясні сумки.\n\nСпільне в них — розрахунок на щоденне носіння: щільна шкіра або тиснене полотно Signature, міцна фурнітура, проста форма без зайвого декору. Саме з цього марка й починала 1941 року, коли шила сумки з бейсбольної шкіри.",
+      "i18n": {
+        "en": {
+          "description": "This brings together the bag side of the brand: women's Tabby styles, everyday mini formats, men's crossbodies and belt bags.\n\nWhat they share is a focus on everyday wear: sturdy leather or embossed Signature canvas, solid hardware, simple shapes without unnecessary embellishment. This is exactly how the brand started out in 1941, making bags from baseball-glove leather."
+        },
+        "ru": {
+          "description": "Здесь собрана вся сторона марки, связанная с сумками: женские модели линии Tabby, мини-форматы на каждый день, мужские кросс-боди и поясные сумки.\n\nОбщее у них — расчет на ежедневную носку: плотная кожа или тисненое полотно Signature, прочная фурнитура, простая форма без лишнего декора. Именно с этого марка и начинала в 1941 году, когда шила сумки из бейсбольной кожи."
+        }
+      }
     },
     {
       "page": "Годинники Michael Kors",
-      "description": "Найбільша добірка годинників у каталозі. Характер моделей упізнаваний: великий циферблат, металевий браслет — сітчастий або ланковий, — часто з камінцями по безелю.\n\nНайвідоміша лінія марки — Lexington, вона є в кількох розмірах корпусу. Частину моделей привозимо під замовлення: розмір у годиннику ролі не грає, тож ризик «не підійшло» мінімальний."
+      "description": "Найбільша добірка годинників у каталозі. Характер моделей упізнаваний: великий циферблат, металевий браслет — сітчастий або ланковий, — часто з камінцями по безелю.\n\nНайвідоміша лінія марки — Lexington, вона є в кількох розмірах корпусу. Частину моделей привозимо під замовлення: розмір у годиннику ролі не грає, тож ризик «не підійшло» мінімальний.",
+      "i18n": {
+        "en": {
+          "description": "The largest selection of watches in the catalog. The character of the models is unmistakable: a large dial, a metal bracelet — mesh or link — often with stones around the bezel.\n\nThe brand's best-known line is Lexington, available in several case sizes. Some models are available for pre-order: with a watch, size doesn't matter, so the risk of “it didn't fit” is minimal."
+        },
+        "ru": {
+          "description": "Самая большая подборка часов в каталоге. Характер моделей узнаваемый: крупный циферблат, металлический браслет — сетчатый или звеньевой, — часто с камешками по безелю.\n\nСамая известная линия марки — Lexington, она есть в нескольких размерах корпуса. Часть моделей привозим под заказ: размер в часах роли не играет, поэтому риск «не подошло» минимален."
+        }
+      }
     },
     {
       "page": "Окуляри і оправи Marc Jacobs",
-      "description": "Сонцезахисні моделі марки тримаються двох форм: прямокутник із широкими скроневими дужками й «котяче око» з виразним вигином оправи.\n\nЛоготип марки стоїть на дузі, а не на лінзі — його видно збоку й не видно з очей того, хто в окулярах."
+      "description": "Сонцезахисні моделі марки тримаються двох форм: прямокутник із широкими скроневими дужками й «котяче око» з виразним вигином оправи.\n\nЛоготип марки стоїть на дузі, а не на лінзі — його видно збоку й не видно з очей того, хто в окулярах.",
+      "i18n": {
+        "en": {
+          "description": "The brand's sunglasses stick to two shapes: a rectangle with wide temples and a “cat-eye” with a pronounced curve to the frame.\n\nThe brand's logo sits on the temple, not the lens — it's visible from the side but not to the person wearing the glasses."
+        },
+        "ru": {
+          "description": "Солнцезащитные модели марки держатся двух форм: прямоугольник с широкими дужками и «кошачий глаз» с выразительным изгибом оправы.\n\nЛоготип марки стоит на дужке, а не на линзе — его видно сбоку и не видно тому, кто носит очки."
+        }
+      }
     },
     {
       "page": "Кросівки Lacoste",
-      "description": "Міські моделі під джинси й повсякденний одяг, не бігові. Основа добірки — L003: щільна багатошарова підошва, комбінація текстилю й шкіри, крокодил на боці.\n\nРозмір звіряйте з таблицею в картці товару, а не беріть звичний: сітка в брендів відрізняється, і це найчастіша причина обміну."
+      "description": "Міські моделі під джинси й повсякденний одяг, не бігові. Основа добірки — L003: щільна багатошарова підошва, комбінація текстилю й шкіри, крокодил на боці.\n\nРозмір звіряйте з таблицею в картці товару, а не беріть звичний: сітка в брендів відрізняється, і це найчастіша причина обміну.",
+      "i18n": {
+        "en": {
+          "description": "City styles to wear with jeans and casual clothes, not for running. The core of the selection is the L003: a thick multi-layer sole, a mix of textile and leather, and the crocodile on the side.\n\nCheck your size against the chart on the product page rather than going with your usual one: sizing differs between brands, and this is the most common reason for exchanges."
+        },
+        "ru": {
+          "description": "Городские модели под джинсы и повседневную одежду, не беговые. Основа подборки — L003: плотная многослойная подошва, комбинация текстиля и кожи, крокодил на боку.\n\nРазмер сверяйте с таблицей в карточке товара, а не берите привычный: сетка у брендов отличается, и это самая частая причина обмена."
+        }
+      }
     },
     {
       "page": "Гаманці Coach",
-      "description": "Гаманці марки зроблені з тих самих матеріалів, що й сумки: гладка шкіра або тиснене полотно Signature.\n\nУ каталозі компактні формати на кнопці та складані моделі з відділеннями для карток і купюр. Якщо вже є сумка Coach, гаманець збирається з нею в пару без зусиль."
+      "description": "Гаманці марки зроблені з тих самих матеріалів, що й сумки: гладка шкіра або тиснене полотно Signature.\n\nУ каталозі компактні формати на кнопці та складані моделі з відділеннями для карток і купюр. Якщо вже є сумка Coach, гаманець збирається з нею в пару без зусиль.",
+      "i18n": {
+        "en": {
+          "description": "The brand's wallets are made from the same materials as its bags: smooth leather or embossed Signature canvas.\n\nThe catalog features compact snap styles and folding models with slots for cards and bills. If you already have a Coach bag, the wallet pairs with it effortlessly."
+        },
+        "ru": {
+          "description": "Кошельки марки сделаны из тех же материалов, что и сумки: гладкая кожа или тисненое полотно Signature.\n\nВ каталоге компактные форматы на кнопке и складные модели с отделениями для карт и купюр. Если у вас уже есть сумка Coach, кошелек без усилий составит с ней пару."
+        }
+      }
     },
     {
       "page": "Гаманці Marc Jacobs",
-      "description": "Ті самі шкіра й фурнітура, що в сумках марки. У каталозі два формати: на блискавці по периметру, який тримає купюри без згину, і менший із ремінцем на зап'ястя.\n\nДругий часто беруть замість маленької сумки — у нього вміщаються картки, готівка й телефон."
+      "description": "Ті самі шкіра й фурнітура, що в сумках марки. У каталозі два формати: на блискавці по периметру, який тримає купюри без згину, і менший із ремінцем на зап'ястя.\n\nДругий часто беруть замість маленької сумки — у нього вміщаються картки, готівка й телефон.",
+      "i18n": {
+        "en": {
+          "description": "The same leather and hardware as the brand's bags. The catalog offers two formats: a zip-around style that holds bills without folding, and a smaller one with a wrist strap.\n\nThe latter is often chosen instead of a small bag — it fits cards, cash and a phone."
+        },
+        "ru": {
+          "description": "Те же кожа и фурнитура, что в сумках марки. В каталоге два формата: на молнии по периметру, который держит купюры без сгиба, и меньший с ремешком на запястье.\n\nВторой часто берут вместо маленькой сумки — в него помещаются карты, наличные и телефон."
+        }
+      }
     },
     {
       "page": "Аксесуари Marc Jacobs",
-      "description": "Аксесуари марки в каталозі — це сонцезахисні окуляри й гаманці.\n\nВ окулярах марка тримається впізнаваних форм із логотипом на скроневій дузі. Гаманці зроблені з тих самих матеріалів, що й сумки, тож збираються з ними в пару."
+      "description": "Аксесуари марки в каталозі — це сонцезахисні окуляри й гаманці.\n\nВ окулярах марка тримається впізнаваних форм із логотипом на скроневій дузі. Гаманці зроблені з тих самих матеріалів, що й сумки, тож збираються з ними в пару.",
+      "i18n": {
+        "en": {
+          "description": "The brand's accessories in the catalog are sunglasses and wallets.\n\nIn eyewear, the brand sticks to recognizable shapes with the logo on the temple. The wallets are made from the same materials as the bags, so they pair naturally with them."
+        },
+        "ru": {
+          "description": "Аксессуары марки в каталоге — это солнцезащитные очки и кошельки.\n\nВ очках марка держится узнаваемых форм с логотипом на дужке. Кошельки сделаны из тех же материалов, что и сумки, поэтому составляют с ними пару."
+        }
+      }
     }
   ]
 }

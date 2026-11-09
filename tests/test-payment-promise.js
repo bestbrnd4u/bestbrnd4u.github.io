@@ -56,7 +56,11 @@ console.log("\n[1] Платіжного шлюзу на сайті немає");
 {
     // Премиса всього набору. З'явиться шлюз — цей розділ почервоніє,
     // і той, хто його додав, перечитає решту перевірок.
-    const ШЛЮЗИ = /liqpay|fondy|wayforpay|portmone|ipay\.ua|stripe|paypal|checkout\.monobank|acquiring/i;
+    //
+    // Stripe — за адресою чи викликом, а не за словом: на /en/ опис
+    // Gucci каже «green-and-red web stripe» (смуга на сумці), і просте
+    // «stripe» почервоніло на перекладі, а не на шлюзі.
+    const ШЛЮЗИ = /liqpay|fondy|wayforpay|portmone|ipay\.ua|stripe\.(?:com|js)|\bstripe\s*\(|paypal|checkout\.monobank|acquiring/i;
 
     const код = [];
 

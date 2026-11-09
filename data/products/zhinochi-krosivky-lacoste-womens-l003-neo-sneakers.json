@@ -74,5 +74,19 @@
       "37": 1
     }
   },
-  "material": "Верх — шкіра, замша та синтетичні матеріали із сітчастими вставками; підкладка — текстиль; підошва — гума з EVA"
+  "material": "Верх — шкіра, замша та синтетичні матеріали із сітчастими вставками; підкладка — текстиль; підошва — гума з EVA",
+  "i18n": {
+    "en": {
+      "title": "Lacoste Women's L003 Neo Sneakers",
+      "description": "Stylish women's Lacoste sneakers in white with navy and bright orange accents. The combination of leather, synthetic materials, and breathable mesh creates a modern sporty look, and the soft insole provides comfort for everyday wear",
+      "material": "Upper: leather, suede, and synthetic materials with mesh inserts; lining: textile; sole: rubber with EVA",
+      "preOrderDays": "5–10 business days"
+    },
+    "ru": {
+      "title": "Женские кроссовки Lacoste Women's L003 Neo Sneakers",
+      "description": "Стильные женские кроссовки Lacoste в белом цвете с темно-синими и яркими оранжевыми акцентами. Сочетание кожи, синтетических материалов и дышащей сетки создает современный спортивный образ, а мягкая стелька обеспечивает комфорт при ежедневной носке",
+      "material": "Верх — кожа, замша и синтетические материалы с сетчатыми вставками; подкладка — текстиль; подошва — резина с EVA",
+      "preOrderDays": "5–10 рабочих дней"
+    }
+  }
 }

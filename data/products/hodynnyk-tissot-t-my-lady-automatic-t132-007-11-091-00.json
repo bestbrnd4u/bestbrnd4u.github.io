@@ -63,5 +63,25 @@
   "legacySlugs": [
     "годинник-tissot-t-my-lady-automatic-t132-007-11-091-00"
   ],
-  "closure": "Розкладна застібка з кнопками-фіксаторами"
+  "closure": "Розкладна застібка з кнопками-фіксаторами",
+  "i18n": {
+    "en": {
+      "title": "Tissot T-My Lady Automatic T132.007.11.091.00 Watch",
+      "description": "An elegant women's Tissot T-My Lady Automatic watch with a round steel case and a beautiful green dial. The clean design is paired with a modern Swiss automatic movement, making the model a great choice for both everyday and more formal looks.\nThe watch features a Swiss Powermatic 48.111 automatic movement with a power reserve of up to 48 hours and a Nivachron balance spring that is resistant to magnetic fields. The green dial with a date window is protected by domed sapphire crystal. The transparent case back lets you watch the movement at work. Water resistance — up to 100 m (10 bar)",
+      "material": "Case and bracelet — 316L stainless steel; crystal — scratch-resistant sapphire",
+      "dimensions": "2.93 × 2.93 × 1.06 cm",
+      "strapInfo": "Silver-tone steel bracelet with a quick-release system and butterfly clasp with push buttons. Lug width — 1.5 cm",
+      "preOrderDays": "10-14 business days",
+      "closure": "Folding clasp with push-button locks"
+    },
+    "ru": {
+      "title": "Часы Tissot T-My Lady Automatic T132.007.11.091.00",
+      "description": "Элегантные женские часы Tissot T-My Lady Automatic с круглым стальным корпусом и красивым зеленым циферблатом. Лаконичный дизайн сочетается с современным швейцарским автоматическим механизмом, что делает модель отличным выбором как для повседневных, так и для более элегантных образов.\nЧасы оснащены швейцарским автоматическим механизмом Powermatic 48.111 с запасом хода до 48 часов и балансовой пружиной Nivachron, устойчивой к воздействию магнитных полей. Зеленый циферблат с окошком даты защищен куполообразным сапфировым стеклом. Прозрачная задняя крышка позволяет наблюдать за работой механизма. Водонепроницаемость — до 100 м (10 bar)",
+      "material": "Корпус и браслет — нержавеющая сталь 316L; стекло — устойчивое к царапинам сапфировое",
+      "dimensions": "2,93 × 2,93 × 1,06 см",
+      "strapInfo": "Стальной браслет серебристого цвета с системой быстрой замены и застежкой-бабочкой с кнопками. Ширина крепления — 1,5 см",
+      "preOrderDays": "10-14 рабочих дней",
+      "closure": "Раскладная застежка с кнопками-фиксаторами"
+    }
+  }
 }

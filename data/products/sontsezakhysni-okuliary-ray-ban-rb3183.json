@@ -64,5 +64,23 @@
     "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasse-c873f7c8.webp",
     "/assets/images/products/uploads/ray-ban-green-rectangular-mens-sunglasse-dfb377a8.webp"
   ],
-  "material": "Металева оправа; нейлонові лінзи"
+  "material": "Металева оправа; нейлонові лінзи",
+  "i18n": {
+    "en": {
+      "title": "Ray-Ban RB3183 Sunglasses",
+      "description": "Stylish men's Ray-Ban RB3183 sunglasses with a rectangular frame. The clean design combines a sporty character with the signature Ray-Ban aesthetic.\nGreen lenses make bright light comfortable on the eyes, and the lightweight metal frame makes the sunglasses comfortable for everyday wear. The versatile rectangular shape complements modern everyday looks",
+      "material": "Metal frame; nylon lenses",
+      "dimensions": "13.9 × 3.3 cm; lens width — 6.3 cm; bridge — 1.5 cm; temple length — 12.5 cm.",
+      "strapInfo": "Thin metal temples",
+      "preOrderDays": "10-14 business days"
+    },
+    "ru": {
+      "title": "Солнцезащитные очки Ray-Ban RB3183",
+      "description": "Стильные мужские солнцезащитные очки Ray-Ban RB3183 с прямоугольной формой оправы. Лаконичный дизайн модели сочетает спортивный характер с фирменной эстетикой Ray-Ban.\nЗеленые линзы обеспечивают комфортное восприятие яркого света, а легкая металлическая оправа делает очки удобными для ежедневной носки. Универсальная прямоугольная форма хорошо дополняет современные повседневные образы",
+      "material": "Металлическая оправа; нейлоновые линзы",
+      "dimensions": "13,9 × 3,3 см; ширина линзы — 6,3 см; переносица — 1,5 см; длина дужки — 12,5 см.",
+      "strapInfo": "Тонкие металлические дужки",
+      "preOrderDays": "10-14 рабочих дней"
+    }
+  }
 }

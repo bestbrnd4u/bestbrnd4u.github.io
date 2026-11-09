@@ -9,5 +9,15 @@
   "banner": "/assets/images/brands/balenciaga-banner.webp",
   "bannerMobile": "/assets/images/brands/balenciaga-banner-mobile.webp",
   "title": "Окуляри Balenciaga",
-  "description": "Дім заснував іспанець Крістобаль Баленсіага 1917 року, а з 1937-го марка працює в Парижі. Його називали «кутюр'є серед кутюр'є» за вміння будувати об'єм: сукня трималась формою, а не фігурою.\n\nСучасна Balenciaga — це впізнавані сумки City та Hourglass, масивні кросівки й графічний логотип. Марка входить до групи Kering."
+  "description": "Дім заснував іспанець Крістобаль Баленсіага 1917 року, а з 1937-го марка працює в Парижі. Його називали «кутюр'є серед кутюр'є» за вміння будувати об'єм: сукня трималась формою, а не фігурою.\n\nСучасна Balenciaga — це впізнавані сумки City та Hourglass, масивні кросівки й графічний логотип. Марка входить до групи Kering.",
+  "i18n": {
+    "en": {
+      "title": "Balenciaga eyewear",
+      "description": "The house was founded by Spaniard Cristóbal Balenciaga in 1917, and since 1937 it has been based in Paris. He was called “the couturier's couturier” for his mastery of volume: a dress held its shape on its own rather than relying on the figure.\n\nToday's Balenciaga means the recognizable City and Hourglass bags, chunky sneakers and a graphic logo. The brand is part of the Kering group."
+    },
+    "ru": {
+      "title": "Очки Balenciaga",
+      "description": "Дом основал испанец Кристобаль Баленсиага в 1917 году, а с 1937-го марка работает в Париже. Его называли «кутюрье среди кутюрье» за умение строить объем: платье держалось формой, а не фигурой.\n\nСовременная Balenciaga — это узнаваемые сумки City и Hourglass, массивные кроссовки и графичный логотип. Марка входит в группу Kering."
+    }
+  }
 }

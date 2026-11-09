@@ -64,5 +64,23 @@
       "ONESIZE": 1
     }
   },
-  "material": "Екошкіра"
+  "material": "Екошкіра",
+  "i18n": {
+    "en": {
+      "title": "Armani Exchange Crossbody Men's Bag",
+      "description": "A stylish Armani Exchange men's bag in classic black — a practical accessory for everyday looks. The compact format lets you comfortably carry your essentials without weighing down your outfit.\nThe bag features a main zip compartment, an interior zip pocket, a front zip pocket and a rear slip pocket for items you need to reach quickly. The clean design is finished with the signature Armani Exchange logo",
+      "material": "Faux leather",
+      "dimensions": "20 × 22 × 4 cm",
+      "strapInfo": "Adjustable shoulder strap, 80–150 cm long, so the bag can be worn over the shoulder or crossbody",
+      "preOrderDays": "5–10 business days"
+    },
+    "ru": {
+      "title": "Мужская сумка Armani Exchange Crossbody",
+      "description": "Стильная мужская сумка Armani Exchange в классическом черном цвете — практичный аксессуар для повседневных образов. Компактный формат позволяет удобно носить необходимые вещи, не перегружая образ.\nМодель имеет основное отделение на молнии, внутренний карман на молнии, передний карман на молнии и задний накладной карман для вещей, которые должны быть под рукой. Лаконичный дизайн дополнен фирменным логотипом Armani Exchange",
+      "material": "Экокожа",
+      "dimensions": "20 × 22 × 4 см",
+      "strapInfo": "Регулируемый плечевой ремень длиной 80–150 см, который позволяет носить сумку на плече или кросс-боди",
+      "preOrderDays": "5–10 рабочих дней"
+    }
+  }
 }

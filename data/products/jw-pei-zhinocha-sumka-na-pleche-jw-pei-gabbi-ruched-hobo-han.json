@@ -97,5 +97,25 @@
   "material": "Веганська шкіра; підкладка — поліестер",
   "closure": "Магнітна",
   "compartments": "Одна внутрішня кишеня",
-  "strapInfo": "Незнімна нерегульована ручка, перепад 17 см"
+  "strapInfo": "Незнімна нерегульована ручка, перепад 17 см",
+  "i18n": {
+    "en": {
+      "title": "JW PEI Gabbi Ruched Hobo Handbag Women's Shoulder Bag",
+      "description": "JW PEI Gabbi is a hobo bag with the signature ruching that made the model famous. A rounded shape and a short handle; carry it in hand or in the crook of your arm. Two rich colors.",
+      "material": "Vegan leather; lining — polyester",
+      "dimensions": "24.5 × 13 × 6 cm",
+      "strapInfo": "Fixed non-adjustable handle, drop 17 cm",
+      "closure": "Magnetic",
+      "compartments": "One interior pocket"
+    },
+    "ru": {
+      "title": "Женская сумка на плечо JW PEI Gabbi Ruched Hobo Handbag",
+      "description": "JW PEI Gabbi — сумка-хобо с характерной драпировкой, которая сделала модель известной. Округлая форма, короткая ручка, носится в руке или на сгибе локтя. Два насыщенных цвета.",
+      "material": "Веганская кожа; подкладка — полиэстер",
+      "dimensions": "24,5 × 13 × 6 см",
+      "strapInfo": "Несъемная нерегулируемая ручка, высота 17 см",
+      "closure": "Магнитная",
+      "compartments": "Один внутренний карман"
+    }
+  }
 }

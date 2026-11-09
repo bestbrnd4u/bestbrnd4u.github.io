@@ -79,5 +79,29 @@
   },
   "closure": "Блискавка",
   "compartments": "Дві передні кишені з клапанами та дві бічні кишені на блискавці",
-  "decor": "Фурнітура сріблястого тону з гравіюванням логотипа, тиснене брендування"
+  "decor": "Фурнітура сріблястого тону з гравіюванням логотипа, тиснене брендування",
+  "i18n": {
+    "en": {
+      "title": "Marc Jacobs The Leather Cargo Bag Cotton Silver",
+      "description": "A stylish and functional Marc Jacobs The Leather Cargo Bag in Cotton/Silver, a model with an expressive cargo-style design and a practical pocket system.\nThe bag is made of genuine pebbled leather and finished with silver-tone hardware. The front features two patch pockets with flaps, and the sides have zip pockets. The main compartment closes with a zipper.\nThe model has two detachable straps: a leather strap for shoulder wear and a wide adjustable textile strap with a logo. This lets you wear the bag on the shoulder or crossbody",
+      "material": "Genuine leather",
+      "dimensions": "22 × 12 × 7 cm",
+      "strapInfo": "2 detachable straps: leather and adjustable textile",
+      "preOrderDays": "5–10 business days",
+      "closure": "Zipper",
+      "compartments": "Two front flap pockets and two side zip pockets",
+      "decor": "Silver-tone hardware with engraved logo, embossed branding"
+    },
+    "ru": {
+      "title": "Сумка Marc Jacobs The Leather Cargo Bag Cotton Silver",
+      "description": "Стильная и функциональная сумка Marc Jacobs The Leather Cargo Bag в оттенке Cotton/Silver — модель с выразительным дизайном в стиле cargo и практичной системой карманов.\nСумка изготовлена из натуральной зернистой кожи и дополнена серебристой фурнитурой. На передней части расположены два накладных кармана с клапанами, по бокам — карманы на молнии. Основное отделение закрывается на молнию.\nМодель имеет два съемных ремня: кожаный ремень для ношения на плече и широкий регулируемый текстильный ремень с логотипом. Благодаря этому сумку можно носить на плече или через плечо",
+      "material": "Натуральная кожа",
+      "dimensions": "22 × 12 × 7 см",
+      "strapInfo": "2 съемных ремня — кожаный и текстильный регулируемый",
+      "preOrderDays": "5–10 рабочих дней",
+      "closure": "Молния",
+      "compartments": "Два передних кармана с клапанами и два боковых кармана на молнии",
+      "decor": "Фурнитура серебристого тона с гравировкой логотипа, тисненый брендинг"
+    }
+  }
 }

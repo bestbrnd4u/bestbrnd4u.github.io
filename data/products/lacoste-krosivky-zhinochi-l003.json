@@ -80,5 +80,19 @@
       "39": 1
     }
   },
-  "material": "Верх — 65% нейлон, 35% поліуретан; підкладка — поліестер; підошва — 61% гума, 39% EVA"
+  "material": "Верх — 65% нейлон, 35% поліуретан; підкладка — поліестер; підошва — 61% гума, 39% EVA",
+  "i18n": {
+    "en": {
+      "title": "Lacoste L003 Extile Color-Block Women's Sneakers",
+      "description": "Stylish women's Lacoste L003 sneakers — a modern everyday model that combines an athletic character, comfort and recognizable French style. The lightweight nylon upper is complemented by synthetic elements and an original lacing design.\nThe special lacing system and tongue construction ensure a secure hold and a comfortable fit. The textile lining and soft insole make the model comfortable for extended wear.\nThe sole combines rubber and EVA for cushioning, flexibility and good grip. The signature embossed crocodile logo on the heel adds Lacoste's distinctive recognizability.",
+      "material": "Upper — 65% nylon, 35% polyurethane; lining — polyester; sole — 61% rubber, 39% EVA",
+      "preOrderDays": "5–10 business days"
+    },
+    "ru": {
+      "title": "Женские кроссовки Lacoste L003 Extile Color-Block Sneakers",
+      "description": "Стильные женские кроссовки Lacoste L003 — современная модель для повседневного гардероба, сочетающая спортивный характер, комфорт и узнаваемый французский стиль. Легкий нейлоновый верх дополнен синтетическими элементами и оригинальной конструкцией шнуровки.\nСпециальная система шнуровки и конструкция язычка обеспечивают надежную фиксацию стопы и комфортную посадку. Текстильная подкладка и мягкая стелька делают модель удобной для длительной носки.\nПодошва сочетает резину и EVA, обеспечивая амортизацию, гибкость и хорошее сцепление с поверхностью. Фирменный тисненый логотип-крокодил на пятке придает модели характерную для Lacoste узнаваемость.",
+      "material": "Верх — 65% нейлон, 35% полиуретан; подкладка — полиэстер; подошва — 61% резина, 39% EVA",
+      "preOrderDays": "5–10 рабочих дней"
+    }
+  }
 }

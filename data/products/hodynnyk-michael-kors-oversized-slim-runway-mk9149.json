@@ -63,5 +63,25 @@
     "/assets/images/products/uploads/michael-kors-slim-runway-quartz-green-dial-mens-watch-mk9149_2_1.webp",
     "/assets/images/products/uploads/michael-kors-slim-runway-quartz-green-dial-mens-watch-mk9149_3.webp"
   ],
-  "closure": "Застібка-кліпса"
+  "closure": "Застібка-кліпса",
+  "i18n": {
+    "en": {
+      "title": "Michael Kors Oversized Slim Runway MK9149 Watch",
+      "description": "A stylish men's Michael Kors Oversized Slim Runway MK9149 watch with a rich green dial and an elegant two-tone bracelet. The combination of silver and gold tones makes the model versatile and easy to pair with a variety of looks.\nThe model features a quartz movement, an analog dial with minimalist indices and mineral crystal. The case and bracelet are made of stainless steel.\nThanks to its large 44 mm case, the watch makes a bold statement on the wrist. Water resistance up to 50 meters allows comfortable everyday wear",
+      "material": "Stainless steel; mineral crystal",
+      "dimensions": "Case diameter — 4.4 cm. Case thickness — 0.8 cm. Bracelet width — 2.2 cm",
+      "strapInfo": "Two-tone stainless steel metal bracelet — silver-tone + gold-tone. Clip clasp",
+      "preOrderDays": "10-14 business days",
+      "closure": "Clip clasp"
+    },
+    "ru": {
+      "title": "Часы Michael Kors Oversized Slim Runway MK9149",
+      "description": "Стильные мужские часы Michael Kors Oversized Slim Runway MK9149 с насыщенным зеленым циферблатом и элегантным двухцветным браслетом. Сочетание серебристых и золотистых оттенков придает модели универсальность и позволяет легко сочетать ее с разными образами.\nМодель оснащена кварцевым механизмом, аналоговым циферблатом с минималистичными индексами и минеральным стеклом. Корпус и браслет изготовлены из нержавеющей стали.\nБлагодаря крупному корпусу диаметром 44 мм часы выразительно смотрятся на запястье. Водозащита до 50 метров позволяет комфортно использовать модель в повседневной жизни",
+      "material": "Нержавеющая сталь; минеральное стекло",
+      "dimensions": "Диаметр корпуса — 4,4 см. Толщина корпуса — 0,8 см. Ширина браслета — 2,2 см",
+      "strapInfo": "Металлический браслет из нержавеющей стали в двухцветном исполнении — серебристый + золотистый. Застежка-клипса",
+      "preOrderDays": "10-14 рабочих дней",
+      "closure": "Застежка-клипса"
+    }
+  }
 }

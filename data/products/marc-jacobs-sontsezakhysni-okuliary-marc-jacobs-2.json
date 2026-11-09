@@ -56,5 +56,19 @@
   "instagramBlock": "general",
   "description": "Сонцезахисні окуляри Marc Jacobs у формі «котяче око» з темними лінзами. Виразний вигин оправи, фірмовий логотип на скроневій дузі.",
   "sku": "MJ-1028S-0807IR-54",
-  "category": "Окуляри і оправи"
+  "category": "Окуляри і оправи",
+  "i18n": {
+    "en": {
+      "title": "Marc Jacobs MJ-1028S-0807IR-54 Sunglasses",
+      "description": "Marc Jacobs cat-eye sunglasses with dark lenses. A striking frame curve and the signature logo on the temple.",
+      "material": "Acetate; polymer lenses",
+      "dimensions": "Lens width × bridge × temple length: 54 × 19 × 140 mm"
+    },
+    "ru": {
+      "title": "Солнцезащитные очки Marc Jacobs MJ-1028S-0807IR-54",
+      "description": "Солнцезащитные очки Marc Jacobs в форме «кошачий глаз» с темными линзами. Выразительный изгиб оправы, фирменный логотип на заушнике.",
+      "material": "Ацетат; полимерные линзы",
+      "dimensions": "Ширина линзы × переносица × длина заушника: 54 × 19 × 140 мм"
+    }
+  }
 }

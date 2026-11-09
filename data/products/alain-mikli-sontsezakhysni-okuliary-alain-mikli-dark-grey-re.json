@@ -57,5 +57,19 @@
     }
   },
   "dimensions": "Ширина лінзи × місток × довжина завушника: 54 × 19 × 140 мм",
-  "material": "Ацетат; полімерні лінзи"
+  "material": "Ацетат; полімерні лінзи",
+  "i18n": {
+    "en": {
+      "title": "ALAIN MIKLI Dark Grey Rectangular Unisex Sunglasses",
+      "description": "Alain Mikli sunglasses with a tortoiseshell frame. Wide temples, dark lenses. A versatile shape that suits both women and men.",
+      "material": "Acetate; polymer lenses",
+      "dimensions": "Lens width × bridge × temple length: 54 × 19 × 140 mm"
+    },
+    "ru": {
+      "title": "Солнцезащитные очки ALAIN MIKLI Dark Grey Rectangular Unisex",
+      "description": "Солнцезащитные очки Alain Mikli в оправе «черепаха». Широкие заушники, темные линзы. Универсальная форма, которая подходит и женщинам, и мужчинам.",
+      "material": "Ацетат; полимерные линзы",
+      "dimensions": "Ширина линзы × мост × длина заушника: 54 × 19 × 140 мм"
+    }
+  }
 }

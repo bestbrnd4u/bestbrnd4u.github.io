@@ -81,5 +81,29 @@
   },
   "closure": "Блискавка",
   "compartments": "Дві передні кишені з клапанами та дві бічні кишені на блискавці",
-  "decor": "Фурнітура сріблястого тону з гравіюванням логотипа, тиснене брендування"
+  "decor": "Фурнітура сріблястого тону з гравіюванням логотипа, тиснене брендування",
+  "i18n": {
+    "en": {
+      "title": "Marc Jacobs The Leather Cargo Bag Black",
+      "description": "A stylish and functional Marc Jacobs The Leather Cargo Bag in classic black. The model combines a minimalist design with a practical cargo construction and plenty of functional pockets.\nThe bag is made of 100% genuine leather and finished with silver-tone hardware. It features a zippered main compartment, two exterior zip pockets, and two patch pockets with magnetic closures.\nIt comes with two detachable straps: a leather strap and an adjustable textile strap. Wear it on the shoulder or crossbody",
+      "material": "Genuine leather",
+      "dimensions": "22 × 12 × 7 cm",
+      "strapInfo": "Two detachable straps",
+      "preOrderDays": "5–10 business days",
+      "closure": "Zipper",
+      "compartments": "Two front flap pockets and two side zip pockets",
+      "decor": "Silver-tone hardware with engraved logo, embossed branding"
+    },
+    "ru": {
+      "title": "Сумка Marc Jacobs The Leather Cargo Bag Black",
+      "description": "Стильная и функциональная сумка Marc Jacobs The Leather Cargo Bag в классическом черном цвете. Модель сочетает лаконичный дизайн с практичной конструкцией cargo и большим количеством функциональных карманов.\nСумка изготовлена из 100% натуральной кожи и дополнена серебристой фурнитурой. Имеет основное отделение на молнии, два наружных кармана на молнии и два накладных кармана с магнитными застежками.\nМодель комплектуется двумя съемными ремнями: кожаным ремнем и регулируемым текстильным ремнем. Ее можно носить на плече или через плечо",
+      "material": "Натуральная кожа",
+      "dimensions": "22 × 12 × 7 см",
+      "strapInfo": "Два съемных ремня",
+      "preOrderDays": "5–10 рабочих дней",
+      "closure": "Молния",
+      "compartments": "Два передних кармана с клапанами и два боковых кармана на молнии",
+      "decor": "Фурнитура серебристого тона с гравировкой логотипа, тисненый брендинг"
+    }
+  }
 }

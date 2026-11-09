@@ -62,5 +62,25 @@
   "legacySlugs": [
     "годинник-mathey-tissot-mathy-ceramic-h901crbn"
   ],
-  "closure": "Розкладна із захисним фіксатором"
+  "closure": "Розкладна із захисним фіксатором",
+  "i18n": {
+    "en": {
+      "title": "Mathey-Tissot Mathy Ceramic H901CRBN Watch",
+      "description": "A stylish Mathey-Tissot Mathy Ceramic men's watch in a classic combination of silver, black and gold tones. It features a bold black dial, a black unidirectional ceramic bezel and an elegant two-tone steel bracelet.\nThe watch is powered by a Swiss Ronda 505 quartz movement with a date display. The black dial is complemented by gold-tone hands and indices with luminous coating for easy time reading in low light. The case has a screw-down crown, and water resistance is 200 m (20 ATM)",
+      "material": "Case and bracelet — 316L stainless steel; bezel — ceramic; crystal — sapphire-coated",
+      "dimensions": "4.2 × 4.2 × 1.2 cm",
+      "strapInfo": "Two-tone 316L stainless steel bracelet — silver with gold-tone elements. Lug width — 2 cm. Clasp — folding with safety lock",
+      "preOrderDays": "10 -14 business days",
+      "closure": "Folding with safety lock"
+    },
+    "ru": {
+      "title": "Часы Mathey-Tissot Mathy Ceramic H901CRBN",
+      "description": "Стильные мужские часы Mathey-Tissot Mathy Ceramic в классическом сочетании серебристого, черного и золотистого оттенков. Модель имеет выразительный черный циферблат, черный односторонний керамический безель и элегантный двухцветный стальной браслет.\nЧасы оснащены швейцарским кварцевым механизмом Ronda 505 с функцией отображения даты. Черный циферблат дополнен золотистыми стрелками и индексами с люминесцентным покрытием для комфортного считывания времени в условиях недостаточного освещения. Корпус имеет завинчивающуюся заводную головку, а водонепроницаемость составляет 200 м (20 ATM)",
+      "material": "Корпус и браслет — нержавеющая сталь 316L; безель — керамический; стекло — с сапфировым покрытием",
+      "dimensions": "4,2 × 4,2 × 1,2 см",
+      "strapInfo": "Двухцветный браслет из нержавеющей стали 316L — серебристый с золотистыми элементами. Ширина крепления — 2 см. Застежка — раскладная с защитным фиксатором",
+      "preOrderDays": "10 -14 рабочих дней",
+      "closure": "Раскладная с защитным фиксатором"
+    }
+  }
 }

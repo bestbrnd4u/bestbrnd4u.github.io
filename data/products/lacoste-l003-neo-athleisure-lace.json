@@ -66,5 +66,17 @@
       "38": 1
     }
   },
-  "material": "Верх — текстиль і замша із сітчастими вставками та синтетичними накладками; підкладка — текстиль; підошва — гума з EVA"
+  "material": "Верх — текстиль і замша із сітчастими вставками та синтетичними накладками; підкладка — текстиль; підошва — гума з EVA",
+  "i18n": {
+    "en": {
+      "description": "Stylish women's Lacoste L003 NEO Athleisure Lace sneakers in pink. A versatile model with a textile upper, mesh inserts and synthetic details. The flexible sole and soft insole provide comfort throughout an active day, and the breathable material helps keep feet comfortable.",
+      "material": "Upper — textile and suede with mesh inserts and synthetic overlays; lining — textile; sole — rubber with EVA",
+      "preOrderDays": "5–10 business days"
+    },
+    "ru": {
+      "description": "Стильные женские кроссовки Lacoste L003 NEO Athleisure Lace в розовом цвете. Универсальная модель с текстильным верхом, сетчатыми вставками и синтетическими деталями. Гибкая подошва и мягкая стелька обеспечивают комфорт в течение активного дня, а дышащий материал помогает поддерживать комфорт стоп.",
+      "material": "Верх — текстиль и замша с сетчатыми вставками и синтетическими накладками; подкладка — текстиль; подошва — резина с EVA",
+      "preOrderDays": "5–10 рабочих дней"
+    }
+  }
 }

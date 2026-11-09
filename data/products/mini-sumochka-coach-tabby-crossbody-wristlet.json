@@ -82,5 +82,27 @@
     }
   },
   "closure": "Замок-засувка (pushlock)",
-  "compartments": "Зовнішня відкрита кишеня; усередині — багатофункціональна кишеня та два відділення для карток"
+  "compartments": "Зовнішня відкрита кишеня; усередині — багатофункціональна кишеня та два відділення для карток",
+  "i18n": {
+    "en": {
+      "title": "Coach Tabby Crossbody Wristlet Mini Bag",
+      "description": "A stylish, compact COACH Tabby Crossbody Wristlet in a soft Chalk shade with gold-tone hardware. Inspired by archival COACH designs from the 1970s and finished with the signature Signature hardware closure.\nMade of textured genuine Polished Pebble Leather. The compact size holds the essentials: cards, cash and a phone. It has an exterior slip pocket, an interior multifunction pocket and two card slots.\nComes with two detachable straps: a short wrist strap and an elegant chain strap. Wear it as a wristlet, a clutch or over the shoulder.",
+      "material": "Genuine leather",
+      "dimensions": "18 × 10 × 3 cm",
+      "strapInfo": "2 detachable — wrist strap and chain",
+      "preOrderDays": "5–10 business days",
+      "closure": "Pushlock",
+      "compartments": "Exterior slip pocket; inside — multifunction pocket and two card slots"
+    },
+    "ru": {
+      "title": "Мини-сумочка Coach Tabby Crossbody Wristlet",
+      "description": "Стильная и компактная сумка COACH Tabby Crossbody Wristlet в нежном оттенке Chalk с золотистой фурнитурой. Модель вдохновлена архивным дизайном COACH 1970-х годов и дополнена фирменной застежкой Signature.\nСумка изготовлена из натуральной фактурной кожи Polished Pebble Leather. Компактный формат позволяет разместить самое необходимое: карты, наличные и телефон. Есть внешний открытый карман, внутренний многофункциональный карман и два слота для карт.\nМодель комплектуется двумя съемными ремешками: коротким ремешком на запястье и элегантным ремнем-цепочкой. Ее можно носить как браслет-сумку, клатч или через плечо.",
+      "material": "Натуральная кожа",
+      "dimensions": "18 × 10 × 3 см",
+      "strapInfo": "2 съемных — на запястье и цепочка",
+      "preOrderDays": "5–10 рабочих дней",
+      "closure": "Замок-защелка (pushlock)",
+      "compartments": "Внешний открытый карман; внутри — многофункциональный карман и два отделения для карт"
+    }
+  }
 }

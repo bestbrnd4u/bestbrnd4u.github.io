@@ -1,5 +1,13 @@
 {
   "name": "Кросівки",
   "department": "Взуття",
-  "description": "Кросівки в каталозі міські, не бігові: їх беруть під джинси й повсякденний одяг, а не під тренування.\n\nОснова — Lacoste: моделі L003 і Lineshot на щільній підошві. Розмір звіряйте з таблицею в картці товару, а не беріть звичний — сітка в брендів відрізняється, і це найчастіша причина обміну."
+  "description": "Кросівки в каталозі міські, не бігові: їх беруть під джинси й повсякденний одяг, а не під тренування.\n\nОснова — Lacoste: моделі L003 і Lineshot на щільній підошві. Розмір звіряйте з таблицею в картці товару, а не беріть звичний — сітка в брендів відрізняється, і це найчастіша причина обміну.",
+  "i18n": {
+    "en": {
+      "description": "The sneakers in the catalog are made for the city, not for running: people wear them with jeans and casual clothes, not for workouts.\n\nThe core is Lacoste: the L003 and Lineshot models on thick soles. Check your size against the chart on the product page rather than going with your usual one — sizing differs between brands, and this is the most common reason for exchanges."
+    },
+    "ru": {
+      "description": "Кроссовки в каталоге городские, не беговые: их берут под джинсы и повседневную одежду, а не для тренировок.\n\nОснова — Lacoste: модели L003 и Lineshot на плотной подошве. Размер сверяйте с таблицей в карточке товара, а не берите привычный — сетка у брендов отличается, и это самая частая причина обмена."
+    }
+  }
 }

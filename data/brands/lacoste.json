@@ -8,5 +8,13 @@
   "banner": "/assets/images/brands/lacoste-banner.webp",
   "bannerMobile": "/assets/images/brands/lacoste-banner-mobile.webp",
   "title": "Lacoste",
-  "description": "Марку 1933 року заснував тенісист Рене Лакост, якого за впертість на корті прозвали Крокодилом. Прізвисько стало логотипом — і це був один із перших випадків, коли знак виносили на зовнішній бік одягу.\n\nСорочка-поло L.12.12 з'явилась як спортивна форма: коротший рукав і трикотаж пік замість довгих сорочок, у яких тоді грали. У каталозі — взуття, сумки й аксесуари."
+  "description": "Марку 1933 року заснував тенісист Рене Лакост, якого за впертість на корті прозвали Крокодилом. Прізвисько стало логотипом — і це був один із перших випадків, коли знак виносили на зовнішній бік одягу.\n\nСорочка-поло L.12.12 з'явилась як спортивна форма: коротший рукав і трикотаж пік замість довгих сорочок, у яких тоді грали. У каталозі — взуття, сумки й аксесуари.",
+  "i18n": {
+    "en": {
+      "description": "The brand was founded in 1933 by tennis player René Lacoste, nicknamed the Crocodile for his tenacity on court. The nickname became the logo — one of the first cases of a brand mark being placed on the outside of a garment.\n\nThe L.12.12 polo shirt was created as sportswear: shorter sleeves and piqué knit instead of the long-sleeved shirts players wore at the time. The catalog features shoes, bags and accessories."
+    },
+    "ru": {
+      "description": "Марку в 1933 году основал теннисист Рене Лакост, которого за упорство на корте прозвали Крокодилом. Прозвище стало логотипом — и это был один из первых случаев, когда знак выносили на внешнюю сторону одежды.\n\nРубашка-поло L.12.12 появилась как спортивная форма: более короткий рукав и трикотаж пике вместо длинных рубашек, в которых тогда играли. В каталоге — обувь, сумки и аксессуары."
+    }
+  }
 }

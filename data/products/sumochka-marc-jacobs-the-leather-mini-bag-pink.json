@@ -76,5 +76,27 @@
     }
   },
   "closure": "Клапан на магніті",
-  "compartments": "Відкрита кишеня та вісім відділень для карток"
+  "compartments": "Відкрита кишеня та вісім відділень для карток",
+  "i18n": {
+    "en": {
+      "title": "Marc Jacobs The Leather Mini Bag Pink",
+      "description": "An elegant Marc Jacobs The Leather Mini Bag in a soft pink shade, a compact model with a minimalist design and the signature Marc Jacobs style.\nThe bag is made of 100% genuine leather and has a fold-over flap with a magnetic closure. Inside are a main compartment, a pocket for small items, and 8 card slots. Carry it as a clutch or use the detachable adjustable strap to wear it on the shoulder or crossbody",
+      "material": "Genuine leather",
+      "dimensions": "20 × 12 × 4 cm",
+      "strapInfo": "Detachable and adjustable strap",
+      "preOrderDays": "5–10 business days",
+      "closure": "Magnetic flap",
+      "compartments": "Open pocket and eight card slots"
+    },
+    "ru": {
+      "title": "Сумочка Marc Jacobs The Leather Mini Bag Pink",
+      "description": "Элегантная мини-сумка Marc Jacobs The Leather Mini Bag в нежном розовом оттенке — компактная модель с лаконичным дизайном и фирменным стилем Marc Jacobs.\nСумка изготовлена из 100% натуральной кожи и имеет откидной клапан с магнитной застежкой. Внутри расположены основное отделение, карман для мелочей и 8 слотов для карт. Модель можно носить как клатч или использовать съемный регулируемый ремешок для ношения на плече или через плечо",
+      "material": "Натуральная кожа",
+      "dimensions": "20 × 12 × 4 см",
+      "strapInfo": "Ремешок съемный и регулируемый",
+      "preOrderDays": "5–10 рабочих дней",
+      "closure": "Клапан на магните",
+      "compartments": "Открытый карман и восемь отделений для карт"
+    }
+  }
 }

@@ -69,5 +69,19 @@
       "36": 1
     }
   },
-  "material": "Верх — трикотаж PRIMEKNIT частково з перероблених матеріалів, накладки з біо-EVA; проміжна підошва — BOOST; підметка — гума"
+  "material": "Верх — трикотаж PRIMEKNIT частково з перероблених матеріалів, накладки з біо-EVA; проміжна підошва — BOOST; підметка — гума",
+  "i18n": {
+    "en": {
+      "title": "Adidas by Stella Mccartney SolarGlide Sneakers",
+      "description": "Stylish women's adidas by Stella McCartney Solarglide sneakers — a combination of athletic functionality and Stella McCartney's recognizable aesthetic. The model is designed not only for an active lifestyle and running, but also for stylish everyday looks.\nThe lightweight adidas PRIMEKNIT textile upper hugs the foot for a comfortable fit. \nThe BOOST midsole helps cushion every step and gives a feeling of energy when walking and running. The flexible rubber outsole provides reliable grip.",
+      "material": "Upper — PRIMEKNIT knit, partly made from recycled materials, with bio-EVA overlays; midsole — BOOST; outsole — rubber",
+      "preOrderDays": "5–10 business days"
+    },
+    "ru": {
+      "title": "Кроссовки Adidas by Stella Mccartney SolarGlide",
+      "description": "Стильные женские кроссовки adidas by Stella McCartney Solarglide — сочетание спортивной функциональности и узнаваемой эстетики Стеллы Маккартни. Модель создана не только для активного образа жизни и бега, но и для стильных повседневных образов.\nЛегкий текстильный верх adidas PRIMEKNIT плотно облегает стопу и обеспечивает комфортную посадку. \nПромежуточная подошва BOOST помогает амортизировать каждый шаг и дарит ощущение энергичности при ходьбе и беге. Гибкая резиновая подошва обеспечивает надежное сцепление с поверхностью.",
+      "material": "Верх — трикотаж PRIMEKNIT частично из переработанных материалов, накладки из био-EVA; промежуточная подошва — BOOST; подметка — резина",
+      "preOrderDays": "5–10 рабочих дней"
+    }
+  }
 }
