@@ -957,12 +957,177 @@
 
     function порожняСтрічка() {
 
+        // Кнопки-підказки одразу в порожньому чаті: людина, якій важко
+        // сформулювати, просто тисне «Підібрати річ». Тексти ті самі, що
+        // розпізнає бот (chat-bot.js, chips.menu); на /en/ і /ru/ їх
+        // перекладає i18n.js — і бот отримує вже перекладене.
         return [
             '<div class="chat-empty">',
             '  <p>Напишіть, що вас цікавить — розмір, наявність, доставка.</p>',
-            '  <p>Відповідь прийде сюди ж, цю сторінку можна не тримати відкритою.</p>',
+            '  <p>Бот-помічник відповість одразу, менеджер — щодня 09:00–20:00. Відповідь прийде сюди ж, цю сторінку можна не тримати відкритою.</p>',
+            '  <div class="chat-chips chat-chips-start">',
+            '    <button type="button" class="chat-chip">Підібрати річ</button>',
+            '    <button type="button" class="chat-chip">Доставка</button>',
+            '    <button type="button" class="chat-chip">Оплата</button>',
+            '    <button type="button" class="chat-chip">Оригінальність</button>',
+            '  </div>',
             '</div>'
         ].join("");
+
+    }
+
+    // ── Бот-помічник ────────────────────────────────────────────────
+    //
+    // Відповідь бота приходить звичайним текстом (його ж бачить власник
+    // у Telegram) зі службовими рядками — див. supabase/functions/
+    // telegram-order-bot/chat-bot.js, «ФОРМАТ ВІДПОВІДІ»:
+    //   «• Назва — 6 500 ₴ https://…/p/slug/»  → картка товару
+    //   «[[chips: А | Б]]»                     → кнопки-підказки
+    //   «[[handoff]]»                          → службова позначка, не показуємо
+    //
+    // Усе — через textContent і createElement: текст бота складено з
+    // даних сайту, але правило стрічки одне — жодного innerHTML.
+    var РЯДОК_ТОВАРУ = /^•\s+(.+?)\s+—\s+([\d\s  ]+₴)(?:\s+\(([^)]+)\))?\s+(https?:\/\/\S+)$/;
+
+    // Фото для карток — з тієї ж довідки, що й у бота (data/chat-bot.json).
+    // Тягнемо лише тоді, коли бот уперше показав товар.
+    var фотоТоварів = null;
+
+    function фото(slug) {
+        if (!фотоТоварів) {
+            var версії = window.ASSET_VERSIONS || {};
+            var файл = "data/chat-bot.json";
+            фотоТоварів = fetch("/" + файл + (версії[файл] ? "?v=" + версії[файл] : ""))
+                .then(function (r) { return r.ok ? r.json() : { products: [] }; })
+                .catch(function () { return { products: [] }; })
+                .then(function (дані) {
+                    var мапа = {};
+                    (дані.products || []).forEach(function (p) { мапа[p.slug] = p.image; });
+                    return мапа;
+                });
+        }
+        return фотоТоварів.then(function (мапа) { return мапа[slug] || ""; });
+    }
+
+    // Адреса з відповіді бота — абсолютна (для Telegram). На сайті ведемо
+    // на ту саму сторінку ЦЬОГО домену: на dev — на dev, а не на прод.
+    function шляхТовару(адреса) {
+        try { var u = new URL(адреса); return u.pathname + u.search; } catch (e) { return адреса; }
+    }
+
+    function картка(title, price, note, адреса) {
+
+        var a = document.createElement("a");
+        a.className = "chat-product";
+        a.href = шляхТовару(адреса);
+
+        var img = document.createElement("img");
+        img.className = "chat-product-img";
+        img.alt = "";
+        img.width = 56;
+        img.height = 56;
+        img.loading = "lazy";
+
+        var slug = (шляхТовару(адреса).match(/\/p\/([^/?#]+)/) || [])[1];
+        if (slug) фото(decodeURIComponent(slug)).then(function (src) { if (src) img.src = src; else img.remove(); });
+
+        var info = document.createElement("span");
+        info.className = "chat-product-info";
+
+        var name = document.createElement("span");
+        name.className = "chat-product-title";
+        name.textContent = title;
+
+        var cost = document.createElement("span");
+        cost.className = "chat-product-price";
+        cost.textContent = price + (note ? " · " + note : "");
+
+        info.appendChild(name);
+        info.appendChild(cost);
+        a.appendChild(img);
+        a.appendChild(info);
+
+        return a;
+
+    }
+
+    // НАДСИЛАЄМО ПІСЛЯ КЛІКУ, А НЕ В НЬОМУ.
+    //
+    // Надсилання одразу ж прибирає кнопку з DOM (порожня стрічка
+    // зникає, щойно зʼявилось повідомлення). Клік при цьому ще йде
+    // вгору до document — а там закриття «кліком поза панеллю» питає,
+    // чи цільова кнопка всередині панелі. Відʼєднана — ні, і панель
+    // закривалась на першому ж натисканні. Знайдено в браузері.
+    function надіслатиПідказку(текст) {
+        setTimeout(function () {
+            полеЧату.value = текст;
+            if (typeof формаЧату.requestSubmit === "function") формаЧату.requestSubmit();
+            else формаЧату.dispatchEvent(new Event("submit", { cancelable: true }));
+        }, 0);
+    }
+
+    // Кнопки-підказки. Діють лише під ОСТАННЬОЮ відповіддю бота: стара
+    // «Інші варіанти» після нового запиту показала б не те.
+    function підказки(список) {
+
+        стрічка.querySelectorAll(".chat-chips").forEach(function (старі) { старі.remove(); });
+
+        if (!список.length) return null;
+
+        var блок = document.createElement("div");
+        блок.className = "chat-chips";
+
+        список.forEach(function (текст) {
+            var b = document.createElement("button");
+            b.type = "button";
+            b.className = "chat-chip";
+            b.textContent = текст;
+            b.addEventListener("click", function () { надіслатиПідказку(b.textContent.trim()); });
+            блок.appendChild(b);
+        });
+
+        return блок;
+
+    }
+
+    function намалюватиБота(рядок, тіло) {
+
+        var текст = [];
+        var товари = [];
+        var кнопки = [];
+
+        String(тіло || "").split("\n").forEach(function (l) {
+            var m = l.match(РЯДОК_ТОВАРУ);
+            var chips = l.match(/^\[\[chips:\s*(.*)\]\]$/);
+            if (m) товари.push(m);
+            else if (chips) кнопки = chips[1].split("|").map(function (s) { return s.trim(); }).filter(Boolean);
+            else if (!/^\[\[.*\]\]$/.test(l.trim())) текст.push(l);
+        });
+
+        var хмарка = document.createElement("div");
+        хмарка.className = "chat-msg-body chat-bot-body";
+
+        var підпис = document.createElement("span");
+        підпис.className = "chat-bot-label";
+        підпис.textContent = "🤖 Бот-помічник";
+        хмарка.appendChild(підпис);
+
+        var p = document.createElement("p");
+        p.className = "chat-bot-text";
+        p.textContent = текст.join("\n").trim();
+        хмарка.appendChild(p);
+
+        if (товари.length) {
+            var список = document.createElement("div");
+            список.className = "chat-products";
+            товари.forEach(function (m) { список.appendChild(картка(m[1], m[2].trim(), m[3], m[4])); });
+            хмарка.appendChild(список);
+        }
+
+        рядок.appendChild(хмарка);
+
+        var блок = підказки(кнопки);
+        if (блок) рядок.appendChild(блок);
 
     }
 
@@ -986,9 +1151,18 @@
         // репліка в діалозі, а це підпис під усім діалогом.
         var хто = повідомлення.author === "owner" ? "owner"
             : повідомлення.author === "system" ? "system"
-                : "visitor";
+                : повідомлення.author === "bot" ? "bot"
+                    : "visitor";
 
         рядок.className = "chat-msg chat-msg-" + хто;
+
+        // Бот: текст, картки товарів і кнопки-підказки — окремо.
+        if (хто === "bot") {
+            намалюватиБота(рядок, повідомлення.body);
+            стрічка.appendChild(рядок);
+            if (повідомлення.id > останній) останній = повідомлення.id;
+            return;
+        }
 
         // textContent, не innerHTML: усе в стрічці — це або те, що
         // написала людина, або те, що написав власник. Ні в кого з
@@ -1418,6 +1592,13 @@
 
     });
 
+    // Кнопки в порожньому чаті вставлені розміткою (порожняСтрічка) —
+    // слухаємо їх на самій стрічці.
+    стрічка.addEventListener("click", function (e) {
+        var b = e.target.closest && e.target.closest(".chat-chips-start .chat-chip");
+        if (b) надіслатиПідказку(b.textContent.trim());
+    });
+
     формаЧату.addEventListener("submit", async function (e) {
 
         e.preventDefault();
@@ -1450,7 +1631,9 @@
             site_action: "chat-send",
             thread: нитка,
             body: текст,
-            page: location.pathname + location.search
+            page: location.pathname + location.search,
+            // Мовою сторінки відповідає бот-помічник.
+            lang: (window.I18N && window.I18N.lang) || "uk"
         });
 
         if (дані && дані.ok) {
@@ -1466,6 +1649,14 @@
             if (дані.id && дані.id > останній) останній = дані.id;
 
             показано[дані.id] = true;
+
+            // Бот відповів у тому ж запиті — показуємо одразу, не
+            // чекаючи опитування. id той самий, тож опитування його
+            // вдруге не намалює.
+            if (дані.bot && дані.bot.id) {
+                домалювати(дані.bot);
+                донизу();
+            }
 
             підпис.textContent = привітання();
 

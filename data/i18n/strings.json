@@ -1131,6 +1131,10 @@
     "en": "🗑 removed page: {1}/{2}/",
     "ru": "🗑 удалена страница: {1}/{2}/"
   },
+  "🤖 Бот-помічник": {
+    "en": "🤖 Assistant bot",
+    "ru": "🤖 Бот-помощник"
+  },
   "🚚 З Європи": {
     "en": "🚚 From Europe",
     "ru": "🚚 Из Европы"
@@ -1478,6 +1482,14 @@
   "Босоніжки": {
     "en": "Sandals",
     "ru": "Босоножки"
+  },
+  "Бот-помічник": {
+    "en": "Assistant bot",
+    "ru": "Бот-помощник"
+  },
+  "Бот-помічник відповість одразу, менеджер — щодня 09:00–20:00. Відповідь прийде сюди ж, цю сторінку можна не тримати відкритою.": {
+    "en": "The assistant bot replies right away, a manager — daily 09:00–20:00 (Kyiv time). The reply will come here, you don't need to keep this page open.",
+    "ru": "Бот-помощник ответит сразу, менеджер — ежедневно 09:00–20:00. Ответ придет сюда же, эту страницу можно не держать открытой."
   },
   "браузері. Нові посилання ведуть на /promo/": {
     "en": "browser. New links point to /promo/",
@@ -2311,6 +2323,10 @@
     "en": "Done. Emails about new arrivals and sales will now go to this address.",
     "ru": "Готово. Теперь письма о новинках и акциях будут приходить на этот адрес."
   },
+  "Готово. Тепер листи про новинки та акції приходитимуть на цю адресу. Відписатись можна з будь-якого листа.": {
+    "en": "Done. Emails about new arrivals and sales will now come to this address. You can unsubscribe from any email.",
+    "ru": "Готово. Теперь письма о новинках и акциях будут приходить на этот адрес. Отписаться можно из любого письма."
+  },
   "Готуємо фото...": {
     "en": "Preparing photos...",
     "ru": "Готовим фото..."
@@ -3119,6 +3135,10 @@
     "en": "Looks like the link wasn't copied in full. Open the email again",
     "ru": "Похоже, адрес скопировали не полностью. Откройте письмо еще раз"
   },
+  "Здається, адресу скопіювали не цілком. Відкрийте лист ще раз і натисніть кнопку в ньому.": {
+    "en": "It looks like the link was not copied in full. Open the email again and press the button in it.",
+    "ru": "Похоже, адрес скопировали не полностью. Откройте письмо еще раз и нажмите кнопку в нем."
+  },
   "зелен": {
     "en": "green",
     "ru": "зелен"
@@ -3823,6 +3843,10 @@
     "en": "We use cookies to run the store, for analytics",
     "ru": "Мы используем cookie для работы магазина, статистики"
   },
+  "Ми використовуємо cookie для роботи магазину, статистики відвідувань, відео в картках товарів і рекламу у Facebook та Instagram.": {
+    "en": "We use cookies to run the store, for visit statistics, videos in product cards and ads on Facebook and Instagram.",
+    "ru": "Мы используем cookie для работы магазина, статистики посещений, видео в карточках товаров и рекламы в Facebook и Instagram."
+  },
   "Ми отримали вашу заявку на відмову й опрацьовуємо її. Надсилати повторно не потрібно.": {
     "en": "We've received your cancellation request and are processing it. No need to send it again.",
     "ru": "Мы получили вашу заявку на отказ и обрабатываем ее. Отправлять повторно не нужно."
@@ -3878,6 +3902,10 @@
   "Можливо, адресу скопіювали не цілком. Відкрийте лист ще раз": {
     "en": "The link may not have been copied in full. Open the email again",
     "ru": "Возможно, адрес скопировали не полностью. Откройте письмо еще раз"
+  },
+  "Можливо, адресу скопіювали не цілком. Відкрийте лист ще раз або підпишіться заново внизу сторінки.": {
+    "en": "Perhaps the link was not copied in full. Open the email again or subscribe again at the bottom of the page.",
+    "ru": "Возможно, адрес скопировали не полностью. Откройте письмо еще раз или подпишитесь заново внизу страницы."
   },
   "Можливо, його вже розпродано або знято з продажу, а посилання застаріло. Схожі моделі майже завжди є — напишіть нам, і ми підберемо заміну.": {
     "en": "It may have sold out or been discontinued, and the link is outdated. Similar models are almost always available — message us and we'll find a replacement.",
@@ -4315,6 +4343,10 @@
     "en": "Couldn't check the order. Please try again",
     "ru": "Не удалось проверить заказ. Попробуйте еще раз"
   },
+  "Не вдалося перевірити замовлення. Спробуйте ще раз або напишіть нам у Telegram — відповімо швидко.": {
+    "en": "Could not check the order. Try again or write to us on Telegram — we reply quickly.",
+    "ru": "Не удалось проверить заказ. Попробуйте еще раз или напишите нам в Telegram — ответим быстро."
+  },
   "Не вдалося перевірити промокод:": {
     "en": "Couldn't check the promo code:",
     "ru": "Не удалось проверить промокод:"
@@ -4374,6 +4406,10 @@
   "Не змогли підтвердити покупку. Перевірте номер замовлення й телефон —": {
     "en": "We couldn't verify the purchase. Check the order number and phone —",
     "ru": "Не смогли подтвердить покупку. Проверьте номер заказа и телефон —"
+  },
+  "Не змогли підтвердити покупку. Перевірте номер замовлення й телефон — відгук можна залишити на товар, який ви замовляли.": {
+    "en": "We could not confirm the purchase. Check the order number and phone — you can review an item you ordered.",
+    "ru": "Не смогли подтвердить покупку. Проверьте номер заказа и телефон — отзыв можно оставить на товар, который вы заказывали."
   },
   "Не знайдено {*}": {
     "en": "{1} not found",
@@ -4678,6 +4714,10 @@
   "Оберіть, що дозволяєте. Кошик, обране й вхід працюють": {
     "en": "Choose what you allow. Cart, favorites and sign-in work",
     "ru": "Выберите, что разрешаете. Корзина, избранное и вход работают"
+  },
+  "Оберіть, що дозволяєте. Кошик, обране й вхід працюють завжди — без них магазин не працює.": {
+    "en": "Choose what you allow. Cart, favorites and sign-in always work — the store cannot work without them.",
+    "ru": "Выберите, что разрешаете. Корзина, избранное и вход работают всегда — без них магазин не работает."
   },
   "Обираєте оплату карткою онлайн або при отриманні — як вам зручніше.": {
     "en": "Pay by card online or on delivery — whichever suits you.",
@@ -5130,6 +5170,10 @@
   "Піджаки і костюми": {
     "en": "Blazers & suits",
     "ru": "Пиджаки и костюмы"
+  },
+  "Підібрати річ": {
+    "en": "Pick an item",
+    "ru": "Подобрать вещь"
   },
   "Підказки": {
     "en": "Suggestions",
@@ -6154,6 +6198,10 @@
   "Спробуйте ще раз за кілька хвилин. Якщо не вийде — напишіть нам": {
     "en": "Please try again in a few minutes. If it still doesn't work, message us",
     "ru": "Попробуйте еще раз через несколько минут. Если не получится — напишите нам"
+  },
+  "Спробуйте ще раз за кілька хвилин. Якщо не вийде — напишіть нам у Telegram, підпишемо вручну.": {
+    "en": "Try again in a few minutes. If it still fails, write to us on Telegram and we will subscribe you manually.",
+    "ru": "Попробуйте еще раз через несколько минут. Если не получится — напишите нам в Telegram, подпишем вручную."
   },
   "сріб": {
     "en": "silver",

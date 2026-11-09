@@ -50,6 +50,12 @@
 
     if (lang === Core.DEFAULT_LANG) return;
 
+    // Сервер на будь-яку неіснуючу адресу віддає ОДНУ сторінку 404 —
+    // українську, з lang="uk". На /en/… текст її перекладається нижче, а
+    // мова документа лишалась би українською (читалки, перекладач
+    // браузера, пошук).
+    if (document.documentElement.lang !== lang) document.documentElement.lang = lang;
+
     var translate = null;
     var queue = [];
 
