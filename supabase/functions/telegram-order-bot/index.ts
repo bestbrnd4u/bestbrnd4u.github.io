@@ -5444,8 +5444,9 @@ function describeWish(wish, lang) {
     if (wish.type && modelName) parts.push(modelName);
     if (lang !== "en" && wish.brand) parts.push(wish.brand);
     if (wish.material && lang !== "en") parts.push({ leather: { uk: "зі шкіри", ru: "из кожи" }, vegan: { uk: "з екошкіри", ru: "из экокожи" } }[wish.material][lang]);
+    if (wish.band === "metal") parts.push({ uk: "на металевому браслеті", en: "with a metal bracelet", ru: "на металлическом браслете" }[lang]);
     if (wish.size) parts.push(lang === "en" ? `size ${wish.size}` : `${wish.size} ${lang === "ru" ? "размера" : "розміру"}`);
-    if (wish.sale && !wish.fresh) parts.push(D.sale);
+    if (wish.sale) parts.push(D.sale);
     if (wish.budget && wish.budget.max) parts.push(`${D.upTo} ${botMoney(wish.budget.max)}`);
     else if (wish.budget && wish.budget.min) parts.push(`${D.from} ${botMoney(wish.budget.min)}`);
     return parts.join(" ");
@@ -5708,6 +5709,12 @@ const T16 = {
         reviews: "Отзывы — внизу страницы каждого товара. Их оставляют только те, кто действительно покупал: для отзыва нужны номер заказа и телефон.",
         orderQ: "Конечно! Напишите номер заказа и телефон, указанный при оформлении, — я проверю состояние. Или опишите вопрос, и менеджер поможет."
     }
+};
+
+const T17 = {
+    uk: { noMore: "Це всі {desc} — {n} {variants}. Можу показати інший тип чи бренд 👇" },
+    en: { noMore: "That's all the {desc} — {n} {variants}. I can show another type or brand 👇" },
+    ru: { noMore: "Это все {desc} — {n} {variants}. Могу показать другой тип или бренд 👇" }
 };
 
 // Назви типів для фрази «Сумок Prada зараз немає».
@@ -5993,9 +6000,16 @@ function parseWish(text, data) {
     if (hasStem(list, ["веган", "екошкір", "еко-шкір", "екошкіра", "штучн", "экокож", "эко-кож", "искусствен", "vegan", "faux", "pu$"])) wish.material = "vegan";
     else if (hasStem(list, ["шкір", "натуральн шкір", "кожан", "кожа$", "кожи$", "из кожи", "leather"])) wish.material = "leather";
 
+    // Годинник: «з металевим браслетом», «на сталевому браслеті».
+    if (hasStem(list, ["металев", "метал$", "сталев", "сталь", "браслет", "стальн", "металлическ", "steel", "metal", "bracelet"])) wish.band = "metal";
+
     // Фасон сумки — зі слів людини, у назвах і ключових словах товарів.
     const style = STYLES.find(st => hasStem(list, st.stems));
     if (style) wish.style = style.key;
+
+    // «А що є від Prada?», «все від Coach» — усе від бренду: тип і колір
+    // попереднього запиту сюди не переносимо.
+    if (hasStem(list, ["що є від", "що є у", "а що є", "усе від", "все від", "все що є", "что есть от", "что есть у", "а что есть", "все от", "anything from", "what do you have from", "everything from", "all from"])) wish.all = true;
 
     // «Tabby є?», «а Snapshot?», «GG0516S» — назва моделі.
     const models = findModels(text, data);
@@ -6008,7 +6022,7 @@ function parseWish(text, data) {
     if (size) wish.size = size;
 
     if (hasStem(list, ["подар", "gift", "present"])) wish.gift = true;
-    if (hasStem(list, ["новинк", "новинок", "нове надходж", "нові надходж", "новые поступ", "нове$", "новое", "новые", "new arrival", "latest", "what's new"])) wish.fresh = true;
+    if (hasStem(list, ["новинк", "новинок", "що нового", "что нового", "нового$", "нове надходж", "нові надходж", "новые поступ", "нове$", "новое", "новые", "new arrival", "latest", "what's new"])) wish.fresh = true;
     if (hasStem(list, ["знижк", "скидк", "акці", "акци", "sale", "discount"])) wish.sale = true;
 
     // «Інші варіанти» — показати наступні.
@@ -6016,7 +6030,8 @@ function parseWish(text, data) {
 
     const wants = hasStem(list, ["шука", "ищу", "хочу", "хоті", "хотел", "підбер", "подбер", "підібр", "подобр", "порад", "посовет", "покаж", "что есть", "що є", "є ", "есть ", "looking", "want", "need", "recommend", "suggest", "show", "pick", "any "]);
 
-    const criteria = ["type", "gender", "color", "brand", "budget", "models", "size", "material", "style"].filter(k => wish[k]).length;
+    const criteria = ["type", "gender", "color", "brand", "budget", "models", "size", "material", "style", "band"].filter(k => wish[k]).length;
+    if (wish.band && !wish.type) wish.type = "watches";
     // Фасон чи матеріал без типу — це про сумки (інших шкіряних
     // крос-боді в каталозі немає).
     if ((wish.style || wish.material === "vegan") && !wish.type) wish.type = "bags";
@@ -6055,6 +6070,11 @@ function matches(product, wish, now, relax) {
     if (wish.brand && product.brand !== wish.brand) return false;
 
     if (wish.models && !wish.models.has(product.slug)) return false;
+
+    if (wish.band === "metal") {
+        const m = String((product.details && product.details.material && product.details.material.uk) || "") + " " + (product.title && product.title.en || "");
+        if (!/метал|сталь|сталев|браслет|bracelet|steel/i.test(m)) return false;
+    }
 
     if (wish.material) {
         const m = String((product.details && product.details.material && product.details.material.uk) || "");
@@ -6146,13 +6166,14 @@ function mergeWishes(current, previous) {
 
     for (const prev of previous) {
         if (!prev) continue;
+        if (current.all) break;
         if (current.type && prev.type && prev.type !== current.type) break;
-        ["type", "gender", "brand", "color", "budget", "size", "material", "style"].forEach(k => {
+        ["type", "gender", "brand", "color", "budget", "size", "material", "style", "band", "fresh", "sale"].forEach(k => {
             if (out[k] === undefined && prev[k] !== undefined) out[k] = prev[k];
         });
     }
 
-    out.criteria = ["type", "gender", "color", "brand", "budget", "models", "size", "material", "style"].filter(k => out[k]).length;
+    out.criteria = ["type", "gender", "color", "brand", "budget", "models", "size", "material", "style", "band"].filter(k => out[k]).length;
 
     return out;
 
@@ -6465,7 +6486,7 @@ function productAnswer(text, product, data, lang, now, site) {
 
     // Нічого з питаного в картці немає — чесно, і людині.
     if (lines.length === 1) {
-        return { text: L.noInfo, handoff: true };
+        return { text: L.noInfo, handoff: true, pause: false };
     }
 
     if (missing) lines.push(L.noInfo);
@@ -6594,7 +6615,14 @@ function botReply(message, history, data, options) {
     const reply = (body, extra) => {
         // lang — мова ВІДПОВІДІ (мова повідомлення), а не сторінки: її
         // бере функція, записуючи відповідь і перевіряючи замовлення.
+        // handoff — сповістити власника (зі звуком); pause — бот далі мовчить.
+        // Мовчить лише тоді, коли розмова справді перейшла до людини
+        // (попросили людину, скарга, скасування, телефон для дзвінка). На
+        // «не зрозумів» чи «немає такого» бот кличе власника, але й далі
+        // відповідає: раніше він замовкав, і людина з наступним питанням
+        // («а зі знижкою?») лишалась без відповіді до ранку.
         const out = Object.assign({ text: body, products: [], chips: [], handoff: false, lang }, extra);
+        if (out.pause === undefined) out.pause = out.handoff;
         if (out.handoff && late && !out.text.includes(late.trim())) out.text += late;
         if (greet && out.intent !== "hello" && !out.text.startsWith(greet)) out.text = `${greet}! ${out.text}`;
         return out;
@@ -6634,13 +6662,13 @@ function botReply(message, history, data, options) {
     // працює, скарга, доставка за кордон. Чесно кажемо, що далі людина.
     const esc = ESCALATE.find(e => hasStem(list, e.stems));
     if (esc && !(esc.key === "abroad" && criteria)) {
-        return reply(T4L[esc.key], { handoff: true, intent: esc.key === "sorry" ? "sorry" : "handoff" });
+        return reply(T4L[esc.key], { handoff: true, pause: esc.key !== "abroad", intent: esc.key === "sorry" ? "sorry" : "handoff" });
     }
 
     // 1б. «Не прийшло», «де посилка» — посилання на перевірку і людина:
     // це вже не довідка, а можлива проблема.
     if (hasStem(list, LOST) && !criteria) {
-        return reply(fill(T4L.lost, { url: pageUrl(site, "/order-status", lang) }), { handoff: true, intent: "status" });
+        return reply(fill(T4L.lost, { url: pageUrl(site, "/order-status", lang) }), { handoff: true, pause: false, intent: "status" });
     }
 
     // 1г. Невдоволення самим ботом — вибачитись і покликати людину.
@@ -6664,7 +6692,7 @@ function botReply(message, history, data, options) {
     // розстрочку — бот відповідає нею, а не «уточніть у менеджера».
     const personal = ownerAnswer(text, data, lang) ? null : PERSONAL.find(p => hasStem(list, p.stems));
     if (personal) {
-        return reply(fill(T10[lang][personal.key], { url: pageUrl(site, "/aktsii/", lang) }), { handoff: true, intent: "handoff" });
+        return reply(fill(T10[lang][personal.key], { url: pageUrl(site, "/aktsii/", lang) }), { handoff: true, pause: personal.key === "callback", intent: "handoff" });
     }
 
     // 1е. «Працюєте у вихідні / в неділю?» — графік зі сторінки «Контакти».
@@ -6681,7 +6709,7 @@ function botReply(message, history, data, options) {
     // 2а. Автовідповіді власника — понад усе вбудоване: власник знає
     // свій магазин краще за ключові слова в коді.
     const own = ownerAnswer(text, data, lang);
-    if (own && own.missing) return reply(fill(L.handoff, { hours }), { handoff: true, intent: "handoff" });
+    if (own && own.missing) return reply(fill(L.handoff, { hours }), { handoff: true, pause: false, intent: "handoff" });
     if (own) return reply(own.text, { chips: [L.chips.human], intent: "owner" });
 
     // 2а'. «А друга якого кольору?», «скільки коштує перша?» — про товар
@@ -6690,7 +6718,13 @@ function botReply(message, history, data, options) {
     const nth = ordinalOf(text);
     if (nth) {
         const shown = lastShownSlugs(history);
-        const picked = shown[nth - 1] && (data.products || []).find(p => p.slug === shown[nth - 1]);
+        // Показано одну — «друга» це вона ж (людина рахує інакше);
+        // показано кілька, але менше — перепитати з наявними номерами.
+        if (shown.length > 1 && nth > shown.length) {
+            return reply(fill(T13[lang].which, { n: shown.length }), { chips: T13[lang].ordinals.slice(0, Math.min(shown.length, 4)), intent: "ask" });
+        }
+        const idx = shown.length === 1 ? 0 : nth - 1;
+        const picked = shown[idx] && (data.products || []).find(p => p.slug === shown[idx]);
         if (picked) {
             const q = productAnswer(text, picked, data, lang, now, site);
             const link = `\n${pageUrl(site, `/p/${picked.slug}/`, lang)}`;
@@ -6706,7 +6740,7 @@ function botReply(message, history, data, options) {
         return reply(T8[lang].cart, { chips: [L.chips.menu[0], L.chips.human], intent: "how-to-order" });
     }
     if (hasStem(list, ["відкладіть", "відклади", "забронюй", "забронюйте", "залиште для мене", "притримайте", "отложите", "отложи", "забронируйте", "оставьте для меня", "reserve", "hold it for me", "put it aside"])) {
-        return reply(T8[lang].reserve, { handoff: true, intent: "handoff" });
+        return reply(T8[lang].reserve, { handoff: true, pause: false, intent: "handoff" });
     }
 
     // 2а'''. Розмова про одну річ: щойно відповідали про «другу сумку» —
@@ -6723,7 +6757,7 @@ function botReply(message, history, data, options) {
     // 2а''''. Після підбірки «а розміри?», «з чого?» без номера — про яку
     // з них? Перепитати краще, ніж «не зрозумів» і будити власника.
     if (!productFromPage(opts.page, data) && lastShownSlugs(history).length > 1
-        && Object.keys(ASK).some(k => k !== "authentic" && hasStem(list, ASK[k]))
+        && Object.keys(ASK).some(k => k !== "authentic" && k !== "discount" && hasStem(list, ASK[k]))
         && !((parseWish(text, data) || {}).criteria)) {
         const n = lastShownSlugs(history).length;
         return reply(fill(T13[lang].which, { n }), { chips: T13[lang].ordinals.slice(0, Math.min(n, 4)), intent: "ask" });
@@ -6733,7 +6767,7 @@ function botReply(message, history, data, options) {
     const here = productFromPage(opts.page, data);
     const about = productAnswer(text, here, data, lang, now, site);
     if (about) {
-        return reply(about.text, { handoff: Boolean(about.handoff), chips: about.handoff ? [] : [L.chips.human], intent: "product" });
+        return reply(about.text, { handoff: Boolean(about.handoff), pause: false, chips: about.handoff ? [] : [L.chips.human], intent: "product" });
     }
 
     // 2в. Контакти й графік.
@@ -6994,7 +7028,7 @@ function botReply(message, history, data, options) {
     }
 
     // Кнопки меню без критеріїв: «Підібрати річ» — питаємо, що саме.
-    if (wish && !wish.criteria && !wish.more && !wish.gift && !wish.fresh && !wish.sale && !wish.recommend) {
+    if (wish && !wish.criteria && !wish.more && !wish.gift && !wish.fresh && !wish.sale && !wish.recommend && !wish.cheap && !wish.pricey && !(history || []).some(m => m && m.author === "visitor" && parseWish(m.body, data))) {
         return reply(L.askWhat, { chips: L.chips.types, intent: "ask" });
     }
 
@@ -7015,11 +7049,18 @@ function botReply(message, history, data, options) {
         }
         const offset = wish.more ? (pages + 1) * MAX_PRODUCTS : 0;
 
-        if (!wish.criteria && !wish.fresh && !wish.sale && !wish.gift && !wish.recommend) {
+        if (!wish.criteria && !wish.fresh && !wish.sale && !wish.gift && !wish.recommend && !wish.cheap && !wish.pricey) {
             return reply(L.askWhat, { chips: L.chips.types, intent: "ask" });
         }
 
         const picked = pickProducts(wish, data, now, offset);
+
+        // «Ще», а більше нічого: pickProducts повертає з початку — тоді
+        // чесно «це всі», а не та сама підбірка вдруге.
+        if (wish.more && offset > 0 && picked.start === 0 && picked.total <= offset) {
+            const d0 = describeWish(Object.assign({}, wish, { more: false }), lang);
+            return reply(fill(T17[lang].noMore, { desc: d0, n: picked.total, variants: plural(picked.total, T5[lang].variants, lang) }), { chips: L.chips.types.slice(0, 4).concat(L.chips.more[1]), intent: "products" });
+        }
 
         if (!picked.items.length && wish.style) {
             const st = STYLES.find(x => x.key === wish.style);
@@ -7072,7 +7113,7 @@ function botReply(message, history, data, options) {
                     });
                 }
             }
-            return reply(L.nothing, { handoff: true, intent: "handoff" });
+            return reply(L.nothing, { handoff: true, pause: false, intent: "handoff" });
         }
 
         // Заголовок словами людини: «Ось чорні сумки, які є зараз 👇».
@@ -7119,7 +7160,7 @@ function botReply(message, history, data, options) {
     }
 
     // 7. Не зрозумів — чесно кажемо й передаємо людині.
-    return reply(fill(L.unknown, { hours }), { handoff: true, chips: L.chips.menu.slice(0, 3), intent: "unknown" });
+    return reply(fill(L.unknown, { hours }), { handoff: true, pause: false, chips: L.chips.menu.slice(0, 3), intent: "unknown" });
 
 }
 
@@ -7132,7 +7173,8 @@ function serializeBotReply(reply, lang) {
         lines.push(`• ${p.title} — ${botMoney(p.price)}${p.preOrder ? " (" + L.preorder + ")" : ""} ${p.url}`);
     });
     if (reply.chips && reply.chips.length) lines.push(`[[chips: ${reply.chips.join(" | ")}]]`);
-    if (reply.handoff) lines.push("[[handoff]]");
+    if (reply.handoff && reply.pause !== false) lines.push("[[handoff]]");
+    else if (reply.handoff) lines.push("[[notify]]");
     // Про яку річ щойно говорили — щоб «а розміри?» далі стосувалось її.
     if (reply.focus) lines.push(`[[focus: ${reply.focus}]]`);
     // Бот не зрозумів — власнику підказка «навчіть бота».
@@ -7145,8 +7187,10 @@ function botTelegramText(body, threadNo, escape) {
     const esc = typeof escape === "function" ? escape : (s => s);
     const clean = String(body || "").split("\n").filter(l => !/^\[\[.*\]\]$/.test(l.trim())).join("\n");
     const handoff = /\[\[handoff\]\]/.test(String(body || ""));
+    const notify = /\[\[notify\]\]/.test(String(body || ""));
     return `🤖 <b>Бот відповів</b>${threadNo ? ` · розмова #${threadNo}` : ""}\n\n${esc(clean)}`
         + (handoff ? "\n\n⚠️ <b>Бот передав розмову вам</b> — відповідайте реплаєм на повідомлення покупця." : "")
+        + (notify ? "\n\n⚠️ <b>Потрібна ваша відповідь</b> — бот і далі відповідає в розмові, поки ви не напишете." : "")
         // Питання, якого бот не знає, — найкращий матеріал, щоб його
         // навчити: власник бачить його саме тут.
         + (/\[\[unknown\]\]/.test(String(body || "")) ? "\n💡 Щоб бот відповідав на таке сам — адмінка → «Автовідповіді бота в чаті»." : "");

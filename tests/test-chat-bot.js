@@ -791,5 +791,72 @@ console.log("\n[20] Проба з 40 живих повідомлень (10.11.20
     check("en «real leather» — «leather bags», не «bags leather»", /the leather bags/.test(talk("en", ["Is this bag real leather?"]).text));
 }
 
+console.log("\n[21] Цілі розмови (10.11.2026)");
+{
+    // Розмова з історією так, як її бачить функція: після кожної відповіді
+    // перевіряє botShouldStay — бот, що «замовк», далі не відповідає.
+    const chat = (lang, messages) => {
+        const history = [];
+        return messages.map(m => {
+            const r = bot.botShouldStay(history) ? bot.botReply(m, history, data, { lang, now: NOW, siteUrl: "https://bestbrnd4u.com" }) : null;
+            history.push({ author: "visitor", body: m });
+            if (r) history.push({ author: "bot", body: bot.serializeBotReply(r, r.lang || lang) });
+            return r;
+        });
+    };
+
+    // Покликати власника ≠ замовкнути. Раніше після «не зрозумів» бот
+    // мовчав до відповіді власника, і наступне питання лишалось без відповіді.
+    // Старий бот на цих розмовах повертає null — перевірка має дати ✗, а не впасти.
+    const none = { text: "", products: [], intent: null };
+    const say = (lang, msgs) => talk(lang, msgs) || none;
+    const [unk0, after] = chat("uk", ["фывапролд жэ", "скільки коштує доставка?"]);
+    const unk = unk0 || none;
+    check("незрозуміле — власника покликано, але бот не замовк", unk.handoff && unk.pause === false
+        && bot.serializeBotReply(unk, "uk").includes("[[notify]]") && !bot.serializeBotReply(unk, "uk").includes("[[handoff]]"));
+    check("…і на наступне питання відповідає", after && after.intent === "faq", after && after.intent);
+    check("Telegram: «Потрібна ваша відповідь — бот і далі відповідає»",
+        /Потрібна ваша відповідь/.test(bot.botTelegramText(bot.serializeBotReply(unk, "uk"), 1)));
+    const [human0, silent] = chat("uk", ["покличте менеджера", "а доставка скільки?"]);
+    const human = human0 || none;
+    check("«покличте менеджера» — передано, далі бот мовчить", human.handoff && bot.serializeBotReply(human, "uk").includes("[[handoff]]") && silent === null);
+    check("скарга — теж мовчить після", chat("uk", ["жахливо, мене обманули", "ну?"])[1] === null);
+    check("«в кредит?» — кличе власника, але бот і далі відповідає", chat("uk", ["можна оплатити частинами?", "а доставка?"])[1] !== null);
+
+    const metal = say("uk", ["хочу годинник чоловіку", "а з металевим браслетом?"]);
+    check("«а з металевим браслетом?» — лише годинники на браслеті",
+        metal.products.length > 0 && items(metal).every(p => p.category === "Годинники")
+        && /металевому браслеті/.test(metal.text), metal.text.slice(0, 80));
+
+    const fresh = say("uk", ["що нового?"]);
+    check("«що нового?» — новинки", fresh.products.length > 0 && items(fresh).every(p => p.isNew), fresh.text.slice(0, 60));
+    const saleNew = say("uk", ["що нового?", "а зі знижкою?"]);
+    check("«а зі знижкою?» після новинок — новинки зі знижкою",
+        /новинки зі знижкою/.test(saleNew.text) && saleNew.products.length > 0, saleNew.text.slice(0, 70));
+    const cheapNew = say("uk", ["що нового?", "а зі знижкою?", "найдешевші"]);
+    check("«найдешевші» далі — та сама підбірка, відсортована", /найдоступніші новинки зі знижкою/.test(cheapNew.text), cheapNew.text.slice(0, 70));
+
+    // Показано одну — «друга» це вона ж; показано дві — «четверта» перепитує.
+    const one = data.products.find(p => p.slug);
+    const shownOne = [{ author: "visitor", body: "покажи" }, { author: "bot", body: `Ось 👇\n• ${one.title.uk} — 1 000 ₴ https://bestbrnd4u.com/p/${one.slug}/` }];
+    const second = bot.botReply("скільки коштує друга?", shownOne, data, { lang: "uk", now: NOW }) || none;
+    check("«друга», а показано одну — про неї", second.intent === "product" && second.text.includes(`/p/${one.slug}/`), second.text.slice(0, 60));
+
+    const prada = say("uk", ["є сумки Prada?", "а що є від Prada?"]);
+    check("«а що є від Prada?» — усе від Prada, не лише сумки", prada.products.length > 0
+        && items(prada).every(p => /prada/i.test(p.brand)) && !/сумк|сумок/i.test(prada.text.split("\n")[0]), prada.text.slice(0, 70));
+
+    // «Покажіть ще», коли більше немає: чесно «це всі», а не те саме вдруге.
+    const few = (() => {
+        const counts = {};
+        data.products.forEach(p => { counts[p.brand] = (counts[p.brand] || 0) + 1; });
+        return Object.keys(counts).find(b => counts[b] >= 2 && counts[b] <= 4);
+    })();
+    if (few) {
+        const more = say("uk", [few, "покажіть ще"]);
+        check(`«покажіть ще» після всіх ${few} — «Це всі», без повтору`, /^Це всі/.test(more.text) && more.products.length === 0, more.text.slice(0, 70));
+    } else check("є бренд із 2–4 речами для перевірки «ще»", false);
+}
+
 console.log(failures ? `\n✗ Провалено: ${failures}` : "\n✓ Усе зелено");
 process.exit(failures ? 1 : 0);
