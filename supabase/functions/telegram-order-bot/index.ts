@@ -6681,6 +6681,9 @@ function mergeWishes(current, previous) {
     for (const prev of previous) {
         if (!prev) continue;
         if (current.all) break;
+        // «Що подарувати на 8 березня?» після «темно-сірої сумки» — новий
+        // запит: подарунок не успадковує тип і колір попереднього пошуку.
+        if (current.gift && !prev.gift) break;
         if (current.type && prev.type && prev.type !== current.type) break;
         ["type", "gender", "brand", "color", "budget", "size", "material", "style", "band", "fresh", "sale", "neutral", "noLogo", "inStock", "light"].forEach(k => {
             if (out[k] === undefined && prev[k] !== undefined) out[k] = prev[k];
@@ -8013,7 +8016,11 @@ function botReply(message, history, data, options) {
         const previous = (history || []).filter(m => m && m.author === "visitor").slice(-CONTEXT_MESSAGES).reverse()
             .map(m => parseWish(m.body, data)).filter(Boolean);
         wish = mergeWishes(wish, previous);
-        if (!wish.type && !wish.all) {
+        // Подарунок — новий запит: тип із показаних карток не підставляємо,
+        // якщо в цьому ж ряду подарунка ще не було.
+        const freshGift = parseWish(text, data) && (parseWish(text, data) || {}).gift
+            && !(history || []).filter(m => m && m.author === "visitor").slice(-CONTEXT_MESSAGES).some(m => (parseWish(m.body, data) || {}).gift);
+        if (!wish.type && !wish.all && !freshGift) {
             const seen = shownType(history, data);
             const named = (history || []).filter(m => m && m.author === "visitor").slice(-8)
                 .some(m => (parseWish(m.body, data) || {}).type === seen);
