@@ -1446,5 +1446,40 @@ console.log("\n[30] «Про першу» без списку; сторож на
     check(`сторож: ${POOL.length} фраз × 3 мови окремо й ланцюжками — без системних вад`, POOL.length >= 60 && bad.length === 0, bad.slice(0, 3).join(" | "));
 }
 
+console.log("\n[31] Замовлення по кроках, «не та сумка», брак (10.11.2026)");
+{
+    const run = (lang, msgs) => {
+        const history = [];
+        const out = [];
+        msgs.forEach(m => {
+            const r = bot.botShouldStay(history) ? bot.botReply(m, history, data, { lang, now: NOW, siteUrl: "https://bestbrnd4u.com" }) : null;
+            history.push({ author: "visitor", body: m });
+            if (r) history.push({ author: "bot", body: bot.serializeBotReply(r, r.lang || lang) });
+            out.push(r);
+        });
+        return out;
+    };
+
+    // Бот просить номер і телефон — людина шле їх по черзі. Раніше:
+    // номер → та сама підказка вдруге, телефон → «менеджер передзвонить».
+    const [, num, phone] = run("uk", ["де моє замовлення?", "8689484479", "0671234567"]);
+    check("номер окремо після «де замовлення?» — «тепер напишіть телефон»", /^Дякую! Тепер напишіть, будь ласка, телефон/.test(num.text), num.text.slice(0, 40));
+    check("…телефон далі — перевірка замовлення з обома", phone && phone.lookup && phone.lookup.orderNumber === "8689484479" && phone.lookup.phone === "0671234567" && !phone.handoff, phone && phone.intent);
+    const [, ph, ord] = run("ru", ["где мой заказ", "0671234567", "8689484479"]);
+    check("ru телефон, потім номер — «а номер заказа?» і перевірка", /^Спасибо! А номер заказа/.test(ph.text) && ord.lookup && ord.lookup.orderNumber === "8689484479", ph.text.slice(0, 30));
+    check("«передзвоніть 067…» без розмови про замовлення — як і раніше, дзвінок", run("uk", ["передзвоніть мені 0671234567"])[0].handoff === true);
+    check("номер і телефон одним повідомленням — як і раніше, перевірка", run("uk", ["замовлення 8689484479 телефон 0671234567"])[0].intent === "lookup");
+    check("«мій номер замовлення 12345» — підказка про перевірку, а не «не зрозумів»", run("uk", ["мій номер замовлення 12345"])[0].intent === "status");
+    check("про номер замовлення бот не обіцяє SMS — магазин шле лише лист і Telegram",
+        !/SMS/.test(read("supabase/functions/telegram-order-bot/chat-bot.js").replace(/\/\/.*$/gm, "")));
+
+    const wrong = run("uk", ["прийшла не та сумка"])[0];
+    check("«прийшла не та сумка» — вибачення й власнику, а не підбірка сумок", wrong.handoff && !wrong.products.length && /шкода/.test(wrong.text), wrong.text.slice(0, 40));
+    check("en «you sent the wrong item» — теж власнику", (r => r.handoff && !r.products.length)(run("en", ["you sent the wrong item"])[0]));
+    const defect = run("uk", ["товар прийшов з дефектом"])[0];
+    check("«прийшов з дефектом» — умови гарантії й власник покликаний, бот не замовк", defect.handoff && defect.pause === false && /return-warranty/.test(defect.text));
+    check("«а що з гарантією?» — як і раніше, довідка без дзвінка", run("uk", ["а що з гарантією?"])[0].handoff === false);
+}
+
 console.log(failures ? `\n✗ Провалено: ${failures}` : "\n✓ Усе зелено");
 process.exit(failures ? 1 : 0);
