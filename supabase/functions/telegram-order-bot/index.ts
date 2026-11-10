@@ -5245,7 +5245,8 @@ function onlyEmoji(text) {
 
 function smallTalk(text) {
     const list = words(text);
-    if (onlyEmoji(text)) return "ack";
+    // Самий «?» — людина чекає реакції, а не «добре»: «Так, я тут!».
+    if (onlyEmoji(text)) return /\?/.test(text) ? "anyone" : "ack";
     // Довге повідомлення — це вже питання, навіть якщо в ньому є «дякую»:
     // «дякую, а доставка скільки?» — про доставку.
     if (list.length > 6) return null;
@@ -5660,6 +5661,27 @@ const T13 = {
     ru: { which: "Про какую из них? Напишите номер — «первая», «вторая»… — или нажмите ниже.", ordinals: ["Расскажите о первой", "Расскажите о второй", "Расскажите о третьей", "Расскажите о четвертой"] }
 };
 
+const T14 = {
+    uk: { discountYes: "Так, зараз знижка {pct} %: {price} замість {old}.", discountNo: "На цю річ зараз знижки немає — ціна {price}. Усі акції — тут: {url}", until: "Діє до {date}." },
+    en: { discountYes: "Yes, it's {pct}% off right now: {price} instead of {old}.", discountNo: "There's no discount on this item right now — the price is {price}. All current sales: {url}", until: "Valid until {date}." },
+    ru: { discountYes: "Да, сейчас скидка {pct} %: {price} вместо {old}.", discountNo: "На эту вещь сейчас скидки нет — цена {price}. Все акции — здесь: {url}", until: "Действует до {date}." }
+};
+
+// Місяці в родовому відмінку (en — назви). Для «діє до 12 листопада».
+function mailMonths(lang) {
+    return {
+        uk: ["січня", "лютого", "березня", "квітня", "травня", "червня", "липня", "серпня", "вересня", "жовтня", "листопада", "грудня"],
+        en: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+        ru: ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"]
+    }[lang] || [];
+}
+
+const T15 = {
+    uk: { recommend: "{what}ось що радимо зараз — хіти, новинки й знижки 👇", among: "" },
+    en: { recommend: "{what}here's what we recommend right now — hot picks, new arrivals and sales 👇", among: "" },
+    ru: { recommend: "{what}вот что советуем сейчас — хиты, новинки и скидки 👇", among: "" }
+};
+
 // Назви типів для фрази «Сумок Prada зараз немає».
 const TYPE_WORDS = {
     uk: { bags: "Сумок", watches: "Годинників", glasses: "Окулярів", sneakers: "Кросівок", wallets: "Гаманців" },
@@ -5928,6 +5950,11 @@ function parseWish(text, data) {
     const budget = parseBudget(text);
     if (budget) wish.budget = budget;
 
+    // «Що порадите?», «що популярне?» — порада: хіти (позначка HOT від
+    // власника), потім новинки, потім знижки. Відгуків поки немає, тож
+    // «найпопулярніше» за продажами бот чесно не вигадує.
+    if (hasStem(list, ["що порад", "що б ви порад", "порадьте", "порадь", "порекоменд", "що популяр", "популярн", "хіт", "хит", "бестселер", "бестселлер", "что посовет", "посоветуйте", "что популяр", "recommend", "suggest something", "popular", "bestseller", "best seller", "trending", "what's hot"])) wish.recommend = true;
+
     // «Найдешевші сумки», «найдорожчі годинники», «преміум».
     if (hasStem(list, ["найдешевш", "найбюджетн", "самые дешев", "самый дешев", "cheapest"])) wish.cheap = true;
     if (hasStem(list, ["найдорожч", "найдорожчий", "самые дорог", "самый дорог", "most expensive", "преміум", "премиум", "premium", "найкращ", "лучш", "best$"])) wish.pricey = true;
@@ -5966,7 +5993,7 @@ function parseWish(text, data) {
     // крос-боді в каталозі немає).
     if ((wish.style || wish.material === "vegan") && !wish.type) wish.type = "bags";
 
-    if (!criteria && !wish.gift && !wish.fresh && !wish.sale && !wish.more && !wish.cheap && !wish.pricey && !wants) return null;
+    if (!criteria && !wish.gift && !wish.fresh && !wish.sale && !wish.more && !wish.cheap && !wish.pricey && !wish.recommend && !wants) return null;
 
     wish.criteria = criteria;
     wish.wants = wants;
@@ -6065,7 +6092,9 @@ function pickProducts(wish, data, now, offset) {
     for (let i = 0; i < steps.length; i++) {
         const found = products.filter(p => matches(p, wish, now, steps[i]));
         if (!found.length) continue;
-        found.sort((a, b) => wish.cheap ? botPriceNow(a, now) - botPriceNow(b, now) :
+        const score = p => (p.badge === "HOT" ? 4 : 0) + (p.isNew ? 2 : 0) + (botPriceNow(p, now) < (p.oldPrice || p.price) ? 1 : 0);
+        found.sort((a, b) => wish.recommend ? (score(b) - score(a)) || (Number(b.inStock && !b.preOrder) - Number(a.inStock && !a.preOrder)) :
+            wish.cheap ? botPriceNow(a, now) - botPriceNow(b, now) :
             wish.pricey ? botPriceNow(b, now) - botPriceNow(a, now) :
             (Number(b.inStock && !b.preOrder) - Number(a.inStock && !a.preOrder))
             || (wish.budget && wish.budget.max ? botPriceNow(b, now) - botPriceNow(a, now) : 0)
@@ -6174,13 +6203,38 @@ function findTopics(text, faq) {
 // продаєте ви репліки?» і починається з «Ні.» — на питання «це
 // оригінал?» вона читалась би як «ні, не оригінал». Тож «Ні» лишаємо
 // лише тоді, коли людина й питала про репліки чи підробки.
-function topicAnswer(topic, item, list, lang) {
+// Частина повідомлення, де стоїть питання саме цієї теми: «скільки
+// коштує доставка | і чи можна оплатити при отриманні?» — у кожної
+// відповіді свій «так/ні».
+function clauseOf(topic, text) {
+    const clauses = String(text || "").split(/[?;!,]|\s(?:і|й|та|и|and|а також|also)\s/i).map(c => c.trim()).filter(Boolean);
+    return clauses.find(c => hasStem(words(c), topic.stems)) || String(text || "");
+}
+
+function topicAnswer(topic, item, wholeList, lang, text) {
+    const list = text ? words(clauseOf(topic, text)) : wholeList;
     // «Це оригінал чи репліка?» — теж «так, оригінал»: «Ні» на питання,
     // де першим стоїть «оригінал», читається як відмова.
     const positive = hasStem(list, ["оригінал", "оригинал", "справжн", "настоящ", "original", "authentic", "genuine", "real$"]);
     const replica = hasStem(list, ["реплік", "реплик", "підробк", "подделк", "копі", "копи", "фейк", "fake", "replica", "copy", "copies", "knock"]);
     if (topic.key === "fake" && (positive || !replica)) {
         return T4[lang].authYes;
+    }
+    // «Так.» / «Ні.» на початку — відповідь на питання «чи…?». На «як
+    // оплатити?», «які способи оплати?» чи просто «оплата» таке «Так.»
+    // безглузде: прибираємо, лишаючи суть. 10 відповідей кожною мовою
+    // з сайту починаються саме так (заміряно 09.11.2026).
+    const yesNoQuestion = hasStem(list, ["чи$", "можна", "можливо", "є$", "а є", "буде", "будете", "могу", "can$", "could", "do$", "does", "is$", "are$", "will$", "should", "можно", "ли$", "есть$", "будет", "будете"]);
+    // Питання з «як / які / де / how / what / как…» на початку — не «так
+    // чи ні», навіть якщо далі є «can» чи «можна»: «how can I pay?».
+    const WH = ["як", "які", "який", "яка", "де", "коли", "куди", "скільки", "що", "how", "what", "which", "where", "when", "как", "какие", "какой", "какая", "где", "когда", "куда", "сколько", "что"];
+    const first = list[0] === "а" || list[0] === "і" || list[0] === "и" || list[0] === "and" ? list[1] : list[0];
+    // «Ви продаєте підробки?» — теж «так чи ні», хоч без «чи»: знак
+    // питання й жодного «як / де / скільки» на початку.
+    const asked = /\?/.test(String(text || "")) && !WH.includes(first);
+    if ((!yesNoQuestion && !asked) || WH.includes(first)) {
+        const stripped = item.a.replace(/^(Так|Ні|Yes|No|Да|Нет)[.,!]\s*/, "");
+        if (stripped !== item.a) return stripped.charAt(0).toUpperCase() + stripped.slice(1);
     }
     return item.a;
 }
@@ -6249,6 +6303,8 @@ const ASK = {
     sizes: ["розмір", "розмер", "размер", "size", "сітк", "сетк", "маломір", "маломер", "великомір", "большемер"],
     stock: ["наявн", "наличи", "in stock", "available", "availability", "є в ", "є?", "есть в ", "залиш", "остал", "коли отрима", "когда получ", "when will i get", "скільки чека", "сколько жда", "how long will", "how long until", "how long does it take", "how long to get"],
     price: ["ціна", "ціну", "ціни", "скільки кошту", "вартість", "цена", "цену", "сколько стоит", "стоимость", "price", "cost", "how much"],
+    // «На цю сумку є знижка?» — про ціну ЦІЄЇ речі, а не пошук знижок.
+    discount: ["знижк", "скидк", "акці", "акци", "discount", "sale", "on sale"],
     material: ["матеріал", "материал", "шкір", "кожа", "кожан", "material", "leather", "з чого", "из чего", "made of", "склад", "состав"],
     dimensions: ["габарит", "розміри сумк", "размеры сумк", "dimension", "заввишки", "завширшки", "высот", "ширин", "how big", "влізе", "влезет", "fit"],
     strap: ["ремін", "ремен", "ременя", "ручк", "ручка", "довжин", "длин", "strap", "handle", "length"],
@@ -6281,7 +6337,7 @@ function productAnswer(text, product, data, lang, now, site) {
         const t = TYPES.find(x => x.key === wish.type);
         return t && ((t.department && t.department === product.department) || (t.category && t.category === product.category));
     })();
-    if (wish && ((wish.type && !sameType) || (wish.brand && wish.brand !== product.brand) || wish.budget)) return null;
+    if (wish && ((wish.type && !sameType) || (wish.brand && wish.brand !== product.brand) || wish.budget || (wish.sale && wish.type && !sameType))) return null;
 
     if (!asked.length) return null;
 
@@ -6296,6 +6352,23 @@ function productAnswer(text, product, data, lang, now, site) {
         const now_ = botPriceNow(product, now);
         const old = product.sale && now_ < product.price ? product.price : (product.oldPrice && product.oldPrice > now_ ? product.oldPrice : 0);
         lines.push(old ? fill(L.priceSale, { price: botMoney(now_), old: botMoney(old) }) : fill(L.price, { price: botMoney(now_) }));
+    }
+
+    if (asked.includes("discount") && !asked.includes("price")) {
+        const now_ = botPriceNow(product, now);
+        const old = product.sale && now_ < product.price ? product.price : (product.oldPrice && product.oldPrice > now_ ? product.oldPrice : 0);
+        if (old) {
+            const pct = Math.round((1 - now_ / old) * 100);
+            lines.push(fill(T14[lang].discountYes, { pct, price: botMoney(now_), old: botMoney(old) }));
+            // Знижка зі строком — коли закінчиться, щоб не обіцяти зайвого.
+            const to = product.sale && product.sale.to ? new Date(product.sale.to) : null;
+            if (to && !Number.isNaN(to.getTime()) && now_ < product.price) {
+                const months = mailMonths(lang);
+                lines.push(fill(T14[lang].until, { date: lang === "en" ? `${months[to.getMonth()]} ${to.getDate()}` : `${to.getDate()} ${months[to.getMonth()]}` }));
+            }
+        } else {
+            lines.push(fill(T14[lang].discountNo, { price: botMoney(now_), url: pageUrl(site, "/aktsii/", lang) }));
+        }
     }
 
     // Конкретний колір («а чорний є?») — відповідь прямо: так чи ні.
@@ -6443,7 +6516,7 @@ function botShouldStay(history) {
 // говорити повз. Лише за однозначними ознаками: «ы э ъ», суто російські
 // слова; для англійської — службові слова («the», «do you», «i want»),
 // бо сама назва бренду латиницею («Coach») — ще не англійська.
-const RU_WORDS = ["что", "как", "это", "есть", "нужно", "сколько", "где", "какие", "какой", "какая", "можно", "хочу купить", "подскажите", "здравствуйте", "спасибо", "пожалуйста", "привет", "сумку", "часы", "очки", "кроссовки", "кошелек", "женская", "мужская", "женские", "мужские", "черная", "черную", "белую", "белая", "или", "еще", "уже", "нет", "да", "мне", "вас", "у вас", "доставка в", "оплата при"];
+const RU_WORDS = ["что", "как", "это", "есть", "нужно", "сколько", "где", "какие", "какой", "какая", "можно", "хочу купить", "подскажите", "здравствуйте", "спасибо", "пожалуйста", "привет", "часы", "очки", "кроссовки", "кошелек", "женская", "мужская", "женские", "мужские", "черная", "черную", "белую", "белая", "или", "еще", "уже", "нет", "да", "мне", "вас", "у вас", "доставка в", "оплата при"];
 const UK_WORDS = ["що", "як", "це", "є", "скільки", "де", "які", "який", "яка", "можна", "підкажіть", "вітаю", "дякую", "будь ласка", "привіт", "годинник", "окуляри", "кросівки", "гаманець", "жіноча", "чоловіча", "чорна", "чорну", "біла", "білу", "або", "ще", "вже", "ні", "так", "мені", "вас", "у вас"];
 const EN_WORDS = ["the", "do you", "i want", "i need", "i'm", "looking for", "how much", "is it", "are you", "can i", "have you", "what", "where", "when", "please", "thanks", "thank you", "hello", "hi", "for", "with", "and", "a", "an", "my", "your", "do", "have", "is", "are", "any"];
 
@@ -6731,7 +6804,7 @@ function botReply(message, history, data, options) {
         // питання, до трьох, кожне окремим абзацом; посилання — один раз.
         const many = findTopics(text, faq).filter(x => x.item || (x.topic.legal && lang !== "uk"));
         if (many.length > 1) {
-            const parts = many.slice(0, 3).map(x => x.item ? topicAnswer(x.topic, x.item, list, lang)
+            const parts = many.slice(0, 3).map(x => x.item ? topicAnswer(x.topic, x.item, list, lang, text)
                 : fill(L.returnsLegal, { url: pageUrl(site, "/return-warranty", lang) }));
             const pages = [...new Set(many.slice(0, 3).filter(x => x.item).map(x => x.item.page))];
             const links = pages.map(p => pageUrl(site, p, lang)).join(" · ");
@@ -6742,7 +6815,7 @@ function botReply(message, history, data, options) {
         }
         const item = faq.find(f => topic.faq.test(f.q)) || faqByWords(text, faq);
         if (item) {
-            let answer = topicAnswer(topic, item, list, lang);
+            let answer = topicAnswer(topic, item, list, lang, text);
             // На сайті питання «Чи є фізичний магазин?» і відповідь
             // починається з «Ні,». На «де ви знаходитесь?» таке «Ні»
             // звучить як відмова відповідати — прибираємо його.
@@ -6863,7 +6936,7 @@ function botReply(message, history, data, options) {
     }
 
     // Кнопки меню без критеріїв: «Підібрати річ» — питаємо, що саме.
-    if (wish && !wish.criteria && !wish.more && !wish.gift && !wish.fresh && !wish.sale) {
+    if (wish && !wish.criteria && !wish.more && !wish.gift && !wish.fresh && !wish.sale && !wish.recommend) {
         return reply(L.askWhat, { chips: L.chips.types, intent: "ask" });
     }
 
@@ -6884,7 +6957,7 @@ function botReply(message, history, data, options) {
         }
         const offset = wish.more ? (pages + 1) * MAX_PRODUCTS : 0;
 
-        if (!wish.criteria && !wish.fresh && !wish.sale && !wish.gift) {
+        if (!wish.criteria && !wish.fresh && !wish.sale && !wish.gift && !wish.recommend) {
             return reply(L.askWhat, { chips: L.chips.types, intent: "ask" });
         }
 
@@ -6947,7 +7020,15 @@ function botReply(message, history, data, options) {
         // Заголовок словами людини: «Ось чорні сумки, які є зараз 👇».
         const T5L = T5[lang];
         const desc = describeWish(wish, lang);
-        const head = picked.relaxed ? L.relaxed
+        // Порада: «Годинники: ось що радимо зараз…» — опис спереду, щоб
+        // не відмінювати його («серед годинників» / «з сумок»).
+        const recWhat = (wish.type || wish.brand || wish.gender || wish.budget)
+            ? describeWish(Object.assign({}, wish, { recommend: false }), lang) : "";
+        const recHead = recWhat
+            ? fill(T15[lang].recommend, { what: recWhat.charAt(0).toUpperCase() + recWhat.slice(1) + ": " })
+            : (s => s.charAt(0).toUpperCase() + s.slice(1))(fill(T15[lang].recommend, { what: "" }));
+        const head = wish.recommend && !picked.relaxed && picked.start === 0 ? recHead
+            : picked.relaxed ? L.relaxed
             : picked.start > 0 ? fill(T5L.hereMore, { desc, from: picked.start + 1, to: picked.start + picked.items.length, total: picked.total })
                 : picked.total > MAX_PRODUCTS ? fill(T5L.hereMany, { desc, total: picked.total, k: picked.items.length, variants: plural(picked.total, T5L.variants, lang) })
                     : fill(T5L.here, { desc });

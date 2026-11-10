@@ -718,5 +718,49 @@ console.log("\n[18] Оригінальність без «Ні», кілька �
     check("звичайна відповідь — без підказки", !/Автовідповіді/.test(bot.botTelegramText(bot.serializeBotReply(talk("uk", ["сумка"]), "uk"), 1, s => s)));
 }
 
+console.log("\n[19] «Так/ні» лише на «чи…?», «?», знижка на цю річ, порада");
+{
+    // 10 відповідей кожною мовою з сайту починаються з «Так.»/«Ні.» —
+    // доречно лише на питання «так чи ні».
+    const starts = (lang, q) => talk(lang, [q]).text.slice(0, 6);
+    [["uk", "як оплатити?"], ["uk", "які способи оплати?"], ["uk", "оплата"], ["en", "how can I pay?"], ["ru", "как оплатить?"]]
+        .forEach(([lang, q]) => check(`«${q}» — без «Так.» на початку`, !/^(Так|Yes|Да)[.,]/.test(starts(lang, q)), starts(lang, q)));
+    [["uk", "чи можна оплатити карткою?"], ["uk", "можна оплатити карткою?"], ["en", "can I pay by card?"], ["ru", "можно оплатить картой?"]]
+        .forEach(([lang, q]) => check(`«${q}» — з «Так»`, /^(Так|Yes|Да)[.,]/.test(starts(lang, q)), starts(lang, q)));
+    check("«ви продаєте підробки?» (без «чи», але зі знаком питання) — «Ні»", /^Ні\./.test(talk("uk", ["ви продаєте підробки?"]).text));
+    const mixed = talk("uk", ["скільки коштує доставка і чи можна оплатити при отриманні?"]).text;
+    check("у двох питаннях «так/ні» — окремо для кожного: друге з «Так.»", /\n\nТак\./.test(mixed) && !/^Так/.test(mixed), mixed.slice(0, 40));
+
+    // «?» сам по собі.
+    check("«?» — «Так, я тут!», а не «Добре»", /^Так, я тут/.test(talk("uk", ["?"]).text));
+    check("«👍» — як і раніше, «Добре»", /^Добре/.test(talk("uk", ["👍"]).text));
+
+    // Знижка на річ зі сторінки.
+    const onSale = data.products.find(p => (p.oldPrice || 0) > bot.botPriceNow(p, NOW));
+    const noSale = data.products.find(p => !p.oldPrice && !p.sale);
+    const ask = (p, q, lang) => bot.botReply(q, [], data, { lang: lang || "uk", now: NOW, page: `${lang && lang !== "uk" ? "/" + lang : ""}/p/${p.slug}/` });
+    if (onSale) {
+        const r = ask(onSale, "є знижка?");
+        const pct = Math.round((1 - bot.botPriceNow(onSale, NOW) / onSale.oldPrice) * 100);
+        check("«є знижка?» на сторінці товару зі знижкою — відсоток і стара ціна", r.intent === "product" && r.text.includes(`${pct} %`) && /замість/.test(r.text), r.text);
+        check("en «is it on sale?»", /% off right now/.test(ask(onSale, "is it on sale?", "en").text));
+    }
+    if (noSale) check("без знижки — «знижки немає», ціна й посилання на акції", /знижки немає[\s\S]*aktsii/.test(ask(noSale, "є знижка?").text));
+    check("поза сторінкою «а знижки є?» — як і раніше, товари зі знижкою", talk("uk", ["а знижки є?"]).intent === "products");
+
+    // Порада.
+    const rec = talk("uk", ["що порадите?"]);
+    const hot = data.products.filter(p => p.badge === "HOT");
+    check("«що порадите?» — заголовок поради", /^Ось що радимо зараз — хіти, новинки й знижки/.test(rec.text), rec.text);
+    if (hot.length) check("…і першою — річ із позначкою HOT", bySlug.get(rec.products[0].slug).badge === "HOT");
+    const recW = talk("uk", ["що популярне з годинників?"]);
+    check("«що популярне з годинників?» — «Годинники: ось що радимо…», лише годинники",
+        /^Годинники: ось що радимо/.test(recW.text) && items(recW).every(p => p.category === "Годинники"), recW.text);
+    check("порада без вигаданого «найпопулярніше»", !/найпопулярніш|бестселер|хіт продажів/i.test(rec.text));
+    check("«порадьте сумку до 8000» — українською (спільне слово «сумку» не робить її російською)",
+        talk("uk", ["порадьте сумку до 8000"]).lang === "uk" && bot.detectLang("порадьте сумку", "uk") === "uk");
+    check("довідка знає позначку товару", data.products.every(p => typeof p.badge === "string"));
+}
+
 console.log(failures ? `\n✗ Провалено: ${failures}` : "\n✓ Усе зелено");
 process.exit(failures ? 1 : 0);

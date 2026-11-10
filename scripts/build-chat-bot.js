@@ -195,6 +195,8 @@ function buildProducts() {
             inStock: p.inStock !== false,
             preOrder: Boolean(p.preOrder),
             isNew: Boolean(p.isNew),
+            // Позначка власника (HOT, SALE) — для «що порадите?».
+            badge: String(p.badge || ""),
             keywords: String(p.searchKeywords || "").slice(0, 300),
             image: image === "/" ? "" : image,
             details: details(p, t)
