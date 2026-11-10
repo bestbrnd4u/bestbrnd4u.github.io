@@ -1531,5 +1531,51 @@ console.log("\n[32] Кнопки-підказки: мова розмови, «І
     check("сторож кнопок: усі кнопки з 13 типових розмов ведуть далі тією ж мовою", bad.length === 0, bad.slice(0, 3).join(" | "));
 }
 
+console.log("\n[33] Бренд ≠ тема («Armani Exchange»), ім'я, «я з Києва» (10.11.2026)");
+{
+    // Через запобіжник: на старій версії бота цих функцій немає, і без нього
+    // розділ обривався б винятком замість чесних ✗.
+    const introOf = m => typeof bot.introOf === "function" ? bot.introOf(m) : null;
+    const withoutBrands = (t, d) => typeof bot.withoutBrands === "function" ? bot.withoutBrands(t, d) : t;
+    const one = (m, lang, h) => bot.botReply(m, h || [], data, { lang: lang || "uk", now: NOW, siteUrl: "https://bestbrnd4u.com" });
+
+    // «Exchange» у назві бренду = «exchange» (обмін): раніше до підбірки
+    // дописувалась відповідь про повернення, а «Armani Exchange» саме —
+    // ставало питанням про обмін.
+    if (data.products.some(p => p.brand === "Armani Exchange")) {
+        const ax = one("Armani Exchange");
+        check("«Armani Exchange» — речі бренду, а не умови повернення", /Armani Exchange/.test(ax.text.split("\n")[0]) && ax.products.length > 0 && !/Поверніть/.test(ax.text), ax.text.slice(0, 50));
+        const beige = one("бежевий сумку Armani Exchange");
+        check("«бежевий сумку Armani Exchange» — чесне «нічого немає», без відповіді про повернення", /^За запитом «бежеві сумки Armani Exchange»/.test(beige.text) && !/Поверніть/.test(beige.text), beige.text.slice(0, 50));
+    }
+    check("«хочу обміняти» — як і раніше, повернення й обмін", /Поверніть/.test(one("хочу обміняти").text));
+    check("withoutBrands прибирає назви брендів каталогу", !/Coach|Armani/i.test(withoutBrands("сумка Coach і Armani Exchange", data)));
+
+    // Ім'я. Раніше «мене звати Оля» — «не зрозумів» і дзвінок власнику.
+    const ola = one("мене звати Оля");
+    check("«мене звати Оля» — «Приємно познайомитись!», власника не будить", /^Приємно познайомитись/.test(ola.text) && !ola.handoff, ola.text.slice(0, 40));
+    check("українською ім'я не підставляємо (кличного відмінка бот не вгадає)", !/Оля/.test(ola.text));
+    check("ru «меня зовут Марина» — «Приятно познакомиться, Марина!»", /^Приятно познакомиться, Марина!/.test(one("меня зовут Марина", "ru").text));
+    check("en «Hi, I am Kate» — «Nice to meet you, Kate!»", /^Nice to meet you, Kate!/.test(one("Hi, I am Kate", "en").text));
+    const andriy = one("Привіт, я Андрій, шукаю годинник");
+    check("«я Андрій, шукаю годинник» — і знайомство, і годинники", /Приємно познайомитись/.test(andriy.text) && items(andriy).every(p => p.category === "Годинники") && andriy.products.length > 0);
+    check("«I am looking for a bag» — не ім'я, а запит", !introOf("I am looking for a bag") && one("I am looking for a bag", "en").products.length > 0);
+    check("«я Київ», «я тут», «я дівчина» — не імена", !introOf("я Київ") && !introOf("я тут") && !introOf("я дівчина"));
+
+    // Ім'я — у підсумку для власника, коли бот його кличе пізніше.
+    const h = [];
+    let last = null;
+    for (const m of ["мене звати Оля", "чорна сумка Coach до 8000", "дайте знижку"]) {
+        last = one(m, "uk", h);
+        h.push({ author: "visitor", body: m });
+        if (last) h.push({ author: "bot", body: bot.serializeBotReply(last, "uk") });
+    }
+    const tg = bot.botTelegramText(bot.serializeBotReply(last, "uk"), 3, s => s);
+    check("у Telegram — «👤 Оля · 🔎 Шукає: …»", /👤 Оля · 🔎 Шукає: чорні сумки Coach до 8 000 ₴/.test(tg), tg.split("\n").pop());
+
+    check("«я з Києва» — доставка в будь-яке місто, а не «не зрозумів»", /в будь-яке місто України/.test(one("я з Києва").text));
+    check("«я з Польщі» — не «в будь-яке місто України»", !/в будь-яке місто України/.test(one("я з Польщі").text));
+}
+
 console.log(failures ? `\n✗ Провалено: ${failures}` : "\n✓ Усе зелено");
 process.exit(failures ? 1 : 0);

@@ -227,7 +227,7 @@ const SMALL = [
     { key: "compliment", stems: ["класн", "клас$", "круто", "крут$", "молодц", "дуже гарн", "гарний магазин", "гарний сайт", "подобаєт", "сподобал", "нравит", "понравил", "люблю ваш", "відмінн", "отличн", "супер магазин", "nice shop", "great shop", "love your", "love this", "awesome", "amazing", "well done", "good job"] },
     { key: "anyone", stems: ["є хтось", "хтось є", "хтось тут", "ви тут", "ви на зв", "на звʼязку?", "алло", "ау$", "есть кто", "кто-нибудь", "вы тут", "вы здесь", "anyone there", "is anyone", "are you there", "hello?"] },
     { key: "smalltalk", stems: ["як справи", "як ти", "як ви", "як життя", "как дела", "как ты", "как вы", "how are you", "how's it going", "what's up"] },
-    { key: "ack", stems: ["ок$", "окей", "ok$", "okay", "оке$", "добре$", "гаразд", "зрозуміл", "ясно", "чудово", "супер", "клас$", "понятно", "хорошо", "ладно", "отлично", "got it", "fine$", "great$", "cool$", "perfect", "alright", "sounds good", "так$", "ні$", "да$", "нет$", "yes$", "no$", "ага$", "угу$", "дяку", "спасиб", "благодар", "thank", "thx", "ty$", "ні дякую", "нет спасибо", "no thanks"] }
+    { key: "ack", stems: ["я тут$", "я здесь$", "i'm here", "ок$", "окей", "ok$", "okay", "оке$", "добре$", "гаразд", "зрозуміл", "ясно", "чудово", "супер", "клас$", "понятно", "хорошо", "ладно", "отлично", "got it", "fine$", "great$", "cool$", "perfect", "alright", "sounds good", "так$", "ні$", "да$", "нет$", "yes$", "no$", "ага$", "угу$", "дяку", "спасиб", "благодар", "thank", "thx", "ty$", "ні дякую", "нет спасибо", "no thanks"] }
 ];
 
 // Повідомлення без жодної літери чи цифри: «👍», «🙂», «!!!».
@@ -988,6 +988,14 @@ const T26 = {
     ru: { needPhone: "Спасибо! Теперь напишите, пожалуйста, телефон, на который оформляли заказ, — и я проверю статус.", needOrder: "Спасибо! А номер заказа? Он есть на странице подтверждения и в письме после оформления — 10 цифр." }
 };
 
+const T27 = {
+    // Українською — без імені в звертанні: правильно «Олю», «Андрію», а
+    // кличного відмінка бот не вгадає. Ім'я бачить власник у Telegram.
+    uk: { only: "Приємно познайомитись! 🙂 Чим можу допомогти — підібрати річ чи розповісти про доставку й оплату?", prefix: "Приємно познайомитись! " },
+    en: { only: "Nice to meet you, {name}! 🙂 How can I help — pick an item or tell you about delivery and payment?", prefix: "Nice to meet you, {name}! " },
+    ru: { only: "Приятно познакомиться, {name}! 🙂 Чем могу помочь — подобрать вещь или рассказать о доставке и оплате?", prefix: "Приятно познакомиться, {name}! " }
+};
+
 const T17 = {
     uk: { noMore: "Це всі {desc} — {n} {variants}. Можу показати інший тип чи бренд 👇" },
     en: { noMore: "That's all the {desc} — {n} {variants}. I can show another type or brand 👇" },
@@ -1598,6 +1606,17 @@ function faqByWords(text, faq) {
 
 }
 
+// Текст без назв брендів каталогу — для пошуку тем: «Armani Exchange»
+// інакше ставало питанням про обмін, і до підбірки дописувалась відповідь
+// про повернення.
+export function withoutBrands(text, data) {
+    let out = " " + String(text || "") + " ";
+    for (const b of [...new Set(((data && data.products) || []).map(p => p.brand).filter(Boolean))]) {
+        out = out.replace(new RegExp(b.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi"), " ");
+    }
+    return out.trim();
+}
+
 export function findTopic(text) {
     const list = words(text);
     return TOPICS.find(t => hasStem(list, t.stems)) || null;
@@ -1989,7 +2008,39 @@ export function untranslit(text) {
     return out;
 }
 
+// «Мене звати Оля», «я Андрій», «меня зовут Марина», «my name is Kate».
+// Ім'я — з великої літери й не слово, яке бот і так розуміє (тип, місто,
+// привітання): «я Київ» чи «I am Looking» іменами не стануть.
+const NOT_NAMES = ["привіт", "вітаю", "дякую", "шукаю", "хочу", "можна", "добрий", "доброго", "здравствуйте", "привет", "спасибо", "ищу", "хочу", "можно", "добрый", "україни", "україна", "киев", "київ", "клієнт", "клиент", "покупець", "покупатель", "тут", "знову", "снова", "looking", "interested", "here", "back", "from", "not", "just", "sorry", "fine", "ok", "okay"];
+export function introOf(text) {
+    const raw = String(text || "");
+    const m = raw.match(/(?:^|[\s,.!])(?:мене звати|моє ім'я|моє імʼя|меня зовут|моё имя|мое имя)\s+([А-ЯІЇЄҐA-Z][а-яіїєґё'ʼa-z]{1,14})/u)
+        || raw.match(/(?:^|[,.!]\s*|^(?:привіт|вітаю|добрий день|доброго дня|привет|здравствуйте|добрый день)[,!]?\s+)(?:я|це|это)\s*[—-]?\s+([А-ЯІЇЄҐ][а-яіїєґё'ʼ]{1,14})(?=[\s,.!?]|$)/u)
+        || raw.match(/(?:^|[\s,.!])(?:[Mm]y name is|I am|I'm|i am|i'm|[Tt]his is)\s+([A-Z][a-z]{1,14})\b/);
+    if (!m) return null;
+    const name = m[1];
+    if (NOT_NAMES.includes(name.toLowerCase())) return null;
+    const rest = (raw.slice(0, m.index) + " " + raw.slice(m.index + m[0].length)).replace(/^[\s,.!—-]+|[\s,—-]+$/g, "").trim();
+    return { name, rest };
+}
+
 export function botReply(message, history, data, options) {
+    // Представились — ім'я для власника; решта повідомлення — звичайний запит.
+    {
+        const intro = introOf(message);
+        if (intro) {
+            const optsI = options || {};
+            const langI = detectLang(intro.rest || message, optsI.lang);
+            const T27L = T27[langI];
+            const rest = intro.rest && words(intro.rest).filter(w => !GREETINGS.some(g => w.startsWith(g.replace(/\$$/, "")))).length ? botReply(intro.rest, history, data, options) : null;
+            if (rest && rest.intent !== "unknown" && rest.intent !== "hello") {
+                rest.text = fill(T27L.prefix, { name: intro.name }) + rest.text.replace(/^[^!]{1,25}! /, "");
+                if (rest.summary) rest.summary = `👤 ${intro.name} · ${rest.summary}`;
+                return rest;
+            }
+            return { text: fill(T27L.only, { name: intro.name }), products: [], chips: T[langI].chips.menu, handoff: false, pause: false, lang: langI, intent: "hello" };
+        }
+    }
     // Трансліт: латиниця без кирилиці, якої англійською бот не розуміє, а
     // в кирилиці — розуміє. Лишаємо й оригінал (у ньому бренд: «rayban»).
     if (/[a-z]/i.test(String(message || "")) && !/[а-яіїєґ]/i.test(String(message || ""))) {
@@ -2021,6 +2072,7 @@ export function botReply(message, history, data, options) {
     if (!botShouldStay(history)) return null;
 
     const text = String(message ?? "");
+    const topicText = withoutBrands(text, data);
     const list = words(text);
     const hours = HOURS[lang];
     // Передаючи розмову вночі, кажемо, коли чекати відповіді: «відповімо
@@ -2046,7 +2098,7 @@ export function botReply(message, history, data, options) {
         // відповіддю про доставку), дала б ту саму відповідь удруге.
         if (out.intent === "faq" && out.chips && out.chips.length) {
             const fam = t => t && t.key.split("-")[0];
-            const cur = fam(findTopic(text));
+            const cur = fam(findTopic(topicText));
             if (cur) out.chips = out.chips.filter(c => fam(findTopic(c)) !== cur);
         }
         return out;
@@ -2065,6 +2117,8 @@ export function botReply(message, history, data, options) {
             const p = slug && (data.products || []).find(x => x.slug === slug);
             if (p) parts.push(`👀 Дивиться: «${(p.title && p.title.uk) || p.slug}» — ${botMoney(botPriceNow(p, now))}`);
             if (lang !== "uk") parts.push(`🌐 Пише ${lang === "en" ? "англійською" : "російською"}`);
+            const named = (history || []).filter(m => m && m.author === "visitor").map(m => introOf(m.body)).filter(Boolean).pop();
+            if (named) parts.unshift(`👤 ${named.name}`);
             return parts.join(" · ");
         } catch (e) { return ""; }
     };
@@ -2310,7 +2364,7 @@ export function botReply(message, history, data, options) {
 
     // Питання важливіше за ввічливість: «дякую, а доставка скільки?» —
     // про доставку.
-    const small = (criteria || findTopic(text) || hasStem(list, HOW_TO_ORDER) || hasStem(list, CHEAPER)) ? null : smallTalk(text);
+    const small = (criteria || findTopic(topicText) || hasStem(list, HOW_TO_ORDER) || hasStem(list, CHEAPER)) ? null : smallTalk(text);
     if (small === "ack") {
         const thanks = hasStem(list, ["дяку", "спасиб", "благодар", "thank", "thx", "ty$"]);
         return reply(thanks ? T4L.thanks : T4L.ack, { intent: "ack" });
@@ -2373,7 +2427,7 @@ export function botReply(message, history, data, options) {
     // (закордон — вище, менеджеру). Факти — як в оформленні й картках.
     if (!criteria && hasStem(list, ["доставите", "доставляєте", "доставляете", "відправите", "відправляєте", "отправите", "отправляете", "привезете", "deliver to", "ship to", "do you deliver", "do you ship"])
         && hasStem(list, ["місто", "міста", "село", "смт", "област", "україн", "украин", "ukraine", "харків", "харкова", "харьков", "львів", "львова", "львов", "одес", "дніпр", "днепр", "запоріж", "запорож", "київ", "києва", "киев", "kyiv", "kharkiv", "lviv", "odesa", "odessa", "dnipro", "вінниц", "винниц", "полтав", "черніг", "черниг", "чернів", "черновц", "житомир", "рівн", "ровн", "луцьк", "луцк", "ужгород", "франків", "тернопіл", "тернопол", "хмельниц", "черкас", "кропивн", "миколаїв", "николаев", "херсон", "суми", "сумы", "краматор", "я з$", "я из$", "i'm from", "i live in", "до мене", "ко мне"])
-        && findTopics(text, (data.faq && data.faq[lang]) || []).filter(x => !["delivery", "delivery-time"].includes(x.topic.key)).length === 0
+        && findTopics(topicText, (data.faq && data.faq[lang]) || []).filter(x => !["delivery", "delivery-time"].includes(x.topic.key)).length === 0
         && !hasStem(list, ["кордон", "границ", "abroad", "europe", "польщ", "польш", "poland", "germany", "німеч", "герман", "сша", "usa"])) {
         return reply(T23[lang].city, { chips: L.chips.menu.slice(0, 5), intent: "faq" });
     }
@@ -2389,6 +2443,12 @@ export function botReply(message, history, data, options) {
     // 2д'''. «Чому деякі товари під замовлення?»
     if (hasStem(list, ["чому", "почему", "why", "навіщо", "зачем"]) && hasStem(list, ["під замовлен", "под заказ", "pre-order", "preorder", "to order"])) {
         return reply(T24[lang].whyPreorder, { chips: [L.chips.human], intent: "faq" });
+    }
+
+    // «Я з Києва», «я з Харкова» — людина каже, звідки; відповідь та сама.
+    if (!criteria && list.length <= 5 && /^(?:а\s+)?(?:я|ми|мы|i'm|we're|i am)\s+(?:з|із|зі|из|from)\s+/i.test(text.trim())
+        && !hasStem(list, ["кордон", "границ", "abroad", "польщ", "польш", "poland", "germany", "німеч", "герман", "сша", "usa", "europe"])) {
+        return reply(T23[lang].city, { chips: L.chips.menu.slice(0, 5), intent: "faq" });
     }
 
     // 2д. Як оформити замовлення.
@@ -2447,7 +2507,7 @@ export function botReply(message, history, data, options) {
     }
 
     // 3. Тема з частих питань.
-    const topic = findTopic(text);
+    const topic = findTopic(topicText);
     const faq = (data.faq && data.faq[lang]) || [];
 
     // «Ваші сумки оригінальні?» — питання про оригінальність, хоч у ньому
@@ -2466,7 +2526,7 @@ export function botReply(message, history, data, options) {
     else if (topic && (strictFake || !(parseWish(text, data) || {}).criteria)) {
         // «Скільки доставка і чи можна оплатити при отриманні?» — на ВСІ
         // питання, до трьох, кожне окремим абзацом; посилання — один раз.
-        const many = findTopics(text, faq).filter(x => x.item || (x.topic.legal && lang !== "uk"));
+        const many = findTopics(topicText, faq).filter(x => x.item || (x.topic.legal && lang !== "uk"));
         if (many.length > 1) {
             const parts = many.slice(0, 3).map(x => x.item ? topicAnswer(x.topic, x.item, list, lang, text)
                 : fill(L.returnsLegal, { url: pageUrl(site, "/return-warranty", lang) }));
@@ -2865,7 +2925,7 @@ export function botReply(message, history, data, options) {
             notes.push(fill(T22[lang].usSize, { list: eu.join(", ") }));
         }
         // «Чорна сумка і скільки доставка?» — раніше питання губилось.
-        const mixed = findTopics(text, faq).filter(x => x.item && x.topic.key !== "fake" && !x.topic.always).slice(0, 2);
+        const mixed = findTopics(topicText, faq).filter(x => x.item && x.topic.key !== "fake" && !x.topic.always).slice(0, 2);
         const faqPrefix = mixed.length ? mixed.map(x => topicAnswer(x.topic, x.item, list, lang, text)).join("\n\n") + "\n\n" : "";
         return reply(authPrefix + faqPrefix + (notes.length ? notes.join("\n") + "\n" : "") + head, { products, chips: (wish.foreign ? L.chips.budget : []).concat(chips).slice(0, 7), intent: "products" });
 
