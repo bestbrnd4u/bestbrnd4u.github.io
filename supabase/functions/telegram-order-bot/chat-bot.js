@@ -315,7 +315,7 @@ const T4 = {
 const ESCALATE = [
     { key: "cancel", stems: ["скасув", "відмін", "відмов", "змінити замовлен", "змінити адрес", "отмен", "изменить заказ", "изменить адрес", "cancel", "change my order", "change the order", "change address"] },
     { key: "broken", stems: ["не працює", "не працюють", "не відкрива", "не можу оформ", "не виходить оформ", "не вдається", "помилк", "глюч", "зависа", "не работает", "не открывается", "не могу оформ", "не получается", "ошибк", "глючит", "doesn't work", "does not work", "not working", "can't checkout", "cannot checkout", "can't order", "error", "bug$", "broken"] },
-    { key: "sorry", stems: ["жахлив", "огидн", "незадовол", "розчарован", "погано", "обман", "шахра", "кидал", "скарг", "ужасн", "отвратит", "недовол", "разочаров", "плохо", "мошенн", "жалоб", "terrible", "awful", "horrible", "disappointed", "unhappy", "scam", "fraud", "complaint", "worst"] },
+    { key: "sorry", stems: ["не той товар", "не та сумка", "не той колір", "не той розмір", "не те що замовл", "не те, що замовл", "прийшло не те", "прийшла не та", "прийшов не той", "прислали не", "надіслали не", "пришла не та", "пришел не тот", "пришло не то", "прислали не то", "не то что заказ", "wrong item", "wrong product", "not what i ordered", "sent the wrong", "жахлив", "огидн", "незадовол", "розчарован", "погано", "обман", "шахра", "кидал", "скарг", "ужасн", "отвратит", "недовол", "разочаров", "плохо", "мошенн", "жалоб", "terrible", "awful", "horrible", "disappointed", "unhappy", "scam", "fraud", "complaint", "worst"] },
     { key: "abroad", stems: ["за кордон", "закордон", "за межі україни", "в європ", "в польщ", "в німеччин", "за границ", "в европ", "в польш", "в германи", "abroad", "international", "outside ukraine", "ship to poland", "ship to germany", "ship to europe", "worldwide", "to poland", "to germany", "to usa", "to the us"] }
 ];
 
@@ -695,9 +695,9 @@ const STATUS_TEXT = {
 };
 
 const T12 = {
-    uk: { head: "Замовлення {number}: {label}.", ttn: "Номер накладної: {ttn}", notFound: "Не знайшов замовлення з таким номером і телефоном 🤔 Перевірте цифри (номер — у листі чи SMS про замовлення, телефон — той, що вказували при оформленні) або напишіть, і менеджер подивиться." },
-    en: { head: "Order {number}: {label}.", ttn: "Waybill number: {ttn}", notFound: "I couldn't find an order with that number and phone 🤔 Please check the digits (the number is in the order email or SMS, the phone is the one you entered at checkout) or write here and a manager will look into it." },
-    ru: { head: "Заказ {number}: {label}.", ttn: "Номер накладной: {ttn}", notFound: "Не нашел заказ с таким номером и телефоном 🤔 Проверьте цифры (номер — в письме или SMS о заказе, телефон — тот, что указывали при оформлении) или напишите, и менеджер посмотрит." }
+    uk: { head: "Замовлення {number}: {label}.", ttn: "Номер накладної: {ttn}", notFound: "Не знайшов замовлення з таким номером і телефоном 🤔 Перевірте цифри (номер — на сторінці підтвердження й у листі про замовлення, телефон — той, що вказували при оформленні) або напишіть, і менеджер подивиться." },
+    en: { head: "Order {number}: {label}.", ttn: "Waybill number: {ttn}", notFound: "I couldn't find an order with that number and phone 🤔 Please check the digits (the number is on the confirmation page and in the order email, the phone is the one you entered at checkout) or write here and a manager will look into it." },
+    ru: { head: "Заказ {number}: {label}.", ttn: "Номер накладной: {ttn}", notFound: "Не нашел заказ с таким номером и телефоном 🤔 Проверьте цифры (номер — на странице подтверждения и в письме о заказе, телефон — тот, что указывали при оформлении) или напишите, и менеджер посмотрит." }
 };
 
 // view — publicOrderView (order-lookup.js) або null, якщо не знайдено.
@@ -980,6 +980,12 @@ const T25 = {
     uk: { noList: "Я ще нічого не показував 🙂 Напишіть, що шукаєте, — підберу, і тоді розповім про будь-яку з речей." },
     en: { noList: "I haven't shown anything yet 🙂 Tell me what you're looking for — I'll pick some, and then tell you about any of them." },
     ru: { noList: "Я ещё ничего не показывал 🙂 Напишите, что ищете, — подберу, и тогда расскажу о любой из вещей." }
+};
+
+const T26 = {
+    uk: { needPhone: "Дякую! Тепер напишіть, будь ласка, телефон, на який оформлювали замовлення, — і я перевірю стан.", needOrder: "Дякую! А номер замовлення? Він є на сторінці підтвердження й у листі після оформлення — 10 цифр." },
+    en: { needPhone: "Thank you! Now please write the phone number used for the order — and I'll check the status.", needOrder: "Thank you! And the order number? It's on the confirmation page and in the email after checkout — 10 digits." },
+    ru: { needPhone: "Спасибо! Теперь напишите, пожалуйста, телефон, на который оформляли заказ, — и я проверю статус.", needOrder: "Спасибо! А номер заказа? Он есть на странице подтверждения и в письме после оформления — 10 цифр." }
 };
 
 const T17 = {
@@ -2059,7 +2065,18 @@ export function botReply(message, history, data, options) {
     // звертається до бази, як сторінка «Де моє замовлення», з тим самим
     // лімітом). Тут — лише позначка й запасний текст на випадок, коли
     // перевірити не вийшло.
-    const lookup = extractLookup(text);
+    // Бот попросив номер і телефон — людина часто шле їх по черзі:
+    // «8689484479», потім «0671234567». Раніше перше давало ту саму
+    // підказку вдруге, а телефон — «менеджер передзвонить».
+    const prevVisitorL = (history || []).filter(m => m && m.author === "visitor").slice(-1)[0];
+    // Дві останні репліки бота: «напишіть телефон» іде вже після посилання.
+    const askedLookup = (history || []).filter(m => m && m.author === BOT_AUTHOR).slice(-2).some(m => /order-status/.test(String(m.body || "")));
+    let lookup = extractLookup(text);
+    if (!lookup && prevVisitorL && askedLookup) lookup = extractLookup(prevVisitorL.body + " " + text);
+    const onlyOrder = /^\D{0,25}[1-9]\d{7,11}\D{0,3}$/.test(String(text).trim()) && !PHONE_RE.test(String(text));
+    const onlyPhone = PHONE_RE.test(String(text)) && String(text).replace(PHONE_RE, "").replace(/[^\p{L}\d]/gu, "").length <= 12;
+    if (!lookup && askedLookup && onlyOrder) return reply(T26[lang].needPhone, { chips: [L.chips.human], intent: "status" });
+    if (!lookup && askedLookup && onlyPhone) return reply(T26[lang].needOrder, { chips: [L.chips.human], intent: "status" });
     if (lookup) {
         return reply(fill(L.status, { url: pageUrl(site, "/order-status", lang) }), { intent: "lookup", lookup, chips: [L.chips.human] });
     }
@@ -2134,7 +2151,7 @@ export function botReply(message, history, data, options) {
     }
 
     // 2. Де моє замовлення.
-    if (hasStem(list, ["де моє замовлен", "где мой заказ", "статус замовлен", "статус заказ", "стан замовлен", "where is my order", "order status", "трек", "track", "накладн", "ттн"]) || /\b\d{8,12}\b/.test(text)) {
+    if (hasStem(list, ["номер замовлен", "номер заказ", "order number", "my order number", "мій номер замовлен", "де моє замовлен", "где мой заказ", "статус замовлен", "статус заказ", "стан замовлен", "where is my order", "order status", "трек", "track", "накладн", "ттн"]) || /\b\d{8,12}\b/.test(text)) {
         return reply(fill(L.status, { url: pageUrl(site, "/order-status", lang) }), { chips: [L.chips.human], intent: "status" });
     }
 
@@ -2367,8 +2384,11 @@ export function botReply(message, history, data, options) {
 
     // 2е. Гарантія.
     if (hasStem(list, WARRANTY) && (!criteria || (criteria === 1 && hasStem(list, ["гаранті", "warranty", "guarantee"])))) {
+        // «Прийшов з дефектом», «зламався» — уже проблема, а не довідка:
+        // власник мусить знати одразу (бот і далі відповідає).
+        const defect = hasStem(list, ["брак", "дефект", "зламал", "сломал", "поломал", "порван", "порвал", "тріснул", "треснул", "пошкоджен", "поврежден", "defect", "broken", "broke$", "damaged", "torn"]);
         return reply(fill(T4L.warranty, { url: pageUrl(site, "/return-warranty", lang) }) + `\n${L.faqMore} ${pageUrl(site, "/return-warranty", lang)}`,
-            { chips: [L.chips.human], intent: "faq" });
+            Object.assign({ chips: [L.chips.human], intent: "faq" }, defect ? { handoff: true, pause: false } : {}));
     }
 
     // 2є. «Дорого», «а дешевше є?» — той самий запит, але дешевше за
