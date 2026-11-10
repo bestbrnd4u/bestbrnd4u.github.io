@@ -609,6 +609,10 @@ const T10 = {
         waterproof: "Про водостійкість конкретної моделі точно підкаже менеджер — передаю питання. Характеристики є й на сторінці товару.",
         callback: "Менеджер звʼяжеться з вами найближчим часом (щодня 09:00–20:00) — я нагадав йому про вас.",
         loyalty: "Про знижку для постійних клієнтів чи на перше замовлення скаже менеджер — я передав йому питання. Діючі акції — тут: {url}",
+        certificate: "Про сертифікати — подарункові чи документи до речі — точно скаже менеджер, я передав йому питання. Звідки речі: з офіційних магазинів брендів у США.",
+        care: "Порад із догляду в картках немає — підкаже менеджер, я передав йому питання.",
+        promoPlans: "Плани акцій знає менеджер — я передав йому питання. Діючі знижки вже зараз — тут: {url}",
+        aboutShop: "Про історію магазину краще розповість менеджер — я передав йому питання. Відгуки покупців — внизу сторінки кожного товару.",
         packaging: "Про пакування, коробку й документи до покупки точно скаже менеджер — я передав йому питання, він відповість тут.",
         specs: "Таких подробиць у картці товару немає — точно скаже менеджер, я передав йому питання. Усе, що відомо, — на сторінці товару.",
         weekend: "Так, працюємо {hours} — без вихідних. Бот відповідає цілодобово 🙂"
@@ -622,6 +626,10 @@ const T10 = {
         waterproof: "A manager will tell you exactly about this model's water resistance — I'm passing your question on. The specs are also on the product page.",
         callback: "A manager will contact you shortly (daily 09:00–20:00, Kyiv time) — I've reminded them about you.",
         loyalty: "A manager will tell you about discounts for regular customers or on a first order — I've passed your question on. Current sales are here: {url}",
+        certificate: "A manager will tell you exactly about certificates — gift ones or documents for the item; I've passed your question on. Our items come from official brand stores in the USA.",
+        care: "There are no care tips in the product cards — a manager will advise, I've passed your question on.",
+        promoPlans: "A manager knows the sale plans — I've passed your question on. Current discounts are here: {url}",
+        aboutShop: "A manager will tell you more about the shop — I've passed your question on. Customer reviews are at the bottom of every product page.",
         packaging: "A manager will tell you exactly about packaging, the box and purchase documents — I've passed your question on, they will reply here.",
         specs: "That detail isn't in the product card — a manager will tell you exactly, I've passed your question on. Everything we know is on the product page.",
         weekend: "Yes, we work {hours} — no days off. The bot answers around the clock 🙂"
@@ -635,6 +643,10 @@ const T10 = {
         waterproof: "О водостойкости конкретной модели точно подскажет менеджер — передаю вопрос. Характеристики есть и на странице товара.",
         callback: "Менеджер свяжется с вами в ближайшее время (ежедневно 09:00–20:00) — я напомнил ему о вас.",
         loyalty: "О скидке для постоянных клиентов или на первый заказ скажет менеджер — я передал ему вопрос. Действующие акции — здесь: {url}",
+        certificate: "О сертификатах — подарочных или документах к вещи — точно скажет менеджер, я передал ему вопрос. Откуда вещи: из официальных магазинов брендов в США.",
+        care: "Советов по уходу в карточках нет — подскажет менеджер, я передал ему вопрос.",
+        promoPlans: "Планы акций знает менеджер — я передал ему вопрос. Действующие скидки уже сейчас — здесь: {url}",
+        aboutShop: "Об истории магазина лучше расскажет менеджер — я передал ему вопрос. Отзывы покупателей — внизу страницы каждого товара.",
         packaging: "Об упаковке, коробке и документах к покупке точно скажет менеджер — я передал ему вопрос, он ответит здесь.",
         specs: "Таких подробностей в карточке товара нет — точно скажет менеджер, я передал ему вопрос. Всё, что известно, — на странице товара.",
         weekend: "Да, работаем {hours} — без выходных. Бот отвечает круглосуточно 🙂"
@@ -946,6 +958,24 @@ const T23 = {
     }
 };
 
+const T24 = {
+    uk: {
+        face: "Підібрати оправу під форму обличчя краще з менеджером — я передав йому питання. А поки ось окуляри, щоб подивитися 👇",
+        whyPreorder: "«Під замовлення» — річ, яку ми привозимо вже після вашого замовлення. Строк указано на сторінці кожної речі.",
+        returning: "Раді, що повертаєтесь! 🙂 Що шукаєте цього разу?"
+    },
+    en: {
+        face: "Choosing frames for your face shape is best done with a manager — I've passed your question on. Meanwhile, here are the sunglasses 👇",
+        whyPreorder: "“To order” means we bring the item after you place the order. The lead time is on each item's page.",
+        returning: "Glad to have you back! 🙂 What are you looking for this time?"
+    },
+    ru: {
+        face: "Подобрать оправу под форму лица лучше с менеджером — я передал ему вопрос. А пока вот очки, чтобы посмотреть 👇",
+        whyPreorder: "«Под заказ» — вещь, которую мы привозим уже после вашего заказа. Срок указан на странице каждой вещи.",
+        returning: "Рады, что вы вернулись! 🙂 Что ищете в этот раз?"
+    }
+};
+
 const T17 = {
     uk: { noMore: "Це всі {desc} — {n} {variants}. Можу показати інший тип чи бренд 👇" },
     en: { noMore: "That's all the {desc} — {n} {variants}. I can show another type or brand 👇" },
@@ -1249,7 +1279,10 @@ export function parseWish(text, data) {
         if (c) { notColors.push(c.key); negated.add(i + 1); }
     });
     if (notColors.length) wish.notColors = [...new Set(notColors)];
-    const colorList = list.filter((w, i) => !negated.has(i));
+    // «Чорна п'ятниця», «black friday» — акція, а не чорний колір.
+    const BF = ["чорна п'ятниц", "чорну п'ятниц", "чорної п'ятниц", "чорна пятниц", "черная пятниц", "черную пятниц", "черной пятниц", "black friday"];
+    const blackFriday = hasStem(list, BF);
+    const colorList = list.filter((w, i) => !negated.has(i) && !(blackFriday && /^(чорн|черн|black)/.test(w)));
     const color = COLORS.find(c => hasStem(colorList, c.stems) && !notColors.includes(c.key));
     if (color) wish.color = color.key;
 
@@ -1284,7 +1317,7 @@ export function parseWish(text, data) {
     // «Що порадите?», «що популярне?» — порада: хіти (позначка HOT від
     // власника), потім новинки, потім знижки. Відгуків поки немає, тож
     // «найпопулярніше» за продажами бот чесно не вигадує.
-    if (hasStem(list, ["що порад", "що б ви порад", "порадьте", "порадь", "порекоменд", "що популяр", "популярн", "найпопулярн", "самое популяр", "самые популяр", "самый популяр", "most popular", "хіт", "хит", "бестселер", "бестселлер", "что посовет", "посоветуйте", "что популяр", "recommend", "suggest something", "popular", "bestseller", "best seller", "trending", "what's hot", "універсальн", "на кожен день", "на щодень", "повсякденн", "на каждый день", "повседневн", "универсальн", "everyday", "versatile", "for every day"])) wish.recommend = true;
+    if (hasStem(list, ["що порад", "що б ви порад", "порадьте", "порадь", "порекоменд", "що популяр", "популярн", "найпопулярн", "самое популяр", "самые популяр", "самый популяр", "most popular", "хіт", "хит", "бестселер", "бестселлер", "что посовет", "посоветуйте", "что популяр", "recommend", "suggest something", "popular", "bestseller", "best seller", "trending", "what's hot", "що краще для", "что лучше для", "what's best for", "what is best for", "універсальн", "на кожен день", "на щодень", "повсякденн", "на каждый день", "повседневн", "универсальн", "everyday", "versatile", "for every day"])) wish.recommend = true;
 
     // «Найдешевші сумки», «найдорожчі годинники», «преміум».
     if (hasStem(list, ["найдешевш", "найбюджетн", "самые дешев", "самый дешев", "cheapest"])) wish.cheap = true;
@@ -1502,13 +1535,14 @@ export function mergeWishes(current, previous) {
 // питання: «скільки йде посилка» і «коли відправите» — одне й те саме.
 const TOPICS = [
     { key: "delivery-cost", stems: ["скільки кошт доставк", "вартість доставк", "ціна доставк", "сколько стоит доставк", "стоимость доставк", "delivery cost", "shipping cost", "how much delivery", "how much is delivery", "how much does delivery"], faq: /Скільки коштує доставка|How much does delivery|Сколько стоит доставка/i },
-    { key: "delivery-time", stems: ["як швидко", "як довго", "довго йде", "довго їде", "скільки днів", "коли відправ", "скільки йде", "скільки їде", "как долго", "долго идет", "сколько дней", "термін доставк", "строк доставк", "как быстро", "когда отправ", "сколько идет", "срок доставк", "how fast", "how quickly", "when will", "how long", "ship", "скільки їхати", "скільки їде", "сколько ехать", "сколько едет", "коли прийде", "коли отрима", "на завтра", "когда придет", "когда получ", "tomorrow"], faq: /Як швидко|How quickly|How fast|Как быстро/i },
+    { key: "delivery-time", stems: ["як швидко", "як довго", "довго йде", "довго їде", "скільки днів", "коли відправ", "скільки йде", "скільки їде", "как долго", "долго идет", "сколько дней", "термін доставк", "строк доставк", "как быстро", "когда отправ", "сколько идет", "срок доставк", "how fast", "how quickly", "when will", "how long", "ship", "до понеділк", "до вівторк", "до середи", "до четверг", "до п'ятниц", "до суботи", "до неділі", "до понедельник", "до вторник", "до среды", "до четверг", "до пятниц", "до субботы", "до воскресень", "by monday", "by tuesday", "by wednesday", "by thursday", "by friday", "by saturday", "by sunday", "by the weekend", "скільки їхати", "скільки їде", "сколько ехать", "сколько едет", "коли прийде", "коли отрима", "на завтра", "когда придет", "когда получ", "tomorrow"], faq: /Як швидко|How quickly|How fast|Как быстро/i },
     { key: "delivery", stems: ["доставк", "нова пошт", "новой почт", "новая почт", "відправк", "отправк", "delivery", "shipping", "nova poshta", "courier", "кур'єр", "курьер", "поштомат", "почтомат"], faq: /Скільки коштує доставка|How much does delivery|Сколько стоит доставка/i },
     { key: "payment", stems: ["оплат", "оплач", "карт", "готівк", "наличн", "накладен", "післяплат", "наложен", "payment", "pay ", "card", "cash", "cod"], faq: /оплатити карткою|pay by card|pay online|оплатить картой/i },
     { key: "inspect", stems: ["оглян", "огляд", "осмотр", "посмотреть перед", "inspect", "check before", "приміря", "примiря", "примеря", "примерит", "примерять", "примерк", "примірк", "try on", "try it on"], faq: /оглянути|inspect|осмотреть/i },
     { key: "fake", always: true, stems: ["оригінал", "оригинал", "підробк", "подделк", "реплік", "реплик", "фейк", "fake", "replica", "original", "authentic", "genuine", "справжн", "настоящ", "real$"], faq: /репліки|replicas|реплики/i },
     { key: "source", stems: ["звідки", "откуда", "чому так дешев", "чому дешев", "чому такі ціни", "чому ціни", "чому у вас так дешев", "почему так дешев", "почему дешев", "почему такие цены", "почему у вас так дешев", "why so cheap", "why is it so cheap", "why are your prices", "why cheap", "where do you", "where from", "де купу", "где покупа"], faq: /Звідки ви привозите|Where do you|Откуда вы привозите/i },
     { key: "doubt", stems: ["сумнів", "сомнева", "doubt", "перевір оригін", "проверить оригин"], faq: /сумніваюся|doubt|сомневаюсь/i },
+    { key: "return-cond", stems: ["бирк", "бирочк", "ярлик", "ярлык", "этикетк", "розпаков", "распаков", "unpack", "tags$", "tag$"], faq: /Що потрібно для повернення|Who pays for return|Кто оплачивает доставку при возврате/i, legal: true },
     { key: "returns", stems: ["поверн", "возврат", "вернут", "обмін", "обмен", "не підійш", "не подош", "не підходит", "не сподоба", "не подобає", "не понрав", "передума", "don't like", "do not like", "change my mind", "return", "refund", "exchange", "doesn't fit", "didn't fit"], faq: /Що робити, якщо товар не підійшов|What if the item|What to do if the item|Что делать, если товар не подош/i, legal: true },
     { key: "store", stems: ["знаходит", "находит", "де ви$", "где вы$", "в якому місті", "в каком городе", "where are you", "where is your store", "located", "магазин", "шоурум", "showroom", "офлайн", "offline", "адрес", "address", "самовивіз", "самовывоз", "забрат", "pickup", "pick up", "приїхат", "приехать"], faq: /фізичний магазин|physical store|физический магазин/i },
     { key: "buyer", stems: ["байєр", "байер", "під замовлен", "под заказ", "привез", "немає в каталоз", "нет в каталог", "buyer", "to order", "not in the catalog", "з сша", "из сша", "from the us", "from usa"], faq: /Чи можна замовити річ, якої немає|order an item that|заказать вещь, которой нет/i }
@@ -1595,7 +1629,7 @@ export function topicAnswer(topic, item, wholeList, lang, text) {
     const yesNoQuestion = hasStem(list, ["чи$", "можна", "можливо", "є$", "а є", "буде", "будете", "могу", "can$", "could", "do$", "does", "is$", "are$", "will$", "should", "можно", "ли$", "есть$", "будет", "будете"]);
     // Питання з «як / які / де / how / what / как…» на початку — не «так
     // чи ні», навіть якщо далі є «can» чи «можна»: «how can I pay?».
-    const WH = ["як", "які", "який", "яка", "де", "коли", "куди", "скільки", "що", "how", "what", "which", "where", "when", "как", "какие", "какой", "какая", "где", "когда", "куда", "сколько", "что"];
+    const WH = ["як", "які", "який", "яка", "де", "коли", "куди", "скільки", "що", "чому", "навіщо", "how", "what", "which", "where", "when", "why", "как", "какие", "какой", "какая", "где", "когда", "куда", "сколько", "что", "почему", "зачем"];
     const first = list[0] === "а" || list[0] === "і" || list[0] === "и" || list[0] === "and" ? list[1] : list[0];
     // «Ви продаєте підробки?» — теж «так чи ні», хоч без «чи»: знак
     // питання й жодного «як / де / скільки» на початку.
@@ -2042,8 +2076,12 @@ export function botReply(message, history, data, options) {
         { key: "photos", stems: ["більше фото", "ще фото", "живі фото", "реальні фото", "відео", "больше фото", "еще фото", "живые фото", "реальные фото", "видео", "more photos", "more pictures", "real photos", "video"] },
         { key: "wholesale", stems: ["опт$", "оптом", "оптов", "дропшип", "дроп$", "wholesale", "bulk", "dropship"] },
         { key: "loyalty", need: ["знижк", "скидк", "discount", "бонус", "кешбек", "кэшбэк", "cashback", "промокод", "акці", "акци"], stems: ["постійн", "постоянн", "перше замовлен", "першого замовлен", "першу покупк", "першої покупк", "первый заказ", "первого заказ", "первую покупк", "лояльн", "накопичувальн", "накопительн", "кешбек", "кэшбэк", "cashback", "loyalty", "first order", "first purchase", "regular customer", "returning customer"] },
-        { key: "packaging", stems: ["пакуван", "упаковк", "упакуван", "подарункове пак", "подарункову упак", "подарочн", "коробк", "листівк", "открытк", "цінник", "ценник", "чек$", "чека$", "чеком", "квитанц", "фіскальн", "фискальн", "gift wrap", "gift box", "packaging", "receipt", "price tag"] },
-        { key: "specs", pageOnly: true, stems: ["механізм", "механизм", "кварцов", "автоподзавод", "автопідзавод", "калібр", "калибр", "mechanism", "movement", "quartz", "automatic movement"] },
+        { key: "packaging", stems: ["пакуван", "упаковк", "упакуван", "подарункове пак", "подарункову упак", "подарочн", "коробк", "листівк", "открытк", "цінник", "ценник", "чек$", "чека$", "чеком", "квитанц", "фіскальн", "фискальн", "gift wrap", "gift box", "packaging", "receipt", "price tag", "dust bag", "dustbag", "пильник", "пыльник", "чохол", "чехол"] },
+        { key: "specs", pageOnly: true, stems: ["батарейк", "батарей", "battery", "элемент питания", "важить", "вага$", "вагу$", "весит", "вес$", "weight", "how heavy", "механізм", "механизм", "кварцов", "автоподзавод", "автопідзавод", "калібр", "калибр", "mechanism", "movement", "quartz", "automatic movement"] },
+        { key: "certificate", stems: ["сертифікат", "сертификат", "gift card", "gift certificate", "voucher", "ваучер", "подарункова карт", "подарочная карт"] },
+        { key: "care", stems: ["доглядат", "догляд за", "доглянути", "чистит", "почистит", "чистк", "ухаживат", "уход за", "care for", "take care", "how to clean", "clean it"] },
+        { key: "promoPlans", stems: ["чорна п'ятниц", "чорну п'ятниц", "чорної п'ятниц", "чорна пятниц", "черная пятниц", "черную пятниц", "black friday", "cyber monday", "кіберпонеділ", "розпродаж буде", "знижки будуть", "буде знижк", "будуть знижк", "скидки будут", "будет скидк", "будут скидк", "will there be a sale", "will there be discounts", "upcoming sale"] },
+        { key: "aboutShop", stems: ["на ринку", "давно працюєте", "скільки років ви", "як давно ви", "як довго ви працює", "как давно вы", "сколько лет вы", "давно работаете", "how long have you been", "years in business"] },
         { key: "restock", stems: ["поповнен", "коли привезете", "коли буде в наявн", "коли зʼявиться", "коли з'явиться", "коли появиться", "пополнен", "когда привезете", "когда будет в налич", "когда появится", "restock", "back in stock", "when will it be available"] }
     ];
     // Власна відповідь з адмінки важливіша: написав власник про
@@ -2219,7 +2257,9 @@ export function botReply(message, history, data, options) {
     }
 
     // 2д''. «Скільки чекати під замовлення?» — строк свій у кожної речі.
-    if (hasStem(list, ["під замовлен", "под заказ", "to order", "pre-order", "preorder", "made to order"])
+    const PRE = ["під замовлен", "под заказ", "to order", "pre-order", "preorder", "made to order"];
+    const prevVisitor = (history || []).filter(m => m && m.author === "visitor").slice(-1)[0];
+    if ((hasStem(list, PRE) || (prevVisitor && hasStem(words(prevVisitor.body), PRE) && hasStem(list, ["чекати", "чекат", "ждать", "wait"])))
         && hasStem(list, ["скільки", "сколько", "як довго", "как долго", "how long", "коли", "когда", "when", "строк", "срок", "термін"])
         && !((parseWish(text, data) || {}).criteria)) {
         return reply(T16[lang].preorder, { chips: [L.chips.human], intent: "faq" });
@@ -2265,6 +2305,19 @@ export function botReply(message, history, data, options) {
         return reply(T23[lang].city, { chips: L.chips.menu.slice(0, 5), intent: "faq" });
     }
 
+    // 2д''. «Які окуляри до круглого обличчя?» — порадить менеджер; щоб
+    // людина не чекала, одразу всі окуляри (з тим, що вже сказано).
+    if (hasStem(list, ["до кругл", "до овальн", "до квадратн", "до трикутн", "форм обличч", "форма обличч", "тип обличч", "к кругл", "к овальн", "к квадратн", "форма лица", "форму лица", "тип лица", "face shape", "round face", "oval face", "square face"])) {
+        const fw = Object.assign({}, parseWish(text, data) || {}, { type: "glasses", criteria: 1 });
+        const g = pickProducts(fw, data, now, 0);
+        return reply(T24[lang].face, { products: g.items.map(p => ({ slug: p.slug, title: (p.title && (p.title[lang] || p.title.uk)) || p.slug, price: botPriceNow(p, now), url: pageUrl(site, `/p/${p.slug}/`, lang), preOrder: Boolean(p.preOrder || !p.inStock) })), chips: [L.chips.more[1]], handoff: true, pause: false, intent: "products" });
+    }
+
+    // 2д'''. «Чому деякі товари під замовлення?»
+    if (hasStem(list, ["чому", "почему", "why", "навіщо", "зачем"]) && hasStem(list, ["під замовлен", "под заказ", "pre-order", "preorder", "to order"])) {
+        return reply(T24[lang].whyPreorder, { chips: [L.chips.human], intent: "faq" });
+    }
+
     // 2д. Як оформити замовлення.
     if (hasStem(list, HOW_TO_ORDER)) {
         return reply(T4L.howToOrder, { chips: [L.chips.menu[0], L.chips.menu[1], L.chips.menu[2]], intent: "how-to-order" });
@@ -2290,7 +2343,14 @@ export function botReply(message, history, data, options) {
             const m = l.match(/—\s+([\d\s  ]+)₴/);
             if (m) shownPrices.push(Number(m[1].replace(/\D/g, "")));
         });
-        const ceiling = shownPrices.length ? Math.min(...shownPrices) - 1 : 0;
+        let ceiling = shownPrices.length ? Math.min(...shownPrices) - 1 : 0;
+        // На сторінці товару без іншого запиту — дешевше за ЦЮ річ, того ж розділу.
+        const herePage = productFromPage(opts.page, data);
+        if (herePage && !base.type && !base.brand) {
+            const t = TYPES.find(x => (x.category && x.category === herePage.category) || (x.department && x.department === herePage.department));
+            if (t) { base.type = t.key; base.criteria = 1; }
+            ceiling = botPriceNow(herePage, now) - 1;
+        }
         const cheapWish = Object.assign({}, base, { cheap: true, more: false },
             ceiling > 0 ? { budget: Object.assign({}, base.budget || {}, { max: ceiling }) } : {});
         const picked = pickProducts(cheapWish, data, now, 0);
@@ -2483,7 +2543,8 @@ export function botReply(message, history, data, options) {
 
     // 3д. Голе «скільки?» / «ціна?» після підбірки: одна річ — її ціна,
     // кілька — діапазон і «про яку розповісти?». Раніше — «не зрозумів».
-    if (!here && list.length <= 4 && hasStem(list, ["скільки", "сколько", "почем", "ціна$", "цена$", "по ціні", "по цінах", "по цене", "по ценам", "how much", "price$"]) && !(parseWish(text, data) || {}).criteria) {
+    const bareHowMuch = list.filter(w => !["а", "і", "и", "ну", "так"].includes(w)).length === 1 && hasStem(list, ["скільки$", "сколько$"]);
+    if (!here && list.length <= 4 && (bareHowMuch || hasStem(list, ["кошту", "стоит", "стоят", "почем", "ціна$", "цена$", "по ціні", "по цінах", "по цене", "по ценам", "how much", "price$"])) && !(parseWish(text, data) || {}).criteria) {
         const shownNow = lastShownSlugs(history).map(slug => (data.products || []).find(p => p.slug === slug)).filter(Boolean);
         if (shownNow.length === 1) {
             const p = shownNow[0];
@@ -2530,6 +2591,11 @@ export function botReply(message, history, data, options) {
     // весь каталог зі 103 речей на «подарунок» — не допомога.
     if (wish && wish.gift && !wish.criteria) {
         return reply(T8[lang].gift, { chips: L.chips.types.slice(0, 4).concat(L.chips.budget.slice(0, 2)), intent: "ask" });
+    }
+
+    // «Я вже замовляла у вас, хочу ще» — раді, що повертаються.
+    if (wish && !wish.criteria && hasStem(list, ["замовлял", "заказывал", "купувал", "покупал", "ordered from you", "bought from you", "вже замовл", "уже заказ"]) && hasStem(list, ["ще", "еще", "again", "знову", "снова", "more"])) {
+        return reply(T24[lang].returning, { chips: L.chips.types, intent: "ask" });
     }
 
     // Кнопки меню без критеріїв: «Підібрати річ» — питаємо, що саме.

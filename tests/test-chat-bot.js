@@ -1187,5 +1187,53 @@ console.log("\n[26] Підсумок для власника в Telegram (10.11.
     check("рядок товару не плутається з підсумком (картки — лише «• … ₴ url»)", !/\/p\//.test((body.match(/^\[\[summary: (.*)\]\]$/m) || [])[1] || ""));
 }
 
+console.log("\n[27] Сьома проба: акції, сертифікати, догляд, сторінка товару (10.11.2026)");
+{
+    const none = { text: "", products: [], intent: null };
+    const say = (lang, msgs, page) => {
+        const history = [];
+        let last = null;
+        msgs.forEach(m => {
+            last = bot.botReply(m, history, data, { lang, now: NOW, siteUrl: "https://bestbrnd4u.com", page: page || "" });
+            history.push({ author: "visitor", body: m });
+            if (last) history.push({ author: "bot", body: bot.serializeBotReply(last, last.lang || lang) });
+        });
+        return last || none;
+    };
+    const askOwner = r => r.handoff && r.pause === false && !r.products.length;
+
+    // Раніше «чорна п'ятниця» — «Ось чорні речі».
+    const bf = say("uk", ["коли буде чорна п'ятниця?"]);
+    check("«коли буде чорна п'ятниця?» — плани акцій у менеджера, а не чорні речі", askOwner(bf) && /aktsii/.test(bf.text), bf.text.slice(0, 40));
+    check("«а знижки будуть?» — теж про плани акцій", /Плани акцій/.test(say("uk", ["а знижки будуть?"]).text));
+    check("«чорна сумка» — як і раніше, чорні", /^Ось чорні сумки/.test(say("uk", ["чорна сумка"]).text));
+    check("«є подарункові сертифікати?» — менеджеру, а не «для кого подарунок?»", askOwner(say("uk", ["є подарункові сертифікати?"])));
+    check("«як доглядати за шкіряною сумкою?» — менеджеру, а не підбірка", askOwner(say("uk", ["як доглядати за шкіряною сумкою?"])));
+    check("«скільки часу ви на ринку?» — менеджеру, а не «14 днів на повернення»",
+        (r => askOwner(r) && !/14 днів/.test(r.text))(say("uk", ["скільки часу ви працюєте на ринку?"])));
+    const face = say("uk", ["які окуляри підійдуть до круглого обличчя?"]);
+    check("«окуляри до круглого обличчя» — порада менеджера й окуляри одразу", face.handoff && face.products.length > 0 && items(face).every(p => /Окуляри/.test(p.category)));
+    check("«а якщо зняла бирку?» — умови повернення з сайту (бирки, пакування)", /бирками/.test(say("uk", ["а якщо зняла бирку?"]).text));
+
+    // Сторінка товару.
+    const watchPage = "/p/" + data.products.find(p => p.category === "Годинники").slug + "/";
+    check("«батарейка є?» на сторінці годинника — менеджеру, а не «є в наявності»", (r => r.handoff && !/в наявності/.test(r.text))(say("uk", ["батарейка є?"], watchPage)));
+    check("«скільки важить?» — менеджеру", say("uk", ["скільки важить?"], watchPage).handoff);
+    const bagP = data.products.find(p => p.department === "Сумки" && p.inStock);
+    check("en «does it come with a dust bag?» — менеджеру, а не підбірка сумок", askOwner(say("en", ["does it come with a dust bag?"], "/en/p/" + bagP.slug + "/")));
+    check("en «can I get it by Friday?» — строки доставки", /1–2 business days/.test(say("en", ["can I get it by Friday?"], "/en/p/" + bagP.slug + "/").text));
+    const cheap = say("ru", ["а можно дешевле?"], "/ru/p/" + bagP.slug + "/");
+    check("ru «а можно дешевле?» на сторінці сумки — сумки, дешевші за цю", cheap.products.length > 0
+        && items(cheap).every(p => p.department === "Сумки" && bot.botPriceNow(p, NOW) < bot.botPriceNow(bagP, NOW)), cheap.text.slice(0, 30));
+
+    // «Чому», «скільки чекати» після «під замовлення».
+    const why = say("uk", ["а чому деякі товари під замовлення?"]);
+    check("«а чому … під замовлення?» — пояснення, без «Так.» на початку", /^«Під замовлення»/.test(why.text), why.text.slice(0, 30));
+    check("«скільки чекати?» після «під замовлення» — строк під замовлення", /Строк під замовлення/.test(say("uk", ["а чому деякі товари під замовлення?", "скільки чекати?"]).text));
+    check("«скільки?» саме — як і раніше, «яка річ?»", say("uk", ["скільки?"]).intent === "ask");
+    check("«я замовляла у вас, хочу ще» — «Раді, що повертаєтесь»", /^Раді, що повертаєтесь/.test(say("uk", ["я замовляла у вас минулого місяця, хочу ще"]).text));
+    check("«що краще для подарунка дівчині?» — порада серед жіночого", /^Жіночі речі: ось що радимо/.test(say("uk", ["що краще для подарунка дівчині 20 років?"]).text));
+}
+
 console.log(failures ? `\n✗ Провалено: ${failures}` : "\n✓ Усе зелено");
 process.exit(failures ? 1 : 0);
