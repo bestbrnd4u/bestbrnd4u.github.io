@@ -1101,5 +1101,56 @@ console.log("\n[24] П'ята проба: купити показане, цін�
     check("на сторінці товару «розкажіть про цю» — коротко все з картки", (r => r.intent === "product" && /Ціна/.test(r.text) && !/не вказано/.test(r.text))(say("uk", ["розкажіть про цю"], "/p/" + linked.slug + "/")));
 }
 
+console.log("\n[25] Шоста проба: суржик, повтори, моделі, доставка по Україні (10.11.2026)");
+{
+    const none = { text: "", products: [], intent: null };
+    const say = (lang, msgs) => {
+        const history = [];
+        let last = null;
+        msgs.forEach(m => {
+            last = bot.botReply(m, history, data, { lang, now: NOW, siteUrl: "https://bestbrnd4u.com" });
+            history.push({ author: "visitor", body: m });
+            if (last) history.push({ author: "bot", body: bot.serializeBotReply(last, last.lang || lang) });
+        });
+        return last || none;
+    };
+
+    check("«шо є по сумках?» — як «що є по сумках»", (r => r.products.length > 0 && items(r).every(p => p.department === "Сумки"))(say("uk", ["шо є по сумках?"])));
+    check("«а шо по ціні?» після підбірки — діапазон цін", /^Ціни — на картках вище/.test(say("uk", ["шо є по сумках?", "а по годинниках?", "а шо по ціні?"]).text));
+    // Раніше «скільки коштує» без речі — відповідь про ціну ДОСТАВКИ.
+    const price0 = say("uk", ["скільки коштує"]);
+    check("«скільки коштує» без речі — «яка річ цікавить?», а не про доставку", price0.intent === "ask" && !/доставк|перевізник/i.test(price0.text), price0.text.slice(0, 50));
+    check("«скільки коштує доставка?» — як і раніше, про доставку", say("uk", ["скільки коштує доставка?"]).intent === "faq");
+    check("«мені б щось гарненьке» — «що саме шукаєте?», а не «не зрозумів»", say("uk", ["мені б щось гарненьке"]).intent === "ask");
+    check("«Що у вас найпопулярніше?» — порада", /радимо/.test(say("uk", ["Що у вас найпопулярніше?"]).text));
+
+    // Той самий запит удруге й утретє — далі, а не те саме.
+    const b1 = say("uk", ["сумка"]), b2 = say("uk", ["сумка", "сумка"]), b3 = say("uk", ["сумка", "сумка", "сумка"]);
+    const slugs = r => r.products.map(p => p.slug).join();
+    check("«сумка» тричі — три різні четвірки", slugs(b1) !== slugs(b2) && slugs(b2) !== slugs(b3) && /^Ще сумки — 5–8/.test(b2.text) && /^Ще сумки — 9–12/.test(b3.text), b3.text.slice(0, 30));
+    const hi2 = say("uk", ["привіт", "привіт"]);
+    check("друге «привіт» — не те саме вітання вдруге", /^Я тут/.test(hi2.text), hi2.text.slice(0, 30));
+    check("«привіт» після підбірки — знову вітання", /^Привіт!/.test(say("uk", ["сумка", "привіт"]).text));
+
+    // З картки: камені, автоматичні, поляризація.
+    const stones = say("ru", ["ищу женские часы до 15 тысяч", "а с камнями?"]);
+    check("ru «а с камнями?» після годинників — годинники з кристалами (pavé)", stones.products.length > 0
+        && items(stones).every(p => p.category === "Годинники" && /pav[eé]|кристал/i.test(p.title.en + " " + p.details.material.uk)), stones.text.slice(0, 60));
+    check("«автоматичний» після годинників — Automatic / Swissmatic",
+        (r => r.products.length > 0 && items(r).every(p => /automatic|swissmatic/i.test(p.title.en)))(say("uk", ["годинник", "автоматичний"])));
+    const polar = say("uk", ["окуляри з поляризацією?"]);
+    check("«окуляри з поляризацією?» — лише ті, де це в картці, і так і сказано",
+        polar.products.length > 0 && items(polar).every(p => /polari|поляриз/i.test(p.title.uk + p.title.en + JSON.stringify(p.keywords))) && /як зазначено в картці/.test(polar.text), polar.text.slice(0, 60));
+
+    // Модель, якої немає.
+    const way = say("uk", ["Ray-Ban Aviator є?", "а Wayfarer?"]);
+    check("«Ray-Ban» → «а Wayfarer?» — «моделі немає», і Ray-Ban, що є", /^Моделі «Wayfarer» зараз у каталозі немає/.test(way.text) && items(way).every(p => p.brand === "Ray-Ban"), way.text.slice(0, 50));
+    check("«а Tabby?» після Coach — як і раніше, Tabby", items(say("uk", ["сумка coach", "а Tabby?"])).every(p => /tabby/i.test(p.title.en)));
+
+    const city = say("uk", ["а якщо я з Харкова, доставите?"]);
+    check("«з Харкова, доставите?» — так, по Україні Новою поштою", /^Так, відправляємо Новою поштою в будь-яке місто України/.test(city.text), city.text.slice(0, 50));
+    check("«доставляєте в Польщу?» — як і раніше, менеджеру", say("uk", ["доставляєте в Польщу?"]).handoff === true);
+}
+
 console.log(failures ? `\n✗ Провалено: ${failures}` : "\n✓ Усе зелено");
 process.exit(failures ? 1 : 0);
