@@ -1481,5 +1481,55 @@ console.log("\n[31] Замовлення по кроках, «не та сумк
     check("«а що з гарантією?» — як і раніше, довідка без дзвінка", run("uk", ["а що з гарантією?"])[0].handoff === false);
 }
 
+console.log("\n[32] Кнопки-підказки: мова розмови, «Інші варіанти» після повтору (10.11.2026)");
+{
+    const send = (h, m, lang) => {
+        const r = bot.botShouldStay(h) ? bot.botReply(m, h, data, { lang, now: NOW, siteUrl: "https://bestbrnd4u.com" }) : null;
+        const h2 = h.concat([{ author: "visitor", body: m }]);
+        if (r) h2.push({ author: "bot", body: bot.serializeBotReply(r, r.lang || lang) });
+        return [r, h2];
+    };
+    const chat = (lang, msgs) => { let h = [], r = null; for (const m of msgs) [r, h] = send(h, m, lang); return [r, h]; };
+
+    // Українською на /ru/ — бот відповідає українською й кнопки українські.
+    // Раніше натиск «Покликати менеджера» перемикав розмову на російську:
+    // з самої кнопки мови не видно, і бралась мова сторінки.
+    const [r1, h1] = chat("ru", ["шукаю сумку і гаманець в комплект"]);
+    check("українською на /ru/ — відповідь і кнопки українською", r1.lang === "uk" && r1.chips.length > 0 && r1.chips.every(c => !/[ыэъё]/.test(c)), r1.lang + " " + r1.chips.join("|"));
+    check("після відповіді про доставку — без кнопки «Доставка» (дала б те саме)", !chat("uk", ["скільки коштує доставка?"])[0].chips.includes("Доставка"));
+    const [human] = send(h1, "Покликати менеджера", "ru");
+    check("кнопка «Покликати менеджера» там же — відповідь українською", human.lang === "uk" && /менеджер/.test(human.text), human.lang);
+    const [, h2] = chat("uk", ["a bag"]);
+    const [women] = send(h2, "Women's bags", "uk");
+    check("англійською на укр. сторінці → кнопка «Women's bags» — англійською", women.lang === "en", women.lang);
+    check("на /ru/ без попередніх реплік «Coach» — як і раніше, мовою сторінки", chat("ru", ["Coach"])[0].lang === "ru");
+    check("перейшла на іншу мову сама — бот за нею", chat("uk", ["чорна сумка", "а подешевле есть?"])[0].lang === "ru");
+
+    // «Сумка» → «сумка» (друга четвірка) → «Інші варіанти» — третя, а не друга ще раз.
+    const [p2, hp] = chat("uk", ["сумка не дорожче 6 тис", "сумка не дорожче 6 тис"]);
+    const [p3] = send(hp, "Інші варіанти", "uk");
+    check("повтор запиту, потім «Інші варіанти» — наступна четвірка, а не та сама",
+        p3.products.length > 0 && p3.products.every(p => !p2.products.some(q => q.slug === p.slug)), p3.text.slice(0, 40));
+    const [m3] = chat("uk", ["сумка", "Інші варіанти", "Інші варіанти"]);
+    check("«ще» двічі після запиту — як і раніше, 9–12", /9–12/.test(m3.text), m3.text.slice(0, 30));
+
+    // Сторож кнопок: кожна кнопка з типових розмов, натиснута там, де її
+    // показали, — не «не зрозумів», не та сама відповідь, не інша мова.
+    const starts = [["uk", ["сумка"]], ["uk", ["Привіт"]], ["uk", ["подарунок"]], ["uk", ["сумка coach"]], ["uk", ["що нового?"]], ["uk", ["скільки коштує доставка?"]],
+        ["en", ["bag"]], ["en", ["hi"]], ["ru", ["часы"]], ["ru", ["привет"]], ["uk", ["у вас є Louis Vuitton?"]], ["uk", ["хочу штани"]], ["uk", ["фывапролд"]]];
+    const bad = [];
+    for (const [lang, msgs] of starts) {
+        const [r, h] = chat(lang, msgs);
+        for (const chip of (r && r.chips) || []) {
+            const [c] = send(h, chip, lang);
+            if (!c) { bad.push(`${msgs} → «${chip}»: мовчить`); continue; }
+            if (c.intent === "unknown") bad.push(`${msgs} → «${chip}»: не зрозумів`);
+            if (c.text === r.text && JSON.stringify(c.products) === JSON.stringify(r.products)) bad.push(`${msgs} → «${chip}»: те саме`);
+            if (c.lang !== r.lang) bad.push(`${msgs} → «${chip}»: ${r.lang}→${c.lang}`);
+        }
+    }
+    check("сторож кнопок: усі кнопки з 13 типових розмов ведуть далі тією ж мовою", bad.length === 0, bad.slice(0, 3).join(" | "));
+}
+
 console.log(failures ? `\n✗ Провалено: ${failures}` : "\n✓ Усе зелено");
 process.exit(failures ? 1 : 0);

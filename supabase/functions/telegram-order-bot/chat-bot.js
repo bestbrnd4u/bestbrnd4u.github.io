@@ -1955,8 +1955,12 @@ const RU_WORDS = ["покажите", "больше", "меньше", "вари�
 const UK_WORDS = ["що", "як", "це", "є", "скільки", "де", "які", "який", "яка", "можна", "підкажіть", "вітаю", "дякую", "будь ласка", "привіт", "годинник", "окуляри", "кросівки", "гаманець", "жіноча", "чоловіча", "чорна", "чорну", "біла", "білу", "або", "ще", "вже", "ні", "так", "мені", "вас", "у вас"];
 const EN_WORDS = ["the", "do you", "i want", "i need", "i'm", "looking for", "how much", "is it", "are you", "can i", "have you", "what", "where", "when", "please", "thanks", "thank you", "hello", "hi", "for", "with", "and", "a", "an", "my", "your", "do", "have", "is", "are", "any"];
 
-export function detectLang(text, pageLang) {
-    const page = botLang(pageLang);
+// prevLang — мова, якою людина писала досі. Кнопка «Покликати менеджера»,
+// «Women's bags», «Coach» самі мови не видають: раніше тоді бралась мова
+// СТОРІНКИ, і розмова українською на /ru/ від натиску кнопки ставала
+// російською.
+export function detectLang(text, pageLang, prevLang) {
+    const page = prevLang ? botLang(prevLang) : botLang(pageLang);
     const raw = String(text || "").toLowerCase();
     const list = words(text);
     if (!list.length) return page;
@@ -1970,7 +1974,7 @@ export function detectLang(text, pageLang) {
         const ru = count(RU_WORDS), uk = count(UK_WORDS);
         if (ru > uk) return "ru";
         if (uk > ru) return "uk";
-        return page === "en" ? "uk" : page;
+        return page === "en" ? (botLang(pageLang) === "en" ? "uk" : botLang(pageLang)) : page;
     }
     // Латиниця: англійська — лише коли є службові слова.
     return count(EN_WORDS) >= 1 && list.length >= 2 ? "en" : page;
@@ -2005,7 +2009,10 @@ export function botReply(message, history, data, options) {
         }
     }
     // Мова відповіді — мова повідомлення; сторінка — запасна.
-    const lang = detectLang(message, opts.lang);
+    // Мова розмови — з усіх попередніх реплік людини, від давніх до нових.
+    let talkLang;
+    for (const m of (history || []).filter(x => x && x.author === "visitor")) talkLang = detectLang(m.body, opts.lang, talkLang);
+    const lang = detectLang(message, opts.lang, talkLang);
     const L = T[lang];
     const site = opts.siteUrl || "https://bestbrnd4u.com";
     const now = Number.isFinite(opts.now) ? opts.now : Date.now();
@@ -2035,6 +2042,13 @@ export function botReply(message, history, data, options) {
         if (out.handoff && late && !out.text.includes(late.trim())) out.text += late;
         if (greet && out.intent !== "hello" && !out.text.startsWith(greet)) out.text = `${greet}! ${out.text}`;
         if (out.handoff) out.summary = ownerSummary(out);
+        // Кнопка на ту саму тему, на яку щойно відповіли («Доставка» під
+        // відповіддю про доставку), дала б ту саму відповідь удруге.
+        if (out.intent === "faq" && out.chips && out.chips.length) {
+            const fam = t => t && t.key.split("-")[0];
+            const cur = fam(findTopic(text));
+            if (cur) out.chips = out.chips.filter(c => fam(findTopic(c)) !== cur);
+        }
         return out;
     };
     // «🔎 Шукає: чорні жіночі сумки Coach до 8 000 ₴ · 👀 Дивиться: «…»» —
@@ -2707,11 +2721,16 @@ export function botReply(message, history, data, options) {
         const visitorPrev = (history || []).filter(m => m && m.author === "visitor").reverse();
         const byRepeat = !wish.more && visitorPrev.length > 0 && same(visitorPrev[0].body);
         if (byRepeat) wish.more = true;
+        // Скільки разів поспіль уже гортали: «ще» або повтор попереднього
+        // запиту («сумка» → «сумка» — це теж «покажи далі»). Перший запит
+        // ряду — сам запит, не крок.
         let pages = 0;
         if (wish.more) {
-            for (const m of visitorPrev) { if ((parseWish(m.body, data) || {}).more || (byRepeat && same(m.body))) pages += 1; else break; }
-            // «Сумка» → «сумка»: перша «сумка» — сам запит, а не прохання «ще».
-            if (byRepeat) pages -= 1;
+            for (let i = 0; i < visitorPrev.length; i++) {
+                const m = visitorPrev[i];
+                const repeat = i + 1 < visitorPrev.length && normalizeText(m.body) === normalizeText(visitorPrev[i + 1].body);
+                if ((parseWish(m.body, data) || {}).more || repeat) pages += 1; else break;
+            }
         }
         const offset = wish.more ? (pages + 1) * MAX_PRODUCTS : 0;
 
