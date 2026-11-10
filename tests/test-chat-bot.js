@@ -1577,5 +1577,107 @@ console.log("\n[33] Бренд ≠ тема («Armani Exchange»), ім'я, «я
     check("«я з Польщі» — не «в будь-яке місто України»", !/в будь-яке місто України/.test(one("я з Польщі").text));
 }
 
+console.log("\n[34] Сорок свіжих повідомлень: рік ≠ бюджет, тренди, барсетка, країна, каталог (10.11.2026)");
+{
+    const one = (m, lang) => bot.botReply(m, [], data, { lang: lang || "uk", now: NOW, siteUrl: "https://bestbrnd4u.com" }) || { text: "", products: [], intent: null };
+    // Не «не зрозумів»: той теж кличе власника, і перевірка була б зелена й на старому боті.
+    const askOwner = r => r.handoff && r.pause === false && !r.products.length && r.intent !== "unknown";
+
+    // Неправильні відповіді.
+    check("«трендові сумки 2026» — рік, а не бюджет «до 2 026 ₴»", !/2 026/.test(one("трендові сумки 2026").text));
+    check("«бюджет до 2026 грн» — з «грн» це бюджет", /2 026 ₴/.test(one("бюджет до 2026 грн").text));
+    const colleague = one("шукаю щось у подарунок колезі, бюджет невеликий");
+    check("«бюджет невеликий» — найдоступніше, а не маленькі сумки", /найдоступніш/.test(colleague.text) && !/маленьк/.test(colleague.text), colleague.text.slice(0, 50));
+    check("«маленька сумка» — як і раніше, маленькі", /маленькі сумки/.test(one("маленька сумка").text));
+    check("«є щось під джинси?» — порада, а не «джинсів немає»", (r => r.products.length > 0 && !/джинсів/.test(r.text))(one("є щось під джинси?")));
+    check("«хочу джинси» — як і раніше, «джинсів немає»", /джинсів/.test(one("хочу джинси").text));
+    const kids = one("є дитячі окуляри?");
+    check("«є дитячі окуляри?» — «дитячих окулярів немає», а не дорослі мовчки", /^Дитячих окулярів зараз немає/.test(kids.text) && !kids.products.length, kids.text.slice(0, 40));
+    const vs = one("чим відрізняється Coach від Michael Kors?");
+    check("«чим відрізняється Coach від Michael Kors?» — по дві кожного", /по дві моделі Coach і Michael Kors/.test(vs.text) && items(vs).some(p => p.brand === "Coach") && items(vs).some(p => p.brand === "Michael Kors"));
+    check("ru «скидка студентам?» — менеджеру, а не підбірка знижок", askOwner(one("есть ли скидка студентам?", "ru")));
+
+    // Нове розуміння.
+    check("«що зараз модно?», ru «в тренде», «щоб пасувала до всього» — порада",
+        ["що зараз модно?", "щоб пасувала до всього"].every(m => /радимо/.test(one(m).text)) && /советуем/.test(one("что сейчас в тренде?", "ru").text));
+    check("«сумка на пляж» — шопери", /^Ось шопери/.test(one("мені треба сумка на пляж").text));
+    check("«годинник для бігу» — спортивні", /^Ось спортивні годинники/.test(one("потрібен годинник для бігу").text));
+    check("«хочу клатч на весілля», ru «на свадьбу», en «for a wedding» — клатчі",
+        /клатчі/.test(one("хочу клатч на весілля").text) && /клатчи/.test(one("нужна сумка на свадьбу", "ru").text) && /clutches/.test(one("something for a wedding", "en").text));
+    check("«годинник на весілля» — годинники, а не клатчі", /^Ось годинники/.test(one("годинник на весілля").text));
+    const bars = one("барсетка");
+    check("«барсетка» — чоловічі сумки", /^Ось чоловічі сумки/.test(bars.text) && items(bars).every(p => p.department === "Сумки"), bars.text.slice(0, 30));
+    check("«портфель для документів» — сумки під ноутбук (за габаритами)", /ноутбук 13″/.test(one("портфель для документів").text));
+    check("«сумка-конверт» — «немає» і інші сумки", /^Сумок-конвертів зараз немає/.test(one("сумка-конверт").text));
+    check("«візитниця є?» — «немає, але є гаманці»", (r => /^Візитниць у нас зараз немає/.test(r.text) && items(r).every(p => p.category === "Гаманці"))(one("візитниця є?")));
+    check("«сумки з Італії?», «якої країни виробництва?» — менеджеру, з тим, що відомо (США)",
+        ["сумки з Італії є?", "а якої країни виробництва?"].every(m => (r => askOwner(r) && /США/.test(r.text))(one(m))));
+    check("«ви на OLX є?», «на Rozetka?» — менеджеру", askOwner(one("ви на OLX є?")) && askOwner(one("а на Rozetka продаєте?")));
+    check("«оригінал? на олх дешевше» — як і раніше, про оригінальність", /оригінальні/.test(one("а у вас реально оригінал? бо на олх такі самі дешевше").text));
+    check("ru «работаете с юрлицами?» — менеджеру", askOwner(one("работаете с юрлицами?", "ru")));
+    check("«дайте посилання на каталог» — посилання", /\/catalog/.test(one("дайте посилання на каталог").text));
+    check("«сайт англійською?» — три мовні версії з посиланнями", (r => /\/en\//.test(r.text) && /\/ru\//.test(r.text))(one("у вас є сайт англійською?")));
+    check("en «are prices in dollars?» — у гривнях", /^Prices on the website are in hryvnias/.test(one("are prices in dollars?", "en").text));
+}
+
+console.log("\n[35] Людина вагається: «не можу вибрати», «яка краща?», якість (10.11.2026)");
+{
+    const chat = (lang, msgs, page) => {
+        const h = [];
+        let r = null;
+        for (const m of msgs) {
+            r = bot.botReply(m, h, data, { lang, now: NOW, siteUrl: "https://bestbrnd4u.com", page: page || "" });
+            h.push({ author: "visitor", body: m });
+            if (r) h.push({ author: "bot", body: bot.serializeBotReply(r, r.lang || lang) });
+        }
+        return r || { text: "", products: [], intent: null };
+    };
+    const coach = items(chat("uk", ["сумка coach"]));
+
+    // Раніше — «не зрозумів» і дзвінок власнику.
+    for (const [lang, m] of [["uk", "не можу вибрати"], ["uk", "яка з них краща?"], ["uk", "що б ви взяли?"], ["ru", "какая из них лучше?"], ["en", "I can't decide"]]) {
+        const r = chat(lang, [lang === "en" ? "coach bag" : lang === "ru" ? "сумка коуч" : "сумка coach", m]);
+        check(`«${m}» після підбірки — показані поруч (ціна, матеріал, габарити), без дзвінка`,
+            r.intent === "product" && !r.handoff && /\n1\. «/.test(r.text) && /\n2\. «/.test(r.text) && /₴/.test(r.text), r.text.slice(0, 40));
+    }
+    check("ru «какая лучше?» — не «самые дорогие»", !/самые дорогие/.test(chat("ru", ["сумка коуч", "какая из них лучше?"]).text));
+    check("«найдорожчі сумки» — як і раніше, найдорожчі", /найдорожчі/.test(chat("uk", ["найдорожчі сумки"]).text));
+    const between = chat("uk", ["сумка coach", "допоможіть вибрати між першою і третьою"]);
+    check("«вибрати між першою і третьою» — саме ці дві поруч (а не «я бот-помічник»)", /^Порівняння/.test(between.text)
+        && between.text.includes(coach[0].title.uk) && between.text.includes(coach[2].title.uk), between.text.slice(0, 40));
+    check("en «I can't decide» — не «моделі немає»", !/There's no “I can't decide”/.test(chat("en", ["coach bag", "I can't decide"]).text));
+
+    // «Брат» — лише брат.
+    const bagP = data.products.find(p => p.department === "Сумки" && p.inStock);
+    const worth = chat("uk", ["варто брати?"], "/p/" + bagP.slug + "/");
+    check("«варто брати?» на сторінці сумки — не «чоловічі речі»", !/чоловічі/.test(worth.text) && /оригінал/.test(worth.text), worth.text.slice(0, 40));
+    check("«подарунок брату» — як і раніше, чоловічі речі", /чоловічі/.test(chat("uk", ["подарунок брату"]).text));
+    check("«а вона якісна?», «довго прослужить?» — оригінал, гарантія, 14 днів",
+        ["а вона якісна?", "довго прослужить?"].every(m => (r => /оригінал/.test(r.text) && /14 днів/.test(r.text) && !r.handoff)(chat("uk", [m]))));
+    check("«я ще подумаю» — «звісно, подумайте», без дзвінка", (r => /^Звісно, подумайте/.test(r.text) && !r.handoff)(chat("uk", ["я ще подумаю"])));
+    check("«мені всі подобаються 😅» — подяка, а не «не зрозумів»", /приємно/.test(chat("uk", ["мені всі подобаються 😅"]).text));
+    check("«хочу щось незвичайне» — порада", /радимо/.test(chat("uk", ["хочу щось незвичайне"]).text));
+    const sim = chat("uk", ["сумка coach", "а є ще щось схоже на другу?"]);
+    check("«схоже на другу?» — схожі на неї (а не опис другої)", /^Схожі на «/.test(sim.text) && sim.products.length > 0 && sim.products.every(p => p.slug !== coach[1].slug), sim.text.slice(0, 40));
+}
+
+console.log("\n[36] Подарунок кому: стать за словом (10.11.2026)");
+{
+    const g = m => (bot.parseWish(m, data) || {}).gender || null;
+    // Раніше «подарунок бабусі / тещі / дочці / дідусю» — «для кого?»,
+    // хоч сказано прямо.
+    const female = ["подарунок тещі", "подарунок свекрусі", "подарунок бабусі", "подарунок дочці", "подарунок нареченій", "подарунок коханій", "подарунок начальниці", "подарунок вчительці", "подарунок хрещеній", "подарок теще", "подарок свекрови", "подарок бабушке", "подарок любимой", "gift for grandma", "gift for my daughter"];
+    const male = ["подарунок дідусю", "подарунок нареченому", "подарунок коханому", "подарунок начальнику", "подарунок синові", "подарок дедушке", "подарок жениху", "gift for my son", "gift for grandpa"];
+    const missF = female.filter(m => g(m) !== "Жінкам"), missM = male.filter(m => g(m) !== "Чоловікам");
+    check(`${female.length} «жіночих» адресатів — жінкам`, !missF.length, missF.join(", "));
+    check(`${male.length} «чоловічих» адресатів — чоловікам`, !missM.length, missM.join(", "));
+    // Двозначні — свідомо без статі: бот перепитає, а не вгадає.
+    check("«колезі», «gift for my boss» — стать не вгадуємо", g("подарунок колезі") === null && g("gift for my boss") === null);
+    check("«синя сумка», «сусідка порадила вас» — не стать", g("синя сумка") === null && g("сусідка порадила вас") === null);
+    check("«варто брати?» — не «брат»", g("варто брати?") === null);
+    const gran = bot.botReply("подарунок бабусі", [], data, { lang: "uk", now: NOW });
+    check("«подарунок бабусі» — жіночі речі одразу, а не «для кого?»", gran.intent === "products" && /жіночі/.test(gran.text), gran.text.slice(0, 40));
+}
+
 console.log(failures ? `\n✗ Провалено: ${failures}` : "\n✓ Усе зелено");
 process.exit(failures ? 1 : 0);
