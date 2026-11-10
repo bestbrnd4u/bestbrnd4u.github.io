@@ -1901,5 +1901,24 @@ console.log("\n[45] Подарунок — новий запит (перевір
     check("«годинник» → «жіночий» → «золотий» — як і раніше, золотисті жіночі годинники", /золотисті жіночі годинники/.test(run(["годинник", "жіночий", "золотий"]).text));
 }
 
+console.log("\n[46] Подарунок — межа розмови: старе не переходить через нього (перевірка на проді 10.11.2026)");
+{
+    const run = msgs => {
+        const h = [];
+        let r = null;
+        for (const m of msgs) {
+            r = bot.botReply(m, h, data, { lang: "uk", now: NOW, siteUrl: "https://bestbrnd4u.com" });
+            h.push({ author: "visitor", body: m });
+            if (r) h.push({ author: "bot", body: bot.serializeBotReply(r, "uk") });
+        }
+        return r || { text: "" };
+    };
+    // На проді: бренд із запиту ДО подарунків дотягнувся до «черепахових окулярів».
+    const r = run(["Armani Exchange", "подарунок бабусі", "на день батька", "черепахові окуляри"]);
+    check("«Armani Exchange» → подарунки → «черепахові окуляри» — без Armani Exchange", !/Armani/.test(r.text), r.text.slice(0, 70));
+    check("уточнення після подарунка — як і раніше («подарунок мамі» → «а гаманці?» → «а червоні?»)", /червоні жіночі гаманці/.test(run(["подарунок мамі", "а гаманці?", "а червоні?"]).text));
+    check("«сумка coach» → «а чорна?» — як і раніше, чорні сумки Coach", /чорні сумки Coach/.test(run(["сумка coach", "а чорна?"]).text));
+}
+
 console.log(failures ? `\n✗ Провалено: ${failures}` : "\n✓ Усе зелено");
 process.exit(failures ? 1 : 0);

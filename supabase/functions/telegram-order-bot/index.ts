@@ -6690,6 +6690,10 @@ function mergeWishes(current, previous) {
         });
         if (prev.notColors) out.notColors = [...new Set((out.notColors || []).concat(prev.notColors))].filter(c => c !== out.color);
         if (out.models === undefined && prev.models && !current.type && !current.brand) out.models = prev.models;
+        // Подарунок почав нову тему: те, що було ДО нього, далі не переносимо.
+        // На проді 10.11.2026: «Armani Exchange» → «подарунок бабусі» → «на
+        // день батька» → «черепахові окуляри» дало «окулярів Armani Exchange немає».
+        if (prev.gift) break;
     }
 
     out.criteria = ["type", "gender", "color", "brand", "budget", "models", "size", "material", "style", "band", "notColors", "neutral", "noLogo", "light"].filter(k => out[k]).length;
