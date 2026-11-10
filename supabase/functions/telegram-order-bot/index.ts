@@ -6135,9 +6135,9 @@ function parseBudget(text) {
         if (a && b && b > a && b >= 500) return { min: a, max: b };
     }
 
-    const max = t.match(new RegExp(`(?:^|\\s)(?:до|до\\s+ціни|не дорожче|не дороже|дешевше|дешевле|в межах|у межах|в пределах|приблизно|десь|около|примерно|under|below|up to|max|less than|within|around|about)\\s*${unit}`));
+    const max = t.match(new RegExp(`(?:^|\\s)(?:до|до\\s+ціни|не дорожче|не дороже|дешевше|дешевле|в межах|у межах|в пределах|приблизно|десь|около|примерно|no more than|not more than|not over|at most|under|below|up to|max|less than|within|around|about)\\s*${unit}`));
     // «Не дорожче 6 тис» — стеля; «дорожче» тут не нижня межа.
-    const min = t.match(new RegExp(`(?:^|\\s)(?<!не\\s)(?:від|от|from|over|above|more than|дорожче|дороже)\\s*${unit}`));
+    const min = t.match(new RegExp(`(?:^|\\s)(?<!не\\s)(?<!no\\s)(?<!not\\s)(?:від|от|from|over|above|more than|дорожче|дороже)\\s*${unit}`));
 
     const out = {};
     if (max) { const n = num(max[1]); if (n >= 300) out.max = n; }
@@ -6377,7 +6377,7 @@ function parseWish(text, data) {
     if (hasStem(list, ["знижк", "скидк", "акці", "акци", "розпродаж", "распродаж", "уцінк", "уценк", "sale", "discount", "clearance"])) wish.sale = true;
 
     // «Інші варіанти» — показати наступні.
-    if (hasStem(list, ["інші варіант", "ще варіант", "другие вариант", "еще вариант", "other option", "more option", "show more", "покажи ще", "покажіть ще", "більше варіант", "больше вариант", "more options", "more variants", "покажи еще", "покажите еще"]) || (list.length <= 2 && (list.includes("ще") || list.includes("еще") || list.includes("more")))) wish.more = true;
+    if (hasStem(list, ["інші варіант", "ще варіант", "другие вариант", "еще вариант", "other option", "more option", "show more", "покажи ще", "покажіть ще", "більше варіант", "больше вариант", "покажіть більше", "покажи більше", "покажите больше", "покажи больше", "ще покажіть", "еще покажите", "more options", "more variants", "покажи еще", "покажите еще"]) || (list.length <= 2 && (list.includes("ще") || list.includes("еще") || list.includes("more")))) wish.more = true;
 
     const wants = hasStem(list, ["гарненьк", "щось гарн", "щось красив", "щось стильн", "мені б", "мне бы", "что-то красив", "что-нибудь красив", "something nice", "something pretty", "шука", "ищу", "хочу", "хоті", "хотел", "підбер", "подбер", "підібр", "подобр", "порад", "посовет", "покаж", "что есть", "що є", "є ", "есть ", "looking", "want", "need", "recommend", "suggest", "show", "pick", "any "]);
 
@@ -6723,7 +6723,7 @@ function productFromPage(page, data) {
 }
 
 const ASK = {
-    colors: ["кольор", "колір", "колор", "цвет", "цвета", "color", "colour", "чорн", "черн", "біл", "бел", "black", "white", "інш колір", "другой цвет", "other color"],
+    colors: ["кольор", "колір", "колор", "цвет", "цвета", "color", "colour", "чорн", "черн", "білий", "біла", "білу", "біле", "білі", "білого", "білої", "білих", "бел", "black", "white", "інш колір", "другой цвет", "other color"],
     sizes: ["розмір", "розмер", "размер", "size", "сітк", "сетк", "маломір", "маломер", "великомір", "большемер"],
     stock: ["наявн", "наличи", "in stock", "available", "availability", "є в ", "є?", "есть в ", "залиш", "остал", "коли отрима", "когда получ", "when will i get", "скільки чека", "сколько жда", "how long will", "how long until", "how long does it take", "how long to get"],
     price: ["ціна", "ціну", "ціни", "скільки кошту", "вартість", "цена", "цену", "сколько стоит", "стоимость", "price", "cost", "how much"],
@@ -6948,7 +6948,8 @@ function botShouldStay(history) {
 // говорити повз. Лише за однозначними ознаками: «ы э ъ», суто російські
 // слова; для англійської — службові слова («the», «do you», «i want»),
 // бо сама назва бренду латиницею («Coach») — ще не англійська.
-const RU_WORDS = ["что", "как", "это", "есть", "нужно", "сколько", "где", "какие", "какой", "какая", "можно", "хочу купить", "подскажите", "здравствуйте", "спасибо", "пожалуйста", "привет", "часы", "очки", "кроссовки", "кошелек", "женская", "мужская", "женские", "мужские", "черная", "черную", "белую", "белая", "или", "еще", "уже", "нет", "да", "мне", "вас", "у вас", "доставка в", "оплата при"];
+// «Покажите больше вариантов» — без жодного з цих слів визначалось як укр.
+const RU_WORDS = ["покажите", "больше", "меньше", "вариантов", "варианты", "дешевле", "дороже", "нужна", "нужен", "ищу", "кошелёк", "черный", "черные", "белый", "красная", "синяя", "мужской", "женский", "мужу", "жене", "что", "как", "это", "есть", "нужно", "сколько", "где", "какие", "какой", "какая", "можно", "хочу купить", "подскажите", "здравствуйте", "спасибо", "пожалуйста", "привет", "часы", "очки", "кроссовки", "кошелек", "женская", "мужская", "женские", "мужские", "черная", "черную", "белую", "белая", "или", "еще", "уже", "нет", "да", "мне", "вас", "у вас", "доставка в", "оплата при"];
 const UK_WORDS = ["що", "як", "це", "є", "скільки", "де", "які", "який", "яка", "можна", "підкажіть", "вітаю", "дякую", "будь ласка", "привіт", "годинник", "окуляри", "кросівки", "гаманець", "жіноча", "чоловіча", "чорна", "чорну", "біла", "білу", "або", "ще", "вже", "ні", "так", "мені", "вас", "у вас"];
 const EN_WORDS = ["the", "do you", "i want", "i need", "i'm", "looking for", "how much", "is it", "are you", "can i", "have you", "what", "where", "when", "please", "thanks", "thank you", "hello", "hi", "for", "with", "and", "a", "an", "my", "your", "do", "have", "is", "are", "any"];
 
@@ -7164,9 +7165,10 @@ function botReply(message, history, data, options) {
             if (idx.length < 2) idx = [0, 1];
             return reply(T21[lang].compare + "\n" + idx.slice(0, 3).map(i => card(shownC[i], i + 1)).join("\n"), { chips: T13[lang].ordinals.slice(0, Math.min(shownC.length, 4)), intent: "product" });
         }
-        const other = hasStem(list, ["варіант", "вариант", "фото", "option", "photo", "picture"]);
-        const bigger = !other && hasStem(list, ["більша", "більшу", "більший", "побільше", "крупніш", "большая", "большую", "побольше", "крупнее", "bigger", "larger", "biggest", "largest"]);
-        const smaller = !other && hasStem(list, ["менша", "меншу", "менший", "поменше", "компактніш", "меньшая", "меньшую", "поменьше", "компактнее", "smaller", "smallest", "more compact"]);
+        // «Покажіть більше» — прохання ще, а не «яка більша?».
+        const other = hasStem(list, ["варіант", "вариант", "фото", "option", "photo", "picture", "покаж", "show", "дайте", "скиньте", "ще$", "еще$"]);
+        const bigger = !other && hasStem(list, ["більша", "більшу", "більший", "побільше", "крупніш", "большая", "большую", "побольше", "крупнее", "больше$", "більше$", "bigger", "larger", "biggest", "largest"]);
+        const smaller = !other && hasStem(list, ["менша", "меншу", "менший", "поменше", "компактніш", "меньшая", "меньшую", "поменьше", "компактнее", "меньше$", "менше$", "smaller", "smallest", "more compact"]);
         if (shownC.length >= 2 && (bigger || smaller) && !typesOf(text).length) {
             const sized = shownC.filter(p => bagArea(p) > 0).sort((a, b) => bagArea(b) - bagArea(a));
             if (!sized.length) return reply(T21[lang].noDims, { handoff: true, pause: false, intent: "product" });
@@ -7238,7 +7240,7 @@ function botReply(message, history, data, options) {
     if (!productFromPage(opts.page, data) && lastShownSlugs(history).length > 1
         && Object.keys(ASK).some(k => k !== "authentic" && k !== "discount" && hasStem(list, ASK[k]))
         && !hasStem(list, ["маломір", "маломер", "великомір", "большемер", "таблиц", "сітк", "сетк", "size chart", "size guide", "true to size"])
-        && !((parseWish(text, data) || {}).criteria)) {
+        && !((parseWish(text, data) || {}).criteria) && !((parseWish(text, data) || {}).more)) {
         const n = lastShownSlugs(history).length;
         const onlyPrice = hasStem(list, ASK.price || []) && !Object.keys(ASK).some(k => k !== "price" && hasStem(list, ASK[k]));
         if (onlyPrice) {

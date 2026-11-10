@@ -1268,5 +1268,45 @@ console.log("\n[28] Восьма проба: трансліт, бюджет сл
     check("«шопер … а4 і ноут» — сумки під ноутбук", /ноутбук 13″/.test(one("сумка шопер велика для роботи щоб вміщався а4 і ноут").text));
 }
 
+console.log("\n[29] Ті самі ходи англійською й російською; «біл» ≠ «більше» (10.11.2026)");
+{
+    const none = { text: "", products: [], intent: null };
+    const say = (lang, msgs) => {
+        const history = [];
+        let last = null;
+        msgs.forEach(m => {
+            last = bot.botReply(m, history, data, { lang, now: NOW, siteUrl: "https://bestbrnd4u.com" });
+            history.push({ author: "visitor", body: m });
+            if (last) history.push({ author: "bot", body: bot.serializeBotReply(last, last.lang || lang) });
+        });
+        return last || none;
+    };
+    const coach = items(say("uk", ["сумка coach"]));
+
+    check("en «bag no more than 6000» — under 6 000 ₴ (раніше «from 6 000»)", (r => /under 6 000 ₴/.test(r.text) && r.products.every(p => p.price <= 6000))(say("en", ["bag no more than 6000"])));
+    check("en «more than 6000» — як і раніше, from 6 000", /from 6 000 ₴/.test(say("en", ["bag more than 6000"]).text));
+    check("ru «а какая больше?» — найбільша з показаних", /^Самая большая из показанных/.test(say("ru", ["сумка коуч", "а какая больше?"]).text));
+    check("ru «а какая меньше?» — найменша з показаних", /^Самая маленькая из показанных/.test(say("ru", ["сумка коуч", "а какая меньше?"]).text));
+
+    // «Біл» (білий) збігалося з «більше» — «покажіть більше» ставало
+    // питанням про колір і отримувало «Про яку з них?».
+    const more = say("uk", ["сумка coach", "покажіть більше"]);
+    check("«покажіть більше» — наступні варіанти, а не «про яку з них?» чи «яка більша»",
+        /^Ще сумки Coach — 5–8/.test(more.text) && more.products.length > 0 && more.products.every(p => !coach.some(c => c.slug === p.slug)), more.text.slice(0, 40));
+    check("«а біла є?» про показані — як і раніше, питання про колір", say("uk", ["сумка coach", "а біла є?"]).products.length > 0 || /біл/i.test(say("uk", ["сумка coach", "а біла є?"]).text));
+    check("«більше фото» — як і раніше, менеджеру", say("uk", ["сумка coach", "більше фото"]).handoff);
+
+    // Мова повідомлення.
+    check("«покажите больше вариантов» на укр. сторінці — відповідь російською", bot.detectLang("покажите больше вариантов", "uk") === "ru");
+    check("«мужские часы», «кошелек женский» — російською", bot.detectLang("мужские часы", "uk") === "ru" && bot.detectLang("кошелек женский", "uk") === "ru");
+    check("«чорна сумка», «годинник чоловічий» — як і раніше, українською", bot.detectLang("чорна сумка", "uk") === "uk" && bot.detectLang("годинник чоловічий", "uk") === "uk");
+
+    // Ходи, перевірені українською, — і двома іншими мовами.
+    check("en «a bag, but not black» → «and not brown» — except brown and black", /except brown and black/.test(say("en", ["I want a bag, but not black", "and not brown"]).text));
+    check("ru «беру вторую» — як оформити саме її", say("ru", ["сумка коуч", "беру вторую"]).intent === "buy");
+    check("ru «когда черная пятница?» — плани акцій", /Планы акций/.test(say("ru", ["когда черная пятница?"]).text));
+    check("en «do you deliver to Lviv?» — any city in Ukraine", /any city in Ukraine/.test(say("en", ["do you deliver to Lviv?"]).text));
+}
+
 console.log(failures ? `\n✗ Провалено: ${failures}` : "\n✓ Усе зелено");
 process.exit(failures ? 1 : 0);
