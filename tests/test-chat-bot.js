@@ -1812,5 +1812,36 @@ console.log("\n[41] Коротко, як в Instagram: «інфо», «акту�
     check("«ок», «👍» — як і раніше, згода", off("ок").intent === "ack" && off("👍").intent === "ack");
 }
 
+console.log("\n[42] Незвичне введення: телефон — окреме число, розмітка не повертається (10.11.2026)");
+{
+    // Раніше в «1234567890123456789» знаходився «телефон 0123456789» —
+    // і бот ішов перевіряти замовлення з вигаданими цифрами.
+    check("довге число — не номер і телефон", bot.extractLookup("1234567890123456789") === null);
+    for (const [m, order, phone] of [["замовлення 8689484479 телефон 0671234567", "8689484479", "0671234567"], ["+380671234567 8689484479", "8689484479", "+380671234567"],
+        ["тел.0671234567, №8689484479", "8689484479", "0671234567"], ["(067) 123-45-67 8689484479", "8689484479", "0671234567"]]) {
+        const l = bot.extractLookup(m);
+        check(`«${m}» — як і раніше, номер ${order} і телефон`, !!l && l.orderNumber === order && l.phone === phone, JSON.stringify(l));
+    }
+
+    // Сторож: незвичне введення не ламає бота, а текст людини не
+    // повертається у відповідь сирою розміткою (Telegram — HTML).
+    const strange = ["<script>alert(1)</script> сумка", "<b>жирний</b>", "Моделі <img src=x onerror=alert(1)>", "Wayfarer<script>", "!!!!!!!!", "??????", "))))",
+        "{desc}", "${process.env}", "SELECT * FROM orders", "a".repeat(3000), "Добрий день! " + "шукаю сумку, ".repeat(150) + "чорна до 8000?"];
+    const bad = [];
+    for (const m of strange) {
+        const h = [{ author: "visitor", body: "Ray-Ban" }, { author: "bot", body: "Ось речі Ray-Ban 👇" }];
+        let r;
+        const t0 = Date.now();
+        try { r = bot.botReply(m, h, data, { lang: "uk", now: NOW }); } catch (e) { bad.push(`виняток на «${m.slice(0, 30)}»: ${e.message}`); continue; }
+        if (Date.now() - t0 > 1500) bad.push(`повільно (${Date.now() - t0} мс): «${m.slice(0, 30)}»`);
+        if (!r || !r.text) { bad.push(`порожньо: «${m.slice(0, 30)}»`); continue; }
+        if (/<script|<img|onerror|<b>/i.test(r.text)) bad.push(`розмітка у відповіді: «${m.slice(0, 30)}»`);
+        const tg = bot.botTelegramText(bot.serializeBotReply(r, "uk"), 1, s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"));
+        if (/<script|<img/i.test(tg)) bad.push(`розмітка в Telegram: «${m.slice(0, 30)}»`);
+        if (/\{[a-z]+\}|undefined|NaN/.test(r.text)) bad.push(`шаблон/undefined: «${m.slice(0, 30)}»`);
+    }
+    check(`сторож незвичного введення: ${strange.length} випадків без винятків, розмітки й «{…}»`, bad.length === 0, bad.join(" | "));
+}
+
 console.log(failures ? `\n✗ Провалено: ${failures}` : "\n✓ Усе зелено");
 process.exit(failures ? 1 : 0);
