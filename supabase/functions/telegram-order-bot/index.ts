@@ -5583,9 +5583,13 @@ function shownType(history, data) {
 }
 
 function lastShownSlugs(history) {
-    const last = (history || []).slice().reverse().find(m => m && m.author === BOT_AUTHOR && /\/p\//.test(String(m.body || "")));
+    // Підбірка — лише відповідь із КАРТКАМИ («• Назва — ціна посилання»).
+    // Відповідь про одну річ теж має посилання, але це не новий список:
+    // інакше після «а четверта поляризована?» «перша» ставала тією четвертою.
+    const isCard = l => /^•\s/.test(l) && /\/p\//.test(l);
+    const last = (history || []).slice().reverse().find(m => m && m.author === BOT_AUTHOR && String(m.body || "").split("\n").some(isCard));
     if (!last) return [];
-    return String(last.body).split("\n").map(l => (l.match(/\/p\/([^/\s?#]+)\//) || [])[1]).filter(Boolean)
+    return String(last.body).split("\n").filter(isCard).map(l => (l.match(/\/p\/([^/\s?#]+)\//) || [])[1]).filter(Boolean)
         .map(x => { try { return decodeURIComponent(x); } catch (e) { return x; } });
 }
 
@@ -6064,21 +6068,27 @@ const T30 = {
         sizeNo: "Розміру {size} у цієї моделі немає — є: {list}.", sizeElsewhere: "Розмір {size} є в «{title}»: {url}",
         fitYes: "За габаритами ({dims}) {thing} має влізти. Точно — з урахуванням форми — підкаже менеджер.",
         fitNo: "За габаритами ({dims}) {thing} не влізе.",
-        a4: "аркуш А4 (29,7 × 21 см)", laptop: "ноутбук 13″ (≈30,5 × 21,5 см)"
+        a4: "аркуш А4 (29,7 × 21 см)", laptop: "ноутбук 13″ (≈30,5 × 21,5 см)",
+        polarYes: "Так, у картці зазначено поляризовані лінзи.",
+        colorsAll: "Кольори показаних 👇"
     },
     en: {
         sizeYes: "Yes, size {size} is available.", sizeYesPre: "Size {size} is available to order.",
         sizeNo: "This model doesn't come in size {size} — available: {list}.", sizeElsewhere: "Size {size} is available in “{title}”: {url}",
         fitYes: "By its dimensions ({dims}) {thing} should fit. A manager can confirm, taking the shape into account.",
         fitNo: "By its dimensions ({dims}) {thing} won't fit.",
-        a4: "an A4 sheet (29.7 × 21 cm)", laptop: "a 13″ laptop (≈30.5 × 21.5 cm)"
+        a4: "an A4 sheet (29.7 × 21 cm)", laptop: "a 13″ laptop (≈30.5 × 21.5 cm)",
+        polarYes: "Yes, the card says the lenses are polarized.",
+        colorsAll: "Colours of the items above 👇"
     },
     ru: {
         sizeYes: "Да, размер {size} есть.", sizeYesPre: "Размер {size} есть под заказ.",
         sizeNo: "Размера {size} у этой модели нет — есть: {list}.", sizeElsewhere: "Размер {size} есть в «{title}»: {url}",
         fitYes: "По габаритам ({dims}) {thing} должен поместиться. Точно — с учетом формы — подскажет менеджер.",
         fitNo: "По габаритам ({dims}) {thing} не поместится.",
-        a4: "лист А4 (29,7 × 21 см)", laptop: "ноутбук 13″ (≈30,5 × 21,5 см)"
+        a4: "лист А4 (29,7 × 21 см)", laptop: "ноутбук 13″ (≈30,5 × 21,5 см)",
+        polarYes: "Да, в карточке указаны поляризованные линзы.",
+        colorsAll: "Цвета показанных 👇"
     }
 };
 
@@ -6591,7 +6601,7 @@ function matches(product, wish, now, relax) {
         if (wish.budget.min && price < wish.budget.min) return false;
     }
 
-    if (wish.sale && !(botPriceNow(product, now) < (product.oldPrice || product.price) )) return false;
+    if (wish.sale && !relax.sale && !(botPriceNow(product, now) < (product.oldPrice || product.price) )) return false;
     if (wish.fresh && !product.isNew) return false;
 
     // Виключені кольори: річ відпадає, лише якщо ВСІ її кольори виключені
@@ -6624,7 +6634,9 @@ function pickProducts(wish, data, now, offset) {
     const steps = wish.cheap
         // і стать: чоловікові на «а дешевше?» жіночий гаманець — не відповідь.
         ? [{}, { color: true }]
-        : [{}, { color: true }, { color: true, budget: true }, { color: true, budget: true, gender: true }];
+        // Знижку — раніше за стать: «чоловічі годинники зі знижкою», а знижок
+        // немає — краще чоловічі без знижки, ніж жіночі зі знижкою.
+        : [{}, { color: true }, { color: true, budget: true }, { color: true, budget: true, sale: true }, { color: true, budget: true, sale: true, gender: true }];
 
     for (let i = 0; i < steps.length; i++) {
         const found = products.filter(p => matches(p, wish, now, steps[i]));
@@ -6857,12 +6869,13 @@ function productFromPage(page, data) {
 
 const ASK = {
     colors: ["кольор", "колір", "колор", "цвет", "цвета", "color", "colour", "чорн", "черн", "білий", "біла", "білу", "біле", "білі", "білого", "білої", "білих", "бел", "black", "white", "інш колір", "другой цвет", "other color"],
-    sizes: ["розмір", "розмер", "размер", "size", "сітк", "сетк", "маломір", "маломер", "великомір", "большемер"],
+    sizes: ["розмір", "розмер", "размер", "size"],
     stock: ["наявн", "наличи", "in stock", "available", "availability", "є в ", "є?", "есть в ", "залиш", "остал", "коли отрима", "когда получ", "when will i get", "скільки чека", "сколько жда", "how long will", "how long until", "how long does it take", "how long to get"],
     price: ["ціна", "ціну", "ціни", "скільки кошту", "вартість", "цена", "цену", "сколько стоит", "стоимость", "price", "cost", "how much"],
     // «На цю сумку є знижка?» — про ціну ЦІЄЇ речі, а не пошук знижок.
     discount: ["знижк", "скидк", "акці", "акци", "розпродаж", "распродаж", "discount", "sale", "on sale"],
     material: ["матеріал", "материал", "шкір", "кожа", "кожан", "material", "leather", "з чого", "из чего", "made of", "склад", "состав"],
+    polar: ["поляриз", "polari"],
     fit: ["а4$", "a4$", "формат а4", "ноутбук", "ноут$", "laptop", "macbook", "макбук", "документи влізуть", "документы влезут"],
     dimensions: ["влазить", "влізе", "вміщ", "вмещ", "помещает", "поміщає", "місткіст", "вместим", "capacity", "how much fits", "габарит", "розміри сумк", "размеры сумк", "dimension", "заввишки", "завширшки", "высот", "ширин", "how big", "влізе", "влезет", "fit"],
     strap: ["ремін", "ремен", "ременя", "ручк", "ручка", "довжин", "длин", "strap", "handle", "length"],
@@ -7009,6 +7022,10 @@ function productAnswer(text, product, data, lang, now, site) {
         else missing = true;
     }
 
+    if (asked.includes("polar")) {
+        const hay = [product.title && product.title.uk, product.title && product.title.en, JSON.stringify(product.keywords || "")].join(" ");
+        if (/polari|поляриз/i.test(hay)) lines.push(T30[lang].polarYes); else missing = true;
+    }
     if (asked.includes("fit") && d.dimensions && d.dimensions.uk) {
         const nums = String(d.dimensions.uk).replace(/,/g, ".").match(/\d+(?:\.\d+)?/g);
         if (nums && nums.length >= 2) {
@@ -7474,6 +7491,9 @@ function botReply(message, history, data, options) {
             const q = productAnswer(text, picked, data, lang, now, site);
             const link = `\n${pageUrl(site, `/p/${picked.slug}/`, lang)}`;
             if (q && !q.handoff) return reply(q.text + link, { chips: [L.chips.human], intent: "product", focus: picked.slug });
+            // Конкретне питання, на яке в картці відповіді немає («друга
+            // поляризована?») — чесно «не вказано» і власнику, а не загальний опис.
+            if (q && q.handoff) return reply(q.text + link, { handoff: true, pause: false, intent: "product", focus: picked.slug });
             // Без конкретного питання («розкажіть про другу») — коротко все.
             const all = productAnswer("ціна наявність кольори розмір матеріал", picked, data, lang, now, site);
             if (all) return reply(all.text.replace(/\n[^\n]*(не вказано|isn't listed|не указано)[^\n]*$/, "") + link, { chips: [L.chips.human], intent: "product", focus: picked.slug });
@@ -7507,6 +7527,12 @@ function botReply(message, history, data, options) {
         && !((parseWish(text, data) || {}).criteria) && !((parseWish(text, data) || {}).more)) {
         const n = lastShownSlugs(history).length;
         const onlyPrice = hasStem(list, ASK.price || []) && !Object.keys(ASK).some(k => k !== "price" && hasStem(list, ASK[k]));
+        const onlyColors = hasStem(list, ["кольор", "колір", "цвет", "color", "colour"]) && !Object.keys(ASK).some(k => k !== "colors" && hasStem(list, ASK[k]));
+        if (onlyColors) {
+            const shownP = lastShownSlugs(history).map(slug => (data.products || []).find(p => p.slug === slug)).filter(Boolean).slice(0, 4);
+            const lines0 = shownP.map((p, i) => `${i + 1}. ${(p.title && (p.title[lang] || p.title.uk)) || p.slug} — ${(((p.details && p.details.variants) || []).map(v => colorName(v, lang)).filter(Boolean).join(", ")) || (p.colors || []).join(", ")}`);
+            if (lines0.length) return reply(T30[lang].colorsAll + "\n" + lines0.join("\n"), { chips: T13[lang].ordinals.slice(0, Math.min(shownP.length, 4)), intent: "product" });
+        }
         if (onlyPrice) {
             const prices = lastShownSlugs(history).map(slug => (data.products || []).find(p => p.slug === slug)).filter(Boolean).map(p => botPriceNow(p, now)).sort((a, b) => a - b);
             if (prices.length) return reply(fill(T20[lang].many, { min: botMoney(prices[0]), max: botMoney(prices[prices.length - 1]) }), { chips: T13[lang].ordinals.slice(0, Math.min(n, 4)), intent: "ask" });
@@ -7834,8 +7860,12 @@ function botReply(message, history, data, options) {
     // 3г. «Що краще, Coach чи Michael Kors?» — по дві моделі кожного.
     // Сказати «кращий» бот не може й не має: обидва оригінальні, вибір —
     // за смаком, тож показуємо поруч.
-    const both = findBrands(text, data);
-    if (both.length === 2 && hasStem(list, ["чи$", "або$", "или$", "or$", "vs$", "versus", "відрізня", "отлича", "різниц", "разниц", "difference", "differ", "порівня", "сравн", "compare", "краще", "лучше", "better"])) {
+    let both = findBrands(text, data);
+    if (both.length === 1 && hasStem(list, ["краща за", "кращий за", "краще за", "гірша за", "порівняно з", "чим вона", "чим він", "лучше чем", "хуже чем", "чем она", "чем он", "по сравнению", "better than", "worse than", "compared to", "vs$"])) {
+        const prevB = (history || []).filter(m => m && m.author === "visitor").slice(-CONTEXT_MESSAGES).reverse().map(m => (parseWish(m.body, data) || {}).brand).find(b => b && b !== both[0]);
+        if (prevB) both = [prevB, both[0]];
+    }
+    if (both.length === 2 && hasStem(list, ["краща за", "кращий за", "краще за", "чим вона", "чим він", "лучше чем", "чем она", "чем он", "better than", "compared to", "чи$", "або$", "или$", "or$", "vs$", "versus", "відрізня", "отлича", "різниц", "разниц", "difference", "differ", "порівня", "сравн", "compare", "краще", "лучше", "better"])) {
         const cw = parseWish(text, data) || {};
         if (!cw.type && both.every(b => (data.products || []).some(p => p.brand === b && p.department === "Сумки"))) cw.type = "bags";
         const pick2 = b => pickProducts(Object.assign({}, cw, { brand: b, models: undefined }), data, now, 0).items.slice(0, 2);

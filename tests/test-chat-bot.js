@@ -1754,5 +1754,45 @@ console.log("\n[39] Не зрозумів — власнику готові кл
     check("«чи є у вас примірочна?» — «магазин працює тільки з доставкою», а не «що шукаєте?»", /тільки з доставкою/.test(tg("чи є у вас примірочна?")[0].text));
 }
 
+console.log("\n[40] Довгі розмови: знижка раніше за стать, «краща за Coach», номер у підбірці (10.11.2026)");
+{
+    const chat = (lang, msgs) => {
+        const h = [];
+        let r = null;
+        for (const m of msgs) {
+            r = bot.botReply(m, h, data, { lang, now: NOW, siteUrl: "https://bestbrnd4u.com" });
+            h.push({ author: "visitor", body: m });
+            if (r) h.push({ author: "bot", body: bot.serializeBotReply(r, r.lang || lang) });
+        }
+        return r || { text: "", products: [] };
+    };
+
+    // «Подарунок мужу» → годинники → «а со скидкой?», а чоловічих зі знижкою
+    // немає: раніше — жіночі зі знижкою, тепер — чоловічі без знижки.
+    const menSale = data.products.some(p => p.category === "Годинники" && (p.gender || []).includes("Чоловікам") && bot.botPriceNow(p, NOW) < (p.oldPrice || p.price));
+    if (!menSale) {
+        const r = chat("ru", ["нужен подарок мужу", "часы", "а со скидкой?"]);
+        check("«мужские часы со скидкой», а таких немає — чоловічі без знижки, а не жіночі", r.products.length > 0
+            && items(r).every(p => !(p.gender || []).length || (p.gender || []).some(g => g !== "Жінкам")) && /Вот ближайшее — мужские часы/.test(r.text), r.text.slice(0, 80));
+    }
+    const vs = chat("uk", ["Jacquemus", "а чим вона краща за Coach?"]);
+    check("«Jacquemus» → «чим вона краща за Coach?» — по дві обох", /Jacquemus і Coach/.test(vs.text) && items(vs).some(p => p.brand === "Jacquemus") && items(vs).some(p => p.brand === "Coach"), vs.text.slice(0, 60));
+
+    // Номер у підбірці — лише серед карток: відповідь про одну річ із
+    // посиланням раніше ставала «новою підбіркою», і «перша» була нею.
+    const rb = items(chat("uk", ["Ray-Ban"]));
+    const after = chat("uk", ["Ray-Ban", "а четверта поляризована?", "розкажіть про першу"]);
+    check("після питання про четверту «розкажіть про першу» — саме перша з підбірки", rb.length >= 4 && after.text.includes(rb[0].title.uk), after.text.slice(0, 60));
+    const polar = rb.find(p => /polari|поляриз/i.test(p.title.uk + p.title.en + JSON.stringify(p.keywords)));
+    const notPolar = rb.find(p => !/polari|поляриз/i.test(p.title.uk + p.title.en + JSON.stringify(p.keywords)));
+    if (polar) check("«а N-та поляризована?» — «так, у картці зазначено»", /у картці зазначено поляризовані/.test(chat("uk", ["Ray-Ban", `а ${["перша", "друга", "третя", "четверта"][rb.indexOf(polar)]} поляризована?`]).text));
+    if (notPolar) check("не вказано в картці — «не вказано», власнику, а не загальний опис", (r => r.handoff && /не вказано/.test(r.text) && !/Ціна —/.test(r.text))(chat("uk", ["Ray-Ban", `а ${["перша", "друга", "третя", "четверта"][rb.indexOf(notPolar)]} поляризована?`])));
+
+    check("«маломірять?» після розмови про кросівки — таблиця розмірів, а не список розмірів",
+        /Таблиця розмірів/.test(chat("uk", ["кросівки", "скільки коштує перша?", "маломірять?"]).text));
+    const colors = chat("uk", ["жіночі гаманці", "а які є кольори?"]);
+    check("«а які є кольори?» після підбірки — кольори кожної, а не «про яку з них?»", /^Кольори показаних/.test(colors.text) && /\n1\. /.test(colors.text), colors.text.slice(0, 40));
+}
+
 console.log(failures ? `\n✗ Провалено: ${failures}` : "\n✓ Усе зелено");
 process.exit(failures ? 1 : 0);
