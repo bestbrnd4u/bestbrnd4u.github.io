@@ -1697,6 +1697,64 @@ console.log("\n[14] Повернувся на сайт — побачив, що 
             !/\n👤 \n/.test(chatClearReceipt("", 3)), JSON.stringify(chatClearReceipt("", 3)));
     }
 
+    console.log("\n[18] Опитування приносить надіслане раніше за відповідь на надсилання");
+    {
+        // На проді 10.11.2026: «0671234567» стояло в стрічці двічі. Бот
+        // перевіряв замовлення в базі, відповідь на chat-send ішла довше,
+        // і опитування встигало принести те саме повідомлення зі
+        // справжнім id — клієнт не знав, що це вже намальована бульбашка.
+        // pretendToBeVisual: без нього document.hidden === true, і
+        // модуль чесно не питає сховану вкладку — перегони не відтворяться
+        // (саме так перша версія цієї перевірки була зелена й на старому коді).
+        const dom2 = new JSDOM("<!doctype html><body></body>", { runScripts: "outside-only", pretendToBeVisual: true, url: "https://bestbrnd4u.com/catalog" });
+        const w = dom2.window;
+        if (!w.requestAnimationFrame) w.requestAnimationFrame = cb => w.setTimeout(cb, 0);
+        if (!w.matchMedia) w.matchMedia = () => ({ matches: false, addListener() {}, removeListener() {} });
+        w.localStorage.setItem("bb4u_chat_thread", "7a1c8a3e-5b4d-4e6f-9a0b-1c2d3e4f5a6b");
+        w.eval('var SUPABASE_URL = "https://example.test"; var SUPABASE_PUBLISHABLE_KEY = "test";');
+        w.setInterval = () => 1;
+        w.clearInterval = () => {};
+
+        const сказано = [];
+        let відпустити = null;
+        let опитувань = 0;
+        // Надіслане приходить з опитування з \r\n і пробілом наприкінці
+        // — так, як його збереже сервер, а не як набрала людина.
+        w.fetch = (url, opt) => {
+            const тіло = JSON.parse((opt && opt.body) || "{}");
+            сказано.push(тіло.site_action || "poll");
+            if (тіло.site_action === "chat-send") {
+                return new Promise(ok => { відпустити = () => ok({ json: () => Promise.resolve({ ok: true, id: 201, bot: { id: 202, author: "bot", body: "Не знайшов замовлення" } }) }); });
+            }
+            опитувань++;
+            // Лише поки надсилання висить: до нього повідомлення ще не існує.
+            const повідомлення = відпустити ? [{ id: 201, author: "visitor", body: "0671234567\nще рядок" }] : [];
+            return Promise.resolve({ json: () => Promise.resolve({ ok: true, messages: повідомлення, unseen: 0 }) });
+        };
+        w.eval(МОДУЛЬ);
+        await доки(w, () => опитувань >= 1);
+        const d2 = w.document;
+        d2.getElementById("dockChat").dispatchEvent(new w.Event("click", { bubbles: true }));
+        await доки(w, () => опитувань >= 2 || сказано.length >= 2);
+
+        d2.getElementById("chatInput").value = "0671234567\r\nще рядок ";
+        d2.getElementById("chatForm").dispatchEvent(new w.Event("submit", { bubbles: true, cancelable: true }));
+        await доки(w, () => !!відпустити);
+
+        // Поки сервер думає — опитування приносить те саме повідомлення.
+        const доОпитування = опитувань;
+        d2.dispatchEvent(new w.Event("visibilitychange"));
+        await доки(w, () => опитувань > доОпитування);
+        await new Promise(r => w.setTimeout(r, 30));
+        відпустити();
+        await доки(w, () => /Не знайшов замовлення/.test(d2.getElementById("chatLog").textContent));
+
+        const відвідувача = [...d2.querySelectorAll("#chatLog .chat-msg-visitor")].filter(e => /0671234567/.test(e.textContent));
+        check("надіслане людиною — одна бульбашка, хоч опитування встигло раніше", відвідувача.length === 1, String(відвідувача.length));
+        check("відповідь бота — теж одна", d2.querySelectorAll("#chatLog .chat-msg-bot:not(.chat-typing)").length === 1);
+        check("бульбашка не позначена як ненадіслана", !відвідувача.some(e => e.classList.contains("chat-msg-failed")));
+    }
+
     console.log(failures === 0 ? "\n✅ Усі перевірки пройдено" : `\n❌ Провалено: ${failures}`);
     process.exit(failures === 0 ? 0 : 1);
 
