@@ -958,5 +958,80 @@ console.log("\n[22] Друга й третя проба розмовами (10.1
     check("«😍» — подяка за комплімент", /приємно/.test(say("uk", ["😍"]).text));
 }
 
+console.log("\n[23] Четверта проба: заперечення, дві речі, порівняння (10.11.2026)");
+{
+    const none = { text: "", products: [], intent: null };
+    const say = (lang, msgs) => {
+        const history = [];
+        let last = null;
+        msgs.forEach(m => {
+            last = bot.botReply(m, history, data, { lang, now: NOW, siteUrl: "https://bestbrnd4u.com" });
+            history.push({ author: "visitor", body: m });
+            if (last) history.push({ author: "bot", body: bot.serializeBotReply(last, last.lang || lang) });
+        });
+        return last || none;
+    };
+    const allCol = (p, stem) => (p.colors || []).length && p.colors.every(c => String(c).toLowerCase().startsWith(stem));
+
+    // Раніше «тільки не чорну» → «Ось чорні сумки».
+    const notBlack = say("uk", ["хочу сумку, тільки не чорну"]);
+    check("«тільки не чорну» — «сумки, крім чорних», жодної суто чорної",
+        /сумки, крім чорних/.test(notBlack.text) && notBlack.products.length > 0 && items(notBlack).every(p => !allCol(p, "чорн")), notBlack.text.slice(0, 50));
+    const notBrown = say("uk", ["хочу сумку, тільки не чорну", "і не коричневу"]);
+    check("«і не коричневу» — виключення накопичуються", /крім коричневих і чорних/.test(notBrown.text)
+        && items(notBrown).every(p => !allCol(p, "чорн") && !allCol(p, "коричн")), notBrown.text.slice(0, 60));
+    check("en «a bag, not black» — без суто чорних", items(say("en", ["a bag, not black"])).every(p => !allCol(p, "чорн")));
+    check("«чорна сумка» — як і раніше, чорні", /^Ось чорні сумки/.test(say("uk", ["чорна сумка"]).text));
+
+    const pair = say("uk", ["шукаю сумку і гаманець в комплект"]);
+    check("«сумку і гаманець» — по дві кожного", /^Ось сумки і гаманці/.test(pair.text)
+        && items(pair).filter(p => p.department === "Сумки").length === 2 && items(pair).filter(p => p.category === "Гаманці").length === 2, pair.text.slice(0, 40));
+    const pairCoach = say("uk", ["шукаю сумку і гаманець в комплект", "Coach"]);
+    check("…«Coach» далі — сумки й гаманці Coach", pairCoach.products.length === 4 && items(pairCoach).every(p => p.brand === "Coach")
+        && items(pairCoach).some(p => p.category === "Гаманці") && items(pairCoach).some(p => p.department === "Сумки"), pairCoach.text.slice(0, 40));
+
+    const cmp2 = say("uk", ["сумка коуч", "яка різниця між першою і другою?"]);
+    check("«яка різниця між першою і другою?» — дві картки поруч із ціною", /^Порівняння/.test(cmp2.text) && /\n1\. «/.test(cmp2.text) && /\n2\. «/.test(cmp2.text) && /₴/.test(cmp2.text), cmp2.text.slice(0, 60));
+    const big = say("uk", ["сумка коуч", "а яка більша?"]);
+    const coachShown = items(say("uk", ["сумка коуч"]));
+    const area = p => { const d = String(p.details.dimensions.uk || "").replace(/,/g, ".").match(/\d+(?:\.\d+)?/g) || []; const [a, b] = d.map(Number).sort((x, y) => y - x); return (a || 0) * (b || 0); };
+    const biggest = coachShown.slice().sort((a, b) => area(b) - area(a))[0];
+    check("«а яка більша?» — найбільша з показаних за габаритами", biggest && big.text.includes(biggest.details.dimensions.uk), big.text.slice(0, 60));
+    check("«покажіть більше варіантів» — не «яка більша»", say("uk", ["сумка коуч", "покажіть більше варіантів"]).intent !== "product");
+
+    const calm = say("ru", ["нужна сумка для мамы", "без яркого цвета"]);
+    check("ru «без яркого цвета» — «спокойных цветов», а не «о какой из них?»", /спокойных цветов/.test(calm.text) && calm.products.length > 0, calm.text.slice(0, 50));
+    const plain = say("uk", ["сумка без логотипу"]);
+    // Перші чотири сумки й так бувають без логотипу — тож і заголовок має
+    // назвати фільтр, інакше перевірка зелена й без нього.
+    check("«без логотипу» — без Signature, монограми й фірмового канвасу", plain.products.length > 0 && /без фірмового принту/.test(plain.text)
+        && items(plain).every(p => !/signature|monogram/i.test(p.title.en) && !/^фірмов/i.test(p.details.material.uk)), plain.text.slice(0, 40));
+    const sport = say("en", ["men's watch under 10000", "something sporty"]);
+    check("en «something sporty» після годинників — спортивні моделі", /sporty watches/.test(sport.text) && items(sport).every(p => p.category === "Годинники"), sport.text.slice(0, 50));
+    check("«є хронограф?» — лише хронографи", (r => r.products.length > 0 && items(r).every(p => /chronograph|хронограф/i.test(p.title.en + " " + p.title.uk)))(say("uk", ["є хронограф?"])));
+
+    const gift = say("uk", ["подарунок чоловіку до 2000"]);
+    check("«подарунок чоловіку до 2000», а до 2000 нічого — чоловіче дорожче, а не жіноче",
+        gift.products.length > 0 && items(gift).every(p => !(p.gender || []).length || (p.gender || []).some(g => g === "Чоловікам" || g === "Унісекс")), gift.text.slice(0, 70));
+    check("«від 5000 до 8000» — так і в заголовку", /від 5 000 ₴ до 8 000 ₴/.test(say("uk", ["сумка Michael Kors від 5000 до 8000"]).text));
+    check("«годиннник жиночий» (зайва буква, «и») — жіночі годинники", /^Ось жіночі годинники/.test(say("uk", ["годиннник жиночий"]).text));
+    const tabby = say("en", ["Do you have the Coach Tabby?", "in black?"]);
+    check("en «Tabby» → «in black?» — чорні Tabby, а не все чорне Coach", /Tabby/.test(tabby.text) && items(tabby).every(p => /tabby/i.test(p.title.en)), tabby.text.slice(0, 50));
+    const howMuch = say("en", ["Do you have the Coach Tabby?", "how much?"]);
+    check("en «how much?» після підбірки — діапазон цін", /^Prices are on the cards above: from/.test(howMuch.text), howMuch.text.slice(0, 40));
+    check("en «can I pay on delivery?» — «Yes, you can pay on delivery»", /^Yes, you can pay on delivery/.test(say("en", ["can I pay on delivery?"]).text));
+    check("«скільки доставка і чи можна оплатити при отриманні?» — і далі дві відповіді",
+        say("uk", ["скільки доставка і чи можна оплатити при отриманні?"]).text.split("\n\n").length >= 2);
+    const stock = say("uk", ["є сумки в наявності, щоб сьогодні відправили?"]);
+    check("«в наявності, щоб сьогодні відправили» — без речей під замовлення", stock.products.length > 0 && items(stock).every(p => p.inStock && !p.preOrder) && /сумки в наявності/.test(stock.text), stock.text.slice(0, 40));
+    const bb = say("uk", ["покажи всі бренди сумок"]);
+    const bagBrands = [...new Set(data.products.filter(p => p.department === "Сумки").map(p => p.brand))];
+    check("«всі бренди сумок» — саме бренди сумок", /^Сумки: у наявності такі бренди/.test(bb.text) && bagBrands.every(b => bb.text.includes(b))
+        && data.products.filter(p => !bagBrands.includes(p.brand)).every(p => !bb.text.includes(p.brand)), bb.text.slice(0, 50));
+    check("«щось універсальне» після сумок — порада серед сумок", (r => /^Сумки: ось що радимо/.test(r.text))(say("uk", ["сумку хочу але не знаю яку", "щось універсальне"])));
+    const cheaperMen = say("uk", ["а гаманці чоловічі є?", "а дешевше?"]);
+    check("«а дешевше?» після чоловічих гаманців — без жіночих", items(cheaperMen).every(p => !(p.gender || []).length || !(p.gender || []).every(g => g === "Жінкам")));
+}
+
 console.log(failures ? `\n✗ Провалено: ${failures}` : "\n✓ Усе зелено");
 process.exit(failures ? 1 : 0);

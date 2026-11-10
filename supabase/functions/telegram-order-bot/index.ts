@@ -5456,9 +5456,19 @@ function describeWish(wish, lang) {
     if (wish.band === "metal") parts.push({ uk: "на металевому браслеті", en: "with a metal bracelet", ru: "на металлическом браслете" }[lang]);
     if (wish.size) parts.push(lang === "en" ? `size ${wish.size}` : `${wish.size} ${lang === "ru" ? "размера" : "розміру"}`);
     if (wish.sale) parts.push(D.sale);
-    if (wish.budget && wish.budget.max) parts.push(`${D.upTo} ${botMoney(wish.budget.max)}`);
+    if (wish.inStock) parts.push({ uk: "в наявності", en: "in stock", ru: "в наличии" }[lang]);
+    if (wish.noLogo) parts.push({ uk: "без фірмового принту", en: "without an all-over logo print", ru: "без фирменного принта" }[lang]);
+    if (wish.neutral) parts.push({ uk: "спокійних кольорів", en: "in neutral colours", ru: "спокойных цветов" }[lang]);
+    if (wish.budget && wish.budget.max && wish.budget.min) parts.push(`${D.from} ${botMoney(wish.budget.min)} ${D.upTo} ${botMoney(wish.budget.max)}`);
+    else if (wish.budget && wish.budget.max) parts.push(`${D.upTo} ${botMoney(wish.budget.max)}`);
     else if (wish.budget && wish.budget.min) parts.push(`${D.from} ${botMoney(wish.budget.min)}`);
-    return parts.join(" ");
+    let out = parts.join(" ");
+    if (wish.notColors && wish.notColors.length) {
+        const NOT = { uk: ["крім", "і"], en: ["except", "and"], ru: ["кроме", "и"] }[lang];
+        const names = wish.notColors.map(c => (COLOR_GEN[lang] || {})[c]).filter(Boolean);
+        if (names.length) out += `, ${NOT[0]} ${names.join(` ${NOT[1]} `)}`;
+    }
+    return out;
 }
 
 // Чого в магазині немає. Відповідь — «на жаль, штанів немає», і що є
@@ -5831,6 +5841,9 @@ function findOtherBrand(text, data) {
     return hit[0];
 }
 
+// Спокійна гама: чорний, білий, бежевий, сірий, коричневий, темно-синій…
+const NEUTRAL_RE = /^(чорн|біл|беж|сір|коричн|темно-коричн|айвор|тауп|темно-син|темно-сір|молоч|кремов|пудров|карамел|сіро|бежево|чорно|графіт|антрацит)/;
+
 // Бренди в наявності — від найбільшого вибору.
 function brandsInStock(data) {
     const counts = new Map();
@@ -5852,6 +5865,41 @@ const T20 = {
     ru: { one: "«{title}» стоит {price}.\n{url}", many: "Цены — на карточках выше: от {min} до {max}. О какой рассказать?" }
 };
 
+const T21 = {
+    uk: {
+        brandsOf: "{what}: у наявності такі бренди — {list}. Напишіть бренд — покажу 👇",
+        pair: "Ось {a} і {b}{brand} — по два варіанти 👇",
+        compare: "Порівняння 👇", bigger: "Найбільша з показаних — «{title}»: {dims}.\n{url}", smaller: "Найменша з показаних — «{title}»: {dims}.\n{url}",
+        noDims: "У картках цих речей немає габаритів, щоб порівняти, — передаю питання менеджеру."
+    },
+    en: {
+        brandsOf: "{what}: brands in stock — {list}. Write a brand and I'll show it 👇",
+        pair: "Here are {a} and {b}{brand} — two of each 👇",
+        compare: "Side by side 👇", bigger: "The biggest of these is “{title}”: {dims}.\n{url}", smaller: "The smallest of these is “{title}”: {dims}.\n{url}",
+        noDims: "These items have no dimensions in their cards to compare — I'm passing your question to a manager."
+    },
+    ru: {
+        brandsOf: "{what}: в наличии такие бренды — {list}. Напишите бренд — покажу 👇",
+        pair: "Вот {a} и {b}{brand} — по два варианта 👇",
+        compare: "Сравнение 👇", bigger: "Самая большая из показанных — «{title}»: {dims}.\n{url}", smaller: "Самая маленькая из показанных — «{title}»: {dims}.\n{url}",
+        noDims: "В карточках этих вещей нет габаритов, чтобы сравнить, — передаю вопрос менеджеру."
+    }
+};
+
+// Типи, названі в повідомленні: «сумку і гаманець в комплект».
+function typesOf(text) {
+    const list = words(text);
+    return [...new Set(TYPES.filter(t => hasStem(list, t.stems)).map(t => t.key))];
+}
+
+// Площа двох більших сторін із габаритів картки, см².
+function bagArea(p) {
+    const d = String((p.details && p.details.dimensions && p.details.dimensions.uk) || "").replace(/,/g, ".").match(/\d+(?:\.\d+)?/g);
+    if (!d || d.length < 2) return 0;
+    const [a, b] = d.map(Number).sort((x, y) => y - x);
+    return a * b;
+}
+
 const T17 = {
     uk: { noMore: "Це всі {desc} — {n} {variants}. Можу показати інший тип чи бренд 👇" },
     en: { noMore: "That's all the {desc} — {n} {variants}. I can show another type or brand 👇" },
@@ -5859,6 +5907,13 @@ const T17 = {
 };
 
 // Назви типів для фрази «Сумок Prada зараз немає».
+// «Крім чорних» — родовий множини.
+const COLOR_GEN = {
+    uk: { "Чорн": "чорних", "Біл": "білих", "Коричн": "коричневих", "Беж": "бежевих", "Сір": "сірих", "Рожев": "рожевих", "Син": "синіх", "Зелен": "зелених", "Золот": "золотистих", "Срібл": "сріблястих", "Червон": "червоних" },
+    en: { "Чорн": "black", "Біл": "white", "Коричн": "brown", "Беж": "beige", "Сір": "grey", "Рожев": "pink", "Син": "blue", "Зелен": "green", "Золот": "gold", "Срібл": "silver", "Червон": "red" },
+    ru: { "Чорн": "черных", "Біл": "белых", "Коричн": "коричневых", "Беж": "бежевых", "Сір": "серых", "Рожев": "розовых", "Син": "синих", "Зелен": "зеленых", "Золот": "золотистых", "Срібл": "серебристых", "Червон": "красных" }
+};
+
 const TYPE_WORDS = {
     uk: { bags: "Сумок", watches: "Годинників", glasses: "Окулярів", sneakers: "Кросівок", wallets: "Гаманців" },
     en: { bags: "bags", watches: "watches", glasses: "sunglasses", sneakers: "sneakers", wallets: "wallets" },
@@ -5883,6 +5938,8 @@ function normalizeText(text) {
         .replace(/ё/g, "е")
         .replace(/[«»"“”„.,!?;:()\[\]{}…•/\\|+*_=<>~^]/g, " ")
         .replace(/\s+/g, " ")
+        // «Годиннник», «сууумка» — три й більше однакових букв поспіль.
+        .replace(/(\p{L})\1{2,}/gu, "$1$1")
         .trim();
 }
 
@@ -5920,7 +5977,7 @@ const TYPES = [
 ];
 
 const GENDERS = [
-    { key: "Жінкам", stems: ["жін", "жен", "дівч", "девуш", "мам", "дружин", "жена", "жене", "сестр", "доньк", "дочк", "подруг", "подрузі", "подружці", "для подруги", "дружині", "мамі", "сестрі", "доньці", "для неї", "для нее", "woman", "women", "female", "lady", "ladies", "her$", "wife", "girl", "mom$", "mother"] },
+    { key: "Жінкам", stems: ["жін", "жен", "жиноч", "жинк", "дівч", "девуш", "мам", "дружин", "жена", "жене", "сестр", "доньк", "дочк", "подруг", "подрузі", "подружці", "для подруги", "дружині", "мамі", "сестрі", "доньці", "для неї", "для нее", "woman", "women", "female", "lady", "ladies", "her$", "wife", "girl", "mom$", "mother"] },
     { key: "Чоловікам", stems: ["чолов", "мужч", "мужск", "хлопц", "хлопець", "хлопчик", "парн", "парен", "тато", "тата", "татові", "татов", "папа", "папе", "папы", "папі", "муж", "сина", "сину", "синові", "синов", "сын", "брат", "другу$", "другові", "для друга", "чоловікові", "татові", "братові", "синові", "мужу", "для нього", "для него", "man$", "men$", "men's", "mens$", "male", "him$", "husband", "boyfriend", "dad$", "father", "guy$", "guys$"] }
 ];
 
@@ -6013,6 +6070,8 @@ const STYLES = [
     { key: "belt", stems: ["бананк", "поясн сумк", "поясна", "поясная", "belt bag", "fanny", "waist bag"], re: /belt bag|поясн|бананк|racer/i, name: { uk: "поясні сумки", en: "belt bags", ru: "поясные сумки" }, none: { uk: "поясних сумок", ru: "поясных сумок" } },
     { key: "bucket", stems: ["сумка-мішок", "мішок", "мешок", "bucket"], re: /bucket|мішок/i, name: { uk: "сумки-мішки", en: "bucket bags", ru: "сумки-мешки" }, none: { uk: "сумок-мішків", ru: "сумок-мешков" } },
     { key: "backpack", stems: ["рюкзак", "backpack"], re: /backpack|рюкзак/i, name: { uk: "рюкзаки", en: "backpacks", ru: "рюкзаки" }, none: { uk: "рюкзаків", ru: "рюкзаков" } },
+    { key: "chrono", type: "watches", stems: ["хронограф", "chronograph", "chrono$"], re: /chronograph|хронограф/i, name: { uk: "годинники-хронографи", en: "chronographs", ru: "часы-хронографы" }, none: { uk: "хронографів", ru: "хронографов" } },
+    { key: "sport", type: "watches", stems: ["спортивн", "для спорту", "для спорта", "sporty", "sport watch", "дайвер", "diver"], re: /chronograph|diver|sport|pr 100|хронограф|дайвер/i, name: { uk: "спортивні годинники", en: "sporty watches", ru: "спортивные часы" }, none: { uk: "спортивних годинників", ru: "спортивных часов" } },
     // У каталозі лише сонцезахисні окуляри — на «для зору» чесне «немає».
     { key: "optical", type: "glasses", stems: ["для зору", "для зрения", "діоптр", "диоптр", "оправи для", "оправа для", "оправу для", "для читання", "для чтения", "optical", "prescription", "eyeglasses", "reading glasses"], re: /optical|prescription|для зору|діоптр/i, name: { uk: "окуляри для зору", en: "prescription glasses", ru: "очки для зрения" }, none: { uk: "окулярів для зору", ru: "очков для зрения" } },
     // «Щоб влазив ноутбук» — з габаритів картки: 13-дюймовий ноутбук має
@@ -6121,8 +6180,27 @@ function parseWish(text, data) {
     const gender = GENDERS.filter(g => hasStem(list, g.stems.filter(s => !s.endsWith(" "))) || g.stems.some(s => s.endsWith(" ") && raw.includes(" " + s)));
     if (gender.length === 1) wish.gender = gender[0].key;
 
-    const color = COLORS.find(c => hasStem(list, c.stems));
+    // «Тільки не чорну», «без коричневого», «not black» — виключення, а не
+    // запит: раніше бот на «не чорну» показував саме чорні.
+    const NEG = ["не", "без", "крім", "окрім", "кроме", "not", "except"];
+    const negated = new Set();
+    const notColors = [];
+    list.forEach((w, i) => {
+        if (!NEG.includes(w) || i + 1 >= list.length) return;
+        const c = COLORS.find(x => hasStem([list[i + 1]], x.stems));
+        if (c) { notColors.push(c.key); negated.add(i + 1); }
+    });
+    if (notColors.length) wish.notColors = [...new Set(notColors)];
+    const colorList = list.filter((w, i) => !negated.has(i));
+    const color = COLORS.find(c => hasStem(colorList, c.stems) && !notColors.includes(c.key));
     if (color) wish.color = color.key;
+
+    // «Без яскравого кольору», «щось спокійне» — нейтральна гама.
+    if (hasStem(list, ["без яскрав", "неяскрав", "не яскрав", "спокійн", "нейтральн", "базового кольору", "базовий колір", "класичного кольору", "без ярк", "неярк", "не ярк", "спокойн", "нейтральн", "базового цвета", "neutral", "muted", "not bright", "no bright"])) wish.neutral = true;
+    // «Без логотипу», «однотонна» — без фірмового принту на всю сумку.
+    if (hasStem(list, ["без логотип", "без лого", "без принт", "без монограм", "однотонн", "без надпис", "no logo", "without logo", "plain", "без логотип", "без надпис"])) wish.noLogo = true;
+    // «Щоб сьогодні відправили», «в наявності» — без речей під замовлення.
+    if (hasStem(list, ["в наявност", "у наявност", "в наличи", "є в наявн", "in stock", "available now", "сьогодні відправ", "відправите сьогодні", "відправили сьогодні", "сегодня отправ", "отправите сегодня", "ship today"])) wish.inStock = true;
 
     const brands = [...new Set((data && data.products || []).map(p => p.brand).filter(Boolean))];
     const brand = brands.find(b => raw.includes(" " + normalizeText(b) + " ") || raw.includes(" " + normalizeText(b).split(" ")[0] + " ") && normalizeText(b).split(" ")[0].length > 4)
@@ -6139,7 +6217,7 @@ function parseWish(text, data) {
     // «Що порадите?», «що популярне?» — порада: хіти (позначка HOT від
     // власника), потім новинки, потім знижки. Відгуків поки немає, тож
     // «найпопулярніше» за продажами бот чесно не вигадує.
-    if (hasStem(list, ["що порад", "що б ви порад", "порадьте", "порадь", "порекоменд", "що популяр", "популярн", "хіт", "хит", "бестселер", "бестселлер", "что посовет", "посоветуйте", "что популяр", "recommend", "suggest something", "popular", "bestseller", "best seller", "trending", "what's hot"])) wish.recommend = true;
+    if (hasStem(list, ["що порад", "що б ви порад", "порадьте", "порадь", "порекоменд", "що популяр", "популярн", "хіт", "хит", "бестселер", "бестселлер", "что посовет", "посоветуйте", "что популяр", "recommend", "suggest something", "popular", "bestseller", "best seller", "trending", "what's hot", "універсальн", "на кожен день", "на щодень", "повсякденн", "на каждый день", "повседневн", "универсальн", "everyday", "versatile", "for every day"])) wish.recommend = true;
 
     // «Найдешевші сумки», «найдорожчі годинники», «преміум».
     if (hasStem(list, ["найдешевш", "найбюджетн", "самые дешев", "самый дешев", "cheapest"])) wish.cheap = true;
@@ -6181,7 +6259,7 @@ function parseWish(text, data) {
 
     const wants = hasStem(list, ["шука", "ищу", "хочу", "хоті", "хотел", "підбер", "подбер", "підібр", "подобр", "порад", "посовет", "покаж", "что есть", "що є", "є ", "есть ", "looking", "want", "need", "recommend", "suggest", "show", "pick", "any "]);
 
-    const criteria = ["type", "gender", "color", "brand", "budget", "models", "size", "material", "style", "band"].filter(k => wish[k]).length;
+    const criteria = ["type", "gender", "color", "brand", "budget", "models", "size", "material", "style", "band", "notColors", "neutral", "noLogo"].filter(k => wish[k]).length;
     if (wish.band && !wish.type) wish.type = "watches";
     // Фасон чи матеріал без типу — це про сумки (інших шкіряних
     // крос-боді в каталозі немає).
@@ -6271,6 +6349,19 @@ function matches(product, wish, now, relax) {
     if (wish.sale && !(botPriceNow(product, now) < (product.oldPrice || product.price) )) return false;
     if (wish.fresh && !product.isNew) return false;
 
+    // Виключені кольори: річ відпадає, лише якщо ВСІ її кольори виключені
+    // (у «Чорний / Бежевий» є бежевий варіант).
+    const cols = (product.colors || []).map(c => String(c).toLowerCase());
+    if (wish.notColors && wish.notColors.length && cols.length
+        && cols.every(c => wish.notColors.some(n => c.startsWith(n.toLowerCase())))) return false;
+    if (wish.neutral && cols.length && !cols.some(c => NEUTRAL_RE.test(c))) return false;
+    if (wish.noLogo) {
+        const m = String((product.details && product.details.material && product.details.material.uk) || "");
+        const hay = [product.title && product.title.uk, product.title && product.title.en, product.keywords].join(" ");
+        if (/^(фірмов|монограмн|жакард)/i.test(m.trim()) || /signature|monogram|монограм|логотип|logo|jacquard|жакард|\bgg\b|4g/i.test(hay)) return false;
+    }
+    if (wish.inStock && (!product.inStock || product.preOrder)) return false;
+
     return true;
 
 }
@@ -6285,8 +6376,9 @@ function pickProducts(wish, data, now, offset) {
     // «Дешевше» бюджет не послаблює: показати дорожче у відповідь на
     // «а дешевше є?» — гірше, ніж чесно сказати, що дешевшого немає.
     const steps = wish.cheap
-        ? [{}, { color: true }, { color: true, gender: true }]
-        : [{}, { color: true }, { color: true, gender: true }, { color: true, gender: true, budget: true }];
+        // і стать: чоловікові на «а дешевше?» жіночий гаманець — не відповідь.
+        ? [{}, { color: true }]
+        : [{}, { color: true }, { color: true, budget: true }, { color: true, budget: true, gender: true }];
 
     for (let i = 0; i < steps.length; i++) {
         const found = products.filter(p => matches(p, wish, now, steps[i]));
@@ -6322,12 +6414,14 @@ function mergeWishes(current, previous) {
         if (!prev) continue;
         if (current.all) break;
         if (current.type && prev.type && prev.type !== current.type) break;
-        ["type", "gender", "brand", "color", "budget", "size", "material", "style", "band", "fresh", "sale"].forEach(k => {
+        ["type", "gender", "brand", "color", "budget", "size", "material", "style", "band", "fresh", "sale", "neutral", "noLogo", "inStock"].forEach(k => {
             if (out[k] === undefined && prev[k] !== undefined) out[k] = prev[k];
         });
+        if (prev.notColors) out.notColors = [...new Set((out.notColors || []).concat(prev.notColors))].filter(c => c !== out.color);
+        if (out.models === undefined && prev.models && !current.type && !current.brand) out.models = prev.models;
     }
 
-    out.criteria = ["type", "gender", "color", "brand", "budget", "models", "size", "material", "style", "band"].filter(k => out[k]).length;
+    out.criteria = ["type", "gender", "color", "brand", "budget", "models", "size", "material", "style", "band", "notColors", "neutral", "noLogo"].filter(k => out[k]).length;
 
     return out;
 
@@ -6872,6 +6966,34 @@ function botReply(message, history, data, options) {
     if (own && own.missing) return reply(fill(L.handoff, { hours }), { handoff: true, pause: false, intent: "handoff" });
     if (own) return reply(own.text, { chips: [L.chips.human], intent: "owner" });
 
+    // 2а''. «Яка різниця між першою і другою?» — поруч ціна, матеріал,
+    // габарити з карток. «А яка більша / менша?» — з габаритів.
+    {
+        const shownC = lastShownSlugs(history).map(slug => (data.products || []).find(p => p.slug === slug)).filter(Boolean);
+        const ORD = [["перш", "перв", "first", "1$"], ["друг", "втор", "second", "2$"], ["трет", "third", "3$"], ["четверт", "fourth", "4$"]];
+        const card = (p, n) => {
+            const d = p.details || {};
+            const bits = [botMoney(botPriceNow(p, now))];
+            if (d.material && d.material[lang]) bits.push(d.material[lang]);
+            if (d.dimensions && d.dimensions[lang]) bits.push(d.dimensions[lang]);
+            return `${n}. «${(p.title && (p.title[lang] || p.title.uk)) || p.slug}» — ${bits.join("; ")}\n${pageUrl(site, `/p/${p.slug}/`, lang)}`;
+        };
+        if (shownC.length >= 2 && hasStem(list, ["різниц", "порівня", "відрізня", "отлича", "разниц", "сравн", "difference", "compare", "differ"])) {
+            let idx = ORD.map((st, i) => hasStem(list, st) ? i : -1).filter(i => i >= 0 && i < shownC.length);
+            if (idx.length < 2) idx = [0, 1];
+            return reply(T21[lang].compare + "\n" + idx.slice(0, 3).map(i => card(shownC[i], i + 1)).join("\n"), { chips: T13[lang].ordinals.slice(0, Math.min(shownC.length, 4)), intent: "product" });
+        }
+        const other = hasStem(list, ["варіант", "вариант", "фото", "option", "photo", "picture"]);
+        const bigger = !other && hasStem(list, ["більша", "більшу", "більший", "побільше", "крупніш", "большая", "большую", "побольше", "крупнее", "bigger", "larger", "biggest", "largest"]);
+        const smaller = !other && hasStem(list, ["менша", "меншу", "менший", "поменше", "компактніш", "меньшая", "меньшую", "поменьше", "компактнее", "smaller", "smallest", "more compact"]);
+        if (shownC.length >= 2 && (bigger || smaller) && !typesOf(text).length) {
+            const sized = shownC.filter(p => bagArea(p) > 0).sort((a, b) => bagArea(b) - bagArea(a));
+            if (!sized.length) return reply(T21[lang].noDims, { handoff: true, pause: false, intent: "product" });
+            const p = bigger ? sized[0] : sized[sized.length - 1];
+            return reply(fill(T21[lang][bigger ? "bigger" : "smaller"], { title: (p.title && (p.title[lang] || p.title.uk)) || p.slug, dims: p.details.dimensions[lang] || p.details.dimensions.uk, url: pageUrl(site, `/p/${p.slug}/`, lang) }), { chips: [L.chips.more[1]], intent: "product", focus: p.slug });
+        }
+    }
+
     // 2а'. «А друга якого кольору?», «скільки коштує перша?» — про товар
     // з ОСТАННЬОЇ підбірки бота, за номером. Відповідь — як на сторінці
     // цього товару, плюс посилання на нього.
@@ -6920,6 +7042,11 @@ function botReply(message, history, data, options) {
         && Object.keys(ASK).some(k => k !== "authentic" && k !== "discount" && hasStem(list, ASK[k]))
         && !((parseWish(text, data) || {}).criteria)) {
         const n = lastShownSlugs(history).length;
+        const onlyPrice = hasStem(list, ASK.price || []) && !Object.keys(ASK).some(k => k !== "price" && hasStem(list, ASK[k]));
+        if (onlyPrice) {
+            const prices = lastShownSlugs(history).map(slug => (data.products || []).find(p => p.slug === slug)).filter(Boolean).map(p => botPriceNow(p, now)).sort((a, b) => a - b);
+            if (prices.length) return reply(fill(T20[lang].many, { min: botMoney(prices[0]), max: botMoney(prices[prices.length - 1]) }), { chips: T13[lang].ordinals.slice(0, Math.min(n, 4)), intent: "ask" });
+        }
         return reply(fill(T13[lang].which, { n }), { chips: T13[lang].ordinals.slice(0, Math.min(n, 4)), intent: "ask" });
     }
 
@@ -6995,8 +7122,13 @@ function botReply(message, history, data, options) {
     if (!criteria && hasStem(list, ["передоплат", "предоплат", "prepay", "prepaid", "upfront", "аванс"])) {
         return reply(T18[lang].prepay + `\n${L.faqMore} ${pageUrl(site, "/delivery-payment", lang)}`, { chips: L.chips.menu.slice(0, 5), intent: "faq" });
     }
-    if (!criteria && hasStem(list, ["накладен", "наложен", "післяплат", "наложк", "налож", "cash on delivery", "cod$"]) && !hasStem(list, ["оглян", "огляд", "осмотр", "перевір", "inspect"])
-        && findTopics(text, (data.faq && data.faq[lang]) || []).length <= 1) {
+    if (!criteria && hasStem(list, ["накладен", "наложен", "післяплат", "наложк", "налож", "cash on delivery", "cod$", "pay on delivery", "payment on delivery", "pay upon delivery", "при отриманні", "при получении"]) && !hasStem(list, ["оглян", "огляд", "осмотр", "перевір", "inspect"])
+        // Інша тема поруч («скільки доставка і чи можна оплатити при
+        // отриманні?») — відповідаємо на всі питання нижче. Саму фразу
+        // про оплату при отриманні вирізаємо, щоб «delivery» в ній не
+        // рахувалась окремою темою.
+        && findTopics(String(text).replace(/pay(?:ment)?\s+(?:up)?on\s+delivery|on\s+delivery|при\s+отриманні|при\s+получении|накладен\S*|наложен\S*|післяплат\S*/gi, " "), (data.faq && data.faq[lang]) || [])
+            .filter(x => x.topic.key !== "payment").length === 0) {
         return reply(T18[lang].cod + `\n${L.faqMore} ${pageUrl(site, "/delivery-payment", lang)}`, { chips: L.chips.menu.slice(0, 5), intent: "faq" });
     }
 
@@ -7209,9 +7341,11 @@ function botReply(message, history, data, options) {
             chips: top.slice(0, 4), handoff: true, pause: false, intent: "other-brand"
         });
     }
-    if (hasStem(list, ["які бренди", "які у вас бренди", "які є бренди", "список брендів", "з люксу", "із люксу", "які марки", "какие бренды", "какие у вас бренды", "список брендов", "из люкса", "какие марки", "what brands", "which brands", "brands do you", "list of brands"])) {
-        const top = brandsInStock(data);
-        return reply(fill(T18[lang].brands, { list: top.join(", ") }), { chips: top.slice(0, 5), intent: "brands" });
+    if (hasStem(list, ["бренди$", "брендів$", "бренды$", "брендов$", "brands$", "марки$", "які бренди", "які у вас бренди", "які є бренди", "список брендів", "з люксу", "із люксу", "які марки", "какие бренды", "какие у вас бренды", "список брендов", "из люкса", "какие марки", "what brands", "which brands", "brands do you", "list of brands"])) {
+        const bt = (parseWish(text, data) || {}).type;
+        const top = brandsInStock(bt ? { products: (data.products || []).filter(p => matches(p, { type: bt }, now, {})) } : data);
+        const head = bt ? fill(T21[lang].brandsOf, { what: DESC[lang].type[bt].charAt(0).toUpperCase() + DESC[lang].type[bt].slice(1), list: top.join(", ") }) : fill(T18[lang].brands, { list: top.join(", ") });
+        return reply(head, { chips: top.slice(0, 5), intent: "brands" });
     }
 
     // 3д. Голе «скільки?» / «ціна?» після підбірки: одна річ — її ціна,
@@ -7269,6 +7403,21 @@ function botReply(message, history, data, options) {
     }
 
     if (wish) {
+        const curTypes = typesOf(text);
+        const lastVisitor = (history || []).filter(m => m && m.author === "visitor").slice(-1)[0];
+        const pairTypes = curTypes.length >= 2 ? curTypes
+            : (!curTypes.length && lastVisitor && typesOf(lastVisitor.body).length >= 2 ? typesOf(lastVisitor.body) : null);
+        if (pairTypes) {
+            const prevW = (history || []).filter(m => m && m.author === "visitor").slice(-CONTEXT_MESSAGES).reverse().map(m => parseWish(m.body, data)).filter(Boolean);
+            const base = Object.assign(mergeWishes(Object.assign({}, wish, { type: undefined }), prevW.map(w => Object.assign({}, w, { type: undefined }))), { type: undefined, more: false });
+            const two = pairTypes.slice(0, 2).flatMap(t => pickProducts(Object.assign({}, base, { type: t }), data, now, 0).items.slice(0, 2));
+            if (two.length) {
+                return reply(fill(T21[lang].pair, { a: DESC[lang].type[pairTypes[0]], b: DESC[lang].type[pairTypes[1]], brand: base.brand ? " " + base.brand : "" }), {
+                    products: two.map(p => ({ slug: p.slug, title: (p.title && (p.title[lang] || p.title.uk)) || p.slug, price: botPriceNow(p, now), url: pageUrl(site, `/p/${p.slug}/`, lang), preOrder: Boolean(p.preOrder || !p.inStock) })),
+                    chips: [L.chips.more[1]], intent: "products"
+                });
+            }
+        }
 
         // Попередні запити цієї розмови — щоб «до 5000» доповнило
         // «сумку», а не шукало все дешевше п'яти тисяч.
