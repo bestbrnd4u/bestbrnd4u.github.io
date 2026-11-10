@@ -858,5 +858,105 @@ console.log("\n[21] Цілі розмови (10.11.2026)");
     } else check("є бренд із 2–4 речами для перевірки «ще»", false);
 }
 
+console.log("\n[22] Друга й третя проба розмовами (10.11.2026)");
+{
+    const none = { text: "", products: [], intent: null };
+    const say = (lang, msgs, page) => {
+        const history = [];
+        let last = null;
+        msgs.forEach(m => {
+            last = bot.botReply(m, history, data, { lang, now: NOW, siteUrl: "https://bestbrnd4u.com", page: page || "" });
+            history.push({ author: "visitor", body: m });
+            if (last) history.push({ author: "bot", body: bot.serializeBotReply(last, last.lang || lang) });
+        });
+        return last || none;
+    };
+    const brands = new Set(data.products.map(p => p.brand.toLowerCase()));
+
+    // Бренди поза каталогом: чесно «немає» + байєр-сервіс, власник покликаний,
+    // бот не замовкає. Раніше — «Що саме шукаєте?» або чужі гаманці мовчки.
+    if (!brands.has("louis vuitton")) {
+        const lv = say("uk", ["у вас є Louis Vuitton?"]);
+        check("«є Louis Vuitton?» — «немає», байєр-сервіс, бренди в наявності, бот не замовк",
+            lv.intent === "other-brand" && /^Louis Vuitton у нас зараз немає/.test(lv.text) && /bayer-service/.test(lv.text)
+            && lv.handoff && lv.pause === false && data.products.some(p => lv.text.includes(p.brand)), lv.text.slice(0, 60));
+    }
+    if (!brands.has("guess")) {
+        const gw = say("uk", ["шукаю щось від Guess", "а гаманці Guess?"]);
+        check("«а гаманці Guess?» — гаманці інших брендів і прямо «Guess немає»",
+            /^Guess у нас зараз немає/.test(gw.text) && gw.products.length > 0 && items(gw).every(p => p.category === "Гаманці"), gw.text.slice(0, 60));
+    }
+    check("«найкращий годинник» — не Nike; «що є зараз зі знижкою?» — не Zara; «I guess the black one» — не Guess",
+        say("uk", ["найкращий годинник"]).intent === "products" && say("uk", ["що є зараз зі знижкою?"]).intent === "products"
+        && say("en", ["black Coach bag", "I guess the black one"]).intent !== "other-brand");
+    check("«а що є з люксу?» — перелік брендів у наявності", (r => r.intent === "brands" && data.products.every(p => r.text.includes(p.brand)))(say("uk", ["а що є з люксу?"])));
+
+    // Стать, якої в розділі немає зовсім.
+    const menSneakers = data.products.some(p => p.category === "Кросівки" && (p.gender || []).includes("Чоловікам"));
+    if (!menSneakers) {
+        const ms = say("ru", ["есть мужские кроссовки 43?"]);
+        check("ru «мужские кроссовки 43?» — «есть только женские — мужских кроссовок нет»", /только женские — мужских кроссовок нет/.test(ms.text), ms.text.slice(0, 70));
+    }
+    const s44 = say("uk", ["кросівки 39 розміру", "а 40?"]);
+    check("«а 40?» після кросівок — розмір, а не «не зрозумів»", s44.intent !== "unknown" && /40/.test(s44.text), s44.text.slice(0, 60));
+
+    // Сумка під ноутбук — за габаритами картки, не вигадкою.
+    const lap = say("uk", ["мені потрібна сумка на роботу", "щоб влазив ноутбук"]);
+    const fits = p => { const d = String(p.details.dimensions.uk || "").replace(/,/g, ".").match(/\d+(?:\.\d+)?/g).map(Number).sort((a, b) => b - a); return d[0] >= 31 && d[1] >= 22; };
+    check("«щоб влазив ноутбук» — лише сумки від 31 × 22 см", lap.products.length > 0 && items(lap).every(fits) && /31 × 22/.test(lap.text), lap.text.slice(0, 70));
+    const opt = say("uk", ["окуляри", "а оправи для зору?"]);
+    check("«оправи для зору?» — «Окулярів для зору зараз немає» і сонцезахисні", /^Окулярів для зору зараз немає/.test(opt.text) && items(opt).every(p => /Окуляри/.test(p.category)), opt.text.slice(0, 60));
+
+    // Довге уточнення: годинник згадано чотири репліки тому.
+    const strap = say("uk", ["хочу годинник", "жіночий", "золотий", "а сріблястий?", "а на шкіряному ремінці?"]);
+    check("«а на шкіряному ремінці?» через 4 репліки — годинники на ремінці, не «ременів немає»",
+        strap.intent === "products" && strap.products.length > 0 && items(strap).every(p => p.category === "Годинники" && /шкір/i.test(p.details.material.uk))
+        && /на шкіряному ремінці/.test(strap.text), strap.text.slice(0, 70));
+    check("«ремінців немає?» без годинника — як і раніше, «ременів немає»", say("uk", ["ремінців немає?"]).intent === "missing");
+    check("металевий браслет — без годинників на шкіряному ремінці",
+        items(say("uk", ["годинник з металевим браслетом"])).every(p => !/ремін/i.test(p.details.material.uk)));
+
+    // Пом'якшений запит: що саме не знайшлося і від дешевшого.
+    const relaxed = say("uk", ["а сумки зі знижкою?", "до 1000"]);
+    const rp = relaxed.products.map(p => p.price);
+    check("«до 1000» без збігів — «За запитом «сумки зі знижкою до 1 000 ₴» нічого немає», від найдешевшої",
+        /^За запитом «сумки зі знижкою до 1 000 ₴» зараз нічого немає/.test(relaxed.text) && rp.length > 1 && rp.every((x, i) => !i || rp[i - 1] <= x), relaxed.text.slice(0, 80));
+    check("«що у вас на розпродажі?» — речі зі знижкою", (r => r.products.length > 0 && items(r).every(p => bot.botPriceNow(p, NOW) < (p.oldPrice || p.price)))(say("uk", ["що у вас на розпродажі?"])));
+
+    // Оплата.
+    const pre = say("uk", ["а передоплата потрібна?"]);
+    check("«передоплата потрібна?» — «не обовʼязкова», без «Так.» на початку", /^Передоплата не обовʼязкова/.test(pre.text), pre.text.slice(0, 40));
+    check("«а накладений платіж?» — «Так, можна оплатити при отриманні»", /^Так, можна оплатити при отриманні/.test(say("uk", ["а накладений платіж?"]).text));
+
+    // Неправильні відповіді третьої проби.
+    check("«чому у вас так дешево?» — звідки речі, а не «Добре!»", (r => r.intent === "faq" && /офіційних/.test(r.text))(say("uk", ["чому у вас так дешево?"])));
+    check("«так» саме — і далі згода", say("uk", ["так"]).intent === "ack");
+    check("«якщо замовлю сьогодні, коли прийде?» — строки доставки, а не «де замовлення»",
+        (r => r.intent === "faq" && /1–2 робочих днів/.test(r.text) && !r.handoff)(say("uk", ["якщо замовлю сьогодні, коли прийде?"])));
+    check("«коли прийде моя посилка?» — як і раніше, стан замовлення", say("uk", ["коли прийде моя посилка?"]).intent === "status");
+    check("«можна доставку на завтра?» — строки, а не ціна доставки", /1–2 робочих днів/.test(say("uk", ["можна доставку на завтра?"]).text));
+    check("«а гарантія на годинник є?» — гарантія, а не підбірка", (r => r.intent === "faq" && /return-warranty/.test(r.text) && !r.products.length)(say("uk", ["а гарантія на годинник є?"])));
+    const loyal = say("uk", ["є знижка для постійних клієнтів?"]);
+    check("«знижка для постійних?» — менеджеру, без підбірки знижок", loyal.handoff && loyal.pause === false && !loyal.products.length && /постійних/.test(loyal.text));
+    check("«які знижки є?» — як і раніше, речі зі знижкою", say("uk", ["які знижки є?"]).products.length > 0);
+    const wrap = say("uk", ["подарункове пакування є?"]);
+    check("«подарункове пакування є?» — менеджеру, а не «для кого подарунок?»", wrap.handoff && /пакування/.test(wrap.text) && wrap.intent !== "ask");
+    check("«подарунок мамі» — як і раніше, жіночі речі", items(say("uk", ["подарунок мамі"])).every(p => (p.gender || []).includes("Жінкам") || !(p.gender || []).length));
+    const watchPage = "/p/" + data.products.find(p => p.category === "Годинники").slug + "/";
+    check("«який механізм?» на сторінці годинника — менеджеру", (r => r.handoff && /подробиць/.test(r.text))(say("uk", ["який механізм?"], watchPage)));
+    check("«хочу кварцовий годинник» поза сторінкою — підбірка, а не «подробиць немає»", say("uk", ["хочу кварцовий годинник"]).products.length > 0);
+    check("ru «а подешевле» — «дешевле», а не «не понял»", say("ru", ["сумка коач черная", "а подешевле"]).intent === "cheaper");
+    const howMuch = say("uk", ["Сумочка мішель корс", "скільки?"]);
+    check("«скільки?» після підбірки — «від … до …» і «про яку розповісти?»", /^Ціни — на картках вище: від .+ до .+\. Про яку/.test(howMuch.text), howMuch.text.slice(0, 60));
+    const b5 = say("uk", ["що подарувати мамі?", "бюджет 3000", "а 5000?"]);
+    check("«а 5000?» після бюджету — новий бюджет, жіночі речі до 5 000 ₴", /до 5 000 ₴/.test(b5.text) && b5.products.every(p => p.price <= 5000), b5.text.slice(0, 60));
+    check("«для себе, я хлопець» — чоловічі речі", /чоловічі/.test(say("uk", ["хочу щось стильне на кожен день", "для себе, я хлопець"]).text));
+    check("«працюєте сьогодні?» — графік", say("uk", ["працюєте сьогодні?"]).intent === "contacts");
+    check("«замовила вчора, ще не подзвонили» — менеджер звʼяжеться, передано", (r => r.handoff && /звʼяжеться/.test(r.text))(say("uk", ["замовила вчора, ще не подзвонили"])));
+    const match = say("ru", ["сумка коач черная", "а кошелек к ней?"]);
+    check("ru «а кошелек к ней?» — кошельки того ж бренду", match.products.length > 0 && items(match).every(p => p.brand === "Coach" && p.category === "Гаманці"), match.text.slice(0, 50));
+    check("«😍» — подяка за комплімент", /приємно/.test(say("uk", ["😍"]).text));
+}
+
 console.log(failures ? `\n✗ Провалено: ${failures}` : "\n✓ Усе зелено");
 process.exit(failures ? 1 : 0);
