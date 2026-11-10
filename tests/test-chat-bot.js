@@ -1679,5 +1679,80 @@ console.log("\n[36] Подарунок кому: стать за словом (1
     check("«подарунок бабусі» — жіночі речі одразу, а не «для кого?»", gran.intent === "products" && /жіночі/.test(gran.text), gran.text.slice(0, 40));
 }
 
+console.log("\n[37] Розмір і місткість зі сторінки товару (10.11.2026)");
+{
+    const on = (m, page, lang) => bot.botReply(m, [], data, { lang: lang || "uk", now: NOW, siteUrl: "https://bestbrnd4u.com", page }) || { text: "" };
+    const sizesOf = p => [...new Set(((p.details && p.details.variants) || []).flatMap(v => (v.sizes || []).map(x => String(x.size))))];
+    // Товар із розмірами-літерами, де бракує розміру, що є в іншої моделі того ж бренду й розділу.
+    const letter = data.products.find(p => sizesOf(p).length === 1 && /^[SML]$/.test(sizesOf(p)[0])
+        && data.products.some(q => q !== p && q.brand === p.brand && q.category === p.category && sizesOf(q).some(x => /^[SML]$/.test(x) && x !== sizesOf(p)[0])));
+    if (letter) {
+        const mine = sizesOf(letter)[0];
+        const other = data.products.find(q => q !== letter && q.brand === letter.brand && q.category === letter.category && sizesOf(q).some(x => /^[SML]$/.test(x) && x !== mine));
+        const want = sizesOf(other).find(x => /^[SML]$/.test(x) && x !== mine);
+        const r = on(`а розмір ${want} є?`, `/p/${letter.slug}/`);
+        check(`«а розмір ${want} є?» (є лише ${mine}) — прямо «немає» і де він є`,
+            new RegExp(`Розміру ${want} у цієї моделі немає — є: ${mine}`).test(r.text) && r.text.includes(`/p/${other.slug}/`), r.text.replace(/\n/g, " ").slice(0, 90));
+        check(`«а розмір ${mine} є?» — «так»`, new RegExp(`Так, розмір ${mine} є`).test(on(`а розмір ${mine} є?`, `/p/${letter.slug}/`).text));
+    }
+    const sneaker = data.products.find(p => p.category === "Кросівки" && sizesOf(p).length > 1);
+    const bare = on("а 45 є?", `/p/${sneaker.slug}/`);
+    check("«а 45 є?» на сторінці кросівок — про розмір (раніше «є в наявності»), розміри по порядку",
+        /^Розміру 45 у цієї моделі немає — є: /m.test(bare.text) && (l => l.join() === l.slice().sort((a, b) => a - b).join())((bare.text.match(/є: ([\d, ]+)/) || [, ""])[1].split(", ").map(Number)), bare.text.replace(/\n/g, " ").slice(0, 80));
+    check("«є?» саме — як і раніше, наявність", /в наявності|під замовлення/i.test(on("є?", `/p/${sneaker.slug}/`).text));
+
+    // «А4 влізе?» — з габаритів картки, а не просто габарити.
+    const dimsOf = p => (String((p.details && p.details.dimensions && p.details.dimensions.uk) || "").replace(/,/g, ".").match(/\d+(?:\.\d+)?/g) || []).map(Number).sort((a, b) => b - a);
+    const small = data.products.find(p => p.department === "Сумки" && dimsOf(p).length >= 2 && dimsOf(p)[0] < 30);
+    const big = data.products.find(p => p.department === "Сумки" && dimsOf(p).length >= 2 && dimsOf(p)[0] >= 31 && dimsOf(p)[1] >= 22);
+    check("«а А4 влізе?» у маленькій — «не влізе»", /аркуш А4 \(29,7 × 21 см\) не влізе/.test(on("а А4 влізе?", `/p/${small.slug}/`).text));
+    check("«ноутбук влізе?» у великій — «має влізти», з застереженням", /ноутбук 13″[^.]*має влізти\. Точно/.test(on("ноутбук влізе?", `/p/${big.slug}/`).text));
+    check("«скільки влазить?» — габарити, а не «не зрозумів»", /Розміри: /.test(on("скільки влазить?", `/p/${small.slug}/`).text));
+
+    check("«шопер розмір S» у пошуку — лише з розміром S", (r => r.products.length > 0 && items(r).every(p => sizesOf(p).includes("S")))(bot.botReply("шопер розмір S", [], data, { lang: "uk", now: NOW })));
+    check("«підійдуть на широке обличчя?» — порада менеджера й окуляри", (r => r.handoff && r.products.length > 0)(on("підійдуть на широке обличчя?", "/p/" + data.products.find(p => /Окуляри/.test(p.category)).slug + "/")));
+}
+
+console.log("\n[38] Після оформлення: «що далі?», «оплатила, а статус не змінився» (10.11.2026)");
+{
+    const one = (m, lang) => bot.botReply(m, [], data, { lang: lang || "uk", now: NOW, siteUrl: "https://bestbrnd4u.com" }) || { text: "" };
+    // Раніше — «не зрозумів» і дзвінок власнику.
+    for (const [m, lang, re] of [["оформила, що далі?", "uk", /^Дякуємо за замовлення!/], ["оформила замовлення", "uk", /^Дякуємо за замовлення!/], ["оформила заказ, что дальше?", "ru", /^Спасибо за заказ!/], ["I placed an order, what happens next?", "en", /^Thank you for your order!/]]) {
+        const r = one(m, lang);
+        check(`«${m}» — що буде далі (підтвердження, 1–2 дні, Нова пошта), без дзвінка`, re.test(r.text) && /order-status/.test(r.text) && !r.handoff, r.text.slice(0, 40));
+    }
+    const paid = one("оплатила карткою, а статус не змінився");
+    check("«оплатила, а статус не змінився» — власнику (раніше — довідка про оплату карткою)", paid.handoff && /Оплату перевіряє менеджер/.test(paid.text), paid.text.slice(0, 40));
+    check("«замовила чорну сумку, де вона?» — про замовлення, а не підбірка чорних сумок", (r => r.intent === "status" && !r.products.length)(one("замовила чорну сумку, де вона?")));
+    // Що вже працювало — так і лишилось.
+    check("«оформила, коли зателефонуєте?» — як і раніше, «менеджер звʼяжеться»", /звʼяжеться/.test(one("Я оформила замовлення, коли зателефонуєте?").text));
+    check("«хочу скасувати, оформила вчора» — як і раніше, скасування", /Скасувати/.test(one("хочу скасувати, оформила вчора").text));
+    check("номер і телефон після «оформила» — як і раніше, перевірка", one("оформила замовлення 8689484479 телефон 0671234567").intent === "lookup");
+    check("«підтвердження не прийшло» — як і раніше, перевірка стану й власник", (r => r.intent === "status" && r.handoff)(one("я оформив замовлення, а підтвердження не прийшло")));
+}
+
+console.log("\n[39] Не зрозумів — власнику готові ключові слова; «примірочна» (10.11.2026)");
+{
+    const tg = (m, lang) => {
+        const r = bot.botReply(m, [], data, { lang: lang || "uk", now: NOW, siteUrl: "https://bestbrnd4u.com" });
+        return [r, bot.botTelegramText(bot.serializeBotReply(r, lang || "uk"), 1, s => s)];
+    };
+    const [r1, t1] = tg("а можна зробити гравіювання ініціалів?");
+    check("не зрозумів — у Telegram «🔑 Ключові слова для автовідповіді: «гравіюван», «ініціал»»",
+        r1.intent === "unknown" && /🔑 Ключові слова для автовідповіді: «гравіюван», «ініціал»/.test(t1), t1.split("\n").pop());
+    check("службові слова й дієслова («можна», «зробити») — не ключові", !/«можна»|«зроби/.test(t1));
+    const [, t2] = tg("do you offer engraving?", "en");
+    check("англійською — «engravi», без «offer»", /«engravi»/.test(t2) && !/«offer»/.test(t2), t2.split("\n").pop());
+    // Ключові слова — саме ті основи, які адмінка розуміє: автовідповідь із
+    // ними справді спрацьовує на те саме питання.
+    const keys = (t1.match(/🔑[^:]*: (.+)$/m) || [, ""])[1].split(", ").map(k => k.replace(/[«»]/g, ""));
+    const taught = Object.assign({}, data, { answers: [{ keywords: keys, answer: { uk: "Гравіювання не робимо.", en: "", ru: "" }, link: "" }] });
+    check("автовідповідь із запропонованими словами відповідає на те саме питання",
+        bot.botReply("а можна зробити гравіювання ініціалів?", [], taught, { lang: "uk", now: NOW }).text === "Гравіювання не робимо.");
+    const [r3, t3] = tg("сумка");
+    check("звичайна відповідь — без ключових слів", !/🔑/.test(t3) && !/\[\[keys/.test(bot.serializeBotReply(r3, "uk")));
+    check("«чи є у вас примірочна?» — «магазин працює тільки з доставкою», а не «що шукаєте?»", /тільки з доставкою/.test(tg("чи є у вас примірочна?")[0].text));
+}
+
 console.log(failures ? `\n✗ Провалено: ${failures}` : "\n✓ Усе зелено");
 process.exit(failures ? 1 : 0);
