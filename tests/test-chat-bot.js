@@ -1033,5 +1033,73 @@ console.log("\n[23] Четверта проба: заперечення, дві 
     check("«а дешевше?» після чоловічих гаманців — без жіночих", items(cheaperMen).every(p => !(p.gender || []).length || !(p.gender || []).every(g => g === "Жінкам")));
 }
 
+console.log("\n[24] П'ята проба: купити показане, ціни словами, розміри (10.11.2026)");
+{
+    const none = { text: "", products: [], intent: null };
+    const say = (lang, msgs, page) => {
+        const history = [];
+        let last = null;
+        msgs.forEach(m => {
+            last = bot.botReply(m, history, data, { lang, now: NOW, siteUrl: "https://bestbrnd4u.com", page: page || "" });
+            history.push({ author: "visitor", body: m });
+            if (last) history.push({ author: "bot", body: bot.serializeBotReply(last, last.lang || lang) });
+        });
+        return last || none;
+    };
+    const coach = items(say("uk", ["сумка coach"]));
+
+    // Раніше «беру другу» — опис товару, а людина вже вирішила.
+    const buy = say("uk", ["сумка coach", "беру другу"]);
+    check("«беру другу» — як оформити саме її, з посиланням", buy.intent === "buy" && /^Чудовий вибір/.test(buy.text)
+        && buy.text.includes(`/p/${coach[1].slug}/`) && /Купити/.test(buy.text), buy.text.slice(0, 50));
+    check("«хочу купити першу» — те саме про першу", (r => r.intent === "buy" && r.text.includes(`/p/${coach[0].slug}/`))(say("uk", ["сумка coach", "хочу купити першу"])));
+    const watchPage = "/p/" + data.products.find(p => p.category === "Годинники").slug + "/";
+    check("«беру» на сторінці товару — про цей товар", (r => r.intent === "buy" && r.text.includes(watchPage))(say("uk", ["беру"], watchPage)));
+    check("«хочу купити сумку» — і далі підбір, а не «чудовий вибір»", say("uk", ["хочу купити сумку"]).intent === "products");
+    check("«беру, як замовити?» після кількох — інструкція оформлення", say("uk", ["сумка coach", "беру, як замовити?"]).intent === "how-to-order");
+    check("«беру» після однієї показаної — як оформити саме її", say("uk", ["а гаманці чоловічі є?", "до 5000", "беру"]).intent === (say("uk", ["а гаманці чоловічі є?", "до 5000"]).products.length === 1 ? "buy" : "ask"));
+    const hold = say("uk", ["сумка coach", "відкладіть першу до завтра"]);
+    check("«відкладіть першу» — власнику, з назвою речі, бот не замовк",
+        hold.handoff && hold.pause === false && hold.text.includes(`/p/${coach[0].slug}/`), hold.text.slice(0, 50));
+
+    // Ціни словами й валюта.
+    const range = say("uk", ["годинник за 10-12 тисяч"]);
+    check("«за 10-12 тисяч» — від 10 000 до 12 000 ₴ (а не «від 10 ₴»)", /від 10 000 ₴ до 12 000 ₴/.test(range.text)
+        && range.products.every(p => p.price >= 10000 && p.price <= 12000), range.text.slice(0, 50));
+    check("«до 200 доларів» — ціни в гривнях, курс не вигадує", (r => /^Ціни в нас у гривнях/.test(r.text) && !/\$|курс/.test(r.text.split("\n")[0].replace("(₴)", "")))(say("uk", ["сумка до 200 доларів"])));
+    check("en «bag under $300» — prices are in hryvnias", /^Our prices are in hryvnias/.test(say("en", ["bag under $300"]).text));
+    check("«сумка до 8к» — як і раніше, до 8 000 ₴", /до 8 000 ₴/.test(say("uk", ["сумка до 8к"]).text));
+
+    // Розміри.
+    const sizes = [...new Set(data.products.filter(p => p.category === "Кросівки").flatMap(p => (p.details.variants || []).flatMap(v => (v.sizes || []).map(x => String(x.size)))))];
+    if (!sizes.some(x => /\.5$/.test(x))) {
+        const half = say("uk", ["кросівки 38.5"]);
+        check("«кросівки 38.5» — «Розміру 38,5 немає», а не мовчки 38-й", /^Розміру 38,5 зараз немає/.test(half.text) && !half.products.length, half.text.slice(0, 50));
+    }
+    check("«маломірять?» після кросівок — таблиця розмірів, а не «про яку з них?»", /Таблиця розмірів/.test(say("uk", ["кросівки 37", "маломірять?"]).text));
+    const us = say("en", ["sneakers size 8 US"]);
+    check("en «size 8 US» — розміри EU лише кросівок", /European \(EU\): 3\d/.test(us.text) && !/5[0-9]/.test(us.text.split("\n")[0]), us.text.slice(0, 70));
+
+    // Довге повідомлення з кількома побажаннями.
+    const long = say("uk", ["Добрий день! Хотіла б придбати сумочку для себе, щось не дуже велике, бажано світле, до 7 тисяч. Дякую!"]);
+    check("довге повідомлення — жіночі, маленькі, світлі, до 7 000 ₴", /жіночі маленькі сумки світлих кольорів до 7 000 ₴/.test(long.text)
+        && long.products.every(p => p.price <= 7000), long.text.slice(0, 80));
+
+    // Неправильні відповіді.
+    const olx = say("uk", ["а у вас реально оригінал? бо на олх такі самі дешевше"]);
+    check("«оригінал? на олх дешевше» — про оригінальність, а не «дешевше»", olx.intent === "faq" && /оригінальні/.test(olx.text) && !olx.products.length, olx.text.slice(0, 40));
+    check("«а дешевше є?» — як і раніше, дешевше", say("uk", ["сумка coach", "а дешевше є?"]).intent === "cheaper");
+    check("ru «сколько стоит доставка и сколько ехать?» — обидві відповіді", say("ru", ["сколько стоит доставка в Киев и сколько ехать?"]).text.split("\n\n").length >= 2);
+    check("«не сподобається колір?» — повернення", /14 днів/.test(say("uk", ["а якщо мені не сподобається колір в житті?"]).text));
+    check("«скинь фото на вайбер 067…» — фото на цей номер", /надішле фото/.test(say("uk", ["скинь фото на вайбер 0671234567"]).text));
+    check("«передзвоніть 067…» — як і раніше, передзвонить", /передзвонить/.test(say("uk", ["передзвоніть мені 0671234567"]).text));
+
+    // Посилання на товар у повідомленні — як зі сторінки товару.
+    const linked = data.products.find(p => p.inStock && !p.preOrder);
+    const viaLink = say("uk", [`https://bestbrnd4u.com/p/${linked.slug}/ ця є?`]);
+    check("посилання на товар + «ця є?» — наявність саме цієї", viaLink.intent === "product" && /Є в наявності/.test(viaLink.text), viaLink.text.slice(0, 50));
+    check("на сторінці товару «розкажіть про цю» — коротко все з картки", (r => r.intent === "product" && /Ціна/.test(r.text) && !/не вказано/.test(r.text))(say("uk", ["розкажіть про цю"], "/p/" + linked.slug + "/")));
+}
+
 console.log(failures ? `\n✗ Провалено: ${failures}` : "\n✓ Усе зелено");
 process.exit(failures ? 1 : 0);
