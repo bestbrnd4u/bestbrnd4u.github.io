@@ -1958,7 +1958,25 @@ export function botReply(message, history, data, options) {
         if (out.pause === undefined) out.pause = out.handoff;
         if (out.handoff && late && !out.text.includes(late.trim())) out.text += late;
         if (greet && out.intent !== "hello" && !out.text.startsWith(greet)) out.text = `${greet}! ${out.text}`;
+        if (out.handoff) out.summary = ownerSummary(out);
         return out;
+    };
+    // «🔎 Шукає: чорні жіночі сумки Coach до 8 000 ₴ · 👀 Дивиться: «…»» —
+    // завжди українською: це для власника, а не для покупця.
+    const ownerSummary = out => {
+        try {
+            const visitorMsgs = (history || []).filter(m => m && m.author === "visitor").slice(-CONTEXT_MESSAGES).reverse().map(m => parseWish(m.body, data)).filter(Boolean);
+            const merged = mergeWishes(parseWish(text, data) || { criteria: 0 }, visitorMsgs);
+            // «Дайте знижку» — прохання, а не пошук акційних речей.
+            if (merged.sale && !visitorMsgs.some(w => w.sale)) merged.sale = undefined;
+            const parts = [];
+            if (merged.criteria) parts.push("🔎 Шукає: " + describeWish(Object.assign({}, merged, { more: false }), "uk"));
+            const slug = (productFromPage(opts.page, data) || {}).slug || out.focus || lastFocus(history);
+            const p = slug && (data.products || []).find(x => x.slug === slug);
+            if (p) parts.push(`👀 Дивиться: «${(p.title && p.title.uk) || p.slug}» — ${botMoney(botPriceNow(p, now))}`);
+            if (lang !== "uk") parts.push(`🌐 Пише ${lang === "en" ? "англійською" : "російською"}`);
+            return parts.join(" · ");
+        } catch (e) { return ""; }
     };
 
     // 0. «Ти людина?», «ви бот?» — питання ПРО бота. Перевіряємо раніше за
@@ -2747,6 +2765,8 @@ export function serializeBotReply(reply, lang) {
     else if (reply.handoff) lines.push("[[notify]]");
     // Про яку річ щойно говорили — щоб «а розміри?» далі стосувалось її.
     if (reply.focus) lines.push(`[[focus: ${reply.focus}]]`);
+    // Підсумок для власника (див. ownerSummary) — клієнт службові рядки не показує.
+    if (reply.summary) lines.push(`[[summary: ${String(reply.summary).replace(/\]\]/g, "] ]").replace(/\n/g, " ")}]]`);
     // Бот не зрозумів — власнику підказка «навчіть бота».
     if (reply.intent === "unknown") lines.push("[[unknown]]");
     return lines.join("\n");
@@ -2758,9 +2778,11 @@ export function botTelegramText(body, threadNo, escape) {
     const clean = String(body || "").split("\n").filter(l => !/^\[\[.*\]\]$/.test(l.trim())).join("\n");
     const handoff = /\[\[handoff\]\]/.test(String(body || ""));
     const notify = /\[\[notify\]\]/.test(String(body || ""));
+    const summary = (String(body || "").match(/^\[\[summary: (.*)\]\]$/m) || [])[1];
     return `🤖 <b>Бот відповів</b>${threadNo ? ` · розмова #${threadNo}` : ""}\n\n${esc(clean)}`
         + (handoff ? "\n\n⚠️ <b>Бот передав розмову вам</b> — відповідайте реплаєм на повідомлення покупця." : "")
         + (notify ? "\n\n⚠️ <b>Потрібна ваша відповідь</b> — бот і далі відповідає в розмові, поки ви не напишете." : "")
+        + (summary && (handoff || notify) ? `\n${esc(summary)}` : "")
         // Питання, якого бот не знає, — найкращий матеріал, щоб його
         // навчити: власник бачить його саме тут.
         + (/\[\[unknown\]\]/.test(String(body || "")) ? "\n💡 Щоб бот відповідав на таке сам — адмінка → «Автовідповіді бота в чаті»." : "");

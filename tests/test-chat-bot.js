@@ -1152,5 +1152,40 @@ console.log("\n[25] Шоста проба: суржик, повтори, мод�
     check("«доставляєте в Польщу?» — як і раніше, менеджеру", say("uk", ["доставляєте в Польщу?"]).handoff === true);
 }
 
+console.log("\n[26] Підсумок для власника в Telegram (10.11.2026)");
+{
+    const run = (lang, msgs, page) => {
+        const history = [];
+        let last = null;
+        msgs.forEach(m => {
+            last = bot.botReply(m, history, data, { lang, now: NOW, siteUrl: "https://bestbrnd4u.com", page: page || "" });
+            history.push({ author: "visitor", body: m });
+            if (last) history.push({ author: "bot", body: bot.serializeBotReply(last, last.lang || lang) });
+        });
+        return last;
+    };
+    const tg = r => bot.botTelegramText(bot.serializeBotReply(r, r.lang), 5, s => s);
+
+    // Бот кличе власника — у Telegram одразу видно, що людина шукала.
+    const bargain = tg(run("uk", ["чорна жіноча сумка Coach до 8000", "дайте знижку"]));
+    check("торг після підбірки — «🔎 Шукає: чорні жіночі сумки Coach до 8 000 ₴»", /🔎 Шукає: чорні жіночі сумки Coach до 8 000 ₴/.test(bargain), bargain.split("\n").pop());
+    check("«дайте знижку» — не «зі знижкою» в підсумку", !/Шукає:[^\n]*зі знижкою/.test(bargain));
+    const en = tg(run("en", ["men's watch under 10000", "do you ship to Poland?"]));
+    check("англійською — підсумок українською й «Пише англійською»", /🔎 Шукає: чоловічі годинники до 10 000 ₴/.test(en) && /🌐 Пише англійською/.test(en), en.split("\n").pop());
+    const page = "/p/" + data.products[0].slug + "/";
+    const onPage = tg(run("uk", ["є знижка для постійних?"], page));
+    check("зі сторінки товару — «👀 Дивиться: «назва» — ціна»", onPage.includes("👀 Дивиться: «" + data.products[0].title.uk + "»"), onPage.split("\n").pop());
+    const hold = tg(run("uk", ["сумка coach", "відкладіть першу"]));
+    check("«відкладіть першу» — у підсумку саме ця річ", /👀 Дивиться: «/.test(hold) && hold.includes(items(talk("uk", ["сумка coach"]))[0].title.uk), hold.split("\n").pop());
+
+    // Звичайна відповідь — без підсумку, у чаті службового рядка не видно.
+    const plain = run("uk", ["сумка"]);
+    check("звичайна підбірка — без підсумку", !/Шукає|Дивиться/.test(tg(plain)) && !/\[\[summary/.test(bot.serializeBotReply(plain, "uk")));
+    const body = bot.serializeBotReply(run("uk", ["чорна сумка", "дайте знижку"]), "uk");
+    check("підсумок — службовим рядком [[summary: …]], який чат не показує", /^\[\[summary: .+\]\]$/m.test(body)
+        && /else if \(!\/\^\\\[\\\[\.\*\\\]\\\]\$\/\.test\(l\.trim\(\)\)\) текст\.push\(l\)/.test(read("assets/js/contact-buttons.js")));
+    check("рядок товару не плутається з підсумком (картки — лише «• … ₴ url»)", !/\/p\//.test((body.match(/^\[\[summary: (.*)\]\]$/m) || [])[1] || ""));
+}
+
 console.log(failures ? `\n✗ Провалено: ${failures}` : "\n✓ Усе зелено");
 process.exit(failures ? 1 : 0);
