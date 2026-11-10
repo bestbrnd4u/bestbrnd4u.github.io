@@ -6123,6 +6123,9 @@ function parseBudget(text) {
 
     const unit = "(\\d+(?:[.,]\\d+)?\\s*(?:тис|тыс|k|к)?)";
 
+    // «Тисяч 8-10», «тыс 8–10» — одиниця перед числами.
+    const before = t.match(/(?:тисяч|тисячі|тис|тысяч|тыс)\s*(\d+)\s*(?:-|–|—|до)\s*(\d+)(?!\d)/);
+    if (before && Number(before[1]) < Number(before[2]) && Number(before[2]) < 1000) return { min: Number(before[1]) * 1000, max: Number(before[2]) * 1000 };
     const range = t.match(new RegExp(`${unit}\\s*(?:-|–|—|до|to)\\s*${unit}`));
     if (range && /^\d/.test(range[1]) && !/^(до|to)\b/.test(t.slice(range.index - 3, range.index).trim())) {
         let a = num(range[1]);
@@ -6132,8 +6135,9 @@ function parseBudget(text) {
         if (a && b && b > a && b >= 500) return { min: a, max: b };
     }
 
-    const max = t.match(new RegExp(`(?:^|\\s)(?:до|до\\s+ціни|не дорожче|не дороже|дешевше|дешевле|under|below|up to|max|less than|within)\\s*${unit}`));
-    const min = t.match(new RegExp(`(?:^|\\s)(?:від|от|from|over|above|more than|дорожче|дороже)\\s*${unit}`));
+    const max = t.match(new RegExp(`(?:^|\\s)(?:до|до\\s+ціни|не дорожче|не дороже|дешевше|дешевле|в межах|у межах|в пределах|приблизно|десь|около|примерно|under|below|up to|max|less than|within|around|about)\\s*${unit}`));
+    // «Не дорожче 6 тис» — стеля; «дорожче» тут не нижня межа.
+    const min = t.match(new RegExp(`(?:^|\\s)(?<!не\\s)(?:від|от|from|over|above|more than|дорожче|дороже)\\s*${unit}`));
 
     const out = {};
     if (max) { const n = num(max[1]); if (n >= 300) out.max = n; }
@@ -6172,7 +6176,7 @@ const STYLES = [
     { key: "optical", type: "glasses", stems: ["для зору", "для зрения", "діоптр", "диоптр", "оправи для", "оправа для", "оправу для", "для читання", "для чтения", "optical", "prescription", "eyeglasses", "reading glasses"], re: /optical|prescription|для зору|діоптр/i, name: { uk: "окуляри для зору", en: "prescription glasses", ru: "очки для зрения" }, none: { uk: "окулярів для зору", ru: "очков для зрения" } },
     // «Щоб влазив ноутбук» — з габаритів картки: 13-дюймовий ноутбук має
     // близько 30,5 × 21,5 см, тож дві більші сторони сумки — від 31 і 22 см.
-    { key: "laptop", type: "bags", stems: ["ноутбук", "макбук", "laptop", "macbook", "формат а4", "а4$", "a4$"], fit: p => {
+    { key: "laptop", type: "bags", stems: ["ноутбук", "ноут$", "ноута$", "макбук", "laptop", "macbook", "формат а4", "а4$", "a4$"], fit: p => {
         const d = String((p.details && p.details.dimensions && p.details.dimensions.uk) || "").replace(/,/g, ".").match(/\d+(?:\.\d+)?/g);
         if (!d || d.length < 2) return false;
         const [a, b] = d.map(Number).sort((x, y) => y - x);
@@ -6343,7 +6347,7 @@ function parseWish(text, data) {
     if (hasStem(list, ["металев", "метал$", "сталев", "сталь", "браслет", "стальн", "металлическ", "steel", "metal", "bracelet"])) wish.band = "metal";
 
     // Фасон сумки — зі слів людини, у назвах і ключових словах товарів.
-    const style = STYLES.find(st => hasStem(list, st.stems));
+    const style = STYLES.find(st => st.key === "laptop" && hasStem(list, st.stems)) || STYLES.find(st => hasStem(list, st.stems));
     if (style) wish.style = style.key;
 
     // «А що є від Prada?», «все від Coach» — усе від бренду: тип і колір
@@ -6351,6 +6355,14 @@ function parseWish(text, data) {
     if (hasStem(list, ["що є від", "що є у", "а що є", "усе від", "все від", "все що є", "что есть от", "что есть у", "а что есть", "все от", "anything from", "what do you have from", "everything from", "all from"])) wish.all = true;
 
     // «Tabby є?», «а Snapshot?», «GG0516S» — назва моделі.
+    // «Сумка 8000», «годинник 12 000» — число біля типу без «до» = стеля.
+    // Лише окреме число 1 000–100 000: «RB3498», «MK4968», «Tabby 26» — ні.
+    if (!wish.budget && wish.type) {
+        const bare = String(text || "").replace(/(\d)[\s  ,.](?=\d{3}(?!\d))/g, "$1").match(/(?:^|[\s,;:(])(\d{4,6})(?=$|[\s,;:)?!.]|\s*(?:грн|₴|uah))/i);
+        const n = bare ? Number(bare[1]) : 0;
+        if (n >= 1000 && n <= 100000 && !(wish.size && String(n) === wish.size)) wish.budget = { max: n };
+    }
+
     const models = findModels(text, data);
     if (models) wish.models = models;
 
@@ -6961,7 +6973,24 @@ function detectLang(text, pageLang) {
     return count(EN_WORDS) >= 1 && list.length >= 2 ? "en" : page;
 }
 
+// Латиниця → кирилиця для повідомлень транслітом («sumka chorna»).
+function untranslit(text) {
+    const pairs = [["shch", "щ"], ["zh", "ж"], ["kh", "х"], ["ts", "ц"], ["ch", "ч"], ["sh", "ш"], ["ya", "я"], ["yu", "ю"], ["ye", "є"], ["yi", "ї"], ["ia", "я"], ["iu", "ю"], ["ie", "є"],
+        ["a", "а"], ["b", "б"], ["v", "в"], ["h", "г"], ["g", "г"], ["d", "д"], ["e", "е"], ["z", "з"], ["y", "и"], ["i", "і"], ["j", "й"], ["k", "к"], ["l", "л"], ["m", "м"], ["n", "н"], ["o", "о"], ["p", "п"], ["r", "р"], ["s", "с"], ["t", "т"], ["u", "у"], ["f", "ф"], ["c", "к"], ["w", "в"], ["x", "кс"], ["q", "к"]];
+    let out = String(text || "").toLowerCase();
+    for (const [a, b] of pairs) out = out.split(a).join(b);
+    return out;
+}
+
 function botReply(message, history, data, options) {
+    // Трансліт: латиниця без кирилиці, якої англійською бот не розуміє, а
+    // в кирилиці — розуміє. Лишаємо й оригінал (у ньому бренд: «rayban»).
+    if (/[a-z]/i.test(String(message || "")) && !/[а-яіїєґ]/i.test(String(message || ""))) {
+        const w0 = parseWish(message, data);
+        const tr = untranslit(message);
+        const w1 = parseWish(tr, data);
+        if (w1 && (w1.criteria > ((w0 && w0.criteria) || 0) || (w1.type && !(w0 && w0.type))) && !/\b(the|a|an|is|are|do|you|have|any|i|my|for|with|and|what|how)\b/i.test(String(message))) message = `${tr} ${message}`;
+    }
 
     const opts = Object.assign({}, options || {});
     {
@@ -7341,7 +7370,7 @@ function botReply(message, history, data, options) {
 
     // 2є. «Дорого», «а дешевше є?» — той самий запит, але дешевше за
     // найдешевше, що вже показали. Без попереднього запиту — найдоступніше.
-    if (hasStem(list, CHEAPER) && !hasStem(list, ["оригінал", "оригинал", "підробк", "подделк", "реплік", "реплик", "фейк", "fake", "replica", "authentic", "genuine", "real$"])) {
+    if (hasStem(list, CHEAPER) && !((parseWish(text, data) || {}).budget && (parseWish(text, data) || {}).type) && !hasStem(list, ["оригінал", "оригинал", "підробк", "подделк", "реплік", "реплик", "фейк", "fake", "replica", "authentic", "genuine", "real$"])) {
         const previous = (history || []).filter(m => m && m.author === "visitor").slice(-CONTEXT_MESSAGES).reverse()
             .map(m => parseWish(m.body, data)).filter(Boolean);
         const base = mergeWishes(parseWish(text, data) || { criteria: 0 }, previous);
@@ -7793,7 +7822,10 @@ function botReply(message, history, data, options) {
             const eu = [...new Set((data.products || []).filter(p => matches(p, { type: "sneakers" }, now, {})).flatMap(p => ((p.details && p.details.variants) || []).flatMap(v => (v.sizes || []).map(x => String(x.size)))).filter(x => /^(3[3-9]|4[0-6])(\.5)?$/.test(x)))].sort((a, b) => Number(a) - Number(b));
             notes.push(fill(T22[lang].usSize, { list: eu.join(", ") }));
         }
-        return reply(authPrefix + (notes.length ? notes.join("\n") + "\n" : "") + head, { products, chips: (wish.foreign ? L.chips.budget : []).concat(chips).slice(0, 7), intent: "products" });
+        // «Чорна сумка і скільки доставка?» — раніше питання губилось.
+        const mixed = findTopics(text, faq).filter(x => x.item && x.topic.key !== "fake" && !x.topic.always).slice(0, 2);
+        const faqPrefix = mixed.length ? mixed.map(x => topicAnswer(x.topic, x.item, list, lang, text)).join("\n\n") + "\n\n" : "";
+        return reply(authPrefix + faqPrefix + (notes.length ? notes.join("\n") + "\n" : "") + head, { products, chips: (wish.foreign ? L.chips.budget : []).concat(chips).slice(0, 7), intent: "products" });
 
     }
 

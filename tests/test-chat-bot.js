@@ -1235,5 +1235,38 @@ console.log("\n[27] Сьома проба: акції, сертифікати, �
     check("«що краще для подарунка дівчині?» — порада серед жіночого", /^Жіночі речі: ось що радимо/.test(say("uk", ["що краще для подарунка дівчині 20 років?"]).text));
 }
 
+console.log("\n[28] Восьма проба: трансліт, бюджет словами, річ + питання (10.11.2026)");
+{
+    const one = (m, lang) => bot.botReply(m, [], data, { lang: lang || "uk", now: NOW, siteUrl: "https://bestbrnd4u.com" }) || { text: "", products: [], intent: null };
+    const prices = r => r.products.map(p => p.price);
+
+    // Трансліт — раніше «не зрозумів».
+    const tr = one("sumka chorna");
+    check("«sumka chorna» — чорні сумки", /^Ось чорні сумки/.test(tr.text), tr.text.slice(0, 30));
+    check("«godynnyk cholovichyi» — чоловічі годинники", /^Ось чоловічі годинники/.test(one("godynnyk cholovichyi").text));
+    check("«okuliary rayban» — окуляри Ray-Ban (і тип, і бренд)", /^Ось окуляри Ray-Ban/.test(one("okuliary rayban").text));
+    check("англійська не транслітерується: «black bag» — black bags", /black bags/.test(one("black bag", "en").text));
+    check("«hello» — як і раніше, вітання", one("hello", "en").intent === "hello");
+
+    // Бюджет словами.
+    const notMore = one("сумка не дорожче 6 тис");
+    check("«не дорожче 6 тис» — до 6 000 ₴ (раніше «від 6 000 до 6 000»)", /до 6 000 ₴/.test(notMore.text) && !/від 6 000/.test(notMore.text) && prices(notMore).every(x => x <= 6000), notMore.text.slice(0, 40));
+    check("«дорожче 10000 годинник» — як і раніше, від 10 000", /від 10 000 ₴/.test(one("годинник дорожче 10000").text));
+    check("«в межах 7000 сумка» — до 7 000 ₴", (r => /до 7 000 ₴/.test(r.text) && prices(r).every(x => x <= 7000))(one("в межах 7000 сумка")));
+    check("«сумка 8.000» — до 8 000 ₴", /до 8 000 ₴/.test(one("сумка 8.000").text));
+    check("«бюджет тисяч 8-10» — від 8 000 до 10 000 ₴", /від 8 000 ₴ до 10 000 ₴/.test(one("подарунок мамі, бюджет тисяч 8-10").text));
+    check("«сумка дешевше 5000» — до 5 000 ₴, а не «найдоступніші»", (r => /^Ось сумки до 5 000 ₴/.test(r.text) && prices(r).every(x => x <= 5000))(one("сумка дешевше 5000")));
+    check("«Tabby 26» — не бюджет 26", !/до 26 ₴/.test(one("скільки коштує сумка Coach Tabby 26?").text));
+    check("«окуляри RB3498» — не бюджет 3498", !/3 498 ₴/.test(one("окуляри RB3498").text.split("\n")[0]));
+
+    // Річ і питання в одному повідомленні.
+    const mix = one("чорна сумка і скільки доставка?");
+    check("«чорна сумка і скільки доставка?» — і відповідь про доставку, і чорні сумки",
+        /перевізник/.test(mix.text) && /Ось чорні сумки/.test(mix.text) && mix.products.length > 0, mix.text.slice(0, 50));
+    check("«покажіть годинники і як оплатити?» — і оплата, і годинники", (r => /оплат/.test(r.text) && items(r).every(p => p.category === "Годинники") && r.products.length > 0)(one("покажіть годинники і як оплатити?")));
+    check("«чорна сумка» — без зайвої відповіді з частих питань", /^Ось чорні сумки/.test(one("чорна сумка").text));
+    check("«шопер … а4 і ноут» — сумки під ноутбук", /ноутбук 13″/.test(one("сумка шопер велика для роботи щоб вміщався а4 і ноут").text));
+}
+
 console.log(failures ? `\n✗ Провалено: ${failures}` : "\n✓ Усе зелено");
 process.exit(failures ? 1 : 0);
