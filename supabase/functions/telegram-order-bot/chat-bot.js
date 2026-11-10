@@ -976,6 +976,12 @@ const T24 = {
     }
 };
 
+const T25 = {
+    uk: { noList: "Я ще нічого не показував 🙂 Напишіть, що шукаєте, — підберу, і тоді розповім про будь-яку з речей." },
+    en: { noList: "I haven't shown anything yet 🙂 Tell me what you're looking for — I'll pick some, and then tell you about any of them." },
+    ru: { noList: "Я ещё ничего не показывал 🙂 Напишите, что ищете, — подберу, и тогда расскажу о любой из вещей." }
+};
+
 const T17 = {
     uk: { noMore: "Це всі {desc} — {n} {variants}. Можу показати інший тип чи бренд 👇" },
     en: { noMore: "That's all the {desc} — {n} {variants}. I can show another type or brand 👇" },
@@ -2150,7 +2156,9 @@ export function botReply(message, history, data, options) {
             if (d.dimensions && d.dimensions[lang]) bits.push(d.dimensions[lang]);
             return `${n}. «${(p.title && (p.title[lang] || p.title.uk)) || p.slug}» — ${bits.join("; ")}\n${pageUrl(site, `/p/${p.slug}/`, lang)}`;
         };
-        if (shownC.length >= 2 && hasStem(list, ["різниц", "порівня", "відрізня", "отлича", "разниц", "сравн", "difference", "compare", "differ"])) {
+        const diffAsk = hasStem(list, ["різниц", "порівня", "відрізня", "отлича", "разниц", "сравн", "difference", "compare", "differ"]);
+        if (!shownC.length && !productFromPage(opts.page, data) && diffAsk && hasStem(list, ["перш", "перв", "first", "друг", "втор", "second"])) return reply(T25[lang].noList, { chips: L.chips.types, intent: "ask" });
+        if (shownC.length >= 2 && diffAsk) {
             let idx = ORD.map((st, i) => hasStem(list, st) ? i : -1).filter(i => i >= 0 && i < shownC.length);
             if (idx.length < 2) idx = [0, 1];
             return reply(T21[lang].compare + "\n" + idx.slice(0, 3).map(i => card(shownC[i], i + 1)).join("\n"), { chips: T13[lang].ordinals.slice(0, Math.min(shownC.length, 4)), intent: "product" });
@@ -2159,6 +2167,7 @@ export function botReply(message, history, data, options) {
         const other = hasStem(list, ["варіант", "вариант", "фото", "option", "photo", "picture", "покаж", "show", "дайте", "скиньте", "ще$", "еще$"]);
         const bigger = !other && hasStem(list, ["більша", "більшу", "більший", "побільше", "крупніш", "большая", "большую", "побольше", "крупнее", "больше$", "більше$", "bigger", "larger", "biggest", "largest"]);
         const smaller = !other && hasStem(list, ["менша", "меншу", "менший", "поменше", "компактніш", "меньшая", "меньшую", "поменьше", "компактнее", "меньше$", "менше$", "smaller", "smallest", "more compact"]);
+        if (!shownC.length && !productFromPage(opts.page, data) && (bigger || smaller) && !typesOf(text).length && list.length <= 4) return reply(T25[lang].noList, { chips: L.chips.types, intent: "ask" });
         if (shownC.length >= 2 && (bigger || smaller) && !typesOf(text).length) {
             const sized = shownC.filter(p => bagArea(p) > 0).sort((a, b) => bagArea(b) - bagArea(a));
             if (!sized.length) return reply(T21[lang].noDims, { handoff: true, pause: false, intent: "product" });
@@ -2185,6 +2194,8 @@ export function botReply(message, history, data, options) {
     }
     if (nth) {
         const shown = lastShownSlugs(history);
+        // «Друга сумка чорна» — це запит, а не номер у списку, якого ще немає.
+        if (!shown.length && !productFromPage(opts.page, data) && !lastFocus(history) && !(parseWish(text, data) || {}).criteria) return reply(T25[lang].noList, { chips: L.chips.types, intent: "ask" });
         // Показано одну — «друга» це вона ж (людина рахує інакше);
         // показано кілька, але менше — перепитати з наявними номерами.
         if (shown.length > 1 && nth > shown.length) {

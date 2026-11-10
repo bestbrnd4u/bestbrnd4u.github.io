@@ -1308,5 +1308,143 @@ console.log("\n[29] Ті самі ходи англійською й росій�
     check("en «do you deliver to Lviv?» — any city in Ukraine", /any city in Ukraine/.test(say("en", ["do you deliver to Lviv?"]).text));
 }
 
+console.log("\n[30] «Про першу» без списку; сторож на 80 фразах (10.11.2026)");
+{
+    const say = (lang, msgs) => {
+        const history = [];
+        let last = null;
+        msgs.forEach(m => {
+            last = bot.botReply(m, history, data, { lang, now: NOW, siteUrl: "https://bestbrnd4u.com" });
+            history.push({ author: "visitor", body: m });
+            if (last) history.push({ author: "bot", body: bot.serializeBotReply(last, last.lang || lang) });
+        });
+        return last;
+    };
+
+    // Раніше — «не зрозумів» і дзвінок власнику.
+    for (const [m, lang] of [["розкажіть про першу", "uk"], ["the second one, is it in stock?", "en"], ["беру вторую", "ru"], ["а яка більша?", "uk"], ["яка різниця між першою і другою?", "uk"]]) {
+        const r = say(lang, [m]);
+        check(`«${m}» без підбірки — «я ще нічого не показував», власника не будить`, r.intent === "ask" && !r.handoff && /нічого не показував|haven't shown anything|ничего не показывал/.test(r.text), r.text.slice(0, 40));
+    }
+    check("«друга сумка чорна» без підбірки — це запит: чорні сумки", /^Ось чорні сумки/.test(say("uk", ["друга сумка чорна"]).text));
+    check("«подарунок другу» — як і раніше, чоловічі речі", /чоловічі/.test(say("uk", ["подарунок другу"]).text));
+    check("«розкажіть про першу» після підбірки — як і раніше, про неї", say("uk", ["сумка coach", "розкажіть про першу"]).intent === "product");
+
+    // Сторож: 80 різних фраз з усіх проб — окремо трьома мовами і
+    // ланцюжками по п'ять. Ловить системне: виняток, порожній текст,
+    // «{desc}», undefined/NaN, той самий товар двічі, порожню кнопку.
+    // Перевірено поломкою: шаблон, undefined і виняток — усі червоні.
+    const POOL = [
+        "Привіт",
+        "а чорна є?",
+        "дякую",
+        "а щось дешевше?",
+        "кросівки",
+        "скільки коштує друга?",
+        "мне нужны очки",
+        "спасибо",
+        "a bag",
+        "Coach",
+        "покажіть ще",
+        "а Gucci?",
+        "а якщо брак?",
+        "через плече",
+        "а зі знижкою?",
+        "хочу сумку, тільки не чорну",
+        "шукаю сумку і гаманець в комплект",
+        "яка різниця між першою і другою?",
+        "хочу сумочку червону під сукню",
+        "сумка Michael Kors від 5000 до 8000",
+        "тисот",
+        "Hi, I'm looking for a men's watch under 10000",
+        "Do you have the Coach Tabby?",
+        "can I pay on delivery?",
+        "щось універсальне",
+        "є сумки в наявності, щоб сьогодні відправили?",
+        "для підлітка дівчинки 14 років",
+        "годинник за 10-12 тисяч",
+        "сумка coach",
+        "як оплатити?",
+        "кросівки 37",
+        "оформіть мені замовлення на першу, Київ, відділення 5, 0671234567",
+        "скільки сумок Coach у вас є і скільки коштує найдешевша?",
+        "а якщо мені не сподобається колір в житті?",
+        "шо є по сумках?",
+        "мені б щось гарненьке",
+        "а серебряные?",
+        "any in brown?",
+        "привіт",
+        "сумка Jacquemus є?",
+        "а Wayfarer?",
+        "автоматичний",
+        "а Prada?",
+        "а для чоловіків?",
+        "а якщо я з Харкова, доставите?",
+        "sumka chorna",
+        "ЧОРНА СУМКА COACH",
+        "сумочку 👜 чорну 🖤 хочу",
+        "сумка не дорожче 6 тис",
+        "сумка дешевше 5000",
+        "чорна сумка і скільки доставка?",
+        "Сумка?)",
+        "Подскажите пожалуйста есть ли у вас мужской кошелек кожаный коричневого цвета недорого",
+        "I want a bag, but not black",
+        "и не коричневую",
+        "беру вторую",
+        "сумка не дороже 6 тысяч",
+        "what brands do you have?",
+        "what's the difference between the first and the second?",
+        "а какая больше?",
+        "сколько?",
+        "men's sneakers 43?",
+        "что нового?",
+        "без логотипа сумка",
+        "доставите в Одессу?",
+        "добре",
+        "понятно",
+        "got it",
+        "thank you!",
+        "як справи?",
+        "ти бот?",
+        "are you a bot?",
+        "чем можешь помочь",
+        "добрий вечір",
+        "good morning",
+        "як купити?",
+        "можна без реєстрації?",
+        "а дешевше є?",
+        "сайт не працює",
+        "мені не прийшло замовлення"
+    ];
+    const bad = [];
+    const inspect = (r, ctx) => {
+        if (!r) return;
+        if (!r.text || !r.text.trim()) bad.push("порожньо: " + ctx);
+        else if (/\{[a-zA-Z]+\}/.test(r.text)) bad.push("шаблон: " + ctx);
+        else if (/undefined|NaN|\[object|\bnull\b/.test(r.text)) bad.push("undefined: " + ctx);
+        const slugs = r.products.map(p => p.slug);
+        if (new Set(slugs).size !== slugs.length) bad.push("двічі: " + ctx);
+        if ((r.chips || []).some(c => !c || !String(c).trim())) bad.push("кнопка: " + ctx);
+        if (r.products.length > 4) bad.push(">4: " + ctx);
+    };
+    for (const lang of ["uk", "en", "ru"]) {
+        for (const m of POOL) {
+            try { inspect(bot.botReply(m, [], data, { lang, now: NOW }), `«${m}» ${lang}`); } catch (e) { bad.push(`виняток ${e.message}: «${m}» ${lang}`); }
+        }
+        for (let i = 0; i + 5 <= POOL.length; i += 5) {
+            const seq = POOL.slice(i, i + 5);
+            const history = [];
+            for (const m of seq) {
+                let r;
+                try { r = bot.botShouldStay(history) ? bot.botReply(m, history, data, { lang, now: NOW }) : null; } catch (e) { bad.push(`виняток ${e.message}: ${seq.join(" → ")}`); break; }
+                inspect(r, seq.join(" → ") + " " + lang);
+                history.push({ author: "visitor", body: m });
+                if (r) history.push({ author: "bot", body: bot.serializeBotReply(r, r.lang || lang) });
+            }
+        }
+    }
+    check(`сторож: ${POOL.length} фраз × 3 мови окремо й ланцюжками — без системних вад`, POOL.length >= 60 && bad.length === 0, bad.slice(0, 3).join(" | "));
+}
+
 console.log(failures ? `\n✗ Провалено: ${failures}` : "\n✓ Усе зелено");
 process.exit(failures ? 1 : 0);
