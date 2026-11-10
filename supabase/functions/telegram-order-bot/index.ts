@@ -5248,6 +5248,8 @@ function onlyEmoji(text) {
 function smallTalk(text) {
     const list = words(text);
     // Самий «?» — людина чекає реакції, а не «добре»: «Так, я тут!».
+    // «+» в Instagram-стилі — «цікавить, розкажіть», а не «добре».
+    if (/^\s*\++\s*$/.test(String(text || ""))) return null;
     if (onlyEmoji(text)) return /\?/.test(text) ? "anyone" : /[😍🥰😻❤♥💖💕💗🔥🤩😘]/u.test(text) ? "compliment" : "ack";
     // Довге повідомлення — це вже питання, навіть якщо в ньому є «дякую»:
     // «дякую, а доставка скільки?» — про доставку.
@@ -6897,9 +6899,11 @@ function productAnswer(text, product, data, lang, now, site) {
     const asked = Object.keys(ASK).filter(k => hasStem(list, ASK[k]));
     // «Ця є?», «а вона є?» — саме «є» в короткому питанні (знак питання
     // нормалізація зрізає, тож стем «є?» його не бачить).
-    if (!asked.length && list.length <= 3 && hasStem(list, ["є$", "есть$", "available$"])) asked.push("stock");
+    if (!asked.length && list.length <= 4 && hasStem(list, ["є$", "есть$", "available$", "актуальн", "продан", "продали", "продаєт", "продается", "sold", "still available", "наявн", "наличи"])) asked.push("stock");
+    // «Скільки?» саме на сторінці товару — ціна.
+    if (!asked.length && list.length <= 2 && hasStem(list, ["скільки$", "сколько$", "how much"])) asked.push("price");
     // «Розкажіть про цю», «що це?» — коротко все з картки, без «не вказано».
-    if (!asked.length && hasStem(list, ["розкаж", "расскаж", "tell me about", "tell me more", "more about", "детальніш", "подробн", "подробиц", "опис", "що це", "что это", "what is it", "інформац", "информац"])) {
+    if (!asked.length && (/^\s*\++\s*$/.test(String(text || "")) || hasStem(list, ["інфо$", "інфа$", "инфо$", "інформацію", "деталі$", "детальн", "подробиц", "подробнее", "подробности", "info$", "details$", "more info", "розкаж", "расскаж", "tell me about", "tell me more", "more about", "детальніш", "подробн", "подробиц", "опис", "що це", "что это", "what is it", "інформац", "информац"]))) {
         const all = productAnswer("ціна наявність кольори розмір матеріал", product, data, lang, now, site);
         return all ? { text: all.text.replace(/\n[^\n]*(не вказано|isn't listed|не указано)[^\n]*$/, ""), handoff: false } : null;
     }
@@ -7359,7 +7363,7 @@ function botReply(message, history, data, options) {
         { key: "waterproof", stems: ["водонепроник", "водостійк", "волого", "водонепрониц", "водостойк", "влагостойк", "waterproof", "water resistant", "water-resistant", "можна плавати", "можно плавать"] },
         { key: "callback", stems: ["коли зателефон", "коли подзвон", "коли передзвон", "коли звʼяж", "коли зв'яж", "когда позвон", "когда перезвон", "когда свяж", "when will you call", "when will you contact", "you haven't called", "не подзвон", "не зателефон", "не передзвон", "не зв'яз", "не звʼяз", "ніхто не дзвон", "не позвонил", "не перезвонил", "не связал", "никто не звон", "nobody called", "no one called", "haven't heard"] },
         { key: "bargain", stems: ["дайте знижк", "зробіть знижк", "зробите знижк", "можна знижк", "можна зі знижк", "а знижку", "скинете", "скиньте", "скинути ціну", "торг", "поторгу", "дадите скидк", "сделаете скидк", "можно скидк", "скинете цену", "уступите", "give me a discount", "can you give a discount", "any discount for me", "negotiable", "best price"] },
-        { key: "photos", stems: ["більше фото", "ще фото", "живі фото", "реальні фото", "відео", "больше фото", "еще фото", "живые фото", "реальные фото", "видео", "more photos", "more pictures", "real photos", "video"] },
+        { key: "photos", stems: ["можна фото", "фото можна", "скиньте фото", "скинь фото", "надішліть фото", "фотки", "фоточк", "можно фото", "скиньте фото", "пришлите фото", "more pics", "more pictures", "can i see photos", "більше фото", "ще фото", "живі фото", "реальні фото", "відео", "больше фото", "еще фото", "живые фото", "реальные фото", "видео", "more photos", "more pictures", "real photos", "video"] },
         { key: "wholesale", stems: ["опт$", "оптом", "оптов", "дропшип", "дроп$", "wholesale", "bulk", "dropship"] },
         { key: "loyalty", need: ["знижк", "скидк", "discount", "бонус", "кешбек", "кэшбэк", "cashback", "промокод", "акці", "акци"], stems: ["постійн", "постоянн", "перше замовлен", "першого замовлен", "першу покупк", "першої покупк", "первый заказ", "первого заказ", "первую покупк", "лояльн", "накопичувальн", "накопительн", "кешбек", "кэшбэк", "cashback", "loyalty", "first order", "first purchase", "regular customer", "returning customer", "студент", "пенсіонер", "пенсионер", "військов", "военн", "student", "veteran"] },
         { key: "packaging", stems: ["пакуван", "упаковк", "упакуван", "подарункове пак", "подарункову упак", "подарочн", "коробк", "листівк", "открытк", "цінник", "ценник", "чек$", "чека$", "чеком", "квитанц", "фіскальн", "фискальн", "gift wrap", "gift box", "packaging", "receipt", "price tag", "dust bag", "dustbag", "пильник", "пыльник", "чохол", "чехол"] },
@@ -7924,6 +7928,13 @@ function botReply(message, history, data, options) {
         }
         // Нічого не показано — раніше тут була відповідь про ціну доставки.
         if (!shownNow.length) return reply(T23[lang].whatPrice, { chips: L.chips.types, intent: "ask" });
+    }
+
+    // 3е. Коротке питання про «річ» без самої речі.
+    if (!here && list.length <= 4 && !lastShownSlugs(history).length && !lastFocus(history)
+        && (/^\s*\++\s*$/.test(text) || hasStem(list, ["інфо$", "інфа$", "инфо$", "деталі$", "подробиц", "подробн", "актуальн", "продан", "наявн", "наличи", "available$", "in stock", "розмір$", "размер$", "size$", "ціну в", "цену в", "ціну пишіть", "info$", "details$", "про цю", "про неї", "про нього", "про эту", "про нее", "про неё", "about this", "about it"]))
+        && !(parseWish(text, data) || {}).criteria) {
+        return reply(T23[lang].whatPrice, { chips: L.chips.types, intent: "ask" });
     }
 
     // 4. Підбір товару.
