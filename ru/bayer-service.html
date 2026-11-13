@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru" data-season="standard"><head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"7a6c2900","data/catalog.json":"7af5999c","data/categories.json":"2c24d857","data/chat-answers.json":"de163d93","data/chat-bot.json":"2305c5f1","data/collections.json":"858469e9","data/home.json":"179e2c76","data/i18n-en.json":"4c7bca6d","data/i18n-ru.json":"a2748f00","data/image-variants.json":"8d6e1e7e","data/instagram-links.json":"610ebd7b","data/legal.json":"f84751b2","data/notifications.json":"a35b367f","data/page-texts.json":"9666f432","data/product-texts.json":"e9b88208","data/products-updated.json":"3da58ea6","data/products.json":"ae78eb0a","data/promo-popups.json":"0940ece5","data/promotions.json":"92880867","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/season.json":"17f1306b","data/security.json":"0c05c691","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script><base href="/">
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"7a6c2900","data/catalog.json":"7af5999c","data/categories.json":"2c24d857","data/chat-answers.json":"de163d93","data/chat-bot.json":"80e24831","data/collections.json":"858469e9","data/delivery.json":"3d6f2eab","data/home.json":"179e2c76","data/i18n-en.json":"1fd40ffb","data/i18n-ru.json":"e79b24cc","data/image-variants.json":"8d6e1e7e","data/instagram-links.json":"610ebd7b","data/legal.json":"f84751b2","data/notifications.json":"a35b367f","data/page-texts.json":"9666f432","data/product-texts.json":"e9b88208","data/products-updated.json":"3da58ea6","data/products.json":"ae78eb0a","data/promo-popups.json":"0940ece5","data/promotions.json":"92880867","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/season.json":"17f1306b","data/security.json":"0c05c691","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script><base href="/">
+    <meta name="robots" content="noindex,nofollow">
     <meta charset="UTF-8">
     <meta name="author" content="BestBrnd4u">
     <meta name="copyright" content="© 2026 BestBrnd4u. Усі права захищено.">
@@ -35,7 +36,7 @@
     <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-v20-latin.woff2?v=v20" crossorigin="">
     <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-v20-cyrillic.woff2?v=v20" crossorigin="">
 
-    <link rel="stylesheet" href="assets/css/style.css?v=d63b9f93">
+    <link rel="stylesheet" href="assets/css/style.css?v=688cfd32">
 
 
 
@@ -467,18 +468,112 @@
 
     <div class="container">
 
-        <div class="bayer-cta">
+        <!-- Заявка на байєр-сервіс. Надсилає assets/js/buyer-request.js у
+             Edge Function (site_action "buyer-request") — власнику
+             прилітає Telegram. У базу нічого не пишемо. -->
+        <div class="bayer-request">
 
-            <h2>Готовы оформить заказ?</h2>
+            <div class="bayer-request-intro">
 
-            <p>
-                Пришлите ссылку на товар — и мы посчитаем стоимость выкупа и подберем самый выгодный способ доставки.
-            </p>
+                <h2>Заявка на выкуп</h2>
 
-            <div class="bayer-cta-actions">
-                <a href="mailto:bestbrnd4u@proton.me" class="btn">✉ Написать на bestbrnd4u@proton.me</a>
-                <a href="https://www.instagram.com/bestbrnd4u" target="_blank" rel="noopener" class="btn btn-outline">Instagram Direct</a>
-                <a href="/ru/contacts" class="btn btn-outline">Все способы связи</a>
+                <p>
+                    Пришлите ссылку на вещь — посчитаем полную стоимость с доставкой и комиссией и напишем вам в течение рабочего дня. Заявка ни к чему не обязывает.
+                </p>
+
+                <ol class="bayer-request-steps">
+                    <li>Проверяем наличие, размер и цену у продавца.</li>
+                    <li>Присылаем расчёт: товар, доставка, комиссия — одна финальная сумма.</li>
+                    <li>Согласились — вносите предоплату, и мы выкупаем вещь.</li>
+                </ol>
+
+                <p class="bayer-request-alt">
+                    Удобнее написать самим?
+                    <a href="https://t.me/bestbrnd4u" target="_blank" rel="noopener">Telegram</a>,
+                    <a href="https://www.instagram.com/bestbrnd4u" target="_blank" rel="noopener">Instagram Direct</a>
+                    или <a href="mailto:bestbrnd4u@proton.me">bestbrnd4u@proton.me</a>.
+                </p>
+
+            </div>
+
+            <form class="bayer-request-form checkout-form" id="buyerRequestForm" novalidate="">
+
+                <label>
+                    Ссылка на товар
+                    <textarea id="buyerLinks" name="links" rows="3" placeholder="https://www.coach.com/…" autocomplete="off"></textarea>
+                    <span class="bayer-request-help">До 5 ссылок — каждая с новой строки.</span>
+                </label>
+
+                <label>
+                    Размер, цвет, пожелания
+                    <textarea id="buyerDetails" name="details" rows="3" maxlength="1000" placeholder="Например: размер M, чёрный цвет. Или опишите вещь, если ссылки нет"></textarea>
+                    <span class="field-error" id="buyerItemError" aria-live="polite"></span>
+                </label>
+
+                <div class="bayer-request-row">
+
+                    <label>
+                        Доставка в Украину
+                        <select id="buyerDelivery" name="delivery">
+                            <option value="advise">Посоветуйте самый выгодный</option>
+                            <option value="europe">Из Европы — 5–14 дней</option>
+                            <option value="sea">Морем из США — 20–45 дней</option>
+                            <option value="air">Авиа из США — 10–21 день</option>
+                        </select>
+                    </label>
+
+                    <label>
+                        Бюджет, грн
+                        <input type="text" id="buyerBudget" name="budget" inputmode="numeric" maxlength="9" placeholder="Необязательно" autocomplete="off">
+                    </label>
+
+                </div>
+
+                <div class="bayer-request-row">
+
+                    <label>
+                        Ваше имя
+                        <input type="text" id="buyerName" name="name" maxlength="80" autocomplete="given-name" required="">
+                        <span class="field-error" id="buyerNameError" aria-live="polite"></span>
+                    </label>
+
+                    <label>
+                        Телефон
+                        <input type="tel" id="buyerPhone" name="phone" inputmode="tel" autocomplete="tel" placeholder="+380 XX XXX XX XX" required="">
+                        <span class="field-error" id="buyerPhoneError" aria-live="polite"></span>
+                    </label>
+
+                </div>
+
+                <fieldset class="bayer-request-contact">
+                    <legend>Где вам ответить</legend>
+                    <label><input type="radio" name="contact" value="telegram" checked=""> Telegram</label>
+                    <label><input type="radio" name="contact" value="viber"> Viber</label>
+                    <label><input type="radio" name="contact" value="call"> Звонок</label>
+                </fieldset>
+
+                <!-- Пастка для ботів: людина цього поля не бачить. -->
+                <div class="bayer-request-trap" aria-hidden="true">
+                    <label>Сайт <input type="text" name="website" id="buyerWebsite" tabindex="-1" autocomplete="off"></label>
+                </div>
+
+                <label class="bayer-request-consent">
+                    <input type="checkbox" id="buyerConsent">
+                    <span>Соглашаюсь на обработку контактных данных для ответа на заявку — <a href="/ru/privacy-policy">как мы обращаемся с данными.</a></span>
+                </label>
+                <span class="field-error" id="buyerConsentError" aria-live="polite"></span>
+
+                <button type="submit" class="btn" id="buyerSubmit">Отправить заявку</button>
+
+                <p class="bayer-request-status" id="buyerStatus" role="status" aria-live="polite" hidden=""></p>
+
+            </form>
+
+            <div class="bayer-request-done" id="buyerDone" hidden="" tabindex="-1">
+                <div class="bayer-request-done-icon" aria-hidden="true">✓</div>
+                <h3>Заявку получили</h3>
+                <p>Посчитаем стоимость и ответим в течение рабочего дня (Пн–Вс 09:00–20:00).</p>
+                <button type="button" class="btn btn-outline" id="buyerAgain">Отправить ещё одну</button>
             </div>
 
         </div>
@@ -793,7 +888,7 @@
 <!-- Транслітерація: productUrl() кладе колір в адресу латиницею.
      Той самий файл використовує збірка для адрес товарів. -->
 <script src="assets/js/translit.js?v=c0957cb7" defer=""></script>
-<script src="assets/js/common.js?v=7e4fac4b" defer=""></script>
+<script src="assets/js/common.js?v=76147b3a" defer=""></script>
 <!-- Дзвінок і зв'язок: дві плаваючі кнопки в лівому кутку -->
 <script src="assets/js/contact-buttons.js?v=572343ec" defer=""></script>
 <!-- Підписка на листи магазину -->
@@ -801,6 +896,8 @@
 <script src="assets/js/sync.js?v=48ef002e" defer=""></script>
 <script src="assets/js/mega-menu.js?v=ff0d32d0" defer=""></script>
 <script src="assets/js/ui.js?v=fa1e1236" defer=""></script>
+<!-- Заявка на байєр-сервіс (#bayerContact) -->
+<script src="assets/js/buyer-request.js?v=eb72be72" defer=""></script>
 
 <script>
 

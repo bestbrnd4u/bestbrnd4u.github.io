@@ -2,7 +2,8 @@
 <html lang="uk" data-season="standard">
 
 <head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"7a6c2900","data/catalog.json":"7af5999c","data/categories.json":"2c24d857","data/chat-answers.json":"de163d93","data/chat-bot.json":"2305c5f1","data/collections.json":"858469e9","data/home.json":"179e2c76","data/i18n-en.json":"4c7bca6d","data/i18n-ru.json":"a2748f00","data/image-variants.json":"8d6e1e7e","data/instagram-links.json":"610ebd7b","data/legal.json":"f84751b2","data/notifications.json":"a35b367f","data/page-texts.json":"9666f432","data/product-texts.json":"e9b88208","data/products-updated.json":"3da58ea6","data/products.json":"ae78eb0a","data/promo-popups.json":"0940ece5","data/promotions.json":"92880867","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/season.json":"17f1306b","data/security.json":"0c05c691","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script>
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"7a6c2900","data/catalog.json":"7af5999c","data/categories.json":"2c24d857","data/chat-answers.json":"de163d93","data/chat-bot.json":"80e24831","data/collections.json":"858469e9","data/delivery.json":"3d6f2eab","data/home.json":"179e2c76","data/i18n-en.json":"1fd40ffb","data/i18n-ru.json":"e79b24cc","data/image-variants.json":"8d6e1e7e","data/instagram-links.json":"610ebd7b","data/legal.json":"f84751b2","data/notifications.json":"a35b367f","data/page-texts.json":"9666f432","data/product-texts.json":"e9b88208","data/products-updated.json":"3da58ea6","data/products.json":"ae78eb0a","data/promo-popups.json":"0940ece5","data/promotions.json":"92880867","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/season.json":"17f1306b","data/security.json":"0c05c691","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script>
+    <meta name="robots" content="noindex,nofollow">
     <meta charset="UTF-8">
     <meta name="author" content="BestBrnd4u">
     <meta name="copyright" content="© 2026 BestBrnd4u. Усі права захищено.">
@@ -39,7 +40,7 @@
     <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-v20-latin.woff2?v=v20" crossorigin>
     <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-v20-cyrillic.woff2?v=v20" crossorigin>
 
-    <link rel="stylesheet" href="assets/css/style.css?v=d63b9f93">
+    <link rel="stylesheet" href="assets/css/style.css?v=688cfd32">
 
 
 
@@ -307,6 +308,10 @@
                 доставки не включається. Орієнтовні тарифи й строки — на сторінці
                 <a href="delivery-payment">«Оплата і доставка»</a>.
             </p>
+
+            <!-- Поріг — з data/delivery.json (scripts/build-free-delivery.js).
+                 Поріг 0 — абзац порожній і схований. -->
+            <p data-free-delivery="offer">Виняток: замовлення на суму від 30 000 грн (з урахуванням знижок) Продавець доставляє за власний рахунок — вартість доставки оплачує Продавець, і Покупець перевізнику за неї не платить.</p>
 
             <p>
                 Ризик випадкового знищення або пошкодження товару переходить до
@@ -684,7 +689,7 @@
 <!-- Транслітерація: productUrl() кладе колір в адресу латиницею.
      Той самий файл використовує збірка для адрес товарів. -->
 <script src="assets/js/translit.js?v=c0957cb7" defer></script>
-<script src="assets/js/common.js?v=7e4fac4b" defer></script>
+<script src="assets/js/common.js?v=76147b3a" defer></script>
 <!-- Дзвінок і зв'язок: дві плаваючі кнопки в лівому кутку -->
 <script src="assets/js/contact-buttons.js?v=572343ec" defer></script>
 <!-- Підписка на листи магазину -->

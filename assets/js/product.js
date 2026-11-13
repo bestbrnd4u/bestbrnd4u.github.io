@@ -1953,6 +1953,31 @@ ${sizeButtons}
                 }
             </p>
 
+            <!-- «Повідомити, коли з'явиться» (assets/js/stock-alert.js).
+
+                 Лише для товару, якого немає на складі ЗАРАЗ. Річ «під
+                 замовлення завжди» не «з'являється» ніколи — там
+                 обіцянка листа була б неправдою.
+
+                 Колір і розмір форма бере з обраних на сторінці в мить
+                 натискання; data-color / data-size — запас для товару
+                 без вибору (один колір, один розмір). -->
+            <form class="stock-alert" novalidate
+                  data-product-id="${escapeHtml(String(product.id))}"
+                  data-color="${escapeHtml((activeVariant && activeVariant.color) || "")}"
+                  data-size="${escapeHtml(getVariantSizes(product, activeVariant).length === 1 ? getVariantSizes(product, activeVariant)[0] : "")}"
+                  ${product.preOrderAlways === true ? "hidden" : ""}>
+                <p class="stock-alert-title">Не хочете чекати? Напишемо, щойно ця річ з'явиться в наявності.</p>
+                <div class="stock-alert-row">
+                    <input type="email" name="email" autocomplete="email" inputmode="email"
+                           placeholder="Ваша пошта" aria-label="Ваша пошта" required>
+                    <button type="submit" class="btn stock-alert-submit">Повідомити мене</button>
+                </div>
+                <input type="text" name="website" class="stock-alert-trap" tabindex="-1" autocomplete="off" aria-hidden="true">
+                <p class="stock-alert-status" role="status" aria-live="polite" hidden></p>
+                <p class="stock-alert-note">Один лист — коли саме цей колір і розмір буде в наявності. <a href="/privacy-policy">Як ми поводимось із даними.</a></p>
+            </form>
+
         </div>
 
         <!-- «Єдиний екземпляр».

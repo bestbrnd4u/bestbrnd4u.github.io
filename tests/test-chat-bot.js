@@ -1920,5 +1920,18 @@ console.log("\n[46] Подарунок — межа розмови: старе �
     check("«сумка coach» → «а чорна?» — як і раніше, чорні сумки Coach", /чорні сумки Coach/.test(run(["сумка coach", "а чорна?"]).text));
 }
 
+console.log("\n[47] Безкоштовна доставка від суми — трьома мовами (13.11.2026)");
+{
+    const freeFrom = require("../scripts/build-free-delivery.js").readThreshold();
+    const ask = (text, lang) => (bot.botReply(text, [], data, { lang, now: NOW, siteUrl: "https://bestbrnd4u.com" }) || { text: "" }).text;
+    if (freeFrom) {
+        // Відповідь — з питань сайту, а там поріг пише збірка з data/delivery.json.
+        check("«є безкоштовна доставка?» — поріг у відповіді", /30 000 грн доставляємо безкоштовно/.test(ask("є безкоштовна доставка?", "uk")), ask("є безкоштовна доставка?", "uk").slice(0, 80));
+        check("«free shipping?» — поріг, а не лише строки", /delivered free of charge/.test(ask("free shipping?", "en")), ask("free shipping?", "en").slice(0, 80));
+        check("«бесплатная доставка есть?» — не «что ищете», а поріг", /доставляем бесплатно/.test(ask("бесплатная доставка есть?", "ru")), ask("бесплатная доставка есть?", "ru").slice(0, 80));
+    }
+    check("«безкоштовне повернення?» — як і раніше про повернення, не про доставку", !/доставляємо безкоштовно/.test(ask("безкоштовне повернення?", "uk")));
+}
+
 console.log(failures ? `\n✗ Провалено: ${failures}` : "\n✓ Усе зелено");
 process.exit(failures ? 1 : 0);

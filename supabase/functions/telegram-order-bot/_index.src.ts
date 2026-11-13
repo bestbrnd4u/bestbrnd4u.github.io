@@ -27,7 +27,7 @@ import {
   STATUSES, normalizeStatus, formatOrder, formatRefusal, buildKeyboard,
   parseStartPayload, formatProductCard, buildProductKeyboard, absoluteImageUrl,
   customerStatusMessage, customerStatusKeyboard, validateTracking, parseTtnCommand,
-  orderListLine, orderListKeyboard,
+  orderListLine, orderListKeyboard, setFreeDeliveryFrom,
 } from "./format.js";
 import {
   ADMIN_TOKEN_HEADER, corsHeaders, isAllowedOrigin, parseAdminRequest,
@@ -89,6 +89,12 @@ import {
 import {
   normalizeCallBackPhone, cleanCallBackPage, formatCallBack,
 } from "./call-back.js";
+import {
+  normalizeBuyerRequest, formatBuyerRequest,
+} from "./buyer-request.js";
+import {
+  normalizeStockAlert, stockAlertVariant, formatStockAlert,
+} from "./stock-alert.js";
 import {
   cleanChatBody, cleanThreadId, cleanChatPage, formatChatMessage,
   CHAT_LIMITS, CHAT_DONE_TEXT, chatDoneReceipt, chatClearReceipt, chatUserName, chatWho,
@@ -429,6 +435,8 @@ async function createOrder(row: Record<string, any>) {
 
 async function askStep(chatId: number, step: string, product: Record<string, any>, session: Record<string, any>) {
 
+  if (step === "confirm") await loadFreeDelivery();
+
   const text = step === "confirm"
     ? summaryText(product, session)
     : stepPrompt(step, product, session);
@@ -530,6 +538,8 @@ async function advance(chatId: number, fromStep: string, product: Record<string,
 // 1. Нове замовлення з бази → повідомлення власнику
 async function handleNewOrder(record: Record<string, any>) {
 
+  await loadFreeDelivery();
+
   const text = formatOrder(record);
 
   const sent = await telegram("sendMessage", {
@@ -621,6 +631,8 @@ async function handleCallback(callback: Record<string, any>) {
       return;
 
     }
+
+    await loadFreeDelivery();
 
     const sent = await telegram("sendMessage", {
       chat_id: callback.message.chat.id,
@@ -740,6 +752,8 @@ async function handleCallback(callback: Record<string, any>) {
 
   // перемальовуємо те саме повідомлення — щоб історія в чаті не
   // засмічувалась дублями, а поточний статус завжди був актуальним
+  await loadFreeDelivery();
+
   await telegram("editMessageText", {
     chat_id: callback.message.chat.id,
     message_id: callback.message.message_id,
@@ -1088,6 +1102,8 @@ async function rememberCardMessage(orderId: unknown, messageId: unknown) {
 async function refreshOwnerCard(order: Record<string, any> | null) {
 
   if (!order || !order.bot_message_id || !TELEGRAM_CHAT_ID) return;
+
+  await loadFreeDelivery();
 
   await telegram("editMessageText", {
     chat_id: TELEGRAM_CHAT_ID,
@@ -2773,6 +2789,13 @@ async function handleReviewCallback(callback: Record<string, any>, data: string)
 // Якщо магазин виросте — числа тут, в одному місці.
 const CONTACT_LIMITS = {
   callback: { perIp: 3, global: 30 },
+  // Заявка на байєр-сервіс: людині треба одна-дві, а розрахунок — це
+  // робота власника, тож флуд тут дорожчий, ніж у чаті.
+  buyer: { perIp: 3, global: 20 },
+  // «Повідомити, коли з'явиться»: людина може чекати кілька розмірів
+  // чи кольорів, тож з адреси більше, ніж дзвінків. Загальна межа —
+  // заради Telegram: кожна підписка — повідомлення власнику.
+  "stock-alert": { perIp: 10, global: 60 },
   "chat-new": { perIp: 3, global: 30 },
   "chat-msg": { perIp: 30, global: 150 },
 };
@@ -2825,7 +2848,11 @@ async function warnAboutFlood(kind: string) {
 
   const що = kind === "callback"
     ? "замовлень дзвінка"
-    : "повідомлень у чаті";
+    : kind === "buyer"
+      ? "заявок на байєр-сервіс"
+      : kind === "stock-alert"
+        ? "підписок «повідомити, коли з'явиться»"
+        : "повідомлень у чаті";
 
   await telegram("sendMessage", {
     chat_id: TELEGRAM_CHAT_ID,
@@ -3130,6 +3157,31 @@ let chatBotData: { at: number; data: any } | null = null;
 // Адреса для бота: github.io (запасне значення SITE_URL) перекидає на
 // основний домен, а посилання в чаті мають вести одразу туди.
 const BOT_SITE = /github\.io/.test(SITE_URL) ? "https://bestbrnd4u.com" : SITE_URL;
+
+// Поріг безкоштовної доставки — з того самого файлу, що читає сайт
+// (data/delivery.json, адмінка → Налаштування → «Безкоштовна
+// доставка»). Без нього картка власника й лист мовчали б про те, що
+// відправку цього замовлення оплачує магазин.
+//
+// Хвіст ?t= міняється раз на 10 хвилин: інакше CDN віддавав би стару
+// копію годинами після зміни порогу в адмінці. Не вдалося — лишаємо
+// останнє відоме значення (на холодному старті це 0: картка мовчить,
+// а не обіцяє вигаданий поріг).
+let freeDeliveryAt = 0;
+
+async function loadFreeDelivery(): Promise<void> {
+  if (Date.now() - freeDeliveryAt < 10 * 60 * 1000) return;
+  try {
+    const bucket = Math.floor(Date.now() / (10 * 60 * 1000));
+    const response = await fetch(`${BOT_SITE}/data/delivery.json?t=${bucket}`, { signal: AbortSignal.timeout(2500) });
+    if (!response.ok) return;
+    const data = await response.json();
+    setFreeDeliveryFrom(data?.freeFrom);
+    freeDeliveryAt = Date.now();
+  } catch (_) {
+    // мережа чи кривий файл — не причина не надіслати картку
+  }
+}
 
 async function loadChatBotData(): Promise<any> {
   if (chatBotData && Date.now() - chatBotData.at < 10 * 60 * 1000) return chatBotData.data;
@@ -3594,6 +3646,162 @@ async function handleCallBack(request: Request, body: Record<string, any>): Prom
 
     return adminJson({ ok: false, error: "unavailable" }, 200, origin);
 
+  }
+
+  return adminJson({ ok: true }, 200, origin);
+
+}
+
+// Заявка на байєр-сервіс зі сторінки /bayer-service. Як і зворотний
+// дзвінок — лише повідомлення власнику в Telegram: у базу нічого не
+// пишемо, листів не шлемо. Перевірка полів і текст — у buyer-request.js.
+async function handleBuyerRequest(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  // Пастка для ботів: приховане поле, яке людина не бачить і не
+  // заповнює. Заповнене — відповідаємо «готово» й нічого не робимо:
+  // бот не дізнається, що його впізнали, і не підлаштується.
+  if (String(body.website ?? "").trim()) {
+    console.warn("Заявка на байєр-сервіс: заповнено поле-пастку");
+    return adminJson({ ok: true }, 200, origin);
+  }
+
+  const checked = normalizeBuyerRequest(body);
+
+  if (!checked.ok) {
+    return adminJson({ ok: false, error: checked.error }, 400, origin);
+  }
+
+  const вердикт = await contactAllowed(request, "buyer");
+
+  if (вердикт !== "ok") {
+
+    if (вердикт === "global-first") await warnAboutFlood("buyer");
+
+    return adminJson({ ok: false, error: "too_many" }, 429, origin);
+
+  }
+
+  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
+
+    // Не «ок»: інакше людина чекала б розрахунку, якого ніхто не робить.
+    console.error("Заявка на байєр-сервіс: бот не налаштований");
+
+    return adminJson({ ok: false, error: "not_configured" }, 501, origin);
+
+  }
+
+  const sent = await telegram("sendMessage", {
+    chat_id: TELEGRAM_CHAT_ID,
+    text: formatBuyerRequest(checked.request, escapeHtml),
+    parse_mode: "HTML",
+    disable_web_page_preview: true,
+  });
+
+  if (!sent?.ok) {
+
+    await reportServerIssue("buyer_request", "Telegram не прийняв заявку на байєр-сервіс");
+
+    return adminJson({ ok: false, error: "unavailable" }, 200, origin);
+
+  }
+
+  return adminJson({ ok: true }, 200, origin);
+
+}
+
+// Каталог сайту — щоб перевірити, що такий товар, колір і розмір є, і
+// назвати товар у повідомленні власнику. Той самий файл, що вантажить
+// сайт; кеш на 10 хвилин, як у даних бота.
+let stockAlertCatalog: { at: number; list: any[] } | null = null;
+
+async function loadSiteCatalog(): Promise<any[]> {
+  if (stockAlertCatalog && Date.now() - stockAlertCatalog.at < 10 * 60 * 1000) return stockAlertCatalog.list;
+  const response = await fetch(`${BOT_SITE}/data/catalog.json`, { signal: AbortSignal.timeout(4000) });
+  if (!response.ok) throw new Error(`catalog.json: ${response.status}`);
+  const list = await response.json();
+  stockAlertCatalog = { at: Date.now(), list: Array.isArray(list) ? list : [] };
+  return stockAlertCatalog.list;
+}
+
+// «Повідомити, коли з'явиться» зі сторінки товару. Підписка — у
+// stock_alerts (міграція 046), лист — scripts/stock-alerts.js.
+async function handleStockAlert(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  // Пастка для ботів — як у заявці на байєр-сервіс.
+  if (String(body.website ?? "").trim()) {
+    return adminJson({ ok: true }, 200, origin);
+  }
+
+  const checked = normalizeStockAlert(body);
+
+  if (!checked.ok) {
+    return adminJson({ ok: false, error: checked.error }, 400, origin);
+  }
+
+  const вердикт = await contactAllowed(request, "stock-alert");
+
+  if (вердикт !== "ok") {
+
+    if (вердикт === "global-first") await warnAboutFlood("stock-alert");
+
+    return adminJson({ ok: false, error: "too_many" }, 429, origin);
+
+  }
+
+  let product: any = null;
+
+  try {
+    product = (await loadSiteCatalog()).find((p: any) => Number(p.id) === checked.alert.product_id) ?? null;
+  } catch (error) {
+    console.error("Підписка на наявність: каталог недоступний", error);
+    return adminJson({ ok: false, error: "unavailable" }, 200, origin);
+  }
+
+  const variant = product ? stockAlertVariant(product, checked.alert.color, checked.alert.size) : null;
+
+  if (!variant) {
+    return adminJson({ ok: false, error: "bad_product" }, 400, origin);
+  }
+
+  const added = await supabaseRest("rpc/stock_alert_add", {
+    method: "POST",
+    body: JSON.stringify({
+      p_email: checked.alert.email,
+      p_product: checked.alert.product_id,
+      p_color: variant.color,
+      p_size: variant.size,
+      p_lang: checked.alert.lang,
+    }),
+  });
+
+  if (!added.ok) {
+    // Найімовірніше, міграції 046 ще немає. Не «ок»: інакше людина
+    // чекала б листа, якого ніхто не надішле.
+    console.error("Підписка на наявність: stock_alert_add →", added.status, (await added.text()).slice(0, 200));
+    return adminJson({ ok: false, error: "unavailable" }, 200, origin);
+  }
+
+  const result = await added.json().catch(() => "");
+
+  if (result === "exists") return adminJson({ ok: true, already: true }, 200, origin);
+
+  if (result === "limit") return adminJson({ ok: false, error: "limit" }, 429, origin);
+
+  if (result !== "ok") return adminJson({ ok: false, error: "bad_email" }, 400, origin);
+
+  // Власнику — що є попит. Не вийшло — підписка однаково збережена,
+  // тож людині кажемо «готово».
+  if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
+    await telegram("sendMessage", {
+      chat_id: TELEGRAM_CHAT_ID,
+      text: formatStockAlert(product, { ...checked.alert, ...variant }, escapeHtml),
+      parse_mode: "HTML",
+      disable_web_page_preview: true,
+    }).catch(() => null);
   }
 
   return adminJson({ ok: true }, 200, origin);
@@ -6323,6 +6531,20 @@ async function handleRequest(request: Request): Promise<Response> {
   if (body.site_action === "call-back") {
 
     return await handleCallBack(request, body);
+
+  }
+
+  // --- заявка на байєр-сервіс зі сторінки /bayer-service ---
+  if (body.site_action === "buyer-request") {
+
+    return await handleBuyerRequest(request, body);
+
+  }
+
+  // --- «повідомити, коли з'явиться» зі сторінки товару ---
+  if (body.site_action === "stock-alert") {
+
+    return await handleStockAlert(request, body);
 
   }
 

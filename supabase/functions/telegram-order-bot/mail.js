@@ -32,7 +32,7 @@
 // підтвердженої адреси. Хай власник обирає, що йому простіше; код
 // однаково готовий до обох.
 
-import { escapeHtml, money, trackingUrl } from "./format.js";
+import { escapeHtml, money, trackingUrl, freeDeliveryApplies } from "./format.js";
 
 // Куда приходить відповідь покупця.
 //
@@ -88,6 +88,7 @@ const TEXT = {
     uk: {
         hours: "Пн–Нд 09:00–20:00",
         subtotal: "Сума товарів", discount: "Знижка", delivery: "Доставка", total: "Разом",
+        freeDelivery: "безкоштовно",
         method: "Спосіб", city: "Місто", branch: "Відділення", payment: "Оплата",
         yourOrder: "Ваше замовлення",
         lookup: "Стан замовлення можна перевірити будь-коли: {link} — потрібні номер {number} і ваш телефон.",
@@ -134,11 +135,17 @@ const TEXT = {
         subscribeButton: "Підтвердити підписку",
         copyLink: "Кнопка не працює? Скопіюйте адресу:",
         subscribeNote: "Посилання діє тиждень. Листи приходять не частіше ніж кілька разів на місяць, і відписатись можна з будь-якого — посилання внизу кожного.",
-        subscribeIgnore: "Якщо це були не ви — просто видаліть лист. Без переходу за посиланням ми на цю адресу нічого не надсилатимемо."
+        subscribeIgnore: "Якщо це були не ви — просто видаліть лист. Без переходу за посиланням ми на цю адресу нічого не надсилатимемо.",
+        stockSubject: "Знову в наявності: {title}",
+        stockTitle: "Знову в наявності",
+        stockIntro: "Ви просили повідомити, коли ця річ з'явиться. Вона знову в наявності — відправляємо за 1–3 дні.",
+        stockButton: "Переглянути товар",
+        stockNote: "Це єдиний лист про цей товар — більше ми про нього не напишемо. Найчастіше така річ у нас одна, тож наявність може змінитись. Якщо вона вже не потрібна, просто не звертайте уваги."
     },
     en: {
         hours: "Mon–Sun 09:00–20:00 (Kyiv time)",
         subtotal: "Items", discount: "Discount", delivery: "Delivery", total: "Total",
+        freeDelivery: "free",
         method: "Method", city: "City", branch: "Branch", payment: "Payment",
         yourOrder: "Your order",
         lookup: "You can check your order status any time: {link} — you will need the number {number} and your phone.",
@@ -185,11 +192,17 @@ const TEXT = {
         subscribeButton: "Confirm subscription",
         copyLink: "Button not working? Copy the link:",
         subscribeNote: "The link is valid for a week. We write no more than a few times a month, and you can unsubscribe from any email — the link is at the bottom of each one.",
-        subscribeIgnore: "If this wasn't you, just delete this email. Unless the link is opened, we will send nothing to this address."
+        subscribeIgnore: "If this wasn't you, just delete this email. Unless the link is opened, we will send nothing to this address.",
+        stockSubject: "Back in stock: {title}",
+        stockTitle: "Back in stock",
+        stockIntro: "You asked us to let you know when this item is available. It's back in stock — we ship within 1–3 days.",
+        stockButton: "View the item",
+        stockNote: "This is the only email about this item — we won't write about it again. We usually have just one piece, so availability may change. If you no longer need it, simply ignore this email."
     },
     ru: {
         hours: "Пн–Вс 09:00–20:00",
         subtotal: "Сумма товаров", discount: "Скидка", delivery: "Доставка", total: "Итого",
+        freeDelivery: "бесплатно",
         method: "Способ", city: "Город", branch: "Отделение", payment: "Оплата",
         yourOrder: "Ваш заказ",
         lookup: "Состояние заказа можно проверить в любой момент: {link} — понадобятся номер {number} и ваш телефон.",
@@ -236,7 +249,12 @@ const TEXT = {
         subscribeButton: "Подтвердить подписку",
         copyLink: "Кнопка не работает? Скопируйте адрес:",
         subscribeNote: "Ссылка действует неделю. Письма приходят не чаще нескольких раз в месяц, и отписаться можно из любого — ссылка внизу каждого.",
-        subscribeIgnore: "Если это были не вы — просто удалите письмо. Без перехода по ссылке мы на этот адрес ничего не будем отправлять."
+        subscribeIgnore: "Если это были не вы — просто удалите письмо. Без перехода по ссылке мы на этот адрес ничего не будем отправлять.",
+        stockSubject: "Снова в наличии: {title}",
+        stockTitle: "Снова в наличии",
+        stockIntro: "Вы просили сообщить, когда эта вещь появится. Она снова в наличии — отправляем за 1–3 дня.",
+        stockButton: "Посмотреть товар",
+        stockNote: "Это единственное письмо об этом товаре — больше мы о нём не напишем. Чаще всего такая вещь у нас одна, поэтому наличие может измениться. Если она уже не нужна, просто не обращайте внимания."
     }
 };
 
@@ -475,6 +493,11 @@ export function orderLetter(order, siteUrl) {
         Number(order?.subtotal) > 0 ? row(mailText(l, "subtotal"), escapeHtml(localMoney(order.subtotal, l))) : "",
         Number(order?.discount) > 0 ? row(mailText(l, "discount"), "−" + escapeHtml(localMoney(order.discount, l))) : "",
         Number(order?.delivery_price) > 0 ? row(mailText(l, "delivery"), escapeHtml(localMoney(order.delivery_price, l))) : "",
+        // Від порогу відправку оплачує магазин — це варто сказати в
+        // листі прямо: інакше людина приготує гроші для пошти.
+        !(Number(order?.delivery_price) > 0) && freeDeliveryApplies(order?.total)
+            ? row(mailText(l, "delivery"), escapeHtml(mailText(l, "freeDelivery")))
+            : "",
         row(mailText(l, "total"), escapeHtml(localMoney(order?.total, l)), true)
     ].join("");
 
@@ -992,6 +1015,50 @@ export function addEmailLetter(confirmUrl, email, siteUrl) {
     return {
         subject: "Підтвердіть email для кабінету BestBrnd4u",
         html: letterShell("Підтвердіть адресу ✉️", body, siteUrl),
+    };
+
+}
+
+// «Знову в наявності» — підписка з кнопки на сторінці товару
+// (міграція 046, scripts/stock-alerts.js).
+//
+// ЧОМУ ЛИСТ ОДИН. Людина просила одне: сказати, коли річ з'явиться. Тому
+// після цього листа підписка закрита, і про це сказано в тексті — інакше
+// він читається як початок розсилки, на яку людина не погоджувалась.
+//
+// item: { title, brand, price, color, size, image, url } — адреси вже
+// абсолютні (їх складає скрипт розсилки).
+export function stockAlertLetter(item, siteUrl, lang) {
+
+    if (!item || !item.url) return null;
+
+    const l = mailLang(lang);
+
+    const url = escapeHtml(item.url);
+
+    const body = [
+        `<div style="font-size:15px;line-height:1.6">`,
+        escapeHtml(mailText(l, "stockIntro")),
+        `</div>`,
+        itemsTable([{ ...item, qty: 1 }], l),
+        `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:18px auto 0">`,
+        `<tr><td style="background:#111827;border-radius:10px">`,
+        `<a href="${url}" style="display:inline-block;padding:14px 28px;`,
+        `font-size:15px;font-weight:700;color:#ffffff;text-decoration:none">`,
+        escapeHtml(mailText(l, "stockButton")),
+        `</a>`,
+        `</td></tr>`,
+        `</table>`,
+        `<div style="margin-top:22px;font-size:13px;line-height:1.6;color:#6b7280">`,
+        escapeHtml(mailText(l, "stockNote")),
+        `</div>`
+    ].join("");
+
+    const title = (l !== "uk" && item.title_local) || item.title || "";
+
+    return {
+        subject: mailText(l, "stockSubject", { title: [item.brand, title].filter(Boolean).join(" ") }),
+        html: letterShell(mailText(l, "stockTitle"), body, siteUrl, l)
     };
 
 }

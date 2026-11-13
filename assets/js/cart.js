@@ -14,6 +14,34 @@ const cartDiscountRowEl = document.getElementById("cartDiscountRow");
 const cartDiscountEl = document.getElementById("cartDiscount");
 const cartTotalEl = document.getElementById("cartTotal");
 const checkoutBtn = document.getElementById("checkoutBtn");
+const cartDeliveryNoteEl = document.getElementById("cartDeliveryNote");
+const cartFreeDeliveryHintEl = document.getElementById("cartFreeDeliveryHint");
+
+// Рядок «Доставка» і підказка під сумою — за порогом із адмінки
+// (див. FreeDelivery у common.js). Сума до сплати від цього не
+// змінюється: від порогу відправку оплачує магазин, а не покупець.
+function renderFreeDelivery(total) {
+
+    if (!window.FreeDelivery || !cartDeliveryNoteEl) return;
+
+    window.FreeDelivery.threshold().then(from => {
+
+        const free = window.FreeDelivery.applies(total, from);
+
+        cartDeliveryNoteEl.textContent = free ? "безкоштовно" : "за тарифом перевізника";
+        cartDeliveryNoteEl.classList.toggle("is-free", free);
+
+        if (!cartFreeDeliveryHintEl) return;
+
+        const text = window.FreeDelivery.hint(total, from, formatPrice);
+
+        cartFreeDeliveryHintEl.textContent = text;
+        cartFreeDeliveryHintEl.classList.toggle("is-free", free);
+        cartFreeDeliveryHintEl.hidden = !text;
+
+    });
+
+}
 
 async function initCart() {
 
@@ -330,6 +358,8 @@ function renderCart() {
     }
 
     cartTotalEl.textContent = formatPrice(subtotal);
+
+    renderFreeDelivery(subtotal);
 
     updateCartCounter();
 

@@ -12,6 +12,8 @@
 //   supabase/functions/telegram-order-bot/reviews.js
 //   supabase/functions/telegram-order-bot/subscribe.js
 //   supabase/functions/telegram-order-bot/call-back.js
+//   supabase/functions/telegram-order-bot/buyer-request.js
+//   supabase/functions/telegram-order-bot/stock-alert.js
 //   supabase/functions/telegram-order-bot/chat.js
 //   supabase/functions/telegram-order-bot/chat-bot.js
 //   supabase/functions/telegram-order-bot/checkout-draft.js
@@ -171,6 +173,34 @@ function itemLine(item) {
 
 }
 
+// Безкоштовна доставка від суми (data/delivery.json на сайті, адмінка
+// → Налаштування → «Безкоштовна доставка»).
+//
+// Ставить loadFreeDelivery() в _index.src.ts перед кожною карткою й
+// листом. Поки поріг невідомий (файл не завантажився) — 0, і картка
+// мовчить про доставку, як мовчала досі: краще не сказати, ніж
+// пообіцяти власнику чужий поріг.
+//
+// Магазин за доставку грошей не бере — від порогу ВІН оплачує
+// відправку замість покупця. Тому для власника це не прикраса, а
+// дія: оформити накладну з оплатою відправником.
+let freeDeliveryFrom = 0;
+
+function setFreeDeliveryFrom(value) {
+  const n = Math.round(Number(value));
+  freeDeliveryFrom = Number.isFinite(n) && n > 0 ? n : 0;
+}
+
+function getFreeDeliveryFrom() {
+  return freeDeliveryFrom;
+}
+
+// Порівнюємо з сумою ДО СПЛАТИ (після знижок) — так само, як сайт
+// (FreeDelivery у assets/js/common.js).
+function freeDeliveryApplies(total, from = freeDeliveryFrom) {
+  return from > 0 && Number(total) >= from;
+}
+
 function formatOrder(order) {
 
   const status = STATUSES[normalizeStatus(order.status)] ?? STATUSES.new;
@@ -191,6 +221,9 @@ function formatOrder(order) {
     Number(order.discount) > 0 ? `Знижка: −${money(order.discount)}` : "",
     Number(order.delivery_price) > 0 ? `Доставка: ${money(order.delivery_price)}` : "",
     `<b>Разом: ${money(order.total)}</b>`,
+    freeDeliveryApplies(order.total)
+      ? `🎁 <b>Безкоштовна доставка</b> (від ${money(freeDeliveryFrom)}) — відправку оплачує магазин`
+      : "",
     // Суму рахує браузер, а перевіряє база — своїми цінами
     // (supabase/migrations/014-order-pricing.sql). Розбіжність означає
     // або підроблене замовлення, або ціну, що змінилась між
@@ -974,7 +1007,9 @@ function summaryText(product, session) {
     // «безкоштовно», а насправді її оплачують перевізнику.
     totals.delivery > 0
       ? `Доставка: ${money(totals.delivery)}`
-      : "Доставка: за тарифом перевізника",
+      : freeDeliveryApplies(totals.total)
+        ? "Доставка: безкоштовно — відправку оплачує магазин"
+        : "Доставка: за тарифом перевізника",
     `<b>Разом: ${money(totals.total)}</b>`,
   ];
 
@@ -1984,6 +2019,7 @@ const TEXT = {
     uk: {
         hours: "Пн–Нд 09:00–20:00",
         subtotal: "Сума товарів", discount: "Знижка", delivery: "Доставка", total: "Разом",
+        freeDelivery: "безкоштовно",
         method: "Спосіб", city: "Місто", branch: "Відділення", payment: "Оплата",
         yourOrder: "Ваше замовлення",
         lookup: "Стан замовлення можна перевірити будь-коли: {link} — потрібні номер {number} і ваш телефон.",
@@ -2030,11 +2066,17 @@ const TEXT = {
         subscribeButton: "Підтвердити підписку",
         copyLink: "Кнопка не працює? Скопіюйте адресу:",
         subscribeNote: "Посилання діє тиждень. Листи приходять не частіше ніж кілька разів на місяць, і відписатись можна з будь-якого — посилання внизу кожного.",
-        subscribeIgnore: "Якщо це були не ви — просто видаліть лист. Без переходу за посиланням ми на цю адресу нічого не надсилатимемо."
+        subscribeIgnore: "Якщо це були не ви — просто видаліть лист. Без переходу за посиланням ми на цю адресу нічого не надсилатимемо.",
+        stockSubject: "Знову в наявності: {title}",
+        stockTitle: "Знову в наявності",
+        stockIntro: "Ви просили повідомити, коли ця річ з'явиться. Вона знову в наявності — відправляємо за 1–3 дні.",
+        stockButton: "Переглянути товар",
+        stockNote: "Це єдиний лист про цей товар — більше ми про нього не напишемо. Найчастіше така річ у нас одна, тож наявність може змінитись. Якщо вона вже не потрібна, просто не звертайте уваги."
     },
     en: {
         hours: "Mon–Sun 09:00–20:00 (Kyiv time)",
         subtotal: "Items", discount: "Discount", delivery: "Delivery", total: "Total",
+        freeDelivery: "free",
         method: "Method", city: "City", branch: "Branch", payment: "Payment",
         yourOrder: "Your order",
         lookup: "You can check your order status any time: {link} — you will need the number {number} and your phone.",
@@ -2081,11 +2123,17 @@ const TEXT = {
         subscribeButton: "Confirm subscription",
         copyLink: "Button not working? Copy the link:",
         subscribeNote: "The link is valid for a week. We write no more than a few times a month, and you can unsubscribe from any email — the link is at the bottom of each one.",
-        subscribeIgnore: "If this wasn't you, just delete this email. Unless the link is opened, we will send nothing to this address."
+        subscribeIgnore: "If this wasn't you, just delete this email. Unless the link is opened, we will send nothing to this address.",
+        stockSubject: "Back in stock: {title}",
+        stockTitle: "Back in stock",
+        stockIntro: "You asked us to let you know when this item is available. It's back in stock — we ship within 1–3 days.",
+        stockButton: "View the item",
+        stockNote: "This is the only email about this item — we won't write about it again. We usually have just one piece, so availability may change. If you no longer need it, simply ignore this email."
     },
     ru: {
         hours: "Пн–Вс 09:00–20:00",
         subtotal: "Сумма товаров", discount: "Скидка", delivery: "Доставка", total: "Итого",
+        freeDelivery: "бесплатно",
         method: "Способ", city: "Город", branch: "Отделение", payment: "Оплата",
         yourOrder: "Ваш заказ",
         lookup: "Состояние заказа можно проверить в любой момент: {link} — понадобятся номер {number} и ваш телефон.",
@@ -2132,7 +2180,12 @@ const TEXT = {
         subscribeButton: "Подтвердить подписку",
         copyLink: "Кнопка не работает? Скопируйте адрес:",
         subscribeNote: "Ссылка действует неделю. Письма приходят не чаще нескольких раз в месяц, и отписаться можно из любого — ссылка внизу каждого.",
-        subscribeIgnore: "Если это были не вы — просто удалите письмо. Без перехода по ссылке мы на этот адрес ничего не будем отправлять."
+        subscribeIgnore: "Если это были не вы — просто удалите письмо. Без перехода по ссылке мы на этот адрес ничего не будем отправлять.",
+        stockSubject: "Снова в наличии: {title}",
+        stockTitle: "Снова в наличии",
+        stockIntro: "Вы просили сообщить, когда эта вещь появится. Она снова в наличии — отправляем за 1–3 дня.",
+        stockButton: "Посмотреть товар",
+        stockNote: "Это единственное письмо об этом товаре — больше мы о нём не напишем. Чаще всего такая вещь у нас одна, поэтому наличие может измениться. Если она уже не нужна, просто не обращайте внимания."
     }
 };
 
@@ -2371,6 +2424,11 @@ function orderLetter(order, siteUrl) {
         Number(order?.subtotal) > 0 ? row(mailText(l, "subtotal"), escapeHtml(localMoney(order.subtotal, l))) : "",
         Number(order?.discount) > 0 ? row(mailText(l, "discount"), "−" + escapeHtml(localMoney(order.discount, l))) : "",
         Number(order?.delivery_price) > 0 ? row(mailText(l, "delivery"), escapeHtml(localMoney(order.delivery_price, l))) : "",
+        // Від порогу відправку оплачує магазин — це варто сказати в
+        // листі прямо: інакше людина приготує гроші для пошти.
+        !(Number(order?.delivery_price) > 0) && freeDeliveryApplies(order?.total)
+            ? row(mailText(l, "delivery"), escapeHtml(mailText(l, "freeDelivery")))
+            : "",
         row(mailText(l, "total"), escapeHtml(localMoney(order?.total, l)), true)
     ].join("");
 
@@ -2888,6 +2946,50 @@ function addEmailLetter(confirmUrl, email, siteUrl) {
     return {
         subject: "Підтвердіть email для кабінету BestBrnd4u",
         html: letterShell("Підтвердіть адресу ✉️", body, siteUrl),
+    };
+
+}
+
+// «Знову в наявності» — підписка з кнопки на сторінці товару
+// (міграція 046, scripts/stock-alerts.js).
+//
+// ЧОМУ ЛИСТ ОДИН. Людина просила одне: сказати, коли річ з'явиться. Тому
+// після цього листа підписка закрита, і про це сказано в тексті — інакше
+// він читається як початок розсилки, на яку людина не погоджувалась.
+//
+// item: { title, brand, price, color, size, image, url } — адреси вже
+// абсолютні (їх складає скрипт розсилки).
+function stockAlertLetter(item, siteUrl, lang) {
+
+    if (!item || !item.url) return null;
+
+    const l = mailLang(lang);
+
+    const url = escapeHtml(item.url);
+
+    const body = [
+        `<div style="font-size:15px;line-height:1.6">`,
+        escapeHtml(mailText(l, "stockIntro")),
+        `</div>`,
+        itemsTable([{ ...item, qty: 1 }], l),
+        `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:18px auto 0">`,
+        `<tr><td style="background:#111827;border-radius:10px">`,
+        `<a href="${url}" style="display:inline-block;padding:14px 28px;`,
+        `font-size:15px;font-weight:700;color:#ffffff;text-decoration:none">`,
+        escapeHtml(mailText(l, "stockButton")),
+        `</a>`,
+        `</td></tr>`,
+        `</table>`,
+        `<div style="margin-top:22px;font-size:13px;line-height:1.6;color:#6b7280">`,
+        escapeHtml(mailText(l, "stockNote")),
+        `</div>`
+    ].join("");
+
+    const title = (l !== "uk" && item.title_local) || item.title || "";
+
+    return {
+        subject: mailText(l, "stockSubject", { title: [item.brand, title].filter(Boolean).join(" ") }),
+        html: letterShell(mailText(l, "stockTitle"), body, siteUrl, l)
     };
 
 }
@@ -4741,6 +4843,260 @@ function formatCallBack(phone, page, escape) {
         "",
         "Обіцяли передзвонити протягом робочого дня.",
     ].filter(Boolean).join("\n");
+
+}
+
+
+// Заявка на байєр-сервіс: людина лишає посилання на річ, якої немає в
+// каталозі, — власнику прилітає Telegram із усім, що треба для
+// розрахунку.
+//
+// ЧОГО ТУТ НЕМА
+// --------------
+// Мережі. Лише чисті функції — щоб перевірялись тестами в Node (так
+// само, як call-back.js). Обробник із межами й відправкою — у
+// _index.src.ts, handleBuyerRequest().
+//
+// ЧОМУ ПЕРЕВІРЯЄМО ТУТ, ХОЧ СТОРІНКА ВЖЕ ПЕРЕВІРИЛА
+// ---------------------------------------------------
+// Запит до функції можна надіслати й без сторінки. Перевірка в
+// браузері — зручність для людини, ця — єдина справжня. А текст
+// потрапляє в повідомлення з parse_mode HTML: усе, що прийшло від
+// клієнта, екранується, а посилання беремо лише http(s).
+
+
+const BUYER_LIMITS = {
+    links: 5,        // посилань в одній заявці
+    link: 500,       // знаків в одному посиланні
+    name: 80,
+    details: 1000,   // «розмір, колір, побажання»
+    budget: 10000000 // грн — стеля здорового глузду
+};
+
+// Варіанти доставки — ті самі, що в таблиці на сторінці. Ключ, а не
+// текст: сторінка буває англійською й російською, а власник читає
+// українською.
+const BUYER_DELIVERY = {
+    advise: "Порадьте найвигідніший",
+    europe: "З Європи",
+    sea: "Морем із США",
+    air: "Авіа із США"
+};
+
+const BUYER_CONTACT = {
+    telegram: "Telegram",
+    viber: "Viber",
+    call: "Дзвінок"
+};
+
+function buyerClean(value, max) {
+    return String(value ?? "")
+        // Керівні символи (окрім переносу рядка) — геть: у Telegram
+        // вони ламають розмітку, а людині не потрібні.
+        .replace(/[\u0000-\u0009\u000B-\u001F\u007F]/g, " ")
+        .replace(/[ \t]+/g, " ")
+        .replace(/\n{3,}/g, "\n\n")
+        .trim()
+        .slice(0, max);
+}
+
+// Посилання — з поля, де людина пише «одне в рядку», але насправді
+// вставляє через пробіл, кому чи взагалі разом із текстом. Тому шукаємо
+// самі адреси, а не ділимо за рядками.
+function buyerLinks(raw) {
+
+    const found = String(raw ?? "").match(/https?:\/\/[^\s<>"'«»]+/gi) || [];
+
+    const out = [];
+
+    for (const candidate of found) {
+
+        // Хвостова пунктуація з речення — не частина адреси.
+        const link = candidate.replace(/[.,;:!?)\]]+$/, "");
+
+        if (link.length > BUYER_LIMITS.link) continue;
+
+        let url;
+        try { url = new URL(link); } catch (_) { continue; }
+
+        // Протокол окремо не перевіряємо: регулярка вище бере лише
+        // http:// і https://, тож javascript: чи data: сюди не доходять.
+
+        // Адреса без крапки в імені вузла (http://localhost, http://1) —
+        // не магазин.
+        if (!url.hostname.includes(".")) continue;
+
+        if (!out.includes(link)) out.push(link);
+
+        if (out.length >= BUYER_LIMITS.links) break;
+    }
+
+    return out;
+
+}
+
+// Повертає { ok: true, request } або { ok: false, error }.
+//
+// Коди помилок — ті, на які сторінка показує людині зрозуміле:
+//   bad_phone   — номер не схожий на український;
+//   no_item     — немає ні посилання, ні опису речі;
+//   no_name     — ім'я порожнє;
+//   no_consent  — не погодився на обробку даних.
+function normalizeBuyerRequest(body) {
+
+    const b = body || {};
+
+    const phone = normalizeCallBackPhone(b.phone);
+
+    if (!phone) return { ok: false, error: "bad_phone" };
+
+    const name = buyerClean(b.name, BUYER_LIMITS.name);
+
+    if (!name) return { ok: false, error: "no_name" };
+
+    const links = buyerLinks(b.links);
+
+    // Опис без посилань теж годиться: «Coach Tabby 26, чорна» — цього
+    // власнику досить, щоб знайти. А от зовсім порожня заявка — ні.
+    const details = buyerClean(b.details, BUYER_LIMITS.details);
+
+    if (!links.length && details.replace(/\s/g, "").length < 3) return { ok: false, error: "no_item" };
+
+    if (b.consent !== true) return { ok: false, error: "no_consent" };
+
+    const delivery = Object.prototype.hasOwnProperty.call(BUYER_DELIVERY, b.delivery) ? b.delivery : "advise";
+    const contact = Object.prototype.hasOwnProperty.call(BUYER_CONTACT, b.contact) ? b.contact : "call";
+
+    const budgetDigits = String(b.budget ?? "").replace(/\D/g, "");
+    const budget = budgetDigits ? Math.min(Number(budgetDigits), BUYER_LIMITS.budget) : 0;
+
+    const lang = b.lang === "en" || b.lang === "ru" ? b.lang : "uk";
+
+    return { ok: true, request: { name, phone, links, details, delivery, contact, budget, lang } };
+
+}
+
+function buyerGrn(value) {
+    return `${String(value).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} грн`;
+}
+
+const BUYER_LANG_NAME = { uk: "", en: "англійською", ru: "російською" };
+
+function formatBuyerRequest(req, escape) {
+
+    const esc = typeof escape === "function" ? escape : (v) => String(v ?? "");
+
+    return [
+        "🛍 <b>Заявка на байєр-сервіс</b>",
+        "",
+        `👤 ${esc(req.name)}`,
+        `📞 <a href="tel:${esc(req.phone)}">${esc(req.phone)}</a> — відповісти: <b>${esc(BUYER_CONTACT[req.contact])}</b>`,
+        req.lang !== "uk" ? `🌐 Заявку заповнено ${BUYER_LANG_NAME[req.lang]} — відповідайте тією ж мовою` : "",
+        "",
+        req.links.length ? "🔗 <b>Що викупити:</b>" : "",
+        ...req.links.map((link, i) => `${i + 1}. ${esc(link)}`),
+        req.details ? `📝 ${esc(req.details)}` : "",
+        "",
+        `🚚 Доставка: ${esc(BUYER_DELIVERY[req.delivery])}`,
+        req.budget ? `💰 Бюджет: до ${buyerGrn(req.budget)}` : "",
+        "",
+        "Обіцяли повний розрахунок протягом робочого дня.",
+    ].filter((line, i, all) => line !== "" || (all[i - 1] !== "" && i > 0)).join("\n").trim();
+
+}
+
+
+// «Повідомити, коли з'явиться»: підписка на наявність товару.
+//
+// ЧОГО ТУТ НЕМА
+// --------------
+// Мережі. Лише чисті функції — щоб перевірялись тестами в Node.
+// Обробник — handleStockAlert() у _index.src.ts, таблиця — міграція
+// 046, розсилка — scripts/stock-alerts.js.
+
+const STOCK_ALERT_LIMITS = {
+    email: 254,
+    color: 80,
+    size: 40
+};
+
+// Та сама проста перевірка, що в базі (stock_alert_add): «щось@щось.щось»
+// без пробілів. Точніше пошту перевіряє лише лист, який до неї дійде.
+function normalizeStockAlertEmail(raw) {
+    const email = String(raw ?? "").trim().toLowerCase();
+    if (email.length < 5 || email.length > STOCK_ALERT_LIMITS.email) return null;
+    return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) ? email : null;
+}
+
+function stockAlertClean(value, max) {
+    return String(value ?? "").replace(/[\u0000-\u001F\u007F]/g, " ").replace(/\s+/g, " ").trim().slice(0, max);
+}
+
+// Повертає { ok: true, alert } або { ok: false, error }:
+//   bad_email   — пошта не схожа на пошту;
+//   bad_product — немає номера товару.
+// Чи існує такий товар і такий колір, вирішує обробник за каталогом.
+function normalizeStockAlert(body) {
+
+    const b = body || {};
+
+    const email = normalizeStockAlertEmail(b.email);
+
+    if (!email) return { ok: false, error: "bad_email" };
+
+    const productId = Number(b.product_id);
+
+    if (!Number.isInteger(productId) || productId <= 0) return { ok: false, error: "bad_product" };
+
+    return {
+        ok: true,
+        alert: {
+            email,
+            product_id: productId,
+            color: stockAlertClean(b.color, STOCK_ALERT_LIMITS.color),
+            // Розмір — як у залишках, навіть ONESIZE: саме за цим
+            // ключем scripts/stock-alerts.js шукає комірку. Ховаємо
+            // заглушку лише там, де її читає людина (лист, Telegram).
+            size: stockAlertClean(b.size, STOCK_ALERT_LIMITS.size),
+            lang: b.lang === "en" || b.lang === "ru" ? b.lang : null
+        }
+    };
+
+}
+
+// Колір і розмір — лише ті, що є в товарі (каталог). Чужий текст сюди
+// не пишемо: він потім іде в лист і в повідомлення власнику, а комірку
+// залишку з вигаданим розміром розсилка не знайшла б ніколи.
+//
+// Повертає { color, size } або null.
+function stockAlertVariant(product, color, size) {
+    const variants = Array.isArray(product && product.variants) ? product.variants : [];
+    const variant = color ? variants.find(v => v && v.color === color) : variants[0];
+    if (color && !variant) return null;
+    const sizes = (variant && Array.isArray(variant.sizes) && variant.sizes.length)
+        ? variant.sizes
+        : (Array.isArray(product && product.sizes) ? product.sizes : []);
+    if (size && !sizes.includes(size)) return null;
+    return { color: color || '', size: size || '' };
+}
+
+// Повідомлення власнику: хто й чого чекає. Не адреса — вона власнику
+// ні до чого, а в переписці Telegram зайва; досить знати, на що попит.
+function formatStockAlert(product, alert, escape) {
+
+    const esc = typeof escape === "function" ? escape : (v) => String(v ?? "");
+
+    const size = /^onesize$/i.test(alert.size || "") ? "" : alert.size;
+    const variant = [alert.color, size].filter(Boolean).join(" / ");
+
+    return [
+        "🔔 <b>Чекають на наявність</b>",
+        "",
+        `${esc([product.brand, product.title].filter(Boolean).join(" "))}`,
+        variant ? `Варіант: ${esc(variant)}` : "",
+        "",
+        "Людина залишила пошту — щойно цей варіант буде в наявності, лист піде сам (scripts/stock-alerts.js).",
+    ].filter((line, i, all) => line !== "" || all[i - 1] !== "").join("\n");
 
 }
 
@@ -6707,7 +7063,7 @@ function mergeWishes(current, previous) {
 // Теми, на які людина питає найчастіше, — словами, а не номером
 // питання: «скільки йде посилка» і «коли відправите» — одне й те саме.
 const TOPICS = [
-    { key: "delivery-cost", stems: ["скільки кошт доставк", "вартість доставк", "ціна доставк", "сколько стоит доставк", "стоимость доставк", "delivery cost", "shipping cost", "how much delivery", "how much is delivery", "how much does delivery"], faq: /Скільки коштує доставка|How much does delivery|Сколько стоит доставка/i },
+    { key: "delivery-cost", stems: ["скільки кошт доставк", "вартість доставк", "ціна доставк", "сколько стоит доставк", "стоимость доставк", "delivery cost", "shipping cost", "how much delivery", "how much is delivery", "how much does delivery", "безкоштовна доставк", "безкоштовну доставк", "безкоштовної доставк", "доставка безкоштовн", "доставку безкоштовн", "бесплатная доставк", "бесплатную доставк", "бесплатной доставк", "доставка бесплатн", "доставку бесплатн", "free shipping", "free delivery", "shipping free", "delivery free", "ship free", "ships free", "shipping is free", "delivery is free"], faq: /Скільки коштує доставка|How much does delivery|Сколько стоит доставка/i },
     { key: "delivery-time", stems: ["як швидко", "як довго", "довго йде", "довго їде", "скільки днів", "коли відправ", "скільки йде", "скільки їде", "как долго", "долго идет", "сколько дней", "термін доставк", "строк доставк", "как быстро", "когда отправ", "сколько идет", "срок доставк", "how fast", "how quickly", "when will", "how long", "ship", "до понеділк", "до вівторк", "до середи", "до четверг", "до п'ятниц", "до суботи", "до неділі", "до понедельник", "до вторник", "до среды", "до четверг", "до пятниц", "до субботы", "до воскресень", "by monday", "by tuesday", "by wednesday", "by thursday", "by friday", "by saturday", "by sunday", "by the weekend", "скільки їхати", "скільки їде", "сколько ехать", "сколько едет", "коли прийде", "коли отрима", "на завтра", "когда придет", "когда получ", "tomorrow"], faq: /Як швидко|How quickly|How fast|Как быстро/i },
     { key: "delivery", stems: ["доставк", "нова пошт", "новой почт", "новая почт", "відправк", "отправк", "delivery", "shipping", "nova poshta", "courier", "кур'єр", "курьер", "поштомат", "почтомат"], faq: /Скільки коштує доставка|How much does delivery|Сколько стоит доставка/i },
     { key: "payment", stems: ["оплат", "оплач", "карт", "готівк", "наличн", "накладен", "післяплат", "наложен", "payment", "pay ", "card", "cash", "cod"], faq: /оплатити карткою|pay by card|pay online|оплатить картой/i },
@@ -9950,6 +10306,8 @@ function fromBase64url(text) {
 
 
 
+
+
 const TELEGRAM_BOT_TOKEN = Deno.env.get("TELEGRAM_BOT_TOKEN") ?? "";
 const TELEGRAM_CHAT_ID = Deno.env.get("TELEGRAM_CHAT_ID") ?? "";
 
@@ -10277,6 +10635,8 @@ async function createOrder(row: Record<string, any>) {
 
 async function askStep(chatId: number, step: string, product: Record<string, any>, session: Record<string, any>) {
 
+  if (step === "confirm") await loadFreeDelivery();
+
   const text = step === "confirm"
     ? summaryText(product, session)
     : stepPrompt(step, product, session);
@@ -10378,6 +10738,8 @@ async function advance(chatId: number, fromStep: string, product: Record<string,
 // 1. Нове замовлення з бази → повідомлення власнику
 async function handleNewOrder(record: Record<string, any>) {
 
+  await loadFreeDelivery();
+
   const text = formatOrder(record);
 
   const sent = await telegram("sendMessage", {
@@ -10469,6 +10831,8 @@ async function handleCallback(callback: Record<string, any>) {
       return;
 
     }
+
+    await loadFreeDelivery();
 
     const sent = await telegram("sendMessage", {
       chat_id: callback.message.chat.id,
@@ -10588,6 +10952,8 @@ async function handleCallback(callback: Record<string, any>) {
 
   // перемальовуємо те саме повідомлення — щоб історія в чаті не
   // засмічувалась дублями, а поточний статус завжди був актуальним
+  await loadFreeDelivery();
+
   await telegram("editMessageText", {
     chat_id: callback.message.chat.id,
     message_id: callback.message.message_id,
@@ -10936,6 +11302,8 @@ async function rememberCardMessage(orderId: unknown, messageId: unknown) {
 async function refreshOwnerCard(order: Record<string, any> | null) {
 
   if (!order || !order.bot_message_id || !TELEGRAM_CHAT_ID) return;
+
+  await loadFreeDelivery();
 
   await telegram("editMessageText", {
     chat_id: TELEGRAM_CHAT_ID,
@@ -12621,6 +12989,13 @@ async function handleReviewCallback(callback: Record<string, any>, data: string)
 // Якщо магазин виросте — числа тут, в одному місці.
 const CONTACT_LIMITS = {
   callback: { perIp: 3, global: 30 },
+  // Заявка на байєр-сервіс: людині треба одна-дві, а розрахунок — це
+  // робота власника, тож флуд тут дорожчий, ніж у чаті.
+  buyer: { perIp: 3, global: 20 },
+  // «Повідомити, коли з'явиться»: людина може чекати кілька розмірів
+  // чи кольорів, тож з адреси більше, ніж дзвінків. Загальна межа —
+  // заради Telegram: кожна підписка — повідомлення власнику.
+  "stock-alert": { perIp: 10, global: 60 },
   "chat-new": { perIp: 3, global: 30 },
   "chat-msg": { perIp: 30, global: 150 },
 };
@@ -12673,7 +13048,11 @@ async function warnAboutFlood(kind: string) {
 
   const що = kind === "callback"
     ? "замовлень дзвінка"
-    : "повідомлень у чаті";
+    : kind === "buyer"
+      ? "заявок на байєр-сервіс"
+      : kind === "stock-alert"
+        ? "підписок «повідомити, коли з'явиться»"
+        : "повідомлень у чаті";
 
   await telegram("sendMessage", {
     chat_id: TELEGRAM_CHAT_ID,
@@ -12978,6 +13357,31 @@ let chatBotData: { at: number; data: any } | null = null;
 // Адреса для бота: github.io (запасне значення SITE_URL) перекидає на
 // основний домен, а посилання в чаті мають вести одразу туди.
 const BOT_SITE = /github\.io/.test(SITE_URL) ? "https://bestbrnd4u.com" : SITE_URL;
+
+// Поріг безкоштовної доставки — з того самого файлу, що читає сайт
+// (data/delivery.json, адмінка → Налаштування → «Безкоштовна
+// доставка»). Без нього картка власника й лист мовчали б про те, що
+// відправку цього замовлення оплачує магазин.
+//
+// Хвіст ?t= міняється раз на 10 хвилин: інакше CDN віддавав би стару
+// копію годинами після зміни порогу в адмінці. Не вдалося — лишаємо
+// останнє відоме значення (на холодному старті це 0: картка мовчить,
+// а не обіцяє вигаданий поріг).
+let freeDeliveryAt = 0;
+
+async function loadFreeDelivery(): Promise<void> {
+  if (Date.now() - freeDeliveryAt < 10 * 60 * 1000) return;
+  try {
+    const bucket = Math.floor(Date.now() / (10 * 60 * 1000));
+    const response = await fetch(`${BOT_SITE}/data/delivery.json?t=${bucket}`, { signal: AbortSignal.timeout(2500) });
+    if (!response.ok) return;
+    const data = await response.json();
+    setFreeDeliveryFrom(data?.freeFrom);
+    freeDeliveryAt = Date.now();
+  } catch (_) {
+    // мережа чи кривий файл — не причина не надіслати картку
+  }
+}
 
 async function loadChatBotData(): Promise<any> {
   if (chatBotData && Date.now() - chatBotData.at < 10 * 60 * 1000) return chatBotData.data;
@@ -13442,6 +13846,162 @@ async function handleCallBack(request: Request, body: Record<string, any>): Prom
 
     return adminJson({ ok: false, error: "unavailable" }, 200, origin);
 
+  }
+
+  return adminJson({ ok: true }, 200, origin);
+
+}
+
+// Заявка на байєр-сервіс зі сторінки /bayer-service. Як і зворотний
+// дзвінок — лише повідомлення власнику в Telegram: у базу нічого не
+// пишемо, листів не шлемо. Перевірка полів і текст — у buyer-request.js.
+async function handleBuyerRequest(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  // Пастка для ботів: приховане поле, яке людина не бачить і не
+  // заповнює. Заповнене — відповідаємо «готово» й нічого не робимо:
+  // бот не дізнається, що його впізнали, і не підлаштується.
+  if (String(body.website ?? "").trim()) {
+    console.warn("Заявка на байєр-сервіс: заповнено поле-пастку");
+    return adminJson({ ok: true }, 200, origin);
+  }
+
+  const checked = normalizeBuyerRequest(body);
+
+  if (!checked.ok) {
+    return adminJson({ ok: false, error: checked.error }, 400, origin);
+  }
+
+  const вердикт = await contactAllowed(request, "buyer");
+
+  if (вердикт !== "ok") {
+
+    if (вердикт === "global-first") await warnAboutFlood("buyer");
+
+    return adminJson({ ok: false, error: "too_many" }, 429, origin);
+
+  }
+
+  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
+
+    // Не «ок»: інакше людина чекала б розрахунку, якого ніхто не робить.
+    console.error("Заявка на байєр-сервіс: бот не налаштований");
+
+    return adminJson({ ok: false, error: "not_configured" }, 501, origin);
+
+  }
+
+  const sent = await telegram("sendMessage", {
+    chat_id: TELEGRAM_CHAT_ID,
+    text: formatBuyerRequest(checked.request, escapeHtml),
+    parse_mode: "HTML",
+    disable_web_page_preview: true,
+  });
+
+  if (!sent?.ok) {
+
+    await reportServerIssue("buyer_request", "Telegram не прийняв заявку на байєр-сервіс");
+
+    return adminJson({ ok: false, error: "unavailable" }, 200, origin);
+
+  }
+
+  return adminJson({ ok: true }, 200, origin);
+
+}
+
+// Каталог сайту — щоб перевірити, що такий товар, колір і розмір є, і
+// назвати товар у повідомленні власнику. Той самий файл, що вантажить
+// сайт; кеш на 10 хвилин, як у даних бота.
+let stockAlertCatalog: { at: number; list: any[] } | null = null;
+
+async function loadSiteCatalog(): Promise<any[]> {
+  if (stockAlertCatalog && Date.now() - stockAlertCatalog.at < 10 * 60 * 1000) return stockAlertCatalog.list;
+  const response = await fetch(`${BOT_SITE}/data/catalog.json`, { signal: AbortSignal.timeout(4000) });
+  if (!response.ok) throw new Error(`catalog.json: ${response.status}`);
+  const list = await response.json();
+  stockAlertCatalog = { at: Date.now(), list: Array.isArray(list) ? list : [] };
+  return stockAlertCatalog.list;
+}
+
+// «Повідомити, коли з'явиться» зі сторінки товару. Підписка — у
+// stock_alerts (міграція 046), лист — scripts/stock-alerts.js.
+async function handleStockAlert(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  // Пастка для ботів — як у заявці на байєр-сервіс.
+  if (String(body.website ?? "").trim()) {
+    return adminJson({ ok: true }, 200, origin);
+  }
+
+  const checked = normalizeStockAlert(body);
+
+  if (!checked.ok) {
+    return adminJson({ ok: false, error: checked.error }, 400, origin);
+  }
+
+  const вердикт = await contactAllowed(request, "stock-alert");
+
+  if (вердикт !== "ok") {
+
+    if (вердикт === "global-first") await warnAboutFlood("stock-alert");
+
+    return adminJson({ ok: false, error: "too_many" }, 429, origin);
+
+  }
+
+  let product: any = null;
+
+  try {
+    product = (await loadSiteCatalog()).find((p: any) => Number(p.id) === checked.alert.product_id) ?? null;
+  } catch (error) {
+    console.error("Підписка на наявність: каталог недоступний", error);
+    return adminJson({ ok: false, error: "unavailable" }, 200, origin);
+  }
+
+  const variant = product ? stockAlertVariant(product, checked.alert.color, checked.alert.size) : null;
+
+  if (!variant) {
+    return adminJson({ ok: false, error: "bad_product" }, 400, origin);
+  }
+
+  const added = await supabaseRest("rpc/stock_alert_add", {
+    method: "POST",
+    body: JSON.stringify({
+      p_email: checked.alert.email,
+      p_product: checked.alert.product_id,
+      p_color: variant.color,
+      p_size: variant.size,
+      p_lang: checked.alert.lang,
+    }),
+  });
+
+  if (!added.ok) {
+    // Найімовірніше, міграції 046 ще немає. Не «ок»: інакше людина
+    // чекала б листа, якого ніхто не надішле.
+    console.error("Підписка на наявність: stock_alert_add →", added.status, (await added.text()).slice(0, 200));
+    return adminJson({ ok: false, error: "unavailable" }, 200, origin);
+  }
+
+  const result = await added.json().catch(() => "");
+
+  if (result === "exists") return adminJson({ ok: true, already: true }, 200, origin);
+
+  if (result === "limit") return adminJson({ ok: false, error: "limit" }, 429, origin);
+
+  if (result !== "ok") return adminJson({ ok: false, error: "bad_email" }, 400, origin);
+
+  // Власнику — що є попит. Не вийшло — підписка однаково збережена,
+  // тож людині кажемо «готово».
+  if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
+    await telegram("sendMessage", {
+      chat_id: TELEGRAM_CHAT_ID,
+      text: formatStockAlert(product, { ...checked.alert, ...variant }, escapeHtml),
+      parse_mode: "HTML",
+      disable_web_page_preview: true,
+    }).catch(() => null);
   }
 
   return adminJson({ ok: true }, 200, origin);
@@ -16171,6 +16731,20 @@ async function handleRequest(request: Request): Promise<Response> {
   if (body.site_action === "call-back") {
 
     return await handleCallBack(request, body);
+
+  }
+
+  // --- заявка на байєр-сервіс зі сторінки /bayer-service ---
+  if (body.site_action === "buyer-request") {
+
+    return await handleBuyerRequest(request, body);
+
+  }
+
+  // --- «повідомити, коли з'явиться» зі сторінки товару ---
+  if (body.site_action === "stock-alert") {
+
+    return await handleStockAlert(request, body);
 
   }
 

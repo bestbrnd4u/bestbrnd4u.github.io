@@ -437,6 +437,30 @@ const orderDiscountRowEl = document.getElementById("orderDiscountRow");
 const orderDiscountEl = document.getElementById("orderDiscount");
 const orderDeliveryPriceEl = document.getElementById("orderDeliveryPrice");
 const orderTotalEl = document.getElementById("orderTotal");
+const orderFreeDeliveryHintEl = document.getElementById("orderFreeDeliveryHint");
+
+// Поріг безкоштовної доставки (data/delivery.json, див. FreeDelivery у
+// common.js). Поки файл не приїхав — 0, тобто «за тарифом
+// перевізника», як було завжди; приїхав — суму перемальовуємо.
+let freeDeliveryFrom = 0;
+
+if (window.FreeDelivery) {
+
+    window.FreeDelivery.threshold().then(from => {
+
+        freeDeliveryFrom = from;
+
+        // Сторінка вже намальована — домальовуємо рядок доставки.
+        // Порожній кошик (сторінка ще не готова) лишаємо як є.
+        if (orderSummaryItemsEl && orderSummaryItemsEl.children.length) updateTotals();
+
+    });
+
+}
+
+function freeDeliveryFor(total) {
+    return Boolean(window.FreeDelivery && window.FreeDelivery.applies(total, freeDeliveryFrom));
+}
 
 const promoInput = document.getElementById("promoInput");
 const applyPromoBtn = document.getElementById("applyPromo");
@@ -924,11 +948,30 @@ function updateTotals() {
         orderDiscountRowEl.hidden = true;
     }
 
-    orderDeliveryPriceEl.textContent = delivery
-        ? "за тарифом перевізника"
-        : "Оберіть спосіб";
+    // Від порогу — «безкоштовно» навіть до вибору способу: доставку
+    // будь-яким способом оплачує магазин, і людині корисно знати це
+    // одразу, а не після того, як вона обрала пошту.
+    const free = freeDeliveryFor(Math.max(total, 0));
+
+    orderDeliveryPriceEl.textContent = free
+        ? "безкоштовно"
+        : delivery
+            ? "за тарифом перевізника"
+            : "Оберіть спосіб";
+
+    orderDeliveryPriceEl.classList.toggle("is-free", free);
 
     orderTotalEl.textContent = formatPrice(Math.max(total, 0));
+
+    if (orderFreeDeliveryHintEl && window.FreeDelivery) {
+
+        const hint = window.FreeDelivery.hint(Math.max(total, 0), freeDeliveryFrom, formatPrice);
+
+        orderFreeDeliveryHintEl.textContent = hint;
+        orderFreeDeliveryHintEl.classList.toggle("is-free", free);
+        orderFreeDeliveryHintEl.hidden = !hint;
+
+    }
 
 }
 
@@ -1364,7 +1407,9 @@ function fillHiddenFields() {
         : "0 грн";
     document.getElementById("orderPromoField").value = appliedPromo ? appliedPromo.code : "—";
     document.getElementById("orderDeliveryField").value = delivery
-        ? `${delivery.label} — оплата при отриманні`
+        ? (freeDeliveryFor(total)
+            ? `${delivery.label} — безкоштовно, відправку оплачує магазин`
+            : `${delivery.label} — оплата при отриманні`)
         : "—";
     document.getElementById("orderTotalField").value = formatPrice(total);
     document.getElementById("orderReplyTo").value = document.getElementById("email").value.trim();
@@ -1400,7 +1445,9 @@ function buildEmailTemplateParams(orderId, orderDate) {
         order_items: buildOrderCompositionText(),
         order_subtotal: formatPrice(subtotal),
         order_discount: totalDiscount > 0 ? `-${formatPrice(totalDiscount)}` : "0 грн",
-        order_delivery_price: delivery ? "за тарифом перевізника" : "—",
+        order_delivery_price: freeDeliveryFor(total)
+            ? "безкоштовно — відправку оплачує магазин"
+            : delivery ? "за тарифом перевізника" : "—",
         order_total: formatPrice(total),
         delivery_city: cityValue,
         delivery_method: delivery ? delivery.label : "—",

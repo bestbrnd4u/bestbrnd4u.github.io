@@ -143,6 +143,34 @@ function itemLine(item) {
 
 }
 
+// Безкоштовна доставка від суми (data/delivery.json на сайті, адмінка
+// → Налаштування → «Безкоштовна доставка»).
+//
+// Ставить loadFreeDelivery() в _index.src.ts перед кожною карткою й
+// листом. Поки поріг невідомий (файл не завантажився) — 0, і картка
+// мовчить про доставку, як мовчала досі: краще не сказати, ніж
+// пообіцяти власнику чужий поріг.
+//
+// Магазин за доставку грошей не бере — від порогу ВІН оплачує
+// відправку замість покупця. Тому для власника це не прикраса, а
+// дія: оформити накладну з оплатою відправником.
+let freeDeliveryFrom = 0;
+
+export function setFreeDeliveryFrom(value) {
+  const n = Math.round(Number(value));
+  freeDeliveryFrom = Number.isFinite(n) && n > 0 ? n : 0;
+}
+
+export function getFreeDeliveryFrom() {
+  return freeDeliveryFrom;
+}
+
+// Порівнюємо з сумою ДО СПЛАТИ (після знижок) — так само, як сайт
+// (FreeDelivery у assets/js/common.js).
+export function freeDeliveryApplies(total, from = freeDeliveryFrom) {
+  return from > 0 && Number(total) >= from;
+}
+
 export function formatOrder(order) {
 
   const status = STATUSES[normalizeStatus(order.status)] ?? STATUSES.new;
@@ -163,6 +191,9 @@ export function formatOrder(order) {
     Number(order.discount) > 0 ? `Знижка: −${money(order.discount)}` : "",
     Number(order.delivery_price) > 0 ? `Доставка: ${money(order.delivery_price)}` : "",
     `<b>Разом: ${money(order.total)}</b>`,
+    freeDeliveryApplies(order.total)
+      ? `🎁 <b>Безкоштовна доставка</b> (від ${money(freeDeliveryFrom)}) — відправку оплачує магазин`
+      : "",
     // Суму рахує браузер, а перевіряє база — своїми цінами
     // (supabase/migrations/014-order-pricing.sql). Розбіжність означає
     // або підроблене замовлення, або ціну, що змінилась між

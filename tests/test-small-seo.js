@@ -181,7 +181,13 @@ console.log("\n[4] llms.txt");
     // від 3500» — бо так у дев'яти магазинах із десяти.
     check("сказано, чого на сайті немає", /## Чого на сайті немає/.test(text));
 
-    check("зокрема про безкоштовну доставку", /Безкоштовної доставки[^\n]*немає/.test(text));
+    // З 13.11.2026 поріг є (data/delivery.json). Тоді модель має знати
+    // ТОЧНЕ число — і жодного «немає»; поріг 0 — як раніше, «немає».
+    const freeFrom = require("../scripts/build-free-delivery.js").readThreshold();
+
+    check("зокрема про безкоштовну доставку", freeFrom
+        ? text.includes(require("../scripts/build-free-delivery.js").money(freeFrom)) && !/Безкоштовної доставки[^\n]*немає/.test(text)
+        : /Безкоштовної доставки[^\n]*немає/.test(text));
 
     check("і про оплату частинами", /частинами[^\n]*немає/i.test(text));
 

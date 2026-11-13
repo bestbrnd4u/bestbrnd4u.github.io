@@ -1598,6 +1598,70 @@ function dataUrl(url) {
 
 }
 
+// Безкоштовна доставка від суми (адмінка → Налаштування →
+// «Безкоштовна доставка», файл data/delivery.json).
+//
+// ЩО ЦЕ ОЗНАЧАЄ. Магазин за доставку грошей не бере ніколи: покупець
+// платить перевізнику при отриманні. Від порогу відправку оплачує сам
+// магазин — тобто «безкоштовно» тут правда, а не нуль у сумі. Сума
+// замовлення від цього НЕ змінюється, міняється лише те, хто платить
+// пошті.
+//
+// Порівнюємо з сумою ДО СПЛАТИ — після знижок і промокоду: поріг
+// обіцяє доставку за рахунок магазину замовленням, за які людина
+// платить стільки, а не тим, що коштували б стільки без знижки.
+//
+// Поріг 0 або порожньо — пропозиції немає, і про неї не пишемо ніде.
+//
+// Той самий поріг читає Edge Function (картка замовлення в Telegram і
+// лист) — з того самого файлу, див. loadFreeDelivery() у
+// supabase/functions/telegram-order-bot/_index.src.ts.
+const FreeDelivery = (() => {
+
+    let request = null;
+
+    function normalize(value) {
+        const n = Math.round(Number(value));
+        return Number.isFinite(n) && n > 0 ? n : 0;
+    }
+
+    // Обіцянка, а не значення у фоні: кошик малюється раніше, ніж
+    // приїде файл, і має домалюватись, коли він приїде.
+    function threshold() {
+        if (!request) {
+            request = fetch(dataUrl("data/delivery.json"))
+                .then(response => (response.ok ? response.json() : {}))
+                .then(data => normalize(data && data.freeFrom))
+                .catch(() => 0);
+        }
+        return request;
+    }
+
+    function applies(total, from) {
+        return from > 0 && Number(total) >= from;
+    }
+
+    function left(total, from) {
+        return from > 0 ? Math.max(from - (Number(total) || 0), 0) : 0;
+    }
+
+    // Підказка під сумою. «Лишилось 27 000 грн» до кошика за 3 000 —
+    // не стимул, а глузування: поки людина не набрала й половини,
+    // просто кажемо, від якої суми.
+    function hint(total, from, format) {
+        if (!from) return "";
+        const money = format || (value => `${new Intl.NumberFormat("uk-UA").format(value)} грн`);
+        if (applies(total, from)) return "Доставка безкоштовна — відправку оплачує магазин";
+        if (Number(total) >= from / 2) return `До безкоштовної доставки лишилось ${money(left(total, from))}`;
+        return `Безкоштовна доставка — від ${money(from)}`;
+    }
+
+    return { threshold, normalize, applies, left, hint };
+
+})();
+
+window.FreeDelivery = FreeDelivery;
+
 // Дані для СПИСКІВ товарів.
 //
 // Каталог, головна, кошик, обране й пошук показують картки — їм не

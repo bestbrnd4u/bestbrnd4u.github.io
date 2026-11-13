@@ -1,0 +1,64 @@
+# «Знову в наявності»: лист тим, хто натиснув «Повідомити, коли
+# з'явиться» на сторінці товару.
+#
+# НАВІЩО
+# -------
+# Підписки лежать у базі (міграція 046), а залишки міняються з адмінки й
+# від замовлень. Раз на годину scripts/stock-alerts.js звіряє одне з
+# одним тими самими правилами, що й сайт, і надсилає ОДИН лист на
+# підписку, коли саме той колір і розмір знову в наявності.
+#
+# ЧОМУ ЩОГОДИНИ
+# --------------
+# Залишок змінюється, коли власник вніс його в адмінці або коли
+# скасували замовлення, — події раз на години. Година затримки листа
+# нічого не коштує, а частіший запуск — це лише хвилини Actions.
+#
+# ⚠️ ЗАПРАЦЮЄ ЛИШЕ ПІСЛЯ ПЕРЕНЕСЕННЯ В MAIN
+#
+# GitHub бере розклад тільки з головної гілки. Поки цей файл лежить у
+# dev, крок мовчить. Actions → Sync branches → dev-to-main.
+
+name: Stock alerts
+
+on:
+  schedule:
+    - cron: "20 * * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+# Два одночасні запуски надіслали б два листи одній людині.
+concurrency:
+  group: stock-alerts
+  cancel-in-progress: false
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Каталог і залишки з адмінки — з main, тобто ті, що зараз на
+      # сайті.
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: main
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+
+      # Без будь-якого з цих секретів крок нічого не робить і
+      # завершується успішно — розклад не червонітиме. Секрети ті самі,
+      # що в «Remind carts», нових заводити не треба.
+      - name: Надіслати «знову в наявності»
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+          MAIL_FROM: ${{ secrets.MAIL_FROM }}
+          MAIL_REPLY_TO: ${{ secrets.MAIL_REPLY_TO }}
+        run: node scripts/stock-alerts.js

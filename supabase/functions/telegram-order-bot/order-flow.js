@@ -11,7 +11,7 @@
 // де альтернатив немає.
 // ======================================
 
-import { escapeHtml, money, priceNow, oldPriceNow } from "./format.js";
+import { escapeHtml, money, priceNow, oldPriceNow, freeDeliveryApplies } from "./format.js";
 
 // Способи доставки — ті самі назви й ціни, що в checkout.html.
 // ⚠️ Мусять збігатися з сайтом: назва їде в orders.delivery_method,
@@ -328,7 +328,9 @@ export function summaryText(product, session) {
     // «безкоштовно», а насправді її оплачують перевізнику.
     totals.delivery > 0
       ? `Доставка: ${money(totals.delivery)}`
-      : "Доставка: за тарифом перевізника",
+      : freeDeliveryApplies(totals.total)
+        ? "Доставка: безкоштовно — відправку оплачує магазин"
+        : "Доставка: за тарифом перевізника",
     `<b>Разом: ${money(totals.total)}</b>`,
   ];
 

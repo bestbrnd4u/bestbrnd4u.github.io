@@ -41,6 +41,10 @@ const CATEGORIES_FILE = path.join(ROOT, "data", "categories.json");
 const LEGAL_FILE = path.join(ROOT, "data", "legal.json");
 
 const Sections = require("./sections");
+
+// Поріг безкоштовної доставки — той самий, що бачить покупець
+// (data/delivery.json, scripts/build-free-delivery.js).
+const FreeDelivery = require("./build-free-delivery");
 const { brandPages, categoryPages, departmentPages, pairPages, readRecords, DEPARTMENTS_SRC }
     = require("./build-taxonomy-pages");
 
@@ -108,10 +112,16 @@ function build() {
     // мусять бути на початку файлу, а не після сорока посилань.
     lines.push("## Умови");
     lines.push("");
+    const freeFrom = FreeDelivery.readThreshold();
+
     lines.push(link("Оплата і доставка", `${SITE_URL}/delivery-payment`,
         "Нова пошта (відділення, поштомат, курʼєр) та інші перевізники. "
-        + "Доставку оплачує покупець перевізнику при отриманні, у суму "
-        + "замовлення вона не входить"));
+        + (freeFrom
+            ? `Замовлення від ${FreeDelivery.money(freeFrom)} доставляються безкоштовно — `
+                + "відправку оплачує магазин; менші — покупець оплачує перевізнику "
+                + "при отриманні, у суму замовлення доставка не входить"
+            : "Доставку оплачує покупець перевізнику при отриманні, у суму "
+                + "замовлення вона не входить")));
     lines.push(link("Повернення та гарантія", `${SITE_URL}/return-warranty`,
         "14 днів на повернення, кошти повертаються протягом 3 робочих днів"));
     lines.push(link("Публічна оферта", `${SITE_URL}/offer`,
@@ -219,8 +229,11 @@ function build() {
     lines.push("- Онлайн-форми оплати на сайті немає: оплату карткою "
         + "менеджер узгоджує з покупцем після підтвердження замовлення");
     lines.push("- Оплати частинами й розсрочки немає");
-    lines.push("- Безкоштовної доставки від певної суми немає: тариф "
-        + "перевізника оплачує покупець при отриманні");
+    // Поріг є — про нього сказано вище, в «Умовах», точним числом.
+    if (!FreeDelivery.readThreshold()) {
+        lines.push("- Безкоштовної доставки від певної суми немає: тариф "
+            + "перевізника оплачує покупець при отриманні");
+    }
     lines.push("- Самовивозу й фізичного магазину немає — тільки доставка");
     lines.push("");
 
