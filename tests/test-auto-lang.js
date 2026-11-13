@@ -156,5 +156,20 @@ console.log("\n[8] Правило Cloudflare у документації");
     check("українська мова браузера — без переходу; російська — /ru", /contains "uk"/.test(doc) && /concat\("\/ru", http\.request\.uri\.path\)/.test(doc) && /concat\("\/en", http\.request\.uri\.path\)/.test(doc));
 }
 
+console.log("\n[9] Рядок перемикача натискається на всю ширину");
+{
+    // Перемикач стоїть у .header-icons, а «.header-icons a» робить кожне
+    // посилання круглою кнопкою 46×46. 13.11.2026 так і було: рядок мови
+    // 148 px, натискався лише квадрат посередині. Правило перемикача
+    // мусить скидати розмір, тінь і тло, які той селектор нав'язує.
+    const css = read("assets/css/style.css");
+    const icons = (css.match(/\.header-icons a,\s*\.header-icons button\{([^}]*)\}/) || [])[1] || "";
+    const option = (css.match(/\.lang-switch \.lang-switch-option\{([^}]*)\}/) || [])[1] || "";
+
+    check("правило іконок шапки знайдено (воно й нав'язує 46×46)", /width:46px/.test(icons));
+    check("перемикач скидає ширину, висоту, тінь і тло", /width:auto/.test(option) && /height:auto/.test(option) && /box-shadow:none/.test(option) && /background:transparent/.test(option));
+    check("і має display:block (на всю ширину списку)", /display:block/.test(option));
+}
+
 console.log(failures ? `\n✗ Провалено: ${failures}` : "\n✓ Мова за країною: усе гаразд");
 process.exit(failures ? 1 : 0);
