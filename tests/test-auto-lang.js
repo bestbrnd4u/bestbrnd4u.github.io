@@ -146,9 +146,13 @@ console.log("\n[8] Правило Cloudflare у документації");
 {
     const doc = read("docs/МОВА-ЗА-КРАЇНОЮ.md");
 
+    // Cloudflare Free відмовив саме в цьому полі (13.11.2026) — у правилі
+    // його бути не повинно, інакше власник отримає «Invalid expression».
+    const rules = (doc.match(/```\n\(ip\.src\.country[\s\S]*?```/g) || []).join("\n");
+    check("у правилі немає cf.client.bot (заборонене на Free)", rules.length > 0 && !/cf\.client\.bot/.test(rules));
     check("тимчасове перенаправлення (302), не 301", /302/.test(doc) && /не 301/i.test(doc));
     check("зберігати запит (Preserve query string)", /Preserve query string/.test(doc));
-    check("Україна, боти, cookie вибору, свої переходи — винятки", ["ip.src.country ne \"UA\"", "cf.client.bot", "http.cookie contains \"bb-lang=\"", "http.referer contains \"bestbrnd4u.com\""].every(s => doc.includes(s)));
+    check("Україна, боти, cookie вибору, свої переходи — винятки", ["ip.src.country ne \"UA\"", "contains \"bot\"", "contains \"google\"", "http.cookie contains \"bb-lang=\"", "http.referer contains \"bestbrnd4u.com\""].every(s => doc.includes(s)));
     check("українська мова браузера — без переходу; російська — /ru", /contains "uk"/.test(doc) && /concat\("\/ru", http\.request\.uri\.path\)/.test(doc) && /concat\("\/en", http\.request\.uri\.path\)/.test(doc));
 }
 
