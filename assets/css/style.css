@@ -1132,8 +1132,19 @@ nav li.has-mega[data-mega-open] .mega-menu.mega-menu-columns{
     box-shadow:var(--shadow-lg);
 }
 
+/* width/height/box-shadow/background — скидаємо явно: перемикач стоїть
+   у .header-icons, а «.header-icons a» робить кожне посилання круглою
+   кнопкою 46×46 (як серце й кошик). Відступи й форму це правило
+   перекривало, а розмір — ні: рядок «Українська» був 148 px завширшки,
+   а натискався лише квадрат 46×46 посередині (заміряно 13.11.2026).
+   Тепер натискається весь рядок. */
 .lang-switch .lang-switch-option{
     display:block;
+    width:auto;
+    height:auto;
+    box-shadow:none;
+    background:transparent;
+    text-align:left;
     padding:10px 12px;
     border-radius:8px;
     font-size:15px;
