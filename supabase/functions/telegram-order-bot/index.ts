@@ -12,6 +12,7 @@
 //   supabase/functions/telegram-order-bot/reviews.js
 //   supabase/functions/telegram-order-bot/subscribe.js
 //   supabase/functions/telegram-order-bot/call-back.js
+//   supabase/functions/telegram-order-bot/buyer-request.js
 //   supabase/functions/telegram-order-bot/chat.js
 //   supabase/functions/telegram-order-bot/chat-bot.js
 //   supabase/functions/telegram-order-bot/checkout-draft.js
@@ -4782,6 +4783,165 @@ function formatCallBack(phone, page, escape) {
         "",
         "Обіцяли передзвонити протягом робочого дня.",
     ].filter(Boolean).join("\n");
+
+}
+
+
+// Заявка на байєр-сервіс: людина лишає посилання на річ, якої немає в
+// каталозі, — власнику прилітає Telegram із усім, що треба для
+// розрахунку.
+//
+// ЧОГО ТУТ НЕМА
+// --------------
+// Мережі. Лише чисті функції — щоб перевірялись тестами в Node (так
+// само, як call-back.js). Обробник із межами й відправкою — у
+// _index.src.ts, handleBuyerRequest().
+//
+// ЧОМУ ПЕРЕВІРЯЄМО ТУТ, ХОЧ СТОРІНКА ВЖЕ ПЕРЕВІРИЛА
+// ---------------------------------------------------
+// Запит до функції можна надіслати й без сторінки. Перевірка в
+// браузері — зручність для людини, ця — єдина справжня. А текст
+// потрапляє в повідомлення з parse_mode HTML: усе, що прийшло від
+// клієнта, екранується, а посилання беремо лише http(s).
+
+
+const BUYER_LIMITS = {
+    links: 5,        // посилань в одній заявці
+    link: 500,       // знаків в одному посиланні
+    name: 80,
+    details: 1000,   // «розмір, колір, побажання»
+    budget: 10000000 // грн — стеля здорового глузду
+};
+
+// Варіанти доставки — ті самі, що в таблиці на сторінці. Ключ, а не
+// текст: сторінка буває англійською й російською, а власник читає
+// українською.
+const BUYER_DELIVERY = {
+    advise: "Порадьте найвигідніший",
+    europe: "З Європи",
+    sea: "Морем із США",
+    air: "Авіа із США"
+};
+
+const BUYER_CONTACT = {
+    telegram: "Telegram",
+    viber: "Viber",
+    call: "Дзвінок"
+};
+
+function clean(value, max) {
+    return String(value ?? "")
+        // Керівні символи (окрім переносу рядка) — геть: у Telegram
+        // вони ламають розмітку, а людині не потрібні.
+        .replace(/[\u0000-\u0009\u000B-\u001F\u007F]/g, " ")
+        .replace(/[ \t]+/g, " ")
+        .replace(/\n{3,}/g, "\n\n")
+        .trim()
+        .slice(0, max);
+}
+
+// Посилання — з поля, де людина пише «одне в рядку», але насправді
+// вставляє через пробіл, кому чи взагалі разом із текстом. Тому шукаємо
+// самі адреси, а не ділимо за рядками.
+function buyerLinks(raw) {
+
+    const found = String(raw ?? "").match(/https?:\/\/[^\s<>"'«»]+/gi) || [];
+
+    const out = [];
+
+    for (const candidate of found) {
+
+        // Хвостова пунктуація з речення — не частина адреси.
+        const link = candidate.replace(/[.,;:!?)\]]+$/, "");
+
+        if (link.length > BUYER_LIMITS.link) continue;
+
+        let url;
+        try { url = new URL(link); } catch (_) { continue; }
+
+        // Протокол окремо не перевіряємо: регулярка вище бере лише
+        // http:// і https://, тож javascript: чи data: сюди не доходять.
+
+        // Адреса без крапки в імені вузла (http://localhost, http://1) —
+        // не магазин.
+        if (!url.hostname.includes(".")) continue;
+
+        if (!out.includes(link)) out.push(link);
+
+        if (out.length >= BUYER_LIMITS.links) break;
+    }
+
+    return out;
+
+}
+
+// Повертає { ok: true, request } або { ok: false, error }.
+//
+// Коди помилок — ті, на які сторінка показує людині зрозуміле:
+//   bad_phone   — номер не схожий на український;
+//   no_item     — немає ні посилання, ні опису речі;
+//   no_name     — ім'я порожнє;
+//   no_consent  — не погодився на обробку даних.
+function normalizeBuyerRequest(body) {
+
+    const b = body || {};
+
+    const phone = normalizeCallBackPhone(b.phone);
+
+    if (!phone) return { ok: false, error: "bad_phone" };
+
+    const name = clean(b.name, BUYER_LIMITS.name);
+
+    if (!name) return { ok: false, error: "no_name" };
+
+    const links = buyerLinks(b.links);
+
+    // Опис без посилань теж годиться: «Coach Tabby 26, чорна» — цього
+    // власнику досить, щоб знайти. А от зовсім порожня заявка — ні.
+    const details = clean(b.details, BUYER_LIMITS.details);
+
+    if (!links.length && details.replace(/\s/g, "").length < 3) return { ok: false, error: "no_item" };
+
+    if (b.consent !== true) return { ok: false, error: "no_consent" };
+
+    const delivery = Object.prototype.hasOwnProperty.call(BUYER_DELIVERY, b.delivery) ? b.delivery : "advise";
+    const contact = Object.prototype.hasOwnProperty.call(BUYER_CONTACT, b.contact) ? b.contact : "call";
+
+    const budgetDigits = String(b.budget ?? "").replace(/\D/g, "");
+    const budget = budgetDigits ? Math.min(Number(budgetDigits), BUYER_LIMITS.budget) : 0;
+
+    const lang = b.lang === "en" || b.lang === "ru" ? b.lang : "uk";
+
+    return { ok: true, request: { name, phone, links, details, delivery, contact, budget, lang } };
+
+}
+
+function grn(value) {
+    return `${String(value).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} грн`;
+}
+
+const LANG_NAME = { uk: "", en: "англійською", ru: "російською" };
+
+function formatBuyerRequest(req, escape) {
+
+    const esc = typeof escape === "function" ? escape : (v) => String(v ?? "");
+
+    return [
+        "🛍 <b>Заявка на байєр-сервіс</b>",
+        "",
+        `👤 ${esc(req.name)}`,
+        `📞 <a href="tel:${esc(req.phone)}">${esc(req.phone)}</a> — відповісти: <b>${esc(BUYER_CONTACT[req.contact])}</b>`,
+        req.lang !== "uk" ? `🌐 Заявку заповнено ${LANG_NAME[req.lang]} — відповідайте тією ж мовою` : "",
+        "",
+        req.links.length ? "🔗 <b>Що викупити:</b>" : "",
+        ...req.links.map((link, i) => `${i + 1}. ${esc(link)}`),
+        req.details ? `📝 ${esc(req.details)}` : "",
+        "",
+        `🚚 Доставка: ${esc(BUYER_DELIVERY[req.delivery])}`,
+        req.budget ? `💰 Бюджет: до ${grn(req.budget)}` : "",
+        "",
+        "Обіцяли повний розрахунок протягом робочого дня.",
+    ].filter((line, i, all) => line !== "" || (all[i - 1] !== "" && i > 0)).join("\n").trim();
 
 }
 
@@ -9991,6 +10151,7 @@ function fromBase64url(text) {
 
 
 
+
 const TELEGRAM_BOT_TOKEN = Deno.env.get("TELEGRAM_BOT_TOKEN") ?? "";
 const TELEGRAM_CHAT_ID = Deno.env.get("TELEGRAM_CHAT_ID") ?? "";
 
@@ -12672,6 +12833,9 @@ async function handleReviewCallback(callback: Record<string, any>, data: string)
 // Якщо магазин виросте — числа тут, в одному місці.
 const CONTACT_LIMITS = {
   callback: { perIp: 3, global: 30 },
+  // Заявка на байєр-сервіс: людині треба одна-дві, а розрахунок — це
+  // робота власника, тож флуд тут дорожчий, ніж у чаті.
+  buyer: { perIp: 3, global: 20 },
   "chat-new": { perIp: 3, global: 30 },
   "chat-msg": { perIp: 30, global: 150 },
 };
@@ -12724,7 +12888,9 @@ async function warnAboutFlood(kind: string) {
 
   const що = kind === "callback"
     ? "замовлень дзвінка"
-    : "повідомлень у чаті";
+    : kind === "buyer"
+      ? "заявок на байєр-сервіс"
+      : "повідомлень у чаті";
 
   await telegram("sendMessage", {
     chat_id: TELEGRAM_CHAT_ID,
@@ -13515,6 +13681,65 @@ async function handleCallBack(request: Request, body: Record<string, any>): Prom
     // Telegram не прийняв — отже, власник НЕ дізнається. Сказати тут
     // «готово» означало б пообіцяти дзвінок у порожнечу.
     await reportServerIssue("call_back", "Telegram не прийняв замовлення дзвінка");
+
+    return adminJson({ ok: false, error: "unavailable" }, 200, origin);
+
+  }
+
+  return adminJson({ ok: true }, 200, origin);
+
+}
+
+// Заявка на байєр-сервіс зі сторінки /bayer-service. Як і зворотний
+// дзвінок — лише повідомлення власнику в Telegram: у базу нічого не
+// пишемо, листів не шлемо. Перевірка полів і текст — у buyer-request.js.
+async function handleBuyerRequest(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  // Пастка для ботів: приховане поле, яке людина не бачить і не
+  // заповнює. Заповнене — відповідаємо «готово» й нічого не робимо:
+  // бот не дізнається, що його впізнали, і не підлаштується.
+  if (String(body.website ?? "").trim()) {
+    console.warn("Заявка на байєр-сервіс: заповнено поле-пастку");
+    return adminJson({ ok: true }, 200, origin);
+  }
+
+  const checked = normalizeBuyerRequest(body);
+
+  if (!checked.ok) {
+    return adminJson({ ok: false, error: checked.error }, 400, origin);
+  }
+
+  const вердикт = await contactAllowed(request, "buyer");
+
+  if (вердикт !== "ok") {
+
+    if (вердикт === "global-first") await warnAboutFlood("buyer");
+
+    return adminJson({ ok: false, error: "too_many" }, 429, origin);
+
+  }
+
+  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
+
+    // Не «ок»: інакше людина чекала б розрахунку, якого ніхто не робить.
+    console.error("Заявка на байєр-сервіс: бот не налаштований");
+
+    return adminJson({ ok: false, error: "not_configured" }, 501, origin);
+
+  }
+
+  const sent = await telegram("sendMessage", {
+    chat_id: TELEGRAM_CHAT_ID,
+    text: formatBuyerRequest(checked.request, escapeHtml),
+    parse_mode: "HTML",
+    disable_web_page_preview: true,
+  });
+
+  if (!sent?.ok) {
+
+    await reportServerIssue("buyer_request", "Telegram не прийняв заявку на байєр-сервіс");
 
     return adminJson({ ok: false, error: "unavailable" }, 200, origin);
 
@@ -16247,6 +16472,13 @@ async function handleRequest(request: Request): Promise<Response> {
   if (body.site_action === "call-back") {
 
     return await handleCallBack(request, body);
+
+  }
+
+  // --- заявка на байєр-сервіс зі сторінки /bayer-service ---
+  if (body.site_action === "buyer-request") {
+
+    return await handleBuyerRequest(request, body);
 
   }
 

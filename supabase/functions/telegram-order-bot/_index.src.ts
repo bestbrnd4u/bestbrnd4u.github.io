@@ -90,6 +90,9 @@ import {
   normalizeCallBackPhone, cleanCallBackPage, formatCallBack,
 } from "./call-back.js";
 import {
+  normalizeBuyerRequest, formatBuyerRequest,
+} from "./buyer-request.js";
+import {
   cleanChatBody, cleanThreadId, cleanChatPage, formatChatMessage,
   CHAT_LIMITS, CHAT_DONE_TEXT, chatDoneReceipt, chatClearReceipt, chatUserName, chatWho,
 } from "./chat.js";
@@ -2783,6 +2786,9 @@ async function handleReviewCallback(callback: Record<string, any>, data: string)
 // Якщо магазин виросте — числа тут, в одному місці.
 const CONTACT_LIMITS = {
   callback: { perIp: 3, global: 30 },
+  // Заявка на байєр-сервіс: людині треба одна-дві, а розрахунок — це
+  // робота власника, тож флуд тут дорожчий, ніж у чаті.
+  buyer: { perIp: 3, global: 20 },
   "chat-new": { perIp: 3, global: 30 },
   "chat-msg": { perIp: 30, global: 150 },
 };
@@ -2835,7 +2841,9 @@ async function warnAboutFlood(kind: string) {
 
   const що = kind === "callback"
     ? "замовлень дзвінка"
-    : "повідомлень у чаті";
+    : kind === "buyer"
+      ? "заявок на байєр-сервіс"
+      : "повідомлень у чаті";
 
   await telegram("sendMessage", {
     chat_id: TELEGRAM_CHAT_ID,
@@ -3626,6 +3634,65 @@ async function handleCallBack(request: Request, body: Record<string, any>): Prom
     // Telegram не прийняв — отже, власник НЕ дізнається. Сказати тут
     // «готово» означало б пообіцяти дзвінок у порожнечу.
     await reportServerIssue("call_back", "Telegram не прийняв замовлення дзвінка");
+
+    return adminJson({ ok: false, error: "unavailable" }, 200, origin);
+
+  }
+
+  return adminJson({ ok: true }, 200, origin);
+
+}
+
+// Заявка на байєр-сервіс зі сторінки /bayer-service. Як і зворотний
+// дзвінок — лише повідомлення власнику в Telegram: у базу нічого не
+// пишемо, листів не шлемо. Перевірка полів і текст — у buyer-request.js.
+async function handleBuyerRequest(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  // Пастка для ботів: приховане поле, яке людина не бачить і не
+  // заповнює. Заповнене — відповідаємо «готово» й нічого не робимо:
+  // бот не дізнається, що його впізнали, і не підлаштується.
+  if (String(body.website ?? "").trim()) {
+    console.warn("Заявка на байєр-сервіс: заповнено поле-пастку");
+    return adminJson({ ok: true }, 200, origin);
+  }
+
+  const checked = normalizeBuyerRequest(body);
+
+  if (!checked.ok) {
+    return adminJson({ ok: false, error: checked.error }, 400, origin);
+  }
+
+  const вердикт = await contactAllowed(request, "buyer");
+
+  if (вердикт !== "ok") {
+
+    if (вердикт === "global-first") await warnAboutFlood("buyer");
+
+    return adminJson({ ok: false, error: "too_many" }, 429, origin);
+
+  }
+
+  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
+
+    // Не «ок»: інакше людина чекала б розрахунку, якого ніхто не робить.
+    console.error("Заявка на байєр-сервіс: бот не налаштований");
+
+    return adminJson({ ok: false, error: "not_configured" }, 501, origin);
+
+  }
+
+  const sent = await telegram("sendMessage", {
+    chat_id: TELEGRAM_CHAT_ID,
+    text: formatBuyerRequest(checked.request, escapeHtml),
+    parse_mode: "HTML",
+    disable_web_page_preview: true,
+  });
+
+  if (!sent?.ok) {
+
+    await reportServerIssue("buyer_request", "Telegram не прийняв заявку на байєр-сервіс");
 
     return adminJson({ ok: false, error: "unavailable" }, 200, origin);
 
@@ -6358,6 +6425,13 @@ async function handleRequest(request: Request): Promise<Response> {
   if (body.site_action === "call-back") {
 
     return await handleCallBack(request, body);
+
+  }
+
+  // --- заявка на байєр-сервіс зі сторінки /bayer-service ---
+  if (body.site_action === "buyer-request") {
+
+    return await handleBuyerRequest(request, body);
 
   }
 

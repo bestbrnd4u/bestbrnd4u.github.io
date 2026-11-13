@@ -1203,6 +1203,10 @@
     "en": "or subscribe again at the bottom of the page.",
     "ru": "или подпишитесь заново внизу страницы."
   },
+  "Авіа із США — 10–21 день": {
+    "en": "By air from the USA — 10–21 days",
+    "ru": "Авиа из США — 10–21 день"
+  },
   "адрес акцій перекладено на латиницю: {*}": {
     "en": "promotion URLs transliterated to Latin: {1}",
     "ru": "адресов акций переведено на латиницу: {1}"
@@ -1562,6 +1566,10 @@
   "Будь ласка, оберіть розмір": {
     "en": "Please select a size",
     "ru": "Пожалуйста, выберите размер"
+  },
+  "Бюджет, грн": {
+    "en": "Budget, UAH",
+    "ru": "Бюджет, грн"
   },
   "в інтернет-магазині BestBrnd4u": {
     "en": "at the BestBrnd4u online store",
@@ -2387,6 +2395,10 @@
     "en": "Order date: {1}",
     "ru": "Дата заказа: {1}"
   },
+  "Де вам відповісти": {
+    "en": "Where should we reply",
+    "ru": "Где вам ответить"
+  },
   "де все це стоїть статично. -->": {
     "en": "where all of this is static. -->",
     "ru": "где все это стоит статически. -->"
@@ -2422,6 +2434,10 @@
   "Джинси": {
     "en": "Jeans",
     "ru": "Джинсы"
+  },
+  "Дзвінок": {
+    "en": "Phone call",
+    "ru": "Звонок"
   },
   "Дивитись усі товари": {
     "en": "View all products",
@@ -2491,6 +2507,10 @@
     "en": "up to {#} cm",
     "ru": "до {#} см"
   },
+  "До 5 посилань — кожне з нового рядка.": {
+    "en": "Up to 5 links — one per line.",
+    "ru": "До 5 ссылок — каждая с новой строки."
+  },
   "До безкоштовної доставки лишилось {#} грн": {
     "en": "{#} UAH more for free delivery",
     "ru": "До бесплатной доставки осталось {#} грн"
@@ -2550,6 +2570,10 @@
   "додайте в назву те, чим вони різняться": {
     "en": "add what sets them apart to the name",
     "ru": "добавьте в название то, чем они отличаются"
+  },
+  "Додайте посилання на товар або опишіть, що шукаєте": {
+    "en": "Add a link to the item or describe what you're looking for",
+    "ru": "Добавьте ссылку на товар или опишите, что ищете"
   },
   "Додано в обране": {
     "en": "Added to favorites",
@@ -2779,6 +2803,10 @@
     "en": "No spam. Only sales and new collections.",
     "ru": "Никакого спама. Только акции и новые коллекции."
   },
+  "З Європи — 5–14 днів": {
+    "en": "From Europe — 5–14 days",
+    "ru": "Из Европы — 5–14 дней"
+  },
   "з кореня (\"data/products.json\", \"assets/images/…\").\\n": {
     "en": "from the root (\"data/products.json\", \"assets/images/…\").\\n",
     "ru": "от корня (\"data/products.json\", \"assets/images/…\").\\n"
@@ -2842,6 +2870,10 @@
   "За цим посиланням уже переходили — підписка діє. Нічого робити не треба.": {
     "en": "This link has already been used — your subscription is active. Nothing else to do.",
     "ru": "По этой ссылке уже переходили — подписка действует. Ничего делать не нужно."
+  },
+  "Забагато заявок за годину. Спробуйте пізніше або напишіть нам у Telegram — @bestbrnd4u.": {
+    "en": "Too many requests in the last hour. Try again later or message us on Telegram — @bestbrnd4u.",
+    "ru": "Слишком много заявок за час. Попробуйте позже или напишите нам в Telegram — @bestbrnd4u."
   },
   "Забагато листів поспіль — це обмеження пошти, не помилка.": {
     "en": "Too many emails in a row — this is a mail service limit, not an error.",
@@ -3043,6 +3075,10 @@
     "en": "Can't send right now. Message us on Telegram.",
     "ru": "Сейчас не удается отправить. Напишите нам в Telegram."
   },
+  "Зараз не вдається надіслати заявку. Напишіть нам у Telegram — @bestbrnd4u.": {
+    "en": "The request can't be sent right now. Message us on Telegram — @bestbrnd4u.",
+    "ru": "Сейчас не удаётся отправить заявку. Напишите нам в Telegram — @bestbrnd4u."
+  },
   "зараз немає в магазині.": {
     "en": "is currently not in the store.",
     "ru": "сейчас нет в магазине."
@@ -3079,6 +3115,10 @@
     "en": "Wait a minute and try again",
     "ru": "Подождите минуту и попробуйте еще раз"
   },
+  "Заявка на викуп": {
+    "en": "Purchase request",
+    "ru": "Заявка на выкуп"
+  },
   "Заявка на відмову:": {
     "en": "Cancellation request:",
     "ru": "Заявка на отказ:"
@@ -3098,6 +3138,14 @@
   "Заявку на ці товари вже надіслано": {
     "en": "A request for these items has already been sent",
     "ru": "Заявка на эти товары уже отправлена"
+  },
+  "Заявку надіслано": {
+    "en": "Request sent",
+    "ru": "Заявка отправлена"
+  },
+  "Заявку отримали": {
+    "en": "Request received",
+    "ru": "Заявку получили"
   },
   "Зберегти": {
     "en": "Save",
@@ -3330,6 +3378,10 @@
   "Зручні способи оплати та швидка доставка Новою поштою по всій Україні від BestBrnd4u.": {
     "en": "Convenient payment options and fast Nova Poshta delivery across Ukraine from BestBrnd4u.",
     "ru": "Удобные способы оплаты и быстрая доставка Новой почтой по всей Украине от BestBrnd4u."
+  },
+  "Зручніше написати самим?": {
+    "en": "Prefer to write to us yourself?",
+    "ru": "Удобнее написать самим?"
   },
   "і натисніть кнопку в ньому.": {
     "en": "and click the button in it.",
@@ -3979,6 +4031,10 @@
     "en": "Milky white",
     "ru": "Молочный"
   },
+  "Морем із США — 20–45 днів": {
+    "en": "By sea from the USA — 20–45 days",
+    "ru": "Морем из США — 20–45 дней"
+  },
   "мужск": {
     "en": "men",
     "ru": "мужск"
@@ -4043,21 +4099,41 @@
     "en": "Submit review",
     "ru": "Отправить отзыв"
   },
+  "Надіслати заявку": {
+    "en": "Send request",
+    "ru": "Отправить заявку"
+  },
   "Надіслати повідомлення": {
     "en": "Send message",
     "ru": "Отправить сообщение"
+  },
+  "Надіслати ще одну": {
+    "en": "Send another one",
+    "ru": "Отправить ещё одну"
   },
   "Надішлемо посилання для відновлення пароля на": {
     "en": "We'll send a password reset link to",
     "ru": "Отправим ссылку для восстановления пароля на"
   },
+  "Надішліть посилання на річ — порахуємо повну вартість із доставкою та комісією й напишемо вам протягом робочого дня. Заявка ні до чого не зобов'язує.": {
+    "en": "Send us a link to the item — we'll calculate the full cost including delivery and our fee and get back to you within one business day. The request is not binding.",
+    "ru": "Пришлите ссылку на вещь — посчитаем полную стоимость с доставкой и комиссией и напишем вам в течение рабочего дня. Заявка ни к чему не обязывает."
+  },
   "Надішліть посилання на товар — і ми порахуємо вартість викупу та підберемо найвигідніший спосіб доставки.": {
     "en": "Send us a link to the item — we'll calculate the purchase cost and find the best delivery option.",
     "ru": "Пришлите ссылку на товар — и мы посчитаем стоимость выкупа и подберем самый выгодный способ доставки."
   },
+  "Надсилаємо розрахунок: товар, доставка, комісія — одна фінальна сума.": {
+    "en": "We send you the quote: item, delivery, fee — one final amount.",
+    "ru": "Присылаем расчёт: товар, доставка, комиссия — одна финальная сумма."
+  },
   "Надсилаємо...": {
     "en": "Sending...",
     "ru": "Отправляем..."
+  },
+  "Надсилаємо…": {
+    "en": "Sending…",
+    "ru": "Отправляем…"
   },
   "Надсилаєте посилання на товар": {
     "en": "You send a link to the item",
@@ -4186,6 +4262,10 @@
   "Наприклад: Поштомат №1234": {
     "en": "For example: Parcel locker No. 1234",
     "ru": "Например: Почтомат №1234"
+  },
+  "Наприклад: розмір M, чорний колір. Або опишіть річ, якщо посилання немає": {
+    "en": "For example: size M, black. Or describe the item if you don't have a link",
+    "ru": "Например: размер M, чёрный цвет. Или опишите вещь, если ссылки нет"
   },
   "Наприклад: Укрпошта, відділення 03150": {
     "en": "For example: Ukrposhta, branch 03150",
@@ -4362,6 +4442,10 @@
   "Не вдалося надіслати запит. Зателефонуйте нам, будь ласка": {
     "en": "Couldn't send your request. Please give us a call",
     "ru": "Не удалось отправить запрос. Пожалуйста, позвоните нам"
+  },
+  "Не вдалося надіслати заявку. Напишіть нам у Telegram — @bestbrnd4u.": {
+    "en": "Couldn't send the request. Message us on Telegram — @bestbrnd4u.",
+    "ru": "Не удалось отправить заявку. Напишите нам в Telegram — @bestbrnd4u."
   },
   "Не вдалося надіслати лист:": {
     "en": "Couldn't send the email:",
@@ -5123,6 +5207,10 @@
     "en": "Check your BestBrnd4u order by order number and phone: status, contents and Nova Poshta tracking number.",
     "ru": "Проверьте состояние своего заказа в BestBrnd4u по номеру заказа и телефону: статус, состав, номер накладной Новой почты."
   },
+  "Перевіряємо наявність, розмір і ціну в продавця.": {
+    "en": "We check availability, size and price with the seller.",
+    "ru": "Проверяем наличие, размер и цену у продавца."
+  },
   "Переглянути всі →": {
     "en": "View all →",
     "ru": "Посмотреть все →"
@@ -5391,6 +5479,14 @@
     "en": "Repeat password",
     "ru": "Повторите пароль"
   },
+  "Погоджуюсь на обробку контактних даних для відповіді на заявку —": {
+    "en": "I agree to the processing of my contact details to reply to this request —",
+    "ru": "Соглашаюсь на обработку контактных данных для ответа на заявку —"
+  },
+  "Погодились — вносите передоплату, і ми викуповуємо річ.": {
+    "en": "If you agree, you make a prepayment and we buy the item.",
+    "ru": "Согласились — вносите предоплату, и мы выкупаем вещь."
+  },
   "Подзвоніть перед відправкою; це подарунок; зручніше отримати після 18:00": {
     "en": "Call before shipping; it's a gift; prefer delivery after 6 PM",
     "ru": "Позвоните перед отправкой; это подарок; удобнее получить после 18:00"
@@ -5539,6 +5635,14 @@
     "en": "Popular items",
     "ru": "Популярные товары"
   },
+  "Порадьте найвигідніший": {
+    "en": "Suggest the best value",
+    "ru": "Посоветуйте самый выгодный"
+  },
+  "Порахуємо вартість і відповімо протягом робочого дня (Пн–Нд 09:00–20:00).": {
+    "en": "We'll calculate the cost and reply within one business day (Mon–Sun 09:00–20:00, Kyiv time).",
+    "ru": "Посчитаем стоимость и ответим в течение рабочего дня (Пн–Вс 09:00–20:00)."
+  },
   "портмоне": {
     "en": "wallet",
     "ru": "портмоне"
@@ -5555,6 +5659,10 @@
     "en": "The link has expired. Add your email again — we'll send a new one",
     "ru": "Ссылка устарела. Добавьте почту еще раз — отправим новую"
   },
+  "Посилання на товар": {
+    "en": "Link to the item",
+    "ru": "Ссылка на товар"
+  },
   "Посилання не впізнали": {
     "en": "We didn't recognize this link",
     "ru": "Ссылку не распознали"
@@ -5570,6 +5678,10 @@
   "Поставте оцінку від 1 до 5 зірок.": {
     "en": "Rate it from 1 to 5 stars.",
     "ru": "Поставьте оценку от 1 до 5 звезд."
+  },
+  "Потрібна ваша згода, щоб ми могли відповісти": {
+    "en": "We need your consent to be able to reply",
+    "ru": "Нужно ваше согласие, чтобы мы могли ответить"
   },
   "Потрібна згода на обробку персональних даних": {
     "en": "Consent to personal data processing is required",
@@ -5919,6 +6031,10 @@
     "en": "Size",
     "ru": "Размер"
   },
+  "Розмір, колір, побажання": {
+    "en": "Size, colour, wishes",
+    "ru": "Размер, цвет, пожелания"
+  },
   "Розмір: {*}": {
     "en": "Size: {1}",
     "ru": "Размер: {1}"
@@ -5950,6 +6066,10 @@
   "Рюкзаки": {
     "en": "Backpacks",
     "ru": "Рюкзаки"
+  },
+  "Сайт": {
+    "en": "Website",
+    "ru": "Сайт"
   },
   "Сандалі": {
     "en": "Sandals",
@@ -7650,6 +7770,10 @@
   "Як відписатися від розсилки?": {
     "en": "How do I unsubscribe from the newsletter?",
     "ru": "Как отписаться от рассылки?"
+  },
+  "Як до вас звертатись?": {
+    "en": "What should we call you?",
+    "ru": "Как к вам обращаться?"
   },
   "Як доставляють великогабаритні або важкі речі?": {
     "en": "How are bulky or heavy items delivered?",
