@@ -48,6 +48,75 @@
         });
     });
 
+    // -------------------------
+    // Мова за країною при вході
+    // -------------------------
+    //
+    // Правило — assets/js/lang-rule.js. Збірка вписує його в <head>, і там
+    // же ухвалюється все, що відомо одразу (вибір перемикачем, кешована
+    // країна, мова браузера): перехід стається ще до першого кадру. Сюди
+    // доходить лише випадок «треба спитати країну» — тоді сторінка вже
+    // схована, і ми або переходимо, або показуємо її.
+    //
+    // Що людина обрала перемикачем, пам'ятаємо — у localStorage для цього
+    // скрипта і в cookie для правила Cloudflare (сервер localStorage не
+    // бачить). Автоматичний вибір не запам'ятовуємо як «обрала».
+    //
+    // Країну дає Cloudflare за адресою /cdn-cgi/trace на нашому ж домені
+    // (рядок loc=UA) — без сторонніх сервісів і без нових дозволів у CSP.
+    var CHOICE_KEY = "bb-lang";
+    var GEO_KEY = "bb-geo";
+
+    function storageSet(key, value) {
+        try { localStorage.setItem(key, value); } catch (e) { /* приватне вікно */ }
+    }
+
+    document.addEventListener("click", function (event) {
+        var option = event.target.closest && event.target.closest(".lang-switch a[hreflang]");
+        var chosen = option && option.getAttribute("hreflang");
+        if (!chosen || Core.LANGS.indexOf(chosen) < 0) return;
+        storageSet(CHOICE_KEY, chosen);
+        try {
+            document.cookie = CHOICE_KEY + "=" + chosen + "; path=/; max-age=31536000; SameSite=Lax"
+                + (location.protocol === "https:" ? "; Secure" : "");
+        } catch (e) { /* без cookie правило Cloudflare просто не знатиме вибору */ }
+    });
+
+    function fetchCountry() {
+        // Не чекаємо довше секунди: сторінка схована, і довше тримати
+        // людину перед порожнім екраном гірше, ніж показати українську.
+        var timeout = new Promise(function (resolve) { setTimeout(function () { resolve(null); }, 1000); });
+        var request = fetch("/cdn-cgi/trace", { cache: "no-store" })
+            .then(function (r) { return r.ok ? r.text() : ""; })
+            .then(function (text) {
+                var m = String(text).match(/^loc=([A-Z]{2})$/m);
+                if (m) storageSet(GEO_KEY, JSON.stringify({ c: m[1], t: Date.now() }));
+                return m ? m[1] : null;
+            })
+            .catch(function () { return null; });
+        return Promise.race([request, timeout]);
+    }
+
+    (function autoLanguage() {
+
+        var Rule = window.LangRule;
+        var input = window.LangRuleInput;
+        var show = function () { document.documentElement.style.opacity = ""; };
+
+        if (!Rule || !input || !window.LangRulePending) return;
+
+        fetchCountry().then(function (country) {
+            input.country = country;
+            var go = Rule.target(input);
+            if (go) {
+                clearTimeout(window.LangRuleTimer);
+                location.replace(Rule.path(location.pathname, go) + location.search + location.hash);
+            }
+            else show();
+        }, show);
+
+    })();
+
     if (lang === Core.DEFAULT_LANG) return;
 
     // Сервер на будь-яку неіснуючу адресу віддає ОДНУ сторінку 404 —
