@@ -531,9 +531,97 @@ window.CATALOG_PRESET = {"category":"Жіночі сумки"};
 <link rel="alternate" hreflang="ru" href="https://dev.bestbrnd4u.com/ru/categories/zhinochi-sumky/">
 <link rel="alternate" hreflang="x-default" href="https://dev.bestbrnd4u.com/categories/zhinochi-sumky/">
 <link rel="preload" href="/data/i18n-en.json" as="fetch" crossorigin>
-<script src="/assets/js/i18n-core.js?v=cbf9cc5c" defer></script>
-<script src="/assets/js/i18n.js?v=5bf95bec" defer></script>
+<script src="/assets/js/i18n-core.js?v=742167b2" defer></script>
+<script src="/assets/js/i18n.js?v=ed0bbc40" defer></script>
 <!-- i18n:end -->
+<script id="lang-early">
+(function (root) {
+"use strict";
+var LANGS = ["uk", "en", "ru"];
+var BOT = /bot|crawl|spider|slurp|lighthouse|pagespeed|headless|facebookexternalhit|preview|google|bing|yandex|baidu|duckduck|semrush|ahrefs/i;
+function has(languages, code) {
+for (var i = 0; i < (languages || []).length; i++) {
+var tag = String(languages[i] || "").toLowerCase();
+if (tag === code || tag.indexOf(code + "-") === 0) return true;
+}
+return false;
+}
+function valid(lang) {
+return LANGS.indexOf(lang) >= 0;
+}
+function common(o) {
+return Boolean(o && o.external && !BOT.test(String(o.agent || "")));
+}
+function needsCountry(o) {
+return common(o) && !valid(o.saved) && o.current === "uk"
+&& !has(o.languages, "uk") && !o.country;
+}
+function target(o) {
+if (!common(o)) return null;
+var want;
+if (valid(o.saved)) {
+want = o.saved;
+} else {
+if (o.current !== "uk") return null;
+if (has(o.languages, "uk")) return null;
+var country = String(o.country || "").toUpperCase();
+if (!/^[A-Z]{2}$/.test(country) || country === "XX" || country === "T1" || country === "UA") return null;
+want = has(o.languages, "ru") ? "ru" : "en";
+}
+if (want === o.current) return null;
+if ((o.alternates || []).indexOf(want) < 0) return null;
+return want;
+}
+function path(pathname, lang) {
+var bare = String(pathname || "/").replace(/^\/(en|ru)(?=\/|$)/, "") || "/";
+if (bare.charAt(0) !== "/") bare = "/" + bare;
+return lang === "uk" ? bare : "/" + lang + (bare === "/" ? "/" : bare);
+}
+function current(pathname) {
+var m = String(pathname || "/").match(/^\/(en|ru)(?:\/|$)/);
+return m ? m[1] : "uk";
+}
+root.LangRule = { target: target, needsCountry: needsCountry, path: path, current: current, BOT: BOT, LANGS: LANGS };
+}(typeof window !== "undefined" ? window : globalThis));
+(function () {
+if (typeof document === "undefined" || !window.LangRule) return;
+var R = window.LangRule;
+var html = document.documentElement;
+try {
+var store = function (key) { try { return localStorage.getItem(key); } catch (e) { return null; } };
+var geo = null;
+try { geo = JSON.parse(store("bb-geo") || "null"); } catch (e) { geo = null; }
+var referrer = "";
+try { referrer = document.referrer ? new URL(document.referrer).origin : ""; } catch (e) { referrer = ""; }
+var links = document.querySelectorAll('link[rel="alternate"][hreflang]');
+var alternates = [];
+for (var i = 0; i < links.length; i++) alternates.push(links[i].getAttribute("hreflang"));
+var input = {
+current: R.current(location.pathname),
+saved: store("bb-lang"),
+country: geo && geo.c && Date.now() - geo.t < 86400000 ? geo.c : null,
+languages: navigator.languages || [navigator.language],
+agent: navigator.userAgent,
+external: referrer !== location.origin,
+alternates: alternates
+};
+window.LangRuleInput = input;
+var go = R.target(input);
+if (go) {
+html.style.opacity = "0";
+location.replace(R.path(location.pathname, go) + location.search + location.hash);
+return;
+}
+if (R.needsCountry(input)) {
+html.style.opacity = "0";
+window.LangRulePending = true;
+window.LangRuleTimer = setTimeout(function () { html.style.opacity = ""; }, 1500);
+}
+} catch (e) {
+html.style.opacity = "";
+}
+}());
+</script>
 </head>
 
 <body data-popup-page="catalog">
