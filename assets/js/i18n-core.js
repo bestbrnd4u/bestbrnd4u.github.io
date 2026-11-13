@@ -459,7 +459,93 @@
         return visit(data, null);
     }
 
+    // -------------------------
+    // Мова за країною — при ВХОДІ на сайт
+    // -------------------------
+    //
+    // Рішення власника 13.11.2026: з України — українська, з-за кордону —
+    // англійська, російська сама не вмикається ніколи (лише перемикачем).
+    //
+    // Повертає мову, на яку перейти, або null — лишитись. Чиста функція:
+    // мережі й сторінки не торкається, тож тест перевіряє саме її, а
+    // i18n.js лише збирає вхідні дані й робить перехід.
+    //
+    //   o.current    — мова сторінки (langFromPath)
+    //   o.saved      — мова, яку людина САМА обрала перемикачем, або null
+    //   o.country    — країна від Cloudflare (UA, PL, …) або null
+    //   o.languages  — navigator.languages
+    //   o.agent      — navigator.userAgent
+    //   o.external   — чи прийшли ззовні (не перехід по сайту)
+    //   o.alternates — мови, якими ця сторінка існує (hreflang у <head>)
+    //
+    // ЧОМУ ЛИШЕ ПРИ ВХОДІ. Усередині сайту посилання вже ведуть тією
+    // мовою, якою людина читає; перекидати її посеред перегляду — значить
+    // сперечатися з її власним кліком.
+    //
+    // ЧОМУ НЕ ДЛЯ БОТІВ. Google заходить із США: перекинутий на /en/, він
+    // не побачив би української версії взагалі. Пошуковики самі обирають
+    // мову за hreflang.
+    //
+    // ЧОМУ УКРАЇНОМОВНИЙ БРАУЗЕР ЗА КОРДОНОМ ЛИШАЄТЬСЯ НА УКРАЇНСЬКІЙ.
+    // Чимало покупців — українці в Польщі, Німеччині, Чехії. Браузер
+    // українською чи російською каже про людину більше, ніж країна, з
+    // якої вона зайшла.
+    var AUTO_LANG_BOT = /bot|crawl|spider|slurp|lighthouse|pagespeed|headless|facebookexternalhit|preview|google|bing|yandex|baidu|duckduck|semrush|ahrefs/i;
+
+    function speaksUkrainian(languages) {
+        return (languages || []).some(function (l) { return /^(uk|ru)(-|$)/i.test(String(l || "")); });
+    }
+
+    function autoLangTarget(o) {
+
+        if (!o || !o.external) return null;
+
+        if (AUTO_LANG_BOT.test(String(o.agent || ""))) return null;
+
+        var alternates = o.alternates || [];
+        var want;
+
+        if (o.saved && LANGS.indexOf(o.saved) >= 0) {
+
+            // Сама обрала — так і лишається, звідки б не зайшла.
+            want = o.saved;
+
+        } else {
+
+            // Відкрили /en/ чи /ru/ — свідомо (посилання, пошук): не чіпаємо.
+            if (o.current !== DEFAULT_LANG) return null;
+
+            if (speaksUkrainian(o.languages)) return null;
+
+            var country = String(o.country || "").toUpperCase();
+
+            // XX — Cloudflare не знає, T1 — Tor: краще нічого, ніж навмання.
+            if (!/^[A-Z]{2}$/.test(country) || country === "XX" || country === "T1" || country === "UA") return null;
+
+            want = "en";
+
+        }
+
+        if (want === o.current) return null;
+
+        if (alternates.indexOf(want) < 0) return null;
+
+        return want;
+
+    }
+
+    // Чи взагалі потрібна країна. Українці з українським браузером — а це
+    // більшість покупців — не чекають на зайвий запит.
+    function autoLangNeedsCountry(o) {
+        return Boolean(o && o.external && !o.saved && o.current === DEFAULT_LANG
+            && !AUTO_LANG_BOT.test(String(o.agent || ""))
+            && !speaksUkrainian(o.languages)
+            && (o.alternates || []).indexOf("en") >= 0);
+    }
+
     var api = {
+        autoLangTarget: autoLangTarget,
+        autoLangNeedsCountry: autoLangNeedsCountry,
         localizeAbsolute: localizeAbsolute,
         localizeJsonLd: localizeJsonLd,
         numberBefore: numberBefore,

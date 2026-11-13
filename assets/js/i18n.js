@@ -48,6 +48,95 @@
         });
     });
 
+    // -------------------------
+    // Мова за країною при вході (правило — Core.autoLangTarget)
+    // -------------------------
+    //
+    // Що людина обрала перемикачем, пам'ятаємо: далі сайт відкривається
+    // саме цією мовою, з будь-якої країни. Автоматичний вибір не
+    // запам'ятовуємо як «обрала»: він лише здогад.
+    //
+    // Країну дає Cloudflare за адресою /cdn-cgi/trace на нашому ж домені
+    // (рядок loc=UA) — без сторонніх сервісів і без нових дозволів у CSP.
+    // Запам'ятовуємо на добу: країна людини за годину не змінюється, а
+    // запит на кожен вхід був би зайвою затримкою.
+    var CHOICE_KEY = "bb-lang";
+    var GEO_KEY = "bb-geo";
+
+    function storageGet(key) {
+        try { return localStorage.getItem(key); } catch (e) { return null; }
+    }
+
+    function storageSet(key, value) {
+        try { localStorage.setItem(key, value); } catch (e) { /* приватне вікно */ }
+    }
+
+    document.addEventListener("click", function (event) {
+        var option = event.target.closest && event.target.closest(".lang-switch a[hreflang]");
+        if (option && Core.LANGS.indexOf(option.getAttribute("hreflang")) >= 0) {
+            storageSet(CHOICE_KEY, option.getAttribute("hreflang"));
+        }
+    });
+
+    function cachedCountry() {
+        try {
+            var geo = JSON.parse(storageGet(GEO_KEY) || "null");
+            return geo && geo.c && Date.now() - geo.t < 86400000 ? geo.c : null;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function fetchCountry() {
+        var cached = cachedCountry();
+        if (cached) return Promise.resolve(cached);
+        // Не чекаємо довше секунди: людина вже читає сторінку, і пізній
+        // перехід посеред читання гірший за жоден.
+        var timeout = new Promise(function (resolve) { setTimeout(function () { resolve(null); }, 1000); });
+        var request = fetch("/cdn-cgi/trace", { cache: "no-store" })
+            .then(function (r) { return r.ok ? r.text() : ""; })
+            .then(function (text) {
+                var m = String(text).match(/^loc=([A-Z]{2})$/m);
+                if (m) storageSet(GEO_KEY, JSON.stringify({ c: m[1], t: Date.now() }));
+                return m ? m[1] : null;
+            })
+            .catch(function () { return null; });
+        return Promise.race([request, timeout]);
+    }
+
+    (function autoLanguage() {
+
+        var referrer = "";
+        try { referrer = document.referrer ? new URL(document.referrer).origin : ""; } catch (e) { referrer = ""; }
+
+        var input = {
+            current: lang,
+            saved: storageGet(CHOICE_KEY),
+            languages: navigator.languages || [navigator.language],
+            agent: navigator.userAgent,
+            external: referrer !== location.origin,
+            alternates: Array.prototype.map.call(
+                document.querySelectorAll('link[rel="alternate"][hreflang]'),
+                function (link) { return link.getAttribute("hreflang"); }
+            ),
+            country: null
+        };
+
+        var go = function (target) {
+            if (!target) return;
+            location.replace(Core.localizePath(location.pathname, target) + location.search + location.hash);
+        };
+
+        // Без країни рішення вже відоме (обрала сама, бот, український браузер…).
+        if (!Core.autoLangNeedsCountry(input)) return go(Core.autoLangTarget(input));
+
+        fetchCountry().then(function (country) {
+            input.country = country;
+            go(Core.autoLangTarget(input));
+        });
+
+    })();
+
     if (lang === Core.DEFAULT_LANG) return;
 
     // Сервер на будь-яку неіснуючу адресу віддає ОДНУ сторінку 404 —
