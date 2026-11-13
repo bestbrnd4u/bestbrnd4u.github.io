@@ -171,6 +171,34 @@ function itemLine(item) {
 
 }
 
+// Безкоштовна доставка від суми (data/delivery.json на сайті, адмінка
+// → Налаштування → «Безкоштовна доставка»).
+//
+// Ставить loadFreeDelivery() в _index.src.ts перед кожною карткою й
+// листом. Поки поріг невідомий (файл не завантажився) — 0, і картка
+// мовчить про доставку, як мовчала досі: краще не сказати, ніж
+// пообіцяти власнику чужий поріг.
+//
+// Магазин за доставку грошей не бере — від порогу ВІН оплачує
+// відправку замість покупця. Тому для власника це не прикраса, а
+// дія: оформити накладну з оплатою відправником.
+let freeDeliveryFrom = 0;
+
+function setFreeDeliveryFrom(value) {
+  const n = Math.round(Number(value));
+  freeDeliveryFrom = Number.isFinite(n) && n > 0 ? n : 0;
+}
+
+function getFreeDeliveryFrom() {
+  return freeDeliveryFrom;
+}
+
+// Порівнюємо з сумою ДО СПЛАТИ (після знижок) — так само, як сайт
+// (FreeDelivery у assets/js/common.js).
+function freeDeliveryApplies(total, from = freeDeliveryFrom) {
+  return from > 0 && Number(total) >= from;
+}
+
 function formatOrder(order) {
 
   const status = STATUSES[normalizeStatus(order.status)] ?? STATUSES.new;
@@ -191,6 +219,9 @@ function formatOrder(order) {
     Number(order.discount) > 0 ? `Знижка: −${money(order.discount)}` : "",
     Number(order.delivery_price) > 0 ? `Доставка: ${money(order.delivery_price)}` : "",
     `<b>Разом: ${money(order.total)}</b>`,
+    freeDeliveryApplies(order.total)
+      ? `🎁 <b>Безкоштовна доставка</b> (від ${money(freeDeliveryFrom)}) — відправку оплачує магазин`
+      : "",
     // Суму рахує браузер, а перевіряє база — своїми цінами
     // (supabase/migrations/014-order-pricing.sql). Розбіжність означає
     // або підроблене замовлення, або ціну, що змінилась між
@@ -974,7 +1005,9 @@ function summaryText(product, session) {
     // «безкоштовно», а насправді її оплачують перевізнику.
     totals.delivery > 0
       ? `Доставка: ${money(totals.delivery)}`
-      : "Доставка: за тарифом перевізника",
+      : freeDeliveryApplies(totals.total)
+        ? "Доставка: безкоштовно — відправку оплачує магазин"
+        : "Доставка: за тарифом перевізника",
     `<b>Разом: ${money(totals.total)}</b>`,
   ];
 
@@ -1984,6 +2017,7 @@ const TEXT = {
     uk: {
         hours: "Пн–Нд 09:00–20:00",
         subtotal: "Сума товарів", discount: "Знижка", delivery: "Доставка", total: "Разом",
+        freeDelivery: "безкоштовно",
         method: "Спосіб", city: "Місто", branch: "Відділення", payment: "Оплата",
         yourOrder: "Ваше замовлення",
         lookup: "Стан замовлення можна перевірити будь-коли: {link} — потрібні номер {number} і ваш телефон.",
@@ -2035,6 +2069,7 @@ const TEXT = {
     en: {
         hours: "Mon–Sun 09:00–20:00 (Kyiv time)",
         subtotal: "Items", discount: "Discount", delivery: "Delivery", total: "Total",
+        freeDelivery: "free",
         method: "Method", city: "City", branch: "Branch", payment: "Payment",
         yourOrder: "Your order",
         lookup: "You can check your order status any time: {link} — you will need the number {number} and your phone.",
@@ -2086,6 +2121,7 @@ const TEXT = {
     ru: {
         hours: "Пн–Вс 09:00–20:00",
         subtotal: "Сумма товаров", discount: "Скидка", delivery: "Доставка", total: "Итого",
+        freeDelivery: "бесплатно",
         method: "Способ", city: "Город", branch: "Отделение", payment: "Оплата",
         yourOrder: "Ваш заказ",
         lookup: "Состояние заказа можно проверить в любой момент: {link} — понадобятся номер {number} и ваш телефон.",
@@ -2371,6 +2407,11 @@ function orderLetter(order, siteUrl) {
         Number(order?.subtotal) > 0 ? row(mailText(l, "subtotal"), escapeHtml(localMoney(order.subtotal, l))) : "",
         Number(order?.discount) > 0 ? row(mailText(l, "discount"), "−" + escapeHtml(localMoney(order.discount, l))) : "",
         Number(order?.delivery_price) > 0 ? row(mailText(l, "delivery"), escapeHtml(localMoney(order.delivery_price, l))) : "",
+        // Від порогу відправку оплачує магазин — це варто сказати в
+        // листі прямо: інакше людина приготує гроші для пошти.
+        !(Number(order?.delivery_price) > 0) && freeDeliveryApplies(order?.total)
+            ? row(mailText(l, "delivery"), escapeHtml(mailText(l, "freeDelivery")))
+            : "",
         row(mailText(l, "total"), escapeHtml(localMoney(order?.total, l)), true)
     ].join("");
 
@@ -6707,7 +6748,7 @@ function mergeWishes(current, previous) {
 // Теми, на які людина питає найчастіше, — словами, а не номером
 // питання: «скільки йде посилка» і «коли відправите» — одне й те саме.
 const TOPICS = [
-    { key: "delivery-cost", stems: ["скільки кошт доставк", "вартість доставк", "ціна доставк", "сколько стоит доставк", "стоимость доставк", "delivery cost", "shipping cost", "how much delivery", "how much is delivery", "how much does delivery"], faq: /Скільки коштує доставка|How much does delivery|Сколько стоит доставка/i },
+    { key: "delivery-cost", stems: ["скільки кошт доставк", "вартість доставк", "ціна доставк", "сколько стоит доставк", "стоимость доставк", "delivery cost", "shipping cost", "how much delivery", "how much is delivery", "how much does delivery", "безкоштовна доставк", "безкоштовну доставк", "безкоштовної доставк", "доставка безкоштовн", "доставку безкоштовн", "бесплатная доставк", "бесплатную доставк", "бесплатной доставк", "доставка бесплатн", "доставку бесплатн", "free shipping", "free delivery", "shipping free", "delivery free", "ship free", "ships free", "shipping is free", "delivery is free"], faq: /Скільки коштує доставка|How much does delivery|Сколько стоит доставка/i },
     { key: "delivery-time", stems: ["як швидко", "як довго", "довго йде", "довго їде", "скільки днів", "коли відправ", "скільки йде", "скільки їде", "как долго", "долго идет", "сколько дней", "термін доставк", "строк доставк", "как быстро", "когда отправ", "сколько идет", "срок доставк", "how fast", "how quickly", "when will", "how long", "ship", "до понеділк", "до вівторк", "до середи", "до четверг", "до п'ятниц", "до суботи", "до неділі", "до понедельник", "до вторник", "до среды", "до четверг", "до пятниц", "до субботы", "до воскресень", "by monday", "by tuesday", "by wednesday", "by thursday", "by friday", "by saturday", "by sunday", "by the weekend", "скільки їхати", "скільки їде", "сколько ехать", "сколько едет", "коли прийде", "коли отрима", "на завтра", "когда придет", "когда получ", "tomorrow"], faq: /Як швидко|How quickly|How fast|Как быстро/i },
     { key: "delivery", stems: ["доставк", "нова пошт", "новой почт", "новая почт", "відправк", "отправк", "delivery", "shipping", "nova poshta", "courier", "кур'єр", "курьер", "поштомат", "почтомат"], faq: /Скільки коштує доставка|How much does delivery|Сколько стоит доставка/i },
     { key: "payment", stems: ["оплат", "оплач", "карт", "готівк", "наличн", "накладен", "післяплат", "наложен", "payment", "pay ", "card", "cash", "cod"], faq: /оплатити карткою|pay by card|pay online|оплатить картой/i },
@@ -10277,6 +10318,8 @@ async function createOrder(row: Record<string, any>) {
 
 async function askStep(chatId: number, step: string, product: Record<string, any>, session: Record<string, any>) {
 
+  if (step === "confirm") await loadFreeDelivery();
+
   const text = step === "confirm"
     ? summaryText(product, session)
     : stepPrompt(step, product, session);
@@ -10378,6 +10421,8 @@ async function advance(chatId: number, fromStep: string, product: Record<string,
 // 1. Нове замовлення з бази → повідомлення власнику
 async function handleNewOrder(record: Record<string, any>) {
 
+  await loadFreeDelivery();
+
   const text = formatOrder(record);
 
   const sent = await telegram("sendMessage", {
@@ -10469,6 +10514,8 @@ async function handleCallback(callback: Record<string, any>) {
       return;
 
     }
+
+    await loadFreeDelivery();
 
     const sent = await telegram("sendMessage", {
       chat_id: callback.message.chat.id,
@@ -10588,6 +10635,8 @@ async function handleCallback(callback: Record<string, any>) {
 
   // перемальовуємо те саме повідомлення — щоб історія в чаті не
   // засмічувалась дублями, а поточний статус завжди був актуальним
+  await loadFreeDelivery();
+
   await telegram("editMessageText", {
     chat_id: callback.message.chat.id,
     message_id: callback.message.message_id,
@@ -10936,6 +10985,8 @@ async function rememberCardMessage(orderId: unknown, messageId: unknown) {
 async function refreshOwnerCard(order: Record<string, any> | null) {
 
   if (!order || !order.bot_message_id || !TELEGRAM_CHAT_ID) return;
+
+  await loadFreeDelivery();
 
   await telegram("editMessageText", {
     chat_id: TELEGRAM_CHAT_ID,
@@ -12978,6 +13029,31 @@ let chatBotData: { at: number; data: any } | null = null;
 // Адреса для бота: github.io (запасне значення SITE_URL) перекидає на
 // основний домен, а посилання в чаті мають вести одразу туди.
 const BOT_SITE = /github\.io/.test(SITE_URL) ? "https://bestbrnd4u.com" : SITE_URL;
+
+// Поріг безкоштовної доставки — з того самого файлу, що читає сайт
+// (data/delivery.json, адмінка → Налаштування → «Безкоштовна
+// доставка»). Без нього картка власника й лист мовчали б про те, що
+// відправку цього замовлення оплачує магазин.
+//
+// Хвіст ?t= міняється раз на 10 хвилин: інакше CDN віддавав би стару
+// копію годинами після зміни порогу в адмінці. Не вдалося — лишаємо
+// останнє відоме значення (на холодному старті це 0: картка мовчить,
+// а не обіцяє вигаданий поріг).
+let freeDeliveryAt = 0;
+
+async function loadFreeDelivery(): Promise<void> {
+  if (Date.now() - freeDeliveryAt < 10 * 60 * 1000) return;
+  try {
+    const bucket = Math.floor(Date.now() / (10 * 60 * 1000));
+    const response = await fetch(`${BOT_SITE}/data/delivery.json?t=${bucket}`, { signal: AbortSignal.timeout(2500) });
+    if (!response.ok) return;
+    const data = await response.json();
+    setFreeDeliveryFrom(data?.freeFrom);
+    freeDeliveryAt = Date.now();
+  } catch (_) {
+    // мережа чи кривий файл — не причина не надіслати картку
+  }
+}
 
 async function loadChatBotData(): Promise<any> {
   if (chatBotData && Date.now() - chatBotData.at < 10 * 60 * 1000) return chatBotData.data;

@@ -32,7 +32,7 @@
 // підтвердженої адреси. Хай власник обирає, що йому простіше; код
 // однаково готовий до обох.
 
-import { escapeHtml, money, trackingUrl } from "./format.js";
+import { escapeHtml, money, trackingUrl, freeDeliveryApplies } from "./format.js";
 
 // Куда приходить відповідь покупця.
 //
@@ -88,6 +88,7 @@ const TEXT = {
     uk: {
         hours: "Пн–Нд 09:00–20:00",
         subtotal: "Сума товарів", discount: "Знижка", delivery: "Доставка", total: "Разом",
+        freeDelivery: "безкоштовно",
         method: "Спосіб", city: "Місто", branch: "Відділення", payment: "Оплата",
         yourOrder: "Ваше замовлення",
         lookup: "Стан замовлення можна перевірити будь-коли: {link} — потрібні номер {number} і ваш телефон.",
@@ -139,6 +140,7 @@ const TEXT = {
     en: {
         hours: "Mon–Sun 09:00–20:00 (Kyiv time)",
         subtotal: "Items", discount: "Discount", delivery: "Delivery", total: "Total",
+        freeDelivery: "free",
         method: "Method", city: "City", branch: "Branch", payment: "Payment",
         yourOrder: "Your order",
         lookup: "You can check your order status any time: {link} — you will need the number {number} and your phone.",
@@ -190,6 +192,7 @@ const TEXT = {
     ru: {
         hours: "Пн–Вс 09:00–20:00",
         subtotal: "Сумма товаров", discount: "Скидка", delivery: "Доставка", total: "Итого",
+        freeDelivery: "бесплатно",
         method: "Способ", city: "Город", branch: "Отделение", payment: "Оплата",
         yourOrder: "Ваш заказ",
         lookup: "Состояние заказа можно проверить в любой момент: {link} — понадобятся номер {number} и ваш телефон.",
@@ -475,6 +478,11 @@ export function orderLetter(order, siteUrl) {
         Number(order?.subtotal) > 0 ? row(mailText(l, "subtotal"), escapeHtml(localMoney(order.subtotal, l))) : "",
         Number(order?.discount) > 0 ? row(mailText(l, "discount"), "−" + escapeHtml(localMoney(order.discount, l))) : "",
         Number(order?.delivery_price) > 0 ? row(mailText(l, "delivery"), escapeHtml(localMoney(order.delivery_price, l))) : "",
+        // Від порогу відправку оплачує магазин — це варто сказати в
+        // листі прямо: інакше людина приготує гроші для пошти.
+        !(Number(order?.delivery_price) > 0) && freeDeliveryApplies(order?.total)
+            ? row(mailText(l, "delivery"), escapeHtml(mailText(l, "freeDelivery")))
+            : "",
         row(mailText(l, "total"), escapeHtml(localMoney(order?.total, l)), true)
     ].join("");
 

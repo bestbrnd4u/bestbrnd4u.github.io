@@ -74,6 +74,31 @@
 
     }
 
+    // Речення про доставку під сумою. Від порогу безкоштовної доставки
+    // (data/delivery.json, FreeDelivery у common.js) відправку цього
+    // замовлення оплачує магазин — і «оплачуєте перевізнику» було б
+    // неправдою саме тій людині, яка заплатила найбільше.
+    //
+    // Поріг беремо сьогоднішній, а не той, що діяв у день замовлення:
+    // окремої позначки в замовленні немає. Власник бачив ту саму
+    // позначку в картці Telegram за тим самим правилом.
+    const deliveryNoteEl = document.getElementById("lookupDeliveryNote");
+    const deliveryNoteDefault = deliveryNoteEl ? deliveryNoteEl.textContent : "";
+
+    function renderDeliveryNote(total) {
+
+        if (!deliveryNoteEl || !window.FreeDelivery) return;
+
+        window.FreeDelivery.threshold().then(from => {
+
+            deliveryNoteEl.textContent = window.FreeDelivery.applies(total, from)
+                ? "Доставку цього замовлення оплачує магазин — на пошті за неї платити не потрібно."
+                : deliveryNoteDefault;
+
+        });
+
+    }
+
     function dateLabel(iso) {
 
         const date = new Date(iso);
@@ -197,6 +222,8 @@
         setRow("lookupDiscountRow", "lookupResultDiscount", discount > 0 ? "−" + money(discount) : "");
 
         document.getElementById("lookupResultTotal").textContent = money(order.total);
+
+        renderDeliveryNote(order.total);
 
         // Накладна. Кнопка веде на відстеження Нової пошти — той самий
         // формат посилання, що в листі покупцеві.

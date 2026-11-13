@@ -27,7 +27,7 @@ import {
   STATUSES, normalizeStatus, formatOrder, formatRefusal, buildKeyboard,
   parseStartPayload, formatProductCard, buildProductKeyboard, absoluteImageUrl,
   customerStatusMessage, customerStatusKeyboard, validateTracking, parseTtnCommand,
-  orderListLine, orderListKeyboard,
+  orderListLine, orderListKeyboard, setFreeDeliveryFrom,
 } from "./format.js";
 import {
   ADMIN_TOKEN_HEADER, corsHeaders, isAllowedOrigin, parseAdminRequest,
@@ -429,6 +429,8 @@ async function createOrder(row: Record<string, any>) {
 
 async function askStep(chatId: number, step: string, product: Record<string, any>, session: Record<string, any>) {
 
+  if (step === "confirm") await loadFreeDelivery();
+
   const text = step === "confirm"
     ? summaryText(product, session)
     : stepPrompt(step, product, session);
@@ -530,6 +532,8 @@ async function advance(chatId: number, fromStep: string, product: Record<string,
 // 1. Нове замовлення з бази → повідомлення власнику
 async function handleNewOrder(record: Record<string, any>) {
 
+  await loadFreeDelivery();
+
   const text = formatOrder(record);
 
   const sent = await telegram("sendMessage", {
@@ -621,6 +625,8 @@ async function handleCallback(callback: Record<string, any>) {
       return;
 
     }
+
+    await loadFreeDelivery();
 
     const sent = await telegram("sendMessage", {
       chat_id: callback.message.chat.id,
@@ -740,6 +746,8 @@ async function handleCallback(callback: Record<string, any>) {
 
   // перемальовуємо те саме повідомлення — щоб історія в чаті не
   // засмічувалась дублями, а поточний статус завжди був актуальним
+  await loadFreeDelivery();
+
   await telegram("editMessageText", {
     chat_id: callback.message.chat.id,
     message_id: callback.message.message_id,
@@ -1088,6 +1096,8 @@ async function rememberCardMessage(orderId: unknown, messageId: unknown) {
 async function refreshOwnerCard(order: Record<string, any> | null) {
 
   if (!order || !order.bot_message_id || !TELEGRAM_CHAT_ID) return;
+
+  await loadFreeDelivery();
 
   await telegram("editMessageText", {
     chat_id: TELEGRAM_CHAT_ID,
@@ -3130,6 +3140,31 @@ let chatBotData: { at: number; data: any } | null = null;
 // Адреса для бота: github.io (запасне значення SITE_URL) перекидає на
 // основний домен, а посилання в чаті мають вести одразу туди.
 const BOT_SITE = /github\.io/.test(SITE_URL) ? "https://bestbrnd4u.com" : SITE_URL;
+
+// Поріг безкоштовної доставки — з того самого файлу, що читає сайт
+// (data/delivery.json, адмінка → Налаштування → «Безкоштовна
+// доставка»). Без нього картка власника й лист мовчали б про те, що
+// відправку цього замовлення оплачує магазин.
+//
+// Хвіст ?t= міняється раз на 10 хвилин: інакше CDN віддавав би стару
+// копію годинами після зміни порогу в адмінці. Не вдалося — лишаємо
+// останнє відоме значення (на холодному старті це 0: картка мовчить,
+// а не обіцяє вигаданий поріг).
+let freeDeliveryAt = 0;
+
+async function loadFreeDelivery(): Promise<void> {
+  if (Date.now() - freeDeliveryAt < 10 * 60 * 1000) return;
+  try {
+    const bucket = Math.floor(Date.now() / (10 * 60 * 1000));
+    const response = await fetch(`${BOT_SITE}/data/delivery.json?t=${bucket}`, { signal: AbortSignal.timeout(2500) });
+    if (!response.ok) return;
+    const data = await response.json();
+    setFreeDeliveryFrom(data?.freeFrom);
+    freeDeliveryAt = Date.now();
+  } catch (_) {
+    // мережа чи кривий файл — не причина не надіслати картку
+  }
+}
 
 async function loadChatBotData(): Promise<any> {
   if (chatBotData && Date.now() - chatBotData.at < 10 * 60 * 1000) return chatBotData.data;

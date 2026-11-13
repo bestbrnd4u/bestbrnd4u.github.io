@@ -16357,6 +16357,44 @@ body.refusal-open{
     text-align:right;
 }
 
+/* Безкоштовна доставка від суми (data/delivery.json).
+   Підказка під «До сплати»: скільки лишилось до порогу або що поріг
+   уже набрано. Набраний — зелений, як «Виконано» в статусі
+   замовлення: це добра новина, а не застереження. */
+.free-delivery-hint{
+    margin:0;
+    padding:10px 12px;
+    border-radius:10px;
+    background:var(--gray50);
+    color:var(--gray700);
+    font-size:13.5px;
+    line-height:1.45;
+}
+
+.free-delivery-hint.is-free{
+    background:#eaf6ef;
+    color:#1d6b42;
+    font-weight:600;
+}
+
+/* Той самий поріг на сторінці «Оплата і доставка», під таблицею. */
+.free-delivery-note{
+    margin:18px 0 0;
+    padding:12px 16px;
+    border-radius:12px;
+    background:#eaf6ef;
+    color:#1d6b42;
+    font-weight:600;
+    font-size:15px;
+    line-height:1.5;
+}
+
+.summary-note.is-free,
+#orderDeliveryPrice.is-free{
+    color:#1d6b42;
+    font-weight:600;
+}
+
 
 /* =========================================================
    Блок довіри на сторінці товару
