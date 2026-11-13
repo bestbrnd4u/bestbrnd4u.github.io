@@ -93,6 +93,9 @@ import {
   normalizeBuyerRequest, formatBuyerRequest,
 } from "./buyer-request.js";
 import {
+  normalizeStockAlert, stockAlertVariant, formatStockAlert,
+} from "./stock-alert.js";
+import {
   cleanChatBody, cleanThreadId, cleanChatPage, formatChatMessage,
   CHAT_LIMITS, CHAT_DONE_TEXT, chatDoneReceipt, chatClearReceipt, chatUserName, chatWho,
 } from "./chat.js";
@@ -2789,6 +2792,10 @@ const CONTACT_LIMITS = {
   // Заявка на байєр-сервіс: людині треба одна-дві, а розрахунок — це
   // робота власника, тож флуд тут дорожчий, ніж у чаті.
   buyer: { perIp: 3, global: 20 },
+  // «Повідомити, коли з'явиться»: людина може чекати кілька розмірів
+  // чи кольорів, тож з адреси більше, ніж дзвінків. Загальна межа —
+  // заради Telegram: кожна підписка — повідомлення власнику.
+  "stock-alert": { perIp: 10, global: 60 },
   "chat-new": { perIp: 3, global: 30 },
   "chat-msg": { perIp: 30, global: 150 },
 };
@@ -2843,7 +2850,9 @@ async function warnAboutFlood(kind: string) {
     ? "замовлень дзвінка"
     : kind === "buyer"
       ? "заявок на байєр-сервіс"
-      : "повідомлень у чаті";
+      : kind === "stock-alert"
+        ? "підписок «повідомити, коли з'явиться»"
+        : "повідомлень у чаті";
 
   await telegram("sendMessage", {
     chat_id: TELEGRAM_CHAT_ID,
@@ -3696,6 +3705,103 @@ async function handleBuyerRequest(request: Request, body: Record<string, any>): 
 
     return adminJson({ ok: false, error: "unavailable" }, 200, origin);
 
+  }
+
+  return adminJson({ ok: true }, 200, origin);
+
+}
+
+// Каталог сайту — щоб перевірити, що такий товар, колір і розмір є, і
+// назвати товар у повідомленні власнику. Той самий файл, що вантажить
+// сайт; кеш на 10 хвилин, як у даних бота.
+let stockAlertCatalog: { at: number; list: any[] } | null = null;
+
+async function loadSiteCatalog(): Promise<any[]> {
+  if (stockAlertCatalog && Date.now() - stockAlertCatalog.at < 10 * 60 * 1000) return stockAlertCatalog.list;
+  const response = await fetch(`${BOT_SITE}/data/catalog.json`, { signal: AbortSignal.timeout(4000) });
+  if (!response.ok) throw new Error(`catalog.json: ${response.status}`);
+  const list = await response.json();
+  stockAlertCatalog = { at: Date.now(), list: Array.isArray(list) ? list : [] };
+  return stockAlertCatalog.list;
+}
+
+// «Повідомити, коли з'явиться» зі сторінки товару. Підписка — у
+// stock_alerts (міграція 046), лист — scripts/stock-alerts.js.
+async function handleStockAlert(request: Request, body: Record<string, any>): Promise<Response> {
+
+  const origin = request.headers.get("origin");
+
+  // Пастка для ботів — як у заявці на байєр-сервіс.
+  if (String(body.website ?? "").trim()) {
+    return adminJson({ ok: true }, 200, origin);
+  }
+
+  const checked = normalizeStockAlert(body);
+
+  if (!checked.ok) {
+    return adminJson({ ok: false, error: checked.error }, 400, origin);
+  }
+
+  const вердикт = await contactAllowed(request, "stock-alert");
+
+  if (вердикт !== "ok") {
+
+    if (вердикт === "global-first") await warnAboutFlood("stock-alert");
+
+    return adminJson({ ok: false, error: "too_many" }, 429, origin);
+
+  }
+
+  let product: any = null;
+
+  try {
+    product = (await loadSiteCatalog()).find((p: any) => Number(p.id) === checked.alert.product_id) ?? null;
+  } catch (error) {
+    console.error("Підписка на наявність: каталог недоступний", error);
+    return adminJson({ ok: false, error: "unavailable" }, 200, origin);
+  }
+
+  const variant = product ? stockAlertVariant(product, checked.alert.color, checked.alert.size) : null;
+
+  if (!variant) {
+    return adminJson({ ok: false, error: "bad_product" }, 400, origin);
+  }
+
+  const added = await supabaseRest("rpc/stock_alert_add", {
+    method: "POST",
+    body: JSON.stringify({
+      p_email: checked.alert.email,
+      p_product: checked.alert.product_id,
+      p_color: variant.color,
+      p_size: variant.size,
+      p_lang: checked.alert.lang,
+    }),
+  });
+
+  if (!added.ok) {
+    // Найімовірніше, міграції 046 ще немає. Не «ок»: інакше людина
+    // чекала б листа, якого ніхто не надішле.
+    console.error("Підписка на наявність: stock_alert_add →", added.status, (await added.text()).slice(0, 200));
+    return adminJson({ ok: false, error: "unavailable" }, 200, origin);
+  }
+
+  const result = await added.json().catch(() => "");
+
+  if (result === "exists") return adminJson({ ok: true, already: true }, 200, origin);
+
+  if (result === "limit") return adminJson({ ok: false, error: "limit" }, 429, origin);
+
+  if (result !== "ok") return adminJson({ ok: false, error: "bad_email" }, 400, origin);
+
+  // Власнику — що є попит. Не вийшло — підписка однаково збережена,
+  // тож людині кажемо «готово».
+  if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
+    await telegram("sendMessage", {
+      chat_id: TELEGRAM_CHAT_ID,
+      text: formatStockAlert(product, { ...checked.alert, ...variant }, escapeHtml),
+      parse_mode: "HTML",
+      disable_web_page_preview: true,
+    }).catch(() => null);
   }
 
   return adminJson({ ok: true }, 200, origin);
@@ -6432,6 +6538,13 @@ async function handleRequest(request: Request): Promise<Response> {
   if (body.site_action === "buyer-request") {
 
     return await handleBuyerRequest(request, body);
+
+  }
+
+  // --- «повідомити, коли з'явиться» зі сторінки товару ---
+  if (body.site_action === "stock-alert") {
+
+    return await handleStockAlert(request, body);
 
   }
 

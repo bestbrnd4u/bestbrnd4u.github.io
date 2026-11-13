@@ -41,7 +41,7 @@ export const BUYER_CONTACT = {
     call: "Дзвінок"
 };
 
-function clean(value, max) {
+function buyerClean(value, max) {
     return String(value ?? "")
         // Керівні символи (окрім переносу рядка) — геть: у Telegram
         // вони ламають розмітку, а людині не потрібні.
@@ -102,7 +102,7 @@ export function normalizeBuyerRequest(body) {
 
     if (!phone) return { ok: false, error: "bad_phone" };
 
-    const name = clean(b.name, BUYER_LIMITS.name);
+    const name = buyerClean(b.name, BUYER_LIMITS.name);
 
     if (!name) return { ok: false, error: "no_name" };
 
@@ -110,7 +110,7 @@ export function normalizeBuyerRequest(body) {
 
     // Опис без посилань теж годиться: «Coach Tabby 26, чорна» — цього
     // власнику досить, щоб знайти. А от зовсім порожня заявка — ні.
-    const details = clean(b.details, BUYER_LIMITS.details);
+    const details = buyerClean(b.details, BUYER_LIMITS.details);
 
     if (!links.length && details.replace(/\s/g, "").length < 3) return { ok: false, error: "no_item" };
 
@@ -128,11 +128,11 @@ export function normalizeBuyerRequest(body) {
 
 }
 
-function grn(value) {
+function buyerGrn(value) {
     return `${String(value).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} грн`;
 }
 
-const LANG_NAME = { uk: "", en: "англійською", ru: "російською" };
+const BUYER_LANG_NAME = { uk: "", en: "англійською", ru: "російською" };
 
 export function formatBuyerRequest(req, escape) {
 
@@ -143,14 +143,14 @@ export function formatBuyerRequest(req, escape) {
         "",
         `👤 ${esc(req.name)}`,
         `📞 <a href="tel:${esc(req.phone)}">${esc(req.phone)}</a> — відповісти: <b>${esc(BUYER_CONTACT[req.contact])}</b>`,
-        req.lang !== "uk" ? `🌐 Заявку заповнено ${LANG_NAME[req.lang]} — відповідайте тією ж мовою` : "",
+        req.lang !== "uk" ? `🌐 Заявку заповнено ${BUYER_LANG_NAME[req.lang]} — відповідайте тією ж мовою` : "",
         "",
         req.links.length ? "🔗 <b>Що викупити:</b>" : "",
         ...req.links.map((link, i) => `${i + 1}. ${esc(link)}`),
         req.details ? `📝 ${esc(req.details)}` : "",
         "",
         `🚚 Доставка: ${esc(BUYER_DELIVERY[req.delivery])}`,
-        req.budget ? `💰 Бюджет: до ${grn(req.budget)}` : "",
+        req.budget ? `💰 Бюджет: до ${buyerGrn(req.budget)}` : "",
         "",
         "Обіцяли повний розрахунок протягом робочого дня.",
     ].filter((line, i, all) => line !== "" || (all[i - 1] !== "" && i > 0)).join("\n").trim();

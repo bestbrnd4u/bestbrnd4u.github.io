@@ -105,7 +105,8 @@ console.log("\n[2] Межі описані в одному місці й не з
     check("перелік меж знайдено", !!межі.trim());
 
     // buyer — заявка на байєр-сервіс (з 13.11.2026).
-    const ВИДИ = ["callback", "chat-new", "chat-msg", "buyer"];
+    // stock-alert — «повідомити, коли з'явиться» (з 13.11.2026).
+    const ВИДИ = ["callback", "chat-new", "chat-msg", "buyer", "stock-alert"];
 
     ВИДИ.forEach(вид => {
 

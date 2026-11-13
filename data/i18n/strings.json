@@ -1635,6 +1635,10 @@
     "en": "Your email",
     "ru": "Ваш email"
   },
+  "Ваша пошта": {
+    "en": "Your email",
+    "ru": "Ваша почта"
+  },
   "Ваше замовлення": {
     "en": "Your order",
     "ru": "Ваш заказ"
@@ -1679,6 +1683,10 @@
     "en": "Enter your current password",
     "ru": "Введите текущий пароль"
   },
+  "Введіть пошту, на яку прийде лист": {
+    "en": "Enter the email address for the notification",
+    "ru": "Введите почту, на которую придёт письмо"
+  },
   "Введіть промокод": {
     "en": "Enter promo code",
     "ru": "Введите промокод"
@@ -1706,6 +1714,10 @@
   "Ви вже підписані": {
     "en": "You're already subscribed",
     "ru": "Вы уже подписаны"
+  },
+  "Ви вже чекаєте саме цей варіант — лист прийде, щойно він з'явиться.": {
+    "en": "You're already waiting for this option — we'll email you as soon as it's back.",
+    "ru": "Вы уже ждёте именно этот вариант — письмо придёт, как только он появится."
   },
   "Ви входите через": {
     "en": "You're signing in with",
@@ -2335,6 +2347,10 @@
     "en": "Done: phone number updated on {1} pages",
     "ru": "Готово: телефон обновлен на {1} страницах"
   },
+  "Готово! Напишемо на {*}, щойно цей варіант з'явиться в наявності.": {
+    "en": "Done! We'll email {1} as soon as this option is back in stock.",
+    "ru": "Готово! Напишем на {1}, как только этот вариант появится в наличии."
+  },
   "Готово! Перевірте пошту: там лист із підтвердженням": {
     "en": "Done! Check your inbox for a confirmation email",
     "ru": "Готово! Проверьте почту: там письмо с подтверждением"
@@ -2883,6 +2899,10 @@
     "en": "Too many messages. Try again in an hour or message us on Telegram.",
     "ru": "Слишком много сообщений. Попробуйте через час или напишите в Telegram."
   },
+  "Забагато спроб за годину. Спробуйте пізніше.": {
+    "en": "Too many attempts in the last hour. Please try again later.",
+    "ru": "Слишком много попыток за час. Попробуйте позже."
+  },
   "Забагато спроб. Спробуйте за годину": {
     "en": "Too many attempts. Try again in an hour",
     "ru": "Слишком много попыток. Попробуйте через час"
@@ -3078,6 +3098,10 @@
   "Зараз не вдається надіслати заявку. Напишіть нам у Telegram — @bestbrnd4u.": {
     "en": "The request can't be sent right now. Message us on Telegram — @bestbrnd4u.",
     "ru": "Сейчас не удаётся отправить заявку. Напишите нам в Telegram — @bestbrnd4u."
+  },
+  "Зараз не вдається підписатися. Напишіть нам у Telegram — @bestbrnd4u.": {
+    "en": "Can't subscribe right now. Message us on Telegram — @bestbrnd4u.",
+    "ru": "Сейчас не удаётся подписаться. Напишите нам в Telegram — @bestbrnd4u."
   },
   "зараз немає в магазині.": {
     "en": "is currently not in the store.",
@@ -4075,6 +4099,10 @@
     "en": "We've already received a request for this number — we'll call you back.",
     "ru": "На этот номер мы уже получили заявку — перезвоним."
   },
+  "На цю пошту вже багато підписок. Напишіть нам у Telegram — @bestbrnd4u.": {
+    "en": "This email already has many alerts. Message us on Telegram — @bestbrnd4u.",
+    "ru": "На эту почту уже много подписок. Напишите нам в Telegram — @bestbrnd4u."
+  },
   "Набори білизни": {
     "en": "Lingerie sets",
     "ru": "Комплекты белья"
@@ -4495,6 +4523,10 @@
     "en": "Couldn't subscribe you. Please try again or message us on Telegram.",
     "ru": "Не удалось оформить подписку. Попробуйте еще раз или напишите нам в Telegram."
   },
+  "Не вдалося підписатися. Напишіть нам у Telegram — @bestbrnd4u.": {
+    "en": "Couldn't subscribe. Message us on Telegram — @bestbrnd4u.",
+    "ru": "Не удалось подписаться. Напишите нам в Telegram — @bestbrnd4u."
+  },
   "Не вдалося підставити дані профілю:": {
     "en": "Couldn't fill in your profile details:",
     "ru": "Не удалось подставить данные профиля:"
@@ -4582,6 +4614,10 @@
   "Не підійшло — повертаємо кошти протягом 3 робочих днів.": {
     "en": "Not a fit? We refund you within 3 business days.",
     "ru": "Не подошло — вернем деньги в течение 3 рабочих дней."
+  },
+  "Не хочете чекати? Напишемо, щойно ця річ з'явиться в наявності.": {
+    "en": "Don't want to wait? We'll email you as soon as this item is back in stock.",
+    "ru": "Не хотите ждать? Напишем, как только эта вещь появится в наличии."
   },
   "Не читається {*} — беру порожній список": {
     "en": "Can't read {1} — using an empty list",
@@ -4918,6 +4954,10 @@
   "Обхват талії": {
     "en": "Waist",
     "ru": "Обхват талии"
+  },
+  "Один лист — коли саме цей колір і розмір буде в наявності.": {
+    "en": "One email — when this exact colour and size is in stock.",
+    "ru": "Одно письмо — когда именно этот цвет и размер будет в наличии."
   },
   "Один файл не вдалося додати: потрібне зображення до 25 МБ.": {
     "en": "One file couldn't be added: it must be an image up to 25 MB.",
@@ -5466,6 +5506,10 @@
   "Поверніть товар протягом 14 днів у первинному вигляді з бирками — обміняємо його або повернемо кошти.": {
     "en": "Return the item within 14 days in its original condition with tags — we'll exchange it or refund you.",
     "ru": "Верните товар в течение 14 дней в первоначальном виде с бирками — обменяем его или вернем деньги."
+  },
+  "Повідомити мене": {
+    "en": "Notify me",
+    "ru": "Сообщить мне"
   },
   "Повідомлення": {
     "en": "Message",
@@ -7794,6 +7838,10 @@
   "як ми поводимось із даними.": {
     "en": "how we handle your data.",
     "ru": "как мы обращаемся с данными."
+  },
+  "Як ми поводимось із даними.": {
+    "en": "How we handle data.",
+    "ru": "Как мы обращаемся с данными."
   },
   "Як оформити замовлення": {
     "en": "How to place an order",
