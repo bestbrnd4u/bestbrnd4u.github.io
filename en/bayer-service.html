@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" data-season="standard"><head>
-<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"7a6c2900","data/catalog.json":"7af5999c","data/categories.json":"2c24d857","data/chat-answers.json":"de163d93","data/chat-bot.json":"80e24831","data/collections.json":"858469e9","data/delivery.json":"3d6f2eab","data/home.json":"179e2c76","data/i18n-en.json":"1b1260b6","data/i18n-ru.json":"b603d2b8","data/image-variants.json":"8d6e1e7e","data/instagram-links.json":"610ebd7b","data/legal.json":"f84751b2","data/notifications.json":"a35b367f","data/page-texts.json":"9666f432","data/product-texts.json":"e9b88208","data/products-updated.json":"3da58ea6","data/products.json":"ae78eb0a","data/promo-popups.json":"0940ece5","data/promotions.json":"92880867","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/season.json":"17f1306b","data/security.json":"0c05c691","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script><base href="/">
+<script>window.ASSET_VERSIONS = {"data/analytics.json":"707bd1f8","data/brands.json":"7a6c2900","data/catalog.json":"7af5999c","data/categories.json":"2c24d857","data/chat-answers.json":"de163d93","data/chat-bot.json":"80e24831","data/collections.json":"858469e9","data/delivery.json":"3d6f2eab","data/home.json":"179e2c76","data/i18n-en.json":"964fa366","data/i18n-ru.json":"9265c0f3","data/image-variants.json":"8d6e1e7e","data/instagram-links.json":"610ebd7b","data/legal.json":"f84751b2","data/notifications.json":"a35b367f","data/page-texts.json":"9666f432","data/product-texts.json":"e9b88208","data/products-updated.json":"3da58ea6","data/products.json":"ae78eb0a","data/promo-popups.json":"0940ece5","data/promotions.json":"92880867","data/reviews.json":"5f36b2ea","data/search-banners.json":"9adaab83","data/season.json":"17f1306b","data/security.json":"0c05c691","data/size-groups.json":"7f4d6d1e","data/telegram.json":"94d77add"};</script><base href="/">
     <meta name="robots" content="noindex,nofollow">
     <meta charset="UTF-8">
     <meta name="author" content="BestBrnd4u">
@@ -36,7 +36,7 @@
     <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-v20-latin.woff2?v=v20" crossorigin="">
     <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-v20-cyrillic.woff2?v=v20" crossorigin="">
 
-    <link rel="stylesheet" href="assets/css/style.css?v=64c1bf6b">
+    <link rel="stylesheet" href="assets/css/style.css?v=0516e974">
 
 
 
@@ -468,18 +468,112 @@
 
     <div class="container">
 
-        <div class="bayer-cta">
+        <!-- Заявка на байєр-сервіс. Надсилає assets/js/buyer-request.js у
+             Edge Function (site_action "buyer-request") — власнику
+             прилітає Telegram. У базу нічого не пишемо. -->
+        <div class="bayer-request">
 
-            <h2>Ready to place your order?</h2>
+            <div class="bayer-request-intro">
 
-            <p>
-                Send us a link to the item — we'll calculate the purchase cost and find the best delivery option.
-            </p>
+                <h2>Purchase request</h2>
 
-            <div class="bayer-cta-actions">
-                <a href="mailto:bestbrnd4u@proton.me" class="btn">✉ Email bestbrnd4u@proton.me</a>
-                <a href="https://www.instagram.com/bestbrnd4u" target="_blank" rel="noopener" class="btn btn-outline">Instagram Direct</a>
-                <a href="/en/contacts" class="btn btn-outline">All ways to contact us</a>
+                <p>
+                    Send us a link to the item — we'll calculate the full cost including delivery and our fee and get back to you within one business day. The request is not binding.
+                </p>
+
+                <ol class="bayer-request-steps">
+                    <li>We check availability, size and price with the seller.</li>
+                    <li>We send you the quote: item, delivery, fee — one final amount.</li>
+                    <li>If you agree, you make a prepayment and we buy the item.</li>
+                </ol>
+
+                <p class="bayer-request-alt">
+                    Prefer to write to us yourself?
+                    <a href="https://t.me/bestbrnd4u" target="_blank" rel="noopener">Telegram</a>,
+                    <a href="https://www.instagram.com/bestbrnd4u" target="_blank" rel="noopener">Instagram Direct</a>
+                    or <a href="mailto:bestbrnd4u@proton.me">bestbrnd4u@proton.me</a>.
+                </p>
+
+            </div>
+
+            <form class="bayer-request-form checkout-form" id="buyerRequestForm" novalidate="">
+
+                <label>
+                    Link to the item
+                    <textarea id="buyerLinks" name="links" rows="3" placeholder="https://www.coach.com/…" autocomplete="off"></textarea>
+                    <span class="bayer-request-help">Up to 5 links — one per line.</span>
+                </label>
+
+                <label>
+                    Size, colour, wishes
+                    <textarea id="buyerDetails" name="details" rows="3" maxlength="1000" placeholder="For example: size M, black. Or describe the item if you don't have a link"></textarea>
+                    <span class="field-error" id="buyerItemError" aria-live="polite"></span>
+                </label>
+
+                <div class="bayer-request-row">
+
+                    <label>
+                        Delivery to Ukraine
+                        <select id="buyerDelivery" name="delivery">
+                            <option value="advise">Suggest the best value</option>
+                            <option value="europe">From Europe — 5–14 days</option>
+                            <option value="sea">By sea from the USA — 20–45 days</option>
+                            <option value="air">By air from the USA — 10–21 days</option>
+                        </select>
+                    </label>
+
+                    <label>
+                        Budget, UAH
+                        <input type="text" id="buyerBudget" name="budget" inputmode="numeric" maxlength="9" placeholder="Optional" autocomplete="off">
+                    </label>
+
+                </div>
+
+                <div class="bayer-request-row">
+
+                    <label>
+                        Your first name
+                        <input type="text" id="buyerName" name="name" maxlength="80" autocomplete="given-name" required="">
+                        <span class="field-error" id="buyerNameError" aria-live="polite"></span>
+                    </label>
+
+                    <label>
+                        Phone
+                        <input type="tel" id="buyerPhone" name="phone" inputmode="tel" autocomplete="tel" placeholder="+380 XX XXX XX XX" required="">
+                        <span class="field-error" id="buyerPhoneError" aria-live="polite"></span>
+                    </label>
+
+                </div>
+
+                <fieldset class="bayer-request-contact">
+                    <legend>Where should we reply</legend>
+                    <label><input type="radio" name="contact" value="telegram" checked=""> Telegram</label>
+                    <label><input type="radio" name="contact" value="viber"> Viber</label>
+                    <label><input type="radio" name="contact" value="call"> Phone call</label>
+                </fieldset>
+
+                <!-- Пастка для ботів: людина цього поля не бачить. -->
+                <div class="bayer-request-trap" aria-hidden="true">
+                    <label>Website <input type="text" name="website" id="buyerWebsite" tabindex="-1" autocomplete="off"></label>
+                </div>
+
+                <label class="bayer-request-consent">
+                    <input type="checkbox" id="buyerConsent">
+                    <span>I agree to the processing of my contact details to reply to this request — <a href="/en/privacy-policy">how we handle your data.</a></span>
+                </label>
+                <span class="field-error" id="buyerConsentError" aria-live="polite"></span>
+
+                <button type="submit" class="btn" id="buyerSubmit">Send request</button>
+
+                <p class="bayer-request-status" id="buyerStatus" role="status" aria-live="polite" hidden=""></p>
+
+            </form>
+
+            <div class="bayer-request-done" id="buyerDone" hidden="" tabindex="-1">
+                <div class="bayer-request-done-icon" aria-hidden="true">✓</div>
+                <h3>Request received</h3>
+                <p>We'll calculate the cost and reply within one business day (Mon–Sun 09:00–20:00, Kyiv time).</p>
+                <button type="button" class="btn btn-outline" id="buyerAgain">Send another one</button>
             </div>
 
         </div>
@@ -802,6 +896,8 @@
 <script src="assets/js/sync.js?v=48ef002e" defer=""></script>
 <script src="assets/js/mega-menu.js?v=ff0d32d0" defer=""></script>
 <script src="assets/js/ui.js?v=fa1e1236" defer=""></script>
+<!-- Заявка на байєр-сервіс (#bayerContact) -->
+<script src="assets/js/buyer-request.js?v=eb72be72" defer=""></script>
 
 <script>
 
